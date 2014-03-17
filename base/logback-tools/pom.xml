@@ -2,27 +2,22 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.sos.sos-products.jobscheduler</groupId>
+        <groupId>com.sos-berlin.products.jobscheduler</groupId>
         <artifactId>base</artifactId>
         <version>1.6.4064</version>
     </parent>
 
     <artifactId>logback-tools</artifactId>
     <packaging>jar</packaging>
-    <name>${artifactId}</name>
+    <name>${project.artifactId}</name>
     <description>Tools to integrate logback in JobScheduler</description>
-
-    <properties>
-        <engine.version>1.5.3346</engine.version>
-        <setup.do.not.deploy>false</setup.do.not.deploy>
-    </properties>
 
     <dependencies>
 
         <dependency>
             <groupId>com.sos.scheduler.engine</groupId>
-            <artifactId>kernel</artifactId>
-            <version>1.3.12.2193</version>
+            <artifactId>jar</artifactId>
+            <version>${sos.engine.version}</version>
         </dependency>
 
         <dependency>

@@ -8,7 +8,7 @@
         <version>1.6.4064</version>
     </parent>
 
-    <groupId>com.sos.sos-products</groupId>
+    <groupId>com.sos-berlin.products</groupId>
     <artifactId>jobscheduler</artifactId>
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>

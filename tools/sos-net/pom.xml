@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.sos.sos-products.jobscheduler</groupId>
+        <groupId>com.sos-berlin.products.jobscheduler</groupId>
         <artifactId>tools</artifactId>
         <version>1.6.4064</version>
     </parent>
 
-    <groupId>com.sos.sos-products.jobscheduler.tools</groupId>
+    <groupId>com.sos-berlin.products.jobscheduler.tools</groupId>
     <artifactId>sos-net</artifactId>
     <name>${project.artifactId}</name>
 
