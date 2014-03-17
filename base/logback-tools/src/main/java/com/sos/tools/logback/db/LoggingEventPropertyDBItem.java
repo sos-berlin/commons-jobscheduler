@@ -29,11 +29,12 @@ package com.sos.tools.logback.db;
  */
 
 import com.sos.hibernate.classes.DbItem;
-import org.apache.log4j.Logger;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 
@@ -41,7 +42,7 @@ import javax.persistence.*;
 @Table(name="LOGGING_EVENT_PROPERTY")
 public class LoggingEventPropertyDBItem extends DbItem {
 
-	private static Logger logger = Logger.getLogger(LoggingEventPropertyDBItem.class);
+	private static Logger logger = LoggerFactory.getLogger(LoggingEventPropertyDBItem.class);
 	
 	 private LoggingEventDBItem loggingEventDBItem = null;
      private Long eventId;
