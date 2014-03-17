@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.sos.sos-products</groupId>
+		    <artifactId>jobscheduler</artifactId>
+        <version>1.6.4064</version>
+    </parent>
+
+    <groupId>com.sos.sos-products.jobscheduler</groupId>
+    <artifactId>tools</artifactId>
+    <packaging>pom</packaging>
+    <name>${project.artifactId}</name>
+    <inceptionYear>2014</inceptionYear>
+
+    <modules>
+        <module>sos-configuration</module>
+        <module>sos-settings</module>
+        <module>sos-util</module>
+        <module>sos-xml</module>
+        <module>sos-connection</module>
+        <module>sos-data-exchange</module>
+        <module>sos-graphviz-adapter</module>
+        <module>sos-h2-connection</module>
+        <module>sos-ldap</module>
+        <module>sos-mail</module>
+        <module>sos-marshalling</module>
+        <module>sos-net</module>
+        <module>sos-scheduler</module>
+        <module>sos-textprocessor</module>
+        <module>sos-virtual-file-system</module>
+    </modules>
+
+</project>

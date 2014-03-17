@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.sos.sos-products.jobscheduler</groupId>
+        <artifactId>tools</artifactId>
+        <version>1.6.4064</version>
+    </parent>
+
+    <artifactId>sos-graphviz-adapter</artifactId>
+    <packaging>jar</packaging>
+    <name>${project.artifactId}</name>
+    <inceptionYear>2013</inceptionYear>
+
+    <build>
+
+       <resources>
+         <resource>
+           <directory>target/generated-svg</directory>
+         </resource>
+       </resources>
+
+     <pluginManagement>
+        <plugins>
+
+		        <plugin>
+		            <groupId>org.eclipse.m2e</groupId>
+		            <artifactId>lifecycle-mapping</artifactId>
+		            <version>1.0.0</version>
+		            <configuration>
+		                <lifecycleMappingMetadata>
+		                    <pluginExecutions>
+		                        <pluginExecution>
+		                            <pluginExecutionFilter>
+		                                <groupId>org.apache.maven.plugins</groupId>
+		                                <artifactId>maven-antrun-plugin</artifactId>
+		                                <versionRange>[1.7,)</versionRange>
+		                                <goals>
+		                                    <goal>run</goal>
+		                                </goals>
+		                            </pluginExecutionFilter>
+		                            <action>
+		                                <ignore/>
+		                            </action>
+		                        </pluginExecution>
+		                    </pluginExecutions>
+		                </lifecycleMappingMetadata>
+		            </configuration>
+		        </plugin>
+        
+		        <!-- create folder generated-svg in target folder -->
+		        <plugin>
+		            <artifactId>maven-antrun-plugin</artifactId>
+		            <executions>
+		                <execution>
+		                    <id>generate-sources</id>
+		                    <phase>generate-sources</phase>
+		                    <configuration>
+		                        <tasks>
+		                            <mkdir dir="target/generated-svg" />
+		                        </tasks>
+		                    </configuration>
+		                    <goals>
+		                        <goal>run</goal>
+		                    </goals>
+		                </execution>
+		            </executions>
+		        </plugin>
+        </plugins>
+      </pluginManagement>
+
+    </build>
+	
+    <dependencies>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+        </dependency>
+
+    </dependencies>
+
+</project>
