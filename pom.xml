@@ -6,6 +6,7 @@
         <groupId>com.sos</groupId>
 		    <artifactId>sos-products</artifactId>
         <version>1.6.4064</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>com.sos-berlin.products</groupId>

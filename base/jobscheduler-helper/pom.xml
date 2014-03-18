@@ -7,6 +7,7 @@
         <groupId>com.sos-berlin.products.jobscheduler</groupId>
         <artifactId>base</artifactId>
         <version>1.6.4064</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>com.sos-berlin.products.jobscheduler.base</groupId>
