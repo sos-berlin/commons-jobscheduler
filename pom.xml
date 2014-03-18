@@ -3,8 +3,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.sos</groupId>
-		    <artifactId>sos-products</artifactId>
+        <groupId>com.sos-berlin</groupId>
+		    <artifactId>products</artifactId>
         <version>1.6.4064</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
