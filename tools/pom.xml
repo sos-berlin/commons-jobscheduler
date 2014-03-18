@@ -15,21 +15,21 @@
     <inceptionYear>2014</inceptionYear>
 
     <modules>
-        <module>sos-configuration</module>
-        <module>sos-settings</module>
-        <module>sos-util</module>
-        <module>sos-xml</module>
-        <module>sos-connection</module>
-        <module>sos-data-exchange</module>
-        <module>sos-graphviz-adapter</module>
-        <module>sos-h2-connection</module>
-        <module>sos-ldap</module>
-        <module>sos-mail</module>
-        <module>sos-marshalling</module>
-        <module>sos-net</module>
+        <module>configuration</module>
+        <module>settings</module>
+        <module>util</module>
+        <module>xml</module>
+        <module>connection</module>
+        <module>data-exchange</module>
+        <module>graphviz-adapter</module>
+        <module>h2-connection</module>
+        <module>ldap</module>
+        <module>mail</module>
+        <module>marshalling</module>
+        <module>net</module>
         <module>sos-scheduler</module>
-        <module>sos-textprocessor</module>
-        <module>sos-virtual-file-system</module>
+        <module>textprocessor</module>
+        <module>virtual-file-system</module>
     </modules>
 
 </project>
