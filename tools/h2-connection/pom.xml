@@ -8,9 +8,9 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>sos-h2-connection</artifactId>
+    <artifactId>h2-connection</artifactId>
     <packaging>jar</packaging>
-    <name>${artifactId}</name>
+    <name>${project.artifactId}</name>
 
     <properties>
         <setup.do.not.deploy>false</setup.do.not.deploy>
