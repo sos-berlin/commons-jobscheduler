@@ -11,7 +11,7 @@
     </parent>
 
     <groupId>com.sos-berlin.products.jobscheduler.tools</groupId>
-    <artifactId>sos-textprocessor</artifactId>
+    <artifactId>textprocessor</artifactId>
     <name>${project.artifactId}</name>
 
     <dependencies>

@@ -9,7 +9,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>sos-graphviz-adapter</artifactId>
+    <artifactId>graphviz-adapter</artifactId>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
     <inceptionYear>2013</inceptionYear>

@@ -11,7 +11,7 @@
     </parent>
 
     <groupId>com.sos-berlin.products.jobscheduler.tools</groupId>
-    <artifactId>sos-data-exchange</artifactId>
+    <artifactId>data-exchange</artifactId>
     <name>${project.artifactId}</name>
 
     <dependencies>
