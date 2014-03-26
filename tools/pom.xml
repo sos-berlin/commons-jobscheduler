@@ -16,6 +16,7 @@
     <inceptionYear>2014</inceptionYear>
 
     <modules>
+        <module>jobscheduler-web-services</module>
         <module>configuration</module>
         <module>settings</module>
         <module>util</module>
