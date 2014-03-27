@@ -14,7 +14,7 @@
     </parent>
     
     <properties>
-    	<engine.version>1.7-SNAPSHOT</engine.version>
+    	<engine.version>1.6.4035</engine.version>
     </properties>
 
     <artifactId>jobscheduler-web-services</artifactId>
