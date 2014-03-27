@@ -49,6 +49,18 @@ public class MyWebservice {
 
     }
 
+    @GET
+    @Path("/startjob")
+    @Produces( {MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public String isAuthenticated(@QueryParam("job") String job) {
+
+         
+      
+        xmlCommandExecutor.executeXml(String.format("<start_job job=\"%s\"/>",job));
+        return String.format("job %s gestartet",job);
+
+    }
+
      
 
 }
