@@ -12,6 +12,7 @@
 		<!-- Bewirkt die Kopie in lib_release_unversioned_jar und lib_release_jar -->
     <properties>
         <setup.do.not.deploy>false</setup.do.not.deploy>
+        <setup.target.name>com.sos.tools.graphviz-adapter</setup.target.name>
     </properties>
 
     <artifactId>graphviz-adapter</artifactId>

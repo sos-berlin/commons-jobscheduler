@@ -14,6 +14,7 @@
 
     <properties>
         <setup.do.not.deploy>false</setup.do.not.deploy>
+        <setup.target.name>com.sos.tools.h2-connection</setup.target.name>
     </properties>
 
     <build>
