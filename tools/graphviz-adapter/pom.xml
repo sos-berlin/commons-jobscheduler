@@ -8,6 +8,11 @@
         <version>1.7.0-SNAPSHOT</version>
         <!-- relativePath>../pom.xml</relativePath -->
     </parent>
+    
+		<!-- Bewirkt die Kopie in lib_release_unversioned_jar und lib_release_jar -->
+    <properties>
+        <setup.do.not.deploy>false</setup.do.not.deploy>
+    </properties>
 
     <artifactId>graphviz-adapter</artifactId>
     <packaging>jar</packaging>
