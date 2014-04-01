@@ -6,7 +6,6 @@
         <groupId>com.sos-berlin</groupId>
 		    <artifactId>products</artifactId>
         <version>1.7.0-SNAPSHOT</version>
-        <!-- relativePath>../pom.xml</relativePath -->
     </parent>
 
     <groupId>com.sos-berlin.products</groupId>
@@ -26,7 +25,6 @@
         <module>base</module>
         <module>tools</module>
         <!--
-        <module>base</module>
         <module>gui</module>
         <module>scheduler</module>
         -->
