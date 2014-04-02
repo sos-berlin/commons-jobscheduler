@@ -17,8 +17,8 @@
     <modules>
         <module>jobscheduler-helper</module>
         <module>logback-tools</module>
-        <!--
         <module>hibernate-tools</module>
+        <!--
         <module>jobscheduler-object-model</module>
         -->
     </modules>
