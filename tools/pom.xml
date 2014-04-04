@@ -21,13 +21,13 @@
         <module>util</module>
         <module>xml</module>
         <module>connection</module>
-        <module>data-exchange</module>
+        <!-- module>data-exchange</module -->
         <module>graphviz-adapter</module>
         <module>h2-connection</module>
         <module>ldap</module>
         <module>mail</module>
         <module>marshalling</module>
-        <module>net</module>
+        <!-- module>net</module -->
         <module>sos-scheduler</module>
         <module>textprocessor</module>
         <module>virtual-file-system</module>
