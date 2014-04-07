@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.sos-berlin.products.jobscheduler</groupId>
         <artifactId>base</artifactId>
-        <version>1.7.0-SNAPSHOT</version>
+        <version>1.7.0</version>
     </parent>
     
 		<!-- Bewirkt die Kopie in lib_release_unversioned_jar und lib_release_jar -->
