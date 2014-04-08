@@ -22,11 +22,32 @@
 
 
     <modules>
-        <module>base</module>
-        <module>tools</module>
+        <module>jobscheduler-helper</module>
+        <module>logback-tools</module>
+        <module>hibernate-tools</module>
         <!--
-        <module>gui</module>
-        <module>scheduler</module>
+        <module>jobscheduler-object-model</module>
+        -->
+        <module>jobscheduler-web-services</module>
+        <module>configuration</module>
+        <module>settings</module>
+        <module>util</module>
+        <module>xml</module>
+        <module>connection</module>
+        <module>data-exchange</module>
+        <module>graphviz-adapter</module>
+        <module>h2-connection</module>
+        <module>marshalling</module>
+        <module>net</module>
+        <module>sos-scheduler</module>
+        <module>textprocessor</module>
+        <module>virtual-file-system</module>
+        <!--
+        <module>daily-schedule</module>
+        <module>events</module>
+        <module>ftp-history</module>
+        <module>jobscheduler-history</module>
+        <module>eventing-frontend</module>
         -->
     </modules>
 
