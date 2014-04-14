@@ -38,7 +38,7 @@
         <module>jobscheduler-web-services</module>
         <module>logback-tools</module>
         <module>marshalling</module>
-        <module>net</module>
+        <!-- <module>net</module> commented because of build problems to solve later [SP]-->
         <module>settings</module>
         <!-- module>sos-dialog</module -->
         <module>sos-scheduler</module>
