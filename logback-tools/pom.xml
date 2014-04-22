@@ -48,13 +48,13 @@
         </dependency>
 
         <dependency>
-            <groupId>com.sos-berlin.products.jobscheduler</groupId>
+            <groupId>com.sos-berlin.products</groupId>
             <artifactId>hibernate-tools</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.sos-berlin.products.jobscheduler</groupId>
+            <groupId>com.sos-berlin.products</groupId>
             <artifactId>jobscheduler-helper</artifactId>
             <version>${project.version}</version>
         </dependency>
