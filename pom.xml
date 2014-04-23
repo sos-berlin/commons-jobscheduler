@@ -46,6 +46,7 @@
         <module>util</module>
         <!-- module>virtual-file-system</module -->
         <module>xml</module>
+        <module>sos-security</module>
     </modules>
 
 </project>
