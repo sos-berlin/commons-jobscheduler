@@ -1,0 +1,7 @@
+http://localhost:40040/jobscheduler/rest/sosPermission/permission?user=SOS01&pwd=sos01&permission=jobscheduler:jid:joctab:show
+
+http://localhost:40040/jobscheduler/rest/sosPermission/permission?user=SOS01&pwd=sos01&permission=jobscheduler:jid:joctab:show
+
+http://localhost:40040/jobscheduler/rest/sosPermission/permissions?user=SOS01&pwd=sos01
+
+http://localhost:40040/jobscheduler/rest/sosPermission/authenticate?user=SOS01&pwd=sos01
