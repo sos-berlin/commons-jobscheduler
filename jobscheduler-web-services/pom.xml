@@ -26,6 +26,13 @@
     </build>
 
     <dependencies>
+    
+        <dependency>
+        <groupId>com.sos-berlin.products</groupId>
+        <artifactId>sos-security</artifactId>
+        <version>${project.version}</version>
+        </dependency>
+        
         <dependency>
             <groupId>com.sos.scheduler.engine</groupId>
             <artifactId>kernel</artifactId>
