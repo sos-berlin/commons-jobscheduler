@@ -29,18 +29,28 @@ public class SOSSecurityWebservice {
      
     
 
+
     @Inject
     private SOSSecurityWebservice   (SchedulerXmlCommandExecutor xmlCommandExecutor_)   {
         xmlCommandExecutor = xmlCommandExecutor_;
      }
     
+    public SOSSecurityWebservice()   {
+        //For Junit Tests only
+        xmlCommandExecutor = null;
+     }
+    
+    public void executeXml(String cmd) {
+        if (xmlCommandExecutor != null) {
+            xmlCommandExecutor.executeXml(cmd);
+        }
+    }
+
     @GET
     @Path("/test2")
     @Produces( {MediaType.TEXT_PLAIN})
-    public String isAuthenticated() {
-
-      
-
+    public String test2() {
+ 
         return "hello world";
 
     }
@@ -48,18 +58,23 @@ public class SOSSecurityWebservice {
     @GET
     @Path("/test")
     @Produces( {MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public MyWebserviceAnswer isAuthenticated(@QueryParam("name") String name, @QueryParam("email") String email) {
+    public MyWebserviceAnswer test(@QueryParam("name") String name, @QueryParam("email") String email) {
 
          
         MyWebserviceAnswer m = new MyWebserviceAnswer("Uwe Risse");
         m.setTelephone("03086479034");
         m.setName(name);
         m.setEmail(email);
-       // xmlCommandExecutor.executeXml("<start_job job=\"test\"/>");
         return m;
 
     }
 
+    private SOSSecurityWebserviceAnswer createAnswer(String message) {
+        
+        SOSSecurityWebserviceAnswer m = new SOSSecurityWebserviceAnswer(user,resource,message);
+        return m;
+    }
+    
     private String checkAuthentication(String permission, String s1,String item ) throws MalformedURLException {
         if (getSOSShiroCurrentUserAnswer == null) {
             return "Please login";
@@ -70,8 +85,13 @@ public class SOSSecurityWebservice {
         }
          
         permission = permission + ":" + item;
+        permission = permission.replace("/",":");
         if (!isPermitted(permission)) {
-            return String.format("User %s is not permitted to %s for %s. Missing permission: %s", user, s1,item,permission);
+            if (getSOSShiroCurrentUserAnswer == null) {
+                return String.format("Could not reach resource %s for permission %s", resource, permission);
+            }else {
+                return String.format("User %s is not permitted to %s for %s. Missing permission: %s", user, s1,item,permission);
+            }
         }
          
        return "";
@@ -81,14 +101,14 @@ public class SOSSecurityWebservice {
     @GET
     @Path("/startjob")
     @Produces( {MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public String startJob(@QueryParam("job") String job) throws MalformedURLException {
+    public SOSSecurityWebserviceAnswer startJob(@QueryParam("job") String job) throws MalformedURLException {
 
         String s = checkAuthentication(PERMISSION_START_JOB,PERMISSION_START_JOB_PROMPT,job);
         if (s.equals("")) {
-            xmlCommandExecutor.executeXml(String.format("<start_job job=\"%s\"/>",job));
-            return String.format("job %s gestartet",job);
+            executeXml(String.format("<start_job job=\"%s\"/>",job));
+            return createAnswer(String.format("job %s gestartet",job));
         }else {
-            return s;
+            return createAnswer(s);
         }
 
     }
@@ -97,21 +117,21 @@ public class SOSSecurityWebservice {
     @GET
     @Path("/startorder")
     @Produces( {MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public String startOrder(@QueryParam("job_chain") String jobChain, @QueryParam("order_id") String orderId) throws MalformedURLException {
+    public SOSSecurityWebserviceAnswer startOrder(@QueryParam("job_chain") String jobChain, @QueryParam("order_id") String orderId) throws MalformedURLException {
         String order = String.format("%s(%s)",jobChain,orderId);
         String s = checkAuthentication(PERMISSION_START_ORDER,PERMISSION_START_ORDER_PROMPT,order);
         if (s.equals("")) {
-            xmlCommandExecutor.executeXml(String.format("<add_order job_chain=\"%s\" id=\"%s\"/>",jobChain,orderId));
-            return String.format("job chain %s gestartet with order %s",jobChain, orderId);
+            executeXml(String.format("<add_order job_chain=\"%s\" id=\"%s\"/>",jobChain,orderId));
+            return createAnswer(String.format("job chain %s gestartet with order %s",jobChain, orderId));
         }else {
-            return s;
+            return createAnswer(s);
         }
     }
      
     @GET
     @Path("/login")
     @Produces( {MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public String login(@QueryParam("user") String user_,@QueryParam("password") String password_,@QueryParam("resource") String resource_)   {
+    public SOSSecurityWebserviceAnswer login(@QueryParam("user") String user_,@QueryParam("password") String password_,@QueryParam("resource") String resource_)   {
         
         user = user_;
         password = password_;
@@ -125,27 +145,28 @@ public class SOSSecurityWebservice {
         }
         catch (MalformedURLException e) {
             e.printStackTrace();
-            return sAuthenticated;
+            return createAnswer(sAuthenticated);
         }
         if (authenticated) {
             sAuthenticated = String.format("%s --> authenticated", sAuthenticated); 
         }else {
             sAuthenticated = String.format("%s --> Not authenticated", sAuthenticated); 
         }
-        return  sAuthenticated;
+        return  createAnswer(sAuthenticated);
 
     }
 
     @GET
     @Path("/logout")
     @Produces( {MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void login() {
+    public SOSSecurityWebserviceAnswer logout() {
         
+        SOSSecurityWebserviceAnswer message =  createAnswer(String.format("%s --> Abgemeldet", user)); 
         user = null;
         password = null;
         resource = null;
         getSOSShiroCurrentUserAnswer = null;
-
+        return message; 
     }
  
     private boolean authenticate() throws MalformedURLException {
