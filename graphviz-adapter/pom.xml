@@ -14,6 +14,7 @@
         <setup.target.name>com.sos.tools.graphviz-adapter</setup.target.name>
     </properties>
 
+    <groupId>com.sos-berlin.products.jobscheduler</groupId>
     <artifactId>graphviz-adapter</artifactId>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>

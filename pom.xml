@@ -24,29 +24,27 @@
     <modules>
         <module>configuration</module>
         <module>connection</module>
-        <!-- module>daily-schedule</module -->
         <module>data-exchange</module>
-        <!-- module>eventing-frontend</module -->
-        <!-- module>events</module -->
-        <!-- module>ftp-history</module -->
+        <module>ftp-history</module>
         <module>graphviz-adapter</module>
         <module>h2-connection</module>
-        <module>hibernate-tools</module>
+        <module>hibernate-commons</module>
         <module>jobscheduler-helper</module>
-        <!-- module>jobscheduler-history</module -->
-        <!-- module>jobscheduler-object-model</module -->
+        <module>jobscheduler-object-model</module>
         <module>jobscheduler-web-services</module>
         <module>logback-tools</module>
         <module>marshalling</module>
-        <!-- <module>net</module> commented because of build problems to solve later [SP]-->
+        <module>sos-net</module>
         <module>settings</module>
-        <!-- module>sos-dialog</module -->
+        <module>sos-dialog</module>
         <module>sos-scheduler</module>
         <module>textprocessor</module>
         <module>util</module>
         <!-- module>virtual-file-system</module -->
         <module>xml</module>
         <module>sos-security</module>
+        <!-- module>sos-mail</module -->
+        <!-- module>sos-ssh</module -->
     </modules>
 
 </project>

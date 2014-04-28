@@ -17,6 +17,7 @@
     	<engine.version>1.6.4035</engine.version>
     </properties>
 
+    <groupId>com.sos-berlin.products.jobscheduler</groupId>
     <artifactId>jobscheduler-web-services</artifactId>
     <name>${project.artifactId}</name>
     <inceptionYear>2014</inceptionYear>
@@ -28,7 +29,7 @@
     <dependencies>
     
         <dependency>
-        <groupId>com.sos-berlin.products</groupId>
+        <groupId>com.sos-berlin.products.jobscheduler</groupId>
         <artifactId>sos-security</artifactId>
         <version>${project.version}</version>
         </dependency>
