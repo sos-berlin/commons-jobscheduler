@@ -40,11 +40,11 @@
         <module>sos-scheduler</module>
         <module>textprocessor</module>
         <module>util</module>
-        <!-- module>virtual-file-system</module -->
+        <module>virtual-file-system</module>
         <module>xml</module>
         <module>sos-security</module>
-        <!-- module>sos-mail</module -->
-        <!-- module>sos-ssh</module -->
+        <module>sos-mail</module>
+        <module>sos-ssh</module>
     </modules>
 
 </project>
