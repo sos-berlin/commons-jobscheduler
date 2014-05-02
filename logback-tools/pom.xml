@@ -28,6 +28,18 @@
         </dependency>
 
         <dependency>
+            <groupId>com.sos-berlin.products.jobscheduler</groupId>
+            <artifactId>hibernate-commons</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sos-berlin.products.jobscheduler</groupId>
+            <artifactId>jobscheduler-helper</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
         </dependency>
@@ -46,18 +58,6 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sos-berlin.products.jobscheduler</groupId>
-            <artifactId>hibernate-commons</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sos-berlin.products.jobscheduler</groupId>
-            <artifactId>jobscheduler-helper</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <!-- hibernate libraries -->
