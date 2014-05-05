@@ -22,11 +22,8 @@
 
 
     <modules>
-        <module>configuration</module>
-        <module>connection</module>
         <module>data-exchange</module>
         <module>ftp-history</module>
-        <module>graphviz-adapter</module>
         <module>h2-connection</module>
         <module>hibernate-commons</module>
         <module>jobscheduler-helper</module>
@@ -35,13 +32,10 @@
         <module>logback-tools</module>
         <module>marshalling</module>
         <module>sos-net</module>
-        <module>settings</module>
         <module>sos-dialog</module>
         <module>sos-scheduler</module>
         <module>textprocessor</module>
-        <module>util</module>
         <module>virtual-file-system</module>
-        <module>xml</module>
         <module>sos-security</module>
         <module>sos-mail</module>
         <module>sos-ssh</module>
