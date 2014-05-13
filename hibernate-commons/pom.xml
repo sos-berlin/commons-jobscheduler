@@ -13,78 +13,11 @@
     <artifactId>hibernate-commons</artifactId>
     <name>${project.artifactId}</name>
 
-    <build>
-
-        <sourceDirectory>src</sourceDirectory>
-
-        <plugins>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>add-source</id>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>src</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>add-resource</id>
-                        <goals>
-                            <goal>add-resource</goal>
-                        </goals>
-                        <configuration>
-                            <resources>
-                                <resource>
-                                    <directory>src</directory>
-                                    <targetPath>.</targetPath>
-                                    <includes>
-                                        <include>**/*.properties</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>add-test-source</id>
-                        <goals>
-                            <goal>add-test-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>junit</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>add-test-resource</id>
-                        <goals>
-                            <goal>add-test-resource</goal>
-                        </goals>
-                        <configuration>
-                            <resources>
-                                <resource>
-                                    <directory>junit</directory>
-                                    <targetPath>.</targetPath>
-                                    <includes>
-                                        <include>**/*.properties</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-        </plugins>
-
-    </build>
+    <!-- Bewirkt die Kopie in lib_release_unversioned_jar und lib_release_jar -->
+    <properties>
+        <setup.do.not.deploy>false</setup.do.not.deploy>
+        <setup.target.name>com.sos.hibernate</setup.target.name>
+    </properties>
 
     <dependencies>
     
