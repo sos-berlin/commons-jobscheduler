@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns:xi="http://www.w3.org/2001/XInclude"
+       xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="ftp_overwrite_files"
+       default_value="true"
+       required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Der Parameter bestimmt, ob ggf. vorhandene Dateien am FTP server überschrieben werden sollen.</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">This parameter specifies whether existing files on the remote host should be overwritten.</div>
+        </note>
+      </param>

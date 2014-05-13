@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="max_file_size"
+       Category="FileSystem"
+       DataType="SOSOptionFileSize"
+       OptionName="FileSizeMaximum"
+       Alias="FileSizeMaximum"
+       default_value="-1"
+       required="false">
+				<note language="de">
+					<title>Maximale Größe einer Datei</title>
+					<div xmlns="http://www.w3.org/1999/xhtml">
+						Vereinbart die maximale Größe einer oder mehrerer Dateien in
+						Bytes:
+						überschreitet die Größe einer der Dateien diesen Wert,
+						dann
+						gilt sie als nicht vorhanden.
+						<br/>
+						   <br/>
+						Mögliche Werte sind:
+						<br/>
+						-1 (parameter wird ignoriert)
+						<br/>
+						Zahl (Byte), z.B. 40
+						<br/>
+						ZahlKB, z.B. 5KB (Groß/Kleinschreibung wird ignoriert)
+						<br/>
+						ZahlMB, z.B. 20MB (Groß/Kleinschreibung wird ignoriert)
+						<br/>
+						ZahlGB, z.B. 10GB (Groß/Kleinschreibung wird ignoriert)
+					</div>
+				</note>
+				<note language="en">
+					<title>maximum size of a file</title>
+					<div xmlns="http://www.w3.org/1999/xhtml">
+						Specifies the maximum size of a file in bytes:
+						should the size of one of the files exceed this value,
+						then it is
+						classified as non-existing.
+					</div>
+				</note>
+    <xi:include href="../notes/FileSizeValues.xml" xmlns:xi="http://www.w3.org/2001/XInclude"
+        parse="xml" />
+			</param>

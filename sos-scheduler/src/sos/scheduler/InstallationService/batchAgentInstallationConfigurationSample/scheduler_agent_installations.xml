@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<installations>
+    <globals>
+        <schedulerId>scheduler_agent_${host}_${scheduler_port}</schedulerId>
+        <licence>SOS-DEMO-1-L2O-4-7-22-KL22SL7</licence>
+        <licenceOptions>GPL</licenceOptions>
+        <schedulerPort>4445</schedulerPort>
+        <schedulerAllowedHost>yourHostname</schedulerAllowedHost>
+        <installPath>/opt/sos-berlin.com/jobscheduler</installPath>
+        <UserPathPanelElement>/home/schedulerUser/sos-berlin.com/jobscheduler</UserPathPanelElement>
+        <ftp>
+            <localDir>config\live\sos\batchAgentInstallation</localDir>
+            <remoteDir>/home/schedulerUser/tmp</remoteDir>
+            <port>21</port>
+        </ftp>
+        <ssh>
+            <authMethod>password</authMethod>
+            <port>22</port>
+            <command>echo ${sudo_password} | sudo -S java -jar  ${ftp_remote_dir}/scheduler_linux32_agent.jar  ${ftp_remote_dir}/${installation_file}</command>
+        </ssh>
+    </globals>
+    <installation>
+        <schedulerPort>0</schedulerPort>
+        <host>wilma</host>
+        <ftp>
+            <user>schedulerUser</user>
+            <password>passwordForschedulerUser</password>
+            <port>0</port>
+        </ftp>
+        <ssh>
+            <user>schedulerUser</user>
+            <password>passwordForschedulerUser</password>
+            <sudoPassword>yourSudoPassword</sudoPassword>
+            <port>0</port>
+        </ssh>
+    </installation>
+</installations>

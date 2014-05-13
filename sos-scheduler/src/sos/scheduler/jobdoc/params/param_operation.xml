@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="operation"
+       required="true"
+       DefaultValue="send"
+       DataType="SOSOptionStringValueList">
+        <values>
+        	<value>send</value>
+        	<value>receive</value>
+        	<value alias="delete">remove</value>
+        	<value>execute</value>
+        	<value>install</value>
+        	<value state="experimental">move</value>
+        	<value state="experimental">copy</value>
+        </values>
+        <note language="de">
+          <title>Die auszuführende Operation</title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <em>send</em>, <em>receive</em>, <em>remove</em>, <em>execute</em> oder <em>install</em>.
+            <br/>
+         <br/>
+            <ul>
+              <li>send - Dateien mit FTP/SFTP versenden</li>
+              <li>receive - Dateien mit FTP/SFTP empfangen</li>
+              <li>remove - Dateien mit FTP/SFTP auf einem anderen Server-System entfernen</li>
+              <li>execute - Kommando per SSH auf einem anderen Server-System ausführen</li>
+              <li>install - SOSFTP-Client auf einem anderen Server-System installieren</li>
+             </ul>
+          </div>
+        </note>
+        <note language="en">
+          <title>Operation to be executed</title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <em>send</em>, <em>receive</em>, <em>remove</em>, <em>execute</em> or <em>install</em>.
+            <br/>
+         <br/>
+            <ul>
+              <li>send - transfer files by FTP/SFTP to a remote server</li>
+              <li>receive - transfer files by FTP/SFTP from a remote server</li>
+              <li>remove - remove files by FTP/SFTP on a remote server</li>
+              <li>execute - execute a command by SSH on a remote server</li>
+              <li>install - install SOSFTP on a remote server</li>
+             </ul>
+          </div>
+        </note>
+      </param>

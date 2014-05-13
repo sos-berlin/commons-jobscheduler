@@ -1,0 +1,309 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="scheduler_job_documentation_v1.1.xsl"?>
+<description xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+
+  <job name  = "JobSchedulerMySQLMaintenanceMonitor"
+       title = "Maintain MySQL tables and indexes"
+       order = "no"
+       tasks = "1">
+    <script language   = "java"
+            java_class = "sos.scheduler.mysql.JobSchedulerMaintenanceMonitor"
+            resource   = "1"/>
+  </job>
+
+  <releases>
+    <release id="1.0" created="2005-09-20" modified="2005-09-20">
+      <title>Version 1.0</title>
+      <author name="Andreas Püschel" email="andreas.pueschel@sos-berlin.com"/>
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Initiale Auslieferung</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Initial Release</div></note>
+    </release>
+  </releases>
+
+  <resources>
+    <file os="all" type="java" file="sos.scheduler.jar" id="1">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Standard-Job der Auslieferung</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Standard job in distribution</div></note>
+    </file>
+    <file os="all" type="java" file="sos.spooler.jar" id="2">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Klasse Job_Impl</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Class Job_Impl</div></note>
+    </file>
+    <file os="all" type="java" file="sos.util.jar" id="3">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Klasse SOSLogger</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Class SOSLogger</div></note>
+    </file>
+    <file os="all" type="java" file="sos.connection.jar" id="4">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Klasse SOSMySQLConnection</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Class SOSMySQLConnection</div></note>
+    </file>
+    <file os="all" type="java" file="sos.settings.jar" id="5">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Klasse SOSProfileSettings</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Class SOSProfileSettings</div></note>
+    </file>
+    <file os="all" type="java" file="mysql*.jar" id="6">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">MySQL JDBC Treiber</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">MySQL JDBC Driver</div></note>
+    </file>
+
+    <database required="true">
+      <resource name="mysql database" type="other">
+        <note language="de">
+	      	<div xmlns="http://www.w3.org/1999/xhtml">
+  	        Der Job kann für MySQL-Datenbanken ab Version 4.0.13 verwendet werden.
+    	     </div>
+        </note>
+        <note language="en">
+	      	<div xmlns="http://www.w3.org/1999/xhtml">
+  	        This jobs can be used fpr MySQL databases starting with version 4.0.13.
+    	    </div>
+        </note>
+      </resource>
+    </database>
+  </resources>
+
+  <configuration>
+    <settings>
+      <profile name="default">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Die nachstehenden Parameter müssen nicht gesetzt werden, da für den Normalbetrieb ausreichende Voreinstellungen vorhanden sind.
+            <br/><br/>
+            Beispiel für Parameterangaben in der Konfigurationsdatei <code>factory.ini</code>:
+            <br/><br/>
+            <code>
+              [job mysql_maintenance_monitor]
+              <br/>
+              config &#160;&#160;&#160;&#160;&#160;&#160; = config/sos_settings.ini
+              <br/>
+              database &#160;&#160;&#160;&#160; = scheduler
+              <br/>
+              tables &#160;&#160;&#160;&#160;&#160;&#160; = SCHEDULER_HISTORY, SCHEDULER_ORDER_HISTORY:optimize, SCHEDULER_ORDERS:repair@quick
+              <br/>
+              operations &#160;&#160; = analyze, optimize, repair@quick
+            </code>
+          </div>
+        </note>
+
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            None of these parameters have to be set - the default settings are sufficient for normal operation.
+            <br/><br/>
+            Example for parameters in the configuration file <code>factory.ini</code>:
+            <br/><br/>
+            <code>
+              [job mysql_maintenance_monitor]
+              <br/>
+              config &#160;&#160;&#160;&#160;&#160;&#160; = config/sos_settings.ini
+              <br/>
+              database &#160;&#160;&#160;&#160; = scheduler
+              <br/>
+              tables &#160;&#160;&#160;&#160;&#160;&#160; = SCHEDULER_HISTORY, SCHEDULER_ORDER_HISTORY:optimize, SCHEDULER_ORDERS:repair@quick
+              <br/>
+              operations &#160;&#160; = analyze, optimize, repair@quick
+            </code>
+          </div>
+        </note>
+
+        <section name="Job Section">
+      		<setting name="config" default_value="" required="false">
+        		<note language="de">
+          		<div xmlns="http://www.w3.org/1999/xhtml">
+            		Der Parameter gibt optional den Pfad und Namen einer Konfigurationsdatei mit Zugangsdaten für die Datenbank an.
+            		Fehlt der Parameter, dann wird die Datenbankverbindung des JobSchedulers verwendet.
+            		<br/><br/>
+      	        Die Konfigurationsdatei hat folgenden beispielhaften Inhalt:
+          			<br/><br/>
+          			<code>
+			            class &#160;&#160;&#160;&#160; = SOSMySQLConnection
+      			      <br/>
+            			driver &#160;&#160;&#160; = com.mysql.jdbc.Driver
+			            <br/>
+      			      url &#160;&#160;&#160;&#160;&#160;&#160; = jdbc:mysql://localhost:3306/scheduler
+            			<br/>
+			            user &#160;&#160;&#160;&#160;&#160; = <em>scheduler</em>
+      			      <br/>
+            			password &#160; = <em>scheduler</em>
+			          </code>
+      				  <br/><br/>
+			      	  Die Bedeutung der Werte im einzelnen:
+			      	  <br/><br/>
+      				  <ul>
+      	    			<li>
+			      	      class: Name der Datenbankverbindungsklasse (aus <code>sos.connection.jar</code>) ist konstant SOSMySQLConnection
+      				    </li>
+      	    			<li>
+			      	      driver: Name der Datenbanktreiberklasse (aus <code>mysql*.jar</code>) ist abhängig vom gewählten Treiber
+      				    </li>
+      	    			<li>
+			      	      url: URL für den Verbindungsaufbau mit den Teilen jdbc:mysql://<em>host:port/database</em>
+      				    </li>
+      	    			<li>
+			      	      user: Kennung des Datenbankbenutzers
+      				    </li>
+      	    			<li>
+			      	      password: Kennwort des Datenbankbenutzers
+      				    </li>
+      	  			</ul>
+							</div>
+						</note>
+        		<note language="en">
+          		<div xmlns="http://www.w3.org/1999/xhtml">
+            		This parameter optionally specifies the path and name of a database access configuration file.
+            		The JobScheduler database connection is used should this parameter not have been specified.
+            		<br/><br/>
+            		The content of this configuration file should look like this:
+          			<br/><br/>
+          			<code>
+			            class &#160;&#160;&#160;&#160; = SOSMySQLConnection
+      			      <br/>
+            			driver &#160;&#160;&#160; = com.mysql.jdbc.Driver
+			            <br/>
+      			      url &#160;&#160;&#160;&#160;&#160;&#160; = jdbc:mysql://localhost:3306/scheduler
+            			<br/>
+			            user &#160;&#160;&#160;&#160;&#160; = <em>scheduler</em>
+      			      <br/>
+            			password &#160; = <em>scheduler</em>
+			          </code>
+      				  <br/><br/>
+			      	  The values used in this example have the following meaning:
+			      	  <br/><br/>
+      				  <ul>
+      	    			<li>
+			      	      class: name of a database connection class (from <code>sos.connection.jar</code>) is always SOSMySQLConnection
+      				    </li>
+      	    			<li>
+			      	      driver: name of database driver class (from <code>mysql*.jar</code>) depends on the database driver installed
+      				    </li>
+      	    			<li>
+			      	      url: URL for database connection with the parts jdbc:mysql://<em>host:port/database</em>
+      				    </li>
+      	    			<li>
+			      	      user: database user account
+      				    </li>
+      	    			<li>
+			      	      password: password of the database user account
+      				    </li>
+      	  			</ul>
+							</div>
+						</note>
+					</setting>
+      		<setting name="database" default_value="JobScheduler database" required="false">
+        		<note language="de">
+          		<div xmlns="http://www.w3.org/1999/xhtml">
+            		Der Parameter gibt den Namen der zu verwendenden Datenbank an.
+            		<br/><br/>
+            		Ohne diesen Parameter wird die Datenbank des JobSchedulers verwendet.
+							</div>
+						</note>
+        		<note language="en">
+          		<div xmlns="http://www.w3.org/1999/xhtml">
+            		This parameter specifies the name of the database to be used.
+            		<br/><br/>
+            	  If this parameter is omitted the JobScheduler database is used instead.
+							</div>
+						</note>
+					</setting>
+      		<setting name="tables" default_value="all tables" required="false">
+        		<note language="de">
+          		<div xmlns="http://www.w3.org/1999/xhtml">
+                Mit dem Parameter wird eine durch Komma getrennte Liste der zu wartenden Tabellen benannt.
+                Nach dem Tabellennamen können durch Doppelpunkt getrennt die auszuführenden Operationen
+                (analyze, optimize oder repair@quick) angegeben werden.
+                <br/><br/>
+                Fehlt der Parameter, dann werden alle Tabellen der Datenbank gewartet.
+							</div>
+						</note>
+        		<note language="en">
+          		<div xmlns="http://www.w3.org/1999/xhtml">
+          		  This parameter specifies a comma separated list of table names to be maintained.
+          		  Following the table name the operations (analyze, optimize or repair@quick) can be denoted, separated by colons.
+            		<br/><br/>
+								Without this parameter all tables in the database are maintained.
+							</div>
+						</note>
+					</setting>
+      		<setting name="operations" default_value="analyze, optimize, repair@quick" required="false">
+        		<note language="de">
+          		<div xmlns="http://www.w3.org/1999/xhtml">
+                Mit dem Parameter wird eine durch Komma getrennte Liste der Wartungsoperationen benannt.
+                Die Operationen gelten für alle Tabellen, für die nicht explizit andere Operationen angegeben wurden.
+                Die Operation beinhalten:
+          		  <br/><br/>
+                <ul>
+                  <li>
+                    analyze: <code>ANALYZE TABLE</code>
+                  </li>
+                  <li>
+                    optimize: <code>OPTIMIZE TABLE</code>
+                  </li>
+                  <li>
+                    repair: <code>REPAIR TABLE</code> ggf. mit der Option <code>QUICK</code>
+                  </li>
+                </ul>
+                <br/>
+                Fehlt der Parameter, dann werden die Operationen <em>analyze, optimize, repair@quick</em> ausgeführt.
+							</div>
+						</note>
+        		<note language="en">
+          		<div xmlns="http://www.w3.org/1999/xhtml">
+          		  This parameter specifies a comma separated list of operations that should be executed.
+          		  These operations apply to all tables for which no other options have been explicitly set.
+          		  The meaning of the operations is:
+          		  <br/><br/>
+                <ul>
+                  <li>
+                    analyze: <code>ANALYZE TABLE</code>
+                  </li>
+                  <li>
+                    optimize: <code>OPTIMIZE TABLE</code>
+                  </li>
+                  <li>
+                    repair: <code>REPAIR TABLE</code> resp. with the option <code>QUICK</code>
+                  </li>
+                </ul>
+            		<br/>
+								Without this parameter the operations <em>analyze, optimize, repair@quick</em> are executed.
+							</div>
+						</note>
+					</setting>
+      		<setting name="flush_tables" default_value="" required="false">
+        		<note language="de">
+          		<div xmlns="http://www.w3.org/1999/xhtml">
+                Mit dem Parameter wird optional vereinbart, dass die Operation <code>FLUSH TABLES</code>
+                nach Ausführung der anderen Operationen ausgeführt wird, um Änderungen von
+                Tabellen und Indizes in der Datenbank bekannt zu machen.
+							</div>
+						</note>
+        		<note language="en">
+          		<div xmlns="http://www.w3.org/1999/xhtml">
+          		  This parameter optionally specifies that the operation <code>FLUSH TABLES</code>
+          		  should be performed after having executed the other operations.
+          		  <code>FLUSH TABLES</code> publishes changes of tables and indexes in the database.
+							</div>
+						</note>
+					</setting>
+				</section>
+      </profile>
+    </settings>
+  </configuration>
+
+  <documentation language="de">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      Dieser Job erledigt Wartungsaufgaben für eine MySQL Datenbank. Er kann für alle oder
+      nur für bestimmte Tabellen einer Datenbank die Operationen ANALYZE TABLE, OPTIMIZE TABLE und REPAIR TABLE
+      (mit der Option QUICK) ausführen. Die Operationen sind wichtig für die Performance von InnoDB Tabellen,
+      können in dieser Form aber erst ab MySQL 4.0.13 verwendet werden.
+    </div>
+  </documentation>
+
+  <documentation language="en">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      This job takes care of maintenance tasks for a MySQL database. It performs the operations ANALYZE TABLE, OPTIMIZE TABLE
+      and REPAIR TABLE (with the QUICK option) for all or for selected tables.
+      These operations are important for the performance of InnoDB tables, but can only be used with
+      MySQL version 4.0.13 or newer.
+    </div>
+  </documentation>
+
+</description>

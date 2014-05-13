@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="jump_simulate_shell"
+       required="false"
+       DefaultValue="false"
+       DataType="SOSOptionBoolean">
+        <note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Wird der Wert <em>true</em> für diesen Parameter angegeben, dann wird ein Login
+            an der Shell simuliert, um die Befehle auszuführen. Manche Scripte haben
+            Probleme, wenn keine Shell vorhanden ist.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Should the value <em>true</em> be specified for this parameter, 
+            then a login to a shell is simulated to execute commands. Some scripts
+            may cause problems if no shell is present.
+          </div>
+        </note>
+      </param>

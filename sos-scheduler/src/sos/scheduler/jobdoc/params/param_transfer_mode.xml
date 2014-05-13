@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id$ -->
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="transfer_mode"
+       DefaultValue="binary"
+       required="false"
+       i18nkey="transfer_mode"
+       DataType="SOSOptionTransferMode">
+      <values> 
+      	<value value="binary">
+        <note language="en">
+        <title></title>
+        <p></p>
+        </note>
+        <note language="de">
+        <title></title>
+        <p></p>
+        </note>
+        </value>
+      	<value value="ascii">
+        <note language="en">
+        <title></title>
+        <p></p>
+        </note>
+        <note language="de">
+        <title></title>
+        <p></p>
+        </note>
+        </value>
+      </values>
+    <indexterm index="transfer_mode, parameter" display="false"></indexterm>
+    <indexterm index="parameter, transfer_mode" display="false"></indexterm>
+	  
+        <note language="de">
+              <title>Art der Zeichencodierung</title>
+        
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Transfer-Modus gilt für das FTP-Protokoll und kann die Werte
+            <code>ascii</code>
+            oder
+            <code>binary</code>
+            annehmen.
+          </div>
+        </note>
+        <note language="en">
+              <title>Type of Character-Encoding</title>
+        
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Transfer mode is used for FTP exclusively and can be either
+            <code>ascii</code>
+            or
+            <code>binary</code>.
+          </div>
+        </note>
+      </param>

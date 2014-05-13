@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="history_repeat"
+       DefaultValue="3"
+       required="false"
+       DataType="SOSOptionInteger">
+        <note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter wird verwendet, um das gleichzeitige Schreiben mehrerer
+            Instanzen dieses Programms in die Historiendatei zu synchronisieren.
+            <br/>
+         <br/>
+            Der Parameter bestimmt die maximale Anzahl der Wiederholungsintervall beim Schreiben
+            in die Historiendatei, falls die Datei von einer anderen Instanz dieses
+            Programms gesperrt ist.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            The parameter is used in order to synchronize parallel write access
+            to the history file by multiple instances of this program.
+            <br/>
+         <br/>
+            This parameter specifies the maximum number of repeat intervals when trying
+            to write to the history file if the history file is locked
+            due to parallel instances of this program.
+          </div>
+        </note>
+      </param>

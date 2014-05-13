@@ -1,0 +1,284 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="scheduler_job_documentation_v1.1.xsl"?>
+<description xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+
+  <job name  = "JobSchedulerSendMailJob"
+       title = "Send and dequeue mails from a directory, database or order queue"
+       order = "both">
+    <script language   = "java"
+            java_class = "sos.scheduler.job.JobSchedulerSendMailJob"
+            resource   = "1"/>
+  </job>
+
+  <releases>
+    <release id="1.0" created="2006-03-30" modified="2006-09-15">
+      <title>Version 1.0</title>
+      <author name="Andreas Püschel" email="andreas.pueschel@sos-berlin.com"/>
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Initiale Auslieferung</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Initial Release</div></note>
+    </release>
+  </releases>
+
+  <resources>
+    <file os="all" type="java" file="sos.scheduler.jar" id="1">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Standard-Job der Auslieferung</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Standard job in distribution</div></note>
+    </file>
+    <file os="all" type="java" file="sos.spooler.jar" id="2">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Klasse Job_Impl</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Class Job_Impl</div></note>
+    </file>
+    <file os="all" type="java" file="sos.util.jar" id="3">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Klasse SOSLogger</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Class SOSLogger</div></note>
+    </file>
+    <file os="all" type="java" file="sos.settings.jar" id="4">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Klasse SOSProfileSettings</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Class SOSProfileSettings</div></note>
+    </file>
+    <file os="all" type="java" file="sos.net.jar" id="5">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Klasse SOSMail</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Class SOSMail</div></note>
+    </file>
+
+    <database required="false">
+      <resource name="SETTINGS" type="table">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Falls Datenbankbetrieb konfiguriert ist, werden Einstellungen des Mail Servers werden aus der Tabelle gelesen,
+            siehe Parameter <em>db</em>.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            If database support is configured then the settings for the mail server are looked up in this table,
+            see parameter <em>db</em>.
+          </div>
+        </note>
+      </resource>
+      <resource name="MAILS" type="table">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Mails werden anhand ihres Status in dieser Tabelle gesucht,
+            versendet und der Versandstatus in der Tabelle aktualisiert.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Mails are looked up in this table by their status, are sent and their shipping state is updated in this table.
+          </div>
+        </note>
+      </resource>
+    </database>
+
+    <space min="1" unit="MB">
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+          Der Plattenplatz für die max. Anzahl zwischenzuspeichernder Mails muss nach Bedarf vorgehalten werden.
+        </div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+          The minimal disk space requirements depend on the number of mails to be stored in case of mail server failures.
+        </div>
+      </note>
+    </space>
+  </resources>
+
+  <configuration>
+    <params id="job_parameter">
+      <param name="smtp" default_value="Mail.smtp()" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter benennt den Namen oder die IP-Adresse des SMTP Hosts für den eMail-Versand.
+            Wird kein Wert angegeben, dann verwendet der Job den Hostnamen aus der Einstellungstabelle,
+            falls eine Datenbank verwendet wird oder aus der Einstellung <code>smtp</code> der
+            Konfigurationsdatei <code>factory.ini</code>.
+            <br/><br/>
+            Der Parameter sollte eingesetzt werden, wenn der automatische Mail-Versand durch den Hauptprozess
+            des JobSchedulers mit der Einstellung
+            <br/><br/>
+            smtp = -queue
+            <br/><br/>
+            abgestellt wird und Mails automatisch in einem Verzeichnis zwischengespeichert werden,
+            um sie mit diesem Job zu versenden.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the name or ip address for the SMTP host by which mails are sent.
+            Should no value be specified then this job will use the hostname from a settings table of
+            database if a database is used. Without use of a database the setting <code>smtp</code>
+            of the configuration file <code>factory.ini</code> applies.
+            <br/><br/>
+            This parameter should be used if mail processing in the main task of the JobScheduler
+            has been deactivated with the setting
+            <br/><br/>
+            smtp = -queue
+            <br/><br/>
+            and mails are automatically stored to a directory from which they are dequeued by this job.
+          </div>
+        </note>
+      </param>
+
+      <param name="queue_directory" default_value="Mail.dequeue()" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter enthält den Namen des Verzeichnisses, aus dem zwischengespeicherte Mails versendet werden.
+            Wird kein Wert angegeben, dann verwendet der Job dasjenige Verzeichnis, das für den JobScheduler
+            zum Zwischenspeichern konfiguriert wurde, wie es z.B. die API-Methode Mail.dequeue() liefert.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter contains the name of the directory in which mails have been stored.
+            If the value is left blank then the job will use the directory that was configured for the JobScheduler
+            for dequeueing and that is retured by the API method Mail.dequeue().
+          </div>
+        </note>
+      </param>
+
+      <param name="queue_prefix_spec" default_value="^(sos.*)(?&lt;!\\~)$" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter enthält einen regulären Ausdruck für die Spezifikation der Dateien,
+            die automatisch versendet werden sollen.
+            <br/><br/>
+            Der Parameter wird ignoriert, wenn der Job durch Aufträge gestartet wird.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter contains a regular expression to specify the files that should be dequeued.
+            <br/><br/>
+            The parameter is ignored if this job is triggered by orders.
+          </div>
+        </note>
+      </param>
+
+      <param name="queue_prefix" default_value="sos." required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Falls ein Mail nicht versendet werden kann, da der Mail Server nicht erreichbar ist,
+            wird es unter einem Dateinamen mit diesem Präfix zwischengespeichert.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            If an email cannot be sent due to mail server failures,
+            then it will be stored in a file with the given prefix.
+          </div>
+        </note>
+      </param>
+
+      <param name="db" default_value="false" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Vereinbart, dass eine Datenbank verwendet wird und Mails in einer Tabelle gesucht werden,
+            um deren Versandstatus zu aktualisieren.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This setting states that a database is used and mails are looked up in a table
+            to update their shipping state.
+          </div>
+        </note>
+      </param>
+
+      <param name="max_delivery" default_value="0" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Vereinbart eine max. Anzahl von Wiederholungsversuchen für das Versenden von Mails.
+            Beim Senden eines Mails wird automatisch ein X-Header mit dem Namen <code>X-SOSMail-delivery-counter</code>
+            und dem Wert der laufenden Nr. des Wiederholungsversuchs erzeugt.
+            <br/><br/>
+            Ist der Wert des Parameters 0, dann erfolgen beliebig viele Wiederholungsversuche,
+            andernfalls wird der Versand beim Erreichen des angegebenen Werts abgebrochen
+            und das Mail in einer Datei mit dem Präfix <code>failed.</code> im Verzeichnis abgelegt.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This setting states a max. number of trials to send an email.
+            If an email is sent then an X-Header named <code>X-SOSMail-delivery-counter</code>
+            with the value of the current number of trials is created.
+            <br/><br/>
+            If the value of this parameter is 0, then an infinite number of trials may occur.
+            For other values the shipment will be cancelled if this value is exceeded.
+            In this case the email will be stored in a file prefixed with <code>failed.</code> in the dequeue directory.
+          </div>
+        </note>
+      </param>
+    </params>
+
+    <payload>
+      <params id="payload_parameter">
+        <param name="file" required="true">
+          <note language="de">
+            <div xmlns="http://www.w3.org/1999/xhtml">
+              Der Parameter enthält den Namen der Datei, die versendet werden soll.
+              Der Pfad wird nicht mit dem Dateinamen übermittelt, er ist Teil des Job-Parameters <em>queue_directory</em>
+            </div>
+          </note>
+          <note language="en">
+            <div xmlns="http://www.w3.org/1999/xhtml">
+              This parameter provides the name of the file that contains a mail to be dequeued.
+              The path is not given with the filename but in the job parameter <em>queue_directory</em>.
+            </div>
+          </note>
+        </param>
+      </params>
+    </payload>
+
+    <settings>
+      <connection name="default">
+        <application name="email" id="application_email">
+          <section name="mail_server" reference="mail_server">
+            <setting name="host" default_value="localhost" required="false">
+              <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Host oder IP-Adresse des Mail Servers</div></note>
+              <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Host or IP address of the mail server</div></note>
+            </setting>
+            <setting name="port" default_value="25" required="false">
+              <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Port des Mail Servers</div></note>
+              <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Port of the mail server</div></note>
+            </setting>
+            <setting name="user" default_value="" required="false">
+              <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Benutzername zur SMTP Authentifizierung</div></note>
+              <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">user name for SMTP authentification</div></note>
+            </setting>
+            <setting name="password" default_value="" required="false">
+              <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Kennwort zur SMTP Authentifizierung</div></note>
+              <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">password for SMTP authentification</div></note>
+            </setting>
+          </section>
+        </application>
+      </connection>
+    </settings>
+
+  </configuration>
+
+  <documentation language="de">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      Kann der JobScheduler ein Mail nicht versenden, da der Mail Server nicht
+      erreichbar ist, dann wird dieses Mail in einem Verzeichnis zwischengespeichert.
+      Dieser Job versucht erneut, die in diesem Verzeichnis enthaltenen Mails zu versenden.
+      <br/><br/>
+      Der Job kann auftragsgesteuert oder als Standard-Job betrieben werden.
+      Als Standard-Job wird automatisch das gesamte Verzeichnis zwischengespeicherter Mails abgearbeitet,
+      als auftragsgesteuerter Job wird ein einzelnes Mail versendet.
+    </div>
+  </documentation>
+
+  <documentation language="en">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      If the JobScheduler fails to send mails, for example in case the mail server is down, then the mails
+      are stored in a special directory. This job tries to send the mails that have been stored.
+    <br/><br/>
+      This job can be triggered by orders or executed as a standard job.
+      As a standard job all files in the directory with stored mails are processed,
+      as an order driven job distinct files with mails are processed.
+    </div>
+  </documentation>
+
+</description>

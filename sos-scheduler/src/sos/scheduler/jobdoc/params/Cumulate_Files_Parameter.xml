@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id: FileOrder_Parameter.xml 16251 2012-01-16 07:52:02Z kb $ -->
+<params id="job_parameter"
+    xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+    xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+
+    category="Transform"
+>
+
+    <note language="de">
+        <title language="de">Parameter für die Kumulierung von Dateien</title>
+        <p>
+            Mit den in diesem Kapitel beschriebenen Optionen kann festgelegt werden, daß die
+            Dateien aus der Ergebnisliste nicht
+            einzeln transferiert werden sollen, sondern
+            vor dem Transfer in einer anderen, weiteren, Datei hintereinander
+            zusammengefasst werden sollen.
+        </p>
+        <p>
+            Der Name der (Ziel-)Datei wird mit dem Parameter
+            <paramref>cumulative_filename</paramref>
+            festgelegt.
+        </p>
+        <p>
+            Um den Inhalt der einzelnen Dateien separieren zu können wird
+            mit dem
+            Parameter
+            <paramref>cumulative_file_separator</paramref>
+            ein Text festgelegt, der zwischen den einzelnen Dateien in der
+            Zieldatei eingefügt wird.
+        </p>
+        <p>
+            Die Dateien können nach dem Transfer gelöscht werden.
+            Dies wird mit
+            dem Parameter
+            <paramref>cumulative_file_delete</paramref>
+            bestimmt.
+        </p>
+    </note>
+    <note language="en">
+        <title language="en">Cumulate File Parameters</title>
+        <p>
+            With the options described in this chapter one can be determined that the files
+            from the resultlist should not
+            be transferred separately, but
+            are to be combined prior to transfer to another, additional file (target file)
+            consecutively.
+        </p>
+        <p>
+            The name of the target file is set with the parameter
+            <paramref> cumulative_filename </paramref>
+            .
+        </p>
+        <p>
+            With the parameter
+            <paramref> cumulative_file_separator </paramref>
+            is
+            set a text that will be inserted between the individual files in the target
+            file.
+        </p>
+        <p>
+            The files can be deleted after transfer.
+            This is determined with the parameter
+            <paramref>cumulative_file_delete</paramref>
+            .
+        </p>
+    </note>
+
+    <xi:include href="./param_cumulate_files.xml" parse="xml" />
+    <xi:include href="./param_cumulative_filename.xml" parse="xml" />
+    <xi:include href="./param_cumulative_file_separator.xml" parse="xml" />
+    <xi:include href="./param_cumulative_file_delete.xml" parse="xml" />
+
+    <todo>Beispiel für cumulate_files einbauen</todo>
+</params>

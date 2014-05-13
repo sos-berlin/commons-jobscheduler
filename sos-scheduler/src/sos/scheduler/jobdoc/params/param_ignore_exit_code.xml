@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="ignore_exit_code"
+       required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter legt einen oder mehrere exit codes fest, die vom Job nicht
+            als Fehler gewertet werden sollen. Mehrere exit codes können durch Komma
+            getrennt oder auch als Bereiche angegeben werden. Beispiele:<br/>
+            <code>255</code>
+         <br/>
+            <code>2,3,4,100</code>
+         <br/>
+            <code>4,50-60,210-220</code>            
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter configures one or more exit codes which will not be treated
+            as errors. Multiple exit codes can be defined comma seperated or
+            using ranges. Examples:<br/>
+            <code>255</code>
+         <br/>
+            <code>2,3,4,100</code>
+         <br/>
+            <code>4,50-60,210-220</code>            
+          </div>
+        </note>
+        <example props="all" product="client" >
+            <p>
+                <codeblock  translate="no" frame="top" spectitle="Example: ini-file">
+[SomeTransmissionProfile]
+ignore_exit_code=255
+ignore_exit_code=2,3,4,100
+ignore_exit_code=4,50-60,210-220
+      </codeblock>
+            </p>
+        </example>
+        <example props="all" product="client">
+            <p>
+                <codeblock translate="no" frame="top" spectitle="Example: command-line">
+java –classpath … sos.net.SOSFTPCommand ..... \ 
+   <b>ignore_exit_code</b>=<i>4,50-60,210-220</i>
+      </codeblock>
+            </p>
+        </example>
+
+        <example props="all" product="APIJobs">
+            <p>
+                <codeblock translate="no" frame="top" spectitle="Example: Java-coding">
+objOptions.<b>ignore_exit_code</b>.Value("<i>4,50-60,210-220</i>");
+      </codeblock>
+            </p>
+        </example>
+
+        <example props="all" product="JobScheduler">
+            <p>
+                <codeblock translate="no" frame="top" spectitle="Example: JobScheduler Job- and Order-Parameter">
+                <![CDATA[
+<params>
+    ...
+    <param name="ignore_exit_code" value="4,50-60,210-220"/>
+    ...
+</params>
+                ]]>
+      </codeblock>
+            </p>
+        </example>
+        
+      </param>

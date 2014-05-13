@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns:xi="http://www.w3.org/2001/XInclude"
+       xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="ftp_check_size"
+       default_value="true"
+       required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Der Parameter bestimmt, ob nach dem Transfer die Größen der übertragenen Datei
+            und der Anzahl übertragener Byte geprüft werden und im Fall fehlender Übereinstimmung
+            ein Fehler ausgelöst wird.</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">This parameter determines whether the original file size and the number of
+            bytes transferred should be compared after a file transfer and whether
+            an error should be raised if they do not match.</div>
+        </note>
+      </param>

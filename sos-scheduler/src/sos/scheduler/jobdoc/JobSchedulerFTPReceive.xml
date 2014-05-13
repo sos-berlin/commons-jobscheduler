@@ -1,0 +1,692 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="scheduler_job_documentation_v1.1.xsl"?>
+<description xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" 
+  xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xi="http://www.w3.org/2001/XInclude" 
+  xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+  <job name="JobSchedulerFTPReceive" title="Receives files by FTP" order="both" tasks="unbounded">
+    <script language="java" java_class="sos.scheduler.ftp.JobSchedulerFTPReceive" resource="1" />
+  </job>
+  <releases>
+    <release id="1.7" created="2008-07-04" modified="2008-07-04">
+      <title>Version 1.7</title>
+      <author name="Andreas Liebert" email="andreas.liebert@sos-berlin.com" />
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Parameter ftp_poll_error_state</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Parameter ftp_poll_error_state</div>
+      </note>
+    </release>
+    <release id="1.6" created="2008-06-30" modified="2008-06-30">
+      <title>Version 1.6</title>
+      <author name="Andreas Liebert" email="andreas.liebert@sos-berlin.com" />
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Parameter ftp_skip_transfer</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Parameter ftp_skip_transfer</div>
+      </note>
+    </release>
+    <release id="1.5" created="2008-02-08" modified="2008-02-08">
+      <title>Version 1.5</title>
+      <author name="Ghassan Beydoun" email="ghassan.beydoun@sos-berlin.com" />
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Erweiterung für FTPS (ftp over SSL) SSL/TLS</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">adding FTPS support (ftp over ssl) SSL/TLS</div>
+      </note>
+    </release>
+    <release id="1.4" created="2008-01-04" modified="2008-01-04">
+      <title>Version 1.4</title>
+      <author name="Andreas Liebert" email="andreas.liebert@sos-berlin.com" />
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Erweiterung für SFTP</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Enhancements for SFTP</div>
+      </note>
+    </release>
+    <release id="1.3" created="2007-09-21" modified="2007-09-21">
+      <title>Version 1.3</title>
+      <author name="Mürüvet Öksüz" email="mueruevet.oeksuez@sos-berlin.com" />
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+          Erweiterung für Verarbeitungsattribute
+          <code>ftp_recursive</code>
+        </div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+          Enhancements for job processing attributes:
+          <code>ftp_recursive</code>
+        </div>
+      </note>
+    </release>
+    <release id="1.3" created="2007-08-20" modified="2007-08-20">
+      <title>Version 1.3</title>
+      <author name="Mürüvet Öksüz" email="mueruevet.oeksuez@sos-berlin.com" />
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+          Erweiterung für Verarbeitungsattribute
+          <code>ftp_file_path</code>
+        </div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+          Enhancements for job processing attributes:
+          <code>ftp_file_path</code>
+        </div>
+      </note>
+    </release>
+    <release id="1.2" created="2007-02-07" modified="2006-02-07">
+      <title>Version 1.2</title>
+      <author name="Andreas Liebert" email="andreas.liebert@sos-berlin.com" />
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Erweiterung für polling</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Enhancements for polling</div>
+      </note>
+    </release>
+    <release id="1.1" created="2006-12-02" modified="2006-12-02">
+      <title>Version 1.0</title>
+      <author name="Andreas Püschel" email="andreas.pueschel@sos-berlin.com" />
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Erweiterung für Verarbeitungsattribute</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Enhancements for job processing attributes</div>
+      </note>
+    </release>
+    <release id="1.0" created="2005-11-11" modified="2005-11-11">
+      <title>Version 1.0</title>
+      <author name="Andreas Püschel" email="andreas.pueschel@sos-berlin.com" />
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Initiale Auslieferung</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Initial release</div>
+      </note>
+    </release>
+    <release id="1.8" created="2009-08-10" modified="2009-08-10">
+      <title>Version 1.8</title>
+      <author name="Mürüvet Öksüz" email="mueruevet.oeksuez@sos-berlin.com" />
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+          Erweiterung der Parametern:
+          <ul>
+            <li>ftp_simple_transfer</li>
+            <li>ftp_file_path</li>
+          </ul>
+        </div>
+      </note>
+    </release>
+    <release id="1.9" created="2013-10-10" modified="2013-10-10">
+      <title>Version 1.9</title>
+      <author name="Mürüvet Öksüz" email="mueruevet.oeksuez@gmx.de" />
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Redesign mit SOSFTP</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Redesign with SOSFTP</div>
+      </note>
+    </release>
+    <release id="1.10" created="2011-10-19" modified="2011-10-19">
+      <title>Version 1.10</title>
+      <author name="Mürüvet Öksüz" email="mueruevet.oeksuez@sos-berlin.com" />
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Dokumentation der vom Job generierten Parametern:
+ftp_result_files
+ftp_result_zero_byte_files
+ftp_result_filenames
+ftp_result_filepaths</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Documentation from Parametern:
+ftp_result_files
+ftp_result_zero_byte_files
+ftp_result_filenames
+ftp_result_filepaths</div>
+      </note>
+    </release>
+  </releases>
+  <resources>
+    <file os="all" type="java" file="sos.scheduler.jar" id="1">
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Standard-Jobs der Auslieferung</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Standard jobs in distribution</div>
+      </note>
+    </file>
+    <file os="all" type="java" file="sos.spooler.jar" id="2">
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Klasse Job_Impl</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Class Job_Impl</div>
+      </note>
+    </file>
+    <file os="all" type="java" file="sos.util.jar" id="3">
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Klassen SOSFile, SOSSchedulerLogger</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Classes SOSFile, SOSSchedulerLogger</div>
+      </note>
+    </file>
+    <file os="all" type="java" file="sos.net.jar" id="4">
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Klasse SOSFTP</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Class SOSFTP</div>
+      </note>
+    </file>
+    <file os="all" type="java" file="commons-net-1.2.2.jar" id="5">
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Apache FTP Implementierung</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Apache FTP implementation</div>
+      </note>
+    </file>
+    <file os="all" type="java" file="sos.stacks.jar" id="6">
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Anbindung für Trilead SFTP Klassen (nur für ftp_protocol=sftp)</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Connector to Trilead SFTP classes (only for ftp_protocol=sftp)</div>
+      </note>
+    </file>
+    <file os="all" type="java" file="trilead-ssh2-build211.jar" id="7">
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Trilead SFTP Implementierung (nur für ftp_protocol=sftp)</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Trilead SFTP implementation (only for ftp_protocol=sftp)</div>
+      </note>
+    </file>
+    <file os="all" type="java" file="xalan.jar" id="8" />
+    <file os="all" type="java" file="xml-apis.jar" id="9" />
+    <file os="all" type="java" file="xercesImpl.jar" id="10" />
+    <file os="all" type="java" file="sos.xml.jar" id="11" />
+    <file os="all" type="java" file="sos.connection.jar" id="12" />
+    <file os="all" type="java" file="sos.settings.jar" id="13" />
+  </resources>
+  <configuration>
+    <note language="de">
+      <div xmlns="http://www.w3.org/1999/xhtml">Dieser Job kann standalone oder auftragsgesteuert eingesetzt werden.
+         Die Parameter werden entsprechend als Job- oder Auftragsparameter verarbeitet.</div>
+    </note>
+    <note language="en">
+      <div xmlns="http://www.w3.org/1999/xhtml">This job can be used standalone or as an order driven job.
+        Parameters can be accepted as job or as order parameters.</div>
+    </note>
+    <params id="job_parameter">
+<xi:include href="./params/param_Additional parameters.xml" parse="xml"/>
+<xi:include href="./params/param_banner_footer.xml" parse="xml"/>
+<xi:include href="./params/param_banner_header.xml" parse="xml"/>
+<xi:include href="./params/param_classpath_base.xml" parse="xml"/>
+<xi:include href="./params/param_current_pid.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_account.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_alternative_account.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_alternative_host.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_alternative_passive_mode.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_alternative_password.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_alternative_port.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_alternative_remote_dir.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_alternative_transfer_mode.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_alternative_user.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_append_files.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_atomic_suffix.xml" parse="xml"/>
+		<param name="ftp_check_interval" default_value="60" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter bestimmt das Wiederholungsintervall in Sekunden zwischen zwei Versuchen
+            eine Datei zu übertragen, wenn mit dem Parameter
+            <code>ftp_check_retry</code>
+            eine wiederholte Übertragung vereinbart wurde.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the interval in seconds between two file transfer trials, 
+            if repeated transfer of files has been configured using the
+            <code>ftp_check_retry</code>
+            parameter.
+          </div>
+        </note>
+      </param>
+      <param name="ftp_check_retry" default_value="0" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter bestimmt, ob eine Datei mehrfach übertragen werden soll,
+            um zu prüfen, ob die Datei beim Start der Verarbeitung vollständig
+            am FTP Server vorhanden war. Dies ist z.B. für Unix Dateisysteme relevant,
+            bei denen Dateien gleichzeitig gelesen und geschrieben werden.
+            <br clear="none" />
+            <br clear="none" />
+            Der Job vergleicht die Dateigrößen der aktuellen und der vorhergehenden Übertragung
+            und wiederholt bis zu der mit diesem Parameter angebebenen Anzahl die Wiederholungsversuche
+            eine Datei zu übertragen. Stimmen die Dateigrößen aus zwei Übertragungen überein, 
+            dann gilt die Datei als korrekt übertragen.
+            <br clear="none" />
+            <br clear="none" />
+            Mit dem Parameter
+            <code>ftp_check_interval</code>
+            kann das Intervall zwischen
+            zwei Wiederholungsversuchen eine Datei zu übertragen eingestellt werden.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies whether a file transfer should be repeated
+            in order to ensure that the file was complete when this job started.
+            This is relevant for Unix systems that allow read and write access
+            to files at the same time.
+            <br clear="none" />
+            <br clear="none" />
+            This jobs compares the size of the current and the previous file transfer
+            and repeats transferring one file up to the number of trials specified in
+            this parameter. If the file size of both transfers is identical,
+            then it is assumed that the file was complete at the FTP server.
+            <br clear="none" />
+            <br clear="none" />
+            The interval between two trials to transfer a file is configured
+            using the
+            <code>ftp_check_interval</code>
+            parameter.
+          </div>
+        </note>
+      </param>
+<xi:include href="./params/param_ftp_check_size.xml" parse="xml"/>
+<!--xi:include href="./params/param_ftp_compress_files.xml" parse="xml"/-->
+<!--xi:include href="./params/param_ftp_compressed_file_extension.xml" parse="xml"/-->
+<xi:include href="./params/param_ftp_file_notification_bcc.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_file_notification_body.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_file_notification_cc.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_file_notification_subject.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_file_notification_to.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_file_path.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_file_spec.xml" parse="xml"/>            
+<xi:include href="./params/param_ftp_file_zero_byte_notification_bcc.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_file_zero_byte_notification_body.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_file_zero_byte_notification_cc.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_file_zero_byte_notification_subject.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_file_zero_byte_notification_to.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_file_zero_byte_transfer.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_force_files.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_host.xml" parse="xml"/>
+<!--xi:include href="./params/param_ftp_keep_connection.xml" parse="xml"/-->
+<xi:include href="./params/param_ftp_local_dir.xml" parse="xml"/>
+<!--xi:include href="./params/param_ftp_no_nlist.xml" parse="xml"/-->
+<xi:include href="./params/param_ftp_overwrite_files.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_parallel.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_parallel_check_interval.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_parallel_check_retry.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_passive_mode.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_password.xml" parse="xml"/>
+			<param name="ftp_poll_error_state" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Gibt den Namen eines Fehlerzustands an, in den der Auftrag gesetzt wird falls
+            das ftp_poll_timeout abgelaufen ist.</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">Configures an error state to which the order is set if the poll timeout has expired.</div>
+        </note>
+      </param>
+      <param name="ftp_poll_interval" default_value="60" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Der Parameter bestimmt den intervall in Sekunden, wie oft nach einer Datei
+            gepollt wird.</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">This parameter specifies the interval in seconds, how often the job may
+            poll for a file.</div>
+        </note>
+      </param>
+      <param name="ftp_poll_minfiles" default_value="1" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Der Parameter bestimmt wie viele Dateien beim Pollen mindestens gefunden werden
+            müssen, damit der Transfer beginnt.</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">This parameter specifies the number of files that have to be found when polling
+            for the transfer to start.</div>
+        </note>
+      </param>
+      <param name="ftp_poll_timeout" default_value="0" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Der Parameter bestimmt den Zeitraum in Minuten, wie lange nach einer Datei
+            gepollt wird.</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">This parameter specifies the time in minutes, for how long the job may
+            poll for a file.</div>
+        </note>
+      </param>      
+<xi:include href="./params/param_ftp_port.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_protocol.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_recursive.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_remote_dir.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_remove_files.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_result_files.xml" parse="xml"/>
+			<param name="ftp_result_filenames" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Dieser Parameter wird erst nach dem Dateitransfer generiert.
+          In diesem Parameter steht die semikolonseparierte Liste der übertragten Dateien</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">This parameter is generated after the file transfer. It
+          contains a semicolon-separated list of the transferred files.</div>
+        </note>
+      </param>
+      <param name="ftp_result_filepaths" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Dieser Parameter wird erst nach dem Dateitransfer generiert.
+           In diesem Parameter steht die semikolonseparierte Liste der 
+           übertragten Dateien mit Verzeichnissangabe.</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">This parameter is generated after the file transfer. It
+          contains a semicolon-separated list of the transferred files with the complete path.</div>
+        </note>
+      </param>
+<xi:include href="./params/param_ftp_result_zero_byte_files.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_simple_transfer.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_transfer_mode.xml" parse="xml"/>
+<xi:include href="./params/param_ftp_user.xml" parse="xml"/>
+<xi:include href="./params/param_history.xml" parse="xml"/>
+<xi:include href="./params/param_history_repeat.xml" parse="xml"/>
+<xi:include href="./params/param_history_repeat_interval.xml" parse="xml"/>
+<xi:include href="./params/param_http_proxy_host.xml" parse="xml"/>      
+<xi:include href="./params/param_jump_command.xml" parse="xml"/>
+<xi:include href="./params/param_jump_command_delimiter.xml" parse="xml"/>
+<xi:include href="./params/param_jump_command_script.xml" parse="xml"/>
+<xi:include href="./params/param_jump_command_script_file.xml" parse="xml"/>
+<xi:include href="./params/param_jump_host.xml" parse="xml"/>
+<xi:include href="./params/param_jump_ignore_error.xml" parse="xml"/>
+<xi:include href="./params/param_jump_ignore_signal.xml" parse="xml"/>
+<xi:include href="./params/param_jump_ignore_stderr.xml" parse="xml"/>
+<xi:include href="./params/param_jump_password.xml" parse="xml"/>
+<xi:include href="./params/param_jump_port.xml" parse="xml"/>
+<xi:include href="./params/param_jump_proxy_host.xml" parse="xml"/>
+<xi:include href="./params/param_jump_proxy_password.xml" parse="xml"/>
+<xi:include href="./params/param_jump_proxy_port.xml" parse="xml"/>
+<xi:include href="./params/param_jump_proxy_user.xml" parse="xml"/>
+<xi:include href="./params/param_jump_ssh_auth_file.xml" parse="xml"/>
+<xi:include href="./params/param_jump_ssh_auth_method.xml" parse="xml"/>
+<xi:include href="./params/param_jump_user.xml" parse="xml"/>
+<xi:include href="./params/param_mandator.xml" parse="xml"/>
+<xi:include href="./params/param_ppid.xml" parse="xml"/>
+<xi:include href="./params/param_replacement.xml" parse="xml"/>
+<xi:include href="./params/param_replacing.xml" parse="xml"/>
+<xi:include href="./params/param_root.xml" parse="xml"/>
+<xi:include href="./params/param_scheduler_host.xml" parse="xml"/>
+<xi:include href="./params/param_scheduler_job_chain.xml" parse="xml"/>
+<xi:include href="./params/param_scheduler_port.xml" parse="xml"/>
+      <param name="ftp_skip_transfer" default_value="false" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Ist dieser Parameter "true", so wird alles ausser dem eigentlichen Transfer durchgeführt. So kann z.B. nur getriggert oder nur auf dem FTP Server gelöscht werden.</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">If this Parameter is set to "true", everything except the transfer itself will be performed. This can be used to just trigger for files or to only delete files on the ftp server.</div>
+        </note>
+      </param>
+<xi:include href="./params/param_ssh_auth_file.xml" parse="xml"/>
+<xi:include href="./params/param_ssh_auth_method.xml" parse="xml"/>
+<xi:include href="./params/param_ssh_proxy_host.xml" parse="xml"/>
+<xi:include href="./params/param_ssh_proxy_password.xml" parse="xml"/>
+<xi:include href="./params/param_ssh_proxy_port.xml" parse="xml"/>
+<xi:include href="./params/param_ssh_proxy_user.xml" parse="xml"/>
+<xi:include href="./params/param_testmode.xml" parse="xml"/>
+<xi:include href="./params/param_transactional.xml" parse="xml"/>
+    </params>
+    <payload>
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Die Job-Implementierung verwendet für Aufträge dieselben Parameter wie für Jobs.</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">This job implementation uses the same parameters for orders as for standalone jobs.</div>
+      </note>
+      <params id="payload_parameter" reference="job_parameter" />
+    </payload>
+  </configuration>
+  <documentation language="de">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      Der Job wird als standalone Lösung oder auftragsgesteuert eingesetzt,
+      um Dateien per FTP zu empfangen.
+      <br clear="none" />
+      <br clear="none" />
+      Der Job implementiert folgende Features:
+      <br clear="none" />
+      <br clear="none" />
+      <ul>
+        <li>
+          Teilqualifizierter Transfer von Dateien
+          <br clear="none" />
+          <br clear="none" />
+          Alternativ zum Transfer einer einzelnen Datei können mit regulären Ausdrücken
+          Dateimengen übertragen werden.
+        </li>
+        <li>
+          Rekursiver Transfer von Dateien
+          <br clear="none" />
+          <br clear="none" />
+          Es können Dateien aus beliebigen Unterverzeichnissen anhand von regulären Ausdrücken
+          für die Übertragung selektiert werden. Unterverzeichnisse werden im lokalen Dateisystem eingerichtet, falls erforderlich.
+        </li>
+        <li>
+          Polling von Dateien
+          <br clear="none" />
+          <br clear="none" />
+          Für das Warten auf Eingabedateien können entsprechende Intervalle für Dauer und Häufigkeit
+          der Existenzprüfung von Eingabedateien angegeben werden.
+        </li>
+        <li>
+          Atomare Übertragung
+          <br clear="none" />
+          <br clear="none" />
+          Dateien können während des Transfers umbenannt werden, um sie nach vollständiger Übertragung
+          atomar in einem Verzeichnis erscheinen zu lassen. Dies ist z.B. relevant, wenn Verzeichnisse
+          überwacht werden und ausschließlich vollständig übertragene Dateien weiterverarbeitet werden sollen.
+        </li>
+        <li>
+          Vollständigkeitsprüfung übertragener Dateien
+          <br clear="none" />
+          <br clear="none" />
+          Die Prüfung beinhaltet, dass nach dem Transfer die Größen der übertragenen Datei
+          und der Anzahl übertragener Byte geprüft werden sowie die wiederholte Übertragung
+          von Dateien, um sicherzustellen, dass Eingabedateien nicht während der Dauer des Transfers verändert wurden.
+        </li>
+        <li>
+          Behandlung leerer Dateien
+          <br clear="none" />
+          <br clear="none" />
+          Zur Behandlung leerer Dateien stehen eine Reihe von Optionen zur Verfügung, z.B.
+          Ausschluß leerer Dateien, Zulasssen einzelner leerer Dateien, Benachrichtigung per E-Mail beim Transfer leerer Dateien.
+        </li>
+        <li>
+          Benachrichtigung per E-Mail
+          <br clear="none" />
+          <br clear="none" />
+          Im Anschluss an den Transfer (oder das Ausbleiben) von Dateien können Benachrichtigungen
+          per E-Mail versendet werden.
+        </li>
+        <li>
+          Umbenennen von Dateien
+          <br clear="none" />
+          <br clear="none" />
+          Nach der Übertragung können Dateien anhand von regulären Ausdrücken umbenannt werden.
+        </li>
+        <li>
+          Verwendung alternativer Zugangsdaten
+          <br clear="none" />
+          <br clear="none" />
+          Für den Fall, dass ein Verbindungsaufbau bzw. eine Anmeldung am FTP Server fehlschlägt,
+          kann eine alternative Zugangskonfiguration angegeben werden, die bspw. im Fehlerfall einen Backup FTP Server 
+          anspricht.
+          <br clear="none" />
+          <br clear="none" />
+          Primäre und alternative Zugangsdaten werden additiv gehandhabt, d.h. es müssen nur
+          diejenigen alternativen Zugangsparameter angegeben werden, die sich von den primären 
+          Zugangsparametern unterscheiden.
+        </li>
+        <li>Unterstützung für UNC Pfade als Zielverzeichnisse: Dateien können direkt von einem FTP Server
+          zu einem entfernten Server-System übertragen werden.</li>
+        <li>
+          Paralleler Transfer von Dateien
+          <br clear="none" />
+          <br clear="none" />
+          Zur Parallelisierung von Transfers mehrerer Dateien kann dieser Job für den Betrieb
+          in mehreren Instanzen parametrisiert werden: für standalone Jobs wird jeweils pro einzelner
+          zu übertragender Datei ein Folge-Job via
+          <code>&lt;start_job&gt;</code>
+          veranlasst.
+          <br clear="none" />
+          <br clear="none" />
+          Für auftragsgesteuerte Jobs wird ein impliziter Auftrag via
+          <code>&lt;add_order&gt;</code>
+          pro zu übertragender Datei in der aktuellen Job-Kette für den aktuellen Job-Knoten erzeugt.
+          Der aktuelle Job prüft in einem konfigurierbaren Intervall die Erledigung der 
+          impliziten Aufträge - eine Job-Kette wird daher erst fortgesetzt, wenn 
+          alle Transfers einzelner Dateien beendet sind. Der ursprüngliche Auftrag für den paralleln Transfer
+          mehrerer Dateien gilt nur dann als erfolgreich, wenn alle impliziten Aufträge erfolgreich
+          abgeschlossen wurden.
+        </li>
+        <li>Dateien von einem entfernten Server System via FTP und SFTP auf einem "jump host" 
+        annehmen und per FTP oder SFTP auf das lokale System transferieren. 
+        Unterschiedliche Protokolle können für den Transfer zwischen den Systemen eingesetzt 
+        werden.</li>
+        <li>Alle Parameter werden ausschließlich am lokalen System angegeben, dies gilt in 
+        gleicher Weise bei Verwendung eines "jump host", da lokale Parameter dynamisch 
+        an den "jump host" weitergeleitet werden.</li>
+        <li>Sicherheit: am "jump host" werden keine Konfigurationsdateien vorgehalten. 
+        (außer privaten Schlüsseldateien die für den Zugriff auf das Zielsystem benötigt werden).
+        Am "jump host" werden keine Kennwörter gespeichert. Es werden keine Proxy-Funktionalitäten der Server Systeme vorausgesetzt.</li>
+        <li>
+          Führung einer Transfer-Historie
+          <br clear="none" />
+          Optional wird für jeden Transfer eine Historie geführt. 
+         Historieneinträge werden optional an einen Job Scheduler signalisiert, der sie in einer 
+         zentralen Datenbank konsolidiert und für Auskünfte zur Verfügung stellt
+        </li>
+      </ul>
+    </div>
+  </documentation>
+  <documentation language="en">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      This job is used as a standalone solution or triggered by orders
+      to receive files via FTP.
+      <br clear="none" />
+      <br clear="none" />
+      This job implements the following features:
+      <br clear="none" />
+      <br clear="none" />
+      <ul>
+        <li>
+          Transfer of partially matched files
+          <br clear="none" />
+          <br clear="none" />
+          Alternatively to transferring individual files, you could transfer multiple files by use of regular expressions.
+        </li>
+        <li>
+          Recursive transfer of files in directories
+          <br clear="none" />
+          <br clear="none" />
+          Files from arbitrarily nested subdirectories can be selected for transfer by regular expressions.
+          Subdirectories will be created in the local file system if required.
+        </li>
+        <li>
+          Polling for files
+          <br clear="none" />
+          <br clear="none" />
+          This job can be used to wait for incoming files. Intervals and frequency of checking
+          periods are configurable.
+        </li>
+        <li>
+          Atomic Transfer
+          <br clear="none" />
+          <br clear="none" />
+          Files can be renamed during transfer in order to make them appear atomically in a target directory.
+          This is relevant e.g. should target directories be monitored for incoming files. This feature
+          guarantees that incoming files are completely transferred before they appear in a directory.
+        </li>
+        <li>
+          Check transferred files for completeness
+          <br clear="none" />
+          <br clear="none" />
+          Checking completeness is done by comparing the size of incoming files with the number of transferred bytes.
+          Moreover, files can be transferred repeatedly should the files have been changed on the
+          FTP server during the transfer period.
+        </li>
+        <li>
+          Handling of empty files
+          <br clear="none" />
+          <br clear="none" />
+          There are multiple options to handle empty files: Exclude empty files from transfer,
+          include particular empty files, notification by e-mail in case of transfer of empty files.
+        </li>
+        <li>
+          Notification by E-Mail
+          <br clear="none" />
+          <br clear="none" />
+          Following the transfer (or absence) of incoming files notifications can be sent by e-mail.
+        </li>
+        <li>
+          Renaming of files
+          <br clear="none" />
+          <br clear="none" />
+          Files can be renamed after transfer by regular expressions.
+        </li>
+        <li>
+          Use of alternative access data and credentials
+          <br clear="none" />
+          <br clear="none" />
+          Should a connection or the login to an FTP server fail then alternative access data and credentials
+          can be used, e.g. to connect to a backup FTP server in case of failure.
+          <br clear="none" />
+          <br clear="none" />
+          Primary and alternative access parameters are handled additively, i.e. only those alternative
+          parameters have to be specified that differ from the primary access parameters.
+        </li>
+        <li>Support for UNC paths in target directories: Files can be directly transferred from an FTP server
+          to a remote server system.</li>
+        <li>
+          Massive parallel file transfer
+          <br clear="none" />
+          <br clear="none" />
+          For simultaneous transfer of multiple files this job can be parameterized to run
+          in multiple instances: For independent jobs a new job is started per file via
+          <code>&lt;start_job&gt;</code>
+          .
+          <br clear="none" />
+          <br clear="none" />
+          For order driven jobs implicit orders are created per file for the current job chain and job node
+          via
+          <code>&lt;add_order&gt;</code>
+          .
+          The current job will be setback until all implicit orders for parallel file transfers are terminated.
+          The initial order for multiple parallel file transfers will be considered as successful if all implicit
+          orders have successfully been completed.
+        </li>
+        <li>Receive files from a remote host by FTP or SFTP to a "jump host" and forward them by FTP or 
+SFTP to the local host. Different protocols can be used for transfer between the hosts.</li>
+        <li>All parameters are specified on the localhost exclusively, this applies in the same way 
+        when using a "jump host" as local parameters are dynamically forwarded to the "jump host".</li>
+        <li>Security: no configuration files are used on the "jump host" (except for private key 
+        files that are used in order to access a target host); no passwords are stored on the 
+        "jump host"; FTP proxy functionality is not used.</li>
+        <li>
+          Track record of file transfers
+          <br clear="none" />
+          Optionally a history file keeps track of every transfer that has been effected. History entries are optionally signalled to a Job Scheduler that adds them to a central database.
+        </li>
+      </ul>
+    </div>
+  </documentation>
+</description>
+

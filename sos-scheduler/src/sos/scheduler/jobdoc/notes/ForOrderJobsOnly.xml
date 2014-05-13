@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id$ -->
+<items xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 
+    http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+    >
+    <note language="en">
+        <p>
+            This parameter is valid and available for order driven jobs only.
+            JobChains, for example, are order driven jobs.
+            In standalone jobs this parameter will
+            be ignored without further notice.
+        </p>
+    </note>
+
+    <note language="de">
+        <p>
+            Dieser Parameter ist nur gültig und verfügbar für Jobs in einer Job-Kette, die
+            durch einen Auftrag gestartet wird.
+            In einem "stand alone" Job wird
+            dieser Parameter ohne einen weiteren Hinweis ignoriert.
+        </p>
+    </note>
+</items>

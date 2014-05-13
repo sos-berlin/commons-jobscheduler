@@ -1,0 +1,15 @@
+<job  title="SSH example job" order="no">
+    &lt;description >
+        &lt;include  file="jobs/SOSSSHJob2JSAdapter.xml"/>
+    &lt;/description>
+    &lt;params >
+        &lt;param  name="host" value="wilma.sos"/>
+        &lt;param  name="port" value="22"/>
+        &lt;param  name="user" value="test"/>
+        &lt;param  name="password" value="*****"/>
+        &lt;param  name="auth_method" value="password"/>
+        &lt;param  name="command_script_file" value="c:/temp/test.sh"/>
+    &lt;/params>
+    &lt;script  language="java" java_class="sos.scheduler.job.SOSSSHJob2JSAdapter"/>
+    &lt;run_time />
+</job>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<job_chain orders_recoverable="yes"
+           visible="yes"
+           title="Automatisierte Installation von Agenten">
+    <job_chain_node state="TransferInstallationSetup"
+                    job="FtpSend"
+                    next_state="TransferInstallationFile"
+                    error_state="error"/>
+    <job_chain_node state="TransferInstallationFile"
+                    job="FtpSend"
+                    next_state="ShutdownScheduler"
+                    error_state="error"/>
+    <job_chain_node state="ShutdownScheduler"
+                    job="SSHJob"
+                    next_state="PerformInstall"
+                    error_state="PerformInstall"/>
+    <job_chain_node state="PerformInstall"
+                    job="SSHJob"
+                    next_state="success"
+                    error_state="error"
+                    on_error="setback"/>
+    <job_chain_node state="success"/>
+    <job_chain_node state="error"/>
+</job_chain>

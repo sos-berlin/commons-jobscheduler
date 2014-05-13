@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--$Id: FileSizeValues.xml 15153 2011-09-14 11:59:34Z kb $ -->
+<note xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" language="de">
+    <p>
+        Mögliche Werte sind:
+    </p>
+        <table border="1" cellspacing="0">
+        <tr>
+            <th>Wert</th>
+            <th>Bedeutung
+                </th>
+        </tr>
+        <tr>
+            <td>0</td>
+            <td>Der Parameter wird ignoriert und hat somit keine Bedeutung.
+                </td>
+        </tr>
+        <tr>
+            <td>Sekunden</td>
+            <td>
+                Anzahl Sekunden. 30 bedeutet: "30 Sekunden". 
+                </td>
+        </tr>
+        <tr>
+            <td>Stunden:Minuten</td>
+            <td>01:15 bedeutet "1 Stunde und 15 Minuten".
+                </td>
+        </tr>
+        <tr>
+            <td>Stunden:Minuten:Sekunden</td>
+            <td>01:15:10 bedeutet "1 Stunde, 15 Minuten und 10 Sekunden".
+                </td>
+        </tr>
+    </table>
+    
+</note>

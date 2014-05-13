@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns:xi="http://www.w3.org/2001/XInclude"
+       xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1
+http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd"
+       name="mail_on_empty_files"
+       Category="eMail,Notification"
+       required="false"
+           DataType="SOSOptionBoolean"
+       >
+
+                <examples>
+                    <codeexample type="ini">
+                        <embeddedExample>
+                        <![CDATA[
+ mail_on_empty_files=true
+ mail_on_empty_files_to=kb@sos-berlin.com
+ mail_on_empty_files_subject=Files transfered without errors
+ ...
+                        ]]>
+                       </embeddedExample>
+                        <explanation language="de">
+                            <title></title>
+                            <p>
+                                Der Versand eines Mails bei dem Transfer von leeren Datein aktiviert (eingeschaltet).
+                                Der Empfänger und der Betreff wird über den Prefix "mail_on_empty_files_"
+                                definiert.
+                            </p>
+                        </explanation>
+                        <explanation language="en">
+                            <title></title>
+                            <p>
+                            </p>
+                        </explanation>
+                    </codeexample>
+                </examples>
+
+
+<indexterm index="mail_on_empty_files, Parameter" display="false" />
+<indexterm index="MailOnEmptyFiles_, Prefix" display="false" />
+
+        <note language="de">
+        <title>EMail wenn leere Dateien entdeckt wurden</title>
+            <p>
+            Falls bei der Übertragung leere Dateien (dies sind Dateien mit der Größe 0 bytes) aufgetreten sind, so
+            soll eine eMail versendet werden.
+            Die Parameter zur Konfiguration des zu versendenden Mails beginnen mit dem Prefix "MailOnEMptyFiles_".
+              </p>
+        </note>
+        <note language="en">
+        <title>eMail if empty files detected</title>
+            <p>This parameter specifies the recipient of a notification mail,
+              should files have been transferred.</p>
+        </note>
+      </param>

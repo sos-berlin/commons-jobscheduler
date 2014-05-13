@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id$ -->
+<params xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 
+    http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+
+    <xi:include href="./param_scheduler_sos_file_operations_result_set.xml" parse="xml" />
+    <xi:include href="./param_scheduler_sos_file_operations_ResultSetSize.xml" parse="xml" />
+    <xi:include href="./param_scheduler_sos_file_operations_file_count.xml" parse="xml" />
+
+</params>

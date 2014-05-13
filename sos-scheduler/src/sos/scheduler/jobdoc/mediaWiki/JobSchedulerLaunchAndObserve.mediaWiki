@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<mediawiki version="0.3" xml:lang="en">
+   <siteinfo xmlns:xalan="http://xml.apache.org/xalan">
+      <sitename>jobscheduler</sitename>
+      <base>http://sourceforge.net/apps/mediawiki/jobscheduler/index.php?title=Main_Page</base>
+      <generator>MediaWiki 1.15.1</generator>
+      <case>first-letter</case>
+   </siteinfo>
+   <page>
+      <title>Job JobSchedulerPLSQLJob</title>
+      <id/>
+      <revision>
+         <id/>
+         <timestamp>xxxxx</timestamp>
+         <contributor>
+            <username>Soskb</username>
+            <id>8</id>
+         </contributor>
+         <text xml:space="preserve">[[Category:ReadyMadeJobs]][[Category:JobSchedulerPLSQLJob]]
+ 
+
+ 
+===Parameter used by JobSchedulerPLSQLJob===
+ 
+ 
+ 
+
+{| border="1"
+|+ List of parameter
+! ! Name || title || mandatory || default
+|- 
+| [[#command|command]]
+| 
+| false
+| 
+|- 
+| [[#db_url|db_url]]
+| 
+| false
+| 
+|- 
+| [[#db_user|db_user]]
+| 
+| false
+| 
+|- 
+| [[#db_password|db_password]]
+| 
+| false
+| 
+|}
+
+
+ 
+====Parameter <span id="command">command</span>: ====
+----
+ 
+<div>Database Commands for the Job. It is possible to define more than one instruction in the COMMAND field. Such instructions are then carried out in the order in which they are written and must be separated by a semicolon and a subsequent new line. Parameters can be replaced in database commands. This is done by the addition of a variable in the form §{param} at any given point in a command. This variable is then given the value of the instruction parameter with the name [param] before execution.</div>
+ 
+Data-Type : 
+ 
+
+
+ 
+====Parameter <span id="db_url">db_url</span>: ====
+----
+ 
+<div>jdbc url (e.g. jdbc:oracle:thin:@localhost:1521:XE)</div>
+ 
+Data-Type : 
+ 
+
+
+ 
+====Parameter <span id="db_user">db_user</span>: ====
+----
+ 
+<div>database user</div>
+ 
+Data-Type : 
+ 
+
+
+ 
+====Parameter <span id="db_password">db_password</span>: ====
+----
+ 
+<div>database password</div>
+ 
+Data-Type : 
+ 
+
+ 
+===Return parameter JobSchedulerPLSQLJob===
+ 
+The order parameter described below are returned by the job to the JobScheduler. JobSchedulerPLSQLJob
+ 
+ 
+ 
+
+{| border="1"
+|+ List of parameter
+! ! Name || title || mandatory || default
+|- 
+| [[#sql_error|sql_error]]
+| Error Messages of the client or the server
+| false
+| 
+                ./params/param_std_out_output.xml not found
+            
+|}
+
+
+ 
+====Parameter <span id="sql_error">sql_error</span>: Error Messages of the client or the server====
+----
+ 
+<p>''Error Messages of the client or the server''</p><xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml"><p>If during the execution of the code one (or more) errors occurs, the error-text will be stored on this variable in the order. If no error occurs then the contents of the variable will remain empty.</p></xhtml:div>
+ 
+Data-Type : SOSOptionString
+ 
+Use together with parameter:  
+ 
+
+ 
+./params/param_std_out_output.xml not found
+ 
+This article was last modified on (mm/dd/yyyy)  {{REVISIONMONTH}}/{{REVISIONDAY}}/{{REVISIONYEAR}}.
+ 
+[[File:Wiki-rabbit-left.jpg]] &lt;&lt; [[JobScheduler_FAQ| back to all FAQs]]</text>
+      </revision>
+   </page>
+</mediawiki>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="mandator"
+       DefaultValue="SOS"
+       required="false"
+       DataType="SOSOptionString">
+        <note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter nimmt die Bezeichnung eines Mandanten auf, für den der File Transfer ausgeführt wird.
+            Der Mandant wird in eine ggf. verwendete Historiendatei übernommen, siehe Parameter <paramref>history</paramref>,
+            er hat keine technische Relevanz für den Transfer.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the mandator for which a file transfer is effected.
+            The mandator is added to an optional history file, see parameter <paramref>history</paramref>
+            and has no technical relevance for the transfer.
+          </div>
+        </note>
+      </param>

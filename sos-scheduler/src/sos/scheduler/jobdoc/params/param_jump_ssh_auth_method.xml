@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="jump_ssh_auth_method"
+       required="false"
+       extends="ssh_auth_method">
+        <note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter spezifiziert die Authentifizierungsmethode am SSH Server des <paramref>jump_host</paramref>, 
+            unterstützt werden <em>publickey</em> und <em>password</em>.
+            <br/>
+         <br/>
+            Bei Verwendung der Authentifizierungsmethode <em>publickey</em> muss
+            im Parameter <paramref>jump_ssh_auth_file</paramref> der Pfad der Datei mit dem Private Key
+            des Benutzers angegeben werden. Ist diese Datei mit einer Passphrase geschützt,
+            dann muss die Passphrase mit dem Parameter <paramref>jump_password</paramref> angegeben werden.
+            <br/>
+         <br/>
+            Bei Verwendung der Authentifizierungsmethode <em>password</em> wird das 
+            Kennwort des Benutzers mit dem Parameter <paramref>jump_password</paramref> angegeben.
+            <br/>
+         <br/>
+            Welche Authentifizierungsmethoden unterstützt werden, ist am SSH Server konfiguriert.
+            Nicht alle SSH Server sind für die Authentifizierungsmethode <em>password</em> konfiguriert.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the authentication method for the SSH server -
+            the <em>publickey</em> and <em>password</em> methods are supported.
+            <br/>
+         <br/>
+            When the <em>publickey</em> authentication method is used,
+            then the path name of the private key file must be set in the <paramref>jump_ssh_auth_file</paramref> parameter.
+            Should the private key file be secured by a passphrase then this passphrase has to be specified 
+            by the <paramref>jump_password</paramref> parameter.
+            <br/>
+         <br/>
+            For the <em>password</em> authentication method the password for the user account has to be specified
+            using the <paramref>jump_password</paramref> parameter.
+            <br/>
+         <br/>
+            The authentication methods that are enabled depend on the SSH server configuration.
+            Not all SSH servers are configured for <em>password</em> authentication.
+          </div>
+        </note>
+      </param>

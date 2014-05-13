@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns:xi="http://www.w3.org/2001/XInclude"
+	xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+	xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	name="ftp_simple_transfer" default_value="false" required="false">
+	<note language="de">
+		<title>Simple FileTransfer</title>
+		<div xmlns="http://www.w3.org/1999/xhtml">
+			Der Parameter bewirkt, das lediglich eine einzige Datei
+			transferiert wird. Wenn ftp_simple_transfer=yes ist,
+			dann ist der Parameter ftp_file_path ein Pflichtfeld.
+			Die restlichen Funktionen (-&gt; Parameter) werden ignoriert.
+			Dazu gehören die Parameter:
+			<br />
+			<br />
+			<ul>
+				<li>ftp_file_spec</li>
+				<li>replacement</li>
+				<li>replacing</li>
+				<li>ftp_force_files</li>
+				<li>ftp_atomic_suffix</li>
+				<li>ftp_recursive</li>
+				<li>ftp_compress</li>
+				<li>ftp_overwrite_files</li>
+				<li>ftp_remove_files</li>
+				<li>ftp_make_dirs</li>
+			</ul>
+		</div>
+	</note>
+
+	<note language="en">
+		<title>Simple FileTransfer</title>
+		<div xmlns="http://www.w3.org/1999/xhtml">
+			Der Parameter bewirkt, das lediglich eine einzige Datei
+			transferiert wird. Wenn ftp_simple_transfer=yes ist,
+			dann ist der Parameter ftp_file_path ein Pflichtfeld.
+			Die restlichen Funktionen (-&gt; Parameter) werden ignoriert.
+			Dazu gehören die Parameter:
+			<br />
+			<br />
+			<ul>
+				<li>ftp_file_spec</li>
+				<li>replacement</li>
+				<li>replacing</li>
+				<li>ftp_force_files</li>
+				<li>ftp_atomic_suffix</li>
+				<li>ftp_recursive</li>
+				<li>ftp_compress</li>
+				<li>ftp_overwrite_files</li>
+				<li>ftp_remove_files</li>
+				<li>ftp_make_dirs</li>
+			</ul>
+		</div>
+	</note>
+
+</param>

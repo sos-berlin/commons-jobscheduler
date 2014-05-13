@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="ignore_signal"
+       required="false"
+       default_value="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Wird der Wert <em>true</em> angegeben, dann werden unter Unix 
+            Signale ignoriert, die zur Beendigung des am SSH Server ausgeführten Kommandos führen,
+            z.B. falls ein Kommando mit <em>kill</em> beendet wurde.
+            <br/>
+         <br/>
+            Per Voreinstellung wird das Beenden von Kommandos durch Signale als
+            Fehler des Jobs bzw. des Auftrags vom Job Scheduler gemeldet.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Should the value <em>true</em> be specified, 
+            then on Unix systems all signals will be ignored
+            that terminate the execution of a command on the SSH server - 
+            if for example a command is terminated using <em>kill</em>.
+            <br/>
+         <br/>
+            Note that by default the Job Scheduler reports errors for commands that are terminated by signals.
+          </div>
+        </note>
+      </param>

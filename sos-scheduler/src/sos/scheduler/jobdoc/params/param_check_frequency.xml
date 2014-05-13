@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id: FileOrder_Parameter.xml 16251 2012-01-16 07:52:02Z kb $ -->
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 
+    http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd"
+       name="CheckFrequency"
+       DefaultValue="true"
+       required="false"
+       DataType="SOSOptionBoolean">
+        <note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Mit dieser Option wird das Laufzeitverhalten der Order eines Jobnetzplanes untersucht (der sog. FrequenyChecker).
+
+Das bedeutet:
+<ul>
+<li>
+Alle Order des Jobnetzes, bei denen der Parameter <i>on_demand='true'</i> gesetzt ist, werden in der Datenbank gekennzeichnet (das Feld 
+IS_RUNNER_ON_DEMAND der Tabelle SCHEDULER_JOB_NET_PLAN wird auf <i>true</i> gesetzt). Der JobScheduler stoppt die Ausführung des Jobnetzes 
+vor dieser Order und wartet, bis die Order manuell gestartet wird.
+</li>
+<li>
+Die Laufzeitdefintionen der Order des Jobnetzes werden analysiert. Dabei wird entschieden, ob eine Order für den soeben erzeugten Jobnetzplan 
+zur Ausführung kommt. Das ist dann der Fall, wenn die Order im betrachteten Zeithorizont (siehe Parameter <i>TimeHorizon</i>) eine Laufzeit hat. 
+<br/>
+<b>Beispiel:</b>
+Die Order <i>A</i> startet jeden Montag um 10.00 Uhr:
+<code><pre>&lt;run_time let_run="no"&gt;
+  &lt;weekdays&gt;
+    &lt;day day="1"&gt;
+      &lt;period single_start="10:00"/&gt;
+    &lt;/day&gt;
+  &lt;/weekdays&gt;
+&lt;/run_time&gt;</pre></code>
+Die Order zur Erzeugung des Jobnetzes läuft täglich um 0.01 Uhr und betrachtet einen Zeithorizont (Parameter <i>TimeHorizon</i>) von 24h.
+Läuft die Order an den Tagen Dienstag bis Sonntag wird keine gültige Laufzeit für die Order <i>A</i> ermittelt. Sie wird im Jobnetzplan entsprechend
+gekennzeichnet (das Feld IS_RUNNER_SKIPPED in der Tabelle SCHEDULER_JOB_NET_PLAN wird auf <i>true</i> gesetzt). Damit wird die Ausführung dieser
+Order Dienstag bis Sonntags unterdrückt. Sie läuft nur am Montag.
+</li>
+</ul>
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+This option is used to inspect the runtimes of the orders of a job net (the so-called FrequenyChecker will be executed).
+<!-- Mit dieser Option wird das Laufzeitverhalten der Order eines Jobnetzplanes untersucht (der sog. FrequenyChecker). -->
+
+That means:
+<!-- Das bedeutet: -->
+<ul>
+<li>
+All orders of a job net with the parameter <i>on_demand='true'</i> will be marked in the database (the field IS_RUNNER_ON_DEMAND
+of the table SCHEDULER_JOB_NET_PLAN will be set to <i>true</i>). JobScheduler stops the execution of the job net before this this 
+order and waits till the order started manually.
+<!-- Alle Order des Jobnetzes, bei denen der Parameter <i>on_demand='true'</i> gesetzt ist, werden in der Datenbank gekennzeichnet (das Feld 
+IS_RUNNER_ON_DEMAND der Tabelle SCHEDULER_JOB_NET_PLAN wird auf <i>true</i> gesetzt). Der JobScheduler stoppt die Ausführung des Jobnetzes 
+vor dieser Order und wartet, bis die Order manuell gestartet wird. -->
+</li>
+<li>
+The runtime defintions of the job net orders will be analyzed. It is decided if an order for the just created job net plan should be executed.
+This is the case if the order has a runtime within the given time horizon (see parameter <i>TimeHorizon</i>).
+<!-- Die Laufzeitdefintionen der Order des Jobnetzes werden analysiert. Dabei wird entschieden, ob eine Order für den soeben erzeugten Jobnetzplan 
+zur Ausführung kommt. Das ist dann der Fall, wenn die Order im betrachteten Zeithorizont (siehe Parameter <i>TimeHorizon</i>) eine Laufzeit hat. -->
+<br/>
+<b>Sample:</b>
+Order <i>A</i> starts every Monday at 10 a.m.:
+<code><pre>&lt;run_time let_run="no"&gt;
+  &lt;weekdays&gt;
+    &lt;day day="1"&gt;
+      &lt;period single_start="10:00"/&gt;
+    &lt;/day&gt;
+  &lt;/weekdays&gt;
+&lt;/run_time&gt;</pre></code>
+The order for the job net creation runs at 0:01 a.m. every day and consider a time horizon of 24 hours (see parameter <i>TimeHorizon</i> also).
+if the order is running Tuesday to Sunday no valid runtime for the order <i>A</i> is calculated. The order will be marked in the job net plan (field
+IS_RUNNER_SKIPPED in the table SCHEDULER_JOB_NET_PLAN is set to <i>true</i>). This will cause the supression of the execution of this order from Tuesday to Sunday. 
+However, at Monday the order will be executed. 
+
+<!-- Die Order zur Erzeugung des Jobnetzes läuft täglich um 0.01 Uhr und betrachtet einen Zeithorizont (Parameter <i>TimeHorizon</i>) von 24h.
+Läuft die Order an den Tagen Dienstag bis Sonntag wird keine gültige Laufzeit für die Order <i>A</i> ermittelt. Sie wird im Jobnetzplan entsprechend
+gekennzeichnet (das Feld IS_RUNNER_SKIPPED in der Tabelle SCHEDULER_JOB_NET_PLAN wird auf <i>true</i> gesetzt). Damit wird die Ausführung dieser
+Order Dienstag bis Sonntags unterdrückt. Sie läuft nur am Montag. -->
+</li>
+</ul>
+          </div>
+        </note>
+      </param>

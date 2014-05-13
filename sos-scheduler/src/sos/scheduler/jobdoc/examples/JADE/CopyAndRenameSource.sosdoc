@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- $Id$ -->
+<!--
+ -->
+<codeexample xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1
+http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+        <embeddedExample scope="client" type="ini"> [CopyAndRenameSource_Local2Local]
+
+ source_replacing=(.*)(.txt)
+ source_replacement=\1_[date:yyyyMMddHHmm];\2
+
+ source_dir = J:/E/java/junittests/testdata/JADE/
+ target_dir = J:/E/java/junittests/testdata/JADE/SOSMDX/
+ file_spec = ^.*\.txt$
+ operation = copy
+ source_protocol = local
+ target_protocol = local  </embeddedExample>
+
+        <explanation language="en">
+            <title>Rename files on source and target</title>
+            <p>
+
+            </p>
+        </explanation>
+        <explanation language="de">
+            <title>Dateinamen in der Quelle umbenennen</title>
+            <p>
+            In diesem Beispiel werden alle Dateien, deren Name mit ".txt" endet,
+            zunächst auf das target kopiert.
+                <indexterm index="Zeitstempel, im Dateinamen" display="false"></indexterm>
+    <indexterm index="Dateiname, mit Zeitstempel" display="false"></indexterm>
+        <indexterm index="[date: ], Platzhalter" display="false"></indexterm>
+    <indexterm index="Platzhalter, [date: ]" display="false"></indexterm>
+            </p>
+            <p>
+            Die Dateien in der Quelle werden nach dem Transfer umbenannt.
+            Es wird für die Umbenennung ein Zeitstempel verwendet,
+            der auch die Minuten und Sekunden der aktuellen Uhrzeit (yyyyMMddHHmm) enthält.
+            </p>
+            <p>
+            Das Umbenennen wird mit den Parametern <paramref>replacement</paramref> und <paramref>replacing</paramref> konfiguriert.
+            Der Präfix "source_" wird verwendet, um die Aktion auf dem Source-Server, und nicht auf dem Target-Server, durchführen zu lassen.
+            </p>
+            <p>
+            Die Operation "copy" muß verwendet werden, wenn die Dateien auf dem source-server umbenannt werden sollen.
+            </p>
+        </explanation>
+    </codeexample>
+

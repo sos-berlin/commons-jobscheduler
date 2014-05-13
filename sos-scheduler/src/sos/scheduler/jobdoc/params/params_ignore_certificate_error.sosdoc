@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id$ -->
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1
+     http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd "
+
+    name="Ignore_Certificate_Error" required="false" default_value="true" DataType="SOSOptionString" Category="Webdav" OptionName="Ignore_Certificate_Error"
+    Alias="" usewith="" see="" since="1.5.3191">
+
+
+    <indexterm index="Ignore_Certificate_Error" display="false"></indexterm>
+
+    <note language="de">
+        <title>Ignore_Certificate_Error</title>
+        <p>
+
+        </p>
+    </note>
+    <note language="en">
+        <title>Ignore_Certificate_Error</title>
+        <p>
+        </p>
+    </note>
+    <note language="fr">
+        <title>Ignore_Certificate_Error</title>
+        <p>
+        </p>
+    </note>
+</param>

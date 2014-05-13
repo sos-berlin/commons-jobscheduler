@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="scheduler_port"
+       required="false"
+       extends="port"
+       DefaultValue="4444"       
+       DataType="SOSOptionPortNumber">
+
+        <note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der TCP-Port, über den mit dem JobScheduler kommuniziert werden kann.
+            Siehe auch den Parameter <paramref>scheduler_host</paramref>.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            The TCP-port for which a JobScheduler, see parameter <paramref>scheduler_host</paramref>.
+          </div>
+        </note>
+      </param>

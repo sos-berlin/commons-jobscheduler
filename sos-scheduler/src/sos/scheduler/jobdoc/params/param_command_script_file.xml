@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" 
+xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="command_script_file" DataType="SOSOptionInFileName" required="false" Category="SSH,Remote Execution"
+    OptionName="CommandScriptFile" Alias="" see="command,command_delimiter,command_script" prefix="" scope="all">
+
+    <note language="de">
+        <title>Auszuführende Script-Datei</title>
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+                Der Wert des Parameters enthält den Namen (ung ggfs. den Pfad-Namen) einer (Script-)Datei, die zum entfernten Host übertragen
+                und
+                dort ausgeführt werden soll.
+                Die Datei wird in dem Home-Verzeichnis des Nutzers gespeichert.
+                Nach dem Ende der Ausführung des Skripts wird die Datei gelöscht.
+            </p>
+            <p>
+                Von dem Skript benötigte Parameter, die in der Kommandozeile nach dem Namen des Skripts anzugeben sind, werden mit dem
+                Parameter
+                <paramref>command_script_param</paramref>
+                zusätzlich angegeben.
+            </p>
+            <p>
+                Das Script kann mit Hilfe von Umgebungsvariablen auf Job- und Auftrags-Parameter zugreifen.
+                Die Namen sind großgeschrieben.
+                "SCHEDULER_PARAM_" ist den Namen vorangestellt.
+            </p>
+            <p>
+                Der Parameter kann alternativ zu
+                <paramref>command</paramref>
+                ,
+                <paramref>command_delimiter</paramref>
+                und
+                <paramref>command_script</paramref>
+                angegeben werden.
+            </p>
+            <p>
+                Auftragsparameter überschreiben gleichnamige Job-Parameter.
+            </p>
+        </div>
+    </note>
+    <note language="en">
+        <title>Script file name to Execute</title>
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+                The value of this parameter contains the file-name (and path-name, if needed) of a local (script-)file, which will be transferred to the
+                remote host and will then be executed there.
+                The script can access job- and order-parameters by environment variables.
+                The names of the environment variables are in upper case and have the string "SCHEDULER_PARAM_" as a prefix.
+                Order parameters with the same name overwrite task parameters.
+            </p>
+            <p>
+                This parameter can be used as an alternative to
+                <paramref>command</paramref>
+                ,
+                <paramref>command_delimiter</paramref>
+                and
+                <paramref>command_script</paramref>
+                .
+            </p>
+        </div>
+    </note>
+    <xi:include href="../examples/ssh/command_script_file.xml" parse="xml">
+        <xi:fallback>"../examples/ssh/command_script_file.xml" not found</xi:fallback>
+    </xi:include>
+
+</param>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<param xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+    xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1
+    http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd"
+    Alias="bcc" name="ftp_file_notification_bcc" Category="eMail,Notification" required="false"
+    DataType="SOSOptioneMailAdress"
+    >
+
+    <note language="de">
+        <title>Bcc eMail Empfänger</title>
+        <p>Der Parameter benennt den oder die Empfänger der Blindkopie einer eMail-Benachrichtigung
+            falls Dateien übertragen wurden.</p>
+    </note>
+
+    <note language="en">
+        <title>Bcc eMail Recipient</title>
+        <p>This parameter specifies the recipient(s) of a blind carbon copy notification e-mail ,
+            should files have been transferred</p>
+    </note>
+</param>

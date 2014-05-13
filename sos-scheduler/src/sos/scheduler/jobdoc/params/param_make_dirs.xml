@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id: param_create_dir.xml 18204 2012-10-15 13:49:57Z kb $ -->
+<param
+	xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+	xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1
+http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd"
+    name="make_dirs"
+	Category="FileHandling" DataType="SOSOptionBoolean" OptionName="MakeDirs"
+	Alias="createFoldersOnTarget" default_value="true" required="false">
+    <!--  -->
+	<note language="de">
+		<title>Verzeichnis anlegen</title>
+		<p>
+			Wenn dieser Parameter den Wert "true" hat, wird überprüft, ob das im
+			target
+			angegebene Verzeichnis
+			existiert.
+			Wenn es nicht existiert, wird
+			es angelegt.
+		</p>
+	</note>
+    <!--  -->
+	<note language="en">
+		<title>Create folder</title>
+		<p>
+			If enabled the folder, which is specified as target
+			,
+			is checked for existence.
+			If the foldes
+			does not exist it
+			will be created as a directory.
+		</p>
+	</note>
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../notes/BooleanValues.xml"
+		parse="xml" />
+	<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../notes-de/BooleanValues.xml"
+		parse="xml" />
+</param>

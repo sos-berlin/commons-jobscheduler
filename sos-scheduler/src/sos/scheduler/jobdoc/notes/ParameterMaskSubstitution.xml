@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id$ -->
+<note
+	xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+	xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" language="en">
+        <p>
+            Supports masks for substitution in the file name
+            and directory
+            name with format strings that are
+            enclosed by brackets
+            ([
+            and
+            ]).
+            The following format strings are supported:
+        </p>
+
+        <p>
+            <code>
+                [date:date format]
+            </code>
+        </p>
+        <p>
+        
+            date format
+            must be a valid Java data format string,
+            e.g.
+            yyyyMMddHHmmss
+            ,
+            yyyy-MM-dd.HHmmss
+            etc.
+        </p>
+                <p>
+            For further information on valid values for a dateformat string see
+            <a href="http://docs.oracle.com/javase/1.4.2/docs/api/java/text/SimpleDateFormat.html">SimpleDateFormat</a>
+        </p>
+        
+        <p>
+            An example:
+        </p>
+        <p>
+            <code>
+                &lt;param name="file"
+                value="sample/hello[date:yyyyMMdd].txt"
+                /&gt; </code>
+        </p>
+        <p>
+            On 2050-12-31 the parameter
+            <code>file</code>
+            contains the value
+            <code>"sample/hello20501231.txt"</code>
+            .
+        </p>
+</note>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:xi="http://www.w3.org/2001/XInclude"
+       xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1
+http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd"
+       name="settings"
+       required="false"
+       DataType="SOSOptionIniFileName"
+       Alias="ConfigFileName"
+       DefaultValue="./Settings.ini"
+        Category="Configuration"
+           see="profile"
+
+       >
+        <note language="de">
+         <title>Name der Konfigurationsdatei mit den Profilen</title>
+          <p>
+            Bei Verwendung einer Konfigurationsdatei werden Profile als Sektionen eingerichtet und einzelne Parameter als Paare aus Namen
+            und Wert in einem einfach Textformat aufgeführt:
+          </p>
+    <xi:include href="../examples/JADE/inifile_1.sosdoc" parse="xml">
+        <xi:fallback>"../examples/JADE/inifile_1.sosdoc" not found</xi:fallback>
+    </xi:include>
+
+<p>
+            An der Kommandozeile wird der Name der Konfigurationsdatei und des Profils angegeben:
+</p>
+    <xi:include href="../examples/JADE/commandline_1.sosdoc" parse="xml">
+        <xi:fallback>"../examples/JADE/commandline_1.sosdoc" not found</xi:fallback>
+    </xi:include>
+<p>
+Ein Profil kann den Inhalt anderer Profile wie folgt referenzieren:
+</p>
+    <xi:include href="../examples/JADE/ini_include_1.sosdoc" parse="xml">
+        <xi:fallback>"../examples/JADE/ini_include_1.sosdoc" not found</xi:fallback>
+    </xi:include>
+
+          <p>
+          </p>
+        </note>
+        <note language="en">
+          <title>Name of INI-File which contains the profiles to execute</title>
+          <p>
+            A configuration (INI-) file can be specified that contains profiles, i.e. sections,
+            with parameters specified as pairs of names and values in a plain text format like this:
+          </p>
+    <xi:include href="../examples/JADE/inifile_1.sosdoc" parse="xml">
+        <xi:fallback>"../examples/JADE/inifile_1.sosdoc" not found</xi:fallback>
+    </xi:include>
+<p>
+            At the command line the name of the configuration file and the profile are specified like this:
+</p>
+    <xi:include href="../examples/JADE/commandline_1.sosdoc" parse="xml">
+        <xi:fallback>"../examples/JADE/commandline_1.sosdoc" not found</xi:fallback>
+    </xi:include>
+
+<p>
+            A profile can reference the contents of other profiles like this:
+</p>
+    <xi:include href="../examples/JADE/ini_include_1.sosdoc" parse="xml">
+        <xi:fallback>"../examples/JADE/ini_include_1.sosdoc" not found</xi:fallback>
+    </xi:include>
+        </note>
+      </param>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="file_spec2"
+       required="false"
+       DataType="SOSOptionRegExp"
+       deprecated="true">
+        <note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            In Ergänzung zum Parameter <paramref>file_spec</paramref> können Parameter 
+            für weitere Dateigruppen in dieser Form angegeben werden:
+            <br/>
+         <br/>
+            <code>file_spec2</code>, <code>file_spec3</code>, ..., <code>file_spec9</code>
+            <br/>
+         <br/>
+            Diese Parameter spezifizieren jeweils eine Dateigruppe, für die individuelle Transfereinstellungen gelten.
+            Bis zu 9 Dateigruppen lassen sich auf diese Weise angeben:
+            <br/>
+         <br/>
+            <code>-file_spec=.*\.gif$ -local_dir=/tmp/1 -remote_dir=/tmp/1</code>
+            <br/>
+            <code>-file_spec2=.*\.exe$::param_set_2 -param_set_2="transfer_mode=binary::remote_dir=/tmp/2::local_dir=/tmp/2"</code>
+            <br/>
+         <br/>
+            Dabei wird durch <em>::</em> getrennt dem regulären Ausdruck, der die Dateigruppe spezifiziert,
+            der Name einer Parametergruppe zugewiesen. Dieser Name ist frei wählbar, er darf 
+            nur die Zeichen <em>0-9, a-z</em> sowie <em>_</em> enthalten.
+            <br/>
+         <br/>
+            Der Name der Parametergruppe wird als selbstständiger Parameter an der Kommandozeile aufgeführt.
+            Als Wertzuweisung der Parametergruppe werden die für diese Gruppe geltenden abweichenden Parameter spezifiziert.
+            Dazu werden jeweils im Format <code>name=wert::name2=wert2 ...</code> die Namen und Werte
+            derjenigen Parameter aufgeführt, die speziell für diese Gruppe gelten.
+            <br/>
+         <br/>
+            Im obigen Beispiel werden für alle mit der Endung <em>.gif</em> versehenen Dateien vom lokalen 
+            Verzeichnis <em>/tmp/1</em> in das gleichnamige Verzeichnis am Zielsystem übertragen.
+            Für Dateien mit der Endung <em>.exe</em> wird eine Gruppe <em>param_set_2</em> spezifiziert,
+            die abweichende Transferparameter aufweist, z.B. binäre Übertragung und andere Quell- bzw. Zielverzeichnisse.
+            <br/>
+         <br/>
+            Bitte beachten Sie, dass in Parametergruppen keine Parameter zur Steuerung des Verbindungsaufbaus
+            angegeben werden können, d.h. die Dateien werden immer zwischen denselben Systemen übertragen,
+            allerdings kann die Transferrichtung wechseln, z.B. durch Angabe des Parameters <paramref>operation</paramref>
+            für eine Dateigruppe.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            In addition to what is stated for the parameter <paramref>file_spec</paramref> additional parameters
+            can be specified for up to 9 file sets like this:
+            <br/>
+         <br/>
+            <code>-file_spec=.*\.gif$ -local_dir=/tmp/1 -remote_dir=/tmp/1</code>
+            <br/>
+            <code>-file_spec2=.*\.exe$::param_set_2 -param_set_2="transfer_mode=binary::remote_dir=/tmp/2::local_dir=/tmp/2"</code>
+            <br/>
+         <br/>
+            Within the <code>file_spec2</code> parameter value the regular expression is separated by <em>::</em> 
+            from the name of a file set. This name can freely be chosen, it consists of the 
+            characters <em>0-9, a-z</em> and <em>_</em>.
+            <br/>
+         <br/>
+            The name of the file set is used as a separate parameter in the command line.
+            This parameter is assigend the list of parameters that should be valid for the specific file set.
+            Therefore the names and values of individual parameters are specified in the form
+            <code>name=value::name2=value2 ...</code>. Such parameters are exclusively valid for the specific file set.
+            <br/>
+         <br/>
+            The above sample causes all files with the extension <em>.gif</em> to be transferred from
+            the local directory <em>/tmp/1</em> to a directory with the same name on the target host.
+            For files with the extension <em>.exe</em> a file set <em>param_set_2</em> is specified
+            that contains parameters that are specific for this file set, as binary transfer and 
+            different source and target directories.
+            <br/>
+         <br/>
+            Please, consider that parameter file sets cannot specify parameters that control the 
+            connection to a target host, i.e. all files are transferred between the same local and remote hosts.
+            However, the transfer direction can be changed, e.g. by specifying a different <paramref>operation</paramref>
+            parameter for a file set.
+          </div>
+        </note>
+      </param>

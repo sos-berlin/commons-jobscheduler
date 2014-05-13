@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+
+    xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1
+     ../scheduler_job_documentation_v1.1.xsd "
+
+       name="verbose"
+       required="false"
+       DataType="SOSOptionInteger"
+       Alias="VerbosityLevel"
+       DefaultValue="10">
+	  <values>
+		    <value value="1..9" />
+	  </values>
+        <note language="de">
+                  <title>Granularität der Protokollierung von (Debug-)Meldungen</title>
+
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der <em>verbosity level</em> bestimmt die Intensität der Protokollierung.
+            Als Wert kann eine Zahl zwischen <em>1</em> und <em>9</em> angegeben werden.
+            Höhere Werte erzeugen detailliertere Protokollausgaben.
+            <br/>
+         <br/>
+            Die Protokollausgabe erfolgt nach stdout bzw. in die mit dem Parameter
+            <paramref>log_filename</paramref> angegebene Datei.
+          </div>
+        </note>
+
+        <note language="en">
+          <title>The granuality of (Debug-)Messages</title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+          <todo>
+          Change granuality to granularity
+          </todo>
+            The <em>verbosity level</em> specifies the intensity of log entries.
+            A value between <em>1</em> and <em>9</em> can be specified.
+            Higher values cause more detailed information to be logged.
+            <br/>
+         <br/>
+            Log output is written to stdout or to a file that has been specified
+            with the parameter <paramref>log_filename</paramref>.
+          </div>
+        </note>
+      </param>

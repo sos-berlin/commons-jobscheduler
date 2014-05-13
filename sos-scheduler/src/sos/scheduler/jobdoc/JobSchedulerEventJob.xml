@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="scheduler_job_documentation_v1.1.xsl"?>
+<description xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+  <job name="JobSchedulerEventJob" title="Process Events" order="yes" tasks="1">
+    <script language="java" java_class="sos.scheduler.job.JobSchedulerEventJob" resource="1" />
+  </job>
+  <releases>
+    <release id="1.0" created="2008-05-09" modified="2008-05-09">
+      <title>Version 1.0</title>
+      <author name="Andreas Liebert" email="andreas.liebert@sos-berlin.com" />
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Initiale Auslieferung</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Initial Release</div>
+      </note>
+    </release>
+  </releases>
+  <resources>
+    <file os="all" type="java" file="sos.scheduler.jar" id="1">
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Standard-Job der Auslieferung</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Standard job in distribution</div>
+      </note>
+    </file>
+    <file os="all" type="java" file="sos.spooler.jar" id="2">
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Klasse Job_Impl</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Class Job_Impl</div>
+      </note>
+    </file>
+    <file os="all" type="java" file="sos.util.jar" id="3">
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Klasse SOSLogger</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Class SOSLogger</div>
+      </note>
+    </file>
+  </resources>
+  <configuration>
+    <params id="job_parameter">
+      <param name="expiration_period" default_value="24:00:00" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter enthält einen Zeitwert für die Dauer, nach der Events verfallen.
+            Dieser Wert gilt nicht für alle events, der Errechnete Zeitpunkt kann jedoch
+            in event handler stylesheets mit
+            <code>/events/@expiration_date</code>
+            verwendet werden.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies an expiration period for events. This period is not
+            used for all events. But it can be used in event handler stylesheets by accessing
+            <code>/events/@expiration_date</code>
+            .
+          </div>
+        </note>
+      </param>
+      <param name="expiration_cycle" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Ähnlich zum
+            <code>expiration_period</code>
+            Parameter setzt expiration_cycle eine Uhrzeit (z.B. 06:00) zu der
+            das Event verfallen soll. 
+            Dieser Wert gilt nicht für alle events, der Errechnete Zeitpunkt kann jedoch
+            in event handler stylesheets mit
+            <code>/events/@expiration_date</code>
+            verwendet werden.
+            <code>expiration_cycle</code>
+            hat Vorrang vor
+            <code>expiration_period</code>
+            .
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Similar to
+            <code>expiration_period</code>
+            this parameter specifies a time (z.B. 06:00) when
+            an event will expire. 
+            This time is not
+            used for all events. But it can be used in event handler stylesheets by accessing
+            <code>/events/@expiration_date</code>
+            .
+            <code>expiration_cycle</code>
+            takes precedence over
+            <code>expiration_period</code>
+            .
+          </div>
+        </note>
+      </param>
+      <param name="event_handler_filepath" required="true">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Der Pfad in dem der Job nach Event Handler Stylesheets sucht.</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">The path in which the event handler stylesheets can be found.</div>
+        </note>
+      </param>
+      <param name="event_handler_filespec" required="false" DefaultValue="\.xsl$">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Regulärer Ausdruck, der die Stylesheets beschreibt, die bei jedem Lauf des Jobs verarbeitet werden.
+            Zusätzlich verarbeitet der Job Stylesheets für bestimmte Jobs, Jobketten oder Event Klassen nach der
+            Namenskonvention:
+            <br />
+            <ul>
+              <li>[job_name].*.job.xsl wird ausgeführt für Events vom Job [job_name]</li>
+              <li>[job_chain_name].*.job_chain.xsl wird ausgeführt für Events von einem Job in der Jobkette [job_chain_name]</li>
+              <li>[event_class].*.event_class.xsl wird ausgeführt für Events mit der Event Klasse [event_class]</li>
+            </ul>
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This regular expression specifies the stylesheets which will be processed on every run of the job.
+            Additionally, the job will process stylesheets which follow the naming scheme:
+            <br />
+            <ul>
+              <li>[job_name].*.job.xsl will be run for events created by the job [job_name]</li>
+              <li>[job_chain_name].*.job_chain.xsl will be run for events created by a job in the job chain [job_chain_name]</li>
+              <li>[event_class].*.event_class.xsl will be run for events with the event class [event_class]</li>
+            </ul>
+          </div>
+        </note>
+      </param>
+      <param name="action" default_value="add" required="false" />
+      <param name="scheduler_id" default_value="id of the job scheduler this job is running" required="false" />
+      <param name="spooler_id" required="false" />
+      <param name="remote_scheduler_host" required="false" />
+      <param name="remote_scheduler_port" required="false" />
+      <param name="job_chain" required="false" />
+      <param name="order_id" required="false" />
+      <param name="job_name" required="false" />
+      <param name="event_class" required="false" />
+      <param name="event_id" required="false" />
+      <param name="exit_code" required="false" />
+      <param name="expires" required="false" />
+      <param name="created" required="false" />
+      <param name="expiration_period" required="false" default_value="24:00:00" />
+      <param name="expiration_cycle" required="false" />
+      <param name="event_handler_filepath" required="false" default_value="./config/events" />
+      <param name="event_handler_filespec" required="false" default_value="\\.xsl$" />
+      <param name="socket_timeout" default_value="5" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Bestimmt den Timeout für die Socket Kommunikation mit den Job Schedulern bei der Ausführung von Kommandos.</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">Timeout for socket communication</div>
+        </note>
+      </param>
+    </params>
+    <payload>
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Alle weiteren (als die hier erklärten) Auftragsparameter werden als Eventparameter behandelt.</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">All other order parameters (than those explained here) will be treated as event parameters.</div>
+      </note>
+      <params>
+        <param name="action" default_value="add" required="false">
+          <note language="de">
+            <div xmlns="http://www.w3.org/1999/xhtml">
+              Der Parameter bestimmt die Aktion die durchgeführt wird:
+              <br />
+              <code>add</code>
+              fügt das übergebene Event hinzu und führt die Event Handler aus.
+              <br />
+              <code>remove</code>
+              entfernt das übergebene Event und führt die Event Handler aus.
+              <br />
+              <code>process</code>
+              führt die Event Handler aus.
+              <br />
+              Bei remove werden alle Events entfernt, die mit den angegebenen Event Parametern übereinstimmen.
+            </div>
+          </note>
+          <note language="en">
+            <div xmlns="http://www.w3.org/1999/xhtml">
+              This parameter specifes which action will be performed by the job:
+              <br />
+              <code>add</code>
+              adds the submitted event and executes the event handlers.
+              <br />
+              <code>remove</code>
+              removes the submitted event and executes the event handlers.
+              <br />
+              <code>process</code>
+              executes the event handlers.
+              <br />
+              The remove command removes all events, which match the specified parameters.
+            </div>
+          </note>
+        </param>
+        <param name="remote_scheduler_host" required="false">
+          <note language="de">
+            <div xmlns="http://www.w3.org/1999/xhtml">Host des Job Scheduler der das Event erstellt hat.</div>
+          </note>
+          <note language="en">
+            <div xmlns="http://www.w3.org/1999/xhtml">Host of the Job Scheduler which created the event</div>
+          </note>
+        </param>
+        <param name="remote_scheduler_port" required="false">
+          <note language="de">
+            <div xmlns="http://www.w3.org/1999/xhtml">Port des Job Scheduler der das Event erstellt hat.</div>
+          </note>
+          <note language="en">
+            <div xmlns="http://www.w3.org/1999/xhtml">Port of the Job Scheduler which created the event</div>
+          </note>
+        </param>
+        <param name="job_chain" required="false">
+          <note language="de">
+            <div xmlns="http://www.w3.org/1999/xhtml">Jobkette in der das Event erstellt wurde.</div>
+          </note>
+          <note language="en">
+            <div xmlns="http://www.w3.org/1999/xhtml">Job chain in which the event was created.</div>
+          </note>
+        </param>
+        <param name="order_id" required="false">
+          <note language="de">
+            <div xmlns="http://www.w3.org/1999/xhtml">Id des Auftrags, der das Event erstellt hat.</div>
+          </note>
+          <note language="en">
+            <div xmlns="http://www.w3.org/1999/xhtml">ID of the order which created the event.</div>
+          </note>
+        </param>
+        <param name="job_name" required="false">
+          <note language="de">
+            <div xmlns="http://www.w3.org/1999/xhtml">Name des Jobs, der das Event erstellt hat.</div>
+          </note>
+          <note language="en">
+            <div xmlns="http://www.w3.org/1999/xhtml">Name of the job which created the event.</div>
+          </note>
+        </param>
+        <param name="event_class" required="false">
+          <note language="de">
+            <div xmlns="http://www.w3.org/1999/xhtml">
+              Klasse des Events (frei wählbar).
+              <br />
+              Wird bei der action "remove" die Klasse
+              <code>*all_events*</code>
+              angegeben,
+              so werden alle events gelöscht.
+            </div>
+          </note>
+          <note language="en">
+            <div xmlns="http://www.w3.org/1999/xhtml">
+              Event class (arbitrary).
+              <br />
+              If the event class
+              <code>*all_events*</code>
+              is used with the "remove" action,
+              all events will be deleted.
+            </div>
+          </note>
+        </param>
+        <param name="event_id" required="false">
+          <note language="de">
+            <div xmlns="http://www.w3.org/1999/xhtml">
+              ID des Events (frei wählbar).
+              <br />
+            </div>
+          </note>
+          <note language="en">
+            <div xmlns="http://www.w3.org/1999/xhtml">
+              Event ID (arbitrary).
+              <br />
+            </div>
+          </note>
+        </param>
+        <param name="exit_code" required="false">
+          <note language="de">
+            <div xmlns="http://www.w3.org/1999/xhtml">Exit code des Jobs, der das Event erzeugt hat.</div>
+          </note>
+          <note language="en">
+            <div xmlns="http://www.w3.org/1999/xhtml">Exit code of the job which created the event.</div>
+          </note>
+        </param>
+        <param name="expires" required="false">
+          <note language="de">
+            <div xmlns="http://www.w3.org/1999/xhtml">Verfallsdatum des Events (ISO-Format yyyy-mm-dd hh:mm:ss)</div>
+          </note>
+          <note language="en">
+            <div xmlns="http://www.w3.org/1999/xhtml">Expiration date of the event (ISO-format yyyy-mm-dd hh:mm:ss)</div>
+          </note>
+        </param>
+        <param name="created" required="false">
+          <note language="de">
+            <div xmlns="http://www.w3.org/1999/xhtml">Erzugungsdatum des Events (ISO-Format yyyy-mm-dd hh:mm:ss)</div>
+          </note>
+          <note language="en">
+            <div xmlns="http://www.w3.org/1999/xhtml">Creation date of the event (ISO-format yyyy-mm-dd hh:mm:ss)</div>
+          </note>
+        </param>
+      </params>
+    </payload>
+  </configuration>
+  <documentation language="de">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      Jobs des Job Schedulers können Events erzeugen, die von einer Job Scheduler
+      Supervisor Instanz verarbeitet werden. Dazu werden im Supervisor Event Handler
+      konfiguriert, die individuelle Bedingungen implementieren, auf welche Events
+      in welcher Weise reagiert werden soll, z.B. durch Starten weiterer Jobs und Job-Ketten.
+      <br />
+      <br />
+      Dieser Job verarbeitet auftragsgetrieben die Events und führt dazu die Event Handler aus.
+      Dadurch können weitere Befehle an andere Job Scheduler gesendet werden.
+      <br />
+      Der Job kann events hinzufügen oder löschen.
+      <br />
+      Es wird empfohlen einen Auftrag zu konfigurieren, der periodisch alle Event Handler ausführt:
+      <code>
+        <pre>&lt;add_order id="event_processor" job_chain="scheduler_event_service"&gt;
+       &lt;params&gt;
+           &lt;param name="action" value="process"/&gt;
+           &lt;param name="stylesheet_filespec"    value="\.xsl$"/&gt;
+       &lt;/params&gt;
+       &lt;run_time let_run="yes" repeat="300"/&gt;
+ &lt;/add_order&gt;</pre>
+      </code>
+    </div>
+  </documentation>
+  <documentation language="en">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      During job execution in a Job Scheduler Workload instance events could be created 
+      that should be processed by a Job Scheduler Supervisor Instance. Therefore 
+      event handlers are configured in the Supervisor that implement individual conditions
+      that state to which events should be reacted, e.g. by starting other jobs and job chains.
+      <br />
+      <br />
+      This job is triggered by orders. It processes events by executing event handlers. Event handlers can create 
+      commands which are sent to other Job Schedulers.
+      <br />
+      This job can add or remove events
+      <br />
+      It is recommended to configure and order which periodically executes all event handlers:
+      <code>
+        <pre>&lt;add_order id="event_processor" job_chain="scheduler_event_service"&gt;
+       &lt;params&gt;
+           &lt;param name="action" value="process"/&gt;
+           &lt;param name="stylesheet_filespec"    value="\.xsl$"/&gt;
+       &lt;/params&gt;
+       &lt;run_time let_run="yes" repeat="300"/&gt;
+ &lt;/add_order&gt;</pre>
+      </code>
+    </div>
+  </documentation>
+</description>
+

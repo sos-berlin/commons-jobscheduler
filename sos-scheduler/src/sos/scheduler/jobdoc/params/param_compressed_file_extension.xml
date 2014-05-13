@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    name="compressed_file_extension" default_value=".gz" required="false"
+    DataType="SOSOptionString" interface="ISOSFileCompression" Alias="ftp_compressed_file_extension"
+>
+    <note language="de">
+        <title>Dateinamenendung für komprimierte Dateien</title>
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+                Der Parameter bestimmt die Endung des Dateinamens, falls eine
+                Komprimierung
+                mit dem Parameter
+                <paramref>compress_files</paramref>
+                durchgeführt wird.
+                Die Endung wird an an eine evtl. bereits vorhandene Dateinamensendung
+                angehängt.
+            </p>
+        </div>
+    </note>
+    <note language="en">
+        <title>Additional file-name extension for compressed files</title>
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the file extension should target file
+            compression
+            be specified using the
+            <paramref>compress_files</paramref>
+            parameter.
+        </div>
+    </note>
+</param>

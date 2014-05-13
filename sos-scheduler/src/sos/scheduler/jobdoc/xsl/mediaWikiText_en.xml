@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+	<!-- $Id$ -->
+<items>
+<item id="usedby">Parameter used by&#x20;</item>
+<item id="defaultvalue">The default value for this parameter is&#x20;</item>
+<item id="mandatory">This parameter is mandatory.</item>
+<item id="descriptionof">Description of&#x20;</item>
+<item id="deprecatedjob">This job is deprecated. It should be not used anymore. It will be discarded from the package in the near future. </item>
+<item id="useinstead">&#x20;should be used instead.</item>
+<item id="lastrevision">This article was last modified on (mm/dd/yyyy) &#x20;</item>
+<item id="datatype">Data-Type </item>
+<item id="parameter">Parameter</item>
+<item id="return.parameter">Return parameter</item>
+<item id="return.parameter.text">The order parameter described below are returned by the job to the JobScheduler.</item>
+<item id="parameter.table.title">! Name || title || mandatory || default</item>
+<item id="job.example">An example for a job-xml file:</item>
+<item id="usewith">Use together with parameter: &#x20;</item>
+
+</items>

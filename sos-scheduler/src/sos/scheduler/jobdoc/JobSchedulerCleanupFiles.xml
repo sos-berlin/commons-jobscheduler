@@ -1,0 +1,266 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="scheduler_job_documentation_v1.1.xsl"?>
+<description xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xi="http://www.w3.org/2001/XInclude" xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 
+    http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+
+    <job name="JobSchedulerCleanupFiles" title="Remove temporary files" order="both" tasks="1" category="FileHandling, FileOperations" since="1.3.?">
+        <script language="java" java_class="sos.scheduler.job.JobSchedulerCleanupFiles" resource="1">
+        </script>
+    </job>
+
+    <releases>
+        <release id="1.0" created="2006-02-20" modified="2006-02-21">
+            <title>Version 1.0</title>
+            <author name="Andreas Püschel" email="andreas.pueschel@sos-berlin.com" />
+            <note language="de">
+                <div xmlns="http://www.w3.org/1999/xhtml">Initiale Auslieferung</div>
+            </note>
+            <note language="en">
+                <div xmlns="http://www.w3.org/1999/xhtml">Initial release</div>
+            </note>
+        </release>
+    </releases>
+
+    <resources>
+        <xi:include href="./jars/sos.scheduler.jar.xml" parse="xml" />
+        <xi:include href="./jars/sos.spooler.jar.xml" parse="xml" />
+        <xi:include href="./jars/sos.util.jar.xml" parse="xml" />
+        <xi:include href="./jars/sos.JSHelper.jar.xml" parse="xml" />
+<!-- 
+    <file os="all" type="java" file="sos.settings.jar" id="4">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Klasse SOSProfileSettings</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Class SOSProfileSettings</div></note>
+    </file>
+    <file os="win32"     type="binary" file="hostole.dll"    id="5"/>
+    <file os="win32"     type="binary" file="hostjava.dll"   id="6"/>
+    <file os="linux32"   type="binary" file="libhostole.so"  id="7"/>
+    <file os="linux32"   type="binary" file="libhostjava.so" id="8"/>
+    <file os="solaris32" type="binary" file="libhostole.so"  id="9"/>
+    <file os="solaris32" type="binary" file="libhostjava.so" id="10"/>
+    <file os="hpux64"    type="binary" file="libhostjava.sl" id="11"/>
+     -->
+    </resources>
+
+    <configuration>
+        <xi:include href="./notes-de/OrderOrStandAlone.xml" parse="xml" />
+        <xi:include href="./notes/OrderOrStandAlone.xml" parse="xml" />
+
+        <params id="job_parameter">
+            <param name="file_path" default_value="" required="false">
+                <note language="de">
+                    <title>Verzeichnis-Name(n)</title>
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                        <p>
+                            Der Wert des Parameters spezifiziert den Namen des Verzeichnis, aus dem die temporären Dateien gelöscht werden sollen.
+                        </p>
+                        <p>
+                            Fehlt der Parameter, dann wird das System-Verzeichnis für temporäre Dateien verwendet.
+                            Unter Unix ist dies das Verzeichnis
+                            <foldername>/tmp</foldername>
+                            , unter Windows das Temp-Verzeichnis der Kennung des JobSchedulers.
+                        </p>
+                        <p>
+                            Mehr als ein Verzeichnis kann, getrennt durch ";", konfiguriert werden. Im
+                            Parameter
+                            <paramref>file_specification</paramref>
+                            muss dann die gleiche Anzahl
+                            Dateispezifikationen konfiguriert werden. Das temporäre Verzeichnis kann
+                            mit
+                            <java.system.property>java.io.tmpdir</java.system.property>
+                            in die liste aufgenommen werden.
+                        </p>
+                    </div>
+                </note>
+                <note language="en">
+                    <title>Foldername(s)</title>
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                        <p>
+                            This parameter specifies a directory with files to be removed.
+                        </p>
+                        <p>
+                            If this parameter is not given, then the temporary files directory for will be used.
+                            For Unix this is
+                            <foldername>/tmp</foldername>
+                            , for Windows this is the JobScheduler account temporary files directory.
+                        </p>
+                        <p>
+                            More than one directory can be configured by separating the elements with ";".
+                            The
+                            <paramref>file_specification</paramref>
+                            parameter then needs to configure
+                            the same amount of elemens. The temporary directory can be added to the
+                            list with
+                            <java.system.property>java.io.tmpdir</java.system.property>
+                            .
+                        </p>
+                    </div>
+                </note>
+            </param>
+            <xi:include href="./params/param_file_spec_fileop.xml" xmlns:xi="http://www.w3.org/2001/XInclude" parse="xml" />
+            <param name="file_specification" default_value="^(sos.*)" required="false">
+                <note language="de">
+                    <title>Dateinamens-Filter</title>
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                        <p>
+                            Der Parameter spezifiziert einen regulären Ausdruck für die zu entfernenden Dateien.
+                        </p>
+                        <p>
+                            Mit der Voreinstellung dieses Parameters werden die vom JobScheduler erzeugten und ggf. nicht entfernten Dateien gelöscht.
+                            Vom
+                            JobScheduler erzeugte
+                            temporäre Dateien werden mit dem Präfix
+                            <em>sos</em>
+                            angelegt.
+                        </p>
+                        <p>
+                            Sind in
+                            <paramref>file_path</paramref>
+                            mehrere Verzeichnisse angegeben, so müssen
+                            hier entsprechend viele Datei-Spezifikationen, durch ";" getrennt, spezifiziert
+                            werden.
+                        </p>
+                    </div>
+                    <xi:include href="./notes-de/RegExpRemarks.xml" xmlns:xi="http://www.w3.org/2001/XInclude" parse="xml" />
+                    <xi:include href="./notes-de/ExampleReplace.xml" xmlns:xi="http://www.w3.org/2001/XInclude" parse="xml" />
+                </note>
+                <note language="en">
+                    <title>regular expression for selecting the files to be deleted</title>
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                        <p>
+                            This parameter specifies a regular expression for the files to be removed.
+                        </p>
+                        <p>
+                            By default temporary files are removed that have been created by the JobScheduler
+                            and for some reason could not be deleted.
+                            Temporary
+                            files created by the JobScheduler have the prefix
+                            <em>sos</em>
+                            .
+                        </p>
+                        <p>
+                            If more than one directory is configured in
+                            <paramref>file_path</paramref>
+                            , then
+                            the according number of filespecs needs to be set separated by ";".
+                        </p>
+                    </div>
+                    <xi:include href="./notes/RegExpRemarks.xml" xmlns:xi="http://www.w3.org/2001/XInclude" parse="xml" />
+                    <xi:include href="./notes/ExampleReplace.xml" xmlns:xi="http://www.w3.org/2001/XInclude" parse="xml" />
+                </note>
+            </param>
+            <param name="file_age" default_value="24:00" required="false">
+                <note language="de">
+                    <title>Dateimindestalter</title>
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                        <p>
+                            Der Parameter bestimmt das Mindestalter der Dateien, die entfernt werden.
+                        </p>
+                    </div>
+                </note>
+                <note language="en">
+                    <title>Min file age</title>
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                        <p>
+                            This parameter specifies the minimum age of the files to be removed.
+                        </p>
+                    </div>
+                </note>
+            </param>
+
+            <param name="warning_file_limit" default_value="0" required="false">
+                <note language="de">
+                    <title>Maximale Anzahl erwarteter Dateien</title>
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                        <p>
+                            Werden in einem Verzeichnis mehr als die hier konfigurierte Anzahl an Dateien gefunden,
+                            so wird der Job mit einer Warnung beendet.
+                        </p>
+                    </div>
+                </note>
+                <note language="en">
+                    <title>Max number of files expected</title>
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                        <p>
+                            Should more files be found in a directory than the number which is specified here, the job
+                            will terminate with a warning message.
+                        </p>
+                    </div>
+                </note>
+            </param>
+        </params>
+        <params id="return_parameter">
+        </params>
+        <params id="other">
+        </params>
+
+    </configuration>
+
+    <documentation language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+                Der Job entfernt temporäre Dateien.
+                The job belongs to the category "FileOperations".
+            </p>
+            <xi:include href="./notes/FileOperations.xml" parse="xml" />
+            <p>
+                Sie können den Job einsetzen, um die von indivduell implementierten Jobs erzeugten temporären Dateien
+                regelmäßig zu löschen, sofern dies nicht
+                bereits im Job geschieht.
+                Dies ist für vom JobScheduler erzeugte temporäre Dateien nicht erforderlich,
+                da hier temporäre Dateien, z.B. die
+                Ausgaben von Jobs
+                nach stdout oder stderr, normalerweise nach Beendigung eines Jobs vom JobScheduler wieder gelöscht werden.
+            </p>
+            <p>
+                <features>
+                    <feature>
+                        deleting of files
+                    </feature>
+                    <feature>
+                        Use of regular expressions (much more than a simple wildcard)
+                    </feature>
+                    <feature>
+                        Recurse of subdirectories
+                    </feature>
+                </features>
+            </p>
+        </div>
+    </documentation>
+
+    <documentation language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+                This job removes temporary files.
+                It is not required for the JobScheduler itself - which automatically removes temporary files,
+                e.g. for output to
+                stdout or stderr.
+            </p>
+            <p>
+                This job should be used when indivdual job implementations create temporary files,
+                which then need to be regularly deleted.
+                The job belongs to the
+                category "FileOperations".
+            </p>
+            <xi:include href="./notes/FileOperations.xml" parse="xml" />
+            <p>
+                <features>
+                    <feature>
+                        deleting of files
+                    </feature>
+                    <feature>
+                        Use of regular expressions (much more than a simple wildcard)
+                    </feature>
+                    <feature>
+                        Recurse of subdirectories
+                    </feature>
+                    <feature>
+                        Use of variables for a state-dependent substitution
+                        such as inserting the current date into the filename or into the name of the
+                        target directory
+                    </feature>
+                </features>
+            </p>
+        </div>
+    </documentation>
+</description>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="xml2live" default="create_live_objects" basedir=".">
+	<description>
+        Build live objects from scheduler.xml
+    </description>
+
+	<property name="transformer" location="R:\backup\sos\java\lib\Saxon9/saxon9he.jar" />
+	<property name="target.dir" location="c:/temp/CronConverter/live" />
+	<property name="source.file" location="c:/temp/crontab.xml" />
+	<property name="xsl.file" location="${basedir}/xml2live.xsl" />
+
+	<path id="base.path">
+		<pathelement path="${transformer}" />
+	</path>
+
+	<target name="create_live_objects" depends="clean">
+		<echo>Start create live objects</echo>
+		<echo>input is ${source.file}</echo>
+		<echo>output in ${target.dir}</echo>
+
+		<xslt style="${xsl.file}" in="${source.file}" out="${source.file}.tmp" failOnError="true" force="yes">
+			<factory name="net.sf.saxon.TransformerFactoryImpl" />
+			<param name="sos.destination" expression="${target.dir}" />
+			<classpath refid="base.path" />
+		</xslt>
+		<delete file="${source.file}.tmp" />
+	</target>
+
+	<target name="clean" description="clean up">
+		<delete dir="${target.dir}" />
+	</target>
+
+</project>

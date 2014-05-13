@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="MaxJobNetNodes"
+       required="false"
+       DefaultValue="500"       
+              DataType="SOSOptionInteger"
+       >
+        <note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Begrenzt die Anzahl der Jobkettenknoten eines Jobnetzes. Überschreitet ein Jobnetz diese Anzahl, wird der Job mit dem Fehler
+            <i>JOBNETC_E_0017</i> (Jobnetz enthält zu viele Knoten) beendet. Auf diese Weise werden endlose Rekursionen in einem Jobnetz erkannt.
+            <br/>
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            With this parameter you can set a limitation for the number ob jobnet nodes in a jobnet. The job will be end with error <i>JOBNETC_E_0017</i>
+            (the jobnet contains too many nodes) if the number of nodes exceeds this limitation.
+            <br/>
+            </div>
+        </note>
+      </param>

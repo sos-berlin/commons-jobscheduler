@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns:xi="http://www.w3.org/2001/XInclude"
+       xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="ftp_parallel"
+       default_value="false"
+       required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter bestimmt, ob Dateien parallel übertragen werden sollen.
+            Enthält der Parameter den Wert
+            <em>yes</em>
+            und es werden mehrere Dateien für
+            die Übertragung gefunden, z.B. nach Verwendung eines regulären Ausdrucks im 
+            Parameter
+            <code>ftp_file_spec</code>
+            , dann startet dieser Job automatisch
+            pro Datei einen Folge-Job via
+            <code>&lt;start_job&gt;</code>
+            .
+            Die einzelnen Folge-Jobs laufen parallel ab.
+            <br clear="none"/>
+            <br clear="none"/>
+            Bei Verwendung innerhalb einer Job-Kette wird automatisch pro zu übertragender Datei ein impliziter Auftrag
+            für dieselbe Job-Kette und denselben Job-Knoten via
+            <code>&lt;add_order&gt;</code>
+            erzeugt. Der Job muss z.B. mit dem Job-Attribut
+            <code>&lt;job tasks="5"&gt;</code>
+            konfiguriert sein, damit fünf Job-Instanzen
+            parallel ablaufen können. Müssen eine größere Anzahl Dateien übertragen werden als Job-Instanzen
+            konfiguriert sind, dann werden diese Aufträge in eine Warteschlange aufgenommen
+            und bei Freiwerden der nächsten Task abgearbeitet.
+            <br clear="none"/>
+            <br clear="none"/>
+            Mit den Parametern
+            <code>ftp_parallel_check_retry</code>
+            und
+            <code>ftp_parallel_check_interval</code>
+            werden die maximale Anzahl und das Intervall
+            von Wiederholungsversuchen festgelegt, in denen dieser Job prüft, ob alle
+            Teilaufträge für parallele Transfers erledigt sind. Eine Job-Kette wird erst forgesetzt,
+            wenn alle Teilaufträge abgeschlossen sind bzw. die maximale Anzahl Wiederholungsversuche
+            erreicht wurde.
+            <br clear="none"/>
+            <br clear="none"/>
+            Nur wenn alle Teilaufträge für parallele Transfers erfolgreich abgeschlossen sind, gilt der 
+            ursprüngliche Auftrag als erfolgreich, andernfalls geht der ursprüngliche Auftrag
+            in den entsprechenden Fehlerzustand seines Job-Knotens über.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies whether a file transfer should be executed in parallel.
+            If this parameter is assigned the value
+            <em>true</em>
+            and if multiple files were
+            selected for transfer, e.g. when using a regular expression for matching file names
+            by the parameter
+            <code>ftp_file_spec</code>
+            , then this job will automatically
+            launch one successor job per file by
+            <code>&lt;start_job&gt;</code>
+            .
+            Such successor jobs will be executed in parallel.
+            <br clear="none"/>
+            <br clear="none"/>
+            When used within a job chain then automatically for each file an implicit order will be created
+            for the same job chain and the same job node via
+            <code>&lt;add_order&gt;</code>
+            .
+            This job has to be configured e.g. with the job attribute
+            <code>&lt;job tasks="5"&gt;</code>
+            in order to enable five parallel job instances. Should the number of files for parallel
+            transfers exceed the maximum allowed number of parallel tasks then the additional
+            orders will be enqueued and will be processed as soon as a free task becomes available.
+            <br clear="none"/>
+            <br clear="none"/>
+            With the parameters
+            <code>ftp_parallel_check_retry</code>
+            and
+            <code>ftp_parallel_check_interval</code>
+            the maximum number of trials and the interval between
+            two trials are set in which the completion of parallel transfers is checked.
+            A job chain will be continued only if all dependent orders for parallel transfers
+            have been completed or if the maximum number of trials to check for completion is exceeded.
+            <br clear="none"/>
+            <br clear="none"/>
+            The initial order will be classified as successful only if all implicit orders
+            for parallel transfers have been successfully completed, otherwise the initial
+            order will switch to the error state of the current job node.
+          </div>
+        </note>
+      </param>

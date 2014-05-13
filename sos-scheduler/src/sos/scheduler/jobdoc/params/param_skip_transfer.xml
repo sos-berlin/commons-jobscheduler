@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="skip_transfer"
+       DefaultValue="false"
+       required="false"
+       DataType="SOSOptionBoolean">
+        <note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Enthält dieser Parameter den Wert <em>true</em>, dann werden alle Operationen 
+            ausser dem eigentlichen Transfer durchgeführt. 
+            Dadurch kann z.B. nur getriggert oder nur auf dem FTP/SFTP Server gelöscht werden.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            If this Parameter is set to <em>true</em> then 
+            all operations except for the transfer itself will be performed. 
+            This can be used to just trigger for files or to only delete files on the FTP/SFTP server.
+          </div>
+        </note>
+      </param>

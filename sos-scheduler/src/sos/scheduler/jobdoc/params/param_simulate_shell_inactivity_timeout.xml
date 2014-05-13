@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="simulate_shell_inactivity_timeout"
+       required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Wenn die angegebene Anzahl von Millisekunden keine neuen Zeichen nach
+            stdout oder stderr geschrieben werden, wird angenommen, dass das Kommando
+            ausgeführt wurde und die Shell auf eine Eingabe wartet.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            If no new characters are written to stdout or stderr after the given number
+            of milliseconds, the job assumes that that the command has been carried out and
+            the shell is waiting for commands.
+          </div>
+        </note>
+      </param>

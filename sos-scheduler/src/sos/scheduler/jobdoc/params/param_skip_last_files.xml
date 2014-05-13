@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    name="skip_last_files" Category="FileSystem" DataType="SOSOptionInteger"
+    OptionName="NoOfLastFiles2Skip" Alias="NoOfLastFiles2Skip" default_value="0"
+    required="false"
+>
+    <note language="de">
+        <title>number of files to remove from the beginning of the
+            result-set
+        </title>
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            Die angegebene Anzahl Dateien wird vom Ende der Ergebnismenge
+            entfernt.
+            Auf diese Dateien wirkt sich die weitere Operation nicht
+            aus.
+            <br />
+
+            Der Parameter wirkt auf die resultierende Menge von min_file_size,
+            min_file_age etc.
+            <br />
+            <br />
+            Die Menge ist sortiert entsprechend der verwendeten
+            einschränkenden Parameter:
+            <br />
+            + min_file_age, max_file_age: aufsteigend nach Änderungsdatum der
+            Datei, d.h. jüngere zuerst
+            <br />
+            + min_file_size, max_file_size: aufsteigend nach Größe, d.h.
+            kleinere zuerst
+            <br />
+            + sind sowohl Parameter für Größe wie Alter angegeben, dann
+            erfolgt die Sortierung nach Alter
+            <br />
+            <br />
+            Es darf nur entweder skip_first_files oder skip_last_files gesetzt
+            sein.
+        </div>
+    </note>
+    <note language="en">
+        <title>number of files to remove from the bottom of the result-set
+        </title>
+        <p>
+            The number of files are removed from the end of the result set
+            by
+            <paramref>min_file_size</paramref>
+            ,
+            <paramref>min_file_age</paramref>
+            etc.
+            These files are excluded from
+            further operations.
+        </p>
+        <p>
+            The result set is sorted according to the used constraining
+            parameters:
+            <ul>
+                <li>
+                    <paramref>min_file_age</paramref>
+                    ,
+                    <paramref>max_file_age</paramref>
+                    : in ascending order by date of last
+                    modification, the newest file first.
+                </li>
+                <li>
+                    <paramref>min_file_size</paramref>
+                    ,
+                    <paramref>max_file_size</paramref>
+                    : in ascending order by file size,
+                    the smallest file first.
+                </li>
+                <li>
+                    if parameters for file age as well as file size are given the
+                    set is sorted by file age.
+                </li>
+            </ul>
+            Only either
+            <paramref>skip_first_files</paramref>
+            or
+            <paramref>skip_last_files</paramref>
+            is allowed to be
+            set at one time.
+        </p>
+    </note>
+</param>

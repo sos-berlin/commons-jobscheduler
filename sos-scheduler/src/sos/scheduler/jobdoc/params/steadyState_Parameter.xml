@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id: FileOrder_Parameter.xml 16251 2012-01-16 07:52:02Z kb $ -->
+<params key="parameters.steady_state"
+	xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+	xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" category="FileTransfer, steadyState">
+
+	<title language="de">Prüfung auf Vollständigkeit aller Dateien</title>
+	<title language="en">Check the completeness of a file (steady state)</title>
+	
+	<xi:include href="./param_CheckSteadyStateOfFiles.sosdoc" parse="xml" />
+	<xi:include href="./param_steady_state_count.sosdoc" parse="xml" />
+	<xi:include href="./param_check_steady_state_interval.sosdoc" parse="xml" />
+</params>

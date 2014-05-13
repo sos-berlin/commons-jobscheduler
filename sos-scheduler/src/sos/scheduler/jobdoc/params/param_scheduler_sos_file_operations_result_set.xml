@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id$ -->
+<param
+	xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+    xmlns:xi="http://www.w3.org/2001/XInclude" 
+	xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	name="scheduler_sosfileoperations_resultset" Category="FileHandling Filtering" DataType="SOSOptionString"
+	OptionName="SOSOptionFileOperationResultSet" Alias="ResultSet" default_value="empty"
+	required="false"
+	usewith="scheduler_sosfileoperations_Resultsetsize, scheduler_sosfileoperations_file_count"
+    since="1.3.11.1090" 	
+	>
+	<note language="de">
+		<title>Eine Liste aller Dateinamen</title>
+		<p>
+		</p>
+	</note>
+	<note language="en">
+		<title>The result of the operation as a list of items</title>
+		<p>
+		</p>
+	</note>
+</param>

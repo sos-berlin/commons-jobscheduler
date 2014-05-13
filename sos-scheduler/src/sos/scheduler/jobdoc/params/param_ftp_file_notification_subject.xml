@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns:xi="http://www.w3.org/2001/XInclude"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+
+       xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1
+http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd"
+Alias="subject"
+       name="ftp_file_notification_subject"
+
+       Category="eMail,Notification"
+    DataType="SOSOptionString"
+       required="false">
+        <note language="de">
+        <title>Betreffzeile einer eMail-Benachrichtigung</title>
+            <p>Der Parameter benennt den Betreff einer eMail-Benachrichtigung
+              falls Dateien übertragen wurden.</p>
+        </note>
+        <note language="en">
+        <title>Subject of an eMail Notification</title>
+            <p>This parameter specifies the subject of a mail notification,
+              should files have been transferred.</p>
+        </note>
+      </param>

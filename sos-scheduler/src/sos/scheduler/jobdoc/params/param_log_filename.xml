@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- $Id$ -->
+<param
+	xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+	xmlns:xhtml="http://www.w3.org/1999/xhtml" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 
+    http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd"
+	name="log_filename" required="false" DataType="SOSOptionOutFileName"
+	DefaultValue="stdout, global"
+	Category="logging">
+
+            <indexterm index="log_filename, param" display="false"></indexterm>
+            <indexterm index="param, log_filename" display="false"></indexterm>
+	<note language="de">
+		<title>Der Name (und Pfadname) der Protokoll-Datei</title>
+		<div xmlns="http://www.w3.org/1999/xhtml">
+		<p>
+			Der Wert des Parameters spezifiziert eine Datei, in die die Protokollausgaben der Anwendung
+			erfolgen.
+			</p>
+			<p>
+			Ist die Datei noch nicht vorhanden, dann wird sie angelegt.
+			An eine bestehende Datei werden Protokollausgaben angehängt.
+            </p>
+            <p>
+			Ohne Verwendung dieses Parameters erfolgen Protokollausgaben nach
+			stdout.
+            </p>
+			<p>
+			Nicht alle Anwendungen verwenden diesen Parameter
+			</p>
+		</div>
+	</note>
+	<note language="en">
+		<title>Name (and Pathname) of the logging-file</title>
+		<div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+			This parameter specifies the location of a file to which the log
+			output will be written.
+            </p>
+            <p>
+			Should the file not exist then it will be created. If the file already
+			exists
+			then all log output will be appended.
+            </p>
+            <p>
+			Without specifying this parameter all log output will be written to
+			stdout.
+            </p>
+		</div>
+	</note>
+</param>

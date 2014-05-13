@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id: param_replacement.xml 18349 2012-11-06 07:46:24Z kb $ -->
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    name="source_replacement" required="false" DataType="SOSOptionString" Alias="SourceReplaceWith"
+    usewith="source_replacing" see="replacement" prefix="source, target" 
+>
+
+    <indexterm index="replacement, parameter" display="false"></indexterm>
+    <indexterm index="parameter, replacement" display="false"></indexterm>
+
+
+    <note language="de">
+        <title>Zeichenkette für Substitution</title>
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+                Dieser Parameter hat nur Einfluss auf die Quell-Dateien.
+                Wenn die Ziel-Dateien umbenannt werden sollen, dann verwenden Sie bitte
+                <paramref>replacement</paramref>
+                .
+            </p>
+            <p>
+                Für weitere Informationen siehe die Beschreibung des Parameter
+                <paramref>replacement</paramref>
+                .
+            </p>
+        </div>
+    </note>
+    <note language="en">
+        <title>String for renaming Filenames </title>
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+                This parameter has only effect on the source files.
+                If you want to rename target files then use
+                <paramref>replacement</paramref>
+                .
+            </p>
+            <p>
+                For further information look at the description of the parameter
+                <paramref>replacement</paramref>
+                .
+            </p>
+        </div>
+    </note>
+</param>

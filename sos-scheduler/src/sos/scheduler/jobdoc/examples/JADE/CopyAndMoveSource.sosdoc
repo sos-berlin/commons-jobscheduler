@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- $Id$ -->
+<!--
+ -->
+<codeexample xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1
+http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+        <embeddedExample scope="client" type="ini"><![CDATA[
+[CopyAndMoveSource_Local2Local]
+
+ source_replacing=(.*)(.txt)
+ source_replacement=/SAVE/\1_[date:yyyyMMddHHmm];\2
+
+ source_dir = J:/E/java/junittests/testdata/JADE/
+ target_dir = J:/E/java/junittests/testdata/JADE/SOSMDX/
+ file_spec = ^.*\.txt$
+ operation = copy
+ source_protocol = local
+ target_protocol = local ]]></embeddedExample>
+
+        <embeddedExample scope="java" type="code"><![CDATA[
+    @Test
+    public void testCopyAndRenameSource() throws Exception {
+        setSourceAndTarget();
+
+        objOptions.FileNamePatternRegExp.Value("^.*\\.txt$");
+        objOptions.operation.Value(enuJadeOperations.copy);
+
+        objOptions.Source().replacing.Value("(.*)(.txt)");
+        objOptions.Source().replacement.Value("/SAVE/\\1_[date:yyyyMMddHHmm];\\2");
+
+        objOptions.remove_files.value(false);
+
+        startTransfer(objOptions);
+    }  ]]></embeddedExample>
+
+
+        <embeddedExample scope="command" type="shell"><![CDATA[
+        jade.sh -settings=settings-file-name -profile=CopyAndMoveSource_Local2Local
+]]></embeddedExample>
+
+        <explanation language="en">
+            <title>Rename files on source and target</title>
+            <p>
+
+            </p>
+        </explanation>
+        <explanation language="de">
+            <title>Dateinamen in der Quelle umbenennen und verschieben</title>
+            <p>
+            In diesem Beispiel werden alle Dateien, deren Name mit ".txt" endet,
+            zunächst auf das target kopiert.
+                <indexterm index="Zeitstempel, im Dateinamen" display="false"></indexterm>
+    <indexterm index="Dateiname, mit Zeitstempel" display="false"></indexterm>
+        <indexterm index="[date: ], Platzhalter" display="false"></indexterm>
+    <indexterm index="Platzhalter, [date: ]" display="false"></indexterm>
+            </p>
+            <p>
+            Die Dateien in der Quelle werden nach dem Transfer umbenannt.
+            Es wird für die Umbenennung ein Zeitstempel verwendet,
+            der auch die Minuten und Sekunden der aktuellen Uhrzeit (yyyyMMddHHmm) enthält.
+            </p>
+            <p>
+            Das Umbenennen wird mit den Parametern <paramref>replacement</paramref> und <paramref>replacing</paramref> konfiguriert.
+            Der Präfix "source_" wird verwendet, um die Aktion auf dem Source-Server, und nicht auf dem Target-Server, durchführen zu lassen.
+            </p>
+            <p>
+            Im Parameter <paramref>replacing</paramref> wir der Name eines Unterverzeichnisses, hier SAVE, angegeben, in das die Quelldateien
+            verschoben werden sollen.
+
+            </p>
+            <p>
+            Der Wert des Parameters <paramref>make_dirs</paramref> muß auf <paramval>true</paramval> gesetzt werden, falls das Unterverzeichnis noch nicht
+            existiert.
+            Geschieht dies nicht so wird die Applikation mit einem Fehler abgebrochen, wenn das Unterverzeichnis noch  nicht vorhanden ist.
+            </p>
+            <p>
+            Die Operation "copy" muß verwendet werden, wenn die Dateien auf dem source-server umbenannt werden sollen.
+            </p>
+        </explanation>
+    </codeexample>
+

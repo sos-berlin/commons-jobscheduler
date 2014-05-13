@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param
+	xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+    xmlns:xi="http://www.w3.org/2001/XInclude" 
+	xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	name="min_file_size" Category="FileSystem" DataType="SOSOptionFileSize"
+	OptionName="FileSizeMinimum" Alias="FileSizeMinimum" default_value="-1"
+	required="false">
+	<note language="de">
+		<title>minimale Größe einer oder mehrerer Dateien </title>
+		<p>
+			Vereinbart die minimale Größe einer oder mehrerer Dateien in
+			Bytes:
+			unterschreitet die Größe einer Datei diesen Wert,
+			dann
+			wird diese
+			nicht in das Resultat (result list) übernommen.
+		</p>
+	</note>
+	<xi:include href="./../notes-de/FileSizeValues.xml" parse="xml" />
+	<note language="en">
+		<title>minimum size of one or multiple files </title>
+		<p>
+			Specifies the minimum size of one or multiple files in bytes:
+			should
+			the size of one of the files fall below this value,
+			then it
+			is not included in the result list of the operation.
+		</p>
+	</note>
+	<xi:include href="./../notes/FileSizeValues.xml" parse="xml" />
+</param>

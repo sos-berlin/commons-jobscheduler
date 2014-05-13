@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="scheduler_job_documentation_v1.1.xsl"?>
+<description xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+  <job name="JSBatchInstaller" order="no" title="Unattended Batch Installation on remote servers" tasks="1">
+    <script language="java" java_class="sos.scheduler.InstallationService.JSBatchInstaller" />
+  </job>
+  <releases>
+    <release created="2011-03-22" modified="2011-03-22" id="1">
+      <title>First delivery</title>
+      <author name="Uwe Risse" email="uwe.risse@sos-berlin.com" />
+    </release>
+  </releases>
+  <resources>
+    <file os="all" type="other" file="scheduler_agent_installations.xml">
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Contains the entries for each server</div>
+      </note>
+    </file>
+  </resources>
+  <configuration>
+    <params>
+      <param name="configuration_path" required="true" DataType="SOSOptionFolderName">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Pfad zum Ordner mit den erzeugten Installationsdateien.</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">Path to the folder with the generated installation files.</div>
+        </note>
+      </param>
+      <param name="installation_definition_file" required="true" DataType="SOSOptionInFileName">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">XML Datei mit den Installationselementen. Ein Element pro Installation.</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">XML file with installation elements. One element per installation.</div>
+        </note>
+      </param>
+      <param name="installation_job_chain" required="true" default_value="automatic_installation" DataType="JSJobChainName">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Job chain mit den Schritten zum Übertragen der Installdateien. Die Jobkette muss die Knoten 
+
+-TransferInstallationSetup (FTP)
+Übertrag das Setup.
+
+-TransferInstallationFile (FTP)
+Übertrag die Installationsdatei
+
+-PerformInstall (SSH)
+Führt das Setup aus.
+
+beinhalten.</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">Job chain with the steps for transfer the installation files and perform the setup. The job chain must contain the nodes:
+
+-TransferInstallationSetup (FTP)
+Transfering setup
+
+-TransferInstallationFile (FTP)
+Transfering installation file
+
+-PerformInstall (SSH)
+Executing setup</div>
+        </note>
+      </param>
+      <param name="filter_install_host" required="false" DataType="SOSOptionHostName" >
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Angabe eines Host. Es werden nur die Installationen ausgeführt, die diesem Host zugeordnet sind.</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">Only installations are executed which belongs to this host.</div>
+        </note>
+      </param>
+      <param name="filter_install_port" required="false" default_value="0" DataType="SOSOptionPortNumber" >
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">Only installations are executed which belongs to this port.</div>
+        </note>
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Angabe eines Port. Es werden nur die Installationen ausgeführt, die diesem Port zugeordnet sind.</div>
+        </note>
+      </param>
+      <param name="execute_all_entries" required="false" default_value="false" DataType="SOSOptionBoolean">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">False: Nur die Installationen werden ausgeführt, die noch keinen Eintrag "LastRun" haben.
+
+True: Alle Installationen werden ausgeführt (unter Berücksichtigung des angegebenen Filters)</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">False: Only installations are executed which have no entry "LastRun" 
+
+True: All installations are executed (matching a given filter).</div>
+        </note>
+      </param>
+    </params>
+  </configuration>
+  <documentation language="de">
+    <div xmlns="http://www.w3.org/1999/xhtml">Der Job erzeugt Aufträge für die Jobkette "installation_job_chain". Die Aufträge sind wie folgt parametrisiert:
+
+     installation_file
+     
+     ftp_user
+     ftp_local_dir
+     ftp_host
+     ftp_password
+     ftp_remote_dir
+      
+     TransferInstallationSetup/ftp_file_path
+     TransferInstallationFile/ftp_local_dir
+     TransferInstallationFile/ftp_file_path
+
+     PerformInstall/host
+     PerformInstall/port
+     PerformInstall/user
+     PerformInstall/auth_method
+     PerformInstall/password
+     PerformInstall/sudo_passwd
+     PerformInstall/command
+
+Die Werte entstammen der XML Datei aus "installation_definition_file".</div>
+  </documentation>
+  <documentation language="en">
+    <div xmlns="http://www.w3.org/1999/xhtml">The job generates orders for the job chain "installation_job_chain". The orders are parameterized as follows:
+
+     installation_file
+     
+     ftp_user
+     ftp_local_dir
+     ftp_host
+     ftp_password
+     ftp_remote_dir
+      
+     TransferInstallationSetup/ftp_file_path
+     TransferInstallationFile/ftp_local_dir
+     TransferInstallationFile/ftp_file_path
+
+     PerformInstall/host
+     PerformInstall/port
+     PerformInstall/user
+     PerformInstall/auth_method
+     PerformInstall/password
+     PerformInstall/sudo_passwd
+     PerformInstall/command
+
+The value are specified in the file "installation_definition_file"</div>
+  </documentation>
+</description>
+

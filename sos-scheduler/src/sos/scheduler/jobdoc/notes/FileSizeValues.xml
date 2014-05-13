@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--$Id$ -->
+<note
+	xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+	xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" language="en">
+	<p>valid values for file size are</p>
+		<table>
+			<tr>
+				<th>Value</th>
+				<th>Description</th>
+			</tr>
+			<tr>
+				<td>-1</td>
+				<td>The value of the parameter has no effect and the parameter is
+					not part of the filter.
+                </td>
+			</tr>
+			<tr>
+				<td>number</td>
+				<td>a number stand for the size in byte, e.g. 40 means 40 bytes.</td>
+			</tr>
+			<tr>
+				<td>numberKB</td>
+				<td>a number with the chars "KB" stand for the size in kilobyte.</td>
+			</tr>
+			<tr>
+				<td>numberMB</td>
+				<td>a number with the chars "MB" stand for the size in megabyte.</td>
+			</tr>
+            <tr>
+                <td>numberGB</td>
+                <td>a number with the chars "GB" stand for the size in gigabyte.</td>
+            </tr>
+		</table>
+</note>

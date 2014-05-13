@@ -1,0 +1,1048 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="scheduler_job_documentation_v1.1.xsl"?>
+<description xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1
+http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+
+    <job name="JobSchedulerManagedDBReportJob" title="Launch Database Report" order="both" tasks="unbounded">
+        <script language="java" java_class="sos.scheduler.managed.JobSchedulerManagedDBReportJob" resource="1">
+        </script>
+    </job>
+
+    <releases>
+        <release id="1.0" created="2006-05-11" modified="2006-05-11">
+            <title>Version 1.0</title>
+            <author name="Andreas Liebert" email="andreas.liebert@sos-berlin.com" />
+            <note language="de">
+                <xhtml:div>Initiale Auslieferung</xhtml:div>
+            </note>
+            <note language="en">
+                <xhtml:div>Initial release</xhtml:div>
+            </note>
+        </release>
+        <release id="1.1" created="2012-08-31" modified="2012-08-31">
+            <title>Version 1.1</title>
+            <author name="kb" email="kb@sos-berlin.com" />
+            <note language="de">
+                <xhtml:div>Zusätzliche Optionen und "command" erweitert um "hex" und "File".</xhtml:div>
+            </note>
+            <note language="en">
+                <xhtml:div>Additional Options and "command" extended by "hex" and "file"</xhtml:div>
+            </note>
+        </release>
+    </releases>
+
+    <resources>
+
+        <file os="all" type="java" file="sos.scheduler.jar" id="1">
+            <note language="de">
+                <xhtml:div>Standard-Job der Auslieferung</xhtml:div>
+            </note>
+            <note language="en">
+                <xhtml:div>Standard job in distribution</xhtml:div>
+            </note>
+        </file>
+        <file os="all" type="java" file="sos.spooler.jar" id="2">
+            <note language="de">
+                <xhtml:div>Klasse Job_Impl</xhtml:div>
+            </note>
+            <note language="en">
+                <xhtml:div>Class Job_Impl</xhtml:div>
+            </note>
+        </file>
+        <file os="all" type="java" file="sos.util.jar" id="3">
+            <note language="de">
+                <xhtml:div>Klasse SOSLogger</xhtml:div>
+            </note>
+            <note language="en">
+                <xhtml:div>Class SOSLogger</xhtml:div>
+            </note>
+        </file>
+        <file os="all" type="java" file="sos.connection.jar" id="4">
+            <note language="de">
+                <xhtml:div>Datenbankverbindungs Klassen</xhtml:div>
+            </note>
+            <note language="en">
+                <xhtml:div>Database-connection classes</xhtml:div>
+            </note>
+        </file>
+        <file os="all" type="java" file="sos.net.jar" id="5">
+            <note language="de">
+                <xhtml:div>Klasse SOSMail</xhtml:div>
+            </note>
+            <note language="en">
+                <xhtml:div>Class SOSMail</xhtml:div>
+            </note>
+        </file>
+
+        <database required="true">
+            <resource name="SCHEDULER_MANAGED_JOBS" type="table">
+                <note language="de">
+                    <xhtml:div>
+                        Die Tabelle nimmt die Definitionen der Jobs auf und
+                        wird mit der Web-Oberfläche der Managed Jobs verwaltet.
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <xhtml:div>
+                        This table contains the job definitions and
+                        is administered using the Managed Jobs web interface.
+                    </xhtml:div>
+                </note>
+            </resource>
+            <resource name="SCHEDULER_MANAGED_ORDERS" type="table">
+                <note language="de">
+                    <xhtml:div>
+                        Die Tabelle nimmt die Definitionen der Aufträge auf und
+                        wird mit der Web-Oberfläche der Managed Jobs verwaltet.
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <xhtml:div>
+                        This table contains the order definitions and
+                        is administered using the Managed Jobs web interface.
+                    </xhtml:div>
+                </note>
+            </resource>
+            <resource name="SCHEDULER_MANAGED_CONNECTIONS" type="table">
+                <note language="de">
+                    <xhtml:div>
+                        Die Tabelle nimmt die Definitionen von Datenbankverbindungen auf und
+                        wird mit der Web-Oberfläche der Managed Jobs verwaltet.
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <xhtml:div>
+                        This table contains definitions of database connections and
+                        is administered using the Managed Jobs web interface.
+                    </xhtml:div>
+                </note>
+            </resource>
+        </database>
+    </resources>
+
+    <configuration>
+        <xi:include href="./notes-de/OrderOrStandAlone.xml" parse="xml" />
+        <xi:include href="./notes/OrderOrStandAlone.xml" parse="xml" />
+
+
+        <params id="job_parameter">
+            <param name="command" required="false" DataType="SOSOptionCommandString" Alias="SQL_Command">
+                <note language="de">
+                    <title>Auszuführende SQL-Anweisung</title>
+                    <xhtml:div>
+                        <p>
+                            Auzuführendes Datenbankkommando.
+                            Es ist möglich, im Feld COMMAND mehrere Befehle anzugeben, die der Reihe nach ausgeführt
+                            werden.
+                            Diese müssen durch ein Semikolon und ein darauf folgendes Newline getrennt sein.
+                            Die Datenbank-Kommandos können parameterisiert werden.
+                            Dazu ist an beliebiger
+                            Stelle im Kommando eine Variable in der Form §{param} einzufügen.
+                            Diese wird dann vor der Ausführung durch den Wert
+                            des Auftragsparameters
+                            mit dem Namen [param] ersetzt.
+                        </p>
+                    </xhtml:div>
+                </note>
+                <note language="de" since="1.3.12.2243">
+                    <p>
+                        Anstelle eines Strings kann alternativ der Name einer Datei angegeben werden. Der Inhalt der Datei
+                        wird dann als Wert des Parameters verwendet.
+                    </p>
+                </note>
+                <note language="en">
+                    <title>Database Commands for the Job</title>
+                    <xhtml:div>
+                        <p>
+                            Database Commands for the Job. It is possible to define more than one instruction in the COMMAND field.
+                            Such instructions are then
+                            carried out in the order in which they are written
+                            and must be separated by a semi colon and a subsequent new line.
+                            Parameters can be
+                            replaced in database commands. This is done by the addition of a variable in the form §{param}
+                            at any given point in a command. This
+                            variable is then given the value of the
+                            instruction parameter with the name [param] before execution.
+                        </p>
+                    </xhtml:div>
+                </note>
+                <note language="en" since="1.3.12.2243">
+                    <xhtml:div>
+                        <p>
+                            Alternatively to a string a name of a file can be specified as a value for this parameter.
+                            The content of the file will be taken as a value of this parameter.
+                        </p>
+                    </xhtml:div>
+                </note>
+            </param>
+            <param name="exec_returns_resultset" required="false" default_value="false" DataType="SOSOptionBoolean">
+                <note language="de">
+                    <title></title>
+                    <xhtml:div>
+                        <p>
+                            Wenn stored procedures, die ein Resultset zurückliefern, ausgeführt werden sollen, muss dieser parameter auf true gesetzt werden,
+                            damit die stored procedure als query ausgeführt wird.
+                            Dies funktioniert nicht mit dem SQL Server 2000 und 2005 jdbc Treiber.
+                        </p>
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <title></title>
+                    <xhtml:div>
+                        <p>
+                            If stored procedures are called which return a result set, this needs to be set to true in order to run the stored procedure as a
+                            query.
+                            This does not work with the SQL Server 2000 and 2005 jdbc drivers.
+                        </p>
+                    </xhtml:div>
+                </note>
+            </param>
+            <param name="database_connection" required="false" DataType="SOSOptionString" Category="Managed">
+                <note language="de">
+                    <title>Datenbankverbindung aus der Tabelle SCHEDULER_MANAGED_CONNECTIONS</title>
+                    <xhtml:div>
+                        <p>
+                            Name der zu verwendenden Datenbankverbindung aus der Tabelle SCHEDULER_MANAGED_CONNECTIONS.
+                        </p>
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <title>database connection from table SCHEDULER_MANAGED_CONNECTIONS</title>
+                    <xhtml:div>
+                        <p>
+                            Name of the selected database connection in table SCHEDULER_MANAGED_CONNECTIONS.
+                        </p>
+                    </xhtml:div>
+                </note>
+            </param>
+
+            <param name="db_class" required="false" DataType="SOSOptionJavaClassName" Alias="SOSConnectionClassName">
+                <note language="de">
+                    <title>SOS Connection Klasse</title>
+                    <xhtml:div>
+                        <p>
+                            Name der zu verwendenden SOS Connection Klasse für den Zugriff auf die Datenbank:
+                        </p>
+                        <p>
+                            <ul>
+                                <li>SOSMSSQLConnection</li>
+                                <li>SOSMySQLConnection</li>
+                                <li>SOSOracleConnection</li>
+                                <li>SOSPgSQLConnection</li>
+                                <li>SOSFbSQLConnection</li>
+                                <li>SOSDB2Connection</li>
+                            </ul>
+                        </p>
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <title>SOS Connection class</title>
+                    <xhtml:div>
+                        <p>
+                            Name of the SOS Connection class for access the database:
+                        </p>
+                        <p>
+                            <ul>
+                                <li>SOSMSSQLConnection</li>
+                                <li>SOSMySQLConnection</li>
+                                <li>SOSOracleConnection</li>
+                                <li>SOSPgSQLConnection</li>
+                                <li>SOSFbSQLConnection</li>
+                                <li>SOSDB2Connection</li>
+                            </ul>
+                        </p>
+                    </xhtml:div>
+                </note>
+            </param>
+            <param name="db_driver" required="false" DataType="SOSOptionDBDriver" Alias="JdbcDriverClassName">
+                <note language="de">
+                    <title></title>
+                    <xhtml:div>
+                        <p>
+                            Name der jdbc driver Klasse
+                        </p>
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <title></title>
+                    <xhtml:div>
+                        <p>
+                            Name of the jdbc driver Class
+                        </p>
+                    </xhtml:div>
+                </note>
+            </param>
+            <param name="db_url" required="false" DataType="SOSOptionJdbcUrl">
+                <note language="de">
+                    <title></title>
+                    <xhtml:div>
+                        <p>
+                            jdbc url
+                        </p>
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <title></title>
+                    <xhtml:div>
+                        <p>
+                            jdbc url
+                        </p>
+                    </xhtml:div>
+                </note>
+            </param>
+            <param name="db_user" required="false" DataType="SOSOptionUserName">
+                <note language="de">
+                    <title></title>
+                    <xhtml:div>
+                        <p>
+                            Datenbank User
+                        </p>
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <title></title>
+                    <xhtml:div>
+                        <p>
+                            database user
+                        </p>
+                    </xhtml:div>
+                </note>
+            </param>
+
+            <param name="db_password" required="false" DataType="SOSOptionPassword">
+                <note language="de">
+                    <title>Passwort des Nutzers für die Datenbank</title>
+                    <xhtml:div>
+                        <p>
+                            Datenbank Passwort
+                        </p>
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <title>database password</title>
+                    <xhtml:div>
+                        <p>
+                            database password
+                        </p>
+                    </xhtml:div>
+                </note>
+                <xi:include href="./notes/dynamic_password.xml" parse="xml" />
+            </param>
+            <param name="Adjust_column_names" required="false" DataType="SOSOptionBoolean" default_value="true"  since="1.3.12.2243">
+                <note language="de">
+                    <title>Zeichenumsetzung in den Spalten-Namen</title>
+                    <xhtml:div>
+                        <p>
+                            Mit diesem Parameter wird festgelegt, ob die Namen der Tabellen-Spalten
+                            in der DB-Tabelle "eins-zu-eins" übernommen werden sollen oder ob eine Umsetzung
+                            durchgeführt werden soll.
+                        </p>
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <title>Character conversion for column names</title>
+                    <xhtml:div>
+                        <p>
+                            This parameter specifies wether a conversion of the column name of the db table should be performed or not.
+                        </p>
+                    </xhtml:div>
+                </note>
+            </param>
+            <param name="Column_names_case_sensitivity" required="false" DataType="SOSOptionBoolean" default_value="false"  since="1.3.12.2243">
+                <note language="de">
+                    <title>Groß-/Kleinschreibung beibehalten</title>
+                    <xhtml:div>
+                        <p>
+                            Mit diesem Parameter wird festgelegt, ob die Groß-/Kleinschreibung der Spalten-Namen in der Tabelle beibehalten
+                            werden soll.
+                        </p>
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <title>Let Column names as is</title>
+                    <xhtml:div>
+                        <p>
+                            The value of this parameter indicated wether the column names should be a) translated to upper- or lower-case letters
+                            or b) leave it unchanged.
+                        </p>
+                    </xhtml:div>
+                </note>
+            </param>
+            <param name="Max_No_Of_Records_To_Process" required="false" DataType="SOSOptionInteger" default_value="-1"  since="1.3.12.2243">
+                <note language="de">
+                    <title>Maximale Anzahl der in der Ergebnis-Liste zu berücksichtigender Zeilen </title>
+                    <xhtml:div>
+                        <p>
+                            "-1" bedeutet daß keine Restriktion bezüglich der max. Anzahl Zeilen besteht.
+                        </p>
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <title>Max Number of lines in the result table to process</title>
+                    <xhtml:div>
+                        <p>
+                            "-1" means no restriction.
+                        </p>
+                    </xhtml:div>
+                </note>
+            </param>
+            <param name="scheduler_order_report_asbody" required="false" default_value="false" DataType="SOSOptionBoolean" Category="eMail">
+                <note language="de">
+                    <title>Report als Anhang versenden</title>
+                    <xhtml:div>
+                        <p>
+                            Mit dieser Einstellung wird der Report als Inhalt der eMail versendet, andernfalls als Anhang.
+                        </p>
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <title>Send Report as Attachment</title>
+                    <xhtml:div>
+                        <p>
+                            This setting determines whether the report should be sent as an attachment (default) or as the content of an e-mail.
+                        </p>
+                    </xhtml:div>
+                </note>
+            </param>
+            <param name="scheduler_order_report_body" required="false" DataType="SOSOptionString" Category="eMail">
+                <note language="de">
+                    <title>Report Layout Definition</title>
+                    <xhtml:div>
+<p>                            Mit diesem Parameter wird das Layout
+                            des Reports im
+                            HTML-Format oder als plain text festgelegt.
+
+</p>
+                        <p>
+                            Enthält der Parameter
+                            <paramref>scheduler_order_report_asbody</paramref>
+                            den Werte false, dann wird der Inhalt dieses Parameters
+                            ignoriert.
+
+                            Innerhalb des Layouts können folgende Platzhalter verwendet werden, die jeweils mit
+                            [
+                            und ] geklammert werden, z.B. in der Form [date]:
+                        </p>
+                        <p>
+                            <ul>
+                                <li>[date] - aktuelles Datum</li>
+                                <li>[datetime] - aktuelles Datum und Uhrzeit</li>
+                                <li>[orderid] - ID des Auftrags</li>
+                                <li>[jobname] - Name des Jobs</li>
+                                <li>[taskid] - ID der Task</li>
+                                <li>[sql] - SQL-Query, aus der der Report erstellt wurde</li>
+                                <li>
+                                    [xml] - aus dem Ergebnis der Abfrage generiertes xml vor der
+                                    Transformation
+                                </li>
+                            </ul>
+                        </p>
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <title>Report Layout Definition</title>
+                    <xhtml:div>
+                        <p>
+                            This parameter specifies the report layout in either HTML or
+                            plain text formats. The following placeholders can be used
+                            in the layout,
+                            each within square [ ] brackets, e.g. [date]:
+                        </p>
+                        <ul>
+                            <li>
+                                [date] - the current date
+                            </li>
+                            <li>
+                                [datetime] - the current date and time
+                            </li>
+                            <li>
+                                [orderid] - the order ID
+                            </li>
+                            <li>[jobname] - the job name</li>
+                            <li>[taskid] - the task ID</li>
+                            <li>[sql] - the SQL query used to create the report</li>
+                            <li>
+                                [xml] - untransformed XML generated from the query results
+                            </li>
+                        </ul>
+                        <p>
+                            Note that the content of this parameter will be ignored,
+                            should the
+                            <paramref>scheduler_order_report_asbody</paramref>
+                            parameter be set to false.
+                        </p>
+                    </xhtml:div>
+                </note>
+            </param>
+            <param name="scheduler_order_report_filename" required="false" default_value="report_[date]_[taskid].xml" DataType="SOSOptionOutFileName">
+                <note language="de">
+                    <title>Dateiname des Reports</title>
+                    <xhtml:div>
+                        <p>
+                            Der angegebene Dateiname wird für den Namen des Anhangs
+                            verwendet, wenn der Report als eMail versendet wird, und für
+                            die permanent
+                            abgelegte Datei, falls ein Report-Pfad mit dem
+                            Parameter
+                            <paramref>scheduler_order_report_path</paramref>
+                            angegeben wurde. Dabei können folgende Platzhalter verwendet
+                            werden, die jeweils mit [ und&#160;] geklammert werden, z.B.
+                            in der Form
+                            [date]:
+                        </p>
+                        <ul>
+                            <li>[date] - aktuelles Datum</li>
+                            <li>[orderid] - ID des Auftrags</li>
+                            <li>[jobname] - Name des Jobs</li>
+                            <li>[taskid] - ID der Task</li>
+                        </ul>
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <title>Report-Filename</title>
+                    <xhtml:div>
+                        <p>
+                            The name to be used for the attachment file when the report
+                            is to be sent as an e-mail.
+                        </p>
+                        <p>
+                            This name will also be used for the permanently saved copy of
+                            the report, should a path have been specified using the
+                            <paramref>scheduler_order_report_path</paramref>
+                            parameter.
+                        </p>
+                        <p>
+                            The following placeholders can be used, each placeholder
+                            being inserted in square [ ] brackets - e.g. [date]:
+                        </p>
+                        <ul>
+                            <li>
+                                [date] - the current date
+                            </li>
+                            <li>[orderid] - the order ID</li>
+                            <li>
+                                [jobname] - the job name
+                            </li>
+                            <li>[taskid] - the task ID</li>
+                        </ul>
+                    </xhtml:div>
+                </note>
+            </param>
+            <param name="scheduler_order_report_mailto" required="false" DataType="SOSOptionString" Category="eMail">
+                <note language="de">
+                    <title>report_mailto: Empfänger des Reports</title>
+                    <xhtml:div>
+                        <p>
+                            Geben Sie hier eine oder mehrere eMail Adressen an, die den Report erhalten sollen.
+                            Mehrere eMail Adressen werden durch Komma getrennt.
+                        </p>
+                        <p>
+                            Ist diese Einstellung leer, dann werden Reports nicht per eMail versendet. Sie werden in diesem Fall
+                            im Dateisystem
+                            abgelegt.
+                            Dateiname???
+                        </p>
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <title>report_mailto: recipients of a report</title>
+                    <xhtml:div>
+                        <p>
+                            One or more e-mail addresses of recipients of a report.
+                            Multiple addresses are to be separated by commas.
+                        </p>
+                        <p>
+                        </p>
+                        <p>
+                            Should this setting be left empty, then no reports will be
+                            sent by e-mail. The reports will however be generated and
+                            saved.
+                        </p>
+                        <p>
+                        </p>
+                    </xhtml:div>
+                </note>
+            </param>
+            <param name="scheduler_order_report_mailcc" required="false" DataType="SOSOptionString" Category="eMail">
+                <note language="de">
+                    <title>Kopien-Empfänger</title>
+                    <xhtml:div>
+                        <p>
+                            Geben Sie hier eine oder mehrere eMail Adressen an, die den Report als Kopie ("carbon copy") erhalten.
+                            Mehrere eMail Adressen werden durch
+                            Komma getrennt.
+                        </p>
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <title>Carbon Copies Recipients</title>
+                    <xhtml:div>
+                        <p>
+                        </p>
+                        One or more e-mail addresses of recipients of carbon copies of a report. Multiple addresses are to be separated by commas.
+                    </xhtml:div>
+                </note>
+            </param>
+            <param name="scheduler_order_report_mailbcc" required="false" DataType="SOSOptionString" Category="eMail">
+                <note language="de">
+                    <title>Versteckte Kopien-Empfänger</title>
+                    <xhtml:div>
+                        <p>
+                        </p>
+                        Geben Sie hier eine oder mehrere eMail Adressen an, die den Report als blind carbon copy erhalten.
+                        Mehrere eMail Adressen werden
+                        durch
+                        Komma getrennt.
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <title>Blind Carbon Copies Recipients</title>
+                    <xhtml:div>
+                        <p>
+                        </p>
+                        One or more e-mail addresses of recipients of blind carbon copies of a report. Multiple addresses are to be separated by commas.
+                    </xhtml:div>
+                </note>
+            </param>
+            <param name="scheduler_order_report_path" required="false" DataType="SOSOptionString">
+                <note language="de">
+                    <title>Pfadname der Report-Datei</title>
+                    <xhtml:div>
+                        <p>Wird hier ein Pfad (ohne Dateinamen) angegeben, dann wird der
+                            Report nicht nur per eMail verschickt, sondern unter diesem
+                            Pfad
+                            abgelegt. Dabei können folgende Platzhalter verwendet
+                            werden, die mit [ und ] geklammert werden, z.B. in der Form
+                            [date]:
+                        </p>
+                        <ul>
+                            <li>[date] - aktuelles Datum</li>
+                            <li>[orderid] - ID des Auftrags</li>
+                            <li>[jobname] - Name des Jobs</li>
+                            <li>[taskid] - ID der Task</li>
+                        </ul>
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <title></title>
+                    <xhtml:div>
+                        <p>
+                            The path to the directory in which a report is saved.
+                        </p>
+                        <p>
+                            The name of the report file is not to be specified here.
+                        </p>
+                        <p>
+                            The following placeholders can be used in the path, inserted
+                            in square [ ] brackets - e.g.&#160; [date]:
+                        </p>
+                        <ul>
+                            <li>
+                                [date] - the current date
+                            </li>
+                            <li>[orderid] - the order ID</li>
+                            <li>
+                                [jobname] - the job name
+                            </li>
+                            <li>[taskid] - the task ID</li>
+                        </ul>
+                    </xhtml:div>
+                </note>
+            </param>
+            <param name="scheduler_order_report_send_if_no_result" required="false" default_value="false" DataType="SOSOptionBoolean" Category="eMail">
+                <note language="de">
+                    <title></title>
+                    <xhtml:div>
+                        <p>
+                        </p>
+                        Diese Einstellung konfiguriert, ob ein Report verschickt werden soll, wenn die SQL Abfrage kein Ergebnis lieferte.
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <title></title>
+                    <xhtml:div>
+                        <p>
+                        </p>
+                        This setting specifies whether a report should be sent when the SQL query does not return a result.
+                    </xhtml:div>
+                </note>
+            </param>
+            <param name="scheduler_order_report_send_if_result" required="false" default_value="true" DataType="SOSOptionBoolean" Category="eMail">
+                <note language="de">
+                    <title></title>
+                    <xhtml:div>
+                        <p>
+                        </p>
+                        Diese Einstellung konfiguriert, ob ein Report verschickt werden soll, wenn die SQL Abfrage ein Ergebnis lieferte.
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <title></title>
+                    <xhtml:div>
+                        <p>
+                        </p>
+                        This setting specifies whether a report should be sent when an SQL query returns a result.
+                    </xhtml:div>
+                </note>
+            </param>
+            <param name="scheduler_order_report_stylesheet" required="false" default_value="config/default.xslt" Alias="report_stylesheet" DataType="SOSOptionString">
+                <note language="de">
+                    <title>report_stylesheet</title>
+                    <xhtml:div>
+                        <p>
+                            Reports werden im XML Format erzeugt und mittels Stylesheet-Transformation gestaltet. Der Parameter enthält optional den Pfad und
+                            Namen
+                            eines individuellen Stylesheets, das zur Gestaltung des Reports verwendet wird, andernfalls wird ein Default Stylesheet
+                            verwendet.
+                        </p>
+                        <p>
+                            Der Pfad kann relativ zum Installationsverzeichnis des JobSchedulers angegeben werden.
+                        </p>
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <title></title>
+                    <xhtml:div>
+                        <p>
+                            The style sheet to be used to transform a report from XML
+                            format.
+                        </p>
+                        <p>
+                            Both the path and name of the style sheet are optional in
+                            this parameter.
+                        </p>
+                        <p>
+                            Should no individual style sheet be available, then the
+                            default style sheet can be used.
+                        </p>
+                        <p>
+                            The path can be specified relative to the JobScheduler
+                            installation directory.
+                        </p>
+                    </xhtml:div>
+                </note>
+            </param>
+            <param name="scheduler_order_report_subject" required="false" DataType="SOSOptionString" Alias="report_subject" Category="eMail">
+                <note language="de">
+                    <title>report_subject</title>
+                    <xhtml:div>
+                        <p>
+                            Der Inhalt des Parameters wird als Betreff der eMail des
+                            Reports verwendet und muss ausgefüllt sein, wenn Reports per
+                            eMail versendet
+                            werden.
+                        </p>
+                        <p>
+                            Es können folgende Platzhalter verwendet werden, die durch [
+                            und&#160;] geklammert werden, z.B. in der Form [date]:
+                        </p>
+                        <ul>
+                            <li>[date] - aktuelles Datum</li>
+                            <li>[datetime] - aktuelles Datum und Uhrzeit</li>
+                            <li>[orderid] - ID des Auftrags</li>
+                            <li>[jobname] - Name des Jobs</li>
+                            <li>[taskid] - ID der Task</li>
+                        </ul>
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <title>report_subject</title>
+                    <xhtml:div>
+                        <p>
+                            The subject of e-mails to be used to send reports.
+                            This field is mandatory should reports be sent by e-mail.
+                        </p>
+
+                        <p>
+                            The following placeholders can be used, surrounded by square
+                            [ ] brackets - e.g. [date]:
+                        </p>
+                        <ul>
+                            <li>
+                                [date] - the current date
+                            </li>
+                            <li>[datetime] - the current date and time</li>
+                            <li>[orderid] - the order ID</li>
+                            <li>[jobname] - the job name</li>
+                            <li>[taskid] - the task ID</li>
+                        </ul>
+                    </xhtml:div>
+                </note>
+            </param>
+            <param name="resultset_as_warning" required="false" default_value="false" DataType="SOSOptionBoolean">
+                <note language="de">
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                        <p>
+                        </p>
+
+                        Bei true, wird ein Result nach den Statements als Warnung ausgegeben
+                    </div>
+                </note>
+                <note language="en">
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                        <p>
+                        </p>
+
+                        If set to true, a warning will be issued, if the statements produce a result
+                    </div>
+                </note>
+            </param>
+            <param name="resultset_as_parameters" required="false" default_value="false" DataType="SOSOptionBoolean">
+                <note language="de">
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                        <p>
+                        </p>
+
+                        <strong>false</strong>
+                        <br />
+                        Es werden keine Parameter generiert.
+                        <br />
+                        <br />
+                        <strong>true</strong>
+                        <br />
+                        Bei true werden aus der ersten Zeile des Result Set Auftragsparameter generiert.
+                        Die Parameternamen sind die Spaltennamen.
+
+                        Beispiel:
+                        <br />
+                        "SELECT first_name, last_name, age FROM persons" liefert die folgende Ergebnismenge
+                        <br />
+                        <table>
+                            <tr>
+                                <th>first_name</th>
+                                <th>last_name</th>
+                                <th>age</th>
+                            </tr>
+                            <tr>
+                                <td>John</td>
+                                <td>Doe</td>
+                                <td>30</td>
+                            </tr>
+                            <tr>
+                                <td>Hans</td>
+                                <td>Mustermann</td>
+                                <td>33</td>
+                            </tr>
+                            <tr>
+                                <td>Jean</td>
+                                <td>Dupont</td>
+                                <td>56</td>
+                            </tr>
+                        </table>
+                        Daraus werden als Auftragsparameter die folgenden Name/Wert Paare generiert:
+                        <br />
+                        <code>
+                            first_name=John
+                            <br />
+                            last_name=Doe
+                            <br />
+                            age=30
+                            <br />
+                        </code>
+                        <br />
+                        <br />
+                        <strong>name_value</strong>
+                        <br />
+                        Bei name_value werden aus den ersten beiden Spalten Zeile des Result Set Auftragsparameter generiert.
+                        Die Parameternamen sind die Werte der ersten Spalte, die Parameterwerte sind die Werte der zweiten Spalte. Beispiel:
+                        <br />
+                        Aus der oben angegebenen Ergebnismenge werden als Auftragsparameter die folgenden Name/Wert Paare generiert:
+                        <br />
+                        <code>
+                            John=Doe
+                            <br />
+                            Hans=Mustermann
+                            <br />
+                            Jean=Dupont
+                            <br />
+                        </code>
+                    </div>
+                </note>
+                <note language="en">
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                        <p>
+
+                            <strong>false</strong>
+                            <br />
+                            No output parameters are generated.
+                            <br />
+                            <br />
+                            <strong>true</strong>
+                            <br />
+                            If set to true, the first row of the resultset will be set as order parameters
+                            (using the column names as parameter names). Example:
+                            <br />
+                            The query "SELECT first_name, last_name, age FROM persons" produces the following result set:
+                            <br />
+                            <table>
+                                <tr>
+                                    <th>first_name</th>
+                                    <th>last_name</th>
+                                    <th>age</th>
+                                </tr>
+                                <tr>
+                                    <td>John</td>
+                                    <td>Doe</td>
+                                    <td>30</td>
+                                </tr>
+                                <tr>
+                                    <td>Hans</td>
+                                    <td>Mustermann</td>
+                                    <td>33</td>
+                                </tr>
+                                <tr>
+                                    <td>Jean</td>
+                                    <td>Dupont</td>
+                                    <td>56</td>
+                                </tr>
+                            </table>
+                            The following name/value pairs will be generated as order parameters:
+                            <br />
+                            <code>
+                                first_name=John
+                                <br />
+                                last_name=Doe
+                                <br />
+                                age=30
+                                <br />
+                            </code>
+                            <br />
+                            <br />
+                            <strong>name_value</strong>
+                            <br />
+                            If set to name_value, the first two columns of the resultset will be turned into order parameters.
+                            The values of the first column will become parameter names, the values of the second column will become
+                            parameter values. Example:
+                            <br />
+                            From the above resultset, the following name/value pairs will be generated as order parameters:
+                            <br />
+                            <code>
+                                John=Doe
+                                <br />
+                                Hans=Mustermann
+                                <br />
+                                Jean=Dupont
+                                <br />
+                            </code>
+                        </p>
+                    </div>
+                </note>
+            </param>
+        </params>
+
+        <payload>
+            <note language="de">
+                <title></title>
+                <xhtml:div>
+                    Auftragsparameter überschreiben Jobparameter.
+                </xhtml:div>
+            </note>
+            <note language="en">
+                <title></title>
+                <xhtml:div>
+                    Order parameters overwrite job parameters.
+                </xhtml:div>
+            </note>
+            <params reference="job_parameter" />
+        </payload>
+    </configuration>
+
+    <documentation language="de">
+        <xhtml:div>
+            <p>
+                Dieser Job ist eine Erweiterung des Managed Database Job. Genau wie
+                dieser führt er Datenbank-Statements aus. Aus dem Ergebnis des
+                letzten
+                Select-Statements wird ein Report generiert, per Email
+                verschickt und optional in einem Verzeichnis abgelegt.
+            </p>
+            <p>
+                Der Report wird in einem XML-Format erzeugt, in dem alle Zeilen des
+                Result Sets enthalten sind. Der Job kann den Report in diesem
+                Format
+                versenden, oder ihn zuvor mit Hilfe eines Style Sheets in
+                ein anderes XML-Format oder in HTML umwandeln. Zu diesem Zweck wird
+                im
+                <code>config</code>
+                -Verzeichnis des JobSchedulers das Style Sheet
+                <em>default.xslt</em>
+                mitgeliefert. Dieses transformiert den Report in eine HTML-Tabelle.
+            </p>
+        </xhtml:div>
+    </documentation>
+
+    <documentation language="en">
+        <xhtml:div>
+            <p>
+                This job is an extension of the Managed Database Job and executes
+                database queries in exactly the same manner. A report is generated
+                as the result
+                of the last select statement and then either sent per
+                e-mail or saved in a directory.
+            </p>
+            <p>
+                The report is first created in an XML format, which contains every
+                line of the database query result set. This job can send the report
+                in this
+                format - it can also transform the report with the help of
+                a style sheet into HTML or another XML format. The
+                <em>default.xslt</em>
+                style sheet, which is delivered in the JobScheduler
+                <code>config</code>
+                directory is intended for use in such transformations and
+                transforms the report into a HTML table.
+            </p>
+            <p>
+                <code>
+                    <pre>
+            <![CDATA[
+    <order title="DBReport2">
+        <params>
+            <param name="command" value="SELECT Wert FROM SCHEDULER_VARIABLES where name = 'scheduler_managed_user_job.port';"/>
+            <param name="db_driver" value="com.mysql.jdbc.Driver"/>
+            <param name="db_class" value="SOSMySQLConnection"/>
+            <param name="db_user" value="scheduler"/>
+            <param name="db_password" value="******"/>
+            <param name="db_url" value="jdbc:mysql://wilma.sos:3305/scheduler"/>
+            <param name="scheduler_order_report_mailto" value="kb@sos-berlin.com"/>
+            <param name="exec_returns_resultset" value="true"/>
+            <param name="scheduler_order_report_stylesheet" value="config/default.xslt"/>
+            <param name="scheduler_order_report_subject" value="test"/>
+            <param name="resultset_as_parameters" value="true"/>
+        </params>
+        <run_time let_run="no"/>
+    </order>
+            ]]>
+                    </pre>
+                </code>
+            </p>
+
+        </xhtml:div>
+    </documentation>
+
+
+    <documentation>
+        <p>
+            <![CDATA[
+    <order title="DBReport2">
+        <params>
+            <param name="command" value="SELECT Wert FROM SCHEDULER_VARIABLES where name = 'scheduler_managed_user_job.port';"/>
+            <param name="db_driver" value="com.mysql.jdbc.Driver"/>
+            <param name="db_class" value="SOSMySQLConnection"/>
+            <param name="db_user" value="scheduler"/>
+            <param name="db_password" value="******"/>
+            <param name="db_url" value="jdbc:mysql://wilma.sos:3305/scheduler"/>
+            <param name="scheduler_order_report_mailto" value="kb@sos-berlin.com"/>
+            <param name="exec_returns_resultset" value="true"/>
+            <param name="scheduler_order_report_stylesheet" value="config/default.xslt"/>
+            <param name="scheduler_order_report_subject" value="test"/>
+            <param name="resultset_as_parameters" value="true"/>
+        </params>
+        <run_time let_run="no"/>
+    </order>
+            ]]>
+        </p>
+    </documentation>
+</description>

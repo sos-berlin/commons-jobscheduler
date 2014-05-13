@@ -1,0 +1,189 @@
+<project name="TranformXml" default="TransformSingleFile">
+
+    <!--
+    	see http://ant.apache.org/manual/ 
+    -->
+    <property name="sos.temp" value="c:/temp/" />
+
+    <property name="paramdir" value="${sos.temp}params" />
+    <property name="resourcedir" value="${sos.temp}resource" />
+    <property name="dita.paramdir" value="${sos.temp}dita/params" />
+    <property name="dita.resourcedir" value="${sos.temp}dita/resource" />
+    <property name="dita.mapsdir" value="${sos.temp}dita/maps" />
+    <property name="dita.conceptsdir" value="${sos.temp}dita/concepts" />
+
+    <!-- 
+    running in eclipse the classpath must be specified in "external tools configuration"
+    -->
+
+    <path id="saxon.classpath">
+        <fileset dir="J:/E/DITA-OT1.5.2/lib/saxon">
+            <include name="**/*.jar" />
+        </fileset>
+    </path>
+
+    <path id="xerces.classpath">
+        <fileset dir="J:/E/java/lib/xerces-2_9_1">
+            <include name="**/*.jar" />
+            <include name="**/*xalan*.jar" />
+        </fileset>
+    </path>
+    <!-- - - - - - - - - - - - - - - - - - 
+          target: init                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="init">
+        <tstamp>
+            <format property="touch.time" pattern="yyyy/MM/dd hh:mm aa" offset="1" unit="hour" />
+        </tstamp>
+        <echo>TimeStamp is ${touch.time} </echo>
+    </target>
+    <!-- - - - - - - - - - - - - - - - - - 
+          target: DeleteDirs                      
+         - - - - - - - - - - - - - - - - - -->
+
+    <target name="DeleteDirs" depends="init">
+        <!-- see http://ant.apache.org/manual/Tasks/delete.html -->
+        <delete dir="${paramdir}" />
+        <delete dir="${resourcedir}" />
+    </target>
+
+    <!-- - - - - - - - - - - - - - - - - - 
+          target: MakeDirs                      
+         - - - - - - - - - - - - - - - - - -->
+
+    <target name="MakeDirs" depends="DeleteDirs">
+        <mkdir dir="${paramdir}" />
+        <mkdir dir="${resourcedir}" />
+    </target>
+
+    <!-- - - - - - - - - - - - - - - - - - 
+          target: DeleteDitaDirs                      
+         - - - - - - - - - - - - - - - - - -->
+
+    <target name="DeleteDitaDirs" depends="init">
+        <!-- see http://ant.apache.org/manual/Tasks/delete.html -->
+        <delete dir="${dita.paramdir}" />
+        <delete dir="${dita.resourcedir}" />
+        <delete dir="${dita.mapsdir}" />
+    </target>
+
+    <!-- - - - - - - - - - - - - - - - - - 
+          target: MakeDitaDirs                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="MakeDitaDirs" depends="DeleteDitaDirs">
+        <mkdir dir="${dita.paramdir}" />
+        <mkdir dir="${dita.resourcedir}" />
+        <mkdir dir="${dita.mapsdir}" />
+    </target>
+
+    <!-- - - - - - - - - - - - - - - - - - 
+          target: TransformSingleFile                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="TransformSingleFile">
+        <xslt in="student_directory.xml" out="student.html" style="student_html.xsl" />
+    </target>
+
+    <!-- - - - - - - - - - - - - - - - - - 
+          target: CreateSingleParameterFiles4Dita                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="CreateSingleParameterFiles4Dita" depends="MakeDitaDirs">
+        <!-- 
+		Transform all the files in the current directory 
+		see http://ant.apache.org/manual/Tasks/style.html
+		-->
+        <xslt basedir="." 
+        	destdir="${java.io.tmpdir}/dita" 
+        	includes="**/*.xml" 
+            style="./xsl/CreateSingleParameterFiles4Dita.xsl" 
+            reloadstylesheet="true" 
+            filenameparameter="CurrentFileName" 
+            filedirparameter="CurrentFileDir"
+        	>
+            
+            <classpath>
+                <path refid="saxon.classpath" />
+                <path refid="xerces.classpath" />
+                <pathelement path="${java.class.path}/" />
+            </classpath>
+            <!-- 
+            
+            <factory name="net.sf.saxon.TransformerFactoryImpl">
+            </factory>
+-->
+        	<outputproperty name="method" value="xml" />
+            <outputproperty name="standalone" value="yes" />
+            <outputproperty name="encoding" value="iso-8859-1" />
+            <outputproperty name="indent" value="yes" />
+
+            <param name="paramdir" expression="${paramdir}" />
+            <param name="resourcedir" expression="${resourcedir}" />
+            <param name="sos.timestamp" expression="${touch.time}" />
+
+        </xslt>
+    </target>
+
+    <!-- - - - - - - - - - - - - - - - - - 
+          target: CreateSingleParameterFiles                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="CreateSingleParameterFiles" depends="MakeDirs">
+        <!-- 
+		Transform all the files in the current directory 
+		see http://ant.apache.org/manual/Tasks/style.html
+		-->
+        <xslt basedir="." destdir="${java.io.tmpdir}/dita" includes="**/*.xml" 
+            style="./xsl/CreateSingleParameterFiles.xsl" 
+            reloadstylesheet="true" 
+            filenameparameter="CurrentFileName" 
+            filedirparameter="CurrentFileDir">
+            
+            <classpath>
+                <path refid="saxon.classpath" />
+                <path refid="xerces.classpath" />
+                <pathelement path="${java.class.path}/" />
+            </classpath>
+            
+            <factory name="net.sf.saxon.TransformerFactoryImpl">
+            </factory>
+
+            <outputproperty name="method" value="xml" />
+            <outputproperty name="standalone" value="yes" />
+            <outputproperty name="encoding" value="iso-8859-1" />
+            <outputproperty name="indent" value="yes" />
+
+            <param name="paramdir" expression="${paramdir}" />
+            <param name="resourcedir" expression="${resourcedir}" />
+            <param name="sos.timestamp" expression="${touch.time}" />
+        </xslt>
+    </target>
+
+    <!-- - - - - - - - - - - - - - - - - - 
+          target: CreateFreeMindMaps                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="CreateFreeMindMaps" depends="MakeDitaDirs">
+        <!-- 
+		Transform all the files in the current directory 
+		see http://ant.apache.org/manual/Tasks/style.html
+		-->
+        <xslt basedir="." destdir="${java.io.tmpdir}/freemind" includes="**/*.xml" 
+            style="./xsl/CreateFreeMindMap.xsl" reloadstylesheet="true" filenameparameter="CurrentFileName" filedirparameter="CurrentFileDir">
+            <classpath>
+                <path refid="saxon.classpath" />
+                <path refid="xerces.classpath" />
+                <pathelement path="${java.class.path}/" />
+            </classpath>
+            
+            <factory name="net.sf.saxon.TransformerFactoryImpl" />
+
+            <outputproperty name="method" value="xml" />
+            <outputproperty name="standalone" value="yes" />
+            <outputproperty name="encoding" value="iso-8859-1" />
+            <outputproperty name="indent" value="yes" />
+
+            <param name="paramdir" expression="${paramdir}" />
+            <param name="resourcedir" expression="${resourcedir}" />
+            <param name="sos.timestamp" expression="${touch.time}" />
+
+        </xslt>
+    </target>
+
+</project>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="LoadIdDurationType"
+       DefaultValue="days"
+       required="false"
+       DataType="SOSOptionString">
+        <note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+          <p>
+            Die Zeiteinheit, nach der die Berechnung erfolgt. Gültige Angaben sind:
+            <ul>
+            <li>centuries</li>
+						<li>eras</li>
+						<li>years</li>
+						<li>months</li>
+						<li>days</li>
+						<li>halfdays</li>
+						<li>weeks</li>
+						<li>weekyears</li>
+						<li>hours</li>
+						<li>minutes</li>
+						<li>seconds</li>
+						<li>millis</li>
+					</ul>
+          </p>
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+          <p>
+            The type time the calculation will be follow. Valid entries are: 
+            <ul>
+            <li>centuries</li>
+						<li>eras</li>
+						<li>years</li>
+						<li>months</li>
+						<li>days</li>
+						<li>halfdays</li>
+						<li>weeks</li>
+						<li>weekyears</li>
+						<li>hours</li>
+						<li>minutes</li>
+						<li>seconds</li>
+						<li>millis</li>
+					</ul>
+          </p>
+          </div>
+        </note>
+      </param>

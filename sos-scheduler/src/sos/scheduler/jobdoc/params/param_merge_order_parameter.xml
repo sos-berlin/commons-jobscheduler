@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- created at 20.08.2012 -->
+<!-- $Id$ -->
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 
+     ../../scheduler_job_documentation_v1.1.xsd "
+       
+       name="merge_order_parameter"
+       required="false"
+       default_value="false"
+              DataType="SOSOptionBoolean"
+Category="OrderProcessing, JobStart, FileOrder, OrderCreation" 
+	OptionName="MergeOrderParameter" Alias="" 
+	usewith="create_order"
+    see="create_order,create_orders_for_all_files,order_jobchain_name,next_state"
+              >
+        <note language="de">
+        <title>aktuelle Parameter in den zu erzeugenden Auftrag übernehmen</title>
+          <xhtml:div>
+          <p>
+          Mit diesem Parameter wird festgelegt, ob die Auftrags-Parameter des aktuellen Auftrages in die
+          Auftragsparameter des zu erzeugenden Auftrages übernommen werden sollen.
+          Sollen die Parameter des aktuellen Auftrages nicht übernommen werden, so wird ein Auftrag, der lediglich die
+          Informationen über die Datei enthält, erzeugt.
+          </p>
+          </xhtml:div>
+        </note>
+        <note language="en">
+        <title>merge actual order parameter into new created order</title>
+          <xhtml:div >
+          <p>
+          This parameter specifies, that the order, which has to be created, will be extended by the parameters of the
+          actual order.
+          </p>
+          </xhtml:div>
+        </note>
+      </param>

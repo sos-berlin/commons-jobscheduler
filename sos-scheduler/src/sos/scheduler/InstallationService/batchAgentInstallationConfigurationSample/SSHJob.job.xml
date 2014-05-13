@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<job title="Launch remote commands or executable files by SSH"
+     stop_on_error="no"
+     order="yes"
+     tasks="10">
+    <settings>
+        <log_level><![CDATA[info]]></log_level>
+    </settings>
+    <description>
+        <include file="jobs/JobSchedulerSSHJob.xml"/>
+    </description>
+    <params>
+        <param name="command_delimiter"
+               value="%%"/>
+
+
+        <param name="ignore_stderr"
+               value="true"/>
+
+
+        <param name="host"
+               value=""/>
+
+
+        <param name="port"
+               value="22"/>
+
+
+        <param name="user"
+               value=""/>
+
+
+        <param name="ignore_exit_code"
+               value="3"/>
+    </params>
+    <script language="java"
+            java_class="sos.scheduler.job.SOSSSHJob2JSAdapter"
+            java_class_path=""/>
+    <delay_order_after_setback setback_count="1"
+                               is_maximum="no"
+                               delay="10"/>
+    <delay_order_after_setback setback_count="10"
+                               is_maximum="no"
+                               delay="30"/>
+    <delay_order_after_setback setback_count="15"
+                               is_maximum="yes"
+                               delay="0"/>
+    <run_time/>
+</job>

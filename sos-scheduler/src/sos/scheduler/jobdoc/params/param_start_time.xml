@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="start_time"
+       default_value="0:00:00:00"
+       required="false"
+       DataType="SOSOptionTimeHorizon"
+       OptionName="startTime"
+       >
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+          <p>
+            Zeitpunkt, ab dem geprüft wird, ob der übergebene Job erfolgreich gelaufen ist oder nicht.
+            <br/>Der Zeitpunkt wird in der Form <code>[- Anzahl Tage ab heute][:Uhrzeit(HH:MM[:SS])]</code> angegeben.
+            <pre>
+              Beispiele:
+              -1:12:00:00 = -1:12:00 = prüft ab gestern 12Uhr
+              -7 = prüft die letzte Woche bei aktueller Uhrzeit
+            </pre>
+            Damit entspricht die Voreinstellung der letzten Mitternacht.
+            </p>
+            <p>
+            </p>
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            The start time from which the parametrisized job is checked wether it has successfully run or not.
+            <br/>The start time must be set in the form <code>[- Count of days from now][:Time(HH:MM[:SS])]</code>,
+            so that the default value is last midnight.
+            <pre>
+              Examples:
+              -1:12:00:00 = -1:12:00 = checks from yesterday 12h
+              -7 = checks from the last week with the current time
+            </pre>
+          </div>
+        </note>
+      </param>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="protocol"
+       required="true"
+       DefaultValue="ftp"
+       DataType="SOSOptionStringValueList"
+       Alias="TransferProtocol">
+      <values>
+         <value>ftp</value>
+         <value>sftp</value>
+         <value>ftps</value>
+      </values>
+        <note language="de">
+      <title>Art des Datenübertragungsprotokolls</title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter nimmt die Werte <paramval>ftp</paramval>, <paramval>sftp</paramval> oder <paramval>ftps</paramval> an.
+            <br/>
+         <br/>
+            Bei Verwendung von <paramval>sftp</paramval> werden auch die <paramval>ssh_*</paramval>-Parameter
+            ausgewertet.   
+          </div>
+        </note>
+        <note language="en">
+      <title>Type of requested Datatransfer</title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            The values <paramval>ftp</paramval>, <paramval>sftp</paramval> or <paramval>ftps</paramval>
+            are valid for this parameter.
+            <br/>
+         <br/>
+            If <paramval>sftp</paramval> is used, then the <paramval>ssh_*</paramval> parameters will
+            be applied.
+          </div>
+        </note>
+      </param>

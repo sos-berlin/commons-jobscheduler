@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="scheduler_job_documentation_v1.1.xsl"?>
+<description xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+
+  <job name  = "JobSchedulerDeleteHistory"
+       title = "Deletes log entries in the Job Scheduler history"
+       order = "no"
+       tasks = "1">
+    <script language   = "java"
+            java_class = "sos.scheduler.job.JobSchedulerDeleteHistory"
+            resource   = "1"/>
+  </job>
+
+  <releases>
+    <release id="1.0" created="2006-03-30" modified="2011-10-05">
+      <title>Version 1.0</title>
+      <author name="Uwe Risse" email="uwe.risse@sos-berlin.com"/>
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+        Initiale Auslieferung
+        </div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+        Initial Release
+        </div>
+      </note>
+    </release>
+  </releases>
+
+  <resources>
+    <file os="all" type="java" file="sos.scheduler.jar" id="1">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Standard-Job der Auslieferung</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Standard job in distribution</div></note>
+    </file>
+    <file os="all" type="java" file="sos.spooler.jar" id="2">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Klasse Job_Impl</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Class Job_Impl</div></note>
+    </file>
+    <file os="all" type="java" file="sos.util.jar" id="3">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Klasse SOSLogger</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Class SOSLogger</div></note>
+    </file>
+    <file os="all" type="java" file="sos.settings.jar" id="4">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Klasse SOSProfileSettings</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Class SOSProfileSettings</div></note>
+    </file>
+
+    <database required="true">
+      <resource name="SCHEDULER_HISTORY" type="table">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Die Tabelle nimmt die Historie und Protokolle der Jobs im Scheduler auf.
+            Der Job löscht alte Einträge.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This table contains the history and log files of jobs carried out by the Job Scheduler.
+            The job deletes old entries.
+          </div>
+        </note>
+      </resource>
+      <resource name="SCHEDULER_ORDER_HISTORY" type="table">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Die Tabelle nimmt die Historie und Protokolle der Aufträge im Scheduler auf.
+            Der Job löscht alte Einträge.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This table contains the history and log files of orders carried out by the Job Scheduler.
+            The job deletes old entries.
+          </div>
+        </note>
+      </resource>
+    </database>
+  </resources>
+
+  <configuration>
+    <params id="job_parameter">
+
+      <param name="delete_history_olderthan" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter bestimmt das Mindestalter (in Tagen) für History und Order History Einträge, die gelöscht werden sollen.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the minumum age (in days) for history and order history entries which will be deleted.
+          </div>
+        </note>
+      </param>
+ 
+    </params>
+  </configuration>
+
+  <documentation language="de">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+     
+    </div>
+  </documentation>
+
+  <documentation language="en">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+     
+    </div>
+  </documentation>
+
+</description>

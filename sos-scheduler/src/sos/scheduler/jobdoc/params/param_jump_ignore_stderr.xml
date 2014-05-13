@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="jump_ignore_stderr"
+       required="false"
+       DefaultValue="false"
+       DataType="SOSOptionBoolean">
+        <note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Job prüft das Vorhandensein von Ausgaben nach stderr des am SSH Server ausgeführten Kommandos
+            und interpretiert dies als Fehler des Jobs bzw. Auftrags.
+            <br/>
+         <br/>
+            Wird der Wert <em>true</em> für diesen Parameter angegeben, dann werden
+            Ausgaben nach stderr nicht als Fehler gemeldet.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This job checks if any output to stderr has been created by a command that is being
+            executed on the SSH server and reports this as an error.
+            <br/>
+         <br/>
+            Should the value <em>true</em> be specified for this parameter, 
+            then output to stderr will not be reported as an error by the Job Scheduler.
+          </div>
+        </note>
+      </param>

@@ -1,0 +1,898 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: FileOrder_Parameter.xml 16251 2012-01-16 07:52:02Z kb $ -->
+<?xml-stylesheet type="text/xsl" href="scheduler_job_documentation_v1.1.xsl"?>
+<description xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xi="http://www.w3.org/2001/XInclude" xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1
+    http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+
+    <job name="JADE-Job" title="API Job for JobScheduler Advanced Data Exchange" order="both" category="ftp;MFT;FileTransfer;WebDav">
+        <script language="java" java_class="sos.scheduler.jade.JadeJob" resource="1" />
+    </job>
+    <releases>
+        <release id="1.0" created="2012-01-01" modified="2012-01-01">
+            <title>Version 1.7</title>
+            <author name="kb" email="kb  sos-berlin.com" />
+            <note language="de">
+                <p>Initiales Release</p>
+            </note>
+            <note language="en">
+                <p>Initial Release</p>
+            </note>
+        </release>
+    </releases>
+
+    <resources>
+        <xi:include href="./jars/sos.settings.jar.xml" parse="xml" />
+        <xi:include href="./jars/sos.util.jar.xml" parse="xml" />
+        <xi:include href="./jars/log4j.jar.xml" parse="xml" />
+        <xi:include href="./jars/sos.VirtualFileSystem.jar.xml" parse="xml" />
+        <xi:include href="./jars/sos.JSHelper.jar.xml" parse="xml" />
+    </resources>
+
+    <configuration>
+        <xi:include href="./notes-de/OrderOrStandAlone.xml" parse="xml" />
+        <xi:include href="./notes/OrderOrStandAlone.xml" parse="xml" />
+
+        <xi:include href="./description/ResultSet_Description.xml" parse="xml" />
+        <xi:include href="./description/ResultSet_Description-de.xml" parse="xml" />
+
+        <xi:include href="./description/FileOrderCreation_Description.xml" parse="xml" />
+        <xi:include href="./description-de/FileOrderCreation_Description.xml" parse="xml" />
+        <xi:include href="./description-de/CheckSteadyState_Description.xml" parse="xml" />
+
+        <xi:include href="./notes/ParameterSubstitution.xml" parse="xml">
+            <xi:fallback>"./notes/ParameterSubstitution.xml" not found</xi:fallback>
+        </xi:include>
+        <xi:include href="./notes/NodeParameterByStateName.xml" parse="xml">
+            <xi:fallback>"./notes/NodeParameterByStateName.xml" not found</xi:fallback>
+        </xi:include>
+
+        <note language="de">
+            <p>
+            </p>
+        </note>
+        <note language="en">
+            <p>
+            </p>
+        </note>
+
+        <params id="job_parameter">
+            <xi:include href="./params/param_account.xml" parse="xml" />
+            <xi:include href="./params/param_alternative_account.xml" parse="xml" />
+            <xi:include href="./params/param_alternative_host.xml" parse="xml" />
+            <xi:include href="./params/param_alternative_passive_mode.xml" parse="xml" />
+            <xi:include href="./params/param_alternative_password.xml" parse="xml" />
+            <xi:include href="./params/param_alternative_port.xml" parse="xml" />
+            <xi:include href="./params/param_alternative_remote_dir.xml" parse="xml" />
+            <xi:include href="./params/param_alternative_transfer_mode.xml" parse="xml" />
+            <xi:include href="./params/param_alternative_user.xml" parse="xml" />
+            <xi:include href="./params/param_append_files.xml" parse="xml" />
+            <xi:include href="./params/param_atomic_prefix.xml" parse="xml" />
+            <xi:include href="./params/param_atomic_suffix.xml" parse="xml" />
+            <xi:include href="./params/param_banner_footer.xml" parse="xml" />
+            <xi:include href="./params/param_banner_header.xml" parse="xml" />
+            <xi:include href="./params/param_check_interval.xml" parse="xml" />
+            <xi:include href="./params/param_check_retry.xml" parse="xml" />
+            <xi:include href="./params/param_check_size.xml" parse="xml" />
+            <xi:include href="./params/param_compress_files.xml" parse="xml" />
+            <xi:include href="./params/param_compressed_file_extension.xml" parse="xml" />
+            <xi:include href="./params/param_file_path.xml" parse="xml" />
+            <xi:include href="./params/param_file_spec.xml" parse="xml" />
+
+            <xi:include href="./params/param_history.xml" parse="xml" />
+
+            <!--
+            <xi:include href="./params/param_current_pid.xml" parse="xml" />
+            <xi:include href="./params/param_classpath_base.xml" parse="xml" />
+
+            <xi:include href="./params/param_file_spec2.xml" parse="xml" />
+            <xi:include href="./params/param_history_repeat.xml" parse="xml" />
+            <xi:include href="./params/param_history_repeat_interval.xml" parse="xml" />
+
+
+            <xi:include href="./params/param_http_proxy_host.xml" parse="xml" />
+            <xi:include href="./params/param_http_proxy_port.xml" parse="xml" />
+
+            <xi:include href="./params/param_ppid.xml" parse="xml" />
+
+            <xi:include href="./params/param_root.xml" parse="xml" />
+
+            <xi:include href="./params/param_skip_transfer.xml" parse="xml" />
+
+            -->
+
+            <xi:include href="./params/param_ssh_auth_file.xml" parse="xml" />
+            <xi:include href="./params/param_ssh_auth_method.xml" parse="xml" />
+            <xi:include href="./params/param_ssh_proxy_host.xml" parse="xml" />
+            <xi:include href="./params/param_ssh_proxy_password.xml" parse="xml" />
+            <xi:include href="./params/param_ssh_proxy_port.xml" parse="xml" />
+            <xi:include href="./params/param_ssh_proxy_user.xml" parse="xml" />
+
+            <xi:include href="./params/param_force_files.xml" parse="xml" />
+            <xi:include href="./params/param_host.xml" parse="xml" />
+            <xi:include href="./params/param_local_dir.xml" parse="xml" />
+            <xi:include href="./params/param_log_filename.xml" parse="xml" />
+            <xi:include href="./params/param_mandator.xml" parse="xml" />
+            <xi:include href="./params/param_jade_operation.xml" parse="xml" />
+            <xi:include href="./params/param_overwrite_files.xml" parse="xml" />
+            <xi:include href="./params/param_passive_mode.xml" parse="xml" />
+            <xi:include href="./params/param_password.xml" parse="xml" />
+            <xi:include href="./params/param_poll_interval.xml" parse="xml" />
+            <xi:include href="./params/param_poll_minfiles.xml" parse="xml" />
+            <xi:include href="./params/param_poll_timeout.xml" parse="xml" />
+            <xi:include href="./params/param_port.xml" parse="xml" />
+            <xi:include href="./params/param_profile.xml" parse="xml" />
+            <xi:include href="./params/param_protocol.xml" parse="xml" />
+            <xi:include href="./params/param_recursive.xml" parse="xml" />
+            <xi:include href="./params/param_remote_dir.xml" parse="xml" />
+            <xi:include href="./params/param_remove_files.xml" parse="xml" />
+            <xi:include href="./params/param_target_replacement.xml" parse="xml" />
+            <xi:include href="./params/param_target_replacing.xml" parse="xml" />
+            <xi:include href="./params/param_source_replacement.xml" parse="xml" />
+            <xi:include href="./params/param_source_replacing.xml" parse="xml" />
+            <xi:include href="./params/param_scheduler_host.xml" parse="xml" />
+            <xi:include href="./params/param_scheduler_job_chain.xml" parse="xml" />
+            <xi:include href="./params/param_scheduler_port.xml" parse="xml" />
+            <xi:include href="./params/param_settings.xml" parse="xml" />
+            <xi:include href="./params/param_transactional.xml" parse="xml" />
+            <xi:include href="./params/param_transfer_mode.xml" parse="xml" />
+            <xi:include href="./params/param_user.xml" parse="xml" />
+            <xi:include href="./params/param_verbose.xml" parse="xml" />
+            <xi:include href="./params/param_zero_byte_transfer.xml" parse="xml" />
+
+            <xi:include href="./params/param_max_file_age.xml" parse="xml" />
+            <xi:include href="./params/param_min_file_age.xml" parse="xml" />
+            <xi:include href="./params/param_max_file_size.xml" parse="xml" />
+            <xi:include href="./params/param_min_file_size.xml" parse="xml" />
+            <xi:include href="./params/param_skip_first_files.xml" parse="xml" />
+            <xi:include href="./params/param_skip_last_files.xml" parse="xml" />
+
+            <xi:include href="./params/Mail_Parameter.xml" parse="xml" />
+            <xi:include href="./params/FileOrderCreation_Parameter.xml" parse="xml" />
+            <xi:include href="./params/ResultSet_Parameter.xml" parse="xml" />
+            <xi:include href="./params/steadyState_Parameter.xml" parse="xml" />
+            <xi:include href="./params/jumpserver_Parameter.xml" parse="xml" />
+
+            <xi:include href="./params/param_settings.xml" parse="xml" />
+            <xi:include href="./params/param_profile.xml" parse="xml" />
+
+            <xi:include href="./params/param_load_Class_name.sosdoc" parse="xml" />
+
+        </params>
+        <params id="return_parameter">
+            <xi:include href="./params/FileOrder_Parameter.xml" parse="xml" />
+            <xi:include href="./params/ResultSet_ReturnParameter.xml" parse="xml" />
+            <param name="ftp_result_filenames" required="false">
+                <note language="de">
+                    <p>
+                    Dieser Parameter wird nach dem Dateitransfer erzeugt.
+                        In diesem Parameter steht die semikolonseparierte Liste der
+                        übertragten Dateien
+                        </p>
+                </note>
+                <note language="en">
+                    <p>
+                    This parameter is created after the file transfer. It
+                        contains a semicolon-separated list of the transferred files.
+                    </p>
+                </note>
+            </param>
+            <param name="ftp_result_filepaths" required="false">
+                <note language="de">
+                    <p>Dieser Parameter wird nach dem Dateitransfer generiert.
+                        In diesem Parameter steht die semikolonseparierte Liste der
+                        übertragten
+                        Dateien mit Verzeichnissangabe.
+                    </p>
+                </note>
+                <note language="en">
+                    <p>This parameter is generated after the file transfer. It
+                        contains a semicolon-separated list of the transferred files with the
+                        complete path.
+                    </p>
+                </note>
+            </param>
+            <xi:include href="./params/param_ftp_result_zero_byte_files.xml" parse="xml" />
+
+<!--
+            <param name="*" required="false">
+                <note language="de">
+                    <p>
+                        Beliebige weitere Parameter ohne Schlüsselwort stellen die Pfade von
+                        Dateien dar,
+                        die transferiert werden sollen.
+                    </p>
+                </note>
+                <note language="en">
+                    <p>
+                        Any additional parameters that are not preceeded by keywords
+                        represent paths for files that should be transferred.
+                    </p>
+                </note>
+            </param>
+ -->
+        </params>
+    </configuration>
+
+    <documentation language="de">
+        <p>
+            Das Programm wird als synchrone File Transfer Lösung eingesetzt.
+            Asynchroner Transfer wird von den entsprechenden Standard-Jobs im Job
+            Scheduler
+            unterstützt.
+            </p>
+            <p>
+            File Transfer Features
+            </p>
+            <p>
+            <ul>
+                <li>Senden und Empfangen von Dateien via FTP von/zu Server Systemen.
+                </li>
+                <li>Senden und Empfangen von Dateien via SFTP von/zu Server
+                    Systemen.
+                </li>
+                <li>Kommandos per SSH auf einem entfernten Rechner ausführen.</li>
+                <li>Dateien per FTP oder SFTP zu einem "jump host" versenden und von
+                    dort via FTP oder SFTP
+                    auf ein Zielsystem weiterleiten.
+                    Unterschiedliche
+                    Protokolle können zwischen lokalem System und "jump host"
+                    sowie zwischen "jump host" und Zielsystem verwendet werden.
+                </li>
+                <li>Dateien von einem entfernten Server System via SFTP auf
+                    einem "jump host" annehmen
+                    und per FTP oder SFTP auf das lokale System
+                    transferieren.
+                    Unterschiedliche Protokolle können für den Transfer zwischen den
+                    Systemen eingesetzt werden.
+                </li>
+                <li>Authentifizierung per Kennwort und per privatem/öffentlichem
+                    Schlüssel
+                    für Transfers via SFTP werden unterstützt.
+                </li>
+                <li>Die Parametrisierung erfolgt per Kommandozeile und
+                    Konfigurationsdateien.
+                </li>
+                <li>Alle Parameter werden ausschließlich am lokalen System
+                    angegeben,
+                    dies gilt in gleicher Weise bei Verwendung eines "jump host", da lokale
+                    Parameter
+                    dynamisch an den "jump host" weitergeleitet werden.
+                </li>
+                <li>Protokollierung und Fehlerbehandlung: Fehler bei der Übertragung
+                    einzelner Dateien werden erkannt.
+                </li>
+                <li>Sicherheit: am "jump host" werden keine Konfigurationsdateien
+                    vorgehalten.
+                    (außer privaten Schlüsseldateien die für den Zugriff auf das
+                    Zielsystem
+                    benötigt werden).
+                    Am "jump host" werden keine Kennwörter gespeichert.
+                    Es werden keine Proxy-Funktionalitäten der Server Systeme
+                    vorausgesetzt.
+                </li>
+            </ul>
+            </p>
+            <p>
+            Spezielle Transfer Features
+            </p>
+            <p>
+            <ul>
+                <li>
+                    Teilqualifizierter Transfer von Dateien
+                    <br />
+                    <br />
+                    Alternativ zum Transfer einer einzelnen Datei können mit regulären
+                    Ausdrücken
+                    Dateimengen für den Transfer selektiert werden.
+                </li>
+                <li>
+                    Rekursiver Transfer von Dateien
+                    <br />
+                    <br />
+                    Es können Dateien aus beliebigen Unterverzeichnissen anhand von
+                    regulären Ausdrücken
+                    für die Übertragung selektiert werden. Unterverzeichnisse
+                    werden im
+                    lokalen Dateisystem eingerichtet, falls erforderlich.
+                </li>
+                <li>
+                    Atomare Übertragung
+                    <br />
+                    <br />
+                    Dateien können während des Transfers umbenannt werden, um sie nach
+                    vollständiger Übertragung
+                    atomar in einem Verzeichnis erscheinen zu lassen.
+                    Dies ist z.B. relevant,
+                    wenn Verzeichnisse
+                    überwacht werden und ausschließlich vollständig übertragene Dateien
+                    weiterverarbeitet werden sollen.
+                </li>
+                <li>
+                    Vollständigkeitsprüfung übertragener Dateien
+                    <br />
+                    <br />
+                    Die Prüfung beinhaltet, dass nach dem Transfer die Größen der
+                    übertragenen Datei
+                    und der Anzahl übertragener Byte geprüft werden sowie die
+                    wiederholte
+                    Übertragung
+                    von Dateien, um sicherzustellen, dass Eingabedateien nicht während der
+                    Dauer des Transfers verändert wurden.
+                </li>
+                <li>
+                    Behandlung leerer Dateien
+                    <br />
+                    <br />
+                    Zur Behandlung leerer Dateien stehen eine Reihe von Optionen zur
+                    Verfügung, z.B.
+                    Ausschluß leerer Dateien, Zulasssen einzelner leerer Dateien,
+                    Benachrichtigung per E-Mail beim Transfer leerer Dateien.
+                </li>
+                <li>
+                    Umbenennen von Dateien
+                    <br />
+                    <br />
+                    Nach der Übertragung können Dateien anhand von regulären Ausdrücken
+                    umbenannt werden.
+                </li>
+                <li>
+                    Verwendung alternativer Zugangsdaten
+                    <br />
+                    <br />
+                    Für den Fall, dass ein Verbindungsaufbau bzw. eine Anmeldung an
+                    einem FTP Server fehlschlägt,
+                    kann eine alternative Zugangskonfiguration
+                    angegeben werden, die bspw.
+                    im Fehlerfall einen Backup FTP Server
+                    anspricht.
+                    <br />
+                    <br />
+                    Primäre und alternative Zugangsdaten werden additiv gehandhabt,
+                    d.h. es müssen nur
+                    diejenigen alternativen Zugangsparameter angegeben werden,
+                    die sich von den
+                    primären
+                    Zugangsparametern unterscheiden.
+                </li>
+                <li>
+                    Unterstützung für UNC Pfade als Zielverzeichnisse
+                    <br />
+                    <br />
+                    Dateien können direkt von einem FTP/SFTP Server
+                    zu einem entfernten Server-System übertragen werden.
+                </li>
+                <li>
+                    Führung einer Transfer-Historie
+                    <br />
+                    <br />
+                    Optional wird für jeden Transfer eine Historie geführt.
+                    Historieneinträge werden optional an einen Job Scheduler
+                    signalisiert,
+                    der sie in einer
+                    zentralen Datenbank konsolidiert und für Auskünfte
+                    zur Verfügung stellt.
+                </li>
+            </ul>
+            </p>
+            <p>
+            Systemvoraussetzungen
+            </p>
+            <p>
+            <ul>
+                <li>Java Runtime Environment JRE 1.6 und höher</li>
+                <li>Für die "jump host" Funktionalität muss die Applikation am "jump
+                    host"
+                    und am lokalen System installiert sein.
+                </li>
+            </ul>
+            </p>
+            <p>
+            Start Skript
+            </p>
+            <p>
+            <ul>
+                <li>
+                    Windows: jade.cmd
+                    <br />
+                    <code>
+                        <pre>
+                            set CLASSPATH_BASE=.
+                            java -classpath
+                            "%CLASSPATH_BASE%/commons-net-1.2.2.jar;%CLASSPATH_BASE%/sos.net.jar;
+                            %CLASSPATH_BASE%/sos.settings.jar;%CLASSPATH_BASE%/sos.util.jar;
+                            %CLASSPATH_BASE%/trilead-ssh2-build211.jar"
+                            com.sos.jade.SOSJadeEngineMain
+                            %*
+                        </pre>
+                    </code>
+                </li>
+                <li>
+                    Unix: jade.sh
+                    <br />
+                    <code>
+                        <pre>
+                            CLASSPATH_BASE=.
+                            JAVA_BIN="java"
+                            "$JAVA_BIN" -classpath
+                            "$CLASSPATH_BASE/commons-net-1.2.2.jar:$CLASSPATH_BASE/sos.net.jar:
+                            $CLASSPATH_BASE/sos.settings.jar:$CLASSPATH_BASE/sos.util.jar:
+                            $CLASSPATH_BASE/trilead-ssh2-build211.jar"
+                            com.sos.jade.SOSJadeEngineMain
+                            $*
+                        </pre>
+                    </code>
+                </li>
+            </ul>
+            </p>
+            <p>
+            Kommandozeilenparameter
+            </p>
+            <p>
+            <ul>
+                <li>
+                    Generell
+                    <br />
+                    <code>
+                        <pre>
+                            Usage: com.sos.jade.SOSJadeEngineMain
+
+                            -operation=[copy|move|getlist|delete|rename|send|receive]
+                            -settings=[file] name of Configuration file
+                            -profile=[profile] Section/Profile for FTP/SFTP settings
+                            -verbose=[1..9]
+                        </pre>
+                    </code>
+                </li>
+                <li>
+                    Kommandozeilenparameter und Konfigurationsdateien
+                    <br />
+                    <br />
+                    Das Programm kann Parameter direkt von der Kommandozeile
+                    oder aus einer Konfigurationsdatei lesen. Bei Angabe an der
+                    Kommandozeile wird
+                    jeweils ein Bindestrich
+                    vor den Namen des Parameters gesetzt:
+                    <br />
+                    <br />
+                    <code>
+                        jade.sh -operation=copy -target_protocol=ftp -source_host=localhost -target_host=localhost -target_port=21 -local_dir=/tmp
+                    </code>
+                    <br />
+                    <br />
+                    Bei Verwendung einer Konfigurationsdatei werden Profile als
+                    Sektionen eingerichtet und einzelne Parameter als Paare aus Namen
+                    und Wert
+                    aufgeführt, z.B. in einer Datei
+                    <em>settings.ini</em>
+                    :
+                    <br />
+                    <br />
+                    <code>
+                        <pre>
+                            [example_transfer]
+                            protocol = ftp
+                            host = localhost
+                            port = 21
+                            local_dir = /tmp
+                            operation=copy
+                            ...
+                        </pre>
+                    </code>
+                    <br />
+                    <br />
+                    An der Kommandozeile wird der Name der Konfigurationsdatei und des
+                    Profils angegeben:
+                    <br />
+                    <br />
+                    <code>
+                        jade.sh -settings=settings.ini -profile=sample_transfer
+                    </code>
+                    <br />
+                    <br />
+                    Parameter aus der Konfigurationsdatei und von der Kommandozeile
+                    können gemischt verwendet werden,
+                    dabei haben die Parameter von der Kommandozeile
+                    Vorrang.
+                </li>
+            </ul>
+        </p>
+    </documentation>
+    <documentation language="en">
+            <p> This program is used as a standalone, synchroneous File Transfer
+                client application.
+            </p>
+            <xi:include href="./description/FileOrderCreation_Description.xml" parse="xml" />
+
+            <p>
+                <features>
+                    <feature>
+                        <p>
+                            Send and receive files by FTP to/from some host.
+                        </p>
+                    </feature>
+                    <feature name="jade.sftp">
+                        <p>
+                            Send and receive files by SFTP to/from some target host.
+                        </p>
+                    </feature>
+                    <feature name="jade.ftps">
+                        <p>
+                            Send and receive files by FTPS to/from some target host.
+                        </p>
+                    </feature>
+                    <feature name="jade.polling">
+                        <p>
+                            Polling the source server for incoming files.
+                        </p>
+                    </feature>
+                    <feature name="jade.server2server">
+                        <p>
+                            Server to Server transfer without touchdown. Different protocols can be used for
+                            transfer between the hosts., e.g. FTP to SFTP.
+                        </p>
+                    </feature>
+                    <!-- 
+                    <feature name="jade.authentication">
+                        <p>
+                            Execute commands by SSH on some host.
+                        </p>
+                    </feature>
+                     -->
+                    <feature name="jade.authentication">
+                        <p>
+                            Both password and public key authentication are supported for
+                            SFTP.
+                        </p>
+                    </feature>
+                    <feature name="jade.parameterization">
+                        <p>
+                            The parameterization is effected by command line parameters and/or
+                            by configuration files.
+                        </p>
+                        <p>
+                            Mixed usage of parameters from the command line and from a
+                            configuration file is supported,
+                            command line parameters have precedence.
+                        </p>
+                    </feature>
+                    <feature name="jade.logging">
+                        <p>
+                            Logging and error handling are provided, errors are detected and reported on
+                            a per file basis.
+                        </p>
+                    </feature>
+                    <feature  name="jade.regexp">
+                        <title>
+                            Transfer of partially matched files
+                        </title>
+                        <p>
+                            Alternatively to transferring individual files, you could transfer
+                            multiple files by use of regular expressions.
+                        </p>
+                    </feature>
+                    <feature  name="jade.recursesubfolders">
+                        <p>
+                            Recursive transfer of files in directories
+                        </p>
+                        <p>
+                            Files from arbitrarily nested subdirectories can be selected for
+                            transfer by regular expressions.
+                            Subdirectories will be created in the
+                            target file system, if required.
+                        </p>
+                    </feature>
+                    <feature>
+                        <p>
+                            Atomic Transfer
+                        </p>
+                        <p>
+                            Files can be renamed during transfer in order to make them appear
+                            atomically in a target directory.
+                            This is relevant e.g. should target
+                            directories be monitored for
+                            incoming files. This feature
+                            guarantees that incoming files are completely transferred before they appear
+                            in a
+                            directory.
+                        </p>
+                    </feature>
+                    <feature>
+                        <p>
+                            Check transferred data for completeness
+                        </p>
+                        <p>
+                            Checking completeness is done by comparing the size of incoming
+                            files with the number of transferred bytes.
+                            Moreover, files can be
+                            transferred repeatedly in order to verify that the
+                            files have not been changed on the
+                            FTP server during the transfer period.
+                        </p>
+                    </feature>
+
+                    <feature>
+                        <p>
+                            Handling of zero-byte (empty) files
+                        </p>
+                        <p>
+                            There are multiple options to handle empty files: Exclude empty
+                            files from transfer,
+                            include particular empty files, notification by
+                            e-mail in case of transfer
+                            of empty files.
+                        </p>
+                    </feature>
+
+                    <feature>
+                        <p>
+                            Renaming of files
+                        </p>
+                        <p>
+                            Files can be renamed after transfer by regular expressions.
+                        </p>
+                    </feature>
+                    <feature>
+                        <p>
+                            Use of alternative access data and credentials
+                        </p>
+                        <p>
+                            Should a connection or the login to an FTP server fail then
+                            alternative access data and credentials
+                            can be used, e.g. to connect to a
+                            backup FTP server in case of
+                            failure.
+                        </p>
+                        <p>
+                            Primary and alternative access parameters are handled additively,
+                            i.e. only those alternative
+                            parameters have to be specified that
+                            differ
+                            from the primary access
+                            parameters.
+                        </p>
+                    </feature>
+                    <feature>
+                        <p>
+                            Support for UNC paths in target directories
+                        </p>
+                        <p>
+                            Files can be directly transferred from an FTP/SFTP server
+                            to a target server system.
+                        </p>
+                    </feature>
+                    <feature name="jade.transferhistory">
+                        <p>
+                            Track record of file transfers
+                        </p>
+                        <p>
+                            Optionally a history file keeps track of every transfer that has
+                            been effected.
+                        </p>
+                        <p>
+                            History entries are optionally transferred to a JobScheduler instance (background service) that adds them
+                            to a central database.
+                        </p>
+                        <p>
+                            As an alternative the transfer history can be stored directly into the database of the background service.
+                        </p>
+                    </feature>
+                    <feature name="jade.filecompression">
+                        <p>
+                            File compression using gzip or zip.
+                        </p>
+                    </feature>
+                </features>
+            </p>
+            <p>
+                Features of former SOSFtp, which are actually not supported by JADE
+            </p>
+            <p>
+                <ul>
+                    <li>
+                        jump host
+                        <br />
+                        <br />
+                        Send files by FTP or SFTP to a "jump host" and forward them by
+                        FTP or SFTP to a target host.
+                        Different transfer protocols can be used
+                        between
+                        local host and "jump_host"
+                        and
+                        between "jump_host" and target host.
+                    </li>
+                    <li>
+                        <p>
+                            file_spec2
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            $ppid
+                        </p>
+                    </li>
+
+                    <li>
+                        <p>
+                            -verbose: due to the change to a modern logging concept (log4j) this parameter is no longer supported.
+                            The logging level is configured
+                            by a log4j-properties file.
+                        </p>
+                    </li>
+
+                    <li>
+                        <p>
+                            All parameters must be specified as a keyword and value pair.
+                            The functionality to specify filenames only is discarded.
+                            The parameter
+                            -filepath should be used instead.
+                        </p>
+                    </li>
+
+                    <li>
+                        <p>
+                            current_pid
+                        </p>
+                    </li>
+                </ul>
+            </p>
+            <p>
+                System Requirements
+            </p>
+            <p>
+                <ul>
+                    <li>
+                        <p>Java Runtime Environment JRE 1.6 and above.</p>
+                    </li>
+                </ul>
+            </p>
+            <p>
+                Start Script
+            </p>
+            <p>
+                <ul>
+                    <li>
+                        Windows: jade.cmd
+                        <br />
+                        <code>
+                            <pre>
+                                set CLASSPATH_BASE=.
+                                java -classpath
+                                "%CLASSPATH_BASE%/commons-net-1.2.2.jar;%CLASSPATH_BASE%/sos.net.jar;
+                                %CLASSPATH_BASE%/sos.settings.jar;%CLASSPATH_BASE%/sos.util.jar;
+                                %CLASSPATH_BASE%/trilead-ssh2-build211.jar"
+                                com.sos.jade.SOSJadeEngineMain
+                                %*
+                            </pre>
+                        </code>
+                    </li>
+                    <li>
+                        Unix: jade.sh
+                        <br />
+                        <code>
+                            <pre>
+                                CLASSPATH_BASE=.
+                                JAVA_BIN="java"
+                                "$JAVA_BIN" -classpath
+                                "$CLASSPATH_BASE/commons-net-1.2.2.jar:$CLASSPATH_BASE/sos.net.jar:
+                                $CLASSPATH_BASE/sos.settings.jar:$CLASSPATH_BASE/sos.util.jar:
+                                $CLASSPATH_BASE/trilead-ssh2-build211.jar"
+                                com.sos.jade.SOSJadeEngineMain $*
+                            </pre>
+                        </code>
+                    </li>
+                </ul>
+            </p>
+            <p>
+                Command line parameters
+            </p>
+            <p>
+                <ul>
+                    <li>
+                        General
+                        <br />
+                        <code>
+                            <pre>
+                                Usage: com.sos.jade.SOSJadeEngineMain -
+                                -
+                                operation
+                                =
+                                -
+                                settings
+                                =
+                                -
+                                profile
+                                =
+                                -verbose=
+                                -
+                                operation
+                                =[send|receive] FTP/SFTP operation
+                                -
+                                settings
+                                =[file] Configuration file
+                                -
+                                profile
+                                =[profile] Section/Profile for FTP/SFTP
+                                settings
+
+                                in configuration file
+
+                                -verbose=[1..9] Verbosity level
+                            </pre>
+                        </code>
+                    </li>
+                    <li>
+                        <p>
+                            Command line parameters and Configuration Files
+                        </p>
+                        <p>
+                            This program can receive parameters directly from the command line
+                            and from a configuration file. if specified at the command line
+                            then a
+                            hyphen
+                            must be added in front of each parameter name:
+                        </p>
+                        <p>
+                            <code>
+                                <pre>
+                                    jade.sh -
+                                    operation
+                                    =send -
+                                    protocol
+                                    =ftp -
+                                    host
+                                    =localhost -
+                                    port
+                                    =21 -
+                                    local_dir
+                                    =/tmp ...
+                                </pre>
+                            </code>
+                        </p>
+                        <p>
+                            If a configuration file is used then profiles can be added as
+                            sections in this file and
+                            individual parameters can be specified as
+                            pairs of
+                            names and values, e.g. for
+                            a file
+                            <em>settings.ini</em>
+                            :
+                        </p>
+                        <p>
+                            <code>
+                                <pre>
+                                    [sample_transfer]
+                                    protocol
+                                    = ftp
+                                    host
+                                    = localhost
+                                    port
+                                    = 21
+                                    local_dir
+                                    = /tmp
+                                    ...
+                                </pre>
+                            </code>
+                        </p>
+                        <p>
+                            At the command line the name of the configuration file and the
+                            profile are specified like this:
+                        </p>
+                        <p>
+                            <code>
+                                <pre>
+                                    jade.sh -settings=settings.ini -profile=sample_transfer
+                                </pre>
+                            </code>
+                        </p>
+                        <p>
+                            Mixed usage of parameters from the command line and from a
+                            configuration file is supported,
+                            command line parameters have precedence.
+                        </p>
+                    </li>
+                </ul>
+            </p>
+    </documentation>
+</description>

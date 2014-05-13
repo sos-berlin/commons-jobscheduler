@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: JobSchedulerExistsFile.xml 16326 2012-01-24 12:44:31Z oh $ -->
+<?xml-stylesheet type="text/xsl" href="scheduler_job_documentation_v1.1.xsl"?>
+<!-- 
+<?oasis-xml-catalog catalog="J:/E/java/development/com.sos.scheduler/src/sos/scheduler/jobdoc/catalog.xml"?>
+ -->
+
+<description xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 
+  http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+
+    <job order="yes" name="JobnetIdCalculator" tasks="1" title="Methods to create and modify various timestamps and put them to one or more variables." 
+    category="Scheduling, JobNet" since="1.3.?">
+
+        <script language="java" java_class="com.sos.jobnet.creator.jobs.JobNetIdCalculatorJSAdapterClass" resource="1" />
+    </job>
+
+    <releases>
+        <release id="1.0" created="2013-02-11" modified="2013-03-26">
+            <title>version 1.1</title>
+            <author name="Stefan Schaedlich" email="stefan.schaedlich@sos-berlin.com" />
+        </release>
+    </releases>
+
+    <resources>
+        <xi:include href="./jars/sos.spooler.jar.xml" parse="xml" />
+        <xi:include href="./jars/sos.scheduler.jar.xml" parse="xml" />
+        <xi:include href="./jars/sos.jobnet.jar.xml" parse="xml" />
+        <xi:include href="./jars/sos.JSHelper.jar" parse="xml" />
+        <xi:include href="./jars/joda-time.jar" parse="xml" />
+        <xi:include href="./jars/log4j.jar" parse="xml" />
+    </resources>
+
+    <configuration> 
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+          Die Parameter werden als Job- oder Auftragsparameter verarbeitet.
+        </div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+          Parameters are accepted as job parameters or as order parameters as appropriate.
+        </div>
+      </note>
+
+        <params id="job_parameter">
+            <xi:include href="./params/param_LoadId.xml" parse="xml" />
+            <xi:include href="./params/param_ResultParameterName.xml" parse="xml" />
+            <xi:include href="./params/param_ResultDateFormat.xml" parse="xml" />
+            <xi:include href="./params/param_CalculationRule.xml" parse="xml" />
+            <xi:include href="./params/param_LoadIdDateFormat.xml" parse="xml" />
+            <xi:include href="./params/param_LoadIdDurationType.xml" parse="xml" />
+            </params>
+    </configuration>
+
+    <documentation language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+Dieser Job erzeugt und verändert Zeitstempel, die u.A. zur Identifizierung von Jobnetzinstanzen verwendet werden können.            
+            </p>
+        </div>
+    </documentation>
+
+    <documentation language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude">
+            <p>
+This job creates and modifies timestamps, which can used to identify instances of jobnets.
+            </p>
+        </div>
+    </documentation>
+
+</description>

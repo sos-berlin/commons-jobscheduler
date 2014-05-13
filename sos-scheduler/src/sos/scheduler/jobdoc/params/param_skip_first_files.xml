@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    name="skip_first_files" Category="FileSystem, Filter" DataType="SOSOptionInteger"
+    OptionName="NoOfFirstFiles2Skip" Alias="NoOfFirstFiles2Skip" default_value="0"
+    required="false" exclude="skip_last_files"
+>
+
+    <note language="de">
+        <title>Anzahl nicht zu berücksichtigender Dateien</title>
+        <p>
+            Die angegebene Anzahl Dateien wird vom Anfang der Ergebnismenge
+            (result-list)
+            der Operation entfernt.
+            Auf diese Dateien wirkt sich die
+            Operation damit
+            nicht
+            aus.
+            </p><p>
+            Der Parameter wirkt auf die resultierende Menge von
+            <paramref>min_file_size</paramref>
+            ,
+            <paramref>min_file_age</paramref>
+            etc.
+        </p>
+        <p>
+            Die Reihenfolge der Einträge in der Ergebnis-Menge wird durch die
+            verwendeten Filter-Parameter ermittelt:
+            <ul>
+                <li>
+                    <paramref>min_file_age</paramref>
+                    ,
+                    <paramref>max_file_age</paramref>
+                    : aufsteigend nach Änderungsdatum der
+                    Datei, d.h. jüngere
+                    zuerst.
+                </li>
+                <li>
+                    <paramref>min_file_size</paramref>
+                    ,
+                    <paramref>max_file_size</paramref>
+                    : aufsteigend nach Größe, d.h.
+                    kleinere zuerst
+                </li>
+                <li>
+                    sind sowohl die Parameter für Größe und Alter einer Datei
+                    angegeben,
+                    dann
+                    erfolgt die Sortierung aufsteigend nach Alter.
+                </li>
+            </ul>
+        </p>
+        <p>
+            Es darf nur entweder
+            <paramref>skip_first_files </paramref>
+            oder
+            <paramref>skip_last_files</paramref>
+            verwendet
+            werden.
+        </p>
+    </note>
+    <note language="en">
+        <title>number of files to remove from the top of the result-set
+        </title>
+        <p>
+            The number of files are removed from the beginning of the set
+            resulting by
+            <paramref>min_file_size</paramref>
+            ,
+            <paramref>min_file_age</paramref>
+            etc.
+            These files are
+            excluded from further operations.
+        </p>
+        <p>
+            The result set is sorted according to the used filter
+            parameters:
+            </p><p>
+            <ul>
+                <li>
+                    <paramref>min_file_age</paramref>
+                    ,
+                    <paramref>max_file_age</paramref>
+                    : in ascending order by date of last
+                    modification, the newest
+                    file first.
+                </li>
+                <li>
+                    <paramref>min_file_size</paramref>
+                    ,
+                    <paramref>max_file_size</paramref>
+                    : in ascending order by file size,
+                    the smallest file on top.
+                </li>
+                <li>
+                    if parameters for file age as well as file size are given
+                    the result
+                    set is sorted by file age.
+                </li>
+            </ul>
+        </p>
+        <p>
+            Only either
+            <paramref>skip_first_files</paramref>
+            or
+            <paramref>skip_last_files</paramref>
+            is allowed to be
+            set at the same time.
+        </p>
+    </note>
+</param>

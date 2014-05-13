@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id: smtp_mail_parameter.xml 15153 2011-09-14 11:59:34Z kb $ -->
+<params xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1
+http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd"
+  >
+        <note language="de">
+            <title>Optionen für den Mail-Versand</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>Alle für den Mail-Versand notwendigen Optionen sind in dieser Gruppe definiert.</p>
+            </div>
+        </note>
+        <note language="en">
+            <title>eMail Options</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>All Options which are needed to send mails by smtp are described in this group.</p>
+            </div>
+        </note>
+
+
+    <param name="to" required="true" DataType="SOSOptionMailAdress" Alias="mail_to" >
+        <note language="de">
+            <title>Mail Empfänger</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>Mail Empfänger</p>
+            </div>
+        </note>
+        <note language="en">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>mail recipient(s)</p>
+            </div>
+        </note>
+    </param>
+    <param name="from" required="false" DataType="SOSOptionMailAdress">
+        <note language="de">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>Absenderadresse</p>
+            </div>
+        </note>
+        <note language="en">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>mail sender</p>
+            </div>
+        </note>
+    </param>
+
+    <param name="from_name" required="false" DataType="SOSOptionString">
+        <note language="de">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>Absendername</p>
+            </div>
+        </note>
+        <note language="en">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>name of the sender</p>
+            </div>
+        </note>
+    </param>
+
+    <param name="reply_to" required="false" DataType="SOSOptionMailAdress">
+        <note language="de">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>Antwortadresse</p>
+            </div>
+        </note>
+        <note language="en">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>reply address</p>
+            </div>
+        </note>
+    </param>
+    <param name="cc" required="false" DataType="SOSOptionMailAdress">
+        <note language="de">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>cc Empfänger</p>
+            </div>
+        </note>
+        <note language="en">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>cc recipient(s)</p>
+            </div>
+        </note>
+    </param>
+    <param name="bcc" required="false" DataType="SOSOptionMailAdress">
+        <note language="de">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>bcc Empfänger</p>
+            </div>
+        </note>
+        <note language="en">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>bcc recipient(s)</p>
+            </div>
+        </note>
+    </param>
+    <param name="subject" required="false" DataType="SOSOptionString">
+        <note language="de">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>Betreff der Mail</p>
+            </div>
+        </note>
+        <note language="en">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>Mail Subject</p>
+            </div>
+        </note>
+    </param>
+    <param name="host" required="false" DataType="SOSOptionHostName" Alias="smtp_server_name">
+        <note language="de">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>Host des Mail Servers</p>
+            </div>
+        </note>
+        <note language="en">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>mail server host</p>
+            </div>
+        </note>
+    </param>
+    <param name="port" required="false" default_value="25" DataType="SOSOptionPortNumber" Alias="smtp_port_number">
+        <note language="de">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>Port des Mailservers</p>
+            </div>
+        </note>
+        <note language="en">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>mail server port</p>
+            </div>
+        </note>
+    </param>
+    <param name="smtp_user" required="false" DataType="SOSOptionString">
+        <note language="de">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>smtp Benutzername</p>
+            </div>
+        </note>
+        <note language="en">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>smtp username</p>
+            </div>
+        </note>
+    </param>
+    <param name="smtp_password" required="false" DataType="SOSOptionPassword">
+        <note language="de">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>smtp Benutzer Passwort</p>
+            </div>
+        </note>
+        <note language="en">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>smtp user password</p>
+            </div>
+        </note>
+    </param>
+    <param name="queue_directory" required="false" DataType="SOSOptionString">
+        <note language="de">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>Verzeichnis für eingereite Mails.
+                    Mails die nicht verschickt werden können landen hier.
+                    Der Scheduler versucht zu einem späteren Zeitpunkt erneut, sie zu verschicken.
+                </p>
+            </div>
+        </note>
+        <note language="en">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>Mail queue directory.
+                    Mails which cannot be transferred will be put here. The Job Scheduler will later retry to send these mails.
+                </p>
+            </div>
+        </note>
+    </param>
+    <param name="body" required="false" DataType="SOSOptionString" Alias="mail_body">
+        <note language="de">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>Mail body</p>
+            </div>
+        </note>
+        <note language="en">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>Mail body</p>
+            </div>
+        </note>
+    </param>
+    <param name="content_type" required="false" default_value="text/plain" DataType="SOSOptionString">
+        <note language="de">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>content_type der Mail (text/plain, text/html...)</p>
+            </div>
+        </note>
+        <note language="en">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>content_type of the mail (text/plain, text/html...)</p>
+            </div>
+        </note>
+    </param>
+    <param name="encoding" required="false" default_value="7bit" DataType="SOSOptionString" Alias="mail_encoding">
+        <note language="de">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>encoding der Mail (7bit, Quoted-Printable, Base64)</p>
+            </div>
+        </note>
+        <note language="en">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>encoding of the mail (7bit, Quoted-Printable, Base64)</p>
+            </div>
+        </note>
+    </param>
+    <param name="charset" required="false" default_value="iso-8859-1" DataType="SOSOptionString">
+        <note language="de">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>Zeichensatz der Mail</p>
+            </div>
+        </note>
+        <note language="en">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>charset of the mail</p>
+            </div>
+        </note>
+    </param>
+    <param name="attachment_content_type" required="false" default_value="application/octet-stream" DataType="SOSOptionString">
+        <note language="de">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>content_type der Attachments (application/octet-stream, application/pdf...)</p>
+            </div>
+        </note>
+        <note language="en">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>content_type of attachments (application/octet-stream, application/pdf...)</p>
+            </div>
+        </note>
+    </param>
+    <param name="attachment_encoding" required="false" default_value="Base64" DataType="SOSOptionString">
+        <note language="de">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>encoding der Attachments (7bit, Quoted-Printable, Base64)</p>
+            </div>
+        </note>
+        <note language="en">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>encoding of attachments (7bit, Quoted-Printable, Base64)</p>
+            </div>
+        </note>
+    </param>
+    <param name="attachment_charset" required="false" default_value="iso-8859-1" DataType="SOSOptionString">
+        <note language="de">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>Zeichensatz der Attachments</p>
+            </div>
+        </note>
+        <note language="en">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>charset of attachments</p>
+            </div>
+        </note>
+    </param>
+    <param name="attachment" required="false" DataType="SOSOptionString">
+        <note language="de">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>Name und Pfad der Attachment(s) (mehrere Attachments werden durch ";" getrennt)</p>
+            </div>
+        </note>
+        <note language="en">
+            <title>title</title>
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <p>Filename and path of the attachment(s) (multiple attachments separated by ";")</p>
+            </div>
+        </note>
+    </param>
+
+</params>

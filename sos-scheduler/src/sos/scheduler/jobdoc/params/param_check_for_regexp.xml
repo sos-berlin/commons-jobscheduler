@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id: FileOrder_Parameter.xml 16251 2012-01-16 07:52:02Z kb $ -->
+
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 
+    http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd"
+       
+       name="check_for_regexp"
+       DefaultValue="true"
+       required="false"
+       DataType="SOSOptionRegExp">
+        <note language="de">
+		    <title>Text-Muster zur Log-Datei-Suche</title>		
+          <div xmlns="http://www.w3.org/1999/xhtml">
+          <p>
+            </p>
+          </div>
+        </note>
+        <note language="en">
+		    <title>Text pattern to search for in log file</title>		
+          <div xmlns="http://www.w3.org/1999/xhtml">
+          </div>
+        </note>
+      </param>

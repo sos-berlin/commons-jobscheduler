@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<items xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    name="account" >
+
+    <note language="de">
+        <title>Operation send: lokale Dateien an einen remote server senden</title>
+        <xhtml:div>
+            <p>
+            </p>
+            <p>
+            </p>
+        </xhtml:div>
+    </note>
+    <note language="en">
+        <title>Operation send: local files to remote server</title>
+        <xhtml:div>
+            <p>
+            </p>
+        </xhtml:div>
+    </note>
+</items>

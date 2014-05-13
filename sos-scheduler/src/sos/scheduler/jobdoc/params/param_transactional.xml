@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id$ -->
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="transactional"
+       DefaultValue="false"
+       required="false"
+       DataType="SOSOptionBoolean"
+       Alias="TransactionMode"
+	   usewith="atomic_prefix, atomic_suffix">
+
+	<indexterm index="transactional, parameter" display="false"></indexterm>
+    <indexterm index="parameter, transactional" display="false"></indexterm>
+
+        <note language="de">
+		    <title>Transaktions orientierter Transfer </title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+		  <p>
+            Der Parameter bestimmt, ob ob die Dateiübertragung innerhalb einer Transaktion abläuft,
+            d.h. es werden entweder alle Dateien erfolgreich übertragen oder keine.
+            Tritt bei der Übertragung einer Datei ein Fehler auf, dann werden die Übertragungen
+            aller bis dahin übertragenen Dateien rückgängig gemacht ("zurückgerollt").
+		  </p>
+		  <p>
+            Wird der Parameter mit dem Wert "true" verwendet, dann wirken folgende Parameter:
+		  </p>
+		  <p>
+            <ul>
+            <li>
+			<p>
+			Der Parameter <paramref>atomic_suffix</paramref> oder <paramref>atomic_prefix</paramref> muss angegeben sein.
+              Ist die Übertragung einer von mehreren Dateien nicht erfolgreich, dann
+              wird keine Datei in den Zieldateinamen umbenannt, stattdessen werden die
+              temporär erzeugten Dateien vom Zielsystem wieder gelöscht.
+			  </p>
+            </li>
+            <li>
+			<p>Der Parameter <paramref>remove_files</paramref> wirkt nur dann, wenn alle
+			Dateien erfolgreich übertragen worden sind.
+			  </p>
+            </li>
+            </ul>
+		  </p>
+          </div>
+		                <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../notes-de/BooleanValues.xml" parse="xml" />
+        </note>
+        <note language="en">
+		    <title>Transaction controlled Transfer </title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+		  <p>
+            This parameter specifies wether a transfer should be processed within a single transaction,
+            i.e. either all objects are successfully transferred or none.
+            Should an error occur during a transfer operation then all transfers will be rolled back.
+		  </p>
+		  <p>
+            When specifying the value true then the following applies:
+ 		  </p>
+		  <p>
+           <ul>
+            <li>
+			<p>
+			The parameter <paramref>atomic_suffix</paramref> or <paramref>atomic_prefix</paramref> has to be specified that causes
+            target files to be created with a suffix such as "~"
+            and that causes the respective files to be renamed to their target file name
+            after the transfer of all files has been successfully completed.
+            If at least one file out of a set of files cannot be transferred successfully
+            then no files will be renamed, instead the temporarily created files are removed
+            from the target system.
+			</p>
+            </li>
+            <li>
+			<p>
+			The parameter <paramref>remove_files</paramref> that causes files to be removed after
+            successful transfer will be effective only after all files have been successfully
+            transferred. Otherwise no files will be removed.
+			</p>
+            </li>
+            </ul>
+		  </p>
+          </div>
+		                <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../notes/BooleanValues.xml" parse="xml" />
+        </note>
+
+      </param>

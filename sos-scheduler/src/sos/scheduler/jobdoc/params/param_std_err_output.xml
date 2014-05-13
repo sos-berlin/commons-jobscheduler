@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1
+http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd"
+    name="std_err_output" required="false">
+    <note language="de">
+        <title>Inhalt des Fehlerprotokolls STDERR</title>
+        <p>
+                Die Ausgabe des Prozesses nach STDERR wird in diesem Parameter gespeichert.
+        </p>
+    </note>
+    <note language="en">
+        <title>Content of STDERR</title>
+        <p>
+        The output of the process into STDERR is reported as the value of this parameter.
+        </p>
+    </note>
+</param>

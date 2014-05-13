@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="StartOrder"
+       DefaultValue="true"
+       required="false"
+       DataType="SOSOptionBoolean">
+        <note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Diese Option wirkt nach der Erstellung des Jobnetzplanes. Ist sie auf <i>true</i> gesetzt wird unmittelbar nach der Erzeugung des
+Jobnetzplanes eine Order zur Ausführung des Jobnetzes erzeugt. Anderenfalls wird keine Order erzeugt.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+This options causes after a Jobnet plan was created succesfully. If it is set on <i>true</i> an order to execute the Jobnet plan will be
+created.
+          </div>
+        </note> 
+      </param>

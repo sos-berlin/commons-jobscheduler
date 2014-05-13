@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns:xi="http://www.w3.org/2001/XInclude"
+	xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+	xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	name="compress_files" default_value="false" required="false" 
+	DataType="SOSOptionBoolean"
+	interface="ISOSFileCompression"
+	>
+
+	<note language="de">
+		<div xmlns="http://www.w3.org/1999/xhtml">
+			<p>
+				Mit diesem Parameter wird festgelegt, ob der Inhalt der Dateien
+				"gezippt", also
+				komprimiert wird.
+            </p>
+			<p>
+				Der Parameter wird beim
+				<em>Senden</em>
+				von Daten ausgewertet und falls auf "true" gesetzt,
+				werden die zu sendenden Datei(en) vor dem Senden komprimiert mit einem
+				Zip-kompatiblen
+				Verfahren.
+			</p>
+		</div>
+	</note>
+	<note language="en">
+		<div xmlns="http://www.w3.org/1999/xhtml">
+			<p>
+				This parameter specifies whether or not the content of the source files
+				should be compressed by using a zip-algorithm.
+            </p>
+			<p>
+				In case of sending files each files which has to be selected for sending will be compressed in
+				a single zip file.
+				The extension of the file-name is defined with the parameter <paramref>compress_filename_extension</paramref>.
+				
+			</p>
+			<p>
+				A gzip-compatible compression is used, no further software components are required.
+			</p>
+			<p>
+				If <paramref>compress_files</paramref> is used the parameter <paramref>append_files</paramref>
+				is not allowed.
+			</p>
+		</div>
+	</note>
+</param>

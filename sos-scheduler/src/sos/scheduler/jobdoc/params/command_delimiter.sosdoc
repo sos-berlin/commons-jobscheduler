@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id: FileOrder_Parameter.xml 16251 2012-01-16 07:52:02Z kb $ -->
+<items xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xi="http://www.w3.org/2001/XInclude" 
+    xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 
+    http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+
+    <note language="de">
+        <title >Trennzeichen zwischen mehreren shell-Kommandos</title>
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+                In einem SSH Kommando-Parameter (JobScheduler, JADE oder SOSFtp) können mehrere auszuführende shell-Kommandos
+                hintereinander spezifiziert werden.
+                Voneinander getrennt werden diese Kommandos durch die (mit diesem Parameter) festgelegte Zeichenfolge.
+            </p>
+            <p>
+                Getrennt auszuführende Kommandos werden in separaten SSH Sessions ausgeführt.
+            </p>
+        </div>
+    </note>
+    <note language="en">
+        <title >Delimiter character/string for multiple shell commands</title>
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+                Command delimiter characters are specified using this parameter.
+                These delimiters can then be used in the
+                <paramref>jump_command</paramref>
+                parameter
+                to separate multiple commands.
+            </p>
+            <p>
+                These commands are then excecuted in separate SSH sessions.
+            </p>
+        </div>
+    </note>
+</items>

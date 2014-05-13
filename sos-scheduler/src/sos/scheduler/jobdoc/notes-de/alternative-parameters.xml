@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id: ParameterSubstitution.xml 15153 2011-09-14 11:59:34Z kb $ -->
+<items xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" 
+    xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <note language="de">
+        <p>
+            Die alternativen Parameter werden nur verwendet, wenn die Verbindung zum (FTP/SFTP) Server
+            fehlschlägt, z.B. der Server nicht verfügbar ist,
+            die Zugangsdaten ungültig sind etc.
+        </p>
+    </note>
+</items>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1
+http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd"
+    name="force_files" DefaultValue="true" required="false" DataType="SOSOptionBoolean" Alias="ErrorOnNoDataFound"
+    >
+
+    <indexterm index="ErrorOnNoDataFound, parameter" display="false"></indexterm>
+    <indexterm index="parameter, ErrorOnNoDataFound" display="false"></indexterm>
+
+    <indexterm index="force_files, parameter" display="false"></indexterm>
+    <indexterm index="parameter, force_files" display="false"></indexterm>
+
+
+    <note language="de">
+        <title>Fehler ignorieren</title>
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+                Der Parameter bestimmt, ob ein Fehler gemeldet wird, wenn keine Dateien
+                für eine Übertragung gefunden werden.
+                Ist der Wert dieses Parameter "false" so wird kein Fehler gemeldet, obwohl kein
+                Transfer erfolgt ist.
+            </p>
+            <p>
+                Der Umfang bzw die Anzahl der zu übertragenen Dateien wird u.A. mit den Parametern
+                <paramref>file_spec</paramref>
+                und
+                <paramref>file_path</paramref>
+                bestimmt und ggf. durch den Parameter
+                <paramref>overwrite_files</paramref>
+                eingeschränkt, falls dieser den Wert
+                <em>false</em>
+                aufweist.
+            </p>
+        </div>
+    </note>
+    <note language="en">
+        <title>Raise Error, if no files found for transfer</title>
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+            This parameter specifies whether an error should be raised if no files could be found for transfer.
+            If the value is false no error is reported.
+            </p>
+            <p>
+            The number of files to be transferred is determined by the
+            <paramref>file_spec</paramref>
+            or
+            <paramref>file_path</paramref>
+            parameters and can be restricted by the
+            <paramref>overwrite_files</paramref>
+            parameter should this
+            be specified with the value
+            <em>false</em>
+            .
+            </p>
+        </div>
+    </note>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../notes/BooleanValues.xml" parse="xml" />
+
+</param>

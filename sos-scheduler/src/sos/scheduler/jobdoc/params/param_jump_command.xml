@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id$ -->
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+
+    xmlns:xi="http://www.w3.org/2001/XInclude" xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1
+    http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd"
+
+    name="jump_command"
+    required="false"
+    DataType="SOSOptionCommandString"
+    Category="FileTransfer, JumpServer">
+
+    <note language="de">
+        <p>
+            Der Parameter spezifiziert das Kommando (bzw. die Kommandos), das in der DMZ ausgeführt wird,
+            um den Client zu starten.
+        </p>
+    </note>
+    <note language="en">
+        <p>
+            This parameter specifies the command that is to be executed on the DMZ server to start the client.
+        </p>
+    </note>
+
+    <xi:include href="./command.sosdoc" parse="xml" />
+
+
+</param>

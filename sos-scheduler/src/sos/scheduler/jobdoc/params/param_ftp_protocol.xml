@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param 
+       xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       
+    xmlns:xi="http://www.w3.org/2001/XInclude" 
+    xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 
+    http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd"
+       
+       name="ftp_protocol"
+       required="false"
+       Category="Connection"
+       DataType="SOSOptionProtocol"
+       OptionName="Protocol" 
+       Alias="ProtocolType"
+       
+       default_value="ftp">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <code>ftp</code>
+            ,
+            <code>sftp</code>
+            oder
+            <code>ftps</code>
+            <br clear="none"/>
+            Bei Wahl von
+            <code>sftp</code>
+            werden auch die
+            <code>ssh_*</code>
+            -Parameter
+            ausgewertet.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <code>ftp</code>
+            ,
+            <code>sftp</code>
+            or
+            <code>ftps</code>
+            <br clear="none"/>
+            If
+            <code>sftp</code>
+            is selected, the
+            <code>ssh_*</code>
+            parameters will
+            be considered.
+          </div>
+        </note>
+      </param>

@@ -1,0 +1,990 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<languages>
+   <item key="AllReleases">
+      <language id="de">
+         <text>Ältere Releases anzeigen</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Show previous Releases</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Voir les versions précédentes</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Application">
+      <language id="de">
+         <text>Application</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Application</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Application</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Author">
+      <language id="de">
+         <text>Autor</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Author</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Auteur</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="BothJob">
+      <language id="de">
+         <text>Dieser Job kann durch Aufträge oder durch Job-Starts veranlasst ablaufen.</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>This job is triggered by orders or by standard job starts.</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Ce tâche permet de drainer invité par des ordres ou par l'intermédiaire commence normal.</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="ChangeLog">
+      <language id="de">
+         <text>Change Log</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Change Log</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Change Log</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Class">
+      <language id="de">
+         <text>Class</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Class</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Classe</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="CodeToConfigurateJob">
+      <language id="de">
+         <text>Code zur Konfiguration des Jobs</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Code to configurate the job</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Code pour configurer la tâche</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="ComClassName">
+      <language id="de">
+         <text>Name der COM Klasse</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Name of COM Class</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Nom de la classe COM</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Comment">
+      <language id="de">
+         <text>Kommentar</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Comment</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Commentaire</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Configuration">
+      <language id="de">
+         <text>Konfiguration</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Configuration</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Configuration</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="ConfigurationFileName">
+      <language id="de">
+         <text>Name der Konfigurationsdatei</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Name of the Configuration File</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Nom du fichier de configuration</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Database">
+      <language id="de">
+         <text>Datenbank</text>
+         <description/>
+         <tooltip>Zentrale Einstellungen für den Job in einer Datenbank. Alternativ zu den Einstellungen über XML-Konfiguration oder Profile können Parameter auch aus logischen Tabellen in einer Datenbank gelesen werden. Ein Parameter-Eintrag liegt innerhalb der logischen Struktur der Attribute application/section/entry der Tabelle SETTINGS. Per Default werden Einstellungen aus der Datenbank gelesen, die in der Konfigurationsdatei factory.ini angegeben wurde.</tooltip>
+      </language>
+      <language id="en">
+         <text>Database</text>
+         <description/>
+         <tooltip>Central job settings read from a database. As an alternative to the XML configuration file or the profile, settings can be read from database tables. Parameter entries must use the attributes structure of the SETTINGS table - i.e. application/section/entry. By default values are read from Job Scheduler Database whose connection data is specified in the factory.ini configuration file.</tooltip>
+      </language>
+      <language id="fr">
+         <text>Base de données</text>
+         <description/>
+         <tooltip>Central job settings read from a database. As an alternative to the XML configuration file or the profile, settings can be read from database tables. Parameter entries must use the attributes structure of the SETTINGS table - i.e. application/section/entry. By default values are read from Job Scheduler Database whose connection data is specified in the factory.ini configuration file.</tooltip>
+      </language>
+   </item>
+   <item key="DatabaseName">
+      <language id="de">
+         <text>Datenbank-Name</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Database Name</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Nom de la base</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="DataType">
+      <language id="de">
+         <text>Datentyp</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>DataType</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>DataType</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Default">
+      <language id="de">
+         <text>Default</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Default</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Par défaut</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Alias">
+      <language id="de">
+         <text>Alias</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Alias</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Alias</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="DiskSpace">
+      <language id="de">
+         <text>Plattenplatz</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Disk Space</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Espace disque</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Documentation">
+      <language id="de">
+         <text>Dokumentation</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Documentation</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Documentation</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="EnvVars">
+      <language id="de">
+         <text>Umgebungsvariablen</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Environment Variables</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Variables d'environnement</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="File">
+      <language id="de">
+         <text>Datei</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>File</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Fichier</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Filename">
+      <language id="de">
+         <text>Dateiname</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Filename</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Nom du fichier</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Files">
+      <language id="de">
+         <text>Dateien</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Files</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Fichiers</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="GenerateJob">
+      <language id="de">
+         <text>Job generieren</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Generate Job</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Générer tâche</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="JavaClassName">
+      <language id="de">
+         <text>Name der Java-Klasse</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Name of Java Class</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Nom de la classe Java</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="JobParameter">
+      <language id="de">
+         <text>Job-Parameter</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Job Parameter</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Paramètre de tâche</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Language">
+      <language id="de">
+         <text>Sprache</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Language</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>langage</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="LastChanges">
+      <language id="de">
+         <text>letzte Änderung</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Last Changes</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Derniers changements</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="LogFile">
+      <language id="de">
+         <text>Protokolldatei</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Log File</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Fichier de log</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Memory">
+      <language id="de">
+         <text>Hauptspeicher</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Memory</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Mémoire</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="MonitorScript">
+      <language id="de">
+         <text>Monitor-Skript</text>
+         <description/>
+         <tooltip>Monitor Scripts check the requirements before a job or order is started. Moreover, they are used to control execution results, e.g. the conditional execution of successor jobs.</tooltip>
+      </language>
+      <language id="en">
+         <text>Monitor Script</text>
+         <description/>
+         <tooltip>Monitor-Skripte werden zur Prüfung von Voraussetzungen für den Start von Jobs und Aufträgen eingesetzt und für die Steuerung der Weiterverarbeitung, z.B. für den bedingten Start von Folge-Jobs.</tooltip>
+      </language>
+      <language id="fr">
+         <text>Moniteur Script</text>
+         <description/>
+         <tooltip>Monitor-Skripte werden zur Prüfung von Voraussetzungen für den Start von Jobs und Aufträgen eingesetzt und für die Steuerung der Weiterverarbeitung, z.B. für den bedingten Start von Folge-Jobs.</tooltip>
+      </language>
+   </item>
+   <item key="Name">
+      <language id="de">
+         <text>Name</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Name</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Nom</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="NoOrderJob">
+      <language id="de">
+         <text>Dieser Job verarbeitet keine Aufträge.</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>This job does not process orders.</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Ce tâche ne traite pas les ordres.</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="optional">
+      <language id="de">
+         <text>optional</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>optional</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>optionnelle</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Order">
+      <language id="de">
+         <text>Auftrag</text>
+         <description/>
+         <tooltip>'Ein Auftrag aktiviert die Verarbeitung einer Job-Kette. Er enthält Parameter für einen oder mehrere Jobs einer Job-Kette.'</tooltip>
+      </language>
+      <language id="en">
+         <text>Order</text>
+         <description/>
+         <tooltip>An order activates the processing of a job chain and contains parameters for one or more jobs in the job chain.</tooltip>
+      </language>
+      <language id="fr">
+         <text>Ordre</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="OrderControl">
+      <language id="de">
+         <text>Auftragssteuerung</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Order Control</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Contrôle l'ordre</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="OrderJob">
+      <language id="de">
+         <text>Dieser Job läuft auftragsgesteuert ab.</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>This job is executed order driven, i.e. it starts automatically if an order is received.</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Cette tâche est exécutée afin conduit, c'est à dire qu'il démarre automatiquement si un ordre est reçue.</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="OS">
+      <language id="de">
+         <text>OS</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>OS</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>OS</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Parameter">
+      <language id="de">
+         <text>Parameter</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Parameter</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Paramètre</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Parameters">
+      <language id="de">
+         <text>Parameter</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Parameters</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Paramètres</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="ReturnParameters">
+      <language id="de">
+         <text>Return Parameter</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Return Parameters</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Paramètres de retour</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Payload">
+      <language id="de">
+         <text>Payload</text>
+         <description/>
+         <tooltip>Auftragsgesteuerte Jobs verarbeiten Aufträge mit einer optionalen Payload für auftragsbezogene Parameter.</tooltip>
+      </language>
+      <language id="en">
+         <text>Payload</text>
+         <description/>
+         <tooltip>Order driven jobs execute orders with an optional payload that contains parameters for the order.</tooltip>
+      </language>
+      <language id="fr">
+         <text>Charge utile</text>
+         <description/>
+         <tooltip>Order driven jobs execute orders with an optional payload that contains parameters for the order.</tooltip>
+      </language>
+   </item>
+   <item key="PayloadParameter">
+      <language id="de">
+         <text>Payload-Parameter</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Payload Parameter</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Paramètre de charge utile</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Process">
+      <language id="de">
+         <text>Prozess</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Process</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Processus</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Profile">
+      <language id="de">
+         <text>Profile</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Profile</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Profil</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Releases">
+      <language id="de">
+         <text>Releases</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Releases</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Communiqués</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="required">
+      <language id="de">
+         <text>erforderlich</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>required</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>demandé</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Resource">
+      <language id="de">
+         <text>Ressource</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Resource</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Ressource</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Resources">
+      <language id="de">
+         <text>Ressourcen</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Resources</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Ressources</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Script">
+      <language id="de">
+         <text>Skript</text>
+         <description/>
+         <tooltip>Ein Skript enthält die Implementierung eines Jobs. Skripte können mit den Methoden des Job Scheduler API in den Sprachen  Java, Javascript, Perlscript und VBScript implementiert werden. Alternativ zur Implementierung mit Skripten können Jobs zur Ausführung beliebiger Programme und Kommandodateien konfiguriert werden.</tooltip>
+      </language>
+      <language id="en">
+         <text>Script</text>
+         <description/>
+         <tooltip>A script contains the implementation of one or more jobs. Scripts make optional use of the Job Scheduler API methods and are implemented in Java,Javascript, PerlScript or VBScript. Jobs are an alternative to scripts, and can be configured to start programs and executable files.</tooltip>
+      </language>
+      <language id="fr">
+         <text>Script</text>
+         <description/>
+         <tooltip>A script contains the implementation of one or more jobs. Scripts make optional use of the Job Scheduler API methods and are implemented in Java,Javascript, PerlScript or VBScript. Jobs are an alternative to scripts, and can be configured to start programs and executable files.</tooltip>
+      </language>
+   </item>
+   <item key="Section">
+      <language id="de">
+         <text>Section</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Section</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Section</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Settings">
+      <language id="de">
+         <text>Settings</text>
+         <description/>
+         <tooltip>Zentrale Einstellungen für den Job in einer Konfigurationsdatei. Per Default ist der Name der Konfigurationsdatei factory.ini.</tooltip>
+      </language>
+      <language id="en">
+         <text>Settings</text>
+         <description/>
+         <tooltip>Central job settings given in a profile: the default profile is held in the factory.ini configuration file.</tooltip>
+      </language>
+      <language id="fr">
+         <text>Settings</text>
+         <description/>
+         <tooltip>Central job settings given in a profile: the default profile is held in the factory.ini configuration file.</tooltip>
+      </language>
+   </item>
+   <item key="ShowAll">
+      <language id="de">
+         <text>Alles anzeigen</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Show all</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Montrer tous les</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Tasks">
+      <language id="de">
+         <text>Tasks</text>
+         <description/>
+         <tooltip>zeigt die maximale Anzahl der Tasks an, die ein Job parallel ausführen kann</tooltip>
+      </language>
+      <language id="en">
+         <text>Tasks</text>
+         <description/>
+         <tooltip>shows the maximum number of tasks that a job can operate in parallel</tooltip>
+      </language>
+      <language id="fr">
+         <text>Instances de tâche</text>
+         <description/>
+         <tooltip>indique le nombre maximum de tâches qui peuvent exécuter un travail en parallèle</tooltip>
+      </language>
+   </item>
+   <item key="Title">
+      <language id="de">
+         <text>Titel</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Title</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Titre</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Type">
+      <language id="de">
+         <text>Typ</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Type</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Type</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Unit">
+      <language id="de">
+         <text>Einheit</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Unit</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Unité</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+   <item key="Value">
+      <language id="de">
+         <text>Wert</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Value</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Valeur</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+      <item key="SourceDoc">
+      <language id="de">
+         <text>Source-Dokumentation</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="en">
+         <text>Source documentation</text>
+         <description/>
+         <tooltip/>
+      </language>
+      <language id="fr">
+         <text>Source documentation</text>
+         <description/>
+         <tooltip/>
+      </language>
+   </item>
+
+</languages>

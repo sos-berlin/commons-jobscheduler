@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id$ -->
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="ssh_auth_file"
+       required="false"
+       DataType="SOSOptionInFileName"
+xmlns:xi="http://www.w3.org/2001/XInclude"
+       >
+
+		       <indexterm index="SSH, ssh_auth_file" display="false"></indexterm>
+
+	 <indexterm index="ssh_auth_file, parameter" display="false"></indexterm>
+    <indexterm index="parameter, ssh_auth_file" display="false"></indexterm>
+
+    <indexterm index="publickey, ssh_auth_file" display="false"></indexterm>
+
+	 <indexterm index="ssh_auth_file, parameter" display="false"></indexterm>
+    <indexterm index="parameter, ssh_auth_file" display="false"></indexterm>
+
+
+        <note language="de">
+		    <title>Schlüsseldatei mit privatem Schlüssel</title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+		  <p>
+            Der Parameter bestimmt den Pfad und Namen einer Datei mit dem privaten Schlüssel
+            des Benutzers, für den die Anmeldung an einem SSH Server erfolgt.
+                key file: ~/.ssh/id_rsa or ~/.ssh/id_dsa (must be OpenSSH-Format).
+				</p>
+				<p>
+            Der Parameter muss angegeben werden, wenn mit dem Parameter <paramref>ssh_auth_method</paramref>
+            die Authentifizierungsmethode <em>publickey</em> bestimmt wurde.
+				</p>
+				<p>
+            Falls die Datei mit einer Passphrase geschützt ist, muß diese mit dem Parameter
+            <paramref>password</paramref> angegeben werden.
+				</p>
+          </div>
+        </note>
+        <note language="en">
+		    <title>Keyfile with private Key</title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+				<p>
+            This parameter specifies the path and name of a user's private key file
+            that is used for authentication with an SSH server.
+                key file: ~/.ssh/id_rsa or ~/.ssh/id_dsa (must be OpenSSH-Format).
+				</p>
+				<p>
+            This parameter has to be specified should the <em>publickey</em> authentication method
+            have been specified in the <paramref>ssh_auth_method</paramref> parameter.
+				</p>
+				<p>
+            Should the private key file be secured by a passphrase, then the passphrase has to be specified
+            using the <paramref>password</paramref> parameter.
+							</p>
+          </div>
+        </note>
+      </param>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id$ -->
+
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1
+     ../scheduler_job_documentation_v1.1.xsd " name="append_files"
+    DefaultValue="false" required="false" DataType="SOSOptionBoolean" Alias="AppendFileContent" OptionName="AppendFiles" see="overwrite_files"
+    Category="Filehandling"
+    >
+    <note language="de">
+        <title>Dateiinhalt an eine existierende Datei anhängen</title>
+        <p>
+            Der Wert des Parameters bestimmt, ob der Inhalt der Quelldatei an das Ende der Zieldatei
+            angehängt wird, falls die Zieldatei existiert.
+            Existiert die
+            Zieldatei (noch) nicht, so hat dieser Parameter keine Wirkung.
+        </p>
+        <p>
+            Der Parameter
+            <paramref>overwrite_files</paramref>
+            wird nicht beachtet,
+            falls
+            <paramref>append_files</paramref>
+            den Wert
+            <paramval datatype="SOSOptionBoolean">true</paramval>
+            enthält.
+        </p>
+        <p>
+            Es wird zusätzlich eine Meldung vom Typ "info" erzeugt.
+        </p>
+    </note>
+    <note language="en">
+        <title>Append content of transferred files to existing files</title>
+        <p>
+            This parameter specifies wether the content of a source file should
+            be appended to the target file, should the target file exist.
+        </p>
+        <p>
+            The parameter
+            <paramref>overwrite_files</paramref>
+            will be ignored if this parameter
+            is specified with the value
+            <paramval datatype="SOSOptionBoolean">true</paramval>.
+        </p>
+        <p>
+            A message of type "info" will be created.
+        </p>
+    </note>
+</param>

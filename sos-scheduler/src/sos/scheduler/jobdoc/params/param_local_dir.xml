@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 
+    http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd"
+
+    name="local_dir" DefaultValue="." required="true" DataType="SOSOptionFolderName">
+    <note language="de">
+        <title>local_dir</title>
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+                Lokales Verzeichnis, in das bzw. von dem Dateien übertragen werden.
+                Per Voreinstellung wird das Arbeitsverzeichnis verwendet.
+            </p>
+            <p>
+                Neben Verzeichnissen im lokalen Dateisystem werden UNC Namen unterstützt,
+                mit denen Verzeichnisse auf anderen Servern adressiert werden können:
+                <code>\\somehost\somedirectory</code>
+                kann genau wie
+                <code>//somehost/somedirectory</code>
+                verwendet werden, um Dateien
+                von einem FTP/SFTP Server direkt auf einen anderen entfernten Server zu übertragen.
+            </p>
+            <p>
+                Darüber hinaus können URIs für ein
+                <code>file</code>
+                -Schema angegeben werden, z.B.
+                <code>file:////somehost/somedirectory</code>
+                .
+                Beachten Sie bitte die erforderliche Anzahl Schrägstriche.
+                <code>file</code>
+                -URIs
+                unterliegen folgenden, durch das verwendete Java JRE bedingte Limitationen:
+                <ul>
+                    <li>Es können keine Dateien mit Leerzeichen im Pfad oder Dateinamen verarbeitet werden</li>
+                    <li>
+                        Authentifizierung anhand von
+                        <code>authority strings</code>
+                        , z.B.
+                        <code>file:////user:password@somehost/somedirectory</code>
+                        wird nicht unterstützt.
+                    </li>
+                </ul>
+            </p>
+        </div>
+    </note>
+    <note language="en">
+        <title>local_dir</title>
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+                Local directory into which or from which files should be transferred.
+                By default the current working directory is used.
+            </p>
+            <p>
+                Besides paths in the local file system UNC path names are supported
+                that could be used to address remote server systems:
+                <code>\\somehost\somedirectory</code>
+                can be used in the same way as
+                <code>//somehost/somedirectory</code>
+                to transfer files from an FTP/SFTP server to
+                a different remote server system.
+            </p>
+            <p>
+                Moreover, you could specify URIs for a
+                <code>file</code>
+                schema as in
+                <code>file:////somehost/somedirectory</code>
+                .
+                Please, consider the required number of slashes.
+                <code>file</code>
+                URIs are
+                subject to the following limitations due to constraints of the underlying Java JRE:
+            </p>
+            <p>
+                <ul>
+                    <li>File names and path names must not contain any spaces.</li>
+                    <li>
+                        Authentication by
+                        <code>authority strings</code>
+                        as in
+                        <code>file:////user:password@somehost/somedirectory</code>
+                        is not supported.
+                    </li>
+                </ul>
+            </p>
+        </div>
+    </note>
+</param>

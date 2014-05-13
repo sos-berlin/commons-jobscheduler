@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="file_spec"
+       DefaultValue=".*"
+       required="false"
+       DataType="SOSOptionRegExp"
+	   see="FileListName"
+       Alias="FileNamePatternRegExp">
+	   
+	 <indexterm index="FileNamePatternRegExp, parameter" display="false"></indexterm>
+    <indexterm index="parameter, FileNamePatternRegExp" display="false"></indexterm>
+	   
+	 <indexterm index="file_spec, parameter" display="false"></indexterm>
+    <indexterm index="parameter, file_spec" display="false"></indexterm>
+	   
+        <note language="de">
+		    <title>Dateinamens-Filter mit regulären Ausdruck</title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+		  <p>
+            Mit diesem Parameter wird ein regulärer Ausdruck spezifiziert.
+			Alle Dateinamen, die dem spezifizierten regulären Ausdruck entsprechen, werden in eine
+			Ergebnis-Liste übernommen.
+			Alle in der Ergebnis-Liste enthaltenen Dateien werden transferiert.
+			<!-- 
+            (in Abhängigkeit vom Parameter <paramref>operation</paramref>, der mit den Werten <paramval>send</paramval> 
+            und <paramval>receive</paramval> die Richtung des Transfers bestimmt)
+			-->
+		  </p>
+		  <!--
+		  <p>
+            Für die Operationen <paramval>send</paramval> und <paramval>receive</paramval> muss entweder dieser Parameter
+            oder der Parameter <paramref>file_path</paramref> bzw. eine Liste von Dateinamen als zusätzliche
+            Parameter angegeben sein.
+		  </p>
+		  -->
+          </div>
+        </note>
+        <note language="en">
+		    <title>File filtering using a regular expression</title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies a regular expression, which is used to select files from a directory.
+            All file names that correspond to the regular expression are transferred to a results list.
+            All files whose names are contained in this list will be transferred.
+<!--
+			or from an FTP/SFTP server 
+            (depending on the <paramref>operation</paramref> parameter values <paramval>send</paramval> or <paramval>receive</paramval>)
+            to be transferred.
+            <br/>
+         <br/>
+            For the operations <paramval>send</paramval> and <paramval>receive</paramval> either this parameter has to be specified
+            or the parameter <paramref>file_path</paramref> or a list of file names as additional parameters.
+ -->			
+          </div>
+        </note>
+        <xi:include href="../notes/RegExpRemarks.xml" xmlns:xi="http://www.w3.org/2001/XInclude" parse="xml"/>
+      </param>

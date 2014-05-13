@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="sql_script_file" required="false" DataType="SOSOptionCommandString" Category="Database,SQL,PL/SQL"
+    OptionName="SQLScriptFile" Alias="command_script_file" see="" prefix="" scope="all">
+
+    <note language="de">
+        <title>SQL Script</title>
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+                Der Wert des Parameters enthält eine oder mehrer Zeilen, die zusammen ein (SQL)script beschreiben.
+                Alternativ kann der Name einer Datei angegeben werden, die das Script enthält.
+            </p>
+            <p>
+                Das Script kann mit Hilfe von Umgebungsvariablen auf Job- und Auftrags-Parameter zugreifen.
+                Die Namen sind großgeschrieben.
+                "SCHEDULER_PARAM_" ist den Namen vorangestellt.
+            </p>
+        </div> 
+    </note>
+    <note language="en">
+        <title>SQL Script</title>
+        <div xmlns="http://www.w3.org/1999/xhtml">
+        <p>The value of the parameter contains one or more lines ot text, which together describe an (SQL) script.
+                 Alternatively, the name of a file can be specified that contains the script.
+                 </p>
+            <p>
+                This parameter can be used as an alternative to
+                <paramref>command</paramref>
+                ,
+                <paramref>command_delimiter</paramref>
+                and
+                <paramref>command_script_file</paramref>
+                .
+                It contains scriptcode which will be transferred to the remote host as a file and will then be executed there.
+                The script can access job and order parameters by environment variables.
+                The names are in upper case and have "SCHEDULER_PARAM_" as a prefix.
+                Order parameters with the same name overwrite task parameters.
+            </p>
+        </div>
+    </note>
+</param>

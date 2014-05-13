@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param
+	xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+	xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	name="db_url"
+	Category="database" DefaultValue="" required="true"
+	DataType="SOSOptionString">
+	<note language="de">
+		<title>url für die Datenbankverbindung</title>
+		<div xmlns="http://www.w3.org/1999/xhtml">
+        <p>            jdbc url (e.g.  jdbc:oracle:thin:@localhost:1521:XE)
+        </p>
+          </div>
+	</note>
+	<note language="en">
+		<title>URL for connection to database</title>
+
+		<div xmlns="http://www.w3.org/1999/xhtml">
+        <p>
+                    jdbc url (e.g.  jdbc:oracle:thin:@localhost:1521:XE)
+        </p>
+          </div>
+	</note>
+</param>

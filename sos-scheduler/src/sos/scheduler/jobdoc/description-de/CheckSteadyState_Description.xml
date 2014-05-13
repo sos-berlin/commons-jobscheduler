@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id: FileOrderCreation_Description.xml 16122 2012-01-06 09:39:15Z kb $ -->
+<note language="de"
+	xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+	xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<title>Check Steady State of Files</title>
+			<p>
+            Dieser Job kann prüfen, ob alle zu transferierenden Dateien vollständig erstellt sind.
+            Damit ist sichergestellt, daß eine Übertragung einer Datei erst dann erfolgt, wenn diese vollständig ist.
+            </p>
+                                <p>
+                                Ist eine Datei als (noch) nicht vollständig erkannt, so wird gewartet, bis Dateien
+                                vollständig bzw. geschlossen ist.
+        </p>
+        <p>
+        Je nach verwendetem Filesystem wird versucht festzustellen, ob a) die Größe der Datei oder b) das Modifikationsdateum (und die Zeit)
+        sich verändert. Das Intervall, in dem dies gesprüft wird, kann mit dem entsprechenden Parameter festgelegt werden.
+        </p>
+
+</note>

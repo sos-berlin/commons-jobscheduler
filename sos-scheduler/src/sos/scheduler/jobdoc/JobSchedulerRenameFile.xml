@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id$ -->
+<?xml-stylesheet type="text/xsl" href="scheduler_job_documentation_v1.1.xsl"?>
+<description xmlns:xi="http://www.w3.org/2001/XInclude" xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+    <job order="both" name="JobSchedulerRenameFile" title="Rename one or more files" tasks="unbounded" category="FileHandling" since="1.3.?">
+        <script language="java" java_class="sos.scheduler.file.JobSchedulerRenameFile" resource="1" />
+    </job>
+
+    <releases>
+        <release id="1.3" created="2006-11-10" modified="2009-06-15">
+            <title>version 1.3</title>
+            <author name="Florian Schreiber" email="florian.schreiber@sos-berlin.com" />
+        </release>
+    </releases>
+
+    <resources>
+        <xi:include href="./jars/sos.scheduler.jar.xml" parse="xml" />
+        <xi:include href="./jars/sos.spooler.jar.xml" parse="xml" />
+        <xi:include href="./jars/sos.util.jar.xml" parse="xml" />
+    </resources>
+
+    <configuration>
+        <xi:include href="./notes-de/OrderOrStandAlone.xml" parse="xml" />
+        <xi:include href="./notes/OrderOrStandAlone.xml" parse="xml" />
+
+        <params id="job_parameter">
+            <xi:include href="./params/param_file.xml" parse="xml" />
+            <xi:include href="./params/param_target_file.xml" xmlns:xi="http://www.w3.org/2001/XInclude" parse="xml" />
+            <xi:include href="./params/param_file_spec_fileop.xml" parse="xml" />
+            <xi:include href="./params/param_gracious.xml" parse="xml" />
+            <xi:include href="./params/param_recursive.xml" parse="xml" />
+            <xi:include href="./params/param_create_dir.xml" parse="xml" />
+            <xi:include href="./params/param_overwrite.xml" xmlns:xi="http://www.w3.org/2001/XInclude" parse="xml" />
+            <xi:include href="./params/param_replacing.xml" xmlns:xi="http://www.w3.org/2001/XInclude" parse="xml" />
+            <xi:include href="./params/param_replacement.xml" xmlns:xi="http://www.w3.org/2001/XInclude" parse="xml" />
+
+            <xi:include href="./params/param_max_file_age.xml" parse="xml" />
+            <xi:include href="./params/param_min_file_age.xml" parse="xml" />
+            <xi:include href="./params/param_max_file_size.xml" parse="xml" />
+            <xi:include href="./params/param_min_file_size.xml" parse="xml" />
+            <xi:include href="./params/param_skip_first_files.xml" parse="xml" />
+            <xi:include href="./params/param_skip_last_files.xml" parse="xml" />
+
+            <xi:include href="./params/param_count_files.xml" parse="xml" />
+
+            <xi:include href="./params/FileOrderCreation_Parameter.xml" parse="xml" />
+            <xi:include href="./params/ResultSet_Parameter.xml" parse="xml" />
+
+
+            <param name="source_file" required="true">
+                <note language="de">
+                <title>Alias für Parameter file</title>
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                        Alias für den Parameter
+                        <paramref>file</paramref>
+                    </div>
+                </note>
+                <note language="en">
+                <title>Alias name for parameter file</title>
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                        Alias name for the parameter
+                        <paramref>file</paramref>
+                    </div>
+                </note>
+            </param>
+
+        </params>
+        <params id="return_parameter">
+            <xi:include href="./params/FileOrder_Parameter.xml" parse="xml" />
+            <xi:include href="./params/ResultSet_ReturnParameter.xml" parse="xml" />
+        </params>
+        <params id="other">
+        </params>
+    </configuration>
+    <documentation language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+                Dieser Job benennt eine Datei oder mehrere Dateien eines
+                Verzeichnisses um.
+                <p>
+                    Das Umbenennen von Dateien über Filesystem-Grenzen hinaus ist
+                    abhängig vom verwendeten Betriebssystem bzw. dessen
+                    Version.
+                    (siehe auch
+                    <a href="http://download.oracle.com/javase/1.4.2/docs/api/java/io/File.html#renameTo%28java.io.File%29)">renameTo</a>
+                    ).
+                </p>
+            </p>
+            <xi:include href="./notes-de/ExampleReplace.xml" xmlns:xi="http://www.w3.org/2001/XInclude" parse="xml" />
+            <xi:include href="./notes-de/RegExpRemarks.xml" xmlns:xi="http://www.w3.org/2001/XInclude" parse="xml" />
+            <xi:include href="./notes-de/OrderOrStandAlone.xml" parse="xml" />
+        </div>
+    </documentation>
+    <documentation language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+
+            <p>
+                This job renames one or more files.
+                <p>
+				<!-- JS-690 -->
+                    Whether or not this job can move a file from one filesystem to
+                    another is platform-dependent.
+                    (see
+                    <a href="http://download.oracle.com/javase/1.4.2/docs/api/java/io/File.html#renameTo%28java.io.File%29)">renameTo</a>
+                    ).
+                </p>
+                                The job belongs to the category "FileOperations".
+            </p>
+            <xi:include href="./notes/FileOperations.xml" xmlns:xi="http://www.w3.org/2001/XInclude" parse="xml" />
+            <p>
+                <features>
+                    <feature>
+                        Rename or moves files in the (local) file system
+                    </feature>
+                    <xi:include href="./notes/feature-use-of-regexp.xml" parse="xml" />
+                    <xi:include href="./notes/feature-recurse-of-subdirectories.xml" parse="xml" />
+                    <xi:include href="./notes/feature-parameter-substitution.xml" parse="xml" />
+                    <xi:include href="./notes/feature-resultset-creation.xml" parse="xml" />
+                </features>
+            </p>
+        		<xi:include href="./notes/ExampleReplace.xml" xmlns:xi="http://www.w3.org/2001/XInclude" parse="xml" />
+    				<xi:include href="./notes/RegExpRemarks.xml" xmlns:xi="http://www.w3.org/2001/XInclude" parse="xml" />
+    				<xi:include href="./notes/OrderOrStandAlone.xml" parse="xml" />
+    		</div>
+    </documentation>
+
+</description>

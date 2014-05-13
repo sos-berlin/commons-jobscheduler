@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id$ -->
+<param
+	xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+	xmlns:xi="http://www.w3.org/2001/XInclude" 
+	xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    
+        xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 
+     http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd "
+    
+	name="next_state" Category="OrderCreation, JobSequenceControl" DataType="SOSOptionJobChainNode"
+	OptionName="NextState" Alias="" required="false" DefaultValue=""
+	usewith="create_order, order_jobchain_name"
+		since="1.3.11.1090"
+	>
+
+	<note language="de">
+		<title>Der erste auszuführende Job-Knoten einer Job-Kette</title>
+		<p>
+		Soll eine Jobkette nicht mit dem ersten Knoten gestartet werden, so kann der Name des Knotens, mit
+		dem die Ausführung der Jobkette stattdessen starten soll, als Wert dieses Parameters angegeben werden.
+		</p>
+	</note>
+	<note language="en">
+		<title>The first node to execute in a jobchain</title>
+		<p>
+		The name of the node of a jobchain, with which the execution of the chain must be started, is the value
+		of this parameter.
+		</p>
+	</note>
+</param>

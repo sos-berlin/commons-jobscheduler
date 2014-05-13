@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<items xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1
+    http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+
+    <note language="de">
+        <title>Operation copy: kopieren Daten von der Quelle zum Ziel</title>
+            <p>
+            Die Operation "copy" kopiert Daten von der Quelle zum Ziel.
+            Dies bedeutet, daß die Daten nach der Übertragung in der Quelle gelöscht werden.
+            </p>
+    </note>
+    <note language="en">
+        <title>Operation copy: copies Data from Source to Target</title>
+            <p>
+            Die Operation "move" kopiert Daten von der Quelle zum Ziel.
+            Dies bedeutet, daß die Daten nach der Übertragung in der Quelle bestehen bleiben.
+            </p>
+    </note>
+</items>

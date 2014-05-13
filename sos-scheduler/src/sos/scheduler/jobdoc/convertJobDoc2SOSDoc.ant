@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="com.sos.scheduler.jobdoc" default="xslt" basedir=".">
+    <description>
+        Build a documentation
+    </description>
+
+    <property environment="MyEnv" />
+
+    <property name="extsrcdir" location="C:/Users/KB/sossvn/doc" />
+<!--    <property name="src.tmp" location="${java.io.tmpdir}" />  -->
+    <property name="src.tmp" location="${basedir}" />
+    <property name="sos.xslt.dir" location="${basedir}" />
+
+    <property name="lang" value="en" />
+
+    <property name="saxon" location="${extsrcdir}/lib/saxon8.jar" />
+    <property name="ibex" location="${extsrcdir}/lib/ibex-3.9.34.jar" />
+
+    <property name="sos.pdfdir" location="pdf/${lang}" />
+    <property name="sos.htmldir" location="${basedir}/html/${lang}" />
+    <property name="pdf" location="${sos.pdfdir}/${ant.project.name}.pdf" />
+    <property name="html" location="${sos.htmldir}/${ant.project.name}.html" />
+    <property name="fo_file" location="${java.io.tmpdir}/${ant.project.name}.fo" />
+
+    <property name="sos.inputfile" value="${MyEnv.sos.inputfile}" />
+    <property name="sos.outputfile" location="${sos.htmldir}/${sos.inputfile}" />
+
+    <property name="tocdepth" value="4" />
+    <property name="makeindex" value="1" />
+    <property name="lowestFileLevel" value="3" />
+    <property name="paraOffset" value="1em" />
+    <!-- pdf: how much space between 2 <p/>? -->
+    <property name="indexcolumns" value="2" />
+    <!-- pdf: how many columns for index page(s) -->
+    <property name="linkimage" value="${extsrcdir}/sos_doku_link.jpg" />
+    <!-- pdf: creates link icon after link text -->
+
+
+    <property name="xslt1_processor" value="com.icl.saxon.StyleSheet"/>
+    <property name="basedir" value="."/>
+    <property name="stylesheet" value="c:/users/kb/sossvn/com.sos.scheduler/src/sos/scheduler/jobdoc/xsl/ConvertJobDoc2SOSDoc.xsl"/>
+    <property name="outfile" value="c:/temp/output.sosdoc"/>
+    <property name="infile" value="c:/users/kb/sossvn/com.sos.scheduler/src/sos/scheduler/jobdoc/JobSchedulerExistsFile.xml"/>
+    <property name="xslt1_jar" value="l:/java/_jars/saxon-6.5.3.jar"/>
+    <property name="resolver_jar" value="l:/java/_jars/resolver.jar"/>
+        <property name="xerces_impl_jar" value="l:/java/_jars/xercesImpl.jar"/>
+            <property name="xerces_jar" value="l:/java/_jars/xerces.jar"/>
+
+
+
+    <path id="xslt1.processor.classpath">
+      <pathelement path="${xslt1_jar}"/>  <!-- Saxon jar -->
+      <pathelement path="${resolver_jar}"/> <!-- resolver jar -->
+      <pathelement path="${xerces_impl_jar}"/> <!-- xinclude -->
+          <pathelement path="${xerces_jar}"/> <!-- xinclude -->
+      <pathelement path="/sgml"/> <!-- for catalogManager.properties -->
+
+
+
+    </path>
+
+    <target name="xslt" >
+      <java classname="${xslt1_processor}"
+    	fork="yes"
+    	dir="${basedir}"
+    	failonerror="true">
+        <classpath refid="xslt1.processor.classpath" />
+
+        <jvmarg line="-Dorg.apache.xerces.xni.parser.XMLParserConfiguration=org.apache.xerces.parsers.XIncludeParserConfiguration"/>
+        <jvmarg line="-Djavax.xml.parsers.DocumentBuilderFactory=org.apache.xerces.jaxp.DocumentBuilderFactoryImpl"/>
+        <jvmarg line="-Djavax.xml.parsers.SAXParserFactory=org.apache.xerces.jaxp.SAXParserFactoryImpl"/>
+        <jvmarg line="-Dorg.apache.xerces.xni.parser.XMLParserConfiguration=org.apache.xerces.parsers.XIncludeParserConfiguration"/>
+
+        <arg line="-x org.apache.xml.resolver.tools.ResolvingXMLReader"/>
+        <arg line="-y org.apache.xml.resolver.tools.ResolvingXMLReader"/>
+        <arg line="-r org.apache.xml.resolver.tools.CatalogResolver "/>
+        <arg value="-l"/>
+        <arg value="-o"/>
+        <arg value="${outfile}"/>
+        <arg line="${infile} ${stylesheet}" />
+
+      </java>
+      <tstamp>
+        <format property="fintim" pattern="E @ H:m a" locale="en,UK"/>
+      </tstamp>
+      <echo>Finished at ${fintim}</echo>
+    </target></project>

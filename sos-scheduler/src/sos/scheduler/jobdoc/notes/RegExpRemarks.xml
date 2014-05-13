@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id$ -->
+<items
+	xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+	xmlns:xi="http://www.w3.org/2001/XInclude"
+	xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<note
+	language="en">
+	<p>
+	Some remarks on regular expression, used in JobScheduler and JADE.</p>
+	<p>
+	A regular expression is not a
+	<a href="http://en.wikipedia.org/wiki/Wildcard_character#Files_and_directories">
+	wildcard
+	</a>.
+	To get an impression of the differences one have a look on the meaning of the wildcard *.txt, which will
+	select all filenames with the filename-extension ".txt".
+	A regular expression to match, e.g. works the same way, this "wildcard" must look like "^.*\.txt$".
+	That looks a little bit strange but it is much more flexible and powerfull on filtering filenames
+	than the concept of wildcards, if one want to filter more complex names or pattern.
+	</p>
+	<p>
+        The general syntax of an
+        <a href="http://en.wikipedia.org/wiki/Regular_expression">regular expression</a>, also referred to as regex or regexp,
+        is described
+        <a href="http://pubs.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap09.html">
+        here</a>.
+        It is different to other RegExp definitions, e.g. as for Perl.
+	</p>
+            <p>
+            For further information on regular expressions see
+            <a
+                href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html">java.util.regex.Pattern</a>
+        </p>
+    <p>
+    As an extension of regular expression the [date:] variable is supported. Using this feature it is possible to create a regexp, which is
+    depending on the date with is defined in the date-format.
+
+    </p>
+    <p>
+    If you want (only part of the regex) to be case sensitive , then you have the option to use
+    the (?-i) and [optionally] (?i) mode modifiers:    (?-i)G[a-b](?i).*
+</p>
+<p>
+If you're dealing with Unicode characters besides ASCII, check whether or not your regex engine properly supports them.
+</p>
+</note>
+
+<note
+	language="de">
+	<p>
+	Einige Anmerkungen und Erklärungen zur Technik und Verwendung der regulären Ausdrücke in JobScheduler und JADE.
+	</p>
+	<p>
+	Ein regulärer Ausdruck ist keine
+	<a href="http://en.wikipedia.org/wiki/Wildcard_character#Files_and_directories">
+	wildcard
+	</a>.
+	Um einen ersten Eindruck bezüglich des Unterschiedes zwischen einem "regulären Ausdruck" und einer "wildcard" zu bekommen,
+	vergleichen Sie die Bedeutung der wildcard "*.txt" mit dem regulären Ausdruck "^.*\.txt$".
+	Beide Ausdrücke erlauben die Selektion aller Dateinamen, die mit einer beliebigen Zeichenfolge beginnen und dann mit
+	".txt" enden.
+	Der reguläre Ausdruck erfüllt in diesem Beispiel die gleichen Anforderungen, ist aber wesentlich mächtiger, sobald
+	komplexere Kriterien abgebildet werden müssen.
+	</p>
+	<p>
+	Die generelle Syntax eines
+        <a href="http://en.wikipedia.org/wiki/Regular_expression">regulären Ausdrucks</a>, auch bezeichnet als regex oder regexp,
+        ist
+        <a href="http://pubs.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap09.html">
+        hier</a>  beschrieben.
+			Es weicht ab von anderen Definitionen der regulären Ausdrücke, zum Beispiel wie sie in Perl verwendet werden.
+	</p>
+            <p>
+			Für weitere Informationen über reguläre Ausdrücke siehe
+            <a
+                href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html">java.util.regex.Pattern</a>
+        </p>
+    <p>
+    Als Erweiterung der Syntax der regulären Ausdrücke kann die [date:]-variable verwendet werden.
+    Mit dieser Variablen kann z.B. ein regulärer Ausdruck gebildet werden, der das jeweilige aktuelle Datum enthält, ohne
+    daß der Ausdruck neu gebildet werden muß.
+
+    </p>
+
+    <p>
+    Wenn der Vergleich mit dem regulären Ausdruck, oder Teile des Ausdruck, die Groß-/Kleinschreibung berücksichtigt werden soll, so kann 
+    dies mit der folgenden Schreibweise spezifiziert werden. 
+</p>
+<p>
+    Durch Verwendung von (?-i) - Klein-/Großschreibung beachten - und [optional] (?i) - Klein-/Großschreibung nicht beachten - Modifikatoren:    (?-i)G[a-b](?i).*
+</p>
+<p>
+Sie sollten sicherstellen, daß die regex engine Unicode unterstützt, sobald Sie Unicode-Zeichen im regexp verwenden.
+Andernfalls erhalten Sie unerwartete Ergebnisse des Vergleichs.
+</p>
+
+</note>
+
+</items>

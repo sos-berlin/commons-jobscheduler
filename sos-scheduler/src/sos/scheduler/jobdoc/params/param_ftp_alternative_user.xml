@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns:xi="http://www.w3.org/2001/XInclude"
+       xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="ftp_alternative_user"
+       required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Alternativer Parameter für den primären Parameter
+            <code>ftp_user</code>
+            .
+            <br clear="none"/>
+            <br clear="none"/>
+            Die aternativen Parameter werden nur verwendet, wenn die Verbindung zum FTP-Server
+            fehlschlägt, z.B. der Server nicht verfügbar ist, Zugangsdaten ungültig sind etc.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Alternative parameter for the primary parameter
+            <code>ftp_user</code>
+            .
+            <br clear="none"/>
+            <br clear="none"/>
+            The alternative parameters are used solely should the connection to an FTP server fail,
+            e.g. if the FTP server were not available or invalid credentials were used.
+          </div>
+        </note>
+      </param>

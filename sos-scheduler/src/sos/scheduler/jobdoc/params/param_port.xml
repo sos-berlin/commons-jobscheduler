@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="port"
+       DefaultValue="21"
+       required="true"
+       DataType="SOSOptionPortNumber">
+        <note language="de">
+              <title>zu verwendende Port-Nummer des Protokolls</title>
+        
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Port, über den Dateien gesendet werden.
+            Für FTP meist Port 21, für SFTP meist Port 22.
+          </div>
+        </note>
+        <note language="en">
+              <title>Port-Number to be used for Data-Transfer</title>
+        
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Port by which files should be transferred.
+            For FTP this is usually port 21, for SFTP this is usually port 22.
+          </div>
+        </note>
+      </param>

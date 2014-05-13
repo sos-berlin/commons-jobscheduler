@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="scheduler_job_documentation_v1.1.xsl"?>
+<description xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+  <job name="CheckDailySchedule" title="Checking a DailySchedule with runs in History" order="both" tasks="1">
+    <script language="java" java_class="com.sos.dailyschedule.job.CheckDailyScheduleJSAdapterClass" />
+  </job>
+  <releases>
+    <release id="first" created="2011-10-26" modified="2011-10-26">
+      <title>First release</title>
+      <author name="Uwe Risse" email="uwe.risse@sos-berlin.com" />
+    </release>
+  </releases>
+  <configuration>
+    <params>
+      <param name="dayOffset" required="false" default_value="0" DataType="SOSOptionInteger">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Setzt das von-bis Intervall, für das der Tagesplan erstellt werden soll. 
+
+0: Aktueller Tag
+-2:von vorgestern bis heute
+1: von heute bis morgen
+ 
+Es wird pro Tag ein Tagesplan ertellt. Vorhandene Tagespläne werden zuvor gelöscht.</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">set the from-to intervall for calculating the days schedule.
+
+Samples:
+0: actual day
+-2:from the before yesterday until today
+1: from today until tomorrow
+
+For each day a days schedule will be creatied. Existing days schedules will be deleted.</div>
+        </note>
+      </param>
+      <param name="scheduler_id" required="false" />
+      <param name="configuration_file" required="false" DataType="SOSOptionString">
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">Die Datei mit den Einstellungen für die Datenbank.
+
+Beispiel:
+
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+                                         "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd"&gt;
+&lt;hibernate-configuration&gt;
+ &lt;session-factory&gt;
+  &lt;property name="hibernate.connection.driver_class"&gt;oracle.jdbc.driver.OracleDriver&lt;/property&gt;
+  &lt;property name="hibernate.connection.password"&gt;dbpwd&lt;/property&gt;
+  &lt;property name="hibernate.connection.url"&gt;jdbc:oracle:thin:@8of9:1521:dbserver&lt;/property&gt;
+  &lt;property name="hibernate.connection.username"&gt;dbuser&lt;/property&gt;
+  &lt;property name="hibernate.dialect"&gt;org.hibernate.dialect.Oracle10gDialect&lt;/property&gt;
+  &lt;property name="hibernate.show_sql"&gt;true&lt;/property&gt;
+  &lt;property name="hibernate.connection.autocommit"&gt;false&lt;/property&gt;
+  &lt;property name="hibernate.format_sql"&gt;true&lt;/property&gt;
+  &lt;property name="hibernate.temp.use_jdbc_metadata_defaults"&gt;false&lt;/property&gt;
+  &lt;mapping class="com.sos.jade.db.JadeTransferDBItem"/&gt;
+  &lt;mapping class="com.sos.jade.db.JadeTransferDetailDBItem"/&gt;
+  &lt;mapping class="com.sos.dailyschedule.db.DailyScheduleDBItem"/&gt;
+  &lt;mapping class="com.sos.scheduler.history.db.SchedulerHistoryDBItem"/&gt;
+  &lt;mapping class="com.sos.scheduler.history.db.SchedulerOrderHistoryDBItem"/&gt;
+  
+ &lt;/session-factory&gt;
+&lt;/hibernate-configuration&gt;</div>
+        </note>
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Die Datei mit den Einstellungen für die Datenbank.
+
+Beispiel:
+
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+                                         "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd"&gt;
+&lt;hibernate-configuration&gt;
+ &lt;session-factory&gt;
+  &lt;property name="hibernate.connection.driver_class"&gt;oracle.jdbc.driver.OracleDriver&lt;/property&gt;
+  &lt;property name="hibernate.connection.password"&gt;dbpwd&lt;/property&gt;
+  &lt;property name="hibernate.connection.url"&gt;jdbc:oracle:thin:@8of9:1521:dbserver&lt;/property&gt;
+  &lt;property name="hibernate.connection.username"&gt;dbuser&lt;/property&gt;
+  &lt;property name="hibernate.dialect"&gt;org.hibernate.dialect.Oracle10gDialect&lt;/property&gt;
+  &lt;property name="hibernate.show_sql"&gt;true&lt;/property&gt;
+  &lt;property name="hibernate.connection.autocommit"&gt;false&lt;/property&gt;
+  &lt;property name="hibernate.format_sql"&gt;true&lt;/property&gt;
+  &lt;property name="hibernate.temp.use_jdbc_metadata_defaults"&gt;false&lt;/property&gt;
+  &lt;mapping class="com.sos.jade.db.JadeTransferDBItem"/&gt;
+  &lt;mapping class="com.sos.jade.db.JadeTransferDetailDBItem"/&gt;
+  &lt;mapping class="com.sos.dailyschedule.db.DailyScheduleDBItem"/&gt;
+  &lt;mapping class="com.sos.scheduler.history.db.SchedulerHistoryDBItem"/&gt;
+  &lt;mapping class="com.sos.scheduler.history.db.SchedulerOrderHistoryDBItem"/&gt;
+  
+ &lt;/session-factory&gt;
+&lt;/hibernate-configuration&gt;</div>
+        </note>
+      </param>
+      <param name="check_all_jobscheduler_instances" default_value="false" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Wenn diese Option auf true gesetzt wird, wird der Abgleich mit alle Tagesplänen aller JobScheduler Instanzen durchgeführt.</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">Setting this option to true, all JobScheduler instances will be checked against all daily plans of the current day.</div>
+        </note>
+      </param>
+    </params>
+    <settings>
+      <profile name="Hibernate configuration file">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Die Datei mit den Einstellungen für Hibernate ist notwendig. Siehe Parameter configuration_file.</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">The file with settings for hibernate is neccessary. See parameter configuration_file.</div>
+        </note>
+      </profile>
+    </settings>
+  </configuration>
+  <documentation language="de">
+    <div xmlns="http://www.w3.org/1999/xhtml">Der Job sucht für jeden geplanten Eintrag im Tageskalender, der noch keinen Eintrag im Feld "Executed" hat, einen entsprechenden Satz in den History Tabellen des Job Schedulers. Der Job sollte periodisch in einem festen Intervall gestartet werden.
+
+Es wird dabei im angegebenen Zeitraum gesucht. Ist kein Zeitraum angegeben, wird im aktuellen Tag gesucht (siehe Parameter dayOffset). Bereits zugewiesene History Einträge werden nicht mehr verwendet. Ein Eintrag ist dann zugewiesen, wenn die entsprechende HistoryId des Satzes im Tageskalender gefunden wird. 
+
+Es werden die Einträge in aufsteigender Reihenfolge nach Alter sortiert zugewiesen (alte Einträge zuerst).</div>
+  </documentation>
+  <documentation language="en">
+    <div xmlns="http://www.w3.org/1999/xhtml">The job looks for each planned entry in the daily calendar a matching entry in the history tables of JobScheduler. The job should be startet with a interval.
+
+The job looks in the given period. Is no period specified, the job looks in entries for the actual day (see parameter dayOffset). An entry in the history tables will not be assigned more than one time.
+
+The entries will be assigned in ascending order on the starting time (old entries first).</div>
+  </documentation>
+</description>
+

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<items xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xi="http://www.w3.org/2001/XInclude" xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 
+    http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+
+    <note language="de">
+        <title>Operation delete: Daten in der Quelle löschen</title>
+        <xhtml:div>
+            <indexterm index="delete, operation"></indexterm>
+            <p>
+                Die Operation "delete" dient dazu, Daten in der Quelle zu löschen ohne diese an ein Ziel
+                zu übertragen.
+            </p>
+            <p>
+                Diese Operation ist eine monadische, oder unäre, Operation.
+                Dies bedeutet, daß sie lediglich Angaben zur Quelle, nicht aber zum Target, benötigt, da die
+                Verarbeitung auf der Quelle stattfindet.
+            </p>
+            <p>
+                Monadische Operationen sind "delete", "rename" "zip", "getlist".
+            </p>
+        </xhtml:div>
+    </note>
+    <note language="en">
+        <title>Operation delete: delete data on source</title>
+        <xhtml:div>
+            <indexterm index="delete, operation"></indexterm>
+            <p>
+                Die Operation "delete" dient dazu, Daten in der Quelle zu löschen ohne diese an ein Ziel
+                zu übertragen.
+            </p>
+            <p>
+                Diese Operation ist eine monadische, oder unäre, Operation.
+                Dies bedeutet, daß sie lediglich Angaben zur Quelle, nicht aber zum Target, benötigt, da die
+                Verarbeitung auf der Quelle stattfindet.
+            </p>
+            <p>
+                Monadische Operationen sind "delete", "rename" "zip", "getlist".
+            </p>
+        </xhtml:div>
+    </note>
+</items>

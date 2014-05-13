@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="kill_job"
+       DefaultValue="true"
+       required="false"
+       DataType="SOSOptionBoolean">
+        <note language="de">
+		    <title>Job bei Inaktivität abbrechen</title>		
+          <div xmlns="http://www.w3.org/1999/xhtml">
+          <p>
+            </p>
+          </div>
+        </note>
+        <note language="en">
+		    <title>kill job due to Inactivity</title>		
+          <div xmlns="http://www.w3.org/1999/xhtml">
+          </div>
+        </note>
+      </param>

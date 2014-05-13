@@ -1,0 +1,376 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id: JobSchedulerSFTPSendJob.xml 15153 2011-09-14 11:59:34Z kb $ -->
+<?xml-stylesheet type="text/xsl" href="scheduler_job_documentation_v1.1.xsl"?>
+<description xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" 
+xmlns:xhtml="http://www.w3.org/1999/xhtml"
+xmlns:xi="http://www.w3.org/2001/XInclude" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+  <job name="JobSchedulerSFTPSendJob" title="Send files from remote host using SSH" order="both">
+    <script language="java" java_class="sos.scheduler.jade.SFTPSendJob" resource="1"/>
+  </job>
+  <releases>
+    <release id="1.0" created="2006-09-15" modified="2006-10-14">
+      <title>Version 1.0</title>
+      <author name="Andreas Püschel" email="andreas.pueschel@sos-berlin.com"/>
+      <author name="Ghassan Beydoun" email="ghassan.beydoun@sos-berlin.com"/>
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Initiale Auslieferung</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Initial release</div>
+      </note>
+    </release>
+  </releases>
+  <resources>
+    <file os="all" type="java" file="sos.scheduler.jar" id="1">
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Software Stacks</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Software stacks in distribution</div>
+      </note>
+    </file>
+    <file os="all" type="java" file="sos.spooler.jar" id="2">
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Klasse Job_Impl</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Class Job_Impl</div>
+      </note>
+    </file>
+    <file os="all" type="java" file="sos.util.jar" id="3">
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Klasse SOSFile</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Class SOSFile</div>
+      </note>
+    </file>
+    <file os="all" type="java" file="ganymed-ssh2.jar" id="4">
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+          SSH2 Bibliothek von Christian Plattner: plattner@inf.ethz.ch, http://www.ganymed.ethz.ch/ssh2
+        </div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+          SSH2 library by Christian Plattner: plattner@inf.ethz.ch, http://www.ganymed.ethz.ch/ssh2
+        </div>
+      </note>
+    </file>
+  </resources>
+  <configuration>
+    <params id="job_parameter">
+      <param name="host" required="true">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter benennt den Hostnamen oder die IP-Adresse des SSH Servers,
+            für den eine Verbindung hergestellt wird.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the hostname or IP address of the SSH server
+            to which a connection is to be made.
+          </div>
+        </note>
+      </param>
+      <param name="port" required="true" default_value="22">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter spezifiziert die Port-Nummer des SSH Servers, Voreinstellung ist Port 22.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the port number of the SSH server - the default is 22.
+          </div>
+        </note>
+      </param>
+      <param name="user" required="true">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter benennt die Benutzerkennung, unter der eine Anmeldung am SSH Server erfolgt. 
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the user account to be used when connecting to the SSH server.
+          </div>
+        </note>
+      </param>
+      <param name="password" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Wert des Parameters enthält das Kennwort einer Benutzerkennung
+            zur Autorisierung am SSH Server und muss angegeben werden,
+            wenn mit dem Parameter <code>auth_method</code> die
+            Authentifizierungsmethode <em>password</em> bestimmt
+            wurde.
+            <br/><br/>
+            Wird die Authentifizierungsmethode <em>publickey</em> verwendet, dann 
+            kann mit diesem Parameter die Phassphrase des privaten Schlüssels
+            angegeben werden, der mit dem Parameter <code>auth_file</code>
+            spezifizier wurde.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the user account password for authorization by the SSH server and 
+            must be specified if the <em>password</em> authorization method is specified in the <code>auth_method</code> parameter.
+            <br/><br/>
+            Alternatively, this parameter may specify the secret key passphrase if the <em>publickey</em> authorization method
+            has been set in the <code>auth_method</code> parameter.
+          </div>
+        </note>
+      </param>
+      <param name="proxy_host" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Wert des Parameters ist der Hostname oder die IP-Adresse eines Proxies, 
+            über den die Verbindung zum SSH Server hergestellt wird.
+            Die Verwendung von Proxies ist optional.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            The value of this parameter is the host name or the IP address of a 
+            proxy used to create the connection to the SSH server. 
+            The use of a proxy is optional.
+          </div>
+        </note>
+      </param>
+      <param name="proxy_port" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Wert des Parameters ist der Port des Proxies, über den eine Verbindung 
+            zum SSH Server hergestellt wird.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the port number of the proxy, 
+            should a proxy be used to create the connection to the SSH server.
+          </div>
+        </note>
+      </param>
+      <param name="proxy_user" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Wert des Parameters enthält den Namen einer Benutzerkennung
+            zur Autorisierung am Proxy Server, wenn die Verbindung zum SSH
+            Server über einen Proxy hergestellt wird.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            The value of this parameter specifies the user account for authorization 
+            by the proxy server should a proxy be used to connect to the SSH server.
+          </div>
+        </note>
+      </param>
+      <param name="proxy_password" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Wert des Parameters enthält das Kennwort einer Benutzerkennung
+            zur Autorisierung am Proxy Server, wenn die Verbindung zum SSH
+            Server über einen Proxy hergestellt wird.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the password for the proxy server user account, 
+            should a proxy be used to connect to the SSH server.
+          </div>
+        </note>
+      </param>
+      <param name="auth_method" required="false" default_value="publickey">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter spezifiziert die Authentifizierungsmethode am SSH Server, unterstützt
+            werden <em>publickey</em> und <em>password</em>.
+            <br/><br/>
+            Bei Verwendung der Authentifizierungsmethode <em>publickey</em> muss
+            im Parameter <code>auth_file</code> der Pfad der Datei mit dem Private Key
+            des Benutzers angegeben werden. Ist diese Datei mit einem Kennwort geschützt,
+            dann muss es mit dem Parameter <code>password</code> angegeben werden.
+            <br/><br/>
+            Bei Verwendung der Authentifizierungsmethode <em>password</em> wird das 
+            Kennwort des Benutzers mit dem Parameter <code>password</code> angegeben.
+            <br/><br/>
+            Welche Authentifizierungsmethoden unterstützt werden, ist am SSH Server konfiguriert.
+            Nicht alle SSH Server bieten die Authentifizierungsmethode <em>password</em> an.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the authorization method for the SSH server -
+            the <em>publickey</em> and <em>password</em> methods are supported.
+            <br/><br/>
+            When the <em>publickey</em> authorization method used,
+            then the path name of the private key file must be set in the <code>auth_file</code> parameter.
+            Should the private key file be secured by a password then this must be specified 
+            with the <code>password</code> parameter.
+            <br/><br/>
+            For the <em>password</em> authorization method the password for each user account must be specified
+            using the <code>password</code> parameter.
+            <br/><br/>
+            The authorization methods which are enabled depend on the SSH server configuration.
+            Not all SSH server configurations support the <em>password</em> authorization method.
+          </div>
+        </note>
+      </param>
+      <param name="auth_file" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter bestimmt den Pfad und Namen einer Datei mit dem Private Key 
+            des Benutzers, für den die Anmeldung am SSH Server erfolgt.
+            <br/><br/>
+            Der Parameter muss angegeben werden, wenn mit dem Parameter <code>auth_method</code>
+            die Authentifizierungsmethode <em>publickey</em> bestimmt wurde.
+            <br/><br/>
+            Falls die Datei mit einem Kennwort geschützt ist, wird es mit dem Parameter
+            <code>password</code> angegeben.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the path and name of a user's private key file
+            used for registeration on an SSH server.
+            <br/><br/>
+            This parameter must be specified if the <em>publickey</em> authorization method
+            has been specified in the <code>auth_method</code> parameter.
+            <br/><br/>
+            Should the private key file be secured by a password, then this must be specified
+            using the <code>password</code> parameter. 
+          </div>
+        </note>
+      </param>
+
+      <param name="file_spec" default_value="^(.*)$" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Ein regulärer Ausdruck zum Filtern der Eingabedateien, wenn ein Eingabeverzeichnis vereinbart wurde.
+          </div>
+         </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            A regular expression may be used to filter the input files contained in a directory.
+          </div>
+        </note>
+      </param>
+
+      <param name="create_dir" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Ist der Wert des Parameters <em>true</em>, dann wird das Verzeichnis <code>remote_dir</code> angelegt, falls es nicht bereits existiert.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            If this parameter is set to <em>true</em>, then the <code>remote_dir</code> target directory will be created if it doesn't already exist. 
+          </div>
+        </note>
+      </param>
+
+      <param name="recursive" required="false" default_value="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Wird der Wert <em>true</em> angegeben, dann werden Unterverzeichnisse mitkopiert.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            If this parameter set to <em>true</em>, then subdirectories will be copied.
+          </div>
+        </note>
+      </param>
+      <param name="local_dir" required="true">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Lokales Verzeichnis, aus dem Dateien übertragen werden.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            The local directory which files should be transferred from.
+          </div>
+        </note>
+      </param>
+      <param name="remote_dir" required="true">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Verzeichnis am SSH-Server, in das Dateien übertragen werden.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            The directory on the SSH Server which files are to be transferred to.
+          </div>
+        </note>
+      </param>
+      <param name="truncate_files" required="false" default_value="true">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Ist der Wert des Parameters <em>true</em>, dann werden evtl. vorhandene Zieldateien automatisch überschrieben,
+            andernfalls werden übertragenen Dateien an vorhandene Dateien angehängt.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            If this parameter is set to <em>true</em>, then existing files in the <code>remote_dir</code> will be truncated,
+            otherwise transferred files would be appended to existing files.
+          </div>
+        </note>
+      </param>
+      <param name="atomic_suffix" required="false" >
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Wert des Parameters wird zu den Zieldateinamen - während des Übertragens - hinzugefügt und danach entfernt. 
+            <code>atomic_suffix</code> sorgt dafür, dass das Übertragen von Dateien atomar funktioniert.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies a suffix that is added to files during transfer, 
+            and which is then removed after transfer has been completed.
+            Use of the <code>atomic_suffix</code> ensures that file transfer takes place "atomically".
+          </div>
+        </note>
+      </param>
+      <param name="permissions" required="false" >
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Wert des Parameters ist eine Oktalzahl und representiert die Zugriffsrechte, die 
+            am am Remote Server für die zu übertragenden Dateien eingerichtet werden.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter is an octal number representing the permissions to be assigned to the files which are to be transferred. 
+          </div>
+        </note>
+      </param>
+    </params>
+  </configuration>
+  <documentation language="de">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      Der Job wird für das Transferieren von Dateien mittels Secure File Transfer (SFTP) verwendet.
+      <br/><br/>
+      Der Job kann selbständig oder auftragsgesteuert in einer Job-Kette betrieben werden.
+      <br/><br/>
+      Der Job verwendet die SSH2 Bibliothek von Christian Plattner: plattner@inf.ethz.ch, http://www.ganymed.ethz.ch/ssh2.
+    </div>
+  </documentation>
+  <documentation language="en">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      This job is used to transfer files between two hosts, using Secure File Transfer (SFTP).
+      <br/><br/>
+      This job can be used standalone or for orders within a job chain.
+      <br/><br/>
+      The implementation makes use of the SSH2 library provided by Christian Plattner: 
+      plattner@inf.ethz.ch, http://www.ganymed.ethz.ch/ssh2.
+    </div>
+  </documentation>
+</description>

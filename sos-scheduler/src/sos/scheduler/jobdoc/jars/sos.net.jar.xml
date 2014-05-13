@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--$Id: sos.util.jar.xml 15153 2011-09-14 11:59:34Z kb $ -->
+<file
+	xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+	xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" os="all" type="java"
+	file="com.sos.net-*.jar" id="1" sourcedoc="com.sos.net"
+          license_type="GPL V2.0"
+  license_url="http://www.gnu.org/licenses/gpl-2.0-standalone.html"
+    >
+
+           <note language="de">
+                <div xmlns="http://www.w3.org/1999/xhtml">Klassen SOSFTPCommand, SOSFTP</div>
+            </note>
+            <note language="en">
+                <div xmlns="http://www.w3.org/1999/xhtml">Classes SOSFTPCommand, SOSFTP</div>
+            </note>
+ 
+</file>

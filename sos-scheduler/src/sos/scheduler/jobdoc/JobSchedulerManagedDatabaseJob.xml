@@ -1,0 +1,370 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="scheduler_job_documentation_v1.1.xsl"?>
+<description xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+
+  <job name  = "JobSchedulerManagedDatabaseJob"
+       title = "Launch Database Statement"
+       order = "both"
+       tasks = "unbounded">
+    <script language   = "java"
+            java_class = "sos.scheduler.managed.JobSchedulerManagedDatabaseJob"
+            resource   = "1">
+    </script>
+  </job>
+
+  <releases>
+    <release id="1.0" created="2006-05-11" modified="2006-05-11">
+      <title>Version 1.0</title>
+      <author name="Andreas Liebert" email="andreas.liebert@sos-berlin.com"/>
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Initiale Auslieferung</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Initial release</div></note>
+    </release>
+  </releases>
+
+  <resources>
+        <xi:include href="./jars/sos.scheduler.jar.xml" parse="xml" />
+        <xi:include href="./jars/sos.spooler.jar.xml" parse="xml" />
+        <xi:include href="./jars/sos.connection.jar.xml" parse="xml" />
+        <xi:include href="./jars/sos.util.jar.xml" parse="xml" />
+        <xi:include href="./jars/log4j.jar.xml" parse="xml" />
+        <xi:include href="./jars/sos.JSHelper.jar.xml" parse="xml" />
+
+
+    <database required="true">
+      <resource name="SCHEDULER_MANAGED_JOBS" type="table">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Die Tabelle nimmt die Definitionen der Jobs auf und
+            wird mit der Web-Oberfläche der Managed Jobs verwaltet.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This table contains the job definitions and
+            is administered using the Managed Jobs web interface.
+          </div>
+        </note>
+      </resource>
+      <resource name="SCHEDULER_MANAGED_ORDERS" type="table">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Die Tabelle nimmt die Definitionen der Aufträge auf und
+            wird mit der Web-Oberfläche der Managed Jobs verwaltet.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This table contains the order definitions and
+            is administered using the Managed Jobs web interface.
+          </div>
+        </note>
+      </resource>
+      <resource name="SCHEDULER_MANAGED_CONNECTIONS" type="table">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Die Tabelle nimmt die Definitionen von Datenbankverbindungen auf und
+            wird mit der Web-Oberfläche der Managed Jobs verwaltet.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This table contains definitions of database connections and
+            is administered using the Managed Jobs web interface.
+          </div>
+        </note>
+      </resource>
+    </database>
+  </resources>
+
+  <configuration>
+  		<!-- German notes contains ./notes/OrderOrStandAlone.xml -->
+        <!--xi:include href="./notes-de/OrderOrStandAlone.xml" parse="xml" /-->
+        <xi:include href="./notes/OrderOrStandAlone.xml" parse="xml" />
+
+
+    <note language="en">
+      <div xmlns="http://www.w3.org/1999/xhtml">
+      The parameters for this job may be set as job- or order-parameters or they
+      may be read from the tables SCHEDULER_MANAGED_JOBS or SCHEDULER_MANGED_ORDERS.
+      </div>
+    </note>
+    <params id="job_parameter">
+      <param name="command" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Das auszuführende Datenbankkommando.
+            Es ist möglich, im Feld COMMAND mehrere Kommandos anzugeben, die der Reihe nach ausgeführt
+            werden. Diese müssen durch ein Semikolon und einen darauf folgenden Zeilenwechsel (Newline) getrennt sein.
+            Die Datenbank-Kommandos können parameterisiert werden. Dazu ist an beliebiger
+            Stelle im Kommando eine Variable in der Form §{param} einzufügen.
+            Diese wird dann vor der Ausführung durch den Wert des Auftragsparameters
+            mit dem Namen [param] ersetzt.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Database Commands for the Job. It is possible to define more than one instruction in the COMMAND field.
+            Such instructions  are then carried out in the order in which they are written
+            and must be separated by a semicolon and a subsequent new line.
+            Parameters can be replaced in database commands. This is done by the addition of a variable in the form §{param}
+            at any given point in a command. This variable is then given the value of the
+            instruction parameter with the name [param] before execution.
+          </div>
+        </note>
+      </param>
+      <param name="database_connection" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Name der zu verwendenden Datenbankverbindung aus der Tabelle SCHEDULER_MANAGED_CONNECTIONS.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Name of the selected database connection in table SCHEDULER_MANAGED_CONNECTIONS.
+          </div>
+        </note>
+      </param>
+      <param name="db_class" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Name der zu verwendenden SOS Connection Klasse für die Datenbank:
+            <ul>
+              <li>SOSMSSQLConnection</li>
+              <li>SOSMySQLConnection</li>
+              <li>SOSOracleConnection</li>
+              <li>SOSPgSQLConnection</li>
+              <li>SOSFbSQLConnection</li>
+              <li>SOSDB2Connection</li>
+            </ul>
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Name of the SOS Connection class for the database:
+            <ul>
+              <li>SOSMSSQLConnection</li>
+              <li>SOSMySQLConnection</li>
+              <li>SOSOracleConnection</li>
+              <li>SOSPgSQLConnection</li>
+              <li>SOSFbSQLConnection</li>
+              <li>SOSDB2Connection</li>
+            </ul>
+          </div>
+        </note>
+      </param>
+      <param name="db_driver" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Name der jdbc driver Klasse
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Name of the jdbc driver Class
+          </div>
+        </note>
+      </param>
+      <param name="db_url" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            jdbc url
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            jdbc url
+          </div>
+        </note>
+      </param>
+      <param name="db_user" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Datenbank User
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            database user
+          </div>
+        </note>
+      </param>
+      <param name="db_password" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Datenbank Passwort
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            database password
+          </div>
+        </note>
+      </param>
+      <param name="resultset_as_warning" required="false" default_value="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Bei true, wird ein Result nach den Statements als Warnung ausgegeben
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            If set to true, a warning will be issued, if the statements produce a result
+          </div>
+        </note>
+      </param>
+      <param name="exec_returns_resultset" required="false" default_value="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Wenn stored procedures, die ein Resultset zurückliefern, ausgeführt werden sollen, muss dieser parameter auf true gesetzt werden, damit die stored procedure als query ausgeführt wird.
+            Dies funktioniert nicht mit dem SQL Server 2000 und 2005 jdbc Treiber.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            If stored procedures are called which return a result set, this needs to be set to true in order to run the stored procedure as a query.
+            This does not work with the SQL Server 2000 and 2005 jdbc drivers.
+          </div>
+        </note>
+      </param>
+      <param name="resultset_as_parameters" required="false" default_value="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <strong>false</strong><br/>
+            Es werden keine Parameter generiert.<br/><br/>
+            <strong>true</strong><br/>
+            Bei true werden aus der ersten Zeile des Result Set Auftragsparameter generiert.
+            Die Parameternamen sind die Spaltennamen.
+
+            Beispiel:<br/>
+            "SELECT first_name, last_name, age FROM persons" liefert die folgende Ergebnismenge<br/>
+            <table>
+              <tr>
+                  <th>first_name</th>
+                  <th>last_name</th>
+                  <th>age</th>
+              </tr>
+              <tr>
+                <td>John</td>
+                <td>Doe</td>
+                <td>30</td>
+              </tr>
+              <tr>
+                <td>Hans</td>
+                <td>Mustermann</td>
+                <td>33</td>
+              </tr>
+              <tr>
+                <td>Jean</td>
+                <td>Dupont</td>
+                <td>56</td>
+              </tr>
+            </table>
+            Daraus werden als Auftragsparameter die folgenden Name/Wert Paare generiert:<br/>
+            <code>
+               first_name=John<br/>
+               last_name=Doe<br/>
+               age=30<br/>
+            </code>
+            <br/><br/>
+            <strong>name_value</strong><br/>
+            Bei name_value werden aus den ersten beiden Spalten Zeile des Result Set Auftragsparameter generiert.
+            Die Parameternamen sind die Werte der ersten Spalte, die Parameterwerte sind die Werte der zweiten Spalte. Beispiel:<br/>
+            Aus der oben angegebenen Ergebnismenge werden als Auftragsparameter die folgenden Name/Wert Paare generiert:<br/>
+            <code>
+               John=Doe<br/>
+               Hans=Mustermann<br/>
+               Jean=Dupont<br/>
+            </code>
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <strong>false</strong><br/>
+            No output parameters are generated.<br/><br/>
+            <strong>true</strong><br/>
+            If set to true, the first row of the resultset will be set as order parameters
+            (using the column names as parameter names). Example:<br/>
+            The query "SELECT first_name, last_name, age FROM persons" produces the following result set:<br/>
+            <table>
+              <tr>
+                  <th>first_name</th>
+                  <th>last_name</th>
+                  <th>age</th>
+              </tr>
+              <tr>
+                <td>John</td>
+                <td>Doe</td>
+                <td>30</td>
+              </tr>
+              <tr>
+                <td>Hans</td>
+                <td>Mustermann</td>
+                <td>33</td>
+              </tr>
+              <tr>
+                <td>Jean</td>
+                <td>Dupont</td>
+                <td>56</td>
+              </tr>
+            </table>
+            The following name/value pairs will be generated as order parameters:<br/>
+            <code>
+               first_name=John<br/>
+               last_name=Doe<br/>
+               age=30<br/>
+            </code>
+            <br/><br/>
+            <strong>name_value</strong><br/>
+            If set to name_value, the first two columns of the resultset will be turned into order parameters.
+            The values of the first column will become parameter names, the values of the second column will become
+            parameter values. Example:<br/>
+            From the above resultset, the following name/value pairs will be generated as order parameters:<br/>
+            <code>
+               John=Doe<br/>
+               Hans=Mustermann<br/>
+               Jean=Dupont<br/>
+            </code>
+          </div>
+        </note>
+      </param>
+    </params>
+    <payload>
+      <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Auftragsparameter überschreiben Jobparameter.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Order parameters overwrite job parameters.
+          </div>
+        </note>
+      <params reference="job_parameter"/>
+    </payload>
+  </configuration>
+
+  <documentation language="de">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      Dieser Job ermöglicht es, Statements in
+      Datenbanken auszuführen. Dies können Datenbankprozeduraufrufe und SQL-Befehle sein.
+      Der Managed Database Job nimmt Aufträge an, die in der Tabelle SCHEDULER_MANAGED_ORDERS
+      definiert sind. Er benutzt die im Feld CONNECTION referenzierte Datenbankverbindung, um den
+      Befehl aus dem Feld COMMAND auszuführen.
+    </div>
+  </documentation>
+
+  <documentation language="en">
+   <div xmlns="http://www.w3.org/1999/xhtml">
+    This job executes statements in a database. These can be database
+    procedures or SQL statements. The Managed Database Job takes on
+    orders which have been defined in the SCHEDULER_MANAGED_ORDERS
+    table. The job uses the database connection reference from the
+    CONNECTION field to carry out the instruction stored in the COMMAND
+    field.
+   </div>
+  </documentation>
+</description>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns:xi="http://www.w3.org/2001/XInclude"
+       xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="ftp_recursive"
+       required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter gibt an, ob Dateien aus Unterverzeichnissen des 
+            Quellverzeichnisses rekursiv übertragen werden.
+            Der Parameter vereinbart mit den Wertem
+            <em>yes</em>
+            oder
+            <em>true</em>
+            die rekursive Verarbeitung von Verzeichnissen.
+            <br clear="none"/>
+            <br clear="none"/>
+            Reguläre Ausdrücke wie sie der Parameter
+            <code>ftp_file_spec</code>
+            spezifiziert,
+            werden auf die Dateien in Unterverzeichnissen angewendet.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies if files from subdirectories 
+            should be transferred recursively. Recursive processing is
+            specified by one of the values
+            <em>yes</em>
+            or
+            <em>true</em>
+            .
+            <br clear="none"/>
+            <br clear="none"/>
+            Regular expression matches apply to files from subdirectories 
+            as specified by the parameter
+            <code>ftp_file_spec</code>
+            .
+          </div>
+        </note>
+      </param>

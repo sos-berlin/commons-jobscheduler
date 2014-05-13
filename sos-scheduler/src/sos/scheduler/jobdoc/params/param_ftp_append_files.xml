@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns:xi="http://www.w3.org/2001/XInclude"
+	xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+	xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	name="ftp_append_files" default_value="false" required="false"
+	DataType="SOSOptionBoolean">
+
+	<note language="de">
+		<div xmlns="http://www.w3.org/1999/xhtml">
+			<p>
+				Der Parameter bestimmt, ob der Inhalt der Quelldateien an die
+				Zieldateien
+				angehängt wird, falls die Zieldateien existieren.
+            </p>
+			<p>
+				Der Parameter
+				<paramref>ftp_overwrite_files</paramref>
+				wird nicht beachtet,
+				falls dieser Parameter den Wert
+				<em>true</em>
+				aufweist.
+			</p>
+		</div>
+	</note>
+	<note language="en">
+		<div xmlns="http://www.w3.org/1999/xhtml">
+			<p>
+				This parameter specifies whether the content of the source files should
+				be appended to the target files, if the target files exist.
+            </p>
+			<p>
+				The parameter
+				<paramref>ftp_overwrite_files</paramref>
+				will not be effective if this parameter
+				is specified with the value
+				<em>true</em>.
+			</p>
+		</div>
+	</note>
+</param>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<items xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1
+http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <note language="de">
+        <p>
+            Für diesen Job können Parameter verwendet werden, deren Name eine Kombination aus dem Job-Ketten state- und dem
+            Parameternamen ist (z.B.
+            start/command).
+            Der state und der Name sind durch einen Schrägstrich zu trennen.
+            Diese Parameter werden dann nur von genau dem Job verarbeitet, dessen
+            state-name im Parameter-Namen genannt ist.
+        </p>
+    </note>
+    <note language="en">
+        <p>
+            For this job, parameters can be used, whose name is a combination of the job chain state (or step) and the
+            parameter name (for example start/command).
+            The state and the parameter name must be separated by a slash.
+            These parameters are only used by just the job in the job chain whose state-name is mentioned in the parameter name.
+        </p>
+    </note>
+    <p>
+        <codeexample>
+            <embeddedExample type="xml">
+    <![CDATA[
+ <params >
+     ...
+    <param  name="step1/command" value="ls"/>
+    <param  name="step2/command" value="select * from table;"/>
+    <param  name="step3/command" value="do something"/>
+    ...
+ </params>
+     ...
+ <job_chain  .... >
+    <job_chain_node  state="step1" job="MailBoxCleansing" next_state="step2" error_state="!CleansSchedulerTest"/>
+    <job_chain_node  state="step2" job="MailBoxCleansing" next_state="step3" error_state="!CleansSchedulerTest"/>
+    <job_chain_node  state="step3" job="MailBoxCleansing" next_state="success" error_state="!CleansSchedulerTest"/>
+    <job_chain_node  state="success"/>
+    <job_chain_node  state="!CleansSchedulerTest"/>
+ </job_chain>
+     ]]>
+            </embeddedExample>
+            <explanation language="de">
+                <title>Ein Beispiel: Identischer Parametername in unterschiedlichen Steps</title>
+                <p>
+                    In diesem Beispiel wird der Parameter "command" für jeden einzelnen Step mit einem anderen Wert definiert.
+                </p>
+            </explanation>
+            <explanation language="en">
+                <title>An Example: Different Steps with the same parameter name</title>
+                <p>
+                    In this example the parameter with the name "command" is used in different steps with a unique value for each step.
+                </p>
+            </explanation>
+        </codeexample>
+    </p>
+</items>

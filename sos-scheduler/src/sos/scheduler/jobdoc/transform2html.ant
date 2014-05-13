@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="com.sos.scheduler.jobdoc" default="format2html" basedir=".">
+    <description>
+        Build a documentation
+    </description>
+
+    <property environment="MyEnv" />
+
+    <property name="extsrcdir" location="R:\\backup\\sos\\java\\development\\com.sos.scheduler\\src\\sos\\scheduler\\jobdoc" />
+    <property name="sos.libdir" location="J:/Data/doku/lib" />
+    <property name="src.tmp" location="${basedir}" />
+    <property name="sos.xslt.dir" location="${basedir}" />
+
+    <property name="lang" value="en" />
+
+    <property name="saxon" location="${sos.libdir}/saxon8.jar" />
+    <property name="ibex" location="${sos.libdir}/ibex-3.9.34.jar" />
+
+    <property name="sos.pdfdir" location="pdf/${lang}" />
+    <property name="sos.htmldir" location="${basedir}/html/${lang}" />
+    <property name="pdf" location="${sos.pdfdir}/${ant.project.name}.pdf" />
+    <property name="html" location="${sos.htmldir}/${ant.project.name}.html" />
+    <property name="fo_file" location="${java.io.tmpdir}/${ant.project.name}.fo" />
+
+<!--    <property name="sos.inputfile" value="${MyEnv.sos.inputfile}" />
+-->
+    <property name="sos.inputfile" value="SOSSQLPlusJob.xml" />
+    <property name="sos.outputfile" location="${sos.htmldir}/${sos.inputfile}" />
+
+    <property name="tocdepth" value="4" />
+    <property name="makeindex" value="1" />
+    <property name="lowestFileLevel" value="3" />
+    <property name="paraOffset" value="1em" />
+    <!-- pdf: how much space between 2 <p/>? -->
+    <property name="indexcolumns" value="2" />
+    <!-- pdf: how many columns for index page(s) -->
+    <property name="linkimage" value="${extsrcdir}/sos_doku_link.jpg" />
+    <!-- pdf: creates link icon after link text -->
+
+
+    <path id="base.path">
+        <pathelement path="${saxon}" />
+        <pathelement path="${classpath}" />
+        <fileset dir="${sos.libdir}/lib/xalan">
+            <include name="**/*.jar" />
+        </fileset>
+        <fileset dir="${sos.libdir}/lib/xerces-2_11_0">
+            <include name="**/*.jar" />
+        </fileset>
+        <pathelement path="${java.class.path}" />
+    </path>
+
+    <target name="all" depends="format2pdf, format2sos_help" />
+
+    <target name="format2html" depends="init">
+        <echo>Start format2html</echo>
+        <echo>input is   ${basedir}/${sos.inputfile}</echo>
+        <echo>output is ${sos.outputfile}.html</echo>
+        <echo>XSLT is ${sos.xslt.dir}/scheduler_job_documentation_v1.1.xsl</echo>
+
+    	<delete file="${sos.outputfile}.html" failonerror="false" />
+        <xslt style="${sos.xslt.dir}/scheduler_job_documentation_v1.1.xsl" destdir="${sos.htmldir}" in="${basedir}/${sos.inputfile}" out="${sos.outputfile}.html" basedir="." extension=".html" filenameparameter="filename" filedirparameter="filedir" failOnError="true">
+
+            <factory name="org.apache.xalan.processor.TransformerFactoryImpl">
+                <attribute name="http://xml.apache.org/xalan/features/optimize" value="true" />
+            </factory>
+
+            <sysproperty key="org.apache.xalan.extensions.bsf.BSFManager" value="org.apache.bsf.BSFManager" />
+            <sysproperty key="org.apache.xerces.xni.parser.XMLParserConfiguration" value="org.apache.xerces.parsers.XIncludeParserConfiguration" />
+
+            <param name="lang" expression="${lang}" />
+            <param name="tocdepth" expression="${tocdepth}" />
+            <param name="makeindex" expression="${makeindex}" />
+            <param name="paraOffset" expression="${paraOffset}" />
+            <param name="indexcolumns" expression="${indexcolumns}" />
+            <param name="sos.timestamp" expression="${sos.timestamp}" />
+
+            <classpath refid="base.path" />
+
+        </xslt>
+        <echo>---- output ${sos.outputfile}.html created -----</echo>
+
+    </target>
+
+    <!--
+	- target: xinclude
+	- description: Creates one combined temporary files for the different inputs files.
+	- The combined file will then be processed via different ant tasks
+		-->
+    <target name="xinclude">
+        <echo>Start xinclude_resolver</echo>
+        <echo>input is   ${basedir}/${sos.inputfile}</echo>
+        <echo>output is  ${src.tmp}/${sos.inputfile}</echo>
+
+        <xslt style="${sos.xslt.dir}/xsl/ResolveXIncludes.xsl" destdir="${src.tmp}" in="${basedir}/${sos.inputfile}" out="${src.temp}/${sos.inputfile}" basedir="." extension=".xml" filenameparameter="filename" filedirparameter="filedir" failOnError="true">
+
+            <factory name="org.apache.xalan.processor.TransformerFactoryImpl">
+                <attribute name="http://xml.apache.org/xalan/features/optimize" value="true" />
+            </factory>
+
+            <sysproperty key="org.apache.xalan.extensions.bsf.BSFManager" value="org.apache.bsf.BSFManager" />
+            <sysproperty key="org.apache.xerces.xni.parser.XMLParserConfiguration" value="org.apache.xerces.parsers.XIncludeParserConfiguration" />
+
+            <param name="lang" expression="${lang}" />
+            <param name="tocdepth" expression="${tocdepth}" />
+            <param name="makeindex" expression="${makeindex}" />
+            <param name="paraOffset" expression="${paraOffset}" />
+            <param name="indexcolumns" expression="${indexcolumns}" />
+            <param name="sos.timestamp" expression="${sos.timestamp}" />
+
+            <classpath refid="base.path" />
+
+        </xslt>
+
+        <!-- 		<xsl.xinclude in="${basedir}/${sos.inputfile}" out="${src.tmp}/${sos.inputfile}" /> -->
+        <!--
+        <sysproperty key="javax.xml.parsers.DocumentBuilderFactory" value="org.apache.xerces.jaxp.DocumentBuilderFactoryImpl" />
+        <xinclude in="${basedir}/${sos.inputfile}" out="${src.tmp}/${sos.inputfile}">
+
+        </xinclude>
+        <copyfile dest="${src.tmp}/${sos.inputfile}" src="${basedir}/${sos.inputfile}"/>
+        -->
+    </target>
+
+
+    <!--
+    http://ant.apache.org/manual/Tasks/style.html
+    -->
+    <target name="transform2fo">
+        <echo>Start transform2fo</echo>
+        <echo>input is ${ant.project.name}.sosdoc</echo>
+        <echo>output is ${fo_file}</echo>
+
+        <xslt style="${sos.xslt.dir}/sosdoku2fo.xsl" destdir="${java.io.tmpdir}" in="${ant.project.name}.sosdoc" out="${fo_file}" basedir="." extension=".fo" filenameparameter="filename" filedirparameter="filedir" failOnError="true">
+
+            <factory name="org.apache.xalan.processor.TransformerFactoryImpl">
+                <attribute name="http://xml.apache.org/xalan/features/optimize" value="true" />
+            </factory>
+
+            <sysproperty key="org.apache.xerces.xni.parser.XMLParserConfiguration" value="org.apache.xerces.parsers.XIncludeParserConfiguration" />
+
+            <param name="lang" expression="${lang}" />
+            <param name="tocdepth" expression="${tocdepth}" />
+            <param name="makeindex" expression="${makeindex}" />
+            <param name="paraOffset" expression="${paraOffset}" />
+            <param name="indexcolumns" expression="${indexcolumns}" />
+            <param name="sos.timestamp" expression="${sos.timestamp}" />
+
+            <classpath refid="base.path" />
+
+        </xslt>
+    </target>
+
+    <target name="transform2fo----">
+        <echo>Start transform2fo</echo>
+        <echo>input is ${ant.project.name}.sosdoc</echo>
+        <echo>output is ${fo_file}</echo>
+
+        <java classname="com.icl.saxon.StyleSheet" fork="yes">
+            <arg line='-o ${fo_file} ${ant.project.name}.sosdoc ${sos.xslt.dir}/sosdoku2fo.xsl lang="${lang}" tocdepth="${tocdepth}" makeindex="${makeindex}" paraOffset="${paraOffset}" indexcolumns="${indexcolumns}"' />
+            <classpath>
+                <pathelement path="${saxon}" />
+            </classpath>
+        </java>
+    </target>
+
+    <target name="format2pdf" depends="init, transform2fo" description="transform the .fo file to pdf">
+        <echo>Start transform2pdf</echo>
+        <java classname="ibex.Run">
+            <arg line="-xml ${fo_file} -pdf ${pdf}" />
+            <classpath>
+                <pathelement path="${ibex}" />
+                <pathelement path="${java.class.path}" />
+            </classpath>
+        </java>
+    </target>
+
+    <target name="format2sos_help" depends="init">
+        <java classname="com.icl.saxon.StyleSheet" fork="yes">
+            <arg line='-o sos_help/data/contents.htm ${ant.project.name}.sosdoc ${sos.xslt.dir}/sosdoku2soshelp.xslt lang="${lang}" tocdepth="${tocdepth}" lowestFileLevel="${lowestFileLevel}"' />
+            <classpath>
+                <pathelement path="${saxon}" />
+            </classpath>
+        </java>
+        <copy todir="sos_help/data/images">
+            <fileset dir="images" />
+        </copy>
+    </target>
+
+    <target name="init">
+        <!-- Create the time stamp -->
+        <tstamp />
+        <echo>Basedir : ${basedir}</echo>
+        <echo>Ant-Version : ${ant.version}</echo>
+        <echo>Ant-Home : ${ant.home}</echo>
+        <mkdir dir="${sos.htmldir}" />
+
+        <tstamp>
+            <format property="sos.timestamp" pattern="MM/dd/yyyy hh:mm aa" />
+        </tstamp>
+
+    </target>
+
+    <target name="clean" description="clean up">
+        <delete file="${pdf}" />
+        <delete file="${fo_file}" />
+        <delete file="${new_xml}/*.xml" />
+    </target>
+</project>

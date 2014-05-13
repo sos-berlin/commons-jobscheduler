@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id$ -->
+
+<param
+	xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+	xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    
+    xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 
+    http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd"
+	name="cause" default_value="late" required="false" DataType="SOSOptionString"
+	OptionName="cause">
+	<note language="de">
+		<div xmlns="http://www.w3.org/1999/xhtml">
+			Kriterium, nachdem geprüft werden soll.
+			<br />
+			Mögliche Werte
+			<ul>
+				<li>
+					<code>late</code>
+				</li>
+				<li>
+					<code>not_expected</code>
+				</li>
+			</ul>
+
+		</div>
+	</note>
+	<note language="en">
+		<div xmlns="http://www.w3.org/1999/xhtml">
+			Criterion for checking
+			<br />
+			Possible values
+			<ul>
+				<li>
+					<code>late</code>
+				</li>
+				<li>
+					<code>not_expected</code>
+				</li>
+			</ul>
+		</div>
+	</note>
+</param>

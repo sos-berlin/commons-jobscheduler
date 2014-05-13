@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<mediawiki version="0.3" xml:lang="en">
+   <siteinfo xmlns:xalan="http://xml.apache.org/xalan">
+      <sitename>jobscheduler</sitename>
+      <base>http://sourceforge.net/apps/mediawiki/jobscheduler/index.php?title=Main_Page</base>
+      <generator>MediaWiki 1.15.1</generator>
+      <case>first-letter</case>
+   </siteinfo>
+   <page>
+      <title>Job JobSchedulerLaunchAndObserve</title>
+      <id/>
+      <revision>
+         <id/>
+         <timestamp>2011-11-24T16:18:46.618Z</timestamp>
+         <contributor>
+            <username>Soskb</username>
+            <id>8</id>
+         </contributor>
+         <text xml:space="preserve">[[Category:ReadyMadeJobs]][[Category:JobSchedulerLaunchAndObserve]][[Category:Scheduling]]
+ 
+
+ 
+===Description of JobSchedulerLaunchAndObserve - Launch and observe any given job or job chain===
+ 
+<div><xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml"><p>This job is doing a check wether a job with a given job_name ist running.</p></xhtml:div></div>
+ 
+
+ 
+An example for a job-xml file:
+ 
+  &lt;job order='no' &gt;
+     &lt;params&gt;
+     &lt;/params&gt;
+     &lt;script language="java" java_class="sos.scheduler.job.JobSchedulerLaunchAndObserve" /&gt;
+  &lt;/job&gt;
+ 
+
+ 
+
+ 
+===Parameter used by JobSchedulerLaunchAndObserve===
+ 
+ 
+ 
+
+{| border="1"
+|+ List of parameter
+! ! Name || title || mandatory || default
+|}
+
+ 
+===Return parameter JobSchedulerLaunchAndObserve===
+ 
+The order parameter described below are returned by the job to the JobScheduler. JobSchedulerLaunchAndObserve
+ 
+ 
+ 
+
+{| border="1"
+|+ List of parameter
+! ! Name || title || mandatory || default
+|}
+
+ 
+This article was last modified on (mm/dd/yyyy)  {{REVISIONMONTH}}/{{REVISIONDAY}}/{{REVISIONYEAR}}.</text>
+      </revision>
+   </page>
+</mediawiki>

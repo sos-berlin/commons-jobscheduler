@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="addOrder" targetNamespace="http://www.sos-berlin.com/scheduler" xmlns:sos="http://www.sos-berlin.com/scheduler" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <wsdl:types>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.sos-berlin.com/scheduler">
+      <xsd:element name="successResponse" type="xsd:boolean"></xsd:element>
+      <xsd:element name="addOrder">
+      	<xsd:complexType>
+      		<xsd:sequence maxOccurs="1" minOccurs="1">
+      			<xsd:element name="jobchain" type="xsd:string"></xsd:element>
+      			<xsd:element name="id" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+      			<xsd:element name="title" type="xsd:string"
+      				maxOccurs="1" minOccurs="0">
+      			</xsd:element>
+      			<xsd:element name="replace" type="xsd:boolean" maxOccurs="1" minOccurs="0">
+      			</xsd:element>
+      			<xsd:element name="priority" type="xsd:int" maxOccurs="1" minOccurs="0"></xsd:element>
+      			<xsd:element ref="sos:param" maxOccurs="unbounded"
+      				minOccurs="0">
+      			</xsd:element>
+      		</xsd:sequence>
+      	</xsd:complexType>
+      </xsd:element>
+      <xsd:element name="startJob">
+      	<xsd:complexType>
+      		<xsd:sequence>
+      			<xsd:element name="job" type="xsd:string">
+      			</xsd:element>
+      			<xsd:element name="name" type="xsd:string"
+      				maxOccurs="1" minOccurs="0">
+      			</xsd:element>
+      			<xsd:element ref="sos:param" maxOccurs="unbounded"
+      				minOccurs="0">
+      			</xsd:element>
+      			<xsd:element name="after" type="xsd:int" maxOccurs="1" minOccurs="0"></xsd:element>
+      			<xsd:element name="at" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+      		</xsd:sequence>
+      	</xsd:complexType>
+      </xsd:element>
+      <xsd:element name="param">
+            	<xsd:complexType>
+            		<xsd:sequence>
+            			<xsd:element name="name" type="xsd:string">
+            			</xsd:element>
+            			<xsd:element name="value" type="xsd:string">
+            			</xsd:element>
+            		</xsd:sequence>
+            	</xsd:complexType>
+            </xsd:element>
+            <xsd:element name="orderId" type="xsd:string"></xsd:element>
+            <xsd:element name="taskId" type="xsd:string"></xsd:element>
+            <xsd:element name="modifyJob">
+             <xsd:complexType>
+              <xsd:sequence>
+               <xsd:element name="job" type="xsd:string"></xsd:element>
+               <xsd:element name="cmd">
+                <xsd:simpleType>
+                 <xsd:restriction base="xsd:NMTOKEN">
+                  <xsd:enumeration value="stop" />
+                  <xsd:enumeration value="unstop" />
+                  <xsd:enumeration value="start" />
+                  <xsd:enumeration value="wake" />
+                  <xsd:enumeration value="end" />
+                  <xsd:enumeration value="suspend" />
+                  <xsd:enumeration value="continue" />
+                  <xsd:enumeration value="reread" />
+                  <xsd:enumeration value="remove" />
+                 </xsd:restriction>
+                </xsd:simpleType>
+               </xsd:element>
+              </xsd:sequence>
+             </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="showOrder">
+             <xsd:complexType>
+              <xsd:sequence>
+               <xsd:element name="jobChain" type="xsd:string"></xsd:element>
+               <xsd:element name="order" type="xsd:string"></xsd:element>
+              </xsd:sequence>
+             </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="order">
+             <xsd:complexType>
+              <xsd:sequence>
+               <xsd:element name="created" type="xsd:dateTime"></xsd:element>
+               <xsd:element name="inProcessSince" type="xsd:dateTime" maxOccurs="1" minOccurs="0"></xsd:element>
+              </xsd:sequence>
+             </xsd:complexType>
+            </xsd:element>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="addOrderResponse">
+  	<wsdl:part name="addOrderResponse" element="sos:orderId">
+  	</wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="addOrder">
+        <wsdl:part name="addOrder" element="sos:addOrder"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="startJobResponse">
+  	<wsdl:part name="startJobResponse" element="sos:taskId">
+  	</wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="startJob">
+  	<wsdl:part name="startJob"
+  		element="sos:startJob">
+  	</wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="modifyJobResponse">
+   <wsdl:part name="modifyJobResponse"
+    element="sos:successResponse">
+   </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="modifyJob">
+   <wsdl:part name="modifyJob" element="sos:modifyJob"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="showOrderResponse">
+   <wsdl:part name="showOrderResponse"
+    element="sos:order">
+   </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="showOrder">
+   <wsdl:part name="showOrder" element="sos:showOrder"></wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="scheduler">
+    <wsdl:operation name="addOrder">
+    	<wsdl:input message="sos:addOrder"></wsdl:input>
+    	<wsdl:output message="sos:addOrderResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="startJob">
+    	<wsdl:input message="sos:startJob"></wsdl:input>
+    	<wsdl:output message="sos:startJobResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="modifyJob">
+     <wsdl:input message="sos:modifyJob"></wsdl:input>
+     <wsdl:output message="sos:modifyJobResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="showOrder">
+     <wsdl:input message="sos:showOrder"></wsdl:input>
+     <wsdl:output message="sos:showOrderResponse"></wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="schedulerSOAP" type="sos:scheduler">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="addOrder"><soap:operation soapAction="http://www.sos-berlin.com/scheduler/addOrder"/><wsdl:input><soap:body use="literal"/></wsdl:input><wsdl:output><soap:body use="literal"/></wsdl:output></wsdl:operation>
+        <wsdl:operation name="startJob">
+        	<soap:operation soapAction="http://www.sos-berlin.com/scheduler/startJob"/>
+        	<wsdl:input>
+        		<soap:body />
+        	</wsdl:input>
+        	<wsdl:output>
+        		<soap:body></soap:body>
+        	</wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="modifyJob">
+         <soap:operation />
+         <wsdl:input></wsdl:input>
+         <wsdl:output></wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="showOrder">
+         <soap:operation />
+         <wsdl:input></wsdl:input>
+         <wsdl:output></wsdl:output>
+        </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="scheduler">
+    <wsdl:port name="schedulerSOAP" binding="sos:schedulerSOAP">
+      <soap:address location="http://www.example.org/"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

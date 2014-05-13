@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns:xi="http://www.w3.org/2001/XInclude"
+       xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="ftp_result_files"
+       default_value="0"
+       Category="Result"
+       DataType="SOSOptionInteger"
+       OptionName="NoOfTransferredFiles" 
+       Alias="NoOfFilesTransferred"
+       
+       required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Dieser Parameter wird erst nach dem Dateitransfer generiert.
+           Er gibt die Anzahl der transferierten Dateien an.</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">This parameter is generated after the file transfer. It
+          contains the number of transferred files.</div>
+        </note>
+      </param>

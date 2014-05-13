@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns:xi="http://www.w3.org/2001/XInclude"
+       xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="ftp_file_path"
+       required="false">
+
+	 <indexterm index="ssh_proxy_password, parameter" display="false"></indexterm>
+    <indexterm index="parameter, ssh_proxy_password" display="false"></indexterm>
+	   
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter nimmt den Namen und Pfad einer Datei auf, die übertragen wird.
+Der Dateipfad kann entweder absolut angegeben sein oder der Dateipfad kann mit ftp_local_dir
+zusammen gebildet werden.
+Es ist auch erlaubt, das mehrere Dateinamen mit semikolon getrennt angegeben werden können.
+            <br clear="none"/>
+            <br clear="none"/>
+            Die Datei wird unter ihrem Namen in dem Verzeichnis am FTP-Server abgelegt,
+            das mit dem Parameter
+            <code>ftp_remote_dir</code>
+            angegeben ist.
+            <br clear="none"/>
+            <br clear="none"/>
+            Folgende Parameter wird mit der Angabe dieser Parameters
+            ignoriert:
+            <code>ftp_file_spec</code>
+            .
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter accepts the absolute name and path of file that should be transferred.
+            An absolute path has to be specified.
+            <br clear="none"/>
+            <br clear="none"/>
+            The file will be stored under its name in the directory at the FTP server 
+            that has been specified by the parameter
+            <code>ftp_remote_dir</code>
+            .
+            <br clear="none"/>
+            <br clear="none"/>
+            The following parameters are ignored should this parameter be used:
+            <code>ftp_file_spec</code>
+            and
+            <code>ftp_local_dir</code>
+            .
+          </div>
+        </note>
+      </param>

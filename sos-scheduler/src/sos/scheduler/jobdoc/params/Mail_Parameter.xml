@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id: FileOrderCreation_Parameter.xml 16369 2012-01-28 01:10:32Z oh $ -->
+<params id="job_parameter" xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+xmlns:xi="http://www.w3.org/2001/XInclude"
+xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1
+http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" category="eMail">
+
+
+    <note language="de">
+        <title language="de">Parameter für eine Benachrichtigung via eMail</title>
+
+        <p>
+        Die Parameter können mit dem Prefix "MailOnError_", "MailOnSuccess_" und "MailOnEmptyFiles_" erstellt werden.
+        Damit ist es möglich, für die unterschiedlichen Situationen auch unterschiedliche Mail zu versenden.
+<indexterm index="eMail, Parameter" display="false" />
+<indexterm index="MailOnError_, Prefix" display="false" />
+<indexterm index="MailOnSuccess_, Prefix" display="false" />
+<indexterm index="MailOnEmptyFiles_, Prefix" display="false" />
+        </p>
+    </note>
+    <note language="en">
+        <title language="en">eMail Notification Parameter</title>
+        <p>
+<indexterm index="eMail, Parameter" display="false" />
+<indexterm index="MailOnError_, Prefix" display="false" />
+<indexterm index="MailOnSuccess_, Prefix" display="false" />
+<indexterm index="MailOnEmptyFiles_, Prefix" display="false" />
+        </p>
+    </note>
+
+    <xi:include href="./param_mail_on_success.sosdoc" parse="xml">
+        <xi:fallback>"./param_mail_on_success.sosdoc" not found</xi:fallback>
+    </xi:include>
+
+    <xi:include href="./param_mail_on_error.sosdoc" parse="xml">
+        <xi:fallback>"./param_mail_on_error.sosdoc" not found</xi:fallback>
+    </xi:include>
+
+    <xi:include href="./param_mail_on_empty_files.sosdoc" parse="xml">
+        <xi:fallback>"./param_mail_on_empty_files.sosdoc" not found</xi:fallback>
+    </xi:include>
+
+    <xi:include href="./param_ftp_file_notification_to.xml" parse="xml" />
+    <xi:include href="./param_ftp_file_notification_cc.xml" parse="xml" />
+    <xi:include href="./param_ftp_file_notification_bcc.xml" parse="xml" />
+    <xi:include href="./param_ftp_file_notification_subject.xml" parse="xml" />
+
+    <xi:include href="./param_ftp_file_notification_body.xml" parse="xml" />
+
+</params>

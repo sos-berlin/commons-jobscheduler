@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id$ -->
+<note
+	xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+	xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" language="de">
+	<p>
+	               Beispiele:
+	</p>
+	<p>
+		<table xmlns="http://www.w3.org/1999/xhtml" border="1" cellspacing="0">
+			<tr>
+				<th>
+					<code>source_file</code>
+				</th>
+				<th>
+					<code>file_spec</code>
+				</th>
+				<th>
+					<code>replacing</code>
+				</th>
+				<th>
+					<code>replacement</code>
+				</th>
+				<th>Beispiel</th>
+				<th>Ergebnis</th>
+				<th>Kommentar</th>
+			</tr>
+			<tr>
+				<td>./temp</td>
+				<td>.*</td>
+				<td>~</td>
+				<td>""</td>
+				<td>hallo.dat~</td>
+				<td>hallo.dat</td>
+				<td>-</td>
+			</tr>
+			<tr>
+				<td>a.txt</td>
+				<td>-</td>
+				<td>[.]txt</td>
+				<td>_2006-11-24.txt</td>
+				<td>-</td>
+				<td>a_2006-11-24.txt</td>
+				<td>-</td>
+			</tr>
+			<tr>
+				<td>./temp</td>
+				<td>.*</td>
+				<td>.*</td>
+				<td>[filename:] [date:yyyy-MM-dd].dat</td>
+				<td>a.txt</td>
+				<td>a.txt2006-11-24.dat</td>
+				<td>[filename:] und [date:] werden substituiert nachdem die
+					Ersetzung durchgeführt wurde</td>
+			</tr>
+			<tr>
+				<td>./temp</td>
+				<td>.*[.]txt</td>
+				<td>a.*?b</td>
+				<td>world</td>
+				<td>a.1.b.txt.b</td>
+				<td>world.txt.b</td>
+				<td>.*? : Verwendung von .* im Modus "ungreedy"</td>
+			</tr>
+			<tr>
+				<td>abcdefg.txt</td>
+				<td>-</td>
+				<td>^(ab)cde(fg)[.]txt</td>
+				<td>123;[date:yyyy-MM-dd]</td>
+				<td>-</td>
+				<td>123cde2006-11-24.txt</td>
+				<td>; : Trennzeichen zwischen mehreren Ersetzungsstrings</td>
+			</tr>
+			<tr>
+				<td>./temp</td>
+				<td>.*dat$</td>
+				<td>(ab)_c[0-9]d_(fg)</td>
+				<td>group1;group2</td>
+				<td>ab_c1d_fg. ab_c2d_fg.dat</td>
+				<td>group1_c1d_group2. ab_c2d_fg.dat</td>
+				<td>Nur die erste Übereinstimmung des Musters wird ersetzt.</td>
+			</tr>
+			<tr>
+				<td>./temp</td>
+				<td>.*</td>
+				<td>^(?:aa|bb)_.{2}_ ([0-9]+_[0-9]+)$</td>
+				<td>tail</td>
+				<td>aa_QU_061205_222334</td>
+				<td>aa_QU_tail</td>
+				<td>(?:...) : "?:" Spezifiziert eine "non capturing group". Diese
+					wird nicht ersetzt.</td>
+			</tr>
+			<tr>
+				<td>./temp</td>
+				<td>FILE.txt</td>
+				<td>.*</td>
+				<td>[filename:lowercase]_[filename:uppercase]_[filename:]</td>
+				<td>FILE.txt</td>
+				<td>file.txt_FILE.TXT_FILE.txt</td>
+				<td>-</td>
+			</tr>
+		</table>
+		<table xmlns="http://www.w3.org/1999/xhtml" border="1" cellspacing="0">
+			<tr>
+				<th>
+					<code>source_file</code>
+				</th>
+				<th>
+					<code>target_file</code>
+				</th>
+				<th>
+					<code>file_spec</code>
+				</th>
+				<th>
+					<code>create_dir</code>
+				</th>
+				<th>
+					<code>replacing</code>
+				</th>
+				<th>
+					<code>replacement</code>
+				</th>
+				<th>Beispiel</th>
+				<th>Ergebnis</th>
+				<th>Kommentar</th>
+			</tr>
+			<tr>
+				<td>aaa/bbb/</td>
+				<td>[directory:]/[date:yyyyMMdd]/</td>
+				<td>hello.txt</td>
+				<td>true</td>
+				<td>[.]txt</td>
+				<td>[date:yyyy].txt</td>
+				<td>aaa/bbb/hello.txt</td>
+				<td>aaa/bbb/20070316/hello2007.txt</td>
+				<td>Wenn das Verzeichnis aaa/bbb/20070316 noch nicht existiert,
+					wird es angelegt</td>
+			</tr>
+		</table>
+</p>
+<p>
+            Für weitere Informationen zu regulären Ausdrücken, siehe
+            <a
+                href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html">java.util.regex.Pattern</a>
+
+	</p>
+</note>

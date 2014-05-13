@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="jump_protocol"
+       required="false"
+       DefaultValue="sftp"
+       extends="protocol">
+        <note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Bei Verwendung eines <paramref>jump_host</paramref> werden Dateien zunächst auf diesen
+            Server transferiert und anschließend an das Zielsystem. Dabei können unterschiedliche
+            Protokolle (FTP/SFTP) für die beiden Transferoperationen verwendet werden.
+            <br/>
+         <br/>
+            Der Parameter nimmt die Werte
+            <paramval>ftp</paramval>, <paramval>sftp</paramval> oder <paramval>ftps</paramval> an.
+            Bei Verwendung von <paramval>sftp</paramval> werden auch die <paramval>jump_ssh_*</paramval>-Parameter
+            ausgewertet.   
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            When using a <paramref>jump_host</paramref> then files are first transferred to this host
+            and then to the target system. Different protocols (FTP/SFTP) can be used for
+            these transfer operations.
+            <br/>
+         <br/>
+            This parameter expects
+            <paramval>ftp</paramval>, <paramval>sftp</paramval> or <paramval>ftps</paramval> to be specified.
+            If <paramval>sftp</paramval> is used, then the <paramval>jump_ssh_*</paramval> parameters will
+            be considered.
+          </div>
+        </note>
+      </param>

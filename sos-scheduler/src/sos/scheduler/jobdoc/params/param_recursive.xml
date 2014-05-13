@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id$ -->
+
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="recursive" DefaultValue="false" required="false" DataType="SOSOptionBoolean" Alias="RecurseSubFolders">
+	
+	       <indexterm index="recursive, parameter" display="false"></indexterm>
+    <indexterm index="parameter, recursive" display="false"></indexterm>
+	   
+	       <indexterm index="RecurseSubFolders, parameter" display="false"></indexterm>
+    <indexterm index="parameter, RecurseSubFolders" display="false"></indexterm>
+	   
+	       <indexterm index="file_spec, parameter" display="false"></indexterm>
+    <indexterm index="parameter, file_spec" display="false"></indexterm>
+	   
+	       <indexterm index="file, parameter" display="false"></indexterm>
+    <indexterm index="parameter, file" display="false"></indexterm>
+	   
+    <note language="de">
+        <title>Unterverzeichnisse berücksichtigen</title>
+        <p>
+            Der Parameter gibt an, ob Dateien aus Unterverzeichnissen des
+            Quellverzeichnisses rekursiv übertragen werden.
+        </p>
+        <p>
+            Nur wirksam, wenn
+            <paramref>file</paramref>
+            ein Verzeichnis ist.
+        </p>
+        <p>
+            Reguläre Ausdrücke, wie sie der Parameter
+            <paramref>file_spec</paramref>
+            spezifiziert,
+            werden auf die Dateien in Unterverzeichnissen angewendet.
+        </p>
+    </note>
+    <note language="en">
+        <title>Include subfolders in operation</title>
+        <p>
+            This parameter specifies wether files from subdirectories
+            should be included recursively.
+        </p>
+        <p>
+            Only effective if
+            <paramref>file</paramref>
+            is a directory.
+        </p>
+        <p>
+            Regular expression matches apply to files from subdirectories
+            as specified by the parameter
+            <paramref>file_spec</paramref>
+            .
+        </p>
+        <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../notes/BooleanValues.xml" parse="xml" />
+
+    </note>
+</param>

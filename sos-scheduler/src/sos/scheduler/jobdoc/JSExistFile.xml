@@ -1,0 +1,1446 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="scheduler_job_documentation_v1.1.xsl"?>
+<description xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<job xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" order="both" name="JSExistsFile" tasks="unbounded" title="check wether a file exist" category="FileHandling" since="1.3.?">
+
+<!-- 
+ xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1    http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd" 
+ -->		
+		<script language="java" java_class="sos.scheduler.file.JobSchedulerExistsFile" resource="1"/>
+	</job>
+<releases xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+        <release id="1.3.11.1095" created="2010-08-08" modified="2010-08-08">
+            <title>refactoring, additional parameters</title>
+            <author name="kb" email=""/>
+        </release>
+		<release id="1.3" created="2006-12-11" modified="2009-06-15">
+			<title>version 1.3</title>
+			<author name="Florian Schreiber" email="florian.schreiber@sos-berlin.com"/>
+		</release>
+	</releases>
+<resources>
+<file os="all" type="java" file="sos.scheduler.jar" id="1">
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<p>
+		</p>
+	</note>
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<p>
+		</p>
+	</note>
+</file>
+<file os="all" type="java" file="sos.spooler.jar" id="1">
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<p>
+		</p>
+	</note>
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<p>
+		</p>
+	</note>
+</file>
+<file os="all" type="java" file="sos.util.jar" id="1">
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<p>
+		</p>
+	</note>
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<p>
+		</p>
+	</note>
+</file>
+        </resources>
+<configuration>
+<note language="de">
+<p xmlns:xhtml="http://www.w3.org/1999/xhtml">Dieser Job kann einzeln, ausserhalb einer JobKette, oder auftragsgesteuert
+                als Knoten in einer Jobkette verwendet werden.
+                Die Parameter werden entsprechend als Job- oder Auftragsparameter
+                interpretiiert und verarbeitet.
+      </p>
+<p xmlns:xhtml="http://www.w3.org/1999/xhtml">
+      Ein Job kann mehrere Parameter haben, die beim Job-Start übergeben werden. 
+      Parameter werden in der Konfigurationsdatei des Jobs bzw des Auftrages oder per API-Methoden bekanntgemacht. 
+      Parameter sind entweder obligatorisch oder optional. 
+      Für einen Parameter kann ein Default-Wert vorgegeben sein.
+      </p>
+</note>
+<note language="en">
+<p xmlns:xhtml="http://www.w3.org/1999/xhtml">
+			This job can be used standalone, as a single job, or as an order driven
+			job in a jobchain as a jobchain node.
+			Parameters are respectively accepted as job- or as order-parameters.
+		</p>
+<p xmlns:xhtml="http://www.w3.org/1999/xhtml">
+		A job can process multiple parameters that are analysed when the job starts. 
+		Parameters are defined in the configuration of the job or of the order.
+		Parameters can be submitted by API methods, as well. 
+		Parameters are optional or mandatory and may contain default values.
+		</p>
+</note>
+<note language="en">
+<p xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+		This job is creating a result set.
+		A result set contain the names of all files which are selected as
+		specified by the filter criteria.
+		The content of the result set is returned as a parameter, but can be
+		written to a file, too.
+            </p>
+<p xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+            Parameters, which are useful for creating a result-set, are</p>
+<table xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" border="1" cellspacing="0">
+		<tr>
+			<th>ParameterName
+			</th>
+			<th>Title
+			</th>
+		</tr>
+        <tr>
+            <td>
+<paramref>raise_error_if_result_set_is</paramref>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+            <td>
+<paramref>result_list_file</paramref>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+            <td>
+<paramref>expected_size_of_result_set</paramref>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+            <td>
+<paramref>on_empty_result_set</paramref>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+            <td>
+<paramref>scheduler_sosfileoperations_resultset</paramref>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+            <td>
+<paramref>scheduler_sosfileoperations_resultsetsize</paramref>
+            </td>
+            <td>
+            </td>
+        </tr>
+	</table>
+</note>
+<note language="de">
+<p xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+				Dieser Job erstellt eine Ergebnisliste.
+				Die Ergebnisliste enthält die Namen aller Dateien die aufgrund des
+				Filterkriteriums ermittelt wurden.
+				Die Ergebnisliste wird als Job-Parameter vom Job geliefert, kann aber
+				auch als Datei erstellt werden.
+        </p>
+</note>
+<note language="en">
+<p xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+				This job can create file-orders.
+It can be specified that a file-order is created for the first file of the result set only or
+for all files of the result set. 
+            </p>
+</note>
+<note language="de">
+<p xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+				Dieser Job kann Datei-Aufträge (file-orders) erzeugen.
+				Dabei kann angegeben werden, ob nur für die erste Datei oder für
+				alle Dateien in der Ergebnisliste ein Dateiauftrag angelegt werden soll. 
+            </p>
+</note>
+<params id="job_parameter">
+<param name="file" Category="FileSystem" DataType="SOSOptionString" OptionName="File" Alias="FileName" required="true" default_value=".">
+<note xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<title>Zu überwachende Datei oder Verzeichnis</title>
+		<p>
+			Überprüfte Datei oder überprüftes Verzeichnis
+			</p>
+		<p>
+			Unterstützt Substitution von Masken im Datei- und
+			Verzeichnisnamen mit Formatangaben, die mit
+			<em>[</em>
+			und
+			<em>]</em>
+			geklammert sind. Folgende Formate werden
+			unterstützt:
+		</p>
+		<p>
+			<code>
+				[date:
+				<em>date format</em>
+				]
+			</code>
+			<em>date format</em>
+			muss ein gültiger Java Format-String für
+			Datumsangaben sein,
+			z.B.
+			<em>yyyyMMddHHmmss</em>
+			,
+			<em>yyyy-MM-dd.HHmmss</em>
+			etc.
+		</p>
+		<p>
+			Beispiel:
+									</p>
+		<p>
+			<code>
+				&lt;param name="file"
+				value="sample/hello[date:yyyyMMdd].txt"
+				/&gt; </code>
+		</p>
+		<p>
+			Am 31.12.2050 enthält der Parameter
+			<paramref>file</paramref>
+			den Wert
+			<code>"sample/hello20501231.txt"</code>
+			.
+		</p>
+		<p>
+			Unterstützt Substitution von Job-Parameternamen
+			durch deren Wert,
+			wenn der jeweilige
+			Job-Parametername mit
+			<em>%</em>
+			 und 
+			<em>%</em>
+			geklammert ist.
+		</p>
+		<p>
+			Beispiel:
+			<code>
+				&lt;param name="file"
+				value="%scheduler_file_path%" /&gt; </code>
+		</p>
+		<p>
+			Der Parameter
+			<paramref>file</paramref>
+			enthält zur Laufzeit den Wert, der im
+			Job-Parameter
+			<paramref>scheduler_file_path</paramref>
+			gesetzt ist.
+			Bei der
+			<a href="http://www.sos-berlin.com/doc/de/scheduler.doc/file_orders.xml">
+				Verzeichnisüberwachung mit Dateiaufträgen
+      				</a>
+			wird der Job-Parameter
+			<paramref>scheduler_file_path</paramref>
+			automatisch mit dem Pfad der Datei gesetzt, die
+			den Auftrag
+			ausgelöst hat.
+		</p>
+	</note>
+<note xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<title>File or Folder to watch for</title>
+		<p>
+			Checked file or directory
+			</p>
+		<p>
+			Supports masks for substitution in the file name
+			and directory
+			name with format strings that are
+			enclosed by
+			<em>[</em>
+			and
+			<em>]</em>
+			. The following format strings are supported:
+		</p>
+
+		<p>
+			<code>
+				[date:
+				<em>date format</em>
+				]
+			</code>
+		</p>
+		<p>
+			<em>date format</em>
+			must be a valid Java data format string,
+			e.g.
+			<em>yyyyMMddHHmmss</em>
+			,
+			<em>yyyy-MM-dd.HHmmss</em>
+			etc.
+		</p>
+		<p>
+			An example:
+									</p>
+		<p>
+			<code>
+				&lt;param name="file"
+				value="sample/hello[date:yyyyMMdd].txt"
+				/&gt; </code>
+		</p>
+		<p>
+			On 2050-12-31 the parameter
+			<code>file</code>
+			contains the value
+			<code>"sample/hello20501231.txt"</code>
+			.
+		</p>
+		<p>
+			This parameter supports substitution of job parameter names with
+			their value if
+			the job parameter name is enclosed
+			by
+			<em>%</em>
+			 and 
+			<em>%</em>
+			.
+		</p>
+		<p>
+			An example:
+			<code>
+				&lt;param name="file"
+				value="%scheduler_file_path%" /&gt; </code>
+		</p>
+		<p>
+			During the job runtime the parameter
+			<paramref>file</paramref>
+			contains the value of the job parameter
+			<paramref>scheduler_file_path</paramref>
+			.
+			Using
+			<a href="http://www.sos-berlin.com/doc/en/scheduler.doc/file_orders.xml">
+				Directory Monitoring with File Orders
+      				</a>
+			the job parameter
+			<paramref>scheduler_file_path</paramref>
+			contains automatically the path of the file that
+			triggered the
+			order.
+		</p>
+	</note>
+</param>
+<param name="file_spec" Category="FileSystem" DataType="SOSOptionRegExp" OptionName="FileNameRegExp" Alias="FileNameRegExp" required="false">
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<title>Regulärer Ausdruck der zu überwachenden Datei(en)</title>
+		<p>
+			Regulärer Ausdruck als Dateifilter.
+			Verhält sich CASE_INSENSITIVE.
+			<br/>
+			Nur wirksam, wenn der Parameter
+			<paramref>file</paramref>
+			ein Verzeichnis ist.
+		</p>
+	</note>
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<title>Regular Expression for filename filtering</title>
+		<p>
+			Regular Expression for file filtering.
+			The behaviour is
+			CASE_INSENSITIVE.
+			<br/>
+			Only effective if the parameter
+			<paramref>file</paramref>
+			is a directory.
+		</p>
+	</note>
+<note language="en">
+<p xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+	Some remarks on regular expression, used in JobScheduler.</p>
+<p xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+	A regular expression is not a 
+	<a href="http://en.wikipedia.org/wiki/Wildcard_character#Files_and_directories">
+	wildcard
+	</a>.
+	To get an impression of the differences one have a look on the meaning of the wildcard *.txt, which will
+	select all filenames with the filename-extension ".txt".
+	A regular expression to match, e.g. works the same way, this "wildcard" must look like "^.*\.txt$".
+	That looks a little bit strange but it is much more flexible and powerfull on filtering filenames
+	than the concept of wildcards, if one want to filter more complex names or pattern.
+	</p>
+<p xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+        The general syntax of an 
+        <a href="http://en.wikipedia.org/wiki/Regular_expression">regular expression</a>, also referred to as regex or regexp,
+        is described
+        <a href="http://pubs.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap09.html">
+        here</a>.
+        It is different to other RegExp definitions, e.g. as for Perl.
+	</p>
+</note>
+</param>
+<param name="gracious" Category="FileSystem" DataType="SOSOptionGracious" OptionName="Gracious" Alias="ErrorBehaviour" default_value="false" required="false" valuelist="true, false, all">
+<note xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<title>Fehlermeldungstoleranz aktivieren</title>
+		<p>
+			Aktiviert oder deaktiviert Fehlermeldungen, die aufgrund einer
+			leeren Ergebnisliste der im Job auszuführenden Operation
+			ausgelöst
+			werden können, und steuert damit den Ablauf der Schritte (Knoten) in
+			einer Job-Kette.
+			</p>
+		<p>
+			Gültige Werte:
+			<em>false, 0, off, no, n, nein, none</em>
+			,
+			<em>true, 1, on, yes, y, ja, j</em>
+			und
+			<em>all</em>
+		</p>
+		<p> Bei einer leeren Ergebnisliste der Operation
+			ergibt sich folgendes
+			Verhalten eines Jobs bzw. einer Job-Kette bezüglich
+			der Meldung eines
+			"Fehlers":
+			</p>
+		<table border="1" cellspacing="0">
+			<tr>
+				<th>
+					<code>GRACIOUS</code>
+				</th>
+				<th>
+					<code>Standalone-Job</code>
+				</th>
+				<th>
+					<code>JobKetten-Job</code>
+				</th>
+			</tr>
+			<tr>
+				<td>false, 0, off, no, n, nein, none</td>
+				<td>
+					error log,
+					<br/>
+					Task error
+				</td>
+				<td>
+					error log,
+					<br/>
+					set_state error
+				</td>
+			</tr>
+			<tr>
+				<td>true, 1, on, yes, y, ja, j</td>
+				<td>
+					no error log,
+					<br/>
+					Task success
+				</td>
+				<td>
+					no error log,
+					<br/>
+					set_state error
+				</td>
+			</tr>
+			<tr>
+				<td>all</td>
+				<td>
+					no error log,
+					<br/>
+					Task success
+				</td>
+				<td>
+					no error log,
+					<br/>
+					set_state success
+				</td>
+			</tr>
+		</table>
+	</note>
+<note xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<title>Specify error message tolerance</title>
+		<p>
+			Enables or disables error messages that are caused by an
+			empty
+			result-set, which is the result of an operation, executed by the job.
+			Therefore this parameter can control the sequence of nodes or states
+			in a job-chain.
+    </p>
+		<p>
+			Valid values:
+			</p>
+			<p>
+			<em>false, 0, off, no, n, nein, none</em>
+			,
+			<em>true, 1, on, yes, y, ja, j</em>
+			and
+			<em>all</em>.
+		</p>
+		<p>
+			The following rules apply when
+			the result-set is empty:
+		</p>
+		<table border="1" cellspacing="0">
+			<tr>
+				<th>
+					<code>GRACIOUS</code>
+				</th>
+				<th>
+					<code>Standalone-Job</code>
+				</th>
+				<th>
+					<code>Order-Job</code>
+				</th>
+			</tr>
+			<tr>
+				<td>false, 0, off, no, n, nein, none</td>
+				<td>
+					error log,
+					<br/>
+					Task error
+				</td>
+				<td>
+					error log,
+					<br/>
+					set_state error
+				</td>
+			</tr>
+			<tr>
+				<td>true, 1, on, yes, y, ja, j</td>
+				<td>
+					no error log,
+					<br/>
+					Task success
+				</td>
+				<td>
+					no error log,
+					<br/>
+					set_state error
+				</td>
+			</tr>
+			<tr>
+				<td>all</td>
+				<td>
+					no error log,
+					<br/>
+					Task success
+				</td>
+				<td>
+					no error log,
+					<br/>
+					set_state success
+				</td>
+			</tr>
+		</table>
+		<p>
+		For example, the setting "gracious=all" will suppress all errors regarding an empty result-set and will terminate a Job (standalone and inside a jobchain)
+		as it would be without errors.
+		</p>
+	</note>
+</param>
+<param name="max_file_age" Category="FileSystem" DataType="SOSOptionTime" OptionName="FileAgeMaximum" Alias="FileAgeMaximum" default_value="0" required="false">
+<note xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<title>Maximales Alter einer oder mehrerer Dateien</title>
+		<p>
+			Vereinbart das Höchstalter einer oder mehrerer Dateien.
+			Ist eine
+			Datei älter, dann gilt sie als nicht vorhanden.
+						</p>
+		<p>
+			Mögliche Werte sind:
+						</p>
+		<p>
+			0 (parameter wird ignoriert)
+						</p>
+		<p>
+			Sekunden
+						</p>
+		<p>
+			Stunden:Minuten
+						</p>
+		<p>
+			Stunden:Minuten:Sekunden
+					</p>
+	</note>
+<note xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<title>maximum age of a file</title>
+		<p>
+			Specifies the maximum age of a file.
+			If a file is older, then it is
+			deemed not to exist, it will be not included in the result-list.
+						</p>
+	</note>
+<note language="en">
+<p xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+		Valid values:
+                        </p>
+<table xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" border="1" cellspacing="0">
+		<tr>
+			<th>Value</th>
+			<th>Description
+                </th>
+		</tr>
+		<tr>
+			<td>0</td>
+			<td>The value of the parameter has no effect and the parameter is not
+				part of the filter.
+                </td>
+		</tr>
+		<tr>
+			<td>seconds</td>
+			<td>
+				no of seconds. 
+                </td>
+		</tr>
+		<tr>
+			<td>hours:minutes</td>
+			<td>01:15 is to read as "1 hour and 15 minutes".
+                </td>
+		</tr>
+		<tr>
+			<td>hours:minutes:seconds</td>
+			<td>01:15:10 is to read as "1 hour, 15 minutes and 10 seconds".
+                </td>
+		</tr>
+	</table>
+</note>
+</param>
+<param name="min_file_age" Category="FileSystem" DataType="SOSOptionTime" OptionName="FileAgeMinimum" Alias="FileAgeMinimum" default_value="0" required="false">
+<note xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<title>Mindestalter der Datei(en)</title>
+
+		<div xmlns="http://www.w3.org/1999/xhtml">
+			Vereinbart das Mindestalter einer oder mehrerer Dateien.
+			Es werden nur Dateien für weitere Operationen berücksichtigt, die
+			mindestens, d.h. auch einschließlich, das angegebene Alter
+			besitzen.
+			Dateien werden nicht in die Resultat-Liste aufgenommen, die jünger sind.
+			<br/>
+			<br/>
+			Mögliche Werte sind:
+			<br/>
+			0 (parameter wird ignoriert)
+			<br/>
+			Sekunden
+			<br/>
+			Stunden:Minuten
+			<br/>
+			Stunden:Minuten:Sekunden
+		</div>
+	</note>
+<note xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<title>minimum age of a file</title>
+		<div xmlns="http://www.w3.org/1999/xhtml">
+			Specifies the minimum age of a files.
+			If the file(s)
+			is newer then it is classified as non-existing, it will be not included
+			in the result-list.
+					</div>
+	</note>
+<note language="en">
+<p xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+		Valid values:
+                        </p>
+<table xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" border="1" cellspacing="0">
+		<tr>
+			<th>Value</th>
+			<th>Description
+                </th>
+		</tr>
+		<tr>
+			<td>0</td>
+			<td>The value of the parameter has no effect and the parameter is not
+				part of the filter.
+                </td>
+		</tr>
+		<tr>
+			<td>seconds</td>
+			<td>
+				no of seconds. 
+                </td>
+		</tr>
+		<tr>
+			<td>hours:minutes</td>
+			<td>01:15 is to read as "1 hour and 15 minutes".
+                </td>
+		</tr>
+		<tr>
+			<td>hours:minutes:seconds</td>
+			<td>01:15:10 is to read as "1 hour, 15 minutes and 10 seconds".
+                </td>
+		</tr>
+	</table>
+</note>
+</param>
+<param name="max_file_size" Category="FileSystem" DataType="SOSOptionFileSize" OptionName="FileSizeMaximum" Alias="FileSizeMaximum" default_value="-1" required="false">
+<note xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+					<title>Maximale Größe einer Datei</title>
+					<div xmlns="http://www.w3.org/1999/xhtml">
+						Vereinbart die maximale Größe einer oder mehrerer Dateien in
+						Bytes:
+						überschreitet die Größe einer der Dateien diesen Wert,
+						dann
+						gilt sie als nicht vorhanden.
+						<br/>
+						   <br/>
+						Mögliche Werte sind:
+						<br/>
+						-1 (parameter wird ignoriert)
+						<br/>
+						Zahl (Byte), z.B. 40
+						<br/>
+						ZahlKB, z.B. 5KB (Groß/Kleinschreibung wird ignoriert)
+						<br/>
+						ZahlMB, z.B. 20MB (Groß/Kleinschreibung wird ignoriert)
+						<br/>
+						ZahlGB, z.B. 10GB (Groß/Kleinschreibung wird ignoriert)
+					</div>
+				</note>
+<note xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+					<title>maximum size of a file</title>
+					<div xmlns="http://www.w3.org/1999/xhtml">
+						Specifies the maximum size of a file in bytes:
+						should the size of one of the files exceed this value,
+						then it is
+						classified as non-existing.
+					</div>
+				</note>
+<note language="en">
+<p xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml">valid values for file size are</p>
+<table xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+			<tr>
+				<th>Value</th>
+				<th>Description</th>
+			</tr>
+			<tr>
+				<td>-1</td>
+				<td>The value of the parameter has no effect and the parameter is
+					not part of the filter.
+                </td>
+			</tr>
+			<tr>
+				<td>number</td>
+				<td>a number stand for the size in byte, e.g. 40 means 40 bytes.</td>
+			</tr>
+			<tr>
+				<td>numberKB</td>
+				<td>a number with the chars "KB" stand for the size in kilobyte.</td>
+			</tr>
+			<tr>
+				<td>numberMB</td>
+				<td>a number with the chars "MB" stand for the size in megabyte.</td>
+			</tr>
+            <tr>
+                <td>numberGB</td>
+                <td>a number with the chars "GB" stand for the size in gigabyte.</td>
+            </tr>
+		</table>
+</note>
+</param>
+<param name="min_file_size" Category="FileSystem" DataType="SOSOptionFileSize" OptionName="FileSizeMinimum" Alias="FileSizeMinimum" default_value="-1" required="false">
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<title>minimale Größe einer oder mehrerer Dateien </title>
+		<p>
+			Vereinbart die minimale Größe einer oder mehrerer Dateien in
+			Bytes:
+			unterschreitet die Größe einer Datei diesen Wert,
+			dann
+			wird diese
+			nicht in das Resultat (result list) übernommen.
+		</p>
+	</note>
+<note language="de">
+<p xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml">Gültige Werte für diesen Parameter sind:</p>
+<p xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+		-1 (parameter wird ignoriert)
+		<br/>
+		Zahl (Byte), z.B. 40
+		<br/>
+		ZahlKB, z.B. 5KB (Groß/Kleinschreibung wird ignoriert)
+		<br/>
+		ZahlMB, z.B. 20MB (Groß/Kleinschreibung wird ignoriert)
+		<br/>
+		ZahlGB, z.B. 10GB (Groß/Kleinschreibung wird ignoriert)
+	</p>
+</note>
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<title>minimum size of one or multiple files </title>
+		<p>
+			Specifies the minimum size of one or multiple files in bytes:
+			should
+			the size of one of the files fall below this value,
+			then it
+			is not included in the result list of the operation.
+		</p>
+	</note>
+<note language="en">
+<p xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml">valid values for file size are</p>
+<table xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+			<tr>
+				<th>Value</th>
+				<th>Description</th>
+			</tr>
+			<tr>
+				<td>-1</td>
+				<td>The value of the parameter has no effect and the parameter is
+					not part of the filter.
+                </td>
+			</tr>
+			<tr>
+				<td>number</td>
+				<td>a number stand for the size in byte, e.g. 40 means 40 bytes.</td>
+			</tr>
+			<tr>
+				<td>numberKB</td>
+				<td>a number with the chars "KB" stand for the size in kilobyte.</td>
+			</tr>
+			<tr>
+				<td>numberMB</td>
+				<td>a number with the chars "MB" stand for the size in megabyte.</td>
+			</tr>
+            <tr>
+                <td>numberGB</td>
+                <td>a number with the chars "GB" stand for the size in gigabyte.</td>
+            </tr>
+		</table>
+</note>
+</param>
+<param name="skip_first_files" Category="FileSystem, Filter" DataType="SOSOptionInteger" OptionName="NoOfFirstFiles2Skip" Alias="NoOfFirstFiles2Skip" default_value="0" required="false" exclude="skip_last_files">
+<note xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<title>Anzahl nicht zu berücksichtigender Dateien</title>
+		<p>
+			Die angegebene Anzahl Dateien wird vom Anfang der Ergebnismenge
+			(result-list)
+			der Operation entfernt.
+			Auf diese Dateien wirkt sich die
+			Operation damit nicht
+			aus.
+			<br/>
+			Der Parameter wirkt auf die resultierende Menge von
+			<paramref>min_file_size</paramref>
+			,
+			<paramref>min_file_age</paramref>
+			etc.
+		</p>
+		<p>
+			Die Reihenfolge der Einträge in der Ergebnis-Menge wird durch die verwendeten Filter-Parameter ermittelt:
+			<ul>
+				<li>
+					<paramref>min_file_age</paramref>
+					,
+					<paramref>max_file_age</paramref>
+					: aufsteigend nach Änderungsdatum der
+					Datei, d.h. jüngere zuerst.
+				</li>
+				<li>
+					<paramref>min_file_size</paramref>
+					,
+					<paramref>max_file_size</paramref>
+					: aufsteigend nach Größe, d.h.
+					kleinere zuerst
+				</li>
+				<li>
+					sind sowohl die Parameter für Größe und Alter einer Datei angegeben,
+					dann
+					erfolgt die Sortierung aufsteigend nach Alter.
+            </li>
+			</ul>
+		</p>
+		<p>
+			Es darf nur entweder
+			<paramref>skip_first_files </paramref>
+			oder
+			<paramref>skip_last_files</paramref>
+			verwendet
+			werden.
+		</p>
+	</note>
+<note xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<title>number of files to remove from the top of the
+			result-set
+		</title>
+		<p>
+			The number of files are removed from the beginning of the set
+			resulting by
+			<paramref>min_file_size</paramref>
+			,
+			<paramref>min_file_age</paramref>
+			etc.
+			These files are
+			excluded from further operations.
+		</p>
+		<p>
+			The result set is sorted according to the used filter
+			parameters:
+			<br/>
+			<ul>
+				<li>
+					<paramref>min_file_age</paramref>
+					,
+					<paramref>max_file_age</paramref>
+					: in ascending order by date of last
+					modification, the newest file first.
+				</li>
+				<li>
+					<paramref>min_file_size</paramref>
+					,
+					<paramref>max_file_size</paramref>
+					: in ascending order by file size,
+					the smallest file on top.
+				</li>
+				<li>
+					if parameters for file age as well as file size are given the result
+					set is sorted by file age.
+                        </li>
+			</ul>
+		</p>
+		<p>
+			Only either
+			<paramref>skip_first_files</paramref>
+			or
+			<paramref>skip_last_files</paramref>
+			is allowed to be
+			set at the same time.
+		</p>
+	</note>
+</param>
+<param name="skip_last_files" Category="FileSystem" DataType="SOSOptionInteger" OptionName="NoOfLastFiles2Skip" Alias="NoOfLastFiles2Skip" default_value="0" required="false">
+<note xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<title>number of files to remove from the beginning of the
+			result-set</title>
+		<div xmlns="http://www.w3.org/1999/xhtml">
+			Die angegebene Anzahl Dateien wird vom Ende der Ergebnismenge
+			entfernt.
+			Auf diese Dateien wirkt sich die weitere Operation nicht
+			aus.
+			<br/>
+
+			Der Parameter wirkt auf die resultierende Menge von min_file_size,
+			min_file_age etc.
+			<br/>
+			<br/>
+			Die Menge ist sortiert entsprechend der verwendeten
+			einschränkenden Parameter:
+			<br/>
+			+ min_file_age, max_file_age: aufsteigend nach Änderungsdatum der
+			Datei, d.h. jüngere zuerst
+			<br/>
+			+ min_file_size, max_file_size: aufsteigend nach Größe, d.h.
+			kleinere zuerst
+			<br/>
+			+ sind sowohl Parameter für Größe wie Alter angegeben, dann
+			erfolgt die Sortierung nach Alter
+			<br/>
+			<br/>
+			Es darf nur entweder skip_first_files oder skip_last_files gesetzt
+			sein.
+		</div>
+	</note>
+<note xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<title>number of files to remove from the bottom of the result-set
+		</title>
+		<p>
+			The number of files are removed from the end of the result set
+			by
+			<paramref>min_file_size</paramref>
+			,
+			<paramref>min_file_age</paramref>
+			etc.
+			These files are excluded from
+			further operations.
+		</p>
+		<p>
+			The result set is sorted according to the used constraining
+			parameters:
+			<ul>
+				<li>
+					<paramref>min_file_age</paramref>
+					,
+					<paramref>max_file_age</paramref>
+					: in ascending order by date of last
+					modification, the newest file first.
+				</li>
+				<li>
+					<paramref>min_file_size</paramref>
+					,
+					<paramref>max_file_size</paramref>
+					: in ascending order by file size,
+					the smallest file first.
+				</li>
+				<li>
+					if parameters for file age as well as file size are given the
+					set is sorted by file age.
+						</li>
+			</ul>
+			Only either
+			<paramref>skip_first_files</paramref>
+			or
+			<paramref>skip_last_files</paramref>
+			is allowed to be
+			set at one time.
+		</p>
+	</note>
+</param>
+<param name="count_files" Category="FileHandling, PostProcessing" DataType="SOSOptionBoolean" OptionName="count_files" Alias="DoCountFiles" default_value="false" required="false">
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<title>Anzahl Treffer im Resultat liefern </title>
+		<p>
+			Wenn dieser Parameter auf "
+			<code>true</code>
+			" gesetzt ist, dann wird die Anzahl der kopierten Dateien in
+			dem
+			Order
+			Parameter "
+			<paramref>scheduler_SOSFileOperations_file_count</paramref>
+			" zurückgeliefert.
+		</p>
+	</note>
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<title>Return the size of resultset</title>
+		<p>
+			If this parameter is set true "
+			<code>true</code>
+			" the number of matches
+			is returned in the order parameter "
+			<paramref>scheduler_SOSFileOperations_file_count</paramref>
+			".
+		</p>
+	</note>
+<note language="de">
+<div xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+		<p>
+			Gültige Werte:
+			<em>true, 1, on, yes, y, ja, j</em>
+			und
+			<em>false, 0, off, no, n, nein</em>
+		</p>
+	</div>
+</note>
+<note language="en">
+<p xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+			Valid values:
+			<em>true, 1, on, yes, y, ja, j</em>
+			and
+			<em>false, 0, off, no, n, nein</em>
+	</p>
+</note>
+<note language="en">
+<p xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+            This parameter is valid and available for order driven jobs only.
+            JobChains, for example, are order driven jobs.
+            In standalone jobs this parameter will be ignored without further notice.
+	</p>
+</note>
+<note language="de">
+<p xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+		Der Parameter ist nur dann sinnvoll verwendbar, wenn er in einem Auftrag verwendet wird.
+		Aufträge werden in Job-Ketten benutzt, um die Ausführung der Job-Kette zu starten.
+		In einem "single" Job (standalone job) wird dieser Parameter ohne weiteren Hinweis ignoriert.
+                    </p>
+</note>
+</param>
+<params>
+<param name="create_order" Category="FileSystem, OrderCreation, Resultlist" DataType="SOSOptionBoolean" OptionName="CreateOrder" Alias="" required="false" DefaultValue="false" usewith="create_orders_for_all_files, order_jobchain_name, next_state" default_value="false">
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<title>File-Order erzeugen</title>
+		<p>
+		Mit diesem Parameter wird festgelegt, daß entweder für die erste oder für alle Dateien
+		<paramref>create_orders_for_all_files</paramref>
+		in der Ergebnisliste eine file-order erzeugt wird.
+		</p>
+		<p>
+		
+		</p>
+	</note>
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<title>Activate file-order creation</title>
+		<p>
+		With this parameter it is possible to specify, that for all filenames in the resultlist or
+		for the first file only (see <paramref>create_orders_for_all_files</paramref>)
+		a file-order has to be created and launched.
+		</p>
+		<p>
+		</p>
+	</note>
+<note language="de">
+<div xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+		<p>
+			Gültige Werte:
+			<em>true, 1, on, yes, y, ja, j</em>
+			und
+			<em>false, 0, off, no, n, nein</em>
+		</p>
+	</div>
+</note>
+<note language="en">
+<p xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+			Valid values:
+			<em>true, 1, on, yes, y, ja, j</em>
+			and
+			<em>false, 0, off, no, n, nein</em>
+	</p>
+</note>
+</param>
+<param name="create_orders_for_all_files" Category="FileSystem, OrderCreation, Resultlist" DataType="SOSOptionBoolean" OptionName="CreateOrdersForAllFiles" Alias="" required="false" DefaultValue="false" usewith="create_order, order_jobchain_name, next_state" default_value="false">
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<title>Für jede Datei der Ergebnisliste eine File-Order erstellen</title>
+		<p>
+		</p>
+	</note>
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<title>Create a file-order for every file in the result-list</title>
+		<p>
+		</p>
+	</note>
+<note language="de">
+<div xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+		<p>
+			Gültige Werte:
+			<em>true, 1, on, yes, y, ja, j</em>
+			und
+			<em>false, 0, off, no, n, nein</em>
+		</p>
+	</div>
+</note>
+<note language="en">
+<p xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+			Valid values:
+			<em>true, 1, on, yes, y, ja, j</em>
+			and
+			<em>false, 0, off, no, n, nein</em>
+	</p>
+</note>
+</param>
+<param name="order_jobchain_name" Category="FileSystem, OrderCreation" DataType="SOSOptionString" OptionName="OrderJobchainName" Alias="" required="false" DefaultValue="" usewith="create_order, next_state" since="1.3.11.1090" default_value="">
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<title>Der Name der mit dem Auftrag auszuführenden Jobkette</title>
+		<p>
+		Mit diesem Parameter wird der Name der Jobkette angegeben, die durch den Auftrag gestartet
+		werden soll.
+		</p>
+		<p>
+		Es ist zu beachten, daß der Name der Jobkette inclusive einer eventuell vorhandenen Ordnerstruktur
+		angegeben werden muß.
+		Ist die Jobkette "Test" zum Beispiel nicht direkt im Verzeichnis "live" zu finden, sondern in ""live/sample/FileOperations/"
+		so ist als Name der Jobkette für diesen Parameter ""/sample/FileOperations/Test" anzugeben.
+		</p>
+	</note>
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<title>The name of the jobchain which belongs to the order</title>
+		<p>
+		The name of the jobchain which has to be launched by the order is the value of this parameter.
+		</p>
+		<p>
+		One must take into account, that the name of the jobchain must contain a subfolder structure if the jobchain is not in the folder "live".
+		An example: the jobchain "Test" is located in "live/sample/FileOperations/".
+		The value which has to be specfied is then "/sample/FileOperations/Test".
+		</p>
+	</note>
+</param>
+<param name="next_state" Category="OrderCreation, JobSequenceControl" DataType="SOSOptionJobChainNode" OptionName="NextState" Alias="" required="false" DefaultValue="" usewith="create_order, order_jobchain_name" since="1.3.11.1090" default_value="">
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<title>Der erste auszuführende Job-Knoten einer Job-Kette</title>
+		<p>
+		Soll eine Jobkette nicht mit dem ersten Knoten gestartet werden, so kann der Name des Knotens, mit
+		dem die Ausführung der Jobkette starten soll, als Wert dieses Parameters angegeben werden.
+		</p>
+	</note>
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<title>The first node to execute in a jobchain</title>
+		<p>
+		The name of the node of a jobchain, with which the execution of the chain must be started, is the value
+		of this parameter.
+		
+		</p>
+	</note>
+</param>
+</params>
+<params>
+<param name="on_empty_result_set" Category="JobSequenceControl, ResultSet" DataType="SOSOptionJobChainNode" OptionName="on_empty_result_set" Alias="" default_value="empty" required="false" since="1.3.11.1090" see="expected_size_of_result_set">
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<title>Set next node on empty result set </title>
+		<p>
+			Der nächste auszuführende Knoten (Step, Job) in einer Job-Kette
+			wird mit
+			diesem
+			Parameter angegeben, falls die Ergebnis-Liste
+			(result-set) keine Einträge hat.
+			Dies wird dann geschehen, wenn zum
+			Beispiel keine Dateien mit dem
+			entsprechenden
+			regulären Ausdruck
+			gefunden wurden.
+		</p>
+	</note>
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<title>Set next node on empty result set</title>
+		<p>
+			The next Node (Step, Job) to execute in a JobChain can be set with this
+			parameter.
+			The value of the parameter is a (valid) node-name of the
+			current
+			JobChain.
+			In case of an empty result-set, e.g. due to non
+			existent files, the current job will end without an errors
+			and
+			the
+			JobChain will continue with the name of the node which is given as
+			the value of
+			this parameter.
+		</p>
+	</note>
+</param>
+<param name="expected_size_of_result_set" Category="FileSystem, OrderCreation, Resultlist" DataType="SOSOptionInteger" OptionName="ExpectedSizeOfResultSet" Alias="" required="false" DefaultValue="0" usewith="raise_error_if_result_set_is" default_value="0">
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<title>Erwartete Anzahl Treffer in der Ergebnisliste</title>
+		<p>
+		</p>
+		<p>
+		
+		</p>
+	</note>
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<title>number of expected hits in result-list</title>
+		<p>
+		</p>
+		<p>
+		</p>
+	</note>
+</param>
+<param name="raise_error_if_result_set_is" Category="Resultlist, JobSequenceControl" DataType="SOSOptionRelOp" OptionName="RaiseErrorIfResultSetIs" Alias="" required="false" DefaultValue="0" usewith="expected_size_of_result_set" since="1.3.11.1090" default_value="0">
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<title>Fehler auslösen abhängig von Größe der Ergebnisliste</title> 
+		<p>
+		Mit diesem relativen Parameter wird festgelegt, ob ein Fehler ausgelöst
+		werden soll, falls die Anzahl der Treffer in der Ergebnisliste nicht den Erwartungen
+		entspricht.
+		<p>
+		Ein Beispiel:
+		</p>
+		<p>
+		Nehmen wir an, dass der Parameter "raise_error_if_result_set_is=ne" angegeben wurde und der Parameter
+		"expected_size_of_result_set=1" wurde ebenso gesetzt. 
+		Ist dann die Anzahl der Treffer in der Ergebnisliste ungleich 1, so wird ein Fehler ausgelöst.
+		</p>
+		</p>
+	</note>
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<title>raise error on expected size of result-set</title>
+		<p>
+		With this parameter it is possible to raise an error if the quantity of hits of the
+		result-list is according to the value of this parameter.
+		</p>
+		<p>
+		An example:
+		</p>
+		<p>
+		Assuming, that the parameter "raise_error_if_result_set_is=ne" is defined and the parameter
+		"expected_size_of_result_set=1" is specified as well. If the number of hits is not equal to "1"
+		an error will raised.
+		</p>
+		<p>
+		</p>
+	</note>
+</param>
+<param name="result_list_file" Category="ResultSet" DataType="SOSOptionFileName" OptionName="ResultListFile" Alias="" default_value="empty" required="false" since="1.3.11.1090" see="">
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<title>Dateiname der Ergebnisliste </title>
+		<p>
+		Wenn mit diesem Parameter ein gültiger Dateiname angegeben wurde so wird die
+		Ergebnisliste in dieser Datei gespeichert.
+		</p>
+	</note>
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<title>Name of the result-list file</title>
+		<p>
+		If the value of this parameter specifies a valid filename the result-list will be
+		written to this file.
+		</p>
+	</note>
+</param>
+</params>
+			</params>
+<params id="return_parameter">
+<params>
+<param name="scheduler_file_path" Category="FileOrder" DataType="SOSOptionFileName" OptionName="SchedulerFilePath" Alias="" default_value="empty" required="false" since="1.3.11.1090" see="">
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<title>Zu verarbeitende Datei des Datei-Auftrages</title>
+		<p>
+			Bei der
+			<a href="http://www.sos-berlin.com/doc/de/scheduler.doc/file_orders.xml">
+				Verzeichnisüberwachung mit Dateiaufträgen
+                    </a>
+			wird der Job-Parameter
+			<paramref>scheduler_file_path</paramref>
+			automatisch mit dem Pfad der Datei gesetzt, die
+			den Auftrag ausgelöst hat.
+
+		</p>
+	</note>
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<title>file to process for a file-order</title>
+		<p>
+			Using
+			<a href="http://www.sos-berlin.com/doc/en/scheduler.doc/file_orders.xml">
+				Directory Monitoring with File Orders
+                    </a>
+			the job parameter
+			<paramref>scheduler_file_path</paramref>
+			contains automatically the path of the file that
+			triggered the
+			order.
+		</p>
+	</note>
+</param>
+<param name="scheduler_file_parent" Category="FileOrder" DataType="SOSOptionFileName" OptionName="SchedulerFileParent" Alias="" default_value="empty" required="false" since="1.3.11.1090" see="scheduler_file_path, scheduler_file_name">
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<title>Pfadname der zu verarbeitenden Datei des Datei-Auftrages</title>
+		<p>
+		</p>
+	</note>
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<title>pathanme of the file to process for a file-order</title>
+		<p>
+		</p>
+	</note>
+</param>
+<param name="scheduler_file_name" Category="FileOrder" DataType="SOSOptionFileName" OptionName="SchedulerFileName" Alias="" default_value="empty" required="false" since="1.3.11.1090" see="scheduler_file_path, scheduler_file_parent">
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<title>Name der zu verarbeitenden Datei des Datei-Auftrages</title>
+		<p>
+		</p>
+	</note>
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<title>Name of the file to process for a file-order</title>
+		<p>
+		</p>
+	</note>
+</param>
+</params>
+<params>
+<param name="scheduler_sosfileoperations_resultset" Category="FileHandling Filtering" DataType="SOSOptionstring" OptionName="SOSOptionFileOperationResultSet" Alias="ResultSet" default_value="empty" required="false" usewith="scheduler_sosfileoperations_Resultsetsize, scheduler_sosfileoperations_file_count" since="1.3.11.1090">
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<title>Eine Liste aller Dateinamen</title>
+		<p>
+		</p>
+	</note>
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<title>The result of the operation as a list of items</title>
+		<p>
+		</p>
+	</note>
+</param>
+<param name="scheduler_sosfileoperations_resultsetsize" Category="FileHandling Filtering" DataType="SOSOptionsInteger" OptionName="SOSOptionFileOperationResultSetSize" Alias="ResultSetSize" default_value="empty" required="false" since="1.3.11.1090" see="" usewith="scheduler_sosfileoperations_ResultSet, scheduler_sosfileoperations_FileCount">
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<title>Die Anzahl Elemente in der Ergebnis-Liste</title>
+		<p>
+		</p>
+	</note>
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<title>The amount of hits in the result set of the operation</title>
+		<p>
+		</p>
+	</note>
+</param>
+<param name="scheduler_sosfileoperations_file_count" Category="FileHandling, Filtering" DataType="SOSOptionInteger" OptionName="FileCount" Alias="FileCount" default_value="0" required="false" since="1.3.11.1090" usewith="scheduler_sosfileoperations_Resultsetsize, scheduler_sosfileoperations_ResultSet">
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<title>Liefert die Anzahl Einträge in einem Result-Set</title>
+		<p>
+		</p>
+	</note>
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<title>Return the size of the result set after a file operation</title>
+		<p>
+		</p>
+	</note>
+</param>
+</params>
+<param name="scheduler_sosfileoperations_file_count" Category="FileHandling, Filtering" DataType="SOSOptionInteger" OptionName="FileCount" Alias="FileCount" default_value="0" required="false" since="1.3.11.1090" usewith="scheduler_sosfileoperations_Resultsetsize, scheduler_sosfileoperations_ResultSet">
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<title>Liefert die Anzahl Einträge in einem Result-Set</title>
+		<p>
+		</p>
+	</note>
+<note xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<title>Return the size of the result set after a file operation</title>
+		<p>
+		</p>
+	</note>
+</param>
+            </params>
+<params xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" id="other">
+        </params>
+		</configuration>
+<documentation xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="de">
+		<div xmlns="http://www.w3.org/1999/xhtml">Prüft auf die Existenz einer Datei, eines
+			Verzeichnisses, oder auf bestimmte Dateien innerhalb eines
+			Verzeichnisses.</div>
+	</documentation>
+<documentation xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" language="en">
+		<div xmlns="http://www.w3.org/1999/xhtml">Checks for the existence of a file, a directory or
+			for specific files inside of a directory.</div>
+	</documentation>
+<note language="en">
+<p xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+		This job is creating a result set.
+		A result set contain the names of all files which are selected as
+		specified by the filter criteria.
+		The content of the result set is returned as a parameter, but can be
+		written to a file, too.
+            </p>
+<p xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+            Parameters, which are useful for creating a result-set, are</p>
+<table xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" border="1" cellspacing="0">
+		<tr>
+			<th>ParameterName
+			</th>
+			<th>Title
+			</th>
+		</tr>
+        <tr>
+            <td>
+<paramref>raise_error_if_result_set_is</paramref>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+            <td>
+<paramref>result_list_file</paramref>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+            <td>
+<paramref>expected_size_of_result_set</paramref>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+            <td>
+<paramref>on_empty_result_set</paramref>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+            <td>
+<paramref>scheduler_sosfileoperations_resultset</paramref>
+            </td>
+            <td>
+            </td>
+        </tr>
+        <tr>
+            <td>
+<paramref>scheduler_sosfileoperations_resultsetsize</paramref>
+            </td>
+            <td>
+            </td>
+        </tr>
+	</table>
+</note>
+<note language="de">
+<p xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+				Dieser Job erstellt eine Ergebnisliste.
+				Die Ergebnisliste enthält die Namen aller Dateien die aufgrund des
+				Filterkriteriums ermittelt wurden.
+				Die Ergebnisliste wird als Job-Parameter vom Job geliefert, kann aber
+				auch als Datei erstellt werden.
+        </p>
+</note>
+</description>

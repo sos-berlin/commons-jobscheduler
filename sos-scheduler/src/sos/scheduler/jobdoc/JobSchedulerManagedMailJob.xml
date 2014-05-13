@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="scheduler_job_documentation_v1.1.xsl"?>
+<description xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+  <job order="both" name="JobSchedulerManagedMailJob" title="Send Mails" tasks="unbounded">
+    <script language="java" java_class="sos.scheduler.managed.JobSchedulerManagedMailJob" resource="1" />
+  </job>
+  <releases>
+    <release id="1.0" created="2007-11-16" modified="2007-11-16">
+      <title>Version 1.0</title>
+      <author name="Andreas Liebert" email="andreas.liebert@sos-berlin.com" />
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Initiale Auslieferung</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Initial release</div>
+      </note>
+    </release>
+  </releases>
+  <resources>
+    <file os="all" type="java" file="sos.scheduler.jar" id="1" />
+    <file os="all" type="java" file="sos.net.jar" id="2" />
+    <file os="all" type="java" file="mail.jar" id="3" />
+  </resources>
+  <configuration>
+    <params id="job_parameter">
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Die Parameter des Jobs können als Job- oder Auftragsparameter kommen</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">The parameters for this job may be set as job or order parameters</div>
+      </note>
+      <param name="to" required="true">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Mail Empfänger</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">mail recipient(s)</div>
+        </note>
+      </param>
+      <param name="from" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Absenderadresse</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">mail sender</div>
+        </note>
+      </param>
+      <param name="from_name" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Absendername</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">name of the sender</div>
+        </note>
+      </param>
+      <param name="reply_to" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Antwortadresse</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">reply address</div>
+        </note>
+      </param>
+      <param name="cc" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">cc Empfänger</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">cc recipient(s)</div>
+        </note>
+      </param>
+      <param name="bcc" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">bcc Empfänger</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">bcc recipient(s)</div>
+        </note>
+      </param>
+      <param name="subject" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Betreff der Mail</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">Mail Subject</div>
+        </note>
+      </param>
+      <param name="host" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Host des Mail Servers</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">mail server host</div>
+        </note>
+      </param>
+      <param name="port" required="false" default_value="25">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Port des Mailservers</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">mail server port</div>
+        </note>
+      </param>
+      <param name="smtp_user" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">smtp Benutzername</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">smtp username</div>
+        </note>
+      </param>
+      <param name="smtp_password" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">smtp Benutzer Passwort</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">smtp user password</div>
+        </note>
+      </param>
+      <param name="queue_directory" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Verzeichnis für eingereihte Mails.
+Mails die nicht verschickt werden können landen hier. Der JobScheduler versucht zu einem späteren Zeitpunkt erneut, sie zu verschicken.</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">Mail queue directory.
+Mails which cannot be transferred will be put here. The JobScheduler will later retry to send these mails.</div>
+        </note>
+      </param>
+      <param name="body" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Mail body</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">Mail body</div>
+        </note>
+      </param>
+      <param name="content_type" required="false" default_value="text/plain">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">content_type der Mail (text/plain, text/html...)</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">content_type of the mail (text/plain, text/html...)</div>
+        </note>
+      </param>
+      <param name="encoding" required="false" default_value="7bit">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">encoding der Mail (7bit, Quoted-Printable, Base64)</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">encoding of the mail (7bit, Quoted-Printable, Base64)</div>
+        </note>
+      </param>
+      <param name="charset" required="false" default_value="iso-8859-1">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Zeichensatz der Mail</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">charset of the mail</div>
+        </note>
+      </param>
+      <param name="attachment_content_type" required="false" default_value="application/octet-stream">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">content_type der Attachments (application/octet-stream, application/pdf...)</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">content_type of attachments (application/octet-stream, application/pdf...)</div>
+        </note>
+      </param>
+      <param name="attachment_encoding" required="false" default_value="Base64">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">encoding der Attachments (7bit, Quoted-Printable, Base64)</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">encoding of attachments (7bit, Quoted-Printable, Base64)</div>
+        </note>
+      </param>
+      <param name="attachment_charset" required="false" default_value="iso-8859-1">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Zeichensatz der Attachments</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">charset of attachments</div>
+        </note>
+      </param>
+      <param name="attachment" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Name und Pfad der Attachment(s) (mehrere Attachments werden durch ";" getrennt)</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">Filename and path of the attachment(s) (multiple attachments separated by ";")</div>
+        </note>
+      </param>
+    </params>
+    <payload>
+      <params reference="params" />
+    </payload>
+    <settings>
+      <connection name="scheduler connection">
+        <application name="email">
+          <section name="mail_server" />
+        </application>
+      </connection>
+    </settings>
+  </configuration>
+  <documentation language="de">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      Der Job wird als standalone Lösung oder auftragsgesteuert eingesetzt,
+um Emails via SMTP zu verschicken. Er wird über Auftrags- und/oder Job-Parameter konfiguriert.
+      <br />
+      Die meisten Parameter sind optional und werden mit den Werten aus der Konfiguration des
+JobScheduler gefüllt.
+    </div>
+  </documentation>
+  <documentation language="en">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      This job is used as a standalone solution or triggered by orders
+to send emails. It is configured with order-parameters and/or job-parameters.
+      <br />
+      Most of the parameters are optional and default to the values from the JobScheduler
+configuration.
+    </div>
+  </documentation>
+</description>
+

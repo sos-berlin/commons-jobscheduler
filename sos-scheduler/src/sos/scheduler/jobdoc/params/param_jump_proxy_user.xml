@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="jump_proxy_user"
+       required="false"
+       extends="user">
+        <note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Wert des Parameters enthält den Namen einer Benutzerkennung
+            zur Autorisierung am Proxy Server, wenn die Verbindung zum jump
+            host über einen Proxy hergestellt wird,
+            siehe Parameter <paramref>jump_proxy_host</paramref>.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            The value of this parameter specifies the user account for authentication 
+            by the proxy server should a proxy be used in order to connect to the jump host,
+            see parameter <paramref>jump_proxy_host</paramref>.
+          </div>
+        </note>
+      </param>

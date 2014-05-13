@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 
+     http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd "
+
+    name="create_order" Category="FileSystem, OrderCreation, Resultlist" DataType="SOSOptionBoolean" OptionName="CreateOrder" Alias="" required="false"
+    DefaultValue="false" usewith="create_orders_for_all_files, order_jobchain_name, next_state, merge_order_parameter">
+
+    <note language="de">
+
+        <title>Datei-Auftrag (File-Order) erzeugen</title>
+        <p>
+            Mit diesem Parameter wird festgelegt, daß entweder für die erste oder für alle Dateien
+            (entsprechend des Wertes des Parameters
+            <paramref>create_orders_for_all_files</paramref>
+            )
+            in der Ergebnisliste ein Datei-Auftrag (file-order) dynamisch erzeugt wird.
+        </p>
+        <p>
+
+        </p>
+        <p>
+            Weitere Informationen zu "file-orders" finden Sie unter
+            <a href="http://www.sos-berlin.com/doc/de/scheduler.doc/file_orders.xml">
+                Directory Monitoring with File Orders
+            </a>
+            .
+        </p>
+    </note>
+    <note language="en">
+
+        <title>Activate file-order creation</title>
+        <p>
+            With this parameter it is possible to specify, that for all filenames in the resultlist or
+            for the first file only (see
+            <paramref>create_orders_for_all_files</paramref>
+            )
+            a file-order has to be created and launched.
+        </p>
+        <p>
+        </p>
+
+        <p>
+            For more information on "file-orders" see
+            <a href="http://www.sos-berlin.com/doc/en/scheduler.doc/file_orders.xml">
+                Directory Monitoring with File Orders
+            </a>
+            .
+        </p>
+
+        <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../notes/BooleanValues.xml" parse="xml" />
+    </note>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../notes-de/BooleanValues.xml" parse="xml" />
+
+</param>

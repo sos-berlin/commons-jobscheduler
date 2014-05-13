@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id$ -->
+<params id="job_parameter" xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+
+    xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 
+     http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd "
+
+    category="FileOrderCreation">
+
+    <note language="de">
+        <title>Datei-Auftrags-Erzeugung</title>
+    </note>
+
+    <note language="en">
+        <title>File Order Creation</title>
+    </note>
+    <xi:include href="./param_create_order.xml" parse="xml" />
+    <xi:include href="./param_create_orders_for_all_files.xml" parse="xml" />
+    <xi:include href="./param_order_jobchain_name.xml" parse="xml" />
+    <xi:include href="./param_next_state.xml" parse="xml" />
+    <xi:include href="./param_merge_order_parameter.xml" parse="xml" />
+
+</params>

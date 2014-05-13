@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?xml-stylesheet type="text/xsl" href="scheduler_job_documentation_v1.1.xsl"?>
+<description xmlns:xi="http://www.w3.org/2001/XInclude" xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+    <job order="both" name="SOSCrontabFileConverter" title="Convert a crontab file to JobScheduler objects" tasks="1">
+        <script language="java" java_class="sos.scheduler.cron.SOSCrontabFileConverter" resource="sos.scheduler.jar" />
+    </job>
+    <releases>
+        <release id="1.0" created="2007-09-12" modified="2007-09-12">
+            <title>first release</title>
+            <author name="Andreas Liebert" email="andreas.liebert@sos-berlin.com" />
+        </release>
+        <release id="2.0" created="2012-09-24" modified="2012-09-24">
+            <title>first release</title>
+            <author name="kb" email="kb at sos-berlin.com" />
+        </release>
+    </releases>
+    <resources>
+        <xi:include href="./jars/sos.scheduler.jar.xml" parse="xml" />
+        <xi:include href="./jars/sos.spooler.jar.xml" parse="xml" />
+        <xi:include href="./jars/sos.util.jar.xml" parse="xml" />
+        <file os="all" type="java" file="sos.xml.jar" />
+    </resources>
+    <configuration>
+            <xi:include href="./notes/OrderOrStandAlone.xml" parse="xml" />
+
+        <params id="job_parameter">
+        <!-- created at 24.09.2012 -->
+            <param name="Base_Directory" required="false" default_value="" DataType="SOSOptionFolderName" OptionName="BaseDirectory" Alias="" usewith="" see="create_sub_folder_structure"
+                since="1.3.12.2267">
+                <note language="de">
+                    <title>Base Directory</title>
+                    <xhtml:div>
+                        <p>
+Mit dem Wert dieses Parameter wird ein Verzeichnis-Name festgelegt, der bei der Speicherung der migrierten Objekte
+als Basis-Verzeichnis angewendet werden soll.
+                        </p>
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <title>Base Directory</title>
+                    <xhtml:div>
+                        <p>
+Mit dem Wert dieses Parameter wird ein Verzeichnis-Name festgelegt, der bei der Speicherung der migrierten Objekte
+als Basis-Verzeichnis angewendet werden soll.
+                        </p>
+                    </xhtml:div>
+                </note>
+            </param>
+        <!-- created at 24.09.2012 -->
+            <param name="Create_Sub_Folder_Structure" required="false" default_value="false" DataType="SOSOptionBoolean" Category="" OptionName="CreateSubFolderStructure"
+                Alias="" usewith="" see="base_directory" since="1.3.12.2267">
+                <note language="de">
+                    <title>Create SubFolder Structure</title>
+                    <xhtml:div>
+                        <p>
+Wird der Wert dieses Parameters auf "true" gesetzt, so erzeugt der Konverter Unterverzeichnisse und speichert das
+erzeugte Objekt in einem Unterverzeichnis.
+Der Name des Unterverzeichnis wird analog zur Verzeichnisstruktur des auszuführenden Kommandos oder Skripts verwendet.
+Der Wert des Parameters <paramref>base_directory</paramref> wird zusätzlich verwendet, falls er angegeben wurde.
+                        </p>
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <title>Create SubFolder Structure</title>
+                    <xhtml:div>
+                        <p>
+                        </p>
+                    </xhtml:div>
+                </note>
+                <codeexample>
+                <title language="en">An Example using a subfolder structure</title>
+                <title language="en">Ein Beispiel für ein Unterverzeichnis</title>
+
+                <embeddedExample type="text">
+                00 21 * * 1-5 su - root -c "\${DIR_BIN}/batch/sel_memorybits.sh
+                </embeddedExample>
+                <explanation>
+                <p language="en">
+                The object "sel_memorybits.sh.job.xml" will be stored in the folder "batch".
+                If the parameter <paramref>base_directory</paramref> is set to "prod" then the
+                structure should be "prod/batch/".
+                </p>
+                <p language="de">
+                Das Object "sel_memorybits.sh.job.xml" wird im Unterverzeichnis "batch" angelegt.
+                Wenn der Prameter <paramref>base_directory</paramref> auf den Wert "prod" gesetzt ist, dann
+                das Unterverzeichnis "prod/batch/" gewählt.
+                </p>
+                </explanation>
+                </codeexample>
+            </param>
+        <!-- created at 24.09.2012 -->
+            <param name="Create_Job_Chain_Jobs" required="false" default_value="false" DataType="SOSOptionBoolean" OptionName="CreateJobChainJobs" Alias=""
+                usewith="" see="" since="1.3.12.2267">
+                <note language="de">
+                    <title>Create JobChain Jobs</title>
+                    <xhtml:div>
+                        <p>
+Wird der Wert dieses Parameters auf "true" gesetzt, so werden anstelle von "stand alone" Jobs solche Jobs erzeugt, die in einer Job-Kette
+ablaufen dürfen.
+Zusätzlich wird für jeden Job ein Auftrag sowie eine Job-Kette, die mit dem Auftrag gestartet werden kann, erzeugt.
+                        </p>
+                        <p>
+                        Die Startzeiten der Job-Ketten Jobs werden am Auftrag angegeben.
+                        </p>
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <title>Create JobChain Jobs</title>
+                    <xhtml:div>
+                        <p>
+If the value of this parameter set to "true", so instead of "stand alone" jobs are generated those jobs in a job chain
+allowed to run.
+Additionally generated for each job is an order and a job chain, which can be started with the order.
+                        </p>
+                    </xhtml:div>
+                </note>
+                <examples>
+                <codeexample>
+                <title language="en">An example for a job</title>
+                <title language="de">Ein Beispiel für einen Job</title>
+                <embeddedExample type="xml" >
+                <![CDATA[
+<?xml version="1.0" encoding="iso-8859-1"?>
+<job order="yes" timeout="600"
+     title="Cron Job su - root -c &#34;\${DIR_BIN}/batch/sel_memorybits.sh ">
+   <extensions>
+          <extension xmlns="www.sos-berlin.com/schema/joe">
+            <generator date="2012-09-21 16:50:32" name="CronConverter" vendor="www.sos-berlin.com">
+              <docu>00 21 * * 1-5 su - root -c "\${DIR_BIN}/batch/sel_memorybits.sh </docu>
+            </generator>
+            <comment/>
+          </extension>
+        </extensions>
+   <script language="shell"><![CDATA[
+echo created by CronConverter, at 2012-09-21 16:50:32
+echo mock-mode: su - root -c "\${DIR_BIN}/batch/sel_memorybits.sh
+exit 0
+]]&lt;</script>
+</job>
+                ]]>
+                </embeddedExample>
+                <explanation>
+                <p language="de"></p>
+                <p language="en"></p>
+                </explanation>
+                </codeexample>
+                <codeexample>
+                <title language="en">An example for a job chain</title>
+                <title language="de">Ein Beispiel für eine Job-Kette</title>
+                <embeddedExample type="xml" >
+                <![CDATA[
+<?xml version="1.0" encoding="iso-8859-1"?>
+<job_chain>
+   <extensions>
+          <extension xmlns="www.sos-berlin.com/schema/joe">
+            <generator date="2012-09-21 16:50:32" name="CronConverter" vendor="www.sos-berlin.com">
+              <docu>00 21 * * 1-5 su - root -c "\${DIR_BIN}/batch/sel_memorybits.sh</docu>
+            </generator>
+            <comment/>
+          </extension>
+        </extensions>
+   <job_chain_node error_state="!error" job="sel_memorybits.sh" next_state="success" state="100"/>
+   <job_chain_node state="success"/>
+   <job_chain_node state="!error"/>
+</job_chain>
+                ]]>
+                </embeddedExample>
+                <explanation>
+                <p language="de">
+                Die erzeugte Job-Kette enthält ersteinmal nur einen Job, weil in der crontab keine Abhängigkeiten definiert sind.
+                Weitere Jobs können später, zum Beispiel mit JOE, in die Job-Kette eingefügt werden.
+                </p>
+                <p language="en"></p>
+                </explanation>
+                </codeexample>
+
+                <codeexample>
+                <title language="en">An example for an order</title>
+                <title language="de">Ein Beispiel für einen Auftrag </title>
+                <embeddedExample type="xml" >
+
+                <![CDATA[
+<?xml version="1.0" encoding="iso-8859-1"?>
+<order title="base/batch/sel_memorybits.sh">
+   <extensions>
+          <extension xmlns="www.sos-berlin.com/schema/joe">
+            <generator date="2012-09-21 16:50:32" name="CronConverter" vendor="www.sos-berlin.com">
+              <docu>00 21 * * 1-5 su - root -c "\${DIR_BIN}/batch/sel_memorybits.sh </docu>
+            </generator>
+            <comment/>
+          </extension>
+        </extensions>
+   <run_time>
+          <weekdays>
+            <day day="1">
+              <period single_start="21:00"/>
+            </day>
+            <day day="2">
+              <period single_start="21:00"/>
+            </day>
+            <day day="3">
+              <period single_start="21:00"/>
+            </day>
+            <day day="4">
+              <period single_start="21:00"/>
+            </day>
+            <day day="5">
+              <period single_start="21:00"/>
+            </day>
+          </weekdays>
+        </run_time>
+</order>
+                ]]>
+
+                </embeddedExample>
+                                <explanation>
+                <p language="de">
+                Der Auftrag enthält die Startzeiten, wie diese in der crontab spezifiziert wurden.
+                Der Auftrag ist über seinen Dateinamen mit der Job-Kette verknüpft.
+                </p>
+                <p language="en"></p>
+                </explanation>
+
+                </codeexample>
+                </examples>
+            </param>
+        <!-- created at 24.09.2012 -->
+            <param name="Create_A_Mock" required="false" default_value="false" DataType="SOSOptionBoolean" Category="Mock" OptionName="CreateAMock" Alias=""
+                usewith="Mock_Command" see="Mock_Command" since="1.3.12.2267">
+                <note language="de">
+                    <title>Create A Mock: Die Ausführung der Jobs simulieren</title>
+                    <xhtml:div>
+                        <p>
+Wird der Wert dieses Parameters auf "true" gesetzt, so wird das script-Element des Jobs mit einem anzugebenden Kommando gefüllt.
+Dieses Kommando wird dann bei der Ausführung des Jobs ausgeführt.
+Das in der crontab Datei aufgeführte Kommando wird als Kommentar ebenfalls im script-Element eingefügt.
+                        </p>
+                        <p>
+                        Mit dieser Einstellung kann der Ablauf aller bei der Migration erstellten Objekte simuliert werden.
+                        </p>
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <title>Create A Mock: simulate the job execution</title>
+                    <xhtml:div>
+                        <p>
+If the value of this parameter set to "true", so the script element of the job is filled with a command to be specified.
+The parameter <paramref>mock_command</paramref> has to be used to specify the MOCK-command.
+This command is then executed in the execution of the job, instead of the "real" command.
+The option in the crontab file command is also added as a comment in the script element.
+                        </p>
+                        <p>
+With this setting, the execution of all created objects are simulated (MOCK-mode).
+                        </p>
+                    </xhtml:div>
+                </note>
+            </param>
+            <param name="Mock_Command" required="false" default_value="ping -n 20 localhost" DataType="SOSOptionCommandString" OptionName="MockCommand" Alias="MockCommandString"
+                usewith="Create_A_Mock" see="" since="1.3.12.2267">
+                <note language="de">
+                    <title>Mock Command</title>
+                    <xhtml:div>
+                        <p>
+Mit diesem Parameter wird das im Mock-Modus auszuführende Kommando festgelegt.
+                        </p>
+                    </xhtml:div>
+                </note>
+                <note language="en">
+                    <title>Mock Command</title>
+                    <xhtml:div>
+                        <p>
+With this parameter, the command is defined, which is to be performed in mock mode.
+                        </p>
+                    </xhtml:div>
+                </note>
+            </param>
+            <param name="crontab" required="true" DataType="SOSOptionInFileName" DefaultValue="crontab" Alias="CronTabFileName">
+                <note language="de">
+                    <title>Name der zu konvertierenden crontab Datei</title>
+
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                        <p>
+                            Pfad und Dateiname der crontab Datei, deren Inhalt konvertiert werden soll.
+                        </p>
+                    </div>
+                </note>
+                <note language="en">
+                    <title>Name of a crontab file to convert</title>
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                        <p>
+                            Path and filename of the crontab file which has to be converted.
+                        </p>
+                    </div>
+                </note>
+            </param>
+            <param name="systab" default_value="false" required="false" DataType="SOSOptionBoolean">
+                <note language="de">
+                <title>Typ der crontab Datei definieren</title>
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                        <p>Stellt ein, ob die aktuelle crontab Datei als System crontab oder als User crontab behandelt werden soll.
+                            Mögliche Werte:
+                        </p>
+                        <br />
+                        <ul>
+                            <li>0: User crontab</li>
+                            <li>1: System crontab</li>
+                        </ul>
+                        <br />
+                        <p>Der Default ist 0. Wenn jedoch als crontab Parameter "/etc/crontab" angegeben wird, so ist der
+                            Default 1.
+                        </p>
+                    </div>
+                </note>
+                <note language="en">
+                    <title>Type of crontab file to convert</title>
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                        <p>Sets if the current crontab is a system or user crontab:</p>
+                        <br />
+                        <ul>
+                            <li>0: User crontab</li>
+                            <li>1: System crontab</li>
+                        </ul>
+                        <br />
+                        <p>The default is 0. If parameter crontab is "/etc/crontab" then the default is 1.</p>
+                    </div>
+                </note>
+            </param>
+            <param name="changeuser" required="false">
+                <note language="de">
+                    <title>Kommando zum wechseln des Benutzers</title>
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                        <p>
+                            Wählt das Kommando, um bei Verwendung einer System crontab den User zu wechseln.
+                            Siehe Dokumentation.
+                        </p>
+                    </div>
+                </note>
+                <note language="en">
+                    <title>Command for switch user</title>
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                        <p>
+                            Sets the command to change the user, if a system crontab is converted. See documentation.
+                        </p>
+                    </div>
+                </note>
+            </param>
+            <param name="timeout" default_value="600" required="false">
+                <note language="de">
+                <title>Maximale Laufzeit des Jobs</title>
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                    <p>
+                    Gibt ein timeout (in Sekunden) für die Ausführung der konvertierten jobs an.
+                    </p>
+                    </div>
+                </note>
+                <note language="en">
+                    <title>Maximum runtime of a job</title>
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                    <p>
+                    Sets a timeout (in seconds) for the execution of the converted jobs.
+                    </p>
+                    </div>
+                </note>
+            </param>
+        </params>
+    </configuration>
+    <documentation language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+        <p>
+        Der SOSCrontabFileConverter kann genutzt werden, um eine crontab Datei in die Objekte des JobSchedulers zu migrieren.
+        </p></div>
+    </documentation>
+    <documentation language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+        <p>
+The SOSCrontabFileConverter can be used to migrate a crontab file in the objects of JobScheduler.
+        </p></div>
+    </documentation>
+</description>
+

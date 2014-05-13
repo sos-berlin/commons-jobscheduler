@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- $Id$ -->
+<param
+	xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+	xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 
+    http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd"
+    
+	name="log4jPropertyFileName" required="false" DataType="SOSOptionInFileName"
+	DefaultValue="stdout, global"
+	Category="logging">
+    
+            <indexterm index="log4jPropertyFileName, param" display="false"></indexterm>
+            <indexterm index="param, log4jPropertyFileName" display="false"></indexterm>
+
+	
+	<note language="de">
+		<title>Der Name der Log4J Konfigurationsdatei</title>
+		<div xmlns="http://www.w3.org/1999/xhtml">
+            <indexterm index="log4j, Konfiguration" display="false"></indexterm>
+            <indexterm index="Konfiguration, log4j" display="false"></indexterm>
+		<p>
+			Die Konfiguration des log4j Frameworks wird in dieser Datei definiert.
+			In der Regel gibt es für eine Anwendung eine Standardeinstellung für das Logging.
+            </p>
+			<p>
+			Verwendet eine Anwendung log4j und es ist keine Konfigurationsdatei angegeben, 
+			so wird eine Minimalkonfiguration bei der ersten Verwendung erzeugt.
+			Der Inhalt dieser Konfiguration ist wie folgt:
+			<todo>Beispiel für die Standardkonfiguration einfügen</todo>
+			</p>
+		</div>
+	</note>
+	<note language="en">
+		<title>Name (and Pathname) of a log4j configuration files</title>
+		<div xmlns="http://www.w3.org/1999/xhtml">
+            <indexterm index="log4j, Configuration" display="false"></indexterm>
+            <indexterm index="Configuration, log4j" display="false"></indexterm>
+            <p>
+			The configuration of the log4j framework is defined with this file.
+			Generally there is a standard logging setting for applications.
+            </p>
+			<p>
+			If an application uses log4j and a configuration file has not been specified
+			then a minimal configuration will be generated the first time the application is used.
+			The configuration contains the following:
+			<todo>Add an example standard configuration</todo>
+			</p>
+			<todo>Add general log4j text</todo>
+		</div>
+	</note>
+</param>

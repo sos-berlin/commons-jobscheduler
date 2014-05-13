@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="scheduler_job_documentation.xsl"?>
+<description xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1  
+http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd"
+    xmlns:xi="http://www.w3.org/2001/XInclude">
+    <job name="CopyJob2OrderParameter" title="CopyJob2OrderParameter" order="yes">
+        <script language="java" java_class="sos.scheduler.misc.CopyJob2OrderParameterJSAdapterClass" />
+    </job>
+    <releases>
+        <release id="id" created="2011-11-04" modified="2011-11-04">
+            <author name="kb" email="info@sos-berlin.com" />
+        </release>
+    </releases>
+    <configuration>
+        <xi:include href="./notes-de/OrderOrStandAlone.xml" parse="xml" />
+        <xi:include href="./notes/OrderOrStandAlone.xml" parse="xml" />
+        <xi:include href="./notes/ParameterSubstitution.xml" parse="xml">
+            <xi:fallback>"./notes/ParameterSubstitution.xml" not found</xi:fallback>
+        </xi:include>
+
+
+        <xi:include href="./notes/NodeParameterByStateName.xml" parse="xml">
+            <xi:fallback>"./notes/NodeParameterByStateName.xml" not found</xi:fallback>
+        </xi:include>
+
+        <params id="job_parameter">
+            <note language="de">
+                <div xmlns="http://www.w3.org/1999/xhtml">operation</div>
+            </note>
+            <note language="en">
+                <div xmlns="http://www.w3.org/1999/xhtml">Operation</div>
+            </note>
+            <param name="operation" required="false" default_value="copy" DataType="SOSOptionString" Category="operation" OptionName="operation" Alias=""
+                usewith="" see="" since="1.3.12.2282">
+
+                <indexterm index="operation" display="false"></indexterm>
+
+                <note language="de">
+                    <title>operation</title>
+                    <p>
+                        Der Wert dieses Parameters spezifiziert die auszuführende Operation.
+                    </p>
+                </note>
+                <note language="en">
+                    <title>operation</title>
+                    <xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                        <p>
+                            The value of this parameter specifies the operation to perform.
+                        </p>
+                    </xhtml:div>
+                </note>
+            </param>
+        </params>
+    </configuration>
+    <documentation>
+        <p language="de">
+            Dieser Job überträgt die Parameter eines Jobs (Job-Parameter) in die Parameter des Auftrages.
+        </p>
+        <p language="en">
+            This Job will merge the parameter definitions of the job into the order parameter.
+        </p>
+    </documentation>
+</description>
+

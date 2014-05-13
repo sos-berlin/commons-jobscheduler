@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id$ -->
+<note
+	xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+	xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	language="de">
+                    <p>
+                        Unterstützt Substitution von Masken in Parameterwerten mit
+                        Formatangaben, die mit
+                        <em>[</em>
+                        und
+                        <em>]</em>
+                        geklammert sind.
+                        Folgende Formate werden unterstützt:
+                        <br />
+                        <ul>
+                            <li>
+                                <code>
+                                    [date:
+                                    <em>date format</em>
+                                    ]
+                                </code>
+                                <br />
+                                <em>date format</em>
+                                muss ein gültiger Java Format-String für Datumsangaben sein,
+                                z.B.
+                                <br />
+                                <em>yyyyMMddHHmmss</em>
+                                ,
+                                <em>yyyy-MM-dd.HHmmss</em>
+                                etc.
+                                <br />
+                                Beispiel:
+                                <br />
+                                <code>&lt;param name="target_file"
+                                    value="sample/hello[date:yyyyMMdd].txt" /&gt;</code>
+                                <br />
+                                Am 31.12.2050 enthält der Parameter
+                                <paramref>target_file</paramref>
+                                den Wert
+                                <code>"sample/hello20501231.txt"</code>
+                                .
+                            </li>
+                            <li>
+                                <code>[directory:]</code>
+                                <br />
+                                Wird durch den Verzeichnispfad von
+                                <code>source_file</code>
+                                ersetzt.
+                            </li>
+
+                            <li>
+                                <code>
+                                    [directory:
+                                    <em>index</em>
+                                    ]
+                                </code>
+                                <br />
+                                Wird durch den Verzeichnispfad von
+                                <paramref>source_file</paramref>
+                                bis zu oder ab dem Verzeichnis
+                                <em>index</em>
+                                ersetzt.
+                                <br />
+                                <em>index</em>
+                                kann eine positive Zahl, eine negative Zahl oder 0 sein.
+                                <br />
+                                Beispiel:
+                                <br />
+                                <paramref>source_file</paramref>
+                                ist "aaa/bbb/ccc/ddd/", umfasst also 4 Verzeichnisse
+                                <br />
+                                <code>[directory:2]</code>
+                                liefert "aaa/bbb" zurück.
+                                <br />
+                                <code>[directory:-3]</code>
+                                liefert "bbb/ccc/ddd" zurück.
+                                <br />
+                                <code>[directory:0]</code>
+                                oder
+                                <code>[directory:-0]</code>
+                                liefern immer den kompletten Pfad zurück.
+                                <br />
+                                <code>[directory:5]</code>
+                                oder
+                                <code>[directory:-12]</code>
+                                liefern hier den kompletten Pfad zurück.
+                                <br />
+                            </li>
+                        </ul>
+                    </p>
+</note>

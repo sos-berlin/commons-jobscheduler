@@ -1,0 +1,210 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="scheduler_job_documentation_v1.1.xsl"?>
+<description xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+
+  <job name  = "JobSchedulerManagedStarter"
+       title = "Start Managed Jobs"
+       order = "no"
+       tasks = "1">
+    <script language   = "java"
+            java_class = "sos.scheduler.managed.JobSchedulerManagedStarter"
+            resource   = "1">
+    </script>
+  </job>
+
+  <releases>
+    <release id="1.0" created="2006-05-11" modified="2006-05-11">
+      <title>Version 1.0</title>
+      <author name="Andreas Liebert" email="andreas.liebert@sos-berlin.com"/>
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Initiale Auslieferung</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Initial release</div></note>
+    </release>
+  </releases>
+
+  <resources>
+    <file os="all" type="java" file="sos.scheduler.jar" id="1">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Standard-Job der Auslieferung</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Standard job in distribution</div></note>
+    </file>
+    <file os="all" type="java" file="sos.spooler.jar" id="2">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Klasse Job_Impl</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Class Job_Impl</div></note>
+    </file>
+    <file os="all" type="java" file="sos.util.jar" id="3">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Klasse SOSLogger</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Class SOSLogger</div></note>
+    </file>
+    <file os="all" type="java" file="sos.connection.jar" id="4">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Datenbankverbindungs Klassen</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Database-connection classes</div></note>
+    </file>
+    <file os="all" type="java" file="sos.xml.jar" id="5">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">XML Validierung</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">XML Validation</div></note>
+    </file>
+    <file os="all" type="java" file="xercesImpl.jar" id="6">
+    </file>
+
+    <database required="true">
+      <resource name="SCHEDULER_MANAGED_MODELS" type="table">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Die Tabelle nimmt die Definitionen für Job-Ketten auf und
+            wird mit der Web-Oberfläche der Managed Jobs verwaltet.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This table contains the definitions of job chains and
+            is administered using the Managed Jobs web interface.
+          </div>
+        </note>
+      </resource>
+      <resource name="SCHEDULER_MANAGED_JOBS" type="table">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Die Tabelle nimmt die Definitionen der Jobs auf und
+            wird mit der Web-Oberfläche der Managed Jobs verwaltet.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This table contains the job definitions and
+            is administered using the Managed Jobs web interface.
+          </div>
+        </note>
+      </resource>
+      <resource name="SCHEDULER_MANAGED_ORDERS" type="table">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Die Tabelle nimmt die Definitionen der Aufträge auf und
+            wird mit der Web-Oberfläche der Managed Jobs verwaltet.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This table contains the order definitions and
+            is administered using the Managed Jobs web interface.
+          </div>
+        </note>
+      </resource>
+      <resource name="SETTINGS" type="table">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            In den Settings können optional Monitor-Startscripte konfiguriert sein.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            These settings may contain Monitor startscripts.
+          </div>
+        </note>
+      </resource>
+    </database>
+  </resources>
+
+  <configuration>
+    <params id="job_parameter">
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Job wird von der Web-Oberfläche der Managed Jobs gestartet. Diese
+            setzt die hier angegebenen Parameter.
+        </div>
+      </note>
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            This job is started by the Managed Jobs web interface. The
+            web interface sets these parameters.
+        </div>
+      </note>
+
+      <param name="order" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Gibt die ID eines Auftrags aus der Tabelle SCHEDULER_MANAGED_ORDERS an, der
+            neu initialisiert werden soll.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            The order in the SCHEDULER_MANAGED_ORDERS table with the given ID will be
+            (re-)initialized.
+          </div>
+        </note>
+      </param>
+      <param name="job" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Gibt die ID eines Jobs aus der Tabelle SCHEDULER_MANAGED_JOBS an, der
+            neu initialisiert werden soll. Kann mit dem Parameter "model" zusammen
+            benutzt werden.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            The job in the SCHEDULER_MANAGED_JOBS table with the given ID will be
+            (re-)initialized. May be used in combination with the "model" parameter.
+          </div>
+        </note>
+      </param>
+      <param name="model" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Gibt die ID einer Jobkette aus der Tabelle SCHEDULER_MANAGED_MODELS an, die
+            neu initialisiert werden soll.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            The Job Chain in the SCHEDULER_MANAGED_MODELS table with the given ID will be
+            (re-)initialized.
+          </div>
+        </note>
+      </param>
+      <param name="once" required="false" default_value="no">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Gibt an, ob ein job nach der initialisierung sofort gestartet werden soll.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            If set to "yes" the Managed Job will be started immediately
+            after initialisation.
+          </div>
+        </note>
+      </param>
+      <param name="remove_job_chain" required="false" default_value="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Bei "true" wird die Job Kette vor der initialisierung komplett entfernt.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            If set to "true" the job chain will be removed before initialisation.
+          </div>
+        </note>
+      </param>
+    </params>
+  </configuration>
+
+  <documentation language="de">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      Dieser Job ist eine zentrale Komponente des Managed Jobs Pakets. Er liest Jobs,
+      Jobketten und Aufträge aus der Datenbank und übergibt sie dem Job Scheduler. <br/>
+      Der Job läuft als Startscript beim Start des Job Scheduler und wird später
+      von der Managed Jobs Weboberfläche gestartet.
+    </div>
+  </documentation>
+
+  <documentation language="en">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      This job is a main component of the Managed Jobs package. It reads definitions
+      for jobs, job chains and orders from the database and submits them to the Job
+      Scheduler. <br/>
+      This job is run as a startscript and is executed automatically after a Job Scheduler has been started. 
+      It can also be started later using the Managed Jobs web interface.
+    </div>
+  </documentation>
+</description>

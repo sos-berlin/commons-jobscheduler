@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--$Id$ -->
+<file
+    xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+    xmlns:xi="http://www.w3.org/2001/XInclude" 
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" os="all" type="java"
+    file="com.sos.SOSJobSchedulerModel-*.jar" id="1">
+
+    <note language="de">
+        <p>
+        Die DoxyGen Dokumentation sowie der Quell-Code für dieses Paket ist zu finden unter
+        <a href="http://www.sos-berlin.com/doc/doxygen-docs/SOSJobSchedulerModel/html/index.html">SOSJobSchedulerModel</a>.
+        </p>
+    </note>
+    <note language="en">
+        <p>
+        The doxygen documenation and the source code of this packe can be found at 
+        <a href="http://www.sos-berlin.com/doc/doxygen-docs/SOSJobSchedulerModel/html/index.html">SOSJobSchedulerModel</a>.
+        </p>
+    </note>
+
+</file>

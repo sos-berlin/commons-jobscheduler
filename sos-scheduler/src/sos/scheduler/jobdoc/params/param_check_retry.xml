@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="check_retry"
+       DefaultValue="0"
+       required="false"
+       DataType="SOSOptionInteger">
+        <note language="de">
+				  <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter bestimmt, ob eine Datei mehrfach übertragen werden soll,
+            um zu prüfen, ob die Datei beim Start der Verarbeitung vollständig
+            am FTP/SFTP Server vorhanden war. Dies ist z.B. für Unix Dateisysteme relevant,
+            bei denen Dateien gleichzeitig gelesen und geschrieben werden können.
+            <br/>
+         <br/>
+            Der Parameter veranlasst den Vergleich der Dateigrößen für die aktuelle und die vorhergehende Übertragung
+            und wiederholt bis zu der mit diesem Parameter angebebenen Anzahl die Wiederholungsversuche
+            eine Datei zu übertragen. Stimmen die Dateigrößen aus zwei aufeinanderfolgenden Übertragungen überein, 
+            dann gilt die Datei als korrekt übertragen.
+            <br/>
+         <br/>
+            Mit dem Parameter
+            <paramref>check_interval</paramref>
+            kann das Intervall zwischen
+            zwei Wiederholungsversuchen eine Datei zu übertragen spezifiert werden.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>		
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies whether a file transfer should be repeated
+            in order to ensure that the file was complete when the transfer started.
+            This is relevant for Unix systems that allow read and write access
+            to a file at the same time.
+            <br/>
+         <br/>
+            This parameter causes the size of the current file transfer and of the previous file transfer
+            to be compared
+            and repeats transferring one file up to the number of trials specified by
+            this parameter. Should the file size of both transfers be the same,
+            then it is assumed that the file was complete at the FTP/SFTP server.
+            <br/>
+         <br/>
+            The interval between two trials to transfer a file is configured
+            using the
+            <paramref>check_interval</paramref>
+            parameter.
+          </div>
+        </note>
+      </param>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="ppid"
+       required="false"
+       DataType="SOSOptionProcessID"
+       Alias="ParentProcessID">
+        <note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter wird unter Unix verwendet und - abweichend von anderen Parametern - 
+            i.d.R. bereits im Start Script <code>sosftp.sh</code> eingesetzt.
+            Als Wert wird die Umgebungsvariable <em>$PPID</em> übergeben, die 
+            die Prozessnummer des aktuellen Vaterprozesses (PPID) enthält.
+            <br/>
+         <br/>
+            Diese Prozessnummer wird beim Schreiben einer Historiendatei für jeden Transfer
+            protokolliert (siehe Parameter <paramref>history</paramref>), 
+            um nachvollziehbar zu halten, von welchem Prozess Dateien übertragen wurden.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter is used for Unix systems and - as opposed to other parameters -
+            is usually specified in the start script <code>sosftp.sh</code>.
+            The value of the environment variable <em>$PPID</em> is assigned, that
+            contains the process id of the current parent process (PPID).
+            <br/>
+         <br/>
+            The parent process id is used when writing an entry to a history file for each transfer 
+            (see parameter <paramref>history</paramref>).
+          </div>
+        </note>
+      </param>

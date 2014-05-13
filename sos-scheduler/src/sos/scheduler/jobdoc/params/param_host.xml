@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns:xi="http://www.w3.org/2001/XInclude"
+       xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="host"
+       Category="Connection"
+       DataType="SOSOptionHostName"
+       OptionName="Host" 
+       Alias="HostName"
+       required="true"
+       >
+        <note language="de">
+          <title>Host-Name</title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+		  <p>
+            Der Parameter benennt den Hostnamen (z.B. wilma.sos) oder die IP-Adresse (z.B. IPv4 192.168.0.1) des (FTP, SFTP, SSH, SMTP, etc.) Servers,
+            zu dem eine Verbindung hergestellt werden soll.
+			</p>
+          </div>
+        </note>
+        <note language="en">
+          <title>Host-Name</title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+		  <p>
+                      This parameter specifies the hostname (e.g. wilma.sos) or IP address (e.g. IPv4 192.168.0.1) of the (FTP, SFTP, SSH, SMTP,  etc.) server
+            to which a connection has to be made.
+	</p>
+          </div>
+        </note>
+      </param>

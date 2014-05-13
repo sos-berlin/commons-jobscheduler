@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id$ -->
+<param
+	xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+	xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	name="xml_out_file_name" Category="FileHandling, XML" DataType="SOSOptionOutFileName"
+	OptionName="xml_out_file_name" Alias="XMLOutFileName" default_value=""
+	required="false"
+	>
+
+    <indexterm index="xml_out_file_name, parameter" display="false"></indexterm>
+    <indexterm index="parameter, xml_out_file_name" display="false"></indexterm>
+
+
+	<note language="de">
+		<title>Der Name der XML-Ausgabedatei</title>
+		<p>
+		</p>
+	</note>
+	<note language="en">
+		<title>The name of the xml-output filename</title>
+		<p>
+		</p>
+	</note>
+</param>

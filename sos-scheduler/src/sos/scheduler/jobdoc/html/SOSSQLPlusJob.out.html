@@ -1,0 +1,1984 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+   <head>
+      <meta http-equiv="Content-Style-Type" content="text/css"/>
+      <meta name="author" content="SOS GmbH"/>
+      <meta name="publisher"
+            content="Software- und Organisations- Service GmbH (SOS), Berlin"/>
+      <meta name="copyright"
+            content="Copyright Software- und Organisations- Service GmbH (SOS), Berlin. All rights reserved."/>
+      <title>SOSSQLPlusJob - JITL - JobScheduler Integrated Template Library</title>
+      <style type="text/css">
+
+      body { background-color:#FFFFFF; margin-left:20px; font-family:verdana,arial,sans-serif;font-size:10pt; }
+
+      ul    { margin-top: 0px; margin-bottom: 10px; margin-left: 0; padding-left: 1em;
+              font-weight:300; }
+      li    { margin-bottom: 10px; }
+
+      h1    { font-family:verdana,arial,sans-serif;font-size:10pt; font-weight:600; }
+
+      /* table { width:100%; background-color:#F3F4F4; } dunkler */
+      /* table { width:100%; background-color:#F5FAFA; } heller */
+
+      table.navi {background-color:#FFFFFF }
+
+      table { font-family:verdana,arial,sans-serif;font-size:10pt;
+              width:100%;
+              background-color:#F9FCFC;
+            }
+
+      td {
+        padding: 2px 2px 2px 2px;
+        vertical-align:top; text-align: left;
+        font-family:verdana, arial, sans-serif;font-size:10pt;
+      }
+
+      table.box        { border-width:2px; border-style:solid; border-color:#C0C0C0; }
+      table.boxRelease { border-color:#C0C0C0;
+                         border-left-width:2px;   border-left-style:solid;
+                         border-right-width:2px;  border-right-style:solid;
+                         border-top-width:1px;    border-top-style:none;
+                         border-bottom-width:2px; border-bottom-style:solid;
+                       }
+
+      td.td1     {width:11%; }
+      td.td2     {width:12%; }
+      td.td3     {width:79%; }
+      td.td2_3   {width:87%; }
+
+      td.td31    {width:20%; }
+      td.td32    {width:80%; }
+
+      td.td31_32 {width:100%; }
+
+      table.resource   { background-color:#DCDCDC; }
+
+      th.resource1     { background-color:#F3F4F4;
+                         text-align: left;
+                         font-family:verdana,arial,sans-serif;font-size:10pt;
+                         font-weight:300;
+                         width:20%;
+                       }
+      th.resource2     { background-color:#F3F4F4;
+                         text-align: left;
+                         font-family:verdana,arial,sans-serif;font-size:10pt;
+                         font-weight:300;
+                         width:10%;
+                       }
+      th.resource3     { background-color:#F3F4F4;
+                         text-align: left;
+                         font-family:verdana,arial,sans-serif;font-size:10pt;
+                         font-weight:300;
+                         width:10%;
+                       }
+      th.resource2_3   { background-color:#F3F4F4;
+                         text-align: left;
+                         font-family:verdana,arial,sans-serif;font-size:10pt;
+                         font-weight:300;
+                         width:20%;
+                       }
+      th.resource4     { background-color:#F3F4F4;
+                         text-align: left;
+                         font-family:verdana,arial,sans-serif;font-size:10pt;
+                         font-weight:300;
+                         width:60%;
+                       }
+
+      th.resource5     { background-color:#F3F4F4;
+                         text-align: left;
+                         font-family:verdana,arial,sans-serif;font-size:10pt;
+                         font-weight:300;
+                         width:10%;
+                       }
+
+      td.resource1     { color:#009900;
+                         background-color:#F3F4F4;
+                         width:25%;
+                       }
+      td.resource2     { color:#336699;
+                         background-color:#F3F4F4;
+                         width:10%;
+                       }
+      td.resource3     { color:#336699;
+                         background-color:#F3F4F4;
+                         width:10%;
+                       }
+      td.resource2_3   { color:#336699;
+                         background-color:#F3F4F4;
+                         width:20%;
+                       }
+      td.resource4     { color:#336699;
+                         background-color:#F3F4F4;
+                         width:60%;
+                       }
+
+      table.section   { background-color:#DCDCDC; }
+
+      td.section1     { color:#009900;
+                        background-color:#F3F4F4;
+                        width:20%;
+                      }
+      td.section2     { color:#336699;
+                        font-weight:300;
+                        background-color:#F3F4F4;
+                        width:80%;
+                      }
+
+      .section        {color:#000000; font-weight:600; }                         /* schwarze Schrift, fett */
+      .label          {color:#000000; font-weight:300; }
+      .labelSmall     {color:#000000; font-weight:300; font-size:8pt; }          /* schwarze Schrift */
+      .sourceName     {color:#009900; font-weight:300; }                         /* grüne Schrift */
+      .sourceNameBold {color:#009900; font-weight:600; }                         /* grüne Schrift */
+      .desc           {color:#336699; font-weight:300; }                         /* blaue Schrift */
+
+      .code           {color:#000000; font-weight:300; font-family:"Courier New",sans-serif;font-size:10pt; }      /* Schrift für XML-Code */
+
+      font.section        {color:#000000; font-weight:600; }                      /* schwarze Schrift, fett */
+      font.label          {color:#000000; font-weight:300; }                      /* schwarze Schrift */
+      font.labelSmall     {color:#000000; font-weight:300; font-size:8pt; }       /* schwarze Schrift */
+      font.sourceName     {color:#009900; font-weight:300; }                      /* grüne Schrift */
+      font.sourceNameBold {color:#009900; font-weight:600; }                      /* grüne Schrift */
+      font.desc           {color:#336699; font-weight:300; }                      /* blaue Schrift */
+
+      font.code           {color:#000000; font-weight:300; font-family:"Courier New",sans-serif;font-size:10pt; }      /* Schrift für XML-Code */
+      .tooltip
+       {
+        position:absolute;
+        width:400px; height:120px;
+        display:none;
+        background-color:#FFFFFF;
+        border:1px solid;
+        border-color:#FF6347;
+        color:#000000;
+        font-weight:300
+       }
+
+      /*** LINK Formatierungen ***/
+
+      	a													{ font-weight:600; text-decoration:none; font-size:10pt; }
+
+      /* Links Navigation */
+	      a.navi:link								{ color:#FF9900; font-weight:600; font-size:12pt;}
+	      a.navi:visited						{ color:#FF9900; font-weight:600; font-size:12pt;}
+	      a.navi:hover							{ color:#FFCC00; font-weight:600; font-size:12pt;}
+	      a.navi:active							{ color:#FF6347; font-weight:600; font-size:12pt;}
+
+      /* Links für Sprachumschaltung */
+	      a.lang								    { color:#660066; font-weight:600; font-size:10pt; text-decoration:underline; }
+
+      /* Links im Doku-Text */
+      /*a.doc:link								    { color:#663333; font-weight:300;}
+      	a.doc:visited									{ color:#663333; font-weight:300;} */
+      	a.doc:link								    { color:#FF9900; font-weight:300;}
+      	a.doc:visited									{ color:#CC3300; font-weight:300;}
+      	a.doc:hover										{ color:#FF9900; font-weight:300;}
+      	a.doc:active									{ color:#FF6347; font-weight:300;}
+
+      /* Mail-Verweis */
+      	a.mail    						    { color:#FF9900; font-weight:300;}
+
+    </style>
+      <script type="text/javascript">
+
+  var wmtt = null;
+      document.onmousemove = updateWMTT;
+
+      function updateWMTT(e) {
+    var x = (document.all) ? window.event.x + document.body.scrollLeft : e.pageX;
+    var y = (document.all) ? window.event.y + document.body.scrollTop  : e.pageY;
+        if (wmtt != null) {
+          wmtt.style.left = (x + 20) + "px";
+          wmtt.style.top 	= (y + 20) + "px";
+        }
+      }
+
+      function showWMTT(id) {
+        wmtt = document.getElementById(id);
+        wmtt.style.display = "block"
+       }
+
+      function hideWMTT() {
+        wmtt.style.display = "none";
+      }
+
+      function select_lang( default_lang ) {
+        var lang;
+        if ( !default_lang ) {
+          lang = 'en';
+        } else {
+          lang = default_lang;
+        }
+
+        //if( window.location.hash.search( /(de|en)/ ) != -1 ) lang = window.location.hash.slice(1);
+        if( window.location.hash ) lang = window.location.hash.substr(1,2);
+        switch_lang( lang );
+      }
+
+      function switch_lang( lang ) {
+        /*if ( lang == 'de' ) {
+          document.getElementById('lang_de').style.display = '';
+          document.getElementById('lang_en').style.display = 'none';
+        } else {
+          document.getElementById('lang_en').style.display = '';
+          document.getElementById('lang_de').style.display = 'none';
+        }*/
+        var divs = document.getElementsByTagName('div');
+        for(var i=0; i != divs.length; i++) {
+          var div = divs[i];
+          if(div.id.substr(0,5) == 'lang_') {
+            if(div.id == 'lang_' + lang) {
+              div.style.display = 'block';
+            } else {
+              div.style.display = 'none';
+            }
+          }
+        }
+      }
+
+      function selected_lang_option( select_elem, lang ) {
+        for( var i=0; i != select_elem.options.length; i++ ) {
+           if(select_elem.options[i].value == lang) {
+             select_elem.selectedIndex = i;
+             break;
+           }
+        }
+      }
+
+      function show_div(id, lang) {
+        if(!lang ) lang = 'en';
+        documentation_id = 'documentation_' + lang;
+        firstRelease_id  = 'firstRelease_' + lang;
+        resources_id     = 'resources_' + lang;
+        configuration_id = 'configuration_' + lang;
+        genXML_id        = 'genXML_' + lang;
+
+        try {
+          if ( id == 'all' ) {
+            if ( document.getElementById(documentation_id)) { document.getElementById(documentation_id).style.display  = ''; }
+            if ( document.getElementById(firstRelease_id))  { document.getElementById(firstRelease_id).style.display   = ''; }
+            if ( document.getElementById(resources_id))     { document.getElementById(resources_id).style.display      = ''; }
+            if (document.getElementById(configuration_id))  { document.getElementById(configuration_id).style.display  = ''; }
+            hide_div(genXML_id);
+          } else {
+            switch (id) {
+              case  'documentation':
+                if ( document.getElementById('previousRelease_' + lang) ) { hide_div('previousRelease_' + lang); }
+                hide_div(firstRelease_id);
+                hide_div(resources_id);
+                hide_div(configuration_id);
+                hide_div(genXML_id);
+                if (document.getElementById(documentation_id)) {
+                  document.getElementById(documentation_id).style.display = '';
+                } else {
+                  if ( lang == 'de' ) {
+                    alert( 'Für diesen Job gibt es keine Dokumentation' );
+                  } else {
+                    alert( 'There is no documentation for this job.' );
+                  }
+                }
+                break;
+              case  'firstRelease':
+                hide_div(documentation_id);
+                hide_div(resources_id);
+                hide_div(configuration_id);
+                hide_div(genXML_id);
+                if (document.getElementById(firstRelease_id)) {
+                  document.getElementById(firstRelease_id).style.display = '';
+                } else {
+                  if ( lang == 'de' ) {
+                    alert( 'Für diesen Job gibt es keine Releases.' );
+                  } else {
+                    alert( 'There are no releases for this job.' );
+                  }
+                }
+                break;
+              case  'resources':
+                hide_div(documentation_id);
+                if ( document.getElementById('previousRelease_' + lang) ) { hide_div('previousRelease_' + lang); }
+                hide_div(firstRelease_id);
+                hide_div(configuration_id);
+                hide_div(genXML_id);
+                if (document.getElementById(resources_id)) {
+                  document.getElementById(resources_id).style.display = '';
+                } else {
+                  if ( lang == 'de' ) {
+                    alert( 'Für diesen Job gibt es keine Ressourcen.' );
+                  } else {
+                    alert( 'There are no resources for this job.' );
+                  }
+                }
+                break;
+              case  'configuration':
+                hide_div(documentation_id);
+                if ( document.getElementById('previousRelease_' + lang) ) { hide_div('previousRelease_' + lang); }
+                hide_div(firstRelease_id);
+                hide_div(resources_id);
+                hide_div(genXML_id);
+                if (document.getElementById(configuration_id)) {
+                  document.getElementById(configuration_id).style.display = '';
+                } else {
+                  if ( lang == 'de' ) {
+                    alert( 'Für diesen Job gibt es keine Konfiguration' );
+                  } else {
+                    alert( 'There is no configuration for this job.' );
+                  }
+                }
+                break;
+              case  'genXML':
+                hide_div(documentation_id);
+                if ( document.getElementById('previousRelease_' + lang) ) { hide_div('previousRelease_' + lang); }
+                hide_div(firstRelease_id);
+                hide_div(resources_id);
+                hide_div(configuration_id);
+                document.getElementById(genXML_id).style.display = '';
+                break;
+            }
+          }
+        }
+        catch(x){
+          alert('show_div : '+x.message);
+         }
+      }
+
+      function hide_div( id ) {
+        if ( document.getElementById(id) ) {
+          try {
+            document.getElementById(id).style.display = 'none';
+          }
+          catch(x) {
+            alert('hide_div : '+x.message);
+          }
+        }
+      }
+
+      function showPreviousReleases( lang ) {
+
+        ref = "javascript:hidePreviousReleases('" + lang + "')";
+        if ( lang == "de" ) {
+          linkTxt = 'Nur letztes Release anzeigen';
+        } else {
+          linkTxt = 'Show most recent Release';
+        }
+
+        document.getElementById('previousRelease_' + lang).style.display = '';
+        document.getElementById('releaseLink_' + lang).innerHTML = linkTxt;
+        document.getElementById('releaseLink_' + lang).href = ref;
+      }
+
+      function hidePreviousReleases( lang ) {
+
+        document.getElementById('previousRelease_' + lang).style.display = 'none';
+        ref = "javascript:showPreviousReleases('" + lang + "')";
+        if ( lang == "de" ) {
+          linkTxt = 'Ältere Releases anzeigen';
+        } else {
+          linkTxt = 'Show previous Releases';
+        }
+
+        document.getElementById('releaseLink_' + lang).innerHTML = linkTxt;
+        document.getElementById('releaseLink_' + lang).href = ref;
+      }
+
+      function genXML( lang ) {
+         show_div('genXML',lang);
+      }
+
+      function check_banner_gifs() {
+
+        var gifs = document.getElementsByTagName("img");
+        var gifs_complete = true;
+        var gifs_length   = gifs.length;
+        var i = 0;
+        while( i != gifs_length ) {
+          if( !gifs[i].complete ) {
+            gifs_complete = false;
+            break;
+          }
+          i++;
+        }
+        if( !gifs_complete ) {
+          i = 0;
+          while( i != gifs_length ) {
+
+            try {
+              gifs[i].parentNode.innerHTML = gifs[i].title;
+            }
+            catch(E) { break; }
+          }
+          i++;
+        }
+      }
+
+      </script>
+   </head>
+   <body onload="check_banner_gifs();select_lang('en');">
+      <div id="lang_de">
+         <table class="navi" width="100%">
+            <tr>
+               <td nowrap="nowrap">
+                  <a class="navi" href="#" onclick="show_div('documentation','de');return false;">Dokumentation</a>
+                            |
+                        <a class="navi" href="#" onclick="show_div('firstRelease','de');return false;">Releases</a>
+            |
+          <a class="navi" href="#" onclick="show_div('resources','de');return false;">Ressourcen</a>
+            |
+          <a class="navi" href="#" onclick="show_div('configuration','de');return false;">Konfiguration</a>
+            |
+          <a class="navi" href="#" style="white-space:nowrap;"
+                     onclick="show_div('all','de');return false;">Alles anzeigen</a>
+               </td>
+               <td style="text-align:center">
+                  <a class="navi" href="#" style="white-space:nowrap;"
+                     onclick="genXML('de');return false;">Job generieren</a>  </td>
+               <td style="text-align:right">
+                  <select size="1" id="languages_de" name="languages_de"
+                          onchange="switch_lang(this.value);selected_lang_option(this,'de');">
+                     <option value="de" selected="true">de</option>
+                     <option value="en">en</option>
+                  </select>
+               </td>
+            </tr>
+         </table>
+         <p/>
+         <table class="box" id="documentation_de">
+            <tr>
+               <td class="td1">
+                  <span class="section">Dokumentation</span>
+               </td>
+               <td class="td2"> </td>
+               <td class="td3">
+                  <div>
+                     <p>Der Job führt SQLPlus Skripte aus. 
+               Parameter werden über eine "DEFINE"-Anweisung dem SQLPlus am Anfang des Skripts hinzugefügt.
+            </p>
+                  </div>
+        
+                  <div>
+                     <p>Beispiel: Define-Anweisung, wenn der job den Parameter "foo=bar" hat.
+            <pre>
+DEFINE foo = bar (char)            
+            </pre>
+                     </p>
+                     <p>Beispiel: SQL+ Skript</p>
+                     <pre>
+WHENEVER SQLERROR EXIT SQL.SQLCODE
+WHENEVER OSERROR EXIT FAILURE
+
+column end_date new_value BCY_DATE
+column period new_value PN_YEAR_PERIOD
+column period_prev new_value PN_YEAR_PERIOD_PREV
+
+select '0' as end_date from dual;
+prompt SET end_date IS &amp;BCY_DATE;
+/
+select '0' as period from dual;
+prompt SET period IS &amp;PN_YEAR_PERIOD;
+/
+select '0' as period_prev from dual;
+prompt SET period_prev IS &amp;PN_YEAR_PERIOD_PREV;
+/
+prompt SET end_date IS &amp;BCY_DATE;
+
+prompt SET new_foo IS &amp;foo;
+exit;            
+            </pre>
+                     <p>
+            
+            </p>
+                  </div>
+                  <div>
+                     <p>
+              
+            </p>
+                  </div>
+               </td>
+            </tr>
+         </table>
+         <table class="box" id="job_de">
+            <tr>
+               <td class="td1">
+                  <span class="section">Class</span>
+               </td>
+               <td class="td2">
+                  <span class="label" style="white-space:nowrap;">Name/ Titel</span>
+               </td>
+               <td class="td3">
+                  <span class="sourceNameBold">SOSSQLPlusJob</span>  <span class="desc">Start SQL*Plus client and execute sql*plus programs</span>
+               </td>
+            </tr>
+            <tr>
+               <td class="td1"> </td>
+               <td class="td2">Auftragssteuerung</td>
+               <td class="td3">
+                  <span class="desc">Dieser Job kann durch Aufträge oder durch Job-Starts veranlasst ablaufen.</span>
+               </td>
+            </tr>
+            <tr>
+               <td class="td1"> </td>
+               <td class="td2">Tasks</td>
+               <td class="td3">
+                  <span class="desc">unbounded</span>
+               </td>
+            </tr>
+            <tr>
+               <td class="td1"> </td>
+               <td class="td2">Skript</td>
+               <td class="td3">
+                  <ul>
+                     <li>Sprache: <span class="sourceName">java</span>
+                     </li>
+                     <li>Name der Java-Klasse: <span class="sourceName">sos.scheduler.db.SOSSQLPlusJobJSAdapterClass</span>
+                     </li>
+                     <li>
+                        <a class="doc" onclick="show_div('resources','de');return false;" href="#1">
+                           <span style="font-family:Arial;font-size:12px;">→</span> Ressource: <span class="sourceName"/>
+                        </a>
+                     </li>
+                  </ul>
+               </td>
+            </tr>
+         </table>
+         <table class="box" style="$DisplayStyle" id="configuration_de">
+            <tr>
+               <td class="td1">
+                  <span class="section">Konfiguration</span>
+               </td>
+               <td class="td2"> </td>
+               <td class="td3">
+                  <p>Dieser Job kann einzeln (eingenständig; stand-alone), außerhalb einer Job-Kette, oder auftragsgesteuert
+            als Knoten innerhalb einer Jobkette verwendet
+            werden.
+            Die Parameter werden entsprechend als Job- oder Auftragsparameter von der Implementierung des Jobs
+            interpretiert und verarbeitet.
+        </p>
+                  <p>
+            Ein Job kann eine beliebige Anzahl Parameter haben, die vom JobSchedulder dem Job beim Job-Start an den Job übergeben werden.
+            Parameter werden in der
+            Konfigurationsdatei des Jobs bzw. des Auftrages oder über die entsprechenden API-Methoden definiert und mit Werten versorgt.
+            Parameter sind entweder
+            obligatorisch oder optional.
+            Für einen Parameter kann ein Default-Wert vorgegeben sein. Der gilt dann, wenn der Parameter nicht angegeben wurde. Nicht
+            alle Parameter
+            haben einen Default-Wert.
+        </p>
+                  <p>
+            Auftragsparameter überschreiben gleichnamige Job-Parameter.
+        </p>
+               </td>
+            </tr>
+            <tr>
+               <td class="td1">
+                  <a name="job_parameter_de"/> </td>
+               <td class="td2">Parameter</td>
+               <td class="td3">
+                  <table class="section" cellpadding="0" cellspacing="1">
+                     <tr>
+                        <td class="section1">
+                           <a name="_de"/>
+                           <a name="ignore_ora_messages_de"/>
+                           <span class="sourceName">ignore_ora_messages</span>
+                        </td>
+                        <td class="section2">
+                           <span class="label">Default: ---</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <span class="labelSmall">[optional]</span>
+                        </td>
+                        <td class="section2">Datentyp: SOSOptionStringValueList<span class="desc">
+        in call_notes
+        
+                    <title>ignore_ora_messages</title>
+                              <xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                                 <p>
+Als Wert dieses Parameters sind die Nummern der Oracle Fehlermeldungen, die nicht als Fehler interpretiert werden sollen,
+ durch Semikolon getrennt, zu spezifizieren.
+ Dabei ist der Text "ORA-" nicht anzugeben.
+                        </p>
+                              </xhtml:div>
+                              <p>This parameter is introduced with version 1.3.12.2268</p>
+                           </span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <a name="_de"/>
+                           <a name="ignore_sp2_messages_de"/>
+                           <span class="sourceName">ignore_sp2_messages</span>
+                        </td>
+                        <td class="section2">
+                           <span class="label">Default: ---</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <span class="labelSmall">[optional]</span>
+                        </td>
+                        <td class="section2">Datentyp: SOSOptionStringValueList<span class="desc">
+        in call_notes
+        
+                    <title>Zu ignorierende SQL*Plus Fehler</title>
+                              <xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                                 <p>
+Als Wert dieses Parameters sind die Nummern der SQL*Plus Fehlermeldungen, die nicht als Fehler interpretiert werden sollen,
+ durch Semikolon getrennt, zu spezifizieren.
+ Dabei ist der Text "SP2-" nicht anzugeben.
+                        </p>
+                              </xhtml:div>
+                              <p>This parameter is introduced with version 1.3.12.2268</p>
+                           </span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <a name="_de"/>
+                           <a name="shell_command_de"/>
+                           <span class="sourceName">shell_command</span>
+                        </td>
+                        <td class="section2">
+                           <span class="label">Default: sqlplus.exe</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <span class="labelSmall">[erforderlich]</span>
+                        </td>
+                        <td class="section2">Datentyp: SOSOptionInFileName<span class="desc">
+        in call_notes
+        
+                    <title>Dateiname des SQL*Plus Clients</title>
+                              <xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                                 <p>
+                            Der Wert dieses Parameters spezifiziert den Namen des SQL*Plus Clients, der für die Ausführung
+                            des SQL*Plus Codes verwendet werden soll.
+                        </p>
+                                 <p>
+                            Falls der Pfad-Name, in dem der Client installiert wurde, in der Path-Variablen
+                            enthalten ist, so kann die Angabe des Pfades entfallen.
+                            (Standard für eine Installation ist ${ORACLE_HOME}/bin).
+                        </p>
+                              </xhtml:div>
+                           </span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <a name="_de"/>
+                           <a name="sqlplus_script_file_de"/>
+                           <span class="sourceName">sqlplus_script_file</span>
+                        </td>
+                        <td class="section2">
+                           <span class="label">Default: ---</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <span class="labelSmall">[optional]</span>
+                        </td>
+                        <td class="section2">Datentyp: SOSOptionCommandString<span class="desc">
+                        extdoc erkeannt
+                        langugage = de</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <a name="_de"/>
+                           <a name="db_url_de"/>
+                           <span class="sourceName">db_url</span>
+                        </td>
+                        <td class="section2">
+                           <span class="label">Default: ---</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <span class="labelSmall">[erforderlich]</span>
+                        </td>
+                        <td class="section2">Datentyp: SOSOptionString<span class="desc">
+                        extdoc erkeannt
+                        langugage = de</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <a name="_de"/>
+                           <a name="variable_parser_reg_expr_de"/>
+                           <span class="sourceName">variable_parser_reg_expr</span>
+                        </td>
+                        <td class="section2">
+                           <span class="label">Default: ^SET\\s+([^\\s]+)\\s*IS\\s+(.*)$</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <span class="labelSmall">[optional]</span>
+                        </td>
+                        <td class="section2">Datentyp: SOSOptionRegExp<span class="desc">
+                        extdoc erkeannt
+                        langugage = de</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <a name="_de"/>
+                           <a name="db_user_de"/>
+                           <span class="sourceName">db_user</span>
+                        </td>
+                        <td class="section2">
+                           <span class="label">Default: ---</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <span class="labelSmall">[optional]</span>
+                        </td>
+                        <td class="section2">Datentyp: SOSOptionUserName<span class="desc">
+        in call_notes
+        
+                    <title>Benutzer-ID des Datenbank-Benutzers</title>
+                              <xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                        Datenbank User
+                    </xhtml:div>
+                           </span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <a name="_de"/>
+                           <a name="db_password_de"/>
+                           <span class="sourceName">db_password</span>
+                        </td>
+                        <td class="section2">
+                           <span class="label">Default: ---</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <span class="labelSmall">[optional]</span>
+                        </td>
+                        <td class="section2">Datentyp: SOSOptionPassword<span class="desc">
+        in call_notes
+        
+                    <title>Passwort des Datenbankbennutzers</title>
+                              <xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                        Datenbank Passwort
+                    </xhtml:div>
+                           </span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <a name="_de"/>
+                           <a name="Command_Line_options_de"/>
+                           <span class="sourceName">Command_Line_options</span>
+                        </td>
+                        <td class="section2">
+                           <span class="label">Default: -S -L</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <span class="labelSmall">[optional]</span>
+                        </td>
+                        <td class="section2">Datentyp: SOSOptionString<span class="desc">
+        in call_notes
+        
+                    <title>Command_Line_options</title>
+                              <xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                                 <p>
+                            Die Optionen, die das Verhalten des SQL*Plus Clients steuern, sind als Wert dieser Option anzugeben.
+                        </p>
+                              </xhtml:div>
+                              <p>This parameter is introduced with version 1.3.12.2268</p>
+                           </span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <a name="_de"/>
+                           <a name="include_files_de"/>
+                           <span class="sourceName">include_files</span>
+                        </td>
+                        <td class="section2">
+                           <span class="label">Default: ---</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <span class="labelSmall">[optional]</span>
+                        </td>
+                        <td class="section2">Datentyp: SOSOptionString<span class="desc">
+        in call_notes
+        
+                    <title>IncludeFiles</title>
+                              <xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                                 <p>
+                            Mit diesem Parameter können Code-Fragmente angegeben werden, die zusätzlich zum auszuführenden SQL*Plus Code, ausgeführt werden. Der SQL*Plus Code wird
+                            um den Code dieser Fragmente temporär vor der Ausführung erweitert.
+                            Es sind die Namen der Dateien anzugeben, durch Semikolon getrennt, die die Code-Fragmente enthalten.
+                            Der Inhalt der Dateien wird an den Anfang des SQL*Plus Codes eingefügt.
+                        </p>
+                              </xhtml:div>
+                              <p>This parameter is introduced with version 1.3.12.2268</p>
+                           </span>
+                        </td>
+                     </tr>
+                  </table>
+               </td>
+            </tr>
+            <tr>
+               <td class="td1">
+                  <a name="return_parameter_de"/> </td>
+               <td class="td2">Return Parameter</td>
+               <td class="td3">
+                  <table class="section" cellpadding="0" cellspacing="1">
+                     <tr>
+                        <td class="section1">
+                           <a name="_de"/>
+                           <a name="sql_error_de"/>
+                           <span class="sourceName">sql_error</span>
+                        </td>
+                        <td class="section2">
+                           <span class="label">Default: ---</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <span class="labelSmall">[optional]</span>
+                        </td>
+                        <td class="section2">Datentyp: SOSOptionString<span class="desc">
+        in call_notes
+        
+                    <title>sql_error text</title>
+                              <xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                                 <p>
+                            Kommt es bei der Ausführung des Codes zu einem (oder mehreren) Fehlern, so wird der Fehlertext auf dieser Variablen im Auftrag gespeichert.
+                            Ist kein Fehler aufgetreten so ist der Inhalt der Variablen leer.
+                        </p>
+                              </xhtml:div>
+                              <p>This parameter is introduced with version </p>
+                           </span>
+                        </td>
+                     </tr>
+                  </table>
+               </td>
+            </tr>
+            <tr>
+               <td class="td1">
+                  <a name="other_de"/> </td>
+               <td class="td2">Parameter</td>
+               <td class="td3"/>
+            </tr>
+         </table>
+         <table class="box" style="$DisplayStyle" id="genXML_de">
+            <tr>
+               <td class="td1">
+                  <span class="section">XML</span>
+               </td>
+               <td class="td2_3" colspan="2">Code zur Konfiguration des Jobs<hr/>
+               </td>
+            </tr>
+            <tr>
+               <td class="td1"> </td>
+               <td class="td2_3" colspan="2">
+                  <span class="code">
+      &lt;job
+      <br/>    
+      title = "Start SQL*Plus client and execute sql*plus programs"
+      <br/>    
+      
+          order = "yes"  stop_on_error = "no"
+			  
+      &gt;
+      <br/>
+                     <br/>    
+      &lt;description&gt;
+      <br/>      
+      &lt;include file = "jobs/SOSSQLPlusJob.xml"
+      /&gt;
+      <br/>    
+      &lt;/description&gt;
+      <br/>    
+      <br/>    
+      &lt;params&gt;
+	    <br/>      
+      &lt;param
+      name = "ignore_ora_messages"
+      value = ""
+      /&gt;
+    <br/>      
+      &lt;param
+      name = "ignore_sp2_messages"
+      value = ""
+      /&gt;
+    <br/>      
+      &lt;param
+      name = "shell_command"
+      value = "sqlplus.exe"
+      /&gt;
+    <br/>      
+      &lt;param
+      name = "sqlplus_script_file"
+      value = ""
+      /&gt;
+    <br/>      
+      &lt;param
+      name = "db_url"
+      value = ""
+      /&gt;
+    <br/>      
+      &lt;param
+      name = "variable_parser_reg_expr"
+      value = ""
+      /&gt;
+    <br/>      
+      &lt;param
+      name = "db_user"
+      value = ""
+      /&gt;
+    <br/>      
+      &lt;param
+      name = "db_password"
+      value = ""
+      /&gt;
+    <br/>      
+      &lt;param
+      name = "Command_Line_options"
+      value = "-S -L"
+      /&gt;
+    <br/>      
+      &lt;param
+      name = "include_files"
+      value = ""
+      /&gt;
+    <br/>    
+      &lt;/params&gt;
+      <br/>
+                     <br/>    
+      
+    &lt;script
+    language   = "java"
+    <br/>            
+      java_class = "sos.scheduler.db.SOSSQLPlusJobJSAdapterClass"
+    
+    &gt;
+	  <br/>    
+      
+    &lt;/script&gt;
+	<br/>
+      &lt;/job&gt;
+      </span>
+               </td>
+            </tr>
+         </table>
+         <table class="box" style="$DisplayStyle" id="firstRelease_de">
+            <tr>
+               <td class="td1">
+                  <span class="section">Releases</span>
+               </td>
+               <td class="td2">
+                  <span class="sourceNameBold">1.0</span>
+               </td>
+               <td class="td3">
+                  <span class="desc">Version 1.7</span>
+               </td>
+            </tr>
+            <tr>
+               <td class="td1"/>
+               <td class="td2"/>
+               <td class="td3">
+                  <span class="desc">2012-09-27
+          [
+          letzte Änderung 2012-09-27
+          ]
+        </span>
+               </td>
+            </tr>
+            <tr>
+               <td class="td1"> </td>
+               <td class="td2"/>
+               <td class="td3">
+                  <span class="desc">kb  <a class="mail" href="mailto:kb  sos-berlin.com">kb  sos-berlin.com</a>
+                  </span>
+               </td>
+            </tr>
+            <tr>
+               <td class="td1"> </td>
+               <td class="td2">Kommentar</td>
+               <td class="td3">
+                  <span class="desc">
+        in call_notes
+        
+                <xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml">Initiales Release</xhtml:div>
+                  </span>
+               </td>
+            </tr>
+         </table>
+         <table class="box" style="$DisplayStyle" id="resources_de">
+            <tr>
+               <td class="td1">
+                  <span class="section">Ressourcen</span>
+               </td>
+               <td class="td3">
+                  <table class="resource" cellpadding="0" cellspacing="1">
+                     <tr>
+                        <th class="resource1">Dateiname</th>
+                        <th class="resource2">Typ</th>
+                        <th class="resource3">OS</th>
+                        <th class="resource4">Kommentar</th>
+                        <th class="resource5">Source-Dokumentation</th>
+                     </tr>
+                     <tr>
+                        <td class="resource1">
+                           <span class="sourceName">com.sos.scheduler-*.jar</span>
+                        </td>
+                        <td class="resource2">
+                           <span class="desc">java</span>
+                        </td>
+                        <td class="resource3">
+                           <span class="desc">all</span>
+                        </td>
+                        <td class="resource4">
+        in call_notes
+        
+		<p>
+		</p>
+	                       </td>
+                        <td class="resource5">
+                Source:
+                  <a href="http://www.sos-berlin.com/doc/doxygen-docs/com.sos.scheduler/html/index.html">com.sos.scheduler</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="resource1">
+                           <span class="sourceName">com.sos.spooler-*.jar</span>
+                        </td>
+                        <td class="resource2">
+                           <span class="desc">java</span>
+                        </td>
+                        <td class="resource3">
+                           <span class="desc">all</span>
+                        </td>
+                        <td class="resource4">
+        in call_notes
+        
+		<p>
+		</p>
+	                       </td>
+                     </tr>
+                     <tr>
+                        <td class="resource1">
+                           <span class="sourceName">com.sos.settings-*.jar</span>
+                        </td>
+                        <td class="resource2">
+                           <span class="desc">java</span>
+                        </td>
+                        <td class="resource3">
+                           <span class="desc">all</span>
+                        </td>
+                        <td class="resource4">
+        in call_notes
+        
+        <div>
+                              <p>Klasse SOSProfileSettings
+            </p>
+                           </div>
+                        </td>
+                        <td class="resource5">
+                Source:
+                  <a href="http://www.sos-berlin.com/doc/doxygen-docs/com.sos.settings/html/index.html">com.sos.settings</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="resource1">
+                           <span class="sourceName">com.sos.util-*.jar</span>
+                        </td>
+                        <td class="resource2">
+                           <span class="desc">java</span>
+                        </td>
+                        <td class="resource3">
+                           <span class="desc">all</span>
+                        </td>
+                        <td class="resource4">
+        in call_notes
+        
+                <div>Klassen SOSFile, SOSSchedulerLogger</div>
+                        </td>
+                        <td class="resource5">
+                Source:
+                  <a href="http://www.sos-berlin.com/doc/doxygen-docs/com.sos.util/html/index.html">com.sos.util</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="resource1">
+                           <span class="sourceName">log4j-x.x.x.jar</span>
+                        </td>
+                        <td class="resource2">
+                           <span class="desc">java</span>
+                        </td>
+                        <td class="resource3">
+                           <span class="desc">all</span>
+                        </td>
+                        <td class="resource4">
+        in call_notes
+        
+		<p>
+			Apache log4j wird unter der
+			<a href="http://www.apache.org/licenses/LICENSE-2.0">Apache Lizenz 2.0</a>
+			veröffentlicht und ist open source.
+			Weitere Lizenzen der Apache
+			Software Foundation finden Sie
+			<a href="http://www.apache.org/licenses/">hier</a>
+			.
+		</p>
+		                         <p>
+			Die Dokumentation für dieses Paket ist
+			zu finden unter
+			<a href="http://logging.apache.org/index.html">logging.apache.org</a>
+			.
+		</p>
+		                         <p>
+			Copyright © 2011 The Apache Software Foundation. Licensed under the Apache
+			Software License, Version 2.0.
+	</p>
+                           <p>		
+			Apache Extras Companion for Apache log4j, Apache log4j, Apache, the Apache
+			feather logo, the Apache Logging Services project logo, the log4j
+			logo, and the Built by Maven logo are trademarks of The Apache
+			Software Foundation. Oracle and Java are registered trademarks of
+			Oracle and/or its affiliates. Other names may be trademarks of their
+			respective owners.
+		</p>
+	                       </td>
+                     </tr>
+                     <tr>
+                        <td class="resource1">
+                           <span class="sourceName">com.sos.VirtualFileSystem-*.jar</span>
+                        </td>
+                        <td class="resource2">
+                           <span class="desc">java</span>
+                        </td>
+                        <td class="resource3">
+                           <span class="desc">all</span>
+                        </td>
+                        <td class="resource4">
+        in call_notes
+        
+        <p>
+        </p>
+                        </td>
+                        <td class="resource5">
+                Source:
+                  <a href="http://www.sos-berlin.com/doc/doxygen-docs/com.sos.VirtualFileSystem/html/index.html">com.sos.VirtualFileSystem</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="resource1">
+                           <span class="sourceName">com.sos.JSHelper-*.jar</span>
+                        </td>
+                        <td class="resource2">
+                           <span class="desc">java</span>
+                        </td>
+                        <td class="resource3">
+                           <span class="desc">all</span>
+                        </td>
+                        <td class="resource4">
+        in call_notes
+        
+        <p>
+        </p>
+                        </td>
+                        <td class="resource5">
+                Source:
+                  <a href="http://www.sos-berlin.com/doc/doxygen-docs/JobSchedulerHelper/html/index.html">JobSchedulerHelper</a>
+                        </td>
+                     </tr>
+                  </table>
+               </td>
+            </tr>
+         </table>
+      </div>
+      <div id="lang_en">
+         <table class="navi" width="100%">
+            <tr>
+               <td nowrap="nowrap">
+                  <a class="navi" href="#" onclick="show_div('documentation','en');return false;">Documentation</a>
+                            |
+                        <a class="navi" href="#" onclick="show_div('firstRelease','en');return false;">Releases</a>
+            |
+          <a class="navi" href="#" onclick="show_div('resources','en');return false;">Resources</a>
+            |
+          <a class="navi" href="#" onclick="show_div('configuration','en');return false;">Configuration</a>
+            |
+          <a class="navi" href="#" style="white-space:nowrap;"
+                     onclick="show_div('all','en');return false;">Show all</a>
+               </td>
+               <td style="text-align:center">
+                  <a class="navi" href="#" style="white-space:nowrap;"
+                     onclick="genXML('en');return false;">Generate Job</a>  </td>
+               <td style="text-align:right">
+                  <select size="1" id="languages_en" name="languages_en"
+                          onchange="switch_lang(this.value);selected_lang_option(this,'en');">
+                     <option value="de">de</option>
+                     <option value="en" selected="true">en</option>
+                  </select>
+               </td>
+            </tr>
+         </table>
+         <p/>
+         <table class="box" id="documentation_en">
+            <tr>
+               <td class="td1">
+                  <span class="section">Documentation</span>
+               </td>
+               <td class="td2"> </td>
+               <td class="td3">
+                  <xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                     <p>Der Job führt SQLPlus Skripte aus.
+            </p>
+                  </xhtml:div>
+        
+               </td>
+            </tr>
+         </table>
+         <table class="box" id="job_en">
+            <tr>
+               <td class="td1">
+                  <span class="section">Class</span>
+               </td>
+               <td class="td2">
+                  <span class="label" style="white-space:nowrap;">Name/ Title</span>
+               </td>
+               <td class="td3">
+                  <span class="sourceNameBold">SOSSQLPlusJob</span>  <span class="desc">Start SQL*Plus client and execute sql*plus programs</span>
+               </td>
+            </tr>
+            <tr>
+               <td class="td1"> </td>
+               <td class="td2">Order Control</td>
+               <td class="td3">
+                  <span class="desc">This job is triggered by orders or by standard job starts.</span>
+               </td>
+            </tr>
+            <tr>
+               <td class="td1"> </td>
+               <td class="td2">Tasks</td>
+               <td class="td3">
+                  <span class="desc">unbounded</span>
+               </td>
+            </tr>
+            <tr>
+               <td class="td1"> </td>
+               <td class="td2">Script</td>
+               <td class="td3">
+                  <ul>
+                     <li>Language: <span class="sourceName">java</span>
+                     </li>
+                     <li>Name of Java Class: <span class="sourceName">sos.scheduler.db.SOSSQLPlusJobJSAdapterClass</span>
+                     </li>
+                     <li>
+                        <a class="doc" onclick="show_div('resources','en');return false;" href="#1">
+                           <span style="font-family:Arial;font-size:12px;">→</span> Resource: <span class="sourceName"/>
+                        </a>
+                     </li>
+                  </ul>
+               </td>
+            </tr>
+         </table>
+         <table class="box" style="$DisplayStyle" id="configuration_en">
+            <tr>
+               <td class="td1">
+                  <span class="section">Configuration</span>
+               </td>
+               <td class="td2"> </td>
+               <td class="td3">
+                  <p>
+            This job can be used standalone, as a single job, or as an order driven
+            job in a jobchain as a jobchain node.
+            Parameters are respectively accepted as
+            job- or as order-parameters.
+        </p>
+                  <p>
+            A job can process multiple parameters that are analysed when the job starts.
+            Parameters are defined in the configuration of the job or of the order.
+            Parameters can be submitted by API methods, as well.
+            Parameters are optional or mandatory and may contain default values.
+        </p>
+               </td>
+            </tr>
+            <tr>
+               <td class="td1">
+                  <a name="job_parameter_en"/> </td>
+               <td class="td2">Parameters</td>
+               <td class="td3">
+                  <table class="section" cellpadding="0" cellspacing="1">
+                     <tr>
+                        <td class="section1">
+                           <a name="_en"/>
+                           <a name="ignore_ora_messages_en"/>
+                           <span class="sourceName">ignore_ora_messages</span>
+                        </td>
+                        <td class="section2">
+                           <span class="label">Default: ---</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <span class="labelSmall">[optional]</span>
+                        </td>
+                        <td class="section2">DataType: SOSOptionStringValueList<span class="desc">
+        in call_notes
+        
+                    <title>ignore_ora_messages</title>
+                              <xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                                 <p>
+                        The value of this parameter are the numbers of the Oracle error messages that should not be interpreted as an error to specify.
+                        Multipe error numbers must be separated by a colon (;).
+                        Here the text "ORA-" is not specified.
+                        </p>
+                              </xhtml:div>
+                              <p>This parameter is introduced with version 1.3.12.2268</p>
+                           </span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <a name="_en"/>
+                           <a name="ignore_sp2_messages_en"/>
+                           <span class="sourceName">ignore_sp2_messages</span>
+                        </td>
+                        <td class="section2">
+                           <span class="label">Default: ---</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <span class="labelSmall">[optional]</span>
+                        </td>
+                        <td class="section2">DataType: SOSOptionStringValueList<span class="desc">
+        in call_notes
+        
+                    <title>Ignore SQL*Plus Errors</title>
+                              <xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                                 <p>
+                        The value of this parameter are the numbers of the SQL*Plus error messages that should not be interpreted as an error to specify.
+                        Multipe error numbers must be separated by a colon (;).
+                        Here the text "SP2-" is not specified.
+                        </p>
+                              </xhtml:div>
+                              <p>This parameter is introduced with version 1.3.12.2268</p>
+                           </span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <a name="_en"/>
+                           <a name="shell_command_en"/>
+                           <span class="sourceName">shell_command</span>
+                        </td>
+                        <td class="section2">
+                           <span class="label">Default: sqlplus.exe</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <span class="labelSmall">[required]</span>
+                        </td>
+                        <td class="section2">DataType: SOSOptionInFileName<span class="desc">
+        in call_notes
+        
+                    <title>Name of the SQL*Plus Client executable</title>
+                              <xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                                 <p/>
+                              </xhtml:div>
+                           </span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <a name="_en"/>
+                           <a name="sqlplus_script_file_en"/>
+                           <span class="sourceName">sqlplus_script_file</span>
+                        </td>
+                        <td class="section2">
+                           <span class="label">Default: ---</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <span class="labelSmall">[optional]</span>
+                        </td>
+                        <td class="section2">DataType: SOSOptionCommandString<span class="desc">
+                        extdoc erkeannt
+                        langugage = en
+        <title>SQL*Plus Script</title>
+                              <div>
+                                 <p>The value of the parameter contains one or more lines ot text, which together describe an (SQL*Plus) script.
+                 Alternatively, the name of a file can be specified that contains the script.
+                 </p>
+
+                              </div>
+                           </span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <a name="_en"/>
+                           <a name="db_url_en"/>
+                           <span class="sourceName">db_url</span>
+                        </td>
+                        <td class="section2">
+                           <span class="label">Default: ---</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <span class="labelSmall">[required]</span>
+                        </td>
+                        <td class="section2">DataType: SOSOptionString<span class="desc">
+                        extdoc erkeannt
+                        langugage = en
+		<title>SID of the database connection</title>
+
+		                            <div>
+                                 <p>
+               The database connection is formed with  the parameters db_url, <code>db_user</code> and <code>db_password</code>: db_user/db_password@db_url, e.g.
+        </p>
+                                 <pre>
+               sys/sys_admin@localhost as sysdba
+               
+               scheduler/scheduler@scheduler
+        </pre>
+                              </div>
+                           </span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <a name="_en"/>
+                           <a name="variable_parser_reg_expr_en"/>
+                           <span class="sourceName">variable_parser_reg_expr</span>
+                        </td>
+                        <td class="section2">
+                           <span class="label">Default: ^SET\\s+([^\\s]+)\\s*IS\\s+(.*)$</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <span class="labelSmall">[optional]</span>
+                        </td>
+                        <td class="section2">DataType: SOSOptionRegExp<span class="desc">
+                        extdoc erkeannt
+                        langugage = en
+		    <title>variable_parser_reg_expr</title>
+                              <div>
+                                 <p>Die Ausgabe des SQLPLUS-Skript wird mit dem hier angegebene Ausdruck parsiert und die Treffer als Auftrag-Parameter zu Verfügung gestellt.
+          </p>
+                                 <ul>
+                                    <li>Der reguläre Ausdruck muss zwei Gruppen enthalten.</li>
+                                    <li>Die erste Gruppe bildet die Parameternamen und die zweite die Parameterwerte.</li>
+                                 </ul>
+                                 <p>
+          Der 'prompt'-Befehl im SQL+ liefert die Ausgabe. Hier ein Beispiel:
+          </p>
+
+                                 <p>
+          </p>
+                                 <pre>
+
+Set Echo on
+WHENEVER SQLERROR EXIT SQL.SQLCODE
+WHENEVER OSERROR EXIT FAILURE
+prompt ready;
+prompt foo = bar;
+prompt SET hello IS world;
+exit;
+
+               </pre>
+
+                              </div>
+                           </span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <a name="_en"/>
+                           <a name="db_user_en"/>
+                           <span class="sourceName">db_user</span>
+                        </td>
+                        <td class="section2">
+                           <span class="label">Default: ---</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <span class="labelSmall">[optional]</span>
+                        </td>
+                        <td class="section2">DataType: SOSOptionUserName<span class="desc">
+        in call_notes
+        
+                    <title>User-ID of the database user</title>
+                              <xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                        database user
+                    </xhtml:div>
+                           </span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <a name="_en"/>
+                           <a name="db_password_en"/>
+                           <span class="sourceName">db_password</span>
+                        </td>
+                        <td class="section2">
+                           <span class="label">Default: ---</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <span class="labelSmall">[optional]</span>
+                        </td>
+                        <td class="section2">DataType: SOSOptionPassword<span class="desc">
+        in call_notes
+        
+                    <title>Password of the database user</title>
+                              <xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                        database password
+                    </xhtml:div>
+                           </span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <a name="_en"/>
+                           <a name="Command_Line_options_en"/>
+                           <span class="sourceName">Command_Line_options</span>
+                        </td>
+                        <td class="section2">
+                           <span class="label">Default: -S -L</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <span class="labelSmall">[optional]</span>
+                        </td>
+                        <td class="section2">DataType: SOSOptionString<span class="desc">
+        in call_notes
+        
+                    <title>Command_Line_options</title>
+                              <xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                                 <p>
+                            The value of this parameter contains the options which are available for the SQL*PLUS client on the command-line.
+                        </p>
+                              </xhtml:div>
+                              <p>This parameter is introduced with version 1.3.12.2268</p>
+                           </span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <a name="_en"/>
+                           <a name="include_files_en"/>
+                           <span class="sourceName">include_files</span>
+                        </td>
+                        <td class="section2">
+                           <span class="label">Default: ---</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <span class="labelSmall">[optional]</span>
+                        </td>
+                        <td class="section2">DataType: SOSOptionString<span class="desc">
+        in call_notes
+        
+                    <title>Include Code Fragments</title>
+                              <xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                                 <p>
+                            This parameter can be specified for code fragments, which are additional to execute the SQL*Plus code.
+                            The SQL*Plus code is temporary extendes by these fragments.
+                            You must specify the names of files, separated by a semicolon, which contain the code fragments.
+                            The contents of the files will be temporaryl inserted at the beginning of the SQL*Plus codes.
+                        </p>
+                              </xhtml:div>
+                              <p>This parameter is introduced with version 1.3.12.2268</p>
+                           </span>
+                        </td>
+                     </tr>
+                  </table>
+               </td>
+            </tr>
+            <tr>
+               <td class="td1">
+                  <a name="return_parameter_en"/> </td>
+               <td class="td2">Return Parameters</td>
+               <td class="td3">
+                  <table class="section" cellpadding="0" cellspacing="1">
+                     <tr>
+                        <td class="section1">
+                           <a name="_en"/>
+                           <a name="sql_error_en"/>
+                           <span class="sourceName">sql_error</span>
+                        </td>
+                        <td class="section2">
+                           <span class="label">Default: ---</span>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="section1">
+                           <span class="labelSmall">[optional]</span>
+                        </td>
+                        <td class="section2">DataType: SOSOptionString<span class="desc">
+        in call_notes
+        
+                    <title>sql_error text</title>
+                              <xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                                 <p>
+                            If during the execution of the code one (or more) errors occurs, the error-text will be stored on this variable in the order.
+                            If no error occurs then the contents of the variable will remain empty.
+                        </p>
+                              </xhtml:div>
+                              <p>This parameter is introduced with version </p>
+                           </span>
+                        </td>
+                     </tr>
+                  </table>
+               </td>
+            </tr>
+            <tr>
+               <td class="td1">
+                  <a name="other_en"/> </td>
+               <td class="td2">Parameters</td>
+               <td class="td3"/>
+            </tr>
+         </table>
+         <table class="box" style="$DisplayStyle" id="genXML_en">
+            <tr>
+               <td class="td1">
+                  <span class="section">XML</span>
+               </td>
+               <td class="td2_3" colspan="2">Code to configurate the job<hr/>
+               </td>
+            </tr>
+            <tr>
+               <td class="td1"> </td>
+               <td class="td2_3" colspan="2">
+                  <span class="code">
+      &lt;job
+      <br/>    
+      title = "Start SQL*Plus client and execute sql*plus programs"
+      <br/>    
+      
+          order = "yes"  stop_on_error = "no"
+			  
+      &gt;
+      <br/>
+                     <br/>    
+      &lt;description&gt;
+      <br/>      
+      &lt;include file = "jobs/SOSSQLPlusJob.xml"
+      /&gt;
+      <br/>    
+      &lt;/description&gt;
+      <br/>    
+      <br/>    
+      &lt;params&gt;
+	    <br/>      
+      &lt;param
+      name = "ignore_ora_messages"
+      value = ""
+      /&gt;
+    <br/>      
+      &lt;param
+      name = "ignore_sp2_messages"
+      value = ""
+      /&gt;
+    <br/>      
+      &lt;param
+      name = "shell_command"
+      value = "sqlplus.exe"
+      /&gt;
+    <br/>      
+      &lt;param
+      name = "sqlplus_script_file"
+      value = ""
+      /&gt;
+    <br/>      
+      &lt;param
+      name = "db_url"
+      value = ""
+      /&gt;
+    <br/>      
+      &lt;param
+      name = "variable_parser_reg_expr"
+      value = ""
+      /&gt;
+    <br/>      
+      &lt;param
+      name = "db_user"
+      value = ""
+      /&gt;
+    <br/>      
+      &lt;param
+      name = "db_password"
+      value = ""
+      /&gt;
+    <br/>      
+      &lt;param
+      name = "Command_Line_options"
+      value = "-S -L"
+      /&gt;
+    <br/>      
+      &lt;param
+      name = "include_files"
+      value = ""
+      /&gt;
+    <br/>    
+      &lt;/params&gt;
+      <br/>
+                     <br/>    
+      
+    &lt;script
+    language   = "java"
+    <br/>            
+      java_class = "sos.scheduler.db.SOSSQLPlusJobJSAdapterClass"
+    
+    &gt;
+	  <br/>    
+      
+    &lt;/script&gt;
+	<br/>
+      &lt;/job&gt;
+      </span>
+               </td>
+            </tr>
+         </table>
+         <table class="box" style="$DisplayStyle" id="firstRelease_en">
+            <tr>
+               <td class="td1">
+                  <span class="section">Releases</span>
+               </td>
+               <td class="td2">
+                  <span class="sourceNameBold">1.0</span>
+               </td>
+               <td class="td3">
+                  <span class="desc">Version 1.7</span>
+               </td>
+            </tr>
+            <tr>
+               <td class="td1"/>
+               <td class="td2"/>
+               <td class="td3">
+                  <span class="desc">2012-09-27
+          [
+          Last Changes 2012-09-27
+          ]
+        </span>
+               </td>
+            </tr>
+            <tr>
+               <td class="td1"> </td>
+               <td class="td2"/>
+               <td class="td3">
+                  <span class="desc">kb  <a class="mail" href="mailto:kb  sos-berlin.com">kb  sos-berlin.com</a>
+                  </span>
+               </td>
+            </tr>
+            <tr>
+               <td class="td1"> </td>
+               <td class="td2">Comment</td>
+               <td class="td3">
+                  <span class="desc">
+        in call_notes
+        
+                <xhtml:div xmlns:xhtml="http://www.w3.org/1999/xhtml">Initial Release</xhtml:div>
+                  </span>
+               </td>
+            </tr>
+         </table>
+         <table class="box" style="$DisplayStyle" id="resources_en">
+            <tr>
+               <td class="td1">
+                  <span class="section">Resources</span>
+               </td>
+               <td class="td3">
+                  <table class="resource" cellpadding="0" cellspacing="1">
+                     <tr>
+                        <th class="resource1">Filename</th>
+                        <th class="resource2">Type</th>
+                        <th class="resource3">OS</th>
+                        <th class="resource4">Comment</th>
+                        <th class="resource5">Source documentation</th>
+                     </tr>
+                     <tr>
+                        <td class="resource1">
+                           <span class="sourceName">com.sos.scheduler-*.jar</span>
+                        </td>
+                        <td class="resource2">
+                           <span class="desc">java</span>
+                        </td>
+                        <td class="resource3">
+                           <span class="desc">all</span>
+                        </td>
+                        <td class="resource4">
+        in call_notes
+        
+		<p>
+		</p>
+	                       </td>
+                        <td class="resource5">
+                Source:
+                  <a href="http://www.sos-berlin.com/doc/doxygen-docs/com.sos.scheduler/html/index.html">com.sos.scheduler</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="resource1">
+                           <span class="sourceName">com.sos.spooler-*.jar</span>
+                        </td>
+                        <td class="resource2">
+                           <span class="desc">java</span>
+                        </td>
+                        <td class="resource3">
+                           <span class="desc">all</span>
+                        </td>
+                        <td class="resource4">
+        in call_notes
+        
+		<p>
+		</p>
+	                       </td>
+                     </tr>
+                     <tr>
+                        <td class="resource1">
+                           <span class="sourceName">com.sos.settings-*.jar</span>
+                        </td>
+                        <td class="resource2">
+                           <span class="desc">java</span>
+                        </td>
+                        <td class="resource3">
+                           <span class="desc">all</span>
+                        </td>
+                        <td class="resource4">
+        in call_notes
+        
+        <div>
+                              <p>Class SOSProfileSettings, processing of init-files
+            </p>
+                           </div>
+                        </td>
+                        <td class="resource5">
+                Source:
+                  <a href="http://www.sos-berlin.com/doc/doxygen-docs/com.sos.settings/html/index.html">com.sos.settings</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="resource1">
+                           <span class="sourceName">com.sos.util-*.jar</span>
+                        </td>
+                        <td class="resource2">
+                           <span class="desc">java</span>
+                        </td>
+                        <td class="resource3">
+                           <span class="desc">all</span>
+                        </td>
+                        <td class="resource4">
+        in call_notes
+        
+                <div>Classes SOSFile, SOSSchedulerLogger</div>
+                        </td>
+                        <td class="resource5">
+                Source:
+                  <a href="http://www.sos-berlin.com/doc/doxygen-docs/com.sos.util/html/index.html">com.sos.util</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="resource1">
+                           <span class="sourceName">log4j-x.x.x.jar</span>
+                        </td>
+                        <td class="resource2">
+                           <span class="desc">java</span>
+                        </td>
+                        <td class="resource3">
+                           <span class="desc">all</span>
+                        </td>
+                        <td class="resource4">
+        in call_notes
+        
+        <p>
+            Apache log4j is licenced under the
+            <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a>
+            and is open source.
+            More infos about the licencing model of ASF (Apache
+            Software Foundation) is available 
+            <a href="http://www.apache.org/licenses/">here</a>
+            .
+        </p>
+		                         <p>
+		</p>
+                           <p>
+            Copyright © 2011 The Apache Software Foundation. Licensed under the Apache
+            Software License, Version 2.0.
+    </p>
+                           <p>     
+            Apache Extras Companion for Apache log4j, Apache log4j, Apache, the Apache
+            feather logo, the Apache Logging Services project logo, the log4j
+            logo, and the Built by Maven logo are trademarks of The Apache
+            Software Foundation. Oracle and Java are registered trademarks of
+            Oracle and/or its affiliates. Other names may be trademarks of their
+            respective owners.
+        </p>
+	                       </td>
+                     </tr>
+                     <tr>
+                        <td class="resource1">
+                           <span class="sourceName">com.sos.VirtualFileSystem-*.jar</span>
+                        </td>
+                        <td class="resource2">
+                           <span class="desc">java</span>
+                        </td>
+                        <td class="resource3">
+                           <span class="desc">all</span>
+                        </td>
+                        <td class="resource4">
+        in call_notes
+        
+        <p>
+        </p>
+                        </td>
+                        <td class="resource5">
+                Source:
+                  <a href="http://www.sos-berlin.com/doc/doxygen-docs/com.sos.VirtualFileSystem/html/index.html">com.sos.VirtualFileSystem</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="resource1">
+                           <span class="sourceName">com.sos.JSHelper-*.jar</span>
+                        </td>
+                        <td class="resource2">
+                           <span class="desc">java</span>
+                        </td>
+                        <td class="resource3">
+                           <span class="desc">all</span>
+                        </td>
+                        <td class="resource4">
+        in call_notes
+        
+        <p>
+        </p>
+                        </td>
+                        <td class="resource5">
+                Source:
+                  <a href="http://www.sos-berlin.com/doc/doxygen-docs/JobSchedulerHelper/html/index.html">JobSchedulerHelper</a>
+                        </td>
+                     </tr>
+                  </table>
+               </td>
+            </tr>
+         </table>
+      </div>
+   </body>
+</html>

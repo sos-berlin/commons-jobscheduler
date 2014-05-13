@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id$ -->
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1
+http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd"
+xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xi="http://www.w3.org/2001/XInclude" name="profile" required="false" DataType="SOSOptionString"
+    Alias="SectionName,ProfileName" Category="Configuration"
+    see="settings">
+	       <indexterm index="profile, parameter" display="false"></indexterm>
+    <indexterm index="parameter, profile" display="false"></indexterm>
+	   
+	       <indexterm index="settings, parameter" display="false"></indexterm>
+    <indexterm index="parameter, settings" display="false"></indexterm>
+	   
+	       <indexterm index="ProfileName, parameter" display="false"></indexterm>
+    <indexterm index="parameter, ProfileName" display="false"></indexterm>
+	   
+	       <indexterm index="SectionName, parameter" display="false"></indexterm>
+    <indexterm index="parameter, SectionName" display="false"></indexterm>
+	   
+    <note language="de">
+        <title>Der Name eines auszuführenden Transfer-Profils in der Konfigurationsdatei</title>
+        <p>
+            Bei Verwendung einer Konfigurationsdatei (siehe Parameter
+            <paramref>settings</paramref>)
+            bezeichnet der Wert dieses Parameters einen Abschnitt, d.h. ein Profil, der Konfigurationsdatei.
+            Profile (auch Abschnitte oder Sektionen genannt) enthalten, zeilenweise organisiert,
+            Parameter als Paare aus Namen und Wert und beschreiben insgesamt einen Transfer.
+        </p>
+        <p>
+            An der Kommandozeile wird der Name der Konfigurationsdatei und des zu verwendenden Transfer- Profils wie folgt angegeben:
+        </p>
+        <xi:include href="../examples/JADE/commandline_1.sosdoc" parse="xml">
+            <xi:fallback>"../examples/JADE/commandline_1.sosdoc" not found</xi:fallback>
+        </xi:include>
+    </note>
+    <note language="en">
+        <title>The Name of a Profile-Section to be executed</title>
+<p>
+            If a configuration file is being used (see parameter
+            <paramref>settings</paramref>)
+            then this parameter specifies a name of a section within the configuration file.
+            Such sections, i.e. profiles, specify parameters as pairs of names
+            and values
+            that otherwise would be specified by command line parameters.
+</p>
+<p>
+            At the command line the name of the configuration file and the profile are specified like this:
+</p>
+        <xi:include href="../examples/JADE/commandline_1.sosdoc" parse="xml">
+            <xi:fallback>"../examples/JADE/commandline_1.sosdoc" not found</xi:fallback>
+        </xi:include>
+    </note>
+</param>

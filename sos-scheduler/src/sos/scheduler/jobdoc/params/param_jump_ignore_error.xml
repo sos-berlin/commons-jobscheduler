@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="jump_ignore_error"
+       required="false"
+       DefaultValue="false"
+       DataType="SOSOptionBoolean">
+        <note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Wird der Wert <em>true</em> angegeben, dann werden Fehler bei Ausführung von
+            Kommandos im SSH Server ignoriert, andernfalls werden sie als Fehler gemeldet.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Should the value <em>true</em> be specified, then execution errors caused by
+            commands on the SSH server are ignored. Otherwise such execution errors will be reported.
+          </div>
+        </note>
+      </param>

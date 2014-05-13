@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="scheduler_job_documentation_v1.1.xsl"?>
+<description xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+  <job order="no" name="JobSchedulerCheckUpdates" title="Automatic Update Procedure" tasks="1">
+    <script language="java" java_class="sos.scheduler.job.JobSchedulerCheckUpdates" />
+  </job>
+  <releases>
+    <release id="1.0" created="2006-08-29" modified="2006-08-29">
+      <title>First Release 1.0</title>
+      <author name="Uwe Risse" email="uwe.risse@sos-berlin.com" />
+    </release>
+  </releases>
+  <resources>
+    <file os="all" type="java" file="sos.scheduler.jar">
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Standard-Job der Auslieferung</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Standard job in distribution</div>
+      </note>
+    </file>
+  </resources>
+  <configuration>
+    <params>
+      <param name="webserviceUrl" default_value="www.sos-berlin.com/check_for_update" id="webserviceUrl" required="false" />
+      <param name="product" default_value="scheduler" id="product" required="false" />
+      <param name="ftp_host" default_value="www.sos-berlin.com" id="ftp_host" required="false" />
+      <param name="ftp_port" default_value="21" id="ftp_port" required="false" />
+      <param name="ftp_user" default_value="anonymous" id="ftp_user" required="false" />
+      <param name="ftp_password" id="ftp_password" required="false" />
+      <param name="ftp_transfer_mode" default_value="binary" id="ftp_transfer_mode" required="false" />
+      <param name="ftp_passive_mode" default_value="1" id="ftp_passive_mode" required="false" />
+      <param name="ftp_remote_dir" id="ftp_remote_dir" required="false" />
+      <param name="ftp_local_dir" id="ftp_local_dir" required="false" />
+      <param name="ftp_automatic_download" default_value="1" id="ftp_automatic_download" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Legt fest, ob die erforderlichen Dateien automatisch heruntergeladen werden sollen. Die Dateien werden im Arbeitsverzeichnis des Job Schedulers abgelegt. 
+            Wenn beim Parameter
+            <i>ftp_local_dir</i>
+            ein Verzeichnis angegeben ist, wird dieses verwendet.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Specifies whether to download the required files. 
+            The files will then be saved in the Job Scheduler working directory.
+            Alternatively, another directory can be specified in
+            <i>ftp_local_dir</i>
+            .
+          </div>
+        </note>
+      </param>
+      <param name="ftp_proxy" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Da das Net project java.net.Socket benutzt, müssen die Einstellungen für die Sockets vorgenommen werden. Falls der proxy ein SOCKS4 oder SOCKS5 proxy ist können proxy und proxy_port gesetzt werden.</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">Since the Net project uses java.net.Socket under the covers, you have to set up the Socket settings. If the proxy you are using is a SOCKS4 or SOCKS5 proxy, you can set the proxy and proxy_port.</div>
+        </note>
+      </param>
+      <param name="ftp_proxy_port" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Da das Net project java.net.Socket benutzt, müssen die Einstellungen für die Sockets vorgenommen werden. Falls der proxy ein SOCKS4 oder SOCKS5 proxy ist können proxy und proxy_port gesetzt werden.</div>
+        </note>
+      </param>
+      <param name="http_proxy" required="false" />
+      <param name="http_proxy_port" required="false" />
+    </params>
+    <settings>
+      <profile name="config/.version">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Wenn ein neues Release gefunden wurde, wird das in der Datei
+            <i>config/.version</i>
+            vermerkt. Wenn die
+						Datei heruntergeladen wurde, wird der Ablageort in diese Datei geschrieben.
+            Nach
+						einer Anfrage, bei der ein neues Release gemeldet wurde, enthält die Datei z.B. folgende Einträge:
+            <pre>[scheduler]
+release=1.2.3.8
+new_release=1.2.9
+os_install=windows
+downloaded_file=filename</pre>
+            Wenn das neue Release nicht installiert wird und der Update-Check erneut anläuft, werden keine weiteren e-mails
+						über ein neues Release an den Administrator gesendet. Wenn die Dateien erfolgreich
+						heruntergeladen wurden, dann werden sie nicht wiederholt angefordert.
+						Stattdessen wird ins Protokoll geschrieben:
+            <br />
+            <br />
+            <code>"You already have downloaded a new release, but it is not installed"</code>
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            When a new release exists, then information about this release will be written to the
+            <i>config/.version</i>
+            file.
+            After downloading the file the location will be added to
+            <i>config/.version</i>
+            .
+            Example:
+            <pre>[scheduler]
+release=1.2.3.8
+new_release=1.2.9
+os_install=windows
+downloaded_file=filename</pre>
+            Only one mail will be sent to the administrator.
+						Should a downloaded file not have been installed, then the following line is added to the log file:
+            <br />
+            <br />
+            <code>"You already have received mail about a new release, but the new release has not been installed"</code>
+          </div>
+        </note>
+        <section name="scheduler">
+          <setting name="release" required="false">
+            <note language="de">
+              <div xmlns="http://www.w3.org/1999/xhtml">Das aktuell verwendete Release.</div>
+            </note>
+            <note language="en">
+              <div xmlns="http://www.w3.org/1999/xhtml">The currently used release.</div>
+            </note>
+          </setting>
+          <setting name="new_release" required="false">
+            <note language="de">
+              <div xmlns="http://www.w3.org/1999/xhtml">Die neue Release-Nummer (Release-Nummer der heruntergeladenen Dateien).</div>
+            </note>
+            <note language="en">
+              <div xmlns="http://www.w3.org/1999/xhtml">The new release number.</div>
+            </note>
+          </setting>
+          <setting name="os_install" required="false">
+            <note language="de">
+              <div xmlns="http://www.w3.org/1999/xhtml">Für dieses Betriebssystem werden Aktualierungen heruntergeladen.</div>
+            </note>
+            <note language="en">
+              <div xmlns="http://www.w3.org/1999/xhtml">Updates will be downloaded for this operating system .</div>
+            </note>
+          </setting>
+          <setting name="downloaded_file" required="false">
+            <note language="de">
+              <div xmlns="http://www.w3.org/1999/xhtml">In dieses Verzeichnis wird die Aktualisierung heruntergeladen.</div>
+            </note>
+            <note language="en">
+              <div xmlns="http://www.w3.org/1999/xhtml">The new release will be downloaded to this directory.</div>
+            </note>
+          </setting>
+        </section>
+      </profile>
+    </settings>
+  </configuration>
+  <documentation language="de">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        An der Web-Adresse
+        <i>http://www.sos-berlin.com</i>
+        ist ein Web Service installiert, der Anfragen zum aktuell verfügbaren Release
+				des Job Schedulers entgegennimmt. Liegt ein neueres Release vor, dann wird diese Information
+				dem Aufrufer zurückgeliefert.
+      </p>
+      <p>Mit dem Setup des Job Schedulers wird ein Job ausgeliefert, der einmal wöchentlich eine Anfrage an
+				den Web Service bezüglich neuerer Releases sendet. Liegt ein neues Release vor, dann wird eine
+				entsprechende e-Mail an den Administrator versendet. Wahlweise kann der Job automatisch
+				die erforderlichen Dateien herunterladen.</p>
+      <p>Arbeitsweise</p>
+      <ol>
+        <li>Startet per Voreinstellung einmal wöchentlich</li>
+        <li>Schickt eine Anfrage an den Web Service (synchron)</li>
+        <li>
+          Angaben über das lokale Release werden der Datei
+          <i>/config/.version</i>
+          entnommen
+        </li>
+        <li>
+          Die eMail-Adresse wird der Datei
+          <i>./config/factory.ini</i>
+          entnommen
+        </li>
+        <li>Der Verbindungs-Timeout beträgt 30 Sekunden</li>
+      </ol>
+      <p>
+        Der Job schickt eine Anfrage an den Web Service und wertet die Antwort aus. Der Timeout für den Verbindungsaufbau ist auf 30 Sekunden eingestellt.
+				Wenn der Web Service meldet, dass ein neueres Release vorliegt, dann wird eine entsprechende Meldung an den Administrator versendet, z.B.:
+        <br />
+        <br />
+        <i>A new release of the Job Scheduler is available.
+Your version is: 1.2.3.3
+New version is: 1.2.7
+The update file has been downloaded
+to: /home/sos/scheduler/scheduler_linux_update.tar.gz</i>
+      </p>
+      <p>Wenn eingestellt ist, dass der Job mögliche Aktualisierungen automatisch herunterlädt, wird ein entsprechender FTP-Transfer gestartet.
+				Im Fehlerfall schreibt der Job Warnungen in das Protokoll.</p>
+    </div>
+  </documentation>
+  <documentation language="en">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        A Web Service is available at
+        <code>http://www.sos-berlin.com</code>
+        that responds to requests for the most recent release
+    		of the Job Scheduler. 
+    		Should a release be available that is newer than the locally installed version, 
+    		then this information will be returned to the requesting Job Scheduler.
+      </p>
+      <p>A job is provided with the Job Scheduler installer 
+    		that requests this Web Service once per week.
+    		Should a newer release be available, 
+    		then an e-mail will be sent to the administrator.
+    		If configured, then this job will automatically download the required files.</p>
+      <p>Mode of Operation</p>
+      <ol>
+        <li>Starts once per week (default interval)</li>
+        <li>Sends a synchronous request to the Web Service</li>
+        <li>
+          Details about the local release are obtained from the
+          <code>./config/.version</code>
+          file
+        </li>
+        <li>
+          The e-mail address is provided in the
+          <code>./config/factory.ini</code>
+          file
+        </li>
+        <li>Connection timeout is 30 seconds</li>
+      </ol>
+      <p>
+        This job sends a request to the Web Service and waits for a response. 
+    		The connection timeout is set to 30 seconds.
+    		Should the Web Service response state that a new release is available, 
+    		then a corresponding message is sent to the administrator by mail, e.g.
+        <br />
+        <br />
+        <code>
+          <pre>An new release of the Job Scheduler is available.
+Your version is: 1.2.3.3
+New version is: 1.2.7
+The update file has been downloaded
+to: /home/sos/scheduler/scheduler_linux_update.tar.gz</pre>
+        </code>
+      </p>
+      <p>If this job is configured to automatically download newer releases, 
+    		then the corresponding FTP transfer will be started.
+    		In case of errors this job writes warnings to the Job Scheduler log file.</p>
+    </div>
+  </documentation>
+</description>
+

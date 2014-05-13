@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param
+	xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+	xmlns:xi="http://www.w3.org/2001/XInclude" 
+	xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    
+        xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 
+     http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd "
+    
+	name="create_orders_for_all_files" Category="FileSystem, OrderCreation, Resultlist" DataType="SOSOptionBoolean"
+	OptionName="CreateOrdersForAllFiles" Alias="" required="false" DefaultValue="false"
+	usewith="create_order, order_jobchain_name, next_state"
+	>
+
+	<note xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" language="de">
+		<title>Für jede Datei der Ergebnisliste eine File-Order erstellen</title>
+		<p>
+        Wenn der Wert dieses Parameters "true" ist und der Parameter <paramref>create_orders</paramref> ebenfalls den Wert "true" hat, wird
+        für jeden Dateinamen in der Ergebnisliste eine file-order erzeugt und gestartet.
+		</p>
+        <p>
+        Dieser Parameter ist nur dann relevant, wennd er Parameter<paramref>create_orders</paramref>
+        den Wert "true" hat.
+        </p>
+	</note>
+	<note xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" language="en">
+		<title>Create a file-order for every file in the result-list</title>
+        <p>If this parameter is set to "true", for each file which which is in the result set, a file-order is created and started.
+        </p>
+		<p>
+        This parameter is in effect only if the parameter 
+        <paramref>create_orders</paramref>
+        has the value "true".
+		</p>
+        <p>
+        <codeexample type="text">
+<title language="en">example 1: create a file-order</title>
+<title language="de">example 1: create a file-order</title>
+<embeddedExample type="text">
+    create_orders=true
+    create_orders_for_all_files=true
+</embeddedExample>
+<explanation language="en">
+Whith this example for all files in the result list a file-order will be created.
+</explanation>
+<explanation language="de">
+In diesem Beispiel wird für jede Datei, die in der Ergebnisliste enthalten ist, ein Datei-Auftrag erzeugt.
+</explanation>
+</codeexample>
+</p>
+	</note>
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../notes-de/BooleanValues.xml"
+        parse="xml" />
+    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../notes/BooleanValues.xml"
+        parse="xml" />
+	
+</param>

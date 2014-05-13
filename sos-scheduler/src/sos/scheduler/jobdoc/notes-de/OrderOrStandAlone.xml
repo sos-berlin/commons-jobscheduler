@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<note xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    language="de">
+    <p>Dieser Job kann einzeln (eingenständig; stand-alone), außerhalb einer Job-Kette, oder auftragsgesteuert
+        als Knoten innerhalb einer Jobkette verwendet
+        werden.
+        Die Parameter werden entsprechend als Job- oder Auftragsparameter von der Implementierung des Jobs
+        interpretiert und verarbeitet.
+    </p>
+    <p>
+        Ein Job kann eine beliebige Anzahl Parameter haben, die vom JobSchedulder dem Job beim Job-Start übergeben werden.
+        Parameter werden in der
+        Konfigurationsdatei des Jobs bzw. des Auftrages oder über die entsprechenden API-Methoden definiert und mit Werten versorgt.
+        Parameter sind entweder
+        obligatorisch oder optional.
+        Für einen Parameter kann ein Default-Wert vorgegeben sein. Der gilt dann, wenn der Parameter nicht angegeben wurde. Nicht
+        alle Parameter
+        haben einen Default-Wert.
+    </p>
+    <p>
+        Auftragsparameter überschreiben gleichnamige Job-Parameter.
+    </p>
+</note>

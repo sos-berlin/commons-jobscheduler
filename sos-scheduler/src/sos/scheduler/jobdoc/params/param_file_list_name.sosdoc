@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param
+xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1
+http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd"
+xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    name="file_list_name" Category="FileSystem" DataType="SOSOptionInFileName" OptionName="FileListName" default_value="" required="false" see="file_path;file_spec">
+
+    <indexterm index="file_list_name, parameter" display="false"></indexterm>
+    <indexterm index="parameter, file_list_name" display="false"></indexterm>
+
+    <note language="de">
+        <title>Name einer Datei mit einer Dateiliste</title>
+        <p>
+            Mit diesem Parameter wird der Name einer sequentiellen Datei angegeben.
+            In jedem Satz der Datei wird ein Dateiname erwartet.
+            Die in dieser Datei
+            spezifizierten Dateien werden in genau der Reihenfolge verarbeitet wie
+            sie in der Datei enthalten sind.
+        </p>
+        <p>
+        Ist eine in der Liste angegebene Datei nicht vorhanden so führt dies zu einem Fehler und
+        zu einem abnormalen Ende der Verarbeitung.
+        </p>
+    </note>
+    <note language="en">
+        <title>Name of a file which contains a filelist</title>
+        <p>
+            Each record in this file contains a file name which has to be processed.
+            All files in the filelist will be processed in the the sequence they appear
+            in the file.
+        </p>
+        <p>
+        If a file in the list does not exist the processing will be aborted.
+        </p>
+    </note>
+    <codeexample os="all" type="text">
+        <title language="en">a filelist</title>
+        <title language="de">a filelist</title>
+        <embeddedExample type="text">
+/home/test/abc.de
+/inbound/daily/cde.dat
+/work/hello.world
+        </embeddedExample>
+        <explanation language="de">
+            <p>
+                Die drei oben angegebenen Dateien werden in der Reihenfolge verarbeitet.
+            </p>
+        </explanation>
+        <explanation language="en">
+            <p>
+                The filellist files contains three records.
+                Each record contains a filename which has to be processed.
+            </p>
+        </explanation>
+    </codeexample>
+
+</param>

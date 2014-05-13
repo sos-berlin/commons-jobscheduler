@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+
+<order >
+    <params >
+        <param  name="error_expected" value="no"/>
+
+        <param  name="command_script_file" value="
+-- initialize the variable of out parameters
+WHENEVER SQLERROR EXIT SQL.SQLCODE
+WHENEVER OSERROR EXIT FAILURE
+
+column end_date new_value BCY_DATE
+column period new_value PN_YEAR_PERIOD
+column period_prev new_value PN_YEAR_PERIOD_PREV
+
+select '0' as end_date from dual;
+prompt SET end_date IS &amp;BCY_DATE;
+/
+select '0' as period from dual;
+prompt SET period IS &amp;PN_YEAR_PERIOD;
+/
+select '0' as period_prev from dual;
+prompt SET period_prev IS &amp;PN_YEAR_PERIOD_PREV;
+/
+prompt SET end_date IS &amp;BCY_DATE;
+exit;
+"/>
+
+        <param  name="hw" value="Hello, world!"/>
+
+        <param  name="count" value="4711"/>
+
+        <param  name="select" value="4711"/>
+    </params>
+
+    <run_time  let_run="no">
+        <period  single_start="14:00"/>
+    </run_time>
+</order>

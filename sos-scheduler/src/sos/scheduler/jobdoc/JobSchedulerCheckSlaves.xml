@@ -1,0 +1,212 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="scheduler_job_documentation_v1.1.xsl"?>
+<description xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+
+  <job name  = "JobSchedulerCheckSlaves"
+       title = "Check registered Job Schedulers"
+       order = "no"
+       tasks = "1">
+    <script language   = "java"
+            java_class = "sos.scheduler.job.JobSchedulerCheckSlaves"
+            resource   = "1">
+    </script>
+  </job>
+
+  <releases>
+    <release id="1.0" created="2006-02-20" modified="2006-02-21">
+      <title>Version 1.0</title>
+      <author name="Andreas Liebert" email="andreas.liebert@sos-berlin.com"/>
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Initiale Auslieferung</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Initial release</div></note>
+    </release>
+  </releases>
+
+  <resources>
+    <file os="all" type="java" file="sos.scheduler.jar" id="1">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Standard-Job der Auslieferung</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Standard job in distribution</div></note>
+    </file>
+    <file os="all" type="java" file="sos.spooler.jar" id="2">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Klasse Job_Impl</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Class Job_Impl</div></note>
+    </file>
+    <file os="all" type="java" file="sos.util.jar" id="3">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Klasse SOSFile</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Class SOSFile</div></note>
+    </file>
+    <file os="all" type="java" file="sos.settings.jar" id="4">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Klasse SOSProfileSettings</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Class SOSProfileSettings</div></note>
+    </file>
+    <file os="all" type="java" file="xercesImpl.jar"   id="5"/>
+    <file os="all" type="java" file="xalan.jar"   id="6"/>
+  </resources>
+
+  <configuration>
+    <settings>
+      <profile name="default">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+              Mit dem Parameter <em>delay_after_error</em> können Wiederholungsintervalle
+              für den Fehlerfall gesetzt werden (siehe Beispiel).
+            <p>
+              Beispiel für Parameterangaben in der Konfigurationsatei <code>factory.ini</code>:
+              <br/><br/>
+              <code>
+                [job scheduler_check_slaves]
+                <br/>
+                slave_1 &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; = localhost:4445
+                <br/>
+                warn_if_not_connected&#160; = true
+                <br/>
+                warn_if_not_registered = true
+                <br/>
+                check_jobs &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; = true
+                <br/>
+                ;delay processing after error: &lt;number of errors&gt;:&lt;delay interval in seconds or stop&gt;;...
+                <br/>
+                delay_after_error = 1:60;5:600;10:1800;20:3600;60:stop
+              </code>
+            </p>
+            <p>
+              <em>delay_after_error</em> ist wie folgt zu interpretieren:
+              nach dem ersten Fehler je 60s warten, ab dem fünften Fehler
+              je 600s warten ... nach dem 60. Fehler den Job stoppen.
+            </p>
+          </div>
+        </note>
+
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+              The intervals to be waited in the event of an error can be
+              configured with the <em>delay_after_error</em> parameter in the job profile (see example).
+            <p>
+              Example for parameters in the <code>factory.ini</code> configuration file:
+              <br/><br/>
+              <code>
+                [job scheduler_check_slaves]
+                <br/>
+                slave_1 &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; = localhost:4445
+                <br/>
+                warn_if_not_connected&#160; = true
+                <br/>
+                warn_if_not_registered = true
+                <br/>
+                check_jobs &#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; = true
+                <br/>
+                ;delay processing after error: &lt;number of errors&gt;:&lt;delay interval in seconds or stop&gt;;...
+                <br/>
+                delay_after_error = 1:60;5:600;10:1800;20:3600;60:stop
+              </code>
+            </p>
+            <p>
+              The meaning of the <em>delay_after_error</em> parameter in the example is: 
+              wait 60s per retry after the first error,
+              wait 600s per retry after the fifth error ... 
+              stop the job after 60 errors.
+            </p>
+          </div>
+        </note>
+
+        <section name="Job Section">
+          <setting name="slave_1" default_value="" type="string" required="false">
+            <note language="de">
+              <div xmlns="http://www.w3.org/1999/xhtml">
+                Der Parameter bestimmt den zu überprüfenden Job Scheduler. Werte müssen in der Form <em>host</em>:<em>port</em>
+                angegeben werden. Wenn Sie diesen Parameter nicht angeben, dann wird die Liste der registrierten Job Scheduler Slaves
+                vom Job Scheduler Master abgerufen.
+                <br/><br/>
+                Das Suffix des Parameternamens kann aufsteigend iteriert angegeben werden, <code>slave_1, slave_2, ..., slave_<em>n</em></code>,
+                um mehrere Job Scheduler auf unterschiedlichen Hosts und/oder Ports zu prüfen.
+              </div>
+            </note>
+            <note language="en">
+              <div xmlns="http://www.w3.org/1999/xhtml">
+                This parameter specifies the Job Scheduler that is to be checked. 
+                Values must given in the form <em>host</em>:<em>port</em>.
+                Should this parameter not be specified then the list of registered Slave Job Schedulers is obtained from the
+                Master Job Scheduler.
+                <br/><br/>
+                Should more than one Job Scheduler be checked then the parameter name suffixes should be consecutively numbered
+                i.e. 
+                <code>slave_1, slave_2, ..., slave_<em>n</em></code> without gaps.
+                This allows a number of Job Schedulers to be checked on differerent hosts and/or ports.
+              </div>
+            </note>
+          </setting>
+          <setting name="warn_if_not_connected" default_value="true" type="boolean" required="false">
+            <note language="de">
+              <div xmlns="http://www.w3.org/1999/xhtml">
+                Der Parameter vereinbart, dass eine Warnung per eMail versendete wird, wenn ein Job Scheduler Slave nicht verbunden ist.
+              </div>
+            </note>
+            <note language="en">
+              <div xmlns="http://www.w3.org/1999/xhtml">
+                This parameter specifies that a warning will be sent by mail should a Slave Job Scheduler not be connected.
+              </div>
+            </note>
+          </setting>
+          <setting name="warn_if_not_registered" default_value="true" type="boolean" required="false">
+            <note language="de">
+              <div xmlns="http://www.w3.org/1999/xhtml">
+                Der Parameter vereinbart, dass eine Warnung per eMail versendete wird, wenn ein Slave Job Scheduler nicht registriert ist.
+              </div>
+            </note>
+            <note language="en">
+              <div xmlns="http://www.w3.org/1999/xhtml">
+                This parameter specifies that a warning will be sent by mail should a Slave Job Scheduler not be registered.
+              </div>
+            </note>
+          </setting>
+          <setting name="check_jobs" default_value="true" type="boolean" required="false">
+            <note language="de">
+              <div xmlns="http://www.w3.org/1999/xhtml">
+                Der Parameter vereinbart, dass alle Jobs des verbundenen Job Scheduler Slaves auf Fehlermeldungen geprüft werden.
+              </div>
+            </note>
+            <note language="en">
+              <div xmlns="http://www.w3.org/1999/xhtml">
+                This parameter specifies whether all jobs from connected Slave Job Schedulers are to be checked for error messages.
+              </div>
+            </note>
+          </setting>
+        </section>
+      </profile>
+    </settings>
+  </configuration>
+
+  <documentation language="de">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      Mehrere Job Scheduler können von einem Job Scheduler Master überwacht werden, wenn in ihrer Konfigurationsdatei <code>scheduler.xml</code>
+      das Attribut <code>&lt;config main_scheduler="masterhost:4444"&gt;</code> gesetzt ist.
+      <em>masterhost</em> ist in diesem Beispiel der Hostname und <em>4444</em> der Port, auf dem der Job Scheduler Master betrieben wird.
+      Diese Job Scheduler Slaves versuchen sich am Job Scheduler Master anzumelden und alle 60s ein Signal (Heartbeat) zu senden.
+      Heartbeats werden nicht blockierend als UDP Datagramme verschickt.
+      <br/><br/>
+      Wenn sich ein Job Scheduler Slave das erste Mal am Job Scheduler Master anmeldet, dann gilt er als registriert.
+      Diese Information wird vom Job Scheduler Master gespeichert, selbst wenn der Job Scheduler Slave sich später beendet.
+      Ein registrierter Job Scheduler Slave, der keinen regelmäßigen Heartbeat sendet, gilt als nicht verbunden.
+      <br/><br/>
+      Sie können den Job einsetzen, wenn Sie mehrere Job Scheduler betreiben und Warnungen per eMail erhalten möchten,
+      falls sich ein Job Scheduler nicht registriert hat, nicht verbunden ist oder sich in anderer Weise beendet hat.
+    </div>
+  </documentation>
+
+  <documentation language="en">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      Multiple Slave Job Schedulers can be checked by a Master Job Scheduler if the slaves are configured with
+      <code>&lt;config main_scheduler="masterhost:4444"&gt;</code> in their <code>scheduler.xml</code> file. 
+      In this case <em>masterhost</em> would be the host name and <em>4444</em>
+      the port on which the Master Job Scheduler is operating. 
+      These Slave Job Schedulers will try to connect to the Master Job Scheduler and will repeat sending a heartbeat every 60s. 
+      Heartbeats are sent without blocking as UDP datagrams.
+      <br/><br/>
+      If a Slave Job Scheduler connects for the first time to the Job Scheduler Master then it is registered. 
+      This information is kept in the Job Scheduler Master even after the Job Scheduler Slave has terminated. 
+      If a registered Job Scheduler Slave does not repeatedly send heartbeats then it is treated as being disconnected.
+      <br/><br/>
+      This job should be used when multiple Job Schedulers are being run and it is necessary that a responsible person is notified 
+      - by e-mail - should one of them not register, not be connected or otherwise have been terminated.
+    </div>
+  </documentation>
+</description>

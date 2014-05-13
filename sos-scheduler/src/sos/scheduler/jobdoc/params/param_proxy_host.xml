@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       name="proxy_host"
+       required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Wert des Parameters ist der Hostname oder die IP-Adresse eines Proxies, 
+            über den die Verbindung zum SSH Server hergestellt wird.
+            Die Verwendung von Proxies ist optional.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            The value of this parameter is the host name or the IP address of a 
+            proxy used to create the connection to the SSH server. 
+            The use of a proxy is optional.
+          </div>
+        </note>
+      </param>

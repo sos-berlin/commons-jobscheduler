@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xi="http://www.w3.org/2001/XInclude" 
+    name="file" Category="FileSystem" DataType="SOSOptionString" OptionName="File" Alias="FileName,SourceFile" required="true" default_value=".">
+
+    <note language="de">
+        <title>Zu überwachende Datei oder Verzeichnis</title>
+        <p>
+            Zu überwachende Datei oder zu überwachendes Verzeichnis.
+        </p>
+    </note>
+    <note language="en">
+        <title>File or Folder to be monitored</title>
+        <p>
+            Monitored file or directory.
+        </p>
+
+    </note>
+    <xi:include href="../notes/ParameterMaskSubstitution.xml" parse="xml" />
+    <xi:include href="../notes-de/ParameterMaskSubstitution.xml" parse="xml" />
+    <xi:include href="../notes/ParameterSubstitution.xml" parse="xml" />
+    <xi:include href="../notes-de/ParameterSubstitution.xml" parse="xml" />
+
+</param>

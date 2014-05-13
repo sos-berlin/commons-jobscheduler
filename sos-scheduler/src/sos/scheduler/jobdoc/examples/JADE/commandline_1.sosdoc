@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- $Id$ -->
+<!--
+<!DOCTYPE documentation [
+    <!ENTITY SSH_example_1 SYSTEM "./SSH_example_1.job.xml">
+]>
+ -->
+<examples xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1
+http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+
+    <codeexample type="cmd">
+        <embeddedExample os="unix">
+  jade.sh -settings=settings.ini -profile=sample_transfer ...
+        </embeddedExample>
+        <embeddedExample os="win">
+  jade.cmd -settings=settings.ini -profile=sample_transfer ...
+        </embeddedExample>
+
+        <explanation language="en">
+            <title>Setting the profile configuration to start the JADE client</title>
+            <p>
+            Starting the JADE-Client at the command line and specifying names of the configuration file and 
+            Profile as parameters.
+            </p>
+        </explanation>
+        <explanation language="de">
+            <title>JADE client starten mit profile-Konfiguration</title>
+            <p>
+            Hier wird der JADE-Client gestartet und als Parameter werden der Name der Konfigurationsdatei
+            sowie der Name für den Profile angegeben.
+            </p>
+        </explanation>
+    </codeexample>
+</examples>
+

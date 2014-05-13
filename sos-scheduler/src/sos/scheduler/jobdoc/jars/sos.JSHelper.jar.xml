@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--$Id$ -->
+<file
+    xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+    xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" os="all" type="java"
+    file="com.sos.JSHelper-*.jar" id="1"
+        sourcedoc="JobSchedulerHelper"
+          license_type="GPL V2.0"
+  license_url="http://www.gnu.org/licenses/gpl-2.0-standalone.html"
+    >
+
+    <note language="de">
+        <p>
+        </p>
+    </note>
+    <note language="en">
+        <p>
+        </p>
+    </note>
+
+</file>

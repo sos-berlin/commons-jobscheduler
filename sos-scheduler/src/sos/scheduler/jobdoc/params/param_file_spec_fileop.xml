@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id$ -->
+<param
+	xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+	xmlns:xi="http://www.w3.org/2001/XInclude" 
+	xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	name="file_spec" Category="FileSystem" DataType="SOSOptionRegExp"
+	DefaultValue=".*"
+	OptionName="FileNameRegExp" Alias="FileNameRegExp, file_specification" required="false">
+
+	<note language="de">
+		<title>Regulärer Ausdruck für die Auswahl der Datei(en)</title>
+		<p>
+			Regulärer Ausdruck als Dateifilter.
+			Verhält sich CASE_INSENSITIVE.
+			</p><p>
+			Nur wirksam, wenn der Parameter
+			<paramref>file</paramref>
+			ein Verzeichnis ist.
+		</p>
+		<xi:include href="../notes-de/RegExpRemarks.xml" xmlns:xi="http://www.w3.org/2001/XInclude"
+        parse="xml" />
+    <xi:include href="../notes-de/ExampleReplace.xml" xmlns:xi="http://www.w3.org/2001/XInclude"
+        parse="xml" />
+	</note>
+	<note language="en">
+		<title>Regular Expression for filename filtering</title>
+		<p>
+			Regular Expression for file filtering.
+			The behaviour is
+			CASE_INSENSITIVE.
+			</p><p>
+			Only effective if the parameter
+			<paramref>file</paramref>
+			is a directory.
+		</p>
+    <xi:include href="../notes/RegExpRemarks.xml" xmlns:xi="http://www.w3.org/2001/XInclude"
+        parse="xml" />
+    <xi:include href="../notes/ExampleReplace.xml" xmlns:xi="http://www.w3.org/2001/XInclude"
+        parse="xml" />
+	</note>
+</param>

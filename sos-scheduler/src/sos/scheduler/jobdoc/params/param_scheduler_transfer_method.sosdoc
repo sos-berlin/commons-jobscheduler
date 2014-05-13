@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- created at 17.10.2012 -->
+<!-- $Id$ -->
+<param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1
+     http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd "
+
+       name="scheduler_transfer_method"
+       required="false"
+       default_value="UDP"
+              DataType="SOSOptionString"
+Category="BackgroundService,JADE"
+	OptionName="scheduler_transfer_method" Alias=""
+	usewith=""
+	see=""
+	since="1.3.12.2282"
+              >
+
+            <indexterm index="scheduler_transfer_method" display="false"></indexterm>
+
+        <note language="de">
+        <title>Kommunikation mit dem Background-Service</title>
+          <p>
+Mit dem Wert dieses Parameters wird festgelegt, auf welchem Weg der Client mit dem BackgroundService
+kommuniziert.
+Mögliche Werte sind "UDP" und TCP.
+          </p>
+        </note>
+        <note language="en">
+        <title>how to communicate with the BackgroundService</title>
+          <p>
+          how to communicate with the BackgroundService.
+          Possible values are "UDP" and "TCP".
+          </p>
+        </note>
+      </param>

@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="scheduler_job_documentation_v1.1.xsl"?>
+<description xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1  http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+  <job name="JobNet" title="title" order="yes">
+    <script      language="java" java_class="sos.scheduler.file.JobSchedulerExistsFile" resource="1"    />
+  </job>
+  <releases>
+    <release id="id" created="2012-02-24" modified="2012-02-24">
+      <author name="name" email="email"        
+ />
+    </release>
+  </releases>
+  <configuration>
+    <params>
+      <param name="hibernate_connection_driver_class" required="false" default_value="oracle.jdbc.driver.OracleDriver"        
+       DataType="SOSOptionDBDriver"         >
+       <note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Zeithorizont, für den der Jobnetzplan erstellt wird.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Time horizon for creating the job net plan.          
+          </div>
+        </note>
+      </param>
+      
+      <param name="hibernate_connection_password"      
+       DefaultValue=""
+       required="false"
+       DataType="SOSOptionPassword"         ><note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Zeithorizont, für den der Jobnetzplan erstellt wird.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Time horizon for creating the job net plan.          
+          </div>
+        </note>
+      </param>
+      
+      <param name="hibernate_connection_url"      
+       DefaultValue="1:00:00:00"
+       required="false"
+       DataType="SOSOptionTimeHorizon"         ><note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Zeithorizont, für den der Jobnetzplan erstellt wird.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Time horizon for creating the job net plan.          
+          </div>
+        </note>
+      </param>
+      
+      <param name="hibernate_connection_username"      
+       DefaultValue="1:00:00:00"
+       required="false"
+       DataType="SOSOptionTimeHorizon"         ><note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Zeithorizont, für den der Jobnetzplan erstellt wird.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Time horizon for creating the job net plan.          
+          </div>
+        </note>
+      </param>
+      
+      <param name="hibernate_dialect" required="false" default_value="org.hibernate.dialect.Oracle10gDialect"        
+       DefaultValue="1:00:00:00"
+       DataType="SOSOptionTimeHorizon"         ><note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Zeithorizont, für den der Jobnetzplan erstellt wird.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Time horizon for creating the job net plan.          
+          </div>
+        </note>
+      </param>
+      
+      <param name="hibernate_show_sql" required="false" default_value="false"        
+       DataType="SOSOptionBoolean"         ><note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Zeithorizont, für den der Jobnetzplan erstellt wird.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Time horizon for creating the job net plan.          
+          </div>
+        </note>
+      </param>
+      
+      <param name="hibernate_connection_autocommit" required="false" default_value="false"        
+       DataType="SOSOptionBoolean"         ><note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Zeithorizont, für den der Jobnetzplan erstellt wird.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Time horizon for creating the job net plan.          
+          </div>
+        </note>
+      </param>
+      <param name="hibernate_format_sql" required="false" default_value="false"        
+       DataType="SOSOptionBoolean"         ><note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Zeithorizont, für den der Jobnetzplan erstellt wird.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Time horizon for creating the job net plan.          
+          </div>
+        </note>
+      </param>
+      <param name="successor_nodes"      
+       DefaultValue=""
+       required="false"
+       DataType="SOSOptionString"         ><note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Zeithorizont, für den der Jobnetzplan erstellt wird.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Time horizon for creating the job net plan.          
+          </div>
+        </note>
+      </param>
+      
+      <param name="predesessor_nodes"      
+       DefaultValue=""
+       required="false"
+       DataType="SOSOptionString"         ><note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Zeithorizont, für den der Jobnetzplan erstellt wird.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Time horizon for creating the job net plan.          
+          </div>
+        </note>
+      </param>
+      
+      <param name="delay_start_dispatcher"      
+       DefaultValue="00:00:03"
+       required="false"
+       DataType="SOSOptionTime"         ><note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Zeithorizont, für den der Jobnetzplan erstellt wird.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Time horizon for creating the job net plan.          
+          </div>
+        </note>
+      </param>
+      <param name="skipWaiter"      
+       DefaultValue="false"
+       required="false"
+       DataType="SOSOptionBoolean"         ><note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Zeithorizont, für den der Jobnetzplan erstellt wird.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Time horizon for creating the job net plan.          
+          </div>
+        </note>
+      </param>
+      
+      <param name="skipDispatcher"      
+       DefaultValue="false"
+       required="false"
+       DataType="SOSOptionBoolean"         ><note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Zeithorizont, für den der Jobnetzplan erstellt wird.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Time horizon for creating the job net plan.          
+          </div>
+        </note>
+      </param>
+      
+      <param name="skipRunner"      
+       DefaultValue="false"
+       required="false"
+       DataType="SOSOptionBoolean"         ><note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Zeithorizont, für den der Jobnetzplan erstellt wird.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Time horizon for creating the job net plan.          
+          </div>
+        </note>
+      </param>
+      
+      <param name="uuid_jobnet_identifier"      
+       DefaultValue=""
+       required="false"
+       DataType="SOSOptionUUID"         ><note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Zeithorizont, für den der Jobnetzplan erstellt wird.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Time horizon for creating the job net plan.          
+          </div>
+        </note>
+      </param>
+      
+      <param name="scheduler_id"      
+       DefaultValue=""
+       required="false"
+       DataType="SOSOptionSchedulerID"         ><note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Zeithorizont, für den der Jobnetzplan erstellt wird.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Time horizon for creating the job net plan.          
+          </div>
+        </note>
+      </param>
+      
+      <param name="check_interval"      
+       DefaultValue="00:00:30"
+       required="false"
+       DataType="SOSOptionTime"         ><note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Zeithorizont, für den der Jobnetzplan erstellt wird.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Time horizon for creating the job net plan.          
+          </div>
+        </note>
+      </param>
+      
+      <param name="max_number_of_checks" default_value="-1"      
+       required="false"
+       DataType="SOSOptionInteger"         ><note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Zeithorizont, für den der Jobnetzplan erstellt wird.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Time horizon for creating the job net plan.          
+          </div>
+        </note>
+      </param>
+      
+      <param name="script_to_execute"      
+       DefaultValue="dir"
+       required="false"
+       DataType="SOSOptionScript"         ><note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Zeithorizont, für den der Jobnetzplan erstellt wird.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Time horizon for creating the job net plan.          
+          </div>
+        </note>
+      </param>
+      
+      <param name="is_bootstrap_order"      
+       DefaultValue="false"
+       required="false"
+       DataType="SOSOptionBoolean"         ><note language="de">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Zeithorizont, für den der Jobnetzplan erstellt wird.
+          </div>
+        </note>
+        <note language="en">
+		    <title/>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+Time horizon for creating the job net plan.          
+          </div>
+        </note>
+      </param>
+    </params>
+  </configuration>
+  <documentation language="de">
+    <xhtml:div>
+      <p>.</p>
+    </xhtml:div>
+  </documentation>
+</description>
+

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="scheduler_job_documentation_v1.1.xsl"?>
+<description xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+xmlns:xi="http://www.w3.org/2001/XInclude"
+xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1
+  http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+
+    <job name="JobSchedulerLaunchAndObserve" title="Launch and observe any given job or job chain" order="both" tasks="unbounded" category="Scheduling" since="1.3.12.1340">
+        <script language="java" java_class="sos.scheduler.LaunchAndObserve.JobSchedulerLaunchAndObserveJSAdapterClass" resource="1" />
+    </job>
+    <releases>
+        <release id="1.3.12.1330" created="2011-11-22" modified="2011-11-22">
+            <title />
+            <author name="kb" email="email" />
+        </release>
+    </releases>
+    <resources>
+        <xi:include href="./jars/sos.scheduler.jar.xml" parse="xml" />
+        <xi:include href="./jars/sos.spooler.jar.xml" parse="xml" />
+        <xi:include href="./jars/sos.util.jar.xml" parse="xml" />
+        <xi:include href="./jars/sos.SOSJobSchedulerModel.jar.xml" parse="xml" />
+        <xi:include href="./jars/sos.JobSchedulerLocalization.jar.xml" parse="xml" />
+        <xi:include href="./jars/log4j.jar.xml" parse="xml" />
+    </resources>
+
+    <configuration>
+        <xi:include href="./notes/OrderOrStandAlone.xml" parse="xml" />
+
+        <xi:include href="./notes/NodeParameterByStateName.xml" parse="xml">
+            <xi:fallback>"./notes/NodeParameterByStateName.xml" not found</xi:fallback>
+        </xi:include>
+
+        <params id="job_parameter">
+            <xi:include href="./params/param_JobName.xml" parse="xml" />
+            <xi:include href="./params/param_check_interval.xml" parse="xml" />
+            <xi:include href="./params/param_restart.xml" parse="xml" />
+            <xi:include href="./params/param_lifetime.xml" parse="xml" />
+            <xi:include href="./params/param_check_inactivity.xml" parse="xml" />
+            <xi:include href="./params/param_kill_job.xml" parse="xml" />
+            <xi:include href="./params/param_mail_on_nonactivity.xml" parse="xml" />
+            <xi:include href="./params/param_mail_on_restart.xml" parse="xml" />
+            <xi:include href="./params/param_check_for_regexp.xml" parse="xml" />
+
+            <xi:include href="./params/param_scheduler_host.xml" parse="xml" />
+            <xi:include href="./params/param_scheduler_port.xml" parse="xml" />
+
+            <xi:include href="./params/param_order_jobchain_name.xml" parse="xml" />
+            <xi:include href="./params/param_OrderId.xml" parse="xml" />
+
+            <xi:include href="./params/smtp_mail_Parameter.xml" parse="xml" />
+
+        </params>
+        <params id="return_parameter">
+        </params>
+        <params id="other">
+        </params>
+
+    </configuration>
+    <documentation language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <xhtml:div>
+                <p>
+                    Dieser LaunchAndObserve (LoA) Job hat die Aufgabe, einen aktuell laufenden
+                    oder einen Job, der durch diesen Job zu starten ist, zu überwachen.
+                    Der Name des zu überwachenden Jobs wird mit dem Parameter
+                    <paramref>job_name</paramref>
+                    festgelegt.
+                    Der zu überwachende Job kann auch in einer Job-Kette enthalten sein.
+                    Dazu sind die Parameter
+                    <paramref>order_jobchain_name</paramref> und
+                    <paramref>OrderID</paramref>
+                    anzugeben.
+                    Anstelle des Jobs wird die Job-Kette gestartet.
+                </p>
+                <p>
+                Die Überwachung wird solange durchgeführt, wie dies durch den Wert des Parameters
+                <paramref>lifetime</paramref>
+                spezifiziert ist.
+                </p>
+                <p>
+                Soll ein Job überwacht werden, der in einem Remote-Scheduler läuft, so sind die Parameter
+                <paramref>scheduler_host</paramref>
+                und
+                <paramref>scheulder_port</paramref>
+                anzugeben.
+                Es ist sicherzustellen, daß die Security-Einstellungen des remote-schedulers
+                einen Zugriff des LaunchAndOberserve Jobs erlaubt.
+                Ansonsten wird der Job in der Scheduler-Instanz überwacht in dem auch der LaO-Job läuft.
+                </p>
+                <p>
+                Nach dem Start des Jobs prüft dieser zunächst, ob ein Job mit dem Namen, der als Wert des Parameters
+                <paramref>job_name</paramref>
+                angegeben wurde, im betreffenden JobScheduler läuft.
+                Ist dies nicht der Fall wird, so wird der Job bzw. die Job-Kette gestartet.
+                </p>
+                <p>
+                Nach dem evtl. erforderlichen Start wartet der LaO eine Anzahl Sekunden, die mit dem Parameter
+                <paramref>check_interval</paramref>
+                definiert wird.
+                </p>
+                <p>
+                Nach Ablauf der Wartezeit wird (erneut) geprüft, ob der Job läuft.
+                </p>
+                <p>
+                Falls der Job nicht läuft, wird anhand der Job-Historie geprüft, mit welchem Exit-Code
+                der Job geendet hat.
+                </p>
+                <p>
+                Anschliessend wird, falls der Wert des Parameters
+                <paramref>restart</paramref>
+                auf "true" gesetzt wurde, der Job erneut gestartet.
+                </p>
+                <p>
+                Hatte der Job sich nicht beendet, so kann jetzt in der Log-Datei des Jobs geprüft werden, ob
+                der Job sich "bewegt" hat.
+                (Der JobScheduler verändert diese Datei in einem Intervall von 10 Sekunden).
+                Diese Prüfung wird aktiviert, indem der Wert des Parameters
+                <paramref>check_inactivity</paramref>
+                auf "true" gesetzt und im Wert des Parameters
+                <paramref>check_for_regexp</paramref>
+                ein regulärer Ausdruck angegeben wird.
+                </p>
+                <p>
+                Die Häufigkeit des Auftretens der Zeichenkette, die bei
+                <paramref>check_for_regexp</paramref>
+                angegeben wurde, wird ermittelt und - falls es nicht das erste mal ist - mit der Anzahl der bei
+                der vorherigen Prüfung ermittelten Anzahl verglichen.
+                Ist die Anzahl gleich oder kleiner als die vorher ermittelte, so wird dies als Indiz dafür genommen, daß der Job sich nicht
+                mehr bewegt hat.
+                </p>
+                <p>
+                Wurde festgestellt, daß der Job sich nicht mehr bewegt hat, so wird in Abhängigkeit des Parameters
+                <paramref>kill_job</paramref>
+                der Job entweder abgebrochen (kill_job=true) oder der Lauf des LoA mit einer Fehlermeldung
+                beendet.
+                </p>
+                <p>
+                Wurde der Job abgebrochen bzw. hat sich selbst beendet, so wird in Abhängigkeit vom Wert des Parameters
+                <paramref>restart</paramref>
+                der Job erneut gestartet oder der Lauf des LoA mit einem Fehler beendet.
+                </p>
+            </xhtml:div>
+        </div>
+    </documentation>
+    <documentation language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <xhtml:div>
+                <p>This job is doing a check wether a job with a given job_name ist running.</p>
+            </xhtml:div>
+        </div>
+    </documentation>
+</description>
+
