@@ -1,0 +1,3385 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="sosftp.xsl"?>
+<description xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" 
+xmlns:xhtml="http://www.w3.org/1999/xhtml" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 
+http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+  <job name="SOSFTP" title="Transfer files by FTP/SFTP and execute commands by SSH" >
+    <script language="java" java_class="sos.net.SOSFTPCommand" resource="1" />
+  </job>
+  <releases>
+    <release id="1.0" created="2008-09-26" modified="2008-09-26">
+      <title>Version 1.7</title>
+      <author name="Mueruevet Oeksuez" email="mueruevet.oeksuez@sos-berlin.com" />
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Initiales Release</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Initial Release</div>
+      </note>
+    </release>
+  </releases>
+
+  <resources>
+    <file os="all" type="java" file="sos.net.jar" id="1">
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Klassen SOSFTPCommand, SOSFTP</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Classes SOSFTPCommand, SOSFTP</div>
+      </note>
+    </file>
+    <file os="all" type="java" file="sos.settings.jar" id="2">
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Klasse SOSProfileSettings</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Class SOSProfileSettings</div>
+      </note>
+    </file>
+    <file os="all" type="java" file="sos.util.jar" id="3">
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Klassen SOSFile, SOSSchedulerLogger</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Classes SOSFile, SOSSchedulerLogger</div>
+      </note>
+    </file>
+    <file os="all" type="java" file="commons-net-1.2.2.jar" id="4">
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Apache FTP Implementierung, siehe http://commons.apache.org/</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Apache FTP implementation, see http://commons.apache.org/</div>
+      </note>
+    </file>
+    <file os="all" type="java" file="trilead-ssh2-build211.jar" id="5">
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Trilead SFTP Implementierung, siehe http://www.trilead.com/</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Trilead SFTP implementation, see http://www.trilead.com/</div>
+      </note>
+    </file>
+  </resources>
+
+  <configuration>
+    <note language="de">
+      <div xmlns="http://www.w3.org/1999/xhtml">
+        <br/><br/>
+      </div>
+    </note>
+    <note language="en">
+      <div xmlns="http://www.w3.org/1999/xhtml">
+        <br/><br/>
+      </div>
+    </note>
+
+    <params id="parameter">
+
+      <param name="operation" required="true"  DefaultValue="send" DataType="SOSOptionStringValueList" >
+        <values>
+        	<value>send</value>
+        	<value>receive</value>
+        	<value>remove</value>
+        	<value>execute</value>
+        	<value>install</value>
+        	<value state="experimental">move</value>
+        	<value state="experimental">copy</value>
+        </values>
+        <note language="de">
+          <title>Die auszuführende Operation</title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <em>send</em>, <em>receive</em>, <em>remove</em>, <em>execute</em> oder <em>install</em>.
+            <br/><br/>
+            <ul>
+              <li>send - Dateien mit FTP/SFTP versenden</li>
+              <li>receive - Dateien mit FTP/SFTP empfangen</li>
+              <li>remove - Dateien mit FTP/SFTP auf einem anderen Server-System entfernen</li>
+              <li>execute - Kommando per SSH auf einem anderen Server-System ausführen</li>
+              <li>install - SOSFTP-Client auf einem anderen Server-System installieren</li>
+             </ul>
+          </div>
+        </note>
+        <note language="en">
+          <title>Operation to be executed</title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <em>send</em>, <em>receive</em>, <em>remove</em>, <em>execute</em> or <em>install</em>.
+            <br/><br/>
+            <ul>
+              <li>send - transfer files by FTP/SFTP to a remote server</li>
+              <li>receive - transfer files by FTP/SFTP from a remote server</li>
+              <li>remove - remove files by FTP/SFTP on a remote server</li>
+              <li>execute - execute a command by SSH on a remote server</li>
+              <li>install - install SOSFTP on a remote server</li>
+             </ul>
+          </div>
+        </note>
+      </param>
+
+      <param name="settings" required="false" DataType="SOSIniFileName" Alias="SOSIniFileName" DefaultValue="./SOSFtpSettings.ini" >
+        <note language="de">
+         <title>Name der INI-Datei mit den Profilen</title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Bei Verwendung einer Konfigurationsdatei werden Profile als Sektionen eingerichtet und einzelne Parameter als Paare aus Namen 
+            und Wert in einem einfach Textformat aufgeführt:
+            <br/><br/><code>
+            [sample_transfer]<br/>
+            protocol = ftp<br/>
+            host = localhost<br/>
+            port = 21<br/>
+            local_dir = /tmp<br/>
+            ...
+            </code><br/><br/>
+            An der Kommandozeile wird der Name der Einstellungsdatei und des Profils angegeben:
+            <br/><br/>
+            <code>sosftp.sh -operation=send -settings=settings.ini -profile=sample_transfer ...</code>
+            <br/><br/>
+            Ein Profil kann den Inhalt anderer Profile wie folgt referenzieren:
+            <br/><br/><code>
+            [default]<br/>
+            history          = /sosftp/transfer_history.csv<br/>
+            mandator         = SOS<br/>
+            scheduler_host   = localhost<br/> 
+            scheduler_port   = 4444<br/>
+            <br/>
+            [sample_transfer]<br/>
+            include          = default<br/>
+            protocol         = ftp<br/>
+            host             = www.sos-berlin.com<br/>
+            port             = 21<br/>
+            local_dir        = /tmp<br/>
+            ...
+            </code><br/><br/>
+            In diesem Beispiel referenziert das Profil <em>sample_transfer</em> 
+            mittels <code>include</code> das <em>default</em> Profil
+            und übernimmt die Einstellungen für die Historienverarbeitung.
+          </div>
+        </note>
+        <note language="en">
+          <title>Name of INI-File which contains the profiles to execute</title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            A configuration (INI-) file can be specified that contains profiles, i.e. sections,
+            with parameters specified as pairs of names and values in a plain text format like this:
+            <br/><br/><code>
+            [sample_transfer]<br/>
+            protocol = ftp<br/>
+            host = localhost<br/>
+            port = 21<br/>
+            local_dir = /tmp<br/>
+            ...
+            </code><br/><br/>
+            At the command line the name of the configuration file and the profile are specified like this:
+            <br/><br/>
+            <code>sosftp.sh -operation=send -settings=settings.ini -profile=sample_transfer ...</code>
+            <br/><br/>
+            A profile can reference the contents of other profiles like this:
+            <br/><br/><code>
+            [default]<br/>
+            history          = /sosftp/transfer_history.csv<br/>
+            mandator         = SOS<br/>
+            scheduler_host   = localhost<br/> 
+            scheduler_port   = 4444<br/>
+            <br/>
+            [sample_transfer]<br/>
+            include          = default<br/>
+            protocol         = ftp<br/>
+            host             = www.sos-berlin.com<br/>
+            port             = 21<br/>
+            local_dir        = /tmp<br/>
+            ...
+            </code><br/><br/>
+            With this sample the profile <em>sample_transfer</em> includes the <em>default</em> profile
+            via the <code>include</code> directive and thus applies the file transfer history settings.
+          </div>
+        </note>
+      </param>
+
+      <param name="profile" required="false" DataType="SOSOptionString" Alias="SectionName">
+        <note language="de">
+                  <title>Der Name eines auszuführenden Profils</title>
+                  <div xmlns="http://www.w3.org/1999/xhtml">
+            Bei Verwendung einer Konfigurationsdatei (siehe Parameter <code>settings</code>)
+            benennt dieser Parameter eine Sektion, d.h. ein Profil, der Konfigurationsdatei.
+            Sektionen enthalten Parameter als Paare aus Namen und Wert, die andernfalls
+            als Kommandozeilenparameter aufgeführt werden. 
+            <br/><br/>
+            An der Kommandozeile wird der Name der Einstellungsdatei und des Profils wie folgt angegeben:
+            <br/><br/>
+            <code>sosftp.sh -operation=send -settings=settings.ini -profile=sample_transfer ...</code>
+            <br/><br/>
+          </div>
+        </note>
+        <note language="en">
+                  <title>The Name of a Profile-Section to be executed</title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            If a configuration file is being used (see parameter <code>settings</code>), 
+            then this parameter specifies a name of a section within the configuration file.
+            Such sections, i.e. profiles, specify parameters as pairs of names and values
+            that otherwise would be specified by command line parameters.
+            <br/><br/>
+            At the command line the name of the configuration file and the profile are specified like this:
+            <br/><br/>
+            <code>sosftp.sh -operation=send -settings=settings.ini -profile=sample_transfer ...</code>
+            <br/><br/>
+          </div>
+        </note>
+      </param>
+
+
+      <param name="" required="true" id="ProtocolParameter">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>Parameter zur Protokollierung</b>
+            <br/><br/>
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>Parameters for logging</b>
+            <br/><br/>
+          </div>
+        </note>
+      </param>
+
+      <param name="verbose" required="false" DataType="SOSOptionInteger" Alias="VerbosityLevel" DefaultValue="1">
+	  <values>
+		<value>1..9</value>
+	  </values>
+        <note language="de">
+                  <title>Granularität der Protokollierung von (Debug-)Meldungen</title>
+        
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der <em>verbosity level</em> bestimmt die Intensität der Protokollierung.
+            Als Wert kann eine Zahl zwischen <em>1</em> und <em>9</em> angegeben werden.
+            Höhere Werte erzeugen detailliertere Protkollausgaben.
+            <br/><br/>
+            Die Protokollausgabe erfolgt nach stdout bzw. in die mit dem Parameter
+            <paramref>log_filename</paramref> angegebene Datei.
+          </div>
+        </note>
+        <note language="en">
+          <title>The granuality of (Debug-)Messages</title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            The <em>verbosity level</em> specifies the intensity of log entries.
+            A value between <em>1</em> and <em>9</em> can be specified.
+            Higher values cause more detailed information to be logged.
+            <br/><br/>
+            Log output is written to stdout or to a file that has been specified
+            with the parameter <paramref>log_filename</paramref>.
+          </div>
+        </note>
+      </param>
+
+      <param name="log_filename" required="false" DataType="SOSOptionOutFileName" >
+        <note language="de">
+                  <title>Der Name (und Pfadname) der Protokoll-Datei</title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter benennt eine Datei, in die alle Protokollausgaben
+            vorgenommen werden. 
+            <br/><br/>
+            Ist die Datei noch nicht vorhanden, dann wird sie angelegt. 
+            An eine bestehende Datei werden Protokollausgaben angehängt.
+            <br/><br/>
+            Ohne Verwendung dieses Parameters erfolgen Protokollausgaben nach stdout.
+          </div>
+        </note>
+        <note language="en">
+          <title>Name (and Pathname) of the logging-file</title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the location of a file to which the log output will be written.
+            <br/><br/>
+            Should the file not exist then it will be created. If the already exists
+            then all log output will be appended.
+            <br/><br/>
+            Without specifying this parameter all log output will be written to stdout.
+          </div>
+        </note>
+      </param>
+
+
+      <param name="banner_header" required="false" DataType="SOSOptionInFileName">
+        <note language="de">
+                  <title>Name der Datei mit einem Protokoll-Template</title>
+        
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Das Programm nimmt Ausgaben nach stdout bzw. in eine mit dem Parameter
+            <paramref>log_filename</paramref> angegebene Datei vor und kann
+            zur Strukturierung dieser Ausgaben eine Musterdatei verwenden.
+            Die Ausgaben sind in die Gruppen Header, Dateiliste und Footer gegliedert.
+            <br/><br/>
+            Mit diesem Parameter wird eine Musterdatei für den Header zugewiesen.
+            <br/><br/>
+            Musterdateien können interne Variablen und Parameter als Platzhalter
+            in der Form <em>%{platzhalter}</em> verwenden, das Standard-Muster für Header hat diesen Inhalt:
+<pre>
+*************************************************************************
+*                                                                       *
+*                SOSFTP - Managed File Transfer Utility                 *
+*                --------------------------------------                 *
+*                                                                       *
+*************************************************************************
+version              = %{version}
+date                 = %{date} %{time}
+operation            = %{operation}
+protocol             = %{protocol}
+file specification   = %{file_spec}
+file path            = %{file_path}
+source host          = %{localhost} (%{local_host_ip})
+local directory      = %{local_dir}
+jump host            = %{jump_host}
+target host          = %{host} (%{host_ip})
+target directory     = %{remote_dir}
+pid                  = %{current_pid}
+ppid                 = %{ppid}
+*************************************************************************
+</pre>
+          </div>
+        </note>
+        <note language="en">
+                  <title>Name of Template-File for log-File</title>
+        
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This program logs output to stdout or to a file that has been specified by the parameter
+            <paramref>log_filename</paramref>. A template can be used in order to organize the output that is created.
+            The output is grouped into header, file list and footer.
+            <br/><br/>
+            This parameter specifies a template file for header output.
+            <br/><br/>
+            Templates can use internal variables and parameters as placeholders
+            in the form <em>%{placeholder}</em>. The standard header template looks like this:
+<pre>
+*************************************************************************
+*                                                                       *
+*                SOSFTP - Managed File Transfer Utility                 *
+*                --------------------------------------                 *
+*                                                                       *
+*************************************************************************
+version              = %{version}
+date                 = %{date} %{time}
+operation            = %{operation}
+protocol             = %{protocol}
+file specification   = %{file_spec}
+file path            = %{file_path}
+source host          = %{localhost} (%{local_host_ip})
+local directory      = %{local_dir}
+jump host            = %{jump_host}
+target host          = %{host} (%{host_ip})
+target directory     = %{remote_dir}
+pid                  = %{current_pid}
+ppid                 = %{ppid}
+*************************************************************************</pre>
+          </div>
+        </note>
+      </param>
+
+      <param name="banner_footer" required="false" DataType="SOSOptionInFileName">
+        <note language="de">
+                  <title>Name der Template-Datei für Protokoll-Ende</title>
+        
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Das Programm nimmt Ausgaben nach stdout bzw. in eine mit dem Parameter
+            <paramref>log_filename</paramref> angegebene Datei vor und kann
+            zur Strukturierung dieser Ausgaben eine Musterdatei verwenden.
+            Die Ausgaben sind in die Gruppen Header, Dateiliste und Footer gegliedert.
+            <br/><br/>
+            Mit diesem Parameter wird eine Musterdatei für den Footer zugewiesen.
+            <br/><br/>
+            Musterdateien können interne Variablen und Parameter als Platzhalter
+            in der Form <em>%{platzhalter}</em> verwenden, das Standard-Muster für Footer hat diesen Inhalt:
+<pre>
+*************************************************************************
+execution status     = %{status}
+successful transfers = %{successful_transfers}
+failed transfers     = %{failed_transfers}
+last error           = %{last_error}
+*************************************************************************</pre>
+          </div>
+        </note>
+        <note language="en">
+        <title>Name der Template-Datei für Protokoll-Ende</title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This program logs output to stdout or to a file that has been specified by the parameter
+            <paramref>log_filename</paramref>. A template can be used in order to organize the output that is created.
+            The output is grouped into header, file list and footer.
+            <br/><br/>
+            This parameter specifies a template file for footer output.
+            <br/><br/>
+            Templates can use internal variables and parameters as placeholders
+            in the form <em>%{placeholder}</em>. The standard footer template looks like this:
+<pre>
+*************************************************************************
+execution status     = %{status}
+successful transfers = %{successful_transfers}
+failed transfers     = %{failed_transfers}
+last error           = %{last_error}
+*************************************************************************</pre>
+          </div>
+        </note>
+      </param>
+
+
+      <param name="" required="true">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>Parameter für Server-Verbindungen</b>
+            <br/><br/>
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>Parameters for server connections</b>
+            <br/><br/>
+          </div>
+        </note>
+      </param>
+
+      <param name="protocol" required="true" DefaultValue="ftp" DataType="SOSOptionStringValueList" Alias="TransferProtocol">
+      <values>
+         <value>ftp</value>
+         <value>sftp</value>
+         <value>ftps</value>
+      </values>
+        <note language="de">
+      <title>Art des Datenübertragungsprotokolls</title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter nimmt die Werte <paramval>ftp</paramval>, <paramval>sftp</paramval> oder <paramval>ftps</paramval> an.
+            <br/><br/>
+            Bei Verwendung von <paramval>sftp</paramval> werden auch die <paramval>ssh_*</paramval>-Parameter
+            ausgewertet.   
+          </div>
+        </note>
+        <note language="en">
+      <title>Type of requested Datatransfer</title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            The values <paramval>ftp</paramval>, <paramval>sftp</paramval> or <paramval>ftps</paramval>
+            are valid for this parameter.
+            <br/><br/>
+            If <paramval>sftp</paramval> is used, then the <paramval>ssh_*</paramval> parameters will
+            be applied.
+          </div>
+        </note>
+      </param>
+
+      <param name="host" required="true" DataType="SOSOptionHostName" Alias="HostName">
+        <note language="de">
+              <title>Name/IP-Adresse des remote-hosts</title>
+        
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Host oder IP-Adresse, von der bzw. zu der Dateien übertragen werden.
+          </div>
+        </note>
+        <note language="en">
+              <title>Name/IP-Adress of remote-host</title>
+        
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Host or IP address from which or to which files should be transferred.
+          </div>
+        </note>
+      </param>
+
+      <param name="port" DefaultValue="21" required="true" DataType="SOSOptionPortNumber">
+        <note language="de">
+              <title>zu verwendende Port-Nummer des Protokolls</title>
+        
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Port, über den Dateien gesendet werden.
+            Für FTP meist Port 21, für SFTP meist Port 22.
+          </div>
+		  <wikipedia lang="de" topic="" />
+        </note>
+        <note language="en">
+              <title>Port-Number to be used for Data-Transfer</title>
+        
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Port by which files should be transferred.
+            For FTP this is usually port 21, for SFTP this is usually port 22.
+          </div>
+		  <wikipedia lang="en" topic="" />
+        </note>
+      </param>
+
+      <param name="user" DefaultValue="anonymous" required="true" DataType="SOSOptionUserName">
+        <note language="de">
+              <title>Kennung/Identifikation des Nutzers</title>
+        
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Benutzername zur Anmeldung am (FTP/SFTP) Server.
+          </div>
+        </note>
+        <note language="en">
+              <title>UserID of user in charge</title>
+        
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            User name for authentication at the (FTP/SFTP) server.
+          </div>
+        </note>
+      </param>
+
+      <param name="password" required="false" DataType="SOSOptionPassword">
+        <note language="de">
+              <title>Das zur Nutzerkennung passende Kennwort</title>
+        
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Kennwort zur Anmeldung am FTP/SFTP Server.
+            <br/>
+            <br/>
+            Fall SSH/SFTP Verbindungen mit private/public key Authentifizierung
+            verwendet werden, dann spezifiziert dieser Parameter die Passphrase,
+            mit der ggf. ein privater Schlüssel geschützt ist.
+          </div>
+        </note>
+        <note language="en">
+              <title>Password for UserID</title>
+        
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Password for authentication at the FTP/SFTP server.
+            <br/><br/>
+            For SSH/SFTP connections that make use of public/private key authentication
+            the <em>password</em> parameter is specified for the passphrase
+            that optionally secures a private key.
+          </div>
+        </note>
+      </param>
+
+      <param name="account" required="false" DataType="SOSOptionString">
+        <note language="de">
+              <title>Abrechnungsinformation</title>
+        
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Optionale Kennung zur Anmeldung an einem (FTP) Server.
+          </div>
+        </note>
+        <note language="en">
+              <title>Additional accounting information</title>
+        
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Optional account info for authentication with an (FTP) server.
+          </div>
+        </note>
+      </param>
+
+      <param name="transfer_mode" DefaultValue="binary" required="false" DataType="SOSOptionTransferMode">
+      <values>
+      	<value>binary</value>
+      	<value>ascii</value>
+      </values>
+        <note language="de">
+              <title>Art der Zeichencodierung</title>
+        
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Transfer-Modus gilt für das FTP-Protokoll und kann die Werte
+            <code>ascii</code>
+            oder
+            <code>binary</code>
+            annehmen.
+          </div>
+        </note>
+        <note language="en">
+              <title>Type of Character-Encoding</title>
+        
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Transfer mode is used for FTP exclusively and can be either
+            <code>ascii</code>
+            or
+            <code>binary</code>.
+          </div>
+        </note>
+      </param>
+
+      <param name="passive_mode" DefaultValue="false" required="false" DataType="SOSOptionBoolean" Alias="FTPTransferModeIsPassive" >
+        <note language="de">
+		<title>passive_mode</title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Passiv-Modus wird oft für FTP z.B. beim Betrieb mit Firewalls eingesetzt.
+            Erlaubte Werte sind
+            <code>0</code>
+            oder
+            <code>1</code>.
+          </div>
+        </note>
+        <note language="en">
+		<title>passive_mode</title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Passive mode for FTP is often used with firewalls. Valid values are
+            <code>0</code>
+            or
+            <code>1</code>.
+          </div>
+        </note>
+      </param>
+
+      <param name="remote_dir" DefaultValue="." required="true" DataType="SOSOptionFolderName">
+        <note language="de">
+		<title>remote_dir</title>
+		<div xmlns="http://www.w3.org/1999/xhtml">
+            Verzeichnis am FTP/SFTP Server, von dem bzw. zu dem Dateien übertragen werden.
+            <br/><br/>
+            Per Voreinstellung wird das Home-Verzeichnis des Benutzers am FTP/SFTP Server verwendet.
+          </div>
+        </note>
+        <note language="en">
+		<title>remote_dir</title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Directory at the FTP/SFTP server from which or to which files should be transferred.
+            <br/><br/>
+            By default the home directory of the user at the FTP/SFTP server is used.
+          </div>
+        </note>
+      </param>
+
+      <param name="local_dir" DefaultValue="." required="true" DataType="SOSOptionFolderName">
+		<title>local_dir</title>
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Lokales Verzeichnis, in das bzw. von dem Dateien übertragen werden. 
+            Per Voreinstellung wird das Arbeitsverzeichnis verwendet.
+            <br/><br/>
+            Neben Verzeichnissen im lokalen Dateisystem werden UNC Namen unterstützt,
+            mit denen Verzeichnisse auf anderen Servern adressiert werden können:
+            <code>\\somehost\somedirectory</code> kann genau wie 
+            <code>//somehost/somedirectory</code> verwendet werden, um Dateien
+            von einem FTP/SFTP Server direkt auf einen anderen entfernten Server zu übertragen.
+            <br/><br/>
+            Darüber hinaus können URIs für ein <code>file</code>-Schema angegeben werden, z.B.
+            <code>file:////somehost/somedirectory</code>.
+            Beachten Sie bitte die erforderliche Anzahl Schrägstriche. <code>file</code>-URIs 
+            unterliegen folgenden, durch das verwendete Java JRE bedingte Limitationen:
+            <br/><br/>
+            <ul>
+              <li>Es können keine Dateien mit Leerzeichen im Pfad oder Dateinamen verarbeitet werden</li>
+              <li>
+                Authentifizierung anhand von <code>authority strings</code>, z.B. 
+                <code>file:////user:password@somehost/somedirectory</code> 
+                wird nicht unterstützt.
+              </li>
+            </ul>
+          </div>
+        </note>
+        <note language="en">
+				<title>local_dir</title>
+
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Local directory into which or from which files should be transferred.
+            By default the current working directory is used.
+            <br/><br/>
+            Besides paths in the local file system UNC path names are supported
+            that could be used to address remote server systems:
+            <code>\\somehost\somedirectory</code> can be used in the same way as 
+            <code>//somehost/somedirectory</code> to transfer files from an FTP/SFTP server to 
+            a different remote server system.
+            <br/><br/>
+            Moreover, you could specify URIs for a <code>file</code> schema as in             
+            <code>file:////somehost/somedirectory</code>.
+            Please, consider the required number of slashes. <code>file</code> URIs are
+            subject to the following limitations due to constraints of the underlying Java JRE:
+            <br/><br/>
+            <ul>
+              <li>File names and path names must not contain any spaces.</li>
+              <li>
+                Authentication by <code>authority strings</code> as in
+                <code>file:////user:password@somehost/somedirectory</code> 
+                is not supported.
+              </li>
+            </ul>
+          </div>
+        </note>
+      </param>
+
+      <param name="file_spec" DefaultValue=".*" required="false" DataType="SOSOptionRegExp" Alias="FileNamePatternRegExp">
+        <note language="de">
+		<title>file_spec</title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter erwartet einen regulären Ausdruck, um eine oder mehrere
+            Dateien aus einem lokalen Verzeichnis oder einem Verzeichnis am FTP/SFTP Server zu selektieren, 
+            (in Abhängigkeit vom Parameter <paramref>operation</paramref>, der mit den Werten <paramval>send</paramval> 
+            und <paramval>receive</paramval> die Richtung des Transfers bestimmt)
+            die übertragen werden sollen.
+            <br/><br/>
+            Für die Operationen <paramval>send</paramval> und <paramval>receive</paramval> muss entweder dieser Parameter
+            oder der Parameter <paramref>file_path</paramref> bzw. eine Liste von Dateinamen als zusätzliche
+            Parameter angegeben sein.
+          </div>
+		  <wikipedia lang="de" topic="" />
+        </note>
+        <note language="en">
+		<title>file_spec</title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter expects a regular expression to select files 
+            from a local directory or from an FTP/SFTP server 
+            (depending on the <paramref>operation</paramref> parameter values <paramval>send</paramval> or <paramval>receive</paramval>)
+            to be transferred.
+            <br/><br/>
+            For the operations <paramval>send</paramval> and <paramval>receive</paramval> either this parameter has to be specified
+            or the parameter <paramref>file_path</paramref> or a list of file names as additional parameters.
+          </div>
+		  <wikipedia lang="en" topic="" />
+        </note>
+      </param>
+
+      <param name="file_path" required="false" DataType="SOSOptionFileName">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter wird alternativ zum Parameter <paramref>file_spec</paramref> verwendet und
+            benennt eine Datei für den Transfer.
+            <br/><br/>
+            <ul>
+              <li>Beim Empfang von Dateien gilt:
+                <br/><br/>
+                Name und Pfad der Datei am FTP/SFTP Server, die übertragen wird. 
+                Der Dateiname muss als Bestandteil den Pfad am FTP/SFTP Server enthalten.
+                <br/><br/>
+                Die Datei wird unter ihrem Namen in dem mit dem Parameter <paramref>local_dir</paramref>
+                angegebenen Verzeichnis abgelegt.
+                <br/>
+                Folgende Parameter werden mit der Angabe dieses Parameters
+                ignoriert: <paramref>file_spec</paramref> und <paramref>remote_dir</paramref>.
+              </li>
+              <li>Für das Senden von Dateien gilt:
+                <br/><br/>
+                Der Parameter nimmt den absoluten Namen und Pfad einer Datei auf, die übertragen wird.
+                Der Dateipfad muss absolut angegeben sein.
+                <br/>
+                <br/>
+                Die Datei wird unter ihrem Namen in dem Verzeichnis am FTP/SFTP Server abgelegt,
+                das mit dem Parameter
+                <paramref>remote_dir</paramref>
+                angegeben ist.
+                <br/>
+                <br/>
+                Folgende Parameter werden mit der Angabe dieses Parameters
+                ignoriert:
+                <paramref>file_spec</paramref>
+                und
+                <paramref>local_dir</paramref>.
+              </li>
+            </ul>
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter is used alternatively to the parameter <paramref>file_spec</paramref>
+            to specify a single file for transfer.
+            <br/><br/>
+            <ul>
+              <li>When receiving files the following applies:
+                <br/><br/>
+                This parameter accepts the absolute name and path of file at the FTP/SFTP server that should be transferred.
+                The file name has to include both name and path of the file at the FTP/SFTP server.
+                <br/><br/>
+                The file will be stored unter its name in the directory that is specified
+                by the parameter <paramref>local_dir</paramref>.
+                <br/><br/>
+                The following parameters are ignored should this parameter be used:
+                <paramref>file_spec</paramref> and <paramref>remote_dir</paramref>.
+              </li>
+              <li>When sending files the following applies:
+                <br/><br/>
+                This parameter accepts the absolute name and path of file that should be transferred.
+                An absolute path has to be specified.
+                <br/>
+                <br/>
+                The file will be stored under its name in the directory at the FTP/SFTP server 
+                that has been specified by the parameter
+                <paramref>remote_dir</paramref>.
+                <br/>
+                <br/>
+                The following parameters are ignored should this parameter be used:
+                <paramref>file_spec</paramref>
+                and
+                <paramref>local_dir</paramref>.
+              </li>
+            </ul>
+          </div>
+        </note>
+      </param>
+
+
+      <param name="" required="true">
+		<title></title>
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>Operationen mit Dateigruppen</b>
+            <br/><br/>
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>File set operations</b>
+            <br/><br/>
+          </div>
+        </note>
+      </param>
+
+      <param name="file_spec2" required="false" DataType="RegExp" deprecated="true" >
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            In Ergänzung zum Parameter <paramref>file_spec</paramref> können Parameter 
+            für weitere Dateigruppen in dieser Form angegeben werden:
+            <br/><br/>
+            <code>file_spec2</code>, <code>file_spec3</code>, ..., <code>file_spec9</code>
+            <br/><br/>
+            Diese Parameter spezifizieren jeweils eine Dateigruppe, für die individuelle Transfereinstellungen gelten.
+            Bis zu 9 Dateigruppen lassen sich auf diese Weise angeben:
+            <br/><br/>
+            <code>-file_spec=.*\.gif$ -local_dir=/tmp/1 -remote_dir=/tmp/1</code>
+            <br/>
+            <code>-file_spec2=.*\.exe$::param_set_2 -param_set_2="transfer_mode=binary::remote_dir=/tmp/2::local_dir=/tmp/2"</code>
+            <br/><br/>
+            Dabei wird durch <em>::</em> getrennt dem regulären Ausdruck, der die Dateigruppe spezifiziert,
+            der Name einer Parametergruppe zugewiesen. Dieser Name ist frei wählbar, er darf 
+            nur die Zeichen <em>0-9, a-z</em> sowie <em>_</em> enthalten.
+            <br/><br/>
+            Der Name der Parametergruppe wird als selbstständiger Parameter an der Kommandozeile aufgeführt.
+            Als Wertzuweisung der Parametergruppe werden die für diese Gruppe geltenden abweichenden Parameter spezifiziert.
+            Dazu werden jeweils im Format <code>name=wert::name2=wert2 ...</code> die Namen und Werte
+            derjenigen Parameter aufgeführt, die speziell für diese Gruppe gelten.
+            <br/><br/>
+            Im obigen Beispiel werden für alle mit der Endung <em>.gif</em> versehenen Dateien vom lokalen 
+            Verzeichnis <em>/tmp/1</em> in das gleichnamige Verzeichnis am Zielsystem übertragen.
+            Für Dateien mit der Endung <em>.exe</em> wird eine Gruppe <em>param_set_2</em> spezifiziert,
+            die abweichende Transferparameter aufweist, z.B. binäre Übertragung und andere Quell- bzw. Zielverzeichnisse.
+            <br/><br/>
+            Bitte beachten Sie, dass in Parametergruppen keine Parameter zur Steuerung des Verbindungsaufbaus
+            angegeben werden können, d.h. die Dateien werden immer zwischen denselben Systemen übertragen,
+            allerdings kann die Transferrichtung wechseln, z.B. durch Angabe des Parameters <paramref>operation</paramref>
+            für eine Dateigruppe.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            In addition to what is stated for the parameter <paramref>file_spec</paramref> additional parameters
+            can be specified for up to 9 file sets like this:
+            <br/><br/>
+            <code>-file_spec=.*\.gif$ -local_dir=/tmp/1 -remote_dir=/tmp/1</code>
+            <br/>
+            <code>-file_spec2=.*\.exe$::param_set_2 -param_set_2="transfer_mode=binary::remote_dir=/tmp/2::local_dir=/tmp/2"</code>
+            <br/><br/>
+            Within the <code>file_spec2</code> parameter value the regular expression is separated by <em>::</em> 
+            from the name of a file set. This name can freely be chosen, it consists of the 
+            characters <em>0-9, a-z</em> and <em>_</em>.
+            <br/><br/>
+            The name of the file set is used as a separate parameter in the command line.
+            This parameter is assigend the list of parameters that should be valid for the specific file set.
+            Therefore the names and values of individual parameters are specified in the form
+            <code>name=value::name2=value2 ...</code>. Such parameters are exclusively valid for the specific file set.
+            <br/><br/>
+            The above sample causes all files with the extension <em>.gif</em> to be transferred from
+            the local directory <em>/tmp/1</em> to a directory with the same name on the target host.
+            For files with the extension <em>.exe</em> a file set <em>param_set_2</em> is specified
+            that contains parameters that are specific for this file set, as binary transfer and 
+            different source and target directories.
+            <br/><br/>
+            Please, consider that parameter file sets cannot specify parameters that control the 
+            connection to a target host, i.e. all files are transferred between the same local and remote hosts.
+            However, the transfer direction can be changed, e.g. by specifying a different <paramref>operation</paramref>
+            parameter for a file set.
+          </div>
+        </note>
+      </param>
+
+
+      <param name="" required="true">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>Optionale Parameter zur Transfersteuerung</b>
+            <br/><br/>
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>Optional parameters for transfer control</b>
+            <br/><br/>
+          </div>
+        </note>
+      </param>
+
+      <param name="transactional" DefaultValue="false" required="false" DataType="SOSOptionBoolean" Alias="TransactionMode" >
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter bestimmt, ob ob die Dateiübertragung innerhalb einer Transaktion abläuft,
+            d.h. es werden entweder alle Dateien erfolgreich übertragen oder keine.
+            Tritt bei der Übertragung einer Datei ein Fehler auf, dann werden die Übertragungen
+            aller bis dahin übertragenen Dateien rückgängig gemacht ("zurückgerollt").
+            <br/><br/>
+            Wird der Parameter mit dem Wert <em>true</em> verwendet, dann wirken folgende Parameter:
+            <br/><br/>
+            <ul>
+            <li>Der Parameter <paramref>atomic_suffix</paramref> muss angegeben sein, der
+              Zieldateien zunächst mit einem Suffix, z.B. <em>"~"</em>, erzeugt 
+              und nach vollständiger Übertragung in den Zieldateinamen umbenennt.
+              Ist die Übertragung einer von mehreren Dateien nicht erfolgreich, dann
+              wird keine Datei in den Zieldateinamen umbenannt, stattdessen werden die
+              temporär erzeugten Dateien aus dem Zielsystem entfernt.
+            </li>
+            <li>Der Parameter <paramref>remove_files</paramref>, der das Entfernen der übertragenen
+              Dateien aus dem Quellsystem veranlasst, wirkt erst nachdem alle Dateien
+              erfolgreich übertragen wurden. Andernfalls wird keine Datei entfernt.
+            </li>
+            </ul>
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies if file transfers should be operated within a single transaction,
+            i.e. either all files are successfully transferred or none.
+            Should an error occur during a transfer operation then all transfers will be rolled back.
+            <br/><br/>
+            When specifying the value <em>true</em> then the following applies:
+            <br/><br/>
+            <ul>
+            <li>The parameter <paramref>atomic_suffix</paramref> has to be specified that causes
+            target files to be created with a suffix such as <em>"~"</em>
+            and that causes the respective files to be renamed to their target file name 
+            after the transfer of all files has been successfully completed.
+            If at least one file out of a set of files cannot be transferred successfully
+            then no files will be renamed, instead the temporarily created files are removed 
+            from the target system.
+            </li>
+            <li>The parameter <paramref>remove_files</paramref> that causes files to be removed after
+            successful transfer will be effective only after all files have been successfully
+            transferred. Otherwise no files will be removed.
+            </li>
+            </ul>
+          </div>
+        </note>
+      </param>
+
+      <param name="atomic_suffix" required="false" DataType="SOSOptionString" >
+		<title></title>
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter bestimmt, ob Zieldateien zunächst mit einem Suffix, z.B. <em>"~"</em>, erzeugt 
+            und nach vollständiger Übertragung in den Zieldateinamen umbenannt werden,
+            damit die Dateien atomar im Verzeichnis erscheinen.
+            <br/><br/>
+            Als Wert des Parameters kann das temporäre Suffix angegeben werden.
+            <br/><br/>
+            Diese Einstellung wird empfohlen, falls Zielverzeichnisse von einer Applikation oder 
+            mit einem Job Scheduler für Dateiaufträge überwacht werden.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies whether target files should be created with a suffix such as <em>"~"</em>,
+            and should be renamed to the target file name after the file transfer is completed.
+            This mechanism is useful if the target directory is monitored for incoming files
+            by some application
+            and if files are required to appear atomically instead of being subsequently written to.
+            <br/><br/>
+            The temporary suffix is specified as the value of this parameter.
+            <br/><br/>
+            This setting is recommended should target directories be monitored by an application
+            or a Job Scheduler.
+          </div>
+        </note>
+      </param>
+
+      <param name="atomic_prefix" required="false" DataType="SOSOptionString" >
+		<title></title>
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter bestimmt, ob Zieldateien zunächst mit einem prefix, z.B. <em>"~"</em>, erzeugt 
+            und nach vollständiger Übertragung in den endgültigen Zieldateinamen umbenannt werden,
+            damit die Dateien atomar im Verzeichnis erscheinen.
+            <br/><br/>
+            Als Wert des Parameters wird eine Zeichenfolge (oder ein Zeichen) für das temporäre prefix angegeben werden.
+            <br/><br/>
+            Diese Einstellung wird empfohlen, falls Zielverzeichnisse von einer Applikation oder 
+            mit einem JobScheduler für Dateiaufträge überwacht werden.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies whether target files should be created with a prefix such as <em>"~"</em>,
+            and must be renamed to the target file name after the file transfer is completed without errors.
+            This mechanism is useful if the target directory is monitored for incoming files
+            by some application
+            and if files are required to appear atomically instead of being subsequently written to.
+            <br/><br/>
+            The temporary prefix is specified as the value of this parameter.
+            <br/><br/>
+            This setting is recommended should target directories be monitored by an application
+            or a JobScheduler.
+          </div>
+        </note>
+      </param>
+
+      <param name="remove_files" DefaultValue="false" required="false" DataType="SOSOptionBoolean">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter bestimmt, ob nach dem Transfer Dateien auf dem FTP/SFTP Server entfernt werden sollen.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies whether files on the FTP/SFTP server should be removed after transfer.
+          </div>
+        </note>
+      </param>
+
+      <param name="skip_transfer" DefaultValue="false" required="false" DataType="SOSOptionBoolean">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Enthält dieser Parameter den Wert <em>true</em>, dann werden alle Operationen 
+            ausser dem eigentlichen Transfer durchgeführt. 
+            Dadurch kann z.B. nur getriggert oder nur auf dem FTP/SFTP Server gelöscht werden.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            If this Parameter is set to <em>true</em> then 
+            all operations except for the transfer itself will be performed. 
+            This can be used to just trigger for files or to only delete files on the FTP/SFTP server.
+          </div>
+        </note>
+      </param>
+
+      <param name="overwrite_files" DefaultValue="true" required="false" DataType="SOSOptionBoolean">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter bestimmt, ob ggf. vorhandene Dateien überschrieben werden sollen.
+            <br/><br/>
+            Wird dieser Parameter gemeinsam mit <paramref>force_files</paramref> verwendet und verhindert er
+            den Transfer von Dateien wg. Überschreibschutz, dann wird ggf. ein Fehler ausgeworfen
+            mit dem Hinweis <em>"no matching files"</em>.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies if existing files should be overwritten.
+            <br/><br/>
+            Should this parameter be used with <paramref>force_files</paramref> und should no files be 
+            transferred due to overwrite protection then an error will be raised stating
+            that <em>"no matching files"</em> could be found.
+          </div>
+        </note>
+      </param>
+
+      <param name="append_files" DefaultValue="false" required="false" DataType="SOSOptionBoolean">
+		<title></title>
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter bestimmt, ob der Inhalt einer Quelldatei an die Zieldatei
+            angehängt wird, falls die Zieldatei existiert.
+            <br/><br/>
+            Der Parameter
+            <paramref>overwrite_files</paramref>
+            wird nicht beachtet,
+            falls <paramref>append_files</paramref> den Wert
+            <em>true</em>
+            aufweist.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies whether the content of a source file should
+            be appended to the target file should this file exist.
+            <br/><br/>
+            The parameter
+            <paramref>overwrite_files</paramref>
+            will be ignored if this parameter
+            is specified with the value
+            <em>true</em>.
+          </div>
+        </note>
+      </param>
+
+      <param name="force_files" DefaultValue="true" required="false" DataType="SOSOptionBoolean">
+		<title></title>
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter bestimmt, ob ein Fehler ausgelöst wird, wenn keine Dateien
+            für die Übertragung gefunden werden.
+            <br/><br/>
+            Der Umfang der zu übertragenen Dateien wird mit den Parametern
+            <paramref>file_spec</paramref> und <paramref>file_path</paramref>
+            bestimmt und ggf. durch den Parameter
+            <paramref>overwrite_files</paramref>
+            eingeschränkt, falls dieser den Wert
+            <em>false</em>
+            aufweist.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies whether an error should be raised if no files could be found for transfer.
+            <br/><br/>
+            The number of files to be transferred is determined by the
+            <paramref>file_spec</paramref> or <paramref>file_path</paramref>
+            parameters and can be restricted by the
+            <paramref>overwrite_files</paramref>
+            parameter should this 
+            be specified with the value
+            <em>false</em>.
+          </div>
+        </note>
+      </param>
+
+
+
+      <param name="zero_byte_transfer" required="false" DefaultValue="yes" DataType="SOSOptionStringValueList">
+	  <values>
+	  <value>yes</value>
+	  <value>no</value>
+	  <value>strict</value>
+	  <value>relaxed</value>
+	  </values>
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+              Der Parameter legt fest, ob Dateien mit 0 Byte Größe übertragen und ggf. in nachfolgenden Kommandos verarbeitet werden sollen.
+              Folgende Einstellungen sind möglich:
+              <br/>
+              <br/>
+              <ul>
+                <li>
+                  <em>yes</em>
+                  : Dateien mit 0 Byte Größe werden übertragen (Voreinstellung).
+                </li>
+                <li>
+                  <em>no</em>
+                  : Dateien mit 0 Byte Größe werden übertragen, wenn mindestens eine
+                  der übertragenen Dateien mehr als 0 Byte Größe aufweist.
+                </li>
+                <li>
+                  <em>strict</em>
+                  : es werden keine Dateien mit 0 Byte Größe übertragen. 
+                  Werden Dateien mit 0 Byte Größe gefunden, dann wird 
+                  ein Fehler ausgelöst bzw. ein Auftrag beendet.
+                </li>
+                <li>
+                  <em>relaxed</em>
+                  : es werden keine Dateien mit 0 Byte Größe übertragen,
+                    allerdings wird kein Fehler ausgelöst, wenn dadurch keine Dateien übertragen werden konnten.
+                    Ein Auftrag wird ggf. als erledigt markiert.
+                </li>
+              </ul>
+              Die Verwendung kann mit dem Parameter
+              <paramref>force_files</paramref>
+              erweitert werden:
+              enthält dieser Parameter den Wert
+              <em>false</em>,
+              dann wird ein Auftrag fortgesetzt,
+              auch wenn keine Dateien übertragen wurden.
+              <br/>
+              <br/>
+              Der Parameter
+              <paramref>remove_files</paramref>
+              gilt uneingeschränkt. Dateien werden entfernt,
+              unabhängig davon, ob sie wg. 0 Byte Größe übertragen wurden oder nicht.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+              This parameter specifies whether zero byte files should be transferred and processed by subsequent commands.
+              The following settings are available:
+              <br/>
+              <br/>
+              <ul>
+                <li>
+                  <em>yes</em>
+                  : Files with zero byte size are transferred (default).
+                </li>
+                <li>
+                  <em>no</em>
+                  : Files with zero byte size are transferred, should at least one of 
+                  the files have more than zero byte size.
+                </li>
+                <li>
+                  <em>strict</em>
+                  : Files with zero byte size are not transferred. An error will
+                  be raised if any zero byte file is found.
+                </li>
+                <li>
+                  <em>relaxed</em>
+                  : Files with zero byte size will not be transferred. 
+                  However, no error will be raised if this results in no files being transferred.
+                </li>
+              </ul>
+              Use of this parameter can be refined using the
+              <paramref>force_files</paramref>
+              parameter:
+              should
+              <paramref>force_files</paramref>
+              have the value
+              <em>false</em>,
+              then processing will be treated as successful in the event of no files having been transferred.
+              <br/>
+              <br/>
+              Note that the
+              <paramref>remove_files</paramref>
+              parameter has unrestricted validity. 
+              Files with zero byte size will be removed regardless of whether or not they have been transferred.
+          </div>
+        </note>
+      </param>
+
+      <param name="recursive" DefaultValue="false" required="false" DataType="SOSOptionBoolean" Alias="RecurseSubFolders" >
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter gibt an, ob Dateien aus Unterverzeichnissen des 
+            Quellverzeichnisses rekursiv übertragen werden.
+            Der Parameter vereinbart mit den Wertem <em>yes</em> oder <em>true</em> 
+            die rekursive Verarbeitung von Verzeichnissen.
+            <br/><br/>
+            Reguläre Ausdrücke wie sie der Parameter <paramref>file_spec</paramref> spezifiziert,
+            werden auf die Dateien in Unterverzeichnissen angewendet.
+          </div>
+        </note>
+        <note language="en">
+				<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies if files from subdirectories 
+            should be transferred recursively. Recursive processing is
+            specified by one of the values <em>yes</em> or <em>true</em>.
+            <br/><br/>
+            Regular expression matches apply to files from subdirectories 
+            as specified by the parameter <paramref>file_spec</paramref>.
+          </div>
+        </note>
+      </param>
+
+
+
+      <param name="" required="true" id="Transfercheck">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>Parameter zur Transferprüfung</b>
+            <br/><br/>
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>Parameters for transfer verification</b>
+            <br/><br/>
+          </div>
+        </note>
+      </param>
+
+      <param name="check_size" DefaultValue="true" required="false" DataType="SOSOptionBoolean" Alias="CheckFileSizeAfterTransfer">
+        <note language="de">
+		<title></title>		
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter bestimmt, ob nach dem Transfer die Größen der übertragenen Datei
+            und der Anzahl übertragener Byte geprüft werden und im Fall fehlender Übereinstimmung
+            ein Fehler ausgelöst wird.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>		
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter determines whether the original file size and the number of
+            bytes transferred should be compared after a file transfer and whether
+            an error should be raised if they would not match.
+          </div>
+        </note>
+      </param>
+
+      <param name="check_retry" DefaultValue="0" required="false" DataType="SOSOptionInteger">
+        <note language="de">
+				<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter bestimmt, ob eine Datei mehrfach übertragen werden soll,
+            um zu prüfen, ob die Datei beim Start der Verarbeitung vollständig
+            am FTP/SFTP Server vorhanden war. Dies ist z.B. für Unix Dateisysteme relevant,
+            bei denen Dateien gleichzeitig gelesen und geschrieben werden können.
+            <br/><br/>
+            Der Parameter veranlasst den Vergleich der Dateigrößen für die aktuelle und die vorhergehende Übertragung
+            und wiederholt bis zu der mit diesem Parameter angebebenen Anzahl die Wiederholungsversuche
+            eine Datei zu übertragen. Stimmen die Dateigrößen aus zwei aufeinanderfolgenden Übertragungen überein, 
+            dann gilt die Datei als korrekt übertragen.
+            <br/><br/>
+            Mit dem Parameter
+            <paramref>check_interval</paramref>
+            kann das Intervall zwischen
+            zwei Wiederholungsversuchen eine Datei zu übertragen eingestellt werden.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>		
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies whether a file transfer should be repeated
+            in order to ensure that the file was complete when the transfer started.
+            This is relevant for Unix systems that allow read and write access
+            to a file at the same time.
+            <br/><br/>
+            This parameter causes the size of the current file transfer and of the previous file transfer
+            to be compared
+            and repeats transferring one file up to the number of trials specified by
+            this parameter. Should the file size of both transfers be the same,
+            then it is assumed that the file was complete at the FTP/SFTP server.
+            <br/><br/>
+            The interval between two trials to transfer a file is configured
+            using the
+            <paramref>check_interval</paramref>
+            parameter.
+          </div>
+        </note>
+      </param>
+
+      <param name="check_interval" DefaultValue="60" required="false" DataType="SOSOptionInteger">
+        <note language="de">
+		<title></title>		
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter bestimmt das Wiederholungsintervall in Sekunden zwischen zwei Versuchen
+            eine Datei zu übertragen, wenn mit dem Parameter
+            <paramref>check_retry</paramref>
+            eine wiederholte Übertragung vereinbart wurde.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>		
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the interval in seconds between two file transfer trials, 
+            if repeated transfer of files has been configured using the
+            <paramref>check_retry</paramref>
+            parameter.
+          </div>
+        </note>
+      </param>
+
+
+      <param name="" required="true" id="FilePolling">
+        <note language="de">
+		<title></title>		
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>Parameter für das Polling</b>
+            <br/><br/>
+          </div>
+        </note>
+        <note language="en">
+		<title></title>		
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>Parameters for polling</b>
+            <br/><br/>
+          </div>
+        </note>
+      </param>
+
+      <param name="poll_timeout" DefaultValue="0" required="false" DataType="SOSOptionInteger">
+        <note language="de">
+		<title></title>		
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter bestimmt den Zeitraum in Minuten, wie lange bis zum Vorhandensein einer Datei
+            abgewartet wird.
+            <br/><br/>
+            Trifft innerhalb der Wartezeit eine Datei ein, so wird sie übertragen;
+            andernfalls wird ein Fehler <em>"no matching files"</em> ausgeworfen.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the time in minutes, how long a file is polled for.
+            <br/><br/>
+            If a file becomes available within the time specified then it will be transferred,
+            otherwise an error <em>"no matching files"</em> will be raised.
+          </div>
+        </note>
+      </param>
+
+      <param name="poll_interval" DefaultValue="60" required="false" DataType="SOSOptionInteger">
+        <note language="de">
+		<title></title>		
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter bestimmt das Intervall in Sekunden, wie oft das Vorhandensein einer Datei
+            innerhalb des mit dem Parameter <paramref>poll_timeout</paramref> benannten Zeitraums geprüft wird.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>		
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the interval in seconds, how often a file is polled for
+            within the duration that is specified by the parameter <paramref>poll_timeout</paramref>.
+          </div>
+        </note>
+      </param>
+      
+      <param name="poll_minfiles" DefaultValue="1" required="false" DataType="SOSOptionInteger">
+        <note language="de">
+		<title></title>		
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter bestimmt wie viele Dateien mindestens gefunden werden
+            müssen, damit der Transfer beginnt. Dieser Parameter ist nur wirksam in Zusammenhang
+            mit dem Parameter <paramref>poll_timeout</paramref>.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>		
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the number of files that have to be found during the polling
+            period in order to cause the transfer to start. This parameter is used exclusively with
+            the parameters <paramref>poll_timeout</paramref>.
+          </div>
+        </note>
+      </param>
+
+
+      <param name="" required="true" id="FileProcessing">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>Parameter zur Dateiverarbeitung</b>
+            <br/><br/>
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>Parameters for file processing</b>
+            <br/><br/>
+          </div>
+        </note>
+      </param>
+
+      <param name="replacing" required="false" DataType="SOSOptionRegExp" Alias="ReplaceWhat">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Regulärer Ausdruck für Dateinamensersetzung mit
+            dem Wert des Parameters <paramref>replacement</paramref>.
+            <br/><br/>            
+            Wenn der Ausdruck im Dateinamen gefunden wird, werden die gefundenen Gruppen ersetzt.
+            <br/>
+            <br/>
+            a)
+            <br/>
+            Für die Ersetzung werden "capturing groups" verwendet. D.h. nur der Inhalt der Gruppen wird ersetzt.
+            <br/>
+            Ersetzungszeichenfolgen werden mit einem Semikolon ";" getrennt. Beispiel:
+            <br/>
+            <paramref>replacing</paramref>
+            : (1)abc(12)def(.*)
+            <br/>
+            <paramref>replacement</paramref>
+            : A;BB;CCC
+            <br/>
+            Eingabedatei: 1abc12def123.txt
+            <br/>
+            Ausgabedatei: AabcBBdefCCC
+            <br/>
+            <br/>
+            b)
+            <br/>
+            Werden keine "capturing groups" angegeben, dann wird die gesamte Übereinstimmung ersetzt. Beispiel:
+            <br/>
+            <paramref>replacing</paramref>
+            : Hallo
+            <br/>
+            <paramref>replacement</paramref>
+            : 1234
+            <br/>
+            Eingabedatei: Hallo_Welt.txt
+            <br/>
+            Ausgabedatei: 1234_Welt.txt
+            <br/>
+            <br/>
+            Erfordert den Parameter
+            <paramref>replacement</paramref>.
+          </div>
+        </note>
+        <note language="en">
+				<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Regular expression for filename replacement with
+            the value of the parameter <paramref>replacement</paramref>.
+            <br/><br/>
+            If the expression matches the filename then the groups found are replaced.
+            <br/>
+            <br/>
+            a)
+            <br/>
+            For replacement "capturing groups" are used. Only the content of the capturing groups is replaced.
+            <br/>
+            Replacements are separated by a semicolon ";". Example:
+            <br/>
+            <paramref>replacing</paramref>
+            : (1)abc(12)def(.*)
+            <br/>
+            <paramref>replacement</paramref>
+            : A;BB;CCC
+            <br/>
+            Input file: 1abc12def123.txt
+            <br/>
+            Output file: AabcBBdefCCC
+            <br/>
+            <br/>
+            b)
+            <br/>
+            If no "capturing groups" are specified then the entire match is replaced. Example:
+            <br/>
+            <paramref>replacing</paramref>
+            : Hello
+            <br/>
+            <paramref>replacement</paramref>
+            : 1234
+            <br/>
+            Input file: Hello_World.txt
+            <br/>
+            Output file: 1234_World.txt
+            <br/>
+            <br/>
+            Requires the parameter
+            <paramref>replacement</paramref>
+            to be specified.
+          </div>
+        </note>
+      </param>
+
+      <param name="replacement" required="false" DataType="SOSOptionString" Alias="ReplaceWith">
+	  		<title></title>
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Zeichenkette für die Ersetzung desjenigen Ausdrucks für Dateinamensbestandteile,
+            der im Wert des Parameters <paramref>replacing</paramref> angegeben ist.
+            <br/><br/>
+            Sollen mehrere Gruppen ersetzt werden, dann muss pro Gruppe eine Zeichenkette angegeben werden. Diese werden mit einem Semikolon ";" voneinander getrennt:
+            <br/>
+            replacement: aa;[filename:];bb
+            <br/><br/>
+              Unterstützt Substitution von Masken im Dateinamen mit Formatangaben, die mit
+              <em>[</em>
+              und
+              <em>]</em>
+              geklammert sind.
+              Folgende Formate werden unterstützt:
+              <br/>
+              <br/>
+              <ul>
+                <li>
+                  <code>
+                    [date:
+                    <em>date format</em>
+                    ]
+                  </code>
+                  <br/>
+                  <em>date format</em>
+                  muss ein gültiger Java Format-String für Datumsangaben sein, z.B.
+                  <br/>
+                  <em>yyyyMMddHHmmss</em>
+                  ,
+                  <em>yyyy-MM-dd.HHmmss</em>
+                  etc.
+                </li>
+                <li>
+                    <code>[filename:]</code>
+                    <br/>
+                    Wird durch den ursprünglichen Dateinamen einschließlich Dateiendung ersetzt.
+                </li>
+                <li>
+                    <code>[filename:lowercase]</code>
+                    <br/>
+                    Wird durch den ursprünglichen Dateinamen einschließlich Dateiendung in Kleinbuchstaben ersetzt.
+                </li>
+                <li>
+                    <code>[filename:uppercase]</code>
+                    <br/>
+                    Wird durch den ursprünglichen Dateinamen einschließlich Dateiendung in Grossbuchstaben ersetzt.
+                </li>
+              </ul>
+            <br/>
+            Erfordert den Parameter
+            <paramref>replacing</paramref>
+            .
+          </div>
+        </note>
+        <note language="en">
+				<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            String for replacement of matching character sequences within file names that are specified with the
+            value of the parameter <paramref>replacing</paramref>.
+            <br/><br/>
+            If multiple "capturing groups" shall be replaced then one replacement string per group has to be specified. 
+            These strings are separated by a semicolon ";":
+            <br/>
+            replacement: aa;[filename:];bb
+            <br/><br/>
+              Supports masks for substitution in the file name with format strings that are enclosed with
+              <em>[</em>
+              and
+              <em>]</em>
+              .
+              The following format strings are supported:
+              <br/>
+              <br/>
+              <ul>
+                <li>
+                  <code>
+                    [date:
+                    <em>date format</em>
+                    ]
+                  </code>
+                  <br/>
+                  <em>date format</em>
+                  must be a valid Java data format string, e.g.
+                  <br/>
+                  <em>yyyyMMddHHmmss</em>
+                  ,
+                  <em>yyyy-MM-dd.HHmmss</em>
+                  etc.
+                </li>
+                <li>
+                  <code>[filename:]</code>
+                  <br/>
+                  Will be substituted by the original file name including the file extension.
+                </li>
+                <li>
+                   <code>[filename:lowercase]</code><br/>
+                    Will be substituted by the original file name including the file extension with all characters converted to lower case.
+                  </li>
+                  <li>
+                    <code>[filename:uppercase]</code><br/>
+                    Will be substituted by the original file name including the file extension with all characters converted to upper case.
+                </li>
+              </ul>
+            <br/>
+            Requires the parameter
+            <paramref>replacing</paramref>
+            to be specified.
+          </div>
+        </note>
+      </param>
+
+      <param name="root" required="false" DataType="FolderName" Alias="TempFolderName">
+      <!-- wer hat den Parameter "root" genannt  und aus welchem Grund? -->
+        <note language="de">
+				<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter benennt das Verzeichnis, in dem dieses Programm
+            temporäre Dateien erzeugen kann. Temporäre Dateien werden
+            benötigt, wenn mittels <paramref>jump_host</paramref> Dateien auf
+            einem Server zwischengespeichert und nach Abschluss des
+            Transfers entfernt werden sollen.
+            <br/><br/>
+            Ohne Angabe dieses Parameters wird der Name des Verzeichnises für temporäre Dateien
+            vom Betriebssystem übernommen.
+          </div>
+        </note>
+        <note language="en">
+				<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            The parameter specifies the directory in which this program
+            is allowed to create temporary files. Temporary files
+            are required if due to the parameter setting <paramref>jump_host</paramref> files have to 
+            be stored on an intermediary server and will be removed
+            after completion of the transfer.
+            <br/><br/>
+            Without this parameter the temporary directory is used as
+            provided by the operating system.
+          </div>
+        </note>
+      </param>
+
+
+      <param name="" required="true" id="AlternateConectionParameters">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>Parameter für alternative Server-Verbindungen</b>
+            <br/><br/>
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>Parameters for alternative connections</b>
+            <br/><br/>
+          </div>
+        </note>
+      </param>
+
+      <param name="alternative_host" required="false" extends="host" DataType="SOSOptionHostName">
+        <note language="de">
+				<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Alternativer Parameter für den primären Parameter
+            <paramref>host</paramref>.
+            <br/><br/>
+            Die aternativen Parameter werden nur dann verwendet, wenn die Verbindung zum FTP/SFTP Server
+            fehlschlägt, z.B. der Server nicht verfügbar ist, Zugangsdaten ungültig sind etc.
+          </div>
+        </note>
+        <note language="en">
+				<title></title>
+
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Alternative parameter for the primary parameter
+            <paramref>host</paramref>.
+            <br/><br/>
+            The alternative parameters are used solely should the connection to an FTP/SFTP server fail,
+            e.g. if the server were not available or if invalid credentials were used.
+          </div>
+        </note>
+      </param>
+
+      <param name="alternative_port" required="false" extends="port" DataType="SOSOptionPortNumber" Alias="AlternativePortNumber">
+        <note language="de">
+				<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Alternativer Parameter für den primären Parameter
+            <paramref>port</paramref>.
+            <br/><br/>
+            Die aternativen Parameter werden nur verwendet, wenn die Verbindung zum FTP/SFTP Server
+            fehlschlägt, z.B. der Server nicht verfügbar ist, Zugangsdaten ungültig sind etc.
+          </div>
+        </note>
+        <note language="en">
+				<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Alternative parameter for the primary parameter
+            <paramref>port</paramref>.
+            <br/><br/>
+            The alternative parameters are used solely should the connection to an FTP/SFTP server fail,
+            e.g. if the server were not available or if invalid credentials were used.
+          </div>
+        </note>
+      </param>
+
+      <param name="alternative_user" required="false"  extends="user">
+        <note language="de">
+				<title></title>
+
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Alternativer Parameter für den primären Parameter
+            <paramref>user</paramref>.
+            <br/><br/>
+            Die aternativen Parameter werden nur verwendet, wenn die Verbindung zum FTP/SFTP Server
+            fehlschlägt, z.B. der Server nicht verfügbar ist, Zugangsdaten ungültig sind etc.
+          </div>
+        </note>
+        <note language="en">
+				<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Alternative parameter for the primary parameter
+            <paramref>user</paramref>.
+            <br/><br/>
+            The alternative parameters are used solely should the connection to an FTP/SFTP server fail,
+            e.g. if the server were not available or if invalid credentials were used.
+          </div>
+        </note>
+      </param>
+
+      <param name="alternative_password" required="false"  extends="Password">
+        <note language="de">
+				<title></title>
+
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Alternativer Parameter für den primären Parameter
+            <paramref>password</paramref>.
+            <br/><br/>
+            Die aternativen Parameter werden nur verwendet, wenn die Verbindung zum FTP/SFTP Server
+            fehlschlägt, z.B. der Server nicht verfügbar ist, Zugangsdaten ungültig sind etc.
+          </div>
+        </note>
+        <note language="en">
+				<title></title>
+
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Alternative parameter for the primary parameter
+            <paramref>password</paramref>.
+            <br/><br/>
+            The alternative parameters are used solely should the connection to an FTP/SFTP server fail,
+            e.g. if the server were not available or if invalid credentials were used.
+          </div>
+        </note>
+      </param>
+
+      <param name="alternative_account" required="false"  extends="account">
+        <note language="de">
+				<title></title>
+
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Alternativer Parameter für den primären Parameter
+            <paramref>account</paramref>.
+            <br/><br/>
+            Die aternativen Parameter werden nur verwendet, wenn die Verbindung zum FTP/SFTP Server
+            fehlschlägt, z.B. der Server nicht verfügbar ist, Zugangsdaten ungültig sind etc.
+          </div>
+        </note>
+        <note language="en">
+				<title></title>
+
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Alternative parameter for the primary parameter
+            <paramref>account</paramref>.
+            <br/><br/>
+            The alternative parameters are used solely should the connection to an FTP/SFTP server fail,
+            e.g. if the server were not available or if invalid credentials were used.
+          </div>
+        </note>
+      </param>
+
+      <param name="alternative_remote_dir" required="false"  extends="remote_dir">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Alternativer Parameter für den primären Parameter
+            <paramref>remote_dir</paramref>.
+            <br/><br/>
+            Die aternativen Parameter werden nur verwendet, wenn die Verbindung zum FTP/SFTP Server
+            fehlschlägt, z.B. der Server nicht verfügbar ist, Zugangsdaten ungültig sind etc.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Alternative parameter for the primary parameter
+            <paramref>remote_dir</paramref>.
+            <br/><br/>
+            The alternative parameters are used solely should the connection to an FTP/SFTP server fail,
+            e.g. if the server were not available or if invalid credentials were used.
+          </div>
+        </note>
+      </param>
+
+      <param name="alternative_passive_mode" required="false"  extends="passive_mode">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Alternativer Parameter für den primären Parameter
+            <paramref>passive_mode</paramref>.
+            <br/><br/>
+            Die aternativen Parameter werden nur verwendet, wenn die Verbindung zum FTP/SFTP Server
+            fehlschlägt, z.B. der Server nicht verfügbar ist, Zugangsdaten ungültig sind etc.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Alternative parameter for the primary parameter
+            <paramref>passive_mode</paramref>.
+            <br/><br/>
+            The alternative parameters are used solely should the connection to an FTP/SFTP server fail,
+            e.g. if the server were not available or if invalid credentials were used.
+          </div>
+        </note>
+      </param>
+
+      <param name="alternative_transfer_mode" required="false"  extends="transfer_mode">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Alternativer Parameter für den primären Parameter
+            <paramref>transfer_mode</paramref>.
+            <br/><br/>
+            Die alternativen Parameter werden nur verwendet, wenn die Verbindung zum FTP/SFTP Server
+            fehlschlägt, z.B. der Server nicht verfügbar ist, Zugangsdaten ungültig sind etc.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Alternative parameter for the primary parameter
+            <paramref>transfer_mode</paramref>.
+            <br/><br/>
+            The alternative parameters are used solely should the connection to an FTP/SFTP server fail,
+            e.g. if the server were not available or if invalid credentials were used.
+          </div>
+        </note>
+      </param>
+
+
+      <param name="" required="true" ID="Authentication">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>Parameter für SSH Verbindungen</b>
+            <br/><br/>
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>Parameters for SSH connections</b>
+            <br/><br/>
+          </div>
+        </note>
+      </param>
+
+      <param name="ssh_proxy_host" required="false"  extends="proxy_host">
+        <note language="de">
+				<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Wert des Parameters ist der Hostname oder die IP-Adresse eines Proxies, 
+            über den die Verbindung zum SSH Server hergestellt wird.
+            Die Verwendung von Proxies ist optional.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            The value of this parameter is the host name or the IP address of a 
+            proxy that is used in order to establish a connection to the SSH server. 
+            The use of a proxy is optional.
+          </div>
+        </note>
+      </param>
+
+      <param name="ssh_proxy_port" required="false"  extends="proxy_port" >
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Wert des Parameters ist der Port des Proxies, über den eine Verbindung 
+            zum SSH Server hergestellt wird.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the port number of the proxy, 
+            should a proxy be used in order to establish a connection to the SSH server.
+          </div>
+        </note>
+      </param>
+
+      <param name="ssh_proxy_user" required="false"  extends="proxy_user">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Wert des Parameters enthält den Namen einer Benutzerkennung
+            zur Autorisierung am Proxy Server, wenn die Verbindung zum SSH
+            Server über einen Proxy hergestellt wird.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            The value of this parameter specifies the user account for authentication 
+            by the proxy server should a proxy be used in order to connect to the SSH server.
+          </div>
+        </note>
+      </param>
+
+      <param name="ssh_proxy_password" required="false"  extends="password">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Wert des Parameters enthält das Kennwort einer Benutzerkennung
+            zur Autorisierung am Proxy Server, wenn die Verbindung zum SSH
+            Server über einen Proxy hergestellt wird.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the password for the proxy server user account, 
+            should a proxy be used in order to connect to the SSH server.
+          </div>
+        </note>
+      </param>
+
+      <param name="ssh_auth_method" required="false" DefaultValue="publickey"  DataType="SOSOptionStringValueList" extends="auth_method" >
+	  <values>
+	  <value>publickey</value>
+	  <value>password</value>
+	  </values>
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parmeter spezifiziert die Authentifizierungsmethode am SSH Server, unterstützt
+            werden <paramval>publickey</paramval> und <paramval>password</paramval>.
+            <br/><br/>
+            Bei Verwendung der Authentifizierungsmethode <paramval>publickey</paramval> muss
+            im Parameter <paramref>ssh_auth_file</paramref> der Pfad der Datei mit dem Private-Key
+            des Benutzers angegeben werden. Ist diese Datei mit einer Passphrase geschützt,
+            dann muss diese mit dem Parameter <paramref>password</paramref> angegeben werden.
+            <br/><br/>
+            Bei Verwendung der Authentifizierungsmethode <paramval>password</paramval> wird das 
+            Kennwort des Benutzers mit dem Parameter <paramref>password</paramref> angegeben.
+            <br/><br/>
+            Welche Authentifizierungsmethoden unterstützt werden, ist am (SSH-) Server konfiguriert.
+            Nicht alle (SSH-) Server sind für die Authentifizierungsmethode <paramval>password</paramval> konfiguriert.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the authentication method for the SSH server -
+            the <em>publickey</em> and <em>password</em> methods are supported.
+            <br/><br/>
+            Should the <em>publickey</em> authentication method be used,
+            then the path name of the private key file has to be specified with the <paramref>ssh_auth_file</paramref> parameter.
+            Should the private key file be secured by a passphrase then the passphrase has to be specified 
+            with the <paramref>password</paramref> parameter.
+            <br/><br/>
+            For the <em>password</em> authentication method the password for the user account has to be specified
+            using the <paramref>password</paramref> parameter.
+            <br/><br/>
+            The authentication methods that are enabled depend on the SSH server configuration.
+            Not all SSH servers are configured for <em>password</em> authentication.
+          </div>
+        </note>
+      </param>
+
+      <param name="ssh_auth_file" required="false" DataType="SOSOptionInFileName" >
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter bestimmt den Pfad und Namen einer Datei mit dem Private Key 
+            des Benutzers, für den die Anmeldung am SSH Server erfolgt.
+            <br/><br/>
+            Der Parameter muss angegeben werden, wenn mit dem Parameter <paramref>ssh_auth_method</paramref>
+            die Authentifizierungsmethode <em>publickey</em> bestimmt wurde.
+            <br/><br/>
+            Falls die Datei mit einer Passphrase geschützt ist, wird diese mit dem Parameter
+            <paramref>password</paramref> angegeben.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the path and name of a user's private key file
+            that is used for authentication with an SSH server.
+            <br/><br/>
+            This parameter has to be specified should the <em>publickey</em> authentication method
+            have been specified in the <paramref>ssh_auth_method</paramref> parameter.
+            <br/><br/>
+            Should the private key file be secured by a passphrase, then the passphrase has to be specified
+            using the <paramref>password</paramref> parameter. 
+          </div>
+        </note>
+      </param>
+
+
+      <param name="" required="true" id="SSLAuthentication">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>Parameter für SSL/TLS Verbindungen</b>
+            <br/><br/>
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>Parameters for SSL/TLS connections</b>
+            <br/><br/>
+          </div>
+        </note>
+      </param>
+
+      <param name="http_proxy_host" required="false"  alias="proxy_host">
+        <note language="de">
+          		<title></title>
+<div xmlns="http://www.w3.org/1999/xhtml">
+            Der Wert des Parameters ist der Hostname oder die IP-Adresse eines Proxies,
+            über den die Verbindung zum SSH Server via SSL/TLS hergestellt wird.
+            Die Verwendung von Proxies ist optional und nur wirksam mit dem 
+            Parameter <paramref>protocol=ftps</paramref>.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            The value of this parameter is the host name or the IP address of a
+            proxy used in order to establish a connection to the SSH server via SSL/TLS.
+            The use of a proxy is optional and exclusively considered
+            if the parameter <paramref>protocol=ftps</paramref> is used.
+          </div>
+        </note>
+      </param>
+
+      <param name="http_proxy_port" required="false" alias="proxy_port">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Wert des Parameters ist der Port des Proxies, über den eine Verbindung
+            zum SSH Server via SSL/TLS hergestellt wird,
+            siehe Parameter <paramref>http_proxy_host</paramref>.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the port of a proxy that is used
+            in order to establish a connection to the SSH server via SSL/TLS,
+            see parameter <paramref>http_proxy_host</paramref>.
+          </div>
+        </note>
+      </param>
+
+
+      <param name="" required="true" id="JumpHostSettings">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>Parameter für die Verwendung von Jump Hosts</b>
+            <br/><br/>
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>Parameters used with Jump Hosts</b>
+            <br/><br/>
+          </div>
+        </note>
+      </param>
+
+      <param name="jump_protocol" required="false" DefaultValue="sftp" extends="protocol" >
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Bei Verwendung eines <paramref>jump_host</paramref> werden Dateien zunächst auf diesen
+            Server transferiert und anschließend an das Zielsystem. Dabei können unterschiedliche
+            Protokolle (FTP/SFTP) für die beiden Transferoperationen verwendet werden.
+            <br/><br/>
+            Der Parameter nimmt die Werte
+            <paramval>ftp</paramval>, <paramval>sftp</paramval> oder <paramval>ftps</paramval> an.
+            Bei Verwendung von <paramval>sftp</paramval> werden auch die <paramval>jump_ssh_*</paramval>-Parameter
+            ausgewertet.   
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            When using a <paramref>jump_host</paramref> then files are first transferred to this host
+            and then to the target system. Different protocols (FTP/SFTP) can be used for
+            these transfer operations.
+            <br/><br/>
+            This parameter expects
+            <paramval>ftp</paramval>, <paramval>sftp</paramval> or <paramval>ftps</paramval> to be specified.
+            If <paramval>sftp</paramval> is used, then the <paramval>jump_ssh_*</paramval> parameters will
+            be considered.
+          </div>
+        </note>
+      </param>
+
+      <param name="jump_host" required="false" extends="host">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Bei Verwendung eines <paramref>jump_host</paramref> werden Dateien zunächst auf diesen
+            Server transferiert und anschließend an das Zielsystem. Dabei können unterschiedliche
+            Protokolle (FTP/SFTP) für die beiden Transferoperationen verwendet werden.
+            <br/><br/>
+            Host oder IP-Adresse des <paramref>jump_host</paramref>, von dem bzw. zu dem Dateien zunächst übertragen werden.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            When using a <paramref>jump_host</paramref> then files are first transferred to this host
+            and then to the target system. Different protocols (FTP/SFTP) can be used for
+            these transfer operations.
+            <br/><br/>
+            Host or IP address of the <paramref>jump_host</paramref> from which or to which files should be transferred in a first operation.
+          </div>
+        </note>
+      </param>
+
+      <param name="jump_port" DefaultValue="22" required="false" extends="port">
+		<title></title>
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Port des <paramref>jump_host</paramref>, über den Dateien gesendet werden.
+            Für FTP meist Port 21, für SFTP meist Port 22.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Port on the <paramref>jump_host</paramref> by which files should be transferred.
+            For FTP this is usually port 21, for SFTP this is usually port 22.
+          </div>
+        </note>
+      </param>
+
+      <param name="jump_user" required="false" extends="user" >
+		<title></title>
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Benutzername zur Anmeldung am <paramref>jump_host</paramref>.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            User name for authentication with the <paramref>jump_host</paramref>.
+          </div>
+        </note>
+      </param>
+
+      <param name="jump_password" required="false" extends="password">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Kennwort zur Anmeldung am <paramref>jump_host</paramref>.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Password for authentication with the <paramref>jump_host</paramref>.
+          </div>
+        </note> 
+      </param>
+
+      <param name="jump_proxy_host" required="false" extends="host" >
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Wert des Parameters ist der Hostname oder die IP-Adresse eines Proxies,
+            über den die Verbindung zum jump host hergestellt wird.
+            Die Verwendung von Proxies ist optional.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            The value of this parameter is the host name or the IP address of a
+            proxy used in order to establish a connection to the jump host.
+            The use of a proxy is optional.
+          </div>
+        </note>
+      </param>
+
+      <param name="jump_proxy_port" required="false" extends="port">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Wert des Parameters ist der Port des Proxies, über den eine Verbindung
+            zum jump host hergestellt wird,
+            siehe Parameter <paramref>jump_proxy_host</paramref>.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the port of a proxy that is used
+            in order to establish a connection to the jump host,
+            see parameter <paramref>jump_proxy_host</paramref>.
+          </div>
+        </note>
+      </param>
+
+      <param name="jump_proxy_user" required="false" extends="user">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Wert des Parameters enthält den Namen einer Benutzerkennung
+            zur Autorisierung am Proxy Server, wenn die Verbindung zum jump
+            host über einen Proxy hergestellt wird,
+            siehe Parameter <paramref>jump_proxy_host</paramref>.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            The value of this parameter specifies the user account for authentication 
+            by the proxy server should a proxy be used in order to connect to the jump host,
+            see parameter <paramref>jump_proxy_host</paramref>.
+          </div>
+        </note>
+      </param>
+
+      <param name="jump_proxy_password" required="false" extends="password">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Wert des Parameters enthält das Kennwort einer Benutzerkennung
+            zur Autorisierung am Proxy Server, wenn die Verbindung zum jump
+            host über einen Proxy hergestellt wird,
+            siehe Parameter <paramref>jump_proxy_host</paramref>.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the password for the proxy server user account, 
+            should a proxy be used in order to connect to the jump host,
+            see parameter <paramref>jump_proxy_host</paramref>.
+          </div>
+        </note>
+      </param>
+
+      <param name="jump_ssh_auth_method" required="false" extends="ssh_auth_method">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter spezifiziert die Authentifizierungsmethode am SSH Server des <paramref>jump_host</paramref>, 
+            unterstützt werden <em>publickey</em> und <em>password</em>.
+            <br/><br/>
+            Bei Verwendung der Authentifizierungsmethode <em>publickey</em> muss
+            im Parameter <paramref>jump_ssh_auth_file</paramref> der Pfad der Datei mit dem Private Key
+            des Benutzers angegeben werden. Ist diese Datei mit einer Passphrase geschützt,
+            dann muss die Passphrase mit dem Parameter <paramref>jump_password</paramref> angegeben werden.
+            <br/><br/>
+            Bei Verwendung der Authentifizierungsmethode <em>password</em> wird das 
+            Kennwort des Benutzers mit dem Parameter <paramref>jump_password</paramref> angegeben.
+            <br/><br/>
+            Welche Authentifizierungsmethoden unterstützt werden, ist am SSH Server konfiguriert.
+            Nicht alle SSH Server sind für die Authentifizierungsmethode <em>password</em> konfiguriert.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the authentication method for the SSH server -
+            the <em>publickey</em> and <em>password</em> methods are supported.
+            <br/><br/>
+            When the <em>publickey</em> authentication method is used,
+            then the path name of the private key file must be set in the <paramref>jump_ssh_auth_file</paramref> parameter.
+            Should the private key file be secured by a passphrase then this passphrase has to be specified 
+            by the <paramref>jump_password</paramref> parameter.
+            <br/><br/>
+            For the <em>password</em> authentication method the password for the user account has to be specified
+            using the <paramref>jump_password</paramref> parameter.
+            <br/><br/>
+            The authentication methods that are enabled depend on the SSH server configuration.
+            Not all SSH servers are configured for <em>password</em> authentication.
+          </div>
+        </note>
+      </param>
+
+      <param name="jump_ssh_auth_file" required="false" extends="ssh_auth_file" >
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter bestimmt den Pfad und Namen einer Datei mit dem Private Key 
+            des Benutzers, für den die Anmeldung am SSH Server des <paramref>jump_host</paramref> erfolgt.
+            <br/><br/>
+            Der Parameter muss angegeben werden, wenn mit dem Parameter <paramref>jump_ssh_auth_method</paramref>
+            die Authentifizierungsmethode <em>publickey</em> bestimmt wurde.
+            <br/><br/>
+            Falls die Datei mit einer Passphrase geschützt ist, wird die Passphrase mit dem Parameter
+            <paramref>jump_password</paramref> angegeben.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the path and name of a user's private key file
+            used for login to the SSH server of the <paramref>jump_host</paramref>.
+            <br/><br/>
+            This parameter must be specified if the <em>publickey</em> authentication method
+            has been specified in the <paramref>jump_ssh_auth_method</paramref> parameter.
+            <br/><br/>
+            Should the private key file be secured by a password, then this password has to be specified
+            using the <paramref>jump_password</paramref> parameter. 
+          </div>
+        </note>
+      </param>
+      
+      <param name="jump_command" required="false" DataType="SOSOptionCommand" >
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter beinhaltet das Kommando, das am SSH Server ausgeführt wird.
+            Mehrere Kommandos können durch die im Parameter <paramref>jump_command_delimiter</paramref>
+            angegebene Zeichenfolge getrennt angegeben werden.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies a command that is to be executed on the SSH server.
+            Multiple commands can be separated by the command delimiter that is
+            specified using the <paramref>jump_command_delimiter</paramref> parameter.
+          </div>
+        </note>
+      </param>
+
+      <param name="jump_command_script" required="false" DataType="SOSOptionCommandScript" >
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter kann alternativ zu <paramref>jump_command</paramref>, <paramref>jump_command_delimiter</paramref> und <paramref>jump_command_script_file</paramref>
+            angegeben werden und enthält Script Code, der als Datei zum entfernten Host übertragen und
+            dort ausgeführt wird.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter can be used as an alternative to <paramref>jump_command</paramref>, <paramref>jump_command_delimiter</paramref> and <paramref>jump_command_script_file</paramref>.
+            It contains script code which will be transferred to the remote host as a file and will then be executed there.
+          </div>
+        </note>
+      </param>
+      <param name="jump_command_script_file" required="false" DataType="SOSOptionCommandScriptFile">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter kann alternativ zu <paramref>jump_command</paramref>, <paramref>jump_command_delimiter</paramref> und <paramref>jump_command_script</paramref>
+            angegeben werden und enthält den Namen einer Script-Datei, die zum entfernten Host übertragen und
+            dort ausgeführt wird.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter can be used as an alternative to <paramref>jump_command</paramref>, <paramref>jump_command_delimiter</paramref> and <paramref>jump_command_script</paramref>.
+            It contains the name of a script file, which will be transferred to the remote host and will then be executed there.
+          </div>
+        </note>
+      </param>
+      <param name="jump_command_delimiter" required="true" DefaultValue="%%" DataType="SOSOptionString">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Alternativ können mehrere getrennt auszuführende Kommandos durch die mit diesem Parameter
+            bestimmte Zeichenfolge getrennt im Wert des Parameters <paramref>jump_command</paramref> angegeben werden.
+            Getrennt auszuführende Kommandos werden in separaten SSH Sessions ausgeführt.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Command delimiter characters are specified using this parameter.
+            These delimiters can then be used in the <paramref>jump_command</paramref> parameter 
+            to seperate multiple commands. 
+            These commands are then excecuted in separate SSH sessions.
+          </div>
+        </note>
+      </param>
+      <param name="jump_ignore_error" required="false" DefaultValue="false" DataType="SOSOptionBoolean">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Wird der Wert <em>true</em> angegeben, dann werden Fehler bei Ausführung von
+            Kommandos im SSH Server ignoriert, andernfalls werden sie als Fehler gemeldet.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Should the value <em>true</em> be specified, then execution errors caused by
+            commands on the SSH server are ignored. Otherwise such execution errors will be reported.
+          </div>
+        </note>
+      </param>
+      <param name="jump_ignore_signal" required="false" DefaultValue="false" DataType="SOSOptionBoolean">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Wird der Wert <em>true</em> angegeben, dann werden unter Unix 
+            Signale ignoriert, die zur Beendigung des am SSH Server ausgeführten Kommandos führen,
+            z.B. falls ein Kommando mit <em>kill</em> beendet wurde.
+            <br/><br/>
+            Per Voreinstellung wird das Beenden von Kommandos durch Signale als
+            Fehler gemeldet.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Should the value <em>true</em> be specified, 
+            then on Unix systems all signals will be ignored
+            that terminate the execution of a command on the SSH server - 
+            if for example a command is terminated using <em>kill</em>.
+            <br/><br/>
+            Note that by default errors will be reported for commands that are terminated by signals.
+          </div>
+        </note>
+      </param>
+      <param name="jump_ignore_stderr" required="false" DefaultValue="false" DataType="SOSOptionBoolean">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Job prüft das Vorhandensein von Ausgaben nach stderr des am SSH Server ausgeführten Kommandos
+            und interpretiert dies als Fehler des Jobs bzw. Auftrags.
+            <br/><br/>
+            Wird der Wert <em>true</em> für diesen Parameter angegeben, dann werden
+            Ausgaben nach stderr nicht als Fehler gemeldet.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This job checks if any output to stderr has been created by a command that is being
+            executed on the SSH server and reports this as an error.
+            <br/><br/>
+            Should the value <em>true</em> be specified for this parameter, 
+            then output to stderr will not be reported as an error by the Job Scheduler.
+          </div>
+        </note>
+      </param>
+      <param name="jump_simulate_shell" required="false" DefaultValue="false" DataType="SOSOptionBoolean">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Wird der Wert <em>true</em> für diesen Parameter angegeben, dann wird ein Login
+            an der Shell simuliert, um die Befehle auszuführen. Manche Scripte haben
+            Probleme, wenn keine Shell vorhanden ist.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Should the value <em>true</em> be specified for this parameter, 
+            then a login to a shell is simulated to execute commands. Some scripts
+            may cause problems if no shell is present.
+          </div>
+        </note>
+      </param>
+      <param name="jump_simulate_shell_prompt_trigger" required="false" DataType="SOSOptionString">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der erwartete Prompt an der Kommandozeile. Damit kann festgestellt werden, ob
+            Befehle eingegeben werden können, bzw. ausgeführt wurden. Kann
+            kein Prompt konfiguriert werden, so müssen timeout Werte verwendet werden,
+            wennn geprüft werden soll, ob die Shell Kommandos entgegennimmt.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            The expected command line prompt. Using this prompt the program tries to find out
+            if commands may be entered or have been carried out. If no prompt can be
+            configured, then timeout parameters have to be used in order to check if 
+            the shell is ready to accept commands.
+          </div>
+        </note>
+      </param>
+      <param name="jump_simulate_shell_login_timeout" required="false" DataType="SOSOptionInteger" >
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Wenn während der angegebenen Dauer von Millisekunden keine neuen Zeichen nach
+            stdout oder stderr geschrieben werden, wird angenommen, dass der Login
+            ausgeführt ist und die Shell auf eine Befehlseingabe wartet.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            If no new characters are written to stdout or stderr after the given number
+            of milliseconds, then it is assumed that the login has been carried out and
+            that the shell is waiting for the next command.
+          </div>
+        </note>
+      </param>
+      <param name="jump_simulate_shell_inactivity_timeout" required="false" DataType="SOSOptionInteger">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Wenn während der angegebenen Dauer von Millisekunden keine neuen Zeichen nach
+            stdout oder stderr geschrieben werden, wird angenommen, dass das Kommando
+            ausgeführt wurde und die Shell auf eine Befehlseingabe wartet.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            If no new characters are written to stdout or stderr after the given number
+            of milliseconds, then it is assumed that the command has been carried out and
+            that the shell is waiting for the next command.
+          </div>
+        </note>
+      </param>
+
+      <param name="" required="true" id="InstallationParameters">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>Parameter zur Installation</b>
+            <br/><br/>
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>Parameters for installation</b>
+            <br/><br/>
+          </div>
+        </note>
+      </param>
+      
+      <param name="classpath_base" required="false" DataType="SOSOptionFolderName">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter wird bei der Installation des Programms auf einem Remote Server
+            verwendet in Zusammenhang mit dem Parameter <paramref>operation</paramref>=install.
+            Der Parameter bestimmt den Pfad des Java Runtime Environments (JRE)
+            am Remote Server und wird eingesetzt falls auf diesem System
+            kein JRE im Pfad verfügbar ist.
+            <br/><br/>
+            Der Pfad des angegebenen JRE wird in das Start Script am Remote Server übernommen
+            (<shell>sosftp.cmd</shell> bzw. <shell>sosftp.sh</shell>).
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            The parameter is used during installation of this program on a remote server
+            with the parameter <paramref>operation</paramref>=installcode>.
+            This parameter specifies the path of the Java Runtime Environment (JRE)
+            at the remote server and is used if on the remote server a JRE
+            is not included in the system path.
+            <br/><br/>
+            The path of the specified JRE is added to the start script at the remote server
+            (<shell>sosftp.cmd</shell> respectively <shell>sosftp.sh</shell>).
+          </div>
+        </note>
+      </param>
+
+
+      <param name="" required="true" id="HistoryParameters">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>Parameter zur Historienführung</b>
+            <br/><br/>
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>Parameters for history processing</b>
+            <br/><br/>
+          </div>
+        </note>
+      </param>
+      
+      <param name="history" required="false" DataType="SOSOptionOutFileName" Alias="SOSFtpHistoryFileName" >
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter benennt den Pfad und Namen einer Historiendatei im CSV Format.
+            Für jede transferierte Datei wird ein Eintrag geschrieben.
+            <br/><br/>
+            Die Historiendatei enthält folgende Spalten:
+            <br/><br/>
+            <ul>
+              <li>guid<br/>
+                Ein eindeutige Identifikation des Historieneintrags. Sie wird zur Prüfung von Dubletten
+                in Kombination mit dem Job Scheduler für Managed File Transfer verwendet.
+              </li> 
+              <li>mandator<br/>
+                Die Bezeichnung eines Mandanten, für den der File Transfer durchgeführt wurde.
+              </li>
+              <li>transfer_timestamp<br/>
+                Der Zeitpunkt des File Transfers.
+              </li>
+              <li>pid<br/>
+                Die Prozessnummer des aktuellen Prozesses, der den File Transfer durchführt,
+                siehe Parameter <paramref>current_pid</paramref>.
+              </li>
+              <li>ppid<br/>
+                Die Prozessnummer des Vaterprozesses des aktuellen Prozesses, der den File Transfer durchführt.
+                siehe den entsprechenden Parameter.
+              </li>
+              <li>operation<br/>
+                Eine der Operationen <em>send</em> oder <em>receive</em>, siehe den entsprechenden Parameter.
+              </li>
+              <li>localhost<br/>
+                Der Name des Hosts, auf dem dieses Programm ausgeführt wird.
+              </li>
+              <li>localhost_ip<br/>
+                Die IP-Adresse des Hosts, auf dem dieses Programm ausgeführt wird.
+              </li>
+              <li>local_user<br/>
+                Der Name des lokalen Benutzer-Accounts, für den dieses Programm ausgeführt wird.
+              </li>
+              <li>remote_host<br/>
+                Der Name des Hosts zu/von dem ein Transfer ausgeführt wird,
+                siehe Parameter <paramref>host</paramref>.
+              </li>
+              <li>remote_host_ip<br/>
+                Die IP-Adresse des Hosts zu/von dem ein Transfer ausgeführt wird,
+                siehe Parameter <paramref>host</paramref>.
+              </li>
+              <li>remote_user<br/>
+                Der Name des Benutzer-Accounts auf dem Remote Host,
+                siehe Parameter <paramref>user</paramref>.
+              </li>
+              <li>protocol<br/>
+                Als Protokoll wird <em>ftp</em>, <em>sftp</em> oder <em>ftps</em> verwendet, 
+                siehe den entsprechenden Parameter.
+              </li>
+              <li>port<br/>
+                Der Port am Remote Host, siehe den entsprechenden Parameter.
+              </li>
+              <li>local_dir<br/>
+                Das lokale Verzeichnis zu/von dem eine Datei transferiert wurde, siehe den entsprechenden Parameter.
+              </li>
+              <li>remote_dir<br/>
+                Das Verzeichnis am Remote Host zu/von dem eine Datei transferiert wurde, siehe den entsprechenden Parameter.
+              </li>
+              <li>local_filename<br/>
+                Für die Operation <em>send</em> ist dies der Original-Dateiname am lokalen System.
+                <br/><br/>
+                Für die Operation <em>receive</em> ist dies der resultierende Dateiname am lokalen System,
+                nachdem ggf. eine Ersetzung des Dateinamens erfolgt ist, siehe Parameter <paramref>replacing</paramref>.
+              </li>
+              <li>remote_filename<br/>
+                Für die Operation <em>send</em> ist dies der resultierende Dateiname am Remote Host,
+                nachdem ggf. eine Ersetzung des Dateinamens erfolgt ist, siehe Parameter <paramref>replacing</paramref>.
+                <br/><br/>
+                Für die Operation <em>receive</em> ist dies der Original-Dateiname am Remote Host.
+              </li>
+              <li>file_size<br/>
+                Die Größe der übertragenen Date in Bytes.
+              </li>
+              <li>md5<br/>
+                Der Wert des MD5 Hash, der aus der übertragenen Datei gewonnen wurde.
+              </li>
+              <li>status<br/>
+                Als Status kann <em>success</em> oder <em>error</em> aufgeführt sein.
+              </li>
+              <li>last_error_message<br/>
+                Falls ein Fehler aufgetreten ist, dann wird die letzte Fehlermeldung ausgegeben.
+              </li>
+              <li>log_filename<br/>
+                Der Name der Protokolldatei, siehe den entsprechenden Paramter.
+              </li>
+            </ul>
+          </div>
+        </note>
+        <note language="en">
+				<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter causes a history file to be written in CSV format. The path and name of the
+            history file is specified as value for this parameter. A history record is created
+            for each file that has been transferred.
+            <br/><br/>
+            A history file contains the following columns:
+            <br/><br/>
+            <ul>
+              <li>guid<br/>
+                A unique identifier for the history entry. This identifier is used for checking of duplicate entries
+                in combination with Job Scheduler for Managed File Transfer.
+              </li> 
+              <li>mandator<br/>
+                A character that denominates the mandator of a file transfer, see respective parameter.
+              </li>
+              <li>transfer_timestamp<br/>
+                The point in time when the transfer took place.
+              </li>
+              <li>pid<br/>
+                The process id of the current process that executes the file transfer, see parameter <paramref>current_pid</paramref>.
+              </li>
+              <li>ppid<br/>
+                The process id of the parent of the process that executes the file transfer, see respective parameter.
+              </li>
+              <li>operation<br/>
+                One of the operations <em>send</em> or <em>receive</em>, see respective parameter.
+              </li>
+              <li>localhost<br/>
+                The name of the host on which this program is executed.
+              </li>
+              <li>localhost_ip<br/>
+                The IP address of the host on which this program is executed.
+              </li>
+              <li>local_user<br/>
+                The name of the user account for which this program is executed.
+              </li>
+              <li>remote_host<br/>
+                The name of the host to/from which a transfer is executed, see parameter <paramref>host</paramref>.
+              </li>
+              <li>remote_host_ip<br/>
+                The IP address of the host to/from which a transfer is executed, see parameter <paramref>host</paramref>.
+              </li>
+              <li>remote_user<br/>
+                The name of the user account for the remote host, see parameter <paramref>user</paramref>.
+              </li>
+              <li>protocol<br/>
+                The protocol can be either <em>ftp</em>, <em>sftp</em> or <em>ftps</em>, see respective parameter.
+              </li>
+              <li>port<br/>
+                The port on the remote host, see respective parameter.
+              </li>
+              <li>local_dir<br/>
+                The local directory to/from which a file has been transferred, see respective parameter.
+              </li>
+              <li>remote_dir<br/>
+                The remote directory to/from which a file has been transferred, see respective parameter.
+              </li>
+              <li>local_filename<br/>
+                For <em>send</em> operations this is the original file name on the local host.
+                <br/><br/>
+                For <em>receive</em> operations this is the resulting file name on the local host
+                optionally having applied <paramref>replacement</paramref> operations, see parameter <paramref>replacing</paramref>.
+              </li>
+              <li>remote_filename<br/>
+                For <em>send</em> operations this is the resulting file name on the remote host
+                optionally having applied <paramref>replacement</paramref> operations, see parameter <paramref>replacing</paramref>.
+                <br/><br/>
+                For <em>receive</em> operations this is the original file name on the remote host.
+              </li>
+              <li>file_size<br/>
+                The size of the transferred file in bytes.
+              </li>
+              <li>md5<br/>
+                The value of the MD5 hash that is created from the file that was transferred.
+              </li>
+              <li>status<br/>
+                The status can be either <em>success</em> or <em>error</em>.
+              </li>
+              <li>last_error_message<br/>
+                Should an error have occurred then the last error message will be given in this column.
+              </li>
+              <li>log_filename<br/>
+                The name of the log file, see respective parameter.
+              </li>
+            </ul>
+          </div>
+        </note>
+      </param>
+      
+      <param name="history_repeat" DefaultValue="3" required="false" DataType="SOSOptionInteger">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter wird verwendet, um das gleichzeitige Schreiben mehrerer
+            Instanzen dieses Programms in die Historiendatei zu synchronisieren.
+            <br/><br/>
+            Der Parameter bestimmt die maximale Anzahl der Wiederholungsintervall beim Schreiben
+            in die Historiendatei, falls die Datei von einer anderen Instanz dieses
+            Programms gesperrt ist.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            The parameter is used in order to synchronize parallel write access
+            to the history file by multiple instances of this program.
+            <br/><br/>
+            This parameter specifies the maximum number of repeat intervals when trying
+            to write to the history file if the history file is locked
+            due to parallel instances of this program.
+          </div>
+        </note>
+      </param>
+
+      <param name="history_repeat_interval" DefaultValue="1" required="false" DataType="SOSOptionInteger">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter wird verwendet, um das gleichzeitige Schreiben mehrerer
+            Instanzen dieses Programms in die Historiendatei zu synchronisieren.
+            <br/><br/>
+            Der Parameter bestimmt das Zeitintervall in Sekunden zwischen zwei Wiederholungsintervall beim Schreiben
+            in die Historiendatei, falls die Datei von einer anderen Instanz dieses
+            Programms gesperrt ist, siehe Parameter <paramref>history_repeat</paramref>.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            The parameter is used in order to synchronize parallel write access
+            to the history file by multiple instances of this program.
+            <br/><br/>
+            This parameter specifies the the interval in seconds of repeated trials
+            to write to the history file if the history file is locked
+            due to parallel instances of this program.
+          </div>
+        </note>
+      </param>
+
+      <param name="current_pid" required="false" DataType="SOSProcessID">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter wird unter Unix verwendet und - abweichend von anderen Parametern - 
+            i.d.R. bereits im Start Script <shell>sosftp.sh</shell> eingesetzt.
+            Als Wert wird die Umgebungsvariable <em>$$</em> übergeben, die 
+            die die aktuelle Prozessnummer (PID) enthält.
+            <br/><br/>
+            Die Prozessnummer wird beim Schreiben einer Historiendatei für jeden Transfer
+            protokolliert (siehe Parameter <paramref>history</paramref>), 
+            um nachvollziehbar zu halten, von welchem Prozess Dateien übertragen wurden.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter is used for Unix systems and - as opposed to other parameters -
+            is usually specified in the start script <shell>sosftp.sh</shell>.
+            The value of the environment variable <em>$$</em> is assigned, that
+            contains the current process id (PID).
+            <br/><br/>
+            The process id is used when writing an entry to a history file for each transfer 
+            (see parameter <paramref>history</paramref>).
+          </div>
+        </note>
+      </param>
+
+      <param name="ppid" required="false" DataType="SOSProcessID">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter wird unter Unix verwendet und - abweichend von anderen Parametern - 
+            i.d.R. bereits im Start Script <code>sosftp.sh</code> eingesetzt.
+            Als Wert wird die Umgebungsvariable <em>$PPID</em> übergeben, die 
+            die Prozessnummer des aktuellen Vaterprozesses (PPID) enthält.
+            <br/><br/>
+            Diese Prozessnummer wird beim Schreiben einer Historiendatei für jeden Transfer
+            protokolliert (siehe Parameter <paramref>history</paramref>), 
+            um nachvollziehbar zu halten, von welchem Prozess Dateien übertragen wurden.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter is used for Unix systems and - as opposed to other parameters -
+            is usually specified in the start script <code>sosftp.sh</code>.
+            The value of the environment variable <em>$PPID</em> is assigned, that
+            contains the process id of the current parent process (PPID).
+            <br/><br/>
+            The parent process id is used when writing an entry to a history file for each transfer 
+            (see parameter <paramref>history</paramref>).
+          </div>
+        </note>
+      </param>
+
+      <param name="mandator" DefaultValue="SOS" required="false" DataType="SOSOptionString" >
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter nimmt die Bezeichnung eines Mandanten auf, für den der File Transfer ausgeführt wird.
+            Der Mandant wird in eine ggf. verwendete Historiendatei übernommen, siehe Parameter <paramref>history</paramref>,
+            er hat keine technische Relevanz für den Transfer.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the mandator for which a file transfer is effected.
+            The mandator is added to an optional history file, see parameter <paramref>history</paramref>
+            and has no technical relevance for the transfer.
+          </div>
+        </note>
+      </param>
+      
+      <param name="scheduler_host" required="false" extends="host">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Parameter benennt den Host-Namen oder die IP-Adresse eines Servers, auf dem ein
+            JobScheduler für den "Managed File Transfer" betrieben wird.
+            <br/><br/>
+            Per Job Scheduling wird automatisiert der Inhalt einer ggf. verwendeten Historiendatei
+            (siehe Parameter <paramref>history</paramref>) in eine zentrale Datenbank übernommen.
+            <br/><br/>
+            Dieser Parameter veranlasst die Übertragung der Historieneinträge
+            für den aktuellen Transfer per UDP an den Job Scheduler. Sollte der Job Scheduler
+            nicht erreichbar sein, dann wird kein Fehler gemeldet, stattdessen wird der Inhalt
+            der Historiendatei nachträglich automatisch vom Job Scheduler verarbeitet.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            This parameter specifies the host name or IP address of a server for which
+            Job Scheduler is operated for Managed File Transfer.
+            <br/><br/>
+            The contents of an optional history file (see parameter <paramref>history</paramref>),
+            is added to a central database by Job Scheduler.
+            <br/><br/>
+            This parameter causes the transfer of the history entries for the current transfer
+            by UDP to Job Scheduler. Should Job Scheduler not be accessible then no errors are
+            reported, instead, the contents of the history will automaticall be processed later on.
+          </div>
+        </note>
+      </param>
+
+      <param name="scheduler_port" required="false" extends="port">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Port, für den ein Job Scheduler für Managed File Transfer betrieben wird,
+            siehe Parameter <paramref>scheduler_host</paramref>.
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            The port for which a Job Scheduler for Managed File Transfer is operated, see parameter <paramref>scheduler_host</paramref>.
+          </div>
+        </note>
+      </param>
+      
+      <param name="scheduler_job_chain" DefaultValue="scheduler_sosftp_history" required="false" DataType="JSJobChain" >
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Der Name einer Job-Kette für den Managed File Transfer im Job Scheduler,
+            siehe Parameter <paramref>scheduler_host</paramref>.
+            Die Job-Kette nimmt einen Historieneintrag entgegen und importiert ihn in 
+            eine zentrale Datenbank.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            The name of a job chain for Managed File Transfer with Job Scheduler,
+            see parameter <paramref>scheduler_host</paramref>.
+            The job chain accepts history entries and performs an import into
+            a central database.
+          </div>
+        </note>
+      </param>
+      
+
+      <param name="" required="true">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>Weitere Parameter</b>
+            <br/><br/>
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <br/><br/>
+            <b>Additional parameters</b>
+            <br/><br/>
+          </div>
+        </note>
+      </param>
+
+      <param name="*" required="false">
+        <note language="de">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Beliebige weitere Parameter ohne Schlüsselwort stellen die Pfade von Dateien dar,
+            die transferiert werden sollen.
+          </div>
+        </note>
+        <note language="en">
+		<title></title>
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Any additional parameters that are not preceeded by keywords
+            represent paths for files that should be transferred.
+          </div>
+        </note>
+      </param>
+
+    </params>
+  </configuration>
+
+  <documentation language="de">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      Das Programm wird als synchrone File Transfer Lösung eingesetzt.
+      Asynchroner Transfer wird von den entsprechenden Standard-Jobs im Job Scheduler unterstützt.
+      <br/><br/>
+      <b>File Transfer Features</b>
+      <br/><br/>
+      <ul>
+        <li>Senden und Empfangen von Dateien via FTP von/zu Server Systemen.</li>
+        <li>Senden und Empfangen von Dateien via SFTP von/zu Server Systemen.</li>
+        <li>Kommandos per SSH auf einem entfernten Rechner ausführen.</li>
+        <li>Dateien per FTP oder SFTP zu einem "jump host" versenden und von dort via FTP oder SFTP
+            auf ein Zielsystem weiterleiten.
+            Unterschiedliche Protokolle können zwischen lokalem System und "jump host" 
+            sowie zwischen "jump host" und Zielsystem verwendet werden.</li>
+        <li>Dateien von einem entfernten Server System via FTP und SFTP auf einem "jump host" annehmen
+            und per FTP oder SFTP auf das lokale System transferieren.
+            Unterschiedliche Protokolle können für den Transfer zwischen den Systemen eingesetzt werden.</li>
+        <li>Authentifizierung per Kennwort und per privatem/öffentlichem Schlüssel 
+            für Transfers via SFTP werden unterstützt.</li>
+        <li>Die Parametrisierung erfolgt per Kommandozeile und Konfigurationsdateien.</li>
+        <li>Alle Parameter werden ausschließlich am lokalen System angegeben,
+            dies gilt in gleicher Weise bei Verwendung eines "jump host", da lokale Parameter
+            dynamisch an den "jump host" weitergeleitet werden.</li> 
+        <li>Protokollierung und Fehlerbehandlung: Fehler bei der Übertragung einzelner Dateien werden erkannt.</li>
+        <li>Sicherheit: am "jump host" werden keine Konfigurationsdateien vorgehalten.
+            (außer privaten Schlüsseldateien die für den Zugriff auf das Zielsystem benötigt werden).
+            Am "jump host" werden keine Kennwörter gespeichert.
+            Es werden keine Proxy-Funktionalitäten der Server Systeme vorausgesetzt.</li>
+      </ul>
+      <br/><br/>
+      <b>Spezielle Transfer Features</b>
+      <br/><br/>
+      <ul>
+        <li>Teilqualifizierter Transfer von Dateien<br/><br/>
+          Alternativ zum Transfer einer einzelnen Datei können mit regulären Ausdrücken
+          Dateimengen für den Transfer selektiert werden.
+        </li>
+        <li>Rekursiver Transfer von Dateien<br/><br/>
+          Es können Dateien aus beliebigen Unterverzeichnissen anhand von regulären Ausdrücken
+          für die Übertragung selektiert werden. Unterverzeichnisse werden im lokalen Dateisystem eingerichtet, falls erforderlich.
+        </li>
+        <li>Atomare Übertragung<br/><br/>
+          Dateien können während des Transfers umbenannt werden, um sie nach vollständiger Übertragung
+          atomar in einem Verzeichnis erscheinen zu lassen. Dies ist z.B. relevant, wenn Verzeichnisse
+          überwacht werden und ausschließlich vollständig übertragene Dateien weiterverarbeitet werden sollen.
+        </li>
+        <li>Vollständigkeitsprüfung übertragener Dateien<br/><br/>
+          Die Prüfung beinhaltet, dass nach dem Transfer die Größen der übertragenen Datei
+          und der Anzahl übertragener Byte geprüft werden sowie die wiederholte Übertragung
+          von Dateien, um sicherzustellen, dass Eingabedateien nicht während der Dauer des Transfers verändert wurden. 
+        </li>
+        <li>Behandlung leerer Dateien<br/><br/>
+          Zur Behandlung leerer Dateien stehen eine Reihe von Optionen zur Verfügung, z.B.
+          Ausschluß leerer Dateien, Zulasssen einzelner leerer Dateien, Benachrichtigung per E-Mail beim Transfer leerer Dateien.
+        </li>
+        <li>Umbenennen von Dateien<br/><br/>
+          Nach der Übertragung können Dateien anhand von regulären Ausdrücken umbenannt werden.
+        </li>
+        <li>Verwendung alternativer Zugangsdaten<br/><br/>
+          Für den Fall, dass ein Verbindungsaufbau bzw. eine Anmeldung an einem FTP Server fehlschlägt,
+          kann eine alternative Zugangskonfiguration angegeben werden, die bspw. im Fehlerfall einen Backup FTP Server 
+          anspricht. 
+          <br/><br/>
+          Primäre und alternative Zugangsdaten werden additiv gehandhabt, d.h. es müssen nur
+          diejenigen alternativen Zugangsparameter angegeben werden, die sich von den primären 
+          Zugangsparametern unterscheiden.
+        </li>
+        <li>Unterstützung für UNC Pfade als Zielverzeichnisse<br/><br/>
+          Dateien können direkt von einem FTP/SFTP Server
+          zu einem entfernten Server-System übertragen werden.
+        </li>
+        <li>Führung einer Transfer-Historie<br/><br/>
+          Optional wird für jeden Transfer eine Historie geführt.
+          Historieneinträge werden optional an einen Job Scheduler signalisiert,
+          der sie in einer zentralen Datenbank konsolidiert und für Auskünfte
+          zur Verfügung stellt.
+        </li>
+      </ul>
+      <br/><br/>
+      <b>Systemvoraussetzungen</b>
+      <br/><br/>
+      <ul>
+        <li>Java Runtime Environment JRE 1.4 und höher</li>
+        <li>Für die "jump host" Functionalität muss das Programm am "jump host" 
+            und am lokalen System installiert sein.
+        </li>
+      </ul>
+      <br/><br/>
+      <b>Start Skript</b>
+      <br/><br/>
+      <ul>
+        <li>Windows: sosftp.cmd<br/><code>
+<pre>set CLASSPATH_BASE=.
+java -classpath "%CLASSPATH_BASE%/commons-net-1.2.2.jar;%CLASSPATH_BASE%/sos.net.jar; 
+                 %CLASSPATH_BASE%/sos.settings.jar;%CLASSPATH_BASE%/sos.util.jar; 
+                 %CLASSPATH_BASE%/trilead-ssh2-build211.jar" sos.net.SOSFTPCommand %*</pre>
+          </code>
+        </li>
+        <li>Unix: sosftp.sh<br/><code>
+<pre>CLASSPATH_BASE=.
+JAVA_BIN="java"
+"$JAVA_BIN" -classpath "$CLASSPATH_BASE/commons-net-1.2.2.jar:$CLASSPATH_BASE/sos.net.jar: 
+                        $CLASSPATH_BASE/sos.settings.jar:$CLASSPATH_BASE/sos.util.jar:
+                        $CLASSPATH_BASE/trilead-ssh2-build211.jar" sos.net.SOSFTPCommand
+                          -current_pid=$$ -ppid=$PPID $*</pre>
+          </code>
+        </li>
+      </ul>
+      <br/><br/>
+      <b>Kommandozeilenparameter</b>
+      <br/><br/>
+      <ul>
+        <li>Generell<br/><code>
+<pre>Usage: sos.net.SOSFTPCommand -operation= -settings= -profile= -verbose=
+        -operation=[send|receive|execute|remove]   FTP/SFTP operation
+        -settings=[file]                   Configuration file
+        -profile=[profile]                 Section/Profile for FTP/SFTP settings
+                                           in configuration file
+        -verbose=[1..9]                    Verbosity level</pre>
+          </code>
+        </li>
+        <li>Kommandozeilenparameter und Konfigurationsdateien<br/><br/>
+        Das Programm kann Parameter direkt von der Kommandozeile
+        oder aus einer Konfigurationsdatei lesen. Bei Angabe an der Kommandozeile wird jeweils ein Bindestrich 
+        vor den Parameter gesetzt:
+        <br/><br/>
+        <code>sosftp.sh -operation=send -protocol=ftp -host=localhost -port=21 -local_dir=/tmp ...</code>
+        <br/><br/>
+        Bei Verwendung einer Konfigurationsdatei werden Profile als Sektionen eingerichtet und einzelne Parameter als Paare aus Namen 
+        und Wert aufgeführt, z.B. in einer Datei <em>settings.ini</em>:
+        <br/><br/><code>
+        [sample_transfer]<br/>
+        protocol = ftp<br/>
+        host = localhost<br/>
+        port = 21<br/>
+        local_dir = /tmp<br/>
+        ...
+        </code><br/><br/>
+        An der Kommandozeile wird der Name der Einstellungsdatei und des Profils angegeben:
+        <br/><br/>
+        <code>sosftp.sh -operation=send -settings=settings.ini -profile=sample_transfer ...</code>
+        <br/><br/>
+        Parameter aus einer Konfigurationsdatei und an der Kommandozeile können gemischt verwendet werden,
+        dabei haben Parameter an der Kommandozeile Vorrang.
+        </li>
+      </ul>     
+    </div>
+  </documentation>
+  <documentation language="en">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      This program is used as a standalone, synchroneous File Transfer solution.
+      For asynchroneous file transfer see the respective standard jobs with the Job Scheduler.
+      <br/><br/>
+      <b>File Transfer Features</b>
+      <br/><br/>
+      <ul>
+        <li>Send and receive files by FTP to/from some target host.</li>
+        <li>Send and receive files by SFTP to/from some target host.</li>
+        <li>Execute commands by SSH on some host.</li>
+        <li>Send files by FTP or SFTP to a "jump host" and forward them by FTP or SFTP to a target host. 
+            Different transfer protocols can be used between local host and "jump_host" and 
+            between "jump_host" and target host.</li>
+        <li>Receive files from a remote host by FTP or SFTP to a "jump host" and forward them 
+            by FTP or SFTP to the local host. Different protocols can be used for transfer between the hosts.</li>
+        <li>Both password and public key authentication are supported for SFTP.</li>
+        <li>The parameterization is effected by command line parameters and by configuration files.</li>
+        <li>All parameters are specified on the localhost exclusively, 
+            this applies in the same way when using a "jump host" as local parameters 
+            are dynamically forwarded to the "jump host".</li>
+        <li>Logging and error handling are provided, errors are detected on a per file basis.</li>
+        <li>Security: no configuration files are used on the "jump host" 
+            (except for private key files that are used in order to access a target host); 
+            no passwords are stored on the "jump host"; FTP proxy functionality is not used.</li>
+      </ul>
+      <br/><br/>
+      <b>Specific Transfer Features</b>
+      <br/><br/>
+      <ul>
+        <li>Transfer of partially matched files<br/><br/>
+          Alternatively to transferring individual files, you could transfer multiple files by use of regular expressions.
+        </li>
+        <li>
+          Recursive transfer of files in directories<br/><br/>
+          Files from arbitrarily nested subdirectories can be selected for transfer by regular expressions.
+          Subdirectories will be created in the local file system if required.
+        </li>
+        <li>Atomic Transfer<br/><br/>
+          Files can be renamed during transfer in order to make them appear atomically in a target directory.
+          This is relevant e.g. should target directories be monitored for incoming files. This feature
+          guarantees that incoming files are completely transferred before they appear in a directory.
+        </li>
+        <li>Check transferred files for completeness<br/><br/>
+          Checking completeness is done by comparing the size of incoming files with the number of transferred bytes.
+          Moreover, files can be transferred repeatedly in order to verify that the files have not been changed on the
+          FTP server during the transfer period.
+        </li>
+        <li>Handling of empty files<br/><br/>
+          There are multiple options to handle empty files: Exclude empty files from transfer,
+          include particular empty files, notification by e-mail in case of transfer of empty files. 
+        </li>
+        <li>Renaming of files<br/><br/>
+          Files can be renamed after transfer by regular expressions.
+        </li>
+        <li>Use of alternative access data and credentials<br/><br/>
+          Should a connection or the login to an FTP server fail then alternative access data and credentials
+          can be used, e.g. to connect to a backup FTP server in case of failure.
+          <br/><br/>
+          Primary and alternative access parameters are handled additively, i.e. only those alternative
+          parameters have to be specified that differ from the primary access parameters.
+        </li>
+        <li>Support for UNC paths in target directories<br/><br/>
+          Files can be directly transferred from an FTP/SFTP server
+          to a remote server system.
+        </li>
+        <li>Track record of file transfers<br/><br/>
+          Optionally a history file keeps track of every transfer that has been effected.
+          History entries are optionally signalled to a Job Scheduler that adds them
+          to a central database.
+        </li>
+      </ul>
+      <br/><br/>
+      <b>System Requirements</b>
+      <br/><br/>
+      <ul>
+        <li>Java Runtime Environment JRE 1.4 and above.</li>
+        <li>For the "jump host" functionality this program has to be deployed to the "jump host" and
+            to the localhost.
+        </li>
+      </ul>
+      <br/><br/>
+      <b>Start Script</b>
+      <br/><br/>
+      <ul>
+        <li>Windows: sosftp.cmd<br/><code>
+<pre>set CLASSPATH_BASE=.
+java -classpath "%CLASSPATH_BASE%/commons-net-1.2.2.jar;%CLASSPATH_BASE%/sos.net.jar; 
+                 %CLASSPATH_BASE%/sos.settings.jar;%CLASSPATH_BASE%/sos.util.jar; 
+                 %CLASSPATH_BASE%/trilead-ssh2-build211.jar" sos.net.SOSFTPCommand %*</pre>
+          </code>
+        </li>
+        <li>Unix: sosftp.sh<br/><code>
+<pre>CLASSPATH_BASE=.
+JAVA_BIN="java"
+"$JAVA_BIN" -classpath "$CLASSPATH_BASE/commons-net-1.2.2.jar:$CLASSPATH_BASE/sos.net.jar: 
+                        $CLASSPATH_BASE/sos.settings.jar:$CLASSPATH_BASE/sos.util.jar:
+                        $CLASSPATH_BASE/trilead-ssh2-build211.jar" sos.net.SOSFTPCommand 
+                          -current_pid=$$ -ppid=$PPID $*</pre>
+          </code>
+        </li>
+      </ul>
+      <br/><br/>
+      <b>Command line parameters</b>
+      <br/><br/>
+      <ul>
+        <li>General<br/><code>
+<pre>Usage: sos.net.SOSFTPCommand -operation= -settings= -profile= -verbose=
+        -operation=[send|receive|execute|remove]   FTP/SFTP operation
+        -settings=[file]                   Configuration file
+        -profile=[profile]                 Section/Profile for FTP/SFTP settings
+                                           in configuration file
+        -verbose=[1..9]                    Verbosity level</pre>
+          </code>
+        </li>
+        <li>Command line parameters and Configuration Files<br/><br/>
+        This program can read parameters directly from the command line
+        and from a configuration file. if specified at the command line then a hyphen is added before each parameter:
+        <br/><br/>
+        <code>sosftp.sh -operation=send -protocol=ftp -host=localhost -port=21 -local_dir=/tmp ...</code>
+        <br/><br/>
+        If a configuration file is used then profiles can be added as sections in this file and 
+        individual parameters can be specified as pairs of names and values, e.g. for a file <em>settings.ini</em>:
+        <br/><br/><code>
+        [sample_transfer]<br/>
+        protocol = ftp<br/>
+        host = localhost<br/>
+        port = 21<br/>
+        local_dir = /tmp<br/>
+        ...
+        </code><br/><br/>
+        At the command line the name of the configuration file and the profile are specified like this:
+        <br/><br/>
+        <code>sosftp.sh -operation=send -settings=settings.ini -profile=sample_transfer ...</code>
+        <br/><br/>
+        Mixed usage of parameters from the command line and from a configuration file is supported,
+        command line parameters have precedence.
+        </li>
+      </ul>
+    </div>
+  </documentation>
+</description>

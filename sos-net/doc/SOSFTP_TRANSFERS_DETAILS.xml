@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="create_table_documentation_v1.1.xsl"?>
+<description
+  xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 
+http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+  <table name="SOSFTP_TRANSFER_DETAILS">
+    <script language="sql"  resource="1" />
+  </table>
+  <releases>
+    <release id="1.0" created="2010-09-09" modified="2010-09-09">
+      <title>Version 1.0 - 2010-09-09</title>
+      <author name="Robert Ehrlich" email="re@sos-berlin.com" />
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Refactoring of former Version</div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Refactoring of former Version</div></note>
+    </release>
+  </releases>
+  
+  <fields>
+    <params id="field_parameter">
+      
+      <field name="GUID" type="VARCHAR" len="40" null="false">
+        <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Primärschlüssel. GUID</div></note>
+        <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Transfer file identifier. GUID</div></note>
+      </field>
+      
+      <field name="TRANSFER_ID" type="VARCHAR" len="40" null="false">
+        <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Fremdschlüssel. Tabelle SOSFTP_TRANSFER.TRANSFER_ID</div></note>
+        <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Foreign key. Table SOSFTP_TRANSFER.TRANSFER_ID</div></note>
+      </field>
+      
+      <field name="PID"  type="INTEGER" null="false" default="0">
+        <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Die Prozessnummer des aktuellen Prozesses, der den File Transfer durchführt.</div></note>
+        <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">The process id of the current process that executes the file transfer.</div></note>
+      </field>
+      
+      <field name="PPID"  type="INTEGER" null="false" default="0">
+        <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Die Prozessnummer des Vaterprozesses des aktuellen Prozesses, der den File Transfer durchführt.</div></note>
+        <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">The process id of the parent of the process that executes the file transfer.</div></note>
+      </field>
+      
+      <field name="SOURCE_FILENAME"  type="VARCHAR" len="255" null="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Für die Operation <em>send</em> ist dies der Original-Dateiname am lokalen System. 
+            <br /><br />
+            Für die Operation <em>receive</em> ist dies der resultierende Dateiname am lokalen System, nachdem ggf. eine Ersetzung des Dateinamens erfolgt ist.           
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            For <em>send</em> operations this is the original file name on the local host. 
+            <br /><br />
+            For <em>receive</em> operations this is the resulting file name on the local host optionally having applied replacement operations. 
+          </div>
+        </note>
+      </field>
+      
+      <field name="TARGET_FILENAME"  type="VARCHAR" len="255" null="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Für die Operation <em>send</em> ist dies der resultierende Dateiname am Remote Host, nachdem ggf. eine Ersetzung des Dateinamens erfolgt ist. 
+            <br /><br />
+            Für die Operation <em>receive</em> ist dies der Original-Dateiname am Remote Host.          
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            For <em>send</em> operations this is the resulting file name on the remote host optionally having applied replacement operations. 
+            <br /><br />
+            For <em>receive</em> operations this is the original file name on the remote host. 
+          </div>
+        </note>
+      </field>
+      
+      <field name="START_TIME" type="DATETIME" null="false">
+        <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Startzeit der Dateiübertragung</div></note>
+        <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Start time of the file transfer</div></note>
+      </field>
+           
+      <field name="END_TIME"  type="DATETIME">
+        <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Ende der Dateiübertragung</div></note>
+        <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">End time of the file transfer</div></note>
+      </field>
+      
+      <field name="MD5"  type="VARCHAR" null="false" len="50">
+        <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Der Wert des MD5 Hash, der aus der übertragenen Datei gewonnen wurde.</div></note>
+        <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">The value of the MD5 hash that is created from the file that was transferred.</div></note>
+      </field>
+      
+      <field name="FILE_SIZE"  type="LONGINTEGER" null="false" default="0">
+        <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Die Größe der übertragenen Date in Bytes.</div></note>
+        <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">The size of the transferred file in bytes.</div></note>
+      </field>
+     
+    
+      <field name="STATUS" type="INTEGER" null="false" default="0">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Status des Dateitransfers.
+            <br/><br/>
+            <table class="box">
+            	<tr><td>0</td><td>(Initialwert) wartend</td></tr>
+            	<tr><td>1</td><td>begonnen</td></tr>
+            	<tr><td>2</td><td>abgebrochen</td></tr>
+            	<tr><td>3</td><td>erfolgreich</td></tr>
+            	<tr><td>4</td><td>fehlerhaft</td></tr>
+            </table>
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Status of file transfer.
+            <br/><br/>
+            <table class="box">
+              <tr><td>0</td><td>(initial value) wait</td></tr>
+              <tr><td>1</td><td>started</td></tr>
+              <tr><td>2</td><td>cancelled</td></tr>
+              <tr><td>3</td><td>success</td></tr>
+              <tr><td>4</td><td>error</td></tr>
+            </table>
+           </div>
+        </note>       
+      </field>
+    
+      
+      <field name="LAST_ERROR_MESSAGE" type="CLOB">
+        <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Letzte Fehlermeldung bei der Übertragung</div></note>
+        <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Should an error have occurred then the last error message will be given in this column</div></note>
+      </field>
+    
+      <field name="COMMAND_TYPE" type="INTEGER" null="false" default="0">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Numerischer Kode des Kommandos Type beim Senden von Commandos auf einen anderen Server.
+            <br/><br/>
+            <table class="box">
+              <tr><td>0</td><td>(Initialwert)</td></tr>
+              <tr><td>1</td><td>pre----------------------------------------</td></tr>
+              <tr><td>2</td><td>xxx-----------------------------------------</td></tr>
+              <tr><td>3</td><td>post------------------------------------------</td></tr>
+            </table>
+          </div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            Numerical code of current command.
+            <br/><br/>
+            <table class="box">
+              <tr><td>0</td><td>(initial value)</td></tr>
+              <tr><td>1</td><td>pre----------------------------------------</td></tr>
+              <tr><td>2</td><td>xxx-----------------------------------------</td></tr>
+              <tr><td>3</td><td>post------------------------------------------</td></tr>
+            </table>
+           </div>
+        </note>
+      </field>
+    
+      <field name="COMMAND" type="CLOB">
+        <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Kommando, das auf einem anderen Server ausgeführt wird.</div></note>
+        <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Command, which is executed on another server</div></note>
+      </field>
+    
+      <field name="CREATED" type="DATETIME" null="false">
+        <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Datum der Anlage des Datensatzes.</div></note>
+        <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Timestamp of the initial record.</div></note>
+       </field>
+    
+      <field name="CREATED_BY" type="VARCHAR" len="100" null="false">
+        <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Benutzer der Anlage des Datensatzes.</div></note>
+        <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Author of the initial record.</div></note>
+      </field>
+    
+      <field name="MODIFIED" type="DATETIME" null="false">
+        <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Datum der letzten Änderung des Datensatzes.</div></note>
+        <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Timestamp of the latest changes to this record.</div></note>
+      </field>
+    
+      <field name="MODIFIED_BY" type="VARCHAR" len="100" null="false">
+        <note language="de"><div xmlns="http://www.w3.org/1999/xhtml">Benutzer der letzten Änderung des Datensatzes.</div></note>
+        <note language="en"><div xmlns="http://www.w3.org/1999/xhtml">Author of the latest changes to this record.</div></note>
+      </field>
+    </params>
+  </fields>
+  
+  
+  <primary_keys>
+    <fields>
+      <field name="GUID">
+        <note language="de"><div xmlns="http://www.w3.org/1999/xhtml"></div></note>
+        <note language="en"><div xmlns="http://www.w3.org/1999/xhtml"></div></note>
+      </field>
+    </fields>
+  </primary_keys>
+  
+  <foreign_keys>
+    <field name="TRANSFER_ID" table="SOSFTP_TRANSFERS.TRANSFER_ID">
+       <note language="de"><div xmlns="http://www.w3.org/1999/xhtml"></div></note>
+       <note language="en"><div xmlns="http://www.w3.org/1999/xhtml"></div></note>
+    </field>
+  </foreign_keys>
+  
+  <indexes>
+    <index type="INDEX" name="SOSFTP_TD_SOURCE_FILENAME" fields="SOURCE_FILENAME"><!-- UNIQUE -->
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml"></div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml"></div></note>
+    </index>
+    
+    <index type="INDEX" name="SOSFTP_TD_TARGET_FILENAME" fields="TARGET_FILENAME">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml"></div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml"></div></note>
+    </index>
+    
+    <index type="INDEX" name="SOSFTP_TD_START_TIME" fields="START_TIME">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml"></div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml"></div></note>
+    </index>
+    
+    <index type="INDEX" name="SOSFTP_TD_END_TIME" fields="END_TIME">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml"></div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml"></div></note>
+    </index>
+    
+    <index type="INDEX" name="SOSFTP_TD_STATUS" fields="STATUS">
+      <note language="de"><div xmlns="http://www.w3.org/1999/xhtml"></div></note>
+      <note language="en"><div xmlns="http://www.w3.org/1999/xhtml"></div></note>
+    </index>
+    
+  </indexes>
+        
+  <documentation language="de">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+     <p>
+      Details-Tabelle der Monitoring von SOSFTP-Client Dateitransfer.
+     </p>
+     <p>
+      Diese Tabelle beinhaltet die Informationen über die einzelen Datei-Übertragung.
+     </p>
+      Die Informationen über den Gesamtentransfer findet man in der Tabelle<br />
+     <strong>SOSFTP_TRANSFERS</strong>
+    </div>
+  </documentation>
+  <documentation language="en">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      <p>
+        Details table for monitoring of SOSFTP Client filetransfer.
+      </p>
+      <p>
+        This table has information about one transfered file per total files transfering.
+     </p>
+      <p>
+        Infos about a SOSFTP Client transfer master table find you into table<br />
+        <strong>SOSFTP_TRANSFERS</strong>
+      </p>
+    </div>
+  </documentation>
+  
+</description>

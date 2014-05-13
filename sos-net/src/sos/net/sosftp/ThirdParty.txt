@@ -1,0 +1,28 @@
+
+                                             Software- und Organisations-Service GmbH
+
+                                             Giesebrechtstr. 15
+                                             D-10629 Berlin
+                                             tel  +49 30 86 47 90-0
+                                             fax  +49 30 8 61 33 35
+                                             mail info@sos-berlin.com
+                                             web   www.sos-berlin.com
+
+This document lists third party software components that are used with SOSFTP Client.
+
+
+1)
+File:    ./lib/commons.net-2.2.jar
+Source:  http://commons.apache.org/
+License: Apache License Version 2.0, see http://commons.apache.org/license.html
+
+2)
+File:    ./lib/trilead-ssh2-build211.jar
+Source:  http://www.trilead.com/Download/Trilead-SSH-2-Java/
+License: BSD-style license, see http://www.trilead.com/Download/Trilead-SSH-2-Java/LICENSE.txt
+
+3)
+File:    ./lib/xalan.jar
+Source:  http://commons.apache.org/
+License: Apache License Version 2.0, see http://commons.apache.org/license.html
+    

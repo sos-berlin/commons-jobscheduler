@@ -1,0 +1,6 @@
+Release Notes - SOSDataExchange (SOSFTP) 
+
+see http://www.sos-berlin.com/jira/browse/SOSFTP#selectedTab=com.atlassian.jira.plugin.system.project%3Achangelog-panel
+
+From release 1.3.7 a Sun java environment at least 1.6.x is required.
+From release 1.3.11 Windows 2000 and XP(SP1) are not supported.

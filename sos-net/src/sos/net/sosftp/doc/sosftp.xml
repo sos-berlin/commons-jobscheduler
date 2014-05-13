@@ -1,0 +1,623 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="sosftp.xsl"?>
+<description xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.0" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1 http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+    <job name="SOSFTP" title="Transfer files by FTP/SFTP and execute commands by SSH">
+        <script language="java" java_class="sos.net.SOSFTPCommand" resource="1" />
+    </job>
+    <releases>
+        <release id="1.0" created="2008-09-26" modified="2008-09-26">
+            <title>Version 1.7</title>
+            <author name="Mueruevet Oeksuez" email="mueruevet.oeksuez@sos-berlin.com" />
+            <note language="de">
+                <div xmlns="http://www.w3.org/1999/xhtml">Initiales Release</div>
+            </note>
+            <note language="en">
+                <div xmlns="http://www.w3.org/1999/xhtml">Initial Release</div>
+            </note>
+        </release>
+    </releases>
+
+    <resources>
+        <file os="all" type="java" file="sos.net.jar" id="1">
+            <note language="de">
+                <div xmlns="http://www.w3.org/1999/xhtml">Klassen SOSFTPCommand, SOSFTP</div>
+            </note>
+            <note language="en">
+                <div xmlns="http://www.w3.org/1999/xhtml">Classes SOSFTPCommand, SOSFTP</div>
+            </note>
+        </file>
+        <file os="all" type="java" file="sos.settings.jar" id="2">
+            <note language="de">
+                <div xmlns="http://www.w3.org/1999/xhtml">Klasse SOSProfileSettings</div>
+            </note>
+            <note language="en">
+                <div xmlns="http://www.w3.org/1999/xhtml">Class SOSProfileSettings</div>
+            </note>
+        </file>
+        <file os="all" type="java" file="sos.util.jar" id="3">
+            <note language="de">
+                <div xmlns="http://www.w3.org/1999/xhtml">Klassen SOSFile, SOSSchedulerLogger</div>
+            </note>
+            <note language="en">
+                <div xmlns="http://www.w3.org/1999/xhtml">Classes SOSFile, SOSSchedulerLogger</div>
+            </note>
+        </file>
+        <file os="all" type="java" file="commons-net-1.2.2.jar" id="4">
+            <note language="de">
+                <div xmlns="http://www.w3.org/1999/xhtml">Apache FTP Implementierung, siehe http://commons.apache.org/</div>
+            </note>
+            <note language="en">
+                <div xmlns="http://www.w3.org/1999/xhtml">Apache FTP implementation, see http://commons.apache.org/</div>
+            </note>
+        </file>
+        <file os="all" type="java" file="trilead-ssh2-build211.jar" id="5">
+            <note language="de">
+                <div xmlns="http://www.w3.org/1999/xhtml">Trilead SFTP Implementierung, siehe http://www.trilead.com/</div>
+            </note>
+            <note language="en">
+                <div xmlns="http://www.w3.org/1999/xhtml">Trilead SFTP implementation, see http://www.trilead.com/</div>
+            </note>
+        </file>
+    </resources>
+
+    <configuration>
+        <note language="de">
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <br />
+                <br />
+            </div>
+        </note>
+        <note language="en">
+            <div xmlns="http://www.w3.org/1999/xhtml">
+                <br />
+                <br />
+            </div>
+        </note>
+
+        <params id="parameter">
+
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_account.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_alternative_account.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_alternative_host.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_alternative_passive_mode.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_alternative_password.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_alternative_port.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_alternative_remote_dir.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_alternative_transfer_mode.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_alternative_user.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_append_files.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_atomic_prefix.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_atomic_suffix.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_banner_footer.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_banner_header.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_check_interval.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_check_retry.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_check_size.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_classpath_base.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_classpath_base.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_compress_files.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_compressed_file_extension.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_current_pid.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_file_path.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_file_spec.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_file_spec2.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_force_files.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_history.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_history_repeat.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_history_repeat_interval.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_host.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_http_proxy_host.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_http_proxy_port.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_jump_command.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_jump_command_delimiter.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_jump_command_script.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_jump_command_script_file.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_jump_host.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_jump_ignore_error.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_jump_ignore_signal.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_jump_ignore_stderr.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_jump_password.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_jump_port.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_jump_protocol.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_jump_proxy_host.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_jump_proxy_password.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_jump_proxy_port.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_jump_proxy_user.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_jump_simulate_shell.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_jump_simulate_shell_inactivity_timeout.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_jump_simulate_shell_login_timeout.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_jump_simulate_shell_prompt_trigger.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_jump_ssh_auth_file.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_jump_ssh_auth_method.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_jump_user.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_local_dir.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_log_filename.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_mandator.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_operation.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_overwrite_files.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_passive_mode.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_password.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_poll_interval.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_poll_minfiles.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_poll_timeout.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_port.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_ppid.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_profile.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_protocol.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_recursive.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_remote_dir.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_remove_files.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_replacement.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_replacing.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_root.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_scheduler_host.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_scheduler_job_chain.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_scheduler_port.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_settings.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_skip_transfer.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_ssh_auth_file.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_ssh_auth_method.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_ssh_proxy_host.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_ssh_proxy_password.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_ssh_proxy_port.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_ssh_proxy_user.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_transactional.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_transfer_mode.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_user.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_verbose.xml" parse="xml" />
+            <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="./params/param_zero_byte_transfer.xml" parse="xml" />
+
+            <param name="*" required="false">
+                <note language="de">
+                    <title></title>
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                        Beliebige weitere Parameter ohne Schlüsselwort stellen die Pfade von Dateien dar,
+                        die transferiert werden sollen.
+                    </div>
+                </note>
+                <note language="en">
+                    <title></title>
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                        Any additional parameters that are not preceeded by keywords
+                        represent paths for files that should be transferred.
+                    </div>
+                </note>
+            </param>
+
+        </params>
+    </configuration>
+
+    <documentation language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            Das Programm wird als synchrone File Transfer Lösung eingesetzt.
+            Asynchroner Transfer wird von den entsprechenden Standard-Jobs im Job Scheduler unterstützt.
+            <br />
+            <br />
+            <b>File Transfer Features</b>
+            <br />
+            <br />
+            <ul>
+                <li>Senden und Empfangen von Dateien via FTP von/zu Server Systemen.</li>
+                <li>Senden und Empfangen von Dateien via SFTP von/zu Server Systemen.</li>
+                <li>Kommandos per SSH auf einem entfernten Rechner ausführen.</li>
+                <li>Dateien per FTP oder SFTP zu einem "jump host" versenden und von dort via FTP oder SFTP
+                    auf ein Zielsystem weiterleiten.
+                    Unterschiedliche Protokolle können zwischen lokalem System und "jump host"
+                    sowie zwischen "jump host" und Zielsystem verwendet werden.
+                </li>
+                <li>Dateien von einem entfernten Server System via FTP und SFTP auf einem "jump host" annehmen
+                    und per FTP oder SFTP auf das lokale System transferieren.
+                    Unterschiedliche Protokolle können für den Transfer zwischen den Systemen eingesetzt werden.
+                </li>
+                <li>Authentifizierung per Kennwort und per privatem/öffentlichem Schlüssel
+                    für Transfers via SFTP werden unterstützt.
+                </li>
+                <li>Die Parametrisierung erfolgt per Kommandozeile und Konfigurationsdateien.</li>
+                <li>Alle Parameter werden ausschließlich am lokalen System angegeben,
+                    dies gilt in gleicher Weise bei Verwendung eines "jump host", da lokale Parameter
+                    dynamisch an den "jump host" weitergeleitet werden.
+                </li>
+                <li>Protokollierung und Fehlerbehandlung: Fehler bei der Übertragung einzelner Dateien werden erkannt.</li>
+                <li>Sicherheit: am "jump host" werden keine Konfigurationsdateien vorgehalten.
+                    (außer privaten Schlüsseldateien die für den Zugriff auf das Zielsystem benötigt werden).
+                    Am "jump host" werden keine Kennwörter gespeichert.
+                    Es werden keine Proxy-Funktionalitäten der Server Systeme vorausgesetzt.
+                </li>
+            </ul>
+            <br />
+            <br />
+            <b>Spezielle Transfer Features</b>
+            <br />
+            <br />
+            <ul>
+                <li>
+                    Teilqualifizierter Transfer von Dateien
+                    <br />
+                    <br />
+                    Alternativ zum Transfer einer einzelnen Datei können mit regulären Ausdrücken
+                    Dateimengen für den Transfer selektiert werden.
+                </li>
+                <li>
+                    Rekursiver Transfer von Dateien
+                    <br />
+                    <br />
+                    Es können Dateien aus beliebigen Unterverzeichnissen anhand von regulären Ausdrücken
+                    für die Übertragung selektiert werden. Unterverzeichnisse werden im lokalen Dateisystem eingerichtet, falls erforderlich.
+                </li>
+                <li>
+                    Atomare Übertragung
+                    <br />
+                    <br />
+                    Dateien können während des Transfers umbenannt werden, um sie nach vollständiger Übertragung
+                    atomar in einem Verzeichnis erscheinen zu lassen. Dies ist z.B. relevant, wenn Verzeichnisse
+                    überwacht werden und ausschließlich vollständig übertragene Dateien weiterverarbeitet werden sollen.
+                </li>
+                <li>
+                    Vollständigkeitsprüfung übertragener Dateien
+                    <br />
+                    <br />
+                    Die Prüfung beinhaltet, dass nach dem Transfer die Größen der übertragenen Datei
+                    und der Anzahl übertragener Byte geprüft werden sowie die wiederholte Übertragung
+                    von Dateien, um sicherzustellen, dass Eingabedateien nicht während der Dauer des Transfers verändert wurden.
+                </li>
+                <li>
+                    Behandlung leerer Dateien
+                    <br />
+                    <br />
+                    Zur Behandlung leerer Dateien stehen eine Reihe von Optionen zur Verfügung, z.B.
+                    Ausschluß leerer Dateien, Zulasssen einzelner leerer Dateien, Benachrichtigung per E-Mail beim Transfer leerer Dateien.
+                </li>
+                <li>
+                    Umbenennen von Dateien
+                    <br />
+                    <br />
+                    Nach der Übertragung können Dateien anhand von regulären Ausdrücken umbenannt werden.
+                </li>
+                <li>
+                    Verwendung alternativer Zugangsdaten
+                    <br />
+                    <br />
+                    Für den Fall, dass ein Verbindungsaufbau bzw. eine Anmeldung an einem FTP Server fehlschlägt,
+                    kann eine alternative Zugangskonfiguration angegeben werden, die bspw. im Fehlerfall einen Backup FTP Server
+                    anspricht.
+                    <br />
+                    <br />
+                    Primäre und alternative Zugangsdaten werden additiv gehandhabt, d.h. es müssen nur
+                    diejenigen alternativen Zugangsparameter angegeben werden, die sich von den primären
+                    Zugangsparametern unterscheiden.
+                </li>
+                <li>
+                    Unterstützung für UNC Pfade als Zielverzeichnisse
+                    <br />
+                    <br />
+                    Dateien können direkt von einem FTP/SFTP Server
+                    zu einem entfernten Server-System übertragen werden.
+                </li>
+                <li>
+                    Führung einer Transfer-Historie
+                    <br />
+                    <br />
+                    Optional wird für jeden Transfer eine Historie geführt.
+                    Historieneinträge werden optional an einen Job Scheduler signalisiert,
+                    der sie in einer zentralen Datenbank konsolidiert und für Auskünfte
+                    zur Verfügung stellt.
+                </li>
+            </ul>
+            <br />
+            <br />
+            <b>Systemvoraussetzungen</b>
+            <br />
+            <br />
+            <ul>
+                <li>Java Runtime Environment JRE 1.4 und höher</li>
+                <li>Für die "jump host" Functionalität muss das Programm am "jump host"
+                    und am lokalen System installiert sein.
+                </li>
+            </ul>
+            <br />
+            <br />
+            <b>Start Skript</b>
+            <br />
+            <br />
+            <ul>
+                <li>
+                    Windows: sosftp.cmd
+                    <br />
+                    <code>
+                        <pre>set CLASSPATH_BASE=.
+                            java -classpath "%CLASSPATH_BASE%/commons-net-1.2.2.jar;%CLASSPATH_BASE%/sos.net.jar;
+                            %CLASSPATH_BASE%/sos.settings.jar;%CLASSPATH_BASE%/sos.util.jar;
+                            %CLASSPATH_BASE%/trilead-ssh2-build211.jar" sos.net.SOSFTPCommand %*</pre>
+                    </code>
+                </li>
+                <li>
+                    Unix: sosftp.sh
+                    <br />
+                    <code>
+                        <pre>CLASSPATH_BASE=.
+                            JAVA_BIN="java"
+                            "$JAVA_BIN" -classpath "$CLASSPATH_BASE/commons-net-1.2.2.jar:$CLASSPATH_BASE/sos.net.jar:
+                            $CLASSPATH_BASE/sos.settings.jar:$CLASSPATH_BASE/sos.util.jar:
+                            $CLASSPATH_BASE/trilead-ssh2-build211.jar" sos.net.SOSFTPCommand
+                            -current_pid=$$ -ppid=$PPID $*
+                        </pre>
+                    </code>
+                </li>
+            </ul>
+            <br />
+            <br />
+            <b>Kommandozeilenparameter</b>
+            <br />
+            <br />
+            <ul>
+                <li>
+                    Generell
+                    <br />
+                    <code>
+                        <pre>Usage: sos.net.SOSFTPCommand -operation= -settings= -profile= -verbose=
+                            -operation=[send|receive|execute|remove] FTP/SFTP operation
+                            -settings=[file] Configuration file
+                            -profile=[profile] Section/Profile for FTP/SFTP settings
+                            in configuration file
+                            -verbose=[1..9] Verbosity level
+                        </pre>
+                    </code>
+                </li>
+                <li>
+                    Kommandozeilenparameter und Konfigurationsdateien
+                    <br />
+                    <br />
+                    Das Programm kann Parameter direkt von der Kommandozeile
+                    oder aus einer Konfigurationsdatei lesen. Bei Angabe an der Kommandozeile wird jeweils ein Bindestrich
+                    vor den Parameter gesetzt:
+                    <br />
+                    <br />
+                    <code>sosftp.sh -operation=send -protocol=ftp -host=localhost -port=21 -local_dir=/tmp ...</code>
+                    <br />
+                    <br />
+                    Bei Verwendung einer Konfigurationsdatei werden Profile als Sektionen eingerichtet und einzelne Parameter als Paare aus Namen
+                    und Wert aufgeführt, z.B. in einer Datei
+                    <em>settings.ini</em>
+                    :
+                    <br />
+                    <br />
+                    <code>
+                        [sample_transfer]
+                        <br />
+                        protocol = ftp
+                        <br />
+                        host = localhost
+                        <br />
+                        port = 21
+                        <br />
+                        local_dir = /tmp
+                        <br />
+                        ...
+                    </code>
+                    <br />
+                    <br />
+                    An der Kommandozeile wird der Name der Einstellungsdatei und des Profils angegeben:
+                    <br />
+                    <br />
+                    <code>sosftp.sh -operation=send -settings=settings.ini -profile=sample_transfer ...</code>
+                    <br />
+                    <br />
+                    Parameter aus einer Konfigurationsdatei und an der Kommandozeile können gemischt verwendet werden,
+                    dabei haben Parameter an der Kommandozeile Vorrang.
+                </li>
+            </ul>
+        </div>
+    </documentation>
+    <documentation language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            This program is used as a standalone, synchroneous File Transfer solution.
+            For asynchroneous file transfer see the respective standard jobs with the Job Scheduler.
+            <br />
+            <br />
+            <b>File Transfer Features</b>
+            <br />
+            <br />
+            <ul>
+                <li>Send and receive files by FTP to/from some target host.</li>
+                <li>Send and receive files by SFTP to/from some target host.</li>
+                <li>Execute commands by SSH on some host.</li>
+                <li>Send files by FTP or SFTP to a "jump host" and forward them by FTP or SFTP to a target host.
+                    Different transfer protocols can be used between local host and "jump_host" and
+                    between "jump_host" and target host.
+                </li>
+                <li>Receive files from a remote host by FTP or SFTP to a "jump host" and forward them
+                    by FTP or SFTP to the local host. Different protocols can be used for transfer between the hosts.
+                </li>
+                <li>Both password and public key authentication are supported for SFTP.</li>
+                <li>The parameterization is effected by command line parameters and by configuration files.</li>
+                <li>All parameters are specified on the localhost exclusively,
+                    this applies in the same way when using a "jump host" as local parameters
+                    are dynamically forwarded to the "jump host".
+                </li>
+                <li>Logging and error handling are provided, errors are detected on a per file basis.</li>
+                <li>Security: no configuration files are used on the "jump host"
+                    (except for private key files that are used in order to access a target host);
+                    no passwords are stored on the "jump host"; FTP proxy functionality is not used.
+                </li>
+            </ul>
+            <br />
+            <br />
+            <b>Specific Transfer Features</b>
+            <br />
+            <br />
+            <ul>
+                <li>
+                    Transfer of partially matched files
+                    <br />
+                    <br />
+                    Alternatively to transferring individual files, you could transfer multiple files by use of regular expressions.
+                </li>
+                <li>
+                    Recursive transfer of files in directories
+                    <br />
+                    <br />
+                    Files from arbitrarily nested subdirectories can be selected for transfer by regular expressions.
+                    Subdirectories will be created in the local file system if required.
+                </li>
+                <li>
+                    Atomic Transfer
+                    <br />
+                    <br />
+                    Files can be renamed during transfer in order to make them appear atomically in a target directory.
+                    This is relevant e.g. should target directories be monitored for incoming files. This feature
+                    guarantees that incoming files are completely transferred before they appear in a directory.
+                </li>
+                <li>
+                    Check transferred files for completeness
+                    <br />
+                    <br />
+                    Checking completeness is done by comparing the size of incoming files with the number of transferred bytes.
+                    Moreover, files can be transferred repeatedly in order to verify that the files have not been changed on the
+                    FTP server during the transfer period.
+                </li>
+                <li>
+                    Handling of empty files
+                    <br />
+                    <br />
+                    There are multiple options to handle empty files: Exclude empty files from transfer,
+                    include particular empty files, notification by e-mail in case of transfer of empty files.
+                </li>
+                <li>
+                    Renaming of files
+                    <br />
+                    <br />
+                    Files can be renamed after transfer by regular expressions.
+                </li>
+                <li>
+                    Use of alternative access data and credentials
+                    <br />
+                    <br />
+                    Should a connection or the login to an FTP server fail then alternative access data and credentials
+                    can be used, e.g. to connect to a backup FTP server in case of failure.
+                    <br />
+                    <br />
+                    Primary and alternative access parameters are handled additively, i.e. only those alternative
+                    parameters have to be specified that differ from the primary access parameters.
+                </li>
+                <li>
+                    Support for UNC paths in target directories
+                    <br />
+                    <br />
+                    Files can be directly transferred from an FTP/SFTP server
+                    to a remote server system.
+                </li>
+                <li>
+                    Track record of file transfers
+                    <br />
+                    <br />
+                    Optionally a history file keeps track of every transfer that has been effected.
+                    History entries are optionally signalled to a Job Scheduler that adds them
+                    to a central database.
+                </li>
+            </ul>
+            <br />
+            <br />
+            <b>System Requirements</b>
+            <br />
+            <br />
+            <ul>
+                <li>Java Runtime Environment JRE 1.6 and above.</li>
+                <li>For the "jump host" functionality this program has to be deployed to the "jump host" and
+                    to the localhost.
+                </li>
+            </ul>
+            <br />
+            <br />
+            <b>Start Script</b>
+            <br />
+            <br />
+            <ul>
+                <li>
+                    Windows: sosftp.cmd
+                    <br />
+                    <code>
+                        <pre>set CLASSPATH_BASE=.
+                            java -classpath "%CLASSPATH_BASE%/commons-net-1.2.2.jar;%CLASSPATH_BASE%/sos.net.jar;
+                            %CLASSPATH_BASE%/sos.settings.jar;%CLASSPATH_BASE%/sos.util.jar;
+                            %CLASSPATH_BASE%/trilead-ssh2-build211.jar" sos.net.SOSFTPCommand %*</pre>
+                    </code>
+                </li>
+                <li>
+                    Unix: sosftp.sh
+                    <br />
+                    <code>
+                        <pre>CLASSPATH_BASE=.
+                            JAVA_BIN="java"
+                            "$JAVA_BIN" -classpath "$CLASSPATH_BASE/commons-net-1.2.2.jar:$CLASSPATH_BASE/sos.net.jar:
+                            $CLASSPATH_BASE/sos.settings.jar:$CLASSPATH_BASE/sos.util.jar:
+                            $CLASSPATH_BASE/trilead-ssh2-build211.jar" sos.net.SOSFTPCommand
+                            -current_pid=$$ -ppid=$PPID $*
+                        </pre>
+                    </code>
+                </li>
+            </ul>
+            <br />
+            <br />
+            <b>Command line parameters</b>
+            <br />
+            <br />
+            <ul>
+                <li>
+                    General
+                    <br />
+                    <code>
+                        <pre>Usage: sos.net.SOSFTPCommand -operation= -settings= -profile= -verbose=
+                            -operation=[send|receive|execute|remove] FTP/SFTP operation
+                            -settings=[file] Configuration file
+                            -profile=[profile] Section/Profile for FTP/SFTP settings
+                            in configuration file
+                            -verbose=[1..9] Verbosity level
+                        </pre>
+                    </code>
+                </li>
+                <li>
+                    Command line parameters and Configuration Files
+                    <br />
+                    <br />
+                    This program can read parameters directly from the command line
+                    and from a configuration file. if specified at the command line then a hyphen is added before each parameter:
+                    <br />
+                    <br />
+                    <code>sosftp.sh -operation=send -protocol=ftp -host=localhost -port=21 -local_dir=/tmp ...</code>
+                    <br />
+                    <br />
+                    If a configuration file is used then profiles can be added as sections in this file and
+                    individual parameters can be specified as pairs of names and values, e.g. for a file
+                    <em>settings.ini</em>
+                    :
+                    <br />
+                    <br />
+                    <code>
+                        [sample_transfer]
+                        <br />
+                        protocol = ftp
+                        <br />
+                        host = localhost
+                        <br />
+                        port = 21
+                        <br />
+                        local_dir = /tmp
+                        <br />
+                        ...
+                    </code>
+                    <br />
+                    <br />
+                    At the command line the name of the configuration file and the profile are specified like this:
+                    <br />
+                    <br />
+                    <code>sosftp.sh -operation=send -settings=settings.ini -profile=sample_transfer ...</code>
+                    <br />
+                    <br />
+                    Mixed usage of parameters from the command line and from a configuration file is supported,
+                    command line parameters have precedence.
+                </li>
+            </ul>
+        </div>
+    </documentation>
+</description>

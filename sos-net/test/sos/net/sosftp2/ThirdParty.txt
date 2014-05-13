@@ -1,0 +1,35 @@
+
+                                             Software- und Organisations-Service GmbH
+
+                                             Giesebrechtstr. 15
+                                             D-10629 Berlin
+                                             tel  +49 30 86 47 90-0
+                                             fax  +49 30 8 61 33 35
+                                             mail info@sos-berlin.com
+                                             web   www.sos-berlin.com
+
+This document lists third party software components that are used with
+SOSFTP Client.
+
+
+1. Package "SOSFTP Client" (FTP and SFTP Processing)
+ 
+Files:
+1.1 ./sosftp_client/commons.net-1.2.2.jar
+1.2 ./sosftp_client/trilead-ssh2-build211.jar
+ 
+Source:
+1.1 http://commons.apache.org/
+1.2 http://www.trilead.com/Download/Trilead-SSH-2-Java/
+
+ 
+Usage:
+     These files are required for FTP and SFTP processing
+ 
+Dispensability:
+     No
+ 
+License Type:
+1.1 Apache License Version 2.0
+     see http://commons.apache.org/license.html
+1.2 BSD-style license, see http://www.trilead.com/Download/Trilead-SSH-2-Java/LICENSE.txt

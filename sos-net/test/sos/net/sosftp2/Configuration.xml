@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSPY v5 rel. 3 U (http://www.xmlspy.com) by Andreas Pueschel (APL Software GmbH) -->
+<Configurations>
+	<items>
+		<!-- Folgende Parameter kennt SOSFTP -->
+		<!-- <item name="operation" default_value="" itemId="operation_id" required="true"/> -->
+		<item name="operation" default_value="" itemId="operation_id"/>
+		<item name="settings" default_value="" itemId="settings_id" checkId="settings_and_profile_id"/>
+		<item name="profile" default_value="false" itemId="profile_id" checkId="settings_and_profile_id"/>
+		<item name="verbose" default_value="10" itemId="verbose_id"/>
+		<item name="log_filename" default_value="" itemId="log_filename_id"/>
+		<item name="banner_header" default_value="" itemId="banner_header_Id"/>
+		<item name="banner_footer" default_value="" itemId="banner_footer_Id"/>
+		<item name="protocol" default_value="ftp" itemId="protocol_id"/>
+		<item name="host" default_value="localhost" itemId="host_id"/>
+		<item name="port" default_value="" itemId="port_id"/>
+		<item name="user" default_value="" itemId="user_id"/>
+		<item name="password" default_value="" itemId="password_id" password="yes"/>
+		<item name="account" default_value="" itemId="account_id"/>
+		<item name="transfer_mode" default_value="" itemId="transfer_mode_id"/>
+		<item name="passive_mode" default_value="0" itemId="passive_mode_id"/>
+		<item name="remote_dir" default_value="" itemId="remote_dir_id"/>
+		<item name="local_dir" default_value="." itemId="local_dir_id"/>
+		<item name="file_spec" default_value=".*" itemId="file_spec_id" checkId="file_spec_or_path_id"/>
+		<item name="file_path" default_value="" itemId="file_path_id" checkId="file_spec_or_path_id"/>
+		<item name="transactional" default_value="false" itemId="transactional_id"/>
+		<item name="atomic_suffix" default_value="" itemId="atomic_suffix_id"/>
+		<item name="remove_files" default_value="false" itemId="remove_files_id"/>
+		<item name="skip_transfer" default_value="false" itemId="skip_transfer_id"/>
+		<item name="overwrite_files" default_value="true" itemId="overwrite_files_id"/>
+		<item name="append_files" default_value="false" itemId="append_files_id"/>
+		<item name="force_files" default_value="true" itemId="force_files_id"/>
+		<item name="zero_byte_transfer" default_value="yes" itemId="zero_byte_transfer_id"/>
+		<item name="recursive" default_value="false" itemId="recursive_id"/>
+		<item name="check_size" default_value="true" itemId="check_size_id"/>
+		<item name="check_retry" default_value="0" itemId="check_retry_id"/>
+		<item name="check_interval" default_value="60" itemId="check_interval_id"/>
+		<item name="poll_timeout" default_value="0" itemId="poll_timeout_id"/>
+		<item name="poll_interval" default_value="60" itemId="poll_interval_id"/>
+		<item name="poll_minfiles" default_value="1" itemId="poll_minfiles_id"/>
+		<item name="replacing" default_value="" itemId="replacing_id"/>
+		<item name="replacement" default_value="" itemId="replacement_id"/>
+		<item name="root" default_value="" itemId="root_id"/>
+		<item name="alternative_host" default_value="" itemId="alternative_host_id"/>
+		<item name="alternative_port" default_value="" itemId="alternative_port_id"/>
+		<item name="alternative_user" default_value="" itemId="alternative_user_id"/>
+		<item name="alternative_password" default_value="" itemId="alternative_password_id" password="yes"/>
+		<item name="alternative_account" default_value="" itemId="alternative_account_id"/>
+		<item name="alternative_remote_dir" default_value="" itemId="alternative_remote_dir_id"/>
+		<item name="alternative_passive_mode" default_value="" itemId="alternative_passive_mode_id"/>
+		<item name="alternative_transfer_mode" default_value="" itemId="alternative_transfer_mode_id"/>
+		<item name="ssh_proxy_host" default_value="" itemId="ssh_proxy_host_id" checkId="ssh_proxy_id"/>
+		<item name="ssh_proxy_port" default_value="" itemId="ssh_proxy_port_id" checkId="ssh_proxy_id"/>
+		<item name="ssh_proxy_user" default_value="" itemId="ssh_proxy_user_id" checkId="ssh_proxy_id"/>
+		<item name="ssh_proxy_password" default_value="" itemId="ssh_proxy_password_id" checkId="ssh_proxy_id" password="yes"/>
+		<item name="ssh_auth_method" default_value="" itemId="ssh_auth_method_id"/>
+		<item name="ssh_auth_file" default_value="" itemId="ssh_auth_file_id"/>
+		<item name="http_proxy_host" default_value="" itemId="http_proxy_host_id"/>
+		<item name="http_proxy_port" default_value="" itemId="http_proxy_port_id"/>
+		<item name="classpath_base" default_value="" itemId="classpath_base_id"/>
+		<item name="history" default_value="" itemId="history_id"/>
+		<item name="history_repeat" default_value="" itemId="history_repeat_id"/>
+		<item name="history_repeat_interval" default_value="" itemId="history_repeat_interval_id"/>
+		<item name="current_pid" default_value="" itemId="current_pid_id"/>
+		<item name="ppid" default_value="" itemId="ppid_id"/>
+		<item name="pid" default_value="" itemId="ppid_id"/>
+		<item name="mandator" default_value="SOS" itemId="mandator_id"/>
+		<item name="scheduler_host" default_value="" itemId="scheduler_host_id"/>
+		<item name="scheduler_port" default_value="" itemId="scheduler_port_id"/>
+		<item name="scheduler_job_chain" default_value="" itemId="scheduler_job_chain_id"/>
+		<item name="scheduler_message" default_value="" itemId="scheduler_message_id"/>
+		<item name="testmode" default_value="" itemId="testmode_id"/>
+		<item name="file_notification_bcc" default_value="" itemId="file_notification_bcc_id"/>
+		<item name="file_notification_body" default_value="" itemId="file_notification_body_id"/>
+		<item name="file_notification_cc" default_value="" itemId="file_notification_cc_id"/>
+		<item name="file_notification_subject" default_value="" itemId="file_notification_subject_id"/>
+		<item name="file_notification_to" default_value="" itemId="file_notification_to_id"/>
+		<item name="file_zero_byte_notification_bcc" default_value="" itemId="file_zero_byte_notification_bcc_id"/>
+		<item name="file_zero_byte_notification_body" default_value="" itemId="file_zero_byte_notification_body_id"/>
+		<item name="file_zero_byte_notification_cc" default_value="" itemId="file_zero_byte_notification_cc_id"/>
+		<item name="file_zero_byte_notification_subject" default_value="" itemId="file_zero_byte_notification_subject_id"/>
+		<item name="file_zero_byte_notification_to" default_value="" itemId="file_zero_byte_notification_to_id"/>
+		<item name="file_zero_byte_transfer" default_value="" itemId="file_zero_byte_transfer_id"/>
+		<item name="parallel" default_value="" itemId="parallel_id"/>
+		<item name="parallel_check_interval" default_value="" itemId="parallel_check_interval_id"/>
+		<item name="parallel_check_retry" default_value="" itemId="parallel_check_retry_id"/>
+		<item name="poll_error_state" default_value="" itemId="poll_error_state_id"/>
+		<item name="simple_transfer" default_value="" itemId="simple_transfer_id"/>
+		<!--Parameter nur für send -->
+		<item name="keep_connection" default_value="" itemId="keep_connection_id"/>
+		<item name="compress_files" default_value="" itemId="compress_files_id"/>
+		<item name="compressed_file_extension" default_value="" itemId="compressed_file_extension_id"/>
+		<item name="payload_parameter" default_value="" itemId="payload_parameter_id"/>
+		<!-- Parameter nur für execute (ssh Commands)-->
+		<item name="jump_protocol" default_value="sftp" itemId="jump_protocol_id"/>
+		<item name="jump_host" default_value="" itemId="jump_host_id"/>
+		<item name="jump_port" default_value="22" itemId="jump_port_id"/>
+		<item name="jump_user" default_value="" itemId="jump_user_id"/>
+		<item name="jump_password" default_value="" itemId="jump_password_id" password="yes"/>
+		<item name="jump_proxy_host" default_value="" itemId="jump_proxy_host_id" checkId="jump_ssh_proxy_id"/>
+		<item name="jump_proxy_port" default_value="" itemId="jump_proxy_port_id" checkId="jump_ssh_proxy_id"/>
+		<item name="jump_proxy_user" default_value="" itemId="jump_proxy_user_id" checkId="jump_ssh_proxy_id"/>
+		<item name="jump_proxy_password" default_value="" itemId="jump_proxy_password_id" password="yes"/>
+		<item name="jump_ssh_auth_method" default_value="" itemId="jump_ssh_auth_method_id"/>
+		<item name="jump_ssh_auth_file" default_value="" itemId="jump_ssh_auth_file_id"/>
+		<item name="jump_command" default_value="" itemId="jump_command_id"/>
+		<item name="jump_command_script" default_value="" itemId="jump_command_script_id"/>
+		<item name="jump_command_script_file" default_value="" itemId="jump_command_script_file_id"/>
+		<item name="jump_command_delimiter" default_value="" itemId="jump_command_delimiter_id"/>
+		<item name="jump_ignore_error" default_value="" itemId="jump_ignore_error_id"/>
+		<item name="jump_ignore_signal" default_value="" itemId="jump_ignore_signal_id"/>
+		<item name="jump_ignore_stderr" default_value="" itemId="jump_ignore_stderr_id"/>
+		<item name="include" default_value="" itemId="include_id"/>
+		<item name="jump_auth_method" default_value="" itemId="jump_ssh_auth_method_id"/>
+		<item name="jump_auth_file" default_value="" itemId="jump_ssh_auth_file_id"/>
+		<item name="jump_simulate_shell" default_value="" itemId="jump_ssh_simulate_shell_id"/>
+		<item name="jump_is_kill_job" default_value="" itemId="jump_ssh_simulate_shell_id"/>
+		<item name="jump_job_scheduler_ssh_kill_pid" default_value="" itemId="jump_job_scheduler_ssh_kill_pid_id"/>
+		<!-- 12.01.2010 -->
+		<item name="mail_smtp" default_value="" itemId="mail_smtp_id"/>
+		<item name="mail_from" default_value="" itemId="mail_from_id"/>
+		<item name="mail_queue_dir" default_value="" itemId="mail_queue_dir_id"/>
+		<!-- ab hier Program interne Parameter -->
+		<item name="input" default_value="" itemId="input_id"/>
+		<item name="make_dirs" default_value="" itemId="make_dirs_id"/>
+		<item name="local_host_ip" default_value="" itemId="local_host_ip"/>
+		<item name="remote_host_ip" default_value="" itemId="remote_host_ip"/>
+		<item name="version" default_value="" itemId="version_ip"/>
+		<item name="transfer_error" default_value="" itemId="transfer_error_ip"/>
+		<item name="transfer_success" default_value="" itemId="transfer_success_ip"/>
+		<item name="remove_after_jump_transfer" default_value="" itemId="remove_after_jump_transfer_ip"/>
+		<item name="xx_make_temp_directory_success_transfer_xx" default_value="" itemId="xx_make_temp_directory_success_transfer_xx_ip"/>
+		<item name="jump_remote_dir" default_value="" itemId="jump_remote_dir_ip"/>
+		<item name="status" default_value="" itemId="status_ip"/>
+		<item name="file_size" default_value="" itemId="file_size_ip"/>
+		<item name="successful_transfers" default_value="" itemId="successful_transfers_ip"/>
+		<item name="transfer_timestamp" default_value="" itemId="transfer_timestamp_ip"/>
+		<item name="time" default_value="" itemId="time_id"/>
+		<item name="date" default_value="" itemId="date_id"/>
+		<item name="local_user" default_value="" itemId="local_user_id"/>
+		<item name="failed_transfers" default_value="" itemId="failed_transfers_id"/>
+		<item name="files" default_value="" itemId="files_id"/>
+		<item name="localhost" default_value="" itemId="localhost_id"/>
+	</items>
+	<!-- Alle Parameter die den Präfix haben sind gültige Parameter -->
+	<prefix>
+		<item name="history_entry_"/>
+		<item name="file_spec"/>
+		<item name="parameter_set"/>
+		<item name=";"/> <!-- werden ignoriert -->
+	</prefix>
+	<!-- Überprüfen der Pflichtfelder -->
+	<dependencies>
+		<item refId="operation_id" value="">
+			<required>
+				<item itemId="protocol_id"/>
+				<item itemId="host_id"/>
+				<item itemId="user_id"/>
+			</required>
+			<optional>
+				<item itemId=""/>
+			</optional>
+		</item>
+		<item refId="operation_id" value="make_temp_directory">
+			<required>
+				<item/>
+			</required>
+		</item>
+		<item refId="operation_id" value="remove_temp_directory">
+			<required>
+				<item/>
+			</required>
+		</item>
+		<item refId="operation_id" value="execute">
+			<required>
+				<item itemId="jump_protocol_id"/>
+				<item itemId="jump_host_id"/>
+				<item itemId="jump_port_id"/>
+				<item itemId="jump_user_id"/>
+			</required>
+			<optional/>
+		</item>
+		<item refId="ssh_auth_method_id" value="publickey">
+			<required>
+				<item itemId="ssh_auth_file_id"/>
+			</required>
+		</item>
+		<item refId="jump_ssh_auth_method_id" value="publickey">
+			<required>
+				<item itemId="jump_ssh_auth_file_id"/>
+			</required>
+		</item>
+	</dependencies>
+	<!-- überprüfen der Abhängigkeiten mit Hilfe der boolean Operationen wie and und or-->
+	<checkParameter>
+		<check checkId="settings_and_profile_id" bool_operation="and">
+			<item itemId="settings_id"/>
+			<item itemId="profile_id"/>
+		</check>
+		<check checkId="ssh_proxy_id" bool_operation="and">
+			<item itemId="ssh_proxy_host_id"/>
+			<item itemId="ssh_proxy_port_id"/>
+			<item itemId="ssh_proxy_user_id"/>
+		</check>
+		<check checkId="jump_ssh_proxy_id" bool_operation="and">
+			<item itemId="jump_proxy_host_id"/>
+			<item itemId="jump_proxy_port_id"/>
+			<item itemId="jump_proxy_user_id"/>
+		</check>
+		<check checkId="file_spec_or_path_id" bool_operation="or">
+			<item itemId="file_path_id"/>
+			<item itemId="file_spec_id"/>
+		</check>
+	</checkParameter>
+	<!-- überprüft ob die Parameterwerte gültig sind -->
+	<checkParameterValue>
+		<check itemId="protocol_id">
+			<paramvalue value="ftp"/>
+			<paramvalue value="sftp"/>
+			<paramvalue value="ftps"/>
+		</check>
+		<check itemId="operation_id">
+			<paramvalue value="send"/>
+			<paramvalue value="receive"/>
+			<paramvalue value="remove"/>
+			<paramvalue value="execute"/>
+			<paramvalue value="make_temp_directory"/>
+			<paramvalue value="remove_temp_directory"/>
+			<paramvalue value="delete"/>
+			<paramvalue value="rename_local_files"/>
+			<paramvalue value="install"/>
+			<paramvalue value="delete_local_files"/>
+			<paramvalue value="install_doc"/>
+		</check>
+		<check itemId="ssh_auth_method_id">
+			<paramvalue value="publickey"/>
+			<paramvalue value="password"/>
+		</check>
+	</checkParameterValue>
+</Configurations>
