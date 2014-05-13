@@ -1,25 +1,21 @@
 package sos.net.sosftp;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import com.sos.JSHelper.io.Files.JSFile;
+import junit.framework.Assert;
+import org.apache.log4j.Logger;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import sos.net.SOSFTP;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.Vector;
 
-import junit.framework.Assert;
-
-import org.apache.log4j.Logger;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import sos.net.SOSFTP;
-
-import com.sos.JSHelper.Logging.Log4JHelper;
-import com.sos.JSHelper.io.Files.JSFile;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
 * \class TestSOSFTP
@@ -63,7 +59,6 @@ public class TestSOSFTP {
 	@SuppressWarnings("unused")
 	private static Logger		logger				= null;
 	@SuppressWarnings("unused")
-	private static Log4JHelper	objLogger			= null;
 	private static SOSFTP		sosftp				= null;
 	private final String		strTestFolderName	= "./TestSOSFtp";
 
@@ -91,13 +86,8 @@ public class TestSOSFTP {
 	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		// TODO über eine Option steuern. Die auch in die Standard-Option-Class aufnehmen
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
-
 		sosftp = new SOSFTP("WILMA", 21, "", 123);
-
 		sosftp.login("kb", "kb");
-
 	}
 
 	/**

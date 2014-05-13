@@ -1,55 +1,24 @@
 package sos.net;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import com.sos.JSHelper.Basics.JSVersionInfo;
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.JSHelper.Logging.Log4JHelper;
+import com.sos.JSHelper.System.SOSCommandline;
+import com.trilead.ssh2.*;
+import org.apache.log4j.Logger;
+import sos.configuration.SOSConfiguration;
+import sos.configuration.SOSConfigurationItem;
+import sos.util.*;
+
+import java.io.*;
 import java.lang.reflect.Method;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.URI;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.StringTokenizer;
-import java.util.UUID;
-import java.util.Vector;
-
-import org.apache.log4j.Logger;
-
-import sos.configuration.SOSConfiguration;
-import sos.configuration.SOSConfigurationItem;
-import sos.util.SOSArguments;
-import sos.util.SOSClassUtil;
-import sos.util.SOSLogger;
-import sos.util.SOSStandardLogger;
-import sos.util.SOSString;
-
-import com.sos.JSHelper.Basics.JSVersionInfo;
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.JSHelper.Logging.Log4JHelper;
-import com.sos.JSHelper.System.SOSCommandline;
-import com.trilead.ssh2.Connection;
-import com.trilead.ssh2.HTTPProxyData;
-import com.trilead.ssh2.SFTPException;
-import com.trilead.ssh2.SFTPv3Client;
-import com.trilead.ssh2.SFTPv3FileAttributes;
-import com.trilead.ssh2.SFTPv3FileHandle;
-import com.trilead.ssh2.Session;
-import com.trilead.ssh2.StreamGobbler;
 
 /**
  *
@@ -79,7 +48,7 @@ import com.trilead.ssh2.StreamGobbler;
  * @author andreas.pueschel@sos-berlin.com
  * @author mueruevet.oeksuez@sos-berlin.com
  * @version 2009-09-22
- * @see documentation ./doc/sosftp.xml
+ * @see ./doc/sosftp.xml
  *
  */
 
@@ -91,7 +60,6 @@ abstract public class SOSFTPCommand {
 	public static final String		conParamPORT							= "port";
 	public static final String		conParamPROTOCOL						= "protocol";
 	private static Logger			objLogger								= Logger.getLogger(SOSFTPCommand.class);
-	private static Log4JHelper		objLoggerHelper							= null;
 
 	public static final String		conParamSSH_AUTH_METHOD					= "ssh_auth_method";
 	public static final String		conParamPASSWORD						= "password";
@@ -521,8 +489,6 @@ abstract public class SOSFTPCommand {
 
 	/**
 	 * Constructor
-	 * @param settingsFile
-	 * @param settingsSection
 	 * @param logger
 	 * @param arguments_
 	 */
@@ -1182,7 +1148,7 @@ abstract public class SOSFTPCommand {
 	}
 
 	/**
-	 * @param logger The logger to set.
+	 * @param logger_ The logger to set.
 	 */
 	public void setLogger(final SOSLogger logger_) {
 		logger = logger_;
@@ -1963,7 +1929,7 @@ abstract public class SOSFTPCommand {
 	 * Umgebungsvaribalen werden in einem globalen Parametern gemerkt, um
 	 * Substitution von Environment-Variablen in Konfigurationsdateien vorzunehmen.
 	 *
-	 * @param logger
+	 * @param logger_
 	 * @return sos.util.Properties
 	 * @throws Exception
 	 */
@@ -2812,7 +2778,7 @@ abstract public class SOSFTPCommand {
 	/**
 	 * sends a command to the scheduler
 	 *
-	 * @param command XML String containing the command
+	 * @param msg XML String containing the command
 	 * @throws java.lang.Exception
 	 */
 	public void sendSchedulerRequest(String msg) throws Exception {
@@ -2862,7 +2828,6 @@ abstract public class SOSFTPCommand {
 	 * sends a command to the scheduler
 	 *
 	 * Überprüft ob alle Parameter correkt angegeben sind
-	 * @param command XML String containing the command
 	 * @throws java.lang.Exception
 	 */
 	private void checkSchedulerRequest() throws Exception {
@@ -4013,8 +3978,6 @@ abstract public class SOSFTPCommand {
 	 * Der PID wird ermittelt, wenn historien Einträge erwünscht sind und
 	 * nicht im Testmodus ist.
 	 *
-	 * @param GETPIDSEXE
-	 * @param arg
 	 * @return
 	 * @throws Exception
 	 */
@@ -4296,7 +4259,7 @@ abstract public class SOSFTPCommand {
 
 	/**
 	 * Send/Receive files by FTP/SFTP and execute commands by SSH
-	 * @see documentation sosftp.xml
+	 * see sosftp.xml
 	 */
 
 	private static int getIntArg(final Properties arg, final String strKey, final int pintDefault) {
