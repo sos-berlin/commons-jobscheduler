@@ -25,20 +25,14 @@ package com.sos.JSHelper.io.Files;
 * Created on 26.08.2011 21:31:13
  */
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.apache.log4j.Logger;
+import org.junit.*;
 
 import java.io.File;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.sos.JSHelper.Logging.Log4JHelper;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author KB
@@ -53,8 +47,6 @@ public class JSIniFileTest {
 	private static final Logger	logger			= Logger.getLogger(JSIniFileTest.class);
 
 	private JSIniFile			objF			= null;
-
-	private static Log4JHelper	objLogger		= null;
 
 	public JSIniFileTest() {
 		//
@@ -97,7 +89,6 @@ public class JSIniFileTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		objLogger = new Log4JHelper("./log4j.properties");
 		objF = new JSIniFile(conIniFileName);
 	}
 

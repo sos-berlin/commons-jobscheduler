@@ -1,20 +1,11 @@
 package com.sos.JSHelper.io.Files;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.apache.log4j.Logger;
+import org.junit.*;
 
 import java.io.IOException;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.sos.JSHelper.Logging.Log4JHelper;
+import static org.junit.Assert.*;
 
 /**
 * \class JSFileTest 
@@ -52,7 +43,6 @@ public class JSFileTest {
 	private String				strTestFileName	= strFolderName + "test.txt";
 
 	private static Logger		logger			= Logger.getLogger(JSFileTest.class);
-	private static Log4JHelper	objLogger		= null;
 
 	public JSFileTest() {
 		//
@@ -70,10 +60,6 @@ public class JSFileTest {
 
 	@Before
 	public void setUp() throws Exception {
-		Log4JHelper.flgUseJobSchedulerLog4JAppender = false;
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
-		objLogger.setLevel(Level.DEBUG);
-
 	}
 
 	@After

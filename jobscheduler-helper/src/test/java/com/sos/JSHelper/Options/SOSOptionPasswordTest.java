@@ -28,19 +28,12 @@ package com.sos.JSHelper.Options;
 * Created on 20.05.2011 16:26:20
  */
 
+import com.sos.JSHelper.io.Files.JSFile;
+import org.apache.log4j.Logger;
+import org.junit.*;
+
 import java.io.File;
 import java.io.IOException;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.sos.JSHelper.Logging.Log4JHelper;
-import com.sos.JSHelper.io.Files.JSFile;
 
 /**
  * @author KB
@@ -52,7 +45,6 @@ public class SOSOptionPasswordTest {
 	private final String		conClassName	= "SOSOptionPasswordTest";
 	private static final Logger	logger			= Logger.getLogger(SOSOptionPasswordTest.class);
 	private SOSOptionPassword objOption = null;
-	private static Log4JHelper	objLogger				= null;
 
 	public SOSOptionPasswordTest() {
 		//
@@ -97,9 +89,6 @@ public class SOSOptionPasswordTest {
 	public void setUp() throws Exception {
 		String strLog4JFileName = "./log4j.properties";
 		String strT = new File(strLog4JFileName).getAbsolutePath();
-		objLogger = new Log4JHelper(strLog4JFileName); //$NON-NLS-1$
-		objLogger.setLevel(Level.DEBUG);
-		// objLogger.setLevel(Level.INFO);
 		logger.info("logfilename = " + strT);
 
 		objOption = new SOSOptionPassword (null, "key", "Description","value", "DefaultValue", true);

@@ -1,8 +1,6 @@
-/**
- * 
- */
+package com.sos.JSHelper.interfaces;
+
 /**
  * @author KB
  *
  */
-package com.sos.JSHelper.interfaces;

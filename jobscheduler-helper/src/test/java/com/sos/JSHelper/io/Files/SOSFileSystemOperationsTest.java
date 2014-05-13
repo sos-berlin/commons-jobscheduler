@@ -1,22 +1,14 @@
 package com.sos.JSHelper.io.Files;
 
+import com.sos.JSHelper.Options.SOSOptionTime;
+import com.sos.JSHelper.io.SOSFileSystemOperations;
+import junit.framework.Assert;
+import org.apache.log4j.Logger;
+import org.junit.*;
+
 import java.io.File;
 import java.util.Vector;
 import java.util.regex.Pattern;
-
-import junit.framework.Assert;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.sos.JSHelper.Logging.Log4JHelper;
-import com.sos.JSHelper.Options.SOSOptionTime;
-import com.sos.JSHelper.io.SOSFileSystemOperations;
 
 //import sos.scheduler.file.JobSchedulerFileOperationsBaseTest;
 
@@ -63,8 +55,6 @@ public class SOSFileSystemOperationsTest {
 	private static final String	conSVNVersion		= "$Id$";
 	private static final Logger	logger				= Logger.getLogger(SOSFileSystemOperationsTest.class);
 
-	private static Log4JHelper	objLogger			= null;
-
 	public SOSFileSystemOperationsTest() {
 		//
 	}
@@ -106,10 +96,6 @@ public class SOSFileSystemOperationsTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		Log4JHelper.flgUseJobSchedulerLog4JAppender = false;
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
-		objLogger.setLevel(Level.DEBUG);
-
 	}
 
 	/**
