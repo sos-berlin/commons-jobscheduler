@@ -2,7 +2,6 @@ package sos.net;
 
 import com.sos.JSHelper.Basics.JSVersionInfo;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.JSHelper.Logging.Log4JHelper;
 import com.sos.JSHelper.System.SOSCommandline;
 import com.trilead.ssh2.*;
 import org.apache.log4j.Logger;
@@ -4301,7 +4300,6 @@ abstract public class SOSFTPCommand {
 			String version = "SOSFTP - " + JSVersionInfo.conVersionNumber + " " + JSVersionInfo.conVersionDate + " / " + JSVersionInfo.conCopyrightText;
 			System.out.println(version);
 			System.out.println(conSVNVersion);
-			objLoggerHelper = new Log4JHelper("./log4j.properties");
 			objLogger = Logger.getRootLogger();
 
 			objLogger.info(version); // $NON-NLS-1$
