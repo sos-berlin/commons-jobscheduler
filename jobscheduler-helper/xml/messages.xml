@@ -1,0 +1,531 @@
+﻿<?xml version="1.0"?>
+<?xml-stylesheet href="../xsl/messages.xsl" type="text/xsl"?>
+
+<messages xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="messages.xsd" name="messages"
+	base_dir="../" package="JobScheduler" author="$Author: kb $"
+	date="$Date: 2010-06-28 15:36:14 +0200 (Mo, 28 Jun 2010) $">
+	<!--
+		<title> ohne Zeilenwechsel schreiben! Also: <title>text ...</title>
+	-->
+	<message code="JSJ-E-100" weight="error">
+		<text lang="de">
+			<title>Fehler aufgetreten beim Lesen der Parameter: %1$s
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="en">
+			<title>error occurred reading Parameters: %1$s
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+
+		</text>
+		<text lang="fr">
+			<title>
+				error occurred reading Parameters: %1$s
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="jp">
+			<title>
+				%1$s -error occurred reading Parameters: %1$s
+			</title>
+			<description>
+				<p>
+					定義されて
+        		</p>
+			</description>
+		</text>
+	</message>
+
+
+	<message code="JSJ-E-105" weight="error">
+		<text lang="de">
+			<title>%1$s - wurde fehlerhaft beendet, Fehler-Code ist %2$d
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="en">
+			<title>%1$s - terminated with exit-code %2$d
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+
+		</text>
+		<text lang="fr">
+			<title>
+				%1$s - fin avec la sortie de code %2$d
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="jp">
+			<title>
+				%1$s - 終了コードで終了 %2$d
+			</title>
+			<description>
+				<p>
+					定義されて
+        		</p>
+			</description>
+		</text>
+	</message>
+	<message code="JSJ-I-106" weight="info">
+		<text lang="de">
+			<title>
+				%1$s - wurde ohne Fehler beendet
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="en">
+			<title>
+				%1$s - ended without errors
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+
+		</text>
+		<text lang="fr">
+			<title>
+				%1$s - s'est terminée sans erreurs
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="jp">
+			<title>
+				%1$s - エラーなしで終了
+			</title>
+			<description>
+				<p>
+					定義されて
+        		</p>
+			</description>
+		</text>
+	</message>
+	<message code="JSJ-E-107" weight="error">
+		<text lang="de">
+			<title>
+				%1$s - eine Ausnahme (Exception) wurde ausgelöst
+			</title>
+			<description>
+				<p>
+					Hierbei handelt es sich um einen schweren Fehler, das Programm wird beendet.
+        		</p>
+			</description>
+		</text>
+		<text lang="en">
+			<title>
+				%1$s - exception occurred
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+
+		</text>
+		<text lang="fr">
+			<title>
+				%1$s - exception s'est produite
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="jp">
+			<title>
+				%1$s - 例外が発生しました
+			</title>
+			<description>
+				<p>
+					定義されて
+        		</p>
+			</description>
+		</text>
+	</message>
+	<message code="JSJ-I-110" weight="info">
+		<text lang="de">
+			<title>
+				%1$s - gestartet ...
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="en">
+			<title>
+				%1$s - started ...
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="fr">
+			<title>
+				exécution de la commande à distance: %1$s
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="jp">
+			<title>
+				%1$s - 開始...
+			</title>
+			<description>
+				<p>
+					定義されて
+        		</p>
+			</description>
+		</text>
+	</message>
+
+	
+
+
+	<message code="JSJ-I-111" alias="JSJ-I-106" weight="info">
+	</message><message code="SSH-I-1" weight="info">
+		<text lang="de">
+			<title>
+				Remote-Kommando: '%1$s' wird ausgeführt
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="en">
+			<title>
+				executing remote command: %1$s
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="fr">
+			<title>
+				exécution de la commande à distance: %1$s
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="jp">
+			<title>
+				%1$s - 開始...
+			</title>
+			<description>
+				<p>
+					定義されて
+        		</p>
+			</description>
+		</text>
+	</message>
+
+	<message code="SSH-I-2" weight="info">
+		<text lang="de">
+			<title>
+			Die Ausgabe nach STDERR wurde ignoriert: %1$s
+			</title>
+			<description>
+				<p>
+					Wegen der Option 'ignore_stderr=true' wurde eine vorhandene Ausgabe nach STDERR (Fehlerkanal)
+					ignoriert.
+					Der Programmlauf ist vermutlich fehlerhaft, so dass eine Analyse des Protokolls empfohlen wird.
+        		</p>
+			</description>
+		</text>
+		<text lang="en">
+			<title>
+				output to stderr is ignored: %1$s
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="fr">
+			<title>
+				sortie vers stderr est ignorée: %1$s
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="jp">
+			<title>
+				%1$s - 開始...
+			</title>
+			<description>
+				<p>
+					定義されて
+        		</p>
+			</description>
+		</text>
+	</message>
+
+	<message code="SSH-E-3" weight="error">
+		<text lang="de">
+			<title>
+				Die Remote-Ausführung des Jobs führte zu folgenden Fehlern: %1$s
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="en">
+			<title>
+				remote execution reports error: %1$s
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="fr">
+			<title>
+				rapports d'exécution à distance d'erreur: %1$s
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="jp">
+			<title>
+				%1$s - 開始...
+			</title>
+			<description>
+				<p>
+					定義されて
+        		</p>
+			</description>
+		</text>
+	</message>
+
+	<message code="SSH-E-4" weight="error">
+		<text lang="de">
+			<title>
+				%1$s - Das remote-Kommando wurde mit einem Fehlercode beendet: %2$d
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="en">
+			<title>
+				%1$s - remote command terminated with exit code: %2$d
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="fr">
+			<title>
+				%1$s - commande à distance s'est arrêté avec le code de sortie:  %2$d
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="jp">
+			<title>
+				%1$s - 開始...
+			</title>
+			<description>
+				<p>
+					定義されて
+        		</p>
+			</description>
+		</text>
+	</message>
+
+	<message code="SSH-I-5" weight="info">
+		<text lang="de">
+			<title>
+			Ein Signal wurde aufgrund der Options-Einstellung ignoriert: %1$s
+			</title>
+			<description>
+				<p>
+        		</p>
+			</description>
+		</text>
+		<text lang="en">
+			<title>
+				exit signal is ignored due to option-settings: %1$s
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="fr">
+			<title>
+				sortie vers stderr est ignorée: %1$s
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="jp">
+			<title>
+				%1$s - 開始...
+			</title>
+			<description>
+				<p>
+					定義されて
+        		</p>
+			</description>
+		</text>
+	</message>
+
+	<message code="SSH-E-6" weight="error">
+		<text lang="de">
+			<title>
+				%1$s - Die Ausführung des remote-Kommandos wurde aufgrund eines Signals abgebrochen: %2$s
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="en">
+			<title>
+				%1$s - remote command terminated with an exit signal: %2$s
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="fr">
+			<title>
+				rapports d'exécution à distance d'erreur: %1$s
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="jp">
+			<title>
+				%1$s - 開始...
+			</title>
+			<description>
+				<p>
+					定義されて
+        		</p>
+			</description>
+		</text>
+	</message>
+
+	<message code="SSH-E-7" weight="error">
+		<text lang="de">
+			<title>
+				%1$s - Bei der Ausführung des SSH-Kommandos sind Fehler(meldungen) aufgetreten: %2$s
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="en">
+			<title>
+				%1$s - error occurred processing ssh command: %2$s
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="fr">
+			<title>
+				rapports d'exécution à distance d'erreur: %1$s
+			</title>
+			<description>
+				<p>
+					tbd
+        		</p>
+			</description>
+		</text>
+		<text lang="jp">
+			<title>
+				%1$s - 開始...
+			</title>
+			<description>
+				<p>
+					定義されて
+        		</p>
+			</description>
+		</text>
+	</message>
+
+
+</messages>

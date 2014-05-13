@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+
+<xsd:schema 
+    xmlns:xsd          = "http://www.w3.org/2001/XMLSchema" 
+    elementFormDefault = "qualified">
+
+    <xsd:annotation>
+        <xsd:documentation xml:lang="de">
+            $Id$
+            Schema für Programm-Meldungen
+        </xsd:documentation>
+    </xsd:annotation>
+
+	    <xsd:element name="messages">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:choice maxOccurs="unbounded">
+                    <xsd:element name="message" type="message" maxOccurs="unbounded"/>
+                    <xsd:element name="messages" type="messages" maxOccurs="unbounded"/>
+                </xsd:choice>
+            </xsd:sequence>
+
+            <xsd:attribute name="name" type="xsd:NMTOKEN" use="required"/>
+            <xsd:attribute name="include"/>
+            <xsd:attribute name="title"/>
+            <xsd:attribute name="base_dir"/>
+            <xsd:attribute name="package" use="required"/>
+            <xsd:attribute name="author"/>
+            <xsd:attribute name="date"/>
+        </xsd:complexType>
+
+    </xsd:element>
+
+
+    <xsd:complexType name="messages">
+        <xsd:sequence>
+            <xsd:element name="message" type="message" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+
+    <xsd:complexType name="message">
+    	<xsd:sequence>
+    		<xsd:element name="text" maxOccurs="unbounded"
+    			minOccurs="0">
+    			<xsd:complexType>
+    				<xsd:sequence>
+    					<xsd:element name="title">
+    						<xsd:complexType mixed="true">
+    							<xsd:sequence minOccurs="0"
+    								maxOccurs="unbounded">
+    								<xsd:choice>
+    									<xsd:element name="p1" />
+    									<xsd:element name="p2" />
+    									<xsd:element name="p3" />
+    									<xsd:element name="p4" />
+    									<xsd:element name="br" />
+    								</xsd:choice>
+    							</xsd:sequence>
+    						</xsd:complexType>
+    					</xsd:element>
+    					<xsd:element name="description" minOccurs="0" />
+    				</xsd:sequence>
+    				<xsd:attribute name="lang">
+    					<xsd:simpleType>
+    						<xsd:restriction base="xsd:string">
+    							<xsd:enumeration value="de"></xsd:enumeration>
+    							<xsd:enumeration value="dk"></xsd:enumeration>
+    							<xsd:enumeration value="en"></xsd:enumeration>
+    							<xsd:enumeration value="es"></xsd:enumeration>
+    							<xsd:enumeration value="fr"></xsd:enumeration>
+    							<xsd:enumeration value="it"></xsd:enumeration>
+    							<xsd:enumeration value="jp"></xsd:enumeration>
+    						</xsd:restriction>
+    					</xsd:simpleType>
+    				</xsd:attribute>
+    			</xsd:complexType>
+    		</xsd:element>
+    	</xsd:sequence>
+
+    	<xsd:attribute name="code" type="xsd:string" use="required"/>
+    	<xsd:attribute name="weight" default="error" use="optional">
+    		<xsd:simpleType>
+    			<xsd:restriction base="xsd:string">
+    				<xsd:enumeration value="error"></xsd:enumeration>
+    				<xsd:enumeration value="info"></xsd:enumeration>
+    				<xsd:enumeration value="warning"></xsd:enumeration>
+    				<xsd:enumeration value="tooltip"></xsd:enumeration>
+    			</xsd:restriction>
+    		</xsd:simpleType>
+    	</xsd:attribute>
+    	<xsd:attribute name="object" type="xsd:string" />
+    	<xsd:attribute name="category" use="optional">
+    		<xsd:simpleType>
+    			<xsd:restriction base="xsd:string">
+    				<xsd:enumeration value="Jobs"></xsd:enumeration>
+    				<xsd:enumeration value="JOE"></xsd:enumeration>
+    				<xsd:enumeration value="JOG"></xsd:enumeration>
+    				<xsd:enumeration value="JSE"></xsd:enumeration>
+    				<xsd:enumeration value="SOSFTP"></xsd:enumeration>
+    			</xsd:restriction>
+    		</xsd:simpleType>
+    	</xsd:attribute>
+
+    	<xsd:attribute name="alias" type="xsd:string" use="optional"></xsd:attribute>
+    </xsd:complexType>
+
+</xsd:schema>

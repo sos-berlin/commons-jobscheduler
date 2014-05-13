@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="JobSchedulerHelper">
+        <wb-resource deploy-path="/" source-path="/src"/>
+        <wb-resource deploy-path="/" source-path="/junit"/>
+        <wb-resource deploy-path="/" source-path="/conf"/>
+        <wb-resource deploy-path="/" source-path="/xml"/>
+        <wb-resource deploy-path="/" source-path="/xsl"/>
+    </wb-module>
+</project-modules>
