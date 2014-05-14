@@ -41,33 +41,33 @@ import com.sos.scheduler.model.objects.Spooler;
 import com.sun.jersey.guice.JerseyServletModule;
 
 @Path("/plugin/security")
-public class SOSSecurityWebservice {
+public class SOSCommandSecurityWebservice {
 
-    private static final String         PERMISSION_ADD_ORDER            = "jobscheduler:joc:command:add:order";
-    private static final String         PERMISSION_ADD_PROCESS_CLASS    = "jobscheduler:joc:command:add:process_class";
-    private static final String         PERMISSION_MODIFY_ORDER         = "jobscheduler:joc:command:modify:order";
-    private static final String         PERMISSION_MODIFY_JOB           = "jobscheduler:joc:command:modify:job";
-    private static final String         PERMISSION_MODIFY_SPOOLER       = "jobscheduler:joc:command:modify:spooler";
-    private static final String         PERMISSION_MODIFY_JOBCHAIN      = "jobscheduler:joc:command:modify:job_chain";
-    private static final String         PERMISSION_MODIFY_JOBCHAIN_NODE = "jobscheduler:joc:command:modify:job_chain_node";
-    private static final String         PERMISSION_START_JOB            = "jobscheduler:joc:command:start:job";
-    private static final String         PERMISSION_KILL_TASK            = "jobscheduler:joc:command:kill_task";
-    private static final String         PERMISSION_LOCK                 = "jobscheduler:joc:command:lock";
-    private static final String         PERMISSION_REMOVE_LOCK          = "jobscheduler:joc:command:remove:lock";
-    private static final String         PERMISSION_REMOVE_PROCESS_CLASS = "jobscheduler:joc:command:remove:process_class";
-    private static final String         PERMISSION_REMOVE_JOB_CHAIN     = "jobscheduler:joc:command:remove:job_chain";
-    private static final String         PERMISSION_REMOVE_ORDER         = "jobscheduler:joc:command:remove:order";
-    private static final String         PERMISSION_TERMINATE            = "jobscheduler:joc:command:terminate";
+    private static final String         PERMISSION_ADD_ORDER            = "sos:products:joc:command:add:order";
+    private static final String         PERMISSION_ADD_PROCESS_CLASS    = "sos:products:joc:command:add:process_class";
+    private static final String         PERMISSION_MODIFY_ORDER         = "sos:products:joc:command:modify:order";
+    private static final String         PERMISSION_MODIFY_JOB           = "sos:products:joc:command:modify:job";
+    private static final String         PERMISSION_MODIFY_SPOOLER       = "sos:products:joc:command:modify:spooler";
+    private static final String         PERMISSION_MODIFY_JOBCHAIN      = "sos:products:joc:command:modify:job_chain";
+    private static final String         PERMISSION_MODIFY_JOBCHAIN_NODE = "sos:products:joc:command:modify:job_chain_node";
+    private static final String         PERMISSION_START_JOB            = "sos:products:joc:command:start:job";
+    private static final String         PERMISSION_KILL_TASK            = "sos:products:joc:command:kill_task";
+    private static final String         PERMISSION_LOCK                 = "sos:products:joc:command:lock";
+    private static final String         PERMISSION_REMOVE_LOCK          = "sos:products:joc:command:remove:lock";
+    private static final String         PERMISSION_REMOVE_PROCESS_CLASS = "sos:products:joc:command:remove:process_class";
+    private static final String         PERMISSION_REMOVE_JOB_CHAIN     = "sos:products:joc:command:remove:job_chain";
+    private static final String         PERMISSION_REMOVE_ORDER         = "sos:products:joc:command:remove:order";
+    private static final String         PERMISSION_TERMINATE            = "sos:products:joc:command:terminate";
     private SchedulerXmlCommandExecutor xmlCommandExecutor;
 
-    private static SOSWebserviceCurrentUsersList               currentUserList;
+    private static SOSCommandSecurityWebserviceCurrentUsersList               currentUserList;
 
     @Inject
-    private SOSSecurityWebservice(SchedulerXmlCommandExecutor xmlCommandExecutor_) {
+    private SOSCommandSecurityWebservice(SchedulerXmlCommandExecutor xmlCommandExecutor_) {
         xmlCommandExecutor = xmlCommandExecutor_;
     }
 
-    public SOSSecurityWebservice() {
+    public SOSCommandSecurityWebservice() {
         //For Junit Tests only
         xmlCommandExecutor = null;
     }
@@ -81,7 +81,7 @@ public class SOSSecurityWebservice {
     
     private String getResource(String sessionId) {
         if (currentUserList != null) {
-        SOSWebserviceCurrentUser c = currentUserList.getUser(sessionId);
+        SOSCommandSecurityWebserviceCurrentUser c = currentUserList.getUser(sessionId);
             if (c != null){
                return c.getResource();
             }else {
@@ -93,15 +93,26 @@ public class SOSSecurityWebservice {
         }
     }
     
-    private String getResourceFromJobScheduler() {
+    private String getResourceFromJobScheduler()  {
         //TODO using Scheduler.model here
-        String answer = executeXml("<params.get name=\"security_server\"/>");
-        SOSXMLXPath xPath = new SOSXMLXPath(new StringBuffer(answer));
-        Node n = xPath.selectSingleNode("" );
-        String v =  n.getAttributes().getNamedItem(attribute).getNodeValue();
-
+        String answer = executeXml("<param.get name=\"security_server\"/>");
+        SOSXMLXPath xPath;
+        try {
+            xPath = new SOSXMLXPath(new StringBuffer(answer));
         
-    }
+        
+        Node n = xPath.selectSingleNode("/spooler/answer/param" );
+        String v =  n.getAttributes().getNamedItem("value").getNodeValue();
+        
+        return v;
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+
+     }
+    
+     
 
     @GET
     @Path("/test2")
@@ -127,12 +138,12 @@ public class SOSSecurityWebservice {
 
     }
 
-    private SOSSecurityWebserviceAnswer createAnswer(String jobSchedulerAnswer, String message, SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord) {
+    private SOSCommandSecurityWebserviceAnswer createAnswer(String jobSchedulerAnswer, String message, SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord) {
         String sessionId = "-";
         if (sosWebserviceAuthenticationRecord != null) {
             sessionId = sosWebserviceAuthenticationRecord.getSessionId();
         }
-        SOSSecurityWebserviceAnswer m = new SOSSecurityWebserviceAnswer();
+        SOSCommandSecurityWebserviceAnswer m = new SOSCommandSecurityWebserviceAnswer();
         m.setUser(sosWebserviceAuthenticationRecord.getUser());
         m.setResource(getResource(sessionId));
         m.setSessionId(sessionId);
@@ -147,6 +158,7 @@ public class SOSSecurityWebservice {
         sosWebserviceAuthenticationRecord.setResource(this.getResource(sosWebserviceAuthenticationRecord.getSessionId()));
 
         String permission = sosWebserviceAuthenticationRecord.getPermission() + ":" + item;
+        
         permission = permission.replace("/", ":");
         sosWebserviceAuthenticationRecord.setPermission(permission);
 
@@ -157,12 +169,12 @@ public class SOSSecurityWebservice {
         }
 
         if (!sosShiroCurrentUserAnswer.isAuthenticated()) {
-            return String.format("User %s is not authenticated", sosWebserviceAuthenticationRecord.getUser());
+            return String.format("%s:User %s is not authenticated","SOSSEC001",sosWebserviceAuthenticationRecord.getUser());
         }
 
         boolean isPermitted = (sosShiroCurrentUserAnswer != null && sosShiroCurrentUserAnswer.isPermitted() && sosShiroCurrentUserAnswer.isAuthenticated());
         if (!isPermitted) {
-            return String.format("User %s is not permitted. Missing permission: %s", sosWebserviceAuthenticationRecord.getUser(), permission);
+            return String.format("%s,User %s is not permitted. Missing permission: %s","SOSSEC002", sosWebserviceAuthenticationRecord.getUser(), permission);
         }
 
         return "";
@@ -181,7 +193,7 @@ public class SOSSecurityWebservice {
     @POST
     @Path("/start_job")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSSecurityWebserviceAnswer startJob(
+    public SOSCommandSecurityWebserviceAnswer startJob(
             @QueryParam("session_id")    String sessionId, 
             @QueryParam("job")           String job, 
             @QueryParam("at")            String at, 
@@ -223,7 +235,7 @@ public class SOSSecurityWebservice {
         String s = checkAuthentication(sosWebserviceAuthenticationRecord, job);
         if (s.equals("")) {
             String answer = executeXml(xml);
-            return createAnswer(answer,String.format("job %s gestartet", job), sosWebserviceAuthenticationRecord);
+            return createAnswer(answer,String.format("%s:job %s gestartet","SOSSEC003",job), sosWebserviceAuthenticationRecord);
         }
         else {
             return createAnswer("",s, sosWebserviceAuthenticationRecord);
@@ -234,7 +246,7 @@ public class SOSSecurityWebservice {
     @POST
     @Path("/modify_order")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSSecurityWebserviceAnswer modifyOrder(
+    public SOSCommandSecurityWebserviceAnswer modifyOrder(
             @QueryParam("session_id")   String sessionId, 
             @QueryParam("job_chain")    String jobChain, 
             @QueryParam("order")        String order, 
@@ -311,7 +323,7 @@ public class SOSSecurityWebservice {
             String xml = objFactory.toXMLString(objOrder);
             String answer = executeXml(xml);
 
-            return createAnswer(answer,String.format("job chain %s modfied with order %s", jobChain, order), sosWebserviceAuthenticationRecord);
+            return createAnswer(answer,String.format("%s:job chain %s modfied with order %s","SOSSEC004", jobChain, order), sosWebserviceAuthenticationRecord);
         }
         else {
             return createAnswer("",s,sosWebserviceAuthenticationRecord);
@@ -321,7 +333,7 @@ public class SOSSecurityWebservice {
     @POST
     @Path("/add_order")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSSecurityWebserviceAnswer addOrder(
+    public SOSCommandSecurityWebserviceAnswer addOrder(
             @QueryParam("session_id")   String sessionId, 
             @QueryParam("job_chain")    String jobChain, 
             @QueryParam("order")        String order, 
@@ -390,7 +402,7 @@ public class SOSSecurityWebservice {
             String xml = objFactory.toXMLString(objOrder);
             String answer = executeXml(xml);
 
-            return createAnswer(answer,String.format("order %s added to job chain %s", order, jobChain),  sosWebserviceAuthenticationRecord);
+            return createAnswer(answer,String.format("%s:order %s added to job chain %s", "SOSSEC005",order, jobChain),  sosWebserviceAuthenticationRecord);
         }
         else {
             return createAnswer("",s,  sosWebserviceAuthenticationRecord);
@@ -400,7 +412,7 @@ public class SOSSecurityWebservice {
     @POST
     @Path("/job_chain_modify")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSSecurityWebserviceAnswer jobChainModify(
+    public SOSCommandSecurityWebserviceAnswer jobChainModify(
             @QueryParam("session_id") String sessionId, 
             @QueryParam("job_chain")  String jobChain, 
             @QueryParam("state")      String state) 
@@ -429,7 +441,7 @@ public class SOSSecurityWebservice {
             String xml = objFactory.toXMLString(objModifyJobChain);
             String answer = executeXml(xml);
 
-            return createAnswer(answer,String.format("job chain %s modified with state %s", jobChain, state), sosWebserviceAuthenticationRecord);
+            return createAnswer(answer,String.format("%s:job chain %s modified with state %s","SOSSEC006", jobChain, state), sosWebserviceAuthenticationRecord);
         }
         else {
             return createAnswer("",s, sosWebserviceAuthenticationRecord);
@@ -439,7 +451,7 @@ public class SOSSecurityWebservice {
     @POST
     @Path("/job_chain_node_modify")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSSecurityWebserviceAnswer jobChainNodeModify(
+    public SOSCommandSecurityWebserviceAnswer jobChainNodeModify(
             @QueryParam("session_id")   String sessionId, 
             @QueryParam("job_chain")    String jobChain, 
             @QueryParam("action")       String action, 
@@ -475,7 +487,7 @@ public class SOSSecurityWebservice {
             String xml = objFactory.toXMLString(objModifyJobChainNode);
             String answer = executeXml(xml);
 
-            return createAnswer(answer, String.format("job chain %s modified with state %s", jobChain, state), sosWebserviceAuthenticationRecord);
+            return createAnswer(answer, String.format("%s:job chain %s modified with state %s","SOSSEC007", jobChain, state), sosWebserviceAuthenticationRecord);
         }
         else {
             return createAnswer("",s,  sosWebserviceAuthenticationRecord);
@@ -485,7 +497,7 @@ public class SOSSecurityWebservice {
     @POST
     @Path("/kill_task")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSSecurityWebserviceAnswer killTask(
+    public SOSCommandSecurityWebserviceAnswer killTask(
             @QueryParam("session_id")    String sessionId, 
             @QueryParam("id")            String id, 
             @QueryParam("immediately")   String immediately, 
@@ -520,7 +532,7 @@ public class SOSSecurityWebservice {
             String xml = objFactory.toXMLString(objKillTask);
             String answer = executeXml(xml);
 
-            return createAnswer(answer, String.format("job %s with id: %s killed", job, id), sosWebserviceAuthenticationRecord);
+            return createAnswer(answer, String.format("%s: job %s with id: %s killed","SOSSEC008", job, id), sosWebserviceAuthenticationRecord);
         }
         else {
             return createAnswer("",s, sosWebserviceAuthenticationRecord);
@@ -531,7 +543,7 @@ public class SOSSecurityWebservice {
     @POST
     @Path("/modify_job")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSSecurityWebserviceAnswer modifyJob(
+    public SOSCommandSecurityWebserviceAnswer modifyJob(
             @QueryParam("session_id")    String sessionId, 
             @QueryParam("job")           String job, 
             @QueryParam("cmd")           String cmd) 
@@ -560,7 +572,7 @@ public class SOSSecurityWebservice {
             String xml = objFactory.toXMLString(objModifyJob);
 
             String answer = executeXml(xml);
-            return createAnswer(answer,String.format("job %s modified with cmd: %s", job, cmd), sosWebserviceAuthenticationRecord);
+            return createAnswer(answer,String.format("%s: job %s modified with cmd: %s","SOSSEC009", job, cmd), sosWebserviceAuthenticationRecord);
         }
         else {
             return createAnswer("",s, sosWebserviceAuthenticationRecord);
@@ -571,7 +583,7 @@ public class SOSSecurityWebservice {
     @POST
     @Path("/modify_spooler")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSSecurityWebserviceAnswer modifySpooler(
+    public SOSCommandSecurityWebserviceAnswer modifySpooler(
             @QueryParam("session_id")    String sessionId, 
             @QueryParam("cmd")           String cmd, 
             @QueryParam("timeout")       String timeout) 
@@ -601,7 +613,7 @@ public class SOSSecurityWebservice {
             String xml = objFactory.toXMLString(objModifySpooler);
 
             String answer = executeXml(xml);
-            return createAnswer(answer,String.format("JobScheduler modified with cmd: %s", cmd), sosWebserviceAuthenticationRecord);
+            return createAnswer(answer,String.format("%s: JobScheduler modified with cmd: %s","SOSSEC010", cmd), sosWebserviceAuthenticationRecord);
         }
         else {
             return createAnswer("",s, sosWebserviceAuthenticationRecord);
@@ -612,7 +624,7 @@ public class SOSSecurityWebservice {
     @POST
     @Path("/process_class")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSSecurityWebserviceAnswer processClass(
+    public SOSCommandSecurityWebserviceAnswer processClass(
             @QueryParam("session_id")          String sessionId, 
             @QueryParam("scheduler_id")        String schedulerId, 
             @QueryParam("name")                String name, 
@@ -660,7 +672,7 @@ public class SOSSecurityWebservice {
 
             String xml = objFactory.toXMLString(objProcessClass);
             String answer = executeXml(xml);
-            return createAnswer(answer,String.format("Process %s class modified", name), sosWebserviceAuthenticationRecord);
+            return createAnswer(answer,String.format("%s: Process %s class modified","SOSSEC011", name), sosWebserviceAuthenticationRecord);
         }
         else {
             return createAnswer("",s, sosWebserviceAuthenticationRecord);
@@ -670,7 +682,7 @@ public class SOSSecurityWebservice {
     @POST
     @Path("/process_class_remove")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSSecurityWebserviceAnswer processClassRemove(
+    public SOSCommandSecurityWebserviceAnswer processClassRemove(
             @QueryParam("session_id")       String sessionId, 
             @QueryParam("process_class")    String processClass) 
                     throws MalformedURLException {
@@ -696,7 +708,7 @@ public class SOSSecurityWebservice {
             String xml = String.format("<process_class.remove process_class=\"%s\"/>", processClass);
 
             String answer = executeXml(xml);
-            return createAnswer(answer,String.format("Process class %s removed", processClass), sosWebserviceAuthenticationRecord);
+            return createAnswer(answer,String.format("%s: Process class %s removed","SOSSEC012", processClass), sosWebserviceAuthenticationRecord);
         }
         else {
             return createAnswer("",s, sosWebserviceAuthenticationRecord);
@@ -707,7 +719,7 @@ public class SOSSecurityWebservice {
     @POST
     @Path("/remove_job_chain")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSSecurityWebserviceAnswer jobChainRemove(
+    public SOSCommandSecurityWebserviceAnswer jobChainRemove(
             @QueryParam("session_id")    String sessionId, 
             @QueryParam("job_chain")     String jobChain) 
                     throws MalformedURLException {
@@ -724,7 +736,7 @@ public class SOSSecurityWebservice {
             String xml = String.format("remove_job_chain job_chain=\"%s\"", jobChain);
 
             String answer = executeXml(xml);
-            return createAnswer(answer,String.format("Job chain %s removed", jobChain), sosWebserviceAuthenticationRecord);
+            return createAnswer(answer,String.format("%s: Job chain %s removed","SOSSEC013", jobChain), sosWebserviceAuthenticationRecord);
         }
         else {
             return createAnswer("",s, sosWebserviceAuthenticationRecord);
@@ -735,7 +747,7 @@ public class SOSSecurityWebservice {
     @POST
     @Path("/remove_order")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSSecurityWebserviceAnswer orderRemove(
+    public SOSCommandSecurityWebserviceAnswer orderRemove(
             @QueryParam("session_id")    String sessionId, 
             @QueryParam("job_chain")     String jobChain, 
             @QueryParam("order")         String order) 
@@ -765,7 +777,7 @@ public class SOSSecurityWebservice {
             executeXml(xml);
 
             String answer = executeXml(xml);
-            return createAnswer(answer,String.format("Order %s removed from job chain %s", order, jobChain), sosWebserviceAuthenticationRecord);
+            return createAnswer(answer,String.format("%s: Order %s removed from job chain %s","SOSSEC014", order, jobChain), sosWebserviceAuthenticationRecord);
         }
         else {
             return createAnswer("",s, sosWebserviceAuthenticationRecord);
@@ -776,7 +788,7 @@ public class SOSSecurityWebservice {
     @POST
     @Path("/lock")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSSecurityWebserviceAnswer lock(
+    public SOSCommandSecurityWebserviceAnswer lock(
             @QueryParam("session_id")           String sessionId, 
             @QueryParam("max_non_exclusive")    String maxNonExclusive, 
             @QueryParam("name")                 String name) 
@@ -805,7 +817,7 @@ public class SOSSecurityWebservice {
             String xml = objFactory.toXMLString(objLock);
 
             String answer = executeXml(xml);
-            return createAnswer(answer,String.format("lock %s created", name), sosWebserviceAuthenticationRecord);
+            return createAnswer(answer,String.format("%s: lock %s created","SOSSEC015", name), sosWebserviceAuthenticationRecord);
         }
         else {
             return createAnswer("",s, sosWebserviceAuthenticationRecord);
@@ -816,7 +828,7 @@ public class SOSSecurityWebservice {
     @POST
     @Path("/lock_remove")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSSecurityWebserviceAnswer lockRemove(
+    public SOSCommandSecurityWebserviceAnswer lockRemove(
             @QueryParam("session_id")    String sessionId, 
             @QueryParam("lock")          String lock) 
                     throws MalformedURLException {
@@ -841,7 +853,7 @@ public class SOSSecurityWebservice {
             // TODO: toXMLString does not work
             String xml = String.format("lock.remove lock=\"%s\"", lock);
             String answer = executeXml(xml);
-            return createAnswer(answer,String.format("lock %s removed", lock), sosWebserviceAuthenticationRecord);
+            return createAnswer(answer,String.format("%s: lock %s removed","SOSSEC016", lock), sosWebserviceAuthenticationRecord);
         }
         else {
             return createAnswer("",s, sosWebserviceAuthenticationRecord);
@@ -852,7 +864,7 @@ public class SOSSecurityWebservice {
     @POST
     @Path("/terminate")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSSecurityWebserviceAnswer terminate(
+    public SOSCommandSecurityWebserviceAnswer terminate(
             @QueryParam("session_id")                   String sessionId, 
             @QueryParam("all_schedulers")               String allSchedulers, 
             @QueryParam("continue_exclusive_operation") String continueExclusiveOperation, 
@@ -888,7 +900,7 @@ public class SOSSecurityWebservice {
             String xml = objFactory.toXMLString(objTerminate);
 
             String answer = executeXml(xml);
-            return createAnswer(answer,"JoBScheduler terminated", sosWebserviceAuthenticationRecord);
+            return createAnswer(answer,"SOSSEC017:JobScheduler terminated", sosWebserviceAuthenticationRecord);
         }
         else {
             return createAnswer("",s, sosWebserviceAuthenticationRecord);
@@ -899,12 +911,12 @@ public class SOSSecurityWebservice {
     @POST
     @Path("/login")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSSecurityWebserviceAnswer login(
+    public SOSCommandSecurityWebserviceAnswer login(
             @QueryParam("user")      String user, 
-            @QueryParam("password")  String password, 
+            @QueryParam("password")  String password)  {
  
         if (currentUserList == null) {
-            currentUserList = new SOSWebserviceCurrentUsersList();
+            currentUserList = new SOSCommandSecurityWebserviceCurrentUsersList();
         }
         
         String resource = getResourceFromJobScheduler();
@@ -920,7 +932,7 @@ public class SOSSecurityWebservice {
             sosShiroCurrentUserAnswer = authenticate(sosWebserviceAuthenticationRecord);
             sosWebserviceAuthenticationRecord.setSessionId(sosShiroCurrentUserAnswer.getSessionId());
 
-            SOSWebserviceCurrentUser c = new SOSWebserviceCurrentUser();
+            SOSCommandSecurityWebserviceCurrentUser c = new SOSCommandSecurityWebserviceCurrentUser();
             c.setSessionId(sosShiroCurrentUserAnswer.getSessionId());
             c.setPassword(password);
             c.setUsername(user);
@@ -947,7 +959,7 @@ public class SOSSecurityWebservice {
     @POST
     @Path("/logout")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSSecurityWebserviceAnswer logout(
+    public SOSCommandSecurityWebserviceAnswer logout(
             @QueryParam("session_id")  String sessionId             
                     ) throws MalformedURLException {
  
@@ -963,7 +975,7 @@ public class SOSSecurityWebservice {
         sosWebserviceAuthenticationRecord.setResource(resource);
 
         sosRestShiroClient.getSOSShiroCurrentUserAnswer(new URL(String.format(sosWebserviceAuthenticationRecord.getResource(),sosWebserviceAuthenticationRecord.getSessionId())));
-        SOSSecurityWebserviceAnswer message = createAnswer("",String.format("%s --> Abgemeldet", sosWebserviceAuthenticationRecord.getSessionId()), sosWebserviceAuthenticationRecord);
+        SOSCommandSecurityWebserviceAnswer message = createAnswer("",String.format("%s --> Abgemeldet", sosWebserviceAuthenticationRecord.getSessionId()), sosWebserviceAuthenticationRecord);
  
         return message;
     }

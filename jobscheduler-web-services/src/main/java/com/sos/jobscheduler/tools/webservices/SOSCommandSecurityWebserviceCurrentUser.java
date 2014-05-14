@@ -1,14 +1,14 @@
 package com.sos.jobscheduler.tools.webservices;
 
  
-public class SOSWebserviceCurrentUser {
+public class SOSCommandSecurityWebserviceCurrentUser {
     
     private String resource;
     private String username;
     private String password;
     private String sessionId;
   
-    public SOSWebserviceCurrentUser() {
+    public SOSCommandSecurityWebserviceCurrentUser() {
         super();
      
     }

@@ -4,17 +4,17 @@ package com.sos.jobscheduler.tools.webservices;
 import javax.xml.bind.annotation.XmlRootElement;
 
     @XmlRootElement(name = "sos_security_webservice_answer")
-    public class SOSSecurityWebserviceAnswer {
+    public class SOSCommandSecurityWebserviceAnswer {
     private String message;
     private String jobSchedulerAnswer;
     private String user;
     private String resource;
     private String sessionId;
   
-    public SOSSecurityWebserviceAnswer() {
+    public SOSCommandSecurityWebserviceAnswer() {
     }
     
-    public SOSSecurityWebserviceAnswer(String user, String resource, String message, String sessionId) {
+    public SOSCommandSecurityWebserviceAnswer(String user, String resource, String message, String sessionId) {
     this.message = message;
     this.user = user;
     this.resource = resource;
