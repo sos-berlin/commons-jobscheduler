@@ -6,18 +6,22 @@ import javax.xml.bind.annotation.XmlRootElement;
     @XmlRootElement(name = "sos_security_webservice_answer")
     public class SOSSecurityWebserviceAnswer {
     private String message;
+    private String jobSchedulerAnswer;
     private String user;
     private String resource;
+    private String sessionId;
   
     public SOSSecurityWebserviceAnswer() {
     }
     
-    public SOSSecurityWebserviceAnswer(String user, String resource, String message) {
+    public SOSSecurityWebserviceAnswer(String user, String resource, String message, String sessionId) {
     this.message = message;
     this.user = user;
     this.resource = resource;
+    this.sessionId = sessionId;
     }
      
+    
     @XmlElement
     public void setMessage(String message) {
     this.message = message;
@@ -28,6 +32,15 @@ import javax.xml.bind.annotation.XmlRootElement;
     }
 
     @XmlElement
+    public void setJobSchedulerAnswer(String jobSchedulerAnswer) {
+    this.jobSchedulerAnswer = jobSchedulerAnswer;
+    }
+     
+    public String getJobSchedulerAnswer() {
+    return this.jobSchedulerAnswer;
+    }
+
+    @XmlElement
     public void setUser(String user) {
     this.user = user;
     }
@@ -35,6 +48,16 @@ import javax.xml.bind.annotation.XmlRootElement;
     public String getUser() {
     return this.user;
     }
+
+    @XmlElement
+    public void setSessionId(String sessionId) {
+    this.sessionId = sessionId;
+    }
+     
+    public String getSessionId() {
+    return this.sessionId;
+    }
+
      
     @XmlElement
     public void setResource(String resource) {
@@ -48,7 +71,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     
     @Override
     public String toString() {
-    return new StringBuffer(" user: ").append(this.user)
-    .append(" resource: ").append(this.resource).append(" -> ").append(this.message).toString();
+    return new StringBuffer(" message: ").append(this.message)
+          .append(" user: ").append(this.user) .append(" sessionId: ").append(this.sessionId).append(" -> ").append(this.resource).toString();
     }
     }

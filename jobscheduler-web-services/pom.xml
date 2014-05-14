@@ -108,12 +108,22 @@
             <groupId>com.fasterxml.jackson.jaxrs</groupId>
             <artifactId>jackson-jaxrs-json-provider</artifactId>
         </dependency>
-
+        
+         <dependency>
+            <groupId>com.sos-berlin.products.commons</groupId>
+            <artifactId>sos-xml</artifactId>
+        </dependency>
+   
             
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+        	<groupId>com.sos-berlin.products.jobscheduler</groupId>
+        	<artifactId>jobscheduler-object-model</artifactId>
+        	<version>1.7</version>
         </dependency>
     </dependencies>
 </project>
