@@ -71,4 +71,17 @@ public class SOSOptionFolderNameTest {
 
 	}
 
+	@Test
+	public void getSubFolderArrayTest () {
+		objCS.Value("/a/b/c/d");
+		String[] strT = objCS.getSubFolderArray();
+		assertTrue("wrong number of folders", strT.length == 4);
+		
+		assertEquals("ungleich", "/a", strT[0]);
+		assertEquals("ungleich", "/a/b", strT[1]);
+		assertEquals("ungleich", "/a/b/c", strT[2]);
+		assertEquals("ungleich", "/a/b/c/d", strT[3]);
+//		assertEquals("ungleich", "", strT[4]);
+
+	}
 }

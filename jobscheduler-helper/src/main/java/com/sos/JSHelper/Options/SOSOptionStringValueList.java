@@ -79,7 +79,7 @@ public class SOSOptionStringValueList extends JSOptionValueList {
 
 	protected void createValueList(final String pstrValues) {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::createValueList";
-		strValueList = pstrValues.split(";");
+		strValueList = pstrValues.split(conValueListDelimiters);
 	} // private void createValueList
 
 	/**

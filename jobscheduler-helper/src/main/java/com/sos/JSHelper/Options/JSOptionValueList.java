@@ -60,18 +60,17 @@ Index 5 hat den Wert 'Nikolaus'
  *
  */
 public class JSOptionValueList extends SOSOptionString {
+	public static final String	conValueListDelimiters	= "[;,|]";
 	/**
 	 *
 	 */
 	private static final long	serialVersionUID	= -402205746280480952L;
 	private final String		conClassName		= "JSOptionValueList";
 	protected String[]			strValueList;
-
 	@SuppressWarnings("hiding")
 	public final String			ControlType			= "combo";
 
-	@Override
-	public String getControlType () {
+	@Override public String getControlType() {
 		return ControlType;
 	}
 
@@ -90,6 +89,7 @@ public class JSOptionValueList extends SOSOptionString {
 	public JSOptionValueList(final JSOptionsClass pPobjParent, final String pPstrKey, final String pPstrDescription, final String pPstrValue,
 			final String pPstrDefaultValue, final boolean pPflgIsMandatory) {
 		super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
+		valueList(pPstrValue.split(conValueListDelimiters));
 	}
 
 	/**
@@ -154,8 +154,7 @@ public class JSOptionValueList extends SOSOptionString {
 	 * @param pintIdx
 	 */
 	public String ElementAt(final int pintIdx) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::ElementAt";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::ElementAt";
 		if (strValueList == null) {
 			return "";
 		}
@@ -188,19 +187,14 @@ public class JSOptionValueList extends SOSOptionString {
 	 * @param pstrValueList
 	 * @throws Exception
 	 */
-	@Override
-	public void Value(final String pstrValueList) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::Value";
-		final String strT = pstrValueList;
+	@Override public void Value(final String pstrValueList) {
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::Value";
+		String strT = pstrValueList;
 		if (isNotEmpty(pstrValueList) && (pstrValueList.contains(";") || pstrValueList.contains("|") || pstrValueList.contains(","))) {
-			strValueList = strT.split("[;,|]");
-			super.Value(pstrValueList);
+			strValueList = strT.split(conValueListDelimiters);
+			strT = strValueList[0];
 		}
-		else {
-			strValueList = new String[] {pstrValueList};
-			super.Value(pstrValueList);
-		}
+		super.Value(strT);
 		// return void;
 	} // public void Value}
 
@@ -218,29 +212,30 @@ public class JSOptionValueList extends SOSOptionString {
 	public void AppendValue(final String pstrValueList) throws Exception {
 		// final String strT = pstrValueList;
 		if (isNotEmpty(pstrValueList)) {
-			// if (isNotEmpty(super.Value())) {
-			// strValue += ";" + pstrValueList;
-			// String[] strarrT = strT.split("[;]");
-			// int intLengthT = strarrT.length;
-			// int intLengthActual = this.strValueList.length;
-			// String[] strNew = new String[intLengthT + intLengthActual];
-			// System.arraycopy(strValueList, 0, strNew, 0, intLengthActual);
-			// System.arraycopy(strarrT, 0, strNew, intLengthActual, intLengthT);
-			// strValueList = strNew;
-			// } else {
-			// super.Value(pstrValueList);
-			// this.strValueList = strT.split("[;|]");
-			// }
-			if (strValueList == null) {
-				strValueList = new String[] {};
-				super.strValue = pstrValueList;
+			if (isNotEmpty(super.Value())) {
+				strValue += ";" + pstrValueList;
+				String[] strarrT = pstrValueList.split(conValueListDelimiters);
+				int intLengthT = strarrT.length;
+				int intLengthActual = strValueList.length;
+				String[] strNew = new String[intLengthT + intLengthActual];
+				System.arraycopy(strValueList, 0, strNew, 0, intLengthActual);
+				System.arraycopy(strarrT, 0, strNew, intLengthActual, intLengthT);
+				strValueList = strNew;
 			}
-			final int intLengthActual = strValueList.length;
-			final String[] strNew = new String[intLengthActual + 1];
-			System.arraycopy(strValueList, 0, strNew, 0, intLengthActual);
-			strNew[intLengthActual] = pstrValueList;
-			strValueList = strNew;
-			super.strValue += ";" + pstrValueList.replace(";", "");
+			else {
+				super.Value(pstrValueList);
+				strValueList = pstrValueList.split(conValueListDelimiters);
+			}
+//			if (strValueList == null) {
+//				strValueList = new String[] {};
+//				super.strValue = pstrValueList;
+//			}
+//			final int intLengthActual = strValueList.length;
+//			final String[] strNew = new String[intLengthActual + 1];
+//			System.arraycopy(strValueList, 0, strNew, 0, intLengthActual);
+//			strNew[intLengthActual] = pstrValueList;
+//			strValueList = strNew;
+//			super.strValue += ";" + pstrValueList.replace(";", "");
 		}
 	}
 
@@ -255,8 +250,7 @@ public class JSOptionValueList extends SOSOptionString {
 	 * @param pstrValueArray
 	 */
 	public void valueList(final String[] pstrValueArray) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::value";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::value";
 		strValueList = pstrValueArray;
 		// return void;
 	} // public void value}
@@ -280,8 +274,7 @@ public class JSOptionValueList extends SOSOptionString {
 	 * @return
 	 */
 	public String[] valueList() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::value";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::value";
 		if (strValueList == null) {
 			strValueList = new String[] { "" };
 		}
@@ -351,8 +344,7 @@ public class JSOptionValueList extends SOSOptionString {
 	 * @return
 	 */
 	public boolean contains(final String pstrValue2Find) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::contains";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::contains";
 		final boolean flgFound = false;
 		if (strValueList == null) {
 			return flgFound;
@@ -380,8 +372,7 @@ public class JSOptionValueList extends SOSOptionString {
 	 * @param pstrValue2Find
 	 */
 	public int IndexOf(final String pstrValue2Find) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::IndexOf";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::IndexOf";
 		for (int i = 0; i < strValueList.length; i++) {
 			if (pstrValue2Find.equalsIgnoreCase(strValueList[i])) {
 				return i;
@@ -391,11 +382,7 @@ public class JSOptionValueList extends SOSOptionString {
 	} // public int IndexOf
 
 	public String[] ValueList() {
-
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::ValueList";
-
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::ValueList";
 		return strValueList;
-
 	} // public String[] ValueList
 }
