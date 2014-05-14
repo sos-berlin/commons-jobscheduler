@@ -22,12 +22,14 @@ import com.sos.auth.rest.permission.model.SOSPermissionWorkingplan;
 import com.sos.auth.rest.permission.model.SOSPermissions;
 import com.sos.auth.shiro.SOSlogin;
 
-import org.apache.shiro.subject.Subject;
+import org.apache.shiro.session.Session;
 
 @Path("/sosPermission")
 public class SOSServicePermissionShiro {
 
-    private Subject currentUser;
+    private SOSShiroCurrentUser currentUser;
+    private static SOSShiroCurrentUsersList currentUsersList;
+ 
 
 
     //@Path("/permissions/{name}/{pwd}")
@@ -35,18 +37,23 @@ public class SOSServicePermissionShiro {
     @GET
     @Path("/permissions")
     @Produces( {MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON} )
-    public SOSPermissionShiro getPermissions(@QueryParam("user")  String user, @QueryParam("pwd")  String pwd) {
+    public SOSPermissionShiro getPermissions(@QueryParam("session_id")  String sessionId,@QueryParam("user")  String user, @QueryParam("pwd")  String pwd) {
         
-        SOSlogin sosLogin = new SOSlogin();
-        sosLogin.login(user, pwd);
-
-        currentUser = sosLogin.getCurrentUser();
+       
+        if (currentUsersList != null && sessionId != null && sessionId.length() > 0) {
+            currentUser = currentUsersList.getUser(sessionId);
+        }else {
+            if (user != null && user.length() > 0 && pwd != null && pwd.length() > 0){
+                currentUser = new SOSShiroCurrentUser(user,pwd);       
+                createUser(currentUser);
+            }
+        }
         
-
+        
         ObjectFactory o = new ObjectFactory();
         SOSPermissionShiro sosPermissionShiro = o.createSOSPermissionShiro();
         
-        if (currentUser != null){
+        if (currentUser != null && currentUser.getCurrentSubject() != null){
 
             
             sosPermissionShiro.setAuthenticated(currentUser.isAuthenticated());
@@ -56,6 +63,7 @@ public class SOSServicePermissionShiro {
             SOSPermissionRoles roles = o.createSOSPermissionRoles();
             addRole(roles.getSOSPermissionRole(), "super");
             addRole(roles.getSOSPermissionRole(), "admin");
+            addRole(roles.getSOSPermissionRole(), "joc_admin");
             addRole(roles.getSOSPermissionRole(), "jobeditor");
             addRole(roles.getSOSPermissionRole(), "controller");
             addRole(roles.getSOSPermissionRole(), "workingplan");
@@ -68,23 +76,36 @@ public class SOSServicePermissionShiro {
             SOSPermissions sosPermissions = o.createSOSPermissions();
     
             SOSPermissionJoe sosPermissionJoe = o.createSOSPermissionJoe();
-            addPermission(sosPermissionJoe.getSOSPermission(), "jobscheduler:joe:execute");
-            addPermission(sosPermissionJoe.getSOSPermission(), "jobscheduler:joe:edit");
-            addPermission(sosPermissionJoe.getSOSPermission(), "jobscheduler:joe:write");
-            addPermission(sosPermissionJoe.getSOSPermission(), "jobscheduler:joe:delete");
+            addPermission(sosPermissionJoe.getSOSPermission(), "sos:products:joe:execute");
+            addPermission(sosPermissionJoe.getSOSPermission(), "sos:products:joe:edit");
+            addPermission(sosPermissionJoe.getSOSPermission(), "sos:products:joe:write");
+            addPermission(sosPermissionJoe.getSOSPermission(), "sos:products:joe:delete");
             sosPermissions.setSOSPermissionJoe(sosPermissionJoe);
     
             SOSPermissionJoc sosPermissionJoc = o.createSOSPermissionJoc();
-            addPermission(sosPermissionJoc.getSOSPermission(), "jobscheduler:joc:execute");
-            addPermission(sosPermissionJoc.getSOSPermission(), "jobscheduler:joc:start_job");
-            addPermission(sosPermissionJoc.getSOSPermission(), "jobscheduler:joc:start_order");
-            addPermission(sosPermissionJoc.getSOSPermission(), "jobscheduler:joc:view_configuration");
-            addPermission(sosPermissionJoc.getSOSPermission(), "jobscheduler:joc:shutdown_service");
-            addPermission(sosPermissionJoc.getSOSPermission(), "jobscheduler:joc:add_parameter");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc:execute");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc:command:start:job");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc:command:add:order");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc:command:add:process_class");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc:command:modify:spooler");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc:command:modify:job");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc:command:modify:job");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc:command:modify:job_chain");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc:command:modify:job_chain_node");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc:command:kill_task"  );
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc:command:lock" );
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc:command:remove:lock" );
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc:command:remove:process_class" );
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc:command:remove:job_chain" );
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc:command:remove:order" );
+                      
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc:command:terminate");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc:view_configuration");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc:add_parameter");
             sosPermissions.setSOSPermissionJoc(sosPermissionJoc);
     
             SOSPermissionDashboard sosPermissionDashboard = o.createSOSPermissionDashboard();
-            addPermission(sosPermissionDashboard.getSOSPermission(), "jobscheduler:jid:dashboard:start_job");
+            addPermission(sosPermissionDashboard.getSOSPermission(), "sos:products:jid:dashboard:start_job");
     
             SOSPermissionEvents sosPermissionEvents = o.createSOSPermissionEvents();
     
@@ -101,12 +122,12 @@ public class SOSServicePermissionShiro {
             sosPermissionJid.setSOSPermissionJobnet(sosPermissionJobnet);
             sosPermissionJid.setSOSPermissionWorkingplan(sosPermissionWorkingplan);
     
-            addPermission(sosPermissionJid.getSOSPermission(), "jobscheduler:jid:execute");
-            addPermission(sosPermissionJid.getSOSPermission(), "jobscheduler:jid:joetab:show");
-            addPermission(sosPermissionJid.getSOSPermission(), "jobscheduler:jid:joctab:show");
-            addPermission(sosPermissionJid.getSOSPermission(), "jobscheduler:jid:eventtab:show");
-            addPermission(sosPermissionJid.getSOSPermission(), "jobscheduler:jid:jobnettab:show");
-            addPermission(sosPermissionJid.getSOSPermission(), "jobscheduler:jid:workingplantab:show");
+            addPermission(sosPermissionJid.getSOSPermission(), "sos:products:jid:execute");
+            addPermission(sosPermissionJid.getSOSPermission(), "sos:products:jid:joetab:show");
+            addPermission(sosPermissionJid.getSOSPermission(), "sos:products:jid:joctab:show");
+            addPermission(sosPermissionJid.getSOSPermission(), "sos:products:jid:eventtab:show");
+            addPermission(sosPermissionJid.getSOSPermission(), "sos:products:jid:jobnettab:show");
+            addPermission(sosPermissionJid.getSOSPermission(), "sos:products:jid:workingplantab:show");
     
             sosPermissions.setSOSPermissionJid(sosPermissionJid);
     
@@ -117,39 +138,82 @@ public class SOSServicePermissionShiro {
 
     }
 
+    private void createUser(SOSShiroCurrentUser sosShiroCurrentUser) {
+        if (currentUsersList == null) {
+            currentUsersList = new SOSShiroCurrentUsersList();
+        }
+        
+        SOSlogin sosLogin = new SOSlogin();
+        sosLogin.login(sosShiroCurrentUser.getUsername(), sosShiroCurrentUser.getPassword());
+        
+        currentUser.setCurrentSubject(sosLogin.getCurrentUser());
+        
+       
+        Session session = sosLogin.getCurrentUser().getSession();
+        String sessionId = session.getId().toString();
+
+        currentUser.setSessionId(sessionId);
+        currentUsersList.addUser(currentUser);
+        
+    }
      
 
     @GET
     @Path("/authenticate")
     @Produces( {MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public SOSShiroCurrentUserAnswer isAuthenticated(@QueryParam("user") String user, @QueryParam("pwd") String pwd) {
-
-        SOSlogin sosLogin = new SOSlogin();
-        sosLogin.login(user, pwd);
-
-        currentUser = sosLogin.getCurrentUser();
+    public SOSShiroCurrentUserAnswer authenticate(@QueryParam("user") String user, @QueryParam("pwd") String pwd) {
+        
+        currentUser = new SOSShiroCurrentUser(user,pwd);       
+        createUser(currentUser);
+        
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer(user);
-        sosShiroCurrentUserAnswer.setIsAuthenticated(currentUser.isAuthenticated());
-
+        sosShiroCurrentUserAnswer.setIsAuthenticated(currentUser.getCurrentSubject().isAuthenticated());
+        sosShiroCurrentUserAnswer.setSessionId(currentUser.getSessionId());
+        sosShiroCurrentUserAnswer.setUser(user);
+        
         return sosShiroCurrentUserAnswer;
 
     }
 
+    @GET
+    @Path("/logout")
+    @Produces( {MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public SOSShiroCurrentUserAnswer logout(@QueryParam("session_id") String sessionId) {
+        
+        currentUser = currentUsersList.getUser(sessionId);
+        
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer(currentUser.getUsername());
+        sosShiroCurrentUserAnswer.setIsAuthenticated(currentUser.isAuthenticated());
+        sosShiroCurrentUserAnswer.setSessionId(currentUser.getSessionId());
+         
+        currentUsersList.removeUser(sessionId);
+
+        return sosShiroCurrentUserAnswer;
+
+    }
     
     @GET
     @Path("/role")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public SOSShiroCurrentUserAnswer hasRole(@QueryParam("user") String user, @QueryParam("pwd") String pwd, @QueryParam("role") String role) {
-        SOSlogin sosLogin = new SOSlogin();
-        sosLogin.login(user, pwd);
+    public SOSShiroCurrentUserAnswer hasRole(@QueryParam("session_id") String sessionId,@QueryParam("user") String user, @QueryParam("pwd") String pwd, @QueryParam("role") String role) {
 
-        currentUser = sosLogin.getCurrentUser();
+        if (currentUsersList != null && sessionId != null && sessionId.length() > 0) {
+            currentUser = currentUsersList.getUser(sessionId);
+        }else {
+            if (user != null && user.length() > 0 && pwd != null && pwd.length() > 0){
+                currentUser = new SOSShiroCurrentUser(user,pwd);       
+                createUser(currentUser);
+            }
+        }
+        
+
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer(user);
         sosShiroCurrentUserAnswer.setRole(role);
         sosShiroCurrentUserAnswer.setIsAuthenticated(currentUser.isAuthenticated());
         sosShiroCurrentUserAnswer.setHasRole(currentUser.hasRole(role));
-
-
+        
+        sosShiroCurrentUserAnswer.setSessionId(currentUser.getSessionId());   
+        
         return sosShiroCurrentUserAnswer;
 
     }
@@ -157,17 +221,26 @@ public class SOSServicePermissionShiro {
     @GET
     @Path("/permission")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public SOSShiroCurrentUserAnswer isPermitted(@QueryParam("user") String user, @QueryParam("pwd") String pwd, @QueryParam("permission") String permission) {
-        SOSlogin sosLogin = new SOSlogin();
-        sosLogin.login(user, pwd);
+    public SOSShiroCurrentUserAnswer isPermitted(@QueryParam("session_id") String sessionId,@QueryParam("user") String user, @QueryParam("pwd") String pwd, @QueryParam("permission") String permission) {
 
-        currentUser = sosLogin.getCurrentUser();
+        if (currentUsersList != null && sessionId != null && sessionId.length() > 0) {
+            currentUser = currentUsersList.getUser(sessionId);
+        }else {
+            if (user != null && user.length() > 0 && pwd != null && pwd.length() > 0){
+                currentUser = new SOSShiroCurrentUser(user,pwd);       
+                createUser(currentUser);
+            }
+        }
+        
+ 
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer(user);
         sosShiroCurrentUserAnswer.setPermission(permission);
         sosShiroCurrentUserAnswer.setIsAuthenticated(currentUser.isAuthenticated());
         sosShiroCurrentUserAnswer.setIsPermitted(currentUser.isPermitted(permission));
 
+        sosShiroCurrentUserAnswer.setSessionId(currentUser.getSessionId());   
 
+ 
         return sosShiroCurrentUserAnswer;
 
     }     
@@ -175,20 +248,6 @@ public class SOSServicePermissionShiro {
     
     
     private void addPermission(List<String> sosPermission, String permission) {
-       /* if (currentUser == null) {
-            sosPermission.add("user=null");
-        }
-        else {
-            if (!currentUser.isAuthenticated()) {
-                sosPermission.add(String.format("user:%s not authenticated",user));
-            }
-            else {
-                if (!currentUser.isPermitted(permission)) {
-                    sosPermission.add(permission + " not allowed");
-                }
-            }
-        }
-        */
         if (currentUser != null && currentUser.isPermitted(permission) && currentUser.isAuthenticated()) {
             sosPermission.add(permission);
         }

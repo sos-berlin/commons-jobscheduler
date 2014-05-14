@@ -15,7 +15,7 @@ import com.sos.auth.rest.permission.model.SOSPermissionShiro;
 public class TestSOSServicePermissionShiro {
 
     private static final String SHIRO_PERMISSION = "jobscheduler:jid:execute";
-    private static final String SHIRO_MAPPED_ROLE = "admin";
+    private static final String SHIRO_MAPPED_ROLE = "jid";
     private static final String LDAP_PASSWORD = "sos01";
     private static final String LDAP_USER = "SOS01";
 
@@ -39,7 +39,7 @@ public class TestSOSServicePermissionShiro {
     @Test
     public void testGetPermissions() {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSPermissionShiro sosPermissionShiro = sosServicePermissionShiro.getPermissions(LDAP_USER,LDAP_PASSWORD);
+        SOSPermissionShiro sosPermissionShiro = sosServicePermissionShiro.getPermissions("",LDAP_USER,LDAP_PASSWORD);
         String permissisonsJid = sosPermissionShiro.getSOSPermissions().getSOSPermissionJid().getSOSPermission().get(0);
         String permissisonsJoe = sosPermissionShiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionJoe().getSOSPermission().get(0);
         String permissisonsJoc = sosPermissionShiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionJoc().getSOSPermission().get(0);
@@ -57,7 +57,7 @@ public class TestSOSServicePermissionShiro {
     @Test
     public void testIsAuthenticated() {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = sosServicePermissionShiro.isAuthenticated(LDAP_USER,LDAP_PASSWORD);
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = sosServicePermissionShiro.authenticate(LDAP_USER,LDAP_PASSWORD);
         assertEquals("testCurrentUserAnswer is authenticated",true,sosShiroCurrentUserAnswer.getIsAuthenticated());
     }
 
@@ -65,7 +65,8 @@ public class TestSOSServicePermissionShiro {
     @Test
     public void testHasRole() {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = sosServicePermissionShiro.hasRole(LDAP_USER,LDAP_PASSWORD,SHIRO_MAPPED_ROLE);
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = sosServicePermissionShiro.authenticate(LDAP_USER,LDAP_PASSWORD);
+        sosShiroCurrentUserAnswer = sosServicePermissionShiro.hasRole(sosShiroCurrentUserAnswer.getSessionId(),LDAP_USER,LDAP_PASSWORD,SHIRO_MAPPED_ROLE);
         assertEquals("testCurrentUserAnswer is authenticated",true,sosShiroCurrentUserAnswer.getIsAuthenticated());
         assertEquals("testCurrentUserAnswer is has role " + SHIRO_MAPPED_ROLE,true, sosShiroCurrentUserAnswer.hasRole());
     }
@@ -74,7 +75,10 @@ public class TestSOSServicePermissionShiro {
     @Test
     public void testIsPermitted() {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = sosServicePermissionShiro.isPermitted(LDAP_USER,LDAP_PASSWORD,SHIRO_PERMISSION);
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = sosServicePermissionShiro.authenticate(LDAP_USER,LDAP_PASSWORD);
+        
+//        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = sosServicePermissionShiro.isPermitted("",LDAP_USER,LDAP_PASSWORD,SHIRO_PERMISSION);
+        sosShiroCurrentUserAnswer = sosServicePermissionShiro.isPermitted(sosShiroCurrentUserAnswer.getSessionId(),LDAP_USER,LDAP_PASSWORD,SHIRO_PERMISSION);
         assertEquals("testCurrentUserAnswer is authenticated",true,sosShiroCurrentUserAnswer.getIsAuthenticated());
         assertEquals("testCurrentUserAnswer is permitted  " + SHIRO_PERMISSION,true, sosShiroCurrentUserAnswer.isPermitted());
     }

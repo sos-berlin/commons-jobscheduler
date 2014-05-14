@@ -4,7 +4,10 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+ 
     @XmlRootElement(name = "sosshiro_current_user")
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public class SOSShiroCurrentUserAnswer {
     private String user;
     private String role;
@@ -12,6 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     private boolean isPermittet;
     private boolean hasRole;
     private boolean isAuthenticated;
+    private String sessionId;
     
     public SOSShiroCurrentUserAnswer() {
     }
@@ -73,7 +77,21 @@ import javax.xml.bind.annotation.XmlRootElement;
     public boolean hasRole() {
     return getHasRole();
     }
+
+    @XmlElement
+    public void setSessionId(String sessionId) {
+    this.sessionId = sessionId;
+    }
      
+    public String getSessionId() {
+    return this.sessionId;
+    }
+    
+    public String sessionId() {
+    return getSessionId();
+    }
+  
+    
     @XmlElement
     public void setIsAuthenticated(boolean isAuthenticated) {
     this.isAuthenticated = isAuthenticated;
@@ -89,8 +107,6 @@ import javax.xml.bind.annotation.XmlRootElement;
     
     @Override
     public String toString() {
-    return new StringBuffer(" User: ").append(this.user)
-    .append(" Role: ").append(this.role).append(this.hasRole)
-    .append(" Permission : ").append(this.permission).append(this.isPermittet).toString();
+      return String.format("User: %s Role: %s hasRole: %s Permission: %s isPermitted: %s -- SessionId=%s",this.user,this.role,this.hasRole,this.permission,this.isPermittet,this.sessionId);
     }
     }

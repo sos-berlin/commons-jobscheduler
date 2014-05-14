@@ -16,13 +16,25 @@ public class SOSJaxbSubject {
     }
     
     public boolean isPermitted(String permission) {
-        return (sosPermissionShiro != null && sosPermissionShiro.getSOSPermissions().getSOSPermissionJid().getSOSPermission().contains(permission));
+        if (permission.startsWith("jobscheduler:jid:")) {
+            return (sosPermissionShiro != null && sosPermissionShiro.getSOSPermissions().getSOSPermissionJid().getSOSPermission().contains(permission));
+         }
+        
+        if (permission.startsWith("jobscheduler:joc:")) {
+            return (sosPermissionShiro != null && sosPermissionShiro.getSOSPermissions().getSOSPermissionJoc().getSOSPermission().contains(permission));
+         }
+        
+        if (permission.startsWith("jobscheduler:joe:")) {
+            return (sosPermissionShiro != null && sosPermissionShiro.getSOSPermissions().getSOSPermissionJoe().getSOSPermission().contains(permission));
+         }
+        
+        return false;
     }
     
   
     
     public boolean isAuthenticated() {
-        return (sosPermissionShiro != null && sosPermissionShiro.isAuthenticated());
+        return (sosPermissionShiro != null && sosPermissionShiro.isAuthenticated() != null && sosPermissionShiro.isAuthenticated());
     }
     
     

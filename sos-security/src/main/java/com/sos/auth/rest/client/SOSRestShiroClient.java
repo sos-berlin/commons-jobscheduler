@@ -8,6 +8,7 @@ import javax.ws.rs.core.MediaType;
 
 
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
+import com.sos.auth.rest.SOSWebserviceAuthenticationRecord;
 import com.sos.auth.rest.permission.model.SOSPermissionShiro;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -33,7 +34,7 @@ private SOSPermissionShiro getSOSPermissionShiro(URL resource) {
 }
 
 
-private SOSShiroCurrentUserAnswer getSOSShiroCurrentUserAnswer(URL resource) {
+public SOSShiroCurrentUserAnswer getSOSShiroCurrentUserAnswer(URL resource) {
     Client client = Client.create();
     WebResource webResource = client.resource(resource.toExternalForm());
     ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);  
@@ -45,18 +46,31 @@ private SOSShiroCurrentUserAnswer getSOSShiroCurrentUserAnswer(URL resource) {
      
 }
 
-public SOSPermissionShiro getPermissions(String user, String password, String resource) throws MalformedURLException {
-    return getSOSPermissionShiro(new URL(String.format(resource,user,password)));
+public SOSPermissionShiro getPermissions(SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord) throws MalformedURLException {
+    return getSOSPermissionShiro(new URL(String.format(sosWebserviceAuthenticationRecord.getResource(),sosWebserviceAuthenticationRecord.getUser(),sosWebserviceAuthenticationRecord.getPassword(),sosWebserviceAuthenticationRecord.getPermission(),sosWebserviceAuthenticationRecord.getSessionId())));
 }
 
-public SOSShiroCurrentUserAnswer getSOSShiroCurrentUserAnswer(String user, String password,String param, String resource) throws MalformedURLException {
-    return getSOSShiroCurrentUserAnswer(new URL(String.format(resource,user,password,param)));
-} 
+
+public SOSShiroCurrentUserAnswer getSOSShiroCurrentUserAnswer(SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord) {
+    String url = String.format(sosWebserviceAuthenticationRecord.getResource(),sosWebserviceAuthenticationRecord.getUser(),sosWebserviceAuthenticationRecord.getPassword(),sosWebserviceAuthenticationRecord.getPermission(),sosWebserviceAuthenticationRecord.getSessionId());
+    try {
+        return getSOSShiroCurrentUserAnswer(new URL(url));
+    }catch (MalformedURLException e) {
+        SOSShiroCurrentUserAnswer a = new SOSShiroCurrentUserAnswer();
+        a.setSessionId(String.format("could not establish a session: MalformedUrlException %s",url));
+        return a;
+    }
+}
 
 public static void main(String[] args) throws MalformedURLException {
     
     SOSRestShiroClient sosRestShiroClient = new SOSRestShiroClient();
-    SOSPermissionShiro shiro = sosRestShiroClient.getPermissions("SOS01","sos01","http://localhost:40040/jobscheduler/rest/sosPermission/permissions?user=%s&pwd=%s");
+    SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord = new SOSWebserviceAuthenticationRecord();
+    sosWebserviceAuthenticationRecord.setUser("SOS01");
+    sosWebserviceAuthenticationRecord.setPassword("sos01");
+    sosWebserviceAuthenticationRecord.setResource("http://localhost:40040/jobscheduler/rest/sosPermission/permissions?user=%s&pwd=%s");
+ 
+    SOSPermissionShiro shiro = sosRestShiroClient.getPermissions(sosWebserviceAuthenticationRecord);
     System.out.println("Output xml client .... \n");
     System.out.println("Roles "+shiro.getSOSPermissionRoles().getSOSPermissionRole());
     System.out.println("Joe "+shiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionJoe().getSOSPermission());
@@ -67,14 +81,14 @@ public static void main(String[] args) throws MalformedURLException {
     System.out.println("Dashboard "+shiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionDashboard().getSOSPermission());
     System.out.println("Workingplan "+shiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionWorkingplan().getSOSPermission());
     
-    SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = sosRestShiroClient.getSOSShiroCurrentUserAnswer("SOS01","sos01","","http://localhost:40040/jobscheduler/rest/sosPermission/authenticate?user=%s&pwd=%s");  
+    SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = sosRestShiroClient.getSOSShiroCurrentUserAnswer(sosWebserviceAuthenticationRecord);  
     System.out.println("SOS01:" + sosShiroCurrentUserAnswer.getIsAuthenticated());
 
-    sosShiroCurrentUserAnswer = sosRestShiroClient.getSOSShiroCurrentUserAnswer("SOS01","sos01","admin","http://localhost:40040/jobscheduler/rest/sosPermission/role?user=%s&pwd=%s&role=%s");  
+    sosShiroCurrentUserAnswer = sosRestShiroClient.getSOSShiroCurrentUserAnswer(sosWebserviceAuthenticationRecord);  
     System.out.println("SOS01:" + sosShiroCurrentUserAnswer.getIsAuthenticated());
     System.out.println("SOS01:" + sosShiroCurrentUserAnswer.getHasRole());
  
-    sosShiroCurrentUserAnswer = sosRestShiroClient.getSOSShiroCurrentUserAnswer("SOS01","sos01","jobscheduler:jid:joctab:show","http://localhost:40040/jobscheduler/rest/sosPermission/permission?user=%s&pwd=%s&permission=%s");  
+    sosShiroCurrentUserAnswer = sosRestShiroClient.getSOSShiroCurrentUserAnswer(sosWebserviceAuthenticationRecord);  
     System.out.println("SOS01:" + sosShiroCurrentUserAnswer.getIsAuthenticated());
     System.out.println("SOS01:" + sosShiroCurrentUserAnswer.getIsPermitted());
 

@@ -17,6 +17,7 @@ import org.junit.Test;
 
 import com.sos.auth.SOSJaxbSubject;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
+import com.sos.auth.rest.SOSWebserviceAuthenticationRecord;
 import com.sos.auth.rest.permission.model.SOSPermissionShiro;
 
 
@@ -50,7 +51,7 @@ import com.sos.auth.rest.permission.model.SOSPermissionShiro;
 
 public class TestSOSRestShiroClient {
 
-    private static final String JETTY_REST_URL_ROLE = "http://localhost:40040/jobscheduler/rest/sosPermission/role?user=%s&pwd=%s&role=admin";
+    private static final String JETTY_REST_URL_ROLE = "http://localhost:40040/jobscheduler/rest/sosPermission/role?user=%s&pwd=%s&role=%s";
     private static final String JETTY_REST_URL_PERMISSION = "http://localhost:40040/jobscheduler/rest/sosPermission/permission?user=%s&pwd=%s&permission=%s";
     private static final String LDAP_PASSWORD = "sos01";
     private static final String LDAP_USER = "SOS01";
@@ -83,7 +84,14 @@ public class TestSOSRestShiroClient {
     public void testClientJaxb() throws MalformedURLException {
         
         SOSRestShiroClient sosRestShiroClient = new SOSRestShiroClient();
-        SOSPermissionShiro shiro = sosRestShiroClient.getPermissions(LDAP_USER,LDAP_PASSWORD,JETTY_URL);
+        
+        SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord = new SOSWebserviceAuthenticationRecord();
+        sosWebserviceAuthenticationRecord.setUser(LDAP_USER);
+        sosWebserviceAuthenticationRecord.setPassword(LDAP_PASSWORD);
+        sosWebserviceAuthenticationRecord.setResource(JETTY_URL);
+        
+        SOSPermissionShiro shiro = sosRestShiroClient.getPermissions(sosWebserviceAuthenticationRecord);
+        
         String permissisonsJid = shiro.getSOSPermissions().getSOSPermissionJid().getSOSPermission().get(0);
         String permissisonsJoe = shiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionJoe().getSOSPermission().get(0);
         String permissisonsJoc = shiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionJoc().getSOSPermission().get(0);
@@ -103,7 +111,13 @@ public class TestSOSRestShiroClient {
      
         
         SOSRestShiroClient sosRestShiroClient = new SOSRestShiroClient();
-        SOSPermissionShiro sosPermissionShiro = sosRestShiroClient.getPermissions(LDAP_USER,LDAP_PASSWORD,JETTY_URL);
+        
+        SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord = new SOSWebserviceAuthenticationRecord();
+        sosWebserviceAuthenticationRecord.setUser(LDAP_USER);
+        sosWebserviceAuthenticationRecord.setPassword(LDAP_PASSWORD);
+        sosWebserviceAuthenticationRecord.setResource(JETTY_URL);
+        
+        SOSPermissionShiro sosPermissionShiro = sosRestShiroClient.getPermissions(sosWebserviceAuthenticationRecord);
         SOSJaxbSubject currentUser = new SOSJaxbSubject(sosPermissionShiro);
         
         assertEquals("testClientWithJaxb is authenticated",true,currentUser.isAuthenticated());
@@ -117,13 +131,27 @@ public class TestSOSRestShiroClient {
      
         
         SOSRestShiroClient sosRestShiroClient = new SOSRestShiroClient();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = sosRestShiroClient.getSOSShiroCurrentUserAnswer(LDAP_USER,LDAP_PASSWORD, "jobscheduler:jid:joctab:show",JETTY_REST_URL_PERMISSION);
- 
- 
+        
+        SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord = new SOSWebserviceAuthenticationRecord();
+        sosWebserviceAuthenticationRecord.setUser(LDAP_USER);
+        sosWebserviceAuthenticationRecord.setPassword(LDAP_PASSWORD);
+//        sosWebserviceAuthenticationRecord.setResource(JETTY_REST_URL_PERMISSION);
+        sosWebserviceAuthenticationRecord.setResource("http://localhost:40040/jobscheduler/rest/sosPermission/authenticate?user=%s&pwd=%s");
+        
+        sosWebserviceAuthenticationRecord.setPermission( "jobscheduler:jid:joctab:show");
+        
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = sosRestShiroClient.getSOSShiroCurrentUserAnswer(sosWebserviceAuthenticationRecord);
+        System.out.println(sosShiroCurrentUserAnswer.getSessionId());
+        
         assertEquals("testCurrentUserAnswer is authenticated",true,sosShiroCurrentUserAnswer.getIsAuthenticated());
         assertEquals("testCurrentUserAnswer is permitted jobscheduler:jid:joctab:show",true, sosShiroCurrentUserAnswer.isPermitted());
 
-        sosShiroCurrentUserAnswer = sosRestShiroClient.getSOSShiroCurrentUserAnswer(LDAP_USER,LDAP_PASSWORD, "admin",JETTY_REST_URL_ROLE);
+         sosWebserviceAuthenticationRecord.setUser(LDAP_USER);
+        sosWebserviceAuthenticationRecord.setPassword(LDAP_PASSWORD);
+        sosWebserviceAuthenticationRecord.setResource(JETTY_REST_URL_ROLE);
+        sosWebserviceAuthenticationRecord.setPermission( "admin");
+      
+        sosShiroCurrentUserAnswer = sosRestShiroClient.getSOSShiroCurrentUserAnswer(sosWebserviceAuthenticationRecord);
         
         assertEquals("testCurrentUserAnswer is authenticated",true,sosShiroCurrentUserAnswer.getIsAuthenticated());
         assertEquals("testCurrentUserAnswer has role admin",true, sosShiroCurrentUserAnswer.hasRole());
