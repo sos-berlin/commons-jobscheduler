@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema id="configuration"
+xmlns:xs="http://www.w3.org/2001/XMLSchema"
+xmlns:jxb="http://java.sun.com/xml/ns/jaxb" jxb:version="2.0"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+<!--
+<xs:schema id="configuration"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="qualified"
+    elementFormDefault="qualified"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:jxb="http://java.sun.com/xml/ns/jaxb" jxb:version="2.0">
+xmlns:jade="http://www.sos-berlin.com/schema/jade_configuration_v1.0"
+    <xs:import namespace="http://www.w3.org/2001/XInclude" />
+
+ -->
+
+    <xs:import namespace="http://www.w3.org/2001/XInclude" />
+
+    <xs:annotation>
+        <xs:appinfo>
+            <jxb:globalBindings
+                fixedAttributeAsConstantProperty="true" collectionType="java.util.Vector" typesafeEnumBase="xs:NCName"
+                choiceContentProperty="false"
+                typesafeEnumMemberName="generateError"
+                enableFailFastCheck="false"
+                generateIsSetMethod="false" underscoreBinding="asCharInWord" />
+            <jxb:schemaBindings>
+                 <jxb:nameXmlTransform>
+                    <jxb:elementName suffix="Element" />
+                </jxb:nameXmlTransform>
+              </jxb:schemaBindings>
+        </xs:appinfo>
+
+<!--
+                <jxb:package name="com.sos.jade.jaxb.configuration">
+                    <jxb:javadoc>
+            <![CDATA[<body> Package level documentation for generated package com.sos.jade.jaxb.configuration.</body>]]>
+                    </jxb:javadoc>
+                </jxb:package>
+
+ -->
+    </xs:annotation>
+
+    <xs:element name="validity">
+        <xs:complexType>
+            <xs:attribute name="from" form="unqualified" type="xs:date" />
+            <xs:attribute name="to" form="unqualified" type="xs:date" />
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="configuration">
+        <xs:complexType>
+<!--
+            <xs:annotation>
+                <xs:appinfo>
+                    <jxb:class name="JADEConfiguration">
+                    </jxb:class>
+                </xs:appinfo>
+            </xs:annotation>
+ -->
+            <xs:sequence>
+                <xs:element ref="validity" minOccurs="0" maxOccurs="1" />
+                <xs:element ref="documentation" minOccurs="0" maxOccurs="1" />
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="xi:include" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element ref="profile" minOccurs="0" maxOccurs="1" />
+                    <xs:element ref="profiles" minOccurs="1" maxOccurs="unbounded" />
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="profiles">
+        <xs:complexType>
+            <xs:annotation>
+                <xs:appinfo>
+                    <jxb:class name="JADEProfiles">
+                        <jxb:javadoc>
+                            A collection of all Profiles.
+                        </jxb:javadoc>
+                    </jxb:class>
+                </xs:appinfo>
+            </xs:annotation>
+
+            <xs:sequence>
+                <xs:element ref="documentation" minOccurs="0" maxOccurs="1" />
+                <xs:choice minOccurs="1" maxOccurs="unbounded">
+                    <xs:element ref="xi:include" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element ref="profile" minOccurs="1" maxOccurs="unbounded" />
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute name="name" form="unqualified" type="xs:string" />
+            <xs:attribute name="id" form="unqualified" type="xs:string" />
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="profile">
+        <xs:annotation>
+            <xs:documentation>
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+                    <xs:annotation>
+                <xs:appinfo>
+                    <jxb:class name="JADEProfile">
+                        <jxb:javadoc>
+                            A container for a Profile.
+                        </jxb:javadoc>
+                    </jxb:class>
+                </xs:appinfo>
+            </xs:annotation>
+
+            <xs:sequence>
+                <xs:element ref="validity" minOccurs="0" maxOccurs="unbounded" />
+                <xs:element ref="documentation" minOccurs="0" maxOccurs="1" />
+                <xs:choice minOccurs="1" maxOccurs="unbounded">
+                    <xs:element ref="xi:include" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element ref="includes" minOccurs="0" maxOccurs="1" />
+                    <xs:element ref="params" />
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute name="name" form="unqualified" type="xs:string" />
+            <xs:attribute name="id" form="unqualified" type="xs:string" />
+            <xs:attribute name="type" form="unqualified" type="xs:string" />
+        </xs:complexType>
+    </xs:element>  <!--  profile -->
+
+    <xs:element name="documentation">
+        <xs:annotation>
+            <xs:documentation>
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+                    <xs:annotation>
+                <xs:appinfo>
+                    <jxb:class name="JADEDocumentation">
+                        <jxb:javadoc>
+                            A general documentation class.
+                        </jxb:javadoc>
+                    </jxb:class>
+                </xs:appinfo>
+            </xs:annotation>
+
+            <xs:sequence>
+                <xs:element ref="title" minOccurs="0" maxOccurs="unbounded" />
+                <xs:element ref="description" minOccurs="0" maxOccurs="1" />
+                <xs:choice minOccurs="1" maxOccurs="unbounded">
+                    <xs:element ref="xi:include" minOccurs="0" maxOccurs="unbounded" />
+                </xs:choice>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="title">
+        <xs:annotation>
+            <xs:documentation>title
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:attribute name="language" form="unqualified" type="xs:string" />
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="description">
+        <xs:annotation>
+            <xs:documentation>
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:choice>
+                <xs:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="lax" />
+            </xs:choice>
+            <xs:attribute name="language" form="unqualified" type="xs:string" />
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="params">
+        <xs:annotation>
+            <xs:documentation>
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:annotation>
+                <xs:appinfo>
+                    <jxb:class name="JADEParams">
+                        <jxb:javadoc>
+                            A collection of all Profiles.
+                        </jxb:javadoc>
+                    </jxb:class>
+                </xs:appinfo>
+            </xs:annotation>
+            <xs:choice minOccurs="1" maxOccurs="unbounded">
+                <xs:element ref="param" minOccurs="1" maxOccurs="unbounded" />
+                <xs:element ref="params" minOccurs="0" maxOccurs="unbounded" />
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="param">
+        <xs:annotation>
+            <xs:documentation>
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:annotation>
+                <xs:appinfo>
+                    <jxb:class name="JADEParam">
+                        <jxb:javadoc>
+                            A collection of all Profiles.
+                        </jxb:javadoc>
+                    </jxb:class>
+                </xs:appinfo>
+            </xs:annotation>
+
+            <xs:sequence>
+                <xs:element ref="validity" minOccurs="0" maxOccurs="1" />
+                <xs:choice minOccurs="1" maxOccurs="unbounded">
+                    <xs:element ref="xi:include" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element ref="values" minOccurs="0" maxOccurs="unbounded" />
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute name="name" form="unqualified" type="xs:string" />
+            <xs:attribute name="id" form="unqualified" type="xs:string" />
+            <xs:attribute name="type" form="unqualified" type="xs:string" />
+            <xs:attribute name="default" form="unqualified" type="xs:string" />
+            <xs:attribute name="value" form="unqualified" type="xs:string" />
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="values">
+        <xs:annotation>
+            <xs:documentation>
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:complexType>
+                    <xs:annotation>
+                <xs:appinfo>
+                    <jxb:class name="JADEParamValues">
+                        <jxb:javadoc>
+                            A collection of all Profiles.
+                        </jxb:javadoc>
+                    </jxb:class>
+                </xs:appinfo>
+            </xs:annotation>
+
+            <xs:sequence>
+                <xs:element ref="value" minOccurs="1" maxOccurs="unbounded" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="value" nillable="true">
+        <xs:annotation>
+            <xs:documentation>
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:attribute name="prefix" form="unqualified" use="optional">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="source">
+                        </xs:enumeration>
+                        <xs:enumeration value="target">
+                        </xs:enumeration>
+                        <xs:enumeration value="alternate">
+                        </xs:enumeration>
+                        <xs:enumeration value="jump">
+                        </xs:enumeration>
+                        <xs:enumeration value="">
+                        </xs:enumeration>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="val" form="unqualified" type="xs:string" use="optional" />
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="includes">
+        <xs:annotation>
+            <xs:documentation>
+                Includes enables to merge fragments or whole profiles into another, the current, profile.
+                This feature supports the modularisation
+                of profiles.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+                    <xs:annotation>
+                <xs:appinfo>
+                    <jxb:class name="JADEProfileIncludes">
+                        <jxb:javadoc>
+                            A collection of all Profiles.
+                        </jxb:javadoc>
+                    </jxb:class>
+                </xs:appinfo>
+            </xs:annotation>
+
+            <xs:sequence>
+                <xs:element ref="merge" minOccurs="1" maxOccurs="unbounded" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="merge">
+        <xs:annotation>
+            <xs:documentation>
+                The content of a profile can be merged into the actual
+                profile.
+                merged parameters will be overwritten by explicit specified parameters in the profile.
+                the profiles will be merged in the order of the appearance.
+                a merged profile can overwrite parameters from previous merge operations.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="validity" minOccurs="0" maxOccurs="1" />
+            </xs:sequence>
+            <xs:attribute name="profile" form="unqualified" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>
+                        The name of a profile which has to be merged into the actual profile.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="id" form="unqualified" type="xs:string" />
+        </xs:complexType>
+    </xs:element>
+
+<!--
+<xs:schema targetNamespace="http://www.w3.org/2001/XInclude" xmlns:jade="http://www.sos-berlin.com/schema/jade_configuration_v1.0" xmlns="http://www.w3.org/2001/XInclude" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" attributeFormDefault="qualified" elementFormDefault="qualified" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <xs:import namespace="http://www.sos-berlin.com/schema/jade_configuration_v1.0" />
+  <xs:element name="include" msdata:Prefix="xi">
+    <xs:complexType>
+      <xs:attribute name="href" form="unqualified" type="xs:string" />
+      <xs:attribute name="type" form="unqualified" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
+ -->
+</xs:schema>
+

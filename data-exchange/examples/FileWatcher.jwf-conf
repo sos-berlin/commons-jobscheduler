@@ -1,0 +1,48 @@
+Parameter
+
+globals:
+    JobSchedulerInstanceServerName (*)
+    JobSchedulerInstancePortNumber (*)
+    LogFileName
+    PollingInterval
+    StartWatchingAt (time)
+    EndWatchingAt  (time)
+    CheckSteadyState  (*)
+    CheckMode (create, delete, modify, all)  (*)
+
+Folder specific: (for each folder an instance of the options class is required)
+    actions
+    action  (type=FileWatch, ...)
+        FolderName (Path)
+        RegExp for File(s)
+        WildCard-Definition
+        RecurseSubFolders
+        MinimumNumberOfFiles
+        MinimumFileSize
+        MinimumCreationDate
+        MaximumNumberOfFiles
+        MaximumFileSize
+        MaximumCreationDate
+
+        StartWatchingAt (time)
+        EndWatchingAt  (time)
+
+        Commands (doCmd, doEmail, JADE, StartJob, StartOrder, JSCmd, Exit, SetEvent, (, ... )
+            onOK | onNotOk
+
+                Command [Attributes: OS, checkMode]
+                    Parameters
+                        Parameter
+                    JobScheduler
+                        ServerName
+                        PortNumber
+
+
+
+output parameter
+    file name
+    folder name
+    checkMode
+    result (error, success)
+    Number of Files Processed
+

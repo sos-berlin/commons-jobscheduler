@@ -1,0 +1,18 @@
+<xsd:schema targetNamespace="http://www.w3.org/2001/XInclude" 
+xmlns:jade="http://www.sos-berlin.com/schema/jade_configuration_v1.0" xmlns="http://www.w3.org/2001/XInclude" 
+xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" attributeFormDefault="qualified" elementFormDefault="qualified" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <xsd:import namespace="http://www.sos-berlin.com/schema/jade_configuration_v1.0" />
+  <xsd:element name="include" >
+  <xsd:annotation>
+  <xsd:appinfo>
+  
+  </xsd:appinfo>
+  </xsd:annotation>
+    <xsd:complexType>
+      <xsd:attribute name="href" form="unqualified" type="xsd:string" />
+      <xsd:attribute name="type" form="unqualified" type="xsd:string" />
+      <xsd:attribute name="parse" form="unqualified" type="xsd:string" />
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>

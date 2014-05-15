@@ -1,0 +1,85 @@
+
+                                             Software- und Organisations-Service GmbH
+
+                                             Giesebrechtstr. 15
+                                             D-10629 Berlin
+                                             tel  +49 30 86 47 90-0
+                                             fax  +49 30 8 61 33 35
+                                             mail info@sos-berlin.com
+                                             web   www.sos-berlin.com
+
+This document lists third party software components that are used with Jade Client.
+
+
+File:    ./lib/commons-codec-1.3.jar
+Source:  http://commons.apache.org
+License: Apache License Version 2.0, see http://www.apache.org/licenses/LICENSE-2.0.html
+
+File:    ./lib/commons-httpclient-3.0.1.jar
+Source:  http://commons.apache.org
+License: Apache License Version 2.0, see http://www.apache.org/licenses/LICENSE-2.0.html
+
+File:    ./lib/commons-logging.jar
+Source:  http://commons.apache.org
+License: Apache License Version 2.0, see http://www.apache.org/licenses/LICENSE-2.0.html
+
+File:    ./lib/commons-lang-2.3.jar
+Source:  http://commons.apache.org/
+License: Apache License Version 2.0, see http://www.apache.org/licenses/LICENSE-2.0.html
+
+File:    ./lib/commons-net-2.2.jar
+Source:  http://commons.apache.org/
+License: Apache License Version 2.0, see http://www.apache.org/licenses/LICENSE-2.0.html
+
+File:    ./lib/commons-ssl.jar
+Source:  http://juliusdavies.ca/commons-ssl/
+License: Apache License Version 2.0, see http://www.apache.org/licenses/LICENSE-2.0.html
+
+File:    ./lib/httpclient-4.2.1.jar
+Source:  http://hc.apache.org/downloads.cgi
+License: Apache License Version 2.0, see http://www.apache.org/licenses/LICENSE-2.0.html
+
+File:    ./lib/httpcore-4.2.1.jar
+Source:  http://hc.apache.org/downloads.cgi
+License: Apache License Version 2.0, see http://www.apache.org/licenses/LICENSE-2.0.html
+
+File:    ./lib/jcifs-1.3.17.jar
+Source:  http://jcifs.samba.org/
+License: LGPL v2.1 license, see http://www.gnu.org/licenses/lgpl-2.1.txt 
+
+File:    ./lib/jdom.jar
+Source:  http://www.jdom.org/
+License: Apache License Version 2.0, see http://www.apache.org/licenses/LICENSE-2.0.html
+
+File:    ./lib/jsch-0.1.48.jar
+Source:  http://www.jcraft.com/jsch/
+License: BSD-style license, see http://www.jcraft.com/jsch/LICENSE.txt
+
+File:    ./lib/log4j-1.2.16.jar
+Source:  http://logging.apache.org/log4j/1.2/download.html
+License: Apache License Version 2.0, see http://www.apache.org/licenses/LICENSE-2.0.html
+
+File:    ./lib/mail.jar
+Source:  http://www.oracle.com/technetwork/java/javamail/index-138643.html
+License: Oracle Binary Code License Agreement for Java EE Technologies, 
+         see http://download.oracle.com/otn-pub/java/licenses/OTN_JavaEE_Legacy_Binary-Code-License_30Jan2012.txt
+    
+File:    ./lib/trilead-ssh2-build211.jar
+Source:  http://www.trilead.com/Download/Trilead-SSH-2-Java/
+License: BSD-style license, see http://www.trilead.com/Download/Trilead-SSH-2-Java/LICENSE.txt
+
+File:    ./lib/webdavclient4j-core-0.92.jar
+License: Apache License Version 2.0, see http://www.apache.org/licenses/LICENSE-2.0.html
+
+File:    ./lib/xalan.jar
+Source:  http://xml.apache.org/xalan-j/
+License: Apache License Version 2.0, see http://www.apache.org/licenses/LICENSE-2.0.html
+
+File:    ./lib/xercesImpl.jar
+Source:  http://xerces.apache.org/xerces2-j/index.html
+License: Apache License Version 2.0, see http://www.apache.org/licenses/LICENSE-2.0.html
+
+File:    ./lib/xml-apis.jar
+Source:  http://xerces.apache.org/xerces2-j/index.html
+License: Apache License Version 2.0, see http://www.apache.org/licenses/LICENSE-2.0.html
+

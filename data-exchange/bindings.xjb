@@ -1,0 +1,18 @@
+<jxb:bindings version="1.0" xmlns:jxb="http://java.sun.com/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <jxb:bindings schemaLocation="jade_configuration_v1.0.xsd" node="/xs:schema">
+        <jxb:globalBindings bindingStyle="modelGroupBinding" fixedAttributeAsConstantProperty="true" collectionType="java.util.Vector"
+            typesafeEnumBase="xs:NCName" choiceContentProperty="false" typesafeEnumMemberName="generateError" enableFailFastCheck="false" generateIsSetMethod="false"
+            underscoreBinding="asCharInWord" />
+        <jxb:schemaBindings>
+            <jxb:package name="com.sos.jade.jaxb.configuration">
+                <jxb:javadoc> Package level documentation for generated package com.sos.jade.jaxb.configuration.
+                </jxb:javadoc>
+            </jxb:package>
+            <jxb:nameXmlTransform>
+                <jxb:elementName suffix="Element" />
+            </jxb:nameXmlTransform>
+        </jxb:schemaBindings>
+
+    </jxb:bindings> 
+
+</jxb:bindings>
