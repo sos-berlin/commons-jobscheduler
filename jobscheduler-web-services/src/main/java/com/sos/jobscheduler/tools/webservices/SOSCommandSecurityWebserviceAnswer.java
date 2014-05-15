@@ -10,6 +10,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     private String user;
     private String resource;
     private String sessionId;
+    private boolean isEnabled;
   
     public SOSCommandSecurityWebserviceAnswer() {
     }
@@ -68,6 +69,14 @@ import javax.xml.bind.annotation.XmlRootElement;
     return this.resource;
     }
     
+    @XmlElement
+    public void setIsEnabled(boolean isEnabled) {
+       this.isEnabled = isEnabled;
+    }
+     
+    public boolean getIsEnabled() {
+       return this.isEnabled;
+    }
     
     @Override
     public String toString() {

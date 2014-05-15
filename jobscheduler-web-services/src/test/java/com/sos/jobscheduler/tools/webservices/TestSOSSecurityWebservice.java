@@ -35,7 +35,7 @@ public class TestSOSSecurityWebservice {
 
      @Test
     public void testMyWebserviceAnswer() {
-         SOSSecurityWebservice sosSecurityWebservice = new SOSSecurityWebservice();
+         SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
          String name = "myName";
          String email = "myEmail";
           
@@ -49,13 +49,13 @@ public class TestSOSSecurityWebservice {
     
      @Test
      public void testStartJob() throws MalformedURLException {
-          SOSSecurityWebservice sosSecurityWebservice = new SOSSecurityWebservice();
+          SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
           String job;
           job = "events2/job_exercise2";
           String user = "SOS01";
           String password = "sos01";
           String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-          SOSSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password,resource);
+          SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password);
           m = sosSecurityWebservice.startJob(m.getSessionId(),job,"","","","myParam=test|yourParam=fest");          
           
          assertEquals("testMyWebserviceAnswerMessage","User SOS01 is not permitted. Missing permission: jobscheduler:joc:command:start:job:myJob",m.getMessage());        
@@ -65,13 +65,13 @@ public class TestSOSSecurityWebservice {
      
      @Test
      public void testModifyOrder() throws MalformedURLException {
-         SOSSecurityWebservice sosSecurityWebservice = new SOSSecurityWebservice();
+         SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
          String jobChain = "myJobChain";
          String orderId = "myOrderId";
          String user = "SOS01";
          String password = "sos01";
          String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-         SOSSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password,resource);
+         SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password);
          m = sosSecurityWebservice.modifyOrder (m.getSessionId(),jobChain,orderId,"","","","","","","","","","myParam=test|yourParam=fest");          
          
          
@@ -83,12 +83,12 @@ public class TestSOSSecurityWebservice {
 
      @Test
      public void testProcessClass() throws MalformedURLException {
-         SOSSecurityWebservice sosSecurityWebservice = new SOSSecurityWebservice();
+         SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
          String processClass = "myProcessClass";
          String user = "SOS01";
          String password = "sos01";
          String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-         SOSSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password,resource);
+         SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password);
          m = sosSecurityWebservice.processClass(m.getSessionId(),"", processClass, "", "", "");          
          
         assertEquals("testMyWebserviceAnswerMessage","job chain myJobChain gestartet with order myOrderId",m.getMessage());        
@@ -98,12 +98,12 @@ public class TestSOSSecurityWebservice {
 
      @Test
      public void testProcessClassRemove() throws MalformedURLException {
-         SOSSecurityWebservice sosSecurityWebservice = new SOSSecurityWebservice();
+         SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
          String processClass = "myProcessClass";
          String user = "SOS01";
          String password = "sos01";
          String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-         SOSSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password,resource);
+         SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password);
          m = sosSecurityWebservice.processClassRemove(m.getSessionId(),processClass);          
          
         assertEquals("testMyWebserviceAnswerMessage","job chain myJobChain gestartet with order myOrderId",m.getMessage());        
@@ -113,12 +113,12 @@ public class TestSOSSecurityWebservice {
 
      @Test
      public void testJobChainRemove() throws MalformedURLException {
-         SOSSecurityWebservice sosSecurityWebservice = new SOSSecurityWebservice();
+         SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
          String jobChain = "xxx";
          String user = "SOS01";
          String password = "sos01";
          String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-         SOSSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password,resource);
+         SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password);
          m = sosSecurityWebservice.jobChainRemove(m.getSessionId(),jobChain);          
          
         assertEquals("testMyWebserviceAnswerMessage","job chain myJobChain gestartet with order myOrderId",m.getMessage());        
@@ -128,13 +128,13 @@ public class TestSOSSecurityWebservice {
 
      @Test
      public void testOrderRemove() throws MalformedURLException {
-         SOSSecurityWebservice sosSecurityWebservice = new SOSSecurityWebservice();
+         SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
          String jobChain = "xxx";
          String order = "2";
          String user = "SOS01";
          String password = "sos01";
          String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-         SOSSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password,resource);
+         SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password);
          m = sosSecurityWebservice.orderRemove(m.getSessionId(),jobChain,order);          
          
         assertEquals("testMyWebserviceAnswerMessage","job chain myJobChain gestartet with order myOrderId",m.getMessage());        
@@ -144,13 +144,13 @@ public class TestSOSSecurityWebservice {
 
      @Test
      public void testModifyJob() throws MalformedURLException {
-         SOSSecurityWebservice sosSecurityWebservice = new SOSSecurityWebservice();
+         SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
          String job = "myJob";
          String cmd = "stop";
          String user = "SOS01";
          String password = "sos01";
          String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-         SOSSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password,resource);
+         SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password);
          m = sosSecurityWebservice.modifyJob (m.getSessionId(),job,cmd);          
          
          
@@ -162,13 +162,13 @@ public class TestSOSSecurityWebservice {
 
      @Test
      public void testModifySpooler() throws MalformedURLException {
-         SOSSecurityWebservice sosSecurityWebservice = new SOSSecurityWebservice();
+         SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
          String cmd = "terminate";
          String timeout = "";
          String user = "SOS01";
          String password = "sos01";
          String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-         SOSSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password,resource);
+         SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password);
          m = sosSecurityWebservice.modifySpooler (m.getSessionId(),cmd, timeout);          
          
          
@@ -180,13 +180,13 @@ public class TestSOSSecurityWebservice {
 
      @Test
      public void testAddOrder() throws MalformedURLException {
-         SOSSecurityWebservice sosSecurityWebservice = new SOSSecurityWebservice();
+         SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
          String jobChain = "myJobChain";
          String orderId = "myOrderId";
          String user = "SOS01";
          String password = "sos01";
          String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-         SOSSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password,resource);
+         SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password);
          m = sosSecurityWebservice.addOrder(m.getSessionId(),jobChain,orderId,"","","","","","","","","");          
          
         assertEquals("testMyWebserviceAnswerMessage","job chain myJobChain gestartet with order myOrderId",m.getMessage());        
@@ -196,12 +196,12 @@ public class TestSOSSecurityWebservice {
 
      @Test
      public void testLockRemove() throws MalformedURLException {
-         SOSSecurityWebservice sosSecurityWebservice = new SOSSecurityWebservice();
+         SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
          String lock = "mylock";
          String user = "SOS01";
          String password = "sos01";
          String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-         SOSSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password,resource);
+         SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password);
          m = sosSecurityWebservice.lockRemove(m.getSessionId()+"*",lock);          
          
          assertEquals("testMyWebserviceAnswerResource",resource,m.getResource());        
@@ -210,14 +210,14 @@ public class TestSOSSecurityWebservice {
     
      @Test
      public void testKillTask() throws MalformedURLException {
-         SOSSecurityWebservice sosSecurityWebservice = new SOSSecurityWebservice();
+         SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
          String id = "1324";
          String immediately = "yes";
          String job = "myJob";
          String user = "SOS01";
          String password = "sos01";
          String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-         SOSSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password,resource);
+         SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password);
          m = sosSecurityWebservice.killTask(m.getSessionId(),id, immediately, job);          
          
          assertEquals("testMyWebserviceAnswerResource",resource,m.getResource());        
@@ -226,13 +226,13 @@ public class TestSOSSecurityWebservice {
     
      @Test
      public void testJobChainModify() throws MalformedURLException {
-         SOSSecurityWebservice sosSecurityWebservice = new SOSSecurityWebservice();
+         SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
          String jobChain = "myJobChain";
          String state="stopped";
          String user = "SOS01";
          String password = "sos01";
          String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-         SOSSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password,resource);
+         SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password);
          m = sosSecurityWebservice.jobChainModify(m.getSessionId(),jobChain, state);          
          
          assertEquals("testMyWebserviceAnswerResource",resource,m.getResource());        
@@ -241,14 +241,14 @@ public class TestSOSSecurityWebservice {
    
      @Test
      public void testJobChainNodeModify() throws MalformedURLException {
-         SOSSecurityWebservice sosSecurityWebservice = new SOSSecurityWebservice();
+         SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
          String jobChain = "myJobChain";
          String state="100";
          String action = "stop";
          String user = "SOS01";
          String password = "sos01";
          String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-         SOSSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password,resource);
+         SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password);
          m = sosSecurityWebservice.jobChainNodeModify(m.getSessionId(),jobChain, action, state);          
          
          assertEquals("testMyWebserviceAnswerResource",resource,m.getResource());        
@@ -257,12 +257,12 @@ public class TestSOSSecurityWebservice {
    
      @Test
      public void testLogin() throws MalformedURLException {
-          SOSSecurityWebservice sosSecurityWebservice = new SOSSecurityWebservice();
+          SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
           
           String user = "SOS01";
           String password = "sos01";
           String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-          SOSSecurityWebserviceAnswer m = sosSecurityWebservice.login(user,password,resource);          
+          SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user,password);          
           
          assertEquals("testMyWebserviceAnswerMessage","user: SOS01, password: sos01, resource: http://localhost:40040/jobscheduler/rest/sosPermission --> authenticated",m.getMessage());        
          assertEquals("testMyWebserviceAnswerResource",resource,m.getResource());        
@@ -271,11 +271,11 @@ public class TestSOSSecurityWebservice {
 
      @Test
      public void testLogout() throws MalformedURLException {
-          SOSSecurityWebservice sosSecurityWebservice = new SOSSecurityWebservice();
+          SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
           String user = "SOS01";
           String password = "sos01";
           String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-          SOSSecurityWebserviceAnswer m = sosSecurityWebservice.login(user,password,resource);          
+          SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user,password);          
        
           
            m = sosSecurityWebservice.logout("test");          
