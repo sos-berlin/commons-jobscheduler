@@ -1,16 +1,6 @@
 package sos.net;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.util.Vector;
-
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ProtocolCommandListener;
 import org.apache.commons.net.ftp.FTP;
@@ -18,10 +8,12 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.log4j.Logger;
-
 import sos.util.SOSLogger;
 
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import java.io.*;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.Vector;
 
 //import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
@@ -131,7 +123,7 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
 	 * Creates a new subdirectory on the FTP server in the current directory .
 	 * @param pathname The pathname of the directory to create.
 	 * @return True if successfully completed, false if not.
-	 * @throws java.lang.IOException
+	 * @throws IOException
 	 */
 	@Override
 	public boolean mkdir(final String pathname) throws IOException {
@@ -151,7 +143,7 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
 	 * Removes a directory on the FTP server (if empty).
 	 * @param pathname The pathname of the directory to remove.
 	 * @return True if successfully completed, false if not.
-	 * @throws java.lang.IOException
+	 * @throws IOException
 	 */
 	public boolean rmdir(final String pathname) throws IOException {
 		return removeDirectory(pathname);
@@ -539,7 +531,11 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
 	public long size(final String remoteFile) throws Exception {
 
 		this.sendCommand("SIZE " + remoteFile);
-		if (this.getReplyCode() == FTPReply.CODE_213)
+        // Version > 2.2 of commons-net mapped the constant 213 (FTPReply.CODE_213) to FTPReply.FILE_STATUS
+        // see http://commons.apache.org/proper/commons-net/changes-report.html
+        // see http://api.j2men.com/commons-net-2.2/
+        // see http://commons.apache.org/proper/commons-net/apidocs/constant-values.html#org.apache.commons.net.ftp.FTPReply
+		if (this.getReplyCode() == FTPReply.FILE_STATUS)
 			return Long.parseLong(trimResponseCode(this.getReplyString()));
 		else
 			return -1L;
@@ -733,8 +729,8 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
 
 	/**
 	 *
-	 * @param localfile The name of the local file.
-	 * @param an OutputStream through which data can be 
+	 * @param localFile The name of the local file.
+	 * @param out OutputStream through which data can be
 	 * written to store a file on the server using the given name.
 	 * @return The total number of bytes written.
 	 * @exception Exception
@@ -843,7 +839,7 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
 
 	/**
 	 * Deletes a file on the FTP server.
-	 * @param The pathname of the file to be deleted.
+	 * @param pathname The pathname of the file to be deleted.
 	 * @return True if successfully completed, false if not.
 	 * @throws IOException If an I/O error occurs while either sending a
 	 * command to the server or receiving a reply from the server.

@@ -133,7 +133,7 @@ public class JobSchedulerLog4JAppenderTest {
 //		@SuppressWarnings("unused")
 //		Log4JHelper.flgUseJobSchedulerLog4JAppender = true;
 //		Log4JHelper objLogger = null;
-		Log4JHelper objLogger = new Log4JHelper("./conf/log4j.properties");
+		Log4JHelper objLogger = new Log4JHelper("./log4j.properties");
 
 		logger = Logger.getRootLogger();
 

@@ -464,7 +464,12 @@ public class SOSFTP  extends FTPClient implements SOSFileTransfer {
 	public long size(String remoteFile) throws Exception {
 
 		this.sendCommand("SIZE " + remoteFile);
-		if (this.getReplyCode() == FTPReply.CODE_213)
+        // Version > 2.2 of commons-net mapped the constant 213 (FTPReply.CODE_213) to FTPReply.FILE_STATUS
+        // see http://commons.apache.org/proper/commons-net/changes-report.html
+        // see http://api.j2men.com/commons-net-2.2/
+        // see http://commons.apache.org/proper/commons-net/apidocs/constant-values.html#org.apache.commons.net.ftp.FTPReply
+        // if (this.getReplyCode() == FTPReply.CODE_213)
+        if (this.getReplyCode() == FTPReply.FILE_STATUS)
 			return Long.parseLong(trimResponseCode(this.getReplyString()));
 		else
 			return -1L;
