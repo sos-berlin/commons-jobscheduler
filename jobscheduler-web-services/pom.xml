@@ -112,6 +112,7 @@
          <dependency>
             <groupId>com.sos-berlin.products.commons</groupId>
             <artifactId>sos-xml</artifactId>
+        	<version>${project.version}</version>
         </dependency>
    
             
@@ -123,7 +124,7 @@
         <dependency>
         	<groupId>com.sos-berlin.products.jobscheduler</groupId>
         	<artifactId>jobscheduler-object-model</artifactId>
-        	<version>1.7</version>
+        	<version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>
