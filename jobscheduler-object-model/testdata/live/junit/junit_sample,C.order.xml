@@ -1,0 +1,9 @@
+<order>
+<params>
+<param name="successor" value="E,F"/>
+<param name="predecessor" value="A"/>
+</params>
+<run_time>
+<monthdays><day day="30"/></monthdays>
+</run_time>
+</order>

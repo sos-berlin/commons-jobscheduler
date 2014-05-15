@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+This schema defines extension elements and attributes for the job-chain element of the JobScheduler engine (scheduler.xsd).
+
+A sample xml to use this schema could be as follows:
+<job_chain
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:ext="sos-berlin/namespaces/scheduler/extensions"
+   xsi:noNamespaceSchemaLocation="scheduler.xsd"
+   xsi:schemaLocation="sos-berlin/namespaces/scheduler/extensions job-chain-node-extensions-v1.0.xsd"
+   orders_recoverable="yes" visible="yes" name="myChain">
+	<job_chain_node state="100" job="JobChainStart" next_state="200" error_state="error"/>
+	<job_chain_node state="200" job="JobChainEnd" next_state="success" error_state="error" ext:previous_state="100">
+		<ext:params>
+			<ext:param name="param1" value="abc" />
+		</ext:params>
+	</job_chain_node>
+	<job_chain_node state="error"/>
+	<job_chain_node state="success"/>
+</job_chain>
+
+The affected elements of the scheduler.xsd must allow child elements (via xsd:any) resp. attributes (via xsd:anyAttribute) from different namespaces.
+See the definition of element job_chain_node in scheduler.xsd for details.
+-->
+<xsd:schema targetNamespace="job-chain-node-extensions" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns1="job-chain-node-extensions" elementFormDefault="qualified" attributeFormDefault="qualified">
+
+    <!-- additional attributes for job_chain_node -->
+	<xsd:attribute name="previous_state" type="xsd:string"/>
+	<xsd:attribute name="node_type">
+		<xsd:simpleType>
+			<xsd:restriction base="xsd:string">
+				<xsd:pattern value="job"/>
+				<xsd:pattern value="error"/>
+				<xsd:pattern value="splitter"/>
+				<xsd:pattern value="eventtrigger"/>
+				<xsd:pattern value="synch"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	</xsd:attribute>
+	<xsd:attribute name="title" type="xsd:string"/>
+	<xsd:attribute name="seq_number" type="xsd:nonNegativeInteger"/>
+
+    <!-- Params element for job-chain-node
+     It is explicitly different to the params Element of scheduler.xsd, because the child elements include and copy_params are not supported -->
+    <xsd:element name="params">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="param" maxOccurs="unbounded">
+					<xsd:complexType>
+						<xsd:attribute name="name" type="xsd:string" use="required" form="unqualified"/>
+						<xsd:attribute name="value" type="xsd:string" use="required" form="unqualified"/>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+    <!-- This element is for jaxb to generate a class JobChainExtended with the additional attributes and child elements -->
+	<xsd:element name="job_chain">
+		<xsd:complexType>
+			<xsd:choice maxOccurs="unbounded">
+				<xsd:element name="job_chain_node">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element ref="ns1:params"/>
+						</xsd:sequence>
+						<xsd:attribute ref="ns1:previous_state"/>
+						<xsd:attribute ref="ns1:node_type"/>
+						<xsd:attribute ref="ns1:title"/>
+						<xsd:attribute ref="ns1:seq_number"/>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:choice>
+		</xsd:complexType>
+	</xsd:element>
+
+</xsd:schema>

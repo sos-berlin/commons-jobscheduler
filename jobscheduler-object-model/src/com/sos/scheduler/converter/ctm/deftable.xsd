@@ -1,0 +1,1319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="DEFTABLE">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="SCHED_TABLE"/>
+          <xs:element ref="SCHED_GROUP"/>
+          <xs:element ref="TABLE"/>
+          <xs:element ref="SMART_TABLE"/>
+        </xs:choice>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="TEMPLATE"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="TEMPLATE">
+    <xs:complexType>
+      <xs:attribute name="dc_platform"/>
+      <xs:attribute name="dc_version"/>
+      <xs:attribute name="description"/>
+      <xs:attribute name="dc_name"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SMART_TABLE">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="TAG"/>
+          <xs:element ref="RULE_BASED_CALENDAR"/>
+          <xs:element ref="INCOND"/>
+          <xs:element ref="OUTCOND"/>
+          <xs:element ref="CONTROL"/>
+          <xs:element ref="AUTOEDIT"/>
+          <xs:element ref="ON_GROUP"/>
+          <xs:element ref="ON_TABLE"/>
+          <xs:element ref="SHOUT"/>
+          <xs:element ref="AUTOEDIT2"/>
+        </xs:choice>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="JOB"/>
+          <xs:element ref="SUB_TABLE"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attribute name="DATACENTER" use="required"/>
+      <xs:attribute name="TABLE_NAME" use="required"/>
+      <xs:attribute name="TABLE_DSN"/>
+      <xs:attribute name="TABLE_USERDAILY"/>
+      <xs:attribute name="GROUP"/>
+      <xs:attribute name="JOBNAME"/>
+      <xs:attribute name="APPLICATION"/>
+      <xs:attribute name="MEMNAME"/>
+      <xs:attribute name="OWNER"/>
+      <xs:attribute name="ADJUST_COND" default="N">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="N"/>
+            <xs:enumeration value="Y"/>
+            <xs:enumeration value="D"/>
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+            <xs:enumeration value="Dummy"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="CONFIRM" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="PRIORITY"/>
+      <xs:attribute name="TIMEFROM"/>
+      <xs:attribute name="TIMETO"/>
+      <xs:attribute name="TIMEZONE"/>
+      <xs:attribute name="DUE_OUT"/>
+      <xs:attribute name="DOCMEM"/>
+      <xs:attribute name="DOCLIB"/>
+      <xs:attribute name="DESCRIPTION"/>
+      <xs:attribute name="AUTHOR"/>
+      <xs:attribute name="USED_BY"/>
+      <xs:attribute name="USED_BY_CODE"/>
+      <xs:attribute name="MODIFIED"/>
+      <xs:attribute name="LAST_UPLOAD"/>
+      <xs:attribute name="CHECKSUM"/>
+      <xs:attribute name="TABLE_ID"/>
+      <xs:attribute name="REAL_TABLEID"/>
+      <xs:attribute name="CREATION_USER"/>
+      <xs:attribute name="CREATION_DATE" default="EMPTY"/>
+      <xs:attribute name="CREATION_TIME" default="EMPTY"/>
+      <xs:attribute name="CHANGE_USERID"/>
+      <xs:attribute name="CHANGE_DATE"/>
+      <xs:attribute name="CHANGE_TIME"/>
+      <xs:attribute name="MULTY_AGENT">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="Y"/>
+            <xs:enumeration value="N"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="ACTIVE_FROM"/>
+      <xs:attribute name="ACTIVE_TILL"/>
+      <xs:attribute name="JOBISN"/>
+      <xs:attribute name="MAXWAIT"/>
+      <xs:attribute name="DUE_OUT_DAYSOFFSET"/>
+      <xs:attribute name="FROM_DAYSOFFSET"/>
+      <xs:attribute name="TO_DAYSOFFSET"/>
+      <xs:attribute name="PREV_DAY"/>
+      <xs:attribute name="CRITICAL" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="APPL_TYPE"/>
+      <xs:attribute name="APPL_VER"/>
+      <xs:attribute name="APPL_FORM"/>
+      <xs:attribute name="CM_VER"/>
+      <xs:attribute name="STAT_CAL"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="TABLE">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="JOB"/>
+      </xs:sequence>
+      <xs:attribute name="DATACENTER" use="required"/>
+      <xs:attribute name="TABLE_NAME" use="required"/>
+      <xs:attribute name="TABLE_DSN"/>
+      <xs:attribute name="TABLE_USERDAILY"/>
+      <xs:attribute name="USED_BY"/>
+      <xs:attribute name="USED_BY_CODE"/>
+      <xs:attribute name="MODIFIED"/>
+      <xs:attribute name="LAST_UPLOAD"/>
+      <xs:attribute name="CHECKSUM"/>
+      <xs:attribute name="TABLE_ID"/>
+      <xs:attribute name="REAL_TABLEID"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SUB_TABLE">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="JOB"/>
+        <xs:element ref="SUB_TABLE"/>
+        <xs:element ref="RULE_BASED_CALENDARS"/>
+        <xs:element ref="TAG_NAMES"/>
+        <xs:element ref="INCOND"/>
+        <xs:element ref="OUTCOND"/>
+        <xs:element ref="CONTROL"/>
+        <xs:element ref="AUTOEDIT"/>
+        <xs:element ref="ON_GROUP"/>
+        <xs:element ref="ON_TABLE"/>
+        <xs:element ref="SHOUT"/>
+        <xs:element ref="AUTOEDIT2"/>
+      </xs:choice>
+      <xs:attribute name="JOBNAME" use="required"/>
+      <xs:attribute name="GROUP" use="required"/>
+      <xs:attribute name="APPLICATION"/>
+      <xs:attribute name="AUTHOR"/>
+      <xs:attribute name="OWNER"/>
+      <xs:attribute name="TIMEFROM"/>
+      <xs:attribute name="TIMETO"/>
+      <xs:attribute name="DUE_OUT"/>
+      <xs:attribute name="TIMEZONE"/>
+      <xs:attribute name="PRIORITY"/>
+      <xs:attribute name="CONFIRM" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="DESCRIPTION"/>
+      <xs:attribute name="DOCMEM"/>
+      <xs:attribute name="DOCLIB"/>
+      <xs:attribute name="PREV_DAY"/>
+      <xs:attribute name="ADJUST_COND"/>
+      <xs:attribute name="CRITICAL" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="CREATION_USER"/>
+      <xs:attribute name="CREATION_DATE" default="EMPTY"/>
+      <xs:attribute name="CREATION_TIME" default="EMPTY"/>
+      <xs:attribute name="CHANGE_USERID"/>
+      <xs:attribute name="CHANGE_DATE"/>
+      <xs:attribute name="CHANGE_TIME"/>
+      <xs:attribute name="JOB_RELEASE"/>
+      <xs:attribute name="JOB_VERSION"/>
+      <xs:attribute name="TABLE_ID"/>
+      <xs:attribute name="REAL_TABLEID"/>
+      <xs:attribute name="JOBISN"/>
+      <xs:attribute name="LARGE_SIZE"/>
+      <xs:attribute name="APPL_TYPE"/>
+      <xs:attribute name="APPL_VER"/>
+      <xs:attribute name="APPL_FORM"/>
+      <xs:attribute name="CM_VER"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SCHED_GROUP">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="TAG"/>
+          <xs:element ref="INCOND"/>
+          <xs:element ref="OUTCOND"/>
+          <xs:element ref="CONTROL"/>
+          <xs:element ref="AUTOEDIT"/>
+          <xs:element ref="ON_GROUP"/>
+          <xs:element ref="SHOUT"/>
+        </xs:choice>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="JOB"/>
+      </xs:sequence>
+      <xs:attribute name="DATACENTER" use="required"/>
+      <xs:attribute name="TABLE_NAME" use="required"/>
+      <xs:attribute name="TABLE_DSN"/>
+      <xs:attribute name="TABLE_USERDAILY"/>
+      <xs:attribute name="GROUP" use="required"/>
+      <xs:attribute name="JOBNAME"/>
+      <xs:attribute name="APPLICATION"/>
+      <xs:attribute name="MEMNAME"/>
+      <xs:attribute name="OWNER"/>
+      <xs:attribute name="ADJUST_COND" default="N">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="N"/>
+            <xs:enumeration value="Y"/>
+            <xs:enumeration value="D"/>
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+            <xs:enumeration value="Dummy"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="CONFIRM" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="PRIORITY"/>
+      <xs:attribute name="TIMEFROM"/>
+      <xs:attribute name="TIMETO"/>
+      <xs:attribute name="TIMEZONE"/>
+      <xs:attribute name="DUE_OUT"/>
+      <xs:attribute name="DOCMEM"/>
+      <xs:attribute name="DOCLIB"/>
+      <xs:attribute name="DESCRIPTION"/>
+      <xs:attribute name="AUTHOR"/>
+      <xs:attribute name="USED_BY"/>
+      <xs:attribute name="USED_BY_CODE"/>
+      <xs:attribute name="MODIFIED"/>
+      <xs:attribute name="LAST_UPLOAD"/>
+      <xs:attribute name="CHECKSUM"/>
+      <xs:attribute name="TABLE_ID"/>
+      <xs:attribute name="REAL_TABLEID"/>
+      <xs:attribute name="CREATION_USER"/>
+      <xs:attribute name="CREATION_DATE" default="EMPTY"/>
+      <xs:attribute name="CREATION_TIME" default="EMPTY"/>
+      <xs:attribute name="CHANGE_USERID"/>
+      <xs:attribute name="CHANGE_DATE"/>
+      <xs:attribute name="CHANGE_TIME"/>
+      <xs:attribute name="MULTY_AGENT">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="Y"/>
+            <xs:enumeration value="N"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="ACTIVE_FROM"/>
+      <xs:attribute name="ACTIVE_TILL"/>
+      <xs:attribute name="JOBISN"/>
+      <xs:attribute name="MAXWAIT"/>
+      <xs:attribute name="STAT_CAL"/>
+      <xs:attribute name="DUE_OUT_DAYSOFFSET"/>
+      <xs:attribute name="FROM_DAYSOFFSET"/>
+      <xs:attribute name="TO_DAYSOFFSET"/>
+      <xs:attribute name="PREV_DAY"/>
+      <xs:attribute name="CRITICAL" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SCHED_TABLE">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="JOB"/>
+      </xs:sequence>
+      <xs:attribute name="DATACENTER" use="required"/>
+      <xs:attribute name="TABLE_NAME" use="required"/>
+      <xs:attribute name="TABLE_DSN"/>
+      <xs:attribute name="TABLE_USERDAILY"/>
+      <xs:attribute name="USED_BY"/>
+      <xs:attribute name="USED_BY_CODE"/>
+      <xs:attribute name="MODIFIED"/>
+      <xs:attribute name="LAST_UPLOAD"/>
+      <xs:attribute name="CHECKSUM"/>
+      <xs:attribute name="TABLE_ID"/>
+      <xs:attribute name="REAL_TABLEID"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="TAG">
+    <xs:complexType>
+      <xs:attribute name="TAG_NAME" use="required"/>
+      <xs:attribute name="LEVEL" default="TABLE">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="TABLE"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="DAYS"/>
+      <xs:attribute name="DAYS_AND_OR" default="OR">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="AND"/>
+            <xs:enumeration value="OR"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="WEEKDAYS"/>
+      <xs:attribute name="DATE"/>
+      <xs:attribute name="DAYSCAL"/>
+      <xs:attribute name="WEEKSCAL"/>
+      <xs:attribute name="CONFCAL"/>
+      <xs:attribute name="RETRO" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="SHIFT">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="IGNOREJOB"/>
+            <xs:enumeration value="PREVDAY"/>
+            <xs:enumeration value="NEXTDAY"/>
+            <xs:enumeration value="NOCONFCAL"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="SHIFTNUM" default="+00"/>
+      <xs:attribute name="MAXWAIT" default="00"/>
+      <xs:attribute name="MAXRUNS"/>
+      <xs:attribute name="JAN" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="FEB" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="MAR" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="APR" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="MAY" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="JUN" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="JUL" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="AUG" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="SEP" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="OCT" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="NOV" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="DEC" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="TAGS_ACTIVE_FROM"/>
+      <xs:attribute name="TAGS_ACTIVE_TILL"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RULE_BASED_CALENDAR">
+    <xs:complexType>
+      <xs:attribute name="NAME" use="required"/>
+      <xs:attribute name="LEVEL" default="TABLE">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="TABLE"/>
+            <xs:enumeration value="CONTROL-M"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="DAYS"/>
+      <xs:attribute name="DAYS_AND_OR" default="OR">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="AND"/>
+            <xs:enumeration value="OR"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="WEEKDAYS"/>
+      <xs:attribute name="DATE"/>
+      <xs:attribute name="DAYSCAL"/>
+      <xs:attribute name="WEEKSCAL"/>
+      <xs:attribute name="CONFCAL"/>
+      <xs:attribute name="RETRO" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="SHIFT">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="IGNOREJOB"/>
+            <xs:enumeration value="PREVDAY"/>
+            <xs:enumeration value="NEXTDAY"/>
+            <xs:enumeration value="NOCONFCAL"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="SHIFTNUM" default="+00"/>
+      <xs:attribute name="MAXWAIT" default="00"/>
+      <xs:attribute name="MAXRUNS"/>
+      <xs:attribute name="JAN" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="FEB" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="MAR" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="APR" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="MAY" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="JUN" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="JUL" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="AUG" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="SEP" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="OCT" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="NOV" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="DEC" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="ACTIVE_FROM"/>
+      <xs:attribute name="ACTIVE_TILL"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="TAG_NAMES">
+    <xs:complexType>
+      <xs:attribute name="TAG_NAME"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RULE_BASED_CALENDARS">
+    <xs:complexType>
+      <xs:attribute name="NAME"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ON_GROUP">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="DO_GROUP"/>
+        <xs:element ref="DOAUTOEDIT"/>
+        <xs:element ref="DOSHOUT"/>
+        <xs:element ref="DOFORCEJOB"/>
+        <xs:element ref="DOCOND"/>
+        <xs:element ref="DOMAIL"/>
+        <xs:element ref="DOREMEDY"/>
+      </xs:choice>
+      <xs:attribute name="CODE" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="OK"/>
+            <xs:enumeration value="NOTOK"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ON_TABLE">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="DO_TABLE"/>
+        <xs:element ref="DOAUTOEDIT"/>
+        <xs:element ref="DOSHOUT"/>
+        <xs:element ref="DOFORCEJOB"/>
+        <xs:element ref="DOCOND"/>
+        <xs:element ref="DOMAIL"/>
+        <xs:element ref="DOREMEDY"/>
+        <xs:element ref="DOAUTOEDIT2"/>
+      </xs:choice>
+      <xs:attribute name="CODE" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="OK"/>
+            <xs:enumeration value="NOTOK"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="JOB">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="TAG_NAMES"/>
+        <xs:element ref="RULE_BASED_CALENDARS"/>
+        <xs:element ref="INCOND"/>
+        <xs:element ref="OUTCOND"/>
+        <xs:element ref="AUTOEDIT"/>
+        <xs:element ref="QUANTITATIVE"/>
+        <xs:element ref="CONTROL"/>
+        <xs:element ref="SHOUT"/>
+        <xs:element ref="STEP_RANGE"/>
+        <xs:element ref="ON"/>
+        <xs:element ref="AUTOEDIT2"/>
+      </xs:choice>
+      <xs:attribute name="JOBNAME"/>
+      <xs:attribute name="MEMNAME"/>
+      <xs:attribute name="GROUP"/>
+      <xs:attribute name="APPLICATION"/>
+      <xs:attribute name="TASKTYPE" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="Job"/>
+            <xs:enumeration value="Detached"/>
+            <xs:enumeration value="Command"/>
+            <xs:enumeration value="Dummy"/>
+            <xs:enumeration value="Started_Task"/>
+            <xs:enumeration value="Cyclic_Job"/>
+            <xs:enumeration value="Cyclic_Task"/>
+            <xs:enumeration value="Emergency_Job"/>
+            <xs:enumeration value="Emergency_Cyclic_Job"/>
+            <xs:enumeration value="Emergency_Task"/>
+            <xs:enumeration value="Emergency_Cyclic_Task"/>
+            <xs:enumeration value="External"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="AUTHOR"/>
+      <xs:attribute name="MEMLIB"/>
+      <xs:attribute name="CMDLINE"/>
+      <xs:attribute name="NODEID"/>
+      <xs:attribute name="OWNER"/>
+      <xs:attribute name="MAXRERUN" default="0"/>
+      <xs:attribute name="TIMEFROM"/>
+      <xs:attribute name="TIMETO"/>
+      <xs:attribute name="TIMEZONE"/>
+      <xs:attribute name="DUE_OUT"/>
+      <xs:attribute name="PRIORITY"/>
+      <xs:attribute name="CRITICAL" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="CYCLIC" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="CONFIRM" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="AUTOARCH" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="INTERVAL"/>
+      <xs:attribute name="OVERLIB"/>
+      <xs:attribute name="MAXWAIT"/>
+      <xs:attribute name="DESCRIPTION"/>
+      <xs:attribute name="DOCMEM"/>
+      <xs:attribute name="DOCLIB"/>
+      <xs:attribute name="DAYS"/>
+      <xs:attribute name="DAYS_AND_OR" default="OR">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="AND"/>
+            <xs:enumeration value="OR"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="WEEKDAYS"/>
+      <xs:attribute name="DATE"/>
+      <xs:attribute name="DAYSCAL"/>
+      <xs:attribute name="WEEKSCAL"/>
+      <xs:attribute name="CONFCAL"/>
+      <xs:attribute name="RETRO" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="SHIFT">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="IGNOREJOB"/>
+            <xs:enumeration value="PREVDAY"/>
+            <xs:enumeration value="NEXTDAY"/>
+            <xs:enumeration value="NOCONFCAL"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="SHIFTNUM" default="+00"/>
+      <xs:attribute name="MAXDAYS"/>
+      <xs:attribute name="MAXRUNS"/>
+      <xs:attribute name="RERUNMEM"/>
+      <xs:attribute name="RETEN_DAYS"/>
+      <xs:attribute name="RETEN_GEN"/>
+      <xs:attribute name="TASK_CLASS"/>
+      <xs:attribute name="PREV_DAY"/>
+      <xs:attribute name="IND_CYCLIC">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="START"/>
+            <xs:enumeration value="END"/>
+            <xs:enumeration value="TARGET"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="TAG_RELATIONSHIP">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="AND"/>
+            <xs:enumeration value="OR"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="RULE_BASED_CALENDAR_RELATIONSHIP">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="AND"/>
+            <xs:enumeration value="OR"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="SYSDB" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="PDSNAME"/>
+      <xs:attribute name="MINIMUM"/>
+      <xs:attribute name="CATEGORY"/>
+      <xs:attribute name="PREVENTNCT2" default="N">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="N"/>
+            <xs:enumeration value="Y"/>
+            <xs:enumeration value="L"/>
+            <xs:enumeration value="F"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="JAN" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="FEB" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="MAR" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="APR" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="MAY" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="JUN" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="JUL" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="AUG" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="SEP" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="OCT" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="NOV" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="DEC" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="OPTION">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="Release"/>
+            <xs:enumeration value="Delete"/>
+            <xs:enumeration value="Copy"/>
+            <xs:enumeration value="Move"/>
+            <xs:enumeration value="File"/>
+            <xs:enumeration value="NewDest"/>
+            <xs:enumeration value="ChangeClass"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="PAR"/>
+      <xs:attribute name="FROM"/>
+      <xs:attribute name="ADJUST_COND"/>
+      <xs:attribute name="JOBS_IN_GROUP"/>
+      <xs:attribute name="LARGE_SIZE"/>
+      <xs:attribute name="CREATION_USER"/>
+      <xs:attribute name="CREATION_DATE" default="EMPTY"/>
+      <xs:attribute name="CREATION_TIME" default="EMPTY"/>
+      <xs:attribute name="CHANGE_USERID"/>
+      <xs:attribute name="CHANGE_DATE"/>
+      <xs:attribute name="CHANGE_TIME"/>
+      <xs:attribute name="JOB_RELEASE"/>
+      <xs:attribute name="JOB_VERSION"/>
+      <xs:attribute name="JOBISN"/>
+      <xs:attribute name="APPL_TYPE"/>
+      <xs:attribute name="APPL_VER"/>
+      <xs:attribute name="APPL_FORM"/>
+      <xs:attribute name="CM_VER"/>
+      <xs:attribute name="MULTY_AGENT">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="Y"/>
+            <xs:enumeration value="N"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="ACTIVE_FROM"/>
+      <xs:attribute name="ACTIVE_TILL"/>
+      <xs:attribute name="SCHEDULING_ENVIRONMENT"/>
+      <xs:attribute name="SYSTEM_AFFINITY"/>
+      <xs:attribute name="REQUEST_NJE_NODE"/>
+      <xs:attribute name="INSTREAM_JCL"/>
+      <xs:attribute name="USE_INSTREAM_JCL"/>
+      <xs:attribute name="STAT_CAL"/>
+      <xs:attribute name="DUE_OUT_DAYSOFFSET"/>
+      <xs:attribute name="FROM_DAYSOFFSET"/>
+      <xs:attribute name="TO_DAYSOFFSET"/>
+      <xs:attribute name="CYCLIC_TYPE" default="Interval">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="Interval"/>
+            <xs:enumeration value="IntervalSequence"/>
+            <xs:enumeration value="SpecificTimes"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="CYCLIC_TOLERANCE"/>
+      <xs:attribute name="CYCLIC_INTERVAL_SEQUENCE"/>
+      <xs:attribute name="CYCLIC_TIMES_SEQUENCE"/>
+      <xs:attribute name="PARENT_TABLE"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="INCOND">
+    <xs:complexType>
+      <xs:attribute name="NAME" use="required"/>
+      <xs:attribute name="ODATE" use="required"/>
+      <xs:attribute name="AND_OR" default="AND">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="AND"/>
+            <xs:enumeration value="OR"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="OP"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OUTCOND">
+    <xs:complexType>
+      <xs:attribute name="NAME" use="required"/>
+      <xs:attribute name="ODATE" use="required"/>
+      <xs:attribute name="SIGN" default="ADD">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="ADD"/>
+            <xs:enumeration value="DEL"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AUTOEDIT">
+    <xs:complexType>
+      <xs:attribute name="EXP" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AUTOEDIT2">
+    <xs:complexType>
+      <xs:attribute name="NAME" use="required"/>
+      <xs:attribute name="VALUE"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="QUANTITATIVE">
+    <xs:complexType>
+      <xs:attribute name="NAME" use="required"/>
+      <xs:attribute name="QUANT" default="1"/>
+      <xs:attribute name="ONFAIL">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="K"/>
+            <xs:enumeration value="R"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="ONOK">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="R"/>
+            <xs:enumeration value="D"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CONTROL">
+    <xs:complexType>
+      <xs:attribute name="NAME" use="required"/>
+      <xs:attribute name="TYPE" default="E">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="E"/>
+            <xs:enumeration value="S"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="ONFAIL">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="K"/>
+            <xs:enumeration value="R"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SHOUT">
+    <xs:complexType>
+      <xs:attribute name="WHEN" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="OK"/>
+            <xs:enumeration value="NOTOK"/>
+            <xs:enumeration value="RERUN"/>
+            <xs:enumeration value="LATESUB"/>
+            <xs:enumeration value="LATETIME"/>
+            <xs:enumeration value="EXECTIME"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="DEST" use="required"/>
+      <xs:attribute name="URGENCY" default="R">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="R"/>
+            <xs:enumeration value="U"/>
+            <xs:enumeration value="V"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="MESSAGE" use="required"/>
+      <xs:attribute name="TIME"/>
+      <xs:attribute name="DAYSOFFSET"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="STEP_RANGE">
+    <xs:complexType>
+      <xs:attribute name="NAME" use="required"/>
+      <xs:attribute name="FPGMS"/>
+      <xs:attribute name="FPROCS"/>
+      <xs:attribute name="TPGMS"/>
+      <xs:attribute name="TPROCS"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ON">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="DO"/>
+        <xs:element ref="DOAUTOEDIT"/>
+        <xs:element ref="DOSHOUT"/>
+        <xs:element ref="DOFORCEJOB"/>
+        <xs:element ref="DOCTBRULE"/>
+        <xs:element ref="DOSYSOUT"/>
+        <xs:element ref="DOIFRERUN"/>
+        <xs:element ref="DOCOND"/>
+        <xs:element ref="DOMAIL"/>
+        <xs:element ref="DOREMEDY"/>
+        <xs:element ref="DOAUTOEDIT2"/>
+      </xs:choice>
+      <xs:attribute name="STMT"/>
+      <xs:attribute name="CODE"/>
+      <xs:attribute name="PGMS"/>
+      <xs:attribute name="PROCS"/>
+      <xs:attribute name="PATTERN"/>
+      <xs:attribute name="FROM_COLUMN"/>
+      <xs:attribute name="TO_COLUMN"/>
+      <xs:attribute name="AND_OR">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="AND"/>
+            <xs:enumeration value="OR"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DO">
+    <xs:complexType>
+      <xs:attribute name="ACTION" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="OK"/>
+            <xs:enumeration value="NOTOK"/>
+            <xs:enumeration value="RERUN"/>
+            <xs:enumeration value="SPCYC"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DO_GROUP">
+    <xs:complexType>
+      <xs:attribute name="ACTION" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="OK"/>
+            <xs:enumeration value="NOTOK"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DO_TABLE">
+    <xs:complexType>
+      <xs:attribute name="ACTION" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="OK"/>
+            <xs:enumeration value="NOTOK"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DOSHOUT">
+    <xs:complexType>
+      <xs:attribute name="DEST" use="required"/>
+      <xs:attribute name="URGENCY" default="R">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="R"/>
+            <xs:enumeration value="U"/>
+            <xs:enumeration value="V"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="MESSAGE" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DOCOND">
+    <xs:complexType>
+      <xs:attribute name="NAME" use="required"/>
+      <xs:attribute name="ODATE" use="required"/>
+      <xs:attribute name="SIGN" default="ADD">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="ADD"/>
+            <xs:enumeration value="DEL"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DOAUTOEDIT">
+    <xs:complexType>
+      <xs:attribute name="EXP" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DOAUTOEDIT2">
+    <xs:complexType>
+      <xs:attribute name="NAME" use="required"/>
+      <xs:attribute name="VALUE"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DOFORCEJOB">
+    <xs:complexType>
+      <xs:attribute name="DSN"/>
+      <xs:attribute name="TABLE_NAME" use="required"/>
+      <xs:attribute name="NAME"/>
+      <xs:attribute name="ODATE" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DOSYSOUT">
+    <xs:complexType>
+      <xs:attribute name="OPTION" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="Release"/>
+            <xs:enumeration value="Delete"/>
+            <xs:enumeration value="Copy"/>
+            <xs:enumeration value="Move"/>
+            <xs:enumeration value="File"/>
+            <xs:enumeration value="NewDest"/>
+            <xs:enumeration value="ChangeClass"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="PAR"/>
+      <xs:attribute name="FROM"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DOIFRERUN">
+    <xs:complexType>
+      <xs:attribute name="CONFIRM" default="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="FPGMS" use="required"/>
+      <xs:attribute name="FPROCS"/>
+      <xs:attribute name="TPGMS"/>
+      <xs:attribute name="TPROCS"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DOMAIL">
+    <xs:complexType>
+      <xs:attribute name="URGENCY" default="R">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="R"/>
+            <xs:enumeration value="U"/>
+            <xs:enumeration value="V"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="DEST" use="required"/>
+      <xs:attribute name="CC_DEST"/>
+      <xs:attribute name="SUBJECT"/>
+      <xs:attribute name="MESSAGE"/>
+      <xs:attribute name="ATTACH_SYSOUT">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="Default"/>
+            <xs:enumeration value="Yes"/>
+            <xs:enumeration value="No"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DOREMEDY">
+    <xs:complexType>
+      <xs:attribute name="SUMMARY" use="required"/>
+      <xs:attribute name="DESCRIPTION" use="required"/>
+      <xs:attribute name="URGENCY" default="L">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="L"/>
+            <xs:enumeration value="M"/>
+            <xs:enumeration value="H"/>
+            <xs:enumeration value="U"/>
+            <xs:enumeration value="C"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DOCTBRULE">
+    <xs:complexType>
+      <xs:attribute name="NAME" use="required"/>
+      <xs:attribute name="PAR"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

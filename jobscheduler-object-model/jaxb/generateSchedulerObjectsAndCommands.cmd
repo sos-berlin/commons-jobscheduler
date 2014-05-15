@@ -1,0 +1,1 @@
+﻿xjc -d ./ -nv -extension -p com.sos.scheduler.model.commands scheduler.xsd -b externalObjectsBind.xml

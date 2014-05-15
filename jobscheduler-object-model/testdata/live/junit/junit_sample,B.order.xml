@@ -1,0 +1,9 @@
+<order>
+<params>
+<param name="successor" value="G"/>
+<param name="predecessor" value="A"/>
+</params>
+<run_time>
+<weekdays><day day="5"/></weekdays>
+</run_time>
+</order>

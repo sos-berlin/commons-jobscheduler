@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<order>
+    <params>
+        <param name="successor"
+               value="G"/>
+
+
+        <param name="predecessor"
+               value="A"/>
+
+        <param name="on_demand"
+               value="true"/>
+
+        <param name="host"
+               value="xps1210"/>
+
+
+        <param name="port"
+               value="4444"/>
+
+
+        <param name="command"
+               value="ping -n 20 localhost"/>
+
+
+        <param name="shell_cmd"
+               value="dir  ecjo &quot;hallo&quot; "/>
+    </params>
+    <run_time let_run="no">
+        <weekdays>
+            <day day="3"/>
+        </weekdays>
+    </run_time>
+</order>

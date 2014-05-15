@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<project name="SOSJobSchedulerModel" basedir=".">
+	
+	<property name="project.name" value="${ant.project.name}"> </property>
+	
+	<import file="../AntHelper/TargetDef4ReleaseBuild.xml" />
+</project>

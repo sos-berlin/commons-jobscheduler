@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<properties name="com.sos.SOSJobSchedulerModel">
+	<package>
+		<path>com/sos/SOSJobSchedulerModel</path>
+		<pref>com.sos.SOSJobSchedulerModel</pref> <!-- Wird verwendet für Dateiname des Jars -->
+	</package>
+	<main.class.name>${properties.package.pref}.NoMainClass</main.class.name>
+	<svn>
+		<target>
+			<url>http://subversion/svn/sos/SOSJobSchedulerModel</url>
+		</target>
+		<working.dir>./src/</working.dir> 
+	</svn>
+	<classpath>
+        <!--  wird nicht mehr benötigt -->	  
+	</classpath>
+	<javac>
+		<target>1.6</target> <!--  Bestandteil des Jar-Namens -->
+		<source>1.6</source>
+	</javac>
+	<settings>
+		<copyright>Copyright (c) 2011 SOS GmbH Berlin - www.sos-berlin.com -
+		</copyright>
+	</settings>
+</properties>

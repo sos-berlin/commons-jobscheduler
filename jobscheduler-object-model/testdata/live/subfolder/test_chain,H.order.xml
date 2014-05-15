@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<order>
+    <params>
+        <param name="successor"
+               value="I,folder1/J"/>
+
+
+        <param name="predecessor"
+               value=""/>
+
+        <param name="command"
+               value="ping -n 20 localhost"/>
+    </params>
+    <run_time let_run="no">
+        <period single_start="17:16"/>
+    </run_time>
+</order>

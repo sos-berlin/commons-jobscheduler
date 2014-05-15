@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<order title="schedule a jobnet">
+	<params>
+		<param name="JobNet" value="myJobNet" />
+		<param name="JobChainName" value="simple_jobnet" />
+		<param name="OrderId" value="/subfoldertest/A" />
+	</params>
+	<run_time />
+</order>

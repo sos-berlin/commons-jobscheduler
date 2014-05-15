@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<spooler>
+  <answer time="2011-01-19 11:32:49.734">
+  <ok>
+      <task job="/show_env" id="3722" task_id="3722" state="none" name="show_env" enqueued="2011-01-19 11:32:49.749" 
+      start_at="2011-01-19 11:32:49.734" steps="0" log_file="C:/Program Files (x86)/Scheduler/logs/scheduler-2011-01-19-105244.scheduler.log" force_start="yes">
+        <log level="debug9"/>
+      </task>
+    </ok>
+     
+       <job path="/start_java_release_build" name="start_java_release_build" job="start_java_release_build" state="running" title="Start Java Release Build" all_steps="4" all_tasks="5" log_file="C:/scheduler.1.3.10/logs/job.start_java_release_build.log" order="yes" tasks="1" in_period="yes" job_chain_priority="2" enabled="yes">
+      <file_based state="active" file="C:/scheduler.1.3.10/config/live/start_java_release_build.job.xml" last_write_time="2011-11-08T11:36:31.000Z">
+        <requisites>
+          <requisite type="Process_class" path=""/>
+        </requisites>
+      </file_based>
+      <tasks count="2">
+        <task job="/start_java_release_build" id="1497679" task="1497679" state="running_remote_process" name="" running_since="2011-11-21 19:14:51.875" start_at="never" cause="order" steps="0" log_file="C:/scheduler.1.3.10/logs/task.start_java_release_build.log" pid="7692" priority="normal" operation="Simple_operation(state=waiting,method=call(step))" force_start="no">
+          <order history_id="237162" path="/BuildJars,1" name="BuildJars,1" order="1" id="1" state="start" initial_state="start" job_chain="/BuildJars" job="/start_java_release_build" task="1497679" in_process_since="now" priority="0" created="2011-11-18 17:56:08.531" log_file="C:/scheduler.1.3.10/logs/order.BuildJars.1.log" touched="yes" start_time="2011-11-21 19:14:51.859">
+            <file_based state="active" file="C:/scheduler.1.3.10/config/live/BuildJars,1.order.xml" last_write_time="2011-11-07T16:21:30.000Z">
+              <requisites>
+                <requisite type="Job_chain" path="/buildjars"/>
+              </requisites>
+            </file_based>
+            <log level="info" highest_level="info" last_info="&#10;Order 1 - Protocol starts in C:/scheduler.1.3.10/logs/order.BuildJars.1.log" mail_on_error="yes" mail_on_warning="yes" smtp="smtp.sos" mail_from="scheduler.1.3.10@8of9" mail_to="oh@sos-berlin.com">2011-11-21 18:01:05.578 [info]   set_state start, Job /start_java_release_build
+</log>
+          </order>
+          <log level="info" highest_level="info" last_info="Buildfile: J:\E\java\scheduler_release\ant-all\ant-all.xml" mail_on_error="yes" mail_on_warning="yes" smtp="smtp.sos" mail_from="scheduler.1.3.10@8of9" mail_to="admin@sos-berlin.com" mail_cc="kb@sos-berlin.com">2011-11-21 19:14:51.875 [info]   SCHEDULER-842  Task is going to process Order BuildJars:1, state=start, on Scheduler http://8of9:4210
+</log>
+        </task>
+        <task job="/start_java_release_build" id="1497679" task="1497679" state="running_remote_process" name="" running_since="2011-11-21 19:14:51.875" start_at="never" cause="order" steps="0" log_file="C:/scheduler.1.3.10/logs/task.start_java_release_build.log" pid="7692" priority="normal" operation="Simple_operation(state=waiting,method=call(step))" force_start="no">
+          <order history_id="237162" path="/BuildJars,1" name="BuildJars,1" order="1" id="1" state="start" initial_state="start" job_chain="/BuildJars" job="/start_java_release_build" task="1497679" in_process_since="now" priority="0" created="2011-11-18 17:56:08.531" log_file="C:/scheduler.1.3.10/logs/order.BuildJars.1.log" touched="yes" start_time="2011-11-21 19:14:51.859">
+            <file_based state="active" file="C:/scheduler.1.3.10/config/live/BuildJars,1.order.xml" last_write_time="2011-11-07T16:21:30.000Z">
+              <requisites>
+                <requisite type="Job_chain" path="/buildjars"/>
+              </requisites>
+            </file_based>
+            <log level="info" highest_level="info" last_info="&#10;Order 1 - Protocol starts in C:/scheduler.1.3.10/logs/order.BuildJars.1.log" mail_on_error="yes" mail_on_warning="yes" smtp="smtp.sos" mail_from="scheduler.1.3.10@8of9" mail_to="oh@sos-berlin.com">2011-11-21 18:01:05.578 [info]   set_state start, Job /start_java_release_build
+</log>
+          </order>
+          <log level="info" highest_level="info" last_info="Buildfile: J:\E\java\scheduler_release\ant-all\ant-all.xml" mail_on_error="yes" mail_on_warning="yes" smtp="smtp.sos" mail_from="scheduler.1.3.10@8of9" mail_to="admin@sos-berlin.com" mail_cc="kb@sos-berlin.com">2011-11-21 19:14:51.875 [info]   SCHEDULER-842  Task is going to process Order BuildJars:1, state=start, on Scheduler http://8of9:4210
+</log>
+        </task>
+      </tasks>
+      <queued_tasks length="0"/>
+      <order_queue length="1"/>
+      <log level="info" highest_level="info" last_info="SCHEDULER-930  Task 1497679 started - cause: Order BuildJars:1" mail_on_error="yes" mail_on_warning="yes" smtp="smtp.sos" mail_from="scheduler.1.3.10@8of9" mail_to="admin@sos-berlin.com" mail_cc="kb@sos-berlin.com">2011-11-18 17:56:09.031 [info]   SCHEDULER-891  Configuration file 'C:/scheduler.1.3.10/config/live/start_java_release_build.job.xml' (2011-11-08 11:36:31.000 UTC) is going to be be loaded into this new Job
+2011-11-18 17:56:11.859 [info]   
+2011-11-18 17:56:11.859 [info]   Job start_java_release_build - Protocol starts in C:/scheduler.1.3.10/logs/job.start_java_release_build.log
+2011-11-18 17:56:12.890 [info]   SCHEDULER-893  Job is 'active' now
+2011-11-18 23:00:00.093 [info]   SCHEDULER-930  Task 1496280 started - cause: Order BuildJars:1
+2011-11-19 23:00:00.031 [info]   SCHEDULER-930  Task 1496514 started - cause: Order BuildJars:1
+2011-11-20 23:00:00.046 [info]   SCHEDULER-930  Task 1496631 started - cause: Order BuildJars:1
+2011-11-21 17:52:13.578 [info]   SCHEDULER-930  Task 1497531 started - cause: Order BuildJars:1
+2011-11-21 19:14:51.875 [info]   SCHEDULER-930  Task 1497679 started - cause: Order BuildJars:1
+</log>
+    </job>
+  
+    
+    
+  </answer>
+</spooler>

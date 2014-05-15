@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<order>
+    <params>
+        <param name="successor"
+               value="../I"/>
+
+
+        <param name="predecessor"
+               value="../H"/>
+
+        <param name="command"
+               value="ping -n 20 localhost"/>
+    </params>
+    <run_time let_run="no"/>
+</order>

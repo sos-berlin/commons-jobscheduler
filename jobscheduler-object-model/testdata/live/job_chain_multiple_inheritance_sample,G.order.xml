@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<order>
+    <params>
+        <param name="successor"
+               value=""/>
+
+
+        <param name="predecessor"
+               value="B,D"/>
+
+
+        <param name="host"
+               value="xps1210"/>
+
+
+        <param name="port"
+               value="4444"/>
+
+
+        <param name="command"
+               value="ping -n 20 localhost"/>
+    </params>
+    <run_time let_run="no">
+      <period begin="00:00" end="24:00" />
+    </run_time>
+</order>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="spooler">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="answer"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="answer">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ok"/>
+        <xs:element ref="job"/>
+      </xs:sequence>
+      <xs:attribute name="time" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ok">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="task"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="job">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="file_based"/>
+        <xs:element ref="tasks"/>
+        <xs:element ref="queued_tasks"/>
+        <xs:element ref="order_queue"/>
+        <xs:element ref="log"/>
+      </xs:sequence>
+      <xs:attribute name="all_steps" use="required" type="xs:integer"/>
+      <xs:attribute name="all_tasks" use="required" type="xs:integer"/>
+      <xs:attribute name="enabled" use="required" type="xs:NCName"/>
+      <xs:attribute name="in_period" use="required" type="xs:NCName"/>
+      <xs:attribute name="job" use="required" type="xs:NCName"/>
+      <xs:attribute name="job_chain_priority" use="required" type="xs:integer"/>
+      <xs:attribute name="log_file" use="required" type="xs:anyURI"/>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+      <xs:attribute name="order" use="required" type="xs:NCName"/>
+      <xs:attribute name="path" use="required"/>
+      <xs:attribute name="state" use="required" type="xs:NCName"/>
+      <xs:attribute name="tasks" use="required" type="xs:integer"/>
+      <xs:attribute name="title" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="tasks">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="task"/>
+      </xs:sequence>
+      <xs:attribute name="count" use="required" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="queued_tasks">
+    <xs:complexType>
+      <xs:attribute name="length" use="required" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="order_queue">
+    <xs:complexType>
+      <xs:attribute name="length" use="required" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="task">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="order"/>
+        <xs:element ref="log"/>
+      </xs:sequence>
+      <xs:attribute name="cause" type="xs:NCName"/>
+      <xs:attribute name="enqueued"/>
+      <xs:attribute name="force_start" use="required" type="xs:NCName"/>
+      <xs:attribute name="id" use="required" type="xs:integer"/>
+      <xs:attribute name="job" use="required"/>
+      <xs:attribute name="log_file" use="required" type="xs:anyURI"/>
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="operation"/>
+      <xs:attribute name="pid" type="xs:integer"/>
+      <xs:attribute name="priority" type="xs:NCName"/>
+      <xs:attribute name="running_since"/>
+      <xs:attribute name="start_at" use="required"/>
+      <xs:attribute name="state" use="required" type="xs:NCName"/>
+      <xs:attribute name="steps" use="required" type="xs:integer"/>
+      <xs:attribute name="task" type="xs:integer"/>
+      <xs:attribute name="task_id" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="order">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="file_based"/>
+        <xs:element ref="log"/>
+      </xs:sequence>
+      <xs:attribute name="created" use="required"/>
+      <xs:attribute name="history_id" use="required" type="xs:integer"/>
+      <xs:attribute name="id" use="required" type="xs:integer"/>
+      <xs:attribute name="in_process_since" use="required" type="xs:NCName"/>
+      <xs:attribute name="initial_state" use="required" type="xs:NCName"/>
+      <xs:attribute name="job" use="required"/>
+      <xs:attribute name="job_chain" use="required"/>
+      <xs:attribute name="log_file" use="required" type="xs:anyURI"/>
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="order" use="required" type="xs:integer"/>
+      <xs:attribute name="path" use="required"/>
+      <xs:attribute name="priority" use="required" type="xs:integer"/>
+      <xs:attribute name="start_time" use="required"/>
+      <xs:attribute name="state" use="required" type="xs:NCName"/>
+      <xs:attribute name="task" use="required" type="xs:integer"/>
+      <xs:attribute name="touched" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="file_based">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="requisites"/>
+      </xs:sequence>
+      <xs:attribute name="file" use="required" type="xs:anyURI"/>
+      <xs:attribute name="last_write_time" use="required" type="xs:NMTOKEN"/>
+      <xs:attribute name="state" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="requisites">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="requisite"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="requisite">
+    <xs:complexType>
+      <xs:attribute name="path" use="required"/>
+      <xs:attribute name="type" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="log">
+    <xs:complexType mixed="true">
+      <xs:attribute name="highest_level" type="xs:NCName"/>
+      <xs:attribute name="last_info"/>
+      <xs:attribute name="level" use="required" type="xs:NCName"/>
+      <xs:attribute name="mail_cc"/>
+      <xs:attribute name="mail_from"/>
+      <xs:attribute name="mail_on_error" type="xs:NCName"/>
+      <xs:attribute name="mail_on_warning" type="xs:NCName"/>
+      <xs:attribute name="mail_to"/>
+      <xs:attribute name="smtp" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

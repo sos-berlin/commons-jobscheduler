@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<spooler>
+  <answer time="2011-01-19 11:32:49.734">
+    <ERROR time="2011-01-19 11:51:31" code="SCHEDULER-161" text="SCHEDULER-161  There is no Job '/willi'"/>  
+    <ok>
+      <task job="/show_env" id="3722" task="3722" state="none" name="show_env" enqueued="2011-01-19 11:32:49.749" 
+      start_at="2011-01-19 11:32:49.734" steps="0" log_file="C:/Program Files (x86)/Scheduler/logs/scheduler-2011-01-19-105244.scheduler.log" force_start="yes">
+        <log level="debug9"/>
+      </task>
+    </ok>
+  </answer>
+</spooler>

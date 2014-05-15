@@ -1,0 +1,1 @@
+xjc -d ../src -nv -extension -p com.sos.scheduler.model.events events.xsd -b externalBind.xml

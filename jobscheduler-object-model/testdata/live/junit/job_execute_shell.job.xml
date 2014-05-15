@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<job order="yes"
+     stop_on_error="no"
+     tasks="5">
+    <params>
+        <param name="waiting_time"
+               value="2"/>
+
+
+        <param name="waiting_count"
+               value="5"/>
+
+
+        <param name="jobnet"
+               value="ncfast_multiple_inheritance"/>
+    </params>
+    <script language="shell">
+        <![CDATA[
+%scheduler_param_command%
+        ]]>
+    </script>
+    <monitor name="multiple_inheritance"
+             ordering="0">
+        <script language="javascript">
+            <![CDATA[
+function spooler_task_before() {
+  var order = spooler_task.order;
+  var host = spooler.hostname;
+  var port = spooler.tcp_port;
+  
+  var myHost = order.params.value("host");
+  var myPort = order.params.value("port");
+  var skip = order.params.value("skip");
+
+
+
+// Checking wether starting on main cluster member
+  if (myHost != host || myPort != port){
+    order.state="ignored";
+  }
+
+// Checking wether node is skipped
+   if (skip == "true"){
+      order.state="skipped";
+   }
+   
+    return true;
+}
+
+
+
+function spooler_process_after(spooler_process_result){
+  spooler_task.order.params.merge(spooler_task.params);
+  var order = spooler_task.order;
+  var params = order.params;
+  
+  var successor = params.value("successor");
+  var arrSuccessor = successor.split(',');
+  
+   	for( var i=0; i < arrSuccessor.length; i++ ) {
+       succ   = arrSuccessor[i];
+       if( !check_run( succ, 20 ) ) {
+          spooler_log.info("Starting order " +  params.value("jobnet") + "/" + succ );
+          spooler.execute_xml("<modify_order job_chain=\""+params.value("jobnet")+"/job_chain_multiple_inheritance_sample\" order=\"" + succ +  "\" at=\"now\"></modify_order> ");    	
+      }
+    }
+    
+
+  
+  spooler_task.order.state_text = "";
+  return true;
+}
+
+function spooler_process_before(){
+	var ok                    = true;
+	var  startTime            = '300';
+	
+  var init_waiting_count = spooler_task.params.value("waiting_count");
+  var akt_waiting_count = spooler_task.order.params.value("waiting_count");
+
+  spooler_task.order.params.merge(spooler_task.params);
+  var order = spooler_task.order;
+  var params = order.params;
+  spooler_log.info("Starting job::: " + order.id);
+  spooler.execute_xml("<modify_job cmd  	= \"start\"	job  	=    \"" + order.id + "\"	/>"  );
+  var waiting_time = params.value("waiting_time");
+  var waiting_count = akt_waiting_count;
+  if (waiting_count == "" || waiting_count == null){
+     waiting_count = init_waiting_count;
+  }
+
+  var predecessor = params.value("predecessor");
+  var successor = params.value("successor");
+
+  spooler_log.info("waiting_time:" + waiting_time);
+  spooler_log.info("predecessor:" + predecessor);
+  spooler_log.info("waiting_count:" + waiting_count);
+
+  waiting_count = waiting_count - 1;
+
+  startTime                 = parseInt(startTime, 10);
+  var now                   = new Date();
+  startTime                 = now.getTime() - ( startTime*1000 );
+  var arrJobNames         	= predecessor.split(',');
+  var act_waitingfor = "";        	
+  for( var i=0; i < arrJobNames.length; i++ ) {
+     	jobname           	    = arrJobNames[i].replace(/^\s+/,'').replace(/\s+$/,'');
+     	if( !jobname ) { continue; }
+     	if( !check_run( jobname, startTime ) ) {
+       		ok                  	= false;
+       		act_waitingfor = act_waitingfor + jobname + ' ';
+     	 }
+   }
+          
+   
+  if (!ok){
+
+     if (waiting_count > 0){
+        java.lang.Thread.sleep(waiting_time*1000);
+        spooler_task.order.state_text = "Waiting for " + params.value("predecessor") +  "::" + act_waitingfor + " missing";
+        params.set_var("waiting_count", waiting_count);
+        spooler_task.order.state=spooler_task.order.state;
+     }else{ 
+        params.set_var("waiting_count", "");
+        spooler_task.order.state_text = "";
+        order.state = "error";
+     }
+  } 
+
+  return true;
+}
+
+ function check_run( jobname, startTime ) {
+          
+            var ok                = false;
+            //look into job history
+            var command_xml       = '<show_job job="'+jobname+'" what="task_history" max_task_history="1" max_orders="0" />';
+            spooler_log.info("...command = " + command_xml);
+            
+            var history_xml       = spooler.execute_xml(command_xml);
+            spooler_log.info("...answer = " + history_xml);
+            
+            //extract value of text attribute from error element in history xml
+            var error_msg         = get_attribute( 'text', 'ERROR', history_xml );
+            
+            //extract value of end_time attribute from history.entry element in history xml
+            var end_timestamp     = get_attribute( 'end_time', 'history.entry', history_xml );
+              
+            //check if end_time attribute value younger than startTime
+            var pattern           = /(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/;
+            if( end_timestamp && pattern.test( end_timestamp ) ) {
+              pattern.exec( end_timestamp );
+              var last_job_end    = new Date(parseInt(RegExp.$1,10),(parseInt(RegExp.$2,10)-1),parseInt(RegExp.$3,10),parseInt(RegExp.$4,10),parseInt(RegExp.$5,10),parseInt(RegExp.$6,10));
+              ok                  = ( last_job_end.getTime() >= startTime );
+            }
+            
+            if( error_msg && ok ) {
+              ok                  = false;
+              spooler_log.info( '...last run of ' + jobname + ' on ' + end_timestamp );
+              spooler_log.info( '...with error: ' + error_msg );
+            }
+              
+            if( ok ) spooler_log.info( '...last successfully run of ' + jobname + ' on ' + end_timestamp );
+            
+            return ok;
+        }
+        
+        
+        
+        function get_attributes( elem, xmlsrc ) {
+        
+          var pattern               = new RegExp('.*<'+elem+'([^>]+)>.*');
+          if( pattern.test( xmlsrc ) ) {
+            pattern.exec( xmlsrc );
+            return RegExp.$1;
+          }
+          return '';
+        }
+        
+        function get_attribute( attribute, elem, xmlsrc ) {
+        
+          var attributes            = get_attributes( elem, xmlsrc );
+          var pattern               = new RegExp('.*\s*'+attribute+'\s*=\s*"([^"]+)".*');
+          if( attributes && pattern.test( attributes ) ) {
+            pattern.exec( attributes );
+            return RegExp.$1;
+          }
+          return '';
+        }
+            ]]>
+        </script>
+    </monitor>
+    <run_time/>
+</job>

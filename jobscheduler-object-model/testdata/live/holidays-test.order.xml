@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<order title="create a job net for a given order">
+	<params>
+		<param name="JobNet" value="myJobNet" />
+		<param name="JobChainName" value="job_chain_multiple_inheritance_sample" />
+		<param name="OrderId" value="A" />
+		<!-- 
+        <param name="LiveFolder" value="C:/ProgramData/sos-berlin.com/jobscheduler/scheduler-1.3.12.2032/config/live" />
+        <param name="hibernate_connection_config_file" value="C:/scheduler/ncfast/com.sos.jobnet/hibernate.cfg.xml" />
+         -->
+	</params>
+  <run_time>
+    <holidays> 
+      <include live_file="/weekdays.xml"/> 
+    </holidays> 
+  </run_time>
+</order>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<order title="schedule a jobnet">
+	<params>
+		<param name="JobNet" value="ncfastJobNet" />
+		<param name="JobChainName" value="CloseofBusinessIndicator" />
+		<param name="OrderId" value="/CloseofBusinessIndicator/CloseofBusinessIndicator" />
+	</params>
+	<run_time />
+</order>

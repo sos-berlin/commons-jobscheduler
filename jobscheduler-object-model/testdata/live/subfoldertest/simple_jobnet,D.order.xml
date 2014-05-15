@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<order>
+    <params>
+        <param name="successor"
+               value=""/>
+
+
+        <param name="predecessor"
+               value="B,C"/>
+
+        <param name="command"
+               value="ping -n 20 localhost"/>
+    </params>
+    <run_time let_run="no">
+        <weekdays>
+            <day day="6"/>
+        </weekdays>
+    </run_time>
+</order>

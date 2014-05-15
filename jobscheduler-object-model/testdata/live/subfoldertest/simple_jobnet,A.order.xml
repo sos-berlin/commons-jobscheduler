@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<order title="Start Jobnet">
+    <params>
+        <param name="successor"
+               value="B,C"/>
+
+
+        <param name="predecessor"
+               value=""/>
+
+
+        <param name="command"
+               value="ping -n 1 localhost"/>
+
+
+        <param name="on_demand"
+               value="true"/>
+    </params>
+    <run_time let_run="no">
+        <period single_start="13:28"/>
+    </run_time>
+</order>

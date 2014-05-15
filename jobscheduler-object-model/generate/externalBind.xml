@@ -1,0 +1,27 @@
+<jxb:bindings version="1.0"
+  xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  
+  <jxb:bindings schemaLocation="events.xsd" node="/xs:schema"> 
+  	
+  	<jxb:globalBindings
+    	typesafeEnumMemberName = "generateName"/> 
+    
+    <jxb:schemaBindings>
+    	<jxb:package name="primer.myPo">
+        <jxb:javadoc><![CDATA[<body>Package level documentation for generated package primer.myPo.</body>]]>
+				</jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+  			<jxb:typeName suffix="type" />
+			</jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+    
+    <!--jxb:bindings node="//xs:element[position()=1 and @name='order']">
+      <jxb:nameXmlTransform>
+        <jxb:typeName suffix="Type"/>
+      </jxb:nameXmlTransform>
+    </jxb:bindings-->
+
+  </jxb:bindings>
+</jxb:bindings>

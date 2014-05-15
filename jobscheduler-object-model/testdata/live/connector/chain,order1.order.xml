@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<order title="schedule the complete ncfast jobnet">
+    <params>
+        <param name="JobNet"
+               value="ncfastJobNet"/>
+
+
+        <param name="JobChainName"
+               value="CloseofBusinessIndicator"/>
+
+
+        <param name="OrderId"
+               value="/CloseofBusinessIndicator/CloseofBusinessIndicator"/>
+
+
+        <param name="MaxJobNetNodes"
+               value="1000"/>
+    </params>
+    <run_time/>
+</order>

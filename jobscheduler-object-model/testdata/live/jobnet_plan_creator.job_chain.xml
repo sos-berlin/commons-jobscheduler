@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<job_chain orders_recoverable="yes"
+           visible="yes">
+    <job_chain_node state="100"
+                    job="/jobnet/jobnet_plan_creator"
+                    next_state="200"
+                    error_state="error"
+                    on_error="suspend"/>
+    <job_chain_node state="200"
+                    job="/jobnet/frequency_checker"
+                    next_state="300"
+                    error_state="error"/>
+    <job_chain_node state="300"
+                    job="/jobnet/jobnet_plan_executor"
+                    next_state="success"
+                    error_state="error"
+                    on_error="suspend"/>
+    <job_chain_node state="success"/>
+    <job_chain_node state="error"/>
+</job_chain>

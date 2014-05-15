@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job order="yes" stop_on_error="no" tasks="3">
+   <params>
+      <param name="hibernate_connection_config_file" value="config/hibernate.cfg.xml"/>
+   </params>
+   <environment>
+      <variable name="SOS_LOCALE" value="en"/>
+   </environment>
+   <script language="javascript"><![CDATA[
+        function spooler_process() {
+        
+          var scriptToExecute       = spooler_task.order.params.value('script_to_execute');
+          var sleepTime							= Math.floor(((Math.random()*1.5)+ 0.5)*10000); //between 5s and 20s
+          
+          spooler_log.info('...running job ' + scriptToExecute);
+          spooler_log.info('...job sleeps for ' + sleepTime + 'ms');
+          java.lang.Thread.sleep(sleepTime);
+          spooler_log.info('...completed job ' + scriptToExecute);
+          
+          return true;
+        }
+   ]]></script>
+   <monitor name="multiple_inheritance" ordering="0">
+      <script language="java" java_class_path=""
+              java_class="com.sos.jobnet.jobs.JobNetWaitAndDispatch"/>
+   </monitor>
+   <run_time/>
+</job>
