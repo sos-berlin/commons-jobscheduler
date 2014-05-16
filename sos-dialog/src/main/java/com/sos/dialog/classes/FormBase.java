@@ -51,7 +51,7 @@ import com.sos.hibernate.classes.SosSortTableItem;
  *
  */
 public class FormBase extends JSToolBox {
-	private static final int				RIGHT_MOUSE_BUTTON					= 3;
+	public static final int				RIGHT_MOUSE_BUTTON					= 3;
 
 	@SuppressWarnings("unused")
 	private final String		conClassName	= "FormBase";
