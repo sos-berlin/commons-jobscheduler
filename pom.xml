@@ -14,13 +14,6 @@
     <name>${project.artifactId}</name>
     <inceptionYear>2014</inceptionYear>
 
-    <scm>
-        <connection>scm:svn:http://subversion.sos/svn/sos/java.sources/tags/products/jobscheduler</connection>
-        <developerConnection>scm:svn:http://subversion.sos/svn/sos/java.sources/trunk/products/jobscheduler</developerConnection>
-        <url>http://subversion.sos/svn/sos/java.sources/trunk/products/jobscheduler</url>
-    </scm>
-
-
     <modules>
         <module>data-exchange</module>
         <module>ftp-history</module>
