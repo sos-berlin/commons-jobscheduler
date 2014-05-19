@@ -129,7 +129,7 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 	public String[] getSubFolderArray() {
 		String[] strRet = null;
 		try {
-			String path = strValue;
+			String path = strValue.trim().replaceAll("/(\\s*/)+","/");
 			String strPath = "";
 			String strSlash = "";
 			int iStart = 0;
@@ -141,12 +141,36 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 			strRet = new String[pathArray.length];
 			int i = 0;
 			for (String strSubFolder : pathArray) {
-				if (strSubFolder.trim().length() > 0) {
-					strPath += strSlash + strSubFolder;
-					strSlash = "/";
-					strRet[i] = strPath;
-				}
+				strPath += strSlash + strSubFolder;
+				strSlash = "/";
+				strRet[i] = strPath;
 				i++;
+			}
+		}
+		catch (Exception e) {
+		}
+		return strRet;
+	}
+	
+	public String[] getSubFolderArrayReverse() {
+		String[] strRet = null;
+		try {
+			String path = strValue.trim().replaceAll("/(\\s*/)+","/");
+			String strPath = "";
+			String strSlash = "";
+			int iStart = 0;
+			if (path.startsWith("/")) {
+				strSlash = "/";
+				iStart = 1;
+			}
+			String[] pathArray = path.substring(iStart).split("/");
+			strRet = new String[pathArray.length];
+			int i = pathArray.length-1;
+			for (String strSubFolder : pathArray) {
+				strPath += strSlash + strSubFolder;
+				strSlash = "/";
+				strRet[i] = strPath;
+				i--;
 			}
 		}
 		catch (Exception e) {
