@@ -69,10 +69,12 @@ public class SOSOptionFileName extends SOSOptionStringWVariables {
 	public String ValueWithFileSeparator() {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::Value";
 		String strT = strValue.trim();
-		if (strValue.endsWith("/") || strValue.endsWith("\\")) {
-		}
-		else {
-			strT = strValue + "/";
+		if (IsNotEmpty()) {  // http://www.sos-berlin.com/jira/browse/SOSFTP-198
+			if (strValue.endsWith("/") || strValue.endsWith("\\")) {
+			}
+			else {
+				strT = strValue + "/";
+			}
 		}
 		return strT;
 	} // private String Value
@@ -101,13 +103,13 @@ public class SOSOptionFileName extends SOSOptionStringWVariables {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::Value";
 		strOriginalValue = pstrStringValue;
 		String strT = pstrStringValue;
-		if (strT.length() > 2 && (strT.startsWith("./") || strT.startsWith(".\\"))) {  // relative path/file location (must be "./" 
+		if (strT.length() > 2 && (strT.startsWith("./") || strT.startsWith(".\\"))) { // relative path/file location (must be "./" 
 			strT = strT.replaceFirst("\\.", Matcher.quoteReplacement(getUserDir()));
 		}
 		super.Value(strT);
 	} // public void Value
-	
-	public String getRelativeValue () {
+
+	public String getRelativeValue() {
 		return strOriginalValue;
 	}
 }
