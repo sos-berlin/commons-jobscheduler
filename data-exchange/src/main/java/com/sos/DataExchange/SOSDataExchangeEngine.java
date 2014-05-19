@@ -1041,14 +1041,19 @@ public class SOSDataExchangeEngine extends JadeBaseEngine implements Runnable, I
 	 *
 	 */
 	public void sendTransferHistory() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::sendTransferHistory";
-		String strBackgroundServiceHostName = objOptions.scheduler_host.Value();
-		if (isEmpty(strBackgroundServiceHostName)) {
-//			Messages is null
-//			logger.debug(Messages.getMsg("No data sent to the background service due to missing host name"));
-			logger.debug("No data sent to the background service due to missing host name");
-		}
-		else {
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::sendTransferHistory";
+		if (objOptions.SendTransferHistory.isTrue()) {
+			String strBackgroundServiceHostName = objOptions.scheduler_host.Value();
+			if (isEmpty(strBackgroundServiceHostName)) {
+				logger.debug("No data sent to the background service due to missing host name");
+				return;
+			}
+			if (objOptions.scheduler_port.isNotDirty()) {
+				logger.debug("No data sent to the background service due to missing port number");
+				return;
+			}
+
 			for (SOSFileListEntry objEntry : objSourceFileList.List()) {
 				if (sendTransferHistory4File(objEntry)) {
 					lngNoOfTransferHistoryRecordsSent++;
@@ -1057,7 +1062,11 @@ public class SOSDataExchangeEngine extends JadeBaseEngine implements Runnable, I
 			// TODO I18N
 			logger.debug(String.format("%1$d transfer history records sent to background service", lngNoOfTransferHistoryRecordsSent));
 		}
+		else {
+			logger.info(String.format("No data sent to the background service due to parameter '%1$s' = false", objOptions.SendTransferHistory.getShortKey()));
+		}
 	} // private void sendTransferHistory
+	
 	SchedulerObjectFactory	objFactory	= null;
 
 	/**
