@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 
 import com.sos.JSHelper.Basics.JSJobUtilities;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.JSHelper.Options.SOSOptionHostName;
 import com.sos.JSHelper.Options.SOSOptionPortNumber;
 import com.sos.JSHelper.Options.SOSOptionTransferMode;
@@ -1286,18 +1287,11 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 	@Override public void mkdir(final String pstrPathName) {
 		final String conMethodName = conClassName + "::mkdir";
 		try {
-			String strPath = "";
-			if (pstrPathName.startsWith("/")) {
-				strPath = "/";
-			}
-			String[] strP = pstrPathName.split("/");
-			for (String strSubFolder : strP) {
-				if (strSubFolder.trim().length() > 0) {
-					strPath += strSubFolder + "/";
-					Client().makeDirectory(strPath);
-					logger.debug(HostID(SOSVfs_E_0106.params(conMethodName, strPath, getReplyString())));
-					// logger.debug(HostID("..ftp server reply [mkdir] [" + strPath + "]: " + getReplyString()));
-				}
+			SOSOptionFolderName objF = new SOSOptionFolderName(pstrPathName);
+			logger.debug(HostID(SOSVfs_D_179.params("mkdir", pstrPathName)));
+			for (String strSubFolder : objF.getSubFolderArray()) {
+				Client().makeDirectory(strSubFolder);
+				logger.debug(HostID(SOSVfs_E_0106.params(conMethodName, strSubFolder, getReplyString())));
 			}
 			// logger.debug(HostID("..ftp server reply [mkdir] [" + pstrPathName + "]: " + getReplyString()));
 		}
@@ -1585,16 +1579,22 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 	@Override public final void rmdir(final String pstrPathName) throws IOException {
 		final String conMethodName = conClassName + "::rmdir";
 		try {
-			String[] strP = pstrPathName.split("/");
-			for (int i = strP.length; i > 0; i--) {
-				String strT = "";
-				for (int j = 0; j < i; j++) {
-					strT += strP[j] + "/";
-				}
-				logger.debug(HostID(SOSVfs_E_0106.params(conMethodName, pstrPathName, getReplyString())));
-				// logger.debug(HostID("..ftp server reply [rmdir] [" + strT + "]: " + getReplyString()));
+			SOSOptionFolderName objF = new SOSOptionFolderName(pstrPathName);
+			for (String subfolder : objF.getSubFolderArrayReverse()) {
+				String strT = subfolder + "/";
 				Client().removeDirectory(strT);
+				logger.debug(HostID(SOSVfs_E_0106.params(conMethodName, strT, getReplyString())));
 			}
+//			String[] strP = pstrPathName.split("/");
+//			for (int i = strP.length; i > 0; i--) {
+//				String strT = "";
+//				for (int j = 0; j < i; j++) {
+//					strT += strP[j] + "/";
+//				}
+//				logger.debug(HostID(SOSVfs_E_0106.params(conMethodName, pstrPathName, getReplyString())));
+//				// logger.debug(HostID("..ftp server reply [rmdir] [" + strT + "]: " + getReplyString()));
+//				Client().removeDirectory(strT);
+//			}
 		}
 		catch (Exception e) {
 			String strM = HostID(SOSVfs_E_0105.params(conMethodName));

@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.omg.SendingContext.RunTime;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
@@ -23,6 +24,7 @@ import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
 import com.jcraft.jsch.SftpProgressMonitor;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.JSHelper.Options.SOSOptionInFileName;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
@@ -256,22 +258,23 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
 	@Override
 	public void mkdir(final String path) {
 		try {
-			reply = "";
-			String strPath = "";
-			String[] pathArray = path.split("/");
-			for (String strSubFolder : pathArray) {
-				if (strSubFolder.trim().length() > 0) {
-					strPath += strSubFolder + "/";
-					logger.debug(HostID(SOSVfs_D_179.params("mkdir", strPath)));
-
-					this.getClient().mkdir(strPath);
-					this.getClient().chmod(484, strPath);
-					reply = "mkdir OK";
-					logger.debug(HostID(SOSVfs_D_181.params("mkdir", strPath, getReplyString())));
+			SOSOptionFolderName objF = new SOSOptionFolderName(path);
+			reply = "mkdir OK";
+			logger.debug(HostID(SOSVfs_D_179.params("mkdir", path)));
+			for (String strSubFolder : objF.getSubFolderArray()) {
+				SftpATTRS attributes = getAttributes(strSubFolder);
+				if (attributes == null) {
+					this.getClient().mkdir(strSubFolder);
+//					this.getClient().chmod(484, strSubFolder); //was ist chmod 484?
+				}
+				else {
+					if (attributes.isDir() == false) {
+						RaiseException(SOSVfs_E_277.params(strSubFolder));
+					}
 				}
 			}
 			// DoCD(strCurrentDir);
-			logINFO(HostID(SOSVfs_D_181.params("mkdir", path, getReplyString())));
+			logger.debug(HostID(SOSVfs_D_181.params("mkdir", path, getReplyString())));
 		}
 		catch (Exception e) {
 			reply = e.toString();
@@ -287,25 +290,49 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
 	@Override
 	public void rmdir(final String path) {
 		try {
+			SOSOptionFolderName objF = new SOSOptionFolderName(path);
 			reply = "rmdir OK";
-			String[] pathArray = path.split("/");
-			for (int i = pathArray.length; i > 0; i--) {
-				String strT = "";
-				for (int j = 0; j < i; j++) {
-					strT += pathArray[j] + "/";
-				}
+			for (String subfolder : objF.getSubFolderArrayReverse()) {
+				String strT = subfolder + "/";
 				logger.debug(HostID(SOSVfs_D_179.params("rmdir", strT)));
 				this.getClient().rmdir(strT);
-
 				reply = "rmdir OK";
 				logger.debug(HostID(SOSVfs_D_181.params("rmdir", strT, getReplyString())));
 			}
+//			String[] pathArray = path.split("/");
+//			for (int i = pathArray.length; i > 0; i--) {
+//				String strT = "";
+//				for (int j = 0; j < i; j++) {
+//					strT += pathArray[j] + "/";
+//				}
+//				logger.debug(HostID(SOSVfs_D_179.params("rmdir", strT)));
+//				this.getClient().rmdir(strT);
+//
+//				reply = "rmdir OK";
+//				logger.debug(HostID(SOSVfs_D_181.params("rmdir", strT, getReplyString())));
+//			}
 			logINFO(HostID(SOSVfs_D_181.params("rmdir", path, getReplyString())));
 		}
 		catch (Exception e) {
 			reply = e.toString();
 			RaiseException(e, SOSVfs_E_134.params("[rmdir]"));
 		}
+	}
+	
+	/**
+	 * returns attributes
+	 *
+	 * @param filename
+	 * @return SftpATTRS
+	 */
+	public SftpATTRS getAttributes(final String filename) {
+		SftpATTRS attributes = null;
+		try {
+			attributes = this.getClient().stat(filename);
+		}
+		catch (Exception e) {
+		}
+		return attributes;
 	}
 
 	/**

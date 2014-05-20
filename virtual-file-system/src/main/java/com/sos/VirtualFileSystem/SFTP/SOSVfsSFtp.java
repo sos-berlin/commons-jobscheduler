@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 
 import com.sos.JSHelper.Basics.JSJobUtilities;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.JSHelper.Options.SOSOptionHostName;
 import com.sos.JSHelper.Options.SOSOptionInFileName;
 import com.sos.JSHelper.Options.SOSOptionPortNumber;
@@ -148,6 +149,23 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
 		if (isConnected() == false)
 			this.connect(hostname, 22);
 	}
+	
+	/**
+	 * returns attributes
+	 *
+	 * @param filename
+	 * @return SftpATTRS
+	 */
+	public SFTPv3FileAttributes getAttributes(final String filename) {
+		SFTPv3FileAttributes attributes = null;
+		try {
+			attributes = this.getClient().lstat(filename);
+		}
+		catch (Exception e) {
+			attributes = null;
+		}
+		return attributes;
+	}
 
 	/**
 	 * Creates a new subdirectory on the FTP server in the current directory .
@@ -158,30 +176,23 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
 	@Override
 	public void mkdir(final String pstrPathName) {
 		try {
+			SOSOptionFolderName objF = new SOSOptionFolderName(pstrPathName);
 			reply = "mkdir OK";
-			String strPath = "";
-			if (pstrPathName.startsWith("/")) {
-				strPath = "/";
-			}
-			String[] strP = pstrPathName.split("/");
-			for (String strSubFolder : strP) {
-				if (strSubFolder.trim().length() > 0) {
-					strPath += strSubFolder + "/";
-					SFTPv3FileAttributes objFA;
-					try {
-						objFA = Client().lstat(strPath);
-					}
-					catch (Exception e) {
-						objFA = null;
-					}
-					if (objFA == null) {
-						Client().mkdir(strPath, 484);
-						logger.debug(HostID(SOSVfs_D_135.params("[mkdir]", strPath, getReplyString())));
+			logger.debug(HostID(SOSVfs_D_179.params("mkdir", pstrPathName)));
+			for (String strSubFolder : objF.getSubFolderArray()) {
+				SFTPv3FileAttributes attributes = getAttributes(strSubFolder);
+				if (attributes == null) {
+					Client().mkdir(strSubFolder, 484);
+//					logger.debug(HostID(SOSVfs_D_135.params("[mkdir]", strSubFolder, getReplyString())));
+				}
+				else {
+					if (attributes.isDirectory() == false) {
+						RaiseException(SOSVfs_E_277.params(strSubFolder));
 					}
 				}
 			}
-			//			DoCD(strCurrentDir);
-			//			logger.debug(HostID(SOSVfs_D_135.params(pstrPathName, getReplyString(), "mkdir")));
+//			DoCD(strCurrentDir);
+			logger.debug(HostID(SOSVfs_D_181.params("mkdir", pstrPathName, getReplyString())));
 		}
 		catch (IOException e) {
 			throw new JobSchedulerException(HostID(SOSVfs_E_130.params("makeDirectory()")), e);
@@ -196,16 +207,22 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
 	@Override
 	public void rmdir(final String pstrPathName) throws IOException {
 		try {
-			String[] strP = pstrPathName.split("/");
+			SOSOptionFolderName objF = new SOSOptionFolderName(pstrPathName);
 			reply = "rmdir OK";
-			for (int i = strP.length; i > 0; i--) {
-				String strT = "";
-				for (int j = 0; j < i; j++) {
-					strT += strP[j] + "/";
-				}
+			for (String subfolder : objF.getSubFolderArrayReverse()) {
+				String strT = subfolder + "/";
 				logger.debug(HostID(SOSVfs_D_135.params("[rmdir]", strT, getReplyString())));
 				Client().rmdir(strT);
 			}
+//			String[] strP = pstrPathName.split("/");
+//			for (int i = strP.length; i > 0; i--) {
+//				String strT = "";
+//				for (int j = 0; j < i; j++) {
+//					strT += strP[j] + "/";
+//				}
+//				logger.debug(HostID(SOSVfs_D_135.params("[rmdir]", strT, getReplyString())));
+//				Client().rmdir(strT);
+//			}
 			reply = "rmdir OK";
 		}
 		catch (Exception e) {

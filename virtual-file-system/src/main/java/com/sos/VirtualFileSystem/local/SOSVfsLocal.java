@@ -747,7 +747,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
 		}
 		else {
 			if (objF.isDirectory() == false) {
-				throw new JobSchedulerException(String.format("can not create directory '%1$s', because it is a file", pathname));
+				throw new JobSchedulerException(SOSVfs_E_277.params(pathname));
 			}
 		}
 	}

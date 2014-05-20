@@ -15,10 +15,12 @@ import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.apache.log4j.Logger;
 import org.apache.webdav.lib.WebdavResource;
+import org.omg.SendingContext.RunTime;
 
 import sos.util.SOSString;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
@@ -248,35 +250,26 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 	@Override
 	public void mkdir(final String path) {
 		try {
+			SOSOptionFolderName objF = new SOSOptionFolderName(path);
 			reply = "";
-			String strPath = "";
-			if (path.startsWith("/")) {
-				strPath = "/";
-			}
-//			String strPath = davClient.getPath();
-			String[] pathArray = path.split("/");
-			for (String strSubFolder : pathArray) {
-				if (strSubFolder.trim().length() > 0) {
-					strPath += strSubFolder + "/";
-					strPath = this.normalizePath(strPath);
-
-					logger.debug(HostID(SOSVfs_D_179.params("mkdir", strPath)));
-
-					if (this.fileExists(strPath)) {
-						continue;
-					}
-
-					if (davClient.mkcolMethod(strPath)) {
+			logger.debug(HostID(SOSVfs_D_179.params("mkdir", path)));
+			for (String strSubFolder : objF.getSubFolderArray()) {
+				if (this.fileExists(strSubFolder) == false) {
+					if (davClient.mkcolMethod(strSubFolder)) {
 						reply = "mkdir OK";
-						logger.debug(HostID(SOSVfs_D_181.params("mkdir", strPath, getReplyString())));
+						logger.debug(HostID(SOSVfs_D_181.params("mkdir", strSubFolder, getReplyString())));
 					}
 					else {
 						throw new Exception(davClient.getStatusMessage());
 					}
 				}
+				else {
+					if (this.isDirectory(strSubFolder) == false) {
+						RaiseException(SOSVfs_E_277.params(strSubFolder));
+					}
+				}
 			}
-
-			// DoCD(strCurrentDir);
+//			DoCD(strCurrentDir);
 			logINFO(HostID(SOSVfs_D_181.params("mkdir", path, getReplyString())));
 		}
 		catch (Exception e) {

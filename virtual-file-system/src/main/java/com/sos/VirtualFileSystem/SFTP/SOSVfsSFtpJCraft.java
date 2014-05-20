@@ -255,18 +255,26 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	 */
 	@Override public void rmdir(final String path) {
 		try {
+			SOSOptionFolderName objF = new SOSOptionFolderName(path);
 			reply = "rmdir OK";
-			String[] pathArray = path.split("/");
-			for (int i = pathArray.length; i > 0; i--) {
-				String strT = "";
-				for (int j = 0; j < i; j++) {
-					strT += pathArray[j] + "/";
-				}
+			for (String subfolder : objF.getSubFolderArrayReverse()) {
+				String strT = subfolder + "/";
 				logger.debug(HostID(SOSVfs_D_179.params("rmdir", strT)));
 				this.getClient().rmdir(strT);
 				reply = "rmdir OK";
 				logger.debug(HostID(SOSVfs_D_181.params("rmdir", strT, getReplyString())));
 			}
+//			String[] pathArray = path.split("/");
+//			for (int i = pathArray.length; i > 0; i--) {
+//				String strT = "";
+//				for (int j = 0; j < i; j++) {
+//					strT += pathArray[j] + "/";
+//				}
+//				logger.debug(HostID(SOSVfs_D_179.params("rmdir", strT)));
+//				this.getClient().rmdir(strT);
+//				reply = "rmdir OK";
+//				logger.debug(HostID(SOSVfs_D_181.params("rmdir", strT, getReplyString())));
+//			}
 			logINFO(HostID(SOSVfs_D_181.params("rmdir", path, getReplyString())));
 		}
 		catch (Exception e) {

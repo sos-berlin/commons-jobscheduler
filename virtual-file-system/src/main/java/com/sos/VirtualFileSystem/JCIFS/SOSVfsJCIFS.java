@@ -17,8 +17,10 @@ import jcifs.smb.SmbFileOutputStream;
 import jcifs.smb.SmbSession;
 
 import org.apache.log4j.Logger;
+import org.omg.SendingContext.RunTime;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
@@ -228,40 +230,25 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 	 * @exception JobSchedulerException
 	 */
 	@Override
-	public void mkdir(String path) {
+	public void mkdir(final String path) {
 		try {
-			reply = "";
-			String strPath = "";
-
-			if (!path.endsWith("/")) {
-				path += "/";
-			}
-
-			if (path.startsWith("/")) {
-				strPath = "/";
-			}
-
-			String[] pathArray = path.split("/");
-			for (String strSubFolder : pathArray) {
-				if (strSubFolder.trim().length() > 0) {
-					strPath += strSubFolder + "/";
-
-					strPath = this.normalizePath(strPath);
-
-					logger.debug(HostID(SOSVfs_D_179.params("mkdir", strPath)));
-
-					if (this.fileExists(strPath)) {
-						continue;
-					}
-
-					SmbFile f = getSmbFile(strPath);
+			SOSOptionFolderName objF = new SOSOptionFolderName(path);
+			reply = "mkdir OK";
+			logger.debug(HostID(SOSVfs_D_179.params("mkdir", path)));
+			for (String strSubFolder : objF.getSubFolderArray()) {
+				strSubFolder = this.normalizePath(strSubFolder);
+				logger.debug(HostID(SOSVfs_D_179.params("mkdir", strSubFolder)));
+				if (this.fileExists(strSubFolder) == false) {
+					SmbFile f = getSmbFile(strSubFolder);
 					f.mkdir();
-					reply = "mkdir OK";
-					logger.debug(HostID(SOSVfs_D_181.params("mkdir", strPath, getReplyString())));
+					logger.debug(HostID(SOSVfs_D_181.params("mkdir", strSubFolder, getReplyString())));
+				}
+				else {
+					if (this.isDirectory(strSubFolder) == false) {
+						RaiseException(SOSVfs_E_277.params(strSubFolder));
+					}
 				}
 			}
-
-			// DoCD(strCurrentDir);
 			logINFO(HostID(SOSVfs_D_181.params("mkdir", path, getReplyString())));
 		}
 		catch (Exception e) {
