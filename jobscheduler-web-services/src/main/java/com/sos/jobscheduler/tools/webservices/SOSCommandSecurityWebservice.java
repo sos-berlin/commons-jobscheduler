@@ -20,6 +20,10 @@ import sos.xml.SOSXMLXPath;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.auth.rest.SOSWebserviceAuthenticationRecord;
 import com.sos.auth.rest.client.SOSRestShiroClient;
+import com.sos.jobscheduler.tools.webservices.globals.MyWebserviceAnswer;
+import com.sos.jobscheduler.tools.webservices.globals.SOSCommandSecurityWebserviceAnswer;
+import com.sos.jobscheduler.tools.webservices.globals.SOSCommandSecurityWebserviceCurrentUser;
+import com.sos.jobscheduler.tools.webservices.globals.SOSCommandSecurityWebserviceCurrentUsersList;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdAddOrder;
@@ -56,7 +60,7 @@ public class SOSCommandSecurityWebservice {
     private static final String                                 PERMISSION_MODIFY_JOBCHAIN_NODE = "sos:products:joc:command:modify:job_chain_node";
     private static final String                                 PERMISSION_START_JOB            = "sos:products:joc:command:start:job";
     private static final String                                 PERMISSION_KILL_TASK            = "sos:products:joc:command:kill_task";
-    private static final String                                 PERMISSION_LOCK                 = "sos:products:joc:command:lock";
+    private static final String                                 PERMISSION_LOCK                 = "sos:products:joc:command:add:lock";
     private static final String                                 PERMISSION_REMOVE_LOCK          = "sos:products:joc:command:remove:lock";
     private static final String                                 PERMISSION_REMOVE_PROCESS_CLASS = "sos:products:joc:command:remove:process_class";
     private static final String                                 PERMISSION_REMOVE_JOB_CHAIN     = "sos:products:joc:command:remove:job_chain";
@@ -119,7 +123,7 @@ public class SOSCommandSecurityWebservice {
     }
 
     private String getResourceFromJobScheduler() {
-        return getParamFromJobScheduler(SECURITY_SERVER_ADDRESS);
+        return getParamFromJobScheduler(SECURITY_SERVER_ADDRESS) + "/jobscheduler/rest/sosPermission";
     }
 
     private boolean getIsEnabled() {
@@ -232,7 +236,7 @@ public class SOSCommandSecurityWebservice {
         objFactory.initMarshaller(Spooler.class);
         JSCmdStartJob objStartJob = new JSCmdStartJob(objFactory);
 
-        if (job != null) {
+        if (job != null && job.length() > 0) {
             objStartJob.setJob(job);
         }
         if (force != null && force.length() > 0) {
@@ -701,9 +705,10 @@ public class SOSCommandSecurityWebservice {
     @POST
     @Path("/process_class_remove")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSCommandSecurityWebserviceAnswer processClassRemove(@QueryParam("session_id")
-    String sessionId, @QueryParam("process_class")
-    String processClass) throws MalformedURLException {
+    public SOSCommandSecurityWebserviceAnswer processClassRemove(
+            @QueryParam("session_id")  String sessionId, 
+            @QueryParam("process_class") String processClass) 
+                    throws MalformedURLException {
 
         SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord = new SOSWebserviceAuthenticationRecord();
         sosWebserviceAuthenticationRecord.setSessionId(sessionId);
@@ -734,6 +739,7 @@ public class SOSCommandSecurityWebservice {
 
     }
 
+    //For test purposes only
     @POST
     @Path("/consumes")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
