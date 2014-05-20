@@ -22,8 +22,6 @@ import com.sos.auth.rest.SOSWebserviceAuthenticationRecord;
 import com.sos.auth.rest.client.SOSRestShiroClient;
 import com.sos.jobscheduler.tools.webservices.globals.MyWebserviceAnswer;
 import com.sos.jobscheduler.tools.webservices.globals.SOSCommandSecurityWebserviceAnswer;
-import com.sos.jobscheduler.tools.webservices.globals.SOSCommandSecurityWebserviceCurrentUser;
-import com.sos.jobscheduler.tools.webservices.globals.SOSCommandSecurityWebserviceCurrentUsersList;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdAddOrder;
@@ -43,7 +41,6 @@ import com.sos.scheduler.model.objects.JSObjProcessClass;
 import com.sos.scheduler.model.objects.JSObjRunTime;
 import com.sos.scheduler.model.objects.JobChainNodeAction;
 import com.sos.scheduler.model.objects.Spooler;
-import com.sun.jersey.guice.JerseyServletModule;
 
 @Path("/plugin/security")
 public class SOSCommandSecurityWebservice {
@@ -308,46 +305,26 @@ public class SOSCommandSecurityWebservice {
 
             JSCmdModifyOrder objOrder = objFactory.createModifyOrder();
 
-            if (jobChain != null && jobChain.length() > 0) {
-                objOrder.setJobChain(jobChain);
-            }
-            if (order != null && order.length() > 0) {
-                objOrder.setOrder(order);
-            }
-            if (action != null && action.length() > 0) {
-                objOrder.setAction(action);
-            }
-            if (at != null && at.length() > 0) {
-                objOrder.setAt(at);
-            }
-            if (endState != null && endState.length() > 0) {
-                objOrder.setEndState(endState);
-            }
-            if (priority != null && priority.length() > 0) {
-                BigInteger p = new BigInteger(priority);
-                objOrder.setPriority(p);
-            }
-            if (setback != null && setback.length() > 0) {
-                objOrder.setSetback(setback);
-            }
-            if (state != null && state.length() > 0) {
-                objOrder.setState(state);
-            }
-            if (suspended != null && suspended.length() > 0) {
-                objOrder.setSuspended(suspended);
-            }
-            if (title != null && title.length() > 0) {
-                objOrder.setTitle(title);
-            }
+            objOrder.setJobChain(jobChain);
+            objOrder.setOrderIfNotEmpty(order);
+            objOrder.setActionIfNotEmpty(action);
+            objOrder.setAtIfNotEmpty(at);
+            objOrder.setEndStateIfNotEmpty(endState);
+            objOrder.setPriorityIfNotEmpty(priority);
+            
+            objOrder.setSetbackIfNotEmpty(setback);
+            objOrder.setStateIfNotEmpty(state);
+            objOrder.setSuspendedIfNotEmpty(suspended);
+            objOrder.setTitleIfNotEmpty(title);
 
             String[] jobParams = getParams(params);
             if (jobParams != null) {
-                // objOrder.setParams(jobParams);
+                objOrder.setParams(jobParams);
             }
 
             if (runtime != null && runtime.length() > 0) {
                 JSObjRunTime objRuntime = new JSObjRunTime(objFactory, runtime);
-                objOrder.setRunTime(objRuntime);
+                objOrder.setRunTimeIfNotEmpty(objRuntime);
             }
 
             String xml = objFactory.toXMLString(objOrder);
@@ -705,10 +682,9 @@ public class SOSCommandSecurityWebservice {
     @POST
     @Path("/process_class_remove")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSCommandSecurityWebserviceAnswer processClassRemove(
-            @QueryParam("session_id")  String sessionId, 
-            @QueryParam("process_class") String processClass) 
-                    throws MalformedURLException {
+    public SOSCommandSecurityWebserviceAnswer processClassRemove(@QueryParam("session_id")
+    String sessionId, @QueryParam("process_class")
+    String processClass) throws MalformedURLException {
 
         SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord = new SOSWebserviceAuthenticationRecord();
         sosWebserviceAuthenticationRecord.setSessionId(sessionId);

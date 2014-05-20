@@ -1,9 +1,13 @@
 package com.sos.scheduler.model.commands;
 
+import java.math.BigInteger;
+
 import org.apache.log4j.Logger;
 
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.objects.Params;
+import com.sos.scheduler.model.objects.RunTime;
+import com.sos.scheduler.model.objects.XmlPayload;
 
 /**
 * \class JSCmdModifyOrder 
@@ -39,36 +43,161 @@ import com.sos.scheduler.model.objects.Params;
  */
 public class JSCmdModifyOrder extends ModifyOrder {
 
-	@SuppressWarnings("unused")
-	private final String		conClassName	= "JSCmdModifyOrder";
-	@SuppressWarnings("unused")
-	private static final Logger	logger			= Logger.getLogger(JSCmdModifyOrder.class);
+    @SuppressWarnings("unused")
+    private final String        conClassName = "JSCmdModifyOrder";
+    @SuppressWarnings("unused")
+    private static final Logger logger       = Logger.getLogger(JSCmdModifyOrder.class);
 
-	public JSCmdModifyOrder (SchedulerObjectFactory schedulerObjectFactory) {
-		super();
-		objFactory = schedulerObjectFactory;
-	}
-	
-	   /**
-     * 
-     * \brief setParams
-     * 
-     * \details
-     *
-     * \return Params
-     *
-     * @param pstrParamArray
-     * @return
-     */
+    public JSCmdModifyOrder(SchedulerObjectFactory schedulerObjectFactory) {
+        super();
+        objFactory = schedulerObjectFactory;
+    }
+
+    /**
+    * 
+    * \brief setParams
+    * 
+    * \details
+    *
+    * \return Params
+    *
+    * @param pstrParamArray
+    * @return
+    */
     public Params setParams(String[] pstrParamArray) {
 
         @SuppressWarnings("unused")
         final String conMethodName = conClassName + "::setParams";
- 
+
         Params objParams = objFactory.setParams(pstrParamArray);
         super.setParams(objParams);
 
         return objParams;
     } // private Params setParams
+
+    private boolean isEmpty(String value) {
+        return (value == null || value.length() == 0);
+    }
+
+    /**
+     * Sets the value of the xmlPayload property.
+     * 
+     */
+    public void setXmlPayloadIfNotEmpty(XmlPayload value) {
+        if (value != null) {
+            this.xmlPayload = value;
+        }
+    }
+
+    /**
+     * Sets the value of the runTime property.
+     * 
+     */
+    public void setRunTimeIfNotEmpty(RunTime value) {
+        if (value != null) {
+            this.runTime = value;
+        }
+    }
+
+    /**
+     * Sets the value of the jobChain property.
+     * 
+     */
+    public void setJobChainIfNotEmpty(String value) {
+        if (!isEmpty(value)) {
+            this.jobChain = value;
+        }
+    }
+
+    /**
+     * Sets the value of the order property.
+     * 
+     */
+    public void setOrderIfNotEmpty(String value) {
+        if (!isEmpty(value)) {
+            this.order = value;
+        }
+    }
+
+    /**
+     * Sets the value of the priority property.
+     * 
+     */
+    public void setPriorityIfNotEmpty(String value) {
+        if (!isEmpty(value)) {
+            BigInteger p = new BigInteger(value);
+            this.priority = p;
+        }
+    }
+
+    /**
+     * Sets the value of the title property.
+     * 
+     */
+    public void setTitleIfNotEmpty(String value) {
+        if (!isEmpty(value)) {
+            this.title = value;
+        }
+    }
+
+    /**
+     * Sets the value of the state property.
+     * 
+     */
+    public void setStateIfNotEmpty(String value) {
+        if (!isEmpty(value)) {
+            this.state = value;
+        }
+    }
+
+    /**
+     * Sets the value of the setback property.
+     * 
+     */
+    public void setSetbackIfNotEmpty(String value) {
+        if (!isEmpty(value)) {
+            this.setback = value;
+        }
+    }
+
+    /**
+     * Sets the value of the suspended property.
+     * 
+     */
+    public void setSuspendedIfNotEmpty(String value) {
+        if (!isEmpty(value)) {
+            this.suspended = value;
+        }
+    }
+
+    /**
+     * Sets the value of the at property.
+     * 
+     */
+    public void setAtIfNotEmpty(String value) {
+        if (!isEmpty(value)) {
+            this.at = value;
+        }
+    }
+
+    /**
+     * Sets the value of the endState property.
+     * 
+     */
+    public void setEndStateIfNotEmpty(String value) {
+        if (!isEmpty(value)) {
+            this.endState = value;
+        }
+    }
+
+    /**
+     * Sets the value of the action property.
+     * 
+     */
+    public void setActionIfNotEmpty(String value) {
+        if (!isEmpty(value)) {
+            this.action = value;
+        }
+    }
 
 }
