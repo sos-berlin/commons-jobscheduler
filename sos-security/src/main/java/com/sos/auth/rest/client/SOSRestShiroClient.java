@@ -7,9 +7,13 @@ import java.net.URL;
 import javax.ws.rs.core.MediaType;
 
 
+
+
+
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.auth.rest.SOSWebserviceAuthenticationRecord;
 import com.sos.auth.rest.permission.model.SOSPermissionShiro;
+import com.sos.jobscheduler.tools.webservices.globals.SOSCommandSecurityWebserviceAnswer;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -33,6 +37,17 @@ private SOSPermissionShiro getSOSPermissionShiro(URL resource) {
      
 }
 
+private SOSCommandSecurityWebserviceAnswer getSOSCommandSecurityPlugin(URL resource) {
+    Client client = Client.create();
+    WebResource webResource = client.resource(resource.toExternalForm());
+    ClientResponse response = webResource.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);  
+    if (response.getStatus() != 200) {
+         throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
+    }   
+    SOSCommandSecurityWebserviceAnswer answer = response.getEntity(SOSCommandSecurityWebserviceAnswer.class); 
+    return answer;
+     
+}
 
 public SOSShiroCurrentUserAnswer getSOSShiroCurrentUserAnswer(URL resource) {
     Client client = Client.create();
@@ -50,6 +65,14 @@ public SOSPermissionShiro getPermissions(SOSWebserviceAuthenticationRecord sosWe
     return getSOSPermissionShiro(new URL(String.format(sosWebserviceAuthenticationRecord.getResource(),sosWebserviceAuthenticationRecord.getUser(),sosWebserviceAuthenticationRecord.getPassword(),sosWebserviceAuthenticationRecord.getPermission(),sosWebserviceAuthenticationRecord.getSessionId())));
 }
 
+public boolean isEnabled(URL url) throws Exception {
+    try{
+        SOSCommandSecurityWebserviceAnswer m = getSOSCommandSecurityPlugin(url);
+        return m.getIsEnabled();
+    }catch (Exception e) {
+       throw new Exception(String.format("Could not connect to security server at %s --> %s",url,e.getMessage()));
+    }
+}
 
 public SOSShiroCurrentUserAnswer getSOSShiroCurrentUserAnswer(SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord) {
     String url = String.format(sosWebserviceAuthenticationRecord.getResource(),sosWebserviceAuthenticationRecord.getUser(),sosWebserviceAuthenticationRecord.getPassword(),sosWebserviceAuthenticationRecord.getPermission(),sosWebserviceAuthenticationRecord.getSessionId());

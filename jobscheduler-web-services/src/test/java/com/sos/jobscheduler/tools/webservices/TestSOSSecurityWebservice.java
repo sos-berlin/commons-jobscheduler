@@ -12,6 +12,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.sos.jobscheduler.tools.webservices.globals.MyWebserviceAnswer;
+import com.sos.jobscheduler.tools.webservices.globals.SOSCommandSecurityWebserviceAnswer;
+
 
 
 public class TestSOSSecurityWebservice {

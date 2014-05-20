@@ -45,6 +45,7 @@ public class SchedulerInstancesDBItem extends DbItem {
 	 private Integer udpPort;
 	 private Date startTime;
 	 private Date stopTime;
+	 private String securityServer;
 	 private String dbName;
 	 private String dbHistoryTableName;
 	 private String dbOrderHistoryTableName;
@@ -61,7 +62,7 @@ public class SchedulerInstancesDBItem extends DbItem {
 	 private boolean isPaused=false;
 	 private boolean isCluster=false;
 	 private boolean isAgent=false;
-	 private String param;
+     private String param;
 	 	 
   	 private String dateFormat="yyyy-MM-dd hh:mm";
 
@@ -190,7 +191,20 @@ public class SchedulerInstancesDBItem extends DbItem {
 	    public String getStopTimeFormated(){
 	        return getDateFormatted(this.getStopTime());
 	 	}
+
 	    
+	    /*
+	        @Column(name="`SECURITY_SERVER`",nullable=false)
+	    public void setSecurityServer(String securityServer) {
+	        this.securityServer = securityServer;
+	    }
+	    
+	     
+	    @Column(name="`SECURITY_SERVER`",nullable=false)
+	    public String getSecurityServer() {
+	        return securityServer;
+	    }
+	    */
 	    @Column(name = "`DB_NAME`", nullable = true)
 		public void setDbName(String dbName) {
 			this.dbName = dbName;

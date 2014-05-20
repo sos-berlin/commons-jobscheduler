@@ -93,7 +93,7 @@ public class SOSServicePermissionShiro {
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc:command:modify:job_chain");
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc:command:modify:job_chain_node");
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc:command:kill_task"  );
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc:command:lock" );
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc:command:add:lock" );
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc:command:remove:lock" );
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc:command:remove:process_class" );
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc:command:remove:job_chain" );

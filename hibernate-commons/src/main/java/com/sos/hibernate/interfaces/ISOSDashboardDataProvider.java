@@ -8,6 +8,7 @@ import org.eclipse.swt.widgets.Table;
 import org.hibernate.Session;
 
 import com.sos.hibernate.classes.DbItem;
+import com.sos.hibernate.classes.SOSSearchFilterData;
 
 
  
@@ -51,7 +52,7 @@ public interface ISOSDashboardDataProvider {
     public void setFrom(Date d);
     public void setTo(Date d);
     
-    public void setSearchField(String s);
+    public void setSearchField(SOSSearchFilterData s);
     public void setShowJobs(boolean b);
     public void setShowJobChains(boolean b);
     public void setShowWithError(boolean b);

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.sos-berlin.products</groupId>
+			  <artifactId>jobscheduler</artifactId>
+        <version>1.7-SNAPSHOT</version>
+ 
+    </parent>
+    
+    <properties>
+    	<engine.version>1.6.4035</engine.version>
+    </properties>
+
+    <groupId>com.sos-berlin.products.jobscheduler</groupId>
+    <artifactId>jobscheduler-web-services-globals</artifactId>
+    <name>${project.artifactId}</name>
+    <inceptionYear>2014</inceptionYear>
+    <description>Web services to connect to JobScheduler engine (Globals)</description>
+
+    <build>
+    </build>
+
+    <dependencies>
+    
+   
+    </dependencies>
+</project>

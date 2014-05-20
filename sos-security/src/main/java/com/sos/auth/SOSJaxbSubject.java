@@ -16,15 +16,15 @@ public class SOSJaxbSubject {
     }
     
     public boolean isPermitted(String permission) {
-        if (permission.startsWith("jobscheduler:jid:")) {
+        if (permission.startsWith("sos:products:jid:")) {
             return (sosPermissionShiro != null && sosPermissionShiro.getSOSPermissions().getSOSPermissionJid().getSOSPermission().contains(permission));
          }
         
-        if (permission.startsWith("jobscheduler:joc:")) {
+        if (permission.startsWith("sos:products:joc:")) {
             return (sosPermissionShiro != null && sosPermissionShiro.getSOSPermissions().getSOSPermissionJoc().getSOSPermission().contains(permission));
          }
         
-        if (permission.startsWith("jobscheduler:joe:")) {
+        if (permission.startsWith("sos:products:joe:")) {
             return (sosPermissionShiro != null && sosPermissionShiro.getSOSPermissions().getSOSPermissionJoe().getSOSPermission().contains(permission));
          }
         
