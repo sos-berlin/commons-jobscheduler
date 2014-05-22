@@ -86,6 +86,8 @@ public class SOSVfsSFtpTest extends JSToolBox {
 		objOptions.protocol.Value("sftp");
 		objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
 		ftpClient = (ISOSVfsFileTransfer) objVFS;
+		
+		dynamicClassNameSource = "com.sos.VirtualFileSystem.SFTP.SOSVfsSFtp";
 	}
 
 	@After
