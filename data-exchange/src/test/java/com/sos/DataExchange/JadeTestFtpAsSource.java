@@ -318,14 +318,4 @@ public class JadeTestFtpAsSource extends JadeTestBase {
 		super.testUseProfileWithoutCreatingTestFiles();
 	}
 	
-	@Test
-	public void testforJobSchedulerSecurityHash() throws Exception {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::testforJobSchedulerSecurityHash";
-		objOptions.settings.Value(strSettingsFile);
-		objOptions.profile.Value("TestforJobSchedulerSecurityHash");
-		super.testUseProfileWOCreatingTestFiles();
-	}
-
-	
 }
