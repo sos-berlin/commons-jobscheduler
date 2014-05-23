@@ -2,6 +2,7 @@ package sos.ftphistory.db;
 
  
 import java.util.Date;
+
 import javax.persistence.*;
 
   
@@ -73,7 +74,8 @@ public class JadeFilesDBItem {
  
      
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(generator="FTP_FILES_ID_GEN",strategy=GenerationType.AUTO)
+    @SequenceGenerator(name="FTP_FILES_ID_GEN", sequenceName="SOSFTP_FILES_ID_SEQ",allocationSize=1)
     @Column(name="`ID`",nullable=false)
     public Long getId() {
 		return id;

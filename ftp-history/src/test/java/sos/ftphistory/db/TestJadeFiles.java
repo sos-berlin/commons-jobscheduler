@@ -34,6 +34,7 @@ import static org.junit.Assert.assertNotNull;
 import java.io.File;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.After;
@@ -71,7 +72,7 @@ public class TestJadeFiles {
 	}
 
 	@Test
-	public void testSchedulerOrderStepHistoryDBLayer() {
+	public void testFtpHistoryDBLayer() {
 		JadeFilesDBLayer d = new JadeFilesDBLayer(configurationFile);
 	}
 
@@ -106,42 +107,7 @@ public class TestJadeFiles {
 
 	}
 
-	@Test
-	public void testDelete() {
-
-		JadeFilesDBItem filesTable = new JadeFilesDBItem();
-		
-
-		UUID uuid = UUID.randomUUID();
-		String randomUUIDString = uuid.toString();
-
-		filesTable.setMandator("myMandator");
-		filesTable.setSourceHost("mySourceHost");
-		filesTable.setSourceHostIp("mySourceHostIp");
-		filesTable.setSourceUser("mySourceUser");
-		filesTable.setSourceDir("mySourceDir");
-		filesTable.setSourceFilename("mySourceFilename");
-		filesTable.setMd5(randomUUIDString);
-		filesTable.setFileSize(1);
-		filesTable.setModifiedBy("myModifiedBy");
-		filesTable.setCreatedBy("myCreatedBy");
-		filesTable.setCreated(new Date());
-		filesTable.setModified(new Date());
-
-		jadeFilesDBLayer.beginTransaction();
-		jadeFilesDBLayer.save(filesTable);
-		Long id= filesTable.getId();
- 
-		JadeFilesDBItem filesTable2  = jadeFilesDBLayer.get(id);
- 		jadeFilesDBLayer.delete(filesTable2);
-		jadeFilesDBLayer.save(filesTable);
-		jadeFilesDBLayer.delete(filesTable);
-
-		jadeFilesDBLayer.commit();
-		jadeFilesDBLayer.closeSession();
-
-	}
-
+	 
 	@Test
 	public void testLoad() {
  
@@ -172,6 +138,16 @@ public class TestJadeFiles {
 		
 		jadeFilesDBLayer.closeSession();
 	}
+	
+	@Test
+    public void testGetList() throws ParseException {
+ 
+	     List<JadeFilesDBItem> l =   jadeFilesDBLayer.getFilesFromTo(new Date(), new Date());
+        
+    
+    }
+	
+	
 
 	 
 

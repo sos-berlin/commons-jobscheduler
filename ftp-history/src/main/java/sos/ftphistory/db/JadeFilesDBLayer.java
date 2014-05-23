@@ -1,12 +1,16 @@
 package sos.ftphistory.db;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import sos.ftphistory.JadeFilesFilter;
 import sos.util.SOSDate;
@@ -39,173 +43,272 @@ import com.sos.hibernate.layer.SOSHibernateIntervalDBLayer;
 
 public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer {
 
-	@SuppressWarnings("unused")
-	private final String conClassName = "JadeFilesDBLayer";
-	protected JadeFilesFilter filter = null;
-
-	public JadeFilesDBLayer(File configurationFile_) {
-		super();
-		this.setConfigurationFile(configurationFile_);
-		this.resetFilter();
-
-	}
-
-	public JadeFilesDBItem get(Long id) {
-		if (id == null) {
-			return null;
-		}
-		if (session == null){
-		   initSession();
-		}
-		try {
-			return (JadeFilesDBItem) this.getSession().get(
-					JadeFilesDBItem.class, id);
-		} catch (ObjectNotFoundException e) {
-			return null;
-		}
-	}
-
-	protected String getWhere() {
-
-		String where = "";
-		String and = "";
-
-		if (filter.getCreatedFrom() != null) {
-			where += and + " created >= :createdFrom";
-			and = " and ";
-		}
-
-		if (filter.getCreatedTo() != null) {
-			where += and + " created <= :createdTo ";
-			and = " and ";
-		}
-		
-		if (filter.getSourceDir() != null && !filter.getSourceDir().equals("")) {
-			where += and + " sourceDir=:sourceDir";
-			and = " and ";
-		}
-
-		if (filter.getSourceFilename() != null
-				&& !filter.getSourceFilename().equals("")) {
-			where += and + " sourceFilename=:sourceFilename";
-			and = " and ";
-		}
-
-		if (filter.getSourceHost() != null	&& !filter.getSourceHost().equals("")) {
-			where += and + " sourceHost=:sourceHost";
-			and = " and ";
-		}
-
-		if (filter.getSourceHostIp() != null && !filter.getSourceHostIp().equals("")) {
-			where += and + " sourceHostIp=:sourceHostIp";
-			and = " and ";
-		}
-
-		if (filter.getSourceUser() != null && !filter.getSourceUser().equals("")) {
-			where += and + " sourceUser=:sourceUser";
-			and = " and ";
-		}
-
-		if (where.trim().equals("")) {
-
-		} else {
-			where = "where " + where;
-		}
-		return where;
-
-	} 
-	
-	
-	private void setWhere(Query query){
-
-		if (filter.getCreatedFrom() != null && !filter.getCreatedFrom().equals("")) {
-			query.setTimestamp("createdFrom", filter.getCreatedFrom());
-		}
-		
-		if (filter.getCreatedTo() != null && !filter.getCreatedTo().equals("")) {
-			query.setTimestamp("createdTo", filter.getCreatedTo());
-		}
-		
-		
-		if (filter.getSourceDir() != null && !filter.getSourceDir().equals("")) {
-			query.setText("sourceDir", filter.getSourceDir());
-		}
-
-		if (filter.getSourceFilename() != null && !filter.getSourceFilename().equals("")) {
-			query.setText("sourceFilename", filter.getSourceFilename());
-		}
-
-		if (filter.getSourceHost() != null && !filter.getSourceHost().equals("")) {
-			query.setText("sourceHost", filter.getSourceHost());
-		}
-
-		if (filter.getSourceHostIp() != null && !filter.getSourceHostIp().equals("")) {
-			query.setText("sourceHostIp", filter.getSourceHostIp());
-		}
-
-		if (filter.getSourceUser() != null && !filter.getSourceUser().equals("")) {
-			query.setText("sourceUser", filter.getSourceUser());
-		}
-		
-	}
-	
-
-	public int delete() {
-
-		if (session == null) {
-			beginTransaction();
-		}
-
-		String q = "delete from JadeFilesHistoryDBItem e where e.jadeFilesDBItem.id IN (select id from JadeFilesDBItem " + getWhere() + ")";
-		Query query = session.createQuery(q);
-		setWhere(query);
-				 
-		int row = query.executeUpdate();
-
-		String hql = "delete from JadeFilesDBItem " + getWhere();
-		query = session.createQuery(hql);
-
-		setWhere(query);
-
-		row = query.executeUpdate();
-		return row;
-	}
-
-	private List<JadeFilesDBItem> executeQuery(Query query,	int limit) {
-
-	    setWhere(query);
-
-		if (limit > 0) {
-			query.setMaxResults(limit);
-		}
-
-		List<JadeFilesDBItem> jadeFilesList = query.list();
-		return jadeFilesList;
-
-	}
+    @SuppressWarnings("unused")
+    private final String      conClassName = "JadeFilesDBLayer";
+    protected JadeFilesFilter filter       = null;
+ 
 
 
-	
-	@Override
-	public JadeFilesFilter getFilter() {
-		return filter;
-	}
+    public JadeFilesDBLayer(File configurationFile_) {
+        super();
+        this.setConfigurationFile(configurationFile_);
+        this.resetFilter();
 
-	public void resetFilter() {
-		this.filter = new JadeFilesFilter();
-		this.filter.setDateFormat("yyyy-MM-dd HH:mm:ss");
-		this.filter.setOrderCriteria("startTime");
-		this.filter.setSortMode("desc");
-	}
+    }
 
-	public void setFilter(JadeFilesFilter filter) {
-		this.filter = filter;
-	}
+    public JadeFilesDBItem get(Long id) {
+        if (id == null) {
+            return null;
+        }
+        
+        try {
+            return (JadeFilesDBItem) this.getSession().get(JadeFilesDBItem.class, id);
+        }
+        catch (ObjectNotFoundException e) {
+            return null;
+        }
+    }
 
-	@Override
-	public int deleteInterval() {
-		return this.delete();
-	}
+    public void resetFilter() {
+        filter = new JadeFilesFilter();
+        this.filter = new JadeFilesFilter();
+        this.filter.setDateFormat("yyyy-MM-dd HH:mm:ss");
+        this.filter.setOrderCriteria("startTime");
+        this.filter.setSortMode("desc");
+        
+    }
+    
+    protected String getWhere() {
+
+        String where = "";
+        String and = "";
+
+        if (filter.getCreatedFrom() != null) {
+            where += and + " created >= :createdFrom";
+            and = " and ";
+        }
+
+        if (filter.getCreatedTo() != null) {
+            where += and + " created <= :createdTo ";
+            and = " and ";
+        }
+
+        if (filter.getSourceDir() != null && !filter.getSourceDir().equals("")) {
+            where += and + " sourceDir=:sourceDir";
+            and = " and ";
+        }
+
+        if (filter.getSourceFilename() != null && !filter.getSourceFilename().equals("")) {
+            where += and + " sourceFilename=:sourceFilename";
+            and = " and ";
+        }
+
+        if (filter.getSourceHost() != null && !filter.getSourceHost().equals("")) {
+            where += and + " sourceHost=:sourceHost";
+            and = " and ";
+        }
+
+        if (filter.getSourceHostIp() != null && !filter.getSourceHostIp().equals("")) {
+            where += and + " sourceHostIp=:sourceHostIp";
+            and = " and ";
+        }
+
+        if (filter.getSourceUser() != null && !filter.getSourceUser().equals("")) {
+            where += and + " sourceUser=:sourceUser";
+            and = " and ";
+        }
+
+        if (where.trim().equals("")) {
+
+        }
+        else {
+            where = "where " + where;
+        }
+        return where;
+
+    }
+
+    private void setWhere(Query query) {
+
+        if (filter.getCreatedFrom() != null && !filter.getCreatedFrom().equals("")) {
+            query.setTimestamp("createdFrom", filter.getCreatedFrom());
+        }
+
+        if (filter.getCreatedTo() != null && !filter.getCreatedTo().equals("")) {
+            query.setTimestamp("createdTo", filter.getCreatedTo());
+        }
+
+        if (filter.getSourceDir() != null && !filter.getSourceDir().equals("")) {
+            query.setText("sourceDir", filter.getSourceDir());
+        }
+
+        if (filter.getSourceFilename() != null && !filter.getSourceFilename().equals("")) {
+            query.setText("sourceFilename", filter.getSourceFilename());
+        }
+
+        if (filter.getSourceHost() != null && !filter.getSourceHost().equals("")) {
+            query.setText("sourceHost", filter.getSourceHost());
+        }
+
+        if (filter.getSourceHostIp() != null && !filter.getSourceHostIp().equals("")) {
+            query.setText("sourceHostIp", filter.getSourceHostIp());
+        }
+
+        if (filter.getSourceUser() != null && !filter.getSourceUser().equals("")) {
+            query.setText("sourceUser", filter.getSourceUser());
+        }
+
+    }
+
+    public int delete() {
+
+        if (session == null) {
+            beginTransaction();
+        }
+
+        String q = "delete from JadeFilesHistoryDBItem e where e.jadeFilesDBItem.id IN (select id from JadeFilesDBItem " + getWhere() + ")";
+        Query query = session.createQuery(q);
+        setWhere(query);
+
+        int row = query.executeUpdate();
+
+        String hql = "delete from JadeFilesDBItem " + getWhere();
+        query = session.createQuery(hql);
+
+        setWhere(query);
+
+        row = query.executeUpdate();
+        return row;
+    }
+
+ 
+
+    public List<JadeFilesDBItem> getFilesFromTo(Date from, Date to) throws ParseException {
+
+        Session session = getSession();
+
+        filter.setCreatedFrom(from); 
+        filter.setCreatedTo(to);
+
+        Transaction transaction = session.beginTransaction();
+        Query query = session.createQuery("  from JadeFilesDBItem where  created >= :createdFrom and created <= :createdTo");
+
+        query.setTimestamp("createdFrom", filter.getCreatedFrom());
+        query.setTimestamp("createdTo", filter.getCreatedTo());
+
+        List<JadeFilesDBItem> resultset = query.list();
+
+        transaction.commit();
+        return resultset;
+
+    }
+
+    public List<JadeFilesHistoryDBItem> getFilesHistoryFromTo(Date from, Date to) throws ParseException {
+ 
+        filter.setCreatedFrom(from); 
+        filter.setCreatedTo(to);
+      
+        Session session = getSession();
+
+        Transaction transaction = session.beginTransaction();
+        Query query = session.createQuery("  from JadeFilesHistoryDBItem where  created >= :createdFrom and created <= :createdTo");
+
+        query.setTimestamp("createdFrom", filter.getCreatedFrom());
+        query.setTimestamp("createdTo", filter.getCreatedTo());
+
+        List<JadeFilesHistoryDBItem> resultset = query.list();
+
+        transaction.commit();
+        return resultset;
+
+    }
+
+    
+    public List<JadeFilesHistoryDBItem> getFilesHistory() throws ParseException {
+        
+ 
+      
+        Session session = getSession();
+
+        Transaction transaction = session.beginTransaction();
+        Query query = session.createQuery("  from JadeFilesDBItem where  created >= :createdFrom and created <= :createdTo");
+
+        query.setTimestamp("createdFrom", filter.getCreatedFrom());
+        query.setTimestamp("createdTo", filter.getCreatedTo());
+
+        if (filter.getCreatedFrom() != null && !filter.getCreatedFrom().equals("")) {
+            query.setTimestamp("createdFrom", filter.getCreatedFrom());
+        }
+        
+        if (filter.getCreatedTo() != null && !filter.getCreatedTo().equals("")) {
+            query.setTimestamp("createdTo", filter.getCreatedTo());
+        }
+ 
+        if (filter.getSourceDir() != null && !filter.getSourceDir().equals("")) {
+            query.setParameter("sourceDir", filter.getSourceDir());
+        }
+ 
+        if (filter.getSourceFilename() != null && !filter.getSourceFilename().equals("")) {
+            query.setParameter("sourceFilename", filter.getSourceFilename());
+        }
+ 
+        if (filter.getSourceHost() != null && !filter.getSourceHost().equals("")) {
+            query.setParameter("sourceHost", filter.getSourceHost());
+        }
+        
+        if (filter.getSourceHostIp() != null && !filter.getSourceHostIp().equals("")) {
+            query.setParameter("sourceHostIp", filter.getSourceHostIp());
+        }
+ 
+        if (filter.getSourceUser() != null && !filter.getSourceUser().equals("")) {
+            query.setParameter("sourceUser", filter.getSourceUser());
+        }
+ 
+        List<JadeFilesHistoryDBItem> resultset = query.list();
+
+        transaction.commit();
+        return resultset;
+
+    }
+    
+    
+    public void setCreatedFrom(Date createdFrom) {
+        filter.setCreatedFrom(createdFrom);
+    }
+
+    public void setCreatedTo(Date createdTo) {
+        filter.setCreatedTo(createdTo);
+    }
+
+    public void setDateFormat(String dateFormat) {
+        filter.setDateFormat(dateFormat);
+    }
+
+    public void setCreatedFrom(String createdFrom) throws ParseException {
+        SimpleDateFormat formatter = new SimpleDateFormat(filter.getDateFormat());
+        setCreatedFrom(formatter.parse(createdFrom));
+    }
+
+    public void setCreatedTo(String createdTo) throws ParseException {
+        SimpleDateFormat formatter = new SimpleDateFormat(filter.getDateFormat());
+        setCreatedTo(formatter.parse(createdTo));
+    }
+
+    @Override
+    public JadeFilesFilter getFilter() {
+        return filter;
+    }
+
+  
+
+    public void setFilter(JadeFilesFilter filter) {
+        this.filter = filter;
+    }
+
+    @Override
+    public int deleteInterval() {
+       return this.delete();
+    }
 
 
 }
