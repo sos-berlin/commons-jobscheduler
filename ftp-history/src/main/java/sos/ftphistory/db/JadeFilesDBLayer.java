@@ -1,6 +1,7 @@
 package sos.ftphistory.db;
 
 import java.io.File;
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -41,9 +42,10 @@ import com.sos.hibernate.layer.SOSHibernateIntervalDBLayer;
  * Created on 12.12.2011 14:40:18
  */
 
-public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer {
+public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Serializable{
+	private static final long serialVersionUID = 1L;
 
-    @SuppressWarnings("unused")
+	@SuppressWarnings("unused")
     private final String      conClassName = "JadeFilesDBLayer";
     protected JadeFilesFilter filter       = null;
  
@@ -191,7 +193,7 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer {
         filter.setCreatedTo(to);
 
         Transaction transaction = session.beginTransaction();
-        Query query = session.createQuery("  from JadeFilesDBItem where  created >= :createdFrom and created <= :createdTo");
+        Query query = session.createQuery("  from JadeFilesDBItem " + getWhere());
 
         query.setTimestamp("createdFrom", filter.getCreatedFrom());
         query.setTimestamp("createdTo", filter.getCreatedTo());
@@ -211,7 +213,7 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer {
         Session session = getSession();
 
         Transaction transaction = session.beginTransaction();
-        Query query = session.createQuery("  from JadeFilesHistoryDBItem where  created >= :createdFrom and created <= :createdTo");
+        Query query = session.createQuery("  from JadeFilesHistoryDBItem " + getWhere());
 
         query.setTimestamp("createdFrom", filter.getCreatedFrom());
         query.setTimestamp("createdTo", filter.getCreatedTo());
@@ -223,48 +225,27 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer {
 
     }
 
+    public List<JadeFilesHistoryDBItem> getFilesHistoryById(Long sosftpId) throws ParseException {
+        Session session = getSession();
+
+        Transaction transaction = session.beginTransaction();
+        Query query = session.createQuery("  from JadeFilesHistoryDBItem where sosftpId=:sosftpId");
+        query.setLong("sosftpId", sosftpId);
+        List<JadeFilesHistoryDBItem> resultset = query.list();
+
+        transaction.commit();
+        return resultset;
+    	
+    }
     
-    public List<JadeFilesHistoryDBItem> getFilesHistory() throws ParseException {
-        
- 
+    public List<JadeFilesDBItem> getFiles() throws ParseException {
       
         Session session = getSession();
 
         Transaction transaction = session.beginTransaction();
-        Query query = session.createQuery("  from JadeFilesDBItem where  created >= :createdFrom and created <= :createdTo");
-
-        query.setTimestamp("createdFrom", filter.getCreatedFrom());
-        query.setTimestamp("createdTo", filter.getCreatedTo());
-
-        if (filter.getCreatedFrom() != null && !filter.getCreatedFrom().equals("")) {
-            query.setTimestamp("createdFrom", filter.getCreatedFrom());
-        }
-        
-        if (filter.getCreatedTo() != null && !filter.getCreatedTo().equals("")) {
-            query.setTimestamp("createdTo", filter.getCreatedTo());
-        }
- 
-        if (filter.getSourceDir() != null && !filter.getSourceDir().equals("")) {
-            query.setParameter("sourceDir", filter.getSourceDir());
-        }
- 
-        if (filter.getSourceFilename() != null && !filter.getSourceFilename().equals("")) {
-            query.setParameter("sourceFilename", filter.getSourceFilename());
-        }
- 
-        if (filter.getSourceHost() != null && !filter.getSourceHost().equals("")) {
-            query.setParameter("sourceHost", filter.getSourceHost());
-        }
-        
-        if (filter.getSourceHostIp() != null && !filter.getSourceHostIp().equals("")) {
-            query.setParameter("sourceHostIp", filter.getSourceHostIp());
-        }
- 
-        if (filter.getSourceUser() != null && !filter.getSourceUser().equals("")) {
-            query.setParameter("sourceUser", filter.getSourceUser());
-        }
- 
-        List<JadeFilesHistoryDBItem> resultset = query.list();
+        Query query = session.createQuery("  from JadeFilesDBItem " + getWhere());
+        setWhere(query);
+        List<JadeFilesDBItem> resultset = query.list();
 
         transaction.commit();
         return resultset;

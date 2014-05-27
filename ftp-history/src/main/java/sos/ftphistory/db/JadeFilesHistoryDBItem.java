@@ -47,7 +47,7 @@ import org.hibernate.Session;
 public class JadeFilesHistoryDBItem {
 
 	 private String guid;
-	 private Integer sosftpId;
+	 private Long sosftpId;
 	 private String operation;
 	 private Date transferTimestamp;
 	 private Integer pid;
@@ -101,12 +101,12 @@ public class JadeFilesHistoryDBItem {
 	}
 
    @Column(name="`SOSFTP_ID`",nullable=false,updatable=false,insertable=false)
-	public Integer getSosftpId() {
+	public Long getSosftpId() {
 		return sosftpId;
 	}
 
    @Column(name="`SOSFTP_ID`",nullable=false,updatable=false,insertable=false)
-	public void setSosftpId(Integer softpId) {
+	public void setSosftpId(Long softpId) {
 		this.sosftpId=softpId;
 	}
 
