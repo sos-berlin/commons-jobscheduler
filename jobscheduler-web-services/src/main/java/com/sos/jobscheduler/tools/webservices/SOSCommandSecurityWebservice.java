@@ -51,6 +51,8 @@ import com.sos.scheduler.model.objects.Spooler;
 @Path("/plugin/security")
 public class SOSCommandSecurityWebservice {
 
+    private static final String PERMISSION_COMMAND = "/permission" + "?user=%s&pwd=%s&permission=%s&session_id=%s";
+    private static final String AUTHENTICATE_COMMAND = "/authenticate" + "?user=%s&pwd=%s";
     private static final String                                 JOBSCHEDULER_REST_SOS_PERMISSION = "/jobscheduler/rest/sosPermission";
     private static final String                                 TRUE                             = "true";
     private static final String                                 PERMISSION_LOGOUT                = "sos:products";
@@ -681,7 +683,9 @@ public class SOSCommandSecurityWebservice {
     @Path("/consumes")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     @Consumes("text/plain")
-    public SOSCommandSecurityWebserviceAnswer consume(@QueryParam("session_id") String sessionId, @QueryParam("job_chain") String jobChain, String xml) throws MalformedURLException {
+    public SOSCommandSecurityWebserviceAnswer consume(
+            @QueryParam("session_id") String sessionId, 
+            @QueryParam("job_chain") String jobChain, String xml) throws MalformedURLException {
 
         SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord = new SOSWebserviceAuthenticationRecord();
         return createAnswer("", xml, sosWebserviceAuthenticationRecord);
@@ -691,7 +695,9 @@ public class SOSCommandSecurityWebservice {
     @POST
     @Path("/remove_job_chain")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSCommandSecurityWebserviceAnswer jobChainRemove(@QueryParam("session_id") String sessionId, @QueryParam("job_chain") String jobChain) throws MalformedURLException {
+    public SOSCommandSecurityWebserviceAnswer jobChainRemove(
+            @QueryParam("session_id") String sessionId, 
+            @QueryParam("job_chain") String jobChain) throws MalformedURLException {
         //TODO adding command to scheduler_model
 
         SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord = getAuthencationRecord(sessionId, PERMISSION_REMOVE_JOB_CHAIN);
@@ -714,7 +720,10 @@ public class SOSCommandSecurityWebservice {
     @POST
     @Path("/remove_order")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSCommandSecurityWebserviceAnswer orderRemove(@QueryParam("session_id") String sessionId, @QueryParam("job_chain") String jobChain, @QueryParam("order") String order) throws MalformedURLException {
+    public SOSCommandSecurityWebserviceAnswer orderRemove(
+            @QueryParam("session_id") String sessionId, 
+            @QueryParam("job_chain") String jobChain, 
+            @QueryParam("order") String order) throws MalformedURLException {
 
         SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord = getAuthencationRecord(sessionId, PERMISSION_REMOVE_ORDER);
 
@@ -742,7 +751,10 @@ public class SOSCommandSecurityWebservice {
     @POST
     @Path("/lock")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSCommandSecurityWebserviceAnswer lock(@QueryParam("session_id") String sessionId, @QueryParam("max_non_exclusive") String maxNonExclusive, @QueryParam("name") String name) throws MalformedURLException {
+    public SOSCommandSecurityWebserviceAnswer lock(
+            @QueryParam("session_id") String sessionId, 
+            @QueryParam("max_non_exclusive") String maxNonExclusive, 
+            @QueryParam("name") String name) throws MalformedURLException {
 
         SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord = getAuthencationRecord(sessionId, PERMISSION_LOCK);
 
@@ -771,7 +783,9 @@ public class SOSCommandSecurityWebservice {
     @POST
     @Path("/lock_remove")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSCommandSecurityWebserviceAnswer lockRemove(@QueryParam("session_id") String sessionId, @QueryParam("lock") String lock) throws MalformedURLException {
+    public SOSCommandSecurityWebserviceAnswer lockRemove(
+            @QueryParam("session_id") String sessionId, 
+            @QueryParam("lock") String lock) throws MalformedURLException {
 
         SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord = getAuthencationRecord(sessionId, PERMISSION_REMOVE_LOCK);
 
@@ -900,21 +914,21 @@ public class SOSCommandSecurityWebservice {
         return message;
     }
 
-    private SOSShiroCurrentUserAnswer authenticate(SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord) throws MalformedURLException {
+    private SOSShiroCurrentUserAnswer callAuthenticationServer(SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord, String command) throws MalformedURLException {
         SOSRestShiroClient sosRestShiroClient = new SOSRestShiroClient();
-        String authenticateRessource = sosWebserviceAuthenticationRecord.getResource() + "/authenticate" + "?user=%s&pwd=%s";
+        String authenticateRessource = sosWebserviceAuthenticationRecord.getResource() + command;
         sosWebserviceAuthenticationRecord.setResource(authenticateRessource);
 
         return sosRestShiroClient.getSOSShiroCurrentUserAnswer(sosWebserviceAuthenticationRecord);
     }
+    
+    
+    private SOSShiroCurrentUserAnswer authenticate(SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord) throws MalformedURLException {
+        return callAuthenticationServer(sosWebserviceAuthenticationRecord, AUTHENTICATE_COMMAND);
+    }
 
     private SOSShiroCurrentUserAnswer isPermitted(SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord) throws MalformedURLException {
-        SOSRestShiroClient sosRestShiroClient = new SOSRestShiroClient();
-        String permissionRessource = sosWebserviceAuthenticationRecord.getResource() + "/permission" + "?user=%s&pwd=%s&permission=%s&session_id=%s";
-        sosWebserviceAuthenticationRecord.setResource(permissionRessource);
-
-        SOSShiroCurrentUserAnswer getSOSShiroCurrentUserAnswer = sosRestShiroClient.getSOSShiroCurrentUserAnswer(sosWebserviceAuthenticationRecord);
-        return getSOSShiroCurrentUserAnswer;
+        return callAuthenticationServer(sosWebserviceAuthenticationRecord,PERMISSION_COMMAND);
 
     }
 
