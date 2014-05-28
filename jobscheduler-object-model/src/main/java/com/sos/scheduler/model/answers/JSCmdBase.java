@@ -78,6 +78,11 @@ public class JSCmdBase extends JSObjBase {
 		return objAnswer;
 	} // public Answer getAnswer
 
+	
+	  public boolean isEmpty(String value) {
+	        return (value == null || value.length() == 0);
+	    }
+	  
 	public void getAnswerWithException() throws JSCommandErrorException, JSCommandOKException {
 
 		@SuppressWarnings("unused")

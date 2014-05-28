@@ -75,9 +75,7 @@ public class JSCmdModifyOrder extends ModifyOrder {
         return objParams;
     } // private Params setParams
 
-    private boolean isEmpty(String value) {
-        return (value == null || value.length() == 0);
-    }
+  
 
     /**
      * Sets the value of the xmlPayload property.
@@ -89,15 +87,7 @@ public class JSCmdModifyOrder extends ModifyOrder {
         }
     }
 
-    /**
-     * Sets the value of the runTime property.
-     * 
-     */
-    public void setRunTimeIfNotEmpty(RunTime value) {
-        if (value != null) {
-            this.runTime = value;
-        }
-    }
+   
 
     /**
      * Sets the value of the jobChain property.

@@ -5,6 +5,7 @@ import com.sos.scheduler.model.commands.JSCmdAddOrder;
 import com.sos.scheduler.model.objects.JSObjParams;
 import com.sos.scheduler.model.objects.Param;
 import com.sos.scheduler.model.objects.Params;
+
 import org.apache.log4j.Logger;
 
 public class JSAddOrder extends JSCommand {
@@ -22,6 +23,9 @@ public class JSAddOrder extends JSCommand {
         super(factory);
 		this.cmdAddOrder = setCommand(orderId, jobChain);
 	}
+	
+
+
 
     private JSCmdAddOrder setCommand(String orderId, String jobChain) {
         JSCmdAddOrder cmd = getFactory().createAddOrder();

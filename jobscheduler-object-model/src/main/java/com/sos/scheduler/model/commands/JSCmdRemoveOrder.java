@@ -47,4 +47,21 @@ public class JSCmdRemoveOrder extends RemoveOrder {
 		super();
 		objFactory = schedulerObjectFactory;
 	}
+	
+
+	  
+      public void  setJobChainIfNotEmpty(String value) {
+         if (!isEmpty(value)) {
+             this.jobChain = value;
+         }
+      }
+
+      public void  setOrderIfNotEmpty(String value) {
+          if (!isEmpty(value)) {
+              this.order = value;
+          }
+      }
+
+
+	  
 }

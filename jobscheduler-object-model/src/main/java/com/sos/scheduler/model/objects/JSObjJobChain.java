@@ -71,6 +71,41 @@ public class JSObjJobChain extends JobChain {
 		setHotFolderSrc(super.objVirtualFile);
 	}
 
+    public void setNameIfNotEmpty(String value) {
+        if (value != null) {
+            this.setName(value);
+        } 
+    }
+    
+    public void setDistributedNotEmpty(String value) {
+        if (value != null) {
+            this.setDistributed(value);
+        }
+    }
+    
+    public void setMaxOrdersIfNotEmpty(String value) {
+        if (value != null) {
+            this.setMaxorders(value);
+        }
+    }
+    
+    public void setOrdersRecoverableIfNotEmpty(String value) {
+        if (value != null) {
+            this.setOrdersRecoverable(value);
+        }
+    }
+
+    public void setVisibleIfNotEmpty(String value) {
+        if (value != null) {
+            this.setVisible(value);
+        }
+    }
+    
+    public void setTitleIfNotEmpty(String value) {
+        if (value != null) {
+            this.setTitle(value);
+        }
+    }
 	/**
 	 *
 	 * \brief setOrdersRecoverable

@@ -86,7 +86,11 @@ public class JSObjBase implements Comparable<JSObjBase> {
 
 	} // private void setDirty
 
-	public void setDirty() {
+	  public boolean isEmpty(String value) {
+	        return (value == null || value.length() == 0);
+	    }
+	  
+	 public void setDirty() {
 
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::setDirty";
