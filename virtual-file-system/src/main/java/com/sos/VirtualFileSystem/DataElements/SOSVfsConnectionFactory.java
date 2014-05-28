@@ -143,7 +143,13 @@ public class SOSVfsConnectionFactory {
 		if (objOptions.passive_mode.value() || objConnectOptions.passive_mode.isTrue()) {
 			objDataClient.passive();
 		}
-		objDataClient.TransferMode(objOptions.transfer_mode);
+		//objConnectOptions.transfer_mode is not used?
+		if (objConnectOptions.transfer_mode.isDirty()) {
+			objDataClient.TransferMode(objConnectOptions.transfer_mode);
+		}
+		else {
+			objDataClient.TransferMode(objOptions.transfer_mode);
+		}
 		objDataClient.ControlEncoding(objOptions.ControlEncoding.Value());
 		// TODO pre-commands for source and target seperately
 		if (objOptions.PreFtpCommands.IsNotEmpty() && pflgIsDataSource == false) {

@@ -8,7 +8,6 @@ import java.util.Locale;
 
 import junit.framework.Assert;
 
-import org.apache.commons.net.ftp.FTPFile;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.After;
@@ -299,24 +298,6 @@ public class SOSVfsFtpTest {
 		objVFS.Connect(objOptions);
 	}
 
-	@Test
-	public void testOH() throws Exception {
-		objOptions.host.Value("homer.sos");
-		objOptions.user.Value("test");
-		objOptions.port.value(21);
-		objOptions.password.Value("12345");
-
-		SOSVfsFtp ftp = new SOSVfsFtp();
-		ftp.Connect(objOptions);
-		ftp.Authenticate(objOptions);
-		//		String curDir = ftp.DoPWD();
-		FTPFile objFTPFile = ftp.getFTPFile(".");
-		objFTPFile = ftp.getFTPFile("/home/test/scheduler.current32");
-		//		objFTPFile =ftp.getFTPFile("/home/test/scheduler.current32/unknown.txt");
-		objFTPFile = ftp.getFTPFile("/home/test/scheduler.current32/licence.txt");
-		//		objFTPFile =ftp.getFTPFile("unknown.txt");
-		ftp.disconnect();
-	}
 
 	@Test
 	public void testMkdir() throws Exception {

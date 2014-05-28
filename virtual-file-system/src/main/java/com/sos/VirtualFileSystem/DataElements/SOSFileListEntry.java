@@ -22,6 +22,7 @@ import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.IJadeTransferDetailHistoryData;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import com.sos.VirtualFileSystem.Options.SOSConnection2Options;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 import com.sos.VirtualFileSystem.common.SOSVfsConstants;
@@ -1058,8 +1059,10 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	 */
 	public void setNoOfBytesTransferred(final long plngNoOfBytesTransferred) {
 		lngNoOfBytesTransferred = plngNoOfBytesTransferred;
-		if (objOptions.transfer_mode.isAscii() || objOptions.CheckFileSizeAfterTransfer.isFalse()) {
-			// Probleme bei Ascii: linux -> windows mit cr/lf -> Datei wird grüüer
+		SOSConnection2Options objConnectOptions = objOptions.getConnectionOptions();
+		if (objOptions.transfer_mode.isAscii() || objConnectOptions.Source().transfer_mode.isAscii() || objConnectOptions.Target().transfer_mode.isAscii()
+				|| objOptions.CheckFileSizeAfterTransfer.isFalse()) {
+			// Probleme bei Ascii: linux -> windows mit cr/lf -> Datei wird groesser
 		}
 		else {
 			if (lngFileSize <= 0) { // if the file is compressed, then the original filesize may be to big
