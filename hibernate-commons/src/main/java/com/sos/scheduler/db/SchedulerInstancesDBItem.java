@@ -41,12 +41,12 @@ public class SchedulerInstancesDBItem extends DbItem {
 	private String schedulerId;
 	 
 	 private String hostName;
-	 private Integer tcpPort;
+     private Integer tcpPort;
 	 private Integer udpPort;
+     private Integer jettyPort;
 	 private Date startTime;
 	 private Date stopTime;
-	 private String securityServer;
-	 private String dbName;
+ 	 private String dbName;
 	 private String dbHistoryTableName;
 	 private String dbOrderHistoryTableName;
 	 private String dbOrdersTableName;
@@ -125,6 +125,18 @@ public class SchedulerInstancesDBItem extends DbItem {
 	public int getTcpPort() {
 		return tcpPort;
 	}
+	
+    @Column(name = "`JETTY_PORT`", nullable = true)
+    public void setJettyPort(int jettyPort) {
+        this.jettyPort = jettyPort;
+    }
+
+    @Column(name = "`JETTY_PORT`", nullable = true)
+    public int getJettyPort() {
+        return jettyPort;
+    }
+	
+	
     @Column(name = "`UDP_PORT`", nullable = true)
 	public void setUdpPort(Integer udpPort) {
 		this.udpPort = udpPort;

@@ -13,12 +13,20 @@
     <artifactId>sos-security</artifactId>
     <name>${project.artifactId}</name>
 
+
     <build>
 
      
 
     </build>
 
+
+    <properties>
+      <!-- Bewirkt die Kopie in lib_release_unversioned_jar und lib_release_jar -->
+        <setup.do.not.deploy>false</setup.do.not.deploy>
+        <setup.target.name>com.sos.security</setup.target.name>
+    </properties>
+    
     <dependencies>
 
         <dependency>

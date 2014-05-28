@@ -14,8 +14,11 @@
     </parent>
     
     <properties>
-    	<engine.version>1.6.4035</engine.version>
+      <!-- Bewirkt die Kopie in lib_release_unversioned_jar und lib_release_jar -->
+        <setup.do.not.deploy>false</setup.do.not.deploy>
+        <setup.target.name>com.sos.webservices</setup.target.name>
     </properties>
+    
 
     <groupId>com.sos-berlin.products.jobscheduler</groupId>
     <artifactId>jobscheduler-web-services</artifactId>
