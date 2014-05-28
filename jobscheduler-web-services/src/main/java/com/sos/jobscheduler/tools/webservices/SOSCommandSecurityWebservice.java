@@ -50,28 +50,29 @@ import com.sos.scheduler.model.objects.Spooler;
 
 @Path("/plugin/security")
 public class SOSCommandSecurityWebservice {
-     
-    private static final String                                 PERMISSION_LOGOUT               = "sos:products";
-    private static final String                                 SECURITY_SERVER_ADDRESS         = "security_server_address";
-    private static final String                                 SECURITY_SERVER_IS_ENABLED      = "security_server_enabled";
-    private static final String                                 GET_PARAMETER                   = "<param.get name=\"%s\"/>";
-    private static final String                                 PERMISSION_ADD_ORDER            = "sos:products:joc:command:add:order";
-    private static final String                                 PERMISSION_EXECUTE              = "sos:products:joc:command";
-    private static final String                                 PERMISSION_ADD_PROCESS_CLASS    = "sos:products:joc:command:add:process_class";
-    private static final String                                 PERMISSION_ADD_JOB_CHAIN        = "sos:products:joc:command:add:job_chain";
-    private static final String                                 PERMISSION_MODIFY_ORDER         = "sos:products:joc:command:modify:order";
-    private static final String                                 PERMISSION_MODIFY_JOB           = "sos:products:joc:command:modify:job";
-    private static final String                                 PERMISSION_MODIFY_SPOOLER       = "sos:products:joc:command:modify:spooler";
-    private static final String                                 PERMISSION_MODIFY_JOBCHAIN      = "sos:products:joc:command:modify:job_chain";
-    private static final String                                 PERMISSION_MODIFY_JOBCHAIN_NODE = "sos:products:joc:command:modify:job_chain_node";
-    private static final String                                 PERMISSION_START_JOB            = "sos:products:joc:command:start:job";
-    private static final String                                 PERMISSION_KILL_TASK            = "sos:products:joc:command:kill_task";
-    private static final String                                 PERMISSION_LOCK                 = "sos:products:joc:command:add:lock";
-    private static final String                                 PERMISSION_REMOVE_LOCK          = "sos:products:joc:command:remove:lock";
-    private static final String                                 PERMISSION_REMOVE_PROCESS_CLASS = "sos:products:joc:command:remove:process_class";
-    private static final String                                 PERMISSION_REMOVE_JOB_CHAIN     = "sos:products:joc:command:remove:job_chain";
-    private static final String                                 PERMISSION_REMOVE_ORDER         = "sos:products:joc:command:remove:order";
-    private static final String                                 PERMISSION_TERMINATE            = "sos:products:joc:command:terminate";
+
+    private static final String                                 JOBSCHEDULER_REST_SOS_PERMISSION = "/jobscheduler/rest/sosPermission";
+    private static final String                                 TRUE                             = "true";
+    private static final String                                 PERMISSION_LOGOUT                = "sos:products";
+    private static final String                                 SECURITY_SERVER_ADDRESS          = "security_server_address";
+    private static final String                                 SECURITY_SERVER_IS_ENABLED       = "security_server_enabled";
+    private static final String                                 GET_PARAMETER                    = "<param.get name=\"%s\"/>";
+    private static final String                                 PERMISSION_ADD_ORDER             = "sos:products:joc:command:add:order";
+    private static final String                                 PERMISSION_ADD_PROCESS_CLASS     = "sos:products:joc:command:add:process_class";
+    private static final String                                 PERMISSION_ADD_JOB_CHAIN         = "sos:products:joc:command:add:job_chain";
+    private static final String                                 PERMISSION_MODIFY_ORDER          = "sos:products:joc:command:modify:order";
+    private static final String                                 PERMISSION_MODIFY_JOB            = "sos:products:joc:command:modify:job";
+    private static final String                                 PERMISSION_MODIFY_SPOOLER        = "sos:products:joc:command:modify:spooler";
+    private static final String                                 PERMISSION_MODIFY_JOBCHAIN       = "sos:products:joc:command:modify:job_chain";
+    private static final String                                 PERMISSION_MODIFY_JOBCHAIN_NODE  = "sos:products:joc:command:modify:job_chain_node";
+    private static final String                                 PERMISSION_START_JOB             = "sos:products:joc:command:start:job";
+    private static final String                                 PERMISSION_KILL_TASK             = "sos:products:joc:command:kill_task";
+    private static final String                                 PERMISSION_LOCK                  = "sos:products:joc:command:add:lock";
+    private static final String                                 PERMISSION_REMOVE_LOCK           = "sos:products:joc:command:remove:lock";
+    private static final String                                 PERMISSION_REMOVE_PROCESS_CLASS  = "sos:products:joc:command:remove:process_class";
+    private static final String                                 PERMISSION_REMOVE_JOB_CHAIN      = "sos:products:joc:command:remove:job_chain";
+    private static final String                                 PERMISSION_REMOVE_ORDER          = "sos:products:joc:command:remove:order";
+    private static final String                                 PERMISSION_TERMINATE             = "sos:products:joc:command:terminate";
     private SchedulerXmlCommandExecutor                         xmlCommandExecutor;
 
     private static SOSCommandSecurityWebserviceCurrentUsersList currentUserList;
@@ -135,12 +136,12 @@ public class SOSCommandSecurityWebservice {
     }
 
     private String getResourceFromJobScheduler() {
-        return getParamFromJobScheduler(SECURITY_SERVER_ADDRESS) + "/jobscheduler/rest/sosPermission";
+        return getParamFromJobScheduler(SECURITY_SERVER_ADDRESS) + JOBSCHEDULER_REST_SOS_PERMISSION;
     }
 
     private boolean getIsEnabled() {
         String s = getParamFromJobScheduler(SECURITY_SERVER_IS_ENABLED);
-        return (s.equalsIgnoreCase("true"));
+        return (s.equalsIgnoreCase(TRUE));
 
     }
 
@@ -256,19 +257,10 @@ public class SOSCommandSecurityWebservice {
         objFactory.initMarshaller(Spooler.class);
         JSCmdStartJob objStartJob = new JSCmdStartJob(objFactory);
 
-        if (job != null && job.length() > 0) {
-            objStartJob.setJob(job);
-        }
-        if (force != null && force.length() > 0) {
-            objStartJob.setForce(force);
-        }
-        if (at != null && at.length() > 0) {
-            objStartJob.setAt(at);
-        }
-
-        if (name != null && name.length() > 0) {
-            objStartJob.setName(name);
-        }
+        objStartJob.setJobIfNotEmpty(job);
+        objStartJob.setForceIfNotEmpty(force);
+        objStartJob.setAtIfNotEmpty(at);
+        objStartJob.setNameIfNotEmpty(name);
 
         String[] jobParams = getParams(params);
         if (jobParams != null) {
@@ -323,7 +315,7 @@ public class SOSCommandSecurityWebservice {
 
             JSCmdModifyOrder objOrder = objFactory.createModifyOrder();
 
-            objOrder.setJobChain(jobChain);
+            objOrder.setJobChainIfNotEmpty(jobChain);
             objOrder.setOrderIfNotEmpty(order);
             objOrder.setActionIfNotEmpty(action);
             objOrder.setAtIfNotEmpty(at);
@@ -373,7 +365,7 @@ public class SOSCommandSecurityWebservice {
             @QueryParam("runtime") String runtime) throws MalformedURLException {
 
         String orderId = order;
-        if (order == null){
+        if (order == null) {
             orderId = "";
         }
         String orderS = String.format("%s:%s", jobChain, orderId);
@@ -418,9 +410,9 @@ public class SOSCommandSecurityWebservice {
         }
     }
 
- //TODO: XML wird noch vollständig aufgebaut. Methode kann so noch nicht verwendet werden. Es fehlt im Model die Mögichkeit
- // Jobketten Knoten hinzuzufügen.
-    
+    //TODO: XML wird noch vollständig aufgebaut. Methode kann so noch nicht verwendet werden. Es fehlt im Model die Mögichkeit
+    // Jobketten Knoten hinzuzufügen.
+
     @POST
     @Path("/job_chain")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
@@ -431,8 +423,7 @@ public class SOSCommandSecurityWebservice {
             @QueryParam("name") String name,
             @QueryParam("orders_recoverable") String ordersRecoverable,
             @QueryParam("title") String title,
-            @QueryParam("visible") String visible 
-           ) throws MalformedURLException {
+            @QueryParam("visible") String visible) throws MalformedURLException {
 
         String jobChainS = String.format("%s", name);
 
@@ -442,7 +433,6 @@ public class SOSCommandSecurityWebservice {
 
         if (s.equals("")) {
 
-            
             SchedulerObjectFactory objFactory = new SchedulerObjectFactory();
 
             objFactory.initMarshaller(Spooler.class);
@@ -455,8 +445,7 @@ public class SOSCommandSecurityWebservice {
 
             objJobChain.setVisibleIfNotEmpty(visible);
             objJobChain.setTitleIfNotEmpty(title);
- 
-         
+
             String xml = objJobChain.toXMLString();
             String answer = executeXml(xml);
 
@@ -482,13 +471,8 @@ public class SOSCommandSecurityWebservice {
             objFactory.initMarshaller(Spooler.class);
             JSCmdJobChainModify objModifyJobChain = objFactory.createJobChainModify();
 
-            if (jobChain != null && jobChain.length() > 0) {
-                objModifyJobChain.setJobChain(jobChain);
-            }
-
-            if (state != null && state.length() > 0) {
-                objModifyJobChain.setState(state);
-            }
+            objModifyJobChain.setJobChainIfNotEmpty(jobChain);
+            objModifyJobChain.setStateIfNotEmpte(state);
 
             String xml = objFactory.toXMLString(objModifyJobChain);
             String answer = executeXml(xml);
@@ -515,19 +499,9 @@ public class SOSCommandSecurityWebservice {
             objFactory.initMarshaller(Spooler.class);
             JSCmdJobChainNodeModify objModifyJobChainNode = objFactory.createJobChainNodeModify();
 
-            JobChainNodeAction jobChainNodeAction = JobChainNodeAction.fromValue(action);
-
-            if (jobChain != null && jobChain.length() > 0) {
-                objModifyJobChainNode.setJobChain(jobChain);
-            }
-
-            if (state != null && state.length() > 0) {
-                objModifyJobChainNode.setState(state);
-            }
-
-            if (action != null && action.length() > 0) {
-                objModifyJobChainNode.setAction(jobChainNodeAction);
-            }
+            objModifyJobChainNode.setJobChainIfNotEmpty(jobChain);
+            objModifyJobChainNode.setStateIfNotEmpty(state);
+            objModifyJobChainNode.setActionIfNotEmpty(action);
 
             String xml = objFactory.toXMLString(objModifyJobChainNode);
             String answer = executeXml(xml);
@@ -554,18 +528,9 @@ public class SOSCommandSecurityWebservice {
             objFactory.initMarshaller(Spooler.class);
             JSCmdKillTask objKillTask = objFactory.createKillTask();
 
-            if (id != null && id.length() > 0) {
-                BigInteger b = new BigInteger(id);
-                objKillTask.setId(b);
-            }
-
-            if (job != null && job.length() > 0) {
-                objKillTask.setJob(job);
-            }
-
-            if (immediately != null && immediately.length() > 0) {
-                objKillTask.setImmediately(immediately);
-            }
+            objKillTask.setIdIfNotEmpty(id);
+            objKillTask.setJobIfNotEmpty(job);
+            objKillTask.setImmediatelyIfNotEmpty(immediately);
 
             String xml = objFactory.toXMLString(objKillTask);
             String answer = executeXml(xml);
@@ -593,13 +558,8 @@ public class SOSCommandSecurityWebservice {
             objFactory.initMarshaller(Spooler.class);
             JSCmdModifyJob objModifyJob = objFactory.createModifyJob();
 
-            if (cmd != null && cmd.length() > 0) {
-                objModifyJob.setCmd(cmd);
-            }
-
-            if (job != null && job.length() > 0) {
-                objModifyJob.setJob(job);
-            }
+            objModifyJob.setCmdIfNotEmpty(cmd);
+            objModifyJob.setJobIfNotEmpty(job);
 
             String xml = objFactory.toXMLString(objModifyJob);
 
@@ -627,14 +587,8 @@ public class SOSCommandSecurityWebservice {
             objFactory.initMarshaller(Spooler.class);
             JSCmdModifySpooler objModifySpooler = objFactory.createModifySpooler();
 
-            if (cmd != null && cmd.length() > 0) {
-                objModifySpooler.setCmd(cmd);
-            }
-
-            if (timeout != null && timeout.length() > 0) {
-                BigInteger b = new BigInteger(timeout);
-                objModifySpooler.setTimeout(b);
-            }
+            objModifySpooler.setCmdIfNotEmpty(cmd);
+            objModifySpooler.setTimeoutIfNotEmpty(timeout);
 
             String xml = objFactory.toXMLString(objModifySpooler);
 
@@ -668,21 +622,11 @@ public class SOSCommandSecurityWebservice {
             objFactory.initMarshaller(Spooler.class);
             JSObjProcessClass objProcessClass = objFactory.createProcessClass();
 
-            if (schedulerId != null && schedulerId.length() > 0) {
-                objProcessClass.setSpoolerId(schedulerId);
-            }
-
-            if (name != null && name.length() > 0) {
-                objProcessClass.setName(name);
-            }
-
-            if (remoteScheduler != null && remoteScheduler.length() > 0) {
-                objProcessClass.setRemoteScheduler(remoteScheduler);
-            }
-
-            if (replace != null && replace.length() > 0) {
-                objProcessClass.setReplace(replace);
-            }
+            objProcessClass.setSpoolerIdIfNotEmpty(schedulerId);
+            objProcessClass.setNameIfNotEmpty(name);
+            objProcessClass.setRemoteSchedulerIfNotEmpty(remoteScheduler);
+            objProcessClass.setReplaceIfNotEmpty(replace);
+            objProcessClass.setMaxProcessesIfNotEmpty(maxProcesses);
 
             if (maxProcesses != null && maxProcesses.length() > 0) {
                 try {
@@ -717,9 +661,7 @@ public class SOSCommandSecurityWebservice {
             objFactory.initMarshaller(Spooler.class);
             JSCmdProcessClassRemove objProcessClass = objFactory.createProcessClassRemove();
 
-            if (processClass != null && processClass.length() > 0) {
-                objProcessClass.setProcessClass(processClass);
-            }
+            objProcessClass.setProcessClassIfNotEmpty(processClass);
 
             //String xml = objFactory.toXMLString(objProcessClass);
             //TODO Scheduler Modell
@@ -812,13 +754,8 @@ public class SOSCommandSecurityWebservice {
             objFactory.initMarshaller(Spooler.class);
             JSObjLock objLock = objFactory.createLock();
 
-            if (maxNonExclusive != null && maxNonExclusive.length() > 0) {
-                objLock.setMaxNonExclusive(Integer.valueOf(maxNonExclusive));
-            }
-
-            if (name != null && name.length() > 0) {
-                objLock.setName(name);
-            }
+            objLock.setMaxNonExclusiveIfNotEmpty(maxNonExclusive);
+            objLock.setNameIfNotEmpty(name);
 
             String xml = objFactory.toXMLString(objLock);
 
@@ -846,9 +783,7 @@ public class SOSCommandSecurityWebservice {
             objFactory.initMarshaller(Spooler.class);
             JSCmdLockRemove objLock = objFactory.createLockRemove();
 
-            if (lock != null && lock.length() > 0) {
-                objLock.setLock(lock);
-            }
+            objLock.setLockIfNotEmpty(lock);
 
             //String xml = objFactory.toXMLString(objLock);
             // TODO: toXMLString does not work
@@ -881,19 +816,10 @@ public class SOSCommandSecurityWebservice {
             objFactory.initMarshaller(Spooler.class);
             JSCmdTerminate objTerminate = new JSCmdTerminate(objFactory);
 
-            if (allSchedulers != null && allSchedulers.length() > 0) {
-                objTerminate.setAllSchedulers(allSchedulers);
-            }
-            if (continueExclusiveOperation != null && continueExclusiveOperation.length() > 0) {
-                objTerminate.setContinueExclusiveOperation(continueExclusiveOperation);
-            }
-            if (restart != null && restart.length() > 0) {
-                objTerminate.setRestart(restart);
-            }
-            if (timeout != null && timeout.length() > 0) {
-                BigInteger t = new BigInteger(timeout);
-                objTerminate.setTimeout(t);
-            }
+            objTerminate.setAllSchedulersIfNotEmpty(allSchedulers);
+            objTerminate.setContinueExclusiveOperationIfNotEmpty(continueExclusiveOperation);
+            objTerminate.setRestartIfNotEmpty(restart);
+            objTerminate.setTimeoutIfNotEmpty(timeout);
 
             String xml = objFactory.toXMLString(objTerminate);
 
@@ -909,7 +835,9 @@ public class SOSCommandSecurityWebservice {
     @POST
     @Path("/login")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSCommandSecurityWebserviceAnswer login(@QueryParam("user") String user, @QueryParam("password") String password) {
+    public SOSCommandSecurityWebserviceAnswer login(
+            @QueryParam("user") String user, 
+            @QueryParam("password") String password) {
 
         if (currentUserList == null) {
             currentUserList = new SOSCommandSecurityWebserviceCurrentUsersList();
@@ -954,10 +882,10 @@ public class SOSCommandSecurityWebservice {
     @POST
     @Path("/logout")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSCommandSecurityWebserviceAnswer logout(@QueryParam("session_id") String sessionId) throws MalformedURLException {
+    public SOSCommandSecurityWebserviceAnswer logout(
+            @QueryParam("session_id") String sessionId) throws MalformedURLException {
 
         SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord = getAuthencationRecord(sessionId, PERMISSION_LOGOUT);
-       
 
         SOSRestShiroClient sosRestShiroClient = new SOSRestShiroClient();
         String resource = sosWebserviceAuthenticationRecord.getResource() + "/logout" + "?session_id=%s";
@@ -965,7 +893,7 @@ public class SOSCommandSecurityWebservice {
 
         sosRestShiroClient.getSOSShiroCurrentUserAnswer(new URL(String.format(sosWebserviceAuthenticationRecord.getResource(), sosWebserviceAuthenticationRecord.getSessionId())));
         SOSCommandSecurityWebserviceAnswer message = createAnswer("", String.format("%s --> Abgemeldet", sosWebserviceAuthenticationRecord.getSessionId()), sosWebserviceAuthenticationRecord);
-        
+
         if (currentUserList != null) {
             currentUserList.removeUser(sessionId);
         }
