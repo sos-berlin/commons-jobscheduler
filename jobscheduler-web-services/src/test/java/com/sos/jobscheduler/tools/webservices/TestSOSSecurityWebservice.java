@@ -11,13 +11,21 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.w3c.dom.Node;
 
+import sos.xml.SOSXMLXPath;
+
+import com.sos.jobscheduler.tools.webservices.client.SOSCommandSecurityClient;
 import com.sos.jobscheduler.tools.webservices.globals.MyWebserviceAnswer;
 import com.sos.jobscheduler.tools.webservices.globals.SOSCommandSecurityWebserviceAnswer;
 
 
 
 public class TestSOSSecurityWebservice {
+
+    private static final String LOGIN_USER = "root";
+    private static final String LOGIN_PWD = "root";
+    private static final String SOS_SECURITY_SERVER = "http://8of9.sos:40002/";
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
@@ -51,242 +59,375 @@ public class TestSOSSecurityWebservice {
      }
     
      @Test
-     public void testStartJob() throws MalformedURLException {
-          SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
-          String job;
-          job = "events2/job_exercise2";
-          String user = "SOS01";
-          String password = "sos01";
-          String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-          SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password);
-          m = sosSecurityWebservice.startJob(m.getSessionId(),job,"","","","myParam=test|yourParam=fest");          
+     public void testStartJob() throws Exception {        
+ 
+         String myUser = LOGIN_USER;
+         String myPwd = LOGIN_PWD;
+         
+         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
+         sosCommandSecurityClient.addParam("myName", "myValue");
+       
+             sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user="+myUser+"&password="+myPwd);
+             System.out.println(sosCommandSecurityClient.getAnswer());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
+            
+             sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/start_job?job=test/jobJunit&params=ping=33|host=localhost&session_id="+session);
+             sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser();
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getJobSchedulerAnswer());
+             
           
-         assertEquals("testMyWebserviceAnswerMessage","User SOS01 is not permitted. Missing permission: jobscheduler:joc:command:start:job:myJob",m.getMessage());        
-         assertEquals("testMyWebserviceAnswerResource",resource,m.getResource());        
-         assertEquals("testMyWebserviceAnswerUser",user,m.getUser());        
+             assertEquals("testMyWebserviceAnswerMessage",myUser,sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser());
+        
       }
      
      @Test
-     public void testModifyOrder() throws MalformedURLException {
-         SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
-         String jobChain = "myJobChain";
-         String orderId = "myOrderId";
-         String user = "SOS01";
-         String password = "sos01";
-         String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-         SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password);
-         m = sosSecurityWebservice.modifyOrder (m.getSessionId(),jobChain,orderId,"","","","","","","","","","myParam=test|yourParam=fest");          
+     public void testModifyOrder() throws Exception {
+      
+         String myUser = LOGIN_USER;
+         String myPwd = LOGIN_PWD;
          
+         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
+         sosCommandSecurityClient.addParam("myName", "myValue");
+       
+             sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user="+myUser+"&password="+myPwd);
+             System.out.println(sosCommandSecurityClient.getAnswer());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
+            
+             sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/modify_order?job_chain=test/job_chain_junit&order=test&suspended=yes&session_id="+session);
+             sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/modify_order?job_chain=test/job_chain_junit&order=test&suspended=no&session_id="+session);
+             sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser();
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getJobSchedulerAnswer());
+ 
+             assertEquals("testMyWebserviceAnswerMessage",myUser,sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser());
          
-         
-        assertEquals("testMyWebserviceAnswerMessage","job chain myJobChain gestartet with order myOrderId",m.getMessage());        
-        assertEquals("testMyWebserviceAnswerResource",resource,m.getResource());        
-        assertEquals("testMyWebserviceAnswerUser",user,m.getUser());        
-     }
-
-     @Test
-     public void testProcessClass() throws MalformedURLException {
-         SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
-         String processClass = "myProcessClass";
-         String user = "SOS01";
-         String password = "sos01";
-         String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-         SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password);
-         m = sosSecurityWebservice.processClass(m.getSessionId(),"", processClass, "", "", "");          
-         
-        assertEquals("testMyWebserviceAnswerMessage","job chain myJobChain gestartet with order myOrderId",m.getMessage());        
-        assertEquals("testMyWebserviceAnswerResource",resource,m.getResource());        
-        assertEquals("testMyWebserviceAnswerUser",user,m.getUser());        
-     }
-
-     @Test
-     public void testProcessClassRemove() throws MalformedURLException {
-         SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
-         String processClass = "myProcessClass";
-         String user = "SOS01";
-         String password = "sos01";
-         String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-         SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password);
-         m = sosSecurityWebservice.processClassRemove(m.getSessionId(),processClass);          
-         
-        assertEquals("testMyWebserviceAnswerMessage","job chain myJobChain gestartet with order myOrderId",m.getMessage());        
-        assertEquals("testMyWebserviceAnswerResource",resource,m.getResource());        
-        assertEquals("testMyWebserviceAnswerUser",user,m.getUser());        
-     }
-
-     @Test
-     public void testJobChainRemove() throws MalformedURLException {
-         SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
-         String jobChain = "xxx";
-         String user = "SOS01";
-         String password = "sos01";
-         String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-         SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password);
-         m = sosSecurityWebservice.jobChainRemove(m.getSessionId(),jobChain);          
-         
-        assertEquals("testMyWebserviceAnswerMessage","job chain myJobChain gestartet with order myOrderId",m.getMessage());        
-        assertEquals("testMyWebserviceAnswerResource",resource,m.getResource());        
-        assertEquals("testMyWebserviceAnswerUser",user,m.getUser());        
-     }
-
-     @Test
-     public void testOrderRemove() throws MalformedURLException {
-         SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
-         String jobChain = "xxx";
-         String order = "2";
-         String user = "SOS01";
-         String password = "sos01";
-         String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-         SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password);
-         m = sosSecurityWebservice.orderRemove(m.getSessionId(),jobChain,order);          
-         
-        assertEquals("testMyWebserviceAnswerMessage","job chain myJobChain gestartet with order myOrderId",m.getMessage());        
-        assertEquals("testMyWebserviceAnswerResource",resource,m.getResource());        
-        assertEquals("testMyWebserviceAnswerUser",user,m.getUser());        
-     }
-
-     @Test
-     public void testModifyJob() throws MalformedURLException {
-         SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
-         String job = "myJob";
-         String cmd = "stop";
-         String user = "SOS01";
-         String password = "sos01";
-         String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-         SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password);
-         m = sosSecurityWebservice.modifyJob (m.getSessionId(),job,cmd);          
-         
-         
-         
-        assertEquals("testMyWebserviceAnswerMessage","job chain myJobChain gestartet with order myOrderId",m.getMessage());        
-        assertEquals("testMyWebserviceAnswerResource",resource,m.getResource());        
-        assertEquals("testMyWebserviceAnswerUser",user,m.getUser());        
-     }
-
-     @Test
-     public void testModifySpooler() throws MalformedURLException {
-         SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
-         String cmd = "terminate";
-         String timeout = "";
-         String user = "SOS01";
-         String password = "sos01";
-         String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-         SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password);
-         m = sosSecurityWebservice.modifySpooler (m.getSessionId(),cmd, timeout);          
-         
-         
-         
-        assertEquals("testMyWebserviceAnswerMessage","job chain myJobChain gestartet with order myOrderId",m.getMessage());        
-        assertEquals("testMyWebserviceAnswerResource",resource,m.getResource());        
-        assertEquals("testMyWebserviceAnswerUser",user,m.getUser());        
-     }
-
-     @Test
-     public void testAddOrder() throws MalformedURLException {
-         SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
-         String jobChain = "myJobChain";
-         String orderId = "myOrderId";
-         String user = "SOS01";
-         String password = "sos01";
-         String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-         SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password);
-         m = sosSecurityWebservice.addOrder(m.getSessionId(),jobChain,orderId,"","","","","","","","","");          
-         
-        assertEquals("testMyWebserviceAnswerMessage","job chain myJobChain gestartet with order myOrderId",m.getMessage());        
-        assertEquals("testMyWebserviceAnswerResource",resource,m.getResource());        
-        assertEquals("testMyWebserviceAnswerUser",user,m.getUser());        
-     }
-
-     @Test
-     public void testLockRemove() throws MalformedURLException {
-         SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
-         String lock = "mylock";
-         String user = "SOS01";
-         String password = "sos01";
-         String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-         SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password);
-         m = sosSecurityWebservice.lockRemove(m.getSessionId()+"*",lock);          
-         
-         assertEquals("testMyWebserviceAnswerResource",resource,m.getResource());        
-        assertEquals("testMyWebserviceAnswerUser",user,m.getUser());        
-     }
-    
-     @Test
-     public void testKillTask() throws MalformedURLException {
-         SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
-         String id = "1324";
-         String immediately = "yes";
-         String job = "myJob";
-         String user = "SOS01";
-         String password = "sos01";
-         String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-         SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password);
-         m = sosSecurityWebservice.killTask(m.getSessionId(),id, immediately, job);          
-         
-         assertEquals("testMyWebserviceAnswerResource",resource,m.getResource());        
-         assertEquals("testMyWebserviceAnswerUser",user,m.getUser());        
-     }
-    
-     @Test
-     public void testJobChainModify() throws MalformedURLException {
-         SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
-         String jobChain = "myJobChain";
-         String state="stopped";
-         String user = "SOS01";
-         String password = "sos01";
-         String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-         SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password);
-         m = sosSecurityWebservice.jobChainModify(m.getSessionId(),jobChain, state);          
-         
-         assertEquals("testMyWebserviceAnswerResource",resource,m.getResource());        
-         assertEquals("testMyWebserviceAnswerUser",user,m.getUser());        
-     }
-   
-     @Test
-     public void testJobChainNodeModify() throws MalformedURLException {
-         SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
-         String jobChain = "myJobChain";
-         String state="100";
-         String action = "stop";
-         String user = "SOS01";
-         String password = "sos01";
-         String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-         SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user, password);
-         m = sosSecurityWebservice.jobChainNodeModify(m.getSessionId(),jobChain, action, state);          
-         
-         assertEquals("testMyWebserviceAnswerResource",resource,m.getResource());        
-         assertEquals("testMyWebserviceAnswerUser",user,m.getUser());        
-     }
-   
-     @Test
-     public void testLogin() throws MalformedURLException {
-          SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
           
-          String user = "SOS01";
-          String password = "sos01";
-          String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-          SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user,password);          
+     }
+
+     @Test
+     public void testProcessClass() throws Exception {
+         
+         String myUser = LOGIN_USER;
+         String myPwd = LOGIN_PWD;
+         
+         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
+         sosCommandSecurityClient.addParam("myName", "myValue");
+       
+             sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user="+myUser+"&password="+myPwd);
+             System.out.println(sosCommandSecurityClient.getAnswer());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
+            
+             sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/process_class?name=myProcessclass&session_id="+session);
+             sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser();
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getJobSchedulerAnswer());
+ 
+             assertEquals("testMyWebserviceAnswerMessage",myUser,sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser());
+
+         
+  
+     }
+
+     @Test
+     public void testProcessClassRemove() throws Exception {
+         String myUser = LOGIN_USER;
+         String myPwd = LOGIN_PWD;
+         
+         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
+         sosCommandSecurityClient.addParam("myName", "myValue");
+       
+             sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user="+myUser+"&password="+myPwd);
+             System.out.println(sosCommandSecurityClient.getAnswer());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
+            
+             sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/process_class?name=myProcessclass&session_id="+session);
+             sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/process_class_remove?process_class=myProcessclass&session_id="+session);
+
+             sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser();
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getJobSchedulerAnswer());
+ 
+             assertEquals("testMyWebserviceAnswerMessage",myUser,sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser());
+        
+     }
+
+     @Test
+     public void testJobChainRemove() throws Exception {
+         String myUser = LOGIN_USER;
+         String myPwd = LOGIN_PWD;
+         
+         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
+       
+             sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user="+myUser+"&password="+myPwd);
+             System.out.println(sosCommandSecurityClient.getAnswer());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
+                      
+
+             sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/add_order?job_chain=test/job_chain_prepare&session_id="+session);
+             java.lang.Thread.sleep(4000);
+             sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/remove_job_chain?job_chain=test&session_id="+session);
+
+             sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser();
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getJobSchedulerAnswer());
+ 
+             assertEquals("testMyWebserviceAnswerMessage",myUser,sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser());
+     }
+
+     @Test
+     public void testOrderRemove() throws Exception {
+         String myUser = LOGIN_USER;
+         String myPwd = LOGIN_PWD;
+         
+         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
+
+             sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user="+myUser+"&password="+myPwd);
+             System.out.println(sosCommandSecurityClient.getAnswer());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
+                      
+             SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
           
-         assertEquals("testMyWebserviceAnswerMessage","user: SOS01, password: sos01, resource: http://localhost:40040/jobscheduler/rest/sosPermission --> authenticated",m.getMessage());        
-         assertEquals("testMyWebserviceAnswerResource",resource,m.getResource());        
-         assertEquals("testMyWebserviceAnswerUser",user,m.getUser());        
+             sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/add_order?job_chain=test/job_chain_junit&order=3&at=now%2B60&session_id="+session);
+             java.lang.Thread.sleep(4000);
+
+             sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/remove_order?job_chain=test/job_chain_junit&order=3&session_id="+session);
+
+             sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser();
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getJobSchedulerAnswer());
+ 
+             assertEquals("testMyWebserviceAnswerMessage",myUser,sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser());
+     }
+
+     @Test
+     public void testModifyJob() throws Exception {
+         String myUser = LOGIN_USER;
+         String myPwd = LOGIN_PWD;
+         
+         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
+         sosCommandSecurityClient.addParam("myName", "myValue");
+       
+             sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user="+myUser+"&password="+myPwd);
+             System.out.println(sosCommandSecurityClient.getAnswer());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
+
+             sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/add_order?state=200&job_chain=test/job_chain_prepare&session_id="+session);
+             java.lang.Thread.sleep(4000);
+             sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/add_order?job_chain=test/job_chain_prepare&session_id="+session);
+             
+             java.lang.Thread.sleep(4000);
+             
+             sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/modify_job?job=test&cmd=stop&action=stop&session_id="+session);
+             sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/modify_job?job=test&cmd=unstop&action=stop&session_id="+session);
+             sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser();
+             
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getJobSchedulerAnswer());
+             
+          
+             assertEquals("testMyWebserviceAnswerMessage",myUser,sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser());
+     }
+
+     @Test
+     public void testModifySpooler() throws Exception {
+         String myUser = LOGIN_USER;
+         String myPwd = LOGIN_PWD;
+         
+         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
+         sosCommandSecurityClient.addParam("myName", "myValue");
+       
+             sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user="+myUser+"&password="+myPwd);
+             System.out.println(sosCommandSecurityClient.getAnswer());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
+ 
+             sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/modify_spooler?cmd=pause&session_id="+session);
+             java.lang.Thread.sleep(8000);
+             sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/modify_spooler?cmd=continue&session_id="+session);
+             sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser();
+             
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getJobSchedulerAnswer());
+             
+          
+             assertEquals("testMyWebserviceAnswerMessage",myUser,sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser());
+     }
+
+     @Test
+     public void testAddOrder() throws Exception {
+         String myUser = LOGIN_USER;
+         String myPwd = LOGIN_PWD;
+         
+         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
+       
+             sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user="+myUser+"&password="+myPwd);
+             System.out.println(sosCommandSecurityClient.getAnswer());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
+                      
+
+             sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/add_order?job_chain=test/job_chain_prepare&session_id="+session);
+
+             sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser();
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getJobSchedulerAnswer());
+ 
+             assertEquals("testMyWebserviceAnswerMessage",myUser,sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser());
+
       }
 
      @Test
-     public void testLogout() throws MalformedURLException {
-          SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
-          String user = "SOS01";
-          String password = "sos01";
-          String resource = "http://localhost:40040/jobscheduler/rest/sosPermission";
-          SOSCommandSecurityWebserviceAnswer m = sosSecurityWebservice.login(user,password);          
+     public void testLockRemove() throws Exception {
+         String myUser = LOGIN_USER;
+         String myPwd = LOGIN_PWD;
+         
+         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
+
+             sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user="+myUser+"&password="+myPwd);
+             System.out.println(sosCommandSecurityClient.getAnswer());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
+                      
+             SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
+          
+             sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/lock?name=mylock&session_id="+session);
+             sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/lock_remove?lock=mylock&session_id="+session);
+
+             sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser();
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getJobSchedulerAnswer());
+ 
+             assertEquals("testMyWebserviceAnswerMessage",myUser,sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser());
+
+     }
+    
+     @Test
+     public void testKillTask() throws Exception {
+         String myUser = LOGIN_USER;
+         String myPwd = LOGIN_PWD;
+         
+         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
+
+             sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user="+myUser+"&password="+myPwd);
+             System.out.println(sosCommandSecurityClient.getAnswer());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
+                      
+             SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
+          
+             //create a task
+             sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/start_job?job=test&session_id="+session);
+
+             String answer = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getJobSchedulerAnswer();
+            
+             //get id and job from scheduler answer
+             SOSXMLXPath   xPath;
+             
+             xPath = new SOSXMLXPath(new StringBuffer(answer));
+             Node n = xPath.selectSingleNode("//task");
+             String id = n.getAttributes().getNamedItem("id").getNodeValue();
+             String job = n.getAttributes().getNamedItem("job").getNodeValue();
+             
+            
+             //kill the task
+             sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/kill_task?id="+id+"&job="+job+"&immediately=yes&session_id="+session);
+
+             sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser();
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getJobSchedulerAnswer());
+ 
+             assertEquals("testMyWebserviceAnswerMessage",myUser,sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser());
+        }
+    
+     @Test
+     public void testJobChainModify() throws Exception {
+         String myUser = LOGIN_USER;
+         String myPwd = LOGIN_PWD;
+         
+         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
        
-          
-           m = sosSecurityWebservice.logout("test");          
-           assertEquals("testMyWebserviceAnswerMessage","SOS01 --> Abgemeldet",m.getMessage());        
-          
-           m = sosSecurityWebservice.logout("test!");          
-           assertEquals("testMyWebserviceAnswerMessage","null --> Abgemeldet",m.getMessage());        
-           assertEquals("testMyWebserviceAnswerResource",null,m.getResource());        
+             sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user="+myUser+"&password="+myPwd);
+             System.out.println(sosCommandSecurityClient.getAnswer());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
+                      
+
+             sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/add_order?job_chain=test/job_chain_prepare&session_id="+session);
+             java.lang.Thread.sleep(4000);
+             sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/job_chain_modify?job_chain=test&state=stopped&session_id="+session);
+
+             sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser();
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getJobSchedulerAnswer());
+ 
+             assertEquals("testMyWebserviceAnswerMessage",myUser,sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser());
+     }
+   
+     @Test
+     public void testJobChainNodeModify() throws Exception {
+         String myUser = LOGIN_USER;
+         String myPwd = LOGIN_PWD;
+         
+         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
+       
+             sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user="+myUser+"&password="+myPwd);
+             System.out.println(sosCommandSecurityClient.getAnswer());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
+                      
+
+             sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/add_order?job_chain=test/job_chain_prepare&session_id="+session);
+             java.lang.Thread.sleep(4000);
+             sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/job_chain_modify?job_chain=test&state=running&session_id="+session);
+             sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/job_chain_node_modify?job_chain=test&state=100&action=stop&session_id="+session);
+
+             sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser();
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getJobSchedulerAnswer());
+ 
+             assertEquals("testMyWebserviceAnswerMessage",myUser,sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser());
+     }
+   
+     @Test
+     public void testLogin() throws Exception {
+         String myUser = LOGIN_USER;
+         String myPwd = LOGIN_PWD;
+         
+         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
+       
+             sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user="+myUser+"&password="+myPwd);
+             System.out.println(sosCommandSecurityClient.getAnswer());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
+                      
+ 
+             assertEquals("testMyWebserviceAnswerMessage",myUser,sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser());
+        
+      }
+
+     @Test
+     public void testLogout() throws Exception {
+         String myUser = LOGIN_USER;
+         String myPwd = LOGIN_PWD;
+         
+         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
+       
+             sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user="+myUser+"&password="+myPwd);
+             System.out.println(sosCommandSecurityClient.getAnswer());
+             System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
+             String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
+             sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/logout?session_id="+session);
+                      
+ 
+             assertEquals("testMyWebserviceAnswerMessage",myUser,sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser());
        }
      
 }
