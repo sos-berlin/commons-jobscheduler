@@ -3,6 +3,8 @@ package com.sos.jobscheduler.tools.webservices.globals;
  import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+ import com.sos.jobscheduler.tools.webservices.globals.jaxb.SOSCommandSecurityWebserviceAnswer.SosSecurityWebserviceAnswer;
+
     @XmlRootElement(name = "sos_security_webservice_answer")
     public class SOSCommandSecurityWebserviceAnswer {
     private String message;
@@ -11,10 +13,21 @@ import javax.xml.bind.annotation.XmlRootElement;
     private String resource;
     private String sessionId;
     private boolean isEnabled;
-  
+    
     public SOSCommandSecurityWebserviceAnswer() {
     }
     
+    
+    public SOSCommandSecurityWebserviceAnswer(SosSecurityWebserviceAnswer sosCommandSecurityWebserviceJaxbAnswer) {
+        this.setIsEnabled(sosCommandSecurityWebserviceJaxbAnswer.isIsEnabled());
+        this.setJobSchedulerAnswer(sosCommandSecurityWebserviceJaxbAnswer.getJobSchedulerAnswer());
+        this.setMessage(sosCommandSecurityWebserviceJaxbAnswer.getMessage());
+        this.setResource(sosCommandSecurityWebserviceJaxbAnswer.getResource());
+        this.setSessionId(sosCommandSecurityWebserviceJaxbAnswer.getSessionId());
+        this.setUser(sosCommandSecurityWebserviceJaxbAnswer.getUser());
+    }
+    
+
     public SOSCommandSecurityWebserviceAnswer(String user, String resource, String message, String sessionId) {
     this.message = message;
     this.user = user;
