@@ -1,6 +1,7 @@
 package com.sos.scheduler.model.objects;
 
 import java.io.File;
+import java.math.BigInteger;
 
 import javax.xml.bind.JAXBElement;
 
@@ -43,50 +44,85 @@ import com.sos.scheduler.model.SchedulerObjectFactory;
  */
 public class JSObjProcessClass extends ProcessClass {
 
-	@SuppressWarnings("unused")
-	private final String		conClassName	= "JSObjProcessClass";
-	@SuppressWarnings("unused")
-	private static final Logger	logger			= Logger.getLogger(JSObjProcessClass.class);
+    @SuppressWarnings("unused")
+    private final String        conClassName      = "JSObjProcessClass";
+    @SuppressWarnings("unused")
+    private static final Logger logger            = Logger.getLogger(JSObjProcessClass.class);
 
-	public final static String fileNameExtension = ".process_class.xml";
+    public final static String  fileNameExtension = ".process_class.xml";
 
-	public JSObjProcessClass (final SchedulerObjectFactory schedulerObjectFactory) {
-		super();
-		objFactory = schedulerObjectFactory;
-		super.strFileNameExtension = fileNameExtension;
-	}
+    public JSObjProcessClass(final SchedulerObjectFactory schedulerObjectFactory) {
+        super();
+        objFactory = schedulerObjectFactory;
+        super.strFileNameExtension = fileNameExtension;
+    }
 
-	public JSObjProcessClass (final SchedulerObjectFactory schedulerObjectFactory, final ProcessClass origOrder) {
-		super();
-		super.strFileNameExtension = fileNameExtension;
-		objFactory = schedulerObjectFactory;
-		setObjectFieldsFrom(origOrder);
-	}
+    public JSObjProcessClass(final SchedulerObjectFactory schedulerObjectFactory, final ProcessClass origOrder) {
+        super();
+        super.strFileNameExtension = fileNameExtension;
+        objFactory = schedulerObjectFactory;
+        setObjectFieldsFrom(origOrder);
+    }
 
-	@SuppressWarnings("unchecked")
-	public JSObjProcessClass(final SchedulerObjectFactory schedulerObjectFactory, final ISOSVirtualFile pobjVirtualFile) {
-		objFactory = schedulerObjectFactory;
-		objJAXBElement = (JAXBElement<JSObjBase>) unMarshal(pobjVirtualFile);
-		setObjectFieldsFrom(objJAXBElement.getValue());
-		setHotFolderSrc(pobjVirtualFile);
-	}
+    @SuppressWarnings("unchecked")
+    public JSObjProcessClass(final SchedulerObjectFactory schedulerObjectFactory, final ISOSVirtualFile pobjVirtualFile) {
+        objFactory = schedulerObjectFactory;
+        objJAXBElement = (JAXBElement<JSObjBase>) unMarshal(pobjVirtualFile);
+        setObjectFieldsFrom(objJAXBElement.getValue());
+        setHotFolderSrc(pobjVirtualFile);
+    }
 
-	@Override
-	public String getObjectName() {
+    public void setSpoolerIdIfNotEmpty(String value) {
+        if (!isEmpty(value)) {
+            super.setSpoolerId(value);
+        }
+    }
 
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getJobName";
+    public void setNameIfNotEmpty(String value) {
+        if (!isEmpty(value)) {
+            super.setName(value);
+        }
+    }
 
-		String name = this.getHotFolderSrc().getName();
-		int i = name.indexOf(fileNameExtension);
-		if (i != -1) {
-			name = name.substring(0, name.indexOf(fileNameExtension));
-		}
-		name = new File(name).getName();
+    public void setRemoteSchedulerIfNotEmpty(String value) {
+        if (!isEmpty(value)) {
+            super.setSpoolerId(value);
+        }
+    }
 
-		return name;
+    public void setReplaceIfNotEmpty(String value) {
+        if (!isEmpty(value)) {
+            super.setReplace(value);
+        }
+    }
 
-	} // private String getJobName
+    public void setMaxProcessesIfNotEmpty(String value) {
+        if (!isEmpty(value)) {
+            try {
+                super.setMaxProcesses(new BigInteger(value));
+            }
+            catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public String getObjectName() {
+
+        @SuppressWarnings("unused")
+        final String conMethodName = conClassName + "::getJobName";
+
+        String name = this.getHotFolderSrc().getName();
+        int i = name.indexOf(fileNameExtension);
+        if (i != -1) {
+            name = name.substring(0, name.indexOf(fileNameExtension));
+        }
+        name = new File(name).getName();
+
+        return name;
+
+    } // private String getJobName
 
     public void setMaxProcesses(final int value) {
         maxProcesses = Int2BigInteger(value);

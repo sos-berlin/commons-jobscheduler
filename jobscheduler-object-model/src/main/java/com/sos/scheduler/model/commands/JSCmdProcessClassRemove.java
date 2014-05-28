@@ -47,4 +47,10 @@ public class JSCmdProcessClassRemove extends ProcessClassRemove {
 		super();
 		objFactory = schedulerObjectFactory;
 	}
+	
+    public void setProcessClassIfNotEmpty(String value) {
+        if (!isEmpty(value)) {
+            super.setProcessClass(value);
+        }
+    }
 }

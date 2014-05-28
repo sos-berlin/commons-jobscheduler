@@ -1,8 +1,11 @@
 package com.sos.scheduler.model.commands;
 
+import java.math.BigInteger;
+
 import org.apache.log4j.Logger;
 
 import com.sos.scheduler.model.SchedulerObjectFactory;
+import com.sos.scheduler.model.objects.JobChainNodeAction;
 
 /**
 * \class JSCmdKillTask 
@@ -47,4 +50,26 @@ public class JSCmdKillTask extends KillTask {
 		super();
 		objFactory = schedulerObjectFactory;
 	}
+	
+    public void setJobIfNotEmpty(String value) {
+        if (!isEmpty(value)) {
+            super.setJob(value);
+        }
+    }
+    
+    public void setImmediatelyIfNotEmpty(String value) {
+        if (!isEmpty(value)) {
+            super.setImmediately(value);
+        }
+    }
+    
+    public void setIdIfNotEmpty(String value) {
+        if (!isEmpty(value)) {
+            BigInteger b = new BigInteger(value);
+            super.setId(b);        }
+    }
+    
+
+       
+
 }

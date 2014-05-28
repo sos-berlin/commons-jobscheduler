@@ -59,6 +59,7 @@ public class JSObjLock extends Lock {
 		setObjectFieldsFrom(origOrder);
 	}
 	
+	
 	@SuppressWarnings("unchecked")
 	public JSObjLock(SchedulerObjectFactory schedulerObjectFactory, ISOSVirtualFile pobjVirtualFile) {
 		objFactory = schedulerObjectFactory;
@@ -66,6 +67,20 @@ public class JSObjLock extends Lock {
 		setObjectFieldsFrom((Lock) this.objJAXBElement.getValue());
 		setHotFolderSrc(pobjVirtualFile);	
 	}
+	
+	   public void  setMaxNonExclusiveIfNotEmpty(String value) {
+	         if (!isEmpty(value)) {
+	             super.setMaxNonExclusive(new BigInteger(value)); 
+	         }
+	      }   
+	   
+	   public void  setNameIfNotEmpty(String value) {
+	          if (!isEmpty(value)) {
+	              super.setName(value);
+	          }
+	       }
+
+	
 	
 	public void setMaxNonExclusive(int pMaxNonExclusive) {
 		@SuppressWarnings("unused")

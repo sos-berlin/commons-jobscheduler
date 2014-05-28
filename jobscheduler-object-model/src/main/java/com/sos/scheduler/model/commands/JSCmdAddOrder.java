@@ -56,50 +56,50 @@ public class JSCmdAddOrder extends JSObjOrder {
 
     public void setJobChainIfNotEmpty(String value) {
         if (!isEmpty(value)) {
-            this.jobChain = value;
+            super.setJobChain(value);
         }
     }
     
     public void setIdIfNotEmpty(String value) {
         if (!isEmpty(value)) {
-            this.id = value;
+            super.setId(value);
         }
     }
     
     public void setWebService(String value) {
         if (!isEmpty(value)) {
-            this.webService = value;
+            super.setWebService(value);
         }
     }
     
     public void setAtIfNotEmpty(String value) {
         if (!isEmpty(value)) {
-            this.at = value;
+            super.setAt(value);
         }
     }
     
     public void setEndState(String value) {
         if (!isEmpty(value)) {
-            this.endState = value;
+            super.setEndState(value);
         }
     }
     
     public void setPriorityIfNotEmpty(String value) {
         if (!isEmpty(value)) {
             BigInteger p = new BigInteger(value);
-            this.priority = p;
+            super.setPriority(p);
         }
     }
     
     public void setStateIfNotEmpty(String value) {
         if (!isEmpty(value)) {
-            this.state = value;
+            super.setState(value);
         }
     }
     
     public void setTitleIfNotEmpty(String value) {
         if (!isEmpty(value)) {
-            this.title = value;
+            super.setTitle(value);
         }
     }
     

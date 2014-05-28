@@ -47,4 +47,11 @@ public class JSCmdLockRemove extends LockRemove {
 		super();
 		objFactory = schedulerObjectFactory;
 	}
+	
+    public void  setLockIfNotEmpty(String value) {
+        if (!isEmpty(value)) {
+            super.setLock(value);
+        }
+     }
+
 }

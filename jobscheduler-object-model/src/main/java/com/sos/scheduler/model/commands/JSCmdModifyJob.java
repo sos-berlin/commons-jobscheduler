@@ -57,6 +57,22 @@ public class JSCmdModifyJob extends ModifyJob {
 		objFactory = schedulerObjectFactory;
 	}
 	
+	
+    
+    public void setCmdIfNotEmpty(String value) {
+         if (!isEmpty(value)) {
+             super.setCmd(value);
+         }
+     }
+
+    
+    public void setJobIfNotEmpty(String value) {
+         if (!isEmpty(value)) {
+             super.setJob(value);
+         }
+     }
+	
+	
 	/**
 	 * 
 	 * \brief setCmd

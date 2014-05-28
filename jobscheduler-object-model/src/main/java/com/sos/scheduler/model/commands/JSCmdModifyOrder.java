@@ -83,7 +83,7 @@ public class JSCmdModifyOrder extends ModifyOrder {
      */
     public void setXmlPayloadIfNotEmpty(XmlPayload value) {
         if (value != null) {
-            this.xmlPayload = value;
+            super.setXmlPayload(value);
         }
     }
 
@@ -95,7 +95,7 @@ public class JSCmdModifyOrder extends ModifyOrder {
      */
     public void setJobChainIfNotEmpty(String value) {
         if (!isEmpty(value)) {
-            this.jobChain = value;
+            super.setJobChain(value);
         }
     }
 
@@ -105,7 +105,7 @@ public class JSCmdModifyOrder extends ModifyOrder {
      */
     public void setOrderIfNotEmpty(String value) {
         if (!isEmpty(value)) {
-            this.order = value;
+            super.setOrder(value);
         }
     }
 
@@ -116,7 +116,7 @@ public class JSCmdModifyOrder extends ModifyOrder {
     public void setPriorityIfNotEmpty(String value) {
         if (!isEmpty(value)) {
             BigInteger p = new BigInteger(value);
-            this.priority = p;
+            super.setPriority(p);
         }
     }
 
@@ -126,7 +126,7 @@ public class JSCmdModifyOrder extends ModifyOrder {
      */
     public void setTitleIfNotEmpty(String value) {
         if (!isEmpty(value)) {
-            this.title = value;
+            super.setTitle(value);
         }
     }
 
@@ -136,7 +136,7 @@ public class JSCmdModifyOrder extends ModifyOrder {
      */
     public void setStateIfNotEmpty(String value) {
         if (!isEmpty(value)) {
-            this.state = value;
+            super.setState(value);
         }
     }
 
@@ -146,7 +146,7 @@ public class JSCmdModifyOrder extends ModifyOrder {
      */
     public void setSetbackIfNotEmpty(String value) {
         if (!isEmpty(value)) {
-            this.setback = value;
+            super.setSetback(value);
         }
     }
 
@@ -156,7 +156,7 @@ public class JSCmdModifyOrder extends ModifyOrder {
      */
     public void setSuspendedIfNotEmpty(String value) {
         if (!isEmpty(value)) {
-            this.suspended = value;
+            super.setSuspended(value);
         }
     }
 
@@ -166,7 +166,7 @@ public class JSCmdModifyOrder extends ModifyOrder {
      */
     public void setAtIfNotEmpty(String value) {
         if (!isEmpty(value)) {
-            this.at = value;
+            super.setAt(value);
         }
     }
 
@@ -176,7 +176,7 @@ public class JSCmdModifyOrder extends ModifyOrder {
      */
     public void setEndStateIfNotEmpty(String value) {
         if (!isEmpty(value)) {
-            this.endState = value;
+            super.setEndState(value);
         }
     }
 
@@ -186,7 +186,7 @@ public class JSCmdModifyOrder extends ModifyOrder {
      */
     public void setActionIfNotEmpty(String value) {
         if (!isEmpty(value)) {
-            this.action = value;
+            super.setAction(value);
         }
     }
 

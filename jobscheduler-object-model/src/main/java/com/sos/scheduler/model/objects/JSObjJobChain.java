@@ -72,37 +72,37 @@ public class JSObjJobChain extends JobChain {
 	}
 
     public void setNameIfNotEmpty(String value) {
-        if (value != null) {
+        if (!isEmpty(value)) {
             this.setName(value);
         } 
     }
     
     public void setDistributedNotEmpty(String value) {
-        if (value != null) {
+        if (!isEmpty(value)) {
             this.setDistributed(value);
         }
     }
     
     public void setMaxOrdersIfNotEmpty(String value) {
-        if (value != null) {
+        if (!isEmpty(value)) {
             this.setMaxorders(value);
         }
     }
     
     public void setOrdersRecoverableIfNotEmpty(String value) {
-        if (value != null) {
+        if (!isEmpty(value)) {
             this.setOrdersRecoverable(value);
         }
     }
 
     public void setVisibleIfNotEmpty(String value) {
-        if (value != null) {
+        if (!isEmpty(value)) {
             this.setVisible(value);
         }
     }
     
     public void setTitleIfNotEmpty(String value) {
-        if (value != null) {
+        if (!isEmpty(value)) {
             this.setTitle(value);
         }
     }

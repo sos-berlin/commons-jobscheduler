@@ -112,6 +112,31 @@ public class JSCmdStartJob extends StartJob {
 	// objFactory.run(this);
 	// }
 
+	
+    public void setJobIfNotEmpty(String value) {
+        if (!isEmpty(value)) {
+            super.setJob(value);
+        }
+    }
+	
+    public void setForceIfNotEmpty(String value) {
+        if (!isEmpty(value)) {
+            super.setForce(value);
+        }
+    }
+    
+    public void setAtIfNotEmpty(String value) {
+        if (!isEmpty(value)) {
+            super.setAt(at);
+        }
+    }
+    
+    public void setNameIfNotEmpty(String value) {
+        if (!isEmpty(value)) {
+            super.setName(value);
+        }
+    }
+    
 	public void setForce(final boolean pflgForce) {
 
 		@SuppressWarnings("unused")

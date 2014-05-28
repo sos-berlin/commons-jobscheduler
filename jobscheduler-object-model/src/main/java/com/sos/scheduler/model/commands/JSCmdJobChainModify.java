@@ -57,6 +57,19 @@ public class JSCmdJobChainModify extends JobChainModify {
 		objFactory = schedulerObjectFactory;
 	}
 	
+    public void setJobChainIfNotEmpty(String value) {
+        if (!isEmpty(value)) {
+            super.setJobChain(value);
+        }
+    }
+	    
+    public void setStateIfNotEmpte(String value) {
+        if (!isEmpty(value)) {
+            super.setState(value);
+        }
+    }
+	
+	
 	/**
 	 * 
 	 * \brief setState
