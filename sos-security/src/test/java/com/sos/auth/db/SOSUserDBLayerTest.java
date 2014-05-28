@@ -57,7 +57,7 @@ public class SOSUserDBLayerTest {
 	@SuppressWarnings("unused")
 	private final String	conClassName	= "SOSUserDBLayerTest";
     private SOSUserDBLayer sosUserDBLayer;
-    private String configurationFilename="c:/temp/hibernate.cfg.xml";
+    private String configurationFilename="R:/nobackup/sos/junit/hibernate_oracle.cfg.xml";
     private File configurationFile;
 
 	

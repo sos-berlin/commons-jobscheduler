@@ -14,7 +14,7 @@ import com.sos.auth.rest.permission.model.SOSPermissionShiro;
 
 public class TestSOSServicePermissionShiro {
 
-    private static final String SHIRO_PERMISSION = "jobscheduler:jid:execute";
+    private static final String SHIRO_PERMISSION = "sos:products:jid:execute";
     private static final String SHIRO_MAPPED_ROLE = "jid";
     private static final String LDAP_PASSWORD = "sos01";
     private static final String LDAP_USER = "SOS01";
@@ -47,9 +47,9 @@ public class TestSOSServicePermissionShiro {
         
         
         assertEquals("testClient",SHIRO_PERMISSION,permissisonsJid);        
-        assertEquals("testClient","jobscheduler:joe:execute",permissisonsJoe);        
-        assertEquals("testClient","jobscheduler:joc:execute",permissisonsJoc);        
-        assertEquals("testClient","jobscheduler:jid:dashboard:start_job",permissisonsDashboard);        
+        assertEquals("testClient","sos:products:joe:execute",permissisonsJoe);        
+        assertEquals("testClient","sos:products:joc:execute",permissisonsJoc);        
+        assertEquals("testClient","sos:products:jid:dashboard:start_job",permissisonsDashboard);        
     }
 
     

@@ -51,11 +51,11 @@ import com.sos.auth.rest.permission.model.SOSPermissionShiro;
 
 public class TestSOSRestShiroClient {
 
-    private static final String JETTY_REST_URL_ROLE = "http://localhost:40040/jobscheduler/rest/sosPermission/role?user=%s&pwd=%s&role=%s";
-    private static final String JETTY_REST_URL_PERMISSION = "http://localhost:40040/jobscheduler/rest/sosPermission/permission?user=%s&pwd=%s&permission=%s";
+    private static final String JETTY_REST_URL_ROLE = "http://8of9:40002/jobscheduler/rest/sosPermission/role?user=%s&pwd=%s&role=%s";
+    private static final String JETTY_REST_URL_PERMISSION = "http://8of9:40002/jobscheduler/rest/sosPermission/permission?user=%s&pwd=%s&permission=%s";
     private static final String LDAP_PASSWORD = "sos01";
     private static final String LDAP_USER = "SOS01";
-    private static final String JETTY_URL = "http://localhost:40040/jobscheduler/rest/sosPermission/permissions?user=%s&pwd=%s";
+    private static final String JETTY_URL = "http://8of9:40002/jobscheduler/rest/sosPermission/permissions?user=%s&pwd=%s";
     @SuppressWarnings("unused")
     private final String    conClassName    = "TestSOSRestShiroClient";
 
@@ -98,10 +98,10 @@ public class TestSOSRestShiroClient {
         String permissisonsDashboard = shiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionDashboard().getSOSPermission().get(0);
         
         
-        assertEquals("testClient","jobscheduler:jid:execute",permissisonsJid);        
-        assertEquals("testClient","jobscheduler:joe:execute",permissisonsJoe);        
-        assertEquals("testClient","jobscheduler:joc:execute",permissisonsJoc);        
-        assertEquals("testClient","jobscheduler:jid:dashboard:start_job",permissisonsDashboard);        
+        assertEquals("testClient","sos:products:jid:execute",permissisonsJid);        
+        assertEquals("testClient","sos:products:joe:execute",permissisonsJoe);        
+        assertEquals("testClient","sos:products:joc:execute",permissisonsJoc);        
+        assertEquals("testClient","sos:products:jid:dashboard:start_job",permissisonsDashboard);        
 
     }
         
@@ -121,44 +121,12 @@ public class TestSOSRestShiroClient {
         SOSJaxbSubject currentUser = new SOSJaxbSubject(sosPermissionShiro);
         
         assertEquals("testClientWithJaxb is authenticated",true,currentUser.isAuthenticated());
-        assertEquals("testClientWithJaxb has role joe",true,currentUser.hasRole("admin"));
-        assertEquals("testClientWithJaxb is permitted jobscheduler:jid:execute",true, currentUser.isPermitted("jobscheduler:jid:execute"));
+        assertEquals("testClientWithJaxb has role joe",true,currentUser.hasRole("joe"));
+        assertEquals("testClientWithJaxb is permitted sos:products:jid:execute",true, currentUser.isPermitted("sos:products:jid:execute"));
          
     }
     
-  @Test
-  public void testCurrentUserAnswer() throws MalformedURLException {
-     
-        
-        SOSRestShiroClient sosRestShiroClient = new SOSRestShiroClient();
-        
-        SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord = new SOSWebserviceAuthenticationRecord();
-        sosWebserviceAuthenticationRecord.setUser(LDAP_USER);
-        sosWebserviceAuthenticationRecord.setPassword(LDAP_PASSWORD);
-//        sosWebserviceAuthenticationRecord.setResource(JETTY_REST_URL_PERMISSION);
-        sosWebserviceAuthenticationRecord.setResource("http://localhost:40040/jobscheduler/rest/sosPermission/authenticate?user=%s&pwd=%s");
-        
-        sosWebserviceAuthenticationRecord.setPermission( "jobscheduler:jid:joctab:show");
-        
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = sosRestShiroClient.getSOSShiroCurrentUserAnswer(sosWebserviceAuthenticationRecord);
-        System.out.println(sosShiroCurrentUserAnswer.getSessionId());
-        
-        assertEquals("testCurrentUserAnswer is authenticated",true,sosShiroCurrentUserAnswer.getIsAuthenticated());
-        assertEquals("testCurrentUserAnswer is permitted jobscheduler:jid:joctab:show",true, sosShiroCurrentUserAnswer.isPermitted());
-
-         sosWebserviceAuthenticationRecord.setUser(LDAP_USER);
-        sosWebserviceAuthenticationRecord.setPassword(LDAP_PASSWORD);
-        sosWebserviceAuthenticationRecord.setResource(JETTY_REST_URL_ROLE);
-        sosWebserviceAuthenticationRecord.setPermission( "admin");
-      
-        sosShiroCurrentUserAnswer = sosRestShiroClient.getSOSShiroCurrentUserAnswer(sosWebserviceAuthenticationRecord);
-        
-        assertEquals("testCurrentUserAnswer is authenticated",true,sosShiroCurrentUserAnswer.getIsAuthenticated());
-        assertEquals("testCurrentUserAnswer has role admin",true, sosShiroCurrentUserAnswer.hasRole());
-
-
-         
-    }
+  
 }
 
 

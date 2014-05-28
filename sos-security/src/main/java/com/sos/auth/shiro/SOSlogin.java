@@ -80,9 +80,9 @@ public class SOSlogin {
         SecurityManager securityManager = factory.getInstance();
         SecurityUtils.setSecurityManager(securityManager);
         currentUser = SecurityUtils.getSubject();
+        currentUser.logout();
 
-        session = currentUser.getSession();    
-        session.setAttribute("someKey", "aValue");
+       
       
     }
 

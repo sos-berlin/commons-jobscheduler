@@ -114,6 +114,8 @@ public class SOSServicePermissionShiro {
             SOSPermissionWorkingplan sosPermissionWorkingplan = o.createSOSPermissionWorkingplan();
     
             SOSPermissionJid sosPermissionJid = o.createSOSPermissionJid();
+            sosPermissionJid.setSOSPermissionJoc(sosPermissionJoc);
+            sosPermissionJid.setSOSPermissionJoe(sosPermissionJoe);
     
             sosPermissionJid.setSOSPermissionJoe(sosPermissionJoe);
             sosPermissionJid.setSOSPermissionJoc(sosPermissionJoc);
