@@ -40,12 +40,12 @@
         <dependency>
             <groupId>com.sos.scheduler.engine</groupId>
             <artifactId>kernel</artifactId>
-            <version>${engine.version}</version>
+            <version>${sos.engine.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sos.scheduler.engine</groupId>
             <artifactId>test</artifactId>
-            <version>${engine.version}</version>
+            <version>${sos.engine.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
