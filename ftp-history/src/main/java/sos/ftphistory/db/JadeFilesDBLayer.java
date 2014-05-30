@@ -95,6 +95,31 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Ser
             and = " and ";
         }
 
+        if (filter.getModifiedFrom() != null) {
+            where += and + " modified >= :modifiedFrom";
+            and = " and ";
+        }
+
+        if (filter.getModifiedTo() != null) {
+            where += and + " modified <= :modifiedTo ";
+            and = " and ";
+        }
+
+        if (filter.getMandator() != null && !filter.getMandator().equals("")) {
+            where += and + " mandator=:mandator";
+            and = " and ";
+        }
+
+        if (filter.getCreatedBy() != null && !filter.getCreatedBy().equals("")) {
+            where += and + " createdBy=:createdBy";
+            and = " and ";
+        }
+
+        if (filter.getModifiedBy() != null && !filter.getModifiedBy().equals("")) {
+            where += and + " modifiedBy=:modifiedBy";
+            and = " and ";
+        }
+
         if (filter.getSourceDir() != null && !filter.getSourceDir().equals("")) {
             where += and + " sourceDir=:sourceDir";
             and = " and ";
@@ -138,6 +163,26 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Ser
 
         if (filter.getCreatedTo() != null && !filter.getCreatedTo().equals("")) {
             query.setTimestamp("createdTo", filter.getCreatedTo());
+        }
+
+        if (filter.getModifiedFrom() != null && !filter.getModifiedFrom().equals("")) {
+            query.setTimestamp("modifiedFrom", filter.getModifiedFrom());
+        }
+
+        if (filter.getModifiedTo() != null && !filter.getModifiedTo().equals("")) {
+            query.setTimestamp("modifiedTo", filter.getModifiedTo());
+        }
+
+        if (filter.getMandator() != null && !filter.getMandator().equals("")) {
+            query.setText("mandator", filter.getMandator());
+        }
+
+        if (filter.getCreatedBy() != null && !filter.getCreatedBy().equals("")) {
+            query.setText("createdBy", filter.getCreatedBy());
+        }
+
+        if (filter.getModifiedBy() != null && !filter.getModifiedBy().equals("")) {
+            query.setText("modifiedBy", filter.getModifiedBy());
         }
 
         if (filter.getSourceDir() != null && !filter.getSourceDir().equals("")) {

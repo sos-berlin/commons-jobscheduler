@@ -51,6 +51,15 @@ public class JadeFilesFilter extends SOSHibernateIntervalFilter implements ISOSH
 	private String			createdFromIso;
 	private String			createdToIso;
 
+	private Date			modifiedFrom;
+	private Date			modifiedTo;
+
+	private String			createdBy;
+
+	private String			modifiedBy;
+	
+	private String			mandator;
+	
 	public String getCreatedFromIso() {
 		return createdFromIso;
 	}
@@ -143,33 +152,35 @@ public class JadeFilesFilter extends SOSHibernateIntervalFilter implements ISOSH
 	}
 
 	public void setCreatedFrom(final Date from) {
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
-		String d = formatter.format(from);
-		try {
+		if (from != null) {
+			SimpleDateFormat formatter = new SimpleDateFormat(
+					"yyyy-MM-dd 00:00:00");
+			String d = formatter.format(from);
+			try {
+				formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				createdFrom = formatter.parse(d);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
 			formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			createdFrom = formatter.parse(d);
+			createdFromIso = formatter.format(from);
 		}
-		catch (ParseException e) {
-			e.printStackTrace();
-		}
-
-		formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		createdFromIso = formatter.format(from);
 	}
 
 	public void setCreatedTo(final Date to) {
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd 23:59:59");
-		String d = formatter.format(to);
-		try {
+		if (to != null) {
+			SimpleDateFormat formatter = new SimpleDateFormat(
+					"yyyy-MM-dd 23:59:59");
+			String d = formatter.format(to);
+			try {
+				formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				createdTo = formatter.parse(d);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
 			formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			createdTo = formatter.parse(d);
+			createdToIso = formatter.format(to);
 		}
-		catch (ParseException e) {
-			e.printStackTrace();
-		}
-
-		formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		createdToIso = formatter.format(to);
 	}
 
 	@Override
@@ -212,4 +223,88 @@ public class JadeFilesFilter extends SOSHibernateIntervalFilter implements ISOSH
 		createdToIso = s;
 	}
 
+	public Date getModifiedFrom() {
+		return modifiedFrom;
+	}
+
+	public void setModifiedFrom(final String modifiedFrom) throws ParseException {
+		if (modifiedFrom.equals("")) {
+			this.modifiedFrom = null;
+		}
+		else {
+			SimpleDateFormat formatter = new SimpleDateFormat(dateFormat1);
+			Date d = formatter.parse(modifiedFrom);
+			setModifiedFrom(d);
+		}
+	}
+
+	public Date getModifiedTo() {
+		return modifiedTo;
+	}
+
+	public void setModifiedTo(final String modifiedTo) throws ParseException {
+		if (modifiedTo.equals("")) {
+			this.modifiedTo = null;
+		}
+		else {
+			SimpleDateFormat formatter = new SimpleDateFormat(dateFormat1);
+			Date d = formatter.parse(modifiedTo);
+			setModifiedTo(d);
+		}
+	}
+
+	public void setModifiedFrom(final Date from) {
+		if (from != null) {
+			SimpleDateFormat formatter = new SimpleDateFormat(
+					"yyyy-MM-dd 00:00:00");
+			String d = formatter.format(from);
+			try {
+				formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				modifiedFrom = formatter.parse(d);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	public void setModifiedTo(final Date to) {
+		if (to != null) {
+			SimpleDateFormat formatter = new SimpleDateFormat(
+					"yyyy-MM-dd 23:59:59");
+			String d = formatter.format(to);
+			try {
+				formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				modifiedTo = formatter.parse(d);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public String getMandator() {
+		return mandator;
+	}
+
+	public void setMandator(String mandator) {
+		this.mandator = mandator;
+	}
+
+	public String getModifiedBy() {
+		return modifiedBy;
+	}
+
+	public void setModifiedBy(String modifiedBy) {
+		this.modifiedBy = modifiedBy;
+	}
+	
 }
