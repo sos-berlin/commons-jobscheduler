@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -20,34 +21,48 @@
     </properties>
 
     <dependencies>
-    
+
         <dependency>
-		    <groupId>com.sos-berlin.products.jobscheduler</groupId>
+            <groupId>com.sos-berlin.products.commons</groupId>
+            <artifactId>common-resources</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sos.scheduler.enginedoc</groupId>
+            <artifactId>enginedoc-common</artifactId>
+            <version>${sos.engine.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sos-berlin.products.jobscheduler</groupId>
             <artifactId>jobscheduler-helper</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-				    <groupId>com.sos-berlin.products.jobscheduler</groupId>
+            <groupId>com.sos-berlin.products.jobscheduler</groupId>
             <artifactId>virtual-file-system</artifactId>
             <version>${project.version}</version>
         </dependency>
-    
+
         <!-- dependencies for third party libraries -->
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
         </dependency>
 
-		<dependency>
-			<groupId>commons-net</groupId>
-			<artifactId>commons-net</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
+        </dependency>
 
         <dependency>
-		    <groupId>xalan</groupId>
-		    <artifactId>xalan</artifactId>
-		</dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>xerces</groupId>

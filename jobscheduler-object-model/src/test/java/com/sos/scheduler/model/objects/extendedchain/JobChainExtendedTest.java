@@ -46,12 +46,15 @@ public class JobChainExtendedTest {
     private final static Logger logger = LoggerFactory.getLogger(JobChainExtendedTest.class);
 
 
-    private final static String packageName = "/com/sos/scheduler/model/objects/extendedchain/";
-
+    private final static String packageName = "com/sos/scheduler/model/objects/extendedchain/";
     private final static String xmlValid = packageName + "valid.job_chain.xml";
     private final static String xmlInvalid = packageName + "invalid.job_chain.xml";
-    private final static String xsdScheduler = packageName + "scheduler.xsd";
-    private final static String xsdJobChainExtensions = packageName + "job-chain-extensions-v1.0.xsd";
+
+    // get the schema from com.sos-berlin.products.commons:common-resources
+    private final static String xsdJobChainExtensions = "com/sos/resources/xsd/job-chain-extensions-v1.0.xsd";
+
+    // get the schema from com.sos.scheduler.enginedoc:enginedoc-commons
+    private final static String xsdScheduler = "com/sos/scheduler/enginedoc/common/scheduler.xsd";
 
     private final static SimpleChainNode node1 = new SimpleChainNode("100","JobChainStart","200",null,"error");
     private final static SimpleChainNode node2 = new SimpleChainNode("200","JobChainEnd","success","100","error");
@@ -70,7 +73,7 @@ public class JobChainExtendedTest {
             .build();
     private final static ImmutableMap<String,SimpleParam> expectedParams = new ImmutableMap.Builder<String,SimpleParam>()
             .put("param1",param1)
-            .put("param2",param2)
+            .put("param2", param2)
             .put("param3",param3)
             .build();
     private Schema schema;
@@ -88,13 +91,15 @@ public class JobChainExtendedTest {
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         Schema schema = null;
         try {
-            InputStream is = this.getClass().getResourceAsStream(xsdScheduler);
+            InputStream is = Resources.getResource(xsdScheduler).openStream();
             schema = schemaFactory.newSchema(new Source[]
                     {
-                            new StreamSource(this.getClass().getResourceAsStream(xsdScheduler),"scheduler.xsd"),
-                            new StreamSource(this.getClass().getResourceAsStream(xsdJobChainExtensions),"job-chain-extensions.xsd")
+                            new StreamSource(Resources.getResource(xsdScheduler).openStream()),
+                            new StreamSource(Resources.getResource(xsdJobChainExtensions).openStream())
                     });
         } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return schema;
@@ -105,7 +110,7 @@ public class JobChainExtendedTest {
 
         try {
 
-            final URL jobChainUrl = getClass().getResource(xmlValid);
+            final URL jobChainUrl = Resources.getResource(xmlValid);
             final String jobChainXml = Resources.toString(jobChainUrl, Charsets.UTF_8);
             JAXBContext jaxbContext = JAXBContext.newInstance(Spooler.class);
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
@@ -156,13 +161,13 @@ public class JobChainExtendedTest {
 
     @Test
     public void validateValid() throws IOException, SAXException {
-        StreamSource source = new StreamSource(this.getClass().getResourceAsStream(xmlValid));
+        StreamSource source = new StreamSource(Resources.getResource(xmlValid).openStream());
         validate(source,schema);
     }
 
     @Test( expected = org.xml.sax.SAXParseException.class)
     public void validateInvalid() throws IOException, SAXException {
-        StreamSource source = new StreamSource(this.getClass().getResourceAsStream(xmlInvalid));
+        StreamSource source = new StreamSource(Resources.getResource(xmlInvalid).openStream());
         validate(source, schema);
     }
 
