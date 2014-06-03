@@ -60,6 +60,7 @@ public class JobChainExtendedTest {
 
     private final static SimpleParam param1 = new SimpleParam("param1","value1");
     private final static SimpleParam param2 = new SimpleParam("param2","value2");
+    private final static SimpleParam param3 = new SimpleParam("param3","value3");
 
     private final static ImmutableMap<String,SimpleChainNode> expectedNodes = new ImmutableMap.Builder<String,SimpleChainNode>()
             .put("100",node1)
@@ -70,6 +71,7 @@ public class JobChainExtendedTest {
     private final static ImmutableMap<String,SimpleParam> expectedParams = new ImmutableMap.Builder<String,SimpleParam>()
             .put("param1",param1)
             .put("param2",param2)
+            .put("param3",param3)
             .build();
     private Schema schema;
 
@@ -89,8 +91,8 @@ public class JobChainExtendedTest {
             InputStream is = this.getClass().getResourceAsStream(xsdScheduler);
             schema = schemaFactory.newSchema(new Source[]
                     {
-                            new StreamSource(this.getClass().getResourceAsStream(xsdScheduler), "scheduler.xsd"),
-                            new StreamSource(this.getClass().getResourceAsStream(xsdJobChainExtensions), "job-chain-extensions-v1.0.xsd")
+                            new StreamSource(this.getClass().getResourceAsStream(xsdScheduler),"scheduler.xsd"),
+                            new StreamSource(this.getClass().getResourceAsStream(xsdJobChainExtensions),"job-chain-extensions.xsd")
                     });
         } catch (SAXException e) {
             e.printStackTrace();
@@ -146,7 +148,7 @@ public class JobChainExtendedTest {
                 for(ParamsExtended.Param p : n.getParams().getParam()) {
                     assertTrue(expectedParams.containsKey(p.getName()));
                     SimpleParam ep = expectedParams.get(p.getName());
-                    assertEquals(ep.value,p.getValue());
+                    assertEquals(ep.value, (p.getValue()!=null) ? p.getValue() : p.getContent() );
                 }
             }
         }
@@ -154,13 +156,13 @@ public class JobChainExtendedTest {
 
     @Test
     public void validateValid() throws IOException, SAXException {
-        StreamSource source = new StreamSource(getClass().getResourceAsStream(xmlValid));
+        StreamSource source = new StreamSource(this.getClass().getResourceAsStream(xmlValid));
         validate(source,schema);
     }
 
     @Test( expected = org.xml.sax.SAXParseException.class)
     public void validateInvalid() throws IOException, SAXException {
-        StreamSource source = new StreamSource(getClass().getResourceAsStream(xmlInvalid));
+        StreamSource source = new StreamSource(this.getClass().getResourceAsStream(xmlInvalid));
         validate(source, schema);
     }
 

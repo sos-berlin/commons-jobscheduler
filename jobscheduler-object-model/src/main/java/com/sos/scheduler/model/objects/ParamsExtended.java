@@ -107,18 +107,44 @@ public class ParamsExtended extends JSObjBase
     public static class Param extends JSObjBase
     {
 
+        @XmlValue
+        protected String content;
         @XmlAttribute(name = "name", required = true)
         protected String name;
-        @XmlAttribute(name = "value", required = true)
+        @XmlAttribute(name = "value")
         protected String value;
 
         /**
-         * Ruft den Wert der name-Eigenschaft ab.
-         * 
+         * Ruft den Wert der content-Eigenschaft ab.
+         *
          * @return
          *     possible object is
          *     {@link String }
-         *     
+         *
+         */
+        public String getContent() {
+            return content;
+        }
+
+        /**
+         * Legt den Wert der content-Eigenschaft fest.
+         *
+         * @param value
+         *     allowed object is
+         *     {@link String }
+         *
+         */
+        public void setContent(String value) {
+            this.content = value;
+        }
+
+        /**
+         * Ruft den Wert der name-Eigenschaft ab.
+         *
+         * @return
+         *     possible object is
+         *     {@link String }
+         *
          */
         public String getName() {
             return name;
@@ -126,11 +152,11 @@ public class ParamsExtended extends JSObjBase
 
         /**
          * Legt den Wert der name-Eigenschaft fest.
-         * 
+         *
          * @param value
          *     allowed object is
          *     {@link String }
-         *     
+         *
          */
         public void setName(String value) {
             this.name = value;
@@ -138,11 +164,11 @@ public class ParamsExtended extends JSObjBase
 
         /**
          * Ruft den Wert der value-Eigenschaft ab.
-         * 
+         *
          * @return
          *     possible object is
          *     {@link String }
-         *     
+         *
          */
         public String getValue() {
             return value;
@@ -150,11 +176,11 @@ public class ParamsExtended extends JSObjBase
 
         /**
          * Legt den Wert der value-Eigenschaft fest.
-         * 
+         *
          * @param value
          *     allowed object is
          *     {@link String }
-         *     
+         *
          */
         public void setValue(String value) {
             this.value = value;

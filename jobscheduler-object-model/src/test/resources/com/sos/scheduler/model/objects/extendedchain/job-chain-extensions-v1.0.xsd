@@ -46,9 +46,9 @@ See the definition of element job_chain_node in scheduler.xsd for details.
 		<xsd:complexType>
 			<xsd:sequence>
 				<xsd:element name="param" maxOccurs="unbounded">
-					<xsd:complexType>
+					<xsd:complexType mixed="true">
 						<xsd:attribute name="name" type="xsd:string" use="required" form="unqualified"/>
-						<xsd:attribute name="value" type="xsd:string" use="required" form="unqualified"/>
+						<xsd:attribute name="value" type="xsd:string" use="optional" form="unqualified"/>
 					</xsd:complexType>
 				</xsd:element>
 			</xsd:sequence>
