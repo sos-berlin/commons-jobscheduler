@@ -406,8 +406,8 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		setDefaultPort(this.Source().protocol, this.Source().port);
 		setDefaultPort(this.Target().protocol, this.Target().port);
 		setDefaultPort(protocol, port);
-		if (file_path.isNotDirty()) {
-			if (file_spec.isNotDirty()) {
+		if (file_path.isDirty()) {
+			if (file_spec.isDirty()) {
 				file_path.Value("");
 				String strT = getOptionNamesAsString(new SOSOptionElement[] { file_path, file_spec });
 				throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_0030.params(strT));
