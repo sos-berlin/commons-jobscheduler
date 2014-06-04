@@ -15,7 +15,6 @@
     <inceptionYear>2014</inceptionYear>
 
     <modules>
-        <module>data-exchange</module>
         <module>ftp-history</module>
         <module>h2-connection</module>
         <module>hibernate-commons</module>
