@@ -1313,7 +1313,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	/**
 	 * \see PreFtpCommands
 	 */
-	public SOSOptionString			PreTransferCommands	= (SOSOptionString) PreFtpCommands.SetAlias("pre_transfer_commands");
+	public SOSOptionCommandString			PreTransferCommands	= (SOSOptionCommandString) PreFtpCommands.SetAlias("pre_transfer_commands");
 
 	public String getPreFtpCommands() {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getPreFtpCommands";

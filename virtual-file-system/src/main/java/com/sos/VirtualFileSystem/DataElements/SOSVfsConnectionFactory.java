@@ -151,11 +151,18 @@ public class SOSVfsConnectionFactory {
 			objDataClient.TransferMode(objOptions.transfer_mode);
 		}
 		objDataClient.ControlEncoding(objOptions.ControlEncoding.Value());
-		// TODO pre-commands for source and target seperately
+		// TODO pre-commands for source and target separately
 		if (objOptions.PreFtpCommands.IsNotEmpty() && pflgIsDataSource == false) {
 			// TODO Command separator as option
 			for (String strCmd : objOptions.PreFtpCommands.split()) {
 				strCmd = objOptions.replaceVars(strCmd);
+				objDataClient.getHandler().ExecuteCommand(strCmd);
+			}
+		}
+		if (objConnectOptions.PreFtpCommands.IsNotEmpty()) {
+			// TODO Command separator as option
+			for (String strCmd : objConnectOptions.PreFtpCommands.split()) {
+				strCmd = objConnectOptions.replaceVars(strCmd);
 				objDataClient.getHandler().ExecuteCommand(strCmd);
 			}
 		}

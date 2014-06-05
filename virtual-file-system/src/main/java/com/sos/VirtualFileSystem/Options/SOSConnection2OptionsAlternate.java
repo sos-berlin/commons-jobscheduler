@@ -13,7 +13,9 @@ import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Listener.JSListener;
 import com.sos.JSHelper.Options.SOSOptionBoolean;
+import com.sos.JSHelper.Options.SOSOptionCommandString;
 import com.sos.JSHelper.Options.SOSOptionElement;
+import com.sos.JSHelper.Options.SOSOptionString;
 import com.sos.VirtualFileSystem.CredentialStore.KeePass.pl.sind.keepass.kdb.KeePassDataBase;
 import com.sos.VirtualFileSystem.CredentialStore.KeePass.pl.sind.keepass.kdb.KeePassDataBaseManager;
 import com.sos.VirtualFileSystem.CredentialStore.KeePass.pl.sind.keepass.kdb.v1.Entry;
@@ -60,6 +62,94 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 	private static final long	serialVersionUID		= 5924032437179660014L;
 	private String				strAlternativePrefix	= "";
 	public boolean				isSource				= false;
+	
+	/**
+	 * \option PreFtpCommands
+	 * \type SOSOptionString
+	 * \brief PreFtpCommands - FTP commands, which has to be executed before the transfer started
+	 *
+	 * \details
+	 * FTP commands, which has to be executed before the transfer started.
+	 *
+	 * see also: PostFtpCommands, PostCommand, PreCommand
+	 *
+	 * \mandatory: false
+	 *
+	 * \created 05.04.2011 15:45:52 by KB
+	 */
+	@JSOptionDefinition(
+						name = "PreFtpCommands",
+						description = "FTP commands, which has to be executed before the transfer started.",
+						key = "PreFtpCommands",
+						type = "SOSOptionString",
+						mandatory = false)
+	public SOSOptionCommandString	PreFtpCommands		= new SOSOptionCommandString(
+														// ...
+																this, // ....
+																conClassName + ".Pre_Ftp_Commands", // ...
+																"FTP commands, which has to be executed before the transfer started.", // ...
+																"", // ...
+																"", // ...
+																false);
+	/**
+	 * \see PreFtpCommands
+	 */
+	public SOSOptionCommandString			PreTransferCommands	= (SOSOptionCommandString) PreFtpCommands.SetAlias("pre_transfer_commands");
+
+	public String getPreFtpCommands() {
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getPreFtpCommands";
+		return PreFtpCommands.Value();
+	} // public String getPreFtpCommands
+
+	public SOSConnection2OptionsAlternate setPreFtpCommands(final String pstrValue) {
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setPreFtpCommands";
+		PreFtpCommands.Value(pstrValue);
+		return this;
+	} // public SOSFtpOptionsSuperClass setPreFtpCommands
+	/**
+	 * \option PostTransferCommands
+	 * \type SOSOptionString
+	 * \brief PostTransferCommands - FTP commands, which has to be executed after the transfer ended
+	 *
+	 * \details
+	 * FTP commands, which has to be executed after the transfer ended.
+	 *
+	 * see also: PostFtpCommands, PostCommand, PreCommand
+	 *
+	 * \mandatory: false
+	 *
+	 * \created 05.04.2011 15:45:52 by KB
+	 */
+	@JSOptionDefinition(
+						name = "PostTransferCommands",
+						description = "FTP commands, which has to be executed after the transfer ended.",
+						key = "PostTransferCommands",
+						type = "SOSOptionString",
+						mandatory = false)
+	public SOSOptionCommandString	PostTransferCommands	= new SOSOptionCommandString(
+															// ...
+																	this, // ....
+																	conClassName + ".post_transfer_Commands", // ...
+																	"FTP commands, which has to be executed after the transfer ended.", // ...
+																	"", // ...
+																	"", // ...
+																	false);
+	/**
+	 * \see PostTransferCommands
+	 */
+	public SOSOptionString			PostFtpCommands			= (SOSOptionString) PostTransferCommands.SetAlias("post_Transfer_commands");
+
+	public String getPostTransferCommands() {
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getPostTransferCommands";
+		return PostTransferCommands.Value();
+	} // public String getPostTransferCommands
+
+	public SOSConnection2OptionsAlternate setPostTransferCommands(final String pstrValue) {
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setPostTransferCommands";
+		PostTransferCommands.Value(pstrValue);
+		return this;
+	} // public SOSFtpOptionsSuperClass setPostTransferCommands
+
 	/**
 	 * \option IgnoreCertificateError
 	 * \type SOSOptionBoolean
