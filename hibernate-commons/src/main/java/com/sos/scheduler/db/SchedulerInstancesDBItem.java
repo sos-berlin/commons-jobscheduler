@@ -43,7 +43,8 @@ public class SchedulerInstancesDBItem extends DbItem {
 	 private String hostName;
      private Integer tcpPort;
 	 private Integer udpPort;
-     private Integer jettyPort;
+     private Integer jettyHttpPort;
+     private Integer jettyHttpsPort;
 	 private Date startTime;
 	 private Date stopTime;
  	 private String dbName;
@@ -61,7 +62,8 @@ public class SchedulerInstancesDBItem extends DbItem {
 	 private boolean isRunning=false;
 	 private boolean isPaused=false;
 	 private boolean isCluster=false;
-	 private boolean isAgent=false;
+     private boolean isAgent=false;
+     private boolean isSosCommandWebservice=false;
      private String param;
 	 	 
   	 private String dateFormat="yyyy-MM-dd hh:mm";
@@ -117,25 +119,46 @@ public class SchedulerInstancesDBItem extends DbItem {
     }
 
     @Column(name = "`TCP_PORT`", nullable = true)
-	public void setTcpPort(int tcpPort) {
+	public void setTcpPort(Integer tcpPort) {
 		this.tcpPort = tcpPort;
 	}
 
 	@Column(name = "`TCP_PORT`", nullable = true)
-	public int getTcpPort() {
+	public Integer getTcpPort() {
 		return tcpPort;
 	}
 	
-    @Column(name = "`JETTY_PORT`", nullable = true)
-    public void setJettyPort(int jettyPort) {
-        this.jettyPort = jettyPort;
+    @Column(name = "`JETTY_HTTP_PORT`", nullable = true)
+    public void setJettyHttpPort(Integer jettyHttpPort) {
+        this.jettyHttpPort = jettyHttpPort;
     }
 
-    @Column(name = "`JETTY_PORT`", nullable = true)
-    public int getJettyPort() {
-        return jettyPort;
+    @Column(name = "`JETTY_HTTP_PORT`", nullable = true)
+    public Integer getJettyHttpPort() {
+        return jettyHttpPort;
     }
-	
+    
+    @Column(name = "`JETTY_HTTPS_PORT`", nullable = true)
+    public void setJettyHttpsPort(Integer jettyHttpsPort) {
+        this.jettyHttpsPort = jettyHttpsPort;
+    }
+
+    @Column(name = "`JETTY_HTTPS_PORT`", nullable = true)
+    public Integer getJettyHttpsPort() {
+        return jettyHttpsPort;
+    }
+    
+    
+    @Column(name = "`IS_SOS_COMMAND_WEBSERVICE`", nullable = true)
+    public void setIsSosCommandWebservice(boolean isSosCommandWebservice) {
+        this.isSosCommandWebservice = isSosCommandWebservice;
+    }
+
+    @Column(name = "`IS_SOS_COMMAND_WEBSERVICE`", nullable = true)
+    public boolean getisSosCommandWebservice() {
+        return isSosCommandWebservice;
+    }
+    
 	
     @Column(name = "`UDP_PORT`", nullable = true)
 	public void setUdpPort(Integer udpPort) {

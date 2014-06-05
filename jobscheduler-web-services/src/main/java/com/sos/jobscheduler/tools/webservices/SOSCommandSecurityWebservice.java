@@ -1,9 +1,7 @@
 package com.sos.jobscheduler.tools.webservices;
 
-import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -17,8 +15,6 @@ import javax.inject.Inject;
 import org.w3c.dom.Node;
 
 import sos.xml.SOSXMLXPath;
-
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.auth.rest.SOSWebserviceAuthenticationRecord;
 import com.sos.auth.rest.client.SOSRestShiroClient;
@@ -26,8 +22,6 @@ import com.sos.jobscheduler.tools.webservices.globals.MyWebserviceAnswer;
 import com.sos.jobscheduler.tools.webservices.globals.SOSCommandSecurityWebserviceAnswer;
 import com.sos.scheduler.engine.kernel.scheduler.SchedulerXmlCommandExecutor;
 import com.sos.scheduler.model.SchedulerObjectFactory;
-import com.sos.scheduler.model.answers.Answer;
-import com.sos.scheduler.model.answers.ERROR;
 import com.sos.scheduler.model.commands.JSCmdAddOrder;
 import com.sos.scheduler.model.commands.JSCmdJobChainModify;
 import com.sos.scheduler.model.commands.JSCmdJobChainNodeModify;
@@ -44,8 +38,6 @@ import com.sos.scheduler.model.objects.JSObjJobChain;
 import com.sos.scheduler.model.objects.JSObjLock;
 import com.sos.scheduler.model.objects.JSObjProcessClass;
 import com.sos.scheduler.model.objects.JSObjRunTime;
-import com.sos.scheduler.model.objects.JobChainNodeAction;
-import com.sos.scheduler.model.objects.Params;
 import com.sos.scheduler.model.objects.Spooler;
 
 @Path("/plugin/security")
@@ -53,28 +45,29 @@ public class SOSCommandSecurityWebservice {
 
     private static final String PERMISSION_COMMAND = "/permission" + "?user=%s&pwd=%s&permission=%s&session_id=%s";
     private static final String AUTHENTICATE_COMMAND = "/authenticate" + "?user=%s&pwd=%s";
-    private static final String                                 JOBSCHEDULER_REST_SOS_PERMISSION = "/jobscheduler/rest/sosPermission";
-    private static final String                                 TRUE                             = "true";
-    private static final String                                 PERMISSION_LOGOUT                = "sos:products";
-    private static final String                                 SECURITY_SERVER_ADDRESS          = "security_server_address";
-    private static final String                                 SECURITY_SERVER_IS_ENABLED       = "security_server_enabled";
-    private static final String                                 GET_PARAMETER                    = "<param.get name=\"%s\"/>";
-    private static final String                                 PERMISSION_ADD_ORDER             = "sos:products:joc:command:add:order";
-    private static final String                                 PERMISSION_ADD_PROCESS_CLASS     = "sos:products:joc:command:add:process_class";
-    private static final String                                 PERMISSION_ADD_JOB_CHAIN         = "sos:products:joc:command:add:job_chain";
-    private static final String                                 PERMISSION_MODIFY_ORDER          = "sos:products:joc:command:modify:order";
-    private static final String                                 PERMISSION_MODIFY_JOB            = "sos:products:joc:command:modify:job";
-    private static final String                                 PERMISSION_MODIFY_SPOOLER        = "sos:products:joc:command:modify:spooler";
-    private static final String                                 PERMISSION_MODIFY_JOBCHAIN       = "sos:products:joc:command:modify:job_chain";
-    private static final String                                 PERMISSION_MODIFY_JOBCHAIN_NODE  = "sos:products:joc:command:modify:job_chain_node";
-    private static final String                                 PERMISSION_START_JOB             = "sos:products:joc:command:start:job";
-    private static final String                                 PERMISSION_KILL_TASK             = "sos:products:joc:command:kill_task";
-    private static final String                                 PERMISSION_LOCK                  = "sos:products:joc:command:add:lock";
-    private static final String                                 PERMISSION_REMOVE_LOCK           = "sos:products:joc:command:remove:lock";
-    private static final String                                 PERMISSION_REMOVE_PROCESS_CLASS  = "sos:products:joc:command:remove:process_class";
-    private static final String                                 PERMISSION_REMOVE_JOB_CHAIN      = "sos:products:joc:command:remove:job_chain";
-    private static final String                                 PERMISSION_REMOVE_ORDER          = "sos:products:joc:command:remove:order";
-    private static final String                                 PERMISSION_TERMINATE             = "sos:products:joc:command:terminate";
+    private static final String JOBSCHEDULER_REST_SOS_PERMISSION = "/jobscheduler/rest/sosPermission";
+    private static final String TRUE                             = "true";
+    private static final String PERMISSION_LOGOUT                = "sos:products";
+    private static final String SECURITY_SERVER_ADDRESS          = "security_server_address";
+    private static final String SECURITY_SERVER_IS_ENABLED       = "security_server_enabled";
+    private static final String GET_PARAMETER                    = "<param.get name=\"%s\"/>";
+    private static final String PERMISSION_ADD_ORDER             = "sos:products:joc:command:add:order";
+    private static final String PERMISSION_ADD_PROCESS_CLASS     = "sos:products:joc:command:add:process_class";
+    private static final String PERMISSION_ADD_JOB_CHAIN         = "sos:products:joc:command:add:job_chain";
+    private static final String PERMISSION_MODIFY_ORDER          = "sos:products:joc:command:modify:order";
+    private static final String PERMISSION_MODIFY_JOB            = "sos:products:joc:command:modify:job";
+    private static final String PERMISSION_MODIFY_SPOOLER        = "sos:products:joc:command:modify:spooler";
+    private static final String PERMISSION_MODIFY_JOBCHAIN       = "sos:products:joc:command:modify:job_chain";
+    private static final String PERMISSION_MODIFY_JOBCHAIN_NODE  = "sos:products:joc:command:modify:job_chain_node";
+    private static final String PERMISSION_START_JOB             = "sos:products:joc:command:start:job";
+    private static final String PERMISSION_KILL_TASK             = "sos:products:joc:command:kill_task";
+    private static final String PERMISSION_LOCK                  = "sos:products:joc:command:add:lock";
+    private static final String PERMISSION_REMOVE_LOCK           = "sos:products:joc:command:remove:lock";
+    private static final String PERMISSION_REMOVE_PROCESS_CLASS  = "sos:products:joc:command:remove:process_class";
+    private static final String PERMISSION_REMOVE_JOB_CHAIN      = "sos:products:joc:command:remove:job_chain";
+    private static final String PERMISSION_REMOVE_ORDER          = "sos:products:joc:command:remove:order";
+    private static final String PERMISSION_TERMINATE             = "sos:products:joc:command:terminate";
+    
     private SchedulerXmlCommandExecutor                         xmlCommandExecutor;
 
     private static SOSCommandSecurityWebserviceCurrentUsersList currentUserList;

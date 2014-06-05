@@ -111,11 +111,16 @@ public class SchedulerInstancesDBLayer  extends SOSHibernateDBLayer{
 			and = " and ";
 		}
 		
-		if (filter.getPort() != null && filter.getPort() > 0) {
-			where += and + " tcpPort = :tcpPort";
-			and = " and ";
-		}
-		 
+        if (filter.getPort() != null && filter.getPort() > 0) {
+            where += and + " tcpPort = :tcpPort";
+            and = " and ";
+        }
+         
+        if (filter.isSosCommandWebservice()) {
+            where += and + " isSosCommandWebservice = 1";
+            and = " and ";
+        }
+         
 		if (where.trim().equals("")) {
 
 		}

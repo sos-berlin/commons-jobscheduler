@@ -43,9 +43,10 @@ public class SchedulerInstancesFilter extends SOSHibernateFilter implements ISOS
 	private String			hostname;
 	private String			dbName;
 	private Integer			port;
-	private boolean			isRunnig;
-	private boolean			isPaused;
-	private boolean			isAgent;
+	private boolean			isRunnig=false;
+	private boolean			isPaused=false;
+    private boolean         isAgent=false;
+    private boolean         isSosCommandWebservice=false;
 
 	public SchedulerInstancesFilter() {
 		super(SOSHibernateConstants.conPropertiesFileName);
@@ -95,13 +96,21 @@ public class SchedulerInstancesFilter extends SOSHibernateFilter implements ISOS
 		this.isPaused = isPaused;
 	}
 
-	public boolean isAgent() {
-		return isAgent;
-	}
+    public boolean isAgent() {
+        return isAgent;
+    }
 
-	public void setAgent(boolean isAgent) {
-		this.isAgent = isAgent;
-	}
+    public void setAgent(boolean isAgent) {
+        this.isAgent = isAgent;
+    }
+
+    public boolean isSosCommandWebservice() {
+        return isSosCommandWebservice;
+    }
+
+    public void setSosCommandWebservice(boolean isSosCommandWebservice) {
+        this.isSosCommandWebservice = isSosCommandWebservice;
+    }
 
 	public String getDateFormat() {
 		return dateFormat;
