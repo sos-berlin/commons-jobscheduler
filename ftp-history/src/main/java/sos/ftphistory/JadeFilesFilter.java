@@ -60,6 +60,8 @@ public class JadeFilesFilter extends SOSHibernateIntervalFilter implements ISOSH
 	
 	private String			mandator;
 	
+	private Integer			fileSize;
+	
 	public String getCreatedFromIso() {
 		return createdFromIso;
 	}
@@ -305,6 +307,14 @@ public class JadeFilesFilter extends SOSHibernateIntervalFilter implements ISOSH
 
 	public void setModifiedBy(String modifiedBy) {
 		this.modifiedBy = modifiedBy;
+	}
+
+	public Integer getFileSize() {
+		return fileSize;
+	}
+
+	public void setFileSize(Integer fileSize) {
+		this.fileSize = fileSize;
 	}
 	
 }

@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.hibernate.ObjectNotFoundException;
@@ -14,7 +13,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import sos.ftphistory.JadeFilesFilter;
-import sos.util.SOSDate;
 
 import com.sos.hibernate.layer.SOSHibernateIntervalDBLayer;
 
@@ -145,6 +143,11 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Ser
             and = " and ";
         }
 
+        if (filter.getFileSize() != null) {
+            where += and + " fileSize=:fileSize";
+            and = " and ";
+        }
+
         if (where.trim().equals("")) {
 
         }
@@ -203,6 +206,10 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Ser
 
         if (filter.getSourceUser() != null && !filter.getSourceUser().equals("")) {
             query.setText("sourceUser", filter.getSourceUser());
+        }
+
+        if (filter.getFileSize() != null) {
+            query.setInteger("fileSize", filter.getFileSize());
         }
 
     }

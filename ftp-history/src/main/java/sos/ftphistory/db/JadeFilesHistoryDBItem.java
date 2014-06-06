@@ -7,9 +7,16 @@ package sos.ftphistory.db;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javax.persistence.*;
-
-import org.hibernate.Session;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
  
 
 
@@ -71,7 +78,7 @@ public class JadeFilesHistoryDBItem {
      private String createdBy;
      private Date   modified;
      private String modifiedBy;
-  //   private Session session;
+ 
      private JadeFilesDBItem jadeFilesDBItem;
 
 	public JadeFilesHistoryDBItem() {
@@ -79,8 +86,8 @@ public class JadeFilesHistoryDBItem {
 	}
      
 	
-	@ManyToOne (optional=true)
-	@JoinColumn(name="`SOSFTP_ID`")
+	@ManyToOne (optional=true, fetch=FetchType.LAZY)
+	@JoinColumn(name="`SOSFTP_ID`", nullable=true)
 	public JadeFilesDBItem getJadeFilesDBItem() {
 	  return this.jadeFilesDBItem;	
 	}
