@@ -15,7 +15,6 @@ import com.sos.JSHelper.Listener.JSListener;
 import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Options.SOSOptionCommandString;
 import com.sos.JSHelper.Options.SOSOptionElement;
-import com.sos.JSHelper.Options.SOSOptionString;
 import com.sos.VirtualFileSystem.CredentialStore.KeePass.pl.sind.keepass.kdb.KeePassDataBase;
 import com.sos.VirtualFileSystem.CredentialStore.KeePass.pl.sind.keepass.kdb.KeePassDataBaseManager;
 import com.sos.VirtualFileSystem.CredentialStore.KeePass.pl.sind.keepass.kdb.v1.Entry;
@@ -78,15 +77,15 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 	 * \created 05.04.2011 15:45:52 by KB
 	 */
 	@JSOptionDefinition(
-						name = "PreFtpCommands",
+						name = "PreTransferCommands",
 						description = "FTP commands, which has to be executed before the transfer started.",
-						key = "PreFtpCommands",
-						type = "SOSOptionString",
+						key = "PreTransferCommands",
+						type = "SOSOptionCommandString",
 						mandatory = false)
-	public SOSOptionCommandString	PreFtpCommands		= new SOSOptionCommandString(
+	public SOSOptionCommandString	PreTransferCommands		= new SOSOptionCommandString(
 														// ...
 																this, // ....
-																conClassName + ".Pre_Ftp_Commands", // ...
+																conClassName + ".pre_transfer_commands", // ...
 																"FTP commands, which has to be executed before the transfer started.", // ...
 																"", // ...
 																"", // ...
@@ -94,16 +93,16 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 	/**
 	 * \see PreFtpCommands
 	 */
-	public SOSOptionCommandString			PreTransferCommands	= (SOSOptionCommandString) PreFtpCommands.SetAlias("pre_transfer_commands");
+	public SOSOptionCommandString			PreFtpCommands	= (SOSOptionCommandString) PreTransferCommands.SetAlias("pre_transfer_commands");
 
-	public String getPreFtpCommands() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getPreFtpCommands";
-		return PreFtpCommands.Value();
+	public String getPreTransferCommands() {
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getPreTransferCommands";
+		return PreTransferCommands.Value();
 	} // public String getPreFtpCommands
 
-	public SOSConnection2OptionsAlternate setPreFtpCommands(final String pstrValue) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setPreFtpCommands";
-		PreFtpCommands.Value(pstrValue);
+	public SOSConnection2OptionsAlternate setPreTransferCommands(final String pstrValue) {
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setPreTransferCommands";
+		PreTransferCommands.Value(pstrValue);
 		return this;
 	} // public SOSFtpOptionsSuperClass setPreFtpCommands
 	/**
@@ -124,7 +123,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 						name = "PostTransferCommands",
 						description = "FTP commands, which has to be executed after the transfer ended.",
 						key = "PostTransferCommands",
-						type = "SOSOptionString",
+						type = "SOSOptionCommandString",
 						mandatory = false)
 	public SOSOptionCommandString	PostTransferCommands	= new SOSOptionCommandString(
 															// ...
@@ -137,7 +136,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 	/**
 	 * \see PostTransferCommands
 	 */
-	public SOSOptionString			PostFtpCommands			= (SOSOptionString) PostTransferCommands.SetAlias("post_Transfer_commands");
+	public SOSOptionCommandString	PostFtpCommands			= (SOSOptionCommandString) PostTransferCommands.SetAlias("post_Transfer_commands");
 
 	public String getPostTransferCommands() {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getPostTransferCommands";
