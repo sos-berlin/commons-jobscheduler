@@ -43,6 +43,7 @@ public class SOSSQLPlusJobOptions extends SOSSQLPlusJobOptionsSuperClass {
 	public SOSSQLPlusJobOptions() {
 	} // public SOSSQLPlusJobOptions
 
+	@Deprecated
 	public SOSSQLPlusJobOptions(final JSListener pobjListener) {
 		this();
 		this.registerMessageListener(pobjListener);
@@ -52,6 +53,7 @@ public class SOSSQLPlusJobOptions extends SOSSQLPlusJobOptionsSuperClass {
 
 	public SOSSQLPlusJobOptions(final HashMap<String, String> JSSettings) throws Exception {
 		super(JSSettings);
+		super.setChildClasses(JSSettings, EMPTY_STRING);
 	} // public SOSSQLPlusJobOptions (HashMap JSSettings)
 
 	/**

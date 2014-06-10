@@ -9,13 +9,21 @@ import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
 import com.sos.JSHelper.Listener.JSListener;
 import com.sos.JSHelper.Options.JSOptionsClass;
+import com.sos.JSHelper.Options.SOSOptionAuthenticationMethod;
 import com.sos.JSHelper.Options.SOSOptionCommandString;
+import com.sos.JSHelper.Options.SOSOptionHostName;
+import com.sos.JSHelper.Options.SOSOptionInFileName;
 import com.sos.JSHelper.Options.SOSOptionPassword;
+import com.sos.JSHelper.Options.SOSOptionPortNumber;
 import com.sos.JSHelper.Options.SOSOptionRegExp;
 import com.sos.JSHelper.Options.SOSOptionString;
 import com.sos.JSHelper.Options.SOSOptionStringValueList;
+import com.sos.JSHelper.Options.SOSOptionTransferType;
+import com.sos.JSHelper.Options.SOSOptionUrl;
 import com.sos.JSHelper.Options.SOSOptionUserName;
 import com.sos.VirtualFileSystem.Interfaces.ISOSCmdShellOptions;
+import com.sos.VirtualFileSystem.Options.keepass4j.ISOSCredentialStoreOptionsBridge;
+import com.sos.VirtualFileSystem.Options.keepass4j.SOSCredentialStoreImpl;
 
 /**
  * \class 		SOSSQLPlusJobOptionsSuperClass - Start SQL*Plus client and execute sql*plus programs
@@ -61,7 +69,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSCmdShellOptions;
  * \endverbatim
  */
 @JSOptionClass(name = "SOSSQLPlusJobOptionsSuperClass", description = "SOSSQLPlusJobOptionsSuperClass")
-public class SOSSQLPlusJobOptionsSuperClass extends JSOptionsClass implements ISOSCmdShellOptions {
+public class SOSSQLPlusJobOptionsSuperClass extends JSOptionsClass implements ISOSCmdShellOptions, ISOSCredentialStoreOptionsBridge {
 	/**
 	 *
 	 */
@@ -709,6 +717,7 @@ public class SOSSQLPlusJobOptionsSuperClass extends JSOptionsClass implements IS
 	public void CheckMandatory() throws JSExceptionMandatoryOptionMissing //
 			, Exception {
 		try {
+			objCredentialStore.checkCredentialStoreOptions();
 			super.CheckMandatory();
 		}
 		catch (Exception e) {
@@ -735,4 +744,80 @@ public class SOSSQLPlusJobOptionsSuperClass extends JSOptionsClass implements IS
 		super.CommandLineArgs(pstrArgs);
 		this.setAllOptions(super.objSettings);
 	}
+	
+	// Credential Store Methods and fields
+	
+	protected SOSCredentialStoreImpl objCredentialStore = null;
+	public SOSCredentialStoreImpl getCredentialStore() {
+		if (objCredentialStore == null) {
+			objCredentialStore = new SOSCredentialStoreImpl(this);
+		}
+		return objCredentialStore;
+	}
+
+	public void setChildClasses(final HashMap<String, String> pobjJSSettings, final String pstrPrefix) throws Exception {
+		getCredentialStore().setChildClasses(pobjJSSettings, pstrPrefix);
+		objCredentialStore.checkCredentialStoreOptions();
+	} // public SOSConnection2OptionsAlternate (HashMap JSSettings)
+
+	@Override public SOSOptionUrl getUrl() {
+		return null;
+	}
+
+	@Override public void setUrl(SOSOptionUrl pstrValue) {
+	}
+
+	@Override public SOSOptionHostName getHost() {
+		return null;
+	}
+
+	@Override public void setHost(SOSOptionHostName p_host) {
+	}
+
+	@Override public SOSOptionPortNumber getPort() {
+		return null;
+	}
+
+	@Override public void setPort(SOSOptionPortNumber p_port) {
+	}
+
+	@Override public SOSOptionTransferType getProtocol() {
+		return null;
+	}
+
+	@Override public void setProtocol(SOSOptionTransferType p_protocol) {
+	}
+
+	@Override public SOSOptionUserName getUser() {
+		return null;
+	}
+
+	@Override public SOSOptionPassword getPassword() {
+		return null;
+	}
+
+	@Override public void setPassword(SOSOptionPassword p_password) {
+		
+	}
+
+	@Override public SOSOptionInFileName getAuth_file() {
+		return null;
+	}
+
+	@Override public void setAuth_file(SOSOptionInFileName p_ssh_auth_file) {
+		
+	}
+
+	@Override public SOSOptionAuthenticationMethod getAuth_method() {
+		return null;
+	}
+
+	@Override public void setAuth_method(SOSOptionAuthenticationMethod p_ssh_auth_method) {
+		
+	}
+
+	@Override public void setUser(SOSOptionUserName pobjUser) {
+		
+	}
+
 } // public class SOSSQLPlusJobOptionsSuperClass

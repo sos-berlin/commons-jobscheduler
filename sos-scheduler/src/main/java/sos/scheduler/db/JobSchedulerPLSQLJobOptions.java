@@ -45,6 +45,7 @@ public class JobSchedulerPLSQLJobOptions extends JobSchedulerPLSQLJobOptionsSupe
 	public JobSchedulerPLSQLJobOptions() {
 	} // public JobSchedulerPLSQLJobOptions
 
+	@Deprecated
 	public JobSchedulerPLSQLJobOptions(final JSListener pobjListener) {
 		this();
 		this.registerMessageListener(pobjListener);
@@ -54,6 +55,7 @@ public class JobSchedulerPLSQLJobOptions extends JobSchedulerPLSQLJobOptionsSupe
 
 	public JobSchedulerPLSQLJobOptions (final HashMap <String, String> JSSettings) throws Exception {
 		super(JSSettings);
+		super.setChildClasses(JSSettings, EMPTY_STRING);
 	} // public JobSchedulerPLSQLJobOptions (HashMap JSSettings)
 /**
  * \brief CheckMandatory - prüft alle Muss-Optionen auf Werte
