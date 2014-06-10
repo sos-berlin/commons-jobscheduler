@@ -75,6 +75,12 @@
             <artifactId>jobscheduler-web-services</artifactId>
             <version>${project.version}</version>
         </dependency>
+        
+        <dependency>
+            <groupId>com.sos-berlin.products.jobscheduler</groupId>
+            <artifactId>jobscheduler-web-services-globals</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>com.sos-berlin.products.jobscheduler</groupId>
