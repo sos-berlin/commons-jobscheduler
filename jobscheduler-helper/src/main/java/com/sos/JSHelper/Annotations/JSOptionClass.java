@@ -35,4 +35,5 @@ public @interface JSOptionClass {
 	String name(); // der Name des Segments
 	String description();
 	String version() default "1.0";
+	String prefix() default "";
 }

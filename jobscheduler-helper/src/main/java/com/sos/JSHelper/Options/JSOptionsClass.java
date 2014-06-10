@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.io.StreamTokenizer;
 import java.lang.annotation.Annotation;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;
@@ -19,6 +20,7 @@ import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.text.StrTokenizer;
 import org.apache.log4j.Logger;
 import org.apache.xerces.parsers.DOMParser;
 import org.w3c.dom.Document;
@@ -205,6 +207,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	protected static final String	conParamNamePrefixJUMP			= "jump_";
 	protected static final String	conParamNamePrefixTARGET		= "target_";
 	protected static final String	conParamNamePrefixSOURCE		= "source_";
+	
+
 	protected enum IterationTypes {
 		setRecord(1), getRecord(2), toOut(3), createXML(4), setDefaultValues(5), clearAllValues(6), countSegmentFields(7), CheckMandatory(12), setPrefix(14), toString(
 				13), getCommandLine(14), DirtyToString(15), getKeyValuePair(16), LoadValues(17), StoreValues(18);
@@ -1961,6 +1965,11 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	public String	gstrApplicationName		= "JobScheduler";
 	public String	gstrApplicationDocuUrl	= "http://docu.sos-berlin.com";
 
+	public void CommandLineArgs(final String pstrArgs) {
+		StrTokenizer objT = new StrTokenizer (pstrArgs);
+		String[] strA = objT.getTokenArray();
+		CommandLineArgs(strA);
+	}
 	/**
 	 *
 	 * \brief CommandLineArgs - �bernehmen der Options/Settings aus der Kommandozeile
@@ -3109,4 +3118,5 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 			IterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.StoreValues, strB);
 		}
 	} // private void storeOptionValues
+	
 } // public class JSOptionsClass
