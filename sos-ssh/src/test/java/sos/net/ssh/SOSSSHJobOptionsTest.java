@@ -4,6 +4,7 @@
 package sos.net.ssh;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 
@@ -15,6 +16,8 @@ import org.junit.Test;
 
 import com.sos.JSHelper.Options.JSOptionsClass;
 import com.sos.JSHelper.io.Files.JSXMLFile;
+import com.sos.VirtualFileSystem.Options.keepass4j.SOSCredentialStoreImpl;
+import com.sos.VirtualFileSystem.Options.keepass4j.SOSCredentialStoreOptions;
 
 /**
  * @author KB
@@ -199,6 +202,21 @@ public class SOSSSHJobOptionsTest {
 		System.out.println(objOptions.toString());
 	}
 	
+	@Test
+	public void SetCmdArgsString() throws Exception {
+
+		SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
+
+		String strArgs = new String ( "-command=ls -auth_method=password -host=8of9.sos -AuthFile=test -user=kb -password=huhu" );
+		objOptions.CommandLineArgs(strArgs);
+
+		objOptions.CheckMandatory();
+		assertEquals(AUTH_FILE, objOptions.auth_file.Value(), "test");
+		assertEquals(USER, objOptions.user.Value(), "kb");
+
+		System.out.println(objOptions.toString());
+	}
+	
 	
 	
 	/*
@@ -258,7 +276,7 @@ public class SOSSSHJobOptionsTest {
 		pobjHM.put("SOSSSHJobOptions.ignore_exit_code", "12,33-47"); // This parameter configures one or more exit codes which wi
 		pobjHM.put("SOSSSHJobOptions.ignore_signal", "false"); // Should the value true be specified, then on
 		pobjHM.put("SOSSSHJobOptions.ignore_stderr", "false"); // This job checks if any output to stderr has been created
-		pobjHM.put("SOSSSHJobOptions.password", "test"); // This parameter specifies the user account password for au
+//		pobjHM.put("SOSSSHJobOptions.password", "test"); // This parameter specifies the user account password for au
 		pobjHM.put("SOSSSHJobOptions.port", "22"); // This parameter specifies the port number of the SSH serve
 		pobjHM.put("SOSSSHJobOptions.proxy_host", "test"); // The value of this parameter is the host name or the IP ad
 		pobjHM.put("SOSSSHJobOptions.proxy_password", "test"); // This parameter specifies the password for the proxy serve
@@ -274,7 +292,68 @@ public class SOSSSHJobOptionsTest {
 		pobjHM.put("step1/SOSSSHJobOptions.user", "step1user"); // This parameter specifies the user account to be used when
 		pobjHM.put("step2/SOSSSHJobOptions.user", "userofstep2"); // This parameter specifies the user account to be used when
 
+		pobjHM.put("UseCredentialStore", "true"); // This parameter specifies the user account to be used when
+		pobjHM.put("CredentialStoreFileName", strKeePassDBFileName); // This parameter specifies the user account to be used when
+		pobjHM.put("CredentialStorePassword", "testing"); // This parameter specifies the user account to be used when
+		pobjHM.put("CredentialStoreKeyPath", "sos/server/wilma.sos"); // This parameter specifies the user account to be used when
+
 		return pobjHM;
 	} // private void SetJobSchedulerSSHJobOptions (HashMap <String, String> pobjHM)
+
+	private HashMap<String, String> SetSSHJobOptionsUsingCredentialStore(final HashMap<String, String> pobjHM) {
+//		pobjHM.put("SOSSSHJobOptions.command", "test"); // This parameter specifies a command that is to be executed
+		pobjHM.put("SOSSSHJobOptions.command_delimiter", "%%"); // Command delimiter characters are specified using this par
+		pobjHM.put("SOSSSHJobOptions.command_script", "test"); // This parameter can be used as an alternative to command,
+		pobjHM.put("SOSSSHJobOptions.command_script_file", "test"); // This parameter can be used as an alternative to command,
+		pobjHM.put("SOSSSHJobOptions.command_script_param", "test"); // This parameter contains a parameterstring, which will be
+		pobjHM.put("SOSSSHJobOptions.ignore_error", "false"); // Should the value true be specified, then execution errors
+		pobjHM.put("SOSSSHJobOptions.ignore_exit_code", "12,33-47"); // This parameter configures one or more exit codes which wi
+		pobjHM.put("SOSSSHJobOptions.ignore_signal", "false"); // Should the value true be specified, then on
+		pobjHM.put("SOSSSHJobOptions.ignore_stderr", "false"); // This job checks if any output to stderr has been created
+
+		pobjHM.put("UseCredentialStore", "true"); // This parameter specifies the user account to be used when
+		pobjHM.put("CredentialStore_FileName", strKeePassDBFileName); // This parameter specifies the user account to be used when
+		pobjHM.put("CredentialStore_Password", "testing"); // This parameter specifies the user account to be used when
+		pobjHM.put("CredentialStore_KeyPath", "sos/server/wilma.sos"); // This parameter specifies the user account to be used when
+		pobjHM.put("CredentialStore_ProcessNotesParams", "true"); // This parameter specifies the user account to be used when
+
+		return pobjHM;
+	} // private void SetJobSchedulerSSHJobOptions (HashMap <String, String> pobjHM)
+
+	@Test (expected=java.lang.RuntimeException.class)
+	public void testCredentialStore1 () {
+		SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
+		SOSCredentialStoreOptions objCSO = objOptions.getCredentialStore().Options();
+		assertTrue("not null", objCSO != null);
+		objCSO.use_credential_Store.setTrue();
+		objCSO.CredentialStore_FileName.Value("c:/temp/t.1");
+		objOptions.getCredentialStore().checkCredentialStoreOptions();
+	}
+
+	private String strKeePassDBFileName = "R:/java.sources/trunk/products/jobscheduler/virtual-file-system/src/test/resources/keepassX-test.kdb";
+	@Test 
+	public void testCredentialStore2 () {
+		SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
+		SOSCredentialStoreOptions objCSO = objOptions.getCredentialStore().Options();
+		assertTrue("not null", objCSO != null);
+		objCSO.use_credential_Store.setTrue();
+		objCSO.CredentialStore_FileName.Value(strKeePassDBFileName);
+		objCSO.CredentialStore_password.Value("testing");
+		objCSO.CredentialStore_KeyPath.Value("sos/server/wilma.sos");
+		objOptions.getCredentialStore().checkCredentialStoreOptions();
+		assertEquals("userid", "test", objOptions.user.Value());
+		assertEquals("password", "12345", objOptions.password.Value());
+	}
+
+	@Test 
+	public void testCredentialStore3 () throws Exception {
+		SOSSSHJobOptions objOptions = new SOSSSHJobOptions(SetSSHJobOptionsUsingCredentialStore(new HashMap <String, String>()));
+		assertTrue("not null", objOptions != null);
+		assertEquals("userid", "test", objOptions.user.Value());
+		assertEquals("password", "12345", objOptions.password.Value());
+		assertEquals("command", "test.bsh", objOptions.command.Value());
+	}
+
+
 
 }

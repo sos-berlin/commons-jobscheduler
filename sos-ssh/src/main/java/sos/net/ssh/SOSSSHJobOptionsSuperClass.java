@@ -18,10 +18,15 @@ import com.sos.JSHelper.Options.SOSOptionPassword;
 import com.sos.JSHelper.Options.SOSOptionPortNumber;
 import com.sos.JSHelper.Options.SOSOptionRegExp;
 import com.sos.JSHelper.Options.SOSOptionString;
+import com.sos.JSHelper.Options.SOSOptionTransferType;
+import com.sos.JSHelper.Options.SOSOptionUrl;
 import com.sos.JSHelper.Options.SOSOptionUserName;
 import com.sos.JSHelper.interfaces.ISOSConnectionOptions;
+import com.sos.JSHelper.interfaces.ISOSDataProviderOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSShellOptions;
+import com.sos.VirtualFileSystem.Options.keepass4j.ISOSCredentialStoreOptionsBridge;
+import com.sos.VirtualFileSystem.Options.keepass4j.SOSCredentialStoreImpl;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 /**
@@ -381,12 +386,54 @@ import com.sos.i18n.annotation.I18NResourceBundle;
   */
 @I18NResourceBundle(baseName = "com_sos_net_messages", defaultLocale = "en")
 @JSOptionClass(name = "SOSSSHJobOptionsSuperClass", description = "Option-Class for a SSH-Connection")
-public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSConnectionOptions, ISOSAuthenticationOptions, ISOSShellOptions {
+public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSConnectionOptions, ISOSAuthenticationOptions, ISOSShellOptions, ISOSCredentialStoreOptionsBridge {
 	/**
 	 *
 	 */
 	private static final long	serialVersionUID		= 526076781389979326L;
 	private final String		conClassName			= "SOSSSHJobOptions";
+
+	/**
+	 * \option url
+	 * \type SOSOptionURL
+	 * \brief url - the url to which a connection have to be made
+	 *
+	 * \details
+	 * the url for the connection
+	 *
+	 * \mandatory: false
+	 *
+	 * \created 30.04.2014 16:32:05 by KB
+	 */
+	@JSOptionDefinition(
+						name = "url",
+						description = "the url for the connection",
+						key = "url",
+						type = "SOSOptionURL",
+						mandatory = false)
+	public SOSOptionUrl			url					= new SOSOptionUrl( // ...
+															this, // ....
+															conClassName + ".url", // ...
+															"the url for the connection", // ...
+															"", // ...
+															"", // ...
+															false);
+
+	/* (non-Javadoc)
+	 * @see com.sos.VirtualFileSystem.Options.ISOSDataProviderOptions#geturl()
+	 */
+	public SOSOptionUrl getUrl() {
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::geturl";
+		return url;
+	} // public String geturl
+
+	/* (non-Javadoc)
+	 * @see com.sos.VirtualFileSystem.Options.ISOSDataProviderOptions#seturl(com.sos.JSHelper.Options.SOSOptionUrl)
+	 */
+	public void setUrl(final SOSOptionUrl pstrValue) {
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::seturl";
+		url = pstrValue;
+	} // public SOSConnection2OptionsSuperClass seturl
 
 	/**
 	 * \option raise_exception_on_error
@@ -510,6 +557,42 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
 																						null, // DefaultValue
 																						true // isMandatory
 																				);	// This parameter specifies the hostname or IP address of th
+	public SOSOptionHostName HostName = (SOSOptionHostName) host.SetAlias("host_name", "ssh_server_name");
+	
+	/**
+	 * \var protocol : Type of requested Datatransfer The values ftp, sftp
+	 * The values ftp, sftp or ftps are valid for this parameter. If sftp is used, then the ssh_* parameters will be applied.
+	 *
+	 */
+	@JSOptionDefinition(
+						name = "protocol",
+						description = "Type of requested Datatransfer The values ftp, sftp",
+						key = "protocol",
+						type = "SOSOptionStringValueList",
+						mandatory = true)
+	public SOSOptionTransferType	protocol		= new SOSOptionTransferType(this, conClassName + ".protocol", // HashMap-Key
+															"Type of requested Datatransfer The values ftp, sftp", // Titel
+															"ssh", // InitValue
+															"ssh", // DefaultValue
+															true // isMandatory
+													);
+	public SOSOptionTransferType	ftp_protocol	= (SOSOptionTransferType) protocol.SetAlias("ftp_protocol");
+
+	/* (non-Javadoc)
+	 * @see com.sos.VirtualFileSystem.Options.ISOSDataProviderOptions#getprotocol()
+	 */
+	public SOSOptionTransferType getProtocol() {
+		return protocol;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.sos.VirtualFileSystem.Options.ISOSDataProviderOptions#setprotocol(com.sos.JSHelper.Options.SOSOptionTransferType)
+	 */
+	public void setProtocol(final SOSOptionTransferType p_protocol) {
+		protocol = p_protocol;
+	}
+	public SOSOptionTransferType	TransferProtocol		= (SOSOptionTransferType) protocol.SetAlias(conClassName + ".TransferProtocol");
+
 	/**
 	 * \var ignore_error: Should the value true be specified, then execution
 	 * errors
@@ -805,6 +888,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
 
 	//
 
+
 	/**
 	 * \brief CheckMandatory - pr�ft alle Muss-Optionen auf Werte
 	 *
@@ -818,6 +902,8 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
 	public void CheckMandatory() throws JSExceptionMandatoryOptionMissing //
 	{
 		try {
+			getCredentialStore().checkCredentialStoreOptions();
+
 			super.CheckMandatory();
 		}
 		catch (Exception e) {
@@ -1541,7 +1627,6 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
 
 	@Override
 	public SOSOptionPortNumber getalternative_port() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -1552,8 +1637,24 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
 
 	@Override
 	public void setalternative_password(final SOSOptionPassword pAlternativePassword) {
-		// TODO Auto-generated method stub
 
 	}
+
+	
+	// Credential Store Methods and fields
+	
+	protected SOSCredentialStoreImpl objCredentialStore = null;
+	public SOSCredentialStoreImpl getCredentialStore() {
+		if (objCredentialStore == null) {
+			objCredentialStore = new SOSCredentialStoreImpl(this);
+		}
+		return objCredentialStore;
+	}
+
+	public void setChildClasses(final HashMap<String, String> pobjJSSettings, final String pstrPrefix) throws Exception {
+		getCredentialStore().setChildClasses(pobjJSSettings, pstrPrefix);
+		objCredentialStore.checkCredentialStoreOptions();
+	} // public SOSConnection2OptionsAlternate (HashMap JSSettings)
+
 
 } // public class SOSSSHJobOptions

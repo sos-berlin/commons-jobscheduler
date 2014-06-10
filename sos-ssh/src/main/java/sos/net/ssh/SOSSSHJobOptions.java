@@ -1,8 +1,26 @@
 package sos.net.ssh;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Date;
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
+
+import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Listener.JSListener;
+import com.sos.JSHelper.Options.SOSOptionElement;
+import com.sos.VirtualFileSystem.CredentialStore.KeePass.pl.sind.keepass.kdb.KeePassDataBase;
+import com.sos.VirtualFileSystem.CredentialStore.KeePass.pl.sind.keepass.kdb.KeePassDataBaseManager;
+import com.sos.VirtualFileSystem.CredentialStore.KeePass.pl.sind.keepass.kdb.v1.Entry;
+import com.sos.VirtualFileSystem.CredentialStore.KeePass.pl.sind.keepass.kdb.v1.KeePassDataBaseV1;
+import com.sos.VirtualFileSystem.CredentialStore.exceptions.CredentialStoreEntryExpired;
+import com.sos.VirtualFileSystem.CredentialStore.exceptions.CredentialStoreKeyNotFound;
+import com.sos.VirtualFileSystem.Options.keepass4j.ISOSCredentialStoreOptionsBridge;
+import com.sos.VirtualFileSystem.Options.keepass4j.SOSCredentialStoreImpl;
+import com.sos.VirtualFileSystem.Options.keepass4j.SOSCredentialStoreOptions;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 /**
@@ -34,14 +52,23 @@ import com.sos.i18n.annotation.I18NResourceBundle;
  *
  */
 @I18NResourceBundle(baseName = "com_sos_net_messages", defaultLocale = "en")
-public class SOSSSHJobOptions extends SOSSSHJobOptionsSuperClass {
+public class SOSSSHJobOptions extends SOSSSHJobOptionsSuperClass  {
+	
 	private static final long	serialVersionUID	= 2072083231341151442L;
-	private final String		conClassName		= "SOSSSHJobOptions";
+	
+	private final String		conClassName			= this.getClass().getSimpleName();
+	@SuppressWarnings("unused")
+	private static final String	conSVNVersion			= "$Id$";
+	private static final Logger		logger					= Logger.getLogger(SOSSSHJobOptions.class);
+
 
 	public SOSSSHJobOptions() {
-		objParentClass = this.getClass();
+		init();
 	}
 
+	private void init () {
+		objParentClass = this.getClass();		
+	}
 	/**
 	 * \brief SOSSSHJobOptions
 	 *
@@ -49,9 +76,10 @@ public class SOSSSHJobOptions extends SOSSSHJobOptionsSuperClass {
 	 *
 	 * @param pobjListener
 	 */
+	@Deprecated
 	public SOSSSHJobOptions(final JSListener pobjListener) {
 		super(pobjListener);
-		objParentClass = this.getClass();
+		init();
 	}
 
 	/**
@@ -63,11 +91,16 @@ public class SOSSSHJobOptions extends SOSSSHJobOptionsSuperClass {
 	 * @throws Exception
 	 */
 	public SOSSSHJobOptions(final HashMap<String, String> JSSettings) throws Exception {
-		super();
-		objParentClass = this.getClass();
-		this.setAllOptions(JSSettings);
+		super(JSSettings);
+		init();
+		setChildClasses(JSSettings, "");
 	}
 
+	public void setChildClasses(final HashMap<String, String> pobjJSSettings, final String pstrPrefix) throws Exception {
+		super.setChildClasses(pobjJSSettings, pstrPrefix);
+	} // public SOSConnection2OptionsAlternate (HashMap JSSettings)
+
+	
 	/**
 	 *
 	 * \brief CheckMandatory
