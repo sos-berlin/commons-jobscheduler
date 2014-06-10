@@ -204,6 +204,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	 *
 	 * @param pobjListener
 	 */
+	@Deprecated
 	public SOSFTPOptions(final JSListener pobjListener) {
 		super(pobjListener);
 	}

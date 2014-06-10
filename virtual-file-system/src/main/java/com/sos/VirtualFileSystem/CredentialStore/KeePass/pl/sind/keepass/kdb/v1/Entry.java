@@ -21,6 +21,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.text.StrTokenizer;
 import org.apache.log4j.Logger;
 
 public class Entry {
@@ -159,6 +160,17 @@ public class Entry {
 	public void setPassword(final TextField password) {
 		this.password = password;
 	}
+
+	public String[] getNotesAsArray () {
+		StrTokenizer objT = new StrTokenizer (notes.getText());
+		String[] strA = objT.getTokenArray();
+		return strA;
+	}
+
+	public String getNotesText() {
+		return notes.getText();
+	}
+
 
 	public TextField getNotes() {
 		return notes;

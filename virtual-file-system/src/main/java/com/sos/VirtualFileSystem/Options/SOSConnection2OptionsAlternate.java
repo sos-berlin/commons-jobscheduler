@@ -223,10 +223,10 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 		AlternateOptionsUsed.Value(pstrValue);
 		return this;
 	} // public SOSConnection2OptionsAlternate setAlternateOptionsUsed
-	private SOSConnection2OptionsAlternate	objAlternativeOptions		= null;
-	private SOSConnection2OptionsAlternate	objProxyOptions				= null;
-	private SOSConnection2OptionsAlternate	objJumpServerOptions		= null;
-	private SOSCredentialStoreOptions		objCredentialStoreOptions	= null;
+	@JSOptionClass(description = "", name = "SOSConnection2OptionsAlternate", prefix="alternate_") private SOSConnection2OptionsAlternate	objAlternativeOptions		= null;
+	@JSOptionClass(description = "", name = "SOSConnection2OptionsAlternate", prefix="proxy_") private SOSConnection2OptionsAlternate	objProxyOptions				= null;
+	@JSOptionClass(description = "", name = "SOSConnection2OptionsAlternate", prefix="jump_") private SOSConnection2OptionsAlternate	objJumpServerOptions		= null;
+	@JSOptionClass(description = "", name = "SOSCredentialStoreOptions") private SOSCredentialStoreOptions		objCredentialStoreOptions	= null;
 
 	/**
 	* constructors
@@ -393,6 +393,11 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 					fleO.deleteOnExit();
 				}
 			}
+			
+			if (objCredentialStoreOptions.CredentialStore_ProcessNotesParams.isTrue()) {
+				CommandLineArgs(objEntry.getNotesText());
+			}
+
 		}
 	}
 

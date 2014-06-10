@@ -139,7 +139,7 @@ public class KeePassDataBaseV1 implements KeePassDataBase {
 						}
 					}
 				}
-				System.out.println(strPath);
+//				System.out.println(strPath);
 				objEntry.setPath(strPath);
 			}
 		}

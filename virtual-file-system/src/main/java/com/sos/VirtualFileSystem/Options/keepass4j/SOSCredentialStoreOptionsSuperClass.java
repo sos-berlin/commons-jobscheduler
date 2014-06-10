@@ -61,7 +61,11 @@ import com.sos.JSHelper.Options.SOSOptionString;
  * \endverbatim
  */
 @JSOptionClass(name = "SOSCredentialStoreOptionsSuperClass", description = "SOSCredentialStoreOptionsSuperClass")
-public class SOSCredentialStoreOptionsSuperClass extends JSOptionsClass {
+public class SOSCredentialStoreOptionsSuperClass extends JSOptionsClass  {
+	/**
+	 * 
+	 */
+	private static final long	serialVersionUID	= -4388209310315139254L;
 	private final String					conClassName						= "SOSCredentialStoreOptionsSuperClass";
 		@SuppressWarnings("unused")
 	private static Logger		logger			= Logger.getLogger(SOSCredentialStoreOptionsSuperClass.class);
@@ -676,9 +680,6 @@ public class SOSCredentialStoreOptionsSuperClass extends JSOptionsClass {
         use_credential_Store = p_use_credential_Store;
     }
 
-
-
-
 	public SOSCredentialStoreOptionsSuperClass() {
 		objParentClass = this.getClass();
 	} // public SOSCredentialStoreOptionsSuperClass
@@ -781,6 +782,6 @@ public class SOSCredentialStoreOptionsSuperClass extends JSOptionsClass {
 	@Override
 	public void CommandLineArgs(final String[] pstrArgs)  {
 		super.CommandLineArgs(pstrArgs);
-		this.setAllOptions(super.objSettings);
+//		this.setAllOptions(super.objSettings);
 	}
 } // public class SOSCredentialStoreOptionsSuperClass
