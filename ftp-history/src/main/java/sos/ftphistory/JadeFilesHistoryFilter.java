@@ -71,6 +71,10 @@ public class JadeFilesHistoryFilter extends SOSHibernateIntervalFilter implement
     private String modifiedBy;
 	private String transferTimestampFromIso;
 	private String transferTimestampToIso;
+	private String mandator;
+	private Integer fileSize;
+	private String sourceFile;
+	private String sourceHost;
 
     private JadeFilesDBItem jadeFilesDBItem;
 
@@ -480,6 +484,38 @@ public class JadeFilesHistoryFilter extends SOSHibernateIntervalFilter implement
 
 	public void setJadeFilesDBItem(JadeFilesDBItem jadeFilesDBItem) {
 		this.jadeFilesDBItem = jadeFilesDBItem;
+	}
+
+	public String getMandator() {
+		return mandator;
+	}
+
+	public void setMandator(String mandator) {
+		this.mandator = mandator;
+	}
+
+	public Integer getFileSize() {
+		return fileSize;
+	}
+
+	public void setFileSize(Integer fileSize) {
+		this.fileSize = fileSize;
+	}
+
+	public String getSourceFile() {
+		return sourceFile;
+	}
+
+	public void setSourceFile(String sourceFile) {
+		this.sourceFile = sourceFile;
+	}
+
+	public String getSourceHost() {
+		return sourceHost;
+	}
+
+	public void setSourceHost(String sourceHost) {
+		this.sourceHost = sourceHost;
 	}
 
 }

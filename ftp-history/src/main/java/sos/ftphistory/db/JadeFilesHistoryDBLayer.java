@@ -105,12 +105,12 @@ public class JadeFilesHistoryDBLayer extends SOSHibernateIntervalDBLayer impleme
         }
 
         if (filter.getTransferTimestampFrom() != null) {
-            where += and + " transferTimestamp >= :transferTimestamp";
+            where += and + " transferTimestamp >= :transferTimestampFrom";
             and = " and ";
         }
 
         if (filter.getTransferTimestampTo() != null) {
-            where += and + " transferTimestamp <= :transferTimestamp";
+            where += and + " transferTimestamp <= :transferTimestampTo";
             and = " and ";
         }
 
@@ -224,10 +224,30 @@ public class JadeFilesHistoryDBLayer extends SOSHibernateIntervalDBLayer impleme
             and = " and ";
         }
 
-        if (filter.getJadeFilesDBItem() != null && !"".equals(filter.getJadeFilesDBItem())) {
-            where += and + " jadeFilesDBItem=:jadeFilesDBItem";
+        if (filter.getMandator() != null && !"".equals(filter.getMandator())) {
+            where += and + " history.jadeFilesDBItem.mandator=:mandator";
             and = " and ";
         }
+
+        if (filter.getFileSize() != null && !"".equals(filter.getFileSize())) {
+            where += and + " history.jadeFilesDBItem.fileSize=:fileSize";
+            and = " and ";
+        }
+
+        if (filter.getSourceFile() != null && !"".equals(filter.getSourceFile())) {
+            where += and + " history.jadeFilesDBItem.sourceFilename=:sourceFilename";
+            and = " and ";
+        }
+
+        if (filter.getSourceHost() != null && !"".equals(filter.getSourceHost())) {
+            where += and + " history.jadeFilesDBItem.sourceHost=:sourceHost";
+            and = " and ";
+        }
+
+//        if (filter.getJadeFilesDBItem() != null && !"".equals(filter.getJadeFilesDBItem())) {
+//            where += and + " jadeFilesDBItem=:jadeFilesDBItem";
+//            and = " and ";
+//        }
 
 
         if (where.trim().equals("")) {
@@ -358,6 +378,21 @@ public class JadeFilesHistoryDBLayer extends SOSHibernateIntervalDBLayer impleme
             query.setLong("sosftpId", filter.getJadeFilesDBItem().getId());
         }
 
+        if (filter.getMandator() != null && !"".equals(filter.getMandator())) {
+            query.setText("mandator", filter.getMandator());
+        }
+
+        if (filter.getFileSize() != null && !"".equals(filter.getFileSize())) {
+            query.setInteger("fileSize", filter.getFileSize());
+        }
+
+        if (filter.getSourceFile() != null && !"".equals(filter.getSourceFile())) {
+            query.setText("sourceFilename", filter.getSourceFile());
+        }
+
+        if (filter.getSourceHost() != null && !"".equals(filter.getSourceHost())) {
+            query.setText("sourceHost", filter.getSourceHost());
+        }
     }
 
     public List<JadeFilesHistoryDBItem> getFilesHistoryFromTo(Date from, Date to) throws ParseException {
@@ -410,7 +445,7 @@ public class JadeFilesHistoryDBLayer extends SOSHibernateIntervalDBLayer impleme
         Session session = getSession();
 
         Transaction transaction = session.beginTransaction();
-        Query query = session.createQuery("  from JadeFilesHistoryDBItem " + getWhere());
+        Query query = session.createQuery("  from JadeFilesHistoryDBItem history " + getWhere());
         setWhere(query);
         List<JadeFilesHistoryDBItem> resultset = query.list();
 
