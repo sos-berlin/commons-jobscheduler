@@ -105,7 +105,7 @@ public class SOSServicePermissionShiro {
             sosPermissions.setSOSPermissionJoc(sosPermissionJoc);
     
             SOSPermissionDashboard sosPermissionDashboard = o.createSOSPermissionDashboard();
-            addPermission(sosPermissionDashboard.getSOSPermission(), "sos:products:jid:dashboard:start_job");
+            addPermission(sosPermissionDashboard.getSOSPermission(), "sos:products:jid:jobstart");
     
             SOSPermissionEvents sosPermissionEvents = o.createSOSPermissionEvents();
     
