@@ -1,18 +1,16 @@
 package com.sos.scheduler.model.objects;
-import java.io.File;
-import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.math.BigInteger;
-
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlTransient;
-
-import org.apache.log4j.Logger;
-
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.scheduler.model.SchedulerHotFolder;
 import com.sos.scheduler.model.SchedulerObjectFactory;
+import org.apache.log4j.Logger;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.annotation.XmlTransient;
+import java.io.File;
+import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.math.BigInteger;
 
 /**
 * \class JSObjBase
@@ -37,10 +35,13 @@ import com.sos.scheduler.model.SchedulerObjectFactory;
 *
 * Created on 03.02.2011 16:06:55
  */
+@XmlTransient
 public class JSObjBase implements Comparable<JSObjBase> {
-	private final String				conClassName			= "JSObjBase";
-	private static final Logger			logger					= Logger.getLogger(JSObjBase.class);
 
+    @XmlTransient
+	private final String				conClassName			= "JSObjBase";
+
+	private static final Logger			logger					= Logger.getLogger(JSObjBase.class);
 	protected static final String		conEMPTY				= "";
 	protected static final String		conNO					= "no";
 	protected static final String		conYES					= "yes";
@@ -50,15 +51,21 @@ public class JSObjBase implements Comparable<JSObjBase> {
 
 	protected static final String	conHtmlBR	= "<br/>";
 
+    @XmlTransient
 	protected SchedulerObjectFactory	objFactory				= null;
+    @XmlTransient
 	private ISOSVirtualFile				hotFolderSrc			= null;
+    @XmlTransient
 	protected JAXBElement<JSObjBase>	objJAXBElement			= null;
 	@XmlTransient
 	private boolean						flgIsDirty				= false;
 
+    @XmlTransient
 	protected String					strFileNameExtension	= "";
+    @XmlTransient
 	protected ISOSVirtualFile			objVirtualFile			= null;
 
+    @XmlTransient
 	protected boolean					flgIsInit				= false;
 
 	@XmlTransient
