@@ -3,6 +3,8 @@ package com.sos.scheduler.model.objects.extendedchain;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
+import com.sos.resources.SOSResource;
+import com.sos.resources.SOSResourceFactory;
 import com.sos.scheduler.model.objects.JobChain;
 import com.sos.scheduler.model.objects.ParamsExtended;
 import com.sos.scheduler.model.objects.Spooler;
@@ -23,7 +25,6 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URL;
 import java.util.Iterator;
@@ -49,12 +50,6 @@ public class JobChainExtendedTest {
     private final static String packageName = "com/sos/scheduler/model/objects/extendedchain/";
     private final static String xmlValid = packageName + "valid.job_chain.xml";
     private final static String xmlInvalid = packageName + "invalid.job_chain.xml";
-
-    // get the schema from com.sos-berlin.products.commons:common-resources
-    private final static String xsdJobChainExtensions = "com/sos/resources/xsd/job-chain-extensions-v1.0.xsd";
-
-    // get the schema from com.sos.scheduler.enginedoc:enginedoc-commons
-    private final static String xsdScheduler = "com/sos/scheduler/enginedoc/common/scheduler.xsd";
 
     private final static SimpleChainNode node1 = new SimpleChainNode("100","JobChainStart","200",null,"error");
     private final static SimpleChainNode node2 = new SimpleChainNode("200","JobChainEnd","success","100","error");
@@ -91,15 +86,12 @@ public class JobChainExtendedTest {
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         Schema schema = null;
         try {
-            InputStream is = Resources.getResource(xsdScheduler).openStream();
             schema = schemaFactory.newSchema(new Source[]
                     {
-                            new StreamSource(Resources.getResource(xsdScheduler).openStream()),
-                            new StreamSource(Resources.getResource(xsdJobChainExtensions).openStream())
+                            SOSResourceFactory.asStreamSource(SOSResource.SCHEDULER_XSD),
+                            SOSResourceFactory.asStreamSource(SOSResource.JOB_CHAIN_EXTENSIONS_XSD)
                     });
         } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
             e.printStackTrace();
         }
         return schema;
@@ -161,14 +153,12 @@ public class JobChainExtendedTest {
 
     @Test
     public void validateValid() throws IOException, SAXException {
-        StreamSource source = new StreamSource(Resources.getResource(xmlValid).openStream());
-        validate(source,schema);
+        validate(SOSResourceFactory.asStreamSource(xmlValid),schema);
     }
 
     @Test( expected = org.xml.sax.SAXParseException.class)
     public void validateInvalid() throws IOException, SAXException {
-        StreamSource source = new StreamSource(Resources.getResource(xmlInvalid).openStream());
-        validate(source, schema);
+        validate(SOSResourceFactory.asStreamSource(xmlInvalid), schema);
     }
 
 }
