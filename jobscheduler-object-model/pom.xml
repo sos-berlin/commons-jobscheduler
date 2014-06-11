@@ -29,13 +29,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.sos.scheduler.enginedoc</groupId>
-            <artifactId>enginedoc-common</artifactId>
-            <version>${sos.engine.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
             <groupId>com.sos-berlin.products.jobscheduler</groupId>
             <artifactId>jobscheduler-helper</artifactId>
             <version>${project.version}</version>
