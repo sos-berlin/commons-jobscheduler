@@ -1,26 +1,10 @@
 package sos.net.ssh;
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Date;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
-import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Listener.JSListener;
-import com.sos.JSHelper.Options.SOSOptionElement;
-import com.sos.VirtualFileSystem.CredentialStore.KeePass.pl.sind.keepass.kdb.KeePassDataBase;
-import com.sos.VirtualFileSystem.CredentialStore.KeePass.pl.sind.keepass.kdb.KeePassDataBaseManager;
-import com.sos.VirtualFileSystem.CredentialStore.KeePass.pl.sind.keepass.kdb.v1.Entry;
-import com.sos.VirtualFileSystem.CredentialStore.KeePass.pl.sind.keepass.kdb.v1.KeePassDataBaseV1;
-import com.sos.VirtualFileSystem.CredentialStore.exceptions.CredentialStoreEntryExpired;
-import com.sos.VirtualFileSystem.CredentialStore.exceptions.CredentialStoreKeyNotFound;
-import com.sos.VirtualFileSystem.Options.keepass4j.ISOSCredentialStoreOptionsBridge;
-import com.sos.VirtualFileSystem.Options.keepass4j.SOSCredentialStoreImpl;
-import com.sos.VirtualFileSystem.Options.keepass4j.SOSCredentialStoreOptions;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 /**
@@ -96,6 +80,7 @@ public class SOSSSHJobOptions extends SOSSSHJobOptionsSuperClass  {
 		setChildClasses(JSSettings, "");
 	}
 
+	@Override
 	public void setChildClasses(final HashMap<String, String> pobjJSSettings, final String pstrPrefix) throws Exception {
 		super.setChildClasses(pobjJSSettings, pstrPrefix);
 	} // public SOSConnection2OptionsAlternate (HashMap JSSettings)

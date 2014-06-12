@@ -2,6 +2,8 @@ package sos.net.ssh;
 
 import java.util.HashMap;
 
+import com.sos.CredentialStore.SOSCredentialStoreImpl;
+import com.sos.CredentialStore.Options.ISOSCredentialStoreOptionsBridge;
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
@@ -22,11 +24,8 @@ import com.sos.JSHelper.Options.SOSOptionTransferType;
 import com.sos.JSHelper.Options.SOSOptionUrl;
 import com.sos.JSHelper.Options.SOSOptionUserName;
 import com.sos.JSHelper.interfaces.ISOSConnectionOptions;
-import com.sos.JSHelper.interfaces.ISOSDataProviderOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSShellOptions;
-import com.sos.VirtualFileSystem.Options.keepass4j.ISOSCredentialStoreOptionsBridge;
-import com.sos.VirtualFileSystem.Options.keepass4j.SOSCredentialStoreImpl;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 /**

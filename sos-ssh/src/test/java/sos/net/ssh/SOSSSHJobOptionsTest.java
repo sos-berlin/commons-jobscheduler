@@ -1,6 +1,3 @@
-/**
- * 
- */
 package sos.net.ssh;
 
 import static org.junit.Assert.assertEquals;
@@ -14,10 +11,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.sos.CredentialStore.Options.SOSCredentialStoreOptions;
 import com.sos.JSHelper.Options.JSOptionsClass;
 import com.sos.JSHelper.io.Files.JSXMLFile;
-import com.sos.VirtualFileSystem.Options.keepass4j.SOSCredentialStoreImpl;
-import com.sos.VirtualFileSystem.Options.keepass4j.SOSCredentialStoreOptions;
 
 /**
  * @author KB
@@ -314,7 +310,7 @@ public class SOSSSHJobOptionsTest {
 		pobjHM.put("UseCredentialStore", "true"); // This parameter specifies the user account to be used when
 		pobjHM.put("CredentialStore_FileName", strKeePassDBFileName); // This parameter specifies the user account to be used when
 		pobjHM.put("CredentialStore_Password", "testing"); // This parameter specifies the user account to be used when
-		pobjHM.put("CredentialStore_KeyPath", "sos/server/wilma.sos"); // This parameter specifies the user account to be used when
+		pobjHM.put("CredentialStore_KeyPath", "/sos/server/wilma.sos"); // This parameter specifies the user account to be used when
 		pobjHM.put("CredentialStore_ProcessNotesParams", "true"); // This parameter specifies the user account to be used when
 
 		return pobjHM;
@@ -330,7 +326,9 @@ public class SOSSSHJobOptionsTest {
 		objOptions.getCredentialStore().checkCredentialStoreOptions();
 	}
 
-	private String strKeePassDBFileName = "R:/java.sources/trunk/products/jobscheduler/virtual-file-system/src/test/resources/keepassX-test.kdb";
+	// "C:/Users/KB/workspace-kepler/credentialstore/src/test/resources/keepassX-test.kdb"
+//	private final String strKeePassDBFileName = "R:/java.sources/trunk/products/jobscheduler/virtual-file-system/src/test/resources/keepassX-test.kdb";
+	private final String strKeePassDBFileName = "R:/backup/sos/java/junittests/testdata/keepassX-test.kdb";
 	@Test 
 	public void testCredentialStore2 () {
 		SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
@@ -339,7 +337,7 @@ public class SOSSSHJobOptionsTest {
 		objCSO.use_credential_Store.setTrue();
 		objCSO.CredentialStore_FileName.Value(strKeePassDBFileName);
 		objCSO.CredentialStore_password.Value("testing");
-		objCSO.CredentialStore_KeyPath.Value("sos/server/wilma.sos");
+		objCSO.CredentialStore_KeyPath.Value("/sos/server/wilma.sos");
 		objOptions.getCredentialStore().checkCredentialStoreOptions();
 		assertEquals("userid", "test", objOptions.user.Value());
 		assertEquals("password", "12345", objOptions.password.Value());

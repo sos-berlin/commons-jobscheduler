@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+>
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -20,13 +22,18 @@
     </properties>
 
     <dependencies>
-    
         <dependency>
-		    <groupId>com.sos-berlin.products.jobscheduler</groupId>
+            <groupId>com.sos-berlin.products.commons</groupId>
+            <artifactId>credentialstore</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sos-berlin.products.jobscheduler</groupId>
             <artifactId>jobscheduler-helper</artifactId>
             <version>${project.version}</version>
         </dependency>
-    
+
         <dependency>
             <groupId>com.sos-berlin.products.jobscheduler</groupId>
             <artifactId>sos-scheduler</artifactId>
@@ -51,15 +58,15 @@
             <artifactId>log4j</artifactId>
         </dependency>
 
-		<dependency>
-			<groupId>com.trilead</groupId>
-			<artifactId>sos-trilead-ssh2</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>com.trilead</groupId>
+            <artifactId>sos-trilead-ssh2</artifactId>
+        </dependency>
 
-		<dependency>
-		    <groupId>commons-httpclient</groupId>
-		    <artifactId>commons-httpclient</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
