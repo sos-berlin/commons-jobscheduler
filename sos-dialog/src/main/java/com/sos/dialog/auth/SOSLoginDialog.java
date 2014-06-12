@@ -56,7 +56,8 @@ public class SOSLoginDialog extends Dialog {
      */
     private void createContents() {
         cancel = false;
-        shell = new Shell(getParent(),  SWT.ON_TOP  | SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+        //shell = new Shell(getParent(),  SWT.ON_TOP  | SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+        shell = new Shell(getParent(), SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.OK | SWT.APPLICATION_MODAL);
         shell.setSize(300, 180);
         shell.setText(getText());
         shell.setLayout(new FillLayout(SWT.HORIZONTAL));
