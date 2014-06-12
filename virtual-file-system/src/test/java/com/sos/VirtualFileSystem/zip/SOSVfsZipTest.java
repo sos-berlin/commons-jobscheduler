@@ -22,28 +22,21 @@ package com.sos.VirtualFileSystem.zip;
 *
 * Created on 29.03.2011 12:03:25
  */
-import static org.junit.Assert.assertFalse;
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.JSHelper.Options.SOSOptionTransferType.enuTransferTypes;
+import com.sos.VirtualFileSystem.Factory.VFSFactory;
+import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
+import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
+import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import org.apache.log4j.Logger;
+import org.junit.*;
 
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Vector;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.JSHelper.Logging.Log4JHelper;
-import com.sos.JSHelper.Options.SOSOptionTransferType.enuTransferTypes;
-import com.sos.VirtualFileSystem.Factory.VFSFactory;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import static org.junit.Assert.assertFalse;
 
 /**
  * @author KB
@@ -54,8 +47,6 @@ public class SOSVfsZipTest {
 	@SuppressWarnings("unused")
 	private final String		conClassName			= "SOSVfsZipTest";
 	private static final Logger	logger					= Logger.getLogger(SOSVfsZipTest.class);
-	private static Log4JHelper	objLogger				= null;
-	// private SOSFTPOptions objOptions = null;
 	private ISOSVFSHandler		objVFS					= null;
 	private ISOSVfsFileTransfer	objFileSystemHandler	= null;
 	private static final String	strTestPathName			= "R:\\nobackup\\junittests\\testdata\\ZIP\\";
@@ -103,9 +94,6 @@ public class SOSVfsZipTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
-		objLogger.setLevel(Level.DEBUG);
-		// objOptions = new SOSFTPOptions();
 		objVFS = VFSFactory.getHandler("zip");
 		objFileSystemHandler = (ISOSVfsFileTransfer) objVFS;
 		objVFS.setSource();

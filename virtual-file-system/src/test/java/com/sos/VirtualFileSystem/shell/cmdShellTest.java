@@ -1,21 +1,13 @@
 package com.sos.VirtualFileSystem.shell;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.sos.JSHelper.Logging.Log4JHelper;
+import org.junit.*;
 
 public class cmdShellTest {
 
 	@SuppressWarnings("unused")
 	private static final String	conSVNVersion			= "$Id$";
 	private static final Logger	logger					= Logger.getLogger(cmdShellTest.class);
-	private static Log4JHelper	objLogger				= null;
 
 	private final 		cmdShell objShell = null;
 
@@ -29,10 +21,6 @@ public class cmdShellTest {
 
 	@Before
 	public void setUp() throws Exception {
-		Log4JHelper.flgUseJobSchedulerLog4JAppender = false;
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
-		objLogger.setLevel(Level.DEBUG);
-
 		String osn = System.getProperty("os.name");
 		String fcp = System.getProperty("file.encoding");
 		String ccp = System.getProperty("console.encoding");

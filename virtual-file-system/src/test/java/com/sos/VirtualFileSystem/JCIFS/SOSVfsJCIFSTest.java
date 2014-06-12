@@ -1,18 +1,5 @@
 package com.sos.VirtualFileSystem.JCIFS;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.OutputStream;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.sos.JSHelper.Logging.Log4JHelper;
 import com.sos.JSHelper.Options.SOSOptionTransferType;
 import com.sos.JSHelper.io.Files.JSTextFile;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
@@ -21,6 +8,12 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
+import org.apache.log4j.Logger;
+import org.junit.*;
+
+import java.io.OutputStream;
+
+import static org.junit.Assert.assertEquals;
 
 /**
 * \class SOSVfsJCIFSTest
@@ -53,7 +46,6 @@ public class SOSVfsJCIFSTest {
 
 	@SuppressWarnings("unused")
 	protected  Logger			logger					= Logger.getLogger(this.getClass());
-	protected static Log4JHelper	objLogger				= null;
 	protected SOSFTPOptions			objOptions				= null;
 
 	protected ISOSVFSHandler		objVFS					= null;
@@ -84,9 +76,6 @@ public class SOSVfsJCIFSTest {
 
 	@Before
 	public void setUp() throws Exception {
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
-		objLogger.setLevel(Level.DEBUG);
-
 		objOptions = new SOSFTPOptions(SOSOptionTransferType.enuTransferTypes.smb);
 		objOptions.protocol.Value(SOSOptionTransferType.enuTransferTypes.smb);
 		objVFS = VFSFactory.getHandler(objOptions.protocol.Value());

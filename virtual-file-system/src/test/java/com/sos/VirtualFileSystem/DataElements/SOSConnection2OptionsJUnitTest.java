@@ -1,22 +1,14 @@
 package com.sos.VirtualFileSystem.DataElements;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import com.sos.JSHelper.Basics.JSToolBox;
+import com.sos.JSHelper.Listener.JSListenerClass;
+import com.sos.VirtualFileSystem.Options.SOSConnection2Options;
+import org.apache.log4j.Logger;
+import org.junit.*;
 
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.sos.JSHelper.Basics.JSToolBox;
-import com.sos.JSHelper.Listener.JSListenerClass;
-import com.sos.JSHelper.Logging.Log4JHelper;
-import com.sos.VirtualFileSystem.Options.SOSConnection2Options;
+import static org.junit.Assert.*;
 
 /**
  * \class 		SOSConnection2OptionsJUnitTest - Options for a connection to an uri (server, site, e.g.)
@@ -49,7 +41,6 @@ public class SOSConnection2OptionsJUnitTest extends JSToolBox {
 	@SuppressWarnings("unused")
 	private static Logger			logger			= Logger.getLogger(SOSConnection2OptionsJUnitTest.class);
 	@SuppressWarnings("unused")
-	private static Log4JHelper		objLogger		= null;
 
 	protected SOSConnection2Options	objOptions		= null;
 
@@ -67,7 +58,6 @@ public class SOSConnection2OptionsJUnitTest extends JSToolBox {
 
 	@Before
 	public void setUp() throws Exception {
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
 		// objE = new SOSConnection2();
 		// objE.registerMessageListener(this);
 		objOptions = new SOSConnection2Options();

@@ -1,34 +1,21 @@
 package com.sos.VirtualFileSystem.FTP;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.util.HashMap;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import sos.net.mail.options.SOSSmtpMailOptions;
-
-import com.sos.JSHelper.Logging.Log4JHelper;
 import com.sos.VirtualFileSystem.Options.SOSConnection2Options;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 import com.sos.VirtualFileSystem.Options.keepass4j.SOSCredentialStoreOptions;
+import org.apache.log4j.Logger;
+import org.junit.*;
+import sos.net.mail.options.SOSSmtpMailOptions;
+
+import java.util.HashMap;
+
+import static org.junit.Assert.*;
 
 public class SOSFTPOptionsTest {
 	@SuppressWarnings("unused") private final String conClassName = this.getClass().getSimpleName();
 	@SuppressWarnings("unused") private static final String conSVNVersion = "$Id$";
 	@SuppressWarnings("unused") private static final Logger logger = Logger.getLogger(SOSFTPOptionsTest.class);
 	
-	private static Log4JHelper	objLogger				= null;
-
 	@BeforeClass public static void setUpBeforeClass() throws Exception {
 	}
 
@@ -36,10 +23,6 @@ public class SOSFTPOptionsTest {
 	}
 
 	@Before public void setUp() throws Exception {
-		Log4JHelper.flgUseJobSchedulerLog4JAppender = false;
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
-		objLogger.setLevel(Level.TRACE);
-
 	}
 
 	@After public void tearDown() throws Exception {

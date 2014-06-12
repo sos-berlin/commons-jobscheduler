@@ -1,18 +1,11 @@
 package com.sos.VirtualFileSystem.Factory;
 
-import static org.junit.Assert.fail;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.sos.JSHelper.Logging.Log4JHelper;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
+import org.apache.log4j.Logger;
+import org.junit.*;
+
+import static org.junit.Assert.fail;
 
 /**
 * \class VFSFactoryTest 
@@ -53,10 +46,6 @@ public class VFSFactoryTest {
 
 	@SuppressWarnings("unused")
 	private static Logger		logger					= Logger.getLogger(VFSFactoryTest.class);
-	private static Log4JHelper	objLogger				= null;
-	// private SOSFTPOptions objOptions = null;
-
-	private ISOSVFSHandler		objVFS					= null;
 	private ISOSVfsFileTransfer	objFileSystemHandler	= null;
 
 
@@ -101,8 +90,6 @@ public class VFSFactoryTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
-		objLogger.setLevel(Level.DEBUG);
 	}
 
 	/**

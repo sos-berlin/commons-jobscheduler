@@ -1,14 +1,5 @@
 package com.sos.VirtualFileSystem.WebDAV;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.sos.JSHelper.Logging.Log4JHelper;
 import com.sos.JSHelper.Options.SOSOptionTransferType;
 import com.sos.JSHelper.io.Files.JSTextFile;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
@@ -17,6 +8,8 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
+import org.apache.log4j.Logger;
+import org.junit.*;
 
 /**
 * \class SOSVfsSFtpTest
@@ -49,7 +42,6 @@ public class SOSVfsWebDAVTest {
 
 	@SuppressWarnings("unused")
 	protected static Logger			logger					= Logger.getLogger(SOSVfsWebDAVTest.class);
-	protected static Log4JHelper	objLogger				= null;
 	protected SOSFTPOptions			objOptions				= null;
 
 	protected ISOSVFSHandler		objVFS					= null;
@@ -86,9 +78,6 @@ public class SOSVfsWebDAVTest {
 
 	@Before
 	public void setUp() throws Exception {
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
-		objLogger.setLevel(Level.DEBUG);
-
 		objOptions = new SOSFTPOptions(SOSOptionTransferType.enuTransferTypes.webdav);
 		objOptions.protocol.Value(SOSOptionTransferType.enuTransferTypes.webdav);
 		objVFS = VFSFactory.getHandler(objOptions.protocol.Value());

@@ -1,22 +1,4 @@
 package com.sos.VirtualFileSystem.FTP;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Locale;
-
-import junit.framework.Assert;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.sos.JSHelper.Logging.Log4JHelper;
 import com.sos.JSHelper.io.Files.JSFile;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
@@ -24,6 +6,16 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.i18n.annotation.I18NResourceBundle;
+import junit.framework.Assert;
+import org.apache.log4j.Logger;
+import org.junit.*;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Locale;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
 * \class SOSVfsFtpTest
@@ -55,7 +47,6 @@ public class SOSVfsFtpTest {
 	private final String		conClassName			= "SOSVfsFtpTest";
 	@SuppressWarnings("unused")
 	private static Logger		logger					= Logger.getLogger(SOSVfsFtpTest.class);
-	private static Log4JHelper	objLogger				= null;
 	private SOSFTPOptions		objOptions				= null;
 	private ISOSVFSHandler		objVFS					= null;
 	private ISOSVfsFileTransfer	ftpClient				= null;
@@ -82,9 +73,6 @@ public class SOSVfsFtpTest {
 
 	@Before
 	public void setUp() throws Exception {
-		Log4JHelper.flgUseJobSchedulerLog4JAppender = false;
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
-		objLogger.setLevel(Level.DEBUG);
 		objOptions = new SOSFTPOptions();
 		// objOptions.protocol.Value(enuTransferTypes.ftps.Text());
 		objVFS = VFSFactory.getHandler(objOptions.protocol.Value());

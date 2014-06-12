@@ -1,21 +1,14 @@
 package com.sos.VirtualFileSystem.HTTP;
-import java.io.OutputStream;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.sos.JSHelper.Logging.Log4JHelper;
 import com.sos.JSHelper.Options.SOSOptionTransferType;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
+import org.apache.log4j.Logger;
+import org.junit.*;
+
+import java.io.OutputStream;
 
 /**
 * \class SOSVfsHTTPTest
@@ -45,7 +38,6 @@ public class SOSVfsHTTPTest {
 	private final String			conClassName			= "SOSVfsHTTPTest";
 	@SuppressWarnings("unused")
 	protected static Logger			logger					= Logger.getLogger(SOSVfsHTTPTest.class);
-	protected static Log4JHelper	objLogger				= null;
 	protected SOSFTPOptions			objOptions				= null;
 	protected ISOSVFSHandler		objVFS					= null;
 	protected ISOSVfsFileTransfer	objVfsClient			= null;
@@ -73,8 +65,6 @@ public class SOSVfsHTTPTest {
 
 	@Before
 	public void setUp() throws Exception {
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
-		objLogger.setLevel(Level.DEBUG);
 		objOptions = new SOSFTPOptions(SOSOptionTransferType.enuTransferTypes.http);
 		objOptions.protocol.Value(SOSOptionTransferType.enuTransferTypes.http);
 		objVFS = VFSFactory.getHandler(objOptions.protocol.Value());

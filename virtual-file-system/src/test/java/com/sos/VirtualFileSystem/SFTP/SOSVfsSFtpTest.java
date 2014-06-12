@@ -1,17 +1,6 @@
 package com.sos.VirtualFileSystem.SFTP;
 
-import java.util.Vector;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import com.sos.JSHelper.Basics.JSToolBox;
-import com.sos.JSHelper.Logging.Log4JHelper;
 import com.sos.JSHelper.Options.SOSOptionJadeOperation.enuJadeOperations;
 import com.sos.JSHelper.Options.SOSOptionPortNumber;
 import com.sos.VirtualFileSystem.FTP.SOSVfsFtpTest;
@@ -20,6 +9,10 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
+import org.apache.log4j.Logger;
+import org.junit.*;
+
+import java.util.Vector;
 
 /**
 * \class SOSVfsSFtpTest
@@ -52,7 +45,6 @@ public class SOSVfsSFtpTest extends JSToolBox {
 
 	@SuppressWarnings("unused")
 	protected static Logger			logger					= Logger.getLogger(SOSVfsFtpTest.class);
-	protected static Log4JHelper	objLogger				= null;
 	protected SOSFTPOptions			objOptions				= null;
 
 	protected ISOSVFSHandler		objVFS					= null;
@@ -79,9 +71,6 @@ public class SOSVfsSFtpTest extends JSToolBox {
 
 	@Before
 	public void setUp() throws Exception {
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
-		objLogger.setLevel(Level.DEBUG);
-
 		objOptions = new SOSFTPOptions();
 		objOptions.protocol.Value("sftp");
 		objVFS = VFSFactory.getHandler(objOptions.protocol.Value());

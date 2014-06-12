@@ -1,20 +1,5 @@
 package com.sos.VirtualFileSystem.FTPS;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-import java.io.IOException;
-import java.util.HashMap;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.sos.JSHelper.Logging.Log4JHelper;
 import com.sos.JSHelper.Options.SOSOptionTransferType.enuTransferTypes;
 import com.sos.JSHelper.io.Files.JSFile;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
@@ -22,6 +7,14 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
+import org.apache.log4j.Logger;
+import org.junit.*;
+
+import java.io.IOException;
+import java.util.HashMap;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
 * \class SOSVfsFtpSTest
@@ -51,7 +44,6 @@ public class SOSVfsFtpSTest {
 	private final String		conClassName	= "SOSVfsFtpSTest";
 	@SuppressWarnings("unused")
 	private static Logger		logger			= Logger.getLogger(SOSVfsFtpSTest.class);
-	private static Log4JHelper	objLogger		= null;
 	private SOSFTPOptions		objOptions		= null;
 	private ISOSVFSHandler		objVFS			= null;
 	private ISOSVfsFileTransfer	ftpClient		= null;
@@ -77,9 +69,6 @@ public class SOSVfsFtpSTest {
 
 	@Before
 	public void setUp() throws Exception {
-		Log4JHelper.flgUseJobSchedulerLog4JAppender = false;
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
-		objLogger.setLevel(Level.DEBUG);
 		objOptions = new SOSFTPOptions();
 		objOptions.protocol.Value(enuTransferTypes.ftps.Text());
 		objVFS = VFSFactory.getHandler(objOptions.protocol.Value());

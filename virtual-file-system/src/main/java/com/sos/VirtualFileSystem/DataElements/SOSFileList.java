@@ -35,8 +35,6 @@ public class SOSFileList extends SOSVfsMessageCodes {
 	private static String					conClassName						= "SOSFileList";
 	private final static Logger				logger								= Logger.getLogger(SOSFileList.class);
 	private final static Logger				objJadeReportLogger					= Logger.getLogger(VFSFactory.getLoggerName());
-//	@SuppressWarnings("unused")
-//	private static Log4JHelper				objLogger							= null;
 	private SOSFTPOptions					objOptions							= null;
 	private Vector<SOSFileListEntry>		objFileListEntries					= new Vector<>();
 	long									lngSuccessfulTransfers				= 0;
