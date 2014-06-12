@@ -68,7 +68,6 @@ public class SOSFilteredFileReader extends JSToolBox implements ISOSFilteredFile
 		}
 	}
 
-
 	public void run() {
 
 		if (lstFilters == null) {

@@ -969,13 +969,16 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 			}
 			if (objOptions.isAtomicTransfer() || objOptions.isReplaceReplacingInEffect()) {
 				if (objOptions.transactional.isFalse()) {
-					flgFileExists = objTargetFile.FileExists();
-					if (objOptions.overwrite_files.value() == true & flgFileExists == true) {
-						// hier werden Dateien gelöscht, vor dem umbenennen.
-						// TODO Besser: auch erstmal umbenennen und dann erst löschen
-						objTargetFile.delete();
+					String strNewFileName = MakeFullPathName(objOptions.TargetDir.Value(), this.TargetFileName());
+					if (objTargetFile.getName().equalsIgnoreCase(strNewFileName) == false) {
+						flgFileExists = objTargetFile.FileExists();
+						if (objOptions.overwrite_files.isTrue() && flgFileExists == true) {
+							// hier werden Dateien gelöscht, vor dem umbenennen.
+							// TODO Besser: auch erstmal umbenennen und dann erst löschen
+							objTargetFile.delete();
+						}
+						RenameTargetFile(MakeFullPathName(objOptions.TargetDir.Value(), this.TargetFileName()));
 					}
-					RenameTargetFile(MakeFullPathName(objOptions.TargetDir.Value(), this.TargetFileName()));
 				}
 			}
 			RenameSourceFile(objSourceFile);

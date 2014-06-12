@@ -2,7 +2,6 @@
  *
  */
 package com.sos.VirtualFileSystem.Filter;
-
 import org.apache.log4j.Logger;
 
 import com.sos.VirtualFileSystem.Filter.Options.SOSFilterOptions;
@@ -12,17 +11,14 @@ import com.sos.VirtualFileSystem.Filter.Options.SOSFilterOptions;
  *
  */
 public class SOSRecordsFilter extends SOSNullFilter {
-
 	private final String		conClassName		= this.getClass().getSimpleName();
 	@SuppressWarnings("unused")
 	private static final String	conSVNVersion		= "$Id$";
 	private final Logger		logger				= Logger.getLogger(this.getClass());
-
 	private boolean				flgIncludeRecord	= false;
+	private long				lngRecordsIncluded	= 0;
+	private long				lngRecordsExcluded	= 0;
 
-	private long lngRecordsIncluded = 0;
-	private long lngRecordsExcluded = 0;
-	
 	/**
 	 *
 	 */
@@ -33,42 +29,61 @@ public class SOSRecordsFilter extends SOSNullFilter {
 	public SOSRecordsFilter(final SOSFilterOptions pobjOptions) {
 		super(pobjOptions);
 		logger.debug(conClassName);
+		// excludeLinesBefore is not mandatory
+		flgIncludeRecord = pobjOptions.excludeLinesBefore.isNotDirty();
 	}
 
-	@Override
-	protected void doProcess() {
-
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::doProcess";
+	@Override protected void doProcess() {
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::doProcess";
 		if (bteBuffer == null) {
 			return;
 		}
 		String strT = byte2String(bteBuffer);
-
 		if (objOptions.excludeLinesBefore.match(strT)) {
 			flgIncludeRecord = true;
 		}
-
 		if (flgIncludeRecord == true) {
-			bteBuffer = strT.getBytes();
-			lngRecordsIncluded++;
+			if (objOptions.excludeEmptyLines.isTrue()) {
+				if (strT.trim().length() > 0) {
+					fillBuffer(strT);
+				}
+			}
+			else {
+				fillBuffer(strT);
+			}
 		}
 		else {
 			bteBuffer = null;
 			lngRecordsExcluded++;
 		}
-
 		if (objOptions.exclude_lines_after.match(strT)) {
 			flgIncludeRecord = false;
 		}
-
 	} // private void doProcess
-	
-	@Override
-	public void close() {
-		
+
+	private String createLineNumbers (final String pstrT) {
+		String strT = pstrT;
+		if (objOptions.create_line_numbers.isTrue()) {
+			String strF = objOptions.Line_Numbering_Format.Value();
+			String strN = String.format(strF, lngRecordsIncluded);
+			int intP = objOptions.Line_numbering_position.value();
+			if (intP <= 1) {
+			strT = strN + strT.substring(intP-1);
+			}
+			else {
+				strT = strT.substring(0, intP) + strN + strT.substring(intP - 1);
+			}
+		}
+		return strT;
+	}
+	private void fillBuffer (final String pstrT) {
+		lngRecordsIncluded++;
+		String strT = createLineNumbers(pstrT); 
+		bteBuffer = strT.getBytes();
+	}
+
+	@Override public void close() {
 		objJSJobUtilities.setJSParam(conClassName + ".records_included", String.valueOf(lngRecordsIncluded));
 		objJSJobUtilities.setJSParam(conClassName + ".records_excluded", String.valueOf(lngRecordsExcluded));
-		
 	}
 }

@@ -411,7 +411,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			if (file_spec.isDirty()) {
 				file_path.Value("");
 				String strT = getOptionNamesAsString(new SOSOptionElement[] { file_path, file_spec });
-				throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_0030.params(strT));
+//				throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_0030.params(strT));
 			}
 			if (RecurseSubFolders.value() == true) {
 				String strT = getOptionNamesAsString(new SOSOptionElement[] { file_path, recursive });
@@ -606,6 +606,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		}
 	}
 
+	@Override
 	public void CommandLineArgs(final String pstrArgs) {
 		try {
 			this.CommandLineArgs(pstrArgs.split(" "));

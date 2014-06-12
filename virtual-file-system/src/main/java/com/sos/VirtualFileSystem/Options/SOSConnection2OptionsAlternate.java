@@ -7,6 +7,13 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
+import com.sos.CredentialStore.KeePass.pl.sind.keepass.kdb.KeePassDataBase;
+import com.sos.CredentialStore.KeePass.pl.sind.keepass.kdb.KeePassDataBaseManager;
+import com.sos.CredentialStore.KeePass.pl.sind.keepass.kdb.v1.Entry;
+import com.sos.CredentialStore.KeePass.pl.sind.keepass.kdb.v1.KeePassDataBaseV1;
+import com.sos.CredentialStore.Options.SOSCredentialStoreOptions;
+import com.sos.CredentialStore.exceptions.CredentialStoreEntryExpired;
+import com.sos.CredentialStore.exceptions.CredentialStoreKeyNotFound;
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
@@ -15,13 +22,6 @@ import com.sos.JSHelper.Listener.JSListener;
 import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Options.SOSOptionCommandString;
 import com.sos.JSHelper.Options.SOSOptionElement;
-import com.sos.VirtualFileSystem.CredentialStore.KeePass.pl.sind.keepass.kdb.KeePassDataBase;
-import com.sos.VirtualFileSystem.CredentialStore.KeePass.pl.sind.keepass.kdb.KeePassDataBaseManager;
-import com.sos.VirtualFileSystem.CredentialStore.KeePass.pl.sind.keepass.kdb.v1.Entry;
-import com.sos.VirtualFileSystem.CredentialStore.KeePass.pl.sind.keepass.kdb.v1.KeePassDataBaseV1;
-import com.sos.VirtualFileSystem.CredentialStore.exceptions.CredentialStoreEntryExpired;
-import com.sos.VirtualFileSystem.CredentialStore.exceptions.CredentialStoreKeyNotFound;
-import com.sos.VirtualFileSystem.Options.keepass4j.SOSCredentialStoreOptions;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 /**

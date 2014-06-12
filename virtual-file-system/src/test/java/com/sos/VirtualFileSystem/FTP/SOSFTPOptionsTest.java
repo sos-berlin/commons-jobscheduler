@@ -1,15 +1,24 @@
 package com.sos.VirtualFileSystem.FTP;
-import com.sos.VirtualFileSystem.Options.SOSConnection2Options;
-import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
-import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
-import com.sos.VirtualFileSystem.Options.keepass4j.SOSCredentialStoreOptions;
-import org.apache.log4j.Logger;
-import org.junit.*;
-import sos.net.mail.options.SOSSmtpMailOptions;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 
-import static org.junit.Assert.*;
+import org.apache.log4j.Logger;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import sos.net.mail.options.SOSSmtpMailOptions;
+
+import com.sos.CredentialStore.Options.SOSCredentialStoreOptions;
+import com.sos.VirtualFileSystem.Options.SOSConnection2Options;
+import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
+import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 
 public class SOSFTPOptionsTest {
 	@SuppressWarnings("unused") private final String conClassName = this.getClass().getSimpleName();
