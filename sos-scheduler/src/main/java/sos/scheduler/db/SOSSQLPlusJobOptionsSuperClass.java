@@ -4,6 +4,8 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
+import com.sos.CredentialStore.SOSCredentialStoreImpl;
+import com.sos.CredentialStore.Options.ISOSCredentialStoreOptionsBridge;
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
@@ -22,8 +24,6 @@ import com.sos.JSHelper.Options.SOSOptionTransferType;
 import com.sos.JSHelper.Options.SOSOptionUrl;
 import com.sos.JSHelper.Options.SOSOptionUserName;
 import com.sos.VirtualFileSystem.Interfaces.ISOSCmdShellOptions;
-import com.sos.VirtualFileSystem.Options.keepass4j.ISOSCredentialStoreOptionsBridge;
-import com.sos.VirtualFileSystem.Options.keepass4j.SOSCredentialStoreImpl;
 
 /**
  * \class 		SOSSQLPlusJobOptionsSuperClass - Start SQL*Plus client and execute sql*plus programs
@@ -764,28 +764,28 @@ public class SOSSQLPlusJobOptionsSuperClass extends JSOptionsClass implements IS
 		return null;
 	}
 
-	@Override public void setUrl(SOSOptionUrl pstrValue) {
+	@Override public void setUrl(final SOSOptionUrl pstrValue) {
 	}
 
 	@Override public SOSOptionHostName getHost() {
 		return null;
 	}
 
-	@Override public void setHost(SOSOptionHostName p_host) {
+	@Override public void setHost(final SOSOptionHostName p_host) {
 	}
 
 	@Override public SOSOptionPortNumber getPort() {
 		return null;
 	}
 
-	@Override public void setPort(SOSOptionPortNumber p_port) {
+	@Override public void setPort(final SOSOptionPortNumber p_port) {
 	}
 
 	@Override public SOSOptionTransferType getProtocol() {
 		return null;
 	}
 
-	@Override public void setProtocol(SOSOptionTransferType p_protocol) {
+	@Override public void setProtocol(final SOSOptionTransferType p_protocol) {
 	}
 
 	@Override public SOSOptionUserName getUser() {
@@ -796,7 +796,7 @@ public class SOSSQLPlusJobOptionsSuperClass extends JSOptionsClass implements IS
 		return null;
 	}
 
-	@Override public void setPassword(SOSOptionPassword p_password) {
+	@Override public void setPassword(final SOSOptionPassword p_password) {
 		
 	}
 
@@ -804,7 +804,7 @@ public class SOSSQLPlusJobOptionsSuperClass extends JSOptionsClass implements IS
 		return null;
 	}
 
-	@Override public void setAuth_file(SOSOptionInFileName p_ssh_auth_file) {
+	@Override public void setAuth_file(final SOSOptionInFileName p_ssh_auth_file) {
 		
 	}
 
@@ -812,11 +812,11 @@ public class SOSSQLPlusJobOptionsSuperClass extends JSOptionsClass implements IS
 		return null;
 	}
 
-	@Override public void setAuth_method(SOSOptionAuthenticationMethod p_ssh_auth_method) {
+	@Override public void setAuth_method(final SOSOptionAuthenticationMethod p_ssh_auth_method) {
 		
 	}
 
-	@Override public void setUser(SOSOptionUserName pobjUser) {
+	@Override public void setUser(final SOSOptionUserName pobjUser) {
 		
 	}
 
