@@ -33,7 +33,7 @@ public class JSVersionInfo {
 	private final static String	conClassName		= "JSVersionInfo";
 	// private static final Logger logger = Logger.getLogger(JSVersionInfo.class);
 
-	public static final String	conVersionNumber	= "1.6.{properties.timestamp_YDDD}";
+	public static final String	conVersionNumber	= "1.7.{properties.timestamp_YDDD}";
 	public static final String	conVersionDate		= "{build-date}";
 	public static final String	conCopyrightText	= "Copyright 2003-2014 SOS GmbH Berlin";
 	public static final String  conSVNVersion = "$Id$";
