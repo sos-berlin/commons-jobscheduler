@@ -129,6 +129,7 @@ public class SOSServicePermissionShiro {
             addPermission(sosPermissionJid.getSOSPermission(), "sos:products:jid:joctab:show");
             addPermission(sosPermissionJid.getSOSPermission(), "sos:products:jid:eventtab:show");
             addPermission(sosPermissionJid.getSOSPermission(), "sos:products:jid:jobnettab:show");
+            addPermission(sosPermissionJid.getSOSPermission(), "sos:products:jid:instances:show");
             addPermission(sosPermissionJid.getSOSPermission(), "sos:products:jid:workingplantab:show");
     
             sosPermissions.setSOSPermissionJid(sosPermissionJid);

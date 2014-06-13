@@ -3,6 +3,7 @@ package com.sos.dialog.classes;
   
  
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.log4j.Logger; 
 import org.eclipse.swt.SWT;
@@ -19,6 +20,7 @@ import org.eclipse.swt.widgets.TableItem;
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.dialog.comparators.SortBaseComparator;
 import com.sos.hibernate.classes.SosSortTableItem;
+
 
 
 /**

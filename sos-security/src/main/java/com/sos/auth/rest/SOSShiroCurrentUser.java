@@ -49,7 +49,7 @@ public class SOSShiroCurrentUser {
     
     public boolean isPermitted(String permission) {
         if (currentSubject != null) {
-            return currentSubject.isPermitted(permission);
+            return currentSubject.isPermitted(permission) && !currentSubject.isPermitted("-" + permission);
         }else {
             return false;
         }
