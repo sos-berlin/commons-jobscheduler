@@ -101,9 +101,17 @@ public class SosHibernateSession {
         classList.addClassIfExist("com.sos.jobnet.db.JobNetHistoryDBItem");
         classList.addClassIfExist("com.sos.jobnet.db.JobNetCmdHistoryDBItem");
         classList.addClassIfExist("com.sos.jobnet.db.JobNetDBItem");
+
+        classList.addClassIfExist("com.sos.auth.shiro.db.SOSUserDBItem");
+        classList.addClassIfExist("com.sos.auth.shiro.db.SOSUserRightDBItem");
+        classList.addClassIfExist("com.sos.auth.shiro.db.SOSUserRoleDBItem");
+        classList.addClassIfExist("com.sos.auth.shiro.db.SOSUser2RoleDBItem");
+        
+        
         classList.addClassIfExist("com.sos.tools.logback.db.LoggingEventDBItem");
         classList.addClassIfExist("com.sos.tools.logback.db.LoggingEventExceptionDBItem");
         classList.addClassIfExist("com.sos.tools.logback.db.LoggingEventPropertyDBItem");
+          
         return classList;
     }
 
