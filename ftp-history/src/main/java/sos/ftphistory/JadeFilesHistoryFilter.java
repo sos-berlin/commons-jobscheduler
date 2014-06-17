@@ -289,7 +289,7 @@ public class JadeFilesHistoryFilter extends SOSHibernateIntervalFilter implement
 	public void setTransferTimestampTo(final Date to) {
 		if (to != null) {
 			SimpleDateFormat formatter = new SimpleDateFormat(
-					"yyyy-MM-dd 00:00:00");
+					"yyyy-MM-dd 23:59:59");
 			String d = formatter.format(to);
 			try {
 				formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
