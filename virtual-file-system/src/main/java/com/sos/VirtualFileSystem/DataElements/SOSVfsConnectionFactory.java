@@ -144,7 +144,7 @@ public class SOSVfsConnectionFactory {
 			objDataClient.passive();
 		}
 		//objConnectOptions.transfer_mode is not used?
-		if (objConnectOptions.transfer_mode.isDirty()) {
+		if (objConnectOptions.transfer_mode.isDirty() && objConnectOptions.transfer_mode.IsNotEmpty()) {
 			objDataClient.TransferMode(objConnectOptions.transfer_mode);
 		}
 		else {
