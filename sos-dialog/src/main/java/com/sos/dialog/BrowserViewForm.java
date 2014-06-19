@@ -1,7 +1,10 @@
 package com.sos.dialog;
 
+
+
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
+
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.CloseWindowListener;
 import org.eclipse.swt.browser.OpenWindowListener;
@@ -30,6 +33,7 @@ public class BrowserViewForm {
 	private final Logger	logger	= Logger.getLogger(BrowserViewForm.class);
 	private SOSUrl			url;
 	private final Composite	parent;
+ 	  
 
 	public BrowserViewForm(final Composite parent_, final int style, final String url_) {
 		parent = parent_;
@@ -57,9 +61,9 @@ public class BrowserViewForm {
 
 		try {
 
-			browser = new Browser(parent, SWT.NONE);
-           //browser = new Browser(parent, SWT.MOZILLA);
+		    browser = new Browser(parent, SWT.NONE);
 			initialize(parent.getDisplay(), browser);
+			
             
 			logger.debug("load url = " + url.getUrlValue());
 			
@@ -99,14 +103,17 @@ public class BrowserViewForm {
 		browser.addOpenWindowListener(new OpenWindowListener() {
 			@Override
 			public void open(final WindowEvent event) {
-				if (!event.required)
-					return; /* only do it if necessary */
+			    
+		 		if (!event.required) {
+		 		    	return; /* only do it if necessary */
+		 		 
+			}else {    
 				Shell shell = new Shell(display);
 				shell.setLayout(new FillLayout());
 				Browser browser = new Browser(shell, SWT.NONE);
-
-				initialize(display, browser);
+ 				initialize(display, browser);
 				event.browser = browser;
+			}
 			}
 		});
 		browser.addVisibilityWindowListener(new VisibilityWindowListener() {
@@ -139,11 +146,12 @@ public class BrowserViewForm {
 			}
 		});
 	}
-
+	
 	public String getUrlCaption() {
 		return url.getUrlCaption();
 	}
 
+	
 	public void setUrl(final String url_) {
 		this.url = new SOSUrl(url_);
 		browser.setUrl(url.getHost() + "://" + url.getUrl().getPath());

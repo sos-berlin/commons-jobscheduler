@@ -177,18 +177,26 @@ public class DbItem {
  		time/=60;
  		long minutes = time % 60;
  		time/=60;
- 		long hours = time;
+ 		long hours = time % 24;
+ 		time/=24;
+ 		long days = time;
  		 
  		 
  		
  	 	Calendar calendar = GregorianCalendar.getInstance(); 
- 		calendar.set(Calendar.HOUR_OF_DAY, (int) hours);  
+        calendar.set(Calendar.HOUR_OF_DAY, (int) hours);  
  		calendar.set(Calendar.MINUTE, (int) minutes);  
  		calendar.set(Calendar.SECOND, (int) seconds);  
 
  		
 	    SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
- 		String d = formatter.format(calendar.getTime());
+	    String d = "";
+	    
+	    if (days > 0) {
+ 		   d = String.format("%sd " + formatter.format(calendar.getTime()),days);
+	    }else {
+	       d =  formatter.format(calendar.getTime()) ;
+	    }
 
  		return d;
  		}
