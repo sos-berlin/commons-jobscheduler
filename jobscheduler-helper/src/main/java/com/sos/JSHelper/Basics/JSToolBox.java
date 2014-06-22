@@ -69,6 +69,33 @@ public class JSToolBox extends JSListenerClass {
 		return Messages;
 	}
 
+	public String getMethodName() {
+
+		try {
+			StackTraceElement trace[] = new Throwable().getStackTrace();
+			String lineNumber = trace[1].getLineNumber() > 0 ? "(" + trace[1].getLineNumber() + ")" : "";
+			return trace[1].getClassName() + "." + trace[1].getMethodName() + lineNumber;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return "";
+
+	}
+
+	/**
+	 * Liefert den Namen der Klasse zurck
+	 *
+	 * @return String Name der Klasse
+	 * @throws java.lang.Exception
+	 */
+	public String getClassName() throws Exception {
+		StackTraceElement trace[] = new Throwable().getStackTrace();
+		return trace[1].getClassName();
+	}
+
+
 	protected void setMessageResource(final String pstrResourceBundleName) {
 		String strSOSLocale = System.getenv(conEnvVarSOS_LOCALE);
 		if (strSOSLocale == null) {
