@@ -136,8 +136,12 @@ public class SosHibernateSession {
     }
 
     public static void close() {
-        sessionFactory.close();
-        session.close();
+        if (sessionFactory != null) {
+            sessionFactory.close();
+        }
+        if (session != null) {
+            session.close();
+        }
         session = null;
         sessionFactory = null;
     }
