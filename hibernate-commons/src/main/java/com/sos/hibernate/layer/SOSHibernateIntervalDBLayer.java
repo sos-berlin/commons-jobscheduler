@@ -1,8 +1,11 @@
 package com.sos.hibernate.layer;
  
-import java.util.Date;
-import java.util.GregorianCalendar;
 
+import java.util.GregorianCalendar;
+import java.util.Iterator;
+import java.util.List;
+
+import com.sos.hibernate.classes.DbItem;
 import com.sos.hibernate.classes.SOSHibernateIntervalFilter;
  
 
@@ -40,40 +43,51 @@ public abstract class SOSHibernateIntervalDBLayer extends SOSHibernateDBLayer {
 	private final String	conClassName	= "SOSHibernateDBLayer";
 	
 	public abstract SOSHibernateIntervalFilter getFilter();
-	public abstract int deleteInterval();
-	 
+    public abstract void onAfterDeleting(DbItem h);
+    public abstract List<DbItem> getListOfItemsToDelete();	 
 
 	public SOSHibernateIntervalDBLayer() {
 		super();
 	}
 	
- 
- 
-	public int deleteInterval(int interval) {
-		if (interval > 0) {
-			GregorianCalendar to = new GregorianCalendar();
-			to.add(GregorianCalendar.DAY_OF_YEAR, -interval);
-			this.getFilter().setIntervalFrom(null);
-			this.getFilter().setIntervalTo(to.getTime());
-			int ret =  this.deleteInterval();
-			return ret;
-		} else {
-			return interval;
-		}
-	}
+    public long deleteInterval(int interval,int limit) {
+        long deleted = 0;
+        
+        if (session == null) {
+            beginTransaction();
+        }
 
-	public int deleteInterval(String interval) {
-		int actInterval = -1;
-		try {
-			actInterval = Integer.parseInt(interval);
-			return deleteInterval(actInterval);
-		} catch (Exception e) {
-			return -1;
-		}
-	}
-	
-	
-	
-	
+        if (interval > 0) {
+            GregorianCalendar to = new GregorianCalendar();
+            to.add(GregorianCalendar.DAY_OF_YEAR, -interval);
+            this.getFilter().setLimit(limit);
+            this.getFilter().setIntervalFrom(null);
+            this.getFilter().setIntervalTo(to.getTime());
+            List <DbItem> listOfDBItems =  this.getListOfItemsToDelete();
 
+            Iterator<DbItem> dbitemEntries = listOfDBItems.iterator();
+            int i = 0;
+            while (dbitemEntries.hasNext()) {
+                DbItem h = (DbItem) dbitemEntries.next();
+                this.delete(h);
+                this.onAfterDeleting(h);
+                deleted = deleted + 1;
+                i = i +1;
+                if (i == limit) {
+                    commit();
+                    beginTransaction();
+                    i = 0;
+                }
+            }
+        }
+        
+        commit();
+        return deleted;
+    }
+
+    public long deleteInterval(int interval) {
+        return deleteInterval(interval,300);
+    }
+	   
+    
 }

@@ -43,6 +43,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.sos.hibernate.classes.DbItem;
+
 public class TestJadeFiles {
 	JadeFilesDBLayer jadeFilesDBLayer;
 
@@ -142,7 +144,7 @@ public class TestJadeFiles {
 	@Test
     public void testGetList() throws ParseException {
  
-	     List<JadeFilesDBItem> l =   jadeFilesDBLayer.getFilesFromTo(new Date(), new Date());
+	     List<DbItem> l =   jadeFilesDBLayer.getFilesFromTo(new Date(), new Date());
         
     
     }
@@ -158,7 +160,7 @@ public class TestJadeFiles {
 		jadeFilesDBLayer.beginTransaction();
 		jadeFilesDBLayer.deleteInterval(30);
 		jadeFilesDBLayer.beginTransaction();
-		int i = jadeFilesDBLayer.deleteInterval(3);
+		long i = jadeFilesDBLayer.deleteInterval(3);
 
 		assertEquals("testDeleteInterval fails...:", 0, i);
 	}

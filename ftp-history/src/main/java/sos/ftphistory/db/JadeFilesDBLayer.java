@@ -14,6 +14,7 @@ import org.hibernate.Transaction;
 
 import sos.ftphistory.JadeFilesFilter;
 
+import com.sos.hibernate.classes.DbItem;
 import com.sos.hibernate.layer.SOSHibernateIntervalDBLayer;
 
 /**
@@ -237,7 +238,7 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Ser
 
  
 
-    public List<JadeFilesDBItem> getFilesFromTo(Date from, Date to) throws ParseException {
+    public List<DbItem> getFilesFromTo(Date from, Date to)  {
 
         Session session = getSession();
 
@@ -247,35 +248,20 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Ser
         Transaction transaction = session.beginTransaction();
         Query query = session.createQuery("  from JadeFilesDBItem " + getWhere());
 
-        query.setTimestamp("createdFrom", filter.getCreatedFrom());
-        query.setTimestamp("createdTo", filter.getCreatedTo());
+        if (filter.getCreatedFrom() != null) {
+           query.setTimestamp("createdFrom", filter.getCreatedFrom());
+        }
+        if (filter.getCreatedTo() != null) {
+           query.setTimestamp("createdTo", filter.getCreatedTo());
+        }
 
-        List<JadeFilesDBItem> resultset = query.list();
+        List<DbItem> resultset = query.list();
 
-        transaction.commit();
         return resultset;
 
     }
 
-    public List<JadeFilesHistoryDBItem> getFilesHistoryFromTo(Date from, Date to) throws ParseException {
  
-        filter.setCreatedFrom(from); 
-        filter.setCreatedTo(to);
-      
-        Session session = getSession();
-
-        Transaction transaction = session.beginTransaction();
-        Query query = session.createQuery("  from JadeFilesHistoryDBItem " + getWhere());
-
-        query.setTimestamp("createdFrom", filter.getCreatedFrom());
-        query.setTimestamp("createdTo", filter.getCreatedTo());
-
-        List<JadeFilesHistoryDBItem> resultset = query.list();
-
-        transaction.commit();
-        return resultset;
-
-    }
 
     public List<JadeFilesHistoryDBItem> getFilesHistoryById(Long sosftpId) throws ParseException {
         Session session = getSession();
@@ -339,9 +325,16 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Ser
     }
 
     @Override
-    public int deleteInterval() {
-       return this.delete();
+    public void onAfterDeleting(DbItem h) {        
     }
+
+    @Override
+    public List<DbItem> getListOfItemsToDelete()  {
+         return getFilesFromTo(filter.getCreatedFrom(),filter.getCreatedTo());
+             
+    }
+
+    
 
 
 }

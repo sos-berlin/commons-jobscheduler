@@ -14,6 +14,7 @@ import org.hibernate.Transaction;
 
 import sos.ftphistory.JadeFilesHistoryFilter;
 
+import com.sos.hibernate.classes.DbItem;
 import com.sos.hibernate.layer.SOSHibernateIntervalDBLayer;
 
 /**
@@ -395,25 +396,32 @@ public class JadeFilesHistoryDBLayer extends SOSHibernateIntervalDBLayer impleme
         }
     }
 
-    public List<JadeFilesHistoryDBItem> getFilesHistoryFromTo(Date from, Date to) throws ParseException {
-
+  
+    public List<DbItem> getFilesHistoryFromTo(Date from, Date to){
+        
+        filter.setCreatedFrom(from); 
+        filter.setCreatedTo(to);
+      
         Session session = getSession();
-
-        filter.setTransferTimestampFrom(from); 
-        filter.setTransferTimestampTo(to);
 
         Transaction transaction = session.beginTransaction();
         Query query = session.createQuery("  from JadeFilesHistoryDBItem " + getWhere());
 
-        query.setTimestamp("transferTimestampFrom", filter.getTransferTimestampFrom());
-        query.setTimestamp("transferTimestampTo", filter.getTransferTimestampTo());
+        if (filter.getCreatedFrom() != null) {
+            query.setTimestamp("createdFrom", filter.getCreatedFrom());
+        }
+        
+        if (filter.getCreatedTo() != null) {
+            query.setTimestamp("createdTo", filter.getCreatedTo());
+        }
 
-        List<JadeFilesHistoryDBItem> resultset = query.list();
+        List<DbItem> resultset = query.list();
 
-        transaction.commit();
         return resultset;
 
-    }
+    }    
+    
+    
 
     public List<JadeFilesHistoryDBItem> getFilesHistoryById(Long sosftpId) throws ParseException {
         Session session = getSession();
@@ -486,11 +494,16 @@ public class JadeFilesHistoryDBLayer extends SOSHibernateIntervalDBLayer impleme
         this.filter = filter;
     }
 
-	@Override
-	public int deleteInterval() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    @Override
+    public void onAfterDeleting(DbItem h) {        
+    }
+
+    @Override
+    public List<DbItem> getListOfItemsToDelete()  {
+         return getFilesHistoryFromTo(filter.getCreatedFrom(),filter.getCreatedTo());
+             
+    }
+
 
 
 }
