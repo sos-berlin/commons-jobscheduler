@@ -28,6 +28,26 @@
 
         <plugins>
 
+        
+		        <!-- create folder generated-sources in target folder -->
+		        <plugin>
+		            <artifactId>maven-antrun-plugin</artifactId>
+		            <executions>
+		                <execution>
+		                    <id>generate-sources</id>
+		                    <phase>generate-sources</phase>
+		                    <configuration>
+		                        <tasks>
+		                            <mkdir dir="target/generated-sources" />
+		                        </tasks>
+		                    </configuration>
+		                    <goals>
+		                        <goal>run</goal>
+		                    </goals>
+		                </execution>
+		            </executions>
+		        </plugin>
+
             <!-- add the folder with generated sources to the classpath -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -41,7 +61,7 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>${project.build.directory}/generated-sources</source>
+                                <source>target/generated-sources</source>
                             </sources>
                         </configuration>
                     </execution>
