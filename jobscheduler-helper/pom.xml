@@ -49,25 +49,23 @@
                 </executions>
             </plugin>
 
-<!--
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>buildnumber-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <phase>initialize</phase>
+                        <phase>validate</phase>
                         <goals>
                             <goal>create</goal>
                         </goals>
+				                <configuration>
+				                    <buildNumberPropertyName>svn.build.number</buildNumberPropertyName>
+				                    <doCheck>false</doCheck>
+				                    <doUpdate>false</doUpdate>
+				                </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <buildNumberPropertyName>svn.build.number</buildNumberPropertyName>
-                    <doCheck>false</doCheck>
-                    <doUpdate>false</doUpdate>
-                </configuration>
             </plugin>
-            -->
 
             <!-- get the template for the VersionInfo class, replace the placeholder and put the file into target/generated-sources -->
             <plugin>
