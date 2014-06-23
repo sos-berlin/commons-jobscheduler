@@ -1,13 +1,12 @@
 package sos.scheduler.job;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-
+import com.sos.JSHelper.Basics.VersionInfo;
 import sos.spooler.Job_impl;
 import sos.util.SOSDate;
 
-import com.sos.JSHelper.Basics.JSVersionInfo;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 /**
  * @author andreas.pueschel@sos-berlin.com
@@ -84,7 +83,7 @@ public class JobSchedulerCleanupHistory extends Job_impl {
 
 		final String conMethodName = conClassName + "::spooler_init";
 		
-		spooler_log.info(JSVersionInfo.getVersionString());
+		spooler_log.info(VersionInfo.VERSION_STRING);
 		spooler_log.info(conSVNVersion);
 		spooler_log.debug(String.format("Enter procedure %1$s ", conMethodName));
 

@@ -1,25 +1,18 @@
 package sos.scheduler.file;
 
-import static com.sos.scheduler.messages.JSMessages.JSJ_D_0044;
-import static com.sos.scheduler.messages.JSMessages.JSJ_E_0017;
-import static com.sos.scheduler.messages.JSMessages.JSJ_E_0020;
-import static com.sos.scheduler.messages.JSMessages.JSJ_E_0040;
-import static com.sos.scheduler.messages.JSMessages.JSJ_E_0041;
-import static com.sos.scheduler.messages.JSMessages.JSJ_E_0042;
-import static com.sos.scheduler.messages.JSMessages.JSJ_E_0110;
-import static com.sos.scheduler.messages.JSMessages.JSJ_E_0120;
-import static com.sos.scheduler.messages.JSMessages.JSJ_E_0130;
-import static com.sos.scheduler.messages.JSMessages.JSJ_F_0015;
-import static com.sos.scheduler.messages.JSMessages.JSJ_F_0016;
-import static com.sos.scheduler.messages.JSMessages.JSJ_F_0080;
-import static com.sos.scheduler.messages.JSMessages.JSJ_F_0090;
-import static com.sos.scheduler.messages.JSMessages.JSJ_I_0017;
-import static com.sos.scheduler.messages.JSMessages.JSJ_I_0018;
-import static com.sos.scheduler.messages.JSMessages.JSJ_I_0019;
-import static com.sos.scheduler.messages.JSMessages.JSJ_I_0040;
-import static com.sos.scheduler.messages.JSMessages.JSJ_I_0090;
-import static com.sos.scheduler.messages.JSMessages.JSJ_T_0010;
-import static com.sos.scheduler.messages.JSMessages.JSJ_W_0043;
+import com.sos.JSHelper.Basics.VersionInfo;
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.JSHelper.Options.SOSOptionFileAge;
+import com.sos.JSHelper.Options.SOSOptionTime;
+import com.sos.JSHelper.io.Files.JSTextFile;
+import com.sos.JSHelper.io.SOSFileSystemOperations;
+import com.sos.i18n.annotation.I18NResourceBundle;
+import org.apache.log4j.Logger;
+import sos.scheduler.job.JobSchedulerJobAdapter;
+import sos.spooler.Job_chain;
+import sos.spooler.Order;
+import sos.spooler.Variable_set;
+import sos.util.SOSSchedulerLogger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -32,21 +25,7 @@ import java.util.HashMap;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
-
-import sos.scheduler.job.JobSchedulerJobAdapter;
-import sos.spooler.Job_chain;
-import sos.spooler.Order;
-import sos.spooler.Variable_set;
-import sos.util.SOSSchedulerLogger;
-
-import com.sos.JSHelper.Basics.JSVersionInfo;
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.JSHelper.Options.SOSOptionFileAge;
-import com.sos.JSHelper.Options.SOSOptionTime;
-import com.sos.JSHelper.io.SOSFileSystemOperations;
-import com.sos.JSHelper.io.Files.JSTextFile;
-import com.sos.i18n.annotation.I18NResourceBundle;
+import static com.sos.scheduler.messages.JSMessages.*;
 
 /**
  */
@@ -350,7 +329,7 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 	public boolean initialize(final String pstrVersionInfo) {
 		try {
 			super.spooler_process();
-			logger.info(JSVersionInfo.getVersionString());
+			logger.info(VersionInfo.VERSION_STRING);
 			logger.info(pstrVersionInfo);
 			params = null;
 			params = getSchedulerParameterAsProperties(super.getJobOrOrderParameters());

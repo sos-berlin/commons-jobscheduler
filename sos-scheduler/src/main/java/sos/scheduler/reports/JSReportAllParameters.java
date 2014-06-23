@@ -1,15 +1,14 @@
 package sos.scheduler.reports;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
-
 import com.sos.JSHelper.Basics.JSJobUtilities;
 import com.sos.JSHelper.Basics.JSToolBox;
-import com.sos.JSHelper.Basics.JSVersionInfo;
+import com.sos.JSHelper.Basics.VersionInfo;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.i18n.annotation.I18NResourceBundle;
+import org.apache.log4j.Logger;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * \class 		JSReportAllParameters - Workerclass for "Report all Parameters"
@@ -111,7 +110,7 @@ public class JSReportAllParameters extends JSToolBox implements JSJobUtilities {
 		try {
 			logger.debug(String.format(Messages.getMsg("JSJ-I-110"), conMethodName));
 			logger.info(conSVNVersion);
-			logger.info(JSVersionInfo.getVersionString());
+			logger.info(VersionInfo.VERSION_STRING);
 			// Options().CheckMandatory();
 			logger.debug(Options().toString());
 			HashMap<String, String> objSettings = Options().Settings();

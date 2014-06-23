@@ -4,19 +4,13 @@
  * 
  */
 package sos.scheduler.file;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 
+import com.sos.JSHelper.Basics.VersionInfo;
 import sos.scheduler.job.JobSchedulerJob;
 import sos.spooler.Variable_set;
 import sos.util.SOSCrypt;
 
-import com.sos.JSHelper.Basics.JSVersionInfo;
+import java.io.*;
 
 public class JobSchedulerMD5File extends JobSchedulerJob {
 	@SuppressWarnings("unused")
@@ -33,7 +27,7 @@ public class JobSchedulerMD5File extends JobSchedulerJob {
 		String fileName = "";
 		String mode = conModeCREATE;
 		try {
-			getLogger().debug(JSVersionInfo.getVersionString());
+			getLogger().debug(VersionInfo.VERSION_STRING);
 			getLogger().debug(conSVNVersion);
 
 			// Job oder Order

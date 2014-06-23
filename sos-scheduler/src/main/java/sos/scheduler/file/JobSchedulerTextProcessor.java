@@ -1,20 +1,15 @@
 package sos.scheduler.file;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.HashMap;
 
+import com.sos.JSHelper.Basics.VersionInfo;
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import sos.spooler.Job_impl;
 import sos.spooler.Variable_set;
 import sos.util.SOSLogger;
 import sos.util.SOSSchedulerLogger;
 import sos.util.SOSStandardLogger;
 
-import com.sos.JSHelper.Basics.JSVersionInfo;
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import java.io.*;
+import java.util.HashMap;
 
 class SOSSchedulerTextProcessor {
 	private final String	conSVNVersion	= "$Id$";
@@ -277,7 +272,7 @@ public class JobSchedulerTextProcessor extends Job_impl {
 	   •	Zählen des Vorkommens einer bestimmten Zeichenfolge in einer Datei
 */
 		try {
-			logger.debug(JSVersionInfo.getVersionString());
+			logger.debug(VersionInfo.VERSION_STRING);
 			logger.debug(conSVNVersion);
 			// Job oder Order
 			Variable_set params = spooler.create_variable_set();

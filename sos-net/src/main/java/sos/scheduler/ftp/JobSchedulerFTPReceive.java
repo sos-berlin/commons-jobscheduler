@@ -1,11 +1,6 @@
 package sos.scheduler.ftp;
-import java.io.File;
-import java.util.Iterator;
-import java.util.Properties;
-import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import com.sos.JSHelper.Basics.VersionInfo;
 import sos.configuration.SOSConfiguration;
 import sos.net.SOSFileTransfer;
 import sos.net.sosftp.SOSFTPCommandReceive;
@@ -15,7 +10,12 @@ import sos.spooler.Variable_set;
 import sos.util.SOSSchedulerLogger;
 import sos.util.SOSString;
 
-import com.sos.JSHelper.Basics.JSVersionInfo;
+import java.io.File;
+import java.util.Iterator;
+import java.util.Properties;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * FTP File Transfer
@@ -69,7 +69,7 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
 		try {
 			try {
 				this.setLogger(new SOSSchedulerLogger(spooler_log));
-				getLogger().debug(JSVersionInfo.getVersionString());
+				getLogger().debug(VersionInfo.VERSION_STRING);
 				getLogger().debug(conSVNVersion);
 				params = getParameters();
 				schedulerParams = getSchedulerParameterAsProperties(params);

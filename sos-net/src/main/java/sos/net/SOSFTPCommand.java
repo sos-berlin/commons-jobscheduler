@@ -1,6 +1,6 @@
 package sos.net;
 
-import com.sos.JSHelper.Basics.JSVersionInfo;
+import com.sos.JSHelper.Basics.VersionInfo;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.System.SOSCommandline;
 import com.trilead.ssh2.*;
@@ -3350,9 +3350,7 @@ abstract public class SOSFTPCommand {
 	}
 
 	public static String getVersion() {
-		String version = JSVersionInfo.conVersionNumber + " " + JSVersionInfo.conVersionDate + " / " + JSVersionInfo.conCopyrightText;
-		// String version = major + "." + minor + "." + bugFix;
-		return version;
+		return VersionInfo.VERSION_STRING;
 	}
 
 	/**
@@ -4297,7 +4295,7 @@ abstract public class SOSFTPCommand {
 		listOfErrorTransfer = new ArrayList();
 
 		try {
-			String version = "SOSFTP - " + JSVersionInfo.conVersionNumber + " " + JSVersionInfo.conVersionDate + " / " + JSVersionInfo.conCopyrightText;
+			String version = "SOSFTP - " + VersionInfo.VERSION_STRING;
 			System.out.println(version);
 			System.out.println(conSVNVersion);
 			objLogger = Logger.getRootLogger();

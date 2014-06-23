@@ -1,11 +1,9 @@
 package sos.scheduler.ftp;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Properties;
-import java.util.Vector;
-
+import com.sos.JSHelper.Basics.VersionInfo;
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.JSHelper.Options.JSOptionsClass;
+import com.sos.i18n.annotation.I18NResourceBundle;
 import sos.configuration.SOSConfiguration;
 import sos.net.sosftp.SOSFTPCommandSend;
 import sos.scheduler.job.JobSchedulerJobAdapter;
@@ -14,10 +12,11 @@ import sos.spooler.Variable_set;
 import sos.util.SOSSchedulerLogger;
 import sos.util.SOSString;
 
-import com.sos.JSHelper.Basics.JSVersionInfo;
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.JSHelper.Options.JSOptionsClass;
-import com.sos.i18n.annotation.I18NResourceBundle;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Properties;
+import java.util.Vector;
 
 /**
  * FTP File Transfer
@@ -69,7 +68,7 @@ public class JobSchedulerFTPSend extends JobSchedulerJobAdapter {
 
 		try {
 			this.setLogger(new SOSSchedulerLogger(spooler_log));
-			getLogger().info(JSVersionInfo.getVersionString());
+			getLogger().info(VersionInfo.VERSION_STRING);
 			getLogger().info(conSVNVersion);
 
 			try { // to get the job and order parameters
