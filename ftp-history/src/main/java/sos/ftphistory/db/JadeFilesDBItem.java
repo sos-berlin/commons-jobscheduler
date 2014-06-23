@@ -5,6 +5,8 @@ import java.util.Date;
 
 import javax.persistence.*;
 
+import com.sos.hibernate.classes.DbItem;
+
   
 /**
 * \class JadeFilesDBItem 
@@ -36,7 +38,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name="SOSFTP_FILES")
-public class JadeFilesDBItem {
+public class JadeFilesDBItem extends DbItem {
 	
 	 private Long id;
 	 private String mandator;

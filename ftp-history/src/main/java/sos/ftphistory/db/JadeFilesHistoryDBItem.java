@@ -17,6 +17,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+
+import com.sos.hibernate.classes.DbItem;
  
 
 
@@ -51,7 +53,7 @@ import javax.persistence.Transient;
 @Entity
 @Table(name="SOSFTP_FILES_HISTORY")
              
-public class JadeFilesHistoryDBItem {
+public class JadeFilesHistoryDBItem extends DbItem{
 
 	 private String guid;
 	 private Long sosftpId;
