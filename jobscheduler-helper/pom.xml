@@ -54,6 +54,7 @@
                 <artifactId>buildnumber-maven-plugin</artifactId>
                 <executions>
                     <execution>
+                    		<id>get-svn-revision</id>
                         <phase>validate</phase>
                         <goals>
                             <goal>create</goal>
