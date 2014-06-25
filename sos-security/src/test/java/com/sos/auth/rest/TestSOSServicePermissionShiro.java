@@ -16,8 +16,8 @@ public class TestSOSServicePermissionShiro {
 
     private static final String SHIRO_PERMISSION = "sos:products:jid:execute";
     private static final String SHIRO_MAPPED_ROLE = "jid";
-    private static final String LDAP_PASSWORD = "sos01";
-    private static final String LDAP_USER = "SOS01";
+    private static final String LDAP_PASSWORD = "admin";
+    private static final String LDAP_USER = "admin";
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
