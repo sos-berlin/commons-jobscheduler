@@ -12,6 +12,7 @@ import org.eclipse.swt.events.SelectionEvent;
  
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.wb.swt.SWTResourceManager;
  
 public class SOSLoginForm extends Composite {
 
@@ -26,9 +27,11 @@ public class SOSLoginForm extends Composite {
     private Label lblPassword;
     private Text user;
     private Text password;
+    private Label lbMessage;
  
     public SOSLoginForm(Composite parent, int style ) {
         super(parent, style);
+        setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.BOLD));
         setLayout(new GridLayout(3, false));
         createContent();
     }
@@ -65,6 +68,14 @@ public class SOSLoginForm extends Composite {
                gd_btnCancel.widthHint = 101;
                btnCancel.setLayoutData(gd_btnCancel);
                btnCancel.setText("Cancel");
+               new Label(this, SWT.NONE);
+               new Label(this, SWT.NONE);
+               new Label(this, SWT.NONE);
+               new Label(this, SWT.NONE);
+               
+               lbMessage = new Label(this, SWT.NONE);
+               lbMessage.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+               lbMessage.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.BOLD));
     }
 
     @Override
@@ -94,7 +105,8 @@ public class SOSLoginForm extends Composite {
 //    }
 
     public void setMsg(String msg) {
-    
+      lbMessage.setText(msg);
+      this.layout();
     }
  
 
