@@ -377,7 +377,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 				password.setHideValue(flgHideValuesFromCredentialStore);
 			}
 			if (isNotEmpty(objEntry.Url())) {
-				host.Value(objEntry.Url());
+				setIfNotDirty(host, objEntry.Url());
 				host.setHideValue(flgHideValuesFromCredentialStore);
 			}
 			objEntry.ExpirationDate();

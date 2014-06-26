@@ -22,6 +22,7 @@ public class SOSLoginDialog extends Dialog {
     private boolean rememberMe;
     private  SOSLoginForm loginForm;
     private boolean cancel;
+    private String message="";
      /**
      * 
      * Create the dialog.
@@ -63,7 +64,9 @@ public class SOSLoginDialog extends Dialog {
         shell.setLayout(new FillLayout(SWT.HORIZONTAL));
 
         loginForm = new SOSLoginForm(shell, SWT.NONE);
+        loginForm.setMsg(message);
         loginForm.getBtnOk().addSelectionListener(new SelectionAdapter() {
+        
             @Override
             public void widgetSelected(SelectionEvent e) {
                 user = loginForm.getUser().getText();
@@ -104,12 +107,16 @@ public class SOSLoginDialog extends Dialog {
     }
     
     public void setMsg(String msg) {
-        loginForm.setMsg(msg); 
+        message = msg; 
     }
 
     
     public boolean isCancel() {
         return cancel;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
     
 

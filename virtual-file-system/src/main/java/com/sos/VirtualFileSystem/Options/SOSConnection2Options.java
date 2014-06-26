@@ -102,6 +102,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 		logger.trace(SOSVfsMessageCodes.SOSVfs_T_267.params(conParamNamePrefixTARGET));
 		objTargetOptions.setAllOptions(pobjJSSettings, conParamNamePrefixTARGET);
 		objTargetOptions.Alternatives().setChildClasses(pobjJSSettings, conParamNamePrefixTARGET);
+		objTargetOptions.setChildClasses(pobjJSSettings, conParamNamePrefixTARGET);
 		this.addProcessedOptions(objTargetOptions.getProcessedOptions());
 		//
 		logger.trace(SOSVfsMessageCodes.SOSVfs_T_269.params(objTargetOptions.dirtyString()));
