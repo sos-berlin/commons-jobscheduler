@@ -190,13 +190,6 @@
             <artifactId>commons-lang3</artifactId>
         </dependency>
 
-        <!-- this dependency is needed as long a tests in this artifact located in the main folder, not in test -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>compile</scope>
-        </dependency>
-
     </dependencies>
 
 </project>
