@@ -101,6 +101,7 @@ public class SosHibernateSession {
         classList.addClassIfExist("com.sos.jobnet.db.JobNetHistoryDBItem");
         classList.addClassIfExist("com.sos.jobnet.db.JobNetCmdHistoryDBItem");
         classList.addClassIfExist("com.sos.jobnet.db.JobNetDBItem");
+        classList.addClassIfExist("com.sos.jobnet.db.ConditionsDBItem");
 
         classList.addClassIfExist("com.sos.auth.shiro.db.SOSUserDBItem");
         classList.addClassIfExist("com.sos.auth.shiro.db.SOSUserRightDBItem");
