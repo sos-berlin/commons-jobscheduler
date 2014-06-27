@@ -67,7 +67,6 @@ public class JSOptionValueList extends SOSOptionString {
 	private static final long	serialVersionUID	= -402205746280480952L;
 	private final String		conClassName		= "JSOptionValueList";
 	protected String[]			strValueList;
-	@SuppressWarnings("hiding")
 	public final String			ControlType			= "combo";
 
 	@Override public String getControlType() {
@@ -193,6 +192,9 @@ public class JSOptionValueList extends SOSOptionString {
 		if (isNotEmpty(pstrValueList) && (pstrValueList.contains(";") || pstrValueList.contains("|") || pstrValueList.contains(","))) {
 			strValueList = strT.split(conValueListDelimiters);
 			strT = strValueList[0];
+		}
+		else {  //JITL-93 oh 27.06.14, sonst bleibt strValueList = [init_value] nach Constructor-Aufruf 
+			strValueList = new String[] { pstrValueList };
 		}
 		super.Value(strT);
 		// return void;
