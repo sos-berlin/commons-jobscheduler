@@ -1,16 +1,21 @@
 package sos.scheduler.db;
 
-import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
-import com.sos.JSHelper.Listener.JSListenerClass;
-import com.sos.JSHelper.Logging.Log4JHelper;
-import com.sos.JSHelper.io.Files.JSTextFile;
-import org.apache.log4j.Logger;
-import org.junit.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.util.HashMap;
 
-import static org.junit.Assert.assertEquals;
+import org.apache.log4j.Logger;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
+import com.sos.JSHelper.Listener.JSListenerClass;
+import com.sos.JSHelper.io.Files.JSTextFile;
 
 /**
  * \class 		SOSSQLPlusJobJUnitTest - JUnit-Test for "Start SQL*Plus client and execute sql*plus programs"
@@ -28,8 +33,7 @@ import static org.junit.Assert.assertEquals;
 public class SOSSQLPlusJobJUnitTest extends JSJobUtilitiesClass <SOSSQLPlusJobOptions>{
 	private final static String		conClassName	= "SOSSQLPlusJobJUnitTest";						//$NON-NLS-1$
 	private static Logger			logger			= Logger.getLogger(SOSSQLPlusJobJUnitTest.class);
-	@SuppressWarnings("unused")
-	private static Log4JHelper		objLogger		= null;
+//	private static Log4JHelper		objLogger		= null;
 
 	protected SOSSQLPlusJobOptions	objOptions		= null;
 	private SOSSQLPlusJob			objE			= null;
@@ -48,7 +52,7 @@ public class SOSSQLPlusJobJUnitTest extends JSJobUtilitiesClass <SOSSQLPlusJobOp
 
 	@Before
 	public void setUp() throws Exception {
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
+//		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
 		objE = new SOSSQLPlusJob();
 		objE.setJSJobUtilites(this);
 		objOptions = objE.Options();
@@ -127,8 +131,8 @@ public class SOSSQLPlusJobJUnitTest extends JSJobUtilitiesClass <SOSSQLPlusJobOp
 
 	}
 
-    @Ignore    // Test hängt
-    // @Test
+    //@Ignore    // Test hängt
+    @Test
 	public void testExecute3() throws Exception {
 
 		setOptions();
@@ -139,7 +143,6 @@ public class SOSSQLPlusJobJUnitTest extends JSJobUtilitiesClass <SOSSQLPlusJobOp
 				"select &SELECT from dual;" + conNL + //
 				"prompt fertig;" + conNL + //
 				"prompt set db_user is &DB_USER;" + conNL + //
-				"prompt set db_user is &DB_USER1;" + conNL + //
 				"prompt set huhu is &SELECT;" + conNL + //
 				"prompt SET varname IS varWert;" + conNL + //
 				"exit;" + conNL;
@@ -149,8 +152,8 @@ public class SOSSQLPlusJobJUnitTest extends JSJobUtilitiesClass <SOSSQLPlusJobOp
 
 	}
 
-    @Ignore    // Test hängt
-    // @Test
+    //@Ignore    // Test hängt
+    @Test
 	public void testExecute4() throws Exception {
 
 		setOptions();
@@ -161,7 +164,6 @@ public class SOSSQLPlusJobJUnitTest extends JSJobUtilitiesClass <SOSSQLPlusJobOp
 				"select &SELECT from dual;" + conNL + //
 				"prompt fertig;" + conNL + //
 				"prompt set db_user is &DB_USER;" + conNL + //
-				"prompt set db_user is &DB_USER1;" + conNL + //
 				"prompt set huhu is &SELECT;" + conNL + //
 				"prompt huhu = &SELECT;" + conNL + //
 				"prompt SET varname IS varWert;" + conNL + //
@@ -213,7 +215,7 @@ public class SOSSQLPlusJobJUnitTest extends JSJobUtilitiesClass <SOSSQLPlusJobOp
 		String strCmdScript = "Set Echo on" + conNL + //
 				"WHENEVER SQLERROR EXIT SQL.SQLCODE" + conNL + //
 				"WHENEVER OSERROR EXIT FAILURE" + conNL + //
-				"selct &SELECT from dual;" + conNL + //
+				"select &SELECT from dual;" + conNL + //
 				"exit;" + conNL;
 		setScript(strCmdScript);
 		objOptions.command_script_file.Value("file:" + "abcd.ef");
@@ -227,7 +229,6 @@ public class SOSSQLPlusJobJUnitTest extends JSJobUtilitiesClass <SOSSQLPlusJobOp
 	public void testExecute8() throws Exception {
 
 		setOptions();
-		objOptions.ignore_sp2_messages.Value("0734");
 		String strCmdScript = "Set Echo on" + conNL + //
 				"WHENEVER SQLERROR EXIT SQL.SQLCODE" + conNL + //
 				"WHENEVER OSERROR EXIT FAILURE" + conNL + //
@@ -286,6 +287,7 @@ public class SOSSQLPlusJobJUnitTest extends JSJobUtilitiesClass <SOSSQLPlusJobOp
 		objOptions.db_url.Value("localhost as sysdba");
 
 	} // private void setOptions
+	
 
 	private void setScript(final String pstrScript) throws Exception {
 		String strSQLFileName = File.createTempFile("SOS", "sql").getAbsolutePath();
