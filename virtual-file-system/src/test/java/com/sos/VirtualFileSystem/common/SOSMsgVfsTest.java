@@ -28,7 +28,7 @@ public class SOSMsgVfsTest {
 		SOSMsg.flgShowFullMessageText = false;
 		SOSMsgVfs objT = new SOSMsgVfs("SOSVfs_W_136");
 		String strT = objT.get().trim();
-		String strExpectedMessage = "SOSVfs_W_136: Problem beim Abbau der Verbindung.";
+		strExpectedMessage = "SOSVfs_W_136: Problem beim Abbau der Verbindung.";
 		assertEquals("Msg not as expected", strExpectedMessage, strT);
 	}
 

@@ -287,12 +287,15 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 					outputStream.close();
 				}
 			}
-			catch (Exception e) {}
+			catch (Exception e) {
+				throw new JobSchedulerException(e);
+			}
 		}
 
 		return fileSize;
 	}
 
+	
 	/**
 	 *
 	 * \brief getInputStream

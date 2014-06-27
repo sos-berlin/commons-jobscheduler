@@ -6863,7 +6863,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	@SuppressWarnings("unused") private String getAllOptionsAsString() {
 		final String conMethodName = conClassName + "::getAllOptionsAsString";
 		String strT = conClassName + "\n";
-		final StringBuffer strBuffer = new StringBuffer();
+//		final StringBuffer strBuffer = new StringBuffer();
 		// strT += IterateAllDataElementsByAnnotation(objParentClass, this,
 		// JSOptionsClass.IterationTypes.toString, strBuffer);
 		// strT += IterateAllDataElementsByAnnotation(objParentClass, this, 13,

@@ -1,5 +1,14 @@
 package com.sos.VirtualFileSystem.SFTP;
 
+import java.util.Vector;
+
+import org.apache.log4j.Logger;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.Options.SOSOptionJadeOperation.enuJadeOperations;
 import com.sos.JSHelper.Options.SOSOptionPortNumber;
@@ -9,10 +18,6 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
-import org.apache.log4j.Logger;
-import org.junit.*;
-
-import java.util.Vector;
 
 /**
 * \class SOSVfsSFtpTest
@@ -43,7 +48,6 @@ public class SOSVfsSFtpTest extends JSToolBox {
 	@SuppressWarnings("unused")
 	private final String			conClassName			= "SOSVfsSFtpTest";
 
-	@SuppressWarnings("unused")
 	protected static Logger			logger					= Logger.getLogger(SOSVfsFtpTest.class);
 	protected SOSFTPOptions			objOptions				= null;
 
@@ -77,6 +81,7 @@ public class SOSVfsSFtpTest extends JSToolBox {
 		ftpClient = (ISOSVfsFileTransfer) objVFS;
 		
 		dynamicClassNameSource = "com.sos.VirtualFileSystem.SFTP.SOSVfsSFtp";
+		dynamicClassNameTarget = "com.sos.VirtualFileSystem.SFTP.SOSVfsSFtp";
 	}
 
 	@After

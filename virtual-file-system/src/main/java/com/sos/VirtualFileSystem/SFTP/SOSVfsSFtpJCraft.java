@@ -39,6 +39,9 @@ import com.sos.i18n.annotation.I18NResourceBundle;
  *
  * @author Robert Ehrlich
  *
+ * see also: https://svn.codehaus.org/mule/branches/mule-3.x/transports/sftp/src/main/java/org/mule/transport/sftp/SftpClient.java
+ * createUniqueName
+ * 
  */
 @I18NResourceBundle(
 					baseName = "SOSVirtualFileSystem",
@@ -264,17 +267,17 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 				reply = "rmdir OK";
 				logger.debug(HostID(SOSVfs_D_181.params("rmdir", strT, getReplyString())));
 			}
-//			String[] pathArray = path.split("/");
-//			for (int i = pathArray.length; i > 0; i--) {
-//				String strT = "";
-//				for (int j = 0; j < i; j++) {
-//					strT += pathArray[j] + "/";
-//				}
-//				logger.debug(HostID(SOSVfs_D_179.params("rmdir", strT)));
-//				this.getClient().rmdir(strT);
-//				reply = "rmdir OK";
-//				logger.debug(HostID(SOSVfs_D_181.params("rmdir", strT, getReplyString())));
-//			}
+			//			String[] pathArray = path.split("/");
+			//			for (int i = pathArray.length; i > 0; i--) {
+			//				String strT = "";
+			//				for (int j = 0; j < i; j++) {
+			//					strT += pathArray[j] + "/";
+			//				}
+			//				logger.debug(HostID(SOSVfs_D_179.params("rmdir", strT)));
+			//				this.getClient().rmdir(strT);
+			//				reply = "rmdir OK";
+			//				logger.debug(HostID(SOSVfs_D_181.params("rmdir", strT, getReplyString())));
+			//			}
 			logINFO(HostID(SOSVfs_D_181.params("rmdir", path, getReplyString())));
 		}
 		catch (Exception e) {
@@ -725,7 +728,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		try {
 			SftpATTRS objAttr = this.getClient().stat(path);
 			if (objAttr != null) {
-				int mt = objAttr.getMTime();
+				long mt = objAttr.getMTime() * 1000L;
 				DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 				dateTime = df.format(new Date(mt));
 			}

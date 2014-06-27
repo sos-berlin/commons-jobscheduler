@@ -1,21 +1,33 @@
 package com.sos.VirtualFileSystem.FTP;
-import com.sos.JSHelper.Basics.JSJobUtilities;
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.VirtualFileSystem.DataElements.SOSFileList;
-import com.sos.VirtualFileSystem.DataElements.SOSFileListEntry;
-import com.sos.VirtualFileSystem.DataElements.SOSFolderName;
-import com.sos.VirtualFileSystem.Interfaces.*;
-import com.sos.i18n.annotation.I18NResourceBundle;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPClientConfig;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.log4j.Logger;
 
-import java.io.*;
-import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.sos.JSHelper.Basics.JSJobUtilities;
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.VirtualFileSystem.DataElements.SOSFileList;
+import com.sos.VirtualFileSystem.DataElements.SOSFileListEntry;
+import com.sos.VirtualFileSystem.DataElements.SOSFolderName;
+import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
+import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
+import com.sos.VirtualFileSystem.Interfaces.ISOSSession;
+import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
+import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
+import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFileSystem;
+import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer, ISOSVFSHandler, ISOSVirtualFileSystem, ISOSConnection {
@@ -144,7 +156,7 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 			FTPClientConfig conf = new FTPClientConfig();
 			// TODO create additional Options for ClientConfig
 			// conf.setServerLanguageCode("fr");
-			// objFTPClient.configure(conf);
+			 objFTPClient.configure(conf);
 			/**
 			 * This listener is to write all commands and response from commands to system.out
 			 *

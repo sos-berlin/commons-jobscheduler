@@ -1,7 +1,11 @@
 package com.sos.VirtualFileSystem.shell;
 
 import org.apache.log4j.Logger;
-import org.junit.*;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class cmdShellTest {
 
@@ -9,7 +13,7 @@ public class cmdShellTest {
 	private static final String	conSVNVersion			= "$Id$";
 	private static final Logger	logger					= Logger.getLogger(cmdShellTest.class);
 
-	private final 		cmdShell objShell = null;
+	private 		cmdShell objShell = null;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -26,7 +30,7 @@ public class cmdShellTest {
 		String ccp = System.getProperty("console.encoding");
 
 		logger.info(osn + ", fcp =  " + fcp + ", ccp = " + ccp);
-		cmdShell objShell = new cmdShell();
+		objShell = new cmdShell();
 
 	}
 
@@ -52,7 +56,7 @@ public class cmdShellTest {
 //	@Test
 	public void testExecuteCommand() throws Exception {
 
-		cmdShell objShell = new cmdShell();
+		objShell = new cmdShell();
 		int intCC = 0;
 //		 intCC = objShell.executeCommand("C:/Users/KB/Desktop/filezilla_start.bat");
 		intCC = objShell.executeCommand("dir");
@@ -71,7 +75,7 @@ public class cmdShellTest {
 	@Test
 	public void testExecuteSQLPlus() throws Exception {
 
-		cmdShell objShell = new cmdShell();
+		objShell = new cmdShell();
 		int intCC = 0;
 //		 intCC = objShell.executeCommand("C:/Users/KB/Desktop/filezilla_start.bat");
 		intCC = objShell.executeCommand("echo 1 | \"C:/oraclexe/app/oracle/product/11.2.0/server/bin/sqlplus.exe\" -S -L sys/scheduler@localhost as sysdba @c:/temp/mycmd.sql");

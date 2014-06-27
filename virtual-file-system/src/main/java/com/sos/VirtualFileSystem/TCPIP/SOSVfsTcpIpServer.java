@@ -40,7 +40,9 @@ public class SOSVfsTcpIpServer {
 		}
 		finally {
 			try {
+				if (listenSocket != null) {
 				listenSocket.close();
+				}
 			}
 			catch (IOException e) {
 				e.printStackTrace();

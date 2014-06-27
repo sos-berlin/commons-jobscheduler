@@ -503,6 +503,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 					}
 					catch (Exception e) {
 						e.printStackTrace();
+						throw new JobSchedulerException(e);
 					}
 					String strHash = objF.File2String();
 					strHash = strHash.replaceAll("\\n", "");

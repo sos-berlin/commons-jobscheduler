@@ -124,7 +124,7 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
 			FTPClientConfig conf = new FTPClientConfig();
 			// TODO create additional Options for ClientConfig
 			// conf.setServerLanguageCode("fr");
-			// objFTPClient.configure(conf);
+			 objFTPClient.configure(conf);
 			/**
 			 * This listener is to write all commands and response from commands to system.out
 			 *

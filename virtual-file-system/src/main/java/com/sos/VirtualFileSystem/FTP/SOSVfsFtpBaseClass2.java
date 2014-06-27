@@ -311,14 +311,12 @@ public class SOSVfsFtpBaseClass2 extends SOSVfsFtpBaseClass implements ISOSVfsFi
 				}
 				else {
 					if (flgIsDirectory && flgRecurseSubFolders == true) {
-						if (flgRecurseSubFolders) {
 							// TODO die Directories evtl. in jeweils einem separaten Thread parsen? Bringt das was? Option wäre gut.
 							// TODO special regexp for the folder names?
 							Vector<String> vecNames = getFilenames(strCurrentDirectory + strCurrentFile, flgRecurseSubFolders, regexp);
-							if (vecNames != null & vecNames.size() > 0) {
+							if (vecNames != null && vecNames.size() > 0) {
 								vecDirectoryListing.addAll(vecNames);
 							}
-						}
 					}
 				}
 			}

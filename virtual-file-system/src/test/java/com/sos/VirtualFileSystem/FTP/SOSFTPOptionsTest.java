@@ -23,7 +23,7 @@ import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 public class SOSFTPOptionsTest {
 	@SuppressWarnings("unused") private final String conClassName = this.getClass().getSimpleName();
 	@SuppressWarnings("unused") private static final String conSVNVersion = "$Id$";
-	@SuppressWarnings("unused") private static final Logger logger = Logger.getLogger(SOSFTPOptionsTest.class);
+	private  final Logger logger = Logger.getLogger(SOSFTPOptionsTest.class);
 	
 	@BeforeClass public static void setUpBeforeClass() throws Exception {
 	}
