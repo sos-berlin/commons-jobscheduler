@@ -211,10 +211,11 @@ public class JSOptionValueListTest {
 		assertEquals("Value must be 'eins'", "eins", optionValueList1.Value());
 		optionValueList1.Value("zwei,drei,vier");
 		assertEquals("Value must be 'zwei'", "zwei", optionValueList1.Value());
-		optionValueList1.Value("sieben");
-		assertEquals("Value must be 'sieben'", "sieben", optionValueList1.Value());
 		String strT = optionValueList1.concatenatedValue(",");
 		assertEquals("ValueList is wrong", "zwei,drei,vier", strT);
+		optionValueList1.Value("sieben");
+		assertEquals("Value must be 'sieben'", "sieben", optionValueList1.Value());
+		assertTrue("Value must have value 'sieben'",  optionValueList1.contains("sieben"));
 	}
 
 	@Test//	@Ignore   // Test is not really complete !?
