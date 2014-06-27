@@ -60,6 +60,16 @@ xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation
             This job deletes the entries in this table according to the given interval.</div>
         </note>
       </resource>
+      <resource name="SOS_FTP_FILES_HISTORY" type="table">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Die Tabelle nimmt die Historie und Protokolle der Jade FTP Transfers auf.
+            Der Job löscht die Datensätze in der Tabelle entsprechend dem angegebenen Intervall.</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">This table contains the history and log files of Jade transfers.
+            This job deletes the entries in this table according to the given interval.</div>
+        </note>
+      </resource>
     </database>
   </resources>
   <configuration>
@@ -80,12 +90,47 @@ xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation
           <div xmlns="http://www.w3.org/1999/xhtml">Items in the tables SCHEDULER_HISTORY, SCHEDULER_ORDER_HISTORY, DAYS_SCHEDULE,SOS_FTP_FILES which are older than the given number of days will be deleted.</div>
         </note>
       </param>
+      
+       <param name="cleanup_JobScheduler_History_limit" default_value="true" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Gibt an, nach wie vielen Sätzen spätestens ein COMMIT an die Datenbank gesendet wird .</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">After this number of deleted records, a commit will be sent to the database.</div>
+        </note>
+      </param>
+      <param name="cleanup_JobScheduler_History_execute" default_value="true" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Wenn false, werden die Sätze in den Tabellen SCHEDULER_HISTORY und SCHEDULER_ORDER_HISTORY nicht gelöscht .</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">When false the records in the tables SCHEDULER_HISTORY and SCHEDULER_ORDER_HISTORY will not be deleted.</div>
+        </note>
+      </param>
+      
+      
       <param name="delete_ftp_history_interval" default_value="0" required="false">
         <note language="de">
           <div xmlns="http://www.w3.org/1999/xhtml">Einträge in den Tabellen SOSFTP_FILES und SOSFTP_FILES_HISTORY, die älter als die angegebene Anzahl von Tagen sind, werden gelöscht.</div>
         </note>
         <note language="en">
           <div xmlns="http://www.w3.org/1999/xhtml">Items in the tables SOSFTP_FILES and SOSFTP_FILES_HISTORY which are older than the given number of days will be deleted.</div>
+        </note>
+      </param>
+      <param name="cleanup_JADE_History_limit" default_value="true" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Gibt an, nach wie vielen Sätzen spätestens ein COMMIT an die Datenbank gesendet wird .</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">After this number of deleted records, a commit will be sent to the database.</div>
+        </note>
+      </param>
+      <param name="cleanup_JADE_History_execute" default_value="true" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Wenn false, werden die Sätze in den Tabellen SOSFTP_FILES_HISTORY und SOSFTP_FILES nicht gelöscht .</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">When false the records in the tables SOSFTP_FILES_HISTORY and SOSFTP_FILES will not be deleted.</div>
         </note>
       </param>
       <param name="delete_daily_plan_interval" default_value="0" required="false">
@@ -96,6 +141,23 @@ xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation
           <div xmlns="http://www.w3.org/1999/xhtml">Items in the table DAYS_SCHEDULE which are older than the given number of days will be deleted.</div>
         </note>
       </param>
+      <param name="cleanup_daily_plan_limit" default_value="true" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Gibt an, nach wie vielen Sätzen spätestens ein COMMIT an die Datenbank gesendet wird .</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">After this number of deleted records, a commit will be sent to the database.</div>
+        </note>
+      </param>
+      <param name="cleanup_daily_plan_execute" default_value="true" required="false">
+        <note language="de">
+          <div xmlns="http://www.w3.org/1999/xhtml">Wenn false, werden die Sätze in der Tabelle DAYS_SCHEDULE nicht gelöscht .</div>
+        </note>
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">When false the records in the table DAYS_SCHEDULE will not be deleted.</div>
+        </note>
+      </param>
+
       <param name="hibernate_configuration_file" default_value="%scheduler_data%/config/hibernate_configuration.xml" required="false">
         <note language="de">
           <div xmlns="http://www.w3.org/1999/xhtml">Speicherort der hibernate configuration Konfigurationsdatei.</div>
