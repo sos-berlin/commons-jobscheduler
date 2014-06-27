@@ -198,6 +198,16 @@ public class SOSOptionJadeOperation extends SOSOptionStringValueList {
 		return enuT == enuJadeOperations.copy;
 	} // private boolean isOperationReceive
 
+	public boolean isOperationMove() {
+
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + ":: isOperationReceive";
+
+		enuJadeOperations enuT = this.value();
+
+		return enuT == enuJadeOperations.move;
+	} // private boolean isOperationReceive
+
 	public boolean isOperationGetList() {
 
 		@SuppressWarnings("unused")

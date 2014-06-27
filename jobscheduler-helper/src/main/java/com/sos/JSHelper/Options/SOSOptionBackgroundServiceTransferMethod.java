@@ -125,6 +125,11 @@ public class SOSOptionBackgroundServiceTransferMethod extends SOSOptionStringVal
 	}
 
 
+	public SOSOptionBackgroundServiceTransferMethod setAlias (final String pstrAlias){
+		super.SetAlias(pstrAlias);
+		return this;
+	}
+	
 	public String getDescription() {
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::getDescription";

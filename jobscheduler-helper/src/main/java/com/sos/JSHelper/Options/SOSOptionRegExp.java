@@ -75,11 +75,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "com_sos_JSHelper_Messages", defaultLocale = "en")
 public class SOSOptionRegExp extends SOSOptionStringWVariables {
 
-	/**
-	 *
-	 */
 	private static final long	serialVersionUID	= 8393808803161272343L;
-
 	private final String		conClassName		= "SOSOptionRegExp";
 
 	private Pattern				objCurrentPattern	= null;
