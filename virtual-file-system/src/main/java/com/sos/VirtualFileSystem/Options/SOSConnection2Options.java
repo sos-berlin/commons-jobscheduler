@@ -97,15 +97,15 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 		objSourceOptions.Alternatives().setChildClasses(pobjJSSettings, conParamNamePrefixSOURCE);
 		objSourceOptions.setChildClasses(pobjJSSettings, conParamNamePrefixSOURCE);
 		this.addProcessedOptions(objSourceOptions.getProcessedOptions());
-		//
 		logger.trace(SOSVfsMessageCodes.SOSVfs_T_268.params(objSourceOptions.dirtyString()));
+		//
 		logger.trace(SOSVfsMessageCodes.SOSVfs_T_267.params(conParamNamePrefixTARGET));
 		objTargetOptions.setAllOptions(pobjJSSettings, conParamNamePrefixTARGET);
 		objTargetOptions.Alternatives().setChildClasses(pobjJSSettings, conParamNamePrefixTARGET);
 		objTargetOptions.setChildClasses(pobjJSSettings, conParamNamePrefixTARGET);
 		this.addProcessedOptions(objTargetOptions.getProcessedOptions());
-		//
 		logger.trace(SOSVfsMessageCodes.SOSVfs_T_269.params(objTargetOptions.dirtyString()));
+		//
 		//		logger.trace(String.format("set parameter for prefix '%1$s'", "jump_"));
 		objJumpServerOptions.setAllOptions(pobjJSSettings, conParamNamePrefixJUMP);
 		this.addProcessedOptions(objJumpServerOptions.getProcessedOptions());

@@ -319,7 +319,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			return;
 		}
 		operation.CheckMandatory();
-		if (operation.Value().equalsIgnoreCase(enuJadeOperations.move.Text())) {
+		if (operation.isOperationMove()) {
 			remove_files.value(true);
 		}
 		if (TransactionMode.isTrue()) {
@@ -327,7 +327,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 				atomic_suffix.Value("~");
 			}
 		}
-		if (operation.Value().equalsIgnoreCase(enuJadeOperations.getlist.Text())) {
+		if (operation.isOperationGetList()) {
 			remove_files.setFalse();
 		}
 		checkURLParameter(this.getConnectionOptions().Source());

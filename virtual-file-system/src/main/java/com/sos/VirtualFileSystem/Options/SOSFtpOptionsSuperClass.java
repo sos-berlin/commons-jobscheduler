@@ -1271,6 +1271,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 																						enuJSTransferModes.udp.description, // ...
 																						enuJSTransferModes.udp.description, // ...
 																						true);
+	public SOSOptionBackgroundServiceTransferMethod BackgroundServiceTransferMethod = (SOSOptionBackgroundServiceTransferMethod) Scheduler_Transfer_Method.SetAlias("Background_Service_Transfer_Method"); 
 
 	public String getScheduler_Transfer_Method() {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getScheduler_Transfer_Method";
@@ -6088,7 +6089,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						key = "scheduler_host",
 						type = "SOSOptionString",
 						mandatory = false)
-	public SOSOptionHostName	scheduler_host			= new SOSOptionHostName(this, conClassName + ".scheduler_host", // HashMap-Key
+	@Deprecated	public SOSOptionHostName	scheduler_host			= new SOSOptionHostName(this, conClassName + ".scheduler_host", // HashMap-Key
 																"This parameter specifies the host name or IP addre", // Titel
 																"", // InitValue
 																"", // DefaultValue
@@ -6133,6 +6134,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						key = "scheduler_job_chain",
 						type = "JSJobChain",
 						mandatory = false)
+	@Deprecated
 	public JSJobChain	scheduler_job_chain				= new JSJobChain(this, conClassName + ".scheduler_job_chain", // HashMap-Key
 																"The name of a job chain for Managed File Transfer", // Titel
 																"scheduler_sosftp_history", // InitValue
@@ -6178,7 +6180,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						key = "scheduler_port",
 						type = "SOSOptionString",
 						mandatory = false)
-	public SOSOptionPortNumber	scheduler_port			= new SOSOptionPortNumber(this, conClassName + ".scheduler_port", // HashMap-Key
+	@Deprecated	public SOSOptionPortNumber	scheduler_port			= new SOSOptionPortNumber(this, conClassName + ".scheduler_port", // HashMap-Key
 																"The port for which a Job Scheduler for Managed File Trans", // Titel
 																"0", // InitValue
 																"4444", // DefaultValue

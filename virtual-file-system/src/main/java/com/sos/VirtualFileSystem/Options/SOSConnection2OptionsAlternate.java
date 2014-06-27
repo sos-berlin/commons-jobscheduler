@@ -260,7 +260,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 		//		super(pobjJSSettings);   // wrong, because every options which has not the prefix will be set as well.
 		strAlternativePrefix = pstrPrefix;
 		getCredentialStore().setAllOptions(pobjJSSettings, strAlternativePrefix);
-		logger.trace("setChildClasses 1= " + objCredentialStoreOptions.dirtyString());
+		logger.trace("setChildClasses objCredentialStoreOptions= " + objCredentialStoreOptions.dirtyString());
 		getAlternativeOptions().setAllOptions(pobjJSSettings, "alternative_" + strAlternativePrefix);
 		getAlternativeOptions().setAllOptions(pobjJSSettings, "alternate_" + strAlternativePrefix);
 		getProxyOptions().setAllOptions(pobjJSSettings, "proxy_" + strAlternativePrefix);
