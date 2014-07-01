@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.sos-berlin.products</groupId>
+        <groupId>com.sos-berlin</groupId>
         <artifactId>jobscheduler</artifactId>
         <version>1.8-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.sos-berlin.products.jobscheduler</groupId>
+    <groupId>com.sos-berlin.jobscheduler</groupId>
     <artifactId>jobscheduler-object-model</artifactId>
     <name>${project.artifactId}</name>
 
@@ -22,20 +22,20 @@
     <dependencies>
 
         <dependency>
-            <groupId>com.sos-berlin.products.commons</groupId>
+            <groupId>com.sos-berlin.commons</groupId>
             <artifactId>common-resources</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
-            <groupId>com.sos-berlin.products.jobscheduler</groupId>
+            <groupId>com.sos-berlin.jobscheduler</groupId>
             <artifactId>jobscheduler-helper</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.sos-berlin.products.jobscheduler</groupId>
+            <groupId>com.sos-berlin.jobscheduler</groupId>
             <artifactId>virtual-file-system</artifactId>
             <version>${project.version}</version>
         </dependency>

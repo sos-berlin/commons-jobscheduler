@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.sos-berlin.products</groupId>
+        <groupId>com.sos-berlin</groupId>
         <artifactId>jobscheduler</artifactId>
         <version>1.8-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.sos-berlin.products.jobscheduler</groupId>
+    <groupId>com.sos-berlin.jobscheduler</groupId>
     <artifactId>sos-security</artifactId>
     <name>${project.artifactId}</name>
 
@@ -30,13 +30,13 @@
     <dependencies>
 
         <dependency>
-            <groupId>com.sos-berlin.products.jobscheduler</groupId>
+            <groupId>com.sos-berlin.jobscheduler</groupId>
             <artifactId>hibernate-commons</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.sos-berlin.products.jobscheduler</groupId>
+            <groupId>com.sos-berlin.jobscheduler</groupId>
             <artifactId>jobscheduler-helper</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -93,7 +93,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.sos-berlin.products.jobscheduler</groupId>
+			<groupId>com.sos-berlin.jobscheduler</groupId>
 			<artifactId>jobscheduler-web-services-globals</artifactId>
 			<version>${project.version}</version>
 		</dependency>

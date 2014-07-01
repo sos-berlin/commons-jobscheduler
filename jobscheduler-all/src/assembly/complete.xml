@@ -12,7 +12,7 @@
             <unpack>true</unpack>
             <useTransitiveDependencies>false</useTransitiveDependencies>
             <includes>
-                <include>com.sos-berlin.products.jobscheduler:*</include>
+                <include>com.sos-berlin.jobscheduler:*</include>
             </includes>
         </dependencySet>
     </dependencySets>

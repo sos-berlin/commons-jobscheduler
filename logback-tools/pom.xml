@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.sos-berlin.products</groupId>
+        <groupId>com.sos-berlin</groupId>
         <artifactId>jobscheduler</artifactId>
         <version>1.8-SNAPSHOT</version>
     </parent>
@@ -13,7 +13,7 @@
         <setup.target.name>com.sos.tools.logback-tools</setup.target.name>
     </properties>
 
-    <groupId>com.sos-berlin.products.jobscheduler</groupId>
+    <groupId>com.sos-berlin.jobscheduler</groupId>
     <artifactId>logback-tools</artifactId>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
@@ -28,13 +28,13 @@
         </dependency>
 
         <dependency>
-            <groupId>com.sos-berlin.products.jobscheduler</groupId>
+            <groupId>com.sos-berlin.jobscheduler</groupId>
             <artifactId>hibernate-commons</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>com.sos-berlin.products.jobscheduler</groupId>
+            <groupId>com.sos-berlin.jobscheduler</groupId>
             <artifactId>jobscheduler-helper</artifactId>
             <version>${project.version}</version>
         </dependency>

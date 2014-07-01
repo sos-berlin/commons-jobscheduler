@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.sos-berlin.products</groupId>
+        <groupId>com.sos-berlin</groupId>
 			  <artifactId>jobscheduler</artifactId>
         <version>1.8-SNAPSHOT</version>
  
@@ -15,7 +15,7 @@
         <setup.target.name>com.sos.webservices-globals</setup.target.name>
     </properties>
 
-    <groupId>com.sos-berlin.products.jobscheduler</groupId>
+    <groupId>com.sos-berlin.jobscheduler</groupId>
     <artifactId>jobscheduler-web-services-globals</artifactId>
     <name>${project.artifactId}</name>
     <inceptionYear>2014</inceptionYear>
