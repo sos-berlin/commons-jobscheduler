@@ -34,7 +34,8 @@ import org.eclipse.swt.widgets.TableColumn;
 
 public class WindowsSaver {
 
-	private static final String	conWIN_LOCATE_Y		= "win:locateY:";
+	private static final int MAX_KEY_LENGTH = 80;
+    private static final String	conWIN_LOCATE_Y		= "win:locateY:";
 	private static final String	conWIN_LOCATE_X		= "win:locateX:";
 	private static final String	conWIN_SIZE_Y		= "win:sizeY:";
 	private static final String	conWIN_SIZE_X		= "win:sizeX:";
@@ -154,8 +155,13 @@ public class WindowsSaver {
 		}
 	}
 
+		
 	private void putPref(final String pstrKey, final int pintValue) {
-		prefs.put(pstrKey + className, String.valueOf(pintValue));
+	    String key = pstrKey + className;
+	    if (key.length() > MAX_KEY_LENGTH) {
+	        key = key.substring(0,MAX_KEY_LENGTH-1);
+	    }
+		prefs.put(key, String.valueOf(pintValue));
 	}
 
 	public void centerScreen() {

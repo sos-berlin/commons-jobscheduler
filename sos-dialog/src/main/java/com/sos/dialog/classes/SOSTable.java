@@ -1,6 +1,7 @@
 package com.sos.dialog.classes;
 
 import java.io.File;
+import java.util.prefs.Preferences;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
@@ -24,17 +25,18 @@ import com.sos.dialog.interfaces.ISOSTable;
 
 public abstract class SOSTable extends Table implements ISOSTable{
 
-	@SuppressWarnings("unused")
+    public static final int             RIGHT_MOUSE_BUTTON                  = 3;
+    @SuppressWarnings("unused")
 	private final String conClassName = this.getClass().getSimpleName();
 	@SuppressWarnings("unused")
 	private static final String conSVNVersion = "$Id$";
 	@SuppressWarnings("unused")
 	private final Logger logger = Logger.getLogger(this.getClass());
 
-    private final int                columnWidth=0;
     private TableColumn        lastColumn;
     private WindowsSaver       formPosSizeHandler   = null;
     private String             msg;
+    private boolean            rightMouseclick;
 
     Listener    ColumnMoveListener  = new Listener() {
         @Override
@@ -51,7 +53,7 @@ public abstract class SOSTable extends Table implements ISOSTable{
         formPosSizeHandler = new WindowsSaver(this.getClass(), getShell(), 643, 600);
         this.setData("caption",this.getClass());
 
-        addResizeListener(parent);
+        addListeners(parent);
      }
 
     @Override
@@ -61,11 +63,42 @@ public abstract class SOSTable extends Table implements ISOSTable{
         return (SOSTableColumn)this.getColumn(index);
     }
 
+    private void addListeners(Composite parent) {
+        addResizeListener(parent);
+        addMouselistener();
+    }
+    
+    private void addMouselistener() {
+        this.addListener(SWT.MouseDown, new Listener() {
+            @Override
+            public void handleEvent(final Event event) {
+                if (event.button == RIGHT_MOUSE_BUTTON) // rechte maustaste
+                {
+                    setRightMausclick(true);
+                } else {
+                    setRightMausclick(false);
+                }
+            }
+        });
+    }
+    
     private SOSTable getThis() {
         return this;
     }
 
+    public boolean isRightMouseclick() {
+        return rightMouseclick;
+    }
 
+
+    public void setRightMausclick(boolean b) {
+        rightMouseclick = b;
+    }
+
+    public void setRightMausclick(Event event) {
+        setRightMausclick((event.button == RIGHT_MOUSE_BUTTON));
+    }    
+    
     public void setMoveableColums(final boolean moveable) {
        TableColumn[] columns = this.getColumns();
 
@@ -76,20 +109,17 @@ public abstract class SOSTable extends Table implements ISOSTable{
          formPosSizeHandler.TableColumnOrderRestore(this);
     }
 
-
-
-
-    private void calculateColumnWidth() {
+    private int calculateColumnWidth() {
 
         TableColumn[] columns = this.getColumns();
         lastColumn = columns[this.getColumnOrder ()[columns.length-1]];
 
         int columnWidth = 0;
-        for (int i = 0; i < columns.length-1-1; i++) {
+        for (int i = 0; i < columns.length-1; i++) {
             columnWidth = columnWidth + columns[i].getWidth();
         }
 
-
+     return columnWidth+getVerticalBar().getSize().x + 10;
     }
 
     private void addResizeListener(final Composite composite) {
@@ -107,15 +137,15 @@ public abstract class SOSTable extends Table implements ISOSTable{
                     }
                 }
                 Point oldSize = getSize();
-                calculateColumnWidth();
+                int cWidth = calculateColumnWidth();
 
                 if (oldSize.x > area.width) {
-                    lastColumn.setWidth(width - columnWidth);
+                    lastColumn.setWidth(width - cWidth);
                     setSize(area.width, area.height);
                 }
                 else {
                     setSize(area.width, area.height);
-                    lastColumn.setWidth(width - columnWidth);
+                    lastColumn.setWidth(width - cWidth);
                 }
             }
         });
@@ -165,4 +195,6 @@ public abstract class SOSTable extends Table implements ISOSTable{
     public String getMsg() {
         return msg;
     }
+
+    
 }
