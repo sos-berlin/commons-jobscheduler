@@ -161,6 +161,9 @@ public class JSObjJob extends Job {
 		}
 	} // public afterUnmarshal
 
+	public boolean hasDescription () {
+		return description != null;
+	}
 	@Override public Description getDescription() {
 		if (description == null) {
 			description = objFactory.createJobDescription();
@@ -297,6 +300,19 @@ public class JSObjJob extends Job {
 		setDirty();
 	} // public void setTemporary
 
+	// todo move to JSObjJob
+	public boolean isScriptEmpty () {
+		
+		boolean flgIsEmpty = true;
+		if (script != null ) {
+			if (script.getContent().size() > 0) {
+				flgIsEmpty = false;
+			}
+		}
+		
+		return flgIsEmpty;
+	}
+	
 	public boolean hasScript() {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::hasScript";
 		objScript = getScript();
@@ -647,7 +663,14 @@ public class JSObjJob extends Job {
 			"debug9", ""							};
 
 	public String getLogLevel () {
-		return this.getSettings().getLogLevel().value();
+		JobSettings objS = this.getSettings();
+		if (objS != null) {
+			LogLevel objL = objS.getLogLevel();
+			if (objL != null) {
+				return objL.value();
+			}
+		}
+		return "";
 	}
 	public void setLogLevel(final String text) {
 		if (canUpdate() == false)
@@ -747,7 +770,7 @@ public class JSObjJob extends Job {
 		return "";
 	}
 
-	public void setMonitorName(final String name) {
+	public void setMonitorName(@SuppressWarnings("unused") final String name) {
 		//	TODO	Utils.setAttribute("name", name, _parent);
 	}
 
