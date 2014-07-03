@@ -4,7 +4,6 @@ package com.sos.dialog;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
-
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.CloseWindowListener;
 import org.eclipse.swt.browser.OpenWindowListener;
@@ -27,10 +26,14 @@ import com.sos.dialog.classes.SOSUrl;
 
 public class BrowserViewForm {
 
+	@SuppressWarnings("unused") private final String conClassName = this.getClass().getSimpleName();
+	@SuppressWarnings("unused") private static final String conSVNVersion = "$Id$";
+	@SuppressWarnings("unused") private final Logger logger = Logger.getLogger(this.getClass());
+	
+
 	private Browser			browser	= null;
 	private GridLayout		gridLayout;
 	private GridData		data;
-	private final Logger	logger	= Logger.getLogger(BrowserViewForm.class);
 	private SOSUrl			url;
 	private final Composite	parent;
  	  
@@ -50,7 +53,7 @@ public class BrowserViewForm {
 
     public BrowserViewForm(final Composite parent_, final int style, final SOSUrl url_) {
         parent = parent_;
-        this.url = url_;
+        url = url_;
         showBrowser();
     }
 
@@ -151,9 +154,8 @@ public class BrowserViewForm {
 		return url.getUrlCaption();
 	}
 
-	
 	public void setUrl(final String url_) {
-		this.url = new SOSUrl(url_);
+		url = new SOSUrl(url_);
 		browser.setUrl(url.getHost() + "://" + url.getUrl().getPath());
 	}
 
