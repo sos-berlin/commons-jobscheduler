@@ -67,6 +67,24 @@
 			<artifactId>org.eclipse.swt.${swtSuffix}</artifactId>
 			<version>${swt.version}</version>
 		</dependency>
+		
+		<dependency>
+           <groupId>net.sourceforge.jtds</groupId>
+           <artifactId>jtds</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <scope>provided</scope>
+        </dependency>
+          
+        <dependency>
+	     <groupId>org.postgresql</groupId>
+	     <artifactId>postgresql</artifactId>
+	     <version>9.3-1101-jdbc41</version>
+        </dependency>      
+
 
     </dependencies>
 

@@ -3,7 +3,6 @@ package com.sos.auth.rest;
 import java.util.List;
 
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -127,6 +126,7 @@ public class SOSServicePermissionShiro {
             addPermission(sosPermissionJid.getSOSPermission(), "sos:products:jid:execute");
             addPermission(sosPermissionJid.getSOSPermission(), "sos:products:jid:joetab:show");
             addPermission(sosPermissionJid.getSOSPermission(), "sos:products:jid:joctab:show");
+            addPermission(sosPermissionJid.getSOSPermission(), "sos:products:jid:reportstab:show");
             addPermission(sosPermissionJid.getSOSPermission(), "sos:products:jid:eventtab:show");
             addPermission(sosPermissionJid.getSOSPermission(), "sos:products:jid:jobnettab:show");
             addPermission(sosPermissionJid.getSOSPermission(), "sos:products:jid:instances:show");
