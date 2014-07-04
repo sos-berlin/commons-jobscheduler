@@ -1,16 +1,18 @@
 package com.sos.scheduler.model.objects;
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
-import com.sos.scheduler.model.SchedulerHotFolder;
-import com.sos.scheduler.model.SchedulerObjectFactory;
-import org.apache.log4j.Logger;
-
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlTransient;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.annotation.XmlTransient;
+
+import org.apache.log4j.Logger;
+
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import com.sos.scheduler.model.SchedulerHotFolder;
+import com.sos.scheduler.model.SchedulerObjectFactory;
 
 /**
 * \class JSObjBase
@@ -93,8 +95,8 @@ public class JSObjBase implements Comparable<JSObjBase> {
 
 	} // private void setDirty
 
-	  public boolean isEmpty(String value) {
-	        return (value == null || value.length() == 0);
+	  public boolean isEmpty(final String value) {
+	        return value == null || value.length() == 0;
 	    }
 	  
 	 public void setDirty() {
@@ -185,6 +187,10 @@ public class JSObjBase implements Comparable<JSObjBase> {
 		return toXMLFile(objO, pobjVirtualFile);
 	}
 
+	public Object save() {
+		return toXMLFile(hotFolderSrc);		
+	}
+	
 	public Object toXMLFile() {
 		return toXMLFile(hotFolderSrc);
 	}
