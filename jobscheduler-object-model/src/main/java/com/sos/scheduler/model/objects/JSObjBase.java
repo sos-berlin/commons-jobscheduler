@@ -191,6 +191,17 @@ public class JSObjBase implements Comparable<JSObjBase> {
 		return toXMLFile(hotFolderSrc);		
 	}
 	
+	public Object saveAs(final String pstrSaveAsFileName) {
+		// TODO implement saveAs
+		return null;		
+	}
+	
+	public Object Rename(final String pstrRenameFileName) {
+		// TODO implement Rename
+		return null;		
+	}
+	
+
 	public Object toXMLFile() {
 		return toXMLFile(hotFolderSrc);
 	}
