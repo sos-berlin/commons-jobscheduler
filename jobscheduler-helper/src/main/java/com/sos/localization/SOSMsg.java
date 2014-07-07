@@ -135,6 +135,14 @@ public class SOSMsg {
 		}
 	}
 
+	public String icon () {
+		String key = strMessageCode.trim().replaceAll(" ", "").toLowerCase();
+		String strI = Messages.getLabel(key + conPropertyExtensionICon);
+		if (strI == null) {
+			strI = "noIcon";
+		}
+		return strI;
+	}
 	private String getLabel(final String pstrDefaultValue) {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::label";
 		String key = strMessageCode.trim().replaceAll(" ", "");
