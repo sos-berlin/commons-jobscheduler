@@ -49,7 +49,7 @@ public class TestSOSServicePermissionShiro {
         assertEquals("testClient",SHIRO_PERMISSION,permissisonsJid);        
         assertEquals("testClient","sos:products:joe:execute",permissisonsJoe);        
         assertEquals("testClient","sos:products:joc:execute",permissisonsJoc);        
-        assertEquals("testClient","sos:products:jid:dashboard:start_job",permissisonsDashboard);        
+        assertEquals("testClient","sos:products:jid:jobstart",permissisonsDashboard);        
     }
 
     
