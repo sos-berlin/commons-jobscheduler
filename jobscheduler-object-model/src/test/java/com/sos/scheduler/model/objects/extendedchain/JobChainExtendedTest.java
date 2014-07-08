@@ -3,7 +3,7 @@ package com.sos.scheduler.model.objects.extendedchain;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
-import com.sos.resources.SOSResource;
+import com.sos.resources.SOSProductionResource;
 import com.sos.resources.SOSResourceFactory;
 import com.sos.scheduler.model.objects.JobChain;
 import com.sos.scheduler.model.objects.ParamsExtended;
@@ -88,8 +88,8 @@ public class JobChainExtendedTest {
         try {
             schema = schemaFactory.newSchema(new Source[]
                     {
-                            SOSResourceFactory.asStreamSource(SOSResource.SCHEDULER_XSD),
-                            SOSResourceFactory.asStreamSource(SOSResource.JOB_CHAIN_EXTENSIONS_XSD)
+                            SOSResourceFactory.asStreamSource(SOSProductionResource.SCHEDULER_XSD),
+                            SOSResourceFactory.asStreamSource(SOSProductionResource.JOB_CHAIN_EXTENSIONS_XSD)
                     });
         } catch (SAXException e) {
             e.printStackTrace();
