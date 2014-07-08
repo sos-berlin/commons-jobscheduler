@@ -27,7 +27,6 @@ public class SOSlogin {
     
     public SOSlogin() {
         super();
-        this.inifile = "file:R:/nobackup/junittests/shiro/shiro.ini";
      }
     
     public void createSubject(String user, String pwd) {

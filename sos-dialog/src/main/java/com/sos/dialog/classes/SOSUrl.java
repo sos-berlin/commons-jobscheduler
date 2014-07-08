@@ -11,8 +11,23 @@ public class SOSUrl  {
 
     private URL url;    
     private String urlValue;
+    private String title;
      
     public SOSUrl(String url_) {
+        initUrl(url_);
+        this.title = getUrlCaption(); 
+    }
+
+    public SOSUrl(String title_,String url_) {
+        initUrl(url_);
+        if (title_ == null || title_.trim().length() == 0) {
+            this.title = getUrlCaption(); 
+        }else {
+            this.title = title_;
+        }
+    }
+    
+    private void initUrl(String url_) {
         try {
             urlValue = url_;
             url = new URL(urlValue);
@@ -55,7 +70,7 @@ public class SOSUrl  {
         }
     }
 
-    public String getUrlCaption() {
+    private String getUrlCaption() {
         if (url.getProtocol().equalsIgnoreCase(DEFAULT_PROTOCOL)) {
             if (url.getPort() < 0) {
                return String.format("%s",url.getHost());
@@ -77,6 +92,10 @@ public class SOSUrl  {
     
     public String getUrlValue() {
         return urlValue;
+    }
+
+    public String getTitle() {
+        return title;
     }
 
   
