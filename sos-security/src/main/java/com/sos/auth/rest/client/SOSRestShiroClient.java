@@ -25,7 +25,7 @@ public SOSRestShiroClient() {
     super();
  }
 
-private SOSPermissionShiro getSOSPermissionShiro(URL resource) {
+public SOSPermissionShiro getSOSPermissionShiro(URL resource) {
     Client client = Client.create();
     WebResource webResource = client.resource(resource.toExternalForm());
     ClientResponse response = webResource.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);  
