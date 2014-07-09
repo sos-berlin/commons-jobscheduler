@@ -3,7 +3,8 @@ package com.sos.auth;
 import com.sos.auth.rest.permission.model.SOSPermissionShiro;
  
 public class SOSJaxbSubject {
-
+    
+ 
     private SOSPermissionShiro sosPermissionShiro;
     
        public SOSJaxbSubject(SOSPermissionShiro sosPermissionShiro) {
@@ -40,6 +41,16 @@ public class SOSJaxbSubject {
     public boolean isAuthenticated() {
         return (sosPermissionShiro != null && sosPermissionShiro.isAuthenticated() != null && sosPermissionShiro.isAuthenticated());
     }
+
+    public String getSessionId() {
+       if (sosPermissionShiro == null) {
+           return "";
+       }else {
+           return sosPermissionShiro.getSessionId();
+       }
+    }
+
+ 
     
     
 

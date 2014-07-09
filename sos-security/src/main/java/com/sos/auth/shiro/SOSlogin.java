@@ -27,6 +27,7 @@ public class SOSlogin {
     
     public SOSlogin() {
         super();
+        this.inifile = "classpath:shiro.ini";
      }
     
     public void createSubject(String user, String pwd) {

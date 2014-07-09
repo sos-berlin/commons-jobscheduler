@@ -56,6 +56,7 @@ public class SOSServicePermissionShiro {
 
             
             sosPermissionShiro.setAuthenticated(currentUser.isAuthenticated());
+            sosPermissionShiro.setSessionId(currentUser.getSessionId());
             sosPermissionShiro.setUser(user);
             
     

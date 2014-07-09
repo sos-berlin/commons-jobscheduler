@@ -32,7 +32,8 @@ private SOSPermissionShiro getSOSPermissionShiro(URL resource) {
     if (response.getStatus() != 200) {
          throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
     }   
-    SOSPermissionShiro shiro = response.getEntity(SOSPermissionShiro.class); 
+    SOSPermissionShiro shiro = response.getEntity(SOSPermissionShiro.class);
+    shiro.setSecurityServerUrl(String.format("%s://%s:%s",resource.getProtocol(),resource.getHost(),resource.getPort()));
     return shiro;
      
 }
