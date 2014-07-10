@@ -52,6 +52,7 @@
             <xi:include href="./params/param_ignore_hangup_signal.xml" parse="xml" />
             <xi:include href="./params/param_ignore_signal.xml" parse="xml" />
             <xi:include href="./params/param_ignore_stderr.xml" parse="xml" />
+            <xi:include href="./params/param_raise_exception_on_error.xml" parse="xml" />
             <xi:include href="./params/param_password.xml" parse="xml" />
             <xi:include href="./params/param_proxy_host.xml" parse="xml" />
             <xi:include href="./params/param_proxy_password.xml" parse="xml" />
