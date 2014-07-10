@@ -1,14 +1,12 @@
 package com.sos.testframework.h2;
 
-import com.google.common.io.Files;
 import com.google.common.io.Resources;
+import com.sos.resources.ResourceHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +35,7 @@ public class ResourceList {
      * @param resources
      */
     public ResourceList(Map<String,?> resources) {
-        this.workingDirectory = Files.createTempDir();
+        this.workingDirectory = ResourceHelper.getInstance().createWorkingDirectory();
         for(String className : resources.keySet()) {
             Object o = resources.get(className);
             if (o instanceof String) {
@@ -60,7 +58,7 @@ public class ResourceList {
      * A constructor to create an empty resource list. It is possible to add new member with the different variants of the add() method.
      */
     public ResourceList() {
-        this.workingDirectory = Files.createTempDir();
+        this.workingDirectory = ResourceHelper.getInstance().createWorkingDirectory();
     }
 
     /**
@@ -78,7 +76,8 @@ public class ResourceList {
      * @param resource
      */
     public void add(String className, URL resource) {
-        resources.put(className, createFileFromURL(resource)) ;
+        File resourceFile = ResourceHelper.getInstance().createFileFromURL(resource);
+        resources.put(className, resourceFile) ;
     }
 
     /**
@@ -92,49 +91,8 @@ public class ResourceList {
 
     private File createFileFromResource(String resource) {
         URL url = Resources.getResource(resource);
-        return  createFileFromURL(url);
-    }
-
-    /**
-     * Creates a file from content of the given resource resides in the workingDirectory.
-     * @param resource
-     * @return
-     */
-    private File createFileFromURL(URL resource) {
-        logger.info("Resource is " + resource.getPath());
-        String[] arr = resource.getPath().split("/");
-        String filenameWithoutPath = arr[arr.length-1];
-        File configFile = null;
-        try {
-            String fileContent = Resources.toString(resource, Charset.defaultCharset());
-            configFile = createFileFromString(fileContent, filenameWithoutPath);
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-        return  configFile;
-    }
-
-    /**
-     * Create a file with given fileContent in a file named filenameWithoutPath (resides in the workingDirectory).
-     * @param fileContent
-     * @param filenameWithoutPath
-     * @return
-     */
-    private File createFileFromString(String fileContent, String filenameWithoutPath) {
-        File configFile = null;
-        logger.info("Copy resource to folder " + workingDirectory.getAbsolutePath());
-        logger.info("Targetname is " + filenameWithoutPath);
-        try {
-            workingDirectory.mkdirs();
-            logger.info("Create file from Resource String:\n" + fileContent);
-            configFile = new File(workingDirectory, filenameWithoutPath);
-            logger.info("Write file " + configFile.getAbsolutePath());
-            Files.write(fileContent, configFile, Charset.defaultCharset());
-        } catch (IOException e) {
-            logger.error("Could not create File from resource String:\n" + fileContent);
-            throw new RuntimeException(e);
-        }
-        return configFile;
+        File resourceFile = ResourceHelper.getInstance().createFileFromURL(url);
+        return  resourceFile;
     }
 
     public List<File> getFilelist() {
@@ -154,25 +112,7 @@ public class ResourceList {
     }
 
     public void release() {
-        removeFolderRecursively(workingDirectory);
-    }
-
-    private static void removeFolderRecursively(File folder) {
-        for(File f : folder.listFiles()) {
-            if (f.isFile())
-                deleteFile(f);
-            else
-                removeFolderRecursively(f);
-        }
-        deleteFile(folder);
-    }
-
-    private static void deleteFile(File f) {
-        String type = (f.isDirectory()) ? "folder" : "file";
-        if(f.delete())
-            logger.info("Temporary " + type + " [" + f.getAbsolutePath() + "] removed succesfully.");
-        else
-            logger.warn("Could not delete Temporary " + type + " [" + f.getAbsolutePath() + "].");
+        ResourceHelper.destroy();
     }
 
 }
