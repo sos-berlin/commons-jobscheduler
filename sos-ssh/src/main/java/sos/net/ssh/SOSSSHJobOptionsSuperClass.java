@@ -1,16 +1,15 @@
 package sos.net.ssh;
 import java.util.HashMap;
 
-import com.sos.CredentialStore.SOSCredentialStoreImpl;
-import com.sos.CredentialStore.Options.ISOSCredentialStoreOptionsBridge;
+import com.sos.CredentialStore.SOSCredentialStoreSuperClass;
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
 import com.sos.JSHelper.Listener.JSListener;
-import com.sos.JSHelper.Options.JSOptionsClass;
 import com.sos.JSHelper.Options.SOSOptionAuthenticationMethod;
 import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Options.SOSOptionCommandString;
+import com.sos.JSHelper.Options.SOSOptionElement;
 import com.sos.JSHelper.Options.SOSOptionHostName;
 import com.sos.JSHelper.Options.SOSOptionInFileName;
 import com.sos.JSHelper.Options.SOSOptionInteger;
@@ -388,8 +387,8 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @JSOptionClass(
 				name = "SOSSSHJobOptionsSuperClass",
 				description = "Option-Class for a SSH-Connection")
-public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSConnectionOptions, ISOSAuthenticationOptions, ISOSShellOptions,
-		ISOSCredentialStoreOptionsBridge {
+public class SOSSSHJobOptionsSuperClass extends SOSCredentialStoreSuperClass implements ISOSConnectionOptions, ISOSAuthenticationOptions, ISOSShellOptions
+		 {
 	/**
 	 *
 	 */
@@ -432,9 +431,9 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
 	/* (non-Javadoc)
 	 * @see com.sos.VirtualFileSystem.Options.ISOSDataProviderOptions#seturl(com.sos.JSHelper.Options.SOSOptionUrl)
 	 */
-	@Override public void setUrl(final SOSOptionUrl pstrValue) {
+	@Override public void setUrl(final SOSOptionElement pstrValue) {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::seturl";
-		url = pstrValue;
+		url = (SOSOptionUrl) pstrValue;
 	} // public SOSConnection2OptionsSuperClass seturl
 	/**
 	 * \option raise_exception_on_error
@@ -1686,18 +1685,4 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
 
 	@Override public void setalternative_password(final SOSOptionPassword pAlternativePassword) {
 	}
-	//	// Credential Store Methods and fields
-	protected SOSCredentialStoreImpl	objCredentialStore	= null;
-
-	public SOSCredentialStoreImpl getCredentialStore() {
-		if (objCredentialStore == null) {
-			objCredentialStore = new SOSCredentialStoreImpl(this);
-		}
-		return objCredentialStore;
-	}
-
-	public void setChildClasses(final HashMap<String, String> pobjJSSettings, final String pstrPrefix) throws Exception {
-		getCredentialStore().setChildClasses(pobjJSSettings, pstrPrefix);
-		objCredentialStore.checkCredentialStoreOptions();
-	} // public SOSConnection2OptionsAlternate (HashMap JSSettings)
 } // public class SOSSSHJobOptions
