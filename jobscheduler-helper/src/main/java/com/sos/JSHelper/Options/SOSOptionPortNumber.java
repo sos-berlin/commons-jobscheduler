@@ -144,6 +144,9 @@ public class SOSOptionPortNumber extends SOSOptionInteger {
 		super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
 	}
 
+	public SOSOptionPortNumber(final String pstrPortNumber) {
+		super(null, null, "", pstrPortNumber, "", false);
+	}
 	public static int getStandardSFTPPort() {
 		return conPort4SFTP;
 	}

@@ -69,6 +69,9 @@ public class SOSOptionHostName extends SOSOptionElement {
 		objH = new SOSOptionString(null, this.XMLTagName() + "_ip", "Description", this.getHostAdress(), "0.0.0.0", false);
 	}
 
+	public SOSOptionHostName(final String pstrHostName) {
+		super (pstrHostName);
+	}
 	@Override
 	public void Value (final String pstrHostName) {
 		if (pstrHostName != null && pstrHostName.equalsIgnoreCase("local")) {

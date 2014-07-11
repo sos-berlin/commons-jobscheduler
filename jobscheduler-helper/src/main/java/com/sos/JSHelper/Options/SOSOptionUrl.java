@@ -6,7 +6,7 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.interfaces.ISOSDataProviderOptions;
 import com.sos.JSHelper.interfaces.ISOSFtpOptions;
 
-public class SOSOptionUrl extends SOSOptionString {
+public class SOSOptionUrl extends SOSOptionHostName {
 	/**
 	 * 
 	 */

@@ -489,16 +489,16 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 	@Override
 	public void Value (final String pstrValue) {
 		super.Value(pstrValue);  // make first some text replacements
-		String strV = super.Value();
-		if (isNotEmpty(strV)) {
+//		String strV = super.Value();
+//		if (isNotEmpty(strV)) {
 	        try {
-	            Pattern.compile(strV);
+	            Pattern.compile(pstrValue);
 	        } catch (PatternSyntaxException exception) {
-	        	String strT = String.format("The RegExp '%1$s' is invalid", strV);
+	        	String strT = String.format("The RegExp '%1$s' is invalid", pstrValue);
 	        	SOSValidationError objVE = new SOSValidationError(strT);
 	        	objVE.setException(new JobSchedulerException(strT, exception));
 //	            System.err.println(exception.getDescr  iption());
 	        }
-		}
+//		}
 	}
 }
