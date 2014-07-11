@@ -1,11 +1,9 @@
 package sos.scheduler.managed.configuration;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 
 import sos.spooler.Order;
 import sos.util.SOSSchedulerLogger;
-import sos.xml.SOSXMLXPath;
 
 /**
  * <p>ConfigurationOrderMonitor implements a Monitor script, which reads parameters for the order
