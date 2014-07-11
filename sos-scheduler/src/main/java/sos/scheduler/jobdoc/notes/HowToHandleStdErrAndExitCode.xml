@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id:$ -->
+<documentation xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
+xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+
+xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1
+http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd"
+>
+    <note language="en">
+        <title>How to handle StdErr and ExitCode</title>
+        <p >
+            The job knows some parameters to handle the stderr and the exit code.
+These are
+<ul>
+<li><p>ignore_stderr</p></li>
+<li><p>ignore_error</p></li>
+<li><p>ignore_exit_code</p></li>
+<li><p>raise_exception_on_error</p></li>
+</ul>
+
+As an example, we examine the command
+<pre class="example">ls _unknown_folder_; exit 5;</pre>
+This commmand has a stderr = "<code>ls: _unknown_folder_: No such file or directory</code>" and the exit code 5.
+
+<table class="description" cellspacing="1" cellpadding="0">
+    <tr>
+        <th style="text-align:center;">ignore_stdout</th>
+        <th style="text-align:center;">ignore_error</th>
+        <th style="text-align:center;">raise_exception_on_error</th>
+        <th style="text-align:center;">ExitCode of the<br/>command</th>
+        <th style="text-align:center;">ExitCode of the<br/>job's task</th>
+        <th style="text-align:center;">Order goes to...</th>
+    </tr>
+    <tr>
+        <td style="text-align:center;">false</td>
+        <td style="text-align:center;">false</td>
+        <td style="text-align:center;">true</td>
+        <td style="text-align:center;color:red;">5</td>
+        <td style="text-align:center;color:red;">1</td>
+        <td style="text-align:center;color:red;">error node</td>
+    </tr>
+    <tr>
+        <td style="text-align:center;">true</td>
+        <td style="text-align:center;">false</td>
+        <td style="text-align:center;">true</td>
+        <td style="text-align:center;color:red;">5</td>
+        <td style="text-align:center;color:red;">1</td>
+        <td style="text-align:center;color:red;">error node</td>
+    </tr>
+    <tr>
+        <td style="text-align:center;">false</td>
+        <td style="text-align:center;">true</td>
+        <td style="text-align:center;">true</td>
+        <td style="text-align:center;color:red;">5</td>
+        <td style="text-align:center;color:red;">1</td>
+        <td style="text-align:center;color:red;">error node</td>
+    </tr>
+    <tr>
+        <td style="text-align:center;">true</td>
+        <td style="text-align:center;">true</td>
+        <td style="text-align:center;">true</td>
+        <td style="text-align:center;color:red;">5</td>
+        <td style="text-align:center;color:green;">0</td>
+        <td style="text-align:center;color:green;">next node</td>
+    </tr>
+    <tr>
+        <td style="text-align:center;">false</td>
+        <td style="text-align:center;">false</td>
+        <td style="text-align:center;">false</td>
+        <td style="text-align:center;color:red;">5</td>
+        <td style="text-align:center;color:red;">5</td>
+        <td style="text-align:center;color:green;">next node</td>
+    </tr>
+    <tr>
+        <td style="text-align:center;">true</td>
+        <td style="text-align:center;">false</td>
+        <td style="text-align:center;">false</td>
+        <td style="text-align:center;color:red;">5</td>
+        <td style="text-align:center;color:red;">5</td>
+        <td style="text-align:center;color:green;">next node</td>
+    </tr>
+    <tr>
+        <td style="text-align:center;">false</td>
+        <td style="text-align:center;">true</td>
+        <td style="text-align:center;">false</td>
+        <td style="text-align:center;color:red;">5</td>
+        <td style="text-align:center;color:red;">5</td>
+        <td style="text-align:center;color:green;">next node</td>
+    </tr>
+    <tr>
+        <td style="text-align:center;">true</td>
+        <td style="text-align:center;">true</td>
+        <td style="text-align:center;">false</td>
+        <td style="text-align:center;color:red;">5</td>
+        <td style="text-align:center;color:green;">0</td>
+        <td style="text-align:center;color:green;">next node</td>
+    </tr>
+</table> 
+
+Further the job creates the parameters
+<ul>
+<li><p>std_out_output</p></li>
+<li><p>std_err_output</p></li>
+<li><p>exit_code</p></li>
+</ul>
+If you use the job in a job chain then you can use these parameters in a next job of the job chain to handle the result.
+        </p>
+    </note>
+</documentation>

@@ -2235,6 +2235,9 @@ xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml" 
                         background-color:#F3F4F4;
                         width:80%;
                       }
+                      
+      table.description   { background-color:#DCDCDC; margin-top:4px; margin-bottom:4px; }
+      table.description th, table.description td { background-color:#F3F4F4; }
 
       .section        {color:#000000; font-weight:600; }                         /* schwarze Schrift, fett */
       .label          {color:#000000; font-weight:300; }

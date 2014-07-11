@@ -95,6 +95,7 @@
                 <link>http://en.wikipedia.org/wiki/Secure_Shell</link>
             </p>
             <xi:include href="./notes/HowToUseOpenSSH.xml" />
+            <xi:include href="./notes/HowToHandleStdErrAndExitCode.xml" />
         </xhtml:div>
     </documentation>
     <documentation language="en">
@@ -109,7 +110,8 @@
                 <link>http://en.wikipedia.org/wiki/Secure_Shell</link>
             </p>
             <xi:include href="./notes/HowToUseOpenSSH.xml" />
+            <xi:include href="./notes/HowToHandleStdErrAndExitCode.xml" />
         </xhtml:div>
     </documentation>
-    <xi:include href="./notes/HowToUseOpenSSH.xml" />
+    <!-- xi:include href="./notes/HowToUseOpenSSH.xml" /-->
 </description>

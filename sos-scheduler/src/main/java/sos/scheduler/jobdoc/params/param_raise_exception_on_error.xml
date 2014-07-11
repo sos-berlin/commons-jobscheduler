@@ -1,27 +1,26 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
+<!-- $Id:$ -->
 <param xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1
 http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd"
     name="raise_exception_on_error"
     required="false"
     default_value="true">
-    <note language="de">
-        <p>
-    If any output to stderr has been created or the exit code is unequal 0 then the job usually throws an exception. 
+    <note language="en">
+        <p>If any output to stderr has been created or the exit code is unequal 0 then the job usually throws an exception. 
     Whenever the job throws an exception then its task ends with the exit code 1. 
     If the job is started by an order and an exception is thrown then the order goes to the error node of the job chain.
-    </p><p> 
-    Should this value <em>false</em> be specified, then it prevents an exception is thrown, the task has the exit code 
+        </p>
+        <p>Should this value <em>false</em> be specified, then it prevents an exception is thrown, the task has the exit code 
     of the command that is being executed on the SSH server and an order goes to the next node of the job chain. 
         </p>
     </note>
-    <note language="en">
-        <p>
-    Gibt es Ausgaben nach stderr oder der Exit-Code ist ungleich 0, dann wirft der job normalerweise eine Exception.
+    <note language="de">
+        <p>Gibt es Ausgaben nach stderr oder der Exit-Code ist ungleich 0, dann wirft der job normalerweise eine Exception.
     Wird eine Exception geworfen, dann endet die Task des Job mit dem Eixt-Code 1. 
     Wird der in einer Job-Kette verwendet, dann geht der Auftrag in den Error-Knoten der Job-Kette.
-    </p><p>
-    Wird der Wert <em>false</em> für diesen Parameter angegeben, dann wird keine Exception ausgelöst. 
+        </p>
+        <p>Wird der Wert <em>false</em> für diesen Parameter angegeben, dann wird keine Exception ausgelöst. 
     Die Task des Job erhält den Exit-Code des am SSH Server ausgeführten Kommandos und ein Auftrag geht ganz normal 
     in den nächsten Knoten der Kette (nicht in den Fehler-Knoten). 
         </p>
