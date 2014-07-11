@@ -129,7 +129,7 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 	public String[] getSubFolderArray() {
 		String[] strRet = null;
 		try {
-			String path = strValue.trim().replaceAll("/(\\s*/)+","/");
+			String path = strValue.trim().replaceAll("/(\\s*/)+", "/");
 			String strPath = "";
 			String strSlash = "";
 			int iStart = 0;
@@ -151,11 +151,30 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 		}
 		return strRet;
 	}
-	
+
+	public String[] getSubFolders() {
+		String[] pathArray = null;
+		try {
+			String path = strValue.trim().replaceAll("/(\\s*/)+", "/");
+			String strPath = "";
+			String strSlash = "";
+			int iStart = 0;
+			if (path.startsWith("/")) {
+				strSlash = "/";
+				iStart = 1;
+			}
+			pathArray = path.substring(iStart).split("/");
+		}
+		catch (Exception e) {
+		}
+		return pathArray;
+	}
+
+
 	public String[] getSubFolderArrayReverse() {
 		String[] strRet = null;
 		try {
-			String path = strValue.trim().replaceAll("/(\\s*/)+","/");
+			String path = strValue.trim().replaceAll("/(\\s*/)+", "/");
 			String strPath = "";
 			String strSlash = "";
 			int iStart = 0;
@@ -165,7 +184,7 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 			}
 			String[] pathArray = path.substring(iStart).split("/");
 			strRet = new String[pathArray.length];
-			int i = pathArray.length-1;
+			int i = pathArray.length - 1;
 			for (String strSubFolder : pathArray) {
 				strPath += strSlash + strSubFolder;
 				strSlash = "/";
@@ -176,5 +195,43 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 		catch (Exception e) {
 		}
 		return strRet;
+	}
+
+	public boolean isAbsolutPath() {
+		boolean strT = true;
+		if (strValue.startsWith("/") == false) {
+			strT = false;
+		}
+		return strT;
+	}
+
+	public boolean isNotHiddenFile() {
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::isNotHiddenFile";
+		if (strValue.equalsIgnoreCase("..") == false && strValue.equalsIgnoreCase(".") == false) {
+			return true; // not a hidden file
+		}
+		return false; // it is a hidden-file
+	} // public boolean isNotHiddenFile
+
+	public String getName () {
+		return new File(strValue).getName();
+	}
+	
+	public String getParentFolderName() {
+		String strParent = new File(strValue).getParent();
+		if (strParent == null) {
+			strParent = ".";
+		}
+		strParent = strParent.replaceAll("\\\\", "/");
+		if (strParent == null || strParent.equals("/")) {
+			strParent = ".";
+		}
+		return strParent;
+	}
+
+	public boolean hasSubFolders() {
+		boolean flgRet = false;
+		flgRet = strValue.contains("/") || strValue.contains("\\");
+		return flgRet;
 	}
 }

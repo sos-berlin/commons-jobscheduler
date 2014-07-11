@@ -157,8 +157,9 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 
 		try {
 			strTargetString = replaceGroups(strTargetString, pstrReplacementPattern /* .split(";") */);
-			strTargetString = substituteAllDate(strTargetString);
 			strTargetString = substituteAllFilename(strTargetString, pstrSourceString);
+			Value(strTargetString);
+			super.doReplace();
 
 			// TODO allow timestamp: as an alternative date-pattern
 			strTargetString = substituteTimeStamp(strTargetString);
@@ -270,6 +271,7 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 	}
 
 
+	@Override
 	public String substituteAllDate(String targetFilename) throws Exception {
 
 		String temp = substituteFirstDate(targetFilename);
@@ -311,6 +313,7 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 		}
 	}
 
+	@Override
 	public String substituteAllFilename(String targetFilename, final String original) throws Exception {
 
 		// original ist das replacement; es ist der urspruengliche Dateiname inklusive Endung
@@ -486,11 +489,12 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 	@Override
 	public void Value (final String pstrValue) {
 		super.Value(pstrValue);  // make first some text replacements
-		if (isNotEmpty(strValue)) {
+		String strV = super.Value();
+		if (isNotEmpty(strV)) {
 	        try {
-	            Pattern.compile(strValue);
+	            Pattern.compile(strV);
 	        } catch (PatternSyntaxException exception) {
-	        	String strT = String.format("The RegExp '%1$s' is invalid", strValue);
+	        	String strT = String.format("The RegExp '%1$s' is invalid", strV);
 	        	SOSValidationError objVE = new SOSValidationError(strT);
 	        	objVE.setException(new JobSchedulerException(strT, exception));
 //	            System.err.println(exception.getDescr  iption());

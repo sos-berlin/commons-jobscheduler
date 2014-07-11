@@ -1,4 +1,11 @@
 package com.sos.JSHelper.Options;
+import java.sql.Timestamp;
+import java.util.Date;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import com.sos.JSHelper.DataElements.JSDataElementDate;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
 /**
@@ -37,6 +44,11 @@ public class SOSOptionStringWVariables extends SOSOptionElement {
 	private final String		conClassName		= "SOSOptionFileName";
 	protected String			strOriginalValue	= "";
 
+	public SOSOptionStringWVariables(final String pstrValue) {
+		super(pstrValue);
+		this.Value(pstrValue);
+	}
+
 	/**
 	 * \brief SOSOptionStringWVariables
 	 *
@@ -60,13 +72,13 @@ public class SOSOptionStringWVariables extends SOSOptionElement {
 		// TODO substituteAllDate in JSFile abhandeln
 		//		String targetFileName = new File(strValue).getPath();  // nicht verwenden:
 		//  hier werden die "/" brutal in "\" umgebogen bei JADE
-		String temp = strValue;
-		if (strValue.indexOf("[") > -1) {
+		String temp = strOriginalValue;
+		if (strOriginalValue.indexOf("[") > -1) {
 			String targetFileName = strValue;
-			temp = substituteDateMask(targetFileName);
+			temp = substituteDateMask();
 			while (!targetFileName.equals(temp)) {
 				targetFileName = temp;
-				temp = substituteDateMask(targetFileName);
+				temp = substituteDateMask();
 			}
 		}
 		else {
@@ -74,8 +86,9 @@ public class SOSOptionStringWVariables extends SOSOptionElement {
 		return temp;
 	}
 
-	private String substituteDateMask(String targetFilename) throws Exception {
+	private String substituteDateMask() throws Exception {
 		final String conVarName = "[date:";
+		String targetFilename = strOriginalValue;
 		try {
 			// check for a date format string given in the file mask
 			if (targetFilename.matches("(.*)(\\" + conVarName + ")([^\\]]*)(\\])(.*)")) {
@@ -120,15 +133,17 @@ public class SOSOptionStringWVariables extends SOSOptionElement {
 	@Override public String Value() {
 		String strT = strValue;
 		try {
-			if (objParentClass != null && objParentClass.gflgSubsituteVariables == true) {
-				strT = substituteAllDate();
+			if (objParentClass != null) {
+				if (objParentClass.gflgSubsituteVariables == true) {
+					strT = doReplace();
+				}
 			}
 			else {
-				strT = substituteAllDate();
+				strT = doReplace();
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			throw new JobSchedulerException(e);
 		}
 		return strT;
 	}
@@ -138,4 +153,174 @@ public class SOSOptionStringWVariables extends SOSOptionElement {
 		strOriginalValue = pstrStringValue;
 		super.Value(pstrStringValue);
 	} // public void Value
+
+	/**
+	 *
+	 * \brief doReplace
+	 *
+	 * \details
+	 *
+	 * \return String
+	 *
+	 * @param pstrSourceString
+	 * @param pstrReplacementPattern
+	 * @return
+	 * @throws Exception
+	 */
+	public String doReplace(/* final String pstrSourceString, final String pstrReplacementPattern */) {
+		final String conMethodName = conClassName + "::doReplace";
+		try {
+			strValue = strOriginalValue;
+			strValue = substituteAllDate(strValue);
+			//			strValue = substituteAllFilename(strValue, pstrSourceString);
+			// TODO allow timestamp: as an alternative date-pattern
+			strValue = substituteTimeStamp(strValue);
+			// TODO implement uuid: as an additional pattern for substitution.
+			strValue = substituteUUID(strValue);
+			// TODO implement sqltimestamp: as an additional pattern for substitution
+			strValue = substituteSQLTimeStamp(strValue);
+			// // should any opening and closing brackets be found in the file name, then this is an error
+			Matcher m = Pattern.compile("\\[[^\\]]*\\]").matcher(strValue);
+			if (m.find()) {
+				throw new JobSchedulerException(String.format("unsupported variable found: ' %1$s'", m.group()));
+			}
+			return strValue;
+		}
+		catch (Exception e) {
+			e.printStackTrace(System.err);
+			throw new JobSchedulerException(conMethodName + ": " + e.getMessage());
+		}
+	}
+
+	public String substituteAllDate(String targetFilename) throws Exception {
+		String temp = substituteFirstDate(targetFilename);
+		while (!targetFilename.equals(temp)) {
+			targetFilename = temp;
+			temp = substituteFirstDate(targetFilename);
+		}
+		return temp;
+	}
+
+	private String substituteFirstDate(String targetFilename) {
+		final String conVarName = "[date:";
+		try {
+			// check for a date format string given in the file mask
+			String strDateMask = getVariablePart(targetFilename, conVarName);
+			if (isEmpty(strDateMask)) {
+				strDateMask = SOSOptionTime.dateTimeFormat;
+			}
+			String strDateTime = JSDataElementDate.getCurrentTimeAsString(strDateMask);
+			String strReplaceWhat = "\\" + conVarName + strDateMask + "\\]";
+			String strReplaceWith = Matcher.quoteReplacement(strDateTime);
+			targetFilename = targetFilename.replaceAll(strReplaceWhat, strReplaceWith);
+			return targetFilename;
+		}
+		catch (Exception e) {
+			throw new JobSchedulerException("error substituting [date:]: " + e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * 
+	*
+	* \brief getVariablePart
+	*
+	* \details
+	*  Return the variable part of a placeholder pattern.
+	*  
+	* \return String
+	*
+	 */
+	public String getVariablePart(final String pstrWhere, final String pstrVariablePattern) {
+		String strVariablePart = "";
+		int intLen = pstrVariablePattern.length();
+		if (pstrWhere.matches("(.*)(\\" + pstrVariablePattern + ")([^\\]]*)(\\])(.*)")) {
+			int posBegin = pstrWhere.indexOf(pstrVariablePattern);
+			if (posBegin > -1) {
+				int posEnd = pstrWhere.indexOf("]", posBegin + intLen);
+				if (posEnd > -1) {
+					strVariablePart = pstrWhere.substring(posBegin + intLen, posEnd);
+				}
+			}
+		}
+		return strVariablePart;
+	}
+
+	public String substituteAllFilename(String targetFilename, final String original) throws Exception {
+		// original ist das replacement; es ist der urspruengliche Dateiname inklusive Endung
+		String temp = substituteFirstFilename(targetFilename, original);
+		while (!targetFilename.equals(temp)) {
+			targetFilename = temp;
+			temp = substituteFirstFilename(targetFilename, original);
+		}
+		return temp;
+	}
+
+	private String substituteUUID(String strValue1) throws Exception {
+		// check for [filename:...]
+		Matcher matcher1 = Pattern.compile("\\[uuid:([^\\]]*)\\]", intRegExpFlags).matcher(strValue1);
+		if (matcher1.find()) {
+			if (matcher1.group(1).equals("")) {
+				strValue1 = strValue1.replaceFirst("\\[uuid:\\]", getUUID());
+			}
+		}
+		return strValue1;
+	}
+
+	public static String getUUID() {
+		return UUID.randomUUID().toString();
+	}
+
+	private String substituteTimeStamp(String pstrValue) throws Exception {
+		// check for [filename:...]
+		Matcher matcher1 = Pattern.compile("\\[timestamp:([^\\]]*)\\]", intRegExpFlags).matcher(pstrValue);
+		if (matcher1.find()) {
+			if (matcher1.group(1).equals("")) {
+				// System.currentTimeMillis()
+				//				strValue = strValue.replaceFirst("\\[timestamp:\\]", JSDataElementDate.getCurrentTimeAsString("yyyyMMddHHmmss"));
+				//				strValue = strValue.replaceFirst("\\[timestamp:\\]", String.valueOf(System.currentTimeMillis()));
+				pstrValue = pstrValue.replaceFirst("\\[timestamp:\\]", getUnixTimeStamp());
+			}
+		}
+		return pstrValue;
+	}
+
+	public static String getUnixTimeStamp() {
+		return String.valueOf(System.nanoTime());
+	}
+
+	private String substituteSQLTimeStamp(String strValue) throws Exception {
+		// check for [filename:...]
+		Matcher matcher1 = Pattern.compile("\\[sqltimestamp:([^\\]]*)\\]", intRegExpFlags).matcher(strValue);
+		if (matcher1.find()) {
+			if (matcher1.group(1).equals("")) {
+				strValue = strValue.replaceFirst("\\[sqltimestamp:\\]", new Timestamp(new Date().getTime()).toString());
+			}
+		}
+		return strValue;
+	}
+
+	public static String getSqlTimeStamp() {
+		return new Timestamp(new Date().getTime()).toString();
+	}
+
+	private String substituteFirstFilename(String targetFilename, final String pstrReplaceWith) throws Exception {
+		// check for [filename:...]
+		Matcher matcher1 = Pattern.compile("\\[filename:([^\\]]*)\\]", intRegExpFlags).matcher(targetFilename);
+		if (matcher1.find()) {
+			if (matcher1.group(1).equals("")) {
+				targetFilename = targetFilename.replaceFirst("\\[filename:\\]", pstrReplaceWith);
+			}
+			else
+				if (matcher1.group(1).equals("lowercase")) {
+					targetFilename = targetFilename.replaceFirst("\\[filename:lowercase\\]", pstrReplaceWith.toLowerCase());
+				}
+				else
+					if (matcher1.group(1).equals("uppercase")) {
+						targetFilename = targetFilename.replaceFirst("\\[filename:uppercase\\]", pstrReplaceWith.toUpperCase());
+					}
+		}
+		return targetFilename;
+	}
+	protected final int	intRegExpFlags	= Pattern.CASE_INSENSITIVE;
 }

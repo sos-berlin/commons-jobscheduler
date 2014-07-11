@@ -361,6 +361,7 @@ public class JSDataElementDate extends JSDataElement {
 	 *
 	 * @return
 	 */
+	@Override
 	public Date Now() {
 
 		@SuppressWarnings("unused")
@@ -370,7 +371,7 @@ public class JSDataElementDate extends JSDataElement {
 		return now.getTime();
 	} // public Date Now}
 
-	public static String getCurrentTimeAsString(String dateTimeFormat) throws Exception {
+	public static String getCurrentTimeAsString(final String dateTimeFormat)  {
 
 		String strFormat = dateTimeFormat;
 		if (dateTimeFormat == null || dateTimeFormat.length() <= 0) {
@@ -387,7 +388,7 @@ public class JSDataElementDate extends JSDataElement {
 		return getCurrentTimeAsString("yyyyMMddHHmmss");
 	}
 
-	public int getLastFridayInAMonth(int month, int year) {
+	public int getLastFridayInAMonth(final int month, final int year) {
 		Calendar cal = Calendar.getInstance();
 		cal.set(year, month, 1, 0, 0, 0); // set to first day of the month
 		cal.set(Calendar.MILLISECOND, 0);
@@ -420,7 +421,7 @@ public class JSDataElementDate extends JSDataElement {
 		throw new RuntimeException("what day of the month?");
 	}
 
-	public int getLastThursday (int month, int year) {
+	public int getLastThursday (final int month, final int year) {
 		return getLastFridayInAMonth(month, year) - 1;
 	}
 }

@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.io.StreamTokenizer;
 import java.lang.annotation.Annotation;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;
@@ -3118,5 +3117,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 			IterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.StoreValues, strB);
 		}
 	} // private void storeOptionValues
+	
+	
 	
 } // public class JSOptionsClass
