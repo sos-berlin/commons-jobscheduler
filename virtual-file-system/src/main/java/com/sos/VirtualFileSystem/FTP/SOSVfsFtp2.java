@@ -79,18 +79,6 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
 //		return i;
 //	} // appendFile
 
-	/**
-	 *
-	 * @param directory The new working directory.
-	 * @return The reply code received from the server.
-	 * @throws IOException If an I/O error occurs while either sending a
-	 * command to the server or receiving a reply from the server.
-	 */
-	@Override
-	public int cd(final String directory) throws IOException {
-		return Client().cwd(directory);
-	}
-
 	@Override
 	public boolean changeWorkingDirectory(final String pathname) {
 		final String conMethodName = conClassName + "::changeWorkingDirectory";
@@ -268,20 +256,6 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
 	}
 
 	@Override
-	public void disconnect() {
-		final String conMethodName = conClassName + "::disconnect";
-
-		try {
-			if (Client().isConnected()) {
-				Client().disconnect();
-			}
-		}
-		catch (IOException e) {
-			RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
-		}
-	}
-
-	@Override
 	public void ExecuteCommand(final String strCmd) throws Exception {
 		final String conMethodName = conClassName + "::ExecuteCommand";
 
@@ -409,8 +383,7 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
 			if (isPositiveCommandCompletion() == false) {
 				throw new JobSchedulerException(SOSVfs_E_144.params("getFile()", remoteFile, getReplyString()));
 			}
-			// TODO Buffersize must be an Option
-			byte[] buffer = new byte[4096];
+			byte[] buffer = new byte[objOptions.BufferSize.value()];
 			out = new FileOutputStream(new File(localFile), append);
 			// TODO get progress info
 			int bytes_read = 0;
@@ -526,18 +499,6 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
 
 	@Override
 	public ISOSSession getSession() {
-		return null;
-	}
-
-	@Override
-	public StringBuffer getStdErr() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public StringBuffer getStdOut() throws Exception {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -771,8 +732,7 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
 		FileInputStream in = null;
 		long lngTotalBytesWritten = 0;
 		try {
-			// TODO Buffersize must be an Option
-			byte[] buffer = new byte[4096];
+			byte[] buffer = new byte[objOptions.BufferSize.value()];
 			in = new FileInputStream(new File(localFile));
 			// TODO get progress info
 			int bytesWritten;

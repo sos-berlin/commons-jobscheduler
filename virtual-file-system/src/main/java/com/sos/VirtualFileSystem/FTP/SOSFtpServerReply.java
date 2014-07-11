@@ -145,12 +145,19 @@ public class SOSFtpServerReply extends JSToolBox {
 	 * 
 	 * @return true if the code of the reply is in the range of success codes
 	 *         (2**).
+	 *         
+	 *         see http://en.wikipedia.org/wiki/List_of_FTP_server_return_codes
 	 */
+	
+	
 	public boolean isSuccessCode() {
 		int aux = code - 200;
 		return aux >= 0 && aux < 100;
 	}
 
+	public boolean isErrorCode () {
+		return code >= 500;
+	}
 	/**
 	 * Returns the textual message(s) of the reply.
 	 * 

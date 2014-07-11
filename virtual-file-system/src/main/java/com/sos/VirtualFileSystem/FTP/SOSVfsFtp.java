@@ -121,18 +121,6 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 		}
 	}
 
-	/**
-	 *
-	 * @param directory The new working directory.
-	 * @return The reply code received from the server.
-	 * @throws IOException If an I/O error occurs while either sending a
-	 * command to the server or receiving a reply from the server.
-	 */
-	@Override
-	public int cd(final String directory) throws IOException {
-		return Client().cwd(directory);
-	}
-
 	@Override
 	public boolean changeWorkingDirectory(final String pathname) {
 		final String conMethodName = conClassName + "::changeWorkingDirectory";
@@ -305,20 +293,6 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 			}
 		}
 		return fileList;
-	}
-
-	@Override
-	public void disconnect() {
-		final String conMethodName = conClassName + "::disconnect";
-
-		try {
-			if (Client().isConnected()) {
-				Client().disconnect();
-			}
-		}
-		catch (IOException e) {
-			RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
-		}
 	}
 
 	private int DoCD(final String strFolderName) {
@@ -644,17 +618,6 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 
 	@Override
 	public ISOSSession getSession() {
-		return null;
-	}
-
-	@Override
-	public StringBuffer getStdErr() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public StringBuffer getStdOut() throws Exception {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,6 +15,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
+import org.apache.commons.net.ftp.FTPFileFilter;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.log4j.Logger;
 
@@ -182,12 +184,31 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 	 * command to the server or receiving a reply from the server.
 	 */
 	public int cd(final String directory) throws IOException {
-		return Client().cwd(directory);
+		int intRet = 0;
+		try {
+			intRet = Client().cwd(directory);
+			String strT = getReplyString();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		onErrorRaiseException(HostID(String.format("cd '%1$s' ok", directory)), HostID(String.format("cd '%1$s' failed", directory)));
+		return intRet;
+	}
+
+	public int cd(final FTPFile pobjFile) {
+		try {
+			return cd(pobjFile.getName());
+		}
+		catch (IOException e) {
+			throw new JobSchedulerException(e);
+		}
 	}
 
 	@Override public boolean changeWorkingDirectory(final String pathname) {
 		try {
-			Client().cwd(pathname);
+			this.cd(pathname);
+			//			Client().cwd(pathname);
 			logger.debug(SOSVfs_D_135.params(pathname, getReplyString(), "[directory exists]"));
 		}
 		catch (IOException e) {
@@ -338,7 +359,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 				//				}
 			}
 			else {
-				logger.warn(SOSVfs_D_0102.params(host, port));
+				logger.info(SOSVfs_D_0102.params(host, port));
 			}
 		}
 		catch (Exception e) {
@@ -559,7 +580,9 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 	@Override public void disconnect() {
 		try {
 			if (Client().isConnected()) {
+				logout();
 				Client().disconnect();
+				logger.debug(HostID("disconnected"));
 			}
 		}
 		catch (IOException e) {
@@ -606,7 +629,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 		String strT;
 		try {
 			strT = Client().getSystemType();
-			logger.info(String.format("System-Type = %1$s", strT));
+			logger.info(HostID(String.format("System-Type = %1$s", strT)));
 		}
 		catch (IOException e) {
 			logger.info(e.getLocalizedMessage());
@@ -1121,10 +1144,18 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 		}
 		return objO;
 	}
+	private final StringBuffer	strStdOut	= new StringBuffer("");
+	private final StringBuffer	strStdError	= new StringBuffer("");
 
 	@Override public final String getReplyString() {
 		String strT = Client().getReplyString();
 		objFTPReply = new SOSFtpServerReply(strT);
+		if (objFTPReply.isErrorCode() == true) {
+			strStdError.append(strT);
+		}
+		else {
+			strStdOut.append(strT);
+		}
 		return strT;
 	}
 
@@ -1140,13 +1171,11 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 	}
 
 	@Override public StringBuffer getStdErr() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return strStdError;
 	}
 
 	@Override public StringBuffer getStdOut() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return strStdOut;
 	}
 
 	protected final String HostID(final String pstrText) {
@@ -1160,21 +1189,39 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 		//		Client().setDefaultTimeout(1200);
 		//		Client().setDataTimeout(1200);
 	}
+	private HashMap<String, Boolean>	objDirectoriesFound	= new HashMap<String, Boolean>();
 
 	@Override public final boolean isDirectory(final String pstrPathName) {
 		boolean flgResult = false;
-		//		FTPFile objFTPFile = getFTPFile(pstrPathName);
-		//		flgResult =  objFTPFile.isDirectory();
-		if (isNotHiddenFile(pstrPathName)) {
-			if (strCurrentPath.length() <= 0) {
-				strCurrentPath = getCurrentPath();
+		SOSOptionFolderName objF = new SOSOptionFolderName(pstrPathName);
+		if (objF.isNotHiddenFile() == true) {
+			try {
+				Boolean flgFound = objDirectoriesFound.get(pstrPathName);
+				if (flgFound != null && flgFound == true) { // checked before
+					flgResult = true;
+				}
+				else {
+					if (objF.hasSubFolders() == true) {
+						String strCurrentPathName = this.getCurrentPath();
+						if (objF.isAbsolutPath() == true) {
+							this.cd("/");
+						}
+						for (String strSubFolder : objF.getSubFolders()) {
+							flgResult = checkFolder(strSubFolder);
+							if (flgResult == false) {
+								break;
+							}
+						}
+						this.cd(strCurrentPathName);
+						objDirectoriesFound.put(pstrPathName, flgResult);
+					}
+					else { // single foldername, relative to the current folder
+						flgResult = checkFolder(pstrPathName);
+					}
+				}
 			}
-			DoCD(pstrPathName); // is this file-entry a subfolder?
-			if (isNegativeCommandCompletion()) {
-			}
-			else { // yes, it's a subfolder. undo the cd now
-				DoCD(strCurrentPath);
-				flgResult = true;
+			catch (IOException e) {
+				throw new JobSchedulerException(e);
 			}
 		}
 		return flgResult;
@@ -1224,6 +1271,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 			if (objFTPReply.isSuccessCode()) {
 				objProtocolCommandListener.setClientId(HostID(""));
 				logger.debug(HostID(SOSVfs_D_133.params(strUserName)));
+				this.setLogin(true);
 				try {
 					doPostLoginOperations();
 				}
@@ -1245,12 +1293,14 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 	@Override public void logout() {
 		try {
 			if (this.Client().isConnected() == true) {
-				this.Client().logout();
-				String strHost = host;
-				if (objHost != null) {
-					strHost = objHost.Value();
+				if (flgLoggedIn == true) {
+					this.Client().logout();
+					String strHost = host;
+					if (objHost != null) {
+						strHost = objHost.Value();
+					}
+					logger.debug(SOSVfs_D_138.params(strHost, getReplyString()));
 				}
-				logger.debug(SOSVfs_D_138.params(strHost, getReplyString()));
 			}
 			else {
 				logger.info(SOSVfs_I_139.get());
@@ -1277,6 +1327,12 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 		this.mkdir(pobjFolderName.Value());
 		return null;
 	}
+	private HashMap<String, String>	newFolders	= new HashMap<String, String>();
+
+	private void initializeNewFolderTable() {
+		newFolders = new HashMap<>();
+		objDirectoriesFound = new HashMap<>();
+	}
 
 	/**
 	 * Creates a new subdirectory on the FTP server in the current directory .
@@ -1287,19 +1343,112 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 	@Override public void mkdir(final String pstrPathName) {
 		final String conMethodName = conClassName + "::mkdir";
 		try {
-			SOSOptionFolderName objF = new SOSOptionFolderName(pstrPathName);
-			logger.debug(HostID(SOSVfs_D_179.params("mkdir", pstrPathName)));
-			for (String strSubFolder : objF.getSubFolderArray()) {
-				Client().makeDirectory(strSubFolder);
-				logger.debug(HostID(SOSVfs_E_0106.params(conMethodName, strSubFolder, getReplyString())));
+			if (newFolders.get(pstrPathName) == null) { // avoid servers-calls by checking the list of already created folders first
+				String strCurrFolderName = getCurrentPath();
+				SOSOptionFolderName objF = new SOSOptionFolderName(pstrPathName);
+				if (objF.isAbsolutPath() == true) {
+					cd("/");
+				}
+				for (String strSubFolder : objF.getSubFolderArray()) {
+					checkAndCreateSubFolder(strSubFolder);
+				}
+				newFolders.put(pstrPathName, "added");
+				cd(strCurrFolderName);
 			}
 			// logger.debug(HostID("..ftp server reply [mkdir] [" + pstrPathName + "]: " + getReplyString()));
 		}
-		catch (IOException e) {
+		catch (Exception e) {
 			String strM = HostID(SOSVfs_E_0105.params(conMethodName));
 			e.printStackTrace(System.err);
 			throw new RuntimeException(strM, e);
 			// throw new JobSchedulerException(HostID("makeDirectory returns an exception"), e);
+		}
+	}
+	// TODO create a class (and an Interface) for this (and more) counters
+	private long		noOfFoldersCreated	= 0;
+	private final long	noOfFoldersDeleted	= 0;
+	// TODO use this class as well for files and use regexp for the accept method
+	class SOSFTPFileFilter implements FTPFileFilter {
+		private String	strLook4FileName	= "";
+
+		@Override public boolean accept(final FTPFile ftpFile) {
+			return ftpFile.isDirectory() && ftpFile.getName().equalsIgnoreCase(strLook4FileName);
+		}
+
+		public void setLook4FileName(final String pstrLook4FileName) {
+			strLook4FileName = pstrLook4FileName;
+		}
+	}
+	private final SOSFTPFileFilter	objFilter4Directory	= new SOSFTPFileFilter();
+
+	private void checkAndCreateSubFolder(final String pstrPathName) {
+		final String conMethodName = conClassName + "::checkAndCreateSubFolder";
+		final String strPath = new File(pstrPathName).getName();
+		SOSOptionFolderName objF = new SOSOptionFolderName(pstrPathName);
+		try {
+			String strParent = objF.getParentFolderName();
+			objFilter4Directory.setLook4FileName(strPath);
+			FTPFile[] listFiles = Client().listFiles(strParent, objFilter4Directory);
+			if (listFiles != null && listFiles.length > 0) { // assert: if the folder is empty we expect an empty "listFiles" with length == 0, but not listFiles == null
+				for (FTPFile ftpFile : listFiles) {
+					if (ftpFile.isDirectory()) { // what if: SYMBOLIC_LINK_TYPE? can be file or folder? how to recognize it?
+						cd(ftpFile);
+					}
+					else {
+						// Exception, item is not a folder
+						throw new JobSchedulerException(String.format("Can not create Directory '%1$s', because it is an existing single file", pstrPathName));
+					}
+				}
+			}
+			else { // folder not found, create the folder and go to the directory in case there are more folders to crete there
+				logger.debug(HostID(SOSVfs_D_179.params("mkdir", strPath)));
+				Client().makeDirectory(strPath);
+				String strT = getReplyString();
+				onErrorRaiseException(HostID(SOSVfs_E_0106.params(conMethodName, strPath, strT)),
+						String.format("Can not create Directory '%1$s', because '%2$s'.", strPath, strT));
+				cd(strPath);
+				noOfFoldersCreated++;
+			}
+		}
+		catch (IOException e) {
+			throw new JobSchedulerException(e);
+		}
+	}
+
+	private boolean checkFolder(final String pstrPathName) {
+		final String conMethodName = conClassName + "::checkFolder";
+		boolean flgIsFolder = true;
+		SOSOptionFolderName objF = new SOSOptionFolderName(pstrPathName);
+		try {
+			objFilter4Directory.setLook4FileName(objF.getName());
+			FTPFile[] listFiles = Client().listFiles(objF.getParentFolderName(), objFilter4Directory);
+			if (listFiles != null && listFiles.length > 0) { // assert: if the folder is empty we expect an empty "listFiles" with length == 0, but not listFiles == null
+				for (FTPFile ftpFile : listFiles) {
+					if (ftpFile.isDirectory() == false) { // what if: SYMBOLIC_LINK_TYPE? can be file or folder? how to recognize it?
+						flgIsFolder = false;
+						break;
+					}
+					this.cd(ftpFile);
+				}
+			}
+			else {
+				flgIsFolder = false;
+			}
+		}
+		catch (IOException e) {
+			throw new JobSchedulerException(e);
+		}
+		return flgIsFolder;
+	}
+
+	private void onErrorRaiseException(final String pstrMessageText, final String pstrErrorText) {
+		String strT = getReplyString();
+		if (objFTPReply.isErrorCode() == false) {
+			logger.debug(pstrMessageText);
+		}
+		else {
+			logger.debug(pstrErrorText);
+			throw new JobSchedulerException(pstrErrorText);
 		}
 	}
 
@@ -1581,20 +1730,13 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 		try {
 			SOSOptionFolderName objF = new SOSOptionFolderName(pstrPathName);
 			for (String subfolder : objF.getSubFolderArrayReverse()) {
-				String strT = subfolder + "/";
-				Client().removeDirectory(strT);
-				logger.debug(HostID(SOSVfs_E_0106.params(conMethodName, strT, getReplyString())));
+				String strPath = subfolder + "/";
+				Client().removeDirectory(strPath);
+				String strT = getReplyString();
+				onErrorRaiseException(HostID(SOSVfs_E_0106.params("rmdir", strPath, strT)),
+						String.format("rmdir: Can not delete Directory '%1$s', because '%2$s'.", strPath, strT));
+				initializeNewFolderTable(); // folder(s) should be created from now on if not exists. no check against this table
 			}
-//			String[] strP = pstrPathName.split("/");
-//			for (int i = strP.length; i > 0; i--) {
-//				String strT = "";
-//				for (int j = 0; j < i; j++) {
-//					strT += strP[j] + "/";
-//				}
-//				logger.debug(HostID(SOSVfs_E_0106.params(conMethodName, pstrPathName, getReplyString())));
-//				// logger.debug(HostID("..ftp server reply [rmdir] [" + strT + "]: " + getReplyString()));
-//				Client().removeDirectory(strT);
-//			}
 		}
 		catch (Exception e) {
 			String strM = HostID(SOSVfs_E_0105.params(conMethodName));
