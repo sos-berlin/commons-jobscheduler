@@ -43,7 +43,7 @@ public class JobSchedulerPLSQLJob extends JSJobUtilitiesClass <JobSchedulerPLSQL
 //	private final JSJobUtilities			objJSJobUtilities	= this;
 
 	private CallableStatement				cs					= null;
-	private Connection						c					= null;
+	private Connection						objConnection					= null;
 	private DbmsOutput						dbmsOutput			= null;
 	private String							strOutput			= "";
 	private String							strSqlError			= "";
@@ -86,7 +86,7 @@ public class JobSchedulerPLSQLJob extends JSJobUtilitiesClass <JobSchedulerPLSQL
 			logger.debug(Options().dirtyString());
 
 			DriverManager.registerDriver(new oracle.jdbc.OracleDriver());
-			c = DriverManager.getConnection(objOptions.db_url.Value(), objOptions.db_user.Value(), objOptions.db_password.Value());
+			objConnection = DriverManager.getConnection(objOptions.db_url.Value(), objOptions.db_user.Value(), objOptions.db_password.Value());
 
 			// pl/sql is expecting \n as newline.
 //			String plsql = objOptions.command.Value().replace("\r\n", "\n");
@@ -95,11 +95,11 @@ public class JobSchedulerPLSQLJob extends JSJobUtilitiesClass <JobSchedulerPLSQL
 
 			objOptions.replaceVars(plsql);
 
-			dbmsOutput = new DbmsOutput(c);
+			dbmsOutput = new DbmsOutput(objConnection);
 			// TODO Option Buffersize
 			dbmsOutput.enable(1000000);
 
-			cs = c.prepareCall(plsql);
+			cs = objConnection.prepareCall(plsql);
 			cs.execute();
 
 		}
@@ -162,9 +162,9 @@ public class JobSchedulerPLSQLJob extends JSJobUtilitiesClass <JobSchedulerPLSQL
 				cs.close();
 				cs = null;
 			}
-			if (c != null) {
-				c.close();
-				c = null;
+			if (objConnection != null) {
+				objConnection.close();
+				objConnection = null;
 			}
 		}
 

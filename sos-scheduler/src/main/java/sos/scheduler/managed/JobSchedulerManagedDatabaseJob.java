@@ -67,20 +67,20 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 		return true;
 	}
 
-	protected boolean getBoolParam(final String pstrParamName, final boolean pflgDefaultValue) {
-		boolean flgRet = pflgDefaultValue;
-
-		if (orderPayload != null) {
-			String strValue = orderPayload.var(pstrParamName);
-			if (strValue != null) {
-				if (strValue.equals("1") || strValue.equalsIgnoreCase("true")) {
-					flgRet = true;
-				}
-			}
-		}
-		return flgRet;
-	}
-
+//	protected boolean getBoolParam(final String pstrParamName, final boolean pflgDefaultValue) {
+//		boolean flgRet = pflgDefaultValue;
+//
+//		if (orderPayload != null) {
+//			String strValue = orderPayload.var(pstrParamName);
+//			if (strValue != null) {
+//				if (strValue.equals("1") || strValue.equalsIgnoreCase("true")) {
+//					flgRet = true;
+//				}
+//			}
+//		}
+//		return flgRet;
+//	}
+//
 	protected JobSchedulerManagedDBReportJobOptions objOptions = null;
 	/**
 	 * processing

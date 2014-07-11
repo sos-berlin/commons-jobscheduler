@@ -80,7 +80,7 @@ public class SOSSQLPlusJob extends JSJobUtilitiesClass <SOSSQLPlusJobOptions> {
 				strCommand += " " + objOptions.CommandLineOptions.Value();
 			}
 
-			String strDBConn = objOptions.getConnectionString();
+			String strDBConn = objOptions.getConnectionStringDefinition();
 			if (strDBConn.length() > 0) {
 				strCommandParams += " " + strDBConn;
 			}
