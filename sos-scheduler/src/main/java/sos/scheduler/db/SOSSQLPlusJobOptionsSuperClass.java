@@ -10,6 +10,7 @@ import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
 import com.sos.JSHelper.Listener.JSListener;
 import com.sos.JSHelper.Options.SOSOptionCommandString;
 import com.sos.JSHelper.Options.SOSOptionConnectionString;
+import com.sos.JSHelper.Options.SOSOptionElement;
 import com.sos.JSHelper.Options.SOSOptionHostName;
 import com.sos.JSHelper.Options.SOSOptionPassword;
 import com.sos.JSHelper.Options.SOSOptionPortNumber;
@@ -782,11 +783,12 @@ public class SOSSQLPlusJobOptionsSuperClass extends SOSCredentialStoreSuperClass
 		this.setAllOptions(super.objSettings);
 	}
 
-	@Override public SOSOptionUrl getUrl() {
-		return ConnectionString;
-	}
-
-	@Override public void setUrl(final SOSOptionUrl pstrValue) {
+//	@Override
+//	public SOSOptionElement getUrl() {
+//		return ConnectionString;
+//	}
+//
+	@Override public void setUrl(final SOSOptionElement pstrValue) {
 		ConnectionString.Set(pstrValue);
 	}
 
@@ -794,7 +796,7 @@ public class SOSSQLPlusJobOptionsSuperClass extends SOSCredentialStoreSuperClass
 		return null;
 	}
 
-	@Override public void setHost(final SOSOptionHostName p_host) {
+	@Override public void setHost(final SOSOptionElement p_host) {
 	}
 
 	@Override public SOSOptionPortNumber getPort() {

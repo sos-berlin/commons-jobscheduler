@@ -11,12 +11,11 @@ import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
 import com.sos.JSHelper.Listener.JSListener;
 import com.sos.JSHelper.Options.SOSOptionCommandString;
 import com.sos.JSHelper.Options.SOSOptionConnectionString;
-import com.sos.JSHelper.Options.SOSOptionHostName;
+import com.sos.JSHelper.Options.SOSOptionElement;
 import com.sos.JSHelper.Options.SOSOptionPassword;
 import com.sos.JSHelper.Options.SOSOptionPortNumber;
 import com.sos.JSHelper.Options.SOSOptionRegExp;
 import com.sos.JSHelper.Options.SOSOptionString;
-import com.sos.JSHelper.Options.SOSOptionUrl;
 import com.sos.JSHelper.Options.SOSOptionUserName;
 
 /**
@@ -198,7 +197,7 @@ public class JobSchedulerPLSQLJobOptionsSuperClass extends SOSCredentialStoreSup
 															" ", // DefaultValue
 															false // isMandatory
 													);
-
+	public SOSOptionPassword password = (SOSOptionPassword) db_password.SetAlias("password");
 	/**
 	 * \brief getdb_password : database password
 	 * 
@@ -230,7 +229,7 @@ public class JobSchedulerPLSQLJobOptionsSuperClass extends SOSCredentialStoreSup
 	 *
 	 */
 	@JSOptionDefinition(name = "db_url", description = "jdbc url (e.g. jdbc:oracle:thin:@localhost:1521:XE)", key = "db_url", type = "SOSOptionString", mandatory = false)
-	public SOSOptionUrl	db_url	= new SOSOptionUrl(this, conClassName + ".db_url", // HashMap-Key
+	public SOSOptionConnectionString	db_url	= new SOSOptionConnectionString(this, conClassName + ".db_url", // HashMap-Key
 											"jdbc url (e.g. jdbc:oracle:thin:@localhost:1521:XE)", // Titel
 											" ", // InitValue
 											" ", // DefaultValue
@@ -246,7 +245,7 @@ public class JobSchedulerPLSQLJobOptionsSuperClass extends SOSCredentialStoreSup
 	 * \return jdbc url (e.g. jdbc:oracle:thin:@localhost:1521:XE)
 	 *
 	 */
-	public SOSOptionUrl getdb_url() {
+	public SOSOptionConnectionString getdb_url() {
 		return db_url;
 	}
 
@@ -258,7 +257,7 @@ public class JobSchedulerPLSQLJobOptionsSuperClass extends SOSCredentialStoreSup
 	 *
 	 * @param db_url : jdbc url (e.g. jdbc:oracle:thin:@localhost:1521:XE)
 	 */
-	public void setdb_url(final SOSOptionUrl p_db_url) {
+	public void setdb_url(final SOSOptionConnectionString p_db_url) {
 		db_url = p_db_url;
 	}
 
@@ -274,7 +273,7 @@ public class JobSchedulerPLSQLJobOptionsSuperClass extends SOSCredentialStoreSup
 											" ", // DefaultValue
 											false // isMandatory
 									);
-
+	public SOSOptionUserName user = (SOSOptionUserName) db_user.SetAlias("user");
 	/**
 	 * \brief getdb_user : database user
 	 * 
@@ -521,19 +520,11 @@ public class JobSchedulerPLSQLJobOptionsSuperClass extends SOSCredentialStoreSup
 		this.setAllOptions(super.objSettings);
 	}
 	
-	@Override public SOSOptionUrl getUrl() {
-		return ConnectionString;
-	}
-
-	@Override public void setUrl(final SOSOptionUrl pstrValue) {
+	public void setUrl(final SOSOptionConnectionString pstrValue) {
 		ConnectionString.Set(pstrValue);
 	}
 
-	@Override public SOSOptionHostName getHost() {
-		return db_url;
-	}
-
-	@Override public void setHost(final SOSOptionHostName p_host) {
+	@Override public void setHost(final SOSOptionElement p_host) {
 	}
 
 	@Override public SOSOptionPortNumber getPort() {
