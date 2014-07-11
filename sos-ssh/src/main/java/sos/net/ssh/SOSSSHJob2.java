@@ -97,9 +97,6 @@ public class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
 	private ISOSVFSHandler		objVFS				= null;
 
-	//	private JSJobUtilities		objJSJobUtilities	= this;
-	//	protected SOSSSHJobOptions	objOptions			= null;
-
 	public String[] getCommands2Execute() {
 
 		@SuppressWarnings("unused")
@@ -179,11 +176,9 @@ public class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 			objVFS.Connect(objOptions);
 			ISOSAuthenticationOptions objAU = objOptions;
 			ISOSConnection authenticate = objVFS.Authenticate(objAU);
-			//			objVFS.OpenSession(objOptions);
 			logger.debug("connection established");
 		}
 		catch (Exception e) {
-			e.printStackTrace();
 			throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
 		}
 
