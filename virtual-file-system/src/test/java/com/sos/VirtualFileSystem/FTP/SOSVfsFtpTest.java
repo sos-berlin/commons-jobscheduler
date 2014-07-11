@@ -228,8 +228,10 @@ public class SOSVfsFtpTest {
 
 	@Test// (expected = java.lang.Exception.class)
 	public void testConnect() throws Exception {
+		System.setProperty("AddFTPProtocol", "true");
 		objOptions.host.Value("wilma.sos");
 		objOptions.user.Value("kbxsy");
+		objOptions.passive_mode.setTrue();
 		objVFS.Connect(objOptions);
 	}
 
@@ -533,6 +535,8 @@ public class SOSVfsFtpTest {
 		objOptions.user.Value("kb");
 		objOptions.password.Value("kb");
 		objVFS.Authenticate(objOptions);
+		ftpClient.passive();
+
 	}
 
 	// // @Test

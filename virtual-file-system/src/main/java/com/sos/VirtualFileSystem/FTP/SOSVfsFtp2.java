@@ -383,7 +383,7 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
 			if (isPositiveCommandCompletion() == false) {
 				throw new JobSchedulerException(SOSVfs_E_144.params("getFile()", remoteFile, getReplyString()));
 			}
-			byte[] buffer = new byte[objOptions.BufferSize.value()];
+			byte[] buffer = new byte[Options().BufferSize.value()];
 			out = new FileOutputStream(new File(localFile), append);
 			// TODO get progress info
 			int bytes_read = 0;
@@ -732,7 +732,7 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
 		FileInputStream in = null;
 		long lngTotalBytesWritten = 0;
 		try {
-			byte[] buffer = new byte[objOptions.BufferSize.value()];
+			byte[] buffer = new byte[Options().BufferSize.value()];
 			in = new FileInputStream(new File(localFile));
 			// TODO get progress info
 			int bytesWritten;

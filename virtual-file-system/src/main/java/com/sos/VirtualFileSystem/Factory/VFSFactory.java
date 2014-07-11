@@ -193,7 +193,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 		if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.ftp.Text())) {
 			//  ftp://<user>:<password>@<host>:<port>/<url-path>;type=<typecode>
 			// "com.sos.VirtualFileSystem.FTP.SOSVfsFtp"
-			objC = getDynamicVFSHandler("com.sos.VirtualFileSystem.FTP.SOSVfsFtp");
+			objC = getDynamicVFSHandler("com.sos.VirtualFileSystem.FTP.SOSVfsFtp2");
 			//			objC = new SOSVfsFtp();
 			//			logger.debug(String.format(objMsg.getMsg(SOSVfs_D_0201), conMethodName, SOSVfsFtp.class.toString()));
 		}

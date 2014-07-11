@@ -159,6 +159,9 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 
 			// TODO implement as an additional Option-setting
 			String strAddFTPProtocol = System.getenv("AddFTPProtocol");
+			if (strAddFTPProtocol == null) {
+				strAddFTPProtocol = System.getProperty("AddFTPProtocol");
+			}
 			if (strAddFTPProtocol != null && strAddFTPProtocol.equalsIgnoreCase("true")) {
 				objFTPClient.addProtocolCommandListener(objProtocolCommandListener);
 			}

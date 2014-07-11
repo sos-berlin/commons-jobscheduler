@@ -239,7 +239,9 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 	@Override public void CloseConnection() throws Exception {
 		if (Client().isConnected()) {
 			Client().disconnect();
-			logger.debug(SOSVfs_D_125.params(objConnection2Options.getHost().Value()));
+			if (objConnection2Options != null) {
+				logger.debug(SOSVfs_D_125.params(objConnection2Options.getHost().Value()));
+			}
 			LogReply();
 		}
 	}
@@ -1213,11 +1215,11 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 							}
 						}
 						this.cd(strCurrentPathName);
-						objDirectoriesFound.put(pstrPathName, flgResult);
 					}
 					else { // single foldername, relative to the current folder
 						flgResult = checkFolder(pstrPathName);
 					}
+					objDirectoriesFound.put(pstrPathName, flgResult); // problem: this is a relative pathname, can be used on different folders
 				}
 			}
 			catch (IOException e) {
@@ -1299,7 +1301,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 					if (objHost != null) {
 						strHost = objHost.Value();
 					}
-					logger.debug(SOSVfs_D_138.params(strHost, getReplyString()));
+					logger.debug(HostID(SOSVfs_D_138.params(strHost, getReplyString())));
 				}
 			}
 			else {
@@ -1383,8 +1385,8 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 
 	private void checkAndCreateSubFolder(final String pstrPathName) {
 		final String conMethodName = conClassName + "::checkAndCreateSubFolder";
-		final String strPath = new File(pstrPathName).getName();
 		SOSOptionFolderName objF = new SOSOptionFolderName(pstrPathName);
+		String strPath = objF.getName();
 		try {
 			String strParent = objF.getParentFolderName();
 			objFilter4Directory.setLook4FileName(strPath);
