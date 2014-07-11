@@ -232,7 +232,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		}
 	}
 
-	private void setChildClasses(final HashMap<String, String> JSSettings)  {
+	public void setChildClasses(final HashMap<String, String> JSSettings)  {
 		try {
 			if (objConnectionOptions == null) {
 				objConnectionOptions = new SOSConnection2Options(JSSettings);

@@ -163,6 +163,7 @@ public class SOSFTPOptionsTest {
 
 		try {
 			SOSFTPOptions objO = new SOSFTPOptions(objH);
+			objO.setChildClasses(objH);
 			SOSConnection2Options objCO = objO.getConnectionOptions();
 			SOSConnection2OptionsAlternate objSource = objCO.Source();
 			SOSCredentialStoreOptions objCS = objSource.getCredentialStore();
