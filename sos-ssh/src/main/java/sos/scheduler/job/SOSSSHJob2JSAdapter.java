@@ -99,11 +99,7 @@ public class SOSSSHJob2JSAdapter extends JobSchedulerJobAdapter {
 		// Allow <script> tag of job as command parameter
 		// http://www.sos-berlin.com/jira/browse/JITL-48
 		if (objO.commandSpecified() == false) {
-			String strS = getJobScript();
-			if (isNotEmpty(strS)) {
-				objO.command_script.Value(strS);
-				logger.debug("setting 'command_script' value from script tag of job: \n" + strS);
-			}
+			setJobScript(objO.command_script);
 		}
 
 		objO.CheckMandatory();
