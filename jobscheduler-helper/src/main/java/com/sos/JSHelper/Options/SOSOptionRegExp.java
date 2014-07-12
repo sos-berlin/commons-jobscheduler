@@ -158,7 +158,6 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 			strTargetString = replaceGroups(strTargetString, pstrReplacementPattern /* .split(";") */);
 			strTargetString = substituteAllFilename(strTargetString, pstrSourceString);
 			strTargetString = substituteAllDate(strTargetString);
-
 			// TODO allow timestamp: as an alternative date-pattern
 			strTargetString = substituteTimeStamp(strTargetString);
 			// TODO implement uuid: as an additional pattern for substitution.
@@ -181,8 +180,7 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 			return strTargetString;
 		}
 		catch (Exception e) {
-			e.printStackTrace(System.err);
-			throw new JobSchedulerException(conMethodName + ": " + e.getMessage());
+			throw new JobSchedulerException(conMethodName + ": " + e.getMessage(), e);
 		}
 	}
 
@@ -454,16 +452,17 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 	@Override
 	public void Value (final String pstrValue) {
 		super.Value(pstrValue);  // make first some text replacements
-//		String strV = super.Value();
-//		if (isNotEmpty(strV)) {
+		String strV = super.Value();
+		if (isNotEmpty(strV)) {
+//		String strV = pstrValue;
 	        try {
-	            Pattern.compile(pstrValue);
+	            Pattern.compile(strV);
 	        } catch (PatternSyntaxException exception) {
-	        	String strT = String.format("The RegExp '%1$s' is invalid", pstrValue);
+	        	String strT = String.format("The RegExp '%1$s' is invalid", strV);
 	        	SOSValidationError objVE = new SOSValidationError(strT);
 	        	objVE.setException(new JobSchedulerException(strT, exception));
 //	            System.err.println(exception.getDescr  iption());
 	        }
-//		}
+		}
 	}
 }
