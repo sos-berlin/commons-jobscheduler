@@ -2,7 +2,6 @@ package com.sos.JSHelper.Options;
 
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.UUID;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -327,45 +326,6 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 		return temp;
 	}
 
-	private String substituteUUID(String strValue) throws Exception {
-
-		// check for [filename:...]
-		Matcher matcher1 = Pattern.compile("\\[uuid:([^\\]]*)\\]", intRegExpFlags).matcher(strValue);
-
-		if (matcher1.find()) {
-			if (matcher1.group(1).equals("")) {
-				strValue = strValue.replaceFirst("\\[uuid:\\]", getUUID());
-			}
-		}
-
-		return strValue;
-	}
-
-	public static String getUUID () {
-		return UUID.randomUUID().toString();
-	}
-	
-	private String substituteTimeStamp(String pstrValue) throws Exception {
-
-		// check for [filename:...]
-		Matcher matcher1 = Pattern.compile("\\[timestamp:([^\\]]*)\\]", intRegExpFlags).matcher(pstrValue);
-
-		if (matcher1.find()) {
-			if (matcher1.group(1).equals("")) {
-				// System.currentTimeMillis()
-//				strValue = strValue.replaceFirst("\\[timestamp:\\]", JSDataElementDate.getCurrentTimeAsString("yyyyMMddHHmmss"));
-//				strValue = strValue.replaceFirst("\\[timestamp:\\]", String.valueOf(System.currentTimeMillis()));
-				pstrValue = pstrValue.replaceFirst("\\[timestamp:\\]", getUnixTimeStamp());
-			}
-		}
-
-		return pstrValue;
-	}
-
-	public static String getUnixTimeStamp () {
-		return String.valueOf(System.nanoTime());
-	}
-	
 	private String substituteSQLTimeStamp(String strValue) throws Exception {
 
 		// check for [filename:...]

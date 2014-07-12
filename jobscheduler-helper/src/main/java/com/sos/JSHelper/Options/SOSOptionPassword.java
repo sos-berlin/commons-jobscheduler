@@ -1,10 +1,4 @@
 package com.sos.JSHelper.Options;
-
-import java.util.Vector;
-
-import com.sos.JSHelper.System.SOSCommandline;
-
-
 /**
 * \class SOSOptionPassword 
 * 
@@ -32,9 +26,7 @@ import com.sos.JSHelper.System.SOSCommandline;
 *
 * Created on 16.05.2010 19:50:51
  */
-
-public class SOSOptionPassword extends SOSOptionString {
-
+public class SOSOptionPassword extends SOSOptionStringWVariables {
 	/**
 	 * 
 	 */
@@ -46,14 +38,12 @@ public class SOSOptionPassword extends SOSOptionString {
 	// SOSOptionPassword() {
 	// //
 	// }
-
 	// TODO see http://docs.oracle.com/javase/6/docs/api/java/io/Console.html for protecting the pw
 	// TODO keypass usage (V2): see https://code.google.com/p/keepass4j/
-	
-	public SOSOptionPassword(final JSOptionsClass pPobjParent, final String pPstrKey, final String pPstrDescription, final String pPstrValue, final String pPstrDefaultValue,
-			final boolean pPflgIsMandatory) {
+	public SOSOptionPassword(final JSOptionsClass pPobjParent, final String pPstrKey, final String pPstrDescription, final String pPstrValue,
+			final String pPstrDefaultValue, final boolean pPflgIsMandatory) {
 		super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
-		this.setHideValue(true); 
+		this.setHideValue(true);
 	}
 
 	/**
@@ -66,50 +56,36 @@ public class SOSOptionPassword extends SOSOptionString {
 	 *
 	 * @return
 	 */
-	@Override
-	public String toString() {
-
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::toString";
-
-//		String strPValue = "*****";
-//		if (ExecuteCommandToGetPassword()) {
-//			strPValue = strValue;
-//		}
-//
-//		return this.Description() + ": " + strPValue;
-
+	@Override public String toString() {
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::toString";
+		//		String strPValue = "*****";
+		//		if (ExecuteCommandToGetPassword()) {
+		//			strPValue = strValue;
+		//		}
+		//
+		//		return this.Description() + ": " + strPValue;
 		return super.toString();
-		
 	} // private String toString
 
 	/**
 	 * Checks if an external command needs to be executed to get the password
 	 */
-	@Override
-	public String Value() {
-
+	@Override public String Value() {
 		String strReturnPassword = strValue;
-		if (strValue != null) {
+		if (isNotEmpty(strValue)) {
 			try {
 				if (ExecuteCommandToGetPassword()) {
-					if (strCachedPW.length() <= 0) {
+					if (isEmpty(strCachedPW)) {
 						String command = strValue.substring(1, strValue.length() - 1);
-
-						Vector returnValues = new SOSCommandline().execute(command);
-						logger.debug(returnValues);
-						Integer exitValue = (Integer) returnValues.elementAt(0);
-//						Integer exitValue = Integer.getInteger(strT);
-						if (exitValue.compareTo(new Integer(0)) == 0) {
-							if (returnValues.elementAt(1) != null) {
-								strReturnPassword = (String) returnValues.elementAt(1);
-								strCachedPW = strReturnPassword;
-							}
-						}
+						strReturnPassword = executeShellScript(command);
+						strCachedPW = strReturnPassword;
 					}
 					else {
 						strReturnPassword = strCachedPW;
 					}
+				}
+				else {
+					strReturnPassword = super.Value();
 				}
 			}
 			catch (Exception e) {
@@ -120,17 +96,11 @@ public class SOSOptionPassword extends SOSOptionString {
 	}
 
 	public boolean ExecuteCommandToGetPassword() {
-
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::PasswordByExecution";
-
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::PasswordByExecution";
 		boolean flgExecuteCommandToGetPassword = false;
-
 		if (strValue.startsWith(conBackTic) && strValue.endsWith(conBackTic)) {
 			flgExecuteCommandToGetPassword = true;
 		}
-
 		return flgExecuteCommandToGetPassword;
 	} // private boolean PasswordByExecution
-
 }

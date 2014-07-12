@@ -28,12 +28,17 @@ package com.sos.JSHelper.Options;
 * Created on 20.05.2011 16:26:20
  */
 
-import com.sos.JSHelper.io.Files.JSFile;
-import org.apache.log4j.Logger;
-import org.junit.*;
-
 import java.io.File;
 import java.io.IOException;
+
+import org.apache.log4j.Logger;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import com.sos.JSHelper.io.Files.JSFile;
 
 /**
  * @author KB
@@ -116,18 +121,18 @@ public class SOSOptionPasswordTest {
 		objOption.Value("huhu");
 		org.junit.Assert.assertEquals("password", "huhu", objOption.Value());
 		
-		String strFileName = System.getProperty("java.io.tmpdir") + "test.cmd";
-		CreateTestFile (strFileName);
+		String strFileName = CreateTestFile ();
 		
 		objOption.Value(SOSOptionPassword.conBackTic + strFileName + SOSOptionPassword.conBackTic);
 		org.junit.Assert.assertEquals("password", "huhu", objOption.Value());
 	}
 
-	private void CreateTestFile (final String pstrFileName) {
+	private String  CreateTestFile () {
 		
+		String strFileName = System.getProperty("java.io.tmpdir") + "test.cmd";
 
-		JSFile objFile = new JSFile(pstrFileName);
-		// objFile.deleteOnExit();
+		JSFile objFile = new JSFile(strFileName);
+		 objFile.deleteOnExit();
 		try {
 			objFile.WriteLine("@echo off");
 			objFile.WriteLine("echo huhu");
@@ -137,6 +142,7 @@ public class SOSOptionPasswordTest {
 		catch (IOException e) {
 			e.printStackTrace();
 		}
+		return strFileName;
 	}
 
 
@@ -145,6 +151,17 @@ public class SOSOptionPasswordTest {
 	 */
 	@Test
 	public final void testValue() {
+	}
+
+	@Test
+	public final void testValueString() {
+		objOption.Value("[uuid:]");
+		logger.debug(objOption.Value());
+		objOption.Value("[env:username]");
+		logger.debug(objOption.Value());
+		String strFilenName = CreateTestFile();
+		objOption.Value("[shell:" + strFilenName + "]");
+		logger.debug(objOption.Value());
 	}
 
 	/**
