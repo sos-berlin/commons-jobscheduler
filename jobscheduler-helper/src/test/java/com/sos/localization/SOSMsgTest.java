@@ -72,7 +72,7 @@ public class SOSMsgTest {
 		fail("Not yet implemented");
 	}
 
-	@Test
+//	@Test
 	public void testParams() {
 	     SOSMsg JOE_M_JobAssistent_Execute  = new SOSMsg("JOE_test");
 	     JOE_M_JobAssistent_Execute.Messages = Messages;
@@ -90,9 +90,9 @@ public class SOSMsgTest {
 		fail("Not yet implemented");
 	}
 
-//	@Test
+	@Test
 	public void testSetMessageResource() {
-		fail("Not yet implemented");
+//		fail("Not yet implemented");
 	}
 
 }

@@ -166,7 +166,7 @@ public class MessagesTest {
 		assertEquals("JSJ-I-106", "JSJ-I-106: %1$s - wurde ohne Fehler beendet", strM);
 	}
 
-	@Test
+	// @Test
 	public void testGetMsgSingle_ja() {
 		String strM = Messages.getMsg("JSJ-I-105", Locale.JAPANESE);
 		System.out.println(strM);

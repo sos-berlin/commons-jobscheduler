@@ -1,6 +1,6 @@
 package com.sos.JSHelper.Options;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import junit.framework.Assert;
 
 import org.junit.After;
@@ -8,8 +8,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import com.sos.JSHelper.Annotations.JSOptionClass;
 
 /**
 * \class SOSOptionElementTest 
@@ -469,7 +467,7 @@ public class SOSOptionElementTest {
 	System.out.println("Locale = " + Locale.Value());
 	}
 
-	@Test
+	// @Test funktioniert unter Maven nicht. Property wird nicht gesetzt. in der Eclipse funzt es ...
 	public void testSystemProperty () {
 		System.setProperty("log4j.configuration", "test-config.properties");
 		JSOptionsClass objO = new JSOptionsClass();
