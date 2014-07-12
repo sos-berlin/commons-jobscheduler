@@ -201,10 +201,10 @@ public class SOSOptionStringWVariables extends SOSOptionElement {
 			strValue = substituteFileContent(strValue);
 			strValue = substituteShell(strValue);
 			// // should any opening and closing brackets be found in the file name, then this is an error
-			Matcher m = Pattern.compile("\\[[^\\]]*\\]").matcher(strValue);
-			if (m.find()) {
-				throw new JobSchedulerException(String.format("unsupported variable found: ' %1$s'", m.group()));
-			}
+//			Matcher m = Pattern.compile("\\[[^\\]]*\\]").matcher(strValue);
+//			if (m.find()) {
+//				throw new JobSchedulerException(String.format("unsupported variable found: ' %1$s'", m.group()));
+//			}
 			return strValue;
 		}
 		catch (Exception e) {

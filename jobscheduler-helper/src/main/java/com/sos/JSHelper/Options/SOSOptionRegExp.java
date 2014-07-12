@@ -157,8 +157,7 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 		try {
 			strTargetString = replaceGroups(strTargetString, pstrReplacementPattern /* .split(";") */);
 			strTargetString = substituteAllFilename(strTargetString, pstrSourceString);
-			Value(strTargetString);
-			super.doReplace();
+			strTargetString = substituteAllDate(strTargetString);
 
 			// TODO allow timestamp: as an alternative date-pattern
 			strTargetString = substituteTimeStamp(strTargetString);
@@ -167,11 +166,17 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 			// TODO implement sqltimestamp: as an additional pattern for substitution
 			strTargetString = substituteSQLTimeStamp(strTargetString);
 			
+			strValue = substituteTempFile(strValue);
+			strValue = substituteSQLTimeStamp(strValue);
+			strValue = substituteEnvironmenVariable(strValue);
+			strValue = substituteFileContent(strValue);
+			strValue = substituteShell(strValue);
+
 			// // should any opening and closing brackets be found in the file name, then this is an error
-			Matcher m = Pattern.compile("\\[[^\\]]*\\]").matcher(strTargetString);
-			if (m.find()) {
-				throw new JobSchedulerException(String.format("unsupported variable found: ' %1$s'", m.group()));
-			}
+//			Matcher m = Pattern.compile("\\[[^\\]]*\\]").matcher(strTargetString);
+//			if (m.find()) {
+//				throw new JobSchedulerException(String.format("unsupported variable found: ' %1$s'", m.group()));
+//			}
 
 			return strTargetString;
 		}
