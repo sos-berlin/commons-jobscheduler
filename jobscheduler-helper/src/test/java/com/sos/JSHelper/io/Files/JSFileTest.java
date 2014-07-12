@@ -1,11 +1,17 @@
 package com.sos.JSHelper.io.Files;
 
-import org.apache.log4j.Logger;
-import org.junit.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
-import static org.junit.Assert.*;
+import org.apache.log4j.Logger;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
 * \class JSFileTest 
@@ -39,7 +45,7 @@ public class JSFileTest {
 
 	private final String		conClassName	= "JSFileTest";
 	private final String		strRec			= "Eine Zeile zum Test ...";
-	private final String		strFolderName	= "R:/nobackup/junittests/testdata/JSFileTest/";
+	private final String		strFolderName	= "R:\\backup\\sos\\Java\\junittests\\testdata\\JSCsvFileTest";
 	private String				strTestFileName	= strFolderName + "test.txt";
 
 	private static Logger		logger			= Logger.getLogger(JSFileTest.class);

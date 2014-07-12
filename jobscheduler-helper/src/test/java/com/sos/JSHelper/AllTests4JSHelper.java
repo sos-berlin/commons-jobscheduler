@@ -7,9 +7,7 @@ import com.sos.JSHelper.DataElements.JSDataElementDateTest;
 import com.sos.JSHelper.DataElements.JSDataElementDateTimeTest;
 import com.sos.JSHelper.DataElements.JSDataElementNumericTest;
 import com.sos.JSHelper.DataElements.JSDataElementTimeStampISOTest;
-import com.sos.JSHelper.Options.JSOptionIndexedItemTest;
 import com.sos.JSHelper.Options.JSOptionValueListTest;
-import com.sos.JSHelper.Options.JSOptionsClass;
 import com.sos.JSHelper.Options.SOSOptionBooleanTest;
 import com.sos.JSHelper.Options.SOSOptionElementTest;
 import com.sos.JSHelper.Options.SOSOptionIntegerArrayTest;
@@ -50,12 +48,10 @@ import com.sos.JSHelper.io.Files.JSXMLFileTest;
 	/* */
 	JSCsvFileTest.class,
 	JSFileTest.class,
-	JSOptionsClass.class,
 	JSToolBoxTest.class,
 	JSXMLFileTest.class,
 	/* */
 	/* */
-	JSOptionIndexedItemTest.class,
 	JSOptionValueListTest.class,
 	SOSOptionBooleanTest.class,
 	SOSOptionElementTest.class,

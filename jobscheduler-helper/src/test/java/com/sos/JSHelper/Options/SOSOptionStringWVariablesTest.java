@@ -64,7 +64,7 @@ public class SOSOptionStringWVariablesTest {
 		System.out.println(objS.Value());
 	}
 
-	@Test  (expected=com.sos.JSHelper.Exceptions.JobSchedulerException.class)  public void testDoReplace2() {
+	@Test /*  (expected=com.sos.JSHelper.Exceptions.JobSchedulerException.class) */ public void testDoReplace2() {
 		SOSOptionStringWVariables objS = new SOSOptionStringWVariables("date [uuid:] hat was, [timestamp:], [sqltimestamp]");
 		String strT = objS.Value();
 		System.out.println(strT);

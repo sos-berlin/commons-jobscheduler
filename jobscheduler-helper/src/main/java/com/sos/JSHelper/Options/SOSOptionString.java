@@ -32,7 +32,7 @@ package com.sos.JSHelper.Options;
  * @author eqbfd
  *
  */
-public class SOSOptionString extends SOSOptionElement {
+public class SOSOptionString extends SOSOptionStringWVariables {
 
 	private static final long	serialVersionUID	= -7931744980509663560L;
 	@SuppressWarnings("unused")
@@ -58,6 +58,11 @@ public class SOSOptionString extends SOSOptionElement {
 		super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
 		
 		this.intOptionType = isOptionTypeString;
+		
+	}
+
+	public SOSOptionString(final String pstrValue) {
+		this(null, "", "", pstrValue, pstrValue, false);
 		
 	}
 }
