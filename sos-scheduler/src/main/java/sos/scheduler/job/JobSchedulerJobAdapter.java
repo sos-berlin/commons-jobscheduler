@@ -1,34 +1,15 @@
 package sos.scheduler.job;
-import static com.sos.scheduler.messages.JSMessages.JSJ_D_0010;
-import static com.sos.scheduler.messages.JSMessages.JSJ_D_0032;
-import static com.sos.scheduler.messages.JSMessages.JSJ_D_0040;
-import static com.sos.scheduler.messages.JSMessages.JSJ_D_0070;
-import static com.sos.scheduler.messages.JSMessages.JSJ_D_0080;
-import static com.sos.scheduler.messages.JSMessages.JSJ_E_0009;
-import static com.sos.scheduler.messages.JSMessages.JSJ_F_0010;
-import static com.sos.scheduler.messages.JSMessages.JSJ_F_0050;
-import static com.sos.scheduler.messages.JSMessages.JSJ_F_0060;
-import static com.sos.scheduler.messages.JSMessages.JSJ_I_0010;
-import static com.sos.scheduler.messages.JSMessages.JSJ_I_0020;
-import static com.sos.scheduler.messages.JSMessages.JSJ_I_0030;
-import static com.sos.scheduler.messages.JSMessages.LOG_I_0010;
-import static com.sos.scheduler.messages.JSMessages.LOG_I_0020;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.log4j.Appender;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.SimpleLayout;
-
+import com.sos.JSHelper.Basics.IJSCommands;
+import com.sos.JSHelper.Basics.JSJobUtilities;
+import com.sos.JSHelper.Basics.VersionInfo;
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.JSHelper.Options.JSOptionsClass;
+import com.sos.JSHelper.Options.SOSOptionElement;
+import com.sos.i18n.annotation.I18NResourceBundle;
+import com.sos.localization.Messages;
+import com.sos.localization.SOSMsg;
+import com.sos.scheduler.JobSchedulerLog4JAppender;
+import org.apache.log4j.*;
 import sos.scheduler.interfaces.IJobSchedulerMonitor_impl;
 import sos.spooler.Job;
 import sos.spooler.Order;
@@ -36,17 +17,12 @@ import sos.spooler.Supervisor_client;
 import sos.spooler.Variable_set;
 import sos.util.SOSSchedulerLogger;
 
-import com.sos.JSHelper.Basics.IJSCommands;
-import com.sos.JSHelper.Basics.JSJobUtilities;
-import com.sos.JSHelper.Basics.VersionInfo;
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.JSHelper.Logging.Log4JHelper;
-import com.sos.JSHelper.Options.JSOptionsClass;
-import com.sos.JSHelper.Options.SOSOptionElement;
-import com.sos.i18n.annotation.I18NResourceBundle;
-import com.sos.localization.Messages;
-import com.sos.localization.SOSMsg;
-import com.sos.scheduler.JobSchedulerLog4JAppender;
+import java.io.File;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static com.sos.scheduler.messages.JSMessages.*;
 
 /**
 * \file JobSchedulerJobAdapter.java
@@ -85,8 +61,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 	public final String					conMessageFilePath				= "com_sos_scheduler_messages";
 	protected Variable_set				objJobOrOrderParams				= null;
 	protected Logger					logger							= Logger.getLogger(JobSchedulerJobAdapter.class);
-	@SuppressWarnings("unused")
-	private static Log4JHelper			objLogger						= null;
 	protected Messages					Messages						= null;
 	private JobSchedulerLog4JAppender	objJSAppender					= null;
 	private final static int			maxLengthOfStatusText			= 100;																	// maximum of state text in JobScheduler DB is 100
@@ -95,6 +69,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 	protected final String				EMPTY_STRING					= "";
 	protected final boolean				continue_with_spooler_process	= true;
 	protected final boolean				continue_with_task				= true;
+
+    private static boolean logbackWarningPublished = false;
 
 	public JobSchedulerJobAdapter() {
 		Messages = new Messages(conMessageFilePath, Locale.getDefault());
@@ -150,7 +126,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 			strJobName = this.getJobName();
 		}
 		strJobName = strJobName.replace('/', '-');
-		Log4JHelper.flgUseJobSchedulerLog4JAppender = true;
 		File fleLog4JFile = null;
 		JSOptionsClass objOC = new JSOptionsClass();
 		if (objOC.log4jPropertyFileName.isDefault() == false) {
@@ -162,8 +137,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 				fleLog4JFile = new File("./" + "log4j.properties");
 			}
 		}
-		objLogger = new Log4JHelper(fleLog4JFile.getAbsolutePath());
-		logger = Logger.getRootLogger();
 		/**
 		 * the JobSchedulerLog4JAppender is used as the stdout-appender
 		 * Therefore the code-snippet below asked log4j what the stdout-appender

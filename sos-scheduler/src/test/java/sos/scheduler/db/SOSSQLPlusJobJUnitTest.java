@@ -33,7 +33,6 @@ import com.sos.JSHelper.io.Files.JSTextFile;
 public class SOSSQLPlusJobJUnitTest extends JSJobUtilitiesClass <SOSSQLPlusJobOptions>{
 	private final static String		conClassName	= "SOSSQLPlusJobJUnitTest";						//$NON-NLS-1$
 	private static Logger			logger			= Logger.getLogger(SOSSQLPlusJobJUnitTest.class);
-//	private static Log4JHelper		objLogger		= null;
 
 	protected SOSSQLPlusJobOptions	objOptions		= null;
 	private SOSSQLPlusJob			objE			= null;
@@ -52,7 +51,6 @@ public class SOSSQLPlusJobJUnitTest extends JSJobUtilitiesClass <SOSSQLPlusJobOp
 
 	@Before
 	public void setUp() throws Exception {
-//		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
 		objE = new SOSSQLPlusJob();
 		objE.setJSJobUtilites(this);
 		objOptions = objE.Options();

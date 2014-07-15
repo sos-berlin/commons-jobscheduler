@@ -28,21 +28,8 @@ package com.sos.scheduler.model;
 * Created on 15.02.2011 10:39:39
  */
 
-import java.io.File;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Hashtable;
-
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import com.sos.JSHelper.DataElements.JSDataElementDate;
 import com.sos.JSHelper.DataElements.JSDateFormat;
-import com.sos.JSHelper.Logging.Log4JHelper;
 import com.sos.JSHelper.io.Files.JSTextFile;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
@@ -50,14 +37,15 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 import com.sos.VirtualFileSystem.shell.cmdShell;
-import com.sos.scheduler.model.objects.JSObjBase;
-import com.sos.scheduler.model.objects.JSObjHolidays;
-import com.sos.scheduler.model.objects.JSObjJob;
-import com.sos.scheduler.model.objects.JSObjJobChain;
-import com.sos.scheduler.model.objects.JSObjLock;
-import com.sos.scheduler.model.objects.JSObjOrder;
+import com.sos.scheduler.model.objects.*;
 import com.sos.scheduler.model.objects.JobChain.JobChainNode;
-import com.sos.scheduler.model.objects.Spooler;
+import org.apache.log4j.Logger;
+import org.junit.*;
+
+import java.io.File;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Hashtable;
 
 /**
  * @author oh
@@ -73,8 +61,6 @@ public class SchedulerHotFolderTest {
 	private final String					conClassName				= "SchedulerHotFolderTest";
 
 	private static Logger					logger						= Logger.getLogger(SchedulerHotFolderTest.class);
-	@SuppressWarnings("unused")
-	private static Log4JHelper				objLogger					= null;
 
 	private static SchedulerObjectFactory	objFactory					= null;
 
@@ -97,10 +83,7 @@ public class SchedulerHotFolderTest {
 	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		objLogger = new Log4JHelper("./log4j.properties");
-		logger = Logger.getRootLogger();
 		logger.debug("test start");
-
 		objFactory = new SchedulerObjectFactory("8of9.sos", 4210);
 		objFactory.initMarshaller(Spooler.class);
 	}

@@ -2,9 +2,8 @@
 
 package sos.scheduler.misc;
 
-import org.apache.log4j.Logger;
 import com.sos.JSHelper.Basics.JSToolBox;
-import com.sos.JSHelper.Logging.Log4JHelper;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -25,8 +24,6 @@ import com.sos.JSHelper.Logging.Log4JHelper;
 public class CopyJob2OrderParameterMain extends JSToolBox {
 	private final static String					conClassName						= "CopyJob2OrderParameterMain"; //$NON-NLS-1$
 	private static Logger		logger			= Logger.getLogger(CopyJob2OrderParameterMain.class);
-	@SuppressWarnings("unused")	
-	private static Log4JHelper	objLogger		= null;
 
 	protected CopyJob2OrderParameterOptions	objOptions			= null;
 
@@ -45,9 +42,6 @@ public class CopyJob2OrderParameterMain extends JSToolBox {
 
 		final String conMethodName = conClassName + "::Main"; //$NON-NLS-1$
 
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
-
-		logger = Logger.getRootLogger();
 		logger.info("CopyJob2OrderParameter - Main"); //$NON-NLS-1$
 
 		try {

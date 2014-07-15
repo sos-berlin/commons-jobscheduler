@@ -1,13 +1,7 @@
 package sos.scheduler.file;
 
 import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.sos.JSHelper.Logging.Log4JHelper;
+import org.junit.*;
 
 /**
 * \class JSFolderSyncTest 
@@ -44,8 +38,6 @@ public class JSFolderSyncTest  {
 	private JSExistsFileOptions objO = null;
 	private JSFolderSync objSync = null;
 
-	private static Log4JHelper						objLogger		= null;
-
 	public JSFolderSyncTest() {
 		//
 	}
@@ -60,8 +52,6 @@ public class JSFolderSyncTest  {
 
 	@Before
 	public void setUp() throws Exception {
-		objLogger = new Log4JHelper("./log4j.properties"); 
-
 		objSync = new JSFolderSync ();
 		objO = objSync.Options();
 	}

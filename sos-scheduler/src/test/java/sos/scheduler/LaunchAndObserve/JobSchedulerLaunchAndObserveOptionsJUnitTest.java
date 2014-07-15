@@ -1,24 +1,13 @@
 package sos.scheduler.LaunchAndObserve;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import com.sos.JSHelper.Basics.JSToolBox;
+import com.sos.JSHelper.Listener.JSListenerClass;
+import org.apache.log4j.Logger;
+import org.junit.*;
 
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import sos.scheduler.LaunchAndObserve.JobSchedulerLaunchAndObserve;
-import sos.scheduler.LaunchAndObserve.JobSchedulerLaunchAndObserveOptions;
-
-import com.sos.JSHelper.Basics.JSToolBox;
-import com.sos.JSHelper.Listener.JSListenerClass;
-import com.sos.JSHelper.Logging.Log4JHelper;
+import static org.junit.Assert.*;
 
 /**
  * \class 		JobSchedulerLaunchAndObserveOptionsJUnitTest - Launch and observe any given job or job chain
@@ -50,8 +39,6 @@ public class JobSchedulerLaunchAndObserveOptionsJUnitTest extends JSToolBox {
 	private final String							conClassName	= "JobSchedulerLaunchAndObserveOptionsJUnitTest";						//$NON-NLS-1$
 	@SuppressWarnings("unused")//$NON-NLS-1$
 	private static Logger							logger			= Logger.getLogger(JobSchedulerLaunchAndObserveOptionsJUnitTest.class);
-	@SuppressWarnings("unused")
-	private static Log4JHelper						objLogger		= null;
 	private JobSchedulerLaunchAndObserve			objE			= null;
 
 	protected JobSchedulerLaunchAndObserveOptions	objOptions		= null;
@@ -70,7 +57,6 @@ public class JobSchedulerLaunchAndObserveOptionsJUnitTest extends JSToolBox {
 
 	@Before
 	public void setUp() throws Exception {
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
 		objE = new JobSchedulerLaunchAndObserve();
 		objE.registerMessageListener(this);
 		objOptions = objE.Options();

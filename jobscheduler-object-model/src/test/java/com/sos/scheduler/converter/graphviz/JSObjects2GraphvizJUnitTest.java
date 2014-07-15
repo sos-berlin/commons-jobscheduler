@@ -2,16 +2,10 @@
 
 package com.sos.scheduler.converter.graphviz;
 
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.Listener.JSListenerClass;
-import com.sos.JSHelper.Logging.Log4JHelper;
+import org.apache.log4j.Logger;
+import org.junit.*;
 
 /**
  * \class 		JSObjects2GraphvizJUnitTest - JUnit-Test for "JSObjects2Graphviz"
@@ -31,8 +25,6 @@ public class JSObjects2GraphvizJUnitTest extends JSToolBox {
 	private final static String					conClassName						= "JSObjects2GraphvizJUnitTest"; //$NON-NLS-1$
 	@SuppressWarnings("unused")
 	private static Logger		logger			= Logger.getLogger(JSObjects2GraphvizJUnitTest.class);
-	@SuppressWarnings("unused")
-	private static Log4JHelper	objLogger		= null;
 
 	protected JSObjects2GraphvizOptions	objOptions			= null;
 	private JSObjects2Graphviz objE = null;
@@ -52,7 +44,6 @@ public class JSObjects2GraphvizJUnitTest extends JSToolBox {
 
 	@Before
 	public void setUp() throws Exception {
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
 		objE = new JSObjects2Graphviz();
 		objE.registerMessageListener(this);
 		objOptions = objE.Options();

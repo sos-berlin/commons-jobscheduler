@@ -2,20 +2,13 @@
 
 package sos.scheduler.LaunchAndObserve;
 
-import java.util.HashMap;
-
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import sos.net.mail.options.SOSSmtpMailOptions;
-
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.Listener.JSListenerClass;
-import com.sos.JSHelper.Logging.Log4JHelper;
+import org.apache.log4j.Logger;
+import org.junit.*;
+import sos.net.mail.options.SOSSmtpMailOptions;
+
+import java.util.HashMap;
 
 /**
  * \class 		JobSchedulerLaunchAndObserveJUnitTest - JUnit-Test for "Launch and observe any given job or job chain"
@@ -35,8 +28,6 @@ public class JobSchedulerLaunchAndObserveJUnitTest extends JSToolBox {
 	private final static String					conClassName						= "JobSchedulerLaunchAndObserveJUnitTest"; //$NON-NLS-1$
 	@SuppressWarnings("unused")	 //$NON-NLS-1$
 	private static Logger		logger			= Logger.getLogger(JobSchedulerLaunchAndObserveJUnitTest.class);
-	@SuppressWarnings("unused")	 //$NON-NLS-1$
-	private static Log4JHelper	objLogger		= null;
 
 	@SuppressWarnings("unused")
 	private final String				conSVNVersion		= "$Id: JobSchedulerJobAdapter.java 15749 2011-11-22 16:04:10Z kb $";
@@ -59,7 +50,6 @@ public class JobSchedulerLaunchAndObserveJUnitTest extends JSToolBox {
 
 	@Before
 	public void setUp() throws Exception {
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
 		objE = new JobSchedulerLaunchAndObserve();
 		objE.registerMessageListener(this);
 		objO = objE.Options();

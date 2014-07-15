@@ -1,20 +1,14 @@
 package sos.scheduler.xsl;
 
-import java.io.File;
-
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.DataElements.JSDataElementDateISO;
 import com.sos.JSHelper.Listener.JSListenerClass;
-import com.sos.JSHelper.Logging.Log4JHelper;
 import com.sos.JSHelper.io.Files.JSXMLFile;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Logger;
+import org.junit.*;
+
+import java.io.File;
 
 /**
  * \class 		JobSchedulerXslTransformationJUnitTest - JUnit-Test for "JobSchedulerXslTransform"
@@ -34,8 +28,6 @@ public class JobSchedulerXslTransformJUnitTest extends JSToolBox {
 	private final static String					conClassName	= "JobSchedulerXslTransformationJUnitTest";
 	@SuppressWarnings("unused")
 	private static Logger						logger			= Logger.getLogger(JobSchedulerXslTransformJUnitTest.class);
-	@SuppressWarnings("unused")
-	private static Log4JHelper					objLogger		= null;
 
 	protected JobSchedulerXslTransformOptions	objOptions		= null;
 	private JobSchedulerXslTransform			objE			= null;
@@ -57,7 +49,6 @@ public class JobSchedulerXslTransformJUnitTest extends JSToolBox {
 	@Before
 	public void setUp() throws Exception {
 		System.setProperty("user.dir", strBaseDirName);
-		objLogger = new Log4JHelper("./log4j.properties");
 		objE = new JobSchedulerXslTransform();
 		objOptions = objE.Options();
 

@@ -52,7 +52,6 @@ import org.junit.Test;
 
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.Listener.JSListenerClass;
-import com.sos.JSHelper.Logging.Log4JHelper;
 
 /**
  * \class 		<xsl:value-of select="$class_name" /> - JUnit-Test for "<xsl:value-of select="$class_title" />"
@@ -73,7 +72,6 @@ public class <xsl:value-of select="$class_name" /> extends <xsl:value-of select=
 	@SuppressWarnings("unused")	 //$NON-NLS-1$
 	private static Logger		logger			= Logger.getLogger(<xsl:value-of select="$class_name" />.class);
 	@SuppressWarnings("unused")	 //$NON-NLS-1$
-	private static Log4JHelper	objLogger		= null;
 
 	protected <xsl:value-of select="$WorkerClassName" />Options	objOptions			= null;
 	private <xsl:value-of select="$WorkerClassName" /> objE = null;
@@ -93,7 +91,6 @@ public class <xsl:value-of select="$class_name" /> extends <xsl:value-of select=
 
 	@Before
 	public void setUp() throws Exception {
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
 		objE = new <xsl:value-of select="$WorkerClassName" />();
 		objE.registerMessageListener(this);
 		objOptions = objE.Options();

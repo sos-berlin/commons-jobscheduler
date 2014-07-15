@@ -4,7 +4,6 @@ package sos.scheduler.managed.db;
 
 import org.apache.log4j.Logger;
 import com.sos.JSHelper.Basics.JSToolBox;
-import com.sos.JSHelper.Logging.Log4JHelper;
 
 
 /**
@@ -25,8 +24,6 @@ import com.sos.JSHelper.Logging.Log4JHelper;
 public class JobSchedulerManagedDBReportJobMain extends JSToolBox {
 	private final static String					conClassName						= "JobSchedulerManagedDBReportJobMain"; //$NON-NLS-1$
 	private static Logger		logger			= Logger.getLogger(JobSchedulerManagedDBReportJobMain.class);
-	@SuppressWarnings("unused")	
-	private static Log4JHelper	objLogger		= null;
 
 	protected JobSchedulerManagedDBReportJobOptions	objOptions			= null;
 
@@ -45,9 +42,6 @@ public class JobSchedulerManagedDBReportJobMain extends JSToolBox {
 
 		final String conMethodName = conClassName + "::Main"; //$NON-NLS-1$
 
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
-
-		logger = Logger.getRootLogger();
 		logger.info("JobSchedulerManagedDBReportJob - Main"); //$NON-NLS-1$
 
 		try {

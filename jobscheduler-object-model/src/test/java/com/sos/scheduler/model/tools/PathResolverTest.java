@@ -1,19 +1,14 @@
 package com.sos.scheduler.model.tools;
 
-import static org.junit.Assert.assertEquals;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
-import com.sos.JSHelper.Logging.Log4JHelper;
+import static org.junit.Assert.assertEquals;
 
 public class PathResolverTest {
 
 	private final static Logger logger = Logger.getLogger(PathResolverTest.class);
 
-	public PathResolverTest() {
-		new Log4JHelper("./log4j.properties");
-	}
-	
 	@Test
 	public void test() throws Exception {
 		assertEquals("/folder", PathResolver.getRelativePath("", "", "/folder"));

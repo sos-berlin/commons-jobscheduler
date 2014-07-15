@@ -1,9 +1,7 @@
 package com.sos.scheduler.converter.graphviz;
 
-import org.apache.log4j.Logger;
-
 import com.sos.JSHelper.Basics.JSToolBox;
-import com.sos.JSHelper.Logging.Log4JHelper;
+import org.apache.log4j.Logger;
 
 /**
  * \class 		JSObjects2GraphvizMain - Main-Class for "JSObjects2Graphviz"
@@ -23,8 +21,6 @@ import com.sos.JSHelper.Logging.Log4JHelper;
 public class JSObjects2GraphvizMain extends JSToolBox {
 	private final static String			conClassName	= "JSObjects2GraphvizMain";						//$NON-NLS-1$
 	private static Logger				logger			= Logger.getLogger(JSObjects2GraphvizMain.class);
-	@SuppressWarnings("unused")
-	private static Log4JHelper			objLogger		= null;
 
 	protected JSObjects2GraphvizOptions	objOptions		= null;
 
@@ -43,9 +39,6 @@ public class JSObjects2GraphvizMain extends JSToolBox {
 
 		final String conMethodName = conClassName + "::Main"; //$NON-NLS-1$
 
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
-
-		logger = Logger.getRootLogger();
 		logger.info("JSObjects2Graphviz - Main"); //$NON-NLS-1$
 
 		try {

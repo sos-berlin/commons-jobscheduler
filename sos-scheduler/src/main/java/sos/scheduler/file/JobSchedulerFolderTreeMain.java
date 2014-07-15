@@ -1,13 +1,11 @@
 package sos.scheduler.file;
 
-import java.util.Locale;
-
-import org.apache.log4j.Logger;
-
 import com.sos.JSHelper.Basics.JSToolBox;
-import com.sos.JSHelper.Logging.Log4JHelper;
 import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.localization.Messages;
+import org.apache.log4j.Logger;
+
+import java.util.Locale;
 
 /**
  * \class 		JobSchedulerFolderTreeMain - Main-Class for "check wether a file exist"
@@ -28,8 +26,6 @@ import com.sos.localization.Messages;
 public class JobSchedulerFolderTreeMain extends JSToolBox {
 	private final static String				conClassName	= "JobSchedulerFolderTreeMain";										//$NON-NLS-1$
 	private static Logger					logger			= Logger.getLogger(JobSchedulerFolderTreeMain.class);
-	@SuppressWarnings("unused")
-	private static Log4JHelper				objLogger		= null;
 	private final String					conSVNVersion	= "$Id$";
 	protected static Messages					Messages			= null;
 
@@ -50,10 +46,6 @@ public class JobSchedulerFolderTreeMain extends JSToolBox {
 
 		final String conMethodName = conClassName + "::Main"; //$NON-NLS-1$
 		Messages = new Messages("com_sos_scheduler_messages", Locale.getDefault());
-
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
-
-		logger = Logger.getRootLogger();
 		logger.info("JobSchedulerFolderTree - Main"); //$NON-NLS-1$
 
 		try {

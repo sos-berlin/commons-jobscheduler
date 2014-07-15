@@ -1,15 +1,11 @@
 package com.sos.scheduler.model.xmldoc;
 
-import java.io.File;
+import org.apache.log4j.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-
-import org.apache.log4j.Logger;
-
-import com.sos.JSHelper.Logging.Log4JHelper;
-import com.sos.scheduler.model.xmldoc.Description;
+import java.io.File;
  
 /**
 * \class TestLoadSchedulerXML 
@@ -48,8 +44,6 @@ public class TestLoadSchedulerXmlDoc implements Runnable {
 	private final String		conClassName	= "TestLoadSchedulerXML";
 	private final String		testFilename	= "./JobSchedulerCanWrite.xml";
 	private static Logger		logger			= Logger.getLogger(TestLoadSchedulerXmlDoc.class);
-	@SuppressWarnings("unused")
-	private static Log4JHelper	objLogger		= null;
 
 	TestLoadSchedulerXmlDoc() {
 	}
@@ -61,10 +55,6 @@ public class TestLoadSchedulerXmlDoc implements Runnable {
 
 		File documentationFile = new File(testFilename);
 		try {
-
-			objLogger = new Log4JHelper("./log4j.properties");
-
-			logger = Logger.getRootLogger();
 			logger.debug("test start");
   			try {
   				 JAXBContext context = JAXBContext.newInstance( Description.class );

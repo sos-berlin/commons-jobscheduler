@@ -1,14 +1,8 @@
 package sos.scheduler.LaunchAndObserve;
 
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import com.sos.JSHelper.Listener.JSListenerClass;
-import com.sos.JSHelper.Logging.Log4JHelper;
+import org.apache.log4j.Logger;
+import org.junit.*;
 
 /**
 * \class LaunchAndObserveTest 
@@ -43,8 +37,6 @@ public class LaunchAndObserveTest {
 	@SuppressWarnings("unused")
 	private static final Logger	logger			= Logger.getLogger(LaunchAndObserveTest.class);
 	
-	@SuppressWarnings("unused")
-	private static Log4JHelper	objLogger		= null;
 	private JobSchedulerLaunchAndObserve objE 	= null;
 
 	private JobSchedulerLaunchAndObserveOptions	objOptions			= null;
@@ -66,7 +58,6 @@ public class LaunchAndObserveTest {
 
 	@Before
 	public void setUp() throws Exception {
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
 		objE = new JobSchedulerLaunchAndObserve();
 		objOptions = objE.Options();
 		objOptions.scheduler_host.Value(schedulerHost);

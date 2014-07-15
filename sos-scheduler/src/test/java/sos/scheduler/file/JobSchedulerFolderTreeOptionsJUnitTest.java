@@ -2,19 +2,13 @@
 
 package sos.scheduler.file;
 
-import static org.junit.Assert.assertEquals;
-
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.Listener.JSListenerClass;
-import com.sos.JSHelper.Logging.Log4JHelper;
 import com.sos.i18n.annotation.I18NResourceBundle;
+import org.apache.log4j.Logger;
+import org.junit.*;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * \class 		JobSchedulerFolderTreeOptionsJUnitTest - check wether a file exist
@@ -47,8 +41,6 @@ public class JobSchedulerFolderTreeOptionsJUnitTest extends  JSToolBox {
 	private final String					conClassName						= "JobSchedulerFolderTreeOptionsJUnitTest"; //$NON-NLS-1$
 		@SuppressWarnings("unused") //$NON-NLS-1$
 	private static Logger		logger			= Logger.getLogger(JobSchedulerFolderTreeOptionsJUnitTest.class);
-	@SuppressWarnings("unused")
-	private static Log4JHelper	objLogger		= null;
 	private JobSchedulerFolderTree objE = null;
 	private final String	conSVNVersion	= "$Id$";
 
@@ -68,7 +60,6 @@ public class JobSchedulerFolderTreeOptionsJUnitTest extends  JSToolBox {
 
 	@Before
 	public void setUp() throws Exception {
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
 		objE = new JobSchedulerFolderTree();
 		objE.registerMessageListener(this);
 		objOptions = objE.Options();

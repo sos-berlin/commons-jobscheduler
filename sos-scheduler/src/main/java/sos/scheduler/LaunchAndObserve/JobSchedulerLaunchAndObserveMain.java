@@ -1,9 +1,7 @@
 package sos.scheduler.LaunchAndObserve;
 
-import org.apache.log4j.Logger;
-
 import com.sos.JSHelper.Basics.JSToolBox;
-import com.sos.JSHelper.Logging.Log4JHelper;
+import org.apache.log4j.Logger;
 
 /**
  * \class 		JobSchedulerLaunchAndObserveMain - Main-Class for "Launch and observe any given job or job chain"
@@ -23,8 +21,6 @@ import com.sos.JSHelper.Logging.Log4JHelper;
 public class JobSchedulerLaunchAndObserveMain extends JSToolBox {
 	private final static String						conClassName	= "JobSchedulerLaunchAndObserveMain";									//$NON-NLS-1$
 	private static Logger							logger			= Logger.getLogger(JobSchedulerLaunchAndObserveMain.class);
-	@SuppressWarnings("unused")
-	private static Log4JHelper						objLogger		= null;
 
 	@SuppressWarnings("unused")
 	private final String							conSVNVersion	= "$Id: JobSchedulerJobAdapter.java 15749 2011-11-22 16:04:10Z kb $";
@@ -45,8 +41,6 @@ public class JobSchedulerLaunchAndObserveMain extends JSToolBox {
 	public final static void main(String[] pstrArgs) {
 
 		final String conMethodName = conClassName + "::Main"; //$NON-NLS-1$
-
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
 
 		logger = Logger.getRootLogger();
 		logger.info("JobSchedulerLaunchAndObserve - Main"); //$NON-NLS-1$

@@ -1,20 +1,13 @@
 package sos.scheduler.job;
 
+import junit.framework.Assert;
+import org.apache.commons.lang3.text.StrSubstitutor;
+import org.apache.log4j.Logger;
+import org.junit.*;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import junit.framework.Assert;
-
-import org.apache.commons.lang3.text.StrSubstitutor;
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import sos.scheduler.TestBase;
 
 /**
 * \class JobSchedulerJobAdapterTest
@@ -41,7 +34,7 @@ import sos.scheduler.TestBase;
 * Created on 03.08.2011 18:16:39
  */
 
-public class JobSchedulerJobAdapterTest extends TestBase {
+public class JobSchedulerJobAdapterTest {
 
 	@SuppressWarnings("unused")
 	private final String		conClassName	= "JobSchedulerJobAdapterTest";

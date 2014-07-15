@@ -1,32 +1,20 @@
 package com.sos.scheduler.model.commands;
 
 
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.sos.JSHelper.Logging.Log4JHelper;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdShowJob.enu4What;
 import com.sos.scheduler.model.objects.Spooler;
+import org.apache.log4j.Logger;
+import org.junit.*;
 
 public class JSCmd64Test {
 	
 	private static Logger logger = Logger.getLogger(JSCmd64Test.class);
-	
-	private static SchedulerObjectFactory factory = null;
-	@SuppressWarnings("unused")
-	private static Log4JHelper				objLogger					= null;
 	private static SchedulerObjectFactory	objSchedulerObjectFactory	= null;
 
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		objLogger = new Log4JHelper("./log4j.properties");
-		logger = Logger.getRootLogger();
 		objSchedulerObjectFactory = new SchedulerObjectFactory("homer.sos",4464);
 		objSchedulerObjectFactory.initMarshaller(Spooler.class);
 	}

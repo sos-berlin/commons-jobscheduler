@@ -2,9 +2,8 @@
 
 package sos.scheduler.reports;
 
-import org.apache.log4j.Logger;
 import com.sos.JSHelper.Basics.JSToolBox;
-import com.sos.JSHelper.Logging.Log4JHelper;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -25,8 +24,6 @@ import com.sos.JSHelper.Logging.Log4JHelper;
 public class JSReportAllParametersMain extends JSToolBox {
 	private final static String					conClassName						= "JSReportAllParametersMain"; //$NON-NLS-1$
 	private static Logger		logger			= Logger.getLogger(JSReportAllParametersMain.class);
-	@SuppressWarnings("unused")	
-	private static Log4JHelper	objLogger		= null;
 
 	protected JSReportAllParametersOptions	objOptions			= null;
 
@@ -45,9 +42,6 @@ public class JSReportAllParametersMain extends JSToolBox {
 
 		final String conMethodName = conClassName + "::Main"; //$NON-NLS-1$
 
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
-
-		logger = Logger.getRootLogger();
 		logger.info("JSReportAllParameters - Main"); //$NON-NLS-1$
 
 		try {

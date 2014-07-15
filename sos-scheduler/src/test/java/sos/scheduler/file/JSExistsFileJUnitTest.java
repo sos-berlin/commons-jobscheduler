@@ -1,22 +1,14 @@
 package sos.scheduler.file;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import com.sos.JSHelper.Basics.JSToolBox;
+import com.sos.JSHelper.Listener.JSListenerClass;
+import com.sos.JSHelper.io.Files.JSTextFile;
+import org.apache.log4j.Logger;
+import org.junit.*;
 
 import java.util.Date;
 
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.sos.JSHelper.Basics.JSToolBox;
-import com.sos.JSHelper.Listener.JSListenerClass;
-import com.sos.JSHelper.Logging.Log4JHelper;
-import com.sos.JSHelper.io.Files.JSTextFile;
+import static org.junit.Assert.*;
 
 /**
  * \class 		JSExistsFileJUnitTest - JUnit-Test for "check wether a file exist"
@@ -40,8 +32,6 @@ public class JSExistsFileJUnitTest extends JSToolBox {
 	private final static String		conClassName				= "JSExistsFileJUnitTest";								//$NON-NLS-1$
 	@SuppressWarnings("unused")//$NON-NLS-1$
 	private static Logger			logger						= Logger.getLogger(JSExistsFileJUnitTest.class);
-	@SuppressWarnings("unused")//$NON-NLS-1$
-	private static Log4JHelper		objLogger					= null;
 
 	protected JSExistsFileOptions	objOptions					= null;
 	private JSExistsFile			objE						= null;
@@ -60,7 +50,6 @@ public class JSExistsFileJUnitTest extends JSToolBox {
 
 	@Before
 	public void setUp() throws Exception {
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
 		objE = new JSExistsFile();
 		// objE.registerMessageListener(this);
 		objOptions = objE.Options();

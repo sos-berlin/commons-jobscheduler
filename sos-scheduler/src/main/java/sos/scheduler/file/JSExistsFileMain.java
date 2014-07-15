@@ -1,10 +1,8 @@
 package sos.scheduler.file;
 
-import org.apache.log4j.Logger;
-
 import com.sos.JSHelper.Basics.JSToolBox;
-import com.sos.JSHelper.Logging.Log4JHelper;
 import com.sos.i18n.annotation.I18NResourceBundle;
+import org.apache.log4j.Logger;
 
 /**
  * \class 		JSExistsFileMain - Main-Class for "check wether a file exist"
@@ -25,8 +23,6 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 public class JSExistsFileMain extends JSToolBox {
 	private final static String		conClassName	= "JSExistsFileMain";						//$NON-NLS-1$
 	private static Logger			logger			= Logger.getLogger(JSExistsFileMain.class);
-	@SuppressWarnings("unused")
-	private static Log4JHelper		objLogger		= null;
 
 	protected JSExistsFileOptions	objOptions		= null;
 
@@ -45,9 +41,6 @@ public class JSExistsFileMain extends JSToolBox {
 
 		final String conMethodName = conClassName + "::Main"; //$NON-NLS-1$
 
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
-
-		logger = Logger.getRootLogger();
 		logger.info("JSExistFile - Main"); //$NON-NLS-1$
 
 		try {

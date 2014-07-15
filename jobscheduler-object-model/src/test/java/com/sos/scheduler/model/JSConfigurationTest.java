@@ -26,20 +26,14 @@ package com.sos.scheduler.model;
 *
 * Created on 02.03.2011 10:38:02
  */
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.sos.JSHelper.Logging.Log4JHelper;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 import com.sos.scheduler.model.objects.Spooler;
+import org.apache.log4j.Logger;
+import org.junit.*;
 
 /**
  * @author oh
@@ -49,8 +43,6 @@ public class JSConfigurationTest {
 	@SuppressWarnings("unused")
 	private final String					conClassName			= "JSConfigurationTest";
 	private static Logger					logger					= Logger.getLogger(JSConfigurationTest.class);
-	@SuppressWarnings("unused")
-	private static Log4JHelper				objLogger				= null;
 	private static SchedulerObjectFactory	objFactory				= null;
 	private ISOSVFSHandler					objVFS					= null;
 	private ISOSVfsFileTransfer				objFileSystemHandler	= null;
@@ -71,8 +63,6 @@ public class JSConfigurationTest {
 	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		// objLogger = new Log4JHelper("./log4j.properties");
-		logger = Logger.getRootLogger();
 		logger.debug("test start");
 		objFactory = new SchedulerObjectFactory("8of9.sos", 4210);
 		objFactory.initMarshaller(Spooler.class);

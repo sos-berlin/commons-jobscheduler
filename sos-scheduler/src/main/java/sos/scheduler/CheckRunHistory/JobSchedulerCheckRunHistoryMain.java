@@ -1,13 +1,11 @@
 package sos.scheduler.CheckRunHistory;
 
-import java.util.Locale;
-
-import org.apache.log4j.Logger;
-
 import com.sos.JSHelper.Basics.JSToolBox;
-import com.sos.JSHelper.Logging.Log4JHelper;
 import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.localization.Messages;
+import org.apache.log4j.Logger;
+
+import java.util.Locale;
 
 /**
  * \class 		JobSchedulerCheckRunHistoryMain - Main-Class for "Check the last job run"
@@ -28,8 +26,6 @@ import com.sos.localization.Messages;
 public class JobSchedulerCheckRunHistoryMain extends JSToolBox {
 	private final static String						conClassName	= "JobSchedulerCheckRunHistoryMain";						//$NON-NLS-1$
 	private static Logger							logger			= Logger.getLogger(JobSchedulerCheckRunHistoryMain.class);
-	@SuppressWarnings("unused")
-	private static Log4JHelper						objLogger		= null;
 	private static Messages Messages = null;
 
 	protected JobSchedulerCheckRunHistoryOptions	objOptions		= null;
@@ -50,9 +46,6 @@ public class JobSchedulerCheckRunHistoryMain extends JSToolBox {
 		final String conMethodName = conClassName + "::Main"; //$NON-NLS-1$
 		Messages = new Messages("com_sos_scheduler_messages", Locale.getDefault());
 
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
-
-		logger = Logger.getRootLogger();
 		logger.info("JobSchedulerCheckRunHistory - Main"); //$NON-NLS-1$
 
 		try {

@@ -1,13 +1,8 @@
 package com.sos.scheduler.model.xmldoc;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.GregorianCalendar;
+import com.sos.JSHelper.io.Files.JSXMLFile;
+import org.apache.log4j.Logger;
+import org.junit.*;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -20,16 +15,12 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.GregorianCalendar;
 
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import com.sos.JSHelper.Logging.Log4JHelper;
-import com.sos.JSHelper.io.Files.JSXMLFile;
+import static org.junit.Assert.*;
 
 /**
 * \class DescriptionTest 
@@ -70,8 +61,6 @@ public class DescriptionTest {
 	private final String		testFilename		= "junit/com/sos/scheduler/model/xmldoc/JobSchedulerCanWrite.xml";
 
 	private static Logger		logger				= Logger.getLogger(TestLoadSchedulerXmlDoc.class);
-	@SuppressWarnings("unused")
-	private static Log4JHelper	objLogger			= null;
 	private File				documentationFile	= null;
 
 	static JAXBContext			context				= null;
@@ -113,9 +102,7 @@ public class DescriptionTest {
 
 		logger = Logger.getRootLogger();
 		logger.debug("test start");
-		objLogger = new Log4JHelper("./log4j.properties");
 
-		logger = Logger.getRootLogger();
 		documentationFile = new File(testFilename);
 
 		context = JAXBContext.newInstance(Description.class);
@@ -173,7 +160,7 @@ public class DescriptionTest {
 		assertEquals("Job.Script.Language must be java", "java", str);
 
 		str = description.getJob().getScript().getResource();
-		assertEquals("Job.Script.Resource must be 1", "1", str);
+		assertEquals("Job.Script.SOSResource must be 1", "1", str);
 
 		str = description.getJob().getMonitor().getScript().getComClass();
 		assertNull("Job.Monitor.Script.ComClass must be myComClass", str);
@@ -185,7 +172,7 @@ public class DescriptionTest {
 		assertEquals("Job.Monitor.Script must be java", "java", str);
 
 		str = description.getJob().getMonitor().getScript().getResource();
-		assertEquals("Job.Monitor.Script.Resource must be myResource", "myResource", str);
+		assertEquals("Job.Monitor.Script.SOSResource must be myResource", "myResource", str);
 
 		Description.Job.Process proc = description.getJob().getProcess();
 		assertNull("Job.Process.File must be NULL", proc);
@@ -264,7 +251,7 @@ public class DescriptionTest {
 		assertEquals("Job.Script.Language must be myJava", "myJava", str);
 
 		str = description.getJob().getScript().getResource();
-		assertEquals("Job.Script.Resource must be myResource", "myResource", str);
+		assertEquals("Job.Script.SOSResource must be myResource", "myResource", str);
 
 		str = description.getJob().getMonitor().getScript().getComClass();
 		assertEquals("Job.Script.ComClass must be myComClass", "myComClass", str);
@@ -276,7 +263,7 @@ public class DescriptionTest {
 		assertEquals("Job.Script.Language must be myJava", "myJava", str);
 
 		str = description.getJob().getMonitor().getScript().getResource();
-		assertEquals("Job.Script.Resource must be myResource", "myResource", str);
+		assertEquals("Job.Script.SOSResource must be myResource", "myResource", str);
 
 		str = description.getJob().getProcess().getFile();
 		assertEquals("Job.Process.File must be myFile", "myFile", str);
@@ -512,13 +499,13 @@ public class DescriptionTest {
 		if (o.getClass().getName().equals("com.sos.scheduler.model.xmldoc.Description$Resources$File")) {
 			Description.Resources.File f = (Description.Resources.File) o;
 			str = f.getFile();
-			assertEquals("Resource.File.file must be sos.util.jar", "sos.util.jar", str);
+			assertEquals("SOSResource.File.file must be sos.util.jar", "sos.util.jar", str);
 			str = f.getId();
-			assertEquals("Resource.File.Id must be 3", "3", str);
+			assertEquals("SOSResource.File.Id must be 3", "3", str);
 			str = f.getOs();
-			assertEquals("Resource.File.os must be all", "all", str);
+			assertEquals("SOSResource.File.os must be all", "all", str);
 			str = f.getType();
-			assertEquals("Resource.File.type must be java", "java", str);
+			assertEquals("SOSResource.File.type must be java", "java", str);
 			ArrayList<Note> list_note = (ArrayList<Note>) f.getNote();
 			for (int ii = 1; ii < 2; ii++) {
 				Note n = list_note.get(ii);
@@ -585,13 +572,13 @@ public class DescriptionTest {
 		if (o.getClass().getName().equals("com.sos.scheduler.model.xmldoc.Description$Resources$File")) {
 			Description.Resources.File f = (Description.Resources.File) o;
 			str = f.getFile();
-			assertEquals("Resource.File.file must be myNewFile", "myNewFile", str);
+			assertEquals("SOSResource.File.file must be myNewFile", "myNewFile", str);
 			str = f.getId();
-			assertEquals("Resource.File.Id must be myNewId", "myNewId", str);
+			assertEquals("SOSResource.File.Id must be myNewId", "myNewId", str);
 			str = f.getOs();
-			assertEquals("Resource.File.os must be myNewOs", "myNewOs", str);
+			assertEquals("SOSResource.File.os must be myNewOs", "myNewOs", str);
 			str = f.getType();
-			assertEquals("Resource.File.type must be myNewType", "myNewType", str);
+			assertEquals("SOSResource.File.type must be myNewType", "myNewType", str);
 			ArrayList<Note> list_note = (ArrayList<Note>) f.getNote();
 		}
 	}

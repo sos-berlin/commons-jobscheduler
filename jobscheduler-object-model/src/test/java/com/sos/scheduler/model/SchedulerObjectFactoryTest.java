@@ -24,8 +24,36 @@ package com.sos.scheduler.model;
 * Created on 20.01.2011 11:31:54
  */
 
-import static org.junit.Assert.fail;
+import com.sos.JSHelper.Basics.JSToolBox;
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.JSHelper.Options.SOSOptionJSTransferMethod.enuJSTransferModes;
+import com.sos.scheduler.model.SchedulerObjectFactory.enu4What;
+import com.sos.scheduler.model.answers.*;
+import com.sos.scheduler.model.answers.Job;
+import com.sos.scheduler.model.answers.JobChain;
+import com.sos.scheduler.model.answers.JobChains;
+import com.sos.scheduler.model.answers.Jobs;
+import com.sos.scheduler.model.answers.Order;
+import com.sos.scheduler.model.answers.Period;
+import com.sos.scheduler.model.answers.ProcessClass;
+import com.sos.scheduler.model.answers.ProcessClasses;
+import com.sos.scheduler.model.commands.*;
+import com.sos.scheduler.model.exceptions.JSCommandErrorException;
+import com.sos.scheduler.model.exceptions.JSCommandOKException;
+import com.sos.scheduler.model.objects.Include;
+import com.sos.scheduler.model.objects.*;
+import com.sos.scheduler.model.objects.Job.Description;
+import com.sos.scheduler.model.objects.Spooler;
+import org.apache.log4j.Logger;
+import org.junit.*;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.soap.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -37,84 +65,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.Name;
-import javax.xml.soap.SOAPBody;
-import javax.xml.soap.SOAPBodyElement;
-import javax.xml.soap.SOAPConnection;
-import javax.xml.soap.SOAPConnectionFactory;
-import javax.xml.soap.SOAPElement;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPFactory;
-import javax.xml.soap.SOAPHeader;
-import javax.xml.soap.SOAPMessage;
-
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
-import com.sos.JSHelper.Basics.JSToolBox;
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.JSHelper.Logging.Log4JHelper;
-import com.sos.JSHelper.Options.SOSOptionJSTransferMethod.enuJSTransferModes;
-import com.sos.scheduler.model.SchedulerObjectFactory.enu4What;
-import com.sos.scheduler.model.answers.Answer;
-import com.sos.scheduler.model.answers.At;
-import com.sos.scheduler.model.answers.Calendar;
-import com.sos.scheduler.model.answers.ERROR;
-import com.sos.scheduler.model.answers.FileBased;
-import com.sos.scheduler.model.answers.Folder;
-import com.sos.scheduler.model.answers.Folders;
-import com.sos.scheduler.model.answers.HistoryEntry;
-import com.sos.scheduler.model.answers.JSCmdBase;
-import com.sos.scheduler.model.answers.Job;
-import com.sos.scheduler.model.answers.JobChain;
-import com.sos.scheduler.model.answers.JobChains;
-import com.sos.scheduler.model.answers.Jobs;
-import com.sos.scheduler.model.answers.Log;
-import com.sos.scheduler.model.answers.Order;
-import com.sos.scheduler.model.answers.Orders;
-import com.sos.scheduler.model.answers.Period;
-import com.sos.scheduler.model.answers.ProcessClass;
-import com.sos.scheduler.model.answers.ProcessClasses;
-import com.sos.scheduler.model.answers.State;
-import com.sos.scheduler.model.answers.Task;
-import com.sos.scheduler.model.commands.JSCmdAddJobs;
-import com.sos.scheduler.model.commands.JSCmdAddOrder;
-import com.sos.scheduler.model.commands.JSCmdJobChainModify;
-import com.sos.scheduler.model.commands.JSCmdKillTask;
-import com.sos.scheduler.model.commands.JSCmdModifyJob;
-import com.sos.scheduler.model.commands.JSCmdModifyOrder;
-import com.sos.scheduler.model.commands.JSCmdModifySpooler;
-import com.sos.scheduler.model.commands.JSCmdShowCalendar;
-import com.sos.scheduler.model.commands.JSCmdShowHistory;
-import com.sos.scheduler.model.commands.JSCmdShowJob;
-import com.sos.scheduler.model.commands.JSCmdShowJobChain;
-import com.sos.scheduler.model.commands.JSCmdShowJobs;
-import com.sos.scheduler.model.commands.JSCmdShowState;
-import com.sos.scheduler.model.commands.JSCmdShowTask;
-import com.sos.scheduler.model.commands.JSCmdStartJob;
-import com.sos.scheduler.model.commands.JSCmdSubsystemShow;
-import com.sos.scheduler.model.exceptions.JSCommandErrorException;
-import com.sos.scheduler.model.exceptions.JSCommandOKException;
-import com.sos.scheduler.model.objects.Include;
-import com.sos.scheduler.model.objects.JSObjJob;
-import com.sos.scheduler.model.objects.JSObjScript;
-import com.sos.scheduler.model.objects.Job.Description;
-import com.sos.scheduler.model.objects.Params;
-import com.sos.scheduler.model.objects.Script;
-import com.sos.scheduler.model.objects.Spooler;
-import com.sos.scheduler.model.objects.XmlPayload;
+import static org.junit.Assert.fail;
 
 /**
  * @author KB
@@ -123,8 +74,6 @@ import com.sos.scheduler.model.objects.XmlPayload;
 public class SchedulerObjectFactoryTest extends JSToolBox {
 	private final String					conClassName				= "SchedulerObjectFactoryTest";
 	private static Logger					logger						= Logger.getLogger(SchedulerObjectFactoryTest.class);
-	@SuppressWarnings("unused")
-	private static Log4JHelper				objLogger					= null;
 	private static SchedulerObjectFactory	objSchedulerObjectFactory	= null;
 
 	public SchedulerObjectFactoryTest() {
@@ -144,8 +93,6 @@ public class SchedulerObjectFactoryTest extends JSToolBox {
 	@BeforeClass
 	// ! [setUpBeforeClass]
 	public static void setUpBeforeClass() throws Exception {
-		objLogger = new Log4JHelper("./log4j.properties");
-		logger = Logger.getRootLogger();
 		logger.debug("test start");
 		//objSchedulerObjectFactory = new SchedulerObjectFactory("ur.sos", 4139);
 		// objSchedulerObjectFactory = new SchedulerObjectFactory("8of9.sos", 4844);

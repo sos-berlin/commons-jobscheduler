@@ -1,11 +1,9 @@
 package sos.net.ssh;
 
-import java.util.HashMap;
-
+import com.sos.i18n.annotation.I18NResourceBundle;
 import org.apache.log4j.Logger;
 
-import com.sos.JSHelper.Logging.Log4JHelper;
-import com.sos.i18n.annotation.I18NResourceBundle;
+import java.util.HashMap;
 
 /**
  * \class SOSSSHJob2Main - Start a Script using SSH
@@ -37,9 +35,7 @@ public class SOSSSHJob2Main {
 
 	private final static String	conClassName	= "SOSSSHJob2Main";
 
-	private static Logger		logger			= null;
-	@SuppressWarnings("unused")
-	private static Log4JHelper	objLogger		= null;
+	private static Logger		logger			= Logger.getLogger(SOSSSHJob2Main.class);
 
 	/**
 	 * 
@@ -56,10 +52,6 @@ public class SOSSSHJob2Main {
 
 		final String conMethodName = conClassName + "::Main"; //$NON-NLS-1$
 
-		// TODO über eine Option steuern. Die auch in die Standard-Option-Class aufnehmen
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
-
-		logger = Logger.getRootLogger();
 		logger.info("SOSSSHJob2 - Main"); //$NON-NLS-1$
 		logger.info("User-Dir : " + System.getProperty("user.dir"));   //$NON-NLS-1$
 

@@ -2,10 +2,8 @@
 
 package sos.scheduler.db;
 
-import org.apache.log4j.Logger;
-
 import com.sos.JSHelper.Basics.JSToolBox;
-import com.sos.JSHelper.Logging.Log4JHelper;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -26,8 +24,6 @@ import com.sos.JSHelper.Logging.Log4JHelper;
 public class SOSSQLPlusJobMain extends JSToolBox {
 	private final static String					conClassName						= "SOSSQLPlusJobMain"; //$NON-NLS-1$
 	private static Logger		logger			= Logger.getLogger(SOSSQLPlusJobMain.class);
-	@SuppressWarnings("unused")
-	private static Log4JHelper	objLogger		= null;
 
 	protected SOSSQLPlusJobOptions	objOptions			= null;
 
@@ -46,9 +42,6 @@ public class SOSSQLPlusJobMain extends JSToolBox {
 
 		final String conMethodName = conClassName + "::Main"; //$NON-NLS-1$
 
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
-
-		logger = Logger.getRootLogger();
 		logger.info("SOSSQLPlusJob - Main"); //$NON-NLS-1$
 
 		try {

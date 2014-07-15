@@ -1,45 +1,25 @@
 package sos.scheduler.cron;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.StringWriter;
+import com.sos.JSHelper.Basics.JSToolBox;
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import org.apache.commons.cli.*;
+import org.apache.log4j.Logger;
+import org.apache.xml.serialize.OutputFormat;
+import org.apache.xml.serialize.XMLSerializer;
+import org.w3c.dom.*;
+import sos.util.SOSDate;
+import sos.util.SOSLogger;
+import sos.util.SOSStandardLogger;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.Options;
-import org.apache.log4j.Logger;
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.XMLSerializer;
-import org.w3c.dom.Comment;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
-import sos.util.SOSDate;
-import sos.util.SOSLogger;
-import sos.util.SOSStandardLogger;
-
-import com.sos.JSHelper.Basics.JSToolBox;
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.JSHelper.Logging.Log4JHelper;
 
 /**
  * This Class converts a crontab file to a JobScheduler XML Configuration
@@ -211,11 +191,6 @@ public class CrontabFileConverter extends JSToolBox {
 	public static void main(final String[] args) {
 
 		Logger logger = Logger.getLogger(CrontabFileConverter.class);
-		@SuppressWarnings("unused")
-		Log4JHelper objLogger = null;
-
-		objLogger = new Log4JHelper(null);
-
 		logger = Logger.getRootLogger();
 		logger.info("SOS CronConverter - Main"); //$NON-NLS-1$
 

@@ -2,18 +2,12 @@
 
 package sos.scheduler.db;
 
-import java.util.HashMap;
-
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.Listener.JSListenerClass;
-import com.sos.JSHelper.Logging.Log4JHelper;
+import org.apache.log4j.Logger;
+import org.junit.*;
+
+import java.util.HashMap;
 
 /**
  * \class 		JobSchedulerPLSQLJobJUnitTest - JUnit-Test for "Launch Database Statement"
@@ -33,8 +27,6 @@ public class JobSchedulerPLSQLJobJUnitTest extends JSToolBox {
 	private final static String					conClassName						= "JobSchedulerPLSQLJobJUnitTest"; //$NON-NLS-1$
 	@SuppressWarnings("unused")	 
 	private static Logger		logger			= Logger.getLogger(JobSchedulerPLSQLJobJUnitTest.class);
-	@SuppressWarnings("unused")	 
-	private static Log4JHelper	objLogger		= null;
 
 	protected JobSchedulerPLSQLJobOptions	objOptions			= null;
 	private JobSchedulerPLSQLJob objE = null;
@@ -54,7 +46,6 @@ public class JobSchedulerPLSQLJobJUnitTest extends JSToolBox {
 
 	@Before
 	public void setUp() throws Exception {
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
 		objE = new JobSchedulerPLSQLJob();
 		objE.registerMessageListener(this);
 		objOptions = objE.Options();

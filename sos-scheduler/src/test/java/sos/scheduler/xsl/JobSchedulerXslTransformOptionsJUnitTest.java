@@ -2,18 +2,12 @@
 
 package sos.scheduler.xsl;
 
-import static org.junit.Assert.assertEquals;
-
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.Listener.JSListenerClass;
-import com.sos.JSHelper.Logging.Log4JHelper;
+import org.apache.log4j.Logger;
+import org.junit.*;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * \class 		JobSchedulerXslTransformOptionsJUnitTest - JobSchedulerXslTransform
@@ -45,8 +39,6 @@ public class JobSchedulerXslTransformOptionsJUnitTest extends  JSToolBox {
 	private final String					conClassName						= "JobSchedulerXslTransformOptionsJUnitTest"; //$NON-NLS-1$
 		@SuppressWarnings("unused") //$NON-NLS-1$
 	private static Logger		logger			= Logger.getLogger(JobSchedulerXslTransformOptionsJUnitTest.class);
-	@SuppressWarnings("unused")
-	private static Log4JHelper	objLogger		= null;
 	private JobSchedulerXslTransform objE = null;
 
 	protected JobSchedulerXslTransformOptions	objOptions			= null;
@@ -65,7 +57,6 @@ public class JobSchedulerXslTransformOptionsJUnitTest extends  JSToolBox {
 
 	@Before
 	public void setUp() throws Exception {
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
 		objE = new JobSchedulerXslTransform();
 		objE.registerMessageListener(this);
 		objOptions = objE.Options();

@@ -1,16 +1,16 @@
 package com.sos.scheduler.model;
 
-import static org.junit.Assert.assertEquals;
+import com.sos.scheduler.model.objects.JSObjOrder;
+import org.apache.log4j.Logger;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
-import org.apache.log4j.Logger;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import com.sos.JSHelper.Logging.Log4JHelper;
-import com.sos.scheduler.model.objects.JSObjOrder;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * \file LiveConnectorTest.java
@@ -42,9 +42,7 @@ public class LiveConnectorTest extends TestBase {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		new Log4JHelper("./log4j.properties");
 		factory = new SchedulerObjectFactory();
-
 		expected.add(liveFolder + "chain,order1.order.xml");
 		expected.add(liveFolder + "folder1/chain,order1.order.xml");
 		expected.add(liveFolder + "folder2/chain,order1.order.xml");

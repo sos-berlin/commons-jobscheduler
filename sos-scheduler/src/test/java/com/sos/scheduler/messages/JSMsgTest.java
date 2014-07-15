@@ -1,19 +1,12 @@
 package com.sos.scheduler.messages;
 
-import static com.sos.scheduler.messages.JSMessages.JSJ_D_0032;
-import static com.sos.scheduler.messages.JSMessages.JSJ_I_110;
-
+import com.sos.localization.SOSMsg;
 import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
+import org.junit.*;
 import sos.scheduler.CheckRunHistory.JobSchedulerCheckRunHistoryJUnitTest;
 
-import com.sos.JSHelper.Logging.Log4JHelper;
-import com.sos.localization.SOSMsg;
+import static com.sos.scheduler.messages.JSMessages.JSJ_D_0032;
+import static com.sos.scheduler.messages.JSMessages.JSJ_I_110;
 
 public class JSMsgTest {
 
@@ -21,8 +14,6 @@ public class JSMsgTest {
 	private final static String						conClassName	= "JobSchedulerCheckRunHistoryJUnitTest";						//$NON-NLS-1$
 	@SuppressWarnings("unused")
 	private static Logger							logger			= Logger.getLogger(JobSchedulerCheckRunHistoryJUnitTest.class);
-	@SuppressWarnings("unused")
-	private static Log4JHelper						objLogger		= null;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -34,7 +25,6 @@ public class JSMsgTest {
 
 	@Before
 	public void setUp() throws Exception {
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
 		SOSMsg.flgShowFullMessageText = true;
 	}
 

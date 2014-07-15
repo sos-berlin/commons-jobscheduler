@@ -4,7 +4,6 @@ package sos.scheduler.misc;
 
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.Listener.JSListenerClass;
-import com.sos.JSHelper.Logging.Log4JHelper;
 import org.apache.log4j.Logger;
 import org.junit.*;
 
@@ -40,8 +39,6 @@ public class CopyJob2OrderParameterOptionsJUnitTest extends  JSToolBox {
 	private final String					conClassName						= "CopyJob2OrderParameterOptionsJUnitTest"; //$NON-NLS-1$
 		@SuppressWarnings("unused") //$NON-NLS-1$
 	private static Logger		logger			= Logger.getLogger(CopyJob2OrderParameterOptionsJUnitTest.class);
-	@SuppressWarnings("unused")
-	private static Log4JHelper	objLogger		= null;
 	private CopyJob2OrderParameter objE = null;
 
 	protected CopyJob2OrderParameterOptions	objOptions			= null;
@@ -60,7 +57,6 @@ public class CopyJob2OrderParameterOptionsJUnitTest extends  JSToolBox {
 
 	@Before
 	public void setUp() throws Exception {
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
 		objE = new CopyJob2OrderParameter();
 		objE.registerMessageListener(this);
 		objOptions = objE.Options();

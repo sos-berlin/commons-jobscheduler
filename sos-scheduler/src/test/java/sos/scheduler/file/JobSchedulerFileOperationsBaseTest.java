@@ -25,25 +25,16 @@ package sos.scheduler.file;
 * Created on 01.08.2011 13:23:09
  */
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import com.sos.JSHelper.io.Files.JSFile;
+import org.apache.log4j.Logger;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import sos.scheduler.job.JobSchedulerJobAdapter;
 
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import sos.scheduler.job.JobSchedulerJobAdapter;
-
-import com.sos.JSHelper.Logging.Log4JHelper;
-import com.sos.JSHelper.io.Files.JSFile;
+import static org.junit.Assert.*;
 
 
 /**
@@ -56,7 +47,6 @@ public class JobSchedulerFileOperationsBaseTest {
 	private final String							conClassName	= "JobSchedulerFileOperationsBaseTest";
 	private static final String						conSVNVersion	= "$Id$";
 	private static final Logger						logger			= Logger.getLogger(JobSchedulerFileOperationsBaseTest.class);
-	private static Log4JHelper	objLogger				= null;
 	private static final String 					strTestDataDir 	= "R:/nobackup/junittests/testdata/JobSchedulerFileOperationsBase";
 
 	private static JobSchedulerFileOperationBase	objFOP			= null;
@@ -80,49 +70,6 @@ public class JobSchedulerFileOperationsBaseTest {
 		objFOP = new JobSchedulerFileOperationBase();
 		params.put("boolean", "true");
 		objFOP.setParams(params);
-	}
-
-	/**
-	 * \brief tearDownAfterClass
-	 *
-	 * \details
-	 *
-	 * \return void
-	 *
-	 * @throws java.lang.Exception
-	 */
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
-
-	/**
-	 * \brief setUp
-	 *
-	 * \details
-	 *
-	 * \return void
-	 *
-	 * @throws java.lang.Exception
-	 */
-	@Before
-	public void setUp() throws Exception {
-		Log4JHelper.flgUseJobSchedulerLog4JAppender = false;
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
-		objLogger.setLevel(Level.DEBUG);
-
-	}
-
-	/**
-	 * \brief tearDown
-	 *
-	 * \details
-	 *
-	 * \return void
-	 *
-	 * @throws java.lang.Exception
-	 */
-	@After
-	public void tearDown() throws Exception {
 	}
 
 	/**

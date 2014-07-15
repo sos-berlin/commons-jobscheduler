@@ -1,29 +1,21 @@
 package com.sos.scheduler.model.test;
 
-import java.io.File;
-import java.math.BigInteger;
-
-import org.apache.log4j.Logger;
-
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.JSHelper.Logging.Log4JHelper;
 import com.sos.JSHelper.io.Files.JSXMLFile;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.answers.At;
 import com.sos.scheduler.model.answers.Calendar;
 import com.sos.scheduler.model.answers.Period;
 import com.sos.scheduler.model.answers.Task;
-import com.sos.scheduler.model.commands.JSCmdShowCalendar;
-import com.sos.scheduler.model.commands.JSCmdShowHistory;
-import com.sos.scheduler.model.commands.JSCmdShowJob;
-import com.sos.scheduler.model.commands.JSCmdShowJobs;
-import com.sos.scheduler.model.commands.JSCmdShowState;
-import com.sos.scheduler.model.commands.JSCmdShowTask;
-import com.sos.scheduler.model.commands.JSCmdStartJob;
+import com.sos.scheduler.model.commands.*;
 import com.sos.scheduler.model.objects.Job;
 import com.sos.scheduler.model.objects.ProcessClass;
 import com.sos.scheduler.model.objects.Spooler;
 import com.sos.scheduler.model.objects.Spooler.Config;
+import org.apache.log4j.Logger;
+
+import java.io.File;
+import java.math.BigInteger;
 
 /**
 * \class TestLoadSchedulerXML
@@ -61,8 +53,6 @@ public class TestLoadSchedulerXML implements Runnable {
 
 	private final String		conClassName	= "TestLoadSchedulerXML";
 	private static Logger		logger			= Logger.getLogger(TestLoadSchedulerXML.class);
-	@SuppressWarnings("unused")
-	private static Log4JHelper	objLogger		= null;
 
 	TestLoadSchedulerXML() {
 	}
@@ -75,9 +65,6 @@ public class TestLoadSchedulerXML implements Runnable {
 
 		try {
 
-			objLogger = new Log4JHelper("./log4j.properties");
-
-			logger = Logger.getRootLogger();
 			logger.debug("test start");
 			SchedulerObjectFactory objFactory = new SchedulerObjectFactory("localhost", 4444);
 			objFactory.initMarshaller(Spooler.class);

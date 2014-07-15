@@ -1,22 +1,17 @@
 package sos.scheduler.file;
 
+import com.sos.JSHelper.Basics.JSToolBox;
+import com.sos.JSHelper.io.Files.JSFile;
+import org.apache.log4j.Logger;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Vector;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.sos.JSHelper.Basics.JSToolBox;
-import com.sos.JSHelper.Logging.Log4JHelper;
-import com.sos.JSHelper.io.Files.JSFile;
 
 /**
 * \class ExistsFileTest
@@ -49,27 +44,16 @@ public class ExistsFileTest extends JSToolBox {
 	@SuppressWarnings("unused")
 	private final String		conClassName	= "ExistsFileTest";
 	private static final Logger	logger			= Logger.getLogger(ExistsFileTest.class);
-	private static Log4JHelper	objLogger		= null;
 
 	public ExistsFileTest() {
 		//
 	}
 
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
 
 	@Before
 	public void setUp() throws Exception {
 		String strLog4JFileName = "./log4j.properties";
 		String strT = new File(strLog4JFileName).getAbsolutePath();
-		objLogger = new Log4JHelper(strLog4JFileName);
-		objLogger.setLevel(Level.DEBUG);
-		// objLogger.setLevel(Level.INFO);
 		logger.info("log4j properties filename = " + strT);
 	}
 

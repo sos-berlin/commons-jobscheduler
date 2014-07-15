@@ -1,24 +1,16 @@
 package sos.net.ssh;
-import static org.junit.Assert.assertEquals;
+import com.sos.JSHelper.Basics.JSJobUtilities;
+import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
+import com.sos.JSHelper.Listener.JSListenerClass;
+import com.sos.JSHelper.io.Files.JSTextFile;
+import com.sos.i18n.annotation.I18NResourceBundle;
+import org.apache.log4j.Logger;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import com.sos.JSHelper.Basics.JSJobUtilities;
-import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
-import com.sos.JSHelper.Listener.JSListenerClass;
-import com.sos.JSHelper.Logging.Log4JHelper;
-import com.sos.JSHelper.io.Files.JSTextFile;
-import com.sos.i18n.Msg;
-import com.sos.i18n.Msg.BundleBaseName;
-import com.sos.i18n.annotation.I18NResourceBundle;
+import static org.junit.Assert.assertEquals;
 
 /**
 * \class SOSSSHJob2Test
@@ -51,32 +43,9 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 	@SuppressWarnings({ "hiding" })
 	private static final Logger	logger			= Logger.getLogger(SOSSSHJob2Test.class);
-	private final String		conClassName	= "SOSSSHJob2Test";
-	@SuppressWarnings("unused")
-	private static Log4JHelper	objLogger		= null;
-
-	protected Msg				objMsg			= new Msg(new BundleBaseName(this.getClass().getAnnotation(I18NResourceBundle.class).baseName()));
 
 	public SOSSSHJob2Test() {
 		super(new SOSSSHJobOptions());
-	}
-
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
-
-	@Before
-	public void setUp() throws Exception {
-		// TODO über eine Option steuern. Die auch in die Standard-Option-Class aufnehmen
-		objLogger = new Log4JHelper("./log4j.properties"); //$NON-NLS-1$
-	}
-
-	@After
-	public void tearDown() throws Exception {
 	}
 
 	@Test
