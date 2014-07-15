@@ -1058,7 +1058,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 				objFTPFile = ftpFiles[0];
 			}
 			else {
-				throw new JobSchedulerException(SOSVfs_E_226.params(strFileName));
+//				throw new JobSchedulerException(SOSVfs_E_226.params(strFileName));
 			}
 		}
 		catch (Exception e) {
@@ -1345,16 +1345,17 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 	@Override public void mkdir(final String pstrPathName) {
 		final String conMethodName = conClassName + "::mkdir";
 		try {
-			if (newFolders.get(pstrPathName) == null) { // avoid servers-calls by checking the list of already created folders first
+			SOSOptionFolderName objF = new SOSOptionFolderName(pstrPathName);
+			String strAP = objF.getAdjustedValue();
+			if (newFolders.get(strAP) == null) { // avoid servers-calls by checking the list of already created folders first
 				String strCurrFolderName = getCurrentPath();
-				SOSOptionFolderName objF = new SOSOptionFolderName(pstrPathName);
 				if (objF.isAbsolutPath() == true) {
 					cd("/");
 				}
 				for (String strSubFolder : objF.getSubFolderArray()) {
 					checkAndCreateSubFolder(strSubFolder);
 				}
-				newFolders.put(pstrPathName, "added");
+				newFolders.put(strAP, pstrPathName);
 				cd(strCurrFolderName);
 			}
 			// logger.debug(HostID("..ftp server reply [mkdir] [" + pstrPathName + "]: " + getReplyString()));
@@ -1374,7 +1375,14 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 		private String	strLook4FileName	= "";
 
 		@Override public boolean accept(final FTPFile ftpFile) {
-			return ftpFile.isDirectory() && ftpFile.getName().equalsIgnoreCase(strLook4FileName);
+			boolean flgR = false;
+			if (ftpFile != null && ftpFile.isDirectory()) {
+				String strName = ftpFile.getName();
+				if (strName != null) {
+					flgR = strName.equalsIgnoreCase(strLook4FileName);
+				}
+			}
+			return flgR;
 		}
 
 		public void setLook4FileName(final String pstrLook4FileName) {
@@ -1388,28 +1396,32 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 		SOSOptionFolderName objF = new SOSOptionFolderName(pstrPathName);
 		String strPath = objF.getName();
 		try {
-			String strParent = objF.getParentFolderName();
-			objFilter4Directory.setLook4FileName(strPath);
-			FTPFile[] listFiles = Client().listFiles(strParent, objFilter4Directory);
-			if (listFiles != null && listFiles.length > 0) { // assert: if the folder is empty we expect an empty "listFiles" with length == 0, but not listFiles == null
-				for (FTPFile ftpFile : listFiles) {
-					if (ftpFile.isDirectory()) { // what if: SYMBOLIC_LINK_TYPE? can be file or folder? how to recognize it?
-						cd(ftpFile);
-					}
-					else {
-						// Exception, item is not a folder
-						throw new JobSchedulerException(String.format("Can not create Directory '%1$s', because it is an existing single file", pstrPathName));
+			if (newFolders.get(pstrPathName) == null) { // avoid servers-calls by checking the list of already created folders first
+				String strParent = objF.getParentFolderName();
+				objFilter4Directory.setLook4FileName(strPath);
+				FTPFile[] listFiles = Client().listFiles(strParent, objFilter4Directory);
+				if (listFiles != null && listFiles.length > 0) { // assert: if the folder is empty we expect an empty "listFiles" with length == 0, but not listFiles == null
+					for (FTPFile ftpFile : listFiles) {
+						if (ftpFile.isDirectory()) { // what if: SYMBOLIC_LINK_TYPE? can be file or folder? how to recognize it?
+							cd(ftpFile);
+						}
+						else {
+							// Exception, item is not a folder
+							throw new JobSchedulerException(String.format("Can not create Directory '%1$s', because it is an existing single file",
+									pstrPathName));
+						}
 					}
 				}
-			}
-			else { // folder not found, create the folder and go to the directory in case there are more folders to crete there
-				logger.debug(HostID(SOSVfs_D_179.params("mkdir", strPath)));
-				Client().makeDirectory(strPath);
-				String strT = getReplyString();
-				onErrorRaiseException(HostID(SOSVfs_E_0106.params(conMethodName, strPath, strT)),
-						String.format("Can not create Directory '%1$s', because '%2$s'.", strPath, strT));
-				cd(strPath);
-				noOfFoldersCreated++;
+				else { // folder not found, create the folder and go to the directory in case there are more folders to crete there
+					logger.debug(HostID(SOSVfs_D_179.params("mkdir", strPath)));
+					Client().makeDirectory(strPath);
+					newFolders.put(pstrPathName, "added");
+					String strT = getReplyString();
+					onErrorRaiseException(HostID(SOSVfs_E_0106.params(conMethodName, strPath, strT)),
+							String.format("Can not create Directory '%1$s', because '%2$s'.", strPath, strT));
+					cd(strPath);
+					noOfFoldersCreated++;
+				}
 			}
 		}
 		catch (IOException e) {
