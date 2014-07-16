@@ -229,6 +229,14 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 		return strParent;
 	}
 
+	public String getAdjustedValue () {
+		String strRet = strValue.replaceAll("//", "/");
+		strRet = strRet.replaceAll("\\\\\\\\", "\\");
+		if (strRet.endsWith("/") == false) {
+			strRet += "/";
+		}
+		return strRet;
+	}
 	public boolean hasSubFolders() {
 		boolean flgRet = false;
 		flgRet = strValue.contains("/") || strValue.contains("\\");
