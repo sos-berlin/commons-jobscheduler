@@ -1423,6 +1423,9 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 					noOfFoldersCreated++;
 				}
 			}
+			else {
+				cd(strPath);
+			}
 		}
 		catch (IOException e) {
 			throw new JobSchedulerException(e);
