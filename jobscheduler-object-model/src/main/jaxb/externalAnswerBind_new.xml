@@ -1,0 +1,39 @@
+<jxb:bindings
+  xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+  jxb:version="2.1" 
+  xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" 
+  jxb:extensionBindingPrefixes="xjc"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  
+  <jxb:bindings schemaLocation="scheduler_answers.xsd" node="/xs:schema"> 
+    
+    <jxb:globalBindings typesafeEnumMemberName = "generateName">
+        <!--jxb:javaType name="int" xmlType="xs:integer"
+            parseMethod="javax.xml.bind.DatatypeConverter.parseInt" 
+          printMethod="javax.xml.bind.DatatypeConverter.printInt" /-->
+    </jxb:globalBindings>    
+    
+    <jxb:schemaBindings>
+        <jxb:package name="com.sos.scheduler.model.answers"/>
+    </jxb:schemaBindings>
+    
+    <jxb:bindings node="//xs:element[@name='job']/xs:complexType/xs:attribute[@name='tasks']">
+                <jxb:property name="num_of_tasks"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='job_chain_node']/xs:complexType/xs:attribute[@name='job']">
+                <jxb:property name="job_path"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='history.entry']/xs:complexType/xs:attribute[@name='error']">
+                <jxb:property name="has_error"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='process_class']/xs:complexType/xs:attribute[@name='processes']">
+                <jxb:property name="num_of_processes"/>
+        </jxb:bindings>
+        <jxb:bindings node="//xs:element[@name='file_based']/xs:complexType/xs:attribute[@name='removed']">
+                <jxb:property name="is_removed"/>
+        </jxb:bindings>
+        
+    
+  </jxb:bindings>
+</jxb:bindings> 
+

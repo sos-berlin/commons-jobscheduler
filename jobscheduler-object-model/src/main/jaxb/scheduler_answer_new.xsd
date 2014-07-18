@@ -1,0 +1,831 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="spooler">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="answer"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="answer">
+    <xs:complexType>
+        <!-- TODO xs:choice is better because e.g. 
+        <commands><show_state/><show_state/></commands>
+        returns two state elements -->
+      <xs:all>
+        <xs:element minOccurs="0" ref="calendar"/>
+        <xs:element minOccurs="0" ref="ERROR"/>
+        <xs:element minOccurs="0" ref="history"/>
+        <xs:element minOccurs="0" ref="job"/>
+        <xs:element minOccurs="0" ref="jobs"/>
+        <xs:element minOccurs="0" ref="job_chain"/>
+        <xs:element minOccurs="0" ref="job_chains"/>
+        <xs:element minOccurs="0" ref="log_categories"/>
+        <xs:element minOccurs="0" ref="ok"/>
+        <xs:element minOccurs="0" ref="order"/>
+        <xs:element minOccurs="0" ref="params"/>
+        <xs:element minOccurs="0" ref="param"/>
+        <xs:element minOccurs="0" ref="state"/>
+        <xs:element minOccurs="0" ref="subsystems"/>
+        <xs:element minOccurs="0" ref="task"/>
+      </xs:all>
+      <xs:attribute name="time" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="calendar">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="at"/>
+        <xs:element ref="period"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="at">
+    <xs:complexType>
+      <xs:attribute name="at" use="required" type="xs:string"/>
+      <xs:attribute name="job" type="xs:string"/>
+      <xs:attribute name="job_chain" type="xs:string"/>
+      <xs:attribute name="order" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="period">
+    <xs:complexType>
+      <xs:attribute name="absolute_repeat" type="xs:integer"/>
+      <xs:attribute name="begin" type="xs:string"/>
+      <xs:attribute name="end" type="xs:string"/>
+      <xs:attribute name="job" type="xs:string"/>
+      <xs:attribute name="job_chain" type="xs:string"/>
+      <!--xs:attribute name="let_run"/-->
+      <xs:attribute name="order" type="xs:string"/>
+      <xs:attribute name="repeat" type="xs:integer"/>
+      <!--xs:attribute name="when_holiday"/-->
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="ERROR">
+    <xs:complexType>
+      <xs:attribute name="code" use="required" type="xs:string"/>
+      <xs:attribute name="text" use="required" type="xs:string"/>
+      <xs:attribute name="time" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="history">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="history.entry"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="history.entry">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="ERROR"/>
+        <xs:element minOccurs="0" ref="log"/>
+      </xs:sequence>
+      <xs:attribute name="cause" use="required" type="xs:string"/>
+      <xs:attribute name="end_time" type="xs:string"/>
+      <xs:attribute name="error" type="xs:integer"/>
+      <xs:attribute name="error_code" type="xs:string"/>
+      <xs:attribute name="error_text" type="xs:string"/>
+      <xs:attribute name="exit_code" type="xs:integer"/>
+      <xs:attribute name="job_name" use="required" type="xs:string"/>
+      <xs:attribute name="pid" use="required" type="xs:integer"/>
+      <xs:attribute name="spooler_id" use="required" type="xs:string"/>
+      <xs:attribute name="start_time" use="required" type="xs:string"/>
+      <xs:attribute name="steps" type="xs:integer"/>
+      <xs:attribute name="task" use="required" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="log">
+    <xs:complexType mixed="true">
+      <xs:attribute name="highest_level" type="xs:string"/>
+      <xs:attribute name="last_error" type="xs:string"/>
+      <xs:attribute name="last_info" type="xs:string"/>
+      <xs:attribute name="last_warning" type="xs:string"/>
+      <xs:attribute name="level" use="required" type="xs:string"/>
+      <xs:attribute name="mail_from" type="xs:string"/>
+      <xs:attribute name="mail_bcc" type="xs:string"/>
+      <xs:attribute name="mail_cc" type="xs:string"/>
+      <xs:attribute name="mail_on_error" type="xs:string"/>
+      <xs:attribute name="mail_on_warning" type="xs:string"/>
+      <xs:attribute name="mail_on_process" type="xs:string"/>
+      <xs:attribute name="mail_on_success" type="xs:string"/>
+      <xs:attribute name="mail_subject" type="xs:string"/>
+      <xs:attribute name="mail_to" type="xs:string"/>
+      <xs:attribute name="smtp" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="jobs">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="job"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="job">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="file_based"/>
+        <xs:element minOccurs="0" ref="source"/>
+        <xs:element minOccurs="0" ref="replacement"/>
+        <xs:element minOccurs="0" ref="params"/>
+        <xs:element minOccurs="0" ref="run_time"/>
+        <xs:element minOccurs="0" ref="lock.requestor"/>
+        <xs:element ref="tasks"/>
+        <xs:element minOccurs="0" name="description">
+                <xs:complexType mixed="true"/>
+            </xs:element>
+        <xs:element minOccurs="0" name="commands"><!--TODO content has all commands from scheduler.xsd-->
+                <xs:complexType mixed="true"/>
+            </xs:element>
+        <xs:element ref="queued_tasks"/>
+        <xs:element minOccurs="0" ref="history"/>
+        <xs:element minOccurs="0" ref="order_queue"/>
+        <xs:element minOccurs="0" ref="ERROR"/>
+        <xs:element ref="log"/>
+      </xs:sequence>
+      <xs:attribute name="all_tasks" type="xs:integer"/>
+      <xs:attribute name="all_steps" type="xs:integer"/>
+      <xs:attribute name="delay_after_error" type="xs:string"/>
+      <xs:attribute name="enabled" use="required" type="xs:string"/>
+      <xs:attribute name="has_description" type="xs:string"/>
+      <xs:attribute name="in_period" type="xs:string"/>
+      <xs:attribute name="job" use="required" type="xs:string"/>
+      <xs:attribute name="job_chain_priority" type="xs:integer"/>
+      <xs:attribute name="log_file" use="required" type="xs:string"/>
+      <xs:attribute name="name" use="required" type="xs:string"/>
+      <xs:attribute name="next_start_time" type="xs:string"/>
+      <xs:attribute name="tasks" type="xs:integer"/><!-- jaxb conflict with tasks element; needs in external binding file-->
+      <xs:attribute name="order" type="xs:string"/>
+      <xs:attribute name="path" use="required" type="xs:string"/>
+      <xs:attribute name="process_class" type="xs:string"/>
+      <xs:attribute name="remove" type="xs:string"/>
+      <xs:attribute name="state" use="required" type="xs:string"/>
+      <xs:attribute name="state_text" type="xs:string"/>
+      <xs:attribute name="temporary" type="xs:string"/>
+      <xs:attribute name="title" type="xs:string"/>
+      <xs:attribute name="waiting_for_process" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="file_based">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="ERROR"/>
+        <xs:element minOccurs="0" ref="includes"/>
+        <xs:element minOccurs="0" ref="requisites"/>
+        <xs:element minOccurs="0" name="removed">
+            <xs:complexType>
+            <xs:sequence>
+               <xs:element ref="ERROR"/>
+            </xs:sequence>
+          </xs:complexType>     
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="file" type="xs:string"/>
+      <xs:attribute name="last_write_time" type="xs:string"/>
+      <xs:attribute name="state" type="xs:string"/>
+      <xs:attribute name="removed" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="includes">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="include"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="include">
+    <xs:complexType>
+      <xs:attribute name="file" type="xs:string"/>
+      <xs:attribute name="live_file" type="xs:string"/>
+      <xs:attribute name="node" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="requisites">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="requisite"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="requisite">
+    <xs:complexType>
+      <xs:attribute name="path" use="required" type="xs:string"/>
+      <xs:attribute name="type" use="required" type="xs:string"/>
+      <xs:attribute name="is_missing" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="replacement">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element minOccurs="0" ref="job"/>
+        <xs:element minOccurs="0" ref="job_chain"/>
+        <xs:element minOccurs="0" ref="lock"/>
+        <xs:element minOccurs="0" ref="order"/>
+        <xs:element minOccurs="0" ref="process_class"/>
+        <xs:element minOccurs="0" ref="schedule"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="lock.requestor">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="lock.use"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="lock.use">
+    <xs:complexType>
+      <xs:attribute name="exclusive" use="required" type="xs:string"/>
+      <xs:attribute name="lock" use="required" type="xs:string"/>
+      <xs:attribute name="is_missing" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="params">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="param"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="param">
+    <xs:complexType>
+        <xs:attribute name="name" use="required" type="xs:string"/>
+        <xs:attribute name="value" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="tasks">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="task"/>
+      </xs:sequence>
+      <xs:attribute name="count" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="task">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="order"/>
+        <xs:element minOccurs="0" ref="subprocesses"/>
+        <xs:element minOccurs="0" ref="ERROR"/>
+        <xs:element minOccurs="0" ref="log"/>
+      </xs:sequence>
+      <xs:attribute name="calling" type="xs:string"/>
+      <xs:attribute name="cause" type="xs:string"/>
+      <xs:attribute name="delay_after_error_task" type="xs:integer"/>
+      <xs:attribute name="enqueued" type="xs:string"/>
+      <xs:attribute name="force_start" use="required" type="xs:string"/>
+      <!--xs:attribute name="id" use="required" type="xs:integer"/--><!-- see task attribute -->
+      <xs:attribute name="idle_since" type="xs:string"/>
+      <xs:attribute name="in_process_since" type="xs:string"/>
+      <xs:attribute name="job" use="required" type="xs:string"/>
+      <xs:attribute name="log_file" use="required" type="xs:string"/>
+      <!--xs:attribute name="name" use="required"/--><!-- is empty; see job attribute -->
+      <!--xs:attribute name="operation" use="required"/-->
+      <xs:attribute name="pid" use="required" type="xs:integer"/>
+      <xs:attribute name="priority" type="xs:integer"/>
+      <xs:attribute name="running_since" use="required" type="xs:string"/>
+      <xs:attribute name="start_at" use="required" type="xs:string"/>
+      <xs:attribute name="state" use="required" type="xs:string"/>
+      <xs:attribute name="steps" use="required" type="xs:integer"/>
+      <xs:attribute name="task" use="required" type="xs:integer"/><!-- the same like id attribute -->
+      <xs:attribute name="web_service" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="order">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="file_based"/>
+        <xs:element minOccurs="0" ref="source"/>
+        <xs:element minOccurs="0" ref="replacement"/>
+        <xs:element minOccurs="0" name="payload">
+          <xs:complexType>
+                    <xs:sequence>
+                    <xs:element ref="params"/>
+                </xs:sequence>
+                </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" ref="run_time"/>
+        <xs:element minOccurs="0" ref="log"/>
+      </xs:sequence>
+      <!--xs:attribute name="at" use="required"/--><!-- see next_start_time attribute -->
+      <xs:attribute name="created" use="required" type="xs:string"/>
+      <xs:attribute name="history_id" type="xs:string"/>
+      <!--xs:attribute name="id" use="required"/--><!-- see order attribute -->
+      <xs:attribute name="in_process_since" type="xs:string"/>
+      <xs:attribute name="initial_state" use="required" type="xs:string"/>
+      <xs:attribute name="job" use="required" type="xs:string"/>
+      <xs:attribute name="job_chain" use="required" type="xs:string"/>
+      <xs:attribute name="log_file" use="required" type="xs:string"/>
+      <xs:attribute name="name" use="required" type="xs:string"/>
+      <xs:attribute name="next_start_time" type="xs:string"/>
+      <xs:attribute name="order" use="required" type="xs:string"/><!-- the same like id attribute -->
+      <xs:attribute name="path" use="required" type="xs:string"/>
+      <xs:attribute name="priority" type="xs:integer"/>
+      <xs:attribute name="removed" type="xs:string"/>
+      <xs:attribute name="replaced" type="xs:string"/>
+      <xs:attribute name="running_since" type="xs:string"/>
+      <xs:attribute name="setback" type="xs:string"/>
+      <xs:attribute name="setback_count" type="xs:integer"/>
+      <xs:attribute name="start_time" type="xs:string"/>
+      <xs:attribute name="state" use="required"/>
+      <xs:attribute name="state_text" type="xs:string"/>
+      <xs:attribute name="suspended" type="xs:string"/>
+      <xs:attribute name="title" type="xs:string"/>
+      <xs:attribute name="web_service" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="queued_tasks">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="queued_task"/>
+      </xs:sequence>
+      <xs:attribute name="length" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="queued_task">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="params"/>
+      </xs:sequence>
+      <xs:attribute name="enqueued" type="xs:string"/>
+      <xs:attribute name="name" type="xs:string"/>
+      <xs:attribute name="start_at" type="xs:string"/>
+      <xs:attribute name="task" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="order_queue">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="order"/>
+      </xs:sequence>
+      <xs:attribute name="length" type="xs:integer"/>
+      <xs:attribute name="next_start_time" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="job_chains">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="job_chain"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="job_chain">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="file_based"/>
+        <xs:element minOccurs="0" ref="source"/>
+        <xs:element minOccurs="0" ref="replacement"/>
+        <xs:element minOccurs="0" ref="file_order_source"/>
+        <xs:element maxOccurs="unbounded" ref="job_chain_node"/>
+      </xs:sequence>
+      <xs:attribute name="name" type="xs:string"/>
+      <xs:attribute name="orders" type="xs:integer"/>
+      <xs:attribute name="order_id_space" type="xs:string"/>
+      <xs:attribute name="orders_recoverable" type="xs:string"/>
+      <xs:attribute name="path" type="xs:string"/>
+      <xs:attribute name="running_orders" type="xs:integer"/>
+      <xs:attribute name="state" type="xs:string"/>
+      <xs:attribute name="title" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="file_order_source">
+    <xs:complexType>
+      <xs:attribute name="delay_after_error" type="xs:integer"/>
+      <xs:attribute name="directory" use="required" type="xs:string"/>
+      <xs:attribute name="max" use="required" type="xs:integer"/>
+      <xs:attribute name="next_state" use="required" type="xs:string"/>
+      <xs:attribute name="regex" type="xs:string"/>
+      <xs:attribute name="repeat" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="job_chain_node">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="order_queue"/>
+        <xs:element minOccurs="0" name="file_order_sink">
+          <xs:complexType>
+                <xs:attribute name="remove" type="xs:string"/>
+                <xs:attribute name="move_to" type="xs:string"/>
+                </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" ref="job"/>
+      </xs:sequence>
+      <xs:attribute name="error_state" type="xs:string"/>
+      <xs:attribute name="job" type="xs:string"/>
+      <xs:attribute name="job_chain" type="xs:string"/>
+      <xs:attribute name="next_state" type="xs:string"/>
+      <xs:attribute name="state" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="ok">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="task"/>
+        <xs:element minOccurs="0" ref="order"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="subsystems">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="subsystem"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="subsystem">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="file_based.statistics"/>
+        <xs:element minOccurs="0" ref="task_subsystem"/>
+        <xs:element minOccurs="0" ref="job_subsystem"/>
+        <xs:element minOccurs="0" ref="order_subsystem"/>
+      </xs:sequence>
+      <xs:attribute name="name" use="required" type="xs:string"/>
+      <xs:attribute name="state" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="task_subsystem">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="task_subsystem.statistics"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="task_subsystem.statistics">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="task.statistics"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="task.statistics">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="task.statistic"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="task.statistic">
+    <xs:complexType>
+      <xs:attribute name="count" use="required" type="xs:integer"/>
+      <xs:attribute name="task_state" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="file_based.statistics">
+    <xs:complexType>
+      <xs:attribute name="count" use="required" type="xs:integer"/>
+      <xs:attribute name="count_visible" use="required" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="job_subsystem">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="job_subsystem.statistics"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="job_subsystem.statistics">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="job.statistics"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="job.statistics">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="job.statistic"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="job.statistic">
+    <xs:complexType>
+      <xs:attribute name="count" use="required" type="xs:integer"/>
+      <xs:attribute name="job_state" type="xs:string"/>
+      <xs:attribute name="need_process" type="xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="order_subsystem">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="order_subsystem.statistics"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="order_subsystem.statistics">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="order.statistics"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="order.statistics">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="order.statistic"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="order.statistic">
+    <xs:complexType>
+      <xs:attribute name="count" use="required" type="xs:integer"/>
+      <xs:attribute name="order_state" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="state">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="folder"/>
+        <xs:element minOccurs="0" ref="locks"/>
+        <xs:element minOccurs="0" ref="jobs"/>
+        <xs:element minOccurs="0" ref="process_classes"/>
+        <xs:element minOccurs="0" ref="schedules"/>
+        <xs:element minOccurs="0" ref="job_chains"/>
+        <xs:element ref="order_id_spaces"/>
+        <xs:element ref="subprocesses"/>
+        <xs:element ref="remote_schedulers"/>
+        <xs:element name="http_server"/><!--TODO first uninterested; incomplete -->
+        <xs:element name="connections"/><!--TODO first uninterested; incomplete -->
+      </xs:sequence>
+      <xs:attribute name="commitNumber" type="xs:string"/>
+      <xs:attribute name="config_file" use="required" type="xs:string"/>
+      <xs:attribute name="cpu_time" type="xs:decimal"/>
+      <xs:attribute name="db" use="required" type="xs:string"/>
+      <xs:attribute name="db_waiting" type="xs:string"/><!--yes|no-->
+      <xs:attribute name="host" use="required" type="xs:string"/>
+      <xs:attribute name="id" use="required" type="xs:string"/>
+      <xs:attribute name="log_file" use="required" type="xs:string"/>
+      <xs:attribute name="loop" use="required" type="xs:integer"/>
+      <xs:attribute name="need_db" use="required" type="xs:string"/><!--yes|no-->
+      <xs:attribute name="pid" use="required" type="xs:integer"/>
+      <xs:attribute name="spooler_id" use="required" type="xs:string"/>
+      <xs:attribute name="spooler_running_since" use="required"/>
+      <xs:attribute name="state" use="required" type="xs:string"/>
+      <xs:attribute name="tcp_port" use="required" type="xs:integer"/>
+      <xs:attribute name="time" use="required" type="xs:string"/>
+      <xs:attribute name="udp_port" use="required" type="xs:integer"/>
+      <xs:attribute name="version" use="required" type="xs:string"/>
+      <xs:attribute name="wait_until" use="required" type="xs:string"/>
+      <xs:attribute name="wait_errno" type="xs:integer"/>
+      <xs:attribute name="wait_errno_filename" type="xs:string"/>
+      <xs:attribute name="wait_errno_text" type="xs:string"/>
+      <xs:attribute name="waits" use="required" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="locks">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="lock"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="lock">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="file_based"/>
+        <xs:element minOccurs="0" ref="source"/>
+        <xs:element minOccurs="0" ref="replacement"/>
+      </xs:sequence>
+      <xs:attribute name="path" use="required" type="xs:string"/>
+      <xs:attribute name="name" use="required" type="xs:string"/>
+      <xs:attribute name="is_free" use="required" type="xs:string"/><!--yes|no-->
+      <xs:attribute name="max_non_exclusive" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="process_classes">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="process_class"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="process_class">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="file_based"/>
+        <xs:element minOccurs="0" ref="source"/>
+        <xs:element minOccurs="0" ref="replacement"/>
+        <xs:element minOccurs="0" ref="processes"/>
+      </xs:sequence>
+      <xs:attribute name="max_processes" use="required" type="xs:integer"/>
+      <xs:attribute name="name" type="xs:string"/>
+      <xs:attribute name="path" use="required" type="xs:string"/>
+      <xs:attribute name="processes" use="required" type="xs:integer"/><!-- jaxb conflict with processes element-->
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="processes">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="process"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="process">
+    <xs:complexType>
+      <xs:attribute name="callbacks" use="required" type="xs:integer"/> 
+      <xs:attribute name="job" use="required" type="xs:string"/>
+      <xs:attribute name="operation" use="required" type="xs:string"/>
+      <xs:attribute name="operations" use="required" type="xs:integer"/>
+      <xs:attribute name="pid" use="required" type="xs:integer"/>
+      <xs:attribute name="running_since" use="required" type="xs:string"/>
+      <xs:attribute name="task" use="required" type="xs:integer"/>
+      <xs:attribute name="task_id" use="required" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="folder">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="file_based"/>
+        <xs:element minOccurs="0" ref="jobs"/>
+        <xs:element minOccurs="0" ref="process_classes"/>
+        <xs:element minOccurs="0" ref="schedules"/>
+        <xs:element minOccurs="0" ref="job_chains"/>
+        <xs:element minOccurs="0" ref="locks"/>
+        <xs:element minOccurs="0" ref="orders"/>
+        <xs:element minOccurs="0" ref="folders"/>
+      </xs:sequence>
+      <xs:attribute name="name" type="xs:string"/>
+      <xs:attribute name="path" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="folders">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="folder"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="schedules">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="schedule"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="schedule">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="file_based"/>
+        <xs:element minOccurs="0" ref="replacement"/>
+        <!--xs:element minOccurs="0" ref="run_time"/--><!--TODO all elements which can contain in run_time, see scheduler.xsd -->
+      </xs:sequence>
+      <xs:attribute name="name" use="required" type="xs:string"/>
+      <xs:attribute name="path" use="required" type="xs:string"/>
+      <xs:attribute name="active" use="required" type="xs:string"/><!--yes|no-->
+      <xs:attribute name="now_covered_by_schedule" type="xs:string"/>
+      <xs:attribute name="substitute" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="run_time"><!--TODO the same like in scheduler.xsd-->
+    <xs:complexType mixed="true"/>
+  </xs:element>
+  
+  <xs:element name="source"><!--TODO content could be all object elements (job, job_chain, etc.) from scheduler.xsd-->
+    <xs:complexType mixed="true"/>
+  </xs:element>
+  
+  <xs:element name="orders">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="order"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="order.job_chain_stack">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" name="order.job_chain_stack.entry">
+            <xs:complexType>
+                <xs:attribute name="state" use="required" type="xs:string"/>
+                <xs:attribute name="job_chain" use="required" type="xs:string"/>
+            </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="order_id_spaces">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="order_id_space"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="order_id_space">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" name="job_chain">
+            <xs:complexType>
+                <xs:attribute name="job_chain" use="required" type="xs:string"/>
+            </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="name" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="subprocesses">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="subprocess"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="subprocess">
+    <xs:complexType>
+      <xs:attribute name="pid" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="remote_schedulers">
+    <xs:complexType>
+      <xs:sequence> 
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="remote_scheduler"/>
+      </xs:sequence>
+      <xs:attribute name="count" use="required" type="xs:integer"/>
+      <xs:attribute name="active" type="xs:integer"/>
+      <xs:attribute name="connected" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="remote_scheduler">
+    <xs:complexType>
+      <xs:attribute name="configuration_directory" type="xs:string"/>
+      <xs:attribute name="configuration_transfered_at" type="xs:string"/>
+      <xs:attribute name="connected" type="xs:string"/>
+      <xs:attribute name="connected_at" type="xs:string"/>
+      <xs:attribute name="disconnected_at" type="xs:string"/>
+      <xs:attribute name="hostname" type="xs:string"/>
+      <xs:attribute name="ip" type="xs:string"/>
+      <xs:attribute name="scheduler_id" type="xs:string"/>
+      <xs:attribute name="tcp_port" type="xs:integer"/>
+      <xs:attribute name="version" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name="log_categories"><!-- TODO first uninterested; incomplete -->
+    <xs:complexType mixed="true"/>
+  </xs:element>
+  
+</xs:schema>
