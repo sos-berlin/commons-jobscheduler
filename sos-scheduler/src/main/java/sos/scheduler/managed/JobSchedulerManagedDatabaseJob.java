@@ -213,12 +213,16 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 			if ((resultsetAsWarning || resultsetAsParameters) && localConnection.getResultSet() != null) {
 				String warning = "";
 				HashMap result = null;
+				boolean resultParametersSet = false;
 				while (!(result = localConnection.get()).isEmpty()) {
+//					http://www.sos-berlin.com/jira/browse/JS-1181
+					if (resultParametersSet == true) {
+						break;
+					}
 					String orderParamKey = "";
 					int columnCount = 0;
 					warning = "execution terminated with warning:";
 					Iterator resultIterator = result.keySet().iterator();
-					boolean resultParametersSet = false;
 					while (resultIterator.hasNext()) {
 						columnCount++;
 						String key = (String) resultIterator.next();
@@ -226,7 +230,7 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 							continue;
 						String value = result.get(key).toString();
 						warning += " " + key + "=" + value;
-						if (resultsetAsParameters && order != null && !resultParametersSet) {
+						if (resultsetAsParameters && order != null) {
 							if (resultsetNameValue) { // name/value pairs from two columns
 								if (columnCount == 1) {
 									orderParamKey = value;
@@ -234,15 +238,18 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 								if (columnCount == 2) {
 									//if (realOrderParams.value(orderParamKey) == null || realOrderParams.value(orderParamKey).length() == 0) {
 										realOrderParams.set_var(orderParamKey, value);
+										break;
 									//}
 								}
 							}
-							else
+							else { 
 								//if (realOrderParams.value(key) == null || realOrderParams.value(key).length() == 0) {
 									// column name = name, value=value
 									realOrderParams.set_var(key, value);
+									//http://www.sos-berlin.com/jira/browse/JS-1181
 									resultParametersSet = true;
 								//}
+							}
 						}
 					}
 				}
