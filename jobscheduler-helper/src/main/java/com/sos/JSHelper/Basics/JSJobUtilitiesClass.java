@@ -57,6 +57,12 @@ public class JSJobUtilitiesClass<T> extends JSToolBox implements JSJobUtilities,
 		objOptions = pobjO;
 	}
 
+	public T freshInstanceOfOptions() {
+		objOptions = null;
+		return objOptions;
+	}
+
+
 	/**
 	 *
 	 * \brief Options - OptionClass
