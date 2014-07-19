@@ -60,6 +60,10 @@ public class SOSFilteredFileReader extends JSToolBox implements ISOSFilteredFile
 		objFile2Read = pobjJSFile;
 	}
 
+	public JSFile getCurrentFile () {
+		return objFile2Read;
+	}
+	
 	public void runMultipleFiles(final String pstrPathName) {
 		SOSOptionFolderName objFN = new SOSOptionFolderName(pstrPathName);
 		for (File file : objFN.listFiles()) {
