@@ -535,10 +535,12 @@ public class JSXMLFile extends JSTextFile /* implements ErrorHandler */{
 					new StreamResult(new java.io.OutputStreamWriter(System.out)));
 		}
 		else {
+			FileOutputStream objFOS = new FileOutputStream(outputFile); 
 			transformer.transform(objDS, // ...
-					new StreamResult(new FileOutputStream(outputFile)));
+					new StreamResult(objFOS));
 			// transformer.transform(new StreamSource(fleFile), // ...
 			// new StreamResult(new FileOutputStream(outputFile)));
+			objFOS.close();
 		}
 	}
 
