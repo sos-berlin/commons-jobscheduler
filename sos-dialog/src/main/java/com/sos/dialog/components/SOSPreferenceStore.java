@@ -21,14 +21,14 @@ public class SOSPreferenceStore  implements ISOSPreferenceStore {
 	
 
 	// TODO make class variable
-	public Preferences	prefs = Preferences.userNodeForPackage(this.getClass());
-	private String strPreferenceStoreKey = "JOE";
+	public Preferences	prefs = Preferences.userRoot().node(this.getClass().getName());
+	protected String strPreferenceStoreKey = "JOE";
 	/**
 	 *
 	 */
 
 	public SOSPreferenceStore(final Class <?> c) {
-		prefs = Preferences.userNodeForPackage(c);
+		prefs = Preferences.userRoot().node(c.getName());
 	}
 
 	
@@ -58,6 +58,22 @@ public class SOSPreferenceStore  implements ISOSPreferenceStore {
 		logger.debug(String.format("getProperty %1$s = %2$s", pstrPropName, strR));
 		return strR;
 	}
+
+	@Override public String readPreferenceStore() {
+		String strT = "";
+		if (prefs != null && strPreferenceStoreKey.length() > 0) {
+			strT = prefs.get(strPreferenceStoreKey, "");
+		}
+		return strT;
+	}
+
+	@Override public String writePreferenceStore(final String strT) {
+		if (prefs != null && strPreferenceStoreKey.length() > 0) {
+			prefs.put(strPreferenceStoreKey, strT);
+		}
+		return strT;
+	}
+
 
 
 }

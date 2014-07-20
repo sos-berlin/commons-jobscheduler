@@ -46,7 +46,7 @@ public class SOSFileNameSelector extends SOSPreferenceStoreText {
 	private final Logger		logger					= Logger.getLogger(this.getClass());
 	//	private JobListener		objDataProvider			= null;
 	private String				strFileName				= "";
-	private final String				strPreferenceStoreKey	= "";
+//	private final String				strPreferenceStoreKey	= "";
 	// TODO make class variable
 	private final Preferences	prefs					= Preferences.userNodeForPackage(this.getClass());
 
@@ -105,14 +105,14 @@ public class SOSFileNameSelector extends SOSPreferenceStoreText {
 				strFileName = getText();
 				String strKey = strPreferenceStoreKey + "/" + "lastFileName";
 				if (strFileName.trim().length() <= 0) {
-					strFileName = prefs.get(strPreferenceStoreKey, "");
+					strFileName = prefs.get(strKey, "");
 				}
 				strT = openDirectoryFile("*.*", strFileName);
 				if (strT.trim().length() > 0) {
 					File objFile = new File(strT);
 					if (objFile.canRead()) {
 						setText(objFile.getAbsoluteFile().toString());
-						prefs.put(strPreferenceStoreKey, strT);
+						prefs.put(strKey, strT);
 						strFileName = strT;
 						setText(objFile.getName());
 					}
