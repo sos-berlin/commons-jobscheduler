@@ -501,17 +501,10 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
 	@Override
 	public void write(final byte[] bteBuffer) {
 		notImplemented();
-		try {
-			this.getFileOutputStream().write(bteBuffer);
-		}
-		catch (IOException e) {
-			RaiseException(e, SOSVfs_E_134.params("write()"));
-		}
 	}
 
 	@Override
 	public void putFile(final ISOSVirtualFile pobjVirtualFile) throws Exception {
-		// TODO Auto-generated method stub
 		notImplemented();
 	}
 

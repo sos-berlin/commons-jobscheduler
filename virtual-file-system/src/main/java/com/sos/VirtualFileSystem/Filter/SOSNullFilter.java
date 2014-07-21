@@ -3,8 +3,6 @@
  */
 package com.sos.VirtualFileSystem.Filter;
 
-import java.io.UnsupportedEncodingException;
-
 import org.apache.log4j.Logger;
 
 import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
@@ -67,10 +65,11 @@ public class SOSNullFilter extends JSJobUtilitiesClass<SOSFilterOptions> impleme
 	protected String byte2String(final byte[] pbteBuffer) {
 		String strT = "";
 		try {
-			strT = new String(bteBuffer, "UTF-8");
-			logger.debug(strT);
+//			strT = new String(bteBuffer, "UTF-8");
+			strT = new String(bteBuffer);
+			logger.trace(strT);
 		}
-		catch (UnsupportedEncodingException e) {
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 

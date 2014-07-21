@@ -65,55 +65,8 @@ public class SOSFilteredFileReaderTest implements ISOSFilteredFileReader {
 		objFO.excludeLines.Value("^(\\*.*)|^(JOB  ).*|.*(LIST ALL FOR).*$");
 		objR.run();
 	}
-	SOSFilteredFileReader	objR	= null;
 
 	@Test public void testRunMultipleFiles() {
-		logger.info("start");
-		JSFile objFile = new JSFile("R:/backup/projects/anubex/Events/");
-		objR = new SOSFilteredFileReader();
-		objR.setProcesshandler(this);
-		SOSFilterOptions objFO = objR.Options();
-		objFO.excludeLinesBefore.Value("^(\\$EVENT_START).*$");
-		objFO.exclude_lines_after.Value("^\\$EVENT_END");
-		objFO.excludeEmptyLines.value(true);
-		objFO.excludeLines.Value("^(\\*.*)|^(JOB  ).*|(LIST ALL FOR).*$");
-		objR.runMultipleFiles(objFile.getAbsolutePath());
-		for (String strKey : mapXref.keySet()) {
-			System.out.println(strKey + " --- " + mapXref.get(strKey));
-		}
-		String strHeader = "GROUP;EVENTNAME;DESCR;CSPD;STATUS;WHEN_PRIM;WHEN_QNAM;WHEN_OP;WHEN_TYPE;WHEN_QUAL;WHEN_CMRC;WHEN_MRC;ESUCC_EVENT;ESUCC_GROUP;ESUCC_MRC;ESUCC_CONDMRC;ESUCC_ABND;CMD;CSUCC_MRC;CSUCC_CMD;CSUCC_ABND;CSUCC_CONDMRC";
-		JSFile objCSV = new JSFile("c:/temp/anubex.csv");
-		String strLine = "";
-		try {
-			objCSV.WriteLine(strHeader);
-		}
-		catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		for (String strKey : mapEvents.keySet()) {
-			HashMap<String, String> objH = mapEvents.get(strKey);
-			strLine = "";
-			for (String strK : strHeader.split(";")) {
-				String strL = objH.get(strK);
-				if (strL != null) {
-					strLine += strL;
-				}
-				strLine += ";";
-			}
-			try {
-				objCSV.WriteLine(strLine);
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		try {
-			objCSV.close();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-		createDiagramForSubTree("03P1I-TE");
 	}
 
 	private void createDiagramForSubTree(final String pstrSubTreeName) {
@@ -188,6 +141,8 @@ public class SOSFilteredFileReaderTest implements ISOSFilteredFileReader {
 		}
 		return strR;
 	}
+	private final 	SOSFilteredFileReader	objR	= null;
+
 	JSFile										objOutput		= new JSFile("c:/temp/anubex.txt");
 	String										strLastTooken	= "";
 	String										strLastRecord	= "";
