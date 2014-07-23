@@ -1,5 +1,19 @@
 package com.sos.VirtualFileSystem.local;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.io.IOException;
+
+import org.apache.log4j.Logger;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import com.sos.JSHelper.Options.SOSOptionTransferType.enuTransferTypes;
 import com.sos.JSHelper.io.Files.JSFile;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
@@ -7,12 +21,6 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
-import org.apache.log4j.Logger;
-import org.junit.*;
-
-import java.io.IOException;
-
-import static org.junit.Assert.*;
 
 /**
 * \class SOSVfsFtpTest 
@@ -274,7 +282,15 @@ public class SOSVfslocalTest {
 
 		objVFS.ExecuteCommand("dir");
 	}
-
+	  
+	  
+	@Test
+	public void testReplaceCommand4Windows() throws Exception {
+		SOSVfsLocal objSOSVfsLocal = new SOSVfsLocal();
+		String strR = objSOSVfsLocal.replaceCommand4Windows("echo /Y //host/c/nobackup/text.txt c:/nobackup/text.txt /nobackup/text.txt");
+		assertEquals("CommandStringReplace message", "echo /Y \\\\host\\c\\nobackup\\text.txt c:\\nobackup\\text.txt \\nobackup\\text.txt", strR);
+	}
+	
 	// // @Test
 	public void testCreateScriptFile() {
 		fail("Not yet implemented");
