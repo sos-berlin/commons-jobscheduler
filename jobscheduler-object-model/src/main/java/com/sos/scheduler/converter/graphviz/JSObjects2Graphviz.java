@@ -123,7 +123,6 @@ public class JSObjects2Graphviz extends JSJobUtilitiesClass<JSObjects2GraphvizOp
 					objShell.executeCommand("dot.exe -x -Tpdf " + strOutFile + " > " + strOutFile + ".pdf");
 				}
 			}
-
 		}
 		catch (Exception e) {
 			throw new JobSchedulerException(JOM_F_107.get(conMethodName) + ":" + e.getMessage(), e);
