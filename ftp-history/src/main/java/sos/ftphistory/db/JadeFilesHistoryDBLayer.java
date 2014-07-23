@@ -449,11 +449,25 @@ public class JadeFilesHistoryDBLayer extends SOSHibernateIntervalDBLayer impleme
     }
     
     public List<JadeFilesHistoryDBItem> getHistoryFiles() throws ParseException {
-      
+        
         Session session = getSession();
 
         Transaction transaction = session.beginTransaction();
         Query query = session.createQuery("  from JadeFilesHistoryDBItem history " + getWhere());
+        setWhere(query);
+        List<JadeFilesHistoryDBItem> resultset = query.list();
+
+        transaction.commit();
+        return resultset;
+
+    }
+    
+    public List<JadeFilesHistoryDBItem> getHistoryFilesOrderedByTimestamp() throws ParseException {
+        
+        Session session = getSession();
+
+        Transaction transaction = session.beginTransaction();
+        Query query = session.createQuery("  from JadeFilesHistoryDBItem history " + getWhere() + " order by transferTimestamp desc");
         setWhere(query);
         List<JadeFilesHistoryDBItem> resultset = query.list();
 
