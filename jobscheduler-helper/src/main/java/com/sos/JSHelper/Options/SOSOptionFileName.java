@@ -62,6 +62,9 @@ public class SOSOptionFileName extends SOSOptionStringWVariables {
 		super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
 	}
 
+	public SOSOptionFileName (final String pstrFileName) {
+		super(null, "", "", pstrFileName, "", false);
+	}
 	@Override public String getControlType() {
 		return ControlType;
 	}
