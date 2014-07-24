@@ -1,4 +1,41 @@
 package sos.scheduler.job;
+import static com.sos.scheduler.messages.JSMessages.JSJ_D_0010;
+import static com.sos.scheduler.messages.JSMessages.JSJ_D_0030;
+import static com.sos.scheduler.messages.JSMessages.JSJ_D_0032;
+import static com.sos.scheduler.messages.JSMessages.JSJ_D_0040;
+import static com.sos.scheduler.messages.JSMessages.JSJ_D_0070;
+import static com.sos.scheduler.messages.JSMessages.JSJ_D_0080;
+import static com.sos.scheduler.messages.JSMessages.JSJ_E_0009;
+import static com.sos.scheduler.messages.JSMessages.JSJ_F_0010;
+import static com.sos.scheduler.messages.JSMessages.JSJ_F_0050;
+import static com.sos.scheduler.messages.JSMessages.JSJ_F_0060;
+import static com.sos.scheduler.messages.JSMessages.JSJ_I_0010;
+import static com.sos.scheduler.messages.JSMessages.JSJ_I_0020;
+import static com.sos.scheduler.messages.JSMessages.LOG_I_0010;
+import static com.sos.scheduler.messages.JSMessages.LOG_I_0020;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.log4j.Appender;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.SimpleLayout;
+
+import sos.scheduler.interfaces.IJobSchedulerMonitor_impl;
+import sos.spooler.Job;
+import sos.spooler.Order;
+import sos.spooler.Supervisor_client;
+import sos.spooler.Variable_set;
+import sos.util.SOSSchedulerLogger;
+
 import com.sos.JSHelper.Basics.IJSCommands;
 import com.sos.JSHelper.Basics.JSJobUtilities;
 import com.sos.JSHelper.Basics.VersionInfo;
@@ -9,20 +46,6 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.localization.Messages;
 import com.sos.localization.SOSMsg;
 import com.sos.scheduler.JobSchedulerLog4JAppender;
-import org.apache.log4j.*;
-import sos.scheduler.interfaces.IJobSchedulerMonitor_impl;
-import sos.spooler.Job;
-import sos.spooler.Order;
-import sos.spooler.Supervisor_client;
-import sos.spooler.Variable_set;
-import sos.util.SOSSchedulerLogger;
-
-import java.io.File;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static com.sos.scheduler.messages.JSMessages.*;
 
 /**
 * \file JobSchedulerJobAdapter.java
@@ -555,7 +578,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 					strTemp = myReplaceAll(strTemp, regex, strParamValue);
 				}
 			}
-			JSJ_I_0030.toLog(strTemp);
+			JSJ_D_0030.toLog(strTemp);
 		}
 		else {
 			JSJ_D_0040.toLog();
