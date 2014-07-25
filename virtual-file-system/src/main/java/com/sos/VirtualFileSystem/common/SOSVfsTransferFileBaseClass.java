@@ -623,4 +623,12 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+	
+	@Override
+	public boolean isReadable () {
+		boolean flgF = true;
+		
+		return flgF;
+	}
+
 }

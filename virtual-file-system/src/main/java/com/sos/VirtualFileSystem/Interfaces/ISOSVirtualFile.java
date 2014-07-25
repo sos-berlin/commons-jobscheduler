@@ -130,6 +130,7 @@ public interface ISOSVirtualFile {
 	public boolean isDirectory() throws Exception;
 
 	public boolean notExists () ;
+	public boolean isReadable () ;
 
 	public boolean isEmptyFile ();
 

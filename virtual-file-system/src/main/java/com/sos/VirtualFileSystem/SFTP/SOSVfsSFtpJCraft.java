@@ -712,6 +712,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		return file;
 	}
 
+	
 	/**
 	 *
 	 * \brief getModificationTime

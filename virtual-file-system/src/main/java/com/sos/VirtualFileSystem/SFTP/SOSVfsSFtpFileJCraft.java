@@ -221,8 +221,14 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
 	@Override
 	public long setModificationDateTime(final long pdteDateTime) {
 
-		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public boolean isReadable () {
+		boolean flgF = true;
+		
+		return flgF;
 	}
 
 }

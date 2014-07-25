@@ -250,7 +250,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		objJadeReportLogger.info(strM);
 	}
 
-	@SuppressWarnings("finally") private long doTransfer(final ISOSVirtualFile objInput, final ISOSVirtualFile objOutput) {
+	@SuppressWarnings({ "finally", "null" }) private long doTransfer(final ISOSVirtualFile objInput, final ISOSVirtualFile objOutput) {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::doTransfer";
 		boolean flgClosingDone = false;
 		if (objOutput == null) {
@@ -274,7 +274,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		executePreCommands();
 		long lngTotalBytesTransferred = 0;
 		Base64 objBase64 = null;
-		this.setStatus(enuTransferStatus.transferring);
+		boolean flgErrorOnInput = false;		this.setStatus(enuTransferStatus.transferring);
 		try {
 			int intCumulativeFileSeperatorLength = 0;
 			int lngBufferSize = objOptions.BufferSize.value();
@@ -294,6 +294,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 					intCumulativeFileSeperatorLength = bteB.length;
 					objOutput.write(bteB);
 				}
+				// wozu genau ist das? Damit wird doch eine null datei im target angelegt, auch wenn die source-datei nicht gelesen werden kann.
+				// ich halte das für einen Fehler. kb 2014-07-25
 				if (objInput.getFileSize() <= 0) {
 					objOutput.write(buffer, 0, 0);
 				}
@@ -312,6 +314,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 							objOutput.write(buffer, 0, intBytes2Write);
 						}
 						catch (JobSchedulerException e) {
+							flgErrorOnInput = true;
 							e.printStackTrace(System.err);
 							break;
 						}
@@ -348,6 +351,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 			return lngTotalBytesTransferred;
 		}
 		catch (Exception e) {
+			flgErrorOnInput = true;
 			String strT = SOSVfs_E_229.params(e);
 			// TODO rollback?
 			logger.error(strT);
@@ -356,7 +360,11 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		finally {
 			if (flgClosingDone == false) {
 				objInput.closeInput();
+				// Hier wird die Datei angelegt mit 0 bytes, auch wenn nichts geschrieben wurde, weil die source nicht lesbar war.
 				objOutput.closeOutput();
+				if (flgErrorOnInput == true) {
+					objOutput.delete();
+				}
 				flgClosingDone = true;
 			}
 			return lngTotalBytesTransferred;
@@ -806,47 +814,23 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::run";
 		boolean flgNewConnectionUsed = false;
 		try {
-			//			logger.debug(SOSVfs_D_272.get());
-			//			ISOSVFSHandler objVFS4Source = null;
-			//			ISOSVFSHandler objVFS4Target = null;
 			logger.info(SOSVfs_I_0108.params(strSourceFileName));
 			flgNewConnectionUsed = false;
 			if (objDataSourceClient == null) {
 				setDataSourceClient((ISOSVfsFileTransfer) objConnPoolSource.getUnused());
-				//				SOSConnection2OptionsAlternate objSourceConnect = objOptions.getConnectionOptions().Source();
-				//				if (objSourceConnect.loadClassName.isDirty() == false) {
-				//					objSourceConnect.loadClassName.Value(objOptions.getConnectionOptions().loadClassName.Value());
-				//				}
-				//
-				//				objVFS4Source = VFSFactory.getHandler(objOptions.getDataSourceType());
-				//				objVFS4Source.setSource();
-				//
-				//				// TODO use a Connection-Pool Object, to avoid to many connects and authenticates
-				//				objVFS4Source.Connect(objSourceConnect);
-				//				objVFS4Source.Authenticate(objSourceConnect);
-				//				objDataSourceClient = (ISOSVfsFileTransfer) objVFS4Source;
-				//				objVFS4Source.setSource();
-				//				objVFS4Source.Options(objOptions);
 			}
 			if (objDataTargetClient == null & objOptions.NeedTargetClient() == true) {
 				setDataTargetClient((ISOSVfsFileTransfer) objConnPoolTarget.getUnused());
-				//				SOSConnection2OptionsAlternate objTargetConnectOptions = objOptions.getConnectionOptions().Target();
-				//				if (objTargetConnectOptions.loadClassName.isDirty() == false) {
-				//					objTargetConnectOptions.loadClassName.Value(objOptions.getConnectionOptions().loadClassName.Value());
-				//				}
-				//
-				//				objVFS4Target = VFSFactory.getHandler(objOptions.getDataTargetType());
-				//				objVFS4Target.setTarget();
-				//				objVFS4Target.Connect(objTargetConnectOptions);
-				//				objVFS4Target.Authenticate(objTargetConnectOptions);
-				//				objDataTargetClient = (ISOSVfsFileTransfer) objVFS4Target;
-				//				objVFS4Target.setTarget();
-				//				objVFS4Target.Options(objOptions);
 			}
 			ISOSVirtualFile objSourceFile = objDataSourceClient.getFileHandle(strSourceFileName);
 			if (objSourceFile.notExists() == true) {
 				throw new JobSchedulerException(SOSVfs_E_226.params(strSourceFileName));
 			}
+			
+			// just to check wether the file is readable. will raise an exception if not
+			// prevent to create a 0-byte file on the target
+			
+			objDataSourceClient.getFileHandle(strSourceFileName);			
 			/**
 			 * hier nicht verwenden, weil es zu spüt kommt.
 			 */

@@ -3874,7 +3874,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	/**
 	* \var force_files : This parameter specifies whether an error should b
 	*
-	This parameter specifies whether an error should be raised if no files could be found for transfer. The number of files to be transferred is determined by the file_spec or file_path parameters and can be restricted by the overwrite_files parameter should this be specified with the value false.
+	This parameter specifies whether an error should be raised if no files could be found for transfer. 
+	The number of files to be transferred is determined by the file_spec or file_path parameters and can be restricted by the overwrite_files parameter should this be specified with the value false.
 	*
 	*/
 	@JSOptionDefinition(
