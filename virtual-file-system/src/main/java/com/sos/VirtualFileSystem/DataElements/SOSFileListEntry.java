@@ -977,6 +977,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		}
 		catch (Exception e) {
 			String strT = SOSVfs_E_229.params(e);
+			TransferStatus(enuTransferStatus.transfer_aborted);
 			// TODO rollback?
 			logger.error(strT);
 			throw new JobSchedulerException(strT, e);
