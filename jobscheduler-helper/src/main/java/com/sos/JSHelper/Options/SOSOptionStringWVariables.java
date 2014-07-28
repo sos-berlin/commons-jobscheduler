@@ -201,10 +201,10 @@ public class SOSOptionStringWVariables extends SOSOptionElement {
 			strValue = substituteFileContent(strValue);
 			strValue = substituteShell(strValue);
 			// // should any opening and closing brackets be found in the file name, then this is an error
-//			Matcher m = Pattern.compile("\\[[^\\]]*\\]").matcher(strValue);
-//			if (m.find()) {
-//				throw new JobSchedulerException(String.format("unsupported variable found: ' %1$s'", m.group()));
-//			}
+			//			Matcher m = Pattern.compile("\\[[^\\]]*\\]").matcher(strValue);
+			//			if (m.find()) {
+			//				throw new JobSchedulerException(String.format("unsupported variable found: ' %1$s'", m.group()));
+			//			}
 			return strValue;
 		}
 		catch (Exception e) {
@@ -339,7 +339,7 @@ public class SOSOptionStringWVariables extends SOSOptionElement {
 		String strShellScriptName = pstrShellScriptName;
 		logger.debug(strShellScriptName);
 		SOSCommandline objShell = new SOSCommandline();
-		Vector <String> returnValues = objShell.execute(strShellScriptName);
+		Vector<String> returnValues = objShell.execute(strShellScriptName);
 		logger.debug(returnValues);
 		int exitValue = objShell.getExitValue();
 		if (exitValue == 0) {
@@ -385,8 +385,10 @@ public class SOSOptionStringWVariables extends SOSOptionElement {
 	public String substituteTempFile(String pstrValue) {
 		String strT = pstrValue;
 		try {
-			String strTempFileName = JSFile.createTempFileName();
-			strT = checkAndSubstitute("tempfile", strT, strTempFileName);
+			if (pstrValue.toLowerCase().contains("tempfile")) {
+				String strTempFileName = JSFile.createTempFileName();
+				strT = checkAndSubstitute("tempfile", strT, strTempFileName);
+			}
 		}
 		catch (Exception e) {
 			e.printStackTrace();

@@ -1577,11 +1577,13 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 
 		String strTempFileName = null;
 		try {
-			strTempFileName = File.createTempFile(strTempFileNamePrefix, strTempFileNameExtension).getAbsoluteFile().getAbsolutePath();
+			File objF = File.createTempFile(strTempFileNamePrefix, strTempFileNameExtension);
+			objF.deleteOnExit();
+			strTempFileName = objF.getAbsoluteFile().getAbsolutePath();
 			strTempFileName = strTempFileName.replaceAll("\\\\", "/");
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 		return strTempFileName;
 	}
