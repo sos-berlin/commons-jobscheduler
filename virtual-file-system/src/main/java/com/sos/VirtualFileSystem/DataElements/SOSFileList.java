@@ -133,6 +133,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 						lngSuccessfulTransfers++;
 						break;
 					case transfer_has_errors:
+					case transfer_aborted:
 						lngFailedTransfers++;
 						break;
 					case transfer_skipped:

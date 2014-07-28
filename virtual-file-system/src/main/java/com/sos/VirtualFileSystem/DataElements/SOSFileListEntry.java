@@ -351,6 +351,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 			return lngTotalBytesTransferred;
 		}
 		catch (Exception e) {
+			TransferStatus(enuTransferStatus.transfer_has_errors);
 			flgErrorOnInput = true;
 			String strT = SOSVfs_E_229.params(e);
 			// TODO rollback?
