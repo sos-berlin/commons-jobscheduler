@@ -384,7 +384,6 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 					pobjDataClient.getHandler().ExecuteCommand(strCmd);
 				}
 				catch (Exception e) {
-					e.printStackTrace(System.err);
 					throw new JobSchedulerException(conMethodName, e);
 				}
 			}
