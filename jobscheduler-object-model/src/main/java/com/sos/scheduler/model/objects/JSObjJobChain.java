@@ -39,14 +39,11 @@ import com.sos.scheduler.model.SchedulerObjectFactory;
 * Created on 09.02.2011 14:37:58
  */
 public class JSObjJobChain extends JobChain {
-	@SuppressWarnings("unused")
-	private final String		conClassName							= this.getClass().getSimpleName();
-	@SuppressWarnings("unused")
-	private static final String	conSVNVersion							= "$Id$";
-	@SuppressWarnings("unused")
-	private final Logger		logger									= Logger.getLogger(this.getClass());
-	public final static String	fileNameExtension						= ".job_chain.xml";
-	public static final String	conFileNameExtension4NodeParameterFile	= ".config.xml";
+	@SuppressWarnings("unused") private final String		conClassName							= this.getClass().getSimpleName();
+	@SuppressWarnings("unused") private static final String	conSVNVersion							= "$Id$";
+	@SuppressWarnings("unused") private final Logger		logger									= Logger.getLogger(this.getClass());
+	public final static String								fileNameExtension						= ".job_chain.xml";
+	public static final String								conFileNameExtension4NodeParameterFile	= ".config.xml";
 
 	public JSObjJobChain(final SchedulerObjectFactory schedulerObjectFactory) {
 		super();
@@ -71,41 +68,56 @@ public class JSObjJobChain extends JobChain {
 		setHotFolderSrc(super.objVirtualFile);
 	}
 
-    public void setNameIfNotEmpty(String value) {
-        if (!isEmpty(value)) {
-            this.setName(value);
-        } 
-    }
-    
-    public void setDistributedNotEmpty(String value) {
-        if (!isEmpty(value)) {
-            this.setDistributed(value);
-        }
-    }
-    
-    public void setMaxOrdersIfNotEmpty(String value) {
-        if (!isEmpty(value)) {
-            this.setMaxorders(value);
-        }
-    }
-    
-    public void setOrdersRecoverableIfNotEmpty(String value) {
-        if (!isEmpty(value)) {
-            this.setOrdersRecoverable(value);
-        }
-    }
+	public void setNameIfNotEmpty(String value) {
+		if (!isEmpty(value)) {
+			this.setName(value);
+		}
+	}
 
-    public void setVisibleIfNotEmpty(String value) {
-        if (!isEmpty(value)) {
-            this.setVisible(value);
-        }
-    }
-    
-    public void setTitleIfNotEmpty(String value) {
-        if (!isEmpty(value)) {
-            this.setTitle(value);
-        }
-    }
+	public void setDistributedNotEmpty(String value) {
+		if (!isEmpty(value)) {
+			this.setDistributed(value);
+		}
+	}
+
+	public void setMaxOrdersIfNotEmpty(String value) {
+		if (!isEmpty(value)) {
+			this.setMaxorders(value);
+		}
+	}
+
+	public void setOrdersRecoverableIfNotEmpty(String value) {
+		if (!isEmpty(value)) {
+			this.setOrdersRecoverable(value);
+		}
+	}
+
+	public void setVisibleIfNotEmpty(String value) {
+		if (!isEmpty(value)) {
+			this.setVisible(value);
+		}
+	}
+
+	public void setTitleIfNotEmpty(String value) {
+		if (!isEmpty(value)) {
+			this.setTitle(value);
+		}
+	}
+
+	public boolean isNestedJobChain() {
+		boolean flgR = false;
+		if (jobChainNodeJobChain != null) {
+			flgR = true;
+		}
+		//    	for (Object obj : this.getJobChainNodeOrFileOrderSinkOrJobChainNodeEnd()) {
+		//			if (obj instanceof JobChainNodeJobChain) {
+		//				flgR = true;
+		//				break;
+		//			}
+		//		}
+		return flgR;
+	}
+
 	/**
 	 *
 	 * \brief setOrdersRecoverable
@@ -539,6 +551,56 @@ public class JSObjJobChain extends JobChain {
 		return objList;
 	}
 
+	public boolean isStateDefined(final String state) {
+		for (String _state : getAllStates()) {
+			if (_state.equals(state)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public String[] getAllStates() {
+		return getStates();
+	}
+
+	public String[] getStates() {
+		List<String> strStatesList = new ArrayList<String>();
+		for (JobChainNode objNode : getJobChainNodeList()) {
+			addToList(strStatesList, objNode.errorState);
+			addToList(strStatesList, objNode.nextState);
+			addToList(strStatesList, objNode.state);
+		}
+		return arrayListToStringArray(strStatesList);
+	}
+
+	public String[] getErrorStates() {
+		List<String> strStatesList = new ArrayList<String>();
+		for (JobChainNode objNode : getJobChainNodeList()) {
+			addToList(strStatesList, objNode.errorState);
+		}
+		return arrayListToStringArray(strStatesList);
+	}
+
+	public String[] getNextStates() {
+		List<String> strStatesList = new ArrayList<String>();
+		for (JobChainNode objNode : getJobChainNodeList()) {
+			addToList(strStatesList, objNode.nextState);
+		}
+		return arrayListToStringArray(strStatesList);
+	}
+
+	private void addToList (List <String> pobjL, final String pstrS) {
+		if (pstrS != null && pobjL.contains(pstrS) == false) {
+			pobjL.add(pstrS);
+		}
+	}
+	//	private String[] arrayListToStringArray (final List <String> pobjArray) {
+	//		String[] strA = new String[pobjArray.size()];
+	//		strA = pobjArray.toArray(strA);
+	//		return strA;
+	//	}
+	//
 	public List<JobChainNodeEnd> getJobChainNodeEndList() {
 		List<JobChainNodeEnd> objList = new ArrayList<JobChainNodeEnd>();
 		for (Object objO : this.getJobChainNodeOrFileOrderSinkOrJobChainNodeEnd()) {

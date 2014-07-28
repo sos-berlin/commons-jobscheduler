@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
+import java.util.List;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -454,6 +455,12 @@ public class JSObjBase implements Comparable<JSObjBase> {
 		   }
 		   return sb.toString();
 		}
+
+	protected String[] arrayListToStringArray (final List <String> pobjArray) {
+		String[] strA = new String[pobjArray.size()];
+		strA = pobjArray.toArray(strA);
+		return strA;
+	}
 
 
 }

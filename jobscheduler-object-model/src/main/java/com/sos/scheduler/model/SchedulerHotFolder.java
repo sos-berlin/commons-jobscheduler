@@ -97,6 +97,17 @@ public class SchedulerHotFolder extends JSObjBase {
 		return result;
 	}
 
+	public JSObjJob  getJobByName(final String pstrJobName) {
+		JSObjJob objJob = null;
+		for (JSObjJob objJ : getHotFolderFileList().getJobList()) {
+			String strJobName = objJ.getJobName();
+			if (strJobName.equalsIgnoreCase(pstrJobName)) {
+				objJob = objJ;
+				break;
+			}
+		}
+		return objJob;
+	}
 	/**
 	 *
 	 * @param pobjVirtualDir
