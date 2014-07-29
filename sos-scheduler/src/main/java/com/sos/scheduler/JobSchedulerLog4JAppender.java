@@ -5,6 +5,8 @@ import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
 
+import com.sos.JSHelper.interfaces.IJobSchedulerLoggingAppender;
+
 import sos.util.SOSLogger;
 import sos.util.SOSSchedulerLogger;
 
@@ -38,7 +40,7 @@ import sos.util.SOSSchedulerLogger;
  * @author KB
  *
  */
-public class JobSchedulerLog4JAppender extends ConsoleAppender {
+public class JobSchedulerLog4JAppender extends ConsoleAppender implements IJobSchedulerLoggingAppender {
 
 	private final String		conClassName	= "JobSchedulerLog4JAppender";
 
@@ -52,13 +54,17 @@ public class JobSchedulerLog4JAppender extends ConsoleAppender {
 		super(pobjLayout);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.sos.scheduler.IJobSchedulerLoggingAppender#setSchedulerLogger(sos.util.SOSSchedulerLogger)
+	 */
 	public void setSchedulerLogger(final SOSSchedulerLogger pobjSchedulerLogger) {
 		sosLogger = pobjSchedulerLogger;
 	}
 
-	/**
-	 * @see org.apache.log4j.FileAppender#activateOptions() */
-	@Override
+	/* (non-Javadoc)
+	 * @see com.sos.scheduler.IJobSchedulerLoggingAppender#activateOptions()
+	 */
+	@Override 
 	public void activateOptions() {
 		super.activateOptions();
 	}
@@ -116,7 +122,10 @@ public class JobSchedulerLog4JAppender extends ConsoleAppender {
 		}
 	}
 
-	public boolean hasLogger() {
+	/* (non-Javadoc)
+	 * @see com.sos.scheduler.IJobSchedulerLoggingAppender#hasLogger()
+	 */
+	@Override public boolean hasLogger() {
 		return sosLogger != null ? true : false;
 	}
 }

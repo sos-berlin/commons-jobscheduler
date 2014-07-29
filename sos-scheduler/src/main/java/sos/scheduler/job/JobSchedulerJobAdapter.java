@@ -42,6 +42,7 @@ import com.sos.JSHelper.Basics.VersionInfo;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.JSOptionsClass;
 import com.sos.JSHelper.Options.SOSOptionElement;
+import com.sos.JSHelper.interfaces.IJobSchedulerLoggingAppender;
 import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.localization.Messages;
 import com.sos.localization.SOSMsg;
@@ -169,7 +170,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		 * All Log4J-Messages are redirected to the sosLogger.
 		 */
 		Appender objStdoutAppender = logger.getAppender("stdout"); //$NON-NLS-1$
-		if (objStdoutAppender instanceof JobSchedulerLog4JAppender) {
+		if (objStdoutAppender instanceof IJobSchedulerLoggingAppender) {
 			objJSAppender = (JobSchedulerLog4JAppender) objStdoutAppender;
 			objJSAppender.setSchedulerLogger(sosLogger);
 			LOG_I_0020.toLog();
@@ -893,7 +894,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 			return conJobChainFailure;
 		}
 		return conJobFailure;
-	} // private boolean signalSuccess
+	} // private boolean signalFailure
 
 	/*
 	 * setBack driven by JS

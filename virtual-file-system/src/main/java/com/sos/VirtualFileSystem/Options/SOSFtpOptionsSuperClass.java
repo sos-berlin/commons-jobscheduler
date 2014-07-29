@@ -3732,22 +3732,34 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	/**
 	* \var file_path : This parameter is used alternatively to the parame
 	*
-	This parameter is used alternatively to the parameter file_spec to specify a single file for transfer. When receiving files the following applies: This parameter accepts the absolute name and path of file at the FTP/SFTP server that should be transferred. The file name has to include both name and path of the file at the FTP/SFTP server. The file will be stored unter its name in the directory that is specified by the parameter local_dir. The following parameters are ignored should this parameter be used: file_spec and remote_dir. When sending files the following applies: This parameter accepts the absolute name and path of file that should be transferred. An absolute path has to be specified. The file will be stored under its name in the directory at the FTP/SFTP server that has been specified by the parameter remote_dir. The following parameters are ignored should this parameter be used: file_spec and local_dir.
+	* This parameter is used alternatively to the parameter file_spec to specify a single file for transfer. 
+	* When receiving files the following applies: 
+	* This parameter accepts the absolute name and path of file at the FTP/SFTP server that should be transferred. 
+	* The file name has to include both name and path of the file at the server. 
+	* The file will be stored unter its name in the directory that is specified by the parameter target_dir. 
+	* The following parameters are ignored should this parameter be used: file_spec and remote_dir. 
+	* When sending files the following applies: 
+	* This parameter accepts the absolute name and path of file that should be transferred. 
+	* An absolute path has to be specified. 
+	* The file will be stored under its name in the directory at the server that has been specified by the 
+	* parameter remote_dir. 
+	* 
+	* The following parameters are ignored should this parameter be used: file_spec and local_dir.
 	*
 	*/
 	@JSOptionDefinition(
 						name = "file_path",
-						description = "This parameter is used alternatively to the parame",
+						description = "Specifies One or more specific file names to transfer",
 						key = "file_path",
 						type = "SOSOptionFileName",
 						mandatory = false)
 	public SOSOptionFileName	file_path	= new SOSOptionFileName(this, conClassName + ".file_path", // HashMap-Key
-													"This parameter is used alternatively to the parame", // Titel
+													"Specifies One or more specific file names to transfer", // Titel
 													"", // InitValue
 													"", // DefaultValue
 													false // isMandatory
 											);
-
+	public SOSOptionFileName FileNames = (SOSOptionFileName) file_path.SetAlias("File_Names");
 	/**
 	 * \brief getfile_path
 	 *

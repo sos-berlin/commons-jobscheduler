@@ -2,12 +2,9 @@ package com.sos.scheduler;
 
 import java.util.ArrayList;
 
-import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Layout;
-import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
 
-import sos.util.SOSLogger;
 import sos.util.SOSSchedulerLogger;
 
 /**
@@ -56,7 +53,7 @@ public class BufferedJobSchedulerLog4JAppender extends JobSchedulerLog4JAppender
 		super(pobjLayout);
 	}
 
-	public void setSchedulerLogger(SOSSchedulerLogger pobjSchedulerLogger) {
+	@Override public void setSchedulerLogger(SOSSchedulerLogger pobjSchedulerLogger) {
 		super.setSchedulerLogger(pobjSchedulerLogger);
 		for (int i = 0; i < logEvents.size(); i++) {
 			super.subAppend(logEvents.get(i));

@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.sos.JSHelper.interfaces.IJobSchedulerLoggingAppender;
 import com.sos.scheduler.BufferedJobSchedulerLog4JAppender;
 import com.sos.scheduler.JobSchedulerLog4JAppender;
 
@@ -91,7 +92,7 @@ public class JobSchedulerLog4JAppenderTest {
 		Logger logger = null;
 
 		logger = Logger.getRootLogger();
-		JobSchedulerLog4JAppender objJSAppender = null;
+		IJobSchedulerLoggingAppender objJSAppender = null;
 		/**
 		 * the JobSchedulerLog4JAppender is used as the stdout-appender
 		 * Therefore the code-snippet below asked log4j what the stdout-appender
@@ -101,8 +102,8 @@ public class JobSchedulerLog4JAppenderTest {
 		 * All Log4J-Messages are redirected to the sosLogger.
 		 */
 		Appender objStdoutAppender = logger.getAppender("stdout"); //$NON-NLS-1$
-		if (objStdoutAppender instanceof JobSchedulerLog4JAppender) {
-			objJSAppender = (JobSchedulerLog4JAppender) objStdoutAppender;
+		if (objStdoutAppender instanceof IJobSchedulerLoggingAppender) {
+			objJSAppender = (IJobSchedulerLoggingAppender) objStdoutAppender;
 			logger.info("JobSchedulerLog4JAppender is configured as log4j-appender");
 		}
 
@@ -127,7 +128,7 @@ public class JobSchedulerLog4JAppenderTest {
 		Logger logger = null;
 		logger = Logger.getRootLogger();
 
-		JobSchedulerLog4JAppender objJSAppender = null;
+		IJobSchedulerLoggingAppender objJSAppender = null;
 		/**
 		 * the JobSchedulerLog4JAppender is used as the stdout-appender
 		 * Therefore the code-snippet below asked log4j what the stdout-appender
@@ -138,7 +139,7 @@ public class JobSchedulerLog4JAppenderTest {
 		 */
 		Appender objStdoutAppender = logger.getAppender("buffered"); //$NON-NLS-1$
 		if (objStdoutAppender instanceof BufferedJobSchedulerLog4JAppender) {
-			objJSAppender = (JobSchedulerLog4JAppender) objStdoutAppender;
+			objJSAppender = (IJobSchedulerLoggingAppender) objStdoutAppender;
 			logger.info("JobSchedulerLog4JAppender is configured as buffered log4j-appender");
 		}
 

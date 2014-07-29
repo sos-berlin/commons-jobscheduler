@@ -170,7 +170,6 @@ public class SOSOptionLogFileName extends SOSOptionOutFileName {
 				}
 			}
 			catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				throw new JobSchedulerException("Problems with log4jappender", e);
 			}

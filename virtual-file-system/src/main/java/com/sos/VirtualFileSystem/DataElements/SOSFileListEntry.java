@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.util.Base64;
@@ -271,6 +273,13 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 				flgCreateSecurityHash = false;
 			}
 		}
+		Checksum objCRC = null;
+		try {
+	        objCRC = new CRC32();
+		}
+		catch (Exception e1) {
+			e1.printStackTrace();
+		}
 		executePreCommands();
 		long lngTotalBytesTransferred = 0;
 		Base64 objBase64 = null;
@@ -325,6 +334,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 						if (flgCreateSecurityHash) {
 							md.update(buffer, 0, intBytesTransferred);
 						}
+						objCRC.update(buffer, 0, intBytesTransferred);
 					}
 				}
 			}
@@ -341,6 +351,9 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 					objF.deleteOnExit();
 				}
 			}
+
+			String localCRC = Long.toHexString(objCRC.getValue()).toUpperCase();
+			   logger.info("CRC32 is " + localCRC);
 			// objDataTargetClient.CompletePendingCommand();
 			if (objDataTargetClient.isNegativeCommandCompletion()) {
 				RaiseException(SOSVfs_E_175.params(objTargetTransferFile.getName(), objDataTargetClient.getReplyString()));

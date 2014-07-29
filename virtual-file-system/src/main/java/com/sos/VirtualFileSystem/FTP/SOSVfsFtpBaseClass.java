@@ -1302,6 +1302,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 						strHost = objHost.Value();
 					}
 					logger.debug(HostID(SOSVfs_D_138.params(strHost, getReplyString())));
+					flgLoggedIn = false;
 				}
 			}
 			else {

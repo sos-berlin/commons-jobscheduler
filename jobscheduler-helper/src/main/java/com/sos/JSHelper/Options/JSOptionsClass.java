@@ -730,7 +730,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 						key = "log4j_Property_FileName",
 						type = "SOSOptionInFileName",
 						mandatory = false)
-	public SOSOptionInFileName	log4jPropertyFileName	= new SOSOptionInFileName(
+	public SOSOptionLog4JPropertyFile	log4jPropertyFileName	= new SOSOptionLog4JPropertyFile(
 														// ...
 																this, // ....
 																conClassName + ".log4j_Property_FileName", // ...
@@ -739,6 +739,14 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 																"./log4j.properties", // ...
 																false);
 
+	public SOSOptionLog4JPropertyFile log4jPropertyFileName () {
+		return log4jPropertyFileName;
+	}
+	
+	public void log4jPropertyFileName (SOSOptionLog4JPropertyFile pobjO) {
+		 log4jPropertyFileName = pobjO;
+	}
+	
 	public String getlog4jPropertyFileName() {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getlog4jPropertyFileName";
 		return log4jPropertyFileName.Value();
@@ -775,6 +783,9 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 													"env:SOSApplicationName", // ...
 													false);
 
+	public SOSOptionString ApplicationName () {
+		return ApplicationName;
+	}
 	public SOSOptionString getApplicationName() {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getApplicationName";
 		return ApplicationName;
