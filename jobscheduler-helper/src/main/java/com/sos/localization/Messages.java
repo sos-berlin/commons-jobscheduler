@@ -48,7 +48,7 @@ public class Messages implements Serializable {
 
 	private enuEncodings		enuEncoding			= enuEncodings.ISO_8859_1;
 	private final enuEncodings	enuEncodingDefault	= enuEncodings.ISO_8859_1;
-
+	
 	public static enum enuEncodings {
 		ISO_8859_1, UTF_8
 		/* */;
@@ -80,6 +80,18 @@ public class Messages implements Serializable {
 		objCurrentLocale = pobjLocale;
 		objResource_Bundle = this.getBundle();
 	}
+	
+	/**
+	 * Pass a ClassLoader to be able to load a ResourceBundle from a different context.
+	 * @param pstrBundleName
+	 * @param pobjLocale
+	 * @param loader
+	 */
+	public Messages(final String pstrBundleName, final Locale pobjLocale, ClassLoader loader) {
+		BUNDLE_NAME = pstrBundleName;
+		objCurrentLocale = pobjLocale;
+		objResource_Bundle = this.getBundle(loader);
+	}
 
 	public ResourceBundle getBundle() {
 		@SuppressWarnings("unused")
@@ -106,6 +118,48 @@ public class Messages implements Serializable {
 		objResourceBundleDefault = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("en"));
 		return objB;
 	} // private ResourceBundle getBundle
+	
+	public ResourceBundle getBundle(ClassLoader loader) {
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getBundle";
+		ResourceBundle objB = null;
+		try {
+			if (loader == null) {
+				objB = ResourceBundle.getBundle(BUNDLE_NAME, objCurrentLocale);
+			} else {
+				objB = ResourceBundle.getBundle(BUNDLE_NAME, objCurrentLocale, loader);
+			}
+			// logger.debug(String.format("current ResourceBundle is %1$s, locale is %2$s.", BUNDLE_NAME, objB.getLocale().getLanguage()));
+			//readEncodingFromMessageFile(objB);
+			setEncoding(objB);
+		}
+		catch (MissingResourceException mb){
+			try{//Try to get local default
+				if (loader == null) {
+					objB = ResourceBundle.getBundle(BUNDLE_NAME);
+				} else {
+					objB = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault(), loader);
+				}
+			}
+			catch (MissingResourceException mbb){
+				if (loader == null) {
+					objB = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("en"));
+				} else {
+					objB = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("en"), loader);
+				}
+			}
+
+		}
+		catch (Exception e) {
+			e.printStackTrace(System.err);
+		}
+		if (loader == null) {
+		objResourceBundleDefault = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("en"));
+		} else {
+			objResourceBundleDefault = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("en"), loader);
+		}
+		return objB;
+	}
 
 	public void setLocale(final Locale pobjLocale) {
 		@SuppressWarnings("unused")
