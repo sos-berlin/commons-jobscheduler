@@ -27,6 +27,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2Options;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
+import com.sos.VirtualFileSystem.common.SOSMsgVfs;
 import com.sos.VirtualFileSystem.common.SOSVfsConstants;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.VirtualFileSystem.zip.SOSVfsZip;
@@ -555,6 +556,11 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
 	@Override public String getStatusText() {
 		return eTransferStatus.name();
+	}
+	
+	public String getStatusMsg() {
+		SOSMsgVfs objSOSMsgVfs = new SOSMsgVfs("SOSVfs_I_03" + (eTransferStatus.ordinal() + 10));
+		return objSOSMsgVfs.get();
 	}
 
 	public ISOSVirtualFile getTargetFile(final ISOSFtpOptions objO) {
