@@ -642,7 +642,7 @@ public class SOSMailTest {
 		objO.subject.Value( "mail from JUnit-Test");
 		objO.to.Value("kb@sos-berlin.com");
 		objO.cc.Value("kb@sos-berlin.com;info@sos-berlin.com");
-		objO.bcc.Value("kb@sos-berlin.com;support@sos-berlin.com");
+		objO.bcc.Value("kb@sos-berlin.com;scheduler_test@sos-berlin.com");
 
 		SOSMail objMail = new SOSMail(objO.host.Value());
 		objMail.sendMail(objO);
