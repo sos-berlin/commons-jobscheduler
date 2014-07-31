@@ -34,7 +34,7 @@ public enum enuTransferModes  {
 	}
 	
 	public static String[] getArray() {
-		String[] strA = new String[3];
+		String[] strA = new String[enuTransferModes.values().length];
 		int i = 0;
 		for (enuTransferModes enuType : enuTransferModes.values()) {
 			strA[i++] = enuType.Text();
