@@ -2681,7 +2681,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	 */
 	@JSOptionDefinition(
 						name = "File_List_Name",
-						description = "File with a list of file names",
+						description = "File with a list of file names which has to be transferred",
 						key = "File_List_Name",
 						type = "SOSOptionInFileName",
 						mandatory = false)

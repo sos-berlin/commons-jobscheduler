@@ -489,6 +489,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	public String getFileName4ResultList() {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getFileName4ResultList";
 		// starting with TargetfileName.
+		// TODO allow ResultSetFileName for source_ and target_
 		String strT = strTargetFileName;
 		if (isEmpty(strT)) { // If empty, e.g. in case of operation getlist, use source file name
 			strT = strSourceFileName;

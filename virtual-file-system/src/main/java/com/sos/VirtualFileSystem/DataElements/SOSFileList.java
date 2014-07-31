@@ -400,7 +400,6 @@ public class SOSFileList extends SOSVfsMessageCodes {
 		try {
 			if (objOptions.CreateResultSet.isTrue()) {
 				if (objOptions.ResultSetFileName.isDirty()) {
-					// TODO use the file object from the option
 					JSFile objResultSetFile = objOptions.ResultSetFileName.JSFile();
 					for (SOSFileListEntry objListItem : objFileListEntries) {
 						String strFileName = objListItem.getFileName4ResultList();
