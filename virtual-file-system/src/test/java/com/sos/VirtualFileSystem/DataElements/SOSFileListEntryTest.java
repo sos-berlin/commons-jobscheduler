@@ -90,6 +90,17 @@ public class SOSFileListEntryTest extends JSListenerClass {
 	public void tearDown() throws Exception {
 	}
 
+	@Test
+	public void testEnuTransferStatus () {
+		enuTransferStatus eStatus = enuTransferStatus.FileNotFound;
+		String strT = eStatus.name();
+		System.out.println(strT + ", " + eStatus.description + ", " + eStatus.MsgCode);
+		
+		String[] strA = enuTransferStatus.getArray();
+		for (String string : strA) {
+			System.out.println(string);
+		}
+	}
 	// @Test
 	public void testVfsHandler() {
 		fail("Not yet implemented");

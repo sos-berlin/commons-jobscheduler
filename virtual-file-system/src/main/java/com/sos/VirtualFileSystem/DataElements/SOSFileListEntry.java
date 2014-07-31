@@ -57,10 +57,8 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 * @exception classname description
 *
 */
-@I18NResourceBundle(
-					baseName = "SOSVirtualFileSystem",
-					defaultLocale = "en")
-public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJadeTransferDetailHistoryData /* , ISOSVirtualFile */{
+@I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en") public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable,
+		IJadeTransferDetailHistoryData /* , ISOSVirtualFile */{
 	private static final String	conFieldJUMP_USER			= "jump_user";
 	private static final String	conFieldJUMP_PROTOCOL		= "jump_protocol";
 	private static final String	conFieldJUMP_PORT			= "jump_port";
@@ -89,57 +87,105 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	private static final String	conFieldTRANSFER_TIMESTAMP	= "transfer_timestamp";
 	private static final String	conFieldMANDATOR			= "mandator";
 	private static final String	conFieldGUID				= "guid";
+	// TODO should be placed in a separate file
 	public enum enuTransferStatus {
-		transferUndefined, waiting4transfer, transferring, transferInProgress, transferred, transfer_skipped, transfer_has_errors, transfer_aborted, compressed, notOverwritten, deleted, renamed, IgnoredDueToZerobyteConstraint, setBack, polling
+		// Java -> Code Style -> Formatter -> Edit -> Off/On Tags
+		// @formatter:off
+		transferUndefined("SOSVfs_T_0310"), 
+		waiting4transfer("SOSVfs_T_0311"), 
+		transferring("SOSVfs_T_0312"), 
+		transferInProgress("SOSVfs_T_0313"), 
+		transferred("SOSVfs_T_0314"), 
+		transfer_skipped("SOSVfs_T_0315"), 
+		transfer_has_errors("SOSVfs_T_0316"), 
+		transfer_aborted("SOSVfs_T_0317"), 
+		compressed("SOSVfs_T_0318"), 
+		notOverwritten("SOSVfs_T_0319"), 
+		deleted("SOSVfs_T_0320"), 
+		renamed("SOSVfs_T_0321"), 
+		IgnoredDueToZerobyteConstraint("SOSVfs_T_0322"), 
+		setBack("SOSVfs_T_0323"), 
+		polling("SOSVfs_T_0324"), 
+		FileNotFound("SOSVfs_T_0325");
+		// @formatter:on
+		public String	description;  // returns the i18n text
+		public String	MsgCode;	// returns the property key of the i18n file
+
+		public String Text() {
+			return description;
+		}
+
+		/**
+		 * constructor for enum
+		 * @param name
+		 */
+		private enuTransferStatus(final String name) {
+			String k;
+			if (name == null) {
+				k = this.name();
+			}
+			else {
+				k = new SOSMsgVfs(name).get();
+				MsgCode = name;
+			}
+			description = k;
+		}
+
+		public static String[] getArray() {
+			String[] strA = new String[enuTransferStatus.values().length];
+			int i = 0;
+			for (enuTransferStatus enuType : enuTransferStatus.values()) {
+				strA[i++] = enuType.description;
+			}
+			return strA;
+		}
 	}
-	private static String			conClassName					= "SOSFileListEntry";
-	private final static Logger		logger							= Logger.getLogger(SOSFileListEntry.class);
-	private final static Logger		objJadeReportLogger				= Logger.getLogger(VFSFactory.getLoggerName());
-	@SuppressWarnings("unused")
-	private final String			conSVNVersion					= "$Id$";
+	//
+	private static String									conClassName					= "SOSFileListEntry";
+	private final static Logger								logger							= Logger.getLogger(SOSFileListEntry.class);
+	private final static Logger								objJadeReportLogger				= Logger.getLogger(VFSFactory.getLoggerName());
+	@SuppressWarnings("unused") private final String		conSVNVersion					= "$Id$";
 	//	private static boolean									flgNoDataSent					= false;
-	private ISOSVirtualFile			fleSourceTransferFile			= null;
-	private ISOSVirtualFile			fleSourceFile					= null;
-	private ISOSVirtualFile			fleTargetFile					= null;
-	private String					strSourceFileName				= null;
-	private String					strSourceTransferName			= null;
-	private String					strTargetTransferName			= null;
-	private String					strTargetFileName				= null;
-	private long					lngNoOfBytesTransferred			= 0;
-	private long					lngFileSize						= -1L;
-	private long					lngFileModDate					= -1L;
-	private final String			strZipFileName					= "";
-	private long					lngTransferProgress				= 0;
-	private boolean					flgTransactionalRemoteFile		= false;
-	private boolean					flgTransactionalLocalFile		= false;
-	public long						zeroByteCount					= 0;
-	private long					lngOriginalFileSize				= 0;
-	@SuppressWarnings("unused")
-	private final boolean			flgTransferSkipped				= false;
-	private SOSFTPOptions			objOptions						= null;
-	private String					strAtomicFileName				= EMPTY_STRING;
-	private enuTransferStatus		eTransferStatus					= enuTransferStatus.transferUndefined;
-	private ISOSVfsFileTransfer		objDataSourceClient				= null;
-	private ISOSVfsFileTransfer		objDataTargetClient				= null;
-	private ISOSVirtualFile			objTargetTransferFile			= null;
-	private ISOSVirtualFile			objSourceTransferFile			= null;
-	private SOSFileList				objParent						= null;
-	private boolean					flgFileExists					= false;
-	private String					strMD5Hash						= "n.a.";
-	private Date					dteStartTransfer				= null;
-	private Date					dteEndTransfer					= null;
-	@SuppressWarnings("unused")
-	private ISOSVfsFileTransfer		objVfsHandler					= null;
+	private ISOSVirtualFile									fleSourceTransferFile			= null;
+	private ISOSVirtualFile									fleSourceFile					= null;
+	private ISOSVirtualFile									fleTargetFile					= null;
+	private String											strSourceFileName				= null;
+	private String											strSourceTransferName			= null;
+	private String											strTargetTransferName			= null;
+	private String											strTargetFileName				= null;
+	private long											lngNoOfBytesTransferred			= 0;
+	private long											lngFileSize						= -1L;
+	private long											lngFileModDate					= -1L;
+	private final String									strZipFileName					= "";
+	private long											lngTransferProgress				= 0;
+	private boolean											flgTransactionalRemoteFile		= false;
+	private boolean											flgTransactionalLocalFile		= false;
+	public long												zeroByteCount					= 0;
+	private long											lngOriginalFileSize				= 0;
+	@SuppressWarnings("unused") private final boolean		flgTransferSkipped				= false;
+	private SOSFTPOptions									objOptions						= null;
+	private String											strAtomicFileName				= EMPTY_STRING;
+	private enuTransferStatus								eTransferStatus					= enuTransferStatus.transferUndefined;
+	private ISOSVfsFileTransfer								objDataSourceClient				= null;
+	private ISOSVfsFileTransfer								objDataTargetClient				= null;
+	private ISOSVirtualFile									objTargetTransferFile			= null;
+	private ISOSVirtualFile									objSourceTransferFile			= null;
+	private SOSFileList										objParent						= null;
+	private boolean											flgFileExists					= false;
+	private String											strMD5Hash						= "n.a.";
+	private Date											dteStartTransfer				= null;
+	private Date											dteEndTransfer					= null;
+	@SuppressWarnings("unused") private ISOSVfsFileTransfer	objVfsHandler					= null;
 	// Hier bereits zuweisen, damit in der CSV-Datei und in der Order eine identische GUID verwendet wird.
-	private final String			guid							= UUID.randomUUID().toString();
-	private boolean					flgSteadyFlag					= false;
-	private final boolean			flgTransferHistoryAlreadySent	= false;
-	public boolean					flgIsHashFile					= false;
-	private FTPFile					objFTPFile						= null;
-	private String					strCSVRec						= new String();
-	private String					strRenamedSourceFileName		= null;
-	private SOSVfsConnectionPool	objConnPoolSource				= null;
-	private SOSVfsConnectionPool	objConnPoolTarget				= null;
+	private final String									guid							= UUID.randomUUID().toString();
+	private boolean											flgSteadyFlag					= false;
+	private final boolean									flgTransferHistoryAlreadySent	= false;
+	public boolean											flgIsHashFile					= false;
+	private FTPFile											objFTPFile						= null;
+	private String											strCSVRec						= new String();
+	private String											strRenamedSourceFileName		= null;
+	private SOSVfsConnectionPool							objConnPoolSource				= null;
+	private SOSVfsConnectionPool							objConnPoolTarget				= null;
 
 	public SOSFileListEntry() {
 		super(SOSVfsConstants.strBundleBaseName);
@@ -276,7 +322,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		}
 		Checksum objCRC = null;
 		try {
-	        objCRC = new CRC32();
+			objCRC = new CRC32();
 		}
 		catch (Exception e1) {
 			e1.printStackTrace();
@@ -284,7 +330,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		executePreCommands();
 		long lngTotalBytesTransferred = 0;
 		Base64 objBase64 = null;
-		boolean flgErrorOnInput = false;		this.setStatus(enuTransferStatus.transferring);
+		boolean flgErrorOnInput = false;
+		this.setStatus(enuTransferStatus.transferring);
 		try {
 			int intCumulativeFileSeperatorLength = 0;
 			int lngBufferSize = objOptions.BufferSize.value();
@@ -352,9 +399,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 					objF.deleteOnExit();
 				}
 			}
-
 			String localCRC = Long.toHexString(objCRC.getValue()).toUpperCase();
-			   logger.info("CRC32 is " + localCRC);
+			logger.info("CRC32 is " + localCRC);
 			// objDataTargetClient.CompletePendingCommand();
 			if (objDataTargetClient.isNegativeCommandCompletion()) {
 				RaiseException(SOSVfs_E_175.params(objTargetTransferFile.getName(), objDataTargetClient.getReplyString()));
@@ -558,10 +604,11 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	@Override public String getStatusText() {
 		return eTransferStatus.name();
 	}
-	
+
 	public String getStatusMsg() {
-		SOSMsgVfs objSOSMsgVfs = new SOSMsgVfs("SOSVfs_I_03" + (eTransferStatus.ordinal() + 10));
-		return objSOSMsgVfs.get();
+//		SOSMsgVfs objSOSMsgVfs = new SOSMsgVfs("SOSVfs_I_03" + (eTransferStatus.ordinal() + 10));
+//		return objSOSMsgVfs.get();
+		return eTransferStatus.description;
 	}
 
 	public ISOSVirtualFile getTargetFile(final ISOSFtpOptions objO) {
@@ -844,13 +891,17 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 			}
 			ISOSVirtualFile objSourceFile = objDataSourceClient.getFileHandle(strSourceFileName);
 			if (objSourceFile.notExists() == true) {
-				throw new JobSchedulerException(SOSVfs_E_226.params(strSourceFileName));
+				if (objOptions.ErrorOnNoDataFound.isTrue()) { // File is no (longer) existing. may be file_path was specified with a non existing file
+					throw new JobSchedulerException(SOSVfs_E_226.params(strSourceFileName));
+				}
+				else {
+					this.setStatus(enuTransferStatus.FileNotFound);
+					return;
+				}
 			}
-			
 			// just to check wether the file is readable. will raise an exception if not
 			// prevent to create a 0-byte file on the target
-			
-			objDataSourceClient.getFileHandle(strSourceFileName);			
+			objDataSourceClient.getFileHandle(strSourceFileName);
 			/**
 			 * hier nicht verwenden, weil es zu spüt kommt.
 			 */

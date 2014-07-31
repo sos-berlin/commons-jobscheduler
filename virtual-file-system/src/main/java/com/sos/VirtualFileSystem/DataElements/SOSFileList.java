@@ -39,6 +39,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 	private Vector<SOSFileListEntry>		objFileListEntries					= new Vector<>();
 	long									lngSuccessfulTransfers				= 0;
 	long									lngFailedTransfers					= 0;
+	long									lngFilesNotFound					= 0;
 	long									lngSkipedTransfers					= 0;
 	long									lngNoOfTransferHistoryRecordsSent	= 0;
 	long									lngNoOfHistoryFileRecordsWritten	= 0;
@@ -116,6 +117,8 @@ public class SOSFileList extends SOSVfsMessageCodes {
 		lngFailedTransfers = 0;
 		lngSkipedTransfers = 0;
 		lngNoOfBytesTransferred = 0;
+		lngFilesNotFound = 0;
+
 		if (objFileListEntries != null) {
 			for (SOSFileListEntry objEntry : objFileListEntries) {
 				if (objEntry == null) {
@@ -131,6 +134,9 @@ public class SOSFileList extends SOSVfsMessageCodes {
 						break;
 					case deleted:
 						lngSuccessfulTransfers++;
+						break;
+					case FileNotFound:
+						lngFilesNotFound++;
 						break;
 					case transfer_has_errors:
 					case transfer_aborted:
