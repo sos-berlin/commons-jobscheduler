@@ -17,7 +17,6 @@ import com.sos.JSHelper.Options.SOSOptionPortNumber;
 import com.sos.JSHelper.Options.SOSOptionRegExp;
 import com.sos.JSHelper.Options.SOSOptionString;
 import com.sos.JSHelper.Options.SOSOptionStringValueList;
-import com.sos.JSHelper.Options.SOSOptionUrl;
 import com.sos.JSHelper.Options.SOSOptionUserName;
 import com.sos.VirtualFileSystem.Interfaces.ISOSCmdShellOptions;
 
@@ -344,7 +343,7 @@ public class SOSSQLPlusJobOptionsSuperClass extends SOSCredentialStoreSuperClass
 						key = "db_url",
 						type = "SOSOptionString",
 						mandatory = true)
-	public SOSOptionUrl	db_url	= new SOSOptionUrl(this, conClassName + ".db_url", // HashMap-Key
+	public SOSOptionString	db_url	= new SOSOptionString(this, conClassName + ".db_url", // HashMap-Key
 										"URL for connection to database jdbc url (e.g.", // Titel
 										"", // InitValue
 										"", // DefaultValue
@@ -360,7 +359,7 @@ public class SOSSQLPlusJobOptionsSuperClass extends SOSCredentialStoreSuperClass
 	 * \return URL for connection to database jdbc url (e.g.
 	 *
 	 */
-	public SOSOptionUrl getdb_url() {
+	public SOSOptionString getdb_url() {
 		return db_url;
 	}
 
@@ -372,7 +371,7 @@ public class SOSSQLPlusJobOptionsSuperClass extends SOSCredentialStoreSuperClass
 	 *
 	 * @param db_url : URL for connection to database jdbc url (e.g.
 	 */
-	public void setdb_url(final SOSOptionUrl p_db_url) {
+	public void setdb_url(final SOSOptionString p_db_url) {
 		db_url = p_db_url;
 	}
 	/**
