@@ -5515,7 +5515,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	/**
 	* \var poll_minfiles : This parameter specifies the number of files tha
 	*
-	This parameter specifies the number of files that have to be found during the polling period in order to cause the transfer to start. This parameter is used exclusively with the parameters poll_timeout.
+	* This parameter specifies the number of files that have to be found during the polling period in order to cause the transfer to start. 
+	* This parameter is used exclusively with the parameters poll_timeout.
 	*
 	*/
 	@JSOptionDefinition(

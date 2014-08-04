@@ -299,7 +299,7 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 		objJadeReportLogger.info(strM);
 	}
 
-	@SuppressWarnings({ "finally", "null" }) private long doTransfer(final ISOSVirtualFile objInput, final ISOSVirtualFile objOutput) {
+	@SuppressWarnings({ "null", "finally" }) private long doTransfer(final ISOSVirtualFile objInput, final ISOSVirtualFile objOutput) {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::doTransfer";
 		boolean flgClosingDone = false;
 		if (objOutput == null) {
@@ -386,6 +386,7 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 					}
 				}
 			}
+			
 			objInput.closeInput();
 			objOutput.closeOutput();
 			flgClosingDone = true;
@@ -408,7 +409,6 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 			this.setNoOfBytesTransferred(lngTotalBytesTransferred);
 			lngTotalBytesTransferred += intCumulativeFileSeperatorLength;
 			executeTFNPostCommnands();
-			return lngTotalBytesTransferred;
 		}
 		catch (Exception e) {
 			TransferStatus(enuTransferStatus.transfer_has_errors);
@@ -428,8 +428,9 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 				}
 				flgClosingDone = true;
 			}
-			return lngTotalBytesTransferred;
+
 		}
+		return lngTotalBytesTransferred;
 	} //doTransfer
 
 	private void executeCommands(final ISOSVfsFileTransfer pobjDataClient, final SOSOptionString pstrCommandString) {
