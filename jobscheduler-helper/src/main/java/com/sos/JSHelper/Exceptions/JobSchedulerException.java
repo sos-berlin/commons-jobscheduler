@@ -170,13 +170,13 @@ public class JobSchedulerException extends RuntimeException {
 		saveException(e);
 	}
 
-	private void setMessage(final String pstrMsg) {
+	public void setMessage(final String pstrMsg) {
 
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::setMessage";
 
 		strMessage = pstrMsg;
-		LastErrorMessage = pstrMsg;
+		LastErrorMessage += pstrMsg + "\n";
 
 	} // private void setMessage
 
