@@ -48,7 +48,6 @@
   
   <configuration>
     <params id="job_parameter">
-    <!-- 
       <param name="file_path" default_value="./logs" required="false">
         <note language="de">
           <div xmlns="http://www.w3.org/1999/xhtml">
@@ -63,8 +62,6 @@
           </div>
         </note>
       </param>
-     -->
-      <!-- 
       <param name="file_specification" default_value="^(scheduler).*([0-9\\-]+).*(\.log)$" required="false">
         <note language="de">
           <div xmlns="http://www.w3.org/1999/xhtml">
@@ -88,8 +85,6 @@
           </div>
         </note>
       </param>
-       -->
-      <!-- 
       <param name="delete_file_specification" default_value="^(scheduler)([0-9\\-]+).*(\.log)(\.gz)?$" required="false">
         <note language="de">
           <div xmlns="http://www.w3.org/1999/xhtml">
@@ -113,7 +108,6 @@
           </div>
         </note>
       </param>
-       -->
       <param name="file_age" default_value="14" required="false">
         <note language="de">
           <div xmlns="http://www.w3.org/1999/xhtml">
