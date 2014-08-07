@@ -93,6 +93,11 @@ public class JSFileTest {
 		fleTarget.delete();
 	}
 
+	@Test
+	public void testGetTimeStamp () {
+		JSFile fleT = JSFile.createTempFile();
+		System.out.println(fleT.getTimeStamp());
+	}
 	// @Test
 	public void testAppendFile() throws Exception {
 		createTestFile();

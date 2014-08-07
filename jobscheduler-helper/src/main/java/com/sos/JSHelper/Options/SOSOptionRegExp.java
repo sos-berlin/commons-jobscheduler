@@ -100,6 +100,10 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 		super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
 	}
 
+	public SOSOptionRegExp(final String pstrRegExp) {
+		super(null, "", "", pstrRegExp, "", false);
+		
+	}
 	public int getRegExpFlags() {
 		return intRegExpFlags;
 	}
