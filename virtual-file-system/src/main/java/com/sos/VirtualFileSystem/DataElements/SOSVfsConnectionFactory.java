@@ -2,26 +2,31 @@
  *
  */
 package com.sos.VirtualFileSystem.DataElements;
+import static com.sos.VirtualFileSystem.exceptions.JADEExceptionFactory.RaiseJadeException;
+import static com.sos.VirtualFileSystem.exceptions.JADEExceptionFactory.resetLastErrorMessage;
+
 import org.apache.log4j.Logger;
 
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
+import com.sos.VirtualFileSystem.enums.JADEExitCodes;
 
 /**
  * @author KB
  *
  */
 public class SOSVfsConnectionFactory {
-	@SuppressWarnings("unused") private final String		conClassName		= this.getClass().getSimpleName();
-	@SuppressWarnings("unused") private static final String	conSVNVersion		= "$Id$";
+	@SuppressWarnings("unused")
+	private final String			conClassName		= this.getClass().getSimpleName();
+	@SuppressWarnings("unused")
+	private static final String		conSVNVersion		= "$Id$";
 	private final static Logger		logger				= Logger.getLogger(SOSVfsConnectionFactory.class);
-	protected SOSFTPOptions									objOptions			= null;
-	private SOSVfsConnectionPool							objConnPoolSource	= null;
-	private SOSVfsConnectionPool							objConnPoolTarget	= null;
+	protected SOSFTPOptions			objOptions			= null;
+	private SOSVfsConnectionPool	objConnPoolSource	= null;
+	private SOSVfsConnectionPool	objConnPoolTarget	= null;
 
 	/**
 	 *
@@ -100,7 +105,7 @@ public class SOSVfsConnectionFactory {
 			}
 		}
 		catch (Exception ex) {
-			throw (RuntimeException) ex;
+			RaiseJadeException(JADEExitCodes.virtualFileSystemError, ex);
 		}
 		return objVFS4Handler;
 	}
@@ -111,18 +116,28 @@ public class SOSVfsConnectionFactory {
 		}
 		catch (Exception e) { // Problem to connect, try alternate host
 			// TODO respect alternate data-source type? alternate port etc. ?
-			JobSchedulerException.LastErrorMessage = "";
+			resetLastErrorMessage();
 			try {
 				objVFS4Handler.Connect(objConnectOptions.Alternatives());
 				objConnectOptions.setAlternateOptionsUsed("true");
 			}
 			catch (Exception e1) {
-				throw new JobSchedulerException(e);
+				RaiseJadeException(JADEExitCodes.connectionError, e1);
 			}
 			// TODO get an instance of .Alternatives for Authentication ...
 		}
 	}
 
+	//	private void RaiseJadeException (final JADEExitCodes penuExitCode, final Exception e) {
+	//		if (e instanceof JADEException) {
+	//			((JADEException) e).setExitCode(penuExitCode);
+	//			throw (JADEException) e;
+	//		}
+	//		JADEException objJ = new JADEException(e);
+	//		objJ.setExitCode(penuExitCode);
+	//		throw objJ;
+	//	}
+	//	
 	private void doAuthenticate(final ISOSVFSHandler objVFS4Handler, final SOSConnection2OptionsAlternate objConnectOptions, final boolean pflgIsDataSource)
 			throws Exception {
 		try {
@@ -130,12 +145,12 @@ public class SOSVfsConnectionFactory {
 		}
 		catch (Exception e) { // SOSFTP-113: Problem to login, try alternate User
 			// TODO respect alternate authentication, eg password and/or public key
-			JobSchedulerException.LastErrorMessage = "";
+			resetLastErrorMessage();
 			try {
 				objVFS4Handler.Authenticate(objConnectOptions.Alternatives());
 			}
 			catch (RuntimeException e1) {
-				throw e1;
+				RaiseJadeException(JADEExitCodes.authenticatenError, e1);
 			}
 			objConnectOptions.setAlternateOptionsUsed("true");
 		}

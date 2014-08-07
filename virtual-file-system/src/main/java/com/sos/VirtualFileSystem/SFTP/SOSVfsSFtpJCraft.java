@@ -32,10 +32,13 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsSuperClass;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
+import com.sos.VirtualFileSystem.enums.JADEExitCodes;
+import com.sos.VirtualFileSystem.exceptions.JADEException;
+import com.sos.VirtualFileSystem.exceptions.JADEExceptionFactory;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 /**
- * @ressources jsch-0.1.48.jar
+ * @ressources see: pom.xml
  *
  * @author Robert Ehrlich
  *
@@ -308,10 +311,34 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 			}
 		}
 		catch (Exception e) {
+			throw new JADEException(e);
 		}
 		return flgR;
 	}
 
+//	public boolean canRead(final String filename) {
+//		/**
+//		 * Problem: the concept of links is not considered in the Concept of SOSVfs
+//		 * Therefore: wie return here "true" if the filename is a link
+//		 */
+//		boolean flgR = false;
+//		try {
+//			SftpATTRS attributes = this.getClient().stat(filename);
+//			if (attributes != null) {
+//				SftpATTRS objPermissions = attributes.getPermissions();
+//				if (flgR == false) {
+//					flgR = attributes.isLink();
+//				}
+//			}
+//		}
+//		catch (Exception e) {
+//			throw new JobSchedulerException(e);
+//		}
+//		return flgR;
+//	}
+//
+
+	
 	/**
 	 * returns attributes
 	 *
@@ -346,10 +373,10 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 			if (path.length() == 0) {
 				path = ".";
 			}
-			if (!this.fileExists(path)) {
+			if (this.fileExists(path) == false) {
 				return null;
 			}
-			if (!isDirectory(path)) {
+			if (isDirectory(path) == false) {
 				reply = "ls OK";
 				return new String[] { path };
 			}
@@ -368,7 +395,12 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		}
 		catch (Exception e) {
 			reply = e.toString();
-			return null;
+			if (e instanceof JADEException) { 
+				throw (JADEException) e;
+			}
+			else {
+				throw new JADEException(JADEExitCodes.nListError,e);
+			}
 		}
 	}
 
@@ -421,7 +453,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 			transferFile = new File(localFile);
 			if (!append) {
 				if (remoteFileSize > 0 && remoteFileSize != transferFile.length()) {
-					throw new JobSchedulerException(SOSVfs_E_162.params(remoteFileSize, transferFile.length()));
+					throw new JADEException(SOSVfs_E_162.params(remoteFileSize, transferFile.length()));
 				}
 			}
 			remoteFileSize = transferFile.length();
@@ -482,14 +514,21 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	 */
 	@Override public void delete(final String path) {
 		try {
-			if (this.isDirectory(path)) {
-				throw new JobSchedulerException(SOSVfs_E_186.params(path));
+			boolean flgR;
+			try {
+				flgR = this.isDirectory(path);
+			}
+			catch (Exception e) {
+				flgR = false;
+			}
+			if (flgR == true) {
+				JADEExceptionFactory.RaiseDeleteException(HostID(SOSVfs_E_186.params(path)));
 			}
 			this.getClient().rm(path);
 		}
 		catch (Exception ex) {
 			reply = ex.toString();
-			RaiseException(ex, SOSVfs_E_187.params("delete", path));
+			JADEExceptionFactory.RaiseJadeException(JADEExitCodes.someUnspecificError,  HostID(SOSVfs_E_187.params("delete", path)), ex);
 		}
 		reply = "rm OK";
 		logINFO(HostID(SOSVfs_D_181.params("delete", path, getReplyString())));
@@ -514,7 +553,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		}
 		catch (Exception e) {
 			reply = e.toString();
-			throw new JobSchedulerException(SOSVfs_E_188.params("rename", from, to), e);
+			JADEExceptionFactory.RaiseJadeException(JADEExitCodes.someUnspecificError, HostID(SOSVfs_E_188.params("rename", from, to)), e);
 		}
 		reply = "mv OK";
 		logger.info(HostID(SOSVfs_I_189.params(from, to, getReplyString())));
@@ -594,7 +633,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		}
 		catch (Exception ex) {
 			reply = ex.toString();
-			RaiseException(ex, SOSVfs_E_134.params("ExecuteCommand"));
+			JADEExceptionFactory.RaiseJadeException(JADEExitCodes.someUnspecificError, ex);
 		}
 		finally {
 			if (out != null) {

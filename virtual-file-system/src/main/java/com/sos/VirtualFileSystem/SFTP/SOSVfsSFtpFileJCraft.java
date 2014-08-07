@@ -133,7 +133,6 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
 
 			OutputStream os = this.getFileOutputStream();
 			if (os == null) {
-
 				throw new Exception(SOSVfs_E_147.get());
 			}
 			os.write(bteBuffer, intOffset, intLength);

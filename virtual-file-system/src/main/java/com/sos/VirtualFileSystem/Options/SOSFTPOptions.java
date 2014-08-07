@@ -28,6 +28,7 @@ import com.sos.JSHelper.Options.SOSOptionTransferType;
 import com.sos.JSHelper.Options.SOSOptionTransferType.enuTransferTypes;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
+import com.sos.VirtualFileSystem.exceptions.JADEException;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 /**
@@ -366,7 +367,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		// TODO in die Options-Klasse, falls nicht schon drin ist ....
 		if (localDir.startsWith(conURIPrefixFILE)) {
 			if (new File(createURI(localDir)).exists() == false) {
-				throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_0010.params(localDir));
+				throw new JADEException(SOSVfsMessageCodes.SOSVfs_E_0010.params(localDir));
 			}
 		}
 		checkReplaceAndReplacing(Target());

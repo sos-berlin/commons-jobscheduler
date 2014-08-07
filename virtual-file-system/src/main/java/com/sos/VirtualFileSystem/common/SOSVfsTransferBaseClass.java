@@ -28,28 +28,25 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFileSystem;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFolder;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
+import com.sos.VirtualFileSystem.enums.JADEExitCodes;
+import com.sos.VirtualFileSystem.exceptions.JADEExceptionFactory;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
-@I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
+@I18NResourceBundle(
+					baseName = "SOSVirtualFileSystem",
+					defaultLocale = "en")
 public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTransfer, ISOSVFSHandler, ISOSVirtualFileSystem, ISOSConnection {
-
 	private final static Logger					logger						= Logger.getLogger(SOSVfsTransferBaseClass.class);
-
 	/** key file: ~/.ssh/id_rsa or ~/.ssh/id_dsa (must be OpenSSH-Format) */
 	protected String							authenticationFilename		= "";
 	private Vector<String>						directoryListing			= null;
-
 	protected String							host						= EMPTY_STRING;
 	protected int								port						= 0;
 	protected String							userName					= EMPTY_STRING;
-
 	protected String							reply						= "OK";
-
 	// keep Track of current directory for ftp emulation
 	protected String							currentDirectory			= "";
-
 	protected SOSConnection2OptionsAlternate	connection2OptionsAlternate	= null;
-
 	@SuppressWarnings("unused")
 	protected ISOSAuthenticationOptions			authenticationOptions		= null;
 
@@ -73,21 +70,19 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	 *
 	 * @return The reply code received from the server.
 	 */
-	@Override
-	public int passive() {
+	@Override public int passive() {
 		return 0;
 	}
 
-	@Override
-	public String DoPWD() {
+	@Override public String DoPWD() {
 		try {
 			logDEBUG(SOSVfs_D_141.params("pwd."));
 			return this.getCurrentPath();
 		}
 		catch (Exception e) {
-			RaiseException(e, SOSVfs_E_134.params("pwd"));
-			return null;
+			JADEExceptionFactory.RaiseJadeException(JADEExitCodes.someUnspecificError, HostID(SOSVfs_E_134.params("pwd")), e);
 		}
+		return null;
 	} // private int DoPWD
 
 	/**
@@ -111,16 +106,12 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 		if (reply.trim().length() > 0) {
 			logDEBUG(reply);
 		}
-
 		return true;
 	} // private boolean LogReply
 
-	@Override
-	public boolean isNegativeCommandCompletion() {
-
+	@Override public boolean isNegativeCommandCompletion() {
 		int x = 0;
 		// TODO separate Routine draus machen
-
 		// try {
 		// if (Client().completePendingCommand() == false) {
 		// logout();
@@ -132,14 +123,11 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 		// // TODO Auto-generated catch block
 		// e.printStackTrace();
 		// }
-
 		// int x = getReplyCode();
-
 		return x > 300;
 	} // private boolean isNegativeCommandCompletion
 
-	@Override
-	public void CompletePendingCommand() {
+	@Override public void CompletePendingCommand() {
 		// try {
 		// if (Client().completePendingCommand() == false) {
 		// logout();
@@ -152,7 +140,6 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 		// e.printStackTrace();
 		// RaiseException("File transfer failed. completePendingCommand() raised an exception");
 		// }
-
 	}
 
 	/**
@@ -162,13 +149,11 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	 *
 	 * @param pstrStrictHostKeyCheckingValue
 	 */
-	public void StrictHostKeyChecking (final String pstrStrictHostKeyCheckingValue) {
-
+	public void StrictHostKeyChecking(final String pstrStrictHostKeyCheckingValue) {
 	}
 
 	private boolean isPositiveCommandCompletion() {
 		int x = 0;
-
 		return x <= 300;
 	} // private boolean isPositiveCommandCompletion
 
@@ -176,7 +161,6 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 		if (strFileName.equalsIgnoreCase("..") == false && strFileName.equalsIgnoreCase(".") == false) {
 			return true; // not a hidden file
 		}
-
 		return false; // it is a hidden-file
 	} // private boolean isNotHiddenFile
 
@@ -189,8 +173,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	 * @exception RuntimeException
 	 * @see #dir()
 	 */
-	@Override
-	public Vector<String> nList(final String pathname) {
+	@Override public Vector<String> nList(final String pathname) {
 		return getFilenames(pathname);
 	} // nList
 
@@ -203,9 +186,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	 * @exception JobSchedulerException
 	 * @see #dir()
 	 */
-	@Override
-	public Vector<String> nList(final String pathname, final boolean flgRecurseSubFolder) {
-
+	@Override public Vector<String> nList(final String pathname, final boolean flgRecurseSubFolder) {
 		Vector<String> result = null;
 		try {
 			result = getFilenames(pathname, flgRecurseSubFolder);
@@ -227,8 +208,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	 * @see #dir()
 	 * @see #dir( String )
 	 */
-	@Override
-	public Vector<String> nList() {
+	@Override public Vector<String> nList() {
 		Vector<String> result = null;
 		try {
 			result = getFilenames();
@@ -237,7 +217,6 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 			RaiseException(e, SOSVfs_E_134.params("nList"));
 		}
 		return result;
-
 	} // nList
 
 	/**
@@ -251,10 +230,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	 * @see #dir()
 	 * @see #dir( String )
 	 */
-
-	@Override
-	public Vector<String> nList(final boolean recursive) {
-
+	@Override public Vector<String> nList(final boolean recursive) {
 		Vector<String> result = null;
 		try {
 			result = getFilenames(recursive);
@@ -293,9 +269,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	 * @see #nList( String )
 	 * @see #dir()
 	 */
-	@Override
-	public SOSFileList dir(final String pathname, final int flag) {
-
+	@Override public SOSFileList dir(final String pathname, final int flag) {
 		SOSFileList fileList = new SOSFileList();
 		String[] listFiles = null;
 		try {
@@ -328,8 +302,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	 * @param filename
 	 * @return true, if filename is a directory
 	 */
-	@Override
-	public boolean isDirectory(final String filename) {
+	@Override public boolean isDirectory(final String filename) {
 		logINFO("not implemented yet");
 		return false;
 	}
@@ -347,8 +320,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	 * @return
 	 * @throws IOException
 	 */
-	@Override
-	public String[] listNames(final String path) throws IOException {
+	@Override public String[] listNames(final String path) throws IOException {
 		logINFO("not implemented yet");
 		return null;
 	}
@@ -384,8 +356,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	* @return the response string without response code
 	* @throws Exception
 	*/
-	@SuppressWarnings("unused")
-	protected String trimResponseCode(final String response) throws Exception {
+	@SuppressWarnings("unused") protected String trimResponseCode(final String response) throws Exception {
 		if (response.length() < 5)
 			return response;
 		return response.substring(4).trim();
@@ -401,7 +372,6 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 		}
 		catch (Exception e) {
 		}
-
 	}
 
 	protected void closeInput(InputStream objO) {
@@ -413,7 +383,6 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 		}
 		catch (IOException e) {
 		}
-
 	}
 
 	/**
@@ -425,8 +394,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	 * @see #get( String, String )
 	 * @exception Exception
 	 */
-	@Override
-	public long getFile(final String remoteFile, final String localFile) {
+	@Override public long getFile(final String remoteFile, final String localFile) {
 		final boolean flgAppendLocalFile = false;
 		long lngNoOfBytesRead = 0;
 		try {
@@ -457,9 +425,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	 * @exception Exception
 	 * @see #putFile( String, String )
 	 */
-	@Override
-	public void put(final String localFile, final String remoteFile) {
-
+	@Override public void put(final String localFile, final String remoteFile) {
 		this.putFile(localFile, remoteFile);
 	}
 
@@ -473,8 +439,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	 * @exception Exception
 	 * @see #put( String, String )
 	 */
-	@Override
-	// ISOSVfsFileTransfer
+	@Override// ISOSVfsFileTransfer
 	public long putFile(final String localFile, final String remoteFile) {
 		logINFO("not implemented yet");
 		return 0;
@@ -488,13 +453,10 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	 * @return The total number of bytes written.
 	 * @exception Exception
 	 */
-	@SuppressWarnings("null")
-	@Override
-	public long putFile(final String localFile, final OutputStream out) {
+	@SuppressWarnings("null") @Override public long putFile(final String localFile, final OutputStream out) {
 		if (out == null) {
 			RaiseException(SOSVfs_E_147.get());
 		}
-
 		FileInputStream in = null;
 		long bytesWrittenTotal = 0;
 		try {
@@ -535,8 +497,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	 * @see #put( String, String )
 	 * @see #putFile( String, String )
 	 */
-	@Override
-	public long appendFile(final String localFile, final String remoteFile) {
+	@Override public long appendFile(final String localFile, final String remoteFile) {
 		notImplemented();
 		return -1;
 	} // appendFile
@@ -547,8 +508,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	 * @throws IOException If an I/O error occurs while either sending a
 	 * command to the server or receiving a reply from the server.
 	 */
-	@Override
-	public void ascii() {
+	@Override public void ascii() {
 		// try {
 		// boolean flgResult = Client().setFileType(FTP.ASCII_FILE_TYPE);
 		// if (flgResult == false) {
@@ -566,8 +526,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	 * @throws IOException If an I/O error occurs while either sending a
 	 * command to the server or receiving a reply from the server.
 	 */
-	@Override
-	public void binary() {
+	@Override public void binary() {
 		// try {
 		// boolean flgResult = Client().setFileType(FTP.BINARY_FILE_TYPE);
 		// if (flgResult == false) {
@@ -621,8 +580,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	 * @return
 	 * @throws IOException
 	 */
-	@Override
-	public boolean changeWorkingDirectory(final String pathname) throws IOException {
+	@Override public boolean changeWorkingDirectory(final String pathname) throws IOException {
 		logINFO("not implemented yet");
 		return true;
 	}
@@ -641,17 +599,13 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 		return pathname;
 	}
 
-	@Override
-	public void login(final String strUserName, final String strPassword) {
-
+	@Override public void login(final String strUserName, final String strPassword) {
 	} // private boolean login
 
-	@Override
-	public void disconnect() {
+	@Override public void disconnect() {
 	}
 
-	@Override
-	public String getReplyString() {
+	@Override public String getReplyString() {
 		String strT = reply;
 		return strT;
 	}
@@ -667,8 +621,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	 *
 	 * @return
 	 */
-	@Override
-	public boolean isConnected() {
+	@Override public boolean isConnected() {
 		return false;
 	}
 
@@ -678,9 +631,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	// logger.debug(String.format("reply from FTP-Server is %1$s, code = %2$d", Client().getReplyString(), Client().getReplyCode()));
 	// return strA;
 	// }
-
-	@Override
-	public void logout() {
+	@Override public void logout() {
 		try {
 			if (isConnected() == true) {
 				disconnect();
@@ -695,41 +646,34 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 		}
 	}
 
-	@Override
-	public ISOSVFSHandler getHandler() {
+	@Override public ISOSVFSHandler getHandler() {
 		return this;
 	}
 
-	@Override
-	public void ExecuteCommand(final String strCmd) throws Exception {
+	@Override public void ExecuteCommand(final String strCmd) throws Exception {
 		logINFO("not implemented yet");
 	}
 
-	@Override
-	public String createScriptFile(final String pstrContent) throws Exception {
+	@Override public String createScriptFile(final String pstrContent) throws Exception {
 		notImplemented();
 		return null;
 	}
 
-	@Override
-	public Integer getExitCode() {
+	@Override public Integer getExitCode() {
 		notImplemented();
 		return null;
 	}
 
-	@Override
-	public String getExitSignal() {
+	@Override public String getExitSignal() {
 		notImplemented();
 		return null;
 	}
 
-	@Override
-	public ISOSConnection Authenticate(final ISOSAuthenticationOptions pobjAO) throws Exception {
+	@Override public ISOSConnection Authenticate(final ISOSAuthenticationOptions pobjAO) throws Exception {
 		return this;
 	}
 
-	@Override
-	public void CloseConnection() throws Exception {
+	@Override public void CloseConnection() throws Exception {
 		if (isConnected()) {
 			disconnect();
 			logDEBUG(SOSVfs_D_125.params(host));
@@ -737,47 +681,36 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 		}
 	}
 
-	@Override
-	public ISOSConnection Connect() {
+	@Override public ISOSConnection Connect() {
 		//this.connect(objConnection2Options.host.Value(), objConnection2Options.port.value());
 		notImplemented();
 		return this;
 	}
 
-	@Override
-	public ISOSConnection Connect(final SOSConnection2OptionsAlternate pobjConnectionOptions) {
-
+	@Override public ISOSConnection Connect(final SOSConnection2OptionsAlternate pobjConnectionOptions) {
 		return this;
 	}
 
-	@Override
-	public ISOSConnection Connect(final ISOSConnectionOptions pobjConnectionOptions) throws Exception {
+	@Override public ISOSConnection Connect(final ISOSConnectionOptions pobjConnectionOptions) throws Exception {
 		notImplemented();
-
 		return this;
 	}
 
-	@Override
-	public ISOSConnection Connect(final String pstrHostName, final int pintPortNumber) throws Exception {
+	@Override public ISOSConnection Connect(final String pstrHostName, final int pintPortNumber) throws Exception {
 		notImplemented();
-
 		return this;
 	}
 
-	@Override
-	public void CloseSession() throws Exception {
+	@Override public void CloseSession() throws Exception {
 		this.logout();
 	}
 
-	@Override
-	public ISOSSession OpenSession(final ISOSShellOptions pobjShellOptions) throws Exception {
+	@Override public ISOSSession OpenSession(final ISOSShellOptions pobjShellOptions) throws Exception {
 		notImplemented();
 		return null;
 	}
 
-	@Override
-	public ISOSVirtualFile TransferMode(final SOSOptionTransferMode pobjFileTransferMode) {
-
+	@Override public ISOSVirtualFile TransferMode(final SOSOptionTransferMode pobjFileTransferMode) {
 		if (pobjFileTransferMode.isAscii()) {
 			this.ascii();
 		}
@@ -793,56 +726,42 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 		return objF;
 	}
 
-	@Override
-	public ISOSVirtualFolder mkdir(final SOSFolderName pobjFolderName) throws IOException {
+	@Override public ISOSVirtualFolder mkdir(final SOSFolderName pobjFolderName) throws IOException {
 		this.mkdir(pobjFolderName.Value());
 		return null;
 	}
 
-	@Override
-	public boolean rmdir(final SOSFolderName pobjFolderName) throws IOException {
+	@Override public boolean rmdir(final SOSFolderName pobjFolderName) throws IOException {
 		this.rmdir(pobjFolderName.Value());
 		return true;
 	}
 
-	@Override
-	public ISOSConnection getConnection() {
+	@Override public ISOSConnection getConnection() {
 		return this;
 	}
 
-	@Override
-	public ISOSSession getSession() {
+	@Override public ISOSSession getSession() {
 		return null;
 	}
 
-	@Override
-	public SOSFileList dir(final SOSFolderName pobjFolderName) {
+	@Override public SOSFileList dir(final SOSFolderName pobjFolderName) {
 		this.dir(pobjFolderName.Value());
 		return null;
 	}
 
-	@Override
-	public StringBuffer getStdErr() throws Exception {
-		 
+	@Override public StringBuffer getStdErr() throws Exception {
 		return null;
 	}
 
-	@Override
-	public StringBuffer getStdOut() throws Exception {
-		 
+	@Override public StringBuffer getStdOut() throws Exception {
 		return null;
 	}
 
-	@Override
-	public boolean remoteIsWindowsShell() {
-		 
+	@Override public boolean remoteIsWindowsShell() {
 		return false;
 	}
 
-	@Override
-	public void setJSJobUtilites(final JSJobUtilities pobjJSJobUtilities) {
-		 
-
+	@Override public void setJSJobUtilites(final JSJobUtilities pobjJSJobUtilities) {
 	}
 
 	/**
@@ -857,53 +776,53 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	 * @param pstrFilename
 	 * @return
 	 */
-	@Override
-	public ISOSVirtualFile getFileHandle(final String pstrFilename) {
+	@Override public ISOSVirtualFile getFileHandle(final String pstrFilename) {
 		return null;
 	}
 
-	@Override
-	public String[] getFilelist(final String folder, final String regexp, final int flag, final boolean withSubFolder) {
-		Vector<String> result = nList(folder, withSubFolder);
+	@Override public String[] getFilelist(final String folder, final String regexp, final int flag, final boolean withSubFolder) {
+		Vector<String> newResult = new Vector<String>();
+		try {
+			Vector<String> result = nList(folder, withSubFolder);
+			Pattern pattern = Pattern.compile(regexp, flag);
+			for (String strFile : result) {
+				/**
+				 * the file_spec has to be compared to the filename only ... excluding the path
+				 */
+				Matcher matcher = pattern.matcher(new File(strFile).getName());
+				if (matcher.find() == true) {
+					newResult.add(strFile);
+				}
+			}
+		}
+		catch (Exception e) {
+			if (e instanceof JobSchedulerException) {
+				throw (JobSchedulerException) e;
+			}
+			else {
+				throw new JobSchedulerException(e);
+			}
+		}
+		return newResult.toArray(new String[newResult.size()]);
+	}
 
+	@Override public String[] getFolderlist(final String folder, final String regexp, final int flag, final boolean withSubFolder) {
+		Vector<String> result = nList(folder, withSubFolder);
 		Vector<String> newResult = new Vector<String>();
 		Pattern pattern = Pattern.compile(regexp, flag);
 		for (String strFile : result) {
 			/**
 			 * the file_spec has to be compared to the filename only ... excluding the path
 			 */
-
 			Matcher matcher = pattern.matcher(new File(strFile).getName());
 			if (matcher.find() == true) {
 				newResult.add(strFile);
 			}
 		}
-
 		return newResult.toArray(new String[newResult.size()]);
 	}
 
-	@Override
-	public String[] getFolderlist(final String folder, final String regexp, final int flag, final boolean withSubFolder) {
-		Vector<String> result = nList(folder, withSubFolder);
-
-		Vector<String> newResult = new Vector<String>();
-		Pattern pattern = Pattern.compile(regexp, flag);
-		for (String strFile : result) {
-			/**
-			 * the file_spec has to be compared to the filename only ... excluding the path
-			 */
-
-			Matcher matcher = pattern.matcher(new File(strFile).getName());
-			if (matcher.find() == true) {
-				newResult.add(strFile);
-			}
-		}
-
-		return newResult.toArray(new String[newResult.size()]);
-	}
-
-	@Override
-	public OutputStream getAppendFileStream(final String strFileName) {
+	@Override public OutputStream getAppendFileStream(final String strFileName) {
 		OutputStream objO = null;
 		return objO;
 	}
@@ -913,8 +832,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 		return 0;
 	}
 
-	@Override
-	public long getFileSize(final String strFileName) {
+	@Override public long getFileSize(final String strFileName) {
 		long lngFileSize = 0;
 		try {
 			String lstrFileName = strFileName.replaceAll("\\\\", "/");
@@ -924,93 +842,68 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 			e.printStackTrace();
 			RaiseException(e, SOSVfs_E_134.params("getFileSize()"));
 		}
-		 
 		return lngFileSize;
 	}
 
-	@Override
-	public InputStream getInputStream(final String strFileName) {
-
+	@Override public InputStream getInputStream(final String strFileName) {
 		InputStream objI = null;
 		// SFTPv3FileHandle objI = getClient().openFileRO(strFileName);
-
 		return objI;
 	}
 
-	@Override
-	public String getModificationTime(final String fileName) {
+	@Override public String getModificationTime(final String fileName) {
 		logINFO("not implemented yet");
 		return null;
 	}
 
-	@Override
-	public abstract OutputStream getOutputStream(final String fileName);
-//	{
-//		logINFO("not implemented yet");
-//		return null;
-//	}
+	@Override public abstract OutputStream getOutputStream(final String fileName);
 
-	@Override
-	public void close() {
+	//	{
+	//		logINFO("not implemented yet");
+	//		return null;
+	//	}
+	@Override public void close() {
 	}
 
-	@Override
-	public void closeInput() {
+	@Override public void closeInput() {
 	}
 
-	@Override
-	public void closeOutput() {
+	@Override public void closeOutput() {
 	}
 
-	@Override
-	public void flush() {
+	@Override public void flush() {
 	}
 
-	@Override
-	public int read(final byte[] bteBuffer) {
+	@Override public int read(final byte[] bteBuffer) {
 		return 0;
 	}
 
-	@Override
-	public int read(final byte[] bteBuffer, final int intOffset, final int intLength) {
+	@Override public int read(final byte[] bteBuffer, final int intOffset, final int intLength) {
 		return 0;
 	}
 
-	@Override
-	public void write(final byte[] bteBuffer, final int intOffset, final int intLength) {
+	@Override public void write(final byte[] bteBuffer, final int intOffset, final int intLength) {
 		logINFO("not implemented yet");
 	}
 
-	@Override
-	public void write(final byte[] bteBuffer) {
-		 
-
+	@Override public void write(final byte[] bteBuffer) {
 	}
 
-	@Override
-	public void openInputFile(final String pstrFileName) {
-
+	@Override public void openInputFile(final String pstrFileName) {
 	}
 
-	@Override
-	public void openOutputFile(final String pstrFileName) {
+	@Override public void openOutputFile(final String pstrFileName) {
 	}
 
-	@Override
-	public Vector<ISOSVirtualFile> getFiles(final String string) {
-		 
+	@Override public Vector<ISOSVirtualFile> getFiles(final String string) {
 		return null;
 	}
 
-	@Override
-	public Vector<ISOSVirtualFile> getFiles() {
-		 
+	@Override public Vector<ISOSVirtualFile> getFiles() {
 		return null;
 	}
 
-	@Override
-	public void putFile(final ISOSVirtualFile objVirtualFile) {
-
+	@Override public void putFile(final ISOSVirtualFile objVirtualFile) {
 		String strName = objVirtualFile.getName();
 		// strName = new File(strName).getAbsolutePath();
 		// if (strName.startsWith("c:") == true) {
@@ -1018,9 +911,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 		// }
 		ISOSVirtualFile objVF = this.getFileHandle(strName);
 		OutputStream objOS = objVF.getFileOutputStream();
-
 		InputStream objFI = objVirtualFile.getFileInputStream();
-
 		int lngBufferSize = 1024;
 		byte[] buffer = new byte[lngBufferSize];
 		int intBytesTransferred;
@@ -1041,32 +932,24 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 		}
 		finally {
 		}
-
 	}
 
-	@Override
-	public void ControlEncoding(final String pstrControlEncoding) {
-
+	@Override public void ControlEncoding(final String pstrControlEncoding) {
 	}
 
-	@Override
-	public void mkdir(final String pathname) throws IOException {
+	@Override public void mkdir(final String pathname) throws IOException {
 		logINFO("not implemented yet");
 	}
 
-	@Override
-	public void rmdir(final String pstrFolderName) throws IOException {
+	@Override public void rmdir(final String pstrFolderName) throws IOException {
 		logINFO("not implemented yet");
 	}
 
-	@Override
-	public void delete(final String pathname) throws IOException {
+	@Override public void delete(final String pathname) throws IOException {
 		logINFO("not implemented yet");
 	}
 
-	@Override
-	public long getFile(final String remoteFile, final String localFile, final boolean append) throws Exception {
-		 
+	@Override public long getFile(final String remoteFile, final String localFile, final boolean append) throws Exception {
 		return 0;
 	}
 
@@ -1082,8 +965,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	 * @param strFileName
 	 * @param pstrNewFileName
 	 */
-	@Override
-	public void rename(final String from, final String to) {
+	@Override public void rename(final String from, final String to) {
 		logINFO("not implemented yet");
 	}
 
@@ -1099,9 +981,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	 * @param msg
 	 */
 	protected void RaiseException(final Exception e, final String msg) {
-//		logEXCEPTION(msg);
-//		e.printStackTrace(System.err);
-		throw new JobSchedulerException(msg, e);
+		JADEExceptionFactory.RaiseJadeException(JADEExitCodes.someUnspecificError, msg, e);
 	}
 
 	/**
@@ -1146,7 +1026,6 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	private String getLogPrefix(final int level) {
 		StackTraceElement ste = Thread.currentThread().getStackTrace()[level];
 		String[] classNameArr = ste.getClassName().split("\\.");
-
 		return "(" + classNameArr[classNameArr.length - 1] + "::" + ste.getMethodName() + ") ";
 	}
 
@@ -1255,14 +1134,11 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	}
 
 	private Vector<String> getFilenames(String path, final boolean recurseSubFolders, int recLevel) throws Exception {
-
 		if (recLevel == 0) {
 			directoryListing = new Vector<String>();
 		}
-
 		String[] fileList = null;
 		String currentPath = this.DoPWD();
-
 		path = path.trim();
 		if (path.length() <= 0) {
 			path = ".";
@@ -1270,30 +1146,25 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 		if (path.equals(".")) {
 			path = currentPath;
 		}
-
 		try {
 			fileList = listNames(path);
 		}
 		catch (IOException e) {
 			e.printStackTrace(System.err);
 		}
-
 		if (fileList == null) {
 			return directoryListing;
 		}
-
 		for (String strCurrentFile : fileList) {
 			if (strCurrentFile == null || strCurrentFile.endsWith("/.") || strCurrentFile.endsWith("/..")) {
 				continue;
 			}
-
 			/**
 			 * kb 2012-10-08
 			 * The filename could be a subfolder. the name of this subfolder must not included in the
 			 * list of filenames.
 			 */
 			//			directoryListing.add(strCurrentFile);
-
 			/**
 			 * isDirectory is suboptiomal in this situation. think of links
 			 * better is isRegularFile instead
@@ -1310,27 +1181,18 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 				directoryListing.add(strCurrentFile);
 			}
 		}
-
 		logDEBUG("currentPath = " + currentPath);
-
 		return directoryListing;
-
 	} // nList
 
-	@Override
-	public void doPostLoginOperations() {
-
+	@Override public void doPostLoginOperations() {
 	}
 
-	@Override
-	public ISOSConnection Connect(final ISOSDataProviderOptions pobjConnectionOptions) throws Exception {
+	@Override public ISOSConnection Connect(final ISOSDataProviderOptions pobjConnectionOptions) throws Exception {
 		return null;
 	}
 
-	@Override
-	public OutputStream getFileOutputStream() {
-		 
+	@Override public OutputStream getFileOutputStream() {
 		return null;
 	}
-
 }

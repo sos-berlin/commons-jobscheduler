@@ -7,9 +7,10 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import com.sos.VirtualFileSystem.enums.JADEExitCodes;
+import com.sos.VirtualFileSystem.exceptions.JADEExceptionFactory;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 /**
@@ -108,7 +109,6 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
 			objVFSHandler.delete(fileName);
 		}
 		catch (Exception e) {
-			SOSVfs_E_158.get();
 			RaiseException(e, SOSVfs_E_158.params("delete()", fileName));
 		}
 		return true;
@@ -520,8 +520,7 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
 	 * @param msg
 	 */
 	protected void RaiseException(final Exception e, final String msg) {
-		logger.error(msg);
-		throw new JobSchedulerException(msg, e);
+		JADEExceptionFactory.RaiseJadeException(JADEExitCodes.someUnspecificError, msg, e);
 	}
 
 	/**
@@ -535,8 +534,7 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
 	 * @param msg
 	 */
 	protected void RaiseException(final String msg) {
-		logger.error(msg);
-		throw new JobSchedulerException(msg);
+		JADEExceptionFactory.RaiseJadeException(msg);
 	}
 
 	/**

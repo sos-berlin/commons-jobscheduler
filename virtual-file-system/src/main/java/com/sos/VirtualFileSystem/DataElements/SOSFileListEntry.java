@@ -330,7 +330,7 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 		executePreCommands();
 		long lngTotalBytesTransferred = 0;
 		Base64 objBase64 = null;
-		boolean flgErrorOnInput = false;
+		boolean flgErrorOnTransfer = false;
 		this.setStatus(enuTransferStatus.transferring);
 		try {
 			int intCumulativeFileSeperatorLength = 0;
@@ -358,6 +358,7 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 				}
 				else {
 					// TODO Option Blockmode=true (default), if false line mode and getLine
+					transferLoop:
 					while ((intBytesTransferred = objInput.read(buffer)) != -1) {
 						try {
 							int intBytes2Write = intBytesTransferred;
@@ -371,9 +372,10 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 							objOutput.write(buffer, 0, intBytes2Write);
 						}
 						catch (JobSchedulerException e) {
-							flgErrorOnInput = true;
-							e.printStackTrace(System.err);
-							break;
+							flgErrorOnTransfer = true;
+//							e.printStackTrace(System.err);
+							throw e;
+//							break transferLoop;
 						}
 						// TODO in case of wrong outputbuffer the handling of the error must be improved
 						lngTotalBytesTransferred += intBytesTransferred;
@@ -410,21 +412,26 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 			lngTotalBytesTransferred += intCumulativeFileSeperatorLength;
 			executeTFNPostCommnands();
 		}
+
 		catch (Exception e) {
 			TransferStatus(enuTransferStatus.transfer_has_errors);
-			flgErrorOnInput = true;
+			flgErrorOnTransfer = true;
 			String strT = SOSVfs_E_229.params(e);
 			// TODO rollback?
-			logger.error(strT);
-			throw new JobSchedulerException(strT, e);
+			RaiseException(e, strT);
 		}
 		finally {
 			if (flgClosingDone == false) {
 				objInput.closeInput();
-				// Hier wird die Datei angelegt mit 0 bytes, auch wenn nichts geschrieben wurde, weil die source nicht lesbar war.
+				// Hier wird die Datei angelegt mit 0 bytes, auch wenn nichts geschrieben wurde, weil die source nicht lesbar war oder "disc" full.
 				objOutput.closeOutput();
-				if (flgErrorOnInput == true) {
-					objOutput.delete();
+				if (flgErrorOnTransfer == true) {
+					try {
+						objOutput.delete();
+					}
+					catch (Exception e) {
+						// nothing to do, 
+					}
 				}
 				flgClosingDone = true;
 			}
@@ -798,14 +805,15 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 	} // private void Options
 
 	private void RaiseException(final Exception e, final String pstrM) {
-		logger.error(pstrM);
-		e.printStackTrace(System.err);
+		if (e instanceof JobSchedulerException) {
+			throw (JobSchedulerException) e;
+		}
 		throw new JobSchedulerException(pstrM, e);
 	}
 
 	private void RaiseException(final String pstrM) {
 		this.TransferStatus(enuTransferStatus.transfer_aborted);
-		logger.error(pstrM);
+//		logger.error(pstrM);
 		throw new JobSchedulerException(pstrM);
 	}
 
@@ -1047,11 +1055,16 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 				objDataTargetClient.disconnect();
 			}
 		}
+		catch (JobSchedulerException e) {
+			String strT = SOSVfs_E_229.params(e);
+			TransferStatus(enuTransferStatus.transfer_aborted);
+			// TODO rollback?
+			throw e;
+		}
 		catch (Exception e) {
 			String strT = SOSVfs_E_229.params(e);
 			TransferStatus(enuTransferStatus.transfer_aborted);
 			// TODO rollback?
-			logger.error(strT);
 			throw new JobSchedulerException(strT, e);
 		}
 	}
