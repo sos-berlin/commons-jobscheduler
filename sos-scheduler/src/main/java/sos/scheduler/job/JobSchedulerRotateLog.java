@@ -1,4 +1,7 @@
 package sos.scheduler.job;
+import static sos.scheduler.job.JobSchedulerConstants.JobSchedulerLogFileName;
+import static sos.scheduler.job.JobSchedulerConstants.JobSchedulerLogFileNameExtension;
+
 import org.apache.log4j.Logger;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
@@ -10,15 +13,14 @@ import com.sos.JSHelper.io.Files.JSFolder;
  * @author andreas.pueschel@sos-berlin.com 
  */
 public class JobSchedulerRotateLog extends JobSchedulerJob {
-	@SuppressWarnings("unused") private final String		conClassName	= this.getClass().getSimpleName();
-	private final String	conSVNVersion	= "$Id$";
-	@SuppressWarnings("unused") private final Logger		logger			= Logger.getLogger(this.getClass());
+	@SuppressWarnings("unused") private final String	conClassName	= this.getClass().getSimpleName();
+	private final String								conSVNVersion	= "$Id$";
+	@SuppressWarnings("unused") private final Logger	logger			= Logger.getLogger(this.getClass());
+	private String										strSchedulerID;
 
-	private 		String strSchedulerID;
-	
 	@Override public boolean spooler_process() {
 		try {
-			super.spooler_process(); 
+			super.spooler_process();
 			spooler_log.info(conSVNVersion);
 		}
 		catch (Exception e1) {
@@ -26,15 +28,15 @@ public class JobSchedulerRotateLog extends JobSchedulerJob {
 		}
 		/** give a path for files to remove */
 		String filePath = spooler.log_dir();
-		strSchedulerID = spooler.id();		
-		/** give the number of days, defaults to 14 days */
+		strSchedulerID = spooler.id();
 		objParams = spooler_task.params();
+		/** give the number of days, defaults to 14 days */
 		long lngCompressFileAge = 14;
 		/** number of days, for file age of files that should be deleted **/
 		long deleteFileAge = 0;
 		/** give a regular expression as file specification */
-		String strRegExpr4LogFiles2Compress 		= "^(scheduler)([0-9\\-]+)" + getRegExp4SchedulerID() + "(\\.log)$";
-		String strRegExpr4CompressedFiles2Delete 	= "^(scheduler)([0-9\\-]+)" + getRegExp4SchedulerID() + "(\\.log)(\\.gz)?$";
+		String strRegExpr4LogFiles2Compress = "^(scheduler)([0-9\\-]+)" + getRegExp4SchedulerID() + "(\\.log)$";
+		String strRegExpr4CompressedFiles2Delete = "^(scheduler)([0-9\\-]+)" + getRegExp4SchedulerID() + "(\\.log)(\\.gz)?$";
 		//
 		filePath = getParm("file_path", filePath);
 		strRegExpr4LogFiles2Compress = getParm("file_specification", strRegExpr4LogFiles2Compress);
@@ -46,46 +48,32 @@ public class JobSchedulerRotateLog extends JobSchedulerJob {
 		//
 		try {
 			JSFolder objLogDirectory = new JSFolder(filePath);
-			JSFile fleSchedulerLog = objLogDirectory.newFile("scheduler.log");
-			String strNewLogFileName = "scheduler.log-" + fleSchedulerLog.getTimeStamp() + getRegExp4SchedulerID() + ".log";
+			JSFile fleSchedulerLog = objLogDirectory.newFile(JobSchedulerLogFileName);
+			String strNewLogFileName = JobSchedulerLogFileName + "-" + fleSchedulerLog.getTimeStamp() + getRegExp4SchedulerID()
+					+ JobSchedulerLogFileNameExtension;
 			JSFile objN = objLogDirectory.newFile(strNewLogFileName);
 			fleSchedulerLog.copy(objN);
 			objN.createZipFile("");
 			//
 			long lngMillisPerDay = 24 * 3600 * 1000;
 			if (deleteFileAge > 0) {
-				long lngInterval = (deleteFileAge * lngMillisPerDay);
+				objLogDirectory.IncludeOlderThan = (deleteFileAge * lngMillisPerDay);
 				for (JSFile tempFile : objLogDirectory.getFilelist(strRegExpr4CompressedFiles2Delete, 0)) {
-					if (tempFile.isOlderThan(lngInterval)) {
-						tempFile.delete();
-						intNoOfLogFilesDeleted++;
-					}
-					else {
-						spooler_log.debug(String.format("File '%1$s' not deleted due to age", tempFile.getAbsolutePath()));
-					}
+					tempFile.delete();
+					intNoOfLogFilesDeleted++;
 				}
 				String deleteSchedulerLogFileSpec = "^(scheduler-log\\.)([0-9\\-]+)" + getRegExp4SchedulerID() + "(\\.log)(\\.gz)?$";
 				for (JSFile fleT : objLogDirectory.getFilelist(deleteSchedulerLogFileSpec, 0)) {
-					if (fleT.isOlderThan(lngInterval)) {
-						fleT.delete();
-						intNoOfLogFilesDeleted++;
-					}
-					else {
-						spooler_log.debug(String.format("File '%1$s' not deleted due to age", fleT.getAbsolutePath()));
-					}
+					fleT.delete();
+					intNoOfLogFilesDeleted++;
 				}
 			}
 			if (lngCompressFileAge > 0) {
-				long lngInterval = (lngCompressFileAge * lngMillisPerDay);
+				objLogDirectory.IncludeOlderThan = (lngCompressFileAge * lngMillisPerDay);
 				for (JSFile fleT : objLogDirectory.getFilelist(strRegExpr4LogFiles2Compress, 0)) {
-					if (fleT.isOlderThan(lngInterval)) {
-						intNoOfLogFilesCompressed++;
-						fleT.createZipFile(filePath);
-						fleT.delete();
-					}
-					else {
-						spooler_log.debug(String.format("File '%1$s' not compressed due to age", fleT.getAbsolutePath()));
-					}
+					intNoOfLogFilesCompressed++;
+					fleT.createZipFile(filePath);
+					fleT.delete();
 				}
 			}
 		}
@@ -98,7 +86,7 @@ public class JobSchedulerRotateLog extends JobSchedulerJob {
 			spooler_log.info(intNoOfLogFilesDeleted + " compressed log files deleted");
 		}
 		try {
-			spooler.log().start_new_file();  // this will start with a fresh log file
+			spooler.log().start_new_file(); // this will start with a fresh log file
 		}
 		catch (Exception e) {
 			e.printStackTrace(System.err);
@@ -107,8 +95,8 @@ public class JobSchedulerRotateLog extends JobSchedulerJob {
 		}
 		return false;
 	}
-	
-	private String getRegExp4SchedulerID () {
+
+	private String getRegExp4SchedulerID() {
 		String strR = "";
 		if (strSchedulerID != null) {
 			strR += "(\\." + strSchedulerID + ")";
