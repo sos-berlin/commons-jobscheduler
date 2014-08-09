@@ -1,8 +1,6 @@
 package sos.scheduler.job;
 import org.apache.log4j.Logger;
 
-import sos.spooler.Variable_set;
-
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.io.Files.JSFile;
 
@@ -16,6 +14,12 @@ public class JobSchedulerRotateLog extends JobSchedulerJob {
 	@SuppressWarnings("unused") private final Logger		logger			= Logger.getLogger(this.getClass());
 
 	@Override public boolean spooler_process() {
+		try {
+			super.spooler_process();
+		}
+		catch (Exception e1) {
+			throw new JobSchedulerException(e1);
+		}
 		/** give a path for files to remove */
 		String filePath = spooler.log_dir();
 		/** give the number of days, defaults to 14 days */
@@ -34,7 +38,7 @@ public class JobSchedulerRotateLog extends JobSchedulerJob {
 			deleteFileSpec += "(\\." + strSchedulerID + ")";
 		}
 		deleteFileSpec += "(\\.log)(\\.gz)?$";
-		Variable_set objParams = spooler_task.params();
+		objParams = spooler_task.params();
 		//
 		filePath = getParm("file_path", filePath);
 		fileSpec = getParm("file_specification", fileSpec);
