@@ -24,9 +24,7 @@ import com.sos.scheduler.converter.graphviz.JSObjects2GraphvizOptions;
  */
 public class JSObjects2GraphvizJSAdapterClass extends JobSchedulerJobAdapter {
 	private final String	conClassName	= "JSObjects2GraphvizJSAdapterClass";						//$NON-NLS-1$
-	@SuppressWarnings("unused")
-	private static Logger	logger			= Logger.getLogger(JSObjects2GraphvizJSAdapterClass.class);
-	@SuppressWarnings("unused")
+	private final  Logger	logger			= Logger.getLogger(JSObjects2GraphvizJSAdapterClass.class);
 	private final String				conSVNVersion		= "$Id: SOSSSHJob2JSAdapter.java 18220 2012-10-18 07:46:10Z kb $";
 
 	public void init() {
@@ -46,7 +44,7 @@ public class JSObjects2GraphvizJSAdapterClass extends JobSchedulerJobAdapter {
 	}
 
 	@Override
-	public boolean spooler_process() throws Exception {
+	public boolean spooler_process()  { 
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::spooler_process"; //$NON-NLS-1$
 
@@ -55,13 +53,11 @@ public class JSObjects2GraphvizJSAdapterClass extends JobSchedulerJobAdapter {
 			doProcessing();
 		}
 		catch (Exception e) {
-			return false;
+			return signalFailure();
 		}
 		finally {
 		} // finally
-			// return value for classic and order driven processing
-			// TODO create method in base-class for this functionality
-		return spooler_task.job().order_queue() != null;
+		return signalSuccess();
 
 	} // spooler_process
 
@@ -76,6 +72,8 @@ public class JSObjects2GraphvizJSAdapterClass extends JobSchedulerJobAdapter {
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::doProcessing"; //$NON-NLS-1$
 
+		logger.info(conSVNVersion);
+		
 		JSObjects2Graphviz objR = new JSObjects2Graphviz();
 		JSObjects2GraphvizOptions objO = objR.Options();
 		objO.setAllOptions(getSchedulerParameterAsProperties(getJobOrOrderParameters()));

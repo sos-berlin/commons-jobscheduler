@@ -10,6 +10,7 @@ import java.io.ByteArrayInputStream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -20,6 +21,8 @@ import sos.spooler.Job_chain;
 import sos.spooler.Order;
 import sos.spooler.Variable_set;
 
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
+
 /**
  * Dieser Job prüft. ob es Jobketten gibt, die Aufträge in der Blacklist haben. 
  * @author Uwe Risse 
@@ -27,6 +30,10 @@ import sos.spooler.Variable_set;
 
 public class JobSchedulerCheckBlacklist extends JobSchedulerJob {
 
+	@SuppressWarnings("unused") private final String conClassName = this.getClass().getSimpleName();
+	@SuppressWarnings("unused") private static final String conSVNVersion = "$Id$";
+	@SuppressWarnings("unused") private final Logger logger = Logger.getLogger(this.getClass());
+	
 	private class BlackList {
 		protected String	id;
 		protected String	job_chain;
@@ -81,8 +88,14 @@ public class JobSchedulerCheckBlacklist extends JobSchedulerJob {
 	}
 
 	@Override
-	public boolean spooler_process() throws Exception {
-		checkBlacklist();
+	public boolean spooler_process()  {
+		try {
+			super.spooler_process();
+			checkBlacklist();
+		}
+		catch (Exception e) {
+			throw new JobSchedulerException(e);
+		}
 		return false;
 	}
 
@@ -98,11 +111,11 @@ public class JobSchedulerCheckBlacklist extends JobSchedulerJob {
 				while (answerNode != null && answerNode.getNodeType() != Node.ELEMENT_NODE)
 					answerNode = answerNode.getNextSibling();
 				if (answerNode == null) {
-					throw new Exception("answer contains no xml elements");
+					throw new JobSchedulerException("answer contains no xml elements, is null");
 				}
 				Element answerElement = (Element) answerNode;
 				if (!answerElement.getNodeName().equals("answer"))
-					throw new Exception("element <answer> is missing");
+					throw new JobSchedulerException("element <answer> is missing");
 				NodeList schedulerNodes = answerElement.getElementsByTagName("blacklist");
 				getLogger().debug3(schedulerNodes.getLength() + " blacklists found.");
 
@@ -121,7 +134,7 @@ public class JobSchedulerCheckBlacklist extends JobSchedulerJob {
 			}
 		}
 		catch (Exception e) {
-			throw new Exception("Error occured checking blacklists: " + e, e);
+			throw new JobSchedulerException("Error occured checking blacklists: " + e, e);
 		}
 	}
 

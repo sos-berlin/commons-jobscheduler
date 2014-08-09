@@ -108,7 +108,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		return super.spooler_init();
 	}
 
-	@Override public boolean spooler_process() throws Exception {
+	@Override public boolean spooler_process() throws Exception  {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::spooler_process";
 		try {
 			super.spooler_process();

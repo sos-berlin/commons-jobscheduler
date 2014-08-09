@@ -4,6 +4,8 @@
  * 
  */
 package sos.scheduler.job;
+import org.apache.log4j.Logger;
+
 import sos.spooler.Order;
 import sos.spooler.Variable_set;
 
@@ -13,7 +15,12 @@ import sos.spooler.Variable_set;
  * @author Andreas Liebert 
  */
 public class JobSchedulerShowParams extends JobSchedulerJob {
-	public boolean spooler_process() throws Exception {
+	
+	@SuppressWarnings("unused") private final String conClassName = this.getClass().getSimpleName();
+	@SuppressWarnings("unused") private static final String conSVNVersion = "$Id$";
+	@SuppressWarnings("unused") private final Logger logger = Logger.getLogger(this.getClass());
+	
+	@Override public boolean spooler_process()  {
 		boolean rc = false;
 		// classic or order queue driven? return true for order queue driven invocation, return false for classic job start
 		rc = !(spooler_task.job().order_queue() == null);

@@ -16,6 +16,7 @@ import sos.util.SOSArguments;
 import sos.util.SOSLogger;
 import sos.util.SOSSchedulerLogger;
 
+import com.sos.JSHelper.Basics.VersionInfo;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
 /**
@@ -56,6 +57,11 @@ public class JobSchedulerJob extends Job_impl {
 	/** name of the application (for settings) */
 	protected String				application			= new String("");
 
+	@Override public boolean spooler_process () throws Exception {
+		objParams = spooler_task.params();
+		spooler_log.info(VersionInfo.VERSION_STRING);
+		return true;
+	}
 	public SOSConnection ConnectToJSDataBase() {
 
 		@SuppressWarnings("unused")

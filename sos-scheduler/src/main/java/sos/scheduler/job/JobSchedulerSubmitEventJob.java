@@ -52,7 +52,7 @@ public class JobSchedulerSubmitEventJob extends JobSchedulerJobAdapter {
 	private final String		conSVNVersion								= "$Id$";
 
 	@Override
-	public boolean spooler_process() throws Exception {
+	public boolean spooler_process() {
 
 		try {
 			spooler_log.info(conSVNVersion);
