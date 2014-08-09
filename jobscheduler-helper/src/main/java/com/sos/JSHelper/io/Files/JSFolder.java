@@ -3,12 +3,13 @@
  */
 package com.sos.JSHelper.io.Files;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.net.URI;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-
-import sos.util.SOSFilelistFilter;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
@@ -24,7 +25,54 @@ public class JSFolder extends File {
 	@SuppressWarnings("unused") private final String		conClassName		= this.getClass().getSimpleName();
 	@SuppressWarnings("unused") private static final String	conSVNVersion		= "$Id$";
 	@SuppressWarnings("unused") private final Logger		logger				= Logger.getLogger(this.getClass());
+	private final long										UNDEFINED			= -1L;
+	public long												IncludeOlderThan	= UNDEFINED;
+	public long												IncludeNewerThan	= UNDEFINED;
 	private String											strFolderName		= "";
+	//
+	public class SOSFilelistFilter implements FilenameFilter {
+		Pattern	pattern	= null;
+
+		/**
+		 * Konstruktor
+		 * @param regexp ein regul�er Ausdruck
+		 * @param flag ist ein Integer-Wert: CASE_INSENSITIVE, MULTILINE, DOTALL, UNICODE_CASE, and CANON_EQ
+		 * @see <a href="http://java.sun.com/j2se/1.4.2/docs/api/constant-values.html#java.util.regex.Pattern.UNIX_LINES">Constant Field Values</a> 
+		 */
+		public SOSFilelistFilter(String regexp, int flag) throws Exception {
+			if (regexp != null) {
+				pattern = Pattern.compile(regexp, flag);
+			}
+		}
+
+		@Override public boolean accept(File dir, String filename) {
+			boolean flgR = true;
+			if (pattern != null) {
+				Matcher matcher = pattern.matcher(filename);
+				flgR = matcher.find();
+			}
+			else {
+				flgR = true;
+			}
+			if (flgR == true) {
+				flgR = checkMoreFilter(new JSFile(dir, filename));
+			}
+			return flgR;
+		}
+	}
+
+	private boolean checkMoreFilter(final JSFile pfleFile) {
+		boolean flgR = true;
+		if (IncludeOlderThan != UNDEFINED && flgR) {
+			flgR = pfleFile.isOlderThan(IncludeOlderThan);
+		}
+		else {
+			if (IncludeNewerThan != UNDEFINED && flgR) {
+				flgR = !pfleFile.isOlderThan(IncludeNewerThan);
+			}
+		}
+		return flgR;
+	}
 
 	/**
 	 * @param pathname
@@ -39,7 +87,6 @@ public class JSFolder extends File {
 		if (!strFolderName.endsWith("/")) {
 			strFolderName += "/";
 		}
-
 		if (isDirectory() == true) {
 			//
 		}
@@ -98,16 +145,39 @@ public class JSFolder extends File {
 		}
 		return filelist;
 	}
-	
-	public JSFile newFile (final String pstrFileName) {
+
+	public Vector<JSFolder> getFolderlist(final String regexp, final int flag) {
+		//		File f = new File(folder);
+		if (!this.exists()) {
+			throw new JobSchedulerException(String.format("directory does not exist: %1$s", this.getAbsolutePath()));
+		}
+		Vector<JSFolder> objFolderList = new Vector<>();
+		try {
+			for (File file : listFiles(new SOSFilelistFilter(regexp, flag))) {
+				if (file.isDirectory()) {
+					objFolderList.add(new JSFolder(file.getAbsolutePath()));
+				}
+				else
+					if (file.isFile()) {
+					}
+					else {
+						// unknown
+					}
+			}
+		}
+		catch (Exception e) {
+			throw new JobSchedulerException(e);
+		}
+		return objFolderList;
+	}
+
+	public JSFile newFile(final String pstrFileName) {
 		JSFile fleT = new JSFile(strFolderName + pstrFileName);
 		return fleT;
 	}
-	
+
 	public static final JSFolder getTempDir() {
 		String strT = System.getProperty("java.io.tmpdir");
 		return new JSFolder(strT);
 	}
-
-
 }
