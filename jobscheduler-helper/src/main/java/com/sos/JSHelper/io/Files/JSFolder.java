@@ -1,0 +1,113 @@
+/**
+ * 
+ */
+package com.sos.JSHelper.io.Files;
+import java.io.File;
+import java.net.URI;
+import java.util.Vector;
+
+import org.apache.log4j.Logger;
+
+import sos.util.SOSFilelistFilter;
+
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
+
+/**
+ * @author KB
+ *
+ */
+public class JSFolder extends File {
+	/**
+	 * 
+	 */
+	private static final long								serialVersionUID	= -4423886110579623387L;
+	@SuppressWarnings("unused") private final String		conClassName		= this.getClass().getSimpleName();
+	@SuppressWarnings("unused") private static final String	conSVNVersion		= "$Id$";
+	@SuppressWarnings("unused") private final Logger		logger				= Logger.getLogger(this.getClass());
+	private String											strFolderName		= "";
+
+	/**
+	 * @param pathname
+	 */
+	public JSFolder(String pathname) {
+		super(pathname);
+		init();
+	}
+
+	private void init() {
+		strFolderName = this.getAbsolutePath();
+		if (!strFolderName.endsWith("/")) {
+			strFolderName += "/";
+		}
+
+		if (isDirectory() == true) {
+			//
+		}
+		else {
+			throw new JobSchedulerException(String.format("%1$s is not a directory", strFolderName));
+		}
+	}
+
+	/**
+	 * @param uri
+	 */
+	public JSFolder(URI uri) {
+		super(uri);
+		init();
+	}
+
+	/**
+	 * @param parent
+	 * @param child
+	 */
+	public JSFolder(String parent, String child) {
+		super(parent, child);
+		init();
+	}
+
+	/**
+	 * @param parent
+	 * @param child
+	 */
+	public JSFolder(File parent, String child) {
+		super(parent, child);
+		init();
+	}
+
+	public Vector<JSFile> getFilelist(final String regexp, final int flag) {
+		//		File f = new File(folder);
+		if (!this.exists()) {
+			throw new JobSchedulerException(String.format("directory does not exist: %1$s", this.getAbsolutePath()));
+		}
+		Vector<JSFile> filelist = new Vector<>();
+		try {
+			for (File file : listFiles(new SOSFilelistFilter(regexp, flag))) {
+				if (file.isDirectory()) {
+				}
+				else
+					if (file.isFile()) {
+						filelist.add(new JSFile(file.getAbsolutePath()));
+					}
+					else {
+						// unknown
+					}
+			}
+		}
+		catch (Exception e) {
+			throw new JobSchedulerException(e);
+		}
+		return filelist;
+	}
+	
+	public JSFile newFile (final String pstrFileName) {
+		JSFile fleT = new JSFile(strFolderName + pstrFileName);
+		return fleT;
+	}
+	
+	public static final JSFolder getTempDir() {
+		String strT = System.getProperty("java.io.tmpdir");
+		return new JSFolder(strT);
+	}
+
+
+}

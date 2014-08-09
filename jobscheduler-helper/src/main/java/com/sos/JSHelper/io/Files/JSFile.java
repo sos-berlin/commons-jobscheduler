@@ -81,13 +81,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Vector;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.log4j.Logger;
 
-import sos.util.SOSFilelistFilter;
 import sos.util.SOSGZip;
 
 import com.sos.JSHelper.Archiver.IJSArchiver;
@@ -481,36 +479,6 @@ import com.sos.localization.Messages;
 		return strT;
 	}
 
-	public static Vector<JSFile> getFilelist(final String folder, final String regexp, final int flag) {
-		if (folder == null || folder.length() == 0) {
-			throw new JobSchedulerException("empty directory not allowed!!");
-		}
-		File f = new File(folder);
-		if (!f.exists()) {
-			throw new JobSchedulerException("directory does not exist: " + folder);
-		}
-		File[] files;
-		try {
-			files = f.listFiles(new SOSFilelistFilter(regexp, flag));
-		}
-		catch (Exception e) {
-			throw new JobSchedulerException(e);
-		}
-		Vector<JSFile> filelist = new Vector<>();
-		for (File file : files) {
-			if (file.isDirectory()) {
-			}
-			else
-				if (file.isFile()) {
-					filelist.add(new JSFile(file.getAbsolutePath()));
-				}
-				else {
-					// unknown
-				}
-		}
-		return filelist;
-	}
-
 	public boolean isOlderThan(final long plngCompareTo) {
 		boolean flgR = false;
 		long interval = System.currentTimeMillis() - lastModified();
@@ -524,7 +492,7 @@ import com.sos.localization.Messages;
 		boolean flgR = true;
 		try {
 			if (canWrite() == true) {
-				this.delete();
+				super.delete();
 				logger.debug(String.format("file '%1$s' deleted", getAbsolutePath()));
 			}
 			else {
@@ -874,6 +842,14 @@ import com.sos.localization.Messages;
 		strPushBackBuffer = strRecordBuffer.toString();
 	}
 
+	public void copy(final JSFile pobjTargetFile) {
+		try {
+			this.copy(pobjTargetFile.getAbsolutePath());
+		}
+		catch (Exception e) {
+			throw new JobSchedulerException(e);
+		}
+	}
 	/**
 	 *
 	 * \brief copy - FileCopy actual to new file
