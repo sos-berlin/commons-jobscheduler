@@ -29,7 +29,7 @@ import com.sos.dialog.components.SOSDateTime;
 import com.sos.dialog.swtdesigner.SWTResourceManager;
 import com.sos.localization.SOSMsg;
 
-public class SOSMsgControl extends SOSMsg {
+public abstract class SOSMsgControl extends SOSMsg {
 	@SuppressWarnings("unused") private final String		conClassName	= this.getClass().getSimpleName();
 	@SuppressWarnings("unused") private static final String	conSVNVersion	= "$Id$";
 	@SuppressWarnings("unused") private final Logger		logger			= Logger.getLogger(this.getClass());
@@ -38,9 +38,7 @@ public class SOSMsgControl extends SOSMsg {
 		super(pstrMessageCode);
 	}
 
-	public SOSMsgControl newMsg(final String pstrMessageCode) {
-		return this;
-	}
+	public abstract SOSMsgControl newMsg(final String pstrMessageCode);
 
 	public Text Control(final Text pobjC) {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::Control";

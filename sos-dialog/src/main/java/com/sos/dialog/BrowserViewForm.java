@@ -150,7 +150,9 @@ public class BrowserViewForm {
 		});
 	}
 	
-	
+	public Browser getBrowser () {
+		return browser;
+	}
 
 	public void setUrl(final String url_) {
 		url = new SOSUrl(url_);
