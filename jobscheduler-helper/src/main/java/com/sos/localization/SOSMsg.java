@@ -144,7 +144,7 @@ public class SOSMsg {
 		return strI;
 	}
 	private String getLabel(final String pstrDefaultValue) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::label";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getLabel";
 		String key = strMessageCode.trim().replaceAll(" ", "");
 		try {
 			strLastMsgKey = key;

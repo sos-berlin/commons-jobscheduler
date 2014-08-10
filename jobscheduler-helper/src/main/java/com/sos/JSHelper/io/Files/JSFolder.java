@@ -122,7 +122,6 @@ public class JSFolder extends File {
 	}
 
 	public Vector<JSFile> getFilelist(final String regexp, final int flag) {
-		//		File f = new File(folder);
 		if (!this.exists()) {
 			throw new JobSchedulerException(String.format("directory does not exist: %1$s", this.getAbsolutePath()));
 		}
@@ -146,14 +145,13 @@ public class JSFolder extends File {
 		return filelist;
 	}
 
-	public Vector<JSFolder> getFolderlist(final String regexp, final int flag) {
-		//		File f = new File(folder);
+	public Vector<JSFolder> getFolderlist(final String regexp, final int intRegExpOptions) {
 		if (!this.exists()) {
 			throw new JobSchedulerException(String.format("directory does not exist: %1$s", this.getAbsolutePath()));
 		}
 		Vector<JSFolder> objFolderList = new Vector<>();
 		try {
-			for (File file : listFiles(new SOSFilelistFilter(regexp, flag))) {
+			for (File file : listFiles(new SOSFilelistFilter(regexp, intRegExpOptions))) {
 				if (file.isDirectory()) {
 					objFolderList.add(new JSFolder(file.getAbsolutePath()));
 				}
@@ -180,4 +178,27 @@ public class JSFolder extends File {
 		String strT = System.getProperty("java.io.tmpdir");
 		return new JSFolder(strT);
 	}
+
+	public int deleteFolder() {
+		intNoOfObjectsDeleted = 0;
+		return deleteFolder(this);
+	}
+
+	public int intNoOfObjectsDeleted = 0;
+	
+	public int deleteFolder(final JSFolder pobjFolder) {
+		try {
+			if (pobjFolder.isDirectory()) {
+				for (File file2 : pobjFolder.listFiles()) {
+					deleteFolder(new JSFolder(file2.getAbsolutePath()));
+				}
+			}
+			pobjFolder.delete();
+			intNoOfObjectsDeleted++;
+		}
+		catch (Exception e) {
+			throw new JobSchedulerException(String.format("Folder '%1$s' not deleted due to an error.", pobjFolder.getAbsolutePath()), e);
+		}
+		return intNoOfObjectsDeleted;
+	} // deleteFile
 }
