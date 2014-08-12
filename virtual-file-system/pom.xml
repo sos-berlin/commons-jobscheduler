@@ -28,7 +28,7 @@
 </dependency>
 
         <dependency>
-            <groupId>com.sos-berlin.products</groupId>
+            <groupId>com.sos-berlin</groupId>
             <artifactId>graphviz-adapter</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
