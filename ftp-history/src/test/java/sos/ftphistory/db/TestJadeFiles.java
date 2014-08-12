@@ -44,11 +44,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.sos.hibernate.classes.DbItem;
-
+import com.sos.resources.SOSResourceFactory;
+import com.sos.resources.SOSTestResource;
+  
 public class TestJadeFiles {
 	JadeFilesDBLayer jadeFilesDBLayer;
 
-	private final String configurationFilename = "R:/nobackup/junittests/hibernate/hibernate.cfg.xml";
 	private File configurationFile;
 
 	public TestJadeFiles() {
@@ -64,7 +65,7 @@ public class TestJadeFiles {
 
 	@Before
 	public void setUp() throws Exception {
-		configurationFile = new File(configurationFilename);
+        configurationFile = SOSResourceFactory.asFile(SOSTestResource.HIBERNATE_CONFIGURATION_ORACLE);
 		jadeFilesDBLayer = new JadeFilesDBLayer(configurationFile);
 
 	}

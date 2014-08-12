@@ -121,9 +121,19 @@
         <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc6</artifactId>
+            <scope>test</scope>         
+        </dependency>
+        
+        <dependency>
+            <groupId>com.sos-berlin.commons</groupId>
+            <artifactId>common-resources</artifactId>
+            <version>${project.version}</version>
+            <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
 
+		
+       
     </dependencies>
 
 </project>

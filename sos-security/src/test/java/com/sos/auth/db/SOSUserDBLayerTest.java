@@ -3,13 +3,7 @@ package com.sos.auth.db;
 import static org.junit.Assert.*;
 
 import java.io.File;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-
-import org.hibernate.Query;
- 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -20,6 +14,8 @@ import com.sos.auth.shiro.db.SOSUser2RoleDBItem;
 import com.sos.auth.shiro.db.SOSUserDBItem;
 import com.sos.auth.shiro.db.SOSUserDBLayer;
 import com.sos.auth.shiro.db.SOSUserRightDBItem;
+import com.sos.resources.SOSResourceFactory;
+import com.sos.resources.SOSTestResource;
 
  
  
@@ -57,7 +53,6 @@ public class SOSUserDBLayerTest {
 	@SuppressWarnings("unused")
 	private final String	conClassName	= "SOSUserDBLayerTest";
     private SOSUserDBLayer sosUserDBLayer;
-    private String configurationFilename="R:/nobackup/sos/junit/hibernate_oracle.cfg.xml";
     private File configurationFile;
 
 	
@@ -77,7 +72,7 @@ public class SOSUserDBLayerTest {
 
 	@Before
 	public void setUp() throws Exception {
-        configurationFile = new File(configurationFilename);
+        configurationFile = SOSResourceFactory.asFile(SOSTestResource.HIBERNATE_CONFIGURATION_ORACLE);;
 		sosUserDBLayer = new SOSUserDBLayer(configurationFile);
 	}
 

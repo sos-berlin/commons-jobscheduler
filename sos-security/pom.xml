@@ -97,6 +97,14 @@
 			<artifactId>jobscheduler-web-services-globals</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+            <groupId>com.sos-berlin.commons</groupId>
+            <artifactId>common-resources</artifactId>
+            <version>${project.version}</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+		
     </dependencies>
 
 </project>
