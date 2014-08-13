@@ -37,9 +37,14 @@
 		                    <id>generate-sources</id>
 		                    <phase>generate-sources</phase>
 		                    <configuration>
+<!--  		                [WARNING] Parameter tasks is deprecated, use target instead        
 		                        <tasks>
 		                            <mkdir dir="target/generated-sources" />
 		                        </tasks>
+-->		                        
+		                      	<target>
+		                            <mkdir dir="target/generated-sources" />
+		                        </target>
 		                    </configuration>
 		                    <goals>
 		                        <goal>run</goal>
