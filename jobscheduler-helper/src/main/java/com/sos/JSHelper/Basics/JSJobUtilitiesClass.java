@@ -148,7 +148,7 @@ public class JSJobUtilitiesClass<T> extends JSToolBox implements JSJobUtilities,
 	 */
 	@Override
 	public String replaceSchedulerVars(final boolean isWindows, final String pstrString2Modify) {
-		logger.debug("replaceSchedulerVars as Dummy-call executed. No Instance of JobUtilites specified.");
+		logger.trace("replaceSchedulerVars as Dummy-call executed. No Instance of JobUtilites specified.");
 		return pstrString2Modify;
 	}
 
@@ -165,12 +165,12 @@ public class JSJobUtilitiesClass<T> extends JSToolBox implements JSJobUtilities,
 	 */
 	@Override
 	public void setJSParam(final String pstrKey, final String pstrValue) {
-		logger.debug(String.format("*mock* set param '%1$s' to value '%2$s'", pstrKey, pstrValue));
+		logger.trace(String.format("*mock* set param '%1$s' to value '%2$s'", pstrKey, pstrValue));
 	}
 
 	@Override
 	public void setJSParam(final String pstrKey, final StringBuffer pstrValue) {
-		logger.debug(String.format("*mock* set param '%1$s' to value '%2$s'", pstrKey, pstrValue));
+		logger.trace(String.format("*mock* set param '%1$s' to value '%2$s'", pstrKey, pstrValue));
 	}
 
 	/**

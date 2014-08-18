@@ -770,7 +770,7 @@ public class JSToolBox extends JSListenerClass {
 			         case '\u00A9': sb.append("&copy;");break;
 			         case '\u20AC': sb.append("&euro;"); break;
 			         // be carefull with this one (non-breaking white space)
-			         case ' ': sb.append("&nbsp;");break;
+			         case ' ': sb.append("&#160;");break;
 
 			         default:  sb.append(c); break;
 			      }

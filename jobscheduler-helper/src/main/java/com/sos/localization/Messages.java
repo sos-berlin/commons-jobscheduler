@@ -236,7 +236,7 @@ public class Messages implements Serializable {
 					// link to another key?
 					if (strM.startsWith("[") && strM.endsWith("]")) { //$NON-NLS-1$
 						logger.debug("strLastKey = " + strLastKey + ", strKey = " + strM);
-						System.out.println("strLastKey = " + strLastKey + ", strKey = " + strM);
+//						System.out.println("strLastKey = " + strLastKey + ", strKey = " + strM);
 						if (strM.equalsIgnoreCase(strLastKey)) {
 							strM = "** loop: " + strM;
 						}

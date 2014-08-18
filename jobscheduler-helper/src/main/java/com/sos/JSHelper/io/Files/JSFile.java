@@ -310,7 +310,7 @@ import com.sos.localization.Messages;
 					}
 				}
 			}
-			logger.debug(Messages.getMsg(JSH_I_0090, strFileName, strCharSet4InputFile)); // conMethodName + ": " + "File opened for read: "
+			logger.trace(Messages.getMsg(JSH_I_0090, strFileName, strCharSet4InputFile)); // conMethodName + ": " + "File opened for read: "
 		}
 		return bufReader;
 	}
@@ -491,12 +491,14 @@ import com.sos.localization.Messages;
 	@Override public boolean delete() {
 		boolean flgR = true;
 		try {
-			if (canWrite() == true) {
-				super.delete();
-				logger.debug(String.format("file '%1$s' deleted", getAbsolutePath()));
-			}
-			else {
-				logger.debug(String.format("file NOT '%1$s' deleted, because its not writable", getAbsolutePath()));
+			if (exists() == true) {
+				if (canWrite() == true) {
+					super.delete();
+					logger.debug(String.format("file '%1$s' deleted", getAbsolutePath()));
+				}
+				else {
+					logger.debug(String.format("file NOT '%1$s' deleted, because its not writable", getAbsolutePath()));
+				}
 			}
 		}
 		catch (Exception e) {
@@ -622,12 +624,12 @@ import com.sos.localization.Messages;
 				}
 				else {
 					bufWriter = new BufferedWriter(fleFileWriter);
-					logger.debug(Messages.getMsg(JSH_I_0060, strFileName));
+					logger.trace(Messages.getMsg(JSH_I_0060, strFileName));
 				}
 			}
 			else {
 				bufWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this), strCharSet4OutputFile));
-				logger.debug(Messages.getMsg(JSH_I_0070, strFileName, strCharSet4InputFile));
+				logger.trace(Messages.getMsg(JSH_I_0070, strFileName, strCharSet4InputFile));
 			}
 			// - </newcode>
 			// - </remark> <!-- id=<Unicode> -->
@@ -850,6 +852,7 @@ import com.sos.localization.Messages;
 			throw new JobSchedulerException(e);
 		}
 	}
+
 	/**
 	 *
 	 * \brief copy - FileCopy actual to new file
@@ -1066,8 +1069,8 @@ import com.sos.localization.Messages;
 		try {
 			fin = this.Reader();
 		}
-		catch (IOException e1) {
-			throw new JobSchedulerException(e1);
+		catch (Exception e1) {
+			throw new JobSchedulerException("Could not get content from file " + this.getAbsolutePath(),e1);
 		}
 		// FileInputStream fin = null;
 		int lngFileSize = 0;
