@@ -57,20 +57,18 @@ import com.sos.dialog.swtdesigner.SWTResourceManager;
  * Created on 25.08.2011 13:54:32
  */
 public class TextArea extends StyledText /* Text */{
-	@SuppressWarnings("unused")
-	private final String	conClassName			= this.getClass().getSimpleName();
-	private final Logger	logger					= Logger.getLogger(this.getClass());
-	@SuppressWarnings("unused")
-	private final String	conSVNVersion			= "$Id$";
-	private WindowsSaver	objFormPosSizeHandler	= null;
+	@SuppressWarnings("unused") private final String	conClassName			= this.getClass().getSimpleName();
+	private final Logger								logger					= Logger.getLogger(this.getClass());
+	@SuppressWarnings("unused") private final String	conSVNVersion			= "$Id$";
+	private WindowsSaver								objFormPosSizeHandler	= null;
 	//	public static enum enuSourceTypes {
 	//		ScriptSource, MonitorSource, xmlSource, xmlComment, JobDocu;
 	//	}
 	//
-	private final String			strTagName				= "job";
-	private final String			strAttributeName		= "";
+	private final String								strTagName				= "job";
+	private final String								strAttributeName		= "";
 	//	private enuSourceTypes	enuWhatSourceType	= TextArea.enuSourceTypes.ScriptSource;
-	boolean					flgInit					= false;
+	boolean												flgInit					= false;
 
 	public StyledText getControl() {
 		return this;
@@ -147,8 +145,7 @@ public class TextArea extends StyledText /* Text */{
 
 	private Listener getSaveAsListener() {
 		return new Listener() {
-			@Override
-			public void handleEvent(final Event e) {
+			@Override public void handleEvent(final Event e) {
 				logger.debug("save as was pressed....");
 				saveFile();
 			}
@@ -157,8 +154,7 @@ public class TextArea extends StyledText /* Text */{
 
 	private Listener getStartExternalEditorListener() {
 		return new Listener() {
-			@Override
-			public void handleEvent(final Event e) {
+			@Override public void handleEvent(final Event e) {
 				startExternalEditor();
 			}
 		};
@@ -174,6 +170,9 @@ public class TextArea extends StyledText /* Text */{
 			String strCommandString = String.format("uedit32.exe \"%1$s\"", objTempF);
 			objShell.setCommand(strCommandString);
 			objShell.run();
+			if (objShell.getCC() != 0) {
+				throw new JobSchedulerException(String.format("Command '%1$s' returns with error '%2$s'", strCommandString, objShell.getCC()));
+			}
 		}
 		catch (Exception e) {
 			throw new JobSchedulerException(e);
@@ -183,8 +182,7 @@ public class TextArea extends StyledText /* Text */{
 
 	private Listener getSelectFontListener() {
 		return new Listener() {
-			@Override
-			public void handleEvent(final Event e) {
+			@Override public void handleEvent(final Event e) {
 				logger.debug("'Select Font' was pressed....");
 				changeFont();
 			}
@@ -193,8 +191,7 @@ public class TextArea extends StyledText /* Text */{
 
 	private Listener getReadFileListener() {
 		return new Listener() {
-			@Override
-			public void handleEvent(final Event e) {
+			@Override public void handleEvent(final Event e) {
 				logger.debug("getReadFileListener was pressed....");
 				doReadFile();
 			}
@@ -203,8 +200,7 @@ public class TextArea extends StyledText /* Text */{
 
 	private Listener getInsertFileListener() {
 		return new Listener() {
-			@Override
-			public void handleEvent(final Event e) {
+			@Override public void handleEvent(final Event e) {
 				logger.debug("getInsertFileListener was pressed....");
 				doInsertFile();
 			}
@@ -213,8 +209,7 @@ public class TextArea extends StyledText /* Text */{
 
 	private Listener getCopyListener() {
 		return new Listener() {
-			@Override
-			public void handleEvent(final Event e) {
+			@Override public void handleEvent(final Event e) {
 				logger.debug("getCopyListener was pressed....");
 				_copy();
 			}
@@ -223,8 +218,7 @@ public class TextArea extends StyledText /* Text */{
 
 	private Listener getPasteListener() {
 		return new Listener() {
-			@Override
-			public void handleEvent(final Event e) {
+			@Override public void handleEvent(final Event e) {
 				logger.debug("getCopyListener was pressed....");
 				_paste();
 			}
@@ -233,8 +227,7 @@ public class TextArea extends StyledText /* Text */{
 
 	private Listener getCutListener() {
 		return new Listener() {
-			@Override
-			public void handleEvent(final Event e) {
+			@Override public void handleEvent(final Event e) {
 				logger.debug("getCopyListener was pressed....");
 				_cut();
 			}
@@ -243,8 +236,7 @@ public class TextArea extends StyledText /* Text */{
 
 	private Listener getSelectAllListener() {
 		return new Listener() {
-			@Override
-			public void handleEvent(final Event e) {
+			@Override public void handleEvent(final Event e) {
 				logger.debug("getSelectAllListener was pressed....");
 				_selectAll();
 			}
@@ -269,83 +261,80 @@ public class TextArea extends StyledText /* Text */{
 
 	public void refreshContent() {
 		flgInit = true;
-//		switch (enuWhatSourceType) {
-//			case ScriptSource:
-//				setText(objDataProvider.getSource());
-//				strTagName = "job";
-//				strAttributeName = "script";
-//				break;
-//			case xmlSource:
-//				String strT = objDataProvider.getXML();
-//				strT = strT.replaceAll("\\n\\n", System.getProperty("line.separator"));
-//				setText(strT);
-//				strTagName = "job";
-//				strAttributeName = "script";
-//				break;
-//			case MonitorSource:
-//				setText(objDataProvider.getSource());
-//				strTagName = "job";
-//				strAttributeName = "Monitor";
-//				break;
-//			case xmlComment:
-//				setText(objDataProvider.getComment());
-//				strTagName = "job";
-//				strAttributeName = "comment";
-//				break;
-//			case JobDocu:
-//				setText(objDataProvider.getDescription());
-//				strTagName = "job";
-//				strAttributeName = "documentation";
-//				break;
-//			default:
-//				break;
-//		}
+		//		switch (enuWhatSourceType) {
+		//			case ScriptSource:
+		//				setText(objDataProvider.getSource());
+		//				strTagName = "job";
+		//				strAttributeName = "script";
+		//				break;
+		//			case xmlSource:
+		//				String strT = objDataProvider.getXML();
+		//				strT = strT.replaceAll("\\n\\n", System.getProperty("line.separator"));
+		//				setText(strT);
+		//				strTagName = "job";
+		//				strAttributeName = "script";
+		//				break;
+		//			case MonitorSource:
+		//				setText(objDataProvider.getSource());
+		//				strTagName = "job";
+		//				strAttributeName = "Monitor";
+		//				break;
+		//			case xmlComment:
+		//				setText(objDataProvider.getComment());
+		//				strTagName = "job";
+		//				strAttributeName = "comment";
+		//				break;
+		//			case JobDocu:
+		//				setText(objDataProvider.getDescription());
+		//				strTagName = "job";
+		//				strAttributeName = "documentation";
+		//				break;
+		//			default:
+		//				break;
+		//		}
 		SOSFontDialog objFontDialog = new SOSFontDialog(getFont().getFontData()[0], getForeground().getRGB());
 		objFontDialog.readFontData();
 		setFont(objFontDialog.getFontData(), objFontDialog.getForeGround());
 		flgInit = false;
 	}
 
+	public TextArea(final Composite pobjComposite) {
+		this(pobjComposite, SWT.V_SCROLL | SWT.MULTI | SWT.BORDER | SWT.H_SCROLL);
+		createContextMenue();
+	}
+
 	public TextArea(final Composite pobjComposite, final int arg1) {
 		super(pobjComposite, arg1);
 		this.setBackground(Globals.getFieldBackground());
-
 		addVerifyListener(new VerifyListener() {
-			@Override
-			public void verifyText(final VerifyEvent e) {
+			@Override public void verifyText(final VerifyEvent e) {
 			}
 		});
-
 		addMouseListener(new MouseListener() {
-			@Override
-			public void mouseUp(final MouseEvent event) {
+			@Override public void mouseUp(final MouseEvent event) {
 				if (event.button == 3) {
 					logger.debug("button2");
 				}
 			}
 
-			@Override
-			public void mouseDown(final MouseEvent arg0) {
+			@Override public void mouseDown(final MouseEvent arg0) {
 			}
 
-			@Override
-			public void mouseDoubleClick(final MouseEvent arg0) {
+			@Override public void mouseDoubleClick(final MouseEvent arg0) {
 				// startExternalEditor();
 			}
 		});
 		addHelpListener(new HelpListener() {
-			@Override
-			public void helpRequested(final HelpEvent objHelpEvent) {
-//				MainWindow.message(Messages.getString("OrderJob.Help"), SWT.ICON_INFORMATION);
+			@Override public void helpRequested(final HelpEvent objHelpEvent) {
+				//				MainWindow.message(Messages.getString("OrderJob.Help"), SWT.ICON_INFORMATION);
 			}
 		});
 		addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyPressed(final KeyEvent e) {
+			@Override public void keyPressed(final KeyEvent e) {
 				e.doit = false;
-//				if (objDataProvider.Check4HelpKey(e.keyCode, strTagName, strAttributeName)) {
-//					return;
-//				}
+				//				if (objDataProvider.Check4HelpKey(e.keyCode, strTagName, strAttributeName)) {
+				//					return;
+				//				}
 				if ((e.stateMask & SWT.MOD1) == SWT.MOD1) {
 					switch (e.keyCode) {
 						case 'a':
@@ -401,8 +390,7 @@ public class TextArea extends StyledText /* Text */{
 		gridData_1.heightHint = 139;
 		setLayoutData(gridData_1);
 		addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(final ModifyEvent e) {
+			@Override public void modifyText(final ModifyEvent e) {
 			}
 		});
 	}
@@ -466,7 +454,7 @@ public class TextArea extends StyledText /* Text */{
 		}
 		catch (Exception e) {
 			try {
-//				new ErrorLog(String.format("error selecting file '%1$s'", strSelectedFileName), e);
+				//				new ErrorLog(String.format("error selecting file '%1$s'", strSelectedFileName), e);
 				new JobSchedulerException(String.format("error selecting file '%1$s'", strSelectedFileName), e);
 			}
 			catch (Exception ee) {
@@ -482,22 +470,22 @@ public class TextArea extends StyledText /* Text */{
 			if (objFormPosSizeHandler != null) {
 				fdialog.setFilterPath(objFormPosSizeHandler.getProperty("LastSelectedFile4Save"));
 			}
-			//			strFilename4Save = fdialog.open();
-			if ((strFilename4Save = fdialog.open()) == null) {
+			strFilename4Save = fdialog.open();
+			if (strFilename4Save == null) {
 				return false;
 			}
 			JSFile objFile = new JSFile(strFilename4Save);
 			if (objFile.exists()) {
-//				String strM = Messages.getString("MainListener.doFileOverwrite") + ": " + strFilename4Save;
-//				int ok = MainWindow.message(strM, SWT.ICON_QUESTION | SWT.YES | SWT.NO);
-//				if (ok == SWT.NO) {
-//					return false;
-//				}
-//				if (!objFile.canWrite()) {
-//					strM = Messages.getString("MainListener.fileWriteProtected") + ":" + strFilename4Save;
-//					MainWindow.message(strM, SWT.ICON_WARNING | SWT.OK);
-//					return false;
-//				}
+				//				String strM = Messages.getString("MainListener.doFileOverwrite") + ": " + strFilename4Save;
+				//				int ok = MainWindow.message(strM, SWT.ICON_QUESTION | SWT.YES | SWT.NO);
+				//				if (ok == SWT.NO) {
+				//					return false;
+				//				}
+				//				if (!objFile.canWrite()) {
+				//					strM = Messages.getString("MainListener.fileWriteProtected") + ":" + strFilename4Save;
+				//					MainWindow.message(strM, SWT.ICON_WARNING | SWT.OK);
+				//					return false;
+				//				}
 			}
 			objFile.WriteLine(getText());
 			objFile.close();
@@ -507,18 +495,13 @@ public class TextArea extends StyledText /* Text */{
 			return true;
 		}
 		catch (Exception e) {
-			try {
-//				new ErrorLog(String.format("error saving file '%1$s'", strFilename4Save), e);
-				new JobSchedulerException(String.format("error saving file '%1$s'", strFilename4Save), e);
-			}
-			catch (Exception ee) {
-			}
+			//				new ErrorLog(String.format("error saving file '%1$s'", strFilename4Save), e);
+			new JobSchedulerException(String.format("error saving file '%1$s'", strFilename4Save), e);
 			return false;
 		}
 	}
 
-	@Override
-	protected void checkSubclass() {
+	@Override protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components
 	}
 }

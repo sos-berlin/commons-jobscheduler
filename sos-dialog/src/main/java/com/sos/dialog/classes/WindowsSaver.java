@@ -66,6 +66,7 @@ public class WindowsSaver {
 		prefs = Preferences.userNodeForPackage(c);
 		shell = s;
 		className = c.getName();
+		strKey = className;
 		defaultSize = new Point(x, y);
 		defaultLocation = new Point(100, 100);
 
