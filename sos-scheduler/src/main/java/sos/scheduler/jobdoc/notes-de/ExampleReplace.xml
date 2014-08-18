@@ -8,7 +8,7 @@
 	               Beispiele:
 	</p>
 	<p>
-		<table xmlns="http://www.w3.org/1999/xhtml" border="1" cellspacing="0">
+		<table xmlns="http://www.w3.org/1999/xhtml" border="1" cellspacing="0" class="box" >
 			<tr>
 				<th>
 					<code>source_file</code>
