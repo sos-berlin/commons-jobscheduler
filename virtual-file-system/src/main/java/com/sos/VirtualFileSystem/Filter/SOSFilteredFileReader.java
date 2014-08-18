@@ -72,6 +72,19 @@ public class SOSFilteredFileReader extends JSToolBox implements ISOSFilteredFile
 		}
 	}
 
+	public String getFilteredLine () {
+		String strB = null;
+		StringBuffer strBF = objFile2Read.GetLine();
+		if (strBF != null) {
+			strB = strBF.toString();
+			for (SOSNullFilter sosNullFilter : lstFilters) {
+				sosNullFilter.write(strB);
+				strB = sosNullFilter.readString();
+			}
+			
+		}
+		return strB;
+	}
 	public void run() {
 
 		if (lstFilters == null) {
@@ -91,8 +104,8 @@ public class SOSFilteredFileReader extends JSToolBox implements ISOSFilteredFile
 		}
 
 		try {
-			objFile2Read.close();
 			objFilterOptions.startPostProcessing(null);
+			objFile2Read.close();
 			objFilterOptions.startCloseProcessing(null);
 		}
 		catch (IOException e) {
