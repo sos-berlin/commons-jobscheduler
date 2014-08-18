@@ -1024,7 +1024,7 @@ public class SchedulerObjectFactoryTest extends JSToolBox {
 		        <tasks count="0"/>
 		        <queued_tasks length="0"/>
 		        <order_queue length="0"/>
-		        <log level="debug9" highest_level="info" last_info="SCHEDULER-893  Job is 'active' now" mail_on_error="yes" mail_on_warning="yes" smtp="smtp.sos" mail_from="scheduler@localhost" mail_to="kb@sos-berlin.com"/>
+		        <log level="debug9" highest_level="info" last_info="SCHEDULER-893  Job is 'active' now" mail_on_error="yes" mail_on_warning="yes" smtp="smtp.sos" mail_from="scheduler@localhost" mail_to="scheduler_test@sos-berlin.com"/>
 		     </job>
 
 		 */

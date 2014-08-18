@@ -102,14 +102,14 @@ public class JobSchedulerLaunchAndObserveJUnitTest extends JSToolBox {
 		SOSSmtpMailOptions objM = (SOSSmtpMailOptions) objO.getMailOnRestartOptions();
 		objH.put(objM.getbody().getShortKey()+"MailOnRestart_", "bodobodododo");
 		objH.put(objM.getsubject().getShortKey()+"MailOnRestart_", "mail from LaunchAndObserve");
-		objH.put(objM.getto().getShortKey()+"MailOnRestart_", "kb@sos-berlin.com,oh@sos-berlin.com");
+		objH.put(objM.getto().getShortKey()+"MailOnRestart_", "scheduler_test@sos-berlin.com,oh@sos-berlin.com");
 		objH.put(objM.getfrom().getShortKey(),"8of9@sos-berlin.com");
 
 		objH.put(objM.gethost().getShortKey(), "smtp.sos");
 
 		objH.put(objM.getbody().getShortKey(), "bodobodododo");
 		objH.put(objM.getsubject().getShortKey(), "mail from LaunchAndObserve");
-		objH.put(objM.getto().getShortKey(), "kb@sos-berlin.com,oh@sos-berlin.com");
+		objH.put(objM.getto().getShortKey(), "scheduler_test@sos-berlin.com,oh@sos-berlin.com");
 
 		objO.setAllOptions(objH);
 		objO.CheckMandatory();
