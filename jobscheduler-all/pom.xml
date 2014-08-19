@@ -28,7 +28,7 @@
                         <configuration>
                             <appendAssemblyId>false</appendAssemblyId>
                             <descriptors>
-                                <descriptor>src/assembly/complete.xml</descriptor>
+                                <descriptor>src/main/assembly/complete.xml</descriptor>
                             </descriptors>
                         </configuration>
                     </execution>
