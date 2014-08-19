@@ -626,7 +626,7 @@ public class SOSMailTest {
 	}
 
 	@Test
-	public void testMain() {
+	public void testMain() {	
 		//  fail("Not yet implemented");
 	}
 
