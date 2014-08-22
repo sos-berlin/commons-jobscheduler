@@ -78,7 +78,7 @@ public class JSIniFile extends JSTextFile {
 				line = strB.toString().trim();
 				logger.debug(line);
 				int intLineLength = line.length();
-				if (intLineLength <= 0 || line.startsWith(";")) {
+				if (intLineLength <= 0 || line.startsWith(";") || line.startsWith("#")) {
 					continue;
 				}
 
