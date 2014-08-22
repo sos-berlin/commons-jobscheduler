@@ -42,12 +42,14 @@
             <artifactId>kernel</artifactId>
             <version>${sos.engine.version}</version>
         </dependency>
-        <dependency>
+        <!-- <dependency>
             <groupId>com.sos.scheduler.engine</groupId>
             <artifactId>engine-test</artifactId>
             <version>${sos.engine.version}</version>
             <scope>test</scope>
+         
         </dependency>
+           -->
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-library</artifactId>

@@ -191,8 +191,10 @@ public class ConfigurationBaseMonitor extends Monitor_impl {
 	            this.getLogger().debug3(String.format(conClassName + ": error occurred initializing configuration: File %s not found", configurationFilename1));
 			}
 
-			setOrderParam(conVariableNameSCHEDULER_ORDER_CONFIGURATION_LOADED, conTRUE);
+		/*	To avoid side effects e.g. when cloning the order for other job chains or in nested job chains, this should not be set in the order parameter.  
+		    setOrderParam(conVariableNameSCHEDULER_ORDER_CONFIGURATION_LOADED, conTRUE);
 			setOrderParam(conParamNameCONFIGURATION_FILE, configurationFilename1);
+			*/
 		}
 		catch (Exception e) {
  			this.getLogger().warn(conClassName + ": error occurred initializing configuration: " + e.getMessage());
