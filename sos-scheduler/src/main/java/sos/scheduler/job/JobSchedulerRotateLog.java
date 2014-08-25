@@ -49,7 +49,7 @@ public class JobSchedulerRotateLog extends JobSchedulerJob {
 		try {
 			JSFolder objLogDirectory = new JSFolder(filePath);
 			JSFile fleSchedulerLog = objLogDirectory.newFile(JobSchedulerLogFileName);
-			String strNewLogFileName = JobSchedulerLogFileName + "-" + fleSchedulerLog.getTimeStamp() + getRegExp4SchedulerID()
+			String strNewLogFileName = JobSchedulerLogFileName + "-" + fleSchedulerLog.getTimeStamp() + "-" + strSchedulerID
 					+ JobSchedulerLogFileNameExtension;
 			JSFile objN = objLogDirectory.newFile(strNewLogFileName);
 			fleSchedulerLog.copy(objN);
@@ -62,7 +62,7 @@ public class JobSchedulerRotateLog extends JobSchedulerJob {
 					tempFile.delete();
 					intNoOfLogFilesDeleted++;
 				}
-				String deleteSchedulerLogFileSpec = "^(scheduler-log\\.)([0-9\\-]+)" + getRegExp4SchedulerID() + "(\\.log)(\\.gz)?$";
+				String deleteSchedulerLogFileSpec = "^(" + JobSchedulerLogFileName + "\\.)([0-9\\-]+)" + getRegExp4SchedulerID() + "(\\" + JobSchedulerLogFileNameExtension +")(\\.gz)?$";
 				for (JSFile fleT : objLogDirectory.getFilelist(deleteSchedulerLogFileSpec, 0)) {
 					fleT.delete();
 					intNoOfLogFilesDeleted++;
