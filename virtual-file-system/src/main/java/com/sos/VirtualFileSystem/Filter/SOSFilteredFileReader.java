@@ -36,6 +36,11 @@ public class SOSFilteredFileReader extends JSToolBox implements ISOSFilteredFile
 		logger.debug(conClassName);
 	}
 
+	public SOSFilteredFileReader(final ISOSFilteredFileReader pobjProcessHandler) {
+		this();
+		this.setProcesshandler(pobjProcessHandler);
+	}
+
 	public SOSFilteredFileReader(final JSFile pobjJSFile) {
 		this();
 		objFile2Read = pobjJSFile;
@@ -64,6 +69,9 @@ public class SOSFilteredFileReader extends JSToolBox implements ISOSFilteredFile
 		return objFile2Read;
 	}
 	
+	public void runMultipleFiles(final SOSOptionFolderName pobjFolderName) {
+		this.runMultipleFiles(pobjFolderName.JSFile().getAbsolutePath());
+	}
 	public void runMultipleFiles(final String pstrPathName) {
 		SOSOptionFolderName objFN = new SOSOptionFolderName(pstrPathName);
 		for (File file : objFN.listFiles()) {

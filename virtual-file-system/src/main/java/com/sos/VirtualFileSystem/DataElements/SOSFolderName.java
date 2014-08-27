@@ -54,7 +54,6 @@ public class SOSFolderName extends JSDataElement {
 	 */
 	public SOSFolderName(String pstrValue) {
 		super(pstrValue);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -67,7 +66,6 @@ public class SOSFolderName extends JSDataElement {
 	 */
 	public SOSFolderName(String pstrValue, String pstrDescription) {
 		super(pstrValue, pstrDescription);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -86,6 +84,5 @@ public class SOSFolderName extends JSDataElement {
 	public SOSFolderName(String pstrValue, String pstrDescription, int pintSize, int pintPos, String pstrFormatString, String pstrColumnHeader,
 			String pstrXMLTagName) {
 		super(pstrValue, pstrDescription, pintSize, pintPos, pstrFormatString, pstrColumnHeader, pstrXMLTagName);
-		// TODO Auto-generated constructor stub
 	}
 }
