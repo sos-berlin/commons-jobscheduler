@@ -3,6 +3,7 @@ import java.io.File;
 
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.JSHelper.io.Files.JSFile;
 
 /**
 * \class JSOptionFolderName
@@ -197,6 +198,23 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 		return strRet;
 	}
 
+	public SOSOptionFolderName getSubFolder (final String pstrSubFolderName) {
+		String strF = this.getAdjustedValue() + pstrSubFolderName;
+		SOSOptionFolderName objF = new SOSOptionFolderName(strF);
+		if (objF.JSFile().exists()) {
+			if (objF.JSFile().isDirectory()) {
+//				
+			}
+			else {
+				throw new JobSchedulerException(String.format("Path '%1$s' is not a folder", strF));
+			}
+		}
+		else {
+			throw new JobSchedulerException(String.format("Folder '%1$s' does not exists", strF));
+		}
+		return objF;
+	}
+	
 	public boolean isAbsolutPath() {
 		boolean strT = true;
 		if (strValue.startsWith("/") == false) {
@@ -241,5 +259,19 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 		boolean flgRet = false;
 		flgRet = strValue.contains("/") || strValue.contains("\\");
 		return flgRet;
+	}
+
+	public JSFile createFile(String pstrNewFileName) {
+		String strF = this.getAdjustedValue() + pstrNewFileName;
+		JSFile objF = new JSFile(strF);
+		if (objF.exists()) {
+			if (objF.isDirectory()) {
+				throw new JobSchedulerException(String.format("Path '%1$s' is a folder", strF));
+			}
+			else {
+				objF.delete();
+			}
+		}
+		return objF;
 	}
 }

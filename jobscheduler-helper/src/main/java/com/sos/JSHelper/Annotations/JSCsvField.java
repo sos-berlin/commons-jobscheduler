@@ -1,24 +1,25 @@
 package com.sos.JSHelper.Annotations;
 
 import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target( { FIELD } )
+@Target( { FIELD , METHOD } )
 @Retention( RetentionPolicy.RUNTIME )
 public @interface JSCsvField  {
 
-	String name();
+	String name() default "";
 
-	String description();
+	String description() default "";
 
 	String xmltagname() default "";
 
 	int size() default -1;
 
-	int pos();
+	int pos() default -1;
 
 	String type() default "string";
 
