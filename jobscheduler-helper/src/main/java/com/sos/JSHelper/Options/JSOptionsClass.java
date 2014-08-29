@@ -201,6 +201,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	private static final long		serialVersionUID				= 8497293387023797049L;
 	public static boolean			gflgUseBase64ForObject			= true;
 	public static boolean			flgIncludeProcessingInProgress	= false;
+	public static String	gstrIncludeSectionName = "";
 	public boolean					gflgSubsituteVariables			= true;
 	protected static final String	conParamNamePrefixALTERNATIVE	= "alternative_";
 	protected static final String	conParamNamePrefixJUMP			= "jump_";
@@ -208,6 +209,13 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	protected static final String	conParamNamePrefixSOURCE		= "source_";
 	
 
+	public String getIncludeSectionName () {
+		return gstrIncludeSectionName;
+	}
+	
+	public void setIncludeSectionName (final String pstrInludeSectionName) {
+		gstrIncludeSectionName = pstrInludeSectionName;
+	}
 	protected enum IterationTypes {
 		setRecord(1), getRecord(2), toOut(3), createXML(4), setDefaultValues(5), clearAllValues(6), countSegmentFields(7), CheckMandatory(12), setPrefix(14), toString(
 				13), getCommandLine(14), DirtyToString(15), getKeyValuePair(16), LoadValues(17), StoreValues(18);
@@ -217,6 +225,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 			intType = pintType;
 		}
 
+		
 		/**
 		 *
 		 * \brief Code

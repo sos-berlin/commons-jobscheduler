@@ -183,6 +183,9 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 				strT += strAlias + ", ";
 			}
 		}
+		if (isProtected()) {
+			strT += "\nis Protected, Origin=" + this.strIncludeSectionName; 
+		}
 		if (flgIsMandatory == true) {
 			strT += "\nValue is mandatory\n";
 		}
@@ -747,6 +750,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 			else { // warum auf default setzen wenn er nicht in der hashmap ist? Dann unveründert lassen
 				this.Value(strV);
 				this.setProtected(JSOptionsClass.flgIncludeProcessingInProgress);
+				this.setIncludeSectionName(JSOptionsClass.gstrIncludeSectionName);
 			}
 			// - <remark who='EQALS' when='Dienstag, 6. Oktober 2009' id='PublishSQLStatement' >
 			/**
@@ -761,6 +765,11 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 			// - </remark> <!-- id=<PublishSQLStatement> -->
 		}
 	} // public void MapValue
+
+	private String strIncludeSectionName = "";
+	public void setIncludeSectionName (final String pstrInludeSectionName) {
+		strIncludeSectionName = pstrInludeSectionName;
+	}
 
 	public String OptionalQuotedValue() {
 		String strR = strValue;
@@ -1212,6 +1221,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 				// this.SignalDebug(String.format(this.conChangedMsg, this.strValue, strTemp, this.strTitle));
 				Properties objP = objParentClass.getTextProperties();
 				objP.put(getShortKey(), pstrValue);
+				this.setProtected(false);
 			}
 			strValue = pstrValue;
 		}
