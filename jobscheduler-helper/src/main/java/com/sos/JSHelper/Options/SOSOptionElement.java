@@ -40,9 +40,7 @@ import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
 import com.sos.JSHelper.io.Files.JSXMLFile;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
-@I18NResourceBundle(
-					baseName = "com_sos_JSHelper_Messages",
-					defaultLocale = "en")
+@I18NResourceBundle(baseName = "com_sos_JSHelper_Messages", defaultLocale = "en")
 public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOptions {
 	private static final String					constPrefixForEnviromentVariables	= "env:";
 	/**
@@ -57,7 +55,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 																																// attribute
 	private Stack<String>						objValueStack						= null;
 	private ArrayList<IValueChangedListener>	lstValueChangedListeners			= null;
-	public IValueChangedListener objParentControl = null;
+	public IValueChangedListener				objParentControl					= null;
 	protected String							strKey								= "";
 	protected String							strValue							= "";
 	private String								strDefaultValue						= "";
@@ -97,10 +95,10 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	protected boolean							isCData								= false;
 
 	public void addValueChangedListener(final IValueChangedListener pobjValueChangedListener) {
-				if (lstValueChangedListeners == null) {
-					lstValueChangedListeners = new ArrayList<IValueChangedListener>();
-				}
-				lstValueChangedListeners.add(pobjValueChangedListener);
+		if (lstValueChangedListeners == null) {
+			lstValueChangedListeners = new ArrayList<IValueChangedListener>();
+		}
+		lstValueChangedListeners.add(pobjValueChangedListener);
 	}
 
 	public void removeValueChangedListener(final IValueChangedListener pobjValueChangedListener) {
@@ -125,14 +123,16 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	}
 
 	public void changeDefaults(final String pstrValue, final String pstrDefaultValue) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::changeDefaults";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::changeDefaults";
 		strDefaultValue = getValue(pstrDefaultValue);
 		this.Value(getValue(pstrValue));
 		flgIsDirty = false;
 	} // public void changeDefaults
 
 	public void changeDefaults(final int pintValue, final int pintDefaultValue) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::changeDefaults";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::changeDefaults";
 		strDefaultValue = String.valueOf(pintDefaultValue);
 		this.Value(String.valueOf(pintValue));
 		flgIsDirty = false;
@@ -289,12 +289,14 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	 * @return
 	 */
 	public String DefaultValue() {
-		@SuppressWarnings("unused") final String conMethodName = SOSOptionElement.conClassName + "::DefaultValue";
+		@SuppressWarnings("unused")
+		final String conMethodName = SOSOptionElement.conClassName + "::DefaultValue";
 		return strDefaultValue;
 	} // public String DefaultValue
 
 	public void DefaultValue(final String pstrValue) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setDefaultValue";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setDefaultValue";
 		strDefaultValue = pstrValue;
 		//	return void;
 	} // private void setDefaultValue
@@ -437,7 +439,8 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	 * \return String
 	 */
 	public String getKey() {
-		@SuppressWarnings("unused") final String conMethodName = SOSOptionElement.conClassName + "::getKey";
+		@SuppressWarnings("unused")
+		final String conMethodName = SOSOptionElement.conClassName + "::getKey";
 		return strKey;
 	} // private String getKey
 
@@ -488,6 +491,9 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 					if (isEmpty(strRet) == true) {
 						strRet = strDefaultValue;
 					}
+					else {
+						strRet = StripQuotes(strRet);
+					}
 				}
 				else {
 					strRet = strEnvVarValue;
@@ -528,7 +534,8 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	*
 	 */
 	public boolean isDefault() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::isDefault";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::isDefault";
 		return strValue.equalsIgnoreCase(strDefaultValue);
 	} // private boolean  isDefault
 
@@ -544,7 +551,8 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	*
 	 */
 	public boolean isDirty() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::isDirty";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::isDirty";
 		return flgIsDirty;
 	} // private boolean isDirty
 
@@ -611,7 +619,8 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	 * protect
 	 */
 	public boolean isProtected() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::isProtected";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::isProtected";
 		boolean retVal = gflgProtected;
 		return retVal;
 	} // private boolean Protected
@@ -627,7 +636,8 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	 * protect
 	 */
 	public SOSOptionElement setProtected(final boolean pflgProtected) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setProtected";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setProtected";
 		gflgProtected = pflgProtected;
 		return this;
 	} // private SOSOptionElement Protected
@@ -643,7 +653,8 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	*
 	 */
 	public boolean isMandatory() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::isMandatory";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::isMandatory";
 		return flgIsMandatory;
 	} // private boolean isMandatory
 
@@ -658,12 +669,14 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	 * @param pflgIsMandatory
 	 */
 	public void isMandatory(final boolean pflgIsMandatory) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::isMandatory";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::isMandatory";
 		flgIsMandatory = pflgIsMandatory;
 	} // private void isMandatory
 
 	public boolean isNotDirty() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::isDirty";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::isDirty";
 		return !flgIsDirty;
 	} // private boolean isDirty
 
@@ -676,28 +689,24 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	}
 
 	public void loadValues() {
-		
 		@SuppressWarnings("unused")
-		final String	conMethodName	= conClassName + "::loadValues";
-		
+		final String conMethodName = conClassName + "::loadValues";
 		Preferences objP = objParentClass.getPreferenceStore();
 		if (objP != null) {
 			String strT = objP.get(getKey().toLowerCase(), strDefaultValue);
 			Value(strT);
 		}
 	} // private void loadValues
-	
+
 	public void storeValues() {
-		
 		@SuppressWarnings("unused")
-		final String	conMethodName	= conClassName + "::storeValues";
-		
+		final String conMethodName = conClassName + "::storeValues";
 		Preferences objP = objParentClass.getPreferenceStore();
 		if (objP != null) {
 			objP.put(getKey().toLowerCase(), Value());
 		}
-		
 	} // private void storeValues
+
 	/**
 	 *
 	 * \brief MapValue - Wert der Option aus der HashTable übernehmen
@@ -713,7 +722,8 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	 * @throws Exception
 	 */
 	public void MapValue() {
-		@SuppressWarnings("unused") final String conMethodName = SOSOptionElement.conClassName + "::MapValue";
+		@SuppressWarnings("unused")
+		final String conMethodName = SOSOptionElement.conClassName + "::MapValue";
 		/**
 		 * \todo Wenn abgeleitete Klassen in der Value()-Methode prüfungen auf gültige Werte haben
 		 * und ein "leerer" String ein ungültiger Wert ist, dann wird dieser ungültige Wert nicht erkannt.
@@ -798,7 +808,8 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	 * @return
 	 */
 	public String QuotedValue() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::QuotedValue";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::QuotedValue";
 		return this.QuotedValue(strValue);
 	} // private String QuotedValue
 
@@ -814,7 +825,8 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	 * @return
 	 */
 	public String QuotedValue(final String pstrValue) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::QuotedValue";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::QuotedValue";
 		String strRet = "\"" + pstrValue.replaceAll("\"", "\"\"") + "\"";
 		return strRet;
 	} // private String QuotedValue
@@ -852,13 +864,15 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	}
 
 	public SOSOptionElement SetAlias(final String pstrAliasKey) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setAlias";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setAlias";
 		objAliase.add(pstrAliasKey);
 		return this;
 	} // private void setAlias
 
 	public SOSOptionElement SetAlias(final String... pstrAliasKey) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setAlias";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setAlias";
 		for (String string : pstrAliasKey) {
 			objAliase.add(string);
 		}
@@ -902,7 +916,8 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	}
 
 	public String setPrefix(final String strPrefix) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setPrefix";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setPrefix";
 		String strT = strKey;
 		int i = strT.indexOf(".");
 		if (i > 0) {
@@ -969,7 +984,8 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 
 	public String StripQuotes(final String pstrS) {
 		String strR = pstrS;
-		if (pstrS.substring(0, 1).equals("\"") && pstrS.substring(pstrS.length() - 1).equals("\"")) {
+//		if (pstrS.substring(0, 1).equals("\"") && pstrS.substring(pstrS.length() - 1).equals("\"")) {
+		if (pstrS.startsWith("\"") && pstrS.endsWith("\"")) {
 			strR = pstrS.substring(1, pstrS.length() - 1);
 		}
 		return strR;
@@ -1049,7 +1065,8 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	 * @throws Exception
 	 */
 	public String toOut() throws Exception {
-		@SuppressWarnings("unused") final String conMethodName = SOSOptionElement.conClassName + "::toOut";
+		@SuppressWarnings("unused")
+		final String conMethodName = SOSOptionElement.conClassName + "::toOut";
 		String strT = "";
 		strT = String.format("%1$s %2$s: %3$s \n", strTitle, strDescription, this.Value());
 		return strT;
@@ -1065,7 +1082,8 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	 *
 	 * @return
 	 */
-	@Override public String toString() {
+	@Override
+	public String toString() {
 		String strR = "";
 		if (flgHideOption == false) {
 			String strV = strValue;
@@ -1169,7 +1187,8 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	 * @return
 	 * @throws Exception
 	 */
-	@Override public void Value(final String pstrValue) {
+	@Override
+	public void Value(final String pstrValue) {
 		if (flgIsMandatory) {
 			if (pstrValue == null) {
 				if (gflgProcessHashMap == false) {
@@ -1248,7 +1267,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 		return new String[] {};
 	}
 
-	public String getUserDir () {
+	public String getUserDir() {
 		String strT = System.getProperty("user.dir");
 		if (objParentClass != null) {
 			strT = objParentClass.BaseDirectory.Value();

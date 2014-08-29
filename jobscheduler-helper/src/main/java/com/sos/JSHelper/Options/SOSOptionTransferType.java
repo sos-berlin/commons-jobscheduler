@@ -1,6 +1,8 @@
 package com.sos.JSHelper.Options;
 import org.apache.log4j.Logger;
 
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
+
 /**
 * \class SOSOptionTransferType
 *
@@ -41,23 +43,62 @@ public class SOSOptionTransferType extends SOSOptionStringValueList {
 	private static final Logger	logger				= Logger.getLogger(SOSOptionTransferType.class);
 	private enuTransferTypes	enuTT				= enuTransferTypes.local;
 	public static enum enuTransferTypes {
+		// @formatter:off
 		local, /* filesystem on localhost */
 		file, /* same as local */
-		ftp, sftp, ftps, ssh2, zip, mq, // Message Queue
-		http, https, svn, webdav, smb, smtp, imap
-		/* */;
+		ftp, 
+		sftp, 
+		ftps, 
+		http, https, 
+		webdav, 
+		smb, 
+		mq, // Message Queue
+		ssh2, 
+		svn, 
+		smtp, imap,
+		zip 
+		/*
+		 * 
+		 *  */;
+		// @formatter:on
 		public String Text() {
 			String strT = this.name();
 			return strT;
 		}
 
 		public static String[] getArray() {
-			String[] strA = new String[15];
+			String[] strA = new String[enuTransferTypes.values().length];
 			int i = 0;
 			for (enuTransferTypes enuType : enuTransferTypes.values()) {
 				strA[i++] = enuType.Text();
 			}
 			return strA;
+		}
+
+		public static String getAsString() {
+			String strR = "";
+			for (enuTransferTypes enuType : enuTransferTypes.values()) {
+				strR += enuType.Text() + ", ";
+			}
+			return strR;
+		}
+
+		public static boolean isTypeValid(final String pstrType) {
+			boolean flgT = false;
+			for (enuTransferTypes enuType : enuTransferTypes.values()) {
+				if (pstrType.equalsIgnoreCase(enuType.Text())) {
+					flgT = true;
+					break;
+				}
+			}
+			return flgT;
+		}
+	}
+	public class SOSTransferTypeException extends JobSchedulerException {
+		private static final long	serialVersionUID	= -738287289757042422L;
+
+		public SOSTransferTypeException(final String pstrMessage) {
+			super(pstrMessage);
 		}
 	}
 
@@ -77,6 +118,11 @@ public class SOSOptionTransferType extends SOSOptionStringValueList {
 			final String pstrDefaultValue, final boolean pflgIsMandatory) {
 		super(pobjParent, pstrKey, pstrDescription, pstrValue, pstrDefaultValue, pflgIsMandatory);
 		super.valueList(enuTransferTypes.getArray());
+		Text2Enum();
+	}
+
+	public SOSOptionTransferType(final String pstrTransferType) {
+		this(null, "", "", pstrTransferType, "", false);
 	}
 
 	public void Value(final enuTransferTypes penuTT) {
@@ -106,7 +152,38 @@ public class SOSOptionTransferType extends SOSOptionStringValueList {
 		}
 	}
 
-	public enuTransferTypes getEnum () {
+	public boolean needPortNumber() {
+		boolean strR = true;
+		switch (enuTT) {
+			case file:
+			case local:
+			case zip:
+			case smb:
+				strR = false;
+				break;
+			default:
+				strR = true;
+				break;
+		}
+		return strR;
+	}
+
+	public enuTransferTypes getEnum() {
 		return enuTT;
+	}
+
+	@Override
+	public void CheckMandatory() {
+		super.CheckMandatory();
+		if (isDirty()) {
+			if (validate() == false) {
+				throw new SOSTransferTypeException(String.format("invalid transfertype '%1$s' specified. valid types are '%2$s'.", strValue,
+						enuTransferTypes.getAsString()));
+			}
+		}
+	}
+
+	public boolean validate() {
+		return enuTransferTypes.isTypeValid(strValue);
 	}
 }

@@ -41,6 +41,9 @@ public class SOSOptionUrl extends SOSOptionHostName {
 		// TODO Auto-generated constructor stub
 	}
 
+	public SOSOptionUrl (final String pstrUrl) {
+		super (null, "", "", pstrUrl, "", false);
+	}
 	public URL getUrl() {
 		return objURL;
 	}
@@ -48,7 +51,8 @@ public class SOSOptionUrl extends SOSOptionHostName {
 	/**
 	 * 
 	 */
-	@Override public void Value(final String pstrUrl) {
+	@Override
+	public void Value(final String pstrUrl) {
 		if (isNotEmpty(pstrUrl)) {
 			// Possible Elements of an URL are:
 			//
@@ -61,10 +65,10 @@ public class SOSOptionUrl extends SOSOptionHostName {
 			//
 			//  ftp://<user>:<password>@<host>:<port>/<url-path>;type=<typecode>
 			// see http://docs.oracle.com/javase/7/docs/api/java/net/URL.html
-			String strUrl = pstrUrl; // 
+			String strUrl = pstrUrl.trim(); // 
 			try {
 				objURL = new URL(strUrl);
-				super.Value(pstrUrl);
+				super.Value(strUrl);
 			}
 			catch (MalformedURLException e) {
 				throw new JobSchedulerException(String.format("invalid url '%1$s' specified", pstrUrl), e);
@@ -87,19 +91,24 @@ public class SOSOptionUrl extends SOSOptionHostName {
 		if (objURL == null) {
 			throw new JobSchedulerException("no URL speficied");
 		}
+		SOSOptionTransferType objTT = pobjO.getprotocol();
+		objTT.Value(objURL.getProtocol());
 		setIfNotDirty(pobjO.getHost(), objURL.getHost());
-		String strPort = String.valueOf(objURL.getPort());
-		if (isEmpty(strPort) || strPort.equals("-1")) {
-			strPort = String.valueOf(objURL.getDefaultPort());
+		if (objTT.needPortNumber() == true) {
+			String strPort = String.valueOf(objURL.getPort());
+			if (isEmpty(strPort) || strPort.equals("-1")) {
+				strPort = String.valueOf(objURL.getDefaultPort());
+			}
+			setIfNotDirty(pobjO.getport(), strPort);
 		}
-		setIfNotDirty(pobjO.getport(), strPort);
-//		setIfNotDirty(pobjO.getprotocol(), objURL.getProtocol());
-		pobjO.getprotocol().Value(objURL.getProtocol());
+		
 		String strUserInfo = objURL.getUserInfo();
-		String[] strU = strUserInfo.split(":");
-		setIfNotDirty(pobjO.getUser(), strU[0]);
-		if (strU.length > 1) {
-			setIfNotDirty(pobjO.getPassword(), strU[1]);
+		if (isNotNull(strUserInfo)) {
+			String[] strU = strUserInfo.split(":");
+			setIfNotDirty(pobjO.getUser(), strU[0]);
+			if (strU.length > 1) {
+				setIfNotDirty(pobjO.getPassword(), strU[1]);
+			}
 		}
 	}
 
@@ -118,19 +127,20 @@ public class SOSOptionUrl extends SOSOptionHostName {
 			throw new JobSchedulerException("no URL speficied");
 		}
 		String strPath = objURL.getPath();
-//		setIfNotDirty(pobjO.getfile_path(), strPath);
-//		setIfNotDirty(pobjO.getdir(), strPath);
+		//		setIfNotDirty(pobjO.getfile_path(), strPath);
+		//		setIfNotDirty(pobjO.getdir(), strPath);
 		String strAuthority = objURL.getAuthority();
 		String[] strA = strAuthority.split("@"); // user:pw  host
 	}
 
-	public String getFolderName () {
+	public String getFolderName() {
 		if (objURL == null) {
 			throw new JobSchedulerException("no URL speficied");
 		}
 		String strPath = objURL.getPath();
 		return strPath;
 	}
+
 	/**
 	 * 
 	*

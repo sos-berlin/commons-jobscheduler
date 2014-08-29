@@ -119,6 +119,9 @@ public class SOSOptionTime extends SOSOptionInteger {
 		return formatter.format(now.getTime());
 	}
 
+	public long getTimeAsMilliSeconds () {
+		return getTimeAsSeconds() * 1000L;
+	}
 	/**
 	 *
 	 * \brief getTimeAsSeconds
