@@ -33,6 +33,8 @@ import org.apache.log4j.Logger;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
 
+import sos.spooler.Variable_set;
+
 import com.sos.JSHelper.Basics.JSJobUtilities;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
@@ -740,6 +742,20 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
 
 	} // private void closeSocket
 
+	public Params setParams(final Variable_set pobjProperties) {
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setParams";
+
+		String strParamValue = "";
+		Params objParams = super.createParams();
+
+		for (String strKey : pobjProperties.names().split(";")) {
+			strParamValue = pobjProperties.value(strKey);
+			Param objP = this.createParam(strKey, strParamValue);
+			objParams.getParamOrCopyParamsOrInclude().add(objP);
+		}
+		return objParams;
+	}
 	/**
 	 *
 	 * \brief setParams
