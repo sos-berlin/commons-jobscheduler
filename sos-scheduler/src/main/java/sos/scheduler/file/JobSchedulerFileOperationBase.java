@@ -1,18 +1,24 @@
 package sos.scheduler.file;
-
-import com.sos.JSHelper.Basics.VersionInfo;
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.JSHelper.Options.SOSOptionFileAge;
-import com.sos.JSHelper.Options.SOSOptionTime;
-import com.sos.JSHelper.io.Files.JSTextFile;
-import com.sos.JSHelper.io.SOSFileSystemOperations;
-import com.sos.i18n.annotation.I18NResourceBundle;
-import org.apache.log4j.Logger;
-import sos.scheduler.job.JobSchedulerJobAdapter;
-import sos.spooler.Job_chain;
-import sos.spooler.Order;
-import sos.spooler.Variable_set;
-import sos.util.SOSSchedulerLogger;
+import static com.sos.scheduler.messages.JSMessages.JSJ_D_0044;
+import static com.sos.scheduler.messages.JSMessages.JSJ_E_0017;
+import static com.sos.scheduler.messages.JSMessages.JSJ_E_0020;
+import static com.sos.scheduler.messages.JSMessages.JSJ_E_0040;
+import static com.sos.scheduler.messages.JSMessages.JSJ_E_0041;
+import static com.sos.scheduler.messages.JSMessages.JSJ_E_0042;
+import static com.sos.scheduler.messages.JSMessages.JSJ_E_0110;
+import static com.sos.scheduler.messages.JSMessages.JSJ_E_0120;
+import static com.sos.scheduler.messages.JSMessages.JSJ_E_0130;
+import static com.sos.scheduler.messages.JSMessages.JSJ_F_0015;
+import static com.sos.scheduler.messages.JSMessages.JSJ_F_0016;
+import static com.sos.scheduler.messages.JSMessages.JSJ_F_0080;
+import static com.sos.scheduler.messages.JSMessages.JSJ_F_0090;
+import static com.sos.scheduler.messages.JSMessages.JSJ_I_0017;
+import static com.sos.scheduler.messages.JSMessages.JSJ_I_0018;
+import static com.sos.scheduler.messages.JSMessages.JSJ_I_0019;
+import static com.sos.scheduler.messages.JSMessages.JSJ_I_0040;
+import static com.sos.scheduler.messages.JSMessages.JSJ_I_0090;
+import static com.sos.scheduler.messages.JSMessages.JSJ_T_0010;
+import static com.sos.scheduler.messages.JSMessages.JSJ_W_0043;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -25,48 +31,53 @@ import java.util.HashMap;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
-import static com.sos.scheduler.messages.JSMessages.*;
+import org.apache.log4j.Logger;
+
+import sos.scheduler.job.JobSchedulerJobAdapter;
+import sos.spooler.Job_chain;
+import sos.spooler.Order;
+import sos.spooler.Variable_set;
+import sos.util.SOSSchedulerLogger;
+
+import com.sos.JSHelper.Basics.VersionInfo;
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.JSHelper.Options.SOSOptionFileAge;
+import com.sos.JSHelper.Options.SOSOptionTime;
+import com.sos.JSHelper.io.SOSFileSystemOperations;
+import com.sos.JSHelper.io.Files.JSTextFile;
+import com.sos.i18n.annotation.I18NResourceBundle;
 
 /**
  */
 @I18NResourceBundle(baseName = "com_sos_scheduler_messages", defaultLocale = "en")
 public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
-
 	private static final String			conOrderParameterSCHEDULER_FILE_PATH							= "scheduler_file_path";
 	private static final String			conOrderParameterSCHEDULER_FILE_PARENT							= "scheduler_file_parent";
 	private static final String			conOrderParameterSCHEDULER_FILE_NAME							= "scheduler_file_name";
 	public static final String			conOrderParameterSCHEDULER_SOS_FILE_OPERATIONS_RESULT_SET		= "scheduler_SOSFileOperations_ResultSet";
 	public static final String			conOrderParameterSCHEDULER_SOS_FILE_OPERATIONS_RESULT_SET_SIZE	= "scheduler_SOSFileOperations_ResultSetSize";
 	public static final String			conOrderParameterSCHEDULER_SOS_FILE_OPERATIONS_FILE_COUNT		= "scheduler_SOSFileOperations_file_count";
-
 	protected static final String		conPropertyJAVA_IO_TMPDIR										= "java.io.tmpdir";
-
 	/** give a path for files to remove */
 	protected String					filePath														= System.getProperty(conPropertyJAVA_IO_TMPDIR);
-
 	/** give the number of milliseconds, defaults to 24 hours */
 	protected long						lngFileAge														= 86400000;
-
 	/** number of files which causes a warning */
 	protected int						warningFileLimit												= 0;
-
 	private static final String			conParameterCREATE_ORDERS_FOR_ALL_FILES							= "create_orders_for_all_files";
 	private static final String			conParameterNEXT_STATE											= "next_state";
 	private static final String			conParameterORDER_JOBCHAIN_NAME									= "order_jobchain_name";
 	private static final String			conParameterCREATE_ORDER										= "create_order";
 	private static final String			conParameterMERGE_ORDER_PARAMETER								= "merge_order_parameter";
-
 	protected static final String		conParameterCHECK_STEADYSTATEOFFILE								= "check_steady_state_of_files";
 	protected static final String		conParameterCHECK_STEADYSTATEINTERVAL							= "check_steady_state_interval";
 	protected static final String		conParameterSTEADYSTATECOUNT									= "steady_state_count";
-
 	protected static final String		conParameterWARNING_FILE_LIMIT									= "warning_file_limit";
 	protected static final String		conParameterFILE_AGE											= "file_age";
 	protected static final String		conParameterFILE_SPEC											= "file_spec";
 	protected static final String		conParameterFILE_REGEX											= "file_regex";
 	protected static final String		conParameterFILE_SPECIFICATION									= "file_specification";
 	protected static final String		conParameterFILE_PATH											= "file_path";
-
 	protected static final String		conParameterMAX_FILE_SIZE										= "max_file_size";
 	protected static final String		conParameterMIN_FILE_SIZE										= "min_file_size";
 	protected static final String		conParameterMAX_FILE_AGE										= "max_file_age";
@@ -87,7 +98,7 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 	protected static final String		conParameterEXPECTED_SIZE_OF_RESULT_SET							= "Expected_Size_Of_Result_Set";
 	protected SOSSchedulerLogger		objSOSLogger													= null;
 	@SuppressWarnings("hiding")
-	protected final Logger					logger															= Logger.getLogger(JobSchedulerFileOperationBase.class);
+	protected final Logger				logger															= Logger.getLogger(JobSchedulerFileOperationBase.class);
 	protected static final String		conParameterRESULT_LIST_FILE									= "Result_List_File";
 	protected static final String		conParameterRECURSIVE											= "recursive";
 	protected static final String		conParameterCREATE_DIR											= "create_dir";
@@ -134,15 +145,12 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 	protected boolean					flgCreateOrders4AllFiles										= false;
 	protected String					strOrderJobChainName											= null;
 	protected String					strNextState													= null;
-
 	protected boolean					flgCheckSteadyStateOfFiles										= false;
 	protected long						lngSteadyCount													= 30;
 	protected long						lngCheckSteadyStateInterval										= 1000;																		// millis
 	protected boolean					flgUseNIOLock													= false;
-
 	private SOSOptionFileAge			objOptionFileAge												= null;
 	private SOSOptionTime				objOptionTime													= null;
-
 	protected SOSFileSystemOperations	SOSFileOperations												= new SOSFileSystemOperations();
 
 	public JobSchedulerFileOperationBase() {
@@ -159,7 +167,6 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 	*
 	* @return
 	*/
-
 	@Override
 	public boolean spooler_init() {
 		final String conMethodName = conClassName + "::spooler_init";
@@ -188,10 +195,8 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 	}
 
 	private void ResetVariables() {
-
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::ResetVariables";
-
 		flgOperationWasSuccessful = false;
 		name = null;
 		file = null;
@@ -221,14 +226,11 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 		flgCreateOrders4AllFiles = false;
 		strOrderJobChainName = null;
 		strNextState = null;
-
 		objOptionFileAge = new SOSOptionFileAge(null, "file_age", "file_age", "0", "0", false);
 		objOptionTime = new SOSOptionTime(null, conParameterCHECK_STEADYSTATEINTERVAL, conParameterCHECK_STEADYSTATEINTERVAL, "1", "1", false);
-
 		flgCheckSteadyStateOfFiles = false;
 		lngSteadyCount = 30;
 		lngCheckSteadyStateInterval = 1000;
-
 	} // private void ResetVariables
 
 	protected boolean getParamBoolean(final String pstrParamName, final boolean pflgDefaultValue) {
@@ -343,12 +345,9 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 	}
 
 	protected void getParametersFromHashMap() throws Exception {
-
 		ResetVariables();
-
 		flgCreateOrders4AllFiles = getParamBoolean(conParameterCREATE_ORDERS_FOR_ALL_FILES, false);
 		flgCreateOrder = getParamBoolean(conParameterCREATE_ORDER, false) | flgCreateOrders4AllFiles;
-
 		flgMergeOrderParameter = getParamBoolean(conParameterMERGE_ORDER_PARAMETER, false);
 		if (flgCreateOrder == true) {
 			strOrderJobChainName = getParamValue(conParameterORDER_JOBCHAIN_NAME);
@@ -366,10 +365,8 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 			flgCreateOrders4AllFiles = false;
 			flgMergeOrderParameter = false;
 		}
-
 		lngFileAge = calculateFileAge(getParamValue(conParameterFILE_AGE, "0"));
 		warningFileLimit = getParamInteger(conParameterWARNING_FILE_LIMIT, 0);
-
 		intExpectedSizeOfResultSet = getParamInteger(conParameterEXPECTED_SIZE_OF_RESULT_SET, 0);
 		strRaiseErrorIfResultSetIs = getParamValue(conParameterRAISE_ERROR_IF_RESULT_SET_IS, EMPTY_STRING);
 		strResultList2File = getParamValue(conParameterRESULT_LIST_FILE, EMPTY_STRING);
@@ -377,33 +374,25 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 		source = file = filePath = getParamValue(new String[] { conParameterSOURCE_FILE, conParameterFILE, conParameterFILE_PATH }, EMPTY_STRING);
 		fileSpec = getParamValue(new String[] { conParameterFILE_SPEC, conParameterFILE_SPECIFICATION }, strFileSpecDefault);
 		if (isNotEmpty(fileSpec) || isNotEmpty(source)) {
-
 		}
 		else { // can be started by a file order source. In this case the name of the file comes as the value of SCHEDULER_WITH_PATH
 			source = file = filePath = getParamValue(new String[] { conOrderParameterSCHEDULER_FILE_PATH }, EMPTY_STRING);
 		}
 		target = getParamValue(conParameterTARGET_FILE, null);
-
 		minFileAge = getParamValue(conParameterMIN_FILE_AGE, "0");
 		objOptionFileAge.Value(minFileAge);
 		minFileAge = String.valueOf(objOptionFileAge.getAgeAsSeconds());
-
 		maxFileAge = getParamValue(conParameterMAX_FILE_AGE, "0");
 		objOptionFileAge.Value(maxFileAge);
 		maxFileAge = String.valueOf(objOptionFileAge.getAgeAsSeconds());
-
 		minFileSize = getParamValue(conParameterMIN_FILE_SIZE, conFileSizeDefault);
 		maxFileSize = getParamValue(conParameterMAX_FILE_SIZE, conFileSizeDefault);
-
 		flgUseNIOLock = getParamBoolean("use_nio_lock", false);
-
 		strGracious = getParamValue(conParameterGRACIOUS, "false");
 		skipFirstFiles = getParamInteger(conParameterSKIP_FIRST_FILES, 0);
 		skipLastFiles = getParamInteger(conParameterSKIP_LAST_FILES, 0);
-
 		flags = 0;
 		String strCreateWhat = getParamValue(new String[] { conParameterCREATE_DIR, conParameterCREATE_FILE, conParameterCREATE_FILES }, "false");
-
 		if (SOSFileOperations.toBoolean(strCreateWhat) == true) {
 			flags |= SOSFileSystemOperations.CREATE_DIR;
 		}
@@ -430,7 +419,6 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 		if (isNull(replacing) && isNotNull(replacement)) {
 			throw new JobSchedulerException(strM);
 		}
-
 		flgCheckSteadyStateOfFiles = getParamBoolean(conParameterCHECK_STEADYSTATEOFFILE, false);
 		lngSteadyCount = getParamLong(conParameterSTEADYSTATECOUNT, 30);
 		objOptionTime.Value(getParamValue(conParameterCHECK_STEADYSTATEINTERVAL, "1"));
@@ -476,19 +464,15 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 	 *
 	 */
 	public void saveResultList() {
-
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::saveResultList";
-
 		if (isNull(lstResultList)) {
 			lstResultList = new Vector<File>();
 		}
-
 		Vector<File> lstR = SOSFileOperations.lstResultList;
 		if (isNotNull(lstR) && lstR.size() > 0) {
 			lstResultList.addAll(lstR);
 		}
-
 	} // private void saveResultList
 
 	public boolean createResultListParam(final boolean pflgOperationWasSuccessful) {
@@ -498,7 +482,6 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 			saveResultList();
 		}
 		intNoOfHitsInResultSet = 0;
-
 		if (isNotNull(lstResultList) && lstResultList.size() > 0) {
 			intNoOfHitsInResultSet = lstResultList.size();
 			strFirstFile = lstResultList.get(0).getAbsolutePath();
@@ -506,7 +489,6 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 				strResultSetFileList += objFile.getAbsolutePath() + ";";
 			}
 		}
-
 		if (isJobchain()) {
 			if (count_files) {
 				setOrderParameter(conOrderParameterSCHEDULER_SOS_FILE_OPERATIONS_FILE_COUNT, String.valueOf(intNoOfHitsInResultSet));
@@ -516,14 +498,12 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 				setOrderParameter(conOrderParameterSCHEDULER_SOS_FILE_OPERATIONS_RESULT_SET, strResultSetFileList);
 				setOrderParameter(conOrderParameterSCHEDULER_SOS_FILE_OPERATIONS_RESULT_SET_SIZE, String.valueOf(intNoOfHitsInResultSet));
 			}
-
 			if (isNotEmpty(strOnEmptyResultSet) && intNoOfHitsInResultSet <= 0) {
 				JSJ_I_0090.toLog(strOnEmptyResultSet);
 				setNextNodeState(strOnEmptyResultSet);
-//				spooler_task.order().set_state(strOnEmptyResultSet);
+				//				spooler_task.order().set_state(strOnEmptyResultSet);
 			}
 		}
-
 		if (isNotEmpty(strResultList2File) && isNotEmpty(strResultSetFileList)) {
 			JSTextFile objResultListFile = new JSTextFile(strResultList2File);
 			try {
@@ -541,7 +521,6 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 				throw new JobSchedulerException(e);
 			}
 		}
-
 		if (isNotEmpty(strRaiseErrorIfResultSetIs)) {
 			boolean flgR = compareIntValues(strRaiseErrorIfResultSetIs, intNoOfHitsInResultSet, intExpectedSizeOfResultSet);
 			if (flgR == true) {
@@ -549,7 +528,6 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 				return false;
 			}
 		}
-
 		//  http://www.sos-berlin.com/jira/browse/JITL-71
 		if (intNoOfHitsInResultSet > 0 && flgCreateOrder == true && pflgOperationWasSuccessful == true) {
 			if (flgCreateOrders4AllFiles == true) {
@@ -561,17 +539,13 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 				createOrder(strFirstFile, strOrderJobChainName);
 			}
 		}
-
 		return pflgOperationWasSuccessful;
 	}// private void createResultListParam
 
 	public boolean compareIntValues(final String pstrComparator, final int pintValue1, final int pintValue2) {
-
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::compareIntValues";
-
 		HashMap<String, Integer> objRelOp = new HashMap<String, Integer>();
-
 		objRelOp.put("eq", 1);
 		objRelOp.put("equal", 1);
 		objRelOp.put("==", 1);
@@ -592,7 +566,6 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 		objRelOp.put("gt", 6);
 		objRelOp.put("greater than", 6);
 		objRelOp.put(">", 6);
-
 		boolean flgR = false;
 		String strT1 = pstrComparator;
 		Integer iOp = objRelOp.get(strT1.toLowerCase());
@@ -601,27 +574,21 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 				case 1:
 					flgR = pintValue1 == pintValue2;
 					break;
-
 				case 2:
 					flgR = pintValue1 != pintValue2;
 					break;
-
 				case 3:
 					flgR = pintValue1 < pintValue2;
 					break;
-
 				case 4:
 					flgR = pintValue1 <= pintValue2;
 					break;
-
 				case 5:
 					flgR = pintValue1 >= pintValue2;
 					break;
-
 				case 6:
 					flgR = pintValue1 > pintValue2;
 					break;
-
 				default:
 					break;
 			}
@@ -629,34 +596,26 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 		else {
 			throw new JobSchedulerException(JSJ_E_0017.get(pstrComparator));
 		}
-
 		return flgR;
 	}// private boolean compareIntValues
 
 	private void createOrder(final String pstrOrder4FileName, final String pstrOrderJobChainName) {
-
 		final String conMethodName = conClassName + "::createOrder";
-
 		Order objOrder = spooler.create_order();
 		Variable_set objOrderParams = spooler.create_variable_set();
-
 		// kb: merge actual parameters into created order params (2012-07-25)
 		if (flgMergeOrderParameter == true && isOrderJob() == true) {
 			objOrderParams.merge(getOrderParams());
 		}
-
 		objOrderParams.set_value(conOrderParameterSCHEDULER_FILE_PATH, pstrOrder4FileName);
 		objOrderParams.set_value(conOrderParameterSCHEDULER_FILE_PARENT, new File(pstrOrder4FileName).getParent());
 		objOrderParams.set_value(conOrderParameterSCHEDULER_FILE_NAME, new File(pstrOrder4FileName).getName());
-
 		if (isNotEmpty(strNextState)) {
 			objOrder.set_state(strNextState);
 		}
-
 		objOrder.set_params(objOrderParams);
 		objOrder.set_id(pstrOrder4FileName);
 		objOrder.set_title(JSJ_I_0017.get(conMethodName)); // "Order created by %1$s"
-
 		Job_chain objJobchain = spooler.job_chain(pstrOrderJobChainName);
 		objJobchain.add_order(objOrder);
 		String strT = JSJ_I_0018.get(pstrOrder4FileName, pstrOrderJobChainName); // "Order '%1$s' created for JobChain '%2$s'."
@@ -664,15 +623,12 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 			strT += " " + JSJ_I_0019.get(strNextState); // "Next State is '%1$s'."
 		}
 		logger.info(strT);
-
 	} // private void createOrder
 
 	public String replaceVars4(String pstrReplaceIn) {
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::replaceVars";
-
 		String strParamNameEnclosedInPercentSigns = "^.*%([^%]+)%.*$"; // "^.*%[^%]+%.*$";
-
 		if (isNotNull(pstrReplaceIn)) {
 			// To make orderparams available for substitution in orderparam value
 			while (pstrReplaceIn.matches(strParamNameEnclosedInPercentSigns)) {
@@ -704,12 +660,9 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 	 * @param pobjparams
 	 */
 	public void setParams(final HashMap<String, String> pobjparams) {
-
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::setParams";
-
 		params = pobjparams;
-
 	} // private void setParams
 
 	/**
@@ -727,13 +680,11 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::setReturnResult";
 		boolean rc1 = pflgResult;
-
 		// if (isJobchain()) {
 		// rc1 = createResultListParam(pflgResult);
 		// }
 		// nicht nur für Jobchains rufen, weil hier auch die Order(s) erzeugt werden
 		rc1 = createResultListParam(pflgResult);
-
 		if (rc1 == false && isGraciousAll()) {
 			return signalSuccess();
 		}
@@ -808,7 +759,6 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 				age = Long.parseLong(hoursMinSec);
 			}
 		}
-
 		return age;
 	}
 
@@ -830,58 +780,36 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 	}
 	private final String	JSJ_F_0110	= "JSJ_F_0110"; // "This function is not implemented: %1$s";
 
-	class FileDescriptor {
-		FileDescriptor() {
-
-		}
-		public long		lastModificationDate	= 0;
-		public long		lastFileLength			= 0;
-		public String	FileName				= "";
-		public boolean	flgIsSteady				= false;
-	}
-
-
-
-
-
 	public boolean checkSteadyStateOfFiles() {
-
 		@SuppressWarnings("unused")
-
-
-
 		final String conMethodName = conClassName + "::checkSteadyStateOfFiles";
 		if (isNull(lstResultList)) {
 			saveResultList();
 		}
 		boolean flgAllFilesAreSteady = flgOperationWasSuccessful;
-
 		if (flgOperationWasSuccessful == true && flgCheckSteadyStateOfFiles == true && lstResultList.size() > 0) {
 			logger.debug("checking file(s) for steady state");
 			Vector<FileDescriptor> lstFD = new Vector<FileDescriptor>();
 			for (File objFile : lstResultList) {
 				FileDescriptor objFD = new FileDescriptor();
-				objFD.lastFileLength = objFile.length();
-				objFD.lastModificationDate = objFile.lastModified();
-				objFD.FileName = objFile.getAbsolutePath();
-
-				logger.debug("filedescriptor is : " + objFD.lastModificationDate + ", "  + objFD.lastFileLength);
-
-			    lstFD.add(objFD);
-			}
+				objFD.setLastFileLength(objFile.length());
+				objFD.setLastModificationDate(objFile.lastModified());
+				objFD.setFileName(objFile.getAbsolutePath());
+				logger.debug("filedescriptor is : " + objFD.getLastModificationDate() + ", " + objFD.getLastFileLength());
+				lstFD.add(objFD);
+			} 
 			try {
 				Thread.sleep(lngCheckSteadyStateInterval);
 			}
 			catch (InterruptedException e1) {
 				e1.printStackTrace();
 			}
-
 			for (int i = 0; i < lngSteadyCount; i++) {
 				flgAllFilesAreSteady = true;
 				for (FileDescriptor objFD : lstFD) {
-					File objActFile = new File(objFD.FileName);
-					logger.debug("result is : " + objActFile.lastModified() + ", " + objFD.lastModificationDate + ", " + objActFile.length() + ", "
-							+ objFD.lastFileLength);
+					File objActFile = new File(objFD.getFileName());
+					logger.debug("result is : " + objActFile.lastModified() + ", " + objFD.getLastModificationDate() + ", " + objActFile.length() + ", "
+							+ objFD.getLastFileLength());
 					if (flgUseNIOLock == true) {
 						try {
 							RandomAccessFile objRAFile = new RandomAccessFile(objActFile, "rw");
@@ -915,16 +843,16 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 							e.printStackTrace();
 						}
 					}
-					if (objActFile.lastModified() != objFD.lastModificationDate || objActFile.length() != objFD.lastFileLength) {
+					if (objActFile.lastModified() != objFD.getLastModificationDate() || objActFile.length() != objFD.getLastFileLength()) {
 						flgAllFilesAreSteady = false;
-						objFD.lastModificationDate = objActFile.lastModified();
-						objFD.lastFileLength = objActFile.length();
-						objFD.flgIsSteady = false;
+						objFD.setLastModificationDate(objActFile.lastModified());
+						objFD.setLastFileLength(objActFile.length());
+						objFD.setFlgIsSteady(false);
 						logger.info(String.format("File '%1$s' changed during checking steady state", objActFile.getAbsolutePath()));
 						break;
 					}
 					else {
-						objFD.flgIsSteady = true;
+						objFD.setFlgIsSteady(true);
 					}
 				}
 				if (flgAllFilesAreSteady == false) {
@@ -942,8 +870,8 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 			if (flgAllFilesAreSteady == false) {
 				logger.error("not all files are steady");
 				for (FileDescriptor objFD : lstFD) {
-					if (objFD.flgIsSteady == false) {
-						logger.info(String.format("File '%1$s' is not steady", objFD.FileName));
+					if (objFD.isFlgIsSteady() == false) {
+						logger.info(String.format("File '%1$s' is not steady", objFD.getFileName()));
 					}
 				}
 				throw new JobSchedulerException("not all files are steady");
@@ -951,5 +879,4 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 		}
 		return flgAllFilesAreSteady;
 	} // private boolean checkSteadyStateOfFiles
-
 }

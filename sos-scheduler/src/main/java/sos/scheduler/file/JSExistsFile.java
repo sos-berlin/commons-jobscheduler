@@ -72,12 +72,11 @@ public class JSExistsFile extends JSFileOperationBase {
 					Options().skip_last_files, -1, -1);
 
 			flgOperationWasSuccessful = createResultListParam(flgOperationWasSuccessful);
-			return flgOperationWasSuccessful;
 
-//			if (flgOperationWasSuccessful == true) {
-//				flgOperationWasSuccessful = checkSteadyStateOfFiles();
-//			}
-//			return setReturnResult(flgOperationWasSuccessful);
+			if (flgOperationWasSuccessful == true) {
+				flgOperationWasSuccessful = checkSteadyStateOfFiles();
+			}
+			return flgOperationWasSuccessful;
 
 		}
 		catch (Exception e) {

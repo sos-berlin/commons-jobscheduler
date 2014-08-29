@@ -98,7 +98,7 @@ public class JobSchedulerXslTransformOptionsSuperClass extends JSOptionsClass {
 	 * \details
 	 *
 	 *
-	 * @param FileName :
+	 * @param data.getFileName() :
 	 */
 	public void setFileName(final SOSOptionInFileName p_FileName) {
 		FileName = p_FileName;
