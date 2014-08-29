@@ -342,7 +342,8 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			localDir += "";
 		}
 		if (Source().url.isDirty() && SourceDir.isNotDirty()) {
-			SourceDir.Value(Source().url.getFolderName());
+			localDir = Source().url.getFolderName();
+			SourceDir.Value(localDir);
 		}
 		if (Target().url.isDirty() && TargetDir.isNotDirty()) {
 			TargetDir.Value(Target().url.getFolderName());
@@ -356,6 +357,8 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			remove_files.setFalse();
 		}
 		super.CheckMandatory();
+		Source().CheckMandatory();
+		Target().CheckMandatory();
 		// TODO mandatory options in datatarget/datasource prüfen. Interface erweitern um checkmandatory
 		// TODO in die Options-Klasse, falls nicht schon drin ist ....
 		if (localDir.startsWith("\\\\")) {

@@ -116,6 +116,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 															"", // ...
 															false);
 
+	public SOSOptionUrl URI = (SOSOptionUrl) url.SetAlias("uri");
 	/* (non-Javadoc)
 	 * @see com.sos.VirtualFileSystem.Options.ISOSDataProviderOptions#geturl()
 	 */
