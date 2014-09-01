@@ -5600,6 +5600,45 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 		replacement = p_replacement;
 	}
 	public SOSOptionString	ReplaceWith	= (SOSOptionString) replacement.SetAlias(conClassName + ".ReplaceWith");
+	
+	/**
+	 * \option useRegExp4ReplaceWith
+	 * \type SOSOptionBoolean
+	 * \brief useRegExp4ReplaceWith - Use a regular expression for substitution
+	 *
+	 * \details
+	 * Use a regular expression for substitution
+	 *
+	 * \mandatory: false
+	 *
+	 * \created 01.09.2014 12:45:40 by KB
+	 */
+	@JSOptionDefinition(name = "useRegExp4ReplaceWith", description = "Use a regular expression for substitution", key = "useRegExp4ReplaceWith", type = "SOSOptionBoolean", mandatory = false)
+	public SOSOptionBoolean		useRegExp4ReplaceWith	= new SOSOptionBoolean( // ...
+																null, // ....
+																conClassName + ".useRegExp4ReplaceWith", // ...
+																"Use a regular expression for substitution", // ...
+																"false", // ...
+																"false", // ...
+																false);
+
+	public SOSOptionBoolean useRegExp4ReplaceWith() {
+
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getuseRegExp4ReplaceWith";
+
+		return useRegExp4ReplaceWith;
+	} // public String getuseRegExp4ReplaceWith
+
+	public SOSOptionBoolean useRegExp4ReplaceWith(final SOSOptionBoolean pstrValue) {
+
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setuseRegExp4ReplaceWith";
+		useRegExp4ReplaceWith = pstrValue;
+		return useRegExp4ReplaceWith;
+	} // public SOSOptionRegExp setuseRegExp4ReplaceWith
+
+
 	/**
 	* \var replacing : Regular expression for filename replacement with
 	*

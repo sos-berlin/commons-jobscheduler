@@ -350,13 +350,17 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		 * credentialStore?
 		 */
 		checkCredentialStore(Source());
-		checkCredentialStore(Target());
+		if (NeedTargetClient() == true) {
+			checkCredentialStore(Target());
+		}
 		if (Source().replacing.IsNotEmpty() && Source().replacement.IsNotEmpty()) {
 			remove_files.setFalse();
 		}
 		super.CheckMandatory();
 		Source().CheckMandatory();
-		Target().CheckMandatory();
+		if (NeedTargetClient() == true) {
+			Target().CheckMandatory();
+		}
 		// TODO mandatory options in datatarget/datasource prüfen. Interface erweitern um checkmandatory
 		// TODO in die Options-Klasse, falls nicht schon drin ist ....
 		if (localDir.startsWith("\\\\")) {
@@ -714,7 +718,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			objParamsFromConfigFile.putAll(objConf.getParameterAsProperties());
 			objAllParams.putAll(objConf.getParameterAsProperties());
 			resolveIncludes(objParamsFromConfigFile, null, strConfigurationFileName);
-				//
+			//
 			for (Object k : objParamsFromConfigFile.keySet()) {
 				String strKey = (String) k;
 				if (strKey.equalsIgnoreCase("uuid") == true) {
@@ -770,7 +774,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 								else {
 									objFile = new File(strConfig);
 								}
-								strFragmentName = objFile.getName();  // dummy operation
+								strFragmentName = objFile.getName(); // dummy operation
 								strConfig = objFile.getParent();
 							}
 							SOSConfiguration config_ = new SOSConfiguration(strConfig, strFragmentName, objSOSLogger);
@@ -795,7 +799,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		} // ResolveIncludes
 	}
 
-	private boolean hasIncludeDirectives (final Properties pobjProps) {
+	private boolean hasIncludeDirectives(final Properties pobjProps) {
 		boolean flgR = false;
 		for (Object k : pobjProps.keySet()) {
 			String strKey = (String) k;
@@ -805,8 +809,9 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			}
 		}
 		return flgR;
-		
+
 	}
+
 	//
 	private void addProtectedProperties2Options(final Properties pobjProps, final String pstrIncludeName) {
 		flgIncludeProcessingInProgress = true;

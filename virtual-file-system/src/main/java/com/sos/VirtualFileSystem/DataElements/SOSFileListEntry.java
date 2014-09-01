@@ -645,6 +645,7 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 			// replacing has to be taken from general or target_ options for the target replacing  SOSFTP-151
 			if (objO.getreplacing().IsNotEmpty()) {
 				try {
+					objO.getreplacing().SetIfNotDirty(objOptions.useRegExp4ReplaceWith);
 					strTargetFileName = objO.getreplacing().doReplace(strTargetFileName, objO.getreplacement().Value());
 				}
 				catch (Exception e) {
@@ -773,10 +774,11 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 		String strR = adjustFileSeparator(pstrFileName);
 		String strReplaceWith = objOptions.getreplacement().Value();
 		try {
+			objOptions.getreplacing().SetIfNotDirty(objOptions.useRegExp4ReplaceWith);
 			strR = objOptions.getreplacing().doReplace(strR, strReplaceWith);
 		}
 		catch (Exception e) {
-			logger.error(e.getLocalizedMessage(), new JobSchedulerException(SOSVfs_E_0150.get(), e));
+//			logger.error(e.getLocalizedMessage(), new JobSchedulerException(SOSVfs_E_0150.get(), e));
 			throw new JobSchedulerException(SOSVfs_E_0150.get(), e);
 		}
 		return strR;
