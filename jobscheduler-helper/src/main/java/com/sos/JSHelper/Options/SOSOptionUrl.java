@@ -138,6 +138,10 @@ public class SOSOptionUrl extends SOSOptionHostName {
 			throw new JobSchedulerException("no URL speficied");
 		}
 		String strPath = objURL.getPath();
+		// bug?
+		if (strPath.startsWith("/./")) {
+			strPath = strPath.substring(1);
+		}
 		return strPath;
 	}
 

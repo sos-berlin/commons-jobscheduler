@@ -46,15 +46,19 @@ public class SOSOptionRegExpTest {
 		//
 	}
 
-	@Test public void WrongRegExp() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::WrongRegExp";
+	@Test
+	public void WrongRegExp() {
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::WrongRegExp";
 		objRE = new SOSOptionRegExp(null, "test", "TestOption", "^test_dh000000.err", "", false);
 		Pattern p = objRE.getPattern();
 		p = objRE.getPattern("/\\.swf(\\?\\.*)?$/i");
 	} // private void WrongRegExp
 
-	@Test public void testMatcher() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::testMatcher";
+	@Test
+	public void testMatcher() {
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::testMatcher";
 		objRE = new SOSOptionRegExp(null, "test", "TestOption", "^(.*/*)2.*\\.txt$", "", false);
 		boolean flgMatched = objRE.match("/home/test/kb/4_abc.txt");
 		Assert.assertFalse("do not match", flgMatched);
@@ -70,7 +74,8 @@ public class SOSOptionRegExpTest {
 		Assert.assertEquals("group found", "/home/test/kb/", strGroupText);
 	} // private void testMatcher
 
-	@Test public void testRegExpWithPlaceHolders() throws Exception {
+	@Test
+	public void testRegExpWithPlaceHolders() throws Exception {
 		String strDateformat = "yyyy-MM-dd";
 		String strDate = JSDataElementDate.getCurrentTimeAsString(strDateformat);
 		System.out.println(strDate);
@@ -80,7 +85,8 @@ public class SOSOptionRegExpTest {
 		assertEquals("place holders 1", String.format("^.*_%1$s_\\.txt$", strDate), strV);
 	}
 
-	@Test public void testDoReplace() throws Exception {
+	@Test
+	public void testDoReplace() throws Exception {
 		objRE = new SOSOptionRegExp(null, "test", "TestOption", "", "", false);
 		String strReplaceWhat = "";
 		String strReplaceWith = "";
@@ -187,22 +193,38 @@ public class SOSOptionRegExpTest {
 		// anstelle von timestamp kann auch 
 	}
 
-	@Test public void testUnixTimeStamp() throws Exception {
+	@Test
+	public void testUnixTimeStamp() throws Exception {
 		objRE = new SOSOptionRegExp(null, "test", "TestOption", "", "", false);
-		doTestReplace("timestamp", "(.*)(.txt)", "[timestamp:]_\\1;\\2", "1.txt", null);
+		doTestReplace("timestamp", "(.*)(.txt)", "[timestamp:]_\\1;\\2", "abc.txt", null);
 	}
 
-	@Test public void testUUID() throws Exception {
+	@Test
+	public void testTempFile() throws Exception {
+		objRE = new SOSOptionRegExp(null, "test", "TestOption", "", "", false);
+		doTestReplace("tempfile", "(.*)(.txt)", "[tempfile:]_\\1;\\2", "abc.txt", null);
+	}
+
+	@Test
+	public void testUUID() throws Exception {
 		objRE = new SOSOptionRegExp(null, "test", "TestOption", "", "", false);
 		doTestReplace("UUID", "(.*)(.txt)", "[uuid:]_\\1;\\2", "1.txt", null);
 	}
 
-	@Test public void testSQLTimeStamp() throws Exception {
+	@Test
+	public void testSQLTimeStamp() throws Exception {
 		objRE = new SOSOptionRegExp(null, "test", "TestOption", "", "", false);
 		doTestReplace("SQLTimeStamp", "(.*)(.txt)", "[sqltimestamp:]_\\1;\\2", "1.txt", null);
 	}
 
-	@Test public void testDoRegExReplace() throws Exception {
+	@Test
+	public void testRegExpSQLTimeStamp() throws Exception {
+		objRE = new SOSOptionRegExp(null, "test", "TestOption", "", "", false);
+		doRegExTest("SQLTimeStamp", "(.*)(.txt)", "[sqltimestamp:]_$1$2", "abcd.txt", null);
+	}
+
+	@Test
+	public void testDoRegExReplace() throws Exception {
 		objRE = new SOSOptionRegExp(null, "test", "TestOption", "", "", false);
 		//		doRegExTest ("ausschneiden", "(.*)(\\.DAT)(\\.SHRTIS001_DOR)", "[filename:]$1$2", "20120613_144343_SHRTIS001_0000000001011689.DAT.SHRTIS001_DOR", "20120613_144343_SHRTIS001_0000000001011689.DAT" );
 		//		doRegExTest ("ausschneiden", "(.*)(\\.DAT)(\\.SHRTIS001_DOR)", "[date:]$1$2", "20120613_144343_SHRTIS001_0000000001011689.DAT.SHRTIS001_DOR", "20120613_144343_SHRTIS001_0000000001011689.DAT" );
@@ -212,7 +234,8 @@ public class SOSOptionRegExpTest {
 
 	private void doTestReplace(final String strText, final String strReplaceWhat, final String strReplaceWith, final String strWork,
 			final String strExpectedResult) throws Exception {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::doTest";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::doTest";
 		objRE.Value(strReplaceWhat);
 		Assert.assertEquals(strText, strReplaceWhat, objRE.Value());
 		String strResult = objRE.doReplace(strWork, strReplaceWith);
@@ -225,11 +248,15 @@ public class SOSOptionRegExpTest {
 
 	private void doRegExTest(final String strText, final String strReplaceWhat, final String strReplaceWith, final String strWork,
 			final String strExpectedResult) throws Exception {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::doTest";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::doTest";
 		objRE.Value(strReplaceWhat);
 		Assert.assertEquals(strText, strReplaceWhat, objRE.Value());
 		String strResult = objRE.doRegExpReplace(strWork, strReplaceWith);
-		Assert.assertEquals(strText, strExpectedResult, strResult);
+		if (strExpectedResult != null) {
+
+			Assert.assertEquals(strText, strExpectedResult, strResult);
+		}
 		System.out.println(strResult);
 		logger.debug(strResult);
 	} // private void doTest
