@@ -90,13 +90,6 @@
 					<version>9.3-1101-jdbc41</version>
         </dependency>      
 
-			  <dependency>
-			    <groupId>com.sos-berlin.jid</groupId>
-			    <artifactId>scheduler-instances</artifactId>
-	        <version>${project.version}</version>
-			    <scope>test</scope>
-			  </dependency>
-
     </dependencies>
 
 </project>

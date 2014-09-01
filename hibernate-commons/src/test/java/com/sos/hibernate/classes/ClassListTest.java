@@ -15,14 +15,14 @@ import static junit.framework.Assert.assertTrue;
 public class ClassListTest {
 
     private final static List<String> expectedClasses = Arrays.asList(
-            "com.sos.scheduler.db.SchedulerInstancesDBItem"
+            "com.sos.hibernate.classes.DbItem"
     );
 
     @Test
     public void test() {
         ClassList classList = new ClassList();
-        classList.addClassIfExist("com.sos.scheduler.db.SchedulerInstancesDBItem");
-        classList.addClassIfExist("sos.ftphistory.db.JadeFilesDBItem");                 // is not in classpath
+        classList.addClassIfExist("com.sos.scheduler.db.SchedulerInstancesDBItem");     // is not in classpath
+        classList.addClassIfExist("com.sos.hibernate.classes.DbItem");
         assertEquals(expectedClasses.size(),classList.getClasses().size());
         for(Class c : classList.getClasses()) {
             assertTrue(expectedClasses.contains(c.getName()));
