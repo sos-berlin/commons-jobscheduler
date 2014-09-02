@@ -184,7 +184,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 			}
 		}
 		if (isProtected()) {
-			strT += "\nis Protected, Origin=" + this.strIncludeSectionName; 
+			strT += "\nis Protected, Origin=" + strIncludeSectionName; 
 		}
 		if (flgIsMandatory == true) {
 			strT += "\nValue is mandatory\n";
@@ -731,7 +731,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 		 * \todo Wenn abgeleitete Klassen in der Value()-Methode prüfungen auf gültige Werte haben
 		 * und ein "leerer" String ein ungültiger Wert ist, dann wird dieser ungültige Wert nicht erkannt.
 		 */
-		if (this.isEmpty(strKey) == false) {
+		if (this.isEmpty(strKey) == false && objParentClass != null) {
 			String strV = objParentClass.getItem(strKey, null);
 			if (strV == null) {
 				for (String strAlias : objAliase) {
