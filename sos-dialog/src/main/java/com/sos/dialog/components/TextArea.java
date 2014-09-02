@@ -2,6 +2,7 @@ package com.sos.dialog.components;
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.HelpEvent;
@@ -301,6 +302,8 @@ public class TextArea extends StyledText /* Text */{
 	public TextArea(final Composite pobjComposite) {
 		this(pobjComposite, SWT.V_SCROLL | SWT.MULTI | SWT.BORDER | SWT.H_SCROLL);
 		createContextMenue();
+	    this.setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
+//	    this.setText("|i|m|\n|m|i|");
 	}
 
 	public TextArea(final Composite pobjComposite, final int arg1) {
@@ -400,8 +403,9 @@ public class TextArea extends StyledText /* Text */{
 	 * Clipboard(getDisplay()); } return cb; }
 	 */
 	public void setFont(final FontData f, final RGB foreGround) {
-		SWTResourceManager.getFont(f.getLocale(), f.getHeight(), f.getStyle());
+//		SWTResourceManager.getFont(f.getLocale(), f.getHeight(), f.getStyle());
 		setFont(SWTResourceManager.getFont(f.getLocale(), f.getHeight(), f.getStyle()));
+		
 		setForeground(SWTResourceManager.getColor(foreGround));
 	}
 

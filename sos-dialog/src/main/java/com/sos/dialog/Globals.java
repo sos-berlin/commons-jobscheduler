@@ -19,6 +19,12 @@ public class Globals {
 	public static FontRegistry	stFontRegistry	= new FontRegistry();
 	public static ColorRegistry	stColorRegistry	= new ColorRegistry();
 	public static SOSMsgControl	MsgHandler		= null;
+	
+	public static final String	conColor4TEXT				= "text";
+	public static final String	conColor4INCLUDED_OPTION	= "IncludedOption";
+	public static final String	conMANDATORY_FIELD_COLOR	= "MandatoryFieldColor";
+	public static final String	conCOLOR4_FIELD_HAS_FOCUS	= "Color4FieldHasFocus";
+
 
 	public Globals() {
 	}
@@ -27,6 +33,8 @@ public class Globals {
 	public static void setApplicationWindow(final ApplicationWindow pobjAW) {
 		Application = pobjAW;
 	}
+
+	public static boolean	flgIgnoreColors	= true;
 
 	public static void setStatus(final String pobjMessage) {
 		Application.setStatus(pobjMessage);
@@ -37,25 +45,49 @@ public class Globals {
 	}
 
 	public static Color getCompositeBackground() {
-		Color objC = stColorRegistry.get("CompositeBackGround");
+		Color objC = null;
+		if (flgIgnoreColors == false) {
+			objC = getDefaultColor(stColorRegistry.get("CompositeBackGround"));
+		}
+
+		return objC;
+	}
+
+	private static Color getDefaultColor (final Color pobjC) {
+		Color objC = pobjC;
 		if (objC == null && Application != null) {
 			objC = Application.getShell().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
 		}
 		return objC;
 	}
-
 	public static Color getFieldBackground() {
-		Color objC = stColorRegistry.get("FieldBackGround");
-		if (objC == null) {
-			objC = Application.getShell().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+		Color objC = null;
+		if (flgIgnoreColors == false) {
+			objC = getDefaultColor(stColorRegistry.get("FieldBackGround"));
+		}
+		return objC;
+	}
+
+	public static Color getMandatoryFieldColor() {
+		Color objC = null;
+		if (flgIgnoreColors == false) {
+			objC = getDefaultColor(stColorRegistry.get("MandatoryFieldColor"));
+		}
+		return objC;
+	}
+
+	public static Color getProtectedFieldColor() {
+		Color objC = null;
+		if (flgIgnoreColors == false) {
+			objC = getDefaultColor(stColorRegistry.get(conColor4INCLUDED_OPTION));
 		}
 		return objC;
 	}
 
 	public static Color getFieldHasFocusBackground() {
-		Color objC = stColorRegistry.get("Color4FieldHasFocus");
-		if (objC == null) {
-			objC = Application.getShell().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+		Color objC = null;
+		if (flgIgnoreColors == false) {
+			objC = getDefaultColor(stColorRegistry.get(conCOLOR4_FIELD_HAS_FOCUS));
 		}
 		return objC;
 	}
@@ -83,7 +115,8 @@ public class Globals {
 		return string + "], ";
 	}
 	public static Listener	listener	= new Listener() {
-											@Override public void handleEvent(final Event e) {
+											@Override
+											public void handleEvent(final Event e) {
 												String string = "Unknown";
 												switch (e.type) {
 													case SWT.MouseDoubleClick:

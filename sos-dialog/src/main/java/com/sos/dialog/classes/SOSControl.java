@@ -19,7 +19,7 @@ public abstract class SOSControl extends Control {
 	@SuppressWarnings("unused") private static final String conSVNVersion = "$Id$";
 	@SuppressWarnings("unused") private final Logger logger = Logger.getLogger(this.getClass());
 
-	private final Vector <Control> objControlList = new Vector <Control> ();
+	private Vector <Control> objControlList = new Vector <Control> ();
 
 	/**
 	 *
@@ -34,6 +34,12 @@ public abstract class SOSControl extends Control {
 
 	@Override protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components
+	}
+	
+	@Override
+	public void dispose() {
+		objControlList = null;
+		this.dispose();
 	}
 
 }

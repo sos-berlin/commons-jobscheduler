@@ -67,6 +67,7 @@ public class SOSCTabItem extends CTabItem {
 			this.dispose();
 			objTabFolder = null;
 			objTabComposite = null;
+			this.setImage(null);
 		}
 	}
 	@Override

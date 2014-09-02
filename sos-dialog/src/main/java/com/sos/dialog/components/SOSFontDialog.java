@@ -148,7 +148,7 @@ public class SOSFontDialog extends SOSPreferenceStore {
 
 //		t.setText(SOSJOEMessageCodes.JOE_M_Blindtext.label());  // The quick brown fox jumps over the lazy poddle.
 		t.setText("The quick brown fox jumps over the lazy poddle.");
-		t.setFont(SWTResourceManager.getFont(conDefaultfontName, 8, SWT.NORMAL));
+		t.setFont(SWTResourceManager.getFont(conDefaultfontName, 10, SWT.NORMAL));
 		t.setForeground(new Color(d, foreGround));
 
 		t.setFont(new Font(d, fontData));

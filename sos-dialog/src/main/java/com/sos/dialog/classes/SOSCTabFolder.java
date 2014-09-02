@@ -4,8 +4,6 @@
 package com.sos.dialog.classes;
 import static com.sos.dialog.Globals.MsgHandler;
 
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
@@ -42,8 +40,8 @@ public class SOSCTabFolder extends CTabFolder {
 	private static final String			conSVNVersion				= "$Id$";
 	@SuppressWarnings("unused")
 	private final Logger				logger						= Logger.getLogger(this.getClass());
-	private final Vector<SOSCTabItem>	objItemList					= new Vector<SOSCTabItem>();
-	public boolean						ItemsHasClose				= true;
+//	private final Vector<SOSCTabItem>	objItemList					= new Vector<SOSCTabItem>();
+	public boolean				ItemsHasClose				= true;
 	public boolean						gflgCreateControlsImmediate	= true;
 	public boolean flgRejectTabItemSelection = false;
 	/**
@@ -193,6 +191,9 @@ public class SOSCTabFolder extends CTabFolder {
 			}
 		});
 		this.addCTabFolder2Listener(new CTabFolder2Adapter() {
+			 public void itemClosed (final CTabFolderEvent event) {
+				
+			}
 			@Override public void close(final CTabFolderEvent event) {
 				CTabItem objI = (CTabItem) event.item;
 				if (objI != null) {
@@ -202,6 +203,7 @@ public class SOSCTabFolder extends CTabFolder {
 							CTabFolder objC = objI.getParent();
 							
 							objI.dispose();
+							event.doit = true;
 							logger.debug("tabitem disposed");
 							objC.layout(true, true);
 //							break;
@@ -211,7 +213,7 @@ public class SOSCTabFolder extends CTabFolder {
 //						objI.getControl().dispose();
 //					}
 				}
-			}
+			}  // close
 
 			@Override public void minimize(final CTabFolderEvent event) {
 			}
@@ -286,11 +288,11 @@ public class SOSCTabFolder extends CTabFolder {
 	*
 	 */
 	public SOSCTabItem getTabItem(final Object pobjObject) {
-		for (SOSCTabItem objTI : objItemList) {
-			if (objTI.getData().equals(pobjObject)) {
-				return objTI;
-			}
-		}
+//		for (SOSCTabItem objTI : objItemList) {
+//			if (objTI.getData().equals(pobjObject)) {
+//				return objTI;
+//			}
+//		}
 		return null;
 	}
 
@@ -323,7 +325,7 @@ public class SOSCTabFolder extends CTabFolder {
 	public SOSCTabItem getTabItem(final String pstrCaption) {
 		SOSCTabItem objTabItem = new SOSCTabItem(this, SWT.NONE);
 		MsgHandler.newMsg(pstrCaption).Control(objTabItem);
-		objTabItem.setData("key", pstrCaption);
+//		objTabItem.setData("key", pstrCaption);
 		objTabItem.setFont(Globals.stFontRegistry.get("tabitem-text"));
 
 		objTabItem.setShowClose(ItemsHasClose);
@@ -348,9 +350,9 @@ return objTabItem;
 	*
 	 */
 	public SOSCTabItem newTabItem(final ISOSControlProperties pobjObject) {
-		if (objItemList.contains(pobjObject)) {
-			return getTabItem(pobjObject);
-		}
+//		if (objItemList.contains(pobjObject)) {
+//			return getTabItem(pobjObject);
+//		}
 		int iSWT = SWT.None;
 		if (ItemsHasClose == true) {
 			iSWT = SWT.Close;

@@ -26,7 +26,6 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 
 import com.sos.dialog.components.SOSDateTime;
-import com.sos.dialog.swtdesigner.SWTResourceManager;
 import com.sos.localization.SOSMsg;
 
 public abstract class SOSMsgControl extends SOSMsg {
@@ -191,7 +190,7 @@ public abstract class SOSMsgControl extends SOSMsg {
 	public CTabItem Control(final CTabItem pobjC) {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::Control";
 		pobjC.setText(label());
-		pobjC.setImage(SWTResourceManager.getImage(getImageFileName()));
+//		pobjC.setImage(SWTResourceManager.getImage(getImageFileName()));
 		pobjC.setToolTipText(this.tooltip());
 		return pobjC;
 	} // public CTabItem Control
