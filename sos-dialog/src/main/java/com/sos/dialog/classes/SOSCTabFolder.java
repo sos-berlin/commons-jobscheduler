@@ -163,7 +163,7 @@ public class SOSCTabFolder extends CTabFolder {
 		close.addListener(SWT.Selection, new Listener() {
 			@Override public void handleEvent(final Event event) {
 				// the widget here is the menueItem
-				//				event.widget.dispose();
+//								event.widget.dispose();
 			}
 		});
 		MenuItem closeOthers = new MenuItem(contextMenu, SWT.NONE);

@@ -65,6 +65,8 @@ public class SOSCTabItem extends CTabItem {
 			setData("composite", null);
 			this.setControl(null);
 			this.dispose();
+			objTabFolder = null;
+			objTabComposite = null;
 		}
 	}
 	@Override
