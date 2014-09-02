@@ -2712,7 +2712,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	} // private void AllDataElements
 
 	private String addNewLine (final String pstrV ) {
-		if (pstrV.contains("\n") == false) {
+		if (isEmpty(pstrV) == false && pstrV.contains("\n") == false) {
 			return pstrV + "\n";
 		}
 		return pstrV;

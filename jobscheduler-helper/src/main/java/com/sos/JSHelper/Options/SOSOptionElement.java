@@ -93,11 +93,12 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	@SuppressWarnings("unused")
 	private final String						strRegExpr4Check					= "";
 	protected boolean							isCData								= false;
-	public static boolean flgShowPasswords = false;
-	
-	public static  boolean getShowPassowrds() {
+	public static boolean						flgShowPasswords					= false;
+
+	public static boolean getShowPassowrds() {
 		return flgShowPasswords;
 	}
+
 	public void addValueChangedListener(final IValueChangedListener pobjValueChangedListener) {
 		if (lstValueChangedListeners == null) {
 			lstValueChangedListeners = new ArrayList<IValueChangedListener>();
@@ -188,7 +189,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 			}
 		}
 		if (isProtected()) {
-			strT += "\nis Protected, Origin=" + strIncludeSectionName; 
+			strT += "\nis Protected, Origin=" + strIncludeSectionName;
 		}
 		if (flgIsMandatory == true) {
 			strT += "\nValue is mandatory\n";
@@ -342,10 +343,12 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 		String strR = "";
 		if (flgHideOption == false && this.isDirty() && isProtected() == false) {
 			String strV = strValue;
-			if (flgHideValue == true && flgShowPasswords == false) {
-				strV = "*****";
+			if (isEmpty(strV) == false) {
+				if (flgHideValue == true && flgShowPasswords == false) {
+					strV = "*****";
+				}
+				strR = this.getShortKey() + "=" + strV;
 			}
-			strR = this.getShortKey() + " = " + strV;
 		}
 		return strR;
 	}
@@ -770,8 +773,9 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 		}
 	} // public void MapValue
 
-	private String strIncludeSectionName = "";
-	public void setIncludeSectionName (final String pstrInludeSectionName) {
+	private String	strIncludeSectionName	= "";
+
+	public void setIncludeSectionName(final String pstrInludeSectionName) {
 		strIncludeSectionName = pstrInludeSectionName;
 	}
 
@@ -997,7 +1001,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 
 	public String StripQuotes(final String pstrS) {
 		String strR = pstrS;
-//		if (pstrS.substring(0, 1).equals("\"") && pstrS.substring(pstrS.length() - 1).equals("\"")) {
+		//		if (pstrS.substring(0, 1).equals("\"") && pstrS.substring(pstrS.length() - 1).equals("\"")) {
 		if (pstrS.startsWith("\"") && pstrS.endsWith("\"")) {
 			strR = pstrS.substring(1, pstrS.length() - 1);
 		}
