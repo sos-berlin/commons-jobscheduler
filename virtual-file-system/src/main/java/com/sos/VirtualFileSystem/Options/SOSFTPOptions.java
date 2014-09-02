@@ -356,11 +356,6 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		if (Source().replacing.IsNotEmpty() && Source().replacement.IsNotEmpty()) {
 			remove_files.setFalse();
 		}
-		super.CheckMandatory();
-		Source().CheckMandatory();
-		if (NeedTargetClient() == true) {
-			Target().CheckMandatory();
-		}
 		// TODO mandatory options in datatarget/datasource prüfen. Interface erweitern um checkmandatory
 		// TODO in die Options-Klasse, falls nicht schon drin ist ....
 		if (localDir.startsWith("\\\\")) {
@@ -453,6 +448,11 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		getDataTargetType();
 		if (CheckNotProcessedOptions.value() == true) {
 			this.CheckNotProcessedOptions();
+		}
+		super.CheckMandatory();
+		Source().CheckMandatory();
+		if (NeedTargetClient() == true) {
+			Target().CheckMandatory();
 		}
 		flgCheckMandatoryDone = true;
 	} // private void CheckMandatory
@@ -1330,9 +1330,10 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	public String DirtyString() {
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::DirtyString";
-		String strD = "\n" + super.dirtyString();
+		String strD =  super.dirtyString();
 		strD += "\n" + Source().dirtyString();
 		strD += "\n" + Target().dirtyString();
+//		strD = strD.replaceAll("\\n\\n", "\\n");
 		return strD;
 	} // private String DirtyString
 

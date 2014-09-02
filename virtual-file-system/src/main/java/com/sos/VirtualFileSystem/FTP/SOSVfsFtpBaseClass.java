@@ -1196,7 +1196,8 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 	@Override public final boolean isDirectory(final String pstrPathName) {
 		boolean flgResult = false;
 		SOSOptionFolderName objF = new SOSOptionFolderName(pstrPathName);
-		if (objF.isNotHiddenFile() == true) {
+		
+		if (objF.isNotHiddenFile() == true) {  // problematisch, wenn nur "." als
 			try {
 				Boolean flgFound = objDirectoriesFound.get(pstrPathName);
 				if (flgFound != null && flgFound == true) { // checked before
@@ -1204,13 +1205,14 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 				}
 				else {
 					if (objF.hasSubFolders() == true) {
+						flgResult = true;
 						String strCurrentPathName = this.getCurrentPath();
 						if (objF.isAbsolutPath() == true) {
 							this.cd("/");
 						}
 						for (String strSubFolder : objF.getSubFolders()) {
-							flgResult = checkFolder(strSubFolder);
-							if (flgResult == false) {
+							boolean flgR = checkFolder(strSubFolder);
+							if (flgR == false) {
 								break;
 							}
 						}

@@ -257,7 +257,7 @@ public class SOSVfsFtpBaseClass2 extends SOSVfsFtpBaseClass implements ISOSVfsFi
 		if (lstrPathName.length() <= 0) {
 			lstrPathName = ".";
 		}
-		if (lstrPathName.equals(".")) {
+		if (lstrPathName.equals(".") || lstrPathName.equals("./")) {
 			lstrPathName = DoPWD();
 			strCurrentDirectory = lstrPathName;
 		}

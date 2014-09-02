@@ -40,6 +40,7 @@ import com.sos.JSHelper.Options.SOSOptionTime;
 import com.sos.JSHelper.Options.SOSOptionTransferMode;
 import com.sos.JSHelper.Options.SOSOptionTransferType;
 import com.sos.JSHelper.Options.SOSOptionUserName;
+import com.sos.JSHelper.Options.SOSOptionVerbose;
 import com.sos.JSHelper.interfaces.ISOSConnectionOptions;
 import com.sos.JSHelper.interfaces.ISOSFtpOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
@@ -6358,10 +6359,10 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	*
 	*/
 	@JSOptionDefinition(name = "verbose", description = "The granuality of (Debug-)Messages The verbosit", key = "verbose", type = "SOSOptionInteger", mandatory = false)
-	public SOSOptionInteger	verbose	= new SOSOptionInteger(this, conClassName + ".verbose", // HashMap-Key
+	public SOSOptionVerbose	verbose	= new SOSOptionVerbose(this, conClassName + ".verbose", // HashMap-Key
 											"The granuality of (Debug-)Messages The verbosit", // Titel
-											"1", // InitValue
-											"10", // DefaultValue
+											"-1", // InitValue
+											"-1", // DefaultValue
 											false // isMandatory
 									);
 
@@ -6375,7 +6376,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	 * @return
 	 */
 	@Override
-	public SOSOptionInteger getverbose() {
+	public SOSOptionVerbose getverbose() {
 		return verbose;
 	}
 
@@ -6389,7 +6390,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	 * @param p_verbose
 	 */
 	@Override
-	public void setverbose(final SOSOptionInteger p_verbose) {
+	public void setverbose(final SOSOptionVerbose p_verbose) {
 		verbose = p_verbose;
 	}
 	public SOSOptionInteger			VerbosityLevel			= (SOSOptionInteger) verbose.SetAlias(conClassName + ".VerbosityLevel");
