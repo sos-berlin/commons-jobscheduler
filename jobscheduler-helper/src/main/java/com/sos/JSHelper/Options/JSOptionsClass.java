@@ -1424,7 +1424,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 		//		String strT = objParentClass.toString() + " -> " + objParentClass.hashCode();
 		String strT = "";
 		try {
-			strT += "\n" + getAllOptionsAsString(IterationTypes.DirtyToString);
+			strT += getAllOptionsAsString(IterationTypes.DirtyToString);
 		}
 		catch (final Exception e) {
 			throw new JobSchedulerException("dirtyString failed", e);
@@ -2426,7 +2426,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	public Properties getTextProperties() {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getTextProperties";
 		if (objP == null) {
-			objP = objP = new Properties();
+			objP = new Properties();
 		}
 		return objP;
 	} // private Properties getTextProperties
@@ -2642,11 +2642,11 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 								System.out.println(objDE.toString());
 							}
 							if (enuIterate4What == IterationTypes.toString) {
-								pstrBuffer.append(objDE.toString() + "\n");
+								pstrBuffer.append(addNewLine(objDE.toString()));
 							}
 							if (enuIterate4What == IterationTypes.DirtyToString) {
 								if (objDE.isDirty() == true) {
-									pstrBuffer.append(objDE.DirtyToString() + "\n");
+									pstrBuffer.append(addNewLine(objDE.DirtyToString()));
 								}
 							}
 							if (enuIterate4What == IterationTypes.createXML) {
@@ -2669,7 +2669,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 							if (enuIterate4What == IterationTypes.getKeyValuePair) {
 								strT = objDE.toKeyValuePair(strAlternativePrefix);
 								if (isNotEmpty(strT)) {
-									pstrBuffer.append(strT + "\n");
+									pstrBuffer.append(addNewLine(strT));
 								}
 							}
 							if (enuIterate4What == IterationTypes.countSegmentFields) {
@@ -2711,6 +2711,12 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 		return pstrBuffer;
 	} // private void AllDataElements
 
+	private String addNewLine (final String pstrV ) {
+		if (pstrV.contains("\n") == false) {
+			return pstrV + "\n";
+		}
+		return pstrV;
+	}
 	public StringBuffer Iterate(final IterationTypes enuIterate4What) {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::Iterate";
 		StringBuffer strB = new StringBuffer();

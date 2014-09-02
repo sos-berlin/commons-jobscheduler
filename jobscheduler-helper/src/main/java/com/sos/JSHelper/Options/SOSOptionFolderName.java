@@ -84,6 +84,14 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 		intOptionType = isOptionTypeFolder;
 	}
 
+	@Override
+	public void Value (final String pstrValue) {
+		strValue = pstrValue;
+		if (pstrValue.equals(".")) {
+			strValue += "/";
+		}
+		super.Value(strValue);
+	}
 	/**
 	 * \brief Value - Wert der Option liefern
 	 *

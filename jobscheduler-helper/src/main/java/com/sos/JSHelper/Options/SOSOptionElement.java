@@ -93,7 +93,11 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	@SuppressWarnings("unused")
 	private final String						strRegExpr4Check					= "";
 	protected boolean							isCData								= false;
-
+	public static boolean flgShowPasswords = false;
+	
+	public static  boolean getShowPassowrds() {
+		return flgShowPasswords;
+	}
 	public void addValueChangedListener(final IValueChangedListener pobjValueChangedListener) {
 		if (lstValueChangedListeners == null) {
 			lstValueChangedListeners = new ArrayList<IValueChangedListener>();
@@ -336,9 +340,9 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 
 	public String DirtyToString() {
 		String strR = "";
-		if (flgHideOption == false && this.isDirty()) {
+		if (flgHideOption == false && this.isDirty() && isProtected() == false) {
 			String strV = strValue;
-			if (flgHideValue == true) {
+			if (flgHideValue == true && flgShowPasswords == false) {
 				strV = "*****";
 			}
 			strR = this.getShortKey() + " = " + strV;
@@ -1094,9 +1098,9 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	@Override
 	public String toString() {
 		String strR = "";
-		if (flgHideOption == false) {
+		if (flgHideOption == false && isProtected() == false) {
 			String strV = strValue;
-			if (flgHideValue == true) {
+			if (flgHideValue == true || getShowPassowrds() == true) {
 				strV = "*****";
 			}
 			strR = strKey + " (" + strDescription + "): " + strV;
