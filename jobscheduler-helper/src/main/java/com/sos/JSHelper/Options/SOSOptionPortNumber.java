@@ -124,6 +124,8 @@ public class SOSOptionPortNumber extends SOSOptionInteger {
 	public static final int		conPortWebDav		= 443;						// WebDAV
 	public static final int		conPort4FTPS		= 990;						// ftp
 
+	private int portNum = 0;
+	
 	// SOSOptionPortNumber() {
 	// //
 	// }
@@ -155,6 +157,16 @@ public class SOSOptionPortNumber extends SOSOptionInteger {
 		return conPort4FTP;
 	}
 
+	public boolean isNotEmpty () {
+		
+		if (portNum > 0 && portNum <= 65535) {
+			return true;
+		}
+		else {
+			return false;
+		}
+		
+	}
 	@Override
 	public void Value(final String pstrPortNo) {
 		@SuppressWarnings("unused")
@@ -168,7 +180,7 @@ public class SOSOptionPortNumber extends SOSOptionInteger {
 		try {
 			if (isNotEmpty(strP)) {
 				strP = StripQuotes(strP);
-				int portNum = Integer.parseInt(strP);
+				portNum = Integer.parseInt(strP);
 				if (portNum >= 0 && portNum <= 65535) {
 					super.Value(strP);
 				}

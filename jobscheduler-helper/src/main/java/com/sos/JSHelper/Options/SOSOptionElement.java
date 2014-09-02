@@ -341,13 +341,15 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 
 	public String DirtyToString() {
 		String strR = "";
-		if (flgHideOption == false && this.isDirty() && isProtected() == false) {
-			String strV = strValue;
-			if (isEmpty(strV) == false) {
-				if (flgHideValue == true && flgShowPasswords == false) {
-					strV = "*****";
+		if (isProtected() == false) {
+			if (flgHideOption == false && this.isDirty()) {
+				String strV = strValue;
+				if (IsNotEmpty() == true) {
+					if (flgHideValue == true && flgShowPasswords == false) {
+						strV = "*****";
+					}
+					strR = this.getShortKey() + "=" + strV;
 				}
-				strR = this.getShortKey() + "=" + strV;
 			}
 		}
 		return strR;
@@ -355,6 +357,12 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 
 	protected void doInit() {
 		//
+	}
+
+	public boolean isNotEmpty () {
+		
+		return isNotEmpty(strValue);
+		
 	}
 
 	/**
