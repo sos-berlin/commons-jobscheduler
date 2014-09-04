@@ -89,11 +89,15 @@ public class SOSOptionUrl extends SOSOptionHostName {
 	 */
 	public void getOptions(final ISOSDataProviderOptions pobjO) {
 		if (objURL == null) {
-			throw new JobSchedulerException("no URL speficied");
+			throw new JobSchedulerException("no URL specified");
 		}
 		SOSOptionTransferType objTT = pobjO.getprotocol();
 		objTT.Value(objURL.getProtocol());
-		setIfNotDirty(pobjO.getHost(), objURL.getHost());
+		String strHost = objURL.getHost();
+		if (isEmpty(strHost)) {
+			strHost = "localHost";
+		}
+		pobjO.getHost().Value(strHost);
 		if (objTT.needPortNumber() == true) {
 			String strPort = String.valueOf(objURL.getPort());
 			if (isEmpty(strPort) || strPort.equals("-1")) {

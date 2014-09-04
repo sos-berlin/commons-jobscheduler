@@ -2484,18 +2484,18 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 						if (strKey.equalsIgnoreCase("uuid")) {
 							continue;
 						}
+						strVal = (String) objP.get(strKey);
 						String strPP = "(\\$|%)\\{" + strKey + "\\}";
-						strVal = this.OptionByName(strKey);
-						if (isNotNull(strVal)) {
-							strVal = strVal.replace('\\', '/');
+						if (strVal != null) {
 							string = string.replaceAll(strPP, Matcher.quoteReplacement(strVal));
-							// logger.debug(Messages.getMsg(JSJ_D_0031, name, strPP, s)); //
-							// "processing job parameter '%1$s': substitute '%2$s' with '%3$s'."
 						}
 						else {
-							strVal = (String) objP.get(strKey);
-							if (strVal != null) {
+							strVal = this.OptionByName(strKey);
+							if (isNotNull(strVal)) {
+								strVal = strVal.replace('\\', '/');
 								string = string.replaceAll(strPP, Matcher.quoteReplacement(strVal));
+								// logger.debug(Messages.getMsg(JSJ_D_0031, name, strPP, s)); //
+								// "processing job parameter '%1$s': substitute '%2$s' with '%3$s'."
 							}
 							else {
 								strVal = Settings().get(strKey);
