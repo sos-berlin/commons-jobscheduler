@@ -51,7 +51,7 @@ import com.sos.JSHelper.Options.SOSOptionVerbose;
 * <br />---------------------------------------------------------------------------
 * </p>
 * \author KB
-* @version $Id: ISOSFtpOptions.java 23649 2014-04-09 22:38:14Z kb $15.08.2010
+* @version $Id$15.08.2010
 * \see reference
 *
 * Created on 15.08.2010 11:26:23

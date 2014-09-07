@@ -82,16 +82,21 @@ public class JSFolder extends File {
 		init();
 	}
 
+	public String getFolderName () {
+		return strFolderName;
+	}
+	
+	public String addFileSeparator(final String str) {
+		return str.endsWith("/") || str.endsWith("\\") ? str : str + "/";
+	}
+
 	private void init() {
-		strFolderName = this.getAbsolutePath();
-		if (!strFolderName.endsWith("/")) {
-			strFolderName += "/";
-		}
+		strFolderName = addFileSeparator(this.getAbsolutePath());
 		if (isDirectory() == true) {
 			//
 		}
 		else {
-			throw new JobSchedulerException(String.format("%1$s is not a directory", strFolderName));
+//			throw new JobSchedulerException(String.format("%1$s is not a directory", strFolderName));
 		}
 	}
 
@@ -125,6 +130,7 @@ public class JSFolder extends File {
 		if (!this.exists()) {
 			throw new JobSchedulerException(String.format("directory does not exist: %1$s", this.getAbsolutePath()));
 		}
+		logger.debug("regexp for filelist: " + regexp);
 		Vector<JSFile> filelist = new Vector<>();
 		try {
 			for (File file : listFiles(new SOSFilelistFilter(regexp, flag))) {
@@ -201,4 +207,22 @@ public class JSFolder extends File {
 		}
 		return intNoOfObjectsDeleted;
 	} // deleteFile
+	
+	public String CheckFolder(final Boolean flgCreateIfNotExist) {
+			if (this.exists() == false) {
+				if (!flgCreateIfNotExist) {
+					logger.error(String.format("Folder '%1$s' does not exist.", strFolderName));
+				}
+				else {
+					this.mkdir();
+					logger.debug(String.format("Folder '%1$s' created.", strFolderName));
+				}
+			}
+			if (this.canRead() == false) {
+				logger.error(String.format("File '%1$s'. canRead returns false. Check permissions.", strFolderName));
+			}
+		return strFolderName;
+	} // CheckFolder
+
+
 }

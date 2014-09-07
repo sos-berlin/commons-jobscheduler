@@ -38,7 +38,9 @@ public class SOSProfileSection {
 
 	@SuppressWarnings("unused")
 	private final String		conClassName	= "SOSProfileSection";
+	@SuppressWarnings("unused")
 	private static final String	conSVNVersion	= "$Id$";
+	@SuppressWarnings("unused")
 	private static final Logger	logger			= Logger.getLogger(SOSProfileSection.class);
 
 	public SOSProfileSection() {
@@ -70,7 +72,7 @@ public class SOSProfileSection {
 		SOSProfileEntry objPE = this.Entry(pstrEntryName);
 		if (objPE == null) {
 			objPE = new SOSProfileEntry(pstrEntryName, pstrEntryValue);
-			Map m = this.Entries();
+			Map<String, SOSProfileEntry> m = this.Entries();
 			m.put(pstrEntryName.toLowerCase(), objPE);
 		}
 		else {
@@ -103,7 +105,7 @@ public class SOSProfileSection {
 	}
 
 	public SOSProfileEntry Entry(String pstrKey) {
-		return (SOSProfileEntry) mapEntries.get(pstrKey.toLowerCase());
+		return mapEntries.get(pstrKey.toLowerCase());
 	}
 
 	/**
@@ -120,6 +122,7 @@ public class SOSProfileSection {
 		strSectionName = string;
 	}
 
+	@Override
 	public String toString() {
 		String strT = "";
 

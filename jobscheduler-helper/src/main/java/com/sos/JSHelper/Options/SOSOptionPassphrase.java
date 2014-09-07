@@ -23,7 +23,7 @@ package com.sos.JSHelper.Options;
 * <br />---------------------------------------------------------------------------
 * </p>
 * \author KB
-* @version $Id: SOSOptionPassword.java 14829 2011-07-15 17:38:31Z kb $16.05.2010
+* @version $Id$16.05.2010
 * \see reference
 *
 * Created on 16.05.2010 19:50:51

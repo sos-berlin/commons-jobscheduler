@@ -100,7 +100,8 @@ import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.localization.Messages;
 
-@I18NResourceBundle(baseName = "com_sos_JSHelper_Messages", defaultLocale = "en") public class JSFile extends java.io.File implements JSListener, IJSArchiver {
+@I18NResourceBundle(baseName = "com_sos_JSHelper_Messages", defaultLocale = "en")
+public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	public static final String	conPropertySOS_JSFILE_PREFIX_4_TEMPFILE			= "sos.jsfile.prefix.4.tempfile";
 	public static final String	conPropertySOS_JSFILE_EXTENSION_4_TEMPFILE		= "sos.jsfile.extension.4.tempfile";
 	public static final String	conPropertySOS_JSFILE_EXTENSION_4_EXCLUSIVEFILE	= "sos.jsfile.extension.4.exclusivefile";
@@ -226,7 +227,8 @@ import com.sos.localization.Messages;
 	 *
 	 */
 	private void doInit() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::FileName";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::FileName";
 		try {
 			strFileName = getAbsolutePath();
 			fleFile = this;
@@ -252,7 +254,7 @@ import com.sos.localization.Messages;
 	}
 
 	public String createZipFile(final String pstrPathName) {
-		String gzipFilename = pstrPathName + getName().concat(".gz");
+		String gzipFilename = addFileSeparator(pstrPathName) + getName().concat(".gz");
 		try {
 			File gzipFile = new File(gzipFilename);
 			SOSGZip.compressFile(this, gzipFile);
@@ -267,8 +269,13 @@ import com.sos.localization.Messages;
 		return gzipFilename;
 	}
 
+	public String addFileSeparator(final String str) {
+		return str.endsWith("/") || str.endsWith("\\") ? str : str + "/";
+	}
+
 	public void setZipFile(final boolean pflgIsZipFile) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setZipFile";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setZipFile";
 		flgIsZipfile = pflgIsZipFile;
 	} // private void setZipFile
 
@@ -346,7 +353,8 @@ import com.sos.localization.Messages;
 	 * @param pstrCharSet4InputFile
 	 */
 	public void CharSet4InputFile(final String pstrCharSet4InputFile) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::CharSet4InputFile";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::CharSet4InputFile";
 		strCharSet4InputFile = pstrCharSet4InputFile;
 		// return void;
 	} // public void CharSet4InputFile
@@ -362,7 +370,8 @@ import com.sos.localization.Messages;
 	 * @return
 	 */
 	public String CharSet4InputFile() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::CharSet4InputFile";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::CharSet4InputFile";
 		return strCharSet4InputFile;
 	} // public String CharSet4InputFile
 
@@ -379,7 +388,8 @@ import com.sos.localization.Messages;
 	 * \see {@link #getTimeStamp()}
 	 */
 	public String CopyTimeStamp() throws Exception {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::CopyTimeStamp";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::CopyTimeStamp";
 		try {
 			String strNewFileName = null;
 			final String strTimeStamp = getTimeStamp();
@@ -409,7 +419,8 @@ import com.sos.localization.Messages;
 	 * @throws Exception
 	 */
 	public String CreateBackup() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::CreateBackup";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::CreateBackup";
 		// TODO Extension �ber eine Option sos.jsfile.extension.4.backupfile
 		String strExtension4BackupFile = System.getProperty(conPropertySOS_JSFILE_EXTENSION_4_BACKUPFILE, ConDefaultExtension4BackupFile);
 		String strR = this.doCreateBackUp(strExtension4BackupFile);
@@ -428,12 +439,14 @@ import com.sos.localization.Messages;
 	 * @throws Exception
 	 */
 	public String CreateBackup(final String pstrExtension4BackupFile) throws Exception {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::CreateBackup";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::CreateBackup";
 		return this.doCreateBackUp(pstrExtension4BackupFile);
 	} // private String CreateBackup
 
 	private String doCreateBackUp(final String pstrExtension4BackupFileName) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::doCreateBackUp";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::doCreateBackUp";
 		String strNewFileName = "";
 		String strBackupFolderName = BackupFolderName.Value();
 		if (strBackupFolderName.length() > 0) {
@@ -488,17 +501,27 @@ import com.sos.localization.Messages;
 		return flgR;
 	}
 
-	@Override public boolean delete() {
+	@Override
+	public boolean delete() {
 		boolean flgR = true;
 		try {
 			if (exists() == true) {
 				if (canWrite() == true) {
-					super.delete();
-					logger.debug(String.format("file '%1$s' deleted", getAbsolutePath()));
+					boolean flgT = super.delete();
+//					flgT = new File(getAbsolutePath()).delete();
+					if (flgT == false) {
+						logger.error(String.format("file NOT '%1$s' deleted, due to false returncode", getAbsolutePath()));
+					}
+					else {
+						logger.debug(String.format("file '%1$s' deleted", getAbsolutePath()));
+					}
 				}
 				else {
-					logger.debug(String.format("file NOT '%1$s' deleted, because its not writable", getAbsolutePath()));
+					logger.error(String.format("file NOT '%1$s' deleted, because its not writable", getAbsolutePath()));
 				}
+			}
+			else {
+				logger.debug(String.format("file '%1$s' does not exists. deletion failed.", getAbsolutePath()));
 			}
 		}
 		catch (Exception e) {
@@ -578,13 +601,15 @@ import com.sos.localization.Messages;
 	protected boolean			flgIsAppendMode	= false;
 
 	public boolean getAppendMode() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getAppendMode";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getAppendMode";
 		return flgIsAppendMode;
 		//	return boolean;
 	} // private boolean getAppendMode
 
 	public JSFile setAppendMode(final boolean pflgIsAppendMode) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setAppendMode";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setAppendMode";
 		flgIsAppendMode = pflgIsAppendMode;
 		return this;
 	} // private JSFile setAppendMode
@@ -642,7 +667,8 @@ import com.sos.localization.Messages;
 	}
 
 	public boolean isExclusive() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::isExclusive";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::isExclusive";
 		return flgIsExclusive;
 	} // private boolean isExclusive
 
@@ -790,7 +816,8 @@ import com.sos.localization.Messages;
 	public void WriteLine() throws IOException, Exception {
 		// - </newcode>
 		// - </remark> <!-- id=<Fehlerkorrektur> -->
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::WriteLine";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::WriteLine";
 		WriteLine("");
 	} // public void WriteLine
 
@@ -1047,7 +1074,8 @@ import com.sos.localization.Messages;
 	 * @return
 	 */
 	public String File2String() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::File2String";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::File2String";
 		final String strT = getContent();
 		return strT;
 	} // public String File2String}
@@ -1063,14 +1091,15 @@ import com.sos.localization.Messages;
 	 * @return
 	 */
 	public String getContent() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getContent ";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getContent ";
 		String strB = "";
 		BufferedReader fin;
 		try {
 			fin = this.Reader();
 		}
 		catch (Exception e1) {
-			throw new JobSchedulerException("Could not get content from file " + this.getAbsolutePath(),e1);
+			throw new JobSchedulerException("Could not get content from file " + this.getAbsolutePath(), e1);
 		}
 		// FileInputStream fin = null;
 		int lngFileSize = 0;
@@ -1323,7 +1352,8 @@ import com.sos.localization.Messages;
 	 *
 	 * @param pstrMsg
 	 */
-	@Override public void message(final String pstrMsg) {
+	@Override
+	public void message(final String pstrMsg) {
 		if (JSListener != null) {
 			JSListener.message(pstrMsg);
 		}
@@ -1343,7 +1373,8 @@ import com.sos.localization.Messages;
 	 *
 	 * @param l
 	 */
-	@Deprecated public void registerMessageListener(final JSListener l) {
+	@Deprecated
+	public void registerMessageListener(final JSListener l) {
 		JSListener = l;
 	}
 
@@ -1411,7 +1442,8 @@ import com.sos.localization.Messages;
 	 *
 	 * @throws Exception
 	 */
-	@Override public JSArchiver getArchiver() throws Exception {
+	@Override
+	public JSArchiver getArchiver() throws Exception {
 		if (objArchiver == null) {
 			objArchiver = new JSArchiver();
 			objArchiver.registerMessageListener(this);
@@ -1433,7 +1465,8 @@ import com.sos.localization.Messages;
 	 * @throws Exception
 	 */
 	public JSArchiver getArchiver(final JSArchiverOptions pobjArchiverOptions) throws Exception {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getArchiver";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getArchiver";
 		if (objArchiver == null) {
 			objArchiver = new JSArchiver();
 			objArchiver.registerMessageListener(this);
@@ -1647,7 +1680,8 @@ import com.sos.localization.Messages;
 	 * @throws Exception
 	 */
 	public JSFile Send2FtpServer(final HashMap<String, String> settings) throws Exception {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::Send2FtpServer";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::Send2FtpServer";
 		// final JSFtp objFtpClient = new JSFtp();
 		// final JSFtpOptions objFtpOptions = objFtpClient.Options(settings);
 		// objFtpOptions.setAllOptions(settings);
@@ -1733,12 +1767,14 @@ import com.sos.localization.Messages;
 	 * @throws IOException
 	 */
 	public boolean compare(final String pstrFile2Compare) throws IOException, Exception {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::compare";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::compare";
 		return this.compare(new JSFile(pstrFile2Compare));
 	} // public boolean compare
 
 	public void Write(final StringBuffer pstrLine) throws Exception {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::Write";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::Write";
 		this.Write(pstrLine.toString());
 	} // public void Write
 
@@ -1801,7 +1837,8 @@ import com.sos.localization.Messages;
 	 * @throws Exception
 	 */
 	public boolean doLock() throws Exception {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::doLock";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::doLock";
 		return this.doLock("rw");
 	} // private boolean doLock
 
@@ -1835,7 +1872,8 @@ import com.sos.localization.Messages;
 	 * @return
 	 */
 	public boolean isLocked() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::isLocked";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::isLocked";
 		boolean flgIsLocked = false;
 		if (randomFile != null) {
 			flgIsLocked = flgFileIsLocked;
@@ -1903,7 +1941,8 @@ import com.sos.localization.Messages;
 	} // private boolean checkExclusiveDeny
 
 	private void doReleaseExclusive() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::doReleaseExclusive";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::doReleaseExclusive";
 		flgIsExclusive = false;
 		if (fleExclusiveFile != null) {
 			fleExclusiveFile.delete();
@@ -1912,7 +1951,8 @@ import com.sos.localization.Messages;
 	} // private void doReleaseExclusive
 
 	public String toXml() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::toXml";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::toXml";
 		String strXml = String.format("<file name='%1$s' size='%2$d' modificationdate='%3$s' />", this.getAbsolutePath(), fleFile.length(),
 				new Date(fleFile.lastModified()));
 		return strXml;
@@ -1943,7 +1983,8 @@ import com.sos.localization.Messages;
 	*
 	 */
 	public String getUniqueFileName() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getUniqueFileName";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getUniqueFileName";
 		String strUniqueFileName = strFileName;
 		String strE = getFileExtensionName();
 		String strF = getName();

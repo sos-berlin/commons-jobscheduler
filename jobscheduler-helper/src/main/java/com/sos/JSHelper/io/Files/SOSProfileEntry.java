@@ -35,6 +35,7 @@ public class SOSProfileEntry {
 
 	@SuppressWarnings("unused")
 	private final String		conClassName	= "SOSProfileEntry";
+	@SuppressWarnings("unused")
 	private static final String	conSVNVersion	= "$Id$";
 	private static final Logger	logger			= Logger.getLogger(SOSProfileEntry.class);
 	private String				strName;
@@ -54,6 +55,7 @@ public class SOSProfileEntry {
 		// System.out.println ("SOSProfileEntry: " + pstrEntryName + " = " + pstrEntryValue);
 	}
 
+	@Override
 	public String toString() {
 		return (strName + "=" + strValue + "\n");
 	}

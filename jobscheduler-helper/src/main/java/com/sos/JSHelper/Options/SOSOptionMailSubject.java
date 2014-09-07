@@ -14,7 +14,7 @@ import com.sos.JSHelper.io.Files.JSFile;
 public class SOSOptionMailSubject extends SOSOptionString {
 
 	@SuppressWarnings("unused")
-	private final String	conSVNVersion		= "$Id: JobSchedulerExistsFile.java 17751 2012-08-03 11:51:07Z kb $";
+	private final String	conSVNVersion		= "$Id$";
 	private final String	conClassName		= this.getClass().getName();
 
 	private boolean			flgSubjectFromFile	= false;

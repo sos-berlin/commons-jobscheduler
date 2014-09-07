@@ -22,7 +22,7 @@ package com.sos.JSHelper.Options;
 * <br />---------------------------------------------------------------------------
 * </p>
 * \author eqbfd
-* @version $Id: SOSOptionString.java 17737 2012-08-02 16:46:57Z kb $23.01.2009
+* @version $Id$23.01.2009
 * \see reference
 *
 * Created on 23.01.2009 15:45:36

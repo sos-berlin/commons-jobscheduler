@@ -33,7 +33,7 @@ import com.sos.JSHelper.io.Files.JSFile;
 * <br />---------------------------------------------------------------------------
 * </p>
 * \author eqbfd
-* @version $Id: SOSOptionFileName.java 18717 2013-01-02 21:34:03Z kb $23.01.2009
+* @version $Id$23.01.2009
 * \see reference
 *
 * Created on 23.01.2009 16:58:58

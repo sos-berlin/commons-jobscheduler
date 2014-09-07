@@ -20,7 +20,7 @@ package com.sos.JSHelper.Options;
 * <br />---------------------------------------------------------------------------
 * </p>
 * \author KB
-* @version $Id: SOSOptionJSTransferMethod.java 15777 2011-11-25 12:27:39Z kb $12.07.2010
+* @version $Id$12.07.2010
 * \see reference
 *
 * Created on 12.07.2010 14:31:02
