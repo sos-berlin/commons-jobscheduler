@@ -35,15 +35,16 @@ import com.sos.dialog.layouts.Gridlayout;
  */
 public class SOSCTabFolder extends CTabFolder {
 	@SuppressWarnings("unused")
-	private final String				conClassName				= this.getClass().getSimpleName();
+	private final String		conClassName				= this.getClass().getSimpleName();
 	@SuppressWarnings("unused")
-	private static final String			conSVNVersion				= "$Id$";
+	private static final String	conSVNVersion				= "$Id$";
 	@SuppressWarnings("unused")
-	private final Logger				logger						= Logger.getLogger(this.getClass());
-//	private final Vector<SOSCTabItem>	objItemList					= new Vector<SOSCTabItem>();
+	private final Logger		logger						= Logger.getLogger(this.getClass());
+	//	private final Vector<SOSCTabItem>	objItemList					= new Vector<SOSCTabItem>();
 	public boolean				ItemsHasClose				= true;
-	public boolean						gflgCreateControlsImmediate	= true;
-	public boolean flgRejectTabItemSelection = false;
+	public boolean				gflgCreateControlsImmediate	= true;
+	public boolean				flgRejectTabItemSelection	= false;
+
 	/**
 	 * @param parent
 	 * @param style
@@ -57,16 +58,20 @@ public class SOSCTabFolder extends CTabFolder {
 		setTabHeight(getTabHeight() + 6);
 		this.setBackground(Globals.getCompositeBackground());
 
-//		this.setSelectionBackground(new Color[]{new Color(getDisplay(), new RGB(242, 244, 247)), new Color(getDisplay(), new RGB(157, 167, 195))}, new int[]{100}, true);
-		this.setSelectionBackground(new Color[]{Globals.getFieldHasFocusBackground(), Globals.getCompositeBackground(), Globals.getCompositeBackground()}, new int[]{50, 100}, true);
+		//		this.setSelectionBackground(new Color[]{new Color(getDisplay(), new RGB(242, 244, 247)), new Color(getDisplay(), new RGB(157, 167, 195))}, new int[]{100}, true);
+		this.setSelectionBackground(new Color[] { Globals.getFieldHasFocusBackground(), Globals.getCompositeBackground(), Globals.getCompositeBackground() },
+				new int[] { 50, 100 }, true);
 		Gridlayout.set4ColumnLayout(this);
 		//
 		addFocusListener(new FocusListener() {
-			@Override public void focusLost(final FocusEvent e) {
+			@Override
+			public void focusLost(final FocusEvent e) {
 				// TODO validate?
 			}
 
-			@SuppressWarnings("unused") @Override public void focusGained(final FocusEvent e) {
+			@SuppressWarnings("unused")
+			@Override
+			public void focusGained(final FocusEvent e) {
 				logger.debug("focusGained");
 				SOSCTabFolder o = (SOSCTabFolder) e.widget;
 				Object d = e.data;
@@ -78,7 +83,8 @@ public class SOSCTabFolder extends CTabFolder {
 		 * SelectionListener
 		 */
 		addSelectionListener(new SelectionAdapter() {
-			@Override public void widgetSelected(final SelectionEvent event) {
+			@Override
+			public void widgetSelected(final SelectionEvent event) {
 				logger.debug("CTabFolder Item selected");
 				if (flgRejectTabItemSelection == true) {
 					return;
@@ -147,7 +153,8 @@ public class SOSCTabFolder extends CTabFolder {
 		this.addListener(SWT.MouseWheel, Globals.listener);
 		this.addListener(SWT.MouseHorizontalWheel, Globals.listener);
 		this.addListener(SWT.MouseDoubleClick, new Listener() {
-			@Override public void handleEvent(final Event event) {
+			@Override
+			public void handleEvent(final Event event) {
 				System.out.println("doubleClick");
 				maximizeToSashForm();
 				event.doit = true;
@@ -159,72 +166,94 @@ public class SOSCTabFolder extends CTabFolder {
 		MenuItem close = new MenuItem(contextMenu, SWT.NONE);
 		close.setText("Close");
 		close.addListener(SWT.Selection, new Listener() {
-			@Override public void handleEvent(final Event event) {
+			@Override
+			public void handleEvent(final Event event) {
+				CTabItem objTabItem = getSelection();
+				objTabItem.dispose();
 				// the widget here is the menueItem
-//								event.widget.dispose();
 			}
 		});
 		MenuItem closeOthers = new MenuItem(contextMenu, SWT.NONE);
 		closeOthers.setText("Close Others");
 		closeOthers.addListener(SWT.Selection, new Listener() {
-			@Override public void handleEvent(final Event event) {
+			@Override
+			public void handleEvent(final Event event) {
+				CTabItem objTabItem = getSelection();
+				for (CTabItem objTI : getItems()) {
+					if (objTI != objTabItem) {
+						objTI.dispose();
+					}
+				}
 			}
 		});
 		MenuItem closeAll = new MenuItem(contextMenu, SWT.NONE);
 		closeAll.setText("Close All");
 		closeAll.addListener(SWT.Selection, new Listener() {
-			@Override public void handleEvent(final Event event) {
+			@Override
+			public void handleEvent(final Event event) {
+				for (CTabItem objTI : getItems()) {
+					objTI.dispose();
+				}
 			}
 		});
 		this.setMenu(contextMenu);
 		this.addSelectionListener(new SelectionListener() {
 			boolean	flgIsActive	= false;
 
-			@Override public void widgetDefaultSelected(final SelectionEvent arg0) {
+			@Override
+			public void widgetDefaultSelected(final SelectionEvent arg0) {
 				widgetSelected(arg0);
 			}
 
-			@Override public void widgetSelected(final SelectionEvent arg0) {
+			@Override
+			public void widgetSelected(final SelectionEvent arg0) {
 				logger.debug("widgetSelected");
 				//				doHandleEvent(arg0);
 				arg0.doit = true;
 			}
 		});
 		this.addCTabFolder2Listener(new CTabFolder2Adapter() {
-			 public void itemClosed (final CTabFolderEvent event) {
-				
+			public void itemClosed(final CTabFolderEvent event) {
+
 			}
-			@Override public void close(final CTabFolderEvent event) {
-				CTabItem objI = (CTabItem) event.item;
+
+			@Override
+			public void close(final CTabFolderEvent event) {
+				SOSCTabItem objI = (SOSCTabItem) event.item;
 				if (objI != null) {
-//					for (SOSCTabItem objTI : objItemList) {
-//						if (objTI.equals(objI)) {
-//							objItemList.remove(objI);
-							CTabFolder objC = objI.getParent();
-							
-							objI.dispose();
-							event.doit = true;
-							logger.debug("tabitem disposed");
-							objC.layout(true, true);
-//							break;
-//						}
-//					}
-//					if (objI.getControl() != null) {
-//						objI.getControl().dispose();
-//					}
+					//					for (SOSCTabItem objTI : objItemList) {
+					//						if (objTI.equals(objI)) {
+					CTabFolder objC = objI.getParent();
+					//							objC.remove(objI);
+					event.doit = true;
+					objI.dispose();
+					objI = null;
+					logger.debug("tabitem disposed");
+					System.gc();
+					//							objC.layout(true, true);
+					//							break;
+					//						}
+					//					}
+					//					if (objI.getControl() != null) {
+					//						objI.getControl().dispose();
+					//					}
 				}
-			}  // close
+			} // close
 
-			@Override public void minimize(final CTabFolderEvent event) {
+			@Override
+			public void minimize(final CTabFolderEvent event) {
 			}
 
-			@Override public void maximize(final CTabFolderEvent event) {
+			@Override
+			public void maximize(final CTabFolderEvent event) {
 			}
 
-			@Override public void restore(final CTabFolderEvent event) {
+			@Override
+			public void restore(final CTabFolderEvent event) {
 			}
 
-			@Override public void showList(final CTabFolderEvent event) {
+			@Override
+			public void showList(final CTabFolderEvent event) {
 			}
 		});
 	}
@@ -288,11 +317,11 @@ public class SOSCTabFolder extends CTabFolder {
 	*
 	 */
 	public SOSCTabItem getTabItem(final Object pobjObject) {
-//		for (SOSCTabItem objTI : objItemList) {
-//			if (objTI.getData().equals(pobjObject)) {
-//				return objTI;
-//			}
-//		}
+		//		for (SOSCTabItem objTI : objItemList) {
+		//			if (objTI.getData().equals(pobjObject)) {
+		//				return objTI;
+		//			}
+		//		}
 		return null;
 	}
 
@@ -325,18 +354,18 @@ public class SOSCTabFolder extends CTabFolder {
 	public SOSCTabItem getTabItem(final String pstrCaption) {
 		SOSCTabItem objTabItem = new SOSCTabItem(this, SWT.NONE);
 		MsgHandler.newMsg(pstrCaption).Control(objTabItem);
-//		objTabItem.setData("key", pstrCaption);
+		objTabItem.setData("key", pstrCaption);
 		objTabItem.setFont(Globals.stFontRegistry.get("tabitem-text"));
 
 		objTabItem.setShowClose(ItemsHasClose);
 		Composite composite = new SOSComposite(this, SWT.NONE);
 		objTabItem.setControl(composite);
-//		objTabItem.setData("composite", composite);
+		objTabItem.setData("composite", composite);
 		Gridlayout.set4ColumnLayout(composite);
-		
-//		objItemList.add(objTabItem);
 
-return objTabItem;
+		//		objItemList.add(objTabItem);
+
+		return objTabItem;
 	}
 
 	/**
@@ -350,9 +379,9 @@ return objTabItem;
 	*
 	 */
 	public SOSCTabItem newTabItem(final ISOSControlProperties pobjObject) {
-//		if (objItemList.contains(pobjObject)) {
-//			return getTabItem(pobjObject);
-//		}
+		//		if (objItemList.contains(pobjObject)) {
+		//			return getTabItem(pobjObject);
+		//		}
 		int iSWT = SWT.None;
 		if (ItemsHasClose == true) {
 			iSWT = SWT.Close;
@@ -364,7 +393,7 @@ return objTabItem;
 		objTI.setData("key", strT);
 		objTI.setText(pobjObject.getTitle());
 		objTI.setFont(Globals.stFontRegistry.get("text"));
-//		objItemList.add(objTI);
+		//		objItemList.add(objTI);
 		SOSComposite composite = new SOSComposite(this, SWT.NONE);
 		objTI.setControl(composite);
 		Gridlayout.set4ColumnLayout(composite);
@@ -383,7 +412,8 @@ return objTabItem;
 		return null;
 	}
 
-	@SuppressWarnings("unused") private void doHandleEvent(final SelectionEvent arg0) {
+	@SuppressWarnings("unused")
+	private void doHandleEvent(final SelectionEvent arg0) {
 		CTabItem objTI = (CTabItem) arg0.item;
 		logger.debug(objTI.getText() + " selected");
 		Object objCP = objTI.getData();
@@ -460,12 +490,19 @@ return objTabItem;
 		}
 	}
 
-	@Override public void setSelection(final int intTabIndex) {
+	@Override
+	public void setSelection(final int intTabIndex) {
 		super.setSelection(intTabIndex);
-		layout(true,true);
+		layout(true, true);
 	}
 
-	@Override protected void checkSubclass() {
+	@Override
+	public void dispose() {
+		super.dispose();
+	}
+
+	@Override
+	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components
 	}
 }

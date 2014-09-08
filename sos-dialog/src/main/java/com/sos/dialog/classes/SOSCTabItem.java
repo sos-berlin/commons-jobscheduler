@@ -17,12 +17,17 @@ import com.sos.dialog.interfaces.ISOSTabItem;
  */
 public class SOSCTabItem extends CTabItem {
 
-	@SuppressWarnings("unused") private final String conClassName = this.getClass().getSimpleName();
-	@SuppressWarnings("unused") private static final String conSVNVersion = "$Id$";
-	@SuppressWarnings("unused") private final Logger logger = Logger.getLogger(this.getClass());
+	@SuppressWarnings("unused")
+	private final String		conClassName	= this.getClass().getSimpleName();
+	@SuppressWarnings("unused")
+	private static final String	conSVNVersion	= "$Id$";
+	@SuppressWarnings("unused")
+	private Logger				logger			= Logger.getLogger(this.getClass());
 
-	@SuppressWarnings("unused") private SOSCTabFolder objTabFolder = null;
-	@SuppressWarnings("unused") private ISOSTabItem objTabComposite = null;
+	@SuppressWarnings("unused")
+	private SOSCTabFolder		objTabFolder	= null;
+	@SuppressWarnings("unused")
+	private ISOSTabItem			objTabComposite	= null;
 
 	/**
 	 * @param parent
@@ -33,11 +38,11 @@ public class SOSCTabItem extends CTabItem {
 		objTabFolder = parent;
 	}
 
-	public Composite getComposite () {
+	public Composite getComposite() {
 		return (Composite) getData("composite");
 	}
-	
-	public void setComposite (final ISOSTabItem pobjComposite) {
+
+	public void setComposite(final ISOSTabItem pobjComposite) {
 		setData("composite", pobjComposite);
 		setData(pobjComposite);
 		objTabComposite = pobjComposite;
@@ -52,27 +57,39 @@ public class SOSCTabItem extends CTabItem {
 		super(parent, style, index);
 	}
 
-	public void setParent (final SOSCTabFolder pobjTabFolder ) {
+	public void setParent(final SOSCTabFolder pobjTabFolder) {
 
 	}
-	
+
 	@Override
-	public void dispose () {
-		Control objC = this.getControl();
-		if (objC != null && objC.isDisposed() == false) {
-			objC.dispose();
-			setData(null);
-			setData("composite", null);
-			this.setControl(null);
-			this.dispose();
-			objTabFolder = null;
-			objTabComposite = null;
-			this.setImage(null);
+	public void dispose() {
+		if (this.isDisposed() == false) {
+			Control objC = this.getControl();
+			if (objC != null && objC.isDisposed() == false) {
+				setChilds2Null();
+				objC.dispose();
+				objTabFolder = null;
+				objTabComposite = null;
+				//			this.dispose();
+				super.dispose();
+			}
 		}
 	}
+
+	public void setChilds2Null() {
+		setData("composite", null);
+		this.setImage(null);
+		setData("key", null);
+		setControl(null);
+		setData(null);
+		setFont(null);
+		setComposite(null);
+		logger = null;
+	}
+
 	@Override
 	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components
-		}
+	}
 
 }
