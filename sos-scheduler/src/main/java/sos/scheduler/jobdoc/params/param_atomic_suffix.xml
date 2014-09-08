@@ -3,6 +3,7 @@
 <param
 	xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1"
 	xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1     http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd"
 	name="atomic_suffix" required="false" DataType="SOSOptionString"
 	constraint="append_files" Category="Filehandling, atomic, filewatcher"
 	Alias="TargetTransferFilenameSuffix">
@@ -44,6 +45,8 @@
 		<abstract>A Suffix for the target transfer file name, e.g. "~" to
 			ensure atomic transfer
 		</abstract>
+		<description>
+		
 		<p>
 			This parameter specifies whether target files should be created
 			with a
@@ -69,5 +72,6 @@
 			application
 			or the JobScheduler.
 		</p>
+		</description>
 	</note>
 </param>
