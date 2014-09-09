@@ -2930,7 +2930,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-			throw new JobSchedulerException(String.format("SAXException ", pobjXMLFile.getAbsolutePath()));
+			throw new JobSchedulerException(String.format("SAXException %1$s", pobjXMLFile.getAbsolutePath()), e);
 		}
 		try {
 			// parser.parse(new ByteArrayInputStream(pstrXMLAsString.getBytes()));
@@ -2952,7 +2952,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-			throw new JobSchedulerException(String.format("Exception ", pobjXMLFile.getAbsolutePath()));
+			throw new JobSchedulerException(String.format("Exception %1$s", pobjXMLFile.getAbsolutePath()), e);
 		}
 		return objProp;
 	} // private void LoadXML

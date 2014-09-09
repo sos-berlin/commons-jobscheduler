@@ -117,7 +117,8 @@ public class JSDataElementDate extends JSDataElement {
 	 * @param pdatDate
 	 */
 	public JSDataElementDate(final Date pdatDate) {
-		JSDateFormat objFormat = JSDateFormat.dfTIMESTAMPS24;
+//		Call to method of static java.text.DateFormat in new com.sos.JSHelper.DataElements.JSDataElementDate(Date) [Scary(8), Normal confidence]
+		JSDateFormat objFormat = new JSDateFormat("yyyyMMddHHmmss");
 
 		this.Value(objFormat.format(pdatDate));
 	}
@@ -324,7 +325,7 @@ public class JSDataElementDate extends JSDataElement {
 	public boolean isEmpty() {
 
 		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::ISEmpty";
+		final String conMethodName = conClassName + "::isEmpty";
 
 		if (super.Value().trim().length() <= 0 || super.Value().trim().equals("00000000")) {
 			return true;

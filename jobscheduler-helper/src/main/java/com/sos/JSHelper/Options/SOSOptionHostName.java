@@ -217,7 +217,6 @@ public class SOSOptionHostName extends SOSOptionElement {
 			strRet = toXml();
 		}
 		catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		finally {

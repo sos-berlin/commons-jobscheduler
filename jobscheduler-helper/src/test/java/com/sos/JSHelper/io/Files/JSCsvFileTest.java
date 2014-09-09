@@ -11,7 +11,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.sos.JSHelper.Listener.JSListenerClass;
-import com.sos.JSHelper.Options.JSOptionsClass;
 
 /**
  * \class JSCsvFileTest
@@ -49,7 +48,7 @@ public class JSCsvFileTest extends JSListenerClass {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		JSOptionsClass objOptionsClass = new JSOptionsClass();
+//		JSOptionsClass objOptionsClass = new JSOptionsClass();
 		fleTestdataDirectory = new JSFile("R:/backup/sos/java/junittests/testdata/JSCsvFileTest/");
 		BasicConfigurator.configure();
 	}

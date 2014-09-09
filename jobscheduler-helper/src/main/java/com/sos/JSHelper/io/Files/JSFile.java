@@ -522,6 +522,7 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 			}
 			else {
 				logger.debug(String.format("file '%1$s' does not exists. deletion failed.", getAbsolutePath()));
+//				throw new JobSchedulerException("delete failed");
 			}
 		}
 		catch (Exception e) {
@@ -1889,7 +1890,7 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 			return flgIsExclusive;
 		}
 		flgIsExclusive = pflgIsExclusive;
-		if (flgIsExclusive = true) {
+		if (flgIsExclusive == true) {
 			if (this.checkExclusiveDeny() == false) {
 				// String localHost = InetAddress.getLocalHost().getHostName();
 				InetAddress ia = InetAddress.getLocalHost();
@@ -1919,8 +1920,8 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 		final String conMethodName = conClassName + "::checkExclusiveDeny";
 		boolean flgExclusiveDeny = false;
 		String strExclusiveFileNameExtension = System.getProperty(conPropertySOS_JSFILE_EXTENSION_4_EXCLUSIVEFILE, "~");
-		fleExclusiveFile = new JSFile(strFileName + strExclusiveFileNameExtension);
-		if (fleExclusiveFile.exists()) {
+		File _fleExclusiveFile = new JSFile(strFileName + strExclusiveFileNameExtension);
+		if (_fleExclusiveFile != null && _fleExclusiveFile.exists()) {
 			/**
 			 * exclusive-file exists. check, who is the owner.
 			 * If the current user is not the owner, we must deny the request.
@@ -1937,16 +1938,19 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 				}
 			}
 		}
+		else {
+			_fleExclusiveFile = null;
+		}
 		return flgExclusiveDeny;
 	} // private boolean checkExclusiveDeny
 
 	private void doReleaseExclusive() {
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::doReleaseExclusive";
-		flgIsExclusive = false;
-		if (fleExclusiveFile != null) {
+		if (flgIsExclusive == true && fleExclusiveFile != null) {
 			fleExclusiveFile.delete();
 			fleExclusiveFile = null;
+			flgIsExclusive = false;
 		}
 	} // private void doReleaseExclusive
 

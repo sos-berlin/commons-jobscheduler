@@ -45,7 +45,7 @@ public class JSDataElementDateTime extends JSDataElement {
 
 	public static final String	SIMPLE_DATE_FORMAT		= "yyyy-MM-dd";
 	public static final String	FULL_DATETIME_FORMAT	= "yyyy-MM-dd HH:mm:ss";
-	private String				strDateFormat			= "yyyy.MM.dd HH:mm:ss";
+	private final String				strDateFormat			= "yyyy.MM.dd HH:mm:ss";
 
 	private String				strTimestamp			= null;					// "yyyy.MM.dd hh:mm:ss"
 
@@ -138,7 +138,9 @@ public class JSDataElementDateTime extends JSDataElement {
 	@Override
 	public void doInit() {
 		// super.doInit();
-		super.FormatString(strDateFormat);
+//  strDateFormat isn't initialized in com.sos.JSHelper.DataElements.JSDataElementDateTime.doInit() when invoked from constructor for superclass [Scary(8), High confidence]
+//		super.FormatString(strDateFormat);
+		super.FormatString("yyyy.MM.dd HH:mm:ss");
 		super.Description("DateAndTime");
 		super.ColumnHeader("DateTime");
 		super.XMLTagName("DateTime");

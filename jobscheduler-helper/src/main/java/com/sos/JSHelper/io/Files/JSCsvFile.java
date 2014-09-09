@@ -227,7 +227,7 @@ public class JSCsvFile extends JSTextFile {
 			if (str == null) { // EOF
 				break;
 			}
-			if (str == END_OF_LINE && intColumnCount == intFieldCount) { // EOL
+			if (str.equals(END_OF_LINE) && intColumnCount == intFieldCount) { // EOL
 				flgFieldCount = false;
 				break;
 			}
@@ -235,7 +235,7 @@ public class JSCsvFile extends JSTextFile {
 				intFieldCount++; // Anzahl Spalten des ersten Satzes
 			}
 			intColumnCount++;
-			if (str == END_OF_LINE) { // EOL
+			if (str.equals(END_OF_LINE)) { // EOL
 				list.add("");
 				break;
 			}

@@ -3044,7 +3044,7 @@ public class SOSFileSystemOperations {
 		// filtern
 		temp = filelistFilterAge(temp, minFileAge, maxFileAge);
 		temp = filelistFilterSize(temp, minFileSize, maxFileSize);
-		if ((minFileSize != -1 || minFileSize != -1) && minFileAge == 0 && maxFileAge == 0)
+		if ((minFileSize != -1 || maxFileSize != -1) && minFileAge == 0 && maxFileAge == 0)
 			temp = filelistSkipFiles(temp, skipFirstFiles, skipLastFiles, "sort_size");
 		else
 			if (minFileAge != 0 || maxFileAge != 0)

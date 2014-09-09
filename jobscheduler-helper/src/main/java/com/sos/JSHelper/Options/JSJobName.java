@@ -54,10 +54,12 @@ public class JSJobName extends SOSOptionString {
 	 */
 	public JSJobName(final JSOptionsClass pPobjParent, final String pPstrKey, final String pPstrDescription, final String pPstrValue, final String pPstrDefaultValue, final boolean pPflgIsMandatory) {
 		super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
-		// TODO Auto-generated constructor stub
 	}
 	
 	public void Value(final String jobFolder, final String jobName) {
-		this.Value(new String(jobFolder + "/").replaceAll("\\", "/").replaceAll("/{2,}", "/") + jobName);
+// findbugs:  Invalid syntax for regular expression in com.sos.JSHelper.Options.JSJobName.Value(String, String) [Scary(9), High confidence]
+
+//		this.Value(new String(jobFolder + "/").replaceAll("\\", "/").replaceAll("/{2,}", "/") + jobName);
+		this.Value(new String(jobFolder + "/").replaceAll("\\", "/").replaceAll("//", "/") + jobName);
 	}
 }

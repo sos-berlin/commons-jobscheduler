@@ -98,7 +98,7 @@ public class JSXMLFile extends JSTextFile /* implements ErrorHandler */{
 	protected HashMap<String, String>	hsmParameters											= null;
 
 	public JSXMLFile() {
-		super(null);
+		super("");
 		// nothing to do
 	}
 

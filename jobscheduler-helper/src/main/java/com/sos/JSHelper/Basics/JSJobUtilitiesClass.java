@@ -124,7 +124,7 @@ public class JSJobUtilitiesClass<T> extends JSToolBox implements JSJobUtilities,
 		else {
 			objJSCommands = pobjJSCommands;
 		}
-		logger.trace("pobjJSCommands = " + pobjJSCommands.getClass().getName());
+		logger.trace("pobjJSCommands = " + objJSCommands.getClass().getName());
 	}
 
 	@Override
