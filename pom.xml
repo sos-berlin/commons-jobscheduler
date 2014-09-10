@@ -5,12 +5,12 @@
     <parent>
         <groupId>com.sos-berlin</groupId>
 		    <artifactId>products</artifactId>
-        <version>1.7.4253</version>
+        <version>1.7-SNAPSHOT</version>
     </parent>
 
     <groupId>com.sos-berlin.products</groupId>
     <artifactId>jobscheduler</artifactId>
-  <version>1.7.4253</version>
+  <version>1.7-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
     <inceptionYear>2014</inceptionYear>
