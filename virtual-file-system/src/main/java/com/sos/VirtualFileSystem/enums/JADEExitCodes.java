@@ -11,12 +11,13 @@ import com.sos.VirtualFileSystem.common.SOSMsgVfs;
 public enum JADEExitCodes {
 	// Java -> Code Style -> Formatter -> Edit -> Off/On Tags
 	// @formatter:off
-	virtualFileSystemError 		(98, "SOSVfs_T_0310"),
-	someUnspecificError 		(99, "SOSVfs_T_0310"),
+	virtualFileSystemError 		 (98, "SOSVfs_T_0310"),
+	someUnspecificError 		 (99, "SOSVfs_T_0310"),
+	UnsupportedParametersFound   (15, "SOSVfs_T_0310"),
 	ParametersMissingButRequired (14, "SOSVfs_T_0310"),
-		connectionError			(13, "SOSVfs_T_0310"),
-		authenticatenError		(12, "SOSVfs_T_0310"),
-		nListError				(11, "SOSVfs_T_0310")
+		connectionError			 (13, "SOSVfs_T_0310"),
+		authenticatenError		 (12, "SOSVfs_T_0310"),
+		nListError				 (11, "SOSVfs_T_0310")
 		;
 	// @formatter:on
 	public String	description;	// returns the i18n text

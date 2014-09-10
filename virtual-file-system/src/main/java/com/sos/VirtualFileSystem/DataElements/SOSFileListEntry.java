@@ -1472,7 +1472,6 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 		addCSv(objAttributesProperties.get(conFieldJUMP_USER)); // 28
 		// Diff to the format of the transfer history as order
 		SOSOptionTime objModTime = new SOSOptionTime(null, null, null, "", "", false);
-		objModTime.value(lngFileModDate);
 		addCSv(objModTime.getTimeAsString(lngFileModDate));
 		return strCSVRec;
 	}

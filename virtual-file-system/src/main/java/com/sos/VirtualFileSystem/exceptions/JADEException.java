@@ -16,8 +16,8 @@ public class JADEException extends JobSchedulerException {
 	 * 
 	 */
 	private static final long	serialVersionUID	= 8221368427102971162L;
-	private JADEExitCodes ExitCode = JADEExitCodes.someUnspecificError;  // default exitcode, if an exception occurs
-	
+	private JADEExitCodes		ExitCode			= JADEExitCodes.someUnspecificError;	// default exitcode, if an exception occurs
+
 	/**
 	 * 
 	 */
@@ -47,7 +47,7 @@ public class JADEException extends JobSchedulerException {
 	}
 
 	public JADEException(final JADEExitCodes pintExitCode, final Exception e) {
-		super( e);
+		super(e);
 		ExitCode = pintExitCode;
 	}
 
