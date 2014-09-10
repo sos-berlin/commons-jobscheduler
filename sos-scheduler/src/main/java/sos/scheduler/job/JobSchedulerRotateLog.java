@@ -46,7 +46,7 @@ public class JobSchedulerRotateLog extends JobSchedulerJob {
 		strRegExpr4CompressedFiles2Delete = getParm("delete_file_specification", strRegExpr4CompressedFiles2Delete);
 		int intNoOfLogFilesDeleted = 0;
 		int intNoOfLogFilesCompressed = 0;
-		String strRegExpr4DeleteSchedulerLogFilec = "";
+		String strRegExpr4DeleteSchedulerLogFiles = "";
 		//
 		try {
 			JSFolder objLogDirectory = new JSFolder(filePath);
@@ -66,9 +66,9 @@ public class JobSchedulerRotateLog extends JobSchedulerJob {
 					tempFile.delete();
 					intNoOfLogFilesDeleted++;
 				}
-				strRegExpr4DeleteSchedulerLogFilec = strCaseInsensitive + "^(" + JobSchedulerLogFileName + "\\.)([0-9\\-]+)" + getRegExp4SchedulerID() + "(\\"
+				strRegExpr4DeleteSchedulerLogFiles = strCaseInsensitive + "^(" + JobSchedulerLogFileName + "\\.)([0-9\\-]+)" + getRegExp4SchedulerID() + "(\\"
 						+ JobSchedulerLogFileNameExtension + ")(\\.gz)?$";
-				for (JSFile fleT : objLogDirectory.getFilelist(strRegExpr4DeleteSchedulerLogFilec, 0)) {
+				for (JSFile fleT : objLogDirectory.getFilelist(strRegExpr4DeleteSchedulerLogFiles, 0)) {
 					fleT.delete();
 					intNoOfLogFilesDeleted++;
 				}
@@ -89,7 +89,7 @@ public class JobSchedulerRotateLog extends JobSchedulerJob {
 		}
 		finally {
 			logger.info(intNoOfLogFilesCompressed + " log files compressed for regexp: " + strRegExpr4LogFiles2Compress);
-			logger.info(intNoOfLogFilesDeleted + " compressed log files deleted for regexp: " + strRegExpr4DeleteSchedulerLogFilec);
+			logger.info(intNoOfLogFilesDeleted + " compressed log files deleted for regexp: " + strRegExpr4DeleteSchedulerLogFiles);
 		}
 		try {
 			spooler.log().start_new_file(); // this will start with a fresh log file
