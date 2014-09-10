@@ -80,7 +80,7 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 
 	private Pattern				objCurrentPattern		= null;
 	private int					intRegExpFlags			= Pattern.CASE_INSENSITIVE;
-
+	public final 	static	String strCaseInsensitive = "(?i)";
 	private Matcher				matcher					= null;
 	private String				strMatchValue			= "";
 

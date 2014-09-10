@@ -143,14 +143,8 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 		flgIsDirty = false;
 	} // public void changeDefaults
 
-	public SOSOptionElement(final String pstrFolderName) {
-		this.setMessageResource("com_sos_JSHelper_Messages");
-		objParentClass = null;
-		strKey = "";
-		this.Description("description");
-		this.Value(pstrFolderName);
-		flgIsMandatory = false;
-		flgIsDirty = false;
+	public SOSOptionElement(final String pstrOptionValue) {
+		this(null, "", "", pstrOptionValue, pstrOptionValue, false);
 	}
 
 	public SOSOptionElement(final JSOptionsClass pobjParent, final String pstrKey, final String pstrDescription, final String pstrValue,
@@ -219,23 +213,20 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	}
 
 	/**
-	* \brief CheckMandatory - prüft ob eine Option tatsüchlich gefüllt ist
+	* \brief CheckMandatory - prüft ob eine Option tatsächlich gefüllt ist
 	 *
 	 * \details
 	 *
-	* @throws Exception - wird ausgelüst, wenn eine mandatory-Option keinen Wert hat
+	* @throws Exception - wird ausgeläst, wenn eine mandatory-Option keinen Wert hat
 	 */
 	public void CheckMandatory() {
-		try {
-			if (flgIsMandatory) {
-				if (this.isEmpty(strValue)) {
-					//					this.SignalError(Messages.getMsg("%1$s (%2$s) %3$s", this.strDescription, this.strKey, this.conNullButMandatory));
-					this.SignalError(Messages.getMsg(SOSOptionElement.conNullButMandatory, strDescription, strKey));
-				}
+		if (flgIsMandatory) {
+			if (this.isEmpty(strValue)) {
+				//					this.SignalError(Messages.getMsg("%1$s (%2$s) %3$s", this.strDescription, this.strKey, this.conNullButMandatory));
+				String strT = Messages.getMsg(SOSOptionElement.conNullButMandatory, strDescription, strKey);
+				logger.error(strT);
+				throw new JSExceptionMandatoryOptionMissing(strT);
 			}
-		}
-		catch (final Exception e) {
-			throw new JSExceptionMandatoryOptionMissing(e.toString());
 		}
 	} // public void CheckMandatory ()
 
@@ -359,10 +350,10 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 		//
 	}
 
-	public boolean isNotEmpty () {
-		
+	public boolean isNotEmpty() {
+
 		return isNotEmpty(strValue);
-		
+
 	}
 
 	/**
@@ -505,16 +496,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 				String strEnvVarName = pstrValue.substring(4);
 				String strEnvVarValue = EnvironmentVariable(strEnvVarName);
 				if (isEmpty(strEnvVarValue) == true) {
-					strRet = System.getProperty(strEnvVarName);
-					if (isEmpty(strRet) == true) {
-						strRet = strDefaultValue;
-					}
-					else {
-						strRet = StripQuotes(strRet);
-					}
-				}
-				else {
-					strRet = strEnvVarValue;
+					strRet = strDefaultValue;
 				}
 			}
 			else {
@@ -524,6 +506,9 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 					if (iTo != -1) {
 						String strEnvVarName = pstrValue.substring(iFrom + 2, iTo);
 						String strEnvVarValue = EnvironmentVariable(strEnvVarName);
+						if (strEnvVarValue == null) {
+							strEnvVarValue = "";
+						}
 						strRet = "";
 						if (iFrom > 0) {
 							strRet = pstrValue.substring(0, iFrom);
@@ -1005,15 +990,6 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 			}
 		}
 		return flgT;
-	}
-
-	public String StripQuotes(final String pstrS) {
-		String strR = pstrS;
-		//		if (pstrS.substring(0, 1).equals("\"") && pstrS.substring(pstrS.length() - 1).equals("\"")) {
-		if (pstrS.startsWith("\"") && pstrS.endsWith("\"")) {
-			strR = pstrS.substring(1, pstrS.length() - 1);
-		}
-		return strR;
 	}
 
 	/**

@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.JSHelper.Options.SOSOptionRegExp;
 
 /**
  * @author KB
@@ -214,7 +215,7 @@ public class JSFolder extends File {
 					logger.error(String.format("Folder '%1$s' does not exist.", strFolderName));
 				}
 				else {
-					this.mkdir();
+					this.mkdirs();
 					logger.debug(String.format("Folder '%1$s' created.", strFolderName));
 				}
 			}
@@ -224,5 +225,53 @@ public class JSFolder extends File {
 		return strFolderName;
 	} // CheckFolder
 
+	public Vector<String> deleteFileList (final SOSOptionRegExp objRegExpr4Files2Delete) {
+		return deleteFileList(objRegExpr4Files2Delete.Value());
+	}
+
+	
+	public int deleteFiles (final String strRegExpr4Files2Delete) {
+		return deleteFileList(strRegExpr4Files2Delete).size();
+	}
+	
+	public Vector<String> deleteFileList (final String strRegExpr4Files2Delete) {
+		int intNoOfFilesDeleted = 0;
+		Vector<String> objFileList = new Vector<>();
+
+		for (JSFile tempFile : this.getFilelist(strRegExpr4Files2Delete, 0)) {
+			tempFile.delete();
+			String strName = tempFile.getAbsolutePath();
+			objFileList.add(strName);
+			logger.debug(String.format("File '%1$s' deleted", strName));
+			intNoOfFilesDeleted++;
+		}
+		logger.debug(String.format("%1$s files deleted matching the regexp '%2$s'", intNoOfFilesDeleted, strRegExpr4Files2Delete));
+		return objFileList;
+	}
+
+	public int compressFiles (final String strRegExpr4Files2Compress) {
+		return compressFileList(strRegExpr4Files2Compress).size();
+	}
+	
+	public Vector<String> compressFileList (final SOSOptionRegExp objRegExpr4Files2Compress) {
+		return compressFileList(objRegExpr4Files2Compress.Value());
+	}
+	
+	public Vector<String> compressFileList (final String strRegExpr4Files2Compress) {
+		int intNoOfFilesCompressed = 0;
+		Vector<String> objFileList = new Vector<>();
+
+		for (JSFile tempFile : this.getFilelist(strRegExpr4Files2Compress, 0)) {
+			intNoOfFilesCompressed++;
+			tempFile.createZipFile(getFolderName());
+			tempFile.delete();
+			String strName = tempFile.getAbsolutePath();
+			objFileList.add(strName);
+			logger.debug(String.format("File '%1$s' compressed", strName));
+			intNoOfFilesCompressed++;
+		}
+		logger.debug(String.format("%1$s files compressed matching the regexp '%2$s'", intNoOfFilesCompressed, strRegExpr4Files2Compress));
+		return objFileList;
+	}
 
 }

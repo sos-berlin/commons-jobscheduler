@@ -4,6 +4,7 @@ import java.io.File;
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.io.Files.JSFile;
+import com.sos.JSHelper.io.Files.JSFolder;
 
 /**
 * \class JSOptionFolderName
@@ -51,13 +52,7 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 	* \details
 	*
 	*/
-	@JSOptionDefinition(
-						name = "CreateFolder",
-						value = "true",
-						description = "Folder anlegen, wenn noch nicht vorhanden",
-						key = "CreateFolder",
-						type = "JSOptionBoolean",
-						mandatory = false)
+	@JSOptionDefinition(name = "CreateFolder", value = "true", description = "Folder anlegen, wenn noch nicht vorhanden", key = "CreateFolder", type = "JSOptionBoolean", mandatory = false)
 	public SOSOptionBoolean	CreateFolder	= new SOSOptionBoolean(objParentClass, // Verweis auf die SOSOptionClass-Instanz
 													".CreateFolder", // Schlüssel, i.d.r. identisch mit dem Namen der Option
 													"Folder anlegen, wenn noch nicht vorhanden", // Kurzbeschreibung
@@ -85,13 +80,16 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 	}
 
 	@Override
-	public void Value (final String pstrValue) {
+	public void Value(final String pstrValue) {
 		strValue = pstrValue;
-		if (pstrValue.equals(".")) {
-			strValue += "/";
+		if (isNotNull(pstrValue)) {
+//			if (pstrValue.equals(".")) {
+//				strValue += "/";
+//			}
 		}
 		super.Value(strValue);
 	}
+
 	/**
 	 * \brief Value - Wert der Option liefern
 	 *
@@ -100,8 +98,10 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 	 * @param pstrValue
 	 * @return
 	 */
-	@Override public String Value() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::Value";
+	@Override
+	public String Value() {
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::Value";
 		if (strValue == null) {
 			strValue = "";
 		}
@@ -179,7 +179,6 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 		return pathArray;
 	}
 
-
 	public String[] getSubFolderArrayReverse() {
 		String[] strRet = null;
 		try {
@@ -206,12 +205,12 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 		return strRet;
 	}
 
-	public SOSOptionFolderName getSubFolder (final String pstrSubFolderName) {
+	public SOSOptionFolderName getSubFolder(final String pstrSubFolderName) {
 		String strF = this.getAdjustedValue() + pstrSubFolderName;
 		SOSOptionFolderName objF = new SOSOptionFolderName(strF);
 		if (objF.JSFile().exists()) {
 			if (objF.JSFile().isDirectory()) {
-//				
+				//				
 			}
 			else {
 				throw new JobSchedulerException(String.format("Path '%1$s' is not a folder", strF));
@@ -222,7 +221,7 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 		}
 		return objF;
 	}
-	
+
 	public boolean isAbsolutPath() {
 		boolean strT = true;
 		if (strValue.startsWith("/") == false) {
@@ -232,17 +231,18 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 	}
 
 	public boolean isNotHiddenFile() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::isNotHiddenFile";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::isNotHiddenFile";
 		if (strValue.equalsIgnoreCase("..") == false && strValue.equalsIgnoreCase(".") == false) {
 			return true; // not a hidden file
 		}
 		return false; // it is a hidden-file
 	} // public boolean isNotHiddenFile
 
-	public String getName () {
+	public String getName() {
 		return new File(strValue).getName();
 	}
-	
+
 	public String getParentFolderName() {
 		String strParent = new File(strValue).getParent();
 		if (strParent == null) {
@@ -255,7 +255,7 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 		return strParent;
 	}
 
-	public String getAdjustedValue () {
+	public String getAdjustedValue() {
 		String strRet = strValue.replaceAll("//", "/");
 		strRet = strRet.replaceAll("\\\\\\\\", "\\");
 		if (strRet.endsWith("/") == false) {
@@ -263,6 +263,7 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 		}
 		return strRet;
 	}
+
 	public boolean hasSubFolders() {
 		boolean flgRet = false;
 		flgRet = strValue.contains("/") || strValue.contains("\\");
@@ -281,5 +282,9 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 			}
 		}
 		return objF;
+	}
+
+	public JSFolder getFolder() {
+		return new JSFolder(strValue);
 	}
 }

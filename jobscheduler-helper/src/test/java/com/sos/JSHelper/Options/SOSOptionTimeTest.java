@@ -1,5 +1,6 @@
 package com.sos.JSHelper.Options;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import org.apache.log4j.Logger;
@@ -61,6 +62,26 @@ public class SOSOptionTimeTest {
 	@After
 	public void tearDown() throws Exception {}
 
+
+	@Test
+	public final void testUnitOfMeasure(){
+		objTime = new SOSOptionTime("2d");
+		assertEquals("2d", "2:00:00:00", objTime.Value());
+		objTime.Value("2d");
+		assertEquals("2d", "2:00:00:00", objTime.Value());
+		assertEquals("2d", 172800, objTime.getTimeAsSeconds());
+		objTime = new SOSOptionTime("2w");
+		assertEquals("2d", "14:00:00:00", objTime.Value());
+		objTime = new SOSOptionTime("2h");
+		assertEquals("2d", "2:00:00", objTime.Value());
+		objTime = new SOSOptionTime("2m");
+		assertEquals("2d", "2:00", objTime.Value());
+		objTime = new SOSOptionTime("2s");
+		assertEquals("2d", "2", objTime.Value());
+		objTime = new SOSOptionTime("2");
+		assertEquals("2d", "2:00:00:00", objTime.Value());
+	}
+	
 	@Test
 	public final void testGetTimeAsSeconds(){
 		objTime.Value("10");
@@ -77,6 +98,7 @@ public class SOSOptionTimeTest {
 		System.out.println("time in seconds : " + objTime.getTimeAsSeconds());
 		
 		objTime.value(17);
+		assertEquals ("17 seconds", 17, objTime.getTimeAsSeconds());
 		System.out.println("time in seconds : " + objTime.getTimeAsSeconds());
 		
 	}

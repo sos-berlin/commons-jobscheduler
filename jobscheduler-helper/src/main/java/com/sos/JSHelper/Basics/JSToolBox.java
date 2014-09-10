@@ -507,12 +507,26 @@ public class JSToolBox extends JSListenerClass {
 				SignalDebug(String.format("%s: %s = %s", conMethodName, pstrVariableName, strValue));
 			}
 			else {
-				// SignalInfo(String.format("%s: '%s' is not assigned.", conMethodName, pstrVariableName));
+				strValue = System.getProperty(pstrVariableName);
+			}
+			if (isNotEmpty(strValue)) {
+				strValue = StripQuotes(strValue);
 			}
 		}
 
 		return strValue;
 	}
+
+	public String StripQuotes(final String pstrS) {
+		String strR = pstrS;
+		//		if (pstrS.substring(0, 1).equals("\"") && pstrS.substring(pstrS.length() - 1).equals("\"")) {
+		if (pstrS.startsWith("\"") && pstrS.endsWith("\"")) {
+			strR = pstrS.substring(1, pstrS.length() - 1);
+			strR = strR.replaceAll("\"\"", "\"");
+		}
+		return strR;
+	}
+
 
 	/**
 	 * \brief vereinfachter Stringvergleich

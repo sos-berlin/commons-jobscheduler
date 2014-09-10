@@ -32,6 +32,7 @@ import com.sos.JSHelper.Archiver.IJSArchiverOptions;
 import com.sos.JSHelper.Archiver.JSArchiverOptions;
 import com.sos.JSHelper.Exceptions.JSExceptionFileNotReadable;
 import com.sos.JSHelper.Exceptions.JSExceptionInputFileNotFound;
+import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Exceptions.ParametersMissingButRequiredException;
 import com.sos.JSHelper.io.Files.JSFile;
@@ -1193,8 +1194,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 		boolean flgIsOK = true;
 		int intNumberOfNotProcessedOptions = 0;
 		if (objSettings != null) {
-			for (final Object element : objSettings.entrySet()) {
-				final Map.Entry<String, String> mapItem = (Map.Entry<String, String>) element;
+			for (final Map.Entry<String, String> element : objSettings.entrySet()) {
+				final Map.Entry<String, String> mapItem =  element;
 				String strMapKey = mapItem.getKey().toString();
 				String strT = objProcessedOptions.get(strMapKey);
 				if (strT == null) {
@@ -2025,6 +2026,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 					int intESPos = strOptionName.indexOf("=");
 					if (intESPos > 0) {
 						strOptionValue = strOptionName.substring(intESPos + 1);
+						strOptionValue = StripQuotes(strOptionValue);
 						strOptionName = strOptionName.substring(0, intESPos);
 						objSettings.put(strOptionName, strOptionValue);
 						this.SignalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", conMethodName, strOptionName, strOptionValue));
@@ -2032,7 +2034,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 					}
 				}
 				else {
-					// not a keyword. a positional parameter?
+					logger.error(String.format("'%1$s' seems to be an unsupported (positional) parameter. ignored", strCommandLineArg));
 				}
 			}
 			else {
@@ -2587,6 +2589,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 		}
 		Field objField = null;
 		SOSOptionElement.gflgProcessHashMap = true;
+		boolean flgMandatoryOptionsMissing = false;
 		try {
 			final Field objFields[] = objC.getFields();
 			final StringBuffer strXML = new StringBuffer("");
@@ -2636,7 +2639,12 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 								// continue;
 							}
 							if (enuIterate4What == IterationTypes.CheckMandatory) {
-								objDE.CheckMandatory();
+								try {
+									objDE.CheckMandatory();
+								}
+								catch (Exception e) {
+									flgMandatoryOptionsMissing = true;
+								}
 							}
 							if (enuIterate4What == IterationTypes.toOut) {
 								System.out.println(objDE.toString());
@@ -2708,6 +2716,10 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 			SOSOptionElement.gflgProcessHashMap = false;
 			//
 		} // finally
+		if (flgMandatoryOptionsMissing == true && enuIterate4What == IterationTypes.CheckMandatory) {
+			throw new JSExceptionMandatoryOptionMissing("at least one mandatory option is missing");
+
+		}
 		return pstrBuffer;
 	} // private void AllDataElements
 
