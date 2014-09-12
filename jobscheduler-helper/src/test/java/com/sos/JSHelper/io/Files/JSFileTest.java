@@ -159,6 +159,27 @@ public class JSFileTest {
 
 	} // private void doDelete
 
+	@Test
+	public void testWriteWindowsPathNames () {
+
+		String strPathName = "c:\temp\rmyFile\noLineBreak\noLine\bbb\fff";
+		try {
+			JSFile fleFile =  new JSFile(JSFile.getTempdir(),"testWriteWindowsPathNames");
+			for (int i = 0; i < 1; i++) {
+				strPathName = strPathName.replaceAll("\n", "\\\\n");
+				strPathName = strPathName.replaceAll("\t", "\\\\t");
+				strPathName = strPathName.replaceAll("\r", "\\\\r");
+				strPathName = strPathName.replaceAll("\b", "\\\\b");
+				strPathName = strPathName.replaceAll("\f", "\\\\f");
+				fleFile.WriteLine(strPathName);
+			}
+			fleFile.close();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
 	// @Test
 	public void doWrite() throws Exception {
 
