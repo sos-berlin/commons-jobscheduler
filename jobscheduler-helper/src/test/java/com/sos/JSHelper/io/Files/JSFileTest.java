@@ -166,6 +166,7 @@ public class JSFileTest {
 		try {
 			JSFile fleFile =  new JSFile(JSFile.getTempdir(),"testWriteWindowsPathNames");
 			for (int i = 0; i < 1; i++) {
+				fleFile.WriteLine(strPathName);
 				strPathName = strPathName.replaceAll("\n", "\\\\n");
 				strPathName = strPathName.replaceAll("\t", "\\\\t");
 				strPathName = strPathName.replaceAll("\r", "\\\\r");
