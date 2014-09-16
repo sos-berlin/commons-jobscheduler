@@ -44,7 +44,7 @@ public class SOSCTabItem extends CTabItem {
 
 	public void setComposite(final ISOSTabItem pobjComposite) {
 		setData("composite", pobjComposite);
-		setData(pobjComposite);
+//		setData(pobjComposite);
 		objTabComposite = pobjComposite;
 	}
 

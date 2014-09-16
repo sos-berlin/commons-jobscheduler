@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
+import com.sos.JSHelper.interfaces.IDirty;
 import com.sos.dialog.Globals;
 import com.sos.dialog.interfaces.ISOSControlProperties;
 import com.sos.dialog.interfaces.ISOSTabItem;
@@ -169,8 +170,7 @@ public class SOSCTabFolder extends CTabFolder {
 			@Override
 			public void handleEvent(final Event event) {
 				CTabItem objTabItem = getSelection();
-				objTabItem.dispose();
-				// the widget here is the menueItem
+				event.doit = closeTabItem(objTabItem);
 			}
 		});
 		MenuItem closeOthers = new MenuItem(contextMenu, SWT.NONE);
@@ -181,7 +181,7 @@ public class SOSCTabFolder extends CTabFolder {
 				CTabItem objTabItem = getSelection();
 				for (CTabItem objTI : getItems()) {
 					if (objTI != objTabItem) {
-						objTI.dispose();
+						closeTabItem(objTI);
 					}
 				}
 			}
@@ -192,7 +192,7 @@ public class SOSCTabFolder extends CTabFolder {
 			@Override
 			public void handleEvent(final Event event) {
 				for (CTabItem objTI : getItems()) {
-					objTI.dispose();
+					closeTabItem(objTI);
 				}
 			}
 		});
@@ -221,22 +221,7 @@ public class SOSCTabFolder extends CTabFolder {
 			public void close(final CTabFolderEvent event) {
 				SOSCTabItem objI = (SOSCTabItem) event.item;
 				if (objI != null) {
-					//					for (SOSCTabItem objTI : objItemList) {
-					//						if (objTI.equals(objI)) {
-					CTabFolder objC = objI.getParent();
-					//							objC.remove(objI);
-					event.doit = true;
-					objI.dispose();
-					objI = null;
-					logger.debug("tabitem disposed");
-					System.gc();
-					//							objC.layout(true, true);
-					//							break;
-					//						}
-					//					}
-					//					if (objI.getControl() != null) {
-					//						objI.getControl().dispose();
-					//					}
+					event.doit = closeTabItem(objI);
 				}
 			} // close
 
@@ -256,6 +241,36 @@ public class SOSCTabFolder extends CTabFolder {
 			public void showList(final CTabFolderEvent event) {
 			}
 		});
+	}
+
+	private boolean closeTabItem(final CTabItem pobjTabItem) {
+		int buttonID = -99;
+		boolean flgDoClose = true;
+		if (pobjTabItem != null) {
+			Object objO = pobjTabItem.getData();
+			if (objO instanceof IDirty) {
+				IDirty objDH = (IDirty) objO;
+				if (objDH.isDirty()) {
+					buttonID = objDH.doSave(true);
+				}
+			}
+			switch (buttonID) {
+				case SWT.CANCEL:
+					flgDoClose = false;
+					break;
+				case SWT.YES:
+				case SWT.NO:	
+					pobjTabItem.dispose();
+					logger.debug("tabitem disposed");
+					System.gc();		
+					flgDoClose = true;
+					break;
+
+				default:
+					break;
+			}
+		}
+		return flgDoClose;
 	}
 
 	private void handleSelection() {
