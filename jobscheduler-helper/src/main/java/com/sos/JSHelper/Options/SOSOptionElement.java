@@ -95,7 +95,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	protected boolean							isCData								= false;
 	public static boolean						flgShowPasswords					= false;
 
-	public static boolean getShowPassowrds() {
+	public static boolean getShowPasswords() {
 		return flgShowPasswords;
 	}
 
@@ -497,6 +497,9 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 				String strEnvVarValue = EnvironmentVariable(strEnvVarName);
 				if (isEmpty(strEnvVarValue) == true) {
 					strRet = strDefaultValue;
+				}
+				else {
+					strRet = strEnvVarValue;
 				}
 			}
 			else {
@@ -1088,7 +1091,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 		String strR = "";
 		if (flgHideOption == false && isProtected() == false) {
 			String strV = strValue;
-			if (flgHideValue == true || getShowPassowrds() == true) {
+			if (flgHideValue == true || getShowPasswords() == true) {
 				strV = "*****";
 			}
 			strR = strKey + " (" + strDescription + "): " + strV;

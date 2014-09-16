@@ -25,14 +25,18 @@ package com.sos.JSHelper.io.Files;
 * Created on 26.08.2011 21:31:13
  */
 
-import org.apache.log4j.Logger;
-import org.junit.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.apache.log4j.Logger;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * @author KB
@@ -130,9 +134,9 @@ public class JSIniFileTest {
 		assertTrue("is not null", objS != null);
 		logger.debug("number of sections = " + objS.size());
 		for (SOSProfileSection objPS : objS.values()) {
-			logger.debug(objPS.Name());
+			logger.debug(objPS.toString());
 			for (SOSProfileEntry objEntry : objPS.Entries().values()) {
-				logger.debug("     " + objEntry.Name() + " = " + objEntry.Value());
+				logger.debug("     " + objEntry.toString());
 			}
 		}
 	}
@@ -157,7 +161,7 @@ public class JSIniFileTest {
 	@Test
 	public final void testSetValue() {
 		SOSProfileSection obj = objF.getSection("do_sftp");
-		assertEquals("section name not ok", "do_sftp", obj.strSectionName);
+		assertEquals("section name not ok", "do_sftp", obj.strName);
 		obj.addEntry("Test", "HalloTest");
 		SOSProfileEntry objE = obj.Entry("protocol");
 		String strT = objE.Value();
@@ -167,7 +171,7 @@ public class JSIniFileTest {
 	@Test
 	public final void testDeleteValue() {
 		SOSProfileSection obj = objF.getSection("do_sftp");
-		assertEquals("section name not ok", "do_sftp", obj.strSectionName);
+		assertEquals("section name not ok", "do_sftp", obj.strName);
 		obj.addEntry("Test", "HalloTest");
 		obj.deleteEntry("protocol");
 		SOSProfileEntry objE = obj.Entry("protocol");
@@ -180,14 +184,21 @@ public class JSIniFileTest {
 	@Test
 	public final void testSectionNameString() {
 		SOSProfileSection obj = objF.getSection("do_sftp");
-		assertEquals("section name not ok", "do_sftp", obj.strSectionName);
+		assertEquals("section name not ok", "do_sftp", obj.strName);
 	}
 
 	/**
 	 * Test method for {@link com.sos.JSHelper.io.Files.JSIniFile#SectionName()}.
 	 */
-	@Test
+	@Test (expected=com.sos.JSHelper.Exceptions.JobSchedulerException.class)
 	public final void testSectionName() {
+		objF.addSection("[invalidS=ectionName");
+		
+	}
+
+	@Test (expected=com.sos.JSHelper.Exceptions.JobSchedulerException.class)
+	public final void testSectionName2() {
+		objF.addSection("invalidS\"ectionName");
 	}
 
 	/**
@@ -217,7 +228,7 @@ public class JSIniFileTest {
 	@Test
 	public final void testProfileName() {
 		String strName = objF.strFileName;
-		assertTrue("name is identisch", strName.replace('\\', '/').equals(conIniFileName.replace('\\', '/')));
+		assertTrue("name ist identisch", strName.replace('\\', '/').equals(conIniFileName.replace('\\', '/')));
 	}
 
 	/**
@@ -253,6 +264,10 @@ public class JSIniFileTest {
 		objS = objNew.addSection("Test3");
 		objS.addEntry("Test", "ValueOfTest");
 		objNew.save();
-		assertTrue("File exists ", new File(strNewIniFileName).exists());		
+		assertTrue("File exists ", new File(strNewIniFileName).exists());	
+		
+		assertEquals("test = valueofTest", "ValueOfTest", objNew.getSection("Test2").Entry("Test").Value());
+		assertEquals("test = valueofTest", "ValueOfTest", objNew.getSection("Test3").Entry("Test").Value());
+		assertEquals("test = valueofTest", null, objNew.getSection("Test3").Entry("Test--"));
 	}
 }

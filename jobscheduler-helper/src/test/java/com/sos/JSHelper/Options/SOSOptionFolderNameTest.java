@@ -39,21 +39,21 @@ public class SOSOptionFolderNameTest {
 	public void tearDown() throws Exception {
 	}
 
-//	@Test
-//	public void testValueString() throws Exception {
-//		JSOptionsClass objO = new JSOptionsClass();
-//		String strF = objO.TempDir() + "testSOSOptionFolderName.txt";
-//		JSFile objF = new JSFile(strF);
-//		objF.deleteOnExit();
-//		String strT = "Select * from table;";
-//		objF.Write(strT);
-//		objF.close();
-//
-//		objCS.Value(strF); // the filename is the value
-//		System.out.println(objCS.Value());
-//		assertEquals("select", strT, objCS.Value());
-//	}
-//
+	//	@Test
+	//	public void testValueString() throws Exception {
+	//		JSOptionsClass objO = new JSOptionsClass();
+	//		String strF = objO.TempDir() + "testSOSOptionFolderName.txt";
+	//		JSFile objF = new JSFile(strF);
+	//		objF.deleteOnExit();
+	//		String strT = "Select * from table;";
+	//		objF.Write(strT);
+	//		objF.close();
+	//
+	//		objCS.Value(strF); // the filename is the value
+	//		System.out.println(objCS.Value());
+	//		assertEquals("select", strT, objCS.Value());
+	//	}
+	//
 	@Test
 	public void testRelativeFolderNames() {
 		objCS.Value(".");
@@ -68,20 +68,19 @@ public class SOSOptionFolderNameTest {
 		assertTrue("relative ..", objCS.isDotFolder());
 		objCS.Value("/tmp/test");
 		assertFalse("absolute .", objCS.isDotFolder());
-
 	}
 
 	@Test
-	public void getSubFolderArrayTest () {
+	public void getSubFolderArrayTest() {
 		objCS.Value("/a/b/c/d");
 		String[] strT = objCS.getSubFolderArray();
 		assertTrue("wrong number of folders", strT.length == 4);
-		
+
 		assertEquals("ungleich", "/a", strT[0]);
 		assertEquals("ungleich", "/a/b", strT[1]);
 		assertEquals("ungleich", "/a/b/c", strT[2]);
 		assertEquals("ungleich", "/a/b/c/d", strT[3]);
-//		assertEquals("ungleich", "", strT[4]);
+		//		assertEquals("ungleich", "", strT[4]);
 
 	}
 }

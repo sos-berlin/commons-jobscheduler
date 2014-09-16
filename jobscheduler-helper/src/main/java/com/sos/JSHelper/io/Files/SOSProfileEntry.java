@@ -2,6 +2,9 @@ package com.sos.JSHelper.io.Files;
 
 import org.apache.log4j.Logger;
 
+import com.sos.JSHelper.Options.IValueChangedListener;
+import com.sos.JSHelper.Options.SOSValidationError;
+
 /**
 * \class SOSProfileEntry 
 * 
@@ -31,15 +34,13 @@ import org.apache.log4j.Logger;
  * @author KB
  *
  */
-public class SOSProfileEntry {
+public class SOSProfileEntry extends SOSProfileBaseClass<SOSProfileSection> implements IValueChangedListener {
 
 	@SuppressWarnings("unused")
 	private final String		conClassName	= "SOSProfileEntry";
 	@SuppressWarnings("unused")
 	private static final String	conSVNVersion	= "$Id$";
 	private static final Logger	logger			= Logger.getLogger(SOSProfileEntry.class);
-	private String				strName;
-	private String				strValue;
 
 	public SOSProfileEntry() {
 		//
@@ -52,47 +53,76 @@ public class SOSProfileEntry {
 	public SOSProfileEntry(String pstrEntryName, String pstrEntryValue) {
 		strName = pstrEntryName;
 		strValue = pstrEntryValue;
-		// System.out.println ("SOSProfileEntry: " + pstrEntryName + " = " + pstrEntryValue);
+		logger.trace("SOSProfileEntry: " + pstrEntryName + " = " + pstrEntryValue);
 	}
 
 	@Override
 	public String toString() {
-		return (strName + "=" + strValue + "\n");
+		String strT = "";
+		if (strComment != null) {
+			strT += strComment.toString();
+		}
+		strT += strName + "=" + strValue + "\n";
+		return strT;
 	}
 
+	/**
+	 * 
+	* \brief toXML - 	
+	*
+	* \details
+	* 
+	*
+	* @return
+	* @param 
+	* @author KB
+	 */
 	public String toXML() {
 		String strT = "";
 		strT = strT.concat("<" + strName + ">\n");
-		strT = strT.concat(strValue + "\n");
+		strT = strT.concat("<![CDATA[" + strValue + "]]>\n");
 		return strT.concat("</" + strName + ">\n");
 	}
 
 	/**
-	 * @return
-	 */
-	public String Name() {
-		return strName;
-	}
-
-	/**
-	 * @return
+	 * 
+	* \brief Value - 	
+	*
+	* \details
+	* 
+	*
+	* @return
+	* @author KB
 	 */
 	public String Value() {
-		return strValue;
+		String strT = strValue;
+		return strT;
 	}
 
 	/**
-	 * @param string
+	 * 
+	* \brief Value - 	
+	*
+	* \details
+	* 
+	*
+	* @param pstrNewValue
+	* @author KB
 	 */
-	public void Name(String string) {
-		strName = string;
+	public void Value(String pstrNewValue) {
+		if (strValue.equalsIgnoreCase(pstrNewValue) == false) {
+			setDirty();
+		}
+		strValue = pstrNewValue;
 	}
 
-	/**
-	 * @param string
-	 */
-	public void Value(String string) {
-		strValue = string;
+	@Override  // IValueChangedListener
+	public void ValueHasChanged(String pstrNewValue) {
+		this.Value(pstrNewValue);
 	}
 
+	@Override  // IValueChangedListener
+	public void ValidationError(SOSValidationError pobjVE) {
+		// nothing to do
+	}
 }

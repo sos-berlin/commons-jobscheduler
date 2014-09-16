@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
  * @author KB
  *
  */
-public class SOSProfileSection {
+public class SOSProfileSection extends SOSProfileBaseClass <JSIniFile> {
 
 	@SuppressWarnings("unused")
 	private final String		conClassName	= "SOSProfileSection";
@@ -47,12 +47,11 @@ public class SOSProfileSection {
 		//
 	}
 
-	public String						strSectionName;
-	public Map<String, SOSProfileEntry>	mapEntries;
+	public Map<String, SOSProfileEntry>	mapProfileEntries;
 
 	public SOSProfileSection(String pstrSectionName) {
-		strSectionName = pstrSectionName;
-		mapEntries = new HashMap<String, SOSProfileEntry>();
+		strName = pstrSectionName;
+		mapProfileEntries = new HashMap<String, SOSProfileEntry>();
 	}
 
 	/**
@@ -72,6 +71,7 @@ public class SOSProfileSection {
 		SOSProfileEntry objPE = this.Entry(pstrEntryName);
 		if (objPE == null) {
 			objPE = new SOSProfileEntry(pstrEntryName, pstrEntryValue);
+			objPE.setObjParent(this);
 			Map<String, SOSProfileEntry> m = this.Entries();
 			m.put(pstrEntryName.toLowerCase(), objPE);
 		}
@@ -81,14 +81,22 @@ public class SOSProfileSection {
 		return objPE;
 	}
 
+	@Override
+	public boolean setDirty() {
+		this.flgIsDirty = true;
+		objParent.setDirty();
+		return flgIsDirty;
+	}
+
 	public SOSProfileEntry deleteEntry(String pstrEntryName) {
 
 		SOSProfileEntry objPE = this.Entry(pstrEntryName);
 		if (objPE == null) {
 		}
 		else {
-			Map m = this.Entries();
+			Map<String, SOSProfileEntry> m = this.Entries();
 			m.remove(pstrEntryName.toLowerCase());
+			setDirty();
 		}
 		return objPE;
 	}
@@ -97,41 +105,29 @@ public class SOSProfileSection {
 	 * @return
 	 */
 	public Map<String, SOSProfileEntry> Entries() {
-		if (mapEntries == null) {
-			mapEntries = new HashMap<String, SOSProfileEntry>();
+		if (mapProfileEntries == null) {
+			mapProfileEntries = new HashMap<String, SOSProfileEntry>();
 		}
 
-		return mapEntries;
+		return mapProfileEntries;
 	}
 
 	public SOSProfileEntry Entry(String pstrKey) {
-		return mapEntries.get(pstrKey.toLowerCase());
-	}
-
-	/**
-	 * @return
-	 */
-	public String Name() {
-		return strSectionName;
-	}
-
-	/**
-	 * @param string
-	 */
-	public void Name(String string) {
-		strSectionName = string;
+		return mapProfileEntries.get(pstrKey.toLowerCase());
 	}
 
 	@Override
 	public String toString() {
 		String strT = "";
 
-		strT = strT.concat("[" + strSectionName + "]\n");
+		if (strComment != null) {
+			strT += strComment.toString();
+		}
+		strT = strT.concat("[" + strName + "]\n");
 		return strT;
 	}
 
 	public String toXML() {
-
 		return "";
 	}
 }

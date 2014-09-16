@@ -146,16 +146,19 @@ public class SOSOptionStringWVariables extends SOSOptionElement {
 		}
 	}
 
-	@Override public String Value() {
+	@Override
+	public String Value() {
 		String strT = strValue;
 		try {
-			if (objParentClass != null) {
-				if (objParentClass.gflgSubsituteVariables == true) {
+			if (strValue != null) {
+				if (objParentClass != null && strValue != null) {
+					if (objParentClass.gflgSubsituteVariables == true) {
+						strT = doReplace();
+					}
+				}
+				else {
 					strT = doReplace();
 				}
-			}
-			else {
-				strT = doReplace();
 			}
 		}
 		catch (Exception e) {
@@ -164,8 +167,10 @@ public class SOSOptionStringWVariables extends SOSOptionElement {
 		return strT;
 	}
 
-	@Override public void Value(final String pstrStringValue) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::Value";
+	@Override
+	public void Value(final String pstrStringValue) {
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::Value";
 		strOriginalValue = pstrStringValue;
 		super.Value(pstrStringValue);
 	} // public void Value
