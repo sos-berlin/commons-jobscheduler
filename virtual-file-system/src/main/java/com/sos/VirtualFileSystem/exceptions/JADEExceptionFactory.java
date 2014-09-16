@@ -45,8 +45,7 @@ public final class JADEExceptionFactory {
 		}
 		else {
 			if (e instanceof JobSchedulerException) {
-				objJ = (JADEException) e;
-			}
+				objJ = new JADEException(e);			}
 			else {
 				objJ = new JADEException(e);
 				objJ.setExitCode(penuExitCode);
