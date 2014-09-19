@@ -1,16 +1,18 @@
 package sos.net.ssh;
-import com.sos.JSHelper.Basics.JSJobUtilities;
-import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
-import com.sos.JSHelper.Listener.JSListenerClass;
-import com.sos.JSHelper.io.Files.JSTextFile;
-import com.sos.i18n.annotation.I18NResourceBundle;
-import org.apache.log4j.Logger;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.junit.Test;
+
+import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
+import com.sos.JSHelper.Listener.JSListenerClass;
+import com.sos.JSHelper.io.Files.JSTextFile;
+import com.sos.i18n.annotation.I18NResourceBundle;
 
 /**
 * \class SOSSSHJob2Test
@@ -44,21 +46,39 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 	@SuppressWarnings({ "hiding" })
 	private static final Logger	logger			= Logger.getLogger(SOSSSHJob2Test.class);
 
+	private SOSSSHJob2 objSSH = null;
+	private SOSSSHJobOptions objOptions = null;
+	
 	public SOSSSHJob2Test() {
 		super(new SOSSSHJobOptions());
 	}
 
-	@Test
-	public void testExecute() throws Exception {
-		SOSSSHJob2 objSSH = new SOSSSHJob2();
-		SOSSSHJobOptions objOptions = objSSH.Options();
+	private void initializeClazz () {
+		objSSH = new SOSSSHJob2();
+		objOptions = objSSH.Options();
 		objSSH.setJSJobUtilites(this);
-		String strArgs[] = new String[] { "-command", "ls", "-auth_method", "password", "-host", "wilma.sos", "-auth_file", "test", "-user", "test",
-				"-password", "12345" };
-		objOptions.CommandLineArgs(strArgs);
-		// objOptions.CheckMandatory();
 		JSListenerClass.bolLogDebugInformation = true;
 		JSListenerClass.intMaxDebugLevel = 9;
+		BasicConfigurator.configure();
+		logger.setLevel(Level.DEBUG);
+	}
+	@Test
+	public void testExecute() throws Exception {
+		initializeClazz();
+		String strArgs[] = new String[] { "-command", "ls", "-auth_method", "password", "-host", "wilma.sos", "-auth_file=test", "-user=test",
+				"-password", "12345" };
+		objOptions.CommandLineArgs(strArgs);
+		objSSH.Execute();
+		assertEquals("auth_file", objOptions.auth_file.Value(), "test");
+		assertEquals("user", objOptions.user.Value(), "test");
+	}
+
+	@Test (expected=com.sos.JSHelper.Exceptions.JobSchedulerException.class)  // auth_file not found
+	public void testExecuteUsingKeyFile() throws Exception {
+		initializeClazz();
+		String strArgs[] = new String[] { "-command", "ls", "-auth_method=publickey", "-host", "wilma.sos", "-auth_file=./src/test/resources/testing-key.key", "-user", "test",
+				"-password", "12345" };
+		objOptions.CommandLineArgs(strArgs);
 		objSSH.Execute();
 		assertEquals("auth_file", objOptions.auth_file.Value(), "test");
 		assertEquals("user", objOptions.user.Value(), "test");
@@ -66,15 +86,10 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
 	@Test(expected = com.sos.JSHelper.Exceptions.JobSchedulerException.class)
 	public void testExecuteWithCC() throws Exception {
-		SOSSSHJob2 objSSH = new SOSSSHJob2();
-		SOSSSHJobOptions objOptions = objSSH.Options();
-		objSSH.setJSJobUtilites(this);
+		initializeClazz();
 		String strArgs[] = new String[] { "-command", "ls;exit 5", "-auth_method", "password", "-host", "wilma.sos", "-auth_file", "test", "-user", "kb",
 				"-password", "kb" };
 		objOptions.CommandLineArgs(strArgs);
-		// objOptions.CheckMandatory();
-		JSListenerClass.bolLogDebugInformation = true;
-		JSListenerClass.intMaxDebugLevel = 9;
 		objSSH.Execute();
 		assertEquals("auth_file", objOptions.auth_file.Value(), "test");
 		assertEquals("user", objOptions.user.Value(), "test");
@@ -83,15 +98,10 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
 	@Test
 	public void testExecuteWithCC0() throws Exception {
-		SOSSSHJob2 objSSH = new SOSSSHJob2();
-		objOptions = objSSH.Options();
-		objSSH.setJSJobUtilites(this);
+		initializeClazz();
 		String strArgs[] = new String[] { "-command", "ls hallo;exit 0", "-auth_method", "password", "-host", "wilma.sos", "-auth_file", "test", "-user",
 				"test", "-password", "12345", "-ignore_stderr", "true" };
 		objOptions.CommandLineArgs(strArgs);
-		// objOptions.CheckMandatory();
-		JSListenerClass.bolLogDebugInformation = true;
-		JSListenerClass.intMaxDebugLevel = 9;
 		objSSH.Execute();
 		assertEquals("auth_file", objOptions.auth_file.Value(), "test");
 		assertEquals("user", objOptions.user.Value(), "test");
@@ -100,15 +110,10 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
 	@Test
 	public void testExecuteWithCCAndIgnore() throws Exception {
-		SOSSSHJob2 objSSH = new SOSSSHJob2();
-		objOptions = objSSH.Options();
-		objSSH.setJSJobUtilites(this);
+		initializeClazz();
 		String strArgs[] = new String[] { "-command", "ls hallo;exit 0", "-auth_method", "password", "-host", "wilma.sos", "-auth_file", "test", "-user",
 				"test", "-password", "12345", "-ignore_stderr", "false" };
 		objOptions.CommandLineArgs(strArgs);
-		// objOptions.CheckMandatory();
-		JSListenerClass.bolLogDebugInformation = true;
-		JSListenerClass.intMaxDebugLevel = 9;
 		objSSH.Execute();
 		assertEquals("auth_file", objOptions.auth_file.Value(), "test");
 		assertEquals("user", objOptions.user.Value(), "test");
@@ -128,15 +133,10 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 	 */
 	@Test
 	public void testExecuteWithCCAndDelimiter() throws Exception {
-		SOSSSHJob2 objSSH = new SOSSSHJob2();
-		objOptions = objSSH.Options();
-		objSSH.setJSJobUtilites(this);
+		initializeClazz();
 		String strArgs[] = new String[] { "-command", "ls hallo%%exit 0", "-auth_method", "password", "-host", "wilma.sos", "-auth_file", "test", "-user",
 				"test", "-password", "12345", "-ignore_stderr", "false" };
 		objOptions.CommandLineArgs(strArgs);
-		// objOptions.CheckMandatory();
-		JSListenerClass.bolLogDebugInformation = true;
-		JSListenerClass.intMaxDebugLevel = 9;
 		objSSH.Execute();
 		assertEquals("auth_file", objOptions.auth_file.Value(), "test");
 		assertEquals("user", objOptions.user.Value(), "test");
@@ -145,17 +145,10 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
 	@Test
 	public void testExecuteCmdString() throws Exception {
-		SOSSSHJob2 objSSH = new SOSSSHJob2();
-		objSSH.registerMessageListener(this);
-		SOSSSHJobOptions objOptions = objSSH.Options();
-		objOptions.registerMessageListener(this);
-		objSSH.setJSJobUtilites(this);
+		initializeClazz();
 		String strArgs[] = new String[] { "-command_script", "ps;ls", "-auth_method", "password", "-host", "wilma.sos", "-auth_file", "test", "-user", "test",
 				"-password", "12345" };
 		objOptions.CommandLineArgs(strArgs);
-		// objOptions.CheckMandatory();
-		JSListenerClass.bolLogDebugInformation = true;
-		JSListenerClass.intMaxDebugLevel = 9;
 		objSSH.Execute();
 		assertEquals("auth_file", objOptions.auth_file.Value(), "test");
 		assertEquals("user", objOptions.user.Value(), "test");
@@ -163,16 +156,10 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
 	@Test
 	public void testExecuteCmdScriptFile() throws Exception {
-		SOSSSHJob2 objSSH = new SOSSSHJob2();
-		objSSH.registerMessageListener(this);
-		SOSSSHJobOptions objOptions = objSSH.Options();
-		objOptions.registerMessageListener(this);
-		objSSH.setJSJobUtilites(this);
+		initializeClazz();
 		String strArgs[] = new String[] { "-command_script_file", "R:/nobackup/junittests/testdata/SSH/hostname.sh", "-auth_method", "password", "-host", "wilma.sos", "-auth_file", "test",
 				"-user", "test", "-password", "12345" };
 		objOptions.CommandLineArgs(strArgs);
-		JSListenerClass.bolLogDebugInformation = true;
-		JSListenerClass.intMaxDebugLevel = 9;
 		objSSH.Execute();
 		assertEquals("auth_file", objOptions.auth_file.Value(), "test");
 		assertEquals("user", objOptions.user.Value(), "test");
@@ -181,17 +168,10 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
 	@Test
 	public void testExecuteCommands() throws Exception {
-		SOSSSHJob2 objSSH = new SOSSSHJob2();
-		objSSH.registerMessageListener(this);
-		SOSSSHJobOptions objOptions = objSSH.Options();
-		objOptions.registerMessageListener(this);
-		objSSH.setJSJobUtilites(this);
+		initializeClazz();
 		String strArgs[] = new String[] { "-command_script", "ps;ls $SCHEDULER_PARAM_test", "-auth_method", "password", "-host", "wilma.sos", "-auth_file",
 				"test", "-user", "test", "-password", "12345" };
 		objOptions.CommandLineArgs(strArgs);
-		// objOptions.CheckMandatory();
-		JSListenerClass.bolLogDebugInformation = true;
-		JSListenerClass.intMaxDebugLevel = 9;
 		objSSH.setJSJobUtilites(this);
 		objSSH.Execute();
 
@@ -205,22 +185,15 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
 	@Test
 	public void testExecuteScriptFile() throws Exception {
-		SOSSSHJob2 objSSH = new SOSSSHJob2();
-		objSSH.registerMessageListener(this);
-		SOSSSHJobOptions objOptions = objSSH.Options();
-		objOptions.registerMessageListener(this);
+		initializeClazz();
 		JSTextFile objScriptFile = new JSTextFile("t.1");
 		objScriptFile.WriteLine("ps");
 		objScriptFile.deleteOnExit();
 		objScriptFile.close();
 
-		objSSH.setJSJobUtilites(this);
 		String strArgs[] = new String[] { "-command_script_file", "t.1", "-auth_method", "password", "-host", "wilma.sos", "-auth_file", "test", "-user",
 				"test", "-password", "12345" };
 		objOptions.CommandLineArgs(strArgs);
-		// objOptions.CheckMandatory();
-		JSListenerClass.bolLogDebugInformation = true;
-		JSListenerClass.intMaxDebugLevel = 9;
 		objSSH.setJSJobUtilites(this);
 		objSSH.Execute();
 
@@ -234,58 +207,13 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
 	@Test
 	public void testSimulateShellParam() throws Exception {
-		SOSSSHJob2 objSSH = new SOSSSHJob2();
-		objSSH.registerMessageListener(this);
-		SOSSSHJobOptions objOptions = objSSH.Options();
-		objOptions.registerMessageListener(this);
-		objSSH.setJSJobUtilites(this);
+		initializeClazz();
 		String strArgs[] = new String[] { "-command", "ls", "-auth_method", "password", "-host", "wilma.sos", "-port", "22", "-user", "test", "-password",
 				"12345", "-simulate_shell", "true", "-simulate_shell_prompt_trigger", "test@wilma:~> ", "-simulate_shell_login_timeout", "100000" };
 		objOptions.CommandLineArgs(strArgs);
-		// objOptions.CheckMandatory();
-		JSListenerClass.bolLogDebugInformation = true;
-		JSListenerClass.intMaxDebugLevel = 9;
 		objSSH.Execute();
-
 	}
 
-	/**
-	 *
-	 * \brief replaceSchedulerVars
-	 *
-	 * \details
-	 *
-	 * \return void
-	 *
-	 * @param isWindows
-	 */
-//	@Override
-//	public String replaceSchedulerVars(final boolean isWindows, final String pstrString2Modify) {
-//		String strTemp = pstrString2Modify;
-//		HashMap<String, String> objJobOrOrderParams = new HashMap<String, String>();
-//		objJobOrOrderParams.put("test", ".");
-//		objJobOrOrderParams.put("test1", "value_of_test1");
-//		if (objJobOrOrderParams != null) {
-//			// logger.debug("Replacing task and order parameters...");
-//			Set<String> paramNames = objJobOrOrderParams.keySet();
-//			for (String name : paramNames) {
-//				// SignalDebug("Replacing parameter " + name);
-//				String regex = "(?i)";
-//				String strParamValue = objJobOrOrderParams.get(name);
-//				logger.debug("name = " + name + ", value " + strParamValue);
-//				if (isWindows) {
-//					regex += "%SCHEDULER_PARAM_" + name + "%";
-//				}
-//				else {
-//					regex += "\\$\\{?SCHEDULER_PARAM_" + name + "\\}?";
-//				}
-//				strTemp = myReplaceAll(strTemp, regex, strParamValue);
-//				logger.debug("String after replace = " + strTemp);
-//			}
-//		}
-//		return strTemp;
-//	}
-	
 	@Override
 	public String replaceSchedulerVars(final boolean isWindows, final String pstrString2Modify) {
 		String strTemp = pstrString2Modify;
@@ -355,26 +283,4 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 		return source.replaceAll("(?m)" + what, newReplacement);
 	}
 
-	@Override
-	public void setJSParam(final String pstrKey, final String pstrValue) {
-	}
-
-	@Override
-	public void setJSParam(final String pstrKey, final StringBuffer pstrValue) {
-	}
-
-	@Override
-	public void setJSJobUtilites(final JSJobUtilities pobjJSJobUtilities) {
-	}
-
-	@Override
-	public String getCurrentNodeName() {
-		return "";
-	}
-
-	@Override
-	public void setStateText(final String pstrStateText) {
-		// TODO Auto-generated method stub
-
-	}
 }
