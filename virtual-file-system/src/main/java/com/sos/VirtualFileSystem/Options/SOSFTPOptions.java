@@ -447,7 +447,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		getDataSourceType();
 		getDataTargetType();
 		if (CheckNotProcessedOptions.value() == true) {
-			this.CheckNotProcessedOptions();
+			this.ReportNotProcessedOptions();
 		}
 		super.CheckMandatory();
 		Source().CheckMandatory();
