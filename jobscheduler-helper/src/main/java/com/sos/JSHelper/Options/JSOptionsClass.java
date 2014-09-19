@@ -1181,7 +1181,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 
 	/**
 	 *
-	 * \brief CheckNotProcessedOptions
+	 * \brief ReportNotProcessedOptions
 	 *
 	 * \details
 	 *
@@ -1189,7 +1189,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 *
 	 * @return
 	 */
-	public boolean CheckNotProcessedOptions() {
+	public boolean ReportNotProcessedOptions() {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::CheckNotProcessedOptions";
 		boolean flgIsOK = true;
 		int intNumberOfNotProcessedOptions = 0;

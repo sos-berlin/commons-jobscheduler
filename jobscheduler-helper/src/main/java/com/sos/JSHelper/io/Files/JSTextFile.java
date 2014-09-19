@@ -80,6 +80,10 @@ public class JSTextFile extends JSFile {
 		super(pstrFileName);
 	} // public JSTextFile
 
+	public JSTextFile(String pstrPathName, String pstrFileName) {
+		super(pstrPathName, pstrFileName);
+	} // public JSTextFile
+
 	/**
 	 * 
 	 * \brief replaceString - Zeichenfolge in der Datei ersetzen durch eine andere Zeichenfolge
