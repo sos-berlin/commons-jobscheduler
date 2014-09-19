@@ -101,10 +101,17 @@
 		    <artifactId>commons-httpclient</artifactId>
 		</dependency>
 		
-        <dependency>
-		    <groupId>xalan</groupId>
-		    <artifactId>xalan</artifactId>
+    <dependency>
+	    <groupId>xalan</groupId>
+	    <artifactId>xalan</artifactId>
 		</dependency>
+
+    <dependency>
+	    <groupId>junit</groupId>
+	    <artifactId>junit</artifactId>
+	    <scope>test</scope>
+		</dependency>
+
     </dependencies>
 
 </project>
