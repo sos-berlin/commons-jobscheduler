@@ -44,7 +44,7 @@ public class SOSCTabItem extends CTabItem {
 
 	public void setComposite(final ISOSTabItem pobjComposite) {
 		setData("composite", pobjComposite);
-//		setData(pobjComposite);
+		//		setData(pobjComposite);
 		objTabComposite = pobjComposite;
 	}
 
@@ -65,13 +65,18 @@ public class SOSCTabItem extends CTabItem {
 	public void dispose() {
 		if (this.isDisposed() == false) {
 			Control objC = this.getControl();
-			if (objC != null && objC.isDisposed() == false) {
-				setChilds2Null();
-				objC.dispose();
-				objTabFolder = null;
-				objTabComposite = null;
-				//			this.dispose();
-				super.dispose();
+			if (objC != null) {
+				if (objC.isDisposed() == false) {
+					setChilds2Null();
+					objC.dispose();
+					objTabFolder = null;
+					objTabComposite = null;
+					//			this.dispose();
+					super.dispose();
+				}
+			}
+			else {
+//				throw new JobSchedulerException("CTabItem with getControl == null");
 			}
 		}
 	}
@@ -84,6 +89,7 @@ public class SOSCTabItem extends CTabItem {
 		setData(null);
 		setFont(null);
 		setComposite(null);
+		objTabFolder = null;
 		logger = null;
 	}
 

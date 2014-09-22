@@ -34,7 +34,7 @@ public class Globals {
 		Application = pobjAW;
 	}
 
-	public static boolean	flgIgnoreColors	= true;
+	public static boolean	flgIgnoreColors	= false;
 
 	public static void setStatus(final String pobjMessage) {
 		Application.setStatus(pobjMessage);

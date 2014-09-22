@@ -29,6 +29,7 @@ import com.sos.dialog.Globals;
 import com.sos.dialog.interfaces.ISOSControlProperties;
 import com.sos.dialog.interfaces.ISOSTabItem;
 import com.sos.dialog.layouts.Gridlayout;
+import com.sos.dialog.swtdesigner.SWTResourceManager;
 
 /**
  * @author KB
@@ -39,7 +40,6 @@ public class SOSCTabFolder extends CTabFolder {
 	private final String		conClassName				= this.getClass().getSimpleName();
 	@SuppressWarnings("unused")
 	private static final String	conSVNVersion				= "$Id$";
-	@SuppressWarnings("unused")
 	private final Logger		logger						= Logger.getLogger(this.getClass());
 	//	private final Vector<SOSCTabItem>	objItemList					= new Vector<SOSCTabItem>();
 	public boolean				ItemsHasClose				= true;
@@ -253,16 +253,19 @@ public class SOSCTabFolder extends CTabFolder {
 				if (objDH.isDirty()) {
 					buttonID = objDH.doSave(true);
 				}
+				else {
+					buttonID = SWT.NO;
+				}
 			}
 			switch (buttonID) {
 				case SWT.CANCEL:
 					flgDoClose = false;
 					break;
 				case SWT.YES:
-				case SWT.NO:	
+				case SWT.NO:
 					pobjTabItem.dispose();
 					logger.debug("tabitem disposed");
-					System.gc();		
+					System.gc();
 					flgDoClose = true;
 					break;
 
@@ -366,14 +369,18 @@ public class SOSCTabFolder extends CTabFolder {
 	* \return SOSCTabItem
 	*
 	 */
-	public SOSCTabItem getTabItem(final String pstrCaption) {
+	public SOSCTabItem getTabItem(final String pstrI18NKey) {
 		SOSCTabItem objTabItem = new SOSCTabItem(this, SWT.NONE);
-		MsgHandler.newMsg(pstrCaption).Control(objTabItem);
-		objTabItem.setData("key", pstrCaption);
-		objTabItem.setFont(Globals.stFontRegistry.get("tabitem-text"));
+		SOSMsgControl objMsg = MsgHandler.newMsg(pstrI18NKey);
 
+		objMsg.Control(objTabItem);
+		objTabItem.setData("key", pstrI18NKey);
+		objTabItem.setFont(Globals.stFontRegistry.get("tabitem-text"));
+		objTabItem.setImage(SWTResourceManager.getImageFromResource(objMsg.icon()));
 		objTabItem.setShowClose(ItemsHasClose);
-		Composite composite = new SOSComposite(this, SWT.NONE);
+		objTabItem.setToolTipText(objMsg.tooltip());
+		
+		Composite composite = new SOSComposite(this, SWT.None /* SWT.H_SCROLL | SWT.V_SCROLL */);
 		objTabItem.setControl(composite);
 		objTabItem.setData("composite", composite);
 		Gridlayout.set4ColumnLayout(composite);
