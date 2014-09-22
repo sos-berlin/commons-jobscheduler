@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id$ -->
+<?xml-stylesheet type="text/xsl" href="scheduler_job_documentation_v1.1.xsl"?>
+<description xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1     http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1.xsd">
+  <job name="JobSchedulerCheckExistEvents" title="Check if events exist" order="yes" tasks="1">
+    <script language="java" java_class="com.sos.jitl.eventing.JobSchedulerCheckEventsJSAdapterClass" />
+  </job>
+  <releases>
+    <release id="1.0" created="2013-11-11" modified="2013-11-11">
+      <title>Version 1.0</title>
+      <author name="Uwe Risse" email="uwe.risse@sos-berlin.com" />
+      <note language="de">
+        <div xmlns="http://www.w3.org/1999/xhtml">Initiale Auslieferung</div>
+      </note>
+      <note language="en">
+        <div xmlns="http://www.w3.org/1999/xhtml">Initial Release</div>
+      </note>
+    </release>
+  </releases>
+  <resources>
+ 
+  </resources>
+  <configuration>
+    <params id="job_parameter">
+      <param name="event_class" required="false">
+      
+        <note language="de">
+          <title>EventClassName</title>
+          <xhtml:div>
+            <p />
+          </xhtml:div>
+        </note>
+        <note language="en">
+          <title>EventClassName</title>
+          <p />
+        </note>
+      </param>
+      <param name="remote_scheduler_host" required="false">
+        <note language="de">
+          <title>RemoteSchedulerhost Host-Name</title>
+          <p> </p>
+        </note>
+        <note language="en">
+          <title>RemoteSchedulerhost Host-Name</title>
+          <p> </p>
+        </note>
+      </param>
+      <param name="remote_scheduler_port" required="false">
+        <note language="de">
+          <title>RemoteSchedulerPort Port-Nummer</title>
+          <p> </p>
+        </note>
+        <note language="en">
+          <title>RemoteSchedulerPort port number</title>
+          <p> </p>
+        </note>
+      </param>
+      
+      <param name="configuration_file" required="false">
+        <note language="de">
+          <title>ConfigurationFileName</title>
+          <xhtml:div>
+            <p>Der Name der Hibernate Konfigurationsdatei. Default ist $SCHEDULER_DATA/config/hibernate.cfg.xml</p>
+          </xhtml:div>
+        </note>
+        <note language="en">
+          <title>ConfigurationFileName</title>
+          <p>The name of the hibernate configuration file. Default is $SCHEDULER_DATA/config/hibernate.cfg.xml</p>        
+         </note>
+      </param>
+
+      <param name="event_condition" required="false">
+        <note language="de">
+          <title>EventCondition</title>
+          <xhtml:div>
+            <p>Es kann eine Bedingung für Prüfung nach Events angegeben werden. </p>
+            <p>Beispiel:  class_a.event_1:99 and not (class_b.event2 or class_b.event3) </p>
+            
+            Das Event wird mit class.id:exit_code gekennzeichnet (exit_code kann fehlen). Fehlt die class, dann wird nur nach Events mit der angegeben id gesucht. M?cherweise sind diese dann nicht mehr eindeutig.
+          </xhtml:div>
+        </note>
+        <note language="en">
+          <title>EventCondition</title>
+            <p>The condition for the check of events 
+            Example:  class_a.event_1:99 and not (class_b.event2 or class_b.event3)</p>
+            
+            The event will be identified by class.id:exit_code (exit_code is not mandatory). if class is missing, events with the given id are validd. Probably these are not unique any more.
+         </note>
+      </param>
+
+      <param name="event_exit_code" required="false">
+        <note language="de">
+          <title>ExitCode</title>
+          <xhtml:div>
+            <p>Wenn nicht event_condition für Prüfung verwendet wird, kann auch direkt mit event_id, event_class, event_scheduler_id und event_exit_code nach bestimmten Events gesucht werden. Das Ergebnis ist true, wenn es einen Event gibt, der allen angegebenen Parametern entspricht </p>
+          </xhtml:div>
+        </note>
+        <note language="en">
+          <title>ExitCode</title>
+            <p>if event_condition is not set, the parameters event_id, event_class, event_scheduler_id and event_exit_code define the criteria for the check. The check is true if there is an event with all given parameters.</p>
+         </note>
+      </param>
+
+
+      <param name="event_scheduler_id" required="false">
+        <note language="de">
+          <title>EventSchedulerId</title>
+          <xhtml:div>
+            <p>Wenn nicht event_condition für Prüfung verwendet wird, kann auch direkt mit event_id, event_class, event_scheduler_id und event_exit_code nach bestimmten Events gesucht werden. Das Ergebnis ist true, wenn es einen Event gibt, der allen angegebenen Parametern entspricht </p>
+          </xhtml:div>
+        </note>
+        <note language="en">
+          <title>ExitCode</title>
+            <p>if event_condition is not set, the parameters event_id, event_class, event_scheduler_id and event_exit_code define the criteria for the check. The check is true if there is an event with all given parameters.</p>
+         </note>
+      </param>
+      
+      <param name="event_job" required="false">
+        <note language="de">
+          <title>EventJob</title>
+          <xhtml:div>
+            <p>Wenn nicht event_condition für Prüfung verwendet wird, kann auch direkt mit event_id, event_class, event_scheduler_id, event_job und event_exit_code nach bestimmten Events gesucht werden. Das Ergebnis ist true, wenn es einen Event gibt, der allen angegebenen Parametern entspricht </p>
+          </xhtml:div>
+        </note>
+        <note language="en">
+          <title>EventJob</title>
+            <p>if event_condition is not set, the parameters event_id, event_class, event_scheduler_id, event_job and event_exit_code define the criteria for the check. The check is true if ther<p align="center"></p>e is an event with all given parameters.</p>
+         </note>
+      </param>
+      
+      <param name="event_job_chain" required="false">
+        <note language="de">
+          <title>EventJobChain</title>
+          <xhtml:div>
+            <p>Wenn nicht event_condition für Prüfung verwendet wird, kann auch direkt mit event_id, event_class, event_scheduler_id, event_job, event_job_chain und event_exit_code nach bestimmten Events gesucht werden. Das Ergebnis ist true, wenn es einen Event gibt, der allen angegebenen Parametern entspricht </p>
+          </xhtml:div>
+        </note>
+        <note language="en">
+          <title>EventJobChain</title>
+            <p>if event_condition is not set, the parameters event_id, event_class, event_scheduler_id, event_job, event_job_chain and event_exit_code define the criteria for the check. The check is true if there is an event with all given parameters.</p>
+         </note>
+      </param>
+
+      <param name="event_order_id" required="false">
+        <note language="de">
+          <title>EventOrderId</title>
+          <xhtml:div>
+            <p>Wenn nicht event_condition für Prüfung verwendet wird, kann auch direkt mit event_id, event_class, event_scheduler_id, event_job, event_job_chain, event_order_id und event_exit_code nach bestimmten Events gesucht werden. Das Ergebnis ist true, wenn es einen Event gibt, der allen angegebenen Parametern entspricht </p>
+          </xhtml:div>
+        </note>
+        <note language="en">
+          <title>EventOrderId</title>
+            <p>if event_condition is not set, the parameters event_id, event_class, event_scheduler_id, event_job, event_job_chain, event_oder_id and event_exit_code define the criteria for the check. The check is true if there is an event with all given parameters.</p>
+         </note>
+      </param>
+      
+       <param name="handle_existing_as" required="false">
+        <note language="de">
+          <xhtml:div>
+          <p>
+   Jobs des JobSchedulers können Events erzeugen, die von einer JobScheduler
+            Supervisor Instanz verarbeitet werden. Dieser Job kann prüfen ob bestimmte
+            Events existieren. Dazu verarbeitet er Aufträge, die eine Spezifikation der Events enthalten.
+            Je nach dem, ob die Events existieren oder nicht, wird
+            der Auftrag in den
+      <code>next_state</code>
+      oder in den
+      <code>error_state</code>
+      gesetzt.
+      
+      Der Parameter handle_existing_as="error|success" bzw. handle_not_existing_as="error|success" bestimmt das Verhalten des Jobs bei Existenz bzw. Nichtexistenz der spezifizierten Events. Default ist handle_existing_as="success"
+      </p>
+                </xhtml:div>
+        </note>
+        <note language="en">
+  <div xmlns="http://www.w3.org/1999/xhtml">
+  <p>
+      During job execution in a JobScheduler instance events could be created
+            that should be processed by a JobScheduler Supervisor Instance. This
+            job
+            checks if certain events exists. The job processes orders which are configured
+            with an event specification. Depending on whether these events
+            exist or
+            not the
+            order will be put into the
+      <code>next_state</code>
+      or into the
+      <code>error_state</code>.
+      
+      The parameter handle_existing_as="error|success" and handle_not_existing_as="error|succes" defines the behaviour of the job in case of existing or not existing of the specified events. The default is handle_existing_as="success"
+      </p>
+    </div>         
+    </note>
+      </param>
+      
+      
+
+    </params>
+    
+  </configuration>
+  <documentation language="de">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      Jobs des JobSchedulers können Events erzeugen, die von einer JobScheduler
+            Supervisor Instanz verarbeitet werden. Dieser Job kann prüfen ob bestimmte
+            Events existieren. Dazu verarbeitet er Aufträge, die eine Spezifikation der Events enthalten.
+            Je nach dem, ob die Events existieren oder nicht, wird
+            der Auftrag in den
+      <code>next_state</code>
+      oder in den
+      <code>error_state</code>
+      gesetzt.
+      
+      Der Parameter handle_existing_as="error|success" bzw. handle_not_existing_as="error|success" bestimmt das Verhalten des Jobs bei Existenz bzw. Nichtexistenz der spezifizierten Events. Default ist handle_existing_as="success"
+    </div>
+  </documentation>
+  <documentation language="en">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+      During job execution in a JobScheduler instance events could be created
+            that should be processed by a JobScheduler Supervisor Instance. This
+            job
+            checks if certain events exists. The job processes orders which are configured
+            with an event specification. Depending on whether these events
+            exist or
+            not the
+            order will be put into the
+      <code>next_state</code>
+      or into the
+      <code>error_state</code>.
+      
+      The parameter handle_existing_as="error|success" and handle_not_existing_as="error|succes" defines the behaviour of the job in case of existing or not existing of the specified events. The default is handle_existing_as="success"
+    </div>
+  </documentation>
+</description>
+
