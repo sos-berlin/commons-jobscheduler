@@ -18,10 +18,14 @@ import com.sos.JSHelper.io.Files.JSTextFile;
  */
 public class SOSMsg {
 	private static final String	conPropertyExtensionF1				= ".f1";
+	private static final String	conPropertyExtensionhelpKey			= ".f1";
+	private static final String	conPropertyExtensionGlobalHelp		= ".f10";
 	public static final String	conEnvironmentVariableSOS_LOCALE	= "SOS_LOCALE";
 	public static final String	conPropertyExtensionTOOLTIP			= ".tooltip";
+	public static final String	conPropertyExtensionShortText		= ".shorttext";
 	public static final String	conPropertyExtensionLABEL			= ".label";
 	public static final String	conPropertyExtensionICon			= ".icon";
+	public static final String	conPropertyExtensionAccelerator		= ".acc";
 	public static int			VerbosityLevel						= 0;
 	public enum enuMsgTypes {
 		undefined, error, info, fatal, debug, warning, text, trace, label;
@@ -94,7 +98,8 @@ public class SOSMsg {
 	}
 
 	public void toLog(final Object... pstrArgs) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::params";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::params";
 		String strT = Messages.getMsg(strMessageCode, pstrArgs);
 		strT = getFullMessage(strT);
 		Write2Log(strT);
@@ -135,16 +140,18 @@ public class SOSMsg {
 		}
 	}
 
-	public String icon () {
-		String key = strMessageCode.trim().replaceAll(" ", "").toLowerCase();
+	public String icon() {
+		String key = strMessageCode.trim().replaceAll(" ", ""); // .toLowerCase();
 		String strI = Messages.getLabel(key + conPropertyExtensionICon);
 		if (strI == null) {
 			strI = "noIcon";
 		}
 		return strI;
 	}
+
 	private String getLabel(final String pstrDefaultValue) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getLabel";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getLabel";
 		String key = strMessageCode.trim().replaceAll(" ", "");
 		try {
 			strLastMsgKey = key;
@@ -199,7 +206,8 @@ public class SOSMsg {
 	}
 
 	public String label() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::label";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::label";
 		String key = strMessageCode.trim().replaceAll(" ", "");
 		return getLabel(key);
 	}
@@ -209,7 +217,8 @@ public class SOSMsg {
 	}
 
 	public String tooltip() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::tooltip";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::tooltip";
 		try {
 			strLastMsgKey = strMessageCode;
 			String msg = Messages.getTooltip(strMessageCode + conPropertyExtensionTOOLTIP);
@@ -251,7 +260,8 @@ public class SOSMsg {
 	}
 
 	public String getF1() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getF1";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getF1";
 		String key = strMessageCode.trim().replaceAll(" ", "");
 		try {
 			String msg = Messages.getLabel(key + ".F1");
@@ -275,7 +285,8 @@ public class SOSMsg {
 	}
 
 	public String get() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::get";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::get";
 		String strT = "";
 		if (flgFullMessageReported == false) {
 			strT = getFullMessage();
@@ -287,7 +298,8 @@ public class SOSMsg {
 	} // private String get
 
 	public String get(final Exception pobjEx) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::get";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::get";
 		String strT = "";
 		String strM = pobjEx.getLocalizedMessage();
 		if (flgFullMessageReported == false) {
@@ -300,7 +312,8 @@ public class SOSMsg {
 	} // private String get
 
 	public String getFullMessage() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getFullMessage";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getFullMessage";
 		String strMsgText = Messages.getMsg(strMessageCode);
 		String strT = getFullMessage(strMsgText);
 		return strT;
@@ -338,14 +351,16 @@ public class SOSMsg {
 	 * @return
 	 */
 	public String get(final Object... pstrArgs) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::get";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::get";
 		String strT = Messages.getMsg(strMessageCode, pstrArgs);
 		strT = getFullMessage(strT);
 		return strT;
 	} // private String get
 
 	public String getFullMessage(final Object... pstrArgs) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getFullMessage";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getFullMessage";
 		boolean flgT = flgShowFullMessageText;
 		flgShowFullMessageText = true;
 		String strT = Messages.getMsg(strMessageCode, pstrArgs);
@@ -356,12 +371,14 @@ public class SOSMsg {
 	} // private String getFullMessage
 
 	public String params_(final Object... pstrArgs) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::params";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::params";
 		return Messages.getMsg(strMessageCode, pstrArgs);
 	} // private String params
 
 	public String params(final Object... pstrArgs) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::params";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::params";
 		String msg = Messages.getLabel(strMessageCode + conPropertyExtensionLABEL);
 		if (msg == null) {
 			msg = Messages.getLabel(strMessageCode.toLowerCase() + conPropertyExtensionLABEL);
@@ -381,7 +398,8 @@ public class SOSMsg {
 	} // public String params
 
 	public String params(final String[] pstrArgs) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::params";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::params";
 		String msg = Messages.getLabel(strMessageCode + conPropertyExtensionLABEL);
 		if (msg == null) {
 			msg = Messages.getLabel(strMessageCode.toLowerCase() + conPropertyExtensionLABEL);
@@ -400,7 +418,8 @@ public class SOSMsg {
 	} // private String params
 
 	public String paramsNoKey(final Object... pstrArgs) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::paramsNoKey";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::paramsNoKey";
 		return String.format(Messages.getLabel(strMessageCode), pstrArgs);
 	} // private String paramsNoKey
 
