@@ -1207,15 +1207,24 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 					if (objF.hasSubFolders() == true) {
 						flgResult = true;
 						String strCurrentPathName = this.getCurrentPath();
-						if (objF.isAbsolutPath() == true) {
-							this.cd("/");
+//						jetzt ist das immer true wenn hasSubFolders==true; also pstrPathName ein / oder \ enthaelt. Das ist zu wenig
+//						if (objF.isAbsolutPath() == true) {
+//							this.cd("/");
+//						}
+//						for (String strSubFolder : objF.getSubFolders()) {
+//							boolean flgR = checkFolder(strSubFolder);
+//							if (flgR == false) {
+//								break;
+//							}
+//						}
+						
+						try {
+							this.cd(pstrPathName);
 						}
-						for (String strSubFolder : objF.getSubFolders()) {
-							boolean flgR = checkFolder(strSubFolder);
-							if (flgR == false) {
-								break;
-							}
+						catch(JobSchedulerException je) {
+							flgResult = false;
 						}
+						
 						this.cd(strCurrentPathName);
 					}
 					else { // single foldername, relative to the current folder
