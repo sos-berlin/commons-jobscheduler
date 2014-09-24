@@ -194,7 +194,7 @@ public class JSOptionValueList extends SOSOptionString {
 			strT = strValueList[0];
 		}
 		else {  //JITL-93 oh 27.06.14, sonst bleibt strValueList = [init_value] nach Constructor-Aufruf 
-			strValueList = new String[] { pstrValueList };
+//			strValueList = new String[] { pstrValueList };
 		}
 		super.Value(strT);
 		// return void;

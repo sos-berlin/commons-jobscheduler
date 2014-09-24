@@ -43,17 +43,12 @@ public class SOSOptionJadeOperation extends SOSOptionStringValueList {
 
 	private enuJadeOperations	enuTT				= enuJadeOperations.undefined;
 
-
 	public static enum enuJadeOperations {
 		send, /* old style: from localhost to target-host */
 		receive, /* old style: from remote-host to localhost */
 		copy, move, delete, undefined, rename, zip, getlist // get the list of filenames only
-		, sendusingdmz
-		, receiveusingdmz
-		, copytointernet
-		, copyfrominternet
-		, remove  /* alias for "delete"
-		/* */;
+		, sendusingdmz, receiveusingdmz, copytointernet, copyfrominternet, remove /* alias for "delete"
+																					/* */;
 
 		public String Text() {
 			String strT = this.name();
@@ -73,15 +68,15 @@ public class SOSOptionJadeOperation extends SOSOptionStringValueList {
 	 * @param pstrDefaultValue
 	 * @param pflgIsMandatory
 	 */
-	public SOSOptionJadeOperation(final JSOptionsClass pobjParent, final String pstrKey, final String pstrDescription, final String pstrValue, final String pstrDefaultValue,
-			final boolean pflgIsMandatory) {
+	public SOSOptionJadeOperation(final JSOptionsClass pobjParent, final String pstrKey, final String pstrDescription, final String pstrValue,
+			final String pstrDefaultValue, final boolean pflgIsMandatory) {
 		super(pobjParent, pstrKey, pstrDescription, pstrValue, pstrDefaultValue, pflgIsMandatory);
 
 		String strT = "";
 		for (enuJadeOperations enuT : enuJadeOperations.values()) {
 			strT += enuT.Text() + ";";
 		}
-		this.createValueList(strT.substring(0, strT.length()-1));
+		this.createValueList(strT.substring(0, strT.length() - 1));
 	}
 
 	public void Value(final enuJadeOperations penuOperation) {
@@ -106,12 +101,12 @@ public class SOSOptionJadeOperation extends SOSOptionStringValueList {
 	public void Value(final String pstrValue) {
 
 		boolean flgOperationIsValid = false;
-		if (pstrValue == null){
+		if (pstrValue == null) {
 			throw new JobSchedulerException("illegal parameter value: null");
 		}
-		
+
 		if (pstrValue != null) {
-			for (enuJadeOperations enuT  : enuJadeOperations.values()) {
+			for (enuJadeOperations enuT : enuJadeOperations.values()) {
 				if (enuT.name().equalsIgnoreCase(pstrValue)) {
 					this.Value(enuT);
 					flgOperationIsValid = true;
@@ -177,7 +172,6 @@ public class SOSOptionJadeOperation extends SOSOptionStringValueList {
 		return enuT == enuJadeOperations.receiveusingdmz;
 	} // private boolean isOperationReceiveUsingDMZ
 
-
 	public boolean isOperationReceive() {
 
 		@SuppressWarnings("unused")
@@ -217,5 +211,16 @@ public class SOSOptionJadeOperation extends SOSOptionStringValueList {
 
 		return enuT == enuJadeOperations.getlist;
 	} // private boolean isOperationGetList
+
+	public boolean isOperationDelete() {
+		enuJadeOperations enuT = this.value();
+		return enuT == enuJadeOperations.delete;
+	}
+
+
+	public boolean isOperationRename() {
+		enuJadeOperations enuT = this.value();
+		return enuT == enuJadeOperations.rename;
+	}
 
 }

@@ -189,6 +189,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 			strT += "\nValue is mandatory\n";
 		}
 		strT = strT + "\nType = " + getClass().getName();
+		strT = strT + "\nDefault = " + strDefaultValue;
 		// TODO add Valuelist
 		String[] strVL = getValueList();
 		if (strVL.length > 0) {
@@ -1214,18 +1215,26 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 				// logger.debug(Messages.getMsg(this.conChangedMsg, this.strValue, strTemp, this.strTitle));
 				// }
 				// this.SignalDebug(String.format(this.conChangedMsg, this.strValue, strTemp, this.strTitle));
-				Properties objP = objParentClass.getTextProperties();
-				objP.put(getShortKey(), pstrValue);
-				this.setProtected(false);
+				if (pstrValue.equalsIgnoreCase(strValue) == false) {
+					Properties objP = objParentClass.getTextProperties();
+					objP.put(getShortKey(), pstrValue);
+					this.setProtected(false);
+				}
 			}
-			strValue = pstrValue;
+			changeValue(pstrValue);
 		}
 		else {
-			strValue = "";
+			changeValue("");
 		}
 		// logger.debug(conClassName + ", key = " + strKey + ", value = " + strValue);
-		flgIsDirty = true;
-		raiseValueChangedListener();
+	}
+
+	private void changeValue(final String pstrValue) {
+		if (pstrValue != null && pstrValue.equalsIgnoreCase(strValue) == false) {
+			strValue = pstrValue;
+			flgIsDirty = true;
+			raiseValueChangedListener();
+		}
 	}
 
 	/**

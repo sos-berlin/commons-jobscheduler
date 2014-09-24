@@ -94,6 +94,13 @@ public class SOSOptionTransferType extends SOSOptionStringValueList {
 			return flgT;
 		}
 	}
+	
+	public boolean needConnectionData () {
+		boolean flgR = true;
+		flgR = needPortNumber();
+		return flgR;
+		
+	}
 	public class SOSTransferTypeException extends JobSchedulerException {
 		private static final long	serialVersionUID	= -738287289757042422L;
 
