@@ -20,4 +20,7 @@ public interface IDialogActionHandler {
 	public void doClose ();
 
 	public void setDialogActionHandler (final IDialogActionHandler pobjDialogActionHandler);
+	
+	public boolean doValidation() ;
+	
 }

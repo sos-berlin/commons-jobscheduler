@@ -76,17 +76,19 @@ public class SOSCTabItem extends CTabItem {
 				}
 			}
 			else {
-//				throw new JobSchedulerException("CTabItem with getControl == null");
+				//				throw new JobSchedulerException("CTabItem with getControl == null");
 			}
 		}
 	}
 
 	public void setChilds2Null() {
 		setData("composite", null);
-		this.setImage(null);
 		setData("key", null);
-		setControl(null);
 		setData(null);
+		this.setImage(null);
+		if (getControl().isDisposed() == false && this.isDisposed() == false) {
+			setControl(null);
+		}
 		setFont(null);
 		setComposite(null);
 		objTabFolder = null;
