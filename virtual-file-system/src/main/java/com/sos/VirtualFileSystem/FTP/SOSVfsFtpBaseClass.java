@@ -1197,7 +1197,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 		boolean flgResult = false;
 		SOSOptionFolderName objF = new SOSOptionFolderName(pstrPathName);
 		
-		if (objF.isNotHiddenFile() == true) {  // problematisch, wenn nur "." als
+//		if (objF.isNotHiddenFile() == true) {  // problematisch, wenn nur "." als
 			try {
 				Boolean flgFound = objDirectoriesFound.get(pstrPathName);
 				if (flgFound != null && flgFound == true) { // checked before
@@ -1236,7 +1236,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 			catch (IOException e) {
 				throw new JobSchedulerException(e);
 			}
-		}
+//		}
 		return flgResult;
 	}
 
