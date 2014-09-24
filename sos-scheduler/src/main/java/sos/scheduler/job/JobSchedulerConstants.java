@@ -7,4 +7,7 @@ public class JobSchedulerConstants {
 
 	public static final String  JobSchedulerLogFileNameExtension = ".log";
 	public static final String  JobSchedulerLogFileName = "scheduler" + JobSchedulerLogFileNameExtension;
+	
+	public static final String			conOrderParameterSCHEDULER_FILE_PATH							= "scheduler_file_path";
+
 }

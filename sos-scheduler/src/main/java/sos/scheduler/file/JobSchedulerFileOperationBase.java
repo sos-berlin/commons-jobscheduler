@@ -19,6 +19,7 @@ import static com.sos.scheduler.messages.JSMessages.JSJ_I_0040;
 import static com.sos.scheduler.messages.JSMessages.JSJ_I_0090;
 import static com.sos.scheduler.messages.JSMessages.JSJ_T_0010;
 import static com.sos.scheduler.messages.JSMessages.JSJ_W_0043;
+import static sos.scheduler.job.JobSchedulerConstants.conOrderParameterSCHEDULER_FILE_PATH;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -46,12 +47,10 @@ import com.sos.JSHelper.Options.SOSOptionTime;
 import com.sos.JSHelper.io.SOSFileSystemOperations;
 import com.sos.JSHelper.io.Files.JSTextFile;
 import com.sos.i18n.annotation.I18NResourceBundle;
-
 /**
  */
 @I18NResourceBundle(baseName = "com_sos_scheduler_messages", defaultLocale = "en")
 public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
-	private static final String			conOrderParameterSCHEDULER_FILE_PATH							= "scheduler_file_path";
 	private static final String			conOrderParameterSCHEDULER_FILE_PARENT							= "scheduler_file_parent";
 	private static final String			conOrderParameterSCHEDULER_FILE_NAME							= "scheduler_file_name";
 	public static final String			conOrderParameterSCHEDULER_SOS_FILE_OPERATIONS_RESULT_SET		= "scheduler_SOSFileOperations_ResultSet";

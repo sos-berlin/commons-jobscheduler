@@ -5,6 +5,7 @@ import java.io.File;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -19,7 +20,6 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.wb.swt.SWTResourceManager;
 
 import sos.scheduler.InstallationService.batchInstallationModel.JSInstallations;
 import sos.scheduler.InstallationService.batchInstallationModel.JSinstallation;
@@ -99,7 +99,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 	private Text edSSHCommand;
 	
 	@SuppressWarnings("unused")
-	private JSBatchInstaller jsBatchInstaller	= null;
+	private final JSBatchInstaller jsBatchInstaller	= null;
 
  
 
@@ -139,14 +139,14 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 	 */
 	private void createContents() {
 		shlJobSchedulerAgent = new Shell(getParent(), getStyle());
-		shlJobSchedulerAgent.setBackground(SWTResourceManager.getColor(SWT.COLOR_INFO_BACKGROUND));
+		shlJobSchedulerAgent.setBackground(getSystemColor(SWT.COLOR_INFO_BACKGROUND));
 		shlJobSchedulerAgent.setSize(1018, 712);
 		shlJobSchedulerAgent.setText("Job Scheduler Agent Batch Installer");
 		shlJobSchedulerAgent.setLayout(new GridLayout(3, false));
 		
 		Group gpButtons = new Group(shlJobSchedulerAgent, SWT.NONE);
-		gpButtons.setForeground(SWTResourceManager.getColor(SWT.COLOR_INFO_BACKGROUND));
-		gpButtons.setBackground(SWTResourceManager.getColor(SWT.COLOR_INFO_BACKGROUND));
+		gpButtons.setForeground(getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+		gpButtons.setBackground(getSystemColor(SWT.COLOR_INFO_BACKGROUND));
 		gpButtons.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false, 3, 1));
 		GridLayout gl_gpButtons = new GridLayout(3, false);
 		gl_gpButtons.horizontalSpacing = 9;
@@ -166,12 +166,12 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		
 		Group gpGlobalSettings = new Group(shlJobSchedulerAgent, SWT.NONE);
 		gpGlobalSettings.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
-		gpGlobalSettings.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
+		gpGlobalSettings.setBackground(getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
 		gpGlobalSettings.setLayout(new GridLayout(2, false));
 		gpGlobalSettings.setText("Gobal Settings");
 		
 		Label lblSchedulerId = new Label(gpGlobalSettings, SWT.NONE);
-		lblSchedulerId.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
+		lblSchedulerId.setBackground(getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
 		lblSchedulerId.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblSchedulerId.setText("Scheduler ID");
 		
@@ -185,7 +185,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		
 		Label lblNewLabel_2 = new Label(gpGlobalSettings, SWT.NONE);
 		lblNewLabel_2.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblNewLabel_2.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
+		lblNewLabel_2.setBackground(getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
 		lblNewLabel_2.setBounds(0, 0, 49, 13);
 		lblNewLabel_2.setText("Port");
 		
@@ -194,7 +194,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		
 		Label lblNewLabel_3 = new Label(gpGlobalSettings, SWT.NONE);
 		lblNewLabel_3.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblNewLabel_3.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
+		lblNewLabel_3.setBackground(getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
 		lblNewLabel_3.setText("Licence Key");
 		
 		edGlobalLicenceKey = new Text(gpGlobalSettings, SWT.BORDER);
@@ -202,7 +202,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		
 		Label lblNewLabel_4 = new Label(gpGlobalSettings, SWT.NONE);
 		lblNewLabel_4.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblNewLabel_4.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
+		lblNewLabel_4.setBackground(getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
 		lblNewLabel_4.setText("Licence Type");
 		
 		Combo cbGlobalLicenceType = new Combo(gpGlobalSettings, SWT.NONE);
@@ -212,7 +212,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		
 		Label lblNewLabel_5 = new Label(gpGlobalSettings, SWT.NONE);
 		lblNewLabel_5.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblNewLabel_5.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
+		lblNewLabel_5.setBackground(getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
 		lblNewLabel_5.setText("Allowed Hosts");
 		
 		edGlobalAllowedHosts = new Text(gpGlobalSettings, SWT.BORDER);
@@ -220,7 +220,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		
 		Label lblNewLabel_6 = new Label(gpGlobalSettings, SWT.NONE);
 		lblNewLabel_6.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblNewLabel_6.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
+		lblNewLabel_6.setBackground(getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
 		lblNewLabel_6.setText("Install Path");
 		
 		edGlobalInstallPath = new Text(gpGlobalSettings, SWT.BORDER);
@@ -228,7 +228,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		
 		Label lblNewLabel_7 = new Label(gpGlobalSettings, SWT.NONE);
 		lblNewLabel_7.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblNewLabel_7.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
+		lblNewLabel_7.setBackground(getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT));
 		lblNewLabel_7.setText("Configuration Path");
 		
 		edGlobalConfigurationPath = new Text(gpGlobalSettings, SWT.BORDER);
@@ -237,7 +237,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		new Label(gpGlobalSettings, SWT.NONE);
 		
 		TabFolder tabFolder = new TabFolder(gpGlobalSettings, SWT.NONE);
-		tabFolder.setBackground(SWTResourceManager.getColor(SWT.COLOR_INFO_BACKGROUND));
+		tabFolder.setBackground(getSystemColor(SWT.COLOR_INFO_BACKGROUND));
 		GridData gd_tabFolder = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
 		gd_tabFolder.heightHint = 251;
 		tabFolder.setLayoutData(gd_tabFolder);
@@ -247,12 +247,12 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		tbtmFtp.setText("FTP");
 		
 		Group group = new Group(tabFolder, SWT.NONE);
-		group.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		group.setBackground(getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		tbtmFtp.setControl(group);
 		group.setLayout(new GridLayout(2, false));
 		
 		Label lblPort = new Label(group, SWT.NONE);
-		lblPort.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		lblPort.setBackground(getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		lblPort.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblPort.setText("Port");
 		
@@ -267,7 +267,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		edGlobalFTPUser.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		
 		Label lblNewLabel_9 = new Label(group, SWT.NONE);
-		lblNewLabel_9.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		lblNewLabel_9.setBackground(getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		lblNewLabel_9.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblNewLabel_9.setText("Password");
 		
@@ -275,7 +275,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		edGlobalFTPPassword.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		
 		Label lblLocalDir = new Label(group, SWT.NONE);
-		lblLocalDir.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		lblLocalDir.setBackground(getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		lblLocalDir.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblLocalDir.setText("Local dir");
 		
@@ -283,7 +283,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		edGlobalFTPLocalDir.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		
 		Label lblRemoteDir = new Label(group, SWT.NONE);
-		lblRemoteDir.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		lblRemoteDir.setBackground(getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		lblRemoteDir.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblRemoteDir.setText("Remote dir");
 		
@@ -294,12 +294,12 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		tbtmSsh.setText("SSH");
 		
 		Group group_1 = new Group(tabFolder, SWT.NONE);
-		group_1.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		group_1.setBackground(getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		tbtmSsh.setControl(group_1);
 		group_1.setLayout(new GridLayout(2, false));
 		
 		Label lblPort_1 = new Label(group_1, SWT.NONE);
-		lblPort_1.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		lblPort_1.setBackground(getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		lblPort_1.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblPort_1.setText("Port");
 		
@@ -307,7 +307,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		edGlobalSSHPort.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		
 		Label lblNewLabel_11 = new Label(group_1, SWT.NONE);
-		lblNewLabel_11.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		lblNewLabel_11.setBackground(getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		lblNewLabel_11.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblNewLabel_11.setText("User");
 		
@@ -315,7 +315,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		edGlobalSSHUser.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		
 		Label lblAuthMethod = new Label(group_1, SWT.NONE);
-		lblAuthMethod.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		lblAuthMethod.setBackground(getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		lblAuthMethod.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblAuthMethod.setText("Auth method");
 		
@@ -324,7 +324,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		edGlobalSSHAuthMethod.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		
 		Label lblNewLabel_12 = new Label(group_1, SWT.NONE);
-		lblNewLabel_12.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		lblNewLabel_12.setBackground(getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		lblNewLabel_12.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblNewLabel_12.setText("Auth file");
 		
@@ -332,7 +332,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		edGlobalSSHAuthFile.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		
 		Label lblPassword = new Label(group_1, SWT.NONE);
-		lblPassword.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		lblPassword.setBackground(getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		lblPassword.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblPassword.setText("Password");
 		
@@ -340,7 +340,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		edGlobalSSHPassword.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		
 		Label lblSudopwd = new Label(group_1, SWT.NONE);
-		lblSudopwd.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		lblSudopwd.setBackground(getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		lblSudopwd.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblSudopwd.setText("SudoPwd");
 		
@@ -359,13 +359,13 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		Group gpInstallationItem = new Group(shlJobSchedulerAgent, SWT.NONE);
 		gpInstallationItem.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, false, false, 1, 1));
 		gpInstallationItem.setText("Installation Item");
-		gpInstallationItem.setBackground(SWTResourceManager.getColor(SWT.COLOR_INFO_BACKGROUND));
+		gpInstallationItem.setBackground(getSystemColor(SWT.COLOR_INFO_BACKGROUND));
 		gpInstallationItem.setLayout(new GridLayout(2, false));
 		
 		Label label = new Label(gpInstallationItem, SWT.NONE);
 		label.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		label.setText("Scheduler ID");
-		label.setBackground(SWTResourceManager.getColor(SWT.COLOR_INFO_BACKGROUND));
+		label.setBackground(getSystemColor(SWT.COLOR_INFO_BACKGROUND));
 		
 		edSchedulerId = new Text(gpInstallationItem, SWT.BORDER);
 		GridData gd_edSchedulerId = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
@@ -375,7 +375,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		Label label_1 = new Label(gpInstallationItem, SWT.NONE);
 		label_1.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		label_1.setText("Host");
-		label_1.setBackground(SWTResourceManager.getColor(SWT.COLOR_INFO_BACKGROUND));
+		label_1.setBackground(getSystemColor(SWT.COLOR_INFO_BACKGROUND));
 		
 		edHost = new Text(gpInstallationItem, SWT.BORDER);
 		edHost.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -383,7 +383,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		Label label_2 = new Label(gpInstallationItem, SWT.NONE);
 		label_2.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		label_2.setText("Port");
-		label_2.setBackground(SWTResourceManager.getColor(SWT.COLOR_INFO_BACKGROUND));
+		label_2.setBackground(getSystemColor(SWT.COLOR_INFO_BACKGROUND));
 		
 		edPort = new Text(gpInstallationItem, SWT.BORDER);
 		edPort.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -391,7 +391,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		Label label_3 = new Label(gpInstallationItem, SWT.NONE);
 		label_3.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		label_3.setText("Licence Key");
-		label_3.setBackground(SWTResourceManager.getColor(SWT.COLOR_INFO_BACKGROUND));
+		label_3.setBackground(getSystemColor(SWT.COLOR_INFO_BACKGROUND));
 		
 		edLicenceKey = new Text(gpInstallationItem, SWT.BORDER);
 		edLicenceKey.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -399,7 +399,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		Label label_4 = new Label(gpInstallationItem, SWT.NONE);
 		label_4.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		label_4.setText("Licence Type");
-		label_4.setBackground(SWTResourceManager.getColor(SWT.COLOR_INFO_BACKGROUND));
+		label_4.setBackground(getSystemColor(SWT.COLOR_INFO_BACKGROUND));
 		
 		Combo cbLicenceTyp = new Combo(gpInstallationItem, SWT.NONE);
 		cbLicenceTyp.setVisibleItemCount(2);
@@ -409,7 +409,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		Label label_5 = new Label(gpInstallationItem, SWT.NONE);
 		label_5.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		label_5.setText("Allowed Hosts");
-		label_5.setBackground(SWTResourceManager.getColor(SWT.COLOR_INFO_BACKGROUND));
+		label_5.setBackground(getSystemColor(SWT.COLOR_INFO_BACKGROUND));
 		
 		edAllowedHosts = new Text(gpInstallationItem, SWT.BORDER);
 		edAllowedHosts.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -417,7 +417,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		Label label_6 = new Label(gpInstallationItem, SWT.NONE);
 		label_6.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		label_6.setText("Install Path");
-		label_6.setBackground(SWTResourceManager.getColor(SWT.COLOR_INFO_BACKGROUND));
+		label_6.setBackground(getSystemColor(SWT.COLOR_INFO_BACKGROUND));
 		
 		edInstallPath = new Text(gpInstallationItem, SWT.BORDER);
 		edInstallPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -425,7 +425,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		Label label_7 = new Label(gpInstallationItem, SWT.NONE);
 		label_7.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		label_7.setText("Configuration Path");
-		label_7.setBackground(SWTResourceManager.getColor(SWT.COLOR_INFO_BACKGROUND));
+		label_7.setBackground(getSystemColor(SWT.COLOR_INFO_BACKGROUND));
 		
 		edConfigurationPath = new Text(gpInstallationItem, SWT.BORDER);
 		edConfigurationPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -436,21 +436,21 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		GridData gd_tabFolder_1 = new GridData(SWT.FILL, SWT.CENTER, false, false, 2, 1);
 		gd_tabFolder_1.heightHint = 251;
 		tabFolder_1.setLayoutData(gd_tabFolder_1);
-		tabFolder_1.setBackground(SWTResourceManager.getColor(SWT.COLOR_INFO_BACKGROUND));
+		tabFolder_1.setBackground(getSystemColor(SWT.COLOR_INFO_BACKGROUND));
 		
 		 
 		TabItem tbtmFtp_1 = new TabItem(tabFolder_1, SWT.NONE);
 		tbtmFtp_1.setText("FTP");
 		
 		Group group_3 = new Group(tabFolder_1, SWT.NONE);
-		group_3.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		group_3.setBackground(getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		tbtmFtp_1.setControl(group_3);
 		group_3.setLayout(new GridLayout(2, false));
 		
 		Label label_8 = new Label(group_3, SWT.NONE);
 		label_8.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		label_8.setText("Host");
-		label_8.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		label_8.setBackground(getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		
 		edFTPHost = new Text(group_3, SWT.BORDER);
 		edFTPHost.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -458,7 +458,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		Label label_9 = new Label(group_3, SWT.NONE);
 		label_9.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		label_9.setText("Port");
-		label_9.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		label_9.setBackground(getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		
 		edFTPPort = new Text(group_3, SWT.BORDER);
 		edFTPPort.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -473,7 +473,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		Label label_11 = new Label(group_3, SWT.NONE);
 		label_11.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		label_11.setText("Password");
-		label_11.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		label_11.setBackground(getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		
 		edFTPPassword = new Text(group_3, SWT.BORDER | SWT.PASSWORD);
 		edFTPPassword.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -481,7 +481,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		Label label_12 = new Label(group_3, SWT.NONE);
 		label_12.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		label_12.setText("Local dir");
-		label_12.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		label_12.setBackground(getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		
 		edFTPLocalDir = new Text(group_3, SWT.BORDER);
 		edFTPLocalDir.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -489,7 +489,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		Label label_13 = new Label(group_3, SWT.NONE);
 		label_13.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		label_13.setText("Remote dir");
-		label_13.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		label_13.setBackground(getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		
 		edFTPRemoteDir = new Text(group_3, SWT.BORDER);
 		edFTPRemoteDir.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -498,14 +498,14 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		tbtmSsh_1.setText("SSH");
 		
 		Group group_4 = new Group(tabFolder_1, SWT.NONE);
-		group_4.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		group_4.setBackground(getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		tbtmSsh_1.setControl(group_4);
 		group_4.setLayout(new GridLayout(2, false));
 		
 		Label label_14 = new Label(group_4, SWT.NONE);
 		label_14.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		label_14.setText("Host");
-		label_14.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		label_14.setBackground(getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		
 		edSSHHost = new Text(group_4, SWT.BORDER);
 		edSSHHost.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -513,7 +513,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		Label label_15 = new Label(group_4, SWT.NONE);
 		label_15.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		label_15.setText("Port");
-		label_15.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		label_15.setBackground(getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		
 		edSSHPort = new Text(group_4, SWT.BORDER);
 		edSSHPort.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -521,7 +521,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		Label label_16 = new Label(group_4, SWT.NONE);
 		label_16.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		label_16.setText("User");
-		label_16.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		label_16.setBackground(getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		
 		edSSHUser = new Text(group_4, SWT.BORDER);
 		edSSHUser.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -529,7 +529,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		Label label_17 = new Label(group_4, SWT.NONE);
 		label_17.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		label_17.setText("Auth method");
-		label_17.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		label_17.setBackground(getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		
 		Combo edSSHAuthMethod = new Combo(group_4, SWT.NONE);
 		edSSHAuthMethod.setItems(new String[] {"password", "publickey"});
@@ -538,7 +538,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		Label label_18 = new Label(group_4, SWT.NONE);
 		label_18.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		label_18.setText("Auth file");
-		label_18.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		label_18.setBackground(getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		
 		edSSHAuthFile = new Text(group_4, SWT.BORDER);
 		edSSHAuthFile.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -546,7 +546,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		Label label_19 = new Label(group_4, SWT.NONE);
 		label_19.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		label_19.setText("Password");
-		label_19.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		label_19.setBackground(getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		
 		edSSHPassword = new Text(group_4, SWT.BORDER | SWT.PASSWORD);
 		edSSHPassword.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -554,7 +554,7 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		Label label_20 = new Label(group_4, SWT.NONE);
 		label_20.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		label_20.setText("SudoPwd");
-		label_20.setBackground(SWTResourceManager.getColor(SWT.COLOR_LIST_BACKGROUND));
+		label_20.setBackground(getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 		
 		edSSHSudoPassword = new Text(group_4, SWT.BORDER | SWT.PASSWORD);
 		GridData gd_edSSHSudoPassword = new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1);
@@ -604,7 +604,13 @@ public class JSBatchInstallerConfigurationEditor extends Dialog {
 		
  
 	}
-	
+
+	private final Display display = Display.getCurrent();
+
+	public Color getSystemColor(int systemColorID) {
+		return display.getSystemColor(systemColorID);
+	}
+
 	private void setText(Text t, String value) {
 		if (value == null){
 			value="";
