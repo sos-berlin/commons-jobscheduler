@@ -1067,25 +1067,25 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			objT.host.Value(SOSOptionHostName.conLocalHostName);
 			objT.port.value(0);
 			objT.protocol.Value(strDataSourceType);
-			objT.user = user;
-			objT.password = password;
-			objT.ssh_auth_file = ssh_auth_file;
-			objT.ssh_auth_method = ssh_auth_method;
-			objT.passive_mode = passive_mode;
+			objT.user.Set(user);
+			objT.password.Set(password);
+			objT.ssh_auth_file.Set(ssh_auth_file);
+			objT.ssh_auth_method.Set(ssh_auth_method);
+			objT.passive_mode.Set(passive_mode);
 			objT = this.getConnectionOptions().Target();
-			objT.host = host;
-			objT.port = port;
-			objT.protocol = protocol;
-			objT.user = user;
-			objT.password = password;
-			objT.ssh_auth_file = ssh_auth_file;
-			objT.ssh_auth_method = ssh_auth_method;
-			objT.passive_mode = passive_mode;
+			objT.host.Set(host);
+			objT.port.Set(port);
+			objT.protocol.Set(protocol);
+			objT.user.Set(user);
+			objT.password.Set(password);
+			objT.ssh_auth_file.Set(ssh_auth_file);
+			objT.ssh_auth_method.Set(ssh_auth_method);
+			objT.passive_mode.Set(passive_mode);
 			SOSConnection2OptionsSuperClass objAlt = objT.Alternatives();
-			objAlt.host.Value(alternative_host.Value());
-			objAlt.port.value(alternative_port.value());
-			objAlt.protocol.Value(protocol.Value());
-			objT.passive_mode.Value(alternative_passive_mode.Value());
+			objAlt.host.Set(alternative_host);
+			objAlt.port.Set(alternative_port);
+			objAlt.protocol.Set(protocol);
+			objT.passive_mode.Set(alternative_passive_mode);
 		}
 		else {
 			if (operation.Value().equalsIgnoreCase(conOperationRECEIVE)) {
@@ -1095,19 +1095,19 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 				}
 				changeDirValues4Receive();
 				SOSConnection2OptionsAlternate objT = this.getConnectionOptions().Source();
-				objT.host.Value(host.Value());
-				objT.port.value(port.value());
-				objT.protocol.Value(protocol.Value());
-				objT.passive_mode.Value(passive_mode.Value());
-				objT.user = user;
-				objT.password = password;
-				objT.ssh_auth_file = ssh_auth_file;
-				objT.ssh_auth_method = ssh_auth_method;
+				objT.host.Set(host);
+				objT.port.Set(port);
+				objT.protocol.Set(protocol);
+				objT.passive_mode.Set(passive_mode);
+				objT.user.Set(user);
+				objT.password.Set(password);
+				objT.ssh_auth_file.Set(ssh_auth_file);
+				objT.ssh_auth_method.Set(ssh_auth_method);
 				SOSConnection2OptionsSuperClass objAlt = objT.Alternatives();
-				objAlt.host.Value(alternative_host.Value());
-				objAlt.port.value(alternative_port.value());
-				objAlt.protocol.Value(protocol.Value());
-				objT.passive_mode.Value(alternative_passive_mode.Value());
+				objAlt.host.Set(alternative_host);
+				objAlt.port.Set(alternative_port);
+				objAlt.protocol.Set(protocol);
+				objT.passive_mode.Set(alternative_passive_mode);
 			}
 			else {
 				strDataSourceType = this.getConnectionOptions().Source().protocol.Value();

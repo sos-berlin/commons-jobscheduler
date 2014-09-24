@@ -271,7 +271,7 @@ public class SOSVfsFtpBaseClass2 extends SOSVfsFtpBaseClass implements ISOSVfsFi
 		}
 		catch (IOException e1) {
 			e1.printStackTrace();
-			throw new JobSchedulerException("listfiles failed");
+			throw new JobSchedulerException("listfiles failed", e1);
 		}
 
 		if (objFTPFileList == null || objFTPFileList.length <= 0) {
