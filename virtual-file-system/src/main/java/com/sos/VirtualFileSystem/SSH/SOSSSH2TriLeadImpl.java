@@ -68,7 +68,7 @@ import com.trilead.ssh2.StreamGobbler;
 *
 * Created on 16.05.2010 19:17:53
  */
-
+ 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, ISOSVFSHandler, ISOSVirtualFileSystem, ISOSConnection, ISOSSession {
 
@@ -82,6 +82,7 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 	public SOSSSH2TriLeadImpl() {
 		//
 	}
+	
 	private ISOSConnectionOptions		objCO					= null;
 	private ISOSAuthenticationOptions	objAO					= null;
 	private ISOSShellOptions			objSO					= null;
@@ -1024,6 +1025,10 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 
 	@Override
 	public Integer getExitCode() {
+	    if (exitStatus == null) {
+            throw new RuntimeException( "Error reading exit code from SSH-Server. No exit code is available.");
+        }
+
 		return exitStatus;
 	}
 
