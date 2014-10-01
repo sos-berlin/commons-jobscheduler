@@ -183,7 +183,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 
 	public SOSFTPOptions() {
 		super();
-		//
+		getMailOptions();  // initialize
 	}
 
 	public SOSSmtpMailOptions getMailOptions() {
@@ -824,6 +824,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		objAllParams.putAll(pobjProps);
 	}
 
+	@SuppressWarnings("el-syntax")
 	private boolean hasVariableToSubstitute(final String pstrValue) {
 		boolean flgResult = false;
 		if (pstrValue.indexOf("${") != -1 || pstrValue.indexOf("%{") != -1) {
