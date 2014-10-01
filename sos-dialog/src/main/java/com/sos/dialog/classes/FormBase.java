@@ -2,10 +2,11 @@ package com.sos.dialog.classes;
 
   
  
-import java.util.Arrays;
-import java.util.List;
+import static com.sos.dialog.swtdesigner.SWTResourceManager.getCursor;
 
-import org.apache.log4j.Logger; 
+import java.util.Arrays;
+
+import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.layout.GridData;
@@ -19,6 +20,7 @@ import org.eclipse.swt.widgets.TableItem;
 
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.dialog.comparators.SortBaseComparator;
+//import com.sos.dialog.swtdesigner.SWTResourceManager;
 import com.sos.hibernate.classes.SosSortTableItem;
 
 
@@ -106,21 +108,22 @@ public class FormBase extends JSToolBox {
 	protected void showWaitCursor() {
 		if (!shell.isDisposed())
 			objLastCursor = shell.getCursor();
-		shell.setCursor(new Cursor(shell.getDisplay(), SWT.CURSOR_WAIT));
+		shell.setCursor(getCursor(SWT.CURSOR_WAIT));
 	}
 	
 	protected void resetCursor() {
-        shell.setCursor(new Cursor(shell.getDisplay(), SWT.CURSOR_ARROW));
+        shell.setCursor(getCursor(SWT.CURSOR_ARROW));
         objLastCursor = null;
    }
 
 	protected void RestoreCursor() {
 		if (!shell.isDisposed())
 			if (objLastCursor == null) {
-				shell.setCursor(new Cursor(shell.getDisplay(), SWT.CURSOR_ARROW));
+				shell.setCursor(getCursor(SWT.CURSOR_ARROW));
 			}
 			else {
 				shell.setCursor(objLastCursor);
+				objLastCursor = null;
 			}
 	}
 

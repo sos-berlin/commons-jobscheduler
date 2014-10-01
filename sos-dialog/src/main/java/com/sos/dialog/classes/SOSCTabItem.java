@@ -82,17 +82,23 @@ public class SOSCTabItem extends CTabItem {
 	}
 
 	public void setChilds2Null() {
-		setData("composite", null);
-		setData("key", null);
-		setData(null);
-		this.setImage(null);
-		if (getControl().isDisposed() == false && this.isDisposed() == false) {
-			setControl(null);
+		try {
+			setData("composite", null);
+			setData("key", null);
+			setData(null);
+			this.setImage(null);
+			if (getControl().isDisposed() == false && this.isDisposed() == false) {
+				setControl(null);
+			}
+			setFont(null);
+			setComposite(null);
 		}
-		setFont(null);
-		setComposite(null);
-		objTabFolder = null;
-		logger = null;
+		catch (Exception e) {
+		}
+		finally {
+			objTabFolder = null;
+			logger = null;
+		}
 	}
 
 	@Override

@@ -7,17 +7,17 @@ import java.util.prefs.Preferences;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
 
+import com.sos.dialog.classes.SOSTextBox;
 import com.sos.dialog.interfaces.ISOSPreferenceStore;
 
 /**
  * @author KB
  *
  */
-public class SOSPreferenceStoreText extends Text implements ISOSPreferenceStore {
+public class SOSPreferenceStoreText extends SOSTextBox implements ISOSPreferenceStore {
 	// TODO make class variable
-	public final Preferences	prefs					= Preferences.userRoot().node("SOSPreferenceStore");
+	public Preferences	prefs					= Preferences.userRoot().node("SOSPreferenceStore");
 	protected String			strPreferenceStoreKey	= "";
 	class theModifyListener implements ModifyListener {
 		@Override public void modifyText(final ModifyEvent e) {
@@ -70,5 +70,6 @@ public class SOSPreferenceStoreText extends Text implements ISOSPreferenceStore 
 
 	@Override public void dispose() {
 		this.removeModifyListener(objModifyListener);
+		prefs = null;
 	}
 }

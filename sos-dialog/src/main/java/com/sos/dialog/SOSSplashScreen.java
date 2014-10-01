@@ -1,13 +1,9 @@
 package com.sos.dialog;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Method;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
@@ -15,6 +11,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
+
+import com.sos.dialog.swtdesigner.SWTResourceManager;
 
 /**
  * \class SOSSplashScreen 
@@ -68,7 +66,8 @@ public class SOSSplashScreen {
         Method m = SOSSplashScreen.class.getMethod("openApplicationMainWnd", new Class[] { Shell.class });
 
         SOSSplashScreen.startDialogExecuteLoop(shell, new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 doSomeTimeconsumingOperation();
             }
         }, new Image(display, SOSSplashScreen.class.getResourceAsStream("/SplashScreenJOE.bmp")), m, 2000);
@@ -81,7 +80,7 @@ public class SOSSplashScreen {
         final Display display = splashShell.getDisplay();
 
         if (pobjImage2Show != null) {
-            splashShell.setCursor(new Cursor(display, SWT.CURSOR_WAIT));
+            splashShell.setCursor(SWTResourceManager.getCursor(SWT.CURSOR_WAIT));
             splashShell.setLayout(new FillLayout());
 
             Label label = new Label(splashShell, SWT.BORDER);
@@ -100,10 +99,12 @@ public class SOSSplashScreen {
         }
 
         display.asyncExec(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 // Zeige den SplashScreen auf jeden Fall delay/1000 Sekunden an.
                 display.timerExec(pintHowLong2Show, new Runnable() {
-                    public void run() {
+                    @Override
+					public void run() {
                         // nun erledige die eigentliche "Initialsierungsroutine"
                         pobjRunnable.run();
                         splashShell.close();

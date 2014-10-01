@@ -3,8 +3,11 @@ package com.sos.dialog.classes;
 import java.util.prefs.Preferences;
 
 import org.apache.log4j.Logger;
+import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
@@ -34,8 +37,8 @@ import org.eclipse.swt.widgets.TableColumn;
 
 public class WindowsSaver {
 
-	private static final int MAX_KEY_LENGTH = 80;
-    private static final String	conWIN_LOCATE_Y		= "win:locateY:";
+	private static final int	MAX_KEY_LENGTH		= 80;
+	private static final String	conWIN_LOCATE_Y		= "win:locateY:";
 	private static final String	conWIN_LOCATE_X		= "win:locateX:";
 	private static final String	conWIN_SIZE_Y		= "win:sizeY:";
 	private static final String	conWIN_SIZE_X		= "win:sizeX:";
@@ -71,11 +74,20 @@ public class WindowsSaver {
 		defaultLocation = new Point(100, 100);
 
 		if (shell != null) {
+
+			shell.addDisposeListener(new DisposeListener() {
+				@Override
+				public void widgetDisposed(final DisposeEvent arg0) {
+					logger.debug("disposed");
+					saveWindowPosAndSize();
+				}
+			});
+
 			shell.addControlListener(new ControlAdapter() {
 				@Override
 				public void controlMoved(final ControlEvent e) {
 					if (flgClassIsActive == false) {
-						saveWindowPosAndSize();
+						//						saveWindowPosAndSize();   // fires to much events
 					}
 				}
 
@@ -98,20 +110,46 @@ public class WindowsSaver {
 		}
 	}
 
-	public void restoreWindow() {
+	public WindowsSaver restoreWindow() {
 		flgClassIsActive = true;
 		logger.debug(className);
 		restoreWindowSize();
 		restoreWindowLocation();
 		flgClassIsActive = false;
+		return this;
+	}
+
+	public void saveSash(final int[] sash) {
+		saveProperty("sash.layout", sash[0] + "," + sash[1]);
+		logger.debug("Save Sash");
+	}
+
+	public void loadSash(final SashForm sash) {
+		try {
+			String value = getProperty("sash.layout");
+			if (value != null && value.length() > 0) {
+				String[] values = value.split(",");
+				int[] weights = { new Integer(values[0].trim()).intValue(), new Integer(values[1].trim()).intValue() };
+				sash.setWeights(weights);
+				logger.debug("load sash");
+			}
+		}
+		catch (Exception e) {
+			//			new ErrorLog("error in " + SOSClassUtil.getMethodName(), e);
+		}
 	}
 
 	public void restoreWindowLocation() {
 		if (shell != null) {
-			int x = getInt(prefs.get(conWIN_LOCATE_X + className, String.valueOf(defaultLocation.x)), defaultLocation.x);
-			int y = getInt(prefs.get(conWIN_LOCATE_Y + className, String.valueOf(defaultLocation.y)), defaultLocation.y);
-			logger.debug("restoreWindowLocation: x = " + x + ", y = " + y + ", key = " + className);
-			shell.setLocation(x, y);
+			if (getProperty("isMaximized").equals("1")) {
+				shell.setMaximized(true);
+			}
+			else {
+				int x = getInt(prefs.get(conWIN_LOCATE_X + className, String.valueOf(defaultLocation.x)), defaultLocation.x);
+				int y = getInt(prefs.get(conWIN_LOCATE_Y + className, String.valueOf(defaultLocation.y)), defaultLocation.y);
+				logger.debug("restoreWindowLocation: x = " + x + ", y = " + y + ", key = " + className);
+				shell.setLocation(x, y);
+			}
 		}
 		else {
 			logger.debug("shell is null");
@@ -126,8 +164,13 @@ public class WindowsSaver {
 	}
 
 	public void restoreWindowSize() {
-		shell.setSize(getWindowSize());
-		logger.debug(className + ": Windws size restored");
+		if (getProperty("isMaximized").equals("1")) {
+			shell.setMaximized(true);
+		}
+		else {
+			shell.setSize(getWindowSize());
+			logger.debug(className + ": Windows size restored");
+		}
 	}
 
 	public void saveWindowPosAndSize() {
@@ -143,6 +186,7 @@ public class WindowsSaver {
 
 			putPref(conWIN_SIZE_X, x);
 			putPref(conWIN_SIZE_Y, y);
+			putPref("isMaximized", (shell.getMaximized() == true) ? 1 : 0);
 
 			x = shell.getLocation().x;
 			y = shell.getLocation().y;
@@ -156,12 +200,11 @@ public class WindowsSaver {
 		}
 	}
 
-		
 	private void putPref(final String pstrKey, final int pintValue) {
-	    String key = pstrKey + className;
-	    if (key.length() > MAX_KEY_LENGTH) {
-	        key = key.substring(0,MAX_KEY_LENGTH-1);
-	    }
+		String key = pstrKey + className;
+		if (key.length() > MAX_KEY_LENGTH) {
+			key = key.substring(0, MAX_KEY_LENGTH - 1);
+		}
 		prefs.put(key, String.valueOf(pintValue));
 	}
 

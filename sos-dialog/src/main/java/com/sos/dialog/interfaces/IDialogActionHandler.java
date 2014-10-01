@@ -3,24 +3,26 @@
  */
 package com.sos.dialog.interfaces;
 
+import menues.SOSMenueEvent;
+
 /**
  * @author KB
  *
  */
 public interface IDialogActionHandler {
 
-	public void doCancel ();
+	public void doCancel (final SOSMenueEvent pobjMenueEvent);
 
-	public void doEdit ();
+	public void doEdit (final SOSMenueEvent pobjMenueEvent);
 
-	public void doNew ();
+	public void doNew (final SOSMenueEvent pobjMenueEvent);
 
-	public void doDelete ();
+	public void doDelete (final SOSMenueEvent pobjMenueEvent);
 
-	public void doClose ();
+	public void doClose (final SOSMenueEvent pobjMenueEvent);
 
 	public void setDialogActionHandler (final IDialogActionHandler pobjDialogActionHandler);
 	
-	public boolean doValidation() ;
+	public boolean doValidation(final SOSMenueEvent pobjMenueEvent) ;
 	
 }

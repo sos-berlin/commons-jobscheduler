@@ -514,4 +514,5 @@ public class SWTResourceManager {
 			((Cursor) iter.next()).dispose();
 		m_IdToCursorMap.clear();
 	}
+	
 }

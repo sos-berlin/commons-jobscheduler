@@ -1,4 +1,6 @@
 package com.sos.dialog.classes;
+import menues.SOSMenueEvent;
+
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -20,6 +22,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.sos.dialog.interfaces.ICompositeBaseAbstract;
 import com.sos.dialog.interfaces.IDialogActionHandler;
+import com.sos.dialog.message.ErrorLog;
 
 /**
  *
@@ -28,7 +31,7 @@ import com.sos.dialog.interfaces.IDialogActionHandler;
  * @author KB
  *
  */
-public class DialogAdapter extends Dialog implements IDialogActionHandler {
+public class DialogAdapter extends Dialog  {
 	@SuppressWarnings("unused")
 	private final String			conClassName			= this.getClass().getSimpleName();
 	@SuppressWarnings("unused")
@@ -38,7 +41,7 @@ public class DialogAdapter extends Dialog implements IDialogActionHandler {
 	protected Object				result;
 	protected Shell					shell;
 	private WindowsSaver			objFormHelper;
-	private IDialogActionHandler	objDialogActionHandler	= this;
+	private IDialogActionHandler	objDialogActionHandler	= null;
 
 	/**
 	 * Create the dialog.
@@ -64,7 +67,7 @@ public class DialogAdapter extends Dialog implements IDialogActionHandler {
 	}
 	private Composite	objC	= null;
 
-	public Object open(final ICompositeBaseAbstract objChildComposite) {
+	public Object open(final IDialogActionHandler pobjDialogActionHandler, final ICompositeBaseAbstract objChildComposite) {
 		shell.setRedraw(false);
 		shell.open();
 		set4ColumnLayout(shell);
@@ -72,6 +75,7 @@ public class DialogAdapter extends Dialog implements IDialogActionHandler {
 		if (objC == null) {
 			objC = createContents();
 		}
+		objDialogActionHandler = pobjDialogActionHandler;
 		objChildComposite.createComposite(objC);
 		set4ColumnLayout((Composite) objChildComposite);
 		((Group) objC).setText(objChildComposite.getWindowTitle());
@@ -87,7 +91,6 @@ public class DialogAdapter extends Dialog implements IDialogActionHandler {
 
 	public Object open(final IDialogActionHandler pobjDialogActionHandler) {
 		objDialogActionHandler = pobjDialogActionHandler;
-		objDialogActionHandler.setDialogActionHandler(this);
 		return open();
 	}
 
@@ -167,7 +170,7 @@ public class DialogAdapter extends Dialog implements IDialogActionHandler {
 		btnOK.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				closeShell();
+				doNew();
 			}
 		});
 
@@ -179,7 +182,7 @@ public class DialogAdapter extends Dialog implements IDialogActionHandler {
 		btnCancel.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				closeShell();
+				doCancel();
 			}
 		});
 
@@ -223,48 +226,76 @@ public class DialogAdapter extends Dialog implements IDialogActionHandler {
 		pobjComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 	}
 
-	@Override
 	public void doCancel() {
-		closeShell();
-		objDialogActionHandler.doClose();
+		SOSMenueEvent objME = new SOSMenueEvent();
+		objDialogActionHandler.doCancel(objME);
+		if (objME.doIt == true) {
+			closeShell();
+		}
+		else {
+			
+		}
 	}
 
-	@Override
 	public void doEdit() {
-		closeShell();
-		objDialogActionHandler.doEdit();
+		SOSMenueEvent objME = new SOSMenueEvent();
+		objDialogActionHandler.doEdit(objME);
+		if (objME.doIt == true) {
+			closeShell();
+		}
+		else {
+			
+		}
 	}
 
-	@Override
 	public void doNew() {
-		closeShell();
-		objDialogActionHandler.doNew();
+		SOSMenueEvent objME = new SOSMenueEvent();
+		
+		objDialogActionHandler.doNew(objME);
+		if (objME.doIt == true) {
+			closeShell();
+		}
+		else {
+			new ErrorLog(objME.getMessage());
+		}
 	}
 
-	@Override
 	public void doDelete() {
-		closeShell();
-		objDialogActionHandler.doDelete();
+		SOSMenueEvent objME = new SOSMenueEvent();
+		objDialogActionHandler.doDelete(objME);
+		if (objME.doIt == true) {
+			closeShell();
+		}
+		else {
+			
+		}
 	}
 
-	@Override
 	public void doClose() {
-		closeShell();
-		objDialogActionHandler.doClose();
+		SOSMenueEvent objME = new SOSMenueEvent();
+		objDialogActionHandler.doClose(objME);
+		if (objME.doIt == true) {
+			closeShell();
+		}
+		else {
+			
+		}
 	}
 
 	private void closeShell() {
 		shell.close();
 	}
 
-	@Override
-	public void setDialogActionHandler(final IDialogActionHandler pobjDialogActionHandler) {
-		objDialogActionHandler = pobjDialogActionHandler;
-	}
-
-	@Override
 	public boolean doValidation() {
-		boolean isValid = objDialogActionHandler.doValidation();
-		return isValid;
+		SOSMenueEvent objME = new SOSMenueEvent();
+		objDialogActionHandler.doValidation(objME);
+		if (objME.doIt == true) {
+			closeShell();
+			return true;
+		}
+		else {
+			
+		}
+		return true;
 	}
 }
