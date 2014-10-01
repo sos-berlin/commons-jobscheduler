@@ -57,6 +57,7 @@ public class SOSSmtpMailOptions extends SOSSmtpMailOptionsSuperClass implements 
 	public SOSSmtpMailOptions getOptions(final enuMailClasses penuMailClass) {
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::getOptions";
+		initChildOptions();
 		SOSSmtpMailOptions objO = objMailOnError;
 		switch (penuMailClass) {
 			case MailOnError:
