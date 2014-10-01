@@ -3,6 +3,7 @@ package com.sos.JSHelper.io.Files;
 import org.apache.log4j.Logger;
 
 import com.sos.JSHelper.Options.IValueChangedListener;
+import com.sos.JSHelper.Options.SOSOptionElement;
 import com.sos.JSHelper.Options.SOSValidationError;
 
 /**
@@ -117,8 +118,8 @@ public class SOSProfileEntry extends SOSProfileBaseClass<SOSProfileSection> impl
 	}
 
 	@Override  // IValueChangedListener
-	public void ValueHasChanged(String pstrNewValue) {
-		this.Value(pstrNewValue);
+	public void ValueHasChanged(final SOSOptionElement pobjOptionElement) {
+		this.Value(pobjOptionElement.Value());
 	}
 
 	@Override  // IValueChangedListener

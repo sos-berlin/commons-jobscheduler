@@ -1,5 +1,6 @@
 package com.sos.JSHelper.Options;
 import java.io.File;
+import java.util.HashMap;
 
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
@@ -81,13 +82,12 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 
 	@Override
 	public void Value(final String pstrValue) {
-		strValue = pstrValue;
+		super.Value(pstrValue);   // respect changed listener
 		if (isNotNull(pstrValue)) {
 //			if (pstrValue.equals(".")) {
 //				strValue += "/";
 //			}
 		}
-		super.Value(strValue);
 	}
 
 	/**
@@ -287,4 +287,22 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 	public JSFolder getFolder() {
 		return new JSFolder(strValue);
 	}
+	
+	private static final HashMap <String, String> defaultProposals = new HashMap<>();
+	
+	@Override
+	public void addProposal (final String pstrProposal) {
+		if (pstrProposal != null && pstrProposal.trim().length() > 0) {
+			String strT = pstrProposal.trim();
+			SOSOptionFolderName.defaultProposals.put(strT, strT);
+		}
+	}
+	
+	@Override
+	public String[] getAllProposals(String text) {
+		String[] proposals = SOSOptionFolderName.defaultProposals.keySet().toArray(new String[0]);
+		return proposals;
+	}
+
+
 }

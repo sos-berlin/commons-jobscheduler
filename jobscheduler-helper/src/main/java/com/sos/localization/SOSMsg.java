@@ -197,6 +197,8 @@ public class SOSMsg {
 				objMissingCodesPropertiesFile.WriteLine(strMessageCode + ".shorttext = " + strMessageCode);
 				objMissingCodesPropertiesFile.WriteLine(strMessageCode + ".F1 = ");
 				objMissingCodesPropertiesFile.WriteLine(strMessageCode + ".F10 = ");
+				objMissingCodesPropertiesFile.WriteLine(strMessageCode + ".icon = ");
+				objMissingCodesPropertiesFile.WriteLine(strMessageCode + ".acc = ");
 			}
 			catch (IOException e) {
 				e.printStackTrace();

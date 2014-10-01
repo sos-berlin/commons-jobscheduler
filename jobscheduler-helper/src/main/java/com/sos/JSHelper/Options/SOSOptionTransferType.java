@@ -132,6 +132,11 @@ public class SOSOptionTransferType extends SOSOptionStringValueList {
 		this(null, "", "", pstrTransferType, "", false);
 	}
 
+	@Override
+	public String Value() {
+		return super.Value();
+	}
+	
 	public void Value(final enuTransferTypes penuTT) {
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::Value";

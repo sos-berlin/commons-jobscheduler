@@ -28,6 +28,7 @@ package com.sos.JSHelper.Options;
  */
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Properties;
 import java.util.Stack;
 import java.util.Vector;
@@ -37,11 +38,12 @@ import org.apache.log4j.Logger;
 
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
+import com.sos.JSHelper.interfaces.IAutoCompleteProposal;
 import com.sos.JSHelper.io.Files.JSXMLFile;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "com_sos_JSHelper_Messages", defaultLocale = "en")
-public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOptions {
+public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOptions, IAutoCompleteProposal {
 	private static final String					constPrefixForEnviromentVariables	= "env:";
 	/**
 	 *
@@ -132,7 +134,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 		final String conMethodName = conClassName + "::changeDefaults";
 		strDefaultValue = getValue(pstrDefaultValue);
 		this.Value(getValue(pstrValue));
-		flgIsDirty = false;
+		setNotDirty();
 	} // public void changeDefaults
 
 	public void changeDefaults(final int pintValue, final int pintDefaultValue) {
@@ -140,7 +142,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 		final String conMethodName = conClassName + "::changeDefaults";
 		strDefaultValue = String.valueOf(pintDefaultValue);
 		this.Value(String.valueOf(pintValue));
-		flgIsDirty = false;
+		setNotDirty();
 	} // public void changeDefaults
 
 	public SOSOptionElement(final String pstrOptionValue) {
@@ -163,7 +165,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 			strXMLTagName = pstrKey;
 			strColumnHeader = pstrKey;
 			this.Value(getValue(pstrValue));
-			flgIsDirty = false;
+			setNotDirty();
 		} // try
 		catch (final Exception objException) {
 			objException.printStackTrace();
@@ -213,13 +215,31 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 		}
 	}
 
+	public String getErrorIfMandatory(final boolean pflgIsMandatory) {
+		String strS = null;
+		if (pflgIsMandatory) {
+			boolean flgF = flgIsMandatory;
+			flgIsMandatory = true;
+			try {
+				CheckMandatory();
+			}
+			catch (Exception e) {
+				strS = e.getLocalizedMessage();
+			}
+			finally {
+				flgIsMandatory = flgF;
+			}
+		}
+		return strS;
+	}
+
 	/**
-	* \brief CheckMandatory - prüft ob eine Option tatsächlich gefüllt ist
-	 *
-	 * \details
-	 *
-	* @throws Exception - wird ausgeläst, wenn eine mandatory-Option keinen Wert hat
-	 */
+		* \brief CheckMandatory - prüft ob eine Option tatsächlich gefüllt ist
+		 *
+		 * \details
+		 *
+		* @throws Exception - wird ausgeläst, wenn eine mandatory-Option keinen Wert hat
+		 */
 	public void CheckMandatory() {
 		if (flgIsMandatory) {
 			if (this.isEmpty(strValue)) {
@@ -334,7 +354,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	public String DirtyToString() {
 		String strR = "";
 		if (isProtected() == false) {
-			if (flgHideOption == false && this.isDirty()) {
+			if (flgHideOption == false && this.isDirty() == true) {
 				String strV = strValue;
 				if (IsNotEmpty() == true) {
 					if (flgHideValue == true && flgShowPasswords == false) {
@@ -459,12 +479,12 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 		int i = strT.indexOf(".");
 		if (i > 0) {
 			strT = strT.substring(i + 1);
-			if (objParentClass != null) {
-				String strPrefix = objParentClass.getPrefix();
-				if (isNotEmpty(strPrefix)) {
-					if (strT.startsWith(strPrefix) == false) {
-						strT = strPrefix + "_" + strT;
-					}
+		}
+		if (objParentClass != null) {
+			String strPrefix = objParentClass.getPrefix();
+			if (isNotEmpty(strPrefix)) {
+				if (strT.startsWith(strPrefix) == false) {
+					strT = strPrefix + "_" + strT;
 				}
 			}
 		}
@@ -755,6 +775,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 				this.Value(strV);
 				this.setProtected(JSOptionsClass.flgIncludeProcessingInProgress);
 				this.setIncludeSectionName(JSOptionsClass.gstrIncludeSectionName);
+				setDirty();  // important, otherwise the element is not dirty ??
 			}
 			// - <remark who='EQALS' when='Dienstag, 6. Oktober 2009' id='PublishSQLStatement' >
 			/**
@@ -848,7 +869,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	private void raiseValueChangedListener() {
 		if (lstValueChangedListeners != null) {
 			for (IValueChangedListener objValueChangedListener : lstValueChangedListeners) {
-				objValueChangedListener.ValueHasChanged(strValue);
+				objValueChangedListener.ValueHasChanged(this);
 			}
 		}
 	}
@@ -1222,6 +1243,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 				}
 			}
 			changeValue(pstrValue);
+			addProposal(pstrValue);
 		}
 		else {
 			changeValue("");
@@ -1232,7 +1254,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	private void changeValue(final String pstrValue) {
 		if (pstrValue != null && pstrValue.equalsIgnoreCase(strValue) == false) {
 			strValue = pstrValue;
-			flgIsDirty = true;
+			setDirty();
 			raiseValueChangedListener();
 		}
 	}
@@ -1288,4 +1310,19 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 		}
 		return strT;
 	}
+	private static final HashMap <String, String> defaultProposals = new HashMap<>();
+	
+	@Override
+	public void addProposal (final String pstrProposal) {
+		if (pstrProposal != null && pstrProposal.trim().length() > 0) {
+			defaultProposals.put(pstrProposal, pstrProposal);
+		}
+	}
+	
+	@Override
+	public String[] getAllProposals(String text) {
+		String[] proposals = defaultProposals.keySet().toArray(new String[0]);
+		return proposals;
+	}
+
 }

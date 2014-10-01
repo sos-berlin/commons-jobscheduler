@@ -3,6 +3,7 @@
  */
 package com.sos.JSHelper.Options;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -70,6 +71,8 @@ public class SOSOptionTransferTypeTest {
 	public void testIsFtpS() {
 		SOSOptionTransferType objTT = new SOSOptionTransferType("ftps");
 		assertTrue("is FTPs", objTT.isFtpS());
+		objTT.Value("ftps");
+		assertEquals("ftps is expected", "ftps", objTT.Value());
 	}
 
 	/**
@@ -78,6 +81,8 @@ public class SOSOptionTransferTypeTest {
 	@Test
 	public void testNeedPortNumber() {
 		SOSOptionTransferType objTT = new SOSOptionTransferType("ftps");
+		assertTrue("port number must be mandatory for ftps", objTT.needPortNumber());
+		objTT.Value("ftps");
 		assertTrue("port number must be mandatory for ftps", objTT.needPortNumber());
 	}
 

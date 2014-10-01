@@ -243,8 +243,8 @@ public class SOSOptionTime extends SOSOptionString {
 						case "s":  // seconds
 							strValue = strN;
 							break;
-						default: // is days
-							strValue = strValue + ":00:00:00";
+						default: // is seconds
+							strValue = strValue;
 							break;
 					}
 					strOriginalValue = strValue;

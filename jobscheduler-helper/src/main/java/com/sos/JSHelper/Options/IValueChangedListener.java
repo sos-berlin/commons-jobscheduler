@@ -19,7 +19,8 @@ public interface IValueChangedListener {
 	* \return void
 	*
 	 */
-	public void ValueHasChanged (final String pstrNewValue);
+//	public void ValueHasChanged (final String pstrNewValue);
+	public void ValueHasChanged (final SOSOptionElement pobjOptionElement);
 
 	/**
 	 * 

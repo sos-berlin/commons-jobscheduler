@@ -2,6 +2,7 @@ package com.sos.JSHelper.Options;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -532,4 +533,21 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 			}
 		}
 	}
+	
+	private static final HashMap <String, String> defaultProposals = new HashMap<>();
+	
+	@Override
+	public void addProposal (final String pstrProposal) {
+		if (pstrProposal != null && pstrProposal.trim().length() > 0) {
+			SOSOptionRegExp.defaultProposals.put(pstrProposal, pstrProposal);
+		}
+	}
+	
+	@Override
+	public String[] getAllProposals(String text) {
+		String[] proposals = SOSOptionRegExp.defaultProposals.keySet().toArray(new String[0]);
+		return proposals;
+	}
+
+
 }

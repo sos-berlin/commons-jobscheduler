@@ -2653,9 +2653,9 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 								pstrBuffer.append(addNewLine(objDE.toString()));
 							}
 							if (enuIterate4What == IterationTypes.DirtyToString) {
-								if (objDE.isDirty() == true) {
+//								if (objDE.isDirty() == true) {
 									pstrBuffer.append(addNewLine(objDE.DirtyToString()));
-								}
+//								}
 							}
 							if (enuIterate4What == IterationTypes.createXML) {
 								strXML.append(objDE.toXml());
