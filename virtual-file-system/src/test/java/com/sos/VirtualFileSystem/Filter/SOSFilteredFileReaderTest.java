@@ -243,4 +243,10 @@ public class SOSFilteredFileReaderTest implements ISOSFilteredFileReader {
 
 	@Override public void atEndOfData() {
 	}
+
+	@Override
+	public void atStartOfNewFile(JSFile file) {
+		// TODO Auto-generated method stub
+		
+	}
 }

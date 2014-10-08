@@ -95,6 +95,7 @@ public class SOSFilteredFileReader extends JSToolBox implements ISOSFilteredFile
 	}
 	public void run() {
 
+		objProcessHandler.atStartOfNewFile(objFile2Read);
 		if (lstFilters == null) {
 			lstFilters = objFilterOptions.getFilter();
 		}
@@ -135,6 +136,12 @@ public class SOSFilteredFileReader extends JSToolBox implements ISOSFilteredFile
 	@Override
 	public void atEndOfData() {
 
+	}
+
+	@Override
+	public void atStartOfNewFile(JSFile file) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
