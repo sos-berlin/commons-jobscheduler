@@ -27,7 +27,7 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
  * @see JobSchedulerManagedDatabaseJob#executeStatements(SOSConnection, String)
  * @author andreas.pueschel@sos-berlin.com
  * @since 1.0 2005-03-05
- */
+ */ 
 public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 
 	private static final String	conParameterNAME_VALUE						= "name_value";
@@ -67,20 +67,20 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 		return true;
 	}
 
-//	protected boolean getBoolParam(final String pstrParamName, final boolean pflgDefaultValue) {
-//		boolean flgRet = pflgDefaultValue;
-//
-//		if (orderPayload != null) {
-//			String strValue = orderPayload.var(pstrParamName);
-//			if (strValue != null) {
-//				if (strValue.equals("1") || strValue.equalsIgnoreCase("true")) {
-//					flgRet = true;
-//				}
-//			}
-//		}
-//		return flgRet;
-//	}
-//
+	protected boolean getBoolParam(final String pstrParamName, final boolean pflgDefaultValue) {
+		boolean flgRet = pflgDefaultValue;
+
+		if (orderPayload != null) {
+			String strValue = orderPayload.var(pstrParamName);
+			if (strValue != null) {
+				if (strValue.equals("1") || strValue.equalsIgnoreCase("true")) {
+					flgRet = true;
+				}
+			}
+		}
+		return flgRet;
+	}
+
 	protected JobSchedulerManagedDBReportJobOptions objOptions = null;
 	/**
 	 * processing
@@ -213,16 +213,12 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 			if ((resultsetAsWarning || resultsetAsParameters) && localConnection.getResultSet() != null) {
 				String warning = "";
 				HashMap result = null;
-				boolean resultParametersSet = false;
 				while (!(result = localConnection.get()).isEmpty()) {
-//					http://www.sos-berlin.com/jira/browse/JS-1181
-					if (resultParametersSet == true) {
-						break;
-					}
 					String orderParamKey = "";
 					int columnCount = 0;
 					warning = "execution terminated with warning:";
 					Iterator resultIterator = result.keySet().iterator();
+					boolean resultParametersSet = false;
 					while (resultIterator.hasNext()) {
 						columnCount++;
 						String key = (String) resultIterator.next();
@@ -230,7 +226,7 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 							continue;
 						String value = result.get(key).toString();
 						warning += " " + key + "=" + value;
-						if (resultsetAsParameters && order != null) {
+						if (resultsetAsParameters && order != null && !resultParametersSet) {
 							if (resultsetNameValue) { // name/value pairs from two columns
 								if (columnCount == 1) {
 									orderParamKey = value;
@@ -238,18 +234,15 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 								if (columnCount == 2) {
 									//if (realOrderParams.value(orderParamKey) == null || realOrderParams.value(orderParamKey).length() == 0) {
 										realOrderParams.set_var(orderParamKey, value);
-										break;
 									//}
 								}
 							}
-							else { 
+							else
 								//if (realOrderParams.value(key) == null || realOrderParams.value(key).length() == 0) {
 									// column name = name, value=value
 									realOrderParams.set_var(key, value);
-									//http://www.sos-berlin.com/jira/browse/JS-1181
 									resultParametersSet = true;
 								//}
-							}
 						}
 					}
 				}
@@ -590,14 +583,14 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 	 * @see SOSConnection
 	 */
 	protected void executeStatements(final SOSConnection conn, final String command) throws Exception {
-		JobSchedulerException JobSchedulerException = null;
+		JobSchedulerException jobSchedulerException = null;
 
 		try {
 			conn.setAutoCommit(autoCommit);
 			conn.executeStatements(command);
 		}
 		catch (Exception e) {
-			JobSchedulerException = (com.sos.JSHelper.Exceptions.JobSchedulerException) e;
+			jobSchedulerException = new JobSchedulerException(e);
 		}
 		finally {
 			conn.setAutoCommit(false);
@@ -620,8 +613,8 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 		catch (Exception e) {
 		}
 
-		if (JobSchedulerException != null)
-			throw new JobSchedulerException(JobSchedulerException);
+		if (jobSchedulerException != null)
+			throw new JobSchedulerException(jobSchedulerException);
 	}
 
 }
