@@ -27,7 +27,7 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
  * @see JobSchedulerManagedDatabaseJob#executeStatements(SOSConnection, String)
  * @author andreas.pueschel@sos-berlin.com
  * @since 1.0 2005-03-05
- */
+ */ 
 public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 
 	private static final String	conParameterNAME_VALUE						= "name_value";
@@ -583,14 +583,14 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 	 * @see SOSConnection
 	 */
 	protected void executeStatements(final SOSConnection conn, final String command) throws Exception {
-		JobSchedulerException JobSchedulerException = null;
+		JobSchedulerException jobSchedulerException = null;
 
 		try {
 			conn.setAutoCommit(autoCommit);
 			conn.executeStatements(command);
 		}
 		catch (Exception e) {
-			JobSchedulerException = (com.sos.JSHelper.Exceptions.JobSchedulerException) e;
+			jobSchedulerException = new JobSchedulerException(e);
 		}
 		finally {
 			conn.setAutoCommit(false);
@@ -613,8 +613,8 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 		catch (Exception e) {
 		}
 
-		if (JobSchedulerException != null)
-			throw new JobSchedulerException(JobSchedulerException);
+		if (jobSchedulerException != null)
+			throw new JobSchedulerException(jobSchedulerException);
 	}
 
 }
