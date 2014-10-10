@@ -1001,19 +1001,30 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 				strbStderrOutput.append(line + strEndOfLine);
 			}
 		}
-
+ 
 		// give the session some time to end
 		// TODO waitForCondition as an Option
 		@SuppressWarnings("unused")
 		int res = getSshSession().waitForCondition(ChannelCondition.EOF, 30 * 1000);
+		
+ 
+		
+		long timeout = (2 * 60) * 1000;
 
-		try {
-			exitStatus = this.getSshSession().getExitStatus();
-		}
-		catch (Exception e) {
-			logger.info(SOSVfs_I_250.params("exit status"));
-		}
+		int retval = getSshSession().waitForCondition(ChannelCondition.EXIT_STATUS, timeout);
 
+		if ((retval & ChannelCondition.TIMEOUT) != 0){
+			throw new java.util.concurrent.TimeoutException();
+		} else {
+			try {
+				exitStatus = this.getSshSession().getExitStatus();
+			}
+			catch (Exception e) {
+				logger.info(SOSVfs_I_250.params("exit status"));
+			}
+		}
+		
+		
 		try {
 			exitSignal = this.getSshSession().getExitSignal();
 		}
@@ -1025,10 +1036,9 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 
 	@Override
 	public Integer getExitCode() {
-	    if (exitStatus == null) {
-            throw new RuntimeException( "Error reading exit code from SSH-Server. No exit code is available.");
-        }
-
+		if (exitStatus == null) {
+		    throw new RuntimeException( "Error reading exit code from SSH-Server. No exit code is available.");
+	    }
 		return exitStatus;
 	}
 

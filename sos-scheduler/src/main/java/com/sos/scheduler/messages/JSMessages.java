@@ -25,7 +25,6 @@ public class JSMessages {
 	public static final JSMsg	JSJ_I_0018	= new JSMsg("JSJ_I_0018");	// Order '%1$s' created for JobChain '%2$s'.
 	public static final JSMsg	JSJ_I_0019	= new JSMsg("JSJ_I_0019");	// Next State is '%1$s'.
 	public static final JSMsg	JSJ_I_0020	= new JSMsg("JSJ_I_0020");	// %1$s: Current NodeName is '%2$s'.
-	public static final JSMsg	JSJ_I_0030	= new JSMsg("JSJ_I_0030");	// JSMsg after replacing-operation is = %1$s
 	public static final JSMsg	JSJ_I_0090	= new JSMsg("JSJ_I_0090");	// set order-state to '%1$s'
 
 	/**
@@ -40,6 +39,7 @@ public class JSMessages {
 	public static final JSMsg	JSJ_F_0090	= new JSMsg("JSJ_F_0090");	// File '%1$s' for '%2$s' is not writable
 
 	public static final JSMsg	JSJ_D_0010	= new JSMsg("JSJ_D_0010", 8);	// set parameter '%1$s' to value '%2$s'
+	public static final JSMsg	JSJ_D_0030	= new JSMsg("JSJ_D_0030");	// JSMsg after replacing-operation is = %1$s
 	public static final JSMsg	JSJ_D_0031	= new JSMsg("JSJ_D_0031", 8);	// processing job parameter '%1$s': substitute '%2$s' with '%3$s'.
 	/**
 	 * "variable '%1$s' not found. no substitution done"
