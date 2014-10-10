@@ -756,6 +756,7 @@ public class SOSSQLPlusJobOptionsSuperClass extends SOSCredentialStoreSuperClass
 	@Override public void CheckMandatory() throws JSExceptionMandatoryOptionMissing //
 			, Exception {
 		try {
+		  getCredentialStore().checkCredentialStoreOptions();
 			super.CheckMandatory();
 		}
 		catch (Exception e) {

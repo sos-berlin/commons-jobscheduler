@@ -493,6 +493,7 @@ public class JobSchedulerPLSQLJobOptionsSuperClass extends SOSCredentialStoreSup
 	public void CheckMandatory() throws JSExceptionMandatoryOptionMissing //
 			, Exception {
 		try {
+		  getCredentialStore().checkCredentialStoreOptions();
 			super.CheckMandatory();
 		}
 		catch (Exception e) {
