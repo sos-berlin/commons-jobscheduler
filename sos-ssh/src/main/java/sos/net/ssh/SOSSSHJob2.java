@@ -370,7 +370,7 @@ public class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 	 *
 	 */
 	private void CheckStdErr() {
-		try {
+ 		try {
 			StringBuffer stbStdErr = objVFS.getStdErr();
 			if (strbStderrOutput == null) {
 				strbStderrOutput = new StringBuffer();
@@ -388,7 +388,8 @@ public class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 				logger.info("SOS-SSH-I-150: output to stderr is ignored: " + strbStderrOutput);
 			}
 			else {
-				intCC = objVFS.getExitCode();
+				intCC =  objVFS.getExitCode();
+				
 				if (intCC != 0 && objOptions.RaiseExceptionOnError.isTrue()) {
 					CheckExitCode();
 				}
