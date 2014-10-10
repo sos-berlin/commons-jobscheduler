@@ -570,7 +570,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 				//				logger.debug("regExPattern = " + regExPattern);
 				for (String name : paramNames) {
 					String strParamValue = objJobOrOrderParams.value(name);
-					if (name.contains("password") == false) {
+					if (name.contains("password") == false && name.trim().length() > 0) {
 						logger.debug("name = " + name + ", value = " + strParamValue);
 					}
 					regex = String.format(regExPattern, name);

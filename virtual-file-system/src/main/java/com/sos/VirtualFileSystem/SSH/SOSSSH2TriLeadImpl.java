@@ -4,12 +4,12 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileOutputStream; 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.OutputStreamWriter; 
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -1002,17 +1002,28 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 		}
 
 		// give the session some time to end
-		// TODO waitForCondition as an Option
-		@SuppressWarnings("unused")
-		int res = getSshSession().waitForCondition(ChannelCondition.EOF, 30 * 1000);
+        // TODO waitForCondition as an Option
+        @SuppressWarnings("unused")
+        int res = getSshSession().waitForCondition(ChannelCondition.EOF, 30 * 1000);
+        
 
-		try {
-			exitStatus = this.getSshSession().getExitStatus();
-		}
-		catch (Exception e) {
-			logger.info(SOSVfs_I_250.params("exit status"));
-		}
+        
+        long timeout = (2 * 60) * 1000;
 
+        int retval = getSshSession().waitForCondition(ChannelCondition.EXIT_STATUS, timeout);
+
+        if ((retval & ChannelCondition.TIMEOUT) != 0){
+            throw new java.util.concurrent.TimeoutException();
+        } else {
+            try {
+                exitStatus = this.getSshSession().getExitStatus();
+            }
+            catch (Exception e) {
+                logger.info(SOSVfs_I_250.params("exit status"));
+            }
+        }
+        
+        
 		try {
 			exitSignal = this.getSshSession().getExitSignal();
 		}
@@ -1023,7 +1034,17 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 	}
 
 	@Override
-	public Integer getExitCode() {
+	public Integer getExitCode()  {
+	    
+	    if (exitStatus == null) {
+	        if (this.getSshSession() != null){
+	            // Try again
+	            exitStatus = this.getSshSession().getExitStatus();
+	        }
+	        if (exitStatus == null) {
+                throw new RuntimeException( "Error reading exit code from SSH-Server. No exit code is available.");
+	        }
+        }
 		return exitStatus;
 	}
 

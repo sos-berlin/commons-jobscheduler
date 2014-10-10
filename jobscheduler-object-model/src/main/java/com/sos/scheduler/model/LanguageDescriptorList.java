@@ -23,7 +23,7 @@ public class LanguageDescriptorList {
 	 */
 	public static final String				conLanguageJAVAX_SCRIPT_RHINO	= "javax.script:rhino";
 	public static final String				conLanguageJAVAX_Javascript		= "java:javascript";  // same as rhino, but with "beans"
-	public static final String				conLanguagePL_SQL				= "pl/sql";
+	public static final String				conLanguagePL_SQL				= "plsql";
 	public static final String				conLanguagePERL_SCRIPT			= "perlScript";
 	public static final String				conLanguageVB_SCRIPT			= "VBScript";
 	public static final String				conLanguageJAVASCRIPT			= "javascript";
@@ -43,12 +43,13 @@ public class LanguageDescriptorList {
 			new LanguageDescriptor(conLanguageVB_SCRIPT, 		3, false, conLanguageVB_SCRIPT, "", "", true, true),   // avoid formatting
 			new LanguageDescriptor(conLanguagePERL_SCRIPT, 		4, false, conLanguagePERL_SCRIPT, "", "", true, true),    // avoid formatting
 			new LanguageDescriptor(conLanguageJAVAX_SCRIPT_RHINO, 5, false, conLanguageJAVAX_SCRIPT_RHINO, "", "", true, true),    // avoid formatting
-			new LanguageDescriptor(conLanguagePL_SQL, 			6, true, conLanguageJAVA, "sos.scheduler.db.JobSchedulerPLSQLJobJSAdapterClass",
+		/*	new LanguageDescriptor(conLanguagePL_SQL, 			6, true, conLanguageJAVA, "sos.scheduler.db.JobSchedulerPLSQLJobJSAdapterClass",
 																							"jobdoc/JobSchedulerPLSQLJob.xml", true, false),
 			new LanguageDescriptor(conLanguageSQL_PLUS, 		7, true, conLanguageJAVA, "sos.scheduler.db.SOSSQLPlusJobJSAdapterClass",
 																							"jobdoc/SOSSQLPlusJob.xml", true, false),
 			new LanguageDescriptor(conLanguageSSH, 				8, true, conLanguageJAVA, "sos.scheduler.job.SOSSSHJob2JSAdapter",
 																							"jobdoc/SOSSSHJob2JSAdapter.xml", true, false),
+        */																							
 			new LanguageDescriptor(conLanguageJAVAX_Javascript, 9, false, conLanguageJAVAX_Javascript, "", "", true, true)    // avoid formatting
 																			);
 	// @formatter:on

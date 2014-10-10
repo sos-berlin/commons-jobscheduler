@@ -91,7 +91,7 @@ xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation
         </note>
       </param>
       
-       <param name="cleanup_JobScheduler_History_limit" default_value="true" required="false">
+       <param name="cleanup_JobScheduler_History_limit" default_value="300" required="false">
         <note language="de">
           <div xmlns="http://www.w3.org/1999/xhtml">Gibt an, nach wie vielen Sätzen spätestens ein COMMIT an die Datenbank gesendet wird .</div>
         </note>
@@ -117,7 +117,7 @@ xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation
           <div xmlns="http://www.w3.org/1999/xhtml">Items in the tables SOSFTP_FILES and SOSFTP_FILES_HISTORY which are older than the given number of days will be deleted.</div>
         </note>
       </param>
-      <param name="cleanup_JADE_History_limit" default_value="true" required="false">
+      <param name="cleanup_JADE_History_limit" default_value="300" required="false">
         <note language="de">
           <div xmlns="http://www.w3.org/1999/xhtml">Gibt an, nach wie vielen Sätzen spätestens ein COMMIT an die Datenbank gesendet wird .</div>
         </note>
@@ -141,7 +141,7 @@ xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation
           <div xmlns="http://www.w3.org/1999/xhtml">Items in the table DAYS_SCHEDULE which are older than the given number of days will be deleted.</div>
         </note>
       </param>
-      <param name="cleanup_daily_plan_limit" default_value="true" required="false">
+      <param name="cleanup_daily_plan_limit" default_value="300" required="false">
         <note language="de">
           <div xmlns="http://www.w3.org/1999/xhtml">Gibt an, nach wie vielen Sätzen spätestens ein COMMIT an die Datenbank gesendet wird .</div>
         </note>
