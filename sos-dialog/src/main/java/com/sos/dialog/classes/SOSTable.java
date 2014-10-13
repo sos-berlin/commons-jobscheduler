@@ -123,7 +123,7 @@ public abstract class SOSTable extends Table implements ISOSTable{
     
     private File getExcelFile() {
     
-        FileDialog dlg = new FileDialog(this.getShell());
+        FileDialog dlg = new FileDialog(this.getShell(),SWT.SAVE);
         String filename = dlg.open();
         if (filename != null) {
             return new File(filename);
