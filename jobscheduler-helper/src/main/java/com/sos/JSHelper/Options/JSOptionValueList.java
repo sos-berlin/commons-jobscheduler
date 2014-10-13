@@ -194,6 +194,10 @@ public class JSOptionValueList extends SOSOptionString {
 			strValueList = strT.split(conValueListDelimiters);
 			strT = strValueList[0];
 		}
+		//JITL-93 oh 27.06.14, sonst strValueList immer leer nach Constructor-Aufruf bei z.B. ignore_ora_messages
+		else if(isNotEmpty(pstrValueList) && (isNull(strValueList) || strValueList.length == 0)) { 
+			strValueList = new String[] { pstrValueList };
+		}
 		super.Value(strT);
 		// return void;
 	} // public void Value}
