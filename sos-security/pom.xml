@@ -16,7 +16,34 @@
 
     <build>
 
-     
+      <plugins>     
+      
+        <!-- collect the ini files -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <executions>
+                <execution>
+                    <id>package-setup</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>single</goal>
+                    </goals>
+                    <configuration>
+                        <descriptors>
+                            <descriptor>src/main/assembly/ini-files.xml</descriptor>
+                        </descriptors>
+                        <archive>
+                            <manifest>
+                                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                            </manifest>
+                        </archive>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+			
+  		</plugins>
 
     </build>
 
