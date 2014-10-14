@@ -1,14 +1,21 @@
 package com.sos.dialog.components;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import net.vzurczak.main.XmlRegion;
+import net.vzurczak.main.XmlRegionAnalyzer;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseEvent;
@@ -58,18 +65,22 @@ import com.sos.dialog.swtdesigner.SWTResourceManager;
  * Created on 25.08.2011 13:54:32
  */
 public class TextArea extends StyledText /* Text */{
-	@SuppressWarnings("unused") private final String	conClassName			= this.getClass().getSimpleName();
-	private final Logger								logger					= Logger.getLogger(this.getClass());
-	@SuppressWarnings("unused") private final String	conSVNVersion			= "$Id$";
-	private WindowsSaver								objFormPosSizeHandler	= null;
+	@SuppressWarnings("unused")
+	private final String		conClassName			= this.getClass().getSimpleName();
+	private final Logger		logger					= Logger.getLogger(this.getClass());
+	@SuppressWarnings("unused")
+	private final String		conSVNVersion			= "$Id$";
+	private WindowsSaver		objFormPosSizeHandler	= null;
 	//	public static enum enuSourceTypes {
 	//		ScriptSource, MonitorSource, xmlSource, xmlComment, JobDocu;
 	//	}
 	//
-	private final String								strTagName				= "job";
-	private final String								strAttributeName		= "";
+	private final String		strTagName				= "job";
+	private final String		strAttributeName		= "";
 	//	private enuSourceTypes	enuWhatSourceType	= TextArea.enuSourceTypes.ScriptSource;
-	boolean												flgInit					= false;
+	boolean						flgInit					= false;
+	private String				strPreferenceStoreKey	= "";
+	private final StyledText	objThis					= this;
 
 	public StyledText getControl() {
 		return this;
@@ -146,7 +157,8 @@ public class TextArea extends StyledText /* Text */{
 
 	private Listener getSaveAsListener() {
 		return new Listener() {
-			@Override public void handleEvent(final Event e) {
+			@Override
+			public void handleEvent(final Event e) {
 				logger.debug("save as was pressed....");
 				saveFile();
 			}
@@ -155,7 +167,8 @@ public class TextArea extends StyledText /* Text */{
 
 	private Listener getStartExternalEditorListener() {
 		return new Listener() {
-			@Override public void handleEvent(final Event e) {
+			@Override
+			public void handleEvent(final Event e) {
 				startExternalEditor();
 			}
 		};
@@ -183,7 +196,8 @@ public class TextArea extends StyledText /* Text */{
 
 	private Listener getSelectFontListener() {
 		return new Listener() {
-			@Override public void handleEvent(final Event e) {
+			@Override
+			public void handleEvent(final Event e) {
 				logger.debug("'Select Font' was pressed....");
 				changeFont();
 			}
@@ -192,7 +206,8 @@ public class TextArea extends StyledText /* Text */{
 
 	private Listener getReadFileListener() {
 		return new Listener() {
-			@Override public void handleEvent(final Event e) {
+			@Override
+			public void handleEvent(final Event e) {
 				logger.debug("getReadFileListener was pressed....");
 				doReadFile();
 			}
@@ -201,7 +216,8 @@ public class TextArea extends StyledText /* Text */{
 
 	private Listener getInsertFileListener() {
 		return new Listener() {
-			@Override public void handleEvent(final Event e) {
+			@Override
+			public void handleEvent(final Event e) {
 				logger.debug("getInsertFileListener was pressed....");
 				doInsertFile();
 			}
@@ -210,7 +226,8 @@ public class TextArea extends StyledText /* Text */{
 
 	private Listener getCopyListener() {
 		return new Listener() {
-			@Override public void handleEvent(final Event e) {
+			@Override
+			public void handleEvent(final Event e) {
 				logger.debug("getCopyListener was pressed....");
 				_copy();
 			}
@@ -219,7 +236,8 @@ public class TextArea extends StyledText /* Text */{
 
 	private Listener getPasteListener() {
 		return new Listener() {
-			@Override public void handleEvent(final Event e) {
+			@Override
+			public void handleEvent(final Event e) {
 				logger.debug("getCopyListener was pressed....");
 				_paste();
 			}
@@ -228,7 +246,8 @@ public class TextArea extends StyledText /* Text */{
 
 	private Listener getCutListener() {
 		return new Listener() {
-			@Override public void handleEvent(final Event e) {
+			@Override
+			public void handleEvent(final Event e) {
 				logger.debug("getCopyListener was pressed....");
 				_cut();
 			}
@@ -237,7 +256,8 @@ public class TextArea extends StyledText /* Text */{
 
 	private Listener getSelectAllListener() {
 		return new Listener() {
-			@Override public void handleEvent(final Event e) {
+			@Override
+			public void handleEvent(final Event e) {
 				logger.debug("getSelectAllListener was pressed....");
 				_selectAll();
 			}
@@ -262,78 +282,63 @@ public class TextArea extends StyledText /* Text */{
 
 	public void refreshContent() {
 		flgInit = true;
-		//		switch (enuWhatSourceType) {
-		//			case ScriptSource:
-		//				setText(objDataProvider.getSource());
-		//				strTagName = "job";
-		//				strAttributeName = "script";
-		//				break;
-		//			case xmlSource:
-		//				String strT = objDataProvider.getXML();
-		//				strT = strT.replaceAll("\\n\\n", System.getProperty("line.separator"));
-		//				setText(strT);
-		//				strTagName = "job";
-		//				strAttributeName = "script";
-		//				break;
-		//			case MonitorSource:
-		//				setText(objDataProvider.getSource());
-		//				strTagName = "job";
-		//				strAttributeName = "Monitor";
-		//				break;
-		//			case xmlComment:
-		//				setText(objDataProvider.getComment());
-		//				strTagName = "job";
-		//				strAttributeName = "comment";
-		//				break;
-		//			case JobDocu:
-		//				setText(objDataProvider.getDescription());
-		//				strTagName = "job";
-		//				strAttributeName = "documentation";
-		//				break;
-		//			default:
-		//				break;
-		//		}
 		SOSFontDialog objFontDialog = new SOSFontDialog(getFont().getFontData()[0], getForeground().getRGB());
+		objFontDialog.setKey(strPreferenceStoreKey);
 		objFontDialog.readFontData();
 		setFont(objFontDialog.getFontData(), objFontDialog.getForeGround());
 		flgInit = false;
 	}
 
+	public TextArea(final Composite pobjComposite, final String pstrPreferenceStoreKey) {
+		this(pobjComposite);
+		objFormPosSizeHandler = new WindowsSaver(this.getClass(), pobjComposite.getShell(), 640, 480);
+		strPreferenceStoreKey = pstrPreferenceStoreKey;
+		objFormPosSizeHandler.setKey(pstrPreferenceStoreKey);
+		refreshContent();
+	}
+
 	public TextArea(final Composite pobjComposite) {
 		this(pobjComposite, SWT.V_SCROLL | SWT.MULTI | SWT.BORDER | SWT.H_SCROLL);
 		createContextMenue();
-	    this.setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
-//	    this.setText("|i|m|\n|m|i|");
+		this.setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
 	}
 
 	public TextArea(final Composite pobjComposite, final int arg1) {
 		super(pobjComposite, arg1);
 		this.setBackground(Globals.getFieldBackground());
 		addVerifyListener(new VerifyListener() {
-			@Override public void verifyText(final VerifyEvent e) {
+			@Override
+			public void verifyText(final VerifyEvent e) {
 			}
 		});
 		addMouseListener(new MouseListener() {
-			@Override public void mouseUp(final MouseEvent event) {
+			@Override
+			public void mouseUp(final MouseEvent event) {
 				if (event.button == 3) {
 					logger.debug("button2");
 				}
 			}
 
-			@Override public void mouseDown(final MouseEvent arg0) {
+			@Override
+			public void mouseDown(final MouseEvent arg0) {
 			}
 
-			@Override public void mouseDoubleClick(final MouseEvent arg0) {
+			@Override
+			public void mouseDoubleClick(final MouseEvent arg0) {
 				// startExternalEditor();
 			}
 		});
+
 		addHelpListener(new HelpListener() {
-			@Override public void helpRequested(final HelpEvent objHelpEvent) {
+			@Override
+			public void helpRequested(final HelpEvent objHelpEvent) {
 				//				MainWindow.message(Messages.getString("OrderJob.Help"), SWT.ICON_INFORMATION);
 			}
 		});
+
 		addKeyListener(new KeyAdapter() {
-			@Override public void keyPressed(final KeyEvent e) {
+			@Override
+			public void keyPressed(final KeyEvent e) {
 				e.doit = false;
 				//				if (objDataProvider.Check4HelpKey(e.keyCode, strTagName, strAttributeName)) {
 				//					return;
@@ -359,7 +364,7 @@ public class TextArea extends StyledText /* Text */{
 							break;
 					}
 				}
-				if ((e.stateMask & SWT.MOD1 & SWT.ALT) == (SWT.MOD1 & SWT.ALT)) {
+				if ((e.stateMask & (SWT.MOD1 | SWT.ALT)) == (SWT.MOD1 | SWT.ALT)) {
 					if (e.keyCode == 's') { // caution: lower case letters
 						saveFile();
 						return;
@@ -393,7 +398,8 @@ public class TextArea extends StyledText /* Text */{
 		gridData_1.heightHint = 139;
 		setLayoutData(gridData_1);
 		addModifyListener(new ModifyListener() {
-			@Override public void modifyText(final ModifyEvent e) {
+			@Override
+			public void modifyText(final ModifyEvent e) {
 			}
 		});
 	}
@@ -403,14 +409,13 @@ public class TextArea extends StyledText /* Text */{
 	 * Clipboard(getDisplay()); } return cb; }
 	 */
 	public void setFont(final FontData f, final RGB foreGround) {
-//		SWTResourceManager.getFont(f.getLocale(), f.getHeight(), f.getStyle());
 		setFont(SWTResourceManager.getFont(f.getLocale(), f.getHeight(), f.getStyle()));
-		
 		setForeground(SWTResourceManager.getColor(foreGround));
 	}
 
 	public void changeFont() {
 		SOSFontDialog fd = new SOSFontDialog(getFont().getFontData()[0], getForeground().getRGB());
+		fd.setKey(strPreferenceStoreKey);
 		fd.setParent(getShell());
 		fd.show(getDisplay());
 		setFont(fd.getFontData(), fd.getForeGround());
@@ -505,7 +510,177 @@ public class TextArea extends StyledText /* Text */{
 		}
 	}
 
-	@Override protected void checkSubclass() {
+	public void setXMLText(final String pstrXMLText) {
+		List<XmlRegion> regions = new XmlRegionAnalyzer().analyzeXml(pstrXMLText);
+		List<StyleRange> objStyleRanges = computeStyleRanges(regions);
+		setText(pstrXMLText);
+		verifyXMLText objVfT = new verifyXMLText();
+		addVerifyListener(objVfT);
+		addKeyListener(objVfT);
+		setStyleRanges(objStyleRanges.toArray(new StyleRange[objStyleRanges.size()]));
+		redraw();
+	}
+
+	/**
+	 * Computes style ranges from XML regions.
+	 * @param regions an ordered list of XML regions
+	 * @return an ordered list of style ranges for SWT styled text
+	 */
+	public List<StyleRange> computeStyleRanges(List<XmlRegion> regions) {
+
+		List<StyleRange> styleRanges = new ArrayList<StyleRange>();
+		for (XmlRegion xr : regions) {
+
+			// The style itself depends on the region type
+			// In this example, we use colors from the system
+			StyleRange sr = new StyleRange();
+			switch (xr.getXmlRegionType()) {
+				case MARKUP:
+					sr.foreground = Display.getDefault().getSystemColor(SWT.COLOR_DARK_BLUE);
+					sr.fontStyle = SWT.BOLD;
+					break;
+
+				case ATTRIBUTE:
+					sr.foreground = Display.getDefault().getSystemColor(SWT.COLOR_DARK_RED);
+					break;
+
+				// And so on...
+				case ATTRIBUTE_VALUE:
+					sr.foreground = Display.getDefault().getSystemColor(SWT.COLOR_DARK_CYAN);
+					break;
+				case MARKUP_VALUE:
+					sr.fontStyle = SWT.BOLD;
+					break;
+				case COMMENT:
+					sr.foreground = Display.getDefault().getSystemColor(SWT.COLOR_DARK_GREEN);
+					break;
+				case INSTRUCTION:
+					sr.foreground = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
+					break;
+				case CDATA:
+					sr.foreground = Display.getDefault().getSystemColor(SWT.COLOR_DARK_MAGENTA);
+
+					break;
+				case WHITESPACE:
+					break;
+				default:
+					break;
+			}
+
+			// Define the position and limit
+			sr.start = xr.getStart();
+			sr.length = xr.getEnd() - xr.getStart();
+			styleRanges.add(sr);
+		}
+
+		return styleRanges;
+	}
+
+	public class verifyXMLText implements VerifyListener, KeyListener {
+		private String	strActualText	= "";
+		private boolean	flgInATag		= false;
+		private int		position		= -1;
+
+		private void addActualText(final String pstrText) {
+			if (flgInATag == true) {
+				strActualText += pstrText;
+			}
+		}
+
+		@Override
+		public void verifyText(VerifyEvent event) {
+			// Only expand when text is inserted.
+			if (event.end - event.start == 0) {
+				String strEventText = event.text;
+				switch (strEventText) {
+					case "<":
+						if (flgInATag == true) {
+							strActualText = "";
+						}
+						flgInATag = true;
+						addActualText(strEventText);
+						break;
+
+					case ">":
+						if (flgInATag == true) {
+							addActualText(strEventText);
+							strActualText = strActualText.replace("<", " </");
+							event.text = strEventText + strActualText;
+							sendKeyEvent(0);
+						}
+						break;
+
+					default:
+						addActualText(strEventText);
+						if (flgInATag == true) {
+							switch (strActualText) {
+								case "<![C":
+									event.text = "CDATA[ ]]>";
+									sendKeyEvent (5);
+									break;
+
+								default:
+									break;
+							}
+						}
+						break;
+				}
+				if (event.text.equals("<p>")) {
+					event.text = "<p></p>";
+				}
+			}
+		}
+
+		private void sendKeyEvent (final int intOffset) {
+			flgInATag = false;
+			strActualText = "";
+			position = getCaretOffset() + intOffset;
+			Event objEvent = new Event();
+			objEvent.type = SWT.KeyDown;
+			objEvent.keyCode = SWT.ARROW_LEFT;
+			objEvent.item = objThis;
+			Display.getCurrent().post(objEvent);
+			
+		}
+		@Override
+		public void keyPressed(KeyEvent e) {
+			e.doit = true;
+			if (flgInATag == true || position > 0) {
+				switch (e.keyCode) {
+					case SWT.ARROW_LEFT:
+						if (position > 0) {
+							position++;
+							setSelection(position);
+							setCaretOffset(position);
+							position = -1;
+							e.doit = false;
+						}
+						break;
+
+					case SWT.BS:
+						if (strActualText.equals("<")) {
+							strActualText = "";
+							flgInATag = false;
+						}
+						else {
+							strActualText = strActualText.substring(0, strActualText.length() - 1);
+							logger.debug(strActualText);
+						}
+						return;
+
+					default:
+						break;
+				}
+			}
+		}
+
+		@Override
+		public void keyReleased(KeyEvent e) {
+		}
+	}
+
+	@Override
+	protected void checkSubclass() {
 		// Disable the check that prevents subclassing of SWT components
 	}
 }

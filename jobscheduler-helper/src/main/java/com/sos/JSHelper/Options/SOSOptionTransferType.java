@@ -166,7 +166,8 @@ public class SOSOptionTransferType extends SOSOptionStringValueList {
 
 	public boolean needPortNumber() {
 		boolean strR = true;
-		switch (enuTT) {
+
+		switch (getEnum()) {
 			case file:
 			case local:
 			case zip:
@@ -181,6 +182,7 @@ public class SOSOptionTransferType extends SOSOptionStringValueList {
 	}
 
 	public enuTransferTypes getEnum() {
+		Text2Enum();
 		return enuTT;
 	}
 

@@ -10,6 +10,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.JSHelper.io.Files.JSFile;
 import com.sos.JSHelper.io.Files.JSTextFile;
 
 /**
@@ -188,7 +189,7 @@ public class SOSMsg {
 
 	private void handleMissingCodes() {
 		if (objMissingCodesPropertiesFile == null) {
-			objMissingCodesPropertiesFile = new JSTextFile("c:/temp/MissingCodes.properties");
+			objMissingCodesPropertiesFile = new JSTextFile(JSFile.getTempdir(), "MissingCodes.properties");
 		}
 		if (objMC.get(strMessageCode) == null) {
 			try {
@@ -440,6 +441,10 @@ public class SOSMsg {
 		else {
 			Messages = new Messages(pstrResourceBundleName, new Locale(strSOSLocale));
 		}
+	}
+
+	protected void setMessageResource(final String pstrResourceBundleName, final String pstrLocale) {
+		Messages = new Messages(pstrResourceBundleName, new Locale(pstrLocale));
 	}
 
 	protected void checkVerbosityLevel() {

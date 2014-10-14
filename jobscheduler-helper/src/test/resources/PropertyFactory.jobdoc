@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="scheduler_job_documentation_v1.1.xsl"?>
+<description xmlns="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1  http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.2.xsd">
+  <job name="PropertyFactory" title="PropertyFactora - a Factoroy to maintain I18N Files" order="yes">
+    <script />
+  </job>
+  <releases>
+    <release id="id" created="2014-10-09" modified="2014-10-09">
+      <author name="name" email="email" />
+    </release>
+  </releases>
+  <configuration>
+    <params>
+      <param name="SourceFolderName" DataType="SOSOptionFolderName" required="true">
+        <note language="en">
+          <div xmlns="http://www.w3.org/1999/xhtml">The Folder, which has all the I18N Property files.</div>
+        </note>
+      </param>
+      <param name="PropertyFileName" DataType="SOSOptionString" required="true" />
+      <param name="Operation" default_value="merge" DataType="SOSOptionString" required="false" />
+    </params>
+  </configuration>
+  <documentation language="de">
+    <xhtml:div>
+      <p>.</p>
+    </xhtml:div>
+  </documentation>
+</description>
+

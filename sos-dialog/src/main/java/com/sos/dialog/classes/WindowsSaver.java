@@ -1,7 +1,5 @@
 package com.sos.dialog.classes;
 
-import java.util.prefs.Preferences;
-
 import org.apache.log4j.Logger;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ControlAdapter;
@@ -12,6 +10,8 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+
+import com.sos.dialog.components.SOSPreferenceStore;
 
 /**
 * \class WindowsSaver
@@ -35,9 +35,8 @@ import org.eclipse.swt.widgets.TableColumn;
 * Created on 08.11.2011 15:29:14
  */
 
-public class WindowsSaver {
+public class WindowsSaver extends SOSPreferenceStore {
 
-	private static final int	MAX_KEY_LENGTH		= 80;
 	private static final String	conWIN_LOCATE_Y		= "win:locateY:";
 	private static final String	conWIN_LOCATE_X		= "win:locateX:";
 	private static final String	conWIN_SIZE_Y		= "win:sizeY:";
@@ -52,37 +51,35 @@ public class WindowsSaver {
 
 	private static final String	conPropertyWIDTH	= "width";
 
-	private final Shell			shell;
-	private final Preferences	prefs;
+//	private final Preferences	prefs;
 	private final Point			defaultSize;
 	private final Point			defaultLocation;
-	private final String		className;
+//	private final String		className;
 
-	private String				strKey				= "";
+//	private String				strKey				= "";
 	private boolean				flgClassIsActive	= false;
 
+	@Override
 	public void setKey(final String pstrKey) {
-		strKey = pstrKey;
+		super.setKey(pstrKey);
+		restoreWindow();
 	}
 
 	public WindowsSaver(final Class<?> c, final Shell s, final int x, final int y) {
-		prefs = Preferences.userNodeForPackage(c);
+		super(c);
 		shell = s;
-		className = c.getName();
 		strKey = className;
 		defaultSize = new Point(x, y);
 		defaultLocation = new Point(100, 100);
 
 		if (shell != null) {
-
 			shell.addDisposeListener(new DisposeListener() {
 				@Override
 				public void widgetDisposed(final DisposeEvent arg0) {
-					logger.debug("disposed");
+					logger.trace("disposed");
 					saveWindowPosAndSize();
 				}
 			});
-
 			shell.addControlListener(new ControlAdapter() {
 				@Override
 				public void controlMoved(final ControlEvent e) {
@@ -101,26 +98,19 @@ public class WindowsSaver {
 		}
 	}
 
-	private int getInt(final String s, final int def) {
-		try {
-			return Integer.parseInt(s);
-		}
-		catch (NumberFormatException e) {
-			return def;
-		}
-	}
-
 	public WindowsSaver restoreWindow() {
 		flgClassIsActive = true;
-		logger.debug(className);
 		restoreWindowSize();
 		restoreWindowLocation();
 		flgClassIsActive = false;
 		return this;
 	}
 
-	public void saveSash(final int[] sash) {
-		saveProperty("sash.layout", sash[0] + "," + sash[1]);
+	public void saveSash(final SashForm objSashForm) {
+		this.saveSash(objSashForm.getWeights());
+	}
+	public void saveSash(final int[] intWeights) {
+		saveProperty("sash.layout", intWeights[0] + "," + intWeights[1]);
 		logger.debug("Save Sash");
 	}
 
@@ -145,8 +135,8 @@ public class WindowsSaver {
 				shell.setMaximized(true);
 			}
 			else {
-				int x = getInt(prefs.get(conWIN_LOCATE_X + className, String.valueOf(defaultLocation.x)), defaultLocation.x);
-				int y = getInt(prefs.get(conWIN_LOCATE_Y + className, String.valueOf(defaultLocation.y)), defaultLocation.y);
+				int x = getInt(getProperty(conWIN_LOCATE_X), defaultLocation.x);
+				int y = getInt(getProperty(conWIN_LOCATE_Y), defaultLocation.y);
 				logger.debug("restoreWindowLocation: x = " + x + ", y = " + y + ", key = " + className);
 				shell.setLocation(x, y);
 			}
@@ -157,8 +147,8 @@ public class WindowsSaver {
 	}
 
 	public Point getWindowSize() {
-		int x = getInt(prefs.get(conWIN_SIZE_X + className, String.valueOf(defaultSize.x)), defaultSize.x);
-		int y = getInt(prefs.get(conWIN_SIZE_Y + className, String.valueOf(defaultSize.y)), defaultSize.y);
+		int x = getInt(getProperty(conWIN_SIZE_X), defaultSize.x);
+		int y = getInt(getProperty(conWIN_SIZE_Y), defaultSize.y);
 		logger.debug("getWindowSize: x = " + x + ", y = " + y + ", key = " + className);
 		return new Point(x, y);
 	}
@@ -182,30 +172,20 @@ public class WindowsSaver {
 			logger.debug(className);
 			int x = shell.getSize().x;
 			int y = shell.getSize().y;
-			logger.debug("saveWindowSize: x = " + x + ", y = " + y);
 
-			putPref(conWIN_SIZE_X, x);
-			putPref(conWIN_SIZE_Y, y);
-			putPref("isMaximized", (shell.getMaximized() == true) ? 1 : 0);
+			saveProperty(conWIN_SIZE_X, x + "");
+			saveProperty(conWIN_SIZE_Y, y + "");
+			saveProperty("isMaximized", (shell.getMaximized() == true) ? "1" : "0");
 
 			x = shell.getLocation().x;
 			y = shell.getLocation().y;
-			logger.debug("saveWindowLocation: x = " + x + ", y = " + y);
 
-			putPref(conWIN_LOCATE_X, x);
-			putPref(conWIN_LOCATE_Y, y);
+			saveProperty(conWIN_LOCATE_X, x + "");
+			saveProperty(conWIN_LOCATE_Y, y + "");
 		}
 		else {
 			logger.debug("shell is null");
 		}
-	}
-
-	private void putPref(final String pstrKey, final int pintValue) {
-		String key = pstrKey + className;
-		if (key.length() > MAX_KEY_LENGTH) {
-			key = key.substring(0, MAX_KEY_LENGTH - 1);
-		}
-		prefs.put(key, String.valueOf(pintValue));
 	}
 
 	public void centerScreen() {
@@ -214,21 +194,6 @@ public class WindowsSaver {
 		shell.setBounds((screen.width - shell.getBounds().width) / 2, (screen.height - shell.getBounds().height) / 2, shell.getBounds().width,
 				shell.getBounds().height);
 		flgClassIsActive = false;
-	}
-
-	private String getPropertyKey() {
-		return "properties/" + strKey;
-	}
-
-	public void saveProperty(final String pstrPropName, final String pstrPropValue) {
-		prefs.node(getPropertyKey()).put(pstrPropName, pstrPropValue);
-		logger.debug(String.format("saveProperty %1$s = %2$s", pstrPropName, pstrPropValue));
-	}
-
-	public String getProperty(final String pstrPropName) {
-		String strR = prefs.node(getPropertyKey()).get(pstrPropName, "");
-		logger.debug(String.format("getProperty %1$s = %2$s", pstrPropName, strR));
-		return strR;
 	}
 
 	public void saveTableColumn(final String tableName, final TableColumn t) {

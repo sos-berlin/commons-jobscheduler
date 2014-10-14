@@ -444,8 +444,14 @@ public class SOSCTabFolder extends CTabFolder {
 			}
 			objCurrTab.createTabItemComposite();
 			objComposite.layout(true, true);
-			getParent().layout(true);
-			layout(true);
+			Composite objPP = objComposite;
+			while (objPP != null) {
+				objPP = getParent();
+				if (objPP != null) {
+					objPP.layout(true, true);
+				}				
+			}
+			layout(true, true);
 			//			redraw();
 		}
 	}

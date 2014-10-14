@@ -1,6 +1,4 @@
 package com.sos.dialog.classes;
-import menues.SOSMenueEvent;
-
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -11,7 +9,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
@@ -22,6 +19,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.sos.dialog.interfaces.ICompositeBaseAbstract;
 import com.sos.dialog.interfaces.IDialogActionHandler;
+import com.sos.dialog.menu.SOSMenueEvent;
 import com.sos.dialog.message.ErrorLog;
 
 /**
@@ -61,7 +59,7 @@ public class DialogAdapter extends Dialog  {
 
 	private void init(final Shell parent) {
 		shell = new Shell(parent, SWT.ON_TOP | SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
-		objFormHelper = new WindowsSaver(this.getClass(), parent, 643, 600);
+		objFormHelper = new WindowsSaver(this.getClass(), shell, 643, 600);
 		setText("SWT Dialog");
 
 	}
@@ -71,7 +69,6 @@ public class DialogAdapter extends Dialog  {
 		shell.setRedraw(false);
 		shell.open();
 		set4ColumnLayout(shell);
-		;
 		if (objC == null) {
 			objC = createContents();
 		}
@@ -148,9 +145,7 @@ public class DialogAdapter extends Dialog  {
 		composite.addDisposeListener(new DisposeListener() {
 			@Override
 			public void widgetDisposed(final DisposeEvent e) {
-				//					if (butApply.isEnabled()) {
-				//						save();
-				//					}
+				
 			}
 		});
 		composite.layout(true, true);
@@ -159,26 +154,19 @@ public class DialogAdapter extends Dialog  {
 		grp2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1));
 		//		set4ColumnLayout(grp2);
 		//		grp2.setLayout(new RowLayout());
-		Button btnOK = new Button(grp2, SWT.PUSH);
-		btnOK.setText("OK");
+		SOSButton btnOK = new SOSButton(grp2, "ok");
 		shell.setDefaultButton(btnOK);
-
-		GridData data = new GridData(GridData.FILL_HORIZONTAL);
 		btnOK.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, true, 2, 1));
-
-		//		btnOK.setLayoutData(data);
 		btnOK.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-				doNew();
+				doOK();
 			}
 		});
 
-		Button btnCancel = new Button(grp2, SWT.PUSH);
-		btnCancel.setText("Cancel");
+		SOSButton btnCancel = new SOSButton(grp2, "cancel");
 		btnCancel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, true, 2, 1));
 
-		//		btnCancel.setLayoutData(data);
 		btnCancel.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
@@ -186,7 +174,6 @@ public class DialogAdapter extends Dialog  {
 			}
 		});
 
-		//		shell.layout(true, true);
 		objC = composite;
 		return composite;
 	}
@@ -201,7 +188,7 @@ public class DialogAdapter extends Dialog  {
 	public void set4ColumnLayout(final Composite objC) {
 		objC.setLayout(get4ColumnLayout());
 		if (GridData4Column == null) {
-			GridData4Column = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
+			GridData4Column = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		}
 		objC.setLayoutData(GridData4Column);
 	}
@@ -248,10 +235,9 @@ public class DialogAdapter extends Dialog  {
 		}
 	}
 
-	public void doNew() {
+	public void doOK() {
 		SOSMenueEvent objME = new SOSMenueEvent();
-		
-		objDialogActionHandler.doNew(objME);
+		objDialogActionHandler.doOK(objME);
 		if (objME.doIt == true) {
 			closeShell();
 		}

@@ -38,8 +38,10 @@ public class Gridlayout {
 			gridLayout.horizontalSpacing = 4;
 			gridLayout.verticalSpacing = 5;
 			gridLayout.marginBottom = 0;
-			gridLayout.marginLeft = 1;
-			gridLayout.marginRight = 1;
+			gridLayout.marginLeft = 3;    // leave space for control-decorator
+//			gridLayout.marginLeft = 1;
+//			gridLayout.marginRight = 1;
+			gridLayout.marginRight = 6;  // leave space for control-decorator
 			gridLayout.marginTop = 2;
 			gridLayout.marginHeight = 2;
 		}

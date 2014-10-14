@@ -1,7 +1,7 @@
 /**
  * 
  */
-package menues;
+package com.sos.dialog.menu;
 
 /**
  * @author KB

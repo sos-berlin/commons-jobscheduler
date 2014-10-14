@@ -172,7 +172,8 @@ public class ControlCreator {
 		Control objT = null;
 		{
 			Label lblNewLabel = new Label(objParentComposite, SWT.NONE);
-			lblNewLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
+			GridData lblGridData = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+			lblNewLabel.setLayoutData(lblGridData);
 			MsgHandler.newMsg(pobjOption.getShortKey()).Control(lblNewLabel);
 			String strControlType = pobjOption.getControlType();
 			//

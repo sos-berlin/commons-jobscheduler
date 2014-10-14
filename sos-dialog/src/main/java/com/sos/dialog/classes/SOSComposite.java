@@ -7,8 +7,12 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+
+import com.sos.dialog.Globals;
 
 /**
  * @author KB
@@ -29,7 +33,10 @@ public class SOSComposite extends Composite {
 	}
 	public SOSComposite(final Composite parent, final int style) {
 		super(parent,SWT.None);
-//		this.setBackground(Globals.getCompositeBackground());
+		this.setBackground(Globals.getCompositeBackground());
+		GridLayout gridLayout = new GridLayout(1, false);
+		setLayout(gridLayout);
+		setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 	}
 
 	public void addChild (final Control pobjC) {

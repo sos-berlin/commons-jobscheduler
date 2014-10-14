@@ -4,6 +4,8 @@
 package com.sos.dialog.components;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.DisposeEvent;
@@ -14,6 +16,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
@@ -112,6 +115,7 @@ public class ControlHelper implements IValueChangedListener {
 					flgIsDirty = true;
 				}
 			});
+			createControlDecoration(objText, SWT.RIGHT);
 			objText.addTraverseListener(changeReturn2Tab());
 		}
 		if (objControl instanceof Combo) {
@@ -127,6 +131,7 @@ public class ControlHelper implements IValueChangedListener {
 					flgIsDirty = true;
 				}
 			});
+			createControlDecoration(objCombo, SWT.RIGHT);
 			objCombo.addTraverseListener(changeReturn2Tab());
 		}
 		if (objControl instanceof CCombo) {
@@ -148,6 +153,7 @@ public class ControlHelper implements IValueChangedListener {
 					flgIsDirty = true;
 				}
 			});
+			createControlDecoration(objCombo, SWT.RIGHT);
 			objCombo.addTraverseListener(changeReturn2Tab());
 		}
 		if (objControl instanceof Button || objControl instanceof SOSCheckBox) {
@@ -161,6 +167,8 @@ public class ControlHelper implements IValueChangedListener {
 			if (objControl instanceof SOSCheckBox) {
 				objControl.addTraverseListener(changeReturn2Tab());
 			}
+			createControlDecoration(objControl, SWT.LEFT);
+
 		}
 		objControl.addDisposeListener(new DisposeListener() {
 			@Override
@@ -275,10 +283,15 @@ public class ControlHelper implements IValueChangedListener {
 		if (objControl instanceof Button) {
 		}
 		else {
-			objControl.setBackground(Globals.getFieldHasFocusBackground());
-		}
-		if (objControl instanceof Text) {
-			((Text) objControl).setSelection(0);
+			if (objControl.isEnabled()) {
+				objControl.setBackground(Globals.getFieldHasFocusBackground());
+				if (objControl instanceof Text) {
+					((Text) objControl).setSelection(0);
+				}
+			}
+			else {
+				objControl.setBackground(Globals.getProtectedFieldColor());
+			}
 		}
 	}
 
@@ -360,5 +373,14 @@ public class ControlHelper implements IValueChangedListener {
 	public void ValidationError(final SOSValidationError pobjVE) {
 		flgControlValueInError = true;
 		MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", pobjVE.getErrorMessage());
+	}
+
+	private void createControlDecoration(final Control objControl, final int intOrientation) {
+		// http://javawiki.sowas.com/doku.php?id=swt-jface:control-decoration
+		Image image = FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION).getImage();
+
+		ControlDecoration decoration = new ControlDecoration(objControl, intOrientation | SWT.TOP);
+		decoration.setImage(image);
+		decoration.setDescriptionText(getToolTip());
 	}
 }

@@ -81,8 +81,8 @@ public abstract class CompositeBaseClass<T> extends Composite implements ISOSTab
 			createComposite();
 			logger.debug("createTabItemComposite " + conClassName);
 			composite.pack();
-			composite.layout(true);
-			composite.getParent().layout(true);
+			composite.layout(true, true);
+			composite.getParent().layout(true, true);
 		}
 		flgCompositeIsCreated = true;
 	}

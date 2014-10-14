@@ -3,13 +3,15 @@
  */
 package com.sos.dialog.interfaces;
 
-import menues.SOSMenueEvent;
+import com.sos.dialog.menu.SOSMenueEvent;
 
 /**
  * @author KB
  *
  */
 public interface IDialogActionHandler {
+
+	public void doOK (final SOSMenueEvent pobjMenueEvent);
 
 	public void doCancel (final SOSMenueEvent pobjMenueEvent);
 

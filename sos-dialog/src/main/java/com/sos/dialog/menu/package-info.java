@@ -5,4 +5,4 @@
  * @author KB
  *
  */
-package menues;
+package com.sos.dialog.menu;
