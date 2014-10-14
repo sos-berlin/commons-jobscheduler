@@ -109,17 +109,17 @@ public class BrowserViewForm {
 			@Override
 			public void open(final WindowEvent event) {
 			    
-		 		if ( false && !event.required) {
-		 			return; /* only do it if necessary */
+//JID-59	if ( false && !event.required) {
+//		 			return; /* only do it if necessary */
 		 		 
-			}else {    
+//			}else {    
 				Shell shell = new Shell(display);
 				shell.setLayout(new FillLayout());
 				Browser browser = new Browser(shell, SWT.NONE);
  
 				initialize(display, browser);
 				event.browser = browser;
-			}
+//			}
 			}
 		});
 		browser.addVisibilityWindowListener(new VisibilityWindowListener() {
