@@ -1,42 +1,41 @@
 package com.sos.VirtualFileSystem.HTTP;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.GeneralSecurityException;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpVersion;
-import org.apache.http.StatusLine;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.ClientConnectionManager;
-import org.apache.http.conn.scheme.PlainSocketFactory;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.conn.scheme.SchemeSocketFactory;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.BasicClientConnectionManager;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.params.HttpProtocolParams;
+import org.apache.commons.httpclient.Credentials;
+import org.apache.commons.httpclient.HostConfiguration;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpHost;
+import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.HttpURL;
+import org.apache.commons.httpclient.HttpsURL;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.URIException;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.contrib.ssl.EasySSLProtocolSocketFactory;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.protocol.Protocol;
+import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.apache.log4j.Logger;
 
 import sos.util.SOSString;
 
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsSuperClass;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
+import com.sos.VirtualFileSystem.exceptions.JADEException;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 /**
- * @ressources httpclient-4.2.1.jar,httpcore-4.2.1.jar
  *
  * @author Robert Ehrlich
  *
@@ -45,11 +44,11 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 
 	private final Logger				logger		= Logger.getLogger(SOSVfsHTTP.class);
-	private DefaultHttpClient 	httpClient;
-	private HttpHost 			targetHost;
-
-	private final boolean  isHTTPS = false;
-
+	
+	private MultiThreadedHttpConnectionManager connectionManager;
+	private HttpClient  		httpClient;
+	private HttpURL				rootUrl			= null;
+	
 	/**
 	 *
 	 */
@@ -87,7 +86,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 	 * @return
 	 */
 	@Override
-	public ISOSConnection Connect(final SOSConnection2OptionsAlternate pConnection2OptionsAlternate) {
+	public ISOSConnection Connect(final SOSConnection2OptionsAlternate pConnection2OptionsAlternate){
 		connection2OptionsAlternate = pConnection2OptionsAlternate;
 
 		if (connection2OptionsAlternate == null) {
@@ -126,10 +125,8 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 				if (!optionsAlternatives.host.IsEmpty() && !optionsAlternatives.user.IsEmpty()) {
 					logger.info(SOSVfs_I_170.params(connection2OptionsAlternate.Alternatives().host.Value()));
 					try {
-
-						host = optionsAlternatives.host.Value();
-						port = optionsAlternatives.port.value();
-
+						this.connect(optionsAlternatives.host.Value(), 
+								optionsAlternatives.port.value());
 						this.doAuthenticate(optionsAlternatives);
 						exx = null;
 					}
@@ -163,12 +160,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 
 
 		try {
-
-			userName = user;
-
-			logger.debug(SOSVfs_D_132.params(userName));
-
-			this.doLogin(userName, password);
+			this.doLogin(user, password);
 
 			reply = "OK";
 			logger.debug(SOSVfs_D_133.params(userName));
@@ -193,18 +185,16 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 	public void disconnect() {
 		reply = "disconnect OK";
 
-		if (httpClient != null) {
+		if (this.connectionManager != null) {
 			try {
-				httpClient.getConnectionManager().shutdown();
+				this.connectionManager.shutdown();
 			}
 			catch (Exception ex) {
 				reply = "disconnect: " + ex;
 			}
-			httpClient = null;
+			this.connectionManager = null;
+			this.httpClient = null;
 		}
-
-		targetHost = null;
-
 		logger.info(reply);
 	}
 
@@ -220,59 +210,41 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 	 */
 	@Override
 	public boolean isConnected() {
-		return httpClient != null && httpClient.getConnectionManager() != null;
+		//return httpClient != null && httpClient.getConnectionManager() != null;
+		return httpClient != null && connectionManager != null;
 	}
 
 
-	/**
-	 *
-	 * \brief getFile
-	 *
-	 * \details
-	 *
-	 * \return
-	 *
-	 * @param remoteFile
-	 * @param localFile
-	 * @param append
-	 * @return
-	 */
+	private String normalizeHttpPath(String path){
+		if(!path.toLowerCase().startsWith("http://") && !path.toLowerCase().startsWith("https://")){
+			if(!path.startsWith("/")){
+				path = "/"+path; 
+			}
+			path = this.httpClient.getHostConfiguration().getHostURL()+path;
+		}
+		
+		return path;
+	}
+	
 	@Override
 	public long getFile(final String remoteFile, final String localFile, final boolean append) {
-
-		FileOutputStream outputStream = null;
 		long fileSize = -1;
+		FileOutputStream outputStream = null;
+		
 		try {
+			InputStream responseStream = getInputStream(remoteFile);
+			File local = new File(localFile);
 
-			HttpGet request 		= new HttpGet(remoteFile);
-			HttpResponse response 	= httpClient.execute(targetHost, request);
-			StatusLine status 		= response.getStatusLine();
+			outputStream = new FileOutputStream(local,append);
+			byte buffer[] = new byte[1000];
+			int  numOfBytes = 0;
 
-			if (status.getStatusCode() < 200 || status.getStatusCode() >= 300) {
-				throw new Exception("HTTP Error : "+ status.toString());
+			while ( (numOfBytes = responseStream.read(buffer)) != -1 ) {
+				outputStream.write(buffer, 0, numOfBytes);
 			}
 
-			HttpEntity entity = response.getEntity();
-
-			if(entity != null) {
-				File local = new File(localFile);
-
-				outputStream = new FileOutputStream(local,append);
-
-				byte buffer[] = new byte[1000];
-				int  numOfBytes = 0;
-
-				InputStream responseStream = entity.getContent();
-				while ( (numOfBytes = responseStream.read(buffer)) != -1 ) {
-					outputStream.write(buffer, 0, numOfBytes);
-				}
-
-				fileSize = local.length();
-			}
-			else {
-				throw new JobSchedulerException("HTTP Response is empty (HttpEntity is NULL)");
-			}
-
+			fileSize = local.length();
+			
 			reply = "get OK";
 			logger.info(HostID(SOSVfs_I_182.params("getFile", remoteFile, localFile, getReplyString())));
 		}
@@ -288,53 +260,11 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 				}
 			}
 			catch (Exception e) {
-				throw new JobSchedulerException(e);
 			}
 		}
-
 		return fileSize;
 	}
-
 	
-	/**
-	 *
-	 * \brief getInputStream
-	 *
-	 * \details
-	 *
-	 * \return
-	 *
-	 * @param path
-	 * @return
-	 */
-	@Override
-	public InputStream getInputStream(final String path) {
-		try {
-
-			HttpGet request 		= new HttpGet(path);
-			HttpResponse response 	= httpClient.execute(targetHost, request);
-			StatusLine status 		= response.getStatusLine();
-
-			if (status.getStatusCode() < 200 || status.getStatusCode() >= 300) {
-				throw new Exception("HTTP Error : "+ status.toString());
-			}
-
-			HttpEntity entity = response.getEntity();
-
-			if(entity != null) {
-				return entity.getContent();
-			}
-			else {
-				throw new Exception("HTTP Response is empty (HttpEntity is NULL)");
-			}
-		}
-		catch (Exception ex) {
-			RaiseException(ex, SOSVfs_E_193.params("getInputStream()", path));
-		}
-		return null;
-	}
-
-
 	/**
 	 *
 	 * \brief getFileHandle
@@ -362,19 +292,17 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 	 */
 	@Override
 	protected boolean fileExists(final String path) {
+		GetMethod method = new GetMethod(normalizeHttpPath(path));
 		try {
-
-			HttpGet request 		= new HttpGet(path);
-			HttpResponse response 	= httpClient.execute(targetHost, request);
-			StatusLine status 		= response.getStatusLine();
-
-			// siehe HTTP StatusCode unter http://www.elektronik-kompendium.de/sites/net/0902231.htm
-			if (status.getStatusCode() >= 200 && status.getStatusCode() < 404) {
-				return true;
-			}
+			return isSuccessStatusCode(executeHttpMethod(method));
 		}
 		catch (Exception ex) {}
-
+		finally{
+			try{
+				method.releaseConnection();
+			}
+			catch(Exception ex){}
+		}
 		return false;
 	}
 
@@ -385,21 +313,17 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 	 * @throws Exception
 	 */
 	private void doLogin(final String user, final String password) throws Exception{
-
-		if(!SOSString.isEmpty(user)) { //theoretisch password kann auch leer sein
-			httpClient.getCredentialsProvider().
-							setCredentials( new AuthScope(
-									targetHost.getHostName(),
-									targetHost.getPort()),
-									new UsernamePasswordCredentials(user,password));
-
-			HttpResponse response = httpClient.execute(targetHost,new HttpGet("/"));
-			StatusLine status	= response.getStatusLine();
-
-			if (status.getStatusCode() < 200 || status.getStatusCode() >= 300) {
-				throw new Exception("HTTP Error : "+ status.toString());
-			}
+		this.userName = user;
+		
+		logger.debug(SOSVfs_D_132.params(userName));
+		
+		if(!SOSString.isEmpty(userName)){
+			Credentials credentials = new UsernamePasswordCredentials(this.userName, password);
+			this.httpClient.getState().setCredentials(AuthScope.ANY, credentials);
 		}
+		
+		executeHttpMethod(new GetMethod());
+	
 	}
 
 	/**
@@ -417,30 +341,10 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 	private ISOSConnection doAuthenticate(final ISOSAuthenticationOptions pAuthenticationOptions) throws Exception {
 
 		authenticationOptions = pAuthenticationOptions;
-
-		userName = authenticationOptions.getUser().Value();
-		String password = authenticationOptions.getPassword().Value();
-		logger.debug(SOSVfs_D_132.params(userName));
-
-		if(httpClient == null) {
-			throw new Exception("HTTP Client ist not initialized (NULL)");
-		}
-		if(targetHost == null) {
-			throw new Exception("Target Host ist not initialized (NULL)");
-		}
-
-		try {
-			this.doLogin(userName,password);
-		}
-		catch (Exception ex) {
-			throw new JobSchedulerException(SOSVfs_E_167.params(authenticationOptions.getAuth_method().Value(), authenticationOptions.getAuth_file()
-					.Value()));
-		}
-
-		reply = "OK";
-		logger.debug(SOSVfs_D_133.params(userName));
-		this.LogReply();
-
+		
+		this.doLogin(authenticationOptions.getUser().Value(), 
+				authenticationOptions.getPassword().Value());
+		
 		return this;
 	}
 
@@ -454,53 +358,85 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 	 *
 	 * @param phost
 	 * @param pport
+	 * @throws URIException 
+	 * @throws IOException 
+	 * @throws GeneralSecurityException 
 	 */
-	private void connect(final String phost, final int pport) {
-
-		host = phost;
-		port = pport;
-
-		logger.debug(SOSVfs_D_0101.params(host, port));
-
-		String protocol;
-		SchemeSocketFactory scheme;
-
-
+	private void connect(final String phost, final int pport){
+	
 		if (this.isConnected() == false) {
-
-			if(isHTTPS) {//default port 443
-				protocol = "https";
-				scheme = new EasySSLSocketFactory();
-			}
-			else {//default port 80
-				protocol = "http";
-				scheme = PlainSocketFactory.getSocketFactory();
-			}
-
-
-			SchemeRegistry schemeRegistry = new SchemeRegistry();
-			schemeRegistry.register(new Scheme(protocol, port,scheme));
-
-			HttpParams params = new BasicHttpParams();
-			HttpProtocolParams.setUseExpectContinue(params, false);
-			HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
-
-			ClientConnectionManager cm = new BasicClientConnectionManager(schemeRegistry);
-			httpClient = new DefaultHttpClient(cm, params);
-
-			try {
-				targetHost = new HttpHost(host,port,protocol);
-				httpClient.execute(targetHost,new HttpGet("/"));
-
+			try{
+				this.port = pport;
+				HostConfiguration hc = new HostConfiguration();
+				
+				if(phost.toLowerCase().startsWith("https://")){
+					this.rootUrl 	= new HttpsURL(phost);
+					this.host 	= this.rootUrl.getHost();
+					if(this.port > 0){
+						//Protocol.registerProtocol("https", new Protocol("https", (ProtocolSocketFactory) new EasySSLProtocolSocketFactory(), this.port));
+						hc.setHost(this.host,this.port, new Protocol("https", (ProtocolSocketFactory) new EasySSLProtocolSocketFactory(), this.port));
+					}
+					else{
+						hc.setHost(new HttpHost(host,port));
+					}
+				}
+				else{
+					this.rootUrl 	= new HttpURL(phost.toLowerCase().startsWith("http://") ? phost : "http://"+phost);
+					this.host 		= this.rootUrl.getHost();
+					hc.setHost(new HttpHost(host,port));
+				}
+				
+				logger.debug(SOSVfs_D_0101.params(host, port));
+				
+				connectionManager = new MultiThreadedHttpConnectionManager();
+				httpClient = new HttpClient(connectionManager);
+				httpClient.setHostConfiguration(hc);
+				
 				this.LogReply();
 			}
-			catch(Exception ex) {
-				logERROR(ex);
+			catch(Exception ex){
+				throw new JADEException(ex);
 			}
 		}
 		else {
 			logWARN(SOSVfs_D_0103.params(host, port));
 		}
+	}
+	
+	private int executeHttpMethod(HttpMethod method) throws Exception{
+		try{
+			this.httpClient.executeMethod(method);
+			
+			if(!isSuccessStatusCode(method.getStatusCode())){
+				throw new Exception(String.format("HTTP [%s][%s] = %s",
+						method.getURI(),
+						method.getStatusCode(),
+						method.getStatusText()));
+			}
+			return method.getStatusCode();
+		}
+		catch(Exception ex){
+			throw ex;
+		}
+		finally{
+			try{
+				method.releaseConnection();
+			}
+			catch(Exception ex){};
+		}
+	}
+	
+	private boolean isSuccessStatusCode(int statusCode){
+		// siehe HTTP StatusCode unter http://www.elektronik-kompendium.de/sites/net/0902231.htm
+		/**
+		if(statusCode >= HttpStatus.SC_OK && statusCode < HttpStatus.SC_NOT_FOUND){
+			return true;
+		}*/
+		if(statusCode == HttpStatus.SC_OK){
+			return true;
+		}
+		
+		return false;
 	}
 
 	@Override
@@ -509,14 +445,39 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 		return null;
 	}
 
+	/**
+	 * @TODO es fehlt method.releaseConnection();
+	 * 
+	 * @param fileName
+	 * @return
+	 */
+	@Override public InputStream getInputStream(final String fileName) {
+		try {
+			GetMethod method = new GetMethod(normalizeHttpPath(fileName));
+			this.httpClient.executeMethod(method);
+				
+			if(!isSuccessStatusCode(method.getStatusCode())){
+				throw new Exception(String.format("HTTP [%s][%s] = %s",
+						method.getURI(),
+						method.getStatusCode(),
+						method.getStatusText()));
+			}
+		  return method.getResponseBodyAsStream();
+		}
+		catch (Exception ex) {
+			RaiseException(ex, SOSVfs_E_193.params("getInputStream()", fileName));
+			return null;
+		}
+	}
+
 	@Override
-	public InputStream getInputStream() {
+	public OutputStream getOutputStream(final String fileName) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public OutputStream getOutputStream(final String fileName) {
+	public InputStream getInputStream() {
 		// TODO Auto-generated method stub
 		return null;
 	}
