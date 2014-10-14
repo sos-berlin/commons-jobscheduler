@@ -84,7 +84,7 @@ public class SOSNullFilter extends JSJobUtilitiesClass<SOSFilterOptions> impleme
 			String strT = byte2String(bteBuffer);
 
 			bteBuffer = strT.getBytes();
-			logger.debug(byte2String(bteBuffer));
+			logger.trace(byte2String(bteBuffer));
 		}
 
 	} // private void doProcess
