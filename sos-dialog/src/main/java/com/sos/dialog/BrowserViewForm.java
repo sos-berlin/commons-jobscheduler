@@ -2,9 +2,13 @@ package com.sos.dialog;
 
 
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
-
+import org.eclipse.swt.browser.AuthenticationEvent;
+import org.eclipse.swt.browser.AuthenticationListener;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.CloseWindowListener;
 import org.eclipse.swt.browser.OpenWindowListener;
@@ -54,6 +58,7 @@ public class BrowserViewForm {
         showBrowser();
     }
 
+    
 	private void showBrowser() {
 		gridLayout = new GridLayout();
 		gridLayout.numColumns = 2;
@@ -104,14 +109,15 @@ public class BrowserViewForm {
 			@Override
 			public void open(final WindowEvent event) {
 			    
-		 		if (!event.required) {
-		 		    	return; /* only do it if necessary */
+		 		if ( false && !event.required) {
+		 			return; /* only do it if necessary */
 		 		 
 			}else {    
 				Shell shell = new Shell(display);
 				shell.setLayout(new FillLayout());
 				Browser browser = new Browser(shell, SWT.NONE);
- 				initialize(display, browser);
+ 
+				initialize(display, browser);
 				event.browser = browser;
 			}
 			}
@@ -134,19 +140,22 @@ public class BrowserViewForm {
 					Point size = event.size;
 					shell.setSize(shell.computeSize(size.x, size.y));
 				}
-				shell.open();
+ 				shell.open();
 			}
 		});
 		browser.addCloseWindowListener(new CloseWindowListener() {
 			@Override
 			public void close(final WindowEvent event) {
-				Browser browser = (Browser) event.widget;
+ 				Browser browser = (Browser) event.widget;
 				Shell shell = browser.getShell();
+				
 				shell.close();
 			}
 		});
-	}
 	
+
+	}
+
 	public String getUrlCaption() {
 		return url.getUrlCaption();
 	}
