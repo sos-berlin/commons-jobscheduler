@@ -41,16 +41,17 @@ public class SOSVfsHTTPTest {
 	protected SOSFTPOptions			objOptions				= null;
 	protected ISOSVFSHandler		objVFS					= null;
 	protected ISOSVfsFileTransfer	objVfsClient			= null;
+	SOSConnection2OptionsAlternate objSource				= null;
 	// siehe setUp
 	protected String				dynamicClassNameSource	= null;
 	protected String				dynamicClassNameTarget	= null;
 	protected final String			LOCAL_BASE_PATH			= "R:/backup/sos/java/junittests/testdata/JADE/";
-	protected final String			REMOTE_BASE_PATH		= "/home/kb/";
-	protected final String			WEB_URI					= "http://www.sos-berlin.com";
+	protected final String			HTTP_URI				= "www.sos-berlin.com";
+	protected final int				HTTP_PORT				= 80;
 
-	//	protected final String			WEB_URI					= "https://mediacenter.gmx.net";
-	//	protected final String			WEB_USER				= "sos.apl@gmx.de";
-	//	protected final String			WEB_PASS				= "sosapl10629";
+	protected final String			HTTPS_URI				= "https://kb.sos-berlin.com";
+	protected final int				HTTPS_PORT				= 443;
+
 	public SOSVfsHTTPTest() {
 		//
 	}
@@ -67,6 +68,8 @@ public class SOSVfsHTTPTest {
 	public void setUp() throws Exception {
 		objOptions = new SOSFTPOptions(SOSOptionTransferType.enuTransferTypes.http);
 		objOptions.protocol.Value(SOSOptionTransferType.enuTransferTypes.http);
+		objOptions.auth_method.isURL(true);
+		objSource = objOptions.getConnectionOptions().Source();
 		objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
 		objVfsClient = (ISOSVfsFileTransfer) objVFS;
 	}
@@ -75,51 +78,47 @@ public class SOSVfsHTTPTest {
 	public void tearDown() throws Exception {
 	}
 
+	private void connect() throws RuntimeException, Exception {
+		objSource.host.Value(HTTP_URI);
+		objSource.port.value(HTTP_PORT);
+		objVFS.Connect(objSource);
+		
+	}
+
+	private void authenticate() throws Exception {
+		objSource.user.Value("xxx");
+		objSource.password.Value("xxx");
+		
+		objVFS.Authenticate(objSource);
+	}
+	
+	private void disconnect() throws Exception {
+		objVfsClient.disconnect();
+		objVFS.CloseConnection();
+	}
+	
 	@Test
 	public void testConnect() throws Exception {
-		objOptions.host.Value(WEB_URI);
-		objOptions.port.value(0);
-		SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().Source();
-		objSource.host.Value(WEB_URI);
-		//		objSource.user.Value(WEB_USER);
-		objOptions.operation.Value("send");
-		VFSFactory.setConnectionOptions(objSource);
-		objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
-		objVfsClient = (ISOSVfsFileTransfer) objVFS;
-		objVFS.Connect(objOptions.getConnectionOptions().Source());
-		// ftpClient.disconnect();
+		connect();
+		disconnect();
 	}
 
 	@Test
 	public void testAuthenticate() throws Exception {
-		testConnect();
+		connect();
 		authenticate();
-		objVfsClient.disconnect();
+		disconnect();
 	}
 
-	private void connect() throws RuntimeException, Exception {
-		objOptions.host.Value(WEB_URI);
-		objOptions.port.value(0);
-		// objOptions.local_dir.Value("/temp");
-		SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().Source();
-		objSource.host.Value(WEB_URI);
-		//		objSource.user.Value(WEB_USER);
-		objSource.protocol.Value("webdav");
-		objOptions.operation.Value("send");
-		VFSFactory.setConnectionOptions(objSource);
-		objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
-		objVfsClient = (ISOSVfsFileTransfer) objVFS;
-		objVFS.Connect(objOptions.getConnectionOptions().Source());
-	}
-
-	private void authenticate() throws Exception {
-		SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().Source();
-		objSource.host.Value(WEB_URI);
-		//		objSource.user.Value(WEB_USER);
-		//		objSource.password.Value(WEB_PASS);
-		objSource.protocol.Value("webdav");
-		objSource.ssh_auth_method.isURL(true);
-		objVFS.Authenticate(objSource);
+	@Test
+	public void testGetFile() throws Exception {
+		connect();
+		authenticate();
+		
+		objVfsClient.getFile("timecard/timecard_dialog.php","D:\\1.php");
+		//objVfsClient.getFile("http://download.sos-berlin.com/JobScheduler.1.7/jobscheduler_windows-x64.1.7.4274.zip","D:\\1.zip");
+		
+		disconnect();
 	}
 
 	@Test
@@ -128,7 +127,7 @@ public class SOSVfsHTTPTest {
 		authenticate();
 		objVfsClient.mkdir("test1");
 		objVfsClient.rmdir("test1");
-		objVfsClient.disconnect();
+		disconnect();
 	}
 
 	@Test
@@ -137,7 +136,7 @@ public class SOSVfsHTTPTest {
 		authenticate();
 		objVfsClient.mkdir("test1/test2/test3/");
 		objVfsClient.rmdir("test1/");
-		objVfsClient.disconnect();
+		disconnect();
 	}
 
 	@Test
@@ -145,162 +144,74 @@ public class SOSVfsHTTPTest {
 		connect();
 		authenticate();
 		objVfsClient.getInputStream("test1/test2/test3/");
-		objVfsClient.disconnect();
+		disconnect();
 	}
 
-	@Test
-	public void testNListString() {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testIsNotHiddenFile() {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testNListStringBoolean() {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testNList() {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testNListBoolean() {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testDirString() {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testDirStringInt() {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testListNames() {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testDir() {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetResponse() {
-		// fail("Not yet implemented");
-	}
-
+	
 	@Test
 	public void testSize() throws Exception {
 		connect();
 		authenticate();
-		System.out.println(objVfsClient.getFileSize(REMOTE_BASE_PATH + "sos-net-src.zip"));
-		System.out.println(objVfsClient.getFileSize(REMOTE_BASE_PATH + "BVG.pdf"));
-		objVfsClient.disconnect();
+		
+		//System.out.println(objVfsClient.getFileSize(REMOTE_BASE_PATH + "sos-net-src.zip"));
+		//System.out.println(objVfsClient.getFileSize(REMOTE_BASE_PATH + "BVG.pdf"));
+		
+		disconnect();
 	}
 
-	@Test
-	public void testGetFileStringStringBoolean() {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetFileStringString() {
-		// fail("Not yet implemented");
-	}
-
+	
 	@Test
 	public void testPut() throws RuntimeException, Exception {
 		connect();
 		authenticate();
-		objVfsClient.putFile(LOCAL_BASE_PATH + "sos-net-src.zip", REMOTE_BASE_PATH + "sos-net-src.zip");
-		objVfsClient.disconnect();
-	}
-
-	@Test
-	public void testPutFileStringString() {
-		// fail("Not yet implemented");
+		//objVfsClient.putFile(LOCAL_BASE_PATH + "sos-net-src.zip", REMOTE_BASE_PATH + "sos-net-src.zip");
+		
+		disconnect();
 	}
 
 	@Test
 	public void testPutFileStringOutputStream() throws Exception {
 		connect();
 		authenticate();
+		
+		/**
 		OutputStream out = objVfsClient.getOutputStream(REMOTE_BASE_PATH + "out.test.txt");
 		out.write("hallo".getBytes());
 		out.flush();
 		out.close();
-		objVfsClient.disconnect();
+		*/
+		
+		disconnect();
 	}
 
-	@Test
-	public void testGetClient() {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testAppendFile() {
-		// fail("Not yet implemented");
-	}
 
 	@Test
 	public void testCd() throws Exception {
 		connect();
 		authenticate();
 		objVfsClient.changeWorkingDirectory("/xxx/xxx");
-		objVfsClient.disconnect();
+		disconnect();
 	}
 
-	@Test
-	public void testChangeWorkingDirectory() throws Exception {
-		testCd();
-	}
-
+	
 	@Test
 	public void testDelete() throws Exception {
 		connect();
 		authenticate();
-		objVfsClient.put(LOCAL_BASE_PATH + "sos-net-src.zip", REMOTE_BASE_PATH + "tmp123.zip");
-		objVfsClient.delete(REMOTE_BASE_PATH + "tmp123.zip");
-		objVfsClient.disconnect();
+		
+		//objVfsClient.put(LOCAL_BASE_PATH + "sos-net-src.zip", REMOTE_BASE_PATH + "tmp123.zip");
+		//objVfsClient.delete(REMOTE_BASE_PATH + "tmp123.zip");
+		
+		disconnect();
 	}
 
-	@Test
-	public void testLogin() throws Exception {
-		connect();
-		//		objVfsClient.login(WEB_USER,WEB_PASS);
-		objVfsClient.disconnect();
-	}
-
-	@Test
-	public void testDisconnect() throws Exception {
-		connect();
-		//		objVfsClient.login(WEB_USER,WEB_PASS);
-		objVfsClient.disconnect();
-	}
-
-	@Test
-	public void testGetReplyString() throws Exception {
-		connect();
-		//		objVfsClient.login(WEB_USER,WEB_PASS);
-		logger.info("Replay = " + objVfsClient.getReplyString());
-		objVfsClient.disconnect();
-	}
 
 	@Test
 	public void testIsConnected() throws Exception {
 		connect();
 		//ftpClient.login(WEB_USER,WEB_PASS);
 		logger.debug("IS CONNECTED = " + objVfsClient.isConnected());
-		objVfsClient.disconnect();
+		disconnect();
 	}
 
 	@Test
@@ -308,17 +219,19 @@ public class SOSVfsHTTPTest {
 		connect();
 		//		objVfsClient.login(WEB_USER,WEB_PASS);
 		//		objVfsClient.logout();
-		objVfsClient.disconnect();
+		disconnect();
 	}
 
 	@Test
 	public void testRename() throws Exception {
 		connect();
 		authenticate();
-		objVfsClient.put(LOCAL_BASE_PATH + "sos-net-src.zip", REMOTE_BASE_PATH + "tmp123.zip");
-		objVfsClient.rename(REMOTE_BASE_PATH + "tmp123.zip", REMOTE_BASE_PATH + "tmp1234.zip");
-		objVfsClient.delete(REMOTE_BASE_PATH + "tmp1234.zip");
-		objVfsClient.disconnect();
+		
+		//objVfsClient.put(LOCAL_BASE_PATH + "sos-net-src.zip", REMOTE_BASE_PATH + "tmp123.zip");
+		//7objVfsClient.rename(REMOTE_BASE_PATH + "tmp123.zip", REMOTE_BASE_PATH + "tmp1234.zip");
+		//objVfsClient.delete(REMOTE_BASE_PATH + "tmp1234.zip");
+		
+		disconnect();
 	}
 
 	@Test
@@ -326,7 +239,7 @@ public class SOSVfsHTTPTest {
 		connect();
 		authenticate();
 		logger.debug("HANDLER = " + objVfsClient.getHandler());
-		objVfsClient.disconnect();
+		disconnect();
 	}
 
 	@Test
@@ -335,131 +248,7 @@ public class SOSVfsHTTPTest {
 		authenticate();
 		String lineSeparator = "\n";
 		objVFS.ExecuteCommand("cd /home/test" + lineSeparator + "cd /home/kb");
-		objVfsClient.disconnect();
+		disconnect();
 	}
 
-	@Test
-	public void testCreateScriptFile() throws Exception {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetExitCode() throws Exception {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetExitSignal() throws Exception {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testCloseConnection() throws Exception {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testConnect1() throws Exception {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testConnectSOSConnection2OptionsAlternate() throws Exception {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testConnectISOSConnectionOptions() throws Exception {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testConnectStringInt() throws Exception {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testCloseSession() throws Exception {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testOpenSession() throws Exception {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testTransferMode() throws Exception {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetNewVirtualFile() throws Exception {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testMkdirSOSFolderName() throws Exception {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testRmdirSOSFolderName() throws Exception {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetConnection() throws Exception {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetSession() throws Exception {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testDirSOSFolderName() throws Exception {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetStdErr() throws Exception {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetStdOut() throws Exception {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testRemoteIsWindowsShell() throws Exception {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testSetJSJobUtilites() throws Exception {
-		// fail("Not yet implemented");
-	}
-
-	@Test
-	public void testGetFileHandle() throws Exception {
-		connect();
-		authenticate();
-		System.out.println(objVfsClient.getModificationTime(REMOTE_BASE_PATH + "sos-net-src.zip"));
-		objVfsClient.disconnect();
-	}
-
-	@Test
-	public void testGetFilelist() throws Exception {
-		connect();
-		authenticate();
-		//String[] result = ftpClient.getFilelist(REMOTE_BASE_PATH, "", 0, true);
-		String[] result = objVfsClient.getFilelist(REMOTE_BASE_PATH, "\\.pdf$", 0, true);
-		for (String element : result) {
-			logger.info(element);
-		}
-		objVfsClient.disconnect();
-	}
 }
