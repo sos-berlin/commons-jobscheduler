@@ -25,7 +25,6 @@ public class JSMessages {
 	public static final JSMsg	JSJ_I_0018	= new JSMsg("JSJ_I_0018");	// Order '%1$s' created for JobChain '%2$s'.
 	public static final JSMsg	JSJ_I_0019	= new JSMsg("JSJ_I_0019");	// Next State is '%1$s'.
 	public static final JSMsg	JSJ_I_0020	= new JSMsg("JSJ_I_0020");	// %1$s: Current NodeName is '%2$s'.
-	public static final JSMsg	JSJ_D_0030	= new JSMsg("JSJ_D_0030");	// JSMsg after replacing-operation is = %1$s
 	public static final JSMsg	JSJ_I_0090	= new JSMsg("JSJ_I_0090");	// set order-state to '%1$s'
 
 	/**
