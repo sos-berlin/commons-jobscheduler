@@ -668,7 +668,7 @@ public class XmlRegionAnalyzerTests {
 	@Test
 	public void testExampleThatFailed_1() throws Exception {
 
-		String test = loadResource( "/net/vzurczak/tests/StackOverflowExample.xml" );
+		String test = loadResource("/net/vzurczak/tests/StackOverflowExample.xml");
 		Assert.assertNotNull( test );
 
 		XmlRegionAnalyzer analyzer = new XmlRegionAnalyzer();
