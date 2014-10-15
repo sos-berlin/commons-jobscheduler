@@ -2,17 +2,10 @@
 
 package com.sos.localization;
 
-import static org.junit.Assert.assertEquals;
-
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.Listener.JSListenerClass;
+import org.apache.log4j.Logger;
+import org.junit.*;
 
 /**
  * \class 		PropertyFactoryJUnitTest - JUnit-Test for "PropertyFactora - a Factoroy to maintain I18N Files"
