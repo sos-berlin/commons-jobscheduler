@@ -12,7 +12,7 @@
             <outputDirectory>/</outputDirectory>
             <includes>
                 <include>shiro.ini.mini</include>
-                <include>*.ini</include>
+                <include>shiro_*.ini</include>
             </includes>
         </fileSet>
     </fileSets>
