@@ -23,7 +23,7 @@
 
         <dependency>
             <groupId>com.sos.scheduler.engine</groupId>
-            <artifactId>jar</artifactId>
+            <artifactId>engine-job-api</artifactId>
             <version>${sos.engine.version}</version>
         </dependency>
 
