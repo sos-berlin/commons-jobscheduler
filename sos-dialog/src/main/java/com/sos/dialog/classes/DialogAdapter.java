@@ -29,7 +29,7 @@ import com.sos.dialog.message.ErrorLog;
  * @author KB
  *
  */
-public class DialogAdapter extends Dialog  {
+public class DialogAdapter extends Dialog {
 	@SuppressWarnings("unused")
 	private final String			conClassName			= this.getClass().getSimpleName();
 	@SuppressWarnings("unused")
@@ -145,7 +145,7 @@ public class DialogAdapter extends Dialog  {
 		composite.addDisposeListener(new DisposeListener() {
 			@Override
 			public void widgetDisposed(final DisposeEvent e) {
-				
+
 			}
 		});
 		composite.layout(true, true);
@@ -154,7 +154,7 @@ public class DialogAdapter extends Dialog  {
 		grp2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1));
 		//		set4ColumnLayout(grp2);
 		//		grp2.setLayout(new RowLayout());
-		SOSButton btnOK = new SOSButton(grp2, "ok");
+		SOSButton btnOK = new SOSButton(grp2, "Dialog_L_ok");
 		shell.setDefaultButton(btnOK);
 		btnOK.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, true, 2, 1));
 		btnOK.addSelectionListener(new SelectionAdapter() {
@@ -164,7 +164,7 @@ public class DialogAdapter extends Dialog  {
 			}
 		});
 
-		SOSButton btnCancel = new SOSButton(grp2, "cancel");
+		SOSButton btnCancel = new SOSButton(grp2, "Dialog_L_cancel");
 		btnCancel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, true, 2, 1));
 
 		btnCancel.addSelectionListener(new SelectionAdapter() {
@@ -220,7 +220,7 @@ public class DialogAdapter extends Dialog  {
 			closeShell();
 		}
 		else {
-			
+
 		}
 	}
 
@@ -231,7 +231,7 @@ public class DialogAdapter extends Dialog  {
 			closeShell();
 		}
 		else {
-			
+
 		}
 	}
 
@@ -253,7 +253,7 @@ public class DialogAdapter extends Dialog  {
 			closeShell();
 		}
 		else {
-			
+
 		}
 	}
 
@@ -264,7 +264,7 @@ public class DialogAdapter extends Dialog  {
 			closeShell();
 		}
 		else {
-			
+
 		}
 	}
 
@@ -280,7 +280,7 @@ public class DialogAdapter extends Dialog  {
 			return true;
 		}
 		else {
-			
+
 		}
 		return true;
 	}

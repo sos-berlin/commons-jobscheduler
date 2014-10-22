@@ -66,45 +66,30 @@ import com.sos.dialog.swtdesigner.SWTResourceManager;
  */
 public class TextArea extends StyledText /* Text */{
 	@SuppressWarnings("unused")
-	private final String		conClassName			= this.getClass().getSimpleName();
-	private final Logger		logger					= Logger.getLogger(this.getClass());
+	private final String	conClassName			= this.getClass().getSimpleName();
+	private Logger			logger					= Logger.getLogger(this.getClass());
 	@SuppressWarnings("unused")
-	private final String		conSVNVersion			= "$Id$";
-	private WindowsSaver		objFormPosSizeHandler	= null;
+	private final String	conSVNVersion			= "$Id$";
+	private WindowsSaver	objFormPosSizeHandler	= null;
 	//	public static enum enuSourceTypes {
 	//		ScriptSource, MonitorSource, xmlSource, xmlComment, JobDocu;
 	//	}
 	//
-	private final String		strTagName				= "job";
-	private final String		strAttributeName		= "";
+	private final String	strTagName				= "job";
+	private final String	strAttributeName		= "";
 	//	private enuSourceTypes	enuWhatSourceType	= TextArea.enuSourceTypes.ScriptSource;
-	boolean						flgInit					= false;
-	private String				strPreferenceStoreKey	= "";
-	private final StyledText	objThis					= this;
+	boolean					flgInit					= false;
+	private String			strPreferenceStoreKey	= "";
+	private StyledText		objThis					= this;
 
 	public StyledText getControl() {
 		return this;
 	}
 
-	//	private JOEListener	objDataProvider	= null;
 	public void setFormHandler(final WindowsSaver pobjFormHandler) {
 		objFormPosSizeHandler = pobjFormHandler;
 	}
 
-	//	public void setSourceType(final enuSourceTypes penuWhatSourceType) {
-	//		enuWhatSourceType = penuWhatSourceType;
-	//	}
-	//	public void setDataProvider(final JOEListener pobjDataProvider, final enuSourceTypes penuWhatSourceType) {
-	//		setSourceType(penuWhatSourceType);
-	//		setDataProvider(pobjDataProvider);
-	//	}
-	//
-	//	public void setDataProvider(final JOEListener pobjDataProvider) {
-	//		objDataProvider = pobjDataProvider;
-	//		refreshContent();
-	//		createContextMenue();
-	//	}
-	//
 	public void createContextMenue() {
 		// Menu objContextMenu = new Menu(this);
 		Menu objContextMenu = getMenu();
@@ -283,7 +268,7 @@ public class TextArea extends StyledText /* Text */{
 	public void refreshContent() {
 		flgInit = true;
 		SOSFontDialog objFontDialog = new SOSFontDialog(getFont().getFontData()[0], getForeground().getRGB());
-		objFontDialog.setKey(strPreferenceStoreKey);
+		objFontDialog.setKey(strPreferenceStoreKey + "font");
 		objFontDialog.readFontData();
 		setFont(objFontDialog.getFontData(), objFontDialog.getForeGround());
 		flgInit = false;
@@ -415,7 +400,7 @@ public class TextArea extends StyledText /* Text */{
 
 	public void changeFont() {
 		SOSFontDialog fd = new SOSFontDialog(getFont().getFontData()[0], getForeground().getRGB());
-		fd.setKey(strPreferenceStoreKey);
+		fd.setKey(strPreferenceStoreKey + "font");
 		fd.setParent(getShell());
 		fd.show(getDisplay());
 		setFont(fd.getFontData(), fd.getForeGround());
@@ -616,7 +601,7 @@ public class TextArea extends StyledText /* Text */{
 							switch (strActualText) {
 								case "<![C":
 									event.text = "CDATA[ ]]>";
-									sendKeyEvent (5);
+									sendKeyEvent(5);
 									break;
 
 								default:
@@ -631,7 +616,7 @@ public class TextArea extends StyledText /* Text */{
 			}
 		}
 
-		private void sendKeyEvent (final int intOffset) {
+		private void sendKeyEvent(final int intOffset) {
 			flgInATag = false;
 			strActualText = "";
 			position = getCaretOffset() + intOffset;
@@ -640,8 +625,9 @@ public class TextArea extends StyledText /* Text */{
 			objEvent.keyCode = SWT.ARROW_LEFT;
 			objEvent.item = objThis;
 			Display.getCurrent().post(objEvent);
-			
+
 		}
+
 		@Override
 		public void keyPressed(KeyEvent e) {
 			e.doit = true;
@@ -677,6 +663,14 @@ public class TextArea extends StyledText /* Text */{
 		@Override
 		public void keyReleased(KeyEvent e) {
 		}
+	}
+
+	@Override
+	public void dispose() {
+		super.dispose();
+		logger = null;
+		objFormPosSizeHandler = null;
+		objThis = null;
 	}
 
 	@Override

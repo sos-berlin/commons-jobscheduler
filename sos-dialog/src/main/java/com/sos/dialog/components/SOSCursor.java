@@ -29,8 +29,8 @@ public class SOSCursor implements AutoCloseable {
 	private final Logger		logger			= Logger.getLogger(this.getClass());
 
 	private final Stack<Cursor>	objCursorStack	= new Stack<>();
-	private Shell shell = null;
-	
+	private Shell				shell			= null;
+
 	/**
 	 * 
 	 */
@@ -41,29 +41,31 @@ public class SOSCursor implements AutoCloseable {
 
 	public SOSCursor(final int pintCursor) {
 		this();
-		showWait ();
+		showWait();
 
 	}
 
-	public SOSCursor showWait () {
-		setCursor (SWT.CURSOR_WAIT);
+	public SOSCursor showWait() {
+		setCursor(SWT.CURSOR_WAIT);
 		return this;
 	}
-	
-	private void setCursor (final int pintCursor) {
+
+	private void setCursor(final int pintCursor) {
 		if (shell.isDisposed() == false) {
 			objCursorStack.push(shell.getCursor());
 			shell.setCursor(getCursor(pintCursor));
-			logger.debug("set cursor to " + pintCursor);
+			logger.trace("set cursor to " + pintCursor);
 		}
-		
+
 	}
-	@Override   // autoclose, implicitely used e.g. with try-with-resources statement
+
+	@Override
+	// autoclose, implicitely used e.g. with try-with-resources statement
 	public void close() throws Exception {
 		try {
 			if (shell.isDisposed() == false) {
 				shell.setCursor(objCursorStack.pop());
-				logger.debug("close SOSCursor. reestablish the cursor");
+				logger.trace("close SOSCursor. reestablish the cursor");
 			}
 		}
 		catch (Exception e) {
@@ -71,25 +73,26 @@ public class SOSCursor implements AutoCloseable {
 		}
 	}
 
-	private Shell getShell () {
+	private Shell getShell() {
 		return getActiveShell();
 	}
 
 	public static Shell getActiveShell() {
-	    Display display = Display.getDefault();
-	    Shell result = display.getActiveShell();
+		Display display = Display.getDefault();
+		Shell result = display.getActiveShell();
 
-	    if (result == null) {
-	        Shell[] shells = display.getShells();
-	        for (Shell shell : shells) {
-	            if (shell.getShells().length == 0) {
-	                if (result != null)
-	                    throw new AssertionError();
-	                result = shell;
-	            }
-	        }
-	    }
+		if (result == null) {
+			Shell[] shells = display.getShells();
+			for (Shell shell : shells) {
+				if (shell.getShells().length == 0) {
+					if (result != null) {
+						throw new AssertionError();
+					}
+					result = shell;
+				}
+			}
+		}
 
-	    return result;
+		return result;
 	}
 }

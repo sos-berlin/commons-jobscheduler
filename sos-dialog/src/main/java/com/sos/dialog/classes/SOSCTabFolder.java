@@ -19,15 +19,18 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Shell;
 
 import com.sos.JSHelper.interfaces.IDirty;
 import com.sos.dialog.Globals;
 import com.sos.dialog.components.CompositeBaseClass;
 import com.sos.dialog.components.SOSCursor;
+import com.sos.dialog.components.WaitCursor;
 import com.sos.dialog.interfaces.ISOSControlProperties;
 import com.sos.dialog.interfaces.ISOSTabItem;
 import com.sos.dialog.layouts.Gridlayout;
@@ -39,6 +42,9 @@ import com.sos.dialog.swtdesigner.SWTResourceManager;
  *
  */
 public class SOSCTabFolder extends CTabFolder {
+	public static final String	conTABITEM_I18NKEY			= "key";
+	public static final String	conTABITEM_SOSITEM			= "SOSCTABITEM";
+	public static final String	conCOMPOSITE_OBJECT_KEY		= "composite";
 	@SuppressWarnings("unused")
 	private final String		conClassName				= this.getClass().getSimpleName();
 	@SuppressWarnings("unused")
@@ -76,7 +82,7 @@ public class SOSCTabFolder extends CTabFolder {
 			@SuppressWarnings("unused")
 			@Override
 			public void focusGained(final FocusEvent e) {
-				logger.debug("focusGained");
+				logger.trace("focusGained");
 				SOSCTabFolder o = (SOSCTabFolder) e.widget;
 				Object d = e.data;
 				Object f = e.getSource();
@@ -89,7 +95,7 @@ public class SOSCTabFolder extends CTabFolder {
 		addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
-				logger.debug("CTabFolder Item selected");
+				logger.trace("CTabFolder Item selected");
 				if (flgRejectTabItemSelection == true) {
 					return;
 				}
@@ -99,7 +105,7 @@ public class SOSCTabFolder extends CTabFolder {
 					if (CompositeBaseClass.gflgCreateControlsImmediate == false) {
 						CompositeBaseClass<?> objBC = (CompositeBaseClass<?>) objCurrComposite;
 						objBC.createTabItemComposite();
-//						objCurrComposite.pack(true);
+						doResize();
 					}
 				}
 				CTabItem tbiLastSelected = (CTabItem) getData("lastSelected");
@@ -107,11 +113,15 @@ public class SOSCTabFolder extends CTabFolder {
 					return;
 				}
 				if (tbiLastSelected != null) {
-					Composite objC = (Composite) tbiLastSelected.getControl();
-					if (objC != null && objC.isDisposed()) {
-						objC.dispose();
+					try {
+						Composite objC = (Composite) tbiLastSelected.getControl();
+						if (objC != null && objC.isDisposed()) {
+							objC.dispose();
+						}
+						if (objC != null && objC.isDisposed() != true) {
+						}
 					}
-					if (objC != null && objC.isDisposed() != true) {
+					catch (Exception e) {
 					}
 				}
 				setData("lastSelected", objSelectedItem);
@@ -128,7 +138,7 @@ public class SOSCTabFolder extends CTabFolder {
 		this.addListener(SWT.MouseDoubleClick, new Listener() {
 			@Override
 			public void handleEvent(final Event event) {
-				System.out.println("doubleClick");
+				//				System.out.println("doubleClick");
 				maximizeToSashForm();
 				event.doit = true;
 				//				if (event.y > getTabHeight())
@@ -163,9 +173,8 @@ public class SOSCTabFolder extends CTabFolder {
 		closeAll.addListener(SWT.Selection, new Listener() {
 			@Override
 			public void handleEvent(final Event event) {
-				for (CTabItem objTI : getItems()) {
-					closeTabItem(objTI);
-				}
+				closeAllTabItems();
+				event.doit = true;
 			}
 		});
 		this.setMenu(contextMenu);
@@ -214,17 +223,23 @@ public class SOSCTabFolder extends CTabFolder {
 		});
 	}
 
+	public void closeAllTabItems() {
+		for (CTabItem objTI : getItems()) {
+			closeTabItem(objTI);
+		}
+	}
+
 	private boolean closeTabItem(final CTabItem pobjTabItem) {
 		boolean flgDoClose = true;
-		try (SOSCursor objC = new SOSCursor().showWait()) {
-			int buttonID = -99;
+		try /* (WaitCursor objWC = new WaitCursor()) */{
+			int buttonID = SWT.NO;
 
 			if (pobjTabItem != null) {
 				Object objO = pobjTabItem.getData();
 				if (objO instanceof IDirty) {
 					IDirty objDH = (IDirty) objO;
 					if (objDH.isDirty()) {
-						buttonID = objDH.doSave(true);
+						//						buttonID = objDH.doSave(true);
 					}
 					else {
 						buttonID = SWT.NO;
@@ -236,7 +251,19 @@ public class SOSCTabFolder extends CTabFolder {
 						break;
 					case SWT.YES:
 					case SWT.NO:
-						pobjTabItem.dispose();
+						Control objCOT = (Control) pobjTabItem.getData(conCOMPOSITE_OBJECT_KEY);
+						if (objCOT != null) {
+							pobjTabItem.setControl(null);
+							objCOT.dispose();
+							objCOT = null;
+						}
+						if (pobjTabItem instanceof SOSCTabItem) {
+							((SOSCTabItem) pobjTabItem).dispose();
+						}
+						else {
+							pobjTabItem.dispose();
+						}
+						//						pobjTabItem.setFont(null);
 						logger.debug("tabitem disposed");
 						System.gc();
 						flgDoClose = true;
@@ -268,8 +295,9 @@ public class SOSCTabFolder extends CTabFolder {
 				}
 			}
 			setData("lastSelected", objSelectedItem);
-			Composite objComposite = (Composite) objSelectedItem.getData("composite");
+			Composite objComposite = (Composite) objSelectedItem.getData(conCOMPOSITE_OBJECT_KEY);
 			ISOSTabItem objCurrTab = (ISOSTabItem) objComposite;
+			objComposite.layout(true, true);
 
 		}
 		catch (Exception e) {
@@ -290,12 +318,14 @@ public class SOSCTabFolder extends CTabFolder {
 	*
 	 */
 	public SOSCTabItem getTabItem(final Object pobjObject) {
-		//		for (SOSCTabItem objTI : objItemList) {
-		//			if (objTI.getData().equals(pobjObject)) {
-		//				return objTI;
-		//			}
-		//		}
-		return null;
+		SOSCTabItem objT = null;
+		for (CTabItem objTI : this.getItems()) {
+			if (objTI.getData().equals(pobjObject)) {
+				objT = (SOSCTabItem) objTI.getData(conTABITEM_SOSITEM);
+				return objT;
+			}
+		}
+		return objT;
 	}
 
 	/**
@@ -310,7 +340,7 @@ public class SOSCTabFolder extends CTabFolder {
 	 */
 	public SOSCTabItem getTabItem(final String pstrCaption, final ISOSTabItem pobjTabComposite) {
 		SOSCTabItem objTab = getTabItem(pstrCaption);
-		objTab.setData("composite", pobjTabComposite);
+		objTab.setData(conCOMPOSITE_OBJECT_KEY, pobjTabComposite);
 		return objTab;
 	}
 
@@ -326,24 +356,30 @@ public class SOSCTabFolder extends CTabFolder {
 	 */
 	public SOSCTabItem getTabItem(final String pstrI18NKey) {
 		SOSCTabItem objTabItem = null;
-		try (SOSCursor objC = new SOSCursor().showWait()) {
+		try (WaitCursor objWC = new WaitCursor()) {
+			for (CTabItem objTI : this.getItems()) {
+				String strI18NKey = (String) objTI.getData(conTABITEM_I18NKEY);
+				if (strI18NKey != null && strI18NKey.equals(pstrI18NKey)) {
+					objTabItem = (SOSCTabItem) objTI.getData(conTABITEM_SOSITEM);
+					return objTabItem;
+				}
+			}
+
 			objTabItem = new SOSCTabItem(this, SWT.NONE);
 			SOSMsgControl objMsg = MsgHandler.newMsg(pstrI18NKey);
 
 			objMsg.Control(objTabItem);
-			objTabItem.setData("key", pstrI18NKey);
+			objTabItem.setData(conTABITEM_I18NKEY, pstrI18NKey);
 			objTabItem.setFont(Globals.stFontRegistry.get("tabitem-text"));
 			objTabItem.setImage(SWTResourceManager.getImageFromResource(objMsg.icon()));
 			objTabItem.setShowClose(ItemsHasClose);
 			objTabItem.setToolTipText(objMsg.tooltip());
 
-			Composite composite = new SOSComposite(this, SWT.None /* SWT.H_SCROLL | SWT.V_SCROLL */);
+			Composite composite = new SOSComposite(this, SWT.None);
 			objTabItem.setControl(composite);
-			objTabItem.setData("composite", composite);
+			objTabItem.setData(conCOMPOSITE_OBJECT_KEY, composite);
+			objTabItem.setData(conTABITEM_SOSITEM, objTabItem);
 			Gridlayout.set4ColumnLayout(composite);
-
-			//		objItemList.add(objTabItem);
-
 		}
 		catch (Exception e) {
 			new ErrorLog("problem", e);
@@ -353,38 +389,40 @@ public class SOSCTabFolder extends CTabFolder {
 		return objTabItem;
 	}
 
-	/**
-	 * 
-	*
-	* \brief newTabItem
-	*
-	* \details
-	* 
-	* \return SOSCTabItem
-	*
-	 */
-	public SOSCTabItem newTabItem(final ISOSControlProperties pobjObject) {
-		//		if (objItemList.contains(pobjObject)) {
-		//			return getTabItem(pobjObject);
-		//		}
-		int iSWT = SWT.None;
-		if (ItemsHasClose == true) {
-			iSWT = SWT.Close;
-		}
-		SOSCTabItem objTI = new SOSCTabItem(this, iSWT);
-		objTI.setData(pobjObject);
-		objTI.setShowClose(ItemsHasClose);
-		String strT = pobjObject.getName();
-		objTI.setData("key", strT);
-		objTI.setText(pobjObject.getTitle());
-		objTI.setFont(Globals.stFontRegistry.get("text"));
-		//		objItemList.add(objTI);
-		SOSComposite composite = new SOSComposite(this, SWT.NONE);
-		objTI.setControl(composite);
-		Gridlayout.set4ColumnLayout(composite);
-		return objTI;
-	}
-
+	//	/**
+	//	 * 
+	//	*
+	//	* \brief newTabItem
+	//	*
+	//	* \details
+	//	* 
+	//	* \return SOSCTabItem
+	//	*
+	//	 */
+	//	public SOSCTabItem newTabItem(final ISOSControlProperties pobjObject) {
+	//		//		if (objItemList.contains(pobjObject)) {
+	//		//			return getTabItem(pobjObject);
+	//		//		}
+	//		int iSWT = SWT.None;
+	//		if (ItemsHasClose == true) {
+	//			iSWT = SWT.Close;
+	//		}
+	//		SOSCTabItem objTI = new SOSCTabItem(this, iSWT);
+	//		objTI.setData(pobjObject);
+	//		objTI.setShowClose(ItemsHasClose);
+	//		String strT = pobjObject.getName();
+	//		objTI.setData(conTABITEM_I18NKEY, strT);
+	//		objTI.setText(pobjObject.getTitle());
+	//		objTI.setFont(Globals.stFontRegistry.get("tabitem-text"));
+	//
+	//		SOSComposite composite = new SOSComposite(this, SWT.NONE);
+	//		objTI.setControl(composite);
+	//		objTI.setData(conCOMPOSITE_OBJECT_KEY, composite);
+	//		objTI.setData(conTABITEM_SOSITEM, objTI);
+	//		Gridlayout.set4ColumnLayout(composite);
+	//		return objTI;
+	//	}
+	//
 	public SOSCTabItem setFocus(final Object pobjObject) {
 		SOSCTabItem objTI = getTabItem(pobjObject);
 		for (CTabItem objT : this.getItems()) {
@@ -427,35 +465,34 @@ public class SOSCTabFolder extends CTabFolder {
 		}
 	}
 
-	public void showLastTab() {
-		SOSCTabItem objSelectedItem = (SOSCTabItem) getData("lastSelected");
-		if (objSelectedItem == null) {
-			objSelectedItem = (SOSCTabItem) getItem(0);
-		}
-		Composite objComposite = objSelectedItem.getComposite();
-		ISOSTabItem objCurrTab = (ISOSTabItem) objComposite;
-		if (objCurrTab != null) {
-			Control objC = objSelectedItem.getControl();
-			if (objC == null || objC.isDisposed() == true) {
-				Composite composite = new Composite(this, SWT.NONE);
-				objSelectedItem.setControl(composite);
-				Gridlayout.set4ColumnLayout(composite);
-				objCurrTab.setParent(composite);
-			}
-			objCurrTab.createTabItemComposite();
-			objComposite.layout(true, true);
-			Composite objPP = objComposite;
-			while (objPP != null) {
-				objPP = getParent();
-				if (objPP != null) {
-					objPP.layout(true, true);
-				}				
-			}
-			layout(true, true);
-			//			redraw();
-		}
-	}
-
+	//	public void showLastTab() {
+	//		SOSCTabItem objSelectedItem = (SOSCTabItem) getData("lastSelected");
+	//		if (objSelectedItem == null) {
+	//			objSelectedItem = (SOSCTabItem) getItem(0);
+	//		}
+	//		Composite objComposite = objSelectedItem.getComposite();
+	//		ISOSTabItem objCurrTab = (ISOSTabItem) objComposite;
+	//		if (objCurrTab != null) {
+	//			Control objC = objSelectedItem.getControl();
+	//			if (objC == null || objC.isDisposed() == true) {
+	//				Composite composite = new Composite(this, SWT.NONE);
+	//				objSelectedItem.setControl(composite);
+	//				Gridlayout.set4ColumnLayout(composite);
+	//				objCurrTab.setParent(composite);
+	//			}
+	//			objCurrTab.createTabItemComposite();
+	//			objComposite.layout(true, true);
+	//			Composite objPP = objComposite;
+	//			while (objPP != null) {
+	//				objPP = getParent();
+	//				if (objPP != null) {
+	//					objPP.layout(true, true);
+	//				}
+	//			}
+	//			doResize();
+	//		}
+	//	}
+	//
 	/**
 	 * 
 	*
@@ -468,23 +505,35 @@ public class SOSCTabFolder extends CTabFolder {
 	 */
 	public void activateTab(final String pstrTabKey) {
 		for (CTabItem objTabItem : getItems()) {
-			String strT = (String) objTabItem.getData("key");
+			String strT = (String) objTabItem.getData(conTABITEM_I18NKEY);
 			if (strT != null && strT.equalsIgnoreCase(pstrTabKey)) {
-				ISOSTabItem objCurrTab = (ISOSTabItem) objTabItem.getData("composite");
+				ISOSTabItem objCurrTab = (ISOSTabItem) objTabItem.getData(conCOMPOSITE_OBJECT_KEY);
 				if (objCurrTab != null) {
 					objCurrTab.createTabItemComposite();
-					//					objParent.layout();
+					doResize();
 				}
-				layout(true, true);
 				break;
 			}
+		}
+	}
+
+	public void doResize() {
+		if (getParent() != null) {
+
+			globalShell().setRedraw(false);
+			globalShell().layout(true, true);
+			globalShell().setRedraw(true);
 		}
 	}
 
 	@Override
 	public void setSelection(final int intTabIndex) {
 		super.setSelection(intTabIndex);
-		layout(true, true);
+		globalShell().layout(true, true);
+	}
+
+	private Shell globalShell() {
+		return Display.getCurrent().getActiveShell();
 	}
 
 	@Override

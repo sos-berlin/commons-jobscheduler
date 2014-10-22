@@ -7,7 +7,7 @@ public class MenueActionSave extends MenueActionBase {
 
 	public MenueActionSave() {
 		this("");
-//		this("Save", "Ctrl+S", "/org/freedesktop/tango/16x16/actions/document-save.png");
+		//		this("Save", "Ctrl+S", "/org/freedesktop/tango/16x16/actions/document-save.png");
 	}
 
 	public MenueActionSave(String pstrMenueText, final String pstrAccText, final String pstrImageFileName) {
@@ -17,6 +17,7 @@ public class MenueActionSave extends MenueActionBase {
 
 	public MenueActionSave(final String pstrMenueTextParameter) {
 		this(new DialogMsg("treenode_menue_save").params(pstrMenueTextParameter), "Ctrl+S", "/org/freedesktop/tango/16x16/actions/document-save.png");
+		strI18NKey = "treenode_menue_save";
 	}
 
 	@Override
@@ -28,6 +29,8 @@ public class MenueActionSave extends MenueActionBase {
 			e.printStackTrace();
 		}
 	}
-	public void executeSave () {}
+
+	public void executeSave() {
+	}
 
 }

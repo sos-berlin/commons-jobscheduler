@@ -38,7 +38,7 @@ public class SOSButton extends Button {
 	public SOSButton(final Composite parent, final String pstrI18NKey) {
 		super(parent, SWT.PUSH | SWT.FLAT);
 		SOSMsg objM = null;
-		if (pstrI18NKey.startsWith("DIALOG_")) {
+		if (pstrI18NKey.toLowerCase().startsWith("dialog_")) {
 			objM = new DialogMsg(pstrI18NKey);
 		}
 		else {

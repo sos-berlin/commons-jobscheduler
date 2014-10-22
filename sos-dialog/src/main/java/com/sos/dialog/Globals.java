@@ -5,26 +5,32 @@ import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
 
 import com.sos.dialog.classes.SOSMsgControl;
 
 public class Globals {
-	private final static Logger	logger			= Logger.getLogger(Globals.class);
-	public final String			conSVNVersion	= "$Id$";
-	//	public static int gTextBoxStyle = SWT.None;
-	public static int			gTextBoxStyle	= SWT.BORDER;
-	public static int			gButtonStyle	= SWT.BORDER;
-	public static FontRegistry	stFontRegistry	= new FontRegistry();
-	public static ColorRegistry	stColorRegistry	= new ColorRegistry();
-	public static SOSMsgControl	MsgHandler		= null;
-	
+	private final static Logger	logger						= Logger.getLogger(Globals.class);
+	public final String			conSVNVersion				= "$Id$";
+	// TODO gTextBoxStyle an an global option
+	public static int			gTextBoxStyle				= SWT.None;
+	//	public static int			gTextBoxStyle				= SWT.BORDER;
+	public static int			gButtonStyle				= SWT.BORDER;
+	public static FontRegistry	stFontRegistry				= new FontRegistry();
+	public static ColorRegistry	stColorRegistry				= new ColorRegistry();
+	public static SOSMsgControl	MsgHandler					= null;
+
+	public static String		gstrApplication				= "";
+
 	public static final String	conColor4TEXT				= "text";
 	public static final String	conColor4INCLUDED_OPTION	= "IncludedOption";
 	public static final String	conMANDATORY_FIELD_COLOR	= "MandatoryFieldColor";
 	public static final String	conCOLOR4_FIELD_HAS_FOCUS	= "Color4FieldHasFocus";
-
 
 	public Globals() {
 	}
@@ -32,8 +38,40 @@ public class Globals {
 
 	public static void setApplicationWindow(final ApplicationWindow pobjAW) {
 		Application = pobjAW;
+		initColorAndFontRegistry();
 	}
 
+	public static void initColorAndFontRegistry() {
+		try {
+			Globals.stFontRegistry.put("button-text", new FontData[] { new FontData("Arial", 11, SWT.BOLD) });
+			Globals.stFontRegistry.put("code", new FontData[] { new FontData("Courier New", 11, SWT.NORMAL) });
+			Globals.stFontRegistry.put("text", new FontData[] { new FontData("Arial", 12, SWT.NORMAL) });
+			Globals.stFontRegistry.put("tabitem-text", new FontData[] { new FontData("Arial", 11, SWT.NORMAL) });
+			Globals.stFontRegistry.put("dirty-text", new FontData[] { new FontData("Arial", 11, SWT.BOLD | SWT.ITALIC) });
+
+			Globals.stColorRegistry.put("IncludedOption", getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW).getRGB());
+			Globals.stColorRegistry.put("MandatoryFieldColor", getSystemColor(SWT.COLOR_BLUE).getRGB());
+			Globals.stColorRegistry.put("Color4FieldHasFocus", getSystemColor(SWT.COLOR_GREEN).getRGB());
+
+			// Colorschema
+
+			Globals.stColorRegistry.put("FieldBackGround", new RGB(245, 250, 210)); // var.
+			Globals.stColorRegistry.put("DisabledFieldBackGround", new RGB(232, 232, 227)); // var.
+			Globals.stColorRegistry.put("Color4FieldHasFocus", new RGB(124, 231, 0)); // var. 1 =
+			Globals.stColorRegistry.put("Color4FieldInError", new RGB(255, 225, 0)); // var.
+
+			// Globals.stColorRegistry.put("CompositeBackGround", new
+			// RGB(236,252,113)); // var. 5 = #ECFC71 = rgb(236,252,113)
+			// var. 5 = #FFFFB0 = rgb(255,255,176)
+			Globals.stColorRegistry.put("CompositeBackGround", new RGB(245, 255, 255)); //  F5FFFF  light blue
+
+			//		Globals.stColorRegistry.put("CompositeBackGround", new RGB(255, 255, 176)); //
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
 	public static boolean	flgIgnoreColors	= false;
 
 	public static void setStatus(final String pobjMessage) {
@@ -53,17 +91,31 @@ public class Globals {
 		return objC;
 	}
 
-	private static Color getDefaultColor (final Color pobjC) {
+	public static Color getSystemColor(final int intColorCode) {
+		return Application.getShell().getDisplay().getSystemColor(intColorCode);
+
+	}
+
+	private static Color getDefaultColor(final Color pobjC) {
 		Color objC = pobjC;
 		if (objC == null && Application != null) {
 			objC = Application.getShell().getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
 		}
 		return objC;
 	}
+
 	public static Color getFieldBackground() {
 		Color objC = null;
 		if (flgIgnoreColors == false) {
 			objC = getDefaultColor(stColorRegistry.get("FieldBackGround"));
+		}
+		return objC;
+	}
+
+	public static Color getFieldBackground4Disabled() {
+		Color objC = null;
+		if (flgIgnoreColors == false) {
+			objC = getDefaultColor(stColorRegistry.get("DisabledFieldBackGround"));
 		}
 		return objC;
 	}
@@ -94,24 +146,33 @@ public class Globals {
 
 	public static String stateMask(final int stateMask) {
 		String string = "[";
-		if ((stateMask & SWT.CTRL) != 0)
+		if ((stateMask & SWT.CTRL) != 0) {
 			string += " CTRL";
-		if ((stateMask & SWT.ALT) != 0)
+		}
+		if ((stateMask & SWT.ALT) != 0) {
 			string += " ALT";
-		if ((stateMask & SWT.SHIFT) != 0)
+		}
+		if ((stateMask & SWT.SHIFT) != 0) {
 			string += " SHIFT";
-		if ((stateMask & SWT.COMMAND) != 0)
+		}
+		if ((stateMask & SWT.COMMAND) != 0) {
 			string += " COMMAND";
-		if ((stateMask & SWT.BUTTON1) != 0)
+		}
+		if ((stateMask & SWT.BUTTON1) != 0) {
 			string += " BUTTON1";
-		if ((stateMask & SWT.BUTTON2) != 0)
+		}
+		if ((stateMask & SWT.BUTTON2) != 0) {
 			string += " BUTTON2";
-		if ((stateMask & SWT.BUTTON3) != 0)
+		}
+		if ((stateMask & SWT.BUTTON3) != 0) {
 			string += " BUTTON3";
-		if ((stateMask & SWT.BUTTON4) != 0)
+		}
+		if ((stateMask & SWT.BUTTON4) != 0) {
 			string += " BUTTON4";
-		if ((stateMask & SWT.BUTTON5) != 0)
+		}
+		if ((stateMask & SWT.BUTTON5) != 0) {
 			string += " BUTTON5";
+		}
 		return string + "], ";
 	}
 	public static Listener	listener	= new Listener() {
@@ -155,4 +216,18 @@ public class Globals {
 												logger.trace(string);
 											}
 										};
+
+	public static Shell globalShell() {
+		return Display.getCurrent().getActiveShell();
+	}
+
+	public static void redraw(final boolean flgDoRedraw) {
+		if (flgDoRedraw == true) {
+			globalShell().layout(true, true);
+			globalShell().setRedraw(true);
+		}
+		else {
+			globalShell().setRedraw(false);
+		}
+	}
 }

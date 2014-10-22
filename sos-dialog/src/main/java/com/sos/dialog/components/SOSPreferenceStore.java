@@ -79,13 +79,13 @@ public class SOSPreferenceStore implements ISOSPreferenceStore {
 
 	public String getPropertyKey() {
 		String strT = "properties/" + strKey;
-		logger.debug("key = " + strT);
+		logger.trace("key = " + strT);
 		return strT;
 	}
 
 	public void saveProperty(final String pstrPropName, final String pstrPropValue) {
 		prefs.node(getPropertyKey()).put(pstrPropName, pstrPropValue);
-		logger.debug(String.format("saveProperty %1$s = %2$s", strKey + "/" + pstrPropName, pstrPropValue));
+		logger.trace(String.format("saveProperty %1$s = %2$s", strKey + "/" + pstrPropName, pstrPropValue));
 		try {
 			prefs.flush();
 		}
@@ -94,9 +94,15 @@ public class SOSPreferenceStore implements ISOSPreferenceStore {
 		}
 	}
 
+	public String getProperty(final String pstrPropName, final String pstrDefaultValue) {
+		String strR = prefs.node(getPropertyKey()).get(pstrPropName, pstrDefaultValue);
+		logger.trace(String.format("getProperty %1$s = %2$s", strKey + "/" + pstrPropName, strR));
+		return strR;
+	}
+
 	public String getProperty(final String pstrPropName) {
 		String strR = prefs.node(getPropertyKey()).get(pstrPropName, "");
-		logger.debug(String.format("getProperty %1$s = %2$s", strKey + "/" + pstrPropName, strR));
+		logger.trace(String.format("getProperty %1$s = %2$s", strKey + "/" + pstrPropName, strR));
 		return strR;
 	}
 

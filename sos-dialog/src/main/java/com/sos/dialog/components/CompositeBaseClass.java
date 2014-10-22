@@ -15,6 +15,7 @@ import com.sos.JSHelper.Options.SOSOptionElement;
 import com.sos.dialog.Globals;
 import com.sos.dialog.classes.SOSCTabFolder;
 import com.sos.dialog.classes.SOSCTabItem;
+import com.sos.dialog.classes.SOSCheckBox;
 import com.sos.dialog.interfaces.ICompositeBaseAbstract;
 import com.sos.dialog.interfaces.ISOSTabItem;
 import com.sos.dialog.layouts.Gridlayout;
@@ -58,10 +59,8 @@ public abstract class CompositeBaseClass<T> extends Composite implements ISOSTab
 	private void getControlCreator(final Composite pobjParentComposite) {
 		composite = pobjParentComposite;
 		objParent = pobjParentComposite;
-		//				Gridlayout.set4ColumnLayout(composite);
 		setLayout(Gridlayout.get4ColumnLayout());
 		objCC = new ControlCreator(this);
-		//		objCC.getInvisibleSeparator();
 		setBackground(Globals.getCompositeBackground());
 	}
 
@@ -75,17 +74,52 @@ public abstract class CompositeBaseClass<T> extends Composite implements ISOSTab
 
 	@Override
 	public void createTabItemComposite() {
-		//		Gridlayout.set4ColumnLayout(composite);
-		if (flgCompositeIsCreated == false) {
-			objCC = new ControlCreator(composite);
-			createComposite();
-			logger.debug("createTabItemComposite " + conClassName);
-			composite.pack();
-			composite.layout(true, true);
-			composite.getParent().layout(true, true);
+		try (WaitCursor objWC = new WaitCursor()) {
+			Globals.redraw(false);
+			if (flgCompositeIsCreated == false) {
+				objCC = new ControlCreator(composite);
+				createComposite();
+				logger.debug("createTabItemComposite " + conClassName);
+				doResize();
+			}
 		}
-		flgCompositeIsCreated = true;
+		catch (Exception e) {
+		}
+		finally {
+			flgCompositeIsCreated = true;
+			Globals.redraw(true);
+		}
 	}
+
+	protected void doResize() {
+		Globals.redraw(true);
+	}
+
+	protected SelectionAdapter	EnableOneOfUsOrNoneListener	= new SelectionAdapter() {
+																@Override
+																public void widgetSelected(final SelectionEvent e) {
+																	setOneOfUsOrNone(e);
+																}
+															};
+
+	public void setOneOfUsOrNone(final SelectionEvent e) {
+		Object objO = e.getSource();
+		if (objO instanceof SOSCheckBox) {
+			SOSCheckBox objCB = (SOSCheckBox) objO;
+			if (objCB.getSelection() == true) {
+				for (Object objC1 : objCB.getControlList()) {
+					if (objC1 instanceof SOSOptionElement) {
+						SOSOptionElement objBx = (SOSOptionElement) objC1;
+						if (objBx.Value().equalsIgnoreCase("true")) {
+							objBx.Value("false");
+						}
+					}
+				}
+			}
+		}
+
+	}
+
 	protected SelectionAdapter	EnableFieldsListener	= new SelectionAdapter() {
 															@Override
 															public void widgetSelected(final SelectionEvent e) {
@@ -103,7 +137,6 @@ public abstract class CompositeBaseClass<T> extends Composite implements ISOSTab
 
 	@Override
 	public void dispose() {
-		logger.debug("Control disposed: " + conClassName);
 		if (composite.isDisposed() == false) {
 			for (Control objContr : composite.getChildren()) {
 				//			Object objO = objContr.getData();
@@ -122,6 +155,9 @@ public abstract class CompositeBaseClass<T> extends Composite implements ISOSTab
 				//
 			}
 			super.dispose();
+			logger = null;
+			objCC = null;
+			objJadeOptions = null;
 			composite.dispose();
 		}
 	}
@@ -134,21 +170,28 @@ public abstract class CompositeBaseClass<T> extends Composite implements ISOSTab
 
 	@Override
 	public void createGroup(final Composite parent) {
-	};
+	}
 
 	@Override
 	public void init() {
-	};
+	}
 
 	@Override
 	public Composite createComposite(final Composite parent) {
 		return this;
-	};
+	}
+
+	private String	strWindowTitle	= "WindowTitle";
 
 	@Override
 	public String getWindowTitle() {
-		return "Window-Title";
-	};
+		return strWindowTitle;
+	}
+
+	@Override
+	public void setWindowTitle(final String pstrWindowTitle) {
+		strWindowTitle = pstrWindowTitle;
+	}
 
 	@Override
 	protected void checkSubclass() {

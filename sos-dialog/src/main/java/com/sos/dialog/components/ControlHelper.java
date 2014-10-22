@@ -235,10 +235,12 @@ public class ControlHelper implements IValueChangedListener {
 			public void keyTraversed(final TraverseEvent e) {
 				e.doit = true;
 				if (e.detail == SWT.TRAVERSE_RETURN) {
-					if ((e.stateMask & SWT.SHIFT) != 0)
+					if ((e.stateMask & SWT.SHIFT) != 0) {
 						e.detail = SWT.TRAVERSE_TAB_PREVIOUS;
-					else
+					}
+					else {
 						e.detail = SWT.TRAVERSE_TAB_NEXT;
+					}
 				}
 			}
 		};
@@ -348,7 +350,6 @@ public class ControlHelper implements IValueChangedListener {
 				((Button) objControl).setSelection(objBoolean.value());
 				if (objControl instanceof SOSCheckBox) {
 					((SOSCheckBox) objControl).setEnabledDisabled();
-					;
 				}
 				//				objBoolean.value(((Button) objControl).getSelection());
 			}
@@ -375,11 +376,11 @@ public class ControlHelper implements IValueChangedListener {
 		MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", pobjVE.getErrorMessage());
 	}
 
-	private void createControlDecoration(final Control objControl, final int intOrientation) {
+	private void createControlDecoration(final Control pobjControl, final int intOrientation) {
 		// http://javawiki.sowas.com/doku.php?id=swt-jface:control-decoration
 		Image image = FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION).getImage();
 
-		ControlDecoration decoration = new ControlDecoration(objControl, intOrientation | SWT.TOP);
+		ControlDecoration decoration = new ControlDecoration(pobjControl, intOrientation | SWT.TOP);
 		decoration.setImage(image);
 		decoration.setDescriptionText(getToolTip());
 	}

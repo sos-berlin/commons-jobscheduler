@@ -3,6 +3,10 @@
  */
 package com.sos.dialog.classes;
 
+import static com.sos.dialog.classes.SOSCTabFolder.conCOMPOSITE_OBJECT_KEY;
+import static com.sos.dialog.classes.SOSCTabFolder.conTABITEM_I18NKEY;
+import static com.sos.dialog.classes.SOSCTabFolder.conTABITEM_SOSITEM;
+
 import org.apache.log4j.Logger;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
@@ -39,12 +43,11 @@ public class SOSCTabItem extends CTabItem {
 	}
 
 	public Composite getComposite() {
-		return (Composite) getData("composite");
+		return (Composite) getData(conCOMPOSITE_OBJECT_KEY);
 	}
 
 	public void setComposite(final ISOSTabItem pobjComposite) {
-		setData("composite", pobjComposite);
-		//		setData(pobjComposite);
+		setData(conCOMPOSITE_OBJECT_KEY, pobjComposite);
 		objTabComposite = pobjComposite;
 	}
 
@@ -64,28 +67,28 @@ public class SOSCTabItem extends CTabItem {
 	@Override
 	public void dispose() {
 		if (this.isDisposed() == false) {
+			setChilds2Null();
 			Control objC = this.getControl();
 			if (objC != null) {
 				if (objC.isDisposed() == false) {
-					setChilds2Null();
 					objC.dispose();
-					objTabFolder = null;
-					objTabComposite = null;
-					//			this.dispose();
-					super.dispose();
 				}
 			}
 			else {
-				//				throw new JobSchedulerException("CTabItem with getControl == null");
 			}
+			super.dispose();
 		}
 	}
 
 	public void setChilds2Null() {
 		try {
-			setData("composite", null);
-			setData("key", null);
+			setData(conCOMPOSITE_OBJECT_KEY, null);
+			setData(conTABITEM_I18NKEY, null);
+			setData(conTABITEM_SOSITEM, null);
 			setData(null);
+			objTabFolder = null;
+			objTabComposite = null;
+
 			this.setImage(null);
 			if (getControl().isDisposed() == false && this.isDisposed() == false) {
 				setControl(null);

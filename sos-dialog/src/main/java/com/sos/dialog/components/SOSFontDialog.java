@@ -30,11 +30,11 @@ import com.sos.dialog.swtdesigner.SWTResourceManager;
 public class SOSFontDialog extends SOSPreferenceStore {
 
 	@SuppressWarnings("unused")
-	private final String conClassName = this.getClass().getSimpleName();
+	private final String		conClassName				= this.getClass().getSimpleName();
 	@SuppressWarnings("unused")
-	private static final String conSVNVersion = "$Id$";
+	private static final String	conSVNVersion				= "$Id$";
 	@SuppressWarnings("unused")
-	private final Logger logger = Logger.getLogger(this.getClass());
+	private final Logger		logger						= Logger.getLogger(this.getClass());
 
 	private static final String	conDefaultfontName			= "Courier New";
 	private static final String	conSCRIPT_EDITOR_FONT_COLOR	= "script_editor_font_color";
@@ -42,7 +42,7 @@ public class SOSFontDialog extends SOSPreferenceStore {
 	private FontData			fontData;
 	private RGB					foreGround;
 	private Shell				objParentShell				= null;
-	private final  Class <?> objClass = this.getClass();
+	private final Class<?>		objClass					= this.getClass();
 
 	public SOSFontDialog(final Shell pobjParentShell, final String pstrPreferenceStoreKey) {
 		super();
@@ -91,28 +91,28 @@ public class SOSFontDialog extends SOSPreferenceStore {
 
 	public void readFontData() {
 		try {
-		String s = getProperty(conSCRIPT_EDITOR_FONT);
-		if (s == null) {
-			fontData = new FontData(conDefaultfontName, 10, SWT.NORMAL);
-		}
-		else {
-			fontData = new FontData(s);
-		}
+			String s = getProperty(conSCRIPT_EDITOR_FONT);
+			if (s == null || s.length() <= 0) {
+				fontData = new FontData(conDefaultfontName, 10, SWT.NORMAL);
+			}
+			else {
+				fontData = new FontData(s);
+			}
 
-		s = getProperty(conSCRIPT_EDITOR_FONT_COLOR);
-		if (s == null) {
-			s = "";
-		}
-		s = s.replaceAll("RGB.*\\{(.*)\\}", "$1");
-		String[] colours = Pattern.compile(",").split(s);
+			s = getProperty(conSCRIPT_EDITOR_FONT_COLOR);
+			if (s == null) {
+				s = "";
+			}
+			s = s.replaceAll("RGB.*\\{(.*)\\}", "$1");
+			String[] colours = Pattern.compile(",").split(s);
 			int r = Integer.parseInt(colours[0].trim());
 			int g = Integer.parseInt(colours[1].trim());
 			int b = Integer.parseInt(colours[2].trim());
 			foreGround = new RGB(r, g, b);
 		}
 		catch (Exception e) {
-//			System.out.println("Wrong colour in Profile");
-//			System.out.println(SOSJOEMessageCodes.JOE_M_WrongColour.label());
+			//			System.out.println("Wrong colour in Profile");
+			//			System.out.println(SOSJOEMessageCodes.JOE_M_WrongColour.label());
 			foreGround = new RGB(0, 0, 0);
 		}
 
@@ -146,14 +146,14 @@ public class SOSFontDialog extends SOSPreferenceStore {
 		final RGB aktForeGround = foreGround;
 
 		objCurrentShell.setSize(302, 160);
-//		s.setText(SOSJOEMessageCodes.JOE_M_FontDialog.label());
+		//		s.setText(SOSJOEMessageCodes.JOE_M_FontDialog.label());
 		objCurrentShell.setText("FontDialog: select or change font");
 		objCurrentShell.setLayout(new GridLayout(11, false));
 
 		new Label(objCurrentShell, SWT.NONE);
 		final Text t = new Text(objCurrentShell, SWT.BORDER | SWT.WRAP | SWT.MULTI);
 
-//		t.setText(SOSJOEMessageCodes.JOE_M_Blindtext.label());  // The quick brown fox jumps over the lazy poddle.
+		//		t.setText(SOSJOEMessageCodes.JOE_M_Blindtext.label());  // The quick brown fox jumps over the lazy poddle.
 		t.setText("The quick brown fox jumps over the lazy poddle.");
 		t.setFont(SWTResourceManager.getFont(conDefaultfontName, 10, SWT.NORMAL));
 		t.setForeground(new Color(d, foreGround));
@@ -165,26 +165,27 @@ public class SOSFontDialog extends SOSPreferenceStore {
 		gd_t.heightHint = 74;
 		t.setLayoutData(gd_t);
 		new Label(objCurrentShell, SWT.NONE);
-//		final Button btnChange = SOSJOEMessageCodes.JOE_B_FontDialog_Change.Control(new Button(s, SWT.PUSH | SWT.BORDER));
+		//		final Button btnChange = SOSJOEMessageCodes.JOE_B_FontDialog_Change.Control(new Button(s, SWT.PUSH | SWT.BORDER));
 		final Button btnChange = new Button(objCurrentShell, SWT.PUSH | SWT.BORDER);
 		btnChange.setText("Change");
 		btnChange.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
 				FontDialog fd = new FontDialog(objCurrentShell, SWT.NONE);
-//				fd.setText(SOSJOEMessageCodes.JOE_M_SelectFont.label());
+				//				fd.setText(SOSJOEMessageCodes.JOE_M_SelectFont.label());
 				fd.setRGB(t.getForeground().getRGB());
 				fd.setFontList(t.getFont().getFontData());
 
 				FontData newFont = fd.open();
-				if (newFont == null)
+				if (newFont == null) {
 					return;
+				}
 				t.setFont(new Font(d, newFont));
 				t.setForeground(new Color(d, fd.getRGB()));
 			}
 		});
 
-//		Button btnSave = SOSJOEMessageCodes.JOE_B_FontDialog_Save.Control(new Button(s, SWT.NONE));
+		//		Button btnSave = SOSJOEMessageCodes.JOE_B_FontDialog_Save.Control(new Button(s, SWT.NONE));
 		Button btnSave = new Button(objCurrentShell, SWT.NONE);
 		btnSave.setText("Save");
 		btnSave.addSelectionListener(new SelectionAdapter() {
@@ -195,7 +196,7 @@ public class SOSFontDialog extends SOSPreferenceStore {
 			}
 		});
 
-//		Button btnReset = SOSJOEMessageCodes.JOE_B_FontDialog_Reset.Control(new Button(s, SWT.NONE));
+		//		Button btnReset = SOSJOEMessageCodes.JOE_B_FontDialog_Reset.Control(new Button(s, SWT.NONE));
 		Button btnReset = new Button(objCurrentShell, SWT.NONE);
 		btnReset.setText("Reset");
 		btnReset.addSelectionListener(new SelectionAdapter() {
@@ -206,7 +207,7 @@ public class SOSFontDialog extends SOSPreferenceStore {
 			}
 		});
 
-//		Button btnCancel = SOSJOEMessageCodes.JOE_B_FontDialog_Cancel.Control(new Button(s, SWT.NONE));
+		//		Button btnCancel = SOSJOEMessageCodes.JOE_B_FontDialog_Cancel.Control(new Button(s, SWT.NONE));
 		Button btnCancel = new Button(objCurrentShell, SWT.NONE);
 		btnCancel.setText("Cancel");
 		btnCancel.addSelectionListener(new SelectionAdapter() {
@@ -220,8 +221,9 @@ public class SOSFontDialog extends SOSPreferenceStore {
 		objCurrentShell.open();
 
 		while (!objCurrentShell.isDisposed()) {
-			if (!d.readAndDispatch())
+			if (!d.readAndDispatch()) {
 				d.sleep();
+			}
 		}
 
 	}

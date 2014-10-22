@@ -4,10 +4,10 @@
 package com.sos.dialog.components;
 import static com.sos.dialog.Globals.MsgHandler;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -30,8 +30,8 @@ public class ControlCreator {
 	private final String		conClassName		= this.getClass().getSimpleName();
 	@SuppressWarnings("unused")
 	private static final String	conSVNVersion		= "$Id$";
-	@SuppressWarnings("unused")
-	private final Logger		logger				= Logger.getLogger(this.getClass());
+	//	@SuppressWarnings("unused")
+	//	private final Logger		logger				= Logger.getLogger(this.getClass());
 	private Composite			objParentComposite	= null;
 
 	/**
@@ -132,12 +132,21 @@ public class ControlCreator {
 		return label;
 	}
 
-
 	public Control getSeparator(final String pstrI18NKey) {
-		CLabel label = new CLabel(objParentComposite, SWT.SHADOW_OUT | SWT.CENTER);
+		CLabel label = new CLabel(objParentComposite, /* SWT.SHADOW_OUT | */SWT.CENTER);
 		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 4, 1));
-		label.setBackground(Globals.getCompositeBackground());
+		//		label.setBackground(Globals.getCompositeBackground());
+
+		//		label.setBackground(new Color[] { Globals.getMandatoryFieldColor(), Globals.getCompositeBackground(), Globals.getCompositeBackground() }, new int[] {
+		//				50, 100 }, true);
+		//
+		// Set the background gradient
+		label.setBackground(new Color[] { Globals.getSystemColor(SWT.COLOR_WHITE), Globals.getSystemColor(SWT.COLOR_GRAY),
+				Globals.getFieldHasFocusBackground(), Globals.getSystemColor(SWT.COLOR_GRAY), Globals.getSystemColor(SWT.COLOR_WHITE) }, new int[] { 25, 50,
+				75, 100 }, false);
 		label.setText(MsgHandler.newMsg(pstrI18NKey).label());
+		label.setFont(Globals.stFontRegistry.get("text"));
+
 		label.setToolTipText(MsgHandler.newMsg(pstrI18NKey).tooltip());
 		return label;
 	}
