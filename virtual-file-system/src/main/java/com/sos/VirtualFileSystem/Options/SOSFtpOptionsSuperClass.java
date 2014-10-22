@@ -39,6 +39,7 @@ import com.sos.JSHelper.Options.SOSOptionStringValueList;
 import com.sos.JSHelper.Options.SOSOptionTime;
 import com.sos.JSHelper.Options.SOSOptionTransferMode;
 import com.sos.JSHelper.Options.SOSOptionTransferType;
+import com.sos.JSHelper.Options.SOSOptionUUID;
 import com.sos.JSHelper.Options.SOSOptionUserName;
 import com.sos.JSHelper.Options.SOSOptionVerbose;
 import com.sos.JSHelper.interfaces.ISOSConnectionOptions;
@@ -87,7 +88,6 @@ return pobjHM;
 public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements ISOSConnectionOptions, ISOSAuthenticationOptions, ISOSFtpOptions {
 	protected Messages			objMsg				= new Messages(this.getClass().getAnnotation(I18NResourceBundle.class).baseName());
 	private static final long	serialVersionUID	= -4445655877481869778L;
-//	private final String		conClassName		= "SOSFtpOptionsSuperClass";
 	private final String		conClassName		= "JadeOptions";
 	// SOSFtp-191 Option TFN_Post_Command: commands executed after creating the final TargetFile
 	/**
@@ -1794,12 +1794,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	 */
 	@JSOptionDefinition(name = "create_order_on_remote_jobscheduler", description = "Create the order(s) on a remote JobScheduler", key = "create_order_on_remote_jobscheduler", type = "SOSOptionBoolean", mandatory = false)
 	public SOSOptionBoolean	createOrderOnRemoteJobScheduler	= new SOSOptionBoolean( // ...
-																		this, // ....
-																		conClassName + ".create_order_on_remote_jobscheduler", // ...
-																		"Create the order(s) on a remote JobScheduler", // ...
-																		"false", // ...
-																		"false", // ...
-																		false);
+																	this, // ....
+																	conClassName + ".create_order_on_remote_jobscheduler", // ...
+																	"Create the order(s) on a remote JobScheduler", // ...
+																	"false", // ...
+																	"false", // ...
+																	false);
 
 	public SOSOptionBoolean getCreateOrderOnRemoteJobScheduler() {
 		@SuppressWarnings("unused")
@@ -3534,6 +3534,44 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	public void setfile_path(final SOSOptionFileName p_file_path) {
 		file_path = p_file_path;
 	}
+
+	/**
+	 * \option profileID
+	 * \type SOSOptionUUID
+	 * \brief profileID - The unique key for a transfer profile
+	 *
+	 * \details
+	 * the unique key for a transfer profile
+	 *
+	 * \mandatory: true
+	 *
+	 * \created 17.10.2014 17:04:54 by KB
+	 */
+	@JSOptionDefinition(name = "profileID", description = "the unique key for a transfer profile", key = "profileID", type = "SOSOptionUUID", mandatory = false)
+	public SOSOptionUUID	profileID	= new SOSOptionUUID( // ...
+												this, // ....
+												conClassName + ".profileID", // ...
+												"the unique key for a transfer profile", // ...
+												"", // ...
+												"", // ...
+												false);
+
+	public SOSOptionUUID getprofileID() {
+
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getprofileID";
+
+		return profileID;
+	} // public String getprofileID
+
+	public SOSFtpOptionsSuperClass setprofileID(final SOSOptionUUID pstrValue) {
+
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setprofileID";
+		profileID = pstrValue;
+		return this;
+	} // public SOSFtpOptionsSuperClass setprofileID
+
 	/**
 	* \var file_spec : file_spec This parameter expects a regular expressi
 	*
@@ -5600,8 +5638,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	public void setreplacement(final SOSOptionString p_replacement) {
 		replacement = p_replacement;
 	}
-	public SOSOptionString	ReplaceWith	= (SOSOptionString) replacement.SetAlias(conClassName + ".ReplaceWith");
-	
+	public SOSOptionString	ReplaceWith				= (SOSOptionString) replacement.SetAlias(conClassName + ".ReplaceWith");
+
 	/**
 	 * \option useRegExp4ReplaceWith
 	 * \type SOSOptionBoolean
@@ -5615,13 +5653,13 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	 * \created 01.09.2014 12:45:40 by KB
 	 */
 	@JSOptionDefinition(name = "useRegExp4ReplaceWith", description = "Use a regular expression for substitution", key = "useRegExp4ReplaceWith", type = "SOSOptionBoolean", mandatory = false)
-	public SOSOptionBoolean		useRegExp4ReplaceWith	= new SOSOptionBoolean( // ...
-																null, // ....
-																conClassName + ".useRegExp4ReplaceWith", // ...
-																"Use a regular expression for substitution", // ...
-																"false", // ...
-																"false", // ...
-																false);
+	public SOSOptionBoolean	useRegExp4ReplaceWith	= new SOSOptionBoolean( // ...
+															null, // ....
+															conClassName + ".useRegExp4ReplaceWith", // ...
+															"Use a regular expression for substitution", // ...
+															"false", // ...
+															"false", // ...
+															false);
 
 	public SOSOptionBoolean useRegExp4ReplaceWith() {
 
@@ -5638,7 +5676,6 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 		useRegExp4ReplaceWith = pstrValue;
 		return useRegExp4ReplaceWith;
 	} // public SOSOptionRegExp setuseRegExp4ReplaceWith
-
 
 	/**
 	* \var replacing : Regular expression for filename replacement with

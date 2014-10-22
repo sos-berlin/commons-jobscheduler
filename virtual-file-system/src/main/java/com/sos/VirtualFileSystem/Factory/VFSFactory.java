@@ -58,13 +58,15 @@ import com.sos.i18n.annotation.I18NResourceBundle;
  * @author KB
  *
  */
-@I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en") public class VFSFactory extends SOSVfsMessageCodes {
+@I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
+public class VFSFactory extends SOSVfsMessageCodes {
 	private final static String						conClassName			= "VFSFactory";
 	// private static Logger logger = Logger.getLogger(VFSFactory.class);
-	private static Logger							logger					= Logger.getRootLogger();
+	//	private static Logger							logger					= Logger.getRootLogger();
+	private static Logger							logger					= Logger.getLogger("com.sos.VirtualFileSystem");
 	protected static Msg							objMsg					= new Msg(new BundleBaseName("SOSVirtualFileSystem"));
 	private static SOSConnection2OptionsAlternate	objConnectionOptions	= null;
-//	public static String							sFTPHandlerClassName	= "com.sos.VirtualFileSystem.SFTP.SOSVfsSFtp";
+	//	public static String							sFTPHandlerClassName	= "com.sos.VirtualFileSystem.SFTP.SOSVfsSFtp";
 	// TODO change default data provider for sftp to com.sos.VirtualFileSystem.SFTP.SOSVfsSFtpFileJCraft
 	public static String							sFTPHandlerClassName	= "com.sos.VirtualFileSystem.SFTP.SOSVfsSFtpJCraft";
 	@I18NMessages(value = { @I18NMessage("%1$s returns instance of %2$s"), //
@@ -85,10 +87,11 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 			@I18NMessage(value = "%1$s returns instance of %2$s", locale = "it", //
 			explanation = "%1$s returns instance of %2$s" //
 			) //
-	}, msgnum = "SOSVfs-D-0201", msgurl = "SOSVfs-D-0201")/*!
-															 * \var SOSVfs_D_0201
-															 * \brief %1$s returns instance of %2$s
-															 */
+	}, msgnum = "SOSVfs-D-0201", msgurl = "SOSVfs-D-0201")
+	/*!
+	 * \var SOSVfs_D_0201
+	 * \brief %1$s returns instance of %2$s
+	 */
 /*!
 * \var SOSVfs_E_0203
 * \brief Msgundefined Virtual File System requested: %1$s
@@ -241,8 +244,9 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 				String[] strUI = strUserInfo.split(":");
 				objAO.getUser().Value(strUI[0]);
 				objAO.getPassword().Value("");
-				if (strUI.length > 1)
+				if (strUI.length > 1) {
 					objAO.getPassword().Value(strUI[1]);
+				}
 				objC.Authenticate(objAO);
 				objAO = null;
 				logger.info("objURL.getAuthority() : " + objURL.getAuthority());
@@ -253,7 +257,8 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 	}
 
 	public static void setConnectionOptions(final SOSConnection2OptionsAlternate pobjConnectionOptions) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setConnectionOptions";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setConnectionOptions";
 		objConnectionOptions = pobjConnectionOptions;
 	} // private VFSFactory setConnectionOptions
 
@@ -264,7 +269,8 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 	 * @return
 	 */
 	private static ISOSVFSHandler getDynamicVFSHandler(final String pstrLoadClassNameDefault) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getDynamicVFSHandler";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getDynamicVFSHandler";
 		String strLoadClassName = pstrLoadClassNameDefault;
 		if (objConnectionOptions != null && objConnectionOptions.loadClassName.isDirty() == true) {
 			strLoadClassName = objConnectionOptions.loadClassName.Value();

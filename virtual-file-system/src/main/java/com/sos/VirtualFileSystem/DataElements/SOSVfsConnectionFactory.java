@@ -144,15 +144,21 @@ public class SOSVfsConnectionFactory {
 			objVFS4Handler.Authenticate(objConnectOptions);
 		}
 		catch (Exception e) { // SOSFTP-113: Problem to login, try alternate User
-			// TODO respect alternate authentication, eg password and/or public key
-			resetLastErrorMessage();
-			try {
-				objVFS4Handler.Authenticate(objConnectOptions.Alternatives());
+			SOSConnection2OptionsAlternate objAltOpts = objConnectOptions.Alternatives();
+			if (objAltOpts.HostName.isDirty() && objAltOpts.UserName.isDirty()) {
+				// TODO respect alternate authentication, eg password and/or public key
+				resetLastErrorMessage();
+				try {
+					objVFS4Handler.Authenticate(objConnectOptions.Alternatives());
+				}
+				catch (RuntimeException e1) {
+					RaiseJadeException(JADEExitCodes.authenticatenError, e1);
+				}
+				objConnectOptions.setAlternateOptionsUsed("true");
 			}
-			catch (RuntimeException e1) {
-				RaiseJadeException(JADEExitCodes.authenticatenError, e1);
+			else {
+				RaiseJadeException(JADEExitCodes.authenticatenError, e);
 			}
-			objConnectOptions.setAlternateOptionsUsed("true");
 		}
 		ISOSVfsFileTransfer objDataClient = (ISOSVfsFileTransfer) objVFS4Handler;
 		if (objOptions.passive_mode.value() || objConnectOptions.passive_mode.isTrue()) {

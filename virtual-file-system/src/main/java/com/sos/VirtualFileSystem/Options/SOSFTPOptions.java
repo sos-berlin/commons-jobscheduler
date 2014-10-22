@@ -98,7 +98,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	public boolean					flgCumulativeTargetDeleted			= false;
 
 	public SOSFTPOptions(final SOSOptionTransferType.enuTransferTypes penuTransferType) {
-		super();
+		this();
 		switch (penuTransferType) {
 			case webdav:
 				auth_method.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
@@ -132,7 +132,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 
 	public SOSFTPOptions(final SOSOptionTransferType.enuTransferTypes penuTransferTypeSource,
 			final SOSOptionTransferType.enuTransferTypes penuTransferTypeTarget) {
-		super();
+		this();
 		switch (penuTransferTypeSource) {
 			case webdav:
 				auth_method.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
@@ -183,7 +183,8 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 
 	public SOSFTPOptions() {
 		super();
-		getMailOptions();  // initialize
+		getConnectionOptions();
+		getMailOptions(); // initialize
 	}
 
 	public SOSSmtpMailOptions getMailOptions() {
@@ -332,6 +333,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		}
 		checkURLParameter(this.getConnectionOptions().Source());
 		checkURLParameter(this.getConnectionOptions().Target());
+
 		String strSourceP = Source().getprotocol().Value();
 		String localDir = local_dir.Value();
 		if (isEmpty(localDir) == true) {
@@ -364,7 +366,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			}
 		}
 		local_dir.Value(localDir);
-		// TODO in die Options-Klasse, falls nicht schon drin ist ....
+		// TODO in die Options-Klasse, falls es nicht schon drin ist ....
 		if (localDir.startsWith(conURIPrefixFILE)) {
 			if (new File(createURI(localDir)).exists() == false) {
 				throw new JADEException(SOSVfsMessageCodes.SOSVfs_E_0010.params(localDir));
@@ -407,7 +409,9 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		}
 		setDefaultPort(this.Source().protocol, this.Source().port);
 		setDefaultPort(this.Target().protocol, this.Target().port);
+
 		setDefaultPort(protocol, port);
+
 		if (file_path.isDirty()) {
 			if (file_spec.isDirty()) {
 				file_path.Value("");
@@ -423,6 +427,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			throw new JobSchedulerException(String.format("SOSVfs-E-0000: one of these parameters must be specified: '%1$s', %2$s', '%3$s'",
 					file_path.getShortKey(), FileNamePatternRegExp.getShortKey(), FileListName.getShortKey()));
 		}
+
 		if (zero_byte_transfer.String2Bool() == true) {
 			TransferZeroByteFiles(true);
 			setZeroByteFilesStrict(false);
@@ -886,8 +891,9 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 					}
 					// logger.debug(String.format("found '%1$s'", strSearchFor));
 					int intEscaped = txt.indexOf("\\" + strSearchFor);
-					if (intEscaped > -1 && intEscaped == pos1 - 1)
+					if (intEscaped > -1 && intEscaped == pos1 - 1) {
 						pos1 = -1;
+					}
 					pos2 = pos1 + strSearchFor.length();
 					if (pos1 > -1 && pos2 > pos1) {
 						txt = txt.substring(0, pos1) + strValue + txt.substring(pos2);
@@ -918,10 +924,12 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 				String fs = System.getProperty(conSystemPropertyFILE_SEPARATOR);
 				if (fs.length() == 1) {
 					char sep = fs.charAt(0);
-					if (sep != '/')
+					if (sep != '/') {
 						path = path.replace(sep, '/');
-					if (path.charAt(0) != '/')
+					}
+					if (path.charAt(0) != '/') {
 						path = '/' + path;
+					}
 				}
 				if (!path.startsWith(conURIPrefixFILE)) {
 					path = conURIPrefixFILE + path;
@@ -1331,10 +1339,12 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	public String DirtyString() {
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::DirtyString";
-		String strD =  super.dirtyString();
-		strD += "\n" + Source().dirtyString();
-		strD += "\n" + Target().dirtyString();
-//		strD = strD.replaceAll("\\n\\n", "\\n");
+		clearBuffer();
+		clearBuffer();
+		String strD = super.dirtyString();
+		strD += concatIfNotEmpty(Source().DirtyString());
+		strD += concatIfNotEmpty(Target().DirtyString());
+		strD += concatIfNotEmpty(getMailOptions().DirtyString());
 		return strD;
 	} // private String DirtyString
 
