@@ -37,18 +37,18 @@ public class Messages implements Serializable {
 	/**
 	 *
 	 */
-	private static final long	serialVersionUID	= -1276188512965716159L;
-	private final String				conClassName		= "Messages";
-	private String				BUNDLE_NAME			= "com.sos.localization.messages";	//$NON-NLS-1$
-	private ResourceBundle		objResource_Bundle	= null;
+	private static final long	serialVersionUID			= -1276188512965716159L;
+	private final String		conClassName				= "Messages";
+	private String				BUNDLE_NAME					= "com.sos.localization.messages";	//$NON-NLS-1$
+	private ResourceBundle		objResource_Bundle			= null;
 	private ResourceBundle		objResourceBundleDefault	= null;
-	private Locale				objCurrentLocale	= Locale.getDefault();
-	private static final Logger	logger				= Logger.getLogger(Messages.class);
-	private static final String	ENCODING_KEY		= "properties.file.encoding";
+	private Locale				objCurrentLocale			= Locale.getDefault();
+	private static final Logger	logger						= Logger.getLogger(Messages.class);
+	private static final String	ENCODING_KEY				= "properties.file.encoding";
 
-	private enuEncodings		enuEncoding			= enuEncodings.ISO_8859_1;
-	private final enuEncodings	enuEncodingDefault	= enuEncodings.ISO_8859_1;
-	
+	private enuEncodings		enuEncoding					= enuEncodings.ISO_8859_1;
+	private final enuEncodings	enuEncodingDefault			= enuEncodings.ISO_8859_1;
+
 	public static enum enuEncodings {
 		ISO_8859_1, UTF_8
 		/* */;
@@ -80,7 +80,7 @@ public class Messages implements Serializable {
 		objCurrentLocale = pobjLocale;
 		objResource_Bundle = this.getBundle();
 	}
-	
+
 	/**
 	 * Pass a ClassLoader to be able to load a ResourceBundle from a different context.
 	 * @param pstrBundleName
@@ -103,11 +103,11 @@ public class Messages implements Serializable {
 			//readEncodingFromMessageFile(objB);
 			setEncoding(objB);
 		}
-		catch (MissingResourceException mb){
-			try{//Try to get local default
-    			objB = ResourceBundle.getBundle(BUNDLE_NAME);
+		catch (MissingResourceException mb) {
+			try {//Try to get local default
+				objB = ResourceBundle.getBundle(BUNDLE_NAME);
 			}
-			catch (MissingResourceException mbb){
+			catch (MissingResourceException mbb) {
 				objB = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("en"));
 			}
 
@@ -118,7 +118,7 @@ public class Messages implements Serializable {
 		objResourceBundleDefault = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("en"));
 		return objB;
 	} // private ResourceBundle getBundle
-	
+
 	public ResourceBundle getBundle(ClassLoader loader) {
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::getBundle";
@@ -126,25 +126,28 @@ public class Messages implements Serializable {
 		try {
 			if (loader == null) {
 				objB = ResourceBundle.getBundle(BUNDLE_NAME, objCurrentLocale);
-			} else {
+			}
+			else {
 				objB = ResourceBundle.getBundle(BUNDLE_NAME, objCurrentLocale, loader);
 			}
 			// logger.debug(String.format("current ResourceBundle is %1$s, locale is %2$s.", BUNDLE_NAME, objB.getLocale().getLanguage()));
 			//readEncodingFromMessageFile(objB);
 			setEncoding(objB);
 		}
-		catch (MissingResourceException mb){
-			try{//Try to get local default
+		catch (MissingResourceException mb) {
+			try {//Try to get local default
 				if (loader == null) {
 					objB = ResourceBundle.getBundle(BUNDLE_NAME);
-				} else {
+				}
+				else {
 					objB = ResourceBundle.getBundle(BUNDLE_NAME, Locale.getDefault(), loader);
 				}
 			}
-			catch (MissingResourceException mbb){
+			catch (MissingResourceException mbb) {
 				if (loader == null) {
 					objB = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("en"));
-				} else {
+				}
+				else {
 					objB = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("en"), loader);
 				}
 			}
@@ -154,8 +157,9 @@ public class Messages implements Serializable {
 			e.printStackTrace(System.err);
 		}
 		if (loader == null) {
-		objResourceBundleDefault = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("en"));
-		} else {
+			objResourceBundleDefault = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("en"));
+		}
+		else {
 			objResourceBundleDefault = ResourceBundle.getBundle(BUNDLE_NAME, new Locale("en"), loader);
 		}
 		return objB;
@@ -167,35 +171,33 @@ public class Messages implements Serializable {
 		objCurrentLocale = pobjLocale;
 	} // private void setLocale
 
-
-//	private void readEncodingFromMessageFile(final ResourceBundle objB) {
-//		String messageFile = BUNDLE_NAME.replace('.', '/');
-//		String language = objB.getLocale().getLanguage();
-//		if(language != null && language.length() > 0) {
-//			messageFile += "_" + language;
-//		}
-//		messageFile += ".properties";
-//		InputStream messagesInputStream = getClass().getClassLoader().getResourceAsStream(messageFile);
-//		if(messagesInputStream != null) {
-//			try {
-//				byte bom[] = new byte[2];
-//				int read = messagesInputStream.read(bom);
-//				if (read == 2 && bom[0] == (byte) 0xFF && bom[1] == (byte) 0xFE) {
-////					logger.debug(String.format("UTF-8 bom found in %1$s", messageFile));
-//					enuEncoding = enuEncodings.UTF_8;
-//				}
-//			}
-//			catch (IOException e) {}
-//			finally {
-//				try {
-//					messagesInputStream.close();
-//				}
-//				catch (IOException e) {}
-//			}
-////			logger.debug(String.format("Message encoding: %1$s", enuEncoding.text()));
-//		}
-//	}
-
+	//	private void readEncodingFromMessageFile(final ResourceBundle objB) {
+	//		String messageFile = BUNDLE_NAME.replace('.', '/');
+	//		String language = objB.getLocale().getLanguage();
+	//		if(language != null && language.length() > 0) {
+	//			messageFile += "_" + language;
+	//		}
+	//		messageFile += ".properties";
+	//		InputStream messagesInputStream = getClass().getClassLoader().getResourceAsStream(messageFile);
+	//		if(messagesInputStream != null) {
+	//			try {
+	//				byte bom[] = new byte[2];
+	//				int read = messagesInputStream.read(bom);
+	//				if (read == 2 && bom[0] == (byte) 0xFF && bom[1] == (byte) 0xFE) {
+	////					logger.debug(String.format("UTF-8 bom found in %1$s", messageFile));
+	//					enuEncoding = enuEncodings.UTF_8;
+	//				}
+	//			}
+	//			catch (IOException e) {}
+	//			finally {
+	//				try {
+	//					messagesInputStream.close();
+	//				}
+	//				catch (IOException e) {}
+	//			}
+	////			logger.debug(String.format("Message encoding: %1$s", enuEncoding.text()));
+	//		}
+	//	}
 
 	private void setEncoding(final ResourceBundle objBundle) {
 		try {
@@ -203,14 +205,16 @@ public class Messages implements Serializable {
 			if (objBundle != null) {
 				strM = objBundle.getString(ENCODING_KEY);
 				if (strM != null && strM.equalsIgnoreCase(enuEncodings.UTF_8.text())) {
-					enuEncoding		= enuEncodings.UTF_8;
+					enuEncoding = enuEncodings.UTF_8;
 				}
 			}
 		}
-		catch (MissingResourceException e) {}
+		catch (MissingResourceException e) {
+		}
 	}
 
-	private String strLastKey = "";
+	private String	strLastKey	= "";
+
 	private String getString(final String pstrKey, final ResourceBundle objBundle) {
 		String strT = null;
 		try {
@@ -235,8 +239,8 @@ public class Messages implements Serializable {
 					// strM = this.getMsg(pstrKey);
 					// link to another key?
 					if (strM.startsWith("[") && strM.endsWith("]")) { //$NON-NLS-1$
-						logger.debug("strLastKey = " + strLastKey + ", strKey = " + strM);
-//						System.out.println("strLastKey = " + strLastKey + ", strKey = " + strM);
+						logger.trace("strLastKey = " + strLastKey + ", strKey = " + strM);
+						//						System.out.println("strLastKey = " + strLastKey + ", strKey = " + strM);
 						if (strM.equalsIgnoreCase(strLastKey)) {
 							strM = "** loop: " + strM;
 						}
@@ -338,7 +342,7 @@ public class Messages implements Serializable {
 	public String getMsg(final String pstrKey, final Object... pstrArgs) {
 		String strM = "";
 		try {
-			strM = addKey (pstrKey, getString(pstrKey, objResource_Bundle));
+			strM = addKey(pstrKey, getString(pstrKey, objResource_Bundle));
 			strM = String.format(strM, pstrArgs);
 
 			// To support the old {x} format in messages

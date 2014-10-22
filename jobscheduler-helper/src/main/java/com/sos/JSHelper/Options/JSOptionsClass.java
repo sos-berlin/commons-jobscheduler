@@ -200,10 +200,12 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	public static boolean			flgIncludeProcessingInProgress	= false;
 	public static String			gstrIncludeSectionName			= "";
 	public boolean					gflgSubsituteVariables			= true;
-	protected static final String	conParamNamePrefixALTERNATIVE	= "alternative_";
+	//	protected static final String	conParamNamePrefixALTERNATIVE	= "alternative_";
+	protected static final String	conParamNamePrefixALTERNATE		= "alternative_";
 	protected static final String	conParamNamePrefixJUMP			= "jump_";
 	protected static final String	conParamNamePrefixTARGET		= "target_";
 	protected static final String	conParamNamePrefixSOURCE		= "source_";
+	protected static final String	conParamNamePrefixPROXY			= "proxy_";
 
 	public String getIncludeSectionName() {
 		return gstrIncludeSectionName;
@@ -235,7 +237,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 			return intType;
 		}
 	}
-	private final StringBuffer			strBuffer						= new StringBuffer("");
+	private StringBuffer				strBuffer						= new StringBuffer("");
 	public String						TestVar							= "Wert von TestVar";
 	/**
 	 * \var conEnvVarJS_TEST_MODE
@@ -823,7 +825,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	public JSOptionPropertyFolderName	UserDir							= new JSOptionPropertyFolderName(this, "", "", "", "", false);
 	@SuppressWarnings("rawtypes")
 	public Class						objParentClass					= this.getClass();
-	private String						strAlternativePrefix			= "";
+	protected String					strAlternativePrefix			= "";
 
 	public JSOptionsClass() {
 		try {
@@ -842,6 +844,13 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 
 	public String getPrefix() {
 		return strAlternativePrefix;
+	}
+
+	protected String concatIfNotEmpty(final String pstrValue) {
+		if (isNotEmpty(pstrValue)) {
+			return "\n" + pstrValue;
+		}
+		return pstrValue;
 	}
 
 	/**
@@ -1355,6 +1364,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	public String dirtyString() {
 		//		String strT = objParentClass.toString() + " -> " + objParentClass.hashCode();
 		String strT = "";
+		clearBuffer();
 		try {
 			strT += getAllOptionsAsString(IterationTypes.DirtyToString);
 		}
@@ -1402,7 +1412,12 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 		return strT;
 	}
 
+	protected void clearBuffer() {
+		strBuffer = new StringBuffer();
+	}
+
 	private String getAllOptionsAsString() {
+		clearBuffer();
 		return getAllOptionsAsString(IterationTypes.toString);
 	}
 
@@ -2138,15 +2153,15 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 * @param hshMap
 	 */
 	public void setAllOptions(final HashMap<String, String> pobjJSSettings, final String pstrAlternativePrefix) throws Exception {
-		if (strAlternativePrefix.length() <= 0) {
-			strAlternativePrefix = pstrAlternativePrefix;
-			if (objParentClass != null) {
-				IterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.setPrefix, strBuffer);
-			}
+		//		if (strAlternativePrefix.length() <= 0) {
+		strAlternativePrefix = pstrAlternativePrefix;
+		if (objParentClass != null) {
+			IterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.setPrefix, strBuffer);
 		}
-		else {
-			logger.trace(String.format("SOSOPT-I-002: Alternate Prefix already set to %1$s, but %2$s as new given", strAlternativePrefix, pstrAlternativePrefix));
-		}
+		//		}
+		//		else {
+		//			logger.trace(String.format("SOSOPT-I-002: Alternate Prefix already set to %1$s, but %2$s as new given", strAlternativePrefix, pstrAlternativePrefix));
+		//		}
 		this.setAllOptions(pobjJSSettings);
 	}
 
@@ -2948,16 +2963,18 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 				Node objN = children.item(i);
 				if (objN.getNodeType() == Node.TEXT_NODE) {
 					strNodeValue = objN.getNodeValue();
-					if (isNotEmpty(strNodeValue))
+					if (isNotEmpty(strNodeValue)) {
 						objProp.put(strNodeName, objN.getNodeValue());
+					}
 					break;
 				}
 			}
 		}
 		// Verarbeitet die Liste der Kindknoten durch rekursiven Abstieg
 		NodeList children = node.getChildNodes();
-		for (int i = 0; i < children.getLength(); i++)
+		for (int i = 0; i < children.getLength(); i++) {
 			traverse(children.item(i), objProp);
+		}
 	}
 
 	/**
@@ -3079,8 +3096,9 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 			for (Annotation a : annotations) {
 				if (a instanceof JSOptionDefinition) {
 					JSOptionDefinition od = (JSOptionDefinition) a;
-					if (od.name().toLowerCase().equals(optionNameInLowerCases))
+					if (od.name().toLowerCase().equals(optionNameInLowerCases)) {
 						return true;
+					}
 				}
 			}
 		}
@@ -3118,5 +3136,12 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 			IterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.StoreValues, strB);
 		}
 	} // private void storeOptionValues
+
+	protected void setIfNotDirty(final SOSOptionElement objOption, final String pstrValue) {
+		if (objOption.isNotDirty() && isNotEmpty(pstrValue)) {
+			logger.trace("setValue = " + pstrValue);
+			objOption.Value(pstrValue);
+		}
+	}
 
 } // public class JSOptionsClass

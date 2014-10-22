@@ -43,11 +43,12 @@ public class SOSOptionOutFileName extends SOSOptionFileName {
 	 */
 	private static final long	serialVersionUID	= -8227806083390668082L;
 	@SuppressWarnings("unused")
-	private final String	conClassName	= "JSOptionOutFileName";
+	private final String		conClassName		= "JSOptionOutFileName";
 
-	private  JSFile				objFile				= null;
+	//	private JSFile				objFile				= null;
 	@SuppressWarnings("hiding")
-	public String ControlType = "file";
+	public String				ControlType			= "file";
+
 	/**
 	 * \brief JSOptionOutFileName
 	 *
@@ -61,10 +62,13 @@ public class SOSOptionOutFileName extends SOSOptionFileName {
 	 * @param pPflgIsMandatory
 	 * @throws Exception
 	 */
-	public SOSOptionOutFileName(final JSOptionsClass pPobjParent, final String pPstrKey, final String pPstrDescription, 
-			final String pPstrValue, final String pPstrDefaultValue,
-			final boolean pPflgIsMandatory) {
+	public SOSOptionOutFileName(final JSOptionsClass pPobjParent, final String pPstrKey, final String pPstrDescription, final String pPstrValue,
+			final String pPstrDefaultValue, final boolean pPflgIsMandatory) {
 		super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
+	}
+
+	public SOSOptionOutFileName(final String pstrFileName) {
+		this(null, "", "", pstrFileName, pstrFileName, false);
 	}
 
 	@Override
@@ -94,9 +98,9 @@ public class SOSOptionOutFileName extends SOSOptionFileName {
 				catch (IOException e) {
 					e.printStackTrace();
 				}
-//				if (objFile.exists() == false) {
-//					throw new RuntimeException(String.format("%1$s: file '%2$s' does not exists", conMethodName, lstrFileName));
-//				}
+				//				if (objFile.exists() == false) {
+				//					throw new RuntimeException(String.format("%1$s: file '%2$s' does not exists", conMethodName, lstrFileName));
+				//				}
 
 				if (objFile.canWrite() == false) {
 					throw new RuntimeException(String.format("%1$s: Has no write permissiong for file '%2$s'", conMethodName, lstrFileName));

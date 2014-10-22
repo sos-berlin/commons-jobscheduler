@@ -18,19 +18,22 @@ import com.sos.JSHelper.io.Files.JSTextFile;
  *
  */
 public class SOSOptionLog4JPropertyFile extends SOSOptionInFileName {
-	private static final long								serialVersionUID					= -5291704259398563937L;
-	public static final String								conLOG4J_PROPERTIESDefaultFileName	= "log4j.properties";
-	@SuppressWarnings("unused") private final String		conClassName						= this.getClass().getSimpleName();
-	@SuppressWarnings("unused") private static final String	conSVNVersion						= "$Id$";
-	@SuppressWarnings("unused") private final Logger		logger								= Logger.getLogger(this.getClass());
-	private static Logger									objCurrentLog						= null;								/*!<  Ausgabe via individuellem Logger (log4j.category.xxx) */
-	private static Logger									objRootLog							= null;								/*!<  Ausgabe via RootLogger (log4j.rootCategory) */
-	private static String									strPropfileName						= null;
-	private String											strParentClassName					= conClassName;
-	private Level											objLevel							= null;
-	private final boolean									flgPrintComputerName				= false;
-	public static boolean									flgUseJobSchedulerLog4JAppender		= false;
-	private IJobSchedulerLoggingAppender					objLoggingAppender					= null;
+	private static final long				serialVersionUID					= -5291704259398563937L;
+	public static final String				conLOG4J_PROPERTIESDefaultFileName	= "log4j.properties";
+	@SuppressWarnings("unused")
+	private final String					conClassName						= this.getClass().getSimpleName();
+	@SuppressWarnings("unused")
+	private static final String				conSVNVersion						= "$Id$";
+	@SuppressWarnings("unused")
+	private final Logger					logger								= Logger.getLogger(this.getClass());
+	private static Logger					objCurrentLog						= null;																	/*!<  Ausgabe via individuellem Logger (log4j.category.xxx) */
+	private static Logger					objRootLog							= null;																	/*!<  Ausgabe via RootLogger (log4j.rootCategory) */
+	private static String					strPropfileName						= null;
+	private String							strParentClassName					= conClassName;
+	private Level							objLevel							= null;
+	private final boolean					flgPrintComputerName				= false;
+	public static boolean					flgUseJobSchedulerLog4JAppender		= false;
+	private IJobSchedulerLoggingAppender	objLoggingAppender					= null;
 
 	public void setLoggingAppender(IJobSchedulerLoggingAppender pobjLoggingAppender) {
 		objLoggingAppender = pobjLoggingAppender;
@@ -83,7 +86,7 @@ public class SOSOptionLog4JPropertyFile extends SOSOptionInFileName {
 					objLog4JPropertyFile.WriteLine("log4j.appender.stdout=org.apache.log4j.ConsoleAppender");
 				}
 				else {
-					/**
+					/**	
 					 * Spezialität für den JobScheduler Logger:
 					 * von aussen steuern. bei junit-tests ist der consoleappender richtig, sonst nicht.
 					 */

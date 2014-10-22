@@ -117,10 +117,10 @@ public class JSDataElementDate extends JSDataElement {
 	 * @param pdatDate
 	 */
 	public JSDataElementDate(final Date pdatDate) {
-//		Call to method of static java.text.DateFormat in new com.sos.JSHelper.DataElements.JSDataElementDate(Date) [Scary(8), Normal confidence]
-		JSDateFormat objFormat = new JSDateFormat("yyyyMMddHHmmss");
+		//		Call to method of static java.text.DateFormat in new com.sos.JSHelper.DataElements.JSDataElementDate(Date) [Scary(8), Normal confidence]
+		JSDateFormat lobjFormat = new JSDateFormat("yyyyMMddHHmmss");
 
-		this.Value(objFormat.format(pdatDate));
+		this.Value(lobjFormat.format(pdatDate));
 	}
 
 	public JSDataElementDate(final String pPstrValue, final String pPstrDescription, final int pPintSize, final int pPintPos, final String pPstrFormatString,
@@ -372,7 +372,7 @@ public class JSDataElementDate extends JSDataElement {
 		return now.getTime();
 	} // public Date Now}
 
-	public static String getCurrentTimeAsString(final String dateTimeFormat)  {
+	public static String getCurrentTimeAsString(final String dateTimeFormat) {
 
 		String strFormat = dateTimeFormat;
 		if (dateTimeFormat == null || dateTimeFormat.length() <= 0) {
@@ -405,16 +405,19 @@ public class JSDataElementDate extends JSDataElement {
 			case Calendar.TUESDAY:
 				return 25;
 			case Calendar.WEDNESDAY:
-				if (daysOfMonth == 31)
+				if (daysOfMonth == 31) {
 					return 31;
+				}
 				return 24;
 			case Calendar.THURSDAY:
-				if (daysOfMonth >= 30)
+				if (daysOfMonth >= 30) {
 					return 30;
+				}
 				return 23;
 			case Calendar.FRIDAY:
-				if (daysOfMonth >= 29)
+				if (daysOfMonth >= 29) {
 					return 29;
+				}
 				return 22;
 			case Calendar.SATURDAY:
 				return 28;
@@ -422,7 +425,7 @@ public class JSDataElementDate extends JSDataElement {
 		throw new RuntimeException("what day of the month?");
 	}
 
-	public int getLastThursday (final int month, final int year) {
+	public int getLastThursday(final int month, final int year) {
 		return getLastFridayInAMonth(month, year) - 1;
 	}
 }

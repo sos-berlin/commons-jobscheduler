@@ -32,7 +32,6 @@ public class SOSOptionPassword extends SOSOptionStringWVariables {
 	 */
 	private static final long	serialVersionUID	= 1374430778591063177L;
 	private final String		conClassName		= "SOSOptionPassword";
-	public static final String	conBackTic			= "`";
 	private String				strCachedPW			= "";
 
 	// SOSOptionPassword() {
@@ -56,8 +55,10 @@ public class SOSOptionPassword extends SOSOptionStringWVariables {
 	 *
 	 * @return
 	 */
-	@Override public String toString() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::toString";
+	@Override
+	public String toString() {
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::toString";
 		//		String strPValue = "*****";
 		//		if (ExecuteCommandToGetPassword()) {
 		//			strPValue = strValue;
@@ -70,7 +71,8 @@ public class SOSOptionPassword extends SOSOptionStringWVariables {
 	/**
 	 * Checks if an external command needs to be executed to get the password
 	 */
-	@Override public String Value() {
+	@Override
+	public String Value() {
 		String strReturnPassword = strValue;
 		if (isNotEmpty(strValue)) {
 			try {
@@ -96,9 +98,10 @@ public class SOSOptionPassword extends SOSOptionStringWVariables {
 	}
 
 	public boolean ExecuteCommandToGetPassword() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::PasswordByExecution";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::PasswordByExecution";
 		boolean flgExecuteCommandToGetPassword = false;
-		if (strValue.startsWith(conBackTic) && strValue.endsWith(conBackTic)) {
+		if (isValueEnclosedByBackticks()) {
 			flgExecuteCommandToGetPassword = true;
 		}
 		return flgExecuteCommandToGetPassword;

@@ -3,8 +3,12 @@
  */
 package com.sos.JSHelper.Options;
 
+import java.util.Enumeration;
+
+import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 
 /**
  * @author KB
@@ -30,32 +34,46 @@ public class SOSOptionVerbose extends SOSOptionInteger {
 		super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
 	}
 
-	public void initializeLog4jLevels () {
+	public void initializeLog4jLevels() {
+
+		PatternLayout layout = new PatternLayout("[%-5p] %d{ABSOLUTE} (%F:%L) - %m%n");
+
 		int intVerbose = this.value();
 		switch (intVerbose) {
 			case -1:
-				Logger.getRootLogger().setLevel(Level.ERROR);
+				setLoggerLevel(Level.ERROR);
+				logger.error("set loglevel to ERROR due to option verbose = " + intVerbose);
 				break;
 			case 0:
 			case 1:
-				Logger.getRootLogger().setLevel(Level.INFO);
+				setLoggerLevel(Level.INFO);
+				layout = new PatternLayout("[%-p] %d{ABSOLUTE} - %m%n");
+				logger.info("set loglevel to INFO due to option verbose = " + intVerbose);
 				break;
 			case 9:
-				Logger.getRootLogger().setLevel(Level.TRACE);
-				logger.setLevel(Level.TRACE);
-				logger.debug("set loglevel to TRACE due to option verbose = " + intVerbose);
+				setLoggerLevel(Level.TRACE);
+				logger.trace("set loglevel to TRACE due to option verbose = " + intVerbose);
 				break;
 			default:
-				Logger.getRootLogger().setLevel(Level.DEBUG);
+				setLoggerLevel(Level.DEBUG);
 				logger.debug("set loglevel to DEBUG due to option verbose = " + intVerbose);
 				break;
 		}
 
+		for (Enumeration appenders = Logger.getRootLogger().getAllAppenders(); appenders.hasMoreElements();) {
+			Appender appender = (Appender) appenders.nextElement();
+			appender.setLayout(layout);
+		}
 	}
-	
+
+	private void setLoggerLevel(final Level pintLevel) {
+		Logger.getRootLogger().setLevel(pintLevel);
+		logger.setLevel(pintLevel);
+	}
+
 	@Override
-	public void Value (final String pstrValue) {
+	public void Value(final String pstrValue) {
 		super.Value(pstrValue);
-//		initializeLog4jLevels();
+		//		initializeLog4jLevels();
 	}
 }

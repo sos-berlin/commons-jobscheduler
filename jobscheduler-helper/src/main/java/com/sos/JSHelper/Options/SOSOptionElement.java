@@ -352,18 +352,25 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	}
 
 	public String DirtyToString() {
-		String strR = "";
-		if (isProtected() == false) {
-			if (flgHideOption == false && this.isDirty() == true) {
-				String strV = strValue;
-				if (IsNotEmpty() == true) {
-					if (flgHideValue == true && flgShowPasswords == false) {
-						strV = "*****";
-					}
-					strR = this.getShortKey() + "=" + strV;
-				}
+		String strR = EMPTY_STRING;
+		if (this.isDirty() == true && isHideOption() == false) {
+			String strG = getStringValue();
+			if (isNotEmpty(strG)) {
+				strR = this.getShortKey() + "=" + strG;
 			}
 		}
+		//		String strR = "";
+		//		if (isProtected() == false) {
+		//			if (flgHideOption == false && this.isDirty() == true) {
+		//				String strV = strValue;
+		//				if (IsNotEmpty() == true) {
+		//					if (flgHideValue == true && flgShowPasswords == false) {
+		//						strV = "*****";
+		//					}
+		//					strR = this.getShortKey() + "=" + strV;
+		//				}
+		//			}
+		//		}
 		return strR;
 	}
 
@@ -484,7 +491,10 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 			String strPrefix = objParentClass.getPrefix();
 			if (isNotEmpty(strPrefix)) {
 				if (strT.startsWith(strPrefix) == false) {
-					strT = strPrefix + "_" + strT;
+					if (strPrefix.endsWith("_") == false) {
+						strPrefix = strPrefix + "_";
+					}
+					strT = strPrefix + strT;
 				}
 			}
 		}
@@ -775,7 +785,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 				this.Value(strV);
 				this.setProtected(JSOptionsClass.flgIncludeProcessingInProgress);
 				this.setIncludeSectionName(JSOptionsClass.gstrIncludeSectionName);
-				setDirty();  // important, otherwise the element is not dirty ??
+				setDirty(); // important, otherwise the element is not dirty ??
 			}
 			// - <remark who='EQALS' when='Dienstag, 6. Oktober 2009' id='PublishSQLStatement' >
 			/**
@@ -953,15 +963,18 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	public String setPrefix(final String strPrefix) {
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::setPrefix";
+
 		String strT = strKey;
-		int i = strT.indexOf(".");
-		if (i > 0) {
-			strT = strT.replaceFirst("\\.", "." + strPrefix);
+		if (strT.contains(strPrefix) == false) {
+			int i = strT.indexOf(".");
+			if (i > 0) {
+				strT = strT.replaceFirst("\\.", "." + strPrefix);
+			}
+			else {
+				strT = strPrefix + strT;
+			}
+			strKey = strT;
 		}
-		else {
-			strT = strPrefix + strT;
-		}
-		strKey = strT;
 		return strT;
 	}
 
@@ -1098,6 +1111,28 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 		return strT;
 	} // public String toOut}
 
+	public String getStringValue() {
+
+		String strR = "";
+		if (flgHideOption == true || isProtected() == true) {
+		}
+		else {
+			String strV = strValue;
+			if (getShowPasswords() == true || isValueEnclosedByBackticks()) {
+				// nothing to do: show the value
+			}
+			else {
+				if (flgHideValue == true) {
+					strV = "*****";
+				}
+			}
+
+			strR = strV;
+		}
+		return strR;
+
+	}
+
 	/**
 	 *
 	 * \brief toString
@@ -1110,15 +1145,18 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	 */
 	@Override
 	public String toString() {
-		String strR = "";
-		if (flgHideOption == false && isProtected() == false) {
-			String strV = strValue;
-			if (flgHideValue == true || getShowPasswords() == true) {
-				strV = "*****";
-			}
-			strR = strKey + " (" + strDescription + "): " + strV;
-		}
+		String strR = getStringValue();
+		strR = strKey + " (" + strDescription + "): " + strR;
 		return strR;
+	}
+
+	public static final String	conBackTic	= "`";
+
+	protected boolean isValueEnclosedByBackticks() {
+		if (strValue.startsWith(conBackTic) && strValue.endsWith(conBackTic)) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -1310,15 +1348,15 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 		}
 		return strT;
 	}
-	private static final HashMap <String, String> defaultProposals = new HashMap<>();
-	
+	private static final HashMap<String, String>	defaultProposals	= new HashMap<>();
+
 	@Override
-	public void addProposal (final String pstrProposal) {
+	public void addProposal(final String pstrProposal) {
 		if (pstrProposal != null && pstrProposal.trim().length() > 0) {
 			defaultProposals.put(pstrProposal, pstrProposal);
 		}
 	}
-	
+
 	@Override
 	public String[] getAllProposals(String text) {
 		String[] proposals = defaultProposals.keySet().toArray(new String[0]);

@@ -60,19 +60,23 @@ public class SOSOptionFileName extends SOSOptionStringWVariables {
 	public SOSOptionFileName(final JSOptionsClass pPobjParent, final String pPstrKey, final String pPstrDescription, final String pPstrValue,
 			final String pPstrDefaultValue, final boolean pPflgIsMandatory) {
 		super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
+		this.JSFile();
 	}
 
-	public SOSOptionFileName (final String pstrFileName) {
+	public SOSOptionFileName(final String pstrFileName) {
 		super(null, "", "", pstrFileName, "", false);
 	}
-	@Override public String getControlType() {
+
+	@Override
+	public String getControlType() {
 		return ControlType;
 	}
 
 	public String ValueWithFileSeparator() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::Value";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::Value";
 		String strT = strValue.trim();
-		if (IsNotEmpty()) {  // http://www.sos-berlin.com/jira/browse/SOSFTP-198
+		if (IsNotEmpty()) { // http://www.sos-berlin.com/jira/browse/SOSFTP-198
 			if (strValue.endsWith("/") || strValue.endsWith("\\")) {
 			}
 			else {
@@ -93,7 +97,8 @@ public class SOSOptionFileName extends SOSOptionStringWVariables {
 	 * @return
 	 */
 	public JSFile JSFile() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::JSFile";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::JSFile";
 		if (objFile == null) {
 			if (isNotEmpty(strValue)) {
 				objFile = new JSFile(strValue);
@@ -103,7 +108,8 @@ public class SOSOptionFileName extends SOSOptionStringWVariables {
 	} // private JSFile JSFile
 
 	public void RelativeValue(final String pstrStringValue) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::Value";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::Value";
 		strOriginalValue = pstrStringValue;
 		String strT = pstrStringValue;
 		if (strT.length() > 2 && (strT.startsWith("./") || strT.startsWith(".\\"))) { // relative path/file location (must be "./" 
