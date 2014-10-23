@@ -4,12 +4,12 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream; 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter; 
+import java.io.OutputStreamWriter;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -68,7 +68,7 @@ import com.trilead.ssh2.StreamGobbler;
 *
 * Created on 16.05.2010 19:17:53
  */
-
+ 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, ISOSVFSHandler, ISOSVirtualFileSystem, ISOSConnection, ISOSSession {
 
@@ -82,6 +82,7 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 	public SOSSSH2TriLeadImpl() {
 		//
 	}
+	
 	private ISOSConnectionOptions		objCO					= null;
 	private ISOSAuthenticationOptions	objAO					= null;
 	private ISOSShellOptions			objSO					= null;
@@ -451,7 +452,7 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 			if (flgIsRemoteOSWindows == false) {
 				strFileName2Return = "./" + strFileName2Return;
 			}
-			Add2Files2Delete(strFileName2Return);
+			add2Files2Delete(strFileName2Return);
 			logger.info(SOSVfs_I_253.params(fleTempScriptFile.getAbsolutePath()));
 			return strFileName2Return;
 		}
@@ -461,7 +462,7 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 		}
 	}
 
-	private void Add2Files2Delete(final String pstrFilenName2Delete) {
+	private void add2Files2Delete(final String pstrFilenName2Delete) {
 		this.getFilesToDelete().add(pstrFilenName2Delete);
 		logger.debug(String.format(SOSVfs_D_254.params(pstrFilenName2Delete)));
 	}
@@ -1000,30 +1001,30 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 				strbStderrOutput.append(line + strEndOfLine);
 			}
 		}
-
+ 
 		// give the session some time to end
-        // TODO waitForCondition as an Option
-        @SuppressWarnings("unused")
-        int res = getSshSession().waitForCondition(ChannelCondition.EOF, 30 * 1000);
-        
+		// TODO waitForCondition as an Option
+		@SuppressWarnings("unused")
+		int res = getSshSession().waitForCondition(ChannelCondition.EOF, 30 * 1000);
+		
+ 
+		
+		long timeout = (2 * 60) * 1000;
 
-        
-        long timeout = (2 * 60) * 1000;
+		int retval = getSshSession().waitForCondition(ChannelCondition.EXIT_STATUS, timeout);
 
-        int retval = getSshSession().waitForCondition(ChannelCondition.EXIT_STATUS, timeout);
-
-        if ((retval & ChannelCondition.TIMEOUT) != 0){
-            throw new java.util.concurrent.TimeoutException();
-        } else {
-            try {
-                exitStatus = this.getSshSession().getExitStatus();
-            }
-            catch (Exception e) {
-                logger.info(SOSVfs_I_250.params("exit status"));
-            }
-        }
-        
-        
+		if ((retval & ChannelCondition.TIMEOUT) != 0){
+			throw new java.util.concurrent.TimeoutException();
+		} else {
+			try {
+				exitStatus = this.getSshSession().getExitStatus();
+			}
+			catch (Exception e) {
+				logger.info(SOSVfs_I_250.params("exit status"));
+			}
+		}
+		
+		
 		try {
 			exitSignal = this.getSshSession().getExitSignal();
 		}
@@ -1034,17 +1035,10 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 	}
 
 	@Override
-	public Integer getExitCode()  {
-	    
-	    if (exitStatus == null) {
-	        if (this.getSshSession() != null){
-	            // Try again
-	            exitStatus = this.getSshSession().getExitStatus();
-	        }
-	        if (exitStatus == null) {
-                throw new RuntimeException( "Error reading exit code from SSH-Server. No exit code is available.");
-	        }
-        }
+	public Integer getExitCode() {
+		if (exitStatus == null) {
+		    throw new RuntimeException( "Error reading exit code from SSH-Server. No exit code is available.");
+	    }
 		return exitStatus;
 	}
 

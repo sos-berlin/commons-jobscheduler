@@ -1,5 +1,4 @@
 package com.sos.hibernate.classes;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -107,8 +106,8 @@ public abstract class SOSHibernateFilter extends I18NBase {
 		super(SOSHibernateConstants.conPropertiesFileName);
 	}
 
-	public SOSHibernateFilter(final String strI28NPropertyFileName) {
-		super(strI28NPropertyFileName);
+	public SOSHibernateFilter(final String i18NPropertyFileName) {
+		super(i18NPropertyFileName);
 	}
 	
 	

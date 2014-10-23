@@ -1,18 +1,23 @@
 package com.sos.dialog.classes;
  
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
+
+import com.sos.hibernate.classes.UtcTimeHelper;
 
 public class SOSTableItem extends TableItem {
 
     protected  Color [] colorsBackground;
     protected  Color [] colorsForeground;  
     private Table table;
+    private String timeZone="";
+    protected UtcTimeHelper utcTimeHelper;
+
     
     public SOSTableItem(Table parent, int style) {
         super(parent, style);
+        utcTimeHelper = new UtcTimeHelper();
         table = parent;
     }
     
@@ -40,6 +45,19 @@ public Color[] getForegroundColumn() {
 
 public Table  getTable () {
     return this.table;
+}
+
+
+public String getTimeZone() {
+    if (timeZone.length() == 0) {
+        this.timeZone = UtcTimeHelper.localTimeZoneString();
+    }
+    return timeZone;
+}
+
+
+public void setTimeZone(String timeZone) {
+    this.timeZone = timeZone;
 }
 
 }

@@ -1,7 +1,5 @@
 package com.sos.dialog;
 
-
-
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
@@ -26,14 +24,10 @@ import com.sos.dialog.classes.SOSUrl;
 
 public class BrowserViewForm {
 
-	@SuppressWarnings("unused") private final String conClassName = this.getClass().getSimpleName();
-	@SuppressWarnings("unused") private static final String conSVNVersion = "$Id$";
-	@SuppressWarnings("unused") private final Logger logger = Logger.getLogger(this.getClass());
-	
-
 	private Browser			browser	= null;
 	private GridLayout		gridLayout;
 	private GridData		data;
+	private final Logger	logger	= Logger.getLogger(BrowserViewForm.class);
 	private SOSUrl			url;
 	private final Composite	parent;
  	  
@@ -53,10 +47,11 @@ public class BrowserViewForm {
 
     public BrowserViewForm(final Composite parent_, final int style, final SOSUrl url_) {
         parent = parent_;
-        url = url_;
+        this.url = url_;
         showBrowser();
     }
 
+    
 	private void showBrowser() {
 		gridLayout = new GridLayout();
 		gridLayout.numColumns = 2;
@@ -107,16 +102,17 @@ public class BrowserViewForm {
 			@Override
 			public void open(final WindowEvent event) {
 			    
-		 		if (!event.required) {
-		 		    	return; /* only do it if necessary */
+//JID-59	if ( false && !event.required) {
+//		 			return; /* only do it if necessary */
 		 		 
-			}else {    
+//			}else {    
 				Shell shell = new Shell(display);
 				shell.setLayout(new FillLayout());
 				Browser browser = new Browser(shell, SWT.NONE);
- 				initialize(display, browser);
+ 
+				initialize(display, browser);
 				event.browser = browser;
-			}
+//			}
 			}
 		});
 		browser.addVisibilityWindowListener(new VisibilityWindowListener() {
@@ -137,25 +133,29 @@ public class BrowserViewForm {
 					Point size = event.size;
 					shell.setSize(shell.computeSize(size.x, size.y));
 				}
-				shell.open();
+ 				shell.open();
 			}
 		});
 		browser.addCloseWindowListener(new CloseWindowListener() {
 			@Override
 			public void close(final WindowEvent event) {
-				Browser browser = (Browser) event.widget;
+ 				Browser browser = (Browser) event.widget;
 				Shell shell = browser.getShell();
+				
 				shell.close();
 			}
 		});
-	}
 	
-	public Browser getBrowser () {
-		return browser;
+
 	}
 
+	public String getUrlCaption() {
+		return url.getUrlCaption();
+	}
+
+	
 	public void setUrl(final String url_) {
-		url = new SOSUrl(url_);
+		this.url = new SOSUrl(url_);
 		browser.setUrl(url.getHost() + "://" + url.getUrl().getPath());
 	}
 

@@ -70,7 +70,7 @@ public class SOSUrl  {
         }
     }
 
-    private String getUrlCaption() {
+    public String getUrlCaption() {
         if (url.getProtocol().equalsIgnoreCase(DEFAULT_PROTOCOL)) {
             if (url.getPort() < 0) {
                return String.format("%s",url.getHost());

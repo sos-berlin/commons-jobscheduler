@@ -43,18 +43,21 @@ public class DbItem {
 
 	@SuppressWarnings("unused")
 	private final String	conClassName	= "DbItem";
-	protected UtcTimeHelper utcTimeHelper;
-
+ 
     private DateTimeZone dateTimeZone4Getters = DateTimeZone.getDefault();
 
 	public DbItem() {
-	     utcTimeHelper = new UtcTimeHelper();
-		//
+ 		//
 	}
 
     @Transient
     public void setDateTimeZone4Getters(DateTimeZone dateTimeZone4Getters) {
         this.dateTimeZone4Getters = dateTimeZone4Getters;
+    }
+
+    @Transient
+    public void setDateTimeZone4Getters(String dateTimeZone4Getters) {
+        this.dateTimeZone4Getters =  DateTimeZone.forID(dateTimeZone4Getters);
     }
 
     @Transient 
@@ -121,28 +124,14 @@ public class DbItem {
  	    
        DateTime dateTimeInUtc = new DateTime(d);
  
-       String toTimeZoneString = utcTimeHelper.localTimeZoneString();
-      
-       if (isToday(utcTimeHelper.convertTimeZonesToDate(fromTimeZoneString, toTimeZoneString, new DateTime(d)))) {
-           return utcTimeHelper.convertTimeZonesToString("HH:mm:ss",fromTimeZoneString, toTimeZoneString, dateTimeInUtc);
+       String toTimeZoneString = getDateTimeZone4Getters().getID();
+
+       if (isToday(UtcTimeHelper.convertTimeZonesToDate(fromTimeZoneString, toTimeZoneString, new DateTime(d)))) {
+           return UtcTimeHelper.convertTimeZonesToString("HH:mm:ss",fromTimeZoneString, toTimeZoneString, dateTimeInUtc);
        }else {
-           return utcTimeHelper.convertTimeZonesToString("yyyy-MM-dd H:mm:ss",fromTimeZoneString, toTimeZoneString, dateTimeInUtc);
+           return UtcTimeHelper.convertTimeZonesToString("yyyy-MM-dd H:mm:ss",fromTimeZoneString, toTimeZoneString, dateTimeInUtc);
        }
        
-/* 	    
-	    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
- 		if (d == null) {
- 			return "";
- 		}else{
- 			if (isToday(d)) {
-	 		     formatter = new SimpleDateFormat("HH:mm:ss");
- 			}else {
-	 		     formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
- 			}
- 		    String s = formatter.format(d);
- 		    return s;
- 		}
-*/
  	}
  
  	  protected String null2Blank(String s) {

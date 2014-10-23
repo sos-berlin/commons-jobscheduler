@@ -895,7 +895,7 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
 
 	@Override
 	public Integer getExitCode() {
-		return intExitStatus;
+		return null;
 	}
 
 	@Override

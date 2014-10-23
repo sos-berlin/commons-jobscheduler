@@ -38,6 +38,7 @@ import org.joda.time.format.DateTimeFormatter;
 public abstract class SOSHibernateIntervalFilter extends SOSHibernateFilter {
 	@SuppressWarnings("unused")
 	private final String conClassName = "Filter";
+	private String timeZone;
 	private static final Logger logger = Logger
 			.getLogger(SOSHibernateIntervalFilter.class);
 
@@ -48,11 +49,22 @@ public abstract class SOSHibernateIntervalFilter extends SOSHibernateFilter {
 	public abstract void setIntervalFromDateIso(String s);
 
 	public abstract void setIntervalToDateIso(String s);
+	
 
 	public SOSHibernateIntervalFilter() {
 		super();
  	}
 
+	private Date convertTimeZone(Date d, String fromTimeZoneString, String toTimeZoneString ) {
+         DateTime dateTimeInUtc = new DateTime(d);
+         return UtcTimeHelper.convertTimeZonesToDate(fromTimeZoneString, toTimeZoneString, dateTimeInUtc);
+	}
+	
+	public Date convertFromTimeZoneToUtc(Date d) {
+	    String toTimeZoneString = "UTC";
+        String fromTimeZoneString = this.getTimeZone();
+        return convertTimeZone(d,fromTimeZoneString,toTimeZoneString);
+	}
        
   
   
@@ -67,7 +79,7 @@ public abstract class SOSHibernateIntervalFilter extends SOSHibernateFilter {
 			String d = formatter.format(from);
 			try {
 				formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-				this.setIntervalFromDate(formatter.parse(d));
+				this.setIntervalFromDate(convertFromTimeZoneToUtc(formatter.parse(d)));
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
@@ -86,7 +98,7 @@ public abstract class SOSHibernateIntervalFilter extends SOSHibernateFilter {
 			String d = formatter.format(to);
 			try {
 				formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-				this.setIntervalToDate(formatter.parse(d));
+				this.setIntervalToDate(convertFromTimeZoneToUtc(formatter.parse(d)));
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
@@ -98,5 +110,13 @@ public abstract class SOSHibernateIntervalFilter extends SOSHibernateFilter {
 			this.setIntervalToDate(null);
 		}
 	}
+
+    public String getTimeZone() {
+        return timeZone;
+    }
+
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
+    }
 
 }

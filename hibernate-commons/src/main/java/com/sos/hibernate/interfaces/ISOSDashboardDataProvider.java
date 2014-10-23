@@ -69,5 +69,7 @@ public interface ISOSDashboardDataProvider {
     public void update(DbItem h);
     public void commit();
     public Session getSession();
+    public void setTimeZone(String timeZone);
+    public String getTimeZone();
     
 }

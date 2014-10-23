@@ -18,13 +18,14 @@ public class JobSchedulerException extends RuntimeException {
 
 	private final String		conClassName				= "JobSchedulerException";
 
+	public final static int		NONE     					= -2;
 	public final static int		UNDEFINED					= -1;
 	public final static int		SUCCESS						= 0;
 	public final static int		WARNING						= 1;
 	public final static int		ERROR						= 2;
 	public final static int		PENDING						= 3;
 	public final static int		SKIPPROCESSING				= 4;
-	public final static int		FATAL				= 5;
+	public final static int		FATAL				        = 5;
 
 	public final static String	CategoryIDocProcessing		= "IDocs";
 
@@ -133,7 +134,11 @@ public class JobSchedulerException extends RuntimeException {
 		setMessage(pstrMessage + " (" + e.getLocalizedMessage() + ")");
 		saveException(e);
 	}
+	
 
+
+	 
+	
 	private void saveException(final Exception e) {
 
 		@SuppressWarnings("unused")
@@ -209,6 +214,9 @@ public class JobSchedulerException extends RuntimeException {
 		}
 		return intStatus;
 	} // int Status()
+	public void setIntStatus(int status){
+		intStatus = status;
+	}
 
 	/**
 	 *
@@ -244,8 +252,13 @@ public class JobSchedulerException extends RuntimeException {
 				strT = "SKIPPROCESSING";
 				break;
 
+				
 			case JobSchedulerException.UNDEFINED:
 				strT = "UNDEFINED";
+				break;
+
+			case JobSchedulerException.NONE:
+				strT = "";
 				break;
 
 			default:
@@ -471,8 +484,10 @@ public class JobSchedulerException extends RuntimeException {
 			strT += "\nAdditional Text:\n" + strAdditionalText + "\n";
 		}
 
-		strT += "\nfurther Actions:\n\n";
-		strT += StatusAction() + "\n";
+		if (intStatus != NONE){
+			strT += "\nfurther Actions:\n\n";
+			strT += StatusAction() + "\n";
+		}
 
 		if (nestedException != null) {
 			strT += "\n" + nestedException.getMessage();
