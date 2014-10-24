@@ -173,7 +173,7 @@ public class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 		logger.debug(Options().dirtyString());
 
 		try {
-			objVFS.Connect(objOptions.get);
+			objVFS.Connect(objOptions);
 			ISOSAuthenticationOptions objAU = objOptions;
 			ISOSConnection authenticate = objVFS.Authenticate(objAU);
 			logger.debug("connection established");
