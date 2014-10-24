@@ -159,4 +159,8 @@ public class BrowserViewForm {
 		browser.setUrl(url.getHost() + "://" + url.getUrl().getPath());
 	}
 
+    public Browser getBrowser() {
+        return browser;
+    }
+
 }
