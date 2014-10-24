@@ -9,7 +9,7 @@
     <fileSets>
         <fileSet>
             <directory>${project.build.directory}/classes</directory>
-            <outputDirectory>/com/sos/scheduler/engine/setup/config</outputDirectory>
+            <outputDirectory>/</outputDirectory>
             <includes>
                 <include>shiro.ini.mini</include>
                 <include>shiro_*.ini</include>
