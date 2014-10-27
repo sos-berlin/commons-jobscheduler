@@ -95,7 +95,7 @@ public class SOSOptionUrl extends SOSOptionHostName {
 		objTT.Value(objURL.getProtocol());
 		String strHost = objURL.getHost();
 		if (isEmpty(strHost)) {
-			strHost = "localHost";
+			strHost = "localhost";
 		}
 		pobjO.getHost().Value(strHost);
 		if (objTT.needPortNumber() == true) {
