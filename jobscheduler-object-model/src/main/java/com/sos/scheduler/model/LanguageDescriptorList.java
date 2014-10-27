@@ -37,14 +37,14 @@ public class LanguageDescriptorList {
 //			conLanguagePERL_SCRIPT, conLanguageJAVAX_SCRIPT_RHINO, conLanguagePL_SQL, conLanguageSQL_PLUS, conLanguageSSH, "" };
 //
 	// @formatter:off   // avoid formatting
-	private static List<LanguageDescriptor>	lstLanguages					= Arrays.asList(       // avoid formatting
-			new LanguageDescriptor(conLanguageSHELL, 			  0, false, conLanguageSHELL, "", "", true, true),   // avoid formatting
-			new LanguageDescriptor(conLanguageJAVA, 			  1, false, conLanguageJAVA, "", "", true, true), // avoid formatting
-			new LanguageDescriptor(conLanguageJAVASCRIPT, 		  2, false, conLanguageJAVASCRIPT, "", "", true, true),   // avoid formatting
-			new LanguageDescriptor(conLanguageVB_SCRIPT, 	      3, false, conLanguageVB_SCRIPT, "", "", true, true),   // avoid formatting
-			new LanguageDescriptor(conLanguagePERL_SCRIPT, 		  4, false, conLanguagePERL_SCRIPT, "", "", true, true),    // avoid formatting
-            new LanguageDescriptor(conLanguageJAVAX_SCRIPT_RHINO, 5, false, conLanguageJAVAX_SCRIPT_RHINO, "", "", true, true),    // avoid formatting
-            new LanguageDescriptor(conLanguageJAVAX_SCRIPT_RHINO, 6, false, conLanguageJAVAX_SCRIPT_ECMASCRIPT, "", "", true, true),    // avoid formatting
+	private static List<LanguageDescriptor>	lstLanguages		 = Arrays.asList(       // avoid formatting
+			new LanguageDescriptor(conLanguageSHELL, 			       0, false, conLanguageSHELL, "", "", true, true),   // avoid formatting
+			new LanguageDescriptor(conLanguageJAVA, 			       1, false, conLanguageJAVA, "", "", true, true), // avoid formatting
+			new LanguageDescriptor(conLanguageJAVASCRIPT, 		       2, false, conLanguageJAVASCRIPT, "", "", true, true),   // avoid formatting
+			new LanguageDescriptor(conLanguageVB_SCRIPT, 	           3, false, conLanguageVB_SCRIPT, "", "", true, true),   // avoid formatting
+			new LanguageDescriptor(conLanguagePERL_SCRIPT, 		       4, false, conLanguagePERL_SCRIPT, "", "", true, true),    // avoid formatting
+            new LanguageDescriptor(conLanguageJAVAX_SCRIPT_RHINO,      5, false, conLanguageJAVAX_SCRIPT_RHINO, "", "", true, true),    // avoid formatting
+            new LanguageDescriptor(conLanguageJAVAX_SCRIPT_ECMASCRIPT, 6, false, conLanguageJAVAX_SCRIPT_ECMASCRIPT, "", "", true, true),    // avoid formatting
 			
 			/*	new LanguageDescriptor(conLanguagePL_SQL, 			6, true, conLanguageJAVA, "sos.scheduler.db.JobSchedulerPLSQLJobJSAdapterClass",
 																							"jobdoc/JobSchedulerPLSQLJob.xml", true, false),
@@ -53,8 +53,7 @@ public class LanguageDescriptorList {
 			new LanguageDescriptor(conLanguageSSH, 				8, true, conLanguageJAVA, "sos.scheduler.job.SOSSSHJob2JSAdapter",
 																							"jobdoc/SOSSSHJob2JSAdapter.xml", true, false),
         */																							
-			new LanguageDescriptor(conLanguageJAVAX_Javascript, 7, false, conLanguageJAVAX_Javascript, "", "", true, true)    // avoid formatting
-																			);
+			new LanguageDescriptor(conLanguageJAVAX_Javascript, 7, false, conLanguageJAVAX_Javascript, "", "", true, true));    // avoid formatting
 	// @formatter:on
 
 	public LanguageDescriptorList() {
