@@ -120,25 +120,32 @@ public class SOSOptionAuthenticationMethod extends SOSOptionStringValueList {
 	@Override public void Value(final String pstrAuthenticationMethod) {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::Value";
 		try {
-			switch (pstrAuthenticationMethod) {
-				case "ppk":
-				case "privatekey":
-				case conValuePUBLICKEY:
-					super.Value(pstrAuthenticationMethod);
-					enuMethod = enuAuthenticationMethods.publicKey;
-					break;
-				case conValuePASSWORD:
-					super.Value(pstrAuthenticationMethod);
-					enuMethod = enuAuthenticationMethods.password;
-					break;
-				case conValueURL:
-					super.Value(pstrAuthenticationMethod);
-					enuMethod = enuAuthenticationMethods.url;
-					break;
-				default:
-					super.Value("*invalid*: " + pstrAuthenticationMethod);
-					enuMethod = enuAuthenticationMethods.notDefined;
-					break;
+			//oh 2014-10-30 NullPointer in switch if pstrAuthenticationMethod is null.
+			if(isNull(pstrAuthenticationMethod)) {
+				super.Value(pstrAuthenticationMethod);
+				enuMethod = enuAuthenticationMethods.notDefined;
+			}
+			else {
+				switch (pstrAuthenticationMethod) {
+					case "ppk":
+					case "privatekey":
+					case conValuePUBLICKEY:
+						super.Value(pstrAuthenticationMethod);
+						enuMethod = enuAuthenticationMethods.publicKey;
+						break;
+					case conValuePASSWORD:
+						super.Value(pstrAuthenticationMethod);
+						enuMethod = enuAuthenticationMethods.password;
+						break;
+					case conValueURL:
+						super.Value(pstrAuthenticationMethod);
+						enuMethod = enuAuthenticationMethods.url;
+						break;
+					default:
+						super.Value("*invalid*: " + pstrAuthenticationMethod);
+						enuMethod = enuAuthenticationMethods.notDefined;
+						break;
+				}
 			}
 		}
 		catch (Exception e) {
