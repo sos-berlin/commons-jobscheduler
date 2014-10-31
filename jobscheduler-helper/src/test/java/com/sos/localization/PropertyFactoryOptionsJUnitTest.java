@@ -115,7 +115,7 @@ public class PropertyFactoryOptionsJUnitTest extends  JSToolBox {
     @Test
     public void testSourceFolderName() {  // SOSOptionFolderName
     	objOptions.SourceFolderName.Value("++----++");
-    	assertEquals ("The Folder, which has all the I18N Property files.", objOptions.SourceFolderName.Value(),"++----++");
+    	assertEquals ("The Folder, which has all the I18N Property files.","++----++" +"/" , objOptions.SourceFolderName.Value());
     	
     }
 
