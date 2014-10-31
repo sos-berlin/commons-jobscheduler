@@ -71,15 +71,15 @@ public class SOSOptionTimeTest {
 		assertEquals("2d", "2:00:00:00", objTime.Value());
 		assertEquals("2d", 172800, objTime.getTimeAsSeconds());
 		objTime = new SOSOptionTime("2w");
-		assertEquals("2d", "14:00:00:00", objTime.Value());
+		assertEquals("2w", "14:00:00:00", objTime.Value());
 		objTime = new SOSOptionTime("2h");
-		assertEquals("2d", "2:00:00", objTime.Value());
+		assertEquals("2h", "2:00:00", objTime.Value());
 		objTime = new SOSOptionTime("2m");
-		assertEquals("2d", "2:00", objTime.Value());
+		assertEquals("2m", "2:00", objTime.Value());
 		objTime = new SOSOptionTime("2s");
+		assertEquals("2s", "2", objTime.Value());
+		objTime = new SOSOptionTime("2"); //Default is seconds
 		assertEquals("2d", "2", objTime.Value());
-		objTime = new SOSOptionTime("2");
-		assertEquals("2d", "2:00:00:00", objTime.Value());
 	}
 	
 	@Test
