@@ -100,7 +100,9 @@ public class SOSVfsConnectionFactory {
 			}
 		}
 		catch (Exception ex) {
-			throw (RuntimeException) ex;
+			//			https://change.sos-berlin.com/browse/SOSFTP-212
+			//			throw (RuntimeException) ex;
+			throw new JobSchedulerException(ex);
 		}
 		return objVFS4Handler;
 	}
