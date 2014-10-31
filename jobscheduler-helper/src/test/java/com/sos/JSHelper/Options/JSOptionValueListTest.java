@@ -215,6 +215,7 @@ public class JSOptionValueListTest {
 		assertEquals("ValueList is wrong", "zwei,drei,vier", strT);
 		optionValueList1.Value("sieben");
 		assertEquals("Value must be 'sieben'", "sieben", optionValueList1.Value());
+		// the following assertTrue fails, because the JSOptionValueList doesn't work with an one-value-list
 		assertTrue("Value must have value 'sieben'",  optionValueList1.contains("sieben"));
 	}
 
