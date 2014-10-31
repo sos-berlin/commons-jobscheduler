@@ -1,12 +1,14 @@
 package com.sos.JSHelper.Options;
 
 import static org.junit.Assert.assertEquals;
-import junit.framework.Assert;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -119,20 +121,20 @@ public class SOSOptionElementTest {
 		String strPrefix = "alternate_";
 		String strKey = "key";
 		String strNewKey = objOption.setPrefix(strPrefix);
-		Assert.assertEquals("Key has wrong prefix", strPrefix + strKey, strNewKey);
+		assertEquals("Key has wrong prefix", strPrefix + strKey, strNewKey);
 		
 		objOption.strKey = conClassName + ".key";
 		strNewKey = objOption.setPrefix(strPrefix);
-		Assert.assertEquals("Key has wrong prefix", conClassName + "." + strPrefix + strKey, strNewKey);
+		assertEquals("Key has wrong prefix", conClassName + "." + strPrefix + strKey, strNewKey);
 	}
 	@Test
 	public void testHide () {
 		String strT = objOption.toString();
-		Assert.assertEquals("toString", "key (Description): value", strT);
+		assertEquals("toString", "key (Description): value", strT);
 		objOption.setHideValue(true);
-		Assert.assertEquals("toString", "key (Description): *****", objOption.toString());
+		assertEquals("toString", "key (Description): *****", objOption.toString());
 		objOption.setHideOption(true);
-		Assert.assertEquals("toString", "", objOption.toString());
+		assertEquals("toString", "key (Description): ", objOption.toString());
 	}
 
 	/**
@@ -141,7 +143,7 @@ public class SOSOptionElementTest {
 	@Test
 	public void testToString() {
 		String strString = objOption.toString();
-		Assert.assertEquals("Expected Value not got", "key (Description): value", strString);
+		assertEquals("Expected Value not got", "key (Description): value", strString);
 	}
 
 	/**
@@ -151,11 +153,11 @@ public class SOSOptionElementTest {
 	public void testSOSOptionElement() {
 		
 		SOSOptionElement objOpt = new SOSOptionElement (null, "key", "Description","value", "DefaultValue", true);
-		Assert.assertEquals("Key failed", "key", objOpt.getKey());
-		Assert.assertEquals("Description failed", "Description", objOpt.Description());
-		Assert.assertEquals("Value failed", "value", objOpt.Value());
-		Assert.assertEquals("DefaultValue failed", "DefaultValue", objOpt.DefaultValue());
-		Assert.assertTrue("Is Mandatory failed", objOpt.isMandatory());
+		assertEquals("Key failed", "key", objOpt.getKey());
+		assertEquals("Description failed", "Description", objOpt.Description());
+		assertEquals("Value failed", "value", objOpt.Value());
+		assertEquals("DefaultValue failed", "DefaultValue", objOpt.DefaultValue());
+		assertTrue("Is Mandatory failed", objOpt.isMandatory());
 	}
 
 	/**
@@ -163,9 +165,9 @@ public class SOSOptionElementTest {
 	 */
 	@Test
 	public void testColumnHeaderString() {
-		Assert.assertEquals("ColumnHeader failed", "key", objOption.ColumnHeader());
+		assertEquals("ColumnHeader failed", "key", objOption.ColumnHeader());
 		objOption.ColumnHeader("Column");
-		Assert.assertEquals("ColumnHeader failed", "Column", objOption.ColumnHeader());
+		assertEquals("ColumnHeader failed", "Column", objOption.ColumnHeader());
 		
 	}
 
@@ -173,6 +175,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#ColumnHeader()}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testColumnHeader() {
 //		fail("Not yet implemented");
 	}
@@ -181,6 +184,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#Title(java.lang.String)}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testTitleString() {
 //		fail("Not yet implemented");
 	}
@@ -189,6 +193,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#Title()}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testTitle() {
 //		fail("Not yet implemented");
 	}
@@ -197,6 +202,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#DefaultValue()}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testDefaultValue() {
 //		fail("Not yet implemented");
 	}
@@ -205,6 +211,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#getKey()}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testGetKey() {
 //		fail("Not yet implemented");
 	}
@@ -213,6 +220,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#Value(java.lang.String)}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testValueString() {
 //		fail("Not yet implemented");
 	}
@@ -221,6 +229,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#Value()}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testValue() {
 //		fail("Not yet implemented");
 	}
@@ -229,6 +238,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#Description(java.lang.String)}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testDescriptionString() {
 //		fail("Not yet implemented");
 	}
@@ -237,6 +247,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#Description()}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testDescription() {
 //		fail("Not yet implemented");
 	}
@@ -245,6 +256,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#Size(int)}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testSizeInt() {
 //		fail("Not yet implemented");
 	}
@@ -253,6 +265,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#Size(java.lang.Integer)}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testSizeInteger() {
 //		fail("Not yet implemented");
 	}
@@ -261,6 +274,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#Size()}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testSize() {
 //		fail("Not yet implemented");
 	}
@@ -269,6 +283,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#ISize()}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testISize() {
 //		fail("Not yet implemented");
 	}
@@ -277,6 +292,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#XMLTagName(java.lang.String)}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testXMLTagNameString() {
 //		fail("Not yet implemented");
 	}
@@ -285,6 +301,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#XMLTagName()}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testXMLTagName() {
 //		fail("Not yet implemented");
 	}
@@ -293,6 +310,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#toXml()}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testToXml() {
 //		fail("Not yet implemented");
 	}
@@ -301,6 +319,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#toXml(com.sos.JSHelper.io.Files.JSXMLFile)}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testToXmlJSXMLFile() {
 //		fail("Not yet implemented");
 	}
@@ -309,6 +328,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#FormatString(java.lang.String)}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testFormatStringString() {
 //		fail("Not yet implemented");
 	}
@@ -317,6 +337,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#FormatString()}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testFormatString() {
 //		fail("Not yet implemented");
 	}
@@ -325,6 +346,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#doInit()}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testDoInit() {
 //		fail("Not yet implemented");
 	}
@@ -333,6 +355,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#FormattedValue()}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testFormattedValue() {
 //		fail("Not yet implemented");
 	}
@@ -341,6 +364,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#IsEmpty()}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testIsEmpty() {
 //		fail("Not yet implemented");
 	}
@@ -349,6 +373,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#IsNotEmpty()}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testIsNotEmpty() {
 //		fail("Not yet implemented");
 	}
@@ -357,6 +382,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#MapValue()}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testMapValue() {
 //		fail("Not yet implemented");
 	}
@@ -365,6 +391,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#CheckMandatory()}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testCheckMandatory() {
 //		fail("Not yet implemented");
 	}
@@ -373,6 +400,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#toOut()}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testToOut() {
 //		fail("Not yet implemented");
 	}
@@ -381,6 +409,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#OptionType()}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testOptionType() {
 		
 	}
@@ -389,6 +418,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#OptionType(int)}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testOptionTypeInt() {
 //		fail("Not yet implemented");
 	}
@@ -397,6 +427,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#isMandatory(boolean)}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testIsMandatoryBoolean() {
 //		fail("Not yet implemented");
 	}
@@ -405,6 +436,7 @@ public class SOSOptionElementTest {
 	 * Test method for {@link com.sos.JSHelper.Options.SOSOptionElement#isMandatory()}.
 	 */
 	@Test
+	@Ignore("Not yet implemented")
 	public void testIsMandatory() {
 //		fail("Not yet implemented");
 	}
@@ -424,9 +456,9 @@ public class SOSOptionElementTest {
 	@SuppressWarnings("unused")
 	final String	conMethodName	= conClassName + "::testSetDirty";
 	
-	Assert.assertFalse("Must be not Dirty", objOption.isDirty());
+	assertFalse("Must be not Dirty", objOption.isDirty());
 	objOption.Value("Dirty");
-	Assert.assertTrue("Must be Dirty", objOption.isDirty());
+	assertTrue("Must be Dirty", objOption.isDirty());
 	
 } // private void testSetDirty
 
