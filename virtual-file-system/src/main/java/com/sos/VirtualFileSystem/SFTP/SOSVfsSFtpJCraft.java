@@ -146,7 +146,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 				}
 			}
 			if (exx != null) {
-				throw (RuntimeException) exx;
+				//				https://change.sos-berlin.com/browse/SOSFTP-212
+				//				throw (RuntimeException) exx;
+				throw new JobSchedulerException(exx);
 			}
 		}
 		return this;
