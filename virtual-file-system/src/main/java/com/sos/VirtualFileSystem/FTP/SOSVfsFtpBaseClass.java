@@ -1289,11 +1289,24 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 		try {
 			SOSOptionFolderName objF = new SOSOptionFolderName(pstrPathName);
 			logger.debug(HostID(SOSVfs_D_179.params("mkdir", pstrPathName)));
-			for (String strSubFolder : objF.getSubFolderArray()) {
-				Client().makeDirectory(strSubFolder);
-				logger.debug(HostID(SOSVfs_E_0106.params(conMethodName, strSubFolder, getReplyString())));
+//			for (String strSubFolder : objF.getSubFolderArray()) {
+//				Client().makeDirectory(strSubFolder);
+//				logger.debug(HostID(SOSVfs_E_0106.params(conMethodName, strSubFolder, getReplyString())));
+//			}
+			//https://change.sos-berlin.com/browse/SOSFTP-203 MKD only if directory doesn't exist
+			String[] subfolders = objF.getSubFolderArrayReverse();
+			int idx = subfolders.length;
+			for (String strSubFolder : objF.getSubFolderArrayReverse()) {
+				if (isDirectory(strSubFolder)) {
+					break;
+				}
+				idx--;
 			}
-			// logger.debug(HostID("..ftp server reply [mkdir] [" + pstrPathName + "]: " + getReplyString()));
+			subfolders = objF.getSubFolderArray();
+			for (int i = idx; i < subfolders.length; i++) {
+				Client().makeDirectory(subfolders[i]);
+				logger.debug(HostID(SOSVfs_E_0106.params(conMethodName, subfolders[i], getReplyString())));
+			}
 		}
 		catch (IOException e) {
 			String strM = HostID(SOSVfs_E_0105.params(conMethodName));
