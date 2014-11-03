@@ -1393,7 +1393,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 						key = "domain",
 						type = "SOSOptionString",
 						mandatory = false)
-	public SOSOptionString	domain	= new SOSOptionPassword(this, conClassName + ".domain", // HashMap-Key
+	public SOSOptionString	domain	= new SOSOptionString(this, conClassName + ".domain", // HashMap-Key
 											"This parameter specifies the domain", // Titel
 											"", // InitValue
 											"", // DefaultValue
