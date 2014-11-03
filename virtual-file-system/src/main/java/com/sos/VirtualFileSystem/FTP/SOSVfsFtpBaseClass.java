@@ -218,7 +218,9 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 	@Override public void CloseConnection() throws Exception {
 		if (Client().isConnected()) {
 			Client().disconnect();
-			logger.debug(SOSVfs_D_125.params(objConnection2Options.getHost().Value()));
+			if (objConnection2Options != null) {
+				logger.debug(SOSVfs_D_125.params(objConnection2Options.getHost().Value()));
+			}
 			LogReply();
 		}
 	}
@@ -1033,7 +1035,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 				objFTPFile = ftpFiles[0];
 			}
 			else {
-				throw new JobSchedulerException(SOSVfs_E_226.params(strFileName));
+//				throw new JobSchedulerException(SOSVfs_E_226.params(strFileName));
 			}
 		}
 		catch (Exception e) {
@@ -1298,6 +1300,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 			int idx = subfolders.length;
 			for (String strSubFolder : objF.getSubFolderArrayReverse()) {
 				if (isDirectory(strSubFolder)) {
+					logger.debug(SOSVfs_E_180.params(strSubFolder));
 					break;
 				}
 				idx--;
