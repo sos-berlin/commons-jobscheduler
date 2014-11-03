@@ -149,7 +149,7 @@ public class MessagesTest {
 
 	@Test
 	public void testGetMsgSingle() {
-		String strM = Messages.getMsg("JSJ-I-106");
+		String strM = Messages.getMsg("JSJ-I-106", new Locale("de", "DE"));
 		assertEquals("JSJ-I-106", "JSJ-I-106: %1$s - wurde ohne Fehler beendet", strM);
 	}
 
