@@ -1,4 +1,5 @@
 package com.sos.VirtualFileSystem.SFTP;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -141,6 +142,17 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
 			RaiseException(e, SOSVfs_E_173.params("write", fileName));
 		}
 	}
+	
+	
+	@Override
+	public void write(final byte[] bteBuffer) {
+		try {
+			this.getFileOutputStream().write(bteBuffer);
+		}
+		catch (IOException e) {
+			RaiseException(e, SOSVfs_E_134.params("write()"));
+		}
+	}
 
 	/**
 	 * \brief getFileOutputStream
@@ -163,10 +175,17 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
 				else if (flgModeRestart ){
 					intTransferMode = ChannelSftp.RESUME;
 				}
-
+				
 				SOSVfsSFtpJCraft objJ = (SOSVfsSFtpJCraft) objVFSHandler;
-//				objOutputStream = objJ.getClient().put(fileName, intTransferMode);
-				objOutputStream = objJ.getClient().put(fileName);
+				/**
+				 * kb 2014-07-21
+				 * warum wurde die folgende Zeile auskommentiert und durch die dahinter
+				 * stehende, jetzt auskkommentiert, ersetzt? Damit ist kein AppendMode
+				 * möglich und das ist ein schwerer Fehler.
+				 * siehe hierzu: https://change.sos-berlin.com/browse/SOSFTP-202
+				 */
+				objOutputStream = objJ.getClient().put(fileName, intTransferMode);
+//				objOutputStream = objJ.getClient().put(fileName);
 
 				if (objOutputStream == null) {
 					objVFSHandler.openOutputFile(fileName);
