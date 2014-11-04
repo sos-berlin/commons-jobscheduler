@@ -42,7 +42,7 @@ public class JSObjRunTimeTest extends TestBase {
 	@Test
 	public final void testSetValidXmlContent() {
 		String xmlHeader = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
-		xml = "<run_time single_start=\"15:00\"/>\n";
+		xml = "<run_time single_start=\"15:00\" xmlns:ns2=\"job-chain-extensions\"/>\n";
 		JSObjRunTime runtime = new JSObjRunTime(factory,xml);
 		assertEquals(xmlHeader + xml, runtime.toXMLString());
 	}
@@ -57,7 +57,7 @@ public class JSObjRunTimeTest extends TestBase {
 	@Test
 	public final void testConstructorWithXmlContent() {
 		String xmlHeader = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
-		xml = "<run_time single_start=\"15:00\"/>\n";
+		xml = "<run_time single_start=\"15:00\" xmlns:ns2=\"job-chain-extensions\"/>\n";
 		JSObjRunTime p = new JSObjRunTime(factory,xml);
 		assertEquals(xmlHeader + xml, p.toXMLString());
 	}
@@ -73,7 +73,8 @@ public class JSObjRunTimeTest extends TestBase {
 		assertEquals(false, runtime.hasMonth());
 		assertEquals(false, runtime.hasMonthdays());
 		assertEquals(false, runtime.hasUltimos());
-		assertEquals(false, runtime.hasHolidays());
+		// runtime.hasHolidays returns always true, because if holidays is null, it will be instantiated
+		assertEquals(true, runtime.hasHolidays());
 		assertEquals(false, runtime.hasSubsequentRunTimes());
 
 		xml = "<run_time begin='15:00' end='17:00' repeat='10:00' />";
@@ -92,7 +93,8 @@ public class JSObjRunTimeTest extends TestBase {
 		assertEquals(false, runtime.hasMonth());
 		assertEquals(false, runtime.hasMonthdays());
 		assertEquals(false, runtime.hasUltimos());
-		assertEquals(false, runtime.hasHolidays());
+		// see testFlags
+		assertEquals(true, runtime.hasHolidays());
 		assertEquals(false, runtime.hasSubsequentRunTimes());
 
 		xml = "<run_time begin='15:00' end='17:00' repeat='10:00' />";
