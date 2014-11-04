@@ -25,7 +25,20 @@ public class JSObjOrderTest {
 
 	@Test
 	public final void testSetXml() {
-		xml = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n<order><params><param name=\"successor\" value=\"\"/><param name=\"predecessor\" value=\"H,folder1/J\"/><param name=\"command\" value=\"ping -n 20 localhost\"/></params><run_time let_run=\"no\"><weekdays><day day=\"1\"/><day day=\"3\"/></weekdays></run_time></order>";
+		xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+				+ "<order xmlns:ns2=\"job-chain-extensions\">\n"
+				+ "    <params>\n"
+				+ "        <param name=\"successor\" value=\"\"/>\n"
+				+ "        <param name=\"predecessor\" value=\"H,folder1/J\"/>\n"
+				+ "        <param name=\"command\" value=\"ping -n 20 localhost\"/>\n"
+				+ "    </params>\n"
+				+ "    <run_time let_run=\"no\">\n"
+				+ "        <weekdays>\n"
+				+ "            <day day=\"1\"/>\n"
+				+ "            <day day=\"3\"/>\n"
+				+ "        </weekdays>\n"
+				+ "    </run_time>\n"
+				+ "</order>\n";
 //		xml = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n" + 
 //		"<order job_chain=\"test_chain\" id=\"I\">" +
 //		"<run_time let_run=\"no\">" +
