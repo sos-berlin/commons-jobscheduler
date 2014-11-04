@@ -7,7 +7,6 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -34,8 +33,9 @@ public class SOSComposite extends Composite {
 	public SOSComposite(final Composite parent, final int style) {
 		super(parent,SWT.None);
 		this.setBackground(Globals.getCompositeBackground());
-		//GridLayout gridLayout = new GridLayout(1, false);
-		//setLayout(gridLayout);
+		GridLayout gridLayout = new GridLayout(1, false);
+		setLayout(gridLayout);
+        //ur 20141104: When setting a gridlayout Data here you will get a class cast exception in JOE when resizing the window.
 		//setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 	}
 
