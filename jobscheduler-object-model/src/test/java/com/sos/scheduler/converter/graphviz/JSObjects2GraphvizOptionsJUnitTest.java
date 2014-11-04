@@ -83,7 +83,8 @@ public class JSObjects2GraphvizOptionsJUnitTest extends  JSToolBox {
     @Test
     public void testlive_folder_name() {  // SOSOptionString
     	 objOptions.live_folder_name.Value("++----++");
-    	 assertEquals ("", objOptions.live_folder_name.Value(),"++----++");
+    	 //Value Method of SOSOptionFolderName adds a "/" if missing, so it has to be added to the expected Result also
+    	 assertEquals ("","++----++" + "/", objOptions.live_folder_name.Value());
 
     }
 
@@ -99,7 +100,8 @@ public class JSObjects2GraphvizOptionsJUnitTest extends  JSToolBox {
     @Test
     public void testoutput_folder_name() {  // SOSOptionString
     	 objOptions.output_folder_name.Value("++----++");
-    	 assertEquals ("", objOptions.output_folder_name.Value(),"++----++");
+    	 //Value Method of SOSOptionFolderName adds a "/" if missing, so it has to be added to the expected Result also
+    	 assertEquals ("","++----++" + "/", objOptions.output_folder_name.Value());
 
     }
 
