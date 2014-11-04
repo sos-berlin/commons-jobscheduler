@@ -46,8 +46,14 @@ public class JSObjWeekdaysTest extends TestBase {
 
 	@Test
 	public final void testSetValidXmlContent() {
-		String xmlHeader = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n";
-		xml = "<run_time><weekdays><day day=\"1\"><period single_start=\"15:00\"/></day></weekdays></run_time>";
+		String xmlHeader = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+		xml = "<run_time xmlns:ns2=\"job-chain-extensions\">\n"
+				+ "    <weekdays>\n"
+				+ "        <day day=\"1\">\n"
+				+ "            <period single_start=\"15:00\"/>\n"
+				+ "        </day>\n"
+				+ "    </weekdays>\n"
+				+ "</run_time>\n";
 		JSObjRunTime runtime = new JSObjRunTime(factory,xml);
 		assertEquals(xmlHeader + xml, runtime.toXMLString());
 	}
