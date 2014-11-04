@@ -42,8 +42,12 @@ public class JSObjDayTest {
 
 	@Test
 	public final void testSetValidXmlContent() {
-		String xmlHeader = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n";
-		xml = "<run_time><date date=\"2012-03-12\"><period single_start=\"15:00\"/></date></run_time>";
+		String xmlHeader = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+		xml = "<run_time xmlns:ns2=\"job-chain-extensions\">\n" +
+				  "    <date date=\"2012-03-12\">\n" +
+				  "        <period single_start=\"15:00\"/>\n" + 
+				  "    </date>\n" +
+				  "</run_time>\n";
 		JSObjRunTime runtime = new JSObjRunTime(factory,xml);
 		assertEquals(xmlHeader + xml, runtime.toXMLString());
 	}
