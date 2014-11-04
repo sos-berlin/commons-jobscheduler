@@ -32,8 +32,8 @@ public class JSObjPeriodTest {
 
 	@Test
 	public final void testSetValidXmlContent() {
-		String xmlHeader = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n";
-		xml = "<period single_start=\"15:00\"/>";
+		String xmlHeader = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+		xml = "<period single_start=\"15:00\" xmlns:ns2=\"job-chain-extensions\"/>\n";
 		JSObjPeriod period = new JSObjPeriod(factory,xml);
 		assertEquals(xmlHeader + xml, period.toXMLString());
 	}
@@ -47,8 +47,8 @@ public class JSObjPeriodTest {
 
 	@Test
 	public final void testConstructorWithXmlContent() {
-		String xmlHeader = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n";
-		xml = "<period single_start=\"15:00\"/>";
+		String xmlHeader = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+		xml = "<period single_start=\"15:00\" xmlns:ns2=\"job-chain-extensions\"/>\n";
 		JSObjPeriod p = new JSObjPeriod(factory,xml);
 		assertEquals(xmlHeader + xml, p.toXMLString());
 	}
