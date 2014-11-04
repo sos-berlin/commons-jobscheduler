@@ -34,9 +34,9 @@ public class SOSComposite extends Composite {
 	public SOSComposite(final Composite parent, final int style) {
 		super(parent,SWT.None);
 		this.setBackground(Globals.getCompositeBackground());
-		GridLayout gridLayout = new GridLayout(1, false);
-		setLayout(gridLayout);
-		setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		//GridLayout gridLayout = new GridLayout(1, false);
+		//setLayout(gridLayout);
+		//setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 	}
 
 	public void addChild (final Control pobjC) {
