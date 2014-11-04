@@ -40,8 +40,14 @@ public class JSObjMonthdaysTest {
 
 	@Test
 	public final void testSetValidXmlContent() {
-		String xmlHeader = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n";
-		xml = "<run_time><monthdays><weekday day=\"tuesday\" which=\"2\"><period single_start=\"15:00\"/></weekday></monthdays></run_time>";
+		String xmlHeader = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+		xml = "<run_time xmlns:ns2=\"job-chain-extensions\">\n"
+				+ "    <monthdays>\n"
+				+ "        <weekday day=\"tuesday\" which=\"2\">\n"
+				+ "            <period single_start=\"15:00\"/>\n"
+				+ "        </weekday>\n"
+				+ "    </monthdays>\n"
+				+ "</run_time>\n";
 		JSObjRunTime runtime = new JSObjRunTime(factory,xml);
 		assertEquals(xmlHeader + xml, runtime.toXMLString());
 	}
