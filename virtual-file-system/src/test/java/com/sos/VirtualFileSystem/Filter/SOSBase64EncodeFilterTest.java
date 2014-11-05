@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class SOSBase64EncodeFilterTest extends SOSNullFilterTest <SOSBase64EncodeFilter> {
+public class SOSBase64EncodeFilterTest extends SOSNullFilterBase <SOSBase64EncodeFilter> {
 
 	@SuppressWarnings("unused")
 	private final String conClassName = this.getClass().getSimpleName();
@@ -17,7 +17,6 @@ public class SOSBase64EncodeFilterTest extends SOSNullFilterTest <SOSBase64Encod
 		super (new SOSBase64EncodeFilter());
 	}
 
-	@Override
 	@Test
 	public void testWriteByteArray() {
 		String strT = "Hallo, Welt!";

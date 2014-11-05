@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class SOSDos2UnixFilterTest extends SOSNullFilterTest <SOSDos2UnixFilter> {
+public class SOSDos2UnixFilterTest extends SOSNullFilterBase <SOSDos2UnixFilter> {
 
 	@SuppressWarnings("unused")
 	private final String conClassName = this.getClass().getSimpleName();
@@ -17,7 +17,6 @@ public class SOSDos2UnixFilterTest extends SOSNullFilterTest <SOSDos2UnixFilter>
 		super (new SOSDos2UnixFilter());
 	}
 
-	@Override
 	@Test
 	public void testWriteByteArray() {
 		String strT = "abcdef\r\nabcdef";
