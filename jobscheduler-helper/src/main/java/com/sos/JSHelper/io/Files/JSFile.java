@@ -1561,6 +1561,45 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 		this.doUnlock();
 		this.doReleaseExclusive();
 	}
+	
+	/**
+	 * \brief createTempFileName
+	 *
+	 * \details
+	 *
+	 * \return String
+	 *
+	 */
+	public static String createTempFileName() {
+		String strTempFileNameExtension = System.getProperty(conPropertySOS_JSFILE_EXTENSION_4_TEMPFILE, ".tmp");
+		String strTempFileNamePrefix = System.getProperty(conPropertySOS_JSFILE_PREFIX_4_TEMPFILE, "SOS_");
+		String strTempFileName = null;
+		try {
+			File objF = File.createTempFile(strTempFileNamePrefix, strTempFileNameExtension);
+			objF.deleteOnExit();
+			strTempFileName = objF.getAbsoluteFile().getAbsolutePath();
+			strTempFileName = strTempFileName.replaceAll("\\\\", "/");
+		}
+		catch (IOException e) {
+			//			e.printStackTrace();
+		}
+		return strTempFileName;
+	}
+
+	/**
+	 * \brief createTempFile
+	 *
+	 * \details
+	 *
+	 * \return JSFile
+	 *
+	 */
+	public static JSFile createTempFile() {
+		String strTempFileName = createTempFileName();
+		JSFile tempFile = new JSFile(strTempFileName);
+		tempFile.deleteOnExit();
+		return tempFile;
+	}
 
 	/**
 	 *
@@ -1588,11 +1627,7 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 			return -1;
 		}
 
-		String strTempFileNameExtension = System.getProperty(conPropertySOS_JSFILE_EXTENSION_4_TEMPFILE, ".tmp");
-		String strTempFileNamePrefix = System.getProperty(conPropertySOS_JSFILE_PREFIX_4_TEMPFILE, "SOS");
-
-		String strTempFileName = File.createTempFile(strTempFileNamePrefix, strTempFileNameExtension).getAbsoluteFile().getAbsolutePath();
-		JSFile tempFile = new JSFile(strTempFileName); // Ausgabe
+		JSFile tempFile = createTempFile(); // Ausgabe
 		try {
 			out = new FileOutputStream(tempFile);
 			try {
@@ -1944,7 +1979,7 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 		}
 
 		flgIsExclusive = pflgIsExclusive;
-		if (flgIsExclusive = true) {
+		if (flgIsExclusive == true) {
 			if (this.checkExclusiveDeny() == false) {
 
 				// String localHost = InetAddress.getLocalHost().getHostName();
