@@ -150,6 +150,15 @@ public class SOSMsg {
 		return strI;
 	}
 
+	public String accelerator() {
+		String key = strMessageCode.trim().replaceAll(" ", "");
+		String strI = Messages.getLabel(key + conPropertyExtensionAccelerator);
+		if (strI == null) {
+			strI = "";
+		}
+		return strI;
+	}
+
 	private String getLabel(final String pstrDefaultValue) {
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::getLabel";

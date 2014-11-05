@@ -67,9 +67,12 @@ public class SOSOptionTime extends SOSOptionString {
 	private static final long	serialVersionUID	= 6687670638160800096L;
 	@SuppressWarnings("unused")
 	private final String		conClassName		= "SOSOptionTime";
+	@SuppressWarnings("hiding")
 	public final String			ControlType			= "timetext";
 
 	public static String		dateTimeFormat		= new String("yyyy-MM-dd HH:mm:ss");
+
+	private String				strDefaultUoM		= "";
 
 	/**
 	 * \brief SOSOptionTime
@@ -219,38 +222,61 @@ public class SOSOptionTime extends SOSOptionString {
 	public String adjust2TimeFormat() {
 		if (isNotEmpty(strValue)) {
 			if (strValue.indexOf(":") > -1) {
-				// nothing to do
 			}
 			else {
-				int intL = strValue.length();
-				if (strValue.equals("0") == false) {
-					String strT = strValue.substring(intL - 1, intL).toLowerCase();
-					String strN = strValue.substring(0, intL - 1);
-					switch (strT) { // convert the UoM
-						case "w": // weeks
-							int intW = new Integer(strN);
-							strValue = intW * 7 + ":00:00:00";
-							break;
-						case "d": // days
-							strValue = strN + ":00:00:00";
-							break;
-						case "h": // hours
-							strValue = strN + ":00:00";
-							break;
-						case "m": // minutes
-							strValue = strN + ":00";
-							break;
-						case "s":  // seconds
-							strValue = strN;
-							break;
-						default: // is seconds
-							strValue = strValue;
-							break;
-					}
-					strOriginalValue = strValue;
+				if (isNotEmpty(strDefaultUoM)) {
+					strValue = strValue + strDefaultUoM;
 				}
+				else {
+					return strValue;
+				}
+			}
+			int intL = strValue.length();
+			if (strValue.equals("0") == false) {
+				String strT = strValue.substring(intL - 1, intL).toLowerCase();
+				String strN = strValue.substring(0, intL - 1);
+				switch (strT) { // convert the UoM
+					case "w": // weeks
+						int intW = new Integer(strN);
+						strValue = intW * 7 + ":00:00:00";
+						break;
+					case "d": // days
+						strValue = strN + ":00:00:00";
+						break;
+					case "h": // hours
+						strValue = strN + ":00:00";
+						break;
+					case "m": // minutes
+						strValue = strN + ":00";
+						break;
+					case "s": // seconds
+						strValue = strN;
+						break;
+					default: // is seconds
+						strValue = strValue;
+						break;
+				}
+
+				strOriginalValue = strValue;
 			}
 		}
 		return strValue;
+	}
+
+	/**
+	 * @return the defaultUoM
+	 */
+	public String getDefaultUoM() {
+		return strDefaultUoM;
+	}
+
+	/**
+	 * @param defaultUoM the defaultUoM to set
+	 */
+	public void setDefaultUoM(String defaultUoM) {
+		strDefaultUoM = defaultUoM.toLowerCase();
+		if (isNotEmpty(defaultUoM)) {
+			adjust2TimeFormat();
+		}
 	}
 }
