@@ -41,11 +41,15 @@ public class SOSButton extends Button {
 		if (pstrI18NKey.toLowerCase().startsWith("dialog_")) {
 			objM = new DialogMsg(pstrI18NKey);
 		}
-		else {
+		else { // use application-global message handler
 			objM = MsgHandler.newMsg(pstrI18NKey);
 		}
 		setText(objM.label());
 		setImage(SWTResourceManager.getImageFromResource(objM.icon()));
+		String strAcc = objM.accelerator();
+		if (strAcc != null) {
+			//			this.ac
+		}
 		setToolTipText(objM.tooltip());
 		addSelectionListener(new SelectionAdapter() {
 			@Override

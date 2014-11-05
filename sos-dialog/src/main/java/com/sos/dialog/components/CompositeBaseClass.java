@@ -162,10 +162,11 @@ public abstract class CompositeBaseClass<T> extends Composite implements ISOSTab
 		}
 	}
 
-	protected void createTab(SOSCTabFolder pobjMainTabFolder, Composite pobjComposite, final String pstrI18NKey) {
+	protected ISOSTabItem createTab(SOSCTabFolder pobjMainTabFolder, Composite pobjComposite, final String pstrI18NKey) {
 		SOSCTabItem tbtmItem = pobjMainTabFolder.getTabItem(pstrI18NKey);
 		tbtmItem.setComposite((ISOSTabItem) pobjComposite);
 		tbtmItem.setControl(pobjComposite);
+		return (ISOSTabItem) pobjComposite;
 	}
 
 	@Override

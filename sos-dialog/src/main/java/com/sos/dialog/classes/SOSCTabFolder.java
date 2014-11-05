@@ -13,7 +13,6 @@ import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -86,13 +85,14 @@ public class SOSCTabFolder extends CTabFolder {
 				SOSCTabFolder o = (SOSCTabFolder) e.widget;
 				Object d = e.data;
 				Object f = e.getSource();
-				//				handleSelection();
+				handleSelection();
 			}
 		});
 		/**
 		 * SelectionListener
 		 */
-		addSelectionListener(new SelectionAdapter() {
+		this.addSelectionListener(new SelectionListener() {
+			//		addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
 				logger.trace("CTabFolder Item selected");
@@ -101,7 +101,7 @@ public class SOSCTabFolder extends CTabFolder {
 				}
 				CTabItem objSelectedItem = getSelection();
 				Composite objCurrComposite = (Composite) objSelectedItem.getControl();
-				if (objCurrComposite instanceof CompositeBaseClass) {
+				if (objCurrComposite instanceof ISOSTabItem) {
 					if (CompositeBaseClass.gflgCreateControlsImmediate == false) {
 						CompositeBaseClass<?> objBC = (CompositeBaseClass<?>) objCurrComposite;
 						objBC.createTabItemComposite();
@@ -125,6 +125,15 @@ public class SOSCTabFolder extends CTabFolder {
 					}
 				}
 				setData("lastSelected", objSelectedItem);
+				//				logger.debug("widgetSelected");
+				event.doit = true;
+
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				// TODO Auto-generated method stub
+
 			}
 		});
 		this.addListener(SWT.MouseDoubleClick, Globals.listener);
@@ -178,20 +187,20 @@ public class SOSCTabFolder extends CTabFolder {
 			}
 		});
 		this.setMenu(contextMenu);
-		this.addSelectionListener(new SelectionListener() {
-			boolean	flgIsActive	= false;
-
-			@Override
-			public void widgetDefaultSelected(final SelectionEvent arg0) {
-				widgetSelected(arg0);
-			}
-
-			@Override
-			public void widgetSelected(final SelectionEvent arg0) {
-				logger.debug("widgetSelected");
-				arg0.doit = true;
-			}
-		});
+		//		this.addSelectionListener(new SelectionListener() {
+		//			boolean	flgIsActive	= false;
+		//
+		//			@Override
+		//			public void widgetDefaultSelected(final SelectionEvent arg0) {
+		//				widgetSelected(arg0);
+		//			}
+		//
+		//			@Override
+		//			public void widgetSelected(final SelectionEvent arg0) {
+		//				logger.debug("widgetSelected");
+		//				arg0.doit = true;
+		//			}
+		//		});
 		this.addCTabFolder2Listener(new CTabFolder2Adapter() {
 			public void itemClosed(final CTabFolderEvent event) {
 
@@ -286,7 +295,6 @@ public class SOSCTabFolder extends CTabFolder {
 			logger.debug("handleSelection");
 			CTabItem objSelectedItem = getSelection();
 			CTabItem tbiLastSelected = (CTabItem) getData("lastSelected");
-			//		event.doit
 			if (tbiLastSelected != null) {
 				Composite objC = (Composite) tbiLastSelected.getControl();
 				if (objC != null && objC.isDisposed() != true) {
@@ -296,9 +304,17 @@ public class SOSCTabFolder extends CTabFolder {
 			}
 			setData("lastSelected", objSelectedItem);
 			Composite objComposite = (Composite) objSelectedItem.getData(conCOMPOSITE_OBJECT_KEY);
-			ISOSTabItem objCurrTab = (ISOSTabItem) objComposite;
-			objComposite.layout(true, true);
-
+			if (objComposite instanceof ISOSTabItem) {
+				ISOSTabItem objCurrTab = (ISOSTabItem) objComposite;
+			}
+			doResize();
+			//			objComposite.layout(true, true);
+			//			// see: http://stackoverflow.com/questions/12124828/java-swt-resize-animation-howto-redraw-after-each-layout-change
+			//			//marks the composite's screen are as invalidates, which will force a  redraw on next paint request 
+			//			objComposite.redraw();
+			//
+			//			//tells the application to do all outstanding paint requests immediately
+			//			objComposite.update();
 		}
 		catch (Exception e) {
 			new ErrorLog("problem", e);
@@ -522,6 +538,11 @@ public class SOSCTabFolder extends CTabFolder {
 
 			globalShell().setRedraw(false);
 			globalShell().layout(true, true);
+			// see: http://stackoverflow.com/questions/12124828/java-swt-resize-animation-howto-redraw-after-each-layout-change
+			//marks the composite's screen are as invalidates, which will force a  redraw on next paint request 
+			globalShell().redraw();
+			//tells the application to do all outstanding paint requests immediately
+			globalShell().update();
 			globalShell().setRedraw(true);
 		}
 	}

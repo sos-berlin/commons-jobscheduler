@@ -57,23 +57,24 @@ public class SOSCheckBox extends Button {
 		return objControlList;
 	}
 
-	//	public void setOneOfUs() {
-	//		if (getSelection() == true) {
-	//			for (Object objC : objControlList) {
-	//				if (objC == this) {
-	//					// nothing to do
-	//				}
-	//				else {
-	//					if (objC instanceof SOSCheckBox) {
-	//						SOSCheckBox objBx = (SOSCheckBox) objC;
-	//						objBx.setSelection(false);
-	//					}
-	//				}
-	//			}
-	//		}
-	//
-	//	}
+	public void setOneOfUs() {
+		if (getSelection() == true) {
+			for (Object objC : objControlList) {
+				if (objC == this) {
+					// nothing to do
+				}
+				else {
+					if (objC instanceof SOSCheckBox) {
+						SOSCheckBox objBx = (SOSCheckBox) objC;
+						objBx.setSelection(false);
+					}
+				}
+			}
+		}
 
+	}
+
+	// disable all fields which are "childs" of this checkbox.
 	public void setEnabledDisabled() {
 		boolean flgT = true;
 		if (getSelection() == true) {
