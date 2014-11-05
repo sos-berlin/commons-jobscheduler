@@ -739,10 +739,7 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 		}
 		else {
 			if (rc1 == false && isGraciousTrue()) {
-				if (isJobchain()) {
-					return signalFailure();
-				}
-				return conJobSuccess;
+				return signalFailureNoLog();
 			}
 			else {
 				if (rc1 == true) {
