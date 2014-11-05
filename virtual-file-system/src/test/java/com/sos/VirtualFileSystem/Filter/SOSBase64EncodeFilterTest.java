@@ -27,7 +27,8 @@ public class SOSBase64EncodeFilterTest extends SOSNullFilterTest <SOSBase64Encod
 		bteBuffer = objF.read();
 		String strX = new String(bteBuffer);
 		logger.debug(strX);
-		Assert.assertEquals(strT2, strX);
+		// bteBuffer ends with "\r\n", therefore "\r\n" has to be added to expected value
+		Assert.assertEquals(strT2 + "\r\n", strX);
 	}
 
 }
