@@ -8,7 +8,8 @@
     <!-- merge the platform specific binaries with the common members -->
     <fileSets>
         <fileSet>
-            <directory>${project.build.directory}/classes</directory>
+            <!--directory>${project.build.directory}/classes</directory-->
+            <directory>src/test/resources</directory>
             <outputDirectory>/</outputDirectory>
             <includes>
                 <include>shiro.ini.mini</include>
