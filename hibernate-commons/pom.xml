@@ -75,7 +75,6 @@
 				<dependency>
 					<groupId>org.eclipse.swt</groupId>
 					<artifactId>org.eclipse.swt.${swtSuffix}</artifactId>
-					<version>${swt.version}</version>
 				</dependency>
 				
 				<dependency>
@@ -95,7 +94,8 @@
 					<version>9.3-1101-jdbc41</version>
         </dependency>
 
-<!--    JadeFilesHistoryDBItem nur für lokale Tests benutzt, da sonst zyklische Abhängigkeit zwischen hibernate-commons <-> ftp-history
+<!--
+		    JadeFilesHistoryDBItem nur für lokale Tests benutzt, da sonst zyklische Abhängigkeit zwischen hibernate-commons <-> ftp-history
 				Dependency für lokalen Test einkommentieren 
         <dependency>
         	<groupId>com.sos-berlin.jobscheduler</groupId>
