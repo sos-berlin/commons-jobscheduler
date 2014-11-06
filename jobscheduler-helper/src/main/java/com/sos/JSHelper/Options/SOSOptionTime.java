@@ -227,9 +227,10 @@ public class SOSOptionTime extends SOSOptionString {
 				if (isNotEmpty(strDefaultUoM)) {
 					strValue = strValue + strDefaultUoM;
 				}
-				else {
-					return strValue;
-				}
+				// if strDefaultUoM is empty, rest of code will not be reached, like in SOSOptionTimeTest.testUnitOfMeasure
+//				else {
+//					return strValue;
+//				}
 			}
 			int intL = strValue.length();
 			if (strValue.equals("0") == false) {
