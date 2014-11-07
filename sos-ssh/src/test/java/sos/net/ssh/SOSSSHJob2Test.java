@@ -271,7 +271,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 		objOptions.registerMessageListener(this);
 		objSSH.setJSJobUtilites(this);
 		String strArgs[] = new String[] { "-command", "ls", "-auth_method", "password", "-host", "wilma.sos", "-port", "22", "-user", "test", "-password",
-				"12345", "-simulate_shell", "true", "-simulate_shell_prompt_trigger", "test@wilma:~> ", "-simulate_shell_login_timeout", "100000" };
+				"12345", "-simulate_shell", "true", "-simulate_shell_prompt_trigger", "test@192:~>", "-simulate_shell_login_timeout", "100000" };
 		objOptions.CommandLineArgs(strArgs);
 		// objOptions.CheckMandatory();
 		JSListenerClass.bolLogDebugInformation = true;
