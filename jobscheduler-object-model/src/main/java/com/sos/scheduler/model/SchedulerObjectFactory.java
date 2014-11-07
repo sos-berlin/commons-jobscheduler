@@ -232,6 +232,8 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
 			}
 			else {
 				if (objOptions.TransferMethod.isTcp()) {
+					// setting timeout to prevent hang up if Server is not available [SP]
+					this.getSocket().setSoTimeout(30000);
 					this.getSocket().sendRequest(strT);
 					logger.trace("Request sended to JobScheduler:\n" + strT);
 					strA = getSocket().getResponse();
