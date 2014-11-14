@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.sos-berlin.products</groupId>
     <artifactId>jobscheduler</artifactId>
-    <version>1.7.5-SNAPSHOT</version>
+    <version>1.7.4316</version>
   </parent>
   <groupId>com.sos-berlin.products.jobscheduler</groupId>
   <artifactId>jobscheduler-all</artifactId>
