@@ -35,13 +35,11 @@
         <dependency>
             <groupId>com.sos.scheduler.engine</groupId>
             <artifactId>kernel</artifactId>
-            <version>${sos.engine.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sos.scheduler.engine</groupId>
             <artifactId>test</artifactId>
-            <version>${sos.engine.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
