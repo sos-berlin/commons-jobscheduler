@@ -1,8 +1,11 @@
 package sos.scheduler.db;
 
+import java.util.HashMap;
+
 import org.apache.log4j.Logger;
 
 import sos.scheduler.job.JobSchedulerJobAdapter;
+import sos.spooler.Variable_set;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
@@ -76,8 +79,21 @@ public class SOSSQLPlusJobJSAdapterClass extends JobSchedulerJobAdapter {
 		SOSSQLPlusJob objR = new SOSSQLPlusJob();
 		SOSSQLPlusJobOptions objO = objR.Options();
 		objO.CurrentNodeName(this.getCurrentNodeName());
-
-		objO.setAllOptions(getSchedulerParameterAsProperties(getJobOrOrderParameters()));
+		
+		
+		//oh JITL-93 in JSOptionValueList klappt im JUnit, aber nicht im JobScheduler. Ich leg mir die Karten.
+		//Daher hier nochmal ein Pflaster. Wenn die Parameter "ignore_sp2_messages" oder "ignore_ora_messages"
+		//gefuellt sind, aber nur einen Wert enthalten, dann wird ein ';' am Ende hinzugefuegt.
+		Variable_set jobOrOrderParameters = getJobOrOrderParameters();
+		String[] ignoreParams = new String[] {"ignore_sp2_messages","ignore_ora_messages"};
+		for (String ignoreParam : ignoreParams) {
+			String value = jobOrOrderParameters.value(ignoreParam).toString();
+			if (isNotEmpty(value) && value.matches("[,;|]") == false) {
+				jobOrOrderParameters.set_value(ignoreParam, value + ";");
+			}
+		}
+		
+		objO.setAllOptions(getSchedulerParameterAsProperties(jobOrOrderParameters));
 		// TODO Use content of <script> tag of job as value of command_script_file parameter
 		// http://www.sos-berlin.com/jira/browse/JITL-49
 		if (objO.command_script_file.isNotDirty()) {
