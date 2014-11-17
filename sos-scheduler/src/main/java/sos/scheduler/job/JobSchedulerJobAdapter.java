@@ -114,7 +114,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 			super.spooler_process();
 			initializeLog4jAppenderClass();
 			logger.info(VersionInfo.VERSION_STRING);
-			setStateText("*** running ***");
+			//setStateText("*** running ***");
 		}
 		catch (JobSchedulerException e) {
 			return signalFailure();
@@ -879,7 +879,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		if (isJobchain()) {
 			return conJobChainSuccess;
 		}
-		setStateText("completed without error");
+		//setStateText("completed without error");
 		return conJobSuccess;
 	} // private boolean signalSuccess
 
@@ -1097,10 +1097,10 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 	}
 
 	@Override public void spooler_on_error() {
-		setStateText("! ended with Error !");
+		//setStateText("! ended with Error !");
 	}
 
 	@Override public void spooler_on_success() {
-		setStateText("*** ended without Errors ***");
+		//setStateText("*** ended without Errors ***");
 	}
 }

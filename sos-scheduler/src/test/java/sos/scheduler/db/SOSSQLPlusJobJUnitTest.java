@@ -58,6 +58,7 @@ public class SOSSQLPlusJobJUnitTest extends JSJobUtilitiesClass <SOSSQLPlusJobOp
 
 		JSListenerClass.bolLogDebugInformation = true;
 		JSListenerClass.intMaxDebugLevel = 9;
+		
 	}
 
 	@After
@@ -70,7 +71,8 @@ public class SOSSQLPlusJobJUnitTest extends JSJobUtilitiesClass <SOSSQLPlusJobOp
 		objT.put("hw", "Hello, world!");
 		objT.put("count", "4711");
 		objT.put("select", "4711");
-
+        objT.put("ConfigurationBaseMonitor.conf_", "check");
+ 
 		return objT;
 	}
 
