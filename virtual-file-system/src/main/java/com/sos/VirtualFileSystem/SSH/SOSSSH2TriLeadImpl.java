@@ -889,6 +889,9 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 			this.getSshSession().startShell();
 			ipsStdOut = getSshSession().getStdout();
 			ipsStdErr = getSshSession().getStderr();
+			strbStdoutOutput = new StringBuffer();
+			strbStderrOutput = new StringBuffer();
+
 			stdoutConsumer = new RemoteConsumer(strbStdoutOutput, true, ipsStdOut);
 			stderrConsumer = new RemoteConsumer(strbStderrOutput, false, ipsStdErr);
 			stdoutConsumer.start();
@@ -922,7 +925,10 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 		if (plngLoginTimeOut > 0 && lngLastTime + plngLoginTimeOut < now) {// kommt nichts mehr
 			return true;
 		}
+		
+		logger.debug("strCurrentLine=" + strCurrentLine + " pstrPromptTrigger=" + pstrPromptTrigger);
 		if (pstrPromptTrigger.length() > 0 && strCurrentLine.indexOf(pstrPromptTrigger) != -1) {
+			logger.debug("strCurrentLine=" + strCurrentLine + " pstrPromptTrigger=" + pstrPromptTrigger);
 			logger.debug("Found login prompt " + pstrPromptTrigger);
 			strCurrentLine = "";
 			return true;
@@ -950,12 +956,19 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 
 		exitStatus = null;
 		exitSignal = null;
+		int retval=0;
 		String strCmd = pstrCmd;
 
 		long loginTimeout = objSO.getSimulate_shell_login_timeout().value();
 		String strPromptTrigger = objSO.getSimulate_shell_prompt_trigger().Value();
+		strbStderrOutput = new StringBuffer();
+		strbStdoutOutput = new StringBuffer();
+	 
 
 		if (objSO.getSimulate_shell().value() == true) {
+			
+			logger.debug("executing: " + strCmd);
+			
 			stdinWriter.write(strCmd + strEndOfLine);
 			stdinWriter.flush();
 			boolean prompt = false;
@@ -963,10 +976,13 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 				prompt = Check4TimeOutOrPrompt(loginTimeout, strPromptTrigger);
 			}
 			strCurrentLine = "";
+			
 			logger.debug(SOSVfs_D_163.params("stdout", strCmd));
-			logger.debug(strbStdoutOutput.toString());
-			strbStdoutOutput = new StringBuffer();
-		}
+			logger.debug(strbStdoutOutput.toString());		
+			stdoutConsumer.end();
+			stderrConsumer.end();
+			exitStatus = 0;
+			}
 		else { 
 			// temporär eingebaut um zu prüfen ob das so mit VMS geht. ur 21.6.2013
 			if (flgIsRemoteOSWindows == false && !strCmd.startsWith("@") && !strCmd.startsWith("run ")) {
@@ -979,8 +995,7 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 			ipsStdOut = new StreamGobbler(this.getSshSession().getStdout());
 			ipsStdErr = new StreamGobbler(this.getSshSession().getStderr());
 			BufferedReader stdoutReader = new BufferedReader(new InputStreamReader(ipsStdOut));
-			strbStdoutOutput = new StringBuffer();
-			while (true) {
+ 			while (true) {
 				String line = stdoutReader.readLine();
 				if (line == null)
 					break;
@@ -1002,7 +1017,7 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 				logger.debug(line);
 				strbStderrOutput.append(line + strEndOfLine);
 			}
-		}
+		
  
 		// give the session some time to end
 		// TODO waitForCondition as an Option
@@ -1013,9 +1028,12 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 		
 		long timeout = (2 * 60) * 1000;
 
-		int retval = getSshSession().waitForCondition(ChannelCondition.EXIT_STATUS, timeout);
-
-		if ((retval & ChannelCondition.TIMEOUT) != 0){
+	    retval = getSshSession().waitForCondition(ChannelCondition.EXIT_STATUS, timeout);
+		
+		exitStatus = this.getSshSession().getExitStatus();
+		
+		if ((retval & ChannelCondition.TIMEOUT) != 0 ){
+			logger.debug("Timeout reached");
 			throw new java.util.concurrent.TimeoutException();
 		} else {
 			try {
@@ -1033,7 +1051,7 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 		catch (Exception e) {
 			logger.info(SOSVfs_I_250.params("exit signal"));
 		}
-
+		}
 	}
 
 	@Override
@@ -1089,6 +1107,8 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 		private void addText(final byte[] data, final int len) {
 			lngLastTime = System.currentTimeMillis();
 			String outstring = new String(data).substring(0, len);
+			logger.debug("--> outstring: " + outstring);
+			
 			sbuf.append(outstring);
 			if (writeCurrentline) {
 				int newlineIndex = outstring.indexOf(strEndOfLine);
@@ -1116,16 +1136,20 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 			byte[] buff = new byte[64];
 
 			try {
+				logger.debug("run loop startet");
 				while (!end) {
 					buff = new byte[8];
 					int len = stream.read(buff);
+					logger.debug("run loop len:" + len);
 					if (len == -1)
 						return;
 					addText(buff, len);
-				}
+					logger.debug("run loop:" + strCurrentLine);
+				} 
+				logger.debug("run loop ended");
 			}
 			catch (Exception e) {
-			}
+ 			}
 		}
 
 		/**
