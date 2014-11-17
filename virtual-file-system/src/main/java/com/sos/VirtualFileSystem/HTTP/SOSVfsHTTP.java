@@ -445,6 +445,20 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 		return null;
 	}
 
+	@Override 
+	public long size(final String path) throws Exception {
+		GetMethod method = new GetMethod(normalizeHttpPath(path));
+		this.httpClient.executeMethod(method);
+			
+		if(!isSuccessStatusCode(method.getStatusCode())){
+			throw new Exception(String.format("HTTP [%s][%s] = %s",
+					method.getURI(),
+					method.getStatusCode(),
+					method.getStatusText()));
+		}
+	  return method.getResponseContentLength();
+	}
+	
 	/**
 	 * @TODO es fehlt method.releaseConnection();
 	 * 
