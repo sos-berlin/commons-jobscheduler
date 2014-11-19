@@ -522,11 +522,20 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 	public static Long getInputStreamLen(InputStream is) throws IOException {
 
 		long total = 0;
-		int intBytesTransferred = 0;
-		byte[] buffer = new byte[1024];
-		while ((intBytesTransferred = is.read(buffer)) != -1) {
-			total += intBytesTransferred;
+		try{
+			int intBytesTransferred = 0;
+			byte[] buffer = new byte[1024];
+			while ((intBytesTransferred = is.read(buffer)) != -1) {
+				total += intBytesTransferred;
+			}
 		}
+		catch(Exception ex){
+			throw ex;
+		}
+		finally{
+			try{ is.close();}catch (Exception ex){}
+		}
+		
 		return new Long(total);
 	}
 	
