@@ -20,6 +20,15 @@ public class SOSVfsHTTPFile extends SOSVfsTransferFileBaseClass {
 		super(path);
 	}
 
+	
+	@Override
+	public boolean FileExists() {
+	
+		Long fs = objVFSHandler.getFileSize(fileName);
+		
+		return fs >= 0;
+	}
+	
 	/**
 	 * 
 	 * \brief read
