@@ -56,6 +56,13 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 	//Das ist ein Workaround um die mehreren Aufrufe zu vermeiden
 	//Dei HTTP sollte das keine Probleme verursachen, da nicht so viele? Dateien auf ein mal übertragen werden
 	private HashMap<String,Long> fileSizes = null;
+	
+	private String			proxyHost		= null;
+	private int				proxyPort		= 0;
+	private String			proxyUser		= null;
+	private String			proxyPassword	= null;
+
+	
 	/**
 	 *
 	 */
@@ -101,6 +108,11 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 			RaiseException(SOSVfs_E_190.params("connection2OptionsAlternate"));
 		}
 
+		proxyHost = connection2OptionsAlternate.proxy_host.Value();
+		proxyPort = connection2OptionsAlternate.proxy_port.value();
+		proxyUser = connection2OptionsAlternate.proxy_user.Value();
+		proxyPassword = connection2OptionsAlternate.proxy_password.Value();
+				
 		this.connect(connection2OptionsAlternate.host.Value(), connection2OptionsAlternate.port.value());
 		return this;
 	}
@@ -133,6 +145,11 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 				if (!optionsAlternatives.host.IsEmpty() && !optionsAlternatives.user.IsEmpty()) {
 					logger.info(SOSVfs_I_170.params(connection2OptionsAlternate.Alternatives().host.Value()));
 					try {
+						proxyHost = optionsAlternatives.proxy_host.Value();
+						proxyPort = optionsAlternatives.proxy_port.value();
+						proxyUser = optionsAlternatives.proxy_user.Value();
+						proxyPassword = optionsAlternatives.proxy_password.Value();
+												
 						this.connect(optionsAlternatives.host.Value(), 
 								optionsAlternatives.port.value());
 						this.doAuthenticate(optionsAlternatives);
@@ -407,7 +424,6 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 						Protocol p = new Protocol("https", (ProtocolSocketFactory) new EasySSLProtocolSocketFactory(), this.port);
 						Protocol.registerProtocol("https",p);
 						hc.setHost(this.host,this.port,p);
-						
 						//ohne self signed
 						//hc.setHost(this.host,this.port, new Protocol("https", (ProtocolSocketFactory) new EasySSLProtocolSocketFactory(), this.port));
 					}
@@ -426,8 +442,11 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 				connectionManager = new MultiThreadedHttpConnectionManager();
 				httpClient = new HttpClient(connectionManager);
 				httpClient.setHostConfiguration(hc);
-				
+
 				//connectionManager.getConnection(httpClient.getHostConfiguration()).open();
+				
+				this.setProxyCredentionals();
+				
 				this.LogReply();
 			}
 			catch(Exception ex){
@@ -439,26 +458,28 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 		}
 	}
 	
-	private int executeHttpMethodXX(HttpMethod method) throws Exception{
-		try{
-			this.httpClient.executeMethod(method);
+	/**
+	 * 
+	 * @throws Exception
+	 */
+	private void setProxyCredentionals() throws Exception{
+		if(!SOSString.isEmpty(this.proxyHost)){
+			logger.info(String.format("using proxy: host = %s, port = %s, user = %s, pass = ?",this.proxyHost,this.proxyPort,this.proxyUser));
 			
-			if(!isSuccessStatusCode(method.getStatusCode())){
-				throw new Exception(this.getHttpMethodExceptionText(method));
-			}
-			return method.getStatusCode();
-		}
-		catch(Exception ex){
-			throw ex;
-		}
-		finally{
-			try{
-				method.releaseConnection();
-			}
-			catch(Exception ex){};
+			httpClient.getHostConfiguration().setProxy(this.proxyHost,this.proxyPort);
+            
+			Credentials credentials = new UsernamePasswordCredentials(this.proxyUser, this.proxyPassword);
+			AuthScope authScope = new AuthScope(this.proxyHost,this.proxyPort);
+			 
+			this.httpClient.getState().setProxyCredentials(authScope, credentials);
 		}
 	}
 	
+	/**
+	 * 
+	 * @param statusCode
+	 * @return
+	 */
 	private boolean isSuccessStatusCode(int statusCode){
 		// siehe HTTP StatusCode unter http://www.elektronik-kompendium.de/sites/net/0902231.htm
 		/**
