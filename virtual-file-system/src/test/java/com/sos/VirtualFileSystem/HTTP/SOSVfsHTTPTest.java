@@ -1,14 +1,17 @@
 package com.sos.VirtualFileSystem.HTTP;
+import org.apache.log4j.Logger;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import com.sos.JSHelper.Options.SOSOptionTransferType;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
-import org.apache.log4j.Logger;
-import org.junit.*;
-
-import java.io.OutputStream;
 
 /**
 * \class SOSVfsHTTPTest
@@ -41,7 +44,7 @@ public class SOSVfsHTTPTest {
 	protected SOSFTPOptions			objOptions				= null;
 	protected ISOSVFSHandler		objVFS					= null;
 	protected ISOSVfsFileTransfer	objVfsClient			= null;
-	SOSConnection2OptionsAlternate objSource				= null;
+	SOSConnection2OptionsAlternate	objSource				= null;
 	// siehe setUp
 	protected String				dynamicClassNameSource	= null;
 	protected String				dynamicClassNameTarget	= null;
@@ -82,21 +85,21 @@ public class SOSVfsHTTPTest {
 		objSource.host.Value(HTTP_URI);
 		objSource.port.value(HTTP_PORT);
 		objVFS.Connect(objSource);
-		
+
 	}
 
 	private void authenticate() throws Exception {
 		objSource.user.Value("xxx");
 		objSource.password.Value("xxx");
-		
+
 		objVFS.Authenticate(objSource);
 	}
-	
+
 	private void disconnect() throws Exception {
 		objVfsClient.disconnect();
 		objVFS.CloseConnection();
 	}
-	
+
 	@Test
 	public void testConnect() throws Exception {
 		connect();
@@ -114,10 +117,10 @@ public class SOSVfsHTTPTest {
 	public void testGetFile() throws Exception {
 		connect();
 		authenticate();
-		
-		objVfsClient.getFile("timecard/timecard_dialog.php","D:\\1.php");
+
+		objVfsClient.getFile("timecard/timecard_dialog.php", "D:\\1.php");
 		//objVfsClient.getFile("http://download.sos-berlin.com/JobScheduler.1.7/jobscheduler_windows-x64.1.7.4274.zip","D:\\1.zip");
-		
+
 		disconnect();
 	}
 
@@ -147,25 +150,23 @@ public class SOSVfsHTTPTest {
 		disconnect();
 	}
 
-	
 	@Test
 	public void testSize() throws Exception {
 		connect();
 		authenticate();
-		
+
 		//System.out.println(objVfsClient.getFileSize(REMOTE_BASE_PATH + "sos-net-src.zip"));
 		//System.out.println(objVfsClient.getFileSize(REMOTE_BASE_PATH + "BVG.pdf"));
-		
+
 		disconnect();
 	}
 
-	
 	@Test
 	public void testPut() throws RuntimeException, Exception {
 		connect();
 		authenticate();
 		//objVfsClient.putFile(LOCAL_BASE_PATH + "sos-net-src.zip", REMOTE_BASE_PATH + "sos-net-src.zip");
-		
+
 		disconnect();
 	}
 
@@ -173,17 +174,16 @@ public class SOSVfsHTTPTest {
 	public void testPutFileStringOutputStream() throws Exception {
 		connect();
 		authenticate();
-		
+
 		/**
 		OutputStream out = objVfsClient.getOutputStream(REMOTE_BASE_PATH + "out.test.txt");
 		out.write("hallo".getBytes());
 		out.flush();
 		out.close();
 		*/
-		
+
 		disconnect();
 	}
-
 
 	@Test
 	public void testCd() throws Exception {
@@ -193,18 +193,16 @@ public class SOSVfsHTTPTest {
 		disconnect();
 	}
 
-	
 	@Test
 	public void testDelete() throws Exception {
 		connect();
 		authenticate();
-		
+
 		//objVfsClient.put(LOCAL_BASE_PATH + "sos-net-src.zip", REMOTE_BASE_PATH + "tmp123.zip");
 		//objVfsClient.delete(REMOTE_BASE_PATH + "tmp123.zip");
-		
+
 		disconnect();
 	}
-
 
 	@Test
 	public void testIsConnected() throws Exception {
@@ -226,11 +224,11 @@ public class SOSVfsHTTPTest {
 	public void testRename() throws Exception {
 		connect();
 		authenticate();
-		
+
 		//objVfsClient.put(LOCAL_BASE_PATH + "sos-net-src.zip", REMOTE_BASE_PATH + "tmp123.zip");
 		//7objVfsClient.rename(REMOTE_BASE_PATH + "tmp123.zip", REMOTE_BASE_PATH + "tmp1234.zip");
 		//objVfsClient.delete(REMOTE_BASE_PATH + "tmp1234.zip");
-		
+
 		disconnect();
 	}
 
