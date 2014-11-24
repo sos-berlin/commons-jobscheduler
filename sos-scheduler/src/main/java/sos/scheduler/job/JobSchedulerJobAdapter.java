@@ -896,6 +896,17 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		return conJobFailure;
 	} // private boolean signalFailure
 
+	  public boolean signalFailureNoLog() {
+	        @SuppressWarnings("unused")
+	        final String conMethodName = conClassName + "::signalFailure";
+
+	        if (isJobchain()) {
+	            return conJobChainFailure;
+	        }else{
+	            return conJobFailure;
+	        }
+	    } // private boolean signalFailureNoLog
+	  
 	/*
 	 * setBack driven by JS
 	 */
