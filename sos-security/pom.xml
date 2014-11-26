@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -16,135 +17,135 @@
 
     <build>
 
-      <plugins>     
-      
-        <!-- collect the ini files -->
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <executions>
-                <execution>
-                    <id>package-setup</id>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>single</goal>
-                    </goals>
-                    <configuration>
-                        <descriptors>
-                            <descriptor>src/main/assembly/ini-files.xml</descriptor>
-                        </descriptors>
-                        <archive>
-                            <manifest>
-                                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                            </manifest>
-                        </archive>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
-			
-  		</plugins>
+        <plugins>
+
+            <!-- collect the ini files -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>package-setup</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/assembly/ini-files.xml</descriptor>
+                            </descriptors>
+                            <archive>
+                                <manifest>
+                                    <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
 
     </build>
 
 
     <properties>
-      <!-- Bewirkt die Kopie in lib_release_unversioned_jar und lib_release_jar -->
+        <!-- Bewirkt die Kopie in lib_release_unversioned_jar und lib_release_jar -->
         <setup.do.not.deploy>false</setup.do.not.deploy>
         <setup.target.name>com.sos.security</setup.target.name>
     </properties>
-    
+
     <dependencies>
 
-      <dependency>
-          <groupId>com.sos-berlin.jobscheduler</groupId>
-          <artifactId>hibernate-commons</artifactId>
-          <version>${project.version}</version>
-      </dependency>
+        <dependency>
+            <groupId>com.sos-berlin.jobscheduler</groupId>
+            <artifactId>hibernate-commons</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-      <dependency>
-          <groupId>com.sos-berlin.jobscheduler</groupId>
-          <artifactId>jobscheduler-helper</artifactId>
-          <version>${project.version}</version>
-      </dependency>
-                      
-      <dependency>
-          <groupId>org.hibernate</groupId>
-          <artifactId>hibernate-core</artifactId>
-      </dependency>
+        <dependency>
+            <groupId>com.sos-berlin.jobscheduler</groupId>
+            <artifactId>jobscheduler-helper</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-      <dependency>
-          <groupId>javassist</groupId>
-          <artifactId>javassist</artifactId>
-      </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+        </dependency>
 
-      <dependency>
-          <groupId>com.sun.jersey</groupId>
-          <artifactId>jersey-client</artifactId>
-      </dependency>
-      
-      <dependency>
-          <groupId>com.sun.jersey</groupId>
-          <artifactId>jersey-server</artifactId>
-      </dependency>
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+        </dependency>
 
-      <dependency>
-          <groupId>com.oracle</groupId>
-          <artifactId>ojdbc6</artifactId>
-          <scope>test</scope>
-      </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-client</artifactId>
+        </dependency>
 
-			<dependency>
-				<groupId>org.apache.shiro</groupId>
-				<artifactId>shiro-core</artifactId>
-			</dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-server</artifactId>
+        </dependency>
 
-      <dependency>
-          <groupId>log4j</groupId>
-          <artifactId>log4j</artifactId>
-      </dependency>
-      
-      <dependency>
-          <groupId>com.fasterxml.jackson.core</groupId>
-          <artifactId>jackson-core</artifactId>
-      </dependency>
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc6</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-      <dependency>
-          <groupId>com.fasterxml.jackson.core</groupId>
-          <artifactId>jackson-annotations</artifactId>
-      </dependency>
-        
-			<dependency>
-				<groupId>commons-beanutils</groupId>
-				<artifactId>commons-beanutils</artifactId>
-			</dependency>
-	
-			<dependency>
-				<groupId>com.sos-berlin.jobscheduler</groupId>
-				<artifactId>jobscheduler-web-services-globals</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-	
-			<dependency>
-	      <groupId>com.sos-berlin.commons</groupId>
-	      <artifactId>common-resources</artifactId>
-	      <version>${project.version}</version>
-	      <classifier>tests</classifier>
-	      <scope>test</scope>
-	    </dependency>
-		
-			<dependency>
-				<groupId>com.sos-berlin.products-test</groupId>
-				<artifactId>test-resources</artifactId>
-        <version>${project.version}</version>
-        <scope>test</scope>
-			</dependency>
-	
-      <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <scope>test</scope>
-      </dependency>
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sos-berlin.jobscheduler</groupId>
+            <artifactId>jobscheduler-web-services-globals</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sos-berlin.commons</groupId>
+            <artifactId>common-resources</artifactId>
+            <version>${project.version}</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sos-berlin.products-test</groupId>
+            <artifactId>test-resources</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 

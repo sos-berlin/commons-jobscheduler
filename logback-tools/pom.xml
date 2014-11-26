@@ -24,7 +24,6 @@
         <dependency>
             <groupId>com.sos.scheduler.engine</groupId>
             <artifactId>engine-job-api</artifactId>
-            <version>${sos.engine.version}</version>
         </dependency>
 
         <dependency>
@@ -67,7 +66,7 @@
         </dependency>
 
         <dependency>
-            <groupId>javassist</groupId>
+            <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
         </dependency>
 

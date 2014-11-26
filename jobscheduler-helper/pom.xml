@@ -35,7 +35,7 @@
 		            <executions>
 		                <execution>
 		                    <id>generate-sources</id>
-		                    <phase>generate-sources</phase>
+		                    <phase>process-sources</phase>
 		                    <configuration>
 <!--  		                [WARNING] Parameter tasks is deprecated, use target instead        
 		                        <tasks>

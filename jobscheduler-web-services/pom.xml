@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>com.sos-berlin</groupId>
-			  <artifactId>jobscheduler</artifactId>
+        <artifactId>jobscheduler</artifactId>
         <version>1.8-SNAPSHOT</version>
     </parent>
-    
+
     <properties>
-      <!-- Bewirkt die Kopie in lib_release_unversioned_jar und lib_release_jar -->
+        <!-- Bewirkt die Kopie in lib_release_unversioned_jar und lib_release_jar -->
         <setup.do.not.deploy>false</setup.do.not.deploy>
         <setup.target.name>com.sos.webservices</setup.target.name>
     </properties>
-    
+
 
     <groupId>com.sos-berlin.jobscheduler</groupId>
     <artifactId>jobscheduler-web-services</artifactId>
@@ -25,28 +26,16 @@
     </build>
 
     <dependencies>
-    
         <dependency>
-        <groupId>com.sos-berlin.jobscheduler</groupId>
-        <artifactId>sos-security</artifactId>
-        <version>${project.version}</version>
+            <groupId>com.sos-berlin.jobscheduler</groupId>
+            <artifactId>sos-security</artifactId>
+            <version>${project.version}</version>
         </dependency>
-        
         <dependency>
             <groupId>com.sos.scheduler.engine</groupId>
             <artifactId>kernel</artifactId>
-            <version>${sos.engine.version}</version>
             <scope>provided</scope>
         </dependency>
-        <!-- 
-        <dependency>
-            <groupId>com.sos.scheduler.engine</groupId>
-            <artifactId>engine-test</artifactId>
-            <version>${sos.engine.version}</version>
-            <scope>test</scope>
-         
-        </dependency>
-           -->
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-library</artifactId>
@@ -66,33 +55,6 @@
             <artifactId>jsr305</artifactId>
             <optional>true</optional>
         </dependency>
-        <!-- 
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-servlet</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-servlets</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-xml</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-webapp</artifactId>
-        </dependency>
-                 -->
-        
         <dependency>
             <groupId>com.sun.jersey.contribs</groupId>
             <artifactId>jersey-guice</artifactId>
@@ -114,28 +76,25 @@
             <groupId>com.fasterxml.jackson.jaxrs</groupId>
             <artifactId>jackson-jaxrs-json-provider</artifactId>
         </dependency>
-        
-         <dependency>
+        <dependency>
             <groupId>com.sos-berlin.commons</groupId>
             <artifactId>sos-xml</artifactId>
-        	<version>${project.version}</version>
+            <version>${project.version}</version>
         </dependency>
-   
-            
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-        	<groupId>com.sos-berlin.jobscheduler</groupId>
-        	<artifactId>jobscheduler-object-model</artifactId>
-        	<version>${project.version}</version>
+            <groupId>com.sos-berlin.jobscheduler</groupId>
+            <artifactId>jobscheduler-object-model</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-        	<groupId>com.sos-berlin.jobscheduler</groupId>
-        	<artifactId>jobscheduler-web-services-globals</artifactId>
-        	<version>${project.version}</version>
+            <groupId>com.sos-berlin.jobscheduler</groupId>
+            <artifactId>jobscheduler-web-services-globals</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>
