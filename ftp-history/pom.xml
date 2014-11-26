@@ -13,15 +13,8 @@
     <artifactId>ftp-history</artifactId>
     <name>${project.artifactId}</name>
 
-    <!-- Bewirkt die Kopie in lib_release_unversioned_jar und lib_release_jar -->
-    <properties>
-        <setup.do.not.deploy>false</setup.do.not.deploy>
-        <setup.target.name>com.sos.ftphistory</setup.target.name>
-    </properties>
-
     <dependencies>
-        <!-- these are the dependencies for projects already moved to maven  -->
-                
+
         <dependency>
             <groupId>com.sos-berlin.jobscheduler</groupId>
             <artifactId>jobscheduler-helper</artifactId>

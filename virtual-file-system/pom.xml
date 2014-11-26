@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -13,19 +14,13 @@
     <artifactId>virtual-file-system</artifactId>
     <name>${project.artifactId}</name>
 
-    <!-- Bewirkt die Kopie in lib_release_unversioned_jar und lib_release_jar -->
-    <properties>
-        <setup.do.not.deploy>false</setup.do.not.deploy>
-        <setup.target.name>com.sos.VirtualFileSystem</setup.target.name>
-    </properties>
-
     <dependencies>
 
-<dependency>
-  <groupId>com.sos-berlin.commons</groupId>
-  <artifactId>credentialstore</artifactId>
+        <dependency>
+            <groupId>com.sos-berlin.commons</groupId>
+            <artifactId>credentialstore</artifactId>
             <version>${project.version}</version>
-</dependency>
+        </dependency>
 
         <dependency>
             <groupId>com.sos-berlin</groupId>
@@ -52,7 +47,7 @@
             <artifactId>sos-configuration</artifactId>
             <version>${project.version}</version>
         </dependency>
-    
+
         <dependency>
             <groupId>com.sos-berlin.jobscheduler</groupId>
             <artifactId>sos-mail</artifactId>
@@ -61,10 +56,10 @@
 
 
         <!-- These are the dependencies for third party libraries -->
-<dependency>
-    <groupId>org.apache.commons</groupId>
-    <artifactId>commons-lang3</artifactId>
-</dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
@@ -75,7 +70,7 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
@@ -95,11 +90,11 @@
             <groupId>jcifs</groupId>
             <artifactId>jcifs</artifactId>
         </dependency>
-        
+
         <!-- This is a replacement dependency for the jar file /SOS_LIB/commons-ssl.jar  		   -->
         <!-- which does not exist in any open accessible maven repository. 						   -->
         <!-- this dependency is accessible and the build works, may be changed in the future [SP]  -->
-        <dependency> 
+        <dependency>
             <groupId>ca.juliusdavies</groupId>
             <artifactId>not-yet-commons-ssl</artifactId>
             <version>0.3.11</version>
@@ -111,15 +106,15 @@
         </dependency>
 
         <dependency>
-           <groupId>webdavclient4j</groupId>
-           <artifactId>webdavclient4j-core</artifactId>
+            <groupId>webdavclient4j</groupId>
+            <artifactId>webdavclient4j-core</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-ext-jdk15on</artifactId>
         </dependency>
-                    
+
         <dependency>
             <groupId>com.trilead</groupId>
             <artifactId>sos-trilead-ssh2</artifactId>
@@ -136,8 +131,8 @@
         </dependency>
 
         <dependency>
-			<groupId>commons-httpclient</groupId>
-			<artifactId>commons-httpclient</artifactId>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
         </dependency>
 
     </dependencies>

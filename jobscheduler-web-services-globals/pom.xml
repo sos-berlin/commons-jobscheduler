@@ -1,19 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>com.sos-berlin</groupId>
-			  <artifactId>jobscheduler</artifactId>
+        <artifactId>jobscheduler</artifactId>
         <version>1.8-SNAPSHOT</version>
- 
     </parent>
-    
-    <properties>
-      <!-- Bewirkt die Kopie in lib_release_unversioned_jar und lib_release_jar -->
-        <setup.do.not.deploy>false</setup.do.not.deploy>
-        <setup.target.name>com.sos.webservices-globals</setup.target.name>
-    </properties>
 
     <groupId>com.sos-berlin.jobscheduler</groupId>
     <artifactId>jobscheduler-web-services-globals</artifactId>
@@ -21,16 +15,14 @@
     <inceptionYear>2014</inceptionYear>
     <description>Web services to connect to JobScheduler engine (Globals)</description>
 
-    <build>
-    </build>
-
     <dependencies>
-    
+
         <dependency>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-          <scope>test</scope>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
-   
+
     </dependencies>
+
 </project>
