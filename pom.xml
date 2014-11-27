@@ -29,7 +29,6 @@
         <module>sos-security</module>
         <module>sos-mail</module>
         <module>sos-ssh</module>
-        <module>jobscheduler-all</module>
     </modules>
 
 </project>
