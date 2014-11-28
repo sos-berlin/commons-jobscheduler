@@ -51,6 +51,8 @@ public class SosHibernateSession {
             try {
                 Configuration configuration = getConfiguration(getDefaultClassMapping());
                 configuration.configure(configurationFile);
+                //http://tasks.sos/browse/DVT-53
+                configuration.setProperty("hibernate.jdbc.use_scrollable_resultset","true");
                 openSession(configuration);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -74,6 +76,7 @@ public class SosHibernateSession {
                 configuration.setProperty("hibernate.show_sql", options.gethibernate_show_sql().Value());
                 configuration.setProperty("hibernate.connection.autocommit", options.gethibernate_connection_autocommit().Value());
                 configuration.setProperty("hibernate.format_sql", options.gethibernate_format_sql().Value());
+                configuration.setProperty("hibernate.jdbc.use_scrollable_resultset",options.gethibernate_jdbc_use_scrollable_resultset().Value());
                 openSession(configuration);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -112,6 +115,17 @@ public class SosHibernateSession {
         classList.addClassIfExist("com.sos.tools.logback.db.LoggingEventDBItem");
         classList.addClassIfExist("com.sos.tools.logback.db.LoggingEventExceptionDBItem");
         classList.addClassIfExist("com.sos.tools.logback.db.LoggingEventPropertyDBItem");
+        
+        //http://tasks.sos/browse/DVT-53
+        classList.addClassIfExist("com.sos.scheduler.notification.db.DBItemSchedulerOrderStepHistory");
+        classList.addClassIfExist("com.sos.scheduler.notification.db.DBItemSchedulerOrderHistory");
+        classList.addClassIfExist("com.sos.scheduler.notification.db.DBItemSchedulerVariables");
+        classList.addClassIfExist("com.sos.scheduler.notification.db.DBItemSchedulerHistory");
+        classList.addClassIfExist("com.sos.scheduler.notification.db.DBItemSchedulerMonNotifications");
+        classList.addClassIfExist("com.sos.scheduler.notification.db.DBItemSchedulerMonSystemNotifications");
+        classList.addClassIfExist("com.sos.scheduler.notification.db.DBItemSchedulerMonResults");
+        classList.addClassIfExist("com.sos.scheduler.notification.db.DBItemSchedulerMonChecks");
+        
           
         return classList;
     }

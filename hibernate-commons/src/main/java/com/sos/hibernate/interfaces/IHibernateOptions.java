@@ -206,5 +206,26 @@ public interface IHibernateOptions {
 	 */
 	public abstract void sethibernate_show_sql(
 			SOSOptionBoolean p_hibernate_show_sql);
+	
+	/**
+	 * \brief gethibernate_jdbc_use_scrollable_resultset : 
+	 * 
+	 * \details
+	 * 
+	 *
+	 * \return 
+	 *
+	 */
+	public abstract SOSOptionBoolean gethibernate_jdbc_use_scrollable_resultset();
 
+	/**
+	 * \brief sethibernate_jdbc_use_scrollable_resultset : 
+	 * 
+	 * \details
+	 * 
+	 *
+	 * @param hibernate_jdbc_use_scrollable_resultset : 
+	 */
+	public abstract void sethibernate_jdbc_use_scrollable_resultset(
+			SOSOptionBoolean p_hibernate_jdbc_use_scrollable_resultset);
 }

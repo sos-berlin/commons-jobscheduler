@@ -393,7 +393,41 @@ public class HibernateOptions extends JSOptionsClass implements IHibernateOption
         this.hibernate_show_sql = p_hibernate_show_sql;
     }
 
-                        
+
+    /**
+     * \var hibernate_jdbc_use_scrollable_resultset : 
+     * 
+     *
+     */
+    @JSOptionDefinition(name = "hibernate_jdbc_use_scrollable_resultset", 
+    description = "", 
+    key = "hibernate_jdbc_use_scrollable_resultset", 
+    type = "SOSOptionBoolean", 
+    mandatory = false)
+    
+    public SOSOptionBoolean hibernate_jdbc_use_scrollable_resultset = new SOSOptionBoolean(this, conClassName + ".hibernate_jdbc_use_scrollable_resultset", // HashMap-Key
+                                                                "", // Titel
+                                                                "true", // InitValue
+                                                                "true", // DefaultValue
+                                                                false // isMandatory
+                    );
+
+	/* (non-Javadoc)
+	 * @see com.sos.jobnet.options.ISOSJSHibernateOptions#gethibernate_jdbc_use_scrollable_resultset()
+	 */
+    @Override
+	public SOSOptionBoolean  gethibernate_jdbc_use_scrollable_resultset() {
+        return hibernate_jdbc_use_scrollable_resultset;
+    }
+
+    /* (non-Javadoc)
+     * @see com.sos.jobnet.options.ISOSJSHibernateOptions#sethibernate_jdbc_use_scrollable_resultset(com.sos.JSHelper.Options.SOSOptionBoolean)
+     */
+    @Override
+	public void sethibernate_jdbc_use_scrollable_resultset (SOSOptionBoolean p_hibernate_jdbc_use_scrollable_resultset) { 
+        this.hibernate_jdbc_use_scrollable_resultset = p_hibernate_jdbc_use_scrollable_resultset;
+    }
+
 
 public HibernateOptions() {
 		objParentClass = this.getClass();
