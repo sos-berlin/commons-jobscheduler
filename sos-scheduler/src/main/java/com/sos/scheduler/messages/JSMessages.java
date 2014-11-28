@@ -12,7 +12,7 @@ import com.sos.i18n.annotation.I18NMsg;
 public class JSMessages {
 
 	public static final JSMsg	LOG_I_0010	= new JSMsg("LOG_I_0010");		// Log4j configured programmatically
-	public static final JSMsg	LOG_I_0020	= new JSMsg("LOG_I_0020");		// JobSchedulerLog4JAppender is configured as log4j-appender
+	public static final JSMsg	LOG_D_0020	= new JSMsg("LOG_D_0020");		// JobSchedulerLog4JAppender is configured as log4j-appender
 
 	public static final JSMsg	JSJ_E_0009	= new JSMsg("JSJ_E_0009");		// "Job '%1$s' terminated with error".
 	public static final JSMsg	JSJ_I_0010	= new JSMsg("JSJ_I_0010");		// %1$s: Current Job is '%2$s'.

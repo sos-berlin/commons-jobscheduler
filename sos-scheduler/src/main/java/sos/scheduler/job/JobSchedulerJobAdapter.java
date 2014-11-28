@@ -9,10 +9,9 @@ import static com.sos.scheduler.messages.JSMessages.JSJ_E_0009;
 import static com.sos.scheduler.messages.JSMessages.JSJ_F_0010;
 import static com.sos.scheduler.messages.JSMessages.JSJ_F_0050;
 import static com.sos.scheduler.messages.JSMessages.JSJ_F_0060;
-import static com.sos.scheduler.messages.JSMessages.JSJ_I_0010;
 import static com.sos.scheduler.messages.JSMessages.JSJ_I_0020;
+import static com.sos.scheduler.messages.JSMessages.LOG_D_0020;
 import static com.sos.scheduler.messages.JSMessages.LOG_I_0010;
-import static com.sos.scheduler.messages.JSMessages.LOG_I_0020;
 
 import java.io.File;
 import java.util.HashMap;
@@ -173,7 +172,16 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		if (objStdoutAppender instanceof IJobSchedulerLoggingAppender) {
 			objJSAppender = (JobSchedulerLog4JAppender) objStdoutAppender;
 			objJSAppender.setSchedulerLogger(sosLogger);
-			LOG_I_0020.toLog();
+			LOG_D_0020.toLog();
+			if (spooler_log.level() > 1) {
+				logger.setLevel(Level.ERROR);
+			}
+			if (spooler_log.level() == 1) {
+				logger.setLevel(Level.WARN);
+			}
+			if (spooler_log.level() == 0) {
+				logger.setLevel(Level.INFO);
+			}
 			if (spooler_log.level() < 0) {
 				logger.setLevel(Level.DEBUG);
 			}
@@ -276,7 +284,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		 * Delete the NodeName (StepName) for all parameters dedicated to the current step
 		 * The name of the current step is the return-value of "getCurrentNodeName".
 		 */
-		String strCurrentNodeName = getCurrentNodeName() + "/";
+		String strCurrentNodeName = getCurrentNodeName(false) + "/";
 		int intNNLen = strCurrentNodeName.length();
 		HashMap<String, String> newSchedulerParameters = new HashMap<String, String>();
 		newSchedulerParameters.putAll(pSchedulerParameterSet);
@@ -603,7 +611,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 			specialParams.put("SCHEDULER_JOB_CHAIN_NAME", spooler_task.order().job_chain().name());
 			specialParams.put("SCHEDULER_JOB_CHAIN_TITLE", spooler_task.order().job_chain().title());
 			specialParams.put("SCHEDULER_ORDER_ID", spooler_task.order().id());
-			specialParams.put("SCHEDULER_NODE_NAME", getCurrentNodeName());
+			specialParams.put("SCHEDULER_NODE_NAME", getCurrentNodeName(false));
 			specialParams.put("SCHEDULER_NEXT_NODE_NAME", spooler_task.order().job_chain_node().next_state());
 			specialParams.put("SCHEDULER_NEXT_ERROR_NODE_NAME", spooler_task.order().job_chain_node().error_state());
 		}
@@ -752,18 +760,26 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 	// } // private HashMap <String, String> DeletePrefix
 	@Override// JSJobUtilities
 	public String getCurrentNodeName() {
+		return getCurrentNodeName(true);
+	} // public String getNodeName
+	
+	public String getCurrentNodeName(final boolean verbose) {
 		final String conMethodName = conClassName + "::getNodeName";
 		String lstrNodeName = "node1"; // Test, needed for JUnit-Test
 		if (spooler_task != null) {
 			Order objCurrentOrder = spooler_task.order();
 			if (isNotNull(objCurrentOrder)) {
 				lstrNodeName = objCurrentOrder.state();
-				JSJ_I_0020.toLog(conMethodName, lstrNodeName);
+				if (verbose) {
+					JSJ_I_0020.toLog(conMethodName, lstrNodeName);
+				}
 			}
 			else {
 				Job objCurrentJob = getJob();
 				lstrNodeName = objCurrentJob.name();
-				JSJ_I_0010.toLog(conMethodName, lstrNodeName);
+				if (verbose) {
+					JSJ_I_0020.toLog(conMethodName, lstrNodeName);
+				}
 			}
 		}
 		return lstrNodeName;
