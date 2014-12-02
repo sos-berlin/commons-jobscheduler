@@ -1,15 +1,15 @@
 package com.sos.scheduler.model.objects;
+import com.sos.JSHelper.io.Files.JSTextFile;
+import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
+import com.sos.VirtualFileSystem.shell.cmdShell;
+import com.sos.scheduler.converter.graphviz.Dot;
+import com.sos.scheduler.model.SchedulerObjectFactory;
+import org.apache.log4j.Logger;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-
-import org.apache.log4j.Logger;
-
-import com.sos.JSHelper.io.Files.JSTextFile;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
-import com.sos.VirtualFileSystem.shell.cmdShell;
-import com.sos.scheduler.model.SchedulerObjectFactory;
 
 /**
 * \class JSObjJobChain
@@ -508,7 +508,7 @@ public class JSObjJobChain extends JobChain {
 		objDotFile.close();
 		cmdShell objShell = new cmdShell();
 		// TODO create Method in objDotFile
-		String strCommandString = String.format("dot.exe -x -T%1$s %2$s.dot > %2$s.%1$s", "jpg", strFileName);
+		String strCommandString = String.format(Dot.Command + " -x -T%1$s %2$s.dot > %2$s.%1$s", "jpg", strFileName);
 		objShell.setCommand(strCommandString);
 		objShell.run();
 		return strFileName + ".jpg";

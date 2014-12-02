@@ -37,6 +37,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 import com.sos.VirtualFileSystem.shell.cmdShell;
+import com.sos.scheduler.converter.graphviz.Dot;
 import com.sos.scheduler.model.objects.*;
 import com.sos.scheduler.model.objects.JobChain.JobChainNode;
 import org.apache.log4j.Logger;
@@ -373,7 +374,7 @@ public class SchedulerHotFolderTest {
 
 				cmdShell objShell = new cmdShell();
 
-				String strCommandString = String.format("dot.exe -x -T%1$s %2$s.dot > %2$s.%1$s", "jpg", strFileName);
+				String strCommandString = String.format(Dot.Command + " -x -T%1$s %2$s.dot > %2$s.%1$s", "jpg", strFileName);
 				objShell.setCommand(strCommandString);
 				objShell.run();
 

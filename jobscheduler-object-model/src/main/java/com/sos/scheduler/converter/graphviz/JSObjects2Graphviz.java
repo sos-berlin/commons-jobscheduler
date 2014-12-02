@@ -1,13 +1,5 @@
 package com.sos.scheduler.converter.graphviz;
 
-import static com.sos.scheduler.model.messages.JSMessages.JOM_F_107;
-import static com.sos.scheduler.model.messages.JSMessages.JOM_I_110;
-import static com.sos.scheduler.model.messages.JSMessages.JOM_I_111;
-
-import java.util.Hashtable;
-
-import org.apache.log4j.Logger;
-
 import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.io.Files.JSTextFile;
@@ -19,12 +11,13 @@ import com.sos.VirtualFileSystem.shell.cmdShell;
 import com.sos.scheduler.model.SchedulerHotFolder;
 import com.sos.scheduler.model.SchedulerHotFolderFileList;
 import com.sos.scheduler.model.SchedulerObjectFactory;
-import com.sos.scheduler.model.objects.JSObjBase;
-import com.sos.scheduler.model.objects.JSObjJobChain;
-import com.sos.scheduler.model.objects.JSObjOrder;
+import com.sos.scheduler.model.objects.*;
 import com.sos.scheduler.model.objects.JobChain.JobChainNode;
-import com.sos.scheduler.model.objects.JobChainNodeEnd;
-import com.sos.scheduler.model.objects.Spooler;
+import org.apache.log4j.Logger;
+
+import java.util.Hashtable;
+
+import static com.sos.scheduler.model.messages.JSMessages.*;
 
 /**
  * \class 		JSObjects2Graphviz - Workerclass for "JSObjects2Graphviz"
@@ -120,7 +113,7 @@ public class JSObjects2Graphviz extends JSJobUtilitiesClass<JSObjects2GraphvizOp
 				if (obj instanceof JSObjJobChain) {
 					String strOutFile = createGraphvizFile(obj);
 					cmdShell objShell = new cmdShell();
-					objShell.executeCommand("dot.exe -x -Tpdf " + strOutFile + " > " + strOutFile + ".pdf");
+					objShell.executeCommand(Dot.Command + " -x -Tpdf " + strOutFile + " > " + strOutFile + ".pdf");
 				}
 			}
 		}
