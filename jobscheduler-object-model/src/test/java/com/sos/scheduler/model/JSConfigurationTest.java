@@ -32,6 +32,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 import com.sos.scheduler.model.objects.Spooler;
+
 import org.apache.log4j.Logger;
 import org.junit.*;
 
@@ -148,6 +149,7 @@ public class JSConfigurationTest {
 	 * Test method for {@link com.sos.scheduler.model.JSConfiguration)}.
 	 */
 	@Test
+  @Ignore("Test set to Ignore for later examination")
 	public final void loadSchedulerXMLLocal() {
 		prepareLocalVfs();
 		String strTestHotFolder = "Z:/8of9_buildjars_4210/config/scheduler.xml";

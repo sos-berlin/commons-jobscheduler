@@ -4,9 +4,11 @@ package com.sos.scheduler.model.commands;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdShowJob.enu4What;
 import com.sos.scheduler.model.objects.Spooler;
+
 import org.apache.log4j.Logger;
 import org.junit.*;
 
+@Ignore("Test set to Ignore for later examination")
 public class JSCmd64Test {
 	
 	private static Logger logger = Logger.getLogger(JSCmd64Test.class);

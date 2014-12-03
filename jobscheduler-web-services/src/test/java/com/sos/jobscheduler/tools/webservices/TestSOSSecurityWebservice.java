@@ -10,6 +10,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Node;
 
@@ -59,6 +60,7 @@ public class TestSOSSecurityWebservice {
      }
     
      @Test
+     @Ignore("Test set to Ignore for later examination")
      public void testStartJob() throws Exception {        
  
          String myUser = LOGIN_USER;
@@ -83,6 +85,7 @@ public class TestSOSSecurityWebservice {
       }
      
      @Test
+     @Ignore("Test set to Ignore for later examination")
      public void testModifyOrder() throws Exception {
       
          String myUser = LOGIN_USER;
@@ -108,6 +111,7 @@ public class TestSOSSecurityWebservice {
      }
 
      @Test
+     @Ignore("Test set to Ignore for later examination")
      public void testProcessClass() throws Exception {
          
          String myUser = LOGIN_USER;
@@ -133,6 +137,7 @@ public class TestSOSSecurityWebservice {
      }
 
      @Test
+     @Ignore("Test set to Ignore for later examination")
      public void testProcessClassRemove() throws Exception {
          String myUser = LOGIN_USER;
          String myPwd = LOGIN_PWD;
@@ -157,6 +162,7 @@ public class TestSOSSecurityWebservice {
      }
 
      @Test
+     @Ignore("Test set to Ignore for later examination")
      public void testJobChainRemove() throws Exception {
          String myUser = LOGIN_USER;
          String myPwd = LOGIN_PWD;
@@ -181,6 +187,7 @@ public class TestSOSSecurityWebservice {
      }
 
      @Test
+     @Ignore("Test set to Ignore for later examination")
      public void testOrderRemove() throws Exception {
          String myUser = LOGIN_USER;
          String myPwd = LOGIN_PWD;
@@ -207,6 +214,7 @@ public class TestSOSSecurityWebservice {
      }
 
      @Test
+     @Ignore("Test set to Ignore for later examination")
      public void testModifyJob() throws Exception {
          String myUser = LOGIN_USER;
          String myPwd = LOGIN_PWD;
@@ -237,6 +245,7 @@ public class TestSOSSecurityWebservice {
      }
 
      @Test
+     @Ignore("Test set to Ignore for later examination")
      public void testModifySpooler() throws Exception {
          String myUser = LOGIN_USER;
          String myPwd = LOGIN_PWD;
@@ -262,6 +271,7 @@ public class TestSOSSecurityWebservice {
      }
 
      @Test
+     @Ignore("Test set to Ignore for later examination")
      public void testAddOrder() throws Exception {
          String myUser = LOGIN_USER;
          String myPwd = LOGIN_PWD;
@@ -285,6 +295,7 @@ public class TestSOSSecurityWebservice {
       }
 
      @Test
+     @Ignore("Test set to Ignore for later examination")
      public void testLockRemove() throws Exception {
          String myUser = LOGIN_USER;
          String myPwd = LOGIN_PWD;
@@ -310,6 +321,7 @@ public class TestSOSSecurityWebservice {
      }
     
      @Test
+     @Ignore("Test set to Ignore for later examination")
      public void testKillTask() throws Exception {
          String myUser = LOGIN_USER;
          String myPwd = LOGIN_PWD;
@@ -348,6 +360,7 @@ public class TestSOSSecurityWebservice {
         }
     
      @Test
+     @Ignore("Test set to Ignore for later examination")
      public void testJobChainModify() throws Exception {
          String myUser = LOGIN_USER;
          String myPwd = LOGIN_PWD;
@@ -372,6 +385,7 @@ public class TestSOSSecurityWebservice {
      }
    
      @Test
+     @Ignore("Test set to Ignore for later examination")
      public void testJobChainNodeModify() throws Exception {
          String myUser = LOGIN_USER;
          String myPwd = LOGIN_PWD;
@@ -397,6 +411,7 @@ public class TestSOSSecurityWebservice {
      }
    
      @Test
+     @Ignore("Test set to Ignore for later examination")
      public void testLogin() throws Exception {
          String myUser = LOGIN_USER;
          String myPwd = LOGIN_PWD;
@@ -414,6 +429,7 @@ public class TestSOSSecurityWebservice {
       }
 
      @Test
+     @Ignore("Test set to Ignore for later examination")
      public void testLogout() throws Exception {
          String myUser = LOGIN_USER;
          String myPwd = LOGIN_PWD;

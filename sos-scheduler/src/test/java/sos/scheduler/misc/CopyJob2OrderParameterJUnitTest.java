@@ -4,6 +4,7 @@ package sos.scheduler.misc;
 
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.Listener.JSListenerClass;
+
 import org.apache.log4j.Logger;
 import org.junit.*;
 
@@ -59,6 +60,7 @@ public class CopyJob2OrderParameterJUnitTest extends JSToolBox {
 	}
 
 	@Test
+  @Ignore("Test set to Ignore for later examination")
 	public void testExecute() throws Exception {
 		
 		

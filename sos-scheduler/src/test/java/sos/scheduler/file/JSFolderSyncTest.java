@@ -61,6 +61,7 @@ public class JSFolderSyncTest  {
 	}
 
 	@Test
+  @Ignore("Test set to Ignore for later examination")
 	public void Execute1Test () {
 		objO.file.Value("c:/temp/bin/");
 		objO.file_spec.Value(".*");
@@ -70,6 +71,7 @@ public class JSFolderSyncTest  {
 	}
 
 	@Test (expected=com.sos.JSHelper.Exceptions.JobSchedulerException.class) 
+  @Ignore("Test set to Ignore for later examination")
 	public void JFO_F_0100Test () {
 		objO.skip_first_files.value(-2);
 		objO.skip_last_files.value(2);
@@ -77,16 +79,20 @@ public class JSFolderSyncTest  {
 	}
 	
 	@Test (expected=com.sos.JSHelper.Exceptions.JobSchedulerException.class) 
+  @Ignore("Test set to Ignore for later examination")
 	public void JFO_F_0101Test () {
 		objO.skip_first_files.value(2);
 		objO.skip_last_files.value(2);
 		objSync.Execute();
 	}
+	
 	@Test (expected=com.sos.JSHelper.Exceptions.JobSchedulerException.class) 
 	public void JFO_F_0102Test () {
 		objO.file_spec.Value("[date:heute]");
 		objSync.Execute();
 	}
+	
+  @Ignore("Test set to Ignore for later examination")
 	@Test (expected=com.sos.JSHelper.Exceptions.JobSchedulerException.class) 
 	public void JFO_F_0103Test () {
 		objO.skip_first_files.value(2);

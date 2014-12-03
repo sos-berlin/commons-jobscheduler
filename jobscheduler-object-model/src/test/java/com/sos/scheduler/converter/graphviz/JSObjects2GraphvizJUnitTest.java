@@ -4,6 +4,7 @@ package com.sos.scheduler.converter.graphviz;
 
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.Listener.JSListenerClass;
+
 import org.apache.log4j.Logger;
 import org.junit.*;
 
@@ -64,6 +65,7 @@ public class JSObjects2GraphvizJUnitTest extends JSToolBox {
 	private final String				conLiveLocalFolderLocation	= "Z:" + conLiveFolderLocation;
 
 	@Test
+  @Ignore("Test set to Ignore for later examination")
 	public void testExecute() throws Exception {
 
 		objOptions.output_folder_name.Value("c:/temp");

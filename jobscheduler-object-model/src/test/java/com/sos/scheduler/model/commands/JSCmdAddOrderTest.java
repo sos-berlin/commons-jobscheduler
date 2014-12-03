@@ -3,6 +3,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
@@ -12,6 +13,7 @@ import com.sos.scheduler.model.answers.ERROR;
 import com.sos.scheduler.model.objects.Params;
 import com.sos.scheduler.model.objects.Spooler;
 
+@Ignore("Test set to Ignore for later examination")
 public class JSCmdAddOrderTest {
 	private final static Logger				logger	= Logger.getLogger(JSCmdAddOrderTest.class);
 	private static SchedulerObjectFactory	factory	= null;

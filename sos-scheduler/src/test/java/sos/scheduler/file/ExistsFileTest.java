@@ -2,9 +2,11 @@ package sos.scheduler.file;
 
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.io.Files.JSFile;
+
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -124,6 +126,7 @@ public class ExistsFileTest extends JSToolBox {
 
 
 	@Test
+  @Ignore("Test set to Ignore for later examination")
 	public void testExistsFile() throws Exception {
 		String location = "Z:/scheduler.test/testsuite_files/files/file_operations/exists/13/in/";
 		HashMap <String, String> objT = new HashMap <String, String>();

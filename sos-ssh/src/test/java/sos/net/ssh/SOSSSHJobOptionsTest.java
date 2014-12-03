@@ -9,6 +9,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.sos.CredentialStore.Options.SOSCredentialStoreOptions;
@@ -86,6 +87,7 @@ public class SOSSSHJobOptionsTest {
 	}
 
 	@Test
+  @Ignore("Test set to Ignore for later examination")
 	public void TestSerialize() throws Exception {
 
 		@SuppressWarnings("unused")
@@ -330,6 +332,7 @@ public class SOSSSHJobOptionsTest {
 //	private final String strKeePassDBFileName = "R:/java.sources/trunk/products/jobscheduler/virtual-file-system/src/test/resources/keepassX-test.kdb";
 	private final String strKeePassDBFileName = "R:/backup/sos/java/junittests/testdata/keepassX-test.kdb";
 	@Test 
+  @Ignore("Test set to Ignore for later examination")
 	public void testCredentialStore2 () {
 		SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
 		SOSCredentialStoreOptions objCSO = objOptions.getCredentialStore().Options();
@@ -344,6 +347,7 @@ public class SOSSSHJobOptionsTest {
 	}
 
 	@Test 
+  @Ignore("Test set to Ignore for later examination")
 	public void testCredentialStore3 () throws Exception {
 		SOSSSHJobOptions objOptions = new SOSSSHJobOptions(SetSSHJobOptionsUsingCredentialStore(new HashMap <String, String>()));
 		assertTrue("not null", objOptions != null);
