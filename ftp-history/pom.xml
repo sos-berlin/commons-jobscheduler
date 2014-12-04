@@ -121,17 +121,15 @@
             <groupId>com.sos-berlin.commons</groupId>
             <artifactId>common-resources</artifactId>
             <version>${project.version}</version>
-            <classifier>tests</classifier>
             <scope>test</scope>
         </dependency>
-		<dependency>
-			<groupId>com.sos-berlin.products-test</groupId>
-			<artifactId>test-resources</artifactId>
-            <version>${project.version}</version>
+
+        <dependency>
+            <groupId>com.sos-berlin.sos-internal-test</groupId>
+            <artifactId>test-resources</artifactId>
             <scope>test</scope>
-		</dependency>
-		
-       
+        </dependency>
+
     </dependencies>
 
 </project>
