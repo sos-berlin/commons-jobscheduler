@@ -4,6 +4,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.sos.JSHelper.Options.SOSOptionTransferType;
@@ -143,6 +144,7 @@ public class SOSVfsHTTPTest {
 	}
 
 	@Test
+  @Ignore("Test set to Ignore for later examination")
 	public void testgetInputStream() throws Exception {
 		connect();
 		authenticate();

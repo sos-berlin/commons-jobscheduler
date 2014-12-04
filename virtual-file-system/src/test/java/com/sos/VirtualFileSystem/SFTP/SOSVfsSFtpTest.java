@@ -7,6 +7,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.sos.JSHelper.Basics.JSToolBox;
@@ -171,6 +172,7 @@ public class SOSVfsSFtpTest extends JSToolBox {
 	}
 
 	@Test(expected = com.sos.JSHelper.Exceptions.JobSchedulerException.class)
+  @Ignore("Test set to Ignore for later examination")
 	public void testConnectWithWrongPortNumber() throws Exception {
 		objOptions.host.Value("wilma.sos");
 		objOptions.port.value(45678);
@@ -358,6 +360,7 @@ public class SOSVfsSFtpTest extends JSToolBox {
 	}
 
 	@Test
+  @Ignore("Test set to Ignore for later examination")
 	public void testDelete() throws Exception {
 		connect();
 		authenticate();
@@ -420,6 +423,7 @@ public class SOSVfsSFtpTest extends JSToolBox {
 	}
 
 	@Test
+  @Ignore("Test set to Ignore for later examination")
 	public void testRename() throws Exception {
 		connect();
 		authenticate();
@@ -564,6 +568,7 @@ public class SOSVfsSFtpTest extends JSToolBox {
 	}
 
 	@Test
+  @Ignore("Test set to Ignore for later examination")
 	public void testGetFilelist() throws Exception {
 		connect();
 		authenticate();
