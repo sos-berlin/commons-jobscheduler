@@ -30,6 +30,8 @@ import com.sos.JSHelper.io.Files.JSTextFile;
  * mechanicaly created by C:\Users\KB\eclipse - Kopie\xsl\JSJobDoc2JSJUnitClass.xsl from http://www.sos-berlin.com at 20120927164148
  * \endverbatim
  */
+// oh 16.04.13 test haengt [SP]
+@Ignore("Test set to Ignore for later examination")
 public class SOSSQLPlusJobJUnitTest extends JSJobUtilitiesClass <SOSSQLPlusJobOptions>{
 	private final static String		conClassName	= "SOSSQLPlusJobJUnitTest";						//$NON-NLS-1$
 	private static Logger			logger			= Logger.getLogger(SOSSQLPlusJobJUnitTest.class);

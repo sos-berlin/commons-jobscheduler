@@ -47,8 +47,11 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
+//oh 18.04.14 No runnable methods [SP]
+@Ignore("Test set to Ignore for later examination")
 public class TestJadeFilesHistorie {
  
 	private String configurationFilename = "c:/temp/hibernate.cfg.xml";

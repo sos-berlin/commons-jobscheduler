@@ -1,6 +1,7 @@
 package sos.scheduler.LaunchAndObserve;
 
 import com.sos.JSHelper.Listener.JSListenerClass;
+
 import org.apache.log4j.Logger;
 import org.junit.*;
 
@@ -31,6 +32,8 @@ import org.junit.*;
 *
 * Created on 25.11.2011 13:13:19
  */
+// oh 15.04.13 test laeuft 5min [SP]
+@Ignore("Test set to Ignore for later examination")
 public class LaunchAndObserveTest {
 	@SuppressWarnings("unused")
 	private final String		conClassName	= "LaunchAndObserveTest";

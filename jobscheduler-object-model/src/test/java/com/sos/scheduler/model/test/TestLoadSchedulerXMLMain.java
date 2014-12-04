@@ -1,6 +1,7 @@
 package com.sos.scheduler.model.test;
 
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 
 /**
 * \class TestLoadSchedulerXML 
@@ -34,6 +35,8 @@ import org.apache.log4j.Logger;
  * @author KB
  *
  */
+// oh 07.05.14 No runnable methods [SP]
+@Ignore("Test set to Ignore for later examination")
 public class TestLoadSchedulerXMLMain {
 
 	@SuppressWarnings("unused")

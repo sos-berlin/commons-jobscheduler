@@ -2,6 +2,8 @@ package com.sos.VirtualFileSystem.TransferHistoryExport;
 
 import java.util.Date;
 
+import org.junit.Ignore;
+
 import com.sos.VirtualFileSystem.Interfaces.IJadeTransferDetailHistoryData;
 
 /**
@@ -32,6 +34,8 @@ import com.sos.VirtualFileSystem.Interfaces.IJadeTransferDetailHistoryData;
 * Created on 20.10.2011 12:02:46
  */
 
+//oh 18.04.14 No runnable methods [SP]
+@Ignore("Test set to Ignore for later examination")
 public class JadeTransferDetailHistoryExportDataTest implements IJadeTransferDetailHistoryData {
 
 	@SuppressWarnings("unused")

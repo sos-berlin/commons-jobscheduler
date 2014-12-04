@@ -2,6 +2,7 @@ package sos.scheduler.InstallationService;
 
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.Listener.JSListenerClass;
+
 import org.apache.log4j.Logger;
 import org.junit.*;
 
@@ -20,6 +21,8 @@ import static org.junit.Assert.assertEquals;
  * mechanicaly created by C:\Users\KB\eclipse\sos.scheduler.xsl\JSJobDoc2JSJUnitClass.xsl from http://www.sos-berlin.com at 20110322142434 
  * \endverbatim
  */
+// oh 07.04.14 deprecated [SP]
+@Ignore("Test set to Ignore for later examination")
 public class JSBatchInstallerJUnitTest extends JSToolBox {
 	@SuppressWarnings("unused")
 	private final static String			conClassName	= "JSBatchInstallerJUnitTest";							//$NON-NLS-1$
