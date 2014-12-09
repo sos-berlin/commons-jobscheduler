@@ -13,6 +13,12 @@
     <name>${project.artifactId}</name>
     <inceptionYear>2014</inceptionYear>
 
+    <scm>
+        <connection>scm:git:git@github.com:sos-berlin/commons-jobscheduler.git</connection>
+        <developerConnection>scm:git:git@github.com:sos-berlin/commons-jobscheduler.git</developerConnection>
+        <url>https://github.com/sos-berlin/commons-jobscheduler</url>
+    </scm>
+
     <modules>
         <module>ftp-history</module>
         <module>h2-connection</module>
