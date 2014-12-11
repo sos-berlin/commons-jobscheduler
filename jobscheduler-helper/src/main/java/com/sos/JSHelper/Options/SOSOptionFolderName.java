@@ -4,8 +4,6 @@ import java.util.HashMap;
 
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.JSHelper.io.Files.JSFile;
-import com.sos.JSHelper.io.Files.JSFolder;
 
 /**
 * \class JSOptionFolderName
@@ -53,7 +51,13 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 	* \details
 	*
 	*/
-	@JSOptionDefinition(name = "CreateFolder", value = "true", description = "Folder anlegen, wenn noch nicht vorhanden", key = "CreateFolder", type = "JSOptionBoolean", mandatory = false)
+	@JSOptionDefinition(
+						name = "CreateFolder",
+						value = "true",
+						description = "Folder anlegen, wenn noch nicht vorhanden",
+						key = "CreateFolder",
+						type = "JSOptionBoolean",
+						mandatory = false)
 	public SOSOptionBoolean	CreateFolder	= new SOSOptionBoolean(objParentClass, // Verweis auf die SOSOptionClass-Instanz
 													".CreateFolder", // Schlüssel, i.d.r. identisch mit dem Namen der Option
 													"Folder anlegen, wenn noch nicht vorhanden", // Kurzbeschreibung
@@ -80,16 +84,6 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 		intOptionType = isOptionTypeFolder;
 	}
 
-	@Override
-	public void Value(final String pstrValue) {
-		super.Value(pstrValue);   // respect changed listener
-		if (isNotNull(pstrValue)) {
-//			if (pstrValue.equals(".")) {
-//				strValue += "/";
-//			}
-		}
-	}
-
 	/**
 	 * \brief Value - Wert der Option liefern
 	 *
@@ -98,10 +92,8 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 	 * @param pstrValue
 	 * @return
 	 */
-	@Override
-	public String Value() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::Value";
+	@Override public String Value() {
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::Value";
 		if (strValue == null) {
 			strValue = "";
 		}
@@ -138,7 +130,7 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 	public String[] getSubFolderArray() {
 		String[] strRet = null;
 		try {
-			String path = strValue.trim().replaceAll("/(\\s*/)+", "/");
+			String path = strValue.trim().replaceAll("/(\\s*/)+","/");
 			String strPath = "";
 			String strSlash = "";
 			int iStart = 0;
@@ -160,29 +152,11 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 		}
 		return strRet;
 	}
-
-	public String[] getSubFolders() {
-		String[] pathArray = null;
-		try {
-			String path = strValue.trim().replaceAll("/(\\s*/)+", "/");
-			String strPath = "";
-			String strSlash = "";
-			int iStart = 0;
-			if (path.startsWith("/")) {
-				strSlash = "/";
-				iStart = 1;
-			}
-			pathArray = path.substring(iStart).split("/");
-		}
-		catch (Exception e) {
-		}
-		return pathArray;
-	}
-
+	
 	public String[] getSubFolderArrayReverse() {
 		String[] strRet = null;
 		try {
-			String path = strValue.trim().replaceAll("/(\\s*/)+", "/");
+			String path = strValue.trim().replaceAll("/(\\s*/)+","/");
 			String strPath = "";
 			String strSlash = "";
 			int iStart = 0;
@@ -192,7 +166,7 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 			}
 			String[] pathArray = path.substring(iStart).split("/");
 			strRet = new String[pathArray.length];
-			int i = pathArray.length - 1;
+			int i = pathArray.length-1;
 			for (String strSubFolder : pathArray) {
 				strPath += strSlash + strSubFolder;
 				strSlash = "/";
@@ -203,89 +177,6 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 		catch (Exception e) {
 		}
 		return strRet;
-	}
-
-	public SOSOptionFolderName getSubFolder(final String pstrSubFolderName) {
-		String strF = this.getAdjustedValue() + pstrSubFolderName;
-		SOSOptionFolderName objF = new SOSOptionFolderName(strF);
-		if (objF.JSFile().exists()) {
-			if (objF.JSFile().isDirectory()) {
-				//				
-			}
-			else {
-				throw new JobSchedulerException(String.format("Path '%1$s' is not a folder", strF));
-			}
-		}
-		else {
-			throw new JobSchedulerException(String.format("Folder '%1$s' does not exists", strF));
-		}
-		return objF;
-	}
-
-	public boolean isAbsolutPath() {
-		boolean strT = true;
-		if (strValue.startsWith("/") == false) {
-			strT = false;
-		}
-		return strT;
-	}
-
-	public boolean isNotHiddenFile() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::isNotHiddenFile";
-		if (strValue.equalsIgnoreCase("..") == false && strValue.equalsIgnoreCase(".") == false) {
-			return true; // not a hidden file
-		}
-		return false; // it is a hidden-file
-	} // public boolean isNotHiddenFile
-
-	public String getName() {
-		return new File(strValue).getName();
-	}
-
-	public String getParentFolderName() {
-		String strParent = new File(strValue).getParent();
-		if (strParent == null) {
-			strParent = ".";
-		}
-		strParent = strParent.replaceAll("\\\\", "/");
-		if (strParent == null || strParent.equals("/")) {
-			strParent = ".";
-		}
-		return strParent;
-	}
-
-	public String getAdjustedValue() {
-		String strRet = strValue.replaceAll("//", "/");
-		strRet = strRet.replaceAll("\\\\\\\\", "\\");
-		if (strRet.endsWith("/") == false) {
-			strRet += "/";
-		}
-		return strRet;
-	}
-
-	public boolean hasSubFolders() {
-		boolean flgRet = false;
-		flgRet = strValue.contains("/") || strValue.contains("\\");
-		return flgRet;
-	}
-
-	public JSFile createFile(String pstrNewFileName) {
-		String strF = this.getAdjustedValue() + pstrNewFileName;
-		JSFile objF = new JSFile(strF);
-		if (objF.exists()) {
-			if (objF.isDirectory()) {
-				throw new JobSchedulerException(String.format("Path '%1$s' is a folder", strF));
-			}
-			else {
-				objF.delete();
-			}
-		}
-		return objF;
-	}
-
-	public JSFolder getFolder() {
-		return new JSFolder(strValue);
 	}
 	
 	private static final HashMap <String, String> defaultProposals = new HashMap<>();
@@ -303,6 +194,4 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 		String[] proposals = SOSOptionFolderName.defaultProposals.keySet().toArray(new String[0]);
 		return proposals;
 	}
-
-
 }

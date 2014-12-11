@@ -124,8 +124,6 @@ public class SOSOptionPortNumber extends SOSOptionInteger {
 	public static final int		conPortWebDav		= 443;						// WebDAV
 	public static final int		conPort4FTPS		= 990;						// ftp
 
-	private int portNum = 0;
-	
 	// SOSOptionPortNumber() {
 	// //
 	// }
@@ -145,10 +143,11 @@ public class SOSOptionPortNumber extends SOSOptionInteger {
 			final String pPstrDefaultValue, final boolean pPflgIsMandatory) {
 		super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
 	}
-
-	public SOSOptionPortNumber(final String pstrPortNumber) {
+  
+  public SOSOptionPortNumber(final String pstrPortNumber) {
 		super(null, null, "", pstrPortNumber, "", false);
 	}
+	
 	public static int getStandardSFTPPort() {
 		return conPort4SFTP;
 	}
@@ -157,16 +156,6 @@ public class SOSOptionPortNumber extends SOSOptionInteger {
 		return conPort4FTP;
 	}
 
-	public boolean isNotEmpty () {
-		
-		if (portNum > 0 && portNum <= 65535) {
-			return true;
-		}
-		else {
-			return false;
-		}
-		
-	}
 	@Override
 	public void Value(final String pstrPortNo) {
 		@SuppressWarnings("unused")
@@ -180,7 +169,7 @@ public class SOSOptionPortNumber extends SOSOptionInteger {
 		try {
 			if (isNotEmpty(strP)) {
 				strP = StripQuotes(strP);
-				portNum = Integer.parseInt(strP);
+				int portNum = Integer.parseInt(strP);
 				if (portNum >= 0 && portNum <= 65535) {
 					super.Value(strP);
 				}

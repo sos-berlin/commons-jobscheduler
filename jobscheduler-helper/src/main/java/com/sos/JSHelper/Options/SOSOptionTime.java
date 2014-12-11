@@ -62,7 +62,7 @@ Stunden:Minuten:Sekunden
  * @author KB
  *
  */
-public class SOSOptionTime extends SOSOptionString {
+public class SOSOptionTime extends SOSOptionInteger {
 
 	private static final long	serialVersionUID	= 6687670638160800096L;
 	@SuppressWarnings("unused")
@@ -71,8 +71,6 @@ public class SOSOptionTime extends SOSOptionString {
 	public final String			ControlType			= "timetext";
 
 	public static String		dateTimeFormat		= new String("yyyy-MM-dd HH:mm:ss");
-
-	private String				strDefaultUoM		= "";
 
 	/**
 	 * \brief SOSOptionTime
@@ -90,7 +88,7 @@ public class SOSOptionTime extends SOSOptionString {
 			final String pPstrDefaultValue, final boolean pPflgIsMandatory) {
 		super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
 	}
-
+	
 	public SOSOptionTime(final String pPstrValue) {
 		this(null, "", "", pPstrValue, pPstrValue, false);
 	}
@@ -124,27 +122,7 @@ public class SOSOptionTime extends SOSOptionString {
 		Calendar now = Calendar.getInstance();
 		return formatter.format(now.getTime());
 	}
-
-	public void value(long plngValue) {
-		lngValue = plngValue;
-	}
-
-	private long	lngValue	= 0;
-
-	public void value(int pintValue) {
-		lngValue = pintValue;
-	}
-
-	@Override
-	public void Value(final String pstrValue) {
-		super.Value(pstrValue);
-		strValue = adjust2TimeFormat();
-	}
-
-	public int value() {
-		return getTimeAsSeconds();
-	}
-
+	
 	public long getTimeAsMilliSeconds() {
 		return getTimeAsSeconds() * 1000L;
 	}
@@ -159,21 +137,15 @@ public class SOSOptionTime extends SOSOptionString {
 	 *
 	 * @return time as seconds
 	 */
-
 	public int getTimeAsSeconds() {
 		int intSeconds = 0;
-		if (lngValue != 0) {
-			intSeconds = (int) lngValue;
-		}
-		else {
-			int[] intM = { 1, 60, 3600, 3600 * 24 };
+		int[] intM = { 1, 60, 3600, 3600 * 24 };
 
-			String[] strT = strValue.split(":");
+		String[] strT = strValue.split(":");
 
-			int j = 0;
-			for (int i = strT.length - 1; i >= 0; i--) {
-				intSeconds += new Integer(strT[i]) * intM[j++];
-			}
+		int j = 0;
+		for (int i = strT.length - 1; i >= 0; i--) {
+			intSeconds += new Integer(strT[i]) * intM[j++];
 		}
 
 		return intSeconds;
@@ -217,67 +189,5 @@ public class SOSOptionTime extends SOSOptionString {
 		strT = df.format(lngValue);
 
 		return strT;
-	}
-
-	public String adjust2TimeFormat() {
-		if (isNotEmpty(strValue)) {
-			if (strValue.indexOf(":") > -1) {
-			}
-			else {
-				if (isNotEmpty(strDefaultUoM)) {
-					strValue = strValue + strDefaultUoM;
-				}
-				// if strDefaultUoM is empty, rest of code will not be reached, like in SOSOptionTimeTest.testUnitOfMeasure
-//				else {
-//					return strValue;
-//				}
-			}
-			int intL = strValue.length();
-			if (strValue.equals("0") == false) {
-				String strT = strValue.substring(intL - 1, intL).toLowerCase();
-				String strN = strValue.substring(0, intL - 1);
-				switch (strT) { // convert the UoM
-					case "w": // weeks
-						int intW = new Integer(strN);
-						strValue = intW * 7 + ":00:00:00";
-						break;
-					case "d": // days
-						strValue = strN + ":00:00:00";
-						break;
-					case "h": // hours
-						strValue = strN + ":00:00";
-						break;
-					case "m": // minutes
-						strValue = strN + ":00";
-						break;
-					case "s": // seconds
-						strValue = strN;
-						break;
-					default: // is seconds
-						strValue = strValue;
-						break;
-				}
-
-				strOriginalValue = strValue;
-			}
-		}
-		return strValue;
-	}
-
-	/**
-	 * @return the defaultUoM
-	 */
-	public String getDefaultUoM() {
-		return strDefaultUoM;
-	}
-
-	/**
-	 * @param defaultUoM the defaultUoM to set
-	 */
-	public void setDefaultUoM(String defaultUoM) {
-		strDefaultUoM = defaultUoM.toLowerCase();
-		if (isNotEmpty(defaultUoM)) {
-			adjust2TimeFormat();
-		}
 	}
 }
