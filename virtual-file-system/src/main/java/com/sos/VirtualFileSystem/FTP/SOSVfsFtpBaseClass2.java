@@ -257,7 +257,7 @@ public class SOSVfsFtpBaseClass2 extends SOSVfsFtpBaseClass implements ISOSVfsFi
 		if (lstrPathName.length() <= 0) {
 			lstrPathName = ".";
 		}
-		if (lstrPathName.equals(".") || lstrPathName.equals("./")) {
+		if (lstrPathName.equals(".")) {
 			lstrPathName = DoPWD();
 			strCurrentDirectory = lstrPathName;
 		}
@@ -271,7 +271,7 @@ public class SOSVfsFtpBaseClass2 extends SOSVfsFtpBaseClass implements ISOSVfsFi
 		}
 		catch (IOException e1) {
 			e1.printStackTrace();
-			throw new JobSchedulerException("listfiles failed", e1);
+			throw new JobSchedulerException("listfiles failed");
 		}
 
 		if (objFTPFileList == null || objFTPFileList.length <= 0) {
@@ -311,12 +311,14 @@ public class SOSVfsFtpBaseClass2 extends SOSVfsFtpBaseClass implements ISOSVfsFi
 				}
 				else {
 					if (flgIsDirectory && flgRecurseSubFolders == true) {
+						if (flgRecurseSubFolders) {
 							// TODO die Directories evtl. in jeweils einem separaten Thread parsen? Bringt das was? Option wäre gut.
 							// TODO special regexp for the folder names?
 							Vector<String> vecNames = getFilenames(strCurrentDirectory + strCurrentFile, flgRecurseSubFolders, regexp);
-							if (vecNames != null && vecNames.size() > 0) {
+							if (vecNames != null & vecNames.size() > 0) {
 								vecDirectoryListing.addAll(vecNames);
 							}
+						}
 					}
 				}
 			}

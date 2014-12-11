@@ -35,25 +35,25 @@ public class JSDateFormat extends SimpleDateFormat {
 	 *
 	 */
 	private static final long	serialVersionUID	= -2570993909578952179L;
-	public final static JSDateFormat	dfTIMESTAMP			= new JSDateFormat("yyyyMMddhhmmssS");
-	public final static JSDateFormat	dfTIMESTAMPS		= new JSDateFormat("yyyyMMddhhmmss");
-	public final static JSDateFormat	dfTIMESTAMPS24		= new JSDateFormat("yyyyMMddHHmmss");
-	public final static JSDateFormat	dfAMERCICAN			= new JSDateFormat("MM/dd/yyyy");
-	public final static JSDateFormat	dfAMERCICAN_SHORT	= new JSDateFormat("MM/dd/yy");
-	public final static JSDateFormat	dfGERMAN			= new JSDateFormat("dd.MM.yyyy");
-	public final static JSDateFormat	dfGERMAN_SHORT		= new JSDateFormat("dd.MM.yy");
-	public final static JSDateFormat	dfGERMAN_TIME		= new JSDateFormat("dd.MM.yyyy' 'HH:mm:ss");
-	public final static JSDateFormat	dfDATE				= new JSDateFormat("yyyy-MM-dd");
-	public final static JSDateFormat	dfDATE_SHORT		= new JSDateFormat("yyyy-MM-dd");
-	public final static JSDateFormat	dfDATE_N8			= new JSDateFormat("yyyyMMdd");
-	public final static JSDateFormat	dfDATE_N6			= new JSDateFormat("yyMMdd");
-	public final static JSDateFormat	dfTIME				= new JSDateFormat("HH:mm:ss");
-	public final static JSDateFormat	dfTIME_EXT			= new JSDateFormat("HH:mm:ss.S");
-	public final static JSDateFormat	dfISO				= new JSDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-	public final static JSDateFormat	dfISO_EXT			= new JSDateFormat("yyyy-MM-dd'T'hh:mm:ss.S");
-	public final static JSDateFormat	dfWEEK		 		= new JSDateFormat("ww");
-	public final static JSDateFormat	dfYEAR_WEEK			= new JSDateFormat("yyyy-ww");
-	public final static JSDateFormat	dfWEEK_YEAR			= new JSDateFormat("ww/yyyy");
+	public static JSDateFormat	dfTIMESTAMP			= new JSDateFormat("yyyyMMddhhmmssS");
+	public static JSDateFormat	dfTIMESTAMPS		= new JSDateFormat("yyyyMMddhhmmss");
+	public static JSDateFormat	dfTIMESTAMPS24		= new JSDateFormat("yyyyMMddHHmmss");
+	public static JSDateFormat	dfAMERCICAN			= new JSDateFormat("MM/dd/yyyy");
+	public static JSDateFormat	dfAMERCICAN_SHORT	= new JSDateFormat("MM/dd/yy");
+	public static JSDateFormat	dfGERMAN			= new JSDateFormat("dd.MM.yyyy");
+	public static JSDateFormat	dfGERMAN_SHORT		= new JSDateFormat("dd.MM.yy");
+	public static JSDateFormat	dfGERMAN_TIME		= new JSDateFormat("dd.MM.yyyy' 'HH:mm:ss");
+	public static JSDateFormat	dfDATE				= new JSDateFormat("yyyy-MM-dd");
+	public static JSDateFormat	dfDATE_SHORT		= new JSDateFormat("yyyy-MM-dd");
+	public static JSDateFormat	dfDATE_N8			= new JSDateFormat("yyyyMMdd");
+	public static JSDateFormat	dfDATE_N6			= new JSDateFormat("yyMMdd");
+	public static JSDateFormat	dfTIME				= new JSDateFormat("HH:mm:ss");
+	public static JSDateFormat	dfTIME_EXT			= new JSDateFormat("HH:mm:ss.S");
+	public static JSDateFormat	dfISO				= new JSDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+	public static JSDateFormat	dfISO_EXT			= new JSDateFormat("yyyy-MM-dd'T'hh:mm:ss.S");
+	public static JSDateFormat	dfWEEK		 		= new JSDateFormat("ww");
+	public static JSDateFormat	dfYEAR_WEEK			= new JSDateFormat("yyyy-ww");
+	public static JSDateFormat	dfWEEK_YEAR			= new JSDateFormat("ww/yyyy");
 
 	public JSDateFormat(final String pstrFormat) {
 		super(pstrFormat);

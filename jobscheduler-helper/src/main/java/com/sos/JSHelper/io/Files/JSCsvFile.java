@@ -53,6 +53,7 @@ package com.sos.JSHelper.io.Files;
 * \see JSCsvFile
 *
  */
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -61,8 +62,11 @@ import java.util.Vector;
 import com.sos.JSHelper.Listener.JSListener;
 
 public class JSCsvFile extends JSTextFile {
+
 	private static final long	serialVersionUID					= 1L;
+
 	private final String		conClassName						= "JSCsvFile";
+
 	/**
 	 * strHeaders - a Header for each Column Headers must be defined by the
 	 * caller
@@ -75,16 +79,18 @@ public class JSCsvFile extends JSTextFile {
 	static public char			VALUE_DELIMITER						= '\"';
 	private char				chrColumnDelimiter					= FIELD_DELIMITER;
 	private char				chrRecordDelimiter					= BLOCK_DELIMITER;
-	private final char			chrValueDelimiter					= VALUE_DELIMITER;
-	private final char			chrEscapeCharacter					= '\\';
+	private final char				chrValueDelimiter					= VALUE_DELIMITER;
+	private final char				chrEscapeCharacter					= '\\';
 	// private Reader reader;
 	private boolean				flgIsNewline;
 	/** boolean IgnoreValueDelimiter: Ignore Value Delimiter */
 	private boolean				flgIgnoreValueDelimiter				= false;
 	private boolean				flgHeadersWritten					= false;
-	/** boolean AlwaysSurroundFieldsWithQuotes: AlwaysSurroundFieldsWithQuotes */
-	private boolean				flgAlwaysSurroundFieldsWithQuotes	= true;
+
+	/** boolean AlwaysSurroundFielJSithQuotes: AlwaysSurroundFielJSithQuotes */
+	private boolean				flgAlwaysSurroundFielJSithQuotes	= true;
 	private int					lngNoOfFieldsInBuffer				= 0;
+
 	/**
 	 * \change Donnerstag, 5. März 2009 EQCPN IGNORECOLS
 	 * Zeilen mit falscher Anzahl an Spalten überlesen
@@ -92,11 +98,13 @@ public class JSCsvFile extends JSTextFile {
 	private int					intFieldCount						= 0;
 	private int					intRecordCount						= 0;
 	private boolean				flgFieldCount						= true;
+
 	private boolean				flgCheckColumnCount					= true;
 
 	// should bbb,,,ccc be considered to be two elements?
 	// useful for log parsing.
 	// private boolean consume;
+
 	/*
 	 * ---------------------------------------------------------------------------
 	 * <method type="smcw" version="1.0"> <name></name> <title>Represents a
@@ -132,13 +140,20 @@ public class JSCsvFile extends JSTextFile {
 	}
 
 	public boolean CheckColumnCount() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::CheckColumnCount";
+
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::CheckColumnCount";
+
 		return flgCheckColumnCount;
 	} // public boolean CheckColumnCount}
 
 	public void CheckColumnCount(final boolean pflgCheckColumnCount) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::CheckColumnCount";
+
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::CheckColumnCount";
+
 		flgCheckColumnCount = pflgCheckColumnCount;
+
 	} // public void CheckColumnCount
 
 	public JSCsvFile Headers(final String[] pstrHeaders) throws Exception {
@@ -148,6 +163,7 @@ public class JSCsvFile extends JSTextFile {
 	}
 
 	public JSCsvFile Headers(final ArrayList<String> fields) throws Exception {
+
 		strHeaders = new String[fields.size()];
 		for (int j = 0; j < fields.size(); j++) {
 			strHeaders[j] = fields.get(j);
@@ -227,7 +243,7 @@ public class JSCsvFile extends JSTextFile {
 			if (str == null) { // EOF
 				break;
 			}
-			if (str.equals(END_OF_LINE) && intColumnCount == intFieldCount) { // EOL
+			if (str == END_OF_LINE && intColumnCount == intFieldCount) { // EOL
 				flgFieldCount = false;
 				break;
 			}
@@ -235,17 +251,19 @@ public class JSCsvFile extends JSTextFile {
 				intFieldCount++; // Anzahl Spalten des ersten Satzes
 			}
 			intColumnCount++;
-			if (str.equals(END_OF_LINE)) { // EOL
+			if (str == END_OF_LINE) { // EOL
 				list.add("");
 				break;
 			}
 			list.add(str);
 		}
+
 		if (intColumnCount != intFieldCount) {
 			if (flgCheckColumnCount == true) {
 				message("WARN: problem in record " + intRecordCount + " - " + intFieldCount + " columns expected, but the record contains " + intColumnCount);
 			}
 		}
+
 		if (list.isEmpty() || intColumnCount != intFieldCount && flgCheckColumnCount == true) {
 			return null;
 			//			if (intColumnCount > 0 && list.get(0).startsWith("#") == false) {
@@ -255,6 +273,7 @@ public class JSCsvFile extends JSTextFile {
 		}
 		//- </newcode>
 		//- </remark>      <!-- id=<IGNORECOLS>  -->
+
 		return list.toArray(new String[0]);
 	}
 
@@ -280,17 +299,21 @@ public class JSCsvFile extends JSTextFile {
 	 * @throws IOException
 	 */
 	public String readCSVField() throws IOException {
+
 		if (flgIsNewline) { // End of line occured
 			flgIsNewline = false;
 			return END_OF_LINE;
 		}
+
 		StringBuffer stbBuffer = new StringBuffer();
 		boolean flgFieldIsQuoted = false;
 		int intLast = -1;
 		int ch = Reader().read();
+
 		if (ch == -1) {
 			return null;
 		}
+
 		if (ch == chrValueDelimiter && !flgIgnoreValueDelimiter) {
 			flgFieldIsQuoted = true;
 		}
@@ -307,6 +330,7 @@ public class JSCsvFile extends JSTextFile {
 				}
 			}
 		}
+
 		while ((ch = Reader().read()) != -1) {
 			if (ch == chrRecordDelimiter && !flgFieldIsQuoted) {
 				final int intL = stbBuffer.length();
@@ -343,6 +367,7 @@ public class JSCsvFile extends JSTextFile {
 			}
 			stbBuffer.append((char) ch);
 		}
+
 		final String strR = RemoveNewLineChar(stbBuffer);
 		// message (strR);
 		return strR;
@@ -361,6 +386,7 @@ public class JSCsvFile extends JSTextFile {
 	 */
 	private String RemoveNewLineChar(final StringBuffer pstrB) {
 		String strB = pstrB.toString();
+
 		int intL = pstrB.length();
 		if (intL > 1) {
 			intL--;
@@ -370,25 +396,30 @@ public class JSCsvFile extends JSTextFile {
 			}
 		}
 		return strB;
+
 	}
 
 	public String readCSVField(final String pstrColumnName) throws Exception {
 		if (strHeaders == null) {
 			loadHeaders();
 		}
+
 		if (strCurrentLine == null) {
 			nextBlock();
 			if (strCurrentLine == null) {
 				return null;
 			}
 		}
+
 		int idx = -1;
 		for (int i = 0; i < strHeaders.length; i++) {
 			if (pstrColumnName.equalsIgnoreCase(strHeaders[i])) {
 				idx = i;
 			}
 		}
+
 		String strFieldValue = null;
+
 		if (idx != -1) {
 			strFieldValue = strCurrentLine[idx];
 			strCurrentLine = null;
@@ -396,6 +427,7 @@ public class JSCsvFile extends JSTextFile {
 		else {
 			message(String.format("ColumnName '%1$s' not found in Headers.", pstrColumnName));
 		}
+
 		return strFieldValue;
 	}
 
@@ -416,18 +448,22 @@ public class JSCsvFile extends JSTextFile {
 	}
 
 	public JSCsvFile append(final Object[] fields) throws Exception {
+
 		final StringBuffer buffer = new StringBuffer();
+
 		for (int i = 0; i < fields.length; i++) {
 			buffer.append(MaskSpecialChars(String.valueOf(fields[i])));
 			if (i < fields.length - 1) {
 				buffer.append(chrColumnDelimiter);
 			}
 		}
+
 		Write(buffer.toString());
 		return this;
 	}
 
 	public JSCsvFile append(final Vector<String> fields) throws Exception {
+
 		final StringBuffer buffer = new StringBuffer();
 		final int intSize = fields.size();
 		for (int i = 0; i < intSize; i++) {
@@ -441,6 +477,7 @@ public class JSCsvFile extends JSTextFile {
 	}
 
 	public JSCsvFile append(final Iterator<String> fields) throws Exception {
+
 		final StringBuffer buffer = new StringBuffer();
 		while (fields.hasNext()) {
 			final String elem = fields.next();
@@ -461,9 +498,11 @@ public class JSCsvFile extends JSTextFile {
 	 * @throws Exception
 	 */
 	public JSCsvFile AddCellValues(final Object[] fields) throws Exception {
+
 		for (final Object field : fields) {
 			AddCellValue(String.valueOf(field));
 		}
+
 		return this;
 	}
 
@@ -475,6 +514,7 @@ public class JSCsvFile extends JSTextFile {
 	 * @throws Exception
 	 */
 	public JSCsvFile AddCellValues(final Iterator<String> fields) throws Exception {
+
 		this.append(fields);
 		return this;
 	}
@@ -490,8 +530,12 @@ public class JSCsvFile extends JSTextFile {
 	 * @return JSCsvFile
 	 * @throws Exception
 	 */
-	@Override public JSCsvFile NewLine() throws Exception {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::NewLine";
+	@Override
+	public JSCsvFile NewLine() throws Exception {
+
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::NewLine";
+
 		super.NewLine();
 		lngNoOfFieldsInBuffer = 0;
 		return this;
@@ -510,15 +554,14 @@ public class JSCsvFile extends JSTextFile {
 	 * @throws Exception
 	 */
 	public JSCsvFile AddCellValue(final String pstrS) throws Exception {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::AddCellValue";
-		String strT = pstrS;
-		if (pstrS == null) {
-			strT = "";
-		}
+
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::AddCellValue";
+
 		if (NoOfCharsInBuffer() > 0 || lngNoOfFieldsInBuffer > 0) {
 			OutChar(chrColumnDelimiter);
 		}
-		OutString(MaskSpecialChars(strT));
+		OutString(MaskSpecialChars(pstrS));
 		lngNoOfFieldsInBuffer++;
 		return this;
 	}
@@ -528,38 +571,45 @@ public class JSCsvFile extends JSTextFile {
 	 *
 	 * Hier werden die Textbegrenzer (Standard ist doppelte Anführungszeichen
 	 * '"'; siehe Option \c ColumnDelimiter) in den Text eingebaut, falls es
-	 * gefordert (Option \c AlwaysSurroundFieldsWithQuotes) oder durch den Text
+	 * gefordert (Option \c AlwaysSurroundFielJSithQuotes) oder durch den Text
 	 * selbst erforderlich ist.
 	 *
 	 * Beginnt der Text bereits mit dem Textbegrenzer, so werden alle
 	 * Textbegrenzer verdoppelt und der gesamte Text nocheinmal in einfache
 	 * Begrenzer eingeschlossen. Ist der Text leer, werden Textbegrenzer
 	 * eingesetzt, auch dann nicht, wenn über die Option
-	 * AlwaysSurroundFieldsWithQuotes welche angefordert worden sind.
+	 * AlwaysSurroundFielJSithQuotes welche angefordert worden sind.
 	 *
 	 * @param strT zu modifizierender Text
 	 *
 	 * @return modifizierter Text
 	 */
 	private String MaskSpecialChars(String strT) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::MaskSpecialChars";
+
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::MaskSpecialChars";
+
 		boolean flgSurroundWithQuotes = false;
 		final String strDelim = String.valueOf(chrValueDelimiter);
+
 		final int iPos = strT.indexOf(chrValueDelimiter);
 		if (iPos >= 0) { // -1 is an andicator for "nothing found"
 			strT = strT.replace(strDelim, strDelim + strDelim);
 			flgSurroundWithQuotes = true;
 		}
-		if (strT.length() > 0 && flgAlwaysSurroundFieldsWithQuotes) {
+		if (strT.length() > 0 && flgAlwaysSurroundFielJSithQuotes) {
 			flgSurroundWithQuotes = true;
 		}
+
 		if (flgSurroundWithQuotes || strT.indexOf(chrColumnDelimiter) > 0 || strT.indexOf('\r') > 0 || strT.indexOf('\n') > 0) {
 			strT = strDelim + strT + strDelim;
 		}
+
 		return strT;
 	}
 
-	@SuppressWarnings("unused") private CharSequence munge(final CharSequence field) {
+	@SuppressWarnings("unused")
+	private CharSequence munge(final CharSequence field) {
 		final StringBuffer buffer = new StringBuffer();
 		char c = 0;
 		for (int i = 0; i < field.length(); i++) {
@@ -577,9 +627,9 @@ public class JSCsvFile extends JSTextFile {
 
 	/*
 	 * ---------------------------------------------------------------------------
-	 * <method type="smcw" version="1.0"> <name>AlwaysSurroundFieldsWithQuotes</name>
-	 * <title>AlwaysSurroundFieldsWithQuotes</title> <description> <para>
-	 * AlwaysSurroundFieldsWithQuotes </para> <para> Initial-Wert (Default) ist
+	 * <method type="smcw" version="1.0"> <name>AlwaysSurroundFielJSithQuotes</name>
+	 * <title>AlwaysSurroundFielJSithQuotes</title> <description> <para>
+	 * AlwaysSurroundFielJSithQuotes </para> <para> Initial-Wert (Default) ist
 	 * "true" (ohne Anführungszeichen). </para> <mandatory>true</mandatory>
 	 * </description> <params> <param name="param1" type=" "
 	 * ref="byref|byvalue|out" > <para> </para> </param> </params> <keywords>
@@ -588,34 +638,37 @@ public class JSCsvFile extends JSTextFile {
 	 * ----------------------------------------------------------------------------
 	 */
 	/**
-	 * @brief AlwaysSurroundFieldsWithQuotes - AlwaysSurroundFieldsWithQuotes
+	 * @brief AlwaysSurroundFielJSithQuotes - AlwaysSurroundFielJSithQuotes
 	 *
-	 * Getter: AlwaysSurroundFieldsWithQuotes
+	 * Getter: AlwaysSurroundFielJSithQuotes
 	 *
 	 * Example:
 	 *
-	 * @return Returns the AlwaysSurroundFieldsWithQuotes.
+	 * @return Returns the AlwaysSurroundFielJSithQuotes.
 	 */
-	public boolean AlwaysSurroundFieldsWithQuotes() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::AlwaysSurroundFieldsWithQuotes";
-		return flgAlwaysSurroundFieldsWithQuotes;
-	} // boolean AlwaysSurroundFieldsWithQuotes()
+	public boolean AlwaysSurroundFielJSithQuotes() {
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::AlwaysSurroundFielJSithQuotes";
+		return flgAlwaysSurroundFielJSithQuotes;
+	} // boolean AlwaysSurroundFielJSithQuotes()
 
 	/*
-	 * ! AlwaysSurroundFieldsWithQuotes - AlwaysSurroundFieldsWithQuotes
+	 * ! AlwaysSurroundFielJSithQuotes - AlwaysSurroundFielJSithQuotes
 	 *
-	 * Setter: AlwaysSurroundFieldsWithQuotes
+	 * Setter: AlwaysSurroundFielJSithQuotes
 	 *
-	 * @param pflgAlwaysSurroundFieldsWithQuotes: The boolean
-	 * AlwaysSurroundFieldsWithQuotes to set.
+	 * @param pflgAlwaysSurroundFielJSithQuotes: The boolean
+	 * AlwaysSurroundFielJSithQuotes to set.
 	 */
-	public JSCsvFile AlwaysSurroundFieldsWithQuotes(final boolean pflgAlwaysSurroundFieldsWithQuotes) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::AlwaysSurroundFieldsWithQuotes";
-		flgAlwaysSurroundFieldsWithQuotes = pflgAlwaysSurroundFieldsWithQuotes;
+	public JSCsvFile AlwaysSurroundFielJSithQuotes(final boolean pflgAlwaysSurroundFielJSithQuotes) throws Exception {
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::AlwaysSurroundFielJSithQuotes";
+		flgAlwaysSurroundFielJSithQuotes = pflgAlwaysSurroundFielJSithQuotes;
 		return this;
-	} // public void AlwaysSurroundFieldsWithQuotes(boolean
+	} // public void AlwaysSurroundFielJSithQuotes(boolean
 
-	// pflgAlwaysSurroundFieldsWithQuotes)
+	// pflgAlwaysSurroundFielJSithQuotes)
+
 	/* ---------------------------------------------------------------------------
 	<method type="smcw" version="1.0">
 	<name>IgnoreValueDelimiter</name>
@@ -664,7 +717,8 @@ public class JSCsvFile extends JSTextFile {
 	 * @return Returns the IgnoreValueDelimiter.
 	 */
 	public boolean IgnoreValueDelimiter() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::IgnoreValueDelimiter";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::IgnoreValueDelimiter";
 		return flgIgnoreValueDelimiter;
 	} // boolean IgnoreValueDelimiter()
 
@@ -676,7 +730,8 @@ public class JSCsvFile extends JSTextFile {
 	 * @param pflgIgnoreValueDelimiter: The boolean IgnoreValueDelimiter to set.
 	 */
 	public JSCsvFile IgnoreValueDelimiter(final boolean pflgIgnoreValueDelimiter) throws Exception {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::IgnoreValueDelimiter";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::IgnoreValueDelimiter";
 		flgIgnoreValueDelimiter = pflgIgnoreValueDelimiter;
 		return this;
 	} // public void IgnoreValueDelimiter(boolean pflgIgnoreValueDelimiter)
@@ -686,7 +741,7 @@ public class JSCsvFile extends JSTextFile {
 	 *
 	 * \details
 	 *
-	* @version $Id$2009-03-05-EQCPN
+* @version $Id$2009-03-05-EQCPN
 	 * \return void
 	 *
 	 * @param pchrRecordDelimiter
@@ -696,9 +751,12 @@ public class JSCsvFile extends JSTextFile {
 	}
 
 	public void write(final String[] pstrCells) throws Exception {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::write";
+
+		@SuppressWarnings("unused")
+		final String	conMethodName	= conClassName + "::write";
+
 		String strT = "";
-		for (int i = 0; i < pstrCells.length; i++) {
+		for (int i =0; i < pstrCells.length; i++) {
 			if (pstrCells[i] == null) {
 				pstrCells[i] = "";
 			}
@@ -707,24 +765,33 @@ public class JSCsvFile extends JSTextFile {
 			}
 			strT += pstrCells[i] + FIELD_DELIMITER;
 		}
+
 		if (bufWriter == null) {
 			Writer();
 		}
-		bufWriter.write(strT);
-	} // public void write}
 
+		bufWriter.write(strT);
+
+	} // public void write}
 	public void WriteLine(final String[] pstrCells) throws Exception {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::WriteLine";
-		write(pstrCells);
+
+		@SuppressWarnings("unused")
+		final String	conMethodName	= conClassName + "::WriteLine";
+
+		write (pstrCells);
 		this.WriteLine("");
 	} // public void WriteLine
 
 	public String AdjustCsvValue(final String pstrV) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::AdjustCsvValue";
+
+		@SuppressWarnings("unused")
+		final String	conMethodName	= conClassName + "::AdjustCsvValue";
+
 		String strT = pstrV;
 		if (pstrV.indexOf(FIELD_DELIMITER) > 0) {
 			strT = VALUE_DELIMITER + strT + VALUE_DELIMITER;
 		}
 		return strT;
 	} // public String AdjustCsvValue
+
 } // public class JSCsvFile

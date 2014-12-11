@@ -98,7 +98,7 @@ public class JSXMLFile extends JSTextFile /* implements ErrorHandler */{
 	protected HashMap<String, String>	hsmParameters											= null;
 
 	public JSXMLFile() {
-		super("");
+		super(null);
 		// nothing to do
 	}
 
@@ -535,12 +535,10 @@ public class JSXMLFile extends JSTextFile /* implements ErrorHandler */{
 					new StreamResult(new java.io.OutputStreamWriter(System.out)));
 		}
 		else {
-			FileOutputStream objFOS = new FileOutputStream(outputFile); 
 			transformer.transform(objDS, // ...
-					new StreamResult(objFOS));
+					new StreamResult(new FileOutputStream(outputFile)));
 			// transformer.transform(new StreamSource(fleFile), // ...
 			// new StreamResult(new FileOutputStream(outputFile)));
-			objFOS.close();
 		}
 	}
 

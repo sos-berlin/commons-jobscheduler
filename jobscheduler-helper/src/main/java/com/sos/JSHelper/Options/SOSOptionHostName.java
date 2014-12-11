@@ -29,7 +29,7 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 * <br />---------------------------------------------------------------------------
 * </p>
 * \author KB
-* @version $Id$12.07.2010
+* @version $Id: SOSOptionHostName.java 27127 2014-09-09 18:18:39Z kb $12.07.2010
 * \see reference
 *
 * Created on 12.07.2010 14:02:15

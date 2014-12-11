@@ -25,19 +25,19 @@ import com.sos.JSHelper.interfaces.ISOSSmtpMailOptions;
  */
 @JSOptionClass(name = "SOSSmtpMailOptions", description = "Launch and observe any given job or job chain")
 public class SOSSmtpMailOptions extends SOSSmtpMailOptionsSuperClass implements ISOSSmtpMailOptions {
-	private static final long	serialVersionUID	= 6441074884525254517L;
-	private final String		conClassName		= "SOSSmtpMailOptions";						//$NON-NLS-1$
-	private static Logger		logger				= Logger.getLogger(SOSSmtpMailOptions.class);
+	private static final long	serialVersionUID		= 6441074884525254517L;
+	private final String		conClassName			= "SOSSmtpMailOptions";						//$NON-NLS-1$
+	private static Logger		logger					= Logger.getLogger(SOSSmtpMailOptions.class);
 	@SuppressWarnings("unused")
-	private static final String	conSVNVersion		= "$Id$";
+	private static final String	conSVNVersion			= "$Id$";
 	// TODO über Prefix OnError_, OnSuccess_, OnEmptyFiles_ adressieren
 	@JSOptionClass(description = "", name = "SOSSmtpMailOptions")
-	private SOSSmtpMailOptions	objMailOnError		= null;
+	private SOSSmtpMailOptions	objMailOnError			= null;
 	@JSOptionClass(description = "", name = "SOSSmtpMailOptions")
-	private SOSSmtpMailOptions	objMailOnSuccess	= null;
+	private SOSSmtpMailOptions	objMailOnSuccess		= null;
 	@JSOptionClass(description = "", name = "SOSSmtpMailOptions")
-	private SOSSmtpMailOptions	objMailOnEmptyFiles	= null;
-	//	private String				strAlternativePrefix	= "";
+	private SOSSmtpMailOptions	objMailOnEmptyFiles		= null;
+	private String				strAlternativePrefix	= "";
 	public enum enuMailClasses {
 		MailDefault, MailOnError, MailOnSuccess, MailOnEmptyFiles;
 	}
@@ -49,11 +49,6 @@ public class SOSSmtpMailOptions extends SOSSmtpMailOptionsSuperClass implements 
 		super();
 	} // public SOSSmtpMailOptions
 
-	public SOSSmtpMailOptions(final String pstrPrefix) {
-		this();
-		strAlternativePrefix = pstrPrefix;
-	} // public SOSSmtpMailOptions
-
 	public SOSSmtpMailOptions(final JSListener pobjListener) {
 		this();
 		this.registerMessageListener(pobjListener);
@@ -62,7 +57,6 @@ public class SOSSmtpMailOptions extends SOSSmtpMailOptionsSuperClass implements 
 	public SOSSmtpMailOptions getOptions(final enuMailClasses penuMailClass) {
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::getOptions";
-		initChildOptions();
 		SOSSmtpMailOptions objO = objMailOnError;
 		switch (penuMailClass) {
 			case MailOnError:
@@ -82,9 +76,9 @@ public class SOSSmtpMailOptions extends SOSSmtpMailOptionsSuperClass implements 
 
 	private void initChildOptions() {
 		if (objMailOnError == null) {
-			objMailOnError = new SOSSmtpMailOptions("MailOnError_");
-			objMailOnSuccess = new SOSSmtpMailOptions("MailOnSuccess_");
-			objMailOnEmptyFiles = new SOSSmtpMailOptions("MailOnEmptyFiles_");
+			objMailOnError = new SOSSmtpMailOptions();
+			objMailOnSuccess = new SOSSmtpMailOptions();
+			objMailOnEmptyFiles = new SOSSmtpMailOptions();
 		}
 	}
 
@@ -105,18 +99,6 @@ public class SOSSmtpMailOptions extends SOSSmtpMailOptionsSuperClass implements 
 		setAllOptions(JSSettings, strAlternativePrefix);
 		logger.trace(this.dirtyString());
 	} // public SOSSmtpMailOptions (HashMap JSSettings)
-
-	public String DirtyString() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::DirtyString";
-		clearBuffer();
-		String strD = concatIfNotEmpty(super.dirtyString());
-		initChildOptions();
-		strD += concatIfNotEmpty(objMailOnError.dirtyString());
-		strD += concatIfNotEmpty(objMailOnSuccess.dirtyString());
-		strD += concatIfNotEmpty(objMailOnEmptyFiles.dirtyString());
-		return strD;
-	} // private String DirtyString
 
 	/**
 	 * \brief CheckMandatory - prüft alle Muss-Optionen auf Werte

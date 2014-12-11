@@ -28,7 +28,6 @@ import com.sos.JSHelper.Options.SOSOptionTransferType;
 import com.sos.JSHelper.Options.SOSOptionTransferType.enuTransferTypes;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
-import com.sos.VirtualFileSystem.exceptions.JADEException;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 /**
@@ -58,7 +57,9 @@ import com.sos.i18n.annotation.I18NResourceBundle;
  * @author KB
  *
  */
-@I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
+@I18NResourceBundle(
+					baseName = "SOSVirtualFileSystem",
+					defaultLocale = "en")
 public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	private static final String		conFileNameExtensionJADEConfigFile	= ".jadeconf";
 	@SuppressWarnings("unused")
@@ -68,7 +69,6 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	public static final String		conSchedulerEnvVarPrefix			= "scheduler_param_";
 	// TODO über einen Parameter vorgeben lassen
 	public static final String		conSOSFtpEnvVarPrefix				= "sosftp_";
-	public static final String		conJadeEnvVarPrefix					= "sosftp_";
 	public static final String		conVariableEND						= "}";
 	public static final String		conSystemPropertyFILE_SEPARATOR		= "file.separator";
 	private static final String		conOperationSEND					= "send";
@@ -79,7 +79,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	private static final long		serialVersionUID					= -8219289268940238015L;
 	private final String			conClassName						= "SOSFTPOptions";
 	private static final Logger		logger								= Logger.getLogger(VFSFactory.getLoggerName());
-	private Properties				propJadeEnvironmentVars				= null;
+	private Properties				propSOSFtpEnvironmentVars			= null;
 	private Properties				schedulerParams						= null;
 	@SuppressWarnings("unused")
 	private boolean					zeroByteFiles						= false;
@@ -91,14 +91,18 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	private boolean					flgSettingsFileProcessed			= false;
 	// Map<String, String> variables = null;
 	private Properties				propAllEnvironmentVariables			= null;
-	@JSOptionClass(description = "objConnectionOptions", name = "SOSConnection2Options")
+	@JSOptionClass(
+					description = "objConnectionOptions",
+					name = "SOSConnection2Options")
 	private SOSConnection2Options	objConnectionOptions;
-	@JSOptionClass(description = "objMailOptions", name = "objMailOptions")
+	@JSOptionClass(
+					description = "objMailOptions",
+					name = "objMailOptions")
 	private SOSSmtpMailOptions		objMailOptions;
 	public boolean					flgCumulativeTargetDeleted			= false;
 
 	public SOSFTPOptions(final SOSOptionTransferType.enuTransferTypes penuTransferType) {
-		this();
+		super();
 		switch (penuTransferType) {
 			case webdav:
 				auth_method.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
@@ -132,7 +136,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 
 	public SOSFTPOptions(final SOSOptionTransferType.enuTransferTypes penuTransferTypeSource,
 			final SOSOptionTransferType.enuTransferTypes penuTransferTypeTarget) {
-		this();
+		super();
 		switch (penuTransferTypeSource) {
 			case webdav:
 				auth_method.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
@@ -147,8 +151,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	}
 
 	private void changeDefaults(final SOSOptionTransferType.enuTransferTypes penuTransferType, final SOSConnection2OptionsAlternate pobjOpt) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::changeDefaults";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::changeDefaults";
 		switch (penuTransferType) {
 			case webdav:
 				pobjOpt.auth_method.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
@@ -183,13 +186,11 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 
 	public SOSFTPOptions() {
 		super();
-		getConnectionOptions();
-		getMailOptions(); // initialize
+		//
 	}
 
 	public SOSSmtpMailOptions getMailOptions() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getMailOptions";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getMailOptions";
 		if (objMailOptions == null) {
 			objMailOptions = new SOSSmtpMailOptions();
 		}
@@ -231,7 +232,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		}
 	}
 
-	public void setChildClasses(final HashMap<String, String> JSSettings) {
+	private void setChildClasses(final HashMap<String, String> JSSettings)  {
 		try {
 			if (objConnectionOptions == null) {
 				objConnectionOptions = new SOSConnection2Options(JSSettings);
@@ -312,15 +313,13 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	 * @throws JSExceptionMandatoryOptionMissing, Exception
 	 *
 	 */
-	@Override
-	public void CheckMandatory() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::CheckMandatory";
+	@Override public void CheckMandatory() {
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::CheckMandatory";
 		if (flgCheckMandatoryDone == true) {
 			return;
 		}
 		operation.CheckMandatory();
-		if (operation.isOperationMove()) {
+		if (operation.Value().equalsIgnoreCase(enuJadeOperations.move.Text())) {
 			remove_files.value(true);
 		}
 		if (TransactionMode.isTrue()) {
@@ -328,12 +327,12 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 				atomic_suffix.Value("~");
 			}
 		}
-		if (operation.isOperationGetList()) {
+		if (operation.Value().equalsIgnoreCase(enuJadeOperations.getlist.Text())) {
 			remove_files.setFalse();
 		}
 		checkURLParameter(this.getConnectionOptions().Source());
 		checkURLParameter(this.getConnectionOptions().Target());
-
+		
 		String strSourceP = Source().getprotocol().Value();
 		String localDir = local_dir.Value();
 		if (isEmpty(localDir) == true) {
@@ -342,8 +341,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			localDir += "";
 		}
 		if (Source().url.isDirty() && SourceDir.isNotDirty()) {
-			localDir = Source().url.getFolderName();
-			SourceDir.Value(localDir);
+			SourceDir.Value(Source().url.getFolderName());
 		}
 		if (Target().url.isDirty() && TargetDir.isNotDirty()) {
 			TargetDir.Value(Target().url.getFolderName());
@@ -352,12 +350,11 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		 * credentialStore?
 		 */
 		checkCredentialStore(Source());
-		if (NeedTargetClient() == true) {
-			checkCredentialStore(Target());
-		}
+		checkCredentialStore(Target());
 		if (Source().replacing.IsNotEmpty() && Source().replacement.IsNotEmpty()) {
 			remove_files.setFalse();
 		}
+		super.CheckMandatory();
 		// TODO mandatory options in datatarget/datasource prüfen. Interface erweitern um checkmandatory
 		// TODO in die Options-Klasse, falls nicht schon drin ist ....
 		if (localDir.startsWith("\\\\")) {
@@ -366,10 +363,10 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			}
 		}
 		local_dir.Value(localDir);
-		// TODO in die Options-Klasse, falls es nicht schon drin ist ....
+		// TODO in die Options-Klasse, falls nicht schon drin ist ....
 		if (localDir.startsWith(conURIPrefixFILE)) {
 			if (new File(createURI(localDir)).exists() == false) {
-				throw new JADEException(SOSVfsMessageCodes.SOSVfs_E_0010.params(localDir));
+				throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_0010.params(localDir));
 			}
 		}
 		checkReplaceAndReplacing(Target());
@@ -409,14 +406,12 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		}
 		setDefaultPort(this.Source().protocol, this.Source().port);
 		setDefaultPort(this.Target().protocol, this.Target().port);
-
 		setDefaultPort(protocol, port);
-
 		if (file_path.isDirty()) {
 			if (file_spec.isDirty()) {
 				file_path.Value("");
 				String strT = getOptionNamesAsString(new SOSOptionElement[] { file_path, file_spec });
-				//				throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_0030.params(strT));
+//				throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_0030.params(strT));
 			}
 			if (RecurseSubFolders.value() == true) {
 				String strT = getOptionNamesAsString(new SOSOptionElement[] { file_path, recursive });
@@ -427,7 +422,6 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			throw new JobSchedulerException(String.format("SOSVfs-E-0000: one of these parameters must be specified: '%1$s', %2$s', '%3$s'",
 					file_path.getShortKey(), FileNamePatternRegExp.getShortKey(), FileListName.getShortKey()));
 		}
-
 		if (zero_byte_transfer.String2Bool() == true) {
 			TransferZeroByteFiles(true);
 			setZeroByteFilesStrict(false);
@@ -452,12 +446,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		getDataSourceType();
 		getDataTargetType();
 		if (CheckNotProcessedOptions.value() == true) {
-			this.ReportNotProcessedOptions();
-		}
-		super.CheckMandatory();
-		Source().CheckMandatory();
-		if (NeedTargetClient() == true) {
-			Target().CheckMandatory();
+			this.CheckNotProcessedOptions();
 		}
 		flgCheckMandatoryDone = true;
 	} // private void CheckMandatory
@@ -478,16 +467,15 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			pobjO.checkCredentialStoreOptions();
 		}
 	}
-
-	private void checkURLParameter(final SOSConnection2OptionsAlternate pobjO) {
+	
+	private void checkURLParameter (final SOSConnection2OptionsAlternate pobjO) {
 		if (pobjO.url.isDirty()) {
 			pobjO.url.getOptions(pobjO);
 		}
 	}
 
 	private void setDefaultPort(final SOSOptionTransferType pobjTransferTyp, final SOSOptionPortNumber pobjPort) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::setDefaultPort";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setDefaultPort";
 		if (pobjTransferTyp.isSFtp()) {
 			if (pobjPort.isDirty() == false) {
 				pobjPort.value(SOSOptionPortNumber.conPort4SFTP);
@@ -504,8 +492,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		}
 	} // private void setDefaultPort
 
-	@SuppressWarnings("unused")
-	private boolean isSourceDirSpecified() {
+	@SuppressWarnings("unused") private boolean isSourceDirSpecified() {
 		final String conMethodName = conClassName + "::isSourceDirSpecified";
 		boolean flgResult = false;
 		if (local_dir.IsEmpty() && SourceDir.IsEmpty() && Source().FolderName.IsEmpty()) {
@@ -518,8 +505,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	} // private boolean isSourceDirSpecified
 
 	private String getOptionNamesAsString(final SOSOptionElement[] objA) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getOptionNamesAsString";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getOptionNamesAsString";
 		String strRet = "";
 		for (SOSOptionElement sosOptionElement : objA) {
 			if (strRet.length() > 0) {
@@ -540,8 +526,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	 *
 	 * @return
 	 */
-	@Override
-	public boolean isAtomicTransfer() {
+	@Override public boolean isAtomicTransfer() {
 		boolean flgIsAtomicTransfer = atomic_prefix.IsNotEmpty() || atomic_suffix.IsNotEmpty();
 		return flgIsAtomicTransfer;
 	}
@@ -560,15 +545,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	private Properties getEnvVars() throws Exception {
 		// TODO raus hier. die Routine ist zu generell und muß in die Shell-Klasse
 		try {
-			propJadeEnvironmentVars = new Properties();
-			// Additional Variables
-			propJadeEnvironmentVars.put("uuid", "");
-			propJadeEnvironmentVars.put("date", SOSOptionTime.getCurrentDateAsString());
-			propJadeEnvironmentVars.put("time", SOSOptionTime.getCurrentTimeAsString("hh:mm:ss"));
-			propJadeEnvironmentVars.put("local_user", System.getProperty("user.name"));
-			java.net.InetAddress localMachine = java.net.InetAddress.getLocalHost();
-			propJadeEnvironmentVars.put("localhost", localMachine.getHostName());
-			propJadeEnvironmentVars.put("local_host_ip", localMachine.getHostAddress());
+			propSOSFtpEnvironmentVars = new Properties();
 			// TODO SchedulerParams hat hier nichts zu suchen. Die müssen "von oben" über den JS-Adapter in die Klassen gereicht werden
 			schedulerParams = new Properties();
 			int intSOSFtpEnvVarPrefixLen = conSOSFtpEnvVarPrefix.length();
@@ -581,16 +558,11 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 				//				logger.debug("getEnvVars() - " + key + "=" + value); //$NON-NLS-1$ //$NON-NLS-2$
 				if (key.startsWith(conSOSFtpEnvVarPrefix)) {
 					key = key.substring(intSOSFtpEnvVarPrefixLen);
-					propJadeEnvironmentVars.setProperty(key, value);
-					continue;
-				}
-				if (key.startsWith(conJadeEnvVarPrefix)) {
-					key = key.substring(conJadeEnvVarPrefix.length());
-					propJadeEnvironmentVars.setProperty(key, value);
+					propSOSFtpEnvironmentVars.setProperty(key, value);
 					continue;
 				}
 				if (key.startsWith("current_pid") || key.startsWith("ppid")) {
-					propJadeEnvironmentVars.setProperty(key, value);
+					propSOSFtpEnvironmentVars.setProperty(key, value);
 					continue;
 				}
 				// TODO obsolet. must come from the JSAdapter as a Property-Collection
@@ -599,7 +571,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 					continue;
 				}
 			}
-			return propJadeEnvironmentVars;
+			return propSOSFtpEnvironmentVars;
 		}
 		catch (Exception e) {
 			String strM = SOSVfsMessageCodes.SOSVfs_E_161.params("reading environment", e.toString());
@@ -618,8 +590,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	 * @param pstrArgs
 	 * @throws Exception
 	 */
-	@Override
-	public void CommandLineArgs(final String[] pstrArgs) {
+	@Override public void CommandLineArgs(final String[] pstrArgs)  {
 		super.CommandLineArgs(pstrArgs);
 		this.setAllOptions(super.objSettings);
 		boolean flgFound = false;
@@ -656,10 +627,8 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	 * @param pobjJSSettings
 	 * @throws Exception
 	 */
-	@Override
-	public void setAllOptions(final HashMap<String, String> pobjJSSettings) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::setAllOptions";
+	@Override public void setAllOptions(final HashMap<String, String> pobjJSSettings)  {
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setAllOptions";
 		flgSetAllOptions = true;
 		objSettings = pobjJSSettings;
 		super.Settings(objSettings);
@@ -677,9 +646,6 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		// populate all the Options for "source_" and "target_" ....
 		setChildClasses(hshMap);
 	} // public void setAllOptions (HashMap <String, String> JSSettings)
-	Properties			objAllParams				= new Properties();
-	SOSStandardLogger	objSOSLogger				= null;
-	String				strConfigurationFileName	= "";
 
 	/**
 	 *
@@ -694,47 +660,101 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	// TODO move 'ReadSettingsFile' to JSOptionClass
 	public HashMap<String, String> ReadSettingsFile() {
 		// TODO use the virtual file-system to allow access to diffent types of setting-stores
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::ReadSettingsFile";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::ReadSettingsFile";
 		settings.CheckMandatory();
 		profile.CheckMandatory();
 		HashMap<String, String> map = new HashMap<String, String>();
 		Properties objGlobals = null;
+		SOSStandardLogger objSOSLogger = null;
 		SOSConfiguration objConf = null;
-		Properties objParamsFromConfigFile = new Properties();
-		strConfigurationFileName = settings.Value();
-		objAllParams = new Properties();
+		Properties objP = new Properties();
 		try {
-			objSOSLogger = new SOSStandardLogger(0);
-			getEnvVars();// TODO replace SOSConfigurations by a "ini-File-only" approach, to avoid dependencies on job-scheduler
-			addProtectedProperties2Options(propAllEnvironmentVariables, "Environment");
-			addProtectedProperties2Options(schedulerParams, "JobSchedulerParam");
-			addProtectedProperties2Options(propJadeEnvironmentVars, "JADE_EnvVars");
-			// TODO discard ^M at the end of the line to avoid conflicts with windows -> unix-files
-			objConf = new SOSConfiguration(strConfigurationFileName, "globals", objSOSLogger);
-			objGlobals = objConf.getParameterAsProperties();
-			objConf = new SOSConfiguration(strConfigurationFileName, profile.Value(), objSOSLogger);
-			if (objConf.getParameterAsProperties().size() <= 0) {
-				String strM = SOSVfsMessageCodes.SOSVfs_E_0060.params(profile.Value(), strConfigurationFileName);
-				logger.error(strM, new JobSchedulerException(strM));
-				throw new JobSchedulerException(strM);
+			{
+				objSOSLogger = new SOSStandardLogger(0);
+				getEnvVars();// TODO replace SOSConfigurations by a "ini-File-only" approach, to avoid dependencies on job-scheduler
+				// TODO discard ^M at the end of the line to avoid conflicts with windows -> unix-files
+				objConf = new SOSConfiguration(settings.Value(), "globals", objSOSLogger);
+				objGlobals = objConf.getParameterAsProperties();
+				objConf = new SOSConfiguration(settings.Value(), profile.Value(), objSOSLogger);
+				if (objConf.getParameterAsProperties().size() <= 0) {
+					String strM = SOSVfsMessageCodes.SOSVfs_E_0060.params(profile.Value(), settings.Value());
+					logger.error(strM, new JobSchedulerException(strM));
+					throw new JobSchedulerException(strM);
+				}
+				objP.putAll(objGlobals);
+				objP.putAll(objConf.getParameterAsProperties());
 			}
-			addProtectedProperties2Options(objGlobals, strConfigurationFileName + "/globals");
-			objParamsFromConfigFile.putAll(objConf.getParameterAsProperties());
-			objAllParams.putAll(objConf.getParameterAsProperties());
-			resolveIncludes(objParamsFromConfigFile, null, strConfigurationFileName);
-			//
-			for (Object k : objParamsFromConfigFile.keySet()) {
+			ResolveIncludes:
+			while (true) {
+				Properties objIncludes = new Properties();
+				boolean flgIncludeFound = false;
+				for (Object k : objP.keySet()) {
+					String strKey = (String) k;
+					String strValue = (String) objP.get(k);
+					logger.trace("ReadSettingsFile() - Property. Key = " + strKey + ", val = " + strValue);
+					if (isIncludeDirective(strKey)) {
+						String[] strValues = strValue.split("[;|,]");
+						String strIncludePrefix = getIncludePrefix(strKey);
+						for (String strV : strValues) {
+							strV = strV.trim();
+							SOSConfiguration config_ = new SOSConfiguration(settings.Value(), strV, objSOSLogger);
+							if (config_.getParameterAsProperties().size() <= 0) {
+								String strM = SOSVfsMessageCodes.SOSVfs_E_0000.params(strV, settings.Value());
+								logger.error(strM);
+								throw new JobSchedulerException(strM);
+							}
+							objIncludes.putAll(config_.getParameterAsProperties(strIncludePrefix));
+						}
+						flgIncludeFound = true;
+					}
+					//					else {
+					//						if (isIniComment(strKey) == false) {
+					//							// TODO check duplicate Entry but take into account, that includes are in effect
+					//							objIncludes.put(strKey, strValue);
+					//						}
+					//					}
+				} // for
+				if (objIncludes.size() > 0 && flgIncludeFound == true) {
+					flgIncludeProcessingInProgress = true;
+					this.setAllOptions(objIncludes);
+					setChildClasses(objIncludes);
+					flgIncludeProcessingInProgress = false;
+					isFragment.setFalse();
+					break ResolveIncludes;
+				}
+				else {
+					break ResolveIncludes;
+				}
+			} // ResolveIncludes
+				// Additional Variables
+			objP.put("uuid", "");
+			objP.put("date", SOSOptionTime.getCurrentDateAsString());
+			objP.put("time", SOSOptionTime.getCurrentTimeAsString("hh:mm:ss"));
+			objP.put("local_user", System.getProperty("user.name"));
+			java.net.InetAddress localMachine = java.net.InetAddress.getLocalHost();
+			objP.put("localhost", localMachine.getHostName());
+			objP.put("local_host_ip", localMachine.getHostAddress());
+			for (Object k : objP.keySet()) {
 				String strKey = (String) k;
 				if (strKey.equalsIgnoreCase("uuid") == true) {
-					objParamsFromConfigFile.put(strKey, UUID.randomUUID().toString());
+					objP.put(strKey, UUID.randomUUID().toString());
 				}
-				String strValue = (String) objParamsFromConfigFile.get(k);
+				String strValue = (String) objP.get(k);
 				if (hasVariableToSubstitute(strValue) == true && gflgSubsituteVariables == true) {
 					logger.trace("ReadSettingsFile() - Key = " + strKey + ", value = " + strValue); //$NON-NLS-1$ //$NON-NLS-2$
-					strValue = SubstituteVariables(strValue, objAllParams, "${", conVariableEND);
-					strValue = SubstituteVariables(strValue, objAllParams, "%{", conVariableEND);
-					strValue = SubstituteVariables(strValue, objAllParams, "%", "%");
+					strValue = SubstituteVariables(strValue, objP, "${", conVariableEND);
+					strValue = SubstituteVariables(strValue, objP, "%{", conVariableEND);
+					strValue = SubstituteVariables(strValue, objP, "%", "%");
+					strValue = SubstituteVariables(strValue, propSOSFtpEnvironmentVars, "${", conVariableEND);
+					strValue = SubstituteVariables(strValue, propSOSFtpEnvironmentVars, "%{", conVariableEND);
+					strValue = SubstituteVariables(strValue, propSOSFtpEnvironmentVars, "%", "%");
+					strValue = SubstituteVariables(strValue, propAllEnvironmentVariables, "${", conVariableEND);
+					strValue = SubstituteVariables(strValue, propAllEnvironmentVariables, "%{", conVariableEND);
+					strValue = SubstituteVariables(strValue, propAllEnvironmentVariables, "%", "%");
+					// TODO wrong place: has to come from the JS-Adapter as properties
+					strValue = SubstituteVariables(strValue, schedulerParams, "${", conVariableEND);
+					strValue = SubstituteVariables(strValue, schedulerParams, "%{", conVariableEND);
+					strValue = SubstituteVariables(strValue, schedulerParams, "%", "%");
 					if (hasVariableToSubstitute(strValue)) {
 						String strM = SOSVfsMessageCodes.SOSVfs_W_0070.params(strValue, strKey);
 						logger.warn(strM);
@@ -753,83 +773,6 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		return map;
 	} // private void ReadSettingsFile
 
-	private void resolveIncludes(final Properties pobjProps, final String pstrIncludePrefix, final String pstrConfigurationFileName) {
-		ResolveIncludes: while (true) {
-			for (Object k : pobjProps.keySet()) {
-				String strKey = (String) k;
-				String strValue = (String) pobjProps.get(k);
-				logger.trace("ReadSettingsFile() - Property. Key = " + strKey + ", val = " + strValue);
-				try {
-					if (isIncludeDirective(strKey)) {
-						String[] strNamesOfFragments2Include = strValue.split("[;|,]");
-						String strIncludePrefix = pstrIncludePrefix;
-						if (pstrIncludePrefix == null) {
-							strIncludePrefix = getIncludePrefix(strKey);
-						}
-						for (String strFragmentName : strNamesOfFragments2Include) {
-							strFragmentName = strFragmentName.trim();
-							String strConfig = pstrConfigurationFileName;
-							if (strFragmentName.toLowerCase().startsWith("file:")) {
-								File objFile = null;
-								strConfig = strFragmentName.substring(5);
-								if (strConfig.startsWith("./")) {
-									strConfig = strConfig.substring(2);
-									objFile = new File(new File(pstrConfigurationFileName).getParent(), strConfig);
-								}
-								else {
-									objFile = new File(strConfig);
-								}
-								strFragmentName = objFile.getName(); // dummy operation
-								strConfig = objFile.getParent();
-							}
-							SOSConfiguration config_ = new SOSConfiguration(strConfig, strFragmentName, objSOSLogger);
-							if (config_.getParameterAsProperties().size() <= 0) {
-								String strM = SOSVfsMessageCodes.SOSVfs_E_0000.params(strFragmentName, strConfig);
-								logger.error(strM);
-								throw new JobSchedulerException(strM);
-							}
-							Properties objIncludedParameter = config_.getParameterAsProperties(strIncludePrefix);
-							addProtectedProperties2Options(objIncludedParameter, strConfig + "/" + strFragmentName);
-							if (hasIncludeDirectives(objIncludedParameter)) {
-								resolveIncludes(objIncludedParameter, strIncludePrefix, strConfig);
-							}
-						}
-					}
-				}
-				catch (Exception e) {
-					e.printStackTrace();
-				}
-			} // for
-			break ResolveIncludes;
-		} // ResolveIncludes
-	}
-
-	private boolean hasIncludeDirectives(final Properties pobjProps) {
-		boolean flgR = false;
-		for (Object k : pobjProps.keySet()) {
-			String strKey = (String) k;
-			if (strKey.matches(".*(include)$")) {
-				flgR = true;
-				break;
-			}
-		}
-		return flgR;
-
-	}
-
-	//
-	private void addProtectedProperties2Options(final Properties pobjProps, final String pstrIncludeName) {
-		flgIncludeProcessingInProgress = true;
-		gstrIncludeSectionName = pstrIncludeName;
-		this.setAllOptions(pobjProps);
-		setChildClasses(pobjProps);
-		flgIncludeProcessingInProgress = false;
-		gstrIncludeSectionName = "";
-		isFragment.setFalse();
-		objAllParams.putAll(pobjProps);
-	}
-
-	@SuppressWarnings("el-syntax")
 	private boolean hasVariableToSubstitute(final String pstrValue) {
 		boolean flgResult = false;
 		if (pstrValue.indexOf("${") != -1 || pstrValue.indexOf("%{") != -1) {
@@ -839,8 +782,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	}
 
 	private boolean isIniComment(final String pstrText) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::isIniComment";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::isIniComment";
 		return pstrText.trim().startsWith(";");
 	} // private boolean isIniComment
 	String[]	strIncludeDirectives	= new String[] { "include", "source_include", "target_include", "jump_include", "alternate_include",
@@ -848,8 +790,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	String[]	strIncludePrefixes		= new String[] { "", "source_", "target_", "jump_", "alternate_", "alternatesource_", "alternatetarget_" };
 
 	public boolean isIncludeDirective(final String pstrText) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::isIncludeDirective";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::isIncludeDirective";
 		boolean flgR = false;
 		for (String strText : strIncludeDirectives) {
 			if (pstrText.equalsIgnoreCase(strText)) {
@@ -874,8 +815,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	}
 
 	public String SubstituteVariables(String txt, final Properties prop, final String startPrefix, final String endPrefix) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::SubstituteVariables";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::SubstituteVariables";
 		try {
 			for (Object k : prop.keySet()) {
 				String key = (String) k;
@@ -891,9 +831,8 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 					}
 					// logger.debug(String.format("found '%1$s'", strSearchFor));
 					int intEscaped = txt.indexOf("\\" + strSearchFor);
-					if (intEscaped > -1 && intEscaped == pos1 - 1) {
+					if (intEscaped > -1 && intEscaped == pos1 - 1)
 						pos1 = -1;
-					}
 					pos2 = pos1 + strSearchFor.length();
 					if (pos1 > -1 && pos2 > pos1) {
 						txt = txt.substring(0, pos1) + strValue + txt.substring(pos2);
@@ -924,12 +863,10 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 				String fs = System.getProperty(conSystemPropertyFILE_SEPARATOR);
 				if (fs.length() == 1) {
 					char sep = fs.charAt(0);
-					if (sep != '/') {
+					if (sep != '/')
 						path = path.replace(sep, '/');
-					}
-					if (path.charAt(0) != '/') {
+					if (path.charAt(0) != '/')
 						path = '/' + path;
-					}
 				}
 				if (!path.startsWith(conURIPrefixFILE)) {
 					path = conURIPrefixFILE + path;
@@ -971,8 +908,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	 * @return
 	 */
 	public String getDataTargetType() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getDataTargetType";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getDataTargetType";
 		String strDataTargetType = "";
 		if (operation.Value().equalsIgnoreCase(conOperationSEND)) {
 			strDataTargetType = protocol.Value();
@@ -1045,8 +981,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	}
 
 	private void CopyValue(final SOSOptionElement objTo, final SOSOptionElement objFrom) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::CopyValue";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::CopyValue";
 		if (objTo.isNotDirty()) {
 			objTo.Value(objFrom.Value());
 		}
@@ -1063,8 +998,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	 * @return
 	 */
 	public String getDataSourceType() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getDataSourceType";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getDataSourceType";
 		String strDataSourceType = "";
 		if (operation.Value().equalsIgnoreCase(conOperationSEND)) {
 			strDataSourceType = enuTransferTypes.local.Text();
@@ -1076,25 +1010,25 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			objT.host.Value(SOSOptionHostName.conLocalHostName);
 			objT.port.value(0);
 			objT.protocol.Value(strDataSourceType);
-			objT.user.Set(user);
-			objT.password.Set(password);
-			objT.ssh_auth_file.Set(ssh_auth_file);
-			objT.ssh_auth_method.Set(ssh_auth_method);
-			objT.passive_mode.Set(passive_mode);
+			objT.user = user;
+			objT.password = password;
+			objT.ssh_auth_file = ssh_auth_file;
+			objT.ssh_auth_method = ssh_auth_method;
+			objT.passive_mode = passive_mode;
 			objT = this.getConnectionOptions().Target();
-			objT.host.Set(host);
-			objT.port.Set(port);
-			objT.protocol.Set(protocol);
-			objT.user.Set(user);
-			objT.password.Set(password);
-			objT.ssh_auth_file.Set(ssh_auth_file);
-			objT.ssh_auth_method.Set(ssh_auth_method);
-			objT.passive_mode.Set(passive_mode);
+			objT.host = host;
+			objT.port = port;
+			objT.protocol = protocol;
+			objT.user = user;
+			objT.password = password;
+			objT.ssh_auth_file = ssh_auth_file;
+			objT.ssh_auth_method = ssh_auth_method;
+			objT.passive_mode = passive_mode;
 			SOSConnection2OptionsSuperClass objAlt = objT.Alternatives();
-			objAlt.host.Set(alternative_host);
-			objAlt.port.Set(alternative_port);
-			objAlt.protocol.Set(protocol);
-			objT.passive_mode.Set(alternative_passive_mode);
+			objAlt.host.Value(alternative_host.Value());
+			objAlt.port.value(alternative_port.value());
+			objAlt.protocol.Value(protocol.Value());
+			objT.passive_mode.Value(alternative_passive_mode.Value());
 		}
 		else {
 			if (operation.Value().equalsIgnoreCase(conOperationRECEIVE)) {
@@ -1104,19 +1038,19 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 				}
 				changeDirValues4Receive();
 				SOSConnection2OptionsAlternate objT = this.getConnectionOptions().Source();
-				objT.host.Set(host);
-				objT.port.Set(port);
-				objT.protocol.Set(protocol);
-				objT.passive_mode.Set(passive_mode);
-				objT.user.Set(user);
-				objT.password.Set(password);
-				objT.ssh_auth_file.Set(ssh_auth_file);
-				objT.ssh_auth_method.Set(ssh_auth_method);
+				objT.host.Value(host.Value());
+				objT.port.value(port.value());
+				objT.protocol.Value(protocol.Value());
+				objT.passive_mode.Value(passive_mode.Value());
+				objT.user = user;
+				objT.password = password;
+				objT.ssh_auth_file = ssh_auth_file;
+				objT.ssh_auth_method = ssh_auth_method;
 				SOSConnection2OptionsSuperClass objAlt = objT.Alternatives();
-				objAlt.host.Set(alternative_host);
-				objAlt.port.Set(alternative_port);
-				objAlt.protocol.Set(protocol);
-				objT.passive_mode.Set(alternative_passive_mode);
+				objAlt.host.Value(alternative_host.Value());
+				objAlt.port.value(alternative_port.value());
+				objAlt.protocol.Value(protocol.Value());
+				objT.passive_mode.Value(alternative_passive_mode.Value());
 			}
 			else {
 				strDataSourceType = this.getConnectionOptions().Source().protocol.Value();
@@ -1130,8 +1064,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		return strDataSourceType;
 	} // private String getDataSourceType
 
-	@SuppressWarnings("unused")
-	private void ReplicateConnectionOptions(SOSConnection2OptionsAlternate objT) {
+	@SuppressWarnings("unused") private void ReplicateConnectionOptions(SOSConnection2OptionsAlternate objT) {
 		final String conMethodName = conClassName + "::ReplicateConnectionOptions";
 		objT.host.Value(SOSOptionHostName.conLocalHostName);
 		objT.port.value(0);
@@ -1148,8 +1081,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	} // private void ReplicateConnectionOptions
 
 	private void changeDirValues() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::changeDirValues";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::changeDirValues";
 		ChangeValue(SourceDir, local_dir);
 		ChangeValue(TargetDir, remote_dir);
 		ChangeValue(local_dir, SourceDir);
@@ -1159,15 +1091,13 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	} // private void changeDirValues
 
 	private void changeDirValues4Receive() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::changeDirValues";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::changeDirValues";
 		ChangeValue(SourceDir, remote_dir);
 		ChangeValue(TargetDir, local_dir);
 	} // private void changeDirValues
 
 	private void ChangeValue(final SOSOptionElement pobjTarget, final SOSOptionElement pobjSource) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::ChangeValue";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::ChangeValue";
 		if (pobjTarget.IsEmpty() == true /* && pobjTarget.isDirty() == false */) {
 			if (pobjSource.IsEmpty() == false) {
 				logger.trace(SOSVfsMessageCodes.SOSVfs_I_263.params(pobjTarget.getKey(), pobjSource.Value()));
@@ -1187,8 +1117,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	 * @return
 	 */
 	public boolean DoNotOverwrite() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::DoNotOverwrite";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::DoNotOverwrite";
 		boolean flgT = overwrite_files.value() == false && append_files.value() == false;
 		return flgT;
 	} // private boolean DoNotOverwrite
@@ -1277,20 +1206,17 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	}
 
 	public SOSConnection2OptionsAlternate Source() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::Source";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::Source";
 		return getConnectionOptions().Source();
 	} // private SOSConnection2OptionsAlternate Source
 
 	public SOSConnection2OptionsAlternate Target() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::Source";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::Source";
 		return getConnectionOptions().Target();
 	} // private SOSConnection2OptionsAlternate Source
 
 	public boolean NeedTargetClient() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::NeedTargetClient";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::NeedTargetClient";
 		boolean flgNeedTargetClient = true;
 		switch (operation.value()) {
 			case delete:
@@ -1305,8 +1231,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	} // private boolean NeedTargetClient
 
 	public SOSFTPOptions getClone() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getClone";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getClone";
 		SOSFTPOptions objClone = new SOSFTPOptions();
 		String strB = this.getOptionsAsCommandLine();
 		objClone.CommandLineArgs(strB);
@@ -1314,8 +1239,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	} // private SOSFTPOptions getClone
 
 	public void ClearJumpParameter() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::ClearJumpParameter";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::ClearJumpParameter";
 		String strNullString = null;
 		jump_user.Value(strNullString);
 		jump_password.Value(strNullString);
@@ -1327,8 +1251,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	} // private void ClearJumpParameter
 
 	public boolean isFilePollingEnabled() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::isFilePollingEnabled";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::isFilePollingEnabled";
 		boolean flgFilePollingEnabled = false;
 		if ((poll_timeout.isDirty() || PollingDuration.isDirty()) && skip_transfer.isFalse()) {
 			flgFilePollingEnabled = true;
@@ -1337,21 +1260,15 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	} // private boolean isFilePollingEnabled
 
 	public String DirtyString() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::DirtyString";
-		clearBuffer();
-		clearBuffer();
-		String strD = super.dirtyString();
-		strD += concatIfNotEmpty(Source().DirtyString());
-		strD += concatIfNotEmpty(Target().DirtyString());
-		strD += concatIfNotEmpty(getMailOptions().DirtyString());
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::DirtyString";
+		String strD = "\n" + super.dirtyString();
+		strD += "\n" + Source().dirtyString();
+		strD += "\n" + Target().dirtyString();
 		return strD;
 	} // private String DirtyString
 
-	@Override
-	public SOSOptionRegExp getreplacing() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getreplacing";
+	@Override public SOSOptionRegExp getreplacing() {
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getreplacing";
 		SOSOptionRegExp objR = super.getreplacing();
 		if (Target().getreplacing().isDirty()) {
 			objR = Target().getreplacing();
@@ -1359,10 +1276,8 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		return objR;
 	} // private SOSOptionRegExp getreplacing
 
-	@Override
-	public SOSOptionString getreplacement() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getreplacement";
+	@Override public SOSOptionString getreplacement() {
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getreplacement";
 		SOSOptionString objR = super.getreplacement();
 		if (Target().getreplacement().isDirty()) {
 			objR = Target().getreplacement();

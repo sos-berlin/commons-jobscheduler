@@ -1,18 +1,5 @@
 package com.sos.VirtualFileSystem.DataElements;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-import java.io.IOException;
-import java.lang.management.ManagementFactory;
-
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import com.sos.JSHelper.Listener.JSListenerClass;
 import com.sos.JSHelper.io.Files.JSFile;
 import com.sos.VirtualFileSystem.DataElements.SOSFileListEntry.enuTransferStatus;
@@ -20,6 +7,14 @@ import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
+import org.apache.log4j.Logger;
+import org.junit.*;
+
+import java.io.IOException;
+import java.lang.management.ManagementFactory;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
 * \class SOSFileListEntryTest 
@@ -90,17 +85,6 @@ public class SOSFileListEntryTest extends JSListenerClass {
 	public void tearDown() throws Exception {
 	}
 
-	@Test
-	public void testEnuTransferStatus () {
-		enuTransferStatus eStatus = enuTransferStatus.FileNotFound;
-		String strT = eStatus.name();
-		System.out.println(strT + ", " + eStatus.description + ", " + eStatus.MsgCode);
-		
-		String[] strA = enuTransferStatus.getArray();
-		for (String string : strA) {
-			System.out.println(string);
-		}
-	}
 	// @Test
 	public void testVfsHandler() {
 		fail("Not yet implemented");
@@ -121,14 +105,6 @@ public class SOSFileListEntryTest extends JSListenerClass {
 		// fail("Not yet implemented");
 	}
 
-	@Test
-	public void testFileNameWithBackSlash () {
-		String strF = "c:\\temp\\nest\\text.txt";
-		System.out.println(strF);
-		strF = strF.replaceAll("\\\\", "\\\\\\\\");
-		System.out.println(strF);
-		strF = "";
-	}
 	// @Test
 	public void testGetFile() {
 		// fail("Not yet implemented");

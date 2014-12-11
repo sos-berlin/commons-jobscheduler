@@ -21,6 +21,7 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Listener.JSListener;
 import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Options.SOSOptionCommandString;
+import com.sos.JSHelper.Options.SOSOptionElement;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 /**
@@ -40,21 +41,27 @@ import com.sos.i18n.annotation.I18NResourceBundle;
  * mechanicaly created by JobDocu2OptionsClass.xslt from http://www.sos-berlin.com at 20100917112404
  * \endverbatim
  */
-@JSOptionClass(name = "SOSConnection2OptionsAlternate", description = "Options for a connection to an uri (server, site, e.g.)")
-@I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
+@JSOptionClass(
+				name = "SOSConnection2OptionsAlternate",
+				description = "Options for a connection to an uri (server, site, e.g.)")
+@I18NResourceBundle(
+					baseName = "SOSVirtualFileSystem",
+					defaultLocale = "en")
 public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperClass {
-	private final String			conClassName		= this.getClass().getSimpleName();
-	private KeePassDataBase			keePassDb			= null;
-	private KeePassDataBaseV1		kdb1				= null;
+	private final String		conClassName			= this.getClass().getSimpleName();
+	private KeePassDataBase		keePassDb				= null;
+	private KeePassDataBaseV1	kdb1					= null;
 	@SuppressWarnings("unused")
-	private static final String		conSVNVersion		= "$Id$";
-	private final Logger			logger				= Logger.getLogger(this.getClass());
+	private static final String	conSVNVersion			= "$Id$";
+	@SuppressWarnings("unused")
+	private final Logger		logger					= Logger.getLogger(this.getClass());
 	/**
 	 *
 	 */
-	private static final long		serialVersionUID	= 5924032437179660014L;
-	public boolean					isSource			= false;
-
+	private static final long	serialVersionUID		= 5924032437179660014L;
+	private String				strAlternativePrefix	= "";
+	public boolean				isSource				= false;
+	
 	/**
 	 * \option PreFtpCommands
 	 * \type SOSOptionString
@@ -69,8 +76,13 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 	 *
 	 * \created 05.04.2011 15:45:52 by KB
 	 */
-	@JSOptionDefinition(name = "PreTransferCommands", description = "FTP commands, which has to be executed before the transfer started.", key = "PreTransferCommands", type = "SOSOptionCommandString", mandatory = false)
-	public SOSOptionCommandString	PreTransferCommands	= new SOSOptionCommandString(
+	@JSOptionDefinition(
+						name = "PreTransferCommands",
+						description = "FTP commands, which has to be executed before the transfer started.",
+						key = "PreTransferCommands",
+						type = "SOSOptionCommandString",
+						mandatory = false)
+	public SOSOptionCommandString	PreTransferCommands		= new SOSOptionCommandString(
 														// ...
 																this, // ....
 																conClassName + ".pre_transfer_commands", // ...
@@ -81,17 +93,15 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 	/**
 	 * \see PreFtpCommands
 	 */
-	public SOSOptionCommandString	PreFtpCommands		= (SOSOptionCommandString) PreTransferCommands.SetAlias("pre_transfer_commands");
+	public SOSOptionCommandString			PreFtpCommands	= (SOSOptionCommandString) PreTransferCommands.SetAlias("pre_transfer_commands");
 
 	public String getPreTransferCommands() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getPreTransferCommands";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getPreTransferCommands";
 		return PreTransferCommands.Value();
 	} // public String getPreFtpCommands
 
 	public SOSConnection2OptionsAlternate setPreTransferCommands(final String pstrValue) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::setPreTransferCommands";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setPreTransferCommands";
 		PreTransferCommands.Value(pstrValue);
 		return this;
 	} // public SOSFtpOptionsSuperClass setPreFtpCommands
@@ -109,7 +119,12 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 	 *
 	 * \created 05.04.2011 15:45:52 by KB
 	 */
-	@JSOptionDefinition(name = "PostTransferCommands", description = "FTP commands, which has to be executed after the transfer ended.", key = "PostTransferCommands", type = "SOSOptionCommandString", mandatory = false)
+	@JSOptionDefinition(
+						name = "PostTransferCommands",
+						description = "FTP commands, which has to be executed after the transfer ended.",
+						key = "PostTransferCommands",
+						type = "SOSOptionCommandString",
+						mandatory = false)
 	public SOSOptionCommandString	PostTransferCommands	= new SOSOptionCommandString(
 															// ...
 																	this, // ....
@@ -124,14 +139,12 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 	public SOSOptionCommandString	PostFtpCommands			= (SOSOptionCommandString) PostTransferCommands.SetAlias("post_Transfer_commands");
 
 	public String getPostTransferCommands() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getPostTransferCommands";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getPostTransferCommands";
 		return PostTransferCommands.Value();
 	} // public String getPostTransferCommands
 
 	public SOSConnection2OptionsAlternate setPostTransferCommands(final String pstrValue) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::setPostTransferCommands";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setPostTransferCommands";
 		PostTransferCommands.Value(pstrValue);
 		return this;
 	} // public SOSFtpOptionsSuperClass setPostTransferCommands
@@ -148,25 +161,28 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 	 *
 	 * \created 11.07.2013 20:04:54 by KB
 	 */
-	@JSOptionDefinition(name = "IgnoreCertificateError", description = "Ignore a SSL Certificate Error", key = "IgnoreCertificateError", type = "SOSOptionBoolean", mandatory = true)
-	public SOSOptionBoolean	IgnoreCertificateError	= new SOSOptionBoolean(
-													// ...
-															this, // ....
-															conClassName + ".IgnoreCertificateError", // ...
-															"Ignore a SSL Certificate Error", // ...
-															"true", // ...
-															"true", // ...
-															true);
+	@JSOptionDefinition(
+						name = "IgnoreCertificateError",
+						description = "Ignore a SSL Certificate Error",
+						key = "IgnoreCertificateError",
+						type = "SOSOptionBoolean",
+						mandatory = true)
+	public SOSOptionBoolean		IgnoreCertificateError	= new SOSOptionBoolean(
+														// ...
+																this, // ....
+																conClassName + ".IgnoreCertificateError", // ...
+																"Ignore a SSL Certificate Error", // ...
+																"true", // ...
+																"true", // ...
+																true);
 
 	public boolean getIgnoreCertificateError() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getIgnoreCertificateError";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getIgnoreCertificateError";
 		return IgnoreCertificateError.value();
 	} // public String getIgnoreCertificateError
 
 	public SOSConnection2OptionsAlternate setIgnoreCertificateError(final boolean pflgValue) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::setIgnoreCertificateError";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setIgnoreCertificateError";
 		IgnoreCertificateError.value(pflgValue);
 		return this;
 	} // public SOSConnection2OptionsAlternate setIgnoreCertificateError
@@ -182,7 +198,12 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 	 *
 	 * \created 24.08.2012 20:44:05 by KB
 	 */
-	@JSOptionDefinition(name = "AlternateOptionsUsed", description = "Alternate Options used for connection and/or authentication", key = "AlternateOptionsUsed", type = "SOSOptionBoolean", mandatory = false)
+	@JSOptionDefinition(
+						name = "AlternateOptionsUsed",
+						description = "Alternate Options used for connection and/or authentication",
+						key = "AlternateOptionsUsed",
+						type = "SOSOptionBoolean",
+						mandatory = false)
 	public SOSOptionBoolean	AlternateOptionsUsed	= new SOSOptionBoolean(
 													// ...
 															this, // ....
@@ -193,25 +214,19 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 															false);
 
 	public String getAlternateOptionsUsed() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getAlternateOptionsUsed";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getAlternateOptionsUsed";
 		return AlternateOptionsUsed.Value();
 	} // public String getAlternateOptionsUsed
 
 	public SOSConnection2OptionsAlternate setAlternateOptionsUsed(final String pstrValue) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::setAlternateOptionsUsed";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setAlternateOptionsUsed";
 		AlternateOptionsUsed.Value(pstrValue);
 		return this;
 	} // public SOSConnection2OptionsAlternate setAlternateOptionsUsed
-	@JSOptionClass(description = "", name = "SOSConnection2OptionsAlternate", prefix = "alternate_")
-	private SOSConnection2OptionsAlternate	objAlternativeOptions		= null;
-	@JSOptionClass(description = "", name = "SOSConnection2OptionsAlternate", prefix = "proxy_")
-	private SOSConnection2OptionsAlternate	objProxyOptions				= null;
-	@JSOptionClass(description = "", name = "SOSConnection2OptionsAlternate", prefix = "jump_")
-	private SOSConnection2OptionsAlternate	objJumpServerOptions		= null;
-	@JSOptionClass(description = "", name = "SOSCredentialStoreOptions")
-	private SOSCredentialStoreOptions		objCredentialStoreOptions	= null;
+	@JSOptionClass(description = "", name = "SOSConnection2OptionsAlternate", prefix="alternate_") private SOSConnection2OptionsAlternate	objAlternativeOptions		= null;
+	@JSOptionClass(description = "", name = "SOSConnection2OptionsAlternate", prefix="proxy_") private SOSConnection2OptionsAlternate	objProxyOptions				= null;
+	@JSOptionClass(description = "", name = "SOSConnection2OptionsAlternate", prefix="jump_") private SOSConnection2OptionsAlternate	objJumpServerOptions		= null;
+	@JSOptionClass(description = "", name = "SOSCredentialStoreOptions") private SOSCredentialStoreOptions		objCredentialStoreOptions	= null;
 
 	/**
 	* constructors
@@ -230,27 +245,9 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 
 	public SOSConnection2OptionsAlternate(final HashMap<String, String> pobjJSSettings) throws Exception {
 		super(pobjJSSettings);
-		getAlternativeOptions().setAllOptions(pobjJSSettings, conParamNamePrefixALTERNATE + strAlternativePrefix);
+		getAlternativeOptions().setAllOptions(pobjJSSettings, "alternative_" + strAlternativePrefix);
 		this.addProcessedOptions(objAlternativeOptions.getProcessedOptions());
 	} // public SOSConnection2OptionsAlternate (HashMap JSSettings)
-
-	//	private SOSConnection2OptionsAlternate	objAlternativeOptions		= null;
-	//	private SOSConnection2OptionsAlternate	objProxyOptions				= null;
-	//	private SOSConnection2OptionsAlternate	objJumpServerOptions		= null;
-	//	private SOSCredentialStoreOptions		objCredentialStoreOptions	= null;
-
-	public String DirtyString() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::DirtyString";
-		clearBuffer();
-		String strD = super.dirtyString();
-		//		initChildOptions();
-		strD += concatIfNotEmpty(getAlternativeOptions().dirtyString());
-		strD += concatIfNotEmpty(getProxyOptions().dirtyString());
-		strD += concatIfNotEmpty(getJumpServerOptions().dirtyString());
-		strD += concatIfNotEmpty(getCredentialStore().dirtyString());
-		return strD;
-	} // private String DirtyString
 
 	public SOSConnection2OptionsAlternate(final HashMap<String, String> pobjJSSettings, final String pstrPrefix) throws Exception {
 		//		super(pobjJSSettings);   // wrong, because every options which has not the prefix will be set as well.
@@ -263,11 +260,11 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 		//		super(pobjJSSettings);   // wrong, because every options which has not the prefix will be set as well.
 		strAlternativePrefix = pstrPrefix;
 		getCredentialStore().setAllOptions(pobjJSSettings, strAlternativePrefix);
-		logger.trace("setChildClasses objCredentialStoreOptions= " + objCredentialStoreOptions.dirtyString());
-		//		getAlternativeOptions().setAllOptions(pobjJSSettings, conParamNamePrefixALTERNATIVE + strAlternativePrefix);
-		getAlternativeOptions().setAllOptions(pobjJSSettings, conParamNamePrefixALTERNATE + strAlternativePrefix);
-		getProxyOptions().setAllOptions(pobjJSSettings, conParamNamePrefixPROXY + strAlternativePrefix);
-		getJumpServerOptions().setAllOptions(pobjJSSettings, conParamNamePrefixJUMP + strAlternativePrefix);
+		logger.trace("setChildClasses 1= " + objCredentialStoreOptions.dirtyString());
+		getAlternativeOptions().setAllOptions(pobjJSSettings, "alternative_" + strAlternativePrefix);
+		getAlternativeOptions().setAllOptions(pobjJSSettings, "alternate_" + strAlternativePrefix);
+		getProxyOptions().setAllOptions(pobjJSSettings, "proxy_" + strAlternativePrefix);
+		getJumpServerOptions().setAllOptions(pobjJSSettings, "jump_" + strAlternativePrefix);
 		this.addProcessedOptions(objAlternativeOptions.getProcessedOptions());
 		//		checkCredentialStoreOptions();
 		//		logger.trace("setChildClasses 2= " + objCredentialStoreOptions.dirtyString());
@@ -275,28 +272,28 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 
 	public SOSConnection2OptionsAlternate getAlternativeOptions() {
 		if (objAlternativeOptions == null) {
-			objAlternativeOptions = new SOSConnection2OptionsAlternate(conParamNamePrefixALTERNATE + strAlternativePrefix);
+			objAlternativeOptions = new SOSConnection2OptionsAlternate();
 		}
 		return objAlternativeOptions;
 	}
 
 	public SOSConnection2OptionsAlternate getProxyOptions() {
 		if (objProxyOptions == null) {
-			objProxyOptions = new SOSConnection2OptionsAlternate(conParamNamePrefixPROXY + strAlternativePrefix);
+			objProxyOptions = new SOSConnection2OptionsAlternate();
 		}
 		return objProxyOptions;
 	}
 
 	public SOSConnection2OptionsAlternate getJumpServerOptions() {
 		if (objJumpServerOptions == null) {
-			objJumpServerOptions = new SOSConnection2OptionsAlternate(conParamNamePrefixJUMP + strAlternativePrefix);
+			objJumpServerOptions = new SOSConnection2OptionsAlternate();
 		}
 		return objJumpServerOptions;
 	}
 
 	public SOSCredentialStoreOptions getCredentialStore() {
 		if (objCredentialStoreOptions == null) {
-			objCredentialStoreOptions = new SOSCredentialStoreOptions(strAlternativePrefix);
+			objCredentialStoreOptions = new SOSCredentialStoreOptions();
 		}
 		return objCredentialStoreOptions;
 	}
@@ -328,12 +325,12 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 			if (objEntry == null) {
 				throw new CredentialStoreKeyNotFound(objCredentialStoreOptions);
 			}
-
+			
 			Date objExpDate = objEntry.ExpirationDate();
 			if (new Date().after(objExpDate)) {
 				throw new CredentialStoreEntryExpired(objExpDate);
 			}
-
+			
 			boolean flgHideValuesFromCredentialStore = false;
 			if (objEntry.Url().length() > 0) {
 				logger.trace(objEntry.Url());
@@ -396,11 +393,18 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 					fleO.deleteOnExit();
 				}
 			}
-
+			
 			if (objCredentialStoreOptions.CredentialStore_ProcessNotesParams.isTrue()) {
 				CommandLineArgs(objEntry.getNotesText());
 			}
 
+		}
+	}
+
+	private void setIfNotDirty(final SOSOptionElement objOption, final String pstrValue) {
+		if (objOption.isNotDirty() && isNotEmpty(pstrValue)) {
+			logger.trace("setValue = " + pstrValue);
+			objOption.Value(pstrValue);
 		}
 	}
 
@@ -413,8 +417,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 	 * @throws Exception
 	 * - wird ausgelöst, wenn eine mandatory-Option keinen Wert hat
 	 */
-	@Override
-	// SOSConnection2OptionsAlternateSuperClass
+	@Override// SOSConnection2OptionsAlternateSuperClass
 	public void CheckMandatory() {
 		try {
 			super.CheckMandatory();

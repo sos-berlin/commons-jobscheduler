@@ -7,10 +7,9 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
-import com.sos.VirtualFileSystem.enums.JADEExitCodes;
-import com.sos.VirtualFileSystem.exceptions.JADEExceptionFactory;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 /**
@@ -109,6 +108,7 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
 			objVFSHandler.delete(fileName);
 		}
 		catch (Exception e) {
+			SOSVfs_E_158.get();
 			RaiseException(e, SOSVfs_E_158.params("delete()", fileName));
 		}
 		return true;
@@ -501,10 +501,17 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
 	@Override
 	public void write(final byte[] bteBuffer) {
 		notImplemented();
+		try {
+			this.getFileOutputStream().write(bteBuffer);
+		}
+		catch (IOException e) {
+			RaiseException(e, SOSVfs_E_134.params("write()"));
+		}
 	}
 
 	@Override
 	public void putFile(final ISOSVirtualFile pobjVirtualFile) throws Exception {
+		// TODO Auto-generated method stub
 		notImplemented();
 	}
 
@@ -520,7 +527,8 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
 	 * @param msg
 	 */
 	protected void RaiseException(final Exception e, final String msg) {
-		JADEExceptionFactory.RaiseJadeException(JADEExitCodes.someUnspecificError, msg, e);
+		logger.error(msg);
+		throw new JobSchedulerException(msg, e);
 	}
 
 	/**
@@ -534,7 +542,8 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
 	 * @param msg
 	 */
 	protected void RaiseException(final String msg) {
-		JADEExceptionFactory.RaiseJadeException(msg);
+		logger.error(msg);
+		throw new JobSchedulerException(msg);
 	}
 
 	/**
@@ -621,12 +630,4 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	
-	@Override
-	public boolean isReadable () {
-		boolean flgF = true;
-		
-		return flgF;
-	}
-
 }

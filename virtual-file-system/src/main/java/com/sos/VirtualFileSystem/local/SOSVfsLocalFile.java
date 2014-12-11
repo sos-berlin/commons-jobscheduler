@@ -355,13 +355,6 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
 		return flgResult;
 	}
 
-	@Override
-	public boolean isReadable () {
-		boolean flgF = true;
-		flgF = super.canRead() == true;
-		return flgF;
-	}
-
 	/**
 	 * \brief notExists
 	 *

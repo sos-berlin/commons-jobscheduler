@@ -20,7 +20,7 @@ package com.sos.JSHelper.Options;
 * <br />---------------------------------------------------------------------------
 * </p>
 * \author KB
-* @version $Id$12.07.2010
+* @version $Id: SOSOptionJSTransferMethod.java 15777 2011-11-25 12:27:39Z kb $12.07.2010
 * \see reference
 *
 * Created on 12.07.2010 14:31:02
@@ -125,11 +125,6 @@ public class SOSOptionBackgroundServiceTransferMethod extends SOSOptionStringVal
 	}
 
 
-	public SOSOptionBackgroundServiceTransferMethod setAlias (final String pstrAlias){
-		super.SetAlias(pstrAlias);
-		return this;
-	}
-	
 	public String getDescription() {
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::getDescription";

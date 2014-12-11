@@ -1,6 +1,5 @@
 package com.sos.JSHelper.Options;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import org.apache.log4j.Logger;
@@ -39,63 +38,31 @@ public class SOSOptionTimeTest {
 
 	@SuppressWarnings("unused")
 	private final String		conClassName	= "SOSOptionTimeTest";
-	private static final String	conSVNVersion	= "$Id$";
+	private static final String  conSVNVersion = "$Id$";
 
-	private static final Logger	logger			= Logger.getLogger(SOSOptionTimeTest.class);
+	private static final Logger	logger					= Logger.getLogger(SOSOptionTimeTest.class);
 
-	public SOSOptionTimeTest() {
+	public SOSOptionTimeTest () {
 		//
 	}
 
 	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
+	public static void setUpBeforeClass() throws Exception {}
 
 	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
+	public static void tearDownAfterClass() throws Exception {}
 
-	private SOSOptionTime	objTime	= null;
-
+	private SOSOptionTime objTime = null;
 	@Before
 	public void setUp() throws Exception {
-		objTime = new SOSOptionTime(null, conClassName, conClassName, conClassName, conClassName, false);
+		objTime = new SOSOptionTime (null, conClassName, conClassName, conClassName, conClassName, false);
 	}
 
 	@After
-	public void tearDown() throws Exception {
-	}
+	public void tearDown() throws Exception {}
 
 	@Test
-	public final void testUnitOfMeasure() {
-		objTime = new SOSOptionTime("2d");
-		assertEquals("2d", "2:00:00:00", objTime.Value());
-		objTime.Value("2d");
-		assertEquals("2d", "2:00:00:00", objTime.Value());
-		assertEquals("2d", 172800, objTime.getTimeAsSeconds());
-		objTime = new SOSOptionTime("2w");
-		assertEquals("2w", "14:00:00:00", objTime.Value());
-		objTime = new SOSOptionTime("2h");
-		assertEquals("2h", "2:00:00", objTime.Value());
-		objTime = new SOSOptionTime("2m");
-		assertEquals("2m", "2:00", objTime.Value());
-		objTime = new SOSOptionTime("2s");
-		assertEquals("2s", "2", objTime.Value());
-		objTime = new SOSOptionTime("2"); //Default is seconds
-		assertEquals("2d", "2", objTime.Value());
-	}
-
-	@Test
-	public final void testDefaultUoM() {
-
-		objTime = new SOSOptionTime("30");
-		objTime.setDefaultUoM("M");
-		System.out.println(objTime.Value());
-		assertEquals("30", "30:00", objTime.Value());
-	}
-
-	@Test
-	public final void testGetTimeAsSeconds() {
+	public final void testGetTimeAsSeconds(){
 		objTime.Value("10");
 		System.out.println("time in seconds : " + objTime.getTimeAsSeconds());
 		objTime.Value("1:50");
@@ -108,15 +75,14 @@ public class SOSOptionTimeTest {
 		System.out.println("time in seconds : " + objTime.getTimeAsSeconds());
 		objTime.Value("99:99:99");
 		System.out.println("time in seconds : " + objTime.getTimeAsSeconds());
-
+		
 		objTime.value(17);
-		assertEquals("17 seconds", 17, objTime.getTimeAsSeconds());
 		System.out.println("time in seconds : " + objTime.getTimeAsSeconds());
-
+		
 	}
 
-	//	@Test
-	public final void testCalculateFileAge() {
-		fail("Not yet implemented"); // TODO
+//	@Test
+	public final void testCalculateFileAge(){
+	fail("Not yet implemented"); // TODO
 	}
 }

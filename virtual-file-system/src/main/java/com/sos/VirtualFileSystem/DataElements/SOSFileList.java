@@ -39,7 +39,6 @@ public class SOSFileList extends SOSVfsMessageCodes {
 	private Vector<SOSFileListEntry>		objFileListEntries					= new Vector<>();
 	long									lngSuccessfulTransfers				= 0;
 	long									lngFailedTransfers					= 0;
-	long									lngFilesNotFound					= 0;
 	long									lngSkipedTransfers					= 0;
 	long									lngNoOfTransferHistoryRecordsSent	= 0;
 	long									lngNoOfHistoryFileRecordsWritten	= 0;
@@ -117,8 +116,6 @@ public class SOSFileList extends SOSVfsMessageCodes {
 		lngFailedTransfers = 0;
 		lngSkipedTransfers = 0;
 		lngNoOfBytesTransferred = 0;
-		lngFilesNotFound = 0;
-
 		if (objFileListEntries != null) {
 			for (SOSFileListEntry objEntry : objFileListEntries) {
 				if (objEntry == null) {
@@ -135,11 +132,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 					case deleted:
 						lngSuccessfulTransfers++;
 						break;
-					case FileNotFound:
-						lngFilesNotFound++;
-						break;
 					case transfer_has_errors:
-					case transfer_aborted:
 						lngFailedTransfers++;
 						break;
 					case transfer_skipped:
@@ -406,6 +399,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 		try {
 			if (objOptions.CreateResultSet.isTrue()) {
 				if (objOptions.ResultSetFileName.isDirty()) {
+					// TODO use the file object from the option
 					JSFile objResultSetFile = objOptions.ResultSetFileName.JSFile();
 					for (SOSFileListEntry objListItem : objFileListEntries) {
 						String strFileName = objListItem.getFileName4ResultList();
@@ -509,7 +503,6 @@ public class SOSFileList extends SOSVfsMessageCodes {
 					}
 					catch (Exception e) {
 						e.printStackTrace();
-						throw new JobSchedulerException(e);
 					}
 					String strHash = objF.File2String();
 					strHash = strHash.replaceAll("\\n", "");

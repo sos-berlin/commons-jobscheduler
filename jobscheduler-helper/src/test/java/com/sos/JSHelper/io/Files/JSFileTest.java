@@ -1,18 +1,11 @@
 package com.sos.JSHelper.io.Files;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.apache.log4j.Logger;
+import org.junit.*;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
 * \class JSFileTest 
@@ -46,7 +39,7 @@ public class JSFileTest {
 
 	private final String		conClassName	= "JSFileTest";
 	private final String		strRec			= "Eine Zeile zum Test ...";
-	private final String		strFolderName	= "R:\\backup\\sos\\Java\\junittests\\testdata\\JSCsvFileTest";
+	private final String		strFolderName	= "R:/nobackup/junittests/testdata/JSFileTest/";
 	private String				strTestFileName	= strFolderName + "test.txt";
 
 	private static Logger		logger			= Logger.getLogger(JSFileTest.class);
@@ -94,11 +87,6 @@ public class JSFileTest {
 		fleTarget.delete();
 	}
 
-	@Test
-	public void testGetTimeStamp () {
-		JSFile fleT = JSFile.createTempFile();
-		System.out.println(fleT.getTimeStamp());
-	}
 	// @Test
 	public void testAppendFile() throws Exception {
 		createTestFile();
@@ -160,28 +148,6 @@ public class JSFileTest {
 
 	} // private void doDelete
 
-	@Test
-	public void testWriteWindowsPathNames () {
-
-		String strPathName = "c:\temp\rmyFile\noLineBreak\noLine\bbb\fff";
-		try {
-			JSFile fleFile =  new JSFile(JSFile.getTempdir(),"testWriteWindowsPathNames");
-			for (int i = 0; i < 1; i++) {
-				fleFile.WriteLine(strPathName);
-				strPathName = strPathName.replaceAll("\n", "\\\\n");
-				strPathName = strPathName.replaceAll("\t", "\\\\t");
-				strPathName = strPathName.replaceAll("\r", "\\\\r");
-				strPathName = strPathName.replaceAll("\b", "\\\\b");
-				strPathName = strPathName.replaceAll("\f", "\\\\f");
-				fleFile.WriteLine(strPathName);
-			}
-			fleFile.close();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
 	// @Test
 	public void doWrite() throws Exception {
 
@@ -359,8 +325,7 @@ public class JSFileTest {
 
 	} // private void testZipWrite
 
-	@Test
-  @Ignore("Test set to Ignore for later examination")
+	 @Test
 	public void testCreateUniqueFileName() throws IOException {
 
 		@SuppressWarnings("unused")

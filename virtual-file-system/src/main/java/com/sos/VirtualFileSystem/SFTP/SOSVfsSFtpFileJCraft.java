@@ -133,6 +133,7 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
 
 			OutputStream os = this.getFileOutputStream();
 			if (os == null) {
+
 				throw new Exception(SOSVfs_E_147.get());
 			}
 			os.write(bteBuffer, intOffset, intLength);
@@ -141,7 +142,8 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
 			RaiseException(e, SOSVfs_E_173.params("write", fileName));
 		}
 	}
-
+	
+	
 	@Override
 	public void write(final byte[] bteBuffer) {
 		try {
@@ -151,7 +153,6 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
 			RaiseException(e, SOSVfs_E_134.params("write()"));
 		}
 	}
-
 
 	/**
 	 * \brief getFileOutputStream
@@ -174,14 +175,14 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
 				else if (flgModeRestart ){
 					intTransferMode = ChannelSftp.RESUME;
 				}
-
+				
 				SOSVfsSFtpJCraft objJ = (SOSVfsSFtpJCraft) objVFSHandler;
 				/**
 				 * kb 2014-07-21
 				 * warum wurde die folgende Zeile auskommentiert und durch die dahinter
 				 * stehende, jetzt auskkommentiert, ersetzt? Damit ist kein AppendMode
 				 * möglich und das ist ein schwerer Fehler.
-				 * siehe hierzu: http://www.sos-berlin.com/otrs/index.pl?Action=AgentZoom&TicketID=1520
+				 * siehe hierzu: https://change.sos-berlin.com/browse/SOSFTP-202
 				 */
 				objOutputStream = objJ.getClient().put(fileName, intTransferMode);
 //				objOutputStream = objJ.getClient().put(fileName);
@@ -220,14 +221,8 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
 	@Override
 	public long setModificationDateTime(final long pdteDateTime) {
 
+		// TODO Auto-generated method stub
 		return 0;
-	}
-
-	@Override
-	public boolean isReadable () {
-		boolean flgF = true;
-		
-		return flgF;
 	}
 
 }

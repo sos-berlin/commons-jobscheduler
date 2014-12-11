@@ -45,7 +45,7 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
 			}
 			FTPClientConfig conf = new FTPClientConfig();
 			//			conf.setServerLanguageCode("fr");
-						objFTPClient.configure(conf);
+			//			objFTPClient.configure(conf);
 			/**
 			 * This listener is to write all commands and response from commands to system.out
 			 *

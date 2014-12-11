@@ -27,7 +27,6 @@ import com.sos.JSHelper.Options.SOSOptionTime;
 import com.sos.JSHelper.Options.SOSOptionTransferMode;
 import com.sos.JSHelper.Options.SOSOptionTransferType;
 import com.sos.JSHelper.Options.SOSOptionUserName;
-import com.sos.JSHelper.Options.SOSOptionVerbose;
 
 /**
 * \class ISOSFtpOptions
@@ -51,7 +50,7 @@ import com.sos.JSHelper.Options.SOSOptionVerbose;
 * <br />---------------------------------------------------------------------------
 * </p>
 * \author KB
-* @version $Id$15.08.2010
+* @version $Id: ISOSFtpOptions.java 23649 2014-04-09 22:38:14Z kb $15.08.2010
 * \see reference
 *
 * Created on 15.08.2010 11:26:23
@@ -1901,7 +1900,7 @@ public interface ISOSFtpOptions {
 	     * \return The granuality of (Debug-)Messages The verbosit
 	     *
 	     */
-	public abstract SOSOptionVerbose getverbose();
+	public abstract SOSOptionInteger getverbose();
 
 	/**
 	 * \brief setverbose : The granuality of (Debug-)Messages The verbosit
@@ -1911,7 +1910,7 @@ public interface ISOSFtpOptions {
 	 *
 	 * @param verbose : The granuality of (Debug-)Messages The verbosit
 	 */
-	public abstract void setverbose(SOSOptionVerbose p_verbose);
+	public abstract void setverbose(SOSOptionInteger p_verbose);
 
 	/**
 	     * \brief getzero_byte_transfer : This parameter specifies whether zero byte files

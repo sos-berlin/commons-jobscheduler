@@ -2,10 +2,6 @@ package com.sos.JSHelper.io.Files;
 
 import org.apache.log4j.Logger;
 
-import com.sos.JSHelper.Options.IValueChangedListener;
-import com.sos.JSHelper.Options.SOSOptionElement;
-import com.sos.JSHelper.Options.SOSValidationError;
-
 /**
 * \class SOSProfileEntry 
 * 
@@ -35,13 +31,14 @@ import com.sos.JSHelper.Options.SOSValidationError;
  * @author KB
  *
  */
-public class SOSProfileEntry extends SOSProfileBaseClass<SOSProfileSection> implements IValueChangedListener {
+public class SOSProfileEntry {
 
 	@SuppressWarnings("unused")
 	private final String		conClassName	= "SOSProfileEntry";
-	@SuppressWarnings("unused")
 	private static final String	conSVNVersion	= "$Id$";
 	private static final Logger	logger			= Logger.getLogger(SOSProfileEntry.class);
+	private String				strName;
+	private String				strValue;
 
 	public SOSProfileEntry() {
 		//
@@ -54,76 +51,46 @@ public class SOSProfileEntry extends SOSProfileBaseClass<SOSProfileSection> impl
 	public SOSProfileEntry(String pstrEntryName, String pstrEntryValue) {
 		strName = pstrEntryName;
 		strValue = pstrEntryValue;
-		logger.trace("SOSProfileEntry: " + pstrEntryName + " = " + pstrEntryValue);
+		// System.out.println ("SOSProfileEntry: " + pstrEntryName + " = " + pstrEntryValue);
 	}
 
-	@Override
 	public String toString() {
-		String strT = "";
-		if (strComment != null) {
-			strT += strComment.toString();
-		}
-		strT += strName + "=" + strValue + "\n";
-		return strT;
+		return (strName + "=" + strValue + "\n");
 	}
 
-	/**
-	 * 
-	* \brief toXML - 	
-	*
-	* \details
-	* 
-	*
-	* @return
-	* @param 
-	* @author KB
-	 */
 	public String toXML() {
 		String strT = "";
 		strT = strT.concat("<" + strName + ">\n");
-		strT = strT.concat("<![CDATA[" + strValue + "]]>\n");
+		strT = strT.concat(strValue + "\n");
 		return strT.concat("</" + strName + ">\n");
 	}
 
 	/**
-	 * 
-	* \brief Value - 	
-	*
-	* \details
-	* 
-	*
-	* @return
-	* @author KB
+	 * @return
 	 */
-	public String Value() {
-		String strT = strValue;
-		return strT;
+	public String Name() {
+		return strName;
 	}
 
 	/**
-	 * 
-	* \brief Value - 	
-	*
-	* \details
-	* 
-	*
-	* @param pstrNewValue
-	* @author KB
+	 * @return
 	 */
-	public void Value(String pstrNewValue) {
-		if (strValue.equalsIgnoreCase(pstrNewValue) == false) {
-			setDirty();
-		}
-		strValue = pstrNewValue;
+	public String Value() {
+		return strValue;
 	}
 
-	@Override  // IValueChangedListener
-	public void ValueHasChanged(final SOSOptionElement pobjOptionElement) {
-		this.Value(pobjOptionElement.Value());
+	/**
+	 * @param string
+	 */
+	public void Name(String string) {
+		strName = string;
 	}
 
-	@Override  // IValueChangedListener
-	public void ValidationError(SOSValidationError pobjVE) {
-		// nothing to do
+	/**
+	 * @param string
+	 */
+	public void Value(String string) {
+		strValue = string;
 	}
+
 }

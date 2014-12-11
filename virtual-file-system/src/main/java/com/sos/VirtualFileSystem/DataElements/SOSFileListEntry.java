@@ -8,8 +8,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.UUID;
-import java.util.zip.CRC32;
-import java.util.zip.Checksum;
 
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.util.Base64;
@@ -27,7 +25,6 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2Options;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
-import com.sos.VirtualFileSystem.common.SOSMsgVfs;
 import com.sos.VirtualFileSystem.common.SOSVfsConstants;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.VirtualFileSystem.zip.SOSVfsZip;
@@ -57,8 +54,10 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 * @exception classname description
 *
 */
-@I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en") public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable,
-		IJadeTransferDetailHistoryData /* , ISOSVirtualFile */{
+@I18NResourceBundle(
+					baseName = "SOSVirtualFileSystem",
+					defaultLocale = "en")
+public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJadeTransferDetailHistoryData /* , ISOSVirtualFile */{
 	private static final String	conFieldJUMP_USER			= "jump_user";
 	private static final String	conFieldJUMP_PROTOCOL		= "jump_protocol";
 	private static final String	conFieldJUMP_PORT			= "jump_port";
@@ -87,105 +86,57 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 	private static final String	conFieldTRANSFER_TIMESTAMP	= "transfer_timestamp";
 	private static final String	conFieldMANDATOR			= "mandator";
 	private static final String	conFieldGUID				= "guid";
-	// TODO should be placed in a separate file
 	public enum enuTransferStatus {
-		// Java -> Code Style -> Formatter -> Edit -> Off/On Tags
-		// @formatter:off
-		transferUndefined("SOSVfs_T_0310"), 
-		waiting4transfer("SOSVfs_T_0311"), 
-		transferring("SOSVfs_T_0312"), 
-		transferInProgress("SOSVfs_T_0313"), 
-		transferred("SOSVfs_T_0314"), 
-		transfer_skipped("SOSVfs_T_0315"), 
-		transfer_has_errors("SOSVfs_T_0316"), 
-		transfer_aborted("SOSVfs_T_0317"), 
-		compressed("SOSVfs_T_0318"), 
-		notOverwritten("SOSVfs_T_0319"), 
-		deleted("SOSVfs_T_0320"), 
-		renamed("SOSVfs_T_0321"), 
-		IgnoredDueToZerobyteConstraint("SOSVfs_T_0322"), 
-		setBack("SOSVfs_T_0323"), 
-		polling("SOSVfs_T_0324"), 
-		FileNotFound("SOSVfs_T_0325");
-		// @formatter:on
-		public String	description;  // returns the i18n text
-		public String	MsgCode;	// returns the property key of the i18n file
-
-		public String Text() {
-			return description;
-		}
-
-		/**
-		 * constructor for enum
-		 * @param name
-		 */
-		private enuTransferStatus(final String name) {
-			String k;
-			if (name == null) {
-				k = this.name();
-			}
-			else {
-				k = new SOSMsgVfs(name).get();
-				MsgCode = name;
-			}
-			description = k;
-		}
-
-		public static String[] getArray() {
-			String[] strA = new String[enuTransferStatus.values().length];
-			int i = 0;
-			for (enuTransferStatus enuType : enuTransferStatus.values()) {
-				strA[i++] = enuType.description;
-			}
-			return strA;
-		}
+		transferUndefined, waiting4transfer, transferring, transferInProgress, transferred, transfer_skipped, transfer_has_errors, transfer_aborted, compressed, notOverwritten, deleted, renamed, IgnoredDueToZerobyteConstraint, setBack, polling
 	}
-	//
-	private static String									conClassName					= "SOSFileListEntry";
-	private final static Logger								logger							= Logger.getLogger(SOSFileListEntry.class);
-	private final static Logger								objJadeReportLogger				= Logger.getLogger(VFSFactory.getLoggerName());
-	@SuppressWarnings("unused") private final String		conSVNVersion					= "$Id$";
+	private static String			conClassName					= "SOSFileListEntry";
+	private final static Logger		logger							= Logger.getLogger(SOSFileListEntry.class);
+	private final static Logger		objJadeReportLogger				= Logger.getLogger(VFSFactory.getLoggerName());
+	@SuppressWarnings("unused")
+	private final String			conSVNVersion					= "$Id$";
 	//	private static boolean									flgNoDataSent					= false;
-	private ISOSVirtualFile									fleSourceTransferFile			= null;
-	private ISOSVirtualFile									fleSourceFile					= null;
-	private ISOSVirtualFile									fleTargetFile					= null;
-	private String											strSourceFileName				= null;
-	private String											strSourceTransferName			= null;
-	private String											strTargetTransferName			= null;
-	private String											strTargetFileName				= null;
-	private long											lngNoOfBytesTransferred			= 0;
-	private long											lngFileSize						= -1L;
-	private long											lngFileModDate					= -1L;
-	private final String									strZipFileName					= "";
-	private long											lngTransferProgress				= 0;
-	private boolean											flgTransactionalRemoteFile		= false;
-	private boolean											flgTransactionalLocalFile		= false;
-	public long												zeroByteCount					= 0;
-	private long											lngOriginalFileSize				= 0;
-	@SuppressWarnings("unused") private final boolean		flgTransferSkipped				= false;
-	private SOSFTPOptions									objOptions						= null;
-	private String											strAtomicFileName				= EMPTY_STRING;
-	private enuTransferStatus								eTransferStatus					= enuTransferStatus.transferUndefined;
-	private ISOSVfsFileTransfer								objDataSourceClient				= null;
-	private ISOSVfsFileTransfer								objDataTargetClient				= null;
-	private ISOSVirtualFile									objTargetTransferFile			= null;
-	private ISOSVirtualFile									objSourceTransferFile			= null;
-	private SOSFileList										objParent						= null;
-	private boolean											flgFileExists					= false;
-	private String											strMD5Hash						= "n.a.";
-	private Date											dteStartTransfer				= null;
-	private Date											dteEndTransfer					= null;
-	@SuppressWarnings("unused") private ISOSVfsFileTransfer	objVfsHandler					= null;
+	private ISOSVirtualFile			fleSourceTransferFile			= null;
+	private ISOSVirtualFile			fleSourceFile					= null;
+	private ISOSVirtualFile			fleTargetFile					= null;
+	private String					strSourceFileName				= null;
+	private String					strSourceTransferName			= null;
+	private String					strTargetTransferName			= null;
+	private String					strTargetFileName				= null;
+	private long					lngNoOfBytesTransferred			= 0;
+	private long					lngFileSize						= -1L;
+	private long					lngFileModDate					= -1L;
+	private final String			strZipFileName					= "";
+	private long					lngTransferProgress				= 0;
+	private boolean					flgTransactionalRemoteFile		= false;
+	private boolean					flgTransactionalLocalFile		= false;
+	public long						zeroByteCount					= 0;
+	private long					lngOriginalFileSize				= 0;
+	@SuppressWarnings("unused")
+	private final boolean			flgTransferSkipped				= false;
+	private SOSFTPOptions			objOptions						= null;
+	private String					strAtomicFileName				= EMPTY_STRING;
+	private enuTransferStatus		eTransferStatus					= enuTransferStatus.transferUndefined;
+	private ISOSVfsFileTransfer		objDataSourceClient				= null;
+	private ISOSVfsFileTransfer		objDataTargetClient				= null;
+	private ISOSVirtualFile			objTargetTransferFile			= null;
+	private ISOSVirtualFile			objSourceTransferFile			= null;
+	private SOSFileList				objParent						= null;
+	private boolean					flgFileExists					= false;
+	private String					strMD5Hash						= "n.a.";
+	private Date					dteStartTransfer				= null;
+	private Date					dteEndTransfer					= null;
+	@SuppressWarnings("unused")
+	private ISOSVfsFileTransfer		objVfsHandler					= null;
 	// Hier bereits zuweisen, damit in der CSV-Datei und in der Order eine identische GUID verwendet wird.
-	private final String									guid							= UUID.randomUUID().toString();
-	private boolean											flgSteadyFlag					= false;
-	private final boolean									flgTransferHistoryAlreadySent	= false;
-	public boolean											flgIsHashFile					= false;
-	private FTPFile											objFTPFile						= null;
-	private String											strCSVRec						= new String();
-	private String											strRenamedSourceFileName		= null;
-	private SOSVfsConnectionPool							objConnPoolSource				= null;
-	private SOSVfsConnectionPool							objConnPoolTarget				= null;
+	private final String			guid							= UUID.randomUUID().toString();
+	private boolean					flgSteadyFlag					= false;
+	private final boolean			flgTransferHistoryAlreadySent	= false;
+	public boolean					flgIsHashFile					= false;
+	private FTPFile					objFTPFile						= null;
+	private String					strCSVRec						= new String();
+	private String					strRenamedSourceFileName		= null;
+	private SOSVfsConnectionPool	objConnPoolSource				= null;
+	private SOSVfsConnectionPool	objConnPoolTarget				= null;
 
 	public SOSFileListEntry() {
 		super(SOSVfsConstants.strBundleBaseName);
@@ -299,7 +250,7 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 		objJadeReportLogger.info(strM);
 	}
 
-	@SuppressWarnings({ "null", "finally" }) private long doTransfer(final ISOSVirtualFile objInput, final ISOSVirtualFile objOutput) {
+	@SuppressWarnings("finally") private long doTransfer(final ISOSVirtualFile objInput, final ISOSVirtualFile objOutput) {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::doTransfer";
 		boolean flgClosingDone = false;
 		if (objOutput == null) {
@@ -320,17 +271,9 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 				flgCreateSecurityHash = false;
 			}
 		}
-		Checksum objCRC = null;
-		try {
-			objCRC = new CRC32();
-		}
-		catch (Exception e1) {
-			e1.printStackTrace();
-		}
 		executePreCommands();
 		long lngTotalBytesTransferred = 0;
 		Base64 objBase64 = null;
-		boolean flgErrorOnTransfer = false;
 		this.setStatus(enuTransferStatus.transferring);
 		try {
 			int intCumulativeFileSeperatorLength = 0;
@@ -351,14 +294,11 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 					intCumulativeFileSeperatorLength = bteB.length;
 					objOutput.write(bteB);
 				}
-				// wozu genau ist das? Damit wird doch eine null datei im target angelegt, auch wenn die source-datei nicht gelesen werden kann.
-				// ich halte das für einen Fehler. kb 2014-07-25
 				if (objInput.getFileSize() <= 0) {
 					objOutput.write(buffer, 0, 0);
 				}
 				else {
 					// TODO Option Blockmode=true (default), if false line mode and getLine
-					transferLoop:
 					while ((intBytesTransferred = objInput.read(buffer)) != -1) {
 						try {
 							int intBytes2Write = intBytesTransferred;
@@ -372,10 +312,8 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 							objOutput.write(buffer, 0, intBytes2Write);
 						}
 						catch (JobSchedulerException e) {
-							flgErrorOnTransfer = true;
-//							e.printStackTrace(System.err);
-							throw e;
-//							break transferLoop;
+							e.printStackTrace(System.err);
+							break;
 						}
 						// TODO in case of wrong outputbuffer the handling of the error must be improved
 						lngTotalBytesTransferred += intBytesTransferred;
@@ -384,11 +322,9 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 						if (flgCreateSecurityHash) {
 							md.update(buffer, 0, intBytesTransferred);
 						}
-						objCRC.update(buffer, 0, intBytesTransferred);
 					}
 				}
 			}
-			
 			objInput.closeInput();
 			objOutput.closeOutput();
 			flgClosingDone = true;
@@ -402,8 +338,6 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 					objF.deleteOnExit();
 				}
 			}
-			String localCRC = Long.toHexString(objCRC.getValue()).toUpperCase();
-			logger.info("CRC32 is " + localCRC);
 			// objDataTargetClient.CompletePendingCommand();
 			if (objDataTargetClient.isNegativeCommandCompletion()) {
 				RaiseException(SOSVfs_E_175.params(objTargetTransferFile.getName(), objDataTargetClient.getReplyString()));
@@ -411,33 +345,22 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 			this.setNoOfBytesTransferred(lngTotalBytesTransferred);
 			lngTotalBytesTransferred += intCumulativeFileSeperatorLength;
 			executeTFNPostCommnands();
+			return lngTotalBytesTransferred;
 		}
-
 		catch (Exception e) {
-			TransferStatus(enuTransferStatus.transfer_has_errors);
-			flgErrorOnTransfer = true;
 			String strT = SOSVfs_E_229.params(e);
 			// TODO rollback?
-			RaiseException(e, strT);
+			logger.error(strT);
+			throw new JobSchedulerException(strT, e);
 		}
 		finally {
 			if (flgClosingDone == false) {
 				objInput.closeInput();
-				// Hier wird die Datei angelegt mit 0 bytes, auch wenn nichts geschrieben wurde, weil die source nicht lesbar war oder "disc" full.
 				objOutput.closeOutput();
-				if (flgErrorOnTransfer == true) {
-					try {
-						objOutput.delete();
-					}
-					catch (Exception e) {
-						// nothing to do, 
-					}
-				}
 				flgClosingDone = true;
 			}
-
+			return lngTotalBytesTransferred;
 		}
-		return lngTotalBytesTransferred;
 	} //doTransfer
 
 	private void executeCommands(final ISOSVfsFileTransfer pobjDataClient, final SOSOptionString pstrCommandString) {
@@ -453,6 +376,7 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 					pobjDataClient.getHandler().ExecuteCommand(strCmd);
 				}
 				catch (Exception e) {
+					e.printStackTrace(System.err);
 					throw new JobSchedulerException(conMethodName, e);
 				}
 			}
@@ -543,7 +467,6 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 	public String getFileName4ResultList() {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getFileName4ResultList";
 		// starting with TargetfileName.
-		// TODO allow ResultSetFileName for source_ and target_
 		String strT = strTargetFileName;
 		if (isEmpty(strT)) { // If empty, e.g. in case of operation getlist, use source file name
 			strT = strSourceFileName;
@@ -613,12 +536,6 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 		return eTransferStatus.name();
 	}
 
-	public String getStatusMsg() {
-//		SOSMsgVfs objSOSMsgVfs = new SOSMsgVfs("SOSVfs_I_03" + (eTransferStatus.ordinal() + 10));
-//		return objSOSMsgVfs.get();
-		return eTransferStatus.description;
-	}
-
 	public ISOSVirtualFile getTargetFile(final ISOSFtpOptions objO) {
 		fleSourceTransferFile = null;
 		fleSourceFile = objDataSourceClient.getFileHandle(strSourceFileName);
@@ -645,7 +562,6 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 			// replacing has to be taken from general or target_ options for the target replacing  SOSFTP-151
 			if (objO.getreplacing().IsNotEmpty()) {
 				try {
-					objO.getreplacing().SetIfNotDirty(objOptions.useRegExp4ReplaceWith);
 					strTargetFileName = objO.getreplacing().doReplace(strTargetFileName, objO.getreplacement().Value());
 				}
 				catch (Exception e) {
@@ -774,11 +690,10 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 		String strR = adjustFileSeparator(pstrFileName);
 		String strReplaceWith = objOptions.getreplacement().Value();
 		try {
-			objOptions.getreplacing().SetIfNotDirty(objOptions.useRegExp4ReplaceWith);
 			strR = objOptions.getreplacing().doReplace(strR, strReplaceWith);
 		}
 		catch (Exception e) {
-//			logger.error(e.getLocalizedMessage(), new JobSchedulerException(SOSVfs_E_0150.get(), e));
+			logger.error(e.getLocalizedMessage(), new JobSchedulerException(SOSVfs_E_0150.get(), e));
 			throw new JobSchedulerException(SOSVfs_E_0150.get(), e);
 		}
 		return strR;
@@ -807,15 +722,14 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 	} // private void Options
 
 	private void RaiseException(final Exception e, final String pstrM) {
-		if (e instanceof JobSchedulerException) {
-			throw (JobSchedulerException) e;
-		}
+		logger.error(pstrM);
+		e.printStackTrace(System.err);
 		throw new JobSchedulerException(pstrM, e);
 	}
 
 	private void RaiseException(final String pstrM) {
 		this.TransferStatus(enuTransferStatus.transfer_aborted);
-//		logger.error(pstrM);
+		logger.error(pstrM);
 		throw new JobSchedulerException(pstrM);
 	}
 
@@ -892,27 +806,47 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::run";
 		boolean flgNewConnectionUsed = false;
 		try {
+			//			logger.debug(SOSVfs_D_272.get());
+			//			ISOSVFSHandler objVFS4Source = null;
+			//			ISOSVFSHandler objVFS4Target = null;
 			logger.info(SOSVfs_I_0108.params(strSourceFileName));
 			flgNewConnectionUsed = false;
 			if (objDataSourceClient == null) {
 				setDataSourceClient((ISOSVfsFileTransfer) objConnPoolSource.getUnused());
+				//				SOSConnection2OptionsAlternate objSourceConnect = objOptions.getConnectionOptions().Source();
+				//				if (objSourceConnect.loadClassName.isDirty() == false) {
+				//					objSourceConnect.loadClassName.Value(objOptions.getConnectionOptions().loadClassName.Value());
+				//				}
+				//
+				//				objVFS4Source = VFSFactory.getHandler(objOptions.getDataSourceType());
+				//				objVFS4Source.setSource();
+				//
+				//				// TODO use a Connection-Pool Object, to avoid to many connects and authenticates
+				//				objVFS4Source.Connect(objSourceConnect);
+				//				objVFS4Source.Authenticate(objSourceConnect);
+				//				objDataSourceClient = (ISOSVfsFileTransfer) objVFS4Source;
+				//				objVFS4Source.setSource();
+				//				objVFS4Source.Options(objOptions);
 			}
 			if (objDataTargetClient == null & objOptions.NeedTargetClient() == true) {
 				setDataTargetClient((ISOSVfsFileTransfer) objConnPoolTarget.getUnused());
+				//				SOSConnection2OptionsAlternate objTargetConnectOptions = objOptions.getConnectionOptions().Target();
+				//				if (objTargetConnectOptions.loadClassName.isDirty() == false) {
+				//					objTargetConnectOptions.loadClassName.Value(objOptions.getConnectionOptions().loadClassName.Value());
+				//				}
+				//
+				//				objVFS4Target = VFSFactory.getHandler(objOptions.getDataTargetType());
+				//				objVFS4Target.setTarget();
+				//				objVFS4Target.Connect(objTargetConnectOptions);
+				//				objVFS4Target.Authenticate(objTargetConnectOptions);
+				//				objDataTargetClient = (ISOSVfsFileTransfer) objVFS4Target;
+				//				objVFS4Target.setTarget();
+				//				objVFS4Target.Options(objOptions);
 			}
 			ISOSVirtualFile objSourceFile = objDataSourceClient.getFileHandle(strSourceFileName);
 			if (objSourceFile.notExists() == true) {
-				if (objOptions.ErrorOnNoDataFound.isTrue()) { // File is no (longer) existing. may be file_path was specified with a non existing file
-					throw new JobSchedulerException(SOSVfs_E_226.params(strSourceFileName));
-				}
-				else {
-					this.setStatus(enuTransferStatus.FileNotFound);
-					return;
-				}
+				throw new JobSchedulerException(SOSVfs_E_226.params(strSourceFileName));
 			}
-			// just to check wether the file is readable. will raise an exception if not
-			// prevent to create a 0-byte file on the target
-			objDataSourceClient.getFileHandle(strSourceFileName);
 			/**
 			 * hier nicht verwenden, weil es zu spüt kommt.
 			 */
@@ -1057,16 +991,10 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 				objDataTargetClient.disconnect();
 			}
 		}
-		catch (JobSchedulerException e) {
-			String strT = SOSVfs_E_229.params(e);
-			TransferStatus(enuTransferStatus.transfer_aborted);
-			// TODO rollback?
-			throw e;
-		}
 		catch (Exception e) {
 			String strT = SOSVfs_E_229.params(e);
-			TransferStatus(enuTransferStatus.transfer_aborted);
 			// TODO rollback?
+			logger.error(strT);
 			throw new JobSchedulerException(strT, e);
 		}
 	}
@@ -1472,6 +1400,7 @@ Montag, 15. Oktober 2007, Klaus.Buettner@sos-berlin.com (KB)
 		addCSv(objAttributesProperties.get(conFieldJUMP_USER)); // 28
 		// Diff to the format of the transfer history as order
 		SOSOptionTime objModTime = new SOSOptionTime(null, null, null, "", "", false);
+		objModTime.value(lngFileModDate);
 		addCSv(objModTime.getTimeAsString(lngFileModDate));
 		return strCSVRec;
 	}

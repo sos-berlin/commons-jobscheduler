@@ -28,7 +28,7 @@ import com.sos.JSHelper.Options.SOSOptionUserName;
 * <br />---------------------------------------------------------------------------
 * </p>
 * \author KB
-* @version $Id$21.05.2010
+* @version $Id: ISOSConnectionOptions.java 17949 2012-08-31 18:27:00Z kb $21.05.2010
 * \see reference
 *
 * Created on 21.05.2010 11:39:42

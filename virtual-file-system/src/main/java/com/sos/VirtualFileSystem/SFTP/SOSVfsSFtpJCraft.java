@@ -32,21 +32,17 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsSuperClass;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
-import com.sos.VirtualFileSystem.enums.JADEExitCodes;
-import com.sos.VirtualFileSystem.exceptions.JADEException;
-import com.sos.VirtualFileSystem.exceptions.JADEExceptionFactory;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 /**
- * @ressources see: pom.xml
+ * @ressources jsch-0.1.48.jar
  *
  * @author Robert Ehrlich
  *
- * see also: https://svn.codehaus.org/mule/branches/mule-3.x/transports/sftp/src/main/java/org/mule/transport/sftp/SftpClient.java
- * createUniqueName
- * 
  */
-@I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
+@I18NResourceBundle(
+					baseName = "SOSVirtualFileSystem",
+					defaultLocale = "en")
 public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	@SuppressWarnings("unused")
 	private final String		conClassName	= this.getClass().getSimpleName();
@@ -73,8 +69,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		secureChannel = new JSch();
 	}
 
-	@Override
-	public void StrictHostKeyChecking(final String pstrStrictHostKeyCheckingValue) {
+	@Override public void StrictHostKeyChecking(final String pstrStrictHostKeyCheckingValue) {
 		JSch.setConfig("StrictHostKeyChecking", pstrStrictHostKeyCheckingValue);
 		//	'	sshConnection.StrictHostKeyChecking(pstrStrictHostKeyCheckingValue);
 	}
@@ -89,8 +84,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	 *
 	 * @return
 	 */
-	@Override
-	public ISOSConnection Connect() {
+	@Override public ISOSConnection Connect() {
 		SOSConnection2OptionsAlternate pConnection2OptionsAlternate = null;
 		this.Connect(pConnection2OptionsAlternate);
 		return this;
@@ -107,8 +101,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	 * @param pobjConnectionOptions
 	 * @return
 	 */
-	@Override
-	public ISOSConnection Connect(final SOSConnection2OptionsAlternate pConnection2OptionsAlternate) {
+	@Override public ISOSConnection Connect(final SOSConnection2OptionsAlternate pConnection2OptionsAlternate) {
 		connection2OptionsAlternate = pConnection2OptionsAlternate;
 		if (connection2OptionsAlternate == null) {
 			RaiseException(SOSVfs_E_190.params("connection2OptionsAlternate"));
@@ -129,8 +122,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	 * @param authenticationOptions
 	 * @return
 	 */
-	@Override
-	public ISOSConnection Authenticate(final ISOSAuthenticationOptions pAuthenticationOptions) {
+	@Override public ISOSConnection Authenticate(final ISOSAuthenticationOptions pAuthenticationOptions) {
 		authenticationOptions = pAuthenticationOptions;
 		try {
 			this.doAuthenticate(authenticationOptions);
@@ -147,7 +139,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 						port = optionsAlternatives.port.value();
 						this.doAuthenticate(optionsAlternatives);
 						exx = null;
-						connection2OptionsAlternate.AlternateOptionsUsed.setTrue();
 					}
 					catch (Exception e) {
 						exx = e;
@@ -174,8 +165,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	 * @param strUserName
 	 * @param strPassword
 	 */
-	@Override
-	public void login(final String pUserName, final String pPassword) {
+	@Override public void login(final String pUserName, final String pPassword) {
 		try {
 			userName = pUserName;
 			logger.debug(SOSVfs_D_132.params(userName));
@@ -201,8 +191,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	 * \return
 	 *
 	 */
-	@Override
-	public void disconnect() {
+	@Override public void disconnect() {
 		reply = "disconnect OK";
 		if (sftpClient != null) {
 			try {
@@ -228,8 +217,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		this.logINFO(reply);
 	}
 
-	@Override
-	public boolean isConnected() {
+	@Override public boolean isConnected() {
 		return sftpClient != null && sftpClient.isConnected();
 	}
 
@@ -238,8 +226,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	 * @param pstrPathName The pathname of the directory to create.
 	 * @exception JobSchedulerException
 	 */
-	@Override
-	public void mkdir(final String path) {
+	@Override public void mkdir(final String path) {
 		try {
 			SOSOptionFolderName objF = new SOSOptionFolderName(path);
 			reply = "mkdir OK";
@@ -268,8 +255,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	 * @param path The pathname of the directory to remove.
 	 * @exception JobSchedulerException
 	 */
-	@Override
-	public void rmdir(final String path) {
+	@Override public void rmdir(final String path) {
 		try {
 			SOSOptionFolderName objF = new SOSOptionFolderName(path);
 			reply = "rmdir OK";
@@ -280,17 +266,17 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 				reply = "rmdir OK";
 				logger.debug(HostID(SOSVfs_D_181.params("rmdir", strT, getReplyString())));
 			}
-			//			String[] pathArray = path.split("/");
-			//			for (int i = pathArray.length; i > 0; i--) {
-			//				String strT = "";
-			//				for (int j = 0; j < i; j++) {
-			//					strT += pathArray[j] + "/";
-			//				}
-			//				logger.debug(HostID(SOSVfs_D_179.params("rmdir", strT)));
-			//				this.getClient().rmdir(strT);
-			//				reply = "rmdir OK";
-			//				logger.debug(HostID(SOSVfs_D_181.params("rmdir", strT, getReplyString())));
-			//			}
+//			String[] pathArray = path.split("/");
+//			for (int i = pathArray.length; i > 0; i--) {
+//				String strT = "";
+//				for (int j = 0; j < i; j++) {
+//					strT += pathArray[j] + "/";
+//				}
+//				logger.debug(HostID(SOSVfs_D_179.params("rmdir", strT)));
+//				this.getClient().rmdir(strT);
+//				reply = "rmdir OK";
+//				logger.debug(HostID(SOSVfs_D_181.params("rmdir", strT, getReplyString())));
+//			}
 			logINFO(HostID(SOSVfs_D_181.params("rmdir", path, getReplyString())));
 		}
 		catch (Exception e) {
@@ -305,8 +291,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	 * @param filename
 	 * @return true, if filename is a directory
 	 */
-	@Override
-	public boolean isDirectory(final String filename) {
+	@Override public boolean isDirectory(final String filename) {
 		/**
 		 * Problem: the concept of links is not considered in the Concept of SOSVfs
 		 * Therefore: wie return here "true" if the filename is a link
@@ -322,32 +307,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 			}
 		}
 		catch (Exception e) {
-			throw new JADEException(e);
 		}
 		return flgR;
 	}
-
-	//	public boolean canRead(final String filename) {
-	//		/**
-	//		 * Problem: the concept of links is not considered in the Concept of SOSVfs
-	//		 * Therefore: wie return here "true" if the filename is a link
-	//		 */
-	//		boolean flgR = false;
-	//		try {
-	//			SftpATTRS attributes = this.getClient().stat(filename);
-	//			if (attributes != null) {
-	//				SftpATTRS objPermissions = attributes.getPermissions();
-	//				if (flgR == false) {
-	//					flgR = attributes.isLink();
-	//				}
-	//			}
-	//		}
-	//		catch (Exception e) {
-	//			throw new JobSchedulerException(e);
-	//		}
-	//		return flgR;
-	//	}
-	//
 
 	/**
 	 * returns attributes
@@ -377,22 +339,20 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	 * @return
 	 * @throws IOException
 	 */
-	@Override
-	public String[] listNames(String path) throws IOException {
+	@Override public String[] listNames(String path) throws IOException {
 		path = resolvePathname(path);
 		try {
 			if (path.length() == 0) {
 				path = ".";
 			}
-			if (this.fileExists(path) == false) {
+			if (!this.fileExists(path)) {
 				return null;
 			}
-			if (isDirectory(path) == false) {
+			if (!isDirectory(path)) {
 				reply = "ls OK";
 				return new String[] { path };
 			}
-			@SuppressWarnings("unchecked")
-			Vector<LsEntry> lsResult = this.getClient().ls(path);
+			@SuppressWarnings("unchecked") Vector<LsEntry> lsResult = this.getClient().ls(path);
 			String[] result = new String[lsResult.size()];
 			String sep = path.endsWith("/") ? "" : "/";
 			for (int i = 0, j = 0; i < lsResult.size(); i++) {
@@ -407,12 +367,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		}
 		catch (Exception e) {
 			reply = e.toString();
-			if (e instanceof JADEException) {
-				throw (JADEException) e;
-			}
-			else {
-				throw new JADEException(JADEExitCodes.nListError, e);
-			}
+			return null;
 		}
 	}
 
@@ -421,8 +376,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	 * @param remoteFile the file on remote machine
 	 * @return the size of remote-file on remote machine
 	 */
-	@Override
-	public long size(String remoteFile) throws Exception {
+	@Override public long size(String remoteFile) throws Exception {
 		remoteFile = this.resolvePathname(remoteFile);
 		long size = -1;
 		SftpATTRS objAttr;
@@ -451,8 +405,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	 * @param append
 	 * @return
 	 */
-	@Override
-	public long getFile(final String remoteFile, final String localFile, final boolean append) {
+	@Override public long getFile(final String remoteFile, final String localFile, final boolean append) {
 		String sourceLocation = this.resolvePathname(remoteFile);
 		File transferFile = null;
 		long remoteFileSize = -1;
@@ -467,7 +420,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 			transferFile = new File(localFile);
 			if (!append) {
 				if (remoteFileSize > 0 && remoteFileSize != transferFile.length()) {
-					throw new JADEException(SOSVfs_E_162.params(remoteFileSize, transferFile.length()));
+					throw new JobSchedulerException(SOSVfs_E_162.params(remoteFileSize, transferFile.length()));
 				}
 			}
 			remoteFileSize = transferFile.length();
@@ -500,8 +453,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	 * @exception Exception
 	 * @see #put( String, String )
 	 */
-	@Override
-	// ISOSVfsFileTransfer
+	@Override// ISOSVfsFileTransfer
 	public long putFile(final String localFile, final String remoteFile) {
 		long size = 0;
 		try {
@@ -527,24 +479,16 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	 * @throws RunTime error occurs while either sending a
 	 * command to the server or receiving a reply from the server.
 	 */
-	@Override
-	public void delete(final String path) {
+	@Override public void delete(final String path) {
 		try {
-			boolean flgR;
-			try {
-				flgR = this.isDirectory(path);
-			}
-			catch (Exception e) {
-				flgR = false;
-			}
-			if (flgR == true) {
-				JADEExceptionFactory.RaiseDeleteException(HostID(SOSVfs_E_186.params(path)));
+			if (this.isDirectory(path)) {
+				throw new JobSchedulerException(SOSVfs_E_186.params(path));
 			}
 			this.getClient().rm(path);
 		}
 		catch (Exception ex) {
 			reply = ex.toString();
-			JADEExceptionFactory.RaiseJadeException(JADEExitCodes.someUnspecificError, HostID(SOSVfs_E_187.params("delete", path)), ex);
+			RaiseException(ex, SOSVfs_E_187.params("delete", path));
 		}
 		reply = "rm OK";
 		logINFO(HostID(SOSVfs_D_181.params("delete", path, getReplyString())));
@@ -561,8 +505,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	 * @param from
 	 * @param to
 	 */
-	@Override
-	public void rename(String from, String to) {
+	@Override public void rename(String from, String to) {
 		from = this.resolvePathname(from);
 		to = this.resolvePathname(to);
 		try {
@@ -570,7 +513,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		}
 		catch (Exception e) {
 			reply = e.toString();
-			JADEExceptionFactory.RaiseJadeException(JADEExitCodes.someUnspecificError, HostID(SOSVfs_E_188.params("rename", from, to)), e);
+			throw new JobSchedulerException(SOSVfs_E_188.params("rename", from, to), e);
 		}
 		reply = "mv OK";
 		logger.info(HostID(SOSVfs_I_189.params(from, to, getReplyString())));
@@ -586,8 +529,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	 *
 	 * @param strCmd
 	 */
-	@Override
-	public void ExecuteCommand(final String cmd) {
+	@Override public void ExecuteCommand(final String cmd) {
 		final String strEndOfLine = System.getProperty("line.separator");
 		ChannelExec channelExec = null;
 		Integer exitCode = null;
@@ -651,7 +593,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		}
 		catch (Exception ex) {
 			reply = ex.toString();
-			JADEExceptionFactory.RaiseJadeException(JADEExitCodes.someUnspecificError, ex);
+			RaiseException(ex, SOSVfs_E_134.params("ExecuteCommand"));
 		}
 		finally {
 			if (out != null) {
@@ -696,8 +638,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	 * @param fileName
 	 * @return
 	 */
-	@Override
-	public InputStream getInputStream(final String fileName) {
+	@Override public InputStream getInputStream(final String fileName) {
 		try {
 			return this.getClient().get(fileName);
 		}
@@ -718,8 +659,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	 * @param fileName
 	 * @return
 	 */
-	@Override
-	public OutputStream getOutputStream(final String fileName) {
+	@Override public OutputStream getOutputStream(final String fileName) {
 		try {
 			boolean flgModeAppend = false;
 			boolean flgModeRestart = false;
@@ -739,8 +679,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		}
 	}
 
-	@Override
-	public boolean changeWorkingDirectory(String pathname) {
+	@Override public boolean changeWorkingDirectory(String pathname) {
 		try {
 			pathname = this.resolvePathname(pathname);
 			if (!this.fileExists(pathname)) {
@@ -764,8 +703,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		return true;
 	}
 
-	@Override
-	public ISOSVirtualFile getFileHandle(String fileName) {
+	@Override public ISOSVirtualFile getFileHandle(String fileName) {
 		fileName = adjustFileSeparator(fileName);
 		ISOSVirtualFile file = new SOSVfsSFtpFileJCraft(fileName);
 		file.setHandler(this);
@@ -784,13 +722,12 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	 * @param path
 	 * @return
 	 */
-	@Override
-	public String getModificationTime(final String path) {
+	@Override public String getModificationTime(final String path) {
 		String dateTime = null;
 		try {
 			SftpATTRS objAttr = this.getClient().stat(path);
 			if (objAttr != null) {
-				long mt = objAttr.getMTime() * 1000L;
+				int mt = objAttr.getMTime();
 				DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 				dateTime = df.format(new Date(mt));
 			}
@@ -812,8 +749,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	 * @param filename
 	 * @return
 	 */
-	@Override
-	protected boolean fileExists(final String filename) {
+	@Override protected boolean fileExists(final String filename) {
 		try {
 			SftpATTRS attributes = this.getClient().stat(filename);
 			if (attributes != null) {
@@ -828,8 +764,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		}
 	}
 
-	@Override
-	protected String getCurrentPath() {
+	@Override protected String getCurrentPath() {
 		String path = null;
 		try {
 			path = this.getClient().pwd();
@@ -986,15 +921,13 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		long	transmittedSize		= 0;
 		long	transmittedPercent	= -1;
 
-		@Override
-		public void init(final int operation, final String src, final String dest, final long size) {
+		@Override public void init(final int operation, final String src, final String dest, final long size) {
 			totalSize = size;
 			transmittedSize = 0;
 			transmittedPercent = -1;
 		}
 
-		@Override
-		public boolean count(final long transmitted) {
+		@Override public boolean count(final long transmitted) {
 			System.out.println("Completed " + transmittedSize + "(" + transmittedPercent + "%) out of " + totalSize + ".");
 			transmittedSize += transmitted;
 			long percent = transmittedSize * 100 / totalSize;
@@ -1005,14 +938,12 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 			return true;
 		}
 
-		@Override
-		public void end() {
+		@Override public void end() {
 			System.out.println("END " + transmittedSize + "(" + transmittedPercent + "%) out of " + totalSize + ".");
 		}
 	}
 
-	@Override
-	public void close() {
+	@Override public void close() {
 		try {
 			//			sshSession.disconnect();  // see SOSFTP-122
 			//			sshSession = null;
@@ -1022,14 +953,12 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		}
 	}
 
-	@Override
-	public OutputStream getOutputStream() {
+	@Override public OutputStream getOutputStream() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
-	public InputStream getInputStream() {
+	@Override public InputStream getInputStream() {
 		return null;
 	}
 }

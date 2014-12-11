@@ -73,8 +73,12 @@ import com.sos.i18n.annotation.I18NResourceBundle;
   }  //  private void SetJobSchedulerSSHJobOptions (HashMap <String, String> pobjHM)
  * \endverbatim
  */
-@JSOptionClass(name = "SOSConnection2OptionsSuperClass", description = "SOSConnection2OptionsSuperClass")
-@I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
+@JSOptionClass(
+				name = "SOSConnection2OptionsSuperClass",
+				description = "SOSConnection2OptionsSuperClass")
+@I18NResourceBundle(
+					baseName = "SOSVirtualFileSystem",
+					defaultLocale = "en")
 public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements ISOSAuthenticationOptions, ISOSDataProviderOptions {
 	/**
 	 *
@@ -98,7 +102,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 *
 	 * \created 30.04.2014 16:32:05 by KB
 	 */
-	@JSOptionDefinition(name = "url", description = "the url for the connection", key = "url", type = "SOSOptionURL", mandatory = false)
+	@JSOptionDefinition(
+						name = "url",
+						description = "the url for the connection",
+						key = "url",
+						type = "SOSOptionURL",
+						mandatory = false)
 	public SOSOptionUrl			url					= new SOSOptionUrl( // ...
 															this, // ....
 															conClassName + ".url", // ...
@@ -107,15 +116,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 															"", // ...
 															false);
 
-	public SOSOptionUrl			URI					= (SOSOptionUrl) url.SetAlias("uri");
-
 	/* (non-Javadoc)
 	 * @see com.sos.VirtualFileSystem.Options.ISOSDataProviderOptions#geturl()
 	 */
 	@Override
 	public SOSOptionUrl geturl() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::geturl";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::geturl";
 		return url;
 	} // public String geturl
 
@@ -124,8 +130,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 */
 	@Override
 	public ISOSDataProviderOptions seturl(final SOSOptionUrl pstrValue) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::seturl";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::seturl";
 		url = pstrValue;
 		return this;
 	} // public SOSConnection2OptionsSuperClass seturl
@@ -141,7 +146,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 *
 	 * \created 17.12.2013 19:51:59 by KB
 	 */
-	@JSOptionDefinition(name = "include", description = "the include directive as an option", key = "include", type = "SOSOptionString", mandatory = false)
+	@JSOptionDefinition(
+						name = "include",
+						description = "the include directive as an option",
+						key = "include",
+						type = "SOSOptionString",
+						mandatory = false)
 	public SOSOptionString	include	= new SOSOptionString(
 									// ...
 											this, // ....
@@ -156,8 +166,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 */
 	@Override
 	public String getinclude() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getinclude";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getinclude";
 		return include.Value();
 	} // public String getinclude
 
@@ -166,8 +175,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 */
 	@Override
 	public ISOSDataProviderOptions setinclude(final String pstrValue) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::setinclude";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setinclude";
 		include.Value(pstrValue);
 		return this;
 	} // public SOSFtpOptionsSuperClass setinclude
@@ -183,7 +191,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 *
 	 * \created 04.03.2014 20:15:20 by KB
 	 */
-	@JSOptionDefinition(name = "use_zlib_compression", description = "Use the zlib cmpression on sftp", key = "use_zlib_compression", type = "SOSOptionBoolean", mandatory = false)
+	@JSOptionDefinition(
+						name = "use_zlib_compression",
+						description = "Use the zlib cmpression on sftp",
+						key = "use_zlib_compression",
+						type = "SOSOptionBoolean",
+						mandatory = false)
 	public SOSOptionBoolean	use_zlib_compression	= new SOSOptionBoolean( // ...
 															this, // ....
 															conClassName + ".use_zlib_compression", // ...
@@ -197,8 +210,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 */
 	@Override
 	public SOSOptionBoolean getuse_zlib_compression() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getuse_zlib_compression";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getuse_zlib_compression";
 		return use_zlib_compression;
 	} // public String getuse_zlib_compression
 
@@ -207,8 +219,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 */
 	@Override
 	public ISOSDataProviderOptions setuse_zlib_compression(final SOSOptionBoolean pstrValue) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::setuse_zlib_compression";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setuse_zlib_compression";
 		use_zlib_compression = pstrValue;
 		return this;
 	} // public SOSConnection2OptionsSuperClass setuse_zlib_compression
@@ -224,7 +235,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 *
 	 * \created 04.03.2014 20:21:38 by KB
 	 */
-	@JSOptionDefinition(name = "zlib_compression_level", description = "the compression level to use", key = "zlib_compression_level", type = "SOSOptionInteger", mandatory = false)
+	@JSOptionDefinition(
+						name = "zlib_compression_level",
+						description = "the compression level to use",
+						key = "zlib_compression_level",
+						type = "SOSOptionInteger",
+						mandatory = false)
 	public SOSOptionInteger	zlib_compression_level	= new SOSOptionInteger( // ...
 															this, // ....
 															conClassName + ".zlib_compression_level", // ...
@@ -238,8 +254,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 */
 	@Override
 	public SOSOptionInteger getzlib_compression_level() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getzlib_compression_level";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getzlib_compression_level";
 		return zlib_compression_level;
 	} // public String getzlib_compression_level
 
@@ -248,8 +263,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 */
 	@Override
 	public ISOSDataProviderOptions setzlib_compression_level(final SOSOptionInteger pstrValue) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::setzlib_compression_level";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setzlib_compression_level";
 		zlib_compression_level = pstrValue;
 		return this;
 	} // public SOSConnection2OptionsSuperClass setzlib_compression_level
@@ -265,7 +279,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 *
 	 * \created 05.07.2013 11:02:58 by KB
 	 */
-	@JSOptionDefinition(name = "ProtocolCommandListener", description = "Activate the logging for Apache ftp client", key = "Protocol_Command_Listener", type = "SOSOptionBoolean", mandatory = true)
+	@JSOptionDefinition(
+						name = "ProtocolCommandListener",
+						description = "Activate the logging for Apache ftp client",
+						key = "Protocol_Command_Listener",
+						type = "SOSOptionBoolean",
+						mandatory = true)
 	public SOSOptionBoolean	ProtocolCommandListener	= new SOSOptionBoolean(
 													// ...
 															this, // ....
@@ -280,8 +299,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 */
 	@Override
 	public String getProtocolCommandListener() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getProtocolCommandListener";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getProtocolCommandListener";
 		return ProtocolCommandListener.Value();
 	} // public String getProtocolCommandListener
 
@@ -290,8 +308,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 */
 	@Override
 	public ISOSDataProviderOptions setProtocolCommandListener(final String pstrValue) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::setProtocolCommandListener";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setProtocolCommandListener";
 		ProtocolCommandListener.Value(pstrValue);
 		return this;
 	} // public SOSConnection2OptionsSuperClass setProtocolCommandListener
@@ -301,7 +318,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	Optional account info for authentication with an (FTP) server.
 	*
 	*/
-	@JSOptionDefinition(name = "account", description = "Optional account info for authentication with an", key = "account", type = "SOSOptionString", mandatory = false)
+	@JSOptionDefinition(
+						name = "account",
+						description = "Optional account info for authentication with an",
+						key = "account",
+						type = "SOSOptionString",
+						mandatory = false)
 	public SOSOptionString	account	= new SOSOptionString(this, conClassName + ".account", // HashMap-Key
 											"Optional account info for authentication with an", // Titel
 											"", // InitValue
@@ -336,7 +358,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 *
 	 * \created 20.07.2012 18:19:14 by KB
 	 */
-	@JSOptionDefinition(name = "make_Dirs", description = "Create missing Directory on Target", key = "make_Dirs", type = "SOSOptionBoolean", mandatory = false)
+	@JSOptionDefinition(
+						name = "make_Dirs",
+						description = "Create missing Directory on Target",
+						key = "make_Dirs",
+						type = "SOSOptionBoolean",
+						mandatory = false)
 	public SOSOptionBoolean	makeDirs				= new SOSOptionBoolean(
 													// ...
 															this, // ....
@@ -353,8 +380,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 */
 	@Override
 	public String getmake_Dirs() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getmake_Dirs";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getmake_Dirs";
 		return makeDirs.Value();
 	} // public String getmake_Dirs
 
@@ -363,12 +389,16 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 */
 	@Override
 	public ISOSDataProviderOptions setmake_Dirs(final String pstrValue) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::setmake_Dirs";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setmake_Dirs";
 		makeDirs.Value(pstrValue);
 		return this;
 	} // public SOSFtpOptionsSuperClass setmake_Dirs
-	@JSOptionDefinition(name = "dir", description = "Optional account info for authentication with an", key = "dir", type = "SOSOptionFolderName", mandatory = false)
+	@JSOptionDefinition(
+						name = "dir",
+						description = "Optional account info for authentication with an",
+						key = "dir",
+						type = "SOSOptionFolderName",
+						mandatory = false)
 	public SOSOptionFolderName	Directory	= new SOSOptionFolderName(this, conClassName + ".dir", // HashMap-Key
 													"local_dir Local directory into which or from which", // Titel
 													"", // InitValue
@@ -388,7 +418,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 *
 	 * \created 22.02.2013 18:21:22 by KB
 	 */
-	@JSOptionDefinition(name = "platform", description = "platform on which the app is running", key = "platform", type = "SOSOptionString", mandatory = false)
+	@JSOptionDefinition(
+						name = "platform",
+						description = "platform on which the app is running",
+						key = "platform",
+						type = "SOSOptionString",
+						mandatory = false)
 	public SOSOptionPlatform	platform	= new SOSOptionPlatform(
 											// ...
 													this, // ....
@@ -403,8 +438,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 */
 	@Override
 	public String getplatform() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getplatform";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getplatform";
 		return platform.Value();
 	} // public String getplatform
 
@@ -413,8 +447,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 */
 	@Override
 	public ISOSDataProviderOptions setplatform(final String pstrValue) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::setplatform";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setplatform";
 		platform.Value(pstrValue);
 		return this;
 	} // public SOSFtpOptionsSuperClass setplatform
@@ -424,7 +457,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	String for replacement of matching character sequences within file names that are specified with the value of the parameter replacing. If multiple "capturing groups" shall be replaced then one replacement string per group has to be specified. These strings are separated by a semicolon ";": replacement: aa;[filename:];bb Supports masks for substitution in the file name with format strings that are enclosed with [ and ] . The following format strings are supported: [date: date format ] date format must be a valid Java data format string, e.g. yyyyMMddHHmmss , yyyy-MM-dd.HHmmss etc. [filename:] Will be substituted by the original file name including the file extension. [filename:lowercase] Will be substituted by the original file name including the file extension with all characters converted to lower case. [filename:uppercase] Will be substituted by the original file name including the file extension with all characters converted to upper case. Requires the parameter replacing to be specified.
 	*
 	*/
-	@JSOptionDefinition(name = "replacement", description = "String for replacement of matching character seque", key = "replacement", type = "SOSOptionString", mandatory = false)
+	@JSOptionDefinition(
+						name = "replacement",
+						description = "String for replacement of matching character seque",
+						key = "replacement",
+						type = "SOSOptionString",
+						mandatory = false)
 	public SOSOptionString	replacement	= new SOSOptionString(this, conClassName + ".replacement", // HashMap-Key
 												"String for replacement of matching character seque", // Titel
 												null, // InitValue
@@ -457,7 +495,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	Only the content of the capturing groups is replaced. Replacements are separated by a semicolon ";". Example: replacing : (1)abc(12)def(.*) replacement : A;BB;CCC Input file: 1abc12def123.txt Output file: AabcBBdefCCC b) If no "capturing groups" are specified then the entire match is replaced. Example: replacing : Hello replacement : 1234 Input file: Hello_World.txt Output file: 1234_World.txt Requires the parameter replacement to be specified.
 	*
 	*/
-	@JSOptionDefinition(name = "replacing", description = "Regular expression for filename replacement with", key = "replacing", type = "SOSOptionRegExp", mandatory = false)
+	@JSOptionDefinition(
+						name = "replacing",
+						description = "Regular expression for filename replacement with",
+						key = "replacing",
+						type = "SOSOptionRegExp",
+						mandatory = false)
 	public SOSOptionRegExp	replacing	= new SOSOptionRegExp(this, conClassName + ".replacing", // HashMap-Key
 												"Regular expression for filename replacement with", // Titel
 												"", // InitValue
@@ -493,7 +536,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 *
 	 * \created 13.11.2012 18:40:25 by KB
 	 */
-	@JSOptionDefinition(name = "Strict_HostKey_Checking", description = "Check the hostkey against known hosts for SSH", key = "Strict_HostKey_Checking", type = "SOSOptionValueList", mandatory = false)
+	@JSOptionDefinition(
+						name = "Strict_HostKey_Checking",
+						description = "Check the hostkey against known hosts for SSH",
+						key = "Strict_HostKey_Checking",
+						type = "SOSOptionValueList",
+						mandatory = false)
 	public SOSOptionStringValueList	StrictHostKeyChecking	= new SOSOptionStringValueList(
 															// ...
 																	this, // ....
@@ -508,8 +556,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 */
 	@Override
 	public String getStrict_HostKey_Checking() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getStrict_HostKey_Checking";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getStrict_HostKey_Checking";
 		return StrictHostKeyChecking.Value();
 	} // public String getStrict_HostKey_Checking
 
@@ -518,8 +565,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 */
 	@Override
 	public ISOSDataProviderOptions setStrict_HostKey_Checking(final String pstrValue) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::setStrict_HostKey_Checking";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setStrict_HostKey_Checking";
 		StrictHostKeyChecking.Value(pstrValue);
 		return this;
 	} // public SOSFtpOptionsSuperClass setStrict_HostKey_Checking
@@ -535,7 +581,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 *
 	 * \created 08.04.2014 16:23:51 by KB
 	 */
-	@JSOptionDefinition(name = "TFN_Post_Command", description = "Post commands executed after creating the final TargetFile", key = "TFN_Post_Command", type = "SOSOptionString", mandatory = false)
+	@JSOptionDefinition(
+						name = "TFN_Post_Command",
+						description = "Post commands executed after creating the final TargetFile",
+						key = "TFN_Post_Command",
+						type = "SOSOptionString",
+						mandatory = false)
 	public SOSOptionString	TFN_Post_Command	= new SOSOptionString( // ...
 														this, // ....
 														conClassName + ".TFN_Post_Command", // ...
@@ -549,8 +600,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 */
 	@Override
 	public SOSOptionString getTFN_Post_Command() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getTFN_Post_Command";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getTFN_Post_Command";
 		return TFN_Post_Command;
 	} // public String getTFN_Post_Command
 
@@ -559,8 +609,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 */
 	@Override
 	public ISOSDataProviderOptions setTFN_Post_Command(final SOSOptionString pstrValue) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::setTFN_Post_Command";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setTFN_Post_Command";
 		TFN_Post_Command = pstrValue;
 		return this;
 	} // public SOSConnection2OptionsSuperClass setTFN_Post_Command
@@ -576,7 +625,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 *
 	 * \created 12.10.2011 12:28:42 by KB
 	 */
-	@JSOptionDefinition(name = "Post_Command", description = "FTP-Command to be executed after transfer", key = "Post_Command", type = "SOSOptionString", mandatory = false)
+	@JSOptionDefinition(
+						name = "Post_Command",
+						description = "FTP-Command to be executed after transfer",
+						key = "Post_Command",
+						type = "SOSOptionString",
+						mandatory = false)
 	public SOSOptionString	Post_Command	= new SOSOptionString(
 											// ...
 													this, // ....
@@ -591,8 +645,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 */
 	@Override
 	public String getPost_Command() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getPost_Command";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getPost_Command";
 		return Post_Command.Value();
 	} // public String getPost_Command
 
@@ -601,8 +654,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 */
 	@Override
 	public ISOSDataProviderOptions setPost_Command(final String pstrValue) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::setPost_Command";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setPost_Command";
 		Post_Command.Value(pstrValue);
 		return this;
 	} // public SOSFTPOptions setPost_Command
@@ -618,7 +670,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 *
 	 * \created 12.10.2011 12:25:27 by KB
 	 */
-	@JSOptionDefinition(name = "Pre_Command", description = "FTP-Command to be execute before transfer", key = "Pre_Command", type = "SOSOptionString  ", mandatory = false)
+	@JSOptionDefinition(
+						name = "Pre_Command",
+						description = "FTP-Command to be execute before transfer",
+						key = "Pre_Command",
+						type = "SOSOptionString  ",
+						mandatory = false)
 	public SOSOptionString	Pre_Command	= new SOSOptionString(
 										// ...
 												this, // ....
@@ -633,8 +690,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 */
 	@Override
 	public String getPre_Command() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getPre_Command";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getPre_Command";
 		return Pre_Command.Value();
 	} // public String getPre_Command
 
@@ -643,8 +699,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 */
 	@Override
 	public ISOSDataProviderOptions setPre_Command(final String pstrValue) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::setPre_Command";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setPre_Command";
 		Pre_Command.Value(pstrValue);
 		return this;
 	} // public SOSFTPOptions setPre_Command
@@ -660,7 +715,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 *
 	 * \created 21.04.2011 18:15:36 by KB
 	 */
-	@JSOptionDefinition(name = "FtpS_protocol", description = "Type of FTPS-Protocol, e.g. SSL, TLS", key = "FtpS_protocol", type = "SOSOptionString", mandatory = true)
+	@JSOptionDefinition(
+						name = "FtpS_protocol",
+						description = "Type of FTPS-Protocol, e.g. SSL, TLS",
+						key = "FtpS_protocol",
+						type = "SOSOptionString",
+						mandatory = true)
 	public SOSOptionString	FtpS_protocol	= new SOSOptionString(
 											// ...
 													this, // ....
@@ -675,8 +735,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 */
 	@Override
 	public String getFtpS_protocol() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getFtpS_protocol";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getFtpS_protocol";
 		return FtpS_protocol.Value();
 	} // public String getFtpS_protocol
 
@@ -685,8 +744,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 */
 	@Override
 	public ISOSDataProviderOptions setFtpS_protocol(final String pstrValue) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::setFtpS_protocol";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setFtpS_protocol";
 		FtpS_protocol.Value(pstrValue);
 		return this;
 	} // public SOSConnection2OptionsAlternate setFtpS_protocol
@@ -702,7 +760,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 *
 	 * \created 08.06.2012 13:31:04 by KB
 	 */
-	@JSOptionDefinition(name = "loadClassName", description = "Java Class which implements the ISOSVFSHandlerInterface", key = "load_Class_Name", type = "SOSOptionString ", mandatory = false)
+	@JSOptionDefinition(
+						name = "loadClassName",
+						description = "Java Class which implements the ISOSVFSHandlerInterface",
+						key = "load_Class_Name",
+						type = "SOSOptionString ",
+						mandatory = false)
 	public SOSOptionJavaClassName	loadClassName			= new SOSOptionJavaClassName(
 															// ...
 																	this, // ....
@@ -718,8 +781,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 */
 	@Override
 	public String getloadClassName() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getloadClassName";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getloadClassName";
 		return loadClassName.Value();
 	} // public String getloadClassName
 
@@ -728,8 +790,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 */
 	@Override
 	public ISOSDataProviderOptions setloadClassName(final String pstrValue) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::setloadClassName";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setloadClassName";
 		loadClassName.Value(pstrValue);
 		return this;
 	} // public SOSConnection2OptionsSuperClass setloadClassName
@@ -738,7 +799,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 *
 	 *
 	 */
-	@JSOptionDefinition(name = "javaClassPath", description = "", key = "javaClassPath", type = "SOSOptionString", mandatory = false)
+	@JSOptionDefinition(
+						name = "javaClassPath",
+						description = "",
+						key = "javaClassPath",
+						type = "SOSOptionString",
+						mandatory = false)
 	public SOSOptionString	javaClassPath	= new SOSOptionString(this, conClassName + ".javaClassPath", // HashMap-Key
 													"", // Titel
 													"", // InitValue
@@ -766,7 +832,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 * This parameter specifies the hostname or IP address of the server to which a connection has to be made.
 	 *
 	 */
-	@JSOptionDefinition(name = "host", description = "Host-Name This parameter specifies th", key = "host", type = "SOSOptionHostName", mandatory = false)
+	@JSOptionDefinition(
+						name = "host",
+						description = "Host-Name This parameter specifies th",
+						key = "host",
+						type = "SOSOptionHostName",
+						mandatory = false)
 	public SOSOptionHostName	host	= new SOSOptionHostName(this, conClassName + ".host", // HashMap-Key
 												"Host-Name This parameter specifies th", // Titel
 												"", // InitValue
@@ -796,7 +867,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 * Passive mode for FTP is often used with firewalls. Valid values are 0 or 1.
 	 *
 	 */
-	@JSOptionDefinition(name = "passive_mode", description = "passive_mode Passive mode for FTP is often used wit", key = "passive_mode", type = "SOSOptionBoolean", mandatory = false)
+	@JSOptionDefinition(
+						name = "passive_mode",
+						description = "passive_mode Passive mode for FTP is often used wit",
+						key = "passive_mode",
+						type = "SOSOptionBoolean",
+						mandatory = false)
 	public SOSOptionBoolean		passive_mode	= new SOSOptionBoolean(this, conClassName + ".passive_mode", // HashMap-Key
 														"passive_mode Passive mode for FTP is often used wit", // Titel
 														"false", // InitValue
@@ -826,7 +902,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 * Port by which files should be transferred. For FTP this is usually port 21, for SFTP this is usually port 22.
 	 *
 	 */
-	@JSOptionDefinition(name = "port", description = "Port-Number to be used for Data-Transfer", key = "port", type = "SOSOptionPortNumber", mandatory = true)
+	@JSOptionDefinition(
+						name = "port",
+						description = "Port-Number to be used for Data-Transfer",
+						key = "port",
+						type = "SOSOptionPortNumber",
+						mandatory = true)
 	public SOSOptionPortNumber	port						= new SOSOptionPortNumber(this, conClassName + ".port", // HashMap-Key
 																	"Port-Number to be used for Data-Transfer", // Titel
 																	"21", // InitValue
@@ -855,7 +936,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 * The values ftp, sftp or ftps are valid for this parameter. If sftp is used, then the ssh_* parameters will be applied.
 	 *
 	 */
-	@JSOptionDefinition(name = "protocol", description = "Type of requested Datatransfer The values ftp, sftp", key = "protocol", type = "SOSOptionStringValueList", mandatory = true)
+	@JSOptionDefinition(
+						name = "protocol",
+						description = "Type of requested Datatransfer The values ftp, sftp",
+						key = "protocol",
+						type = "SOSOptionStringValueList",
+						mandatory = true)
 	public SOSOptionTransferType	protocol		= new SOSOptionTransferType(this, conClassName + ".protocol", // HashMap-Key
 															"Type of requested Datatransfer The values ftp, sftp", // Titel
 															"", // InitValue
@@ -879,23 +965,27 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	public void setprotocol(final SOSOptionTransferType p_protocol) {
 		protocol = p_protocol;
 	}
-	public SOSOptionTransferType	TransferProtocol	= (SOSOptionTransferType) protocol.SetAlias(conClassName + ".TransferProtocol");
+	public SOSOptionTransferType	TransferProtocol		= (SOSOptionTransferType) protocol.SetAlias(conClassName + ".TransferProtocol");
 	/**
 	 * \var transfer_mode : Type of Character-Encoding Transfe
 	 * Transfer mode is used for FTP exclusively and can be either ascii or binary.
 	 *
 	 */
-	@JSOptionDefinition(name = "transfer_mode", description = "Type of Character-Encoding Transfe", key = "transfer_mode", type = "SOSOptionTransferMode", mandatory = false)
-	public SOSOptionTransferMode	transfer_mode		= new SOSOptionTransferMode(this, conClassName + ".transfer_mode", // HashMap-Key
-																"Type of Character-Encoding Transfe", // Titel
-																"ascii;binary;text", // InitValue
-																"binary", // DefaultValue
-																false // isMandatory
-														);
-	public SOSOptionTransferMode	ftp_transfer_mode	= (SOSOptionTransferMode) transfer_mode.SetAlias("ftp_transfer_mode");
-
-	//	@SuppressWarnings("unused")
-	//	protected final String			strAlternativePrefix	= "";
+	@JSOptionDefinition(
+						name = "transfer_mode",
+						description = "Type of Character-Encoding Transfe",
+						key = "transfer_mode",
+						type = "SOSOptionTransferMode",
+						mandatory = false)
+	public SOSOptionTransferMode	transfer_mode			= new SOSOptionTransferMode(this, conClassName + ".transfer_mode", // HashMap-Key
+																	"Type of Character-Encoding Transfe", // Titel
+																	"ascii;binary;text", // InitValue
+																	"binary", // DefaultValue
+																	false // isMandatory
+															);
+	public SOSOptionTransferMode	ftp_transfer_mode		= (SOSOptionTransferMode) transfer_mode.SetAlias("ftp_transfer_mode");
+	@SuppressWarnings("unused")
+	private final String			strAlternativePrefix	= "";
 
 	/* (non-Javadoc)
 	 * @see com.sos.VirtualFileSystem.Options.ISOSDataProviderOptions#gettransfer_mode()
@@ -918,7 +1008,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	User name for authentication at the (FTP/SFTP) server.
 	*
 	*/
-	@JSOptionDefinition(name = "user", description = "UserID of user in charge User name", key = "user", type = "SOSOptionUserName", mandatory = true)
+	@JSOptionDefinition(
+						name = "user",
+						description = "UserID of user in charge User name",
+						key = "user",
+						type = "SOSOptionUserName",
+						mandatory = true)
 	public SOSOptionUserName	user	= new SOSOptionUserName(this, conClassName + ".user", // HashMap-Key
 												"UserID of user in charge User name", // Titel
 												"", // InitValue
@@ -929,8 +1024,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	/* (non-Javadoc)
 	 * @see com.sos.VirtualFileSystem.Options.ISOSDataProviderOptions#getUser()
 	 */
-	@Override
-	public SOSOptionUserName getUser() {
+	@Override public SOSOptionUserName getUser() {
 		return user;
 	}
 	/**
@@ -939,7 +1033,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	Password for authentication at the FTP/SFTP server. For SSH/SFTP connections that make use of public/private key authentication the password parameter is specified for the passphrase that optionally secures a private key.
 	*
 	*/
-	@JSOptionDefinition(name = "password", description = "Password for UserID Password for a", key = "password", type = "SOSOptionPassword", mandatory = false)
+	@JSOptionDefinition(
+						name = "password",
+						description = "Password for UserID Password for a",
+						key = "password",
+						type = "SOSOptionPassword",
+						mandatory = false)
 	public SOSOptionPassword	password	= new SOSOptionPassword(this, conClassName + ".password", // HashMap-Key
 													"Password for UserID Password for a", // Titel
 													"", // InitValue
@@ -950,16 +1049,14 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	/* (non-Javadoc)
 	 * @see com.sos.VirtualFileSystem.Options.ISOSDataProviderOptions#getPassword()
 	 */
-	@Override
-	public SOSOptionPassword getPassword() {
+	@Override public SOSOptionPassword getPassword() {
 		return password;
 	}
 
 	/* (non-Javadoc)
 	 * @see com.sos.VirtualFileSystem.Options.ISOSDataProviderOptions#setPassword(com.sos.JSHelper.Options.SOSOptionPassword)
 	 */
-	@Override
-	public void setPassword(final SOSOptionPassword p_password) {
+	@Override public void setPassword(final SOSOptionPassword p_password) {
 		password = p_password;
 	}
 	/**
@@ -968,7 +1065,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	passphrase for authentication at the SFTP server. For SSH/SFTP connections that make use of public/private key authentication the passphrase parameter is specified for the passphrase that optionally secures a private key.
 	*
 	*/
-	@JSOptionDefinition(name = "passphrase", description = "passphrase for UserID passphrase for a", key = "passphrase", type = "SOSOptionpassphrase", mandatory = false)
+	@JSOptionDefinition(
+						name = "passphrase",
+						description = "passphrase for UserID passphrase for a",
+						key = "passphrase",
+						type = "SOSOptionpassphrase",
+						mandatory = false)
 	public SOSOptionPassphrase	passphrase	= new SOSOptionPassphrase(this, conClassName + ".passphrase", // HashMap-Key
 													"passphrase for UserID passphrase for a", // Titel
 													"", // InitValue
@@ -1017,10 +1119,9 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 * \see toOut
 	 */
 	private String getAllOptionsAsString() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getAllOptionsAsString";
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getAllOptionsAsString";
 		String strT = conClassName + "\n";
-		//		final StringBuffer strBuffer = new StringBuffer();
+		final StringBuffer strBuffer = new StringBuffer();
 		// strT += IterateAllDataElementsByAnnotation(objParentClass, this,
 		// JSOptionsClass.IterationTypes.toString, strBuffer);
 		// strT += IterateAllDataElementsByAnnotation(objParentClass, this, 13,
@@ -1033,10 +1134,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	/* (non-Javadoc)
 	 * @see com.sos.VirtualFileSystem.Options.ISOSDataProviderOptions#setAllOptions(java.util.HashMap)
 	 */
-	@Override
-	public void setAllOptions(final HashMap<String, String> pobjJSSettings) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::setAllOptions";
+	@Override public void setAllOptions(final HashMap<String, String> pobjJSSettings)  {
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setAllOptions";
 		flgSetAllOptions = true;
 		objSettings = pobjJSSettings;
 		super.Settings(objSettings);
@@ -1053,8 +1152,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 * @throws Exception
 	 * - wird ausgelöst, wenn eine mandatory-Option keinen Wert hat
 	 */
-	@Override
-	public void CheckMandatory() throws JSExceptionMandatoryOptionMissing //
+	@Override public void CheckMandatory() throws JSExceptionMandatoryOptionMissing //
 			, Exception {
 		try {
 			super.CheckMandatory();
@@ -1078,8 +1176,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 * @param pstrArgs
 	 * @throws Exception
 	 */
-	@Override
-	public void CommandLineArgs(final String[] pstrArgs) {
+	@Override public void CommandLineArgs(final String[] pstrArgs)  {
 		super.CommandLineArgs(pstrArgs);
 		this.setAllOptions(super.objSettings);
 	}
@@ -1089,7 +1186,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	This parameter specifies the path and name of a user's private key file that is used for authentication with an SSH server. This parameter has to be specified should the publickey authentication method have been specified in the ssh_auth_method parameter. Should the private key file be secured by a passphrase, then the passphrase has to be specified using the password parameter.
 	*
 	*/
-	@JSOptionDefinition(name = "ssh_auth_file", description = "This parameter specifies the path and name of a us", key = "ssh_auth_file", type = "SOSOptionInFileName", mandatory = false)
+	@JSOptionDefinition(
+						name = "ssh_auth_file",
+						description = "This parameter specifies the path and name of a us",
+						key = "ssh_auth_file",
+						type = "SOSOptionInFileName",
+						mandatory = false)
 	public SOSOptionInFileName	ssh_auth_file	= new SOSOptionInFileName(this, conClassName + ".ssh_auth_file", // HashMap-Key
 														"This parameter specifies the path and name of a us", // Titel
 														" ", // InitValue
@@ -1101,16 +1203,14 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	/* (non-Javadoc)
 	 * @see com.sos.VirtualFileSystem.Options.ISOSDataProviderOptions#getAuth_file()
 	 */
-	@Override
-	public SOSOptionInFileName getAuth_file() {
+	@Override public SOSOptionInFileName getAuth_file() {
 		return ssh_auth_file;
 	}
 
 	/* (non-Javadoc)
 	 * @see com.sos.VirtualFileSystem.Options.ISOSDataProviderOptions#setAuth_file(com.sos.JSHelper.Options.SOSOptionInFileName)
 	 */
-	@Override
-	public void setAuth_file(final SOSOptionInFileName p_ssh_auth_file) {
+	@Override public void setAuth_file(final SOSOptionInFileName p_ssh_auth_file) {
 		ssh_auth_file = p_ssh_auth_file;
 	}
 	/**
@@ -1119,7 +1219,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	This parameter specifies the authentication method for the SSH server - the publickey and password methods are supported. Should the publickey authentication method be used, then the path name of the private key file has to be specified with the ssh_auth_file parameter. Should the private key file be secured by a passphrase then the passphrase has to be specified with the password parameter. For the password authentication method the password for the user account has to be specified using the password parameter. The authentication methods that are enabled depend on the SSH server configuration. Not all SSH servers are configured for password authentication.
 	*
 	*/
-	@JSOptionDefinition(name = "ssh_auth_method", description = "This parameter specifies the authentication method", key = "ssh_auth_method", type = "SOSOptionStringValueList", mandatory = false)
+	@JSOptionDefinition(
+						name = "ssh_auth_method",
+						description = "This parameter specifies the authentication method",
+						key = "ssh_auth_method",
+						type = "SOSOptionStringValueList",
+						mandatory = false)
 	public SOSOptionAuthenticationMethod	ssh_auth_method	= new SOSOptionAuthenticationMethod(this, conClassName + ".ssh_auth_method", // HashMap-Key
 																	"This parameter specifies the authentication method", // Titel
 																	"publickey", // InitValue
@@ -1131,24 +1236,21 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	/* (non-Javadoc)
 	 * @see com.sos.VirtualFileSystem.Options.ISOSDataProviderOptions#getAuth_method()
 	 */
-	@Override
-	public SOSOptionAuthenticationMethod getAuth_method() {
+	@Override public SOSOptionAuthenticationMethod getAuth_method() {
 		return ssh_auth_method;
 	}
 
 	/* (non-Javadoc)
 	 * @see com.sos.VirtualFileSystem.Options.ISOSDataProviderOptions#setAuth_method(com.sos.JSHelper.Options.SOSOptionAuthenticationMethod)
 	 */
-	@Override
-	public void setAuth_method(final SOSOptionAuthenticationMethod p_ssh_auth_method) {
+	@Override public void setAuth_method(final SOSOptionAuthenticationMethod p_ssh_auth_method) {
 		ssh_auth_method = p_ssh_auth_method;
 	}
 
 	/* (non-Javadoc)
 	 * @see com.sos.VirtualFileSystem.Options.ISOSDataProviderOptions#setUser(com.sos.JSHelper.Options.SOSOptionUserName)
 	 */
-	@Override
-	public void setUser(final SOSOptionUserName pobjUser) {
+	@Override public void setUser(final SOSOptionUserName pobjUser) {
 		user.Value(pobjUser.Value());
 	}
 	/**
@@ -1157,7 +1259,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	* The value of this parameter is the host name or the IP address of a proxy.
 	*
 	*/
-	@JSOptionDefinition(name = "proxy_host", description = "Host name or the IP address of a proxy", key = "proxy_host", type = "SOSOptionHostName", mandatory = false)
+	@JSOptionDefinition(
+						name = "proxy_host",
+						description = "Host name or the IP address of a proxy",
+						key = "proxy_host",
+						type = "SOSOptionHostName",
+						mandatory = false)
 	public SOSOptionHostName	proxy_host	= new SOSOptionHostName(this, conClassName + ".proxy_host", // HashMap-Key
 													"The value of this parameter is the host name or th", // Titel
 													"", // InitValue
@@ -1184,7 +1291,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	* This parameter specifies the port of a proxy that is used in order to establish a connection to the SSH server via SSL/TLS, see parameter http_proxy_host.
 	*
 	*/
-	@JSOptionDefinition(name = "proxy_port", description = "Port-Number to be used for a proxy", key = "proxy_port", type = "SOSOptionPortNumber", mandatory = false)
+	@JSOptionDefinition(
+						name = "proxy_port",
+						description = "Port-Number to be used for a proxy",
+						key = "proxy_port",
+						type = "SOSOptionPortNumber",
+						mandatory = false)
 	public SOSOptionPortNumber	proxy_port	= new SOSOptionPortNumber(this, conClassName + ".proxy_port", // HashMap-Key
 													"This parameter specifies the port of a proxy that", // Titel
 													"", // InitValue
@@ -1211,7 +1323,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	* This parameter specifies the user name of a proxy that is used in order to establish a connection to the SSH server via SSL/TLS, see parameter proxy_host.
 	*
 	*/
-	@JSOptionDefinition(name = "proxy_user", description = "User name to be used for a proxy", key = "proxy_user", type = "SOSOptionUserName", mandatory = false)
+	@JSOptionDefinition(
+						name = "proxy_user",
+						description = "User name to be used for a proxy",
+						key = "proxy_user",
+						type = "SOSOptionUserName",
+						mandatory = false)
 	public SOSOptionUserName	proxy_user	= new SOSOptionUserName(this, conClassName + ".proxy_user", // HashMap-Key
 													"This parameter specifies the user name of a proxy that", // Titel
 													"", // InitValue
@@ -1238,7 +1355,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	* This parameter specifies the password of a proxy that is used in order to establish a connection to the SSH server via SSL/TLS, see parameter proxy_host.
 	*
 	*/
-	@JSOptionDefinition(name = "proxy_password", description = "Password to be used for a proxy", key = "proxy_password", type = "SOSOptionPassword", mandatory = false)
+	@JSOptionDefinition(
+						name = "proxy_password",
+						description = "Password to be used for a proxy",
+						key = "proxy_password",
+						type = "SOSOptionPassword",
+						mandatory = false)
 	public SOSOptionPassword	proxy_password	= new SOSOptionPassword(this, conClassName + ".proxy_password", // HashMap-Key
 														"This parameter specifies the password of a proxy that", // Titel
 														"", // InitValue
@@ -1265,7 +1387,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	* This parameter specifies the domain.
 	*
 	*/
-	@JSOptionDefinition(name = "domain", description = "Domain", key = "domain", type = "SOSOptionString", mandatory = false)
+	@JSOptionDefinition(
+						name = "domain",
+						description = "Domain",
+						key = "domain",
+						type = "SOSOptionString",
+						mandatory = false)
 	public SOSOptionString	domain	= new SOSOptionString(this, conClassName + ".domain", // HashMap-Key
 											"This parameter specifies the domain", // Titel
 											"", // InitValue

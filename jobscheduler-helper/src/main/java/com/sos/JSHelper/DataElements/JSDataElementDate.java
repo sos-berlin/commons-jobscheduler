@@ -117,10 +117,9 @@ public class JSDataElementDate extends JSDataElement {
 	 * @param pdatDate
 	 */
 	public JSDataElementDate(final Date pdatDate) {
-		//		Call to method of static java.text.DateFormat in new com.sos.JSHelper.DataElements.JSDataElementDate(Date) [Scary(8), Normal confidence]
-		JSDateFormat lobjFormat = new JSDateFormat("yyyyMMddHHmmss");
+		JSDateFormat objFormat = JSDateFormat.dfTIMESTAMPS24;
 
-		this.Value(lobjFormat.format(pdatDate));
+		this.Value(objFormat.format(pdatDate));
 	}
 
 	public JSDataElementDate(final String pPstrValue, final String pPstrDescription, final int pPintSize, final int pPintPos, final String pPstrFormatString,
@@ -325,7 +324,7 @@ public class JSDataElementDate extends JSDataElement {
 	public boolean isEmpty() {
 
 		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::isEmpty";
+		final String conMethodName = conClassName + "::ISEmpty";
 
 		if (super.Value().trim().length() <= 0 || super.Value().trim().equals("00000000")) {
 			return true;
@@ -362,7 +361,6 @@ public class JSDataElementDate extends JSDataElement {
 	 *
 	 * @return
 	 */
-	@Override
 	public Date Now() {
 
 		@SuppressWarnings("unused")
@@ -372,7 +370,7 @@ public class JSDataElementDate extends JSDataElement {
 		return now.getTime();
 	} // public Date Now}
 
-	public static String getCurrentTimeAsString(final String dateTimeFormat) {
+	public static String getCurrentTimeAsString(String dateTimeFormat) throws Exception {
 
 		String strFormat = dateTimeFormat;
 		if (dateTimeFormat == null || dateTimeFormat.length() <= 0) {
@@ -389,7 +387,7 @@ public class JSDataElementDate extends JSDataElement {
 		return getCurrentTimeAsString("yyyyMMddHHmmss");
 	}
 
-	public int getLastFridayInAMonth(final int month, final int year) {
+	public int getLastFridayInAMonth(int month, int year) {
 		Calendar cal = Calendar.getInstance();
 		cal.set(year, month, 1, 0, 0, 0); // set to first day of the month
 		cal.set(Calendar.MILLISECOND, 0);
@@ -405,19 +403,16 @@ public class JSDataElementDate extends JSDataElement {
 			case Calendar.TUESDAY:
 				return 25;
 			case Calendar.WEDNESDAY:
-				if (daysOfMonth == 31) {
+				if (daysOfMonth == 31)
 					return 31;
-				}
 				return 24;
 			case Calendar.THURSDAY:
-				if (daysOfMonth >= 30) {
+				if (daysOfMonth >= 30)
 					return 30;
-				}
 				return 23;
 			case Calendar.FRIDAY:
-				if (daysOfMonth >= 29) {
+				if (daysOfMonth >= 29)
 					return 29;
-				}
 				return 22;
 			case Calendar.SATURDAY:
 				return 28;
@@ -425,7 +420,7 @@ public class JSDataElementDate extends JSDataElement {
 		throw new RuntimeException("what day of the month?");
 	}
 
-	public int getLastThursday(final int month, final int year) {
+	public int getLastThursday (int month, int year) {
 		return getLastFridayInAMonth(month, year) - 1;
 	}
 }

@@ -904,9 +904,6 @@ public class JSDataElement extends JSToolBox {
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::equals";
 
-		if (pobjO == null) {
-			return false;
-		}
 		if (pobjO instanceof String) {
 			final String strT = (String) pobjO;
 			return this.Value().equals(strT);

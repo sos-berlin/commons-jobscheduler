@@ -333,13 +333,6 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
 		return flgResult;
 	}
 
-	@Override
-	public boolean isReadable () {
-		boolean flgF = true;
-		
-		return flgF;
-	}
-
 	/**
 	 * \brief notExists
 	 *

@@ -34,24 +34,23 @@ import org.apache.log4j.Logger;
  * @author KB
  *
  */
-public class SOSProfileSection extends SOSProfileBaseClass <JSIniFile> {
+public class SOSProfileSection {
 
 	@SuppressWarnings("unused")
 	private final String		conClassName	= "SOSProfileSection";
-	@SuppressWarnings("unused")
 	private static final String	conSVNVersion	= "$Id$";
-	@SuppressWarnings("unused")
 	private static final Logger	logger			= Logger.getLogger(SOSProfileSection.class);
 
 	public SOSProfileSection() {
 		//
 	}
 
-	public Map<String, SOSProfileEntry>	mapProfileEntries;
+	public String						strSectionName;
+	public Map<String, SOSProfileEntry>	mapEntries;
 
 	public SOSProfileSection(String pstrSectionName) {
-		strName = pstrSectionName;
-		mapProfileEntries = new HashMap<String, SOSProfileEntry>();
+		strSectionName = pstrSectionName;
+		mapEntries = new HashMap<String, SOSProfileEntry>();
 	}
 
 	/**
@@ -71,8 +70,7 @@ public class SOSProfileSection extends SOSProfileBaseClass <JSIniFile> {
 		SOSProfileEntry objPE = this.Entry(pstrEntryName);
 		if (objPE == null) {
 			objPE = new SOSProfileEntry(pstrEntryName, pstrEntryValue);
-			objPE.setObjParent(this);
-			Map<String, SOSProfileEntry> m = this.Entries();
+			Map m = this.Entries();
 			m.put(pstrEntryName.toLowerCase(), objPE);
 		}
 		else {
@@ -81,22 +79,14 @@ public class SOSProfileSection extends SOSProfileBaseClass <JSIniFile> {
 		return objPE;
 	}
 
-	@Override
-	public boolean setDirty() {
-		this.flgIsDirty = true;
-		objParent.setDirty();
-		return flgIsDirty;
-	}
-
 	public SOSProfileEntry deleteEntry(String pstrEntryName) {
 
 		SOSProfileEntry objPE = this.Entry(pstrEntryName);
 		if (objPE == null) {
 		}
 		else {
-			Map<String, SOSProfileEntry> m = this.Entries();
+			Map m = this.Entries();
 			m.remove(pstrEntryName.toLowerCase());
-			setDirty();
 		}
 		return objPE;
 	}
@@ -105,29 +95,40 @@ public class SOSProfileSection extends SOSProfileBaseClass <JSIniFile> {
 	 * @return
 	 */
 	public Map<String, SOSProfileEntry> Entries() {
-		if (mapProfileEntries == null) {
-			mapProfileEntries = new HashMap<String, SOSProfileEntry>();
+		if (mapEntries == null) {
+			mapEntries = new HashMap<String, SOSProfileEntry>();
 		}
 
-		return mapProfileEntries;
+		return mapEntries;
 	}
 
 	public SOSProfileEntry Entry(String pstrKey) {
-		return mapProfileEntries.get(pstrKey.toLowerCase());
+		return (SOSProfileEntry) mapEntries.get(pstrKey.toLowerCase());
 	}
 
-	@Override
+	/**
+	 * @return
+	 */
+	public String Name() {
+		return strSectionName;
+	}
+
+	/**
+	 * @param string
+	 */
+	public void Name(String string) {
+		strSectionName = string;
+	}
+
 	public String toString() {
 		String strT = "";
 
-		if (strComment != null) {
-			strT += strComment.toString();
-		}
-		strT = strT.concat("[" + strName + "]\n");
+		strT = strT.concat("[" + strSectionName + "]\n");
 		return strT;
 	}
 
 	public String toXML() {
+
 		return "";
 	}
 }

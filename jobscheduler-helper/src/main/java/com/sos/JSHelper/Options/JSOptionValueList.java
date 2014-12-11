@@ -67,6 +67,7 @@ public class JSOptionValueList extends SOSOptionString {
 	private static final long	serialVersionUID	= -402205746280480952L;
 	private final String		conClassName		= "JSOptionValueList";
 	protected String[]			strValueList;
+	@SuppressWarnings("hiding")
 	public final String			ControlType			= "combo";
 
 	@Override public String getControlType() {
@@ -194,7 +195,7 @@ public class JSOptionValueList extends SOSOptionString {
 			strT = strValueList[0];
 		}
 		//JITL-93 oh 27.06.14, sonst strValueList immer leer nach Constructor-Aufruf bei z.B. ignore_ora_messages
-		else if(isNotEmpty(pstrValueList) && (isNull(strValueList) || strValueList.length == 0)) { 
+		else if(isNotEmpty(pstrValueList) && (isNull(strValueList) || strValueList.length == 0 || (strValueList.length == 1 && isEmpty(strValueList[0])))) { 
 			strValueList = new String[] { pstrValueList };
 		}
 		super.Value(strT);

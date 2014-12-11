@@ -1,33 +1,21 @@
 package com.sos.VirtualFileSystem.FTP;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import com.sos.JSHelper.Basics.JSJobUtilities;
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.VirtualFileSystem.DataElements.SOSFileList;
+import com.sos.VirtualFileSystem.DataElements.SOSFileListEntry;
+import com.sos.VirtualFileSystem.DataElements.SOSFolderName;
+import com.sos.VirtualFileSystem.Interfaces.*;
+import com.sos.i18n.annotation.I18NResourceBundle;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPClientConfig;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.log4j.Logger;
 
-import com.sos.JSHelper.Basics.JSJobUtilities;
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.VirtualFileSystem.DataElements.SOSFileList;
-import com.sos.VirtualFileSystem.DataElements.SOSFileListEntry;
-import com.sos.VirtualFileSystem.DataElements.SOSFolderName;
-import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
-import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
-import com.sos.VirtualFileSystem.Interfaces.ISOSSession;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFileSystem;
-import com.sos.i18n.annotation.I18NResourceBundle;
+import java.io.*;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer, ISOSVFSHandler, ISOSVirtualFileSystem, ISOSConnection {
@@ -121,6 +109,18 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 		}
 	}
 
+	/**
+	 *
+	 * @param directory The new working directory.
+	 * @return The reply code received from the server.
+	 * @throws IOException If an I/O error occurs while either sending a
+	 * command to the server or receiving a reply from the server.
+	 */
+	@Override
+	public int cd(final String directory) throws IOException {
+		return Client().cwd(directory);
+	}
+
 	@Override
 	public boolean changeWorkingDirectory(final String pathname) {
 		final String conMethodName = conClassName + "::changeWorkingDirectory";
@@ -144,7 +144,7 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 			FTPClientConfig conf = new FTPClientConfig();
 			// TODO create additional Options for ClientConfig
 			// conf.setServerLanguageCode("fr");
-			 objFTPClient.configure(conf);
+			// objFTPClient.configure(conf);
 			/**
 			 * This listener is to write all commands and response from commands to system.out
 			 *
@@ -159,9 +159,6 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 
 			// TODO implement as an additional Option-setting
 			String strAddFTPProtocol = System.getenv("AddFTPProtocol");
-			if (strAddFTPProtocol == null) {
-				strAddFTPProtocol = System.getProperty("AddFTPProtocol");
-			}
 			if (strAddFTPProtocol != null && strAddFTPProtocol.equalsIgnoreCase("true")) {
 				objFTPClient.addProtocolCommandListener(objProtocolCommandListener);
 			}
@@ -296,6 +293,20 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 			}
 		}
 		return fileList;
+	}
+
+	@Override
+	public void disconnect() {
+		final String conMethodName = conClassName + "::disconnect";
+
+		try {
+			if (Client().isConnected()) {
+				Client().disconnect();
+			}
+		}
+		catch (IOException e) {
+			RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
+		}
 	}
 
 	private int DoCD(final String strFolderName) {
@@ -621,6 +632,17 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 
 	@Override
 	public ISOSSession getSession() {
+		return null;
+	}
+
+	@Override
+	public StringBuffer getStdErr() throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public StringBuffer getStdOut() throws Exception {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

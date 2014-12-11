@@ -64,13 +64,10 @@ public class SOSOptionLocale extends SOSOptionString {
 	public SOSOptionLocale(JSOptionsClass pPobjParent, String pPstrKey, String pPstrDescription, String pPstrValue, String pPstrDefaultValue,
 			boolean pPflgIsMandatory) {
 		super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
+		// TODO Auto-generated constructor stub
 	}
 
 	public java.util.Locale getI18NLocale() {
-		String strV = this.Value();
-		if (strV != null) {
-			return new java.util.Locale(strV);
-		}
 		return new java.util.Locale(this.Value());
 	}
 
