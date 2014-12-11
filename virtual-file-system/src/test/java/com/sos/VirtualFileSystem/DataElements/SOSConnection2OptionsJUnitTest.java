@@ -3,7 +3,6 @@ package com.sos.VirtualFileSystem.DataElements;
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.Listener.JSListenerClass;
 import com.sos.VirtualFileSystem.Options.SOSConnection2Options;
-
 import org.apache.log4j.Logger;
 import org.junit.*;
 
@@ -152,7 +151,7 @@ public class SOSConnection2OptionsJUnitTest extends JSToolBox {
 	}
 
 	@Test
-  @Ignore("Test set to Ignore for later examination")
+	@Ignore("Test set to Ignore for later examination")
 	public void testKeyWithPrefix () throws Exception {
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::testKeyWithPrefix";
@@ -167,7 +166,7 @@ public class SOSConnection2OptionsJUnitTest extends JSToolBox {
 	}
 
 	@Test
-  @Ignore("Test set to Ignore for later examination")
+	@Ignore("Test set to Ignore for later examination")
 	public void testKeyWithAlias () throws Exception {
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::testKeyWithAlias";
@@ -182,7 +181,7 @@ public class SOSConnection2OptionsJUnitTest extends JSToolBox {
 	}
 
 	@Test
-  @Ignore("Test set to Ignore for later examination")
+	@Ignore("Test set to Ignore for later examination")
 	public void testAlternativeOptions () throws Exception {
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::testAlternativeOptions";
@@ -216,7 +215,7 @@ public class SOSConnection2OptionsJUnitTest extends JSToolBox {
 		HashMap <String, String> objT = SetJobSchedulerSSHJobOptionsAlias(new HashMap <String, String>());
 		objT.put("IsAnUnknownOption", "ValueOfUnknownOption");
 		objOptions = new SOSConnection2Options(objT);
-		boolean flgAllOptionsProcessed = objOptions.ReportNotProcessedOptions();
+		boolean flgAllOptionsProcessed = objOptions.CheckNotProcessedOptions();
 
 		assertFalse("Unknown Option found", flgAllOptionsProcessed);
 	}  // testForUnknownOptions

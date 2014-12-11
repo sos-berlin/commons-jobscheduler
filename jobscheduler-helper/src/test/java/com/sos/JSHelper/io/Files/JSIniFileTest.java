@@ -25,19 +25,14 @@ package com.sos.JSHelper.io.Files;
 * Created on 26.08.2011 21:31:13
  */
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.apache.log4j.Logger;
+import org.junit.*;
 
 import java.io.File;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author KB
@@ -135,9 +130,9 @@ public class JSIniFileTest {
 		assertTrue("is not null", objS != null);
 		logger.debug("number of sections = " + objS.size());
 		for (SOSProfileSection objPS : objS.values()) {
-			logger.debug(objPS.toString());
+			logger.debug(objPS.Name());
 			for (SOSProfileEntry objEntry : objPS.Entries().values()) {
-				logger.debug("     " + objEntry.toString());
+				logger.debug("     " + objEntry.Name() + " = " + objEntry.Value());
 			}
 		}
 	}
@@ -160,10 +155,9 @@ public class JSIniFileTest {
 	 * Test method for {@link com.sos.JSHelper.io.Files.JSIniFile#setValue(java.lang.String, java.lang.String)}.
 	 */
 	@Test
-  @Ignore("Test set to Ignore for later examination")
 	public final void testSetValue() {
 		SOSProfileSection obj = objF.getSection("do_sftp");
-		assertEquals("section name not ok", "do_sftp", obj.strName);
+		assertEquals("section name not ok", "do_sftp", obj.strSectionName);
 		obj.addEntry("Test", "HalloTest");
 		SOSProfileEntry objE = obj.Entry("protocol");
 		String strT = objE.Value();
@@ -171,10 +165,9 @@ public class JSIniFileTest {
 	}
 
 	@Test
-  @Ignore("Test set to Ignore for later examination")
 	public final void testDeleteValue() {
 		SOSProfileSection obj = objF.getSection("do_sftp");
-		assertEquals("section name not ok", "do_sftp", obj.strName);
+		assertEquals("section name not ok", "do_sftp", obj.strSectionName);
 		obj.addEntry("Test", "HalloTest");
 		obj.deleteEntry("protocol");
 		SOSProfileEntry objE = obj.Entry("protocol");
@@ -185,24 +178,16 @@ public class JSIniFileTest {
 	 * Test method for {@link com.sos.JSHelper.io.Files.JSIniFile#SectionName(java.lang.String)}.
 	 */
 	@Test
-  @Ignore("Test set to Ignore for later examination")
 	public final void testSectionNameString() {
 		SOSProfileSection obj = objF.getSection("do_sftp");
-		assertEquals("section name not ok", "do_sftp", obj.strName);
+		assertEquals("section name not ok", "do_sftp", obj.strSectionName);
 	}
 
 	/**
 	 * Test method for {@link com.sos.JSHelper.io.Files.JSIniFile#SectionName()}.
 	 */
-	@Test (expected=com.sos.JSHelper.Exceptions.JobSchedulerException.class)
+	@Test
 	public final void testSectionName() {
-		objF.addSection("[invalidS=ectionName");
-		
-	}
-
-	@Test (expected=com.sos.JSHelper.Exceptions.JobSchedulerException.class)
-	public final void testSectionName2() {
-		objF.addSection("invalidS\"ectionName");
 	}
 
 	/**
@@ -232,7 +217,7 @@ public class JSIniFileTest {
 	@Test
 	public final void testProfileName() {
 		String strName = objF.strFileName;
-		assertTrue("name ist identisch", strName.replace('\\', '/').equals(conIniFileName.replace('\\', '/')));
+		assertTrue("name is identisch", strName.replace('\\', '/').equals(conIniFileName.replace('\\', '/')));
 	}
 
 	/**
@@ -251,7 +236,7 @@ public class JSIniFileTest {
 	}
 
 	@Test
-  @Ignore("Test set to Ignore for later examination")
+	@Ignore("Test set to Ignore for later examination")
 	public final void testSaveAs() {
 		String strSaveAsFileName = JSFile.getTempdir() + "/SaveAs.ini";
 		new File(strSaveAsFileName).delete();
@@ -269,10 +254,6 @@ public class JSIniFileTest {
 		objS = objNew.addSection("Test3");
 		objS.addEntry("Test", "ValueOfTest");
 		objNew.save();
-		assertTrue("File exists ", new File(strNewIniFileName).exists());	
-		
-		assertEquals("test = valueofTest", "ValueOfTest", objNew.getSection("Test2").Entry("Test").Value());
-		assertEquals("test = valueofTest", "ValueOfTest", objNew.getSection("Test3").Entry("Test").Value());
-		assertEquals("test = valueofTest", null, objNew.getSection("Test3").Entry("Test--"));
+		assertTrue("File exists ", new File(strNewIniFileName).exists());		
 	}
 }

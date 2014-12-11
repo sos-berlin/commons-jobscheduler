@@ -1,6 +1,5 @@
 package com.sos.JSHelper.io.Files;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -9,7 +8,6 @@ import org.apache.log4j.Logger;
 
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.JSHelper.interfaces.IDirty;
 
 /**
 * \class JSIniFile 
@@ -41,22 +39,22 @@ import com.sos.JSHelper.interfaces.IDirty;
  *
  */
 @JSOptionClass(name = "JSOptionsClass", description = "JSOptionsClass")
-public class JSIniFile extends JSTextFile implements IDirty {
+public class JSIniFile extends JSTextFile {
 
-	private static final long				serialVersionUID			= -1960627326921434568L;
+	private static final long						serialVersionUID			= -1960627326921434568L;
 	@SuppressWarnings("unused")
-	private final String					conClassName				= "JSIniFile";
-	private static final String				conSVNVersion				= "$Id$";
-	private static final Logger				logger						= Logger.getLogger(JSIniFile.class);
+	private final String							conClassName				= "JSIniFile";
+	private static final String						conSVNVersion				= "$Id$";
+	private static final Logger						logger						= Logger.getLogger(JSIniFile.class);
 
-	private Map<String, SOSProfileSection>	mapSections					= new HashMap<String, SOSProfileSection>();
+	private final Map<String, SOSProfileSection>	mapSections					= new HashMap<String, SOSProfileSection>();
 	// private final Map <String, SOSProfileSection> mapSections = new LinkedList <String, SOSProfileSection>();
 
-	private String							strSectionName				= null;
-	private final boolean					flgIgnoreDuplicateSections	= true;
-	private boolean							flgIsDirty					= false;
-	private SOSProfileSection				objCurrentSection			= null;
-	private JSTextFile						objSaveFile					= null;
+	private String									strSectionName				= null;
+	private boolean									flgIgnoreDuplicateSections	= true;
+	private boolean									flgIsDirty					= false;
+	private SOSProfileSection						objCurrentSection			= null;
+	private JSTextFile								objSaveFile					= null;
 
 	/**
 	 * \brief JSIniFile
@@ -67,74 +65,45 @@ public class JSIniFile extends JSTextFile implements IDirty {
 	 */
 	public JSIniFile(String pstrFileName) {
 		super(pstrFileName);
-		logger.debug("FileName = " + getAbsolutePath());
-
 		if (fleFile.exists()) {
 			getIniFile();
-			flgIsDirty = false;
-			logger.debug("number of sections = " + Sections().size());
 		}
 	}
 
-	public Collection<SOSProfileSection> getSections() {
-		if (mapSections == null) {
-			mapSections = new HashMap<String, SOSProfileSection>();
-		}
-		return mapSections.values();
-	}
-
-	/**
-	 * 
-	* \brief getIniFile - 	read the content of the whole ini-file
-	*
-	* \details
-	* read the content of the whole ini-file
-	*
-	* @param 
-	* @author KB
-	 */
 	private void getIniFile() {
 		String line = null;
 		try {
 			StringBuffer strB = new StringBuffer();
-			StringBuffer strCommentBuff = new StringBuffer();
 			while ((strB = this.GetLine()) != null) {
 				line = strB.toString().trim();
 				logger.debug(line);
 				int intLineLength = line.length();
 				if (intLineLength <= 0 || line.startsWith(";") || line.startsWith("#")) {
-					strCommentBuff.append(line + "\n");
 					continue;
 				}
 
 				if (line.startsWith("[")) {
 					if (!line.endsWith("]")) {
-						throw new JobSchedulerException("character ']' expected in section header: " + line);
+						throw new JobSchedulerException("] expected in section header: " + line);
 					}
 					String strSectionName = line.substring(1, intLineLength - 1).trim();
 					if (strSectionName.length() > 0) {
 						this.objCurrentSection = addSection(strSectionName);
-						objCurrentSection.setComment(strCommentBuff);
-						objCurrentSection.setNotDirty();
-						strCommentBuff = new StringBuffer();
 					}
 				}
 				else {
 					if (this.objCurrentSection == null) {
-						throw new JobSchedulerException("[sectionname]-header expected");
+						throw new IOException("[sectionname]-header expected");
 					}
 					else {
 						final int index = line.indexOf('=');
 						if (index < 0) {
-							throw new JobSchedulerException("key/value pair without '=' detected : " + line);
+							throw new JobSchedulerException("key/value pair without =  : " + line);
 						}
 
 						final String strKey = line.substring(0, index).trim();
 						final String strValue = line.substring(index + 1).trim();
-						SOSProfileEntry objE = addEntry(strKey, strValue);
-						objE.setComment(strCommentBuff);
-						strCommentBuff = new StringBuffer();
-						objE.setNotDirty();
+						addEntry(strKey, strValue);
 					}
 				}
 			} // while ((line = r.readLine()) != null)
@@ -143,212 +112,80 @@ public class JSIniFile extends JSTextFile implements IDirty {
 
 		}
 		catch (final Exception e) {
-			throw new JobSchedulerException(e.getLocalizedMessage() + "\n\nFile name is: " + strFileName, e);
+			throw new JobSchedulerException(e.toString() + "\n\nFile name is: " + strFileName);
 		}
 	}
 
-	/**
-	 * 
-	* \brief addEntry - 	Add a key/value-pair to the current section
-	*
-	* \details
-	* Add a key/value-pair to the current section
-	*
-	* @param strKey
-	* @param strValue
-	* @return
-	* @param 
-	* @author KB
-	 */
 	public SOSProfileEntry addEntry(final String strKey, final String strValue) {
-		checkKeyName(strKey);
 		SOSProfileEntry objE = null;
 		if (this.objCurrentSection == null) {
 		}
 		else {
 			objE = this.objCurrentSection.addEntry(strKey, strValue);
-			setDirty();
 		}
 		return objE;
 	}
 
-	/**
-	 * 
-	* \brief addSection - 	Add a new Section to the ini-file
-	*
-	* \details
-	* Add a new Section to the ini-file
-	*
-	* @param pstrSectionName
-	* @return
-	* @param 
-	* @author KB
-	 */
 	public SOSProfileSection addSection(final String pstrSectionName) {
-		checkSectionName(pstrSectionName);
-		SOSProfileSection objNewSection = findSection(pstrSectionName);
+		SOSProfileSection objNewSection = (SOSProfileSection) this.mapSections.get(pstrSectionName);
 		if (objNewSection == null) {
 			objNewSection = new SOSProfileSection(pstrSectionName);
-			objNewSection.setObjParent(this);
 			this.mapSections.put(pstrSectionName.toLowerCase(), objNewSection);
-			setDirty();
+			flgIsDirty = true;
 		}
 		else {
 			if (!this.flgIgnoreDuplicateSections) {
 				throw new JobSchedulerException("Section '" + pstrSectionName + "' duplicated.");
 			}
 		}
-		objCurrentSection = objNewSection;
-		strSectionName = objCurrentSection.Name();
 		return objNewSection;
 	}
 
-	/**
-	 * 
-	* \brief getSection - 	
-	*
-	* \details
-	* 
-	*
-	* @param pstrSectionName
-	* @return
-	* @param 
-	* @author KB
-	 */
 	public SOSProfileSection getSection(final String pstrSectionName) {
-		checkSectionName(pstrSectionName);
-		SOSProfileSection objNewSection = findSection(pstrSectionName);
+		SOSProfileSection objNewSection = (SOSProfileSection) this.mapSections.get(pstrSectionName);
 		return objNewSection;
 	}
 
-	private SOSProfileSection findSection(final String pstrSectionName) {
-		SOSProfileSection objNewSection = this.mapSections.get(pstrSectionName.toLowerCase());
-		return objNewSection;
-	}
-
-	@Override
-	public void setDirty() {
+	private void setDirty() {
 		this.flgIsDirty = true;
 	}
 
-	@Override
 	public boolean isDirty() {
 		return this.flgIsDirty;
 	}
 
-	/**
-	 * 
-	* \brief Sections - 	get the collection of all sections
-	*
-	* \details
-	* get the collection of all sections
-	*
-	* @return Map<String, SOSProfileSection>
-	* @param 
-	* @author KB
-	 */
 	public Map<String, SOSProfileSection> Sections() {
 		return this.mapSections;
 	}
 
-	/**
-	 * 
-	* \brief Value - 	
-	*
-	* \details
-	* 
-	*
-	* @param pstrEntryName
-	* @return
-	* @throws IOException
-	* @param 
-	* @author KB
-	 */
 	public String Value(final String pstrEntryName) throws IOException {
-		checkKeyName(pstrEntryName);
 		final String strDefaultValue = null;
 		return this.getPropertyString(this.strSectionName, pstrEntryName, strDefaultValue);
 	}
 
-	/**
-	 * 
-	* \brief Value - 	
-	*
-	* \details
-	* 
-	*
-	* @param pstrEntryName
-	* @param pstrDefaultValue
-	* @return
-	* @throws IOException
-	* @param 
-	* @author KB
-	 */
 	public String Value(final String pstrEntryName, final String pstrDefaultValue) throws IOException {
-		checkKeyName(pstrEntryName);
 		return this.getPropertyString(this.strSectionName, pstrEntryName, pstrDefaultValue);
 	}
 
-	/**
-	 * 
-	* \brief setValue - 	
-	*
-	* \details
-	* 
-	*
-	* @param pstrEntryName
-	* @param pstrEntryValue
-	* @param 
-	* @author KB
-	 */
-	public JSIniFile setValue(final String pstrEntryName, final String pstrEntryValue) {
-		checkKeyName(pstrEntryName);
-		addEntry(pstrEntryName, pstrEntryValue);
-		return this;
+	public void setValue(final String pstrEntryName, final String pstrEntryValue) {
+		/* das geht wohl noch nicht */
 	}
 
-	public JSIniFile SectionName(final String pstrSectionName) {
-		checkSectionName(pstrSectionName);
+	public void SectionName(final String pstrSectionName) {
 		this.strSectionName = pstrSectionName;
-		return this;
 	}
 
-	/**
-	 * 
-	* \brief SectionName - 	
-	*
-	* \details
-	* 
-	*
-	* @return
-	* @param 
-	* @author KB
-	 */
 	public String SectionName() {
 		return this.strSectionName;
 	}
 
-	/**
-	 * 
-	* \brief getPropertyString - 	
-	*
-	* \details
-	* 
-	*
-	* @param pstrSection
-	* @param key
-	* @param defaultValue
-	* @return
-	* @param 
-	* @author KB
-	 */
 	public String getPropertyString(final String pstrSection, final String key, final String defaultValue) {
-		checkSectionName(pstrSection);
-		checkKeyName(key);
-		final SOSProfileSection map = findSection(pstrSection);
+		if (pstrSection == null) {
+			throw new JobSchedulerException("[section] name missing");
+		}
+
+		final SOSProfileSection map = (SOSProfileSection) this.mapSections.get(pstrSection.toLowerCase());
 		if (map != null) {
-			objCurrentSection = map;
-			strSectionName = objCurrentSection.Name();
 			final SOSProfileEntry objPE = map.Entry(key.toLowerCase());
 			if (objPE != null) {
 				return objPE.Value();
@@ -357,86 +194,6 @@ public class JSIniFile extends JSTextFile implements IDirty {
 		return defaultValue;
 	}
 
-	private void checkSectionName(final String pstrSectionName) {
-		if (pstrSectionName == null || pstrSectionName.length() <= 0) {
-			throw new JobSchedulerException("[section] name missing");
-		}
-		check4ValidName(pstrSectionName);
-	}
-
-	private void checkKeyName(final String pstrKey) {
-
-		if (pstrKey == null || pstrKey.length() <= 0) {
-			throw new JobSchedulerException("key is missing");
-		}
-
-		check4ValidName(pstrKey);
-	}
-
-	/**
-	 * 
-	* \brief check4ValidName - 	
-	*
-	* \details
-	* 
-	*
-	* @param pstrKey
-	* @param 
-	* @author KB
-	 */
-	public void check4ValidName(final String pstrKey) {
-		if (pstrKey.matches(".*[\\[\\];\"=\\s].*")) {
-			throw new JobSchedulerException(String.format("invalid characters in name: %1$s", pstrKey));
-		}
-	}
-
-	/**
-	 * 
-	* \brief setPropertyString - 	
-	*
-	* \details
-	* 
-	*
-	* @param pstrSectionName
-	* @param key
-	* @param pstrValue
-	* @return JSIniFile
-	* @author KB
-	 */
-	public JSIniFile setPropertyString(final String pstrSectionName, final String key, final String pstrValue) {
-		checkSectionName(pstrSectionName);
-		checkKeyName(key);
-
-		final SOSProfileSection objSection = findSection(pstrSectionName);
-		if (objSection != null) {
-			final SOSProfileEntry objPE = objSection.Entry(key);
-			if (objPE != null) {
-				objPE.Value(pstrValue);
-			}
-			else {
-				objSection.addEntry(key, pstrValue);
-			}
-		}
-		else {
-			this.addSection(pstrSectionName).addEntry(key, pstrValue);
-		}
-		return this;
-	}
-
-	/**
-	 * 
-	* \brief getPropertyInt - 	
-	*
-	* \details
-	* 
-	*
-	* @param section
-	* @param key
-	* @param defaultValue
-	* @return
-	* @param 
-	* @author KB
-	 */
 	public int getPropertyInt(final String section, final String key, final int defaultValue) {
 		final String s = this.getPropertyString(section, key, null);
 		if (s != null) {
@@ -445,20 +202,6 @@ public class JSIniFile extends JSTextFile implements IDirty {
 		return defaultValue;
 	}
 
-	/**
-	 * 
-	* \brief getPropertyBool - 	
-	*
-	* \details
-	* 
-	*
-	* @param pstrSection
-	* @param key
-	* @param defaultValue
-	* @return
-	* @param 
-	* @author KB
-	 */
 	public boolean getPropertyBool(final String pstrSection, final String key, final boolean defaultValue) {
 		final String s = this.getPropertyString(pstrSection, key, null);
 		if (s != null) {
@@ -499,60 +242,28 @@ public class JSIniFile extends JSTextFile implements IDirty {
 		return strT;
 	}
 
-	/**
-	 * 
-	* \brief saveAs - 	
-	*
-	* \details
-	* 
-	*
-	* @param pstrSaveAsFileName
-	* @param 
-	* @author KB
-	 */
 	public void saveAs(final String pstrSaveAsFileName) {
 		logger.debug("SaveAs = " + pstrSaveAsFileName);
 		objSaveFile = new JSTextFile(pstrSaveAsFileName);
 		this.save(objSaveFile);
 	}
 
-	/**
-	 * 
-	* \brief save - 	
-	*
-	* \details
-	* 
-	*
-	* @param 
-	* @author KB
-	 */
 	public void save() {
 		objSaveFile = new JSTextFile(strFileName);
 		this.save(objSaveFile);
 	}
 
-	/**
-	 * 
-	* \brief save - 	
-	*
-	* \details
-	* 
-	*
-	* @param pobjSaveFile1
-	* @param 
-	* @author KB
-	 */
 	public void save(final JSTextFile pobjSaveFile1) {
-		Map<String, SOSProfileSection> objSections = this.Sections();
-		logger.debug("number of sections = " + objSections.size());
+		Map<String, SOSProfileSection> objS = this.Sections();
+		logger.debug("number of sections = " + objS.size());
 		try {
-			for (SOSProfileSection objProfileSection : objSections.values()) {
+			for (SOSProfileSection objPS : objS.values()) {
 				pobjSaveFile1.WriteLine(" ");
-				pobjSaveFile1.WriteLine(objProfileSection.toString());
-				logger.debug(objProfileSection.Name());
-				for (SOSProfileEntry objEntry : objProfileSection.Entries().values()) {
-					pobjSaveFile1.WriteLine(objEntry.toString());
-					logger.debug("     " + objEntry.toString());
+				pobjSaveFile1.WriteLine("[" + objPS.Name() + "]");
+				logger.debug(objPS.Name());
+				for (SOSProfileEntry objEntry : objPS.Entries().values()) {
+					pobjSaveFile1.WriteLine(objEntry.Name() + "=" + objEntry.Value());
+					logger.debug("     " + objEntry.Name() + " = " + objEntry.Value());
 				}
 			}
 			pobjSaveFile1.close();
@@ -561,17 +272,6 @@ public class JSIniFile extends JSTextFile implements IDirty {
 		catch (Exception e) {
 			throw new JobSchedulerException(e.getLocalizedMessage());
 		}
-	}
 
-	@Override
-	// IDirty
-	public void setDirty(boolean pflgIsDirty) {
-		flgIsDirty = pflgIsDirty;
-	}
-
-	@Override
-	public int doSave(final boolean pflgAskForSave) {
-		save();
-		return 64;   // SWT.YES
 	}
 }

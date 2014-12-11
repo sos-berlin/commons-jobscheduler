@@ -24,7 +24,7 @@ import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 public class SOSFTPOptionsTest {
 	@SuppressWarnings("unused") private final String conClassName = this.getClass().getSimpleName();
 	@SuppressWarnings("unused") private static final String conSVNVersion = "$Id$";
-	private  final Logger logger = Logger.getLogger(SOSFTPOptionsTest.class);
+	@SuppressWarnings("unused") private static final Logger logger = Logger.getLogger(SOSFTPOptionsTest.class);
 	
 	@BeforeClass public static void setUpBeforeClass() throws Exception {
 	}
@@ -164,7 +164,6 @@ public class SOSFTPOptionsTest {
 
 		try {
 			SOSFTPOptions objO = new SOSFTPOptions(objH);
-			objO.setChildClasses(objH);
 			SOSConnection2Options objCO = objO.getConnectionOptions();
 			SOSConnection2OptionsAlternate objSource = objCO.Source();
 			SOSCredentialStoreOptions objCS = objSource.getCredentialStore();
@@ -263,7 +262,7 @@ public class SOSFTPOptionsTest {
 
 	
 	@Test 
-  @Ignore("Test set to Ignore for later examination")
+	@Ignore("Test set to Ignore for later examination")
 	public final void testStoreOptionValues() {
 		SOSFTPOptions objOC = new SOSFTPOptions();
 		objOC.Locale.Value("en_EN");
