@@ -80,7 +80,7 @@ public class SOSSQLPlusJob extends JSJobUtilitiesClass <SOSSQLPlusJobOptions> {
 				strCommand += " " + objOptions.CommandLineOptions.Value();
 			}
 
-			String strDBConn = objOptions.getConnectionStringDefinition();
+			String strDBConn = objOptions.getConnectionString();
 			if (strDBConn.length() > 0) {
 				strCommandParams += " " + strDBConn;
 			}
@@ -106,7 +106,7 @@ public class SOSSQLPlusJob extends JSJobUtilitiesClass <SOSSQLPlusJobOptions> {
 				strMapKey = sqlPlusVariableName(strMapKey);
 
 				if (mapItem.getValue() != null) {
-				    strMapKey = strMapKey.replace(".", "_");//JITL-39
+				    strMapKey = strMapKey.replace(".", "_"); //JITL-39
 					String strT = String.format("DEFINE %1$s = %2$s (char)", strMapKey, AddQuotes(mapItem.getValue().toString()));
 					logger.debug (strT);
 					objTF.WriteLine(strT);

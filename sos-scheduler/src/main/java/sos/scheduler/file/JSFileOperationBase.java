@@ -1,4 +1,5 @@
 package sos.scheduler.file;
+
 import static com.sos.scheduler.messages.JSMessages.JFO_F_0100;
 import static com.sos.scheduler.messages.JSMessages.JFO_F_0101;
 import static com.sos.scheduler.messages.JSMessages.JFO_F_0102;
@@ -12,12 +13,7 @@ import static com.sos.scheduler.messages.JSMessages.JSJ_F_0080;
 import static com.sos.scheduler.messages.JSMessages.JSJ_F_0090;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.nio.channels.OverlappingFileLockException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Vector;
@@ -29,7 +25,7 @@ import org.apache.log4j.Logger;
 import sos.util.SOSFilelistFilter;
 
 import com.sos.JSHelper.Basics.JSJobUtilities;
-import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
+import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionFileName;
 import com.sos.JSHelper.Options.SOSOptionFileSize;
@@ -43,22 +39,28 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 /**
  */
 @I18NResourceBundle(baseName = "com_sos_scheduler_messages", defaultLocale = "en")
-public class JSFileOperationBase extends JSJobUtilitiesClass <JSExistsFileOptions>  {
-//	protected JSExistsFileOptions	objOptions									= null;
-//	private JSJobUtilities			objJSJobUtilities							= this;
+public class JSFileOperationBase extends JSToolBox implements JSJobUtilities {
+
+	protected JSExistsFileOptions	objOptions									= null;
+	private JSJobUtilities			objJSJobUtilities							= this;
 	//
 	protected static final String	conPropertyJAVA_IO_TMPDIR					= "java.io.tmpdir";
+
 	/** give a path for files to remove */
 	protected String				filePath									= System.getProperty(conPropertyJAVA_IO_TMPDIR);
+
 	/** give the number of milliseconds, defaults to 24 hours */
 	protected long					lngFileAge									= 86400000;
+
 	/** number of files which causes a warning */
 	protected int					warningFileLimit							= 0;
+
 	protected static final String	conParameterWARNING_FILE_LIMIT				= "warning_file_limit";
 	protected static final String	conParameterFILE_AGE						= "file_age";
 	protected static final String	conParameterFILE_SPEC						= "file_spec";
 	protected static final String	conParameterFILE_SPECIFICATION				= "file_specification";
 	protected static final String	conParameterFILE_PATH						= "file_path";
+
 	protected static final String	conParameterMAX_FILE_SIZE					= "max_file_size";
 	protected static final String	conParameterMIN_FILE_SIZE					= "min_file_size";
 	protected static final String	conParameterMAX_FILE_AGE					= "max_file_age";
@@ -119,14 +121,16 @@ public class JSFileOperationBase extends JSJobUtilitiesClass <JSExistsFileOption
 	protected String				strNextState								= null;
 
 	public JSFileOperationBase() {
-		super (new JSExistsFileOptions());
+		super("com_sos_scheduler_messages");
 	}
 
 	protected void initialize() {
 		// logger.debug(Options().toString());
 		lstResultList = new Vector<File>();
+
 		// lngFileAge = calculateFileAge(getParamValue(conParameterFILE_AGE));
 		// warningFileLimit = getParamInteger(conParameterWARNING_FILE_LIMIT, 0);
+
 		intExpectedSizeOfResultSet = Options().expected_size_of_result_set.value(); // getParamInteger(conParameterEXPECTED_SIZE_OF_RESULT_SET,
 																					// 0);
 		strRaiseErrorIfResultSetIs = Options().raise_error_if_result_set_is.Value(); // getParamValue(conParameterRAISE_ERROR_IF_RESULT_SET_IS,
@@ -146,6 +150,7 @@ public class JSFileOperationBase extends JSJobUtilitiesClass <JSExistsFileOption
 		strGracious = Options().gracious.Value();
 		skipFirstFiles = Options().skip_first_files.value();
 		skipLastFiles = Options().skip_last_files.value();
+
 		flags = 0;
 		// if (getParamBoolean(conParameterCREATE_DIR, false) == true) {
 		// flags |= SOSFileOperations.CREATE_DIR;
@@ -181,34 +186,36 @@ public class JSFileOperationBase extends JSJobUtilitiesClass <JSExistsFileOption
 	 * \return JSExistsFileOptions
 	 *
 	 */
-	@Override
 	public JSExistsFileOptions Options() {
+
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::Options"; //$NON-NLS-1$
+
 		if (objOptions == null) {
 			objOptions = new JSExistsFileOptions();
 		}
 		return objOptions;
 	}
 
-//	/**
-//	 *
-//	 * \brief Options - set the JSExistsFileOptionClass
-//	 *
-//	 * \details
-//	 * The JSExistsFileOptionClass is used as a Container for all Options (Settings) which are
-//	 * needed.
-//	 *
-//	 * \return JSExistsFileOptions
-//	 *
-//	 */
-//	@Override
-//	public JSExistsFileOptions Options(final JSExistsFileOptions pobjOptions) {
-//		@SuppressWarnings("unused")
-//		final String conMethodName = conClassName + "::Options"; //$NON-NLS-1$
-//		objOptions = pobjOptions;
-//		return objOptions;
-//	}
+	/**
+	 *
+	 * \brief Options - set the JSExistsFileOptionClass
+	 *
+	 * \details
+	 * The JSExistsFileOptionClass is used as a Container for all Options (Settings) which are
+	 * needed.
+	 *
+	 * \return JSExistsFileOptions
+	 *
+	 */
+	public JSExistsFileOptions Options(final JSExistsFileOptions pobjOptions) {
+
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::Options"; //$NON-NLS-1$
+
+		objOptions = pobjOptions;
+		return objOptions;
+	}
 
 	public Vector<File> getResultList() {
 		return lstResultList;
@@ -217,12 +224,14 @@ public class JSFileOperationBase extends JSJobUtilitiesClass <JSExistsFileOption
 	public boolean createResultListParam(final boolean pflgResult) {
 		String strT = "";
 		intNoOfHitsInResultSet = lstResultList.size();
+
 		if (isNotNull(lstResultList) && lstResultList.size() > 0) {
 			intNoOfHitsInResultSet = lstResultList.size();
 			for (File objFile : lstResultList) {
 				strT += objFile.getAbsolutePath() + ";";
 			}
 		}
+
 		if (isNotEmpty(strResultList2File) && isNotEmpty(strT)) {
 			JSTextFile objResultListFile = new JSTextFile(strResultList2File);
 			try {
@@ -239,6 +248,7 @@ public class JSFileOperationBase extends JSJobUtilitiesClass <JSExistsFileOption
 				JSJ_F_0080.toLog(strResultList2File, conParameterRESULT_LIST_FILE);
 			}
 		}
+
 		if (isNotEmpty(strRaiseErrorIfResultSetIs)) {
 			boolean flgR = Options().raise_error_if_result_set_is.compareIntValues(intNoOfHitsInResultSet, intExpectedSizeOfResultSet);
 			if (flgR == true) {
@@ -246,6 +256,7 @@ public class JSFileOperationBase extends JSJobUtilitiesClass <JSExistsFileOption
 				return false;
 			}
 		}
+
 		return pflgResult;
 	}// private void createResultListParam
 
@@ -275,6 +286,7 @@ public class JSFileOperationBase extends JSJobUtilitiesClass <JSExistsFileOption
 
 	@Override
 	public String myReplaceAll(final String pstrSourceString, final String pstrReplaceWhat, final String pstrReplaceWith) {
+
 		String newReplacement = pstrReplaceWith.replaceAll("\\$", "\\\\\\$");
 		return pstrSourceString.replaceAll("(?m)" + pstrReplaceWhat, newReplacement);
 	}
@@ -310,10 +322,12 @@ public class JSFileOperationBase extends JSJobUtilitiesClass <JSExistsFileOption
 	 */
 	@Override
 	public void setJSParam(final String pstrKey, final String pstrValue) {
+
 	}
 
 	@Override
 	public void setJSParam(final String pstrKey, final StringBuffer pstrValue) {
+
 	}
 
 	/**
@@ -330,6 +344,7 @@ public class JSFileOperationBase extends JSJobUtilitiesClass <JSExistsFileOption
 	 */
 	@Override
 	public void setJSJobUtilites(final JSJobUtilities pobjJSJobUtilities) {
+
 		if (pobjJSJobUtilities == null) {
 			objJSJobUtilities = this;
 		}
@@ -347,9 +362,11 @@ public class JSFileOperationBase extends JSJobUtilitiesClass <JSExistsFileOption
 
 	// public String JSJ_T_0010 = "greater or equal";
 	// public String JSJ_E_0017 = "Compare operator not known: '%1$s'";
+
 	// public String JSJ_I_0017 = "Order created by %1$s";
 	// public String JSJ_I_0018 = "Order '%1$s' created for JobChain '%2$s'.";
 	// public String JSJ_I_0019 = "Next State is '%1$s'.";
+
 	/**
 	 * Checks for file existence.
 	 * if file is a directory and <em>fileSpec</em> is not NULL
@@ -401,10 +418,13 @@ public class JSFileOperationBase extends JSJobUtilitiesClass <JSExistsFileOption
 			final SOSOptionFileSize minFileSize1, //
 			final SOSOptionFileSize maxFileSize1, final SOSOptionInteger skipFirstFiles1, final SOSOptionInteger skipLastFiles1, //
 			final int minNumOfFiles, final int maxNumOfFiles) throws IOException, Exception {
+
 		long minAge = 0;
 		long maxAge = 0;
+
 		long minSize = -1;
 		long maxSize = -1;
+
 		// log_debug1("arguments for existsFile:");
 		// log_debug1("argument file=" + file.toString());
 		// log_debug1("argument fileSpec=" + fileSpec1);
@@ -414,21 +434,25 @@ public class JSFileOperationBase extends JSJobUtilitiesClass <JSExistsFileOption
 		// log_debug1("argument maxFileAge=" + maxFileAge1);
 		minAge = minFileAge1.calculateFileAge();
 		maxAge = maxFileAge1.calculateFileAge();
+
 		// log_debug1("argument minFileSize=" + minFileSize1);
 		// log_debug1("argument maxFileSize=" + maxFileSize1);
 		minSize = minFileSize1.getFileSize();
 		maxSize = maxFileSize1.getFileSize();
+
 		// log_debug1("argument skipFirstFiles=" + skipFirstFiles1);
 		// log_debug1("argument skipLastFiles=" + skipLastFiles1);
 		//
 		// log_debug1("argument minNumOfFiles=" + minNumOfFiles);
 		// log_debug1("argument maxNumOfFiles=" + maxNumOfFiles);
+
 		if (skipFirstFiles1.value() < 0) {
 			throw new JobSchedulerException(JFO_F_0100.get(skipFirstFiles1.value(), "skipFirstFiles"));
 		}
 		if (skipLastFiles1.value() < 0) {
 			throw new JobSchedulerException(JFO_F_0100.get(skipLastFiles1.value(), "skipLastFiles"));
 		}
+
 		if (skipFirstFiles1.value() > 0 && skipLastFiles1.value() > 0) {
 			JFO_F_0101.toLog();
 		}
@@ -438,11 +462,13 @@ public class JSFileOperationBase extends JSJobUtilitiesClass <JSExistsFileOption
 			}
 		}
 		String filename = objFile.substituteAllDate();
+
 		// should any opening and closing brackets be found in the file name, then this is an error
 		Matcher m = Pattern.compile("\\[[^]]*\\]").matcher(filename);
 		if (m.find()) {
 			JFO_F_0102.toLog(m.group());
 		}
+
 		File fleFile = new File(filename);
 		if (!fleFile.exists()) {
 			logger.debug(JFO_I_0105.get(fleFile.getCanonicalPath()));
@@ -452,37 +478,46 @@ public class JSFileOperationBase extends JSJobUtilitiesClass <JSExistsFileOption
 			// Es ist eine Datei und sie existiert
 			if (!fleFile.isDirectory()) {
 				JFO_I_0106.toLog(fleFile.getCanonicalPath());
+
 				long currentTime = System.currentTimeMillis();
+
 				if (minAge > 0) {
 					long interval = currentTime - fleFile.lastModified();
 					if (interval < 0)
 						throw new Exception("Cannot filter by file age. File [" + fleFile.getCanonicalPath() + "] was modified in the future.");
+
 					if (interval < minAge) {
 						log("checking file age " + fleFile.lastModified() + ": minimum age required is " + minAge);
 						return false;
 					}
 				}
+
 				if (maxAge > 0) {
 					long interval = currentTime - fleFile.lastModified();
 					if (interval < 0)
 						throw new JobSchedulerException("Cannot filter by file age. File [" + fleFile.getCanonicalPath() + "] was modified in the future.");
+
 					if (interval > maxAge) {
 						log("checking file age " + fleFile.lastModified() + ": maximum age required is " + maxAge);
 						return false;
 					}
 				}
+
 				if (minSize > -1 && minSize > fleFile.length()) {
 					log("checking file size " + fleFile.length() + ": minimum size required is " + minFileSize1);
 					return false;
 				}
+
 				if (maxSize > -1 && maxSize < fleFile.length()) {
 					log("checking file size " + fleFile.length() + ": maximum size required is " + maxFileSize1);
 					return false;
 				}
+
 				if (skipFirstFiles1.value() > 0 || skipLastFiles1.value() > 0) {
 					log("file skipped");
 					return false;
 				}
+
 				return true;
 			}
 			else {
@@ -491,11 +526,14 @@ public class JSFileOperationBase extends JSJobUtilitiesClass <JSExistsFileOption
 					log("checking file " + fleFile.getCanonicalPath() + ": directory exists");
 					return true;
 				}
+
 				Vector<File> fileList = getFilelist(fleFile.getPath(), fileSpec1, false, minAge, maxAge, minSize, maxSize, skipFirstFiles1.value(),
 						skipLastFiles1.value());
+
 				if (fileList.isEmpty()) {
 					log("checking file " + fleFile.getCanonicalPath() + ": directory contains no files matching " + fileSpec1);
 					return false;
+
 				}
 				else {
 					log("checking file " + fleFile.getCanonicalPath() + ": directory contains " + fileList.size() + " file(s) matching " + fileSpec1);
@@ -503,14 +541,17 @@ public class JSFileOperationBase extends JSJobUtilitiesClass <JSExistsFileOption
 						File checkFile = fileList.get(i);
 						log("found " + checkFile.getCanonicalPath());
 					}
+
 					if (minNumOfFiles >= 0 && fileList.size() < minNumOfFiles) {
 						log("found " + fileList.size() + " files, minimum expected " + minNumOfFiles + " files");
 						return false;
 					}
+
 					if (maxNumOfFiles >= 0 && fileList.size() > maxNumOfFiles) {
 						log("found " + fileList.size() + " files, maximum expected " + maxNumOfFiles + " files");
 						return false;
 					}
+
 					lstResultList.addAll(fileList);
 					return true;
 				}
@@ -528,21 +569,29 @@ public class JSFileOperationBase extends JSJobUtilitiesClass <JSExistsFileOption
 	 */
 	private Vector<File> getFilelist(final String folder, final SOSOptionRegExp regexp, final boolean withSubFolder, final long minFileAge1,
 			final long maxFileAge1, final long minFileSize1, final long maxFileSize1, final int skipFirstFiles1, final int skipLastFiles1) throws Exception {
+
 		Vector<File> filelist = new Vector<File>();
 		Vector<File> temp = new Vector<File>();
+
 		File objFile = null;
 		File[] subDir = null;
+
 		objFile = new File(folder);
 		subDir = objFile.listFiles();
+
 		temp = this.getFilelist(folder, regexp);
+
 		temp = filelistFilterAge(temp, minFileAge1, maxFileAge1);
 		temp = filelistFilterSize(temp, minFileSize1, maxFileSize1);
+
 		if ((minFileSize1 != -1 || minFileSize1 != -1) && minFileAge1 == 0 && maxFileAge1 == 0)
 			temp = filelistSkipFiles(temp, skipFirstFiles1, skipLastFiles1, "sort_size");
 		else
 			if (minFileAge1 != 0 || maxFileAge1 != 0)
 				temp = filelistSkipFiles(temp, skipFirstFiles1, skipLastFiles1, "sort_age");
+
 		filelist.addAll(temp);
+
 		if (withSubFolder) {
 			for (File element : subDir) {
 				if (element.isDirectory()) {
@@ -562,10 +611,13 @@ public class JSFileOperationBase extends JSJobUtilitiesClass <JSExistsFileOption
 	 * @see <a href="http://java.sun.com/j2se/1.4.2/docs/api/constant-values.html#java.util.regex.Pattern.UNIX_LINES">Constant Field Values</a>
 	 */
 	public Vector<File> getFilelist(final String folder, final SOSOptionRegExp regexp) throws Exception {
+
 		Vector<File> filelist = new Vector<File>();
+
 		if (folder == null || folder.length() == 0) {
 			throw new JobSchedulerException("a null value for param 'directory' is not allowed");
 		}
+
 		File f = new File(folder);
 		if (!f.exists()) {
 			String strM = JFO_I_0105.get(folder);
@@ -585,17 +637,21 @@ public class JSFileOperationBase extends JSJobUtilitiesClass <JSExistsFileOption
 					// unknown
 				}
 		}
+
 		return filelist;
 	}
 
 	private Vector<File> filelistFilterAge(Vector<File> filelist, final long minAge, final long maxAge) throws Exception {
+
 		long currentTime = System.currentTimeMillis();
+
 		if (minAge != 0) {
 			File file1;
 			Vector<File> newlist = new Vector<File>();
 			for (int i = 0; i < filelist.size(); i++) {
 				file1 = filelist.get(i);
 				long interval = currentTime - file1.lastModified();
+
 				if (interval < 0) {
 					throw new JobSchedulerException("Cannot filter by file age. File [" + file1.getCanonicalPath() + "] was modified in the future.");
 				}
@@ -604,12 +660,14 @@ public class JSFileOperationBase extends JSJobUtilitiesClass <JSExistsFileOption
 			}
 			filelist = newlist;
 		}
+
 		if (maxAge != 0) {
 			File file1;
 			Vector<File> newlist = new Vector<File>();
 			for (int i = 0; i < filelist.size(); i++) {
 				file1 = filelist.get(i);
 				long interval = currentTime - file1.lastModified();
+
 				if (interval < 0) {
 					throw new JobSchedulerException("Cannot filter by file age. File [" + file1.getCanonicalPath() + "] was modified in the future.");
 				}
@@ -622,6 +680,7 @@ public class JSFileOperationBase extends JSJobUtilitiesClass <JSExistsFileOption
 	}
 
 	private Vector<File> filelistFilterSize(Vector<File> filelist, final long minSize, final long maxSize) throws Exception {
+
 		if (minSize > -1) {
 			File file1;
 			Vector<File> newlist = new Vector<File>();
@@ -632,6 +691,7 @@ public class JSFileOperationBase extends JSJobUtilitiesClass <JSExistsFileOption
 			}
 			filelist = newlist;
 		}
+
 		if (maxSize > -1) {
 			File file1;
 			Vector<File> newlist = new Vector<File>();
@@ -642,43 +702,52 @@ public class JSFileOperationBase extends JSJobUtilitiesClass <JSExistsFileOption
 			}
 			filelist = newlist;
 		}
+
 		return filelist;
 	}
 
 	private Vector<File> filelistSkipFiles(Vector<File> filelist, final int skipFirstFiles1, final int skipLastFiles1, final String sorting) throws Exception {
+
 		Object[] oArr = filelist.toArray();
+
 		class SizeComparator implements Comparator {
 			@Override
 			public int compare(final Object o1, final Object o2) {
 				int ret = 0;
 				long val1 = ((File) o1).length();
 				long val2 = ((File) o2).length();
+
 				if (val1 < val2)
 					ret = -1;
 				if (val1 == val2)
 					ret = 0;
 				if (val1 > val2)
 					ret = 1;
+
 				return ret;
 			}
 		}
 		;
+
 		class AgeComparator implements Comparator {
 			@Override
 			public int compare(final Object o1, final Object o2) {
 				int ret = 0;
 				long val1 = ((File) o1).lastModified();
 				long val2 = ((File) o2).lastModified();
+
 				if (val1 > val2)
 					ret = -1;
 				if (val1 == val2)
 					ret = 0;
 				if (val1 < val2)
 					ret = 1;
+
 				return ret;
 			}
 		}
 		;
+
 		// sortiert die Dateien im Array aufsteigend nach Größe der Datei, d.h. kleinere zuerst
 		if (sorting.equals("sort_size"))
 			Arrays.sort(oArr, new SizeComparator());
@@ -686,15 +755,18 @@ public class JSFileOperationBase extends JSJobUtilitiesClass <JSExistsFileOption
 			// sortiert die Dateien im Array aufsteigend nach Änderungsdatum der Datei, d.h. jüngere zuerst
 			if (sorting.equals("sort_age"))
 				Arrays.sort(oArr, new AgeComparator());
+
 		// Skip files
 		filelist = new Vector<File>();
 		for (int i = 0 + skipFirstFiles1; i < oArr.length - skipLastFiles1; i++) {
 			filelist.add((File) oArr[i]);
 		}
+
 		return filelist;
 	}
 
 	private void log(final String msg) {
+
 		try {
 			logger.info(msg);
 		}
@@ -703,6 +775,7 @@ public class JSFileOperationBase extends JSJobUtilitiesClass <JSExistsFileOption
 	}
 
 	private void log_debug1(final String msg) {
+
 		try {
 			if (logger != null)
 				logger.debug(msg);
@@ -710,109 +783,22 @@ public class JSFileOperationBase extends JSJobUtilitiesClass <JSExistsFileOption
 		catch (Exception e) {
 		}
 	}
-	protected boolean	flgUseNIOLock	= true;
 
-	public boolean checkSteadyStateOfFiles() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::checkSteadyStateOfFiles";
-		if (isNull(lstResultList)) {
-			//			saveResultList();
-		}
-		boolean flgAllFilesAreSteady = flgOperationWasSuccessful;
-		if (flgOperationWasSuccessful == true && objOptions.CheckSteadyStateOfFiles.isTrue() == true && lstResultList.size() > 0) {
-			logger.debug("checking file(s) for steady state");
-			Vector<FileDescriptor> lstFD = new Vector<FileDescriptor>();
-			for (File objFile : lstResultList) {
-				FileDescriptor objFD = new FileDescriptor(objFile);
-				logger.debug("filedescriptor is : " + objFD.getLastModificationDate() + ", " + objFD.getLastFileLength());
-				lstFD.add(objFD);
-			}
-			try {
-				Thread.sleep(objOptions.CheckSteadyStateInterval.getTimeAsMilliSeconds());
-			}
-			catch (InterruptedException e1) {
-				e1.printStackTrace();
-			}
-			for (int i = 0; i < objOptions.CheckSteadyCount.value(); i++) {
-				flgAllFilesAreSteady = true;
-				for (FileDescriptor objFD : lstFD) {
-					File objActFile = objFD.getFile();
-					String strActFileName = objActFile.getAbsolutePath();
-					if (flgUseNIOLock == true) {
-						try {
-							RandomAccessFile objRAFile = new RandomAccessFile(objActFile, "rw");
-							FileChannel channel = objRAFile.getChannel();
-							FileLock lock = channel.lock(); // Get an exclusive lock on the whole file
-							try {
-								lock = channel.tryLock();
-								logger.debug(String.format("lock for file '%1$s' ok", strActFileName));
-								// Ok. You got the lock
-								break;
-							}
-							catch (OverlappingFileLockException e) {
-								flgAllFilesAreSteady = false;
-								logger.info(String.format("File '%1$s' is open by someone else", strActFileName));
-								break;
-							}
-							finally {
-								lock.release();
-								logger.debug(String.format("release lock for '%1$s'", strActFileName));
-								if (objRAFile != null) {
-									channel.close();
-									objRAFile.close();
-									objRAFile = null;
-								}
-							}
-						}
-						catch (FileNotFoundException e) {
-							e.printStackTrace();
-						}
-						catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-					if (objFD.isSteady() == false) {
-						flgAllFilesAreSteady = false;
-						break;
-					}
-				}
-				if (flgAllFilesAreSteady == false) {
-					try {
-						Thread.sleep(objOptions.CheckSteadyStateInterval.getTimeAsMilliSeconds());
-					}
-					catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-				else {
-					break;
-				}
-			}
-			if (flgAllFilesAreSteady == false) {
-				logger.error("not all files are steady");
-				for (FileDescriptor objFD : lstFD) {
-					if (objFD.isFlgIsSteady() == false) {
-						logger.info(String.format("File '%1$s' is not steady", objFD.getFileName()));
-					}
-				}
-				throw new JobSchedulerException("not all files are steady");
-			}
-		}
-		return flgAllFilesAreSteady;
-	} // private boolean checkSteadyStateOfFiles
+	@Override
+	public void setStateText(final String pstrStateText) {
+		// TODO Auto-generated method stub
 
-//	@Override
-//	public void setStateText(final String pstrStateText) {
-//		// TODO Auto-generated method stub
-//	}
-//
-//	@Override
-//	public void setCC(final int pintCC) {
-//		// TODO Auto-generated method stub
-//	}
-//
-//	@Override
-//	public void setNextNodeState(final String pstrNodeName) {
-//		// TODO Auto-generated method stub
-//	}
+	}
+
+	@Override
+	public void setCC(final int pintCC) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override public void setNextNodeState(final String pstrNodeName) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

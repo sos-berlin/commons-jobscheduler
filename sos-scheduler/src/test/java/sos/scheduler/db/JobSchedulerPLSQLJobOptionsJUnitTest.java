@@ -70,31 +70,32 @@ public class JobSchedulerPLSQLJobOptionsJUnitTest extends JSToolBox {
 // C:\Users\KB\workspace-kepler\products\commons\credentialstore\src\test\resources\keepassX-test.kdb
 // C:\Users\KB\workspace-kepler\products\jobscheduler\sos-scheduler\keepassX-test.kdb
 	
-	private final String strKeePathDBPathName = "../../commons/credentialstore/src/test/resources/keepassX-test.kdb";
-	@Test public void testSOSCredentialStore() throws Exception {
-		HashMap<String, String> objH = new HashMap<String, String>();
-		objH.put("source_dir", "source_dir");
-		objH.put("use_credential_Store", "true");
-		objH.put("CredentialStore_FileName", strKeePathDBPathName);
-//		objH.put("CredentialStore_KeyFileName", "./testing-key.key");
-		objH.put("CredentialStore_password", "testing");
-		objH.put("CredentialStore_ProcessNotesParams", "true");
-		objH.put("CredentialStore_Key_Path", "testserver/db/db_url_test");
-
-		try {
-			JobSchedulerPLSQLJobOptions objO = new JobSchedulerPLSQLJobOptions(objH);
-			SOSCredentialStoreOptions objCS = objO.getCredentialStore().Options();
-			logger.debug("objSource.UserName.Value() = " + objO.user.Value());
-			logger.debug("objSource.passwrod.Value() = " + objO.password.Value());
-			logger.debug("testSOSCredentialStore1 " + objCS.dirtyString());
-			logger.info("testSOSCredentialStore1 " + objO.dirtyString());
-			assertEquals("source_CredentialStore_use_credential_Store", strKeePathDBPathName, objCS.CredentialStore_FileName.Value());
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-			throw e;
-		}
-	}
+// Test added in 1.8 -> compile error because of rollback 1.7.4
+	//	private final String strKeePathDBPathName = "../../commons/credentialstore/src/test/resources/keepassX-test.kdb";
+//	@Test public void testSOSCredentialStore() throws Exception {
+//		HashMap<String, String> objH = new HashMap<String, String>();
+//		objH.put("source_dir", "source_dir");
+//		objH.put("use_credential_Store", "true");
+//		objH.put("CredentialStore_FileName", strKeePathDBPathName);
+////		objH.put("CredentialStore_KeyFileName", "./testing-key.key");
+//		objH.put("CredentialStore_password", "testing");
+//		objH.put("CredentialStore_ProcessNotesParams", "true");
+//		objH.put("CredentialStore_Key_Path", "testserver/db/db_url_test");
+//
+//		try {
+//			JobSchedulerPLSQLJobOptions objO = new JobSchedulerPLSQLJobOptions(objH);
+//			SOSCredentialStoreOptions objCS = objO.getCredentialStore().Options();
+//			logger.debug("objSource.UserName.Value() = " + objO.user.Value());
+//			logger.debug("objSource.passwrod.Value() = " + objO.password.Value());
+//			logger.debug("testSOSCredentialStore1 " + objCS.dirtyString());
+//			logger.info("testSOSCredentialStore1 " + objO.dirtyString());
+//			assertEquals("source_CredentialStore_use_credential_Store", strKeePathDBPathName, objCS.CredentialStore_FileName.Value());
+//		}
+//		catch (Exception e) {
+//			e.printStackTrace();
+//			throw e;
+//		}
+//	}
 
 
 	/**

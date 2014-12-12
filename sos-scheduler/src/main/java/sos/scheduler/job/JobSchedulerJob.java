@@ -11,12 +11,10 @@ import sos.settings.SOSConnectionSettings;
 import sos.settings.SOSProfileSettings;
 import sos.settings.SOSSettings;
 import sos.spooler.Job_impl;
-import sos.spooler.Variable_set;
 import sos.util.SOSArguments;
 import sos.util.SOSLogger;
 import sos.util.SOSSchedulerLogger;
 
-import com.sos.JSHelper.Basics.VersionInfo;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
 /**
@@ -57,11 +55,6 @@ public class JobSchedulerJob extends Job_impl {
 	/** name of the application (for settings) */
 	protected String				application			= new String("");
 
-	@Override public boolean spooler_process () throws Exception {
-		objParams = spooler_task.params();
-		spooler_log.info(VersionInfo.VERSION_STRING);
-		return true;
-	}
 	public SOSConnection ConnectToJSDataBase() {
 
 		@SuppressWarnings("unused")
@@ -488,26 +481,6 @@ public class JobSchedulerJob extends Job_impl {
 		catch (Exception e) {
 			throw new Exception("error in createFile() [" + fileName + "]: " + e.getMessage());
 		}
-	}
-
-	protected Variable_set									objParams;
-
-	protected String getParm(final String pstrParmName, final String pstrDefaultValue) {
-		String strR = pstrDefaultValue;
-		if (objParams.var(pstrParmName) != null && objParams.var(pstrParmName).length() > 0) {
-			strR = objParams.var(pstrParmName);
-		}
-		spooler_log.info(String.format(".. job parameter [%1$s]: ", strR));
-		return strR;
-	}
-
-	protected long getLongParm(final String pstrParmName, final long plngDefaultValue) {
-		long lngR = plngDefaultValue;
-		if (objParams.var(pstrParmName) != null && objParams.var(pstrParmName).length() > 0) {
-			lngR = Long.parseLong(objParams.var("pstrParamName"));
-		}
-		spooler_log.info(String.format(".. job parameter [%1$s]: ", lngR));
-		return lngR;
 	}
 
 }

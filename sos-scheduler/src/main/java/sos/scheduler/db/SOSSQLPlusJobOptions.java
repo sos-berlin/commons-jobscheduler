@@ -1,4 +1,5 @@
 package sos.scheduler.db;
+
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
@@ -24,9 +25,7 @@ import com.sos.JSHelper.Listener.JSListener;
  * mechanicaly created by JobDocu2OptionsClass.xslt from http://www.sos-berlin.com at 20120927163928
  * \endverbatim
  */
-@JSOptionClass(
-				name = "SOSSQLPlusJobOptions",
-				description = "Start SQL*Plus client and execute sql*plus programs")
+@JSOptionClass(name = "SOSSQLPlusJobOptions", description = "Start SQL*Plus client and execute sql*plus programs")
 public class SOSSQLPlusJobOptions extends SOSSQLPlusJobOptionsSuperClass {
 	/**
 	 *
@@ -40,15 +39,18 @@ public class SOSSQLPlusJobOptions extends SOSSQLPlusJobOptionsSuperClass {
 	/**
 	* constructors
 	*/
+
 	public SOSSQLPlusJobOptions() {
 	} // public SOSSQLPlusJobOptions
 
-	@Deprecated public SOSSQLPlusJobOptions(final JSListener pobjListener) {
+	@Deprecated
+	public SOSSQLPlusJobOptions(final JSListener pobjListener) {
 		this();
 		this.registerMessageListener(pobjListener);
 	} // public SOSSQLPlusJobOptions
 
 	//
+
 	public SOSSQLPlusJobOptions(final HashMap<String, String> JSSettings) throws Exception {
 		super(JSSettings);
 		super.setChildClasses(JSSettings, EMPTY_STRING);
@@ -63,7 +65,8 @@ public class SOSSQLPlusJobOptions extends SOSSQLPlusJobOptionsSuperClass {
 	 * @throws Exception
 	 * - wird ausgelöst, wenn eine mandatory-Option keinen Wert hat
 	 */
-	@Override// SOSSQLPlusJobOptionsSuperClass
+	@Override
+	// SOSSQLPlusJobOptionsSuperClass
 	public void CheckMandatory() {
 		try {
 			super.CheckMandatory();
@@ -73,15 +76,15 @@ public class SOSSQLPlusJobOptions extends SOSSQLPlusJobOptionsSuperClass {
 		}
 	} // public void CheckMandatory ()
 
-	public String getConnectionStringDefinition() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getConnectionString";
+	public String getConnectionString() {
+
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getConnectionString";
 		String strT = "";
+
 		if (db_user.isDirty() == true) {
 			strT = db_user.Value() + "/" + db_password.Value() + "@" + db_url.Value();
 		}
-		if (ConnectionString.isDirty()) {
-			strT = ConnectionString.Value();
-		}
-		return strT;
+			return strT;
 	} // private String getConnectionString
 }

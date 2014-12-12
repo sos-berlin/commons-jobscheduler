@@ -4,18 +4,23 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
-import com.sos.CredentialStore.SOSCredentialStoreSuperClass;
+import com.sos.CredentialStore.SOSCredentialStoreImpl;
+import com.sos.CredentialStore.Options.ISOSCredentialStoreOptionsBridge;
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
 import com.sos.JSHelper.Listener.JSListener;
+import com.sos.JSHelper.Options.JSOptionsClass;
+import com.sos.JSHelper.Options.SOSOptionAuthenticationMethod;
 import com.sos.JSHelper.Options.SOSOptionCommandString;
-import com.sos.JSHelper.Options.SOSOptionConnectionString;
-import com.sos.JSHelper.Options.SOSOptionElement;
+import com.sos.JSHelper.Options.SOSOptionHostName;
+import com.sos.JSHelper.Options.SOSOptionInFileName;
 import com.sos.JSHelper.Options.SOSOptionPassword;
 import com.sos.JSHelper.Options.SOSOptionPortNumber;
 import com.sos.JSHelper.Options.SOSOptionRegExp;
 import com.sos.JSHelper.Options.SOSOptionString;
+import com.sos.JSHelper.Options.SOSOptionTransferType;
+import com.sos.JSHelper.Options.SOSOptionUrl;
 import com.sos.JSHelper.Options.SOSOptionUserName;
 
 /**
@@ -62,7 +67,7 @@ import com.sos.JSHelper.Options.SOSOptionUserName;
  * \endverbatim
  */
 @JSOptionClass(name = "JobSchedulerPLSQLJobOptionsSuperClass", description = "JobSchedulerPLSQLJobOptionsSuperClass")
-public class JobSchedulerPLSQLJobOptionsSuperClass extends SOSCredentialStoreSuperClass {
+public class JobSchedulerPLSQLJobOptionsSuperClass extends JSOptionsClass implements ISOSCredentialStoreOptionsBridge {
 	/**
 	 * 
 	 */
@@ -70,42 +75,6 @@ public class JobSchedulerPLSQLJobOptionsSuperClass extends SOSCredentialStoreSup
 	private final String			conClassName		= "JobSchedulerPLSQLJobOptionsSuperClass";
 	@SuppressWarnings("unused")
 	private static Logger			logger				= Logger.getLogger(JobSchedulerPLSQLJobOptionsSuperClass.class);
-
-	/**
-	 * \option ConnectionString
-	 * \type SOSOptionString
-	 * \brief ConnectionString - The connection String which is used to connect to the database
-	 *
-	 * \details
-	 * The connection String which is used to connect to the database
-	 *
-	 * \mandatory: false
-	 *
-	 * \created 11.07.2014 13:44:57 by KB
-	 */
-	@JSOptionDefinition(
-						name = "ConnectionString",
-						description = "The connection String which is used to connect to the database",
-						key = "ConnectionString",
-						type = "SOSOptionString",
-						mandatory = false)
-	public SOSOptionConnectionString	ConnectionString	= new SOSOptionConnectionString( // ...
-														this, // ....
-														conClassName + ".ConnectionString", // ...
-														"The connection String which is used to connect to the database", // ...
-														"", // ...
-														"", // ...
-														false);
-
-	public SOSOptionConnectionString getConnectionString() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getConnectionString";
-		return ConnectionString;
-	} // public String getConnectionString
-
-	public void setConnectionString(final SOSOptionConnectionString pstrValue) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setConnectionString";
-		ConnectionString = pstrValue;
-	} // public SOSSQLPlusJobOptionsSuperClass setConnectionString
 
 	/**
 	 * \var command : Database Commands for the Job. It is possible to define m
@@ -191,13 +160,13 @@ public class JobSchedulerPLSQLJobOptionsSuperClass extends SOSCredentialStoreSup
 	 *
 	 */
 	@JSOptionDefinition(name = "db_password", description = "database password", key = "db_password", type = "SOSOptionString", mandatory = false)
-	public SOSOptionPassword	db_password				= new SOSOptionPassword(this, conClassName + ".db_password", // HashMap-Key
+	public SOSOptionString	db_password				= new SOSOptionString(this, conClassName + ".db_password", // HashMap-Key
 															"database password", // Titel
 															" ", // InitValue
 															" ", // DefaultValue
 															false // isMandatory
 													);
-	public SOSOptionPassword password = (SOSOptionPassword) db_password.SetAlias("password");
+
 	/**
 	 * \brief getdb_password : database password
 	 * 
@@ -207,7 +176,7 @@ public class JobSchedulerPLSQLJobOptionsSuperClass extends SOSCredentialStoreSup
 	 * \return database password
 	 *
 	 */
-	public SOSOptionPassword getdb_password() {
+	public SOSOptionString getdb_password() {
 		return db_password;
 	}
 
@@ -219,7 +188,7 @@ public class JobSchedulerPLSQLJobOptionsSuperClass extends SOSCredentialStoreSup
 	 *
 	 * @param db_password : database password
 	 */
-	public void setdb_password(final SOSOptionPassword p_db_password) {
+	public void setdb_password(final SOSOptionString p_db_password) {
 		db_password = p_db_password;
 	}
 
@@ -229,7 +198,7 @@ public class JobSchedulerPLSQLJobOptionsSuperClass extends SOSCredentialStoreSup
 	 *
 	 */
 	@JSOptionDefinition(name = "db_url", description = "jdbc url (e.g. jdbc:oracle:thin:@localhost:1521:XE)", key = "db_url", type = "SOSOptionString", mandatory = false)
-	public SOSOptionConnectionString	db_url	= new SOSOptionConnectionString(this, conClassName + ".db_url", // HashMap-Key
+	public SOSOptionString	db_url	= new SOSOptionString(this, conClassName + ".db_url", // HashMap-Key
 											"jdbc url (e.g. jdbc:oracle:thin:@localhost:1521:XE)", // Titel
 											" ", // InitValue
 											" ", // DefaultValue
@@ -245,7 +214,7 @@ public class JobSchedulerPLSQLJobOptionsSuperClass extends SOSCredentialStoreSup
 	 * \return jdbc url (e.g. jdbc:oracle:thin:@localhost:1521:XE)
 	 *
 	 */
-	public SOSOptionConnectionString getdb_url() {
+	public SOSOptionString getdb_url() {
 		return db_url;
 	}
 
@@ -257,7 +226,7 @@ public class JobSchedulerPLSQLJobOptionsSuperClass extends SOSCredentialStoreSup
 	 *
 	 * @param db_url : jdbc url (e.g. jdbc:oracle:thin:@localhost:1521:XE)
 	 */
-	public void setdb_url(final SOSOptionConnectionString p_db_url) {
+	public void setdb_url(final SOSOptionString p_db_url) {
 		db_url = p_db_url;
 	}
 
@@ -267,13 +236,13 @@ public class JobSchedulerPLSQLJobOptionsSuperClass extends SOSCredentialStoreSup
 	 *
 	 */
 	@JSOptionDefinition(name = "db_user", description = "database user", key = "db_user", type = "SOSOptionString", mandatory = false)
-	public SOSOptionUserName	db_user	= new SOSOptionUserName(this, conClassName + ".db_user", // HashMap-Key
+	public SOSOptionString	db_user	= new SOSOptionString(this, conClassName + ".db_user", // HashMap-Key
 											"database user", // Titel
 											" ", // InitValue
 											" ", // DefaultValue
 											false // isMandatory
 									);
-	public SOSOptionUserName user = (SOSOptionUserName) db_user.SetAlias("user");
+
 	/**
 	 * \brief getdb_user : database user
 	 * 
@@ -283,7 +252,7 @@ public class JobSchedulerPLSQLJobOptionsSuperClass extends SOSCredentialStoreSup
 	 * \return database user
 	 *
 	 */
-	public SOSOptionUserName getdb_user() {
+	public SOSOptionString getdb_user() {
 		return db_user;
 	}
 
@@ -295,7 +264,7 @@ public class JobSchedulerPLSQLJobOptionsSuperClass extends SOSCredentialStoreSup
 	 *
 	 * @param db_user : database user
 	 */
-	public void setdb_user(final SOSOptionUserName p_db_user) {
+	public void setdb_user(final SOSOptionString p_db_user) {
 		db_user = p_db_user;
 	}
 
@@ -521,11 +490,33 @@ public class JobSchedulerPLSQLJobOptionsSuperClass extends SOSCredentialStoreSup
 		this.setAllOptions(super.objSettings);
 	}
 	
-	public void setUrl(final SOSOptionConnectionString pstrValue) {
-		ConnectionString.Set(pstrValue);
+	// Credential Store Methods and fields
+	
+	protected SOSCredentialStoreImpl objCredentialStore = null;
+	public SOSCredentialStoreImpl getCredentialStore() {
+		if (objCredentialStore == null) {
+			objCredentialStore = new SOSCredentialStoreImpl(this);
+		}
+		return objCredentialStore;
 	}
 
-	@Override public void setHost(final SOSOptionElement p_host) {
+	public void setChildClasses(final HashMap<String, String> pobjJSSettings, final String pstrPrefix) throws Exception {
+		getCredentialStore().setChildClasses(pobjJSSettings, pstrPrefix);
+		objCredentialStore.checkCredentialStoreOptions();
+	} // public SOSConnection2OptionsAlternate (HashMap JSSettings)
+
+	@Override public SOSOptionUrl getUrl() {
+		return null;
+	}
+
+	@Override public void setUrl(final SOSOptionUrl pstrValue) {
+	}
+
+	@Override public SOSOptionHostName getHost() {
+		return null;
+	}
+
+	@Override public void setHost(final SOSOptionHostName p_host) {
 	}
 
 	@Override public SOSOptionPortNumber getPort() {
@@ -535,19 +526,44 @@ public class JobSchedulerPLSQLJobOptionsSuperClass extends SOSCredentialStoreSup
 	@Override public void setPort(final SOSOptionPortNumber p_port) {
 	}
 
+	@Override public SOSOptionTransferType getProtocol() {
+		return null;
+	}
+
+	@Override public void setProtocol(final SOSOptionTransferType p_protocol) {
+	}
+
 	@Override public SOSOptionUserName getUser() {
-		return db_user;
+		return null;
 	}
 
 	@Override public SOSOptionPassword getPassword() {
-		return db_password;
+		return null;
 	}
 
 	@Override public void setPassword(final SOSOptionPassword p_password) {
-		db_password.Set(p_password);
+		
+	}
+
+	@Override public SOSOptionInFileName getAuth_file() {
+		return null;
+	}
+
+	@Override public void setAuth_file(final SOSOptionInFileName p_ssh_auth_file) {
+		
+	}
+
+	@Override public SOSOptionAuthenticationMethod getAuth_method() {
+		return null;
+	}
+
+	@Override public void setAuth_method(final SOSOptionAuthenticationMethod p_ssh_auth_method) {
+		
 	}
 
 	@Override public void setUser(final SOSOptionUserName pobjUser) {
-		db_user.Set(pobjUser);
+		
 	}
+
+
 } // public class JobSchedulerPLSQLJobOptionsSuperClass
