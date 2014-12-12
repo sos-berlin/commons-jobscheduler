@@ -40,6 +40,10 @@ public class SOSOptionUrl extends SOSOptionString {
 		super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
 		// TODO Auto-generated constructor stub
 	}
+	
+	public SOSOptionUrl(final String pstrUrl) {
+		super(null, "", "", pstrUrl, "", false);
+	}
 
 	public URL getUrl() {
 		return objURL;
