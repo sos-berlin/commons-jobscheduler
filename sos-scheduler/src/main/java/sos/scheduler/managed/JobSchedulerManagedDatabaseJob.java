@@ -212,19 +212,22 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 			this.getLogger().info("database statement(s) executed.");
 			if ((resultsetAsWarning || resultsetAsParameters) && localConnection.getResultSet() != null) {
 				String warning = "";
-				HashMap result = null;
+				int rowCount = 0;
+				HashMap<String,String> result = null;
 				while (!(result = localConnection.get()).isEmpty()) {
 					String orderParamKey = "";
+					rowCount++;
 					int columnCount = 0;
 					warning = "execution terminated with warning:";
-					Iterator resultIterator = result.keySet().iterator();
+					Iterator<String> resultIterator = result.keySet().iterator();
 					boolean resultParametersSet = false;
 					while (resultIterator.hasNext()) {
 						columnCount++;
-						String key = (String) resultIterator.next();
-						if (key == null || key.length() == 0)
+						String key = resultIterator.next();
+						if (key == null || key.length() == 0) {
 							continue;
-						String value = result.get(key).toString();
+						}
+						String value = result.get(key);
 						warning += " " + key + "=" + value;
 						if (resultsetAsParameters && order != null && !resultParametersSet) {
 							if (resultsetNameValue) { // name/value pairs from two columns
@@ -232,17 +235,25 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 									orderParamKey = value;
 								}
 								if (columnCount == 2) {
-									//if (realOrderParams.value(orderParamKey) == null || realOrderParams.value(orderParamKey).length() == 0) {
+									//if (realOrderParams.value(orderParamKey) == null || realOrderParams.value(orderParamKey).length() == 0) 
+									{
 										realOrderParams.set_var(orderParamKey, value);
-									//}
+										//https://change.sos-berlin.com/browse/JITL-125
+										resultParametersSet = true;
+										if (resultsetAsWarning == false) {
+											break;
+										}
+									}
 								}
 							}
 							else
-								//if (realOrderParams.value(key) == null || realOrderParams.value(key).length() == 0) {
-									// column name = name, value=value
+								if (rowCount == 1) 
+								{
+									// column name = key, value=value
 									realOrderParams.set_var(key, value);
-									resultParametersSet = true;
-								//}
+									//https://change.sos-berlin.com/browse/JITL-125
+									//resultParametersSet = true;
+								}
 						}
 					}
 				}
