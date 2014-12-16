@@ -214,22 +214,25 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 				String warning = "";
 				int rowCount = 0;
 				HashMap<String,String> result = null;
+				boolean resultsetTrueReady = false;
 				while (!(result = localConnection.get()).isEmpty()) {
+					if (resultsetTrueReady) {
+						break;
+					}
 					String orderParamKey = "";
 					rowCount++;
 					int columnCount = 0;
 					warning = "execution terminated with warning:";
-					Iterator<String> resultIterator = result.keySet().iterator();
-					boolean resultParametersSet = false;
-					while (resultIterator.hasNext()) {
+					boolean resultsetNameValueReady = false;
+					for (String key : result.keySet()) {
 						columnCount++;
-						String key = resultIterator.next();
 						if (key == null || key.length() == 0) {
 							continue;
 						}
 						String value = result.get(key);
 						warning += " " + key + "=" + value;
-						if (resultsetAsParameters && order != null && !resultParametersSet) {
+						//https://change.sos-berlin.com/browse/JITL-125
+						if (resultsetAsParameters && order != null && !resultsetNameValueReady) {
 							if (resultsetNameValue) { // name/value pairs from two columns
 								if (columnCount == 1) {
 									orderParamKey = value;
@@ -238,8 +241,7 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 									//if (realOrderParams.value(orderParamKey) == null || realOrderParams.value(orderParamKey).length() == 0) 
 									{
 										realOrderParams.set_var(orderParamKey, value);
-										//https://change.sos-berlin.com/browse/JITL-125
-										resultParametersSet = true;
+										resultsetNameValueReady = true;
 										if (resultsetAsWarning == false) {
 											break;
 										}
@@ -251,8 +253,7 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 								{
 									// column name = key, value=value
 									realOrderParams.set_var(key, value);
-									//https://change.sos-berlin.com/browse/JITL-125
-									//resultParametersSet = true;
+									resultsetTrueReady = true;
 								}
 						}
 					}
