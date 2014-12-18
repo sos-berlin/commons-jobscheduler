@@ -37,6 +37,7 @@ import sos.util.SOSSchedulerLogger;
 
 import com.sos.JSHelper.Basics.IJSCommands;
 import com.sos.JSHelper.Basics.JSJobUtilities;
+import com.sos.JSHelper.Logging.Log4JHelper;
 import com.sos.JSHelper.Basics.VersionInfo;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.JSOptionsClass;
@@ -92,6 +93,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 	protected final String				EMPTY_STRING					= "";
 	protected final boolean				continue_with_spooler_process	= true;
 	protected final boolean				continue_with_task				= true;
+	private static Log4JHelper			objLogger			= null;
 
     private static boolean logbackWarningPublished = false;
 
@@ -149,6 +151,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 			strJobName = this.getJobName();
 		}
 		strJobName = strJobName.replace('/', '-');
+		Log4JHelper.flgUseJobSchedulerLog4JAppender = true;
 		File fleLog4JFile = null;
 		JSOptionsClass objOC = new JSOptionsClass();
 		if (objOC.log4jPropertyFileName.isDefault() == false) {
@@ -160,6 +163,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 				fleLog4JFile = new File("./" + "log4j.properties");
 			}
 		}
+		objLogger = new Log4JHelper(fleLog4JFile.getAbsolutePath());
+		logger = Logger.getRootLogger();
 		/**
 		 * the JobSchedulerLog4JAppender is used as the stdout-appender
 		 * Therefore the code-snippet below asked log4j what the stdout-appender
@@ -169,7 +174,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		 * All Log4J-Messages are redirected to the sosLogger.
 		 */
 		Appender objStdoutAppender = logger.getAppender("stdout"); //$NON-NLS-1$
-		if (objStdoutAppender instanceof IJobSchedulerLoggingAppender) {
+		if (objStdoutAppender instanceof JobSchedulerLog4JAppender) {
 			objJSAppender = (JobSchedulerLog4JAppender) objStdoutAppender;
 			objJSAppender.setSchedulerLogger(sosLogger);
 			LOG_D_0020.toLog();
@@ -195,7 +200,22 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 			Appender consoleAppender = objJSAppender; // JobSchedulerLog4JAppender(layout);
 			logger.addAppender(consoleAppender);
 			// ALL | DEBUG | INFO | WARN | ERROR | FATAL | OFF:
-			logger.setLevel(Level.INFO);
+			//logger.setLevel(Level.INFO);
+			if (spooler_log.level() > 1) {
+				logger.setLevel(Level.ERROR);
+			}
+			if (spooler_log.level() == 1) {
+				logger.setLevel(Level.WARN);
+			}
+			if (spooler_log.level() == 0) {
+				logger.setLevel(Level.INFO);
+			}
+			if (spooler_log.level() < 0) {
+				logger.setLevel(Level.DEBUG);
+			}
+			if (spooler_log.level() == -9) {
+				logger.setLevel(Level.TRACE);
+			}
 			LOG_I_0010.toLog();
 		}
 		objJSAppender.setSchedulerLogger(sosLogger);
