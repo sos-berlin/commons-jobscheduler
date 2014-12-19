@@ -173,14 +173,22 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 
 			localConnection.setExecReturnsResultSet(execReturnsResultSet);
 			try {
-				if (orderJob)
-					command = JobSchedulerManagedObject.getOrderCommand(this.getConnection(), this);
+				
+				String commandScript = getJobScript();
+			    getLogger().debug9("setting 'command_script' value from script tag of job: " + commandScript);
+			
+				
+				if (orderJob){
+					command = JobSchedulerManagedObject.getOrderCommand(this.getConnection(), this, commandScript );
+				}
+				
 				if (command == null || command.length() == 0) {
 					command = JobSchedulerManagedObject.getJobCommand(this.getConnection(), this);
 				}
 
-				if (command == null || command.length() == 0)
+				if (command == null || command.length() == 0){
 					throw new JobSchedulerException("command is empty");
+				}
 			}
 			catch (Exception e) {
 				throw new JobSchedulerException("no database command found: " + e);

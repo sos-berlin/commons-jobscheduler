@@ -543,7 +543,7 @@ public class JobSchedulerManagedObject {
 	 * 
 	 * @throws Exception
 	 */
-	public static String getOrderCommand(final SOSConnection connection, final Job_impl job) throws Exception {
+	public static String getOrderCommand(final SOSConnection connection, final Job_impl job, String commandScript) throws Exception {
 
 		job.spooler_log.debug9("entered getOrderCommand()...");
 		Order order = job.spooler_task.order();
@@ -559,14 +559,21 @@ public class JobSchedulerManagedObject {
  		
 		try {
 			sos.spooler.Variable_set params = job.spooler.create_variable_set();
+			
+			if (commandScript != null && commandScript.length() > 0){
+				job.spooler_log.debug9("command in script tag found...");
+				job.spooler_task.params().set_var(conParameterCOMMAND,commandScript);
+			}
+			
 			params.merge(job.spooler_task.params());
 			params.merge(order.params());
 			
 			job.spooler_log.debug9("trying to get Command from parameters...");
  			
 			command = params.var(conParameterCOMMAND);
-			if (command == null || command.length() == 0)
+			if (command == null || command.length() == 0){
 				command = params.var(conParameterSCHEDULER_ORDER_COMMAND);
+			}
 		}
 		catch (Exception e) {
 		}
