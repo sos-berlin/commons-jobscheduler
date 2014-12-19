@@ -496,15 +496,14 @@ public class JobSchedulerManagedObject {
 
 		String command = "";
 		try {
-			sos.spooler.Variable_set jobPayload = job.spooler_task.params();
-			command = jobPayload.var(conParameterCOMMAND);
+			sos.spooler.Variable_set params = job.spooler_task.params();
+			command = params.var(conParameterCOMMAND);
 			if (command == null || command.length() == 0)
-				command = jobPayload.var(conParameterSCHEDULER_ORDER_COMMAND);
+				command = params.var(conParameterSCHEDULER_ORDER_COMMAND);
 		}
 		catch (Exception e) {
 		}
 		job.spooler_log.debug3("job command: " + command);
-		//job.spooler_log.debug3("command.length: "+ command.length());
 
 		if (command != null && command.length() > 0) {
 			if (isHex(command))
@@ -556,15 +555,18 @@ public class JobSchedulerManagedObject {
 		String jobChainName = chain.name();
 		job.spooler_log.debug9("jobChainName: " + jobChainName);
 		String orderID = getOrderIdInTable(spoolerID, jobChainName, order);
-
-		String command = "";
+ 		String command = "";
+ 		
 		try {
-			job.spooler_log.debug9("trying to get Command from order.payload()...");
-			sos.spooler.Variable_set orderPayload = (sos.spooler.Variable_set) order.payload();
-
-			command = orderPayload.var(conParameterCOMMAND);
+			sos.spooler.Variable_set params = job.spooler.create_variable_set();
+			params.merge(job.spooler_task.params());
+			params.merge(order.params());
+			
+			job.spooler_log.debug9("trying to get Command from parameters...");
+ 			
+			command = params.var(conParameterCOMMAND);
 			if (command == null || command.length() == 0)
-				command = orderPayload.var(conParameterSCHEDULER_ORDER_COMMAND);
+				command = params.var(conParameterSCHEDULER_ORDER_COMMAND);
 		}
 		catch (Exception e) {
 		}

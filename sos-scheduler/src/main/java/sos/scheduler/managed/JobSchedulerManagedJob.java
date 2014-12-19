@@ -32,14 +32,18 @@ public abstract class JobSchedulerManagedJob extends JobSchedulerJobAdapter {
 			this.getLogger().debug3(spooler_job.name() + " running without order.");
 		}
 		try {
-			orderPayload = clearBlanks(spooler_task.params());
+			Variable_set params = spooler.create_variable_set();
+
+			params.merge(spooler_task.params());
 			if (orderJob) {
 				order = spooler_task.order();
-				Variable_set orderPay = clearBlanks(order.params());
-				// getLogger().debug3("Cleared orderPayload: "+orderPay.xml());
-				orderPayload.merge(orderPay);
-				getLogger().debug6("Merged Payload: " + orderPayload.xml());
+				params.merge(order.params());
 			}
+				
+	        Variable_set orderPay = clearBlanks(params);
+			orderPayload.merge(orderPay);
+			getLogger().debug6("Merged Payload: " + orderPayload.xml());
+			
 		}
 		catch (Exception e) {
 
@@ -52,6 +56,7 @@ public abstract class JobSchedulerManagedJob extends JobSchedulerJobAdapter {
 		String[] keys = set.names().split(";");
 		for (String key : keys) {
 			String parameterValue = set.var(key);
+			getLogger().debug9(key + "=" + parameterValue);
 			if (parameterValue != null && parameterValue.length() > 0) {
 				retSet.set_var(key, parameterValue);
 			}

@@ -170,6 +170,7 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 				throw new JobSchedulerException("error occurred establishing database connection: " + e.getMessage());
 			}
 
+
 			localConnection.setExecReturnsResultSet(execReturnsResultSet);
 			try {
 				if (orderJob)
