@@ -74,7 +74,8 @@ public class JSFileTest {
 		objTestFile.close();
 	}
 
-	// @Test
+	@Test
+	@Ignore("Test set to Ignore for later examination")
 	public void testCopy() throws Exception {
 		JSFile fleFile = new JSFile("L:/TestData/data/invcon/reference-stocks-1546.xml");
 		JSFile fleTarget = new JSFile("L:/TestData/data/invcon/reference-stocks-1546b.xml");
@@ -87,7 +88,8 @@ public class JSFileTest {
 		fleTarget.delete();
 	}
 
-	// @Test
+	@Test
+	@Ignore("Test set to Ignore for later examination")
 	public void testAppendFile() throws Exception {
 		createTestFile();
 		JSFile fleFile = new JSFile(strTestFileName);
@@ -99,7 +101,8 @@ public class JSFileTest {
 		assertEquals("file size not as expected", lngFileSize * 2, fleFile.length());
 	}
 
-	// @Test(expected = com.sos.JSHelper.Exceptions.JobSchedulerException.class)
+	@Test(expected = com.sos.JSHelper.Exceptions.JobSchedulerException.class)
+	@Ignore("Test set to Ignore for later examination")
 	public void testAppendFile2() throws Exception {
 		createTestFile();
 		JSFile fleFile = new JSFile(strTestFileName);
@@ -111,7 +114,8 @@ public class JSFileTest {
 		assertEquals("file size not as expected", lngFileSize * 2, fleFile.length());
 	}
 
-	// @Test
+	@Test
+	@Ignore("Test set to Ignore for later examination")
 	public void testLock() throws Exception {
 		JSFile fleFile = new JSFile(strTestFileName);
 		fleFile.doLock();
@@ -123,7 +127,8 @@ public class JSFileTest {
 		assertFalse("Erwartet wird ein false, weil File nicht mehr gesperrt ... ", fleFile.isLocked());
 	}
 
-	// @Test
+	@Test
+	@Ignore("Test set to Ignore for later examination")
 	public void testExclusive() throws Exception {
 		JSFile fleFile = new JSFile("c:/temp/test-exclusive.txt");
 		fleFile.setExclusive(true);
@@ -135,7 +140,8 @@ public class JSFileTest {
 		fleFile.delete();
 	}
 
-	// @Test
+	@Test
+	@Ignore("Test set to Ignore for later examination")
 	public void doDelete() {
 
 		@SuppressWarnings("unused")
@@ -148,7 +154,8 @@ public class JSFileTest {
 
 	} // private void doDelete
 
-	// @Test
+	@Test
+	@Ignore("Test set to Ignore for later examination")
 	public void doWrite() throws Exception {
 
 		@SuppressWarnings("unused")
@@ -165,7 +172,8 @@ public class JSFileTest {
 		fleFile.close();
 	} // private void doWrite
 
-	// @Test
+	@Test
+	@Ignore("Test set to Ignore for later examination")
 	public void getLine() throws Exception {
 
 		@SuppressWarnings("unused")
@@ -179,7 +187,8 @@ public class JSFileTest {
 
 	} // private void getLine
 
-	// @Test
+	@Test
+	@Ignore("Test set to Ignore for later examination")
 	public void doRead() throws Exception {
 
 		@SuppressWarnings("unused")
@@ -193,7 +202,8 @@ public class JSFileTest {
 
 	} // private void doRead
 
-	// @Test
+	@Test
+	@Ignore("Test set to Ignore for later examination")
 	public void MassRandom() throws Exception {
 
 		@SuppressWarnings("unused")
@@ -209,7 +219,8 @@ public class JSFileTest {
 		assertEquals("Dummy", "a", "a");
 	} // private void MassRandom
 
-	// @Test
+	@Test
+	@Ignore("Test set to Ignore for later examination")
 	public void MassSequential() throws Exception {
 
 		@SuppressWarnings("unused")
@@ -224,7 +235,8 @@ public class JSFileTest {
 		assertEquals("Dummy", "a", "a");
 	} // private void MassSequential
 
-	// @Test
+	@Test
+	@Ignore("Test set to Ignore for later examination")
 	public void CreateBackupTest() throws Exception {
 
 		@SuppressWarnings("unused")
@@ -238,7 +250,8 @@ public class JSFileTest {
 		fleBackUp.delete();
 	} // private void CreateBackupTest
 
-	// @Test
+	@Test
+	@Ignore("Test set to Ignore for later examination")
 	public void CreateBackupTest2() throws Exception {
 
 		@SuppressWarnings("unused")
@@ -252,7 +265,8 @@ public class JSFileTest {
 		fleBackUp.delete();
 	} // private void CreateBackupTest2
 
-	// @Test
+	@Test
+	@Ignore("Test set to Ignore for later examination")
 	public void CreateBackupTest3() throws Exception {
 
 		@SuppressWarnings("unused")
@@ -267,7 +281,8 @@ public class JSFileTest {
 		fleBackUp.delete();
 	} // private void CreateBackupTest3
 
-	// @Test
+	@Test
+	@Ignore("Test set to Ignore for later examination")
 	public void TestToXml() {
 
 		@SuppressWarnings("unused")
@@ -278,7 +293,8 @@ public class JSFileTest {
 
 	} // private void TestToXml
 
-	// @Test
+	@Test
+	@Ignore("Test set to Ignore for later examination")
 	public void TestGetContent() {
 
 		@SuppressWarnings("unused")
@@ -296,7 +312,8 @@ public class JSFileTest {
 
 	} // private void TestToXml
 
-	// @Test
+	@Test
+	@Ignore("Test set to Ignore for later examination")
 	public void testZipWrite() throws IOException {
 
 		@SuppressWarnings("unused")
@@ -325,7 +342,7 @@ public class JSFileTest {
 
 	} // private void testZipWrite
 
-	 @Test
+	@Test
 	public void testCreateUniqueFileName() throws IOException {
 
 		@SuppressWarnings("unused")
@@ -340,7 +357,8 @@ public class JSFileTest {
 
 	} // private void testCreateUniqueFileName
 
-	// @Test
+	@Test
+	@Ignore("Test set to Ignore for later examination")
 	public void testCreateUniqueFileName2() throws IOException {
 
 		@SuppressWarnings("unused")
@@ -359,7 +377,8 @@ public class JSFileTest {
 
 	} // private void testCreateUniqueFileName
 
-	// @Test
+	@Test
+	@Ignore("Test set to Ignore for later examination")
 	public void testGetExtensionFileName() {
 
 		@SuppressWarnings("unused")
@@ -387,7 +406,8 @@ public class JSFileTest {
 
 	} // private void testGetExtensionFileName
 
-	// @Test
+	@Test
+	@Ignore("Test set to Ignore for later examination")
 	public void testBackupProperty() {
 
 		@SuppressWarnings("unused")
@@ -413,7 +433,9 @@ public class JSFileTest {
 		}
 
 	}
-	// @Test
+
+	@Test
+	@Ignore("Test set to Ignore for later examination")
 	public void testDumpHex() {
 
 		@SuppressWarnings("unused")
