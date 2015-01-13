@@ -10,7 +10,9 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.localization.Messages;
 import com.sos.localization.SOSMsg;
 import com.sos.scheduler.JobSchedulerLog4JAppender;
+
 import org.apache.log4j.*;
+
 import sos.scheduler.interfaces.IJobSchedulerMonitor_impl;
 import sos.spooler.Job;
 import sos.spooler.Order;
@@ -559,54 +561,86 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		String strTemp = pstrString2Modify;
 		logger.debug("strTemp = " + strTemp);
 
-		JSJ_D_0080.toLog();
 
 		if (isNotNull(objJobOrOrderParams)) {
-			String[] paramNames = objJobOrOrderParams.names().split(";");
-			String regExPattern = "(?i)";
-			String regex = "(?i)"; // case insensitive
-			//
-			/**
-			 * beides zulassen, % und $
-			 * mögliche Kombinationen sind:
-			 *
-			 * %SCHEDULER_PARAM_name%
-			 * %name%
-			 * ${SCHEDULER_PARAM_name}
-			 * $SCHEDULER_PARAM_name
-			 * §{SCHEDULER_PARAM_name}
-			 * §SCHEDULER_PARAM_name
-			 * ${name}
-			 * §{name}
-			 * $name
-			 * §name
-			 *
-			 * Managed-DB:
-			 *    §{...}
-			 */
-			String[] strPatterns = new String[] { "%%SCHEDULER_PARAM_%1$s%%", "%%%1$s%%", "(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?", "(\\$|§)\\{?%1$s\\}?" };
-			for (String strPattern : strPatterns) {
-				regExPattern = strPattern;
-				//				logger.debug("regExPattern = " + regExPattern);
-				for (String name : paramNames) {
-					String strParamValue = objJobOrOrderParams.value(name);
-					if (name.contains("password") == false && name.trim().length() > 0 ) {
-						logger.debug("name = " + name + ", value = " + strParamValue);
-					}
-					regex = String.format(regExPattern, name);
-					// avoid "invalid group reference" error when using $ in param values  http://www.sos-berlin.com/jira/browse/JITL-74
-					strParamValue = Matcher.quoteReplacement(strParamValue);
-					strTemp = myReplaceAll(strTemp, regex, strParamValue);
-				}
-			}
-			JSJ_D_0030.toLog(strTemp);
+			HashMap<String, String> params = convertVariableSet2HashMap(objJobOrOrderParams);
+			strTemp = replaceSchedulerVarsInString(params,pstrString2Modify);
 		}
-		else {
-			JSJ_D_0040.toLog();
-		}
-		return strTemp;
+		return strTemp; 
 	}
 
+	
+	public String replaceSchedulerVarsInString(HashMap<String, String> params,
+		final String pstrString2Modify) {
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::replaceSchedulerVarsInString";
+		String strTemp = pstrString2Modify;
+		logger.debug("strTemp = " + strTemp);
+
+		JSJ_D_0080.toLog();
+
+		if (pstrString2Modify.matches("%[^%]+%") ||
+		    pstrString2Modify.matches("(\\$|§)\\{[^{]+\\}") ) {
+			if (isNotNull(params)) {
+
+			//Wenn String.format verwendet werden soll
+				String[] strPatterns2 = new String[] {
+						"%%SCHEDULER_PARAM_%1$s%%", 
+						"%%%1$s%%",
+						"(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?",
+						"(\\$|§)\\{?%1$s\\}?" };
+				
+				String[] strPatterns = new String[] {
+						"%SCHEDULER_PARAM_%1$s%", 
+						"%%1$s%",
+						"(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?",
+						"(\\$|§)\\{?%1$s\\}?" };
+				
+				//
+				/**
+				 * beides zulassen, % und $ mögliche Kombinationen sind:
+				 * 
+				 * %SCHEDULER_PARAM_name% %name% ${SCHEDULER_PARAM_name}
+				 * $SCHEDULER_PARAM_name §{SCHEDULER_PARAM_name}
+				 * §SCHEDULER_PARAM_name ${name} §{name} $name §name
+				 * 
+				 * Managed-DB: §{...}
+				 */
+				for (String strPattern : strPatterns) {
+					String regExPattern = strPattern;
+					
+					for (String name : params.keySet()) {
+						String strParamValue = params.get(name);
+						 if (name.contains("password") == false && name.trim().length() > 0 ) {
+						     logger.debug("name = " + name + ", value = " +  strParamValue);
+						 }
+						 
+						// String.format ist ca. 10% langsamer. 
+	// 				   	String regex = String.format(regExPattern, name);
+					  	String regex = regExPattern.replaceAll("\\%1\\$s",name);
+					  	
+						// avoid "invalid group reference" error when using $ in param values http://www.sos-berlin.com/jira/browse/JITL-74
+						strParamValue = Matcher.quoteReplacement(strParamValue);
+						strTemp = myReplaceAll(strTemp, regex, strParamValue);
+						
+						//End if no more variables in string for substitution
+						if (!(strTemp.matches("%[^%]+%") ||
+							  strTemp.matches("(\\$|§)\\{[^{]+\\}"))) {
+						    break;
+						}
+							  		    
+					}
+
+				}
+				JSJ_D_0030.toLog(strTemp);
+			} else {
+				JSJ_D_0040.toLog();
+			}
+	 	}
+
+		return strTemp;
+	}
+	
 	public HashMap<String, String> getSpecialParameters() {
 
 		HashMap<String, String> specialParams = new HashMap<String, String>();
@@ -1161,5 +1195,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 	public void spooler_on_success() {
 		setStateText("*** ended without Errors ***");
 	}
+	
+	 
 
 }
