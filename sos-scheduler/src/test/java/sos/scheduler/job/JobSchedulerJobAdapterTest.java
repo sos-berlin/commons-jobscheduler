@@ -1,6 +1,7 @@
 package sos.scheduler.job;
 
 import junit.framework.Assert;
+
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.apache.log4j.Logger;
 import org.junit.*;
@@ -182,7 +183,8 @@ public class JobSchedulerJobAdapterTest {
 	}
 
 	@SuppressWarnings("unchecked")
-//	@Test
+	@Test
+	@Ignore("Test set to Ignore for later examination")
 	public final void testGetSchedulerParameterAsProperties2() {
 		JobSchedulerJobAdapter objJA = new JobSchedulerJobAdapter();
 		@SuppressWarnings("rawtypes")
