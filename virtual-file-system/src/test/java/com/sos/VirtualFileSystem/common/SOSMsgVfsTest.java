@@ -25,7 +25,8 @@ public class SOSMsgVfsTest {
 	}
 
 	@Test
-  @Ignore("Test set to Ignore for later examination")
+	@Ignore("Test set to Ignore for later examination")
+	// Test ignores the locale of the system where the test runs, presumes the system has the locale set to german [SP]
 	public void testGet() {
 		SOSMsg.flgShowFullMessageText = false;
 		SOSMsgVfs objT = new SOSMsgVfs("SOSVfs_W_136");
@@ -36,6 +37,7 @@ public class SOSMsgVfsTest {
 
 	@Test
   @Ignore("Test set to Ignore for later examination")
+	// Test ignores the locale of the system where the test runs, presumes the system has the locale set to german [SP]
 	public void testGetWithParams() {
 		SOSMsg.flgShowFullMessageText = false;
 		SOSMsgVfs SOSVfs_D_133 = new SOSMsgVfs("SOSVfs_D_133");
@@ -49,7 +51,7 @@ public class SOSMsgVfsTest {
 	}
 
 	@Test
-  @Ignore("Test set to Ignore for later examination")
+//  @Ignore("Test set to Ignore for later examination")
 	public void testGetFull() {
 		SOSMsg.flgShowFullMessageText = true;
 		SOSMsgVfs objT = new SOSMsgVfs("SOSVfs_W_140");
@@ -58,7 +60,7 @@ public class SOSMsgVfsTest {
 	}
 
 	@Test
-  @Ignore("Test set to Ignore for later examination")
+//  @Ignore("Test set to Ignore for later examination")
 	public void testGetFull2() {
 		SOSMsg.flgShowFullMessageText = false;
 		SOSMsgVfs objT = new SOSMsgVfs("SOSVfs_W_140");
@@ -76,7 +78,7 @@ public class SOSMsgVfsTest {
 	}
 
 	@Test
-  @Ignore("Test set to Ignore for later examination")
+//  @Ignore("Test set to Ignore for later examination")
 	public void testGetFullRepeated() {
 		SOSMsg.flgShowFullMessageText = true;
 		SOSMsgVfs objT = new SOSMsgVfs("SOSVfs_W_140");
