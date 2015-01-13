@@ -331,8 +331,10 @@ public class SOSSSHJobOptionsTest {
 	// "C:/Users/KB/workspace-kepler/credentialstore/src/test/resources/keepassX-test.kdb"
 //	private final String strKeePassDBFileName = "R:/java.sources/trunk/products/jobscheduler/virtual-file-system/src/test/resources/keepassX-test.kdb";
 	private final String strKeePassDBFileName = "R:/backup/sos/java/junittests/testdata/keepassX-test.kdb";
+	
 	@Test 
-  @Ignore("Test set to Ignore for later examination")
+	@Ignore("Test set to Ignore for later examination")
+	//Entry in used credentialStore is expired since 17.07.14, therfore an exception occurs [SP]
 	public void testCredentialStore2 () {
 		SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
 		SOSCredentialStoreOptions objCSO = objOptions.getCredentialStore().Options();
@@ -347,7 +349,8 @@ public class SOSSSHJobOptionsTest {
 	}
 
 	@Test 
-  @Ignore("Test set to Ignore for later examination")
+	@Ignore("Test set to Ignore for later examination")
+	//Entry in used credentialStore is expired since 17.07.14, therfore an exception occurs [SP]
 	public void testCredentialStore3 () throws Exception {
 		SOSSSHJobOptions objOptions = new SOSSSHJobOptions(SetSSHJobOptionsUsingCredentialStore(new HashMap <String, String>()));
 		assertTrue("not null", objOptions != null);
