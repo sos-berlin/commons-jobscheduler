@@ -268,7 +268,20 @@ public class JobSchedulerJobAdapterTest extends TestBase {
 	        
 	    HashMap<String, String> objHM = fillHash(200);
 		objHM.put("scheduler_param_file", "c:/test/1.txt");
-		objHM.put("file_path", "%scheduler_param_file%");
+		objHM.put("file2", "c:/test/2.txt");
+		
+		objHM.put("file_path1", "%scheduler_param_file%");
+		objHM.put("file_path2", "${scheduler_param_file}");
+		objHM.put("file_path3", "§{scheduler_param_file}");
+
+		objHM.put("file_path4", "%file2%");
+		objHM.put("file_path5", "${file2}");
+		objHM.put("file_path6", "§{file2}");
+
+		objHM.put("file_path7", "%scheduler_param_file2%");
+		objHM.put("file_path8", "${scheduler_param_file2}");
+		objHM.put("file_path9", "§{scheduler_param_file2}");
+
 		JobSchedulerJobAdapter objJA = new JobSchedulerJobAdapter();
 		for (String key : objHM.keySet()) {
 			String value = objHM.get(key);
@@ -280,8 +293,34 @@ public class JobSchedulerJobAdapterTest extends TestBase {
 				}
 			}
 		}
-		String strT = objHM.get("file_path");
+		String strT = objHM.get("file_path1");
 		Assert.assertEquals("string must be substituted", "c:/test/1.txt", strT);
+		
+		strT = objHM.get("file_path2");
+		Assert.assertEquals("string must be substituted", "c:/test/1.txt", strT);
+		
+		strT = objHM.get("file_path3");
+		Assert.assertEquals("string must be substituted", "c:/test/1.txt", strT);
+		
+		strT = objHM.get("file_path4");
+		Assert.assertEquals("string must be substituted", "c:/test/2.txt", strT);
+		
+		strT = objHM.get("file_path5");
+		Assert.assertEquals("string must be substituted", "c:/test/2.txt", strT);
+
+		strT = objHM.get("file_path6");
+		Assert.assertEquals("string must be substituted", "c:/test/2.txt", strT);
+		
+		strT = objHM.get("file_path7");
+		Assert.assertEquals("string must be substituted", "c:/test/2.txt", strT);
+		
+		strT = objHM.get("file_path8");
+		Assert.assertEquals("string must be substituted", "c:/test/2.txt", strT);
+
+		strT = objHM.get("file_path9");
+		Assert.assertEquals("string must be substituted", "c:/test/2.txt", strT);
+		
+		
         System.out.println(time + System.currentTimeMillis() + "ms");
 
 	}
