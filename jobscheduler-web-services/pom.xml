@@ -22,8 +22,8 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.sos.scheduler.engine</groupId>
-            <artifactId>kernel</artifactId>
+            <groupId>com.sos-berlin.jobscheduler.engine</groupId>
+            <artifactId>engine-kernel</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
