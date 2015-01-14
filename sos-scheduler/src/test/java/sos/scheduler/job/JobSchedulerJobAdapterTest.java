@@ -4,6 +4,7 @@ import junit.framework.Assert;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.apache.log4j.Logger;
 import org.junit.*;
+import sos.spooler.Variable_set;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -217,18 +218,105 @@ public class JobSchedulerJobAdapterTest {
 		Assert.assertEquals("Integer value", 0, valInt);
 	}
 
+	private HashMap <String, String> fillHash(int count){
+		HashMap<String, String> h=new HashMap<String, String>();
+		for (int i = 0;i<count;i++){
+			h.put("name_"+i,"value_"+i);
+		}
+		return h;
+	}
+	
 	@Test
 	public final void testReplaceVars() {
 
-		HashMap<String, String> objHM = new HashMap<String, String>();
+		long time = -System.currentTimeMillis();
+	    System.out.println("Expensive Method Call....");
+
+	    HashMap<String, String> objHM = fillHash(200);
 		objHM.put("scheduler_param_file", "c:/test/1.txt");
 		objHM.put("file_path", "%scheduler_param_file%");
 		JobSchedulerJobAdapter objJA = new JobSchedulerJobAdapter();
-		String strT = objJA.replaceVars(objHM, "file_path", objHM.get("file_path"));
+		
+		for (String key : objHM.keySet()) {
+			String value = objHM.get(key);
+			if (value != null) {
+				String replacedValue = objJA.replaceVars(objHM, key, value);
+				
+				if (replacedValue.equalsIgnoreCase(value) == false) {
+					objHM.put(key, replacedValue);
+				}
+			}
+		}
+		String strT = objHM.get("file_path");
+
 		Assert.assertEquals("string must be substituted", "c:/test/1.txt", strT);
+        System.out.println(time + System.currentTimeMillis() + "ms");
 
 	}
 
+	@Test
+	public final void testMyReplaceVars() {
+		long time = -System.currentTimeMillis();
+	    System.out.println("Expensive Method Call....");
+	        
+	    HashMap<String, String> objHM = fillHash(200);
+		objHM.put("scheduler_param_file", "c:/test/1.txt");
+		objHM.put("file2", "c:/test/2.txt");
+		
+		objHM.put("file_path1", "%scheduler_param_file%");
+		objHM.put("file_path2", "${scheduler_param_file}");
+		objHM.put("file_path3", "§{scheduler_param_file}");
+
+		objHM.put("file_path4", "%file2%");
+		objHM.put("file_path5", "${file2}");
+		objHM.put("file_path6", "§{file2}");
+
+		objHM.put("file_path7", "%scheduler_param_file2%");
+		objHM.put("file_path8", "${scheduler_param_file2}");
+		objHM.put("file_path9", "§{scheduler_param_file2}");
+
+		JobSchedulerJobAdapter objJA = new JobSchedulerJobAdapter();
+		for (String key : objHM.keySet()) {
+			String value = objHM.get(key);
+			if (value != null) {
+				String replacedValue = objJA.replaceSchedulerVarsInString(objHM, value);
+				
+				if (replacedValue.equalsIgnoreCase(value) == false) {
+					objHM.put(key, replacedValue);
+				}
+			}
+		}
+		String strT = objHM.get("file_path1");
+		Assert.assertEquals("string must be substituted", "c:/test/1.txt", strT);
+		
+		strT = objHM.get("file_path2");
+		Assert.assertEquals("string must be substituted", "c:/test/1.txt", strT);
+		
+		strT = objHM.get("file_path3");
+		Assert.assertEquals("string must be substituted", "c:/test/1.txt", strT);
+		
+		strT = objHM.get("file_path4");
+		Assert.assertEquals("string must be substituted", "c:/test/2.txt", strT);
+		
+		strT = objHM.get("file_path5");
+		Assert.assertEquals("string must be substituted", "c:/test/2.txt", strT);
+
+		strT = objHM.get("file_path6");
+		Assert.assertEquals("string must be substituted", "c:/test/2.txt", strT);
+		
+		strT = objHM.get("file_path7");
+		Assert.assertEquals("string must be substituted", "c:/test/2.txt", strT);
+		
+		strT = objHM.get("file_path8");
+		Assert.assertEquals("string must be substituted", "c:/test/2.txt", strT);
+
+		strT = objHM.get("file_path9");
+		Assert.assertEquals("string must be substituted", "c:/test/2.txt", strT);
+		
+		
+        System.out.println(time + System.currentTimeMillis() + "ms");
+
+	}
 	@Test
 	public final void testReplaceNonExistentVars() {
 
