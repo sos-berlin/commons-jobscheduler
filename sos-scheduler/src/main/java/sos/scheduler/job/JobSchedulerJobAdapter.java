@@ -48,6 +48,8 @@ import com.sos.localization.Messages;
 import com.sos.localization.SOSMsg;
 import com.sos.scheduler.JobSchedulerLog4JAppender;
 
+
+
 /**
 * \file JobSchedulerJobAdapter.java
 *
@@ -568,53 +570,85 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::replaceSchedulerVars";
 		String strTemp = pstrString2Modify;
 		logger.debug("strTemp = " + strTemp);
-		JSJ_D_0080.toLog();
 		if (isNotNull(objJobOrOrderParams)) {
-			String[] paramNames = objJobOrOrderParams.names().split(";");
-			String regExPattern = "(?i)";
-			String regex = "(?i)"; // case insensitive
-			//
-			/**
-			 * beides zulassen, % und $
-			 * mögliche Kombinationen sind:
-			 *
-			 * %SCHEDULER_PARAM_name%
-			 * %name%
-			 * ${SCHEDULER_PARAM_name}
-			 * $SCHEDULER_PARAM_name
-			 * §{SCHEDULER_PARAM_name}
-			 * §SCHEDULER_PARAM_name
-			 * ${name}
-			 * §{name}
-			 * $name
-			 * §name
-			 *
-			 * Managed-DB:
-			 *    §{...}
-			 */
-			String[] strPatterns = new String[] { "%%SCHEDULER_PARAM_%1$s%%", "%%%1$s%%", "(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?", "(\\$|§)\\{?%1$s\\}?" };
-			for (String strPattern : strPatterns) {
-				regExPattern = strPattern;
-				//				logger.debug("regExPattern = " + regExPattern);
-				for (String name : paramNames) {
-					String strParamValue = objJobOrOrderParams.value(name);
-					if (name.contains("password") == false && name.trim().length() > 0) {
-						logger.debug("name = " + name + ", value = " + strParamValue);
-					}
-					regex = String.format(regExPattern, name);
-					// avoid "invalid group reference" error when using $ in param values  http://www.sos-berlin.com/jira/browse/JITL-74
-					strParamValue = Matcher.quoteReplacement(strParamValue);
-					strTemp = myReplaceAll(strTemp, regex, strParamValue);
-				}
-			}
-			JSJ_D_0030.toLog(strTemp);
+			HashMap<String, String> params = convertVariableSet2HashMap(objJobOrOrderParams);
+			strTemp = replaceSchedulerVarsInString(params,pstrString2Modify);
 		}
-		else {
-			JSJ_D_0040.toLog();
-		}
-		return strTemp;
+		return strTemp; 
 	}
 
+	
+	public String replaceSchedulerVarsInString(HashMap<String, String> params,
+		final String pstrString2Modify) {
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::replaceSchedulerVarsInString";
+		String strTemp = pstrString2Modify;
+		logger.debug("strTemp = " + strTemp);
+
+		JSJ_D_0080.toLog();
+
+		if (pstrString2Modify.matches("%[^%]+%") ||
+		    pstrString2Modify.matches("(\\$|§)\\{[^{]+\\}") ) {
+			if (isNotNull(params)) {
+
+			//Wenn String.format verwendet werden soll
+				String[] strPatterns2 = new String[] {
+						"%%SCHEDULER_PARAM_%1$s%%", 
+						"%%%1$s%%",
+						"(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?",
+						"(\\$|§)\\{?%1$s\\}?" };
+				
+				String[] strPatterns = new String[] {
+						"%SCHEDULER_PARAM_%1$s%", 
+						"%%1$s%",
+						"(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?",
+						"(\\$|§)\\{?%1$s\\}?" };
+				
+				//
+				/**
+				 * beides zulassen, % und $ mögliche Kombinationen sind:
+				 * 
+				 * %SCHEDULER_PARAM_name% %name% ${SCHEDULER_PARAM_name}
+				 * $SCHEDULER_PARAM_name §{SCHEDULER_PARAM_name}
+				 * §SCHEDULER_PARAM_name ${name} §{name} $name §name
+				 * 
+				 * Managed-DB: §{...}
+				 */
+				for (String strPattern : strPatterns) {
+					String regExPattern = strPattern;
+					
+					for (String name : params.keySet()) {
+						String strParamValue = params.get(name);
+						 if (name.contains("password") == false && name.trim().length() > 0 ) {
+						     logger.debug("name = " + name + ", value = " +  strParamValue);
+						 }
+						 
+						// String.format ist ca. 10% langsamer. 
+	// 				   	String regex = String.format(regExPattern, name);
+					  	String regex = regExPattern.replaceAll("\\%1\\$s",name);
+					  	
+						// avoid "invalid group reference" error when using $ in param values http://www.sos-berlin.com/jira/browse/JITL-74
+						strParamValue = Matcher.quoteReplacement(strParamValue);
+						strTemp = myReplaceAll(strTemp, regex, strParamValue);
+						
+						//End if no more variables in string for substitution
+						if (!(strTemp.matches("%[^%]+%") ||
+							  strTemp.matches("(\\$|§)\\{[^{]+\\}"))) {
+						    break;
+						}
+							  		    
+					}
+
+				}
+				JSJ_D_0030.toLog(strTemp);
+			} else {
+				JSJ_D_0040.toLog();
+			}
+	 	}
+
+		return strTemp;
+	}
+	
 	public HashMap<String, String> getSpecialParameters() {
 		HashMap<String, String> specialParams = new HashMap<String, String>();
 		if (spooler == null) { // junit test specific
@@ -682,7 +716,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 	 * @param what
 	 * @param replacement
 	 */
-	@Override public String myReplaceAll(final String source, final String what, final String replacement) {
+	@Override
+	public String myReplaceAll(final String source, final String what, final String replacement) {
 		String newReplacement = replacement.replaceAll("\\$", "\\\\\\$");
 		/*
 		 * m) suche über mehrere Zeilen
@@ -718,7 +753,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		return this;
 	}
 
-	@Override public void setJSJobUtilites(final JSJobUtilities pobjJSJobUtilities) {
+	@Override
+	public void setJSJobUtilites(final JSJobUtilities pobjJSJobUtilities) {
 		// TODO Auto-generated method stub
 	}
 
@@ -778,12 +814,13 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 	//
 	// return hsmNewMap;
 	// } // private HashMap <String, String> DeletePrefix
-	@Override// JSJobUtilities
+	@Override
+	// JSJobUtilities
 	public String getCurrentNodeName() {
 		return getCurrentNodeName(true);
 	} // public String getNodeName
 	
-	public String getCurrentNodeName(final boolean verbose) {
+	public String getCurrentNodeName(boolean verbose) {
 		final String conMethodName = conClassName + "::getNodeName";
 		String lstrNodeName = "node1"; // Test, needed for JUnit-Test
 		if (spooler_task != null) {
@@ -798,7 +835,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 				Job objCurrentJob = getJob();
 				lstrNodeName = objCurrentJob.name();
 				if (verbose) {
-					JSJ_I_0020.toLog(conMethodName, lstrNodeName);
+					JSJ_I_0010.toLog(conMethodName, lstrNodeName);
 				}
 			}
 		}
@@ -809,29 +846,35 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		return spooler_task.job();
 	}
 
-	@Override public Object getSpoolerObject() {
+	@Override
+	public Object getSpoolerObject() {
 		return spooler;
 	}
 
-	@Override public String executeXML(final String pstrJSXmlCommand) {
+	@Override
+	public String executeXML(final String pstrJSXmlCommand) {
 		String strX = spooler.execute_xml(pstrJSXmlCommand);
 		return strX;
 	}
 
 	public boolean isOrderJob() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::isOrderJob";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::isOrderJob";
 		return isJobchain();
 	} // private boolean isOrderJob
 
-	@Override public void setNextNodeState(final String pstrNodeName) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setNextNodeState";
+	@Override
+	public void setNextNodeState(final String pstrNodeName) {
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setNextNodeState";
 		if (isJobchain()) {
 			spooler_task.order().set_state(pstrNodeName);
 		}
 	} // private boolean setNextNodeState
 
 	public boolean isJobchain() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::isJobchain";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::isJobchain";
 		boolean flgIsJobChain = false;
 		if (isNotNull(spooler_job)) { // && isNotNull(spooler_task)) {
 			flgIsJobChain = isNotNull(spooler_job.order_queue()); // || (isNotNull(spooler_task.order()));
@@ -863,7 +906,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 	 * @return
 	 */
 	public String setOrderParameter(final String pstrParameterName, final String pstrParameterValue) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setOrderParameter";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setOrderParameter";
 		if (isJobchain()) {
 			Variable_set objP = getOrderParams();
 			if (isNotNull(objP)) {
@@ -883,7 +927,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 	}
 
 	public boolean hasOrderParameters() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::hasOrderParameters";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::hasOrderParameters";
 		boolean flgResult = false;
 		if (isJobchain()) {
 			flgResult = isNotNull(getOrderParams());
@@ -911,7 +956,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 	public final static boolean	conJobChainFailure	= false;
 
 	public boolean signalSuccess() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::signalSuccess";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::signalSuccess";
 		if (isJobchain()) {
 			return conJobChainSuccess;
 		}
@@ -920,7 +966,9 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 	} // private boolean signalSuccess
 
 	public boolean signalFailure() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::signalFailure";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::signalFailure";
+
 		boolean RaiseErrorOnSetback = false;
 		String strMsg = JSJ_E_0009.get(this.getJobName());
 		if (isJobchain()) {
@@ -932,17 +980,18 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		return conJobFailure;
 	} // private boolean signalFailure
 
-	  public boolean signalFailureNoLog() {
-	        @SuppressWarnings("unused")
-	        final String conMethodName = conClassName + "::signalFailure";
+	
+	public boolean signalFailureNoLog() {
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::signalFailure";
 
-	        if (isJobchain()) {
-	            return conJobChainFailure;
-	        }else{
-	            return conJobFailure;
-	        }
-	    } // private boolean signalFailureNoLog
-	  
+		if (isJobchain()) {
+			return conJobChainFailure;
+		}else{
+			return conJobFailure;
+		}
+	} // private boolean signalFailureNoLog
+	
 	/*
 	 * setBack driven by JS
 	 */
@@ -1088,7 +1137,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		return ret;
 	}
 
-	@Override// IJobSchedulerMonitor_impl
+	@Override
+	// IJobSchedulerMonitor_impl
 	public void spooler_task_after() throws Exception {
 		final String conMethodName = conClassName + "::spooler_task_after";
 		initializeLog4jAppenderClass();
@@ -1096,7 +1146,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		logger.info(String.format("%1$s is running", conMethodName));
 	}
 
-	@Override// IJobSchedulerMonitor_impl
+	@Override
+	// IJobSchedulerMonitor_impl
 	public boolean spooler_process_before() throws Exception {
 		final String conMethodName = conClassName + "::spooler_process_before";
 		initializeLog4jAppenderClass();
@@ -1107,7 +1158,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		return ret;
 	}
 
-	@Override// IJobSchedulerMonitor_impl
+	@Override
+	// IJobSchedulerMonitor_impl
 	public boolean spooler_process_after(final boolean spooler_process_result) throws Exception {
 		final String conMethodName = conClassName + "::spooler_process_after";
 		initializeLog4jAppenderClass();
@@ -1116,7 +1168,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		return spooler_process_result;
 	}
 
-	@Override public void setStateText(final String pstrStateText) {
+	@Override
+	public void setStateText(final String pstrStateText) {
 		if (pstrStateText != null) {
 			String stateText = pstrStateText;
 			if (stateText.length() > maxLengthOfStatusText) {
@@ -1136,18 +1189,23 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		}
 	}
 
-	@Override public void setCC(final int pintCC) {
+	@Override
+	public void setCC(final int pintCC) {
 		if (spooler_task != null) {
 			logger.debug(String.format("CC set to %1$d", pintCC));
 			spooler_task.set_exit_code(pintCC);
 		}
 	}
 
-	@Override public void spooler_on_error() {
-		//setStateText("! ended with Error !");
+	@Override
+	public void spooler_on_error() {
+		setStateText("! ended with Error !");
 	}
 
-	@Override public void spooler_on_success() {
-		//setStateText("*** ended without Errors ***");
+	@Override
+	public void spooler_on_success() {
+		setStateText("*** ended without Errors ***");
 	}
+	
+	 
 }

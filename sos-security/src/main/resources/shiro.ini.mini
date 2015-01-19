@@ -1,0 +1,5 @@
+[users]
+admin = admin, all
+
+[roles]
+all = sos:products
