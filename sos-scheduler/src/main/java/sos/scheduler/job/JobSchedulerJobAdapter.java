@@ -9,6 +9,7 @@ import static com.sos.scheduler.messages.JSMessages.JSJ_E_0009;
 import static com.sos.scheduler.messages.JSMessages.JSJ_F_0010;
 import static com.sos.scheduler.messages.JSMessages.JSJ_F_0050;
 import static com.sos.scheduler.messages.JSMessages.JSJ_F_0060;
+import static com.sos.scheduler.messages.JSMessages.JSJ_I_0010;
 import static com.sos.scheduler.messages.JSMessages.JSJ_I_0020;
 import static com.sos.scheduler.messages.JSMessages.LOG_D_0020;
 import static com.sos.scheduler.messages.JSMessages.LOG_I_0010;
