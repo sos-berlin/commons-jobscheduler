@@ -221,37 +221,49 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 			this.getLogger().info("database statement(s) executed.");
 			if ((resultsetAsWarning || resultsetAsParameters) && localConnection.getResultSet() != null) {
 				String warning = "";
-				HashMap result = null;
+				int rowCount = 0;
+				HashMap<String,String> result = null;
+				boolean resultsetTrueReady = false;
 				while (!(result = localConnection.get()).isEmpty()) {
+					if (resultsetTrueReady) {
+						break;
+					}
 					String orderParamKey = "";
+					rowCount++;
 					int columnCount = 0;
 					warning = "execution terminated with warning:";
-					Iterator resultIterator = result.keySet().iterator();
-					boolean resultParametersSet = false;
-					while (resultIterator.hasNext()) {
+					boolean resultsetNameValueReady = false;
+					for (String key : result.keySet()) {
 						columnCount++;
-						String key = (String) resultIterator.next();
-						if (key == null || key.length() == 0)
+						if (key == null || key.length() == 0) {
 							continue;
-						String value = result.get(key).toString();
+						}
+						String value = result.get(key);
 						warning += " " + key + "=" + value;
-						if (resultsetAsParameters && order != null && !resultParametersSet) {
+						//https://change.sos-berlin.com/browse/JITL-125
+						if (resultsetAsParameters && order != null && !resultsetNameValueReady) {
 							if (resultsetNameValue) { // name/value pairs from two columns
 								if (columnCount == 1) {
 									orderParamKey = value;
 								}
 								if (columnCount == 2) {
-									//if (realOrderParams.value(orderParamKey) == null || realOrderParams.value(orderParamKey).length() == 0) {
+									//if (realOrderParams.value(orderParamKey) == null || realOrderParams.value(orderParamKey).length() == 0) 
+									//{
 										realOrderParams.set_var(orderParamKey, value);
+										resultsetNameValueReady = true;
+										if (resultsetAsWarning == false) {
+											break;
+										}
 									//}
 								}
 							}
 							else
-								//if (realOrderParams.value(key) == null || realOrderParams.value(key).length() == 0) {
-									// column name = name, value=value
+								if (rowCount == 1) 
+								{
+									// column name = key, value=value
 									realOrderParams.set_var(key, value);
-									resultParametersSet = true;
-								//}
+									resultsetTrueReady = true;
+								}
 						}
 					}
 				}
