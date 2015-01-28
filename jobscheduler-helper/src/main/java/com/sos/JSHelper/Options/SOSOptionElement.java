@@ -1033,9 +1033,17 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 		String strRet = "";
 		//oh 2014-10-30 add isMandatory(), otherwise https://change.sos-berlin.com/browse/SOSFTP-220
 		if (IsNotEmpty() && isDirty() == true && (isMandatory() || isDefault() == false)) {
-//			https://change.sos-berlin.com/browse/JADE-238
+			strRet = "-" + this.getShortKey() + "=" + OptionalQuotedValue() + " ";
+		}
+		return strRet;
+	}
+	
+	
+	//https://change.sos-berlin.com/browse/JADE-238
+	public String toQuotedCommandLine() {
+		String strRet = "";
+		if (IsNotEmpty() && isDirty() == true && (isMandatory() || isDefault() == false)) {
 			strRet = "-" + this.getShortKey() + "=" + QuotedValue() + " ";
-//			strRet = "-" + this.getShortKey() + "=" + OptionalQuotedValue() + " ";
 		}
 		return strRet;
 	}
