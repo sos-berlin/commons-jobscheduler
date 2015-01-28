@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.sos-berlin</groupId>
         <artifactId>jobscheduler</artifactId>
-        <version>1.8-SNAPSHOT</version>
+        <version>1.8.1-SNAPSHOT</version>
     </parent>
 
     <groupId>com.sos-berlin.jobscheduler</groupId>
@@ -17,35 +17,35 @@
 
     <build>
 
-        <plugins>
+      <plugins>     
+      
+        <!-- collect the ini files -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <executions>
+                <execution>
+                    <id>package-setup</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>single</goal>
+                    </goals>
+                    <configuration>
+                        <descriptors>
+                            <descriptor>src/main/assembly/ini-files.xml</descriptor>
+                        </descriptors>
+                        <archive>
+                            <manifest>
+                                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                            </manifest>
+                        </archive>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
 
-            <!-- collect the ini files -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>package-setup</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>src/main/assembly/ini-files.xml</descriptor>
-                            </descriptors>
-                            <archive>
-                                <manifest>
-                                    <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                                </manifest>
-                            </archive>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-        </plugins>
-
+      </plugins>
+      
     </build>
 
     <dependencies>
@@ -91,6 +91,11 @@
         <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-guice</artifactId>
         </dependency>
 
         <dependency>

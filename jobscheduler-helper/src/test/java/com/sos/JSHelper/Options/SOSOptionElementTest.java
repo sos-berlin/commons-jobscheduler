@@ -134,7 +134,7 @@ public class SOSOptionElementTest {
 		objOption.setHideValue(true);
 		assertEquals("toString", "key (Description): *****", objOption.toString());
 		objOption.setHideOption(true);
-		assertEquals("toString", "key (Description): ", objOption.toString());
+		assertEquals("toString", "", objOption.toString());
 	}
 
 	/**

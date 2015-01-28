@@ -40,8 +40,7 @@ public abstract class JobSchedulerManagedJob extends JobSchedulerJobAdapter {
 				params.merge(order.params());
 			}
 				
-	        Variable_set orderPay = clearBlanks(params);
-			orderPayload.merge(orderPay);
+			orderPayload = clearBlanks(params);
 			getLogger().debug6("Merged Payload: " + orderPayload.xml());
 			
 		}

@@ -151,7 +151,7 @@ public class SOSConnection2OptionsJUnitTest extends JSToolBox {
 	}
 
 	@Test
-	@Ignore("Test set to Ignore for later examination")
+//	@Ignore("Test set to Ignore for later examination")
 	public void testKeyWithPrefix () throws Exception {
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::testKeyWithPrefix";
@@ -166,7 +166,7 @@ public class SOSConnection2OptionsJUnitTest extends JSToolBox {
 	}
 
 	@Test
-	@Ignore("Test set to Ignore for later examination")
+//	@Ignore("Test set to Ignore for later examination")
 	public void testKeyWithAlias () throws Exception {
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::testKeyWithAlias";
@@ -181,7 +181,7 @@ public class SOSConnection2OptionsJUnitTest extends JSToolBox {
 	}
 
 	@Test
-	@Ignore("Test set to Ignore for later examination")
+//	@Ignore("Test set to Ignore for later examination")
 	public void testAlternativeOptions () throws Exception {
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::testAlternativeOptions";

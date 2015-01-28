@@ -6,13 +6,13 @@
     <parent>
         <groupId>com.sos-berlin</groupId>
         <artifactId>jobscheduler</artifactId>
-        <version>1.8-SNAPSHOT</version>
+        <version>1.8.1-SNAPSHOT</version>
     </parent>
 
     <groupId>com.sos-berlin.jobscheduler</groupId>
     <artifactId>jobscheduler-web-services-globals</artifactId>
     <name>${project.artifactId}</name>
-    <inceptionYear>2014</inceptionYear>
+    <inceptionYear>2015</inceptionYear>
     <description>Web services to connect to JobScheduler engine (Globals)</description>
 
     <dependencies>

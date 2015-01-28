@@ -262,7 +262,7 @@ public class SOSFTPOptionsTest {
 
 	
 	@Test 
-	@Ignore("Test set to Ignore for later examination")
+	//@Ignore("Test set to Ignore for later examination")
 	public final void testStoreOptionValues() {
 		SOSFTPOptions objOC = new SOSFTPOptions();
 		objOC.Locale.Value("en_EN");
