@@ -179,7 +179,8 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 			// objC = new SOSSSH2GanymedImpl();
 			// logger.debug(conMethodName + " returns instance of " + SOSSSH2GanymedImpl.class.toString());
 			// Class objA = classLoader.loadClass("com.sos.VirtualFileSystem.SSH.SOSSSH2GanymedImpl");
-			Class objA = classLoader.loadClass("com.sos.VirtualFileSystem.SSH.SOSSSH2TriLeadImpl");
+//      Class objA = classLoader.loadClass("com.sos.VirtualFileSystem.SSH.SOSSSH2TriLeadImpl");
+      Class objA = classLoader.loadClass("com.sos.VirtualFileSystem.SSH.SOSSSH2JcraftImpl");
 			ISOSVFSHandler objD = (ISOSVFSHandler) objA.newInstance();
 			logger.trace(SOSVfs_D_0201.params(conMethodName, objD.toString()));
 			if (objD instanceof ISOSVFSHandler) {
