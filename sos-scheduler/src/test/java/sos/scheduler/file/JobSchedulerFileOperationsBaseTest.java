@@ -28,6 +28,7 @@ package sos.scheduler.file;
 import com.sos.JSHelper.io.Files.JSFile;
 
 import org.apache.log4j.Logger;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -45,7 +46,9 @@ import static org.junit.Assert.*;
  *
  */
 // oh 07.05.14 test haengt? [SP] testCheckSteadyStateOfFiles haengt, testCheckMandatoryFile schlaegt fehl
-@Ignore("Test set to Ignore for later examination")
+// 13.01.15 testCheckSteadyStateOfFiles haengt weiterhin, 
+//          testCheckMandatoryFile reaktiviert, läuft durch setUpBeforeClass --> setUp; Annotation BeforeClass --> Before
+//          Initialisierung jetzt je Methode, nicht für die ganze Klasse. [SP]
 public class JobSchedulerFileOperationsBaseTest {
 
 	@SuppressWarnings("unused")
@@ -70,8 +73,8 @@ public class JobSchedulerFileOperationsBaseTest {
 	 *
 	 * @throws java.lang.Exception
 	 */
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		objFOP = new JobSchedulerFileOperationBase();
 		params.put("boolean", "true");
 		objFOP.setParams(params);
@@ -243,6 +246,7 @@ public class JobSchedulerFileOperationsBaseTest {
 	    }
 	}
 	@Test
+	@Ignore("Test set to Ignore for later examination")
 	public final void testcheckSteadyStateOfFiles() {
 //		wenn ein anderer Test getParametersFromHashMap aufruft, dann ist lstResultList==null
 		if (objFOP.lstResultList == null) {

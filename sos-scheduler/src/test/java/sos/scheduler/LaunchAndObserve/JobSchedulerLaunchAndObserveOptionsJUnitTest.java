@@ -80,8 +80,8 @@ public class JobSchedulerLaunchAndObserveOptionsJUnitTest extends JSToolBox {
 	 */
 	@Test
 	public void testcheck_for_regexp() { // SOSOptionRegExp
-		objOptions.check_for_regexp.Value("++true++");
-		assertEquals("Text pattern to search for in log file", objOptions.check_for_regexp.Value(), "++true++");
+		objOptions.check_for_regexp.Value("\\++true\\++");
+		assertEquals("Text pattern to search for in log file", objOptions.check_for_regexp.Value(), "\\++true\\++");
 
 	}
 
