@@ -338,7 +338,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 			}
 			// SOSFTP-185 Filenames must be compared by respecting upper-/lowercase-letters, otherwise unix-like filenames are not unique
 			//			if (pstrLocalFileName.equalsIgnoreCase(strT)) {
-			if (pstrLocalFileName.equals(strT)) {
+			if (fileNamesAreEqual(pstrLocalFileName, strT, true)) {
 				return objEntry;
 			}
 		}
@@ -442,7 +442,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 				for (SOSFileListEntry objListItem : objFileListEntries) {
 					String strTargetTransferName = objListItem.TargetTransferName();
 					String strToFilename = MakeFullPathName(objOptions.TargetDir.Value(), objListItem.TargetFileName());
-					if (strToFilename.equalsIgnoreCase(strTargetTransferName) == false) { // SOSFTP-142
+					if (!fileNamesAreEqual(strToFilename, strTargetTransferName, false)) { // SOSFTP-142
 						ISOSVirtualFile objF = null;
 						if (objOptions.overwrite_files.isTrue() && objListItem.FileExists() == true) {
 							objF = objDataTargetClient.getFileHandle(strToFilename);
@@ -459,9 +459,9 @@ public class SOSFileList extends SOSVfsMessageCodes {
 				}
 			}
 			else {
-			for (SOSFileListEntry objListItem : objFileListEntries) {
-				objListItem.executePostCommands();
-			}
+				for (SOSFileListEntry objListItem : objFileListEntries) {
+					objListItem.executePostCommands();
+				}
 			}
 		}
 		catch (Exception e) {
@@ -631,5 +631,11 @@ public class SOSFileList extends SOSVfsMessageCodes {
 			intS = this.List().size();
 		}
 		return intS;
+	}
+	
+	private boolean fileNamesAreEqual(String filenameA, String filenameB, boolean caseSensitiv) {
+		String a = filenameA.replaceAll("[\\\\/]+", "/");
+		String b = filenameB.replaceAll("[\\\\/]+", "/");
+		return (caseSensitiv) ? a.equals(b) : a.equalsIgnoreCase(b);
 	}
 }
