@@ -608,6 +608,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 
 	@Override
 	public void CommandLineArgs(final String pstrArgs) {
+		//TODO split(" ") is buggy, wenn der Wert einer Option ein Leerzeichen enthält.
 		try {
 			this.CommandLineArgs(pstrArgs.split(" "));
 		}

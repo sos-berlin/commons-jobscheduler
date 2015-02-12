@@ -211,7 +211,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 
 	protected enum IterationTypes {
 		setRecord(1), getRecord(2), toOut(3), createXML(4), setDefaultValues(5), clearAllValues(6), countSegmentFields(7), CheckMandatory(12), setPrefix(14), toString(
-				13), getCommandLine(14), DirtyToString(15), getKeyValuePair(16), LoadValues(17), StoreValues(18);
+				13), getCommandLine(14), DirtyToString(15), getKeyValuePair(16), LoadValues(17), StoreValues(18), getQuotedCommandLine(19);
 		private int	intType;
 
 		IterationTypes(final int pintType) {
@@ -2551,6 +2551,10 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	public String getOptionsAsCommandLine() {
 		return populateOptions(IterationTypes.getCommandLine);
 	}
+	
+	public String getOptionsAsQuotedCommandLine() {
+		return populateOptions(IterationTypes.getQuotedCommandLine);
+	}
 
 	public String getOptionsAsKeyValuePairs() {
 		return populateOptions(IterationTypes.getKeyValuePair);
@@ -2646,6 +2650,9 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 							}
 							if (enuIterate4What == IterationTypes.getCommandLine) {
 								pstrBuffer.append(objDE.toCommandLine());
+							}
+							if (enuIterate4What == IterationTypes.getQuotedCommandLine) {
+								pstrBuffer.append(objDE.toQuotedCommandLine());
 							}
 							if (enuIterate4What == IterationTypes.getKeyValuePair) {
 								strT = objDE.toKeyValuePair(strAlternativePrefix);
