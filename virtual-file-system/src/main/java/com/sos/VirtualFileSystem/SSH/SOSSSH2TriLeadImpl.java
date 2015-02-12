@@ -985,13 +985,13 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 			}
 		else { 
 			// temporär eingebaut um zu prüfen ob das so mit VMS geht. ur 21.6.2013
-			if (flgIsRemoteOSWindows == false && !strCmd.startsWith("@") && !strCmd.startsWith("run ")) {
-				strCmd = "echo $$ && " + strCmd;
-			}
+			//if (flgIsRemoteOSWindows == false && !strCmd.startsWith("@") && !strCmd.startsWith("run ")) {
+			// 	strCmd = "echo $$ && " + strCmd;
+			//}
 
+            logger.debug(SOSVfs_D_163.params("stdout", strCmd));
 			this.getSshSession().execCommand(strCmd);
 
-			logger.debug(SOSVfs_D_163.params("stdout", strCmd));
 			ipsStdOut = new StreamGobbler(this.getSshSession().getStdout());
 			ipsStdErr = new StreamGobbler(this.getSshSession().getStderr());
 			BufferedReader stdoutReader = new BufferedReader(new InputStreamReader(ipsStdOut));
