@@ -1,19 +1,11 @@
 package com.sos.VirtualFileSystem.SSH;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Reader;
 import java.util.Vector;
-
-import org.apache.activemq.util.ByteArrayOutputStream;
-
-import sos.spooler.Variable_set;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
@@ -41,22 +33,15 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements ISOSShell, ISOSVFSHandler, ISOSVirtualFileSystem,
     ISOSConnection, ISOSSession {
 
-  final private String strEndOfLine = System.getProperty("line.separator");
   private boolean flgIsRemoteOSWindows = false;
   private ISOSConnectionOptions sosConnectionOptions = null;
   private ISOSAuthenticationOptions sosAuthenticationOptions = null;
   private ISOSShellOptions sosShellOptions = null;
   private SOSConnection2OptionsAlternate connection2OptionsAlternate = null;
   private ISOSDataProviderOptions dataProviderOptions = null;
-  private Variable_set params = null;
-  // private RemoteConsumer stdoutConsumer = null;
-  // private RemoteConsumer stderrConsumer = null;
-  private OutputStream stdin = null;
-  private OutputStreamWriter stdinWriter = null;
   private Integer exitCode = null;
   private String exitSignal = null;
   private Vector<String> vecFilesToDelete = new Vector<String>();
-  private Channel sshChannel = null;
   /** ssh session object */
   private Session sshSession = null;
   private JSch secureChannel = null;
