@@ -222,7 +222,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	}
 
 	/**
-	 * Creates a new subdirectory on the FTP server in the current directory .
+	 * Creates a directory on the Server.
 	 * @param pstrPathName The pathname of the directory to create.
 	 * @exception JobSchedulerException
 	 */
@@ -231,24 +231,32 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 			SOSOptionFolderName objF = new SOSOptionFolderName(path);
 			reply = "mkdir OK";
 			logger.debug(HostID(SOSVfs_D_179.params("mkdir", path)));
-			for (String strSubFolder : objF.getSubFolderArray()) {
+			String[] subfolders = objF.getSubFolderArrayReverse();
+			int idx = subfolders.length;
+			for (String strSubFolder : objF.getSubFolderArrayReverse()) {
 				SftpATTRS attributes = getAttributes(strSubFolder);
-				if (attributes == null) {
-					this.getClient().mkdir(strSubFolder);
+				if (attributes != null && attributes.isDir()) {
+					logger.debug(SOSVfs_E_180.params(strSubFolder));
+					break;
 				}
-				else {
-					if (attributes.isDir() == false) {
-						RaiseException(SOSVfs_E_277.params(strSubFolder));
-					}
+				if (attributes != null && !attributes.isDir()) {
+					RaiseException(SOSVfs_E_277.params(strSubFolder));
+					break;
 				}
+				idx--;
 			}
-			logger.debug(HostID(SOSVfs_D_181.params("mkdir", path, getReplyString())));
+			subfolders = objF.getSubFolderArray();
+			for (int i = idx; i < subfolders.length; i++) {
+				this.getClient().mkdir(subfolders[i]);
+				logger.debug(HostID(SOSVfs_E_0106.params("mkdir", subfolders[i], getReplyString())));
+			}
 		}
 		catch (Exception e) {
 			reply = e.toString();
 			RaiseException(e, SOSVfs_E_134.params("[mkdir]"));
 		}
 	}
+	
 
 	/**
 	 * Removes a directory on the FTP server (if empty).
@@ -260,23 +268,11 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 			SOSOptionFolderName objF = new SOSOptionFolderName(path);
 			reply = "rmdir OK";
 			for (String subfolder : objF.getSubFolderArrayReverse()) {
-				String strT = subfolder + "/";
-				logger.debug(HostID(SOSVfs_D_179.params("rmdir", strT)));
-				this.getClient().rmdir(strT);
+				logger.debug(HostID(SOSVfs_D_179.params("rmdir", subfolder)));
+				this.getClient().rmdir(subfolder);
 				reply = "rmdir OK";
-				logger.debug(HostID(SOSVfs_D_181.params("rmdir", strT, getReplyString())));
+				logger.debug(HostID(SOSVfs_D_181.params("rmdir", subfolder, getReplyString())));
 			}
-//			String[] pathArray = path.split("/");
-//			for (int i = pathArray.length; i > 0; i--) {
-//				String strT = "";
-//				for (int j = 0; j < i; j++) {
-//					strT += pathArray[j] + "/";
-//				}
-//				logger.debug(HostID(SOSVfs_D_179.params("rmdir", strT)));
-//				this.getClient().rmdir(strT);
-//				reply = "rmdir OK";
-//				logger.debug(HostID(SOSVfs_D_181.params("rmdir", strT, getReplyString())));
-//			}
 			logINFO(HostID(SOSVfs_D_181.params("rmdir", path, getReplyString())));
 		}
 		catch (Exception e) {

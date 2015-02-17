@@ -580,7 +580,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		if (flgIncludeSubdirectories == true) {
 			String strSourceDir = getPathWithoutFileName(fleSourceFile.getName());
 			String strOrigSourceDir = objO.SourceDir().Value();
-			if (strSourceDir.equals(strOrigSourceDir) == false) {
+			if (!fileNamesAreEqual(strSourceDir, strOrigSourceDir, true)) {
 				if (strSourceDir.length() > strOrigSourceDir.length()) {
 					String strSubFolder = strSourceDir.substring(strOrigSourceDir.length());
 					strSubFolder = adjustFileSeparator(addFileSeparator(strSubFolder));
@@ -766,7 +766,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	}
 
 	private void RenameTargetFile(final String pstrTargetFileName) {
-		if (pstrTargetFileName.equals(objTargetTransferFile.getName()) == false) {
+		if (!fileNamesAreEqual(pstrTargetFileName, objTargetTransferFile.getName(), true)) {
 			if (pstrTargetFileName.contains("/") && objOptions.makeDirs.isTrue()) { // sosftp-158
 				String strP = normalized(new File(pstrTargetFileName).getParent());
 				try {
@@ -931,7 +931,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 			}
 			objTargetFile.setModeAppend(objOptions.append_files.value());
 			objTargetFile.setModeRestart(objOptions.ResumeTransfer.value());
-			if (strTargetFileName.equalsIgnoreCase(strTargetTransferName) == false) {
+			if (!fileNamesAreEqual(strTargetFileName, strTargetTransferName, false)) {
 				objTargetTransferFile = objDataTargetClient.getFileHandle(MakeFullPathName(objOptions.TargetDir.Value(), strTargetTransferName));
 			}
 			else {
@@ -969,15 +969,15 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 			}
 			if (objOptions.isAtomicTransfer() || objOptions.isReplaceReplacingInEffect()) {
 				if (objOptions.transactional.isFalse()) {
-					String strNewFileName = MakeFullPathName(objOptions.TargetDir.Value(), this.TargetFileName());
-					if (objTargetTransferFile.getName().equalsIgnoreCase(strNewFileName) == false) {
+					String strNewFileName = objTargetFile.getName();
+					if (!fileNamesAreEqual(objTargetTransferFile.getName(), strNewFileName, false)) {
 						flgFileExists = objTargetFile.FileExists();
 						if (objOptions.overwrite_files.isTrue() && flgFileExists == true) {
 							// hier werden Dateien gelöscht, vor dem umbenennen.
 							// TODO Besser: auch erstmal umbenennen und dann erst löschen
 							objTargetFile.delete();
 						}
-						RenameTargetFile(MakeFullPathName(objOptions.TargetDir.Value(), this.TargetFileName()));
+						RenameTargetFile(strNewFileName);
 					}
 				}
 			}
@@ -1437,5 +1437,11 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
 	public void VfsHandler(final ISOSVfsFileTransfer pobjVfs) {
 		objVfsHandler = pobjVfs;
+	}
+	
+	private boolean fileNamesAreEqual(String filenameA, String filenameB, boolean caseSensitiv) {
+		String a = filenameA.replaceAll("[\\\\/]+", "/");
+		String b = filenameB.replaceAll("[\\\\/]+", "/");
+		return (caseSensitiv) ? a.equals(b) : a.equalsIgnoreCase(b);
 	}
 }
