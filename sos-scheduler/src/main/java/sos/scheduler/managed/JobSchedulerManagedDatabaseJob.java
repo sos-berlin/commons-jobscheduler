@@ -248,13 +248,13 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 								}
 								if (columnCount == 2) {
 									//if (realOrderParams.value(orderParamKey) == null || realOrderParams.value(orderParamKey).length() == 0) 
-									{
+									//{
 										realOrderParams.set_var(orderParamKey, value);
 										resultsetNameValueReady = true;
 										if (resultsetAsWarning == false) {
 											break;
 										}
-									}
+									//}
 								}
 							}
 							else

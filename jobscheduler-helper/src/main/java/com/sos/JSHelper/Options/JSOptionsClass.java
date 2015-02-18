@@ -1446,7 +1446,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	private String getAllOptionsAsString(final IterationTypes penuIterationType) {
 		String strT = ""; // conClassName + "\n";
 		if (objParentClass != null) {
-			strT += IterateAllDataElementsByAnnotation(objParentClass, this, penuIterationType, strBuffer);
+			strT += IterateAllDataElementsByAnnotation(objParentClass, this, penuIterationType, new StringBuffer(""));
 		}
 		return strT;
 	}
