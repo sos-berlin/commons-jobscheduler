@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Vector;
 
-import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
@@ -163,8 +162,8 @@ public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements ISOSShell, ISO
       secureChannel.addIdentity(authenticationFile.getAbsolutePath());
     } else if (sosAuthenticationOptions.getAuth_method().isPassword()) {
       sshSession.setPassword(sosAuthenticationOptions.getPassword().Value().toString());
-      sshSession.setConfig("StrictHostKeyChecking", "no");
     }
+    sshSession.setConfig("StrictHostKeyChecking", "no");
 
     try {
       sshSession.connect();
@@ -196,7 +195,6 @@ public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements ISOSShell, ISO
 
   @Override
   public boolean remoteIsWindowsShell() {
-    Session objSSHSession = null;
     flgIsRemoteOSWindows = false;
     strbStdoutOutput = new StringBuffer();
     strbStderrOutput = new StringBuffer();
@@ -204,7 +202,6 @@ public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements ISOSShell, ISO
     try {
       String checkShellCommand = "echo %ComSpec%";
       logger.debug(SOSVfs_D_236.get());
-      objSSHSession = sshSession;
       logger.debug(SOSVfs_D_0151.params(checkShellCommand));
       channel = (ChannelExec) sshSession.openChannel("exec");
       channel.setCommand(checkShellCommand);
@@ -387,12 +384,24 @@ public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements ISOSShell, ISO
   }
 
   public void putFile(File pfleCommandFile) throws Exception {
+    
     String strFileName = pfleCommandFile.getName();
     try {
-      Channel channel = sshSession.openChannel("sftp");
+      if(!sshSession.isConnected()){
+        if(secureChannel == null){
+          secureChannel = new JSch();
+        }
+        sshSession = secureChannel.getSession(sosAuthenticationOptions.getUser().Value(), 
+            sosConnectionOptions.getHost().Value(), 
+            sosConnectionOptions.getPort().value());        
+        sshSession.setPassword(sosAuthenticationOptions.getPassword().Value());
+        sshSession.connect();
+      }
+      ChannelSftp channel = (ChannelSftp)sshSession.openChannel("sftp");
       channel.connect();
       ChannelSftp sftp = (ChannelSftp) channel;
       sftp.put(pfleCommandFile.getCanonicalPath(), strFileName);
+      sftp.chmod(new Integer(0700), strFileName);
     } catch (Exception e) {
       e.printStackTrace();
       throw e;
