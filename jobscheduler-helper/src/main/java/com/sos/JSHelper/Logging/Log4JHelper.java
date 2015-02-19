@@ -5,6 +5,7 @@ package com.sos.JSHelper.Logging;
 import com.sos.JSHelper.Listener.JSListener;
 import com.sos.JSHelper.Options.JSOptionsClass;
 import com.sos.JSHelper.io.Files.JSTextFile;
+
 import org.apache.log4j.*;
 import org.apache.log4j.net.SMTPAppender;
 
@@ -166,7 +167,10 @@ public class Log4JHelper implements JSListener {
 		else {
 			strPropfileName = pstrPropFileName;
 			if (strPropfileName.equalsIgnoreCase("null") == true) {
-				BasicConfigurator.configure();
+				//rootLogger gets basis configuration if it doesn't have already an appender 
+				if( !Logger.getRootLogger().getAllAppenders().hasMoreElements() ) {
+					BasicConfigurator.configure();
+				}
 				return;
 			}
 		}
