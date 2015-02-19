@@ -84,6 +84,17 @@
 				                    <doUpdate>false</doUpdate>
 				                </configuration>
                     </execution>
+                    <execution>
+      									<id>get-build-year</id>
+      									<phase>initialize</phase>
+      									<goals>
+        										<goal>create-timestamp</goal>
+      									</goals>
+      									<configuration>
+      											<timestampPropertyName>build.year</timestampPropertyName>
+        										<timestampFormat>yyyy</timestampFormat>
+      									</configuration>
+    								</execution>
                 </executions>
             </plugin>
 
