@@ -61,7 +61,9 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 		objSSH.setJSJobUtilites(this);
 		JSListenerClass.bolLogDebugInformation = true;
 		JSListenerClass.intMaxDebugLevel = 9;
-		BasicConfigurator.configure();
+    if( !Logger.getRootLogger().getAllAppenders().hasMoreElements() ) {
+      BasicConfigurator.configure();
+    }
 		logger.setLevel(Level.DEBUG);
 	}
 	@Test
