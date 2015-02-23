@@ -1039,6 +1039,16 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 		}
 		return strRet;
 	}
+	
+	
+	//https://change.sos-berlin.com/browse/JADE-238
+	public String toQuotedCommandLine() {
+		String strRet = "";
+		if (IsNotEmpty() && isDirty() == true && (isMandatory() || isDefault() == false)) {
+			strRet = "-" + this.getShortKey() + "=" + QuotedValue() + " ";
+		}
+		return strRet;
+	}
 
 	/**
 	 *
