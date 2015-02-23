@@ -92,9 +92,20 @@ public class SOSSQLPlusJobJSAdapterClass extends JobSchedulerJobAdapter {
 				jobOrOrderParameters.set_value(ignoreParam, value + ";");
 			}
 		}
-
+		
+		objO.setAllOptions(getSchedulerParameterAsProperties(jobOrOrderParameters));
+		// TODO Use content of <script> tag of job as value of command_script_file parameter
+		// http://www.sos-berlin.com/jira/browse/JITL-49
+		if (objO.command_script_file.isNotDirty()) {
+			String strS = getJobScript();
+			if (isNotEmpty(strS)) {
+				objO.command_script_file.Value(strS);
+			}
+		}
 
 		objO.setAllOptions(getSchedulerParameterAsProperties(jobOrOrderParameters));
+		// TODO Use content of <script> tag of job as value of command_script_file parameter
+		// http://www.sos-berlin.com/jira/browse/JITL-49
 		setJobScript(objO.command_script_file);
 
 		objO.CheckMandatory();
