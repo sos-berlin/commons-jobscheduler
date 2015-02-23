@@ -1,5 +1,10 @@
 package sos.net.ssh;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import org.apache.log4j.Logger;
 
 import sos.net.ssh.exceptions.SSHConnectionError;
@@ -13,6 +18,7 @@ import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
+import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.i18n.Msg;
 import com.sos.i18n.Msg.BundleBaseName;
 import com.sos.i18n.annotation.I18NMessage;
@@ -82,11 +88,15 @@ public class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 	 * \var SOS-SSH-D-110
 	 * \brief SOS-SSH-D-110: executing remote command: '%1$s'.
 	 */
-	public static final String	SOS_SSH_D_110		= "SOS-SSH-D-110";
+	private static final String	SOS_SSH_D_110		= "SOS-SSH-D-110";
+  private static final String COMMAND_DELIMITER = ";";
+  private static final String SCHEDULER_RETURN_VALUES = "SCHEDULER_RETURN_VALUES";
+  private static final String SCHEDULER_RETURN_VALUES_PARAM_LINUX = "$SCHEDULER_RETURN_VALUES";
+  private static final String SCHEDULER_RETURN_VALUES_PARAM_WINDOWS = "%SCHEDULER_RETURN_VALUES%";
 
 	private boolean				isConnected			= false;
 	private boolean				flgIsWindowsShell	= false;
-	public boolean				keepConnected		= false;
+	private boolean				keepConnected		= false;
 
 	/** array of commands that have been separated by the commandDelimiter */
 	protected String[]			strCommands2Execute	= {};
@@ -94,6 +104,8 @@ public class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 	/** Output from stdout and stderr **/
 	protected StringBuffer		strbStdoutOutput;
 	protected StringBuffer		strbStderrOutput;
+  private String tmpReturnValueFileName;
+  private String exportEnvVariableCommand;
 
 	private ISOSVFSHandler		objVFS				= null;
 
@@ -143,6 +155,15 @@ public class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 		super(new SOSSSHJobOptions());
 		logger.info(conSVNVersion);
 		getVFS();
+    UUID uuid = UUID.randomUUID();
+    tmpReturnValueFileName = "sos-ssh-return-values-" + uuid + ".txt";
+    StringBuilder strb = new StringBuilder();
+    strb.append("export ")
+        .append(SCHEDULER_RETURN_VALUES)
+        .append("=")
+        .append(tmpReturnValueFileName)
+        .append(COMMAND_DELIMITER);
+    exportEnvVariableCommand = strb.toString();
 	}
 
 	/**
@@ -220,8 +241,7 @@ public class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
 			if (objOptions.command.IsEmpty() == false) {
 				strCommands2Execute = objOptions.command.values();
-			}
-			else
+			} else {
 				if (objOptions.isScript() == true) {
 					strCommands2Execute = new String[1];
 					String strTemp = objOptions.command_script.Value();
@@ -232,39 +252,39 @@ public class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 					strCommands2Execute[0] = objVFS.createScriptFile(strTemp);
 					flgScriptFileCreated = true; // http://www.sos-berlin.com/jira/browse/JITL-17
 					strCommands2Execute[0] += " " + objOptions.command_script_param.Value();
-				}
-				else {
+				} else {
 					throw new SSHMissingCommandError(objMsg.getMsg(SOS_SSH_E_100)); // "SOS-SSH-E-100: neither Commands nor Script(file) specified. Abort.");
 				}
-
+			}
 			for (String strCmd : strCommands2Execute) {
 				try {
+          strCmd = exportEnvVariableCommand + strCmd;
 					/**
 					 * \change Substitution of variables enabled
 					 *
 					 * see http://www.sos-berlin.com/jira/browse/JS-673
 					 *
 					 */
-					logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd)); // ;
+					logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
 					strCmd = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strCmd);
-					logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd)); // ;
+					logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
 					objVFS.ExecuteCommand(strCmd);
 					objJSJobUtilities.setJSParam(conExit_code, "0");
 					CheckStdOut();
 					CheckStdErr();
 					CheckExitCode();
 					ChangeExitSignal();
-				}
-				catch (Exception e) {
+				} catch (Exception e) {
 					logger.error(this.StackTrace2String(e));
 					throw new SSHExecutionError("Exception raised: " + e, e);
-				}
-				finally {
-					if (flgScriptFileCreated == true) { // http://www.sos-berlin.com/jira/browse/JITL-17
+				} finally {
+					if (flgScriptFileCreated == true) { 
+					  // http://www.sos-berlin.com/jira/browse/JITL-17
 						// file will be deleted by the Vfs Component.
 					}
 				}
 			}
+      readReturnValues(tmpReturnValueFileName);
 		}
 		catch (Exception e) {
 			logger.error(this.StackTrace2String(e));
@@ -273,12 +293,52 @@ public class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 			throw new SSHExecutionError(strErrMsg, e);
 		}
 		finally {
-			//
 			if (keepConnected == false) {
 				DisConnect();
 			}
 		}
 		return this;
+	}
+	
+	private void readReturnValues(String tmpFileName){
+	  // set the environmental variable to be available for the following script execution
+    String cmdTempFileExists = 
+        "if [ -f " + SCHEDULER_RETURN_VALUES_PARAM_LINUX + " ]; " + 
+        "then cat " + SCHEDULER_RETURN_VALUES_PARAM_LINUX + "; " + 
+        "fi;";
+    String cmdReadReturnValues = exportEnvVariableCommand + cmdTempFileExists;
+    String stdErr = "";
+    try {
+      objVFS.ExecuteCommand(cmdReadReturnValues);
+      // check if command was processed correctly 
+      if(objVFS.getExitCode() == 0){
+        // read stdout of the cat statement and split the lines
+        String[] lines = objVFS.getStdOut().toString().split("\\n");
+        logger.debug("received Return Values are: ");
+        // check if lines are available in the return values temp file
+        if(lines.length > 0 && !lines[0].isEmpty()){
+          // extract key value pairs from the read line
+          for(String line : lines){
+            String[] keyValue = line.split("=");
+            objJSJobUtilities.setJSParam(keyValue[0], keyValue[1]);
+          }
+          // remove temp file after parsing return values from file
+          objVFS.ExecuteCommand(exportEnvVariableCommand + "rm " + SCHEDULER_RETURN_VALUES_PARAM_LINUX);
+          logger.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tmpFileName));
+        }else{
+          logger.debug("no return values received!");
+        }
+      }else{
+        stdErr = objVFS.getStdErr().toString();
+        if(stdErr.length() > 0){
+          logger.error(stdErr);
+        }
+      }
+    } catch (Exception e) {
+      logger.debug("no temp file for return values found!");
+//      e.printStackTrace();
+    }
+	  
 	}
 
 	public void DisConnect() {

@@ -31,7 +31,6 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements ISOSShell, ISOSVFSHandler, ISOSVirtualFileSystem,
     ISOSConnection, ISOSSession {
-
   private boolean flgIsRemoteOSWindows = false;
   private ISOSConnectionOptions sosConnectionOptions = null;
   private ISOSAuthenticationOptions sosAuthenticationOptions = null;
@@ -180,6 +179,12 @@ public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements ISOSShell, ISO
 
   @Override
   public void CloseConnection() throws Exception {
+    //something like that has to be done in the Job Class
+    if(!vecFilesToDelete.isEmpty()){
+      for(String filename : vecFilesToDelete){
+        deleteFile(filename);
+      }
+    }
     sshSession.disconnect();
   }
 
@@ -423,6 +428,22 @@ public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements ISOSShell, ISO
   private String getScriptFileNameSuffix() {
     String strSuffix = flgIsRemoteOSWindows ? ".cmd" : ".sh";
     return strSuffix;
+  }
+
+  public void deleteFile(final String filename) throws Exception {
+    try {
+      if (isNotEmpty(filename)) {
+        ChannelSftp channel = (ChannelSftp)sshSession.openChannel("sftp");
+        channel.connect();
+        ChannelSftp sftp = (ChannelSftp) channel;
+        sftp.rm(filename);
+        logger.debug(SOSVfs_I_0113.params(filename));
+      }
+    }
+    catch (Exception e) {
+      logger.error(SOSVfs_E_244.params(e));
+      throw new JobSchedulerException(e);
+    }
   }
 
   @Override
