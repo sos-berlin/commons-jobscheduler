@@ -94,9 +94,9 @@ public class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
   private static final String SCHEDULER_RETURN_VALUES_PARAM_LINUX = "$SCHEDULER_RETURN_VALUES";
   private static final String SCHEDULER_RETURN_VALUES_PARAM_WINDOWS = "%SCHEDULER_RETURN_VALUES%";
 
-	private boolean				isConnected			= false;
-	private boolean				flgIsWindowsShell	= false;
-	private boolean				keepConnected		= false;
+	public boolean				isConnected			= false;
+	public boolean				flgIsWindowsShell	= false;
+	public boolean				keepConnected		= false;
 
 	/** array of commands that have been separated by the commandDelimiter */
 	protected String[]			strCommands2Execute	= {};
