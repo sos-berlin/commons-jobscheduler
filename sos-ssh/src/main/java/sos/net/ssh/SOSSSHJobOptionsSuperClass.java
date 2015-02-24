@@ -762,6 +762,49 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
 																						false // isMandatory
 																				);	// Should the value true be specified, then execution errors
 
+  /**
+   * @author SP
+   */
+  @JSOptionDefinition(name = "preCommand", description = "the preCommand to set an environmental variable on the remote host", key = "preCommand", type = "SOSOptionString", mandatory = false)
+  public SOSOptionString preCommand = new SOSOptionString(this, conClassName + ".preCommand", "the preCommand to set an environmental variable on the remote host", "export", "export", false);
+
+  public SOSOptionString getPreCommand() {
+    return preCommand;
+  }
+
+  public void setPreCommand(final SOSOptionString newPreCommand) {
+    this.preCommand = newPreCommand;
+  }
+
+  /**
+   * @author SP
+   */
+  @JSOptionDefinition(name = "postCommandRead", description = "the postCommand to read temporary file and write its content to stdout", key = "postCommandRead", type = "SOSOptionString", mandatory = false)
+  public SOSOptionString postCommandRead = new SOSOptionString(this, conClassName + ".postCommandRead", "the postCommand to read temporary file and write its content to stdout", "cat", "cat", false);
+
+  public SOSOptionString getPostCommandRead() {
+    return postCommandRead;
+  }
+
+  public void setPostCommandRead(final SOSOptionString newPostCommandRead) {
+    this.postCommandRead = newPostCommandRead;
+  }
+
+  /**
+   * @author SP
+   */
+  @JSOptionDefinition(name = "postCommandDelete", description = "the postCommand to delete the temporary file", key = "postCommandDelete", type = "SOSOptionString", mandatory = false)
+  public SOSOptionString postCommandDelete = new SOSOptionString(this, conClassName + ".postCommandDelete", "the postCommand to delete the temporary file", "rm", "rm", false);
+
+  public SOSOptionString getPostCommandDelete() {
+    return postCommandDelete;
+  }
+
+  public void setPostCommandDelete(final SOSOptionString newPostCommandDelete) {
+    this.postCommandDelete = newPostCommandDelete;
+  }
+
+	
 	public SOSSSHJobOptionsSuperClass() {
 		objParentClass = this.getClass();
 	} // public SOSSSHJobOptions
