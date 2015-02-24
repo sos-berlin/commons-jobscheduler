@@ -585,81 +585,77 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 	}
 
 	
-    public String replaceSchedulerVarsInString(HashMap<String, String> params,
-            final String pstrString2Modify) {
-            
-            System.out.println("..... pstrString2Modify=" + pstrString2Modify);
-            @SuppressWarnings("unused")
-            final String conMethodName = conClassName + "::replaceSchedulerVarsInString";
-            String strTemp = pstrString2Modify;
-            logger.debug("strTemp = " + strTemp);
+	  public String replaceSchedulerVarsInString(HashMap<String, String> params,
+	          final String pstrString2Modify) {
+	          @SuppressWarnings("unused")
+	          final String conMethodName = conClassName + "::replaceSchedulerVarsInString";
+	          String strTemp = pstrString2Modify;
+	          logger.debug("strTemp = " + strTemp);
 
-            JSJ_D_0080.toLog();
-            
-            if (pstrString2Modify.matches(".*%[^%]+%.*") ||
-                pstrString2Modify.matches(".*(\\$|§)\\{[^{]+\\}.*") ) {
+	          JSJ_D_0080.toLog();
+	          
+	          if (pstrString2Modify.matches("(?s).*%[^%]+%.*") ||
+	              pstrString2Modify.matches("(?s).*(\\$|§)\\{[^{]+\\}.*") ) {
+	              if (isNotNull(params)) {
 
-                if (isNotNull(params)) {
+	              //Wenn String.format verwendet werden soll
+	                  String[] strPatterns2 = new String[] {
+	                          "%%SCHEDULER_PARAM_%1$s%%", 
+	                          "%%%1$s%%",
+	                          "(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?",
+	                          "(\\$|§)\\{?%1$s\\}?" };
+	                  
+	                  String[] strPatterns = new String[] {
+	                          "%SCHEDULER_PARAM_%1$s%", 
+	                          "%%1$s%",
+	                          "(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?",
+	                          "(\\$|§)\\{?%1$s\\}?" };
+	                  
+	                  //
+	                  /**
+	                   * beides zulassen, % und $ mögliche Kombinationen sind:
+	                   * 
+	                   * %SCHEDULER_PARAM_name% %name% ${SCHEDULER_PARAM_name}
+	                   * $SCHEDULER_PARAM_name §{SCHEDULER_PARAM_name}
+	                   * §SCHEDULER_PARAM_name ${name} §{name} $name §name
+	                   * 
+	                   * Managed-DB: §{...}
+	                   */
+	                  for (String strPattern : strPatterns) {
+	                      String regExPattern = strPattern;
+	                      
+	                      for (String name : params.keySet()) {
+	                          String strParamValue = params.get(name);
+	                      // too verbose
+	                      //if (name.contains("password") == false && name.trim().length() > 0) {
+	                      //  logger.debug("name = " + name + ", value = " + strParamValue);
+	                      //}
+	                          // String.format ist ca. 10% langsamer. 
+	      //                  String regex = String.format(regExPattern, name);
+	                          String regex = regExPattern.replaceAll("\\%1\\$s",name);
+	                          
+	                          // avoid "invalid group reference" error when using $ in param values http://www.sos-berlin.com/jira/browse/JITL-74
+	                          strParamValue = Matcher.quoteReplacement(strParamValue);
+	                          strTemp = myReplaceAll(strTemp, regex, strParamValue);
+	                          
+	                          //End if no more variables in string for substitution
+	                          if (!(strTemp.matches("(?s).*%[^%]+%.*") ||
+	                                strTemp.matches("(?s).*(\\$|§)\\{[^{]+\\}.*"))) {
+	                              break;
+	                          }
+	                                          
+	                      }
 
-                //Wenn String.format verwendet werden soll
-                    String[] strPatterns2 = new String[] {
-                            "%%SCHEDULER_PARAM_%1$s%%", 
-                            "%%%1$s%%",
-                            "(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?",
-                            "(\\$|§)\\{?%1$s\\}?" };
-                    
-                    String[] strPatterns = new String[] {
-                            "%SCHEDULER_PARAM_%1$s%", 
-                            "%%1$s%",
-                            "(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?",
-                            "(\\$|§)\\{?%1$s\\}?" };
-                    
-                    //
-                    /**
-                     * beides zulassen, % und $ mögliche Kombinationen sind:
-                     * 
-                     * %SCHEDULER_PARAM_name% %name% ${SCHEDULER_PARAM_name}
-                     * $SCHEDULER_PARAM_name §{SCHEDULER_PARAM_name}
-                     * §SCHEDULER_PARAM_name ${name} §{name} $name §name
-                     * 
-                     * Managed-DB: §{...}
-                     */
-                    for (String strPattern : strPatterns) {
-                        String regExPattern = strPattern;
-                        for (String name : params.keySet()) {
- 
-                            String strParamValue = params.get(name);
-                        // too verbose
-                        //if (name.contains("password") == false && name.trim().length() > 0) {
-                        //  logger.debug("name = " + name + ", value = " + strParamValue);
-                        //}
-                            // String.format ist ca. 10% langsamer. 
-        //                  String regex = String.format(regExPattern, name);
-                            String regex = regExPattern.replaceAll("\\%1\\$s",name);
-                            
-                            // avoid "invalid group reference" error when using $ in param values http://www.sos-berlin.com/jira/browse/JITL-74
-                            strParamValue = Matcher.quoteReplacement(strParamValue);
-                            strTemp = myReplaceAll(strTemp, regex, strParamValue);
-                            
-                            //End if no more variables in string for substitution
-                            if (!(strTemp.matches(".*%[^%]+%.*") ||
-                                  strTemp.matches(".*(\\$|§)\\{[^{]+\\}.*"))) {
-                                break;
-                            }
-                                            
-                        }
+	                  }
+	                  JSJ_D_0030.toLog(strTemp);
+	              } else {
+	                  JSJ_D_0040.toLog();
+	              }
+	          }
 
-                    }
-                    JSJ_D_0030.toLog(strTemp);
-                } else {
-                    JSJ_D_0040.toLog();
-                }
-            }
-            System.out.println(".....Return strTemp=" + strTemp );
-
-            return strTemp;
-        }
-	
+	          return strTemp;
+	      }
+	      
 	public HashMap<String, String> getSpecialParameters() {
 		HashMap<String, String> specialParams = new HashMap<String, String>();
 		if (spooler == null) { // junit test specific
