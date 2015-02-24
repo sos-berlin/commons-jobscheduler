@@ -103,10 +103,29 @@ public class SOSSSHJob2TestWithJcraft extends JSJobUtilitiesClass<SOSSSHJobOptio
   }
 
   @Test
+  public void testExecuteWithMoreReturnValues() throws Exception {
+    logger.info("****testExecuteWithMoreReturnValues started****");
+    String strArgs[] = new String[] { 
+        "-command", 
+            "ls; "
+            + "echo MY_PARAM=myParam >> $SCHEDULER_RETURN_VALUES; "
+            + "echo MY_OTHER_PARAM=myOtherParam >> $SCHEDULER_RETURN_VALUES; "
+            + "echo =myParamWithoutKey>> $SCHEDULER_RETURN_VALUES", 
+        "-auth_method", "password", 
+        "-host", "homer.sos", 
+        "-user", "test", 
+        "-password", "12345" };
+    objOptions.CommandLineArgs(strArgs);
+    objSSH.Execute();
+    assertTrue(objSSH.getStdErr().toString().isEmpty());
+    objSSH.Clear();
+  }
+
+  @Test
   public void testExecuteWithReturnValues() throws Exception {
     logger.info("****testExecuteWithReturnValues started****");
     String strArgs[] = new String[] { 
-        "-command", "ls; echo MY_PARAM=myParam > $SCHEDULER_RETURN_VALUES", 
+        "-command", "ls; echo MY_PARAM=myParam >> $SCHEDULER_RETURN_VALUES", 
         "-auth_method", "password", 
         "-host", "homer.sos", 
         "-user", "test", 
