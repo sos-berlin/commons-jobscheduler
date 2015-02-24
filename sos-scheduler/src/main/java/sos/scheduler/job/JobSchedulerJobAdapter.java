@@ -594,8 +594,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 
 		JSJ_D_0080.toLog();
 
-		if (pstrString2Modify.matches("%[^%]+%") ||
-		    pstrString2Modify.matches("(\\$|§)\\{[^{]+\\}") ) {
+	          if (pstrString2Modify.matches("(?s).*%[^%]+%.*") ||
+	              pstrString2Modify.matches("(?s).*(\\$|§)\\{[^{]+\\}.*") ) {
 			if (isNotNull(params)) {
 
 			//Wenn String.format verwendet werden soll
@@ -626,10 +626,10 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 					
 					for (String name : params.keySet()) {
 						String strParamValue = params.get(name);
-					// too verbose
-					//if (name.contains("password") == false && name.trim().length() > 0) {
-					//	logger.debug("name = " + name + ", value = " + strParamValue);
-					//}
+	                      // too verbose
+	                      //if (name.contains("password") == false && name.trim().length() > 0) {
+	                      //  logger.debug("name = " + name + ", value = " + strParamValue);
+	                      //}
 						// String.format ist ca. 10% langsamer. 
 	// 				   	String regex = String.format(regExPattern, name);
 					  	String regex = regExPattern.replaceAll("\\%1\\$s",name);
@@ -639,8 +639,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 						strTemp = myReplaceAll(strTemp, regex, strParamValue);
 						
 						//End if no more variables in string for substitution
-						if (!(strTemp.matches("%[^%]+%") ||
-							  strTemp.matches("(\\$|§)\\{[^{]+\\}"))) {
+	                          if (!(strTemp.matches("(?s).*%[^%]+%.*") ||
+	                                strTemp.matches("(?s).*(\\$|§)\\{[^{]+\\}.*"))) {
 						    break;
 						}
 							  		    
