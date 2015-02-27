@@ -4194,9 +4194,9 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						name = "jump_command",
 						description = "This parameter specifies a command that is to be e",
 						key = "jump_command",
-						type = "SOSOptionCommandString",
+						type = "SOSOptionString",
 						mandatory = false)
-	public SOSOptionCommandString	jump_command	= new SOSOptionCommandString(this, conClassName + ".jump_command", // HashMap-Key
+	public SOSOptionString	jump_command	= new SOSOptionString(this, conClassName + ".jump_command", // HashMap-Key
 															"This parameter specifies a command that is to be e", // Titel
 															" ", // InitValue
 															" ", // DefaultValue
@@ -4212,7 +4212,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	 *
 	 * @return
 	 */
-	@Override public SOSOptionCommandString getjump_command() {
+	@Override public SOSOptionString getjump_command() {
 		return jump_command;
 	}
 
@@ -4225,7 +4225,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	 *
 	 * @param p_jump_command
 	 */
-	@Override public void setjump_command(final SOSOptionCommandString p_jump_command) {
+	@Override public void setjump_command(final SOSOptionString p_jump_command) {
 		jump_command = p_jump_command;
 	}
 	/**
