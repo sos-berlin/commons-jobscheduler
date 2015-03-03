@@ -312,7 +312,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 							objOutput.write(buffer, 0, intBytes2Write);
 						}
 						catch (JobSchedulerException e) {
-							e.printStackTrace(System.err);
+							//e.printStackTrace(System.err);
+							logger.error(e.getMessage());
 							break;
 						}
 						// TODO in case of wrong outputbuffer the handling of the error must be improved
@@ -723,7 +724,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
 	private void RaiseException(final Exception e, final String pstrM) {
 		logger.error(pstrM);
-		e.printStackTrace(System.err);
+		//e.printStackTrace(System.err);
 		throw new JobSchedulerException(pstrM, e);
 	}
 

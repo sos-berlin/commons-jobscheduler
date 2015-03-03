@@ -1119,7 +1119,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 			LogReply();
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			RaiseException(e, HostID(SOSVfs_E_0105.params("getOutputStream")));
 		}
 		return objO;
 	}
