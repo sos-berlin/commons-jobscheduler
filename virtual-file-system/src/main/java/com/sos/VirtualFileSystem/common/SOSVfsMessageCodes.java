@@ -396,6 +396,17 @@ public class SOSVfsMessageCodes extends JSToolBox {
 	public static final SOSMsgVfs		SOSVfs_Title_276	= new SOSMsgVfs("SOSVfs_Title_276");							// "Test for UDP communication method";
 	@I18NMsg
 	public static final SOSMsgVfs		SOSVfs_E_277		= new SOSMsgVfs("SOSVfs_E_277");								// "a file '%1$s' already exists.";
+  @I18NMsg
+  public static final SOSMsgVfs   SOSVfs_D_280    = new SOSMsgVfs("SOSVfs_D_280");               // "no return values received!"
+  @I18NMsg
+  public static final SOSMsgVfs   SOSVfs_D_281    = new SOSMsgVfs("SOSVfs_D_281");               // "no temporary file with return values found to process."
+  @I18NMsg
+  public static final SOSMsgVfs   SOSVfs_D_282    = new SOSMsgVfs("SOSVfs_D_282");               // "no temporary file for return values found!"
+  @I18NMsg
+  public static final SOSMsgVfs   SOSVfs_E_283    = new SOSMsgVfs("SOSVfs_E_283");               // "Error occured while opening a Session for postCommands: %1$s"
+  @I18NMsg
+  public static final SOSMsgVfs   SOSVfs_D_284    = new SOSMsgVfs("SOSVfs_D_284");               // "received Return Values are: "
+	
 	
 	@Deprecated
 	public SOSVfsMessageCodes() {
