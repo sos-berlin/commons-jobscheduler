@@ -27,6 +27,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 public class SOSSSH2JcraftTest {
   
   private static final String HOST = "homer.sos";
+  private static final String WINDOWS_HOST = "sp.sos";
   private static final int PORT = 22;
   private static final String USERNAME = "test";
   private static final String PASSWD = "12345";
@@ -173,8 +174,44 @@ public class SOSSSH2JcraftTest {
     sshSession.disconnect();
   }
   
+  @Test
+  public void testExecuteCommandOnWindows() throws JSchException, RuntimeException, IOException{
+    sessionConnectWindows();
+    executeChannelWithCommandConnect("dir");
+    InputStream in = executeChannel.getInputStream();
+    String output = "";
+    int exitCode = -1;
+    byte[] tmp=new byte[1024];
+    while(true){
+      while(in.available()>0){
+        int i=in.read(tmp, 0, 1024);
+        if(i<0)break;
+        output += new String(tmp, 0, i);
+      }
+      if(executeChannel.isClosed()){
+        if(in.available()>0) continue; 
+        log.debug("exit-status: {}", exitCode = executeChannel.getExitStatus());
+        break;
+      }
+      try{Thread.sleep(1000);}catch(Exception ee){}
+    }
+    log.debug("output = {}", output);
+    assertTrue(output.length() > 0);
+    assertEquals("exit code not as expected", 0, exitCode);
+    assertEquals("output not as expected", "**Hallo world!**\n", output);
+    executeChannel.disconnect();
+    sshSession.disconnect();
+  }
+  
   private void sessionConnect() throws JSchException, RuntimeException{
     sshSession = secureChannel.getSession(authenticationOptions.getUser().Value(), HOST, PORT);
+    sshSession.setPassword(authenticationOptions.getPassword().Value().toString());
+    sshSession.setConfig("StrictHostKeyChecking", "no");
+    sshSession.connect();
+  }
+  
+  private void sessionConnectWindows() throws JSchException, RuntimeException{
+    sshSession = secureChannel.getSession(authenticationOptions.getUser().Value(), WINDOWS_HOST, PORT);
     sshSession.setPassword(authenticationOptions.getPassword().Value().toString());
     sshSession.setConfig("StrictHostKeyChecking", "no");
     sshSession.connect();
@@ -194,6 +231,15 @@ public class SOSSSH2JcraftTest {
   }
   
   private void executeChannelWithCommandConnect() throws JSchException{
+    executeChannel = (ChannelExec)sshSession.openChannel(CONNECTION_TYPE_EXECUTE);
+    executeChannel.setCommand(command);
+    executeChannel.setInputStream(System.in);
+    executeChannel.setOutputStream(System.out);
+    executeChannel.setErrStream(System.err);
+    executeChannel.connect(TIMEOUT);
+  }
+  
+  private void executeChannelWithCommandConnect(String command) throws JSchException{
     executeChannel = (ChannelExec)sshSession.openChannel(CONNECTION_TYPE_EXECUTE);
     executeChannel.setCommand(command);
     executeChannel.setInputStream(System.in);
