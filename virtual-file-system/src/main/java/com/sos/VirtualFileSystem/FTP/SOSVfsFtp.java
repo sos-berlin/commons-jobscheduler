@@ -5,7 +5,10 @@ import com.sos.VirtualFileSystem.DataElements.SOSFileList;
 import com.sos.VirtualFileSystem.DataElements.SOSFileListEntry;
 import com.sos.VirtualFileSystem.DataElements.SOSFolderName;
 import com.sos.VirtualFileSystem.Interfaces.*;
+import com.sos.VirtualFileSystem.common.SOSFileEntries;
+import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.i18n.annotation.I18NResourceBundle;
+
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPClientConfig;
@@ -555,7 +558,8 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 			}
 
 			try {
-				objFTPFileList = Client().listFiles(lstrPathName);
+				objFTPFileList = Client().listFiles(lstrPathName);			
+	            this.getSOSFileEntries().clear();
 			}
 			catch (IOException e) {
 				RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
@@ -565,7 +569,14 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 				return vecDirectoryListing;
 			}
 
+
 			for (FTPFile objFTPFile : objFTPFileList) {
+			    SOSFileEntry sosFileEntry = new SOSFileEntry();
+			    sosFileEntry.setDirectory(objFTPFile.isDirectory());
+			    sosFileEntry.setFilename(objFTPFile.getName());
+			    sosFileEntry.setFilesize(objFTPFile.getSize());
+			    sosFileEntry.setParentPath(pstrPathName);
+			    this.getSOSFileEntries().add(sosFileEntry);
 				String strCurrentFile = objFTPFile.getName();
 				if (isNotHiddenFile(strCurrentFile) && strCurrentFile.trim().length() > 0) {
 					boolean flgIsDirectory = objFTPFile.isDirectory();

@@ -31,6 +31,8 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsSuperClass;
+import com.sos.VirtualFileSystem.common.SOSFileEntries;
+import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
@@ -349,10 +351,21 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 				return new String[] { path };
 			}
 			@SuppressWarnings("unchecked") Vector<LsEntry> lsResult = this.getClient().ls(path);
+			
+			this.getSOSFileEntries().clear();
+
+			
 			String[] result = new String[lsResult.size()];
 			String sep = path.endsWith("/") ? "" : "/";
 			for (int i = 0, j = 0; i < lsResult.size(); i++) {
 				LsEntry entry = lsResult.get(i);
+ 			    SOSFileEntry sosFileEntry = new SOSFileEntry();
+	            sosFileEntry.setDirectory(entry.getAttrs().isDir());
+	            sosFileEntry.setFilename(entry.getFilename());
+	            sosFileEntry.setFilesize(entry.getAttrs().getSize());
+	            sosFileEntry.setParentPath(path);
+	            this.getSOSFileEntries().add(sosFileEntry);
+				
 				String strFileName = path + sep + entry.getFilename();
 				//				if (isDirectory(strFileName) == false) {
 				result[j++] = strFileName;
@@ -957,4 +970,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	@Override public InputStream getInputStream() {
 		return null;
 	}
+
+    @Override
+    public SOSFileEntries getSOSFileEntries() {
+        return sosFileEntries;
+    }
 }

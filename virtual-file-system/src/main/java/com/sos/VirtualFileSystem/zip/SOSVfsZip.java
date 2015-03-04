@@ -33,6 +33,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFileSystem;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFolder;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
+import com.sos.VirtualFileSystem.common.SOSFileEntries;
 import com.sos.VirtualFileSystem.common.SOSVfsBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
@@ -1055,4 +1056,9 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
 	public InputStream getInputStream() {
 		return objInputStream;
 	}
+
+    @Override
+    public SOSFileEntries getSOSFileEntries() {
+        return sosFileEntries;
+    }
 }

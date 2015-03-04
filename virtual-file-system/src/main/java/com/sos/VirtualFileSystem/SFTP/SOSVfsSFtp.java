@@ -39,6 +39,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFolder;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsSuperClass;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
+import com.sos.VirtualFileSystem.common.SOSFileEntries;
 import com.sos.VirtualFileSystem.common.SOSVfsBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 import com.trilead.ssh2.ChannelCondition;
@@ -2082,4 +2083,9 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
 	public InputStream getInputStream() {
 		return null;
 	}
+
+    @Override
+    public SOSFileEntries getSOSFileEntries() {
+        return sosFileEntries;
+    }
 }
