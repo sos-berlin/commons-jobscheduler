@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import com.jcraft.jsch.ChannelExec;
@@ -50,6 +52,9 @@ public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements ISOSShell, ISO
   private String userName;
   private String password;
   private String authMethod;
+  private static final int MAX_RECONNECTS = 3;
+  private static final int MAX_SLEEP_MILLIS = 1000;
+  private Map<String, String> envVariables;
 
   public SOSSSH2JcraftImpl() {
     secureChannel = new JSch();
@@ -62,6 +67,7 @@ public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements ISOSShell, ISO
     sshSession = secureChannel.getSession(userName, host, port);
     strbStdoutOutput = new StringBuffer();
     strbStderrOutput = new StringBuffer();
+    envVariables = new HashMap<String, String>();
     return this;
   }
 
@@ -210,39 +216,57 @@ public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements ISOSShell, ISO
       logger.debug(SOSVfs_D_0151.params(checkShellCommand));
       channel = (ChannelExec) sshSession.openChannel("exec");
       channel.setCommand(checkShellCommand);
-      channel.connect(3000);
-      logger.debug(SOSVfs_D_163.params("stdout", checkShellCommand));
       ipsStdOut = channel.getInputStream();
       ipsStdErr = channel.getErrStream();
+      channel.connect(3000);
+      logger.debug(SOSVfs_D_163.params("stdout", checkShellCommand));
       String stdOut = "";
       byte[] tmp = new byte[1024];
-      while (true) {
+      int count = 0;
+      while (true && count < MAX_RECONNECTS) {
         while (ipsStdOut.available() > 0) {
           int i = ipsStdOut.read(tmp, 0, 1024);
-          if (i < 0) break;
+          if (i < 0){ 
+            break;
+          }
           stdOut += new String(tmp, 0, i);
         }
         strbStdoutOutput.append(stdOut);
         if (channel.isClosed()) {
-          if (ipsStdOut.available() > 0) continue;
+          if (ipsStdOut.available() > 0){
+            continue;
+          }
           exitCode = channel.getExitStatus();
           break;
+        }else{
+          Thread.sleep(MAX_SLEEP_MILLIS);
+          logger.debug("number of tries to get the stdout from server(max. " + MAX_RECONNECTS + "): " + (count + 1));
+          count++;
         }
       }
       logger.debug(SOSVfs_D_163.params("stderr", checkShellCommand));
       String stdErr = "";
       tmp = new byte[1024];
-      while (true) {
+      count = 0;
+      while (true && count < MAX_RECONNECTS) {
         while (ipsStdErr.available() > 0) {
           int i = ipsStdErr.read(tmp, 0, 1024);
-          if (i < 0) break;
+          if (i < 0){ 
+            break;
+          }
           stdErr += new String(tmp, 0, i);
         }
         strbStderrOutput.append(stdErr);
         if (channel.isClosed()) {
-          if (ipsStdErr.available() > 0) continue;
+          if (ipsStdErr.available() > 0){
+            continue;
+          }
           exitCode = channel.getExitStatus();
           break;
+        }else{
+          Thread.sleep(MAX_SLEEP_MILLIS);
+          logger.debug("number of tries to get the stderr from server(max. " + MAX_RECONNECTS + "): " + (count + 1));
+          count++;
         }
       }
       if (stdOut.indexOf("cmd.exe") > -1) {
@@ -253,10 +277,12 @@ public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements ISOSShell, ISO
     } catch (Exception e) {
       logger.debug(SOSVfs_D_239.params(e));
     } finally {
-      if (channel != null && !channel.isClosed()) try {
-        channel.disconnect();
-      } catch (Exception e) {
-        logger.debug(SOSVfs_D_240.params(e));
+      if (channel != null && !channel.isClosed()){ 
+        try {
+          channel.disconnect();
+        } catch (Exception e) {
+          logger.debug(SOSVfs_D_240.params(e));
+        }
       }
     }
     return false;
@@ -283,26 +309,42 @@ public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements ISOSShell, ISO
     executeChannel.setErrStream(System.err, true);
     ipsStdOut = executeChannel.getInputStream();
     ipsStdErr = executeChannel.getErrStream();
+    if(envVariables != null && envVariables.size() > 0){
+      for(String key : envVariables.keySet()){
+        executeChannel.setEnv(key, envVariables.get(key));
+      }
+    }
     executeChannel.connect(3000);
     String output = "";
-    byte[] tmp = null;
     logger.debug(SOSVfs_D_163.params("stdout", command));
-    tmp = new byte[1024];
+    byte[] tmp = new byte[1024];
+    int count = 0;
     while (true) {
+      if (count == MAX_RECONNECTS -1) break;
       while (ipsStdOut.available() > 0) {
         int i = ipsStdOut.read(tmp, 0, 1024);
-        if (i < 0) 
+        if (i < 0) {
           break;
+        }
         output += new String(tmp, 0, i);
+//        logger.debug("received output in stdout: " + output);
       }
       strbStdoutOutput.append(output);
       if (executeChannel.isClosed()) {
-        if (ipsStdOut.available() > 0) 
+        if (ipsStdOut.available() > 0) {
           continue;
+        }
+        exitCode = executeChannel.getExitStatus();
+        break;
+      }else if (executeChannel.isEOF()){
+        if (ipsStdOut.available() > 0) {
+          continue;
+        }
         exitCode = executeChannel.getExitStatus();
         break;
       }
       try {
+        count++;
         Thread.sleep(1000);
       }
       catch (Exception ee) {
@@ -314,14 +356,16 @@ public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements ISOSShell, ISO
     while (true) {
       while (ipsStdErr.available() > 0) {
         int i = ipsStdErr.read(tmp, 0, 1024);
-        if (i < 0) 
+        if (i < 0) {
           break;
+        }
         errorOutput = new String(tmp, 0, i);
       }
       strbStderrOutput.append(errorOutput);
       if (executeChannel.isClosed()) {
-        if (ipsStdErr.available() > 0) 
+        if (ipsStdErr.available() > 0) {
           continue;
+        }
         exitCode = executeChannel.getExitStatus();
         break;
       }
@@ -330,12 +374,13 @@ public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements ISOSShell, ISO
       }
       catch (Exception ee) {
       }
+      
     }
     // JCraft might not write to stderr in case of error
     // if exitcode != 0 AND stderr is empty, use stdout instead [SP]
-    if(exitCode != 0 && errorOutput.isEmpty()){
-      strbStderrOutput.append(output);
-    }
+//    if(exitCode != 0 && errorOutput.isEmpty()){
+//      strbStderrOutput.append(output);
+//    }
   }
 
   @Override
@@ -485,4 +530,8 @@ public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements ISOSShell, ISO
     // TODO Auto-generated method stub
   }
 
+  public void addEnvironmentVariable(String key, String value){
+    envVariables.put(key, value);
+  }
+  
 }

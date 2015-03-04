@@ -53,7 +53,6 @@ public class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 	private final String conClassName = this.getClass().getSimpleName();
 	private final Logger logger = Logger.getLogger(this.getClass());
 
-	@SuppressWarnings("unused")
 	private final String		conSVNVersion		= "$Id$";
 
 	private final String		conStd_err_output	= "std_err_output";
@@ -112,7 +111,7 @@ public class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
   private ISOSVFSHandler    objVFS        = null;
   // http://www.sos-berlin.com/jira/browse/JITL-112: Additional Handler for post commands
-  private ISOSVFSHandler    postCommandVFSHandler        = null;
+  private ISOSVFSHandler    prePostCommandVFSHandler        = null;
 
 	public String[] getCommands2Execute() {
 
@@ -146,10 +145,10 @@ public class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         throw new JobSchedulerException("SOS-VFS-E-0010: unable to initialize VFS", e);
       }
     }
-    // http://www.sos-berlin.com/jira/browse/JITL-112: second instance with own session for post commands
-    if (postCommandVFSHandler == null) {
+    // http://www.sos-berlin.com/jira/browse/JITL-112: second instance with own session for pre/post commands
+    if (prePostCommandVFSHandler == null) {
       try {
-        postCommandVFSHandler = VFSFactory.getHandler("SSH2");
+        prePostCommandVFSHandler = VFSFactory.getHandler("SSH2");
       }
       catch (Exception e) {
         // TODO msg must be used in the VFSFactory because it is an VFS Msg
@@ -173,14 +172,6 @@ public class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 		// http://www.sos-berlin.com/jira/browse/JITL-112
 		UUID uuid = UUID.randomUUID();
     tmpReturnValueFileName = "sos-ssh-return-values-" + uuid + ".txt";
-    StringBuilder strb = new StringBuilder();
-    strb.append(objOptions.getPreCommand().Value())
-    .append(" ")
-    .append(SCHEDULER_RETURN_VALUES)
-    .append("=")
-    .append(tmpReturnValueFileName)
-    .append(COMMAND_DELIMITER);
-    exportEnvVariableCommand = strb.toString();
 	}
 
 	/**
@@ -222,6 +213,7 @@ public class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
 		flgIsWindowsShell = objVFS.remoteIsWindowsShell();
 		isConnected = true;
+//		openPrePostCommandsSession();
 		return this;
 	} // private SOSSSHJob2 Connect
 
@@ -273,6 +265,7 @@ public class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 					throw new SSHMissingCommandError(objMsg.getMsg(SOS_SSH_E_100)); // "SOS-SSH-E-100: neither Commands nor Script(file) specified. Abort.");
 				}
 			}
+	    exportEnvVariableCommand = String.format(objOptions.getPreCommand().Value() + objOptions.command_delimiter.Value(), SCHEDULER_RETURN_VALUES, tmpReturnValueFileName);
 			for (String strCmd : strCommands2Execute) {
 				try {
 				  // http://www.sos-berlin.com/jira/browse/JITL-112
@@ -303,7 +296,7 @@ public class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 				}
 			}
 			// http://www.sos-berlin.com/jira/browse/JITL-112
-      readReturnValues(tmpReturnValueFileName);
+      processPostCommands(tmpReturnValueFileName);
 		}
 		catch (Exception e) {
 			logger.error(this.StackTrace2String(e));
@@ -318,45 +311,47 @@ public class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 		}
 		return this;
 	}
-	
-	private void readReturnValues(String tmpFileName){
-	  String postCommandRead = objOptions.getPostCommandRead().Value()+ " " + tmpFileName;
-    String stdErr = "";
-
+	private void openPrePostCommandsSession(){
     try {
-      if (!postCommandVFSHandler.isConnected()) {
-        postCommandVFSHandler.Connect(objOptions);
+      if (!prePostCommandVFSHandler.isConnected()) {
+        prePostCommandVFSHandler.Connect(objOptions);
       }
       ISOSAuthenticationOptions objAU = objOptions;
-      ISOSConnection authenticate = postCommandVFSHandler.Authenticate(objAU);
+      ISOSConnection authenticate = prePostCommandVFSHandler.Authenticate(objAU);
       logger.debug("connection established");
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
     }
-    postCommandVFSHandler.setJSJobUtilites(objJSJobUtilities);
+    prePostCommandVFSHandler.setJSJobUtilites(objJSJobUtilities);
     try {
-      postCommandVFSHandler.OpenSession(objOptions);
+      prePostCommandVFSHandler.OpenSession(objOptions);
     } catch (Exception e1) {
-      String strErrMsg = "SOS-SSH-E-120: error occurred processing ssh command: ";
-      logger.error(strErrMsg, e1);
-      throw new SSHExecutionError(strErrMsg, e1);
+//      String strErrMsg = "Error occured while opening a Session for postCommands: ";
+      logger.error(SOSVfsMessageCodes.SOSVfs_E_283.params(e1));
+//      throw new SSHExecutionError(strErrMsg, e1);
     }
     finally {
       if (keepConnected == false) {
         DisConnect();
       }
     }
+	}
+	
+	private void processPostCommands(String tmpFileName){
+	  openPrePostCommandsSession();
+	  String postCommandRead = String.format(objOptions.getPostCommandRead().Value(), tmpFileName);
+    String stdErr = "";
+
 
     try {
-      postCommandVFSHandler.ExecuteCommand(postCommandRead);
+      prePostCommandVFSHandler.ExecuteCommand(postCommandRead);
       // check if command was processed correctly 
-      if(postCommandVFSHandler.getExitCode() == 0){
+      if(prePostCommandVFSHandler.getExitCode() == 0){
         // read stdout of the read-temp-file statement per line
-        if(postCommandVFSHandler.getStdOut().toString().length() > 0){
-          BufferedReader reader = new BufferedReader(new StringReader(new String(postCommandVFSHandler.getStdOut())));
+        if(prePostCommandVFSHandler.getStdOut().toString().length() > 0){
+          BufferedReader reader = new BufferedReader(new StringReader(new String(prePostCommandVFSHandler.getStdOut())));
           String line = null;
-          logger.debug("received Return Values are: ");
+          logger.debug(SOSVfsMessageCodes.SOSVfs_D_284.getFullMessage());
           while ((line = reader.readLine()) != null){
             Matcher regExMatcher = Pattern.compile("^([^=]+)=(.*)").matcher(line);
             if(regExMatcher.find()){
@@ -366,21 +361,21 @@ public class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
             }
           }
           // remove temp file after parsing return values from file
-          String postCommandDelete = objOptions.getPostCommandDelete().Value() + " " + tmpFileName;
-          postCommandVFSHandler.ExecuteCommand(postCommandDelete);
+          String postCommandDelete = String.format(objOptions.getPostCommandDelete().Value(), tmpFileName);
+          prePostCommandVFSHandler.ExecuteCommand(postCommandDelete);
           logger.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tmpFileName));
         }else{
-          logger.debug("no return values received!");
+          logger.debug(SOSVfsMessageCodes.SOSVfs_D_280.getFullMessage());
         }
       }else{
-        stdErr = postCommandVFSHandler.getStdErr().toString();
+        logger.debug(SOSVfsMessageCodes.SOSVfs_D_281.getFullMessage());
+        stdErr = prePostCommandVFSHandler.getStdErr().toString();
         if(stdErr.length() > 0){
-          logger.error(stdErr);
+          logger.debug(stdErr);
         }
       }
     } catch (Exception e) {
-      logger.debug("no temp file for return values found!");
-//      e.printStackTrace();
+      logger.debug(SOSVfsMessageCodes.SOSVfs_D_282.getFullMessage());
     }
 	  
 	}

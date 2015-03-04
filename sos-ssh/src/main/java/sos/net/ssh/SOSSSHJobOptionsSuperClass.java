@@ -766,7 +766,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
    * @author SP
    */
   @JSOptionDefinition(name = "preCommand", description = "the preCommand to set an environmental variable on the remote host", key = "preCommand", type = "SOSOptionString", mandatory = false)
-  public SOSOptionString preCommand = new SOSOptionString(this, conClassName + ".preCommand", "the preCommand to set an environmental variable on the remote host", "export", "export", false);
+  public SOSOptionString preCommand = new SOSOptionString(this, conClassName + ".preCommand", "the preCommand to set an environmental variable on the remote host", "export %1s=%2s", "export %1s=%2s", false);
 
   public SOSOptionString getPreCommand() {
     return preCommand;
@@ -780,7 +780,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
    * @author SP
    */
   @JSOptionDefinition(name = "postCommandRead", description = "the postCommand to read temporary file and write its content to stdout", key = "postCommandRead", type = "SOSOptionString", mandatory = false)
-  public SOSOptionString postCommandRead = new SOSOptionString(this, conClassName + ".postCommandRead", "the postCommand to read temporary file and write its content to stdout", "cat", "cat", false);
+  public SOSOptionString postCommandRead = new SOSOptionString(this, conClassName + ".postCommandRead", "the postCommand to read temporary file and write its content to stdout", "cat %s", "cat %s", false);
 
   public SOSOptionString getPostCommandRead() {
     return postCommandRead;
@@ -794,7 +794,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
    * @author SP
    */
   @JSOptionDefinition(name = "postCommandDelete", description = "the postCommand to delete the temporary file", key = "postCommandDelete", type = "SOSOptionString", mandatory = false)
-  public SOSOptionString postCommandDelete = new SOSOptionString(this, conClassName + ".postCommandDelete", "the postCommand to delete the temporary file", "rm", "rm", false);
+  public SOSOptionString postCommandDelete = new SOSOptionString(this, conClassName + ".postCommandDelete", "the postCommand to delete the temporary file", "rm %s", "rm %s", false);
 
   public SOSOptionString getPostCommandDelete() {
     return postCommandDelete;

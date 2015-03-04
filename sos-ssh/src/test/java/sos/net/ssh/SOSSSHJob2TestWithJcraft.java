@@ -43,14 +43,15 @@ public class SOSSSHJob2TestWithJcraft extends JSJobUtilitiesClass<SOSSSHJobOptio
 	}
 	
   @Test
-  public void testExecute() throws Exception {
+  public void testExecuteLinux() throws Exception {
     logger.info("****testExecute started****");
     String strArgs[] = new String[] { 
         "-command", "ls", 
         "-auth_method", "password", 
         "-host", "homer.sos", 
         "-user", "test", 
-        "-password", "12345" };
+        "-password", "12345",
+        "-command_delimiter", ";" };
     objOptions.CommandLineArgs(strArgs);
     objSSH.Execute();
     assertTrue(objSSH.getStdErr().toString().isEmpty());
@@ -65,7 +66,8 @@ public class SOSSSHJob2TestWithJcraft extends JSJobUtilitiesClass<SOSSSHJobOptio
         "-auth_method", "password", 
         "-host", "homer.sos", 
         "-user", "test", 
-        "-password", "12345" };
+        "-password", "12345",
+        "-command_delimiter", ";"  };
     objOptions.CommandLineArgs(strArgs);
     objSSH.Execute();
     assertFalse(objSSH.getStdErr().toString().isEmpty());
@@ -73,14 +75,18 @@ public class SOSSSHJob2TestWithJcraft extends JSJobUtilitiesClass<SOSSSHJobOptio
   }
 
   @Test
-  public void testExecuteCmdScriptFile() throws Exception {
-    logger.info("****testExecuteCmdScriptFile started****");
+  public void testExecuteCmdScriptFileOnLinux() throws Exception {
+    logger.info("****testExecuteCmdScriptFileOnLinux started****");
     String strArgs[] = new String[] { 
         "-command_script_file", "src/test/resources/testScriptSSH2Job.sh", 
         "-auth_method", "password", 
         "-host", "homer.sos", 
         "-user", "test", 
-        "-password", "12345" };
+        "-password", "12345",
+        "-preCommand", "export %1s=%2s",
+        "-postCommandRead", "cat %s",
+        "-postCommandDelete", "rm %s",
+        "-command_delimiter", ";" };
     objOptions.CommandLineArgs(strArgs);
     objSSH.Execute();
     assertTrue(objSSH.getStdErr().toString().isEmpty());
@@ -95,7 +101,8 @@ public class SOSSSHJob2TestWithJcraft extends JSJobUtilitiesClass<SOSSSHJobOptio
         "-auth_method", "publickey", 
         "-host", "homer.sos", 
         "-auth_file", "src/test/resources/id_rsa", 
-        "-user", "test"};
+        "-user", "test",
+        "-command_delimiter", ";" };
     objOptions.CommandLineArgs(strArgs);
     objSSH.Execute();
     assertTrue(objSSH.getStdErr().toString().isEmpty());
@@ -103,18 +110,22 @@ public class SOSSSHJob2TestWithJcraft extends JSJobUtilitiesClass<SOSSSHJobOptio
   }
 
   @Test
-  public void testExecuteWithMoreReturnValues() throws Exception {
-    logger.info("****testExecuteWithMoreReturnValues started****");
+  public void testExecuteWithMoreReturnValuesOnLinux() throws Exception {
+    logger.info("****testExecuteWithMoreReturnValuesOnLinux started****");
     String strArgs[] = new String[] { 
         "-command", 
             "ls; "
             + "echo MY_PARAM=myParam >> $SCHEDULER_RETURN_VALUES; "
             + "echo MY_OTHER_PARAM=myOtherParam >> $SCHEDULER_RETURN_VALUES; "
-            + "echo =myParamWithoutKey>> $SCHEDULER_RETURN_VALUES", 
+            + "echo =myParamWithoutKey >> $SCHEDULER_RETURN_VALUES", 
         "-auth_method", "password", 
         "-host", "homer.sos", 
         "-user", "test", 
-        "-password", "12345" };
+        "-password", "12345",
+        "-preCommand", "export %1s=%2s",
+        "-postCommandRead", "cat %s",
+        "-postCommandDelete", "rm %s",
+        "-command_delimiter", ";"};
     objOptions.CommandLineArgs(strArgs);
     objSSH.Execute();
     assertTrue(objSSH.getStdErr().toString().isEmpty());
@@ -129,7 +140,8 @@ public class SOSSSHJob2TestWithJcraft extends JSJobUtilitiesClass<SOSSSHJobOptio
         "-auth_method", "password", 
         "-host", "homer.sos", 
         "-user", "test", 
-        "-password", "12345" };
+        "-password", "12345",
+        "-command_delimiter", ";" };
     objOptions.CommandLineArgs(strArgs);
     objSSH.Execute();
     assertTrue(objSSH.getStdErr().toString().isEmpty());
@@ -144,11 +156,90 @@ public class SOSSSHJob2TestWithJcraft extends JSJobUtilitiesClass<SOSSSHJobOptio
         "-auth_method", "password", 
         "-host", "homer.sos", 
         "-user", "test", 
-        "-password", "12345" };
+        "-password", "12345",
+        "-command_delimiter", ";" };
     objOptions.CommandLineArgs(strArgs);
     objSSH.Execute();
     assertTrue(objSSH.getStdErr().toString().isEmpty());
     objSSH.Clear();
   }
 
+  @Test
+  public void testExecuteWindows() throws Exception {
+    logger.info("****testExecute started****");
+    String strArgs[] = new String[] { 
+        "-command", "echo %SCHEDULER_RETURN_VALUES%", 
+        "-auth_method", "password", 
+        "-host", "lutest.sos", 
+        "-user", "test", 
+        "-password", "12345",
+        "-preCommand", "set %1s=%2s",
+        "-command_delimiter", "&" };
+    objOptions.CommandLineArgs(strArgs);
+    objSSH.Execute();
+    assertTrue(objSSH.getStdErr().toString().isEmpty());
+    objSSH.Clear();
+  }
+
+  @Test
+  public void testExecuteWithMoreReturnValuesOnWindows() throws Exception {
+    logger.info("****testExecuteWithMoreReturnValuesOnWindows started****");
+    String strArgs[] = new String[] { 
+        "-command", 
+            "dir&&\r\n"
+            + "echo MY_PARAM=myParam >> %SCHEDULER_RETURN_VALUES%&&\r\n"
+            + "echo MY_OTHER_PARAM=myOtherParam >> %SCHEDULER_RETURN_VALUES%&&\r\n"
+            + "echo =myParamWithoutKey >> %SCHEDULER_RETURN_VALUES%", 
+        "-auth_method", "password", 
+        "-host", "lutest.sos", 
+        "-user", "test", 
+        "-password", "12345",
+        "-preCommand", "set %1s=%2s",
+        "-postCommandRead", "type %s",
+        "-postCommandDelete", "del %s",
+        "-command_delimiter", "&"};
+    objOptions.CommandLineArgs(strArgs);
+    objSSH.Execute();
+    assertTrue(objSSH.getStdErr().toString().isEmpty());
+    objSSH.Clear();
+  }
+
+  @Test
+  public void testExecuteRemoteScriptWithReturnValuesOnWindows() throws Exception {
+    logger.info("****testExecuteRemoteScriptWithReturnValuesOnWindows started****");
+    String strArgs[] = new String[] { 
+        "-command", "test.cmd", 
+        "-auth_method", "password", 
+        "-host", "lutest.sos", 
+        "-user", "test", 
+        "-password", "12345",
+        "-preCommand", "set %1s=%2s",
+        "-postCommandRead", "type %s",
+        "-postCommandDelete", "del %s",
+        "-command_delimiter", "&"};
+    objOptions.CommandLineArgs(strArgs);
+    objSSH.Execute();
+    assertTrue(objSSH.getStdErr().toString().isEmpty());
+    objSSH.Clear();
+  }
+
+  @Test
+  public void testExecuteCmdScriptFileOnWindows() throws Exception {
+    logger.info("****testExecuteCmdScriptFileOnWindows started****");
+    String strArgs[] = new String[] { 
+        "-command_script_file", "src/test/resources/test.cmd", 
+        "-auth_method", "password", 
+        "-host", "lutest.sos", 
+        "-user", "test", 
+        "-password", "12345",
+        "-preCommand", "set %1s=%2s",
+        "-postCommandRead", "type %s",
+        "-postCommandDelete", "del %s",
+        "-command_delimiter", "&" };
+    objOptions.CommandLineArgs(strArgs);
+    objSSH.Execute();
+    assertTrue(objSSH.getStdErr().toString().isEmpty());
+    objSSH.Clear();
+  }
+  
 }
