@@ -3,7 +3,6 @@ package com.sos.VirtualFileSystem.SSH;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,22 +16,16 @@ import com.sos.JSHelper.Basics.JSJobUtilities;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.interfaces.ISOSConnectionOptions;
 import com.sos.JSHelper.interfaces.ISOSDataProviderOptions;
-import com.sos.VirtualFileSystem.DataElements.SOSFileList;
-import com.sos.VirtualFileSystem.DataElements.SOSFolderName;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSSession;
-import com.sos.VirtualFileSystem.Interfaces.ISOSShell;
 import com.sos.VirtualFileSystem.Interfaces.ISOSShellOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFileSystem;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFolder;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements /*ISOSShell,*/ ISOSVFSHandler, /*ISOSVirtualFileSystem,*/
-    ISOSConnection, ISOSSession {
+public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements ISOSVFSHandler, ISOSConnection, ISOSSession {
   private boolean flgIsRemoteOSWindows = false;
   private ISOSConnectionOptions sosConnectionOptions = null;
   private ISOSAuthenticationOptions sosAuthenticationOptions = null;
@@ -42,7 +35,6 @@ public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements /*ISOSShell,*/
   private Integer exitCode = null;
   private String exitSignal = null;
   private Vector<String> vecFilesToDelete = new Vector<String>();
-  /** ssh session object */
   private Session sshSession = null;
   private JSch secureChannel = null;
   private ChannelExec executeChannel;
@@ -185,7 +177,6 @@ public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements /*ISOSShell,*/
 
   @Override
   public void CloseConnection() throws Exception {
-    //something like that has to be done in the Job Class
     if(!vecFilesToDelete.isEmpty()){
       for(String filename : vecFilesToDelete){
         deleteFile(filename);
@@ -193,16 +184,6 @@ public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements /*ISOSShell,*/
     }
     sshSession.disconnect();
   }
-
-//  @Override
-//  public ISOSConnection getConnection() {
-//    return this;
-//  }
-//
-//  @Override
-//  public ISOSSession getSession() {
-//    return this;
-//  }
 
   @Override
   public boolean remoteIsWindowsShell() {
@@ -327,7 +308,6 @@ public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements /*ISOSShell,*/
           break;
         }
         output += new String(tmp, 0, i);
-//        logger.debug("received output in stdout: " + output);
       }
       strbStdoutOutput.append(output);
       if (executeChannel.isClosed()) {
@@ -376,11 +356,6 @@ public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements /*ISOSShell,*/
       }
       
     }
-    // JCraft might not write to stderr in case of error
-    // if exitcode != 0 AND stderr is empty, use stdout instead [SP]
-//    if(exitCode != 0 && errorOutput.isEmpty()){
-//      strbStderrOutput.append(output);
-//    }
   }
 
   @Override
@@ -490,26 +465,6 @@ public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements /*ISOSShell,*/
       throw new JobSchedulerException(e);
     }
   }
-
-//  @Override
-//  public ISOSVirtualFolder mkdir(SOSFolderName pobjFolderName) throws IOException {
-//    return null;
-//  }
-//
-//  @Override
-//  public boolean rmdir(SOSFolderName pobjFolderName) throws IOException {
-//    return false;
-//  }
-//
-//  @Override
-//  public SOSFileList dir(SOSFolderName pobjFolderName) {
-//    return null;
-//  }
-//
-//  @Override
-//  public SOSFileList dir(String pathname, int flag) {
- //    return null;
-//  }
 
   @Override
   public void doPostLoginOperations() {
