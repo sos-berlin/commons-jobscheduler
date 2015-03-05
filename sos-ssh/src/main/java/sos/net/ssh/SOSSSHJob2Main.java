@@ -56,7 +56,7 @@ public class SOSSSHJob2Main {
 		logger.info("User-Dir : " + System.getProperty("user.dir"));   //$NON-NLS-1$
 
 		try {
-			SOSSSHJob2 objM = new SOSSSHJob2();
+			SOSSSHJob2 objM = new SOSSSHJobTrilead();
 			SOSSSHJobOptions objO = objM.Options();
 			
 			objO.CommandLineArgs(pstrArgs);

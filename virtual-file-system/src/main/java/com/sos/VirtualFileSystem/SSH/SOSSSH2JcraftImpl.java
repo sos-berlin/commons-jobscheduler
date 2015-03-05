@@ -31,7 +31,7 @@ import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
-public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements ISOSShell, ISOSVFSHandler, ISOSVirtualFileSystem,
+public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements /*ISOSShell,*/ ISOSVFSHandler, /*ISOSVirtualFileSystem,*/
     ISOSConnection, ISOSSession {
   private boolean flgIsRemoteOSWindows = false;
   private ISOSConnectionOptions sosConnectionOptions = null;
@@ -194,15 +194,15 @@ public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements ISOSShell, ISO
     sshSession.disconnect();
   }
 
-  @Override
-  public ISOSConnection getConnection() {
-    return this;
-  }
-
-  @Override
-  public ISOSSession getSession() {
-    return this;
-  }
+//  @Override
+//  public ISOSConnection getConnection() {
+//    return this;
+//  }
+//
+//  @Override
+//  public ISOSSession getSession() {
+//    return this;
+//  }
 
   @Override
   public boolean remoteIsWindowsShell() {
@@ -491,29 +491,25 @@ public class SOSSSH2JcraftImpl extends SOSSSH2BaseImpl implements ISOSShell, ISO
     }
   }
 
-  @Override
-  public ISOSVirtualFolder mkdir(SOSFolderName pobjFolderName) throws IOException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public boolean rmdir(SOSFolderName pobjFolderName) throws IOException {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  @Override
-  public SOSFileList dir(SOSFolderName pobjFolderName) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public SOSFileList dir(String pathname, int flag) {
-    // TODO Auto-generated method stub
-    return null;
-  }
+//  @Override
+//  public ISOSVirtualFolder mkdir(SOSFolderName pobjFolderName) throws IOException {
+//    return null;
+//  }
+//
+//  @Override
+//  public boolean rmdir(SOSFolderName pobjFolderName) throws IOException {
+//    return false;
+//  }
+//
+//  @Override
+//  public SOSFileList dir(SOSFolderName pobjFolderName) {
+//    return null;
+//  }
+//
+//  @Override
+//  public SOSFileList dir(String pathname, int flag) {
+ //    return null;
+//  }
 
   @Override
   public void doPostLoginOperations() {

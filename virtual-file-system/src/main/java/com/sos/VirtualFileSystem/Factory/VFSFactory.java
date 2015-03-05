@@ -58,12 +58,14 @@ import com.sos.i18n.annotation.I18NResourceBundle;
  * @author KB
  *
  */
-@I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en") public class VFSFactory extends SOSVfsMessageCodes {
+@I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en") 
+public class VFSFactory extends SOSVfsMessageCodes {
 	private final static String						conClassName			= "VFSFactory";
 	// private static Logger logger = Logger.getLogger(VFSFactory.class);
 	private static Logger							logger					= Logger.getRootLogger();
 	protected static Msg							objMsg					= new Msg(new BundleBaseName("SOSVirtualFileSystem"));
 	private static SOSConnection2OptionsAlternate	objConnectionOptions	= null;
+	private static boolean useTrilead = true;
 //	public static String							sFTPHandlerClassName	= "com.sos.VirtualFileSystem.SFTP.SOSVfsSFtp";
 	// TODO change default data provider for sftp to com.sos.VirtualFileSystem.SFTP.SOSVfsSFtpFileJCraft
 	public static String							sFTPHandlerClassName	= "com.sos.VirtualFileSystem.SFTP.SOSVfsSFtpJCraft";
@@ -95,6 +97,8 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 */
 	private static String							strParentLoggerName		= "";
 	private static ClassLoader						classLoader				= null;
+  private static final String USE_TRILEAD = ".TRILEAD";
+  private static final String USE_JCRAFT = ".JCRAFT";
 
 	/**
 	 *
@@ -130,14 +134,13 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 		boolean authenticate = true;
 		ISOSVFSHandler objC = null;
 		URL objURL = null;
-		// TODO Type of filesystem as an enumeration
-		String strWhatSystem = pstrWhatURL;
+		
 		// Possible Elements of an URL are:
 		//
 		// http://hans:geheim@www.example.org:80/demo/example.cgi?land=de&stadt=aa#geschichte
-		// |        |     | | | | | |
-		// |        |     | host | url-path searchpart fragment
-		// |        |   password port
+		// |        |     |    | | | |        |
+		// |        |     |       host        |   url-path searchpart fragment
+		// |        |   password             port
 		// |       user
 		// protocol
 		/**
@@ -161,6 +164,15 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 		if (pstrWhatURL.startsWith("local:") == true) {
 			pstrWhatURL = pstrWhatURL.replace("local:", "file:");
 		}
+		if(pstrWhatURL.contains(USE_TRILEAD)){
+		  useTrilead = true;
+		  pstrWhatURL = pstrWhatURL.replace(USE_TRILEAD, "");
+		}else if(pstrWhatURL.contains(USE_JCRAFT)){
+		  useTrilead = false;
+		  pstrWhatURL = pstrWhatURL.replace(USE_JCRAFT, "");
+		}
+    // TODO Type of filesystem as an enumeration
+    String strWhatSystem = pstrWhatURL;
 		try {
 			objURL = new URL(pstrWhatURL);
 			strWhatSystem = objURL.getProtocol();
@@ -179,9 +191,16 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 			// objC = new SOSSSH2GanymedImpl();
 			// logger.debug(conMethodName + " returns instance of " + SOSSSH2GanymedImpl.class.toString());
 			// Class objA = classLoader.loadClass("com.sos.VirtualFileSystem.SSH.SOSSSH2GanymedImpl");
+
 //      Class objA = classLoader.loadClass("com.sos.VirtualFileSystem.SSH.SOSSSH2TriLeadImpl");
-      Class objA = classLoader.loadClass("com.sos.VirtualFileSystem.SSH.SOSSSH2JcraftImpl");
-			ISOSVFSHandler objD = (ISOSVFSHandler) objA.newInstance();
+		  Class objA;
+      if (useTrilead){
+        objA = classLoader.loadClass("com.sos.VirtualFileSystem.SSH.SOSSSH2TriLeadImpl");
+      }else {
+        objA = classLoader.loadClass("com.sos.VirtualFileSystem.SSH.SOSSSH2JcraftImpl");
+      }
+			
+      ISOSVFSHandler objD = (ISOSVFSHandler) objA.newInstance();
 			logger.trace(SOSVfs_D_0201.params(conMethodName, objD.toString()));
 			if (objD instanceof ISOSVFSHandler) {
 				logger.trace("ISOSVFSHandler is part of class   ...  " + objA.toString());
