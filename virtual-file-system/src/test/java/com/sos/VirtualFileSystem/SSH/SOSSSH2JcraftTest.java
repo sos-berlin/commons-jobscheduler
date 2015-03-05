@@ -35,7 +35,7 @@ public class SOSSSH2JcraftTest {
   private static final String CONNECTION_TYPE_SHELL = "shell";
   private static final String CONNECTION_TYPE_EXECUTE = "exec";
   private static final int TIMEOUT = 3*1000;
-  private String command = "echo '**Hallo world!**'";
+  private String command = "echo **Hallo world!**";
   private Logger log = LoggerFactory.getLogger(SOSSSH2JcraftTest.class);
   private SOSOptionUserName optionUserName;
   private SOSOptionPassword optionPassword;
@@ -97,56 +97,69 @@ public class SOSSSH2JcraftTest {
   
   @Test
   public void testSessionConnect() throws JSchException, RuntimeException{
+    log.debug("Test testSessionConnect started!");
     sessionConnect();
     assertTrue(sshSession.isConnected());
     sshSession.disconnect();
+    log.debug("Test testSessionConnect ended!");
   }
   
   @Test
   public void testSessionDisconnect() throws JSchException, RuntimeException{
+    log.debug("Test testSessionDisconnect started!");
     sessionConnect();
     sshSession.disconnect();
     assertFalse(sshSession.isConnected());
+    log.debug("Test testSessionDisconnect ended!");
   }
   
   @Test
   public void testShellChannelConnect() throws JSchException, RuntimeException{
+    log.debug("Test testShellChannelConnect started!");
     sessionConnect();
     shellChannelConnect();
     assertTrue(sshChannel.isConnected());
     sshChannel.disconnect();
     sshSession.disconnect();
+    log.debug("Test testShellChannelConnect ended!");
   }
   
   @Test
   public void testShellChannelDisconnect() throws JSchException, RuntimeException{
+    log.debug("Test testShellChannelDisconnect started!");
     sessionConnect();
     shellChannelConnect();
     sshChannel.disconnect();
     sshSession.disconnect();
     assertFalse(sshChannel.isConnected());
+    log.debug("Test testShellChannelDisconnect ended!");
   }
   
   @Test
   public void testExecuteChannelConnect() throws JSchException, RuntimeException{
+    log.debug("Test testExecuteChannelConnect started!");
     sessionConnect();
     executeChannelConnect();
     assertTrue(executeChannel.isConnected());
     executeChannel.disconnect();
     sshSession.disconnect();
+    log.debug("Test testExecuteChannelConnect ended!");
   }
   
   @Test
   public void testExecuteChannelDisconnect() throws JSchException, RuntimeException{
+    log.debug("Test testExecuteChannelDisconnect started!");
     sessionConnect();
     executeChannelConnect();
     executeChannel.disconnect();
     sshSession.disconnect();
     assertFalse(executeChannel.isConnected());
+    log.debug("Test testExecuteChannelDisconnect ended!");
   }
   
   @Test
   public void testExecuteCommand() throws JSchException, RuntimeException, IOException{
+    log.debug("Test testExecuteCommand started!");
     sessionConnect();
     executeChannelWithCommandConnect();
     InputStream in = executeChannel.getInputStream();
@@ -168,16 +181,18 @@ public class SOSSSH2JcraftTest {
     }
     log.debug("output = {}", output);
     assertTrue(output.length() > 0);
-    assertEquals("exit code not as expected", 0, exitCode);
-    assertEquals("output not as expected", "**Hallo world!**\n", output);
+    assertEquals("exit code as expected", 0, exitCode);
+    assertEquals("output as expected", "**Hallo world!**\n", output);
     executeChannel.disconnect();
     sshSession.disconnect();
+    log.debug("Test testExecuteCommand ended!");
   }
   
   @Test
   public void testExecuteCommandOnWindows() throws JSchException, RuntimeException, IOException{
+    log.debug("Test testExecuteCommandOnWindows started!");
     sessionConnectWindows();
-    executeChannelWithCommandConnect("dir");
+    executeChannelWithCommandConnect(command);
     InputStream in = executeChannel.getInputStream();
     String output = "";
     int exitCode = -1;
@@ -198,9 +213,10 @@ public class SOSSSH2JcraftTest {
     log.debug("output = {}", output);
     assertTrue(output.length() > 0);
     assertEquals("exit code not as expected", 0, exitCode);
-    assertEquals("output not as expected", "**Hallo world!**\n", output);
+    assertEquals("output not as expected", "**Hallo world!**\r\n", output);
     executeChannel.disconnect();
     sshSession.disconnect();
+    log.debug("Test testExecuteCommandOnWindows ended!");
   }
   
   private void sessionConnect() throws JSchException, RuntimeException{
