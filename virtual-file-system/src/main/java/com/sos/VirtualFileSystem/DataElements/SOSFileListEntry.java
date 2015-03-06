@@ -250,7 +250,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		objJadeReportLogger.info(strM);
 	}
 
-	@SuppressWarnings("finally") private long doTransfer(final ISOSVirtualFile objInput, final ISOSVirtualFile objOutput) {
+	private boolean doTransfer(final ISOSVirtualFile objInput, final ISOSVirtualFile objOutput) {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::doTransfer";
 		boolean flgClosingDone = false;
 		if (objOutput == null) {
@@ -267,7 +267,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 				md = MessageDigest.getInstance(objOptions.SecurityHashType.Value());
 			}
 			catch (NoSuchAlgorithmException e1) {
-				e1.printStackTrace();
+				logger.error(e1.getLocalizedMessage(), e1);
 				flgCreateSecurityHash = false;
 			}
 		}
@@ -312,7 +312,6 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 							objOutput.write(buffer, 0, intBytes2Write);
 						}
 						catch (JobSchedulerException e) {
-							//e.printStackTrace(System.err);
 							logger.error(e.getMessage());
 							break;
 						}
@@ -329,6 +328,10 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 			objInput.closeInput();
 			objOutput.closeOutput();
 			flgClosingDone = true;
+			// objDataTargetClient.CompletePendingCommand();
+			if (objDataTargetClient.isNegativeCommandCompletion()) {
+				RaiseException(SOSVfs_E_175.params(objTargetTransferFile.getName(), objDataTargetClient.getReplyString()));
+			}
 			if (flgCreateSecurityHash) {
 				strMD5Hash = toHexString(md.digest());
 				logger.info(SOSVfs_I_274.params(strMD5Hash, strSourceTransferName, objOptions.SecurityHashType.Value()));
@@ -339,20 +342,16 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 					objF.deleteOnExit();
 				}
 			}
-			// objDataTargetClient.CompletePendingCommand();
-			if (objDataTargetClient.isNegativeCommandCompletion()) {
-				RaiseException(SOSVfs_E_175.params(objTargetTransferFile.getName(), objDataTargetClient.getReplyString()));
-			}
 			this.setNoOfBytesTransferred(lngTotalBytesTransferred);
 			lngTotalBytesTransferred += intCumulativeFileSeperatorLength;
 			executeTFNPostCommnands();
-			return lngTotalBytesTransferred;
+			return true;
 		}
 		catch (Exception e) {
 			String strT = SOSVfs_E_229.params(e);
 			// TODO rollback?
 			logger.error(strT);
-			throw new JobSchedulerException(strT, e);
+			return false;
 		}
 		finally {
 			if (flgClosingDone == false) {
@@ -360,7 +359,6 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 				objOutput.closeOutput();
 				flgClosingDone = true;
 			}
-			return lngTotalBytesTransferred;
 		}
 	} //doTransfer
 
@@ -377,7 +375,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 					pobjDataClient.getHandler().ExecuteCommand(strCmd);
 				}
 				catch (Exception e) {
-					e.printStackTrace(System.err);
+					logger.error(e.getLocalizedMessage());
 					throw new JobSchedulerException(conMethodName, e);
 				}
 			}
@@ -723,8 +721,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	} // private void Options
 
 	private void RaiseException(final Exception e, final String pstrM) {
-		logger.error(pstrM);
-		//e.printStackTrace(System.err);
+		logger.error(pstrM + " (" + e.getLocalizedMessage() + ")");
 		throw new JobSchedulerException(pstrM, e);
 	}
 
@@ -774,7 +771,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 					objDataTargetClient.mkdir(strP);
 				}
 				catch (IOException e) {
-					e.printStackTrace();
+					logger.error(e.getLocalizedMessage());
 				}
 			}
 			objTargetTransferFile.rename(pstrTargetFileName);
@@ -983,20 +980,26 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 				}
 			}
 			RenameSourceFile(objSourceFile);
-			objDataSourceClient.getHandler().release();
-			objDataTargetClient.getHandler().release();
-			if (flgNewConnectionUsed == true) {
-				objDataSourceClient.logout();
-				objDataSourceClient.disconnect();
-				objDataTargetClient.logout();
-				objDataTargetClient.disconnect();
-			}
 		}
 		catch (Exception e) {
 			String strT = SOSVfs_E_229.params(e);
 			// TODO rollback?
 			logger.error(strT);
 			throw new JobSchedulerException(strT, e);
+		}
+		finally {
+			objDataSourceClient.getHandler().release();
+			objDataTargetClient.getHandler().release();
+			try {
+				if (flgNewConnectionUsed == true) {
+					objDataSourceClient.logout();
+					objDataSourceClient.disconnect();
+					objDataTargetClient.logout();
+					objDataTargetClient.disconnect();
+				}
+			} catch (IOException e) {
+				//
+			}
 		}
 	}
 
@@ -1425,7 +1428,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 			strT = SOSVfs_D_214.params(this.getTargetFileNameAndPath(), this.SourceFileName(), this.NoOfBytesTransferred(), objOptions.operation.Value());
 		}
 		catch (RuntimeException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 			strT = "???";
 		}
 		return strT;
