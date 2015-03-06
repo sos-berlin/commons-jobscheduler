@@ -95,7 +95,7 @@ public class TestJadeFiles {
 		filesTable.setSourceDir("mySourceDir");
 		filesTable.setSourceFilename("mySourceFilename");
 		filesTable.setMd5(randomUUIDString);
-		filesTable.setFileSize(1);
+		filesTable.setFileSize(1L);
 		filesTable.setModifiedBy("myModifiedBy");
 		filesTable.setCreatedBy("myCreatedBy");
 		filesTable.setCreated(new Date());
@@ -125,7 +125,7 @@ public class TestJadeFiles {
 		historyTable.setSourceUser("mySourceUser");
 		historyTable.setSourceDir("mySourceDir");
 		historyTable.setSourceFilename("mySourceFilename");
-		historyTable.setFileSize(1);
+		historyTable.setFileSize(1L);
 		historyTable.setMd5(randomUUIDString);
 		historyTable.setModifiedBy("myModifiedBy");
 		historyTable.setCreatedBy("myCreatedBy");
