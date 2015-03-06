@@ -3,9 +3,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Listener.JSListener;
 import com.sos.JSHelper.Options.JSJobChain;
 import com.sos.JSHelper.Options.JSOptionsClass;
@@ -91,6 +94,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	protected Messages			objMsg				= new Messages(this.getClass().getAnnotation(I18NResourceBundle.class).baseName());
 	private static final long	serialVersionUID	= -4445655877481869778L;
 	private final String		conClassName		= "SOSFtpOptionsSuperClass";
+	private final static Logger		logger		= Logger.getLogger(SOSFtpOptionsSuperClass.class);
 	// SOSFtp-191 Option TFN_Post_Command: commands executed after creating the final TargetFile
 	/**
 	 * \option TFN_Post_Command
@@ -6879,7 +6883,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 			super.setAllOptions(map);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 		}
 	}
 

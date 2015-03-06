@@ -495,8 +495,8 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
 					objVFSHandler.CompletePendingCommand() ;
 				}
 				catch (Exception e) {
-					e.printStackTrace(System.err);  //  SocketTimeOut???
-					throw e;
+					logger.error(e.getLocalizedMessage());  //  SocketTimeOut???
+					throw new JobSchedulerException(e);
 				}
 			}
 		}

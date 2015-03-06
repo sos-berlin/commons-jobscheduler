@@ -300,7 +300,6 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
 			throw new JobSchedulerException(String.format("Class with Name '%1$s' not found and not loaded", strLoadClassName), e);
 		}
 		return objC;
@@ -317,13 +316,13 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 							addUrlMethod.invoke(classLoader1, jar.toURI().toURL());
 						}
 						catch (Exception e) {
-							e.printStackTrace();
+							logger.error(e.getLocalizedMessage());
 						}
 					}
 				}
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				logger.error(e.getLocalizedMessage());
 			}
 		}
 	}

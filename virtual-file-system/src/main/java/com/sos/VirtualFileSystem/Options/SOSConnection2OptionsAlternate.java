@@ -317,7 +317,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 				keePassDb = KeePassDataBaseManager.openDataBase(fleKeePassDataBase, fleKeyFile, strPassword);
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				logger.error(e.getLocalizedMessage());
 				throw new JobSchedulerException(e);
 			}
 			kdb1 = (KeePassDataBaseV1) keePassDb;

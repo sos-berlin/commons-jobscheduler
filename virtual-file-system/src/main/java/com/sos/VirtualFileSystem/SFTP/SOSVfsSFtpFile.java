@@ -200,7 +200,7 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 			throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);
 		}
 		return objOutputStream;
@@ -576,8 +576,7 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
 				lngR = objFA.mtime;
 			}
 			catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.error(e.getLocalizedMessage());
 			}
 		}
 		// TODO Auto-generated method stub
@@ -594,8 +593,7 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
 				lngR = pdteDateTime;
 			}
 			catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.error(e.getLocalizedMessage());
 			}
 		}
 		return lngR;

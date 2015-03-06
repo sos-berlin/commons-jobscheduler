@@ -1,5 +1,7 @@
 package com.sos.JSHelper.Exceptions;
 
+import org.apache.log4j.Logger;
+
 import com.sos.JSHelper.Options.JSOptionsClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.localization.SOSMsg;
@@ -59,6 +61,8 @@ public class JobSchedulerException extends RuntimeException {
 	protected SOSMsg			objSOSMsg					= null;
 
 	public static String		LastErrorMessage			= "";
+	
+	private final static Logger		logger		= Logger.getLogger(JobSchedulerException.class);
 
 	public JobSchedulerException() {
 		super("*** JobSchedulerException ***");
@@ -148,13 +152,15 @@ public class JobSchedulerException extends RuntimeException {
 		if (e instanceof JobSchedulerException) {
 			JobSchedulerException objXE = (JobSchedulerException) e;
 			if (objXE.flgStackTracePrinted == false) {
-				e.printStackTrace(System.err);
+				logger.trace("", e);
+				//e.printStackTrace(System.err);
 				objXE.flgStackTracePrinted = true;
 			}
 		}
 		else {
 			if (gflgStackTracePrinted == false) {
-				e.printStackTrace(System.err);
+				logger.trace("", e);
+				//e.printStackTrace(System.err);
 				gflgStackTracePrinted = true;
 			}
 		}
@@ -176,14 +182,9 @@ public class JobSchedulerException extends RuntimeException {
 	}
 
 	private void setMessage(final String pstrMsg) {
-
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::setMessage";
-
 		strMessage = pstrMsg;
 		LastErrorMessage = pstrMsg;
-
-	} // private void setMessage
+	}
 
 	/**
 	 * @return the nested exception
