@@ -86,6 +86,6 @@ public class JSDataElementDateTimeTest {
 		Date objD = new Date(2011-1900, 0, 25, 15, 15);
 		System.out.println("objD =" + objD.toLocaleString());
 		JSDataElementDateTime objDT = new JSDataElementDateTime(objD);
-		assertEquals("Date", "2011.01.25 15:15:00", objDT.FormattedValue());
+		assertEquals("Date", "2011-01-25 15:15:00", objDT.FormattedValue());
 	}
 }

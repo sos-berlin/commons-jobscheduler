@@ -39,6 +39,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFileSystem;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFolder;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsSuperClass;
+import com.sos.VirtualFileSystem.common.SOSFileEntries;
 import com.sos.VirtualFileSystem.common.SOSVfsBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
@@ -1696,4 +1697,9 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 	@Override public void write(final byte[] bteBuffer, final int intOffset, final int intLength) {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::write";
 	}
+
+    @Override
+    public SOSFileEntries getSOSFileEntries() {
+        return sosFileEntries;
+    }
 }

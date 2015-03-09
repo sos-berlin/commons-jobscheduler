@@ -32,6 +32,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsSuperClass;
 import com.sos.VirtualFileSystem.SFTP.SOSVfsSFtpFileJCraft;
+import com.sos.VirtualFileSystem.common.SOSFileEntries;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
@@ -952,4 +953,9 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
 	@Override public InputStream getInputStream() {
 		return null;
 	}
+
+    @Override
+    public SOSFileEntries getSOSFileEntries() {
+        return sosFileEntries;
+    }
 }

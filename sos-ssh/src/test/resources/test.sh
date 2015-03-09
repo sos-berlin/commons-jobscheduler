@@ -1,0 +1,3 @@
+#!/bin/bash
+echo MY_PARAM=myParam >> $SCHEDULER_RETURN_VALUES
+echo MY_OTHER_PARAM=myOtherParam >> $SCHEDULER_RETURN_VALUES

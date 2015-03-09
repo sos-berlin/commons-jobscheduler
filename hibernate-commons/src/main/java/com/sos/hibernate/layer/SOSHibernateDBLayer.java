@@ -2,6 +2,7 @@ package com.sos.hibernate.layer;
 
 import com.sos.hibernate.classes.ClassList;
 import com.sos.hibernate.classes.SosHibernateSession;
+
 import org.apache.log4j.Logger;
 import org.hibernate.CacheMode;
 import org.hibernate.Query;
@@ -67,14 +68,15 @@ public class SOSHibernateDBLayer {
 	
  	}
 
-    public void initSession()    {
+    public void initSession()     {
       try {
         initSessionEx();
     } catch (Exception e) {
         String s = String.format("Could not initiate session for database using file %s",SosHibernateSession.configurationFile);
         logger.error(s);
         e.printStackTrace();
-     }
+        throw new RuntimeException(e);
+      }
    }
 
 	

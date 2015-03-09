@@ -110,4 +110,5 @@ public class SOSLoginDialog extends Dialog {
 		this.message = message;
 	}
 
+  
 }

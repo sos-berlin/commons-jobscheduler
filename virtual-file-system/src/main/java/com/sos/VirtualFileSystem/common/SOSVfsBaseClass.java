@@ -54,9 +54,11 @@ public class SOSVfsBaseClass extends SOSVfsMessageCodes {
 	private enuSourceOrTarget	intSourceOrTarget	= enuSourceOrTarget.isUndefined;			// source
 
 	protected SOSFTPOptions		objOptions			= null;
+	protected   SOSFileEntries    sosFileEntries      = null;
 
 	public SOSVfsBaseClass() {
 		super("SOSVirtualFileSystem" /* SOSVfsConstants.strBundleBaseName */);
+		sosFileEntries = new SOSFileEntries();
 	}
 
 	public boolean isConnected () {

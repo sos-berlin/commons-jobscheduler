@@ -16,13 +16,13 @@ public class SOSOptionUrlTest {
 		assertEquals("folder name", "/home/test/test.txt", objU.getFolderName());
 		
 		objU.Value("ftp://kb:kb@homer.sos/./test/test.txt");
-		assertEquals("folder name", "./test/test.txt", objU.getFolderName());
+		assertEquals("folder name", "/./test/test.txt", objU.getFolderName());
 		
 	}
 
 	@Test public void testValueString2() {
 		objU.Value("file:///./JCLs");
-		assertEquals("folder name", "./JCLs", objU.getFolderName());
+		assertEquals("folder name", "/./JCLs", objU.getFolderName());
 	}
 
 	@Test public void testValueString3() {

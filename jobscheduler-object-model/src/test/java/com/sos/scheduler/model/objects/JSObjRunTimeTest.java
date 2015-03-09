@@ -201,8 +201,7 @@ public class JSObjRunTimeTest extends TestBase {
 	}
 
 	@Test
-  @Ignore("Test set to Ignore for later examination")
-	public final void testSingleStarts() {
+ 	public final void testSingleStarts() {
 		xml = "<run_time>" +
 				"<period single_start=\"21:00\" />" + 
 				"<period single_start=\"22:00\" />" + 

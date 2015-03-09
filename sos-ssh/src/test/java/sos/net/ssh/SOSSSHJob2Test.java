@@ -44,7 +44,6 @@ import com.sos.i18n.annotation.I18NResourceBundle;
  */
 @I18NResourceBundle(baseName = "com.sos.net.messages", defaultLocale = "en")
 // oh 07.05.14 test haengt? [SP] testSimulateShellParam haengt, testExecuteWithCCAndDelimiter schlägt fehl
-@Ignore("Test set to Ignore for later examination")
 public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 	@SuppressWarnings({ "hiding" })
 	private static final Logger	logger			= Logger.getLogger(SOSSSHJob2Test.class);
@@ -57,12 +56,14 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 	}
 
 	private void initializeClazz () {
-		objSSH = new SOSSSHJob2();
+		objSSH = new SOSSSHJobTrilead();
 		objOptions = objSSH.Options();
 		objSSH.setJSJobUtilites(this);
 		JSListenerClass.bolLogDebugInformation = true;
 		JSListenerClass.intMaxDebugLevel = 9;
-		BasicConfigurator.configure();
+    if( !Logger.getRootLogger().getAllAppenders().hasMoreElements() ) {
+      BasicConfigurator.configure();
+    }
 		logger.setLevel(Level.DEBUG);
 	}
 	@Test
@@ -135,6 +136,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 	*
 	 */
 	@Test
+	@Ignore("Test set to Ignore for later examination")
 	public void testExecuteWithCCAndDelimiter() throws Exception {
 		initializeClazz();
 		String strArgs[] = new String[] { "-command", "ls hallo%%exit 0", "-auth_method", "password", "-host", "wilma.sos", "-auth_file", "test", "-user",
@@ -209,6 +211,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 	}
 
 	@Test
+	@Ignore("Test set to Ignore for later examination")
 	public void testSimulateShellParam() throws Exception {
 		initializeClazz();
 		String strArgs[] = new String[] { "-command", "ls", "-auth_method", "password", "-host", "wilma.sos", "-port", "22", "-user", "test", "-password",

@@ -48,7 +48,7 @@ public class JadeFilesDBItem extends DbItem {
      private String sourceDir;
      private String sourceFilename;
      private String md5;
-     private Integer fileSize;
+     private Long fileSize;
      private Date   created;
      private String createdBy;
      private Date   modified;
@@ -100,13 +100,13 @@ public class JadeFilesDBItem extends DbItem {
 
     
     @Column(name="`FILE_SIZE`",nullable=false)
-    public Integer getFileSize() {
+    public Long getFileSize() {
 		return fileSize;
 	}
 
 
     @Column(name="`FILE_SIZE`",nullable=false)
-	public void setFileSize(Integer fileSize) {
+	public void setFileSize(Long fileSize) {
 		this.fileSize = fileSize;
 	}
  

@@ -39,7 +39,7 @@ import java.util.GregorianCalendar;
 *
 * Created on 19.01.2012 12:57:02
  */
-public class DbItem {
+public  class DbItem {
 
 	@SuppressWarnings("unused")
 	private final String	conClassName	= "DbItem";
@@ -109,6 +109,9 @@ public class DbItem {
  		return "";
  	}
 
+    @Transient
+ 	public void setOrderId(String orderId) {
+  	}
  
  	private boolean isToday(Date d) {
 	    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");

@@ -170,16 +170,25 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 				throw new JobSchedulerException("error occurred establishing database connection: " + e.getMessage());
 			}
 
+
 			localConnection.setExecReturnsResultSet(execReturnsResultSet);
 			try {
-				if (orderJob)
-					command = JobSchedulerManagedObject.getOrderCommand(this.getConnection(), this);
+				
+				String commandScript = getJobScript();
+			    getLogger().debug9("setting 'command_script' value from script tag of job: " + commandScript);
+			
+				
+				if (orderJob){
+					command = JobSchedulerManagedObject.getOrderCommand(this.getConnection(), this, commandScript );
+				}
+				
 				if (command == null || command.length() == 0) {
 					command = JobSchedulerManagedObject.getJobCommand(this.getConnection(), this);
 				}
 
-				if (command == null || command.length() == 0)
+				if (command == null || command.length() == 0){
 					throw new JobSchedulerException("command is empty");
+				}
 			}
 			catch (Exception e) {
 				throw new JobSchedulerException("no database command found: " + e);
@@ -239,13 +248,13 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 								}
 								if (columnCount == 2) {
 									//if (realOrderParams.value(orderParamKey) == null || realOrderParams.value(orderParamKey).length() == 0) 
-									{
+									//{
 										realOrderParams.set_var(orderParamKey, value);
 										resultsetNameValueReady = true;
 										if (resultsetAsWarning == false) {
 											break;
 										}
-									}
+									//}
 								}
 							}
 							else

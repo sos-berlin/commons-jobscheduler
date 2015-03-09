@@ -608,6 +608,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 
 	@Override
 	public void CommandLineArgs(final String pstrArgs) {
+		//TODO split(" ") is buggy, wenn der Wert einer Option ein Leerzeichen enthält.
 		try {
 			this.CommandLineArgs(pstrArgs.split(" "));
 		}
@@ -957,8 +958,8 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		objAlt.host.Value(alternative_host.Value());
 		objAlt.port.value(alternative_port.value());
 		objAlt.protocol.Value(protocol.Value());
-		objT.passive_mode.Value(alternative_passive_mode.Value());
-		objT.transfer_mode.Value(alternative_transfer_mode.Value());
+		objAlt.passive_mode.Value(alternative_passive_mode.Value());
+		objAlt.transfer_mode.Value(alternative_transfer_mode.Value());
 		//		objT.loadClassName.Value(loadClassName.Value());
 	}
 
@@ -975,8 +976,8 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		objAlt.host.Value("localhost");
 		objAlt.port.value(0);
 		objAlt.protocol.Value("local");
-		objT.passive_mode.Value("");
-		objT.transfer_mode.Value("");
+		objAlt.passive_mode.Value("");
+		objAlt.transfer_mode.Value("");
 		//		objT.loadClassName.Value(loadClassName.Value());
 	}
 
@@ -1028,7 +1029,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			objAlt.host.Value(alternative_host.Value());
 			objAlt.port.value(alternative_port.value());
 			objAlt.protocol.Value(protocol.Value());
-			objT.passive_mode.Value(alternative_passive_mode.Value());
+			objAlt.passive_mode.Value(alternative_passive_mode.Value());
 		}
 		else {
 			if (operation.Value().equalsIgnoreCase(conOperationRECEIVE)) {
@@ -1050,7 +1051,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 				objAlt.host.Value(alternative_host.Value());
 				objAlt.port.value(alternative_port.value());
 				objAlt.protocol.Value(protocol.Value());
-				objT.passive_mode.Value(alternative_passive_mode.Value());
+				objAlt.passive_mode.Value(alternative_passive_mode.Value());
 			}
 			else {
 				strDataSourceType = this.getConnectionOptions().Source().protocol.Value();

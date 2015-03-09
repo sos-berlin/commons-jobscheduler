@@ -12,6 +12,7 @@ import java.util.Vector;
 
 import com.sos.JSHelper.Options.SOSOptionTransferMode;
 import com.sos.VirtualFileSystem.DataElements.SOSFolderName;
+import com.sos.VirtualFileSystem.common.SOSFileEntries;
 
 public interface ISOSVfsFileTransfer {
 
@@ -254,6 +255,8 @@ public interface ISOSVfsFileTransfer {
 	public Vector<ISOSVirtualFile> getFiles();
 
 	public void putFile(ISOSVirtualFile objVF);
+
+    public SOSFileEntries getSOSFileEntries();
 
 
 }
