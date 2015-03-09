@@ -590,7 +590,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 	          @SuppressWarnings("unused")
 	          final String conMethodName = conClassName + "::replaceSchedulerVarsInString";
 	          String strTemp = pstrString2Modify;
-	          logger.debug("strTemp = " + strTemp);
 
 	          JSJ_D_0080.toLog();
 	          
