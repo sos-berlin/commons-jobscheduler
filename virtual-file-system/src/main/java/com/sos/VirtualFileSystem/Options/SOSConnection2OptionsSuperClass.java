@@ -1415,4 +1415,23 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	public void setdomain(final SOSOptionString p_domain) {
 		domain = p_domain;
 	}
+
+  @JSOptionDefinition(name = "raise_exception_on_error", description = "Raise an Exception if an error occured", key = "raise_exception_on_error", type = "SOSOptionBoolean", mandatory = true)
+  public SOSOptionBoolean   raise_exception_on_error  = new SOSOptionBoolean( // ...
+                                this, // ....
+                                conClassName + ".raise_exception_on_error", // ...
+                                "Raise an Exception if an error occured", // ...
+                                "true", // ...
+                                "true", // ...
+                                true);
+  
+
+  public SOSOptionBoolean getraise_exception_on_error() {
+    return raise_exception_on_error;
+  } 
+
+  public void setraise_exception_on_error(final SOSOptionBoolean raiseExceptionOnError) {
+    this.raise_exception_on_error = raiseExceptionOnError;
+  } 
+
 } // public class SOSConnection2OptionsSuperClass

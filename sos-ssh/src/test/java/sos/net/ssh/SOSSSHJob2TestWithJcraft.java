@@ -62,18 +62,17 @@ public class SOSSSHJob2TestWithJcraft extends JSJobUtilitiesClass<SOSSSHJobOptio
   }
 
   @Test
-  @Ignore
   public void testExecuteOverProxyLinux() throws Exception {
     logger.info("****testExecuteLinux started****");
     String strArgs[] = new String[] { 
         "-command", "echo ****testExecuteLinux successfully processed!****", 
         "-auth_method", "password", 
-        "-host", "uk.sos-berlin.com", 
+        "-host", "wilma.sos", 
         "-user", "test", 
         "-password", "12345",
         "-proxy_host", "homer.sos", 
         "-proxy_port", "3128", 
-        "-proxy_user", "test", 
+        "-proxy_user", "proxy_user", 
         "-proxy_password", "12345",
         "-command_delimiter", ";" };
     objOptions.CommandLineArgs(strArgs);

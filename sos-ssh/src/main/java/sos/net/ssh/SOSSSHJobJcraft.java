@@ -18,6 +18,7 @@ import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
+import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.SFTP.SOSVfsSFtpJCraft;
 import com.sos.VirtualFileSystem.SSH.SOSSSH2TriLeadImpl;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
@@ -123,15 +124,14 @@ public class SOSSSHJobJcraft extends SOSSSHJob2 {
     return vfsHandler;
   }
 
-  @SuppressWarnings("deprecation")
   private void openPrePostCommandsSession(){
     try {
       if (!prePostCommandVFSHandler.isConnected()) {
-        prePostCommandVFSHandler.Connect(objOptions);
+        SOSConnection2OptionsAlternate postAlternateOptions = getAlternateOptions(objOptions);
+        postAlternateOptions.raise_exception_on_error.value(false);
+        prePostCommandVFSHandler.Connect(postAlternateOptions);
       }
-      ISOSAuthenticationOptions objAU = objOptions;
-      @SuppressWarnings("unused")
-      ISOSConnection authenticate = prePostCommandVFSHandler.Authenticate(objAU);
+      prePostCommandVFSHandler.Authenticate(objOptions);
       logger.debug("connection established");
     } catch (Exception e) {
       throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
@@ -162,9 +162,6 @@ public class SOSSSHJobJcraft extends SOSSSHJob2 {
     try {
       if (isConnected == false) {
         this.Connect();
-      }
-      if(vfsHandler instanceof SOSSSH2TriLeadImpl){
-        vfsHandler.OpenSession(objOptions);
       }
 
       if (objOptions.command.IsEmpty() == false) {
@@ -239,7 +236,7 @@ public class SOSSSHJobJcraft extends SOSSSHJob2 {
   public void DisConnect() {
     if (isConnected == true) {
       try {
-        vfsHandler.CloseSession();
+        vfsHandler.CloseConnection();
       } catch (Exception e) {
         throw new SSHConnectionError("problems closing connection", e);
       }
@@ -256,4 +253,42 @@ public class SOSSSHJobJcraft extends SOSSSHJob2 {
     logger.debug(String.format(SOSVfsMessageCodes.SOSVfs_D_254.params(fileNameToDelete)));
   }
 
+  @SuppressWarnings("deprecation")
+  public SOSSSHJob2 Connect() {
+    getVFS();
+    Options().CheckMandatory();
+
+    try {
+      SOSConnection2OptionsAlternate alternateOptions = getAlternateOptions(objOptions);
+      vfsHandler.Connect(alternateOptions);
+      vfsHandler.Authenticate(objOptions);
+      logger.debug("connection established");
+    }
+    catch (Exception e) {
+      throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
+    }
+
+    flgIsWindowsShell = vfsHandler.remoteIsWindowsShell();
+    isConnected = true;
+    
+    // http://www.sos-berlin.com/jira/browse/JITL-112: 
+    //   preparePostCommandHandler() has to be called once to generate a 
+    //   second instance for post processing of stored return values
+    preparePostCommandHandler();
+    return this;
+  } // private SOSSSHJob2 Connect
+  
+  private SOSConnection2OptionsAlternate getAlternateOptions(SOSSSHJobOptions options){
+    SOSConnection2OptionsAlternate alternateOptions = new SOSConnection2OptionsAlternate();
+    alternateOptions.setStrict_HostKey_Checking("no");
+    alternateOptions.host.Value(options.getHost().Value());
+    alternateOptions.port.value(options.getPort().value());
+    alternateOptions.user.Value(options.getUser().Value());
+    alternateOptions.proxy_host.Value(options.getProxy_host().Value());
+    alternateOptions.proxy_port.value(options.getProxy_port().value());
+    alternateOptions.proxy_user.Value(options.getProxy_user().Value());
+    alternateOptions.proxy_password.Value(options.getProxy_password().Value());
+    alternateOptions.raise_exception_on_error.value(options.getraise_exception_on_error().value());
+    return alternateOptions;
+  }
 }

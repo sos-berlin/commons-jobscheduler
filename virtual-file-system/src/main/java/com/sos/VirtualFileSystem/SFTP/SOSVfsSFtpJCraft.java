@@ -73,7 +73,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	private StringBuffer outContent;
 	private StringBuffer errContent;
     private boolean isRemoteWindowsShell = false;
-    private boolean raiseExeptionOnCommandExecution = true;
 
     //proxy
     private String proxyHost = null;
@@ -634,7 +633,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		}
 		catch (Exception ex) {
 			reply = ex.toString();
-			if(raiseExeptionOnCommandExecution){
+			if(connection2OptionsAlternate.raise_exception_on_error.value()){
 	      RaiseException(ex, SOSVfs_E_134.params("ExecuteCommand"));
 			}
 			

@@ -121,7 +121,7 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 	 * @return
 	 * @throws Exception
 	 */
-	private ISOSVFSHandler getVFS() {
+	protected ISOSVFSHandler getVFS() {
 	  // http://www.sos-berlin.com/jira/browse/JITL-112: get the Handler from the correct Job Extension Class
 	  objVFS = getVFSSSH2Handler();
     // http://www.sos-berlin.com/jira/browse/JITL-112: second instance with own session for pre/post commands
