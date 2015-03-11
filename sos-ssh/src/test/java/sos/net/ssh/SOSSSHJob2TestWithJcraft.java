@@ -6,9 +6,11 @@ import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import sos.net.ssh.exceptions.SSHExecutionError;
+import sos.net.ssh.exceptions.SSHMissingCommandError;
 
 import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
 import com.sos.JSHelper.Listener.JSListenerClass;
@@ -51,6 +53,44 @@ public class SOSSSHJob2TestWithJcraft extends JSJobUtilitiesClass<SOSSSHJobOptio
         "-host", "homer.sos", 
         "-user", "test", 
         "-password", "12345",
+        "-strict_hostkey_checking", "yes",
+        "-command_delimiter", ";" };
+    objOptions.CommandLineArgs(strArgs);
+    objSSH.Execute();
+    assertTrue(objSSH.getStdErr().toString().isEmpty());
+    objSSH.Clear();
+  }
+
+  @Test
+  @Ignore
+  public void testExecuteOverProxyLinux() throws Exception {
+    logger.info("****testExecuteLinux started****");
+    String strArgs[] = new String[] { 
+        "-command", "echo ****testExecuteLinux successfully processed!****", 
+        "-auth_method", "password", 
+        "-host", "uk.sos-berlin.com", 
+        "-user", "test", 
+        "-password", "12345",
+        "-proxy_host", "homer.sos", 
+        "-proxy_port", "3128", 
+        "-proxy_user", "test", 
+        "-proxy_password", "12345",
+        "-command_delimiter", ";" };
+    objOptions.CommandLineArgs(strArgs);
+    objSSH.Execute();
+    assertTrue(objSSH.getStdErr().toString().isEmpty());
+    objSSH.Clear();
+  }
+
+  @Test
+  public void testExecuteGetShellPidLinux() throws Exception {
+    logger.info("****testExecuteGetShellPidLinux started****");
+    String strArgs[] = new String[] { 
+        "-command", "echo $$; echo $$", 
+        "-auth_method", "password", 
+        "-host", "homer.sos", 
+        "-user", "test", 
+        "-password", "12345",
         "-command_delimiter", ";" };
     objOptions.CommandLineArgs(strArgs);
     objSSH.Execute();
@@ -78,14 +118,11 @@ public class SOSSSHJob2TestWithJcraft extends JSJobUtilitiesClass<SOSSSHJobOptio
   public void testExecuteCmdScriptFileOnLinux() throws Exception {
     logger.info("****testExecuteCmdScriptFileOnLinux started****");
     String strArgs[] = new String[] { 
-        "-command_script_file", "src/test/resources/testScriptSSH2Job.sh", 
+        "-command_script_file", "src/test/resources/test.sh", 
         "-auth_method", "password", 
         "-host", "homer.sos", 
         "-user", "test", 
         "-password", "12345",
-//        "-preCommand", "export %1s=%2s",
-//        "-postCommandRead", "cat %s",
-//        "-postCommandDelete", "rm %s",
         "-command_delimiter", ";" };
     objOptions.CommandLineArgs(strArgs);
     objSSH.Execute();
@@ -121,9 +158,6 @@ public class SOSSSHJob2TestWithJcraft extends JSJobUtilitiesClass<SOSSSHJobOptio
         "-host", "homer.sos", 
         "-user", "test", 
         "-password", "12345",
-//        "-preCommand", "export %1s=%2s",
-//        "-postCommandRead", "cat %s",
-//        "-postCommandDelete", "rm %s",
         "-command_delimiter", ";"};
     objOptions.CommandLineArgs(strArgs);
     objSSH.Execute();
@@ -172,7 +206,6 @@ public class SOSSSHJob2TestWithJcraft extends JSJobUtilitiesClass<SOSSSHJobOptio
         "-host", "lutest.sos", 
         "-user", "test", 
         "-password", "12345",
-//        "-preCommand", "export %1s=%2s",
         "-command_delimiter", ";" };
     objOptions.CommandLineArgs(strArgs);
     objSSH.Execute();
@@ -192,9 +225,6 @@ public class SOSSSHJob2TestWithJcraft extends JSJobUtilitiesClass<SOSSSHJobOptio
         "-host", "lutest.sos", 
         "-user", "test", 
         "-password", "12345",
-//        "-preCommand", "export %1s=%2s",
-//        "-postCommandRead", "cat %s",
-//        "-postCommandDelete", "rm %s",
         "-command_delimiter", ";"};
     objOptions.CommandLineArgs(strArgs);
     objSSH.Execute();
@@ -211,9 +241,6 @@ public class SOSSSHJob2TestWithJcraft extends JSJobUtilitiesClass<SOSSSHJobOptio
         "-host", "lutest.sos", 
         "-user", "test", 
         "-password", "12345",
-//        "-preCommand", "export %1s=%2s",
-//        "-postCommandRead", "cat %s",
-//        "-postCommandDelete", "rm %s",
         "-command_delimiter", ";"};
     objOptions.CommandLineArgs(strArgs);
     objSSH.Execute();
@@ -230,9 +257,6 @@ public class SOSSSHJob2TestWithJcraft extends JSJobUtilitiesClass<SOSSSHJobOptio
         "-host", "lutest.sos", 
         "-user", "test", 
         "-password", "12345",
-//        "-preCommand", "export %1s=%2s",
-//        "-postCommandRead", "cat %s",
-//        "-postCommandDelete", "rm %s",
         "-command_delimiter", ";" };
     objOptions.CommandLineArgs(strArgs);
     objSSH.Execute();
@@ -241,6 +265,7 @@ public class SOSSSHJob2TestWithJcraft extends JSJobUtilitiesClass<SOSSSHJobOptio
   }
   
   @Test
+  @Ignore("Tests works but remote machine isn´t always available as this test was ment for local testing only")
   public void testExecuteCmdScriptFileOnWindowsBitvise() throws Exception {
     logger.info("****testExecuteCmdScriptFileOnWindows with bitvise SSH Server started****");
     String strArgs[] = new String[] { 
@@ -260,6 +285,7 @@ public class SOSSSHJob2TestWithJcraft extends JSJobUtilitiesClass<SOSSSHJobOptio
   }
   
   @Test
+  @Ignore("Tests works but remote machine isn´t always available as this test was ment for local testing only")
   public void testExecuteCommandOnWindowsBitvise() throws Exception {
     logger.info("****testExecuteCommandOnWindows with bitvise SSH Server started****");
     String strArgs[] = new String[] { 
@@ -277,5 +303,5 @@ public class SOSSSHJob2TestWithJcraft extends JSJobUtilitiesClass<SOSSSHJobOptio
     assertTrue(objSSH.getStdErr().toString().isEmpty());
     objSSH.Clear();
   }
-  
+
 }
