@@ -2008,7 +2008,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 						strOptionValue = strOptionName.substring(intESPos + 1);
 						strOptionName = strOptionName.substring(0, intESPos);
 						objSettings.put(strOptionName, strOptionValue);
-						if("password".equalsIgnoreCase(strOptionName)){
+						if("password".equalsIgnoreCase(strOptionName) || "proxy_password".equalsIgnoreCase(strOptionName)){
 	            this.SignalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", conMethodName, strOptionName, "*****"));
 						}else{
 	            this.SignalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", conMethodName, strOptionName, strOptionValue));
@@ -2025,7 +2025,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 					strOptionValue = strCommandLineArg;
 					flgOption = true;
 					objSettings.put(strOptionName, strOptionValue);
-          if("password".equalsIgnoreCase(strOptionName)){
+          if("password".equalsIgnoreCase(strOptionName) || "proxy_password".equalsIgnoreCase(strOptionName)){
             this.SignalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", conMethodName, strOptionName, "*****"));
           }else{
             this.SignalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", conMethodName, strOptionName, strOptionValue));
@@ -2051,7 +2051,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 						strOptionValue = strCommandLineArg;
 						flgOption = true;
 						objSettings.put(strOptionName, strOptionValue);
-	          if("password".equalsIgnoreCase(strOptionName)){
+            if("password".equalsIgnoreCase(strOptionName) || "proxy_password".equalsIgnoreCase(strOptionName)){
 	            this.SignalDebug(String.format("%1$s: CmdSettings. Name = %2$s, value = %3$s", conMethodName, strOptionName, "*****"));
 	          }else{
 	            this.SignalDebug(String.format("%1$s: CmdSettings. Name = %2$s, value = %3$s", conMethodName, strOptionName, strOptionValue));
