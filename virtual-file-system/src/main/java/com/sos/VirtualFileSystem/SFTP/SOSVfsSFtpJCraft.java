@@ -16,11 +16,16 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.omg.SendingContext.RunTime;
 
+import sos.util.SOSString;
+
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.ProxyHTTP;
+import com.jcraft.jsch.ProxySOCKS4;
+import com.jcraft.jsch.ProxySOCKS5;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
@@ -28,7 +33,6 @@ import com.jcraft.jsch.SftpProgressMonitor;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.JSHelper.Options.SOSOptionInFileName;
-import com.sos.JSHelper.interfaces.ISOSConnectionOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
@@ -68,9 +72,16 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	private String exitSignal;
 	private StringBuffer outContent;
 	private StringBuffer errContent;
-  private boolean isRemoteWindowsShell = false;
-  private boolean raiseExeptionOnCommandExecution = true;
+    private boolean isRemoteWindowsShell = false;
+    private boolean raiseExeptionOnCommandExecution = true;
 
+    //proxy
+    private String proxyHost = null;
+	private int proxyPort = 0;
+	private String proxyUser = null;
+	private String proxyPassword = null;
+	private int connectionTimeout = 0; //Millisekunden
+    
 	/**
 	 *
 	 * \brief SOSVfsSFtpJCraft
@@ -99,8 +110,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	 * @return
 	 */
 	@Override public ISOSConnection Connect() {
-//		SOSConnection2OptionsAlternate pConnection2OptionsAlternate = null;
-//		this.Connect(pConnection2OptionsAlternate);
+		this.Connect(connection2OptionsAlternate);
 		return this;
 	}
 
@@ -125,25 +135,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		return this;
 	}
 	
-	// https://change.sos-berlin.com/browse/JITL-123
-	@Override
-	public ISOSConnection Connect(ISOSConnectionOptions connectionOptions){
-    if (connectionOptions != null) {
-      host = connectionOptions.getHost().Value();
-      port = connectionOptions.getPort().value();
-      proxyHost = connectionOptions.getProxy_host().Value();
-      proxyPort = connectionOptions.getProxy_port().value();
-      proxyUsername = connectionOptions.getProxy_user().Value();
-      proxyPasswd = connectionOptions.getProxy_password().Value();
-      userName = connectionOptions.getUser().Value();
-      connection2OptionsAlternate = new SOSConnection2OptionsAlternate();
-      connection2OptionsAlternate.setStrict_HostKey_Checking("no");
-      raiseExeptionOnCommandExecution = connectionOptions.getraise_exception_on_error().value();
-      this.connect(host, port);
-    }
-	  return this;
-	}
-
 	/**
 	 *
 	 * \brief Authenticate
@@ -158,6 +149,11 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	@Override public ISOSConnection Authenticate(final ISOSAuthenticationOptions pAuthenticationOptions) {
 		authenticationOptions = pAuthenticationOptions;
 		try {
+			proxyHost = connection2OptionsAlternate.proxy_host.Value();
+			proxyPort = connection2OptionsAlternate.proxy_port.value();
+			proxyUser = connection2OptionsAlternate.proxy_user.Value();
+			proxyPassword = connection2OptionsAlternate.proxy_password.Value();
+			
 			this.doAuthenticate(authenticationOptions);
 		}
 		catch (Exception ex) {
@@ -170,6 +166,12 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 					try {
 						host = optionsAlternatives.host.Value();
 						port = optionsAlternatives.port.value();
+						
+						proxyHost = optionsAlternatives.proxy_host.Value();
+						proxyPort = optionsAlternatives.proxy_port.value();
+						proxyUser = optionsAlternatives.proxy_user.Value();
+						proxyPassword = optionsAlternatives.proxy_password.Value();
+						
 						this.doAuthenticate(optionsAlternatives);
 						exx = null;
 					}
@@ -925,10 +927,95 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		}
 		sshSession = secureChannel.getSession(puser, phost, pport);
 		java.util.Properties config = new java.util.Properties();
-    config.put("StrictHostKeyChecking", connection2OptionsAlternate.StrictHostKeyChecking.Value());
+		config.put("StrictHostKeyChecking", connection2OptionsAlternate.StrictHostKeyChecking.Value());
 		sshSession.setConfig(config);
+		
+		setCommandsTimeout();
+		setProxy();
+		
+		//am Ende
+		setConnectionTimeout();
 	}
 
+	/**
+	 * @TODO Der Wert muss noch festgelegt werden
+	 * 
+	 * zZeit wird nur bei Proxy type socks4 und socks5 gesetzt - ohne timeout bleibt diese Verbindung hängen
+	 * 
+	 * @throws Exception
+	 */
+	private void setConnectionTimeout() throws Exception{
+		if(connectionTimeout > 0){
+			//in Millisekunden
+			logger.info(String.format("connection timeout = %s ms",connectionTimeout));
+			sshSession.setTimeout(connectionTimeout);
+		}
+	}
+	
+	/**
+	 * See http://stackoverflow.com/questions/16546198/configuring-timeout-on-jsch-channelsftp-operations
+	 * 
+	 * Sets the interval to send a keep-alive message.  If zero is
+     * specified, any keep-alive message must not be sent.  The default interval
+     * is zero
+	 * 
+	 * @TODO not used
+	 * 
+	 * @throws Exception
+	 */
+	private void setCommandsTimeout() throws Exception{
+		// specified interval, in milliseconds
+		//int interval = 0;
+		//sshSession.setServerAliveInterval(interval);
+	}
+	
+	/**
+	 * @TODO proxyType aus property lesen
+	 * 
+	 * @throws Exception
+	 */
+	private void setProxy() throws Exception{
+		if(!SOSString.isEmpty(this.proxyHost)){
+			String proxyType = "http";
+			
+			logger.info(String.format("using proxy: type = %s, host = %s, port = %s, user = %s, pass = ?",
+					proxyType,
+					proxyHost,
+					proxyPort,
+					proxyUser));
+			
+			if(proxyType.equals("http")){
+				ProxyHTTP proxy = new ProxyHTTP(proxyHost,proxyPort);
+				if(!SOSString.isEmpty(proxyUser)){
+					proxy.setUserPasswd(proxyUser,proxyPassword);
+				}
+				sshSession.setProxy(proxy); 
+			}
+			else if(proxyType.equals("socks5")){
+				ProxySOCKS5 proxy = new ProxySOCKS5(proxyHost,proxyPort);
+				if(!SOSString.isEmpty(proxyUser)){
+					proxy.setUserPasswd(proxyUser,proxyPassword);
+				}
+				sshSession.setProxy(proxy);
+				
+				connectionTimeout = 15000;
+			}
+			else if(proxyType.equals("socks4")){
+				ProxySOCKS4 proxy = new ProxySOCKS4(proxyHost,proxyPort);
+				if(!SOSString.isEmpty(proxyUser)){
+					proxy.setUserPasswd(proxyUser,proxyPassword);
+				}
+				sshSession.setProxy(proxy);
+				
+				connectionTimeout = 15000;
+			}
+			else{
+				throw new Exception(String.format("unknown proxy type = %s",proxyType));
+			}
+		}
+	}
+
+	
 	/**
 	 *
 	 * \brief createObjFTPClient

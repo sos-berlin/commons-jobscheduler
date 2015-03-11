@@ -1,5 +1,6 @@
 package com.sos.VirtualFileSystem.SFTP;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -23,6 +24,11 @@ public class SOSVfsSFtpJCraftTest extends SOSVfsSFtpTest{
 		dynamicClassNameSource = "com.sos.VirtualFileSystem.SFTP.SOSVfsSFtpJCraft";
 	}
 
+	@After
+	public void tearDown() throws Exception {
+		super.tearDown();
+		ftpClient.disconnect();
+	}
 
 
 	@Override
@@ -31,6 +37,11 @@ public class SOSVfsSFtpJCraftTest extends SOSVfsSFtpTest{
 		super.testConnect();
 	}
 	
+	@Override
+	@Test
+	public void testHttpProxyConnect() throws Exception {
+		super.testHttpProxyConnect();
+	}
 	
 	@Override
 	@Test
