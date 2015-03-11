@@ -1,10 +1,6 @@
 package sos.net.ssh;
 
-import java.io.BufferedReader;
-import java.io.StringReader;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 
@@ -15,10 +11,10 @@ import sos.net.ssh.exceptions.SSHMissingCommandError;
 import com.sos.JSHelper.Basics.JSJobUtilities;
 import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
+import com.sos.VirtualFileSystem.SSH.SOSSSH2TriLeadImpl;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.i18n.Msg;
 import com.sos.i18n.Msg.BundleBaseName;
@@ -51,13 +47,13 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
 	private final String conClassName = this.getClass().getSimpleName();
-	private final Logger logger = Logger.getLogger(this.getClass());
+	protected final Logger logger = Logger.getLogger(this.getClass());
 
 	private final String		conSVNVersion		= "$Id$";
 
 	private final String		conStd_err_output	= "std_err_output";
 	private final String		conStd_out_output	= "std_out_output";
-	private final String		conExit_code		= "exit_code";
+	protected final String		conExit_code		= "exit_code";
 	private final String		conExit_signal		= "exit_signal";
 
 	protected Msg				objMsg				;
@@ -84,16 +80,12 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 			explanation = "executing remote command: '%1$s'." //
 			) //
 	}, msgnum = "SOS-SSH-D-110", msgurl = "msgurl")
+  protected
 	/*!
 	 * \var SOS-SSH-D-110
 	 * \brief SOS-SSH-D-110: executing remote command: '%1$s'.
 	 */
-	private static final String	SOS_SSH_D_110		= "SOS-SSH-D-110";
-  private static final String COMMAND_DELIMITER = ";";
-  // http://www.sos-berlin.com/jira/browse/JITL-112
-  private static final String SCHEDULER_RETURN_VALUES = "SCHEDULER_RETURN_VALUES";
-  private static final String SCHEDULER_RETURN_VALUES_PARAM_DEFAULT = "$SCHEDULER_RETURN_VALUES";//Linux
-  private static final String SCHEDULER_RETURN_VALUES_PARAM_WINDOWS = "%SCHEDULER_RETURN_VALUES%";
+	static final String	SOS_SSH_D_110		= "SOS-SSH-D-110";
 
 	public boolean				isConnected			= false;
 	public boolean				flgIsWindowsShell	= false;
@@ -106,8 +98,7 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 	protected StringBuffer		strbStdoutOutput;
 	protected StringBuffer		strbStderrOutput;
   // http://www.sos-berlin.com/jira/browse/JITL-112
-  private String tmpReturnValueFileName;
-  private String exportEnvVariableCommand;
+  protected Vector<String> tempFilesToDelete = new Vector<String>();
 
   private ISOSVFSHandler    objVFS        = null;
   
@@ -175,19 +166,25 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 		objVFS.setJSJobUtilites(pobjJSJobUtilities);
 	}
 
-	public SOSSSHJob2 Connect() {
+	@SuppressWarnings("deprecation")
+  public SOSSSHJob2 Connect() {
 
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::Connect";
 
 		getVFS();
 		Options().CheckMandatory();
-		logger.debug(Options().dirtyString());
+		// logging commented, because this would be the third time these Options are logged.
+		// first while logging the CommandLineArgs in the Option class itself
+		// second while logging the DumpSettings in the Option class itself
+		// no need for a third one [SP]
+//		logger.debug(Options().dirtyString());
 
 		try {
 			objVFS.Connect(objOptions);
 			ISOSAuthenticationOptions objAU = objOptions;
-			ISOSConnection authenticate = objVFS.Authenticate(objAU);
+			@SuppressWarnings("unused")
+      ISOSConnection authenticate = objVFS.Authenticate(objAU);
 			logger.debug("connection established");
 		}
 		catch (Exception e) {
@@ -203,7 +200,9 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 		preparePostCommandHandler();
 		return this;
 	} // private SOSSSHJob2 Connect
-
+	
+	
+	// moved to extending classes for JCraft and Trilead Job implementation 
 	/**
 	 *
 	 * \brief Execute - Start the Execution of commands or scripts on the SSH-Server-Site
@@ -221,83 +220,86 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 	 *
 	 * @return
 	 */
-	public SOSSSHJob2 Execute() throws Exception {
-		final String conMethodName = conClassName + "::Execute";
-		boolean flgScriptFileCreated = false; // http://www.sos-berlin.com/jira/browse/JITL-17
-		logger.debug(conMethodName + " start ...");
-
-		objVFS.setJSJobUtilites(objJSJobUtilities);
-
-		try {
-			if (isConnected == false) {
-				this.Connect();
-			}
-
-			objVFS.OpenSession(objOptions);
-
-			if (objOptions.command.IsEmpty() == false) {
-				strCommands2Execute = objOptions.command.values();
-			} else {
-				if (objOptions.isScript() == true) {
-					strCommands2Execute = new String[1];
-					String strTemp = objOptions.command_script.Value();
-					if (objOptions.command_script.IsEmpty()) {
-						strTemp = objOptions.command_script_file.JSFile().File2String();
-					}
-					strTemp = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strTemp);
-					strCommands2Execute[0] = objVFS.createScriptFile(strTemp);
-					flgScriptFileCreated = true; // http://www.sos-berlin.com/jira/browse/JITL-17
-					strCommands2Execute[0] += " " + objOptions.command_script_param.Value();
-				} else {
-					throw new SSHMissingCommandError(objMsg.getMsg(SOS_SSH_E_100)); // "SOS-SSH-E-100: neither Commands nor Script(file) specified. Abort.");
-				}
-			}
-			 
-			for (String strCmd : strCommands2Execute) {
-				try {
-				  // http://www.sos-berlin.com/jira/browse/JITL-112
-          strCmd = getPreCommand() + strCmd;
-					/**
-					 * \change Substitution of variables enabled
-					 *
-					 * see http://www.sos-berlin.com/jira/browse/JS-673
-					 *
-					 */
-					logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
-					strCmd = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strCmd);
-					logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
-					objVFS.ExecuteCommand(strCmd);
-					objJSJobUtilities.setJSParam(conExit_code, "0");
-					CheckStdOut();
-					CheckStdErr();
-					CheckExitCode();
-					ChangeExitSignal();
-				} catch (Exception e) {
-					logger.error(this.StackTrace2String(e));
-					throw new SSHExecutionError("Exception raised: " + e, e);
-				} finally {
-					if (flgScriptFileCreated == true) { 
-					  // http://www.sos-berlin.com/jira/browse/JITL-17
-						// file will be deleted by the Vfs Component.
-					}
-				}
-			}
-			// http://www.sos-berlin.com/jira/browse/JITL-112
-      processPostCommands(getTempFileName());
-		}
-		catch (Exception e) {
-			logger.error(this.StackTrace2String(e));
-			String strErrMsg = "SOS-SSH-E-120: error occurred processing ssh command: ";
-			logger.error(strErrMsg, e);
-			throw new SSHExecutionError(strErrMsg, e);
-		}
-		finally {
-			if (keepConnected == false) {
-				DisConnect();
-			}
-		}
-		return this;
-	}
+	public abstract SOSSSHJob2 Execute() throws Exception;
+//	public SOSSSHJob2 Execute() throws Exception {
+//		final String conMethodName = conClassName + "::Execute";
+//		boolean flgScriptFileCreated = false; // http://www.sos-berlin.com/jira/browse/JITL-17
+//		logger.debug(conMethodName + " start ...");
+//
+//		objVFS.setJSJobUtilites(objJSJobUtilities);
+//
+//		try {
+//			if (isConnected == false) {
+//				this.Connect();
+//			}
+//			if(objVFS instanceof SOSSSH2TriLeadImpl){
+//	      objVFS.OpenSession(objOptions);
+//			}
+//
+//			if (objOptions.command.IsEmpty() == false) {
+//				strCommands2Execute = objOptions.command.values();
+//			} else {
+//				if (objOptions.isScript() == true) {
+//					strCommands2Execute = new String[1];
+//					String strTemp = objOptions.command_script.Value();
+//					if (objOptions.command_script.IsEmpty()) {
+//						strTemp = objOptions.command_script_file.JSFile().File2String();
+//					}
+//					strTemp = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strTemp);
+//					strCommands2Execute[0] = objVFS.createScriptFile(strTemp);
+//          // http://www.sos-berlin.com/jira/browse/JITL-123
+//					flgScriptFileCreated = true; // http://www.sos-berlin.com/jira/browse/JITL-17
+//					strCommands2Execute[0] += " " + objOptions.command_script_param.Value();
+//				} else {
+//					throw new SSHMissingCommandError(objMsg.getMsg(SOS_SSH_E_100)); // "SOS-SSH-E-100: neither Commands nor Script(file) specified. Abort.");
+//				}
+//			}
+//			 
+//			for (String strCmd : strCommands2Execute) {
+//				try {
+//				  // http://www.sos-berlin.com/jira/browse/JITL-112
+//          strCmd = getPreCommand() + strCmd;
+//					/**
+//					 * \change Substitution of variables enabled
+//					 *
+//					 * see http://www.sos-berlin.com/jira/browse/JS-673
+//					 *
+//					 */
+//					logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
+//					strCmd = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strCmd);
+//					logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
+//					objVFS.ExecuteCommand(strCmd);
+//					objJSJobUtilities.setJSParam(conExit_code, "0");
+//					CheckStdOut();
+//					CheckStdErr();
+//					CheckExitCode();
+//					ChangeExitSignal();
+//				} catch (Exception e) {
+//					logger.error(this.StackTrace2String(e));
+//					throw new SSHExecutionError("Exception raised: " + e, e);
+//				} finally {
+//					if (flgScriptFileCreated == true) { 
+//					  // http://www.sos-berlin.com/jira/browse/JITL-17
+//						// file will be deleted by the Vfs Component.
+//					}
+//				}
+//			}
+//			// http://www.sos-berlin.com/jira/browse/JITL-112
+//      processPostCommands(getTempFileName());
+//		}
+//		catch (Exception e) {
+//			logger.error(this.StackTrace2String(e));
+//			String strErrMsg = "SOS-SSH-E-120: error occurred processing ssh command: ";
+//			logger.error(strErrMsg, e);
+//			throw new SSHExecutionError(strErrMsg, e);
+//		}
+//		finally {
+//			if (keepConnected == false) {
+//				DisConnect();
+//			}
+//		}
+//		return this;
+//	}
 
 	public void DisConnect() {
 
@@ -306,9 +308,8 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
 		if (isConnected == true) {
 			try {
-				objVFS.CloseConnection();
-			}
-			catch (Exception e) {
+        objVFS.CloseConnection();
+			} catch (Exception e) {
 				throw new SSHConnectionError("problems closing connection", e);
 			}
 			isConnected = false;
@@ -369,7 +370,7 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 					// TODO set logger.error only if RaiseExceptionOnError is true
 					logger.error(strM);
 					objJSJobUtilities.setCC(intExitCode);
-					if (objOptions.RaiseExceptionOnError.isTrue()) {
+					if (objOptions.raise_exception_on_error.isTrue()) {
 						throw new SSHExecutionError(strM);
 					}
 				}
@@ -387,7 +388,7 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 	 * \return void
 	 *
 	 */
-	private void CheckStdErr() {
+	public void CheckStdErr() {
  		try {
 			StringBuffer stbStdErr = objVFS.getStdErr();
 			if (strbStderrOutput == null) {
@@ -408,13 +409,13 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 			else {
 				intCC =  objVFS.getExitCode();
 				
-				if (intCC != 0 && objOptions.RaiseExceptionOnError.isTrue()) {
+				if (intCC != 0 && objOptions.raise_exception_on_error.isTrue()) {
 					CheckExitCode();
 				}
 
 					String strM = "SOS-SSH-E-160: remote execution reports error: " + strbStderrOutput;
 					logger.error(strM);
-					if (objOptions.RaiseExceptionOnError.isTrue()) {
+					if (objOptions.raise_exception_on_error.isTrue()) {
 						throw new SSHExecutionError(strM);
 					}
 
@@ -441,7 +442,7 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 	 * \return void
 	 *
 	 */
-	private void CheckStdOut() {
+	public void CheckStdOut() {
 		try {
 			StringBuffer stbStdOut = objVFS.getStdOut();
 			if (strbStdoutOutput == null) {

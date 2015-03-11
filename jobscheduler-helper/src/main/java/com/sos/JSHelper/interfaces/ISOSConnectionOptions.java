@@ -1,5 +1,6 @@
 package com.sos.JSHelper.interfaces;
 
+import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Options.SOSOptionHostName;
 import com.sos.JSHelper.Options.SOSOptionPassword;
 import com.sos.JSHelper.Options.SOSOptionPortNumber;
@@ -132,6 +133,10 @@ public interface ISOSConnectionOptions {
 
 	public abstract void setProxy_password(SOSOptionPassword proxyPassword);
 	public abstract SOSOptionPassword getProxy_password();
+	
+  public abstract SOSOptionUserName getUser();
+  
+  public SOSOptionBoolean getraise_exception_on_error();
 
 
 }

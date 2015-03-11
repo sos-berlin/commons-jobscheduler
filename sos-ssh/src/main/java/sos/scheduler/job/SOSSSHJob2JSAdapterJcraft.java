@@ -15,7 +15,6 @@ public class SOSSSHJob2JSAdapterJcraft extends SOSSSHJob2JSBaseAdapter {
   public boolean spooler_process() throws Exception {
     @SuppressWarnings("unused")
     final String conMethodName = conClassName + "::spooler_process";
-
     try {
       super.spooler_process();
       doProcessing();
@@ -28,22 +27,18 @@ public class SOSSSHJob2JSAdapterJcraft extends SOSSSHJob2JSBaseAdapter {
     } // finally
 
     return signalSuccess();
-
   } // spooler_process
 
   private void doProcessing() throws Exception {
-
     SOSSSHJob2 objR = new SOSSSHJobJcraft();
     SOSSSHJobOptions objO = objR.Options();
     objO.CurrentNodeName(this.getCurrentNodeName());
     HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(getJobOrOrderParameters());
     objO.setAllOptions(objO.DeletePrefix(hsmParameters1, "ssh_"));
-
     objR.setJSJobUtilites(this);
     if (objO.commandSpecified() == false) {
       setJobScript(objO.command_script);
     }
-
     objO.CheckMandatory();
     objR.Execute();
   }

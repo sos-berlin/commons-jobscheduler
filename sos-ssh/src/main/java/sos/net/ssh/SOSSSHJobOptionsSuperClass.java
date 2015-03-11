@@ -20,12 +20,14 @@ import com.sos.JSHelper.Options.SOSOptionPassword;
 import com.sos.JSHelper.Options.SOSOptionPortNumber;
 import com.sos.JSHelper.Options.SOSOptionRegExp;
 import com.sos.JSHelper.Options.SOSOptionString;
+import com.sos.JSHelper.Options.SOSOptionStringValueList;
 import com.sos.JSHelper.Options.SOSOptionTransferType;
 import com.sos.JSHelper.Options.SOSOptionUrl;
 import com.sos.JSHelper.Options.SOSOptionUserName;
 import com.sos.JSHelper.interfaces.ISOSConnectionOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSShellOptions;
+import com.sos.VirtualFileSystem.Options.SOSFtpOptionsSuperClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 /**
@@ -447,28 +449,21 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
 	 * \created 06.03.2013 16:55:50 by KB
 	 */
 	@JSOptionDefinition(name = "raise_exception_on_error", description = "Raise an Exception if an error occured", key = "raise_exception_on_error", type = "SOSOptionBoolean", mandatory = true)
-	public SOSOptionBoolean		RaiseExceptionOnError	= new SOSOptionBoolean( // ...
+	public SOSOptionBoolean		raise_exception_on_error	= new SOSOptionBoolean( // ...
 																this, // ....
 																conClassName + ".raise_exception_on_error", // ...
 																"Raise an Exception if an error occured", // ...
 																"true", // ...
 																"true", // ...
 																true);
+	
 
-	public String getraise_exception_on_error() {
-
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getraise_exception_on_error";
-
-		return RaiseExceptionOnError.Value();
+	public SOSOptionBoolean getraise_exception_on_error() {
+		return raise_exception_on_error;
 	} // public String getraise_exception_on_error
 
-	public SOSSSHJobOptionsSuperClass setraise_exception_on_error(final String pstrValue) {
-
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::setraise_exception_on_error";
-		RaiseExceptionOnError.Value(pstrValue);
-		return this;
+	public void setraise_exception_on_error(final SOSOptionBoolean raiseExceptionOnError) {
+		this.raise_exception_on_error = raiseExceptionOnError;
 	} // public SOSSSHJobOptionsSuperClass setraise_exception_on_error
 
 	/**
@@ -1698,5 +1693,30 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
 		objCredentialStore.checkCredentialStoreOptions();
 	} // public SOSConnection2OptionsAlternate (HashMap JSSettings)
 
+  @JSOptionDefinition(
+      name = "Strict_HostKey_Checking",
+      description = "Check the hostkey against known hosts for SSH",
+      key = "Strict_HostKey_Checking",
+      type = "SOSOptionValueList",
+      mandatory = false)
+public SOSOptionStringValueList StrictHostKeyChecking = new SOSOptionStringValueList(
+                        // ...
+                            this, // ....
+                            conClassName + ".strict_hostkey_checking", // ...
+                            "Check the hostkey against known hosts for SSH", // ...
+                            "ask;yes;no", // ...
+                            "no", // ...
+                            false);
+
+public String getStrict_HostKey_Checking() {
+@SuppressWarnings("unused") final String conMethodName = conClassName + "::getStrict_HostKey_Checking";
+return StrictHostKeyChecking.Value();
+} // public String getStrict_HostKey_Checking
+
+public SOSSSHJobOptionsSuperClass setStrict_HostKey_Checking(final String pstrValue) {
+@SuppressWarnings("unused") final String conMethodName = conClassName + "::setStrict_HostKey_Checking";
+StrictHostKeyChecking.Value(pstrValue);
+return this;
+} // public SOSFtpOptionsSuperClass setStrict_HostKey_Checking
 
 } // public class SOSSSHJobOptions

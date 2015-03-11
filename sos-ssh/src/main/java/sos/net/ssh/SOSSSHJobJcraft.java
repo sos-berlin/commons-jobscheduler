@@ -3,18 +3,23 @@ package sos.net.ssh;
 import java.io.BufferedReader;
 import java.io.StringReader;
 import java.util.UUID;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
 import sos.net.ssh.exceptions.SSHConnectionError;
+import sos.net.ssh.exceptions.SSHExecutionError;
+import sos.net.ssh.exceptions.SSHMissingCommandError;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
+import com.sos.VirtualFileSystem.SFTP.SOSVfsSFtpJCraft;
+import com.sos.VirtualFileSystem.SSH.SOSSSH2TriLeadImpl;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
@@ -62,6 +67,13 @@ public class SOSSSHJobJcraft extends SOSSSHJob2 {
     String postCommandRead = String.format(objOptions.getPostCommandRead().Value(), tmpFileName);
     String stdErr = "";
 
+    if(tempFilesToDelete != null && !tempFilesToDelete.isEmpty()){
+      for(String tempFileName : tempFilesToDelete){
+        ((SOSVfsSFtpJCraft)vfsHandler).delete(tempFileName);
+        logger.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tempFileName));
+      }
+    }
+    tempFilesToDelete = null;
 
     try {
       prePostCommandVFSHandler.ExecuteCommand(postCommandRead);
@@ -111,28 +123,20 @@ public class SOSSSHJobJcraft extends SOSSSHJob2 {
     return vfsHandler;
   }
 
+  @SuppressWarnings("deprecation")
   private void openPrePostCommandsSession(){
     try {
       if (!prePostCommandVFSHandler.isConnected()) {
         prePostCommandVFSHandler.Connect(objOptions);
       }
       ISOSAuthenticationOptions objAU = objOptions;
+      @SuppressWarnings("unused")
       ISOSConnection authenticate = prePostCommandVFSHandler.Authenticate(objAU);
       logger.debug("connection established");
     } catch (Exception e) {
       throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
     }
     prePostCommandVFSHandler.setJSJobUtilites(objJSJobUtilities);
-    try {
-      prePostCommandVFSHandler.OpenSession(objOptions);
-    } catch (Exception e1) {
-      logger.error(SOSVfsMessageCodes.SOSVfs_E_283.params(e1));
-    }
-    finally {
-      if (keepConnected == false) {
-        DisConnect();
-      }
-    }
   }
   
   @Override
@@ -149,5 +153,107 @@ public class SOSSSHJobJcraft extends SOSSSHJob2 {
   public StringBuffer getStdOut() throws Exception {
     return vfsHandler.getStdOut();
   } 
+
+  @Override
+  public SOSSSHJob2 Execute() throws Exception {
+    boolean flgScriptFileCreated = false; // http://www.sos-berlin.com/jira/browse/JITL-17
+    vfsHandler.setJSJobUtilites(objJSJobUtilities);
+
+    try {
+      if (isConnected == false) {
+        this.Connect();
+      }
+      if(vfsHandler instanceof SOSSSH2TriLeadImpl){
+        vfsHandler.OpenSession(objOptions);
+      }
+
+      if (objOptions.command.IsEmpty() == false) {
+        strCommands2Execute = objOptions.command.values();
+      } else {
+        if (objOptions.isScript() == true) {
+          strCommands2Execute = new String[1];
+          String strTemp = objOptions.command_script.Value();
+          if (objOptions.command_script.IsEmpty()) {
+            strTemp = objOptions.command_script_file.JSFile().File2String();
+          }
+          strTemp = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strTemp);
+          strCommands2Execute[0] = vfsHandler.createScriptFile(strTemp);
+          // http://www.sos-berlin.com/jira/browse/JITL-123
+          if(!(vfsHandler instanceof SOSSSH2TriLeadImpl)){
+            add2Files2Delete(strCommands2Execute[0]);
+          }
+          flgScriptFileCreated = true; // http://www.sos-berlin.com/jira/browse/JITL-17
+          strCommands2Execute[0] += " " + objOptions.command_script_param.Value();
+        } else {
+          throw new SSHMissingCommandError(objMsg.getMsg(SOS_SSH_E_100)); // "SOS-SSH-E-100: neither Commands nor Script(file) specified. Abort.");
+        }
+      }
+       
+      for (String strCmd : strCommands2Execute) {
+        try {
+          // http://www.sos-berlin.com/jira/browse/JITL-112
+          strCmd = getPreCommand() + strCmd;
+          /**
+           * \change Substitution of variables enabled
+           *
+           * see http://www.sos-berlin.com/jira/browse/JS-673
+           *
+           */
+          logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
+          strCmd = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strCmd);
+          logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
+          vfsHandler.ExecuteCommand(strCmd);
+          objJSJobUtilities.setJSParam(conExit_code, "0");
+          CheckStdOut();
+          CheckStdErr();
+          CheckExitCode();
+          ChangeExitSignal();
+        } catch (Exception e) {
+          logger.error(this.StackTrace2String(e));
+          throw new SSHExecutionError("Exception raised: " + e, e);
+        } finally {
+          if (flgScriptFileCreated == true) { 
+            // http://www.sos-berlin.com/jira/browse/JITL-17
+            // file will be deleted by the Vfs Component.
+          }
+        }
+      }
+      // http://www.sos-berlin.com/jira/browse/JITL-112
+      processPostCommands(getTempFileName());
+    }
+    catch (Exception e) {
+      logger.error(this.StackTrace2String(e));
+      String strErrMsg = "SOS-SSH-E-120: error occurred processing ssh command: ";
+      logger.error(strErrMsg, e);
+      throw new SSHExecutionError(strErrMsg, e);
+    }
+    finally {
+      if (keepConnected == false) {
+        DisConnect();
+      }
+    }
+    return this;
+  }
+
+  @Override
+  public void DisConnect() {
+    if (isConnected == true) {
+      try {
+        vfsHandler.CloseSession();
+      } catch (Exception e) {
+        throw new SSHConnectionError("problems closing connection", e);
+      }
+      isConnected = false;
+    }
+  }
+  
+  // http://www.sos-berlin.com/jira/browse/JITL-123
+  private void add2Files2Delete(final String fileNameToDelete) {
+    if (tempFilesToDelete == null){
+      tempFilesToDelete = new Vector<String>();
+    }
+    tempFilesToDelete.add(fileNameToDelete);
+    logger.debug(String.format(SOSVfsMessageCodes.SOSVfs_D_254.params(fileNameToDelete)));
+  }
 
 }

@@ -1,11 +1,13 @@
 package com.sos.VirtualFileSystem.SFTP;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -26,6 +28,7 @@ import com.jcraft.jsch.SftpProgressMonitor;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.JSHelper.Options.SOSOptionInFileName;
+import com.sos.JSHelper.interfaces.ISOSConnectionOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
@@ -58,6 +61,15 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	/** SFTP Client **/
 	private ChannelSftp			sftpClient		= null;
 	private JSch				secureChannel	= null;
+	
+	// additional properties for
+	// https://change.sos-berlin.com/browse/JITL-123 [SP]
+	private Integer exitCode;
+	private String exitSignal;
+	private StringBuffer outContent;
+	private StringBuffer errContent;
+  private boolean isRemoteWindowsShell = false;
+  private boolean raiseExeptionOnCommandExecution = true;
 
 	/**
 	 *
@@ -87,8 +99,8 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	 * @return
 	 */
 	@Override public ISOSConnection Connect() {
-		SOSConnection2OptionsAlternate pConnection2OptionsAlternate = null;
-		this.Connect(pConnection2OptionsAlternate);
+//		SOSConnection2OptionsAlternate pConnection2OptionsAlternate = null;
+//		this.Connect(pConnection2OptionsAlternate);
 		return this;
 	}
 
@@ -111,6 +123,25 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		this.StrictHostKeyChecking(connection2OptionsAlternate.StrictHostKeyChecking.Value());
 		this.connect(connection2OptionsAlternate.host.Value(), connection2OptionsAlternate.port.value());
 		return this;
+	}
+	
+	// https://change.sos-berlin.com/browse/JITL-123
+	@Override
+	public ISOSConnection Connect(ISOSConnectionOptions connectionOptions){
+    if (connectionOptions != null) {
+      host = connectionOptions.getHost().Value();
+      port = connectionOptions.getPort().value();
+      proxyHost = connectionOptions.getProxy_host().Value();
+      proxyPort = connectionOptions.getProxy_port().value();
+      proxyUsername = connectionOptions.getProxy_user().Value();
+      proxyPasswd = connectionOptions.getProxy_password().Value();
+      userName = connectionOptions.getUser().Value();
+      connection2OptionsAlternate = new SOSConnection2OptionsAlternate();
+      connection2OptionsAlternate.setStrict_HostKey_Checking("no");
+      raiseExeptionOnCommandExecution = connectionOptions.getraise_exception_on_error().value();
+      this.connect(host, port);
+    }
+	  return this;
 	}
 
 	/**
@@ -541,7 +572,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	@Override public void ExecuteCommand(final String cmd) {
 		final String strEndOfLine = System.getProperty("line.separator");
 		ChannelExec channelExec = null;
-		Integer exitCode = null;
+		exitCode = null;
 		InputStream out = null;
 		InputStream err = null;
 		BufferedReader errReader = null;
@@ -559,7 +590,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 			err = channelExec.getErrStream();
 			channelExec.connect();
 			logger.debug(SOSVfs_D_163.params("stdout", cmd));
-			StringBuffer outContent = new StringBuffer();
+			outContent = new StringBuffer();
 			byte[] tmp = new byte[1024];
 			while (true) {
 				while (out.available() > 0) {
@@ -583,7 +614,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 			logger.debug(outContent);
 			logger.debug(SOSVfs_D_163.params("stderr", cmd));
 			errReader = new BufferedReader(new InputStreamReader(err));
-			StringBuffer errContent = new StringBuffer();
+			errContent = new StringBuffer();
 			while (true) {
 				String line = errReader.readLine();
 				if (line == null) {
@@ -598,11 +629,13 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 				}
 			}
 			reply = "OK";
-			logINFO(HostID(SOSVfs_I_192.params(getReplyString())));
 		}
 		catch (Exception ex) {
 			reply = ex.toString();
-			RaiseException(ex, SOSVfs_E_134.params("ExecuteCommand"));
+			if(raiseExeptionOnCommandExecution){
+	      RaiseException(ex, SOSVfs_E_134.params("ExecuteCommand"));
+			}
+			
 		}
 		finally {
 			if (out != null) {
@@ -633,6 +666,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 				catch (Exception e) {
 				}
 			}
+      logINFO(HostID(SOSVfs_I_192.params(getReplyString())));
 		}
 	}
 
@@ -891,7 +925,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		}
 		sshSession = secureChannel.getSession(puser, phost, pport);
 		java.util.Properties config = new java.util.Properties();
-		config.put("StrictHostKeyChecking", connection2OptionsAlternate.StrictHostKeyChecking.Value());
+    config.put("StrictHostKeyChecking", connection2OptionsAlternate.StrictHostKeyChecking.Value());
 		sshSession.setConfig(config);
 	}
 
@@ -963,7 +997,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	}
 
 	@Override public OutputStream getOutputStream() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -971,8 +1004,84 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		return null;
 	}
 
-    @Override
-    public SOSFileEntries getSOSFileEntries() {
-        return sosFileEntries;
+  @Override
+  public SOSFileEntries getSOSFileEntries() {
+      return sosFileEntries;
+  }
+  
+  public StringBuffer getStdErr() throws Exception {
+    return errContent;
+  }
+
+  @Override
+  public StringBuffer getStdOut() throws Exception {
+    return outContent;
+  }
+
+  @Override
+  public Integer getExitCode() {
+    return exitCode;
+  }
+
+  @Override
+  public String getExitSignal() {
+    return exitSignal;
+  }
+
+  // https://change.sos-berlin.com/browse/JITL-123
+  @Override
+  public String createScriptFile(String pstrContent) throws Exception {
+    try {
+      String commandScript = pstrContent;
+      logger.info("pstrContent = " + pstrContent);
+      if (isRemoteWindowsShell == false) {
+        commandScript = commandScript.replaceAll("(?m)\r", "");
+      }
+      logger.info(SOSVfs_I_233.params(pstrContent));
+      File fleTempScriptFile = File.createTempFile("sos-sshscript", getScriptFileNameSuffix());
+      BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fleTempScriptFile)));
+      out.write(commandScript);
+      out.flush();
+      out.close();
+      fleTempScriptFile.deleteOnExit();
+      putFile(fleTempScriptFile, 0700);
+      String strFileName2Return = fleTempScriptFile.getName();
+      if (isRemoteWindowsShell == false) {
+        strFileName2Return = "./" + strFileName2Return;
+      }
+      logger.info(SOSVfs_I_253.params(fleTempScriptFile.getAbsolutePath()));
+      return strFileName2Return;
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw e;
     }
+  }
+    
+  private String getScriptFileNameSuffix() {
+    if(isRemoteWindowsShell){
+      return ".cmd";
+    }else{
+      return ".sh";
+    }
+  }
+
+  @Override
+  public boolean remoteIsWindowsShell() {
+     ExecuteCommand("echo %ComSpec%");
+    if (outContent.toString().indexOf("cmd.exe") > -1) {
+      logger.debug(SOSVfs_D_237.get());
+      isRemoteWindowsShell = true;
+      return true;
+    }
+    return false;
+  }
+
+  private void putFile(File pfleCommandFile, Integer chmod) throws Exception {
+    String strFileName = pfleCommandFile.getName();
+    getClient().put(pfleCommandFile.getCanonicalPath(), strFileName);
+    if(chmod != null){
+      getClient().chmod(chmod, strFileName);
+    }
+  }
+
 }

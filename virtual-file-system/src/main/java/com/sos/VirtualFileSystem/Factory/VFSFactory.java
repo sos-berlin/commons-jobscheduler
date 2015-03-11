@@ -197,7 +197,7 @@ public class VFSFactory extends SOSVfsMessageCodes {
       if (useTrilead){
         objA = classLoader.loadClass("com.sos.VirtualFileSystem.SSH.SOSSSH2TriLeadImpl");
       }else {
-        objA = classLoader.loadClass("com.sos.VirtualFileSystem.SSH.SOSSSH2JcraftImpl");
+        objA = classLoader.loadClass("com.sos.VirtualFileSystem.SFTP.SOSVfsSFtpJCraft");
       }
 			
       ISOSVFSHandler objD = (ISOSVFSHandler) objA.newInstance();

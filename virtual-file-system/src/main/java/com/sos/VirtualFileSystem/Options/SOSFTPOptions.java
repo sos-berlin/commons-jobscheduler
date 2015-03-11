@@ -17,6 +17,7 @@ import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Listener.JSListener;
 import com.sos.JSHelper.Options.SOSOptionAuthenticationMethod.enuAuthenticationMethods;
+import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Options.SOSOptionElement;
 import com.sos.JSHelper.Options.SOSOptionHostName;
 import com.sos.JSHelper.Options.SOSOptionJadeOperation.enuJadeOperations;
@@ -1285,4 +1286,9 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		}
 		return objR;
 	} // private SOSOptionRegExp getreplacement
+
+  @Override
+  public SOSOptionBoolean getraise_exception_on_error() {
+      return super.getraise_exception_on_error();
+  }
 }
