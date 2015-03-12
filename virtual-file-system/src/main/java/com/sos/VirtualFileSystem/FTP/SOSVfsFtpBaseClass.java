@@ -5,8 +5,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.Authenticator;
+import java.net.InetSocketAddress;
+import java.net.PasswordAuthentication;
+import java.net.Proxy;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Properties;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,11 +22,14 @@ import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.log4j.Logger;
 
+import sos.util.SOSString;
+
 import com.sos.JSHelper.Basics.JSJobUtilities;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.JSHelper.Options.SOSOptionHostName;
 import com.sos.JSHelper.Options.SOSOptionPortNumber;
+import com.sos.JSHelper.Options.SOSOptionProxyProtocol;
 import com.sos.JSHelper.Options.SOSOptionTransferMode;
 import com.sos.JSHelper.interfaces.ISOSConnectionOptions;
 import com.sos.JSHelper.interfaces.ISOSDataProviderOptions;
@@ -101,6 +109,14 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 	@SuppressWarnings("unused")
 	private ISOSAuthenticationOptions			objAO						= null;
 
+	
+	private SOSOptionProxyProtocol proxyProtocol = null;
+    private String proxyHost = null;
+	private int proxyPort = 0;
+	private String proxyUser = null;
+	private String proxyPassword = null;
+	
+	
 	public SOSVfsFtpBaseClass() {
 		super();
 		//
@@ -349,12 +365,20 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 		}
 	}
 
+		
 	@Override public ISOSConnection Connect() {
 		final String conMethodName = conClassName + "::Connect";
 		String strH = host = objConnectionOptions.getHost().Value();
 		int intP = port = objConnectionOptions.getPort().value();
 		logger.debug(SOSVfs_D_0101.params(strH, intP));
 		try {
+			if(objConnection2Options != null){
+				proxyProtocol = objConnection2Options.proxy_protocol;
+				proxyHost = objConnection2Options.proxy_host.Value();
+				proxyPort = objConnection2Options.proxy_port.value();
+				proxyUser = objConnection2Options.proxy_user.Value();
+				proxyPassword = objConnection2Options.proxy_password.Value();
+			}
 			this.connect(strH, intP);
 			logger.debug(SOSVfs_D_0102.params(strH, intP));
 			Client().setControlKeepAliveTimeout(180); // TODO Options for setControlKeepAliveTimeout
@@ -419,11 +443,25 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 		try {
 			objHost = objConnection2Options.getHost();
 			objPort = objConnection2Options.getport();
+			
+			proxyProtocol = objConnection2Options.proxy_protocol;
+			proxyHost = objConnection2Options.proxy_host.Value();
+			proxyPort = objConnection2Options.proxy_port.value();
+			proxyUser = objConnection2Options.proxy_user.Value();
+			proxyPassword = objConnection2Options.proxy_password.Value();
+			
 			this.connect(objHost.Value(), objPort.value());
 			if (Client().isConnected() == false) {
 				SOSConnection2OptionsSuperClass objAlternate = objConnection2Options.Alternatives();
 				objHost = objAlternate.host;
 				objPort = objAlternate.port;
+				
+				proxyProtocol = objAlternate.proxy_protocol;
+				proxyHost = objAlternate.proxy_host.Value();
+				proxyPort = objAlternate.proxy_port.value();
+				proxyUser = objAlternate.proxy_user.Value();
+				proxyPassword = objAlternate.proxy_password.Value();
+								
 				logger.info(SOSVfs_I_0121.params(host));
 				this.connect(objHost.Value(), objPort.value());
 				if (Client().isConnected() == false) {
@@ -1702,4 +1740,25 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     public SOSFileEntries getSOSFileEntries() {
         return sosFileEntries;
     }
+
+	public SOSOptionProxyProtocol getProxyProtocol() {
+		return proxyProtocol;
+	}
+
+	public String getProxyHost() {
+		return proxyHost;
+	}
+
+	public int getProxyPort() {
+		return proxyPort;
+	}
+
+	public String getProxyUser() {
+		return proxyUser;
+	}
+
+	public String getProxyPassword() {
+		return proxyPassword;
+	}
+    
 }

@@ -17,10 +17,13 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.sos.JSHelper.Options.SOSOptionPortNumber;
+import com.sos.JSHelper.Options.SOSOptionProxyProtocol;
 import com.sos.JSHelper.io.Files.JSFile;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
+import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.i18n.annotation.I18NResourceBundle;
@@ -245,6 +248,32 @@ public class SOSVfsFtpTest {
 		objVFS.Connect(objOptions);
 	}
 
+	@Test
+	public void testHttpProxyConnect() throws Exception {
+		
+		SOSConnection2OptionsAlternate options = objOptions.getConnectionOptions().Source();
+		options.host.Value("wilma.sos");
+		options.port.value(SOSOptionPortNumber.getStandardFTPPort());
+		options.user.Value("kb");
+		options.password.Value("kb");
+		options.protocol.Value("ftp");
+		options.ssh_auth_method.isPassword(true);
+		
+		options.proxy_protocol.Value(SOSOptionProxyProtocol.Protocol.http.name());
+		options.proxy_host.Value("homer.sos");
+		options.proxy_port.value(3128);
+		options.proxy_user.Value("proxy_user");
+		options.proxy_password.Value("12345");
+		
+		objOptions.operation.Value("send");
+		objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
+		ftpClient = (ISOSVfsFileTransfer) objVFS;
+
+		objVFS.Connect(objOptions.getConnectionOptions().Source());
+		objVFS.Authenticate(options);
+		ftpClient.disconnect();
+	}
+	
 	@Test(
 			expected = com.sos.JSHelper.Exceptions.JobSchedulerException.class) public void testConnectFailed() throws Exception {
 		objOptions.host.Value("wilmaxxx.sos");

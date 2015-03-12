@@ -13,9 +13,16 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPClientConfig;
 import org.apache.commons.net.ftp.FTPFile;
+import org.apache.commons.net.ftp.FTPHTTPClient;
 import org.apache.log4j.Logger;
 
+import sos.util.SOSString;
+
 import java.io.*;
+import java.net.Authenticator;
+import java.net.InetSocketAddress;
+import java.net.PasswordAuthentication;
+import java.net.Proxy;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -140,10 +147,78 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 		return flgR;
 	}
 
+	
+	
+	private boolean usingProxy(){
+		return !SOSString.isEmpty(getProxyHost());
+	}
+	
+	private boolean usingHttpProxy(){
+		if(getProxyProtocol() != null && getProxyProtocol().isHttp()){
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * 
+	 * @throws Exception
+	 */
+	private void setSocksProxy(){
+				
+		if(!SOSString.isEmpty(getProxyUser())){
+			Authenticator.setDefault(new Authenticator(){
+			  protected  PasswordAuthentication  getPasswordAuthentication(){
+				   PasswordAuthentication p = new PasswordAuthentication(getProxyUser(),getProxyPassword().toCharArray());
+				   return p;
+			  }
+			});
+
+		}
+		
+		// Proxy.Type.HTTP hat leider nicht funktioniert
+		Proxy proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(getProxyHost(),getProxyPort()));
+		objFTPClient.setProxy(proxy);
+		objFTPClient.setConnectTimeout(30000); //30 Sekunden
+		
+		//objFTPClient.setRemoteVerificationEnabled(false);
+			
+		//System.getProperties().put( "socksProxyHost" ,"proxy.host.address");
+		//System.getProperties().put( "socksProxyPort", "1080");
+			
+		//Properties systemSettings = System.getProperties();
+		//systemSettings.put("http.proxyHost", proxyHost);
+		//systemSettings.put("http.proxyPort", proxyPort);
+	}
+
+	
+	
 	@Override
 	protected final FTPClient Client() {
 		if (objFTPClient == null) {
-			objFTPClient = new FTPClient();
+			if(usingProxy()){
+				logger.info(String.format("using proxy: protocol = %s, host = %s, port = %s, user = %s, pass = ?",
+						getProxyProtocol().Value(),
+						getProxyHost(),
+						getProxyPort(),
+						getProxyUser()));
+				
+				if(usingHttpProxy()){
+					if(SOSString.isEmpty(getProxyUser())){
+						objFTPClient = new FTPHTTPClient(getProxyHost(),getProxyPort());
+					}
+					else{
+						objFTPClient = new FTPHTTPClient(getProxyHost(),getProxyPort(),getProxyUser(),getProxyPassword());
+					}
+				}
+				else{
+					objFTPClient = new FTPClient();
+					setSocksProxy();
+				}
+			}
+			else{
+				objFTPClient = new FTPClient();
+			}
 			FTPClientConfig conf = new FTPClientConfig();
 			// TODO create additional Options for ClientConfig
 			// conf.setServerLanguageCode("fr");
