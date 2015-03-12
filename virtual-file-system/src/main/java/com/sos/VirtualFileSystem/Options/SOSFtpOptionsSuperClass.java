@@ -24,6 +24,7 @@ import com.sos.JSHelper.Options.SOSOptionHostName;
 import com.sos.JSHelper.Options.SOSOptionInFileName;
 import com.sos.JSHelper.Options.SOSOptionIniFileName;
 import com.sos.JSHelper.Options.SOSOptionInteger;
+import com.sos.JSHelper.Options.SOSOptionProxyProtocol;
 import com.sos.JSHelper.Options.SOSOptionJSTransferMethod.enuJSTransferModes;
 import com.sos.JSHelper.Options.SOSOptionJadeOperation;
 import com.sos.JSHelper.Options.SOSOptionJobChainNode;
@@ -4844,6 +4845,34 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	@Override public void setjump_proxy_user(final SOSOptionUserName p_jump_proxy_user) {
 		jump_proxy_user = p_jump_proxy_user;
 	}
+	
+	
+	/**
+	* \var proxy_protocol : http, socks4 oder socks5
+	*
+	*
+	*/
+	@JSOptionDefinition(
+						name = "jump_proxy_protocol",
+						description = "Jump Proxy protocol",
+						key = "jump_proxy_protocol",
+						type = "SOSOptionProxyProtocol",
+						mandatory = false)
+	public SOSOptionProxyProtocol	jump_proxy_protocol	= new SOSOptionProxyProtocol(this, conClassName + ".jump_proxy_protocol", // HashMap-Key
+													"Jump Proxy protocol", // Titel
+													SOSOptionProxyProtocol.Protocol.http.name(), // InitValue
+													SOSOptionProxyProtocol.Protocol.http.name(), // DefaultValue
+													false // isMandatory
+											);
+
+	public SOSOptionProxyProtocol getjump_proxy_protocol() {
+		return jump_proxy_protocol;
+	}
+
+	public void setjump_proxy_protocol(SOSOptionProxyProtocol val) {
+		jump_proxy_protocol = val;
+	}
+	
 	/**
 	* \var jump_simulate_shell : Should the value true be specified for this parame
 	*
