@@ -19,6 +19,7 @@ import com.sos.JSHelper.Options.SOSOptionPassphrase;
 import com.sos.JSHelper.Options.SOSOptionPassword;
 import com.sos.JSHelper.Options.SOSOptionPlatform;
 import com.sos.JSHelper.Options.SOSOptionPortNumber;
+import com.sos.JSHelper.Options.SOSOptionProxyProtocol;
 import com.sos.JSHelper.Options.SOSOptionRegExp;
 import com.sos.JSHelper.Options.SOSOptionString;
 import com.sos.JSHelper.Options.SOSOptionStringValueList;
@@ -1253,6 +1254,34 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	@Override public void setUser(final SOSOptionUserName pobjUser) {
 		user.Value(pobjUser.Value());
 	}
+	
+	/**
+	* \var proxy_protocol : http, socks4 oder socks5
+	*
+	*
+	*/
+	@JSOptionDefinition(
+						name = "proxy_protocol",
+						description = "Proxy protocol",
+						key = "proxy_protocol",
+						type = "SOSOptionProxyProtocol",
+						mandatory = false)
+	public SOSOptionProxyProtocol	proxy_protocol	= new SOSOptionProxyProtocol(this, conClassName + ".proxy_protocol", // HashMap-Key
+													"Proxy protocol", // Titel
+													SOSOptionProxyProtocol.Protocol.http.name(), // InitValue
+													SOSOptionProxyProtocol.Protocol.http.name(), // DefaultValue
+													false // isMandatory
+											);
+
+	public SOSOptionProxyProtocol getproxy_protocol() {
+		return proxy_protocol;
+	}
+
+	public void setproxy_host(SOSOptionProxyProtocol val) {
+		proxy_protocol = val;
+	}
+
+	
 	/**
 	* \var proxy_host : host name or the IP address of a proxy
 	*

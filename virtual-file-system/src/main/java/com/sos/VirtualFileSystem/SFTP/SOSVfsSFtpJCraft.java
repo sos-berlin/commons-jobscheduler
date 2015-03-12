@@ -33,6 +33,7 @@ import com.jcraft.jsch.SftpProgressMonitor;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.JSHelper.Options.SOSOptionInFileName;
+import com.sos.JSHelper.Options.SOSOptionProxyProtocol;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
@@ -75,6 +76,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     private boolean isRemoteWindowsShell = false;
 
     //proxy
+    private SOSOptionProxyProtocol proxyProtocol = null;
     private String proxyHost = null;
 	private int proxyPort = 0;
 	private String proxyUser = null;
@@ -148,6 +150,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	@Override public ISOSConnection Authenticate(final ISOSAuthenticationOptions pAuthenticationOptions) {
 		authenticationOptions = pAuthenticationOptions;
 		try {
+			proxyProtocol = connection2OptionsAlternate.proxy_protocol;
 			proxyHost = connection2OptionsAlternate.proxy_host.Value();
 			proxyPort = connection2OptionsAlternate.proxy_port.value();
 			proxyUser = connection2OptionsAlternate.proxy_user.Value();
@@ -166,6 +169,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 						host = optionsAlternatives.host.Value();
 						port = optionsAlternatives.port.value();
 						
+						proxyProtocol = optionsAlternatives.proxy_protocol;
 						proxyHost = optionsAlternatives.proxy_host.Value();
 						proxyPort = optionsAlternatives.proxy_port.value();
 						proxyUser = optionsAlternatives.proxy_user.Value();
@@ -975,41 +979,41 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	 */
 	private void setProxy() throws Exception{
 		if(!SOSString.isEmpty(this.proxyHost)){
-			String proxyType = "http";
+			int connTimeout = 30000; //0,5 Minute
 			
-			logger.info(String.format("using proxy: type = %s, host = %s, port = %s, user = %s, pass = ?",
-					proxyType,
+			logger.info(String.format("using proxy: protocol = %s, host = %s, port = %s, user = %s, pass = ?",
+					proxyProtocol.Value(),
 					proxyHost,
 					proxyPort,
 					proxyUser));
 			
-			if(proxyType.equals("http")){
+			if(proxyProtocol.isHttp()){
 				ProxyHTTP proxy = new ProxyHTTP(proxyHost,proxyPort);
 				if(!SOSString.isEmpty(proxyUser)){
 					proxy.setUserPasswd(proxyUser,proxyPassword);
 				}
 				sshSession.setProxy(proxy); 
 			}
-			else if(proxyType.equals("socks5")){
+			else if(proxyProtocol.isSocks5()){
 				ProxySOCKS5 proxy = new ProxySOCKS5(proxyHost,proxyPort);
 				if(!SOSString.isEmpty(proxyUser)){
 					proxy.setUserPasswd(proxyUser,proxyPassword);
 				}
 				sshSession.setProxy(proxy);
 				
-				connectionTimeout = 15000;
+				connectionTimeout = connTimeout;
 			}
-			else if(proxyType.equals("socks4")){
+			else if(proxyProtocol.isSocks4()){
 				ProxySOCKS4 proxy = new ProxySOCKS4(proxyHost,proxyPort);
 				if(!SOSString.isEmpty(proxyUser)){
 					proxy.setUserPasswd(proxyUser,proxyPassword);
 				}
 				sshSession.setProxy(proxy);
 				
-				connectionTimeout = 15000;
+				connectionTimeout = connTimeout;
 			}
 			else{
-				throw new Exception(String.format("unknown proxy type = %s",proxyType));
+				throw new Exception(String.format("unknown proxy protocol = %s",proxyProtocol.Value()));
 			}
 		}
 	}

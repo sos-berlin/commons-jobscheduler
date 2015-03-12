@@ -13,6 +13,7 @@ import org.junit.Test;
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.Options.SOSOptionJadeOperation.enuJadeOperations;
 import com.sos.JSHelper.Options.SOSOptionPortNumber;
+import com.sos.JSHelper.Options.SOSOptionProxyProtocol;
 import com.sos.VirtualFileSystem.FTP.SOSVfsFtpTest;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
@@ -121,25 +122,27 @@ public class SOSVfsSFtpTest extends JSToolBox {
 		objOptions.host.Value("wilma.sos");
 		objOptions.port.value(SOSOptionPortNumber.getStandardSFTPPort());
 
-		SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().Source();
-		setDynamicClassNameSource(objSource);
-		objSource.host.Value("wilma.sos");
-		objSource.port.value(SOSOptionPortNumber.getStandardSFTPPort());
-		objSource.user.Value("kb");
-		objSource.password.Value("kb");
-		objSource.protocol.Value("sftp");
-		objSource.ssh_auth_method.isPassword(true);
-		objSource.proxy_host.Value("homer.sos");
-		objSource.proxy_port.value(3128);
-		objSource.proxy_user.Value("proxy_user");
-		objSource.proxy_password.Value("12345");
+		SOSConnection2OptionsAlternate options = objOptions.getConnectionOptions().Source();
+		setDynamicClassNameSource(options);
+		options.host.Value("wilma.sos");
+		options.port.value(SOSOptionPortNumber.getStandardSFTPPort());
+		options.user.Value("kb");
+		options.password.Value("kb");
+		options.protocol.Value("sftp");
+		options.ssh_auth_method.isPassword(true);
+		
+		options.proxy_protocol.Value(SOSOptionProxyProtocol.Protocol.http.name());
+		options.proxy_host.Value("homer.sos");
+		options.proxy_port.value(3128);
+		options.proxy_user.Value("proxy_user");
+		options.proxy_password.Value("12345");
 				
 		objOptions.operation.Value("send");
 		objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
 		ftpClient = (ISOSVfsFileTransfer) objVFS;
 
 		objVFS.Connect(objOptions.getConnectionOptions().Source());
-		objVFS.Authenticate(objSource);
+		objVFS.Authenticate(options);
 		// ftpClient.disconnect();
 	}
 	
