@@ -228,7 +228,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			this.setChildClasses(map);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 		}
 	}
 
@@ -613,7 +613,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			this.CommandLineArgs(pstrArgs.split(" "));
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 			throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_153.params("command lines args"), e);
 		}
 	}
@@ -767,7 +767,6 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			setChildClasses(map);
 		}
 		catch (Exception e) {
-			e.printStackTrace(System.err);
 			logger.error("ReadSettingsFile()", e); //$NON-NLS-1$
 			throw new JobSchedulerException(e.getMessage(), e);
 		}
@@ -958,8 +957,8 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		objAlt.host.Value(alternative_host.Value());
 		objAlt.port.value(alternative_port.value());
 		objAlt.protocol.Value(protocol.Value());
-		objT.passive_mode.Value(alternative_passive_mode.Value());
-		objT.transfer_mode.Value(alternative_transfer_mode.Value());
+		objAlt.passive_mode.Value(alternative_passive_mode.Value());
+		objAlt.transfer_mode.Value(alternative_transfer_mode.Value());
 		//		objT.loadClassName.Value(loadClassName.Value());
 	}
 
@@ -976,8 +975,8 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		objAlt.host.Value("localhost");
 		objAlt.port.value(0);
 		objAlt.protocol.Value("local");
-		objT.passive_mode.Value("");
-		objT.transfer_mode.Value("");
+		objAlt.passive_mode.Value("");
+		objAlt.transfer_mode.Value("");
 		//		objT.loadClassName.Value(loadClassName.Value());
 	}
 
@@ -1029,7 +1028,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			objAlt.host.Value(alternative_host.Value());
 			objAlt.port.value(alternative_port.value());
 			objAlt.protocol.Value(protocol.Value());
-			objT.passive_mode.Value(alternative_passive_mode.Value());
+			objAlt.passive_mode.Value(alternative_passive_mode.Value());
 		}
 		else {
 			if (operation.Value().equalsIgnoreCase(conOperationRECEIVE)) {
@@ -1051,7 +1050,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 				objAlt.host.Value(alternative_host.Value());
 				objAlt.port.value(alternative_port.value());
 				objAlt.protocol.Value(protocol.Value());
-				objT.passive_mode.Value(alternative_passive_mode.Value());
+				objAlt.passive_mode.Value(alternative_passive_mode.Value());
 			}
 			else {
 				strDataSourceType = this.getConnectionOptions().Source().protocol.Value();

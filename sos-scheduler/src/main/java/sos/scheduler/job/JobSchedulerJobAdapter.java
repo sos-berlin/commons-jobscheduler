@@ -79,7 +79,10 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 	public JobSchedulerJobAdapter() {
 		Messages = new Messages(conMessageFilePath, Locale.getDefault());
 		SOSMsg.flgShowFullMessageText = true;
-		BasicConfigurator.configure();
+		//rootLogger gets basis configuration if it doesn't have already an appender 
+		if( !Logger.getRootLogger().getAllAppenders().hasMoreElements() ) {
+			BasicConfigurator.configure();
+		}
 	}
 
 	@Override

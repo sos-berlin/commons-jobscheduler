@@ -171,7 +171,7 @@ public class SOSVfsXmlExport extends SOSVfsMessageCodes implements ISOSTransferH
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 			throw new JobSchedulerException(SOSVfs_E_260.params(conMethodName), e);
 		}
 	}
@@ -223,7 +223,7 @@ public class SOSVfsXmlExport extends SOSVfsMessageCodes implements ISOSTransferH
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 			throw new JobSchedulerException(SOSVfs_E_260.params(conMethodName), e);
 		}
 	}
@@ -247,7 +247,7 @@ public class SOSVfsXmlExport extends SOSVfsMessageCodes implements ISOSTransferH
 				}
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				logger.error(e.getLocalizedMessage());
 				throw new JobSchedulerException(SOSVfs_E_260.params(conMethodName), e);
 			}
 			objXMLFile = null;
@@ -343,7 +343,7 @@ public class SOSVfsXmlExport extends SOSVfsMessageCodes implements ISOSTransferH
 				}
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				logger.error(e.getLocalizedMessage());
 				throw new JobSchedulerException(SOSVfs_E_260.params(conMethodName), e);
 			}
 		}

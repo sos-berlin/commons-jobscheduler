@@ -88,7 +88,7 @@ public class SOSVfsConnectionPool {
 					objHandler.CloseSession();
 				}
 				catch (Exception e) {
-					e.printStackTrace();
+					logger.error(e.getLocalizedMessage());
 				}
 				objHandler.setLogin(false);
 				objHandler.release();

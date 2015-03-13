@@ -253,30 +253,36 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 			SOSOptionFolderName objF = new SOSOptionFolderName(path);
 			reply = "";
 			logger.debug(HostID(SOSVfs_D_179.params("mkdir", path)));
-			for (String strSubFolder : objF.getSubFolderArray()) {
-				if (this.fileExists(strSubFolder) == false) {
-					if (davClient.mkcolMethod(strSubFolder)) {
-						reply = "mkdir OK";
-						logger.debug(HostID(SOSVfs_D_181.params("mkdir", strSubFolder, getReplyString())));
-					}
-					else {
-						throw new Exception(davClient.getStatusMessage());
-					}
+			String[] subfolders = objF.getSubFolderArrayReverse();
+			int idx = subfolders.length;
+			for (String strSubFolder : objF.getSubFolderArrayReverse()) {
+				if (this.isDirectory(strSubFolder)) {
+					logger.debug(SOSVfs_E_180.params(strSubFolder));
+					break;
+				}
+				else if (this.fileExists(strSubFolder)) {
+					RaiseException(SOSVfs_E_277.params(strSubFolder));
+					break;
+				}
+				idx--;
+			}
+			subfolders = objF.getSubFolderArray();
+			for (int i = idx; i < subfolders.length; i++) {
+				if (davClient.mkcolMethod(subfolders[i])) {
+					reply = "mkdir OK";
+					logger.debug(HostID(SOSVfs_E_0106.params("mkdir", subfolders[i], getReplyString())));
 				}
 				else {
-					if (this.isDirectory(strSubFolder) == false) {
-						RaiseException(SOSVfs_E_277.params(strSubFolder));
-					}
+					throw new Exception(davClient.getStatusMessage());
 				}
 			}
-//			DoCD(strCurrentDir);
-			logINFO(HostID(SOSVfs_D_181.params("mkdir", path, getReplyString())));
 		}
 		catch (Exception e) {
 			reply = e.toString();
 			RaiseException(e, SOSVfs_E_134.params("[mkdir]"));
 		}
 	}
+
 
 	/**
 	 * Removes a directory on the FTP server (if empty).
@@ -404,7 +410,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace(System.err);
+			logger.error(e.getLocalizedMessage());
 			throw new Exception(SOSVfs_E_161.params("checking size", e));
 		}
 		finally {

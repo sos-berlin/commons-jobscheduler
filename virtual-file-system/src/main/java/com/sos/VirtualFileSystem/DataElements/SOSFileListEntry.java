@@ -250,7 +250,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		objJadeReportLogger.info(strM);
 	}
 
-	@SuppressWarnings("finally") private long doTransfer(final ISOSVirtualFile objInput, final ISOSVirtualFile objOutput) {
+	private boolean doTransfer(final ISOSVirtualFile objInput, final ISOSVirtualFile objOutput) {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::doTransfer";
 		boolean flgClosingDone = false;
 		if (objOutput == null) {
@@ -267,7 +267,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 				md = MessageDigest.getInstance(objOptions.SecurityHashType.Value());
 			}
 			catch (NoSuchAlgorithmException e1) {
-				e1.printStackTrace();
+				logger.error(e1.getLocalizedMessage(), e1);
 				flgCreateSecurityHash = false;
 			}
 		}
@@ -312,7 +312,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 							objOutput.write(buffer, 0, intBytes2Write);
 						}
 						catch (JobSchedulerException e) {
-							e.printStackTrace(System.err);
+							logger.error(e.getMessage());
 							break;
 						}
 						// TODO in case of wrong outputbuffer the handling of the error must be improved
@@ -328,6 +328,10 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 			objInput.closeInput();
 			objOutput.closeOutput();
 			flgClosingDone = true;
+			// objDataTargetClient.CompletePendingCommand();
+			if (objDataTargetClient.isNegativeCommandCompletion()) {
+				RaiseException(SOSVfs_E_175.params(objTargetTransferFile.getName(), objDataTargetClient.getReplyString()));
+			}
 			if (flgCreateSecurityHash) {
 				strMD5Hash = toHexString(md.digest());
 				logger.info(SOSVfs_I_274.params(strMD5Hash, strSourceTransferName, objOptions.SecurityHashType.Value()));
@@ -338,20 +342,16 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 					objF.deleteOnExit();
 				}
 			}
-			// objDataTargetClient.CompletePendingCommand();
-			if (objDataTargetClient.isNegativeCommandCompletion()) {
-				RaiseException(SOSVfs_E_175.params(objTargetTransferFile.getName(), objDataTargetClient.getReplyString()));
-			}
 			this.setNoOfBytesTransferred(lngTotalBytesTransferred);
 			lngTotalBytesTransferred += intCumulativeFileSeperatorLength;
 			executeTFNPostCommnands();
-			return lngTotalBytesTransferred;
+			return true;
 		}
 		catch (Exception e) {
 			String strT = SOSVfs_E_229.params(e);
 			// TODO rollback?
 			logger.error(strT);
-			throw new JobSchedulerException(strT, e);
+			return false;
 		}
 		finally {
 			if (flgClosingDone == false) {
@@ -359,7 +359,6 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 				objOutput.closeOutput();
 				flgClosingDone = true;
 			}
-			return lngTotalBytesTransferred;
 		}
 	} //doTransfer
 
@@ -376,7 +375,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 					pobjDataClient.getHandler().ExecuteCommand(strCmd);
 				}
 				catch (Exception e) {
-					e.printStackTrace(System.err);
+					logger.error(e.getLocalizedMessage());
 					throw new JobSchedulerException(conMethodName, e);
 				}
 			}
@@ -580,7 +579,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		if (flgIncludeSubdirectories == true) {
 			String strSourceDir = getPathWithoutFileName(fleSourceFile.getName());
 			String strOrigSourceDir = objO.SourceDir().Value();
-			if (strSourceDir.equals(strOrigSourceDir) == false) {
+			if (!fileNamesAreEqual(strSourceDir, strOrigSourceDir, true)) {
 				if (strSourceDir.length() > strOrigSourceDir.length()) {
 					String strSubFolder = strSourceDir.substring(strOrigSourceDir.length());
 					strSubFolder = adjustFileSeparator(addFileSeparator(strSubFolder));
@@ -722,8 +721,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	} // private void Options
 
 	private void RaiseException(final Exception e, final String pstrM) {
-		logger.error(pstrM);
-		e.printStackTrace(System.err);
+		logger.error(pstrM + " (" + e.getLocalizedMessage() + ")");
 		throw new JobSchedulerException(pstrM, e);
 	}
 
@@ -766,14 +764,14 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	}
 
 	private void RenameTargetFile(final String pstrTargetFileName) {
-		if (pstrTargetFileName.equals(objTargetTransferFile.getName()) == false) {
+		if (!fileNamesAreEqual(pstrTargetFileName, objTargetTransferFile.getName(), true)) {
 			if (pstrTargetFileName.contains("/") && objOptions.makeDirs.isTrue()) { // sosftp-158
 				String strP = normalized(new File(pstrTargetFileName).getParent());
 				try {
 					objDataTargetClient.mkdir(strP);
 				}
 				catch (IOException e) {
-					e.printStackTrace();
+					logger.error(e.getLocalizedMessage());
 				}
 			}
 			objTargetTransferFile.rename(pstrTargetFileName);
@@ -931,7 +929,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 			}
 			objTargetFile.setModeAppend(objOptions.append_files.value());
 			objTargetFile.setModeRestart(objOptions.ResumeTransfer.value());
-			if (strTargetFileName.equalsIgnoreCase(strTargetTransferName) == false) {
+			if (!fileNamesAreEqual(strTargetFileName, strTargetTransferName, false)) {
 				objTargetTransferFile = objDataTargetClient.getFileHandle(MakeFullPathName(objOptions.TargetDir.Value(), strTargetTransferName));
 			}
 			else {
@@ -969,33 +967,39 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 			}
 			if (objOptions.isAtomicTransfer() || objOptions.isReplaceReplacingInEffect()) {
 				if (objOptions.transactional.isFalse()) {
-					String strNewFileName = MakeFullPathName(objOptions.TargetDir.Value(), this.TargetFileName());
-					if (objTargetTransferFile.getName().equalsIgnoreCase(strNewFileName) == false) {
+					String strNewFileName = objTargetFile.getName();
+					if (!fileNamesAreEqual(objTargetTransferFile.getName(), strNewFileName, false)) {
 						flgFileExists = objTargetFile.FileExists();
 						if (objOptions.overwrite_files.isTrue() && flgFileExists == true) {
 							// hier werden Dateien gelöscht, vor dem umbenennen.
 							// TODO Besser: auch erstmal umbenennen und dann erst löschen
 							objTargetFile.delete();
 						}
-						RenameTargetFile(MakeFullPathName(objOptions.TargetDir.Value(), this.TargetFileName()));
+						RenameTargetFile(strNewFileName);
 					}
 				}
 			}
 			RenameSourceFile(objSourceFile);
-			objDataSourceClient.getHandler().release();
-			objDataTargetClient.getHandler().release();
-			if (flgNewConnectionUsed == true) {
-				objDataSourceClient.logout();
-				objDataSourceClient.disconnect();
-				objDataTargetClient.logout();
-				objDataTargetClient.disconnect();
-			}
 		}
 		catch (Exception e) {
 			String strT = SOSVfs_E_229.params(e);
 			// TODO rollback?
 			logger.error(strT);
 			throw new JobSchedulerException(strT, e);
+		}
+		finally {
+			objDataSourceClient.getHandler().release();
+			objDataTargetClient.getHandler().release();
+			try {
+				if (flgNewConnectionUsed == true) {
+					objDataSourceClient.logout();
+					objDataSourceClient.disconnect();
+					objDataTargetClient.logout();
+					objDataTargetClient.disconnect();
+				}
+			} catch (IOException e) {
+				//
+			}
 		}
 	}
 
@@ -1424,7 +1428,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 			strT = SOSVfs_D_214.params(this.getTargetFileNameAndPath(), this.SourceFileName(), this.NoOfBytesTransferred(), objOptions.operation.Value());
 		}
 		catch (RuntimeException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 			strT = "???";
 		}
 		return strT;
@@ -1437,5 +1441,11 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
 	public void VfsHandler(final ISOSVfsFileTransfer pobjVfs) {
 		objVfsHandler = pobjVfs;
+	}
+	
+	private boolean fileNamesAreEqual(String filenameA, String filenameB, boolean caseSensitiv) {
+		String a = filenameA.replaceAll("[\\\\/]+", "/");
+		String b = filenameB.replaceAll("[\\\\/]+", "/");
+		return (caseSensitiv) ? a.equals(b) : a.equalsIgnoreCase(b);
 	}
 }

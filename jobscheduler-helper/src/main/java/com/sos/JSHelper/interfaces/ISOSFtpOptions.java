@@ -7,7 +7,6 @@ import com.sos.JSHelper.Options.SOSOptionAuthenticationMethod;
 import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Options.SOSOptionCommandScript;
 import com.sos.JSHelper.Options.SOSOptionCommandScriptFile;
-import com.sos.JSHelper.Options.SOSOptionCommandString;
 import com.sos.JSHelper.Options.SOSOptionFileName;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.JSHelper.Options.SOSOptionHostName;
@@ -720,7 +719,7 @@ public interface ISOSFtpOptions {
 	     * \return This parameter specifies a command that is to be e
 	     *
 	     */
-	public abstract SOSOptionCommandString getjump_command();
+	public abstract SOSOptionString getjump_command();
 
 	/**
 	 * \brief setjump_command : This parameter specifies a command that is to be e
@@ -730,7 +729,7 @@ public interface ISOSFtpOptions {
 	 *
 	 * @param jump_command : This parameter specifies a command that is to be e
 	 */
-	public abstract void setjump_command(SOSOptionCommandString p_jump_command);
+	public abstract void setjump_command(SOSOptionString p_jump_command);
 
 	/**
 	     * \brief getjump_command_delimiter : Command delimiter characters are specified using t

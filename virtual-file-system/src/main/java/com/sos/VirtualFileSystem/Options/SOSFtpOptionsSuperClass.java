@@ -3,9 +3,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Listener.JSListener;
 import com.sos.JSHelper.Options.JSJobChain;
 import com.sos.JSHelper.Options.JSOptionsClass;
@@ -91,6 +94,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	protected Messages			objMsg				= new Messages(this.getClass().getAnnotation(I18NResourceBundle.class).baseName());
 	private static final long	serialVersionUID	= -4445655877481869778L;
 	private final String		conClassName		= "SOSFtpOptionsSuperClass";
+	private final static Logger		logger		= Logger.getLogger(SOSFtpOptionsSuperClass.class);
 	// SOSFtp-191 Option TFN_Post_Command: commands executed after creating the final TargetFile
 	/**
 	 * \option TFN_Post_Command
@@ -4194,9 +4198,9 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						name = "jump_command",
 						description = "This parameter specifies a command that is to be e",
 						key = "jump_command",
-						type = "SOSOptionCommandString",
+						type = "SOSOptionString",
 						mandatory = false)
-	public SOSOptionCommandString	jump_command	= new SOSOptionCommandString(this, conClassName + ".jump_command", // HashMap-Key
+	public SOSOptionString	jump_command	= new SOSOptionString(this, conClassName + ".jump_command", // HashMap-Key
 															"This parameter specifies a command that is to be e", // Titel
 															" ", // InitValue
 															" ", // DefaultValue
@@ -4212,7 +4216,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	 *
 	 * @return
 	 */
-	@Override public SOSOptionCommandString getjump_command() {
+	@Override public SOSOptionString getjump_command() {
 		return jump_command;
 	}
 
@@ -4225,7 +4229,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	 *
 	 * @param p_jump_command
 	 */
-	@Override public void setjump_command(final SOSOptionCommandString p_jump_command) {
+	@Override public void setjump_command(final SOSOptionString p_jump_command) {
 		jump_command = p_jump_command;
 	}
 	/**
@@ -6879,7 +6883,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 			super.setAllOptions(map);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 		}
 	}
 

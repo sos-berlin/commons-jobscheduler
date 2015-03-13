@@ -109,7 +109,6 @@ public class SOSVfsFtpBaseClass2 extends SOSVfsFtpBaseClass implements ISOSVfsFi
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace(System.err);
 			RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
 		}
 	}
@@ -270,8 +269,7 @@ public class SOSVfsFtpBaseClass2 extends SOSVfsFtpBaseClass implements ISOSVfsFi
 			objFTPFileList = Client().listFiles(lstrPathName);
 		}
 		catch (IOException e1) {
-			e1.printStackTrace();
-			throw new JobSchedulerException("listfiles failed");
+			throw new JobSchedulerException("listfiles failed", e1);
 		}
 
 		if (objFTPFileList == null || objFTPFileList.length <= 0) {
