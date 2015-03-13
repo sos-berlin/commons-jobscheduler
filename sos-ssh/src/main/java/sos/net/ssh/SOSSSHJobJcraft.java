@@ -206,12 +206,18 @@ public class SOSSSHJobJcraft extends SOSSSHJob2 {
           CheckExitCode();
           ChangeExitSignal();
         } catch (Exception e) {
-          logger.error(this.StackTrace2String(e));
-          throw new SSHExecutionError("Exception raised: " + e, e);
-        } finally {
-          if (flgScriptFileCreated == true) { 
-            // http://www.sos-berlin.com/jira/browse/JITL-17
-            // file will be deleted by the Vfs Component.
+          if(objOptions.raise_exception_on_error.value()){
+            if(objOptions.ignore_error.value()){
+              if(objOptions.ignore_stderr.value()){
+                logger.debug(this.StackTrace2String(e));
+              }else{
+                logger.error(this.StackTrace2String(e));
+                throw new SSHExecutionError("Exception raised: " + e, e);
+              }
+            }else{
+              logger.error(this.StackTrace2String(e));
+              throw new SSHExecutionError("Exception raised: " + e, e);
+            }
           }
         }
       }
@@ -219,10 +225,23 @@ public class SOSSSHJobJcraft extends SOSSSHJob2 {
       processPostCommands(getTempFileName());
     }
     catch (Exception e) {
-      logger.error(this.StackTrace2String(e));
-      String strErrMsg = "SOS-SSH-E-120: error occurred processing ssh command: ";
-      logger.error(strErrMsg, e);
-      throw new SSHExecutionError(strErrMsg, e);
+      if(objOptions.raise_exception_on_error.value()){
+        String strErrMsg = "SOS-SSH-E-120: error occurred processing ssh command: ";
+        if(objOptions.ignore_error.value()){
+          if(objOptions.ignore_stderr.value()){
+            logger.debug(this.StackTrace2String(e));
+            logger.debug(strErrMsg, e);
+          }else{
+            logger.error(this.StackTrace2String(e));
+            logger.error(strErrMsg, e);
+            throw new SSHExecutionError(strErrMsg, e);
+          }
+        }else{
+          logger.error(this.StackTrace2String(e));
+          logger.error(strErrMsg, e);
+          throw new SSHExecutionError(strErrMsg, e);
+        }
+      }
     }
     finally {
       if (keepConnected == false) {
@@ -253,7 +272,6 @@ public class SOSSSHJobJcraft extends SOSSSHJob2 {
     logger.debug(String.format(SOSVfsMessageCodes.SOSVfs_D_254.params(fileNameToDelete)));
   }
 
-  @SuppressWarnings("deprecation")
   public SOSSSHJob2 Connect() {
     getVFS();
     Options().CheckMandatory();
@@ -284,11 +302,14 @@ public class SOSSSHJobJcraft extends SOSSSHJob2 {
     alternateOptions.host.Value(options.getHost().Value());
     alternateOptions.port.value(options.getPort().value());
     alternateOptions.user.Value(options.getUser().Value());
+    alternateOptions.password.Value(options.getPassword().Value());
+    alternateOptions.proxy_protocol.Value(options.getproxy_protocol().Value());
     alternateOptions.proxy_host.Value(options.getProxy_host().Value());
     alternateOptions.proxy_port.value(options.getProxy_port().value());
     alternateOptions.proxy_user.Value(options.getProxy_user().Value());
     alternateOptions.proxy_password.Value(options.getProxy_password().Value());
     alternateOptions.raise_exception_on_error.value(options.getraise_exception_on_error().value());
+    alternateOptions.ignore_error.value(options.getIgnore_error().value());
     return alternateOptions;
   }
 }

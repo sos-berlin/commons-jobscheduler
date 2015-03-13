@@ -1463,4 +1463,19 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     this.raise_exception_on_error = raiseExceptionOnError;
   } 
 
+  @JSOptionDefinition(name = "ignore_error", description = "Should the value true be specified, then execution errors", key = "ignore_error", type = "SOSOptionString", mandatory = false)
+  public SOSOptionBoolean         ignore_error            = new SOSOptionBoolean(this, conClassName + ".ignore_error", // HashMap-Key
+                                            "Should the value true be specified, then execution errors", // Titel
+                                            "false", // InitiValue
+                                            "false", // DefaultValue
+                                            false // isMandatory
+                                        );  // Should the value true be specified, then execution errors
+  public SOSOptionBoolean getIgnore_error() {
+    return ignore_error;
+  }
+
+  public void setIgnore_error(final SOSOptionBoolean ignoreError) {
+    this.ignore_error = ignoreError;
+  }
+  
 } // public class SOSConnection2OptionsSuperClass
