@@ -17,6 +17,7 @@ import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.JSHelper.Options.SOSOptionHostName;
 import com.sos.JSHelper.Options.SOSOptionInFileName;
 import com.sos.JSHelper.Options.SOSOptionPortNumber;
+import com.sos.JSHelper.Options.SOSOptionString;
 
 /**
  * \class 		JSBatchInstallerOptionsSuperClass - Unattended Batch Installation on remote servers
@@ -284,6 +285,7 @@ public class JSBatchInstallerOptionsSuperClass extends JSOptionsClass {
         return installation_definition_file;
     }
 
+    
 /**
  * \brief setinstallation_definition_file : XML file with installation elements. One element per installation.
  * 
@@ -296,7 +298,49 @@ public class JSBatchInstallerOptionsSuperClass extends JSOptionsClass {
         this.installation_definition_file = p_installation_definition_file;
     }
 
+
                         
+/**
+ * \var installation_setup_filename : Name of the jar file that contains the setup
+ *
+ */
+    @JSOptionDefinition(name = "installation_setup_filename", 
+    description = "Name of the jar file that contains the setup.", 
+    key = "installation_setup_filename", 
+    type = "SOSOptionString", 
+    mandatory = true)
+    
+    public SOSOptionString installation_setup_filename = new SOSOptionString(this, conClassName + ".installation_setup_filename", // HashMap-Key
+                                                                "Name of the jar file that contains the setup.", // Titel
+                                                                "scheduler_agent.jar", // InitValue
+                                                                "scheduler_agent.jar", // DefaultValue
+                                                                true // isMandatory
+                    );
+
+/**
+ * \brief getinstallation_setup_filename: Name of the jar file that contains the setup.
+ * 
+ * \details
+ * Name of the jar file that contains the setup.
+ *
+ * \return Name of the jar file that contains the setup.
+ *
+ */
+    public SOSOptionString  getinstallation_setup_filename() {
+        return installation_setup_filename;
+    }
+     
+/**
+ * \brief setinstallation_setup_filename : Name of the jar file that contains the setup.
+ * 
+ * \details
+ * Name of the jar file that contains the setup.
+ *
+ * @param installation_setup_filename : Name of the jar file that contains the setup.
+ */
+    public void setinstallation_setup_filename (SOSOptionString p_installation_setup_filename) { 
+        this.installation_setup_filename = p_installation_setup_filename;
+    }
 
 /**
  * \var installation_job_chain : Job chain with the steps for transfer the installation files and perfo

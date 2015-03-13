@@ -29,13 +29,14 @@ public class JSBatchInstallerExecuter {
 	private static Logger		logger				= Logger.getLogger(JSBatchInstallerExecuter.class);
 
 	private boolean				update;												//Alle ausführen auf filterInstallHost:filterInstallPort 
-	private String				filterInstallHost	= "";
+    private String              filterInstallHost   = "";
+    private String              installationSetupFilename   = "";
 	private int					filterInstallPort	= 0;
 
 	private void init() {
 		localDir = new File(jsBatchInstaller.Options().getlocal_dir().Value());
 		installationDefinitionFile = new File(jsBatchInstaller.Options().getinstallation_definition_file().Value());
-		 
+		installationSetupFilename =  jsBatchInstaller.Options().getinstallation_setup_filename().Value();
 		installationJobChain = jsBatchInstaller.Options().getinstallation_job_chain().Value();
 		update = jsBatchInstaller.Options().getupdate().isTrue(); //Alle ausführen auf filterInstallHost:filterInstallPort 
 		filterInstallHost = jsBatchInstaller.Options().getfilter_install_host().Value();
@@ -129,7 +130,6 @@ public class JSBatchInstallerExecuter {
 		logger.info("allowed_host:" + installation.getSchedulerAllowedHost());
 		logger.info("scheduler_port:" + installation.getSchedulerPort());
 		logger.info("userPathPanelElement:" + installation.getUserPathPanelElement());
-
 		logger.info("----------------------------------------------");
 
 		if (spooler == null) {
@@ -141,8 +141,8 @@ public class JSBatchInstallerExecuter {
 		order = spooler.create_order();
 		Job_chain jobchain = spooler.job_chain(installationJobChain);
 		order.set_id(installation.getHost() + ":" + installation.getSchedulerPort());
-
-		setParam("installation_file", installationFile.getName());
+        setParam("installation_file", installationFile.getName());
+        setParam("installation_setup_filename", installationSetupFilename);
 
 		setParam("ftp_user", installation.getFtp().getUser());
 		setParam("ftp_local_dir", installation.getFtp().getLocalDir());
@@ -150,7 +150,7 @@ public class JSBatchInstallerExecuter {
 		setParam("ftp_password", installation.getFtp().getPassword());
 		setParam("ftp_remote_dir", installation.getFtp().getRemoteDir());
 
-		setParam("TransferInstallationSetup/ftp_file_path", "scheduler_linux32_agent.jar");
+		setParam("TransferInstallationSetup/ftp_file_path", installationSetupFilename);
 		setParam("TransferInstallationFile/ftp_local_dir", installationFile.getParent());
 		setParam("TransferInstallationFile/ftp_file_path", installationFile.getName());
 
