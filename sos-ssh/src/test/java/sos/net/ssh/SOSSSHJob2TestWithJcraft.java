@@ -53,7 +53,10 @@ public class SOSSSHJob2TestWithJcraft extends JSJobUtilitiesClass<SOSSSHJobOptio
         "-host", "homer.sos", 
         "-user", "test", 
         "-password", "12345",
-        "-strict_hostkey_checking", "yes",
+        "-strict_hostkey_checking", "no",
+        "-ignore_stderr", "false",
+        "-ignore_error", "true",
+        "-raise_exception_on_error", "true",
         "-command_delimiter", ";" };
     objOptions.CommandLineArgs(strArgs);
     objSSH.Execute();
