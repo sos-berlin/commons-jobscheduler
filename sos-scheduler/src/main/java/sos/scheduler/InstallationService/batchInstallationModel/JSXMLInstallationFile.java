@@ -8,11 +8,16 @@ package sos.scheduler.InstallationService.batchInstallationModel;
 
 import java.io.File;
  
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.transform.Result;
  
+
+
 
 import sos.scheduler.InstallationService.batchInstallationModel.installationFile.AutomatedInstallation;
 import sos.scheduler.InstallationService.batchInstallationModel.installationFile.ComIzforgeIzpackPanelsFinishPanel;
@@ -123,11 +128,11 @@ public class JSXMLInstallationFile {
 	 
    }
    
-   public void writeFile(File output) throws JAXBException {
+   public void writeFile(File output) throws JAXBException, FileNotFoundException {
 	  JAXBContext context = JAXBContext.newInstance( AutomatedInstallation.class );
  	  Marshaller m = context.createMarshaller();
 	  m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
-	  m.marshal( automatedInstallation, (Result) output );	  
+	  m.marshal( automatedInstallation, new FileOutputStream(output) );	  
    }
    
 }
