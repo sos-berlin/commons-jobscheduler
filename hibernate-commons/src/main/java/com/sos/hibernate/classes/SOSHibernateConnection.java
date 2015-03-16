@@ -267,17 +267,21 @@ public class SOSHibernateConnection implements Serializable {
 			disconnect();
 		}
 		sessionFactory = configuration.buildSessionFactory();
+		SessionFactoryImpl sf = (SessionFactoryImpl)sessionFactory;
 		
 		try{
-			//((SessionFactoryImplementor)sessionFactory).getDialect();
-			SessionFactoryImpl sf = (SessionFactoryImpl)sessionFactory;
 			dialect = sf.getDialect();
-			jdbcConnection = sf.getConnectionProvider().getConnection();
-			setDbms();
 		}
 		catch(Exception ex){
-			logger.warn(String.format("%s: cannot get dialect or jdbcConnection : %s",method,ex.toString()));
+			throw new Exception(String.format("%s: cannot get dialect : %s",method,ex.toString()));
 		}
+		try{
+			jdbcConnection = sf.getConnectionProvider().getConnection();
+		}
+		catch(Exception ex){
+			throw new Exception(String.format("%s: cannot get jdbcConnection : %s",method,ex.toString()));
+		}
+		setDbms();
 	}
 	
 	/**
@@ -382,12 +386,33 @@ public class SOSHibernateConnection implements Serializable {
 	}
 	
 	/**
+	 * @throws Exception 
 	 * 
 	 */
 	private void setDbms(){
 		dbms = DBMS.UNKNOWN;
-		defaultFetchSize = 1;
 		
+		setDbmsFromJdbcConnection();
+		if(dbms.equals(DBMS.UNKNOWN)){
+			setDbmsFromDialect();
+		}
+		setDbmsDefaultFetchSize();
+	}
+	
+	/**
+	 * 
+	 */
+	private void setDbmsDefaultFetchSize(){
+		defaultFetchSize = 1;
+		if(dbms.equals(DBMS.MYSQL)){
+			defaultFetchSize = Integer.MIN_VALUE;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	private void setDbmsFromDialect(){
 		if(dialect != null){
 			String dialectClassName = dialect.getClass().getSimpleName().toLowerCase();
 			if(dialectClassName.contains("db2")){
@@ -396,12 +421,11 @@ public class SOSHibernateConnection implements Serializable {
 			else if(dialectClassName.contains("firebird")){
 				dbms = DBMS.FBSQL;
 			}
-			else if(dialectClassName.contains("mssql")){
+			else if(dialectClassName.contains("sqlserver")){
 				dbms = DBMS.MSSQL;
 			}
 			else if(dialectClassName.contains("mysql")){
 				dbms = DBMS.MYSQL;
-				defaultFetchSize = Integer.MIN_VALUE;
 			}
 			else if(dialectClassName.contains("oracle")){
 				dbms = DBMS.ORACLE;
@@ -412,6 +436,47 @@ public class SOSHibernateConnection implements Serializable {
 			else if(dialectClassName.contains("sybase")){
 				dbms = DBMS.SYBASE;
 			}
+		}
+	}
+	
+	/**
+	 * 
+	 * @throws Exception
+	 */
+	private void setDbmsFromJdbcConnection(){
+		String method = "setDbmsFromJdbcConnection";
+		try{
+			if(jdbcConnection != null){
+				String pn = jdbcConnection.getMetaData().getDatabaseProductName();
+				if(pn != null){
+					pn = pn.toLowerCase();
+					
+					if(pn.contains("db2")){
+						dbms = DBMS.DB2;
+					}
+					else if(pn.contains("firebird")){
+						dbms = DBMS.FBSQL;
+					}
+					else if(pn.contains("sql server")){
+						dbms = DBMS.MSSQL;
+					}
+					else if(pn.contains("mysql")){
+						dbms = DBMS.MYSQL;
+					}
+					else if(pn.contains("oracle")){
+						dbms = DBMS.ORACLE;
+					}
+					else if(pn.contains("postgre")){
+						dbms = DBMS.PGSQL;
+					}
+					else if(pn.contains("ase")){
+						dbms = DBMS.SYBASE;
+					}
+				}
+			}
+		}
+		catch(Exception ex){
+			logger.warn(String.format("%s: cannot set dbms. %s",method,ex.toString()));
 		}
 	}
 	
