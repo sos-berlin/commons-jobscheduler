@@ -267,7 +267,7 @@ public class SOSSSHJob2TestWithJcraft extends JSJobUtilitiesClass<SOSSSHJobOptio
   }
   
   @Test
-  @Ignore("Tests works but remote machine isn´t always available as this test was ment for local testing only")
+  @Ignore("Tests works but remote machine isn´t always available as this test was meant for local testing only")
   public void testExecuteCmdScriptFileOnWindowsBitvise() throws Exception {
     logger.info("****testExecuteCmdScriptFileOnWindows with bitvise SSH Server started****");
     String strArgs[] = new String[] { 
@@ -287,7 +287,7 @@ public class SOSSSHJob2TestWithJcraft extends JSJobUtilitiesClass<SOSSSHJobOptio
   }
   
   @Test
-  @Ignore("Tests works but remote machine isn´t always available as this test was ment for local testing only")
+  @Ignore("Tests works but remote machine isn´t always available as this test was meant for local testing only")
   public void testExecuteCommandOnWindowsBitvise() throws Exception {
     logger.info("****testExecuteCommandOnWindows with bitvise SSH Server started****");
     String strArgs[] = new String[] { 
