@@ -10,7 +10,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import sos.net.ssh.exceptions.SSHExecutionError;
-import sos.net.ssh.exceptions.SSHMissingCommandError;
 
 import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
 import com.sos.JSHelper.Listener.JSListenerClass;
