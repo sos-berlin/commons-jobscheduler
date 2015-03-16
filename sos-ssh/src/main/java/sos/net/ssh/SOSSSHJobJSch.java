@@ -25,7 +25,7 @@ import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "com_sos_net_messages", defaultLocale = "en")
-public class SOSSSHJobJcraft extends SOSSSHJob2 {
+public class SOSSSHJobJSch extends SOSSSHJob2 {
 
   // http://www.sos-berlin.com/jira/browse/JITL-112: Additional Handler for post commands
   private ISOSVFSHandler    prePostCommandVFSHandler        = null;
@@ -53,7 +53,7 @@ public class SOSSSHJobJcraft extends SOSSSHJob2 {
   public void preparePostCommandHandler() {
     if (prePostCommandVFSHandler == null) {
       try {
-        prePostCommandVFSHandler = VFSFactory.getHandler("SSH2");
+        prePostCommandVFSHandler = VFSFactory.getHandler("SSH2.JSCH");
       }
       catch (Exception e) {
         // TODO msg must be used in the VFSFactory because it is an VFS Msg
@@ -116,7 +116,7 @@ public class SOSSSHJobJcraft extends SOSSSHJob2 {
   @Override
   public ISOSVFSHandler getVFSSSH2Handler() {
     try {
-      vfsHandler = VFSFactory.getHandler("SSH2.JCRAFT");
+      vfsHandler = VFSFactory.getHandler("SSH2.JSCH");
     }
     catch (Exception e) {
       throw new JobSchedulerException("SOS-VFS-E-0010: unable to initialize VFS", e);

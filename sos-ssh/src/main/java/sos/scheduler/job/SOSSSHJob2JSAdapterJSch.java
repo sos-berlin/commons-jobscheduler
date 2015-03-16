@@ -5,10 +5,10 @@ import java.util.HashMap;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
 import sos.net.ssh.SOSSSHJob2;
-import sos.net.ssh.SOSSSHJobJcraft;
+import sos.net.ssh.SOSSSHJobJSch;
 import sos.net.ssh.SOSSSHJobOptions;
 
-public class SOSSSHJob2JSAdapterJcraft extends SOSSSHJob2JSBaseAdapter {
+public class SOSSSHJob2JSAdapterJSch extends SOSSSHJob2JSBaseAdapter {
   private final String conClassName = this.getClass().getSimpleName();
 
   @Override
@@ -30,7 +30,7 @@ public class SOSSSHJob2JSAdapterJcraft extends SOSSSHJob2JSBaseAdapter {
   } // spooler_process
 
   private void doProcessing() throws Exception {
-    SOSSSHJob2 objR = new SOSSSHJobJcraft();
+    SOSSSHJob2 objR = new SOSSSHJobJSch();
     SOSSSHJobOptions objO = objR.Options();
     objO.CurrentNodeName(this.getCurrentNodeName());
     HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(getJobOrOrderParameters());

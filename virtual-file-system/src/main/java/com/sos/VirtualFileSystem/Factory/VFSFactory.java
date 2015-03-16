@@ -98,7 +98,7 @@ public class VFSFactory extends SOSVfsMessageCodes {
 	private static String							strParentLoggerName		= "";
 	private static ClassLoader						classLoader				= null;
   private static final String USE_TRILEAD = ".TRILEAD";
-  private static final String USE_JCRAFT = ".JCRAFT";
+  private static final String USE_JSCH = ".JSCH";
 
 	/**
 	 *
@@ -167,9 +167,9 @@ public class VFSFactory extends SOSVfsMessageCodes {
 		if(pstrWhatURL.contains(USE_TRILEAD)){
 		  useTrilead = true;
 		  pstrWhatURL = pstrWhatURL.replace(USE_TRILEAD, "");
-		}else if(pstrWhatURL.contains(USE_JCRAFT)){
+		}else if(pstrWhatURL.contains(USE_JSCH)){
 		  useTrilead = false;
-		  pstrWhatURL = pstrWhatURL.replace(USE_JCRAFT, "");
+		  pstrWhatURL = pstrWhatURL.replace(USE_JSCH, "");
 		}
     // TODO Type of filesystem as an enumeration
     String strWhatSystem = pstrWhatURL;
