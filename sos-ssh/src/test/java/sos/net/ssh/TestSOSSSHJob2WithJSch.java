@@ -16,19 +16,19 @@ import com.sos.JSHelper.Listener.JSListenerClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "com.sos.net.messages", defaultLocale = "en")
-public class TestSOSSSHJob2WithJcraft extends JSJobUtilitiesClass<SOSSSHJobOptions> {
-	private static final Logger	logger			= Logger.getLogger(TestSOSSSHJob2WithJcraft.class);
+public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions> {
+	private static final Logger	logger			= Logger.getLogger(TestSOSSSHJob2WithJSch.class);
 
 	private static SOSSSHJob2 objSSH = null;
 	private static SOSSSHJobOptions objOptions = null;
 	
-	public TestSOSSSHJob2WithJcraft() {
+	public TestSOSSSHJob2WithJSch() {
 		super(new SOSSSHJobOptions());
     initializeClazz();
 	}
 
 	public static void initializeClazz () {
-    objSSH = new SOSSSHJobJcraft();
+    objSSH = new SOSSSHJobJSch();
     objOptions = objSSH.Options();
 		JSListenerClass.bolLogDebugInformation = true;
 		JSListenerClass.intMaxDebugLevel = 9;
