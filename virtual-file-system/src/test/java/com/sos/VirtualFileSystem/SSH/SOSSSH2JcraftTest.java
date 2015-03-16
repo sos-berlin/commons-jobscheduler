@@ -27,7 +27,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 public class SOSSSH2JcraftTest {
   
   private static final String HOST = "homer.sos";
-  private static final String WINDOWS_HOST = "sp.sos";
+  private static final String WINDOWS_HOST = "lutest.sos";
   private static final int PORT = 22;
   private static final String USERNAME = "test";
   private static final String PASSWD = "12345";
