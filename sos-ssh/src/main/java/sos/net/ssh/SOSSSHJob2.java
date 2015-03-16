@@ -363,15 +363,17 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 				if (objOptions.ignore_error.isTrue() || objOptions.ignore_exit_code.Values().contains(intExitCode)) {
 					logger.info("SOS-SSH-E-140: exit code is ignored due to option-settings: " + intExitCode);
 					objJSJobUtilities.setJSParam("exit_code_ignored", "true");
-				}
-				else {
+				} else {
 					// TODO set next state to name### or to name
 					String strM = "SOS-SSH-E-150: remote command terminated with exit code: " + intExitCode;
-					// TODO set logger.error only if RaiseExceptionOnError is true
-					logger.error(strM);
 					objJSJobUtilities.setCC(intExitCode);
 					if (objOptions.raise_exception_on_error.isTrue()) {
-						throw new SSHExecutionError(strM);
+					  if(objOptions.ignore_error.value()){
+	            logger.info(strM);
+					  }else{
+					    logger.error(strM);
+					  }
+            throw new SSHExecutionError(strM);
 					}
 				}
 			}
@@ -403,22 +405,15 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 			logger.info("stderr = " + strbStderrOutput.toString());
 
 			objJSJobUtilities.setJSParam(conStd_err_output, strbStderrOutput);
-			if (objOptions.ignore_stderr.value() == true) {
+			if (objOptions.ignore_stderr.value()) {
 				logger.info("SOS-SSH-I-150: output to stderr is ignored: " + strbStderrOutput);
 			}
 			else {
-				intCC =  objVFS.getExitCode();
-				
-				if (intCC != 0 && objOptions.raise_exception_on_error.isTrue()) {
-					CheckExitCode();
+        String strM = "SOS-SSH-E-160: remote execution reports error: " + strbStderrOutput;
+        logger.error(strM);
+				if(objOptions.raise_exception_on_error.value()){
+          throw new SSHExecutionError(strM);
 				}
-
-					String strM = "SOS-SSH-E-160: remote execution reports error: " + strbStderrOutput;
-					logger.error(strM);
-					if (objOptions.raise_exception_on_error.isTrue()) {
-						throw new SSHExecutionError(strM);
-					}
-
 			}
 		}
 	}
