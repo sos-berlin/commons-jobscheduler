@@ -60,7 +60,6 @@ public class SOSHibernateConnection implements Serializable {
 	private Properties configurationProperties;
 	private ClassList classMapping;
 		
-	private boolean useSchedulerClassMapping 		  = true;
 	private boolean useDefaultConfigurationProperties = true;
 	private String connectionIdentifier;
 	private Enum<SOSHibernateConnection.DBMS> dbms = DBMS.UNKNOWN;
@@ -1143,14 +1142,6 @@ public class SOSHibernateConnection implements Serializable {
 		return currentSession;
 	}
 	
-	public boolean isUseSchedulerClassMapping() {
-		return useSchedulerClassMapping;
-	}
-
-	public void setUseSchedulerClassMapping(boolean val) {
-		useSchedulerClassMapping = val;
-	}
-
 	public boolean isUseDefaultConfigurationProperties() {
 		return useDefaultConfigurationProperties;
 	}
