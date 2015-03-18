@@ -1102,9 +1102,10 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		objDataSourceClient = objParent.objDataSourceClient;
 		objDataTargetClient = objParent.objDataTargetClient;
 		if (objDataSourceClient != null) {
-			lngOriginalFileSize = objDataSourceClient.getFileHandle(strSourceFileName).getFileSize();
+			ISOSVirtualFile sourceFile = objDataSourceClient.getFileHandle(strSourceFileName);
+			lngOriginalFileSize = sourceFile.getFileSize();
 			lngFileSize = lngOriginalFileSize;
-			lngFileModDate = objDataSourceClient.getFileHandle(strSourceFileName).getModificationDateTime();
+			lngFileModDate = sourceFile.getModificationDateTime();
 		}
 	}
 
