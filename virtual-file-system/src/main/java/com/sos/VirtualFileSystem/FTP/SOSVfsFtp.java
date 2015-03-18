@@ -482,11 +482,7 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 
 	@Override
 	public String[] getFilelist(final String folder, final String regexp, final int flag, final boolean flgRecurseSubFolder) {
-		// TODO vecDirectoryListing = null; prüfen, ob notwendig
-		vecDirectoryListing = null;
-		if (vecDirectoryListing == null) {
-			vecDirectoryListing = nList(folder, flgRecurseSubFolder);
-		}
+		Vector<String> vecDirectoryListing = nList(folder, flgRecurseSubFolder);
 		Vector<String> strB = new Vector<String>();
 		Pattern pattern = Pattern.compile(regexp, flag);
 		for (String strFile : vecDirectoryListing) {
@@ -527,9 +523,10 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 
 	/**
 	 * return a listing of the contents of a directory in short format on
-	 * the remote machine (without subdirectory)
+	 * the remote machine
 	 *
 	 * @param pstrPathName on remote machine
+	 * @param flgRecurseSubFolders for recursive listing
 	 * @return a listing of the contents of a directory on the remote machine
 	 * @throws IOException
 	 *
@@ -537,70 +534,55 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 	 * @see #dir()
 	 */
 	private Vector<String> getFilenames(final String pstrPathName, final boolean flgRecurseSubFolders) {
-
+		// TODO Warum nicht Vector<FTPFile>? 
+		// Dann kann man sich spaeter die zusätzlichen Abfragen nach Mod.Date und Size sparen, 
+		// das diese Angaben im Objekt FTPFile enthalten sind.
+		
 		String conMethodName = "getFilenames";
 		String strCurrentDirectory = null;
-		// TODO vecDirectoryListing = null; prüfen, ob notwendig
-		Vector<String> vecDirectoryListing = null;
-		if (vecDirectoryListing == null) {
-			vecDirectoryListing = new Vector<String>();
-			String[] fileList = null;
-			strCurrentDirectory = DoPWD();
-			String lstrPathName = pstrPathName.trim();
-			if (lstrPathName.length() <= 0) {
-				lstrPathName = ".";
-			}
-			if (lstrPathName.equals(".")) {
-				lstrPathName = strCurrentDirectory;
-			}
-
-			try {
-				objFTPFileList = Client().listFiles(lstrPathName);
-			}
-			catch (IOException e) {
-				RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
-			}
-			if (objFTPFileList == null || objFTPFileList.length <= 0) {
-				if (isNegativeCommandCompletion()) {
-					RaiseException(HostID(SOSVfs_E_0105.params(conMethodName)) + ":" + getReplyString());
-				}
-				return vecDirectoryListing;
-			}
-
-			for (FTPFile objFTPFile : objFTPFileList) {
-				String strCurrentFile = objFTPFile.getName();
-				if (isNotHiddenFile(strCurrentFile) && strCurrentFile.trim().length() > 0) {
-					boolean flgIsDirectory = objFTPFile.isDirectory();
-					if (flgIsDirectory == false) {
-						if (lstrPathName.startsWith("/") == false) { // JIRA SOSFTP-124
-							if (strCurrentFile.startsWith(strCurrentDirectory) == false) {
-								strCurrentFile = addFileSeparator(strCurrentDirectory) + strCurrentFile;
-							}
-						}
-						vecDirectoryListing.add(strCurrentFile);
-					}
-					else {
-						if (flgIsDirectory && flgRecurseSubFolders == true) {
-							DoCD(strCurrentDirectory);
-							if (flgRecurseSubFolders) {
-								logger.debug(String.format(""));
-								Vector<String> vecNames = getFilenames(strCurrentFile, flgRecurseSubFolders);
-								if (vecNames != null) {
-									vecDirectoryListing.addAll(vecNames);
-								}
-							}
-						}
-					}
-				}
-			}
+		Vector<String> vecDirectoryListing = new Vector<String>();
+		String lstrPathName = pstrPathName.trim();
+		if (lstrPathName.length() <= 0) {
+			lstrPathName = ".";
 		}
-		logger.debug("strCurrentDirectory = " + strCurrentDirectory);
-		if (strCurrentDirectory != null) {
-			DoCD(strCurrentDirectory);
-			DoPWD();
+		if (!lstrPathName.startsWith("/")) {
+			strCurrentDirectory = DoPWD();
+			lstrPathName = (strCurrentDirectory + "/" + lstrPathName).replaceAll("//+", "/");
+		}
+		logger.debug("directory = " + lstrPathName);
+		try {
+			objFTPFileList = Client().listFiles(lstrPathName);
+		} catch (IOException e) {
+			RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
+		}
+		if (objFTPFileList == null || objFTPFileList.length <= 0) {
+			if (isNegativeCommandCompletion()) {
+				RaiseException(HostID(SOSVfs_E_0105.params(conMethodName)) + ":" + getReplyString());
+			}
+			return vecDirectoryListing;
+		}
+
+		for (FTPFile objFTPFile : objFTPFileList) {
+			String strCurrentFile = objFTPFile.getName();
+			if (isNotHiddenFile(strCurrentFile) && strCurrentFile.trim().length() > 0) {
+				boolean flgIsDirectory = objFTPFile.isDirectory();
+				if (!strCurrentFile.startsWith("/")) {
+					strCurrentFile = (lstrPathName + "/" + strCurrentFile).replaceAll("//+", "/");
+				}
+				if (flgIsDirectory == false) {
+					vecDirectoryListing.add(strCurrentFile);
+				} else {
+					if (flgIsDirectory && flgRecurseSubFolders == true) {
+						Vector<String> vecNames = getFilenames(strCurrentFile, flgRecurseSubFolders);
+						if (vecNames != null && vecNames.size() > 0) {
+							vecDirectoryListing.addAll(vecNames);
+						}
+					}
+				}
+			}
 		}
 		return vecDirectoryListing;
-	}// nList
+	}
 
 	@Override
 	public Vector<ISOSVirtualFile> getFiles() {
