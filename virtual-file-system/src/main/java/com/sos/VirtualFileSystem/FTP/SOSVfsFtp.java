@@ -541,10 +541,11 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 		String conMethodName = "getFilenames";
 		String strCurrentDirectory = null;
 		Vector<String> vecDirectoryListing = new Vector<String>();
-		String lstrPathName = pstrPathName.trim();
-		if (lstrPathName.length() <= 0) {
-			lstrPathName = ".";
+		String lstrPathName = pstrPathName;
+		if (lstrPathName == null) {
+			lstrPathName = "";
 		}
+		lstrPathName = lstrPathName.trim();
 		if (!lstrPathName.startsWith("/")) {
 			strCurrentDirectory = DoPWD();
 			lstrPathName = (strCurrentDirectory + "/" + lstrPathName).replaceAll("//+", "/");
