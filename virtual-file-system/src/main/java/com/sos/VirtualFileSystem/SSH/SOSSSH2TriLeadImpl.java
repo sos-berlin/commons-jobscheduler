@@ -324,7 +324,7 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 							logger.debug(SOSVfs_I_0113.params(strFileNameToDelete));
 						}
 						catch (Exception e) {
-							e.printStackTrace();
+							logger.error(e.getLocalizedMessage());
 						}
 					}
 					vecFilesToDelete = null;
@@ -457,7 +457,6 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 			return strFileName2Return;
 		}
 		catch (Exception e) {
-			e.printStackTrace();
 			throw e;
 		}
 	}
@@ -741,7 +740,6 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 				fis = null;
 			}
 			catch (Exception e) {
-				e.printStackTrace();
 				throw e;
 			}
 			finally {
@@ -760,7 +758,6 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 			fileHandle = null;
 		}
 		catch (Exception e) {
-			e.printStackTrace();
 			throw e;
 		}
 	}

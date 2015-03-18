@@ -560,8 +560,10 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 			catch (IOException e) {
 				RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
 			}
-
 			if (objFTPFileList == null || objFTPFileList.length <= 0) {
+				if (isNegativeCommandCompletion()) {
+					RaiseException(HostID(SOSVfs_E_0105.params(conMethodName)) + ":" + getReplyString());
+				}
 				return vecDirectoryListing;
 			}
 
@@ -752,6 +754,9 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 
 		try {
 			return getFilenames(pathname, flgRecurseSubFolder);
+		}
+		catch (JobSchedulerException e) {
+			throw e;
 		}
 		catch (Exception e) {
 			RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
