@@ -274,6 +274,32 @@ public class SOSVfsFtpTest {
 		ftpClient.disconnect();
 	}
 	
+	@Test
+	public void testSocks5ProxyConnect() throws Exception {
+		
+		SOSConnection2OptionsAlternate options = objOptions.getConnectionOptions().Source();
+		options.host.Value("wilma.sos");
+		options.port.value(SOSOptionPortNumber.getStandardFTPPort());
+		options.user.Value("kb");
+		options.password.Value("kb");
+		options.protocol.Value("ftp");
+		options.ssh_auth_method.isPassword(true);
+		
+		options.proxy_protocol.Value(SOSOptionProxyProtocol.Protocol.socks5.name());
+		options.proxy_host.Value("homer.sos");
+		options.proxy_port.value(1080);
+		options.proxy_user.Value("sos");
+		options.proxy_password.Value("sos");
+		
+		objOptions.operation.Value("send");
+		objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
+		ftpClient = (ISOSVfsFileTransfer) objVFS;
+
+		objVFS.Connect(objOptions.getConnectionOptions().Source());
+		objVFS.Authenticate(options);
+		ftpClient.disconnect();
+	}
+	
 	@Test(
 			expected = com.sos.JSHelper.Exceptions.JobSchedulerException.class) public void testConnectFailed() throws Exception {
 		objOptions.host.Value("wilmaxxx.sos");

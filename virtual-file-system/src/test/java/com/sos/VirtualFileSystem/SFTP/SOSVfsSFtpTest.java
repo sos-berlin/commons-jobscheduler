@@ -146,6 +146,35 @@ public class SOSVfsSFtpTest extends JSToolBox {
 		// ftpClient.disconnect();
 	}
 	
+	@Test
+	public void testSocks5ProxyConnect() throws Exception {
+
+		objOptions.host.Value("wilma.sos");
+		objOptions.port.value(SOSOptionPortNumber.getStandardSFTPPort());
+
+		SOSConnection2OptionsAlternate options = objOptions.getConnectionOptions().Source();
+		setDynamicClassNameSource(options);
+		options.host.Value("wilma.sos");
+		options.port.value(SOSOptionPortNumber.getStandardSFTPPort());
+		options.user.Value("kb");
+		options.password.Value("kb");
+		options.protocol.Value("sftp");
+		options.ssh_auth_method.isPassword(true);
+		
+		options.proxy_protocol.Value(SOSOptionProxyProtocol.Protocol.socks5.name());
+		options.proxy_host.Value("homer.sos");
+		options.proxy_port.value(1080);
+		options.proxy_user.Value("sos");
+		options.proxy_password.Value("sos");
+				
+		objOptions.operation.Value("send");
+		objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
+		ftpClient = (ISOSVfsFileTransfer) objVFS;
+		
+		objVFS.Connect(objOptions.getConnectionOptions().Source());
+		objVFS.Authenticate(options);
+	}
+	
 	private void setDynamicClassNameSource(final SOSConnection2OptionsAlternate objSource) {
 		if (isNotEmpty(dynamicClassNameSource)) {
 			objSource.loadClassName.Value(dynamicClassNameSource);
