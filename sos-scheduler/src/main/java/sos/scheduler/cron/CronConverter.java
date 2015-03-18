@@ -878,7 +878,7 @@ public class CronConverter extends JSToolBox {
 				String envName = envIter.next().toString();
 				String envValue = environmentVariables.get(envName).toString();
 				script += envName + "=" + envValue + conNewline;
-				script += "export " + envName;
+				script += "export " + envName + conNewline;
 			}
 
 			script += "echo created by " + conClassName + ", at " + SOSDate.getCurrentTimeAsString() + conNewline;
