@@ -545,7 +545,7 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 		if (lstrPathName == null) {
 			lstrPathName = "";
 		}
-		lstrPathName = pstrPathName.trim();
+		lstrPathName = lstrPathName.trim();
 		if (!lstrPathName.startsWith("/")) {
 			strCurrentDirectory = DoPWD();
 			lstrPathName = (strCurrentDirectory + "/" + lstrPathName).replaceAll("//+", "/");
