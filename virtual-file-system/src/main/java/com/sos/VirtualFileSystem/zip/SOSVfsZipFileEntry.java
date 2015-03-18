@@ -180,9 +180,7 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace(System.err);
 			String strT = SOSVfs_E_134.params(conMethodName);
-			logger.error(strT, e);
 			throw new JobSchedulerException(strT, e);
 		}
 		return objOutputStream;
@@ -433,7 +431,7 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
 			}
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 			throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);
 		}
 		finally {
@@ -452,7 +450,7 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
 			objEntryOutputStream.closeEntry();
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 			throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);
 		}
 		finally {
@@ -467,7 +465,7 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
 			this.getFileOutputStream().flush();
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 			throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);
 		}
 	}
@@ -480,7 +478,7 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
 			lngBytesRed = this.getFileInputStream().read(bteBuffer);
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 			throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);
 		}
 		return lngBytesRed;
@@ -494,7 +492,7 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
 			lngBytesRed = this.getFileInputStream().read(bteBuffer, intOffset, intLength);
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 			throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);
 		}
 		return lngBytesRed;
@@ -507,7 +505,7 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
 			this.getFileOutputStream().write(bteBuffer, intOffset, intLength);
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 			throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);
 		}
 	}
@@ -519,7 +517,7 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
 			this.getFileOutputStream().write(bteBuffer);
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 			throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);
 		}
 	}

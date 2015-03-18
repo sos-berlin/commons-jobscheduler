@@ -433,8 +433,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 			lngNoOfBytesRead = this.getFile(remoteFile, localFile, flgAppendLocalFile);
 		}
 		catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage(), e);
 		}
 		return lngNoOfBytesRead;
 	}
@@ -921,7 +920,6 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 			lngFileSize = this.size(lstrFileName);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
 			RaiseException(e, SOSVfs_E_134.params("getFileSize()"));
 		}
 		 
@@ -1099,8 +1097,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	 * @param msg
 	 */
 	protected void RaiseException(final Exception e, final String msg) {
-//		logEXCEPTION(msg);
-//		e.printStackTrace(System.err);
+		logger.error(msg + " (" + e.getLocalizedMessage() + ")");
 		throw new JobSchedulerException(msg, e);
 	}
 
@@ -1275,7 +1272,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 			fileList = listNames(path);
 		}
 		catch (IOException e) {
-			e.printStackTrace(System.err);
+			logger.error(e.getLocalizedMessage());
 		}
 
 		if (fileList == null) {

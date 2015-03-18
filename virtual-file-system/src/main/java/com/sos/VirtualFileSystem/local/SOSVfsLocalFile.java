@@ -152,9 +152,7 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
 			objO = new FileOutputStream(new File(strFileName), true);
 		}
 		catch (FileNotFoundException e) {
-			e.printStackTrace();
 			String strT = SOSVfsMessageCodes.SOSVfs_E_134.params(conMethodName);
-			logger.error(strT, e);
 			throw new JobSchedulerException(strT, e);
 		}
 		return objO;
@@ -207,9 +205,7 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
 			}
 		}
 		catch (FileNotFoundException e) {
-			e.printStackTrace();
 			String strT = SOSVfsMessageCodes.SOSVfs_E_134.params(conMethodName);
-			logger.error(strT, e);
 			throw new JobSchedulerException(strT, e);
 		}
 		return objOutputStream;
@@ -465,10 +461,8 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
 			this.compressFile(fleSourceTransferFile);
 		}
 		catch (Exception e) {
-			e.printStackTrace(System.err);
-			logger.error(e.getLocalizedMessage(), new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_130.params("SOSGZip"), e));
+			logger.error(e.getLocalizedMessage());
 			throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_130.params("SOSGZip"), e);
-			// throw new JobSchedulerException("SOSGZip returns an exception", e);
 		}
 		return strSourceTransferName;
 	}
@@ -528,7 +522,7 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
 			}
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 			throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_134.params(conMethodName), e);
 		}
 		finally {
@@ -680,7 +674,7 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
 			flgClosingDone = true;
 		}
 		catch (Exception e) {
-			e.printStackTrace(System.err);
+			logger.error(e.getLocalizedMessage());
 			throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_266.get(), e);
 		}
 		finally {
@@ -704,8 +698,7 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
 			lngR = new File(strFileName).lastModified();
 		}
 		catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 			lngR = -1;
 		}
 
@@ -721,8 +714,7 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
 			lngR = pdteDateTime;
 		}
 		catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 			lngR = -1;
 		}
 

@@ -40,8 +40,7 @@ public class SOSVfsFtpS2 extends SOSVfsFtpBaseClass2 {
 				objFTPClient = new FTPSClient(strProtocol);
 			}
 			catch (Exception e) {
-				e.printStackTrace();
-				throw new JobSchedulerException("can not create FTPS-Client");
+				throw new JobSchedulerException("can not create FTPS-Client", e);
 			}
 			FTPClientConfig conf = new FTPClientConfig();
 			//			conf.setServerLanguageCode("fr");
@@ -90,7 +89,6 @@ public class SOSVfsFtpS2 extends SOSVfsFtpBaseClass2 {
 		}
 		catch (Exception e) {
 			String strM = HostID("connect returns an exception");
-			e.printStackTrace(System.err);
 			logger.error(strM, e);
 		}
 	}

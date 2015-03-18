@@ -7,6 +7,8 @@
 package sos.scheduler.InstallationService.batchInstallationModel;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -46,7 +48,7 @@ public class JSInstallations {
 	  j.globals = installations.getGlobals();
 	  j.setValues(i);
   	  return j;
-   }
+   } 
    
   
    public Installations getInstallations() {
@@ -71,12 +73,12 @@ public Installation nextInstallation() {
 	 reset();
    }
    
-   public void writeFile(File output) throws JAXBException, ParseException {
+   public void writeFile(File output) throws JAXBException, ParseException, FileNotFoundException {
 	  JAXBContext context = JAXBContext.newInstance( Installations.class );
 
  	  Marshaller m = context.createMarshaller();
  	  m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE );
-	  m.marshal( installations, (Result) output );	  
+	  m.marshal( installations, new FileOutputStream( output) );	  
 	  
    }
    

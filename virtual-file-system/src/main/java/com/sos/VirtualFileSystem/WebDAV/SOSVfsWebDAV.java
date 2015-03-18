@@ -410,7 +410,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace(System.err);
+			logger.error(e.getLocalizedMessage());
 			throw new Exception(SOSVfs_E_161.params("checking size", e));
 		}
 		finally {

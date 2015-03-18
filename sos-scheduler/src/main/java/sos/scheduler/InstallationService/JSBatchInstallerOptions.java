@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
  * \verbatim ;
  * mechanicaly created by JobDocu2OptionsClass.xslt from http://www.sos-berlin.com at 20110322142401 
  * \endverbatim
- */
+ */ 
 @JSOptionClass(name = "JSBatchInstallerOptions", description = "Unattended Batch Installation on remote servers")
 public class JSBatchInstallerOptions extends JSBatchInstallerOptionsSuperClass {
 	/**
