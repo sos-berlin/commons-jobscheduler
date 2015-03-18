@@ -460,7 +460,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
 			strS = objV.toArray(new String[objV.size()]);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 		}
 		return strS;
 	}
@@ -561,7 +561,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
 			strS = objV.toArray(new String[objV.size()]);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 		}
 		return strS;
 	}

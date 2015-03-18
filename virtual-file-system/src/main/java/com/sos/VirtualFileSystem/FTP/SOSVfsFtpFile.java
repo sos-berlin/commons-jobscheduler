@@ -205,7 +205,8 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
 					objOutputStream = objVFSHandler.getOutputStream(strFileName);
 				}
 				if (objOutputStream == null) {
-					objVFSHandler.openOutputFile(strFileName);
+					throw new JobSchedulerException(objVFSHandler.getReplyString());
+					//objVFSHandler.openOutputFile(strFileName);
 				}
 			}
 		}
@@ -494,8 +495,8 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
 					objVFSHandler.CompletePendingCommand() ;
 				}
 				catch (Exception e) {
-					e.printStackTrace(System.err);  //  SocketTimeOut???
-					throw e;
+					logger.error(e.getLocalizedMessage());  //  SocketTimeOut???
+					throw new JobSchedulerException(e);
 				}
 			}
 		}
@@ -511,11 +512,9 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
 	public void closeOutput() {
 		final String conMethodName = conClassName + "::closeOutput";
 		try {
-			OutputStream objO = this.getFileOutputStream();
-			if (objO != null) {
-				objO.flush();
-				objO.close();
-				objO = null;
+			if (objOutputStream != null) {
+				objOutputStream.flush();
+				objOutputStream.close();
 				// siehe kommentar bei closeInput (nur rufen, wenn vorher ein FTP-Commando abgesetzt wurde. ansonsten h‰ngt der Prozeﬂ
 				objVFSHandler.CompletePendingCommand();
 				if (objVFSHandler.isNegativeCommandCompletion()) {
@@ -535,7 +534,9 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
 	public void flush() {
 		final String conMethodName = conClassName + "::flush";
 		try {
-			this.getFileOutputStream().flush();
+			if (objOutputStream != null) {
+				objOutputStream.flush();
+			}
 		}
 		catch (IOException e) {
 			throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);

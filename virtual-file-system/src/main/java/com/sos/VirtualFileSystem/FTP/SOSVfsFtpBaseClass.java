@@ -957,7 +957,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 				objFTPFileList = Client().listFiles(lstrPathName);
 			}
 			catch (IOException e1) {
-				e1.printStackTrace();
+				logger.error(e1.getLocalizedMessage());
 			}
 			//			if (1 == 1) {
 			//				try {
@@ -1038,7 +1038,6 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 			lngFileSize = size(strFileName);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
 			RaiseException(SOSVfs_E_153.params(conMethodName, e));
 		}
 		return lngFileSize;
@@ -1108,7 +1107,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 			}
 		}
 		catch (IOException e) {
-			throw new JobSchedulerException(HostID(SOSVfs_E_0105.params(conMethodName)), e);
+			RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
 		}
 		finally {
 			LogReply();
@@ -1158,7 +1157,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 			LogReply();
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			throw new JobSchedulerException(HostID(SOSVfs_E_0105.params("getOutputStream", e.getMessage())), e);
 		}
 		return objO;
 	}
@@ -1303,16 +1302,12 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 	}
 
 	protected boolean LogReply() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::LogReply";
 		strReply = getReplyString();
-		if (isNotNull(strReply)) {
-			if (strReply.startsWith("550") || strReply.startsWith("500")) {
-				@SuppressWarnings("unused") boolean flgError = true;
-			}
+		if (objConnection2Options.ProtocolCommandListener.isFalse()) {
+			logger.trace(strReply);
 		}
-		logger.trace(strReply);
 		return true;
-	} // private boolean LogReply
+	}
 
 	@Override public ISOSVirtualFolder mkdir(final SOSFolderName pobjFolderName) {
 		this.mkdir(pobjFolderName.Value());
@@ -1351,10 +1346,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 			}
 		}
 		catch (IOException e) {
-			String strM = HostID(SOSVfs_E_0105.params(conMethodName));
-			e.printStackTrace(System.err);
-			throw new RuntimeException(strM, e);
-			// throw new JobSchedulerException(HostID("makeDirectory returns an exception"), e);
+			RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
 		}
 	}
 
@@ -1415,7 +1407,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 			return getFilenames(pathname, flgRecurseSubFolder);
 		}
 		catch (Exception e) {
-			throw new JobSchedulerException(SOSVfs_E_128.params("getfilenames", "nLixt"), e);
+			throw new JobSchedulerException(SOSVfs_E_128.params("getfilenames", "nList"), e);
 		}
 	} // nList
 
@@ -1585,8 +1577,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 	} // putFile
 
 	protected void RaiseException(final Exception e, final String pstrM) {
-		logger.error(pstrM);
-		// e.printStackTrace(System.err);
+		logger.error(pstrM + " (" + e.getLocalizedMessage() + ")");
 		throw new JobSchedulerException(pstrM, e);
 	}
 
@@ -1615,7 +1606,6 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 			this.Client().rename(from, to);
 		}
 		catch (IOException e) {
-			e.printStackTrace();
 			RaiseException(e, SOSVfs_E_134.params("rename"));
 		}
 		logger.info(String.format(SOSVfs_I_150.params(from, to)));

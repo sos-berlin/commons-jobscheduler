@@ -396,7 +396,6 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace(System.err);
 			throw new Exception(SOSVfs_E_161.params("checking size", e));
 		}
 

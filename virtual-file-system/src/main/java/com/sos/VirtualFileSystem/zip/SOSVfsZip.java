@@ -106,9 +106,7 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
 			lngFileSize = objTargetFile.AppendFile(strSourceFileName);
 		}
 		catch (Exception e) {
-			e.printStackTrace(System.err);
 			String strM = SOSVfs_E_134.params("appendFile()");
-			logger.error(strM, e);
 			throw new JobSchedulerException(strM, e);
 		}
 		return lngFileSize;
@@ -177,8 +175,6 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
 			}
 		}
 		catch (IOException e) {
-			e.printStackTrace(System.err);
-			logger.error("", e);
 			throw new JobSchedulerException(e);
 		}
 		return flgResult;
@@ -784,7 +780,7 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
 				objF.setHandler(this);
 			}
 			catch (IOException e) {
-				e.printStackTrace();
+				logger.error(e.getLocalizedMessage());
 			}
 		}
 
@@ -820,7 +816,7 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
 			strS = objV.toArray(new String[objV.size()]);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 		}
 		return strS;
 	}
@@ -845,7 +841,7 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
 			strS = objV.toArray(new String[objV.size()]);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 		}
 		return strS;
 	}
@@ -888,8 +884,8 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
 				objI = objWorkingDirectory.getInputStream(objZE);
 			}
 			catch (IOException e) {
-				e.printStackTrace();
-				throw new JobSchedulerException();
+				logger.error(e.getLocalizedMessage());
+				throw new JobSchedulerException(e);
 			}
 		}
 		return objI;
@@ -912,8 +908,8 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
 				objZOS.putNextEntry(objZE);
 			}
 			catch (Exception e) {
-				e.printStackTrace();
-				throw new JobSchedulerException();
+				logger.error(e.getLocalizedMessage());
+				throw new JobSchedulerException(e);
 			}
 		}
 		return objZOS;

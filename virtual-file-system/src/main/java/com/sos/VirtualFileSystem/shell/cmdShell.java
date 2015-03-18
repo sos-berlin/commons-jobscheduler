@@ -122,7 +122,7 @@ public class cmdShell extends SOSVfsMessageCodes implements Runnable {
 				}
 			}
 			catch (IOException ex) {
-				ex.printStackTrace();
+				logger.error(ex.getLocalizedMessage());
 			}
 		}
 	}
@@ -286,7 +286,7 @@ public class cmdShell extends SOSVfsMessageCodes implements Runnable {
 			this.executeCommand(strCommand);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 		}
 
 	}

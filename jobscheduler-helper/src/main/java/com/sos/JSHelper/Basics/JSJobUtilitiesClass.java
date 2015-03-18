@@ -198,13 +198,13 @@ public class JSJobUtilitiesClass<T> extends JSToolBox implements JSJobUtilities,
 
 	@Override
 	public void setStateText(final String pstrStateText) {
-		logger.trace(String.format("*mock* Set job chain state text to '%1$s'", pstrStateText));
+		//logger.trace(String.format("*mock* Set job chain state text to '%1$s'", pstrStateText));
 	}
 
 	@Override
 	public void setCC(final int pintCC) {
 		intCC = pintCC;
-		logger.trace(String.format("*mock* Set Condition code/return code to '%1$d'", pintCC ));
+		//logger.trace(String.format("*mock* Set Condition code/return code to '%1$d'", pintCC ));
 	}
 
 	protected  int intCC = 0;
@@ -218,13 +218,12 @@ public class JSJobUtilitiesClass<T> extends JSToolBox implements JSJobUtilities,
 
 	@Override
 	public String executeXML(final String pstrJSXmlCommand) {
-		logger.info("***mock***\n" + pstrJSXmlCommand);
+		//logger.info("***mock***\n" + pstrJSXmlCommand);
 		return "";
 	}
 
 	@Override public void setNextNodeState(final String pstrNodeName) {
-		logger.info("***mock***\n" + pstrNodeName);
-		
+		//logger.info("***mock***\n" + pstrNodeName);
 	}
 
 }
