@@ -564,8 +564,14 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 		if (objFTPFileList == null || objFTPFileList.length <= 0) {
 			//e.g. insufficient permissions
 			//should raise only for the source dir and not for sub folders (recursive)
-			if (checkReplyCode && isNegativeCommandCompletion()) {
-				RaiseException(HostID(SOSVfs_E_0105.params(conMethodName)) + ":" + getReplyString());
+			if (isNegativeCommandCompletion()) {
+				String message = HostID(SOSVfs_E_0105.params(conMethodName)) + ":" + getReplyString();
+				if (checkReplyCode) {
+					RaiseException(message);
+				}
+				else {
+					logger.warn(message);
+				}
 			}
 			return vecDirectoryListing;
 		}
