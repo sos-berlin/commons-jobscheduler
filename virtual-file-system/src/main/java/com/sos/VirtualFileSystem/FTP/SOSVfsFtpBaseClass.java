@@ -477,9 +477,21 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 	 * command to the server or receiving a reply from the server.
 	 */
 	@Override public void delete(final String pathname) throws IOException {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::delete";
-		Client().deleteFile(pathname);
-		logger.info(SOSVfs_I_131.params(pathname, getReplyString()));
+		try {
+			Client().deleteFile(pathname);
+			if (isNegativeCommandCompletion()) {
+				RaiseException(SOSVfs_E_144.params("delete()", pathname, getReplyString()));;
+			}
+			else {
+				logger.info(SOSVfs_I_131.params(pathname, getReplyString()));
+			}
+		} 
+		catch (JobSchedulerException e) {
+			throw e;
+		}
+		catch (IOException e) {
+			RaiseException(e, SOSVfs_E_134.params("delete()"));
+		}
 	}
 
 	/**
@@ -1565,11 +1577,19 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 	@Override public void rename(final String from, final String to) {
 		try {
 			this.Client().rename(from, to);
+			if (isNegativeCommandCompletion()) {
+				RaiseException(SOSVfs_E_144.params("rename()", from, getReplyString()));
+			}
+			else {
+				logger.info(String.format(SOSVfs_I_150.params(from, to)));
+			}
+		}
+		catch (JobSchedulerException e) {
+			throw e;
 		}
 		catch (IOException e) {
-			RaiseException(e, SOSVfs_E_134.params("rename"));
+			RaiseException(e, SOSVfs_E_134.params("rename()"));
 		}
-		logger.info(String.format(SOSVfs_I_150.params(from, to)));
 	}
 
 	@Override public boolean rmdir(final SOSFolderName pobjFolderName) throws IOException {

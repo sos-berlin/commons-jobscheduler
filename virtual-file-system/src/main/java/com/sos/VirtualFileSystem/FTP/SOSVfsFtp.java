@@ -6,6 +6,7 @@ import com.sos.VirtualFileSystem.DataElements.SOSFileListEntry;
 import com.sos.VirtualFileSystem.DataElements.SOSFolderName;
 import com.sos.VirtualFileSystem.Interfaces.*;
 import com.sos.i18n.annotation.I18NResourceBundle;
+
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPClientConfig;
@@ -534,6 +535,10 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 	 * @see #dir()
 	 */
 	private Vector<String> getFilenames(final String pstrPathName, final boolean flgRecurseSubFolders) {
+		return getFilenames(pstrPathName, flgRecurseSubFolders, true);
+	}
+	
+	private Vector<String> getFilenames(final String pstrPathName, final boolean flgRecurseSubFolders, final boolean checkReplyCode) {
 		// TODO Warum nicht Vector<FTPFile>? 
 		// Dann kann man sich spaeter die zusätzlichen Abfragen nach Mod.Date und Size sparen, 
 		// das diese Angaben im Objekt FTPFile enthalten sind.
@@ -557,7 +562,9 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 			RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
 		}
 		if (objFTPFileList == null || objFTPFileList.length <= 0) {
-			if (isNegativeCommandCompletion()) {
+			//e.g. insufficient permissions
+			//should raise only for the source dir and not for sub folders (recursive)
+			if (checkReplyCode && isNegativeCommandCompletion()) {
 				RaiseException(HostID(SOSVfs_E_0105.params(conMethodName)) + ":" + getReplyString());
 			}
 			return vecDirectoryListing;
@@ -574,7 +581,7 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 					vecDirectoryListing.add(strCurrentFile);
 				} else {
 					if (flgIsDirectory && flgRecurseSubFolders == true) {
-						Vector<String> vecNames = getFilenames(strCurrentFile, flgRecurseSubFolders);
+						Vector<String> vecNames = getFilenames(strCurrentFile, true, false);
 						if (vecNames != null && vecNames.size() > 0) {
 							vecDirectoryListing.addAll(vecNames);
 						}
@@ -899,16 +906,21 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 
 	@Override
 	public void rename(final String from, final String to) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::rename";
-
 		try {
 			this.Client().rename(from, to);
+			if (isNegativeCommandCompletion()) {
+				RaiseException(SOSVfs_E_144.params("rename()", from, getReplyString()));
+			}
+			else {
+				logger.info(String.format(SOSVfs_I_150.params(from, to)));
+			}
+		}
+		catch (JobSchedulerException e) {
+			throw e;
 		}
 		catch (IOException e) {
 			RaiseException(e, SOSVfs_E_134.params("rename()"));
 		}
-		logger.info(SOSVfs_I_150.params(from, to));
 	}
 
 	@Override

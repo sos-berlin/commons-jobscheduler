@@ -145,6 +145,9 @@ public class SOSFileList extends SOSVfsMessageCodes {
 					case transfer_aborted:
 						lngFailedTransfers++;
 						break;
+					case setBack:
+						lngFailedTransfers++;
+						break;
 					case notOverwritten:
 						lngFailedTransfers++;
 						break;
@@ -460,6 +463,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 					if (!fileNamesAreEqual(strToFilename, strTargetTransferName, false)) { // SOSFTP-142
 						ISOSVirtualFile objF = null;
 						if (objOptions.overwrite_files.isTrue() && objListItem.FileExists() == true) {
+							objListItem.setTargetFileAlreadyExists(true);
 							objF = objDataTargetClient.getFileHandle(strToFilename);
 							objF.delete();
 						}
@@ -572,12 +576,34 @@ public class SOSFileList extends SOSVfsMessageCodes {
 			for (SOSFileListEntry objListItem : objFileListEntries) {
 				String strAtomicFileName = objListItem.getAtomicFileName();
 				if (isNotEmpty(strAtomicFileName)) {
-					objDataTargetClient.getFileHandle(strAtomicFileName).delete();
-					String strT = SOSVfs_D_212.params(strAtomicFileName);
-					logger.debug(strT);
-					objJadeReportLogger.info(strT);
-					objListItem.setAtomicFileName(EMPTY_STRING);
-					objListItem.setStatus(enuTransferStatus.setBack);
+					try {
+						ISOSVirtualFile atomicFile = objDataTargetClient.getFileHandle(strAtomicFileName);
+						if(atomicFile.FileExists()) {
+							atomicFile.delete();
+						}
+						String strT = SOSVfs_D_212.params(strAtomicFileName);
+						logger.debug(strT);
+						objJadeReportLogger.info(strT);
+						objListItem.setAtomicFileName(EMPTY_STRING);
+						objListItem.setStatus(enuTransferStatus.setBack);
+					} catch (Exception e) {
+						logger.error(e.getLocalizedMessage());
+					}
+				}
+				if (!objListItem.isTargetFileAlreadyExists()) {
+					try {
+						String strTargetFilename = MakeFullPathName(objOptions.TargetDir.Value(), objListItem.TargetFileName());
+						ISOSVirtualFile targetFile = objDataTargetClient.getFileHandle(strTargetFilename);
+						if(targetFile.FileExists()) {
+							targetFile.delete();
+						}
+						String strT = SOSVfs_D_212.params(targetFile);
+						logger.debug(strT);
+						objJadeReportLogger.info(strT);
+						objListItem.setStatus(enuTransferStatus.setBack);
+					} catch (Exception e) {
+						logger.error(e.getLocalizedMessage());
+					}
 				}
 			}
 		}

@@ -131,6 +131,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	private final String			guid							= UUID.randomUUID().toString();
 	private boolean					flgSteadyFlag					= false;
 	private final boolean			flgTransferHistoryAlreadySent	= false;
+	private boolean					targetFileAlreadyExists			= false;
 	public boolean					flgIsHashFile					= false;
 	private FTPFile					objFTPFile						= null;
 	private String					strCSVRec						= new String();
@@ -1448,5 +1449,13 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		String a = filenameA.replaceAll("[\\\\/]+", "/");
 		String b = filenameB.replaceAll("[\\\\/]+", "/");
 		return (caseSensitiv) ? a.equals(b) : a.equalsIgnoreCase(b);
+	}
+	
+	public boolean isTargetFileAlreadyExists() {
+		return targetFileAlreadyExists;
+	}
+
+	public void setTargetFileAlreadyExists(boolean targetFileAlreadyExists) {
+		this.targetFileAlreadyExists = targetFileAlreadyExists;
 	}
 }
