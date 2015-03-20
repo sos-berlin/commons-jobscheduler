@@ -586,6 +586,9 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 					strSubFolder = adjustFileSeparator(addFileSeparator(strSubFolder));
 					strTargetFileName = strSubFolder + strTargetFileName;
 					strTargetTransferName = strSubFolder + strTargetTransferName;
+					if (isNotEmpty(this.getAtomicFileName())) {
+						this.setAtomicFileName(strTargetTransferName);
+					}
 					try {
 						if (objParent.add2SubFolders(strSubFolder) == true) {
 							objDataTargetClient.mkdir(addFileSeparator(objO.TargetDir().Value()) + strSubFolder);
@@ -682,8 +685,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		String strAtomicPrefix = objO.getatomic_prefix().Value();
 		strTargetTransferName = strTargetTransferName + strAtomicSuffix.trim();
 		strTargetTransferName = strAtomicPrefix + strTargetTransferName;
-		strAtomicFileName = strTargetTransferName;
-		return strTargetTransferName.trim();
+		strAtomicFileName = strTargetTransferName.trim();
+		return strAtomicFileName;
 	} // private String MakeAtomicFileName
 
 	private String MakeFileNameReplacing(final String pstrFileName) {
@@ -1093,10 +1096,9 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	}
 
 	public void setNotOverwritten() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setNotOverwritten";
 		eTransferStatus = enuTransferStatus.notOverwritten;
-		logger.debug(SOSVfs_D_0111.params(strSourceFileName));
-	} // private void TransferStatus
+		logger.warn(SOSVfs_D_0111.params(strSourceFileName));
+	}
 
 	public void setParent(final SOSFileList objFileList) {
 		objParent = objFileList;

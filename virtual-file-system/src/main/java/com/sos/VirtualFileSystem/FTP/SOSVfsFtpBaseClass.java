@@ -1136,7 +1136,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 	}
 
 	@Override public final String getReplyString() {
-		String strT = Client().getReplyString();
+		String strT = Client().getReplyString().trim();
 		objFTPReply = new SOSFtpServerReply(strT);
 		return strT;
 	}

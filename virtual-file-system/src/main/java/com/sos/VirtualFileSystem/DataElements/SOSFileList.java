@@ -574,8 +574,8 @@ public class SOSFileList extends SOSVfsMessageCodes {
 		// TODO löschen der Dateien mit Atomic-Prefix und -Suffix auf dem Target
 		if (objOptions.isAtomicTransfer()) {
 			for (SOSFileListEntry objListItem : objFileListEntries) {
-				String strAtomicFileName = objListItem.getAtomicFileName();
-				if (isNotEmpty(strAtomicFileName)) {
+				String strAtomicFileName = MakeFullPathName(objOptions.TargetDir.Value(), objListItem.getAtomicFileName());
+				if (isNotEmpty(objListItem.getAtomicFileName())) {
 					try {
 						ISOSVirtualFile atomicFile = objDataTargetClient.getFileHandle(strAtomicFileName);
 						if(atomicFile.FileExists()) {
