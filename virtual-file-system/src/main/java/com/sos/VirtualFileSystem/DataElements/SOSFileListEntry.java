@@ -1099,6 +1099,10 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		eTransferStatus = enuTransferStatus.notOverwritten;
 		logger.warn(SOSVfs_D_0111.params(strSourceFileName));
 	}
+	
+	public boolean isNotOverwritten() {
+		return eTransferStatus == enuTransferStatus.notOverwritten;
+	}
 
 	public void setParent(final SOSFileList objFileList) {
 		objParent = objFileList;

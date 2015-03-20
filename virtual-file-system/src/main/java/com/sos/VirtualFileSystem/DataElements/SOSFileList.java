@@ -149,7 +149,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 						lngFailedTransfers++;
 						break;
 					case notOverwritten:
-						lngFailedTransfers++;
+						lngSkippedTransfers++;
 						break;
 					case waiting4transfer:
 						lngFailedTransfers++;
@@ -458,6 +458,9 @@ public class SOSFileList extends SOSVfsMessageCodes {
 			if (objOptions.isAtomicTransfer() && objOptions.transactional.isTrue()) {
 				logger.debug(SOSVfs_D_209.get());
 				for (SOSFileListEntry objListItem : objFileListEntries) {
+					if (objListItem.isNotOverwritten()) {
+						continue;
+					}
 					String strTargetTransferName = objListItem.TargetTransferName();
 					String strToFilename = MakeFullPathName(objOptions.TargetDir.Value(), objListItem.TargetFileName());
 					if (!fileNamesAreEqual(strToFilename, strTargetTransferName, false)) { // SOSFTP-142
