@@ -992,14 +992,22 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 			throw new JobSchedulerException(strT, e);
 		}
 		finally {
-			objDataSourceClient.getHandler().release();
-			objDataTargetClient.getHandler().release();
 			try {
+				if (objDataSourceClient != null) {
+					objDataSourceClient.getHandler().release();
+				}
+				if (objDataTargetClient != null) {
+					objDataTargetClient.getHandler().release();
+				}
 				if (flgNewConnectionUsed == true) {
-					objDataSourceClient.logout();
-					objDataSourceClient.disconnect();
-					objDataTargetClient.logout();
-					objDataTargetClient.disconnect();
+					if (objDataSourceClient != null) {
+						objDataSourceClient.logout();
+						objDataSourceClient.disconnect();
+					}
+					if (objDataTargetClient != null) {
+						objDataTargetClient.logout();
+						objDataTargetClient.disconnect();
+					}
 				}
 			} catch (IOException e) {
 				//
