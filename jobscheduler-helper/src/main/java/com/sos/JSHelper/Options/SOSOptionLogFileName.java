@@ -170,12 +170,12 @@ public class SOSOptionLogFileName extends SOSOptionOutFileName {
 				}
 			}
 			catch (Exception e) {
-				e.printStackTrace();
+				logger.error(e.getLocalizedMessage());
 				throw new JobSchedulerException("Problems with log4jappender", e);
 			}
 		}
 		else {
-			logger.info("setLogger without instance of logger called.");
+			logger.trace("setLogger without instance of logger called.");
 		}
 	}
 
