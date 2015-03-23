@@ -221,85 +221,8 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 	 * @return
 	 */
 	public abstract SOSSSHJob2 Execute() throws Exception;
-//	public SOSSSHJob2 Execute() throws Exception {
-//		final String conMethodName = conClassName + "::Execute";
-//		boolean flgScriptFileCreated = false; // http://www.sos-berlin.com/jira/browse/JITL-17
-//		logger.debug(conMethodName + " start ...");
-//
-//		objVFS.setJSJobUtilites(objJSJobUtilities);
-//
-//		try {
-//			if (isConnected == false) {
-//				this.Connect();
-//			}
-//			if(objVFS instanceof SOSSSH2TriLeadImpl){
-//	      objVFS.OpenSession(objOptions);
-//			}
-//
-//			if (objOptions.command.IsEmpty() == false) {
-//				strCommands2Execute = objOptions.command.values();
-//			} else {
-//				if (objOptions.isScript() == true) {
-//					strCommands2Execute = new String[1];
-//					String strTemp = objOptions.command_script.Value();
-//					if (objOptions.command_script.IsEmpty()) {
-//						strTemp = objOptions.command_script_file.JSFile().File2String();
-//					}
-//					strTemp = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strTemp);
-//					strCommands2Execute[0] = objVFS.createScriptFile(strTemp);
-//          // http://www.sos-berlin.com/jira/browse/JITL-123
-//					flgScriptFileCreated = true; // http://www.sos-berlin.com/jira/browse/JITL-17
-//					strCommands2Execute[0] += " " + objOptions.command_script_param.Value();
-//				} else {
-//					throw new SSHMissingCommandError(objMsg.getMsg(SOS_SSH_E_100)); // "SOS-SSH-E-100: neither Commands nor Script(file) specified. Abort.");
-//				}
-//			}
-//			 
-//			for (String strCmd : strCommands2Execute) {
-//				try {
-//				  // http://www.sos-berlin.com/jira/browse/JITL-112
-//          strCmd = getPreCommand() + strCmd;
-//					/**
-//					 * \change Substitution of variables enabled
-//					 *
-//					 * see http://www.sos-berlin.com/jira/browse/JS-673
-//					 *
-//					 */
-//					logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
-//					strCmd = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strCmd);
-//					logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
-//					objVFS.ExecuteCommand(strCmd);
-//					objJSJobUtilities.setJSParam(conExit_code, "0");
-//					CheckStdOut();
-//					CheckStdErr();
-//					CheckExitCode();
-//					ChangeExitSignal();
-//				} catch (Exception e) {
-//					logger.error(this.StackTrace2String(e));
-//					throw new SSHExecutionError("Exception raised: " + e, e);
-//				} finally {
-//					if (flgScriptFileCreated == true) { 
-//					  // http://www.sos-berlin.com/jira/browse/JITL-17
-//						// file will be deleted by the Vfs Component.
-//					}
-//				}
-//			}
-//			// http://www.sos-berlin.com/jira/browse/JITL-112
-//      processPostCommands(getTempFileName());
-//		}
-//		catch (Exception e) {
-//			logger.error(this.StackTrace2String(e));
-//			String strErrMsg = "SOS-SSH-E-120: error occurred processing ssh command: ";
-//			logger.error(strErrMsg, e);
-//			throw new SSHExecutionError(strErrMsg, e);
-//		}
-//		finally {
-//			if (keepConnected == false) {
-//				DisConnect();
-//			}
-//		}
-//		return this;
-//	}
+	// different implementations for trilead and JSch, therefore moved to the extending classes
+	// SOSSSHJobTrilead respectively SOSSSHJobJSch
 
 	public void DisConnect() {
 
