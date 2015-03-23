@@ -2,7 +2,7 @@ package sos.ftphistory.job;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Map.Entry;
 
 import sos.connection.SOSDB2Connection;
 import sos.connection.SOSPgSQLConnection;
@@ -236,20 +236,22 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
 			}
 			catch (Exception e) {
 				_recordSkippedErrorCount++;
-				getLogger().warn("error occurred importing order : " + e.getMessage());
 				try {
 					getConnection().rollback();
 				}
 				catch (Exception ex) {
 				}
+				String message = "error occurred importing order : " + e.getMessage();
+				getLogger().error(message);
+				throw new JobSchedulerException(message);
 			}
 		}
 		else {
-			Iterator<?> it = _mappings.entrySet().iterator();
+			Iterator<Entry<String,String>> it = _mappings.entrySet().iterator();
 			String params = "";
 			while (it.hasNext()) {
-				Map.Entry entry = (Map.Entry) it.next();
-				String mappings_val = entry.getValue().toString();
+				Entry<String,String> entry = it.next();
+				String mappings_val = entry.getValue();
 				if (!allParameters.containsKey(mappings_val)) {
 					params += params.length() > 0 ? "," + mappings_val : mappings_val;
 				}
@@ -414,7 +416,7 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
 				}
 				catch (Exception e) {
 					_recordSkippedErrorCount++;
-					getLogger().warn(
+					getLogger().error(
 							"error occurred importing file line " + (_recordFoundCount + 1) + " (record " + _recordFoundCount + ") : " + e.getMessage());
 					try {
 						getConnection().rollback();
@@ -468,11 +470,11 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
 			_recordExtraParameterNames = new LinkedHashMap<String, String>();
 		try {
 			if (recordExtraParameters != null && recordExtraParameters.size() > 0) {
-				Iterator<?> it = recordExtraParameters.entrySet().iterator();
+				Iterator<Entry<String,String>> it = recordExtraParameters.entrySet().iterator();
 				while (it.hasNext()) {
-					Map.Entry entry = (Map.Entry) it.next();
-					String field = entry.getKey().toString().toUpperCase();
-					String val = entry.getValue().toString();
+					Entry<String,String> entry = it.next();
+					String field = entry.getKey().toUpperCase();
+					String val = entry.getValue();
 					try {
 						String checkedField = _recordExtraParameterNames.get(field);
 						if (checkedField != null) {
@@ -666,17 +668,17 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
 			insert2.set_numNull("JUMP_PORT", jump_port);
 
 			if (phshRecordCustomFields != null && phshRecordCustomFields.size() > 0) {
-				Iterator<?> it = phshRecordCustomFields.entrySet().iterator();
+				Iterator<Entry<String,String>> it = phshRecordCustomFields.entrySet().iterator();
 				while (it.hasNext()) {
-					Map.Entry entry = (Map.Entry) it.next();
-					String val = (String) entry.getValue();
+					Entry<String,String> entry = it.next();
+					String val = entry.getValue();
 					if (val == null || val.length() == 0) {
 						val = "NULL";
 					}
 					else {
 						val = SOSFTPHistory.getNormalizedField(getConnection(), val, 255);
 					}
-					insert2.set((String) entry.getKey(), val);
+					insert2.set(entry.getKey(), val);
 				}
 			}
 
