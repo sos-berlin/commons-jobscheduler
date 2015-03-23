@@ -45,6 +45,12 @@ public class SOSVfsSFtpJCraftTest extends SOSVfsSFtpTest{
 	
 	@Override
 	@Test
+	public void testSocks5ProxyConnect() throws Exception {
+		super.testSocks5ProxyConnect();
+	}
+	
+	@Override
+	@Test
 	public void testConnectOpenSSH() throws Exception {
 		super.testConnectOpenSSH();
 	}
