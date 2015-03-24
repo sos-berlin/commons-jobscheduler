@@ -24,7 +24,7 @@ import com.sos.JSHelper.Options.SOSOptionPassword;
 import com.sos.JSHelper.Options.SOSOptionUserName;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 
-public class SOSSSH2JcraftTest {
+public class SOSSSH2JSchTest {
   
   private static final String HOST = "homer.sos";
   private static final String WINDOWS_HOST = "lutest.sos";
@@ -36,7 +36,7 @@ public class SOSSSH2JcraftTest {
   private static final String CONNECTION_TYPE_EXECUTE = "exec";
   private static final int TIMEOUT = 3*1000;
   private String command = "echo **Hallo world!**";
-  private Logger log = LoggerFactory.getLogger(SOSSSH2JcraftTest.class);
+  private Logger log = LoggerFactory.getLogger(SOSSSH2JSchTest.class);
   private SOSOptionUserName optionUserName;
   private SOSOptionPassword optionPassword;
   private SOSOptionAuthenticationMethod optionAuthenticationMethod;
