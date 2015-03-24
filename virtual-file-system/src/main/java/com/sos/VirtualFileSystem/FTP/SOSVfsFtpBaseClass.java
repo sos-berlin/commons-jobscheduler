@@ -749,15 +749,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 			logger.debug(HostID(SOSVfs_E_0106.params(conMethodName, "", lstrCurrentPath)));
 			// Windows reply from pwd is : 257 "/kb" is current directory.
 			// Unix reply from pwd is : 257 "/home/kb"
-			int idx = lstrCurrentPath.indexOf('"'); // Unix?
-			if (idx >= 0) {
-				lstrCurrentPath = lstrCurrentPath.substring(idx + 1, lstrCurrentPath.length() - idx + 1);
-				idx = lstrCurrentPath.indexOf('"');
-				if (idx >= 0) {
-					lstrCurrentPath = lstrCurrentPath.substring(0, idx);
-				}
-			}
-			LogReply();
+			lstrCurrentPath = lstrCurrentPath.replaceFirst("^[^\"]*\"([^\"]*)\".*", "$1");
 		}
 		catch (IOException e) {
 			RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
