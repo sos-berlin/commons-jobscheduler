@@ -122,10 +122,19 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
       logger.error("error occured executing command");
     } finally {
       if (pids != null && pids.size() > 0){
+        // receive pids from Order params here
         Vector<String> pidsToKillAsString = objOptions.getItems("PID_TO_KILL");
         Vector<Integer> pidsToKill = new Vector<Integer>();
+        List<Integer> pidsToKillAvailable = new ArrayList<Integer>();
         for (String pid : pidsToKillAsString){
           pidsToKill.add(Integer.parseInt(pid));
+        }
+        for(Integer pidToKill : pidsToKill){
+          // then check if the pids are still running on the remote host
+          if(pids.get(pidToKill) != null){
+            // and save the resulting (still running) pids to later kill them
+            pidsToKillAvailable.add(pidToKill);
+          }
         }
         
       }
