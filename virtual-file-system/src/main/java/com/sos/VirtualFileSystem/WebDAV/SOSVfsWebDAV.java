@@ -11,8 +11,10 @@ import org.apache.commons.httpclient.HttpURL;
 import org.apache.commons.httpclient.HttpsURL;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.contrib.ssl.EasySSLProtocolSocketFactory;
+import org.apache.commons.httpclient.contrib.ssl.StrictSSLProtocolSocketFactory;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
+import org.apache.commons.ssl.TrustMaterial;
 import org.apache.log4j.Logger;
 import org.apache.webdav.lib.WebdavResource;
 import org.omg.SendingContext.RunTime;
@@ -130,14 +132,13 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 		}
 		catch (Exception ex) {
 			Exception exx = ex;
-
-			this.disconnect();
-
+			
 			if (connection2OptionsAlternate != null) {
 				SOSConnection2OptionsSuperClass optionsAlternatives = connection2OptionsAlternate.Alternatives();
 				if (!optionsAlternatives.host.IsEmpty() && !optionsAlternatives.user.IsEmpty()) {
 					logINFO(SOSVfs_I_170.params(connection2OptionsAlternate.Alternatives().host.Value()));
 					try {
+						this.disconnect();
 
 						host = optionsAlternatives.host.Value();
 						port = optionsAlternatives.port.value();
@@ -157,6 +158,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 			}
 
 			if (exx != null) {
+				System.err.println("RE : "+exx.toString()+" = "+this.port);
 				RaiseException(exx, SOSVfs_E_168.get());
 			}
 		}
@@ -958,13 +960,25 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 				httpUrl = new HttpURL(normalizedHost);
 			}
 
+			logger.info("AAAAAAAAAAAAAAA = "+port+" = "+pport);
+			
 			String phostRootUrl = httpUrl.getScheme() + "://" + httpUrl.getAuthority() + "/";
 			if (httpUrl.getScheme().equalsIgnoreCase("https")) {
 				rootUrl = new HttpsURL(phostRootUrl);
-
+				/**
 				if(pport > 0) {
 					Protocol.registerProtocol("https", new Protocol("https", (ProtocolSocketFactory)new EasySSLProtocolSocketFactory(),pport));
+				}*/
+				StrictSSLProtocolSocketFactory psf = new StrictSSLProtocolSocketFactory();
+				//psf.setCheckCRL and psf.setCheckExpiry sind bei StrictSSL.. per default true
+				psf.setCheckHostname(true);
+				if(connection2OptionsAlternate.accept_untrusted_certificate.value()){
+					//see apache ssl EasySSLProtocolSocketFactory implementation
+					psf.useDefaultJavaCiphers();
+					psf.addTrustMaterial(TrustMaterial.TRUST_ALL);
 				}
+				Protocol p = new Protocol("https", (ProtocolSocketFactory)psf, pport);
+				Protocol.registerProtocol("https",p);
 			}
 			else {
 				rootUrl = new HttpURL(phostRootUrl);

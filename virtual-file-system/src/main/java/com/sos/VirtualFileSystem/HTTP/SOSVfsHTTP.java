@@ -22,14 +22,17 @@ import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.contrib.ssl.EasySSLProtocolSocketFactory;
+import org.apache.commons.httpclient.contrib.ssl.StrictSSLProtocolSocketFactory;
 //import org.apache.commons.httpclient.contrib.ssl.EasySSLProtocolSocketFactory;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
+import org.apache.commons.ssl.TrustMaterial;
 import org.apache.log4j.Logger;
 
 import sos.util.SOSString;
 
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
@@ -138,19 +141,19 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 		}
 		catch (Exception ex) {
 			Exception exx = ex;
-
-			this.disconnect();
-
+			
 			if (connection2OptionsAlternate != null) {
 				SOSConnection2OptionsSuperClass optionsAlternatives = connection2OptionsAlternate.Alternatives();
 				if (!optionsAlternatives.host.IsEmpty() && !optionsAlternatives.user.IsEmpty()) {
-					logger.info(SOSVfs_I_170.params(connection2OptionsAlternate.Alternatives().host.Value()));
+					logger.info(SOSVfs_I_170.params(optionsAlternatives.host.Value()));
 					try {
+						this.disconnect();
+
 						proxyHost = optionsAlternatives.proxy_host.Value();
 						proxyPort = optionsAlternatives.proxy_port.value();
 						proxyUser = optionsAlternatives.proxy_user.Value();
 						proxyPassword = optionsAlternatives.proxy_password.Value();
-												
+
 						this.connect(optionsAlternatives.host.Value(), 
 								optionsAlternatives.port.value());
 						this.doAuthenticate(optionsAlternatives);
@@ -420,17 +423,18 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 				if(phost.toLowerCase().startsWith("https://")){
 					this.rootUrl 	= new HttpsURL(phost);
 					this.host 	= this.rootUrl.getHost();
-					if(this.port > 0){
-						//mit self signed zertifikaten
-						Protocol p = new Protocol("https", (ProtocolSocketFactory) new EasySSLProtocolSocketFactory(), this.port);
-						Protocol.registerProtocol("https",p);
-						hc.setHost(this.host,this.port,p);
-						//ohne self signed
-						//hc.setHost(this.host,this.port, new Protocol("https", (ProtocolSocketFactory) new EasySSLProtocolSocketFactory(), this.port));
+					
+					StrictSSLProtocolSocketFactory psf = new StrictSSLProtocolSocketFactory();
+					//psf.setCheckCRL and psf.setCheckExpiry sind bei StrictSSL.. per default true
+					psf.setCheckHostname(true);
+					if(connection2OptionsAlternate.accept_untrusted_certificate.value()){
+						//see apache ssl EasySSLProtocolSocketFactory implementation
+						psf.useDefaultJavaCiphers();
+						psf.addTrustMaterial(TrustMaterial.TRUST_ALL);
 					}
-					else{
-						hc.setHost(new HttpHost(host,port));
-					}
+					Protocol p = new Protocol("https", (ProtocolSocketFactory)psf, this.port);
+					Protocol.registerProtocol("https",p);
+					hc.setHost(this.host,this.port,p);
 				}
 				else{
 					this.rootUrl 	= new HttpURL(phost.toLowerCase().startsWith("http://") ? phost : "http://"+phost);
@@ -444,8 +448,6 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 				httpClient = new HttpClient(connectionManager);
 				httpClient.setHostConfiguration(hc);
 
-				//connectionManager.getConnection(httpClient.getHostConfiguration()).open();
-				
 				this.setProxyCredentionals();
 				
 				this.LogReply();

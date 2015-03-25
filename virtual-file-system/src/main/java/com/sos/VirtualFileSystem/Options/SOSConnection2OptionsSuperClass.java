@@ -1281,6 +1281,33 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 		proxy_protocol = val;
 	}
 
+
+	/**
+	* \var accept_untrusted_certificate : accept a valid certificat that could not be verified to be trusted
+	*
+	*
+	*/
+	@JSOptionDefinition(
+						name = "accept_untrusted_certificate",
+						description = "Accept a valid certificat that could not be verified to be trusted",
+						key = "accept_untrusted_certificate",
+						type = "SOSOptionBoolean",
+						mandatory = false)
+	public SOSOptionBoolean	accept_untrusted_certificate	= new SOSOptionBoolean(this, conClassName + ".accept_untrusted_certificate", // HashMap-Key
+													"Accept a valid certificat that could not be verified to be trusted", // Titel
+													"", // InitValue
+													"false", // DefaultValue
+													false // isMandatory
+											);
+
+	public SOSOptionBoolean getaccept_untrusted_certificate() {
+		return accept_untrusted_certificate;
+	}
+
+	public void setaccept_untrusted_certificate(SOSOptionBoolean val) {
+		accept_untrusted_certificate = val;
+	}
+
 	
 	/**
 	* \var proxy_host : host name or the IP address of a proxy
