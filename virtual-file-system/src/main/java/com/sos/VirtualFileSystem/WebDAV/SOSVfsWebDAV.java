@@ -960,15 +960,10 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 				httpUrl = new HttpURL(normalizedHost);
 			}
 
-			logger.info("AAAAAAAAAAAAAAA = "+port+" = "+pport);
-			
 			String phostRootUrl = httpUrl.getScheme() + "://" + httpUrl.getAuthority() + "/";
 			if (httpUrl.getScheme().equalsIgnoreCase("https")) {
 				rootUrl = new HttpsURL(phostRootUrl);
-				/**
-				if(pport > 0) {
-					Protocol.registerProtocol("https", new Protocol("https", (ProtocolSocketFactory)new EasySSLProtocolSocketFactory(),pport));
-				}*/
+			
 				StrictSSLProtocolSocketFactory psf = new StrictSSLProtocolSocketFactory();
 				//psf.setCheckCRL and psf.setCheckExpiry sind bei StrictSSL.. per default true
 				psf.setCheckHostname(true);
