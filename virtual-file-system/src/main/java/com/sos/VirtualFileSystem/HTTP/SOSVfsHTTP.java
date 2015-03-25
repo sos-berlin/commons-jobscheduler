@@ -21,9 +21,7 @@ import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.contrib.ssl.EasySSLProtocolSocketFactory;
 import org.apache.commons.httpclient.contrib.ssl.StrictSSLProtocolSocketFactory;
-//import org.apache.commons.httpclient.contrib.ssl.EasySSLProtocolSocketFactory;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
@@ -32,12 +30,10 @@ import org.apache.log4j.Logger;
 
 import sos.util.SOSString;
 
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
-import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsSuperClass;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.VirtualFileSystem.exceptions.JADEException;
@@ -87,26 +83,16 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 	 */
 	@Override
 	public ISOSConnection Connect() {
-		@SuppressWarnings("unused")
-		SOSConnection2OptionsAlternate pConnection2OptionsAlternate = null;
-		this.Connect(pConnection2OptionsAlternate);
+		this.Connect(this.connection2OptionsAlternate);
 		return this;
 	}
 
 	/**
-	 *
-	 * \brief Connect
-	 *
-	 * \details
-	 *
-	 * \return
-	 *
-	 * @param pobjConnectionOptions
-	 * @return
+	 * 
 	 */
 	@Override
-	public ISOSConnection Connect(final SOSConnection2OptionsAlternate pConnection2OptionsAlternate){
-		connection2OptionsAlternate = pConnection2OptionsAlternate;
+	public ISOSConnection Connect(final SOSConnection2OptionsAlternate options){
+		connection2OptionsAlternate = options;
 
 		if (connection2OptionsAlternate == null) {
 			RaiseException(SOSVfs_E_190.params("connection2OptionsAlternate"));
@@ -122,52 +108,17 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 	}
 
 	/**
-	 *
-	 * \brief Authenticate
-	 *
-	 * \details
-	 *
-	 * \return
-	 *
-	 * @param pAuthenticationOptions
-	 * @return
+	 * 
 	 */
 	@Override
-	public ISOSConnection Authenticate(final ISOSAuthenticationOptions pAuthenticationOptions) {
-		authenticationOptions = pAuthenticationOptions;
+	public ISOSConnection Authenticate(final ISOSAuthenticationOptions options) {
+		authenticationOptions = options;
 
 		try {
 			this.doAuthenticate(authenticationOptions);
 		}
 		catch (Exception ex) {
-			Exception exx = ex;
-			
-			if (connection2OptionsAlternate != null) {
-				SOSConnection2OptionsSuperClass optionsAlternatives = connection2OptionsAlternate.Alternatives();
-				if (!optionsAlternatives.host.IsEmpty() && !optionsAlternatives.user.IsEmpty()) {
-					logger.info(SOSVfs_I_170.params(optionsAlternatives.host.Value()));
-					try {
-						this.disconnect();
-
-						proxyHost = optionsAlternatives.proxy_host.Value();
-						proxyPort = optionsAlternatives.proxy_port.value();
-						proxyUser = optionsAlternatives.proxy_user.Value();
-						proxyPassword = optionsAlternatives.proxy_password.Value();
-
-						this.connect(optionsAlternatives.host.Value(), 
-								optionsAlternatives.port.value());
-						this.doAuthenticate(optionsAlternatives);
-						exx = null;
-					}
-					catch (Exception e) {
-						exx = e;
-					}
-				}
-			}
-
-			if (exx != null) {
-				RaiseException(exx, SOSVfs_E_168.get());
-			}
+			RaiseException(ex, SOSVfs_E_168.get());
 		}
 
 		return this;
@@ -378,20 +329,14 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 	
 	
 	/**
-	 *
-	 * \brief doAuthenticate
-	 *
-	 * \details
-	 *
-	 * \return ISOSConnection
-	 *
-	 * @param authenticationOptions
+	 * 
+	 * @param options
 	 * @return
 	 * @throws Exception
 	 */
-	private ISOSConnection doAuthenticate(final ISOSAuthenticationOptions pAuthenticationOptions) throws Exception {
+	private ISOSConnection doAuthenticate(final ISOSAuthenticationOptions options) throws Exception {
 
-		authenticationOptions = pAuthenticationOptions;
+		authenticationOptions = options;
 		
 		this.doLogin(authenticationOptions.getUser().Value(), 
 				authenticationOptions.getPassword().Value());
