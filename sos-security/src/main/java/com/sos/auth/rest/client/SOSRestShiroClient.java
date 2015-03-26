@@ -100,7 +100,6 @@ public static void main(String[] args) throws MalformedURLException {
     System.out.println("Joe "+shiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionJoe().getSOSPermission());
     System.out.println("Joc "+shiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionJoc().getSOSPermission());
     System.out.println("Jid "+shiro.getSOSPermissions().getSOSPermissionJid().getSOSPermission());
-    System.out.println("Jobnet"+shiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionJobnet().getSOSPermission());
     System.out.println("Events "+shiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionEvents().getSOSPermission());
     System.out.println("Dashboard "+shiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionDashboard().getSOSPermission());
     System.out.println("Workingplan "+shiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionWorkingplan().getSOSPermission());
