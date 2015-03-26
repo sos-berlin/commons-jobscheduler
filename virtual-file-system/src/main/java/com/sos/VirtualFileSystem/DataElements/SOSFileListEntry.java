@@ -592,7 +592,6 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 					try {
 						if (objParent.add2SubFolders(strSubFolder) == true) {
 							objDataTargetClient.mkdir(addFileSeparator(objO.TargetDir().Value()) + strSubFolder);
-							logger.debug(String.format("create subdirectory '%1$s' in folder '%2$s'", strSubFolder, objO.TargetDir().Value()));
 						}
 					}
 					catch (IOException e) {
