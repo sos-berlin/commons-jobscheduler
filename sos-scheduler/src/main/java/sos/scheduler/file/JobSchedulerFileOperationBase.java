@@ -1,6 +1,5 @@
 package sos.scheduler.file;
 
-import com.sos.JSHelper.Basics.VersionInfo;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionFileAge;
 import com.sos.JSHelper.Options.SOSOptionTime;
@@ -86,18 +85,16 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 	protected static final String		conParameterRAISE_ERROR_IF_RESULT_SET_IS						= "Raise_Error_If_Result_Set_Is";
 	protected static final String		conParameterEXPECTED_SIZE_OF_RESULT_SET							= "Expected_Size_Of_Result_Set";
 	protected SOSSchedulerLogger		objSOSLogger													= null;
-	@SuppressWarnings("hiding")
 	protected final Logger					logger															= Logger.getLogger(JobSchedulerFileOperationBase.class);
 	protected static final String		conParameterRESULT_LIST_FILE									= "Result_List_File";
 	protected static final String		conParameterRECURSIVE											= "recursive";
 	protected static final String		conParameterCREATE_DIR											= "create_dir";
 	protected static final String		conParameterCREATE_FILE											= "create_file";
 	protected static final String		conParameterCREATE_FILES										= "create_files";
+	protected static final String		conParameterREMOVE_DIR											= "remove_dir";
 	protected static final String		conClassName													= "JobSchedulerFileOperationBase";
 	protected static final String		conValueYES														= "yes";
 	public static final String			conParameterGRACIOUS											= "gracious";
-	@SuppressWarnings("unused")
-	private final String				conSVNVersion													= "$Id$";
 	// protected SOSLogger logger = null;
 	protected boolean					flgOperationWasSuccessful										= false;
 	protected String					name															= null;
@@ -169,7 +166,7 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 				objSOSLogger = new SOSSchedulerLogger(spooler_log);
 			}
 			catch (Exception e) {
-				e.printStackTrace(System.err);
+				logger.error(e.getMessage());
 				throw new JobSchedulerException(JSJ_F_0015.params("SOSSchedulerLogger ", e.getMessage()));
 			}
 			return flgReturn;
@@ -329,8 +326,6 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 	public boolean initialize(final String pstrVersionInfo) {
 		try {
 			super.spooler_process();
-			logger.info(VersionInfo.VERSION_STRING);
-			logger.info(pstrVersionInfo);
 			params = null;
 			params = getSchedulerParameterAsProperties(super.getJobOrOrderParameters());
 			getParametersFromHashMap();
@@ -415,6 +410,9 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 		}
 		if (getParamBoolean(conParameterRECURSIVE, false) == true) {
 			flags |= SOSFileSystemOperations.RECURSIVE;
+		}
+		if (getParamBoolean(conParameterREMOVE_DIR, false) == true) {
+			flags |= SOSFileSystemOperations.REMOVE_DIR;
 		}
 		count_files = getParamBoolean(conParameterCOUNT_FILES, false);
 		if (count_files == true && isJobchain() == false) {

@@ -13,7 +13,6 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 */
 @I18NResourceBundle(baseName = "com.sos.scheduler.messages", defaultLocale = "en")
 public class JobSchedulerRemoveFile extends JobSchedulerFileOperationBase {
-	private final String		conSVNVersion	= "$Id$";
 	private final static String	conClassName	= "JobSchedulerRemoveFile";
 
 	@Override
@@ -24,7 +23,7 @@ public class JobSchedulerRemoveFile extends JobSchedulerFileOperationBase {
 	@Override
 	public boolean spooler_process() {
 		try {
-			initialize(conSVNVersion);
+			initialize("");
 			if (file == null) { // alias
 				file = source;
 			}
@@ -38,8 +37,7 @@ public class JobSchedulerRemoveFile extends JobSchedulerFileOperationBase {
 		}
 		catch (Exception e) {
 			try {
-				e.printStackTrace(System.err);
-				String strM = JSJ_F_0010.params( conClassName, e.getLocalizedMessage());
+				String strM = JSJ_F_0010.params(conClassName, e.getLocalizedMessage());
 				logger.fatal(strM);
 				throw new JobSchedulerException(strM);
 			}

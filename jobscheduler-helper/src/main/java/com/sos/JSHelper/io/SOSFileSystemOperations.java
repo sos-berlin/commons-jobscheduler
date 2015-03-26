@@ -31,11 +31,6 @@ import com.sos.localization.Messages;
  * @version $Id$
  */
 public class SOSFileSystemOperations {
-	@SuppressWarnings("unused")
-	private final String						conClassName	= this.getClass().getSimpleName();
-	@SuppressWarnings("unused")
-	private static final String					conSVNVersion	= "$Id$";
-	@SuppressWarnings("unused")
 	private final Logger						logger			= Logger.getLogger(this.getClass());
 	public Vector<File>							lstResultList	= null;
 	/**
@@ -2863,7 +2858,7 @@ public class SOSFileSystemOperations {
 			return nrOfTransferedFiles;
 		}
 		catch (Exception e) {
-			e.printStackTrace(System.err);
+			logger.error(e.getMessage());
 			if (copying)
 				throw new JobSchedulerException("error occurred copying file(s): " + e.getMessage());
 			else
