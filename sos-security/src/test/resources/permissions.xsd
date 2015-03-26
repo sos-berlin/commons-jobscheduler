@@ -24,18 +24,10 @@
 				<xs:element ref="SOSPermissionJoc"/>
 				<xs:element ref="SOSPermissionDashboard"/>
 				<xs:element ref="SOSPermissionEvents"/>
-				<xs:element ref="SOSPermissionJobnet"/>
 				<xs:element ref="SOSPermissionWorkingplan"/>
 				<xs:sequence minOccurs="0" maxOccurs="unbounded">
 					<xs:element ref="SOSPermission"/>
 				</xs:sequence>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="SOSPermissionJobnet">
-		<xs:complexType>
-			<xs:sequence minOccurs="0" maxOccurs="unbounded">
-				<xs:element ref="SOSPermission"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -77,7 +69,6 @@
 				<xs:enumeration value="SOSRoleJoc"/>
 				<xs:enumeration value="SOSRoleJoe"/>
 				<xs:enumeration value="SOSRoleEvent"/>
-				<xs:enumeration value="SOSRoleJobnet"/>
 				<xs:enumeration value="SOSRoleAdmin"/>
 				<xs:enumeration value="SOSRoleSuper"/>
 				<xs:enumeration value="SOSRoleDashboard"/>

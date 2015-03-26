@@ -12,7 +12,6 @@ import com.sos.auth.rest.permission.model.ObjectFactory;
 import com.sos.auth.rest.permission.model.SOSPermissionDashboard;
 import com.sos.auth.rest.permission.model.SOSPermissionEvents;
 import com.sos.auth.rest.permission.model.SOSPermissionJid;
-import com.sos.auth.rest.permission.model.SOSPermissionJobnet;
 import com.sos.auth.rest.permission.model.SOSPermissionJoc;
 import com.sos.auth.rest.permission.model.SOSPermissionJoe;
 import com.sos.auth.rest.permission.model.SOSPermissionRoles;
@@ -109,8 +108,7 @@ public class SOSServicePermissionShiro {
     
             SOSPermissionEvents sosPermissionEvents = o.createSOSPermissionEvents();
     
-            SOSPermissionJobnet sosPermissionJobnet = o.createSOSPermissionJobnet();
-    
+   
             SOSPermissionWorkingplan sosPermissionWorkingplan = o.createSOSPermissionWorkingplan();
     
             SOSPermissionJid sosPermissionJid = o.createSOSPermissionJid();
@@ -121,7 +119,6 @@ public class SOSServicePermissionShiro {
             sosPermissionJid.setSOSPermissionJoc(sosPermissionJoc);
             sosPermissionJid.setSOSPermissionDashboard(sosPermissionDashboard);
             sosPermissionJid.setSOSPermissionEvents(sosPermissionEvents);
-            sosPermissionJid.setSOSPermissionJobnet(sosPermissionJobnet);
             sosPermissionJid.setSOSPermissionWorkingplan(sosPermissionWorkingplan);
     
             addPermission(sosPermissionJid.getSOSPermission(), "sos:products:jid:execute");
