@@ -1,61 +1,55 @@
 package sos.scheduler.job;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
-
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.VirtualFileSystem.Factory.VFSFactory;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
-import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
-import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 
 import sos.net.ssh.SOSSSHJob2;
 import sos.net.ssh.SOSSSHJobJSch;
 import sos.net.ssh.exceptions.SSHConnectionError;
+import sos.net.ssh.exceptions.SSHExecutionError;
 
+import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
+import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
+import com.sos.i18n.annotation.I18NResourceBundle;
+
+@I18NResourceBundle(baseName = "com_sos_net_messages", defaultLocale = "en")
 public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
-  // https://change.sos-berlin.com/browse/JITL-147: Additional Handler for kill
-  // commands
-  private ISOSVFSHandler checkRemotePidCommandVFSHandler = null;
   private final Logger logger = Logger.getLogger(this.getClass());
-  private Map<Integer, PsEfLine> pids = new HashMap<Integer, PsEfLine>();
+  private List<Integer> availablePidsToKill = new ArrayList<Integer>();
+  private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
 
-  private void prepareCheckRemotePidCommandHandler() {
-    if (checkRemotePidCommandVFSHandler == null) {
-      try {
-        checkRemotePidCommandVFSHandler = VFSFactory.getHandler("SSH2.JSCH");
-      } catch (Exception e) {
-        throw new JobSchedulerException("SOS-VFS-E-0010: unable to initialize VFS for checking remote pid command", e);
-      }
+
+  private List<Integer> getPidsToKill(){
+    logger.info("PIDs to kill From Order: " + objOptions.getItem(PARAM_PIDS_TO_KILL));
+    String[] pidsFromOrder = objOptions.getItem(PARAM_PIDS_TO_KILL).split(",");
+    List<Integer> pidsToKill = new ArrayList<Integer>();
+    for(String pid : pidsFromOrder){
+      pidsToKill.add(Integer.parseInt(pid));
     }
-  }
-  
-  private void getPidsFromJob(){
-    Vector<String> pidsFromJob = objOptions.getItems("PID_TO_KILL");
-    
+    return pidsToKill;
   }
 
-  private void openCheckRemotePidCommandSession() {
+  private void openSession() {
     try {
-      if (!checkRemotePidCommandVFSHandler.isConnected()) {
+      if (!vfsHandler.isConnected()) {
         SOSConnection2OptionsAlternate postAlternateOptions = getAlternateOptions(objOptions);
         postAlternateOptions.raise_exception_on_error.value(false);
-        checkRemotePidCommandVFSHandler.Connect(postAlternateOptions);
+        vfsHandler.Connect(postAlternateOptions);
       }
-      checkRemotePidCommandVFSHandler.Authenticate(objOptions);
+      vfsHandler.Authenticate(objOptions);
       logger.debug("connection for kill commands established");
     } catch (Exception e) {
       throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
     }
-    checkRemotePidCommandVFSHandler.setJSJobUtilites(objJSJobUtilities);
+    vfsHandler.setJSJobUtilites(objJSJobUtilities);
   }
 
   @Override
@@ -64,35 +58,41 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
     Options().CheckMandatory();
     try {
       SOSConnection2OptionsAlternate alternateOptions = getAlternateOptions(objOptions);
-      checkRemotePidCommandVFSHandler.Connect(alternateOptions);
-      checkRemotePidCommandVFSHandler.Authenticate(objOptions);
+      vfsHandler.Connect(alternateOptions);
+      vfsHandler.Authenticate(objOptions);
       logger.debug("connection established");
     } catch (Exception e) {
       throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
     }
-    flgIsWindowsShell = checkRemotePidCommandVFSHandler.remoteIsWindowsShell();
+    flgIsWindowsShell = vfsHandler.remoteIsWindowsShell();
     isConnected = true;
-    // https://change.sos-berlin.com/browse/JITL-147
-    prepareCheckRemotePidCommandHandler();
     return this;
-  } // private SOSSSHJob2 Connect
+  } 
 
-  public void executeListProcessesCommands() {
-    openCheckRemotePidCommandSession();
-
-    String stdOut = "";
-    String stdErr = "";
-    pids = new HashMap();
+  @Override
+  public SOSSSHJob2 Execute() {
+    vfsHandler.setJSJobUtilites(objJSJobUtilities);
+    openSession();
+    Map<Integer, PsEfLine> remoteRunningPids = new HashMap<Integer, PsEfLine>();
     try {
-      checkRemotePidCommandVFSHandler.ExecuteCommand("/bin/ps -ef");
+      if (isConnected == false) {
+        this.Connect();
+      }
+      vfsHandler.ExecuteCommand("/bin/ps -ef");
       // check if command was processed correctly
-      if (checkRemotePidCommandVFSHandler.getExitCode() == 0) {
+      if (vfsHandler.getExitCode() == 0) {
         // read stdout of the read-temp-file statement per line
-        if (checkRemotePidCommandVFSHandler.getStdOut().toString().length() > 0) {
-          BufferedReader reader = new BufferedReader(new StringReader(new String(checkRemotePidCommandVFSHandler.getStdOut())));
+        if (vfsHandler.getStdOut().toString().length() > 0) {
+          BufferedReader reader = new BufferedReader(new StringReader(new String(vfsHandler.getStdOut())));
           String line = null;
           logger.debug(SOSVfsMessageCodes.SOSVfs_D_284.getFullMessage());
+          boolean firstLine = true;
           while ((line = reader.readLine()) != null) {
+            if(firstLine){
+              // The first line is the Header so we skip that
+              firstLine = false;
+              continue;
+            }
             if (line == null) break;
             line = line.trim();
             String[] fields = line.split(" +", 8);
@@ -101,12 +101,12 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
             psOutputLine.pid = Integer.parseInt(fields[1]);
             psOutputLine.parentPid = Integer.parseInt(fields[2]);
             psOutputLine.pidCommand = fields[7];
-            pids.put(new Integer(psOutputLine.pid), psOutputLine);
+            remoteRunningPids.put(new Integer(psOutputLine.pid), psOutputLine);
           }
-          Iterator psOutputLineIterator = pids.values().iterator();
+          Iterator psOutputLineIterator = remoteRunningPids.values().iterator();
           while (psOutputLineIterator.hasNext()) {
             PsEfLine current = (PsEfLine) psOutputLineIterator.next();
-            PsEfLine parent = (PsEfLine) pids.get(new Integer(current.parentPid));
+            PsEfLine parent = (PsEfLine) remoteRunningPids.get(new Integer(current.parentPid));
             if (parent != null) {
               logger.debug("Child of " + parent.pid + " is " + current.pid);
               parent.children.add(new Integer(current.pid));
@@ -119,26 +119,50 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
         logger.error("error occured executing command /bin/ps -ef");
       }
     } catch (Exception e) {
-      logger.error("error occured executing command");
-    } finally {
-      if (pids != null && pids.size() > 0){
-        // receive pids from Order params here
-        Vector<String> pidsToKillAsString = objOptions.getItems("PID_TO_KILL");
-        Vector<Integer> pidsToKill = new Vector<Integer>();
-        List<Integer> pidsToKillAvailable = new ArrayList<Integer>();
-        for (String pid : pidsToKillAsString){
-          pidsToKill.add(Integer.parseInt(pid));
+      if(objOptions.raise_exception_on_error.value()){
+        if(objOptions.ignore_error.value()){
+          if(objOptions.ignore_stderr.value()){
+            logger.debug(this.StackTrace2String(e));
+          }else{
+            logger.error(this.StackTrace2String(e));
+            throw new SSHExecutionError("Exception raised: " + e, e);
+          }
+        }else{
+          logger.error(this.StackTrace2String(e));
+          throw new SSHExecutionError("Exception raised: " + e, e);
         }
-        for(Integer pidToKill : pidsToKill){
+      }
+    } finally {
+      if (remoteRunningPids != null && remoteRunningPids.size() > 0){
+        // receive pids from Order params here
+        List<Integer> pidsToKillFromOrder = getPidsToKill();
+        availablePidsToKill = new ArrayList<Integer>();
+        for(Integer pidToKill : pidsToKillFromOrder){
           // then check if the pids are still running on the remote host
-          if(pids.get(pidToKill) != null){
-            // and save the resulting (still running) pids to later kill them
-            pidsToKillAvailable.add(pidToKill);
+          if(remoteRunningPids.get(pidToKill) != null){
+            availablePidsToKill.add(pidToKill);
           }
         }
-        
+        // and override the order param with the resulting (still running) pids only to later kill them
+        if (availablePidsToKill.size() > 0){
+          StringBuilder strb = new StringBuilder();
+          boolean first = true;
+          // create a String with the comma separated pids to put in one Param 
+          for (Integer pid : availablePidsToKill){
+            if (first){
+              strb.append(pid.toString());
+              first = false;
+            }else{
+              strb.append(",").append(pid.toString());
+            }
+          }
+          logger.info("still running PIDs to kill: " + strb.toString());
+          objJSJobUtilities.setJSParam(PARAM_PIDS_TO_KILL, strb.toString());
+        }
       }
     }
+    logger.info("execute ended");
+    return this;
   }
 
   private class PsEfLine implements Comparable {

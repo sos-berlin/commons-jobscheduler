@@ -578,7 +578,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 						break;
 					}
 					// output line
-					outContent.append(new String(tmp, 0, i) + strEndOfLine);
+					outContent.append(new String(tmp, 0, i));
 				}
 				if (channelExec.isClosed()) {
 					exitCode = channelExec.getExitStatus();
