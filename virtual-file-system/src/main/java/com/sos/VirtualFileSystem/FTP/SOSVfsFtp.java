@@ -150,6 +150,9 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 			Client().cwd(strT);
 			logger.debug(SOSVfs_D_135.params(strT, getReplyString(), "[directory exists]"));
 			flgR = objFTPReply.isSuccessCode();
+			if (flgR) {
+				strCurrentPath = strT;
+			}
 		}
 		catch (IOException e) {
 			RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
@@ -550,7 +553,7 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 //		catch (IOException e) {
 //			RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
 //		}
-		logger.trace(SOSVfs_D_152.params(strT, conMethodName));
+//		logger.trace(SOSVfs_D_152.params(strT, conMethodName));
 		return objFtpFile;
 	}
 

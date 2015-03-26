@@ -2,6 +2,8 @@ package sos.net.ssh;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -15,12 +17,9 @@ import sos.net.ssh.exceptions.SSHMissingCommandError;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
-import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
-import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.SFTP.SOSVfsSFtpJCraft;
-import com.sos.VirtualFileSystem.SSH.SOSSSH2TriLeadImpl;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
@@ -35,6 +34,8 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
   private static final String SCHEDULER_RETURN_VALUES = "SCHEDULER_RETURN_VALUES";
   private String tempFileName;
   private ISOSVFSHandler vfsHandler;
+  private List<Integer> pids = new ArrayList<Integer>();
+  
 
 
   // http://www.sos-berlin.com/jira/browse/JITL-112
@@ -46,7 +47,10 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
 
   @Override
   public String getPreCommand() {
-    return String.format(objOptions.getPreCommand().Value()  + objOptions.command_delimiter.Value(), SCHEDULER_RETURN_VALUES, tempFileName);
+    return String.format("echo $$" + 
+        objOptions.command_delimiter.Value() +
+        objOptions.getPreCommand().Value() + 
+        objOptions.command_delimiter.Value(), SCHEDULER_RETURN_VALUES, tempFileName);
   }
 
   @Override
@@ -54,9 +58,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     if (prePostCommandVFSHandler == null) {
       try {
         prePostCommandVFSHandler = VFSFactory.getHandler("SSH2.JSCH");
-      }
-      catch (Exception e) {
-        // TODO msg must be used in the VFSFactory because it is an VFS Msg
+      } catch (Exception e) {
         throw new JobSchedulerException("SOS-VFS-E-0010: unable to initialize second VFS", e);
       }
     }
@@ -163,7 +165,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
       if (isConnected == false) {
         this.Connect();
       }
-
+      flgIsWindowsShell = vfsHandler.remoteIsWindowsShell();
       if (objOptions.command.IsEmpty() == false) {
         strCommands2Execute = objOptions.command.values();
       } else {
@@ -176,13 +178,12 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
           strTemp = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strTemp);
           strCommands2Execute[0] = vfsHandler.createScriptFile(strTemp);
           // http://www.sos-berlin.com/jira/browse/JITL-123
-          if(!(vfsHandler instanceof SOSSSH2TriLeadImpl)){
-            add2Files2Delete(strCommands2Execute[0]);
-          }
+          add2Files2Delete(strCommands2Execute[0]);
           flgScriptFileCreated = true; // http://www.sos-berlin.com/jira/browse/JITL-17
           strCommands2Execute[0] += " " + objOptions.command_script_param.Value();
         } else {
-          throw new SSHMissingCommandError(objMsg.getMsg(SOS_SSH_E_100)); // "SOS-SSH-E-100: neither Commands nor Script(file) specified. Abort.");
+          // "SOS-SSH-E-100: neither Commands nor Script(file) specified. Abort.");
+          throw new SSHMissingCommandError(objMsg.getMsg(SOS_SSH_E_100)); 
         }
       }
        
@@ -190,17 +191,32 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         try {
           // http://www.sos-berlin.com/jira/browse/JITL-112
           strCmd = getPreCommand() + strCmd;
-          /**
-           * \change Substitution of variables enabled
-           *
-           * see http://www.sos-berlin.com/jira/browse/JS-673
-           *
-           */
+          // see http://www.sos-berlin.com/jira/browse/JS-673
           logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
           strCmd = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strCmd);
           logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
           vfsHandler.ExecuteCommand(strCmd);
           objJSJobUtilities.setJSParam(conExit_code, "0");
+          String pid = null;
+          String output = null;
+          BufferedReader reader = new BufferedReader(new StringReader(new String(vfsHandler.getStdOut())));
+          String line = null;
+          while ((line = reader.readLine()) != null) {
+            // get the first line via a regex matcher, 
+            // if first line is parseable to an Integer we have the pid for the execute channel [SP]
+            Matcher regExMatcher = Pattern.compile("^([^\r\n]*)\r*\n*").matcher(line);
+            if (regExMatcher.find()) {
+              pid = regExMatcher.group(1).trim(); // key with leading and trailing whitespace removed
+              try {
+                pids.add(Integer.parseInt(pid));
+                logger.debug("PID: " + pid);
+                break;
+              } catch (Exception e) {
+                logger.debug("no parseable pid received in line:\n" + pid);
+              }
+              
+            }
+          }
           CheckStdOut();
           CheckStdErr();
           CheckExitCode();
@@ -219,13 +235,19 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
               throw new SSHExecutionError("Exception raised: " + e, e);
             }
           }
+        }finally{
+          if (pids.size() > 0){
+            int count = 0;
+            for (Integer pid : pids){
+              objJSJobUtilities.setJSParam("PID_TO_KILL_" + count, pid.toString());
+            }
+          }
         }
       }
       // http://www.sos-berlin.com/jira/browse/JITL-112
       processPostCommands(getTempFileName());
-    }
-    catch (Exception e) {
-      if(objOptions.raise_exception_on_error.value()){
+    } catch (Exception e) {
+      if (objOptions.raise_exception_on_error.value()) {
         String strErrMsg = "SOS-SSH-E-120: error occurred processing ssh command: ";
         if(objOptions.ignore_error.value()){
           if(objOptions.ignore_stderr.value()){
@@ -285,18 +307,17 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     catch (Exception e) {
       throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
     }
-
-    flgIsWindowsShell = vfsHandler.remoteIsWindowsShell();
     isConnected = true;
     
     // http://www.sos-berlin.com/jira/browse/JITL-112: 
     //   preparePostCommandHandler() has to be called once to generate a 
     //   second instance for post processing of stored return values
     preparePostCommandHandler();
+    // https://change.sos-berlin.com/browse/JITL-147
     return this;
   } // private SOSSSHJob2 Connect
-  
-  private SOSConnection2OptionsAlternate getAlternateOptions(SOSSSHJobOptions options){
+
+  public SOSConnection2OptionsAlternate getAlternateOptions(SOSSSHJobOptions options) {
     SOSConnection2OptionsAlternate alternateOptions = new SOSConnection2OptionsAlternate();
     alternateOptions.setStrict_HostKey_Checking("no");
     alternateOptions.host.Value(options.getHost().Value());

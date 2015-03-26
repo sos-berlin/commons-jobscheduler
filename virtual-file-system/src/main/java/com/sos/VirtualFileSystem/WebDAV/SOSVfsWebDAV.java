@@ -6,13 +6,16 @@ import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Enumeration;
 
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.HttpURL;
 import org.apache.commons.httpclient.HttpsURL;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.contrib.ssl.EasySSLProtocolSocketFactory;
+import org.apache.commons.httpclient.contrib.ssl.StrictSSLProtocolSocketFactory;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
+import org.apache.commons.ssl.TrustMaterial;
 import org.apache.log4j.Logger;
 import org.apache.webdav.lib.WebdavResource;
 import org.omg.SendingContext.RunTime;
@@ -25,7 +28,6 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
-import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsSuperClass;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
@@ -76,27 +78,17 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 	 */
 	@Override
 	public ISOSConnection Connect() {
-		@SuppressWarnings("unused")
-		SOSConnection2OptionsAlternate pConnection2OptionsAlternate = null;
-		this.Connect(pConnection2OptionsAlternate);
+		this.Connect(this.connection2OptionsAlternate);
 		return this;
 
 	}
 
 	/**
-	 *
-	 * \brief Connect
-	 *
-	 * \details
-	 *
-	 * \return
-	 *
-	 * @param pobjConnectionOptions
-	 * @return
+	 * 
 	 */
 	@Override
-	public ISOSConnection Connect(final SOSConnection2OptionsAlternate pConnection2OptionsAlternate) {
-		connection2OptionsAlternate = pConnection2OptionsAlternate;
+	public ISOSConnection Connect(final SOSConnection2OptionsAlternate options) {
+		connection2OptionsAlternate = options;
 
 		if (connection2OptionsAlternate == null) {
 			RaiseException(SOSVfs_E_190.params("connection2OptionsAlternate"));
@@ -107,19 +99,11 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 	}
 
 	/**
-	 *
-	 * \brief Authenticate
-	 *
-	 * \details
-	 *
-	 * \return
-	 *
-	 * @param pAuthenticationOptions
-	 * @return
+	 * 
 	 */
 	@Override
-	public ISOSConnection Authenticate(final ISOSAuthenticationOptions pAuthenticationOptions) {
-		authenticationOptions = pAuthenticationOptions;
+	public ISOSConnection Authenticate(final ISOSAuthenticationOptions options) {
+		authenticationOptions = options;
 		try {
 			proxyHost = connection2OptionsAlternate.proxy_host.Value();
 			proxyPort = connection2OptionsAlternate.proxy_port.value();
@@ -129,36 +113,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 			this.doAuthenticate(authenticationOptions);
 		}
 		catch (Exception ex) {
-			Exception exx = ex;
-
-			this.disconnect();
-
-			if (connection2OptionsAlternate != null) {
-				SOSConnection2OptionsSuperClass optionsAlternatives = connection2OptionsAlternate.Alternatives();
-				if (!optionsAlternatives.host.IsEmpty() && !optionsAlternatives.user.IsEmpty()) {
-					logINFO(SOSVfs_I_170.params(connection2OptionsAlternate.Alternatives().host.Value()));
-					try {
-
-						host = optionsAlternatives.host.Value();
-						port = optionsAlternatives.port.value();
-
-						proxyHost = optionsAlternatives.proxy_host.Value();
-						proxyPort = optionsAlternatives.proxy_port.value();
-						proxyUser = optionsAlternatives.proxy_user.Value();
-						proxyPassword = optionsAlternatives.proxy_password.Value();
-
-						this.doAuthenticate(optionsAlternatives);
-						exx = null;
-					}
-					catch (Exception e) {
-						exx = e;
-					}
-				}
-			}
-
-			if (exx != null) {
-				RaiseException(exx, SOSVfs_E_168.get());
-			}
+			RaiseException(ex, SOSVfs_E_168.get());
 		}
 
 		return this;
@@ -177,7 +132,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 	 */
 	@Override
 	public void login(final String pUserName, final String pPassword) {
-
+		String method = "login";
 		try {
 
 			userName = pUserName;
@@ -189,7 +144,9 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 			davClient = getWebdavResource(httpUrl);
 
 			if (!davClient.exists()) {
-				throw new Exception("not connected " + davClient.getStatusMessage());
+				throw new Exception(String.format("%s: HTTP-DAV isn't enabled %s ",
+						method,
+						getStatusMessage(davClient)));
 			}
 
 			reply = "OK";
@@ -274,7 +231,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 					logger.debug(HostID(SOSVfs_E_0106.params("mkdir", subfolders[i], getReplyString())));
 				}
 				else {
-					throw new Exception(davClient.getStatusMessage());
+					throw new Exception(getStatusMessage(davClient));
 				}
 			}
 		}
@@ -302,7 +259,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 				logger.debug(HostID(SOSVfs_D_181.params("rmdir", path, getReplyString())));
 			}
 			else {
-				throw new JobSchedulerException(davClient.getStatusMessage());
+				throw new JobSchedulerException(getStatusMessage(davClient));
 			}
 
 			logger.info(HostID(SOSVfs_D_181.params("rmdir", path, getReplyString())));
@@ -519,7 +476,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 				return this.size(remoteFile);
 			}
 			else {
-				throw new Exception(davClient.getStatusMessage());
+				throw new Exception(getStatusMessage(davClient));
 			}
 		}
 		catch (Exception e) {
@@ -547,7 +504,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 			}
 
 			if (!davClient.deleteMethod(path)) {
-				throw new Exception(davClient.getStatusMessage());
+				throw new Exception(getStatusMessage(davClient));
 			}
 		}
 		catch (Exception ex) {
@@ -579,7 +536,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 			to = this.normalizePath(to);
 
 			if (!davClient.moveMethod(from, to)) {
-				throw new Exception(davClient.getStatusMessage());
+				throw new Exception(getStatusMessage(davClient));
 			}
 		}
 		catch (Exception e) {
@@ -843,17 +800,52 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 		return getResource(path, true);
 	}
 
+	/**
+	 * 
+	 * @param url
+	 * @return
+	 * @throws Exception
+	 */
 	private WebdavResource getWebdavResource(final HttpURL url) throws Exception {
+		WebdavResource res = null;
 		if(SOSString.isEmpty(proxyHost)) {
-			return new WebdavResource(url);
+			res = new WebdavResource(url);
 		}
 		else {
-			WebdavResource r = new WebdavResource(url,proxyHost, proxyPort,new UsernamePasswordCredentials(proxyUser, proxyPassword));
-			return r;
+			res = new WebdavResource(url,proxyHost, proxyPort,new UsernamePasswordCredentials(proxyUser, proxyPassword));
 		}
+		
+		if(!isSuccessStatusCode(res.getStatusCode())){
+			throw new Exception(getStatusMessage(res));
+		}
+		return res;
 	}
 
+	/**
+	 * 
+	 * @param statusCode
+	 * @return
+	 */
+	private boolean isSuccessStatusCode(int statusCode){
+		// siehe HTTP StatusCode unter http://www.elektronik-kompendium.de/sites/net/0902231.htm
+		/**
+		if(statusCode >= HttpStatus.SC_OK && statusCode < HttpStatus.SC_NOT_FOUND){
+			return true;
+		}*/
+		if(statusCode == HttpStatus.SC_OK){
+			return true;
+		}
+		
+		return false;
+	}
 
+	/**
+	 * 
+	 * @param path
+	 * @param flgTryWithTrailingSlash
+	 * @return
+	 * @throws Exception
+	 */
 	private WebdavResource getResource(String path, final boolean flgTryWithTrailingSlash) throws Exception {
 		path = this.normalizePath(path);
 		WebdavResource res = getWebdavResource(getWebdavRessourceURL(path));
@@ -961,10 +953,17 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 			String phostRootUrl = httpUrl.getScheme() + "://" + httpUrl.getAuthority() + "/";
 			if (httpUrl.getScheme().equalsIgnoreCase("https")) {
 				rootUrl = new HttpsURL(phostRootUrl);
-
-				if(pport > 0) {
-					Protocol.registerProtocol("https", new Protocol("https", (ProtocolSocketFactory)new EasySSLProtocolSocketFactory(),pport));
+			
+				StrictSSLProtocolSocketFactory psf = new StrictSSLProtocolSocketFactory();
+				//psf.setCheckCRL and psf.setCheckExpiry sind bei StrictSSL.. per default true
+				psf.setCheckHostname(true);
+				if(connection2OptionsAlternate.accept_untrusted_certificate.value()){
+					//see apache ssl EasySSLProtocolSocketFactory implementation
+					psf.useDefaultJavaCiphers();
+					psf.addTrustMaterial(TrustMaterial.TRUST_ALL);
 				}
+				Protocol p = new Protocol("https", (ProtocolSocketFactory)psf, pport);
+				Protocol.registerProtocol("https",p);
 			}
 			else {
 				rootUrl = new HttpURL(phostRootUrl);
@@ -974,7 +973,10 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 			httpUrl = new HttpURL(phost, pport, path);
 			rootUrl = new HttpURL(phost, pport, path);
 		}
-		httpUrl.setUserinfo(puser, ppassword);
+		
+		if(!SOSString.isEmpty(puser)){
+			httpUrl.setUserinfo(puser, ppassword);
+		}
 		return httpUrl;
 	}
 
@@ -994,22 +996,27 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 
 		return url;
 	}
-
+	
 	/**
-	 *
-	 * \brief doAuthenticate
-	 *
-	 * \details
-	 *
-	 * \return ISOSConnection
-	 *
-	 * @param authenticationOptions
+	 * 
+	 * @param url
 	 * @return
 	 * @throws Exception
 	 */
-	private ISOSConnection doAuthenticate(final ISOSAuthenticationOptions pAuthenticationOptions) throws Exception {
-
-		authenticationOptions = pAuthenticationOptions;
+	private HttpURL getWebdavRessourceURL(HttpURL url) throws Exception {
+		url.setUserinfo(userName,password);
+		return url;
+	}
+	
+	/**
+	 * 
+	 * @param options
+	 * @return
+	 * @throws Exception
+	 */
+	private ISOSConnection doAuthenticate(final ISOSAuthenticationOptions options) throws Exception {
+		String method = "doAuthenticate";
+		authenticationOptions = options;
 
 		userName = authenticationOptions.getUser().Value();
 		password = authenticationOptions.getPassword().Value();
@@ -1019,21 +1026,21 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 		HttpURL httpUrl = this.setRootHttpURL(userName, password, host, port);
 
 		try {
+			if(!SOSString.isEmpty(proxyHost)) {
+				logger.info(String.format("using proxy: %s:%s, proxy user = %s",
+						proxyHost,
+						proxyPort,
+						proxyUser));
+			}
 			// eigentlich bereits bei new WebdavResource soll eine Exception ausgelöst werden,
 			// wenn die Credentials bzw host etc falsch sind
-			// hier aber aus irgend. Grund kommt keine Exception hoch
-			if(SOSString.isEmpty(proxyHost)) {
-				davClient = new WebdavResource(httpUrl);
-			}
-			else {
-				logger.info("using proxy: host "+proxyHost+":"+proxyPort+" user = "+proxyUser);
-				davClient = new WebdavResource(httpUrl,proxyHost, proxyPort,new UsernamePasswordCredentials(proxyUser, proxyPassword));
-			}
-
+			// an der Stelle kommt aber  aus irgend. Grund keine Exception hoch
+			davClient = getWebdavResource(getWebdavRessourceURL(httpUrl));
 			if (!davClient.exists()) {
-				throw new JobSchedulerException("not connected " + davClient.getStatusMessage());
+				throw new JobSchedulerException(String.format("%s: HTTP-DAV isn't enabled %s ",
+						method,
+						getStatusMessage(davClient)));
 			}
-
 		}
 		catch (Exception ex) {
 			throw new JobSchedulerException(SOSVfs_E_167.params(authenticationOptions.getAuth_method().Value(), authenticationOptions.getAuth_file().Value()), ex);
@@ -1044,6 +1051,38 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 		this.LogReply();
 
 		return this;
+	}
+	
+	/**
+	 * 
+	 * @param client
+	 * @return
+	 */
+	private String getStatusMessage(WebdavResource client){
+		String msg = client.getStatusMessage();
+		String uri = "";
+		try{
+			uri = client.getHttpURL().getURI();
+		}
+		catch(Exception ex){
+			uri = String.format("unknown uri = %s",ex.toString());
+		}
+		if(SOSString.isEmpty(msg)){
+			msg = "no details provided";
+		}
+		
+		String proxy = "";
+		if(!SOSString.isEmpty(proxyHost)) {
+			proxy = String.format("[proxy %s:%s, proxy user = %s]",
+					proxyHost,
+					proxyPort,
+					proxyUser);
+		}
+		
+		return String.format("[%s]%s %s",
+				uri,
+				proxy,
+				msg);
 	}
 
 	/**
@@ -1063,7 +1102,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 		port = pport;
 
 		// TODO Meldung auch ohne Port oder Port mit ?? ausgeben.
-		String msgPort = connection2OptionsAlternate.auth_method.isURL() ? "??" : "" + port;
+		//String msgPort = connection2OptionsAlternate.auth_method.isURL() ? "??" : "" + port;
 
 		logger.debug(SOSVfs_D_0101.params(host, port));
 

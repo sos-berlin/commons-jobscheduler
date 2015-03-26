@@ -788,15 +788,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 			logger.debug(HostID(SOSVfs_E_0106.params(conMethodName, "", lstrCurrentPath)));
 			// Windows reply from pwd is : 257 "/kb" is current directory.
 			// Unix reply from pwd is : 257 "/home/kb"
-			int idx = lstrCurrentPath.indexOf('"'); // Unix?
-			if (idx >= 0) {
-				lstrCurrentPath = lstrCurrentPath.substring(idx + 1, lstrCurrentPath.length() - idx + 1);
-				idx = lstrCurrentPath.indexOf('"');
-				if (idx >= 0) {
-					lstrCurrentPath = lstrCurrentPath.substring(0, idx);
-				}
-			}
-			LogReply();
+			lstrCurrentPath = lstrCurrentPath.replaceFirst("^[^\"]*\"([^\"]*)\".*", "$1");
 		}
 		catch (IOException e) {
 			RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
@@ -1224,12 +1216,15 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 			if (strCurrentPath.length() <= 0) {
 				strCurrentPath = getCurrentPath();
 			}
-			DoCD(pstrPathName); // is this file-entry a subfolder?
-			if (isNegativeCommandCompletion()) {
-			}
-			else { // yes, it's a subfolder. undo the cd now
-				DoCD(strCurrentPath);
+			if (strCurrentPath.replaceFirst("/$", "").equals(pstrPathName.replaceFirst("/$", ""))) {
 				flgResult = true;
+			}
+			else {
+				DoCD(pstrPathName); // is this file-entry a subfolder?
+				if (isPositiveCommandCompletion()) { // yes, it's a subfolder. undo the cd now
+					DoCD(strCurrentPath);
+					flgResult = true;
+				}
 			}
 		}
 		return flgResult;
