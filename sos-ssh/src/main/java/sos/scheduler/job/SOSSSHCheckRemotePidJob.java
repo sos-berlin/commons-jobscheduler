@@ -66,7 +66,7 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
       if (isConnected == false) {
         this.Connect();
       }
-      vfsHandler.ExecuteCommand("/bin/ps -ef");
+      vfsHandler.ExecuteCommand("/bin/ps -ef | grep " + objOptions.user.Value());
       // check if command was processed correctly
       if (vfsHandler.getExitCode() == 0) {
         // read stdout of the read-temp-file statement per line
@@ -96,7 +96,7 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
             PsEfLine current = (PsEfLine) psOutputLineIterator.next();
             PsEfLine parent = (PsEfLine) remoteRunningPids.get(new Integer(current.parentPid));
             if (parent != null) {
-              logger.debug("Child of " + parent.pid + " is " + current.pid);
+//              logger.debug("Child of " + parent.pid + " is " + current.pid);
               parent.children.add(new Integer(current.pid));
             }
           }
@@ -159,13 +159,18 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
 
   private List<Integer> getPidsToKill(){
     logger.debug("PIDs to kill From Order: " + objOptions.getItem(PARAM_PIDS_TO_KILL));
-    String[] pidsFromOrder = objOptions.getItem(PARAM_PIDS_TO_KILL).split(",");
+    String[] pidsFromOrder = null;
+    if(objOptions.getItem(PARAM_PIDS_TO_KILL) != null && objOptions.getItem(PARAM_PIDS_TO_KILL).length() > 0){
+      pidsFromOrder = objOptions.getItem(PARAM_PIDS_TO_KILL).split(",");
+    }
     List<Integer> pidsToKill = new ArrayList<Integer>();
-    for(String pid : pidsFromOrder){
-      if(pid != null && pid.length() > 0){
-        pidsToKill.add(Integer.parseInt(pid));
-      }else{
-        logger.debug("PID is empty!");
+    if (pidsFromOrder != null) {
+      for (String pid : pidsFromOrder) {
+        if (pid != null && pid.length() > 0) {
+          pidsToKill.add(Integer.parseInt(pid));
+        } else {
+          logger.debug("PID is empty!");
+        }
       }
     }
     return pidsToKill;

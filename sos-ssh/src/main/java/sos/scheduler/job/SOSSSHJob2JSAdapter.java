@@ -54,6 +54,12 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
     } else {
       useTrilead = false;
       objR = new SOSSSHJobJSch();
+      if(!useTrilead && 
+          allParams.value(PARAM_RUN_WITH_WATCHDOG) != null && 
+          !allParams.value(PARAM_RUN_WITH_WATCHDOG).isEmpty() && 
+          allParams.value(PARAM_RUN_WITH_WATCHDOG).equalsIgnoreCase("true")){
+        createOrderForWatchdog();
+      }
       spooler_log.debug9("uses JSch implementation of SSH");
     } 
     SOSSSHJobOptions objO = objR.Options();
@@ -68,12 +74,6 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
 
     objO.CheckMandatory();
     objR.Execute();
-    if(!useTrilead && 
-        allParams.value(PARAM_RUN_WITH_WATCHDOG) != null && 
-        !allParams.value(PARAM_RUN_WITH_WATCHDOG).isEmpty() && 
-        allParams.value(PARAM_RUN_WITH_WATCHDOG).equalsIgnoreCase("true")){
-      createOrderForWatchdog();
-    }
   }
   
   // creates a new order for the cleanup jobchain with all the options, params, values and the TaskId of the task which created this

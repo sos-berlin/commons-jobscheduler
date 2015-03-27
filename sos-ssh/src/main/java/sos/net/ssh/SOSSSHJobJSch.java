@@ -34,6 +34,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
   private static final String SCHEDULER_RETURN_VALUES = "SCHEDULER_RETURN_VALUES";
   private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
   private String tempFileName;
+  private static final String PID_FILE_NAME = "sos-ssh-pid.txt";
   protected ISOSVFSHandler vfsHandler;
   private List<Integer> pids = new ArrayList<Integer>();
 
@@ -119,26 +120,26 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
           logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
           vfsHandler.ExecuteCommand(strCmd);
           objJSJobUtilities.setJSParam(conExit_code, "0");
-          String pid = null;
-          String output = null;
-          BufferedReader reader = new BufferedReader(new StringReader(new String(vfsHandler.getStdOut())));
-          String line = null;
-          while ((line = reader.readLine()) != null) {
-            // get the first line via a regex matcher, 
-            // if first line is parseable to an Integer we have the pid for the execute channel [SP]
-            Matcher regExMatcher = Pattern.compile("^([^\r\n]*)\r*\n*").matcher(line);
-            if (regExMatcher.find()) {
-              pid = regExMatcher.group(1).trim(); // key with leading and trailing whitespace removed
-              try {
-                pids.add(Integer.parseInt(pid));
-                logger.debug("PID: " + pid);
-                break;
-              } catch (Exception e) {
-                logger.debug("no parseable pid received in line:\n" + pid);
-              }
-              
-            }
-          }
+//          String pid = null;
+//          String output = null;
+//          BufferedReader reader = new BufferedReader(new StringReader(new String(vfsHandler.getStdOut())));
+//          String line = null;
+//          while ((line = reader.readLine()) != null) {
+//            // get the first line via a regex matcher, 
+//            // if first line is parseable to an Integer we have the pid for the execute channel [SP]
+//            Matcher regExMatcher = Pattern.compile("^([^\r\n]*)\r*\n*").matcher(line);
+//            if (regExMatcher.find()) {
+//              pid = regExMatcher.group(1).trim(); // key with leading and trailing whitespace removed
+//              try {
+//                pids.add(Integer.parseInt(pid));
+//                logger.debug("PID: " + pid);
+//                break;
+//              } catch (Exception e) {
+//                logger.debug("no parseable pid received in line:\n" + pid);
+//              }
+//              
+//            }
+//          }
           CheckStdOut();
           CheckStdErr();
           CheckExitCode();
@@ -158,21 +159,21 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             }
           }
         }finally{
-          if (pids.size() > 0){
-            StringBuilder strb = new StringBuilder();
-            boolean first = true;
-            // create a String with the comma separated pids to put in one Param 
-            for (Integer pid : pids){
-              if (first){
-                strb.append(pid.toString());
-                first = false;
-              }else{
-                strb.append(",").append(pid.toString());
-              }
-            }
-            
-            objJSJobUtilities.setJSParam(PARAM_PIDS_TO_KILL, strb.toString());
-          }
+//          if (pids.size() > 0){
+//            StringBuilder strb = new StringBuilder();
+//            boolean first = true;
+//            // create a String with the comma separated pids to put in one Param 
+//            for (Integer pid : pids){
+//              if (first){
+//                strb.append(pid.toString());
+//                first = false;
+//              }else{
+//                strb.append(",").append(pid.toString());
+//              }
+//            }
+//            
+//            objJSJobUtilities.setJSParam(PARAM_PIDS_TO_KILL, strb.toString());
+//          }
         }
       }
       // http://www.sos-berlin.com/jira/browse/JITL-112
@@ -254,11 +255,12 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
   public void generateTemporaryFilename() {
     UUID uuid = UUID.randomUUID();
     tempFileName = "sos-ssh-return-values-" + uuid + ".txt";
+//    pidFileName = "sos-ssh-pid-" + uuid + ".txt";
   }
 
   @Override
   public String getPreCommand() {
-    return String.format("echo $$" + 
+    return String.format("echo $$ >> " + PID_FILE_NAME + 
         objOptions.command_delimiter.Value() +
         objOptions.getPreCommand().Value() + 
         objOptions.command_delimiter.Value(), SCHEDULER_RETURN_VALUES, tempFileName);

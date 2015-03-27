@@ -1,4 +1,4 @@
 #!/bin/bash
 echo start sleeping
-sleep 90s
+sleep 300
 echo sleep ended
