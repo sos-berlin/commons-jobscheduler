@@ -1,7 +1,6 @@
 package sos.scheduler.job;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,17 +24,6 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
   private final Logger logger = Logger.getLogger(this.getClass());
   private List<Integer> availablePidsToKill = new ArrayList<Integer>();
   private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
-
-
-  private List<Integer> getPidsToKill(){
-    logger.info("PIDs to kill From Order: " + objOptions.getItem(PARAM_PIDS_TO_KILL));
-    String[] pidsFromOrder = objOptions.getItem(PARAM_PIDS_TO_KILL).split(",");
-    List<Integer> pidsToKill = new ArrayList<Integer>();
-    for(String pid : pidsFromOrder){
-      pidsToKill.add(Integer.parseInt(pid));
-    }
-    return pidsToKill;
-  }
 
   private void openSession() {
     try {
@@ -139,13 +127,18 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
         availablePidsToKill = new ArrayList<Integer>();
         for(Integer pidToKill : pidsToKillFromOrder){
           // then check if the pids are still running on the remote host
-          if(remoteRunningPids.get(pidToKill) != null){
+          PsEfLine psLine;
+          if((psLine = remoteRunningPids.get(pidToKill)) != null){
+            logger.debug("Added to available PIDs: " + psLine.pid);
             availablePidsToKill.add(pidToKill);
+          } else{
+            logger.debug("PID " + pidToKill + " not found" );
           }
         }
         // and override the order param with the resulting (still running) pids only to later kill them
+        StringBuilder strb = new StringBuilder();
         if (availablePidsToKill.size() > 0){
-          StringBuilder strb = new StringBuilder();
+          logger.debug("Overriding param " + PARAM_PIDS_TO_KILL);
           boolean first = true;
           // create a String with the comma separated pids to put in one Param 
           for (Integer pid : availablePidsToKill){
@@ -156,13 +149,26 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
               strb.append(",").append(pid.toString());
             }
           }
-          logger.info("still running PIDs to kill: " + strb.toString());
-          objJSJobUtilities.setJSParam(PARAM_PIDS_TO_KILL, strb.toString());
+          logger.debug("still running PIDs to kill: " + strb.toString());
         }
+        objJSJobUtilities.setJSParam(PARAM_PIDS_TO_KILL, strb.toString());
       }
     }
-    logger.info("execute ended");
     return this;
+  }
+
+  private List<Integer> getPidsToKill(){
+    logger.debug("PIDs to kill From Order: " + objOptions.getItem(PARAM_PIDS_TO_KILL));
+    String[] pidsFromOrder = objOptions.getItem(PARAM_PIDS_TO_KILL).split(",");
+    List<Integer> pidsToKill = new ArrayList<Integer>();
+    for(String pid : pidsFromOrder){
+      if(pid != null && pid.length() > 0){
+        pidsToKill.add(Integer.parseInt(pid));
+      }else{
+        logger.debug("PID is empty!");
+      }
+    }
+    return pidsToKill;
   }
 
   private class PsEfLine implements Comparable {
