@@ -9,6 +9,30 @@ import com.sos.JSHelper.Options.SOSOptionString;
 
 public interface IHibernateOptions {
 
+    /**
+     * \brief gethibernate_connection_isolation : 
+     * 
+     * \details
+     * 
+     *
+     * \return 
+     *
+     */
+    public abstract SOSOptionString gethibernate_connection_isolation();
+
+    /**
+     * \brief sethibernate_connection_isolation : 
+     * 
+     * \details
+     * 
+     *
+     * @param hibernate_connection_isolation : 
+     */
+    public abstract void sethibernate_connection_isoalation(
+            SOSOptionString p_hibernate_connection_isolation);
+
+    
+    
 	/**
 	 * \brief gethibernate_connection_autocommit : 
 	 * 

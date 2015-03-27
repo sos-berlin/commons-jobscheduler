@@ -159,6 +159,32 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Ser
 
     }
 
+    
+    protected String getWhereFromTo() {
+
+        String where = "";
+        String and = "";
+
+        if (filter.getCreatedFrom() != null) {
+            where += and + " created >= :createdFrom";
+            and = " and ";
+        }
+
+        if (filter.getCreatedTo() != null) {
+            where += and + " created <= :createdTo ";
+            and = " and ";
+        }
+
+        if (where.trim().equals("")) {
+
+        }
+        else {
+            where = "where " + where;
+        }
+        return where;
+
+    }
+    
     private void setWhere(Query query) {
 
         if (filter.getCreatedFrom() != null && !filter.getCreatedFrom().equals("")) {
@@ -332,6 +358,39 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Ser
     public List<DbItem> getListOfItemsToDelete()  {
          return getFilesFromTo(filter.getCreatedFrom(),filter.getCreatedTo());
              
+    }
+
+    @Override
+    public long deleteInterval() {
+        if (session == null) {
+            beginTransaction();
+        }
+
+        String q = "delete from JadeFilesHistoryDBItem e where e.jadeFilesDBItem.id IN (select id from JadeFilesDBItem " + getWhereFromTo() + ")";
+        
+     
+        Query query = session.createQuery(q);
+        if (filter.getCreatedFrom() != null) {
+            query.setTimestamp("createdFrom", filter.getCreatedFrom());
+         }
+         if (filter.getCreatedTo() != null) {
+            query.setTimestamp("createdTo", filter.getCreatedTo());
+         }
+        
+        int row = query.executeUpdate();
+
+        String hql = "delete from JadeFilesDBItem " + getWhereFromTo();
+        query = session.createQuery(hql);
+
+        if (filter.getCreatedFrom() != null) {
+            query.setTimestamp("createdFrom", filter.getCreatedFrom());
+         }
+         if (filter.getCreatedTo() != null) {
+            query.setTimestamp("createdTo", filter.getCreatedTo());
+         }
+          
+        row = query.executeUpdate();
+        return row;       
     }
 
     

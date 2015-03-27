@@ -245,10 +245,7 @@ public class JadeFilesHistoryDBLayer extends SOSHibernateIntervalDBLayer impleme
             and = " and ";
         }
 
-//        if (filter.getJadeFilesDBItem() != null && !"".equals(filter.getJadeFilesDBItem())) {
-//            where += and + " jadeFilesDBItem=:jadeFilesDBItem";
-//            and = " and ";
-//        }
+  
 
 
         if (where.trim().equals("")) {
@@ -261,6 +258,35 @@ public class JadeFilesHistoryDBLayer extends SOSHibernateIntervalDBLayer impleme
 
     }
 
+    
+    protected String getWhereFromTo() {
+
+        String where = "";
+        String and = "";
+
+        if (filter.getCreatedFrom() != null) {
+            where += and + " created >= :createdFrom";
+            and = " and ";
+        }
+
+        if (filter.getCreatedTo() != null) {
+            where += and + " created <= :createdTo ";
+            and = " and ";
+        }
+
+ 
+
+
+        if (where.trim().equals("")) {
+
+        }
+        else {
+            where = "where " + where;
+        }
+        return where;
+
+    }    
+    
     private void setWhere(Query query) {
 
         if (filter.getCreatedFrom() != null && !filter.getCreatedFrom().equals("")) {
@@ -516,6 +542,10 @@ public class JadeFilesHistoryDBLayer extends SOSHibernateIntervalDBLayer impleme
     public List<DbItem> getListOfItemsToDelete()  {
          return getFilesHistoryFromTo(filter.getCreatedFrom(),filter.getCreatedTo());
              
+    }
+    @Override
+    public long deleteInterval() {
+         return 0;
     }
 
 

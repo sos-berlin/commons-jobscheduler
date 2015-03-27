@@ -1,6 +1,7 @@
 package com.sos.hibernate.classes;
 
 import com.sos.hibernate.interfaces.IHibernateOptions;
+
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -63,9 +64,41 @@ public class SosHibernateSession {
         return session;
     }
 
+
+    public static Session getInstance(final File configurationFile, int transactionIsolationLevel) {
+        if (session == null) {
+            try {
+                Configuration configuration = getConfiguration(getDefaultClassMapping());
+                configuration.configure(configurationFile);
+                //http://tasks.sos/browse/DVT-53
+                configuration.setProperty("hibernate.jdbc.use_scrollable_resultset","true");
+                configuration.setProperty("hibernate.connection.isolation",String.valueOf(transactionIsolationLevel));
+                
+                if (configuration.getProperty("hibernate.dialect").equals("org.hibernate.dialect.MySQLInnoDBDialect") ||
+                   configuration.getProperty("hibernate.dialect").equals("org.hibernate.dialect.SQLServerDialect")){
+                       configuration.setProperty("hibernate.connection.isolation",String.valueOf(transactionIsolationLevel));
+                   }else{
+                       configuration.setProperty("hibernate.connection.isolation",String.valueOf(Connection.TRANSACTION_READ_COMMITTED));
+                   }
+                
+                if (transactionIsolationLevel == Connection.TRANSACTION_READ_UNCOMMITTED){
+                    configuration.setProperty("hibernate.connection.autocommit","true");
+                }
+
+                openSession(configuration);
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            session.clear();
+        }
+        return session;
+    }
+    
+    
     public static Session getInstance(IHibernateOptions options) {
         if (session == null) {
-            ClassLoader classLoader = ClassLoader.getSystemClassLoader();
             try {
                 Configuration configuration = getConfiguration(getDefaultClassMapping());
                 configuration.setProperty("hibernate.connection.url", options.gethibernate_connection_url().Value());
@@ -75,8 +108,10 @@ public class SosHibernateSession {
                 configuration.setProperty("hibernate.dialect", options.gethibernate_dialect().Value());
                 configuration.setProperty("hibernate.show_sql", options.gethibernate_show_sql().Value());
                 configuration.setProperty("hibernate.connection.autocommit", options.gethibernate_connection_autocommit().Value());
+                configuration.setProperty("hibernate.connection.isolation", options.gethibernate_connection_isolation().Value());
                 configuration.setProperty("hibernate.format_sql", options.gethibernate_format_sql().Value());
                 configuration.setProperty("hibernate.jdbc.use_scrollable_resultset",options.gethibernate_jdbc_use_scrollable_resultset().Value());
+
                 openSession(configuration);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -138,18 +173,26 @@ public class SosHibernateSession {
         return configuration;
     }
 
-    private static void openSession(Configuration configuration) {
+    
+
+
+    private static void openSession(final Configuration configuration) {
         sessionFactory = configuration.buildSessionFactory();
         session = sessionFactory.openSession();
         session.doWork(new Work() {
             public void execute(Connection connection) throws SQLException {
-                connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-                connection.setAutoCommit(false);
+//                connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+                try{
+                    connection.setTransactionIsolation(Integer.parseInt(configuration.getProperty("hibernate.connection.isolation")));
+                }catch (NumberFormatException e){
+                    connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+                }
+                connection.setAutoCommit(configuration.getProperty("hibernate.connection.autocommit").equalsIgnoreCase("true"));
             }
         });
         session.setFlushMode(FlushMode.ALWAYS);
     }
-
+    
     public static void close() {
         if (sessionFactory != null) {
             sessionFactory.close();
