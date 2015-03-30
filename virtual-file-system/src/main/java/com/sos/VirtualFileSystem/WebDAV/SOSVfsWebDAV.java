@@ -6,7 +6,6 @@ import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Enumeration;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.HttpURL;
@@ -814,7 +813,6 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 		else {
 			res = new WebdavResource(url,proxyHost, proxyPort,new UsernamePasswordCredentials(proxyUser, proxyPassword));
 		}
-		
 		if(!isSuccessStatusCode(res.getStatusCode())){
 			throw new Exception(getStatusMessage(res));
 		}
@@ -1032,9 +1030,6 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 						proxyPort,
 						proxyUser));
 			}
-			// eigentlich bereits bei new WebdavResource soll eine Exception ausgelöst werden,
-			// wenn die Credentials bzw host etc falsch sind
-			// an der Stelle kommt aber  aus irgend. Grund keine Exception hoch
 			davClient = getWebdavResource(getWebdavRessourceURL(httpUrl));
 			if (!davClient.exists()) {
 				throw new JobSchedulerException(String.format("%s: HTTP-DAV isn't enabled %s ",
@@ -1068,7 +1063,17 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 			uri = String.format("unknown uri = %s",ex.toString());
 		}
 		if(SOSString.isEmpty(msg)){
-			msg = "no details provided";
+			msg = "no details provided.";
+			if(uri.toLowerCase().startsWith("https://") && client.getStatusCode() == 0){
+				//TODO use DefaultHttpMethodRetryHandler und HttpClient beim Initialisieren von WebdabResource
+				//Beispiel
+				//DefaultHttpMethodRetryHandler rh = new DefaultHttpMethodRetryHandler(1,true);
+				//client.getParams().setParameter(HttpMethodParams.RETRY_HANDLER,rh);
+				if(!connection2OptionsAlternate.accept_untrusted_certificate.value()){
+					msg+=" maybe is this the problem by using of a self-signed certificate (option accept_untrusted_certificate = false)";
+				}
+			}
+			
 		}
 		
 		String proxy = "";

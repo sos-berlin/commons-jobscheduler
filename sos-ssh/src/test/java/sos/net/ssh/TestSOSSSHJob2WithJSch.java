@@ -119,7 +119,7 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
   public void testExecuteCmdScriptFileOnLinux() throws Exception {
     logger.info("****testExecuteCmdScriptFileOnLinux started****");
     String strArgs[] = new String[] { 
-        "-command_script_file", "src/test/resources/test.sh", 
+        "-command_script_file", "src/test/resources/test_sleep_90s.sh", // src/test/resources/test.sh
         "-auth_method", "password", 
         "-host", "homer.sos", 
         "-user", "test", 

@@ -239,9 +239,10 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	 */
 	@Override public void mkdir(final String path) {
 		try {
+			String p = path.replaceAll("//+", "/").replaceFirst("/$", "");
 			SOSOptionFolderName objF = new SOSOptionFolderName(path);
 			reply = "mkdir OK";
-			logger.debug(HostID(SOSVfs_D_179.params("mkdir", path)));
+			logger.debug(HostID(SOSVfs_D_179.params("mkdir", p)));
 			String[] subfolders = objF.getSubFolderArrayReverse();
 			int idx = subfolders.length;
 			for (String strSubFolder : objF.getSubFolderArrayReverse()) {
@@ -577,7 +578,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 						break;
 					}
 					// output line
-					outContent.append(new String(tmp, 0, i) + strEndOfLine);
+					outContent.append(new String(tmp, 0, i));
 				}
 				if (channelExec.isClosed()) {
 					exitCode = channelExec.getExitStatus();

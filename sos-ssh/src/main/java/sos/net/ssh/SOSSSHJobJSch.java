@@ -27,93 +27,16 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 public class SOSSSHJobJSch extends SOSSSHJob2 {
 
   // http://www.sos-berlin.com/jira/browse/JITL-112: Additional Handler for post commands
-  private ISOSVFSHandler    prePostCommandVFSHandler        = null;
+  protected ISOSVFSHandler    prePostCommandVFSHandler        = null;
   private final Logger logger = Logger.getLogger(this.getClass());
 
   // http://www.sos-berlin.com/jira/browse/JITL-112
   private static final String SCHEDULER_RETURN_VALUES = "SCHEDULER_RETURN_VALUES";
+  private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
   private String tempFileName;
-  private ISOSVFSHandler vfsHandler;
+  private static final String PID_FILE_NAME = "sos-ssh-pid.txt";
+  protected ISOSVFSHandler vfsHandler;
   private List<Integer> pids = new ArrayList<Integer>();
-  
-
-
-  // http://www.sos-berlin.com/jira/browse/JITL-112
-  @Override
-  public void generateTemporaryFilename() {
-    UUID uuid = UUID.randomUUID();
-    tempFileName = "sos-ssh-return-values-" + uuid + ".txt";
-  }
-
-  @Override
-  public String getPreCommand() {
-    return String.format("echo $$" + 
-        objOptions.command_delimiter.Value() +
-        objOptions.getPreCommand().Value() + 
-        objOptions.command_delimiter.Value(), SCHEDULER_RETURN_VALUES, tempFileName);
-  }
-
-  @Override
-  public void preparePostCommandHandler() {
-    if (prePostCommandVFSHandler == null) {
-      try {
-        prePostCommandVFSHandler = VFSFactory.getHandler("SSH2.JSCH");
-      } catch (Exception e) {
-        throw new JobSchedulerException("SOS-VFS-E-0010: unable to initialize second VFS", e);
-      }
-    }
-  }
-
-  @Override
-  public void processPostCommands(String tmpFileName){
-    openPrePostCommandsSession();
-    String postCommandRead = String.format(objOptions.getPostCommandRead().Value(), tmpFileName);
-    String stdErr = "";
-
-    if(tempFilesToDelete != null && !tempFilesToDelete.isEmpty()){
-      for(String tempFileName : tempFilesToDelete){
-        ((SOSVfsSFtpJCraft)vfsHandler).delete(tempFileName);
-        logger.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tempFileName));
-      }
-    }
-    tempFilesToDelete = null;
-
-    try {
-      prePostCommandVFSHandler.ExecuteCommand(postCommandRead);
-      // check if command was processed correctly 
-      if(prePostCommandVFSHandler.getExitCode() == 0){
-        // read stdout of the read-temp-file statement per line
-        if(prePostCommandVFSHandler.getStdOut().toString().length() > 0){
-          BufferedReader reader = new BufferedReader(new StringReader(new String(prePostCommandVFSHandler.getStdOut())));
-          String line = null;
-          logger.debug(SOSVfsMessageCodes.SOSVfs_D_284.getFullMessage());
-          while ((line = reader.readLine()) != null){
-            Matcher regExMatcher = Pattern.compile("^([^=]+)=(.*)").matcher(line);
-            if(regExMatcher.find()){
-              String key = regExMatcher.group(1).trim(); // key with leading and trailing whitespace removed
-              String value = regExMatcher.group(2).trim(); // value with leading and trailing whitespace removed
-              objJSJobUtilities.setJSParam(key, value);
-            }
-          }
-          // remove temp file after parsing return values from file
-          String postCommandDelete = String.format(objOptions.getPostCommandDelete().Value(), tmpFileName);
-          prePostCommandVFSHandler.ExecuteCommand(postCommandDelete);
-          logger.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tmpFileName));
-        }else{
-          logger.debug(SOSVfsMessageCodes.SOSVfs_D_280.getFullMessage());
-        }
-      }else{
-        logger.debug(SOSVfsMessageCodes.SOSVfs_D_281.getFullMessage());
-        stdErr = prePostCommandVFSHandler.getStdErr().toString();
-        if(stdErr.length() > 0){
-          logger.debug(stdErr);
-        }
-      }
-    } catch (Exception e) {
-      logger.debug(SOSVfsMessageCodes.SOSVfs_D_282.getFullMessage());
-    }
-    
-  }
 
   @Override
   public ISOSVFSHandler getVFSSSH2Handler() {
@@ -197,26 +120,26 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
           logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
           vfsHandler.ExecuteCommand(strCmd);
           objJSJobUtilities.setJSParam(conExit_code, "0");
-          String pid = null;
-          String output = null;
-          BufferedReader reader = new BufferedReader(new StringReader(new String(vfsHandler.getStdOut())));
-          String line = null;
-          while ((line = reader.readLine()) != null) {
-            // get the first line via a regex matcher, 
-            // if first line is parseable to an Integer we have the pid for the execute channel [SP]
-            Matcher regExMatcher = Pattern.compile("^([^\r\n]*)\r*\n*").matcher(line);
-            if (regExMatcher.find()) {
-              pid = regExMatcher.group(1).trim(); // key with leading and trailing whitespace removed
-              try {
-                pids.add(Integer.parseInt(pid));
-                logger.debug("PID: " + pid);
-                break;
-              } catch (Exception e) {
-                logger.debug("no parseable pid received in line:\n" + pid);
-              }
-              
-            }
-          }
+//          String pid = null;
+//          String output = null;
+//          BufferedReader reader = new BufferedReader(new StringReader(new String(vfsHandler.getStdOut())));
+//          String line = null;
+//          while ((line = reader.readLine()) != null) {
+//            // get the first line via a regex matcher, 
+//            // if first line is parseable to an Integer we have the pid for the execute channel [SP]
+//            Matcher regExMatcher = Pattern.compile("^([^\r\n]*)\r*\n*").matcher(line);
+//            if (regExMatcher.find()) {
+//              pid = regExMatcher.group(1).trim(); // key with leading and trailing whitespace removed
+//              try {
+//                pids.add(Integer.parseInt(pid));
+//                logger.debug("PID: " + pid);
+//                break;
+//              } catch (Exception e) {
+//                logger.debug("no parseable pid received in line:\n" + pid);
+//              }
+//              
+//            }
+//          }
           CheckStdOut();
           CheckStdErr();
           CheckExitCode();
@@ -236,12 +159,21 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             }
           }
         }finally{
-          if (pids.size() > 0){
-            int count = 0;
-            for (Integer pid : pids){
-              objJSJobUtilities.setJSParam("PID_TO_KILL_" + count, pid.toString());
-            }
-          }
+//          if (pids.size() > 0){
+//            StringBuilder strb = new StringBuilder();
+//            boolean first = true;
+//            // create a String with the comma separated pids to put in one Param 
+//            for (Integer pid : pids){
+//              if (first){
+//                strb.append(pid.toString());
+//                first = false;
+//              }else{
+//                strb.append(",").append(pid.toString());
+//              }
+//            }
+//            
+//            objJSJobUtilities.setJSParam(PARAM_PIDS_TO_KILL, strb.toString());
+//          }
         }
       }
       // http://www.sos-berlin.com/jira/browse/JITL-112
@@ -294,6 +226,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     logger.debug(String.format(SOSVfsMessageCodes.SOSVfs_D_254.params(fileNameToDelete)));
   }
 
+  @Override
   public SOSSSHJob2 Connect() {
     getVFS();
     Options().CheckMandatory();
@@ -316,6 +249,84 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     // https://change.sos-berlin.com/browse/JITL-147
     return this;
   } // private SOSSSHJob2 Connect
+
+  // http://www.sos-berlin.com/jira/browse/JITL-112
+  @Override
+  public void generateTemporaryFilename() {
+    UUID uuid = UUID.randomUUID();
+    tempFileName = "sos-ssh-return-values-" + uuid + ".txt";
+//    pidFileName = "sos-ssh-pid-" + uuid + ".txt";
+  }
+
+  @Override
+  public String getPreCommand() {
+    return String.format("echo $$ >> " + PID_FILE_NAME + 
+        objOptions.command_delimiter.Value() +
+        objOptions.getPreCommand().Value() + 
+        objOptions.command_delimiter.Value(), SCHEDULER_RETURN_VALUES, tempFileName);
+  }
+
+  @Override
+  public void preparePostCommandHandler() {
+    if (prePostCommandVFSHandler == null) {
+      try {
+        prePostCommandVFSHandler = VFSFactory.getHandler("SSH2.JSCH");
+      } catch (Exception e) {
+        throw new JobSchedulerException("SOS-VFS-E-0010: unable to initialize second VFS", e);
+      }
+    }
+  }
+
+  @Override
+  public void processPostCommands(String tmpFileName){
+    openPrePostCommandsSession();
+    String postCommandRead = String.format(objOptions.getPostCommandRead().Value(), tmpFileName);
+    String stdErr = "";
+
+    if(tempFilesToDelete != null && !tempFilesToDelete.isEmpty()){
+      for(String tempFileName : tempFilesToDelete){
+        ((SOSVfsSFtpJCraft)vfsHandler).delete(tempFileName);
+        logger.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tempFileName));
+      }
+    }
+    tempFilesToDelete = null;
+
+    try {
+      prePostCommandVFSHandler.ExecuteCommand(postCommandRead);
+      // check if command was processed correctly 
+      if(prePostCommandVFSHandler.getExitCode() == 0){
+        // read stdout of the read-temp-file statement per line
+        if(prePostCommandVFSHandler.getStdOut().toString().length() > 0){
+          BufferedReader reader = new BufferedReader(new StringReader(new String(prePostCommandVFSHandler.getStdOut())));
+          String line = null;
+          logger.debug(SOSVfsMessageCodes.SOSVfs_D_284.getFullMessage());
+          while ((line = reader.readLine()) != null){
+            Matcher regExMatcher = Pattern.compile("^([^=]+)=(.*)").matcher(line);
+            if(regExMatcher.find()){
+              String key = regExMatcher.group(1).trim(); // key with leading and trailing whitespace removed
+              String value = regExMatcher.group(2).trim(); // value with leading and trailing whitespace removed
+              objJSJobUtilities.setJSParam(key, value);
+            }
+          }
+          // remove temp file after parsing return values from file
+          String postCommandDelete = String.format(objOptions.getPostCommandDelete().Value(), tmpFileName);
+          prePostCommandVFSHandler.ExecuteCommand(postCommandDelete);
+          logger.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tmpFileName));
+        }else{
+          logger.debug(SOSVfsMessageCodes.SOSVfs_D_280.getFullMessage());
+        }
+      }else{
+        logger.debug(SOSVfsMessageCodes.SOSVfs_D_281.getFullMessage());
+        stdErr = prePostCommandVFSHandler.getStdErr().toString();
+        if(stdErr.length() > 0){
+          logger.debug(stdErr);
+        }
+      }
+    } catch (Exception e) {
+      logger.debug(SOSVfsMessageCodes.SOSVfs_D_282.getFullMessage());
+    }
+    
+  }
 
   public SOSConnection2OptionsAlternate getAlternateOptions(SOSSSHJobOptions options) {
     SOSConnection2OptionsAlternate alternateOptions = new SOSConnection2OptionsAlternate();

@@ -8,10 +8,17 @@ import sos.net.ssh.SOSSSHJob2;
 import sos.net.ssh.SOSSSHJobJSch;
 import sos.net.ssh.SOSSSHJobTrilead;
 import sos.net.ssh.SOSSSHJobOptions;
+import sos.spooler.Job_chain;
+import sos.spooler.Order;
 import sos.spooler.Variable_set;
 
 public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
   private final String conClassName = this.getClass().getSimpleName();
+  private static final String PARAM_SSH_JOB_TASK_ID = "SSH_JOB_TASK_ID";
+  private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
+  private static final String PARAM_RUN_WITH_WATCHDOG = "RUN_WITH_WATCHDOG";
+  private static final String PARAM_JITL_SSH_USE_JSCH_IMPL = "jitl.ssh.use_jsch_impl";
+  private boolean useTrilead = true;
   
   @Override
   public boolean spooler_process() throws Exception {
@@ -37,14 +44,22 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
     SOSSSHJob2 objR;
     Variable_set allParams = getGlobalSchedulerParameters();
     allParams.merge(getParameters());
-    if(allParams.value("jitl.ssh.use_jsch_impl") == null ||
-        allParams.value("jitl.ssh.use_jsch_impl").equalsIgnoreCase("default") ||
-        allParams.value("jitl.ssh.use_jsch_impl").equalsIgnoreCase("false")){
+    if(allParams.value(PARAM_JITL_SSH_USE_JSCH_IMPL) == null ||
+        allParams.value(PARAM_JITL_SSH_USE_JSCH_IMPL).equalsIgnoreCase("default") ||
+        allParams.value(PARAM_JITL_SSH_USE_JSCH_IMPL).equalsIgnoreCase("false")){
       //this is the default value for 1.9, will change to JSch with v 1.10 [SP]
+      useTrilead = true;
       objR = new SOSSSHJobTrilead();
       spooler_log.debug9("uses Trilead implementation of SSH");
     } else {
+      useTrilead = false;
       objR = new SOSSSHJobJSch();
+      if(!useTrilead && 
+          allParams.value(PARAM_RUN_WITH_WATCHDOG) != null && 
+          !allParams.value(PARAM_RUN_WITH_WATCHDOG).isEmpty() && 
+          allParams.value(PARAM_RUN_WITH_WATCHDOG).equalsIgnoreCase("true")){
+        createOrderForWatchdog();
+      }
       spooler_log.debug9("uses JSch implementation of SSH");
     } 
     SOSSSHJobOptions objO = objR.Options();
@@ -59,6 +74,18 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
 
     objO.CheckMandatory();
     objR.Execute();
+  }
+  
+  // creates a new order for the cleanup jobchain with all the options, params, values and the TaskId of the task which created this
+  private void createOrderForWatchdog(){
+    Order order = spooler.create_order();
+    order.params().merge(spooler_task.order().params());
+    order.params().set_var(PARAM_SSH_JOB_TASK_ID, String.valueOf(spooler_task.id()));
+    Job_chain chain = spooler.job_chain("kill_jobs/remote_cleanup_test");
+    chain.add_or_replace_order(order);
+    // echo SCHEDULER_PARAM_PIDS_TO_KILL
+    // echo SCHEDULER_PARAM_SSH_JOB_TASK_ID
+    //
   }
 
 }
