@@ -28,22 +28,18 @@ public class JobSchedulerRemoveFile extends JobSchedulerFileOperationBase {
 				file = source;
 			}
 			CheckMandatoryFile();
-			//
+			
 			intNoOfHitsInResultSet = SOSFileOperations.removeFileCnt(file, fileSpec, flags, isCaseInsensitive, minFileAge, maxFileAge, minFileSize,
 					maxFileSize, skipFirstFiles, skipLastFiles, objSOSLogger);
-			//
+			
 			flgOperationWasSuccessful = intNoOfHitsInResultSet > 0;
 			return setReturnResult(flgOperationWasSuccessful);
 		}
 		catch (Exception e) {
-			try {
-				String strM = JSJ_F_0010.params(conClassName, e.getLocalizedMessage());
-				logger.fatal(strM);
-				throw new JobSchedulerException(strM);
-			}
-			catch (Exception x) {
-			}
-			return false;
+			String strM = JSJ_F_0010.params(conClassName, e.getLocalizedMessage());
+			logger.error(strM);
+			logger.trace("", e);
+			return signalFailure();
 		}
 	}
 }
