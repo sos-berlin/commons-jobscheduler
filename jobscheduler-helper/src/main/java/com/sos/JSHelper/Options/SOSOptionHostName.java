@@ -327,6 +327,16 @@ public class SOSOptionHostName extends SOSOptionElement {
 		return host;
 	}
 	
+	public static String getLocalHost() {
+		String host = conLocalHostName;
+		try {
+			host = InetAddress.getLocalHost().getHostName();
+		} catch (UnknownHostException e) {
+			host = conLocalHostName;
+		}
+		return host;
+	}
+	
 	/**
 	 *
 	 * \brief getLocalHostAdressIfHostIsEmpty

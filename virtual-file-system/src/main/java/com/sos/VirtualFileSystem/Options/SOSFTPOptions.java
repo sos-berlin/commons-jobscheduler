@@ -1,6 +1,8 @@
 package com.sos.VirtualFileSystem.Options;
 import java.io.File;
+import java.net.InetAddress;
 import java.net.URI;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -276,9 +278,9 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 				protocol.Set(this.Target().protocol);
 			}
 		}
-		setDefaultPort(this.Source().protocol, this.Source().port);
-		setDefaultPort(this.Target().protocol, this.Target().port);
-		setDefaultPort(protocol, port);
+		setDefaultHostPort(protocol, port, host);
+		setDefaultHostPort(this.Source().protocol, this.Source().port, this.Source().host);
+		setDefaultHostPort(this.Target().protocol, this.Target().port, this.Target().host);
 		if (zero_byte_transfer.String2Bool() == true) {
 			TransferZeroByteFiles(true);
 			setZeroByteFilesStrict(false);
@@ -405,9 +407,11 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 				protocol.Value(this.Target().protocol.Value());
 			}
 		}
-		setDefaultPort(this.Source().protocol, this.Source().port);
-		setDefaultPort(this.Target().protocol, this.Target().port);
-		setDefaultPort(protocol, port);
+		setDefaultHostPort(protocol, port, host);
+		setDefaultHostPort(this.Source().protocol, this.Source().port, this.Source().host);
+		setDefaultHostPort(this.Target().protocol, this.Target().port, this.Target().host);
+		setDefaultAuth(this.Source().protocol, this.Source());
+		setDefaultAuth(this.Target().protocol, this.Target());
 		if (file_path.isDirty()) {
 			if (file_spec.isDirty()) {
 				file_path.Value("");
@@ -474,20 +478,74 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			pobjO.url.getOptions(pobjO);
 		}
 	}
-
-	private void setDefaultPort(final SOSOptionTransferType pobjTransferTyp, final SOSOptionPortNumber pobjPort) {
+	
+	
+	private void setDefaultAuth(final SOSOptionTransferType pobjTransferTyp, final SOSConnection2OptionsAlternate objConn) {
+		enuTransferTypes transferType = pobjTransferTyp.getEnum();
+		if (transferType == enuTransferTypes.http || transferType == enuTransferTypes.https || transferType == enuTransferTypes.webdav) {
+			if (!objConn.auth_method.isDirty() && !objConn.ssh_auth_method.isDirty()) {
+				objConn.auth_method.Value(enuAuthenticationMethods.url);
+				objConn.ssh_auth_method.Value(enuAuthenticationMethods.url);
+			}
+		}
+	}
+	
+	private void setDefaultHostPort(final SOSOptionTransferType pobjTransferTyp, final SOSOptionPortNumber pobjPort, final SOSOptionHostName pobjHost) {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setDefaultPort";
-		if (pobjTransferTyp.isSFtp()) {
+		enuTransferTypes transferType = pobjTransferTyp.getEnum();
+		
+		if (transferType == enuTransferTypes.sftp) {
 			if (pobjPort.isDirty() == false) {
 				pobjPort.value(SOSOptionPortNumber.conPort4SFTP);
 				pobjPort.setProtected(pobjTransferTyp.isProtected());
 			}
 		}
 		else {
-			if (pobjTransferTyp.isFtpS()) {
+			if (transferType == enuTransferTypes.ftp) {
 				if (pobjPort.isDirty() == false) {
-					pobjPort.value(SOSOptionPortNumber.conPort4FTPS);
+					pobjPort.value(SOSOptionPortNumber.conPort4FTP);
 					pobjPort.setProtected(pobjTransferTyp.isProtected());
+				}
+			}
+			else {
+				if (transferType == enuTransferTypes.local || transferType == enuTransferTypes.file || transferType == enuTransferTypes.zip) {
+					pobjPort.value(0);
+					pobjPort.setProtected(pobjTransferTyp.isProtected());
+					if (pobjHost.isNotDirty() || pobjHost.Value().equalsIgnoreCase("localhost") || pobjHost.Value().equalsIgnoreCase("127.0.0.1")) {
+						pobjHost.Value(SOSOptionHostName.getLocalHost());
+					}
+				}
+				else {
+					if (transferType == enuTransferTypes.ftps) {
+						if (pobjPort.isDirty() == false) {
+							pobjPort.value(SOSOptionPortNumber.conPort4FTPS);
+							pobjPort.setProtected(pobjTransferTyp.isProtected());
+						}
+					}
+					else {
+						if (transferType == enuTransferTypes.webdav) {
+							if (pobjPort.isDirty() == false) {
+								pobjPort.value(SOSOptionPortNumber.conPort4http);
+								pobjPort.setProtected(pobjTransferTyp.isProtected());
+							}
+						}
+						else {
+							if (transferType == enuTransferTypes.http) {
+								if (pobjPort.isDirty() == false) {
+									pobjPort.value(SOSOptionPortNumber.conPort4http);
+									pobjPort.setProtected(pobjTransferTyp.isProtected());
+								}
+							}
+							else {
+								if (transferType == enuTransferTypes.https) {
+									if (pobjPort.isDirty() == false) {
+										pobjPort.value(SOSOptionPortNumber.conPort4SSH);
+										pobjPort.setProtected(pobjTransferTyp.isProtected());
+									}
+								}
+							}
+						}
+					}
 				}
 			}
 		}
@@ -964,8 +1022,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	}
 
 	private void changeOptions2Local(final SOSConnection2OptionsAlternate objT) {
-		objT.host.Value("localhost");
-		logger.debug("prefix_host = " + objT.host.Value());
+		objT.host.Value(SOSOptionHostName.getLocalHost());
 		objT.user.Value("");
 		objT.password.Value("");
 		objT.port.value(0);
@@ -973,7 +1030,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		objT.passive_mode.Value("");
 		objT.transfer_mode.Value("");
 		SOSConnection2OptionsSuperClass objAlt = objT.Alternatives();
-		objAlt.host.Value("localhost");
+		objAlt.host.Value(objT.host.Value());
 		objAlt.port.value(0);
 		objAlt.protocol.Value("local");
 		objAlt.passive_mode.Value("");
@@ -1008,14 +1065,14 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			// strDataSourceType = this.getConnectionOptions().Source().protocol.Value();
 			// }
 			SOSConnection2OptionsAlternate objT = this.getConnectionOptions().Source();
-			objT.host.Value(SOSOptionHostName.conLocalHostName);
+			objT.host.Value(SOSOptionHostName.getLocalHost());
 			objT.port.value(0);
 			objT.protocol.Value(strDataSourceType);
-			objT.user = user;
-			objT.password = password;
-			objT.ssh_auth_file = ssh_auth_file;
-			objT.ssh_auth_method = ssh_auth_method;
-			objT.passive_mode = passive_mode;
+//			objT.user = user;
+//			objT.password = password;
+//			objT.ssh_auth_file = ssh_auth_file;
+//			objT.ssh_auth_method = ssh_auth_method;
+//			objT.passive_mode = passive_mode;
 			objT = this.getConnectionOptions().Target();
 			objT.host = host;
 			objT.port = port;
@@ -1047,6 +1104,11 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 				objT.password = password;
 				objT.ssh_auth_file = ssh_auth_file;
 				objT.ssh_auth_method = ssh_auth_method;
+				
+				objT = this.getConnectionOptions().Target();
+				objT.host.Value(SOSOptionHostName.getLocalHost());
+				objT.port.value(0);
+				objT.protocol.Value(enuTransferTypes.local.Text());
 				SOSConnection2OptionsSuperClass objAlt = objT.Alternatives();
 				objAlt.host.Value(alternative_host.Value());
 				objAlt.port.value(alternative_port.value());
@@ -1067,7 +1129,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 
 	@SuppressWarnings("unused") private void ReplicateConnectionOptions(SOSConnection2OptionsAlternate objT) {
 		final String conMethodName = conClassName + "::ReplicateConnectionOptions";
-		objT.host.Value(SOSOptionHostName.conLocalHostName);
+		objT.host.Value(SOSOptionHostName.getLocalHost());
 		objT.port.value(0);
 		objT.protocol.Value(enuTransferTypes.local.Text());
 		objT = this.getConnectionOptions().Target();

@@ -119,6 +119,7 @@ public class SOSOptionPortNumber extends SOSOptionInteger {
 	public static final int		conPort4Telnet		= 23;						// telnet
 	public static final int		conPort4smtp		= 25;						// smtp
 	public static final int		conPort4http		= 80;						// http
+	public static final int		conPort4https		= 443;						// https
 	public static final int		conPort4pop3		= 110;						// pop3
 	public static final int		conPort4imap		= 143;						// imap
 	public static final int		conPortWebDav		= 443;						// WebDAV
