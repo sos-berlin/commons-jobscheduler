@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
@@ -488,9 +489,14 @@ public class SOSHibernateConnection implements Serializable {
 	 */
 	public static Throwable getException(Throwable ex){
 		if(ex instanceof SQLGrammarException){
-			SQLGrammarException sgex = (SQLGrammarException)ex;
-			
-			return new Exception(sgex.getSQL(),sgex.getSQLException());
+			SQLGrammarException sqlGrEx = (SQLGrammarException)ex;
+			SQLException sqlEx = sqlGrEx.getSQLException();
+						
+			return new Exception(String.format("%s [exception: %s, sql: %s]",
+					ex.getMessage(),
+					sqlEx == null ? "" : sqlEx.getMessage(),
+					sqlGrEx.getSQL()),
+					sqlEx);
 		}
 		else if(ex.getCause() != null){
 			return ex.getCause();
