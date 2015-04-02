@@ -92,7 +92,7 @@ public class SOSVfsFtpBaseClass2 extends SOSVfsFtpBaseClass implements ISOSVfsFi
 			logger.debug(strM);
 			if (isConnected() == false) {
 				Client().connect(host, port);
-				logger.debug(SOSVfs_D_0102.params(host, port));
+				logger.info(SOSVfs_D_0102.params(host, port));
 				LogReply();
 //				String strT;
 //				try {
@@ -104,7 +104,7 @@ public class SOSVfsFtpBaseClass2 extends SOSVfsFtpBaseClass implements ISOSVfsFi
 //				}
 			}
 			else {
-				logger.warn(SOSVfs_D_0102.params(host, port));
+				logger.warn(SOSVfs_D_0103.params(host, port));
 
 			}
 		}
@@ -123,7 +123,7 @@ public class SOSVfsFtpBaseClass2 extends SOSVfsFtpBaseClass implements ISOSVfsFi
 		logger.debug(SOSVfs_D_0101.params(strH, intP));
 		try {
 			this.connect(strH, intP);
-			logger.debug(SOSVfs_D_0102.params(strH, intP));
+			logger.info(SOSVfs_D_0102.params(strH, intP));
 		}
 		catch (RuntimeException e) {
 			logger.info(SOSVfs_E_0107.params(host, port) + e.getMessage());
@@ -133,7 +133,7 @@ public class SOSVfsFtpBaseClass2 extends SOSVfsFtpBaseClass implements ISOSVfsFi
 			if (isNotEmpty(strAltHost) && intAltPort > 0) {
 				logger.debug(SOSVfs_D_0101.params(strAltHost, intAltPort));
 				this.connect(strAltHost, intAltPort);
-				logger.debug(SOSVfs_D_0102.params(strAltHost, intAltPort));
+				logger.info(SOSVfs_D_0102.params(strAltHost, intAltPort));
 			}
 			else {
 				logger.info(SOSVfs_E_0107.params(host, port, e.getMessage()));

@@ -738,7 +738,6 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 				objConf = new SOSConfiguration(settings.Value(), profile.Value(), objSOSLogger);
 				if (objConf.getParameterAsProperties().size() <= 0) {
 					String strM = SOSVfsMessageCodes.SOSVfs_E_0060.params(profile.Value(), settings.Value());
-					logger.error(strM, new JobSchedulerException(strM));
 					throw new JobSchedulerException(strM);
 				}
 				objP.putAll(objGlobals);
@@ -760,7 +759,6 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 							SOSConfiguration config_ = new SOSConfiguration(settings.Value(), strV, objSOSLogger);
 							if (config_.getParameterAsProperties().size() <= 0) {
 								String strM = SOSVfsMessageCodes.SOSVfs_E_0000.params(strV, settings.Value());
-								logger.error(strM);
 								throw new JobSchedulerException(strM);
 							}
 							objIncludes.putAll(config_.getParameterAsProperties(strIncludePrefix));
@@ -825,9 +823,13 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			super.setAllOptions(map);
 			setChildClasses(map);
 		}
+		catch (JobSchedulerException e) {
+			logger.error("ReadSettingsFile(): " + e.getMessage());
+			throw e;
+		}
 		catch (Exception e) {
-			logger.error("ReadSettingsFile()", e); //$NON-NLS-1$
-			throw new JobSchedulerException(e.getMessage(), e);
+			logger.error("ReadSettingsFile(): " + e.getMessage());
+			throw new JobSchedulerException(e);
 		}
 		return map;
 	} // private void ReadSettingsFile

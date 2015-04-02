@@ -149,7 +149,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 			}
 
 			reply = "OK";
-			logger.debug(SOSVfs_D_133.params(userName));
+			logger.info(SOSVfs_D_133.params(userName));
 			this.LogReply();
 		}
 		catch (Exception e) {
@@ -679,7 +679,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 		OutputStream os = getOutputStream(fileName);
 		file.setHandler(this);
 
-		logger.debug(SOSVfs_D_196.params(fileName));
+		//logger.debug(SOSVfs_D_196.params(fileName));
 
 		return file;
 	}
@@ -1042,7 +1042,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 		}
 
 		reply = "OK";
-		logger.debug(SOSVfs_D_133.params(userName));
+		logger.info(SOSVfs_D_133.params(userName));
 		this.LogReply();
 
 		return this;
@@ -1109,7 +1109,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 		// TODO Meldung auch ohne Port oder Port mit ?? ausgeben.
 		//String msgPort = connection2OptionsAlternate.auth_method.isURL() ? "??" : "" + port;
 
-		logger.debug(SOSVfs_D_0101.params(host, port));
+		logger.info(SOSVfs_D_0101.params(host, port));
 
 		if (this.isConnected() == false) {
 

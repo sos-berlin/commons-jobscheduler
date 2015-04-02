@@ -132,6 +132,9 @@ public class SOSVfsConnectionFactory {
 			
 			handleClient(client, options, isSource);
 		}
+		catch (JobSchedulerException ex) {
+			throw ex;
+		}
 		catch (Exception ex) {
 			//			https://change.sos-berlin.com/browse/SOSFTP-212
 			//			throw (RuntimeException) ex;
