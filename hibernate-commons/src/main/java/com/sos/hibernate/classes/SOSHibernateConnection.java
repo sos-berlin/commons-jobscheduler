@@ -22,6 +22,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.engine.SessionImplementor;
+import org.hibernate.exception.SQLGrammarException;
 import org.hibernate.impl.CriteriaImpl;
 import org.hibernate.impl.SessionFactoryImpl;
 import org.hibernate.jdbc.Work;
@@ -478,6 +479,23 @@ public class SOSHibernateConnection implements Serializable {
 		catch(Exception ex){
 			logger.warn(String.format("%s: cannot set dbms. %s",method,ex.toString()));
 		}
+	}
+	
+	/**
+	 * 
+	 * @param ex
+	 * @return
+	 */
+	public static Throwable getException(Throwable ex){
+		if(ex instanceof SQLGrammarException){
+			SQLGrammarException sgex = (SQLGrammarException)ex;
+			
+			return new Exception(sgex.getSQL(),sgex.getSQLException());
+		}
+		else if(ex.getCause() != null){
+			return ex.getCause();
+		}
+		return ex;
 	}
 	
 	/**
