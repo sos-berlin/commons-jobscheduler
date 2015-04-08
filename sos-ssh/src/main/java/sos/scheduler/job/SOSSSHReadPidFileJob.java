@@ -32,7 +32,9 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
   private final Logger logger = Logger.getLogger(this.getClass());
 
   private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
-  private static final String PID_FILE_NAME = "sos-ssh-pid.txt";
+//  private static final String PID_FILE_NAME = "sos-ssh-pid.txt";
+  private static final String PID_FILE_NAME_KEY = "ssh_pid_file_name";
+  private String tempPidFileName;
   private List<Integer> pids = new ArrayList<Integer>();
 
   private void openSession(){
@@ -64,14 +66,14 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
   public SOSSSHJob2 Execute() throws Exception {
     boolean flgScriptFileCreated = false; // http://www.sos-berlin.com/jira/browse/JITL-17
     vfsHandler.setJSJobUtilites(objJSJobUtilities);
-
+    tempPidFileName = vfsHandler.Options().getItem(PID_FILE_NAME_KEY);
     try {
       if (isConnected == false) {
         this.Connect();
       }
-      add2Files2Delete(PID_FILE_NAME);
+      add2Files2Delete(tempPidFileName);
       try {
-        String strCmd = String.format(objOptions.getPostCommandRead().Value(), PID_FILE_NAME);
+        String strCmd = String.format(objOptions.getPostCommandRead().Value(), tempPidFileName);
         // see http://www.sos-berlin.com/jira/browse/JS-673
         logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
         strCmd = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strCmd);
@@ -136,7 +138,7 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
         }
       }
       // http://www.sos-berlin.com/jira/browse/JITL-112
-      processPostCommands(PID_FILE_NAME);
+      processPostCommands(tempPidFileName);
     } catch (Exception e) {
       if (objOptions.raise_exception_on_error.value()) {
         String strErrMsg = "SOS-SSH-E-120: error occurred processing ssh command: ";

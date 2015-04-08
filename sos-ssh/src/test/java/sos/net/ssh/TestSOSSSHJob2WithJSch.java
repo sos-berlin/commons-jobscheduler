@@ -115,21 +115,21 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
     objSSH.Clear();
   }
 
-  @Test
-  public void testExecuteCmdScriptFileOnLinux() throws Exception {
-    logger.info("****testExecuteCmdScriptFileOnLinux started****");
-    String strArgs[] = new String[] { 
-        "-command_script_file", "src/test/resources/test_sleep_90s.sh", // src/test/resources/test.sh
-        "-auth_method", "password", 
-        "-host", "homer.sos", 
-        "-user", "test", 
-        "-password", "12345",
-        "-command_delimiter", ";" };
-    objOptions.CommandLineArgs(strArgs);
-    objSSH.Execute();
-    assertTrue(objSSH.getStdErr().toString().isEmpty());
-    objSSH.Clear();
-  }
+//  @Test
+//  public void testExecuteCmdScriptFileOnLinux() throws Exception {
+//    logger.info("****testExecuteCmdScriptFileOnLinux started****");
+//    String strArgs[] = new String[] { 
+//        "-command_script_file", "src/test/resources/test_sleep_90s.sh", // src/test/resources/test.sh
+//        "-auth_method", "password", 
+//        "-host", "homer.sos", 
+//        "-user", "test", 
+//        "-password", "12345",
+//        "-command_delimiter", ";" };
+//    objOptions.CommandLineArgs(strArgs);
+//    objSSH.Execute();
+//    assertTrue(objSSH.getStdErr().toString().isEmpty());
+//    objSSH.Clear();
+//  }
   
   @Test
   public void testExecuteUsingKeyFile() throws Exception {
