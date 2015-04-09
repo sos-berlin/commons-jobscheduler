@@ -302,6 +302,9 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 		try {
 			return dir(".");
 		}
+		catch (JobSchedulerException e) {
+			throw e;
+		}
 		catch (Exception e) {
 			RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
 		}
@@ -345,16 +348,23 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 	 */
 	@Override
 	public SOSFileList dir(final String pathname, final int flag) {
-		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::dir";
 
 		SOSFileList fileList = new SOSFileList();
 		FTPFile[] listFiles = null;
+		
 		try {
 			listFiles = Client().listFiles(pathname);
 		}
 		catch (IOException e) {
 			RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
+		}
+		if (listFiles == null || listFiles.length <= 0) {
+			if (isNegativeCommandCompletion()) {
+				String message = HostID(SOSVfs_E_0105.params(conMethodName)) + ":" + getReplyString();
+				RaiseException(message);
+			}
+			return fileList;
 		}
 		for (FTPFile listFile : listFiles) {
 			if (flag > 0 && listFile.isDirectory()) {
@@ -435,6 +445,9 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 			if (rc == false) {
 				RaiseException(HostID(SOSVfs_E_0105.params(conMethodName)));
 			}
+		}
+		catch (JobSchedulerException e) {
+			throw e;
 		}
 		catch (IOException e) {
 			RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
@@ -528,6 +541,9 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 			else
 				return -1L;
 		}
+		catch (JobSchedulerException e) {
+			throw e;
+		}
 		catch (IOException e) {
 			RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
 		}
@@ -540,7 +556,7 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 
 	@Override
 	public ISOSVirtualFile getFileHandle(final String pstrFilename) {
-		final String conMethodName = conClassName + "::getFileHandle";
+//		final String conMethodName = conClassName + "::getFileHandle";
 		String strT = pstrFilename.replaceAll("\\\\", "/");
 		ISOSVirtualFile objFtpFile = new SOSVfsFtpFile(strT);
 		objFtpFile.setHandler(this);
@@ -1003,9 +1019,6 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 			else {
 				logger.info(String.format(SOSVfs_I_150.params(from, to)));
 			}
-		}
-		catch (JobSchedulerException e) {
-			throw e;
 		}
 		catch (IOException e) {
 			RaiseException(e, SOSVfs_E_134.params("rename()"));

@@ -183,7 +183,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 
 			reply = "OK";
 			logger.debug(SOSVfs_D_133.params(domain));
-			logger.debug(SOSVfs_D_133.params(userName));
+			logger.info(SOSVfs_D_133.params(userName));
 			this.LogReply();
 		}
 		catch (Exception e) {
@@ -275,15 +275,19 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 			SmbFile f = getSmbFile(path);
 
 			if (!f.exists()) {
-				throw new Exception(String.format("Filepath '%1$s' does not exist.", f.getPath()));
+				throw new JobSchedulerException(String.format("[rmdir] failed. Filepath '%1$s' does not exist.", f.getPath()));
 			}
 			if (!f.isDirectory()) {
-				throw new Exception(String.format("Filepath '%1$s' is not a directory.", f.getPath()));
+				throw new JobSchedulerException(String.format("[rmdir] failed.  Filepath '%1$s' is not a directory.", f.getPath()));
 			}
 			f.delete();
 
 			reply = "rmdir OK";
 			logger.info(HostID(SOSVfs_D_181.params("rmdir", path, getReplyString())));
+		}
+		catch (JobSchedulerException e) {
+			reply = e.toString();
+			throw e;
 		}
 		catch (Exception e) {
 			reply = e.toString();
@@ -396,7 +400,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 			}
 		}
 		catch (Exception e) {
-			throw new Exception(SOSVfs_E_161.params("checking size", e));
+			throw new JobSchedulerException(SOSVfs_E_161.params("checking size", e));
 		}
 
 		return size;
@@ -721,7 +725,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 		//OutputStream os = getOutputStream(fileName);
 		file.setHandler(this);
 
-		logger.debug(SOSVfs_D_196.params(fileName));
+		//logger.debug(SOSVfs_D_196.params(fileName));
 
 		return file;
 	}
@@ -819,7 +823,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 			return new SmbFile(getSmbFilePath(path), authentication);
 		}
 		catch (Exception ex) {
-			throw new Exception("cannot get SmbFile: " + path);
+			throw new JobSchedulerException("cannot get SmbFile: " + path);
 		}
 	}
 
@@ -867,7 +871,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 		}
 
 		reply = "OK";
-		logger.debug(SOSVfs_D_133.params(userName));
+		logger.info(SOSVfs_D_133.params(userName));
 		this.LogReply();
 
 		return this;
@@ -889,7 +893,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 		host = phost;
 		port = pport;
 
-		logger.debug(SOSVfs_D_0101.params(host, port));
+		logger.info(SOSVfs_D_0101.params(host, port));
 
 		if (this.isConnected() == false) {
 

@@ -96,6 +96,11 @@ public class SOSOptionTransferType extends SOSOptionStringValueList {
 		Text2Enum();
 		return enuTT == enuTransferTypes.ftps;
 	}
+	
+	public boolean isLocal() {
+		Text2Enum();
+		return enuTT == enuTransferTypes.local || enuTT == enuTransferTypes.file;
+	}
 
 	private void Text2Enum() {
 		for (enuTransferTypes enuType : enuTransferTypes.values()) {
@@ -107,6 +112,7 @@ public class SOSOptionTransferType extends SOSOptionStringValueList {
 	}
 
 	public enuTransferTypes getEnum () {
+		Text2Enum();
 		return enuTT;
 	}
 }

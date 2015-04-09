@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
@@ -22,6 +23,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.engine.SessionImplementor;
+import org.hibernate.exception.SQLGrammarException;
 import org.hibernate.impl.CriteriaImpl;
 import org.hibernate.impl.SessionFactoryImpl;
 import org.hibernate.jdbc.Work;
@@ -478,6 +480,28 @@ public class SOSHibernateConnection implements Serializable {
 		catch(Exception ex){
 			logger.warn(String.format("%s: cannot set dbms. %s",method,ex.toString()));
 		}
+	}
+	
+	/**
+	 * 
+	 * @param ex
+	 * @return
+	 */
+	public static Throwable getException(Throwable ex){
+		if(ex instanceof SQLGrammarException){
+			SQLGrammarException sqlGrEx = (SQLGrammarException)ex;
+			SQLException sqlEx = sqlGrEx.getSQLException();
+						
+			return new Exception(String.format("%s [exception: %s, sql: %s]",
+					ex.getMessage(),
+					sqlEx == null ? "" : sqlEx.getMessage(),
+					sqlGrEx.getSQL()),
+					sqlEx);
+		}
+		else if(ex.getCause() != null){
+			return ex.getCause();
+		}
+		return ex;
 	}
 	
 	/**

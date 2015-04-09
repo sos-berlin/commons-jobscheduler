@@ -81,6 +81,8 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
     Order order = spooler.create_order();
     order.params().merge(spooler_task.order().params());
     order.params().set_var(PARAM_SSH_JOB_TASK_ID, String.valueOf(spooler_task.id()));
+    // delayed start after 5 seconds when the order is created
+    order.params().set_var("start_at", "now+5");
     Job_chain chain = spooler.job_chain("kill_jobs/remote_cleanup_test");
     chain.add_or_replace_order(order);
     // echo SCHEDULER_PARAM_PIDS_TO_KILL

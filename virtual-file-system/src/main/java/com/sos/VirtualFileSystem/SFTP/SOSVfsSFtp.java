@@ -129,7 +129,7 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
 				sshConnection = new Connection(host, port);
 				sshConnection.connect();
 				isConnected = true;
-				logger.debug(SOSVfs_D_0102.params(host, port));
+				logger.info(SOSVfs_D_0102.params(host, port));
 				LogReply();
 			}
 			else {
@@ -1302,7 +1302,7 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
 			}
 
 			reply = "OK";
-			logger.debug(SOSVfs_D_133.params(strUserName));
+			logger.info(SOSVfs_D_133.params(strUserName));
 			LogReply();
 		}
 		catch (IOException e) {
@@ -1513,7 +1513,7 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
 				throw new JobSchedulerException(SOSVfs_E_167.params(pobjAO.getAuth_method().Value(), pobjAO.getAuth_file().Value()));
 			}
 			reply = "OK";
-			logger.debug(SOSVfs_D_133.params(strUserName));
+			logger.info(SOSVfs_D_133.params(strUserName));
 			LogReply();
 		}
 		catch (Exception e) {
@@ -1747,11 +1747,11 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
 
 	@Override
 	public ISOSVirtualFile getFileHandle(String pstrFilename) {
-		final String conMethodName = conClassName + "::getFileHandle";
+		//final String conMethodName = conClassName + "::getFileHandle";
 
 		pstrFilename = pstrFilename.replaceAll("\\\\", "/");
 		ISOSVirtualFile objFtpFile = new SOSVfsSFtpFile(pstrFilename);
-		logger.debug(SOSVfs_D_152.params(pstrFilename, conMethodName));
+		//logger.debug(SOSVfs_D_152.params(pstrFilename, conMethodName));
 		objFtpFile.setHandler(this);
 		return objFtpFile;
 	}

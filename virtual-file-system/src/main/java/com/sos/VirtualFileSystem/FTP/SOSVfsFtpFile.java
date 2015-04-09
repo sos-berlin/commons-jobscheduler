@@ -150,6 +150,9 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
 			objO = objVFSHandler.getAppendFileStream(strFileName);
 
 		}
+		catch (JobSchedulerException e) {
+			throw e;
+		}
 		catch (Exception e) {
 			throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);
 		}
@@ -176,6 +179,9 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
 					objVFSHandler.openInputFile(strFileName);
 				}
 			}
+		}
+		catch (JobSchedulerException e) {
+			throw e;
 		}
 		catch (Exception e) {
 			throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);
@@ -209,6 +215,9 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
 					//objVFSHandler.openOutputFile(strFileName);
 				}
 			}
+		}
+		catch (JobSchedulerException e) {
+			throw e;
 		}
 		catch (Exception e) {
 			throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);
@@ -500,6 +509,9 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
 				}
 			}
 		}
+		catch (JobSchedulerException e) {
+			throw e;
+		}
 		catch (Exception e) {
 			throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);
 		}
@@ -521,6 +533,9 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
 					throw new JobSchedulerException(SOSVfs_E_175.params(strFileName, objVFSHandler.getReplyString()));
 				}
 			}
+		}
+		catch (JobSchedulerException e) {
+			throw e;
 		}
 		catch (IOException e) {
 			throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);

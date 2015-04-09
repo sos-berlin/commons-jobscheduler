@@ -185,7 +185,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 			sshSession.connect();
 			this.createSftpClient();
 			reply = "OK";
-			logger.debug(SOSVfs_D_133.params(userName));
+			logger.info(SOSVfs_D_133.params(userName));
 			this.LogReply();
 		}
 		catch (Exception e) {
@@ -729,7 +729,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		fileName = adjustFileSeparator(fileName);
 		ISOSVirtualFile file = new SOSVfsSFtpFileJCraft(fileName);
 		file.setHandler(this);
-		logger.debug(SOSVfs_D_196.params(fileName));
+//		logger.debug(SOSVfs_D_196.params(fileName));
 		return file;
 	}
 
@@ -842,7 +842,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 			throw new JobSchedulerException(HostID(e.getClass().getName() + " - " + e.getLocalizedMessage()), e);
 		}
 		reply = "OK";
-		logger.debug(SOSVfs_D_133.params(userName));
+		logger.info(SOSVfs_D_133.params(userName));
 		this.LogReply();
 		return this;
 	}
@@ -876,7 +876,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	private void connect(final String phost, final int pport) {
 		host = phost;
 		port = pport;
-		logger.debug(SOSVfs_D_0101.params(host, port));
+		logger.info(SOSVfs_D_0101.params(host, port));
 		if (this.isConnected() == false) {
 			this.LogReply();
 		}

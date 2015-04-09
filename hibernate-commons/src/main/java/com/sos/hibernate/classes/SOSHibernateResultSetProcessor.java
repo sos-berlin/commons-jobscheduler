@@ -84,14 +84,10 @@ public class SOSHibernateResultSetProcessor implements Serializable {
 	                criteriaImpl.getEntityOrClassName(), 
 	                session.getLoadQueryInfluencers());
 			
-			createSqlStatement(translator,walker.getSQLString());
+			String sql = createSqlStatement(translator,walker.getSQLString());
 			createMetadata(translator);			
 					
-			statement = connection.getJdbcConnection().createStatement(
-					getResultSetType(scrollMode),
-					getConcurrencyMode(criteria.isReadOnly()));
-			resultSet = statement.executeQuery(sqlStatement);
-			resultSet.setFetchSize((fetchSize == null) ? connection.getDefaultFetchSize() : fetchSize.intValue());
+			resultSet = createResultSet(sql,scrollMode,criteria.isReadOnly(),fetchSize);
 		}
 		catch(Exception ex){
 			throw new Exception(String.format("%s: %s",method,ex.toString()));
@@ -102,11 +98,55 @@ public class SOSHibernateResultSetProcessor implements Serializable {
 	
 	/**
 	 * 
+	 * @param sql
+	 * @param scrollMode
+	 * @param isReadOnly
+	 * @return
 	 * @throws Exception
 	 */
-	private void createSqlStatement(CriteriaQueryTranslator translator,String hibernateSqlString) throws Exception{
-		String method = "createSqlStatement";
+	public ResultSet createResultSet(String sql,ScrollMode scrollMode,boolean isReadOnly) throws Exception{
+	
+		return createResultSet(sql, scrollMode, isReadOnly,null);
+	}
+	
+	/**
+	 * 
+	 * @param sql
+	 * @param scrollMode
+	 * @param fetchSize
+	 * @return
+	 * @throws Exception
+	 */
+	public ResultSet createResultSet(String sql,ScrollMode scrollMode,boolean isReadOnly, Long fetchSize) throws Exception{
+		String method = "createResultSet";
 		
+		int fSize = (fetchSize == null) ? connection.getDefaultFetchSize() : fetchSize.intValue();
+		sqlStatement = sql;
+		
+		logger.debug(String.format("%s: sqlStatement = %s, scrollMode = %s, isReadOnly = %s, fetchSize = %s",
+				method,
+				sqlStatement,
+				scrollMode.toString(),
+				isReadOnly,
+				fSize));
+		
+		statement = connection.getJdbcConnection().createStatement(
+				getResultSetType(scrollMode),
+				getConcurrencyMode(isReadOnly));
+		resultSet = statement.executeQuery(sqlStatement);
+		resultSet.setFetchSize(fSize);
+		
+		return resultSet;
+	}
+	
+	/**
+	 * 
+	 * @param translator
+	 * @param hibernateSqlString
+	 * @return
+	 * @throws Exception
+	 */
+	private String createSqlStatement(CriteriaQueryTranslator translator,String hibernateSqlString) throws Exception{
 		String where = translator.getWhereCondition();
 		
 		QueryParameters qp = translator.getQueryParameters();
@@ -120,8 +160,7 @@ public class SOSHibernateResultSetProcessor implements Serializable {
 				where = where.replaceFirst("\\?",val);
 			}
 		}
-		sqlStatement = hibernateSqlString.replace(translator.getWhereCondition(),where);
-		logger.debug(String.format("%s: sqlStatement = %s",method,sqlStatement));
+		return hibernateSqlString.replace(translator.getWhereCondition(),where);
 	}
 	
 	/**
@@ -185,8 +224,17 @@ public class SOSHibernateResultSetProcessor implements Serializable {
 	 * @throws Exception
 	 */
 	public Object get() throws Exception{
-		Object bean = entity.newInstance(); 
+		if(entity == null){
+			throw new Exception("entity is NULL");
+		}
+		if(entitySetMethods == null){
+			throw new Exception("entitySetMethods is NULL");
+		}
+		if(entityGetMethods == null){
+			throw new Exception("entityGetMethods is NULL");
+		}
 		
+		Object bean = entity.newInstance(); 
 		for (Map.Entry<String, Method> setters : entitySetMethods.entrySet()) {
 		    String field = setters.getKey();
 		    Method setter = setters.getValue();

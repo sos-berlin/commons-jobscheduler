@@ -397,6 +397,16 @@ public class SOSFileList extends SOSVfsMessageCodes {
 			this.add(string + "." + pstrHashTypeName).flgIsHashFile = true;
 		}
 	}
+	
+	
+	public void logFileList() {
+		String strT = "";
+		for (SOSFileListEntry objListItem : objFileListEntries) {
+			String strFileName = objListItem.getFileName4ResultList();
+			strT += "\n" + strFileName;
+		}
+		logger.info(strT);
+	}
 
 	/**
 	 *
@@ -577,11 +587,17 @@ public class SOSFileList extends SOSVfsMessageCodes {
 		// TODO löschen der Dateien mit Atomic-Prefix und -Suffix auf dem Target
 		if (objOptions.isAtomicTransfer()) {
 			for (SOSFileListEntry objListItem : objFileListEntries) {
-				String strAtomicFileName = MakeFullPathName(objOptions.TargetDir.Value(), objListItem.getAtomicFileName());
+				String strAtomicFileName = objListItem.getAtomicFileName();
+				if (strAtomicFileName.isEmpty()) {
+					continue;
+				}
+				strAtomicFileName = MakeFullPathName(
+						objOptions.TargetDir.Value(),
+						objListItem.getAtomicFileName());
 				if (isNotEmpty(objListItem.getAtomicFileName())) {
 					try {
 						ISOSVirtualFile atomicFile = objDataTargetClient.getFileHandle(strAtomicFileName);
-						if(atomicFile.FileExists()) {
+						if (atomicFile.FileExists()) {
 							atomicFile.delete();
 						}
 						String strT = SOSVfs_D_212.params(strAtomicFileName);

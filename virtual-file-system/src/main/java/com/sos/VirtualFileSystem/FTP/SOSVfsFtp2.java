@@ -443,7 +443,7 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
 
 	@Override
 	public ISOSVirtualFile getFileHandle(final String pstrFilename) {
-		final String conMethodName = conClassName + "::getFileHandle";
+//		final String conMethodName = conClassName + "::getFileHandle";
 		String strT = pstrFilename.replaceAll("\\\\", "/");
 		ISOSVirtualFile objFtpFile = new SOSVfsFtpFile(strT);
 		objFtpFile.setHandler(this);
@@ -456,7 +456,7 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
 		//		catch (IOException e) {
 		//			RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
 		//		}
-		logger.trace(SOSVfs_D_152.params(strT, conMethodName));
+		//logger.trace(SOSVfs_D_152.params(strT, conMethodName));
 		return objFtpFile;
 	}
 

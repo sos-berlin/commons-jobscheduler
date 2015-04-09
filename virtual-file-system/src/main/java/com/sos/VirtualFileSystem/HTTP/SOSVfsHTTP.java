@@ -143,7 +143,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 			this.doLogin(user, password);
 
 			reply = "OK";
-			logger.debug(SOSVfs_D_133.params(userName));
+			logger.info(SOSVfs_D_133.params(userName));
 			this.LogReply();
 		}
 		catch (Exception e) {
@@ -264,7 +264,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 		ISOSVirtualFile file = new SOSVfsHTTPFile(fileName);
 		file.setHandler(this);
 
-		logger.debug(SOSVfs_D_196.params(fileName));
+		//logger.debug(SOSVfs_D_196.params(fileName));
 
 		return file;
 	}
@@ -387,7 +387,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 					hc.setHost(new HttpHost(host,port));
 				}
 				
-				logger.debug(SOSVfs_D_0101.params(host, port));
+				logger.info(SOSVfs_D_0101.params(host, port));
 				
 				connectionManager = new MultiThreadedHttpConnectionManager();
 				httpClient = new HttpClient(connectionManager);

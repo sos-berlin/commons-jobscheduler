@@ -335,7 +335,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 			}
 			if (flgCreateSecurityHash) {
 				strMD5Hash = toHexString(md.digest());
-				logger.info(SOSVfs_I_274.params(strMD5Hash, strSourceTransferName, objOptions.SecurityHashType.Value()));
+				logger.debug(SOSVfs_I_274.params(strMD5Hash, strSourceTransferName, objOptions.SecurityHashType.Value()));
 				if (objOptions.CreateSecurityHashFile.isTrue()) {
 					JSTextFile objF = new JSTextFile(strSourceFileName + "." + objOptions.SecurityHashType.Value());
 					objF.WriteLine(strMD5Hash);
@@ -348,11 +348,15 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 			executeTFNPostCommnands();
 			return true;
 		}
+		catch (JobSchedulerException e) {
+			throw e;
+		}
 		catch (Exception e) {
-			String strT = SOSVfs_E_229.params(e);
+			//String strT = SOSVfs_E_229.params(e);
 			// TODO rollback?
-			logger.error(strT);
-			return false;
+			//logger.error(strT);
+			throw new JobSchedulerException(e);
+			//return false;
 		}
 		finally {
 			if (flgClosingDone == false) {
@@ -953,9 +957,10 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 				objSourceTransferFile = objDataSourceClient.getFileHandle(MakeFullPathName(getPathWithoutFileName(strSourceFileName) + strT,
 						strSourceTransferName));
 			}
-			if (objOptions.DoNotOverwrite() == true) { // kb 2012-06-29: check setting first, then file - existence
-				flgFileExists = objTargetFile.FileExists();
-				if (flgFileExists == true) {
+			flgFileExists = objTargetFile.FileExists();
+			if (flgFileExists == true) {
+				this.setTargetFileAlreadyExists(true);
+				if (objOptions.DoNotOverwrite() == true) { // kb 2012-06-29: check setting first, then file - existence
 					logger.debug(SOSVfs_E_228.params(strTargetFileName));
 					this.setNotOverwritten();
 					return;
@@ -984,9 +989,13 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 			}
 			RenameSourceFile(objSourceFile);
 		}
+		catch (JobSchedulerException e) {
+			String strT = SOSVfs_E_229.params(e);
+			logger.error(strT);
+			throw e;
+		}
 		catch (Exception e) {
 			String strT = SOSVfs_E_229.params(e);
-			// TODO rollback?
 			logger.error(strT);
 			throw new JobSchedulerException(strT, e);
 		}
