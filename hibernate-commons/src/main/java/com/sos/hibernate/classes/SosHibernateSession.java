@@ -72,7 +72,6 @@ public class SosHibernateSession {
                 configuration.configure(configurationFile);
                 //http://tasks.sos/browse/DVT-53
                 configuration.setProperty("hibernate.jdbc.use_scrollable_resultset","true");
-                configuration.setProperty("hibernate.connection.isolation",String.valueOf(transactionIsolationLevel));
                 
                 if (configuration.getProperty("hibernate.dialect").equals("org.hibernate.dialect.MySQLInnoDBDialect") ||
                    configuration.getProperty("hibernate.dialect").equals("org.hibernate.dialect.SQLServerDialect")){

@@ -200,6 +200,7 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
 	}
 
 	protected String AdjustRelativePathName(final String pstrPathName) {
+	    //TODO: Handle ./name correct.
 		String strT = pstrPathName;
 
 		if (pstrPathName.startsWith("./") || pstrPathName.startsWith(".\\")) {
