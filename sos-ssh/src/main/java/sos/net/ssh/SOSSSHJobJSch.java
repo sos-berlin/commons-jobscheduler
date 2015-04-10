@@ -33,10 +33,11 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
   // http://www.sos-berlin.com/jira/browse/JITL-112
   private static final String SCHEDULER_RETURN_VALUES = "SCHEDULER_RETURN_VALUES";
   private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
-  private static final String PID_FILE_NAME_KEY = "ssh_pid_file_name";
+  private static final String PID_FILE_NAME_KEY = "job_ssh_pid_file_name";
   private String tempFileName;
   private String pidFileName;
-//  private static final String PID_FILE_NAME = "sos-ssh-pid.txt";
+
+  //  private static final String PID_FILE_NAME = "sos-ssh-pid.txt";
   protected ISOSVFSHandler vfsHandler;
   private List<Integer> pids = new ArrayList<Integer>();
 
@@ -240,8 +241,8 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
   public void generateTemporaryFilename() {
     UUID uuid = UUID.randomUUID();
     tempFileName = "sos-ssh-return-values-" + uuid + ".txt";
-    pidFileName = "sos-ssh-pid-" + uuid + ".txt";
-    objJSJobUtilities.setJSParam(PID_FILE_NAME_KEY, pidFileName);
+//    pidFileName = "sos-ssh-pid-" + uuid + ".txt";
+//    objJSJobUtilities.setJSParam(PID_FILE_NAME_KEY, pidFileName);
   }
 
   @Override
@@ -330,4 +331,13 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     alternateOptions.ignore_error.value(options.getIgnore_error().value());
     return alternateOptions;
   }
+
+  public String getPidFileName() {
+    return pidFileName;
+  }
+
+  public void setPidFileName(String pidFileName) {
+    this.pidFileName = pidFileName;
+  }
+
 }

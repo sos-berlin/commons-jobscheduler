@@ -33,8 +33,9 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
 
   private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
 //  private static final String PID_FILE_NAME = "sos-ssh-pid.txt";
-  private static final String PID_FILE_NAME_KEY = "ssh_pid_file_name";
+  private static final String PID_FILE_NAME_KEY = "job_ssh_pid_file_name";
   private String tempPidFileName;
+
   private List<Integer> pids = new ArrayList<Integer>();
 
   private void openSession(){
@@ -66,14 +67,13 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
   public SOSSSHJob2 Execute() throws Exception {
     boolean flgScriptFileCreated = false; // http://www.sos-berlin.com/jira/browse/JITL-17
     vfsHandler.setJSJobUtilites(objJSJobUtilities);
-    tempPidFileName = vfsHandler.Options().getItem(PID_FILE_NAME_KEY);
     try {
       if (isConnected == false) {
         this.Connect();
       }
-      add2Files2Delete(tempPidFileName);
+      add2Files2Delete(getTempPidFileName());
       try {
-        String strCmd = String.format(objOptions.getPostCommandRead().Value(), tempPidFileName);
+        String strCmd = String.format(objOptions.getPostCommandRead().Value(), getTempPidFileName());
         // see http://www.sos-berlin.com/jira/browse/JS-673
         logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
         strCmd = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strCmd);
@@ -138,7 +138,7 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
         }
       }
       // http://www.sos-berlin.com/jira/browse/JITL-112
-      processPostCommands(tempPidFileName);
+      processPostCommands(getTempPidFileName());
     } catch (Exception e) {
       if (objOptions.raise_exception_on_error.value()) {
         String strErrMsg = "SOS-SSH-E-120: error occurred processing ssh command: ";
@@ -258,4 +258,13 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
     alternateOptions.ignore_error.value(options.getIgnore_error().value());
     return alternateOptions;
   }
+
+  public String getTempPidFileName() {
+    return tempPidFileName;
+  }
+
+  public void setTempPidFileName(String tempPidFileName) {
+    this.tempPidFileName = tempPidFileName;
+  }
+
 }
