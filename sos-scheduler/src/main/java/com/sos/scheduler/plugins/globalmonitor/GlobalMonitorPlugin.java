@@ -1,12 +1,15 @@
 package com.sos.scheduler.plugins.globalmonitor;
 
-import java.io.FileNotFoundException;
-import java.text.ParseException;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.xml.bind.JAXBException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import scala.collection.immutable.Set;
 
@@ -19,158 +22,164 @@ import com.sos.scheduler.engine.kernel.plugin.XmlConfigurationChangingPlugin;
 import static com.sos.scheduler.engine.common.xml.XmlUtils.loadXml;
 import static com.sos.scheduler.engine.common.xml.XmlUtils.toXmlBytes;
 import static com.sos.scheduler.engine.common.javautils.ScalaInJava.toScalaSet;
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Strings.nullToEmpty;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.log4j.Logger;
+import org.jdom.JDOMException;
 import org.jdom.input.DOMBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
-public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurationChangingPlugin  {
-    
-    private String paramConfigurationDirectory;
-    private String paramDirectoryExclusions;
-    private String paramFileExclusions;
-    private String paramRecursiv;
-    private String paramRegexSelector;
-    private String paramMonitorRegexSelector;
+public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurationChangingPlugin {
+
+    private static final Logger logger = Logger.getLogger(GlobalMonitorPlugin.class);
+    ConfigurationModifierFileSelectorOptions configurationModifierFileSelectorJobOptions;
+    ConfigurationModifierFileSelectorOptions configurationModifierFileSelectorMonitorOptions;
+
     private HashMap<String, String> parameters;
-    
+
     @Inject
     private GlobalMonitorPlugin(@Named(Plugins.configurationXMLName) Element pluginElement) {
-      setParameters(pluginElement);
+        configurationModifierFileSelectorJobOptions = setParameters(pluginElement, "jobparams");
+        configurationModifierFileSelectorMonitorOptions = setParameters(pluginElement, "monitorparams");
     }
 
     @Override
     public byte[] changeXmlConfiguration(FileBasedType typ, AbsolutePath path, byte[] xmlBytes) {
-        Document doc=null;
-        if (typ == FileBasedType.job){
+        logger.info("---------  changeXmlConfiguration");
+        Document doc = null;
+        if (typ == FileBasedType.job) {
             doc = xmlBytesToDom(xmlBytes);
-            //modifyJobElement(doc.getDocumentElement());
         }
         try {
-            doc = modifyJobElement(doc,path.withTrailingSlash());
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (JAXBException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
+            doc = modifyJobElement(doc, path.string());
+        } catch (JDOMException e) {
             e.printStackTrace();
         }
-        return domToXmlBytes(doc);        
+        return domToXmlBytes(doc);
     }
 
     @Override
     public Set<FileBasedType> fileBasedTypes() {
         return toScalaSet(FileBasedType.job);
     }
-    
-    private void setParameters(Element e){
+
+    private String getStringFromDocument(Document doc) {
+        try {
+            DOMSource domSource = new DOMSource(doc);
+            StringWriter writer = new StringWriter();
+            StreamResult result = new StreamResult(writer);
+            TransformerFactory tf = TransformerFactory.newInstance();
+            Transformer transformer = tf.newTransformer();
+            transformer.transform(domSource, result);
+            return writer.toString();
+        } catch (TransformerException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    private ConfigurationModifierFileSelectorOptions setParameters(Element e, String parent) {
+        logger.info("---------  setParameters:" + parent);
+        ConfigurationModifierFileSelectorOptions c = new ConfigurationModifierFileSelectorOptions();
+
         parameters = new HashMap<String, String>();
+        parameters.put("configuration_directory", "");
+        parameters.put("exclude_dir", "");
+        parameters.put("exclude_file", "");
+        parameters.put("recursiv", "true");
+        parameters.put("regex_selector", "");
+
         DOMBuilder domBuilder = new DOMBuilder();
         org.jdom.Element pluginElement = domBuilder.build(e);
-        
-        List <org.jdom.Element> listOfParams = null;
 
-        org.jdom.Element  paramsElement = pluginElement.getChild("params");
+        List<org.jdom.Element> listOfParams = null;
+
+        org.jdom.Element paramsElement = pluginElement.getChild(parent);
         if (paramsElement != null) {
             listOfParams = paramsElement.getChildren("param");
-         }
-    
-        Iterator<org.jdom.Element> it = listOfParams.iterator();
-        while (it.hasNext()) {
-            org.jdom.Element  param = it.next();
-            if (param.getAttributeValue("name") != null) {
-                String name = param.getAttributeValue("name").toLowerCase();
-                String value =param.getAttributeValue("value");
-                parameters.put(name,value);
-                
-             }
-       }
-        
-        paramConfigurationDirectory =  parameters.get("configurationdirectory");
-        paramDirectoryExclusions    =  parameters.get("directoryexclusions");
-        paramFileExclusions         =  parameters.get("fileexclusions");
-        paramRecursiv               =  parameters.get("recursiv");
-        paramRegexSelector          =  parameters.get("regexselector");
-        paramMonitorRegexSelector   =  parameters.get("monitorregexselector");
+
+            Iterator<org.jdom.Element> it = listOfParams.iterator();
+            while (it.hasNext()) {
+                org.jdom.Element param = it.next();
+                if (param.getAttributeValue("name") != null) {
+                    String name = param.getAttributeValue("name").toLowerCase();
+                    String value = param.getAttributeValue("value");
+                    logger.info("---------  " + name + "=" + value);
+
+                    parameters.put(name, value);
+
+                }
+            }
+
+            c.setConfigurationDirectory(parameters.get("configuration_directory"));
+            c.setDirectoryExclusions(parameters.get("exclude_dir"));
+            c.setFileExclusions(parameters.get("exclude_file"));
+            c.setRecursiv(parameters.get("recursiv"));
+            c.setRegexSelector(parameters.get("regex_selector"));
+        }
+        return c;
     }
-                             
- 
-     
-    private void modifyJobElementx(Element element) {
-        checkArgument(element.getLocalName().equals("job"));
-        String title = nullToEmpty(element.getAttribute("title"));
-        element.setAttribute("title", title + " - " + "appendToTitle2" + paramConfigurationDirectory);
-    }
-    
+
     private static Document xmlBytesToDom(byte[] xmlBytes) {
         String encoding = "";
         return loadXml(xmlBytes, encoding);
     }
-    
+
     private static byte[] domToXmlBytes(Node node) {
         boolean indent = false;
         return toXmlBytes(node, UTF_8, indent);
     }
-    
-    private Document modifyJobElement(Document doc, String jobname) throws FileNotFoundException, JAXBException, ParseException{
-        //1.Create and initialize the options object
-        ConfigurationModifierFileSelectorOptions configurationModifierFileSelectorOptions = new ConfigurationModifierFileSelectorOptions();
-        
-        configurationModifierFileSelectorOptions.setConfigurationDirectory(paramConfigurationDirectory);
-        configurationModifierFileSelectorOptions.setDirectoryExclusions(paramDirectoryExclusions);
-        configurationModifierFileSelectorOptions.setFileExclusions(paramFileExclusions);
-        configurationModifierFileSelectorOptions.setRecursiv(paramRecursiv);
-        configurationModifierFileSelectorOptions.setRegexSelector(paramRegexSelector);
 
-        //2. Create a FileSelector for the jobs that are to be handled depending on the given options.
-        ConfigurationModifierFileSelector configurationModifierFileSelector = new ConfigurationModifierFileSelector(configurationModifierFileSelectorOptions);
-        
-        //3. Set the filter for jobs to an instance of ConfigurationModifierJobFileFilter
-        configurationModifierFileSelector.setSelectorFilter(new ConfigurationModifierJobFileFilter(configurationModifierFileSelectorOptions));
-       
+    private Document modifyJobElement(Document doc, String jobname) throws JDOMException {
+        logger.info("---------  modifyJobElement:" + jobname);
 
-        //4. getting the entire jobs
+        // 1. Create a FileSelector for the jobs that are to be handled
+        // depending on the given options.
+        ConfigurationModifierFileSelector configurationModifierFileSelector = new ConfigurationModifierFileSelector(configurationModifierFileSelectorJobOptions);
+
+        // 2. Set the filter for jobs to an instance of
+        // ConfigurationModifierJobFileFilter
+        configurationModifierFileSelector.setSelectorFilter(new ConfigurationModifierJobFileFilter(configurationModifierFileSelectorJobOptions));
+
+        // 3. getting the entire jobs
         configurationModifierFileSelector.fillSelectedFileList();
         boolean jobIsToBeHandled = configurationModifierFileSelector.isInSelectedFileList(jobname);
+        logger.info("---------  jobIsToBeHandled:" + jobIsToBeHandled);
 
-         if (jobIsToBeHandled){
-            
-            //5. if the current job is to be handled, create the list of monitors to add. 
-            JobSchedulerFileElement jobSchedulerFileElement= configurationModifierFileSelector.getJobSchedulerElement(jobname);
+        if (jobIsToBeHandled) {
+            // 4. if the current job is to be handled, create the list of
+            // monitors to add.
+            JobSchedulerFileElement jobSchedulerFileElement = configurationModifierFileSelector.getJobSchedulerElement(jobname);
 
-            if (jobSchedulerFileElement != null){//always will be != null, as this is the then part of jobIsToBeHandled-if
-                //6.Create and initialize the options object for the monitors.
-                ConfigurationModifierFileSelectorOptions configurationModifierFileSelectorOptions2 = new ConfigurationModifierFileSelectorOptions();
-                                
-                configurationModifierFileSelectorOptions2.setRegexSelector(paramMonitorRegexSelector);
+            if (jobSchedulerFileElement != null) {// always will be != null, as
+                                                  // this is the then part of
+                                                  // jobIsToBeHandled-if
+                // 5. Create a FileSelector for the monitors that are to be
+                // added to the monitor.use list depending on the given options.
+                configurationModifierFileSelector = new ConfigurationModifierFileSelector(configurationModifierFileSelectorMonitorOptions);
 
-                //7. Create a FileSelector for the monitors that are to be added to the monitor.use list depending on the given options.
-                configurationModifierFileSelector = new ConfigurationModifierFileSelector(configurationModifierFileSelectorOptions2);
-                
-                //8. Set the filter for jobs to an instance of ConfigurationModifierMonitorFileFilter
-                configurationModifierFileSelector.setSelectorFilter(new ConfigurationModifierMonitorFileFilter(configurationModifierFileSelectorOptions2));
-
+                // 6. Set the filter for jobs to an instance of
+                // ConfigurationModifierMonitorFileFilter
+                configurationModifierFileSelector.setSelectorFilter(new ConfigurationModifierMonitorFileFilter(configurationModifierFileSelectorMonitorOptions));
                 configurationModifierFileSelector.fillParentMonitorList(jobSchedulerFileElement);
-              
-                
-                //9. Create a jobConfiguration changer to read, parse, change (and write) the job.xml
-                JobConfigurationFileChanger jobConfigurationFileChanger = new JobConfigurationFileChanger(jobSchedulerFileElement);
+
+                // 7. Create a jobConfiguration changer to read, parse, change
+                // (and write) the job.xml
+                JobConfigurationFileChanger jobConfigurationFileChanger = new JobConfigurationFileChanger(doc);
                 jobConfigurationFileChanger.setListOfMonitors(configurationModifierFileSelector.getListOfMonitorConfigurationFiles());
-                
-                jobConfigurationFileChanger.readConfigurationFile(doc);
-                jobConfigurationFileChanger.changeConfigurationFile();
-                return jobConfigurationFileChanger.getJobAsDocument();
-            } 
-         }
+
+                doc = jobConfigurationFileChanger.addMonitorUse();
+                logger.info(getStringFromDocument(doc));
+
+                return doc;
+            }
+        }
         return doc;
     }
-
 
 }

@@ -3,8 +3,12 @@ package com.sos.scheduler.plugins.globalmonitor;
 import java.io.File;
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
+
 
 public class ConfigurationModifierFileSelector {
+
+    private static final Logger logger = Logger.getLogger(GlobalMonitorPlugin.class);
 
     private ConfigurationModifierFileSelectorOptions selectorOptions;
     private ArrayList<JobSchedulerFileElement> listOfSelectedConfigurationFiles;
@@ -35,12 +39,12 @@ public class ConfigurationModifierFileSelector {
            if (files != null){
                for(File file:files)  {
                    if (file.isFile()){
-                       System.out.println(file.getAbsolutePath() + " added");
+                       logger.debug(file.getAbsolutePath() + " added");
                        JobSchedulerFileElement jobSchedulerFileElement = new JobSchedulerFileElement(file,"");
                        listOfSelectedConfigurationFiles.add(jobSchedulerFileElement);
                    }else{
                        if (selectorOptions.isRecursiv()){
-                           System.out.println("reading " + file.getAbsolutePath());
+                           logger.debug("reading " + file.getAbsolutePath());
                            fillFiles(file.getAbsolutePath());
                        }
                    }
@@ -60,6 +64,8 @@ public class ConfigurationModifierFileSelector {
     
     public boolean isInSelectedFileList(String elementName){
         for(JobSchedulerFileElement jobElement:listOfSelectedConfigurationFiles)  {
+            logger.debug(elementName + "=?" + jobElement.getJobSchedulerElementName());
+
             if (elementName.equals(jobElement.getJobSchedulerElementName())){
                 return true;
             }
@@ -78,8 +84,11 @@ public class ConfigurationModifierFileSelector {
     }
     
     private void fillMonitorList(File d, String schedulerLivePath){
-        if (d != null && d.getAbsolutePath().length()> 0 && !d.getAbsolutePath().replace('\\', '/').equals(schedulerLivePath)){
-           fillMonitorList(d.getParentFile(),schedulerLivePath);
+       
+        if (selectorOptions.isRecursiv()){
+            if (d != null && d.getAbsolutePath().length()> 0 && !d.getAbsolutePath().replace('\\', '/').equals(schedulerLivePath)){
+               fillMonitorList(d.getParentFile(),schedulerLivePath);
+            }
         }
         File[] files= null;
 
@@ -91,7 +100,7 @@ public class ConfigurationModifierFileSelector {
         if (files != null){
             for(File file:files)  {
                 if (file.isFile()){
-                    System.out.println(file.getAbsolutePath() + " -------------- monitor added");
+                    logger.debug(file.getAbsolutePath() + " -------------- monitor added");
                     JobSchedulerFileElement jobSchedulerFileElement = new JobSchedulerFileElement(file,"");
                     listOfMonitorConfigurationFiles.add(jobSchedulerFileElement);
                 }
