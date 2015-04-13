@@ -1,6 +1,7 @@
 package sos.scheduler.job;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +16,7 @@ import sos.net.ssh.SOSSSHJobJSch;
 import sos.net.ssh.exceptions.SSHConnectionError;
 import sos.net.ssh.exceptions.SSHExecutionError;
 
+import com.sos.JSHelper.io.Files.JSIniFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.i18n.annotation.I18NResourceBundle;
@@ -24,6 +26,10 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
   private final Logger logger = Logger.getLogger(this.getClass());
   private List<Integer> availablePidsToKill = new ArrayList<Integer>();
   private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
+  private static final String KEY_SSH_JOB_GET_ACTIVE_PROCESSES_COMMAND = "ssh_job_get_active_processes_command";
+  private static final String DEFAULT_LINUX_GET_ACTIVE_PROCESSES_COMMAND = "/bin/ps -ef | grep %s";
+  private static final String DEFAULT_WINDOWS_GET_ACTIVE_PROCESSES_COMMAND = "echo Add command to get active processes to stdout here!";
+  private String ssh_job_get_active_processes_command = "/bin/ps -ef | grep %s";
 
   private void openSession() {
     try {
@@ -53,6 +59,18 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
       throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
     }
     flgIsWindowsShell = vfsHandler.remoteIsWindowsShell();
+    if(objOptions.osProfile.isDirty()){
+      readActiveProcessesCommandFromPropertiesFile();
+      logger.debug("Command to get active processes from OS Profile File used!");
+    } else {
+      if(flgIsWindowsShell){
+        ssh_job_get_active_processes_command = DEFAULT_WINDOWS_GET_ACTIVE_PROCESSES_COMMAND;
+        logger.debug("Default Windows command used to get active processes!");
+      }else{
+        ssh_job_get_active_processes_command = DEFAULT_LINUX_GET_ACTIVE_PROCESSES_COMMAND;
+        logger.debug("Default Linux command used to get active processes!");
+      }
+    }
     isConnected = true;
     return this;
   } 
@@ -66,7 +84,7 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
       if (isConnected == false) {
         this.Connect();
       }
-      vfsHandler.ExecuteCommand("/bin/ps -ef | grep " + objOptions.user.Value());
+      vfsHandler.ExecuteCommand(String.format(ssh_job_get_active_processes_command, objOptions.user.Value()));
       // check if command was processed correctly
       if (vfsHandler.getExitCode() == 0) {
         // read stdout of the read-temp-file statement per line
@@ -85,6 +103,8 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
             line = line.trim();
             String[] fields = line.split(" +", 8);
             PsEfLine psOutputLine = new PsEfLine();
+            // Field numbers correspond to linux format of ps command
+            // Windows Qprocess command differs in field sorting!
             psOutputLine.user = fields[0];
             psOutputLine.pid = Integer.parseInt(fields[1]);
             psOutputLine.parentPid = Integer.parseInt(fields[2]);
@@ -104,7 +124,7 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
           logger.debug("no stdout received from remote host");
         }
       }else{
-        logger.error("error occured executing command /bin/ps -ef");
+        logger.error("error occured executing command: " + String.format(ssh_job_get_active_processes_command, objOptions.user.Value()));
       }
     } catch (Exception e) {
       if(objOptions.raise_exception_on_error.value()){
@@ -192,4 +212,9 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
     }
   }
 
+  private void readActiveProcessesCommandFromPropertiesFile(){
+    JSIniFile osProfile = new JSIniFile(objOptions.osProfile.Value());
+    ssh_job_get_active_processes_command = osProfile.getPropertyString("ssh_commands", KEY_SSH_JOB_GET_ACTIVE_PROCESSES_COMMAND, "default");
+  }
+  
 }
