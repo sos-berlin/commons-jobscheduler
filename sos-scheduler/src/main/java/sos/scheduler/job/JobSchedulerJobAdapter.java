@@ -75,7 +75,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 
 	protected final boolean		continue_with_spooler_process	= true;
 	protected final boolean		continue_with_task				= true;
-
+	private         HashMap<String, String> paramsAsHashmap     = null;
+	
 	public JobSchedulerJobAdapter() {
 		Messages = new Messages(conMessageFilePath, Locale.getDefault());
 		SOSMsg.flgShowFullMessageText = true;
@@ -361,6 +362,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 				objJobOrOrderParameters.merge(getOrderParams());
 			}
 			objJobOrOrderParams = objJobOrOrderParameters;
+	        paramsAsHashmap = convertVariableSet2HashMap(objJobOrOrderParams);
+
 			JSJ_D_0070.toLog(objJobOrOrderParameters.count());
 			return objJobOrOrderParameters;
 		}
@@ -436,6 +439,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 				}
 			}
 			objJobOrOrderParams = params;
+			paramsAsHashmap = convertVariableSet2HashMap(objJobOrOrderParams);
 			return params;
 		}
 		catch (Exception e) {
@@ -476,6 +480,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::setParameters";
 		objJobOrOrderParams = pVariableSet;
+		paramsAsHashmap = convertVariableSet2HashMap(objJobOrOrderParams);
 	} // private void setParameters
 
 	/**
@@ -563,11 +568,13 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		final String conMethodName = conClassName + "::replaceSchedulerVars";
 		String strTemp = pstrString2Modify;
 		logger.debug("strTemp = " + strTemp);
-
+		
+		if (isNull(paramsAsHashmap)) {
+            paramsAsHashmap = convertVariableSet2HashMap(objJobOrOrderParams);
+        }
 
 		if (isNotNull(objJobOrOrderParams)) {
-			HashMap<String, String> params = convertVariableSet2HashMap(objJobOrOrderParams);
-			strTemp = replaceSchedulerVarsInString(params,pstrString2Modify);
+			strTemp = replaceSchedulerVarsInString(paramsAsHashmap,pstrString2Modify);
 		}
 		return strTemp; 
 	}
@@ -1185,7 +1192,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 	public void setCC(final int pintCC) {
 		if (spooler_task != null) {
 			logger.debug(String.format("CC set to %1$d", pintCC));
-			spooler_task.set_exit_code(pintCC);
+			spooler_task.set_exit_code(pintCC); 
 		}
 	}
 
