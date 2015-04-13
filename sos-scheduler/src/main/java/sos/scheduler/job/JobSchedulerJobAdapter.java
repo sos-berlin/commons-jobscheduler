@@ -95,6 +95,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 	protected final String				EMPTY_STRING					= "";
 	protected final boolean				continue_with_spooler_process	= true;
 	protected final boolean				continue_with_task				= true;
+    private static Log4JHelper          objLogger           = null;
+
 	private         HashMap<String, String> paramsAsHashmap     = null;
 
     private static boolean logbackWarningPublished = false;
