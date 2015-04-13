@@ -477,9 +477,21 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 	 * command to the server or receiving a reply from the server.
 	 */
 	@Override public void delete(final String pathname) throws IOException {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::delete";
-		Client().deleteFile(pathname);
-		logger.info(SOSVfs_I_131.params(pathname, getReplyString()));
+		try {
+			Client().deleteFile(pathname);
+			if (isNegativeCommandCompletion()) {
+				RaiseException(SOSVfs_E_144.params("delete()", pathname, getReplyString()));;
+			}
+			else {
+				logger.info(SOSVfs_I_131.params(pathname, getReplyString()));
+			}
+		} 
+		catch (JobSchedulerException e) {
+			throw e;
+		}
+		catch (IOException e) {
+			RaiseException(e, SOSVfs_E_134.params("delete()"));
+		}
 	}
 
 	/**
@@ -737,15 +749,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 			logger.debug(HostID(SOSVfs_E_0106.params(conMethodName, "", lstrCurrentPath)));
 			// Windows reply from pwd is : 257 "/kb" is current directory.
 			// Unix reply from pwd is : 257 "/home/kb"
-			int idx = lstrCurrentPath.indexOf('"'); // Unix?
-			if (idx >= 0) {
-				lstrCurrentPath = lstrCurrentPath.substring(idx + 1, lstrCurrentPath.length() - idx + 1);
-				idx = lstrCurrentPath.indexOf('"');
-				if (idx >= 0) {
-					lstrCurrentPath = lstrCurrentPath.substring(0, idx);
-				}
-			}
-			LogReply();
+			lstrCurrentPath = lstrCurrentPath.replaceFirst("^[^\"]*\"([^\"]*)\".*", "$1");
 		}
 		catch (IOException e) {
 			RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
@@ -918,7 +922,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 				objFTPFileList = Client().listFiles(lstrPathName);
 			}
 			catch (IOException e1) {
-				e1.printStackTrace();
+				logger.error(e1.getLocalizedMessage());
 			}
 			//			if (1 == 1) {
 			//				try {
@@ -999,7 +1003,6 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 			lngFileSize = size(strFileName);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
 			RaiseException(SOSVfs_E_153.params(conMethodName, e));
 		}
 		return lngFileSize;
@@ -1069,7 +1072,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 			}
 		}
 		catch (IOException e) {
-			throw new JobSchedulerException(HostID(SOSVfs_E_0105.params(conMethodName)), e);
+			RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
 		}
 		finally {
 			LogReply();
@@ -1119,13 +1122,16 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 			LogReply();
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			throw new JobSchedulerException(HostID(SOSVfs_E_0105.params("getOutputStream", e.getMessage())), e);
 		}
 		return objO;
 	}
 
 	@Override public final String getReplyString() {
 		String strT = Client().getReplyString();
+		if (strT != null) {
+			strT = strT.trim();
+		}
 		objFTPReply = new SOSFtpServerReply(strT);
 		return strT;
 	}
@@ -1264,16 +1270,12 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 	}
 
 	protected boolean LogReply() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::LogReply";
 		strReply = getReplyString();
-		if (isNotNull(strReply)) {
-			if (strReply.startsWith("550") || strReply.startsWith("500")) {
-				@SuppressWarnings("unused") boolean flgError = true;
-			}
+		if (objConnection2Options.ProtocolCommandListener.isFalse()) {
+			logger.trace(strReply);
 		}
-		logger.trace(strReply);
 		return true;
-	} // private boolean LogReply
+	}
 
 	@Override public ISOSVirtualFolder mkdir(final SOSFolderName pobjFolderName) {
 		this.mkdir(pobjFolderName.Value());
@@ -1312,10 +1314,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 			}
 		}
 		catch (IOException e) {
-			String strM = HostID(SOSVfs_E_0105.params(conMethodName));
-			e.printStackTrace(System.err);
-			throw new RuntimeException(strM, e);
-			// throw new JobSchedulerException(HostID("makeDirectory returns an exception"), e);
+			RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
 		}
 	}
 
@@ -1376,7 +1375,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 			return getFilenames(pathname, flgRecurseSubFolder);
 		}
 		catch (Exception e) {
-			throw new JobSchedulerException(SOSVfs_E_128.params("getfilenames", "nLixt"), e);
+			throw new JobSchedulerException(SOSVfs_E_128.params("getfilenames", "nList"), e);
 		}
 	} // nList
 
@@ -1546,8 +1545,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 	} // putFile
 
 	protected void RaiseException(final Exception e, final String pstrM) {
-		logger.error(pstrM);
-		// e.printStackTrace(System.err);
+		logger.error(pstrM + " (" + e.getLocalizedMessage() + ")");
 		throw new JobSchedulerException(pstrM, e);
 	}
 
@@ -1574,12 +1572,19 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 	@Override public void rename(final String from, final String to) {
 		try {
 			this.Client().rename(from, to);
+			if (isNegativeCommandCompletion()) {
+				RaiseException(SOSVfs_E_144.params("rename()", from, getReplyString()));
+			}
+			else {
+				logger.info(String.format(SOSVfs_I_150.params(from, to)));
+			}
+		}
+		catch (JobSchedulerException e) {
+			throw e;
 		}
 		catch (IOException e) {
-			e.printStackTrace();
-			RaiseException(e, SOSVfs_E_134.params("rename"));
+			RaiseException(e, SOSVfs_E_134.params("rename()"));
 		}
-		logger.info(String.format(SOSVfs_I_150.params(from, to)));
 	}
 
 	@Override public boolean rmdir(final SOSFolderName pobjFolderName) throws IOException {

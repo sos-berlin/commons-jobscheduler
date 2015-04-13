@@ -145,7 +145,7 @@ public class SOSVfsCsvExport extends SOSVfsMessageCodes implements ISOSTransferH
 					.NewLine();
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 			throw new JobSchedulerException(SOSVfs_E_260.params(conMethodName), e);
 		}
 	}
@@ -190,7 +190,7 @@ public class SOSVfsCsvExport extends SOSVfsMessageCodes implements ISOSTransferH
 				objCSVFile.close();
 			}
 			catch (IOException e) {
-				e.printStackTrace();
+				logger.error(e.getLocalizedMessage());
 			}
 			objCSVFile = null;
 		}

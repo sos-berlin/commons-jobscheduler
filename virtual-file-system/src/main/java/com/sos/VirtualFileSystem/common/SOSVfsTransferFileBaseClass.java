@@ -341,7 +341,6 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
 			flgResult = this.FileExists() == false;
 		}
 		catch (Exception e) {
-			e.printStackTrace();
 			RaiseException(e, SOSVfs_E_134.params("notExists()"));
 		}
 		return flgResult;
@@ -527,7 +526,7 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
 	 * @param msg
 	 */
 	protected void RaiseException(final Exception e, final String msg) {
-		logger.error(msg);
+		logger.error(msg + " (" + e.getLocalizedMessage() + ")");
 		throw new JobSchedulerException(msg, e);
 	}
 

@@ -39,11 +39,12 @@ public class SOSFileList extends SOSVfsMessageCodes {
 	private Vector<SOSFileListEntry>		objFileListEntries					= new Vector<>();
 	long									lngSuccessfulTransfers				= 0;
 	long									lngFailedTransfers					= 0;
-	long									lngSkipedTransfers					= 0;
+	long									lngSkippedTransfers					= 0;
 	long									lngNoOfTransferHistoryRecordsSent	= 0;
 	long									lngNoOfHistoryFileRecordsWritten	= 0;
 	long									lngNoOfRecordsInResultSetFile		= 0;
 	long									lngNoOfBytesTransferred				= 0;
+	private boolean							transferCountersCounted				= false;
 	@SuppressWarnings("unused")
 	private SOSFileList						objParent							= null;
 	private ISOSVFSHandler					objVFS								= null;
@@ -111,18 +112,21 @@ public class SOSFileList extends SOSVfsMessageCodes {
 	} // private long count
 
 	private void CountStatus() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::CountStatus";
-		lngSuccessfulTransfers = 0;
-		lngFailedTransfers = 0;
-		lngSkipedTransfers = 0;
-		lngNoOfBytesTransferred = 0;
-		if (objFileListEntries != null) {
-			for (SOSFileListEntry objEntry : objFileListEntries) {
-				if (objEntry == null) {
-					continue;
-				}
-				lngNoOfBytesTransferred += objEntry.getFileSize();
-				switch (objEntry.getTransferStatus()) {
+		if (!transferCountersCounted) {
+			transferCountersCounted = true;
+			lngSuccessfulTransfers = 0;
+			lngFailedTransfers = 0;
+			lngSkippedTransfers = 0;
+			lngNoOfBytesTransferred = 0;
+			if (objFileListEntries != null) {
+				for (SOSFileListEntry objEntry : objFileListEntries) {
+					if (objEntry == null) {
+						continue;
+					}
+					lngNoOfBytesTransferred += objEntry.getFileSize();
+					// What happens with IgnoredDueToZerobyteConstraint,
+					// setBack, polling
+					switch (objEntry.getTransferStatus()) {
 					case transferred:
 						lngSuccessfulTransfers++;
 						break;
@@ -132,14 +136,30 @@ public class SOSFileList extends SOSVfsMessageCodes {
 					case deleted:
 						lngSuccessfulTransfers++;
 						break;
+					case compressed:
+						lngSuccessfulTransfers++;
+						break;
 					case transfer_has_errors:
 						lngFailedTransfers++;
 						break;
+					case transfer_aborted:
+						lngFailedTransfers++;
+						break;
+					case setBack:
+						lngFailedTransfers++;
+						break;
+					case notOverwritten:
+						lngSkippedTransfers++;
+						break;
+					case waiting4transfer:
+						lngFailedTransfers++;
+						break;
 					case transfer_skipped:
-						lngSkipedTransfers++;
+						lngSkippedTransfers++;
 						break;
 					default:
 						break;
+					}
 				}
 			}
 		}
@@ -149,37 +169,20 @@ public class SOSFileList extends SOSVfsMessageCodes {
 		return lngNoOfBytesTransferred;
 	}
 
-	/**
-	 *
-	 * \brief SuccessfulTransfers
-	 *
-	 * \details
-	 *
-	 * \return long
-	 *
-	 * @return
-	 */
 	public long SuccessfulTransfers() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::count";
 		this.CountStatus();
 		return lngSuccessfulTransfers;
-	} // private long SuccessfulTransfers
+	}
 
-	/**
-	 *
-	 * \brief FailedTransfers
-	 *
-	 * \details
-	 *
-	 * \return long
-	 *
-	 * @return
-	 */
 	public long FailedTransfers() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::count";
 		CountStatus();
 		return lngFailedTransfers;
-	} // private long SuccessfulTransfers
+	}
+	
+	public long SkippedTransfers() {
+		CountStatus();
+		return lngSkippedTransfers;
+	}
 
 	/**
 	 *
@@ -236,18 +239,11 @@ public class SOSFileList extends SOSVfsMessageCodes {
 		}
 	}
 
-	/**
-	 *
-	 * \brief add
-	 *
-	 * \details
-	 *
-	 * \return void
-	 *
-	 * @param String[] pstrA
-	 */
 	public void add(final String[] pstrA, final String pstrFolderName) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::add";
+		add(pstrA, pstrFolderName, false);
+	}
+	
+	public void add(final String[] pstrA, final String pstrFolderName, boolean withExistCheck) {
 		if (pstrA == null) {
 			return;
 		}
@@ -259,7 +255,19 @@ public class SOSFileList extends SOSVfsMessageCodes {
 			if (strP == null) {
 				strFileName = strDir + "/" + strFileName;
 			}
-			this.add(strFileName);
+			try {
+				if (withExistCheck && objDataSourceClient.getFileHandle(strFileName).FileExists()) {
+					this.add(strFileName);
+				}
+				else if (!withExistCheck) {
+					this.add(strFileName);
+				}
+			} catch (Exception e) {
+				if (withExistCheck) {
+					throw new JobSchedulerException(e);
+				}
+			}
+			//this.add(strFileName);
 		}
 	} // private SOSFileListEntry add
 
@@ -300,7 +308,12 @@ public class SOSFileList extends SOSVfsMessageCodes {
 			objEntry.setParent(this);
 			objFileListEntries.add(objEntry);
 			objEntry.Options(objOptions);
-			objEntry.setStatus(SOSFileListEntry.enuTransferStatus.waiting4transfer);
+			if (objOptions.skip_transfer.isFalse()) {
+				objEntry.setStatus(SOSFileListEntry.enuTransferStatus.waiting4transfer);
+			}
+			else {
+				objEntry.setStatus(SOSFileListEntry.enuTransferStatus.transfer_skipped);
+			}
 		}
 		return objEntry;
 	} // private SOSFileListEntry add
@@ -320,7 +333,12 @@ public class SOSFileList extends SOSVfsMessageCodes {
 			pobjFileListEntry.setParent(this);
 			objFileListEntries.add(pobjFileListEntry);
 			pobjFileListEntry.Options(objOptions);
-			pobjFileListEntry.setStatus(SOSFileListEntry.enuTransferStatus.waiting4transfer);
+			if (objOptions.skip_transfer.isFalse()) {
+				pobjFileListEntry.setStatus(SOSFileListEntry.enuTransferStatus.waiting4transfer);
+			}
+			else {
+				pobjFileListEntry.setStatus(SOSFileListEntry.enuTransferStatus.transfer_skipped);
+			}
 		}
 		return pobjFileListEntry;
 	} // private SOSFileListEntry add
@@ -440,11 +458,15 @@ public class SOSFileList extends SOSVfsMessageCodes {
 			if (objOptions.isAtomicTransfer() && objOptions.transactional.isTrue()) {
 				logger.debug(SOSVfs_D_209.get());
 				for (SOSFileListEntry objListItem : objFileListEntries) {
+					if (objListItem.isNotOverwritten()) {
+						continue;
+					}
 					String strTargetTransferName = objListItem.TargetTransferName();
 					String strToFilename = MakeFullPathName(objOptions.TargetDir.Value(), objListItem.TargetFileName());
 					if (!fileNamesAreEqual(strToFilename, strTargetTransferName, false)) { // SOSFTP-142
 						ISOSVirtualFile objF = null;
 						if (objOptions.overwrite_files.isTrue() && objListItem.FileExists() == true) {
+							objListItem.setTargetFileAlreadyExists(true);
 							objF = objDataTargetClient.getFileHandle(strToFilename);
 							objF.delete();
 						}
@@ -502,7 +524,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 						}
 					}
 					catch (Exception e) {
-						e.printStackTrace();
+						logger.error(e.getLocalizedMessage());
 					}
 					String strHash = objF.File2String();
 					strHash = strHash.replaceAll("\\n", "");
@@ -555,14 +577,36 @@ public class SOSFileList extends SOSVfsMessageCodes {
 		// TODO löschen der Dateien mit Atomic-Prefix und -Suffix auf dem Target
 		if (objOptions.isAtomicTransfer()) {
 			for (SOSFileListEntry objListItem : objFileListEntries) {
-				String strAtomicFileName = objListItem.getAtomicFileName();
-				if (isNotEmpty(strAtomicFileName)) {
-					objDataTargetClient.getFileHandle(strAtomicFileName).delete();
-					String strT = SOSVfs_D_212.params(strAtomicFileName);
-					logger.debug(strT);
-					objJadeReportLogger.info(strT);
-					objListItem.setAtomicFileName(EMPTY_STRING);
-					objListItem.setStatus(enuTransferStatus.setBack);
+				String strAtomicFileName = MakeFullPathName(objOptions.TargetDir.Value(), objListItem.getAtomicFileName());
+				if (isNotEmpty(objListItem.getAtomicFileName())) {
+					try {
+						ISOSVirtualFile atomicFile = objDataTargetClient.getFileHandle(strAtomicFileName);
+						if(atomicFile.FileExists()) {
+							atomicFile.delete();
+						}
+						String strT = SOSVfs_D_212.params(strAtomicFileName);
+						logger.debug(strT);
+						objJadeReportLogger.info(strT);
+						objListItem.setAtomicFileName(EMPTY_STRING);
+						objListItem.setStatus(enuTransferStatus.setBack);
+					} catch (Exception e) {
+						logger.error(e.getLocalizedMessage());
+					}
+				}
+				if (!objListItem.isTargetFileAlreadyExists()) {
+					try {
+						String strTargetFilename = MakeFullPathName(objOptions.TargetDir.Value(), objListItem.TargetFileName());
+						ISOSVirtualFile targetFile = objDataTargetClient.getFileHandle(strTargetFilename);
+						if(targetFile.FileExists()) {
+							targetFile.delete();
+						}
+						String strT = SOSVfs_D_212.params(targetFile);
+						logger.debug(strT);
+						objJadeReportLogger.info(strT);
+						objListItem.setStatus(enuTransferStatus.setBack);
+					} catch (Exception e) {
+						logger.error(e.getLocalizedMessage());
+					}
 				}
 			}
 		}

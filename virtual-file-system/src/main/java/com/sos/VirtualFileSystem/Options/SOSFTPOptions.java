@@ -228,7 +228,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			this.setChildClasses(map);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 		}
 	}
 
@@ -613,7 +613,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			this.CommandLineArgs(pstrArgs.split(" "));
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getLocalizedMessage());
 			throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_153.params("command lines args"), e);
 		}
 	}
@@ -767,7 +767,6 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			setChildClasses(map);
 		}
 		catch (Exception e) {
-			e.printStackTrace(System.err);
 			logger.error("ReadSettingsFile()", e); //$NON-NLS-1$
 			throw new JobSchedulerException(e.getMessage(), e);
 		}
