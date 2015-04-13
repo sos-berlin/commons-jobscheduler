@@ -3,14 +3,20 @@ package com.sos.scheduler.plugins.monitor;
 import static org.junit.Assert.*;
 
 import java.io.FileNotFoundException;
+import java.io.StringReader;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.jdom.input.DOMBuilder;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
 import com.sos.scheduler.plugins.globalmonitor.ConfigurationModifierFileSelector;
 import com.sos.scheduler.plugins.globalmonitor.ConfigurationModifierFileSelectorOptions;
@@ -58,13 +64,18 @@ public class TestJobConfigurationFileChanger {
 
         //4. getting the entire jobs
         configurationModifierFileSelector.fillSelectedFileList();
-        boolean jobIsToBeHandled = configurationModifierFileSelector.isInSelectedFileList("/Neuer Ordner/job5");
+        boolean jobIsToBeHandled = configurationModifierFileSelector.isInSelectedFileList("/Neuer Ordner/job1");
         assertEquals("testGetMonitorList",true, jobIsToBeHandled);
 
          if (jobIsToBeHandled){
+             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+             DocumentBuilder domBuilder = factory.newDocumentBuilder();
+             Document doc =   domBuilder.parse(new InputSource(new StringReader("<job></job>")));
+
             
             //5. if the current job is to be handled, create the list of monitors to add. 
-            JobSchedulerFileElement jobSchedulerFileElement= configurationModifierFileSelector.getJobSchedulerElement("/Neuer Ordner/job5");
+            JobSchedulerFileElement jobSchedulerFileElement= configurationModifierFileSelector.getJobSchedulerElement("/Neuer Ordner/job1");
 
             if (jobSchedulerFileElement != null){//always will be != null, as this is the then part of jobIsToBeHandled-if
                 //6.Create and initialize the options object for the monitors.
@@ -82,14 +93,15 @@ public class TestJobConfigurationFileChanger {
               
                 
                 //9. Create a jobConfiguration changer to read, parse, change and write the job.xml
-                JobConfigurationFileChanger jobConfigurationFileChanger = new JobConfigurationFileChanger(jobSchedulerFileElement);
+                JobConfigurationFileChanger jobConfigurationFileChanger = new JobConfigurationFileChanger(doc);
                 jobConfigurationFileChanger.setListOfMonitors(configurationModifierFileSelector.getListOfMonitorConfigurationFiles());
                 
-                jobConfigurationFileChanger.readConfigurationFile();
-                jobConfigurationFileChanger.changeConfigurationFile();
+                doc = jobConfigurationFileChanger.addMonitorUse();
+
                 
-                //In the plugin, the file will not be written but will be returned to JobScheduler.
-                jobConfigurationFileChanger.writeFile();
+                // jobConfigurationFileChanger.readConfigurationFile();
+                // jobConfigurationFileChanger.changeConfiguration();              
+                // jobConfigurationFileChanger.writeFile();
                 
                 
             }else{

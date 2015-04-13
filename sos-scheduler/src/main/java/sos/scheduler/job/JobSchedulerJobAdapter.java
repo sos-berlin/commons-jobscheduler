@@ -95,7 +95,9 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 	protected final String				EMPTY_STRING					= "";
 	protected final boolean				continue_with_spooler_process	= true;
 	protected final boolean				continue_with_task				= true;
-	private static Log4JHelper			objLogger			= null;
+	private   Log4JHelper objLogger;
+	
+	private         HashMap<String, String> paramsAsHashmap     = null;
 
     private static boolean logbackWarningPublished = false;
 
@@ -226,7 +228,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		objJSAppender.setSchedulerLogger(sosLogger);
 	}
 
-	/**
+	/** 
 	 *
 	 * \brief getSchedulerParameterAsProperties
 	 *
@@ -380,6 +382,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 				objJobOrOrderParameters.merge(getOrderParams());
 			}
 			objJobOrOrderParams = objJobOrOrderParameters;
+	        paramsAsHashmap = convertVariableSet2HashMap(objJobOrOrderParams);
+
 			JSJ_D_0070.toLog(objJobOrOrderParameters.count());
 			return objJobOrOrderParameters;
 		}
@@ -455,6 +459,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 				}
 			}
 			objJobOrOrderParams = params;
+			paramsAsHashmap = convertVariableSet2HashMap(objJobOrOrderParams);
 			return params;
 		}
 		catch (Exception e) {
@@ -494,6 +499,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 	public void setParameters(final Variable_set pVariableSet) {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setParameters";
 		objJobOrOrderParams = pVariableSet;
+		paramsAsHashmap = convertVariableSet2HashMap(objJobOrOrderParams);
 	} // private void setParameters
 
 	/**
@@ -576,10 +582,12 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		String strTemp = pstrString2Modify;
 		logger.debug("strTemp = " + strTemp);
 
+		if (isNull(paramsAsHashmap)) {
+            paramsAsHashmap = convertVariableSet2HashMap(objJobOrOrderParams);
+        }
 
 		if (isNotNull(objJobOrOrderParams)) {
-			HashMap<String, String> params = convertVariableSet2HashMap(objJobOrOrderParams);
-			strTemp = replaceSchedulerVarsInString(params,pstrString2Modify);
+			strTemp = replaceSchedulerVarsInString(paramsAsHashmap,pstrString2Modify);
 		}
 		return strTemp; 
 	}

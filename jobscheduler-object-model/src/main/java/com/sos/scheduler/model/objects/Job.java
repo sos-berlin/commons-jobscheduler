@@ -741,7 +741,7 @@ public class Job extends JSObjBase {
      *
      */
     @Override
-	public String getTitle() {
+    public String getTitle() {
         return title;
     }
 

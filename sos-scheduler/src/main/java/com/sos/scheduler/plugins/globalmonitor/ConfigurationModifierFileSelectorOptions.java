@@ -71,8 +71,11 @@ public class ConfigurationModifierFileSelectorOptions {
             return false;
         }
         
+        String s = file.getAbsolutePath().replace('\\','/');
+        s = s.replaceAll("^.*/live/(.*)\\.(job|monitor)\\.xml$","$1");
+        
         for(String exclusion:listOfFileExclusions)  {
-            if (file.getAbsolutePath().replace('\\','/').endsWith(exclusion)){
+            if (s.equals(exclusion)){
                 return true;
             }
         }

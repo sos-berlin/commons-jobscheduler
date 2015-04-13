@@ -12,6 +12,7 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 public class SOSSSHReadPidFileJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
   private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
   private static final String PARAM_SSH_JOB_TASK_ID = "SSH_JOB_TASK_ID";
+  private static final String PID_FILE_NAME_KEY = "job_ssh_pid_file_name";
   private Variable_set allParams;
   
   @Override
@@ -33,6 +34,7 @@ public class SOSSSHReadPidFileJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
     SOSSSHJobOptions options = null;
     try {
       SOSSSHJob2 sshJob = new SOSSSHReadPidFileJob();
+      ((SOSSSHReadPidFileJob)sshJob).setTempPidFileName(allParams.value(PID_FILE_NAME_KEY));
       logger.debug("SOSSSHReadPidFileJob instantiated!");
       options = sshJob.Options();
       options.CurrentNodeName(this.getCurrentNodeName());

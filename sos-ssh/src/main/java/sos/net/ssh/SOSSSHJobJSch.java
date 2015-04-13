@@ -1,6 +1,7 @@
 package sos.net.ssh;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,8 @@ import sos.net.ssh.exceptions.SSHExecutionError;
 import sos.net.ssh.exceptions.SSHMissingCommandError;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.JSHelper.Options.SOSOptionIniFileName;
+import com.sos.JSHelper.io.Files.JSIniFile;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
@@ -33,10 +36,15 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
   // http://www.sos-berlin.com/jira/browse/JITL-112
   private static final String SCHEDULER_RETURN_VALUES = "SCHEDULER_RETURN_VALUES";
   private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
-  private static final String PID_FILE_NAME_KEY = "ssh_pid_file_name";
+  private static final String PID_FILE_NAME_KEY = "job_ssh_pid_file_name";
   private String tempFileName;
   private String pidFileName;
-//  private static final String PID_FILE_NAME = "sos-ssh-pid.txt";
+  private static final String KEY_SSH_JOB_GET_PID_COMMAND = "ssh_job_get_pid_command";
+  private static final String DEFAULT_LINUX_GET_PID_COMMAND = "echo $$";
+  private static final String DEFAULT_WINDOWS_GET_PID_COMMAND = "echo Add command to get PID of active shell here!";
+  private String ssh_job_get_pid_command = "echo $$";
+
+  //  private static final String PID_FILE_NAME = "sos-ssh-pid.txt";
   protected ISOSVFSHandler vfsHandler;
   private List<Integer> pids = new ArrayList<Integer>();
 
@@ -85,15 +93,14 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
   public SOSSSHJob2 Execute() throws Exception {
     boolean flgScriptFileCreated = false; // http://www.sos-berlin.com/jira/browse/JITL-17
     vfsHandler.setJSJobUtilites(objJSJobUtilities);
+    String executedCommand = ""; 
+    String completeCommand = "";
 
     try {
       if (isConnected == false) {
         this.Connect();
       }
       flgIsWindowsShell = vfsHandler.remoteIsWindowsShell();
-      // TODO read commands from Profile ini file (ssh_linux.ini(default) || ssh_windows.ini(default) || ssh_profile.ini (customized))
-      // TODO if profile ini file is customized then use this
-      // else use correct command according to flgIsWindowsShell
       if (objOptions.command.IsEmpty() == false) {
         strCommands2Execute = objOptions.command.values();
       } else {
@@ -114,16 +121,16 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
           throw new SSHMissingCommandError(objMsg.getMsg(SOS_SSH_E_100)); 
         }
       }
-       
       for (String strCmd : strCommands2Execute) {
+        executedCommand = strCmd;
+        completeCommand = getPreCommand() + strCmd;
         try {
-          // http://www.sos-berlin.com/jira/browse/JITL-112
-          strCmd = getPreCommand() + strCmd;
           // see http://www.sos-berlin.com/jira/browse/JS-673
           logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
           strCmd = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strCmd);
           logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
-          vfsHandler.ExecuteCommand(strCmd);
+          // http://www.sos-berlin.com/jira/browse/JITL-112
+          vfsHandler.ExecuteCommand(completeCommand);
           objJSJobUtilities.setJSParam(conExit_code, "0");
           CheckStdOut();
           CheckStdErr();
@@ -143,29 +150,14 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
               throw new SSHExecutionError("Exception raised: " + e, e);
             }
           }
-        }finally{
-//          if (pids.size() > 0){
-//            StringBuilder strb = new StringBuilder();
-//            boolean first = true;
-//            // create a String with the comma separated pids to put in one Param 
-//            for (Integer pid : pids){
-//              if (first){
-//                strb.append(pid.toString());
-//                first = false;
-//              }else{
-//                strb.append(",").append(pid.toString());
-//              }
-//            }
-//            
-//            objJSJobUtilities.setJSParam(PARAM_PIDS_TO_KILL, strb.toString());
-//          }
         }
       }
       // http://www.sos-berlin.com/jira/browse/JITL-112
       processPostCommands(getTempFileName());
     } catch (Exception e) {
       if (objOptions.raise_exception_on_error.value()) {
-        String strErrMsg = "SOS-SSH-E-120: error occurred processing ssh command: ";
+        String strErrMsg = "SOS-SSH-E-120: error occurred processing ssh command: \"" + executedCommand + "\"" +
+            "\nSOS-SSH-E-120: full command String: \"" + completeCommand + "\"";
         if(objOptions.ignore_error.value()){
           if(objOptions.ignore_stderr.value()){
             logger.debug(this.StackTrace2String(e));
@@ -240,13 +232,23 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
   public void generateTemporaryFilename() {
     UUID uuid = UUID.randomUUID();
     tempFileName = "sos-ssh-return-values-" + uuid + ".txt";
-    pidFileName = "sos-ssh-pid-" + uuid + ".txt";
-    objJSJobUtilities.setJSParam(PID_FILE_NAME_KEY, pidFileName);
   }
 
   @Override
   public String getPreCommand() {
-    return String.format("echo $$ >> " + pidFileName + 
+    if(objOptions.osProfile.isDirty()){
+      readGetPidCommandFromPropertiesFile();
+      logger.debug("Command to receive PID of the active shell from OS Profile File used!");
+    }else{
+      if(flgIsWindowsShell){
+        ssh_job_get_pid_command = DEFAULT_WINDOWS_GET_PID_COMMAND;
+        logger.debug("Default Windows command used to receive PID of the active shell!");
+      }else{
+        ssh_job_get_pid_command = DEFAULT_LINUX_GET_PID_COMMAND;
+        logger.debug("Default Linux command used to receive PID of the active shell!");
+      }
+    }
+    return String.format(ssh_job_get_pid_command + " >> " + pidFileName + 
         objOptions.command_delimiter.Value() +
         objOptions.getPreCommand().Value() + 
         objOptions.command_delimiter.Value(), SCHEDULER_RETURN_VALUES, tempFileName);
@@ -330,4 +332,18 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     alternateOptions.ignore_error.value(options.getIgnore_error().value());
     return alternateOptions;
   }
+
+  public String getPidFileName() {
+    return pidFileName;
+  }
+
+  public void setPidFileName(String pidFileName) {
+    this.pidFileName = pidFileName;
+  }
+
+  private void readGetPidCommandFromPropertiesFile(){
+    JSIniFile osProfile = new JSIniFile(objOptions.osProfile.Value());
+    ssh_job_get_pid_command = osProfile.getPropertyString("ssh_commands", KEY_SSH_JOB_GET_PID_COMMAND, "default");
+  }
+
 }

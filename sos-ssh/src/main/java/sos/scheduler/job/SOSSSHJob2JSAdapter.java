@@ -1,6 +1,7 @@
 package sos.scheduler.job;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
@@ -18,7 +19,9 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
   private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
   private static final String PARAM_RUN_WITH_WATCHDOG = "RUN_WITH_WATCHDOG";
   private static final String PARAM_JITL_SSH_USE_JSCH_IMPL = "jitl.ssh.use_jsch_impl";
+  private static final String PARAM_PID_FILE_NAME_KEY = "job_ssh_pid_file_name";
   private boolean useTrilead = true;
+  private String pidFileName;
   
   @Override
   public boolean spooler_process() throws Exception {
@@ -54,11 +57,14 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
     } else {
       useTrilead = false;
       objR = new SOSSSHJobJSch();
-      if(!useTrilead && 
-          allParams.value(PARAM_RUN_WITH_WATCHDOG) != null && 
+      // generate temporary file for remote pids for further usage
+      pidFileName = generateTempPidFileName();
+      ((SOSSSHJobJSch)objR).setPidFileName(pidFileName);
+      if(allParams.value(PARAM_RUN_WITH_WATCHDOG) != null && 
           !allParams.value(PARAM_RUN_WITH_WATCHDOG).isEmpty() && 
           allParams.value(PARAM_RUN_WITH_WATCHDOG).equalsIgnoreCase("true")){
         createOrderForWatchdog();
+        allParams.set_value(PARAM_PID_FILE_NAME_KEY, pidFileName);
       }
       spooler_log.debug9("uses JSch implementation of SSH");
     } 
@@ -66,13 +72,16 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
     objO.CurrentNodeName(this.getCurrentNodeName());
     HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(allParams);
     objO.setAllOptions(objO.DeletePrefix(hsmParameters1, "ssh_"));
-
     objR.setJSJobUtilites(this);
     if (objO.commandSpecified() == false) {
       setJobScript(objO.command_script);
     }
 
     objO.CheckMandatory();
+    // if command_delimiter is not set by customer then we override the default value due to compatibility issues
+    if(objO.command_delimiter.isNotDirty()){
+      objO.command_delimiter.Value(";");
+    }
     objR.Execute();
   }
   
@@ -81,13 +90,17 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
     Order order = spooler.create_order();
     order.params().merge(spooler_task.order().params());
     order.params().set_var(PARAM_SSH_JOB_TASK_ID, String.valueOf(spooler_task.id()));
+    order.params().set_var(PARAM_PID_FILE_NAME_KEY, pidFileName);
     // delayed start after 5 seconds when the order is created
-    order.params().set_var("start_at", "now+5");
+    order.set_at("now+15");
     Job_chain chain = spooler.job_chain("kill_jobs/remote_cleanup_test");
     chain.add_or_replace_order(order);
-    // echo SCHEDULER_PARAM_PIDS_TO_KILL
-    // echo SCHEDULER_PARAM_SSH_JOB_TASK_ID
-    //
+  }
+  
+  private String generateTempPidFileName(){
+    UUID uuid = UUID.randomUUID();
+    String pidFileName = "sos-ssh-pid-" + uuid + ".txt";
+    return pidFileName;
   }
 
 }
