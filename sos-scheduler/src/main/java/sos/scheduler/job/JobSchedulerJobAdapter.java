@@ -226,7 +226,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		objJSAppender.setSchedulerLogger(sosLogger);
 	}
 
-	/**
+	/** 
 	 *
 	 * \brief getSchedulerParameterAsProperties
 	 *
