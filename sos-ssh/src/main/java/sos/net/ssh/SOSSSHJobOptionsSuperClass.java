@@ -14,6 +14,7 @@ import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Options.SOSOptionCommandString;
 import com.sos.JSHelper.Options.SOSOptionHostName;
 import com.sos.JSHelper.Options.SOSOptionInFileName;
+import com.sos.JSHelper.Options.SOSOptionIniFileName;
 import com.sos.JSHelper.Options.SOSOptionInteger;
 import com.sos.JSHelper.Options.SOSOptionIntegerArray;
 import com.sos.JSHelper.Options.SOSOptionPassword;
@@ -481,7 +482,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   @JSOptionDefinition(name = "auth_file", description = "auth_file", key = "auth_file", type = "SOSOptionString", mandatory = false)
   public SOSOptionInFileName auth_file = new SOSOptionInFileName(this, conClassName + ".auth_file", // HashMap-Key
       "auth_file", // Titel
-      null, // InitiValue
+      null, // InitValue
       null, // DefaultValue
       false // isMandatory
   ); // This parameter specifies the path and name of a user's pr
@@ -491,7 +492,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   @JSOptionDefinition(name = "auth_method", description = "This parameter specifies the authorization method for the", key = "auth_method", type = "SOSOptionString", mandatory = false)
   public SOSOptionAuthenticationMethod auth_method = new SOSOptionAuthenticationMethod(this, conClassName + ".auth_method", // HashMap-Key
       "auth_method", // Titel
-      "publickey", // InitiValue
+      "publickey", // InitValue
       "publickey", // DefaultValue
       false // isMandatory
   ); // This parameter specifies the authorization method for the
@@ -501,7 +502,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   @JSOptionDefinition(name = "command", description = "This parameter specifies a command that is to be executed", key = "command", type = "SOSOptionString", mandatory = false)
   public SOSOptionCommandString command = new SOSOptionCommandString(this, conClassName + ".command", // HashMap-Key
       "This parameter specifies a command that is to be executed", // Titel
-      null, // InitiValue
+      null, // InitValue
       null, // DefaultValue
       false // isMandatory
   ); // This parameter specifies a command that is to be executed
@@ -512,7 +513,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   @JSOptionDefinition(name = "command_delimiter", description = "Command delimiter characters are specified using this par", key = "command_delimiter", type = "SOSOptionString", mandatory = true)
   public SOSOptionRegExp command_delimiter = new SOSOptionRegExp(this, conClassName + ".command_delimiter", // HashMap-Key
       "Command delimiter characters are specified using this par", // Titel
-      "%%", // InitiValue
+      "%%", // InitValue
       "%%", // DefaultValue
       true // isMandatory
   ); // Command delimiter characters are specified using this par
@@ -523,7 +524,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   @JSOptionDefinition(name = "command_script", description = "This parameter can be used as an alternative to command,", key = "command_script", type = "SOSOptionString", mandatory = false)
   public SOSOptionCommandString command_script = new SOSOptionCommandString(this, conClassName + ".command_script", // HashMap-Key
       "This parameter can be used as an alternative to command,", // Titel
-      null, // InitiValue
+      null, // InitValue
       null, // DefaultValue
       false // isMandatory
   ); // This parameter can be used as an alternative to command,
@@ -534,7 +535,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   @JSOptionDefinition(name = "command_script_file", description = "This parameter can be used as an alternative to command,", key = "command_script_file", type = "SOSOptionString", mandatory = false)
   public SOSOptionInFileName command_script_file = new SOSOptionInFileName(this, conClassName + ".command_script_file", // HashMap-Key
       "This parameter can be used as an alternative to command,", // Titel
-      null, // InitiValue
+      null, // InitValue
       null, // DefaultValue
       false // isMandatory
   ); // This parameter can be used as an alternative to command,
@@ -545,7 +546,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   @JSOptionDefinition(name = "command_script_param", description = "This parameter contains a parameterstring, which will be", key = "command_script_param", type = "SOSOptionString", mandatory = false)
   public SOSOptionString command_script_param = new SOSOptionString(this, conClassName + ".command_script_param", // HashMap-Key
       "This parameter contains a parameterstring, which will be", // Titel
-      null, // InitiValue
+      null, // InitValue
       null, // DefaultValue
       false // isMandatory
   ); // This parameter contains a parameterstring, which will be
@@ -555,7 +556,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   @JSOptionDefinition(name = "host", description = "This parameter specifies the hostname or IP address of th", key = "host", type = "SOSOptionString", mandatory = true)
   public SOSOptionHostName host = new SOSOptionHostName(this, conClassName + ".host", // HashMap-Key
       "This parameter specifies the hostname or IP address of th", // Titel
-      "localhost", // InitiValue
+      "localhost", // InitValue
       null, // DefaultValue
       true // isMandatory
   ); // This parameter specifies the hostname or IP address of th
@@ -602,7 +603,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   @JSOptionDefinition(name = "ignore_error", description = "Should the value true be specified, then execution errors", key = "ignore_error", type = "SOSOptionString", mandatory = false)
   public SOSOptionBoolean ignore_error = new SOSOptionBoolean(this, conClassName + ".ignore_error", // HashMap-Key
       "Should the value true be specified, then execution errors", // Titel
-      "false", // InitiValue
+      "false", // InitValue
       "false", // DefaultValue
       false // isMandatory
   ); // Should the value true be specified, then execution errors
@@ -613,7 +614,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   @JSOptionDefinition(name = "ignore_exit_code", description = "This parameter configures one or more exit codes which wi", key = "ignore_exit_code", type = "SOSOptionString", mandatory = false)
   public SOSOptionIntegerArray ignore_exit_code = new SOSOptionIntegerArray(this, conClassName + ".ignore_exit_code", // HashMap-Key
       "This parameter configures one or more exit codes which wi", // Titel
-      null, // InitiValue
+      null, // InitValue
       null, // DefaultValue
       false // isMandatory
   ); // This parameter configures one or more exit codes which wi
@@ -623,7 +624,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   @JSOptionDefinition(name = "ignore_signal", description = "Should the value true be specified, then on", key = "ignore_signal", type = "SOSOptionString", mandatory = false)
   public SOSOptionBoolean ignore_signal = new SOSOptionBoolean(this, conClassName + ".ignore_signal", // HashMap-Key
       "Should the value true be specified, then on", // Titel
-      "false", // InitiValue
+      "false", // InitValue
       "false", // DefaultValue
       false // isMandatory
   ); // Should the value true be specified, then on
@@ -634,7 +635,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   @JSOptionDefinition(name = "ignore_stderr", description = "This job checks if any output to stderr has been created", key = "ignore_stderr", type = "SOSOptionString", mandatory = false)
   public SOSOptionBoolean ignore_stderr = new SOSOptionBoolean(this, conClassName + ".ignore_stderr", // HashMap-Key
       "This job checks if any output to stderr has been created", // Titel
-      "false", // InitiValue
+      "false", // InitValue
       "false", // DefaultValue
       false // isMandatory
   ); // This job checks if any output to stderr has been created
@@ -644,7 +645,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   @JSOptionDefinition(name = "password", description = "This parameter specifies the user account password for au", key = "password", type = "SOSOptionString", mandatory = false)
   public SOSOptionPassword password = new SOSOptionPassword(this, conClassName + ".password", // HashMap-Key
       "This parameter specifies the user account password for au", // Titel
-      null, // InitiValue
+      null, // InitValue
       null, // DefaultValue
       false // isMandatory
   ); // This parameter specifies the user account password for au
@@ -654,7 +655,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   @JSOptionDefinition(name = "port", description = "This parameter specifies the port number of the SSH serve", key = "port", type = "SOSOptionString", mandatory = true)
   public SOSOptionPortNumber port = new SOSOptionPortNumber(this, conClassName + ".port", // HashMap-Key
       "This parameter specifies the port number of the SSH serve", // Titel
-      "22", // InitiValue
+      "22", // InitValue
       "22", // DefaultValue
       true // isMandatory
   ); // This parameter specifies the port number of the SSH serve
@@ -664,7 +665,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   @JSOptionDefinition(name = "proxy_host", description = "The value of this parameter is the host name or the IP ad", key = "proxy_host", type = "SOSOptionString", mandatory = false)
   public SOSOptionString proxy_host = new SOSOptionString(this, conClassName + ".proxy_host", // HashMap-Key
       "The value of this parameter is the host name or the IP ad", // Titel
-      null, // InitiValue
+      null, // InitValue
       null, // DefaultValue
       false // isMandatory
   ); // The value of this parameter is the host name or the IP ad
@@ -675,7 +676,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   @JSOptionDefinition(name = "proxy_password", description = "This parameter specifies the password for the proxy serve", key = "proxy_password", type = "SOSOptionString", mandatory = false)
   public SOSOptionPassword proxy_password = new SOSOptionPassword(this, conClassName + ".proxy_password", // HashMap-Key
       "This parameter specifies the password for the proxy serve", // Titel
-      null, // InitiValue
+      null, // InitValue
       null, // DefaultValue
       false // isMandatory
   ); // This parameter specifies the password for the proxy serve
@@ -685,7 +686,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   @JSOptionDefinition(name = "proxy_port", description = "This parameter specifies the port number of the proxy,", key = "proxy_port", type = "SOSOptionString", mandatory = false)
   public SOSOptionPortNumber proxy_port = new SOSOptionPortNumber(this, conClassName + ".proxy_port", // HashMap-Key
       "This parameter specifies the port number of the proxy,", // Titel
-      null, // InitiValue
+      null, // InitValue
       null, // DefaultValue
       false // isMandatory
   ); // This parameter specifies the port number of the proxy,
@@ -695,7 +696,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   @JSOptionDefinition(name = "proxy_user", description = "The value of this parameter specifies the user account fo", key = "proxy_user", type = "SOSOptionString", mandatory = false)
   public SOSOptionUserName proxy_user = new SOSOptionUserName(this, conClassName + ".proxy_user", // HashMap-Key
       "The value of this parameter specifies the user account fo", // Titel
-      "user", // InitiValue
+      "user", // InitValue
       null, // DefaultValue
       false // isMandatory
   ); // The value of this parameter specifies the user account fo
@@ -705,7 +706,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   @JSOptionDefinition(name = "simulate_shell", description = "Should the value true be specified for this parameter,", key = "simulate_shell", type = "SOSOptionString", mandatory = false)
   public SOSOptionBoolean simulate_shell = new SOSOptionBoolean(this, conClassName + ".simulate_shell", // HashMap-Key
       "Should the value true be specified for this parameter,", // Titel
-      "false", // InitiValue
+      "false", // InitValue
       "false", // DefaultValue
       false // isMandatory
   ); // Should the value true be specified for this parameter,
@@ -716,7 +717,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   @JSOptionDefinition(name = "simulate_shell_inactivity_timeout", description = "If no new characters are written to stdout or stderr afte", key = "simulate_shell_inactivity_timeout", type = "SOSOptionString", mandatory = false)
   public SOSOptionInteger simulate_shell_inactivity_timeout = new SOSOptionInteger(this, conClassName + ".simulate_shell_inactivity_timeout", // HashMap-Key
       "If no new characters are written to stdout or stderr afte", // Titel
-      "0", // InitiValue
+      "0", // InitValue
       "0", // DefaultValue
       false // isMandatory
   ); // If no new characters are written to stdout or stderr afte
@@ -727,7 +728,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   @JSOptionDefinition(name = "simulate_shell_login_timeout", description = "If no new characters are written to stdout or stderr afte", key = "simulate_shell_login_timeout", type = "SOSOptionString", mandatory = false)
   public SOSOptionInteger simulate_shell_login_timeout = new SOSOptionInteger(this, conClassName + ".simulate_shell_login_timeout", // HashMap-Key
       "If no new characters are written to stdout or stderr afte", // Titel
-      "0", // InitiValue
+      "0", // InitValue
       "0", // DefaultValue
       false // isMandatory
   ); // If no new characters are written to stdout or stderr afte
@@ -738,7 +739,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   @JSOptionDefinition(name = "simulate_shell_prompt_trigger", description = "The expected comman line prompt. Using this prompt the jo", key = "simulate_shell_prompt_trigger", type = "SOSOptionString", mandatory = false)
   public SOSOptionString simulate_shell_prompt_trigger = new SOSOptionString(this, conClassName + ".simulate_shell_prompt_trigger", // HashMap-Key
       "The expected comman line prompt. Using this prompt the jo", // Titel
-      null, // InitiValue
+      null, // InitValue
       null, // DefaultValue
       false // isMandatory
   ); // The expected comman line prompt. Using this prompt the jo
@@ -748,7 +749,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   @JSOptionDefinition(name = "user", description = "This parameter specifies the user account to be used when", key = "user", type = "SOSOptionString", mandatory = true)
   public SOSOptionUserName user = new SOSOptionUserName(this, conClassName + ".user", // HashMap-Key
       "This parameter specifies the user account to be used when", // Titel
-      "user", // InitiValue
+      "user", // InitValue
       null, // DefaultValue
       true // isMandatory
   ); // This parameter specifies the user account to be used when
@@ -756,7 +757,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   @JSOptionDefinition(name = "ignore_hangup_signal", description = "Should the value true be specified, then execution errors", key = "ignore_hangup_signal", type = "SOSOptionBoolean", mandatory = false)
   public SOSOptionBoolean ignore_hangup_signal = new SOSOptionBoolean(this, conClassName + ".ignore_hangup_signal", // HashMap-Key
       "Should the value true be specified, then execution errors", // Titel
-      "true", // InitiValue
+      "true", // InitValue
       "true", // DefaultValue
       false // isMandatory
   ); // Should the value true be specified, then execution errors
@@ -804,6 +805,22 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
 
   public void setPostCommandDelete(final SOSOptionString newPostCommandDelete) {
     this.postCommandDelete = newPostCommandDelete;
+  }
+
+  @JSOptionDefinition(name = "osProfile", description = "This parameter can be used to define os specific commands for the process monitoring", key = "osProfile", type = "SOSOptionIniFileName", mandatory = false)
+  public SOSOptionString osProfile = new SOSOptionString(this, conClassName + ".osProfile", 
+      "This parameter can be used to define os specific commands for the process monitoring,", // Titel
+      "default", // InitValue
+      "default", // DefaultValue
+      false // isMandatory
+  );
+
+  public SOSOptionString getOsProfile() {
+    return osProfile;
+  }
+
+  public void setOsProfile(SOSOptionString osProfile) {
+    this.osProfile = osProfile;
   }
 
   public SOSSSHJobOptionsSuperClass() {
