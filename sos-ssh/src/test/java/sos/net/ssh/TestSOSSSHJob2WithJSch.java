@@ -298,7 +298,7 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         "-preCommand", "set %1s=%2s",
         "-postCommandRead", "type %s",
         "-postCommandDelete", "del %s",
-        "-command_delimiter", "&" };
+        "-command_delimiter", "&&" };
     objOptions.CommandLineArgs(strArgs);
     objSSH.Execute();
     assertTrue(objSSH.getStdErr().toString().isEmpty());

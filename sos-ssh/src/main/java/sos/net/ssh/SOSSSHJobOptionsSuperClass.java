@@ -823,6 +823,38 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
     this.osProfile = osProfile;
   }
 
+  @JSOptionDefinition(name = "runWithWatchdog", description = "This parameter can be used to activate ssh session management", key = "runWithWatchdog", type = "SOSOptionBoolean", mandatory = false)
+  public SOSOptionBoolean runWithWatchdog = new SOSOptionBoolean(this, conClassName + ".runWithWatchdog", 
+      "This parameter can be used to define os specific commands for the process monitoring", // Titel
+      "false", // InitValue
+      "false", // DefaultValue
+      false // isMandatory
+  );
+
+  public SOSOptionBoolean getRunWithWatchdog() {
+    return runWithWatchdog;
+  }
+
+  public void setRunWithWatchdog(SOSOptionBoolean runWithWatchdog) {
+    this.runWithWatchdog = runWithWatchdog;
+  }
+
+  @JSOptionDefinition(name = "cleanupJobchain", description = "This parameter is used to determine the name of the jobchain for cleanup", key = "cleanupJobchain", type = "SOSOptionString", mandatory = false)
+  public SOSOptionString cleanupJobchain = new SOSOptionString(this, conClassName + ".cleanupJobchain", 
+      "This parameter is used to determine the name of the jobchain for cleanup", // Titel
+      "", // InitValue
+      "", // DefaultValue
+      false // isMandatory
+  );
+
+  public SOSOptionString getCleanupJobchain() {
+    return cleanupJobchain;
+  }
+
+  public void SOSOptionString(SOSOptionString cleanupJobchain) {
+    this.cleanupJobchain = cleanupJobchain;
+  }
+
   public SOSSSHJobOptionsSuperClass() {
     objParentClass = this.getClass();
   } // public SOSSSHJobOptions

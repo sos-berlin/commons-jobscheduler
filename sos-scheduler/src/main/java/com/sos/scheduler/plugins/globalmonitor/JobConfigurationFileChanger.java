@@ -48,7 +48,7 @@ public class JobConfigurationFileChanger {
         for (JobSchedulerFileElement monitor : listOfMonitors) {
             org.jdom.Element monitorUse = new org.jdom.Element("monitor.use");
             monitorUse.setAttribute("monitor", monitor.getJobSchedulerElementName());
-            monitorUse.setAttribute("ordering", "0");
+            //monitorUse.setAttribute("ordering", "0");
             if (!monitorUseList.contains(monitorUse)) {
                 monitorUseList.add(monitorUse);
             }
