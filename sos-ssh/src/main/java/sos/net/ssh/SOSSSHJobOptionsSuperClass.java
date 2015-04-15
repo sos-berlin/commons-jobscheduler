@@ -855,7 +855,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
     this.cleanupJobchain = cleanupJobchain;
   }
   
-  @JSOptionDefinition(name = "ssh_job_kill_pid_command", description = "The command to to kill a remote running pid", key = "ssh_job_kill_pid_command", type = "SOSOptionString", mandatory = false)
+  @JSOptionDefinition(name = "ssh_job_kill_pid_command", description = "The command to kill a remote running pid", key = "ssh_job_kill_pid_command", type = "SOSOptionString", mandatory = false)
   public SOSOptionString ssh_job_kill_pid_command = new SOSOptionString(this, conClassName + ".ssh_job_kill_pid_command", 
       "The command to to kill a remote running pid", // Titel
       "", // InitValue
