@@ -27,9 +27,9 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
   // http://www.sos-berlin.com/jira/browse/JITL-112: Additional Handler for post commands
   protected ISOSVFSHandler    prePostCommandVFSHandler        = null;
   private final Logger logger = Logger.getLogger(this.getClass());
-
   // http://www.sos-berlin.com/jira/browse/JITL-112
   private static final String SCHEDULER_RETURN_VALUES = "SCHEDULER_RETURN_VALUES";
+  // http://www.sos-berlin.com/jira/browse/JITL-147
   private String tempFileName;
   private String pidFileName;
   private static final String DEFAULT_LINUX_GET_PID_COMMAND = "echo $$";
@@ -196,7 +196,6 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
   public SOSSSHJob2 Connect() {
     getVFS();
     Options().CheckMandatory();
-
     try {
       SOSConnection2OptionsAlternate alternateOptions = getAlternateOptions(objOptions);
       vfsHandler.Connect(alternateOptions);
@@ -207,14 +206,11 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
       throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
     }
     isConnected = true;
-    
     // http://www.sos-berlin.com/jira/browse/JITL-112: 
-    //   preparePostCommandHandler() has to be called once to generate a 
-    //   second instance for post processing of stored return values
+    // preparePostCommandHandler() has to be called once to generate a second instance for post processing of stored return values
     preparePostCommandHandler();
-    // https://change.sos-berlin.com/browse/JITL-147
     return this;
-  } // private SOSSSHJob2 Connect
+  }
 
   // http://www.sos-berlin.com/jira/browse/JITL-112
   @Override
@@ -225,6 +221,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
 
   @Override
   public String getPreCommand() {
+    // https://change.sos-berlin.com/browse/JITL-147
     if(objOptions.runWithWatchdog.value()){
       readGetPidCommandFromPropertiesFile();
       return String.format(ssh_job_get_pid_command + " >> " + pidFileName + 
@@ -232,6 +229,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
           objOptions.getPreCommand().Value() + 
           objOptions.command_delimiter.Value(), SCHEDULER_RETURN_VALUES, tempFileName);
     }
+    // https://change.sos-berlin.com/browse/JITL-112
     return String.format(objOptions.getPreCommand().Value() + 
         objOptions.command_delimiter.Value(), SCHEDULER_RETURN_VALUES, tempFileName);
   }
@@ -252,7 +250,6 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     openPrePostCommandsSession();
     String postCommandRead = String.format(objOptions.getPostCommandRead().Value(), tmpFileName);
     String stdErr = "";
-
     if(tempFilesToDelete != null && !tempFilesToDelete.isEmpty()){
       for(String tempFileName : tempFilesToDelete){
         ((SOSVfsSFtpJCraft)vfsHandler).delete(tempFileName);
@@ -260,7 +257,6 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
       }
     }
     tempFilesToDelete = null;
-
     try {
       prePostCommandVFSHandler.ExecuteCommand(postCommandRead);
       // check if command was processed correctly 
@@ -295,7 +291,6 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     } catch (Exception e) {
       logger.debug(SOSVfsMessageCodes.SOSVfs_D_282.getFullMessage());
     }
-    
   }
 
   public SOSConnection2OptionsAlternate getAlternateOptions(SOSSSHJobOptions options) {

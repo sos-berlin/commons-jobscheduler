@@ -56,7 +56,6 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
       logger.debug("Task is still active, try to end task!");
       String killTaskXml = new String("<kill_task job=\"" + allParams.value(PARAM_SSH_JOB_NAME) + "\" id=\""+ allParams.value(PARAM_SSH_JOB_TASK_ID) + "\" immediately=\"yes\"/>");
       String killTaskXmlAnswer = spooler.execute_xml(killTaskXml);
-      //log level info only for development change to debug afterwards
       logger.debug("killTaskXmlAnswer:\n" + killTaskXmlAnswer);
       return true;
     } else if (!taskIsActive && runningPids != null && !runningPids.isEmpty()) {
@@ -75,7 +74,6 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
   private boolean isTaskActive(String taskId){
     String showTaskXml = new String("<show_task id=\"" + taskId + "\"/>");
     String showTaskAnswerXml = spooler.execute_xml(showTaskXml);
-    //log level info only for development change to debug afterwards
     logger.debug("showTaskAnswer:\n" + showTaskAnswerXml);
     if(showTaskAnswerXml.contains("state=\"running")){
       return true;

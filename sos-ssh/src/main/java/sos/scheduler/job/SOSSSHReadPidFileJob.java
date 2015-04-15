@@ -29,7 +29,6 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
   private final Logger logger = Logger.getLogger(this.getClass());
 
   private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
-  private static final String PID_FILE_NAME_KEY = "job_ssh_pid_file_name";
   private String tempPidFileName;
 
   private List<Integer> pids = new ArrayList<Integer>();
@@ -61,7 +60,6 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
 
   @Override
   public SOSSSHJob2 Execute() throws Exception {
-    boolean flgScriptFileCreated = false; // http://www.sos-berlin.com/jira/browse/JITL-17
     vfsHandler.setJSJobUtilites(objJSJobUtilities);
     try {
       if (isConnected == false) {
@@ -78,7 +76,6 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
         vfsHandler.ExecuteCommand(strCmd);
         objJSJobUtilities.setJSParam(conExit_code, "0");
         String pid = null;
-        String output = null;
         BufferedReader reader = new BufferedReader(new StringReader(new String(vfsHandler.getStdOut())));
         String line = null;
         while ((line = reader.readLine()) != null) {
@@ -88,7 +85,6 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
           Matcher regExMatcher = Pattern.compile("^([^\r\n]*)\r*\n*").matcher(line);
           if (regExMatcher.find()) {
             pid = regExMatcher.group(1).trim(); // key with leading and trailing whitespace removed
-            logger.debug("PID: " + pid);
             try {
               pids.add(Integer.parseInt(pid));
               logger.debug("PID: " + pid);
@@ -96,7 +92,6 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
             } catch (Exception e) {
               logger.debug("no parseable pid received in line:\n" + pid);
             }
-            
           }
         }
         CheckStdOut();
@@ -200,10 +195,8 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
     isConnected = true;
     
     // http://www.sos-berlin.com/jira/browse/JITL-112: 
-    //   preparePostCommandHandler() has to be called once to generate a 
-    //   second instance for post processing of stored return values
+    // preparePostCommandHandler() has to be called once to generate a second instance for post processing of stored return values
     preparePostCommandHandler();
-    // https://change.sos-berlin.com/browse/JITL-147
     return this;
   } // private SOSSSHJob2 Connect
 

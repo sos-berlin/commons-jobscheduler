@@ -135,7 +135,7 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch{
    private void readKillAndTerminateCommandsFromPropertiesFile(){
      if(objOptions.ssh_job_kill_pid_command.isDirty() && !objOptions.ssh_job_kill_pid_command.Value().isEmpty()){
        ssh_job_kill_pid_command = objOptions.ssh_job_kill_pid_command.Value();
-       logger.debug("Command to kill from OS Profile File used!");
+       logger.debug("Command to kill from Job Parameter used!");
      } else {
        if(flgIsWindowsShell){
          ssh_job_kill_pid_command = DEFAULT_WINDOWS_KILL_PID_COMMAND;
@@ -147,7 +147,7 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch{
      }
      if(objOptions.ssh_job_terminate_pid_command.isDirty() && !objOptions.ssh_job_terminate_pid_command.Value().isEmpty()){
        ssh_job_terminate_pid_command = objOptions.ssh_job_terminate_pid_command.Value();
-       logger.debug("Commands to terminate from OS Profile File used!");
+       logger.debug("Commands to terminate from Job Parameter used!");
      } else {
        if(flgIsWindowsShell){
          ssh_job_terminate_pid_command = DEFAULT_WINDOWS_TERMINATE_PID_COMMAND;
