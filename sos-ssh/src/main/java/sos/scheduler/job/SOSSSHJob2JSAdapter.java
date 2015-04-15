@@ -17,8 +17,6 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
   private final String conClassName = this.getClass().getSimpleName();
   private static final String PARAM_SSH_JOB_TASK_ID = "SSH_JOB_TASK_ID";
   private static final String PARAM_SSH_JOB_NAME = "SSH_JOB_NAME";
-  private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
-  private static final String PARAM_RUN_WITH_WATCHDOG = "RUN_WITH_WATCHDOG";
   private static final String PARAM_JITL_SSH_USE_JSCH_IMPL = "jitl.ssh.use_jsch_impl";
   private static final String PARAM_PID_FILE_NAME_KEY = "job_ssh_pid_file_name";
   private boolean useTrilead = true;
@@ -28,7 +26,6 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
   public boolean spooler_process() throws Exception {
     @SuppressWarnings("unused")
     final String conMethodName = conClassName + "::spooler_process";
-
     try {
       super.spooler_process();
       doProcessing();
@@ -37,19 +34,13 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
       logger.fatal(StackTrace2String(e));
       throw new JobSchedulerException(e);
     }
-    finally {
-    } // finally
-
     return signalSuccess();
-
-  } // spooler_process
+  }
   
   private void doProcessing() throws Exception {
     SOSSSHJob2 objR;
-//    Variable_set allParams = getGlobalSchedulerParameters();
-//    allParams.merge(getParameters());
-    Variable_set allParams = getParameters();
-    allParams.merge(getGlobalSchedulerParameters());
+    Variable_set allParams = getGlobalSchedulerParameters();
+    allParams.merge(getParameters());
     SOSSSHJobOptions objO = null;
     if(allParams.value(PARAM_JITL_SSH_USE_JSCH_IMPL) == null ||
         allParams.value(PARAM_JITL_SSH_USE_JSCH_IMPL).equalsIgnoreCase("default") ||
@@ -100,7 +91,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
     order.params().set_var(PARAM_SSH_JOB_TASK_ID, String.valueOf(spooler_task.id()));
     order.params().set_var(PARAM_PID_FILE_NAME_KEY, pidFileName);
     order.params().set_var(PARAM_SSH_JOB_NAME, spooler_job.name());
-    // delayed start after 5 seconds when the order is created
+    // delayed start after 15 seconds when the order is created
     order.set_at("now+15");
     Job_chain chain = null;
     if(spooler_task.params().value("cleanupJobchain") != null){

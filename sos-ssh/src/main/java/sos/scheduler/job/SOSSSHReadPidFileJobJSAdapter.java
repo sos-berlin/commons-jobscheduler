@@ -10,8 +10,6 @@ import sos.spooler.Variable_set;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
 public class SOSSSHReadPidFileJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
-  private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
-  private static final String PARAM_SSH_JOB_TASK_ID = "SSH_JOB_TASK_ID";
   private static final String PID_FILE_NAME_KEY = "job_ssh_pid_file_name";
   private Variable_set allParams;
   

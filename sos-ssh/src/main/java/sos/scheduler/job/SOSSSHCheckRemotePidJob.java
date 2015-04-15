@@ -82,7 +82,6 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
         }
       }
       if(pidsStillRunning.size() > 0){
-        // and override the order param with the resulting (still running) pids only to later kill them
         StringBuilder strb = new StringBuilder();
         logger.debug("Overriding param " + PARAM_PIDS_TO_KILL);
         boolean first = true;
@@ -96,8 +95,10 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
           }
         }
         logger.debug("still running PIDs to kill: " + strb.toString());
+        // and override the order param with the resulting (still running) pids only to later kill them
         objJSJobUtilities.setJSParam(PARAM_PIDS_TO_KILL, strb.toString());
       }else{
+        // no (still running) pids available, override Param with empty String
         objJSJobUtilities.setJSParam(PARAM_PIDS_TO_KILL, "");
       }
     } catch (JobSchedulerException ex){
@@ -149,7 +150,7 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
   private void readCheckIfProcessesIsStillActiveCommandFromPropertiesFile(){
     if(objOptions.ssh_job_get_active_processes_command.isDirty() && !objOptions.ssh_job_get_active_processes_command.Value().isEmpty()){
       ssh_job_get_active_processes_command = objOptions.ssh_job_get_active_processes_command.Value();
-      logger.debug("Command to check if PID is still running from OS Profile File used!");
+      logger.debug("Command to check if PID is still running from Job Parameter used!");
     }else{
       if(flgIsWindowsShell){
         ssh_job_get_active_processes_command = DEFAULT_WINDOWS_GET_ACTIVE_PROCESSES_COMMAND;
