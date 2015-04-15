@@ -50,7 +50,7 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
 
     @Override
     public byte[] changeXmlConfiguration(FileBasedType typ, AbsolutePath path, byte[] xmlBytes) {
-        logger.info("---------  changeXmlConfiguration");
+        logger.debug("---------  changeXmlConfiguration");
         Document doc = null;
         if (typ == FileBasedType.job) {
             doc = xmlBytesToDom(xmlBytes);
@@ -84,7 +84,7 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
     }
 
     private ConfigurationModifierFileSelectorOptions setParameters(Element e, String parent) {
-        logger.info("---------  setParameters:" + parent);
+        logger.debug("---------  setParameters:" + parent);
         ConfigurationModifierFileSelectorOptions c = new ConfigurationModifierFileSelectorOptions();
 
         parameters = new HashMap<String, String>();
@@ -109,7 +109,7 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
                 if (param.getAttributeValue("name") != null) {
                     String name = param.getAttributeValue("name").toLowerCase();
                     String value = param.getAttributeValue("value");
-                    logger.info("---------  " + name + "=" + value);
+                    logger.debug("---------  " + name + "=" + value);
 
                     parameters.put(name, value);
 
@@ -136,7 +136,7 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
     }
 
     private Document modifyJobElement(Document doc, String jobname) throws JDOMException {
-        logger.info("---------  modifyJobElement:" + jobname);
+        logger.debug("---------  modifyJobElement:" + jobname);
 
         // 1. Create a FileSelector for the jobs that are to be handled
         // depending on the given options.
@@ -149,7 +149,7 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
         // 3. getting the entire jobs
         configurationModifierFileSelector.fillSelectedFileList();
         boolean jobIsToBeHandled = configurationModifierFileSelector.isInSelectedFileList(jobname);
-        logger.info("---------  jobIsToBeHandled:" + jobIsToBeHandled);
+        logger.debug("---------  jobIsToBeHandled:" + jobIsToBeHandled);
 
         if (jobIsToBeHandled) {
             // 4. if the current job is to be handled, create the list of
@@ -174,7 +174,7 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
                 jobConfigurationFileChanger.setListOfMonitors(configurationModifierFileSelector.getListOfMonitorConfigurationFiles());
 
                 doc = jobConfigurationFileChanger.addMonitorUse();
-                logger.info(getStringFromDocument(doc));
+                logger.debug(getStringFromDocument(doc));
 
                 return doc;
             }

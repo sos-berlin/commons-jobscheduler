@@ -807,22 +807,22 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
     this.postCommandDelete = newPostCommandDelete;
   }
 
-  @JSOptionDefinition(name = "osProfile", description = "This parameter can be used to define os specific commands for the process monitoring", key = "osProfile", type = "SOSOptionIniFileName", mandatory = false)
-  public SOSOptionString osProfile = new SOSOptionString(this, conClassName + ".osProfile", 
-      "This parameter can be used to define os specific commands for the process monitoring,", // Titel
-      "default", // InitValue
-      "default", // DefaultValue
-      false // isMandatory
-  );
-
-  public SOSOptionString getOsProfile() {
-    return osProfile;
-  }
-
-  public void setOsProfile(SOSOptionString osProfile) {
-    this.osProfile = osProfile;
-  }
-
+//  @JSOptionDefinition(name = "osProfile", description = "This parameter can be used to define the ini file with the os specific commands for the process monitoring", key = "osProfile", type = "SOSOptionIniFileName", mandatory = false)
+//  public SOSOptionString osProfile = new SOSOptionString(this, conClassName + ".osProfile", 
+//      "This parameter can be used to define the ini file with the os specific commands for the process monitoring", // Titel
+//      "", // InitValue
+//      "", // DefaultValue
+//      false // isMandatory
+//  );
+//
+//  public SOSOptionString getOsProfile() {
+//    return osProfile;
+//  }
+//
+//  public void setOsProfile(SOSOptionString osProfile) {
+//    this.osProfile = osProfile;
+//  }
+//
   @JSOptionDefinition(name = "runWithWatchdog", description = "This parameter can be used to activate ssh session management", key = "runWithWatchdog", type = "SOSOptionBoolean", mandatory = false)
   public SOSOptionBoolean runWithWatchdog = new SOSOptionBoolean(this, conClassName + ".runWithWatchdog", 
       "This parameter can be used to define os specific commands for the process monitoring", // Titel
@@ -851,10 +851,74 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
     return cleanupJobchain;
   }
 
-  public void SOSOptionString(SOSOptionString cleanupJobchain) {
+  public void setCleanupJobchain(SOSOptionString cleanupJobchain) {
     this.cleanupJobchain = cleanupJobchain;
   }
+  
+  @JSOptionDefinition(name = "ssh_job_kill_pid_command", description = "The command to to kill a remote running pid", key = "ssh_job_kill_pid_command", type = "SOSOptionString", mandatory = false)
+  public SOSOptionString ssh_job_kill_pid_command = new SOSOptionString(this, conClassName + ".ssh_job_kill_pid_command", 
+      "The command to to kill a remote running pid", // Titel
+      "", // InitValue
+      "kill -9", // DefaultValue
+      false // isMandatory
+  );
 
+  public SOSOptionString getssh_job_kill_pid_command() {
+    return ssh_job_kill_pid_command;
+  }
+
+  public void setssh_job_kill_pid_command(SOSOptionString ssh_job_kill_pid_command) {
+    this.ssh_job_kill_pid_command = ssh_job_kill_pid_command;
+  }
+  
+  @JSOptionDefinition(name = "ssh_job_terminate_pid_command", description = "The command to to terminate a remote running pid", key = "ssh_job_terminate_pid_command", type = "SOSOptionString", mandatory = false)
+  public SOSOptionString ssh_job_terminate_pid_command = new SOSOptionString(this, conClassName + ".ssh_job_terminate_pid_command", 
+      "The command to to terminate a remote running pid", // Titel
+      "", // InitValue
+      "kill -15", // DefaultValue
+      false // isMandatory
+  );
+
+  public SOSOptionString getssh_job_terminate_pid_command() {
+    return ssh_job_terminate_pid_command;
+  }
+
+  public void setssh_job_terminate_pid_command(SOSOptionString ssh_job_terminate_pid_command) {
+    this.ssh_job_terminate_pid_command = ssh_job_terminate_pid_command;
+  }
+  
+  @JSOptionDefinition(name = "ssh_job_get_pid_command", description = "The command to get the PID of the active shell", key = "ssh_job_get_pid_command", type = "SOSOptionString", mandatory = false)
+  public SOSOptionString ssh_job_get_pid_command = new SOSOptionString(this, conClassName + ".ssh_job_get_pid_command", 
+      "The command to get the PID of the active shell", // Titel
+      "", // InitValue
+      "echo $$", // DefaultValue
+      false // isMandatory
+  );
+
+  public SOSOptionString getssh_job_get_pid_command() {
+    return ssh_job_get_pid_command;
+  }
+
+  public void setssh_job_get_pid_command(SOSOptionString ssh_job_get_pid_command) {
+    this.ssh_job_get_pid_command = ssh_job_get_pid_command;
+  }
+  
+  @JSOptionDefinition(name = "ssh_job_get_active_processes_command", description = "The command to check if the given process is still running", key = "ssh_job_get_active_processes_command", type = "SOSOptionString", mandatory = false)
+  public SOSOptionString ssh_job_get_active_processes_command = new SOSOptionString(this, conClassName + ".ssh_job_get_active_processes_command", 
+      "The command to check if the given process is still running", // Titel
+      "", // InitValue
+      "/bin/ps -ef | grep ${pid} | grep ${user} | grep -v grep", // DefaultValue
+      false // isMandatory
+  );
+
+  public SOSOptionString getssh_job_get_active_processes_command() {
+    return ssh_job_get_active_processes_command;
+  }
+
+  public void setssh_job_get_active_processes_command(SOSOptionString ssh_job_get_active_processes_command) {
+    this.ssh_job_get_active_processes_command = ssh_job_get_active_processes_command;
+  }
+  
   public SOSSSHJobOptionsSuperClass() {
     objParentClass = this.getClass();
   } // public SOSSSHJobOptions
