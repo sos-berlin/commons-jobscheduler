@@ -12,6 +12,7 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
   private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
   private static final String PARAM_SSH_JOB_TASK_ID = "SSH_JOB_TASK_ID";
+  private static final String PARAM_SSH_JOB_NAME = "SSH_JOB_NAME";
   private Variable_set allParams;
   
   @Override
@@ -44,7 +45,7 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
     }
     logger.debug("Task is still active: " + taskIsActive);
     sshJob = executeCheckPids();
-    String runningPids = allParams.value(PARAM_PIDS_TO_KILL);
+    String runningPids = getParameters().value(PARAM_PIDS_TO_KILL);
     if(taskIsActive && runningPids != null && !runningPids.isEmpty()){
       // if task is still running and remote pids are still available  --> do nothing
       // check again after some delay
@@ -53,7 +54,7 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
     }else if (taskIsActive && (runningPids == null || runningPids.isEmpty())) {
       // if task is still running but remote pid is not available anymore (finished) --> kill task
       logger.debug("Task is still active, try to end task!");
-      String killTaskXml = new String("<kill_task id=\""+ allParams.value(PARAM_SSH_JOB_TASK_ID) + "\"immediately=\"yes\"/>");
+      String killTaskXml = new String("<kill_task job=\"" + allParams.value(PARAM_SSH_JOB_NAME) + "\" id=\""+ allParams.value(PARAM_SSH_JOB_TASK_ID) + "\" immediately=\"yes\"/>");
       String killTaskXmlAnswer = spooler.execute_xml(killTaskXml);
       //log level info only for development change to debug afterwards
       logger.debug("killTaskXmlAnswer:\n" + killTaskXmlAnswer);

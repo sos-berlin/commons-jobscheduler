@@ -1,11 +1,7 @@
 package sos.scheduler.job;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -21,7 +17,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "com_sos_net_messages", defaultLocale = "en")
 public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch{
   private final Logger logger = Logger.getLogger(this.getClass());
-  private Map<Integer, PsEfLine> pids = new HashMap<Integer, PsEfLine>();
+//  private Map<Integer, PsEfLine> pids = new HashMap<Integer, PsEfLine>();
   private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
   private static final String KEY_SSH_JOB_KILL_PID_COMMAND = "ssh_job_kill_pid_command";
   private static final String KEY_SSH_JOB_TERMINATE_PID_COMMAND = "ssh_job_terminate_pid_command";
@@ -118,17 +114,17 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch{
     return pidsToKill;
   }
 
-  private void killChildrenOfPid(PsEfLine psCommandLine, HashMap pidMap) throws Exception {
-    if (psCommandLine.children.size() == 0) return;
-    Iterator iter = psCommandLine.children.iterator();
-    while (iter.hasNext()) {
-      Integer childPid = (Integer) iter.next();
-      PsEfLine child = (PsEfLine) pidMap.get(childPid);
-      logger.debug("killing child pid: " + child.pid);
-      processKillCommand(child.pid);
-      killChildrenOfPid(child, pidMap);
-    }
-  }
+//  private void killChildrenOfPid(PsEfLine psCommandLine, HashMap pidMap) throws Exception {
+//    if (psCommandLine.children.size() == 0) return;
+//    Iterator iter = psCommandLine.children.iterator();
+//    while (iter.hasNext()) {
+//      Integer childPid = (Integer) iter.next();
+//      PsEfLine child = (PsEfLine) pidMap.get(childPid);
+//      logger.debug("killing child pid: " + child.pid);
+//      processKillCommand(child.pid);
+//      killChildrenOfPid(child, pidMap);
+//    }
+//  }
   
   private void processKillCommand(Integer pid){
     logger.debug("Sending kill command: " + ssh_job_kill_pid_command + " " + pid);
@@ -165,21 +161,21 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch{
     }
   }
 
-   private class PsEfLine implements Comparable {
-    public String user;
-    public Integer pid;
-    public Integer parentPid;
-    public String pidCommand;
-    public List children = new ArrayList();
-
-    /* (non-Javadoc)
-     * 
-     * @see java.lang.Comparable#compareTo(java.lang.Object) */
-    public int compareTo(Object o) {
-      PsEfLine other = (PsEfLine) o;
-      return pid - other.pid;
-    }
-  }
+//   private class PsEfLine implements Comparable {
+//    public String user;
+//    public Integer pid;
+//    public Integer parentPid;
+//    public String pidCommand;
+//    public List children = new ArrayList();
+//
+//    /* (non-Javadoc)
+//     * 
+//     * @see java.lang.Comparable#compareTo(java.lang.Object) */
+//    public int compareTo(Object o) {
+//      PsEfLine other = (PsEfLine) o;
+//      return pid - other.pid;
+//    }
+//  }
 
    private void readKillAndTerminateCommandsFromPropertiesFile(){
      JSIniFile osProfile = new JSIniFile(objOptions.osProfile.Value());

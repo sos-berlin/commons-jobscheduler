@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,11 +15,9 @@ import sos.net.ssh.SOSSSHJobJSch;
 import sos.net.ssh.SOSSSHJobOptions;
 import sos.net.ssh.exceptions.SSHConnectionError;
 import sos.net.ssh.exceptions.SSHExecutionError;
-import sos.net.ssh.exceptions.SSHMissingCommandError;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
-import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.SFTP.SOSVfsSFtpJCraft;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
@@ -32,7 +29,6 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
   private final Logger logger = Logger.getLogger(this.getClass());
 
   private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
-//  private static final String PID_FILE_NAME = "sos-ssh-pid.txt";
   private static final String PID_FILE_NAME_KEY = "job_ssh_pid_file_name";
   private String tempPidFileName;
 
@@ -232,14 +228,6 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
       }
     }
     tempFilesToDelete = null;
-//    try {
-//      String postCommandDelete = String.format(objOptions.getPostCommandDelete().Value(), tmpFileName);
-//      prePostCommandVFSHandler.ExecuteCommand(postCommandDelete);
-//      logger.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tmpFileName));
-//    } catch (Exception e) {
-//      logger.debug(SOSVfsMessageCodes.SOSVfs_D_282.getFullMessage());
-//    }
-    
   }
 
   public SOSConnection2OptionsAlternate getAlternateOptions(SOSSSHJobOptions options) {

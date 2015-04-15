@@ -1,7 +1,6 @@
 package sos.net.ssh;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +16,6 @@ import sos.net.ssh.exceptions.SSHExecutionError;
 import sos.net.ssh.exceptions.SSHMissingCommandError;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.JSHelper.Options.SOSOptionIniFileName;
 import com.sos.JSHelper.io.Files.JSIniFile;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
@@ -236,6 +234,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
 
   @Override
   public String getPreCommand() {
+    if(objOptions.runWithWatchdog.value()){
     if(objOptions.osProfile.isDirty()){
       readGetPidCommandFromPropertiesFile();
       logger.debug("Command to receive PID of the active shell from OS Profile File used!");
@@ -248,9 +247,12 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         logger.debug("Default Linux command used to receive PID of the active shell!");
       }
     }
-    return String.format(ssh_job_get_pid_command + " >> " + pidFileName + 
-        objOptions.command_delimiter.Value() +
-        objOptions.getPreCommand().Value() + 
+      return String.format(ssh_job_get_pid_command + " >> " + pidFileName + 
+          objOptions.command_delimiter.Value() +
+          objOptions.getPreCommand().Value() + 
+          objOptions.command_delimiter.Value(), SCHEDULER_RETURN_VALUES, tempFileName);
+    }
+    return String.format(objOptions.getPreCommand().Value() + 
         objOptions.command_delimiter.Value(), SCHEDULER_RETURN_VALUES, tempFileName);
   }
 

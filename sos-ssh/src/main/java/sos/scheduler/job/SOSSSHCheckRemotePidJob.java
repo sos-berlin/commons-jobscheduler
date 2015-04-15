@@ -16,6 +16,7 @@ import sos.net.ssh.SOSSSHJobJSch;
 import sos.net.ssh.exceptions.SSHConnectionError;
 import sos.net.ssh.exceptions.SSHExecutionError;
 
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.io.Files.JSIniFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
@@ -27,9 +28,11 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
   private List<Integer> availablePidsToKill = new ArrayList<Integer>();
   private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
   private static final String KEY_SSH_JOB_GET_ACTIVE_PROCESSES_COMMAND = "ssh_job_get_active_processes_command";
-  private static final String DEFAULT_LINUX_GET_ACTIVE_PROCESSES_COMMAND = "/bin/ps -ef | grep %s";
+//  private static final String DEFAULT_LINUX_GET_ACTIVE_PROCESSES_COMMAND = "/bin/ps -ef | grep %s";
+  private static final String DEFAULT_LINUX_GET_ACTIVE_PROCESSES_COMMAND = "kill -0 %s";
   private static final String DEFAULT_WINDOWS_GET_ACTIVE_PROCESSES_COMMAND = "echo Add command to get active processes to stdout here!";
-  private String ssh_job_get_active_processes_command = "/bin/ps -ef | grep %s";
+//  private String ssh_job_get_active_processes_command = "/bin/ps -ef | grep %s";
+  private String ssh_job_get_active_processes_command = "kill -0 %s";
 
   private void openSession() {
     try {
@@ -80,53 +83,93 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
     vfsHandler.setJSJobUtilites(objJSJobUtilities);
     openSession();
     Map<Integer, PsEfLine> remoteRunningPids = new HashMap<Integer, PsEfLine>();
+    boolean configuredRaiseExeptionOnError = objOptions.raise_exception_on_error.value();
+    boolean configuredIgnoreError = objOptions.ignore_error.value();
+    List<Integer> pidsToKillFromOrder = getPidsToKill();
+    List<Integer> pidsStillRunning = new ArrayList<Integer>();
     try {
       if (isConnected == false) {
         this.Connect();
       }
-      vfsHandler.ExecuteCommand(String.format(ssh_job_get_active_processes_command, objOptions.user.Value()));
-      // check if command was processed correctly
-      if (vfsHandler.getExitCode() == 0) {
-        // read stdout of the read-temp-file statement per line
-        if (vfsHandler.getStdOut().toString().length() > 0) {
-          BufferedReader reader = new BufferedReader(new StringReader(new String(vfsHandler.getStdOut())));
-          String line = null;
-          logger.debug(SOSVfsMessageCodes.SOSVfs_D_284.getFullMessage());
-          boolean firstLine = true;
-          while ((line = reader.readLine()) != null) {
-            if(firstLine){
-              // The first line is the Header so we skip that
-              firstLine = false;
-              continue;
-            }
-            if (line == null) break;
-            line = line.trim();
-            String[] fields = line.split(" +", 8);
-            PsEfLine psOutputLine = new PsEfLine();
-            // Field numbers correspond to linux format of ps command
-            // Windows Qprocess command differs in field sorting!
-            psOutputLine.user = fields[0];
-            psOutputLine.pid = Integer.parseInt(fields[1]);
-            psOutputLine.parentPid = Integer.parseInt(fields[2]);
-            psOutputLine.pidCommand = fields[7];
-            remoteRunningPids.put(new Integer(psOutputLine.pid), psOutputLine);
-          }
-          Iterator psOutputLineIterator = remoteRunningPids.values().iterator();
-          while (psOutputLineIterator.hasNext()) {
-            PsEfLine current = (PsEfLine) psOutputLineIterator.next();
-            PsEfLine parent = (PsEfLine) remoteRunningPids.get(new Integer(current.parentPid));
-            if (parent != null) {
-//              logger.debug("Child of " + parent.pid + " is " + current.pid);
-              parent.children.add(new Integer(current.pid));
-            }
-          }
-        } else {
-          logger.debug("no stdout received from remote host");
+      objOptions.raise_exception_on_error.value(false);
+      objOptions.ignore_error.value(true);
+      for(Integer pid : pidsToKillFromOrder){
+        vfsHandler.ExecuteCommand(String.format(ssh_job_get_active_processes_command, pid));
+        if (vfsHandler.getExitCode() == 0) {
+          // process found
+          pidsStillRunning.add(pid);
+          logger.debug("PID " + pid + " is still running");
+        }else{
+          logger.debug("PID " + pid + " is not running anymore");
         }
-      }else{
-        logger.error("error occured executing command: " + String.format(ssh_job_get_active_processes_command, objOptions.user.Value()));
       }
-    } catch (Exception e) {
+      if(pidsStillRunning.size() > 0){
+        // and override the order param with the resulting (still running) pids only to later kill them
+        StringBuilder strb = new StringBuilder();
+        logger.debug("Overriding param " + PARAM_PIDS_TO_KILL);
+        boolean first = true;
+        // create a String with the comma separated pids to put in one Param 
+        for (Integer pid : pidsStillRunning){
+          if (first){
+            strb.append(pid.toString());
+            first = false;
+          }else{
+            strb.append(",").append(pid.toString());
+          }
+        }
+        logger.debug("still running PIDs to kill: " + strb.toString());
+        objJSJobUtilities.setJSParam(PARAM_PIDS_TO_KILL, strb.toString());
+      }else{
+        objJSJobUtilities.setJSParam(PARAM_PIDS_TO_KILL, "");
+      }
+//      vfsHandler.ExecuteCommand(String.format(ssh_job_get_active_processes_command, objOptions.user.Value()));
+      // check if command was processed correctly
+//      if (vfsHandler.getExitCode() == 0) {
+        // read stdout of the read-temp-file statement per line
+//        if (vfsHandler.getStdOut().toString().length() > 0) {
+//          BufferedReader reader = new BufferedReader(new StringReader(new String(vfsHandler.getStdOut())));
+//          String line = null;
+//          logger.debug(SOSVfsMessageCodes.SOSVfs_D_284.getFullMessage());
+//          boolean firstLine = true;
+//          while ((line = reader.readLine()) != null) {
+//            if(firstLine){
+//              // The first line is the Header so we skip that
+//              firstLine = false;
+//              continue;
+//            }
+//            if (line == null) break;
+//            line = line.trim();
+//            String[] fields = line.split(" +", 8);
+//            PsEfLine psOutputLine = new PsEfLine();
+//            // Field numbers correspond to linux format of ps command
+//            // Windows Qprocess command differs in field sorting!
+//            psOutputLine.user = fields[0];
+//            psOutputLine.pid = Integer.parseInt(fields[1]);
+//            psOutputLine.parentPid = Integer.parseInt(fields[2]);
+//            psOutputLine.pidCommand = fields[7];
+//            remoteRunningPids.put(new Integer(psOutputLine.pid), psOutputLine);
+//          }
+//          Iterator psOutputLineIterator = remoteRunningPids.values().iterator();
+//          while (psOutputLineIterator.hasNext()) {
+//            PsEfLine current = (PsEfLine) psOutputLineIterator.next();
+//            PsEfLine parent = (PsEfLine) remoteRunningPids.get(new Integer(current.parentPid));
+//            if (parent != null) {
+////              logger.debug("Child of " + parent.pid + " is " + current.pid);
+//              parent.children.add(new Integer(current.pid));
+//            }
+//          }
+//        } else {
+//          logger.debug("no stdout received from remote host");
+//        }
+//      }else{
+//        logger.error("error occured executing command: " + String.format(ssh_job_get_active_processes_command, objOptions.user.Value()));
+//      }
+    } catch (JobSchedulerException ex){
+      if(pidsStillRunning.size() == 0){
+        logger.debug("Overriding PARAM_PIDS_TO_KILL with empty String");
+        objJSJobUtilities.setJSParam(PARAM_PIDS_TO_KILL, "");
+      }
+    }catch (Exception e) {
       if(objOptions.raise_exception_on_error.value()){
         if(objOptions.ignore_error.value()){
           if(objOptions.ignore_stderr.value()){
@@ -140,39 +183,42 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
           throw new SSHExecutionError("Exception raised: " + e, e);
         }
       }
-    } finally {
-      if (remoteRunningPids != null && remoteRunningPids.size() > 0){
-        // receive pids from Order params here
-        List<Integer> pidsToKillFromOrder = getPidsToKill();
-        availablePidsToKill = new ArrayList<Integer>();
-        for(Integer pidToKill : pidsToKillFromOrder){
-          // then check if the pids are still running on the remote host
-          PsEfLine psLine;
-          if((psLine = remoteRunningPids.get(pidToKill)) != null){
-            logger.debug("Added to available PIDs: " + psLine.pid);
-            availablePidsToKill.add(pidToKill);
-          } else{
-            logger.debug("PID " + pidToKill + " not found" );
-          }
-        }
-        // and override the order param with the resulting (still running) pids only to later kill them
-        StringBuilder strb = new StringBuilder();
-        if (availablePidsToKill.size() > 0){
-          logger.debug("Overriding param " + PARAM_PIDS_TO_KILL);
-          boolean first = true;
-          // create a String with the comma separated pids to put in one Param 
-          for (Integer pid : availablePidsToKill){
-            if (first){
-              strb.append(pid.toString());
-              first = false;
-            }else{
-              strb.append(",").append(pid.toString());
-            }
-          }
-          logger.debug("still running PIDs to kill: " + strb.toString());
-        }
-        objJSJobUtilities.setJSParam(PARAM_PIDS_TO_KILL, strb.toString());
-      }
+    }
+    finally {
+//      if (remoteRunningPids != null && remoteRunningPids.size() > 0){
+//        // receive pids from Order params here
+//        List<Integer> pidsToKillFromOrder = getPidsToKill();
+//        availablePidsToKill = new ArrayList<Integer>();
+//        for(Integer pidToKill : pidsToKillFromOrder){
+//          // then check if the pids are still running on the remote host
+//          PsEfLine psLine;
+//          if((psLine = remoteRunningPids.get(pidToKill)) != null){
+//            logger.debug("Added to available PIDs: " + psLine.pid);
+//            availablePidsToKill.add(pidToKill);
+//          } else{
+//            logger.debug("PID " + pidToKill + " not found" );
+//          }
+//        }
+//        // and override the order param with the resulting (still running) pids only to later kill them
+//        StringBuilder strb = new StringBuilder();
+//        if (availablePidsToKill.size() > 0){
+//          logger.debug("Overriding param " + PARAM_PIDS_TO_KILL);
+//          boolean first = true;
+//          // create a String with the comma separated pids to put in one Param 
+//          for (Integer pid : availablePidsToKill){
+//            if (first){
+//              strb.append(pid.toString());
+//              first = false;
+//            }else{
+//              strb.append(",").append(pid.toString());
+//            }
+//          }
+//          logger.debug("still running PIDs to kill: " + strb.toString());
+//        }
+//        objJSJobUtilities.setJSParam(PARAM_PIDS_TO_KILL, strb.toString());
+//      }
+      objOptions.raise_exception_on_error.value(configuredRaiseExeptionOnError);
+      objOptions.ignore_error.value(configuredIgnoreError);
     }
     return this;
   }
