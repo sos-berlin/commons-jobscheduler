@@ -102,16 +102,14 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
     order.params().set_var(PARAM_SSH_JOB_NAME, spooler_job.name());
     // delayed start after 5 seconds when the order is created
     order.set_at("now+15");
-    //TODO
-//    Job_chain chain;
-//    if(spooler_task.params().value("cleanupJobchain") != null){
-//      chain = spooler.job_chain(spooler_task.params().value("cleanupJobchain"));      
-//      spooler_log.debug9("uses jobchainname from parameter");
-//    }else{//default zum testen
-//      chain = spooler.job_chain("kill_jobs/remote_cleanup_test");
-//      spooler_log.debug9("uses default jobchainname from code");
-//    }
-    Job_chain chain = spooler.job_chain("kill_jobs/remote_cleanup_test");
+    Job_chain chain = null;
+    if(spooler_task.params().value("cleanupJobchain") != null){
+      chain = spooler.job_chain(spooler_task.params().value("cleanupJobchain"));      
+      spooler_log.debug9("uses jobchainname from parameter");
+      spooler_log.debug9("Jobchainname: " + spooler_task.params().value("cleanupJobchain"));
+    }else{
+      logger.error("No jobchain configured to received the order! Please configure the cleanupJobchain Parameter in your SSH Job Configuration.");
+    }
     chain.add_or_replace_order(order);
     spooler_log.debug9("order send");
   }

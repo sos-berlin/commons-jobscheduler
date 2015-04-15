@@ -2,8 +2,6 @@ package sos.net.ssh;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -16,7 +14,6 @@ import sos.net.ssh.exceptions.SSHExecutionError;
 import sos.net.ssh.exceptions.SSHMissingCommandError;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.JSHelper.io.Files.JSIniFile;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
@@ -33,18 +30,12 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
 
   // http://www.sos-berlin.com/jira/browse/JITL-112
   private static final String SCHEDULER_RETURN_VALUES = "SCHEDULER_RETURN_VALUES";
-  private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
-  private static final String PID_FILE_NAME_KEY = "job_ssh_pid_file_name";
   private String tempFileName;
   private String pidFileName;
-  private static final String KEY_SSH_JOB_GET_PID_COMMAND = "ssh_job_get_pid_command";
   private static final String DEFAULT_LINUX_GET_PID_COMMAND = "echo $$";
   private static final String DEFAULT_WINDOWS_GET_PID_COMMAND = "echo Add command to get PID of active shell here!";
   private String ssh_job_get_pid_command = "echo $$";
-
-  //  private static final String PID_FILE_NAME = "sos-ssh-pid.txt";
   protected ISOSVFSHandler vfsHandler;
-  private List<Integer> pids = new ArrayList<Integer>();
 
   @Override
   public ISOSVFSHandler getVFSSSH2Handler() {
@@ -235,18 +226,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
   @Override
   public String getPreCommand() {
     if(objOptions.runWithWatchdog.value()){
-    if(objOptions.osProfile.isDirty()){
       readGetPidCommandFromPropertiesFile();
-      logger.debug("Command to receive PID of the active shell from OS Profile File used!");
-    }else{
-      if(flgIsWindowsShell){
-        ssh_job_get_pid_command = DEFAULT_WINDOWS_GET_PID_COMMAND;
-        logger.debug("Default Windows command used to receive PID of the active shell!");
-      }else{
-        ssh_job_get_pid_command = DEFAULT_LINUX_GET_PID_COMMAND;
-        logger.debug("Default Linux command used to receive PID of the active shell!");
-      }
-    }
       return String.format(ssh_job_get_pid_command + " >> " + pidFileName + 
           objOptions.command_delimiter.Value() +
           objOptions.getPreCommand().Value() + 
@@ -344,8 +324,18 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
   }
 
   private void readGetPidCommandFromPropertiesFile(){
-    JSIniFile osProfile = new JSIniFile(objOptions.osProfile.Value());
-    ssh_job_get_pid_command = osProfile.getPropertyString("ssh_commands", KEY_SSH_JOB_GET_PID_COMMAND, "default");
+    if(objOptions.ssh_job_get_pid_command.isDirty() && !objOptions.ssh_job_get_pid_command.Value().isEmpty()){
+      ssh_job_get_pid_command = objOptions.ssh_job_get_pid_command.Value();
+      logger.debug("Command to receive PID of the active shell from Job Parameter used!");
+    }else{
+      if(flgIsWindowsShell){
+        ssh_job_get_pid_command = DEFAULT_WINDOWS_GET_PID_COMMAND;
+        logger.debug("Default Windows command used to receive PID of the active shell!");
+      }else{
+        ssh_job_get_pid_command = DEFAULT_LINUX_GET_PID_COMMAND;
+        logger.debug("Default Linux command used to receive PID of the active shell!");
+      }
+    }
   }
 
 }
