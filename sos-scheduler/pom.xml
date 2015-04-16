@@ -179,12 +179,14 @@
            <groupId>com.sos-berlin.jobscheduler.engine</groupId>
            <artifactId>engine-kernel</artifactId>
            <version>${sos.engine.version}</version>
+           <scope>provided</scope>
         </dependency>
 
         <dependency>
            <groupId>com.sos-berlin.jobscheduler.engine</groupId>
            <artifactId>engine-common</artifactId>
            <version>${sos.engine.version}</version>
+           <scope>provided</scope>
         </dependency>
 
     </dependencies>
