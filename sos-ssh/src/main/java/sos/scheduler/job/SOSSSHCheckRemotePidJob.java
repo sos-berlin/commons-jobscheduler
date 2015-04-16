@@ -19,7 +19,7 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
   private final Logger logger = Logger.getLogger(this.getClass());
   private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
   private static final String DEFAULT_LINUX_GET_ACTIVE_PROCESSES_COMMAND = "/bin/ps -ef | grep ${pid} | grep ${user} | grep -v grep";
-  private static final String DEFAULT_WINDOWS_GET_ACTIVE_PROCESSES_COMMAND = "echo Add command to get active processes to stdout here!";
+  private static final String DEFAULT_WINDOWS_GET_ACTIVE_PROCESSES_COMMAND = "Qprocess ${pid}";
   private String ssh_job_get_active_processes_command = "/bin/ps -ef | grep ${pid} | grep ${user} | grep -v grep";//default
 
   private void openSession() {
@@ -70,8 +70,13 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
       objOptions.raise_exception_on_error.value(false);
       objOptions.ignore_error.value(true);
       for(Integer pid : pidsToKillFromOrder){
-        String checkPidCommand = ssh_job_get_active_processes_command.replace("${user}", objOptions.user.Value());
-        checkPidCommand = checkPidCommand.replace("${pid}", pid.toString());
+        String checkPidCommand = null;
+        if(ssh_job_get_active_processes_command.contains("${user}")){
+          checkPidCommand = ssh_job_get_active_processes_command.replace("${user}", objOptions.user.Value());
+        }
+        if(ssh_job_get_active_processes_command.contains("${pid}")){
+          checkPidCommand = checkPidCommand.replace("${pid}", pid.toString());
+        }
         vfsHandler.ExecuteCommand(checkPidCommand);
         if (vfsHandler.getExitCode() == 0) {
           // process found

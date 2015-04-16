@@ -19,7 +19,7 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch{
   private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
   private static final String DEFAULT_LINUX_KILL_PID_COMMAND = "kill -9";
   private static final String DEFAULT_LINUX_TERMINATE_PID_COMMAND = "kill -15";
-  private static final String DEFAULT_WINDOWS_KILL_PID_COMMAND = "echo Add command to kill PID here!";
+  private static final String DEFAULT_WINDOWS_KILL_PID_COMMAND = "taskkill /pid";
   private static final String DEFAULT_WINDOWS_TERMINATE_PID_COMMAND = "echo Add command to terminate PID here!";
   private String ssh_job_kill_pid_command = "kill -9";//default
   private String ssh_job_terminate_pid_command = "kill -15";//default
