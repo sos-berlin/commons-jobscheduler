@@ -70,8 +70,13 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
       objOptions.raise_exception_on_error.value(false);
       objOptions.ignore_error.value(true);
       for(Integer pid : pidsToKillFromOrder){
-        String checkPidCommand = ssh_job_get_active_processes_command.replace("${user}", objOptions.user.Value());
-        checkPidCommand = checkPidCommand.replace("${pid}", pid.toString());
+        String checkPidCommand = null;
+        if(ssh_job_get_active_processes_command.contains("${user}")){
+          checkPidCommand = ssh_job_get_active_processes_command.replace("${user}", objOptions.user.Value());
+        }
+        if(ssh_job_get_active_processes_command.contains("${pid}")){
+          checkPidCommand = checkPidCommand.replace("${pid}", pid.toString());
+        }
         vfsHandler.ExecuteCommand(checkPidCommand);
         if (vfsHandler.getExitCode() == 0) {
           // process found
