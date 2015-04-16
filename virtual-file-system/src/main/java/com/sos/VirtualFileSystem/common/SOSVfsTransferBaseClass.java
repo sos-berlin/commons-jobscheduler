@@ -914,13 +914,13 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 
 	@Override
 	public long getFileSize(final String strFileName) {
-		long lngFileSize = 0;
+		long lngFileSize = -1L;
 		try {
 			String lstrFileName = strFileName.replaceAll("\\\\", "/");
 			lngFileSize = this.size(lstrFileName);
 		}
 		catch (Exception e) {
-			RaiseException(e, SOSVfs_E_134.params("getFileSize()"));
+			logger.trace(SOSVfs_E_134.params("getFileSize()") + ":" + e.getMessage());
 		}
 		 
 		return lngFileSize;
