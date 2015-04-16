@@ -19,7 +19,7 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
   private final Logger logger = Logger.getLogger(this.getClass());
   private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
   private static final String DEFAULT_LINUX_GET_ACTIVE_PROCESSES_COMMAND = "/bin/ps -ef | grep ${pid} | grep ${user} | grep -v grep";
-  private static final String DEFAULT_WINDOWS_GET_ACTIVE_PROCESSES_COMMAND = "echo Add command to get active processes to stdout here!";
+  private static final String DEFAULT_WINDOWS_GET_ACTIVE_PROCESSES_COMMAND = "Qprocess ${pid}";
   private String ssh_job_get_active_processes_command = "/bin/ps -ef | grep ${pid} | grep ${user} | grep -v grep";//default
 
   private void openSession() {
