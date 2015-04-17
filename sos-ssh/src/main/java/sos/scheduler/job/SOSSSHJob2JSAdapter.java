@@ -43,6 +43,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
     allParams.merge(getParameters());
     SOSSSHJobOptions objO = null;
     if(allParams.value(PARAM_JITL_SSH_USE_JSCH_IMPL) == null ||
+        allParams.value(PARAM_JITL_SSH_USE_JSCH_IMPL).isEmpty() ||
         allParams.value(PARAM_JITL_SSH_USE_JSCH_IMPL).equalsIgnoreCase("default") ||
         allParams.value(PARAM_JITL_SSH_USE_JSCH_IMPL).equalsIgnoreCase("false")){
       //this is the default value for v1.9, will change to JSch with v1.10 [SP]
