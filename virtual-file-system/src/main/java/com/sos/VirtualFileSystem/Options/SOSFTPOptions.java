@@ -517,10 +517,11 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 				}
 				else {
 					if (transferType == enuTransferTypes.ftps) {
-						if (pobjPort.isDirty() == false) {
-							pobjPort.value(SOSOptionPortNumber.conPort4FTPS);
-							pobjPort.setProtected(pobjTransferTyp.isProtected());
-						}
+						//führt dazu, daß die Profildaten (Port) nicht gesetzt werden, sondert 990 gesetzt wird
+						//if (pobjPort.isDirty() == false) {
+							//pobjPort.value(SOSOptionPortNumber.conPort4FTPS);
+							//pobjPort.setProtected(pobjTransferTyp.isProtected());
+						//}
 					}
 					else {
 						if (transferType == enuTransferTypes.webdav) {
