@@ -58,7 +58,7 @@ public class TestConfigurationModifierFileSelector {
         configurationModifierFileSelectorOptions.setConfigurationDirectory("c:/temp/live");
         configurationModifierFileSelectorOptions.setDirectoryExclusions("live/sos,test_event");
         configurationModifierFileSelectorOptions.setFileExclusions("job_exercise1.job.xml,events2\\job_exercise3.job.xml");
-        configurationModifierFileSelectorOptions.setRecursiv(true);
+        configurationModifierFileSelectorOptions.setRecursive(true);
         configurationModifierFileSelectorOptions.setRegexSelector("^job.*$");
 
         configurationModifierFileSelector = new ConfigurationModifierFileSelector(configurationModifierFileSelectorOptions);
@@ -78,7 +78,7 @@ public class TestConfigurationModifierFileSelector {
         configurationModifierFileSelectorOptions.setConfigurationDirectory("c:/temp/live");
         configurationModifierFileSelectorOptions.setDirectoryExclusions("test_event");
         configurationModifierFileSelectorOptions.setFileExclusions("job_exercise1.job.xml,events2/job_exercise3.job.xml");
-        configurationModifierFileSelectorOptions.setRecursiv(true);
+        configurationModifierFileSelectorOptions.setRecursive(true);
         configurationModifierFileSelectorOptions.setRegexSelector("^job.*$");
 
         configurationModifierFileSelector = new ConfigurationModifierFileSelector(configurationModifierFileSelectorOptions);
@@ -106,7 +106,7 @@ public class TestConfigurationModifierFileSelector {
         configurationModifierFileSelectorOptions.setConfigurationDirectory("c:/temp/live");
         configurationModifierFileSelectorOptions.setDirectoryExclusions("test_event");
         configurationModifierFileSelectorOptions.setFileExclusions("job_exercise1.job.xml,events2/job_exercise3.job.xml");
-        configurationModifierFileSelectorOptions.setRecursiv(true);
+        configurationModifierFileSelectorOptions.setRecursive(true);
         configurationModifierFileSelectorOptions.setRegexSelector("^job.*$");
 
         configurationModifierFileSelector = new ConfigurationModifierFileSelector(configurationModifierFileSelectorOptions);

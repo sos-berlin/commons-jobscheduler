@@ -9,7 +9,7 @@ public class ConfigurationModifierFileSelectorOptions {
     private String regexSelector;
     private String fileExclusions=""; 
     private String directoryExclusions=""; 
-    private boolean recursiv;
+    private boolean recursive;
     private ArrayList<String> listOfFileExclusions;
     private ArrayList<String> listOfDirectoryExclusions;
     
@@ -49,16 +49,16 @@ public class ConfigurationModifierFileSelectorOptions {
         fillExclusionsList();
     }
     
-    public boolean isRecursiv() {
-        return recursiv;
+    public boolean isRecursive() {
+        return recursive;
     }
     
-    public void setRecursiv(boolean recursiv) {
-        this.recursiv = recursiv;
+    public void setRecursive(boolean recursive) {
+        this.recursive = recursive;
     }
 
-    public void setRecursiv(String recursiv) {
-        this.recursiv = recursiv.equalsIgnoreCase("true");
+    public void setRecursive(String recursive) {
+        this.recursive = recursive.equalsIgnoreCase("true");
     }
 
     public void setDirectoryExclusions(String directoryExclusions) {

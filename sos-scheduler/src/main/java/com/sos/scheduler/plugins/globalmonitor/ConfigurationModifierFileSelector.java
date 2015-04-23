@@ -43,7 +43,7 @@ public class ConfigurationModifierFileSelector {
                        JobSchedulerFileElement jobSchedulerFileElement = new JobSchedulerFileElement(file,"");
                        listOfSelectedConfigurationFiles.add(jobSchedulerFileElement);
                    }else{
-                       if (selectorOptions.isRecursiv()){
+                       if (selectorOptions.isRecursive()){
                            logger.debug("reading " + file.getAbsolutePath());
                            fillFiles(file.getAbsolutePath());
                        }
@@ -85,7 +85,7 @@ public class ConfigurationModifierFileSelector {
     
     private void fillMonitorList(File d, String schedulerLivePath){
        
-        if (selectorOptions.isRecursiv()){
+        if (selectorOptions.isRecursive()){
             if (d != null && d.getAbsolutePath().length()> 0 && !d.getAbsolutePath().replace('\\', '/').equals(schedulerLivePath)){
                fillMonitorList(d.getParentFile(),schedulerLivePath);
             }

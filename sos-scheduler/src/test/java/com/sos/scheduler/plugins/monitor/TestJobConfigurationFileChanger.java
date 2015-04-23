@@ -52,7 +52,7 @@ public class TestJobConfigurationFileChanger {
         configurationModifierFileSelectorOptions.setConfigurationDirectory("C:/Users/ur/Documents/sos-berlin.com/jobscheduler/scheduler_current/config/live");
         configurationModifierFileSelectorOptions.setDirectoryExclusions("sos");
         configurationModifierFileSelectorOptions.setFileExclusions("job_exercise1.job.xml,events2/job_exercise3.job.xml");
-        configurationModifierFileSelectorOptions.setRecursiv(true);
+        configurationModifierFileSelectorOptions.setRecursive(true);
         configurationModifierFileSelectorOptions.setRegexSelector("^job.*$");
 
         //2. Create a FileSelector for the jobs that are to be handled depending on the given options.

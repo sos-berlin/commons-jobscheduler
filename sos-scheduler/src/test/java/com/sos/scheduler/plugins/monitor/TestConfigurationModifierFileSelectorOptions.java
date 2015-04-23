@@ -76,22 +76,22 @@ public class TestConfigurationModifierFileSelectorOptions {
     @Test
     public void testIsRecursiv() {
         ConfigurationModifierFileSelectorOptions c = new ConfigurationModifierFileSelectorOptions();
-        c.setRecursiv(true);
-        assertEquals("testIsRecursiv",true, c.isRecursiv());
+        c.setRecursive(true);
+        assertEquals("testIsRecursiv",true, c.isRecursive());
     }
 
     @Test
     public void testSetRecursivBoolean() {
         ConfigurationModifierFileSelectorOptions c = new ConfigurationModifierFileSelectorOptions();
-        c.setRecursiv(true);
-        assertEquals("testSetRecursivBoolean",true, c.isRecursiv());
+        c.setRecursive(true);
+        assertEquals("testSetRecursivBoolean",true, c.isRecursive());
     }
 
     @Test
     public void testSetRecursivString() {
         ConfigurationModifierFileSelectorOptions c = new ConfigurationModifierFileSelectorOptions();
-        c.setRecursiv("true");
-        assertEquals("testSetRecursivString",true, c.isRecursiv());
+        c.setRecursive("true");
+        assertEquals("testSetRecursivString",true, c.isRecursive());
     }
 
     @Test
