@@ -19,8 +19,6 @@ import com.sos.JSHelper.io.Files.JSTextFile;
  */
 public class SOSMsg {
 	private static final String	conPropertyExtensionF1				= ".f1";
-	private static final String	conPropertyExtensionhelpKey			= ".f1";
-	private static final String	conPropertyExtensionGlobalHelp		= ".f10";
 	public static final String	conEnvironmentVariableSOS_LOCALE	= "SOS_LOCALE";
 	public static final String	conPropertyExtensionTOOLTIP			= ".tooltip";
 	public static final String	conPropertyExtensionShortText		= ".shorttext";
@@ -314,12 +312,9 @@ public class SOSMsg {
 		final String conMethodName = conClassName + "::get";
 		String strT = "";
 		String strM = pobjEx.getLocalizedMessage();
-		if (flgFullMessageReported == false) {
-			strT = getFullMessage();
-		}
-		else {
-			strT = Messages.getMsg(strMessageCode, strM);
-		}
+				
+		strT = Messages.getMsg(strMessageCode, strM);
+		
 		return strT;
 	} // private String get
 
