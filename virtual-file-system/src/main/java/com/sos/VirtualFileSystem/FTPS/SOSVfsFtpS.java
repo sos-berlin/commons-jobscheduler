@@ -1,10 +1,13 @@
 package com.sos.VirtualFileSystem.FTPS;
 
-import org.apache.commons.net.ftp.FTPClientConfig;
+import java.net.ProxySelector;
+
 import org.apache.commons.net.ftp.FTPSClient;
 import org.apache.log4j.Logger;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.JSHelper.Options.SOSOptionProxyProtocol;
+import com.sos.JSHelper.Options.SOSOptionProxyProtocol.Protocol;
 import com.sos.VirtualFileSystem.FTP.SOSFtpClientLogger;
 import com.sos.VirtualFileSystem.FTP.SOSVfsFtpBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
@@ -16,7 +19,7 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
 	@SuppressWarnings("unused")
 	private static final String	conSVNVersion	= "$Id$";
 	private final Logger		logger			= Logger.getLogger(this.getClass());
-	private FTPSClient			objFTPClient	= null;
+	private FTPSClient			client	= null;
 
 	/**
 	 *
@@ -34,15 +37,40 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
 
 	@Override
 	protected FTPSClient Client() {
-		if (objFTPClient == null) {
+		if (client == null) {
 			try {
-				String strProtocol = objConnection2Options.FtpS_protocol.Value();
-				objFTPClient = new FTPSClient(strProtocol);
+				logger.info(String.format("use %s client security",
+						objConnection2Options.ftps_client_secutity.Value()));
+				
+				client = new FTPSClient(objConnection2Options.FtpS_protocol.Value(),objConnection2Options.ftps_client_secutity.isImplicit());
+				if(usingProxy()){
+					logger.info(String.format("using proxy: protocol = %s, host = %s, port = %s, user = %s, pass = ?",
+							getProxyProtocol().Value(),
+							getProxyHost(),
+							getProxyPort(),
+							getProxyUser()));
+					
+					if(usingHttpProxy()){
+						logger.info(String.format("ftps via http proxy is experimental and not tested ..."));
+						client.setProxy(getHTTPProxy());
+					}
+					else{
+						//client.setProxy(getSocksProxy());
+						SOSOptionProxyProtocol.Protocol proxyProtocol = getProxyProtocol().isSocks4() ? Protocol.socks4 : Protocol.socks5;
+						SOSVfsFtpSProxySelector ps = new SOSVfsFtpSProxySelector(proxyProtocol,
+								getProxyHost(),
+								getProxyPort(),
+								getProxyUser(),
+								getProxyPassword());
+							ProxySelector.setDefault(ps);
+					}
+				}
 			}
 			catch (Exception e) {
 				throw new JobSchedulerException("can not create FTPS-Client", e);
 			}
-			FTPClientConfig conf = new FTPClientConfig();
+			
+			//FTPClientConfig conf = new FTPClientConfig();
 			//			conf.setServerLanguageCode("fr");
 			//			objFTPClient.configure(conf);
 			/**
@@ -53,17 +81,17 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
 			// TODO create a hidden debug-option to activate this listener
 			if (objConnection2Options != null) {
 				if (objConnection2Options.ProtocolCommandListener.isTrue()) {
-					objFTPClient.addProtocolCommandListener(objProtocolCommandListener);
+					client.addProtocolCommandListener(objProtocolCommandListener);
 				}
 			}
 
-			String strAddFTPProtocol = System.getenv("AddFTPProtocol");
-			if (strAddFTPProtocol != null && strAddFTPProtocol.equalsIgnoreCase("true")) {
-				objFTPClient.addProtocolCommandListener(objProtocolCommandListener);
+			String addFTPProtocol = System.getenv("AddFTPProtocol");
+			if (addFTPProtocol != null && addFTPProtocol.equalsIgnoreCase("true")) {
+				client.addProtocolCommandListener(objProtocolCommandListener);
 			}
 
 		}
-		return objFTPClient;
+		return client;
 	}
 
 	@Override
@@ -88,8 +116,8 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
 			}
 		}
 		catch (Exception e) {
-			String strM = HostID("connect returns an exception");
-			logger.error(strM, e);
+			String msg = HostID("connect returns an exception");
+			logger.error(msg, e);
 		}
 	}
 }

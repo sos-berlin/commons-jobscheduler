@@ -159,38 +159,6 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 		}
 		return flgR;
 	}
-
-	
-	
-	private boolean usingProxy(){
-		return !SOSString.isEmpty(getProxyHost());
-	}
-	
-	private boolean usingHttpProxy(){
-		if(getProxyProtocol() != null && getProxyProtocol().isHttp()){
-			return true;
-		}
-		return false;
-	}
-	
-	/**
-	 * 
-	 * @throws Exception
-	 */
-	private void setSocksProxy(){
-		if(!SOSString.isEmpty(getProxyUser())){
-			Authenticator.setDefault(new Authenticator(){
-			  protected  PasswordAuthentication  getPasswordAuthentication(){
-				   PasswordAuthentication p = new PasswordAuthentication(getProxyUser(),getProxyPassword().toCharArray());
-				   return p;
-			  }
-			});
-
-		}
-		
-		Proxy proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(getProxyHost(),getProxyPort()));
-		objFTPClient.setProxy(proxy);
-	}
 	
 	@Override
 	protected final FTPClient Client() {
@@ -212,7 +180,7 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 				}
 				else{
 					objFTPClient = new FTPClient();
-					setSocksProxy();
+					objFTPClient.setProxy(getSocksProxy());
 				}
 			}
 			else{

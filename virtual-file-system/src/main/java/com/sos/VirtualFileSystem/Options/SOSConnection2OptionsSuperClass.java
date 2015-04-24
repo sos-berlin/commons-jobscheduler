@@ -10,6 +10,7 @@ import com.sos.JSHelper.Listener.JSListener;
 import com.sos.JSHelper.Options.JSOptionsClass;
 import com.sos.JSHelper.Options.SOSOptionAuthenticationMethod;
 import com.sos.JSHelper.Options.SOSOptionBoolean;
+import com.sos.JSHelper.Options.SOSOptionFTPSClientSecurity;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.JSHelper.Options.SOSOptionHostName;
 import com.sos.JSHelper.Options.SOSOptionInFileName;
@@ -1256,6 +1257,33 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	}
 	
 	/**
+	* \var ftps_client_secutity : explicit, implicit
+	*
+	*
+	*/
+	@JSOptionDefinition(
+						name = "ftps_client_secutity",
+						description = "FTPS Client Security",
+						key = "ftps_client_secutity",
+						type = "SOSOptionFTPSClientSecurity",
+						mandatory = false)
+	public SOSOptionFTPSClientSecurity	ftps_client_secutity	= new SOSOptionFTPSClientSecurity(this, conClassName + ".ftps_client_secutity", // HashMap-Key
+													"FTPS Client Security", // Titel
+													SOSOptionFTPSClientSecurity.ClientSecurity.explicit.name(), // InitValue
+													SOSOptionFTPSClientSecurity.ClientSecurity.explicit.name(), // DefaultValue
+													false // isMandatory
+											);
+
+	public SOSOptionFTPSClientSecurity getftps_client_secutity() {
+		return ftps_client_secutity;
+	}
+
+	public void setftps_client_secutity(SOSOptionFTPSClientSecurity val) {
+		ftps_client_secutity = val;
+	}
+
+	
+	/**
 	* \var proxy_protocol : http, socks4 oder socks5
 	*
 	*
@@ -1504,5 +1532,5 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
   public void setIgnore_error(final SOSOptionBoolean ignoreError) {
     this.ignore_error = ignoreError;
   }
-  
+   
 } // public class SOSConnection2OptionsSuperClass

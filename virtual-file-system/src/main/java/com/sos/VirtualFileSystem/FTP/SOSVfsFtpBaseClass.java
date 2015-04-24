@@ -11,7 +11,6 @@ import java.net.PasswordAuthentication;
 import java.net.Proxy;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.Properties;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1783,5 +1782,48 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 	public String getProxyPassword() {
 		return proxyPassword;
 	}
-    
+	
+	protected boolean usingProxy(){
+		return !SOSString.isEmpty(getProxyHost());
+	}
+	
+	protected boolean usingHttpProxy(){
+		if(getProxyProtocol() != null && getProxyProtocol().isHttp()){
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	protected Proxy getSocksProxy(){
+		if(!SOSString.isEmpty(getProxyUser())){
+			Authenticator.setDefault(new Authenticator(){
+			  protected  PasswordAuthentication  getPasswordAuthentication(){
+				   PasswordAuthentication p = new PasswordAuthentication(getProxyUser(),getProxyPassword().toCharArray());
+				   return p;
+			  }
+			});
+
+		}
+		return new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(getProxyHost(),getProxyPort()));
+	}
+    /**
+     * 
+     * @return
+     */
+	protected Proxy getHTTPProxy(){
+		if(!SOSString.isEmpty(getProxyUser())){
+			Authenticator.setDefault(new Authenticator(){
+			  protected  PasswordAuthentication  getPasswordAuthentication(){
+				   PasswordAuthentication p = new PasswordAuthentication(getProxyUser(),getProxyPassword().toCharArray());
+				   return p;
+			  }
+			});
+
+		}
+		return new Proxy(Proxy.Type.HTTP, new InetSocketAddress(getProxyHost(),getProxyPort()));
+	}
 }
