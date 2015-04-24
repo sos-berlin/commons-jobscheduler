@@ -87,8 +87,8 @@
         </dependency>
 
         <!--
-                    JadeFilesHistoryDBItem nur fÃ¼r lokale Tests benutzt, da sonst zyklische AbhÃ¤ngigkeit zwischen hibernate-commons <-> ftp-history
-                        Dependency fÃ¼r lokalen Test einkommentieren
+                    JadeFilesHistoryDBItem nur für lokale Tests benutzt, da sonst zyklische Abhängigkeit zwischen hibernate-commons <-> ftp-history
+                        Dependency für lokalen Test einkommentieren
                 <dependency>
                     <groupId>com.sos-berlin.jobscheduler</groupId>
                     <artifactId>ftp-history</artifactId>
