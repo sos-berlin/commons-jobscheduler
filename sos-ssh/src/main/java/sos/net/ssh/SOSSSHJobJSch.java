@@ -2,6 +2,8 @@ package sos.net.ssh;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -36,6 +38,8 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
   private static final String DEFAULT_WINDOWS_GET_PID_COMMAND = "echo Add command to get PID of active shell here!";
   private String ssh_job_get_pid_command = "echo $$";
   protected ISOSVFSHandler vfsHandler;
+  private Map allParams = null;
+  private Map<String, String> returnValues = new HashMap<String, String>();
 
   @Override
   public ISOSVFSHandler getVFSSSH2Handler() {
@@ -89,8 +93,18 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
       if (isConnected == false) {
         this.Connect();
       }
+      // first check if windows is running on the remote host
       flgIsWindowsShell = vfsHandler.remoteIsWindowsShell();
-      if (objOptions.command.IsEmpty() == false) {
+      // https://change.sos-berlin.com/browse/JITL-157
+//      Map environmentVariables = new HashMap();
+//      if(allParams != null && !allParams.isEmpty()){
+//        for(Object key : allParams.keySet()){
+//          if(key.toString().startsWith("SCHEDULER_")){
+//            environmentVariables.put(key, allParams.get(key));
+//          }
+//        }
+//      }
+      if (objOptions.command.IsNotEmpty()) {
         strCommands2Execute = objOptions.command.values();
       } else {
         if (objOptions.isScript() == true) {
@@ -271,7 +285,9 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             if(regExMatcher.find()){
               String key = regExMatcher.group(1).trim(); // key with leading and trailing whitespace removed
               String value = regExMatcher.group(2).trim(); // value with leading and trailing whitespace removed
-              objJSJobUtilities.setJSParam(key, value);
+//              objJSJobUtilities.setJSParam(key, value);
+              returnValues.put(key, value);
+              
             }
           }
           // remove temp file after parsing return values from file
@@ -331,6 +347,14 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         logger.debug("Default Linux command used to receive PID of the active shell!");
       }
     }
+  }
+  
+  public void setAllParams(Map allParams){
+    this.allParams = allParams;
+  }
+
+  public Map<String, String> getReturnValues() {
+    return returnValues;
   }
 
 }
