@@ -16,6 +16,7 @@ import com.sos.JSHelper.Options.SOSOptionHostName;
 import com.sos.JSHelper.Options.SOSOptionInFileName;
 import com.sos.JSHelper.Options.SOSOptionInteger;
 import com.sos.JSHelper.Options.SOSOptionJavaClassName;
+import com.sos.JSHelper.Options.SOSOptionKeyStoreType;
 import com.sos.JSHelper.Options.SOSOptionPassphrase;
 import com.sos.JSHelper.Options.SOSOptionPassword;
 import com.sos.JSHelper.Options.SOSOptionPlatform;
@@ -1500,6 +1501,107 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 		domain = p_domain;
 	}
 
+	/**
+	* \var keystore_type
+	*
+	* This parameter specifies the keystore type.
+	* JKS,JCEKS,PKCS12,PKCS11,DKS
+	*/
+	@JSOptionDefinition(
+						name = "keystore_type",
+						description = "keystore type",
+						key = "keystore_type",
+						type = "SOSOptionKeyStoreType",
+						mandatory = false)
+	public SOSOptionKeyStoreType	keystore_type	= new SOSOptionKeyStoreType(this, conClassName + ".keystore_type", // HashMap-Key
+											"This parameter specifies the keystore type", // Titel
+											SOSOptionKeyStoreType.Type.JKS.name(), // InitValue
+											SOSOptionKeyStoreType.Type.JKS.name(), // DefaultValue
+											false // isMandatory
+									);
+	/**
+	 * 
+	 * @return
+	 */
+	public SOSOptionKeyStoreType getkeystore_type() {
+		return keystore_type;
+	}
+
+	/**
+	 * 
+	 * @param val
+	 */
+	public void setkeystore_type(final SOSOptionKeyStoreType val) {
+		keystore_type = val;
+	}
+
+	/**
+	* \var keystore_file
+	*
+	* This parameter specifies the keystore file.
+	*/
+	@JSOptionDefinition(
+						name = "keystore_file",
+						description = "keystore file",
+						key = "keystore_file",
+						type = "SOSOptionString",
+						mandatory = false)
+	public SOSOptionString	keystore_file	= new SOSOptionString(this, conClassName + ".keystore_file", // HashMap-Key
+											"This parameter specifies the keystore file path", // Titel
+											"", // InitValue
+											"", // DefaultValue
+											false // isMandatory
+									);
+	/**
+	 * 
+	 * @return
+	 */
+	public SOSOptionString getkeystore_file() {
+		return keystore_file;
+	}
+
+	/**
+	 * 
+	 * @param val
+	 */
+	public void setkeystore_file(final SOSOptionString val) {
+		keystore_file = val;
+	}
+	
+	/**
+	*
+	* This parameter specifies the password of a keystore.
+	*
+	*/
+	@JSOptionDefinition(
+						name = "keystore_password",
+						description = "Password to be used for a keystore",
+						key = "keystore_password",
+						type = "SOSOptionPassword",
+						mandatory = false)
+	public SOSOptionPassword	keystore_password	= new SOSOptionPassword(this, conClassName + ".keystore_password", // HashMap-Key
+														"This parameter specifies the password of a keystore", // Titel
+														"", // InitValue
+														"", // DefaultValue
+														false // isMandatory
+												);
+	/**
+	 * 
+	 * @return
+	 */
+	public SOSOptionPassword getkeystore_password() {
+		return keystore_password;
+	}
+
+	/**
+	 * 
+	 * @param val
+	 */
+	public void setkeystore_password(final SOSOptionPassword val) {
+		keystore_password = val;
+	}
+	
+	
   @JSOptionDefinition(name = "raise_exception_on_error", description = "Raise an Exception if an error occured", key = "raise_exception_on_error", type = "SOSOptionBoolean", mandatory = true)
   public SOSOptionBoolean   raise_exception_on_error  = new SOSOptionBoolean( // ...
                                 this, // ....
