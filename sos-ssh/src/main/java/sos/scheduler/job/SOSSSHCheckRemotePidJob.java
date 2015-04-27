@@ -21,6 +21,7 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
   private static final String DEFAULT_LINUX_GET_ACTIVE_PROCESSES_COMMAND = "/bin/ps -ef | grep ${pid} | grep ${user} | grep -v grep";
   private static final String DEFAULT_WINDOWS_GET_ACTIVE_PROCESSES_COMMAND = "Qprocess ${pid}";
   private String ssh_job_get_active_processes_command = "/bin/ps -ef | grep ${pid} | grep ${user} | grep -v grep";//default
+  private String pids = null;
 
   private void openSession() {
     try {
@@ -101,10 +102,12 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
         }
         logger.debug("still running PIDs to kill: " + strb.toString());
         // and override the order param with the resulting (still running) pids only to later kill them
-        objJSJobUtilities.setJSParam(PARAM_PIDS_TO_KILL, strb.toString());
+//        objJSJobUtilities.setJSParam(PARAM_PIDS_TO_KILL, strb.toString());
+        pids = strb.toString();
       }else{
         // no (still running) pids available, override Param with empty String
-        objJSJobUtilities.setJSParam(PARAM_PIDS_TO_KILL, "");
+//        objJSJobUtilities.setJSParam(PARAM_PIDS_TO_KILL, "");
+        pids = null;
       }
     } catch (JobSchedulerException ex){
       if(pidsStillRunning.size() == 0){
@@ -165,6 +168,10 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
         logger.debug("Default Linux command used to check if PID is still running!");
       }
     }
+  }
+
+  public String getPids() {
+    return pids;
   }
   
 }

@@ -14,17 +14,17 @@ import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "com_sos_net_messages", defaultLocale = "en")
-public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch{
+public class SOSSSHTerminateRemotePidJob extends SOSSSHJobJSch{
   private final Logger logger = Logger.getLogger(this.getClass());
   private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
   private static final String PID_PLACEHOLDER = "${pid}";
   private static final String USER_PLACEHOLDER = "${user}";
   private static final String COMMAND_PLACEHOLDER = "${command}";
-  private static final String DEFAULT_LINUX_KILL_PID_COMMAND = "kill -9 " + PID_PLACEHOLDER;
-  private static final String DEFAULT_WINDOWS_KILL_PID_COMMAND = 
-      "taskkill /f /pid " + PID_PLACEHOLDER + " /FI \"USERNAME eq " + 
+  private static final String DEFAULT_LINUX_TERMINATE_PID_COMMAND = "kill -15 " + PID_PLACEHOLDER;
+  private static final String DEFAULT_WINDOWS_TERMINATE_PID_COMMAND = 
+      "taskkill /pid " + PID_PLACEHOLDER + " /FI \"USERNAME eq " + 
       USER_PLACEHOLDER + "\" /FI \"IMAGENAME eq " + COMMAND_PLACEHOLDER + "\"";
-  private String ssh_job_kill_pid_command = "kill -9 " + PID_PLACEHOLDER;//default
+  private String ssh_job_terminate_pid_command = "kill -15 " + PID_PLACEHOLDER;//default
   
   private void openSession() {
     try {
@@ -54,7 +54,7 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch{
       throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
     }
     flgIsWindowsShell = vfsHandler.remoteIsWindowsShell();
-    getKillCommandFromJobParameters();
+    getTerminateCommandFromJobParameters();
     isConnected = true;
     return this;
   }
@@ -70,7 +70,7 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch{
       }
       logger.debug("try to kill remote PIDs");
       for(Integer pid : pidsToKillFromOrder){
-        processKillCommand(pid);
+        processTerminateCommand(pid);
       }
     } catch (Exception e) {
       if(objOptions.raise_exception_on_error.value()){
@@ -98,22 +98,22 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch{
     }
     return pidsToKill;
   }
-  
-  private void processKillCommand(Integer pid){
-    logger.debug("Sending kill command: " + ssh_job_kill_pid_command + " with ${pid}=" + pid);
-    String killCommand = null;
-    if(ssh_job_kill_pid_command.contains(PID_PLACEHOLDER)){
-      killCommand = ssh_job_kill_pid_command.replace(PID_PLACEHOLDER, pid.toString());
+
+  private void processTerminateCommand(Integer pid){
+    logger.debug("Sending terminate command: " + ssh_job_terminate_pid_command + " with ${pid}=" + pid);
+    String terminateCommand = null;
+    if(ssh_job_terminate_pid_command.contains(PID_PLACEHOLDER)){
+      terminateCommand = ssh_job_terminate_pid_command.replace(PID_PLACEHOLDER, pid.toString());
     }
-    if(ssh_job_kill_pid_command.contains(USER_PLACEHOLDER)){
-      killCommand = killCommand.replace(USER_PLACEHOLDER, objOptions.UserName.Value());
+    if(ssh_job_terminate_pid_command.contains(USER_PLACEHOLDER)){
+      terminateCommand = terminateCommand.replace(USER_PLACEHOLDER, objOptions.UserName.Value());
     }
-    if(ssh_job_kill_pid_command.contains(COMMAND_PLACEHOLDER)){
-      killCommand = killCommand.replace(COMMAND_PLACEHOLDER, objOptions.command.Value());
+    if(ssh_job_terminate_pid_command.contains(COMMAND_PLACEHOLDER)){
+      terminateCommand = terminateCommand.replace(COMMAND_PLACEHOLDER, objOptions.command.Value());
     }
     String stdErr = "";
     try {
-      vfsHandler.ExecuteCommand(killCommand);
+      vfsHandler.ExecuteCommand(terminateCommand);
     } catch (Exception e) {
       // check if command was processed correctly
       if (vfsHandler.getExitCode() != 0) {
@@ -141,19 +141,20 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch{
         }
       }
     }
+    
   }
-
-   private void getKillCommandFromJobParameters(){
-     if(objOptions.ssh_job_kill_pid_command.isDirty() && !objOptions.ssh_job_kill_pid_command.Value().isEmpty()){
-       ssh_job_kill_pid_command = objOptions.ssh_job_kill_pid_command.Value();
-       logger.debug("Command to kill from Job Parameter used!");
+  
+   private void getTerminateCommandFromJobParameters(){
+     if(objOptions.ssh_job_terminate_pid_command.isDirty() && !objOptions.ssh_job_terminate_pid_command.Value().isEmpty()){
+       ssh_job_terminate_pid_command = objOptions.ssh_job_terminate_pid_command.Value();
+       logger.debug("Commands to terminate from Job Parameter used!");
      } else {
        if(flgIsWindowsShell){
-         ssh_job_kill_pid_command = DEFAULT_WINDOWS_KILL_PID_COMMAND;
-         logger.debug("Default Windows commands used to kill PID!");
+         ssh_job_terminate_pid_command = DEFAULT_WINDOWS_TERMINATE_PID_COMMAND;
+         logger.debug("Default Windows commands used to terminate PID!");
        }else{
-         ssh_job_kill_pid_command = DEFAULT_LINUX_KILL_PID_COMMAND;
-         logger.debug("Default Linux commands used to kill PID!");
+         ssh_job_terminate_pid_command = DEFAULT_LINUX_TERMINATE_PID_COMMAND;
+         logger.debug("Default Linux commands used to terminate PID!");
        }
      }
    }

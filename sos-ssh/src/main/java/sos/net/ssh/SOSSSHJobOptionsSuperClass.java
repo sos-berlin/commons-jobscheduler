@@ -859,7 +859,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   public SOSOptionString ssh_job_kill_pid_command = new SOSOptionString(this, conClassName + ".ssh_job_kill_pid_command", 
       "The command to to kill a remote running pid", // Titel
       "", // InitValue
-      "kill -9", // DefaultValue
+      "kill -9 ${pid}", // DefaultValue
       false // isMandatory
   );
 
@@ -875,7 +875,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   public SOSOptionString ssh_job_terminate_pid_command = new SOSOptionString(this, conClassName + ".ssh_job_terminate_pid_command", 
       "The command to to terminate a remote running pid", // Titel
       "", // InitValue
-      "kill -15", // DefaultValue
+      "kill -15 ${pid}", // DefaultValue
       false // isMandatory
   );
 
@@ -918,6 +918,24 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   public void setssh_job_get_active_processes_command(SOSOptionString ssh_job_get_active_processes_command) {
     this.ssh_job_get_active_processes_command = ssh_job_get_active_processes_command;
   }
+  
+  @JSOptionDefinition(name = "ssh_job_timeout_kill_after", description = "The timeout in seconds after which a kill signal will be send", key = "ssh_job_timeout_kill_after", type = "SOSOptionInteger", mandatory = false)
+  public SOSOptionInteger ssh_job_timeout_kill_after = new SOSOptionInteger(this, conClassName + ".ssh_job_timeout_kill_after", 
+      "The timeout in seconds after which a kill signal will be send", // Titel
+      "", // InitValue
+      "", // DefaultValue
+      false // isMandatory
+  );
+
+  public SOSOptionInteger getssh_job_timeout_kill_after() {
+    return ssh_job_timeout_kill_after;
+  }
+
+  public void setssh_job_timeout_kill_after(SOSOptionInteger ssh_job_timeout_kill_after) {
+    this.ssh_job_timeout_kill_after = ssh_job_timeout_kill_after;
+  }
+  
+  
   
   public SOSSSHJobOptionsSuperClass() {
     objParentClass = this.getClass();
