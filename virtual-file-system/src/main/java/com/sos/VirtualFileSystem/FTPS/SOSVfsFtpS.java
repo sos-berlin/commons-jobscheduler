@@ -1,9 +1,14 @@
 package com.sos.VirtualFileSystem.FTPS;
 
+import java.io.File;
 import java.net.ProxySelector;
+import java.security.KeyStore;
 
 import org.apache.commons.net.ftp.FTPSClient;
+import org.apache.commons.net.util.TrustManagerUtils;
 import org.apache.log4j.Logger;
+
+import sos.util.SOSString;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionProxyProtocol;
@@ -65,6 +70,11 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
 							ProxySelector.setDefault(ps);
 					}
 				}
+				
+				if(!SOSString.isEmpty(objConnection2Options.keystore_file.Value())){
+					setTrustManager(client);
+				}
+				
 			}
 			catch (Exception e) {
 				throw new JobSchedulerException("can not create FTPS-Client", e);
@@ -109,7 +119,6 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
 				Client().execPROT("P"); // Secure Data channel, see http://www.faqs.org/rfcs/rfc2228.html
 				LogReply();
 				Client().enterLocalPassiveMode();
-
 			}
 			else {
 				logger.warn(SOSVfs_D_0102.params(host, port));
@@ -119,5 +128,22 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
 			String msg = HostID("connect returns an exception");
 			logger.error(msg, e);
 		}
+	}
+	
+	/**
+	 * 
+	 * @param client
+	 * @throws Exception
+	 */
+	private void setTrustManager(FTPSClient client) throws Exception{
+		logger.info(String.format("using keystore: type = %s, file = %s",
+				objConnection2Options.keystore_type.Value(),
+				objConnection2Options.keystore_file.Value()));
+		
+		KeyStore ks = loadKeyStore(objConnection2Options.keystore_type.Value(),
+				new File(objConnection2Options.keystore_file.Value()), 
+				objConnection2Options.keystore_password.Value());
+		
+		client.setTrustManager(TrustManagerUtils.getDefaultTrustManager(ks));
 	}
 }
