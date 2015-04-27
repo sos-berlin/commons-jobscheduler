@@ -11,6 +11,7 @@ import java.io.OutputStreamWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -38,7 +39,6 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
-import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsSuperClass;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
 import com.sos.VirtualFileSystem.common.SOSFileEntry;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
@@ -66,6 +66,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	/** SFTP Client **/
 	private ChannelSftp			sftpClient		= null;
 	private JSch				secureChannel	= null;
+	private Map environmentVariables = null;
 	
 	// additional properties for
 	// https://change.sos-berlin.com/browse/JITL-123 [SP]
@@ -567,6 +568,12 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 			channelExec.setErrStream(null);
 			out = channelExec.getInputStream();
 			err = channelExec.getErrStream();
+			// https://change.sos-berlin.com/browse/JITL-157
+			if(environmentVariables != null && !environmentVariables.isEmpty()){
+			  for(Object key : environmentVariables.keySet()){
+			    channelExec.setEnv((String)key, (String)environmentVariables.get(key));
+			  }
+			}
 			channelExec.connect();
 			logger.debug(SOSVfs_D_163.params("stdout", cmd));
 			outContent = new StringBuffer();
@@ -590,7 +597,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 				catch (Exception ee) {
 				}
 			}
-			logger.debug(outContent);
+//			logger.debug(outContent); // already logged through the Job class using this implementation [SP]
 			logger.debug(SOSVfs_D_163.params("stderr", cmd));
 			errReader = new BufferedReader(new InputStreamReader(err));
 			errContent = new StringBuffer();
@@ -647,6 +654,10 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 			}
       logINFO(HostID(SOSVfs_I_192.params(getReplyString())));
 		}
+	}
+	
+	public void setEnvironmentVariables(Map<String, String> envVariables){
+	  this.environmentVariables = envVariables;
 	}
 
 	/**

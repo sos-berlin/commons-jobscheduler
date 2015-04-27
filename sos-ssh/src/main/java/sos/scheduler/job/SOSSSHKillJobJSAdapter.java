@@ -13,6 +13,7 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
   private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
   private static final String PARAM_SSH_JOB_TASK_ID = "SSH_JOB_TASK_ID";
   private static final String PARAM_SSH_JOB_NAME = "SSH_JOB_NAME";
+  private static final String PARAM_SSH_JOB_TIMEOUT_KILL_AFTER = "ssh_job_timeout_kill_after";
   private Variable_set allParams;
   
   @Override
@@ -38,14 +39,22 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
     allParams = getGlobalSchedulerParameters();
     allParams.merge(getParameters());
     boolean taskIsActive = true;
+    boolean timeoutAfterKillIsSet = false;
     if(allParams.value(PARAM_SSH_JOB_TASK_ID) != null && !allParams.value(PARAM_SSH_JOB_TASK_ID).isEmpty()){
       taskIsActive = isTaskActive(allParams.value(PARAM_SSH_JOB_TASK_ID));
     } else {
       taskIsActive = false;
     }
+    if(allParams.value(PARAM_SSH_JOB_TIMEOUT_KILL_AFTER) != null && !allParams.value(PARAM_SSH_JOB_TIMEOUT_KILL_AFTER).isEmpty()){
+      timeoutAfterKillIsSet = true;
+    }
     logger.debug("Task is still active: " + taskIsActive);
     sshJob = executeCheckPids();
-    String runningPids = getParameters().value(PARAM_PIDS_TO_KILL);
+    if(((SOSSSHCheckRemotePidJob)sshJob).getPids() != null){
+      spooler_log.debug9(((SOSSSHCheckRemotePidJob)sshJob).getPids());
+      spooler_task.order().params().set_var(PARAM_PIDS_TO_KILL, ((SOSSSHCheckRemotePidJob)sshJob).getPids());
+    }
+    String runningPids = spooler_task.order().params().value(PARAM_PIDS_TO_KILL);
     if(taskIsActive && runningPids != null && !runningPids.isEmpty()){
       // if task is still running and remote pids are still available  --> do nothing
       // check again after some delay
@@ -58,10 +67,18 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
       String killTaskXmlAnswer = spooler.execute_xml(killTaskXml);
       logger.debug("killTaskXmlAnswer:\n" + killTaskXmlAnswer);
       return true;
-    } else if (!taskIsActive && runningPids != null && !runningPids.isEmpty()) {
+    } else if (!taskIsActive && runningPids != null && !runningPids.isEmpty()
+        && !timeoutAfterKillIsSet) {
       logger.debug("Task is not active anymore, processing kill remote pids!");
-      // if task is not running anymore but remote pid is still available --> kill remote pid
+      // if task is not running anymore but remote pid is still available and a timeout_kill_after is not set --> kill remote pid immediately
       sshJob = executeKillPids();
+      return true;
+    } else if (!taskIsActive && runningPids != null && !runningPids.isEmpty() && timeoutAfterKillIsSet) {
+      logger.debug("Task is not active anymore, processing kill remote pids!");
+      // if task is not running anymore but remote pid is still available and a timeout_kill_after is set  --> terminate remote pid
+      // if timeout_kill_after is set, try terminate first and kill after timeout
+      allParams.set_value(PARAM_SSH_JOB_TIMEOUT_KILL_AFTER, "");
+      sshJob = executeTerminatePids();
       return true;
     } else if(!taskIsActive && (runningPids == null || runningPids.isEmpty())){
       // if task is not running anymore AND remote pid is not available anymore --> do nothing
@@ -119,6 +136,37 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
     try {
       sshJob = new SOSSSHKillRemotePidJob();
       logger.debug("SOSSSHKillRemotePidJob instantiated!");
+      options = sshJob.Options();
+      options.CurrentNodeName(this.getCurrentNodeName());
+      HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(allParams);
+      options.setAllOptions(options.DeletePrefix(hsmParameters1, "ssh_"));
+      sshJob.setJSJobUtilites(this);
+      options.CheckMandatory();
+      sshJob.Execute();
+    } catch (Exception e) {
+      if(options.raise_exception_on_error.value()){
+        if(options.ignore_error.value()){
+          if(options.ignore_stderr.value()){
+            logger.debug(this.StackTrace2String(e));
+          }else{
+            logger.error(this.StackTrace2String(e));
+            throw new SSHExecutionError("Exception raised: " + e, e);
+          }
+        }else{
+          logger.error(this.StackTrace2String(e));
+          throw new SSHExecutionError("Exception raised: " + e, e);
+        }
+      }
+    }
+    return sshJob;
+  }
+  
+  private SOSSSHJob2 executeTerminatePids(){
+    SOSSSHJob2 sshJob = null;
+    SOSSSHJobOptions options = null;
+    try {
+      sshJob = new SOSSSHTerminateRemotePidJob();
+      logger.debug("SOSSSHTerminateRemotePidJob instantiated!");
       options = sshJob.Options();
       options.CurrentNodeName(this.getCurrentNodeName());
       HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(allParams);
