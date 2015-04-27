@@ -11,6 +11,9 @@ import java.net.PasswordAuthentication;
 import java.net.Proxy;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,6 +22,7 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
+import org.apache.commons.net.io.Util;
 import org.apache.log4j.Logger;
 
 import sos.util.SOSString;
@@ -1826,4 +1830,28 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 		}
 		return new Proxy(Proxy.Type.HTTP, new InetSocketAddress(getProxyHost(),getProxyPort()));
 	}
+	
+	/**
+	 * 
+	 * @param storeType
+	 * @param storePath
+	 * @param storePass
+	 * @return
+	 * @throws KeyStoreException
+	 * @throws IOException
+	 * @throws GeneralSecurityException
+	 */
+	public KeyStore loadKeyStore(String storeType, File storePath, String storePass)
+			throws KeyStoreException, IOException,
+			GeneralSecurityException {
+		KeyStore ks = KeyStore.getInstance(storeType);
+		FileInputStream stream = null;
+		try {
+			stream = new FileInputStream(storePath);
+			ks.load(stream, storePass.toCharArray());
+		} finally {
+			Util.closeQuietly(stream);
+		}
+		return ks;
+	 }
 }
