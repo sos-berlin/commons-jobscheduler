@@ -55,7 +55,31 @@ public class SOSHibernateResultSetProcessor implements Serializable {
 	 * @throws Exception
 	 */
 	public ResultSet createResultSet(Criteria criteria,ScrollMode scrollMode) throws Exception{
-		return createResultSet(criteria, scrollMode,null);
+		return createResultSet(null,criteria, scrollMode,null);
+	}
+	
+	/**
+	 * 
+	 * @param resultEntity
+	 * @param criteria
+	 * @param scrollMode
+	 * @return
+	 * @throws Exception
+	 */
+	public ResultSet createResultSet(Class<?> resultEntity,Criteria criteria,ScrollMode scrollMode) throws Exception{
+		return createResultSet(resultEntity,criteria, scrollMode,null);
+	}
+	
+	/**
+	 * 
+	 * @param criteria
+	 * @param scrollMode
+	 * @param fetchSize
+	 * @return
+	 * @throws Exception
+	 */
+	public ResultSet createResultSet(Criteria criteria,ScrollMode scrollMode,Long fetchSize) throws Exception{
+		return createResultSet(null,criteria, scrollMode,fetchSize);
 	}
 	
 	/**
@@ -63,14 +87,19 @@ public class SOSHibernateResultSetProcessor implements Serializable {
 	 * @return
 	 * @throws Exception
 	 */
-	public ResultSet createResultSet(Criteria criteria,ScrollMode scrollMode, Long fetchSize) throws Exception{
+	public ResultSet createResultSet(Class<?> resultEntity,Criteria criteria,ScrollMode scrollMode, Long fetchSize) throws Exception{
 		String method = "createResultSet";
 		
 		try{
 			logger.debug(String.format("%s",method));
 			
 			CriteriaImpl criteriaImpl = (CriteriaImpl)criteria;
-			entity = Class.forName(criteriaImpl.getEntityOrClassName());
+			if(resultEntity == null){
+				entity = Class.forName(criteriaImpl.getEntityOrClassName());
+			}
+			else{
+				entity = resultEntity;
+			}
 			
 			SessionImplementor session = criteriaImpl.getSession();
 			SessionFactoryImplementor factory = session.getFactory();
