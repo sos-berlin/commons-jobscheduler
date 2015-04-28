@@ -236,17 +236,17 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
   @Override
   public String getPreCommand() {
     // https://change.sos-berlin.com/browse/JITL-147
-    String getPid = "echo PID = $$";
+//    String getPid = "echo PID = $$";
     if(objOptions.runWithWatchdog.value()){
       readGetPidCommandFromPropertiesFile();
-      return String.format(getPid + objOptions.command_delimiter.Value() + 
+      return String.format(ssh_job_get_pid_command + objOptions.command_delimiter.Value() + 
           ssh_job_get_pid_command + " >> " + pidFileName + 
           objOptions.command_delimiter.Value() +
           objOptions.getPreCommand().Value() + 
           objOptions.command_delimiter.Value(), SCHEDULER_RETURN_VALUES, tempFileName);
     }
     // https://change.sos-berlin.com/browse/JITL-112
-    return String.format(getPid + objOptions.command_delimiter.Value() + objOptions.getPreCommand().Value() + 
+    return String.format(ssh_job_get_pid_command + objOptions.command_delimiter.Value() + objOptions.getPreCommand().Value() + 
         objOptions.command_delimiter.Value(), SCHEDULER_RETURN_VALUES, tempFileName);
   }
 

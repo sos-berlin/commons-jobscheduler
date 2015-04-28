@@ -73,7 +73,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
       }
     }
     // if command_delimiter is not set by customer then we override the default value due to compatibility issues
-    if(objO.command_delimiter.isNotDirty()){
+    if(!useTrilead && objO.command_delimiter.isNotDirty()){
       objO.command_delimiter.Value(";");
     }
     objR.Execute();
