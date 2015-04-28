@@ -406,6 +406,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 			strT += "\n" + strFileName;
 		}
 		logger.info(strT);
+		objJadeReportLogger.info(strT);
 	}
 
 	/**
