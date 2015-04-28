@@ -193,17 +193,26 @@ public class SOSHibernateResultSetProcessor implements Serializable {
 	}
 	
 	/**
+	 * @TODO z.Zeit wird Projection mit den Feldaliasen benötigt.
 	 * 
 	 * @throws Exception
 	 */
 	private void createMetadata(CriteriaQueryTranslator translator) throws Exception{
+		String method = "createMetadata";
+		if(translator.getRootCriteria().getProjection() == null){
+			throw new Exception(String.format("%s: translator.getRootCriteria().getProjection() is NULL. Please use the Projection in the criteria definition",method));
+		}
+		
 		entityGetMethods = new HashMap<String,Method>();
 		entitySetMethods = new HashMap<String,Method>();
-		
 		String[] properties = translator.getProjectedAliases();
 		String[] propertiesColumnAliases = translator.getProjectedColumnAliases();
 		for(int i=0; i< properties.length;i++){
 			 String property = properties[i];
+			 if(property == null){
+				 throw new Exception(String.format("%s: property is NULL. Please use the field aliases in the Projection definition",method));
+			 }
+			 
 			 Method getter = new PropertyDescriptor(property,entity).getReadMethod();
 			 Method setter = new PropertyDescriptor(property,entity).getWriteMethod();
 			 
