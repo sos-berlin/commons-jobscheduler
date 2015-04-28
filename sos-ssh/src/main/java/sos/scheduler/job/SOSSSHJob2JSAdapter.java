@@ -73,6 +73,9 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
       }
     }
     // if command_delimiter is not set by customer then we override the default value due to compatibility issues
+    // the default command delimiter is used in the option class to split the commands with a delimiter not known by the os
+    // but here a command delimiter (known by the os) is needed to chain commands together
+    // TODO: a solution which fits for both cases [SP]
     if(!useTrilead && objO.command_delimiter.isNotDirty()){
       objO.command_delimiter.Value(";");
     }
