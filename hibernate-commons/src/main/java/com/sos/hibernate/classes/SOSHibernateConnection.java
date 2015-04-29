@@ -36,6 +36,9 @@ import org.hibernate.type.NumericBooleanType;
 import org.hibernate.type.StringType;
 import org.hibernate.type.TimestampType;
 import org.hibernate.type.Type;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,6 +86,8 @@ public class SOSHibernateConnection implements Serializable {
 	public static final String HIBERNATE_PROPERTY_USE_SCROLLABLE_RESULTSET = "hibernate.jdbc.use_scrollable_resultset";
 	public static final String HIBERNATE_PROPERTY_CURRENT_SESSION_CONTEXT_CLASS = "hibernate.current_session_context_class";
 	
+	public static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
 	/**
 	 * 
 	 * @throws Exception
@@ -1341,9 +1346,27 @@ public class SOSHibernateConnection implements Serializable {
 			return StringType.INSTANCE.objectToSQLString((String)value, dialect);
 		}
 		else if(type instanceof org.hibernate.type.TimestampType){
-			return TimestampType.INSTANCE.objectToSQLString((Date)value,dialect);
+			if(dbms.equals(DBMS.ORACLE)){
+				String val = SOSHibernateConnection.getDateAsString((Date)value);
+				return "to_date('"+val+"','yyyy-mm-dd HH24:MI:SS')";
+			}
+			else{
+				return TimestampType.INSTANCE.objectToSQLString((Date)value,dialect);
+			}
 		}
 		return null;
+	}
+	
+	/**
+	 * 
+	 * @param d
+	 * @return
+	 * @throws Exception
+	 */
+	public static String getDateAsString(Date d) throws Exception {
+		DateTimeFormatter f = DateTimeFormat.forPattern(DATETIME_FORMAT);
+		DateTime dt = new DateTime(d);
+		return f.print(dt);
 	}
 
 	/**

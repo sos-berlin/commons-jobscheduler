@@ -238,6 +238,35 @@ public class SOSHibernateBatchProcessor implements Serializable {
 	}
 	
 	/**
+	 * kann vor executeBatch() aufgerufen werden 
+	 * @return
+	 */
+	public int getCountCurrentBatches(){
+		return countCurrentBatches;
+	}
+	
+	/**
+	 * Bei Oracle kann minus Werte beinhalten
+	 * A value of -2 indicates that a element was processed successfully, but that the number of effected rows is unknown. 
+	 * siehe http://stackoverflow.com/questions/19022175/executebatch-method-return-array-of-value-2-in-java
+	 * 
+	 * Aufruf: SOSHibernateBatchProcessor.getExecutedBatchSize(bp.executeBatch());
+	 * 
+	 * @param arr
+	 * @return
+	 */
+	public static int getExecutedBatchSize(int[] arr){
+		int count = 0;
+		if(arr != null){
+			for(int i=0;i<arr.length;i++){
+				count+= arr[i];
+			}
+		}
+		
+		return count;
+	}
+	
+	/**
 	 * 
 	 */
 	public void close(){
