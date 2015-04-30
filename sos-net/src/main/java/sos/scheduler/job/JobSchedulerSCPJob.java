@@ -19,14 +19,10 @@ import java.util.regex.Pattern;
 /**
  * @author andreas.pueschel@sos-berlin.com
  * @author ghassan.beydoun@sos-berlin.com
- * $Id: JobSchedulerSCPJob.java 18648 2012-12-12 13:49:03Z kb $
  *
  * see job documentation in the package jobdoc for details
  */
 public class JobSchedulerSCPJob extends JobSchedulerSSHBaseJob {
-	@SuppressWarnings("unused")
-	private final String	conClassName	= "JobSchedulerSCPJob";
-	private final String	conSVNVersion	= "$Id: JobSchedulerSCPJob.java 18648 2012-12-12 13:49:03Z kb $";
 	/** action specifies the copy direction: get, put */
 	protected String		action			= "";
 	/** list of files to be copied */
@@ -42,16 +38,16 @@ public class JobSchedulerSCPJob extends JobSchedulerSSHBaseJob {
 	/** enable recursive processing of directories */
 	protected boolean		recursive		= false;
 	/** create files with explicit permissions */
-	protected int			permissions		= 0;
-	private Vector			filenames		= null;
+	protected String		permissions		= "0600";
+	private Vector<File>	filenames		= null;
 
 	/**
 	 * Processing
 	 *
 	 */
-	@SuppressWarnings("unchecked") @Override public boolean spooler_process() {
+	@SuppressWarnings("unchecked") 
+	@Override public boolean spooler_process() {
 		spooler_log.info(VersionInfo.VERSION_STRING);
-		spooler_log.info(conSVNVersion);
 		Order order = null;
 		Variable_set params = null;
 		SCPClient scpClient = null;
@@ -92,14 +88,14 @@ public class JobSchedulerSCPJob extends JobSchedulerSSHBaseJob {
 				}
 				if (params.value("local_dir") != null && params.value("local_dir").length() > 0) {
 					this.setLocalDir(this.normalizePath(params.value("local_dir")));
-					spooler_log.info(".. parameter [local_dir]: " + this.getLocalDir());
+					spooler_log.info(".. parameter [local_dir]: " + params.value("local_dir"));
 				}
 				else {
 					this.setLocalDir(".");
 				}
 				if (params.value("remote_dir") != null && params.value("remote_dir").length() > 0) {
 					this.setRemoteDir(this.normalizePath(params.value("remote_dir")));
-					spooler_log.info(".. parameter [remote_dir]: " + this.getRemoteDir());
+					spooler_log.info(".. parameter [remote_dir]: " + params.value("remote_dir"));
 				}
 				else {
 					this.setRemoteDir(".");
@@ -131,92 +127,111 @@ public class JobSchedulerSCPJob extends JobSchedulerSSHBaseJob {
 					this.setRecursive(false);
 				}
 				if (params.value("permissions") != null && params.value("permissions").length() > 0) {
-					try {
-						this.setPermissions(Integer.parseInt(params.value("permissions")));
-						spooler_log.info(".. parameter [permissions]: " + this.getPermissions());
+					String perms = "0000"+params.value("permissions");
+					perms = perms.substring(perms.length()-4);
+					if (!perms.matches("^[0-7]{4}$")) {
+						throw new JobSchedulerException("illegal octal value for parameter [permissions]: " + perms);	
 					}
-					catch (Exception e) {
-						throw new JobSchedulerException("illegal octal value for parameter [permissions]: " + params.value("permissions"));
-					}
+					this.setPermissions(perms);
+					spooler_log.info(".. parameter [permissions]: " + this.getPermissions());
 				}
 				else {
-					this.setPermissions(0);
+					this.setPermissions("0600");
 				}
 			}
+			catch (JobSchedulerException e) {
+				throw e;
+			}
 			catch (Exception e) {
-				throw new JobSchedulerException("error occurred processing parameters: ", e);
+				throw new JobSchedulerException("error occurred processing parameters: " + e.getMessage());
 			}
 			try { // to connect, authenticate and process files
 				this.getBaseAuthentication();
 				scpClient = new SCPClient(this.getSshConnection());
 				File localCheckDir = new File(this.getLocalDir());
 				if (!localCheckDir.exists()) {
-					if (this.isCreateDir()) {
+					if (this.isCreateDir() && this.getAction().equals("get")) {
 						try {
-							// TODO use permissions: should no explicit permissions have been set then use the default permissions of the
-							// users home directory
-							localCheckDir.mkdirs();
+							if( ! localCheckDir.mkdirs() ) {
+								throw new JobSchedulerException("directory [" + this.getLocalDir() + "] couldn't created.");
+							}
 						}
 						catch (Exception e) {
 							throw new JobSchedulerException("error occurred creating directory [" + this.getLocalDir() + "]: " + e.getMessage(), e);
 						}
 					}
-					else {
+					else if (!this.isCreateDir()){
 						throw new JobSchedulerException("directory does not exist: " + this.getLocalDir());
 					}
 				}
 				if (this.getFileList() != null && this.getFileList().length() > 0) {
-					this.setFilenames(new Vector(Arrays.asList(this.getFileList().split(";"))));
+					this.setRecursive(false);
+					Vector<File> v = new Vector<File>(); 
+					for (String filename : this.getFileList().split(";")) {
+						if (this.getAction().equals("get")) {
+							v.add(new File(filename));
+						}
+						else {
+							filename = this.normalizePath(filename);
+							if (this.getLocalDir() != null && !this.getLocalDir().equals(".") && !filename.startsWith("/") && !filename.startsWith(":/", 1)) {
+								filename = this.getLocalDir() + "/" + filename;
+							} 
+							File fobj = new File(filename);
+							if (fobj.exists()) {
+								if (fobj.isDirectory()) {
+									spooler_log.info("file [" + fobj.getPath() + "] from filelist is a directory! Transfer will be skipped.");
+								}
+								else {
+									v.add(fobj);
+								}
+							}
+							else {
+								spooler_log.info("file [" + fobj.getPath() + "] from filelist doesn't exist! Transfer will be skipped.");
+							}
+						} 
+					}
+					this.setFilenames(v);
 				}
 				else {
 					// list of files for put operations only
-					this.setFilenames(new SOSFileSystemOperations().listFiles(new File(this.getLocalDir()).getAbsolutePath(), this.getFileSpec(),
+					this.setFilenames(new SOSFileSystemOperations().listFiles(this.getLocalDir(), this.getFileSpec(),
 							Pattern.MULTILINE, this.isRecursive()));
 				}
 				int count = 0;
-				for (int i = 0; i < this.getFilenames().size(); i++) {
+				String[] files = new String[this.getFilenames().size()];
+				for (File file : this.getFilenames()) {
 					try {
 						String filename = null;
-						if (this.getFileList() != null && this.getFileList().length() > 0) {
-							filename = (String) this.getFilenames().get(i);
-						}
-						else {
-							filename = ((File) this.getFilenames().get(i)).getAbsolutePath();
-						}
 						if (this.getAction().equals("get")) {
-							if (this.getRemoteDir() != null && !this.getRemoteDir().equals(".") && !filename.startsWith("/") && !filename.startsWith(":\\", 1))
+							filename = this.normalizePath(file.getPath());
+							if (this.getRemoteDir() != null && !this.getRemoteDir().equals(".") && !filename.startsWith("/") && !filename.startsWith(":/", 1)) {
 								filename = this.getRemoteDir() + "/" + filename;
+							}
 							spooler_log.info("file to receive: " + filename);
 						}
 						else {
-							if (this.getLocalDir() != null && !this.getLocalDir().equals(".") && !filename.startsWith("/") && !filename.startsWith(":\\", 1))
-								filename = this.getLocalDir() + "/" + filename;
+							filename = file.getCanonicalPath();
 							spooler_log.info("file to send: " + filename);
 						}
-						this.getFilenames().setElementAt(filename, i);
+						files[count] = filename;
 						count++;
 					}
 					catch (Exception e) {
 						throw new JobSchedulerException(e.getMessage(), e);
 					}
 				}
-				String[] files = new String[this.getFilenames().size()];
-				this.getFilenames().toArray(files);
 				if (this.getAction().equals("get")) {
 					scpClient.get(files, this.getLocalDir());
 				}
 				else {
-					if (this.getPermissions() > 0) {
-						if (isRecursive())
-							scp_recursive(new File(this.getLocalDir()), this.getRemoteDir(), scpClient);
-						else
-							scpClient.put(files, this.getRemoteDir());
+					if (this.isCreateDir()){
+						execCommand("if [ ! -d " + this.getRemoteDir() + " ]; then mkdir -p " + this.getRemoteDir() + "; fi");
+					}
+					if (isRecursive()) {
+						scp_recursive(localCheckDir, this.getRemoteDir(), scpClient, this.getPermissions());
 					}
 					else {
-						if (isRecursive())
-							scp_recursive(new File(this.getLocalDir()), this.getRemoteDir(), scpClient);
-						else
-							scpClient.put(files, this.getRemoteDir());
+						scpClient.put(files, this.getRemoteDir(), this.getPermissions());
 					}
 				}
 				switch (count) {
@@ -230,8 +245,11 @@ public class JobSchedulerSCPJob extends JobSchedulerSSHBaseJob {
 						break;
 				}
 			}
+			catch (JobSchedulerException e) {
+				throw e;
+			}
 			catch (Exception e) {
-				throw new JobSchedulerException("error occurred processing files: ", e);
+				throw new JobSchedulerException("error occurred processing files: " + e.getMessage());
 			}
 			finally {
 				if (this.getSshConnection() != null)
@@ -246,7 +264,7 @@ public class JobSchedulerSCPJob extends JobSchedulerSSHBaseJob {
 			return spooler_task.job().order_queue() != null;
 		}
 		catch (Exception e) {
-			spooler_log.warn(e.getMessage());
+			spooler_log.error(e.getMessage());
 			return false;
 		}
 	}
@@ -257,25 +275,31 @@ public class JobSchedulerSCPJob extends JobSchedulerSSHBaseJob {
 	 * @param scpClient
 	 * @throws Exception
 	 */
-	private void scp_recursive(final File sourceFile, String targetFile, final SCPClient scpClient) throws Exception {
+	private void scp_recursive(final File sourceFile, String targetFile, final SCPClient scpClient, final String perms) throws Exception {
+		scp_recursive(sourceFile, targetFile, scpClient, perms, true);
+	}
+	
+	private void scp_recursive(final File sourceFile, String targetFile, final SCPClient scpClient, final String perms, boolean firstLevel) throws Exception {
 		if (sourceFile.isDirectory()) {
 			// create target directory if does not exist
-			targetFile += "/" + sourceFile.getName();
-			// TODO  auweia, das ist aber ein heftiger hack. was ist, wenn keine shell da ist?
-			execCommand("if [ ! -d " + targetFile + " ]; then mkdir " + targetFile + "; fi");
+			if (!firstLevel) {
+				targetFile += "/" + sourceFile.getName();
+				// TODO  auweia, das ist aber ein heftiger hack. was ist, wenn keine shell da ist?
+				execCommand("if [ ! -d " + targetFile + " ]; then mkdir " + targetFile + "; fi");
+			}
 			String[] children = sourceFile.list();
 			for (String element : children) {
-				scp_recursive(new File(sourceFile, element), targetFile, scpClient);
+				scp_recursive(new File(sourceFile, element), targetFile, scpClient, perms, false);
 			}
 		}
 		else {
 			if (this.getFileSpec() != null && this.getFileSpec().length() > 0) {
 				// copy matching file only if asked
 				if (sourceFile.getName().matches(this.getFileSpec()))
-					scpClient.put(sourceFile.getAbsolutePath(), targetFile);
+					scpClient.put(sourceFile.getAbsolutePath(), targetFile, perms);
 			}
 			else {
-				scpClient.put(sourceFile.getAbsolutePath(), targetFile);
+				scpClient.put(sourceFile.getAbsolutePath(), targetFile, perms);
 			}
 		}
 	}
@@ -398,14 +422,14 @@ public class JobSchedulerSCPJob extends JobSchedulerSSHBaseJob {
 	/**
 	 * @return Returns the permissions.
 	 */
-	public int getPermissions() {
+	public String getPermissions() {
 		return permissions;
 	}
 
 	/**
 	 * @param permissions The permissions to set.
 	 */
-	public void setPermissions(final int permissions) {
+	public void setPermissions(final String permissions) {
 		this.permissions = permissions;
 	}
 
@@ -454,14 +478,14 @@ public class JobSchedulerSCPJob extends JobSchedulerSSHBaseJob {
 	/**
 	 * @return Returns the filenames.
 	 */
-	public Vector getFilenames() {
+	public Vector<File> getFilenames() {
 		return filenames;
 	}
 
 	/**
 	 * @param filenames The filenames to set.
 	 */
-	public void setFilenames(final Vector filenames) {
+	public void setFilenames(final Vector<File> filenames) {
 		this.filenames = filenames;
 	}
 

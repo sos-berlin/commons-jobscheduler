@@ -2972,7 +2972,7 @@ public class SOSFileSystemOperations {
 	}
 
 	public Vector<File> listFiles(final String folder, final String regexp, final int flag, final boolean withSubFolder) throws Exception {
-		Vector<File> filelist = new Vector<>();
+		Vector<File> filelist = new Vector<File>();
 		File file = null;
 		File[] subDir = null;
 
