@@ -194,10 +194,6 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 		flgIsWindowsShell = objVFS.remoteIsWindowsShell();
 		isConnected = true;
 		
-    // http://www.sos-berlin.com/jira/browse/JITL-112: 
-    //   preparePostCommandHandler() has to be called once to generate a 
-		//   second instance for post processing of stored return values
-		preparePostCommandHandler();
 		return this;
 	} // private SOSSSHJob2 Connect
 	
