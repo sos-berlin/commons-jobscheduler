@@ -1144,7 +1144,7 @@ public class SOSFileSystemOperations {
 
 	public  Vector<File> listFolders(final String folder, final String regexp, final int flag) throws Exception {
 
-		Vector<File> filelist = new Vector<>();
+		Vector<File> filelist = new Vector<File>();
 
 		if (folder == null || folder.length() == 0)
 			throw new FileNotFoundException("empty directory not allowed!!");

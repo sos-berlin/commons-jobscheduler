@@ -5,6 +5,7 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.io.SOSFileSystemOperations;
 import com.trilead.ssh2.SCPClient;
 import com.trilead.ssh2.StreamGobbler;
+
 import sos.spooler.Order;
 import sos.spooler.Variable_set;
 
@@ -12,7 +13,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
@@ -45,8 +45,8 @@ public class JobSchedulerSCPJob extends JobSchedulerSSHBaseJob {
 	 * Processing
 	 *
 	 */
-	@SuppressWarnings("unchecked") 
-	@Override public boolean spooler_process() {
+	@Override 
+	public boolean spooler_process() {
 		spooler_log.info(VersionInfo.VERSION_STRING);
 		Order order = null;
 		Variable_set params = null;
@@ -200,25 +200,19 @@ public class JobSchedulerSCPJob extends JobSchedulerSSHBaseJob {
 				int count = 0;
 				String[] files = new String[this.getFilenames().size()];
 				for (File file : this.getFilenames()) {
-					try {
-						String filename = null;
-						if (this.getAction().equals("get")) {
-							filename = this.normalizePath(file.getPath());
-							if (this.getRemoteDir() != null && !this.getRemoteDir().equals(".") && !filename.startsWith("/") && !filename.startsWith(":/", 1)) {
-								filename = this.getRemoteDir() + "/" + filename;
-							}
-							spooler_log.info("file to receive: " + filename);
+					String filename = null;
+					if (this.getAction().equals("get")) {
+						filename = this.normalizePath(file.getPath());
+						if (this.getRemoteDir() != null && !this.getRemoteDir().equals(".") && !filename.startsWith("/") && !filename.startsWith(":/", 1)) {
+							filename = this.getRemoteDir() + "/" + filename;
 						}
-						else {
-							filename = file.getCanonicalPath();
-							spooler_log.info("file to send: " + filename);
-						}
-						files[count] = filename;
-						count++;
+						spooler_log.info("file to receive: " + filename);
+					} else {
+						filename = file.getCanonicalPath();
+						spooler_log.info("file to send: " + filename);
 					}
-					catch (Exception e) {
-						throw new JobSchedulerException(e.getMessage(), e);
-					}
+					files[count] = filename;
+					count++;
 				}
 				if (this.getAction().equals("get")) {
 					scpClient.get(files, this.getLocalDir());
@@ -236,7 +230,12 @@ public class JobSchedulerSCPJob extends JobSchedulerSSHBaseJob {
 				}
 				switch (count) {
 					case 0:
-						throw new JobSchedulerException("no matching files found for regexp (file_spec) = " + fileSpec);
+						if (this.getFileList() != null && this.getFileList().length() > 0) {
+							throw new JobSchedulerException("no files found to transfer");
+						}
+						else {
+							throw new JobSchedulerException("no matching files found for filter (file_spec) = " + fileSpec);
+						}
 					case 1:
 						spooler_log.info("1 file transferred");
 						break;
@@ -311,6 +310,8 @@ public class JobSchedulerSCPJob extends JobSchedulerSSHBaseJob {
 	 * @throws Exception
 	 */
 	private void execCommand(final String command) throws Exception {
+		BufferedReader stdoutReader = null;
+		BufferedReader stderrReader = null;
 		try {
 			Integer exitStatus = null;
 			String exitSignal = null;
@@ -319,7 +320,7 @@ public class JobSchedulerSCPJob extends JobSchedulerSSHBaseJob {
 			this.getSshSession().execCommand(command);
 			spooler_log.debug5("output to stdout for remote command: " + command);
 			InputStream stdout = new StreamGobbler(this.getSshSession().getStdout());
-			BufferedReader stdoutReader = new BufferedReader(new InputStreamReader(stdout));
+			stdoutReader = new BufferedReader(new InputStreamReader(stdout));
 			while (true) {
 				String line = stdoutReader.readLine();
 				if (line == null)
@@ -328,7 +329,7 @@ public class JobSchedulerSCPJob extends JobSchedulerSSHBaseJob {
 			}
 			spooler_log.debug5("output to stderr for remote command: " + command);
 			InputStream stderr = new StreamGobbler(this.getSshSession().getStderr());
-			BufferedReader stderrReader = new BufferedReader(new InputStreamReader(stderr));
+			stderrReader = new BufferedReader(new InputStreamReader(stderr));
 			String stderrOutput = "";
 			while (true) {
 				String line = stderrReader.readLine();
@@ -367,6 +368,18 @@ public class JobSchedulerSCPJob extends JobSchedulerSSHBaseJob {
 			throw new JobSchedulerException(e.getMessage(), e);
 		}
 		finally {
+			if (stdoutReader != null) {
+				try {
+					stdoutReader.close();
+				} catch (Exception e) {
+				}
+			}
+			if (stderrReader != null) {
+				try {
+					stderrReader.close();
+				} catch (Exception e) {
+				}
+			}
 			if (this.getSshSession() != null)
 				try {
 					this.getSshSession().close();
