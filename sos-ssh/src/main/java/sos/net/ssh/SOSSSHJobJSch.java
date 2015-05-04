@@ -129,7 +129,6 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         completeCommand = getPreCommand() + strCmd;
         try {
           // see http://www.sos-berlin.com/jira/browse/JS-673
-          logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
           strCmd = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strCmd);
           logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
           // http://www.sos-berlin.com/jira/browse/JITL-112
