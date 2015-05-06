@@ -125,10 +125,10 @@
             <artifactId>ganymed-ssh2</artifactId>
         </dependency>
 
-        <dependency>
+        <!--dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-        </dependency>
+        </dependency-->
 
         <dependency>
             <groupId>commons-httpclient</groupId>
