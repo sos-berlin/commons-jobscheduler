@@ -12,78 +12,79 @@
     <groupId>com.sos-berlin.jobscheduler</groupId>
     <artifactId>sos-scheduler</artifactId>
     <name>${project.artifactId}</name>
+    <version>TP_Agent</version>
 
     <dependencies>
         <dependency>
             <groupId>com.sos-berlin.commons</groupId>
             <artifactId>credentialstore</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.sos-berlin.jobscheduler</groupId>
             <artifactId>jobscheduler-helper</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.sos-berlin.commons</groupId>
             <artifactId>sos-util</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.sos-berlin.commons</groupId>
             <artifactId>sos-marshalling</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.sos-berlin.commons</groupId>
             <artifactId>sos-connection</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.sos-berlin.commons</groupId>
             <artifactId>sos-configuration</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.sos-berlin.commons</groupId>
             <artifactId>sos-settings</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.sos-berlin.commons</groupId>
             <artifactId>sos-xml</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.sos-berlin.jobscheduler</groupId>
             <artifactId>sos-mail</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.sos-berlin.jobscheduler</groupId>
             <artifactId>hibernate-commons</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.sos-berlin.commons</groupId>
             <artifactId>sos-textprocessor</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.sos-berlin.jobscheduler</groupId>
             <artifactId>jobscheduler-object-model</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
@@ -191,4 +192,5 @@
 
     </dependencies>
 
+    
 </project>
