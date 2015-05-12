@@ -369,7 +369,8 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 			throw new JobSchedulerException(e.getLocalizedMessage(), e);
 		}
 		objJSJobUtilities.setJSParam(conStd_out_output, strbStdoutOutput);
-		logger.info("stdout = " + strbStdoutOutput.toString());
+	// already logged through the JSch implementation class [SP]
+//		logger.info("stdout = " + strbStdoutOutput.toString());
 	}
 
 	/**
