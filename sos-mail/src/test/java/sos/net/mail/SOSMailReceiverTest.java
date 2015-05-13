@@ -5,6 +5,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import sos.net.SOSMailReceiver;
@@ -28,13 +29,14 @@ public class SOSMailReceiverTest {
 	}
 	
 	@Test
+	@Ignore
 	public void connect() throws Exception {
 		
-		String host = "smtp.sos";
-	    String user = "oh";
-	    String password = "ahxei2Eixeir";
+		String host = "ADD_HOST_HERE";
+	    String user = "ADD_USER_HERE";
+	    String password = "ADD_PASSWORD_HERE";
 	    String protocol = "IMAP";
-	    String port = "143";
+	    String port = "ADD_PORT_HERE";
 	    
 	    connect(host,port,user,password,protocol);
 	}
