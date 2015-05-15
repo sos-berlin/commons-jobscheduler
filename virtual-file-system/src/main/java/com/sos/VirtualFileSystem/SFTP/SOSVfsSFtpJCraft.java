@@ -597,7 +597,10 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 				catch (Exception ee) {
 				}
 			}
-//			logger.debug(outContent); // already logged through the Job class using this implementation [SP]
+			//sdout output will be used from another applications 
+			if(outContent.length() > 0){
+				logger.info(outContent);
+			}
 			logger.debug(SOSVfs_D_163.params("stderr", cmd));
 			errReader = new BufferedReader(new InputStreamReader(err));
 			errContent = new StringBuffer();
@@ -609,17 +612,23 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 				errContent.append(line + strEndOfLine);
 			}
 			logger.debug(errContent);
-			if (exitCode != null) {
-				if (!exitCode.equals(new Integer(0))) {
-					throw new JobSchedulerException(SOSVfs_E_164.params(exitCode));
+			if(exitCode != null && !exitCode.equals(new Integer(0))){
+				StringBuffer errMsg = new StringBuffer();
+				errMsg.append(exitCode.toString());
+				if(errContent.length() > 0){
+					errMsg.append(" (");
+					errMsg.append(errContent);
+					errMsg.append(")");
 				}
+				throw new JobSchedulerException(SOSVfs_E_164.params(errMsg));
 			}
+			
 			reply = "OK";
 		}
 		catch (Exception ex) {
 			reply = ex.toString();
 			if(connection2OptionsAlternate.raise_exception_on_error.value()){
-	      RaiseException(ex, SOSVfs_E_134.params("ExecuteCommand"));
+				RaiseException(ex, SOSVfs_E_134.params("ExecuteCommand"));
 			}
 			
 		}
@@ -652,9 +661,10 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 				catch (Exception e) {
 				}
 			}
-      logINFO(HostID(SOSVfs_I_192.params(getReplyString())));
+			logINFO(HostID(SOSVfs_I_192.params(getReplyString())));
 		}
 	}
+	
 	
 	public void setEnvironmentVariables(Map<String, String> envVariables){
 	  this.environmentVariables = envVariables;
