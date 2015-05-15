@@ -5185,6 +5185,91 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	@Override public void setjump_user(final SOSOptionUserName p_jump_user) {
 		jump_user = p_jump_user;
 	}
+	
+	/**
+	 * 
+	 */
+	@JSOptionDefinition(
+			name = "jump_dir",
+			description = "This parameter specifies the directory on the jump host",
+			key = "jump_dir",
+			type = "SOSOptionString",
+			mandatory = false)
+	public SOSOptionString	jump_dir	= new SOSOptionString(this, conClassName + ".jump_dir", // HashMap-Key
+										"This parameter specifies the directory on the jump host", // Titel
+										"/tmp", // InitValue
+										"/tmp", // DefaultValue
+										false // isMandatory
+								);
+
+	/**
+	* \brief getjump_dir
+	*
+	* \details
+	*
+	* \return
+	*
+	* @return
+	*/
+	public SOSOptionString getjump_dir() {
+	return jump_dir;
+	}
+
+	/**
+	* \brief setjump_dir
+	*
+	* \details
+	*
+	* \return
+	*
+	* @param val
+	*/
+	public void setjump_dir(final SOSOptionString val) {
+		jump_dir = val;
+	}
+	
+	/**
+	 * 
+	 */
+	@JSOptionDefinition(
+			name = "jump_platform",
+			description = "This parameter specifies the platform on the jump host",
+			key = "jump_dir",
+			type = "SOSOptionPlatform",
+			mandatory = false)
+	public SOSOptionPlatform jump_platform	= new SOSOptionPlatform(this, conClassName + ".jump_platform", // HashMap-Key
+										"This parameter specifies the platform on the jump host", // Titel
+										SOSOptionPlatform.enuValidPlatforms.unix.name(), // InitValue
+										SOSOptionPlatform.enuValidPlatforms.unix.name(), // DefaultValue
+										false // isMandatory
+								);
+
+	/**
+	* \brief getjump_platform
+	*
+	* \details
+	*
+	* \return
+	*
+	* @return
+	*/
+	public SOSOptionPlatform getjump_platform() {
+	return jump_platform;
+	}
+
+	/**
+	* \brief setjump_platform
+	*
+	* \details
+	*
+	* \return
+	*
+	* @param val
+	*/
+	public void setjump_platform(final SOSOptionPlatform val) {
+		jump_platform = val;
+	}
+	
 	/**
 	* \var local_dir : local_dir Local directory into which or from which
 	*
