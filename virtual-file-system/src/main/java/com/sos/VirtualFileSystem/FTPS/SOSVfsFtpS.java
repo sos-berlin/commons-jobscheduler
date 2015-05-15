@@ -45,9 +45,9 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
 		if (client == null) {
 			try {
 				logger.info(String.format("use %s client security",
-						objConnection2Options.ftps_client_secutity.Value()));
+						objConnection2Options.ftps_client_security.Value()));
 				
-				client = new FTPSClient(objConnection2Options.FtpS_protocol.Value(),objConnection2Options.ftps_client_secutity.isImplicit());
+				client = new FTPSClient(objConnection2Options.FtpS_protocol.Value(),objConnection2Options.ftps_client_security.isImplicit());
 				if(usingProxy()){
 					logger.info(String.format("using proxy: protocol = %s, host = %s, port = %s, user = %s, pass = ?",
 							getProxyProtocol().Value(),

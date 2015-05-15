@@ -1258,29 +1258,29 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	}
 	
 	/**
-	* \var ftps_client_secutity : explicit, implicit
+	* \var ftps_client_security : explicit, implicit
 	*
 	*
 	*/
 	@JSOptionDefinition(
-						name = "ftps_client_secutity",
+						name = "ftps_client_security",
 						description = "FTPS Client Security",
 						key = "ftps_client_secutity",
 						type = "SOSOptionFTPSClientSecurity",
 						mandatory = false)
-	public SOSOptionFTPSClientSecurity	ftps_client_secutity	= new SOSOptionFTPSClientSecurity(this, conClassName + ".ftps_client_secutity", // HashMap-Key
+	public SOSOptionFTPSClientSecurity	ftps_client_security	= new SOSOptionFTPSClientSecurity(this, conClassName + ".ftps_client_security", // HashMap-Key
 													"FTPS Client Security", // Titel
 													SOSOptionFTPSClientSecurity.ClientSecurity.explicit.name(), // InitValue
 													SOSOptionFTPSClientSecurity.ClientSecurity.explicit.name(), // DefaultValue
 													false // isMandatory
 											);
 
-	public SOSOptionFTPSClientSecurity getftps_client_secutity() {
-		return ftps_client_secutity;
+	public SOSOptionFTPSClientSecurity getftps_client_security() {
+		return ftps_client_security;
 	}
 
-	public void setftps_client_secutity(SOSOptionFTPSClientSecurity val) {
-		ftps_client_secutity = val;
+	public void setftps_client_security(SOSOptionFTPSClientSecurity val) {
+		ftps_client_security = val;
 	}
 
 	
