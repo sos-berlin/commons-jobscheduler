@@ -303,9 +303,9 @@ public class JobSchedulerTextProcessor extends Job_impl {
 			//
 			if (spooler_job.order_queue() != null) {
 				spooler_task.order().params().set_var(conReturnParameterSCHEDULER_TEXTPROCESSOR_RESULT, result);
+				spooler_task.order().params().set_var(conReturnParameterSCHEDULER_TEXTPROCESSOR_COMMAND, textProcessor.getCommand());
+				spooler_task.order().params().set_var(conReturnParameterSCHEDULER_TEXTPROCESSOR_PARAM, textProcessor.getParam());
 			}
-			spooler_task.order().params().set_var(conReturnParameterSCHEDULER_TEXTPROCESSOR_COMMAND, textProcessor.getCommand());
-			spooler_task.order().params().set_var(conReturnParameterSCHEDULER_TEXTPROCESSOR_PARAM, textProcessor.getParam());
 			return (spooler_job.order_queue() != null);
 		}
 		catch (Exception e) {
