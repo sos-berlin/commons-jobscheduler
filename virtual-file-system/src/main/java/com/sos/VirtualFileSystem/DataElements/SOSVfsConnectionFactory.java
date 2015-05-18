@@ -160,7 +160,10 @@ public class SOSVfsConnectionFactory {
 			client.TransferMode(objOptions.transfer_mode);
 		}
 		client.ControlEncoding(objOptions.ControlEncoding.Value());
+		
 		// TODO pre-commands for source and target separately
+		/**
+		 * RE wird durch SOSDataExchangeEngine.executePreTransferCommands() gesetzt
 		if (objOptions.PreFtpCommands.IsNotEmpty() && isSource == false) {
 			// TODO Command separator as option
 			for (String strCmd : objOptions.PreFtpCommands.split()) {
@@ -174,7 +177,7 @@ public class SOSVfsConnectionFactory {
 				strCmd = options.replaceVars(strCmd);
 				client.getHandler().ExecuteCommand(strCmd);
 			}
-		}
+		}*/
 	}
 
 	public void clear() {
