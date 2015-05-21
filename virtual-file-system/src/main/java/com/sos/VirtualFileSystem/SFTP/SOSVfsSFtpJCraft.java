@@ -207,6 +207,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		reply = "disconnect OK";
 		if (sftpClient != null) {
 			try {
+      		  
 				sftpClient.exit();
 				if (sftpClient.isConnected()) {
 					sftpClient.disconnect();
@@ -228,6 +229,25 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		}
 		this.logINFO(reply);
 	}
+	
+	@Override
+	public void logout() {
+		try {
+		  
+   		  if ( sshSession != null && sshSession.isConnected() == true) {
+   			    sshSession.disconnect();
+				logDEBUG(SOSVfs_D_138.params(host, getReplyString()));
+			}
+			else {
+				logINFO("not connected, logout useless.");
+			}
+		}
+		catch (Exception e) { 
+			logWARN(SOSVfs_W_140.get() + e.getMessage());
+		}
+	}
+
+	
 
 	@Override public boolean isConnected() {
 		return sftpClient != null && sftpClient.isConnected();
