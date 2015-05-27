@@ -155,10 +155,13 @@ public class SOSEvaluateEvents {
 							continue;
 						}
 						// remove this event should the expiration date be overdue
+						boolean isNever = curEventExpires.getNodeValue().equalsIgnoreCase("never");
 						Calendar expiresDate = GregorianCalendar.getInstance();
 						Calendar now = GregorianCalendar.getInstance();
-						expiresDate.setTime(SOSDate.getTime(curEventExpires.getNodeValue()));
-						if (expiresDate.before(now)) {
+						if (!isNever){
+							expiresDate.setTime(SOSDate.getTime(curEventExpires.getNodeValue()));
+						}
+						if (!isNever && expiresDate.before(now)) {
 							doc.getFirstChild().removeChild(node);
 							expiredNodeCount++;
 						}
