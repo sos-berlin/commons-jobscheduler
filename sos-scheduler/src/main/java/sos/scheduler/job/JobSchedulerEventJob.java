@@ -21,8 +21,6 @@ import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import org.apache.xalan.xslt.EnvironmentCheck;
 import org.apache.xml.serialize.OutputFormat;
@@ -34,7 +32,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import sos.connection.SOSConnection;
 import sos.connection.SOSPgSQLConnection;
@@ -61,6 +58,7 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
  */
 @SuppressWarnings("deprecation")
 public class JobSchedulerEventJob extends JobSchedulerJob {
+	private static final String NEVER_DATE = "2999-01-01 00:00:00";
 	/** event action */
 	private String				eventAction							= "";
 	/** event JobScheduler id */
@@ -321,11 +319,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 				throw new Exception("error occurred processing parameters: " + e.getMessage());
 			}
 			this.setExpirationDate(calculateExpirationDate(expirationCycle, expirationPeriod));
-			try { // to process events
-					// moved to the beginning of spooler_process()
-					// fetch events from global JobScheduler variable
-					// this.getSchedulerEvents();
-				// perform event action
+			try {
 				if (this.getEventAction().equalsIgnoreCase("add")) {
 					this.getLogger().info("adding event: " + this.getEventClass() + " " + this.getEventId());
 					this.addEvent();
@@ -409,11 +403,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 		try {
 			String eventSet = spooler.var(JobSchedulerConstants.eventVariableName);
 			if (this.getConnection() != null && (eventSet == null || eventSet.length() == 0)) {
-				// ??
-				/*if (this.getExpirationPeriod().length() > 0) {
-				    this.getConnection().executeUpdate("DELETE FROM " + this.getTableEvents() + " WHERE \"EXPIRES\"<=%timestamp_iso('" + SOSDate.getTimeAsString(this.getExpirationDate().getTime()) + "') AND (\"SPOOLER_ID\" IS NULL OR \"SPOOLER_ID\"='' OR \"SPOOLER_ID\"='" + spooler.id() + "')");
-				    this.getConnection().commit();
-				}*/
+				 
 				readEventsFromDB(getConnection(), spooler, getEvents(), getLogger());
 			}
 			else {
@@ -439,7 +429,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 					if (node == null || node.getNodeType() != Node.ELEMENT_NODE)
 						continue;
 					Node curEventExpires = node.getAttributes().getNamedItem("expires");
-					if (curEventExpires == null || curEventExpires.getNodeValue() == null || curEventExpires.getNodeValue().length() == 0) {
+					if (curEventExpires == null || curEventExpires.getNodeValue() == null || curEventExpires.getNodeValue().length() == 0 || curEventExpires.getNodeValue().equalsIgnoreCase("never")) {
 						activeNodeCount++;
 						continue;
 					}
@@ -1024,12 +1014,8 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 				event.setAttribute("expires", SOSDate.getTimeAsString(this.getExpirationDate().getTime()));
 			}
 			else
-				if (getEventExpires().equalsIgnoreCase("never")) {
-					getLogger().debug7("event expires: never");
-				}
-				else {
-					event.setAttribute("expires", this.getEventExpires());
-				}
+				event.setAttribute("expires", this.getEventExpires());
+				
 			if (this.getEventParameters() != null && this.getEventParameters().getChildNodes().getLength() > 0) {
 				event.appendChild(this.getEventParameters());
 			}
@@ -1101,6 +1087,11 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 				catch (Exception pe) {
 					this.getLogger().warn(cal.getTime().toString() + " is not a valid Date. Expires will be set to default");
 				}
+			}
+			
+			if (curEventExpires.equalsIgnoreCase("never") ){
+				curEventExpires = NEVER_DATE;
+				this.getLogger().debug3(".. --> curEventExpires:" + curEventExpires);
 			}
 
 			this.getLogger().info(
