@@ -65,7 +65,7 @@ public class JSExistsFile extends JSFileOperationBase {
 			initialize();
 			Options().file.CheckMandatory();
 			Options().file_spec.setRegExpFlags(Pattern.CASE_INSENSITIVE);
-
+			
 			flgOperationWasSuccessful = existsFile(Options().file, Options().file_spec, //
 					Options().min_file_age, Options().max_file_age, Options().min_file_size, Options().max_file_size, //
 					Options().skip_first_files, //

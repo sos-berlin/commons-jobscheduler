@@ -370,8 +370,10 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 		strResultList2File = getParamValue(conParameterRESULT_LIST_FILE, EMPTY_STRING);
 		strOnEmptyResultSet = getParamValue(conParameterON_EMPTY_RESULT_SET, EMPTY_STRING);
 		source = file = filePath = getParamValue(new String[] { conParameterSOURCE_FILE, conParameterFILE, conParameterFILE_PATH }, EMPTY_STRING);
+        String spec = getParamValue(conParameterFILE_SPEC);
+  		
 		fileSpec = getParamValue(new String[] { conParameterFILE_SPEC, conParameterFILE_SPECIFICATION }, strFileSpecDefault);
-		if (isNotEmpty(fileSpec) || isNotEmpty(source)) {
+		if (isNotEmpty(spec) || isNotEmpty(source)) {
 
 		}
 		else { // can be started by a file order source. In this case the name of the file comes as the value of SCHEDULER_WITH_PATH
