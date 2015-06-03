@@ -1218,11 +1218,12 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 	
 	
 	private void changeValue(final String pstrValue) {
-		if (pstrValue != null && pstrValue.equalsIgnoreCase(strValue) == false) {
+		// Das "if" macht jeder isDirty-Abfrage unsicher
+//		if (pstrValue != null && pstrValue.equalsIgnoreCase(strValue) == false) {
 			strValue = pstrValue;
 			setDirty();
 			raiseValueChangedListener();
-		}
+//		}
 	}
 
 	/**
