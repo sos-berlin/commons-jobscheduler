@@ -30,13 +30,12 @@ import org.apache.log4j.Logger;
 
 import sos.util.SOSString;
 
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
-import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsSuperClass;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
-import com.sos.VirtualFileSystem.exceptions.JADEException;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 /**
@@ -139,30 +138,32 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 			Exception exx = ex;
 
 			this.disconnect();
-
+			
 			if (connection2OptionsAlternate != null) {
-				SOSConnection2OptionsSuperClass optionsAlternatives = connection2OptionsAlternate.Alternatives();
-				if (!optionsAlternatives.host.IsEmpty() && !optionsAlternatives.user.IsEmpty()) {
-					logger.info(SOSVfs_I_170.params(connection2OptionsAlternate.Alternatives().host.Value()));
+				SOSConnection2OptionsAlternate optionsAlternatives = connection2OptionsAlternate.Alternatives();
+				if (optionsAlternatives.optionsHaveMinRequirements()) {
+					logger.warn(ex);
+					logINFO(SOSVfs_I_170.params(optionsAlternatives.host.Value()));
+					JobSchedulerException.LastErrorMessage = "";
 					try {
 						proxyHost = optionsAlternatives.proxy_host.Value();
 						proxyPort = optionsAlternatives.proxy_port.value();
 						proxyUser = optionsAlternatives.proxy_user.Value();
 						proxyPassword = optionsAlternatives.proxy_password.Value();
-												
+						optionsAlternatives.AlternateOptionsUsed.value(true);
 						this.connect(optionsAlternatives.host.Value(), 
 								optionsAlternatives.port.value());
 						this.doAuthenticate(optionsAlternatives);
 						exx = null;
 					}
 					catch (Exception e) {
+						logger.error(e);
 						exx = e;
 					}
 				}
 			}
-
 			if (exx != null) {
-				RaiseException(exx, SOSVfs_E_168.get());
+				throw new JobSchedulerException(exx);
 			}
 		}
 
@@ -450,7 +451,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 				this.LogReply();
 			}
 			catch(Exception ex){
-				throw new JADEException(ex);
+				throw new JobSchedulerException(ex);
 			}
 		}
 		else {

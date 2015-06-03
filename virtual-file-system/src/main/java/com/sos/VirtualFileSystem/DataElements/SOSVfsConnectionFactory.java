@@ -10,6 +10,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
+import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 
 /**
  * @author KB
@@ -22,6 +23,7 @@ public class SOSVfsConnectionFactory {
 	protected SOSFTPOptions									objOptions			= null;
 	private SOSVfsConnectionPool							objConnPoolSource	= null;
 	private SOSVfsConnectionPool							objConnPoolTarget	= null;
+	private boolean alternativeConnectionInUse = false;
 
 	/**
 	 *
@@ -108,17 +110,25 @@ public class SOSVfsConnectionFactory {
 	}
 
 	private void doConnect(final ISOSVFSHandler objVFS4Handler, final SOSConnection2OptionsAlternate objConnectOptions) {
+		alternativeConnectionInUse = false;
 		try {
 			objVFS4Handler.Connect(objConnectOptions);
 		}
 		catch (Exception e) { // Problem to connect, try alternate host
 			// TODO respect alternate data-source type? alternate port etc. ?
-			JobSchedulerException.LastErrorMessage = "";
-			try {
-				objVFS4Handler.Connect(objConnectOptions.Alternatives());
-				objConnectOptions.setAlternateOptionsUsed("true");
+			SOSConnection2OptionsAlternate alternatives = objConnectOptions.Alternatives();
+			if (alternatives.optionsHaveMinRequirements()) {
+				logger.warn(e);
+				logger.info(SOSVfsMessageCodes.SOSVfs_I_170.params(alternatives.host.Value()));
+				try {
+					JobSchedulerException.LastErrorMessage = "";
+					objVFS4Handler.Connect(alternatives);
+					alternativeConnectionInUse = true;
+				} catch (Exception e1) {
+					throw new JobSchedulerException(e1);
+				}
 			}
-			catch (Exception e1) {
+			else {
 				throw new JobSchedulerException(e);
 			}
 			// TODO get an instance of .Alternatives for Authentication ...
@@ -128,19 +138,41 @@ public class SOSVfsConnectionFactory {
 	private void doAuthenticate(final ISOSVFSHandler objVFS4Handler, final SOSConnection2OptionsAlternate objConnectOptions, final boolean pflgIsDataSource)
 			throws Exception {
 		try {
-			objVFS4Handler.Authenticate(objConnectOptions);
-		}
-		catch (Exception e) { // SOSFTP-113: Problem to login, try alternate User
-			// TODO respect alternate authentication, eg password and/or public key
-			JobSchedulerException.LastErrorMessage = "";
-			try {
-				objVFS4Handler.Authenticate(objConnectOptions.Alternatives());
+			if (alternativeConnectionInUse) {
+				alternativeAuthenticate(objVFS4Handler, objConnectOptions);
 			}
-			catch (RuntimeException e1) {
-				throw e1;
+			else {
+				objVFS4Handler.Authenticate(objConnectOptions);
 			}
-			objConnectOptions.setAlternateOptionsUsed("true");
 		}
+		catch (Exception e) {
+			alternativeAuthenticate(objVFS4Handler, objConnectOptions, e);
+		}
+		afterAuthenticate(objVFS4Handler, objConnectOptions, pflgIsDataSource);
+	}
+	
+	
+	private void alternativeAuthenticate(ISOSVFSHandler objVFS4Handler, SOSConnection2OptionsAlternate objConnectOptions) throws Exception {
+		alternativeAuthenticate(objVFS4Handler, objConnectOptions, null);
+	}
+	
+	private void alternativeAuthenticate(ISOSVFSHandler objVFS4Handler, SOSConnection2OptionsAlternate objConnectOptions, Exception e) throws Exception {
+		SOSConnection2OptionsAlternate alternatives = objConnectOptions.Alternatives();
+		if (alternatives.optionsHaveMinRequirements()) {
+			if(e != null) {
+				logger.warn(e);
+				logger.info(SOSVfsMessageCodes.SOSVfs_I_170.params(alternatives.host.Value()));
+				JobSchedulerException.LastErrorMessage = "";
+			}
+			alternatives.AlternateOptionsUsed.value(true);
+			objVFS4Handler.Authenticate(alternatives);
+		}
+		else {
+			if(e != null) throw e;
+		}
+	}
+	
+	private void afterAuthenticate(final ISOSVFSHandler objVFS4Handler, final SOSConnection2OptionsAlternate objConnectOptions, final boolean pflgIsDataSource) throws Exception {
 		ISOSVfsFileTransfer objDataClient = (ISOSVfsFileTransfer) objVFS4Handler;
 		if (objOptions.passive_mode.value() || objConnectOptions.passive_mode.isTrue()) {
 			objDataClient.passive();

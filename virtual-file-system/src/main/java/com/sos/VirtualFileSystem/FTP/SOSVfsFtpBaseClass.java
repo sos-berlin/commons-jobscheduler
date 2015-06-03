@@ -436,6 +436,9 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 			// TODO find the "Microsoft FTP Server" String from the reply and set the HostType accordingly
 			// TODO respect Proxy-Server. implement handling of
 		}
+		catch (JobSchedulerException e) {
+			throw e;
+		}
 		catch (Exception e) {
 			RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
 		}
@@ -1226,10 +1229,10 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::login";
 		gstrUser = strUserName;
 		try {
-			logger.debug(SOSVfs_D_132.params(strUserName));
 			Client().login(strUserName, strPassword);
 			LogReply();
 			if (objFTPReply.isSuccessCode()) {
+				logger.debug(SOSVfs_D_132.params(strUserName));
 				objProtocolCommandListener.setClientId(HostID(""));
 				logger.debug(HostID(SOSVfs_D_133.params(strUserName)));
 				try {
@@ -1239,7 +1242,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 				}
 			}
 			else {
-				// SOSFTP-113
+				logger.info(SOSVfs_D_132.params(strUserName));
 				throw new Exception(SOSVfs_E_134.params("Login"));
 			}
 		}
