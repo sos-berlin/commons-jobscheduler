@@ -340,7 +340,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 				//				}
 			}
 			else {
-				logger.warn(SOSVfs_D_0102.params(host, port));
+				logger.warn(SOSVfs_D_0103.params(host, port));
 			}
 		}
 		catch (Exception e) {
@@ -623,7 +623,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 		String strT;
 		try {
 			strT = Client().getSystemType();
-			logger.info(String.format("System-Type = %1$s", strT));
+			logger.debug(String.format("System-Type = %1$s", strT));
 		}
 		catch (IOException e) {
 			logger.info(e.getLocalizedMessage());
@@ -686,6 +686,9 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 			logger.debug(SOSVfs_D_141.params("pwd"));
 			lstrCurrentPath = getCurrentPath();
 		}
+		catch (JobSchedulerException e) {
+			throw e;
+		}
 		catch (Exception e) {
 			RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
 		}
@@ -718,6 +721,9 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 			if (rc == false) {
 				throw new JobSchedulerException(SOSVfs_E_142.get());
 			}
+		}
+		catch (JobSchedulerException e) {
+			throw e;
 		}
 		catch (IOException e) {
 			throw new JobSchedulerException(SOSVfs_E_130.params("get"), e);
@@ -835,6 +841,9 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 				return totalBytes;
 			else
 				return -1L;
+		}
+		catch (JobSchedulerException e) {
+			throw e;
 		}
 		catch (IOException e) {
 			RaiseException(e, SOSVfs_E_130.params("getFile"));
@@ -1074,6 +1083,9 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 				throw new JobSchedulerException(String.format("unable to get inputstream for file '%1$s'", strFileName));
 			}
 		}
+		catch (JobSchedulerException e) {
+			throw e;
+		}
 		catch (IOException e) {
 			RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
 		}
@@ -1245,6 +1257,9 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 				logger.info(SOSVfs_D_132.params(strUserName));
 				throw new Exception(SOSVfs_E_134.params("Login"));
 			}
+		}
+		catch (JobSchedulerException e) {
+			throw e;
 		}
 		catch (Exception e) {
 			// avoid logger.error because there could be an alternative login
@@ -1440,6 +1455,9 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 				RaiseException(SOSVfs_E_142.params("put"));
 			}
 		}
+		catch (JobSchedulerException e) {
+			throw e;
+		}
 		catch (Exception e) {
 			RaiseException(e, SOSVfs_E_130.params("put"));
 		}
@@ -1515,6 +1533,9 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 				RaiseException(SOSVfs_E_144.params("getFile()", localFile, getReplyString()));
 			}
 			return lngTotalBytesWritten;
+		}
+		catch (JobSchedulerException e) {
+			throw e;
 		}
 		catch (Exception e) {
 			RaiseException(e, SOSVfs_E_130.params("putfile"));

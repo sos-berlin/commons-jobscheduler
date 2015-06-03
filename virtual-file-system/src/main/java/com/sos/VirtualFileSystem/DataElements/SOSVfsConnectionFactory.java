@@ -10,7 +10,6 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
-import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 
 /**
  * @author KB
@@ -23,7 +22,6 @@ public class SOSVfsConnectionFactory {
 	protected SOSFTPOptions									objOptions			= null;
 	private SOSVfsConnectionPool							objConnPoolSource	= null;
 	private SOSVfsConnectionPool							objConnPoolTarget	= null;
-	private boolean alternativeConnectionInUse = false;
 
 	/**
 	 *
@@ -71,133 +69,113 @@ public class SOSVfsConnectionFactory {
 		}
 	}
 
-	private ISOSVFSHandler getVfsHandler(final boolean pflgIsDatasource) {
-		ISOSVFSHandler objVFS4Handler = null;
+	/**
+	 * 
+	 * @param isSource
+	 * @return
+	 */
+	private ISOSVFSHandler getVfsHandler(final boolean isSource) {
+		ISOSVFSHandler handler = null;
 		try {
-			SOSConnection2OptionsAlternate objConnectOptions;
-			String strDataType;
-			if (pflgIsDatasource) {
-				objConnectOptions = objOptions.getConnectionOptions().Source();
-				strDataType = objOptions.getDataSourceType();
+			SOSConnection2OptionsAlternate options;
+			String dataType;
+			if (isSource) {
+				options = objOptions.getConnectionOptions().Source();
+				dataType = objOptions.getDataSourceType();
 			}
 			else {
-				objConnectOptions = objOptions.getConnectionOptions().Target();
-				strDataType = objOptions.getDataTargetType();
+				options = objOptions.getConnectionOptions().Target();
+				dataType = objOptions.getDataTargetType();
 			}
-			objConnectOptions.loadClassName.SetIfNotDirty(objOptions.getConnectionOptions().loadClassName);
-			VFSFactory.setConnectionOptions(objConnectOptions);
-			objVFS4Handler = VFSFactory.getHandler(strDataType);
-			objVFS4Handler.Options(objOptions);
-			if (pflgIsDatasource) {
-				objVFS4Handler.setSource();
-				doConnect(objVFS4Handler, objConnectOptions);
-				doAuthenticate(objVFS4Handler, objConnectOptions, pflgIsDatasource);
+			options.loadClassName.SetIfNotDirty(objOptions.getConnectionOptions().loadClassName);
+			VFSFactory.setConnectionOptions(options);
+			handler = VFSFactory.getHandler(dataType);
+			handler.Options(objOptions);
+			
+			if (isSource) {
+				handler.setSource();
 			}
-			else {
-				objVFS4Handler.setTarget();
-				// TODO implement lazyconnectionmode
-				doConnect(objVFS4Handler, objConnectOptions);
-				String strAuthMethod = objConnectOptions.getAuth_method().Value();
-				doAuthenticate(objVFS4Handler, objConnectOptions, pflgIsDatasource);
+			else{
+				handler.setTarget();
 			}
-		}
-		catch (Exception ex) {
-			//			https://change.sos-berlin.com/browse/SOSFTP-212
-			//			throw (RuntimeException) ex;
-			throw new JobSchedulerException(ex);
-		}
-		return objVFS4Handler;
-	}
-
-	private void doConnect(final ISOSVFSHandler objVFS4Handler, final SOSConnection2OptionsAlternate objConnectOptions) {
-		alternativeConnectionInUse = false;
-		try {
-			objVFS4Handler.Connect(objConnectOptions);
-		}
-		catch (Exception e) { // Problem to connect, try alternate host
-			// TODO respect alternate data-source type? alternate port etc. ?
-			SOSConnection2OptionsAlternate alternatives = objConnectOptions.Alternatives();
-			if (alternatives.optionsHaveMinRequirements()) {
-				logger.warn(e);
-				logger.info(SOSVfsMessageCodes.SOSVfs_I_170.params(alternatives.host.Value()));
-				try {
+			
+			ISOSVfsFileTransfer client = (ISOSVfsFileTransfer)handler;
+			try{
+				handler.Connect(options);
+				handler.Authenticate(options);
+			}
+			catch(Exception e){
+				
+				SOSConnection2OptionsAlternate alternatives = options.Alternatives();
+				if (alternatives.optionsHaveMinRequirements()) {
+					// TODO respect alternate authentication, eg password and/or public key
+					logger.warn(String.format("Connection failed : %s", e.toString()));
+					logger.info(String.format("Try again using the alternate options ..."));
+					logger.debug(alternatives.dirtyString());
+						
 					JobSchedulerException.LastErrorMessage = "";
-					objVFS4Handler.Connect(alternatives);
-					alternativeConnectionInUse = true;
-				} catch (Exception e1) {
-					throw new JobSchedulerException(e1);
+						
+					try{
+						client.disconnect();
+					}
+					catch(Exception ce){
+						logger.warn(String.format("client disconnect failed : %s",ce.toString()));
+					}
+						
+					handler.Connect(alternatives);
+					handler.Authenticate(alternatives);
+					
+					alternatives.AlternateOptionsUsed.value(true);
+				}
+				else{
+					logger.error(String.format("Connection failed : %s", e.toString()));
+					logger.debug(String.format("alternate options are not defined"));
+					throw e;
 				}
 			}
-			else {
-				throw new JobSchedulerException(e);
-			}
-			// TODO get an instance of .Alternatives for Authentication ...
+			
+			handleClient(client, options, isSource);
 		}
+		catch (JobSchedulerException ex) {
+			throw ex;
+		}
+		catch (Exception ex) {
+			throw new JobSchedulerException(ex);
+		}
+		return handler;
 	}
 
-	private void doAuthenticate(final ISOSVFSHandler objVFS4Handler, final SOSConnection2OptionsAlternate objConnectOptions, final boolean pflgIsDataSource)
-			throws Exception {
-		try {
-			if (alternativeConnectionInUse) {
-				alternativeAuthenticate(objVFS4Handler, objConnectOptions);
-			}
-			else {
-				objVFS4Handler.Authenticate(objConnectOptions);
-			}
-		}
-		catch (Exception e) {
-			alternativeAuthenticate(objVFS4Handler, objConnectOptions, e);
-		}
-		afterAuthenticate(objVFS4Handler, objConnectOptions, pflgIsDataSource);
-	}
-	
-	
-	private void alternativeAuthenticate(ISOSVFSHandler objVFS4Handler, SOSConnection2OptionsAlternate objConnectOptions) throws Exception {
-		alternativeAuthenticate(objVFS4Handler, objConnectOptions, null);
-	}
-	
-	private void alternativeAuthenticate(ISOSVFSHandler objVFS4Handler, SOSConnection2OptionsAlternate objConnectOptions, Exception e) throws Exception {
-		SOSConnection2OptionsAlternate alternatives = objConnectOptions.Alternatives();
-		if (alternatives.optionsHaveMinRequirements()) {
-			if(e != null) {
-				logger.warn(e);
-				logger.info(SOSVfsMessageCodes.SOSVfs_I_170.params(alternatives.host.Value()));
-				JobSchedulerException.LastErrorMessage = "";
-			}
-			alternatives.AlternateOptionsUsed.value(true);
-			objVFS4Handler.Authenticate(alternatives);
-		}
-		else {
-			if(e != null) throw e;
-		}
-	}
-	
-	private void afterAuthenticate(final ISOSVFSHandler objVFS4Handler, final SOSConnection2OptionsAlternate objConnectOptions, final boolean pflgIsDataSource) throws Exception {
-		ISOSVfsFileTransfer objDataClient = (ISOSVfsFileTransfer) objVFS4Handler;
-		if (objOptions.passive_mode.value() || objConnectOptions.passive_mode.isTrue()) {
-			objDataClient.passive();
+	/**
+	 * 
+	 * @param client
+	 * @throws Exception
+	 */
+	private void handleClient(ISOSVfsFileTransfer client,SOSConnection2OptionsAlternate options,boolean isSource) throws Exception{
+		if (objOptions.passive_mode.value() || options.passive_mode.isTrue()) {
+			client.passive();
 		}
 		//objConnectOptions.transfer_mode is not used?
-		if (objConnectOptions.transfer_mode.isDirty() && objConnectOptions.transfer_mode.IsNotEmpty()) {
-			objDataClient.TransferMode(objConnectOptions.transfer_mode);
+		if (options.transfer_mode.isDirty() && options.transfer_mode.IsNotEmpty()) {
+			client.TransferMode(options.transfer_mode);
 		}
 		else {
-			objDataClient.TransferMode(objOptions.transfer_mode);
+			client.TransferMode(objOptions.transfer_mode);
 		}
-		objDataClient.ControlEncoding(objOptions.ControlEncoding.Value());
+		client.ControlEncoding(objOptions.ControlEncoding.Value());
+		
 		// TODO pre-commands for source and target separately
-		if (objOptions.PreFtpCommands.IsNotEmpty() && pflgIsDataSource == false) {
+		if (objOptions.PreFtpCommands.IsNotEmpty() && isSource == false) {
 			// TODO Command separator as option
 			for (String strCmd : objOptions.PreFtpCommands.split()) {
 				strCmd = objOptions.replaceVars(strCmd);
-				objDataClient.getHandler().ExecuteCommand(strCmd);
+				client.getHandler().ExecuteCommand(strCmd);
 			}
 		}
-		if (objConnectOptions.PreFtpCommands.IsNotEmpty()) {
+		if (options.PreFtpCommands.IsNotEmpty()) {
 			// TODO Command separator as option
-			for (String strCmd : objConnectOptions.PreFtpCommands.split()) {
-				strCmd = objConnectOptions.replaceVars(strCmd);
-				objDataClient.getHandler().ExecuteCommand(strCmd);
+			for (String strCmd : options.PreFtpCommands.split()) {
+				strCmd = options.replaceVars(strCmd);
+				client.getHandler().ExecuteCommand(strCmd);
 			}
 		}
 	}
