@@ -105,10 +105,13 @@ public class SOSVfsConnectionFactory {
 				handler.Authenticate(options);
 			}
 			catch(Exception e){
-				if (!options.Alternatives().host.IsEmpty() && !options.Alternatives().user.IsEmpty()) {
+				
+				SOSConnection2OptionsAlternate alternatives = options.Alternatives();
+				if (alternatives.optionsHaveMinRequirements()) {
 					// TODO respect alternate authentication, eg password and/or public key
-					logger.info(String.format("Connection failed : %s", e.toString()));
+					logger.warn(String.format("Connection failed : %s", e.toString()));
 					logger.info(String.format("Try again using the alternate options ..."));
+					logger.debug(alternatives.dirtyString());
 						
 					JobSchedulerException.LastErrorMessage = "";
 						
@@ -119,12 +122,13 @@ public class SOSVfsConnectionFactory {
 						logger.warn(String.format("client disconnect failed : %s",ce.toString()));
 					}
 						
-					handler.Connect(options.Alternatives());
-					handler.Authenticate(options.Alternatives());
+					handler.Connect(alternatives);
+					handler.Authenticate(alternatives);
 					
-					options.setAlternateOptionsUsed("true");
+					alternatives.AlternateOptionsUsed.value(true);
 				}
 				else{
+					logger.error(String.format("Connection failed : %s", e.toString()));
 					logger.debug(String.format("alternate options are not defined"));
 					throw e;
 				}
@@ -136,8 +140,6 @@ public class SOSVfsConnectionFactory {
 			throw ex;
 		}
 		catch (Exception ex) {
-			//			https://change.sos-berlin.com/browse/SOSFTP-212
-			//			throw (RuntimeException) ex;
 			throw new JobSchedulerException(ex);
 		}
 		return handler;

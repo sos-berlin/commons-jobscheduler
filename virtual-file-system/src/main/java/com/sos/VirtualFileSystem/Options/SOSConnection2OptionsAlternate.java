@@ -453,4 +453,33 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 	public void AlternativeOptions(final SOSConnection2OptionsAlternate pobjAlternativeOptions) {
 		objAlternativeOptions = pobjAlternativeOptions;
 	}
+	
+	
+	/**
+	 * \brief optionsHaveMinRequirements
+	 *
+	 * \details
+	 * is used before alternative connection is used to check 
+	 * wether host, port, user is set
+	 *
+	 * @return boolean
+	 */
+	public boolean optionsHaveMinRequirements() {
+		if (AlternateOptionsUsed.isTrue()) {
+			return false;
+		}
+		if (protocol.Value().equalsIgnoreCase("local")) {
+			return false;
+		}
+		if (host.isNotDirty() || host.IsEmpty()) {
+			return false;
+		}
+		if (port.isNotDirty() || port.value() <= 0) {
+			return false;
+		}
+		if (user.isNotDirty() || user.IsEmpty()) {
+			return false;
+		}
+		return true;
+	}
 }

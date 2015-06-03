@@ -42,7 +42,6 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 	private final String				conClassName	= this.getClass().getSimpleName();
 	@SuppressWarnings("unused")
 	private static final String			conSVNVersion	= "$Id$";
-	@SuppressWarnings("unused")
 	private final Logger				logger			= Logger.getLogger(this.getClass());
 
 	private NtlmPasswordAuthentication	authentication	= null;
@@ -72,7 +71,6 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 	 */
 	@Override
 	public ISOSConnection Connect() {
-		@SuppressWarnings("unused")
 		SOSConnection2OptionsAlternate pConnection2OptionsAlternate = null;
 		this.Connect(pConnection2OptionsAlternate);
 		return this;
@@ -122,35 +120,12 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 
 			this.doAuthenticate(authenticationOptions);
 		}
-		catch (Exception ex) {
-			Exception exx = ex;
-
-			this.disconnect();
-
-			if (connection2OptionsAlternate != null) {
-				SOSConnection2OptionsSuperClass optionsAlternatives = connection2OptionsAlternate.Alternatives();
-				if (!optionsAlternatives.host.IsEmpty() && !optionsAlternatives.user.IsEmpty()) {
-					logINFO(SOSVfs_I_170.params(connection2OptionsAlternate.Alternatives().host.Value()));
-					try {
-
-						domain = optionsAlternatives.domain.Value();
-						host = optionsAlternatives.host.Value();
-						port = optionsAlternatives.port.value();
-
-						this.doAuthenticate(optionsAlternatives);
-						exx = null;
-					}
-					catch (Exception e) {
-						exx = e;
-					}
-				}
-			}
-
-			if (exx != null) {
-				RaiseException(exx, SOSVfs_E_168.get());
-			}
+		catch (JobSchedulerException ex) {
+			throw ex;
 		}
-
+		catch (Exception ex) {
+			throw new JobSchedulerException(ex);
+		}
 		return this;
 	}
 

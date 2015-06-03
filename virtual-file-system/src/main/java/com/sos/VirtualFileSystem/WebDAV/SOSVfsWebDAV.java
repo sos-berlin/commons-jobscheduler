@@ -111,10 +111,12 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 
 			this.doAuthenticate(authenticationOptions);
 		}
-		catch (Exception ex) {
-			RaiseException(ex, SOSVfs_E_168.get());
+		catch (JobSchedulerException ex) {
+			throw ex;
 		}
-
+		catch (Exception ex) {
+			throw new JobSchedulerException(ex);
+		}
 		return this;
 	}
 

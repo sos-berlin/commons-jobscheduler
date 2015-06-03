@@ -159,8 +159,10 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 			
 			this.doAuthenticate(authenticationOptions);
 		}
+		catch (JobSchedulerException ex) {
+			throw ex;
+		}
 		catch (Exception ex) {
-			//https://change.sos-berlin.com/browse/SOSFTP-212
 			throw new JobSchedulerException(ex);
 		}
 		return this;
@@ -207,7 +209,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		reply = "disconnect OK";
 		if (sftpClient != null) {
 			try {
-      		  
 				sftpClient.exit();
 				if (sftpClient.isConnected()) {
 					sftpClient.disconnect();

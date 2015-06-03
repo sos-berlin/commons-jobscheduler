@@ -30,13 +30,13 @@ import org.apache.log4j.Logger;
 
 import sos.util.SOSString;
 
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
-import com.sos.VirtualFileSystem.exceptions.JADEException;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 /**
@@ -117,10 +117,12 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 		try {
 			this.doAuthenticate(authenticationOptions);
 		}
-		catch (Exception ex) {
-			RaiseException(ex, SOSVfs_E_168.get());
+		catch (JobSchedulerException ex) {
+			throw ex;
 		}
-
+		catch (Exception ex) {
+			throw new JobSchedulerException(ex);
+		}
 		return this;
 	}
 
@@ -398,7 +400,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 				this.LogReply();
 			}
 			catch(Exception ex){
-				throw new JADEException(ex);
+				throw new JobSchedulerException(ex);
 			}
 		}
 		else {
