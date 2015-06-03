@@ -25,7 +25,6 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
-import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsSuperClass;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
@@ -41,7 +40,6 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 	private final String				conClassName	= this.getClass().getSimpleName();
 	@SuppressWarnings("unused")
 	private static final String			conSVNVersion	= "$Id$";
-	@SuppressWarnings("unused")
 	private final Logger				logger			= Logger.getLogger(this.getClass());
 
 	private NtlmPasswordAuthentication	authentication	= null;
@@ -71,7 +69,6 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 	 */
 	@Override
 	public ISOSConnection Connect() {
-		@SuppressWarnings("unused")
 		SOSConnection2OptionsAlternate pConnection2OptionsAlternate = null;
 		this.Connect(pConnection2OptionsAlternate);
 		return this;
@@ -121,36 +118,12 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 
 			this.doAuthenticate(authenticationOptions);
 		}
-		catch (Exception ex) {
-			Exception exx = ex;
-
-			this.disconnect();
-			
-			if (connection2OptionsAlternate != null) {
-				SOSConnection2OptionsAlternate alternatives = connection2OptionsAlternate.Alternatives();
-				if (alternatives.optionsHaveMinRequirements()) {
-					logger.warn(ex);
-					logINFO(SOSVfs_I_170.params(alternatives.host.Value()));
-					JobSchedulerException.LastErrorMessage = "";
-					try {
-						domain = alternatives.domain.Value();
-						host = alternatives.host.Value();
-						port = alternatives.port.value();
-						alternatives.AlternateOptionsUsed.value(true);
-						this.doAuthenticate(alternatives);
-						exx = null;
-					}
-					catch (Exception e) {
-						logger.error(e);
-						exx = e;
-					}
-				}
-			}
-			if (exx != null) {
-				throw new JobSchedulerException(exx);
-			}
+		catch (JobSchedulerException ex) {
+			throw ex;
 		}
-
+		catch (Exception ex) {
+			throw new JobSchedulerException(ex);
+		}
 		return this;
 	}
 
@@ -284,6 +257,10 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 
 			reply = "rmdir OK";
 			logger.info(HostID(SOSVfs_D_181.params("rmdir", path, getReplyString())));
+		}
+		catch (JobSchedulerException e) {
+			reply = e.toString();
+			throw e;
 		}
 		catch (Exception e) {
 			reply = e.toString();

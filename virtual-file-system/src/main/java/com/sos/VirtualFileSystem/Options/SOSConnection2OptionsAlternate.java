@@ -469,7 +469,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 			return false;
 		}
 		if (protocol.Value().equalsIgnoreCase("local")) {
-			return true;
+			return false;
 		}
 		if (host.isNotDirty() || host.IsEmpty()) {
 			return false;

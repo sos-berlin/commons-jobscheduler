@@ -134,39 +134,12 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 		try {
 			this.doAuthenticate(authenticationOptions);
 		}
-		catch (Exception ex) {
-			Exception exx = ex;
-
-			this.disconnect();
-			
-			if (connection2OptionsAlternate != null) {
-				SOSConnection2OptionsAlternate optionsAlternatives = connection2OptionsAlternate.Alternatives();
-				if (optionsAlternatives.optionsHaveMinRequirements()) {
-					logger.warn(ex);
-					logINFO(SOSVfs_I_170.params(optionsAlternatives.host.Value()));
-					JobSchedulerException.LastErrorMessage = "";
-					try {
-						proxyHost = optionsAlternatives.proxy_host.Value();
-						proxyPort = optionsAlternatives.proxy_port.value();
-						proxyUser = optionsAlternatives.proxy_user.Value();
-						proxyPassword = optionsAlternatives.proxy_password.Value();
-						optionsAlternatives.AlternateOptionsUsed.value(true);
-						this.connect(optionsAlternatives.host.Value(), 
-								optionsAlternatives.port.value());
-						this.doAuthenticate(optionsAlternatives);
-						exx = null;
-					}
-					catch (Exception e) {
-						logger.error(e);
-						exx = e;
-					}
-				}
-			}
-			if (exx != null) {
-				throw new JobSchedulerException(exx);
-			}
+		catch (JobSchedulerException ex) {
+			throw ex;
 		}
-
+		catch (Exception ex) {
+			throw new JobSchedulerException(ex);
+		}
 		return this;
 	}
 

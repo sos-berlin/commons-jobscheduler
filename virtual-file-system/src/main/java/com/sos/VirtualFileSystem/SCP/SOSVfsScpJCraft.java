@@ -126,31 +126,11 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
 		try {
 			this.doAuthenticate(authenticationOptions);
 		}
+		catch (JobSchedulerException ex) {
+			throw ex;
+		}
 		catch (Exception ex) {
-			Exception exx = ex;
-			this.disconnect();
-			if (connection2OptionsAlternate != null) {
-				SOSConnection2OptionsAlternate alternatives = connection2OptionsAlternate.Alternatives();
-				if (alternatives.optionsHaveMinRequirements()) {
-					logger.warn(ex);
-					logINFO(SOSVfs_I_170.params(alternatives.host.Value()));
-					JobSchedulerException.LastErrorMessage = "";
-					try {
-						host = alternatives.host.Value();
-						port = alternatives.port.value();
-						alternatives.AlternateOptionsUsed.value(true);
-						this.doAuthenticate(alternatives);
-						exx = null;
-					}
-					catch (Exception e) {
-						logger.error(e);
-						exx = e;
-					}
-				}
-			}
-			if (exx != null) {
-				throw new JobSchedulerException(exx);
-			}
+			throw new JobSchedulerException(ex);
 		}
 		return this;
 	}
