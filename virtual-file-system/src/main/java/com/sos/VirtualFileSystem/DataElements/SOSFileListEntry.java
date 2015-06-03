@@ -104,6 +104,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	private String					strTargetFileName				= null;
 	private long					lngNoOfBytesTransferred			= 0;
 	private long					lngFileSize						= -1L;
+	private long					lastCheckedFileSize			    = -1L;
 	private long					lngFileModDate					= -1L;
 	private final String			strZipFileName					= "";
 	private long					lngTransferProgress				= 0;
@@ -489,6 +490,14 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		return lngFileSize;
 	}
 
+	public Long getLastCheckedFileSize() {
+		return lastCheckedFileSize;
+	}
+	
+	public void setLastCheckedFileSize(Long fileSize) {
+		lastCheckedFileSize = fileSize;
+	}
+	
 	@Override public String getLastErrorMessage() {
 		return EMPTY_STRING;
 	}
@@ -1126,10 +1135,14 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		objDataTargetClient = objParent.objDataTargetClient;
 		if (objDataSourceClient != null) {
 			ISOSVirtualFile sourceFile = objDataSourceClient.getFileHandle(strSourceFileName);
-			lngOriginalFileSize = sourceFile.getFileSize();
-			lngFileSize = lngOriginalFileSize;
-			lngFileModDate = sourceFile.getModificationDateTime();
+			setSourceFileProperties(sourceFile);
 		}
+	}
+	
+	public void setSourceFileProperties(ISOSVirtualFile file){
+		lngOriginalFileSize = file.getFileSize();
+		lngFileSize = lngOriginalFileSize;
+		lngFileModDate = file.getModificationDateTime();
 	}
 
 	public void setRemoteFileName(final String pstrRemoteFileName) {
