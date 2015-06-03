@@ -131,23 +131,25 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 			Exception exx = ex;
 			this.disconnect();
 			if (connection2OptionsAlternate != null) {
-				SOSConnection2OptionsSuperClass optionsAlternatives = connection2OptionsAlternate.Alternatives();
-				if (!optionsAlternatives.host.IsEmpty() && !optionsAlternatives.user.IsEmpty()) {
-					logINFO(SOSVfs_I_170.params(connection2OptionsAlternate.Alternatives().host.Value()));
+				SOSConnection2OptionsAlternate alternatives = connection2OptionsAlternate.Alternatives();
+				if (alternatives.optionsHaveMinRequirements()) {
+					logger.warn(ex);
+					logINFO(SOSVfs_I_170.params(alternatives.host.Value()));
+					JobSchedulerException.LastErrorMessage = "";
 					try {
-						host = optionsAlternatives.host.Value();
-						port = optionsAlternatives.port.value();
-						this.doAuthenticate(optionsAlternatives);
+						host = alternatives.host.Value();
+						port = alternatives.port.value();
+						alternatives.AlternateOptionsUsed.value(true);
+						this.doAuthenticate(alternatives);
 						exx = null;
 					}
 					catch (Exception e) {
+						logger.error(e);
 						exx = e;
 					}
 				}
 			}
 			if (exx != null) {
-				//				https://change.sos-berlin.com/browse/SOSFTP-212
-				//				throw (RuntimeException) exx;
 				throw new JobSchedulerException(exx);
 			}
 		}
