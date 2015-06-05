@@ -859,7 +859,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   public SOSOptionString ssh_job_kill_pid_command = new SOSOptionString(this, conClassName + ".ssh_job_kill_pid_command", 
       "The command to to kill a remote running pid", // Titel
       "", // InitValue
-      "kill -9 ${pid}", // DefaultValue
+      "pkill -9 ${pid}", // DefaultValue
       false // isMandatory
   );
 
@@ -901,6 +901,22 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
 
   public void setssh_job_get_pid_command(SOSOptionString ssh_job_get_pid_command) {
     this.ssh_job_get_pid_command = ssh_job_get_pid_command;
+  }
+  
+  @JSOptionDefinition(name = "ssh_job_get_child_processes_command", description = "The command to get the child processes related to the given pid", key = "ssh_job_get_child_processes_command", type = "SOSOptionString", mandatory = false)
+  public SOSOptionString ssh_job_get_child_processes_command = new SOSOptionString(this, conClassName + ".ssh_job_get_child_processes_command", 
+      "The command to get the child processes related to the given pid", // Titel
+      "", // InitValue
+      "/bin/ps -ef | pgrep -P${pid}", // DefaultValue
+      false // isMandatory
+  );
+
+  public SOSOptionString getssh_job_get_child_processes_command() {
+    return ssh_job_get_child_processes_command;
+  }
+
+  public void setssh_job_get_child_processes_command(SOSOptionString ssh_job_get_child_processes_command) {
+    this.ssh_job_get_child_processes_command = ssh_job_get_child_processes_command;
   }
   
   @JSOptionDefinition(name = "ssh_job_get_active_processes_command", description = "The command to check if the given process is still running", key = "ssh_job_get_active_processes_command", type = "SOSOptionString", mandatory = false)
