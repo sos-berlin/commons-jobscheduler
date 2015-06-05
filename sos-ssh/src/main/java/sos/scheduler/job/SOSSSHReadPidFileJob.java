@@ -29,6 +29,7 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
   private final Logger logger = Logger.getLogger(this.getClass());
 
   private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
+  private static final String PID_PLACEHOLDER = "${pid}";
   private String tempPidFileName;
 
   private List<Integer> pids = new ArrayList<Integer>();
@@ -88,7 +89,8 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
             try {
               pids.add(Integer.parseInt(pid));
               logger.debug("PID: " + pid);
-              break;
+//              break;
+              continue;
             } catch (Exception e) {
               logger.debug("no parseable pid received in line:\n" + pid);
             }
