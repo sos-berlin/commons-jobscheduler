@@ -859,7 +859,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
   public SOSOptionString ssh_job_kill_pid_command = new SOSOptionString(this, conClassName + ".ssh_job_kill_pid_command", 
       "The command to to kill a remote running pid", // Titel
       "", // InitValue
-      "pkill -9 ${pid}", // DefaultValue
+      "kill -9 ${pid}", // DefaultValue
       false // isMandatory
   );
 
