@@ -47,6 +47,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 	private NtlmPasswordAuthentication	authentication	= null;
 	private boolean						isConnected		= false;
 	private String						domain			= null;
+	private String					    currentDirectory = "";
 
 	/**
 	 *
@@ -327,10 +328,11 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 		SmbFile f = null;
 		try {
 			if (path.length() == 0) {
-				path = "/";
+				path = ".";
 			}
 			if (!this.fileExists(path)) {
-				return null;
+//				return null;
+				throw new JobSchedulerException(SOSVfs_E_226.params(path));
 			}
 
 			if (!this.isDirectory(path)) {
@@ -353,9 +355,14 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 			reply = "ls OK";
 			return result;
 		}
+		catch (JobSchedulerException e) {
+			reply = e.toString();
+			throw e;
+		}
 		catch (Exception e) {
 			reply = e.toString();
-			return null;
+//			return null;
+			throw new JobSchedulerException(e);
 		}
 	}
 
@@ -396,7 +403,6 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 	 */
 	@Override
 	public long getFile(final String remoteFile, final String localFile, final boolean append) {
-		String sourceLocation = this.resolvePathname(remoteFile);
 		File transferFile = null;
 		long remoteFileSize = -1;
 		FileOutputStream fos = null;
@@ -433,11 +439,11 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 
 			remoteFileSize = transferFile.length();
 			reply = "get OK";
-			logINFO(HostID(SOSVfs_I_182.params("getFile", sourceLocation, localFile, getReplyString())));
+			logINFO(HostID(SOSVfs_I_182.params("getFile", this.normalizePath(remoteFile), localFile, getReplyString())));
 		}
 		catch (Exception ex) {
 			reply = ex.toString();
-			RaiseException(ex, SOSVfs_E_184.params("getFile", sourceLocation, localFile));
+			RaiseException(ex, SOSVfs_E_184.params("getFile", this.normalizePath(remoteFile), localFile));
 		}
 		finally {
 			if (in != null) {
@@ -841,8 +847,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 			isConnected = true;
 		}
 		catch (Exception ex) {
-			throw new JobSchedulerException(SOSVfs_E_167.params(authenticationOptions.getAuth_method().Value(), authenticationOptions.getAuth_file().Value()),
-					ex);
+			throw new JobSchedulerException(ex);
 		}
 
 		reply = "OK";
@@ -866,7 +871,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 	private void connect(final String phost, final int pport) {
 
 		host = phost;
-		port = pport;
+		port = 0;
 
 		logger.info(SOSVfs_D_0101.params(host, port));
 

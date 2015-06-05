@@ -285,7 +285,7 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
 	@Override
 	public String getName() {
 
-		return super.getAbsolutePath();
+		return super.getPath();
 	}
 
 	/**
@@ -314,8 +314,10 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
 	 */
 	@Override
 	public ISOSVirtualFile getParentVfsFile() {
-		File strP = super.getParentFile();
-		ISOSVirtualFile objF = new SOSVfsFtpFile(strP.getAbsolutePath());
+		//File strP = super.getParentFile();
+		//ISOSVirtualFile objF = new SOSVfsFtpFile(strP.getAbsolutePath());
+		//Wieso war hier SOSVfsFtpFile in local class?
+		ISOSVirtualFile objF = new SOSVfsLocalFile(super.getParent());
 		objF.setHandler(getHandler());
 		return objF;
 	}

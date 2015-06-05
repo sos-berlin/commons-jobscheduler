@@ -28,13 +28,13 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
 	public SOSVfsTransferFileBaseClass(final String pFileName) {
 		this();
 		String name = pFileName;
-		if (objVFSHandler != null) {
-			String currentDir = objVFSHandler.DoPWD();
-			logDEBUG(SOSVfs_I_126.params(currentDir));
-			if (name.startsWith("./") == true) {
-				name = name.replace("./", currentDir + "/");
-			}
-		}
+//		if (objVFSHandler != null) {
+//			String currentDir = objVFSHandler.DoPWD();
+//			logDEBUG(SOSVfs_I_126.params(currentDir));
+//			if (name.startsWith("./") == true) {
+//				name = name.replace("./", currentDir + "/");
+//			}
+//		}
 		fileName = adjustFileSeparator(name);
 	}
 
@@ -57,39 +57,24 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
 		// ebenfalls Namensbestandteil sein.
 		// TODO im Moment kommt der Dateiname mal mit und mal ohne Pfadname hier an.
 		// TODO Methoden bauen: GibDateiNameOhnePFad und GibDateiNameMitPfad
-		if (1 == 1) {
-			File fleF = new File(AdjustRelativePathName(fileName));
-			String strP = fleF.getParent();
-			if (strP == null) {
-				strP = ".";
-			}
-			strP = ".";
-			String strN = fleF.getName();
+//		if (1 == 1) {
 			if (objVFSHandler.getFileSize(fileName) >= 0) {
 				flgResult = true;
 			}
-			/**
-			 * inperformant. the approach with size is much more better and faster.
-			 */
-			// Vector<String> vecTargetFileNamesList = objVFSHandler.nList(strP);
-			// flgResult = vecTargetFileNamesList.contains(strFileName);
-			// if (flgResult == false) {
-			// flgResult = vecTargetFileNamesList.contains(strN);
-			// }
-		}
-		else {
-			Vector<String> vecTargetFileNamesList = objVFSHandler.nList(".");
-			String strCurrDir = objVFSHandler.DoPWD();
-			logDEBUG(SOSVfs_I_126.params(strCurrDir));
-			String strT = fileName;
-			if (strT.startsWith(strCurrDir) == false) {
-				strT = strCurrDir + "/" + fileName;
-			}
-			flgResult = vecTargetFileNamesList.contains(strT);
-			if (flgResult == false) { // Evtl. Windows?
-				flgResult = vecTargetFileNamesList.contains(strCurrDir + "\\" + fileName);
-			}
-		}
+//		}
+//		else {
+//			Vector<String> vecTargetFileNamesList = objVFSHandler.nList(".");
+//			String strCurrDir = objVFSHandler.DoPWD();
+//			logDEBUG(SOSVfs_I_126.params(strCurrDir));
+//			String strT = fileName;
+//			if (strT.startsWith(strCurrDir) == false) {
+//				strT = strCurrDir + "/" + fileName;
+//			}
+//			flgResult = vecTargetFileNamesList.contains(strT);
+//			if (flgResult == false) { // Evtl. Windows?
+//				flgResult = vecTargetFileNamesList.contains(strCurrDir + "\\" + fileName);
+//			}
+//		}
 		logDEBUG(SOSVfs_D_157.params(flgResult, fileName));
 		return flgResult;
 	}
@@ -202,14 +187,15 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
 	protected String AdjustRelativePathName(final String pstrPathName) {
 	    //TODO: Handle ./name correct.
 		String strT = pstrPathName;
-
-		if (pstrPathName.startsWith("./") || pstrPathName.startsWith(".\\")) {
-			String strPath = objVFSHandler.DoPWD() + "/";
-			strT = new File(pstrPathName).getName();
-			strT = strT.replaceAll("\\\\", "/");
-			strT = strPath + strT;
-			logDEBUG(SOSVfs_D_159.params(pstrPathName, strT));
-		}
+//      Kann nicht funktionieren: pstrPathName=./a/b/c und pwd=/home/test -> return /home/test/c
+//		Wieso braucht man diese Methode?
+//		if (pstrPathName.startsWith("./") || pstrPathName.startsWith(".\\")) {
+//			String strPath = objVFSHandler.DoPWD() + "/";
+//			strT = new File(pstrPathName).getName();
+//			strT = strT.replaceAll("\\\\", "/");
+//			strT = strPath + strT;
+//			logDEBUG(SOSVfs_D_159.params(pstrPathName, strT));
+//		}
 
 		strT = strT.replaceAll("\\\\", "/");
 		return strT;
