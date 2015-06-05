@@ -474,9 +474,9 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 		if (host.isNotDirty() || host.IsEmpty()) {
 			return false;
 		}
-		if (port.isNotDirty() || port.value() <= 0) {
-			return false;
-		}
+//		if (!protocol.Value().equalsIgnoreCase("webdav") && (port.isNotDirty() || port.value() <= 0)) {
+//			return false;
+//		}
 		if (user.isNotDirty() || user.IsEmpty()) {
 			return false;
 		}
