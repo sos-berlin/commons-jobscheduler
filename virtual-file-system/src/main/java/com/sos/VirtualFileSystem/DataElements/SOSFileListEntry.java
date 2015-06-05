@@ -498,14 +498,6 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		lastCheckedFileSize = fileSize;
 	}
 
-	public Long getLastCheckedFileSize() {
-		return lastCheckedFileSize;
-	}
-	
-	public void setLastCheckedFileSize(Long fileSize) {
-		lastCheckedFileSize = fileSize;
-	}
-	
 	@Override public String getLastErrorMessage() {
 		return EMPTY_STRING;
 	}
@@ -1153,12 +1145,6 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		lngFileModDate = file.getModificationDateTime();
 	}
 
-	public void setSourceFileProperties(ISOSVirtualFile file){
-		lngOriginalFileSize = file.getFileSize();
-		lngFileSize = lngOriginalFileSize;
-		lngFileModDate = file.getModificationDateTime();
-	}
-	
 	public void setRemoteFileName(final String pstrRemoteFileName) {
 		strTargetFileName = pstrRemoteFileName;
 	}
