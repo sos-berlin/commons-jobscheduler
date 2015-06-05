@@ -37,7 +37,8 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
  * \endverbatim
  */
 public class JSExistsFileJSAdapterClass extends JobSchedulerJobAdapter {
-	private final String		conClassName	= "JSExistsFileJSAdapterClass";						//$NON-NLS-1$
+	private static final String SCHEDULER_FILE_PATH = "scheduler_file_path";
+    private final String		conClassName	= "JSExistsFileJSAdapterClass";						//$NON-NLS-1$
 	private static Logger		logger			= Logger.getLogger(JSExistsFileJSAdapterClass.class);
 	private JSExistsFileOptions	objO			= null;
 
@@ -89,6 +90,18 @@ public class JSExistsFileJSAdapterClass extends JobSchedulerJobAdapter {
 		JSExistsFile objR = new JSExistsFile();
 		objO = objR.Options();
 		objO.setAllOptions(getSchedulerParameterAsProperties(getParameters()));
+		
+        if (!objO.file_spec.isDirty() && !objO.file.isDirty() ){
+            String filename = spooler_task.order().params().value(SCHEDULER_FILE_PATH);
+            if (filename != null && filename.length() > 0){
+                File file = new File(filename);
+                objO.file_spec.Value("^" + file.getName().replaceAll(".", "\\.") + "$");
+                objO.file.Value(file.getParent());
+            }
+
+            
+        }
+
 		// objO.CheckMandatory();
 		objR.setJSJobUtilites(this);
 

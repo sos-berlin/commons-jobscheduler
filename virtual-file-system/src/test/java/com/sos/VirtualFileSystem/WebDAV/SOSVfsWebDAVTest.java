@@ -53,17 +53,11 @@ public class SOSVfsWebDAVTest {
 	protected String				dynamicClassNameTarget	= null;
 
 	protected final String			LOCAL_BASE_PATH			= "R:/backup/sos/java/junittests/testdata/JADE/";
-	protected final String			REMOTE_BASE_PATH		= "/home/kb/";
+	protected final String			REMOTE_BASE_PATH		= "/webdav/";
 
-	protected final String			WEB_URI					= "https://mediacenter.gmx.net";
-	protected final String			WEB_USER				= "sos.apl@gmx.de";
-	protected final String			WEB_PASS				= "sosapl10629";
-	
-	protected final String			REMOTE_BASE_PATH2		= "/webdav/";
-
-	protected final String			WEB_URI2				= "http://homer.sos/webdav";
-	protected final String			WEB_USER2				= "test";
-	protected final String			WEB_PASS2				= "12345";
+	protected final String			WEB_URI				= "http://homer.sos/webdav";
+	protected final String			WEB_USER				= "test";
+	protected final String			WEB_PASS				= "12345";
 
 	public SOSVfsWebDAVTest() {
 		//
@@ -120,13 +114,13 @@ public class SOSVfsWebDAVTest {
 
 	private void connect() throws Exception {
 		objOptions.host.Value(WEB_URI);
-		objOptions.port.value(0);
+		objOptions.port.value(8080);
 		// objOptions.local_dir.Value("/temp");
 		SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().Source();
 		objSource.host.Value(WEB_URI);
 		objSource.user.Value(WEB_USER);
+		objSource.port.value(8080);
 		objSource.protocol.Value("webdav");
-		objSource.port.value(443);
 //		objSource.proxy_host.Value("proxy.sos");
 //		objSource.proxy_port.value(3128);
 		
@@ -141,42 +135,9 @@ public class SOSVfsWebDAVTest {
 		SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().Source();
 		objSource.host.Value(WEB_URI);
 		objSource.user.Value(WEB_USER);
-		objSource.port.value(443);
 //		objSource.proxy_host.Value("proxy.sos");
 //		objSource.proxy_port.value(3128);
 		objSource.password.Value(WEB_PASS);
-		objSource.protocol.Value("webdav");
-		objSource.ssh_auth_method.isURL(true);
-
-		objVFS.Authenticate(objSource);
-	}
-	
-	private void connect2() throws Exception {
-		objOptions.host.Value(WEB_URI2);
-		objOptions.port.value(8080);
-		// objOptions.local_dir.Value("/temp");
-		SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().Source();
-		objSource.host.Value(WEB_URI2);
-		objSource.user.Value(WEB_USER2);
-		objSource.port.value(8080);
-		objSource.protocol.Value("webdav");
-//		objSource.proxy_host.Value("proxy.sos");
-//		objSource.proxy_port.value(3128);
-		
-		objOptions.operation.Value("send");
-		VFSFactory.setConnectionOptions(objSource);
-		objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
-		objVfsClient = (ISOSVfsFileTransfer) objVFS;
-		objVFS.Connect(objOptions.getConnectionOptions().Source());
-	}
-
-	private void authenticate2() throws Exception {
-		SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().Source();
-		objSource.host.Value(WEB_URI2);
-		objSource.user.Value(WEB_USER2);
-//		objSource.proxy_host.Value("proxy.sos");
-//		objSource.proxy_port.value(3128);
-		objSource.password.Value(WEB_PASS2);
 		objSource.protocol.Value("webdav");
 		objSource.ssh_auth_method.isURL(true);
 
@@ -189,23 +150,10 @@ public class SOSVfsWebDAVTest {
 		connect();
 		authenticate();
 
-		objVfsClient.rmdir(REMOTE_BASE_PATH + "test1");
-		objVfsClient.mkdir(REMOTE_BASE_PATH + "test1");
+		objVfsClient.rmdir(REMOTE_BASE_PATH + "kb/test1");
+		objVfsClient.mkdir(REMOTE_BASE_PATH + "kb/test1");
 
-		ISOSVirtualFile objVF = objVfsClient.getFileHandle(REMOTE_BASE_PATH + "test1");
-		System.out.println(objVF.getFileSize());
-		objVfsClient.disconnect();
-	}
-	
-	@Test
-	public void testMkdir2() throws Exception {
-		connect2();
-		authenticate2();
-
-		objVfsClient.rmdir(REMOTE_BASE_PATH2 + "kb/test1");
-		objVfsClient.mkdir(REMOTE_BASE_PATH2 + "kb/test1");
-
-		ISOSVirtualFile objVF = objVfsClient.getFileHandle(REMOTE_BASE_PATH2 + "kb/test1");
+		ISOSVirtualFile objVF = objVfsClient.getFileHandle(REMOTE_BASE_PATH + "kb/test1");
 		System.out.println(objVF.getFileSize());
 		objVfsClient.disconnect();
 	}
@@ -216,41 +164,19 @@ public class SOSVfsWebDAVTest {
 		connect();
 		authenticate();
 
-		objVfsClient.mkdir(REMOTE_BASE_PATH + "test1/test2/test3/");
-//		objVfsClient.rmdir(REMOTE_BASE_PATH + "test1/");
-
-		objVfsClient.disconnect();
-
-	}
-	
-	@Test
-	public void testMkdirMultiple2() throws Exception {
-		connect2();
-		authenticate2();
-
-		objVfsClient.mkdir(REMOTE_BASE_PATH2 + "kb/test1/test2/test3/");
+		objVfsClient.mkdir(REMOTE_BASE_PATH + "kb/test1/test2/test3/");
 
 		objVfsClient.disconnect();
 
 	}
 
 	@Test
-	public void testRmdirString() throws Exception {
+  	@Ignore("Test set to Ignore for later examination")
+	public void testRmRdir() throws Exception {
 		connect();
 		authenticate();
 
-		objVfsClient.rmdir(REMOTE_BASE_PATH +"test1/test2/test3/");
-
-		objVfsClient.disconnect();
-	}
-	
-	@Test
-  @Ignore("Test set to Ignore for later examination")
-	public void testRmdir2() throws Exception {
-		connect2();
-		authenticate2();
-
-		objVfsClient.rmdir(REMOTE_BASE_PATH2 +"kb/test1/test2/test3");
+		objVfsClient.rmdir(REMOTE_BASE_PATH +"kb/test1/test2/test3");
 
 		objVfsClient.disconnect();
 	}
@@ -310,17 +236,7 @@ public class SOSVfsWebDAVTest {
 		connect();
 		authenticate();
 
-		System.out.println(objVfsClient.getFileSize(REMOTE_BASE_PATH + "sos-net-src.zip"));
-		System.out.println(objVfsClient.getFileSize(REMOTE_BASE_PATH + "BVG.pdf"));
-		objVfsClient.disconnect();
-	}
-	
-	@Test
-	public void testSize2() throws Exception {
-		connect2();
-		authenticate2();
-
-		System.out.println(objVfsClient.getFileSize(REMOTE_BASE_PATH2 + "text.txt"));
+		System.out.println(objVfsClient.getFileSize(REMOTE_BASE_PATH + "text.txt"));
 		objVfsClient.disconnect();
 	}
 
@@ -347,28 +263,12 @@ public class SOSVfsWebDAVTest {
 	}
 	
 	@Test
-  @Ignore("Test set to Ignore for later examination")
+	@Ignore("Test set to Ignore for later examination")
 	public void testPut() throws Exception {
 		connect();
 		authenticate();
 
 		String strTargetFileName = REMOTE_BASE_PATH + "sos-net-src.zip";
-		objVfsClient.putFile(createTestFile(), strTargetFileName);
-		ISOSVirtualFile objVF = objVfsClient.getFileHandle(strTargetFileName);
-		long intFileSize = objVF.getFileSize();
-		System.out.println("Size of Targetfile = " + intFileSize);
-
-		objVfsClient.delete(strTargetFileName);
-		objVfsClient.disconnect();
-	}
-	
-	@Test
-  @Ignore("Test set to Ignore for later examination")
-	public void testPut2() throws Exception {
-		connect2();
-		authenticate2();
-
-		String strTargetFileName = REMOTE_BASE_PATH2 + "sos-net-src.zip";
 		objVfsClient.putFile(createTestFile(), strTargetFileName);
 		ISOSVirtualFile objVF = objVfsClient.getFileHandle(strTargetFileName);
 		long intFileSize = objVF.getFileSize();
@@ -418,97 +318,20 @@ public class SOSVfsWebDAVTest {
 		connect();
 		authenticate();
 
-		objVfsClient.changeWorkingDirectory("/xxx/xxx");
-
-		objVfsClient.disconnect();
-	}
-	
-	@Test
-	public void testCd2() throws Exception {
-		connect2();
-		authenticate2();
-
 //		objVfsClient.changeWorkingDirectory("/xxx/xxx");
 		objVfsClient.changeWorkingDirectory("/webdav/kb");
 
 		objVfsClient.disconnect();
 	}
 	
-	
-//	@Test
-	public void testCdSwisscom() throws Exception {
-		SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().Source();
-		objSource.host.Value("https://filestation.creditmaster.ch");
-		objSource.port.value(6006);
-		objSource.user.Value("SwissTest");
-		objSource.protocol.Value("webdav");
-
-		objOptions.operation.Value("send");
-		VFSFactory.setConnectionOptions(objSource);
-		objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
-		objVfsClient = (ISOSVfsFileTransfer) objVFS;
-		objVFS.Connect(objOptions.getConnectionOptions().Source());
-		                          
-		objSource.password.Value("PE8UKgKKFxDGOnbp9CD");
-		objSource.ssh_auth_method.isURL(true);
-
-		objVFS.Authenticate(objSource);
-
-		objVfsClient.changeWorkingDirectory("/Test");
-		//objVfsClient.rmdir("/Test/sos");
-
-		objVfsClient.disconnect();
-	}
-	
-//	@Test
-	public void testCdSwisscomWithProxy() throws Exception {
-		SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().Source();
-		objSource.host.Value("https://filestation.creditmaster.ch:6006/Test");
-		objSource.port.value(6006);
-		objSource.user.Value("SwissTest");
-		objSource.protocol.Value("webdav");
-		
-		objSource.proxy_host.Value("proxy.sos");
-		objSource.proxy_port.value(3128);
-		
-		objOptions.operation.Value("send");
-		VFSFactory.setConnectionOptions(objSource);
-		objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
-		objVfsClient = (ISOSVfsFileTransfer) objVFS;
-		objVFS.Connect(objOptions.getConnectionOptions().Source());
-		                          
-		objSource.password.Value("PE8UKgKKFxDGOnbp9CD");
-		objSource.ssh_auth_method.isURL(true);
-
-		objVFS.Authenticate(objSource);
-
-		objVfsClient.changeWorkingDirectory("/Test");
-		//objVfsClient.rmdir("/Test/sos");
-
-		objVfsClient.disconnect();
-	}
-
-
 	@Test
-  @Ignore("Test set to Ignore for later examination")
+	@Ignore("Test set to Ignore for later examination")
 	public void testDelete() throws Exception {
 		connect();
 		authenticate();
 
 		objVfsClient.put(createTestFile(), REMOTE_BASE_PATH + "tmp123.zip");
 		objVfsClient.delete(REMOTE_BASE_PATH + "tmp123.zip");
-
-		objVfsClient.disconnect();
-	}
-	
-	@Test
-  @Ignore("Test set to Ignore for later examination")
-	public void testDelete2() throws Exception {
-		connect2();
-		authenticate2();
-
-		objVfsClient.put(createTestFile(), REMOTE_BASE_PATH2 + "tmp123.zip");
-		objVfsClient.delete(REMOTE_BASE_PATH2 + "tmp123.zip");
 
 		objVfsClient.disconnect();
 	}
@@ -582,14 +405,14 @@ public class SOSVfsWebDAVTest {
 	@Test
   @Ignore("Test set to Ignore for later examination")
 	public void testRename2() throws Exception {
-		connect2();
-		authenticate2();
+		connect();
+		authenticate();
 
 		String strTestFileName = createTestFile();
 
-		objVfsClient.put(strTestFileName, REMOTE_BASE_PATH2 + "tmp123.zip");
-		objVfsClient.rename(REMOTE_BASE_PATH2 + "tmp123.zip", REMOTE_BASE_PATH2 + "tmp1234.zip");
-		objVfsClient.delete(REMOTE_BASE_PATH2 + "tmp1234.zip");
+		objVfsClient.put(strTestFileName, REMOTE_BASE_PATH + "tmp123.zip");
+		objVfsClient.rename(REMOTE_BASE_PATH + "tmp123.zip", REMOTE_BASE_PATH + "tmp1234.zip");
+		objVfsClient.delete(REMOTE_BASE_PATH + "tmp1234.zip");
 
 		objVfsClient.disconnect();
 	}
@@ -729,17 +552,7 @@ public class SOSVfsWebDAVTest {
 		connect();
 		authenticate();
 
-		System.out.println(objVfsClient.getModificationTime(REMOTE_BASE_PATH + "sos-net-src.zip"));
-
-		objVfsClient.disconnect();
-	}
-	
-	@Test
-	public void testGetFileHandle2() throws Exception {
-		connect2();
-		authenticate2();
-
-		System.out.println(objVfsClient.getModificationTime(REMOTE_BASE_PATH2 + "text.txt"));
+		System.out.println(objVfsClient.getModificationTime(REMOTE_BASE_PATH + "text.txt"));
 
 		objVfsClient.disconnect();
 	}
@@ -749,21 +562,7 @@ public class SOSVfsWebDAVTest {
 		connect();
 		authenticate();
 
-		//String[] result = ftpClient.getFilelist(REMOTE_BASE_PATH, "", 0, true);
-		String[] result = objVfsClient.getFilelist(REMOTE_BASE_PATH, "\\.pdf$", 0, true);
-		for (String element : result) {
-			logger.info(element);
-		}
-
-		objVfsClient.disconnect();
-	}
-	
-	@Test
-	public void testGetFilelist2() throws Exception {
-		connect2();
-		authenticate2();
-
-		String[] result = objVfsClient.getFilelist(REMOTE_BASE_PATH2 + "kb", "", 0, true);
+		String[] result = objVfsClient.getFilelist(REMOTE_BASE_PATH + "kb", "", 0, true);
 		for (String element : result) {
 			logger.info(element);
 		}

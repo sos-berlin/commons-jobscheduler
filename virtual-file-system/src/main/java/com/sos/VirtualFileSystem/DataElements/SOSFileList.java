@@ -426,7 +426,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 		}
 		flgResultSetFileAlreadyCreated = true;
 		try {
-			if (objOptions.CreateResultSet.isTrue()) {
+			//if (objOptions.CreateResultSet.isTrue()) {
 				if (objOptions.ResultSetFileName.isDirty()) {
 					// TODO use the file object from the option
 					JSFile objResultSetFile = objOptions.ResultSetFileName.JSFile();
@@ -436,22 +436,9 @@ public class SOSFileList extends SOSVfsMessageCodes {
 						lngNoOfRecordsInResultSetFile++;
 					}
 					objResultSetFile.close();
-					objResultSetFile = new JSFile(objOptions.ResultSetFileName.Value() + ".csv");
-					for (SOSFileListEntry objListItem : objFileListEntries) {
-						String strLine = objListItem.toCsv();
-						objResultSetFile.WriteLine(strLine);
-					}
-					System.out.println("*** ResultSet End ***");
-					objResultSetFile.close();
-					logger.info(String.format("ResultSet to StdOut and to csv-File '%1$s' written", objResultSetFile.getAbsoluteFile()));
+					logger.info(String.format("ResultSet to '%1$s' is written", objResultSetFile.getAbsoluteFile()));
 				}
-				System.out.println("*** ResultSet Start ***");
-				for (SOSFileListEntry objListItem : objFileListEntries) {
-					String strLine = objListItem.toCsv();
-					System.out.println(strLine);
-				}
-				System.out.println("*** ResultSet End ***");
-			}
+			//}
 		}
 		catch (Exception e) {
 			throw new JobSchedulerException("Problems occured creating ResultSetFile", e);

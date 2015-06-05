@@ -95,7 +95,9 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
     spooler_log.debug9("createOrderForWatchdog started");
     Order order = spooler.create_order();
     order.params().merge(spooler_task.params());
-    order.params().merge(spooler_task.order().params());
+    if(spooler_task.order() != null){
+        order.params().merge(spooler_task.order().params());
+    }
     order.params().set_var(PARAM_SSH_JOB_TASK_ID, String.valueOf(spooler_task.id()));
     order.params().set_var(PARAM_PID_FILE_NAME_KEY, pidFileName);
     order.params().set_var(PARAM_SSH_JOB_NAME, spooler_job.name());

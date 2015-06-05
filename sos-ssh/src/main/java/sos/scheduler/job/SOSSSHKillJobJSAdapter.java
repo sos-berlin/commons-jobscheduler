@@ -48,7 +48,7 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
     if(allParams.value(PARAM_SSH_JOB_TIMEOUT_KILL_AFTER) != null && !allParams.value(PARAM_SSH_JOB_TIMEOUT_KILL_AFTER).isEmpty()){
       timeoutAfterKillIsSet = true;
     }
-    logger.debug("Task is still active: " + taskIsActive);
+    logger.info("Task is still active: " + taskIsActive);
     sshJob = executeCheckPids();
     if(((SOSSSHCheckRemotePidJob)sshJob).getPids() != null){
       spooler_log.debug9(((SOSSSHCheckRemotePidJob)sshJob).getPids());
@@ -58,23 +58,23 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
     if(taskIsActive && runningPids != null && !runningPids.isEmpty()){
       // if task is still running and remote pids are still available  --> do nothing
       // check again after some delay
-      logger.debug("Task and remote processes are still active, do nothing!");
+      logger.info("Task and remote processes are still active, do nothing!");
       return false;
     }else if (taskIsActive && (runningPids == null || runningPids.isEmpty())) {
       // if task is still running but remote pid is not available anymore (finished) --> kill task
-      logger.debug("Task is still active, try to end task!");
+      logger.info("Task is still active, try to end task!");
       String killTaskXml = new String("<kill_task job=\"" + allParams.value(PARAM_SSH_JOB_NAME) + "\" id=\""+ allParams.value(PARAM_SSH_JOB_TASK_ID) + "\" immediately=\"yes\"/>");
       String killTaskXmlAnswer = spooler.execute_xml(killTaskXml);
       logger.debug("killTaskXmlAnswer:\n" + killTaskXmlAnswer);
       return true;
     } else if (!taskIsActive && runningPids != null && !runningPids.isEmpty()
         && !timeoutAfterKillIsSet) {
-      logger.debug("Task is not active anymore, processing kill remote pids!");
+      logger.info("Task is not active anymore, processing kill remote pids!");
       // if task is not running anymore but remote pid is still available and a timeout_kill_after is not set --> kill remote pid immediately
       sshJob = executeKillPids();
       return true;
     } else if (!taskIsActive && runningPids != null && !runningPids.isEmpty() && timeoutAfterKillIsSet) {
-      logger.debug("Task is not active anymore, processing kill remote pids!");
+      logger.info("Task is not active anymore, processing kill remote pids!");
       // if task is not running anymore but remote pid is still available and a timeout_kill_after is set  --> terminate remote pid
       // if timeout_kill_after is set, try terminate first and kill after timeout
       allParams.set_value(PARAM_SSH_JOB_TIMEOUT_KILL_AFTER, "");
@@ -82,7 +82,7 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
       return true;
     } else if(!taskIsActive && (runningPids == null || runningPids.isEmpty())){
       // if task is not running anymore AND remote pid is not available anymore --> do nothing
-      logger.debug("Task is not active anymore, remote pids not available anymore. Nothing to do!");
+      logger.info("Task is not active anymore, remote pids not available anymore. Nothing to do!");
       return true;
     }
     return true;
