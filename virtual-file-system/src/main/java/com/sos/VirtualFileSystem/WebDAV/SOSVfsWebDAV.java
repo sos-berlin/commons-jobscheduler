@@ -46,6 +46,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 
 	private HttpURL			rootUrl		= null;
 	private WebdavResource	davClient	= null;
+	private String			currentDirectory = "";
 
 	private String password = null;
 	private String proxyHost = null;
@@ -206,6 +207,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 	 */
 	@Override
 	public void mkdir(final String path) {
+		WebdavResource res = null;
 		try {
 			SOSOptionFolderName objF = new SOSOptionFolderName(path);
 			reply = "";
@@ -213,11 +215,12 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 			String[] subfolders = objF.getSubFolderArrayReverse();
 			int idx = subfolders.length;
 			for (String strSubFolder : objF.getSubFolderArrayReverse()) {
-				if (this.isDirectory(strSubFolder)) {
+				res = this.getResource(strSubFolder);
+				if (res.isCollection()) {
 					logger.debug(SOSVfs_E_180.params(strSubFolder));
 					break;
 				}
-				else if (this.fileExists(strSubFolder)) {
+				else if (res.exists()) {
 					RaiseException(SOSVfs_E_277.params(strSubFolder));
 					break;
 				}
@@ -225,6 +228,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 			}
 			subfolders = objF.getSubFolderArray();
 			for (int i = idx; i < subfolders.length; i++) {
+				subfolders[i] = getWebdavRessourcePath(subfolders[i]);
 				if (davClient.mkcolMethod(subfolders[i])) {
 					reply = "mkdir OK";
 					logger.debug(HostID(SOSVfs_E_0106.params("mkdir", subfolders[i], getReplyString())));
@@ -237,6 +241,15 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 		catch (Exception e) {
 			reply = e.toString();
 			RaiseException(e, SOSVfs_E_134.params("[mkdir]"));
+		}
+		finally {
+			if (res != null) {
+				try {
+					res.close();
+				}
+				catch (Exception ex) {
+				}
+			}
 		}
 	}
 
@@ -251,6 +264,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 		try {
 			reply = "rmdir OK";
 
+			path = getWebdavRessourcePath(path);
 			path = this.normalizePath(path + "/");
 
 			if (davClient.deleteMethod(path)) {
@@ -296,7 +310,8 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 		}
 		return false;
 	}
-
+	
+	
 	/**
 	 *
 	 * \brief listNames
@@ -314,24 +329,29 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 		WebdavResource res = null;
 		try {
 			if (path.length() == 0) {
-				path = "/";
+				path = ".";
 			}
-			if (!this.fileExists(path)) {
+			
+			res = this.getResource(path);
+			
+			if (!res.exists()) {
 				return null;
 			}
-
-			if (!this.isDirectory(path)) {
+			
+			if (!res.isCollection()) {
 				reply = "ls OK";
 				return new String[] { path };
 			}
 
-			res = this.getResource(path);
-
 			WebdavResource[] lsResult = res.listWebdavResources();
 			String[] result = new String[lsResult.length];
+			String curDir = getCurrentPath();
 			for (int i = 0; i < lsResult.length; i++) {
 				WebdavResource entry = lsResult[i];
 				result[i] = entry.getPath();
+				if (result[i].startsWith(curDir)) {
+					result[i] = result[i].substring(curDir.length());
+				}
 			}
 			reply = "ls OK";
 			return result;
@@ -467,6 +487,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 	public long putFile(final String localFile, String remoteFile) {
 		long size = 0;
 		try {
+			remoteFile = getWebdavRessourcePath(remoteFile);
 			remoteFile = this.normalizePath(remoteFile);
 
 			if (davClient.putMethod(remoteFile, new File(localFile))) {
@@ -496,6 +517,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 	@Override
 	public void delete(String path) {
 		try {
+			path = getWebdavRessourcePath(path);
 			path = this.normalizePath(path);
 
 			if (this.isDirectory(path)) {
@@ -531,7 +553,9 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 		from = this.resolvePathname(from);
 		to = this.resolvePathname(to);
 		try {
+			from = getWebdavRessourcePath(from);
 			from = this.normalizePath(from);
+			to = getWebdavRessourcePath(to);
 			to = this.normalizePath(to);
 
 			if (!davClient.moveMethod(from, to)) {
@@ -576,10 +600,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 	@Override  // SOSVfsTransferBaseClass
 	public InputStream getInputStream(String path) {
 		try {
-			if (!path.startsWith("/")) {
-				path = "/" + path;
-			}
-
+			path = getWebdavRessourcePath(path);
 			return davClient.getMethodData(path);
 		}
 		catch (Exception ex) {
@@ -641,11 +662,12 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 		try {
 			String origPath = davClient.getPath();
 
-			path = this.normalizePath(path+"/");
+			path = this.normalizePath("/"+path+"/");
 
 			davClient.setPath(path);
 			if (davClient.exists()) {
 				reply = "cwd OK";
+				currentDirectory = path;
 				logger.debug(SOSVfs_D_194.params(path, getReplyString()));
 			}
 			else {
@@ -769,18 +791,20 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 	 */
 	@Override
 	protected String getCurrentPath() {
-		String path = null;
 
 		try {
-			path = davClient.getPath();
-			logger.debug(HostID(SOSVfs_D_195.params(path)));
-			LogReply();
+			if (currentDirectory == null || currentDirectory.length() == 0) {
+				currentDirectory = "/" + davClient.getPath() + "/";
+				currentDirectory = normalizePath(currentDirectory);
+				logger.debug(HostID(SOSVfs_D_195.params(currentDirectory)));
+				LogReply();
+			}
 		}
 		catch (Exception e) {
 			RaiseException(e, SOSVfs_E_134.params("getCurrentPath"));
 		}
 
-		return path;
+		return currentDirectory;
 	}
 
 	/**
@@ -882,9 +906,9 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 	 * @return
 	 */
 	private String normalizePath(String path) {
-		if(path.startsWith("/") == false) {
-			path = "/" + path;
-		}
+//		if(path.startsWith("/") == false) {
+//			path = "/" + path;
+//		}
 		path = path.replaceAll("//+", "/");
 		return path;
 	}
@@ -982,6 +1006,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 		HttpURL url = null;
 
 		if(rootUrl != null) {
+			path = getWebdavRessourcePath(path);
 			path = path.startsWith("/") ? path.substring(1) : path;
 			if(rootUrl.getScheme().equalsIgnoreCase("https")) {
 				url = new HttpsURL(rootUrl.getEscapedURI()+path);
@@ -993,6 +1018,16 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 		url.setUserinfo(userName,password);
 
 		return url;
+	}
+	
+	
+	private String getWebdavRessourcePath(String path) {
+
+		if (!path.startsWith("/")) {
+			String curDir = getCurrentPath();
+			path = curDir + path;
+		}
+		return path;
 	}
 	
 	/**

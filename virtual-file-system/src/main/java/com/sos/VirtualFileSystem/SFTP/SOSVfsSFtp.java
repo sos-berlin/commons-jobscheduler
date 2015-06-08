@@ -502,15 +502,16 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
 		//		return false; // it is a hidden-file
 	} // private boolean isNotHiddenFile
 
-	private boolean isHiddenFile(final String pstrFolderName) {
+	private boolean isHiddenFile(final String fileName) {
 		boolean flgR = false;
 
-		if (pstrFolderName.endsWith("..") == true || pstrFolderName.endsWith(".") == true) {
+		if (fileName == null || fileName.equals(".") || fileName.equals("..") || fileName.endsWith("/..") || fileName.endsWith("/.")) {
 			flgR = true; // a hidden file
 		}
 
 		return flgR;
 	}
+	
 
 	/**
 	 * return a listing of the contents of a directory in short format on

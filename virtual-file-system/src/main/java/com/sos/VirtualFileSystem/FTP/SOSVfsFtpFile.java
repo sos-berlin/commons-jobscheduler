@@ -26,31 +26,33 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
 	public SOSVfsFtpFile(final String pstrFileName) {
 		super(SOSVfsConstants.strBundleBaseName);
 
-		final String conMethodName = conClassName + "::SOSVfsFtpFile";
-		String strF = pstrFileName;
+		//final String conMethodName = conClassName + "::SOSVfsFtpFile";
+		//String strF = pstrFileName;
+		/* Warum?
 		if (objVFSHandler != null) {
 			if (strF.startsWith("./") == true) {
 				String strCurrDir = objVFSHandler.DoPWD();
 				logger.debug(SOSVfs_D_171.params(conMethodName, strCurrDir));
 				strF = strF.replace("./", strCurrDir + "/");
 			}
-		}
-		strFileName = strF;
-		
+		} */
+		//strFileName = strF;
+		strFileName = pstrFileName;
 	}
 	
 	public SOSVfsFtpFile(final FTPFile pobjFileFile) {
 		super(SOSVfsConstants.strBundleBaseName);
 
-		final String conMethodName = conClassName + "::SOSVfsFtpFile";
+		//final String conMethodName = conClassName + "::SOSVfsFtpFile";
 		String strF = pobjFileFile.getName();
+		/* Warum?
 		if (objVFSHandler != null) {
 			String strCurrDir = objVFSHandler.DoPWD();
 			logger.debug(SOSVfs_D_171.params(conMethodName, strCurrDir));
 			if (strF.startsWith("./") == true) {
 				strF = strF.replace("./", strCurrDir + "/");
 			}
-		}
+		} */
 		strFileName = strF;
 		objFTPFile	= pobjFileFile;
 	}
@@ -75,39 +77,24 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
 		// ebenfalls Namensbestandteil sein.
 		// TODO im Moment kommt der Dateiname mal mit und mal ohne Pfadname hier an.
 		// TODO Methoden bauen: GibDateiNameOhnePFad und GibDateiNameMitPfad
-		if (1 == 1) {
-			File fleF = new File(AdjustRelativePathName(strFileName));
-			String strP = fleF.getParent();
-			if (strP == null) {
-				strP = ".";
-			}
-			strP = ".";
-			String strN = fleF.getName();
+//		if (1 == 1) {
 			if (objVFSHandler.getFileSize(strFileName) >= 0) {
 				flgResult = true;
 			}
-			/**
-			 * inperformant. the approach with size is much more better and faster.
-			 */
-			// Vector<String> vecTargetFileNamesList = objVFSHandler.nList(strP);
-			// flgResult = vecTargetFileNamesList.contains(strFileName);
-			// if (flgResult == false) {
-			// flgResult = vecTargetFileNamesList.contains(strN);
-			// }
-		}
-		else {
-			Vector<String> vecTargetFileNamesList = objVFSHandler.nList(".");
-			String strCurrDir = objVFSHandler.DoPWD();
-			logger.debug(String.format("%1$s: currDir = %2$s", conMethodName, strCurrDir));
-			String strT = strFileName;
-			if (strT.startsWith(strCurrDir) == false) {
-				strT = strCurrDir + "/" + strFileName;
-			}
-			flgResult = vecTargetFileNamesList.contains(strT);
-			if (flgResult == false) { // Evtl. Windows?
-				flgResult = vecTargetFileNamesList.contains(strCurrDir + "\\" + strFileName);
-			}
-		}
+//		}
+//		else {
+//			Vector<String> vecTargetFileNamesList = objVFSHandler.nList(".");
+//			String strCurrDir = objVFSHandler.DoPWD();
+//			logger.debug(String.format("%1$s: currDir = %2$s", conMethodName, strCurrDir));
+//			String strT = strFileName;
+//			if (strT.startsWith(strCurrDir) == false) {
+//				strT = strCurrDir + "/" + strFileName;
+//			}
+//			flgResult = vecTargetFileNamesList.contains(strT);
+//			if (flgResult == false) { // Evtl. Windows?
+//				flgResult = vecTargetFileNamesList.contains(strCurrDir + "\\" + strFileName);
+//			}
+//		}
 		logger.debug(SOSVfs_D_157.params(conMethodName, flgResult, strFileName));
 		return flgResult;
 	}
@@ -228,12 +215,12 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
 	private String AdjustRelativePathName(final String pstrPathName) {
 		String strT = pstrPathName;
 
-		if (pstrPathName.startsWith("./") || pstrPathName.startsWith(".\\")) {
-			String strPath = objVFSHandler.DoPWD() + "/";
-			strT = new File(pstrPathName).getName();
-			strT = strPath + strT;
-			logger.debug(SOSVfs_D_159.params(pstrPathName, strT));
-		}
+//		if (pstrPathName.startsWith("./") || pstrPathName.startsWith(".\\")) {
+//			String strPath = objVFSHandler.DoPWD() + "/";
+//			strT = new File(pstrPathName).getName();
+//			strT = strPath + strT;
+//			logger.debug(SOSVfs_D_159.params(pstrPathName, strT));
+//		}
 
 		return strT;
 	}

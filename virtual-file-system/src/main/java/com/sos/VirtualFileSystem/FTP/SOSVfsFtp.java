@@ -598,34 +598,32 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 		return getFilenames(pstrPathName, flgRecurseSubFolders, true);
 	}
 	
-	private Vector<String> getFilenames(final String pstrPathName, final boolean flgRecurseSubFolders, final boolean checkReplyCode) {
+	private Vector<String> getFilenames(final String path, final boolean withRecurseSubFolders, final boolean checkReplyCode) {
 		// TODO Warum nicht Vector<FTPFile>? 
-		// Dann kann man sich spaeter die zusätzlichen Abfragen nach Mod.Date und Size sparen, 
+		// Dann kann man sich spaeter die zusaetzlichen Abfragen nach Mod.Date und Size sparen, 
 		// das diese Angaben im Objekt FTPFile enthalten sind.
 		
-		String conMethodName = "getFilenames";
-		String strCurrentDirectory = null;
-		Vector<String> vecDirectoryListing = new Vector<String>();
-		String lstrPathName = pstrPathName;
-		if (lstrPathName == null) {
-			lstrPathName = "";
+		Vector<String> dirListing = new Vector<String>();
+		FTPFile[] ftpFileList = null;
+		
+		String pathName = path.trim();
+		if (pathName == null) {
+			pathName = "";
 		}
-		lstrPathName = lstrPathName.trim();
-		if (!lstrPathName.startsWith("/")) {
-			strCurrentDirectory = DoPWD();
-			lstrPathName = (strCurrentDirectory + "/" + lstrPathName).replaceAll("//+", "/");
+		if (pathName.length() <= 0) {
+			pathName = ".";
 		}
-		logger.debug("directory = " + lstrPathName);
+		logger.debug("directory = " + pathName);
 		try {
-			objFTPFileList = Client().listFiles(lstrPathName);
+			ftpFileList = Client().listFiles(pathName);
 		} catch (IOException e) {
-			RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
+			RaiseException(e, HostID(SOSVfs_E_0105.params("getFilenames")));
 		}
-		if (objFTPFileList == null || objFTPFileList.length <= 0) {
+		if (ftpFileList == null || ftpFileList.length <= 0) {
 			//e.g. insufficient permissions
 			//should raise only for the source dir and not for sub folders (recursive)
 			if (isNegativeCommandCompletion()) {
-				String message = HostID(SOSVfs_E_0105.params(conMethodName)) + ":" + getReplyString();
+				String message = HostID(SOSVfs_E_0105.params("getFilenames")) + ":" + getReplyString();
 				if (checkReplyCode) {
 					RaiseException(message);
 				}
@@ -633,36 +631,34 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 					logger.warn(message);
 				}
 			}
-			return vecDirectoryListing;
+			return dirListing;
 		}
 
-
-		for (FTPFile objFTPFile : objFTPFileList) {
+		for (FTPFile ftpFile : ftpFileList) {
 			    SOSFileEntry sosFileEntry = new SOSFileEntry();
-			    sosFileEntry.setDirectory(objFTPFile.isDirectory());
-			    sosFileEntry.setFilename(objFTPFile.getName());
-			    sosFileEntry.setFilesize(objFTPFile.getSize());
-			    sosFileEntry.setParentPath(pstrPathName);
+			    sosFileEntry.setDirectory(ftpFile.isDirectory());
+			    sosFileEntry.setFilename(ftpFile.getName());
+			    sosFileEntry.setFilesize(ftpFile.getSize());
+			    sosFileEntry.setParentPath(pathName);
 			    this.getSOSFileEntries().add(sosFileEntry);
-			String strCurrentFile = objFTPFile.getName();
-			if (isNotHiddenFile(strCurrentFile) && strCurrentFile.trim().length() > 0) {
-				boolean flgIsDirectory = objFTPFile.isDirectory();
-				if (!strCurrentFile.startsWith("/")) {
-					strCurrentFile = (lstrPathName + "/" + strCurrentFile).replaceAll("//+", "/");
+			String currentFile = ftpFile.getName();
+			if (isNotHiddenFile(currentFile) && currentFile.trim().length() > 0) {
+				// if ftp server returns filename without path
+				if (currentFile.indexOf("/") == -1) {
+					currentFile = pathName + "/" + currentFile;
+					currentFile = currentFile.replaceAll("//+", "/");
 				}
-				if (flgIsDirectory == false) {
-					vecDirectoryListing.add(strCurrentFile);
-				} else {
-					if (flgIsDirectory && flgRecurseSubFolders == true) {
-						Vector<String> vecNames = getFilenames(strCurrentFile, true, false);
-						if (vecNames != null && vecNames.size() > 0) {
-							vecDirectoryListing.addAll(vecNames);
-						}
+				if (ftpFile.isFile()) {
+					dirListing.add(currentFile);
+				} else if (ftpFile.isDirectory() && withRecurseSubFolders) {
+					Vector<String> filelist = getFilenames(currentFile + "/", withRecurseSubFolders, false);
+					if (filelist != null && filelist.size() > 0) {
+						dirListing.addAll(filelist);
 					}
 				}
 			}
 		}
-		return vecDirectoryListing;
+		return dirListing;
 	}
 
 	@Override
@@ -720,14 +716,12 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 	} // private boolean isNegativeCommandCompletion
 
 	@Override
-	public boolean isNotHiddenFile(final String strFileName) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::isNotHiddenFile";
-		if (strFileName.endsWith("..") == false && strFileName.endsWith(".") == false) {
-			return true; // not a hidden file
+	public boolean isNotHiddenFile(final String fileName) {
+		if (fileName == null || fileName.equals(".") || fileName.equals("..") || fileName.endsWith("/..") || fileName.endsWith("/.")) {
+			return false; // it is a hidden-file
 		}
-		return false; // it is a hidden-file
-	} // private boolean isNotHiddenFile
+		return true; // it is not a hidden-file
+	}
 
 	@Override
 	public boolean isPositiveCommandCompletion() {
