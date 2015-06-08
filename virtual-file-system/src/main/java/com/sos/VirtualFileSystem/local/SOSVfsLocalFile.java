@@ -409,8 +409,6 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
 	 */
 	@Override
 	public void rename(final String pstrNewFileName) {
-		String strParent = super.getParent();
-		
 		super.renameTo(new File(pstrNewFileName));
 		logger.info(SOSVfsMessageCodes.SOSVfs_I_150.params(strFileName, pstrNewFileName));
 	}
