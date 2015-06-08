@@ -66,14 +66,14 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
 		// ebenfalls Namensbestandteil sein.
 		// TODO im Moment kommt der Dateiname mal mit und mal ohne Pfadname hier an.
 		// TODO Methoden bauen: GibDateiNameOhnePFad und GibDateiNameMitPfad
-		if (1 == 1) {
-			File fleF = new File(AdjustRelativePathName(strFileName));
-			String strP = fleF.getParent();
-			if (strP == null) {
-				strP = ".";
-			}
-			strP = ".";
-			String strN = fleF.getName();
+//		if (1 == 1) {
+//			File fleF = new File(AdjustRelativePathName(strFileName));
+//			String strP = fleF.getParent();
+//			if (strP == null) {
+//				strP = ".";
+//			}
+//			strP = ".";
+//			String strN = fleF.getName();
 			if (objVFSHandler.getFileSize(strFileName) >= 0) {
 				flgResult = true;
 			}
@@ -85,20 +85,20 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
 			// if (flgResult == false) {
 			// flgResult = vecTargetFileNamesList.contains(strN);
 			// }
-		}
-		else {
-			Vector<String> vecTargetFileNamesList = objVFSHandler.nList(".");
-			String strCurrDir = objVFSHandler.DoPWD();
-			logger.debug(SOSVfs_D_171.get(conMethodName, strCurrDir));
-			String strT = strFileName;
-			if (strT.startsWith(strCurrDir) == false) {
-				strT = strCurrDir + "/" + strFileName;
-			}
-			flgResult = vecTargetFileNamesList.contains(strT);
-			if (flgResult == false) { // Evtl. Windows?
-				flgResult = vecTargetFileNamesList.contains(strCurrDir + "\\" + strFileName);
-			}
-		}
+//		}
+//		else {
+//			Vector<String> vecTargetFileNamesList = objVFSHandler.nList(".");
+//			String strCurrDir = objVFSHandler.DoPWD();
+//			logger.debug(SOSVfs_D_171.get(conMethodName, strCurrDir));
+//			String strT = strFileName;
+//			if (strT.startsWith(strCurrDir) == false) {
+//				strT = strCurrDir + "/" + strFileName;
+//			}
+//			flgResult = vecTargetFileNamesList.contains(strT);
+//			if (flgResult == false) { // Evtl. Windows?
+//				flgResult = vecTargetFileNamesList.contains(strCurrDir + "\\" + strFileName);
+//			}
+//		}
 		logger.debug(SOSVfs_D_157.params(conMethodName, flgResult, strFileName));
 		return flgResult;
 	}
