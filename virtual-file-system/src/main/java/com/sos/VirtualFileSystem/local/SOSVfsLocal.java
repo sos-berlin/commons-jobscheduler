@@ -454,7 +454,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
 			Vector<String> objV = new Vector<String>(objA.size());
 			for (File objF : objA) {
 				if (objF.isDirectory() == false) {
-					objV.add(objF.getAbsolutePath());
+					objV.add(objF.getPath());
 				}
 			}
 			strS = objV.toArray(new String[objV.size()]);

@@ -951,84 +951,60 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 	 * @see #dir()
 	 */
 	private Vector<String> getFilenames(final String pstrPathName, final boolean flgRecurseSubFolders) {
-		String strCurrentDirectory = null;
-		// TODO vecDirectoryListing = null; prüfen, ob notwendig
-		vecDirectoryListing = null;
-		if (vecDirectoryListing == null) {
-			vecDirectoryListing = new Vector<String>();
-			String[] fileList = null;
-			strCurrentDirectory = DoPWD();
-			String lstrPathName = pstrPathName.trim();
-			if (lstrPathName.length() <= 0) {
-				lstrPathName = ".";
+		return getFilenames(pstrPathName, flgRecurseSubFolders, true);
+	}
+	
+	private Vector<String> getFilenames(final String path, final boolean withRecurseSubFolders, final boolean checkReplyCode) {
+		Vector<String> dirListing = new Vector<String>();
+		FTPFile[] ftpFileList = null;
+		
+		String pathName = path.trim();
+		if (pathName == null) {
+			pathName = "";
+		}
+		if (pathName.length() <= 0) {
+			pathName = ".";
+		}
+		try {
+			ftpFileList = Client().listFiles(pathName);
+		} catch (IOException e) {
+			RaiseException(e, HostID(SOSVfs_E_0105.params("getFilenames")));
+		}
+		if (ftpFileList == null || ftpFileList.length <= 0) {
+			//e.g. insufficient permissions
+			//should raise only for the source dir and not for sub folders (recursive)
+			if (isNegativeCommandCompletion()) {
+				String message = HostID(SOSVfs_E_0105.params("getFilenames")) + ":" + getReplyString();
+				if (checkReplyCode) {
+					RaiseException(message);
+				}
+				else {
+					logger.warn(message);
+				}
 			}
-			if (lstrPathName.equals(".")) {
-				lstrPathName = strCurrentDirectory;
-			}
-			FTPFile[] objFTPFileList = null;
-			try {
-				objFTPFileList = Client().listFiles(lstrPathName);
-			}
-			catch (IOException e1) {
-				logger.error(e1.getLocalizedMessage());
-			}
-			//			if (1 == 1) {
-			//				try {
-			//					fileList = listNames(lstrPathName);
-			//					// fileList = listNames(pstrPathName);
-			//				}
-			//				catch (IOException e) {
-			//					e.printStackTrace(System.err);
-			//				}
-			//			}
-			// else {
-			// FTPFile[] objFtpFiles = Client().listFiles(lstrPathName);
-			// if (objFtpFiles != null) {
-			// int i = 0;
-			// for (FTPFile ftpFile : objFtpFiles) {
-			// fileList[i++] = ftpFile.getName();
-			// }
-			// }
-			// }
-			if (objFTPFileList == null) {
-				return vecDirectoryListing;
-			}
-			for (FTPFile ftpFile : objFTPFileList) {
-				String strCurrentFile = ftpFile.getName();
-				if (isNotHiddenFile(strCurrentFile)) {
-					if (flgRecurseSubFolders == false && ftpFile.isFile()) {
-						if (strCurrentFile.startsWith(strCurrentDirectory) == false)
-							strCurrentFile = strCurrentDirectory + "/" + strCurrentFile;
-						vecDirectoryListing.add(strCurrentFile);
-					}
-					else {
-						//						DoCD(strCurrentFile); // is this file-entry a subfolder?
-						//						if (isNegativeCommandCompletion()) {
-						if (ftpFile.isFile()) {
-							if (strCurrentFile.startsWith(strCurrentDirectory) == false)
-								strCurrentFile = strCurrentDirectory + "/" + strCurrentFile;
-							vecDirectoryListing.add(strCurrentFile);
-						}
-						else {
-							//							DoCD(strCurrentDirectory);
-							if (ftpFile.isDirectory() && flgRecurseSubFolders) {
-								Vector<String> vecNames = getFilenames(strCurrentFile);
-								if (vecNames != null) {
-									vecDirectoryListing.addAll(vecNames);
-								}
-							}
-						}
+			return dirListing;
+		}
+		for (FTPFile ftpFile : ftpFileList) {
+			String currentFile = ftpFile.getName();
+			if (isNotHiddenFile(currentFile)) {
+				// if ftp server returns filename without path
+				if (currentFile.indexOf("/") == -1) {
+					currentFile = pathName + "/" + currentFile;
+					currentFile = currentFile.replaceAll("//+", "/");
+				}
+				if (ftpFile.isFile()) {
+					dirListing.add(currentFile);
+				} else if (ftpFile.isDirectory() && withRecurseSubFolders) {
+					Vector<String> filelist = getFilenames(currentFile + "/",
+							withRecurseSubFolders);
+					if (filelist != null && filelist.size() > 0) {
+						dirListing.addAll(filelist);
 					}
 				}
 			}
 		}
-		logger.debug(SOSVfs_I_126.params(strCurrentDirectory));
-		if (strCurrentDirectory != null) {
-			DoCD(strCurrentDirectory);
-			DoPWD();
-		}
-		return vecDirectoryListing;
-	} // nList
+		return dirListing;
+	}
 
 	@Override public OutputStream getFileOutputStream() {
 		return null;
@@ -1252,13 +1228,12 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 		return x > 300;
 	} // private boolean isNegativeCommandCompletion
 
-	public boolean isNotHiddenFile(final String strFileName) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::isNotHiddenFile";
-		if (strFileName.equalsIgnoreCase("..") == false && strFileName.equalsIgnoreCase(".") == false) {
-			return true; // not a hidden file
+	public boolean isNotHiddenFile(final String fileName) {
+		if (fileName == null || fileName.equals(".") || fileName.equals("..") || fileName.endsWith("/..") || fileName.endsWith("/.")) {
+			return false; // it is a hidden-file
 		}
-		return false; // it is a hidden-file
-	} // private boolean isNotHiddenFile
+		return true; // it is not a hidden-file
+	}
 
 	protected boolean isPositiveCommandCompletion() {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::isPositiveCommandCompletion";

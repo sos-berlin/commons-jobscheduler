@@ -172,13 +172,12 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 		return x <= 300;
 	} // private boolean isPositiveCommandCompletion
 
-	public boolean isNotHiddenFile(final String strFileName) {
-		if (strFileName.equalsIgnoreCase("..") == false && strFileName.equalsIgnoreCase(".") == false) {
-			return true; // not a hidden file
+	public boolean isNotHiddenFile(final String fileName) {
+		if (fileName == null || fileName.equals(".") || fileName.equals("..") || fileName.endsWith("/..") || fileName.endsWith("/.")) {
+			return false; // it is a hidden-file
 		}
-
-		return false; // it is a hidden-file
-	} // private boolean isNotHiddenFile
+		return true; // it is not a hidden-file
+	}
 
 	/**
 	 * return a listing of the contents of a directory in short format on
@@ -627,16 +626,15 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	}
 
 	protected String resolvePathname(String pathname) {
-		if (!pathname.startsWith("./") && !pathname.startsWith("/") && currentDirectory.length() > 0) {
-			// if (!pathname.startsWith("/") && currentDirectory.length()>0){
-			String slash = "";
-			if (!currentDirectory.endsWith("/"))
-				slash = "/";
-			pathname = currentDirectory + slash + pathname;
-		}
-		while (pathname.contains("\\")) {
-			pathname = pathname.replace('\\', '/');
-		}
+// 		currentDirectory is always empty
+//		if (!pathname.startsWith("./") && !pathname.startsWith("/") && currentDirectory.length() > 0) {
+//			// if (!pathname.startsWith("/") && currentDirectory.length()>0){
+//			String slash = "";
+//			if (!currentDirectory.endsWith("/"))
+//				slash = "/";
+//			pathname = currentDirectory + slash + pathname;
+//		}
+		pathname = pathname.replaceAll("\\\\", "/");
 		return pathname;
 	}
 
@@ -1253,21 +1251,18 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 
 	private Vector<String> getFilenames(String path, final boolean recurseSubFolders, int recLevel) throws Exception {
 
+		String currentPath = "";
 		if (recLevel == 0) {
 			directoryListing = new Vector<String>();
+			currentPath = this.DoPWD();
 		}
 
 		String[] fileList = null;
-		String currentPath = this.DoPWD();
 
 		path = path.trim();
 		if (path.length() <= 0) {
 			path = ".";
 		}
-		if (path.equals(".")) {
-			path = currentPath;
-		}
-
 		try {
 			fileList = listNames(path);
 		}
@@ -1279,40 +1274,31 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 			return directoryListing;
 		}
 
-		for (String strCurrentFile : fileList) {
-			if (strCurrentFile == null || strCurrentFile.endsWith("/.") || strCurrentFile.endsWith("/..")) {
-				continue;
+		for (String currentFile : fileList) {
+			if (!isNotHiddenFile(currentFile)) continue;
+			//if strCurrentFile has only name without path
+			if (currentFile.indexOf("/") == -1) {
+				currentFile = path + "/" + currentFile;
+				currentFile = currentFile.replaceAll("//+", "/");
 			}
-
-			/**
-			 * kb 2012-10-08
-			 * The filename could be a subfolder. the name of this subfolder must not included in the
-			 * list of filenames.
-			 */
-			//			directoryListing.add(strCurrentFile);
 
 			/**
 			 * isDirectory is suboptiomal in this situation. think of links
 			 * better is isRegularFile instead
 			 * TODO create isRegularFile
 			 */
-			if (this.isDirectory(strCurrentFile) == true) {
+			if (this.isDirectory(currentFile) == true) {
 				if (recurseSubFolders) {
-					this.cd(strCurrentFile);
 					recLevel++;
-					this.getFilenames(strCurrentFile, recurseSubFolders, recLevel);
+					this.getFilenames(currentFile, recurseSubFolders, recLevel);
 				}
 			}
 			else {
-				directoryListing.add(strCurrentFile);
+				directoryListing.add(currentFile);
 			}
 		}
-
-		logDEBUG("currentPath = " + currentPath);
-
 		return directoryListing;
-
-	} // nList
+	} 
 
 	@Override
 	public void doPostLoginOperations() {

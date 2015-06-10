@@ -255,6 +255,10 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 						//						String replacedValue = replaceVars(SchedulerParameters, key, value);
 						if (replacedValue.equalsIgnoreCase(value) == false) {
 							SchedulerParameters.put(key, replacedValue);
+							logger.trace(String.format("%1$s = %2$s", key, replacedValue));
+						}
+						else {
+							logger.trace(String.format("%1$s = %2$s", key, value));
 						}
 					}
 				}
@@ -580,7 +584,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::replaceSchedulerVars";
 		String strTemp = pstrString2Modify;
-		logger.debug("strTemp = " + strTemp);
+		//logger.debug("strTemp = " + strTemp);
 
 		if (isNull(paramsAsHashmap)) {
             paramsAsHashmap = convertVariableSet2HashMap(objJobOrOrderParams);

@@ -490,14 +490,6 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		return lngFileSize;
 	}
 
-	public Long getLastCheckedFileSize() {
-		return lastCheckedFileSize;
-	}
-	
-	public void setLastCheckedFileSize(Long fileSize) {
-		lastCheckedFileSize = fileSize;
-	}
-	
 	@Override public String getLastErrorMessage() {
 		return EMPTY_STRING;
 	}
@@ -516,11 +508,11 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
 	private String getPathWithoutFileName(final String pstrTargetFileName) {
 		String strT = adjustFileSeparator(pstrTargetFileName);
-		File fleT = new File(strT);
-		strT = fleT.getParent();
-		if (strT == null) {
-			strT = "/";
-		}
+//		File fleT = new File(strT);
+//		strT = fleT.getParent();
+//		if (strT == null) {
+//			strT = "/";
+//		}
 		return adjustFileSeparator(strT);
 	}
 

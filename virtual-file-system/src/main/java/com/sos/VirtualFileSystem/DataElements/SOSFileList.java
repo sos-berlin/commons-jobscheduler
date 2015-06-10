@@ -247,14 +247,14 @@ public class SOSFileList extends SOSVfsMessageCodes {
 		if (pstrA == null) {
 			return;
 		}
-		File fleDir = new File(pstrFolderName);
-		String strDir = fleDir.getPath();
+//		File fleDir = new File(pstrFolderName);
+//		String strDir = fleDir.getPath();
 		for (String strFileName : pstrA) {
-			File fleT = new File(strFileName);
-			String strP = fleT.getParent();
-			if (strP == null) {
-				strFileName = strDir + "/" + strFileName;
-			}
+//			File fleT = new File(strFileName);
+//			String strP = fleT.getParent();
+//			if (strP == null) {
+//				strFileName = strDir + "/" + strFileName;
+//			}
 			try {
 				if (withExistCheck && objDataSourceClient.getFileHandle(strFileName).FileExists()) {
 					this.add(strFileName);
