@@ -373,7 +373,14 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 					
 					StrictSSLProtocolSocketFactory psf = new StrictSSLProtocolSocketFactory();
 					//psf.setCheckCRL and psf.setCheckExpiry sind bei StrictSSL.. per default true
-					psf.setCheckHostname(true);
+					psf.setCheckHostname(connection2OptionsAlternate.verify_certificate_hostname.value());
+					if(!psf.getCheckHostname()){
+						logger.info("*********************** Security warning *********************************************************************");
+						logger.info("Jade option \"verify_certificate_hostname\" is currently \"false\". ");
+						logger.info("The certificate verification process will not verify the DNS name of the certificate presented by the server,");
+						logger.info("with the hostname of the server in the URL used by the Jade client.");
+						logger.info("**************************************************************************************************************");
+					}
 					if(connection2OptionsAlternate.accept_untrusted_certificate.value()){
 						//see apache ssl EasySSLProtocolSocketFactory implementation
 						psf.useDefaultJavaCiphers();
