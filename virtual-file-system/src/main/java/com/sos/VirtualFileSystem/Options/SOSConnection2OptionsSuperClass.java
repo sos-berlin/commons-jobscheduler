@@ -1337,6 +1337,31 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 		accept_untrusted_certificate = val;
 	}
 
+	/**
+	* \var verify_certificate_hostname : The certificate verification process will always verify the DNS name of the certificate presented by the server, with the hostname of the server in the URL used by the client.
+	*
+	*
+	*/
+	@JSOptionDefinition(
+						name = "verify_certificate_hostname",
+						description = "The certificate verification process will always verify the DNS name of the certificate presented by the server, with the hostname of the server in the URL used by the client.",
+						key = "verify_certificate_hostname",
+						type = "SOSOptionBoolean",
+						mandatory = false)
+	public SOSOptionBoolean	verify_certificate_hostname	= new SOSOptionBoolean(this, conClassName + ".verify_certificate_hostname", // HashMap-Key
+													"The certificate verification process will always verify the DNS name of the certificate presented by the server, with the hostname of the server in the URL used by the client", // Titel
+													"true", // InitValue
+													"true", // DefaultValue
+													false // isMandatory
+											);
+
+	public SOSOptionBoolean getverify_certificate_hostname() {
+		return verify_certificate_hostname;
+	}
+
+	public void setverify_certificate_hostname(SOSOptionBoolean val) {
+		verify_certificate_hostname = val;
+	}
 	
 	/**
 	* \var proxy_host : host name or the IP address of a proxy
