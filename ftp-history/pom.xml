@@ -112,21 +112,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc6</artifactId>
-            <scope>test</scope>         
-        </dependency>
-        
-        <dependency>
             <groupId>com.sos-berlin.commons</groupId>
             <artifactId>common-resources</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sos-berlin.sos-internal-test</groupId>
-            <artifactId>test-resources</artifactId>
             <scope>test</scope>
         </dependency>
 
