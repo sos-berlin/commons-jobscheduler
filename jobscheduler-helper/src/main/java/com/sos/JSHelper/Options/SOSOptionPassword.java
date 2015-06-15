@@ -97,13 +97,14 @@ public class SOSOptionPassword extends SOSOptionString {
 						String command = strValue.substring(1, strValue.length() - 1);
 
 						Vector returnValues = new SOSCommandline().execute(command);
-						logger.debug(returnValues);
 						Integer exitValue = (Integer) returnValues.elementAt(0);
+						logger.debug("exit code = " + exitValue);
 //						Integer exitValue = Integer.getInteger(strT);
 						if (exitValue.compareTo(new Integer(0)) == 0) {
 							if (returnValues.elementAt(1) != null) {
 								strReturnPassword = (String) returnValues.elementAt(1);
 								strCachedPW = strReturnPassword;
+								logger.debug("password received via command script.");
 							}
 						}
 					}
