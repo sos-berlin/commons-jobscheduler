@@ -124,9 +124,8 @@ public class SOSSSHJob2SuperClass extends JSToolBox {
 				}
 
 			if (!isAuthenticated) {
-//				throw new Exception("authentication failed [host=" + this.getHost() + ", port=" + this.getPort() + ", user:" + this.getUser()
-//						+ ", auth_method=" + this.getAuthenticationMethod() + ", auth_file=" + this.getAuthenticationFilename());
-				throw new Exception(conMethodName + ": " + "authentication failed " + objOptions.toString());
+				throw new Exception("authentication failed [host=" + objOptions.host.Value() + ", port=" + objOptions.port.Value() + ", user:" + objOptions.user.Value()
+						+ ", auth_method=" + objOptions.auth_method.Value());
 			}
 			
 			return this.getSshConnection();
