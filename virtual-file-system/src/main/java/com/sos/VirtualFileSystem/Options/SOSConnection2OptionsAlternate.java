@@ -22,6 +22,7 @@ import com.sos.JSHelper.Listener.JSListener;
 import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Options.SOSOptionCommandString;
 import com.sos.JSHelper.Options.SOSOptionElement;
+import com.sos.JSHelper.Options.SOSOptionPassword;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 /**
@@ -333,7 +334,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 			
 			boolean flgHideValuesFromCredentialStore = false;
 			if (objEntry.Url().length() > 0) {
-				logger.trace(objEntry.Url());
+//				logger.trace(objEntry.Url());
 				// Possible Elements of an URL are:
 				//
 				// http://hans:geheim@www.example.org:80/demo/example.cgi?land=de&stadt=aa#geschichte
@@ -403,7 +404,9 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 
 	private void setIfNotDirty(final SOSOptionElement objOption, final String pstrValue) {
 		if (objOption.isNotDirty() && isNotEmpty(pstrValue)) {
-			logger.trace("setValue = " + pstrValue);
+			if(!objOption instanceof SOSOptionPassword){
+				logger.trace("setValue = " + pstrValue);
+			}
 			objOption.Value(pstrValue);
 		}
 	}
