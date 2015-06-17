@@ -367,10 +367,16 @@ public class JobSchedulerJob extends Job_impl {
 	private boolean getSettings() {
 
 		try {
+			
 			if (spooler_job == null) {
 				return false;
 			}
 
+			File schedulerIniFile = new File(spooler.ini_path());
+			if (!schedulerIniFile.canRead()){
+				spooler_log.debug("No ini file found. Continuing without settings.");
+				return false;
+			}
 			setJobSettings(new SOSProfileSettings(spooler.ini_path()));
 			setJobProperties(getJobSettings().getSection("job " + spooler_job.name()));
 
