@@ -1166,7 +1166,9 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::ChangeValue";
 		if (pobjTarget.IsEmpty() == true /* && pobjTarget.isDirty() == false */) {
 			if (pobjSource.IsEmpty() == false) {
-				if(!(pobjSource instanceof SOSOptionPassword)){
+				if(pobjSource instanceof SOSOptionPassword){
+					logger.trace(SOSVfsMessageCodes.SOSVfs_I_263.params(pobjTarget.getKey(), "*****"));
+				} else{
 					logger.trace(SOSVfsMessageCodes.SOSVfs_I_263.params(pobjTarget.getKey(), pobjSource.Value()));
 				}
 				pobjTarget.Set(pobjSource);
