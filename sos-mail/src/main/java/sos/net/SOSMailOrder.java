@@ -837,14 +837,10 @@ protected SOSPlainTextProcessor mailPlainTextProcessor                      = nu
 	}
 	
 	public static void main(String[] args) throws Exception{
-		//String mailto = "andreas.liebert@sos-berlin.com";		
 		String mailto = "mo@sos-berlin.com";
 		
 		SOSLogger logger = new SOSStandardLogger(9);
 		
-		//db= jdbc -class=com.microsoft.sqlserver.jdbc.SQLServerDriver jdbc:sqlserver://8of9:2433;sendStringParametersAsUnicode=false;selectMethod=cursor;databaseName=ehp_bkk -user=ehp_bkk -password=ehp_bkk
-		
-		//SOSConnection conn = SOSConnection.createInstance("SOSMySQLConnection","com.mysql.jdbc.Driver","jdbc:mysql://wilma.sos:3305/scheduler", "scheduler", "scheduler",logger);
 		SOSConnection conn = SOSConnection.createInstance("SOSMSSQLConnection","com.microsoft.sqlserver.jdbc.SQLServerDriver","jdbc:sqlserver://8of9:2433;sendStringParametersAsUnicode=false;selectMethod=cursor;databaseName=ehp_bkk", "ehp_bkk", "ehp_bkk",logger);
 		conn.connect();
 		SOSSettings settings = new SOSConnectionSettings(conn,"SETTINGS", logger);

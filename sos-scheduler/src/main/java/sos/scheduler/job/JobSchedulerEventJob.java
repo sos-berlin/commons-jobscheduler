@@ -310,7 +310,11 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 						Element param = getEvents().createElement("param");
 						param.setAttribute("name", parameterNames[i]);
 						param.setAttribute("value", this.getParameters().value(parameterNames[i]));
-						getLogger().debug3("Event parameter [" + parameterNames[i] + "]: " + this.getParameters().value(parameterNames[i]));
+						if(parameterNames[i].contains("password")){
+							getLogger().debug3("Event parameter [" + parameterNames[i] + "]: *****");
+						}else{
+							getLogger().debug3("Event parameter [" + parameterNames[i] + "]: " + this.getParameters().value(parameterNames[i]));
+						}
 						this.getEventParameters().appendChild(param);
 					}
 				}
@@ -608,8 +612,11 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 						parameterSubstitutor.addKey(event_class+".*."+param_name, param_value);
 						parameterSubstitutor.addKey(event_id+"."+param_name, param_value);
 						parameterSubstitutor.addKey(param_name, param_value);
-
-						getLogger().debug5(event_class+"."+event_id+"."+param_name+"="+param_value);
+						if(param_name.contains("password")){
+							getLogger().debug5(event_class+"."+event_id+"."+param_name+"=*****");
+						}else{
+							getLogger().debug5(event_class+"."+event_id+"."+param_name+"="+param_value);
+						}
 					}
   				}
 			}

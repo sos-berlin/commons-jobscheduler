@@ -174,7 +174,11 @@ public class JSBatchInstallerExecuter {
 	}
 
 	private void setParam(final String pstrParamName, final String pstrParamValue) {
-		logger.info("ParamName = " + pstrParamName + ", Value = " + pstrParamValue);
+		if(pstrParamName.contains("password")){
+			logger.info("ParamName = " + pstrParamName + ", Value = *****");
+		}else{
+			logger.info("ParamName = " + pstrParamName + ", Value = " + pstrParamValue);
+		}
 		order.params().set_var(pstrParamName, pstrParamValue);
 	}
 

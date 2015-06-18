@@ -66,7 +66,11 @@ public abstract class JobSchedulerManagedJob extends JobSchedulerJobAdapter {
 
 	protected void debugParamter(final Variable_set params, final String name) {
 		try {
-			getLogger().debug6("Parameter: " + name + " value:\"" + params.var(name) + "\"");
+			if(name.contains("password")){
+				getLogger().debug6("Parameter: " + name + " value:\"*****\"");
+			}else{
+				getLogger().debug6("Parameter: " + name + " value:\"" + params.var(name) + "\"");
+			}
 		}
 		catch (Exception e) {
 		}

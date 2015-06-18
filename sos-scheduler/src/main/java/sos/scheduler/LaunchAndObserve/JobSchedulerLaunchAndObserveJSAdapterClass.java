@@ -123,11 +123,15 @@ public class JobSchedulerLaunchAndObserveJSAdapterClass extends JobSchedulerJobA
 		objO.setAllOptions(objH);
 		SOSSmtpMailOptions objM = (SOSSmtpMailOptions) objO.getMailOnRestartOptions();
 		objM.setAllOptions(objH);
-		logger.debug(objM.toString());
+		// JITL-145: commented to prevent logging of passwords, toString-Method of JSOptionClass calls getAllOptionsAsString 
+		// which itself aggregates a String with all Options without checking, to log that String can result in clear passwords being logged
+//		logger.debug(objM.toString());
 		
 		SOSSmtpMailOptions objK = (SOSSmtpMailOptions) objO.getMailOnKillOptions();
 		objK.setAllOptions(objH);
-		logger.debug(objK.toString());
+		// JITL-145: commented to prevent logging of passwords, toString-Method of JSOptionClass calls getAllOptionsAsString 
+		// which itself aggregates a String with all Options without checking, to log that String can result in clear passwords being logged
+//		logger.debug(objK.toString());
 
 		
 		objO.CheckMandatory();

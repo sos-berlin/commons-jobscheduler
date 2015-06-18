@@ -255,10 +255,18 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 						//						String replacedValue = replaceVars(SchedulerParameters, key, value);
 						if (replacedValue.equalsIgnoreCase(value) == false) {
 							SchedulerParameters.put(key, replacedValue);
-							logger.trace(String.format("%1$s = %2$s", key, replacedValue));
+							if(key.contains("password")){
+								logger.trace(String.format("%1$s = *****", key));
+							}else{
+								logger.trace(String.format("%1$s = %2$s", key, replacedValue));
+							}
 						}
 						else {
-							logger.trace(String.format("%1$s = %2$s", key, value));
+							if(key.contains("password")){
+								logger.trace(String.format("%1$s = *****", key));
+							}else{
+								logger.trace(String.format("%1$s = %2$s", key, value));
+							}
 						}
 					}
 				}

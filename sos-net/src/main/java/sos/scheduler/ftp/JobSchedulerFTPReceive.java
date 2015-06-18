@@ -338,7 +338,11 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
 				if (key.startsWith(conPrefixFTP) && key.length() > conPrefixFTP.length()) {
 					key = key.substring(conPrefixFTP.length());
 				}
-				getLogger().debug("param [" + key + "=" + val + "]");
+				if(key.contains("password")){
+					getLogger().debug("param [" + key + "=*****]");
+				}else{
+					getLogger().debug("param [" + key + "=" + val + "]");
+				}
 				schedulerParams.put(key, val);
 			}
 			if (sosString.parseToString(schedulerParams.get("use_order_set_back")).length() > 0) {

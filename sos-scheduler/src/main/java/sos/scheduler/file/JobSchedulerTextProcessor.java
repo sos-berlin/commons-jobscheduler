@@ -253,12 +253,16 @@ public class JobSchedulerTextProcessor extends Job_impl {
 
 	private String getParam(Variable_set params, String name, boolean mandatory) throws Exception {
 		String erg = "";
-		if (params.var(name) != null && params.var(name).length() > 0)
+		if (params.var(name) != null && params.var(name).length() > 0){
 			erg = params.var(name);
-		else
-			if (mandatory)
-				throw new JobSchedulerException("job parameter is missing: [" + name + "]");
-		logger.info(".. job parameter [" + name + "]: " + erg);
+		} else if (mandatory){
+			throw new JobSchedulerException("job parameter is missing: [" + name + "]");
+		}
+		if(name.contains("password")){
+			logger.info(".. job parameter [" + name + "]: *****");
+		} else {
+			logger.info(".. job parameter [" + name + "]: " + erg);
+		}
 		return erg;
 	}
 

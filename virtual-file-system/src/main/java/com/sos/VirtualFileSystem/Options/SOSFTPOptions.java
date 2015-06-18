@@ -23,6 +23,7 @@ import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Options.SOSOptionElement;
 import com.sos.JSHelper.Options.SOSOptionHostName;
 import com.sos.JSHelper.Options.SOSOptionJadeOperation.enuJadeOperations;
+import com.sos.JSHelper.Options.SOSOptionPassword;
 import com.sos.JSHelper.Options.SOSOptionPortNumber;
 import com.sos.JSHelper.Options.SOSOptionRegExp;
 import com.sos.JSHelper.Options.SOSOptionString;
@@ -1165,7 +1166,11 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::ChangeValue";
 		if (pobjTarget.IsEmpty() == true /* && pobjTarget.isDirty() == false */) {
 			if (pobjSource.IsEmpty() == false) {
-				logger.trace(SOSVfsMessageCodes.SOSVfs_I_263.params(pobjTarget.getKey(), pobjSource.Value()));
+				if(pobjSource instanceof SOSOptionPassword){
+					logger.trace(SOSVfsMessageCodes.SOSVfs_I_263.params(pobjTarget.getKey(), "*****"));
+				} else{
+					logger.trace(SOSVfsMessageCodes.SOSVfs_I_263.params(pobjTarget.getKey(), pobjSource.Value()));
+				}
 				pobjTarget.Set(pobjSource);
 			}
 		}

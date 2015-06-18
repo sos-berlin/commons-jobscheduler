@@ -519,7 +519,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		File fleT = new File(strT);
 		strT = fleT.getParent();
 		if (strT == null) {
-			strT = "/";
+			strT = "./";
 		}
 		return adjustFileSeparator(strT);
 	}

@@ -345,7 +345,11 @@ public class SchedulerMailer {
 
 	private void debugParameter(final Variable_set params, final String paramName) {
 		try {
-			logger.debug1(".. mail parameter [" + paramName + "]: " + params.value(paramName));
+			if(paramName.contains("password")){
+				logger.debug1(".. mail parameter [" + paramName + "]: *****");
+			}else{
+				logger.debug1(".. mail parameter [" + paramName + "]: " + params.value(paramName));
+			}
 		}
 		catch (Exception e) {
 		} //No error handling

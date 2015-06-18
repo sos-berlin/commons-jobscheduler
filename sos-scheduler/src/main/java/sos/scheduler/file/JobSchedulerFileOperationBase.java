@@ -317,7 +317,11 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 		if (isNotNull(strT)) { // && params.value(pstrParamName).length() > 0) {
 			strT = strT.trim();
 			if (strT.length() > 0) {
-				logger.info(JSJ_I_0040.params(pstrParamName, strT));
+				if(pstrParamName.contains("password")){
+					logger.info(JSJ_I_0040.params(pstrParamName, "*****"));
+				}else{
+					logger.info(JSJ_I_0040.params(pstrParamName, strT));
+				}
 			}
 		}
 		return strT;

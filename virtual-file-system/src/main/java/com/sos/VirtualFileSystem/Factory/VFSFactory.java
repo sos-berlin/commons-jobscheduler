@@ -183,7 +183,7 @@ public class VFSFactory extends SOSVfsMessageCodes {
 		}
 		classLoader = Thread.currentThread().getContextClassLoader();
 		if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.ssh2.Text())) {
-			// TODO über late binding laden, damit es auch als Option verwendet werden kann
+			// TODO  Ã¼ber late binding laden, damit es auch als Option verwendet werden kann
 			// com.sos.VirtualFileSystem.SSH.SOSSSH2TriLeadImpl
 			// objC = new SOSSSH2TriLeadImpl();
 			// logger.debug(conMethodName + " returns instance of " + SOSSSH2TriLeadImpl.class.toString());
@@ -257,7 +257,8 @@ public class VFSFactory extends SOSVfsMessageCodes {
 				objC.Connect(strHost, intPort);
 				ISOSAuthenticationOptions objAO = new SOSFTPOptions();
 				String strUserInfo = objURL.getUserInfo();
-				logger.info("User-Info = " + strUserInfo);
+				//JITL-145: can contain password, therefore shouldn't be logged
+//				logger.info("User-Info = " + strUserInfo);
 				String[] strUI = strUserInfo.split(":");
 				objAO.getUser().Value(strUI[0]);
 				objAO.getPassword().Value("");
