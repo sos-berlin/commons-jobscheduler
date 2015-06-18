@@ -1429,6 +1429,16 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::createOrder";
 		JSObjOrder objOrder = new JSObjOrder(this, pobjVirtualFile);
+		String s;
+        try {
+            s = pobjVirtualFile.getFile().getName();
+            s = new File(s).getName();
+            s = s.replaceFirst(".*,(.*)\\.order\\.xml","$1");
+            
+            objOrder.setId(s);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 		return objOrder;
 	} // JSObjJob JSObjOrder()
 

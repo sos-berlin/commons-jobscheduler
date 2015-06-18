@@ -1,13 +1,36 @@
 package com.sos.scheduler.model.objects;
+import com.google.common.io.Files;
 import com.sos.JSHelper.io.Files.JSTextFile;
+import com.sos.VirtualFileSystem.Factory.VFSFactory;
+import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
+import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.shell.cmdShell;
+import com.sos.graphviz.Edge;
+import com.sos.graphviz.Graph;
+import com.sos.graphviz.GraphIO;
+import com.sos.graphviz.Node;
+import com.sos.graphviz.SingleNodeProperties;
+import com.sos.graphviz.enums.FileType;
+import com.sos.graphviz.enums.RankDir;
+import com.sos.graphviz.enums.SVGColor;
+import com.sos.graphviz.enums.Shape;
+import com.sos.graphviz.enums.Style;
+import com.sos.graphviz.properties.GraphvizEnumProperty;
+import com.sos.graphviz.properties.GraphvizHtmlProperty;
+import com.sos.graphviz.properties.GraphvizProperty;
 import com.sos.scheduler.converter.graphviz.Dot;
+import com.sos.scheduler.model.SchedulerHotFolder;
+import com.sos.scheduler.model.SchedulerHotFolderFileList;
 import com.sos.scheduler.model.SchedulerObjectFactory;
+import com.sos.scheduler.model.objects.JobChain.JobChainNode.OnReturnCodes.OnReturnCode;
+
 import org.apache.log4j.Logger;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -44,6 +67,8 @@ public class JSObjJobChain extends JobChain {
 	@SuppressWarnings("unused") private final Logger		logger									= Logger.getLogger(this.getClass());
 	public final static String								fileNameExtension						= ".job_chain.xml";
 	public static final String								conFileNameExtension4NodeParameterFile	= ".config.xml";
+	private Hashtable<String, JobChainNode> jobChainNodes;
+	private Graph graph;
 
 	public JSObjJobChain(final SchedulerObjectFactory schedulerObjectFactory) {
 		super();
@@ -61,13 +86,25 @@ public class JSObjJobChain extends JobChain {
 		super.objVirtualFile = pobjVirtualFile;
 		loadObject();
 	}
-
+    
+ 
+	
 	public void loadObject() {
 		JobChain objJobChain = (JobChain) unMarshal(super.objVirtualFile);
 		setObjectFieldsFrom(objJobChain);
 		setHotFolderSrc(super.objVirtualFile);
 	}
 
+	public void loadObject(File file) {
+        JobChain jobChain = (JobChain) unMarshal(file);
+        setObjectFieldsFrom(jobChain);
+        String jobChainName = file.getName();
+        jobChainName = jobChainName.replaceFirst("\\.job_chain\\.xml~$", "");
+        
+        this.setName(jobChainName);
+        setHotFolderSrc(super.objVirtualFile);
+    }
+	
 	public void setNameIfNotEmpty(String value) {
 		if (!isEmpty(value)) {
 			this.setName(value);
@@ -260,17 +297,17 @@ public class JSObjJobChain extends JobChain {
 		if (canUpdate() == false) {
 			return;
 		}
-		int maxOrders;
+		BigInteger maxOrders;
 		try {
-			maxOrders = Integer.parseInt(strMaxOrders);
+			maxOrders = new BigInteger(strMaxOrders);
 			setMaxorders(maxOrders);
 		}
 		catch (NumberFormatException e) {
-			maxOrders = 0;
+			maxOrders = new BigInteger("0");
 		}
 	}
 
-	public void setMaxorders(final int maxOrders) {
+	public void setMaxorders(final BigInteger maxOrders) {
 		super.maxOrders = maxOrders;
 		setDirty();
 	}
@@ -288,7 +325,7 @@ public class JSObjJobChain extends JobChain {
 	}
 
 	public String getMaxOrders() {
-		Integer intM = getmaxOrders();
+		BigInteger intM = getmaxOrders();
 		String strM = "";
 		if (intM != null) {
 			strM = String.valueOf(intM);
@@ -296,227 +333,249 @@ public class JSObjJobChain extends JobChain {
 		return strM;
 	}
 
-	public String createDOTFile() throws Exception {
-		boolean flgCreateCluster = false;
-		boolean flgCreateErrorNodes = false;
-		JSObjJobChain objChain = this;
-		String strName = objChain.getName();
-		if (strName == null) {
-			strName = objChain.getObjectName();
-		}
-		// TODO an Option is needed for the diagram work folder
-		String strFileName = "c:/temp/dottest/" + strName;
-		// TODO implement class JSDOTFile
-		JSTextFile objDotFile = new JSTextFile(strFileName + ".dot");
-		objDotFile.deleteOnExit();
-		// Get list of orders related to this JobChain
-		/**
-		Hashtable<String, JSObjOrder> tblOrders = new Hashtable<String, JSObjOrder>();
-		for (JSObjBase objO : objSchedulerHotFolderFileList.getSortedFileList()) {
-		    if (objO instanceof JSObjOrder) {
-		        JSObjOrder objOrder = (JSObjOrder) objO;
-		        String strOrderName = objOrder.getJobChainName();
-		        if (strName.equalsIgnoreCase(strOrderName)) {
-		            tblOrders.put(strOrderName, objOrder);
-		        }
-		    }
-		}
-		*/
-		objDotFile.WriteLine("digraph " + getQuoted(strName) + " {");
-		objDotFile.WriteLine("rankdir = TB;");
-		objDotFile.WriteLine("graph [");
-		objDotFile.WriteLine("label = " + getQuoted(objChain.getTitle()));
-		objDotFile.WriteLine("fontsize = 8");
-		objDotFile.WriteLine("];");
-		objDotFile.WriteLine("node [");
-		objDotFile.WriteLine("fontsize = 8");
-		objDotFile.WriteLine("shape = " + getQuoted("box"));
-		objDotFile.WriteLine("style = " + getQuoted("rounded,filled"));
-		objDotFile.WriteLine("fillcolor = " + getQuoted("#CCFF99"));
-		//				objDotFile.WriteLine("style = " + getQuoted("rounded"));
-		//		objDotFile.WriteLine("shape = " + getQuoted("plaintext"));
-		//				objDotFile.WriteLine("style = " + getQuoted("filled"));
-		//		objDotFile.WriteLine("fillcolor = " + getQuoted("#EEEEEE"));
-		//				objDotFile.WriteLine("color = " + getQuoted("#EEEEEE"));
-		objDotFile.WriteLine("fontname = " + getQuoted("Arial"));
-		objDotFile.WriteLine("];");
-		objDotFile.WriteLine("edge [") //
-				.WriteLine("color = " + getQuoted("#31CEF0"))
-				.WriteLine("arrowsize = " + getQuoted("0.5"))
-				.WriteLine("];");
-		Hashtable<String, JobChainNode> tblNodes = new Hashtable<String, JobChainNode>();
-		//		objDotFile.WriteLine(getQuoted("start") + " [label = " + getQuoted("start" + ": " + strName) + ", shape = " + getQuoted("box") + ", style = "
-		//				+ getQuoted("solid") + "];");
-		//		objDotFile.WriteLine(getQuoted("end") + " [label = " + getQuoted("end" + ": " + strName) + ", shape = " + getQuoted("box") + ", style = "
-		//				+ getQuoted("solid") + "];");
-		/**
-		for (JSObjOrder objOrder : tblOrders.values()) {
-		    objDotFile.WriteLine(getQuoted(objOrder.getObjectName()) + " [label = " + getQuoted("Order - " + objOrder.getObjectName()) + "];");
-		}
-		*/
-		int intFileOrderSourceCnt = 0;
-		String strFirstState = "";
-		for (Object objO : objChain.getFileOrderSourceList()) {
-			if (objO instanceof FileOrderSource) {
-				FileOrderSource objFOS = (FileOrderSource) objO;
-				String strDir = objFOS.getDirectory();
-				String strRegExp = objFOS.getRegex();
-				String strNextState = objFOS.getNextState();
-				intFileOrderSourceCnt++;
-				String strH = "";
-				strH = "<b>" + "Folder: " + strDir + " </b>" + conHtmlBR;
-				strH += "<i><b><font color=\"blue\" >" + escapeHTML("RegExp: " + strRegExp) + "</font></b></i>" + conHtmlBR;
-				objDotFile.WriteLine(getQuoted("FileOrderSource" + intFileOrderSourceCnt) + " [label = <" + strH + ">];");
+    private Edge newEdge(String from, String to){
+        Edge e = graph.newEdge(from, to);
+        e.getEdgeProperties().setColor(SVGColor.cadetblue);
+        e.getEdgeProperties().setArrowSize(0.5);
+        e.getEdgeProperties().setFontSize(8);
+        e.getEdgeProperties().setFontName("Arial");        
+                 
+        if (jobChainNodes.get(to) == null){
+           Node nNotExist = graph.getNodeOrNull(to);
+           String strH = "<b>" + escapeHTML(to) + "</b>" + conHtmlBR;
+           strH += "<i><font point-size=\"8\" color=\"red\" >missing</font></i>" + conHtmlBR;
+           nNotExist.getSingleNodeProperties().setLabel(strH);
+           nNotExist.getSingleNodeProperties().setFillcolor(SVGColor.lightgray); 
+           }
+        return e;
+    }
+    
+    private void creatingOrders(File file, String firstState) throws Exception{
+      //Creating orders
+      // Get list of orders related to this JobChain
+       
+      String strTestHotFolder = file.getAbsolutePath();
+      ISOSVFSHandler objVFS = VFSFactory.getHandler("local");
+      ISOSVfsFileTransfer objFileSystemHandler = (ISOSVfsFileTransfer) objVFS;
+      ISOSVirtualFile objHotFolder = objFileSystemHandler.getFileHandle(strTestHotFolder);
+      SchedulerHotFolder objSchedulerHotFolder = objFactory.createSchedulerHotFolder(objHotFolder);
+   
+      SchedulerHotFolderFileList objSchedulerHotFolderFileList = objSchedulerHotFolder.load();
+      for (JSObjBase hotFolderItem : objSchedulerHotFolderFileList.getOrderList()) {
+          if (hotFolderItem instanceof JSObjOrder) {
+              JSObjOrder order = (JSObjOrder) hotFolderItem;
+              String jobchainName = order.getJobChainName();
+              if (jobchainName.equalsIgnoreCase(this.getName())){
+                  String from = order.getId();
+                  String to = firstState;
+                  if (order.getState() != null){
+                      to = order.getState();
+                  }
+                  
+                
+                  Node  node = graph.newNode(from);
+                  SingleNodeProperties singleNodeProperties = node.getSingleNodeProperties();
+                  singleNodeProperties.setShape(Shape.ellipse);
+                  singleNodeProperties.setFillcolor(SVGColor.chartreuse);
+                  
+                        
+                  String label = "Order:" + order.getId() + conHtmlBR;
+                  if (order.getTitle() != null){
+                     label += "<i><font point-size=\"8\" color=\"blue\" >" + escapeHTML(order.getTitle()) + "</font></i>" + conHtmlBR;
+                  }
+                 
+                  singleNodeProperties.setLabel(label);
+                  Edge eOrderEdge = newEdge(from, to);
+                        
+                  eOrderEdge.getEdgeProperties().setConstraint(true);
+                  eOrderEdge.getEdgeProperties().setStyle(Style.dashed);
+                  eOrderEdge.getEdgeProperties().setColor(SVGColor.black);
+               }
+          }
+      }    
+   }
+      
+	public String createDOTFile(File file,boolean showErrorNodes) throws Exception {
+		JSObjJobChain jobchain = this;
+		
+	    graph = new Graph();
+		graph.getGraphProperties().setDirection(RankDir.TB);
+        graph.getGraphProperties().setLabel(jobchain.getTitle());
+        graph.getGraphProperties().setFontSize("8");
+
+        graph.getGlobalNodeProperties().setFontsize("8");
+        graph.getGlobalNodeProperties().setShape(Shape.box);
+        graph.getGlobalNodeProperties().setStyle(Style.rounded + "," + Style.filled);
+        graph.getGlobalNodeProperties().setFillcolor(SVGColor.azure);
+        graph.getGlobalNodeProperties().setFontname("Arial");
+ 		 
+	    graph.getGraphProperties().setRatio("auto");
+	 
+	 	
+	 
+		//Creating nodes for file order source.
+		int fileOrderSourceCnt = 0;
+		for (Object fileOrderSourceItem : jobchain.getFileOrderSourceList()) {
+			if (fileOrderSourceItem instanceof FileOrderSource) {
+				FileOrderSource fileOrderSource = (FileOrderSource) fileOrderSourceItem;
+				String dir = fileOrderSource.getDirectory();
+				String regExp = fileOrderSource.getRegex();
+				fileOrderSourceCnt++;
+
+				Node  node = graph.newNode("FileOrderSource" + fileOrderSourceCnt);
+		        SingleNodeProperties singleNodeProperties = node.getSingleNodeProperties();
+		        singleNodeProperties.setFillcolor(SVGColor.beige);
+		        
+		        String strH = "";
+                strH = "<b>" + "Folder: " + dir + " </b>" + conHtmlBR;
+                strH += "<i><b>" + escapeHTML("RegExp: " + regExp) + "</b></i>" + conHtmlBR;
+                singleNodeProperties.setColor(SVGColor.blue);
+		        singleNodeProperties.setLabel (strH);        
 			}
 		}
-		for (Object objO : objChain.getJobChainNodeOrFileOrderSinkOrJobChainNodeEnd()) {
-			if (objO instanceof JobChainNode) {
-				JobChainNode objNode = (JobChainNode) objO;
-				String strState = objNode.getState();
-				if (strFirstState.length() <= 0) {
-					strFirstState = strState;
+		
+        //reading states in Hashmap for exist checking
+        jobChainNodes = new Hashtable<String, JobChainNode>();
+        String firstState = "";
+		for (Object jobChainNodeItem : jobchain.getJobChainNodeOrFileOrderSinkOrJobChainNodeEnd()) {
+			if (jobChainNodeItem instanceof JobChainNode) {
+				JobChainNode jobChainNode = (JobChainNode) jobChainNodeItem;
+                 
+				String state = jobChainNode.getState();
+				if (firstState.length() <= 0) {
+					firstState = state;
 				}
-				if (tblNodes.get(strState) == null) {
-					tblNodes.put(strState, objNode);
-					String strJobName = objNode.getJob();
-					if (strJobName == null) {
-						strJobName = "endNode";
-					}
-					String strT = strState;
-					if (strState.startsWith("!") && flgCreateErrorNodes == false) {
-						if (strState.equalsIgnoreCase(strJobName) == false) {
-							strT = strState + ": " + strJobName;
-						}
-						objDotFile.WriteLine(getQuoted(strState) + " [label = " + getQuoted(strT) + "];");
-					}
-					if (flgCreateErrorNodes == true) {
-						String strErrorState = objNode.getErrorState();
-						if (strErrorState != null && tblNodes.get(strErrorState) == null) {
-							tblNodes.put(strErrorState, objNode);
-							objDotFile.WriteLine(getQuoted(strErrorState) + " [label = " + getQuoted(strErrorState)
-									+ ", color=\"red\", fillcolor=\"yellow\", style=\"filled\", fontcolor=\"blue\"];");
-						}
-					}
-				}
-			}
-		}
-		// TODO implement Method: getNodes()
-		// TODO implement Method: getAllNodeNames()
-		/**
-		for (JSObjOrder objOrder : tblOrders.values()) {
-		    objDotFile.WriteLine(getQuoted(objOrder.getObjectName()) + " -> " + getQuoted("start"));
-		}
-		*/
-		boolean flgStart = true;
-		if (flgStart == true) {
-			flgStart = false;
-			//					objDotFile.WriteLine(getQuoted("start") + " -> " + strState);
-			if (flgCreateCluster) {
-				objDotFile.WriteLine("subgraph cluster_0 {");
-				objDotFile.WriteLine("    style=filled;");
-				objDotFile.WriteLine("    color=lightgrey;");
-				objDotFile.WriteLine("    node [style=filled,color=white];");
-			}
-		}
-		String strState = null;
-		String strNextState = null;
-		String strLastNextState = null;
-		intFileOrderSourceCnt = 0;
-		for (Object objO : objChain.getFileOrderSourceList()) {
-			if (objO instanceof FileOrderSource) {
-				FileOrderSource objFOS = (FileOrderSource) objO;
-				intFileOrderSourceCnt++;
-				strNextState = objFOS.getNextState();
-				if (strNextState.trim().length() <= 0) {
-					strNextState = strFirstState;
-				}
-				objDotFile.WriteLine(getQuoted("FileOrderSource" + intFileOrderSourceCnt) + " -> " + getQuoted(strNextState) + " [constraint=true]");
-			}
-		}
-		for (Object objO : objChain.getJobChainNodeOrFileOrderSinkOrJobChainNodeEnd()) {
-			if (objO instanceof JobChainNode) {
-				JobChainNode objNode = (JobChainNode) objO;
-				strState = objNode.getState();
-				int i = strState.indexOf(":");
-				if (i > 0) {
-					String strFrom = strState.substring(0, i);
-					objDotFile.WriteLine(getQuoted(strFrom) + " -> " + getQuoted(strState) + " [constraint=true]");
-				}
-				if (strState.startsWith("split") == false | i > 0) {
-					strNextState = objNode.getNextState();
-					// TODO Eigenschaft in JobChainNode
-					if (strNextState != null && strNextState.length() > 0) {
-						objDotFile.WriteLine(getQuoted(strState) + " -> " + getQuoted(strNextState));
-						strLastNextState = strNextState;
-					}
-				}
-				// TODO file_sink
-				//						else {
-				//							objDotFile.WriteLine(getQuoted(strState) + " -> " + getQuoted("end"));
-				//						}
-			}
-		}
-		//		objDotFile.WriteLine(getQuoted(strLastNextState) + " -> " + "end");
-		if (flgCreateCluster) {
-			objDotFile.WriteLine("label = \"Process\";");
-			objDotFile.WriteLine("}");
-		}
-		/**
-		 * create the links to the error-states.
-		 */
-		if (flgCreateErrorNodes == true) {
-			Hashtable<String, JobChainNode> tblErrNodes = new Hashtable<String, JobChainNode>();
-			for (Object objO : objChain.getJobChainNodeOrFileOrderSinkOrJobChainNodeEnd()) {
-				if (objO instanceof JobChainNode) {
-					JobChainNode objNode = (JobChainNode) objO;
-					strState = objNode.getState();
-					String strErrorState = objNode.getErrorState();
-					if (strErrorState != null) {
-						objDotFile.WriteLine(getQuoted(strState) + " -> " + getQuoted(strErrorState) + " [style=\"dotted\", constraint=false]");
-						tblErrNodes.put(strErrorState, objNode);
-					}
-					else {
-					}
+				if (jobChainNodes.get(state) == null) {
+					jobChainNodes.put(state, jobChainNode);
 				}
 			}
-			if (flgCreateCluster) {
-				objDotFile.WriteLine("subgraph cluster_1 {");
-				objDotFile.WriteLine("    style=filled;");
-				objDotFile.WriteLine("color=lightgrey;");
-				objDotFile.WriteLine("node [style=filled,color=white];");
-			}
-			String strLastErrNode = "";
-			for (JobChainNode objErrNode : tblErrNodes.values()) {
-				String strErrNodeName = objErrNode.getErrorState();
-				if (flgCreateCluster) {
-					if (strLastErrNode.length() <= 0) {
-						strLastErrNode = strErrNodeName;
-					}
-					else {
-						objDotFile.WriteLine(getQuoted(strLastErrNode) + " -> " + getQuoted(strErrNodeName) + " [style=invis]");
-						strLastErrNode = strErrNodeName;
-					}
-				}
-				objDotFile.WriteLine(getQuoted(strErrNodeName) + " -> " + getQuoted("end"));
-			}
-			if (flgCreateCluster) {
-				objDotFile.WriteLine("label = \"Error\";");
-				objDotFile.WriteLine("}");
+		}
+	 
+	    creatingOrders(file,  firstState);
+
+		//crating edges for file order sources
+		String state = null;
+		String nextState = null;
+		fileOrderSourceCnt = 0;
+ 		for (Object fileOrderSourceItem : jobchain.getFileOrderSourceList()) {
+			if (fileOrderSourceItem instanceof FileOrderSource) {
+				FileOrderSource fileOrderSource = (FileOrderSource) fileOrderSourceItem;
+				fileOrderSourceCnt++;
+				nextState = fileOrderSource.getNextState();
+				if (nextState.trim().length() <= 0) {
+					nextState = firstState;
+				}       
+				
+				Edge e = newEdge("FileOrderSource" + fileOrderSourceCnt, nextState);
+		        e.getEdgeProperties().setConstraint(true);
 			}
 		}
-		objDotFile.WriteLine("}");
-		objDotFile.close();
-		cmdShell objShell = new cmdShell();
-		// TODO create Method in objDotFile
-		String strCommandString = String.format(Dot.Command + " -x -T%1$s %2$s.dot > %2$s.%1$s", "jpg", strFileName);
-		objShell.setCommand(strCommandString);
-		objShell.run();
-		return strFileName + ".jpg";
+ 		
+ 		 
+ 		
+		//Creating nodes and edges of the job chain 
+		for (Object jobChainNodeItem : jobchain.getJobChainNodeOrFileOrderSinkOrJobChainNodeEnd()) {
+			if (jobChainNodeItem instanceof JobChainNode) {
+				JobChainNode jobChainNode = (JobChainNode) jobChainNodeItem;
+				
+				// to have the option to add edges by naming convention (from:state).
+				state = jobChainNode.getState();
+				int i = state.indexOf(":");
+				
+				if (i > 0 && jobChainNodes.get(state.substring(0, i)) != null) {
+                    String from = state.substring(0, i);
+ 					Edge e = newEdge(from, state);
+			        e.getEdgeProperties().setConstraint(true);
+				}
+				
+			 
+				nextState = jobChainNode.getNextState();
+				if (nextState != null && nextState.length() > 0) {
+				    
+				    String strH = "";
+				    
+                   //Get the error handling
+                    String suspend = "";
+                    boolean isSuspend=false;
+                    if (jobChainNode.getOnError() != null && jobChainNode.getOnError().equals("suspend")){
+                        suspend = "on error suspend";
+                        isSuspend = true;
+                    }
+                        
+                    boolean isSetback = false;
+                    if (jobChainNode.getOnError() != null && jobChainNode.getOnError().equals("setback")){
+                        isSetback = true;
+                     }
+                         
+		                
+                    strH = "<b>" + escapeHTML(state) + "</b>" + conHtmlBR;
+                    strH += "<i><font point-size=\"8\" color=\"blue\" >" + escapeHTML(jobChainNode.getJob()) + "</font></i>" + conHtmlBR;
+                    if (isSuspend){
+                        strH += "<i><font point-size=\"8\" color=\"red\" >" + escapeHTML(suspend) + "</font></i>" + conHtmlBR;
+                    }
+
+                    if (isSetback){
+                        Edge eSetbackState = newEdge(state, state);
+                        eSetbackState.getEdgeProperties().setConstraint(false);
+                        eSetbackState.getEdgeProperties().setStyle(Style.dotted);
+                        eSetbackState.getEdgeProperties().setLabel("..setback");
+                    }
+                    
+                    
+                    Node n = graph.newNode(state);
+                    n.getSingleNodeProperties().setLabel(strH);
+                  
+
+                    Edge e = newEdge(state, nextState);
+                    e.getEdgeProperties().setLabel("..next");
+						
+                    //handling the on_return_code properties
+                    if (jobChainNode.getOnReturnCodes() != null){
+                        for (Object onReturnCodeItem : jobChainNode.getOnReturnCodes().getOnReturnCode()){
+                             if (onReturnCodeItem instanceof OnReturnCode) {
+                                 String toState = ((OnReturnCode) onReturnCodeItem).getToState().getState();
+                                 Edge eReturnCode = newEdge(state, toState);
+                                 eReturnCode.getEdgeProperties().setLabel("..exit:" + ((OnReturnCode) onReturnCodeItem).getReturnCode());
+                             }
+                       }
+                    }
+                        
+                        
+
+                    //Show error state nodes and edges				         
+                    String errorState = jobChainNode.getErrorState();
+	                if (showErrorNodes && !isSetback && !isSuspend && errorState != null) {
+  	                    
+                        Edge eErrorState = newEdge(state, errorState);
+	                    
+                        eErrorState.getEdgeProperties().setConstraint(true);
+                        eErrorState.getEdgeProperties().setStyle(Style.dotted);
+
+                        Node nErrorState = graph.getNodeOrNull(errorState);
+                        nErrorState.getSingleNodeProperties().setLabel(errorState);
+                        nErrorState.getSingleNodeProperties().setColor(SVGColor.blue);
+                        nErrorState.getSingleNodeProperties().setFillcolor(SVGColor.yellow);
+                        nErrorState.getSingleNodeProperties().setFontcolor(SVGColor.blue);
+	                        
+	                 }
+                 }
+            }
+        }
+         
+      
+ 		
+ 		//Output the graph to a png file
+	     GraphIO io = new GraphIO(graph);
+         io.setDotDir(file.getAbsolutePath());
+	     io.writeGraphToFile(FileType.png, new File(file.getAbsolutePath(),jobchain.getName()+ ".png") );
+	     return new File(file.getAbsolutePath(),jobchain.getName()).getAbsolutePath() + ".png";
 	}
 
-	@Override public Integer getmaxOrders() {
+	
+   
+	@Override public BigInteger getmaxOrders() {
 		if (maxOrders == null) {
-			return 0;
+			return new BigInteger("0");
 		}
 		return maxOrders;
 	}
@@ -595,12 +654,7 @@ public class JSObjJobChain extends JobChain {
 			pobjL.add(pstrS);
 		}
 	}
-	//	private String[] arrayListToStringArray (final List <String> pobjArray) {
-	//		String[] strA = new String[pobjArray.size()];
-	//		strA = pobjArray.toArray(strA);
-	//		return strA;
-	//	}
-	//
+ 
 	public List<JobChainNodeEnd> getJobChainNodeEndList() {
 		List<JobChainNodeEnd> objList = new ArrayList<JobChainNodeEnd>();
 		for (Object objO : this.getJobChainNodeOrFileOrderSinkOrJobChainNodeEnd()) {
