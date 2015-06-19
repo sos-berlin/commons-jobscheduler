@@ -107,7 +107,7 @@ public class JobSchedulerLog4JAppender extends ConsoleAppender implements IJobSc
 					break;
 			}
 			// strMsg = strMsg.replaceAll("\\n", "");
-			if (strMsg.trim().length() > 0) {
+			if (strMsg.trim().length() > 0 && isAllowedLogger(event)) {
 //				System.out.println("intSOSLevel = " + intSOSLevel);
 				if (hasLogger()) {
 					sosLogger.log(intSOSLevel, strMsg);
@@ -120,6 +120,11 @@ public class JobSchedulerLog4JAppender extends ConsoleAppender implements IJobSc
 		catch (Exception ex) {
 			System.out.print(conClassName + " (system.out): " + strMsg);
 		}
+	}
+	
+	public static boolean isAllowedLogger(LoggingEvent event){
+		if (event.getLoggerName().startsWith("com.sos.scheduler.engine.")) return false;
+		return true;
 	}
 
 	/* (non-Javadoc)

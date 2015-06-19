@@ -8,12 +8,25 @@
 
 package com.sos.scheduler.model.objects;
 
-import javax.xml.bind.annotation.*;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAnyAttribute;
+import javax.xml.bind.annotation.XmlAnyElement;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import javax.xml.namespace.QName;
+import org.w3c.dom.Element;
 
 
 /**
@@ -26,7 +39,8 @@ import java.util.List;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="note" type="{http://www.w3.org/2001/XMLSchema}anyType" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element ref="{}extensions" minOccurs="0"/>
+ *         &lt;element ref="{}note" maxOccurs="unbounded" minOccurs="0"/>
  *         &lt;choice>
  *           &lt;sequence>
  *             &lt;element name="job_chain_node.job_chain" type="{}job_chain_node.job_chain"/>
@@ -60,6 +74,7 @@ import java.util.List;
  *                     &lt;/attribute>
  *                     &lt;attribute name="max" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" />
  *                     &lt;attribute name="next_state" type="{}String" />
+ *                     &lt;attribute name="alert_when_directory_missing" type="{}Yes_no" />
  *                   &lt;/restriction>
  *                 &lt;/complexContent>
  *               &lt;/complexType>
@@ -69,6 +84,41 @@ import java.util.List;
  *                 &lt;complexType>
  *                   &lt;complexContent>
  *                     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                       &lt;sequence>
+ *                         &lt;element ref="{}extensions" minOccurs="0"/>
+ *                         &lt;any processContents='lax' namespace='##other' minOccurs="0"/>
+ *                         &lt;element name="on_return_codes" minOccurs="0">
+ *                           &lt;complexType>
+ *                             &lt;complexContent>
+ *                               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                                 &lt;sequence maxOccurs="unbounded">
+ *                                   &lt;element name="on_return_code">
+ *                                     &lt;complexType>
+ *                                       &lt;complexContent>
+ *                                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                                           &lt;sequence>
+ *                                             &lt;any processContents='lax' namespace='##other' maxOccurs="unbounded" minOccurs="0"/>
+ *                                             &lt;element name="to_state" minOccurs="0">
+ *                                               &lt;complexType>
+ *                                                 &lt;complexContent>
+ *                                                   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                                                     &lt;attribute name="state" type="{}String" />
+ *                                                   &lt;/restriction>
+ *                                                 &lt;/complexContent>
+ *                                               &lt;/complexType>
+ *                                             &lt;/element>
+ *                                           &lt;/sequence>
+ *                                           &lt;attribute name="return_code" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
+ *                                         &lt;/restriction>
+ *                                       &lt;/complexContent>
+ *                                     &lt;/complexType>
+ *                                   &lt;/element>
+ *                                 &lt;/sequence>
+ *                               &lt;/restriction>
+ *                             &lt;/complexContent>
+ *                           &lt;/complexType>
+ *                         &lt;/element>
+ *                       &lt;/sequence>
  *                       &lt;attribute name="state" use="required" type="{}String" />
  *                       &lt;attribute name="job" type="{}Path" />
  *                       &lt;attribute name="next_state" type="{}String" />
@@ -83,6 +133,7 @@ import java.util.List;
  *                       &lt;/attribute>
  *                       &lt;attribute name="suspend" type="{}Yes_no" />
  *                       &lt;attribute name="delay" type="{http://www.w3.org/2001/XMLSchema}nonNegativeInteger" />
+ *                       &lt;anyAttribute processContents='lax' namespace='##other'/>
  *                     &lt;/restriction>
  *                   &lt;/complexContent>
  *                 &lt;/complexType>
@@ -110,15 +161,18 @@ import java.util.List;
  *       &lt;attribute name="orders_recoverable" type="{}Yes_no" />
  *       &lt;attribute name="distributed" type="{}Yes_no" />
  *       &lt;attribute name="title" type="{}String" />
+ *       &lt;attribute name="max_orders" type="{http://www.w3.org/2001/XMLSchema}nonNegativeInteger" />
+ *       &lt;attribute name="process_class" type="{}Path" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- *
- *
+ * 
+ * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
+    "extensions",
     "note",
     "jobChainNodeJobChain",
     "jobChainNodeJobChainOrJobChainNodeEnd",
@@ -128,19 +182,20 @@ import java.util.List;
 @XmlRootElement(name = "job_chain")
 public class JobChain extends JSObjBase {
 
-	protected List<Object> note;
+    protected Extensions extensions;
+    protected List<Note> note;
     @XmlElement(name = "job_chain_node.job_chain")
     protected JobChainNodeJobChain jobChainNodeJobChain;
     @XmlElements({
-        @XmlElement(name = "job_chain_node.end", type = JobChainNodeEnd.class),
-        @XmlElement(name = "job_chain_node.job_chain", type = JobChainNodeJobChain.class)
+        @XmlElement(name = "job_chain_node.job_chain", type = JobChainNodeJobChain.class),
+        @XmlElement(name = "job_chain_node.end", type = JobChainNodeEnd.class)
     })
     protected List<Object> jobChainNodeJobChainOrJobChainNodeEnd;
     @XmlElement(name = "file_order_source")
     protected List<JobChain.FileOrderSource> fileOrderSource;
     @XmlElements({
-        @XmlElement(name = "file_order_sink", type = JobChain.FileOrderSink.class),
         @XmlElement(name = "job_chain_node", type = JobChain.JobChainNode.class),
+        @XmlElement(name = "file_order_sink", type = JobChain.FileOrderSink.class),
         @XmlElement(name = "job_chain_node.end", type = JobChainNodeEnd.class)
     })
     protected List<Object> jobChainNodeOrFileOrderSinkOrJobChainNodeEnd;
@@ -161,156 +216,175 @@ public class JobChain extends JSObjBase {
     protected String title;
     @XmlAttribute(name = "max_orders")
     @XmlSchemaType(name = "nonNegativeInteger")
-    protected Integer maxOrders;
+    protected BigInteger maxOrders;
+    @XmlAttribute(name = "process_class")
+    protected String processClass;
 
-    public Integer getmaxOrders () {
-    	return maxOrders;
+    /**
+     * Ruft den Wert der extensions-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Extensions }
+     *     
+     */
+    public Extensions getExtensions() {
+        return extensions;
     }
 
-    public void setmaxOrders (final Integer pmax_orders) {
-    	maxOrders = pmax_orders;
+    /**
+     * Legt den Wert der extensions-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Extensions }
+     *     
+     */
+    public void setExtensions(Extensions value) {
+        this.extensions = value;
     }
+
     /**
      * Gets the value of the note property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the note property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getNote().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Object }
-     *
-     *
+     * {@link Note }
+     * 
+     * 
      */
-    public List<Object> getNote() {
+    public List<Note> getNote() {
         if (note == null) {
-            note = new ArrayList<Object>();
+            note = new ArrayList<Note>();
         }
-        return note;
+        return this.note;
     }
 
     /**
-     * Gets the value of the jobChainNodeJobChain property.
-     *
+     * Ruft den Wert der jobChainNodeJobChain-Eigenschaft ab.
+     * 
      * @return
      *     possible object is
      *     {@link JobChainNodeJobChain }
-     *
+     *     
      */
     public JobChainNodeJobChain getJobChainNodeJobChain() {
         return jobChainNodeJobChain;
     }
 
     /**
-     * Sets the value of the jobChainNodeJobChain property.
-     *
+     * Legt den Wert der jobChainNodeJobChain-Eigenschaft fest.
+     * 
      * @param value
      *     allowed object is
      *     {@link JobChainNodeJobChain }
-     *
+     *     
      */
-    public void setJobChainNodeJobChain(final JobChainNodeJobChain value) {
-        jobChainNodeJobChain = value;
+    public void setJobChainNodeJobChain(JobChainNodeJobChain value) {
+        this.jobChainNodeJobChain = value;
     }
 
     /**
      * Gets the value of the jobChainNodeJobChainOrJobChainNodeEnd property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the jobChainNodeJobChainOrJobChainNodeEnd property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getJobChainNodeJobChainOrJobChainNodeEnd().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link JobChainNodeEnd }
      * {@link JobChainNodeJobChain }
-     *
-     *
+     * {@link JobChainNodeEnd }
+     * 
+     * 
      */
     public List<Object> getJobChainNodeJobChainOrJobChainNodeEnd() {
         if (jobChainNodeJobChainOrJobChainNodeEnd == null) {
             jobChainNodeJobChainOrJobChainNodeEnd = new ArrayList<Object>();
         }
-        return jobChainNodeJobChainOrJobChainNodeEnd;
+        return this.jobChainNodeJobChainOrJobChainNodeEnd;
     }
 
     /**
      * Gets the value of the fileOrderSource property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the fileOrderSource property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getFileOrderSource().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link JobChain.FileOrderSource }
-     *
-     *
+     * 
+     * 
      */
     public List<JobChain.FileOrderSource> getFileOrderSource() {
         if (fileOrderSource == null) {
             fileOrderSource = new ArrayList<JobChain.FileOrderSource>();
         }
-        return fileOrderSource;
+        return this.fileOrderSource;
     }
 
     /**
      * Gets the value of the jobChainNodeOrFileOrderSinkOrJobChainNodeEnd property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the jobChainNodeOrFileOrderSinkOrJobChainNodeEnd property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getJobChainNodeOrFileOrderSinkOrJobChainNodeEnd().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link JobChain.FileOrderSink }
      * {@link JobChain.JobChainNode }
+     * {@link JobChain.FileOrderSink }
      * {@link JobChainNodeEnd }
-     *
-     *
+     * 
+     * 
      */
     public List<Object> getJobChainNodeOrFileOrderSinkOrJobChainNodeEnd() {
         if (jobChainNodeOrFileOrderSinkOrJobChainNodeEnd == null) {
             jobChainNodeOrFileOrderSinkOrJobChainNodeEnd = new ArrayList<Object>();
         }
-        return jobChainNodeOrFileOrderSinkOrJobChainNodeEnd;
+        return this.jobChainNodeOrFileOrderSinkOrJobChainNodeEnd;
     }
 
     /**
@@ -319,7 +393,7 @@ public class JobChain extends JSObjBase {
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getName() {
         return name;
@@ -331,10 +405,10 @@ public class JobChain extends JSObjBase {
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
-    public void setName(final String value) {
-        name = value;
+    public void setName(String value) {
+        this.name = value;
     }
 
     /**
@@ -343,7 +417,7 @@ public class JobChain extends JSObjBase {
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getReplace() {
         return replace;
@@ -355,10 +429,10 @@ public class JobChain extends JSObjBase {
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
-    public void setReplace(final String value) {
-        replace = value;
+    public void setReplace(String value) {
+        this.replace = value;
     }
 
     /**
@@ -367,7 +441,7 @@ public class JobChain extends JSObjBase {
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getVisible() {
         return visible;
@@ -379,10 +453,10 @@ public class JobChain extends JSObjBase {
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
-    public void setVisible(final String value) {
-        visible = value;
+    public void setVisible(String value) {
+        this.visible = value;
     }
 
     /**
@@ -391,7 +465,7 @@ public class JobChain extends JSObjBase {
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getOrdersRecoverable() {
         return ordersRecoverable;
@@ -403,10 +477,10 @@ public class JobChain extends JSObjBase {
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
-    public void setOrdersRecoverable(final String value) {
-        ordersRecoverable = value;
+    public void setOrdersRecoverable(String value) {
+        this.ordersRecoverable = value;
     }
 
     /**
@@ -415,7 +489,7 @@ public class JobChain extends JSObjBase {
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getDistributed() {
         return distributed;
@@ -427,10 +501,10 @@ public class JobChain extends JSObjBase {
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
-    public void setDistributed(final String value) {
-        distributed = value;
+    public void setDistributed(String value) {
+        this.distributed = value;
     }
 
     /**
@@ -439,23 +513,70 @@ public class JobChain extends JSObjBase {
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
-    @Override
-	public String getTitle() {
+    public String getTitle() {
         return title;
     }
 
     /**
-     * Sets the value of the title property.
-     *
+     * Legt den Wert der title-Eigenschaft fest.
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
-    public void setTitle(final String value) {
-        title = value;
+    public void setTitle(String value) {
+        this.title = value;
+    }
+
+    /**
+     * Ruft den Wert der maxOrders-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link BigInteger }
+     *     
+     */
+    public BigInteger getmaxOrders() {
+        return maxOrders;
+    }
+
+    /**
+     * Legt den Wert der maxOrders-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link BigInteger }
+     *     
+     */
+    public void setMaxOrders(BigInteger value) {
+        this.maxOrders = value;
+    }
+
+    /**
+     * Ruft den Wert der processClass-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getProcessClass() {
+        return processClass;
+    }
+
+    /**
+     * Legt den Wert der processClass-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setProcessClass(String value) {
+        this.processClass = value;
     }
 
 
@@ -476,12 +597,12 @@ public class JobChain extends JSObjBase {
      *   &lt;/complexContent>
      * &lt;/complexType>
      * </pre>
-     *
-     *
+     * 
+     * 
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "")
-    public static class FileOrderSink extends JSObjBase  {
+    public static class FileOrderSink {
 
         @XmlAttribute(name = "state", required = true)
         protected String state;
@@ -500,7 +621,7 @@ public class JobChain extends JSObjBase {
          * @return
          *     possible object is
          *     {@link String }
-         *
+         *     
          */
         public String getState() {
             return state;
@@ -512,10 +633,10 @@ public class JobChain extends JSObjBase {
          * @param value
          *     allowed object is
          *     {@link String }
-         *
+         *     
          */
-        public void setState(final String value) {
-            state = value;
+        public void setState(String value) {
+            this.state = value;
         }
 
         /**
@@ -524,7 +645,7 @@ public class JobChain extends JSObjBase {
          * @return
          *     possible object is
          *     {@link String }
-         *
+         *     
          */
         public String getRemove() {
             return remove;
@@ -536,10 +657,10 @@ public class JobChain extends JSObjBase {
          * @param value
          *     allowed object is
          *     {@link String }
-         *
+         *     
          */
-        public void setRemove(final String value) {
-            remove = value;
+        public void setRemove(String value) {
+            this.remove = value;
         }
 
         /**
@@ -548,7 +669,7 @@ public class JobChain extends JSObjBase {
          * @return
          *     possible object is
          *     {@link String }
-         *
+         *     
          */
         public String getMoveTo() {
             return moveTo;
@@ -560,10 +681,10 @@ public class JobChain extends JSObjBase {
          * @param value
          *     allowed object is
          *     {@link String }
-         *
+         *     
          */
-        public void setMoveTo(final String value) {
-            moveTo = value;
+        public void setMoveTo(String value) {
+            this.moveTo = value;
         }
 
         /**
@@ -572,7 +693,7 @@ public class JobChain extends JSObjBase {
          * @return
          *     possible object is
          *     {@link BigInteger }
-         *
+         *     
          */
         public BigInteger getDelay() {
             return delay;
@@ -584,10 +705,10 @@ public class JobChain extends JSObjBase {
          * @param value
          *     allowed object is
          *     {@link BigInteger }
-         *
+         *     
          */
-        public void setDelay(final BigInteger value) {
-            delay = value;
+        public void setDelay(BigInteger value) {
+            this.delay = value;
         }
 
     }
@@ -622,12 +743,13 @@ public class JobChain extends JSObjBase {
      *       &lt;/attribute>
      *       &lt;attribute name="max" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" />
      *       &lt;attribute name="next_state" type="{}String" />
+     *       &lt;attribute name="alert_when_directory_missing" type="{}Yes_no" />
      *     &lt;/restriction>
      *   &lt;/complexContent>
      * &lt;/complexType>
      * </pre>
-     *
-     *
+     * 
+     * 
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "")
@@ -647,6 +769,9 @@ public class JobChain extends JSObjBase {
         protected BigInteger max;
         @XmlAttribute(name = "next_state")
         protected String nextState;
+        @XmlAttribute(name = "alert_when_directory_missing")
+        @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+        protected String alertWhenDirectoryMissing;
 
         /**
          * Gets the value of the directory property.
@@ -654,7 +779,7 @@ public class JobChain extends JSObjBase {
          * @return
          *     possible object is
          *     {@link String }
-         *
+         *     
          */
         public String getDirectory() {
             return directory;
@@ -666,10 +791,10 @@ public class JobChain extends JSObjBase {
          * @param value
          *     allowed object is
          *     {@link String }
-         *
+         *     
          */
-        public void setDirectory(final String value) {
-            directory = value;
+        public void setDirectory(String value) {
+            this.directory = value;
         }
 
         /**
@@ -678,7 +803,7 @@ public class JobChain extends JSObjBase {
          * @return
          *     possible object is
          *     {@link String }
-         *
+         *     
          */
         public String getRegex() {
             return regex;
@@ -690,10 +815,10 @@ public class JobChain extends JSObjBase {
          * @param value
          *     allowed object is
          *     {@link String }
-         *
+         *     
          */
-        public void setRegex(final String value) {
-            regex = value;
+        public void setRegex(String value) {
+            this.regex = value;
         }
 
         /**
@@ -702,7 +827,7 @@ public class JobChain extends JSObjBase {
          * @return
          *     possible object is
          *     {@link BigInteger }
-         *
+         *     
          */
         public BigInteger getDelayAfterError() {
             return delayAfterError;
@@ -714,10 +839,10 @@ public class JobChain extends JSObjBase {
          * @param value
          *     allowed object is
          *     {@link BigInteger }
-         *
+         *     
          */
-        public void setDelayAfterError(final BigInteger value) {
-            delayAfterError = value;
+        public void setDelayAfterError(BigInteger value) {
+            this.delayAfterError = value;
         }
 
         /**
@@ -726,7 +851,7 @@ public class JobChain extends JSObjBase {
          * @return
          *     possible object is
          *     {@link String }
-         *
+         *     
          */
         public String getRepeat() {
             return repeat;
@@ -738,10 +863,10 @@ public class JobChain extends JSObjBase {
          * @param value
          *     allowed object is
          *     {@link String }
-         *
+         *     
          */
-        public void setRepeat(final String value) {
-            repeat = value;
+        public void setRepeat(String value) {
+            this.repeat = value;
         }
 
         /**
@@ -750,7 +875,7 @@ public class JobChain extends JSObjBase {
          * @return
          *     possible object is
          *     {@link BigInteger }
-         *
+         *     
          */
         public BigInteger getMax() {
             return max;
@@ -762,10 +887,10 @@ public class JobChain extends JSObjBase {
          * @param value
          *     allowed object is
          *     {@link BigInteger }
-         *
+         *     
          */
-        public void setMax(final BigInteger value) {
-            max = value;
+        public void setMax(BigInteger value) {
+            this.max = value;
         }
 
         /**
@@ -774,25 +899,49 @@ public class JobChain extends JSObjBase {
          * @return
          *     possible object is
          *     {@link String }
-         *
+         *     
          */
         public String getNextState() {
-        	if (nextState == null) {
-        		nextState = "";
-        	}
-            return nextState;
-        }
-
+                if (nextState == null) {
+                    nextState = "";
+                }
+                return nextState;
+            }       
+        
         /**
-         * Sets the value of the nextState property.
-         *
+         * Legt den Wert der nextState-Eigenschaft fest.
+         * 
          * @param value
          *     allowed object is
          *     {@link String }
-         *
+         *     
          */
-        public void setNextState(final String value) {
-            nextState = value;
+        public void setNextState(String value) {
+            this.nextState = value;
+        }
+
+        /**
+         * Ruft den Wert der alertWhenDirectoryMissing-Eigenschaft ab.
+         * 
+         * @return
+         *     possible object is
+         *     {@link String }
+         *     
+         */
+        public String getAlertWhenDirectoryMissing() {
+            return alertWhenDirectoryMissing;
+        }
+
+        /**
+         * Legt den Wert der alertWhenDirectoryMissing-Eigenschaft fest.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link String }
+         *     
+         */
+        public void setAlertWhenDirectoryMissing(String value) {
+            this.alertWhenDirectoryMissing = value;
         }
 
     }
@@ -807,6 +956,41 @@ public class JobChain extends JSObjBase {
      * &lt;complexType>
      *   &lt;complexContent>
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *       &lt;sequence>
+     *         &lt;element ref="{}extensions" minOccurs="0"/>
+     *         &lt;any processContents='lax' namespace='##other' minOccurs="0"/>
+     *         &lt;element name="on_return_codes" minOccurs="0">
+     *           &lt;complexType>
+     *             &lt;complexContent>
+     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                 &lt;sequence maxOccurs="unbounded">
+     *                   &lt;element name="on_return_code">
+     *                     &lt;complexType>
+     *                       &lt;complexContent>
+     *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                           &lt;sequence>
+     *                             &lt;any processContents='lax' namespace='##other' maxOccurs="unbounded" minOccurs="0"/>
+     *                             &lt;element name="to_state" minOccurs="0">
+     *                               &lt;complexType>
+     *                                 &lt;complexContent>
+     *                                   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                                     &lt;attribute name="state" type="{}String" />
+     *                                   &lt;/restriction>
+     *                                 &lt;/complexContent>
+     *                               &lt;/complexType>
+     *                             &lt;/element>
+     *                           &lt;/sequence>
+     *                           &lt;attribute name="return_code" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
+     *                         &lt;/restriction>
+     *                       &lt;/complexContent>
+     *                     &lt;/complexType>
+     *                   &lt;/element>
+     *                 &lt;/sequence>
+     *               &lt;/restriction>
+     *             &lt;/complexContent>
+     *           &lt;/complexType>
+     *         &lt;/element>
+     *       &lt;/sequence>
      *       &lt;attribute name="state" use="required" type="{}String" />
      *       &lt;attribute name="job" type="{}Path" />
      *       &lt;attribute name="next_state" type="{}String" />
@@ -821,23 +1005,27 @@ public class JobChain extends JSObjBase {
      *       &lt;/attribute>
      *       &lt;attribute name="suspend" type="{}Yes_no" />
      *       &lt;attribute name="delay" type="{http://www.w3.org/2001/XMLSchema}nonNegativeInteger" />
+     *       &lt;anyAttribute processContents='lax' namespace='##other'/>
      *     &lt;/restriction>
      *   &lt;/complexContent>
      * &lt;/complexType>
      * </pre>
-     *
-     *
+     * 
+     * 
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-            "extensions",
-            "any"
+        "extensions",
+        "any",
+        "onReturnCodes"
     })
     public static class JobChainNode extends JobChainExtended.JobChainNode {
 
         protected Extensions extensions;
+        @XmlAnyElement(lax = true)
         protected Object any;
-
+        @XmlElement(name = "on_return_codes")
+        protected JobChain.JobChainNode.OnReturnCodes onReturnCodes;
         @XmlAttribute(name = "state", required = true)
         protected String state;
         @XmlAttribute(name = "job")
@@ -855,14 +1043,16 @@ public class JobChain extends JSObjBase {
         @XmlAttribute(name = "delay")
         @XmlSchemaType(name = "nonNegativeInteger")
         protected BigInteger delay;
+        @XmlAnyAttribute
+        private Map<QName, String> otherAttributes = new HashMap<QName, String>();
 
         /**
          * Ruft den Wert der extensions-Eigenschaft ab.
-         *
+         * 
          * @return
          *     possible object is
          *     {@link Extensions }
-         *
+         *     
          */
         public Extensions getExtensions() {
             return extensions;
@@ -870,11 +1060,11 @@ public class JobChain extends JSObjBase {
 
         /**
          * Legt den Wert der extensions-Eigenschaft fest.
-         *
+         * 
          * @param value
          *     allowed object is
          *     {@link Extensions }
-         *
+         *     
          */
         public void setExtensions(Extensions value) {
             this.extensions = value;
@@ -882,11 +1072,12 @@ public class JobChain extends JSObjBase {
 
         /**
          * Ruft den Wert der any-Eigenschaft ab.
-         *
+         * 
          * @return
          *     possible object is
+         *     {@link Element }
          *     {@link Object }
-         *
+         *     
          */
         public Object getAny() {
             return any;
@@ -894,41 +1085,65 @@ public class JobChain extends JSObjBase {
 
         /**
          * Legt den Wert der any-Eigenschaft fest.
-         *
+         * 
          * @param value
          *     allowed object is
+         *     {@link Element }
          *     {@link Object }
-         *
+         *     
          */
         public void setAny(Object value) {
             this.any = value;
         }
 
         /**
-         * Gets the value of the state property.
-         *
+         * Ruft den Wert der onReturnCodes-Eigenschaft ab.
+         * 
+         * @return
+         *     possible object is
+         *     {@link JobChain.JobChainNode.OnReturnCodes }
+         *     
+         */
+        public JobChain.JobChainNode.OnReturnCodes getOnReturnCodes() {
+            return onReturnCodes;
+        }
+
+        /**
+         * Legt den Wert der onReturnCodes-Eigenschaft fest.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link JobChain.JobChainNode.OnReturnCodes }
+         *     
+         */
+        public void setOnReturnCodes(JobChain.JobChainNode.OnReturnCodes value) {
+            this.onReturnCodes = value;
+        }
+
+        /**
+         * Ruft den Wert der state-Eigenschaft ab.
+         * 
          * @return
          *     possible object is
          *     {@link String }
-         *
+         *     
          */
         public String getState() {
-        	if (state == null) {
-        		state = "";
-        	}
+            if (state == null) {
+                state = "";
+            }
             return state;
         }
-
         /**
          * Sets the value of the state property.
          *
          * @param value
          *     allowed object is
          *     {@link String }
-         *
+         *     
          */
-        public void setState(final String value) {
-            state = value;
+        public void setState(String value) {
+            this.state = value;
         }
 
         /**
@@ -937,12 +1152,12 @@ public class JobChain extends JSObjBase {
          * @return
          *     possible object is
          *     {@link String }
-         *
+         *     
          */
         public String getJob() {
-        	if (job == null) {
-        		job = "";
-        	}
+            if (job == null) {
+                job = "";
+            }
             return job;
         }
 
@@ -952,10 +1167,10 @@ public class JobChain extends JSObjBase {
          * @param value
          *     allowed object is
          *     {@link String }
-         *
+         *     
          */
-        public void setJob(final String value) {
-            job = value;
+        public void setJob(String value) {
+            this.job = value;
         }
 
         /**
@@ -964,10 +1179,10 @@ public class JobChain extends JSObjBase {
          * @return
          *     possible object is
          *     {@link String }
-         *
+         *     
          */
         public String getNextState() {
-            return notNull(nextState);
+            return nextState;
         }
 
         /**
@@ -976,10 +1191,10 @@ public class JobChain extends JSObjBase {
          * @param value
          *     allowed object is
          *     {@link String }
-         *
+         *     
          */
-        public void setNextState(final String value) {
-            nextState = value;
+        public void setNextState(String value) {
+            this.nextState = value;
         }
 
         /**
@@ -988,10 +1203,10 @@ public class JobChain extends JSObjBase {
          * @return
          *     possible object is
          *     {@link String }
-         *
+         *     
          */
         public String getErrorState() {
-            return notNull(errorState);
+            return errorState;
         }
 
         /**
@@ -1000,10 +1215,10 @@ public class JobChain extends JSObjBase {
          * @param value
          *     allowed object is
          *     {@link String }
-         *
+         *     
          */
-        public void setErrorState(final String value) {
-            errorState = value;
+        public void setErrorState(String value) {
+            this.errorState = value;
         }
 
         /**
@@ -1012,7 +1227,7 @@ public class JobChain extends JSObjBase {
          * @return
          *     possible object is
          *     {@link String }
-         *
+         *     
          */
         public String getOnError() {
             return onError;
@@ -1024,10 +1239,10 @@ public class JobChain extends JSObjBase {
          * @param value
          *     allowed object is
          *     {@link String }
-         *
+         *     
          */
-        public void setOnError(final String value) {
-            onError = value;
+        public void setOnError(String value) {
+            this.onError = value;
         }
 
         /**
@@ -1036,7 +1251,7 @@ public class JobChain extends JSObjBase {
          * @return
          *     possible object is
          *     {@link String }
-         *
+         *     
          */
         public String getSuspend() {
             return suspend;
@@ -1048,10 +1263,10 @@ public class JobChain extends JSObjBase {
          * @param value
          *     allowed object is
          *     {@link String }
-         *
+         *     
          */
-        public void setSuspend(final String value) {
-            suspend = value;
+        public void setSuspend(String value) {
+            this.suspend = value;
         }
 
         /**
@@ -1060,7 +1275,7 @@ public class JobChain extends JSObjBase {
          * @return
          *     possible object is
          *     {@link BigInteger }
-         *
+         *     
          */
         public BigInteger getDelay() {
             return delay;
@@ -1072,10 +1287,284 @@ public class JobChain extends JSObjBase {
          * @param value
          *     allowed object is
          *     {@link BigInteger }
-         *
+         *     
          */
-        public void setDelay(final BigInteger value) {
-            delay = value;
+        public void setDelay(BigInteger value) {
+            this.delay = value;
+        }
+
+        /**
+         * Gets a map that contains attributes that aren't bound to any typed property on this class.
+         * 
+         * <p>
+         * the map is keyed by the name of the attribute and 
+         * the value is the string value of the attribute.
+         * 
+         * the map returned by this method is live, and you can add new attribute
+         * by updating the map directly. Because of this design, there's no setter.
+         * 
+         * 
+         * @return
+         *     always non-null
+         */
+        public Map<QName, String> getOtherAttributes() {
+            return otherAttributes;
+        }
+
+
+        /**
+         * <p>Java-Klasse für anonymous complex type.
+         * 
+         * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+         * 
+         * <pre>
+         * &lt;complexType>
+         *   &lt;complexContent>
+         *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *       &lt;sequence maxOccurs="unbounded">
+         *         &lt;element name="on_return_code">
+         *           &lt;complexType>
+         *             &lt;complexContent>
+         *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *                 &lt;sequence>
+         *                   &lt;any processContents='lax' namespace='##other' maxOccurs="unbounded" minOccurs="0"/>
+         *                   &lt;element name="to_state" minOccurs="0">
+         *                     &lt;complexType>
+         *                       &lt;complexContent>
+         *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *                           &lt;attribute name="state" type="{}String" />
+         *                         &lt;/restriction>
+         *                       &lt;/complexContent>
+         *                     &lt;/complexType>
+         *                   &lt;/element>
+         *                 &lt;/sequence>
+         *                 &lt;attribute name="return_code" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
+         *               &lt;/restriction>
+         *             &lt;/complexContent>
+         *           &lt;/complexType>
+         *         &lt;/element>
+         *       &lt;/sequence>
+         *     &lt;/restriction>
+         *   &lt;/complexContent>
+         * &lt;/complexType>
+         * </pre>
+         * 
+         * 
+         */
+        @XmlAccessorType(XmlAccessType.FIELD)
+        @XmlType(name = "", propOrder = {
+            "onReturnCode"
+        })
+        public static class OnReturnCodes {
+
+            @XmlElement(name = "on_return_code", required = true)
+            protected List<JobChain.JobChainNode.OnReturnCodes.OnReturnCode> onReturnCode;
+
+            /**
+             * Gets the value of the onReturnCode property.
+             * 
+             * <p>
+             * This accessor method returns a reference to the live list,
+             * not a snapshot. Therefore any modification you make to the
+             * returned list will be present inside the JAXB object.
+             * This is why there is not a <CODE>set</CODE> method for the onReturnCode property.
+             * 
+             * <p>
+             * For example, to add a new item, do as follows:
+             * <pre>
+             *    getOnReturnCode().add(newItem);
+             * </pre>
+             * 
+             * 
+             * <p>
+             * Objects of the following type(s) are allowed in the list
+             * {@link JobChain.JobChainNode.OnReturnCodes.OnReturnCode }
+             * 
+             * 
+             */
+            public List<JobChain.JobChainNode.OnReturnCodes.OnReturnCode> getOnReturnCode() {
+                if (onReturnCode == null) {
+                    onReturnCode = new ArrayList<JobChain.JobChainNode.OnReturnCodes.OnReturnCode>();
+                }
+                return this.onReturnCode;
+            }
+
+
+            /**
+             * <p>Java-Klasse für anonymous complex type.
+             * 
+             * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+             * 
+             * <pre>
+             * &lt;complexType>
+             *   &lt;complexContent>
+             *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+             *       &lt;sequence>
+             *         &lt;any processContents='lax' namespace='##other' maxOccurs="unbounded" minOccurs="0"/>
+             *         &lt;element name="to_state" minOccurs="0">
+             *           &lt;complexType>
+             *             &lt;complexContent>
+             *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+             *                 &lt;attribute name="state" type="{}String" />
+             *               &lt;/restriction>
+             *             &lt;/complexContent>
+             *           &lt;/complexType>
+             *         &lt;/element>
+             *       &lt;/sequence>
+             *       &lt;attribute name="return_code" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
+             *     &lt;/restriction>
+             *   &lt;/complexContent>
+             * &lt;/complexType>
+             * </pre>
+             * 
+             * 
+             */
+            @XmlAccessorType(XmlAccessType.FIELD)
+            @XmlType(name = "", propOrder = {
+                "any",
+                "toState"
+            })
+            public static class OnReturnCode {
+
+                @XmlAnyElement(lax = true)
+                protected List<Object> any;
+                @XmlElement(name = "to_state")
+                protected JobChain.JobChainNode.OnReturnCodes.OnReturnCode.ToState toState;
+                @XmlAttribute(name = "return_code")
+                @XmlSchemaType(name = "anySimpleType")
+                protected String returnCode;
+
+                /**
+                 * Gets the value of the any property.
+                 * 
+                 * <p>
+                 * This accessor method returns a reference to the live list,
+                 * not a snapshot. Therefore any modification you make to the
+                 * returned list will be present inside the JAXB object.
+                 * This is why there is not a <CODE>set</CODE> method for the any property.
+                 * 
+                 * <p>
+                 * For example, to add a new item, do as follows:
+                 * <pre>
+                 *    getAny().add(newItem);
+                 * </pre>
+                 * 
+                 * 
+                 * <p>
+                 * Objects of the following type(s) are allowed in the list
+                 * {@link Element }
+                 * {@link Object }
+                 * 
+                 * 
+                 */
+                public List<Object> getAny() {
+                    if (any == null) {
+                        any = new ArrayList<Object>();
+                    }
+                    return this.any;
+                }
+
+                /**
+                 * Ruft den Wert der toState-Eigenschaft ab.
+                 * 
+                 * @return
+                 *     possible object is
+                 *     {@link JobChain.JobChainNode.OnReturnCodes.OnReturnCode.ToState }
+                 *     
+                 */
+                public JobChain.JobChainNode.OnReturnCodes.OnReturnCode.ToState getToState() {
+                    return toState;
+                }
+
+                /**
+                 * Legt den Wert der toState-Eigenschaft fest.
+                 * 
+                 * @param value
+                 *     allowed object is
+                 *     {@link JobChain.JobChainNode.OnReturnCodes.OnReturnCode.ToState }
+                 *     
+                 */
+                public void setToState(JobChain.JobChainNode.OnReturnCodes.OnReturnCode.ToState value) {
+                    this.toState = value;
+                }
+
+                /**
+                 * Ruft den Wert der returnCode-Eigenschaft ab.
+                 * 
+                 * @return
+                 *     possible object is
+                 *     {@link String }
+                 *     
+                 */
+                public String getReturnCode() {
+                    return returnCode;
+                }
+
+                /**
+                 * Legt den Wert der returnCode-Eigenschaft fest.
+                 * 
+                 * @param value
+                 *     allowed object is
+                 *     {@link String }
+                 *     
+                 */
+                public void setReturnCode(String value) {
+                    this.returnCode = value;
+                }
+
+
+                /**
+                 * <p>Java-Klasse für anonymous complex type.
+                 * 
+                 * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+                 * 
+                 * <pre>
+                 * &lt;complexType>
+                 *   &lt;complexContent>
+                 *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+                 *       &lt;attribute name="state" type="{}String" />
+                 *     &lt;/restriction>
+                 *   &lt;/complexContent>
+                 * &lt;/complexType>
+                 * </pre>
+                 * 
+                 * 
+                 */
+                @XmlAccessorType(XmlAccessType.FIELD)
+                @XmlType(name = "")
+                public static class ToState {
+
+                    @XmlAttribute(name = "state")
+                    protected String state;
+
+                    /**
+                     * Ruft den Wert der state-Eigenschaft ab.
+                     * 
+                     * @return
+                     *     possible object is
+                     *     {@link String }
+                     *     
+                     */
+                    public String getState() {
+                        return state;
+                    }
+
+                    /**
+                     * Legt den Wert der state-Eigenschaft fest.
+                     * 
+                     * @param value
+                     *     allowed object is
+                     *     {@link String }
+                     *     
+                     */
+                    public void setState(String value) {
+                        this.state = value;
+                    }
+
+                }
+
+            }
+
         }
 
     }

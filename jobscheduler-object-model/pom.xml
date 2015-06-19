@@ -33,6 +33,12 @@
             <artifactId>virtual-file-system</artifactId>
             <version>${project.version}</version>
         </dependency>
+        
+        <dependency>
+          <groupId>com.sos-berlin</groupId>
+          <artifactId>graphviz-adapter</artifactId>
+          <version>${project.version}</version>
+        </dependency>
 
         <!-- dependencies for third party libraries -->
         <dependency>
@@ -70,11 +76,15 @@
             <artifactId>joda-time</artifactId>
         </dependency>
 
+
         <dependency>
           <groupId>junit</groupId>
           <artifactId>junit</artifactId>
           <scope>test</scope>
         </dependency>
+
+
+
 
     </dependencies>
 
