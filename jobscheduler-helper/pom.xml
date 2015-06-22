@@ -22,32 +22,29 @@
     <build>
 
         <plugins>
-
-        
-		        <!-- create folder generated-sources in target folder -->
-		        <plugin>
-		            <artifactId>maven-antrun-plugin</artifactId>
-		            <executions>
-		                <execution>
-		                    <id>generate-sources</id>
-		                    <phase>process-sources</phase>
-		                    <configuration>
+	        <!-- create folder generated-sources in target folder -->
+	        <plugin>
+	            <artifactId>maven-antrun-plugin</artifactId>
+	            <executions>
+	                <execution>
+	                    <id>generate-sources</id>
+	                    <phase>process-sources</phase>
+	                    <configuration>
 <!--  		                [WARNING] Parameter tasks is deprecated, use target instead        
-		                        <tasks>
-		                            <mkdir dir="target/generated-sources" />
-		                        </tasks>
+		                    <tasks>
+        		                <mkdir dir="target/generated-sources" />
+                		    </tasks>
 -->		                        
-		                      	<target>
-		                            <mkdir dir="target/generated-sources" />
-		                        </target>
-		                    </configuration>
-		                    <goals>
-		                        <goal>run</goal>
-		                    </goals>
-		                </execution>
-		            </executions>
-		        </plugin>
-
+                	      	<target>
+	                            <mkdir dir="target/generated-sources" />
+	                        </target>
+	                    </configuration>
+	                    <goals>
+	                        <goal>run</goal>
+	                    </goals>
+	                </execution>
+	            </executions>
+	        </plugin>
             <!-- add the folder with generated sources to the classpath -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -67,37 +64,35 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>buildnumber-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                    		<id>get-svn-revision</id>
+                   		<id>get-svn-revision</id>
                         <phase>validate</phase>
                         <goals>
                             <goal>create</goal>
                         </goals>
-				                <configuration>
-				                    <buildNumberPropertyName>svn.build.number</buildNumberPropertyName>
-				                    <doCheck>false</doCheck>
-				                    <doUpdate>false</doUpdate>
-				                </configuration>
+		                <configuration>
+		                    <buildNumberPropertyName>svn.build.number</buildNumberPropertyName>
+		                    <doCheck>false</doCheck>
+		                    <doUpdate>false</doUpdate>
+		                </configuration>
                     </execution>
                     <execution>
-      									<id>get-build-year</id>
-      									<phase>initialize</phase>
-      									<goals>
-        										<goal>create-timestamp</goal>
-      									</goals>
-      									<configuration>
-      											<timestampPropertyName>build.year</timestampPropertyName>
-        										<timestampFormat>yyyy</timestampFormat>
-      									</configuration>
-    								</execution>
+						<id>get-build-year</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>create-timestamp</goal>
+						</goals>
+						<configuration>
+							<timestampPropertyName>build.year</timestampPropertyName>
+							<timestampFormat>yyyy</timestampFormat>
+						</configuration>
+					</execution>
                 </executions>
             </plugin>
-
             <!-- get the template for the VersionInfo class, replace the placeholder and put the file into target/generated-sources -->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -123,7 +118,6 @@
                     </execution>
                 </executions>
             </plugin>
-
         </plugins>
 
         <pluginManagement>
@@ -138,17 +132,24 @@
         					<pluginExecutions>
         						<pluginExecution>
         							<pluginExecutionFilter>
-        								<groupId>
-        									org.apache.maven.plugins
-        								</groupId>
-        								<artifactId>
-        									maven-antrun-plugin
-        								</artifactId>
-        								<versionRange>
-        									[1.6,)
-        								</versionRange>
+        								<groupId>org.apache.maven.plugins</groupId>
+        								<artifactId>maven-antrun-plugin</artifactId>
+        								<versionRange>[1.6,)</versionRange>
         								<goals>
         									<goal>run</goal>
+        								</goals>
+        							</pluginExecutionFilter>
+        							<action>
+        								<ignore></ignore>
+        							</action>
+        						</pluginExecution>
+        						<pluginExecution>
+        							<pluginExecutionFilter>
+						                <groupId>org.codehaus.mojo</groupId>
+						                <artifactId>buildnumber-maven-plugin</artifactId>
+        								<versionRange>[1.2,)</versionRange>
+        								<goals>
+        									<goal>create-timestamp</goal>
         								</goals>
         							</pluginExecutionFilter>
         							<action>
@@ -164,61 +165,49 @@
     </build>
 
     <dependencies>
-
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
-
 		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
 		</dependency>
-
-
         <dependency>
             <groupId>com.sos-berlin.commons</groupId>
             <artifactId>sos-util</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
         </dependency>
-
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
         </dependency>
-
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
         </dependency>
-
         <dependency>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
         </dependency>
-
         <dependency>
             <groupId>xerces</groupId>
             <artifactId>xercesImpl</artifactId>
         </dependency>
-
         <dependency>
             <groupId>net.sf.saxon</groupId>
             <artifactId>Saxon-HE</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
           <groupId>junit</groupId>
           <artifactId>junit</artifactId>
           <scope>test</scope>
         </dependency>
-
     </dependencies>
 
 </project>
