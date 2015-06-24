@@ -103,6 +103,7 @@ public class SOSVfsConnectionFactory {
 			try{
 				handler.Connect(options);
 				handler.Authenticate(options);
+				handleClient(client, options, isSource);
 			}
 			catch(Exception e){
 				
@@ -125,7 +126,9 @@ public class SOSVfsConnectionFactory {
 					handler.Connect(alternatives);
 					handler.Authenticate(alternatives);
 					
-					alternatives.AlternateOptionsUsed.value(true);
+					options.AlternateOptionsUsed.value(true);
+					handleClient(client, alternatives, isSource);
+					//alternatives.AlternateOptionsUsed.value(true);
 				}
 				else{
 					logger.error(String.format("Connection failed : %s", e.toString()));
@@ -133,8 +136,6 @@ public class SOSVfsConnectionFactory {
 					throw e;
 				}
 			}
-			
-			handleClient(client, options, isSource);
 		}
 		catch (JobSchedulerException ex) {
 			throw ex;
@@ -151,6 +152,17 @@ public class SOSVfsConnectionFactory {
 	 * @throws Exception
 	 */
 	private void handleClient(ISOSVfsFileTransfer client,SOSConnection2OptionsAlternate options,boolean isSource) throws Exception{
+		if (options.Directory.isDirty()) {
+			if (isSource) {
+				objOptions.SourceDir = options.Directory;
+				objOptions.local_dir = options.Directory;
+			}
+			else {
+				objOptions.TargetDir = options.Directory;
+				objOptions.remote_dir = options.Directory; 
+			}
+		}
+		
 		if (objOptions.passive_mode.value() || options.passive_mode.isTrue()) {
 			client.passive();
 		}

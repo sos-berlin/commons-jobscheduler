@@ -390,24 +390,60 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
 	public void executeTFNPostCommnands() {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::executeTFNPostCommnands";
-		executeCommands(objDataTargetClient, objOptions.TFN_Post_Command);
-		executeCommands(objDataSourceClient, objOptions.getConnectionOptions().Source().TFN_Post_Command);
-		executeCommands(objDataTargetClient, objOptions.getConnectionOptions().Target().TFN_Post_Command);
+		SOSConnection2OptionsAlternate target = objOptions.getConnectionOptions().Target();
+		if (target.AlternateOptionsUsed.isTrue()) {
+			executeCommands(objDataTargetClient, target.Alternatives().TFN_Post_Command);
+		}
+		else {
+			executeCommands(objDataTargetClient, objOptions.TFN_Post_Command);
+			executeCommands(objDataTargetClient, target.TFN_Post_Command);
+		}
+		SOSConnection2OptionsAlternate source = objOptions.getConnectionOptions().Source();
+		if (source.AlternateOptionsUsed.isTrue()) {
+			executeCommands(objDataSourceClient, source.Alternatives().TFN_Post_Command);
+		}
+		else {
+			executeCommands(objDataSourceClient, source.TFN_Post_Command);
+		}
 		//	return void;
 	} // private void executeTFNPostCommnands
 
 	public void executePostCommands() {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::executePostCommands";
-		executeCommands(objDataTargetClient, objOptions.Post_Command);
-		executeCommands(objDataSourceClient, objOptions.getConnectionOptions().Source().Post_Command);
-		executeCommands(objDataTargetClient, objOptions.getConnectionOptions().Target().Post_Command);
+		SOSConnection2OptionsAlternate target = objOptions.getConnectionOptions().Target();
+		if (target.AlternateOptionsUsed.isTrue()) {
+			executeCommands(objDataTargetClient, target.Alternatives().Post_Command);
+		}
+		else {
+			executeCommands(objDataTargetClient, objOptions.Post_Command);
+			executeCommands(objDataTargetClient, target.Post_Command);
+		}
+		SOSConnection2OptionsAlternate source = objOptions.getConnectionOptions().Source();
+		if (source.AlternateOptionsUsed.isTrue()) {
+			executeCommands(objDataSourceClient, source.Alternatives().Post_Command);
+		}
+		else {
+			executeCommands(objDataSourceClient, source.Post_Command);
+		}
 	} // private void executePostCommands
 
 	private void executePreCommands() {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::executePreCommands";
-		executeCommands(objDataTargetClient, objOptions.Pre_Command);
-		executeCommands(objDataSourceClient, objOptions.getConnectionOptions().Source().Pre_Command);
-		executeCommands(objDataTargetClient, objOptions.getConnectionOptions().Target().Pre_Command);
+		SOSConnection2OptionsAlternate target = objOptions.getConnectionOptions().Target();
+		if (target.AlternateOptionsUsed.isTrue()) {
+			executeCommands(objDataTargetClient, target.Alternatives().Pre_Command);
+		}
+		else {
+			executeCommands(objDataTargetClient, objOptions.Pre_Command);
+			executeCommands(objDataTargetClient, target.Pre_Command);
+		}
+		SOSConnection2OptionsAlternate source = objOptions.getConnectionOptions().Source();
+		if (source.AlternateOptionsUsed.isTrue()) {
+			executeCommands(objDataSourceClient, source.Alternatives().Pre_Command);
+		}
+		else {
+			executeCommands(objDataSourceClient, source.Pre_Command);
+		}
 	} // private void executePreCommands
 
 	public boolean FileExists() {
@@ -1299,19 +1335,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	}
 
 	public Properties getFileAttributesAsProperties() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getFileAttributesAsProperties";
 		Properties objAttributesProperties = new Properties();
-		//		boolean flgRet = false;
-		//		if (flgTransferHistoryAlreadySent == true) {
-		//			return flgRet;
-		//		}
-		//		flgTransferHistoryAlreadySent = true;
-		//		if (objOptions.SendTransferHistory.isFalse()) {
-		//			if (flgNoDataSent == false) {
-		//				flgNoDataSent = true;
-		//			}
-		//			return flgRet;
-		//		}
 		SOSFileListEntry pobjEntry = this;
 		String mandator = objOptions.mandator.Value(); // 0-
 		String transfer_timestamp = EMPTY_STRING;
@@ -1324,29 +1348,33 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		 * this hack is tested for SUN-JVM only. No guarantee is made for other JVMs
 		 */
 		// TODO create a getPID method in shell class
-		String pid = ManagementFactory.getRuntimeMXBean().getName();
-		String strA[] = pid.split("@");
-		pid = strA[0];
+		String pid = "0";
+		try {
+			pid = ManagementFactory.getRuntimeMXBean().getName();
+			String strA[] = pid.split("@");
+			pid = strA[0];
+		} catch (Exception e) {
+			pid = "0";
+		}
 		String ppid = System.getProperty(conFieldPPID, "0");
 		String operation = objOptions.operation.Value(); // 4- operation: send|receive
 		SOSConnection2OptionsAlternate objS = objOptions.getConnectionOptions().Source();
+		if (objS.AlternateOptionsUsed.isTrue()) {
+			objS = objS.Alternatives();
+		}
 		String localhost = objS.host.getLocalHostIfHostIsEmpty(); // 5- local host
 		String localhost_ip = objS.host.getLocalHostAdressIfHostIsEmpty(); // 5-1- local host IP adresse
 		String local_user = objS.user.getSystemUserIfUserIsEmpty(); // 6- local user
 		SOSConnection2OptionsAlternate objT = objOptions.getConnectionOptions().Target();
+		if (objT.AlternateOptionsUsed.isTrue()) {
+			objT = objT.Alternatives();
+		}
 		String remote_host = objT.host.getLocalHostIfHostIsEmpty(); // 7- remote host
 		String remote_host_ip = objT.host.getLocalHostAdressIfHostIsEmpty(); // 7- remote host IP
-		String remote_user = "";
-		if (objT.AlternateOptionsUsed.value() == true) {
-			remote_user = "(alternative) " + objT.Alternatives().user.Value(); // 8- remote host user
-		}
-		else {
-			remote_user = objT.user.getSystemUserIfUserIsEmpty(); // 8- remote host user
-		}
+		String remote_user = objT.user.getSystemUserIfUserIsEmpty(); // 8- remote host user
 		String protocol = objT.protocol.Value(); // 9- protocol
 		String port = objT.port.Value(); // 10- port
-		String local_dir = objOptions.local_dir.Value();
-		// String remote_dir = new File(this.strTargetFileName).getAbsolutePath();
+		String local_dir = objOptions.SourceDir.Value();
 		String remote_dir = objOptions.TargetDir.Value();
 		String local_filename = pobjEntry.getSourceFilename(); // 13- file name
 		String remote_filename = pobjEntry.getTargetFilename(); // 14- name
@@ -1355,10 +1383,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		}
 		String fileSize = String.valueOf(pobjEntry.getFileSize());
 		String md5 = pobjEntry.getMd5();
-		String last_error_message = "";
-		// last_error_message = clearCRLF(((getLogger().getError() != null && getLogger().getError().length() > 0) ? getLogger().getError()
-		// : getLogger().getWarning())); // 15- last_error=|warn message
-		// last_error_message = normalizedPassword(sosString.parseToString(last_error_message));
+		String last_error_message = JobSchedulerException.LastErrorMessage;
 		String log_filename = objOptions.log_filename.Value();
 		String jump_host = objOptions.jump_host.Value();
 		String jump_host_ip = objOptions.jump_host.getHostAdress();
