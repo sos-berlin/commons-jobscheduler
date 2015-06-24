@@ -103,12 +103,16 @@ public class SOSVfsConnectionFactory {
 			try{
 				handler.Connect(options);
 				handler.Authenticate(options);
+				handleClient(client, options, isSource);
 			}
 			catch(Exception e){
-				if (!options.Alternatives().host.IsEmpty() && !options.Alternatives().user.IsEmpty()) {
+				
+				SOSConnection2OptionsAlternate alternatives = options.Alternatives();
+				if (alternatives.optionsHaveMinRequirements()) {
 					// TODO respect alternate authentication, eg password and/or public key
-					logger.info(String.format("Connection failed : %s", e.toString()));
+					logger.warn(String.format("Connection failed : %s", e.toString()));
 					logger.info(String.format("Try again using the alternate options ..."));
+					logger.debug(alternatives.dirtyString());
 						
 					JobSchedulerException.LastErrorMessage = "";
 						
@@ -119,25 +123,24 @@ public class SOSVfsConnectionFactory {
 						logger.warn(String.format("client disconnect failed : %s",ce.toString()));
 					}
 						
-					handler.Connect(options.Alternatives());
-					handler.Authenticate(options.Alternatives());
+					handler.Connect(alternatives);
+					handler.Authenticate(alternatives);
 					
-					options.setAlternateOptionsUsed("true");
+					options.AlternateOptionsUsed.value(true);
+					handleClient(client, alternatives, isSource);
+					//alternatives.AlternateOptionsUsed.value(true);
 				}
 				else{
+					logger.error(String.format("Connection failed : %s", e.toString()));
 					logger.debug(String.format("alternate options are not defined"));
 					throw e;
 				}
 			}
-			
-			handleClient(client, options, isSource);
 		}
 		catch (JobSchedulerException ex) {
 			throw ex;
 		}
 		catch (Exception ex) {
-			//			https://change.sos-berlin.com/browse/SOSFTP-212
-			//			throw (RuntimeException) ex;
 			throw new JobSchedulerException(ex);
 		}
 		return handler;
@@ -149,6 +152,17 @@ public class SOSVfsConnectionFactory {
 	 * @throws Exception
 	 */
 	private void handleClient(ISOSVfsFileTransfer client,SOSConnection2OptionsAlternate options,boolean isSource) throws Exception{
+		if (options.Directory.isDirty()) {
+			if (isSource) {
+				objOptions.SourceDir = options.Directory;
+				objOptions.local_dir = options.Directory;
+			}
+			else {
+				objOptions.TargetDir = options.Directory;
+				objOptions.remote_dir = options.Directory; 
+			}
+		}
+		
 		if (objOptions.passive_mode.value() || options.passive_mode.isTrue()) {
 			client.passive();
 		}
