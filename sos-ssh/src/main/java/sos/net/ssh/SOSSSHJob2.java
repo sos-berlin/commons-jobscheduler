@@ -144,7 +144,7 @@ public class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 	 */
 	public SOSSSHJob2() {
 		super(new SOSSSHJobOptions());
-		logger.info(conSVNVersion);
+//		logger.info(conSVNVersion);
 		getVFS();
 	}
 

@@ -159,12 +159,12 @@ public class JSJobUtilitiesClass<T> extends JSToolBox implements JSJobUtilities,
 	 */
 	@Override
 	public void setJSParam(final String pstrKey, final String pstrValue) {
-		logger.debug(String.format("*mock* set param '%1$s' to value '%2$s'", pstrKey, pstrValue));
+//		logger.debug(String.format("*mock* set param '%1$s' to value '%2$s'", pstrKey, pstrValue));
 	}
 
 	@Override
 	public void setJSParam(final String pstrKey, final StringBuffer pstrValue) {
-		logger.debug(String.format("*mock* set param '%1$s' to value '%2$s'", pstrKey, pstrValue));
+//		logger.debug(String.format("*mock* set param '%1$s' to value '%2$s'", pstrKey, pstrValue));
 	}
 
 	/**
