@@ -6,6 +6,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Query;
@@ -514,6 +515,8 @@ public class JadeFilesHistoryDBLayer extends SOSHibernateIntervalDBLayer impleme
 
     @Override
     public List<DbItem> getListOfItemsToDelete()  {
+        TimeZone.setDefault(TimeZone.getTimeZone("Etc/UTC"));
+
          return getFilesHistoryFromTo(filter.getCreatedFrom(),filter.getCreatedTo());
              
     }
