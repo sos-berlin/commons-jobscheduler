@@ -1195,11 +1195,15 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 	}
 
 	@Override public boolean isConnected() {
-		return Client().isConnected();
-		// TODO implement Options
-		//		Client().setSoTimeout(1200);
-		//		Client().setDefaultTimeout(1200);
-		//		Client().setDataTimeout(1200);
+		boolean isConnected = false;
+		if (Client().isConnected()) {
+			try {
+				Client().sendCommand("NOOP");
+				isConnected = true;
+			} catch (IOException e) {
+			}
+		}
+		return isConnected;
 	}
 
 	@Override public final boolean isDirectory(final String pstrPathName) {

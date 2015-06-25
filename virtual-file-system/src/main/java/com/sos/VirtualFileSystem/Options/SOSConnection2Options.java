@@ -58,7 +58,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 	} // public SOSConnection2Options
 
 	private void initChildOptions() {
-		logger.trace("initChildOptions");
+//		logger.trace("initChildOptions");
 		if (objAlternativeOptions == null) {
 			objAlternativeOptions = new SOSConnection2OptionsAlternate("");
 		}
@@ -85,27 +85,27 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 	} // public SOSConnection2Options (HashMap JSSettings)
 
 	public void setPrefixedValues(final HashMap<String, String> pobjJSSettings) throws Exception {
-		logger.trace("setPrefixedValues");
-		logger.trace(SOSVfsMessageCodes.SOSVfs_T_267.params(conParamNamePrefixALTERNATIVE));
+//		logger.trace("setPrefixedValues");
+//		logger.trace(SOSVfsMessageCodes.SOSVfs_T_267.params(conParamNamePrefixALTERNATIVE));
 		objAlternativeOptions.setAllOptions(pobjJSSettings, strAlternativePrefix + conParamNamePrefixALTERNATIVE);
 		this.addProcessedOptions(objAlternativeOptions.getProcessedOptions());
 		objAlternativeOptions.setAllOptions(pobjJSSettings);
 		this.addProcessedOptions(objAlternativeOptions.getProcessedOptions());
 		//
-		logger.trace(SOSVfsMessageCodes.SOSVfs_T_267.params(conParamNamePrefixSOURCE));
+//		logger.trace(SOSVfsMessageCodes.SOSVfs_T_267.params(conParamNamePrefixSOURCE));
 		objSourceOptions.setAllOptions(pobjJSSettings, conParamNamePrefixSOURCE);
 		objSourceOptions.Alternatives().setChildClasses(pobjJSSettings, conParamNamePrefixSOURCE);
 		objSourceOptions.setChildClasses(pobjJSSettings, conParamNamePrefixSOURCE);
 		this.addProcessedOptions(objSourceOptions.getProcessedOptions());
 		//
-		logger.trace(SOSVfsMessageCodes.SOSVfs_T_268.params(objSourceOptions.dirtyString()));
-		logger.trace(SOSVfsMessageCodes.SOSVfs_T_267.params(conParamNamePrefixTARGET));
+//		logger.trace(SOSVfsMessageCodes.SOSVfs_T_268.params(objSourceOptions.dirtyString()));
+//		logger.trace(SOSVfsMessageCodes.SOSVfs_T_267.params(conParamNamePrefixTARGET));
 		objTargetOptions.setAllOptions(pobjJSSettings, conParamNamePrefixTARGET);
 		objTargetOptions.Alternatives().setChildClasses(pobjJSSettings, conParamNamePrefixTARGET);
 		objTargetOptions.setChildClasses(pobjJSSettings, conParamNamePrefixTARGET);
 		this.addProcessedOptions(objTargetOptions.getProcessedOptions());
 		//
-		logger.trace(SOSVfsMessageCodes.SOSVfs_T_269.params(objTargetOptions.dirtyString()));
+//		logger.trace(SOSVfsMessageCodes.SOSVfs_T_269.params(objTargetOptions.dirtyString()));
 		//		logger.trace(String.format("set parameter for prefix '%1$s'", "jump_"));
 		objJumpServerOptions.setAllOptions(pobjJSSettings, conParamNamePrefixJUMP);
 		this.addProcessedOptions(objJumpServerOptions.getProcessedOptions());

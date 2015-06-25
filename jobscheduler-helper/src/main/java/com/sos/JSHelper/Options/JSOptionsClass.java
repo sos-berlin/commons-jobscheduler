@@ -2197,9 +2197,9 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 				IterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.setPrefix, strBuffer);
 			}
 		}
-		else {
-			logger.trace(String.format("SOSOPT-I-002: Alternate Prefix already set to %1$s, but %2$s as new given", strAlternativePrefix, pstrAlternativePrefix));
-		}
+//		else {
+//			logger.trace(String.format("SOSOPT-I-002: Alternate Prefix already set to %1$s, but %2$s as new given", strAlternativePrefix, pstrAlternativePrefix));
+//		}
 		this.setAllOptions(pobjJSSettings);
 	}
 
