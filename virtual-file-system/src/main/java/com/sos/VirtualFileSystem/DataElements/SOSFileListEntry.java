@@ -508,6 +508,9 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		if (isEmpty(strT)) { // If empty, e.g. in case of operation getlist, use source file name
 			strT = strSourceFileName;
 		}
+		if (objOptions.ResultSetFileName.Value().endsWith(".source.tmp")) { //for copyfromInternet
+			strT = strSourceFileName;
+		}
 		return strT;
 	} // private String getFileName4ResultList
 
