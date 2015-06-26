@@ -1041,4 +1041,8 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     public SOSFileEntries getSOSFileEntries() {
         return sosFileEntries;
     }
+
+	@Override
+	public void reconnect(SOSConnection2OptionsAlternate options) {
+	}
 }
