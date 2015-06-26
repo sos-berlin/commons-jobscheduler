@@ -140,7 +140,6 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 		super(new SOSSSHJobOptions());
 	  objMsg        = new Msg(new BundleBaseName(this.getClass().getAnnotation(I18NResourceBundle.class).baseName()));
 
-		logger.info(conSVNVersion);
 		getVFS();
 		// http://www.sos-berlin.com/jira/browse/JITL-112: 
 		//   generateTemporaryFilename() has to be called once to generate a temporary filename 
