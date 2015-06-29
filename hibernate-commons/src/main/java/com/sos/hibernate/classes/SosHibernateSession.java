@@ -131,15 +131,7 @@ public class SosHibernateSession {
         classList.addClassIfExist("sos.ftphistory.db.JadeFilesDBItem");
         classList.addClassIfExist("sos.ftphistory.db.JadeFilesHistoryDBItem");
         classList.addClassIfExist("com.sos.eventing.db.SchedulerEventDBItem");
-        classList.addClassIfExist("com.sos.jobnet.db.EventsDBItem");
-        classList.addClassIfExist("com.sos.jobnet.db.JobNetPlanDBItem");
-        classList.addClassIfExist("com.sos.jobnet.db.JobNetNodeDBItem");
-        classList.addClassIfExist("com.sos.jobnet.db.JobNetEdgesDBItem");
-        classList.addClassIfExist("com.sos.jobnet.db.JobNetHistoryDBItem");
-        classList.addClassIfExist("com.sos.jobnet.db.JobNetCmdHistoryDBItem");
-        classList.addClassIfExist("com.sos.jobnet.db.JobNetDBItem");
-        classList.addClassIfExist("com.sos.jobnet.db.ConditionsDBItem");
-
+        
         classList.addClassIfExist("com.sos.auth.shiro.db.SOSUserDBItem");
         classList.addClassIfExist("com.sos.auth.shiro.db.SOSUserRightDBItem");
         classList.addClassIfExist("com.sos.auth.shiro.db.SOSUserRoleDBItem");
