@@ -2081,4 +2081,29 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
     public SOSFileEntries getSOSFileEntries() {
         return sosFileEntries;
     }
+
+    /**
+	 * 
+	 * @param options
+	 */
+	@Override
+	public void reconnect(SOSConnection2OptionsAlternate options) {
+		if (!isConnected()) {
+			try {
+				Connect(options);
+				Authenticate(options);
+				if (options.passive_mode.value()) {
+					passive();
+				}
+				if (options.transfer_mode.isDirty() && options.transfer_mode.IsNotEmpty()) {
+					TransferMode(options.transfer_mode);
+				}
+			} catch (JobSchedulerException e) {
+				throw e;
+			}
+			catch (Exception e) {
+				throw new JobSchedulerException(e);
+			}
+		}
+	}
 }

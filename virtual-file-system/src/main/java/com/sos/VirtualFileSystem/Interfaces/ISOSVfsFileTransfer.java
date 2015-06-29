@@ -12,6 +12,7 @@ import java.util.Vector;
 
 import com.sos.JSHelper.Options.SOSOptionTransferMode;
 import com.sos.VirtualFileSystem.DataElements.SOSFolderName;
+import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
 
 public interface ISOSVfsFileTransfer {
@@ -20,6 +21,12 @@ public interface ISOSVfsFileTransfer {
 	 * @return True if the client is currently connected to a server, false otherwise.
 	 */
 	public boolean isConnected();
+	
+	/**
+	 * reconnect the connection to the server if client is currently not connected.
+	 * @param options
+	 */
+	public void reconnect(SOSConnection2OptionsAlternate options);
 
 	/**
 	 * @return True if successfully completed, false if not.

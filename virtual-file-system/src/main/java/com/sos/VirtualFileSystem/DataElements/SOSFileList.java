@@ -427,7 +427,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 		flgResultSetFileAlreadyCreated = true;
 		try {
 			//if (objOptions.CreateResultSet.isTrue()) {
-				if (objOptions.ResultSetFileName.isDirty()) {
+				if (objOptions.ResultSetFileName.isDirty() && objOptions.ResultSetFileName.IsNotEmpty()) {
 					// TODO use the file object from the option
 					JSFile objResultSetFile = objOptions.ResultSetFileName.JSFile();
 					for (SOSFileListEntry objListItem : objFileListEntries) {
