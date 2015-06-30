@@ -22,8 +22,8 @@ public class JobSchedulerCleanupHistory extends Job_impl {
 	/** Attribute: delete history for the given number of days */
 	public int			deleteHistoryInterval			= 0;
 
-	/** Attribute: delete FTPhistory for the given number of days */
-	public int			deleteFTPHistoryInterval			= 0;
+	/** Attribute: delete JADEhistory for the given number of days */
+	public int			deleteJADEHistoryInterval			= 0;
 	
 	/** Attribute: delete FTPhistory for the given number of days */
 	public int			deleteDailyPlanInterval			    = 0;
@@ -98,9 +98,9 @@ public class JobSchedulerCleanupHistory extends Job_impl {
 				spooler_log.info(".. job parameter [delete_history_interval]: " + deleteHistoryInterval);
 			}
 
-			if (spooler_task.params().var("delete_ftp_history_interval") != null && spooler_task.params().var("delete_ftp_history_interval").length() > 0) {
-				deleteFTPHistoryInterval = Integer.parseInt(spooler_task.params().var("delete_ftp_history_interval"));
-				spooler_log.info(".. job parameter [delete_ftp_history_interval]: " + deleteFTPHistoryInterval);
+			if (spooler_task.params().var("delete_jade_history_interval") != null && spooler_task.params().var("delete_jade_history_interval").length() > 0) {
+				deleteJADEHistoryInterval = Integer.parseInt(spooler_task.params().var("delete_jade_history_interval"));
+				spooler_log.info(".. job parameter [delete_jade_history_interval]: " + deleteJADEHistoryInterval);
 			}
 
 			if (spooler_task.params().var("delete_daily_plan_interval") != null && spooler_task.params().var("delete_daily_plan_interval").length() > 0) {
@@ -182,9 +182,9 @@ public class JobSchedulerCleanupHistory extends Job_impl {
 		String orderHistoryDeleteQuery = new String("");
 		String orderStepHistoryDeleteQuery = new String("");
 		String orderHistoryQuery = new String("");
-		String sosFtpFilesDeleteQuery = new String("");
+		String sosJadeFilesDeleteQuery = new String("");
 		String sosDailyPlanDeleteQuery = new String("");
-		String sosFtpFilesHistoyDeleteQuery = new String("");
+		String sosJadeFilesHistoyDeleteQuery = new String("");
 		String sqlCondition = new String("");
 		String sqlDeleteCondition = new String("");
 		String sqlAnd = new String(" WHERE ");
@@ -262,23 +262,23 @@ public class JobSchedulerCleanupHistory extends Job_impl {
 				db.destruct();
 			}
 			
-			if (deleteFTPHistoryInterval > 0) {
+			if (deleteJADEHistoryInterval > 0) {
 				
 				db = new sos.hostware.File();
 				db.open("-in -out " + spooler.db_name());
 				
 				GregorianCalendar now = new GregorianCalendar();
-				now.add(GregorianCalendar.DAY_OF_YEAR, -deleteFTPHistoryInterval);
+				now.add(GregorianCalendar.DAY_OF_YEAR, -deleteJADEHistoryInterval);
 				sqlDeleteCondition = " WHERE \"CREATED\" <= %timestamp('" + SOSDate.getDateAsString(now.getTime()) + "')";
  
-				sosFtpFilesDeleteQuery = " DELETE FROM SOSFTP_FILES " + sqlDeleteCondition;
-				spooler_log.debug1("processing ftp files  delete query: " + sosFtpFilesDeleteQuery);
-				db.put_line(sosFtpFilesDeleteQuery);
+				sosJadeFilesDeleteQuery = " DELETE FROM JADE_FILES " + sqlDeleteCondition;
+				spooler_log.debug1("processing jade files  delete query: " + sosJadeFilesDeleteQuery);
+				db.put_line(sosJadeFilesDeleteQuery);
 				db.put_line("commit");
 
-				sosFtpFilesHistoyDeleteQuery = " DELETE FROM SOSFTP_FILES_HISTORY " + sqlDeleteCondition;;
-				spooler_log.debug1("processing ftp files history  delete query: " + sosFtpFilesHistoyDeleteQuery);
-				db.put_line(sosFtpFilesHistoyDeleteQuery);
+				sosJadeFilesHistoyDeleteQuery = " DELETE FROM JADE_FILES_HISTORY " + sqlDeleteCondition;;
+				spooler_log.debug1("processing jade files history  delete query: " + sosJadeFilesHistoyDeleteQuery);
+				db.put_line(sosJadeFilesHistoyDeleteQuery);
 				db.put_line("commit");
  				
 				db.close();

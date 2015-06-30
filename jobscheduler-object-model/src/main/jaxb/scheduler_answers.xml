@@ -1542,10 +1542,10 @@
             <job_chain_node state="finish"/>
             <job_chain_node state="error"/>
           </job_chain>
-          <job_chain path="/scheduler_sosftp_history_file_order" name="scheduler_sosftp_history_file_order" title="Adds a file order source" orders="0" running_orders="0" state="running" orders_recoverable="yes">
-            <file_based state="active" file="C:/Program Files (x86)/Scheduler/config/live/scheduler_sosftp_history_file_order.job_chain.xml" last_write_time="2009-08-27T07:38:37.000Z"/>
+          <job_chain path="/scheduler_jade_history_file_order" name="scheduler_jade_history_file_order" title="Adds a file order source" orders="0" running_orders="0" state="running" orders_recoverable="yes">
+            <file_based state="active" file="C:/Program Files (x86)/Scheduler/config/live/scheduler_jade_history_file_order.job_chain.xml" last_write_time="2009-08-27T07:38:37.000Z"/>
             <file_order_source directory="files" regex="\.csv$" max="100" next_state="first" delay_after_error="60" repeat="60"/>
-            <job_chain_node state="first" next_state="remove" error_state="remove" job="/scheduler_sosftp_import">
+            <job_chain_node state="first" next_state="remove" error_state="remove" job="/scheduler_jade_import">
               <order_queue length="0" next_start_time="never"/>
             </job_chain_node>
             <job_chain_node state="remove" job="/scheduler_file_order_sink">
@@ -1554,9 +1554,9 @@
             </job_chain_node>
             <job_chain_node state="&lt;END_STATE&gt;"/>
           </job_chain>
-          <job_chain path="/scheduler_sosftp_history_receive" name="scheduler_sosftp_history_receive" title="Receive files" orders="0" running_orders="0" state="running" orders_recoverable="no">
-            <file_based state="active" file="C:/Program Files (x86)/Scheduler/config/live/scheduler_sosftp_history_receive.job_chain.xml" last_write_time="2010-11-18T18:04:26.000Z"/>
-            <job_chain_node state="import" next_state="end" error_state="error" job="/scheduler_sosftp_history_receive">
+          <job_chain path="/scheduler_jade_history_receive" name="scheduler_jade_history_receive" title="Receive files" orders="0" running_orders="0" state="running" orders_recoverable="no">
+            <file_based state="active" file="C:/Program Files (x86)/Scheduler/config/live/scheduler_jade_history_receive.job_chain.xml" last_write_time="2010-11-18T18:04:26.000Z"/>
+            <job_chain_node state="import" next_state="end" error_state="error" job="/scheduler_jade_history_receive">
               <order_queue length="0" next_start_time="never"/>
             </job_chain_node>
             <job_chain_node state="end"/>
@@ -1578,9 +1578,9 @@
             <job_chain_node state="200"/>
             <job_chain_node state="300"/>
           </job_chain>
-          <job_chain path="/scheduler_sosftp_history" name="scheduler_sosftp_history" title="Import from order" orders="0" running_orders="0" state="running" orders_recoverable="no">
-            <file_based state="active" file="C:/Program Files (x86)/Scheduler/config/live/scheduler_sosftp_history.job_chain.xml" last_write_time="2009-08-27T07:40:30.000Z"/>
-            <job_chain_node state="import" next_state="end" error_state="error" job="/scheduler_sosftp_import">
+          <job_chain path="/scheduler_jade_history" name="scheduler_jade_history" title="Import from order" orders="0" running_orders="0" state="running" orders_recoverable="no">
+            <file_based state="active" file="C:/Program Files (x86)/Scheduler/config/live/scheduler_jade_history.job_chain.xml" last_write_time="2009-08-27T07:40:30.000Z"/>
+            <job_chain_node state="import" next_state="end" error_state="error" job="/scheduler_jade_import">
               <order_queue length="0" next_start_time="never"/>
             </job_chain_node>
             <job_chain_node state="end"/>
@@ -1599,8 +1599,8 @@
             <order_queue length="0"/>
             <log level="debug9" highest_level="info" last_info="SCHEDULER-893  Job is 'active' now" mail_on_error="yes" mail_on_warning="yes" smtp="smtp.sos" mail_from="scheduler@localhost" mail_to="kb@sos-berlin.com"/>
           </job>
-          <job path="/jasper_report_sosftp" name="jasper_report_sosftp" job="jasper_report_sosftp" state="pending" title="Create JasperReport for Application Manager" all_steps="0" all_no_of_tasks="0" log_file="C:/Program Files (x86)/Scheduler/logs/job.jasper_report_sosftp.log" order="no" no_of_tasks="1" has_description="yes" in_period="no" enabled="yes">
-            <file_based state="active" file="C:/Program Files (x86)/Scheduler/config/live/jasper_report_sosftp.job.xml" last_write_time="2010-07-09T15:11:37.000Z">
+          <job path="/jasper_report_jade" name="jasper_report_jade" job="jasper_report_jade" state="pending" title="Create JasperReport for Application Manager" all_steps="0" all_no_of_tasks="0" log_file="C:/Program Files (x86)/Scheduler/logs/job.jasper_report_jade.log" order="no" no_of_tasks="1" has_description="yes" in_period="no" enabled="yes">
+            <file_based state="active" file="C:/Program Files (x86)/Scheduler/config/live/jasper_report_jade.job.xml" last_write_time="2010-07-09T15:11:37.000Z">
               <requisites>
                 <requisite type="Process_class" path=""/>
               </requisites>
@@ -1639,10 +1639,10 @@
             <queued_tasks length="0"/>
             <log level="debug9" highest_level="info" last_info="SCHEDULER-893  Job is 'active' now" mail_on_error="yes" mail_on_warning="yes" smtp="smtp.sos" mail_from="scheduler@localhost" mail_to="kb@sos-berlin.com"/>
           </job>
-          <job path="/scheduler_sosftp_history_receive" name="scheduler_sosftp_history_receive" job="scheduler_sosftp_history_receive" state="pending" title="Receives files by FTP" process_class="/multi" all_steps="0" all_no_of_tasks="0" log_file="C:/Program Files (x86)/Scheduler/logs/job.scheduler_sosftp_history_receive.log" order="yes" no_of_tasks="4" has_description="yes" in_period="yes" job_chain_priority="1" enabled="yes">
-            <file_based state="active" file="C:/Program Files (x86)/Scheduler/config/live/scheduler_sosftp_history_receive.job.xml" last_write_time="2009-08-27T08:16:54.000Z">
+          <job path="/scheduler_jade_history_receive" name="scheduler_jade_history_receive" job="scheduler_jade_history_receive" state="pending" title="Receives files by FTP" process_class="/multi" all_steps="0" all_no_of_tasks="0" log_file="C:/Program Files (x86)/Scheduler/logs/job.scheduler_jade_history_receive.log" order="yes" no_of_tasks="4" has_description="yes" in_period="yes" job_chain_priority="1" enabled="yes">
+            <file_based state="active" file="C:/Program Files (x86)/Scheduler/config/live/scheduler_jade_history_receive.job.xml" last_write_time="2009-08-27T08:16:54.000Z">
               <includes>
-                <include live_file="/scheduler_sosftp_history.params.xml"/>
+                <include live_file="/scheduler_jade_history.params.xml"/>
               </includes>
               <requisites>
                 <requisite type="Process_class" path="/multi"/>
@@ -1653,10 +1653,10 @@
             <order_queue length="0"/>
             <log level="debug9" highest_level="info" last_info="SCHEDULER-893  Job is 'active' now" mail_on_error="yes" mail_on_warning="yes" smtp="smtp.sos" mail_from="scheduler@localhost" mail_to="kb@sos-berlin.com"/>
           </job>
-          <job path="/scheduler_sosftp_import" name="scheduler_sosftp_import" job="scheduler_sosftp_import" state="pending" title="Import SOSFTP File into Database" process_class="/multi" all_steps="0" all_no_of_tasks="0" log_file="C:/Program Files (x86)/Scheduler/logs/job.scheduler_sosftp_import.log" order="yes" no_of_tasks="3" has_description="yes" in_period="yes" job_chain_priority="1" enabled="yes">
-            <file_based state="active" file="C:/Program Files (x86)/Scheduler/config/live/scheduler_sosftp_import.job.xml" last_write_time="2009-08-27T08:16:30.000Z">
+          <job path="/scheduler_jade_import" name="scheduler_jade_import" job="scheduler_jade_import" state="pending" title="Import JADE File into Database" process_class="/multi" all_steps="0" all_no_of_tasks="0" log_file="C:/Program Files (x86)/Scheduler/logs/job.scheduler_jade_import.log" order="yes" no_of_tasks="3" has_description="yes" in_period="yes" job_chain_priority="1" enabled="yes">
+            <file_based state="active" file="C:/Program Files (x86)/Scheduler/config/live/scheduler_jade_import.job.xml" last_write_time="2009-08-27T08:16:30.000Z">
               <includes>
-                <include live_file="/scheduler_sosftp_history.params.xml"/>
+                <include live_file="/scheduler_jade_history.params.xml"/>
               </includes>
               <requisites>
                 <requisite type="Process_class" path="/multi"/>
@@ -1667,8 +1667,8 @@
             <order_queue length="0"/>
             <log level="debug9" highest_level="info" last_info="SCHEDULER-893  Job is 'active' now" mail_on_error="yes" mail_on_warning="yes" smtp="smtp.sos" mail_from="scheduler@localhost" mail_to="kb@sos-berlin.com"/>
           </job>
-          <job path="/jasper_report_sosftp_repeat_for_mandator" name="jasper_report_sosftp_repeat_for_mandator" job="jasper_report_sosftp_repeat_for_mandator" state="pending" title="Create JasperReport for Mandator" all_steps="0" all_no_of_tasks="0" log_file="C:/Program Files (x86)/Scheduler/logs/job.jasper_report_sosftp_repeat_for_mandator.log" order="no" no_of_tasks="1" has_description="yes" in_period="no" enabled="yes">
-            <file_based state="active" file="C:/Program Files (x86)/Scheduler/config/live/jasper_report_sosftp_repeat_for_mandator.job.xml" last_write_time="2010-07-09T15:11:37.000Z">
+          <job path="/jasper_report_jade_repeat_for_mandator" name="jasper_report_jade_repeat_for_mandator" job="jasper_report_jade_repeat_for_mandator" state="pending" title="Create JasperReport for Mandator" all_steps="0" all_no_of_tasks="0" log_file="C:/Program Files (x86)/Scheduler/logs/job.jasper_report_jade_repeat_for_mandator.log" order="no" no_of_tasks="1" has_description="yes" in_period="no" enabled="yes">
+            <file_based state="active" file="C:/Program Files (x86)/Scheduler/config/live/jasper_report_jade_repeat_for_mandator.job.xml" last_write_time="2010-07-09T15:11:37.000Z">
               <requisites>
                 <requisite type="Process_class" path=""/>
               </requisites>

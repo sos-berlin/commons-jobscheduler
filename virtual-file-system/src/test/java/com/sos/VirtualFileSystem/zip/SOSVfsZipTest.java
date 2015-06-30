@@ -52,7 +52,6 @@ public class SOSVfsZipTest {
 	private ISOSVfsFileTransfer	objFileSystemHandler	= null;
 	private static final String	strTestPathName			= "R:\\nobackup\\junittests\\testdata\\ZIP\\";
 	private static final String	TEST_ZIP				= strTestPathName + "test.zip";
-	private static final String	SRC_SOS_NET_SOSFTP_SOSFTP_CMD	= "src/sos/net/sosftp/sosftp.cmd";
 	private static final String strZipFile1 			= strTestPathName + "sos-net-src.zip";
 	public SOSVfsZipTest() {
 		//
@@ -430,49 +429,6 @@ public class SOSVfsZipTest {
 //		//   fail("Not yet implemented"); // TODO
 	}
 
-	/**
-	 * Test method for {@link com.sos.VirtualFileSystem.zip.SOSVfsZip#getFileHandle(java.lang.String)}.
-	 * @throws Exception 
-	 */
-	@Test
-  @Ignore("Test set to Ignore for later examination")
-	public final void testGetFileHandle() throws Exception {
-		objFileSystemHandler.changeWorkingDirectory(strZipFile1);
-		SOSVfsZipFileEntry objVF = (SOSVfsZipFileEntry) objFileSystemHandler.getFileHandle(SRC_SOS_NET_SOSFTP_SOSFTP_CMD);
-		InputStream objFI = objVF.getFileInputStream();
-		if (objFI == null) {
-			throw new JobSchedulerException("can't get InputStream for " + SRC_SOS_NET_SOSFTP_SOSFTP_CMD);
-		}
-		
-		int lngBufferSize = 1024;
-		byte[] buffer = new byte[lngBufferSize];
-		int intBytesTransferred;
-		synchronized (this) {
-			while ((intBytesTransferred = objFI.read(buffer)) != -1) {
-				try {
-					System.out.println(new String(buffer).substring(0, intBytesTransferred));
-				}
-				catch (JobSchedulerException e) {
-					break;
-				}		
-			}
-		}
-		objFI.close();
-		objFileSystemHandler.close();
-	}
-	
-	@Test
-  @Ignore("Test set to Ignore for later examination")
-	public final void testFile2String () throws Exception {
-		
-		objFileSystemHandler.changeWorkingDirectory(strZipFile1);
-		SOSVfsZipFileEntry objVF = (SOSVfsZipFileEntry) objFileSystemHandler.getFileHandle(SRC_SOS_NET_SOSFTP_SOSFTP_CMD);
-		String strB = objVF.File2String();
-		System.out.println(strB);
-		objFileSystemHandler.close();
-	}
-
-	
 	/**
 	 * Test method for {@link com.sos.VirtualFileSystem.zip.SOSVfsZip#write(byte[])}.
 	 * @throws Exception 
