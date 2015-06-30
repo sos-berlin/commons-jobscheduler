@@ -1057,4 +1057,8 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
     public SOSFileEntries getSOSFileEntries() {
         return sosFileEntries;
     }
+
+	@Override
+	public void reconnect(SOSConnection2OptionsAlternate options) {
+	}
 }

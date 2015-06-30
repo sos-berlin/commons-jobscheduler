@@ -569,6 +569,47 @@ public class SOSMailProcessInboxOptionsSuperClass extends JSOptionsClass {
 	public void setmail_scheduler_port(final SOSOptionPortNumber p_mail_scheduler_port) {
 		mail_scheduler_port = p_mail_scheduler_port;
 	}
+	
+    /**
+     * \var max_mails_to_process :
+     *
+     *
+     */
+    @JSOptionDefinition(name = "max_mails_to_process", description = "", key = "max_mails_to_process", type = "SOSOptionInteger", mandatory = false)
+    public SOSOptionInteger max_mails_to_process = new SOSOptionInteger(this, conClassName + ".max_mails_to_process", // HashMap-Key
+                                                        "", // Titel
+                                                        "0", // InitValue
+                                                        "1000", // DefaultValue
+                                                        false // isMandatory
+                                                );
+
+    /**
+     * \brief getmax_mails_to_process :
+     *
+     * \details
+     *
+     *
+     * \return
+     *
+     */
+    public SOSOptionInteger getmax_mails_to_process() {
+        return max_mails_to_process;
+    }
+
+    /**
+     * \brief setmax_mails_to_process :
+     *
+     * \details
+     *
+     *
+     * @param mail_server_timeout :
+     */
+    public void setmax_mails_to_process(final SOSOptionInteger p_max_mails_to_process) {
+        max_mails_to_process = p_max_mails_to_process;
+    }
+	
+	
+	
 
 	/**
 	 * \var mail_server_timeout :

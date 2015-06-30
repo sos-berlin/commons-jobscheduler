@@ -70,7 +70,6 @@ public class SOSServicePermissionShiro {
             addRole(roles.getSOSPermissionRole(), "joe");
             addRole(roles.getSOSPermissionRole(), "joc");
             addRole(roles.getSOSPermissionRole(), "events");
-            addRole(roles.getSOSPermissionRole(), "jobnet");
     
             SOSPermissions sosPermissions = o.createSOSPermissions();
     
@@ -126,7 +125,6 @@ public class SOSServicePermissionShiro {
             addPermission(sosPermissionJid.getSOSPermission(), "sos:products:jid:joctab:show");
             addPermission(sosPermissionJid.getSOSPermission(), "sos:products:jid:reportstab:show");
             addPermission(sosPermissionJid.getSOSPermission(), "sos:products:jid:eventtab:show");
-            addPermission(sosPermissionJid.getSOSPermission(), "sos:products:jid:jobnettab:show");
             addPermission(sosPermissionJid.getSOSPermission(), "sos:products:jid:instances:show");
             addPermission(sosPermissionJid.getSOSPermission(), "sos:products:jid:workingplantab:show");
     
