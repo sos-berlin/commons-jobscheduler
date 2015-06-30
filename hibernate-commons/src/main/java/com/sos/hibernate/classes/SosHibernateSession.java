@@ -128,8 +128,8 @@ public class SosHibernateSession {
         classList.addClassIfExist("com.sos.scheduler.history.db.SchedulerOrderStepHistoryDBItem");
         classList.addClassIfExist("com.sos.scheduler.history.db.SchedulerOrderHistoryDBItem");
         classList.addClassIfExist("com.sos.scheduler.db.SchedulerInstancesDBItem");
-        classList.addClassIfExist("sos.ftphistory.db.JadeFilesDBItem");
-        classList.addClassIfExist("sos.ftphistory.db.JadeFilesHistoryDBItem");
+        classList.addClassIfExist("sos.jadehistory.db.JadeFilesDBItem");
+        classList.addClassIfExist("sos.jadehistory.db.JadeFilesHistoryDBItem");
         classList.addClassIfExist("com.sos.eventing.db.SchedulerEventDBItem");
         classList.addClassIfExist("com.sos.jobnet.db.EventsDBItem");
         classList.addClassIfExist("com.sos.jobnet.db.JobNetPlanDBItem");
