@@ -1,4 +1,5 @@
 package com.sos.scheduler.model;
+import java.io.File;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -165,7 +166,8 @@ public class SchedulerHotFolder extends JSObjBase {
 						if (lowerFilename.endsWith(JSObjJobChain.fileNameExtension)) {
 							logger.debug("load JSObjJobChain = " + filename);
 							JSObjJobChain obj = objFactory.createJobChain(objVirtualFile1);
-							result.add(obj);
+					       
+  							result.add(obj);
 						}
 						else
 							if (lowerFilename.endsWith(JSObjOrder.fileNameExtension)) {

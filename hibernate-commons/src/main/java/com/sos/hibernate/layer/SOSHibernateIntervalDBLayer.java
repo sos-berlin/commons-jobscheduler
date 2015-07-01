@@ -58,7 +58,9 @@ public abstract class SOSHibernateIntervalDBLayer extends SOSHibernateDBLayer {
             to.add(GregorianCalendar.DAY_OF_YEAR, -interval);
             this.getFilter().setIntervalFrom(null);
             this.getFilter().setIntervalTo(to.getTime());
-            deleted = deleteInterval();
+            try{
+               deleted = deleteInterval();
+            }catch (Exception e){e.printStackTrace();}
         } else {
             if (session == null) {
                 beginTransaction(Connection.TRANSACTION_READ_UNCOMMITTED);

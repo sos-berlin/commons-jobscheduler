@@ -172,7 +172,6 @@ public class SOSHibernateDBLayer {
         if (transaction != null) {
             session.flush();
             transaction.commit();
-            // SosHibernateSession.close();
         }
 
     }

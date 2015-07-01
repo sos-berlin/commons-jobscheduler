@@ -71,6 +71,8 @@ public class JSObjBase implements Comparable<JSObjBase> {
     @XmlTransient
 	protected boolean					flgIsInit				= false;
 
+ 
+
 	@XmlTransient
 	public void setInit(final boolean flgF) {
 

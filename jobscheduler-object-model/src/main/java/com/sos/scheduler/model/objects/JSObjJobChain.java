@@ -1,11 +1,9 @@
 package com.sos.scheduler.model.objects;
-import com.google.common.io.Files;
-import com.sos.JSHelper.io.Files.JSTextFile;
+
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
-import com.sos.VirtualFileSystem.shell.cmdShell;
 import com.sos.graphviz.Edge;
 import com.sos.graphviz.Graph;
 import com.sos.graphviz.GraphIO;
@@ -16,10 +14,6 @@ import com.sos.graphviz.enums.RankDir;
 import com.sos.graphviz.enums.SVGColor;
 import com.sos.graphviz.enums.Shape;
 import com.sos.graphviz.enums.Style;
-import com.sos.graphviz.properties.GraphvizEnumProperty;
-import com.sos.graphviz.properties.GraphvizHtmlProperty;
-import com.sos.graphviz.properties.GraphvizProperty;
-import com.sos.scheduler.converter.graphviz.Dot;
 import com.sos.scheduler.model.SchedulerHotFolder;
 import com.sos.scheduler.model.SchedulerHotFolderFileList;
 import com.sos.scheduler.model.SchedulerObjectFactory;
@@ -30,7 +24,6 @@ import org.apache.log4j.Logger;
 import java.io.File;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -69,8 +62,18 @@ public class JSObjJobChain extends JobChain {
 	public static final String								conFileNameExtension4NodeParameterFile	= ".config.xml";
 	private Hashtable<String, JobChainNode> jobChainNodes;
 	private Graph graph;
+	private FileType graphVizImageType=FileType.png;
+	private String dotOutputPath="./";
 
-	public JSObjJobChain(final SchedulerObjectFactory schedulerObjectFactory) {
+	public void setDotOutputPath(String dotOutputPath) {
+        this.dotOutputPath = dotOutputPath;
+    }
+
+    public void setGraphVizImageType(FileType graphVizImageType) {
+        this.graphVizImageType = graphVizImageType;
+    }
+
+    public JSObjJobChain(final SchedulerObjectFactory schedulerObjectFactory) {
 		super();
 		objFactory = schedulerObjectFactory;
 		super.strFileNameExtension = fileNameExtension;
@@ -84,6 +87,7 @@ public class JSObjJobChain extends JobChain {
 	public JSObjJobChain(final SchedulerObjectFactory schedulerObjectFactory, final ISOSVirtualFile pobjVirtualFile) {
 		this(schedulerObjectFactory);
 		super.objVirtualFile = pobjVirtualFile;
+        setHotFolderSrc(super.objVirtualFile);
 		loadObject();
 	}
     
@@ -98,10 +102,18 @@ public class JSObjJobChain extends JobChain {
 	public void loadObject(File file) {
         JobChain jobChain = (JobChain) unMarshal(file);
         setObjectFieldsFrom(jobChain);
-        String jobChainName = file.getName();
-        jobChainName = jobChainName.replaceFirst("\\.job_chain\\.xml~$", "");
         
-        this.setName(jobChainName);
+        if (super.objVirtualFile == null){
+            try {
+                ISOSVFSHandler sosVFSHandler = VFSFactory.getHandler("local");
+                ISOSVfsFileTransfer sosVFSFileTransfer = (ISOSVfsFileTransfer) sosVFSHandler;            
+                ISOSVirtualFile virtualFile = sosVFSFileTransfer.getFileHandle(file.getAbsolutePath());
+                super.objVirtualFile = virtualFile;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+         }else{
+         }
         setHotFolderSrc(super.objVirtualFile);
     }
 	
@@ -350,14 +362,19 @@ public class JSObjJobChain extends JobChain {
         return e;
     }
     
-    private void creatingOrders(File file, String firstState) throws Exception{
+    private String getOrderNodeId(String n){
+        return "order:" + n;
+        
+    }
+    
+    private void creatingOrders(File liveFolder, String firstState) throws Exception{
       //Creating orders
       // Get list of orders related to this JobChain
        
-      String strTestHotFolder = file.getAbsolutePath();
+      String liveFolderName = liveFolder.getAbsolutePath();
       ISOSVFSHandler objVFS = VFSFactory.getHandler("local");
       ISOSVfsFileTransfer objFileSystemHandler = (ISOSVfsFileTransfer) objVFS;
-      ISOSVirtualFile objHotFolder = objFileSystemHandler.getFileHandle(strTestHotFolder);
+      ISOSVirtualFile objHotFolder = objFileSystemHandler.getFileHandle(liveFolderName);
       SchedulerHotFolder objSchedulerHotFolder = objFactory.createSchedulerHotFolder(objHotFolder);
    
       SchedulerHotFolderFileList objSchedulerHotFolderFileList = objSchedulerHotFolder.load();
@@ -368,12 +385,14 @@ public class JSObjJobChain extends JobChain {
               if (jobchainName.equalsIgnoreCase(this.getName())){
                   String from = order.getId();
                   String to = firstState;
+                  logger.debug("createGraphVizImageFile.order found:" +  from);
+
                   if (order.getState() != null){
                       to = order.getState();
                   }
                   
                 
-                  Node  node = graph.newNode(from);
+                  Node  node = graph.newNode(getOrderNodeId(from));
                   SingleNodeProperties singleNodeProperties = node.getSingleNodeProperties();
                   singleNodeProperties.setShape(Shape.ellipse);
                   singleNodeProperties.setFillcolor(SVGColor.chartreuse);
@@ -385,7 +404,7 @@ public class JSObjJobChain extends JobChain {
                   }
                  
                   singleNodeProperties.setLabel(label);
-                  Edge eOrderEdge = newEdge(from, to);
+                  Edge eOrderEdge = newEdge(getOrderNodeId(from), to);
                         
                   eOrderEdge.getEdgeProperties().setConstraint(true);
                   eOrderEdge.getEdgeProperties().setStyle(Style.dashed);
@@ -395,10 +414,10 @@ public class JSObjJobChain extends JobChain {
       }    
    }
       
-	public String createDOTFile(File file,boolean showErrorNodes) throws Exception {
+	public String createGraphVizImageFile(File imageOutputFolder,boolean showErrorNodes) throws Exception {
+	    File liveFolder = new File(new File(this.getHotFolderSrc().getName()).getParent());
 		JSObjJobChain jobchain = this;
-		
-	    graph = new Graph();
+ 	    graph = new Graph();
 		graph.getGraphProperties().setDirection(RankDir.TB);
         graph.getGraphProperties().setLabel(jobchain.getTitle());
         graph.getGraphProperties().setFontSize("8");
@@ -411,15 +430,20 @@ public class JSObjJobChain extends JobChain {
  		 
 	    graph.getGraphProperties().setRatio("auto");
 	 
-	 	
+        logger.debug("createGraphVizImageFile.Parameter file:" +liveFolder.getAbsolutePath());
+        logger.debug("createGraphVizImageFile.job chain.title:" +jobchain.getTitle());
+	    
 	 
 		//Creating nodes for file order source.
 		int fileOrderSourceCnt = 0;
 		for (Object fileOrderSourceItem : jobchain.getFileOrderSourceList()) {
 			if (fileOrderSourceItem instanceof FileOrderSource) {
+ 
 				FileOrderSource fileOrderSource = (FileOrderSource) fileOrderSourceItem;
 				String dir = fileOrderSource.getDirectory();
-				String regExp = fileOrderSource.getRegex();
+                logger.debug("createGraphVizImageFile.file_order_source found:" +  dir);
+				
+                String regExp = fileOrderSource.getRegex();
 				fileOrderSourceCnt++;
 
 				Node  node = graph.newNode("FileOrderSource" + fileOrderSourceCnt);
@@ -451,7 +475,7 @@ public class JSObjJobChain extends JobChain {
 			}
 		}
 	 
-	    creatingOrders(file,  firstState);
+	    creatingOrders(liveFolder,  firstState);
 
 		//crating edges for file order sources
 		String state = null;
@@ -481,6 +505,8 @@ public class JSObjJobChain extends JobChain {
 				// to have the option to add edges by naming convention (from:state).
 				state = jobChainNode.getState();
 				int i = state.indexOf(":");
+                logger.debug("createGraphVizImageFile.job_chain_node found:" +  state);
+
 				
 				if (i > 0 && jobChainNodes.get(state.substring(0, i)) != null) {
                     String from = state.substring(0, i);
@@ -564,11 +590,22 @@ public class JSObjJobChain extends JobChain {
          
       
  		
- 		//Output the graph to a png file
+ 		//Output the graph to a file
 	     GraphIO io = new GraphIO(graph);
-         io.setDotDir(file.getAbsolutePath());
-	     io.writeGraphToFile(FileType.png, new File(file.getAbsolutePath(),jobchain.getName()+ ".png") );
-	     return new File(file.getAbsolutePath(),jobchain.getName()).getAbsolutePath() + ".png";
+         if (dotOutputPath.equals("./")){
+             io.setDotDir(liveFolder.getAbsolutePath());
+             logger.debug("createGraphVizImageFile.dotOutputPath" + liveFolder.getAbsolutePath());
+         }else{
+             if (dotOutputPath.length()  > 0){
+                 io.setDotDir(dotOutputPath);
+                 logger.debug("createGraphVizImageFile.dotOutputPath" + dotOutputPath);
+             }
+         }
+        
+        
+         logger.debug("createGraphVizImageFile.jobchain.getObjectName()" + jobchain.getObjectName());
+	     io.writeGraphToFile(graphVizImageType, new File(imageOutputFolder.getAbsolutePath(),jobchain.getObjectName() + "." + graphVizImageType) );
+	     return new File(imageOutputFolder.getAbsolutePath(),jobchain.getObjectName()).getAbsolutePath() + "." + graphVizImageType;
 	}
 
 	
