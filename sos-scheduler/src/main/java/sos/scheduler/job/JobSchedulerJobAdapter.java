@@ -95,7 +95,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 	protected final String				EMPTY_STRING					= "";
 	protected final boolean				continue_with_spooler_process	= true;
 	protected final boolean				continue_with_task				= true;
-	private   Log4JHelper objLogger;
 	
 	private         HashMap<String, String> paramsAsHashmap     = null;
 
@@ -158,19 +157,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 			strJobName = this.getJobName();
 		}
 		strJobName = strJobName.replace('/', '-');
-		Log4JHelper.flgUseJobSchedulerLog4JAppender = true;
-		File fleLog4JFile = null;
-		JSOptionsClass objOC = new JSOptionsClass();
-		if (objOC.log4jPropertyFileName.isDefault() == false) {
-			fleLog4JFile = objOC.log4jPropertyFileName.JSFile();
-		}
-		else {
-			fleLog4JFile = new File("./" + strJobName + "-log4j.properties");
-			if (fleLog4JFile.exists() == false) {
-				fleLog4JFile = new File("./" + "log4j.properties");
-			}
-		}
-		objLogger = new Log4JHelper(fleLog4JFile.getAbsolutePath());
+		
 		logger = Logger.getRootLogger();
 		/**
 		 * the JobSchedulerLog4JAppender is used as the stdout-appender
