@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.Optional;
 import java.util.Properties;
 
 import sos.connection.SOSConnection;
@@ -372,9 +373,15 @@ public class JobSchedulerJob extends Job_impl {
 				return false;
 			}
 
-			File schedulerIniFile = new File(spooler.ini_path());
-			if (!schedulerIniFile.canRead()){
-				spooler_log.debug("No ini file found. Continuing without settings.");
+			Optional<File> schedulerIniFile = Optional.empty();
+			try{
+				schedulerIniFile = Optional.of(new File(spooler.ini_path()));
+			} catch(Exception e){
+				// no error handling here
+			}
+			
+			if (!schedulerIniFile.isPresent() || !schedulerIniFile.get().canRead()){
+				spooler_log.debug("No ini file available. Continuing without settings.");
 				return false;
 			}
 			setJobSettings(new SOSProfileSettings(spooler.ini_path()));
