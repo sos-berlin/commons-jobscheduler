@@ -584,9 +584,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 			}
 			channelExec = (ChannelExec) sshSession.openChannel("exec");
 			//JITL-157
-//			if(cmd.contains("|__|")){
-				cmd = cmd.replaceAll("\0", "\\\\\\\\").replaceAll("\"", "\\\"");
-//			}
+			cmd = cmd.replaceAll("\0", "\\\\\\\\").replaceAll("\"", "\\\"");
 			channelExec.setCommand(cmd);
 			channelExec.setInputStream(null);
 			channelExec.setErrStream(null);

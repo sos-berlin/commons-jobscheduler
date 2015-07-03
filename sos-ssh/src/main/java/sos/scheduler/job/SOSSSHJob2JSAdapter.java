@@ -52,7 +52,6 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
     if(envVarNamePrefix == null || envVarNamePrefix.isEmpty()){
     	envVarNamePrefix = PARAM_SCHEDULER_VARIABLE_PREFIX_DEFAULT_VALUE;
     }
-    spooler_log.debug9("envVarNamePrefix = " + envVarNamePrefix);
     SOSSSHJobOptions objO = null;
     if(useJSch == null || useJSch.isEmpty() || useJSch.equalsIgnoreCase("false")){
       useTrilead = true;
@@ -162,7 +161,6 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
 			envVarsCaseSensitive = false;
 		}
 		Variable_set env = spooler_task.create_subprocess().env();
-		spooler_log.debug9("environment variable names: " + env.names());
 		StringTokenizer t = new StringTokenizer(env.names(), ";");
 		while (t.hasMoreTokens()) {
 			String envname = t.nextToken();

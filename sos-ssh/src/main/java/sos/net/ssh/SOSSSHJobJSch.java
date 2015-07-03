@@ -253,7 +253,6 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
 					envVarValue = "\"" + envVarValue.replaceAll("\"", "\\\"") + "\"";
 				}
 				String replacedEnvVarValue = envVarValue.replaceAll("\\\\", "\0");
-				logger.debug("************ " + envVarValue + " replaced by " + replacedEnvVarValue);
 				sb.append(String.format(objOptions.getPreCommand().Value(), keyVal, replacedEnvVarValue));
 				sb.append(objOptions.command_delimiter.Value());
 			}
