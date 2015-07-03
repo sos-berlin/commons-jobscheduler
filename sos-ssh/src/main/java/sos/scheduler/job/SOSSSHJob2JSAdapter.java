@@ -1,6 +1,9 @@
 package sos.scheduler.job;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.TreeMap;
 import java.util.UUID;
 
 import sos.net.ssh.SOSSSHJob2;
@@ -9,6 +12,7 @@ import sos.net.ssh.SOSSSHJobOptions;
 import sos.net.ssh.SOSSSHJobTrilead;
 import sos.spooler.Job_chain;
 import sos.spooler.Order;
+import sos.spooler.Variable_set;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
@@ -18,8 +22,13 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
   private static final String PARAM_SSH_JOB_NAME = "SSH_JOB_NAME";
   private static final String PARAM_JITL_SSH_USE_JSCH_IMPL = "jitl.ssh.use_jsch_impl";
   private static final String PARAM_PID_FILE_NAME_KEY = "job_ssh_pid_file_name";
+  private static final String PARAM_SCHEDULER_VARIABLE_NAME_PREFIX = "scheduler.variable_name_prefix";
+  private static final String PARAM_SCHEDULER_VARIABLE_PREFIX_NONE_VALUE = "*NONE";
+  private static final String PARAM_SCHEDULER_VARIABLE_PREFIX_DEFAULT_VALUE = "SCHEDULER_PARAM_";
   private boolean useTrilead = true;
   private String pidFileName;
+  private boolean envVarsCaseSensitive = true;
+  private String envVarNamePrefix;
   
   @Override
   public boolean spooler_process() throws Exception {
@@ -39,6 +48,10 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
   private void doProcessing() throws Exception {
     SOSSSHJob2 objR;
     String useJSch = spooler.var(PARAM_JITL_SSH_USE_JSCH_IMPL);
+    envVarNamePrefix = spooler.var(PARAM_SCHEDULER_VARIABLE_NAME_PREFIX);
+    if(envVarNamePrefix == null || envVarNamePrefix.isEmpty()){
+    	envVarNamePrefix = PARAM_SCHEDULER_VARIABLE_PREFIX_DEFAULT_VALUE;
+    }
     SOSSSHJobOptions objO = null;
     if(!useJSch.equalsIgnoreCase("true")){
       //this is the default value for v1.9, will change to JSch with v1.10 [SP]
@@ -56,6 +69,22 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
     HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(getJobOrOrderParameters());
     if(!useTrilead){
       ((SOSSSHJobJSch)objR).setAllParams(hsmParameters1);
+      Map allEnvVars = new HashMap();
+      allEnvVars.putAll(getSchedulerEnvironmentVariables());
+      for(String key : hsmParameters1.keySet()){
+    	  if (!"password".equalsIgnoreCase(key)) {
+    		  if(!key.startsWith("SCHEDULER_")){
+    			if(!PARAM_SCHEDULER_VARIABLE_PREFIX_NONE_VALUE.equalsIgnoreCase(envVarNamePrefix)){
+    				allEnvVars.put(envVarNamePrefix + key, hsmParameters1.get(key));
+    			}else{
+    				allEnvVars.put(key, hsmParameters1.get(key));
+    			}
+    		  }else{
+        		  allEnvVars.put(key, hsmParameters1.get(key));
+    		  }
+		  }
+      }
+      ((SOSSSHJobJSch)objR).setSchedulerEnvVars(allEnvVars);
     }
     objO.setAllOptions(objO.DeletePrefix(hsmParameters1, "ssh_"));
     objR.setJSJobUtilites(this);
@@ -121,4 +150,29 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
     return pidFileName;
   }
 
+  public Map getSchedulerEnvironmentVariables(){
+		String OS = System.getProperty("os.name").toLowerCase();
+		boolean win = false;
+		Map envvars = new HashMap();
+		if (OS.indexOf("nt") > -1 || OS.indexOf("windows") > -1) {
+			win = true;
+			envVarsCaseSensitive = false;
+		}
+		Variable_set env = spooler_task.create_subprocess().env();
+		StringTokenizer t = new StringTokenizer(env.names(), ";");
+		while (t.hasMoreTokens()) {
+			String envname = t.nextToken();
+			String envvalue = env.value(envname);
+			if (envname != null && envname.startsWith("SCHEDULER_")) {
+				if (win) {
+					envvars.put(envname.toUpperCase(), envvalue);
+				}
+				else {
+					envvars.put(envname, envvalue);
+				}
+			}
+		}
+		return envvars;
+  }
+  
 }
