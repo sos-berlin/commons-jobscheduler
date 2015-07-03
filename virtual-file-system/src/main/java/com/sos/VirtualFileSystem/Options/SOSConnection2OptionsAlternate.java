@@ -402,7 +402,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 		}
 	}
 
-	private void setIfNotDirty(final SOSOptionElement objOption, final String pstrValue) {
+	protected void setIfNotDirty(final SOSOptionElement objOption, final String pstrValue) {
 		if (objOption.isNotDirty() && isNotEmpty(pstrValue)) {
 			if(objOption instanceof SOSOptionPassword){
 				logger.trace("setValue = *****");

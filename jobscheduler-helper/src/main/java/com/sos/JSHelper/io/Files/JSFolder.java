@@ -262,13 +262,13 @@ public class JSFolder extends File {
 		Vector<String> objFileList = new Vector<>();
 
 		for (JSFile tempFile : this.getFilelist(strRegExpr4Files2Compress, 0)) {
-			intNoOfFilesCompressed++;
+            logger.debug(String.format("...compresing File '%1$s'", tempFile.getAbsolutePath()));
 			tempFile.createZipFile(getFolderName());
 			tempFile.delete();
 			String strName = tempFile.getAbsolutePath();
 			objFileList.add(strName);
-			logger.debug(String.format("File '%1$s' compressed", strName));
 			intNoOfFilesCompressed++;
+            logger.debug(String.format("File '%1$s' compressed", strName));
 		}
 		logger.debug(String.format("%1$s files compressed matching the regexp '%2$s'", intNoOfFilesCompressed, strRegExpr4Files2Compress));
 		return objFileList;

@@ -3,12 +3,12 @@ package com.sos.JSHelper.Options;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.UUID;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.DataElements.JSDataElementDate;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.i18n.annotation.I18NResourceBundle;
@@ -63,7 +63,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 * <br />---------------------------------------------------------------------------
 * </p>
 * \author KB
-* @version $Id$17.05.2010
+* @version $Id: SOSOptionRegExp.java 27463 2014-10-01 16:10:56Z kb $17.05.2010
 * \see reference
 *
 * Created on 17.05.2010 14:49:32
@@ -76,18 +76,51 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "com_sos_JSHelper_Messages", defaultLocale = "en")
 public class SOSOptionRegExp extends SOSOptionStringWVariables {
 
+	private static final long	serialVersionUID		= 8393808803161272343L;
+	private final String		conClassName			= "SOSOptionRegExp";
+
+	private Pattern				objCurrentPattern		= null;
+	private int					intRegExpFlags			= Pattern.CASE_INSENSITIVE;
+	public final 	static	String strCaseInsensitive = "(?i)";
+	private Matcher				matcher					= null;
+	private String				strMatchValue			= "";
+
 	/**
+	 * \option useRegExp4ReplaceWith
+	 * \type SOSOptionBoolean
+	 * \brief useRegExp4ReplaceWith - Use a regular expression for substitution
 	 *
+	 * \details
+	 * Use a regular expression for substitution
+	 *
+	 * \mandatory: false
+	 *
+	 * \created 01.09.2014 12:45:40 by KB
 	 */
-	private static final long	serialVersionUID	= 8393808803161272343L;
+	@JSOptionDefinition(name = "useRegExp4ReplaceWith", description = "Use a regular expression for substitution", key = "useRegExp4ReplaceWith", type = "SOSOptionBoolean", mandatory = false)
+	public SOSOptionBoolean		useRegExp4ReplaceWith	= new SOSOptionBoolean( // ...
+																null, // ....
+																conClassName + ".useRegExp4ReplaceWith", // ...
+																"Use a regular expression for substitution", // ...
+																"false", // ...
+																"false", // ...
+																false);
 
-	private final String		conClassName		= "SOSOptionRegExp";
+	public SOSOptionBoolean useRegExp4ReplaceWith() {
 
-	private Pattern				objCurrentPattern	= null;
-	private int					intRegExpFlags		= Pattern.CASE_INSENSITIVE;
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getuseRegExp4ReplaceWith";
 
-	private Matcher				matcher				= null;
-	private String				strMatchValue		= "";
+		return useRegExp4ReplaceWith;
+	} // public String getuseRegExp4ReplaceWith
+
+	public SOSOptionRegExp useRegExp4ReplaceWith(final SOSOptionBoolean pstrValue) {
+
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setuseRegExp4ReplaceWith";
+		useRegExp4ReplaceWith = pstrValue;
+		return this;
+	} // public SOSOptionRegExp setuseRegExp4ReplaceWith
 
 	/**
 	 * \brief SOSOptionRegExp
@@ -101,9 +134,14 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 	 * @param pPstrDefaultValue
 	 * @param pPflgIsMandatory
 	 */
-	public SOSOptionRegExp(final JSOptionsClass pPobjParent, final String pPstrKey, final String pPstrDescription, final String pPstrValue, final String pPstrDefaultValue,
-			final boolean pPflgIsMandatory) {
+	public SOSOptionRegExp(final JSOptionsClass pPobjParent, final String pPstrKey, final String pPstrDescription, final String pPstrValue,
+			final String pPstrDefaultValue, final boolean pPflgIsMandatory) {
 		super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
+	}
+
+	public SOSOptionRegExp(final String pstrRegExp) {
+		super(null, "", "", pstrRegExp, "", false);
+
 	}
 
 	public int getRegExpFlags() {
@@ -142,6 +180,17 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 		return (flags & f) > 0;
 	}
 
+	public String doReplace(final String pstrSourceString, final String pstrReplacementPattern) throws Exception {
+		String strT;
+		if (useRegExp4ReplaceWith.isTrue()) {
+			strT = doRegExpReplace(pstrSourceString, pstrReplacementPattern);
+		}
+		else {
+			strT = doGroupsReplace(pstrSourceString, pstrReplacementPattern);
+		}
+		return strT;
+	}
+	
 	/**
 	 *
 	 * \brief doReplace
@@ -155,35 +204,52 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 	 * @return
 	 * @throws Exception
 	 */
-	public String doReplace(final String pstrSourceString, final String pstrReplacementPattern) throws Exception {
+	public String doGroupsReplace(final String pstrSourceString, final String pstrReplacementPattern) throws Exception {
 
 		final String conMethodName = conClassName + "::doReplace";
 		String strTargetString = pstrSourceString;
 
 		try {
 			strTargetString = replaceGroups(strTargetString, pstrReplacementPattern /* .split(";") */);
-			strTargetString = substituteAllDate(strTargetString);
 			strTargetString = substituteAllFilename(strTargetString, pstrSourceString);
+			strTargetString = doReplaceSmartVariables(strTargetString);
+			// // should any opening and closing brackets be found in the file name, then this is an error
+			//			Matcher m = Pattern.compile("\\[[^\\]]*\\]").matcher(strTargetString);
+			//			if (m.find()) {
+			//				throw new JobSchedulerException(String.format("unsupported variable found: ' %1$s'", m.group()));
+			//			}
 
+			return strTargetString;
+		}
+		catch (Exception e) {
+			throw new JobSchedulerException(conMethodName + ": " + e.getMessage(), e);
+		}
+	}
+
+	public String doReplaceSmartVariables(final String pstrTargetString) {
+		final String conMethodName = conClassName + "::doReplaceSmartVariables";
+		String strTargetString = pstrTargetString;
+		try {
+			strTargetString = substituteAllDate(strTargetString);
 			// TODO allow timestamp: as an alternative date-pattern
 			strTargetString = substituteTimeStamp(strTargetString);
 			// TODO implement uuid: as an additional pattern for substitution.
 			strTargetString = substituteUUID(strTargetString);
 			// TODO implement sqltimestamp: as an additional pattern for substitution
 			strTargetString = substituteSQLTimeStamp(strTargetString);
-			
-			// // should any opening and closing brackets be found in the file name, then this is an error
-			Matcher m = Pattern.compile("\\[[^\\]]*\\]").matcher(strTargetString);
-			if (m.find()) {
-				throw new JobSchedulerException(String.format("unsupported variable found: ' %1$s'", m.group()));
-			}
 
-			return strTargetString;
+			strTargetString = substituteTempFile(strTargetString);
+			strTargetString = substituteSQLTimeStamp(strTargetString);
+			strTargetString = substituteEnvironmenVariable(strTargetString);
+			strTargetString = substituteFileContent(strTargetString);
+			strTargetString = substituteShell(strTargetString);
 		}
 		catch (Exception e) {
-			e.printStackTrace(System.err);
-			throw new JobSchedulerException(conMethodName + ": " + e.getMessage());
+			// TODO Auto-generated catch block
+			throw new JobSchedulerException(conMethodName + ": " + e.getMessage(), e);
 		}
+
+		return strTargetString;
 	}
 
 	/**
@@ -263,9 +329,8 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 			Matcher matcher1 = pattern.matcher(pstrSourceString);
 			strTargetString = matcher1.replaceAll(pstrReplacementPattern);
 
-			 strTargetString = substituteAllDate(strTargetString);
-			 strTargetString = substituteAllFilename(strTargetString, pstrSourceString);
-
+			strTargetString = substituteAllFilename(strTargetString, pstrSourceString);
+			strTargetString = doReplaceSmartVariables(strTargetString);
 			return strTargetString;
 		}
 		catch (Exception e) {
@@ -274,7 +339,7 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 		}
 	}
 
-
+	@Override
 	public String substituteAllDate(String targetFilename) throws Exception {
 
 		String temp = substituteFirstDate(targetFilename);
@@ -316,6 +381,7 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 		}
 	}
 
+	@Override
 	public String substituteAllFilename(String targetFilename, final String original) throws Exception {
 
 		// original ist das replacement; es ist der urspruengliche Dateiname inklusive Endung
@@ -329,45 +395,6 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 		return temp;
 	}
 
-	private String substituteUUID(String strValue) throws Exception {
-
-		// check for [filename:...]
-		Matcher matcher1 = Pattern.compile("\\[uuid:([^\\]]*)\\]", intRegExpFlags).matcher(strValue);
-
-		if (matcher1.find()) {
-			if (matcher1.group(1).equals("")) {
-				strValue = strValue.replaceFirst("\\[uuid:\\]", getUUID());
-			}
-		}
-
-		return strValue;
-	}
-
-	public static String getUUID () {
-		return UUID.randomUUID().toString();
-	}
-	
-	private String substituteTimeStamp(String pstrValue) throws Exception {
-
-		// check for [filename:...]
-		Matcher matcher1 = Pattern.compile("\\[timestamp:([^\\]]*)\\]", intRegExpFlags).matcher(pstrValue);
-
-		if (matcher1.find()) {
-			if (matcher1.group(1).equals("")) {
-				// System.currentTimeMillis()
-//				strValue = strValue.replaceFirst("\\[timestamp:\\]", JSDataElementDate.getCurrentTimeAsString("yyyyMMddHHmmss"));
-//				strValue = strValue.replaceFirst("\\[timestamp:\\]", String.valueOf(System.currentTimeMillis()));
-				pstrValue = pstrValue.replaceFirst("\\[timestamp:\\]", getUnixTimeStamp());
-			}
-		}
-
-		return pstrValue;
-	}
-
-	public static String getUnixTimeStamp () {
-		return String.valueOf(System.nanoTime());
-	}
-	
 	private String substituteSQLTimeStamp(String strValue) throws Exception {
 
 		// check for [filename:...]
@@ -375,15 +402,15 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 
 		if (matcher1.find()) {
 			if (matcher1.group(1).equals("")) {
-				strValue = strValue.replaceFirst("\\[sqltimestamp:\\]", new Timestamp(new Date().getTime()).toString() );
+				strValue = strValue.replaceFirst("\\[sqltimestamp:\\]", new Timestamp(new Date().getTime()).toString());
 			}
 		}
 
 		return strValue;
 	}
 
-	public static String getSqlTimeStamp () {
-		return new Timestamp(new Date().getTime()).toString() ;
+	public static String getSqlTimeStamp() {
+		return new Timestamp(new Date().getTime()).toString();
 	}
 
 	private String substituteFirstFilename(String targetFilename, final String original) throws Exception {
@@ -437,7 +464,8 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 	} // private Pattern getPattern
 
 	// TODO kann in die basisklasse
-	private Vector <String> lstMatchValues = null;
+	private Vector<String>	lstMatchValues	= null;
+
 	public void addValue(final String pstrValue4Matching) {
 		if (lstMatchValues == null) {
 			lstMatchValues = new Vector();
@@ -489,17 +517,20 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 	} // private String getGroup
 
 	@Override
-	public void Value (final String pstrValue) {
-		super.Value(pstrValue);  // make first some text replacements
-		if (isNotEmpty(strValue)) {
-	        try {
-	            Pattern.compile(strValue);
-	        } catch (PatternSyntaxException exception) {
-	        	String strT = String.format("The RegExp '%1$s' is invalid", strValue);
-	        	SOSValidationError objVE = new SOSValidationError(strT);
-	        	objVE.setException(new JobSchedulerException(strT, exception));
-//	            System.err.println(exception.getDescr  iption());
-	        }
+	public void Value(final String pstrValue) {
+		super.Value(pstrValue); // make first some text replacements
+		String strV = super.Value();
+		if (isNotEmpty(strV)) {
+			//		String strV = pstrValue;
+			try {
+				Pattern.compile(strV);
+			}
+			catch (PatternSyntaxException exception) {
+				String strT = String.format("The RegExp '%1$s' is invalid", strV);
+				SOSValidationError objVE = new SOSValidationError(strT);
+				objVE.setException(new JobSchedulerException(strT, exception));
+				//	            System.err.println(exception.getDescr  iption());
+			}
 		}
 	}
 	
@@ -516,5 +547,7 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 	public String[] getAllProposals(String text) {
 		String[] proposals = SOSOptionRegExp.defaultProposals.keySet().toArray(new String[0]);
 		return proposals;
-	}	
+	}
+
+
 }

@@ -215,7 +215,7 @@ public class SOSConnection2OptionsJUnitTest extends JSToolBox {
 		HashMap <String, String> objT = SetJobSchedulerSSHJobOptionsAlias(new HashMap <String, String>());
 		objT.put("IsAnUnknownOption", "ValueOfUnknownOption");
 		objOptions = new SOSConnection2Options(objT);
-		boolean flgAllOptionsProcessed = objOptions.CheckNotProcessedOptions();
+		boolean flgAllOptionsProcessed = objOptions.ReportNotProcessedOptions();
 
 		assertFalse("Unknown Option found", flgAllOptionsProcessed);
 	}  // testForUnknownOptions
