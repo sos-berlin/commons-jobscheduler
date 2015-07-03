@@ -569,7 +569,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	 *
 	 * @param strCmd
 	 */
-	@Override public void ExecuteCommand(final String cmd) {
+	@Override public void ExecuteCommand(String cmd) {
 		final String strEndOfLine = System.getProperty("line.separator");
 		ChannelExec channelExec = null;
 		exitCode = null;
@@ -583,17 +583,16 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 				throw new JobSchedulerException(SOSVfs_E_190.params("sshSession"));
 			}
 			channelExec = (ChannelExec) sshSession.openChannel("exec");
+			//JITL-157
+//			if(cmd.contains("|__|")){
+				cmd = cmd.replaceAll("\0", "\\\\\\\\").replaceAll("\"", "\\\"");
+//			}
 			channelExec.setCommand(cmd);
 			channelExec.setInputStream(null);
 			channelExec.setErrStream(null);
 			out = channelExec.getInputStream();
 			err = channelExec.getErrStream();
 			// https://change.sos-berlin.com/browse/JITL-157
-			if(environmentVariables != null && !environmentVariables.isEmpty()){
-			  for(Object key : environmentVariables.keySet()){
-			    channelExec.setEnv((String)key, (String)environmentVariables.get(key));
-			  }
-			}
 			channelExec.connect();
 			logger.debug(SOSVfs_D_163.params("stdout", cmd));
 			outContent = new StringBuffer();
