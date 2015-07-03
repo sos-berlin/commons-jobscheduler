@@ -5,6 +5,8 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
+
 /**
  * @author Andreas Püschel <andreas.pueschel@sos-berlin.com>
  * @since 2009-02-20
@@ -16,7 +18,7 @@ public class SOSCommandline {
 	@SuppressWarnings("unused")
 	private final String	conClassName	= this.getClass().getSimpleName();
 	@SuppressWarnings("unused")
-	private final String	conSVNVersion	= "$Id$";
+	private final String	conSVNVersion	= "$Id: SOSCommandline.java 27117 2014-09-07 20:11:07Z kb $";
 	@SuppressWarnings("unused")
 	private final Logger	logger			= Logger.getLogger("SOSCommandline");
 
@@ -25,7 +27,7 @@ public class SOSCommandline {
 	 */
 	public String[] splitArguments(final String arguments) throws Exception {
 		String[] resultArguments = null;
-		Vector resultVector = new Vector();
+		Vector <String> resultVector = new Vector<>();
 		int resultIndex = 0;
 		String resultString = "";
 		boolean inQuote = false;
@@ -103,44 +105,70 @@ public class SOSCommandline {
 			return resultArguments;
 			 */}
 		catch (Exception e) {
-			throw new Exception("error occurred splitting arguments: " + e.getMessage());
+			throw new JobSchedulerException("error occurred splitting arguments: " + e.getMessage(), e);
 		}
 	}
 
 	/**
 	 * executes a command
 	 */
-	public Vector execute(final String command) {
+	public Vector<String> execute(final String command) {
 		return this.execute(command, null);
 	}
 
+	Vector<String> returnValues = new Vector<>();
+	private BufferedReader stbStdInput = null;
+	private BufferedReader stbStdError = null;
+	
+	public String getStdOut() {
+		if (stdOut == null) {
+			stdOut = new StringBuffer("");
+		}
+		return stdOut.toString();
+	}
+
+	public int getExitValue() {
+		return exitValue;
+	}
+
+	public String getStdError() {
+		if (stdError == null) {
+			stdError = new StringBuffer("");
+		}
+		return stdError.toString();
+	}
+
+	private StringBuffer stdOut = null;
+	private StringBuffer stdError = null;
+	private int exitValue = 0;
 	/**
 	 * executes a command
 	 */
-	public Vector execute(final String command, final Object objDummy) {
-		Vector returnValues = new Vector();
+	public Vector<String> execute(final String command, final Object objDummy) {
+
 		try {
 			try { // to execute command
 				Process p = Runtime.getRuntime().exec(splitArguments(command));
-				final BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-				final BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+				stbStdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+				stbStdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 				p.waitFor();
-				logger.debug("command returned exit code: " + p.exitValue());
-				returnValues.add(0, new Integer(p.exitValue()));
+				exitValue = p.exitValue();
+				logger.debug("command returned exit code: " + exitValue);
+				returnValues.add(0, exitValue + "");
 				// logger.debug("number of characters available from stdout: " + p.getInputStream().available());
 				// logger.debug("number of characters available from stderr: " + p.getErrorStream().available());
 				try { // to process output to stdout
 					String line = "";
-					String stdout = "";
+					stdOut = new StringBuffer("");
 					while (line != null) {
-						line = stdInput.readLine();
+						line = stbStdInput.readLine();
 						if (line != null) {
-							stdout += line;
+							stdOut.append(line);
 						}
 					}
 					try {
 						if (logger != null) {
-							if (stdout != null && stdout.trim().length() > 0) {
+							if (stdOut != null && stdOut.length() > 0) {
 								logger.debug("Command returned output to stdout ...");
 							}
 							else {
@@ -150,7 +178,7 @@ public class SOSCommandline {
 					}
 					catch (Exception exc) {
 					}
-					returnValues.add(1, stdout);
+					returnValues.add(1, stdOut.toString());
 				}
 				catch (Exception ex) {
 					returnValues.add(1, "");
@@ -161,51 +189,50 @@ public class SOSCommandline {
 						}
 						catch (Exception exc) {
 						}
-						;
 					}
 				}
 				try { // to process output to stderr
 					String line = "";
-					String stderr = "";
 					while (line != null) {
-						line = stdError.readLine();
+						line = stbStdError.readLine();
 						if (line != null) {
-							stderr += line;
+							stdError.append(line);
 						}
 					}
 					try {
 						if (logger != null) {
-							if (stderr != null && stderr.trim().length() > 0) {
+							if (stdError != null && stdError.length() > 0) {
 								logger.debug("Command returned output to stderr ...");
+								logger.debug(stdError);
+								returnValues.add(2, stdError.toString());
 							}
 							else {
 								logger.debug("Command did not return any output to stderr.");
+								returnValues.add(2, "");
 							}
 						}
 					}
 					catch (Exception exc) {
 					}
-					returnValues.add(2, stderr);
 				}
 				catch (Exception ex) {
 					returnValues.add(2, ex.getMessage());
 					if (logger != null) {
 						try {
-							logger.debug("error occurred processing stderr: " + ex.getMessage());
+							logger.debug("error occurred processing stderr: " + ex.getMessage(), ex);
 						}
 						catch (Exception exc) {
 						}
-						;
 					}
 				}
-				if (stdInput != null)
-					stdInput.close();
-				if (stdError != null)
-					stdError.close();
+				if (stbStdInput != null)
+					stbStdInput.close();
+				if (stbStdError != null)
+					stbStdError.close();
 			}
 			catch (Exception ex) {
-				returnValues.add(0, new Integer(1));
-				returnValues.add(1, "");
+				returnValues.add(0, "1");
+				returnValues.add(1, stdError.toString());
 				returnValues.add(2, ex.getMessage());
 				if (logger != null) {
 					try {
@@ -213,7 +240,6 @@ public class SOSCommandline {
 					}
 					catch (Exception exc) {
 					}
-					;
 				}
 			}
 		}
@@ -224,7 +250,7 @@ public class SOSCommandline {
 			}
 			catch (Exception ex) {
 			}
-			returnValues.add(0, new Integer(1));
+			returnValues.add(0, "1");
 			returnValues.add(1, "");
 			returnValues.add(2, e.getMessage());
 		}
@@ -253,12 +279,10 @@ public class SOSCommandline {
 				catch (Exception ex) {
 					ex.printStackTrace();
 				}
-				Vector returnValues = execute(command, logger);
-				Integer exitValue = (Integer) returnValues.elementAt(0);
-				if (exitValue.compareTo(new Integer(0)) == 0) {
-					if ((String) returnValues.elementAt(1) != null) {
-						returnPassword = (String) returnValues.elementAt(1);
-					}
+//				Vector<?> returnValues = execute(command, logger);
+				int exitValue = getExitValue();
+				if (exitValue == 0) {
+					returnPassword = getStdOut();
 				}
 			}
 		}

@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.io.StreamTokenizer;
 import java.lang.annotation.Annotation;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;
@@ -33,6 +32,7 @@ import com.sos.JSHelper.Archiver.IJSArchiverOptions;
 import com.sos.JSHelper.Archiver.JSArchiverOptions;
 import com.sos.JSHelper.Exceptions.JSExceptionFileNotReadable;
 import com.sos.JSHelper.Exceptions.JSExceptionInputFileNotFound;
+import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Exceptions.ParametersMissingButRequiredException;
 import com.sos.JSHelper.io.Files.JSFile;
@@ -181,16 +181,12 @@ import com.sos.i18n.annotation.I18NResourceBundle;
  * <br />---------------------------------------------------------------------------
  * </p>
  * \author sgx2343
- * @version $Id$
+ * @version $Id: JSOptionsClass.java 27684 2014-10-22 10:02:10Z kb $
  * \see reference
  *
  */
-@JSOptionClass(
-				name = "JSOptionsClass",
-				description = "JSOptionsClass")
-@I18NResourceBundle(
-					baseName = "com_sos_JSHelper_Messages",
-					defaultLocale = "en")
+@JSOptionClass(name = "JSOptionsClass", description = "JSOptionsClass")
+@I18NResourceBundle(baseName = "com_sos_JSHelper_Messages", defaultLocale = "en")
 public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Serializable {
 	protected Msg					objMsg							= null;
 	@SuppressWarnings("unused")
@@ -198,21 +194,31 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	@SuppressWarnings("unused")
 	private static final Logger		logger							= Logger.getLogger(JSOptionsClass.class);
 	@SuppressWarnings("unused")
-	private final String			conSVNVersion					= "$Id$";
+	private final String			conSVNVersion					= "$Id: JSOptionsClass.java 27684 2014-10-22 10:02:10Z kb $";
 	private static final long		serialVersionUID				= 8497293387023797049L;
 	public static boolean			gflgUseBase64ForObject			= true;
 	public static boolean			flgIncludeProcessingInProgress	= false;
+	public static String			gstrIncludeSectionName			= "";
 	public boolean					gflgSubsituteVariables			= true;
 	protected static final String	conParamNamePrefixALTERNATIVE	= "alternative_";
+	protected static final String	conParamNamePrefixALTERNATE		= "alternative_";
 	protected static final String	conParamNamePrefixJUMP			= "jump_";
 	protected static final String	conParamNamePrefixTARGET		= "target_";
 	protected static final String	conParamNamePrefixSOURCE		= "source_";
-	
+	protected static final String	conParamNamePrefixPROXY			= "proxy_";
 
-	protected enum IterationTypes {
-		setRecord(1), getRecord(2), toOut(3), createXML(4), setDefaultValues(5), clearAllValues(6), countSegmentFields(7), CheckMandatory(12), setPrefix(14), toString(
-				13), getCommandLine(14), DirtyToString(15), getKeyValuePair(16), LoadValues(17), StoreValues(18), getQuotedCommandLine(19);
-		private int	intType;
+	public String getIncludeSectionName() {
+		return gstrIncludeSectionName;
+	}
+
+	public void setIncludeSectionName(final String pstrInludeSectionName) {
+		gstrIncludeSectionName = pstrInludeSectionName;
+	}
+    protected enum IterationTypes {
+        setRecord(1), getRecord(2), toOut(3), createXML(4), setDefaultValues(5), clearAllValues(6), countSegmentFields(7), CheckMandatory(12), setPrefix(14), toString(
+                13), getCommandLine(14), DirtyToString(15), getKeyValuePair(16), LoadValues(17), StoreValues(18), getQuotedCommandLine(19);
+        private int intType;
+
 
 		IterationTypes(final int pintType) {
 			intType = pintType;
@@ -232,7 +238,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 			return intType;
 		}
 	}
-	private final StringBuffer			strBuffer						= new StringBuffer("");
+	private StringBuffer				strBuffer						= new StringBuffer("");
 	public String						TestVar							= "Wert von TestVar";
 	/**
 	 * \var conEnvVarJS_TEST_MODE
@@ -264,12 +270,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 *
 	 * \created 28.03.2014 14:51:50 by KB
 	 */
-	@JSOptionDefinition(
-						name = "BaseDirectory",
-						description = "A Base Directory for all relative FileNames used by SOSOptionFileName",
-						key = "Base_Directory",
-						type = "SOSOptionFolderName",
-						mandatory = false)
+	@JSOptionDefinition(name = "BaseDirectory", description = "A Base Directory for all relative FileNames used by SOSOptionFileName", key = "Base_Directory", type = "SOSOptionFolderName", mandatory = false)
 	public SOSOptionFolderName			BaseDirectory					= new SOSOptionFolderName( // ...
 																				this, // ....
 																				conClassName + ".Base_Directory", // ...
@@ -279,12 +280,14 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 																				false);
 
 	public SOSOptionFolderName getBaseDirectory() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getBaseDirectory";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getBaseDirectory";
 		return BaseDirectory;
 	} // public String getBaseDirectory
 
 	public JSOptionsClass setBaseDirectory(final SOSOptionFolderName pstrValue) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setBaseDirectory";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setBaseDirectory";
 		BaseDirectory = pstrValue;
 		return this;
 	} // public JSOptionsClass setBaseDirectory
@@ -300,12 +303,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 *
 	 * \created 28.03.2014 12:30:53 by KB
 	 */
-	@JSOptionDefinition(
-						name = "DateFormatMask",
-						description = "General Mask for date fomatting",
-						key = "Date_Format_Mask",
-						type = "SOSOptionString",
-						mandatory = false)
+	@JSOptionDefinition(name = "DateFormatMask", description = "General Mask for date fomatting", key = "Date_Format_Mask", type = "SOSOptionString", mandatory = false)
 	public SOSOptionString	DateFormatMask	= new SOSOptionString( // ...
 													this, // ....
 													conClassName + ".Date_Format_Mask", // ...
@@ -315,12 +313,14 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 													false);
 
 	public SOSOptionString getDateFormatMask() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getDateFormatMask";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getDateFormatMask";
 		return DateFormatMask;
 	} // public String getDateFormatMask
 
 	public JSOptionsClass setDateFormatMask(final SOSOptionString pstrValue) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setDateFormatMask";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setDateFormatMask";
 		DateFormatMask = pstrValue;
 		return this;
 	} // public JSOptionsClass setDateFormatMask
@@ -336,12 +336,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 *
 	 * \created 28.03.2014 12:08:23 by KB
 	 */
-	@JSOptionDefinition(
-						name = "TimeFormatMask",
-						description = "General Mask for time formatting",
-						key = "Time_Format_Mask",
-						type = "SOSOptionString",
-						mandatory = false)
+	@JSOptionDefinition(name = "TimeFormatMask", description = "General Mask for time formatting", key = "Time_Format_Mask", type = "SOSOptionString", mandatory = false)
 	public SOSOptionString	TimeFormatMask	= new SOSOptionString( // ...
 													this, // ....
 													conClassName + ".Time_Format_Mask", // ...
@@ -351,12 +346,14 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 													false);
 
 	public SOSOptionString getTimeFormatMask() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getTimeFormatMask";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getTimeFormatMask";
 		return TimeFormatMask;
 	} // public String getTimeFormatMask
 
 	public JSOptionsClass setTimeFormatMask(final SOSOptionString pstrValue) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setTimeFormatMask";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setTimeFormatMask";
 		TimeFormatMask = pstrValue;
 		return this;
 	} // public JSOptionsClass setTimeFormatMask
@@ -372,12 +369,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 *
 	 * \created 27.06.2012 17:31:46 by KB
 	 */
-	@JSOptionDefinition(
-						name = "Scheduler_Hot_Folder",
-						description = "Pathname to the JobScheduler live-folder",
-						key = "Scheduler_Hot_Folder",
-						type = "SOSOptionFolderName",
-						mandatory = true)
+	@JSOptionDefinition(name = "Scheduler_Hot_Folder", description = "Pathname to the JobScheduler live-folder", key = "Scheduler_Hot_Folder", type = "SOSOptionFolderName", mandatory = true)
 	public SOSOptionFolderName	Scheduler_Hot_Folder	= new SOSOptionFolderName(
 														// ...
 																this, // ....
@@ -388,12 +380,14 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 																true);
 
 	public String getScheduler_Hot_Folder() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getScheduler_Hot_Folder";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getScheduler_Hot_Folder";
 		return Scheduler_Hot_Folder.Value();
 	} // public String getScheduler_Hot_Folder
 
 	public JSOptionsClass setScheduler_Hot_Folder(final String pstrValue) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setScheduler_Hot_Folder";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setScheduler_Hot_Folder";
 		Scheduler_Hot_Folder.Value(pstrValue);
 		return this;
 	} // public JSOptionsClass setScheduler_Hot_Folder
@@ -409,12 +403,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 *
 	 * \created 27.06.2012 17:07:08 by KB
 	 */
-	@JSOptionDefinition(
-						name = "Scheduler_Data",
-						description = "Data Folder of JobScheduler Installation",
-						key = "Scheduler_Data",
-						type = "SOSOptionFolderName",
-						mandatory = false)
+	@JSOptionDefinition(name = "Scheduler_Data", description = "Data Folder of JobScheduler Installation", key = "Scheduler_Data", type = "SOSOptionFolderName", mandatory = false)
 	public SOSOptionFolderName	Scheduler_Data	= new SOSOptionFolderName(
 												// ...
 														this, // ....
@@ -425,12 +414,14 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 														false);
 
 	public String getScheduler_Data() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getScheduler_Data";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getScheduler_Data";
 		return Scheduler_Data.Value();
 	} // public String getScheduler_Data
 
 	public JSOptionsClass setScheduler_Data(final String pstrValue) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setScheduler_Data";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setScheduler_Data";
 		Scheduler_Data.Value(pstrValue);
 		return this;
 	} // public JSOptionsClass setScheduler_Data
@@ -446,12 +437,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 *
 	 * \created 27.06.2012 16:56:45 by KB
 	 */
-	@JSOptionDefinition(
-						name = "Scheduler_Home",
-						description = "Home Root Folder of JobScheduler",
-						key = "Scheduler_Home",
-						type = "SOSOptionFileName",
-						mandatory = true)
+	@JSOptionDefinition(name = "Scheduler_Home", description = "Home Root Folder of JobScheduler", key = "Scheduler_Home", type = "SOSOptionFileName", mandatory = true)
 	public SOSOptionFolderName	Scheduler_Home	= new SOSOptionFolderName(
 												// ...
 														this, // ....
@@ -462,21 +448,18 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 														false);
 
 	public String getScheduler_Home() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getScheduler_Home";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getScheduler_Home";
 		return Scheduler_Home.Value();
 	} // public String getScheduler_Home
 
 	public JSOptionsClass setScheduler_Home(final String pstrValue) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setScheduler_Home";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setScheduler_Home";
 		Scheduler_Home.Value(pstrValue);
 		return this;
 	} // public JSOptionsClass setScheduler_Home
-	@JSOptionDefinition(
-						name = "Local_user",
-						description = "I18N is for internationalization of Application",
-						key = "Local_user",
-						type = "SOSOptionUserName",
-						mandatory = true)
+	@JSOptionDefinition(name = "Local_user", description = "I18N is for internationalization of Application", key = "Local_user", type = "SOSOptionUserName", mandatory = true)
 	public SOSOptionUserName	UserName	= new SOSOptionUserName(
 											// ...
 													this, // ....
@@ -497,12 +480,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 *
 	 * \created 14.05.2011 17:42:51 by KB
 	 */
-	@JSOptionDefinition(
-						name = "Locale",
-						description = "I18N is for internationalization of Application",
-						key = "Locale",
-						type = "SOSOptionString",
-						mandatory = true)
+	@JSOptionDefinition(name = "Locale", description = "I18N is for internationalization of Application", key = "Locale", type = "SOSOptionString", mandatory = true)
 	public SOSOptionLocale		Locale		= new SOSOptionLocale(
 											// ...
 													this, // ....
@@ -517,12 +495,15 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	}
 
 	public String getLocale() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getLocale";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getLocale";
 		return Locale.Value();
 	} // public String getLocale
 
-	@Override public void setLocale(final String pstrValue) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setLocale";
+	@Override
+	public void setLocale(final String pstrValue) {
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setLocale";
 		Locale.Value(pstrValue);
 	} // public JSOptionsClass setLocale
 	/**
@@ -537,12 +518,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 *
 	 * \created 22.03.2011 11:49:13 by KB
 	 */
-	@JSOptionDefinition(
-						name = "CheckNotProcessedOptions",
-						description = "If this Option is set to true, all not processed or recognized options are reported as a warning",
-						key = "CheckNotProcessedOptions",
-						type = "SOSOptionBoolean",
-						mandatory = false)
+	@JSOptionDefinition(name = "CheckNotProcessedOptions", description = "If this Option is set to true, all not processed or recognized options are reported as a warning", key = "CheckNotProcessedOptions", type = "SOSOptionBoolean", mandatory = false)
 	public SOSOptionBoolean	CheckNotProcessedOptions	= new SOSOptionBoolean(
 																// ...
 																this, // ....
@@ -553,12 +529,14 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 																false);
 
 	public String getCheckNotProcessedOptions() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getCheckNotProcessedOptions";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getCheckNotProcessedOptions";
 		return CheckNotProcessedOptions.Value();
 	} // public String getCheckNotProcessedOptions
 
 	public JSOptionsClass setCheckNotProcessedOptions(final String pstrValue) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setCheckNotProcessedOptions";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setCheckNotProcessedOptions";
 		CheckNotProcessedOptions.Value(pstrValue);
 		return this;
 	} // public JSOptionsClass setCheckNotProcessedOptions
@@ -574,12 +552,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 *
 	 * \created 07.01.2011 18:56:23 by KB
 	 */
-	@JSOptionDefinition(
-						name = "XmlId",
-						description = "This ist the ...",
-						key = "XmlId",
-						type = "SOSOptionString",
-						mandatory = true)
+	@JSOptionDefinition(name = "XmlId", description = "This ist the ...", key = "XmlId", type = "SOSOptionString", mandatory = true)
 	public SOSOptionString	XmlId	= new SOSOptionString(
 									// ...
 											this, // ....
@@ -590,22 +563,18 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 											true);
 
 	public String getXmlId() throws Exception {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getXmlId";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getXmlId";
 		return XmlId.Value();
 	} // public String getXmlId
 
 	public JSOptionsClass setXmlId(final String pstrValue) throws Exception {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setXmlId";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setXmlId";
 		XmlId.Value(pstrValue);
 		return this;
 	} // public JSOptionsClass setXmlId
-	@JSOptionDefinition(
-						name = "ArchiverOptions",
-						value = "",
-						description = "Optionen fï¿½r die Dateiarchivierung",
-						key = "",
-						type = "JSOptionClass",
-						mandatory = false)
+	@JSOptionDefinition(name = "ArchiverOptions", value = "", description = "Optionen fï¿½r die Dateiarchivierung", key = "", type = "JSOptionClass", mandatory = false)
 	private JSArchiverOptions	objArchiverOptions	= null;
 	/**
 	 * \brief TestMode - Option: Test Modus schalten
@@ -613,13 +582,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 * \details
 	 *
 	 */
-	@JSOptionDefinition(
-						name = "TestMode",
-						value = "false",
-						description = "Test Modus schalten ",
-						key = "TestMode",
-						type = "JSOptionBoolean",
-						mandatory = false)
+	@JSOptionDefinition(name = "TestMode", value = "false", description = "Test Modus schalten ", key = "TestMode", type = "JSOptionBoolean", mandatory = false)
 	public SOSOptionBoolean		TestMode			= new SOSOptionBoolean(this, // Verweis auf die
 															// SOSOptionClass-Instanz
 															conClassName + ".TestMode", // Schlï¿½ssel, i.d.r. identisch
@@ -635,13 +598,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 * \details
 	 *
 	 */
-	@JSOptionDefinition(
-						name = "Debug",
-						value = "false",
-						description = "Debug-Modus schalten (true/false)",
-						key = "Debug",
-						type = "JSOptionBoolean",
-						mandatory = false)
+	@JSOptionDefinition(name = "Debug", value = "false", description = "Debug-Modus schalten (true/false)", key = "Debug", type = "JSOptionBoolean", mandatory = false)
 	public SOSOptionBoolean		Debug				= new SOSOptionBoolean(this, // Verweis auf die
 															// SOSOptionClass-Instanz
 															conClassName + ".Debug", // Schlï¿½ssel, i.d.r. identisch mit
@@ -657,13 +614,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 * \details
 	 *
 	 */
-	@JSOptionDefinition(
-						name = "DebugLevel",
-						value = "0",
-						description = "DebugLevel",
-						key = "DebugLevel",
-						type = "JSOptionInteger",
-						mandatory = false)
+	@JSOptionDefinition(name = "DebugLevel", value = "0", description = "DebugLevel", key = "DebugLevel", type = "JSOptionInteger", mandatory = false)
 	public SOSOptionInteger		DebugLevel			= new SOSOptionInteger(this, // Verweis auf die
 															// SOSOptionClass-Instanz
 															conClassName + ".DebugLevel", // Schlï¿½ssel, i.d.r. identisch
@@ -688,12 +639,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 *
 	 * \created 20.01.2012 10:24:18 by KB
 	 */
-	@JSOptionDefinition(
-						name = "log_filename",
-						description = "Name der Datei mit den Logging-Eintrï¿½gen",
-						key = "log_filename",
-						type = "SOSOptionFileName",
-						mandatory = false)
+	@JSOptionDefinition(name = "log_filename", description = "Name der Datei mit den Logging-Eintrï¿½gen", key = "log_filename", type = "SOSOptionFileName", mandatory = false)
 	public SOSOptionLogFileName	log_filename		= new SOSOptionLogFileName(
 													// ...
 															this, // ....
@@ -704,12 +650,14 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 															false);
 
 	public SOSOptionLogFileName getlog_filename() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getlog_filename";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getlog_filename";
 		return log_filename;
 	} // public String getlog_filename
 
 	public void setlog_filename(final SOSOptionLogFileName pstrValue) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setlog_filename";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setlog_filename";
 		log_filename = pstrValue;
 		// return this;
 	} // public JSOptionsClass setlog_filename
@@ -725,28 +673,33 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 *
 	 * \created 20.01.2012 10:12:02 by KB
 	 */
-	@JSOptionDefinition(
-						name = "log4jPropertyFileName",
-						description = "Name of the LOG4J Property File",
-						key = "log4j_Property_FileName",
-						type = "SOSOptionInFileName",
-						mandatory = false)
-	public SOSOptionInFileName	log4jPropertyFileName	= new SOSOptionInFileName(
-														// ...
-																this, // ....
-																conClassName + ".log4j_Property_FileName", // ...
-																"Name of the LOG4J Property File", // ...
-																"env:log4j.configuration", // ...
-																"./log4j.properties", // ...
-																false);
+	@JSOptionDefinition(name = "log4jPropertyFileName", description = "Name of the LOG4J Property File", key = "log4j_Property_FileName", type = "SOSOptionInFileName", mandatory = false)
+	public SOSOptionLog4JPropertyFile	log4jPropertyFileName	= new SOSOptionLog4JPropertyFile(
+																// ...
+																		this, // ....
+																		conClassName + ".log4j_Property_FileName", // ...
+																		"Name of the LOG4J Property File", // ...
+																		"env:log4j.configuration", // ...
+																		"./log4j.properties", // ...
+																		false);
+
+	public SOSOptionLog4JPropertyFile log4jPropertyFileName() {
+		return log4jPropertyFileName;
+	}
+
+	public void log4jPropertyFileName(SOSOptionLog4JPropertyFile pobjO) {
+		log4jPropertyFileName = pobjO;
+	}
 
 	public String getlog4jPropertyFileName() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getlog4jPropertyFileName";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getlog4jPropertyFileName";
 		return log4jPropertyFileName.Value();
 	} // public String getlog4jPropertyFileName
 
 	public JSOptionsClass setlog4jPropertyFileName(final String pstrValue) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setlog4jPropertyFileName";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setlog4jPropertyFileName";
 		log4jPropertyFileName.Value(pstrValue);
 		return this;
 	} // public JSOptionsClass setlog4jPropertyFileName
@@ -762,12 +715,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 *
 	 * \created 07.05.2014 17:15:00 by KB
 	 */
-	@JSOptionDefinition(
-						name = "ApplicationName",
-						description = "Name of the Application",
-						key = "ApplicationName",
-						type = "SOSOptionString",
-						mandatory = false)
+	@JSOptionDefinition(name = "ApplicationName", description = "Name of the Application", key = "ApplicationName", type = "SOSOptionString", mandatory = false)
 	public SOSOptionString	ApplicationName	= new SOSOptionString( // ...
 													this, // ....
 													conClassName + ".ApplicationName", // ...
@@ -776,13 +724,19 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 													"env:SOSApplicationName", // ...
 													false);
 
+	public SOSOptionString ApplicationName() {
+		return ApplicationName;
+	}
+
 	public SOSOptionString getApplicationName() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getApplicationName";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getApplicationName";
 		return ApplicationName;
 	} // public String getApplicationName
 
 	public JSOptionsClass setApplicationName(final SOSOptionString pstrValue) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setApplicationName";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setApplicationName";
 		ApplicationName = pstrValue;
 		return this;
 	} // public JSOptionsClass setApplicationName
@@ -798,12 +752,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 *
 	 * \created 07.05.2014 17:16:17 by KB
 	 */
-	@JSOptionDefinition(
-						name = "ApplicationDocuUrl",
-						description = "The Url of the Documentation of this Application",
-						key = "ApplicationDocuUrl",
-						type = "SOSOptionUrl",
-						mandatory = false)
+	@JSOptionDefinition(name = "ApplicationDocuUrl", description = "The Url of the Documentation of this Application", key = "ApplicationDocuUrl", type = "SOSOptionUrl", mandatory = false)
 	public SOSOptionUrl	ApplicationDocuUrl	= new SOSOptionUrl( // ...
 													this, // ....
 													conClassName + ".ApplicationDocuUrl", // ...
@@ -813,12 +762,14 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 													false);
 
 	public SOSOptionUrl getApplicationDocuUrl() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getApplicationDocuUrl";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getApplicationDocuUrl";
 		return ApplicationDocuUrl;
 	} // public String getApplicationDocuUrl
 
 	public JSOptionsClass setApplicationDocuUrl(final SOSOptionUrl pstrValue) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setApplicationDocuUrl";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setApplicationDocuUrl";
 		ApplicationDocuUrl = pstrValue;
 		return this;
 	} // public JSOptionsClass setApplicationDocuUrl
@@ -834,12 +785,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 *
 	 * \created 07.05.2014 17:19:04 by KB
 	 */
-	@JSOptionDefinition(
-						name = "AllowEmptyParameterList",
-						description = "If true, an empty parameter list leads not into an error",
-						key = "AllowEmptyParameterList",
-						type = "SOSOptionBoolean",
-						mandatory = false)
+	@JSOptionDefinition(name = "AllowEmptyParameterList", description = "If true, an empty parameter list leads not into an error", key = "AllowEmptyParameterList", type = "SOSOptionBoolean", mandatory = false)
 	public SOSOptionBoolean	AllowEmptyParameterList	= new SOSOptionBoolean( // ...
 															this, // ....
 															conClassName + ".AllowEmptyParameterList", // ...
@@ -849,12 +795,14 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 															false);
 
 	public SOSOptionBoolean getAllowEmptyParameterList() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getAllowEmptyParameterList";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getAllowEmptyParameterList";
 		return AllowEmptyParameterList;
 	} // public String getAllowEmptyParameterList
 
 	public JSOptionsClass setAllowEmptyParameterList(final SOSOptionBoolean pstrValue) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setAllowEmptyParameterList";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setAllowEmptyParameterList";
 		AllowEmptyParameterList = pstrValue;
 		return this;
 	} // public JSOptionsClass setAllowEmptyParameterList
@@ -878,7 +826,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	public JSOptionPropertyFolderName	UserDir							= new JSOptionPropertyFolderName(this, "", "", "", "", false);
 	@SuppressWarnings("rawtypes")
 	public Class						objParentClass					= this.getClass();
-	protected String						strAlternativePrefix			= "";
+	protected String					strAlternativePrefix			= "";
 
 	public JSOptionsClass() {
 		try {
@@ -897,6 +845,13 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 
 	public String getPrefix() {
 		return strAlternativePrefix;
+	}
+
+	protected String concatIfNotEmpty(final String pstrValue) {
+		if (isNotEmpty(pstrValue)) {
+			return "\n" + pstrValue;
+		}
+		return pstrValue;
 	}
 
 	/**
@@ -925,7 +880,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 		HashMap<String, String> objS = new HashMap<String, String>();
 		int intStartPos = strCurrentNodeName.length() + 1;
 		for (final Object element : Settings().entrySet()) {
-			@SuppressWarnings("unchecked") final Map.Entry<String, String> mapItem = (Map.Entry<String, String>) element;
+			@SuppressWarnings("unchecked")
+			final Map.Entry<String, String> mapItem = (Map.Entry<String, String>) element;
 			String strMapKey = mapItem.getKey().toString();
 			String strValue = mapItem.getValue();
 			if (strMapKey.indexOf("/") != -1) {
@@ -1161,7 +1117,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 
 	/**
 	 *
-	 * \brief CheckNotProcessedOptions
+	 * \brief ReportNotProcessedOptions
 	 *
 	 * \details
 	 *
@@ -1169,13 +1125,14 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 *
 	 * @return
 	 */
-	public boolean CheckNotProcessedOptions() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::CheckNotProcessedOptions";
+	public boolean ReportNotProcessedOptions() {
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::CheckNotProcessedOptions";
 		boolean flgIsOK = true;
 		int intNumberOfNotProcessedOptions = 0;
 		if (objSettings != null) {
-			for (final Object element : objSettings.entrySet()) {
-				final Map.Entry<String, String> mapItem = (Map.Entry<String, String>) element;
+			for (final Map.Entry<String, String> element : objSettings.entrySet()) {
+				final Map.Entry<String, String> mapItem = element;
 				String strMapKey = mapItem.getKey().toString();
 				String strT = objProcessedOptions.get(strMapKey);
 				if (strT == null) {
@@ -1196,7 +1153,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	} // private boolean CheckNotProcessedOptions
 
 	public HashMap<String, String> getProcessedOptions() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getProcessedOptions";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getProcessedOptions";
 		if (objProcessedOptions == null) {
 			objProcessedOptions = new HashMap<String, String>();
 		}
@@ -1204,7 +1162,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	} // public HashMap<String, String> getProcessedOptions
 
 	public void addProcessedOptions(final HashMap<String, String> phsmMap) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::addProcessedOptions";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::addProcessedOptions";
 		this.getProcessedOptions();
 		objProcessedOptions.putAll(phsmMap);
 	} // public void addProcessedOptions
@@ -1343,7 +1302,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 *
 	 * @param pstrS
 	 */
-	@Override public boolean String2Bool(final String pstrVal) {
+	@Override
+	public boolean String2Bool(final String pstrVal) {
 		boolean flgT = false;
 		if (isNotEmpty(pstrVal)) {
 			if (pstrVal.equals("1") || pstrVal.equalsIgnoreCase("y") || pstrVal.equalsIgnoreCase("yes") || pstrVal.equalsIgnoreCase("j")
@@ -1390,7 +1350,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 		}
 	}
 
-	@Override public String toString() {
+	@Override
+	public String toString() {
 		String strT = null;
 		try {
 			strT = getAllOptionsAsString();
@@ -1404,8 +1365,9 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	public String dirtyString() {
 		//		String strT = objParentClass.toString() + " -> " + objParentClass.hashCode();
 		String strT = "";
+		clearBuffer();
 		try {
-			strT += "\n" + getAllOptionsAsString(IterationTypes.DirtyToString);
+			strT += getAllOptionsAsString(IterationTypes.DirtyToString);
 		}
 		catch (final Exception e) {
 			throw new JobSchedulerException("dirtyString failed", e);
@@ -1446,12 +1408,17 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	private String getAllOptionsAsString(final IterationTypes penuIterationType) {
 		String strT = ""; // conClassName + "\n";
 		if (objParentClass != null) {
-			strT += IterateAllDataElementsByAnnotation(objParentClass, this, penuIterationType, new StringBuffer(""));
+			strT += IterateAllDataElementsByAnnotation(objParentClass, this, penuIterationType, strBuffer);
 		}
 		return strT;
 	}
 
+	protected void clearBuffer() {
+		strBuffer = new StringBuffer();
+	}
+
 	private String getAllOptionsAsString() {
+		clearBuffer();
 		return getAllOptionsAsString(IterationTypes.toString);
 	}
 
@@ -1741,7 +1708,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 * @return
 	 * @throws Exception
 	 */
-	@Override public JSArchiverOptions ArchiverOptions() {
+	@Override
+	public JSArchiverOptions ArchiverOptions() {
 		if (objArchiverOptions == null) {
 			// TODO: falls objSettings = null, dann die Optionen einzeln setzen.
 			objArchiverOptions = new JSArchiverOptions();
@@ -1909,7 +1877,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 * @return Returns the IgnoreEnvironmentVariables.
 	 */
 	public boolean IgnoreEnvironmentVariables() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::IgnoreEnvironmentVariables";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::IgnoreEnvironmentVariables";
 		return flgIgnoreEnvironmentVariables;
 	} // boolean IgnoreEnvironmentVariables()
 
@@ -1921,7 +1890,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 * @param pflgIgnoreEnvironmentVariables: The boolean IgnoreEnvironmentVariables to set.
 	 */
 	public JSOptionsClass IgnoreEnvironmentVariables(final boolean pflgIgnoreEnvironmentVariables) throws Exception {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::IgnoreEnvironmentVariables";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::IgnoreEnvironmentVariables";
 		flgIgnoreEnvironmentVariables = pflgIgnoreEnvironmentVariables;
 		return this;
 	} // public void IgnoreEnvironmentVariables(boolean pflgIgnoreEnvironmentVariables)
@@ -1966,10 +1936,11 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	public String	gstrApplicationDocuUrl	= "http://docu.sos-berlin.com";
 
 	public void CommandLineArgs(final String pstrArgs) {
-		StrTokenizer objT = new StrTokenizer (pstrArgs);
+		StrTokenizer objT = new StrTokenizer(pstrArgs);
 		String[] strA = objT.getTokenArray();
 		CommandLineArgs(strA);
 	}
+
 	/**
 	 *
 	 * \brief CommandLineArgs - ï¿½bernehmen der Options/Settings aus der Kommandozeile
@@ -1981,7 +1952,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 * @param pstrArgs
 	 * @throws Exception
 	 */
-	public void CommandLineArgs(final String[] pstrArgs)  {
+	public void CommandLineArgs(final String[] pstrArgs) {
 		final String conMethodName = conClassName + "::CommandLineArgs ";
 		if (AllowEmptyParameterList.isFalse()) {
 			if (pstrArgs.length <= 0) {
@@ -2006,18 +1977,15 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 					int intESPos = strOptionName.indexOf("=");
 					if (intESPos > 0) {
 						strOptionValue = strOptionName.substring(intESPos + 1);
+						strOptionValue = StripQuotes(strOptionValue);
 						strOptionName = strOptionName.substring(0, intESPos);
 						objSettings.put(strOptionName, strOptionValue);
-						if(strOptionName.contains("password")){
-							this.SignalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", conMethodName, strOptionName, "*****"));
-						}else{
-							this.SignalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", conMethodName, strOptionName, strOptionValue));
-						}
+						this.SignalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", conMethodName, strOptionName, strOptionValue));
 						flgOption = true; // next tooken must be an option
 					}
 				}
 				else {
-					// not a keyword. a positional parameter?
+					logger.error(String.format("'%1$s' seems to be an unsupported (positional) parameter. ignored", strCommandLineArg));
 				}
 			}
 			else {
@@ -2025,11 +1993,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 					strOptionValue = strCommandLineArg;
 					flgOption = true;
 					objSettings.put(strOptionName, strOptionValue);
-					if(strOptionName.contains("password")){
-					    this.SignalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", conMethodName, strOptionName, "*****"));
-					}else{
-					    this.SignalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", conMethodName, strOptionName, strOptionValue));
-					}
+					this.SignalDebug(String.format("%1$s: Name = %2$s, value = %3$s", conMethodName, strOptionName, strOptionValue));
 					strOptionName = null;
 				}
 			}
@@ -2051,11 +2015,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 						strOptionValue = strCommandLineArg;
 						flgOption = true;
 						objSettings.put(strOptionName, strOptionValue);
-						if(strOptionName.contains("password")){
-				            this.SignalDebug(String.format("%1$s: CmdSettings. Name = %2$s, value = %3$s", conMethodName, strOptionName, "*****"));
-						}else{
-				            this.SignalDebug(String.format("%1$s: CmdSettings. Name = %2$s, value = %3$s", conMethodName, strOptionName, strOptionValue));
-						}
+						this.SignalDebug(String.format("%1$s: CmdSettings. Name = %2$s, value = %3$s", conMethodName, strOptionName, strOptionValue));
 						strOptionName = null;
 					}
 				}
@@ -2096,7 +2056,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 * @param pstrPropertiesFileName
 	 * @throws Exception
 	 */
-	public void LoadProperties(final String pstrPropertiesFileName)  {
+	public void LoadProperties(final String pstrPropertiesFileName) {
 		final String conMethodName = conClassName + "::LoadProperties ";
 		try {
 			final Properties objProp = new Properties();
@@ -2138,7 +2098,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 * @throws Exception
 	 */
 	public void LoadSystemProperties() throws Exception {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::LoadSystemProperties ";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::LoadSystemProperties ";
 		Properties objProp = new Properties();
 		objProp = System.getProperties();
 		LoadProperties(objProp);
@@ -2157,10 +2118,12 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 * @throws Exception
 	 */
 	public void LoadProperties(final Properties pobjProp) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::LoadProperties";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::LoadProperties";
 		this.Settings();
 		for (final Object element : pobjProp.entrySet()) {
-			@SuppressWarnings("rawtypes") final Map.Entry mapItem = (Map.Entry) element;
+			@SuppressWarnings("rawtypes")
+			final Map.Entry mapItem = (Map.Entry) element;
 			final String strMapKey = mapItem.getKey().toString();
 			if (mapItem.getValue() != null) {
 				final String strTemp = mapItem.getValue().toString();
@@ -2191,20 +2154,21 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 * @param hshMap
 	 */
 	public void setAllOptions(final HashMap<String, String> pobjJSSettings, final String pstrAlternativePrefix) throws Exception {
-		if (strAlternativePrefix.length() <= 0) {
-			strAlternativePrefix = pstrAlternativePrefix;
-			if (objParentClass != null) {
-				IterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.setPrefix, strBuffer);
-			}
+		//		if (strAlternativePrefix.length() <= 0) {
+		strAlternativePrefix = pstrAlternativePrefix;
+		if (objParentClass != null) {
+			IterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.setPrefix, strBuffer);
 		}
-//		else {
-//			logger.trace(String.format("SOSOPT-I-002: Alternate Prefix already set to %1$s, but %2$s as new given", strAlternativePrefix, pstrAlternativePrefix));
-//		}
+		//		}
+		//		else {
+		//			logger.trace(String.format("SOSOPT-I-002: Alternate Prefix already set to %1$s, but %2$s as new given", strAlternativePrefix, pstrAlternativePrefix));
+		//		}
 		this.setAllOptions(pobjJSSettings);
 	}
 
-	public void setAllOptions(final HashMap<String, String> hshMap)  {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setAllOptions";
+	public void setAllOptions(final HashMap<String, String> hshMap) {
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::setAllOptions";
 		setAllCommonOptions(hshMap);
 	} // public void setAllOptions}
 
@@ -2219,7 +2183,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 * @return Returns the CurrentNodeName.
 	 */
 	public String CurrentNodeName() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::CurrentNodeName";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::CurrentNodeName";
 		return strCurrentNodeName;
 	} // String CurrentNodeName()
 
@@ -2231,7 +2196,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 * @param pstrCurrentNodeName: The String CurrentNodeName to set.
 	 */
 	public JSOptionsClass CurrentNodeName(final String pstrCurrentNodeName) throws Exception {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::CurrentNodeName";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::CurrentNodeName";
 		strCurrentNodeName = pstrCurrentNodeName;
 		return this;
 	} // public void CurrentNodeName(String pstrCurrentNodeName)
@@ -2244,7 +2210,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 * @param pstrCurrentJobName: The String CurrentJobName to set.
 	 */
 	public JSOptionsClass CurrentJobName(final String pstrCurrentJobName) throws Exception {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::CurrentJobName";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::CurrentJobName";
 		strCurrentJobName = pstrCurrentJobName;
 		return this;
 	} // public void CurrentJobName(String pstrCurrentJobName)
@@ -2260,7 +2227,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 * @return Returns the CurrentJobName.
 	 */
 	public String CurrentJobName() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::CurrentJobName";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::CurrentJobName";
 		return strCurrentJobName;
 	} // String CurrentJobName()
 
@@ -2272,7 +2240,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 * @param pintCurrentJobId: The Integer CurrentJobId to set.
 	 */
 	public JSOptionsClass CurrentJobId(final int pintCurrentJobId) throws Exception {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::CurrentJobId";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::CurrentJobId";
 		intCurrentJobId = pintCurrentJobId;
 		return this;
 	} // public void CurrentJobId(String pstrCurrentJobId)
@@ -2288,7 +2257,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 * @return Returns the CurrentJobId.
 	 */
 	public int CurrentJobId() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::CurrentJobId";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::CurrentJobId";
 		return intCurrentJobId;
 	} // String CurrentJobId()
 
@@ -2300,7 +2270,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 * @param pstrCurrentJobFolder: The String CurrentJobFolder to set.
 	 */
 	public JSOptionsClass CurrentJobFolder(final String pstrCurrentJobFolder) throws Exception {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::CurrentJobFolder";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::CurrentJobFolder";
 		strCurrentJobFolder = pstrCurrentJobFolder;
 		return this;
 	} // public void CurrentJobFolder(String pstrCurrentJobFolder)
@@ -2316,7 +2287,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 * @return Returns the CurrentJobFolder.
 	 */
 	public String CurrentJobFolder() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::CurrentJobFolder";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::CurrentJobFolder";
 		return strCurrentJobFolder;
 	} // String CurrentJobFolder()
 
@@ -2339,7 +2311,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 *
 	 * @param strOptionName
 	 */
-	@SuppressWarnings("unchecked") public String OptionByName(final String pstrOptionName) {
+	@SuppressWarnings("unchecked")
+	public String OptionByName(final String pstrOptionName) {
 		String strValue = null;
 		Class c = this.getClass();
 		strValue = getOptionValue(c, pstrOptionName);
@@ -2351,7 +2324,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	}
 
 	private String getOptionValue(final Class c, final String pstrOptionName) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getOptionValue";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getOptionValue";
 		String strValue = null;
 		Field objField = null;
 		try {
@@ -2417,9 +2391,10 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	private static Properties	objP	= new Properties();
 
 	public Properties getTextProperties() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getTextProperties";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getTextProperties";
 		if (objP == null) {
-			objP = objP = new Properties();
+			objP = new Properties();
 		}
 		return objP;
 	} // private Properties getTextProperties
@@ -2435,10 +2410,11 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	*
 	 */
 	public String replaceVars(final String pstrReplaceIn) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::replaceVars";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::replaceVars";
 		getTextProperties();
 		try {
-			// zusã³ºliche Parameter generieren
+			// zusätzliche Parameter generieren
 			objP.put("date", SOSOptionTime.getCurrentDateAsString(DateFormatMask.Value()));
 			objP.put("time", SOSOptionTime.getCurrentTimeAsString(TimeFormatMask.Value()));
 			objP.put("local_user", System.getProperty("user.name"));
@@ -2477,18 +2453,18 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 						if (strKey.equalsIgnoreCase("uuid")) {
 							continue;
 						}
+						strVal = (String) objP.get(strKey);
 						String strPP = "(\\$|%)\\{" + strKey + "\\}";
-						strVal = this.OptionByName(strKey);
-						if (isNotNull(strVal)) {
-							strVal = strVal.replace('\\', '/');
+						if (strVal != null) {
 							string = string.replaceAll(strPP, Matcher.quoteReplacement(strVal));
-							// logger.debug(Messages.getMsg(JSJ_D_0031, name, strPP, s)); //
-							// "processing job parameter '%1$s': substitute '%2$s' with '%3$s'."
 						}
 						else {
-							strVal = (String) objP.get(strKey);
-							if (strVal != null) {
+							strVal = this.OptionByName(strKey);
+							if (isNotNull(strVal)) {
+								strVal = strVal.replace('\\', '/');
 								string = string.replaceAll(strPP, Matcher.quoteReplacement(strVal));
+								// logger.debug(Messages.getMsg(JSJ_D_0031, name, strPP, s)); //
+								// "processing job parameter '%1$s': substitute '%2$s' with '%3$s'."
 							}
 							else {
 								strVal = Settings().get(strKey);
@@ -2522,11 +2498,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 				if (strMapKey.equals("ftp_password")) {
 					strTemp = "***";
 				}
-		        if("password".equalsIgnoreCase(strMapKey)){
-		          this.SignalDebug(conMethodName + ": Key = " + strMapKey + " --> " + "*****");
-		        }else{
-		          this.SignalDebug(conMethodName + ": Key = " + strMapKey + " --> " + strTemp);
-		        }
+				this.SignalDebug(conMethodName + ": Key = " + strMapKey + " --> " + strTemp);
 			}
 		}
 		// return void;
@@ -2567,10 +2539,6 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	public String getOptionsAsCommandLine() {
 		return populateOptions(IterationTypes.getCommandLine);
 	}
-	
-	public String getOptionsAsQuotedCommandLine() {
-		return populateOptions(IterationTypes.getQuotedCommandLine);
-	}
 
 	public String getOptionsAsKeyValuePairs() {
 		return populateOptions(IterationTypes.getKeyValuePair);
@@ -2580,6 +2548,11 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 		return Iterate(intIt).toString();
 	}
 
+	public String getOptionsAsQuotedCommandLine() {
+	    return populateOptions(IterationTypes.getQuotedCommandLine);
+	}
+
+	   
 	public StringBuffer IterateAllDataElementsByAnnotation(final Class<?> objC, final Object objP, final IterationTypes enuIterate4What, StringBuffer pstrBuffer) {
 		final String conMethodName = conClassName + "::IterateAllDataElementsByAnnotation";
 		String strCommandLineOptions = "";
@@ -2588,6 +2561,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 		}
 		Field objField = null;
 		SOSOptionElement.gflgProcessHashMap = true;
+		boolean flgMandatoryOptionsMissing = false;
 		try {
 			final Field objFields[] = objC.getFields();
 			final StringBuffer strXML = new StringBuffer("");
@@ -2637,18 +2611,23 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 								// continue;
 							}
 							if (enuIterate4What == IterationTypes.CheckMandatory) {
-								objDE.CheckMandatory();
+								try {
+									objDE.CheckMandatory();
+								}
+								catch (Exception e) {
+									flgMandatoryOptionsMissing = true;
+								}
 							}
 							if (enuIterate4What == IterationTypes.toOut) {
 								System.out.println(objDE.toString());
 							}
 							if (enuIterate4What == IterationTypes.toString) {
-								pstrBuffer.append(objDE.toString() + "\n");
+								pstrBuffer.append(addNewLine(objDE.toString()));
 							}
 							if (enuIterate4What == IterationTypes.DirtyToString) {
-								if (objDE.isDirty() == true) {
-									pstrBuffer.append(objDE.DirtyToString() + "\n");
-								}
+								//								if (objDE.isDirty() == true) {
+								pstrBuffer.append(addNewLine(objDE.DirtyToString()));
+								//								}
 							}
 							if (enuIterate4What == IterationTypes.createXML) {
 								strXML.append(objDE.toXml());
@@ -2667,13 +2646,10 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 							if (enuIterate4What == IterationTypes.getCommandLine) {
 								pstrBuffer.append(objDE.toCommandLine());
 							}
-							if (enuIterate4What == IterationTypes.getQuotedCommandLine) {
-								pstrBuffer.append(objDE.toQuotedCommandLine());
-							}
 							if (enuIterate4What == IterationTypes.getKeyValuePair) {
 								strT = objDE.toKeyValuePair(strAlternativePrefix);
 								if (isNotEmpty(strT)) {
-									pstrBuffer.append(strT + "\n");
+									pstrBuffer.append(addNewLine(strT));
 								}
 							}
 							if (enuIterate4What == IterationTypes.countSegmentFields) {
@@ -2712,11 +2688,23 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 			SOSOptionElement.gflgProcessHashMap = false;
 			//
 		} // finally
+		if (flgMandatoryOptionsMissing == true && enuIterate4What == IterationTypes.CheckMandatory) {
+			throw new JSExceptionMandatoryOptionMissing("at least one mandatory option is missing");
+
+		}
 		return pstrBuffer;
 	} // private void AllDataElements
 
+	private String addNewLine(final String pstrV) {
+		if (isEmpty(pstrV) == false && pstrV.contains("\n") == false) {
+			return pstrV + "\n";
+		}
+		return pstrV;
+	}
+
 	public StringBuffer Iterate(final IterationTypes enuIterate4What) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::Iterate";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::Iterate";
 		StringBuffer strB = new StringBuffer();
 		if (objParentClass != null) {
 			strB = IterateAllDataElementsByAnnotation(objParentClass, this, enuIterate4What, strB);
@@ -2818,7 +2806,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 * @return
 	 */
 	public String getObjectAsString() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getObjectAsString";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getObjectAsString";
 		try {
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			ObjectOutputStream oos = new ObjectOutputStream(bos);
@@ -2902,7 +2891,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	}
 
 	public void LoadXML(final JSXMLFile pobjXMLFile) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::LoadXML";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::LoadXML";
 		this.LoadXML(pobjXMLFile, null);
 	}
 
@@ -2918,7 +2908,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 * @param pstrXPathExpr = if null, the full XML-String is loaded
 	 */
 	public Properties LoadXML(final JSXMLFile pobjXMLFile, final String pstrXPathExpr) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::LoadXML";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::LoadXML";
 		DOMParser parser = new DOMParser();
 		Properties objProp = new Properties();
 		try {
@@ -2928,7 +2919,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-			throw new JobSchedulerException(String.format("SAXException ", pobjXMLFile.getAbsolutePath()));
+			throw new JobSchedulerException(String.format("SAXException %1$s", pobjXMLFile.getAbsolutePath()), e);
 		}
 		try {
 			// parser.parse(new ByteArrayInputStream(pstrXMLAsString.getBytes()));
@@ -2950,7 +2941,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-			throw new JobSchedulerException(String.format("Exception ", pobjXMLFile.getAbsolutePath()));
+			throw new JobSchedulerException(String.format("Exception %1$s", pobjXMLFile.getAbsolutePath()), e);
 		}
 		return objProp;
 	} // private void LoadXML
@@ -2978,16 +2969,18 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 				Node objN = children.item(i);
 				if (objN.getNodeType() == Node.TEXT_NODE) {
 					strNodeValue = objN.getNodeValue();
-					if (isNotEmpty(strNodeValue))
+					if (isNotEmpty(strNodeValue)) {
 						objProp.put(strNodeName, objN.getNodeValue());
+					}
 					break;
 				}
 			}
 		}
 		// Verarbeitet die Liste der Kindknoten durch rekursiven Abstieg
 		NodeList children = node.getChildNodes();
-		for (int i = 0; i < children.getLength(); i++)
+		for (int i = 0; i < children.getLength(); i++) {
 			traverse(children.item(i), objProp);
+		}
 	}
 
 	/**
@@ -3002,7 +2995,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 * @param pstrXMLFileName - The name (including path) of the XML-File
 	 */
 	public JSXMLFile toXMLFile(final String pstrXMLFileName) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::toXMLFile";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::toXMLFile";
 		JSXMLFile objXF;
 		try {
 			objXF = new JSXMLFile(pstrXMLFileName);
@@ -3031,8 +3025,10 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 		return Iterate(IterationTypes.createXML);
 	}
 
-	@SuppressWarnings("unchecked") public HashMap<String, String> DeletePrefix(final HashMap<String, String> phsmParameters, final String pstrPrefix) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::DeletePrefix";
+	@SuppressWarnings("unchecked")
+	public HashMap<String, String> DeletePrefix(final HashMap<String, String> phsmParameters, final String pstrPrefix) {
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::DeletePrefix";
 		String strTemp;
 		HashMap<String, String> hsmNewMap = new HashMap<String, String>();
 		if (phsmParameters != null) {
@@ -3085,7 +3081,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	} // private HashMap <String, String> DeletePrefix
 
 	public String getPid() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getPid";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getPid";
 		String pid = ManagementFactory.getRuntimeMXBean().getName();
 		String strA[] = pid.split("@");
 		pid = strA[0];
@@ -3105,8 +3102,9 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 			for (Annotation a : annotations) {
 				if (a instanceof JSOptionDefinition) {
 					JSOptionDefinition od = (JSOptionDefinition) a;
-					if (od.name().toLowerCase().equals(optionNameInLowerCases))
+					if (od.name().toLowerCase().equals(optionNameInLowerCases)) {
 						return true;
+					}
 				}
 			}
 		}
@@ -3115,7 +3113,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	public Preferences	objPreferenceStore	= null;
 
 	public Preferences getPreferenceStore() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getPreferenceStore";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::getPreferenceStore";
 		if (objPreferenceStore == null) {
 			objPreferenceStore = Preferences.userNodeForPackage(objParentClass);
 		}
@@ -3123,7 +3122,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	} // private Preferences getPreferenceStore
 
 	public void initializeOptionValues() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::InitializeOptionValues";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::InitializeOptionValues";
 		if (objParentClass != null) {
 			getPreferenceStore();
 			objClassName4PreferenceStore = objParentClass;
@@ -3133,7 +3133,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	} // private void InitializeOptionValues
 
 	public void storeOptionValues() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::storeOptionValues";
+		@SuppressWarnings("unused")
+		final String conMethodName = conClassName + "::storeOptionValues";
 		if (objParentClass != null) {
 			getPreferenceStore();
 			objClassName4PreferenceStore = objParentClass;
@@ -3141,5 +3142,12 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 			IterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.StoreValues, strB);
 		}
 	} // private void storeOptionValues
-	
+
+	protected void setIfNotDirty(final SOSOptionElement objOption, final String pstrValue) {
+		if (objOption.isNotDirty() && isNotEmpty(pstrValue)) {
+			logger.trace("setValue = " + pstrValue);
+			objOption.Value(pstrValue);
+		}
+	}
+
 } // public class JSOptionsClass

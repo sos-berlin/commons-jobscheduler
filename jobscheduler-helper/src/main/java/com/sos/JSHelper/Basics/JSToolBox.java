@@ -39,7 +39,7 @@ import com.sos.localization.Messages;
  * <br />---------------------------------------------------------------------------
  * </p>
  * \author sgx2343
-* @version $Id$0.9
+* @version $Id: JSToolBox.java 28072 2014-11-11 15:26:37Z oh $0.9
  * \see reference
  *
  */
@@ -509,12 +509,26 @@ public class JSToolBox extends JSListenerClass {
 				SignalDebug(String.format("%s: %s = %s", conMethodName, pstrVariableName, strValue));
 			}
 			else {
-				// SignalInfo(String.format("%s: '%s' is not assigned.", conMethodName, pstrVariableName));
+				strValue = System.getProperty(pstrVariableName);
+			}
+			if (isNotEmpty(strValue)) {
+				strValue = StripQuotes(strValue);
 			}
 		}
 
 		return strValue;
 	}
+
+	public String StripQuotes(final String pstrS) {
+		String strR = pstrS;
+		//		if (pstrS.substring(0, 1).equals("\"") && pstrS.substring(pstrS.length() - 1).equals("\"")) {
+		if (pstrS.startsWith("\"") && pstrS.endsWith("\"")) {
+			strR = pstrS.substring(1, pstrS.length() - 1);
+			strR = strR.replaceAll("\"\"", "\"");
+		}
+		return strR;
+	}
+
 
 	/**
 	 * \brief vereinfachter Stringvergleich
@@ -772,7 +786,7 @@ public class JSToolBox extends JSListenerClass {
 			         case '\u00A9': sb.append("&copy;");break;
 			         case '\u20AC': sb.append("&euro;"); break;
 			         // be carefull with this one (non-breaking white space)
-			         case ' ': sb.append("&nbsp;");break;
+			         case ' ': sb.append("&#160;");break;
 
 			         default:  sb.append(c); break;
 			      }

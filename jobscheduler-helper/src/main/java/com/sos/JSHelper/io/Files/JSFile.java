@@ -52,11 +52,10 @@ package com.sos.JSHelper.io.Files;
  * <br />---------------------------------------------------------------------------
  * </p>
  * \author sgx2343
-* @version $Id$0.9
+* @version $Id: JSFile.java 27127 2014-09-09 18:18:39Z kb $0.9
  * \see JSListener
  * \see IJSArchiver
  */
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -103,24 +102,17 @@ import com.sos.localization.Messages;
 
 @I18NResourceBundle(baseName = "com_sos_JSHelper_Messages", defaultLocale = "en")
 public class JSFile extends java.io.File implements JSListener, IJSArchiver {
-	public static final String	conPropertySOS_JSFILE_PREFIX_4_TEMPFILE	= "sos.jsfile.prefix.4.tempfile";
-
-	public static final String	conPropertySOS_JSFILE_EXTENSION_4_TEMPFILE	= "sos.jsfile.extension.4.tempfile";
-
+	public static final String	conPropertySOS_JSFILE_PREFIX_4_TEMPFILE			= "sos.jsfile.prefix.4.tempfile";
+	public static final String	conPropertySOS_JSFILE_EXTENSION_4_TEMPFILE		= "sos.jsfile.extension.4.tempfile";
 	public static final String	conPropertySOS_JSFILE_EXTENSION_4_EXCLUSIVEFILE	= "sos.jsfile.extension.4.exclusivefile";
-
 	private static final String	ConDefaultExtension4BackupFile					= ".bak";
-
 	public static final String	conPropertySOS_JSFILE_EXTENSION_4_BACKUPFILE	= "sos.jsfile.extension.4.backupfile";
-
 	/**
 	* Logger for this class
 	*/
 	private static final Logger	logger											= Logger.getLogger(JSFile.class);
-
 	private final String		conClassName									= "JSFile";
 	private static final long	serialVersionUID								= -1430552107244301112L;
-
 	final String				JSH_E_0010										= "JSH_E_0010";													// "%1$s: File '%2$s' not exist. Append not possible";
 	final String				JSH_E_0020										= "JSH_E_0020";													// "%1$s: Source file '%2$s' and file to append '%3$s' are equal. append not possible";
 	final String				JSH_E_0040										= "JSH_E_0040";													// "%1$s: File '%2$s' not exist. can not append to '%3$s'";
@@ -128,13 +120,11 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	final String				JSH_E_0060										= "JSH_E_0060";													// "%1$s: copy not succesfull for file '%2$s' to '%3$s'";
 	final String				JSH_E_0070										= "JSH_E_0070";													// "Exclusive usage of file %1$s not possible. User is %$2s";
 	final String				JSH_E_0090										= "JSJ_E_0090";													// delete
-	final String JSH_E_0140 = "JSH_E_0140"; // "file '%1$s' does not exist";
-
+	final String				JSH_E_0140										= "JSH_E_0140";													// "file '%1$s' does not exist";
 	final String				JSH_I_0010										= "JSH_I_0010";													// "%1$s: File '%2$s' appended to file '%3$s'";
 	final String				JSH_I_0020										= "JSH_I_0020";													// "%3$s - File '%1$s' created, Size is : %2$s";
 	final String				JSH_I_0030										= "JSH_I_0030";													// "%3$s - file '%1$s' closed. '%2$d' lines written.";
 	final String				JSH_I_0040										= "JSH_I_0040";													// "%3$s - file '%1$s' closed. '%2$d' lines read.";
-
 	final String				JSH_I_0060										= "JSH_I_0060";													// "File opened for write: '%1$s'";
 	final String				JSH_I_0070										= "JSH_I_0070";													// "File '%1$s' opened for write with charset '%2$s'";
 	final String				JSH_I_0080										= "JSH_I_0080";													// "%3$s: File '%1$s' copied to '%2$s'";
@@ -151,8 +141,7 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	final String				JSH_I_0110										= "JSH_I_0110";													// "create exclusive-file-marker with : %1$s";
 	final String				JSH_I_0120										= "JSH_I_0120";													// "Backup for File created '%1$s'";
 	final String				JSH_I_0130										= "JSH_I_0130";													// "File '%1$s' deleted before, because exist";
-	String JSH_I_0150 = "JSH_I_0150";  // "File unlocked: %1$s";
-
+	String						JSH_I_0150										= "JSH_I_0150";													// "File unlocked: %1$s";
 	public SOSOptionFolderName	BackupFolderName								= new SOSOptionFolderName(null, "BackupFolderName",
 																						"Name of Folder for Backup of this file", "", "", false);
 	protected String			strFileName;
@@ -164,15 +153,14 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	protected long				lngNoOfLinesRead								= 0;
 	private long				lngNoOfLinesWritten								= 0;
 	private long				lngNoOfCharsInBuffer							= 0;
-
-	protected String				strCharSet4OutputFile							= null;															// spezifiziert
+	protected String			strCharSet4OutputFile							= null;															// spezifiziert
 																																					// den
 																																					// Zeichensatz
 																																					// wie
 																																					// er
 																																					// in
 																																					// der
-	protected String				strCharSet4InputFile							= null;															// spezifiziert
+	protected String			strCharSet4InputFile							= null;															// spezifiziert
 																																					// den
 																																					// Zeichensatz
 																																					// wie
@@ -189,18 +177,15 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 																																					// FileLocking
 	private FileLock			fleLock											= null;
 	private boolean				flgFileIsLocked									= false;
-
 	private boolean				flgIsExclusive									= false;
 	private JSFile				fleExclusiveFile								= null;
 	private String				strExclusiveFootPrint							= "";
 	private boolean				flgIsZipfile									= false;
-
 	// private long lngBytesCopies = 0;
-
 	private Messages			Messages										= null;
 
 	public JSFile(final String pstrFileAndPathName) {
-		super(pstrFileAndPathName.replace("file:/",""));
+		super(pstrFileAndPathName.replace("file:/", ""));
 		strFileName = pstrFileAndPathName;
 		doInit();
 	}
@@ -213,7 +198,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 
 	public JSFile(final String parent, final String child) {
 		super(parent, child);
-
 		doInit();
 	}
 
@@ -243,13 +227,10 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 *
 	 */
 	private void doInit() {
-
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::FileName";
-
 		try {
 			strFileName = getAbsolutePath();
-
 			fleFile = this;
 			int i = strFileName.indexOf("//");
 			if (i > 0) {
@@ -264,7 +245,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 			else {
 				strFileName = getAbsolutePath();
 			}
-
 			JSToolBox objT = new JSToolBox("com_sos_JSHelper_Messages");
 			Messages = objT.getMessageObject();
 		}
@@ -272,8 +252,7 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 			logger.error("doInit()", e); //$NON-NLS-1$
 		}
 	}
-	
-	
+
 	public String createZipFile(final String pstrPathName) {
 		String gzipFilename = addFileSeparator(pstrPathName) + getName().concat(".gz");
 		try {
@@ -289,20 +268,15 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 		}
 		return gzipFilename;
 	}
-	
-	
+
 	public String addFileSeparator(final String str) {
 		return str.endsWith("/") || str.endsWith("\\") ? str : str + "/";
 	}
-	
 
 	public void setZipFile(final boolean pflgIsZipFile) {
-
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::setZipFile";
-
 		flgIsZipfile = pflgIsZipFile;
-
 	} // private void setZipFile
 
 	/**
@@ -316,12 +290,10 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 */
 	protected BufferedReader Reader() throws IOException {
 		final String conMethodName = conClassName + "::Reader";
-
 		if (bufReader == null) {
 			if (this.checkExclusiveDeny() == true) {
 				throw new JobSchedulerException(Messages.getMsg(JSH_E_0070, strFileName, strExclusiveFootPrint));
 			}
-
 			if (randomFile != null) {
 				fleFileReader = new FileReader(randomFile.getFD());
 			}
@@ -333,7 +305,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 					}
 					else {
 						bufReader = new BufferedReader(new InputStreamReader(objGZ));
-
 					}
 				}
 				else {
@@ -346,8 +317,7 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 					}
 				}
 			}
-
-			logger.debug(Messages.getMsg(JSH_I_0090, strFileName, strCharSet4InputFile)); // conMethodName + ": " + "File opened for read: "
+			logger.trace(Messages.getMsg(JSH_I_0090, strFileName, strCharSet4InputFile)); // conMethodName + ": " + "File opened for read: "
 		}
 		return bufReader;
 	}
@@ -368,7 +338,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 * \change Dienstag, 27. Oktober 2009 eqbfd Unicode
 	 * Unicode lesen k�nnen
 	 */
-
 	/**
 	 *
 	 * \brief CharSet4InputFile
@@ -384,12 +353,9 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 * @param pstrCharSet4InputFile
 	 */
 	public void CharSet4InputFile(final String pstrCharSet4InputFile) {
-
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::CharSet4InputFile";
-
 		strCharSet4InputFile = pstrCharSet4InputFile;
-
 		// return void;
 	} // public void CharSet4InputFile
 
@@ -404,16 +370,13 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 * @return
 	 */
 	public String CharSet4InputFile() {
-
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::CharSet4InputFile";
-
 		return strCharSet4InputFile;
 	} // public String CharSet4InputFile
 
 	// - </newcode>
 	// - </remark> <!-- id=<Unicode> -->
-
 	/**
 	 * \brief CopyTimeStamp - Copy the File with a new filename extended by a time-stamp
 	 *
@@ -427,7 +390,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	public String CopyTimeStamp() throws Exception {
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::CopyTimeStamp";
-
 		try {
 			String strNewFileName = null;
 			final String strTimeStamp = getTimeStamp();
@@ -457,14 +419,12 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 * @throws Exception
 	 */
 	public String CreateBackup() {
-
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::CreateBackup";
 		// TODO Extension �ber eine Option sos.jsfile.extension.4.backupfile
 		String strExtension4BackupFile = System.getProperty(conPropertySOS_JSFILE_EXTENSION_4_BACKUPFILE, ConDefaultExtension4BackupFile);
 		String strR = this.doCreateBackUp(strExtension4BackupFile);
 		return strR;
-
 	} // private String CreateBackup
 
 	/**
@@ -479,16 +439,12 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 * @throws Exception
 	 */
 	public String CreateBackup(final String pstrExtension4BackupFile) throws Exception {
-
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::CreateBackup";
-
 		return this.doCreateBackUp(pstrExtension4BackupFile);
-
 	} // private String CreateBackup
 
-	private String doCreateBackUp(final String pstrExtension4BackupFileName)  {
-
+	private String doCreateBackUp(final String pstrExtension4BackupFileName) {
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::doCreateBackUp";
 		String strNewFileName = "";
@@ -506,7 +462,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 			e.printStackTrace(System.err);
 			throw new JobSchedulerException("problems with createbackup", e);
 		}
-
 		logger.debug(Messages.getMsg(JSH_I_0120, strNewFileName));
 		return strNewFileName;
 	} // private String doCreateBackUp
@@ -521,7 +476,7 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 *
 	 * @return
 	 */
-	private String getTimeStamp() {
+	public String getTimeStamp() {
 		// DateFormat dteF = DateFormat.getDateTimeInstance();
 		final Date now = new Date();
 		String strT = null;
@@ -536,8 +491,7 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 		strT = formatter.format(now);
 		return strT;
 	}
-	
-	
+
 	public boolean isOlderThan(final long plngCompareTo) {
 		boolean flgR = false;
 		long interval = System.currentTimeMillis() - lastModified();
@@ -546,7 +500,38 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 		}
 		return flgR;
 	}
-	
+
+	@Override
+	public boolean delete() {
+		boolean flgR = true;
+		try {
+			if (exists() == true) {
+				if (canWrite() == true) {
+					boolean flgT = super.delete();
+//					flgT = new File(getAbsolutePath()).delete();
+					if (flgT == false) {
+						logger.error(String.format("file NOT '%1$s' deleted, due to false returncode", getAbsolutePath()));
+					}
+					else {
+						logger.debug(String.format("file '%1$s' deleted", getAbsolutePath()));
+					}
+				}
+				else {
+					logger.error(String.format("file NOT '%1$s' deleted, because its not writable", getAbsolutePath()));
+				}
+			}
+			else {
+				logger.debug(String.format("file '%1$s' does not exists. deletion failed.", getAbsolutePath()));
+//				throw new JobSchedulerException("delete failed");
+			}
+		}
+		catch (Exception e) {
+			String strT = String.format("error on delete file '%1$s'", getAbsolutePath());
+			logger.error(strT);
+			throw new JobSchedulerException(strT, e);
+		}
+		return flgR;
+	}
 
 	/**
 	 * \brief move - move/rename actual file to new file
@@ -555,7 +540,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 */
 	public JSFile move(final String pstrNewFileName) throws Exception {
 		final String conMethodName = conClassName + "::move";
-
 		final JSFile RetVal = null;
 		try {
 			final File fleNewFile = new File(pstrNewFileName);
@@ -612,30 +596,25 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 			logger.debug(s);
 			throw new Exception(s);
 		}
-
 	}
 	private FileWriter			fleFileWriter	= null;
 	protected BufferedWriter	bufWriter		= null;
+	protected boolean			flgIsAppendMode	= false;
 
-	protected boolean flgIsAppendMode = false;
 	public boolean getAppendMode() {
-		
 		@SuppressWarnings("unused")
-		final String	conMethodName	= conClassName + "::getAppendMode";
-		
+		final String conMethodName = conClassName + "::getAppendMode";
 		return flgIsAppendMode;
-		
-//	return boolean;
+		//	return boolean;
 	} // private boolean getAppendMode
+
 	public JSFile setAppendMode(final boolean pflgIsAppendMode) {
-		
 		@SuppressWarnings("unused")
-		final String	conMethodName	= conClassName + "::setAppendMode";
-		
+		final String conMethodName = conClassName + "::setAppendMode";
 		flgIsAppendMode = pflgIsAppendMode;
-		
-	return this;
+		return this;
 	} // private JSFile setAppendMode
+
 	/**
 	 *
 	 * \brief Writer - liefert eine BufferedWriter-Instanz f�r die Datei
@@ -649,20 +628,16 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 */
 	protected BufferedWriter Writer() throws IOException {
 		final String conMethodName = conClassName + "::Writer";
-
 		if (bufWriter == null) {
-
 			if (this.checkExclusiveDeny() == true) {
 				throw new IOException(String.format(JSH_E_0070, strFileName, strExclusiveFootPrint));
 			}
 			fleFileWriter = new FileWriter(this, flgIsAppendMode);
-
 			// - <remark who='eqbfd' when='Dienstag, 27. Oktober 2009' id='Unicode' >
 			// - <oldcode>
 			// bufWriter = new BufferedWriter(fleFileWriter);
 			// - </oldcode>
 			// - <newcode>
-
 			if (strCharSet4OutputFile == null) {
 				if (isZipFile() == true) {
 					GZIPOutputStream objGZ = new GZIPOutputStream(new FileOutputStream(this));
@@ -675,12 +650,12 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 				}
 				else {
 					bufWriter = new BufferedWriter(fleFileWriter);
-					logger.debug(Messages.getMsg(JSH_I_0060, strFileName));
+					logger.trace(Messages.getMsg(JSH_I_0060, strFileName));
 				}
 			}
 			else {
 				bufWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(this), strCharSet4OutputFile));
-				logger.debug(Messages.getMsg(JSH_I_0070, strFileName, strCharSet4InputFile));
+				logger.trace(Messages.getMsg(JSH_I_0070, strFileName, strCharSet4InputFile));
 			}
 			// - </newcode>
 			// - </remark> <!-- id=<Unicode> -->
@@ -689,15 +664,12 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 			 * Unicode lesen k�nnen
 			 */
 		}
-
 		return bufWriter;
 	}
 
 	public boolean isExclusive() {
-
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::isExclusive";
-
 		return flgIsExclusive;
 	} // private boolean isExclusive
 
@@ -765,10 +737,8 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 		if (bufWriter == null) {
 			Writer();
 		}
-
 		bufWriter.write(pstrLine);
 		lngNoOfCharsInBuffer += pstrLine.length();
-
 	}
 
 	/**
@@ -807,11 +777,9 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 * @throws IOException
 	 */
 	public JSFile WriteLine(final String pstrLine) throws IOException {
-
 		if (bufWriter == null) {
 			Writer();
 		}
-
 		String strBuff = pstrLine + System.getProperty("line.separator");
 		if (randomFile == null) {
 			bufWriter.write(strBuff);
@@ -849,12 +817,9 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	public void WriteLine() throws IOException, Exception {
 		// - </newcode>
 		// - </remark> <!-- id=<Fehlerkorrektur> -->
-
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::WriteLine";
-
 		WriteLine("");
-
 	} // public void WriteLine
 
 	/**
@@ -871,7 +836,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	public StringBuffer GetLine() {
 		String strT;
 		StringBuffer strSB = new StringBuffer("");
-
 		try {
 			if (strPushBackBuffer.length() > 0) {
 				strSB.append(strPushBackBuffer);
@@ -896,7 +860,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 					strSB = null;
 				}
 			}
-
 		}
 		catch (final Exception e) {
 			logger.error("GetLine()", e); //$NON-NLS-1$
@@ -907,6 +870,15 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 
 	public void PushBack() {
 		strPushBackBuffer = strRecordBuffer.toString();
+	}
+
+	public void copy(final JSFile pobjTargetFile) {
+		try {
+			this.copy(pobjTargetFile.getAbsolutePath());
+		}
+		catch (Exception e) {
+			throw new JobSchedulerException(e);
+		}
 	}
 
 	/**
@@ -921,22 +893,17 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 * @throws Exception
 	 */
 	public void copy(final String pstrTargetFileName) throws Exception {
-
 		final String conMethodName = conClassName + "::copy";
-
 		final File infile = new File(strFileName);
 		if (!infile.getAbsoluteFile().exists()) {
 			SignalError(String.format("%1$s: File '%2$s' not exist. copy not possible", conMethodName, strFileName));
 			return;
 		}
-
 		final File outfile = new File(pstrTargetFileName);
-
 		if (infile.getCanonicalPath().equals(outfile.getCanonicalPath())) {
 			message(String.format("%3$s: File '%1$s' is equal to '%2$s'. copy is useless", strFileName, pstrTargetFileName, conMethodName));
 			return;
 		}
-
 		try {
 			final FileOutputStream out = new FileOutputStream(outfile);
 			try {
@@ -981,17 +948,13 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 * @throws Exception
 	 */
 	public void ReplaceWith(final String strReplaceWhatAsRegEx, final String strReplaceWith) throws Exception {
-
 		final String conMethodName = conClassName + "::ReplaceWith";
-
 		final File infile = fleFile;
 		if (!infile.exists()) {
 			SignalError(String.format("%1$s: File '%2$s' not exist. nothing to do", conMethodName, strFileName));
 			return;
 		}
-
 		final File fleTempfile = java.io.File.createTempFile("JSFile", ".tmp");
-
 		try {
 			FileInputStream in = new FileInputStream(infile);
 			FileOutputStream out = new FileOutputStream(fleTempfile);
@@ -1003,13 +966,11 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 			ExecuteCopy(in, out);
 			fleTempfile.delete();
 		}
-
 		catch (final FileNotFoundException e) {
 			SignalError(String.format("%1$s: File '%2$s' not exist. nothing to do", conMethodName, strFileName));
 		}
 		catch (final Exception e) {
 			SignalError(String.format("%1$s: replace not succesfull for file '%2$s' ", conMethodName, getName()));
-
 		}
 		message(String.format("%1$s: Replacing in File '%2$s' done ", conMethodName, strFileName));
 	} // public void ReplaceWith(String strReplaceWhatAsRegEx, String strReplaceWith)
@@ -1017,18 +978,14 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	private void ExecuteReplace(final FileInputStream in, final FileOutputStream out, final String strReplaceWhatAsRegEx, final String strReplaceWith)
 			throws IOException {
 		final int intBuffsize = 4096;
-
 		synchronized (in) {
 			synchronized (out) {
-
 				byte[] buffer = new byte[intBuffsize];
 				while (true) {
 					final int bytesRead = in.read(buffer);
-
 					if (bytesRead == -1) {
 						break;
 					}
-
 					if (bytesRead < intBuffsize) {
 						byte[] tmpB = new byte[bytesRead];
 						tmpB = buffer;
@@ -1037,7 +994,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 							buffer[i] = tmpB[i];
 						}
 					}
-
 					String strLine = new String(buffer);
 					strLine = strLine.replaceAll(strReplaceWhatAsRegEx, strReplaceWith);
 					byte[] outB = new byte[intBuffsize + strReplaceWith.length()];
@@ -1046,18 +1002,14 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 				} // while (true)
 			}
 		}
-
 		in.close();
 		out.close();
 	}
 
 	private long in2out(final FileInputStream in, final FileOutputStream out) throws IOException {
-
 		long lngBytesCopies = 0;
-
 		synchronized (in) {
 			synchronized (out) {
-
 				final byte[] buffer = new byte[256];
 				while (true) {
 					final int bytesRead = in.read(buffer);
@@ -1069,20 +1021,15 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 				}
 			}
 		}
-
 		return lngBytesCopies;
-
 	}
 
 	private long ExecuteCopyWOClose(final FileInputStream in, final FileOutputStream out) throws IOException {
-
 		return in2out(in, out);
 	}
 
 	private long ExecuteCopy(final FileInputStream in, final FileOutputStream out) throws IOException {
-
 		final long lngBytesCopied = in2out(in, out);
-
 		in.close();
 		out.close();
 		return lngBytesCopied;
@@ -1103,7 +1050,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	private void ExecuteCopy(final FileInputStream in, final PrintStream out) throws IOException {
 		synchronized (in) {
 			synchronized (out) {
-
 				final byte[] buffer = new byte[1024];
 				while (true) {
 					final int bytesRead = in.read(buffer);
@@ -1114,7 +1060,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 				}
 			}
 		}
-
 		in.close();
 		// out.close();
 	}
@@ -1130,12 +1075,9 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 * @return
 	 */
 	public String File2String() {
-
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::File2String";
-
 		final String strT = getContent();
-
 		return strT;
 	} // public String File2String}
 
@@ -1150,21 +1092,16 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 * @return
 	 */
 	public String getContent() {
-
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::getContent ";
-
 		String strB = "";
-
 		BufferedReader fin;
 		try {
 			fin = this.Reader();
 		}
-		catch (IOException e1) {
-			e1.printStackTrace(System.err);
-			throw new JobSchedulerException(e1.getLocalizedMessage());
+		catch (Exception e1) {
+			throw new JobSchedulerException("Could not get content from file " + this.getAbsolutePath(), e1);
 		}
-
 		// FileInputStream fin = null;
 		int lngFileSize = 0;
 		try {
@@ -1174,9 +1111,7 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 			// else {
 			// fin = new FileInputStream(randomFile.getFD());
 			// }
-
 			// TODO Buffsize as a parameter
-
 			final char[] buffer = new char[4096];
 			while (true) {
 				final int bytesRead = fin.read(buffer);
@@ -1186,7 +1121,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 				lngFileSize += bytesRead;
 				strB = strB + new String(buffer);
 			}
-
 		}
 		catch (final IOException e) {
 			logger.error("getContent() - " + e, e); //$NON-NLS-1$
@@ -1203,7 +1137,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 				fin = null;
 			}
 		}
-
 		// final int i = strB.indexOf('\0');
 		// if (i > 0) {
 		final String strT = strB.substring(0, lngFileSize);
@@ -1223,7 +1156,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 * @param out
 	 */
 	public void dumpAscii(final PrintStream out) {
-
 		FileInputStream fin = null;
 		try {
 			fin = new FileInputStream(strFileName);
@@ -1254,7 +1186,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 * @param out
 	 */
 	public void dumpAscii(final FileOutputStream out) {
-
 		FileInputStream fin = null;
 		try {
 			fin = new FileInputStream(strFileName);
@@ -1272,9 +1203,7 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 			catch (final IOException e) {
 			}
 		}
-
 	}
-
 	private final char[]	charArray	= { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
 	/**
@@ -1294,7 +1223,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 			buffer.append(charArray[(0xF0 & element) >> 4]);
 			buffer.append(charArray[0xF & element]);
 		}
-
 		return buffer.toString();
 	}
 
@@ -1309,12 +1237,10 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 * @param filename
 	 */
 	public void dumpDecimal(final String filename) {
-
 		FileInputStream fin = null;
 		final byte[] buffer = new byte[16];
 		boolean end = false;
 		int bytesRead;
-
 		try {
 			fin = new FileInputStream(filename);
 			while (!end) {
@@ -1371,12 +1297,10 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 * @param out
 	 */
 	public void dumpHex(final PrintStream out) {
-
 		BufferedReader fin = null;
 		final char[] buffer = new char[24];
 		boolean end = false;
 		int bytesRead;
-
 		try {
 			fin = Reader();
 			while (!end) {
@@ -1438,7 +1362,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 			logger.debug("message(String) - " + pstrMsg); //$NON-NLS-1$
 		}
 	}
-
 	private JSListener	JSListener;
 
 	/**
@@ -1506,7 +1429,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 		logger.error(strT);
 		throw new JobSchedulerException(strT);
 	}
-
 	private JSArchiver	objArchiver	= null;
 
 	/**
@@ -1543,12 +1465,9 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 *
 	 * @throws Exception
 	 */
-
 	public JSArchiver getArchiver(final JSArchiverOptions pobjArchiverOptions) throws Exception {
-
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::getArchiver";
-
 		if (objArchiver == null) {
 			objArchiver = new JSArchiver();
 			objArchiver.registerMessageListener(this);
@@ -1556,7 +1475,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 			objArchiver.Options(pobjArchiverOptions);
 			// objArchiver.Options().FileName(super.getAbsoluteFile().toString());
 		}
-
 		return objArchiver;
 	} // public JSArchiver getArchiver}
 
@@ -1571,20 +1489,16 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 * @throws IOException
 	 */
 	public void close() throws IOException {
-
 		final String conMethodName = conClassName + "::close";
-
 		if (bufWriter != null) {
 			bufWriter.flush();
 			bufWriter.close();
 			bufWriter = null;
 			final NumberFormat fmt = NumberFormat.getInstance();
 			fmt.setGroupingUsed(true);
-
 			final String strT = Messages.getMsg(JSH_I_0020, fleFile.getAbsoluteFile(), fmt.format(fleFile.length()), conMethodName);
 			logger.debug(strT);
 			logger.debug(Messages.getMsg(JSH_I_0030, strFileName, lngNoOfLinesWritten, conMethodName));
-
 		}
 		else {
 			if (bufReader != null) {
@@ -1593,11 +1507,10 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 				logger.debug(Messages.getMsg(JSH_I_0040, strFileName, lngNoOfLinesRead, conMethodName));
 			}
 		}
-
 		this.doUnlock();
 		this.doReleaseExclusive();
 	}
-	
+
 	/**
 	 * \brief createTempFileName
 	 *
@@ -1648,21 +1561,16 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 * @throws Exception
 	 */
 	public long AppendFile(final String pstrFileName) throws Exception {
-
 		final String conMethodName = conClassName + "::AppendFile";
-
 		long lngBytesWritten = 0;
 		FileInputStream in = null;
 		FileOutputStream out = null;
-
 		final String strFileN = getAbsolutePath();
 		final File objFile2Append = new File(strFileN);
-
 		if (!objFile2Append.getAbsoluteFile().exists()) {
 			SignalError(Messages.getMsg(JSH_E_0010, conMethodName, strFileN));
 			return -1;
 		}
-
 		JSFile tempFile = createTempFile(); // Ausgabe
 		try {
 			out = new FileOutputStream(tempFile);
@@ -1673,7 +1581,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 					tempFile.delete();
 					return -1;
 				}
-
 				if (AFile.getAbsoluteFile().getAbsolutePath().equalsIgnoreCase(strFileN) == true) {
 					SignalError(Messages.getMsg(JSH_E_0020, conMethodName, strFileN, pstrFileName));
 					tempFile.delete();
@@ -1682,15 +1589,11 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 				in = new FileInputStream(objFile2Append); //
 				lngBytesWritten += ExecuteCopyWOClose(in, out);
 				in.close();
-
 				in = new FileInputStream(AFile);
 				lngBytesWritten += ExecuteCopyWOClose(in, out);
-
 				in.close();
 				out.close();
-
 				message(Messages.getMsg(JSH_I_0010, conMethodName, pstrFileName, strFileN));
-
 				objFile2Append.delete(); // otherwise the rename leads into an error
 				tempFile.renameTo(objFile2Append);
 				// tempFile.move(objFile2Append.getAbsolutePath());
@@ -1720,9 +1623,7 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 			}
 			//
 		}
-
 		return lngBytesWritten;
-
 		// try {
 		// String strFileN = this.getAbsolutePath();
 		// File tempFile = new File(strFileN + "~");
@@ -1780,10 +1681,8 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 * @throws Exception
 	 */
 	public JSFile Send2FtpServer(final HashMap<String, String> settings) throws Exception {
-
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::Send2FtpServer";
-
 		// final JSFtp objFtpClient = new JSFtp();
 		// final JSFtpOptions objFtpOptions = objFtpClient.Options(settings);
 		// objFtpOptions.setAllOptions(settings);
@@ -1791,7 +1690,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 		// objFtpOptions.FileMask("^" + strFileName + "$");
 		// objFtpClient.EstablishConnectionToServer();
 		// objFtpClient.putFiles();
-
 		return this;
 	} // public void Send2FtpServer
 
@@ -1821,7 +1719,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	//
 	// return this;
 	// } // public this Send2FtpServer}
-
 	/**
 	 *
 	 * \brief match
@@ -1840,11 +1737,9 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 		final BufferedReader objReader1 = Reader();
 		final BufferedReader objReader2 = pfleFile.Reader();
 		int char1, char2;
-
 		if (pfleFile.length() != length()) {
 			return false;
 		}
-
 		while (true) {
 			char1 = objReader1.read();
 			char2 = objReader2.read();
@@ -1857,7 +1752,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 			if (char1 == -1 || char2 == -1) {
 				return false;
 			}
-
 		}
 	}
 
@@ -1874,20 +1768,15 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 * @throws IOException
 	 */
 	public boolean compare(final String pstrFile2Compare) throws IOException, Exception {
-
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::compare";
-
 		return this.compare(new JSFile(pstrFile2Compare));
 	} // public boolean compare
 
 	public void Write(final StringBuffer pstrLine) throws Exception {
-
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::Write";
-
 		this.Write(pstrLine.toString());
-
 	} // public void Write
 
 	/**
@@ -1908,9 +1797,7 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 * @throws Exception
 	 */
 	public boolean doLock(final String pstrAccessMode) throws Exception {
-
 		final String conMethodName = conClassName + "::doLock";
-
 		// randomFile = new RandomAccessFile(this.strFileName, pstrAccessMode);
 		randomFile = new RandomAccessFile(this, pstrAccessMode);
 		FileChannel channel = randomFile.getChannel();
@@ -1932,9 +1819,8 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 		else {
 			flgFileIsLocked = true;
 		}
-
 		if (flgFileIsLocked == true) {
-			String JSH_I_0160 = "JSH_I_0160";  // "File locked: %1$s";
+			String JSH_I_0160 = "JSH_I_0160"; // "File locked: %1$s";
 			message(String.format(JSH_I_0160, strFileName));
 		}
 		return flgFileIsLocked;
@@ -1952,19 +1838,14 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 * @throws Exception
 	 */
 	public boolean doLock() throws Exception {
-
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::doLock";
-
 		return this.doLock("rw");
 	} // private boolean doLock
 
 	public boolean doUnlock() throws IOException {
-
 		final String conMethodName = conClassName + "::doUnlock";
-
 		if (randomFile != null) {
-
 			try {
 				if (fleLock != null) {
 					fleLock.release();
@@ -1978,7 +1859,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 			flgFileIsLocked = false;
 			message(String.format(JSH_I_0150, strFileName));
 		}
-
 		return true;
 	} // private boolean doUnlock
 
@@ -1993,10 +1873,8 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 * @return
 	 */
 	public boolean isLocked() {
-
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::isLocked";
-
 		boolean flgIsLocked = false;
 		if (randomFile != null) {
 			flgIsLocked = flgFileIsLocked;
@@ -2005,22 +1883,17 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	} // private boolean isLocked
 
 	public boolean setExclusive(final boolean pflgIsExclusive) throws IOException {
-
 		final String conMethodName = conClassName + "::setExclusive";
-
 		if (flgIsExclusive == true && pflgIsExclusive == false) {
 			//
 			this.doReleaseExclusive();
 			return flgIsExclusive;
 		}
-
 		flgIsExclusive = pflgIsExclusive;
 		if (flgIsExclusive == true) {
 			if (this.checkExclusiveDeny() == false) {
-
 				// String localHost = InetAddress.getLocalHost().getHostName();
 				InetAddress ia = InetAddress.getLocalHost();
-
 				String strUserName = System.getProperty("user.name");
 				JSDataElementTimeStampISO tstIso = new JSDataElementTimeStampISO(new JSDataElementDate(new Date()));
 				String strValues = strFileName + ";" + strUserName + ";" + tstIso.FormattedValue() + ";" + ia.getHostAddress();
@@ -2029,7 +1902,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 				fleExclusiveFile.close();
 			}
 		}
-
 		return flgIsExclusive;
 	} // private boolean setExclusive
 
@@ -2045,13 +1917,11 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 * @throws IOException
 	 */
 	private boolean checkExclusiveDeny() throws IOException {
-
 		final String conMethodName = conClassName + "::checkExclusiveDeny";
-
 		boolean flgExclusiveDeny = false;
 		String strExclusiveFileNameExtension = System.getProperty(conPropertySOS_JSFILE_EXTENSION_4_EXCLUSIVEFILE, "~");
-		fleExclusiveFile = new JSFile(strFileName + strExclusiveFileNameExtension);
-		if (fleExclusiveFile.exists()) {
+		File _fleExclusiveFile = new JSFile(strFileName + strExclusiveFileNameExtension);
+		if (_fleExclusiveFile != null && _fleExclusiveFile.exists()) {
 			/**
 			 * exclusive-file exists. check, who is the owner.
 			 * If the current user is not the owner, we must deny the request.
@@ -2068,30 +1938,27 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 				}
 			}
 		}
-
+		else {
+			_fleExclusiveFile = null;
+		}
 		return flgExclusiveDeny;
 	} // private boolean checkExclusiveDeny
 
 	private void doReleaseExclusive() {
-
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::doReleaseExclusive";
-
-		flgIsExclusive = false;
-		if (fleExclusiveFile != null) {
+		if (flgIsExclusive == true && fleExclusiveFile != null) {
 			fleExclusiveFile.delete();
 			fleExclusiveFile = null;
+			flgIsExclusive = false;
 		}
 	} // private void doReleaseExclusive
 
 	public String toXml() {
-
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::toXml";
-
 		String strXml = String.format("<file name='%1$s' size='%2$d' modificationdate='%3$s' />", this.getAbsolutePath(), fleFile.length(),
 				new Date(fleFile.lastModified()));
-
 		return strXml;
 	} // private String toXml
 
@@ -2120,14 +1987,11 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	*
 	 */
 	public String getUniqueFileName() {
-
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::getUniqueFileName";
-
 		String strUniqueFileName = strFileName;
 		String strE = getFileExtensionName();
 		String strF = getName();
-
 		if (this.exists() == true) {
 			for (int i = 2;; i++) {
 				String strN = "(" + String.valueOf(i) + ")";
@@ -2142,9 +2006,7 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 				}
 			}
 		}
-
 		return strUniqueFileName;
-
 	} // private String getUniqueFileName
 
 	/**
@@ -2158,24 +2020,21 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	* \see http://stackoverflow.com/questions/941272/how-do-i-trim-a-file-extension-from-a-string-in-java
 	 */
 	public String removeFileNameExtension() {
-
-//	    String separator = System.getProperty("file.separator");
-	    String filename = strFileName;
-
-	    // Remove the path upto the filename.
-	    int lastSeparatorIndex = strFileName.lastIndexOf(separator);
-	    if (lastSeparatorIndex != -1) {
-	        filename = strFileName.substring(lastSeparatorIndex + 1);
-	    }
-
-	    // Remove the extension.
-	    int extensionIndex = filename.lastIndexOf(".");
-	    if (extensionIndex != -1) {
-		    filename = filename.substring(0, extensionIndex);
-	    }
-
-	    return filename;
+		//	    String separator = System.getProperty("file.separator");
+		String filename = strFileName;
+		// Remove the path upto the filename.
+		int lastSeparatorIndex = strFileName.lastIndexOf(separator);
+		if (lastSeparatorIndex != -1) {
+			filename = strFileName.substring(lastSeparatorIndex + 1);
+		}
+		// Remove the extension.
+		int extensionIndex = filename.lastIndexOf(".");
+		if (extensionIndex != -1) {
+			filename = filename.substring(0, extensionIndex);
+		}
+		return filename;
 	}
+
 	/**
 	 * 
 	*
@@ -2188,7 +2047,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 	 */
 	public String getFileExtensionName() {
 		String strRet = "";
-
 		int intIdx = strFileName.lastIndexOf(".");
 		if (intIdx == -1) {
 			return "";
@@ -2198,7 +2056,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 			int intExtensionLength = strFileName.length() - intIdx;
 			strRet = strFileName.substring(intFL - intExtensionLength, intFL);
 		}
-
 		return strRet;
 	}
 
