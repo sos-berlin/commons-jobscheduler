@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.sos-berlin</groupId>
         <artifactId>jobscheduler</artifactId>
-        <version>1.8.3-SNAPSHOT</version>
+        <version>1.8.4-SNAPSHOT</version>
     </parent>
 
     <groupId>com.sos-berlin.jobscheduler</groupId>
@@ -24,6 +24,7 @@
         <dependency>
             <groupId>com.sos.scheduler.engine</groupId>
             <artifactId>kernel</artifactId>
+            <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
