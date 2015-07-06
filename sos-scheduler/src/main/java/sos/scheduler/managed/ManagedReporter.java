@@ -138,14 +138,20 @@ public class ManagedReporter {
 		String mailPassword="";
 		try{
 			Properties spoolProp = getJobSettings().getSection("spooler");
+			Properties smtpProp = getJobSettings().getSection("smtp");
 			mailServer = spoolProp.getProperty("smtp");
 			logMailFrom = spoolProp.getProperty("log_mail_from");
-			mailUser = spoolProp.getProperty("mail.smtp.user");
-			mailPassword = spoolProp.getProperty("mail.smtp.password");
-			//mailServer = spooler_log.mail().smtp();
-			//getLogger().debug9("mail().smtp():"+mailServer);
-			//logMailFrom = spooler_log.mail().from();
-			//getLogger().debug9("mail().from():"+logMailFrom);
+			
+			mailUser = smtpProp.getProperty("mail.smtp.user");
+			if (mailUser.equals("")){
+				mailUser = spoolProp.getProperty("mail.smtp.user");
+			}
+			mailPassword = smtpProp.getProperty("mail.smtp.password");
+			if (mailPassword.equals("")){
+				mailPassword = spoolProp.getProperty("mail.smtp.password");
+			}
+			
+ 			 
 		} catch (Exception e){}
 		boolean hasSOSMailOrder = false;
 		if (job.getConnection()!=null){
@@ -189,7 +195,7 @@ public class ManagedReporter {
 					mail.setUser(mailUser);
 				}
 				if (mailPassword!=null){
-					getLogger().debug9("Setting mail password");
+					getLogger().debug9("Setting mail password xxxxxxxx");
 					mail.setPassword(mailPassword);
 				}
 				mail.setCharset("ISO-8859-1");		
