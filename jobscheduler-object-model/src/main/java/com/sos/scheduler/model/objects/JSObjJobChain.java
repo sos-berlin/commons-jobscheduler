@@ -60,7 +60,8 @@ public class JSObjJobChain extends JobChain {
 	@SuppressWarnings("unused") private final Logger		logger									= Logger.getLogger(this.getClass());
 	public final static String								fileNameExtension						= ".job_chain.xml";
 	public static final String								conFileNameExtension4NodeParameterFile	= ".config.xml";
-	private Hashtable<String, JobChainNode> jobChainNodes;
+    private Hashtable<String, JobChainNode> jobChainNodes;
+    private Hashtable<String, FileOrderSink> jobChainFileSinks;
 	private Graph graph;
 	private FileType graphVizImageType=FileType.png;
 	private String dotOutputPath="./";
@@ -351,14 +352,23 @@ public class JSObjJobChain extends JobChain {
         e.getEdgeProperties().setArrowSize(0.5);
         e.getEdgeProperties().setFontSize(8);
         e.getEdgeProperties().setFontName("Arial");        
-                 
-        if (jobChainNodes.get(to) == null){
-           Node nNotExist = graph.getNodeOrNull(to);
+
+        
+        if (jobChainFileSinks.get(to) != null){
+           Node nFileSink = graph.getNodeOrNull(to);
            String strH = "<b>" + escapeHTML(to) + "</b>" + conHtmlBR;
-           strH += "<i><font point-size=\"8\" color=\"red\" >missing</font></i>" + conHtmlBR;
-           nNotExist.getSingleNodeProperties().setLabel(strH);
-           nNotExist.getSingleNodeProperties().setFillcolor(SVGColor.lightgray); 
-           }
+           strH += "<i><font point-size=\"8\" color=\"darkblue\" >File Sink</font></i>" + conHtmlBR;
+           nFileSink.getSingleNodeProperties().setLabel(strH);
+           nFileSink.getSingleNodeProperties().setFillcolor(SVGColor.beige); 
+        }else{ 
+            if (jobChainNodes.get(to) == null){
+               Node nNotExist = graph.getNodeOrNull(to);
+               String strH = "<b>" + escapeHTML(to) + "</b>" + conHtmlBR;
+               strH += "<i><font point-size=\"8\" color=\"red\" >missing</font></i>" + conHtmlBR;
+               nNotExist.getSingleNodeProperties().setLabel(strH);
+               nNotExist.getSingleNodeProperties().setFillcolor(SVGColor.lightgray); 
+               }
+        }
         return e;
     }
     
@@ -460,18 +470,34 @@ public class JSObjJobChain extends JobChain {
 		
         //reading states in Hashmap for exist checking
         jobChainNodes = new Hashtable<String, JobChainNode>();
+        jobChainFileSinks = new Hashtable<String, FileOrderSink>();
+        
         String firstState = "";
 		for (Object jobChainNodeItem : jobchain.getJobChainNodeOrFileOrderSinkOrJobChainNodeEnd()) {
-			if (jobChainNodeItem instanceof JobChainNode) {
-				JobChainNode jobChainNode = (JobChainNode) jobChainNodeItem;
+            if (jobChainNodeItem instanceof FileOrderSink ) {
+
+                FileOrderSink fileOrderSink = (FileOrderSink) jobChainNodeItem;
                  
-				String state = jobChainNode.getState();
-				if (firstState.length() <= 0) {
-					firstState = state;
-				}
-				if (jobChainNodes.get(state) == null) {
-					jobChainNodes.put(state, jobChainNode);
-				}
+                String state = fileOrderSink.getState();
+                if (firstState.length() <= 0) {
+                    firstState = state;
+                }
+                if (jobChainFileSinks.get(state) == null) {
+                    jobChainFileSinks.put(state, fileOrderSink);
+                }
+            }
+
+		    
+		    if (jobChainNodeItem instanceof JobChainNode ) {
+                JobChainNode jobChainNode = (JobChainNode) jobChainNodeItem;
+                 
+                String state = jobChainNode.getState();
+                if (firstState.length() <= 0) {
+                    firstState = state;
+                }
+                if (jobChainNodes.get(state) == null) {
+                    jobChainNodes.put(state, jobChainNode);
+                }
 			}
 		}
 	 
@@ -577,11 +603,14 @@ public class JSObjJobChain extends JobChain {
                         eErrorState.getEdgeProperties().setConstraint(true);
                         eErrorState.getEdgeProperties().setStyle(Style.dotted);
 
-                        Node nErrorState = graph.getNodeOrNull(errorState);
-                        nErrorState.getSingleNodeProperties().setLabel(errorState);
-                        nErrorState.getSingleNodeProperties().setColor(SVGColor.blue);
-                        nErrorState.getSingleNodeProperties().setFillcolor(SVGColor.yellow);
-                        nErrorState.getSingleNodeProperties().setFontcolor(SVGColor.blue);
+                        
+                        if (jobChainFileSinks.get(errorState) == null){
+                            Node nErrorState = graph.getNodeOrNull(errorState);
+                            nErrorState.getSingleNodeProperties().setLabel(errorState);
+                            nErrorState.getSingleNodeProperties().setColor(SVGColor.blue);
+                            nErrorState.getSingleNodeProperties().setFillcolor(SVGColor.yellow);
+                            nErrorState.getSingleNodeProperties().setFontcolor(SVGColor.blue);
+                        }
 	                        
 	                 }
                  }
