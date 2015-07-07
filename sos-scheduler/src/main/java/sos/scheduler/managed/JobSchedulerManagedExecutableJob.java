@@ -87,11 +87,11 @@ public class JobSchedulerManagedExecutableJob extends JobSchedulerManagedJob {
 				getLogger().debug9("setting 'command_script' value from script tag of job: " + commandScript);
 				
 				if (orderJob) {
-					command = JobSchedulerManagedObject.getOrderCommand(this.getConnection(), this, commandScript);
+					command = JobSchedulerManagedObject.getOrderCommand(this, commandScript);
 					order = spooler_task.order();
 				}
 				if (command == null || command.trim().length() == 0) {
-					command = JobSchedulerManagedObject.getJobCommand(this.getConnection(), this);
+					command = JobSchedulerManagedObject.getJobCommand(this);
 				}
 
 				// overidden for custom implementation

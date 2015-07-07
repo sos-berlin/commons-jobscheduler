@@ -3,11 +3,12 @@ package sos.scheduler.job;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.Vector;
@@ -15,13 +16,11 @@ import java.util.Vector;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpConnectionManager;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
-import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 
 import sos.spooler.Order;
 import sos.spooler.Variable_set;
-
 import sos.util.SOSFile;
 
 
@@ -182,14 +181,12 @@ public class JobSchedulerHttpPostJob extends JobSchedulerJob {
             getLogger().debug8("merging parameters...");
             mergedVariables = spooler.create_variable_set();
             
-            Variable_set env = spooler_task.create_subprocess().env();
-            //this merge doesn't work:
-            //mergedVariables.merge(env);
-            String[] envVars = env.names().split(";");
-            for (int i =0; i<envVars.length; i++){
-            	String currentName = envVars[i];
-            	mergedVariables.set_var(currentName, env.value(currentName));
-            }
+            Map<String, String> env = System.getenv();
+            
+            for (Entry<String, String> envVar : env.entrySet()) {
+            	mergedVariables.set_var(envVar.getKey(), envVar.getValue());
+			}
+            
             mergedVariables.merge(spooler_task.params());            
             // classic or order driven
             if (spooler_task.job().order_queue() == null) {

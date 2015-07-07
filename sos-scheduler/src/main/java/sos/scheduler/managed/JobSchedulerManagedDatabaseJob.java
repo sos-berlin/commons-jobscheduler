@@ -162,7 +162,7 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 							orderPayload.var(conParameterSCHEDULER_ORDER_SCHEMA));
 				}
 				else {
-					localConnection = JobSchedulerManagedObject.getOrderConnection(this.getConnection(), this);
+					localConnection = JobSchedulerManagedObject.getOrderConnection(this);
 					localConnection.connect();
 				}
 			}
@@ -179,11 +179,11 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 			
 				
 				if (orderJob){
-					command = JobSchedulerManagedObject.getOrderCommand(this.getConnection(), this, commandScript );
+					command = JobSchedulerManagedObject.getOrderCommand(this, commandScript );
 				}
 				
 				if (command == null || command.length() == 0) {
-					command = JobSchedulerManagedObject.getJobCommand(this.getConnection(), this);
+					command = JobSchedulerManagedObject.getJobCommand(this);
 				}
 
 				if (command == null || command.length() == 0){
@@ -304,12 +304,13 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 			if (userJob) {
 				closeUserConnection(localConnection);
 				updateRunTime(order, getLogger(), getConnection());
+				try {
+					getConnection().commit();
+				}
+				catch (Exception e) {
+				}
 			}
-			try {
-				getConnection().commit();
-			}
-			catch (Exception e) {
-			}
+			
 		}
 	}
 

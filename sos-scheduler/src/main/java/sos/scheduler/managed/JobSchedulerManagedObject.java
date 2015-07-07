@@ -53,10 +53,7 @@ public class JobSchedulerManagedObject {
 	/** Tabelle der persistenten Auftragsparameter */
 	private static String		tableManagedOrderParameters			= "SCHEDULER_MANAGED_ORDER_PARAMETERS";
 
-	/** Tabelle der Datenbankverbindungen */
-	private static String		tableManagedConnections				= "SCHEDULER_MANAGED_CONNECTIONS";
-
-	/** Tabelle der Job-Typen */
+		/** Tabelle der Job-Typen */
 	private static String		tableManagedJobTypes				= "SCHEDULER_MANAGED_JOB_TYPES";
 
 	/** Tabelle der Jobs */
@@ -173,20 +170,7 @@ public class JobSchedulerManagedObject {
 		JobSchedulerManagedObject.tableWorkflowPackages = tableWorkflowPackages;
 	}
 
-	/**
-	 * @return Returns the tableManagedConnections.
-	 */
-	public static String getTableManagedConnections() {
-		return tableManagedConnections;
-	}
-
-	/**
-	 * @param tableManagedConnections The tableManagedConnections to set.
-	 */
-	public static void setTableManagedConnections(final String tableManagedConnections) {
-		JobSchedulerManagedObject.tableManagedConnections = tableManagedConnections;
-	}
-
+	
 	/**
 	 * @return Returns the tableManagedJobs.
 	 */
@@ -238,15 +222,14 @@ public class JobSchedulerManagedObject {
 	 * noch connect() und später disconnect() aufgerufen werden.
 	 * @throws Exception
 	 */
-	public static SOSConnection getOrderConnection(final SOSConnection connection, final Job_impl job) throws Exception {
+	public static SOSConnection getOrderConnection(final Job_impl job) throws Exception {
 
 		SOSConnection localConnection = null;
 		Order order = null;
 
-		boolean useManagedConnection = true;
-		// boolean flgOperationWasSuccessful = false;
-		HashMap result = null;
-		String spoolerId = job.spooler.id().toLowerCase();
+		
+		HashMap<String, String> result = null;
+		
 		Variable_set taskParams = job.spooler_task.params();
 		Variable_set orderPayload = null;
 
@@ -262,69 +245,13 @@ public class JobSchedulerManagedObject {
 			mergedParams.merge(orderPayload);
 		}
 		String connectionName = mergedParams.var(conParameterDATABASE_CONNECTION);
+		result = new HashMap<String, String>();
+		result.put("class", mergedParams.var("db_class"));
+		result.put("driver", mergedParams.var("db_driver"));
+		result.put("url", mergedParams.var("db_url"));
+		result.put("username", mergedParams.var("db_user"));
+		result.put("password", mergedParams.var("db_password"));
 
-		// check if job uses ProcessDatabaseJob Parameters:
-		if (mergedParams.var("db_class").length() > 0 && mergedParams.var("db_driver").length() > 0 && mergedParams.var("db_url").length() > 0) {
-			useManagedConnection = false;
-		}
-		if (job.spooler_task.job().order_queue() != null && useManagedConnection) {
-			String jobChain = order.job_chain().name();
-			// String jobChainModel = "";
-			String orderId = getOrderIdInTable(spoolerId, jobChain, order);
-
-			job.spooler_log.debug3("Connection from payload:" + connectionName);
-
-			if (managedVersion.equalsIgnoreCase("1")) {
-				if (connectionName == null || connectionName.length() == 0) {
-					connectionName = connection.getSingleValue("SELECT \"CONNECTION\" FROM " + getTableManagedOrders() + " WHERE \"SPOOLER_ID\"='" + spoolerId
-							+ "' AND \"JOB_CHAIN\"='" + jobChain + "'" + " AND \"ORDER_ID\"='" + orderId + "'");
-				}
-
-				if (connectionName == null || connectionName.length() == 0) {
-					connectionName = connection.getSingleValue("SELECT \"CONNECTION\" FROM " + getTableManagedOrders()
-							+ " WHERE \"SPOOLER_ID\" IS NULL AND \"JOB_CHAIN\"='" + jobChain + "' AND " + "\"ORDER_ID\"='" + orderId + "'");
-				}
-
-				/*
-				 if (connectionName == null || connectionName.length() == 0) {
-				 jobChainModel = connection.getSingleValue("SELECT \"ID\" FROM " + getTableManagedModels() +
-				 " WHERE \"NAME\"='" + jobChain + "'");
-				 
-				 if (jobChainModel == null || jobChainModel.length() == 0)
-				 throw (new Exception("no model found for job chain [" + jobChain + "]of managed order: " + orderId));
-				 }
-				 */
-			}
-
-		}
-
-		if (managedVersion.equalsIgnoreCase("1") && useManagedConnection) {
-			if (connectionName == null || connectionName.length() == 0) {
-				connectionName = connection.getSingleValue("SELECT \"CONNECTION\" FROM " + getTableManagedJobs() + " WHERE \"SPOOLER_ID\"='" + spoolerId
-						+ "' AND \"JOB_NAME\"='" + job.spooler_job.name() + "'");
-			}
-
-			if (connectionName == null || connectionName.length() == 0) {
-				connectionName = connection.getSingleValue("SELECT \"CONNECTION\" FROM " + getTableManagedJobs() + " WHERE \"SPOOLER_ID\" IS NULL AND "
-						+ "\"JOB_NAME\"='" + job.spooler_job.name() + "'");
-			}
-		}
-
-		if (useManagedConnection) {
-			if (connectionName == null || connectionName.length() == 0)
-				throw new Exception("no database connection identifier found for managed order");
-
-			result = connection.getSingle("SELECT \"DRIVER\", \"CLASS\", \"URL\", \"USERNAME\", \"PASSWORD\", \"CONNECTION\" FROM "
-					+ JobSchedulerManagedObject.getTableManagedConnections() + " WHERE \"CONNECTION\"='" + connectionName + "'");
-		}
-		else {
-			result = new HashMap();
-			result.put("class", mergedParams.var("db_class"));
-			result.put("driver", mergedParams.var("db_driver"));
-			result.put("url", mergedParams.var("db_url"));
-			result.put("username", mergedParams.var("db_user"));
-			result.put("password", mergedParams.var("db_password"));
-		}
 
 		if (result.isEmpty())
 			throw new Exception("no connection settings found for managed connection: " + connectionName);
@@ -343,147 +270,7 @@ public class JobSchedulerManagedObject {
 		return localConnection;
 	}
 
-	/**
-	 * Gibt ein Connection Object zurück, welches die Job-spezifische Verbindung darstellt
-	 * @param connection Connection, die benutzt wird, um die Daten für die neue Connection zu finden
-	 * @param spoolerId ID des Schedulers
-	 * @param jobName Name des Jobs
-	 * @param log SOSLogger für Logging der Datenbankverbindung
-	 * @return Connection, die zum Job gehört. Diese ist noch nicht initialisiert, es müssen also
-	 * noch connect() und später disconnect() aufgerufen werden.
-	 * @throws Exception
-	 */
-	public static SOSConnection getJobConnection(final SOSConnection connection, final String spoolerId, final String jobName, SOSLogger log) throws Exception {
-		SOSConnection localConnection;
-		String connectionName = "";
-		HashMap result = null;
-		if (log == null)
-			log = new SOSStandardLogger(SOSLogger.INFO);
-
-		if (connectionName == null || connectionName.length() == 0) {
-			connectionName = connection.getSingleValue("SELECT \"CONNECTION\" FROM " + getTableManagedJobs() + " WHERE \"SPOOLER_ID\"='" + spoolerId
-					+ "' AND \"JOB_NAME\"='" + jobName + "'");
-		}
-
-		if (connectionName == null || connectionName.length() == 0) {
-			connectionName = connection.getSingleValue("SELECT \"CONNECTION\" FROM " + getTableManagedJobs() + " WHERE \"SPOOLER_ID\" IS NULL AND "
-					+ "\"JOB_NAME\"='" + jobName + "'");
-		}
-
-		if (connectionName == null || connectionName.length() == 0)
-			throw new Exception("no database connection identifier found for managed job");
-
-		result = connection.getSingle("SELECT \"DRIVER\", \"CLASS\", \"URL\", \"USERNAME\", \"PASSWORD\", \"CONNECTION\" FROM "
-				+ JobSchedulerManagedObject.getTableManagedConnections() + " WHERE \"CONNECTION\"='" + connectionName + "'");
-		if (result.isEmpty())
-			throw new Exception("no connection settings found for managed connection: " + connectionName);
-
-		try {
-			if (log != null) {
-				log.debug6("..creating local connection object");
-
-				localConnection = SOSConnection.createInstance(result.get("class").toString(), result.get("driver").toString(), result.get("url").toString(),
-						result.get("username").toString(), result.get("password").toString(), log);
-			}
-			else {
-				localConnection = SOSConnection.createInstance(result.get("class").toString(), result.get("driver").toString(), result.get("url").toString(),
-						result.get("username").toString(), result.get("password").toString());
-			}
-
-		}
-		catch (Exception e) {
-			throw new Exception("error occurred establishing database connection: " + e.getMessage());
-		}
-
-		return localConnection;
-
-	}
-
-	/**
-	 * Gibt ein Connection Object zurück, welches die Job-spezifische Verbindung darstellt
-	 * @param connection Connection, die benutzt wird, um die Daten für die neue Connection zu finden
-	 * @param spoolerId ID des Schedulers
-	 * @param jobChain Name der Jobchain
-	 * @param order Id des Auftrags (order.id())
-	 * @param databaseConnection Identifizierer der Datenbankverbindung aus
-	 * @return Connection, die zum Job gehört. Diese ist noch nicht initialisiert, es müssen also
-	 * noch connect() und später disconnect() aufgerufen werden.
-	 * @throws Exception
-	 */
-	public static SOSConnection getOrderConnection(final SOSConnection connection, final String spoolerId, final String jobChain, final String order, final String databaseConnection)
-			throws Exception {
-		return getOrderConnection(connection, spoolerId, jobChain, order, databaseConnection, null);
-	}
-
-	/**
-	 * Gibt ein Connection Object zurück, welches die Job-spezifische Verbindung darstellt
-	 * @param connection Connection, die benutzt wird, um die Daten für die neue Connection zu finden
-	 * @param spoolerId ID des Schedulers
-	 * @param jobChain Name der Jobchain
-	 * @param order Id des Auftrags (order.id())
-	 * @param databaseConnection Identifizierer der Datenbankverbindung aus 
-	 * @param log SOSLogger für Logging der Datenbankverbindung (aus order.payload.value("database_connection") in javascript)
-	 * @return Connection, die zum Job gehört. Diese ist noch nicht initialisiert, es müssen also
-	 * noch connect() und später disconnect() aufgerufen werden.
-	 * @throws Exception
-	 */
-	public static SOSConnection getOrderConnection(final SOSConnection connection, final String spoolerId, final String jobChain, final String order, final String databaseConnection,
-			SOSLogger log) throws Exception {
-
-		SOSConnection localConnection;
-		String connectionName = "";
-		String jobChainModel = "";
-		HashMap result = null;
-
-		if (log == null)
-			log = new SOSStandardLogger(SOSLogger.INFO);
-		String orderId = getOrderIdInTable(spoolerId, jobChain, order);
-
-		connectionName = databaseConnection;
-
-		if (log != null)
-			log.debug3("Connection from payload:" + connectionName);
-
-		if (connectionName == null || connectionName.length() == 0) {
-			connectionName = connection.getSingleValue("SELECT \"CONNECTION\" FROM " + getTableManagedOrders() + " WHERE \"SPOOLER_ID\"='" + spoolerId
-					+ "' AND \"JOB_CHAIN\"='" + jobChain + "'" + " AND \"ORDER_ID\"='" + orderId + "'");
-		}
-
-		if (connectionName == null || connectionName.length() == 0) {
-			connectionName = connection.getSingleValue("SELECT \"CONNECTION\" FROM " + getTableManagedOrders()
-					+ " WHERE \"SPOOLER_ID\" IS NULL AND \"JOB_CHAIN\"='" + jobChain + "' AND " + "\"ORDER_ID\"='" + orderId + "'");
-		}
-
-		if (connectionName == null || connectionName.length() == 0) {
-			jobChainModel = connection.getSingleValue("SELECT \"ID\" FROM " + getTableManagedModels() + " WHERE \"NAME\"='" + jobChain + "'");
-
-			if (jobChainModel == null || jobChainModel.length() == 0)
-				throw new Exception("no model found for job chain [" + jobChain + "]of managed order: " + orderId);
-		}
-
-		result = connection.getSingle("SELECT \"DRIVER\", \"CLASS\", \"URL\", \"USERNAME\", \"PASSWORD\", \"CONNECTION\" FROM "
-				+ JobSchedulerManagedObject.getTableManagedConnections() + " WHERE \"CONNECTION\"='" + connectionName + "'");
-		if (result.isEmpty())
-			throw new Exception("no connection settings found for managed connection: " + connectionName);
-
-		try {
-			if (log != null) {
-				log.debug6("..creating local connection object");
-
-				localConnection = SOSConnection.createInstance(result.get("class").toString(), result.get("driver").toString(), result.get("url").toString(),
-						result.get("username").toString(), result.get("password").toString(), log);
-			}
-			else {
-				localConnection = SOSConnection.createInstance(result.get("class").toString(), result.get("driver").toString(), result.get("url").toString(),
-						result.get("username").toString(), result.get("password").toString());
-			}
-		}
-		catch (Exception e) {
-			throw new Exception("error occurred establishing database connection: " + e);
-		}
-
-		return localConnection;
-	}
+		
 
 	/**
 	 * returns the job-specific command
@@ -492,7 +279,7 @@ public class JobSchedulerManagedObject {
 	 * 
 	 * @throws Exception
 	 */
-	public static String getJobCommand(final SOSConnection connection, final Job_impl job) throws Exception {
+	public static String getJobCommand(final Job_impl job) throws Exception {
 
 		String command = "";
 		try {
@@ -510,27 +297,7 @@ public class JobSchedulerManagedObject {
 				command = new String(fromHexString(command), "US-ASCII");
 			return command;
 		}
-		try {
-			String managedVersion = job.spooler.var(conParameterSCHEDULER_MANAGED_JOBS_VERSION);
-			if (managedVersion == null || managedVersion.length() == 0)
-				managedVersion = "1";
-			job.spooler_log.debug6("scheduler_managed_jobs_version: " + managedVersion);
-
-			if (managedVersion.equalsIgnoreCase("1")) {
-				if (job.spooler.id() != null && job.spooler.id().length() > 0) {
-					command = connection.getClob("SELECT \"COMMAND\" FROM " + getTableManagedJobs() + " WHERE \"SPOOLER_ID\"='"
-							+ job.spooler.id().toLowerCase() + "'" + " AND \"JOB_NAME\"='" + job.spooler_job.name() + "'");
-				}
-
-				if (command == null || command.length() == 0) {
-					command = connection.getClob("SELECT \"COMMAND\" FROM " + getTableManagedJobs() + " WHERE \"SPOOLER_ID\" IS NULL" + " AND \"JOB_NAME\"='"
-							+ job.spooler_job.name() + "'");
-				}
-			}
-		}
-		catch (Exception e) {
-		}
-
+		
 		job.spooler_log.debug3("job command: " + command);
 
 		return command;
@@ -543,7 +310,7 @@ public class JobSchedulerManagedObject {
 	 * 
 	 * @throws Exception
 	 */
-	public static String getOrderCommand(final SOSConnection connection, final Job_impl job, String commandScript) throws Exception {
+	public static String getOrderCommand(final Job_impl job, String commandScript) throws Exception {
 
 		job.spooler_log.debug9("entered getOrderCommand()...");
 		Order order = job.spooler_task.order();
@@ -583,26 +350,7 @@ public class JobSchedulerManagedObject {
 				command = new String(fromHexString(command), "US-ASCII");
 		}
 
-		try {
-			String managedVersion = job.spooler.var(conParameterSCHEDULER_MANAGED_JOBS_VERSION);
-			if (managedVersion == null || managedVersion.length() == 0)
-				managedVersion = "1";
-			job.spooler_log.debug6("scheduler_managed_jobs_version: " + managedVersion);
-			if ((command == null || command.length() == 0) && managedVersion.equalsIgnoreCase("1")) {
-				job.spooler_log.debug9("trying to get Command from table " + getTableManagedOrders() + " ...");
-				if (!order.id().startsWith("-")) {
-					command = connection.getClob("SELECT \"COMMAND\" FROM " + getTableManagedOrders() + " WHERE \"SPOOLER_ID\"='"
-							+ job.spooler.id().toLowerCase() + "' AND \"JOB_CHAIN\"='" + order.job_chain().name() + "'" + " AND \"ORDER_ID\"='" + orderID + "'");
-				}
-				else {
-					command = connection.getClob("SELECT \"COMMAND\" FROM " + getTableManagedOrders() + " WHERE \"SPOOLER_ID\" IS NULL AND \"JOB_CHAIN\"='"
-							+ order.job_chain().name() + "'" + " AND \"ORDER_ID\"='" + orderID + "'");
-				}
-			}
-		}
-		catch (Exception e) {
-		}
-
+		
 		job.spooler_log.debug3("order command: " + command);
 		//job.spooler_log.debug3("command.lentgh: "+ command.length());
 
