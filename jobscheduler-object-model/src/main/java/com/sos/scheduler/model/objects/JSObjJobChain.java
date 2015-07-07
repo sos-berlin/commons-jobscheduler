@@ -353,11 +353,11 @@ public class JSObjJobChain extends JobChain {
         e.getEdgeProperties().setFontSize(8);
         e.getEdgeProperties().setFontName("Arial");        
 
-        
+        //Handling File_Order_Sinks
         if (jobChainFileSinks.get(to) != null){
            Node nFileSink = graph.getNodeOrNull(to);
            String strH = "<b>" + escapeHTML(to) + "</b>" + conHtmlBR;
-           strH += "<i><font point-size=\"8\" color=\"darkblue\" >File Sink</font></i>" + conHtmlBR;
+           strH += "<i><font point-size=\"8\" color=\"blue\" >File Sink</font></i>" + conHtmlBR;
            nFileSink.getSingleNodeProperties().setLabel(strH);
            nFileSink.getSingleNodeProperties().setFillcolor(SVGColor.beige); 
         }else{ 
@@ -437,6 +437,7 @@ public class JSObjJobChain extends JobChain {
         graph.getGlobalNodeProperties().setStyle(Style.rounded + "," + Style.filled);
         graph.getGlobalNodeProperties().setFillcolor(SVGColor.azure);
         graph.getGlobalNodeProperties().setFontname("Arial");
+        
  		 
 	    graph.getGraphProperties().setRatio("auto");
 	 
