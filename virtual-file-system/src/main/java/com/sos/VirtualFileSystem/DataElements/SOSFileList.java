@@ -505,7 +505,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 		dteTransactionEnd.setParsePattern(JSDateFormat.dfTIMESTAMPS);
 		dteTransactionEnd.Value(Now());
 //		this.sendTransferHistory();
-		this.WriteHistory();
+		this.writeTransferHistory();
 		CreateResultSetFile();
 	} // private void EndTransaction
 
@@ -574,40 +574,40 @@ public class SOSFileList extends SOSVfsMessageCodes {
 		// renameAtomic, 3) DeleteSource, 4) deleteOnly, 5) renameOnly
 		// TODO löschen der Dateien mit Atomic-Prefix und -Suffix auf dem Target
 		if (objOptions.isAtomicTransfer()) {
-			for (SOSFileListEntry objListItem : objFileListEntries) {
-				String strAtomicFileName = objListItem.getAtomicFileName();
-				if (strAtomicFileName.isEmpty()) {
+			for (SOSFileListEntry entry : objFileListEntries) {
+				entry.setStatus(enuTransferStatus.transfer_aborted);
+				
+				String atomicFileName = entry.getAtomicFileName();
+				if (atomicFileName.isEmpty()) {
 					continue;
 				}
-				strAtomicFileName = MakeFullPathName(
-						objOptions.TargetDir.Value(),
-						objListItem.getAtomicFileName());
-				if (isNotEmpty(objListItem.getAtomicFileName())) {
+				atomicFileName = MakeFullPathName(objOptions.TargetDir.Value(),	entry.getAtomicFileName());
+				if (isNotEmpty(entry.getAtomicFileName())) {
 					try {
-						ISOSVirtualFile atomicFile = objDataTargetClient.getFileHandle(strAtomicFileName);
+						ISOSVirtualFile atomicFile = objDataTargetClient.getFileHandle(atomicFileName);
 						if (atomicFile.FileExists()) {
 							atomicFile.delete();
 						}
-						String strT = SOSVfs_D_212.params(strAtomicFileName);
+						String strT = SOSVfs_D_212.params(atomicFileName);
 						logger.debug(strT);
 						objJadeReportLogger.info(strT);
-						objListItem.setAtomicFileName(EMPTY_STRING);
-						objListItem.setStatus(enuTransferStatus.setBack);
+						entry.setAtomicFileName(EMPTY_STRING);
+						entry.setStatus(enuTransferStatus.setBack);
 					} catch (Exception e) {
 						logger.error(e.getLocalizedMessage());
 					}
 				}
-				if (!objListItem.isTargetFileAlreadyExists()) {
+				if (!entry.isTargetFileAlreadyExists()) {
 					try {
-						String strTargetFilename = MakeFullPathName(objOptions.TargetDir.Value(), objListItem.TargetFileName());
+						String strTargetFilename = MakeFullPathName(objOptions.TargetDir.Value(), entry.TargetFileName());
 						ISOSVirtualFile targetFile = objDataTargetClient.getFileHandle(strTargetFilename);
 						if(targetFile.FileExists()) {
 							targetFile.delete();
 						}
-						String strT = SOSVfs_D_212.params(targetFile);
-						logger.debug(strT);
-						objJadeReportLogger.info(strT);
-						objListItem.setStatus(enuTransferStatus.setBack);
+						String msg = SOSVfs_D_212.params(targetFile);
+						logger.debug(msg);
+						objJadeReportLogger.info(msg);
+						entry.setStatus(enuTransferStatus.setBack);
 					} catch (Exception e) {
 						logger.error(e.getLocalizedMessage());
 					}
@@ -628,49 +628,59 @@ public class SOSFileList extends SOSVfsMessageCodes {
 	 */
 	private final String	newHistoryFields	= "jump_host;jump_host_ip;jump_port;jump_protocol;jump_user;modification_timestamp";
 
-	public void WriteHistory() {
+	public void writeTransferHistory() {
 		if (flgHistoryFileAlreadyWritten == true) {
 			return;
 		}
 		flgHistoryFileAlreadyWritten = true;
 		dteTransactionEnd.FormatString(JSDateFormat.dfTIMESTAMPS);
 		dteTransactionStart.FormatString(JSDateFormat.dfTIMESTAMPS);
-		long lngDuration = dteTransactionEnd.getDateObject().getTime() - dteTransactionStart.getDateObject().getTime();
-		String strWhat2Do = objOptions.operation.Value();
-		String strT = SOSVfs_D_213.params(dteTransactionStart.FormattedValue(), dteTransactionEnd.FormattedValue(), lngDuration, strWhat2Do);
-		logger.debug(strT);
-		objJadeReportLogger.info(strT);
-		String strHistoryFileName = objOptions.HistoryFileName.Value();
+		long duration = dteTransactionEnd.getDateObject().getTime() - dteTransactionStart.getDateObject().getTime();
+		String operation = objOptions.operation.Value();
+		String msg = SOSVfs_D_213.params(dteTransactionStart.FormattedValue(), dteTransactionEnd.FormattedValue(), duration, operation);
+		logger.debug(msg);
+		objJadeReportLogger.info(msg);
+		String historyFileName = objOptions.HistoryFileName.Value();
+		JSFile historyFile = null;
 		try {
 			if (objOptions.HistoryFileName.isDirty()) {
-				JSFile objTransferHistoryFile = objOptions.HistoryFileName.JSFile();
+				historyFile = objOptions.HistoryFileName.JSFile();
 				if (objOptions.HistoryFileAppendMode.isTrue()) {
-					objTransferHistoryFile.setAppendMode(true);
+					historyFile.setAppendMode(true);
 				}
-				if (objTransferHistoryFile.exists() == false) {
-					objTransferHistoryFile.WriteLine(historyFields + ";" + newHistoryFields);
+				if (historyFile.exists() == false) {
+					historyFile.WriteLine(historyFields + ";" + newHistoryFields);
 				}
-				for (SOSFileListEntry objListItem : objFileListEntries) {
+				for (SOSFileListEntry entry : objFileListEntries) {
 					// TODO  CSV or XML or Hibernate?
-					String strLine = objListItem.toCsv();
-					objTransferHistoryFile.WriteLine(strLine);
+					historyFile.WriteLine(entry.toCsv());
 					lngNoOfHistoryFileRecordsWritten++;
 				}
-				objTransferHistoryFile.close();
+				
+				logger.info(String.format("%s records written to history file '%s', HistoryFileAppendMode = %s", lngNoOfHistoryFileRecordsWritten, 
+						historyFileName,
+						objOptions.HistoryFileAppendMode.Value()));
 			}
 		}
 		catch (Exception e) {
-			throw new JobSchedulerException("Error occured during writing of transfer history file", e);
+			//throw new JobSchedulerException("Error occured during writing of transfer history file", e);
+			logger.warn(String.format("Error occured during writing of the history file: %s",e.toString()));
 		}
-		for (SOSFileListEntry objEntry : objFileListEntries) {
-			if (objEntry.TargetFileName().isEmpty() == false) {
-				strT = objEntry.toString();
-				logger.trace(strT);
-				objJadeReportLogger.info(strT);
+		finally{
+			if(historyFile != null){
+				try{
+					historyFile.close();
+				}
+				catch(Exception ex){}
 			}
 		}
-		// TODO I18N
-		logger.debug(String.format("%1$d records written to history file '%2$s'.", lngNoOfHistoryFileRecordsWritten, strHistoryFileName));
+		for (SOSFileListEntry entry : objFileListEntries) {
+			if (entry.TargetFileName().isEmpty() == false) {
+				msg = entry.toString();
+				logger.trace(msg);
+				objJadeReportLogger.info(msg);
+			}
+		}
 	}
 
 	public long size() {
