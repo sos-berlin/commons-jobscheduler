@@ -2,6 +2,7 @@
  *
  */
 package com.sos.VirtualFileSystem.DataElements;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Vector;
@@ -373,16 +374,16 @@ public class SOSFileList extends SOSVfsMessageCodes {
 	 * Parameter = objOptions.transactional.value() = yes und remove_files=yes
 	 * @throws Exception
 	 */
-	public void DeleteSourceFiles() throws Exception {
+	public void deleteSourceFiles() throws Exception {
 		if (objOptions.remove_files.isTrue()) {
-			boolean flgFilesDeleted = false;
-			for (SOSFileListEntry objListItem : objFileListEntries) {
-				if (objListItem.getTransferStatus() == enuTransferStatus.transferred) {
-					if (flgFilesDeleted == false) {
-						flgFilesDeleted = true;
+			boolean filesDeleted = false;
+			for (SOSFileListEntry entry : objFileListEntries) {
+				if (entry.getTransferStatus() == enuTransferStatus.transferred) {
+					if (filesDeleted == false) {
+						filesDeleted = true;
 						logger.debug(SOSVfs_D_208.get());
 					}
-					objListItem.DeleteSourceFile();
+					entry.DeleteSourceFile();
 				}
 			}
 		}
@@ -567,14 +568,28 @@ public class SOSFileList extends SOSVfsMessageCodes {
 	 *
 	 */
 	public void Rollback() {
+		
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::Rollback";
-		logger.info(SOSVfs_I_211.get());
-		objJadeReportLogger.info(SOSVfs_I_211.get());
+		String msg = null;
+		if(objOptions.transactional.value()){
+			msg = SOSVfs_I_211.get();
+		}
+		else{
+			msg = "Rollback aborted files.";
+		}
+		logger.info(msg);
+		objJadeReportLogger.info(msg);
+
 		// TODO check out, on which stage the process was aborted. Example: 1) source2target, 2)
 		// renameAtomic, 3) DeleteSource, 4) deleteOnly, 5) renameOnly
 		// TODO löschen der Dateien mit Atomic-Prefix und -Suffix auf dem Target
 		if (objOptions.isAtomicTransfer()) {
 			for (SOSFileListEntry entry : objFileListEntries) {
+				if (!objOptions.transactional.value()) {
+					if(entry.getTransferStatus().equals(enuTransferStatus.transferred)){
+						continue;
+					}
+				}
 				entry.setStatus(enuTransferStatus.transfer_aborted);
 				
 				String atomicFileName = entry.getAtomicFileName();
@@ -604,7 +619,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 						if(targetFile.FileExists()) {
 							targetFile.delete();
 						}
-						String msg = SOSVfs_D_212.params(targetFile);
+						msg = SOSVfs_D_212.params(targetFile);
 						logger.debug(msg);
 						objJadeReportLogger.info(msg);
 						entry.setStatus(enuTransferStatus.setBack);
@@ -614,11 +629,17 @@ public class SOSFileList extends SOSVfsMessageCodes {
 				}
 			}
 		}
-		if (objOptions.transactional.isTrue()) {
+		if (!objOptions.transactional.value()) {
+			try {
+				deleteSourceFiles();
+			} catch (Exception e) {
+				logger.error(e.toString());
+			}
 		}
 		this.EndTransaction();
 		// TODO rules, decisions and coding
 	} // private void Rollback
+	
 	/**
 	 * Felder der Historiendatei
 	 */
