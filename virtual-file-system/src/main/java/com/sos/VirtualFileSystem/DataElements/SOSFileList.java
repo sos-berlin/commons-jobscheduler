@@ -629,6 +629,14 @@ public class SOSFileList extends SOSVfsMessageCodes {
 				}
 			}
 		}
+		else{
+			for (SOSFileListEntry entry : objFileListEntries) {
+				if(entry.getTransferStatus().equals(enuTransferStatus.transferred)){
+					continue;
+				}
+				entry.setStatus(enuTransferStatus.transfer_aborted);
+			}
+		}
 		if (!objOptions.transactional.value()) {
 			try {
 				deleteSourceFiles();
