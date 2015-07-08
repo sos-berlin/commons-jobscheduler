@@ -14,8 +14,6 @@ import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.util.Base64;
 import org.apache.log4j.Logger;
 
-import ch.qos.logback.core.joran.spi.XMLUtil;
-
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionString;
 import com.sos.JSHelper.Options.SOSOptionTime;
