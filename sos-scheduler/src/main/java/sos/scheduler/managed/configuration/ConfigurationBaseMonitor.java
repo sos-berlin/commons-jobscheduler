@@ -2,10 +2,10 @@ package sos.scheduler.managed.configuration;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.StringTokenizer;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.Vector;
 import java.util.regex.Pattern;
@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -165,9 +166,6 @@ public class ConfigurationBaseMonitor extends Monitor_impl {
 	 * Initialize order configuration
 	 */
 	public void initConfiguration(final String configurationFilename1) throws Exception {
-
-		FileInputStream fis = null;
-
 		try { // to retrieve configuration from file
 			if (configurationFilename1 == null || configurationFilename1.length() == 0)
 				throw new JobSchedulerException(conClassName + ": no configuration filename was specified");
@@ -348,10 +346,10 @@ public class ConfigurationBaseMonitor extends Monitor_impl {
 
 					// add additional envvars parameter
 					if (additional_envvars != null) {
-						Iterator iter = additional_envvars.keySet().iterator();
+						Iterator<String> iter = additional_envvars.keySet().iterator();
 						String envNames = "";
 						while (iter.hasNext()) {
-							String envName = (String) iter.next();
+							String envName = iter.next();
 							envNames += envName;
 							if (iter.hasNext())
 								envNames += ";";
@@ -521,7 +519,7 @@ public class ConfigurationBaseMonitor extends Monitor_impl {
 																					// env.equalsIgnoreCase(conTRUE));
 										if (setEnv) {
 											if (additional_envvars == null)
-												additional_envvars = new TreeMap();
+												additional_envvars = new TreeMap<>();
 											additional_envvars.put(nodeMap.getNamedItem(conAttributeNameNAME).getNodeValue(), value);
 										}
 									}
@@ -682,22 +680,22 @@ public class ConfigurationBaseMonitor extends Monitor_impl {
 					if (!envVarsCaseSensitive)
 						casePrefix = "(?i)";
 					if (envvars != null) {
-						Iterator envIterator = envvars.keySet().iterator();
+						Iterator<String> envIterator = envvars.keySet().iterator();
 
 						while (envIterator.hasNext()) {
 							try {
-								Object envName = envIterator.next();
-								Object envValue = envvars.get(envName.toString());
+								String envName = envIterator.next();
+								String envValue = envvars.get(envName);
 
-								if (contains(parameterValue, conVariableStartString + envName.toString() + "}", envVarsCaseSensitive)) {
-									parameterValue = myReplaceAll(parameterValue, casePrefix + "\\$\\{" + envName.toString() + "\\}", envValue.toString()
+								if (contains(parameterValue, conVariableStartString + envName + "}", envVarsCaseSensitive)) {
+									parameterValue = myReplaceAll(parameterValue, casePrefix + "\\$\\{" + envName + "\\}", envValue
 											.replaceAll("[\\\\]", "\\\\\\\\"));
 									envFound = true;
 								}
 								else
-									if (contains(parameterValue, conVariableTypeBASENAME + envName.toString() + "}", envVarsCaseSensitive)) {
-										parameterValue = myReplaceAll(parameterValue, casePrefix + "\\$\\{basename:" + envName.toString() + "\\}", new File(
-												envValue.toString()).getName().replaceAll("[\\\\]", "\\\\\\\\"));
+									if (contains(parameterValue, conVariableTypeBASENAME + envName + "}", envVarsCaseSensitive)) {
+										parameterValue = myReplaceAll(parameterValue, casePrefix + "\\$\\{basename:" + envName + "\\}", new File(
+												envValue).getName().replaceAll("[\\\\]", "\\\\\\\\"));
 										envFound = true;
 									}
 							}
@@ -709,29 +707,29 @@ public class ConfigurationBaseMonitor extends Monitor_impl {
 					}
 
 					if (additional_envvars != null) {
-						Iterator envIterator = additional_envvars.keySet().iterator();
+						Iterator<String> envIterator = additional_envvars.keySet().iterator();
 						while (envIterator.hasNext()) {
-							Object envName = envIterator.next();
-							Object envValue = additional_envvars.get(envName.toString());
+							String envName = envIterator.next();
+							String envValue = additional_envvars.get(envName);
 							if (contains(parameterValue, conVariableStartString + envName + "}", envVarsCaseSensitive)) {
-								parameterValue = myReplaceAll(parameterValue, casePrefix + "\\$\\{" + envName.toString() + "\\}", envValue.toString()
+								parameterValue = myReplaceAll(parameterValue, casePrefix + "\\$\\{" + envName + "\\}", envValue
 										.replaceAll("[\\\\]", "\\\\\\\\"));
 								additionalEnvFound = true;
 							}
 							else
-								if (contains(parameterValue, conVariableTypeBASENAME + envName.toString() + "}", envVarsCaseSensitive)) {
-									parameterValue = myReplaceAll(parameterValue, casePrefix + "\\$\\{basename:" + envName.toString() + "\\}", new File(
-											envValue.toString()).getName().replaceAll("[\\\\]", "\\\\\\\\"));
+								if (contains(parameterValue, conVariableTypeBASENAME + envName + "}", envVarsCaseSensitive)) {
+									parameterValue = myReplaceAll(parameterValue, casePrefix + "\\$\\{basename:" + envName + "\\}", new File(
+											envValue).getName().replaceAll("[\\\\]", "\\\\\\\\"));
 									additionalEnvFound = true;
 								}
 								else
-									if (contains(parameterValue, conVariableTypeFILE_CONTENT + envName.toString() + "}", envVarsCaseSensitive)) {
-										if (envValue.toString().indexOf(conVariableStartString) != -1) {
+									if (contains(parameterValue, conVariableTypeFILE_CONTENT + envName + "}", envVarsCaseSensitive)) {
+										if (envValue.indexOf(conVariableStartString) != -1) {
 											getLogger().debug9("file_content parameter still contains other parameters.");
 											metaTrials = 0;
 										}
 										else {
-											File contentFile = new File(envValue.toString());
+											File contentFile = new File(envValue);
 											String fileContent = "";
 											try {
 												fileContent = SOSFile.readFile(contentFile);
@@ -739,7 +737,7 @@ public class ConfigurationBaseMonitor extends Monitor_impl {
 											catch (Exception e) {
 												getLogger().warn(conClassName + ": Failed to read file: " + contentFile.getAbsolutePath());
 											}
-											parameterValue = myReplaceAll(parameterValue, casePrefix + "\\$\\{file_content:" + envName.toString() + "\\}",
+											parameterValue = myReplaceAll(parameterValue, casePrefix + "\\$\\{file_content:" + envName + "\\}",
 													fileContent.replaceAll("[\\\\]", "\\\\\\\\"));
 											additionalEnvFound = true;
 										}
@@ -941,30 +939,28 @@ public class ConfigurationBaseMonitor extends Monitor_impl {
 
 		String OS = System.getProperty(conSystemPropertyOS_NAME).toLowerCase();
 		boolean win = false;
-		envvars = new TreeMap();
+		envvars = new TreeMap<>();
 
 		if (OS.indexOf("nt") > -1 || OS.indexOf("windows") > -1) {
 			win = true;
 			envVarsCaseSensitive = false;
 		}
 
-		Variable_set env = spooler_task.create_subprocess().env();
-		debugx(9, "environment variable names: " + env.names());
-		StringTokenizer t = new StringTokenizer(env.names(), ";");
-		while (t.hasMoreTokens()) {
-			String envname = t.nextToken();
-			if (envname != null) {
-				String envvalue = env.value(envname);
-				if (win) {
-					debugx(9, "set environment variable: " + envname.toUpperCase() + "=" + envvalue);
-					envvars.put(envname.toUpperCase(), envvalue);
-				}
-				else {
-					debugx(9, "set environment variable: " + envname + "=" + envvalue);
-					envvars.put(envname, envvalue);
-				}
+		Map<String, String> env = System.getenv();
+		
+		debugx(9, "environment variable names: " + StringUtils.join(env.keySet(),";"));
+		for (Entry<String, String> envVar : env.entrySet()) {
+			String envname = envVar.getKey();
+			String envvalue = envVar.getValue();
+			if (win) {
+				debugx(9, "set environment variable: " + envname.toUpperCase() + "=" + envvalue);
+				envvars.put(envname.toUpperCase(), envvalue);
 			}
-		}
+			else {
+				debugx(9, "set environment variable: " + envname + "=" + envvalue);
+				envvars.put(envname, envvalue);
+			}
+		}		
 	}
 
 	// TODO move to base class
