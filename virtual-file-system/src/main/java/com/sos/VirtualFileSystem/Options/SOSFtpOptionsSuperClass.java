@@ -1984,6 +1984,63 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	public void seton_empty_result_set(final SOSOptionJobChainNode p_on_empty_result_set) {
 		on_empty_result_set = p_on_empty_result_set;
 	}
+	
+	/**
+	 * Name of Jobscheduler Host where the order have to be started
+	 */
+	@JSOptionDefinition(name = "order_jobscheduler_host", description = "Name of Jobscheduler Host where the order have to be started", key = "order_jobscheduler_host", type = "SOSOptionHostName", mandatory = false)
+	public SOSOptionHostName	order_jobscheduler_host	= new SOSOptionHostName( // ...
+																		this, // ....
+																		conClassName + ".order_jobscheduler_host", // ...
+																		"Name of Jobscheduler Host where the order have to be started", // ...
+																		"", // ...
+																		"", // ...
+																		false);
+
+	/**
+	 * 
+	 * @return
+	 */
+	public SOSOptionHostName getorder_jobscheduler_host() {
+		return order_jobscheduler_host;
+	} 
+
+	/**
+	 * 
+	 * @param hostName
+	 */
+	public void setorder_jobscheduler_host(final SOSOptionHostName hostName) {
+		order_jobscheduler_host = hostName;
+	}
+	
+	/**
+	 * The port of the JobScheduler Node
+	 */
+	@JSOptionDefinition(name = "order_jobscheduler_port", description = "The port of the JobScheduler node", key = "order_jobscheduler_port", type = "SOSOptionPortNumber", mandatory = false)
+	public SOSOptionPortNumber	order_jobscheduler_port	= new SOSOptionPortNumber( // ...
+																		this, // ....
+																		conClassName + ".order_jobscheduler_port", // ...
+																		"The port of the JobScheduler node", // ...
+																		"", // ...
+																		"4444", // ...
+																		false);
+
+	/**
+	 * 
+	 * @return
+	 */
+	public SOSOptionPortNumber getorder_jobscheduler_port() {
+		return order_jobscheduler_port;
+	}
+	
+	/**
+	 * 
+	 * @param portNumber
+	 */
+	public void setorder_jobscheduler_port(final SOSOptionPortNumber portNumber) {
+		order_jobscheduler_port = portNumber;
+	}
+	
 	/**
 	 * \var order_jobchain_name : The name of the jobchain which belongs to the order The name of the jobch
 	 *
