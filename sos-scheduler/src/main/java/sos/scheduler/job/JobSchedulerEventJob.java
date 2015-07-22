@@ -98,7 +98,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 	/** job and order parameters */
 	private Variable_set		parameters							= null;
 	/** table name */
-	private static String		tableEvents							= "SCHEDULER_EVENTS";
+	private final String		tableEvents							= "SCHEDULER_EVENTS";
 	/** local DOM objects of events */
 	private Document			events								= null;
 	/** local list of event handlers */
@@ -348,7 +348,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 		}
 	}
 
-	public static Calendar calculateExpirationDate(final String expirationCycle, final String expirationPeriod) throws Exception {
+	private static Calendar calculateExpirationDate(final String expirationCycle, final String expirationPeriod) throws Exception {
 		Calendar cal = Calendar.getInstance();
 		try {
 			cal.setTime(SOSDate.getCurrentTime());
@@ -399,7 +399,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 	/**
 	 * get events from JobScheduler global variables
 	 */
-	public void getSchedulerEvents() throws Exception {
+	private void getSchedulerEvents() throws Exception {
 		try {
 			String eventSet = spooler.var(JobSchedulerConstants.eventVariableName);
 			if (this.getConnection() != null && (eventSet == null || eventSet.length() == 0)) {
@@ -462,13 +462,13 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 		}
 	}
 
-	public static void readEventsFromDB(final SOSConnection conn, final Spooler spooler, final Document eventsDoc, final SOSLogger log) throws Exception {
+	private void readEventsFromDB(final SOSConnection conn, final Spooler spooler, final Document eventsDoc, final SOSLogger log) throws Exception {
 		try {
-			conn.executeUpdate("DELETE FROM " + getTableEvents()
+			conn.executeUpdate("DELETE FROM " + tableEvents
 					+ " WHERE \"EXPIRES\"<=%now AND (\"SPOOLER_ID\" IS NULL OR \"SPOOLER_ID\"='' OR \"SPOOLER_ID\"='" + spooler.id() + "')");
 			conn.commit();
 			Vector<?> vEvents = conn.getArrayAsVector("SELECT \"SPOOLER_ID\", \"REMOTE_SCHEDULER_HOST\", \"REMOTE_SCHEDULER_PORT\", \"JOB_CHAIN\", \"ORDER_ID\", \"JOB_NAME\", \"EVENT_CLASS\", \"EVENT_ID\", \"EXIT_CODE\", \"CREATED\", \"EXPIRES\", \"PARAMETERS\" FROM "
-					+ getTableEvents() + " WHERE (\"SPOOLER_ID\" IS NULL OR \"SPOOLER_ID\"='' OR \"SPOOLER_ID\"='" + spooler.id() + "') ORDER BY \"ID\" ASC");
+					+ tableEvents + " WHERE (\"SPOOLER_ID\" IS NULL OR \"SPOOLER_ID\"='' OR \"SPOOLER_ID\"='" + spooler.id() + "') ORDER BY \"ID\" ASC");
 			Iterator<?> vIterator = vEvents.iterator();
 			int vCount = 0;
 			while (vIterator.hasNext()) {
@@ -507,7 +507,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 	/**
 	 * update events in JobScheduler global variables
 	 */
-	public void putSchedulerEvents() throws Exception {
+	private void putSchedulerEvents() throws Exception {
 		try {
 			String eventsString = this.xmlDocumentToString(this.getEvents());
 			this.getLogger().debug9("Updating events: " + eventsString);
@@ -654,7 +654,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 	/**
 	 * process events from individual event handlers
 	 */
-	public void processSchedulerEvents() throws Exception {
+	private void processSchedulerEvents() throws Exception {
 		File eventHandler = null;
 		
 	    parameterSubstitutor = new ParameterSubstitutor();
@@ -994,7 +994,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 	/**
 	 * add an event
 	 */
-	public void addEvent() throws Exception {
+	private void addEvent() throws Exception {
 		try {
 			this.getLogger().debug9(
 					".. constructing event: schedulerId=" + this.getEventSchedulerId() + ", eventClass=" + this.getEventClass() + ", eventId="
@@ -1029,14 +1029,14 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 	/**
 	 * add an event
 	 */
-	public void addEvent(final Element event) throws Exception {
+	private void addEvent(final Element event) throws Exception {
 		addEvent(event, true);
 	}
 
 	/**
 	 * add an event
 	 */
-	public void addEvent(final Element event, final boolean replace) throws Exception {
+	private void addEvent(final Element event, final boolean replace) throws Exception {
 		if (event.getAttribute("scheduler_id").length() == 0) {
 			event.setAttribute("scheduler_id", spooler.id());
 		}
@@ -1106,7 +1106,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 			}
 			else {
 				String stmt = "INSERT INTO "
-						+ JobSchedulerEventJob.getTableEvents()
+						+ tableEvents
 						+ " (\"SPOOLER_ID\", \"REMOTE_SCHEDULER_HOST\", \"REMOTE_SCHEDULER_PORT\", \"JOB_CHAIN\", \"ORDER_ID\", \"JOB_NAME\", \"EVENT_CLASS\", \"EVENT_ID\", \"EXIT_CODE\", \"CREATED\", \"EXPIRES\")"
 						+ " VALUES ('" + curEventSchedulerId + "', '" + curEventRemoteSchedulerHost + "', "
 						+ (curEventRemoteSchedulerPort.length() == 0 ? "0" : curEventRemoteSchedulerPort) + ", '" + curEventJobChainName + "', '"
@@ -1124,7 +1124,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 					if (getConnection() instanceof SOSPgSQLConnection)
 						sequenceName = "\"scheduler_events_ID_seq\"";
 					String eventDbID = getConnection().getLastSequenceValue(sequenceName);
-					getConnection().updateClob(getTableEvents(), "PARAMETERS", paramsString, "\"ID\"=" + eventDbID);
+					getConnection().updateClob(tableEvents, "PARAMETERS", paramsString, "\"ID\"=" + eventDbID);
 				}
 				this.getConnection().commit();
 			}
@@ -1144,7 +1144,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 	/**
 	 * remove multiple events with matching attributes
 	 */
-	public void removeEvents(final NodeList events1) throws Exception {
+	private void removeEvents(final NodeList events1) throws Exception {
 		try {
 			for (int i = 0; i < events1.getLength(); i++) {
 				if (events1.item(i) == null || events1.item(i).getNodeType() != Node.ELEMENT_NODE)
@@ -1194,14 +1194,14 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 		}
 	}
 
-	public void removeAllEvents() throws Exception {
+	private void removeAllEvents() throws Exception {
 		try {
 			getLogger().info("event class is: " + JobSchedulerConstants.EVENT_CLASS_ALL_EVENTS + ". Removing all events.");
 			Document eventDocument = getEvents();
 			eventDocument.removeChild(eventDocument.getFirstChild());
 			eventDocument.appendChild(eventDocument.createElement("events"));
 			if (this.getConnection() != null) {
-				String stmt = "DELETE FROM " + JobSchedulerEventJob.getTableEvents() + " WHERE 1>0";
+				String stmt = "DELETE FROM " + tableEvents + " WHERE 1>0";
 				this.getConnection().executeUpdate(stmt);
 				this.getConnection().commit();
 			}
@@ -1215,7 +1215,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 	/**
 	 * remove an event
 	 */
-	public void removeEvent() throws Exception {
+	private void removeEvent() throws Exception {
 		try {
 			this.getLogger().debug9(".. constructing event: eventClass=" + this.getEventClass() + ", eventId=" + this.getEventId());
 			Element event = this.getEvents().createElement("event");
@@ -1247,7 +1247,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 	/**
 	 * remove an event
 	 */
-	public void removeEvent(final Node event) throws Exception {
+	private void removeEvent(final Node event) throws Exception {
 		try {
 			String curEventSchedulerId = this.getAttributeValue(event, "scheduler_id");
 			String curEventClass = this.getAttributeValue(event, "event_class");
@@ -1269,7 +1269,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 				// this.getLogger().debug1("no database in use - events are not stored persistently");
 			}
 			else {
-				String stmt = "DELETE FROM " + JobSchedulerEventJob.getTableEvents() + " WHERE ";
+				String stmt = "DELETE FROM " + tableEvents + " WHERE ";
 				String and = "";
 				if (curEventSchedulerId.length() > 0) {
 					stmt += and + "\"SPOOLER_ID\"='" + curEventSchedulerId + "'";
@@ -1318,7 +1318,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 	/**
 	 * return XML String
 	 */
-	public String getAttributeValue(final Node node, final String namedItem) throws Exception {
+	private String getAttributeValue(final Node node, final String namedItem) throws Exception {
 		try {
 			if (node.getAttributes() == null || node.getAttributes().getLength() == 0)
 				return "";
@@ -1334,7 +1334,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 	/**
 	 * return XML String
 	 */
-	public String xmlNodeToString(final Node node) throws Exception {
+	private String xmlNodeToString(final Node node) throws Exception {
 		try {
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -1353,7 +1353,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 	/**
 	 * return XML String
 	 */
-	public String xmlDocumentToString(final Document document) throws Exception {
+	private String xmlDocumentToString(final Document document) throws Exception {
 		try {
 			StringWriter out = new StringWriter();
 			XMLSerializer serializer = new XMLSerializer(out, new OutputFormat(document));
@@ -1368,7 +1368,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 	/**
 	 * return XML String
 	 */
-	public String xmlElementToString(final Element element) throws Exception {
+	private String xmlElementToString(final Element element) throws Exception {
 		try {
 			StringWriter out = new StringWriter();
 			XMLSerializer serializer = new XMLSerializer(out, new OutputFormat());
@@ -1418,360 +1418,345 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 	/**
 	 * @return the parameters
 	 */
-	public Variable_set getParameters() {
+	private Variable_set getParameters() {
 		return parameters;
 	}
 
 	/**
 	 * @param parameters the parameters to set
 	 */
-	public void setParameters(final Variable_set parameters) {
+	private void setParameters(final Variable_set parameters) {
 		this.parameters = parameters;
 	}
 
 	/**
 	 * @return the eventClass
 	 */
-	public String getEventClass() {
+	private String getEventClass() {
 		return eventClass;
 	}
 
 	/**
 	 * @param eventClass the eventClass to set
 	 */
-	public void setEventClass(final String eventClass) {
+	private void setEventClass(final String eventClass) {
 		this.eventClass = eventClass;
 	}
 
 	/**
 	 * @return the eventExpires
 	 */
-	public String getEventExpires() {
+	private String getEventExpires() {
 		return eventExpires;
 	}
 
 	/**
 	 * @param eventExpires the eventExpires to set
 	 */
-	public void setEventExpires(final String eventExpires) {
+	private void setEventExpires(final String eventExpires) {
 		this.eventExpires = eventExpires;
 	}
 
 	/**
 	 * @return the eventId
 	 */
-	public String getEventId() {
+	private String getEventId() {
 		return eventId;
 	}
 
 	/**
 	 * @param eventId the eventId to set
 	 */
-	public void setEventId(final String eventId) {
+	private void setEventId(final String eventId) {
 		this.eventId = eventId;
 	}
 
 	/**
 	 * @return the eventParameters
 	 */
-	public Element getEventParameters() {
+	private Element getEventParameters() {
 		return eventParameters;
 	}
 
 	/**
 	 * @param eventParameters the eventParameters to set
 	 */
-	public void setEventParameters(final Element eventParameters) {
+	private void setEventParameters(final Element eventParameters) {
 		this.eventParameters = eventParameters;
 	}
 
 	/**
 	 * @return the eventAction
 	 */
-	public String getEventAction() {
+	private String getEventAction() {
 		return eventAction;
 	}
 
 	/**
 	 * @param eventAction the eventAction to set
 	 */
-	public void setEventAction(final String eventAction) throws Exception {
+	private void setEventAction(final String eventAction) throws Exception {
 		if (!eventAction.equalsIgnoreCase("add") && !eventAction.equalsIgnoreCase("remove") && !eventAction.equalsIgnoreCase("process")) {
 			throw new Exception("invalid action specified [add, remove, process]: " + eventAction);
 		}
 		this.eventAction = eventAction;
 	}
 
-	/**
-	 * @return the tableEvents
-	 */
-	public static String getTableEvents() {
-		return JobSchedulerEventJob.tableEvents;
-	}
-
-	/**
-	 * @param tableEvents the tableEvents to set
-	 */
-	public static void setTableEvents(final String tableEvents) {
-		JobSchedulerEventJob.tableEvents = tableEvents;
-	}
-
+ 
+ 
 	/**
 	 * @return the events
 	 */
-	public Document getEvents() {
+	private Document getEvents() {
 		return events;
 	}
 
 	/**
 	 * @param events the events to set
 	 */
-	public void setEvents(final Document events) {
+	private void setEvents(final Document events) {
 		this.events = events;
 	}
 
 	/**
 	 * @return the eventSchedulerId
 	 */
-	public String getEventSchedulerId() {
+	private String getEventSchedulerId() {
 		return eventSchedulerId;
 	}
 
 	/**
 	 * @param eventSchedulerId the eventSchedulerId to set
 	 */
-	public void setEventSchedulerId(final String eventSchedulerId) {
+	private void setEventSchedulerId(final String eventSchedulerId) {
 		this.eventSchedulerId = eventSchedulerId;
 	}
 
 	/**
 	 * @return the expirationPeriod
 	 */
-	public String getExpirationPeriod() {
+	private String getExpirationPeriod() {
 		return expirationPeriod;
 	}
 
 	/**
 	 * @param expirationPeriod the expirationPeriod to set
 	 */
-	public void setExpirationPeriod(final String expirationPeriod) {
+	private void setExpirationPeriod(final String expirationPeriod) {
 		this.expirationPeriod = expirationPeriod;
 	}
 
 	/**
 	 * @return the eventJobChainName
 	 */
-	public String getEventJobChainName() {
+	private String getEventJobChainName() {
 		return eventJobChainName;
 	}
 
 	/**
 	 * @param eventJobChainName the eventJobChainName to set
 	 */
-	public void setEventJobChainName(final String eventJobChainName) {
+	private void setEventJobChainName(final String eventJobChainName) {
 		this.eventJobChainName = eventJobChainName;
 	}
 
 	/**
 	 * @return the eventJobName
 	 */
-	public String getEventJobName() {
+	private String getEventJobName() {
 		return eventJobName;
 	}
 
 	/**
 	 * @param eventJobName the eventJobName to set
 	 */
-	public void setEventJobName(final String eventJobName) {
+	private void setEventJobName(final String eventJobName) {
 		this.eventJobName = eventJobName;
 	}
 
 	/**
 	 * @return the event handler Filepath
 	 */
-	public String getEventHandlerFilepath() {
+	private String getEventHandlerFilepath() {
 		return eventHandlerFilepath;
 	}
 
 	/**
 	 * @param eventHandlerFilepath the event handler Filepath to set
 	 */
-	public void setEventHandlerFilepath(final String eventHandlerFilepath) {
+	private void setEventHandlerFilepath(final String eventHandlerFilepath) {
 		this.eventHandlerFilepath = eventHandlerFilepath;
 	}
 
 	/**
 	 * @return the stylesheetFilespec
 	 */
-	public String getEventHandlerFilespec() {
+	private String getEventHandlerFilespec() {
 		return eventHandlerFilespec;
 	}
 
 	/**
 	 * @param eventHandlerFilespec the stylesheetFilespec to set
 	 */
-	public void setEventHandlerFilespec(final String eventHandlerFilespec) {
+	private void setEventHandlerFilespec(final String eventHandlerFilespec) {
 		this.eventHandlerFilespec = eventHandlerFilespec;
 	}
 
 	/**
 	 * @return the stylesheetFileList
 	 */
-	public Collection<File> getEventHandlerFileList() {
+	private Collection<File> getEventHandlerFileList() {
 		return eventHandlerFileList;
 	}
 
 	/**
 	 * @param eventHandlerFileList the stylesheetFileList to set
 	 */
-	public void setEventHandlerFileList(final Collection<File> eventHandlerFileList) {
+	private void setEventHandlerFileList(final Collection<File> eventHandlerFileList) {
 		this.eventHandlerFileList = eventHandlerFileList;
 	}
 
 	/**
 	 * @return the stylesheetFileListIterator
 	 */
-	public Iterator<File> getEventHandlerFileListIterator() {
+	private Iterator<File> getEventHandlerFileListIterator() {
 		return eventHandlerFileListIterator;
 	}
 
 	/**
 	 * @param eventHandlerFileListIterator the stylesheetFileListIterator to set
 	 */
-	public void setEventHandlerFileListIterator(final Iterator<File> eventHandlerFileListIterator) {
+	private void setEventHandlerFileListIterator(final Iterator<File> eventHandlerFileListIterator) {
 		this.eventHandlerFileListIterator = eventHandlerFileListIterator;
 	}
 
 	/**
 	 * @return the stylesheetResultFileList
 	 */
-	public Collection<Object> getEventHandlerResultFileList() {
+	private Collection<Object> getEventHandlerResultFileList() {
 		return eventHandlerResultFileList;
 	}
 
 	/**
 	 * @param eventHandlerResultFileList the stylesheetResultFileList to set
 	 */
-	public void setEventHandlerResultFileList(final Collection<Object> eventHandlerResultFileList) {
+	private void setEventHandlerResultFileList(final Collection<Object> eventHandlerResultFileList) {
 		this.eventHandlerResultFileList = eventHandlerResultFileList;
 	}
 
 	/**
 	 * @return the expirationDate
 	 */
-	public Calendar getExpirationDate() {
+	private Calendar getExpirationDate() {
 		return expirationDate;
 	}
 
 	/**
 	 * @param expirationDate the expirationDate to set
 	 */
-	public void setExpirationDate(final Calendar expirationDate) {
+	private void setExpirationDate(final Calendar expirationDate) {
 		this.expirationDate = expirationDate;
 	}
 
 	/**
 	 * @return the stylesheetResultFileListIterator
 	 */
-	public Iterator<Object> getEventHandlerResultFileListIterator() {
+	private Iterator<Object> getEventHandlerResultFileListIterator() {
 		return eventHandlerResultFileListIterator;
 	}
 
 	/**
 	 * @param eventHandlerResultFileListIterator the stylesheetResultFileListIterator to set
 	 */
-	public void setEventHandlerResultFileListIterator(final Iterator<Object> eventHandlerResultFileListIterator) {
+	private void setEventHandlerResultFileListIterator(final Iterator<Object> eventHandlerResultFileListIterator) {
 		this.eventHandlerResultFileListIterator = eventHandlerResultFileListIterator;
 	}
 
 	/**
 	 * @return the eventRemoteSchedulerHost
 	 */
-	public String getEventRemoteSchedulerHost() {
+	private String getEventRemoteSchedulerHost() {
 		return eventRemoteSchedulerHost;
 	}
 
 	/**
 	 * @param eventRemoteSchedulerHost the eventRemoteSchedulerHost to set
 	 */
-	public void setEventRemoteSchedulerHost(final String eventRemoteSchedulerHost) {
+	private void setEventRemoteSchedulerHost(final String eventRemoteSchedulerHost) {
 		this.eventRemoteSchedulerHost = eventRemoteSchedulerHost;
 	}
 
 	/**
 	 * @return the eventRemoteSchedulerPort
 	 */
-	public String getEventRemoteSchedulerPort() {
+	private String getEventRemoteSchedulerPort() {
 		return eventRemoteSchedulerPort;
 	}
 
 	/**
 	 * @param eventRemoteSchedulerPort the eventRemoteSchedulerPort to set
 	 */
-	public void setEventRemoteSchedulerPort(final String eventRemoteSchedulerPort) {
+	private void setEventRemoteSchedulerPort(final String eventRemoteSchedulerPort) {
 		this.eventRemoteSchedulerPort = eventRemoteSchedulerPort;
 	}
 
 	/**
 	 * @return the eventExitCode
 	 */
-	public String getEventExitCode() {
+	private String getEventExitCode() {
 		return eventExitCode;
 	}
 
 	/**
 	 * @param eventExitCode the eventExitCode to set
 	 */
-	public void setEventExitCode(final String eventExitCode) {
+	private void setEventExitCode(final String eventExitCode) {
 		this.eventExitCode = eventExitCode;
 	}
 
 	/**
 	 * @return the eventOrderId
 	 */
-	public String getEventOrderId() {
+	private String getEventOrderId() {
 		return eventOrderId;
 	}
 
 	/**
 	 * @param eventOrderId the eventOrderId to set
 	 */
-	public void setEventOrderId(final String eventOrderId) {
+	private void setEventOrderId(final String eventOrderId) {
 		this.eventOrderId = eventOrderId;
 	}
 
 	/**
 	 * @return the eventCreated
 	 */
-	public String getEventCreated() {
+	private String getEventCreated() {
 		return eventCreated;
 	}
 
 	/**
 	 * @param eventCreated the eventCreated to set
 	 */
-	public void setEventCreated(final String eventCreated) {
+	private void setEventCreated(final String eventCreated) {
 		this.eventCreated = eventCreated;
 	}
 
 	/**
 	 * @return the expirationCycle
 	 */
-	public String getExpirationCycle() {
+	private String getExpirationCycle() {
 		return expirationCycle;
 	}
 
 	/**
 	 * @param expirationCycle the expirationCycle to set
 	 */
-	public void setExpirationCycle(final String expirationCycle) {
+	private void setExpirationCycle(final String expirationCycle) {
 		this.expirationCycle = expirationCycle;
 	}
 
-	//	private int getSocket_timeout() {
-	//		return socket_timeout;
-	//	}
-	//
+ 
 	private void setSocket_timeout(final String s) {
 		try {
 			socket_timeout = Integer.parseInt(s);
