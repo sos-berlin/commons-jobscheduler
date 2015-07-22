@@ -348,7 +348,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
 		}
 	}
 
-	private static Calendar calculateExpirationDate(final String expirationCycle, final String expirationPeriod) throws Exception {
+	protected static Calendar calculateExpirationDate(final String expirationCycle, final String expirationPeriod) throws Exception {
 		Calendar cal = Calendar.getInstance();
 		try {
 			cal.setTime(SOSDate.getCurrentTime());
