@@ -32,7 +32,6 @@ import com.sos.JSHelper.Archiver.IJSArchiverOptions;
 import com.sos.JSHelper.Archiver.JSArchiverOptions;
 import com.sos.JSHelper.Exceptions.JSExceptionFileNotReadable;
 import com.sos.JSHelper.Exceptions.JSExceptionInputFileNotFound;
-import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Exceptions.ParametersMissingButRequiredException;
 import com.sos.JSHelper.io.Files.JSFile;
@@ -181,7 +180,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
  * <br />---------------------------------------------------------------------------
  * </p>
  * \author sgx2343
- * @version $Id: JSOptionsClass.java 27684 2014-10-22 10:02:10Z kb $
+ * @version $Id$
  * \see reference
  *
  */
@@ -189,34 +188,21 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "com_sos_JSHelper_Messages", defaultLocale = "en")
 public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Serializable {
 	protected Msg					objMsg							= null;
-	@SuppressWarnings("unused")
 	private final String			conClassName					= this.getClass().getSimpleName();
-	@SuppressWarnings("unused")
 	private static final Logger		logger							= Logger.getLogger(JSOptionsClass.class);
-	@SuppressWarnings("unused")
-	private final String			conSVNVersion					= "$Id: JSOptionsClass.java 27684 2014-10-22 10:02:10Z kb $";
 	private static final long		serialVersionUID				= 8497293387023797049L;
 	public static boolean			gflgUseBase64ForObject			= true;
 	public static boolean			flgIncludeProcessingInProgress	= false;
-	public static String			gstrIncludeSectionName			= "";
 	public boolean					gflgSubsituteVariables			= true;
 	protected static final String	conParamNamePrefixALTERNATIVE	= "alternative_";
-	protected static final String	conParamNamePrefixALTERNATE		= "alternative_";
 	protected static final String	conParamNamePrefixJUMP			= "jump_";
 	protected static final String	conParamNamePrefixTARGET		= "target_";
 	protected static final String	conParamNamePrefixSOURCE		= "source_";
 	protected static final String	conParamNamePrefixPROXY			= "proxy_";
 
-	public String getIncludeSectionName() {
-		return gstrIncludeSectionName;
-	}
-
-	public void setIncludeSectionName(final String pstrInludeSectionName) {
-		gstrIncludeSectionName = pstrInludeSectionName;
-	}
-    protected enum IterationTypes {
-        setRecord(1), getRecord(2), toOut(3), createXML(4), setDefaultValues(5), clearAllValues(6), countSegmentFields(7), CheckMandatory(12), setPrefix(14), toString(
-                13), getCommandLine(14), DirtyToString(15), getKeyValuePair(16), LoadValues(17), StoreValues(18), getQuotedCommandLine(19);
+	protected enum IterationTypes {
+        setRecord(1), getRecord(2), toOut(3), createXML(4), setDefaultValues(5), clearAllValues(6), countSegmentFields(7), CheckMandatory(12), setPrefix(14), 
+        toString(13), getCommandLine(14), DirtyToString(15), getKeyValuePair(16), LoadValues(17), StoreValues(18), getQuotedCommandLine(19);
         private int intType;
 
 
@@ -879,10 +865,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	public HashMap<String, String> Settings4StepName() {
 		HashMap<String, String> objS = new HashMap<String, String>();
 		int intStartPos = strCurrentNodeName.length() + 1;
-		for (final Object element : Settings().entrySet()) {
-			@SuppressWarnings("unchecked")
-			final Map.Entry<String, String> mapItem = (Map.Entry<String, String>) element;
-			String strMapKey = mapItem.getKey().toString();
+		for (final Map.Entry<String, String> mapItem : Settings().entrySet()) {
+			String strMapKey = mapItem.getKey();
 			String strValue = mapItem.getValue();
 			if (strMapKey.indexOf("/") != -1) {
 				if (strMapKey.startsWith(strCurrentNodeName + "/")) {
@@ -1131,8 +1115,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 		boolean flgIsOK = true;
 		int intNumberOfNotProcessedOptions = 0;
 		if (objSettings != null) {
-			for (final Map.Entry<String, String> element : objSettings.entrySet()) {
-				final Map.Entry<String, String> mapItem = element;
+			for (final Map.Entry<String, String> mapItem : objSettings.entrySet()) {
 				String strMapKey = mapItem.getKey().toString();
 				String strT = objProcessedOptions.get(strMapKey);
 				if (strT == null) {
@@ -1365,9 +1348,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	public String dirtyString() {
 		//		String strT = objParentClass.toString() + " -> " + objParentClass.hashCode();
 		String strT = "";
-		clearBuffer();
 		try {
-			strT += getAllOptionsAsString(IterationTypes.DirtyToString);
+			strT += "\n" + getAllOptionsAsString(IterationTypes.DirtyToString);
 		}
 		catch (final Exception e) {
 			throw new JobSchedulerException("dirtyString failed", e);
@@ -1408,17 +1390,12 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	private String getAllOptionsAsString(final IterationTypes penuIterationType) {
 		String strT = ""; // conClassName + "\n";
 		if (objParentClass != null) {
-			strT += IterateAllDataElementsByAnnotation(objParentClass, this, penuIterationType, strBuffer);
+			strT += IterateAllDataElementsByAnnotation(objParentClass, this, penuIterationType, new StringBuffer(""));
 		}
 		return strT;
 	}
 
-	protected void clearBuffer() {
-		strBuffer = new StringBuffer();
-	}
-
 	private String getAllOptionsAsString() {
-		clearBuffer();
 		return getAllOptionsAsString(IterationTypes.toString);
 	}
 
@@ -1980,12 +1957,16 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 						strOptionValue = StripQuotes(strOptionValue);
 						strOptionName = strOptionName.substring(0, intESPos);
 						objSettings.put(strOptionName, strOptionValue);
-						this.SignalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", conMethodName, strOptionName, strOptionValue));
+						if(strOptionName.contains("password")){
+						    this.SignalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", conMethodName, strOptionName, "*****"));
+						}else{
+						    this.SignalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", conMethodName, strOptionName, strOptionValue));
+						}
 						flgOption = true; // next tooken must be an option
 					}
 				}
 				else {
-					logger.error(String.format("'%1$s' seems to be an unsupported (positional) parameter. ignored", strCommandLineArg));
+					logger.warn(String.format("'%1$s' seems to be an unsupported (positional) parameter. ignored", strCommandLineArg));
 				}
 			}
 			else {
@@ -1993,7 +1974,11 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 					strOptionValue = strCommandLineArg;
 					flgOption = true;
 					objSettings.put(strOptionName, strOptionValue);
-					this.SignalDebug(String.format("%1$s: Name = %2$s, value = %3$s", conMethodName, strOptionName, strOptionValue));
+					if(strOptionName.contains("password")){
+			            this.SignalDebug(String.format("%1$s: CmdSettings. Name = %2$s, value = %3$s", conMethodName, strOptionName, "*****"));
+					}else{
+			            this.SignalDebug(String.format("%1$s: CmdSettings. Name = %2$s, value = %3$s", conMethodName, strOptionName, strOptionValue));
+					}
 					strOptionName = null;
 				}
 			}
@@ -2154,15 +2139,15 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 * @param hshMap
 	 */
 	public void setAllOptions(final HashMap<String, String> pobjJSSettings, final String pstrAlternativePrefix) throws Exception {
-		//		if (strAlternativePrefix.length() <= 0) {
-		strAlternativePrefix = pstrAlternativePrefix;
-		if (objParentClass != null) {
-			IterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.setPrefix, strBuffer);
+		if (strAlternativePrefix.length() <= 0) {
+			strAlternativePrefix = pstrAlternativePrefix;
+			if (objParentClass != null) {
+				IterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.setPrefix, strBuffer);
+			}
 		}
-		//		}
-		//		else {
-		//			logger.trace(String.format("SOSOPT-I-002: Alternate Prefix already set to %1$s, but %2$s as new given", strAlternativePrefix, pstrAlternativePrefix));
-		//		}
+//		else {
+//			logger.trace(String.format("SOSOPT-I-002: Alternate Prefix already set to %1$s, but %2$s as new given", strAlternativePrefix, pstrAlternativePrefix));
+//		}
 		this.setAllOptions(pobjJSSettings);
 	}
 
@@ -2414,7 +2399,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 		final String conMethodName = conClassName + "::replaceVars";
 		getTextProperties();
 		try {
-			// zusätzliche Parameter generieren
+			// zusaetzliche Parameter generieren
 			objP.put("date", SOSOptionTime.getCurrentDateAsString(DateFormatMask.Value()));
 			objP.put("time", SOSOptionTime.getCurrentTimeAsString(TimeFormatMask.Value()));
 			objP.put("local_user", System.getProperty("user.name"));
@@ -2439,8 +2424,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 		//		 String strParamNameEnclosedInPercentSigns = "^.*%\\{([^\\}]+).*$";
 		/**
 		 * Problem hier:
-		 * Wenn der gesamte String verwendet wird, so ist spï¿½testens beim file_spec
-		 * keine korrekte Substitution mehr mï¿½glich.
+		 * Wenn der gesamte String verwendet wird, so ist spaetestens beim file_spec
+		 * keine korrekte Substitution mehr moeglich.
 		 * Liegt warscheinlich am regexp pattern.
 		 */
 		String strNewString = "";
@@ -2453,18 +2438,16 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 						if (strKey.equalsIgnoreCase("uuid")) {
 							continue;
 						}
-						strVal = (String) objP.get(strKey);
 						String strPP = "(\\$|%)\\{" + strKey + "\\}";
-						if (strVal != null) {
+						strVal = this.OptionByName(strKey);
+						if (isNotNull(strVal)) {
+							strVal = strVal.replace('\\', '/');
 							string = string.replaceAll(strPP, Matcher.quoteReplacement(strVal));
 						}
 						else {
-							strVal = this.OptionByName(strKey);
-							if (isNotNull(strVal)) {
-								strVal = strVal.replace('\\', '/');
+							strVal = (String) objP.get(strKey);
+							if (strVal != null) {
 								string = string.replaceAll(strPP, Matcher.quoteReplacement(strVal));
-								// logger.debug(Messages.getMsg(JSJ_D_0031, name, strPP, s)); //
-								// "processing job parameter '%1$s': substitute '%2$s' with '%3$s'."
 							}
 							else {
 								strVal = Settings().get(strKey);
@@ -2473,7 +2456,6 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 								}
 								else {
 									string = string.replaceAll(strPP, "?" + Matcher.quoteReplacement(strKey) + "?");
-									//									 logger.trace(Messages.getMsg(JSJ_D_0032, p)); // "variable '%1$s' not found. no substitution done"
 								}
 							}
 						}
@@ -2490,19 +2472,17 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 
 	public void DumpSettings() {
 		final String conMethodName = conClassName + "::DumpSettings";
-		for (final Object element : objSettings.entrySet()) {
-			final Map.Entry mapItem = (Map.Entry) element;
+		for (final Map.Entry<String,String> mapItem : objSettings.entrySet()) {
 			final String strMapKey = mapItem.getKey().toString();
 			if (mapItem.getValue() != null) {
-				String strTemp = mapItem.getValue().toString();
-				if (strMapKey.equals("ftp_password")) {
-					strTemp = "***";
-				}
-				this.SignalDebug(conMethodName + ": Key = " + strMapKey + " --> " + strTemp);
+				if(mapItem.getKey().contains("password")){
+			       this.SignalDebug(conMethodName + ": Key = " + strMapKey + " --> " + "*****");
+			    } else {
+			       this.SignalDebug(conMethodName + ": Key = " + strMapKey + " --> " + mapItem.getValue().toString());
+			    }
 			}
 		}
-		// return void;
-	} // public void DumpSettings}
+	}
 
 	// - <remark who='EQALS' when='Freitag, 8. Mai 2009' id='MehrereExportSQL' >
 	/**
@@ -2539,6 +2519,10 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	public String getOptionsAsCommandLine() {
 		return populateOptions(IterationTypes.getCommandLine);
 	}
+	
+	public String getOptionsAsQuotedCommandLine() {
+		return populateOptions(IterationTypes.getQuotedCommandLine);
+	}
 
 	public String getOptionsAsKeyValuePairs() {
 		return populateOptions(IterationTypes.getKeyValuePair);
@@ -2546,10 +2530,6 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 
 	private String populateOptions(final IterationTypes intIt) {
 		return Iterate(intIt).toString();
-	}
-
-	public String getOptionsAsQuotedCommandLine() {
-	    return populateOptions(IterationTypes.getQuotedCommandLine);
 	}
 
 	   
@@ -2561,7 +2541,6 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 		}
 		Field objField = null;
 		SOSOptionElement.gflgProcessHashMap = true;
-		boolean flgMandatoryOptionsMissing = false;
 		try {
 			final Field objFields[] = objC.getFields();
 			final StringBuffer strXML = new StringBuffer("");
@@ -2611,12 +2590,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 								// continue;
 							}
 							if (enuIterate4What == IterationTypes.CheckMandatory) {
-								try {
-									objDE.CheckMandatory();
-								}
-								catch (Exception e) {
-									flgMandatoryOptionsMissing = true;
-								}
+								objDE.CheckMandatory();
 							}
 							if (enuIterate4What == IterationTypes.toOut) {
 								System.out.println(objDE.toString());
@@ -2625,9 +2599,9 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 								pstrBuffer.append(addNewLine(objDE.toString()));
 							}
 							if (enuIterate4What == IterationTypes.DirtyToString) {
-								//								if (objDE.isDirty() == true) {
-								pstrBuffer.append(addNewLine(objDE.DirtyToString()));
-								//								}
+								if (objDE.isDirty() == true) {
+									pstrBuffer.append(addNewLine(objDE.DirtyToString()));
+								}
 							}
 							if (enuIterate4What == IterationTypes.createXML) {
 								strXML.append(objDE.toXml());
@@ -2645,6 +2619,9 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 							}
 							if (enuIterate4What == IterationTypes.getCommandLine) {
 								pstrBuffer.append(objDE.toCommandLine());
+							}
+							if (enuIterate4What == IterationTypes.getQuotedCommandLine) {
+								pstrBuffer.append(objDE.toQuotedCommandLine());
 							}
 							if (enuIterate4What == IterationTypes.getKeyValuePair) {
 								strT = objDE.toKeyValuePair(strAlternativePrefix);
@@ -2688,15 +2665,11 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 			SOSOptionElement.gflgProcessHashMap = false;
 			//
 		} // finally
-		if (flgMandatoryOptionsMissing == true && enuIterate4What == IterationTypes.CheckMandatory) {
-			throw new JSExceptionMandatoryOptionMissing("at least one mandatory option is missing");
-
-		}
 		return pstrBuffer;
 	} // private void AllDataElements
 
 	private String addNewLine(final String pstrV) {
-		if (isEmpty(pstrV) == false && pstrV.contains("\n") == false) {
+		if (isNotEmpty(pstrV)) {
 			return pstrV + "\n";
 		}
 		return pstrV;
@@ -2957,7 +2930,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 	 * @param node
 	 * @param objProp
 	 */
-	private void traverse(final Node node, final Properties objProp) {
+	private void traverse(final Node node, Properties objProp) {
 		int type = node.getNodeType();
 		logger.debug("NodeType = " + type);
 		String strNodeName = node.getNodeName();
@@ -3033,11 +3006,10 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 		HashMap<String, String> hsmNewMap = new HashMap<String, String>();
 		if (phsmParameters != null) {
 			// First put into the hashmap these items which do not starts with the prefix
-			for (final Object element : phsmParameters.entrySet()) {
-				final Map.Entry<String, String> mapItem = (Map.Entry<String, String>) element;
-				String strMapKey = mapItem.getKey().toString();
+			for (final Map.Entry<String, String> mapItem : phsmParameters.entrySet()) {
+				String strMapKey = mapItem.getKey();
 				if (mapItem.getValue() != null) {
-					strTemp = mapItem.getValue().toString();
+					strTemp = mapItem.getValue();
 				}
 				else {
 					strTemp = null;
@@ -3047,11 +3019,10 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 				}
 			}
 			// Then put into the hashmap these items which starts with the prefix. First, delete prefix
-			for (final Object element : phsmParameters.entrySet()) {
-				final Map.Entry<String, String> mapItem = (Map.Entry<String, String>) element;
-				String strMapKey = mapItem.getKey().toString();
+			for (final Map.Entry<String, String> mapItem : phsmParameters.entrySet()) {
+				String strMapKey = mapItem.getKey();
 				if (mapItem.getValue() != null) {
-					strTemp = mapItem.getValue().toString();
+					strTemp = mapItem.getValue();
 				}
 				else {
 					strTemp = null;

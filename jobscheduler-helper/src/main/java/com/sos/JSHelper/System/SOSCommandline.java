@@ -15,11 +15,6 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
  * Command line processing
  */
 public class SOSCommandline {
-	@SuppressWarnings("unused")
-	private final String	conClassName	= this.getClass().getSimpleName();
-	@SuppressWarnings("unused")
-	private final String	conSVNVersion	= "$Id: SOSCommandline.java 27117 2014-09-07 20:11:07Z kb $";
-	@SuppressWarnings("unused")
 	private final Logger	logger			= Logger.getLogger("SOSCommandline");
 
 	/**
@@ -27,7 +22,7 @@ public class SOSCommandline {
 	 */
 	public String[] splitArguments(final String arguments) throws Exception {
 		String[] resultArguments = null;
-		Vector <String> resultVector = new Vector<>();
+		Vector<String> resultVector = new Vector<String>();
 		int resultIndex = 0;
 		String resultString = "";
 		boolean inQuote = false;
@@ -116,7 +111,7 @@ public class SOSCommandline {
 		return this.execute(command, null);
 	}
 
-	Vector<String> returnValues = new Vector<>();
+	Vector<String> returnValues = new Vector<String>();
 	private BufferedReader stbStdInput = null;
 	private BufferedReader stbStdError = null;
 	
@@ -193,6 +188,7 @@ public class SOSCommandline {
 				}
 				try { // to process output to stderr
 					String line = "";
+					stdError = new StringBuffer("");
 					while (line != null) {
 						line = stbStdError.readLine();
 						if (line != null) {
@@ -279,7 +275,7 @@ public class SOSCommandline {
 				catch (Exception ex) {
 					ex.printStackTrace();
 				}
-//				Vector<?> returnValues = execute(command, logger);
+				execute(command, logger);
 				int exitValue = getExitValue();
 				if (exitValue == 0) {
 					returnPassword = getStdOut();
