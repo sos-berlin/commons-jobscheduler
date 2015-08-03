@@ -72,7 +72,7 @@ public class ConfigurationModifierFileSelectorOptions {
         }
         
         String s = file.getAbsolutePath().replace('\\','/');
-        s = s.replaceAll("^.*/live/(.*)\\.(job|monitor)\\.xml$","$1");
+        s = s.replaceAll("^.*"+configurationDirectory+"/(live|cache)(.*)\\.(job|monitor)\\.xml$","$2");
         
         for(String exclusion:listOfFileExclusions)  {
             if (s.equals(exclusion)){
@@ -82,7 +82,7 @@ public class ConfigurationModifierFileSelectorOptions {
         return false;    
     }
     
-    public boolean isDirExclusion(File directory){
+    public boolean isDirExclusion(File directory){    	
         if (listOfDirectoryExclusions == null){
             return false;
         }

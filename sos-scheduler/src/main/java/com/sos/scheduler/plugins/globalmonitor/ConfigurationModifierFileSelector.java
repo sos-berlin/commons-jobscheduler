@@ -40,10 +40,10 @@ public class ConfigurationModifierFileSelector {
                for(File file:files)  {
                    if (file.isFile()){
                        logger.debug(file.getAbsolutePath() + " added");
-                       JobSchedulerFileElement jobSchedulerFileElement = new JobSchedulerFileElement(file,"");
+                       JobSchedulerFileElement jobSchedulerFileElement = new JobSchedulerFileElement(file);
                        listOfSelectedConfigurationFiles.add(jobSchedulerFileElement);
                    }else{
-                       if (selectorOptions.isRecursiv()){
+                       if (selectorOptions.isRecursive()){
                            logger.debug("reading " + file.getAbsolutePath());
                            fillFiles(file.getAbsolutePath());
                        }
@@ -55,7 +55,9 @@ public class ConfigurationModifierFileSelector {
     
     public void fillSelectedFileList(){      
         listOfSelectedConfigurationFiles = new ArrayList<JobSchedulerFileElement> ();
-        fillFiles(selectorOptions.getConfigurationDirectory());    
+        fillFiles(selectorOptions.getConfigurationDirectory()+"/cache");
+        fillFiles(selectorOptions.getConfigurationDirectory()+"/live");    
+
     }
     
     public ArrayList<JobSchedulerFileElement> getSelectedFileList(){
@@ -84,16 +86,17 @@ public class ConfigurationModifierFileSelector {
     }
     
     private void fillMonitorList(File d, String schedulerLivePath){
-       
-        if (selectorOptions.isRecursiv()){
-            if (d != null && d.getAbsolutePath().length()> 0 && !d.getAbsolutePath().replace('\\', '/').equals(schedulerLivePath)){
+
+         if (selectorOptions.isRecursive()){
+             if (d != null && d.getAbsolutePath().length()> 0 && !d.getAbsolutePath().replace('\\', '/').equals(schedulerLivePath)){
                fillMonitorList(d.getParentFile(),schedulerLivePath);
             }
         }
         File[] files= null;
 
         if (selectorFilter != null){
-           files = d.listFiles(selectorFilter);
+        	files = d.listFiles(selectorFilter);
+        	
         }else{
            files = d.listFiles();
         }
@@ -101,18 +104,28 @@ public class ConfigurationModifierFileSelector {
             for(File file:files)  {
                 if (file.isFile()){
                     logger.debug(file.getAbsolutePath() + " -------------- monitor added");
-                    JobSchedulerFileElement jobSchedulerFileElement = new JobSchedulerFileElement(file,"");
+                    JobSchedulerFileElement jobSchedulerFileElement = new JobSchedulerFileElement(file);
                     listOfMonitorConfigurationFiles.add(jobSchedulerFileElement);
                 }
             }
         }
-    }
+      }
+    
     
     public void fillParentMonitorList(JobSchedulerFileElement jobSchedulerFileElement){
         listOfMonitorConfigurationFiles = new ArrayList<JobSchedulerFileElement>();
-        String schedulerLivePath = jobSchedulerFileElement.getSchedulerLivePath();
-        File d = jobSchedulerFileElement.getConfigurationFile();
-        fillMonitorList(d,schedulerLivePath);
+        
+         String schedulerLivePath = jobSchedulerFileElement.getSchedulerLivePath();
+         schedulerLivePath = new File(schedulerLivePath).getParent();
+         schedulerLivePath =schedulerLivePath.replace('\\','/');
+         File dLive = jobSchedulerFileElement.getConfigurationFile();
+         fillMonitorList(dLive,schedulerLivePath+"/live");
+         String s = dLive.getAbsolutePath();
+         s = s .replace("\\", "/");
+         s = s.replaceFirst("/live", "/cache");
+         File dCache = new File(s);
+         fillMonitorList(dCache,schedulerLivePath+"/cache");
+         
     }
 
     public void setSelectorFilter(ConfigurationModifierFileFilter selectorFilter) {

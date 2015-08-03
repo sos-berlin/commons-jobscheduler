@@ -156,9 +156,7 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
             // monitors to add.
             JobSchedulerFileElement jobSchedulerFileElement = configurationModifierFileSelector.getJobSchedulerElement(jobname);
 
-            if (jobSchedulerFileElement != null) {// always will be != null, as
-                                                  // this is the then part of
-                                                  // jobIsToBeHandled-if
+            if (jobSchedulerFileElement != null) {// always will be != null, as this is the then part of jobIsToBeHandled-if
                 // 5. Create a FileSelector for the monitors that are to be
                 // added to the monitor.use list depending on the given options.
                 configurationModifierFileSelector = new ConfigurationModifierFileSelector(configurationModifierFileSelectorMonitorOptions);

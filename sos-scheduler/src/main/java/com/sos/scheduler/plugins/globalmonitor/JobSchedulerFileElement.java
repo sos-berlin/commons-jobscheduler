@@ -5,24 +5,18 @@ import java.io.File;
 public class JobSchedulerFileElement {
     private File configurationFile;
     private String jobSchedulerElementName;
-    private String schedulerLivePath="";
- 
+   
     
     
-    public JobSchedulerFileElement(File configurationFile, String schedulerLivePath_) {
+    public JobSchedulerFileElement(File configurationFile) {
         this.configurationFile = configurationFile;
-        this.schedulerLivePath = schedulerLivePath_;
         setJobSchedulerElementName();
     }
 
     private String getSchedulerLivePath(String filePath){
-        if (schedulerLivePath.equals("")){
-            filePath = filePath.replace('\\','/');
-            String s = filePath.replaceFirst("^(.*/live)/.*","$1");
-            return s;
-        }else{
-            return schedulerLivePath;
-        }
+       filePath = filePath.replace('\\','/');
+       String s = filePath.replaceFirst("^(.*/)(live|cache)/.*","$1$2");
+       return s;
     }
 
     public String getSchedulerLivePath(){

@@ -97,21 +97,22 @@ public class TestConfigurationModifierFileSelectorOptions {
     @Test
     public void testSetDirectoryExclusions() {
         ConfigurationModifierFileSelectorOptions c = new ConfigurationModifierFileSelectorOptions();
-        c.setDirectoryExclusions("test/1,test/2");
+        c.setDirectoryExclusions("/test/1,test/2");
         assertEquals("testSetDirectoryExclusions",true, c.isDirExclusion(new File("c:/test/2")));
     }
 
     @Test
     public void testIsFileExclusions() {
         ConfigurationModifierFileSelectorOptions c = new ConfigurationModifierFileSelectorOptions();
-        c.setFileExclusions("job1");
+        c.setConfigurationDirectory("c:/temp");
+        c.setFileExclusions("/job1");
         assertEquals("testIsFileExclusions",true, c.isFileExclusions(new File("c:/temp/live/job1.job.xml")));
     }
 
     @Test
     public void testIsDirExclusion() {
         ConfigurationModifierFileSelectorOptions c = new ConfigurationModifierFileSelectorOptions();
-        c.setDirectoryExclusions("test/1,test/2");
+        c.setDirectoryExclusions("/test/1,test/2");
         assertEquals("testIsDirExclusion",true, c.isDirExclusion(new File("c:/test/1")));
     }
 
