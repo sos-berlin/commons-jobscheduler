@@ -49,16 +49,21 @@ public class TestJobConfigurationFileChanger {
         //1.Create and initialize the options object
         ConfigurationModifierFileSelectorOptions configurationModifierFileSelectorOptions = new ConfigurationModifierFileSelectorOptions();
 
-        configurationModifierFileSelectorOptions.setConfigurationDirectory("C:/Users/ur/Documents/sos-berlin.com/jobscheduler/scheduler_current/config/live");
-        configurationModifierFileSelectorOptions.setDirectoryExclusions("sos");
-        configurationModifierFileSelectorOptions.setFileExclusions("job_exercise1.job.xml,events2/job_exercise3.job.xml");
+        configurationModifierFileSelectorOptions.setConfigurationDirectory("C:/Users/ur/Documents/sos-berlin.com/jobscheduler/scheduler_4195/config");
+        configurationModifierFileSelectorOptions.setDirectoryExclusions("/sos");
+        configurationModifierFileSelectorOptions.setFileExclusions("");
         configurationModifierFileSelectorOptions.setRecursive(true);
-        configurationModifierFileSelectorOptions.setRegexSelector("^job.*$");
+        configurationModifierFileSelectorOptions.setRegexSelector("^.*$");
 
         //2. Create a FileSelector for the jobs that are to be handled depending on the given options.
         ConfigurationModifierFileSelector configurationModifierFileSelector = new ConfigurationModifierFileSelector(configurationModifierFileSelectorOptions);
         
         //3. Set the filter for jobs to an instance of ConfigurationModifierJobFileFilter
+        configurationModifierFileSelectorOptions.setConfigurationDirectory("C:/Users/ur/Documents/sos-berlin.com/jobscheduler/scheduler_4195/config");
+        configurationModifierFileSelectorOptions.setDirectoryExclusions("/sos");
+        configurationModifierFileSelectorOptions.setFileExclusions("");
+        configurationModifierFileSelectorOptions.setRecursive(true);
+        configurationModifierFileSelectorOptions.setRegexSelector("^.*$");
         configurationModifierFileSelector.setSelectorFilter(new ConfigurationModifierJobFileFilter(configurationModifierFileSelectorOptions));
        
 
@@ -81,7 +86,9 @@ public class TestJobConfigurationFileChanger {
                 //6.Create and initialize the options object for the monitors.
                 ConfigurationModifierFileSelectorOptions configurationModifierFileSelectorOptions2 = new ConfigurationModifierFileSelectorOptions();
                                 
-                configurationModifierFileSelectorOptions2.setRegexSelector("^global_.*$");
+                configurationModifierFileSelectorOptions2.setRegexSelector("^global_monitor.*$");
+                configurationModifierFileSelectorOptions2.setRecursive(true);
+
 
                 //7. Create a FileSelector for the monitors that are to be added to the monitor.use list depending on the given options.
                 configurationModifierFileSelector = new ConfigurationModifierFileSelector(configurationModifierFileSelectorOptions2);

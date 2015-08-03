@@ -28,7 +28,7 @@ public abstract class ConfigurationModifierFileFilter implements FilenameFilter 
 
     @Override
     public boolean accept(File directory, String filename) {
-        File f = new File(directory,filename);
+    	File f = new File(directory,filename);
         
           if (f.isDirectory()){
               return !options.isDirExclusion(directory);

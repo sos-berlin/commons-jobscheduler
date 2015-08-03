@@ -33,7 +33,7 @@ public class TestJobSchedulerFileElement {
     @Test
     public void testGetSchedulerHome() {
         File f = new File("c:\\config\\live\\xxx\\job.job.xml");
-        JobSchedulerFileElement jobSchedulerFileElement = new JobSchedulerFileElement(f,"");
+        JobSchedulerFileElement jobSchedulerFileElement = new JobSchedulerFileElement(f);
         String s = jobSchedulerFileElement.getSchedulerLivePath();
         assertEquals("testGetSchedulerHome", "c:/config/live", s);
     }
@@ -41,7 +41,7 @@ public class TestJobSchedulerFileElement {
     @Test
     public void testGetJobSchedulerElementName() {
         File f = new File("c:\\config\\live\\xxx\\job.job.xml");
-        JobSchedulerFileElement jobSchedulerFileElement = new JobSchedulerFileElement(f,"");
+        JobSchedulerFileElement jobSchedulerFileElement = new JobSchedulerFileElement(f);
         String s = jobSchedulerFileElement.getJobSchedulerElementName();
         assertEquals("testGetJobSchedulerElementName", "/xxx/job", s);
     }

@@ -56,8 +56,8 @@ public class TestConfigurationModifierFileSelector {
         configurationModifierFileSelectorOptions = new ConfigurationModifierFileSelectorOptions();
 
         configurationModifierFileSelectorOptions.setConfigurationDirectory("c:/temp/live");
-        configurationModifierFileSelectorOptions.setDirectoryExclusions("live/sos,test_event");
-        configurationModifierFileSelectorOptions.setFileExclusions("job_exercise1.job.xml,events2\\job_exercise3.job.xml");
+        configurationModifierFileSelectorOptions.setDirectoryExclusions("/sos,test_event");
+        configurationModifierFileSelectorOptions.setFileExclusions("/job_exercise1,/events2/ob_exercise3.job.xml");
         configurationModifierFileSelectorOptions.setRecursive(true);
         configurationModifierFileSelectorOptions.setRegexSelector("^job.*$");
 
@@ -75,9 +75,9 @@ public class TestConfigurationModifierFileSelector {
     public void testIsInJoblist() {
         configurationModifierFileSelectorOptions = new ConfigurationModifierFileSelectorOptions();
 
-        configurationModifierFileSelectorOptions.setConfigurationDirectory("c:/temp/live");
-        configurationModifierFileSelectorOptions.setDirectoryExclusions("test_event");
-        configurationModifierFileSelectorOptions.setFileExclusions("job_exercise1.job.xml,events2/job_exercise3.job.xml");
+        configurationModifierFileSelectorOptions.setConfigurationDirectory("c:/temp");
+        configurationModifierFileSelectorOptions.setDirectoryExclusions("/test_event");
+        configurationModifierFileSelectorOptions.setFileExclusions("/job_exercise1,/events2/job_exercise3");
         configurationModifierFileSelectorOptions.setRecursive(true);
         configurationModifierFileSelectorOptions.setRegexSelector("^job.*$");
 
@@ -88,7 +88,7 @@ public class TestConfigurationModifierFileSelector {
         boolean b = configurationModifierFileSelector.isInSelectedFileList("/sos/housekeeping/job6");
 
         assertEquals("testIsInJoblist",true, b);
-        configurationModifierFileSelectorOptions.setFileExclusions("job6.job.xml,events2/job_exercise3.job.xml");
+        configurationModifierFileSelectorOptions.setFileExclusions("/sos/housekeeping/job6,/events2/job_exercise3");
         configurationModifierFileSelector = new ConfigurationModifierFileSelector(configurationModifierFileSelectorOptions);
         configurationModifierFileSelector.setSelectorFilter(new ConfigurationModifierJobFileFilter(configurationModifierFileSelectorOptions));
         configurationModifierFileSelector.fillSelectedFileList();
@@ -103,9 +103,9 @@ public class TestConfigurationModifierFileSelector {
     public void testGetMonitorList() {
         configurationModifierFileSelectorOptions = new ConfigurationModifierFileSelectorOptions();
 
-        configurationModifierFileSelectorOptions.setConfigurationDirectory("c:/temp/live");
-        configurationModifierFileSelectorOptions.setDirectoryExclusions("test_event");
-        configurationModifierFileSelectorOptions.setFileExclusions("job_exercise1.job.xml,events2/job_exercise3.job.xml");
+        configurationModifierFileSelectorOptions.setConfigurationDirectory("c:/temp");
+        configurationModifierFileSelectorOptions.setDirectoryExclusions("/test_event");
+        configurationModifierFileSelectorOptions.setFileExclusions("/job_exercise1,/events2/job_exercise3.job.xml");
         configurationModifierFileSelectorOptions.setRecursive(true);
         configurationModifierFileSelectorOptions.setRegexSelector("^job.*$");
 
