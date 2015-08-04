@@ -66,7 +66,7 @@ public class ConfigurationModifierFileSelector {
     
     public boolean isInSelectedFileList(String elementName){
         for(JobSchedulerFileElement jobElement:listOfSelectedConfigurationFiles)  {
-            logger.debug(elementName + "=?" + jobElement.getJobSchedulerElementName());
+            logger.debug("isinSelectedFileList: " + elementName + "=?" + jobElement.getJobSchedulerElementName());
 
             if (elementName.equals(jobElement.getJobSchedulerElementName())){
                 return true;
@@ -87,6 +87,8 @@ public class ConfigurationModifierFileSelector {
     
     private void fillMonitorList(File d, String schedulerLivePath){
 
+    	if (d != null) {
+     		
          if (selectorOptions.isRecursive()){
              if (d != null && d.getAbsolutePath().length()> 0 && !d.getAbsolutePath().replace('\\', '/').equals(schedulerLivePath)){
                fillMonitorList(d.getParentFile(),schedulerLivePath);
@@ -103,28 +105,37 @@ public class ConfigurationModifierFileSelector {
         if (files != null){
             for(File file:files)  {
                 if (file.isFile()){
-                    logger.debug(file.getAbsolutePath() + " -------------- monitor added");
+                	logger.debug(file.getAbsolutePath() + " -------------- monitor added");
                     JobSchedulerFileElement jobSchedulerFileElement = new JobSchedulerFileElement(file);
                     listOfMonitorConfigurationFiles.add(jobSchedulerFileElement);
                 }
             }
         }
+    	}
       }
     
+    private void fillParentMonitorListFromBase(JobSchedulerFileElement jobSchedulerFileElement, String base){
+    	   
+        String schedulerLivePath = jobSchedulerFileElement.getSchedulerLivePath();
+        File d = jobSchedulerFileElement.getConfigurationFile();
+        String s = d.getAbsolutePath();
+        s = s.replace("\\", "/");
+        if (base.equals("live")){
+            s = s.replaceFirst("/cache", "/" + base);
+        }else{
+            s = s.replaceFirst("/live", "/" + base);
+        }
+        File dLive = new File(s);
+        fillMonitorList(dLive,schedulerLivePath+"/cache");
+    }
     
     public void fillParentMonitorList(JobSchedulerFileElement jobSchedulerFileElement){
         listOfMonitorConfigurationFiles = new ArrayList<JobSchedulerFileElement>();
         
-         String schedulerLivePath = jobSchedulerFileElement.getSchedulerLivePath();
-         schedulerLivePath = new File(schedulerLivePath).getParent();
-         schedulerLivePath =schedulerLivePath.replace('\\','/');
-         File dLive = jobSchedulerFileElement.getConfigurationFile();
-         fillMonitorList(dLive,schedulerLivePath+"/live");
-         String s = dLive.getAbsolutePath();
-         s = s .replace("\\", "/");
-         s = s.replaceFirst("/live", "/cache");
-         File dCache = new File(s);
-         fillMonitorList(dCache,schedulerLivePath+"/cache");
+        fillParentMonitorListFromBase(jobSchedulerFileElement,"live");
+        fillParentMonitorListFromBase(jobSchedulerFileElement,"base");
+        
+        
          
     }
 
