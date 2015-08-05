@@ -91,7 +91,7 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
         parameters.put("configuration_directory", "");
         parameters.put("exclude_dir", "");
         parameters.put("exclude_file", "");
-        parameters.put("recursiv", "true");
+        parameters.put("recursive", "true");
         parameters.put("regex_selector", "");
 
         DOMBuilder domBuilder = new DOMBuilder();
@@ -119,7 +119,7 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
             c.setConfigurationDirectory(parameters.get("configuration_directory"));
             c.setDirectoryExclusions(parameters.get("exclude_dir"));
             c.setFileExclusions(parameters.get("exclude_file"));
-            c.setRecursive(parameters.get("recursiv"));
+            c.setRecursive(parameters.get("recursive"));
             c.setRegexSelector(parameters.get("regex_selector"));
         }
         return c;
