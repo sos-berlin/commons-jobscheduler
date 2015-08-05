@@ -2,25 +2,12 @@ package com.sos.scheduler.plugins.monitor;
 
 import static org.junit.Assert.*;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.text.ParseException;
-import java.util.ArrayList;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import sos.scheduler.InstallationService.batchInstallationModel.installations.Installation;
-import sos.scheduler.InstallationService.batchInstallationModel.installations.Installations;
 
 import com.sos.scheduler.model.objects.Job;
 import com.sos.scheduler.plugins.globalmonitor.ConfigurationModifierFileFilter;
@@ -69,7 +56,6 @@ public class TestConfigurationModifierFileSelector {
         
      }
 
-    
     
     @Test
     public void testIsInJoblist() {
