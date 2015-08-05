@@ -133,7 +133,7 @@ public class ConfigurationModifierFileSelector {
         listOfMonitorConfigurationFiles = new ArrayList<JobSchedulerFileElement>();
         
         fillParentMonitorListFromBase(jobSchedulerFileElement,"live");
-        fillParentMonitorListFromBase(jobSchedulerFileElement,"base");
+        fillParentMonitorListFromBase(jobSchedulerFileElement,"cache");
         
         
          

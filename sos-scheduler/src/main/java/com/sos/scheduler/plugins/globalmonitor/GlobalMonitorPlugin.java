@@ -116,9 +116,9 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
                 }
             }
 
-            c.setConfigurationDirectory(parameters.get("configuration_directory"));
-            c.setDirectoryExclusions(parameters.get("exclude_dir"));
-            c.setFileExclusions(parameters.get("exclude_file"));
+            c.setConfigurationDirectory(parameters.get("configuration_directory").replace('\\', '/'));
+            c.setDirectoryExclusions(parameters.get("exclude_dir").replace('\\', '/'));
+            c.setFileExclusions(parameters.get("exclude_file").replace('\\', '/'));
             c.setRecursive(parameters.get("recursive"));
             c.setRegexSelector(parameters.get("regex_selector"));
         }
