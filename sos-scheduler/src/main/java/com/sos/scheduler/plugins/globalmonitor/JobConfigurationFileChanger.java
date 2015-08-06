@@ -1,8 +1,10 @@
 package com.sos.scheduler.plugins.globalmonitor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+
 
 
 import org.apache.log4j.Logger;
@@ -17,15 +19,14 @@ public class JobConfigurationFileChanger {
     private static Logger logger = Logger.getLogger(GlobalMonitorPlugin.class);
 
     private Document jobToChange;
-    private ArrayList<JobSchedulerFileElement> listOfMonitors;
-    //private Job job;
-
+    private HashMap<String,JobSchedulerFileElement> listOfMonitors;
+ 
     public JobConfigurationFileChanger(Document jobToChange_) {
         super();
         this.jobToChange = jobToChange_;
     }
 
-    public void setListOfMonitors(ArrayList<JobSchedulerFileElement> listOfMonitors) {
+    public void setListOfMonitors(HashMap<String,JobSchedulerFileElement> listOfMonitors) {
         this.listOfMonitors = listOfMonitors;
     }
 
@@ -43,15 +44,15 @@ public class JobConfigurationFileChanger {
         org.jdom.Element aktJob = domBuilder.build(jobToChange).getRootElement();
 
         List<org.jdom.Element> monitorUseList = aktJob.getChildren("monitor.use");
-
-        for (JobSchedulerFileElement monitor : listOfMonitors) {
-            org.jdom.Element monitorUse = new org.jdom.Element("monitor.use");
-            monitorUse.setAttribute("monitor", monitor.getJobSchedulerElementName());
-            //monitorUse.setAttribute("ordering", "0");
-            if (!monitorUseList.contains(monitorUse)) {
-                monitorUseList.add(monitorUse);
-            }
+        Iterator <String> listOfMonitorNames = listOfMonitors.keySet().iterator();
+        while (listOfMonitorNames.hasNext()) {
+        	   String monitorName = listOfMonitorNames.next();
+        	   org.jdom.Element monitorUse = new org.jdom.Element("monitor.use");
+               monitorUse.setAttribute("monitor", monitorName);
+               monitorUseList.add(monitorUse);
         }
+        
+      
         reorderDOM(aktJob);
         return convertJdomElement2W3Document(aktJob);
     }

@@ -2,6 +2,7 @@ package com.sos.scheduler.plugins.globalmonitor;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
@@ -11,11 +12,11 @@ public class ConfigurationModifierFileSelector {
     private static final Logger logger = Logger.getLogger(GlobalMonitorPlugin.class);
 
     private ConfigurationModifierFileSelectorOptions selectorOptions;
-    private ArrayList<JobSchedulerFileElement> listOfSelectedConfigurationFiles;
-    private ArrayList<JobSchedulerFileElement> listOfMonitorConfigurationFiles;
+    private HashMap<String,JobSchedulerFileElement> listOfSelectedConfigurationFiles;
+    private HashMap<String,JobSchedulerFileElement> listOfMonitorConfigurationFiles;
    
 
-    public ArrayList<JobSchedulerFileElement> getListOfMonitorConfigurationFiles() {
+    public HashMap<String,JobSchedulerFileElement> getListOfMonitorConfigurationFiles() {
         return listOfMonitorConfigurationFiles;
     }
 
@@ -41,7 +42,7 @@ public class ConfigurationModifierFileSelector {
                    if (file.isFile()){
                        logger.debug(file.getAbsolutePath() + " added");
                        JobSchedulerFileElement jobSchedulerFileElement = new JobSchedulerFileElement(file);
-                       listOfSelectedConfigurationFiles.add(jobSchedulerFileElement);
+                       listOfSelectedConfigurationFiles.put(jobSchedulerFileElement.getJobSchedulerElementName(),jobSchedulerFileElement);
                    }else{
                        if (selectorOptions.isRecursive()){
                            logger.debug("reading " + file.getAbsolutePath());
@@ -54,35 +55,22 @@ public class ConfigurationModifierFileSelector {
     }
     
     public void fillSelectedFileList(){      
-        listOfSelectedConfigurationFiles = new ArrayList<JobSchedulerFileElement> ();
+        listOfSelectedConfigurationFiles = new HashMap<String,JobSchedulerFileElement> ();
         fillFiles(selectorOptions.getConfigurationDirectory()+"/cache");
         fillFiles(selectorOptions.getConfigurationDirectory()+"/live");    
 
     }
     
-    public ArrayList<JobSchedulerFileElement> getSelectedFileList(){
+    public HashMap<String,JobSchedulerFileElement>  getSelectedFileList(){
         return listOfSelectedConfigurationFiles;
     }
     
     public boolean isInSelectedFileList(String elementName){
-        for(JobSchedulerFileElement jobElement:listOfSelectedConfigurationFiles)  {
-            logger.debug("isinSelectedFileList: " + elementName + "=?" + jobElement.getJobSchedulerElementName());
-
-            if (elementName.equals(jobElement.getJobSchedulerElementName())){
-                return true;
-            }
-        }
-        return false;
-        
+    	return (listOfSelectedConfigurationFiles.get(elementName) != null);
     }
 
     public JobSchedulerFileElement getJobSchedulerElement(String jobName){
-        for(JobSchedulerFileElement jobSchedulerElement:listOfSelectedConfigurationFiles)  {
-            if (jobName.equals(jobSchedulerElement.getJobSchedulerElementName())){
-                return jobSchedulerElement;
-            }
-        }
-        return null;
+    	return listOfSelectedConfigurationFiles.get(jobName);
     }
     
     private void fillMonitorList(File d, String schedulerLivePath){
@@ -107,7 +95,7 @@ public class ConfigurationModifierFileSelector {
                 if (file.isFile()){
                 	logger.debug(file.getAbsolutePath() + " -------------- monitor added");
                     JobSchedulerFileElement jobSchedulerFileElement = new JobSchedulerFileElement(file);
-                    listOfMonitorConfigurationFiles.add(jobSchedulerFileElement);
+                    listOfMonitorConfigurationFiles.put(jobSchedulerFileElement.getJobSchedulerElementName(),jobSchedulerFileElement);
                 }
             }
         }
@@ -130,13 +118,10 @@ public class ConfigurationModifierFileSelector {
     }
     
     public void fillParentMonitorList(JobSchedulerFileElement jobSchedulerFileElement){
-        listOfMonitorConfigurationFiles = new ArrayList<JobSchedulerFileElement>();
+        listOfMonitorConfigurationFiles = new HashMap<String,JobSchedulerFileElement>();
         
         fillParentMonitorListFromBase(jobSchedulerFileElement,"live");
         fillParentMonitorListFromBase(jobSchedulerFileElement,"cache");
-        
-        
-         
     }
 
     public void setSelectorFilter(ConfigurationModifierFileFilter selectorFilter) {
