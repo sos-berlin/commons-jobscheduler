@@ -125,7 +125,7 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Ser
         }
 
         if (filter.getSourceFilename() != null && !filter.getSourceFilename().equals("")) {
-            where += and + " sourceFilename=:sourceFilename";
+            where += and + " sourceFilename like :sourceFilename";
             and = " and ";
         }
 
