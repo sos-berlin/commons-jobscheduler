@@ -5253,6 +5253,26 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	 * 
 	 */
 	@JSOptionDefinition(
+			name = "jump_strict_hostKey_checking",
+			description = "Check the hostkey against known hosts for SSH",
+			key = "jump_strict_hostKey_checking",
+			type = "SOSOptionBoolean",
+			mandatory = false)
+	public SOSOptionBoolean	jump_strict_hostkey_checking	= new SOSOptionBoolean(this, conClassName + ".jump_strict_hostkey_checking",
+												"Check the hostkey against known hosts for SSH", "false", "false", false);
+
+	public SOSOptionBoolean getjump_strict_hostKey_checking() {
+		return jump_strict_hostkey_checking;
+	}
+
+	public void setjump_strict_hostKey_checking(final String value) {
+		jump_strict_hostkey_checking.Value(value);
+	}
+	
+	/**
+	 * 
+	 */
+	@JSOptionDefinition(
 			name = "jump_platform",
 			description = "This parameter specifies the platform on the jump host",
 			key = "jump_dir",
@@ -5264,7 +5284,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 										SOSOptionPlatform.enuValidPlatforms.unix.name(), // DefaultValue
 										false // isMandatory
 								);
-
+	
 	/**
 	* \brief getjump_platform
 	*
