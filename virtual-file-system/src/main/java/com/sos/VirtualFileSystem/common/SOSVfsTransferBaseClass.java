@@ -160,9 +160,9 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	 * One of yes (refuse connection), ask (ask the user whether to add/change the key)
 	 * and no (always insert the new key).
 	 *
-	 * @param pstrStrictHostKeyCheckingValue
+	 * @param strictHostKeyCheckingValue
 	 */
-	public void StrictHostKeyChecking (final String pstrStrictHostKeyCheckingValue) {
+	public void setStrictHostKeyChecking (final String strictHostKeyCheckingValue) {
 
 	}
 

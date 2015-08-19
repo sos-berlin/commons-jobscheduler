@@ -115,9 +115,9 @@ public interface ISOSDataProviderOptions {
 	 */
 	public abstract void setreplacing(SOSOptionRegExp p_replacing);
 
-	public abstract String getStrict_HostKey_Checking(); // public String getStrict_HostKey_Checking
+	public abstract SOSOptionBoolean getstrict_hostKey_checking(); // public SOSOptionBoolean getStrict_HostKey_Checking
 
-	public abstract ISOSDataProviderOptions setStrict_HostKey_Checking(String pstrValue); // public SOSFtpOptionsSuperClass setStrict_HostKey_Checking
+	public abstract void setstrict_hostKey_checking(String pstrValue); // public SOSFtpOptionsSuperClass setStrict_HostKey_Checking
 
 	public abstract SOSOptionString getTFN_Post_Command(); // public String getTFN_Post_Command
 

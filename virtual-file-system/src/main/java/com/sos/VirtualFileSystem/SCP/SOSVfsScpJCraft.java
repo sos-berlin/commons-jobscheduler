@@ -23,6 +23,7 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
 import com.jcraft.jsch.SftpProgressMonitor;
+import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.JSHelper.Options.SOSOptionInFileName;
@@ -69,9 +70,12 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
 		secureChannel = new JSch();
 	}
 
-	@Override public void StrictHostKeyChecking(final String pstrStrictHostKeyCheckingValue) {
-		JSch.setConfig(conConfigurationSTRICT_HOST_KEY_CHECKING, pstrStrictHostKeyCheckingValue);
-		//	'	sshConnection.StrictHostKeyChecking(pstrStrictHostKeyCheckingValue);
+	@Override public void setStrictHostKeyChecking(final String strictHostKeyCheckingValue) {
+		JSch.setConfig(conConfigurationSTRICT_HOST_KEY_CHECKING, strictHostKeyCheckingValue);
+	}
+	
+	private String getStrictHostKeyChecking(final SOSOptionBoolean strictHostKeyChecking) {
+		return strictHostKeyChecking.value() ? "yes" : "no";
 	}
 
 	/**
@@ -106,7 +110,7 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
 		if (connection2OptionsAlternate == null) {
 			RaiseException(SOSVfs_E_190.params("connection2OptionsAlternate"));
 		}
-		this.StrictHostKeyChecking(connection2OptionsAlternate.StrictHostKeyChecking.Value());
+		this.setStrictHostKeyChecking(getStrictHostKeyChecking(connection2OptionsAlternate.strictHostKeyChecking));
 		this.connect(connection2OptionsAlternate.host.Value(), connection2OptionsAlternate.port.value());
 		return this;
 	}
@@ -127,27 +131,11 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
 		try {
 			this.doAuthenticate(authenticationOptions);
 		}
+		catch (JobSchedulerException ex) {
+			throw ex;
+		}
 		catch (Exception ex) {
-			Exception exx = ex;
-			this.disconnect();
-			if (connection2OptionsAlternate != null) {
-				SOSConnection2OptionsSuperClass optionsAlternatives = connection2OptionsAlternate.Alternatives();
-				if (!optionsAlternatives.host.IsEmpty() && !optionsAlternatives.user.IsEmpty()) {
-					logINFO(SOSVfs_I_170.params(connection2OptionsAlternate.Alternatives().host.Value()));
-					try {
-						host = optionsAlternatives.host.Value();
-						port = optionsAlternatives.port.value();
-						this.doAuthenticate(optionsAlternatives);
-						exx = null;
-					}
-					catch (Exception e) {
-						exx = e;
-					}
-				}
-			}
-			if (exx != null) {
-				RaiseException(exx, SOSVfs_E_168.get());
-			}
+			throw new JobSchedulerException(ex);
 		}
 		return this;
 	}
@@ -883,7 +871,7 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
 		}
 		sshSession = secureChannel.getSession(puser, phost, pport);
 		java.util.Properties config = new java.util.Properties();
-		config.put(conConfigurationSTRICT_HOST_KEY_CHECKING, connection2OptionsAlternate.StrictHostKeyChecking.Value());
+		config.put(conConfigurationSTRICT_HOST_KEY_CHECKING, getStrictHostKeyChecking(connection2OptionsAlternate.strictHostKeyChecking));
 		sshSession.setConfig(config);
 	}
 

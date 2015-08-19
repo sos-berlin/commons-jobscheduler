@@ -200,10 +200,10 @@ public class SOSConnection2OptionsJUnitTest extends JSToolBox {
 	public void testStrictHostKeyChecking () {
 
 		objOptions = new SOSConnection2Options();
-		assertEquals("StrictHostKeyChecking", "no", objOptions.StrictHostKeyChecking.Value());
+		assertEquals("StrictHostKeyChecking", "no", objOptions.strictHostKeyChecking.Value());
 
-		objOptions.StrictHostKeyChecking.Value("yes");
-		assertEquals("StrictHostKeyChecking", "yes", objOptions.StrictHostKeyChecking.Value());
+		objOptions.strictHostKeyChecking.Value("yes");
+		assertEquals("StrictHostKeyChecking", "yes", objOptions.strictHostKeyChecking.Value());
 
 	}
 

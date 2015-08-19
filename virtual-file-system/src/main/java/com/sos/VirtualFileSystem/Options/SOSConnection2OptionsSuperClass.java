@@ -33,49 +33,7 @@ import com.sos.JSHelper.interfaces.ISOSDataProviderOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
-/**
- * \class 		SOSConnection2OptionsSuperClass - Options for a connection to an uri (server, site, e.g.)
- *
- * \brief
- * An Options-Super-Class with all Options. This Class will be extended by the "real" Options-class (\see SOSConnection2Options.
- * The "real" Option class will hold all the things, which are normaly overwritten at a new generation
- * of the super-class.
- *
- *
 
- *
- * see \see j:\e\java\development\com.sos.scheduler\src\sos\scheduler\jobdoc\SOSConnection2.xml for (more) details.
- *
- * \verbatim ;
- * mechanicaly created by  from http://www.sos-berlin.com at 20100917112403
- * \endverbatim
- * \section OptionsTable Tabelle der vorhandenen Optionen
- *
- * Tabelle mit allen Optionen
- *
- * MethodName
- * Title
- * Setting
- * Description
- * IsMandatory
- * DataType
- * InitialValue
- * TestValue
- *
- *
- *
- * \section TestData Eine Hilfe zum Erzeugen einer HashMap mit Testdaten
- *
- * Die folgenden Methode kann verwendet werden, um für einen Test eine HashMap
- * mit sinnvollen Werten für die einzelnen Optionen zu erzeugen.
- *
- * \verbatim
- private HashMap <String, String> SetJobSchedulerSSHJobOptions (HashMap <String, String> pobjHM) {
-	pobjHM.put ("		SOSConnection2OptionsSuperClass.auth_file", "test");  // This parameter specifies the path and name of a user's pr
-		return pobjHM;
-  }  //  private void SetJobSchedulerSSHJobOptions (HashMap <String, String> pobjHM)
- * \endverbatim
- */
 @JSOptionClass(
 				name = "SOSConnection2OptionsSuperClass",
 				description = "SOSConnection2OptionsSuperClass")
@@ -87,10 +45,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 *
 	 */
 	private static final long	serialVersionUID	= 1997338600688654140L;
-	@SuppressWarnings("unused")
 	private final String		conClassName		= this.getClass().getSimpleName();
-	@SuppressWarnings("unused")
-	private static final String	conSVNVersion		= "$Id$";
 	@SuppressWarnings("unused")
 	private final static Logger	logger				= Logger.getLogger(SOSConnection2OptionsSuperClass.class);
 	/**
@@ -540,38 +495,36 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 * \created 13.11.2012 18:40:25 by KB
 	 */
 	@JSOptionDefinition(
-						name = "Strict_HostKey_Checking",
-						description = "Check the hostkey against known hosts for SSH",
-						key = "Strict_HostKey_Checking",
-						type = "SOSOptionValueList",
-						mandatory = false)
-	public SOSOptionStringValueList	StrictHostKeyChecking	= new SOSOptionStringValueList(
+			name = "strict_hostKey_checking",
+			description = "Check the hostkey against known hosts for SSH",
+			key = "strict_hostKey_checking",
+			type = "SOSOptionBoolean",
+			mandatory = false)
+	public SOSOptionBoolean	strictHostKeyChecking	= new SOSOptionBoolean(
 															// ...
 																	this, // ....
 																	conClassName + ".strict_hostkey_checking", // ...
 																	"Check the hostkey against known hosts for SSH", // ...
-																	"ask;yes;no", // ...
-																	"no", // ...
+																	"false", // ...
+																	"false", // ...
 																	false);
 
 	/* (non-Javadoc)
 	 * @see com.sos.VirtualFileSystem.Options.ISOSDataProviderOptions#getStrict_HostKey_Checking()
 	 */
 	@Override
-	public String getStrict_HostKey_Checking() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getStrict_HostKey_Checking";
-		return StrictHostKeyChecking.Value();
-	} // public String getStrict_HostKey_Checking
+	public SOSOptionBoolean getstrict_hostKey_checking() {
+		return strictHostKeyChecking;
+	}
 
 	/* (non-Javadoc)
 	 * @see com.sos.VirtualFileSystem.Options.ISOSDataProviderOptions#setStrict_HostKey_Checking(java.lang.String)
 	 */
 	@Override
-	public ISOSDataProviderOptions setStrict_HostKey_Checking(final String pstrValue) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setStrict_HostKey_Checking";
-		StrictHostKeyChecking.Value(pstrValue);
-		return this;
-	} // public SOSFtpOptionsSuperClass setStrict_HostKey_Checking
+	public void setstrict_hostKey_checking(final String pstrValue) {
+		strictHostKeyChecking.Value(pstrValue);
+	}
+	
 	/**
 	 * \option TFN_Post_Command
 	 * \type SOSOptionString

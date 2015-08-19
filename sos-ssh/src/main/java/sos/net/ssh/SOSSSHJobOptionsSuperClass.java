@@ -1838,24 +1838,23 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
     objCredentialStore.checkCredentialStoreOptions();
   } // public SOSConnection2OptionsAlternate (HashMap JSSettings)
 
-  @JSOptionDefinition(name = "Strict_HostKey_Checking", description = "Check the hostkey against known hosts for SSH", key = "Strict_HostKey_Checking", type = "SOSOptionValueList", mandatory = false)
-  public SOSOptionStringValueList StrictHostKeyChecking = new SOSOptionStringValueList(
+  @JSOptionDefinition(name = "strict_hostKey_checking", description = "Check the hostkey against known hosts for SSH", key = "strict_hostKey_checking", type = "SOSOptionBoolen", mandatory = false)
+  public SOSOptionBoolean strictHostKeyChecking = new SOSOptionBoolean(
   // ...
       this, // ....
       conClassName + ".strict_hostkey_checking", // ...
       "Check the hostkey against known hosts for SSH", // ...
-      "ask;yes;no", // ...
-      "no", // ...
+      "false", // ...
+      "false", // ...
       false);
 
-  public String getStrict_HostKey_Checking() {
-    return StrictHostKeyChecking.Value();
-  }
+	public String getstrict_hostKey_checking() {
+		return strictHostKeyChecking.Value();
+	}
 
-  public SOSSSHJobOptionsSuperClass setStrict_HostKey_Checking(final String pstrValue) {
-    StrictHostKeyChecking.Value(pstrValue);
-    return this;
-  }
+	public void setstrict_hostKey_checking(final String pstrValue) {
+		strictHostKeyChecking.Value(pstrValue);
+	}
 
   @JSOptionDefinition(name = "proxy_protocol", description = "Proxy protocol", key = "proxy_protocol", type = "SOSOptionProxyProtocol", mandatory = false)
   public SOSOptionProxyProtocol proxy_protocol = new SOSOptionProxyProtocol(

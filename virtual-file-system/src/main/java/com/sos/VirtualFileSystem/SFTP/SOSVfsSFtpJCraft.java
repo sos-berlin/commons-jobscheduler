@@ -32,6 +32,7 @@ import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
 import com.jcraft.jsch.SftpProgressMonitor;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.JSHelper.Options.SOSOptionInFileName;
 import com.sos.JSHelper.Options.SOSOptionProxyProtocol;
@@ -96,9 +97,13 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		secureChannel = new JSch();
 	}
 
-	@Override public void StrictHostKeyChecking(final String pstrStrictHostKeyCheckingValue) {
-		JSch.setConfig("StrictHostKeyChecking", pstrStrictHostKeyCheckingValue);
-		//	'	sshConnection.StrictHostKeyChecking(pstrStrictHostKeyCheckingValue);
+	@Override 
+	public void setStrictHostKeyChecking(final String strictHostKeyCheckingValue) {
+		JSch.setConfig("StrictHostKeyChecking", strictHostKeyCheckingValue);
+	}
+	
+	private String getStrictHostKeyChecking(final SOSOptionBoolean strictHostKeyChecking) {
+		return strictHostKeyChecking.value() ? "yes" : "no";
 	}
 
 	/**
@@ -132,7 +137,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		if (connection2OptionsAlternate == null) {
 			RaiseException(SOSVfs_E_190.params("connection2OptionsAlternate"));
 		}
-		this.StrictHostKeyChecking(connection2OptionsAlternate.StrictHostKeyChecking.Value());
+		this.setStrictHostKeyChecking(getStrictHostKeyChecking(connection2OptionsAlternate.strictHostKeyChecking));
 		this.connect(connection2OptionsAlternate.host.Value(), connection2OptionsAlternate.port.value());
 		return this;
 	}
@@ -159,8 +164,10 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 			
 			this.doAuthenticate(authenticationOptions);
 		}
+		catch (JobSchedulerException ex) {
+			throw ex;
+		}
 		catch (Exception ex) {
-			//https://change.sos-berlin.com/browse/SOSFTP-212
 			throw new JobSchedulerException(ex);
 		}
 		return this;
@@ -207,7 +214,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		reply = "disconnect OK";
 		if (sftpClient != null) {
 			try {
-      		  
 				sftpClient.exit();
 				if (sftpClient.isConnected()) {
 					sftpClient.disconnect();
@@ -942,7 +948,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		}
 		sshSession = secureChannel.getSession(puser, phost, pport);
 		java.util.Properties config = new java.util.Properties();
-		config.put("StrictHostKeyChecking", connection2OptionsAlternate.StrictHostKeyChecking.Value());
+		config.put("StrictHostKeyChecking", getStrictHostKeyChecking(connection2OptionsAlternate.strictHostKeyChecking));
 		sshSession.setConfig(config);
 		
 		setCommandsTimeout();

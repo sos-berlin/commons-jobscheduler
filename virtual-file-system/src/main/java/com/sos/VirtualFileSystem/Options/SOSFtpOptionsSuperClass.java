@@ -1066,43 +1066,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 		FileNameEncoding.Value(pstrValue);
 		return this;
 	} // public SOSFtpOptionsSuperClass setFileNameEncoding
-	/**
-	 * \option Strict_HostKey_Checking
-	 * \type SOSOptionValueList
-	 * \brief Strict_HostKey_Checking - Check the hostKey against known hosts for SSH
-	 *
-	 * \details
-	 * Check the hostkey against known hosts for SSH
-	 *
-	 * \mandatory: false
-	 *
-	 * \created 13.11.2012 18:40:25 by KB
-	 */
-	@JSOptionDefinition(
-						name = "Strict_HostKey_Checking",
-						description = "Check the hostkey against known hosts for SSH",
-						key = "Strict_HostKey_Checking",
-						type = "SOSOptionValueList",
-						mandatory = false)
-	public SOSOptionStringValueList	StrictHostKeyChecking	= new SOSOptionStringValueList(
-															// ...
-																	this, // ....
-																	conClassName + ".strict_hostkey_checking", // ...
-																	"Check the hostkey against known hosts for SSH", // ...
-																	"ask;yes;no", // ...
-																	"no", // ...
-																	false);
-
-	public String getStrict_HostKey_Checking() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getStrict_HostKey_Checking";
-		return StrictHostKeyChecking.Value();
-	} // public String getStrict_HostKey_Checking
-
-	public SOSFtpOptionsSuperClass setStrict_HostKey_Checking(final String pstrValue) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setStrict_HostKey_Checking";
-		StrictHostKeyChecking.Value(pstrValue);
-		return this;
-	} // public SOSFtpOptionsSuperClass setStrict_HostKey_Checking
+	
 	/**
 	 * \option ControlEncoding
 	 * \type SOSOptionString
