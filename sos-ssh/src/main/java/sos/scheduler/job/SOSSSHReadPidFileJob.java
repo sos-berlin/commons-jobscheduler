@@ -227,7 +227,7 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
 
   public SOSConnection2OptionsAlternate getAlternateOptions(SOSSSHJobOptions options) {
     SOSConnection2OptionsAlternate alternateOptions = new SOSConnection2OptionsAlternate();
-    alternateOptions.setStrict_HostKey_Checking("no");
+    alternateOptions.setstrict_hostKey_checking("no");
     alternateOptions.host.Value(options.getHost().Value());
     alternateOptions.port.value(options.getPort().value());
     alternateOptions.user.Value(options.getUser().Value());
