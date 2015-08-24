@@ -1467,7 +1467,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		properties.put(FIELD_GUID, this.guid); // 1- GUID
 		properties.put(FIELD_MANDATOR, mandator); // 2- mandator: default SOS
 //		properties.put(FIELD_TRANSFER_TIMESTAMP, transfer_timestamp); // 3- timestamp: Zeitstempel im ISO-Format
-		properties.put(FIELD_TRANSFER_START, transfer_timestamp); // 3- timestamp: Zeitstempel im ISO-Format
+		properties.put(FIELD_TRANSFER_END, transfer_timestamp); // 3- timestamp: Zeitstempel im ISO-Format
 		properties.put(FIELD_PID, pid); // 4- pid= Environment PID | 0 für Windows
 		properties.put(FIELD_PPID, ppid); // 5- ppid= Environment PPID | 0 für Windows
 		properties.put(FIELD_OPERATION, operation); // 6- operation: send|receive
@@ -1497,7 +1497,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		properties.put(FIELD_JUMP_PORT, jump_port); // 26
 		properties.put(FIELD_JUMP_PROTOCOL, jump_protocol); // 27
 		properties.put(FIELD_JUMP_USER, jump_user); // 28
-		properties.put(FIELD_TRANSFER_END, transfer_timestamp); // 29- timestamp: Zeitstempel im ISO-Format
+		properties.put(FIELD_TRANSFER_START, transfer_timestamp); // 29- timestamp: Zeitstempel im ISO-Format
 		// TODO custom-fields einbauen
 		/**
 		 * bei SOSFTP ist es moeglich "custom" Felder zu definieren, die in der Transfer History als Auftragsparameter mitgeschickt werden.
@@ -1514,7 +1514,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		addCSv(properties.get(FIELD_GUID)); // 1- GUID
 		addCSv(properties.get(FIELD_MANDATOR)); // 2- mandator: default SOS
 //		addCSv(properties.get(FIELD_TRANSFER_TIMESTAMP)); // 3- timestamp: Zeitstempel im ISO-Format
-		addCSv(properties.get(FIELD_TRANSFER_START)); // 3- timestamp: Zeitstempel im ISO-Format
+		addCSv(properties.get(FIELD_TRANSFER_END)); // 3- timestamp: Zeitstempel im ISO-Format
 		addCSv(properties.get(FIELD_PID)); // 4- pid= Environment PID | 0 für Windows
 		addCSv(properties.get(FIELD_PPID)); // 5- ppid= Environment PPID | 0 für Windows
 		addCSv(properties.get(FIELD_OPERATION)); // 6- operation: send|receive
@@ -1540,7 +1540,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		addCSv(properties.get(FIELD_JUMP_PORT)); // 26
 		addCSv(properties.get(FIELD_JUMP_PROTOCOL)); // 27
 		addCSv(properties.get(FIELD_JUMP_USER)); // 28
-		addCSv(properties.get(FIELD_TRANSFER_END)); // 29
+		addCSv(properties.get(FIELD_TRANSFER_START)); // 29
 		// Diff to the format of the transfer history as order
 		SOSOptionTime modified = new SOSOptionTime(null, null, null, "", "", false);
 		modified.value(lngFileModDate);
