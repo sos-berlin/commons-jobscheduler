@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Properties;
@@ -13,6 +15,8 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.util.Base64;
 import org.apache.log4j.Logger;
+
+import sos.util.SOSDate;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionString;
@@ -1377,12 +1381,12 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	public Properties getFileAttributesAsProperties(HistoryRecordType recordType) {
 		Properties properties = new Properties();
 		String mandator = objOptions.mandator.Value(); // 0-
-		String transfer_timestamp = EMPTY_STRING;
-		try {
-			transfer_timestamp = sos.util.SOSDate.getCurrentTimeAsString();
-		}
-		catch (Exception e) {
-		} // 1- timestamp: Zeitstempel im ISO-Format
+//		String transfer_timestamp = EMPTY_STRING;
+//		try {
+//			transfer_timestamp = sos.util.SOSDate.getCurrentTimeAsString();
+//		}
+//		catch (Exception e) {
+//		} // 1- timestamp: Zeitstempel im ISO-Format
 		/**
 		 * this hack is tested for SUN-JVM only. No guarantee is made for other JVMs
 		 */
@@ -1467,7 +1471,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		properties.put(FIELD_GUID, this.guid); // 1- GUID
 		properties.put(FIELD_MANDATOR, mandator); // 2- mandator: default SOS
 //		properties.put(FIELD_TRANSFER_TIMESTAMP, transfer_timestamp); // 3- timestamp: Zeitstempel im ISO-Format
-		properties.put(FIELD_TRANSFER_END, transfer_timestamp); // 3- timestamp: Zeitstempel im ISO-Format
+		properties.put(FIELD_TRANSFER_END, getTransferTimeAsString(this.getEndTime())); // 3- timestamp: Zeitstempel im ISO-Format
 		properties.put(FIELD_PID, pid); // 4- pid= Environment PID | 0 für Windows
 		properties.put(FIELD_PPID, ppid); // 5- ppid= Environment PPID | 0 für Windows
 		properties.put(FIELD_OPERATION, operation); // 6- operation: send|receive
@@ -1497,7 +1501,9 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		properties.put(FIELD_JUMP_PORT, jump_port); // 26
 		properties.put(FIELD_JUMP_PROTOCOL, jump_protocol); // 27
 		properties.put(FIELD_JUMP_USER, jump_user); // 28
-		properties.put(FIELD_TRANSFER_START, transfer_timestamp); // 29- timestamp: Zeitstempel im ISO-Format
+
+		properties.put(FIELD_TRANSFER_START, getTransferTimeAsString(this.getStartTime())); // 29- timestamp: Zeitstempel im ISO-Format
+		
 		// TODO custom-fields einbauen
 		/**
 		 * bei SOSFTP ist es moeglich "custom" Felder zu definieren, die in der Transfer History als Auftragsparameter mitgeschickt werden.
@@ -1594,5 +1600,12 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
 	public void setTargetFileAlreadyExists(boolean targetFileAlreadyExists) {
 		this.targetFileAlreadyExists = targetFileAlreadyExists;
+	}
+	
+	private String getTransferTimeAsString(Date time){
+        SimpleDateFormat formatter = new SimpleDateFormat(SOSDate.dateTimeFormat);
+        formatter.setLenient(false);
+        return formatter.format(time.getTime());
+
 	}
 }
