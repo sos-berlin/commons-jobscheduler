@@ -53,17 +53,17 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
     	envVarNamePrefix = PARAM_SCHEDULER_VARIABLE_PREFIX_DEFAULT_VALUE;
     }
     SOSSSHJobOptions objO = null;
-    if(useJSch == null || useJSch.isEmpty() || useJSch.equalsIgnoreCase("false")){
-      useTrilead = true;
-      objR = new SOSSSHJobTrilead();
-      objO = objR.Options();
-      spooler_log.debug9("uses Trilead implementation of SSH");
-    } else {
+    if(useJSch == null || useJSch.isEmpty() || useJSch.equalsIgnoreCase("true")){
     	//this is the default value since v1.10.0 [SP]
         useTrilead = false;
-      objR = new SOSSSHJobJSch();
-      objO = objR.Options();
-      spooler_log.debug9("uses JSch implementation of SSH");
+    	objR = new SOSSSHJobJSch();
+    	objO = objR.Options();
+    	spooler_log.debug9("uses JSch implementation of SSH");
+    } else {
+        useTrilead = true;
+        objR = new SOSSSHJobTrilead();
+        objO = objR.Options();
+        spooler_log.debug9("uses Trilead implementation of SSH");
     } 
     objO.CurrentNodeName(this.getCurrentNodeName());
     // https://change.sos-berlin.com/browse/JITL-157
