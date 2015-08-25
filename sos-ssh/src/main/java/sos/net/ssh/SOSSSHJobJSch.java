@@ -321,7 +321,8 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
 
 	public SOSConnection2OptionsAlternate getAlternateOptions(SOSSSHJobOptions options) {
 		SOSConnection2OptionsAlternate alternateOptions = new SOSConnection2OptionsAlternate();
-		alternateOptions.strictHostKeyChecking.value(false);
+//		alternateOptions.strictHostKeyChecking.value(false);
+		alternateOptions.strictHostKeyChecking.value(options.strictHostKeyChecking.value());
 		alternateOptions.host.Value(options.getHost().Value());
 		alternateOptions.port.value(options.getPort().value());
 		alternateOptions.user.Value(options.getUser().Value());
