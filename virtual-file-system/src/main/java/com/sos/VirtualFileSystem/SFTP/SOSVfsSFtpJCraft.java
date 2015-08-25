@@ -24,6 +24,7 @@ import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.ProxyHTTP;
 import com.jcraft.jsch.ProxySOCKS4;
 import com.jcraft.jsch.ProxySOCKS5;
@@ -860,6 +861,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		userName = authenticationOptions.getUser().Value();
 		String password = authenticationOptions.getPassword().Value();
 		logger.debug(SOSVfs_D_132.params(userName));
+		setKnownHostsFile();
 		this.createSession(userName, host, port);
 		if (authenticationOptions.getAuth_method().isPublicKey()) {
 			logger.debug(SOSVfs_D_165.params("userid", "publickey"));
@@ -889,6 +891,14 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		logger.info(SOSVfs_D_133.params(userName));
 		this.LogReply();
 		return this;
+	}
+
+	
+	private void setKnownHostsFile() throws JSchException {
+		if(secureChannel != null && connection2OptionsAlternate.strictHostKeyChecking.isTrue()) {
+			File knownHostsFile = new File(System.getProperty("user.home"), ".ssh/known_hosts");
+			secureChannel.setKnownHosts(knownHostsFile.getAbsolutePath());
+		}
 	}
 
 	public ChannelSftp getClient() {
