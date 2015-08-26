@@ -651,11 +651,11 @@ public class SOSFileList extends SOSVfsMessageCodes {
 	/**
 	 * Felder der Historiendatei
 	 */
-	private final String	historyFields		= "guid;mandator;transfer_timestamp;pid;ppid;operation;localhost;localhost_ip;local_user;remote_host;remote_host_ip;remote_user;protocol;port;local_dir;remote_dir;local_filename;remote_filename;file_size;md5;status;last_error_message;log_filename";
+	private final String	historyFields		= "guid;mandator;transfer_end;pid;ppid;operation;localhost;localhost_ip;local_user;remote_host;remote_host_ip;remote_user;protocol;port;local_dir;remote_dir;local_filename;remote_filename;file_size;md5;status;last_error_message;log_filename";
 	/**
 	 * neue Felder der Historiendatei. Der Aufbau ist wie folgt: historyFields;<history_entry_>;newHistoryFields
 	 */
-	private final String	newHistoryFields	= "jump_host;jump_host_ip;jump_port;jump_protocol;jump_user;modification_timestamp";
+	private final String	newHistoryFields	= "jump_host;jump_host_ip;jump_port;jump_protocol;jump_user;modification_timestamp;transfer_start";
 
 	public void writeTransferHistory() {
 		if (flgHistoryFileAlreadyWritten == true) {
