@@ -707,6 +707,35 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		// populate all the Options for "source_" and "target_" ....
 		setChildClasses(hshMap);
 	} // public void setAllOptions (HashMap <String, String> JSSettings)
+	
+	/**
+	 * https://change.sos-berlin.com/browse/JITL-202
+	 * setAllOptions with "settings" destroys params in JADE job
+	 * 
+	 * @param params
+	 */
+	public void setAllOptions2(HashMap<String, String> params) {
+		Map<String, String> mapFromIniFile = new HashMap<String, String>();
+		if (flgSettingsFileProcessed == false
+				&& flgReadSettingsFileIsActive == false) {
+			if (params.containsKey("settings")
+					&& params.containsKey("profile")) {
+				this.settings.Value(params.get("settings"));
+				this.profile.Value(params.get("profile"));
+				flgReadSettingsFileIsActive = true;
+				mapFromIniFile = ReadSettingsFile();
+				flgReadSettingsFileIsActive = false;
+				flgSettingsFileProcessed = true;
+			}
+		}
+		flgSetAllOptions = true;
+		params.putAll(mapFromIniFile);
+		objSettings = params;
+		super.Settings(params);
+		super.setAllOptions(params);
+		setChildClasses(params);
+		flgSetAllOptions = false;
+	}
 
 	/**
 	 *
