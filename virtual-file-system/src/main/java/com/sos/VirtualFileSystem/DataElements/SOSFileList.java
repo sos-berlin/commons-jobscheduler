@@ -655,7 +655,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 	/**
 	 * neue Felder der Historiendatei. Der Aufbau ist wie folgt: historyFields;<history_entry_>;newHistoryFields
 	 */
-	private final String	newHistoryFields	= "jump_host;jump_host_ip;jump_port;jump_protocol;jump_user;modification_timestamp;transfer_start";
+	private final String	newHistoryFields	= "jump_host;jump_host_ip;jump_port;jump_protocol;jump_user;transfer_start;modification_timestamp";
 
 	public void writeTransferHistory() {
 		if (flgHistoryFileAlreadyWritten == true) {
