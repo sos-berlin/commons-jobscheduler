@@ -92,6 +92,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	private static final String	FIELD_TRANSFER_END	= "transfer_end";
 	private static final String	FIELD_MANDATOR			= "mandator";
 	private static final String	FIELD_GUID				= "guid";
+	private static final String	FIELD_MODIFICATION_DATE = "modification_date";
 	public enum enuTransferStatus {
 		transferUndefined, waiting4transfer, transferring, transferInProgress, transferred, transfer_skipped, transfer_has_errors, transfer_aborted, compressed, notOverwritten, deleted, renamed, IgnoredDueToZerobyteConstraint, setBack, polling
 	}
@@ -1500,9 +1501,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		properties.put(FIELD_JUMP_PORT, jump_port); // 26
 		properties.put(FIELD_JUMP_PROTOCOL, jump_protocol); // 27
 		properties.put(FIELD_JUMP_USER, jump_user); // 28
-
 		properties.put(FIELD_TRANSFER_START, getTransferTimeAsString(this.getStartTime())); // 29- timestamp: Zeitstempel im ISO-Format
-		
+//		properties.put(FIELD_MODIFICATION_DATE, getTransferTimeAsString(new Date(lngFileModDate))); // 30- Zeitstempel der letzten Änderung der source Datei 
 		// TODO custom-fields einbauen
 		/**
 		 * bei SOSFTP ist es moeglich "custom" Felder zu definieren, die in der Transfer History als Auftragsparameter mitgeschickt werden.
@@ -1550,6 +1550,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		SOSOptionTime modified = new SOSOptionTime(null, null, null, "", "", false);
 		modified.value(lngFileModDate);
 		addCSv(modified.getTimeAsString(lngFileModDate));
+//		addCSv(properties.get(FIELD_MODIFICATION_DATE)); // 30
 		return strCSVRec;
 	}
 
