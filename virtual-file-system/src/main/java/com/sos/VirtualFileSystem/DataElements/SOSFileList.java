@@ -676,8 +676,10 @@ public class SOSFileList extends SOSVfsMessageCodes {
 				historyFile = objOptions.HistoryFileName.JSFile();
 				if (objOptions.HistoryFileAppendMode.isTrue()) {
 					historyFile.setAppendMode(true);
-				}
-				if (historyFile.exists() == false) {
+					if (!historyFile.exists()) {
+						historyFile.WriteLine(historyFields + ";" + newHistoryFields);
+					}
+				} else {
 					historyFile.WriteLine(historyFields + ";" + newHistoryFields);
 				}
 				for (SOSFileListEntry entry : objFileListEntries) {
