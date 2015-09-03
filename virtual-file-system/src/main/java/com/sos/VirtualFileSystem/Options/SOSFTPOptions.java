@@ -758,6 +758,10 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			properties.put("date", SOSOptionTime.getCurrentDateAsString());
 			properties.put("time", SOSOptionTime.getCurrentTimeAsString("hh:mm:ss"));
 			properties.put("local_user", System.getProperty("user.name"));
+			
+			Properties props4Substitute = new Properties();
+			props4Substitute.put("profile", profile.Value());
+			props4Substitute.put("settings", settings.Value());
 			try {
 				java.net.InetAddress localMachine = java.net.InetAddress.getLocalHost();
 				properties.put("localhost", localMachine.getHostName());
@@ -772,15 +776,17 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 				String value = (String) e.getValue();
 				if (hasVariableToSubstitute(value) == true && gflgSubsituteVariables == true) {
 					logger.trace("ReadSettingsFile() - key = " + key + ", value = " + value);
-					value = SubstituteVariables(value, properties);
-					value = SubstituteVariables(value, propSOSFtpEnvironmentVars);
-					value = SubstituteVariables(value, propAllEnvironmentVariables);
+					value = substituteVariables(value, properties);
+					value = substituteVariables(value, props4Substitute);
+					value = substituteVariables(value, propSOSFtpEnvironmentVars);
+					value = substituteVariables(value, propAllEnvironmentVariables);
 					// TODO wrong place: has to come from the JS-Adapter as properties
-					value = SubstituteVariables(value, schedulerParams);
+					value = substituteVariables(value, schedulerParams);
 					if (hasVariableToSubstitute(value)) {
 						String strM = SOSVfsMessageCodes.SOSVfs_W_0070.params(value, key);
 						logger.warn(strM);
 					}
+					value = unescape(value);
 				}
 				map.put(key, value);
 			}
@@ -835,13 +841,17 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		return props;
 	}
 
-	private boolean hasVariableToSubstitute(String pstrValue) {
+	private boolean hasVariableToSubstitute(String value) {
 		boolean flgResult = false;
-		pstrValue = pstrValue.toLowerCase().replaceAll("[%$]\\{(source|target)(transfer)?filename\\}", "").replaceAll("%(source|target)(transfer)?filename%", "");
-		if (pstrValue.indexOf("${") != -1 || pstrValue.indexOf("%{") != -1) {
+		value = " "+value.toLowerCase().replaceAll("(\\$|%)\\{(source|target)(transfer)?filename\\}", "").replaceAll("%(source|target)(transfer)?filename%", "");
+		if (value.matches("^.*[^\\\\](\\$|%)\\{[^/\\}\\\\]+\\}.*$") || value.matches("^.*[^\\\\]%[^/%\\\\]+%.*$")) {
 			flgResult = true;
 		}
 		return flgResult;
+	}
+	
+	private String unescape(String value) {
+		return value.replaceAll("\\\\((?:\\$|%)\\{[^/\\}\\\\]+\\})", "$1").replaceAll("\\\\(%[^/%\\\\]+%)", "$1");
 	}
 
 	@SuppressWarnings("unused")
@@ -858,18 +868,18 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	}
 	
 	
-	public String SubstituteVariables(String txt, final Properties prop) {
+	public String substituteVariables(String txt, final Properties prop) {
 		Map<String, String> startEndCharsForSubstitute = new HashMap<String, String>();
 		startEndCharsForSubstitute.put("${", "}");
 		startEndCharsForSubstitute.put("%{", "}");
 		startEndCharsForSubstitute.put("%", "%");
 		for (Map.Entry<String,String> e : startEndCharsForSubstitute.entrySet()) {
-			txt = SubstituteVariables(txt, prop, e.getKey(), e.getValue());
+			txt = substituteVariables(txt, prop, e.getKey(), e.getValue());
 		}
 		return txt;
 	}
 
-	public String SubstituteVariables(String txt, final Properties prop, final String startPrefix, final String endPrefix) {
+	public String substituteVariables(String txt, final Properties prop, final String startPrefix, final String endPrefix) {
 		try {
 			for (Object k : prop.keySet()) {
 				String key = (String) k;
