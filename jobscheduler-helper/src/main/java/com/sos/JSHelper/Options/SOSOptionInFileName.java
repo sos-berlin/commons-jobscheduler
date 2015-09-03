@@ -86,15 +86,16 @@ public class SOSOptionInFileName extends JSOptionInFileName {
 		if (this.isMandatory()) {
 			this.JSFile();
 			if (objFile != null) {
-				String lstrFileName = strValue;
-				try {
-					if (isNotEmpty(lstrFileName)) {
-						lstrFileName = objFile.getCanonicalPath();
-					}
-				}
-				catch (IOException e) {
-					e.printStackTrace();
-				}
+				String lstrFileName = objFile.getPath();
+//				String lstrFileName = strValue;
+//				try {
+//					if (isNotEmpty(lstrFileName)) {
+//						lstrFileName = objFile.getCanonicalPath();
+//					}
+//				}
+//				catch (IOException e) {
+//					e.printStackTrace();
+//				}
 				if (objFile.exists() == false) {
 					throw new RuntimeException(String.format("%1$s: file '%2$s' does not exists", conMethodName, lstrFileName));
 				}
