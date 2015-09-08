@@ -406,7 +406,9 @@ public class SOSVfsMessageCodes extends JSToolBox {
   public static final SOSMsgVfs   SOSVfs_E_283    = new SOSMsgVfs("SOSVfs_E_283");               // "Error occured while opening a Session for postCommands: %1$s"
   @I18NMsg
   public static final SOSMsgVfs   SOSVfs_D_284    = new SOSMsgVfs("SOSVfs_D_284");               // "received Return Values are: "
-	
+  @I18NMsg
+  public static final SOSMsgVfs   SOSVfs_I_285    = new SOSMsgVfs("SOSVfs_I_285");               // "Checksum file created: "
+
 	
 	@Deprecated
 	public SOSVfsMessageCodes() {

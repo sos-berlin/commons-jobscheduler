@@ -4,6 +4,7 @@
 package com.sos.VirtualFileSystem.DataElements;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -300,7 +301,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 	public SOSFileListEntry add(final String pstrLocalFileName) {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::add";
 		if (objFileListEntries == null) {
-			objFileListEntries = new Vector<>();
+			objFileListEntries = new Vector<SOSFileListEntry>();
 		}
 		SOSFileListEntry objEntry = this.Find(pstrLocalFileName);
 		if (objEntry == null) {
@@ -389,17 +390,6 @@ public class SOSFileList extends SOSVfsMessageCodes {
 		}
 	}
 
-	public void createHashFileEntries(final String pstrHashTypeName) {
-		Vector<String> objV = new Vector<>();
-		for (SOSFileListEntry objEntry : objFileListEntries) {
-			objV.add(objEntry.SourceFileName());
-		}
-		for (String string : objV) {
-			this.add(string + "." + pstrHashTypeName).flgIsHashFile = true;
-		}
-	}
-	
-	
 	public void logFileList() {
 		String strT = "";
 		for (SOSFileListEntry objListItem : objFileListEntries) {
@@ -447,7 +437,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 	}
 
 	/**
-	 * Erst bei Erfolgreichen transferieren aller Dateien, wird der atomic suffix umbennant
+	 * Erst beim erfolgreichen Transfer aller Dateien, wird der atomic suffix umbenannt
 	 * Bedingung: Parameter objOptions.transactional.value() = yes
 	 * @throws Exception
 	 */
@@ -460,17 +450,23 @@ public class SOSFileList extends SOSVfsMessageCodes {
 					if (objListItem.isNotOverwritten()) {
 						continue;
 					}
+					
 					String strTargetTransferName = objListItem.TargetTransferName();
 					String strToFilename = MakeFullPathName(objOptions.TargetDir.Value(), objListItem.TargetFileName());
-					if (!fileNamesAreEqual(strToFilename, strTargetTransferName, false)) { // SOSFTP-142
+					if (!fileNamesAreEqual(objListItem.TargetFileName(), strTargetTransferName, false)) { // SOSFTP-142
 						ISOSVirtualFile objF = null;
 						if (objOptions.overwrite_files.isTrue() && objListItem.FileExists() == true) {
 							objListItem.setTargetFileAlreadyExists(true);
 							objF = objDataTargetClient.getFileHandle(strToFilename);
 							objF.delete();
 						}
+						if (objListItem.TargetFileName().contains("/") && objOptions.makeDirs.isTrue()) {
+							String parent = objListItem.normalized(new File(strToFilename).getParent());
+							objDataTargetClient.mkdir(parent);
+						}
 						objF = objDataTargetClient.getFileHandle(MakeFullPathName(objOptions.TargetDir.Value(), strTargetTransferName));
 						objF.rename(strToFilename);
+						objListItem.createChecksumFile(strToFilename);
 						objListItem.executePostCommands();
 						// if cumulative_files is true then this loop has to much entries
 						if (objOptions.CumulateFiles.isTrue()) {
@@ -502,7 +498,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 	 */
 	public void EndTransaction() {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::EndTransaction";
-		this.checkSecurityHashFiles();
+//		checkIntegrityHashFiles();
 		dteTransactionEnd.setParsePattern(JSDateFormat.dfTIMESTAMPS);
 		dteTransactionEnd.Value(Now());
 //		this.sendTransferHistory();
@@ -510,39 +506,38 @@ public class SOSFileList extends SOSVfsMessageCodes {
 		CreateResultSetFile();
 	} // private void EndTransaction
 
-	private void checkSecurityHashFiles() {
-		if (objOptions.CheckSecurityHash.isTrue()) {
-			for (SOSFileListEntry objItem : objFileListEntries) {
-				if (objItem.flgIsHashFile == false) {
-					String strTargetFileName = objItem.getTargetFileNameAndPath();
-					ISOSVirtualFile objF = null;
-					try {
-						objF = objItem.getDataTargetClient().getFileHandle(strTargetFileName + "." + objOptions.SecurityHashType.Value());
-						if (objF.FileExists() == false) {
-							logger.info(String.format("Hash file '%1$s' not found", strTargetFileName));
+
+	private void checkIntegrityHashFiles() {
+		if (objOptions.CheckIntegrityHash.isTrue()) {
+			ISOSVirtualFile sourceChecksumFile = null;
+			for (SOSFileListEntry entry : objFileListEntries) {
+				String sourceFileName = objOptions.SourceDir.Value() + entry.getSourceFilename();
+				if (sourceFileName.toLowerCase().endsWith(objOptions.SecurityHashType.Value().toLowerCase())) {
+					continue;
+				}
+				String sourceChecksumFileName = sourceFileName + "." + objOptions.SecurityHashType.Value();
+				try {
+					sourceChecksumFile = entry.getDataSourceClient().getFileHandle(sourceChecksumFileName);
+					if (sourceChecksumFile.FileExists()) {
+						String origChecksum = sourceChecksumFile.File2String().replaceAll("[\\n\\r]", "");
+						if (!origChecksum.equals(entry.getChecksum())) {
+							String strT = String.format("Integrity Hash violation. File %1$s, checksum read: '%2$s', checksum calculated: '%3$s'", sourceChecksumFileName, origChecksum, entry.getChecksum());
+							logger.error(strT);
+							throw new JobSchedulerException(strT);
+						}
+						else {
+							logger.debug(String.format("Integrity Hash checking: File %1$s, checksum read '%2$s', checksum calculated '%3$s'", sourceChecksumFileName, origChecksum, entry.getChecksum()));
 						}
 					}
-					catch (Exception e) {
-						logger.error(e.getLocalizedMessage());
-					}
-					String strHash = objF.File2String();
-					strHash = strHash.replaceAll("\\n", "");
-					strHash = strHash.replaceAll("\\r", "");
-					String strH = objItem.SecurityHash();
-					if (strHash.equals(strH) == false) {
-						String strT = String.format("Security Hash violation. File %1$s, hash read '%2$s', hash calculated '%3$s'", strTargetFileName, strHash,
-								strH);
-						logger.error(strT);
-						throw new JobSchedulerException(strT);
-					}
 					else {
-						logger.info(String.format("Security checking: File %1$s, hash read '%2$s', hash calculated '%3$s'", strTargetFileName, strHash, strH));
+						logger.debug(String.format("Checksum file '%1$s' not found", sourceChecksumFileName));
 					}
+				} catch (Exception e) {
+					logger.error(e.toString());
 				}
 			}
 		}
 	}
-
 	/**
 	 *
 	 * \brief StartTransaction
@@ -609,7 +604,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 						entry.setAtomicFileName(EMPTY_STRING);
 						entry.setStatus(enuTransferStatus.setBack);
 					} catch (Exception e) {
-						logger.error(e.getLocalizedMessage());
+						logger.error(e.toString());
 					}
 				}
 				if (!entry.isTargetFileAlreadyExists()) {
@@ -619,12 +614,25 @@ public class SOSFileList extends SOSVfsMessageCodes {
 						if(targetFile.FileExists()) {
 							targetFile.delete();
 						}
-						msg = SOSVfs_D_212.params(targetFile);
+						msg = SOSVfs_D_212.params(targetFile.getName());
 						logger.debug(msg);
 						objJadeReportLogger.info(msg);
 						entry.setStatus(enuTransferStatus.setBack);
 					} catch (Exception e) {
-						logger.error(e.getLocalizedMessage());
+						logger.error(e.toString());
+					}
+				}
+				if (entry.hasChecksumFile()) {
+					try {
+						ISOSVirtualFile checksumFile = entry.getChecksumFile();
+						if(checksumFile.FileExists()) {
+							checksumFile.delete();
+						}
+						msg = SOSVfs_D_212.params(checksumFile.getName());
+						logger.debug(msg);
+						objJadeReportLogger.info(msg);
+					} catch (Exception e) {
+						logger.error(e.toString());
 					}
 				}
 			}
