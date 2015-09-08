@@ -1339,17 +1339,19 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	} // public SOSFtpOptionsSuperClass setPostTransferCommands
 		// see http://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#MessageDigest
 	@JSOptionDefinition(
-						name = "SecurityHashType",
+						name = "IntegrityHashType",
 						description = "",
-						key = "security_hash_type",
+						key = "integrity_hash_type",
 						type = "SOSOptionString",
 						mandatory = false)
-	public SOSOptionString	SecurityHashType		= new SOSOptionString(this, conClassName + ".security_hash_type", // HashMap-Key
-															"The Type of the security hash, e.g. MD5", // Titel
-															"MD5", // InitValue
-															"MD5", // DefaultValue
+	public SOSOptionString	IntegrityHashType		= new SOSOptionString(this, conClassName + ".integrity_hash_type", // HashMap-Key
+															"The Type of the integrity hash, e.g. md5", // Titel
+															"md5", // InitValue
+															"md5", // DefaultValue
 															false // isMandatory
 													);
+	public SOSOptionString	SecurityHashType		= (SOSOptionString) IntegrityHashType.SetAlias("security_hash_type");
+	
 	@JSOptionDefinition(
 						name = "DecompressAfterTransfer",
 						description = "",
@@ -1375,17 +1377,19 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 															false // isMandatory
 													);
 	@JSOptionDefinition(
-						name = "CheckSecurityHash",
+						name = "CheckIntegrityHash",
 						description = "",
-						key = "Check_Security_Hash",
+						key = "check_integrity_hash",
 						type = "SOSOptionBoolean",
 						mandatory = false)
-	public SOSOptionBoolean	CheckSecurityHash		= new SOSOptionBoolean(this, conClassName + ".Check_Security_Hash", // HashMap-Key
-															"Decompress zipped-files after transfer", // Titel
+	public SOSOptionBoolean	CheckIntegrityHash		= new SOSOptionBoolean(this, conClassName + ".check_integrity_hash", // HashMap-Key
+															"Calculates the integrity hash", // Titel
 															"false", // InitValue
 															"false", // DefaultValue
 															false // isMandatory
 													);
+	public SOSOptionBoolean	CheckSecurityHash	= (SOSOptionBoolean) CheckIntegrityHash.SetAlias("check_security_hash");
+	
 	@JSOptionDefinition(
 						name = "MaxConcurrentTransfers",
 						description = "",
@@ -1399,29 +1403,20 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 															false // isMandatory
 													);
 	@JSOptionDefinition(
-						name = "CreateSecurityHashFile",
+						name = "CreateIntegrityHashFile",
 						description = "",
-						key = "create_security_hash_file",
+						key = "create_integrity_hash_file",
 						type = "SOSOptionBoolean",
 						mandatory = false)
-	public SOSOptionBoolean	CreateSecurityHashFile	= new SOSOptionBoolean(this, conClassName + ".create_security_hash_file", // HashMap-Key
-															"CreateSecurityHashFile", // Titel
+	public SOSOptionBoolean	CreateIntegrityHashFile	= new SOSOptionBoolean(this, conClassName + ".create_integrity_hash_file", // HashMap-Key
+															"Flag if an integrity hash file will be created on the target", // Titel
 															"false", // InitValue
 															"false", // DefaultValue
 															false // isMandatory
 													);
-	@JSOptionDefinition(
-						name = "CreateSecurityHash",
-						description = "",
-						key = "create_security_hash",
-						type = "SOSOptionBoolean",
-						mandatory = false)
-	public SOSOptionBoolean	CreateSecurityHash		= new SOSOptionBoolean(this, conClassName + ".create_security_hash", // HashMap-Key
-															"This parameter specifies whether the content of a", // Titel
-															"true", // InitValue
-															"false", // DefaultValue
-															false // isMandatory
-													);
+	
+	public SOSOptionBoolean	CreateSecurityHashFile	= (SOSOptionBoolean) CreateIntegrityHashFile.SetAlias("create_security_hash_file");
+	
 	@JSOptionDefinition(
 						name = "BufferSize",
 						description = "",
