@@ -381,12 +381,10 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 
 	@Override
 	public void ExecuteCommand(final String strCmd) throws Exception {
-		final String conMethodName = conClassName + "::ExecuteCommand";
-
-		objFTPClient.sendCommand(strCmd);
-		logger.debug(HostID(SOSVfs_E_0106.params(conMethodName, strCmd, getReplyString())));
-		objFTPClient.sendCommand("NOOP");
-		getReplyString();
+		String command = strCmd.endsWith("\n") ? strCmd : strCmd + "\n";
+		objFTPClient.sendCommand(command);
+		logger.info(SOSVfs_D_151.params(strCmd, getReplyString()));
+		objFTPClient.completePendingCommand();
 	}
 
 	@Override
