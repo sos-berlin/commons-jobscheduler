@@ -17,46 +17,7 @@ import com.sos.JSHelper.Options.SOSOptionString;
 import com.sos.hibernate.interfaces.IHibernateOptions;
 import com.sos.JSHelper.Archiver.IJSArchiverOptions;
 
-/**
- * \class JobNetOptionsSuperClass - title
- * 
- * \brief An Options-Super-Class with all Options. This Class will be extended
- * by the "real" Options-class (\see JobNetOptions. The "real" Option class will
- * hold all the things, which are normaly overwritten at a new generation of the
- * super-class.
- * 
- * 
- * 
- * 
- * see \see C:\Dokumente und Einstellungen\Uwe Risse\Lokale
- * Einstellungen\Temp\scheduler_editor-3285541815265253193.html for (more)
- * details.
- * 
- * \verbatim ; mechanicaly created by C:\Dokumente und Einstellungen\Uwe
- * Risse\Eigene
- * Dateien\sos-berlin.com\jobscheduler.1.3.9\scheduler_139\config\JOETemplates
- * \java\xsl\JSJobDoc2JSOptionSuperClass.xsl from http://www.sos-berlin.com at
- * 20120224145540 \endverbatim \section OptionsTable Tabelle der vorhandenen
- * Optionen
- * 
- * Tabelle mit allen Optionen
- * 
- * MethodName Title Setting Description IsMandatory DataType InitialValue
- * TestValue
- * 
- * 
- * 
- * \section TestData Eine Hilfe zum Erzeugen einer HashMap mit Testdaten
- * 
- * Die folgenden Methode kann verwendet werden, um für einen Test eine HashMap
- * mit sinnvollen Werten für die einzelnen Optionen zu erzeugen.
- * 
- * \verbatim private HashMap <String, String> SetJobSchedulerSSHJobOptions
- * (HashMap <String, String> pobjHM) { pobjHM.put
- * ("		JobNetOptionsSuperClass.auth_file", "test"); // This parameter specifies
- * the path and name of a user's pr return pobjHM; } // private void
- * SetJobSchedulerSSHJobOptions (HashMap <String, String> pobjHM) \endverbatim
- */
+ 
 @JSOptionClass(name = "JobNetOptionsSuperClass", description = "JobNetOptionsSuperClass")
 public class HibernateOptions extends JSOptionsClass implements IHibernateOptions {
 
