@@ -387,7 +387,7 @@ public class SOSCommandSecurityWebservice {
 
             String[] orderParams = getParams(params);
             if (orderParams != null) {
-                //objOrder.setParamsIfNotEmpty(orderParams);
+                objOrder.setParams(orderParams);
             }
 
             if (runtime != null && runtime.length() > 0) {
