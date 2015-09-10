@@ -462,16 +462,18 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
 
 	@Override
 	@Deprecated // use getFilenames in superclass
-	public String[] getFilelist(final String folder, final String regexp, final int flag, final boolean flgRecurseSubFolder) {
+	public String[] getFilelist(final String folder, final String regexp, final int flag, final boolean flgRecurseSubFolder, String integrityHashType) {
 		// TODO vecDirectoryListing = null; prüfen, ob notwendig
 		vecDirectoryListing = nList(folder, flgRecurseSubFolder);
 		Vector<String> strB = new Vector<String>();
 		Pattern pattern = Pattern.compile(regexp, flag);
 		for (String strFile : vecDirectoryListing) {
-			/**
-			 * the file_spec has to be compared to the filename only ... excluding the path
-			 */
+			//the file_spec has to be compared to the filename only ... excluding the path
 			String strFileName = new File(strFile).getName();
+			//file list should not contain the checksum files 
+			if (integrityHashType != null && strFileName.endsWith(integrityHashType)) {
+				continue;
+			}
 			Matcher matcher = pattern.matcher(strFileName);
 			if (matcher.find() == true) {
 				strB.add(strFile);

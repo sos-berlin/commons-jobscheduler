@@ -461,7 +461,7 @@ public class SOSVfsZipTest {
 		
 		ISOSVFSHandler objLocalVFS = VFSFactory.getHandler("local");
 		ISOSVfsFileTransfer objLocalFiles = (ISOSVfsFileTransfer) objLocalVFS;
-		String[] strA = objLocalFiles.getFilelist(strTestPathName, ".*\\.txt", 1, false);
+		String[] strA = objLocalFiles.getFilelist(strTestPathName, ".*\\.txt", 1, false, null);
 		
 		for (String string : strA) {
 			ISOSVirtualFile objVF = objLocalFiles.getFileHandle(string);
@@ -475,7 +475,7 @@ public class SOSVfsZipTest {
   @Ignore("Test set to Ignore for later examination")
 	public final void Directory4ZipWithMultipleFiles () throws Exception {
 		objFileSystemHandler.changeWorkingDirectory(TEST_ZIP);
-		String[] strA = objFileSystemHandler.getFilelist(strTestPathName, "^.*\\.txt$", 1, false);
+		String[] strA = objFileSystemHandler.getFilelist(strTestPathName, "^.*\\.txt$", 1, false, null);
 		
 		for (String strFileName : strA) {
 			System.out.println(strFileName);
@@ -488,7 +488,7 @@ public class SOSVfsZipTest {
   @Ignore("Test set to Ignore for later examination")
 	public final void ExtractWithMultipleFiles () throws Exception {
 		objFileSystemHandler.changeWorkingDirectory(TEST_ZIP);
-		String[] strA = objFileSystemHandler.getFilelist("c:\\temp\\", ".*\\.txt$", 1, false);
+		String[] strA = objFileSystemHandler.getFilelist("c:\\temp\\", ".*\\.txt$", 1, false, null);
 
 		ISOSVFSHandler objLocalVFS = VFSFactory.getHandler(enuTransferTypes.local.Text());
 		ISOSVfsFileTransfer objLocalFiles = (ISOSVfsFileTransfer) objLocalVFS;

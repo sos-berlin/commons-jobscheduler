@@ -633,7 +633,7 @@ public class SOSVfsSFtpTest extends JSToolBox {
 		connect();
 		authenticate();
 
-		String[] result = ftpClient.getFilelist(REMOTE_BASE_PATH, "", 0, false);
+		String[] result = ftpClient.getFilelist(REMOTE_BASE_PATH, "", 0, false, null);
 		for (String element : result) {
 			logger.info(element);
 		}

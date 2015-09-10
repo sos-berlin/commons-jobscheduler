@@ -146,7 +146,7 @@ public class SchedulerHotFolder extends JSObjBase {
 			}
 		}
 		logger.debug("getFilelist from: " + pobjVirtualDir.getName());
-		filenames = objVFSHandler.getFilelist(pobjVirtualDir.getName(), ".*", 0, false);
+		filenames = objVFSHandler.getFilelist(pobjVirtualDir.getName(), ".*", 0, false, null);
 		for (String filename : filenames) {
 			ISOSVirtualFile objVirtualFile1 = objVFSHandler.getFileHandle(filename);
 			String lowerFilename = filename.toLowerCase();
