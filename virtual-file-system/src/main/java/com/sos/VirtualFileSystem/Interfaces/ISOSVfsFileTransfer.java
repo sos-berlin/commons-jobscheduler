@@ -181,7 +181,7 @@ public interface ISOSVfsFileTransfer {
 
 	public boolean isNegativeCommandCompletion () ;
 
-	public String[] getFilelist(String folder, String regexp, int flag, boolean withSubFolder);
+	public String[] getFilelist(String folder, String regexp, int flag, boolean withSubFolder, String integrityHashType);
 	public String[] getFolderlist(String folder, String regexp, int flag, boolean withSubFolder);
 
 	public long getFileSize(String strFileName) ;

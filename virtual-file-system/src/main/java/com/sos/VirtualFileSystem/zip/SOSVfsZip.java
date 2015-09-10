@@ -638,7 +638,7 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
 	@Override
 	public SOSFileList dir(final SOSFolderName pobjFolderName) {
 
-		String[] strEntryNames = getFilelist("", ".*", 1, true);
+		String[] strEntryNames = getFilelist("", ".*", 1, true, null);
 		SOSFileList objFL = new SOSFileList();
 		objFL.add(strEntryNames, "");
 		return objFL;
@@ -797,7 +797,7 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
 	}
 
 	@Override
-	public String[] getFilelist(final String folder, final String regexp, final int flag, final boolean withSubFolder) {
+	public String[] getFilelist(final String folder, final String regexp, final int flag, final boolean withSubFolder, String integrityHashType) {
 		String[] strS = null;
 
 		try {
@@ -807,7 +807,10 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
 			Enumeration<?> zipEntries = objWorkingDirectory.entries();
 			while (zipEntries.hasMoreElements()) {
 				String strEntryName = ((ZipEntry) zipEntries.nextElement()).getName();
-
+				//file list should not contain the checksum files 
+				if (integrityHashType != null && strEntryName.endsWith(integrityHashType)) {
+					continue;
+				}
 				Matcher matcher = pattern.matcher(strEntryName);
 				if (matcher.find()) {
 					objV.add(strEntryName);

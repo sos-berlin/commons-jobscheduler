@@ -1758,7 +1758,7 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
 	}
 
 	@Override
-	public String[] getFilelist(final String folder, final String regexp, final int flag, final boolean withSubFolder) {
+	public String[] getFilelist(final String folder, final String regexp, final int flag, final boolean withSubFolder, String integrityHashType) {
 		vecDirectoryListing = null; // start with a fresh copy of this list (due to polling ...)
 		if (vecDirectoryListing == null) {
 			String strT = folder.replaceAll("\\\\", "/");
@@ -1768,10 +1768,12 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
 		Vector<String> strB = new Vector<String>();
 		Pattern pattern = Pattern.compile(regexp, flag);
 		for (String strFile : vecDirectoryListing) {
-			/**
-			 * the file_spec has to be compared to the filename only ... excluding the path
-			 */
+			// the file_spec has to be compared to the filename only ... excluding the path
 			String strFileName = new File(strFile).getName();
+			//file list should not contain the checksum files 
+			if (integrityHashType != null && strFileName.endsWith(integrityHashType)) {
+				continue;
+			}
 			Matcher matcher = pattern.matcher(strFileName);
 			if (matcher.find() == true) {
 				strB.add(strFile);

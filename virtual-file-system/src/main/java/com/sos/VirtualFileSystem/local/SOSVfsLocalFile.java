@@ -457,7 +457,7 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
 			throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_130.params("createTempFile()"), e);
 		}
 		try {
-			logger.info(SOSVfsMessageCodes.SOSVfs_I_264.get());
+			logger.debug(SOSVfsMessageCodes.SOSVfs_I_264.get());
 			this.compressFile(fleSourceTransferFile);
 		}
 		catch (Exception e) {

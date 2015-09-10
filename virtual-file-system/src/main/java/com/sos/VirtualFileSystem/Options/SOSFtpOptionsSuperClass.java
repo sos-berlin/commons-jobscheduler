@@ -6288,9 +6288,9 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						type = "JSJobChain",
 						mandatory = false)
 	public JSJobChain	scheduler_job_chain				= new JSJobChain(this, conClassName + ".scheduler_job_chain", // HashMap-Key
-																"The name of a job chain for Managed File Transfer", // Titel
-																"scheduler_sosftp_history", // InitValue
-																"scheduler_sosftp_history", // DefaultValue
+																"The name of a job chain for Background Service", // Titel
+																"/sos/jade/jade_history", // InitValue
+																"/sos/jade/jade_history", // DefaultValue
 																false // isMandatory
 														);
 	public JSJobChain	BackgroundServiceJobChainName	= (JSJobChain) scheduler_job_chain.SetAlias("BackgroundService_Job_Chain_Name");

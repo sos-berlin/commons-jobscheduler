@@ -562,7 +562,7 @@ public class SOSVfsWebDAVTest {
 		connect();
 		authenticate();
 
-		String[] result = objVfsClient.getFilelist(REMOTE_BASE_PATH + "kb", "", 0, true);
+		String[] result = objVfsClient.getFilelist(REMOTE_BASE_PATH + "kb", "", 0, true, null);
 		for (String element : result) {
 			logger.info(element);
 		}

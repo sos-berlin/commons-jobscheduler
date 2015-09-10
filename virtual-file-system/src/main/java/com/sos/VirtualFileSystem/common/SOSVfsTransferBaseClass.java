@@ -860,17 +860,19 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	}
 
 	@Override
-	public String[] getFilelist(final String folder, final String regexp, final int flag, final boolean withSubFolder) {
+	public String[] getFilelist(final String folder, final String regexp, final int flag, final boolean withSubFolder, String integrityHashType) {
 		Vector<String> result = nList(folder, withSubFolder);
 
 		Vector<String> newResult = new Vector<String>();
 		Pattern pattern = Pattern.compile(regexp, flag);
 		for (String strFile : result) {
-			/**
-			 * the file_spec has to be compared to the filename only ... excluding the path
-			 */
-
-			Matcher matcher = pattern.matcher(new File(strFile).getName());
+			//the file_spec has to be compared to the filename only ... excluding the path
+			String strFileName = new File(strFile).getName();
+			//file list should not contain the checksum files 
+			if (integrityHashType != null && strFileName.endsWith(integrityHashType)) {
+				continue;
+			}
+			Matcher matcher = pattern.matcher(strFileName);
 			if (matcher.find() == true) {
 				newResult.add(strFile);
 			}

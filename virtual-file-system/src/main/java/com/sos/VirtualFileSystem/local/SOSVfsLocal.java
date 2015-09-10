@@ -447,12 +447,16 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
 	}
 
 	@Override
-	public String[] getFilelist(final String folder, final String regexp, final int flag, final boolean pflgRecurseSubFolder) {
+	public String[] getFilelist(final String folder, final String regexp, final int flag, final boolean pflgRecurseSubFolder, String integrityHashType) {
 		String[] strS = null;
 		try {
 			Vector<File> objA = SOSFile.getFolderlist(folder, regexp, flag, pflgRecurseSubFolder);
 			Vector<String> objV = new Vector<String>(objA.size());
 			for (File objF : objA) {
+				//file list should not contain the checksum files 
+				if (integrityHashType != null && objF.getName().endsWith(integrityHashType)) {
+					continue;
+				}
 				if (objF.isDirectory() == false) {
 					objV.add(objF.getPath());
 				}

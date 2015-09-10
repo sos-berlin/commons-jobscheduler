@@ -564,7 +564,7 @@ public class SOSVfsJCIFSTest {
 		authenticate();
 
 		//String[] result = ftpClient.getFilelist(REMOTE_BASE_PATH, "", 0, true);
-		String[] result = objVfsClient.getFilelist(REMOTE_BASE_PATH, "\\.pdf$", 0, true);
+		String[] result = objVfsClient.getFilelist(REMOTE_BASE_PATH, "\\.pdf$", 0, true, null);
 		for (String element : result) {
 			logger.info(element);
 		}
