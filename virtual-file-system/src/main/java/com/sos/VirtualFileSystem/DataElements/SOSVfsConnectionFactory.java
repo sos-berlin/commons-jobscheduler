@@ -89,15 +89,7 @@ public class SOSVfsConnectionFactory {
 			}
 			options.loadClassName.SetIfNotDirty(objOptions.getConnectionOptions().loadClassName);
 			VFSFactory.setConnectionOptions(options);
-			handler = VFSFactory.getHandler(dataType);
-			handler.Options(objOptions);
-			
-			if (isSource) {
-				handler.setSource();
-			}
-			else{
-				handler.setTarget();
-			}
+			handler = prepareVFSHandler(handler, dataType, isSource);
 			
 			ISOSVfsFileTransfer client = (ISOSVfsFileTransfer)handler;
 			try{
@@ -122,7 +114,9 @@ public class SOSVfsConnectionFactory {
 					catch(Exception ce){
 						logger.warn(String.format("client disconnect failed : %s",ce.toString()));
 					}
-						
+					
+					handler = prepareVFSHandler(handler, alternatives.protocol.Value(), isSource);
+					client = (ISOSVfsFileTransfer)handler;
 					handler.Connect(alternatives);
 					handler.Authenticate(alternatives);
 					
@@ -142,6 +136,18 @@ public class SOSVfsConnectionFactory {
 		}
 		catch (Exception ex) {
 			throw new JobSchedulerException(ex);
+		}
+		return handler;
+	}
+	
+	private ISOSVFSHandler prepareVFSHandler(ISOSVFSHandler handler, final String dataType, final boolean isSource) throws Exception {
+		handler = VFSFactory.getHandler(dataType);
+		handler.Options(objOptions);
+		if (isSource) {
+			handler.setSource();
+		}
+		else{
+			handler.setTarget();
 		}
 		return handler;
 	}
