@@ -268,6 +268,8 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		setDefaultHostPort(protocol, port, host);
 		setDefaultHostPort(this.Source().protocol, this.Source().port, this.Source().host);
 		setDefaultHostPort(this.Target().protocol, this.Target().port, this.Target().host);
+		setDefaultHostPort(this.Source().Alternatives().protocol, this.Source().Alternatives().port, this.Source().Alternatives().host);
+		setDefaultHostPort(this.Target().Alternatives().protocol, this.Target().Alternatives().port, this.Target().Alternatives().host);
 		if (zero_byte_transfer.String2Bool() == true) {
 			TransferZeroByteFiles(true);
 			setZeroByteFilesStrict(false);
@@ -396,8 +398,12 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		setDefaultHostPort(protocol, port, host);
 		setDefaultHostPort(this.Source().protocol, this.Source().port, this.Source().host);
 		setDefaultHostPort(this.Target().protocol, this.Target().port, this.Target().host);
+		setDefaultHostPort(this.Source().Alternatives().protocol, this.Source().Alternatives().port, this.Source().Alternatives().host);
+		setDefaultHostPort(this.Target().Alternatives().protocol, this.Target().Alternatives().port, this.Target().Alternatives().host);
 		setDefaultAuth(this.Source().protocol, this.Source());
 		setDefaultAuth(this.Target().protocol, this.Target());
+		setDefaultAuth(this.Source().Alternatives().protocol, this.Source().Alternatives());
+		setDefaultAuth(this.Target().Alternatives().protocol, this.Target().Alternatives());
 		if (file_path.isDirty()) {
 			if (file_spec.isDirty()) {
 				file_path.Value("");
@@ -479,60 +485,43 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	private void setDefaultHostPort(final SOSOptionTransferType pobjTransferTyp, final SOSOptionPortNumber pobjPort, final SOSOptionHostName pobjHost) {
 		enuTransferTypes transferType = pobjTransferTyp.getEnum();
 		
-		if (transferType == enuTransferTypes.sftp) {
-			if (pobjPort.isDirty() == false) {
-				pobjPort.value(SOSOptionPortNumber.conPort4SFTP);
-				pobjPort.setProtected(pobjTransferTyp.isProtected());
+		switch (transferType) {
+		case sftp:
+			pobjPort.DefaultValue("" + SOSOptionPortNumber.conPort4SFTP);
+			break;
+		case ftp:
+			pobjPort.DefaultValue("" + SOSOptionPortNumber.conPort4FTP);
+			break;
+		case zip:
+		case file:
+		case local:
+			pobjPort.DefaultValue("0");
+			if (pobjHost.isNotDirty()
+					|| pobjHost.Value().equalsIgnoreCase("localhost")
+					|| pobjHost.Value().equalsIgnoreCase("127.0.0.1")) {
+				pobjHost.Value(SOSOptionHostName.getLocalHost());
 			}
-		}
-		else {
-			if (transferType == enuTransferTypes.ftp) {
-				if (pobjPort.isDirty() == false) {
-					pobjPort.value(SOSOptionPortNumber.conPort4FTP);
-					pobjPort.setProtected(pobjTransferTyp.isProtected());
-				}
+			break;
+		case ftps:
+			pobjPort.DefaultValue("" + SOSOptionPortNumber.conPort4FTPS);
+			break;
+		case webdav:
+		case http:
+		case https:
+			if (pobjHost.Value().toLowerCase().startsWith("https://")) {
+				pobjPort.DefaultValue("" + SOSOptionPortNumber.conPort4https);
 			}
 			else {
-				if (transferType == enuTransferTypes.local || transferType == enuTransferTypes.file || transferType == enuTransferTypes.zip) {
-					pobjPort.value(0);
-					pobjPort.setProtected(pobjTransferTyp.isProtected());
-					if (pobjHost.isNotDirty() || pobjHost.Value().equalsIgnoreCase("localhost") || pobjHost.Value().equalsIgnoreCase("127.0.0.1")) {
-						pobjHost.Value(SOSOptionHostName.getLocalHost());
-					}
-				}
-				else {
-					if (transferType == enuTransferTypes.ftps) {
-						if (pobjPort.isDirty() == false) {
-							pobjPort.value(SOSOptionPortNumber.conPort4FTPS);
-							pobjPort.setProtected(pobjTransferTyp.isProtected());
-						}
-					}
-					else {
-						if (transferType == enuTransferTypes.webdav) {
-							if (pobjPort.isDirty() == false) {
-								pobjPort.value(SOSOptionPortNumber.conPort4http);
-								pobjPort.setProtected(pobjTransferTyp.isProtected());
-							}
-						}
-						else {
-							if (transferType == enuTransferTypes.http) {
-								if (pobjPort.isDirty() == false) {
-									pobjPort.value(SOSOptionPortNumber.conPort4http);
-									pobjPort.setProtected(pobjTransferTyp.isProtected());
-								}
-							}
-							else {
-								if (transferType == enuTransferTypes.https) {
-									if (pobjPort.isDirty() == false) {
-										pobjPort.value(SOSOptionPortNumber.conPort4SSH);
-										pobjPort.setProtected(pobjTransferTyp.isProtected());
-									}
-								}
-							}
-						}
-					}
-				}
+				pobjPort.DefaultValue("" + SOSOptionPortNumber.conPort4http);
 			}
+			break;
+		default:
+			break;
+		}
+		if (pobjPort.isNotDirty()) {
+			pobjPort.Value(pobjPort.DefaultValue());
+			pobjPort.setNotDirty();
+			pobjPort.setProtected(pobjTransferTyp.isProtected());
 		}
 	} 
 

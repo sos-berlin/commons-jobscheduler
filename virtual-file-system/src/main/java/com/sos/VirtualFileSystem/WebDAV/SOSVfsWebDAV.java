@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -75,25 +76,26 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 	 * \return
 	 *
 	 * @return
+	 * @throws Exception 
 	 */
 	@Override
-	public ISOSConnection Connect() {
+	public ISOSConnection Connect() throws Exception {
 		this.Connect(this.connection2OptionsAlternate);
 		return this;
 
 	}
 
 	/**
+	 * @throws Exception 
 	 * 
 	 */
 	@Override
-	public ISOSConnection Connect(final SOSConnection2OptionsAlternate options) {
+	public ISOSConnection Connect(final SOSConnection2OptionsAlternate options) throws Exception {
 		connection2OptionsAlternate = options;
 
 		if (connection2OptionsAlternate == null) {
 			RaiseException(SOSVfs_E_190.params("connection2OptionsAlternate"));
 		}
-
 		this.connect(connection2OptionsAlternate.host.Value(), connection2OptionsAlternate.port.value());
 		return this;
 	}
@@ -913,34 +915,6 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 		return path;
 	}
 
-	/**
-	 *
-	 * \brief normalizeRootHttpURL
-	 *
-	 * \details
-	 *
-	 * \return String
-	 *
-	 * @param url
-	 * @return String
-	 */
-	private String normalizeRootHttpURL(String url, final int port) {
-
-		@SuppressWarnings("unused")
-		final String	conMethodName	= conClassName + "::normalizeRootHttpURL";
-
-		if(url.endsWith("/") == false) {
-			url += "/";
-		}
-
-		// insert port into url
-		if (connection2OptionsAlternate.auth_method.isURL()) {
-			//--------------------- (schema://)(user:passw@)?(host)(:port)?(path) ----------
-			url = url.replaceFirst("^(https?://)([^/@]+@)?([^/:]+)(:[^/]+)?(.*)$", "$1$2$3:"+port+"$5");
-		}
-
-		return url;
-	} // private String normalizeRootHttpURL
 
 	/**
 	 *
@@ -962,17 +936,27 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 		rootUrl = null;
 		HttpURL httpUrl = null;
 		String path = "/";
-		String normalizedHost = normalizeRootHttpURL(phost, pport);
-
+		
 		if (connection2OptionsAlternate.auth_method.isURL()) {
-			if (phost.toLowerCase().startsWith("https://")) {
+			URL url = new URL(phost);
+			String phostRootUrl = url.getProtocol() + "://" + url.getAuthority();
+			//ignore pport, use port from url in phost or default port
+			if (url.getPort() == -1) {
+				phostRootUrl += ":" + url.getDefaultPort();
+			}
+			String normalizedHost = phostRootUrl + url.getPath();
+			phostRootUrl += "/";
+			if (!url.getPath().endsWith("/") ) {
+				normalizedHost += "/";
+			}
+			
+			if (url.getProtocol().equalsIgnoreCase("https")) {
 				httpUrl = new HttpsURL(normalizedHost);
 			}
 			else {
 				httpUrl = new HttpURL(normalizedHost);
 			}
 
-			String phostRootUrl = httpUrl.getScheme() + "://" + httpUrl.getAuthority() + "/";
 			if (httpUrl.getScheme().equalsIgnoreCase("https")) {
 				rootUrl = new HttpsURL(phostRootUrl);
 			
@@ -1055,7 +1039,6 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 	 * @throws Exception
 	 */
 	private ISOSConnection doAuthenticate(final ISOSAuthenticationOptions options) throws Exception {
-		String method = "doAuthenticate";
 		authenticationOptions = options;
 
 		userName = authenticationOptions.getUser().Value();
@@ -1074,10 +1057,11 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 			}
 			davClient = getWebdavResource(getWebdavRessourceURL(httpUrl));
 			if (!davClient.exists()) {
-				throw new JobSchedulerException(String.format("%s: HTTP-DAV isn't enabled %s ",
-						method,
-						getStatusMessage(davClient)));
+				throw new JobSchedulerException(getStatusMessage(davClient));
 			}
+		}
+		catch (JobSchedulerException ex) {
+			throw ex;
 		}
 		catch (Exception ex) {
 			throw new JobSchedulerException(SOSVfs_E_167.params(authenticationOptions.getAuth_method().Value(), authenticationOptions.getAuth_file().Value()), ex);
@@ -1142,14 +1126,17 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 	 *
 	 * @param phost
 	 * @param pport
+	 * @throws Exception
 	 */
-	private void connect(final String phost, final int pport) {
-
+	private void connect(final String phost, final int pport) throws Exception {
+		
 		host = phost;
 		port = pport;
-
-		// TODO Meldung auch ohne Port oder Port mit ?? ausgeben.
-		//String msgPort = connection2OptionsAlternate.auth_method.isURL() ? "??" : "" + port;
+		
+		if (connection2OptionsAlternate.auth_method.isURL()) {
+			URL url = new URL(phost);
+			port = (url.getPort() == -1) ? url.getDefaultPort() : url.getPort();
+		}
 
 		logger.info(SOSVfs_D_0101.params(host, port));
 
