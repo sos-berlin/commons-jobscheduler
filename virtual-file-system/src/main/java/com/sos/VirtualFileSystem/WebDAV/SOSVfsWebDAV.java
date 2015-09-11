@@ -114,8 +114,11 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 
 			this.doAuthenticate(authenticationOptions);
 		}
+		catch (JobSchedulerException ex) {
+			throw ex;
+		}
 		catch (Exception ex) {
-			RaiseException(ex, SOSVfs_E_168.get());
+			throw new JobSchedulerException(ex);
 		}
 
 		return this;
@@ -389,8 +392,8 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 			}
 		}
 		catch (Exception e) {
-			logger.error(e.getLocalizedMessage());
-			throw new Exception(SOSVfs_E_161.params("checking size", e));
+			logger.trace(e.toString());
+//			throw new Exception(SOSVfs_E_161.params("checking size", e));
 		}
 		finally {
 			if (res != null) {
@@ -700,7 +703,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 	public ISOSVirtualFile getFileHandle(String fileName) {
 		fileName = adjustFileSeparator(fileName);
 		ISOSVirtualFile file = new SOSVfsWebDAVFile(fileName);
-		OutputStream os = getOutputStream(fileName);
+//		OutputStream os = getOutputStream(fileName);
 		file.setHandler(this);
 
 		//logger.debug(SOSVfs_D_196.params(fileName));
@@ -839,9 +842,9 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
 		else {
 			res = new WebdavResource(url,proxyHost, proxyPort,new UsernamePasswordCredentials(proxyUser, proxyPassword));
 		}
-		if(!isSuccessStatusCode(res.getStatusCode())){
-			throw new Exception(getStatusMessage(res));
-		}
+//		if(!isSuccessStatusCode(res.getStatusCode())){
+//			throw new Exception(getStatusMessage(res));
+//		}
 		return res;
 	}
 
