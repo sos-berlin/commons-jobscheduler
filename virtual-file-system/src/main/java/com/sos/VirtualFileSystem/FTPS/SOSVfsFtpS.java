@@ -56,8 +56,9 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
 							getProxyUser()));
 					
 					if(usingHttpProxy()){
-						logger.info(String.format("ftps via http proxy is experimental and not tested ..."));
-						client.setProxy(getHTTPProxy());
+						//JADE-351
+						//client.setProxy(getHTTPProxy());
+						throw new Exception("FTPS via HTTP Proxy not implemented yet");
 					}
 					else{
 						//client.setProxy(getSocksProxy());
