@@ -735,14 +735,14 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 	}
 
 	@Override
-	public ISOSConnection Connect() {
+	public ISOSConnection Connect() throws Exception {
 		//this.connect(objConnection2Options.host.Value(), objConnection2Options.port.value());
 		notImplemented();
 		return this;
 	}
 
 	@Override
-	public ISOSConnection Connect(final SOSConnection2OptionsAlternate pobjConnectionOptions) {
+	public ISOSConnection Connect(final SOSConnection2OptionsAlternate pobjConnectionOptions) throws Exception {
 
 		return this;
 	}

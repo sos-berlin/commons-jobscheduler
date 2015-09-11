@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.util.HashMap;
 
@@ -80,18 +81,20 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 	 * \return
 	 *
 	 * @return
+	 * @throws Exception 
 	 */
 	@Override
-	public ISOSConnection Connect() {
+	public ISOSConnection Connect() throws Exception {
 		this.Connect(this.connection2OptionsAlternate);
 		return this;
 	}
 
 	/**
+	 * @throws Exception 
 	 * 
 	 */
 	@Override
-	public ISOSConnection Connect(final SOSConnection2OptionsAlternate options){
+	public ISOSConnection Connect(final SOSConnection2OptionsAlternate options) throws Exception {
 		connection2OptionsAlternate = options;
 
 		if (connection2OptionsAlternate == null) {
@@ -311,13 +314,15 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 	}
 
 	private void checkConnection() throws Exception{
-		GetMethod method = new GetMethod(this.rootUrl.getURI());
+		String uri = this.rootUrl.getURI();
+		GetMethod method = new GetMethod(uri);
 		try {
-			
-			this.httpClient.executeMethod(method);
+			if(isServerErrorStatusCode(this.httpClient.executeMethod(method))){
+				throw new Exception(this.getHttpMethodExceptionText(method, uri));
+			}
 		}
 		catch (Exception ex) {
-			throw new Exception(this.getHttpMethodExceptionText(method, ex));
+			throw ex;
 		}
 		finally{
 			try{
@@ -363,34 +368,47 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 		if (this.isConnected() == false) {
 			try{
 				this.port = pport;
+				this.host = phost;
 				HostConfiguration hc = new HostConfiguration();
 				
-				if(phost.toLowerCase().startsWith("https://")){
-					this.rootUrl 	= new HttpsURL(phost);
-					this.host 	= this.rootUrl.getHost();
-					
-					StrictSSLProtocolSocketFactory psf = new StrictSSLProtocolSocketFactory();
-					//psf.setCheckCRL and psf.setCheckExpiry sind bei StrictSSL.. per default true
-					psf.setCheckHostname(connection2OptionsAlternate.verify_certificate_hostname.value());
-					if(!psf.getCheckHostname()){
-						logger.info("*********************** Security warning *********************************************************************");
-						logger.info("Jade option \"verify_certificate_hostname\" is currently \"false\". ");
-						logger.info("The certificate verification process will not verify the DNS name of the certificate presented by the server,");
-						logger.info("with the hostname of the server in the URL used by the Jade client.");
-						logger.info("**************************************************************************************************************");
+				
+				if (phost.toLowerCase().startsWith("https://") || phost.toLowerCase().startsWith("http://")) {
+					URL url = new URL(phost);
+					this.port = (url.getPort() == -1) ? url.getDefaultPort() : url.getPort();
+					this.host = url.getHost();
+					String _rootUrl = url.getProtocol() + "://" + this.host + ":" + this.port + url.getPath();
+					if (!url.getPath().endsWith("/")) {
+						_rootUrl += "/";
 					}
-					if(connection2OptionsAlternate.accept_untrusted_certificate.value()){
-						//see apache ssl EasySSLProtocolSocketFactory implementation
-						psf.useDefaultJavaCiphers();
-						psf.addTrustMaterial(TrustMaterial.TRUST_ALL);
+					if (url.getProtocol().equalsIgnoreCase("https")) {
+						this.rootUrl 	= new HttpsURL(_rootUrl);
+						
+						StrictSSLProtocolSocketFactory psf = new StrictSSLProtocolSocketFactory();
+						//psf.setCheckCRL and psf.setCheckExpiry sind bei StrictSSL.. per default true
+						psf.setCheckHostname(connection2OptionsAlternate.verify_certificate_hostname.value());
+						if(!psf.getCheckHostname()){
+							logger.info("*********************** Security warning *********************************************************************");
+							logger.info("Jade option \"verify_certificate_hostname\" is currently \"false\". ");
+							logger.info("The certificate verification process will not verify the DNS name of the certificate presented by the server,");
+							logger.info("with the hostname of the server in the URL used by the Jade client.");
+							logger.info("**************************************************************************************************************");
+						}
+						if(connection2OptionsAlternate.accept_untrusted_certificate.value()){
+							//see apache ssl EasySSLProtocolSocketFactory implementation
+							psf.useDefaultJavaCiphers();
+							psf.addTrustMaterial(TrustMaterial.TRUST_ALL);
+						}
+						Protocol p = new Protocol("https", (ProtocolSocketFactory)psf, this.port);
+						Protocol.registerProtocol("https",p);
+						hc.setHost(this.host,this.port,p);
 					}
-					Protocol p = new Protocol("https", (ProtocolSocketFactory)psf, this.port);
-					Protocol.registerProtocol("https",p);
-					hc.setHost(this.host,this.port,p);
+					else {
+						this.rootUrl 	= new HttpURL(_rootUrl);
+						hc.setHost(new HttpHost(host,port));
+					}
 				}
-				else{
-					this.rootUrl 	= new HttpURL(phost.toLowerCase().startsWith("http://") ? phost : "http://"+phost);
-					this.host 		= this.rootUrl.getHost();
+				else {
+					this.rootUrl = new HttpURL(phost,pport,"/");
 					hc.setHost(new HttpHost(host,port));
 				}
 				
@@ -442,6 +460,20 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 			return true;
 		}*/
 		if(statusCode == HttpStatus.SC_OK){
+			return true;
+		}
+		
+		return false;
+	}
+	
+	
+	/**
+	 * 
+	 * @param statusCode
+	 * @return
+	 */
+	private boolean isServerErrorStatusCode(int statusCode){
+		if(statusCode >= 500){
 			return true;
 		}
 		
@@ -502,12 +534,13 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 		}
 		
 		Long size = new Long(-1);
-		GetMethod method = new GetMethod(normalizeHttpPath(path));
+		String uri = normalizeHttpPath(path);
+		GetMethod method = new GetMethod(uri);
 		try{
 			this.httpClient.executeMethod(method);
 			
 			if(!isSuccessStatusCode(method.getStatusCode())){
-				throw new Exception(this.getHttpMethodExceptionText(method));
+				throw new Exception(this.getHttpMethodExceptionText(method, uri));
 			}
 			size = method.getResponseContentLength(); 
 			if(size < 0){
@@ -576,11 +609,12 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 	 */
 	@Override public InputStream getInputStream(final String fileName) {
 		try {
-			GetMethod method = new GetMethod(normalizeHttpPath(fileName));
+			String uri = normalizeHttpPath(fileName);
+			GetMethod method = new GetMethod(uri);
 			this.httpClient.executeMethod(method);
 				
 			if(!isSuccessStatusCode(method.getStatusCode())){
-				throw new Exception(this.getHttpMethodExceptionText(method));
+				throw new Exception(this.getHttpMethodExceptionText(method, uri));
 			}
 		  return method.getResponseBodyAsStream();
 		}
@@ -608,8 +642,8 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 	 * @return
 	 * @throws Exception
 	 */
-	private String getHttpMethodExceptionText(HttpMethod method) throws Exception{
-		return this.getHttpMethodExceptionText(method,null);
+	private String getHttpMethodExceptionText(HttpMethod method, String uri) throws Exception{
+		return this.getHttpMethodExceptionText(method, uri, null);
 	}
 	
 	/**
@@ -619,8 +653,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 	 * @return
 	 * @throws Exception
 	 */
-	private String getHttpMethodExceptionText(HttpMethod method, Exception ex) throws Exception{
-		String uri = this.getMethodUri(method);
+	private String getHttpMethodExceptionText(HttpMethod method, String uri, Exception ex) throws Exception{
 		int code = this.getMethodStatusCode(method);
 		String text = this.getMethodStatusText(method);
 		if(ex == null){
@@ -670,21 +703,6 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 		return val;
 	}
 	
-	/**
-	 * 
-	 * @param method
-	 * @return
-	 */
-	private String getMethodUri(HttpMethod method){
-		String val = "";
-		
-		try{
-			val = method.getURI().getURI();
-		}
-		catch(Exception ex){}
-		
-		return val;
-	}
 
     @Override
     public SOSFileEntries getSOSFileEntries() {
