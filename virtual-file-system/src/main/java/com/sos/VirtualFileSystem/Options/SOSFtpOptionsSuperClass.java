@@ -1126,8 +1126,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 															this, // ....
 															conClassName + ".History_File_Append_Mode", // ...
 															"Specifies wether the History File has to be written in append mode", // ...
-															"false", // ...
-															"false", // ...
+															"true", // ...
+															"true", // ...
 															false);
 
 	public SOSOptionBoolean getHistoryFileAppendMode() {
@@ -2837,8 +2837,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionString		account		= new SOSOptionString(this, conClassName + ".account", // HashMap-Key
 													"Optional account info for authentication with an", // Titel
-													" ", // InitValue
-													" ", // DefaultValue
+													"", // InitValue
+													"", // DefaultValue
 													false // isMandatory
 											);
 
@@ -2881,8 +2881,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionString	alternative_account	= new SOSOptionString(this, conClassName + ".alternative_account", // HashMap-Key
 														"Alternative parameter for the primary parameter", // Titel
-														" ", // InitValue
-														" ", // DefaultValue
+														"", // InitValue
+														"", // DefaultValue
 														false // isMandatory
 												);
 
@@ -2925,8 +2925,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionHostName	alternative_host	= new SOSOptionHostName(this, conClassName + ".alternative_host", // HashMap-Key
 															"Alternative parameter for the primary parameter", // Titel
-															" ", // InitValue
-															" ", // DefaultValue
+															"", // InitValue
+															"", // DefaultValue
 															false // isMandatory
 													);
 
@@ -2969,8 +2969,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionString	alternative_passive_mode	= new SOSOptionString(this, conClassName + ".alternative_passive_mode", // HashMap-Key
 																"Alternative parameter for the primary parameter", // Titel
-																" ", // InitValue
-																" ", // DefaultValue
+																"", // InitValue
+																"", // DefaultValue
 																false // isMandatory
 														);
 
@@ -3013,8 +3013,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionPassword	alternative_password	= new SOSOptionPassword(this, conClassName + ".alternative_password", // HashMap-Key
 																"Alternative parameter for the primary parameter", // Titel
-																" ", // InitValue
-																" ", // DefaultValue
+																"", // InitValue
+																"", // DefaultValue
 																false // isMandatory
 														);
 
@@ -3102,8 +3102,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionString		alternative_remote_dir	= new SOSOptionString(this, conClassName + ".alternative_remote_dir", // HashMap-Key
 																"Alternative parameter for the primary parameter", // Titel
-																" ", // InitValue
-																" ", // DefaultValue
+																"", // InitValue
+																"", // DefaultValue
 																false // isMandatory
 														);
 
@@ -3146,8 +3146,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionString	alternative_transfer_mode	= new SOSOptionString(this, conClassName + ".alternative_transfer_mode", // HashMap-Key
 																"Alternative parameter for the primary parameter", // Titel
-																" ", // InitValue
-																" ", // DefaultValue
+																"", // InitValue
+																"", // DefaultValue
 																false // isMandatory
 														);
 
@@ -3719,8 +3719,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionProcessID	current_pid	= new SOSOptionProcessID(this, conClassName + ".current_pid", // HashMap-Key
 													"This parameter is used for Unix systems and - as o", // Titel
-													" ", // InitValue
-													" ", // DefaultValue
+													"", // InitValue
+													"", // DefaultValue
 													false // isMandatory
 											);
 
@@ -4086,8 +4086,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionHostName	host	= new SOSOptionHostName(this, conClassName + ".host", // HashMap-Key
 												"Host-Name This parameter specifies th", // Titel
-												" ", // InitValue
-												" ", // DefaultValue
+												"", // InitValue
+												"", // DefaultValue
 												false // isMandatory
 										);
 
@@ -4175,8 +4175,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionString	http_proxy_port	= new SOSOptionString(this, conClassName + ".http_proxy_port", // HashMap-Key
 													"This parameter specifies the port of a proxy that", // Titel
-													" ", // InitValue
-													" ", // DefaultValue
+													"", // InitValue
+													"", // DefaultValue
 													false // isMandatory
 											);
 
@@ -4219,8 +4219,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionString	jump_command	= new SOSOptionString(this, conClassName + ".jump_command", // HashMap-Key
 															"This parameter specifies a command that is to be e", // Titel
-															" ", // InitValue
-															" ", // DefaultValue
+															"", // InitValue
+															"", // DefaultValue
 															false // isMandatory
 													);
 
@@ -4307,8 +4307,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionCommandScript	jump_command_script	= new SOSOptionCommandScript(this, conClassName + ".jump_command_script", // HashMap-Key
 																"This parameter can be used as an alternative to ju", // Titel
-																" ", // InitValue
-																" ", // DefaultValue
+																"", // InitValue
+																"", // DefaultValue
 																false // isMandatory
 														);
 
@@ -4351,8 +4351,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionCommandScriptFile	jump_command_script_file	= new SOSOptionCommandScriptFile(this, conClassName + ".jump_command_script_file", // HashMap-Key
 																			"This parameter can be used as an alternative to ju", // Titel
-																			" ", // InitValue
-																			" ", // DefaultValue
+																			"", // InitValue
+																			"", // DefaultValue
 																			false // isMandatory
 																	);
 
@@ -4395,8 +4395,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionHostName	jump_host	= new SOSOptionHostName(this, conClassName + ".jump_host", // HashMap-Key
 													"When using a jump_host then files are first transf", // Titel
-													" ", // InitValue
-													" ", // DefaultValue
+													"", // InitValue
+													"", // DefaultValue
 													false // isMandatory
 											);
 
@@ -4571,8 +4571,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionPassword	jump_password	= new SOSOptionPassword(this, conClassName + ".jump_password", // HashMap-Key
 														"Password for authentication with the jump_host.", // Titel
-														" ", // InitValue
-														" ", // DefaultValue
+														"", // InitValue
+														"", // DefaultValue
 														false // isMandatory
 												);
 
@@ -4703,8 +4703,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionString	jump_proxy_host	= new SOSOptionString(this, conClassName + ".jump_proxy_host", // HashMap-Key
 													"The value of this parameter is the host name or th", // Titel
-													" ", // InitValue
-													" ", // DefaultValue
+													"", // InitValue
+													"", // DefaultValue
 													false // isMandatory
 											);
 
@@ -4747,8 +4747,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionString	jump_proxy_password	= new SOSOptionString(this, conClassName + ".jump_proxy_password", // HashMap-Key
 														"This parameter specifies the password for the prox", // Titel
-														" ", // InitValue
-														" ", // DefaultValue
+														"", // InitValue
+														"", // DefaultValue
 														false // isMandatory
 												);
 
@@ -4791,8 +4791,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionString	jump_proxy_port	= new SOSOptionString(this, conClassName + ".jump_proxy_port", // HashMap-Key
 													"This parameter specifies the port of a proxy that", // Titel
-													" ", // InitValue
-													" ", // DefaultValue
+													"", // InitValue
+													"", // DefaultValue
 													false // isMandatory
 											);
 
@@ -4835,8 +4835,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionUserName	jump_proxy_user	= new SOSOptionUserName(this, conClassName + ".jump_proxy_user", // HashMap-Key
 														"The value of this parameter specifies the user acc", // Titel
-														" ", // InitValue
-														" ", // DefaultValue
+														"", // InitValue
+														"", // DefaultValue
 														false // isMandatory
 												);
 
@@ -4951,8 +4951,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionInteger	jump_simulate_shell_inactivity_timeout	= new SOSOptionInteger(this, conClassName + ".jump_simulate_shell_inactivity_timeout", // HashMap-Key
 																			"If no new characters are written to stdout or stde", // Titel
-																			" ", // InitValue
-																			" ", // DefaultValue
+																			"", // InitValue
+																			"", // DefaultValue
 																			false // isMandatory
 																	);
 
@@ -4995,8 +4995,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionInteger	jump_simulate_shell_login_timeout	= new SOSOptionInteger(this, conClassName + ".jump_simulate_shell_login_timeout", // HashMap-Key
 																		"If no new characters are written to stdout or stde", // Titel
-																		" ", // InitValue
-																		" ", // DefaultValue
+																		"", // InitValue
+																		"", // DefaultValue
 																		false // isMandatory
 																);
 
@@ -5039,8 +5039,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionString	jump_simulate_shell_prompt_trigger	= new SOSOptionString(this, conClassName + ".jump_simulate_shell_prompt_trigger", // HashMap-Key
 																		"The expected command line prompt. Using this promp", // Titel
-																		" ", // InitValue
-																		" ", // DefaultValue
+																		"", // InitValue
+																		"", // DefaultValue
 																		false // isMandatory
 																);
 
@@ -5083,8 +5083,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionInFileName	jump_ssh_auth_file	= new SOSOptionInFileName(this, conClassName + ".jump_ssh_auth_file", // HashMap-Key
 															"This parameter specifies the path and name of a us", // Titel
-															" ", // InitValue
-															" ", // DefaultValue
+															"", // InitValue
+															"", // DefaultValue
 															false // isMandatory
 													);
 
@@ -5127,8 +5127,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionAuthenticationMethod	jump_ssh_auth_method	= new SOSOptionAuthenticationMethod(this, conClassName + ".jump_ssh_auth_method", // HashMap-Key
 																			"This parameter specifies the authentication method", // Titel
-																			" ", // InitValue
-																			" ", // DefaultValue
+																			"", // InitValue
+																			"", // DefaultValue
 																			false // isMandatory
 																	);
 
@@ -5541,8 +5541,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionPassword	password					= new SOSOptionPassword(this, conClassName + ".password", // HashMap-Key
 																	"Password for UserID Password for a", // Titel
-																	" ", // InitValue
-																	" ", // DefaultValue
+																	"", // InitValue
+																	"", // DefaultValue
 																	false // isMandatory
 															);
 
@@ -5836,8 +5836,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionProcessID	ppid	= new SOSOptionProcessID(this, conClassName + ".ppid", // HashMap-Key
 												"This parameter is used for Unix systems and - as o", // Titel
-												" ", // InitValue
-												" ", // DefaultValue
+												"", // InitValue
+												"", // DefaultValue
 												false // isMandatory
 										);
 
@@ -5881,8 +5881,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionString		profile			= new SOSOptionString(this, conClassName + ".profile", // HashMap-Key
 														"The Name of a Profile-Section to be executed", // Titel
-														" ", // InitValue
-														" ", // DefaultValue
+														"", // InitValue
+														"", // DefaultValue
 														false // isMandatory
 												);
 
@@ -6152,8 +6152,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionRegExp	replacing	= new SOSOptionRegExp(this, conClassName + ".replacing", // HashMap-Key
 												"Regular expression for filename replacement with", // Titel
-												" ", // InitValue
-												" ", // DefaultValue
+												"", // InitValue
+												"", // DefaultValue
 												false // isMandatory
 										);
 
@@ -6603,8 +6603,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionString	ssh_proxy_host	= new SOSOptionString(this, conClassName + ".ssh_proxy_host", // HashMap-Key
 													"The value of this parameter is the host name or th", // Titel
-													" ", // InitValue
-													" ", // DefaultValue
+													"", // InitValue
+													"", // DefaultValue
 													false // isMandatory
 											);
 
@@ -6647,8 +6647,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionString	ssh_proxy_password	= new SOSOptionString(this, conClassName + ".ssh_proxy_password", // HashMap-Key
 														"This parameter specifies the password for the prox", // Titel
-														" ", // InitValue
-														" ", // DefaultValue
+														"", // InitValue
+														"", // DefaultValue
 														false // isMandatory
 												);
 
@@ -6691,8 +6691,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionString	ssh_proxy_port	= new SOSOptionString(this, conClassName + ".ssh_proxy_port", // HashMap-Key
 													"This parameter specifies the port number of the pr", // Titel
-													" ", // InitValue
-													" ", // DefaultValue
+													"", // InitValue
+													"", // DefaultValue
 													false // isMandatory
 											);
 
@@ -6735,8 +6735,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 						mandatory = false)
 	public SOSOptionString	ssh_proxy_user	= new SOSOptionString(this, conClassName + ".ssh_proxy_user", // HashMap-Key
 													"The value of this parameter specifies the user acc", // Titel
-													" ", // InitValue
-													" ", // DefaultValue
+													"", // InitValue
+													"", // DefaultValue
 													false // isMandatory
 											);
 

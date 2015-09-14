@@ -69,6 +69,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 					name = "objMailOptions")
 	private SOSSmtpMailOptions		objMailOptions;
 	public boolean					flgCumulativeTargetDeleted			= false;
+	private Map<String, String> 	dmzOptions 							= new HashMap<String, String>();
 	private final Map<String, String> includeDirectives 				= new HashMap<String, String>(){
 
 		private static final long serialVersionUID = 1L;
@@ -417,7 +418,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		}
 		if (file_path.IsEmpty() && this.Source().Directory.IsEmpty() && FileListName.IsEmpty()) {
 			throw new JobSchedulerException(String.format("SOSVfs-E-0000: one of these parameters must be specified: '%1$s', '%2$s', '%3$s'",
-					file_path.getShortKey(), this.Source().Directory.getShortKey(), FileListName.getShortKey()));
+					file_path.getShortKey(), "source_dir", FileListName.getShortKey()));
 		}
 		if (zero_byte_transfer.String2Bool() == true) {
 			TransferZeroByteFiles(true);
@@ -1329,5 +1330,17 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	@Override
 	public SOSOptionBoolean getraise_exception_on_error() {
 		return super.getraise_exception_on_error();
+	}
+	
+	public Map<String, String> getDmzOptions() {
+		return dmzOptions;
+	}
+	
+	public void setDmzOption(String dmzOptionKey, String dmzOptionValue) {
+		dmzOptions.put(dmzOptionKey, dmzOptionValue);
+	}
+	
+	public String getDmzOption(String dmzOptionKey) {
+		return dmzOptions.getOrDefault(dmzOptionKey, "");
 	}
 }
