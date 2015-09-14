@@ -7,6 +7,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -19,7 +20,6 @@ import sos.util.SOSDate;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionString;
-import com.sos.JSHelper.Options.SOSOptionTime;
 import com.sos.JSHelper.interfaces.ISOSFtpOptions;
 import com.sos.VirtualFileSystem.Factory.VFSFactory;
 import com.sos.VirtualFileSystem.Interfaces.IJadeTransferDetailHistoryData;
@@ -30,7 +30,6 @@ import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 import com.sos.VirtualFileSystem.common.SOSVfsConstants;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
-import com.sos.VirtualFileSystem.zip.SOSVfsZip;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 
@@ -109,7 +108,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	private ISOSVirtualFile			objSourceTransferFile			= null;
 	private SOSFileList				objParent						= null;
 	private boolean					flgFileExists					= false;
-	private String					checksum						= "n.a.";
+	private String					checksum						= "";
 	private Date					dteStartTransfer				= null;
 	private Date					dteEndTransfer					= null;
 	@SuppressWarnings("unused")
@@ -127,6 +126,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	private SOSVfsConnectionPool	objConnPoolTarget				= null;
 
 	private String 					errorMessage					= null;
+	private Map<String, String>     jumpHistoryRecord               = null;
 	
 	public SOSFileListEntry() {
 		super(SOSVfsConstants.strBundleBaseName);
@@ -1146,6 +1146,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
 	public void setNotOverwritten() {
 		eTransferStatus = enuTransferStatus.notOverwritten;
+		dteEndTransfer = Now();
 		logger.warn(SOSVfs_D_0111.params(strSourceFileName));
 	}
 	
@@ -1276,6 +1277,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
 	public void setTransferSkipped() {
 		eTransferStatus = enuTransferStatus.transfer_skipped;
+		dteEndTransfer = Now();
 		String strM = SOSVfs_D_0110.params(strSourceFileName);
 		logger.debug(strM);
 		objJadeReportLogger.info(strM);
@@ -1365,29 +1367,23 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		String remote_user = target.user.getSystemUserIfUserIsEmpty(); // 8- remote host user
 		String protocol = target.protocol.Value(); // 9- protocol
 		String port = target.port.Value(); // 10- port
-		//String local_dir = objOptions.SourceDir.Value();
 		String local_dir = source.Directory.Value();
 		if(isEmpty(local_dir)){
-			local_dir = fleSourceFile.getParentVfs();
-			if(isEmpty(local_dir)){
-				local_dir = "n.a";
-			}
+			local_dir = "";
+		} else {
+			local_dir = normalized(local_dir);
 		}
-		local_dir = normalized(local_dir);
-		//String remote_dir = objOptions.TargetDir.Value();
 		String remote_dir = target.Directory.Value();
 		if(isEmpty(remote_dir)){
-			remote_dir = fleTargetFile.getParentVfs();
-			if(isEmpty(remote_dir)){
-				remote_dir = "n.a";
-			}
+			remote_dir = "";
+		} else {
+			remote_dir = normalized(remote_dir);
 		}
-		remote_dir = normalized(remote_dir);
 		String local_filename = this.getSourceFilename(); // 13- file name
 		local_filename = adjustFileSeparator(local_filename);
 		String remote_filename = this.getTargetFilename(); // 14- name
 		if (isEmpty(remote_filename)) {
-			remote_filename = "n.a.";
+			remote_filename = "";
 		}
 		else{
 			remote_filename = adjustFileSeparator(remote_filename);
@@ -1415,12 +1411,16 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 			jump_port = objOptions.jump_port.Value();
 			jump_protocol = objOptions.jump_protocol.Value();
 		}
+		Date endTime = this.getEndTime();
+		Date startTime = this.getStartTime();
+		if (startTime == null) startTime = Now();
+		if (endTime == null) endTime = startTime;
 		properties.put(FIELD_GUID, this.guid); // 1- GUID
 		properties.put(FIELD_MANDATOR, mandator); // 2- mandator: default SOS
 //		properties.put(FIELD_TRANSFER_TIMESTAMP, transfer_timestamp); // 3- timestamp: Zeitstempel im ISO-Format
-		properties.put(FIELD_TRANSFER_END, getTransferTimeAsString(this.getEndTime())); // 3- timestamp: Zeitstempel im ISO-Format
-		properties.put(FIELD_PID, pid); // 4- pid= Environment PID | 0 für Windows
-		properties.put(FIELD_PPID, ppid); // 5- ppid= Environment PPID | 0 für Windows
+		properties.put(FIELD_TRANSFER_END, getTransferTimeAsString(endTime)); // 3- timestamp: Zeitstempel im ISO-Format
+		properties.put(FIELD_PID, pid); // 4- pid= Environment PID | 0 for Windows
+		properties.put(FIELD_PPID, ppid); // 5- ppid= Environment PPID | 0 for Windows
 		properties.put(FIELD_OPERATION, operation); // 6- operation: send|receive
 		properties.put(FIELD_LOCALHOST, localhost); // 7- local host
 		properties.put(FIELD_LOCALHOST_IP, localhost_ip); // 8- local host IP adresse
@@ -1448,8 +1448,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		properties.put(FIELD_JUMP_PORT, jump_port); // 26
 		properties.put(FIELD_JUMP_PROTOCOL, jump_protocol); // 27
 		properties.put(FIELD_JUMP_USER, jump_user); // 28
-		properties.put(FIELD_TRANSFER_START, getTransferTimeAsString(this.getStartTime())); // 29- timestamp: Zeitstempel im ISO-Format
-//		properties.put(FIELD_MODIFICATION_DATE, getTransferTimeAsString(new Date(lngFileModDate))); // 30- Zeitstempel der letzten Änderung der source Datei 
+		properties.put(FIELD_TRANSFER_START, getTransferTimeAsString(startTime)); // 29- timestamp: Zeitstempel im ISO-Format
+//		properties.put(FIELD_MODIFICATION_DATE, getTransferTimeAsString(new Date(lngFileModDate))); // 30- Zeitstempel der letzten Aenderung der source Datei 
 		// TODO custom-fields einbauen
 		/*
 		 * bei SOSFTP ist es moeglich "custom" Felder zu definieren, die in der Transfer History als Auftragsparameter mitgeschickt werden.
@@ -1458,6 +1458,44 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		 *
 		 * ? alternativ Metadaten der Tabelle lesen (Spalten) und mit den Auftragsparameter vergleichen
 		 */
+		
+		if (jumpHistoryRecord != null) {
+			if (objOptions.getDmzOptions().get("operation").equals("copyToInternet")) {
+				properties.put(FIELD_JUMP_HOST, properties.get(FIELD_REMOTE_HOST)); // 24
+				properties.put(FIELD_JUMP_HOST_IP, properties.get(FIELD_REMOTE_HOST_IP)); // 25
+				properties.put(FIELD_JUMP_PORT, properties.get(FIELD_PORT)); // 26
+				properties.put(FIELD_JUMP_PROTOCOL, properties.get(FIELD_PROTOCOL)); // 27
+				properties.put(FIELD_JUMP_USER, properties.get(FIELD_REMOTE_USER)); // 28
+				properties.put(FIELD_REMOTE_HOST, jumpHistoryRecord.get(FIELD_REMOTE_HOST)); // 10- remote host
+				properties.put(FIELD_REMOTE_HOST_IP, jumpHistoryRecord.getOrDefault(FIELD_REMOTE_HOST_IP, "")); // 11- remote host IP
+				properties.put(FIELD_REMOTE_USER, jumpHistoryRecord.getOrDefault(FIELD_REMOTE_USER, "")); // 12- remote host user
+				properties.put(FIELD_PROTOCOL, jumpHistoryRecord.getOrDefault(FIELD_PROTOCOL, "")); // 13- protocol
+				properties.put(FIELD_PORT, jumpHistoryRecord.getOrDefault(FIELD_PORT, "")); // 14- port
+				properties.put(FIELD_REMOTE_DIR, jumpHistoryRecord.getOrDefault(FIELD_REMOTE_DIR, "")); // 16- remote dir
+				properties.put(FIELD_REMOTE_FILENAME, jumpHistoryRecord.getOrDefault(FIELD_REMOTE_FILENAME, "")); // 18- file name
+				properties.put(FIELD_TRANSFER_END, jumpHistoryRecord.getOrDefault(FIELD_TRANSFER_END, "")); // 3- timestamp: Zeitstempel im ISO-Format
+				properties.put(FIELD_STATUS, jumpHistoryRecord.getOrDefault(FIELD_STATUS, "")); // 21- status=success|error
+				if(recordType.equals(HistoryRecordType.XML)){
+					last_error_message = normalizeErrorMessageForXml(StringEscapeUtils.unescapeXml(jumpHistoryRecord.getOrDefault(FIELD_LAST_ERROR_MESSAGE, "")));
+				}
+				else {
+					last_error_message = jumpHistoryRecord.getOrDefault(FIELD_LAST_ERROR_MESSAGE, "");
+				}
+				properties.put(FIELD_LAST_ERROR_MESSAGE, last_error_message); // 22
+			}
+			else if (objOptions.getDmzOptions().get("operation").equals("copyFromInternet")) {
+				properties.put(FIELD_JUMP_HOST, properties.get(FIELD_LOCALHOST)); // 24
+				properties.put(FIELD_JUMP_HOST_IP, properties.get(FIELD_LOCALHOST_IP)); // 25
+				properties.put(FIELD_JUMP_PORT, source.port.Value()); // 26
+				properties.put(FIELD_JUMP_PROTOCOL, source.protocol.Value()); // 27
+				properties.put(FIELD_JUMP_USER, source.user.Value()); // 28
+				properties.put(FIELD_LOCALHOST, jumpHistoryRecord.get(FIELD_LOCALHOST)); // 10- remote host
+				properties.put(FIELD_LOCALHOST_IP, jumpHistoryRecord.getOrDefault(FIELD_LOCALHOST_IP, "")); // 11- remote host IP
+				properties.put(FIELD_LOCAL_DIR, jumpHistoryRecord.getOrDefault(FIELD_LOCAL_DIR, "")); // 15- local dir
+				properties.put(FIELD_LOCAL_FILENAME, jumpHistoryRecord.getOrDefault(FIELD_LOCAL_FILENAME, "")); // 17- file name
+				properties.put(FIELD_TRANSFER_START, jumpHistoryRecord.getOrDefault(FIELD_TRANSFER_START, "")); // 3- timestamp: Zeitstempel im ISO-Format
+			}
+		}
 		return properties;
 	}
 
@@ -1467,8 +1505,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		addCSv(properties.get(FIELD_MANDATOR)); // 2- mandator: default SOS
 //		addCSv(properties.get(FIELD_TRANSFER_TIMESTAMP)); // 3- timestamp: Zeitstempel im ISO-Format
 		addCSv(properties.get(FIELD_TRANSFER_END)); // 3- timestamp: Zeitstempel im ISO-Format
-		addCSv(properties.get(FIELD_PID)); // 4- pid= Environment PID | 0 für Windows
-		addCSv(properties.get(FIELD_PPID)); // 5- ppid= Environment PPID | 0 für Windows
+		addCSv(properties.get(FIELD_PID)); // 4- pid= Environment PID | 0 for Windows
+		addCSv(properties.get(FIELD_PPID)); // 5- ppid= Environment PPID | 0 for Windows
 		addCSv(properties.get(FIELD_OPERATION)); // 6- operation: send|receive
 		addCSv(properties.get(FIELD_LOCALHOST)); // 7- local host
 		addCSv(properties.get(FIELD_LOCALHOST_IP)); // 8- local host IP adresse
@@ -1493,10 +1531,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		addCSv(properties.get(FIELD_JUMP_PROTOCOL)); // 27
 		addCSv(properties.get(FIELD_JUMP_USER)); // 28
 		addCSv(properties.get(FIELD_TRANSFER_START)); // 29
-		// Diff to the format of the transfer history as order
-		SOSOptionTime modified = new SOSOptionTime(null, null, null, "", "", false);
-		modified.value(lngFileModDate);
-		addCSv(modified.getTimeAsString(lngFileModDate));
+		addCSv(getTransferTimeAsString(Now()));
 //		addCSv(properties.get(FIELD_MODIFICATION_DATE)); // 30
 		return strCSVRec;
 	}
@@ -1566,5 +1601,9 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         formatter.setLenient(false);
         return formatter.format(time.getTime());
 
+	}
+	
+	public void setJumpHistoryRecord(Map<String, String> jumpHistoryRecord) {
+		this.jumpHistoryRecord = jumpHistoryRecord;
 	}
 }
