@@ -18,6 +18,7 @@ import com.sos.scheduler.model.SchedulerHotFolder;
 import com.sos.scheduler.model.SchedulerHotFolderFileList;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.objects.JobChain.JobChainNode.OnReturnCodes.OnReturnCode;
+import com.sos.scheduler.model.objects.JobChain.JobChainNode.OnReturnCodes.OnReturnCode.ToState;
 
 import org.apache.log4j.Logger;
 
@@ -588,9 +589,12 @@ public class JSObjJobChain extends JobChain {
                     if (jobChainNode.getOnReturnCodes() != null){
                         for (Object onReturnCodeItem : jobChainNode.getOnReturnCodes().getOnReturnCode()){
                              if (onReturnCodeItem instanceof OnReturnCode) {
-                                 String toState = ((OnReturnCode) onReturnCodeItem).getToState().getState();
-                                 Edge eReturnCode = newEdge(state, toState);
-                                 eReturnCode.getEdgeProperties().setLabel("..exit:" + ((OnReturnCode) onReturnCodeItem).getReturnCode());
+                                 ToState toState = ((OnReturnCode) onReturnCodeItem).getToState();
+                                 if (toState != null){
+                                     String toStateValue = toState.getState();
+                                     Edge eReturnCode = newEdge(state, toStateValue);
+                                     eReturnCode.getEdgeProperties().setLabel("..exit:" + ((OnReturnCode) onReturnCodeItem).getReturnCode());
+                                 }
                              }
                        }
                     }
