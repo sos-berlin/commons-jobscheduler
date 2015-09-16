@@ -1316,15 +1316,21 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	private String normalizeErrorMessageForXml(String msg){
 		msg = msg.replaceAll("\r?\n"," ");
 		msg = StringEscapeUtils.escapeXml(msg);
-		if(msg.length() > 150){
-			msg = msg.substring(0, 150);
+		int msgLength = msg.length();
+		if(msgLength > 255){
+			msg = msg.substring(msgLength-255, msgLength);
 		}
 		return msg;
 	}
 	
 	private String normalizeErrorMessageForCSV(String msg){
 		msg = msg.replaceAll("\r?\n"," ");
-		return StringEscapeUtils.escapeCsv(msg);
+		msg = StringEscapeUtils.escapeCsv(msg);
+		int msgLength = msg.length();
+		if(msgLength > 255){
+			msg = msg.substring(msgLength-255, msgLength);
+		}
+		return msg;
 	}
 	
 	public Properties getFileAttributesAsProperties(HistoryRecordType recordType) {
