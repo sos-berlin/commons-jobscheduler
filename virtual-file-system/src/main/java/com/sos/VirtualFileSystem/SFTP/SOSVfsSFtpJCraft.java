@@ -960,7 +960,8 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		java.util.Properties config = new java.util.Properties();
 		config.put("StrictHostKeyChecking", getStrictHostKeyChecking(connection2OptionsAlternate.strictHostKeyChecking));
 		sshSession.setConfig(config);
-		
+		// JITL-206
+		sshSession.setConfig("PreferredAuthentications", connection2OptionsAlternate.auth_method.Value());
 		setCommandsTimeout();
 		setProxy();
 		
