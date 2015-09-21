@@ -275,9 +275,11 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 				protocol.Set(this.Target().protocol);
 			}
 		}
-		setDefaultPort(this.Source().protocol, this.Source().port);
-		setDefaultPort(this.Target().protocol, this.Target().port);
-		setDefaultPort(protocol, port);
+		setDefaultHostPort(protocol, port, host);
+		setDefaultHostPort(this.Source().protocol, this.Source().port, this.Source().host);
+		setDefaultHostPort(this.Target().protocol, this.Target().port, this.Target().host);
+		setDefaultHostPort(this.Source().Alternatives().protocol, this.Source().Alternatives().port, this.Source().Alternatives().host);
+		setDefaultHostPort(this.Target().Alternatives().protocol, this.Target().Alternatives().port, this.Target().Alternatives().host);
 		if (zero_byte_transfer.String2Bool() == true) {
 			TransferZeroByteFiles(true);
 			setZeroByteFilesStrict(false);
@@ -404,23 +406,29 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 				protocol.Value(this.Target().protocol.Value());
 			}
 		}
-		setDefaultPort(this.Source().protocol, this.Source().port);
-		setDefaultPort(this.Target().protocol, this.Target().port);
-		setDefaultPort(protocol, port);
+		setDefaultHostPort(protocol, port, host);
+		setDefaultHostPort(this.Source().protocol, this.Source().port, this.Source().host);
+		setDefaultHostPort(this.Target().protocol, this.Target().port, this.Target().host);
+		setDefaultHostPort(this.Source().Alternatives().protocol, this.Source().Alternatives().port, this.Source().Alternatives().host);
+		setDefaultHostPort(this.Target().Alternatives().protocol, this.Target().Alternatives().port, this.Target().Alternatives().host);
+		setDefaultAuth(this.Source().protocol, this.Source());
+		setDefaultAuth(this.Target().protocol, this.Target());
+		setDefaultAuth(this.Source().Alternatives().protocol, this.Source().Alternatives());
+		setDefaultAuth(this.Target().Alternatives().protocol, this.Target().Alternatives());
 		if (file_path.isDirty()) {
 			if (file_spec.isDirty()) {
 				file_path.Value("");
 				String strT = getOptionNamesAsString(new SOSOptionElement[] { file_path, file_spec });
 //				throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_0030.params(strT));
 			}
-			if (RecurseSubFolders.value() == true) {
+			if (recursive.value() == true) {
 				String strT = getOptionNamesAsString(new SOSOptionElement[] { file_path, recursive });
 				//				throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_0030.params(strT));
 			}
 		}
-		if (file_path.IsEmpty() && FileNamePatternRegExp.IsEmpty() && FileListName.IsEmpty()) {
+		if (file_path.IsEmpty() && file_spec.IsEmpty() && FileListName.IsEmpty()) {
 			throw new JobSchedulerException(String.format("SOSVfs-E-0000: one of these parameters must be specified: '%1$s', %2$s', '%3$s'",
-					file_path.getShortKey(), FileNamePatternRegExp.getShortKey(), FileListName.getShortKey()));
+					file_path.getShortKey(), file_spec.getShortKey(), FileListName.getShortKey()));
 		}
 		if (zero_byte_transfer.String2Bool() == true) {
 			TransferZeroByteFiles(true);
@@ -474,24 +482,58 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		}
 	}
 
-	private void setDefaultPort(final SOSOptionTransferType pobjTransferTyp, final SOSOptionPortNumber pobjPort) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setDefaultPort";
-		if (pobjTransferTyp.isSFtp()) {
-			if (pobjPort.isDirty() == false) {
-				pobjPort.value(SOSOptionPortNumber.conPort4SFTP);
-				pobjPort.setProtected(pobjTransferTyp.isProtected());
+	private void setDefaultAuth(final SOSOptionTransferType pobjTransferTyp, final SOSConnection2OptionsAlternate objConn) {
+		enuTransferTypes transferType = pobjTransferTyp.getEnum();
+		if (transferType == enuTransferTypes.http || transferType == enuTransferTypes.https || transferType == enuTransferTypes.webdav) {
+			if (!objConn.auth_method.isDirty() && !objConn.ssh_auth_method.isDirty()) {
+				objConn.auth_method.Value(enuAuthenticationMethods.url);
+				objConn.ssh_auth_method.Value(enuAuthenticationMethods.url);
 			}
 		}
-		else {
-			if (pobjTransferTyp.isFtpS()) {
-				//führt dazu, daß die Profildaten (Port) nicht gesetzt werden, sondert 990 gesetzt wird
-		        //if (pobjPort.isDirty() == false) {
-				//	pobjPort.value(SOSOptionPortNumber.conPort4FTPS);
-				//	pobjPort.setProtected(pobjTransferTyp.isProtected());
-				//}
+	}
+	
+	private void setDefaultHostPort(final SOSOptionTransferType pobjTransferTyp, final SOSOptionPortNumber pobjPort, final SOSOptionHostName pobjHost) {
+		enuTransferTypes transferType = pobjTransferTyp.getEnum();
+		
+		switch (transferType) {
+		case sftp:
+			pobjPort.DefaultValue("" + SOSOptionPortNumber.conPort4SFTP);
+			break;
+		case ftp:
+			pobjPort.DefaultValue("" + SOSOptionPortNumber.conPort4FTP);
+			break;
+		case zip:
+		case file:
+		case local:
+			pobjPort.DefaultValue("0");
+			if (pobjHost.isNotDirty()
+					|| pobjHost.Value().equalsIgnoreCase("localhost")
+					|| pobjHost.Value().equalsIgnoreCase("127.0.0.1")) {
+				pobjHost.Value(SOSOptionHostName.getLocalHost());
 			}
+			break;
+		case ftps:
+			pobjPort.DefaultValue("" + SOSOptionPortNumber.conPort4FTPS);
+			break;
+		case webdav:
+		case http:
+		case https:
+			if (pobjHost.Value().toLowerCase().startsWith("https://")) {
+				pobjPort.DefaultValue("443");
+			}
+			else {
+				pobjPort.DefaultValue("" + SOSOptionPortNumber.conPort4http);
+			}
+			break;
+		default:
+			break;
 		}
-	} // private void setDefaultPort
+		if (pobjPort.isNotDirty()) {
+			pobjPort.Value(pobjPort.DefaultValue());
+			pobjPort.setNotDirty();
+			pobjPort.setProtected(pobjTransferTyp.isProtected());
+		}
+	}
 
 	@SuppressWarnings("unused") private boolean isSourceDirSpecified() {
 		final String conMethodName = conClassName + "::isSourceDirSpecified";
@@ -787,8 +829,8 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		return pstrText.trim().startsWith(";");
 	} // private boolean isIniComment
 	String[]	strIncludeDirectives	= new String[] { "include", "source_include", "target_include", "jump_include", "alternate_include",
-			"alternatesource_include", "alternatetarget_include" };
-	String[]	strIncludePrefixes		= new String[] { "", "source_", "target_", "jump_", "alternate_", "alternatesource_", "alternatetarget_" };
+			"alternatesource_include", "alternatetarget_include", "alternative_source_include", "alternative_target_include" };
+	String[]	strIncludePrefixes		= new String[] { "", "source_", "target_", "jump_", "alternate_", "alternatesource_", "alternatetarget_", "alternative_source_", "alternative_target_" };
 
 	public boolean isIncludeDirective(final String pstrText) {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::isIncludeDirective";

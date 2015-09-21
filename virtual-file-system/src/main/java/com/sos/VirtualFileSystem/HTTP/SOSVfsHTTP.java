@@ -332,11 +332,12 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 	private void checkConnection() throws Exception{
 		GetMethod method = new GetMethod(this.rootUrl.getURI());
 		try {
-			
-			this.httpClient.executeMethod(method);
+			if(isServerErrorStatusCode(this.httpClient.executeMethod(method))){
+				throw new Exception(this.getHttpMethodExceptionText(method));
+			}
 		}
 		catch (Exception ex) {
-			throw new Exception(this.getHttpMethodExceptionText(method, ex));
+			throw ex;
 		}
 		finally{
 			try{
@@ -461,6 +462,20 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 			return true;
 		}*/
 		if(statusCode == HttpStatus.SC_OK){
+			return true;
+		}
+		
+		return false;
+	}
+	
+	
+	/**
+	 * 
+	 * @param statusCode
+	 * @return
+	 */
+	private boolean isServerErrorStatusCode(int statusCode){
+		if(statusCode >= 500){
 			return true;
 		}
 		
