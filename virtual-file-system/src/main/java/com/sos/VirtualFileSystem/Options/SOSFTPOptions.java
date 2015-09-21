@@ -410,7 +410,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 //				String strT = getOptionNamesAsString(new SOSOptionElement[] { file_path, file_spec });
 //				throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_0030.params(strT));
 			}
-//			if (RecurseSubFolders.value() == true) {
+//			if (recursive.value() == true) {
 //				String strT = getOptionNamesAsString(new SOSOptionElement[] { file_path, recursive });
 				//				throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_0030.params(strT));
 //			}
