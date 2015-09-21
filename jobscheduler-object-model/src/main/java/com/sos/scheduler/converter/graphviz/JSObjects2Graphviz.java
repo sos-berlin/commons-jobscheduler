@@ -13,9 +13,11 @@ import com.sos.scheduler.model.SchedulerHotFolderFileList;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.objects.*;
 import com.sos.scheduler.model.objects.JobChain.JobChainNode;
+
 import org.apache.log4j.Logger;
 
 import java.util.Hashtable;
+import java.util.List;
 
 import static com.sos.scheduler.model.messages.JSMessages.*;
 
@@ -108,10 +110,10 @@ public class JSObjects2Graphviz extends JSJobUtilitiesClass<JSObjects2GraphvizOp
 			initialize();
 			// TODO in die Options damit
 			flgCreateCluster = false;
-
-			for (JSObjBase obj : objSchedulerHotFolderFileList.getSortedFileList()) {
+			List<JSObjBase> sortedFileList = objSchedulerHotFolderFileList.getSortedFileList();
+			for (JSObjBase obj : sortedFileList) {
 				if (obj instanceof JSObjJobChain) {
-					String strOutFile = createGraphvizFile(obj);
+					String strOutFile = createGraphvizFile(obj,sortedFileList);
 					cmdShell objShell = new cmdShell();
 					objShell.executeCommand(Dot.Command + " -x -Tpdf " + strOutFile + " > " + strOutFile + ".pdf");
 				}
@@ -128,7 +130,7 @@ public class JSObjects2Graphviz extends JSJobUtilitiesClass<JSObjects2GraphvizOp
 		return this;
 	}
 
-	public String createGraphvizFile(final JSObjBase obj) throws Exception {
+	public String createGraphvizFile(JSObjBase obj, List<JSObjBase> sortedFileList) throws Exception {
 
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::createGraphvizFile";
@@ -150,7 +152,7 @@ public class JSObjects2Graphviz extends JSJobUtilitiesClass<JSObjects2GraphvizOp
 			// Get list of orders related to this JobChain
 
 			Hashtable<String, JSObjOrder> tblOrders = new Hashtable<String, JSObjOrder>();
-			for (JSObjBase objO : objSchedulerHotFolderFileList.getSortedFileList()) {
+			for (JSObjBase objO : sortedFileList) {
 				if (objO instanceof JSObjOrder) {
 					JSObjOrder objOrder = (JSObjOrder) objO;
 					String strOrderName = objOrder.getJobChainName();
