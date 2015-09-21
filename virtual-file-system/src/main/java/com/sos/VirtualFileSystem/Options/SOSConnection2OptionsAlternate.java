@@ -464,8 +464,8 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 	 * \brief optionsHaveMinRequirements
 	 *
 	 * \details
-	 * is used before alternative connection is used to check 
-	 * wether host, port, user is set
+	 * should called before alternative connection is used to check 
+	 * if host, user etc. is set
 	 *
 	 * @return boolean
 	 */
@@ -474,14 +474,14 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 			return false;
 		}
 		if (protocol.Value().equalsIgnoreCase("local")) {
-			return false;
+			return true;
 		}
 		if (host.isNotDirty() || host.IsEmpty()) {
 			return false;
 		}
-//		if (!protocol.Value().equalsIgnoreCase("webdav") && (port.isNotDirty() || port.value() <= 0)) {
-//			return false;
-//		}
+		if (protocol.Value().matches("https?")) {
+			return true;
+		}
 		if (user.isNotDirty() || user.IsEmpty()) {
 			return false;
 		}
