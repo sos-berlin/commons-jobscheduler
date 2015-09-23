@@ -615,6 +615,7 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 		}
 		logger.debug("directory = " + pathName);
 		try {
+			this.getSOSFileEntries().clear();
 			ftpFileList = Client().listFiles(pathName);
 		} catch (IOException e) {
 			RaiseException(e, HostID(SOSVfs_E_0105.params("getFilenames")));
