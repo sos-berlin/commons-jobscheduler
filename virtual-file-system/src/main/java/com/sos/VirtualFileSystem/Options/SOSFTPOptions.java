@@ -416,7 +416,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 				//				throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_0030.params(strT));
 //			}
 		}
-		if (file_path.IsEmpty() && this.Source().Directory.IsEmpty() && FileListName.IsEmpty()) {
+		if (file_path.IsEmpty() && SourceDir.IsEmpty() && this.Source().Directory.IsEmpty() && FileListName.IsEmpty()) {
 			throw new JobSchedulerException(String.format("SOSVfs-E-0000: one of these parameters must be specified: '%1$s', '%2$s', '%3$s'",
 					file_path.getShortKey(), "source_dir", FileListName.getShortKey()));
 		}
