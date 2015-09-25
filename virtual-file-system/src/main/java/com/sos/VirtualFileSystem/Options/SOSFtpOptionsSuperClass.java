@@ -43,6 +43,7 @@ import com.sos.JSHelper.Options.SOSOptionTime;
 import com.sos.JSHelper.Options.SOSOptionTransferMode;
 import com.sos.JSHelper.Options.SOSOptionTransferType;
 import com.sos.JSHelper.Options.SOSOptionUserName;
+import com.sos.JSHelper.Options.SOSOptionZeroByteTransfer;
 import com.sos.JSHelper.interfaces.ISOSConnectionOptions;
 import com.sos.JSHelper.interfaces.ISOSFtpOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
@@ -6795,49 +6796,28 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	public SOSOptionInteger			VerbosityLevel			= (SOSOptionInteger) verbose.SetAlias(conClassName + ".VerbosityLevel");
 	/**
 	* \var zero_byte_transfer : This parameter specifies whether zero byte files
-	*
-	This parameter specifies whether zero byte files should be transferred and processed by subsequent commands. The following settings are available: yes : Files with zero byte size are transferred (default). no : Files with zero byte size are transferred, should at least one of the files have more than zero byte size. strict : Files with zero byte size are not transferred. An error will be raised if any zero byte file is found. relaxed : Files with zero byte size will not be transferred. However, no error will be raised if this results in no files being transferred. Use of this parameter can be refined using the force_files parameter: should force_files have the value false, then processing will be treated as successful in the event of no files having been transferred. Note that the remove_files parameter has unrestricted validity. Files with zero byte size will be removed regardless of whether or not they have been transferred.
+	* This parameter specifies whether zero byte files should be transferred and processed by subsequent commands. 
+	* The following settings are available: 
+	*  yes : Files with zero byte size are transferred (default). 
+	*  no : Files with zero byte size are transferred, should at least one of the files have more than zero byte size. 
+	*  strict : Files with zero byte size are not transferred. An error will be raised if any zero byte file is found. 
+	*  relaxed : Files with zero byte size will not be transferred. However, no error will be raised if this results in no files being transferred. 
 	*
 	*/
 	@JSOptionDefinition(
 						name = "zero_byte_transfer",
 						description = "This parameter specifies whether zero byte files",
 						key = "zero_byte_transfer",
-						type = "SOSOptionStringValueList",
+						type = "SOSOptionZeroByteTransfer",
 						mandatory = false)
-	public SOSOptionStringValueList	zero_byte_transfer		= new SOSOptionStringValueList(this, conClassName + ".zero_byte_transfer", // HashMap-Key
+	public SOSOptionZeroByteTransfer	zero_byte_transfer		= new SOSOptionZeroByteTransfer(this, conClassName + ".zero_byte_transfer", // HashMap-Key
 																	"This parameter specifies whether zero byte files", // Titel
-																	"yes;true;no;false;strict;relaxed", // InitValue
+																	"yes", // InitValue
 																	"yes", // DefaultValue
 																	false // isMandatory
 															);
-	public SOSOptionStringValueList	TransferZeroByteFiles	= (SOSOptionStringValueList) zero_byte_transfer.SetAlias("transfer_zero_byte_files");
+	public SOSOptionZeroByteTransfer	TransferZeroByteFiles	= (SOSOptionZeroByteTransfer) zero_byte_transfer.SetAlias("transfer_zero_byte_files");
 
-	/**
-	 * \brief getzero_byte_transfer
-	 *
-	 * \details
-	 *
-	 * \return
-	 *
-	 * @return
-	 */
-	@Override public SOSOptionStringValueList getzero_byte_transfer() {
-		return zero_byte_transfer;
-	}
-
-	/**
-	 * \brief setzero_byte_transfer
-	 *
-	 * \details
-	 *
-	 * \return
-	 *
-	 * @param p_zero_byte_transfer
-	 */
-	@Override public void setzero_byte_transfer(final SOSOptionStringValueList p_zero_byte_transfer) {
-		zero_byte_transfer = p_zero_byte_transfer;
-	}
 
 	public SOSFtpOptionsSuperClass() {
 		// super("SOSVirtualFileSystem");
