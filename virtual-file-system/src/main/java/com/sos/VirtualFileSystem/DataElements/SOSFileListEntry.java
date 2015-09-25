@@ -69,7 +69,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	private static final String	FIELD_GUID				= "guid";
 	private static final String	FIELD_MODIFICATION_DATE = "modification_date";
 	public enum enuTransferStatus {
-		transferUndefined, waiting4transfer, transferring, transferInProgress, transferred, transfer_skipped, transfer_has_errors, transfer_aborted, compressed, notOverwritten, deleted, renamed, IgnoredDueToZerobyteConstraint, setBack, polling
+		transferUndefined, waiting4transfer, transferring, transferInProgress, transferred, transfer_skipped, transfer_has_errors, transfer_aborted, compressed, notOverwritten, deleted, renamed, ignoredDueToZerobyteConstraint, setBack, polling
 	}
 	public enum HistoryRecordType {
 		XML,CSV
@@ -223,6 +223,9 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 				}
 				if (source.getFileSize() <= 0) {
 					target.write(buffer, 0, 0);
+					if (calculateIntegrityHash) {
+						md.update(buffer, 0, 0);
+					}
 				}
 				else {
 					// TODO Option Blockmode=true (default), if false line mode and getLine
@@ -989,6 +992,12 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 				objSourceTransferFile = objDataSourceClient.getFileHandle(MakeFullPathName(getPathWithoutFileName(strSourceFileName) + strT,
 						strSourceTransferName));
 			}
+			if (eTransferStatus == enuTransferStatus.ignoredDueToZerobyteConstraint) {
+				String strM = SOSVfs_D_0110.params(strSourceFileName);
+				logger.debug(strM);
+				objJadeReportLogger.info(strM);
+				return;
+			}
 			flgFileExists = objTargetFile.FileExists();
 			if (flgFileExists == true) {
 				this.setTargetFileAlreadyExists(true);
@@ -1282,6 +1291,12 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		logger.debug(strM);
 		objJadeReportLogger.info(strM);
 	}
+	
+	public void setIgnoredDueToZerobyteConstraint() {
+		eTransferStatus = enuTransferStatus.ignoredDueToZerobyteConstraint;
+		dteEndTransfer = Now();
+	}
+	
 
 	/**
 	 * Check, wether a source file exists.
