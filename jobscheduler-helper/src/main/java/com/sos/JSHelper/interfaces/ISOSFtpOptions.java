@@ -1912,27 +1912,6 @@ public interface ISOSFtpOptions {
 	public abstract void setverbose(SOSOptionInteger p_verbose);
 
 	/**
-	     * \brief getzero_byte_transfer : This parameter specifies whether zero byte files
-	     *
-	     * \details
-	    This parameter specifies whether zero byte files should be transferred and processed by subsequent commands. The following settings are available: yes : Files with zero byte size are transferred (default). no : Files with zero byte size are transferred, should at least one of the files have more than zero byte size. strict : Files with zero byte size are not transferred. An error will be raised if any zero byte file is found. relaxed : Files with zero byte size will not be transferred. However, no error will be raised if this results in no files being transferred. Use of this parameter can be refined using the force_files parameter: should force_files have the value false, then processing will be treated as successful in the event of no files having been transferred. Note that the remove_files parameter has unrestricted validity. Files with zero byte size will be removed regardless of whether or not they have been transferred.
-	     *
-	     * \return This parameter specifies whether zero byte files
-	     *
-	     */
-	public abstract SOSOptionStringValueList getzero_byte_transfer();
-
-	/**
-	 * \brief setzero_byte_transfer : This parameter specifies whether zero byte files
-	 *
-	 * \details
-	This parameter specifies whether zero byte files should be transferred and processed by subsequent commands. The following settings are available: yes : Files with zero byte size are transferred (default). no : Files with zero byte size are transferred, should at least one of the files have more than zero byte size. strict : Files with zero byte size are not transferred. An error will be raised if any zero byte file is found. relaxed : Files with zero byte size will not be transferred. However, no error will be raised if this results in no files being transferred. Use of this parameter can be refined using the force_files parameter: should force_files have the value false, then processing will be treated as successful in the event of no files having been transferred. Note that the remove_files parameter has unrestricted validity. Files with zero byte size will be removed regardless of whether or not they have been transferred.
-	 *
-	 * @param zero_byte_transfer : This parameter specifies whether zero byte files
-	 */
-	public abstract void setzero_byte_transfer(SOSOptionStringValueList p_zero_byte_transfer);
-
-	/**
 	* \brief setAllOptions - übernimmt die OptionenWerte aus der HashMap
 	*
 	* \details In der als Parameter anzugebenden HashMap sind Schlüssel (Name)

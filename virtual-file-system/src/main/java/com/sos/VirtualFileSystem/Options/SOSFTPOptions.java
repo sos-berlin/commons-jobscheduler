@@ -51,11 +51,6 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	private static final Logger		logger								= Logger.getLogger(VFSFactory.getLoggerName());
 	private Properties				propSOSFtpEnvironmentVars			= null;
 	private Properties				schedulerParams						= null;
-	@SuppressWarnings("unused")
-	private boolean					zeroByteFiles						= false;
-	@SuppressWarnings("unused")
-	private boolean					zeroByteFilesStrict					= false;
-	private boolean					zeroByteFilesRelaxed				= false;
 	private boolean					flgCheckMandatoryDone				= false;
 	private boolean					flgReadSettingsFileIsActive			= false;
 	private boolean					flgSettingsFileProcessed			= false;
@@ -271,27 +266,6 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		setDefaultHostPort(this.Target().protocol, this.Target().port, this.Target().host);
 		setDefaultHostPort(this.Source().Alternatives().protocol, this.Source().Alternatives().port, this.Source().Alternatives().host);
 		setDefaultHostPort(this.Target().Alternatives().protocol, this.Target().Alternatives().port, this.Target().Alternatives().host);
-		if (zero_byte_transfer.String2Bool() == true) {
-			TransferZeroByteFiles(true);
-			setZeroByteFilesStrict(false);
-		}
-		else {
-			if (zero_byte_transfer.equalsIgnoreCase("strict")) {
-				TransferZeroByteFiles(false);
-				setZeroByteFilesStrict(true);
-			}
-			else {
-				if (zero_byte_transfer.equalsIgnoreCase("relaxed")) {
-					TransferZeroByteFiles(false);
-					setZeroByteFilesStrict(false);
-					setZeroByteFilesRelaxed(true);
-				}
-				else {
-					TransferZeroByteFiles(false);
-					setZeroByteFilesStrict(false);
-				}
-			}
-		}
 		getDataSourceType();
 		getDataTargetType();
 	}
@@ -419,27 +393,6 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		if (file_path.IsEmpty() && SourceDir.IsEmpty() && this.Source().Directory.IsEmpty() && FileListName.IsEmpty()) {
 			throw new JobSchedulerException(String.format("SOSVfs-E-0000: one of these parameters must be specified: '%1$s', '%2$s', '%3$s'",
 					file_path.getShortKey(), "source_dir", FileListName.getShortKey()));
-		}
-		if (zero_byte_transfer.String2Bool() == true) {
-			TransferZeroByteFiles(true);
-			setZeroByteFilesStrict(false);
-		}
-		else {
-			if (zero_byte_transfer.equalsIgnoreCase("strict")) {
-				TransferZeroByteFiles(false);
-				setZeroByteFilesStrict(true);
-			}
-			else {
-				if (zero_byte_transfer.equalsIgnoreCase("relaxed")) {
-					TransferZeroByteFiles(false);
-					setZeroByteFilesStrict(false);
-					setZeroByteFilesRelaxed(true);
-				}
-				else {
-					TransferZeroByteFiles(false);
-					setZeroByteFilesStrict(false);
-				}
-			}
 		}
 		getDataSourceType();
 		getDataTargetType();
@@ -1171,55 +1124,6 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		return flgT;
 	}
 
-	public void TransferZeroByteFiles(final boolean pzeroByteFiles) {
-		zeroByteFiles = pzeroByteFiles;
-	}
-
-	public boolean TransferZeroByteFiles() {
-		String strV = zero_byte_transfer.Value();
-		boolean flgR = strV.equalsIgnoreCase("yes") || strV.equalsIgnoreCase("true");
-		return flgR;
-	}
-
-	public boolean TransferZeroByteFilesYes() {
-		return TransferZeroByteFiles();
-	}
-
-	public boolean TransferZeroByteFilesNo() {
-		String strV = zero_byte_transfer.Value();
-		boolean flgR = strV.equalsIgnoreCase("no") || strV.equalsIgnoreCase("false");
-		return flgR;
-	}
-
-	public boolean TransferZeroByteFilesStrict() {
-		String strV = zero_byte_transfer.Value();
-		boolean flgR = strV.equalsIgnoreCase("strict");
-		return flgR;
-	}
-
-	public boolean TransferZeroByteFilesRelaxed() {
-		String strV = zero_byte_transfer.Value();
-		boolean flgR = strV.equalsIgnoreCase("relaxed");
-		return flgR;
-	}
-
-	public void setZeroByteFilesStrict(final boolean pzeroByteFilesStrict) {
-		zeroByteFilesStrict = pzeroByteFilesStrict;
-	}
-
-	public boolean isZeroByteFilesStrict() {
-		String strV = zero_byte_transfer.Value();
-		boolean flgR = strV.equalsIgnoreCase("strict");
-		return flgR;
-	}
-
-	public void setZeroByteFilesRelaxed(final boolean pzeroByteFilesRelaxed) {
-		zeroByteFilesRelaxed = pzeroByteFilesRelaxed;
-	}
-
-	public boolean isZeroByteFilesRelaxed() {
-		return zeroByteFilesRelaxed;
-	}
 
 	/**
 	 * \brief getconnectionOptions
