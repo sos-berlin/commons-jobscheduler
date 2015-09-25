@@ -88,7 +88,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	private static final String	FIELD_MANDATOR			= "mandator";
 	private static final String	FIELD_GUID				= "guid";
 	public enum enuTransferStatus {
-		transferUndefined, waiting4transfer, transferring, transferInProgress, transferred, transfer_skipped, transfer_has_errors, transfer_aborted, compressed, notOverwritten, deleted, renamed, IgnoredDueToZerobyteConstraint, setBack, polling
+		transferUndefined, waiting4transfer, transferring, transferInProgress, transferred, transfer_skipped, transfer_has_errors, transfer_aborted, compressed, notOverwritten, deleted, renamed, ignoredDueToZerobyteConstraint, setBack, polling
 	}
 	public enum HistoryRecordType {
 		XML,CSV
@@ -302,6 +302,9 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 				}
 				if (source.getFileSize() <= 0) {
 					target.write(buffer, 0, 0);
+					if (createSecurityHash) {
+						md.update(buffer, 0, 0);
+					}
 				}
 				else {
 					// TODO Option Blockmode=true (default), if false line mode and getLine
@@ -919,19 +922,6 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 			if (objSourceFile.notExists() == true) {
 				throw new JobSchedulerException(SOSVfs_E_226.params(strSourceFileName));
 			}
-			/**
-			 * hier nicht verwenden, weil es zu spüt kommt.
-			 */
-			// if (CheckFileSizeIsChanging() == false) {
-			// // TODO Exception auslüsen
-			// return;
-			// }
-			//			// improve zeroByteFile handling in transactional mode
-			//			if (objOptions.TransferZeroByteFiles() == false && objSourceFile.isEmptyFile()) {
-			//				this.TransferStatus(enuTransferStatus.transfer_skipped);
-			//				return;
-			//			}
-			//
 			File subParent = null;
 			String subPath = "";
 			String strTargetFolderName = objOptions.TargetDir.Value();
@@ -1023,6 +1013,12 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 				String strT = "";
 				objSourceTransferFile = objDataSourceClient.getFileHandle(MakeFullPathName(getPathWithoutFileName(strSourceFileName) + strT,
 						strSourceTransferName));
+			}
+			if (eTransferStatus == enuTransferStatus.ignoredDueToZerobyteConstraint) {
+				String strM = SOSVfs_D_0110.params(strSourceFileName);
+				logger.debug(strM);
+				objJadeReportLogger.info(strM);
+				return;
 			}
 			flgFileExists = objTargetFile.FileExists();
 			if (flgFileExists == true) {
@@ -1313,10 +1309,18 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	public void setTransferSkipped() {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setTransferSkipped";
 		eTransferStatus = enuTransferStatus.transfer_skipped;
+		dteEndTransfer = Now();
 		String strM = SOSVfs_D_0110.params(strSourceFileName);
 		logger.debug(strM);
 		objJadeReportLogger.info(strM);
 	} // private void TransferStatus
+	
+	public void setIgnoredDueToZerobyteConstraint() {
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setTransferSkipped";
+		eTransferStatus = enuTransferStatus.ignoredDueToZerobyteConstraint;
+		dteEndTransfer = Now();
+	}
+	
 
 	/**
 	 *

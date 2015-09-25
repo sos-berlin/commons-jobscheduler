@@ -58,7 +58,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 	public int								lngNoOfZeroByteSizeFiles			= 0;
 	private boolean							flgHistoryFileAlreadyWritten		= false;
 	private boolean							flgResultSetFileAlreadyCreated		= false;
-
+	
 	public void VFSHandler(final ISOSVFSHandler pobjVFS) {
 		objVFS = pobjVFS;
 	}
@@ -183,6 +183,16 @@ public class SOSFileList extends SOSVfsMessageCodes {
 	public long SkippedTransfers() {
 		CountStatus();
 		return lngSkippedTransfers;
+	}
+	
+	public SOSTransferStateCounts countTransfers() {
+		CountStatus();
+		SOSTransferStateCounts counts = new SOSTransferStateCounts();
+		counts.setSkippedTransfers(lngSkippedTransfers);
+		counts.setSuccessTransfers(lngSuccessfulTransfers);
+		counts.setFailedTransfers(lngFailedTransfers);
+		counts.setZeroBytesTransfers(lngNoOfZeroByteSizeFiles);
+		return counts;
 	}
 
 	/**
@@ -365,9 +375,8 @@ public class SOSFileList extends SOSVfsMessageCodes {
 	} // private SOSFileListEntry Find
 
 	public int getZeroByteCount() {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getZeroByteCount";
 		return lngNoOfZeroByteSizeFiles;
-	} // private int getZeroByteCount
+	}
 
 	/**
 	 * Erst wenn alle Dateien erfolgreich transferieriert wurden, dann sollen die lokalen Dateien gelöscht werden.
@@ -726,5 +735,40 @@ public class SOSFileList extends SOSVfsMessageCodes {
 		String a = filenameA.replaceAll("[\\\\/]+", "/");
 		String b = filenameB.replaceAll("[\\\\/]+", "/");
 		return (caseSensitiv) ? a.equals(b) : a.equalsIgnoreCase(b);
+	}
+	
+	public void handleZeroByteFiles() {
+		switch(objOptions.zero_byte_transfer.getEnum()) {
+			case yes:
+				break;
+			case no:
+				if (size() > 0) {
+					boolean allFilesAreEmpty = true;
+					for (SOSFileListEntry entry : List()) {
+						if (entry.getFileSize() > 0) {
+							allFilesAreEmpty = false;
+							break;
+						}
+					}
+					if (allFilesAreEmpty) {
+						throw new JobSchedulerException("All files have zero byte size, transfer aborted");
+					}
+				}
+				break;
+			case relaxed:
+				for (SOSFileListEntry entry : List()) {
+					if (entry.getFileSize() <= 0) {
+						entry.setIgnoredDueToZerobyteConstraint();
+						lngNoOfZeroByteSizeFiles++;
+					}
+				}
+				break;
+			case strict:
+				for (SOSFileListEntry entry : List()) {
+					if (entry.getFileSize() <= 0) {
+						throw new JobSchedulerException(String.format("zero byte size file detected: %1$s", entry.getSourceFilename()));
+					}
+				}
+		}
 	}
 }
