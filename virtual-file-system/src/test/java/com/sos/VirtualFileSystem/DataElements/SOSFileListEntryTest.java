@@ -203,7 +203,7 @@ public class SOSFileListEntryTest extends JSListenerClass {
 		SOSFileListEntry objE = new SOSFileListEntry(strTestPathName + strTestFileName);
 		objE.setDataSourceClient(objFileSystemHandler);
 		objE.Options(objOptions);
-		objE.getTargetFile(objOptions);
+		objE.getTargetFile();
 
 		logger.info("SourceFileName         = " + objE.SourceFileName());
 		logger.info("SourceTransferFileName = " + objE.SourceTransferName());
@@ -226,7 +226,7 @@ public class SOSFileListEntryTest extends JSListenerClass {
 			objE = new SOSFileListEntry(strTestPathName + strTestFileName);
 			objE.setDataSourceClient(objFileSystemHandler);
 			objE.Options(objOptions);
-			objE.getTargetFile(objOptions);
+			objE.getTargetFile();
 		}
 		catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -266,7 +266,7 @@ public class SOSFileListEntryTest extends JSListenerClass {
 		SOSFileListEntry objE = new SOSFileListEntry(strTestPathName + strTestFileName);
 		objE.setDataSourceClient(objFileSystemHandler);
 		objE.Options(objOptions);
-		objE.getTargetFile(objOptions);
+		objE.getTargetFile();
 		objE.Log4Debug();
 
 		assertEquals("Source-File Name", strTestPathName + strTestFileName, objE.SourceFileName());
@@ -293,7 +293,7 @@ public class SOSFileListEntryTest extends JSListenerClass {
 		SOSFileListEntry objE = new SOSFileListEntry(strTestPathName + strTestFileName);
 		objE.setDataSourceClient(objFileSystemHandler);
 		objE.Options(objOptions);
-		objE.getTargetFile(objOptions);
+		objE.getTargetFile();
 		assertEquals("Source-File Name", strTestPathName + strTestFileName, objE.SourceFileName());
 		assertEquals("Source-Transfer-File Name", strTestPathName + strTestFileName, objE.SourceTransferName());
 		assertEquals("intermediate Atomic-File TargetTransferName", strTestFileName, objE.TargetTransferName());
