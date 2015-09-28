@@ -634,7 +634,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 						logger.error(e.getLocalizedMessage());
 					}
 				}
-				objListItem.rollbackRenameSourceFile();
+				entry.rollbackRenameSourceFile();
 			}
 		}
 		else{

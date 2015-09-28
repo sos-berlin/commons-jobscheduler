@@ -384,7 +384,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
 	
 	private void setEntryErrorMessage(JobSchedulerException ex){
-		errorMessage = ex.LastErrorMessage;
+		errorMessage = JobSchedulerException.LastErrorMessage;
 		if(isEmpty(errorMessage)){
 			errorMessage = ex.toString();
 			if(ex.getNestedException() != null){
@@ -1096,6 +1096,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 			if (objOptions.transactional.isFalse() && strRenamedSourceFileName != null) {
 				RenameSourceFile(objSourceFile);
 			}
+		}
 		catch (JobSchedulerException e) {
 			String strT = SOSVfs_E_229.params(e);
 			logger.error(strT);
