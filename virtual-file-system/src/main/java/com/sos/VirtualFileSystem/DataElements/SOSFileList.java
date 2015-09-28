@@ -4,6 +4,8 @@
 package com.sos.VirtualFileSystem.DataElements;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -444,10 +446,15 @@ public class SOSFileList extends SOSVfsMessageCodes {
 		}
 		flgResultSetFileAlreadyCreated = true;
 		try {
-			//if (objOptions.CreateResultSet.isTrue()) {
-				if (objOptions.ResultSetFileName.isDirty() && objOptions.ResultSetFileName.IsNotEmpty()) {
-					// TODO use the file object from the option
-					JSFile objResultSetFile = objOptions.ResultSetFileName.JSFile();
+			if (objOptions.ResultSetFileName.isDirty() && objOptions.ResultSetFileName.IsNotEmpty()) {
+				JSFile objResultSetFile = objOptions.ResultSetFileName.JSFile();
+				
+				if (objOptions.getDmzOption("operation").equals("copyFromInternet") && objOptions.getDmzOption("resultfile").length() > 0) {
+					ISOSVirtualFile jumpResultSetFile = objDataSourceClient.getFileHandle(objOptions.getDmzOption("resultfile"));
+					if (jumpResultSetFile.FileExists()) {
+						lngNoOfRecordsInResultSetFile = transferResultSetFile(objResultSetFile, jumpResultSetFile);
+					}
+				} else {
 					for (SOSFileListEntry objListItem : objFileListEntries) {
 						String strFileName = objListItem.getFileName4ResultList();
 						objResultSetFile.WriteLine(strFileName);
@@ -455,14 +462,39 @@ public class SOSFileList extends SOSVfsMessageCodes {
 					}
 					objResultSetFile.close();
 					logger.info(String.format("ResultSet to '%1$s' is written", objResultSetFile.getAbsoluteFile()));
+
 				}
-			//}
+			}
 		}
 		catch (Exception e) {
 			throw new JobSchedulerException("Problems occured creating ResultSetFile", e);
 		}
 	}
-
+	
+	private long transferResultSetFile(JSFile localResultSetFile, ISOSVirtualFile jumpResultSetFile) {
+		byte[] buffer = new byte[objOptions.BufferSize.value()];
+		int bytesTransferred = 0;
+		FileOutputStream fos = null;
+		long countLines = 0L;
+		try {
+			fos = new FileOutputStream(localResultSetFile);
+			while ((bytesTransferred = jumpResultSetFile.read(buffer)) != -1) {
+				fos.write(buffer, 0, bytesTransferred);
+				countLines += new String(buffer).replaceAll("[^\n]*", "").length();
+			}
+		} catch (Exception e) {
+			throw new JobSchedulerException(e);
+		} finally {
+			try {
+				if (fos != null) fos.close();
+			} catch (IOException e) {}
+			try {
+				jumpResultSetFile.closeInput();
+			} catch (Exception e) {}
+		}
+		return countLines;
+	}
+	
 	/**
 	 * Erst bei Erfolgreichen transferieren aller Dateien, wird der atomic suffix umbennant
 	 * Bedingung: Parameter objOptions.transactional.value() = yes

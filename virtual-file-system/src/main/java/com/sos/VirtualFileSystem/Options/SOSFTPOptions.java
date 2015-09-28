@@ -64,6 +64,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 					name = "objMailOptions")
 	private SOSSmtpMailOptions		objMailOptions;
 	public boolean					flgCumulativeTargetDeleted			= false;
+	private Map<String, String> 	dmzOptions 							= new HashMap<String, String>();
 	private final Map<String, String> includeDirectives 				= new HashMap<String, String>(){
 
 		private static final long serialVersionUID = 1L;
@@ -1233,5 +1234,17 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	@Override
 	public SOSOptionBoolean getraise_exception_on_error() {
 		return super.getraise_exception_on_error();
+	}
+	
+	public Map<String, String> getDmzOptions() {
+		return dmzOptions;
+	}
+	
+	public void setDmzOption(String dmzOptionKey, String dmzOptionValue) {
+		dmzOptions.put(dmzOptionKey, dmzOptionValue);
+	}
+	
+	public String getDmzOption(String dmzOptionKey) {
+		return dmzOptions.getOrDefault(dmzOptionKey, "");
 	}
 }
