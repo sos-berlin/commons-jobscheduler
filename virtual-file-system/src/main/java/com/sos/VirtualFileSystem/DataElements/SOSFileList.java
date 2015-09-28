@@ -396,6 +396,14 @@ public class SOSFileList extends SOSVfsMessageCodes {
 			}
 		}
 	}
+	
+	public void renameSourceFiles() {
+		if (objOptions.remove_files.isFalse()) {
+			for (SOSFileListEntry objListItem : objFileListEntries) {
+				objListItem.renameSourceFile();
+			}
+		}
+	}
 
 	public void createHashFileEntries(final String pstrHashTypeName) {
 		Vector<String> objV = new Vector<>();
@@ -448,31 +456,21 @@ public class SOSFileList extends SOSVfsMessageCodes {
 	 * Bedingung: Parameter objOptions.transactional.value() = yes
 	 * @throws Exception
 	 */
-	public void renameAtomicTransferFiles() throws Exception {
+	public void renameTargetAndSourceFiles() throws Exception {
 		final String conMethodName = conClassName + "::renameAtomicTransferFiles";
 		try {
 			if (objOptions.isAtomicTransfer() && objOptions.transactional.isTrue()) {
 				logger.debug(SOSVfs_D_209.get());
+				boolean skipRenameTarget = false;
 				for (SOSFileListEntry objListItem : objFileListEntries) {
-					if (objListItem.isNotOverwritten()) {
-						continue;
+					if (!skipRenameTarget) {
+						objListItem.renameTargetFile();
 					}
-					String strTargetTransferName = objListItem.TargetTransferName();
-					String strToFilename = MakeFullPathName(objOptions.TargetDir.Value(), objListItem.TargetFileName());
-					if (!fileNamesAreEqual(strToFilename, strTargetTransferName, false)) { // SOSFTP-142
-						ISOSVirtualFile objF = null;
-						if (objOptions.overwrite_files.isTrue() && objListItem.FileExists() == true) {
-							objListItem.setTargetFileAlreadyExists(true);
-							objF = objDataTargetClient.getFileHandle(strToFilename);
-							objF.delete();
-						}
-						objF = objDataTargetClient.getFileHandle(MakeFullPathName(objOptions.TargetDir.Value(), strTargetTransferName));
-						objF.rename(strToFilename);
-						objListItem.executePostCommands();
-						// if cumulative_files is true then this loop has to much entries
-						if (objOptions.CumulateFiles.isTrue()) {
-							break;
-						}
+					objListItem.renameSourceFile();
+					objListItem.executePostCommands();
+					// if cumulative_files is true then this loop has to much entries
+					if (objOptions.CumulateFiles.isTrue()) {
+						skipRenameTarget = true;
 					}
 				}
 			}
@@ -604,6 +602,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 						logger.error(e.getLocalizedMessage());
 					}
 				}
+				objListItem.rollbackRenameSourceFile();
 			}
 		}
 		if (objOptions.transactional.isTrue()) {
