@@ -649,6 +649,13 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 			
 			reply = "OK";
 		}
+		catch (JobSchedulerException ex) {
+			reply = ex.toString();
+			if(connection2OptionsAlternate.raise_exception_on_error.value()){
+				throw ex;
+			}
+			
+		}
 		catch (Exception ex) {
 			reply = ex.toString();
 			if(connection2OptionsAlternate.raise_exception_on_error.value()){
