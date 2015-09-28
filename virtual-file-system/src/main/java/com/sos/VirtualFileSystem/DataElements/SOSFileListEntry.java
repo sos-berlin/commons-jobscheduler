@@ -2,6 +2,7 @@ package com.sos.VirtualFileSystem.DataElements;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
@@ -249,9 +250,9 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	public void DeleteSourceFile() {
 		// SOSFTP-152: allow source file deletion even if the filename is changed by (replace/replacing)
 		String file = strSourceFileName;
-		if (strRenamedSourceFileName != null) {
-			file = strRenamedSourceFileName;
-		}
+//		if (strRenamedSourceFileName != null) {
+//			strFile2Delete = strRenamedSourceFileName;
+//		}
 		objDataSourceClient.getFileHandle(file).delete();
 		String msg = SOSVfs_I_0113.params(file);
 		logger.info(msg);
@@ -299,6 +300,9 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 					byte[] bytes = fs.getBytes();
 					cumulativeFileSeperatorLength = bytes.length;
 					target.write(bytes);
+					if (createSecurityHash) {
+						md.update(bytes);
+					}
 				}
 				if (source.getFileSize() <= 0) {
 					target.write(buffer, 0, 0);
@@ -610,38 +614,34 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		return eTransferStatus.name();
 	}
 
-	public ISOSVirtualFile getTargetFile(final ISOSFtpOptions objO) {
+	public ISOSVirtualFile getTargetFile() {
 		fleSourceTransferFile = null;
 		fleSourceFile = objDataSourceClient.getFileHandle(strSourceFileName);
 		fleTargetFile = null;
-		// first assumption: localfilename and localTransferfileName are identical
+		// first assumption: sourcefilename and sourceTransferfileName are identical
 		strSourceTransferName = fleSourceFile.getName();
-		// second assumption: localfilename and TargetFileName are equal (until it changed)
+		// second assumption: sourcefilename and TargetFileName are equal (until it changed)
 		strTargetFileName = fleSourceFile.getName();
 		boolean flgIncludeSubdirectories = objOptions.recursive.value();
-		if (objO.getcompress_files().isTrue()) { // compress file before sending
-			strSourceTransferName = fleSourceFile.MakeZIPFile(objO.getcompressed_file_extension().Value());
-			strTargetFileName = strTargetFileName + objO.getcompressed_file_extension().Value();
+		if (objOptions.compress_files.isTrue()) { // compress file before sending
+			strSourceTransferName = fleSourceFile.MakeZIPFile(objOptions.compressed_file_extension.Value());
+			strTargetFileName = strTargetFileName + objOptions.compressed_file_extension.Value();
 		}
 		if (objOptions.CumulateFiles.isTrue()) {
 			strTargetFileName = objOptions.CumulativeFileName.Value();
 			strTargetTransferName = strTargetFileName;
 			objOptions.append_files.value(true);
-			//			if (objOptions.CumulativeFileDelete.isTrue()) {
-			//			}
 		}
 		else {
 			strTargetFileName = getFileNameWithoutPath(strTargetFileName);
 			strTargetTransferName = strTargetFileName;
 			// replacing has to be taken from general or target_ options for the target replacing  SOSFTP-151
-			if (objO.getreplacing().IsNotEmpty()) {
+			if (objOptions.getreplacing().IsNotEmpty()) {
 				try {
-					strTargetFileName = objO.getreplacing().doReplace(strTargetFileName, objO.getreplacement().Value());
+					strTargetFileName = objOptions.getreplacing().doReplace(strTargetFileName, objOptions.getreplacement().Value());
 				}
 				catch (Exception e) {
-					String strM = SOSVfs_E_0150.get();
-					logger.error(e.getLocalizedMessage(), new JobSchedulerException(strM, e));
-					throw new JobSchedulerException(strM, e);
+					throw new JobSchedulerException(SOSVfs_E_0150.get() + " " + e.toString(), e);
 				}
 			}
 		}
@@ -653,19 +653,20 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		}
 		if (flgIncludeSubdirectories == true) {
 			String strSourceDir = getPathWithoutFileName(fleSourceFile.getName());
-			String strOrigSourceDir = objO.SourceDir().Value();
+			String strOrigSourceDir = objOptions.SourceDir().Value();
 			if (!fileNamesAreEqual(strSourceDir, strOrigSourceDir, true)) {
 				if (strSourceDir.length() > strOrigSourceDir.length()) {
 					String strSubFolder = strSourceDir.substring(strOrigSourceDir.length());
 					strSubFolder = adjustFileSeparator(addFileSeparator(strSubFolder));
-					strTargetFileName = strSubFolder + strTargetFileName;
+					//strTargetFileName = strSubFolder + strTargetFileName;
+					strTargetFileName = strTargetFileName.replaceFirst("([^/]*)$", strSubFolder + "$1");
 					strTargetTransferName = strSubFolder + strTargetTransferName;
 					if (isNotEmpty(this.getAtomicFileName())) {
 						this.setAtomicFileName(strTargetTransferName);
 					}
 					try {
 						if (objParent.add2SubFolders(strSubFolder) == true) {
-							objDataTargetClient.mkdir(addFileSeparator(objO.TargetDir().Value()) + strSubFolder);
+							objDataTargetClient.mkdir(addFileSeparator(objOptions.TargetDir().Value()) + strSubFolder);
 						}
 					}
 					catch (IOException e) {
@@ -675,6 +676,38 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 			}
 		}
 		return null;
+	}
+	
+	public void setRenamedSourceFilename() {
+		SOSConnection2OptionsAlternate sourceOptions = objOptions.Source();
+		if (sourceOptions.replacing.isDirty() && !objOptions.remove_files.value()) {
+			String replaceWith = sourceOptions.replacement.Value();
+			try {
+				String sourceFileName = new File(strSourceFileName).getName();
+				String sourceParent = strSourceFileName.substring(0, strSourceFileName.length() - sourceFileName.length());
+				String newSourceFileName = sourceOptions.replacing.doReplace(sourceFileName, replaceWith).replace('\\', '/');
+				if (!newSourceFileName.equals(sourceFileName)) {
+					String sourceDir = addFileSeparator(sourceOptions.Directory.Value());
+					if (objOptions.recursive.value()) {
+						String subDirs = sourceParent.substring(sourceDir.length());
+						newSourceFileName = newSourceFileName.replaceFirst("([^/]*)$", subDirs + "$1");
+					}
+					if (!newSourceFileName.startsWith("/") && !newSourceFileName.matches("^[a-zA-Z]:[\\\\/].*$") ) {
+						newSourceFileName = sourceDir + newSourceFileName;
+					}
+					newSourceFileName = resolveDotsInPath(newSourceFileName);
+					if (!strSourceFileName.equals(newSourceFileName)) {
+						strRenamedSourceFileName = newSourceFileName;
+					}
+				}
+			}
+			catch (JobSchedulerException e) {
+				throw e;
+			}
+			catch (Exception e) {
+				throw new JobSchedulerException(SOSVfs_E_0150.get(), e);
+			}
+		}
 	}
 
 	@Override public String getTargetFilename() {
@@ -791,6 +824,10 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		str = addFileSeparator(str);
 		return str;
 	}
+	
+	protected String resolveDotsInPath(String path) {
+		return Paths.get(path).normalize().toString().replace('\\', '/');
+	}
 
 	public void Options(final ISOSFtpOptions objOptions2) {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::Options";
@@ -812,56 +849,77 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	public String RemoteFileName() {
 		return strTargetFileName;
 	}
+	
+	public void renameSourceFile() {
+		RenameSourceFile(objDataSourceClient.getFileHandle(strSourceFileName));
+	}
 
-	private void RenameSourceFile(final ISOSVirtualFile pobjSourceFile) {
-		SOSConnection2OptionsAlternate objSourceOptions = objOptions.Source();
-		if (objSourceOptions.ReplaceWhat.isDirty()) {
-			String strReplaceWith = objSourceOptions.getreplacement().Value();
+	private void RenameSourceFile(final ISOSVirtualFile sourceFile) {
+		if (strRenamedSourceFileName != null) {
 			try {
-				File fleT = new File(strSourceFileName);
-				String strParent = changeBackslashes(normalized(fleT.getParent()));
-				String strSourceFileName1 = fleT.getName();
-				strSourceFileName1 = changeBackslashes(strSourceFileName1); // Problems on windows: the path separator disapers
-				String strNewSourceFileName = objSourceOptions.ReplaceWhat.doReplace(strSourceFileName1, strReplaceWith);
-				if (strReplaceWith.startsWith("/") == false) {
-					strNewSourceFileName = changeBackslashes(addFileSeparator(strParent) + strNewSourceFileName);
+				ISOSVirtualFile renamedSourceFile = objDataSourceClient.getFileHandle(strRenamedSourceFileName);
+				if (renamedSourceFile.FileExists()) {
+					renamedSourceFile.delete();
 				}
-				if (strNewSourceFileName.contains("/") && objOptions.makeDirs.isTrue()) { // sosftp-158
-					String strP = normalized(new File(strNewSourceFileName).getParent());
-					objDataSourceClient.mkdir(strP);
+				if (strRenamedSourceFileName.contains("/") && objOptions.makeDirs.isTrue()) {
+					String parent = strRenamedSourceFileName.replaceFirst("[^/]*$", "");
+					objDataSourceClient.mkdir(parent);
 				}
-				pobjSourceFile.rename(strNewSourceFileName);
-				strRenamedSourceFileName = strNewSourceFileName;
-			}
-			catch (Exception e) {
-				logger.error(e.getLocalizedMessage(), new JobSchedulerException(SOSVfs_E_0150.get(), e));
+				sourceFile.rename(strRenamedSourceFileName);
+			} catch (Exception e) {
 				throw new JobSchedulerException(SOSVfs_E_0150.get(), e);
 			}
 		}
 	}
-
-	private void RenameTargetFile(final String pstrTargetFileName) {
-		if (!fileNamesAreEqual(pstrTargetFileName, objTargetTransferFile.getName(), true)) {
-			if (pstrTargetFileName.contains("/") && objOptions.makeDirs.isTrue()) { // sosftp-158
-				String strP = normalized(new File(pstrTargetFileName).getParent());
-				try {
-					objDataTargetClient.mkdir(strP);
+	
+	public void rollbackRenameSourceFile() {
+		if (strRenamedSourceFileName != null) {
+			try {
+				ISOSVirtualFile sourceFile = objDataSourceClient.getFileHandle(strSourceFileName);
+				ISOSVirtualFile renamedSourceFile = objDataSourceClient.getFileHandle(strRenamedSourceFileName);
+				if (!sourceFile.FileExists() && renamedSourceFile.FileExists()) {
+					renamedSourceFile.rename(strSourceFileName);
 				}
-				catch (IOException e) {
-					logger.error(e.getLocalizedMessage());
-				}
+			} catch (Exception e) {
+				throw new JobSchedulerException(SOSVfs_E_0150.get(), e);
 			}
-			objTargetTransferFile.rename(pstrTargetFileName);
+		}
+	}
+	
+	public void renameTargetFile() {
+		if(!skipTransfer()) {
+			RenameTargetFile(objDataTargetClient.getFileHandle(MakeFullPathName(objOptions.TargetDir.Value(), strTargetFileName)));
+		}
+	}
+
+	private void RenameTargetFile(ISOSVirtualFile targetFile) {
+		String newFileName = targetFile.getName();
+		newFileName = resolveDotsInPath(newFileName);
+		if (!fileNamesAreEqual(objTargetTransferFile.getName(), newFileName, false)) {
+			try {
+				if (objOptions.overwrite_files.isTrue() && targetFile.FileExists()) {
+					setTargetFileAlreadyExists(true);
+					targetFile.delete();
+				}
+				if (newFileName.contains("/") && objOptions.makeDirs.isTrue()) { // sosftp-158
+					String parent = newFileName.replaceFirst("[^/]*$", "");
+					objDataTargetClient.mkdir(parent);
+				}
+				objTargetTransferFile.rename(newFileName);
+			} catch (Exception e) {
+				throw new JobSchedulerException(SOSVfs_E_0150.get(), e);
+			}
 		}
 	}
 
 	private String replaceVariables(final String pstrReplaceIn) {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::replaceVariables";
 		String strT = pstrReplaceIn;
-		strT = strT.replace("$TargetFileName", MakeFullPathName(objOptions.TargetDir.Value(), strTargetFileName));
-		strT = strT.replace("$TargetTransferFileName", MakeFullPathName(objOptions.TargetDir.Value(), strTargetTransferName));
-		strT = strT.replace("$SourceFileName", MakeFullPathName(objOptions.SourceDir.Value(), strSourceFileName));
-		strT = strT.replace("$SourceTransferFileName", MakeFullPathName(objOptions.SourceDir.Value(), strSourceTransferName));
+		strT = strT.replace("$TargetFileName", resolveDotsInPath(MakeFullPathName(objOptions.TargetDir.Value(), strTargetFileName)));
+		strT = strT.replace("$TargetTransferFileName", resolveDotsInPath(MakeFullPathName(objOptions.TargetDir.Value(), strTargetTransferName)));
+		strT = strT.replace("$SourceFileName", resolveDotsInPath(MakeFullPathName(objOptions.SourceDir.Value(), strSourceFileName)));
+		strT = strT.replace("$SourceTransferFileName", resolveDotsInPath(MakeFullPathName(objOptions.SourceDir.Value(), strSourceTransferName)));
+		strT = strT.replace("$RenamedSourceFileName", strRenamedSourceFileName);
 		Properties objProp = objOptions.getTextProperties();
 		objProp.put("TargetFileName", strTargetFileName);
 		objProp.put("TargetTransferFileName", strTargetTransferName);
@@ -871,6 +929,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		objProp.put("TargetDirName", objOptions.TargetDir.Value());
 		objProp.put("$SourceDirName", objOptions.SourceDir.Value());
 		objProp.put("SourceDirName", objOptions.SourceDir.Value());
+		objProp.put("$RenamedSourceFileName", strRenamedSourceFileName);
+		objProp.put("RenamedSourceFileName", strRenamedSourceFileName);
 		strT = objOptions.replaceVars(strT);
 		// TODO other patterns, like [date:] or others should replaced as well
 		return strT;
@@ -928,32 +988,22 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 			String localDir = objOptions.SourceDir.Value();
 			boolean flgIncludeSubdirectories = objOptions.recursive.value();
 			if (flgIncludeSubdirectories == true) {
-				// TODO Das Erstellen des Verzeichnis muü eine separate Methode werden
-				// überprüfen, ob das Verzeichnis auf den Target (-Server) existiert, wenn nicht dann soll das gleiche Verzeichnis generiert
-				// werden
 				if (objSourceFile.getParentVfs() != null && objSourceFile.getParentVfsFile().isDirectory()) {
 					subPath = strSourceFileName.substring(localDir.length()); // Unterverzeichnisse sind alle Verzeichnisse unterhalb
-					// der localDir
 					subParent = new File(subPath).getParentFile();
 					if (subParent != null) {
 						subPath = adjustFileSeparator(subPath);
 						subPath = subPath.substring(0, subPath.length() - new File(strSourceFileName.toString()).getName().length() - 1);
-						// logger.debug(SOSVfs_D_227.params(subPath));
-						// TODO nur feststellen, ob es den schon gibt. Neue Methode einführen, evtl. FileExists/Folderexists
-						// String[] ftpFiles = objDataTargetClient.listNames(strTargetFolderName + "/" + subPath);
-						// if (ftpFiles == null || ftpFiles.length == 0) {
-						// File.separator führte zu Unterverzeichnissen mit führendem Backslash
-						//objDataTargetClient.mkdir(strTargetFolderName + File.separator + subPath);
 						objDataTargetClient.mkdir(strTargetFolderName + "/" + subPath);
-						// }
 					}
 					else {
 						subPath = "";
 					}
 				}
 			}
-			this.getTargetFile(objOptions); // TODO Namen ündern
-			if (objOptions.transactional.value() == true) {
+			this.getTargetFile();
+			this.setRenamedSourceFilename();
+			if (objOptions.transactional.value()) {
 				this.setTransactionalLocalFile();
 			}
 			switch (objOptions.operation.value()) {
@@ -1018,40 +1068,34 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 				String strM = SOSVfs_D_0110.params(strSourceFileName);
 				logger.debug(strM);
 				objJadeReportLogger.info(strM);
-				return;
 			}
-			flgFileExists = objTargetFile.FileExists();
-			if (flgFileExists == true) {
-				this.setTargetFileAlreadyExists(true);
-				if (objOptions.DoNotOverwrite() == true) { // kb 2012-06-29: check setting first, then file - existence
+			if (objOptions.DoNotOverwrite()) {
+				flgFileExists = objTargetFile.FileExists();
+				if (flgFileExists == true) {
+					this.setTargetFileAlreadyExists(true);
 					logger.debug(SOSVfs_E_228.params(strTargetFileName));
 					this.setNotOverwritten();
-					return;
 				}
 			}
-			this.doTransfer(objSourceTransferFile, objTargetTransferFile);
-			if (objOptions.KeepModificationDate.isTrue()) {
-				long pdteDateTime = objSourceFile.getModificationDateTime();
-				if (pdteDateTime != -1) {
-					objTargetFile.setModificationDateTime(pdteDateTime);
+			
+			if (!skipTransfer()) {
+				this.doTransfer(objSourceTransferFile, objTargetTransferFile);
+				if (objOptions.KeepModificationDate.isTrue()) {
+					long pdteDateTime = objSourceFile.getModificationDateTime();
+					if (pdteDateTime != -1) {
+						objTargetFile.setModificationDateTime(pdteDateTime);
+					}
 				}
-			}
-			if (objOptions.isAtomicTransfer() || objOptions.isReplaceReplacingInEffect()) {
-				if (objOptions.transactional.isFalse()) {
-					String strNewFileName = objTargetFile.getName();
-					if (!fileNamesAreEqual(objTargetTransferFile.getName(), strNewFileName, false)) {
-						flgFileExists = objTargetFile.FileExists();
-						if (objOptions.overwrite_files.isTrue() && flgFileExists == true) {
-							// hier werden Dateien gelöscht, vor dem umbenennen.
-							// TODO Besser: auch erstmal umbenennen und dann erst löschen
-							objTargetFile.delete();
-						}
-						RenameTargetFile(strNewFileName);
+				if (objOptions.isAtomicTransfer()
+						|| objOptions.isReplaceReplacingInEffect()) {
+					if (objOptions.transactional.isFalse()) {
+						RenameTargetFile(objTargetFile);
 					}
 				}
 			}
-			RenameSourceFile(objSourceFile);
-		}
+			if (objOptions.transactional.isFalse() && strRenamedSourceFileName != null) {
+				RenameSourceFile(objSourceFile);
+			}
 		catch (JobSchedulerException e) {
 			String strT = SOSVfs_E_229.params(e);
 			logger.error(strT);
@@ -1172,6 +1216,12 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		}
 		this.setStatus(enuTransferStatus.transferred);
 		// TODO Message "transferCompleted absetzen"
+	}
+	
+	private boolean skipTransfer() {
+		return (eTransferStatus == enuTransferStatus.notOverwritten ||
+				eTransferStatus == enuTransferStatus.transfer_skipped ||
+				eTransferStatus == enuTransferStatus.ignoredDueToZerobyteConstraint);
 	}
 
 	public void setNotOverwritten() {
@@ -1358,6 +1408,10 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
 	public String TargetTransferName() {
 		return strTargetTransferName;
+	}
+	
+	public String renamedSourceFileName() { 
+		return strRenamedSourceFileName;
 	}
 	
 	private String normalizeErrorMessageForXml(String msg){
