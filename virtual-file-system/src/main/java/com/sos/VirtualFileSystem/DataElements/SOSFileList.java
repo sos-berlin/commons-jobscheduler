@@ -568,7 +568,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 						logger.error(e.toString());
 					}
 				}
-				objListItem.rollbackRenameSourceFile();
+				entry.rollbackRenameSourceFile();
 			}
 		}
 		else{
