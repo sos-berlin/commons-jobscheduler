@@ -738,8 +738,10 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 	} // private int DoPWD
 
 	@Override public void ExecuteCommand(final String strCmd) throws Exception {
-		Client().sendCommand(strCmd);
-		logger.debug(SOSVfs_D_151.params(strCmd, getReplyString()));
+		String command = strCmd.endsWith("\n") ? strCmd : strCmd + "\n";
+		sendCommand(command);
+		logger.info(SOSVfs_D_151.params(strCmd, getReplyString()));
+		Client().completePendingCommand();
 	}
 
 	@Override public void flush() {
