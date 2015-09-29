@@ -818,7 +818,11 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	}
 	
 	protected String resolveDotsInPath(String path) {
-		return Paths.get(path).normalize().toString().replace('\\', '/');
+		try {
+			return Paths.get(path).normalize().toString().replace('\\', '/');
+		} catch (Exception e) {
+			return path.replace('\\', '/');
+		}
 	}
 
 	public void Options(final ISOSFtpOptions objOptions2) {
@@ -905,11 +909,12 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
 	private String replaceVariables(final String pstrReplaceIn) {
 		String strT = pstrReplaceIn;
+		String renamedSourceFileName = (strRenamedSourceFileName != null) ? strRenamedSourceFileName : "";
 		strT = strT.replace("$TargetFileName", resolveDotsInPath(MakeFullPathName(objOptions.TargetDir.Value(), strTargetFileName)));
 		strT = strT.replace("$TargetTransferFileName", resolveDotsInPath(MakeFullPathName(objOptions.TargetDir.Value(), strTargetTransferName)));
-		strT = strT.replace("$SourceFileName", resolveDotsInPath(MakeFullPathName(objOptions.SourceDir.Value(), strSourceFileName)));
-		strT = strT.replace("$SourceTransferFileName", resolveDotsInPath(MakeFullPathName(objOptions.SourceDir.Value(), strSourceTransferName)));
-		strT = strT.replace("$RenamedSourceFileName", strRenamedSourceFileName);
+		strT = strT.replace("$SourceFileName", resolveDotsInPath(strSourceFileName));
+		strT = strT.replace("$SourceTransferFileName", resolveDotsInPath(strSourceTransferName));
+		strT = strT.replace("$RenamedSourceFileName", renamedSourceFileName);
 		Properties objProp = objOptions.getTextProperties();
 		objProp.put("TargetFileName", strTargetFileName);
 		objProp.put("TargetTransferFileName", strTargetTransferName);
@@ -919,8 +924,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		objProp.put("TargetDirName", objOptions.TargetDir.Value());
 		objProp.put("$SourceDirName", objOptions.SourceDir.Value());
 		objProp.put("SourceDirName", objOptions.SourceDir.Value());
-		objProp.put("$RenamedSourceFileName", strRenamedSourceFileName);
-		objProp.put("RenamedSourceFileName", strRenamedSourceFileName);
+		objProp.put("$RenamedSourceFileName", renamedSourceFileName);
+		objProp.put("RenamedSourceFileName", renamedSourceFileName);
 		strT = objOptions.replaceVars(strT);
 		// TODO other patterns, like [date:] or others should replaced as well
 		return strT;

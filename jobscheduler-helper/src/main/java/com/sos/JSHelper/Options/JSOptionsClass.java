@@ -2466,6 +2466,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 			catch (Exception e) { // intentionally no error, wrong regexp ?
 			}
 		}
+		strNewString = strNewString.replaceFirst("\n$", "");
 		//		pstrReplaceIn = pstrReplaceIn.replaceAll("\\$\\$N\\$\\$", "\n");
 		return strNewString;
 	}// private String replaceVars
