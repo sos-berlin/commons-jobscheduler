@@ -152,8 +152,8 @@ public class cmdShell extends SOSVfsMessageCodes implements Runnable {
 		strStdOut = bytStdOut.toString(strCharacterEncoding);
 		strStdErr = bytStdErr.toString(strCharacterEncoding); // e.g. ISO-8859-1
 
-		logger.debug(strStdOut);
-		logger.debug(strStdErr);
+		logger.info(strStdOut);
+		logger.info(strStdErr);
 		return intCC;
 	}
 
