@@ -350,11 +350,11 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 						setStatus(enuTransferStatus.transfer_aborted);
 						throw new JobSchedulerException(strT);
 					} else {
-						logger.debug(String.format("Integrity Hash checking: File %1$s, checksum read '%2$s', checksum calculated '%3$s'",
+						logger.info(String.format("Integrity Hash is OK: File %1$s, checksum read '%2$s', checksum calculated '%3$s'",
 										sourceChecksumFileName, origChecksum, checksum));
 					}
 				} else {
-					logger.trace(String.format("Checksum file '%1$s' not found", sourceChecksumFileName));
+					logger.info(String.format("Checksum file '%1$s' not found", sourceChecksumFileName));
 				}
 			} catch (JobSchedulerException e) {
 				throw e;
