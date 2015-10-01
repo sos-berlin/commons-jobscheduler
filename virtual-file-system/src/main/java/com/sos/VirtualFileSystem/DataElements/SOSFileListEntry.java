@@ -109,7 +109,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	private ISOSVirtualFile			objSourceTransferFile			= null;
 	private SOSFileList				objParent						= null;
 	private boolean					flgFileExists					= false;
-	private String					checksum						= "";
+	private String					checksum						= "N/A";
 	private Date					dteStartTransfer				= null;
 	private Date					dteEndTransfer					= null;
 	@SuppressWarnings("unused")
@@ -189,13 +189,14 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 			RaiseException(SOSVfs_E_273.params("Source"));
 		}
 		MessageDigest md = null;
-		boolean calculateIntegrityHash = objOptions.CheckIntegrityHash.isTrue() || objOptions.CreateIntegrityHashFile.isTrue();
+		//boolean calculateIntegrityHash = objOptions.CheckIntegrityHash.isTrue() || objOptions.CreateIntegrityHashFile.isTrue();
+		boolean calculateIntegrityHash = true;
 		if (calculateIntegrityHash) {
 			try {
 				md = MessageDigest.getInstance(objOptions.IntegrityHashType.Value());
 			}
 			catch (NoSuchAlgorithmException e1) {
-				logger.error(e1.getLocalizedMessage(), e1);
+				logger.error(e1.toString());
 				objOptions.CheckIntegrityHash.value(false);
 				objOptions.CreateIntegrityHashFile.value(false);
 				calculateIntegrityHash = false;
