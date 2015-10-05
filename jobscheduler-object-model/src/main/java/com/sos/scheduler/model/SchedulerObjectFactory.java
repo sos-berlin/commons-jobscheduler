@@ -792,6 +792,16 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
 
 		return objParams;
 	} // private Params setParams
+	
+	public Params setParams(final Map<String,String> params) {
+
+		Params objParams = super.createParams();
+		for (Entry<String,String> element : params.entrySet()) {
+			Param param = this.createParam(element.getKey(), element.getValue());
+			objParams.getParamOrCopyParamsOrInclude().add(param);
+		}
+		return objParams;
+	} 
 
 	/**
 	 *
