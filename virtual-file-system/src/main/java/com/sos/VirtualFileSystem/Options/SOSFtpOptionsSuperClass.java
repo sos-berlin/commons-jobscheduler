@@ -3548,31 +3548,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 												false // isMandatory
 										);
 
-	/**
-	 * \brief getcheck_size
-	 *
-	 * \details
-	 *
-	 * \return
-	 *
-	 * @return
-	 */
-	@Override public SOSOptionBoolean getcheck_size() {
-		return check_size;
-	}
-
-	/**
-	 * \brief setcheck_size
-	 *
-	 * \details
-	 *
-	 * \return
-	 *
-	 * @param p_check_size
-	 */
-	@Override public void setcheck_size(final SOSOptionBoolean p_check_size) {
-		check_size = p_check_size;
-	}
+	
 	public SOSOptionBoolean		CheckFileSizeAfterTransfer	= (SOSOptionBoolean) check_size.SetAlias(conClassName + ".CheckFileSizeAfterTransfer");
 	/**
 	* \var classpath_base : The parameter is used during installation of this
@@ -3638,31 +3614,6 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 											);
 
 	/**
-	 * \brief getcompress_files
-	 *
-	 * \details
-	 *
-	 * \return
-	 *
-	 * @return
-	 */
-	@Override public SOSOptionBoolean getcompress_files() {
-		return compress_files;
-	}
-
-	/**
-	 * \brief setcompress_files
-	 *
-	 * \details
-	 *
-	 * \return
-	 *
-	 * @param p_compress_files
-	 */
-	@Override public void setcompress_files(final SOSOptionBoolean p_compress_files) {
-		compress_files = p_compress_files;
-	}
-	/**
 	* \var compressed_file_extension : Additional file-name extension for compressed files This parameter spe
 	*
 	This parameter specifies the file extension should target file compression be specified using the compress_files parameter.
@@ -3681,31 +3632,6 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 																false // isMandatory
 														);
 
-	/**
-	 * \brief getcompressed_file_extension
-	 *
-	 * \details
-	 *
-	 * \return
-	 *
-	 * @return
-	 */
-	@Override public SOSOptionString getcompressed_file_extension() {
-		return compressed_file_extension;
-	}
-
-	/**
-	 * \brief setcompressed_file_extension
-	 *
-	 * \details
-	 *
-	 * \return
-	 *
-	 * @param p_compressed_file_extension
-	 */
-	@Override public void setcompressed_file_extension(final SOSOptionString p_compressed_file_extension) {
-		compressed_file_extension = p_compressed_file_extension;
-	}
 	/**
 	* \var current_pid : This parameter is used for Unix systems and - as o
 	*

@@ -420,12 +420,6 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
 	}
 
 	@Override
-	public String MakeZIPFile(final String pstrZipFileNameExtension) {
-		logINFO(SOSVfs_I_160.params("MakeZIPFile()"));
-		return fileName;
-	}
-
-	@Override
 	public void close() {
 
 		this.closeInput();

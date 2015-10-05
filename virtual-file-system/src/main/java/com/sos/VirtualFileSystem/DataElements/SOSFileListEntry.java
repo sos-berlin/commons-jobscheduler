@@ -1,4 +1,5 @@
 package com.sos.VirtualFileSystem.DataElements;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
@@ -11,10 +12,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.net.ftp.FTPFile;
-import org.apache.commons.net.util.Base64;
 import org.apache.log4j.Logger;
 
 import sos.util.SOSDate;
@@ -92,12 +93,10 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	private long					lngFileSize						= -1L;
 	private long					lastCheckedFileSize			    = -1L;
 	private long					lngFileModDate					= -1L;
-	private final String			strZipFileName					= "";
 	private long					lngTransferProgress				= 0;
 	private boolean					flgTransactionalRemoteFile		= false;
 	private boolean					flgTransactionalLocalFile		= false;
 	public long						zeroByteCount					= 0;
-	private long					lngOriginalFileSize				= 0;
 	@SuppressWarnings("unused")
 	private final boolean			flgTransferSkipped				= false;
 	private SOSFTPOptions			objOptions						= null;
@@ -129,6 +128,25 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	private String 					errorMessage					= null;
 	private Map<String, String>     jumpHistoryRecord               = null;
 	
+	private class Buffer {
+		private byte[] bytes = new byte[0];
+		private int length= 0;
+		
+		public byte[] getBytes() {
+			return bytes;
+		}
+		public void setBytes(byte[] bytes) {
+			this.bytes = bytes;
+			this.length = bytes.length;
+		}
+		public int getLength() {
+			return length;
+		}
+		public void setLength(int length) {
+			this.length = length;
+		}
+	}
+	
 	public SOSFileListEntry() {
 		super(SOSVfsConstants.strBundleBaseName);
 	}
@@ -138,7 +156,6 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		lngFileModDate = pobjFTPFile.getTimestamp().getTimeInMillis();
 		strSourceFileName = pobjFTPFile.getName(); // Achtung: kommt fast immer als name ohne pfad
 		lngFileSize = pobjFTPFile.getSize();
-		lngOriginalFileSize = lngFileSize;
 		objFTPFile = pobjFTPFile;
 	}
 
@@ -204,47 +221,38 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		}
 		executePreCommands();
 		long totalBytesTransferred = 0;
-		Base64 base64 = null;
 		this.setStatus(enuTransferStatus.transferring);
 		try {
 			int cumulativeFileSeperatorLength = 0;
 			byte[] buffer = new byte[objOptions.BufferSize.value()];
 			int bytesTransferred;
-			boolean base64EncodingOnTarget = false;
-			boolean base64EncodingOnSource = false;
-			if (base64EncodingOnTarget) {
-				base64 = new Base64();
-			}
 			synchronized (this) {
 				if (objOptions.CumulateFiles.isTrue() && objOptions.CumulativeFileSeparator.IsNotEmpty()) {
 					String fs = objOptions.CumulativeFileSeparator.Value();
 					fs = this.replaceVariables(fs) + System.getProperty("line.separator");
 					byte[] bytes = fs.getBytes();
 					cumulativeFileSeperatorLength = bytes.length;
-					target.write(bytes);
+					Buffer compressedBytes = compress(bytes);
+					target.write(compressedBytes.getBytes());
 					if (calculateIntegrityHash) {
-						md.update(bytes);
+						md.update(compressedBytes.getBytes());
 					}
 				}
 				if (source.getFileSize() <= 0) {
-					target.write(buffer, 0, 0);
+					Buffer compressedBytes = compress(new byte[0]);
+					target.write(compressedBytes.getBytes());
 					if (calculateIntegrityHash) {
-						md.update(buffer, 0, 0);
+						md.update(compressedBytes.getBytes());
 					}
 				}
 				else {
-					// TODO Option Blockmode=true (default), if false line mode and getLine
 					while ((bytesTransferred = source.read(buffer)) != -1) {
 						try {
-							int bytes2Write = bytesTransferred;
-							if (base64EncodingOnTarget) {
-								byte[] in = new byte[bytesTransferred];
-								byte[] out = base64.encode(in);
-								bytes2Write = out.length;
-								buffer = out;
+							Buffer compressedBytes = compress(buffer, bytesTransferred);
+							target.write(compressedBytes.getBytes(), 0, compressedBytes.getLength());
+							if (calculateIntegrityHash) {
+								md.update(compressedBytes.getBytes(), 0, compressedBytes.getLength());
 							}
-							// TODO Filter Module  "write (byte[] bteBuffer, int intOffset, int intLength )", "read (byte[] btebuffer)", Options
-							target.write(buffer, 0, bytes2Write);
 						}
 						catch (JobSchedulerException e) {
 							setEntryErrorMessage(e);
@@ -253,11 +261,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 						}
 						// TODO in case of wrong outputbuffer the handling of the error must be improved
 						totalBytesTransferred += bytesTransferred;
-						// intOffset += lngTotalBytesTransferred;
 						setTransferProgress(totalBytesTransferred);
-						if (calculateIntegrityHash) {
-							md.update(buffer, 0, bytesTransferred);
-						}
 					}
 				}
 			}
@@ -618,8 +622,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 		// second assumption: sourcefilename and TargetFileName are equal (until it changed)
 		strTargetFileName = fleSourceFile.getName();
 		boolean flgIncludeSubdirectories = objOptions.recursive.value();
-		if (objOptions.compress_files.isTrue()) { // compress file before sending
-			strSourceTransferName = fleSourceFile.MakeZIPFile(objOptions.compressed_file_extension.Value());
+		if (objOptions.compress_files.isTrue()) {
 			strTargetFileName = strTargetFileName + objOptions.compressed_file_extension.Value();
 		}
 		if (objOptions.CumulateFiles.isTrue()) {
@@ -746,10 +749,6 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	
 	public boolean isTransferred() {
 		return eTransferStatus == enuTransferStatus.transferred;
-	}
-
-	public String getZipFileName() {
-		return strZipFileName;
 	}
 
 	public boolean isSteady() {
@@ -1045,17 +1044,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 				objTargetTransferFile.setModeAppend(objOptions.append_files.value());
 				objTargetTransferFile.setModeRestart(objOptions.ResumeTransfer.value());
 			}
-			if (objOptions.compress_files.value() == true) {
-				objSourceTransferFile = objDataSourceClient.getFileHandle(strSourceTransferName);
-				lngFileSize = objSourceTransferFile.getFileSize();
-				lngOriginalFileSize = lngFileSize;
-			}
-			else {
-				strSourceTransferName = getFileNameWithoutPath(strSourceTransferName);
-				String strT = "";
-				objSourceTransferFile = objDataSourceClient.getFileHandle(MakeFullPathName(getPathWithoutFileName(strSourceFileName) + strT,
-						strSourceTransferName));
-			}
+			strSourceTransferName = getFileNameWithoutPath(strSourceTransferName);
+			objSourceTransferFile = objDataSourceClient.getFileHandle(MakeFullPathName(getPathWithoutFileName(strSourceFileName), strSourceTransferName));
 			if (eTransferStatus == enuTransferStatus.ignoredDueToZerobyteConstraint) {
 				String strM = SOSVfs_D_0110.params(strSourceFileName);
 				logger.debug(strM);
@@ -1190,24 +1180,18 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	public void setNoOfBytesTransferred(final long plngNoOfBytesTransferred) {
 		lngNoOfBytesTransferred = plngNoOfBytesTransferred;
 		SOSConnection2Options objConnectOptions = objOptions.getConnectionOptions();
-		if (objOptions.transfer_mode.isAscii() || objConnectOptions.Source().transfer_mode.isAscii() || objConnectOptions.Target().transfer_mode.isAscii()
-				|| objOptions.CheckFileSizeAfterTransfer.isFalse()) {
+		if (objOptions.check_size.isFalse() || objOptions.compress_files.isTrue() || objOptions.transfer_mode.isAscii() 
+				|| objConnectOptions.Source().transfer_mode.isAscii() || objConnectOptions.Target().transfer_mode.isAscii()) {
 			// Probleme bei Ascii: linux -> windows mit cr/lf -> Datei wird groesser
 		}
 		else {
-			if (lngFileSize <= 0) { // if the file is compressed, then the original filesize may be to big
+			if (lngFileSize <= 0) {
 				lngFileSize = objDataSourceClient.getFileHandle(strSourceFileName).getFileSize();
-				lngOriginalFileSize = lngFileSize;
 			}
 			if (lngFileSize != plngNoOfBytesTransferred) {
 				logger.error(SOSVfs_E_216.params(plngNoOfBytesTransferred, lngFileSize, strSourceFileName));
 				this.setStatus(enuTransferStatus.transfer_aborted);
 				throw new JobSchedulerException(SOSVfs_E_271.get());
-			}
-			if (lngOriginalFileSize != plngNoOfBytesTransferred) {
-				logger.error(SOSVfs_E_216.params(plngNoOfBytesTransferred, lngOriginalFileSize, strSourceFileName));
-				this.setStatus(enuTransferStatus.transfer_aborted);
-				throw new JobSchedulerException(SOSVfs_E_270.get());
 			}
 		}
 		this.setStatus(enuTransferStatus.transferred);
@@ -1241,8 +1225,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 	}
 	
 	public void setSourceFileProperties(ISOSVirtualFile file){
-		lngOriginalFileSize = file.getFileSize();
-		lngFileSize = lngOriginalFileSize;
+		lngFileSize = file.getFileSize();
 		lngFileModDate = file.getModificationDateTime();
 	}
 
@@ -1692,10 +1675,40 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         SimpleDateFormat formatter = new SimpleDateFormat(SOSDate.dateTimeFormat);
         formatter.setLenient(false);
         return formatter.format(time.getTime());
-
 	}
 	
 	public void setJumpHistoryRecord(Map<String, String> jumpHistoryRecord) {
 		this.jumpHistoryRecord = jumpHistoryRecord;
+	}
+	
+	private Buffer compress(byte[] dataToCompress) {
+		return compress(dataToCompress, dataToCompress.length);
+	}
+	
+	private Buffer compress(byte[] dataToCompress, int length) {
+		Buffer buf = new Buffer();
+		if (objOptions.compress_files.isTrue()) {
+			try {
+				ByteArrayOutputStream byteStream = new ByteArrayOutputStream(length);
+				try {
+					GZIPOutputStream zipStream = new GZIPOutputStream(byteStream);
+					try {
+						zipStream.write(dataToCompress, 0, length);
+					} finally {
+						zipStream.close();
+					}
+				} finally {
+					byteStream.close();
+				}
+				buf.setBytes(byteStream.toByteArray());
+				return buf;
+			} catch (Exception e) {
+				throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_134.params("GZip"), e);
+			}
+		} else {
+			buf.setBytes(dataToCompress);
+			buf.setLength(length);
+			return buf;
+		}
 	}
 }
