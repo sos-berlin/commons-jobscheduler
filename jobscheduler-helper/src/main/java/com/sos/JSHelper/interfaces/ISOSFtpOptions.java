@@ -396,27 +396,6 @@ public interface ISOSFtpOptions {
 	public abstract void setcheck_retry(SOSOptionInteger p_check_retry);
 
 	/**
-	     * \brief getcheck_size : This parameter determines whether the original f
-	     *
-	     * \details
-	    This parameter determines whether the original file size and the number of bytes transferred should be compared after a file transfer and whether an error should be raised if they would not match.
-	     *
-	     * \return This parameter determines whether the original f
-	     *
-	     */
-	public abstract SOSOptionBoolean getcheck_size();
-
-	/**
-	 * \brief setcheck_size : This parameter determines whether the original f
-	 *
-	 * \details
-	This parameter determines whether the original file size and the number of bytes transferred should be compared after a file transfer and whether an error should be raised if they would not match.
-	 *
-	 * @param check_size : This parameter determines whether the original f
-	 */
-	public abstract void setcheck_size(SOSOptionBoolean p_check_size);
-
-	/**
 	     * \brief getclasspath_base : The parameter is used during installation of this
 	     *
 	     * \details
@@ -436,48 +415,6 @@ public interface ISOSFtpOptions {
 	 * @param classpath_base : The parameter is used during installation of this
 	 */
 	public abstract void setclasspath_base(SOSOptionFolderName p_classpath_base);
-
-	/**
-	     * \brief getcompress_files : This parameter specifies whether the content of the source files
-	     *
-	     * \details
-	    This parameter specifies whether the content of the source files should be compressed by using a zip-algorithm or not. In case of sending files the files to be sent will be compressed.
-	     *
-	     * \return This parameter specifies whether the content of the source files
-	     *
-	     */
-	public abstract SOSOptionBoolean getcompress_files();
-
-	/**
-	 * \brief setcompress_files : This parameter specifies whether the content of the source files
-	 *
-	 * \details
-	This parameter specifies whether the content of the source files should be compressed by using a zip-algorithm or not. In case of sending files the files to be sent will be compressed.
-	 *
-	 * @param compress_files : This parameter specifies whether the content of the source files
-	 */
-	public abstract void setcompress_files(SOSOptionBoolean p_compress_files);
-
-	/**
-	     * \brief getcompressed_file_extension : Additional file-name extension for compressed files This parameter spe
-	     *
-	     * \details
-	    This parameter specifies the file extension should target file compression be specified using the compress_files parameter.
-	     *
-	     * \return Additional file-name extension for compressed files This parameter spe
-	     *
-	     */
-	public abstract SOSOptionString getcompressed_file_extension();
-
-	/**
-	 * \brief setcompressed_file_extension : Additional file-name extension for compressed files This parameter spe
-	 *
-	 * \details
-	This parameter specifies the file extension should target file compression be specified using the compress_files parameter.
-	 *
-	 * @param compressed_file_extension : Additional file-name extension for compressed files This parameter spe
-	 */
-	public abstract void setcompressed_file_extension(SOSOptionString p_compressed_file_extension);
 
 	/**
 	     * \brief getcurrent_pid : This parameter is used for Unix systems and - as o

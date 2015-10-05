@@ -159,24 +159,6 @@ public interface ISOSVirtualFile {
 
 	/**
 	 *
-	 * \brief MakeZIPFile - Compress File
-	 *
-	 * \details
-	 * This Method creates a Zip-File for a Single file.
-	 * If the data-source is not able to create zip-files the method does nothing.
-	 *
-	 * It depends on the transfer-environment, wether function is available or not.
-	 * On some platforms (e.g. ftp or sftp) this function makes no sense, therefore the
-	 * method will return the unchanged filename.
-	 *
-	 * \return String - the name and path of the ZIP file or the unchanged filename
-	 *
-	 * @param pstrZipFileNameExtension
-	 */
-	public String MakeZIPFile(final String pstrZipFileNameExtension) ;
-
-	/**
-	 *
 	 * \brief write - Writes len bytes from the specified byte array
 	 *
 	 * \details

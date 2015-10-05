@@ -442,31 +442,6 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
 		objVFSHandler = pobjVFSHandler;
 	}
 
-	@Override
-	public String MakeZIPFile(final String pstrZipFileNameExtension) {
-		// File fleTargetFile = new File(this.fleFile.getAbsolutePath() + pstrZipFileNameExtension);
-		// String strTargetFileName = fleTargetFile.getName();
-		String strSourceTransferName = "";
-		File fleSourceTransferFile = null;
-		try {
-			fleSourceTransferFile = File.createTempFile("sos", pstrZipFileNameExtension);
-			// fleSourceTransferFile.deleteOnExit();
-			strSourceTransferName = fleSourceTransferFile.getAbsolutePath();
-		}
-		catch (Exception e) {
-			throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_130.params("createTempFile()"), e);
-		}
-		try {
-			logger.info(SOSVfsMessageCodes.SOSVfs_I_264.get());
-			this.compressFile(fleSourceTransferFile);
-		}
-		catch (Exception e) {
-			logger.error(e.getLocalizedMessage());
-			throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_130.params("SOSGZip"), e);
-		}
-		return strSourceTransferName;
-	}
-
 	public void compressFile(final File outputFile) throws Exception {
 
 		BufferedInputStream in = null;
