@@ -221,12 +221,6 @@ public abstract class SOSVfsCommonFile extends SOSVfsMessageCodes implements ISO
 	}
 
 	@Override
-	public String MakeZIPFile(final String pstrZipFileNameExtension) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public void write(final byte[] bteBuffer, final int intOffset, final int intLength) {
 		// TODO Auto-generated method stub
 	}

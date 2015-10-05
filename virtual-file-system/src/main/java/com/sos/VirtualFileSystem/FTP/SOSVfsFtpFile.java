@@ -449,12 +449,6 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
 	}
 
 	@Override
-	public String MakeZIPFile(final String pstrZipFileNameExtension) {
-		logger.info(SOSVfs_I_160.params("MakeZIPFile"));
-		return strFileName;
-	}
-
-	@Override
 	public void close() {
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::close";

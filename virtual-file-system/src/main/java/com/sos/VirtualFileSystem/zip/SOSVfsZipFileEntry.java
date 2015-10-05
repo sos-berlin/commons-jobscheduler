@@ -531,12 +531,6 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
 	}
 
 	@Override
-	public String MakeZIPFile(final String pstrZipFileNameExtension) {
-		notImplemented();
-		return null;
-	}
-
-	@Override
 	public void putFile(final ISOSVirtualFile pobjVirtualFile) throws Exception {
 		notImplemented();
 	}
