@@ -69,7 +69,7 @@ public class JSJobUtilitiesClass<T> extends JSToolBox implements JSJobUtilities,
 	 *
 	 */
 
-	public T Options() {
+	public T getOptions() {
 
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::Options"; //$NON-NLS-1$
@@ -92,7 +92,7 @@ public class JSJobUtilitiesClass<T> extends JSToolBox implements JSJobUtilities,
 	 *
 	 */
 
-	public T Options(final T pobjOptions) {
+	public T getOptions(final T pobjOptions) {
 
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::Options"; //$NON-NLS-1$

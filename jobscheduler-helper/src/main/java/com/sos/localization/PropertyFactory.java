@@ -58,7 +58,7 @@ public class PropertyFactory extends JSJobUtilitiesClass<PropertyFactoryOptions>
 	 *
 	 */
 	@Override
-	public PropertyFactoryOptions Options() {
+	public PropertyFactoryOptions getOptions() {
 
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::Options";
@@ -90,8 +90,8 @@ public class PropertyFactory extends JSJobUtilitiesClass<PropertyFactoryOptions>
 		//		logger.debug(String.format(new JSMsg("JSJ-I-110").get(), conMethodName));
 
 		try {
-			Options().CheckMandatory();
-			logger.debug(Options().dirtyString());
+			getOptions().CheckMandatory();
+			logger.debug(getOptions().dirtyString());
 
 			String strPropertyFileName = objOptions.PropertyFileNamePrefix.Value();
 			HashMap <String, HashMap <String, I18NObject> > allKeys = new HashMap<>();

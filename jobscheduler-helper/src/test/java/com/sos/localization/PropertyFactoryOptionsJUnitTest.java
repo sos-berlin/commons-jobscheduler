@@ -62,7 +62,7 @@ public class PropertyFactoryOptionsJUnitTest extends  JSToolBox {
 	@Before
 	public void setUp() throws Exception {
 		objE = new PropertyFactory();
-		objOptions = objE.Options();
+		objOptions = objE.getOptions();
 		
 	}
 

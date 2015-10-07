@@ -47,7 +47,7 @@ public class JSObjects2GraphvizJUnitTest extends JSToolBox {
 	public void setUp() throws Exception {
 		objE = new JSObjects2Graphviz();
 		objE.registerMessageListener(this);
-		objOptions = objE.Options();
+		objOptions = objE.getOptions();
 		objOptions.registerMessageListener(this);
 
 		JSListenerClass.bolLogDebugInformation = true;

@@ -57,7 +57,7 @@ public class SOSSSHJob2Main {
 
 		try {
 			SOSSSHJob2 objM = new SOSSSHJobTrilead();
-			SOSSSHJobOptions objO = objM.Options();
+			SOSSSHJobOptions objO = objM.getOptions();
 			
 			objO.CommandLineArgs(pstrArgs);
 			objM.Execute();

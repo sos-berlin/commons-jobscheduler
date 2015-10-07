@@ -183,7 +183,7 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
   @Override
   public SOSSSHJob2 Connect() {
     getVFS();
-    Options().CheckMandatory();
+    getOptions().CheckMandatory();
 
     try {
       SOSConnection2OptionsAlternate alternateOptions = getAlternateOptions(objOptions);
