@@ -643,6 +643,36 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 		// populate all the Options for "source_" and "target_" ....
 		setChildClasses(hshMap);
 	} // public void setAllOptions (HashMap <String, String> JSSettings)
+	
+	/**
+	 * https://change.sos-berlin.com/browse/JITL-202
+	 * https://change.sos-berlin.com/browse/JADE-374
+	 * setAllOptions with "settings" destroys params in JADE job
+	 * 
+	 * @param params
+	 */
+	public void setAllOptions2(HashMap<String, String> params) {
+		Map<String, String> mapFromIniFile = new HashMap<String, String>();
+		if (flgSettingsFileProcessed == false
+				&& flgReadSettingsFileIsActive == false) {
+			if (params.containsKey("settings")
+					&& params.containsKey("profile")) {
+				this.settings.Value(params.get("settings"));
+				this.profile.Value(params.get("profile"));
+				flgReadSettingsFileIsActive = true;
+				mapFromIniFile = ReadSettingsFile(params);
+				flgReadSettingsFileIsActive = false;
+				flgSettingsFileProcessed = true;
+			}
+		}
+		flgSetAllOptions = true;
+		params.putAll(mapFromIniFile);
+		objSettings = params;
+		super.Settings(params);
+		super.setAllOptions(params);
+		setChildClasses(params);
+		flgSetAllOptions = false;
+	}
 
 	/**
 	 *
@@ -654,8 +684,10 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	 * \return void
 	 *
 	 */
-	// TODO move 'ReadSettingsFile' to JSOptionClass
 	public HashMap<String, String> ReadSettingsFile() {
+		return ReadSettingsFile(null);
+	}
+	public HashMap<String, String> ReadSettingsFile(Map<String, String> beatParams) {
 		// TODO use the virtual file-system to allow access to diffent types of setting-stores
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::ReadSettingsFile";
 		settings.CheckMandatory();
@@ -724,7 +756,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 				}
 			} // ResolveIncludes
 				// Additional Variables
-			objP.put("uuid", "");
+			objP.put("uuid", UUID.randomUUID().toString());
 			objP.put("date", SOSOptionTime.getCurrentDateAsString());
 			objP.put("time", SOSOptionTime.getCurrentTimeAsString("hh:mm:ss"));
 			objP.put("local_user", System.getProperty("user.name"));
@@ -733,10 +765,10 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			objP.put("local_host_ip", localMachine.getHostAddress());
 			for (Object k : objP.keySet()) {
 				String strKey = (String) k;
-				if (strKey.equalsIgnoreCase("uuid") == true) {
-					objP.put(strKey, UUID.randomUUID().toString());
-				}
 				String strValue = (String) objP.get(k);
+				if (beatParams != null && beatParams.containsKey(strKey)) {
+					strValue = beatParams.get(strKey);
+				}
 				if (hasVariableToSubstitute(strValue) == true && gflgSubsituteVariables == true) {
 					logger.trace("ReadSettingsFile() - Key = " + strKey + ", value = " + strValue); //$NON-NLS-1$ //$NON-NLS-2$
 					strValue = SubstituteVariables(strValue, objP, "${", conVariableEND);
