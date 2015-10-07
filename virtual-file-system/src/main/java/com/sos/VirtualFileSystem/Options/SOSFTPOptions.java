@@ -637,6 +637,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	
 	/**
 	 * https://change.sos-berlin.com/browse/JITL-202
+	 * https://change.sos-berlin.com/browse/JADE-374
 	 * setAllOptions with "settings" destroys params in JADE job
 	 * 
 	 * @param params
@@ -650,7 +651,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 				this.settings.Value(params.get("settings"));
 				this.profile.Value(params.get("profile"));
 				flgReadSettingsFileIsActive = true;
-				mapFromIniFile = ReadSettingsFile();
+				mapFromIniFile = ReadSettingsFile(params);
 				flgReadSettingsFileIsActive = false;
 				flgSettingsFileProcessed = true;
 			}
@@ -671,6 +672,9 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 	 * @return HashMap
 	 */
 	public HashMap<String, String> ReadSettingsFile() {
+		return ReadSettingsFile(null);
+	}
+	public HashMap<String, String> ReadSettingsFile(Map<String, String> beatParams) {
 		settings.CheckMandatory();
 		profile.CheckMandatory();
 		HashMap<String, String> map = new HashMap<String, String>();
@@ -717,6 +721,9 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			for (Map.Entry<Object, Object> e : properties.entrySet()) {
 				String key = (String) e.getKey();
 				String value = (String) e.getValue();
+				if (beatParams != null && beatParams.containsKey(key)) {
+					value = beatParams.get(key);
+				}
 				if (hasVariableToSubstitute(value) == true && gflgSubsituteVariables == true) {
 					logger.trace("ReadSettingsFile() - key = " + key + ", value = " + value);
 					value = substituteVariables(value, properties);
