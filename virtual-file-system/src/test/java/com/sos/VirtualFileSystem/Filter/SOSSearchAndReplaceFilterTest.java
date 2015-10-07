@@ -36,7 +36,7 @@ public class SOSSearchAndReplaceFilterTest {
 	@Before
 	public void setUp() throws Exception {
 		objF = new SOSSearchAndReplaceFilter();
-		objFO = objF.Options();
+		objFO = objF.getOptions();
 		BasicConfigurator.configure();
 		logger.setLevel(Level.DEBUG);
 	}

@@ -105,7 +105,7 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
     try {
       sshJob = new SOSSSHCheckRemotePidJob();
       logger.debug("SOSSSHCheckRemotePidJob instantiated!");
-      options = sshJob.Options();
+      options = sshJob.getOptions();
       options.CurrentNodeName(this.getCurrentNodeName());
       HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(allParams);
       options.setAllOptions(options.DeletePrefix(hsmParameters1, "ssh_"));
@@ -136,7 +136,7 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
     try {
       sshJob = new SOSSSHKillRemotePidJob();
       logger.debug("SOSSSHKillRemotePidJob instantiated!");
-      options = sshJob.Options();
+      options = sshJob.getOptions();
       options.CurrentNodeName(this.getCurrentNodeName());
       HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(allParams);
       options.setAllOptions(options.DeletePrefix(hsmParameters1, "ssh_"));
@@ -167,7 +167,7 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
     try {
       sshJob = new SOSSSHTerminateRemotePidJob();
       logger.debug("SOSSSHTerminateRemotePidJob instantiated!");
-      options = sshJob.Options();
+      options = sshJob.getOptions();
       options.CurrentNodeName(this.getCurrentNodeName());
       HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(allParams);
       options.setAllOptions(options.DeletePrefix(hsmParameters1, "ssh_"));

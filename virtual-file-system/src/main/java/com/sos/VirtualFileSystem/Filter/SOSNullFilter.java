@@ -36,7 +36,7 @@ public class SOSNullFilter extends JSJobUtilitiesClass<SOSFilterOptions> impleme
 	* @see com.sos.VirtualFileSystem.Interfaces.ISOSFileContentFilter#Options()
 	*/
 	@Override
-	public SOSFilterOptions Options() {
+	public SOSFilterOptions getOptions() {
 		if (objOptions == null) {
 			objOptions = new SOSFilterOptions();
 		}

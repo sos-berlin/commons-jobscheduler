@@ -29,7 +29,7 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
 
 	public static void initializeClazz () {
     objSSH = new SOSSSHJobJSch();
-    objOptions = objSSH.Options();
+    objOptions = objSSH.getOptions();
 		JSListenerClass.bolLogDebugInformation = true;
 		JSListenerClass.intMaxDebugLevel = 9;
     if( !Logger.getRootLogger().getAllAppenders().hasMoreElements() ) {

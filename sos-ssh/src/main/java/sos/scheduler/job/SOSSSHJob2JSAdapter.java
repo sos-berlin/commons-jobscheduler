@@ -57,12 +57,12 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
     	//this is the default value since v1.10.0 [SP]
         useTrilead = false;
     	objR = new SOSSSHJobJSch();
-    	objO = objR.Options();
+    	objO = objR.getOptions();
     	spooler_log.debug9("uses JSch implementation of SSH");
     } else {
         useTrilead = true;
         objR = new SOSSSHJobTrilead();
-        objO = objR.Options();
+        objO = objR.getOptions();
         spooler_log.debug9("uses Trilead implementation of SSH");
     } 
     objO.CurrentNodeName(this.getCurrentNodeName());

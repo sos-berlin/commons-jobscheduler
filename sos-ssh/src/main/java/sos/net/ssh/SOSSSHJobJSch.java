@@ -201,7 +201,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
 	@Override
 	public SOSSSHJob2 Connect() {
 		getVFS();
-		Options().CheckMandatory();
+		getOptions().CheckMandatory();
 		try {
 			SOSConnection2OptionsAlternate alternateOptions = getAlternateOptions(objOptions);
 			vfsHandler.Connect(alternateOptions);

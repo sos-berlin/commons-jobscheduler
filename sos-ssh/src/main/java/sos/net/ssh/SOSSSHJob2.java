@@ -172,7 +172,7 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 		final String conMethodName = conClassName + "::Connect";
 
 		getVFS();
-		Options().CheckMandatory();
+		getOptions().CheckMandatory();
 		// logging commented, because this would be the third time these Options are logged.
 		// first while logging the CommandLineArgs in the Option class itself
 		// second while logging the DumpSettings in the Option class itself

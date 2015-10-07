@@ -60,8 +60,8 @@ public class JSObjects2Graphviz extends JSJobUtilitiesClass<JSObjects2GraphvizOp
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::initialize";
 
-		Options().CheckMandatory();
-		logger.debug(Options().dirtyString());
+		getOptions().CheckMandatory();
+		logger.debug(getOptions().dirtyString());
 
 		String liveFolderName = objOptions.live_folder_name.Value();
 		objVFS = VFSFactory.getHandler("local");

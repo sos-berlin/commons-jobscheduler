@@ -34,7 +34,7 @@ public class SOSSSHReadPidFileJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
       SOSSSHJob2 sshJob = new SOSSSHReadPidFileJob();
       ((SOSSSHReadPidFileJob)sshJob).setTempPidFileName(allParams.value(PID_FILE_NAME_KEY));
       logger.debug("SOSSSHReadPidFileJob instantiated!");
-      options = sshJob.Options();
+      options = sshJob.getOptions();
       options.CurrentNodeName(this.getCurrentNodeName());
       HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(allParams);
       options.setAllOptions(options.DeletePrefix(hsmParameters1, "ssh_"));

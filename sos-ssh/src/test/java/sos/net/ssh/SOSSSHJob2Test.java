@@ -57,7 +57,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
 	private void initializeClazz () {
 		objSSH = new SOSSSHJobTrilead();
-		objOptions = objSSH.Options();
+		objOptions = objSSH.getOptions();
 		objSSH.setJSJobUtilites(this);
 		JSListenerClass.bolLogDebugInformation = true;
 		JSListenerClass.intMaxDebugLevel = 9;

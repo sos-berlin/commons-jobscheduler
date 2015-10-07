@@ -49,7 +49,7 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch{
   @Override
   public SOSSSHJob2 Connect() {
     getVFS();
-    Options().CheckMandatory();
+    getOptions().CheckMandatory();
     try {
       SOSConnection2OptionsAlternate alternateOptions = getAlternateOptions(objOptions);
       vfsHandler.Connect(alternateOptions);
