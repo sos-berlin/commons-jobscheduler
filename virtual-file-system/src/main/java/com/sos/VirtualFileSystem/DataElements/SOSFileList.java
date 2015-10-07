@@ -445,25 +445,28 @@ public class SOSFileList extends SOSVfsMessageCodes {
 			return;
 		}
 		flgResultSetFileAlreadyCreated = true;
+		lngNoOfRecordsInResultSetFile = 0L;
 		try {
 			if (objOptions.ResultSetFileName.isDirty() && objOptions.ResultSetFileName.IsNotEmpty()) {
-				JSFile objResultSetFile = objOptions.ResultSetFileName.JSFile();
+				JSFile resultSetFile = objOptions.ResultSetFileName.JSFile();
 				
 				if (objOptions.getDmzOption("operation").equals("copyFromInternet") && objOptions.getDmzOption("resultfile").length() > 0) {
 					ISOSVirtualFile jumpResultSetFile = objDataSourceClient.getFileHandle(objOptions.getDmzOption("resultfile"));
 					if (jumpResultSetFile.FileExists()) {
-						lngNoOfRecordsInResultSetFile = transferResultSetFile(objResultSetFile, jumpResultSetFile);
+						lngNoOfRecordsInResultSetFile = transferResultSetFile(resultSetFile, jumpResultSetFile);
 					}
 				} else {
 					for (SOSFileListEntry objListItem : objFileListEntries) {
 						String strFileName = objListItem.getFileName4ResultList();
-						objResultSetFile.WriteLine(strFileName);
+						resultSetFile.WriteLine(strFileName);
 						lngNoOfRecordsInResultSetFile++;
 					}
-					objResultSetFile.close();
-					logger.info(String.format("ResultSet to '%1$s' is written", objResultSetFile.getAbsoluteFile()));
-
 				}
+				if (lngNoOfRecordsInResultSetFile == 0) {
+					resultSetFile.WriteLine("");
+				}
+				resultSetFile.close();
+				logger.info(String.format("ResultSet to '%1$s' is written", resultSetFile.getAbsoluteFile()));
 			}
 		}
 		catch (Exception e) {
