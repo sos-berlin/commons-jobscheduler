@@ -549,7 +549,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 		dteTransactionEnd.Value(Now());
 //		this.sendTransferHistory();
 		this.writeTransferHistory();
-		CreateResultSetFile();
+//		CreateResultSetFile();
 	} // private void EndTransaction
 
 	private void checkSecurityHashFiles() {
