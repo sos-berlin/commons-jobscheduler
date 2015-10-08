@@ -521,7 +521,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
 		dteTransactionEnd.Value(Now());
 		getJumpHistoryFile();
 		writeTransferHistory();
-		CreateResultSetFile();
+//		CreateResultSetFile();
 	}
 
 
