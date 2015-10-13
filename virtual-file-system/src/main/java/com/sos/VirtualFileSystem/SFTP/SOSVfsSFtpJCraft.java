@@ -589,6 +589,8 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 				// TODO create Session ??
 				throw new JobSchedulerException(SOSVfs_E_190.params("sshSession"));
 			}
+			// JITL-206
+			sshSession.setConfig("PreferredAuthentications", connection2OptionsAlternate.auth_method.Value());
 			channelExec = (ChannelExec) sshSession.openChannel("exec");
 			//JITL-157
 			cmd = cmd.replaceAll("\0", "\\\\\\\\").replaceAll("\"", "\\\"");
@@ -967,8 +969,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		java.util.Properties config = new java.util.Properties();
 		config.put("StrictHostKeyChecking", getStrictHostKeyChecking(connection2OptionsAlternate.strictHostKeyChecking));
 		sshSession.setConfig(config);
-		// JITL-206
-		sshSession.setConfig("PreferredAuthentications", connection2OptionsAlternate.auth_method.Value());
 		setCommandsTimeout();
 		setProxy();
 		
