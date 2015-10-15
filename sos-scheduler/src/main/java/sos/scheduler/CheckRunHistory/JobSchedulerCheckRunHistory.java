@@ -110,7 +110,11 @@ public class JobSchedulerCheckRunHistory extends JSToolBox implements JSJobUtili
 			objShowHistory.setJob(strJobName);
 			objShowHistory.setPrev(BigInteger.valueOf(30));
 			Answer objAnswer = null;
-			 
+			objJSFactory.Options().ServerName.Value(Options().SchedulerHostName.Value());
+			objJSFactory.Options().PortNumber.value(Options().scheduler_port.value());
+			objShowHistory.run();
+			objAnswer = objShowHistory.getAnswer();
+			
 			if(objAnswer != null) {
 				ERROR objError = objAnswer.getERROR();
 				if(objError != null) {
@@ -166,6 +170,7 @@ public class JobSchedulerCheckRunHistory extends JSToolBox implements JSJobUtili
 			}
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 			logger.error(Messages.getMsg("JSJ-F-107", conMethodName), e);
 			throw e;
 		}
