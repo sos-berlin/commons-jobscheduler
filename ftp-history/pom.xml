@@ -51,14 +51,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- these are the dependencies for projects not yet moved to maven, 
-             groupId, artifactId and version will be changed as soon as the projects are moved  -->
-        <dependency>
-            <groupId>sos</groupId>
-            <artifactId>hostware</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
         <!-- These are the dependencies for third party libraries -->
         <dependency>
             <groupId>log4j</groupId>
