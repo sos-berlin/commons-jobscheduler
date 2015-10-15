@@ -808,9 +808,11 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
 						else
 							if (mappingName.equals("mapping_source_dir")) {
 								len = 255;
+								//is possibly empty for file path selection
+								/*
 								if (attr_val.length() == 0) {
 									throw new JobSchedulerException("parameter [" + attr_name + "] can't be empty");
-								}
+								} */
 								if (operation != null && operation.equals(_operationReceive)) {
 									attr_val = getRecordValue(record, "mapping_target_dir", _operationSend);
 								}
