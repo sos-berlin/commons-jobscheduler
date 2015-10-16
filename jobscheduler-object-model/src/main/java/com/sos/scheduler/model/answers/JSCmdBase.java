@@ -57,6 +57,10 @@ public class JSCmdBase extends JSObjBase {
 		objAnswer = objFactory.run(this);
 	}
 
+	public void getAnswerFromSpooler(sos.spooler.Spooler spooler) {
+		objAnswer = objFactory.getAnswerFromSpooler(spooler,this);
+	}
+	
 	public Answer getAnswer() {
 
 		@SuppressWarnings("unused")
