@@ -310,6 +310,21 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
 		
 	}
 
+	
+	public Answer getAnswerFromSpooler(sos.spooler.Spooler spooler, JSCmdBase pobjJSCmd) {
+		String command = pobjJSCmd.toXMLString();
+		strLastAnswer = spooler.execute_xml(command);
+		logger.trace("Answer from JobScheduler:\n" + strLastAnswer);
+		Answer objAnswer = getAnswer(strLastAnswer);
+		if (objAnswer != null) {
+		 
+			if (objAnswer.getERROR() != null) {
+				throw new JobSchedulerException(Messages.getMsg("JOM_E_0010") + "\n" + "command:\n" + command + "\n" + "answer:\n" + strLastAnswer);  
+			}
+		}
+		return objAnswer;
+		
+	}
 	/**
 	 *
 	 * \brief getAnswer
