@@ -123,7 +123,7 @@ public class JobSchedulerCheckRunHistory extends JSToolBox implements JSJobUtili
 				List<HistoryEntry> objHistoryEntries = objAnswer.getHistory().getHistoryEntry();
 				HistoryEntry completedHistoryEntry=null;
 				for (HistoryEntry historyItem : objHistoryEntries) {
-						if ((historyItem.getEndTime() != null) ){
+						if ((historyItem.getEndTime() != null) && completedHistoryEntry == null ){
 							completedHistoryEntry = historyItem;
 						}
 				}
@@ -151,7 +151,7 @@ public class JobSchedulerCheckRunHistory extends JSToolBox implements JSJobUtili
 						flgRunTooLate = objEndDateTime.before(objDateStartTime);
 					}
 					boolean flgRunSuccessful = isEmpty(strErrorText);
-					
+
 					if(flgRunTooLate || !flgRunSuccessful ) {
 						logger.info(Messages.getMsg("JCH_I_0001", strJobName, objEndDateTimeStr));
 						if(!flgRunSuccessful) {
@@ -170,7 +170,6 @@ public class JobSchedulerCheckRunHistory extends JSToolBox implements JSJobUtili
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
 			logger.error(Messages.getMsg("JSJ-F-107", conMethodName), e);
 			throw e;
 		}
