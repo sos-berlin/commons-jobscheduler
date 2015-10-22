@@ -265,7 +265,7 @@ public class JobSchedulerJob extends Job_impl {
 	 * @param jobName The jobName to set.
 	 */
 	protected void setJobName(final String jobName) {
-		this.jobName = jobName;
+		this.jobName = jobName.replaceFirst(".*/([^/]+)$", "$1");
 	}
 	
 	/**
