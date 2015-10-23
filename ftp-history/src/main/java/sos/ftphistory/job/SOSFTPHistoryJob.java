@@ -829,7 +829,7 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
 			} catch (Exception e) {
 				throw new JobSchedulerException("illegal value for parameter [" + attr_name + "] found [yyyy-MM-dd HH:mm:ss]: " + attr_val);
 			}
-		} else if (mappingName.equals("mapping_file_size") || mappingName.equals("mapping_pid") || mappingName.equals("mapping_ppid")) {
+		} else if (mappingName.equals("mapping_file_size") || mappingName.equals("mapping_pid") || mappingName.equals("mapping_ppid")
 				|| mappingName.equals("mapping_port") || mappingName.equals("mapping_jump_port")) {
 			if (attr_val.length() == 0) {
 				attr_val = "0";
