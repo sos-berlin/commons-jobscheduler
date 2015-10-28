@@ -41,7 +41,5 @@ public interface ISOSHibernateDataProvider {
     public void fillTable(Table table);
     public ISOSHibernateFilter getFilter();
     public void resetFilter();
-	public void getData(int limit);
-	public void commit();
-	 
+	public void getData(int limit);	 
 }

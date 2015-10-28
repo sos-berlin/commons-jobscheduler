@@ -36,14 +36,11 @@ public class H2ConnectionTest {
         connection.connect();
         logger.info(connection.getConnectionString());
         File f = connection.createTemporaryHibernateConfiguration();
-
         final String expected = "myName";
-        Table1DBLayer dbLayer = new Table1DBLayer(f);
+        Table1DBLayer dbLayer = new Table1DBLayer(f.getAbsolutePath());
         dbLayer.addRecord(expected);
         Table1DBItem record = dbLayer.getByName(expected);
         assertEquals(expected,record.getName());
-        dbLayer.closeSession();
-
         connection.close();
     }
 
@@ -53,17 +50,13 @@ public class H2ConnectionTest {
         connection.connect();
         logger.info(connection.getConnectionString());
         File f = connection.createTemporaryHibernateConfiguration();
-
         final String expected = "myName";
-        Table1DBLayer dbLayer = new Table1DBLayer(f);
+        Table1DBLayer dbLayer = new Table1DBLayer(f.getAbsolutePath());
         dbLayer.addRecord(expected);
         Table1DBItem record = dbLayer.getByName(expected);
         assertEquals(expected,record.getName());
-        dbLayer.closeSession();
-
         connection.close();
         connection.removeTemporaryFiles();
-
     }
 
     private static String getSQLFileName(String baseName) {

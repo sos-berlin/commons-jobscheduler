@@ -1,13 +1,12 @@
 package com.sos.testframework.h2;
 
-import com.sos.hibernate.layer.SOSHibernateDBLayer;
-import org.hibernate.HibernateException;
+import java.util.List;
+
 import org.hibernate.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.util.List;
+import com.sos.hibernate.layer.SOSHibernateDBLayer;
 
 public class Table2DBLayer extends SOSHibernateDBLayer {
 
@@ -15,19 +14,20 @@ public class Table2DBLayer extends SOSHibernateDBLayer {
 
     private final static String FIELD1 = "name";
 
-    public Table2DBLayer(File configurationFile) {
+    public Table2DBLayer(String configurationFile) {
         super();
-        this.setConfigurationFile(configurationFile);
-        initSession();
+        this.setConfigurationFileName(configurationFile);
+        initConnection(configurationFile);
 	}
 	
     private Query setQueryParams(Table2Filter filter, String hql) {
 		Query query = null;
 		try {
-			query = session.createQuery(hql);
+			getConnection().beginTransaction();
+			query = getConnection().createQuery(hql);
 			if (filter.getName() != null)
 		        query.setParameter(FIELD1, filter.getName());
-		} catch(HibernateException e) {
+		} catch(Exception e) {
 			throw new RuntimeException("Error creating Query",e);
 		}
 		return query;
@@ -60,8 +60,14 @@ public class Table2DBLayer extends SOSHibernateDBLayer {
 	public long addRecord(String name) {
         Table2DBItem record = new Table2DBItem();
         record.setName(name);
-        saveOrUpdate(record);
-        commit();
+        try {
+        	this.getConnection().connect();
+        	this.getConnection().beginTransaction();
+			this.getConnection().saveOrUpdate(record);
+			this.getConnection().commit();
+		} catch (Exception e) {
+			logger.error("Error occurred adding record: ", e);
+		}
         return  record.getId();
 	}
 

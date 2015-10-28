@@ -111,16 +111,16 @@ public class MultiThreadProtocol implements org.slf4j.Logger {
         return forItem + "." + forUUID;
     }
 
-    public static String getProtocolAsText(File configurationFile, String forUUID, String forItem, String forLogger) {
-        LoggingEventPropertyDBLayer loggingDBLayer = new LoggingEventPropertyDBLayer(configurationFile);
+    public static String getProtocolAsText(String configurationFileName, String forUUID, String forItem, String forLogger) {
+        LoggingEventPropertyDBLayer loggingDBLayer = new LoggingEventPropertyDBLayer(configurationFileName);
         String itemIndicator = getItemIndicator(forUUID, forItem);
         List<LoggingEventDBItem> records = loggingDBLayer.getProtocol("itemIndicator", itemIndicator, forLogger);
         String result = loggingDBLayer.asText(records);
         return result;
     }
 
-    public static String getProtocolAsText(File configurationFile, String forUUID, String forLogger) {
-        LoggingEventPropertyDBLayer loggingDBLayer = new LoggingEventPropertyDBLayer(configurationFile);
+    public static String getProtocolAsText(String configurationFileName, String forUUID, String forLogger) {
+        LoggingEventPropertyDBLayer loggingDBLayer = new LoggingEventPropertyDBLayer(configurationFileName);
         List<LoggingEventDBItem> records = loggingDBLayer.getProtocol("fileIndicator", forUUID, forLogger);
         String result = loggingDBLayer.asText(records);
         return result;

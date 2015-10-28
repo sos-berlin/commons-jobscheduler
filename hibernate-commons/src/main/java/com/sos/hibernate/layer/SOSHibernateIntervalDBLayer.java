@@ -1,9 +1,10 @@
 package com.sos.hibernate.layer;
 
-import java.sql.Connection;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.log4j.Logger;
 
 import com.sos.hibernate.classes.DbItem;
 import com.sos.hibernate.classes.SOSHibernateIntervalFilter;
@@ -34,9 +35,8 @@ import com.sos.hibernate.classes.SOSHibernateIntervalFilter;
  */
 
 public abstract class SOSHibernateIntervalDBLayer extends SOSHibernateDBLayer {
-
-    @SuppressWarnings("unused")
-    private final String conClassName = "SOSHibernateDBLayer";
+	
+    private Logger logger = Logger.getLogger(SOSHibernateIntervalFilter.class);
 
     public abstract SOSHibernateIntervalFilter getFilter();
 
@@ -60,12 +60,13 @@ public abstract class SOSHibernateIntervalDBLayer extends SOSHibernateDBLayer {
             this.getFilter().setIntervalTo(to.getTime());
             try{
                deleted = deleteInterval();
-            }catch (Exception e){e.printStackTrace();}
+            }catch (Exception e){
+            	e.printStackTrace();
+        	}
         } else {
-            if (session == null) {
-                beginTransaction(Connection.TRANSACTION_READ_UNCOMMITTED);
+            if (connection == null){
+            	initConnection(getConfigurationFileName());
             }
-
             if (interval > 0) {
                 GregorianCalendar to = new GregorianCalendar();
                 to.add(GregorianCalendar.DAY_OF_YEAR, -interval);
@@ -78,20 +79,23 @@ public abstract class SOSHibernateIntervalDBLayer extends SOSHibernateDBLayer {
                 int i = 0;
                 while (dbitemEntries.hasNext()) {
                     DbItem h = (DbItem) dbitemEntries.next();
-                    this.delete(h);
+                    try {
+                    	connection.connect();
+    					connection.beginTransaction();
+						connection.delete(h);
+            			connection.commit();
+					} catch (Exception e) {
+						logger.error("Error occurred connecting to DB: ", e);
+					}
                     this.onAfterDeleting(h);
                     deleted = deleted + 1;
                     i = i + 1;
                     if (i == limit) {
-                        commit();
-                        beginTransaction(Connection.TRANSACTION_READ_UNCOMMITTED);
                         i = 0;
                     }
                 }
             }
         }
-
-        commit();
         return deleted;
     }
 

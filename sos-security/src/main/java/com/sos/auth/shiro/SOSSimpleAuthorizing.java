@@ -21,7 +21,7 @@ public class SOSSimpleAuthorizing implements ISOSAuthorizing{
     }
 
     @Override
-    public SimpleAuthorizationInfo setPermittions(SimpleAuthorizationInfo authorizationInfo_, PrincipalCollection principalCollection) {
+    public SimpleAuthorizationInfo setPermissions(SimpleAuthorizationInfo authorizationInfo_, PrincipalCollection principalCollection) {
         if (authorizationInfo_ == null) {
             SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
             authorizationInfo = simpleAuthorizationInfo;

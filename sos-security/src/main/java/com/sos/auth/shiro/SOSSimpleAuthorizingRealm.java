@@ -25,7 +25,7 @@ public class SOSSimpleAuthorizingRealm extends AuthorizingRealm {
         SimpleAuthorizationInfo authzInfo = null;
         if (authorizing != null) {
             authzInfo = authorizing.setRoles(authzInfo, principalCollection);
-            authzInfo = authorizing.setPermittions(authzInfo, principalCollection);
+            authzInfo = authorizing.setPermissions(authzInfo, principalCollection);
         }
         return authzInfo;
 

@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import org.hibernate.HibernateException;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -50,9 +51,10 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Ser
  
 
 
-    public JadeFilesDBLayer(File configurationFile_) {
+    public JadeFilesDBLayer(String configurationFile_) {
         super();
-        this.setConfigurationFile(configurationFile_);
+        this.setConfigurationFileName(configurationFile_);
+        this.initConnection(this.getConfigurationFileName());
         this.resetFilter();
 
     }
@@ -63,9 +65,11 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Ser
         }
         
         try {
-            return (JadeFilesDBItem) this.getSession().get(JadeFilesDBItem.class, id);
+        	connection.connect();
+        	connection.beginTransaction();
+            return (JadeFilesDBItem) ((Session)connection.getCurrentSession()).get(JadeFilesDBItem.class, id);
         }
-        catch (ObjectNotFoundException e) {
+        catch (Exception e) {
             return null;
         }
     }
@@ -242,46 +246,50 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Ser
     }
 
     public int delete() {
-
-        if (session == null) {
-            beginTransaction();
-        }
-
         String q = "delete from JadeFilesHistoryDBItem e where e.jadeFilesDBItem.id IN (select id from JadeFilesDBItem " + getWhere() + ")";
-        Query query = session.createQuery(q);
-        setWhere(query);
-
-        int row = query.executeUpdate();
-
-        String hql = "delete from JadeFilesDBItem " + getWhere();
-        query = session.createQuery(hql);
-
-        setWhere(query);
-
-        row = query.executeUpdate();
+        int row = 0;
+        try {
+			connection.connect();
+			connection.beginTransaction();
+			Query query = connection.createQuery(q);
+			setWhere(query);
+			row = query.executeUpdate();
+			connection.commit();
+			String hql = "delete from JadeFilesDBItem " + getWhere();
+			connection.connect();
+			connection.beginTransaction();
+			query = connection.createQuery(hql);
+			setWhere(query);
+			row = query.executeUpdate();
+			connection.commit();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         return row;
     }
 
  
 
     public List<DbItem> getFilesFromTo(Date from, Date to)  {
-
-        Session session = getSession();
-
         filter.setCreatedFrom(from); 
         filter.setCreatedTo(to);
-
-        Transaction transaction = session.beginTransaction();
-        Query query = session.createQuery("  from JadeFilesDBItem " + getWhere());
-
-        if (filter.getCreatedFrom() != null) {
-           query.setTimestamp("createdFrom", filter.getCreatedFrom());
-        }
-        if (filter.getCreatedTo() != null) {
-           query.setTimestamp("createdTo", filter.getCreatedTo());
-        }
-
-        List<DbItem> resultset = query.list();
+		List<DbItem> resultset = null;
+		try {
+			connection.connect();
+			connection.beginTransaction();
+			Query query = connection.createQuery("  from JadeFilesDBItem " + getWhere());
+			if (filter.getCreatedFrom() != null) {
+			   query.setTimestamp("createdFrom", filter.getCreatedFrom());
+			}
+			if (filter.getCreatedTo() != null) {
+			   query.setTimestamp("createdTo", filter.getCreatedTo());
+			}
+			resultset = query.list();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
         return resultset;
 
@@ -290,28 +298,34 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Ser
  
 
     public List<JadeFilesHistoryDBItem> getFilesHistoryById(Long sosftpId) throws ParseException {
-        Session session = getSession();
-
-        Transaction transaction = session.beginTransaction();
-        Query query = session.createQuery("  from JadeFilesHistoryDBItem where sosftpId=:sosftpId");
-        query.setLong("sosftpId", sosftpId);
-        List<JadeFilesHistoryDBItem> resultset = query.list();
-
-        transaction.commit();
+    	List<JadeFilesHistoryDBItem> resultset = null;
+		try {
+			connection.connect();
+			connection.beginTransaction();
+			Query query = connection.createQuery("  from JadeFilesHistoryDBItem where sosftpId=:sosftpId");
+			query.setLong("sosftpId", sosftpId);
+			resultset = query.list();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         return resultset;
     	
     }
     
     public List<JadeFilesDBItem> getFiles() throws ParseException {
       
-        Session session = getSession();
-
-        Transaction transaction = session.beginTransaction();
-        Query query = session.createQuery("  from JadeFilesDBItem " + getWhere());
-        setWhere(query);
-        List<JadeFilesDBItem> resultset = query.list();
-
-        transaction.commit();
+    	List<JadeFilesDBItem> resultset = null;
+		try {
+			connection.connect();
+			connection.beginTransaction();
+			Query query = connection.createQuery("  from JadeFilesDBItem " + getWhere());
+			setWhere(query);
+			resultset = query.list();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         return resultset;
 
     }
@@ -362,34 +376,39 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Ser
 
     @Override
     public long deleteInterval() {
-        if (session == null) {
-            beginTransaction();
-        }
-
         String q = "delete from JadeFilesHistoryDBItem e where e.jadeFilesDBItem.id IN (select id from JadeFilesDBItem " + getWhereFromTo() + ")";
-        
-     
-        Query query = session.createQuery(q);
-        if (filter.getCreatedFrom() != null) {
-            query.setTimestamp("createdFrom", filter.getCreatedFrom());
-         }
-         if (filter.getCreatedTo() != null) {
-            query.setTimestamp("createdTo", filter.getCreatedTo());
-         }
-        
-        int row = query.executeUpdate();
+        int row = 0;
+        try {
+			connection.connect();
+			connection.beginTransaction();
+			Query query = connection.createQuery(q);
+			if (filter.getCreatedFrom() != null) {
+			    query.setTimestamp("createdFrom", filter.getCreatedFrom());
+			 }
+			 if (filter.getCreatedTo() != null) {
+			    query.setTimestamp("createdTo", filter.getCreatedTo());
+			 }
+			
+			row = query.executeUpdate();
+			connection.commit();
+			String hql = "delete from JadeFilesDBItem " + getWhereFromTo();
+			connection.connect();
+			connection.beginTransaction();
+			query = connection.createQuery(hql);
 
-        String hql = "delete from JadeFilesDBItem " + getWhereFromTo();
-        query = session.createQuery(hql);
-
-        if (filter.getCreatedFrom() != null) {
-            query.setTimestamp("createdFrom", filter.getCreatedFrom());
-         }
-         if (filter.getCreatedTo() != null) {
-            query.setTimestamp("createdTo", filter.getCreatedTo());
-         }
-          
-        row = query.executeUpdate();
+			if (filter.getCreatedFrom() != null) {
+			    query.setTimestamp("createdFrom", filter.getCreatedFrom());
+			 }
+			 if (filter.getCreatedTo() != null) {
+			    query.setTimestamp("createdTo", filter.getCreatedTo());
+			 }
+			  
+			row = query.executeUpdate();
+			connection.commit();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         return row;       
     }
 

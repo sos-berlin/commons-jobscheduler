@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.hibernate.HibernateException;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -54,7 +55,7 @@ public class JadeFilesHistoryDBLayer extends SOSHibernateIntervalDBLayer impleme
 
     public JadeFilesHistoryDBLayer(File configurationFile_) {
         super();
-        this.setConfigurationFile(configurationFile_);
+        this.setConfigurationFileName(configurationFile_.getAbsolutePath());
         this.resetFilter();
 
     }
@@ -65,9 +66,11 @@ public class JadeFilesHistoryDBLayer extends SOSHibernateIntervalDBLayer impleme
         }
         
         try {
-            return (JadeFilesHistoryDBItem) this.getSession().get(JadeFilesHistoryDBItem.class, guid);
+        	this.getConnection().connect();
+        	this.getConnection().beginTransaction();
+            return (JadeFilesHistoryDBItem) ((Session)this.getConnection().getCurrentSession()).get(JadeFilesHistoryDBItem.class, guid);
         }
-        catch (ObjectNotFoundException e) {
+        catch (Exception e) {
             return null;
         }
     }
@@ -425,25 +428,24 @@ public class JadeFilesHistoryDBLayer extends SOSHibernateIntervalDBLayer impleme
 
   
     public List<DbItem> getFilesHistoryFromTo(Date from, Date to){
-        
         filter.setCreatedFrom(from); 
         filter.setCreatedTo(to);
-      
-        Session session = getSession();
-
-        Transaction transaction = session.beginTransaction();
-        Query query = session.createQuery("  from JadeFilesHistoryDBItem " + getWhere());
-
-        if (filter.getCreatedFrom() != null) {
-            query.setTimestamp("createdFrom", filter.getCreatedFrom());
-        }
-        
-        if (filter.getCreatedTo() != null) {
-            query.setTimestamp("createdTo", filter.getCreatedTo());
-        }
-
-        List<DbItem> resultset = query.list();
-
+        List<DbItem> resultset = null;
+		try {
+			connection.connect();
+			connection.beginTransaction();
+			Query query = connection.createQuery("  from JadeFilesHistoryDBItem " + getWhere());
+			if (filter.getCreatedFrom() != null) {
+			    query.setTimestamp("createdFrom", filter.getCreatedFrom());
+			}
+			if (filter.getCreatedTo() != null) {
+			    query.setTimestamp("createdTo", filter.getCreatedTo());
+			}
+			resultset = query.list();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         return resultset;
 
     }    
@@ -451,56 +453,67 @@ public class JadeFilesHistoryDBLayer extends SOSHibernateIntervalDBLayer impleme
     
 
     public List<JadeFilesHistoryDBItem> getFilesHistoryById(Long sosftpId) throws ParseException {
-        Session session = getSession();
-
-        Transaction transaction = session.beginTransaction();
-        Query query = session.createQuery("  from JadeFilesHistoryDBItem where sosftpId=:sosftpId");
-        query.setLong("sosftpId", sosftpId);
-        List<JadeFilesHistoryDBItem> resultset = query.list();
-
-        transaction.commit();
+		List<JadeFilesHistoryDBItem> resultset = null;
+		try {
+			connection.connect();
+			connection.beginTransaction();
+			Query query = connection.createQuery("  from JadeFilesHistoryDBItem where sosftpId=:sosftpId");
+			query.setLong("sosftpId", sosftpId);
+			resultset = query.list();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         return resultset;
     }
     
     public JadeFilesDBItem getJadeFileItemById(Long sosftpId) throws ParseException {
-        Session session = getSession();
-
-        Transaction transaction = session.beginTransaction();
-        Query query = session.createQuery("  from JadeFilesDBItem where id=:sosftpId");
-        query.setLong("sosftpId", sosftpId);
-        List<JadeFilesDBItem> resultset = query.list();
-
-        transaction.commit();
+		List<JadeFilesDBItem> resultset = null;
+		try {
+			connection.connect();
+			connection.beginTransaction();
+			Query query = connection.createQuery("  from JadeFilesDBItem where id=:sosftpId");
+			query.setLong("sosftpId", sosftpId);
+			resultset = query.list();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         // id is unique, therefore only one item has to be returned
         return resultset.get(0);
     }
     
     public List<JadeFilesHistoryDBItem> getHistoryFiles() throws ParseException {
-        
-        Session session = getSession();
-
-        Transaction transaction = session.beginTransaction();
-        Query query = session.createQuery("  from JadeFilesHistoryDBItem history " + getWhere());
-        setWhere(query);
-        List<JadeFilesHistoryDBItem> resultset = query.list();
-
-        transaction.commit();
+		List<JadeFilesHistoryDBItem> resultset = null;
+		try {
+			connection.connect();
+			connection.beginTransaction();
+			Query query = connection.createQuery("  from JadeFilesHistoryDBItem history " + getWhere());
+			setWhere(query);
+			resultset = query.list();
+		} catch (HibernateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         return resultset;
-
     }
     
     public List<JadeFilesHistoryDBItem> getHistoryFilesOrderedByTimestamp() throws ParseException {
-        
-        Session session = getSession();
-
-        Transaction transaction = session.beginTransaction();
-        Query query = session.createQuery("  from JadeFilesHistoryDBItem history " + getWhere() + " order by transferTimestamp desc");
-        setWhere(query);
-        List<JadeFilesHistoryDBItem> resultset = query.list();
-
-        transaction.commit();
+		List<JadeFilesHistoryDBItem> resultset = null;
+		try {
+			connection.connect();
+			connection.beginTransaction();
+			Query query = connection.createQuery("  from JadeFilesHistoryDBItem history " + getWhere() + " order by transferTimestamp desc");
+			setWhere(query);
+			resultset = query.list();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         return resultset;
-
     }
     
     

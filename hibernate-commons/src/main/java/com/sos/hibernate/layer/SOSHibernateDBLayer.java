@@ -1,17 +1,9 @@
 package com.sos.hibernate.layer;
 
-import com.sos.hibernate.classes.ClassList;
-import com.sos.hibernate.classes.SosHibernateSession;
-import com.sos.hibernate.interfaces.IHibernateOptions;
-
 import org.apache.log4j.Logger;
-import org.hibernate.CacheMode;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
-import java.io.File;
-import java.sql.Connection;
+import com.sos.hibernate.classes.ClassList;
+import com.sos.hibernate.classes.SOSHibernateConnection;
 
 /**
  * \class SOSHibernateDBLayer
@@ -43,164 +35,74 @@ public class SOSHibernateDBLayer {
     @SuppressWarnings("unused")
     private final String conClassName = "SOSHibernateDBLayer";
     private static Logger logger = Logger.getLogger(SOSHibernateDBLayer.class);
-
-    // private static ServiceRegistry serviceRegistry=null;
-
-    protected Session session = null;
-    protected Transaction transaction = null;
-
+    protected SOSHibernateConnection connection = null;
+    private String configurationFileName = null;
+    
     public SOSHibernateDBLayer() {
         //
     }
 
-    private void initSessionEx(IHibernateOptions options) throws Exception {
-        session = SosHibernateSession.getInstance(options);
-        if (session == null) {
-            String s = String.format("Could not initiate session for database using file %s", SosHibernateSession.configurationFile);
-            throw new Exception(s);
-        } else {
-            session.setCacheMode(CacheMode.IGNORE);
-        }
+    public SOSHibernateDBLayer(String configFileName) {
+        this.configurationFileName = configFileName;
+        this.initConnection(this.getConfigurationFileName());
     }
 
-    private void initSessionEx() throws Exception {
-        session = SosHibernateSession.getInstance(SosHibernateSession.configurationFile);
-        if (session == null) {
-            String s = String.format("Could not initiate session for database using file %s", SosHibernateSession.configurationFile);
-            throw new Exception(s);
-        } else {
-            session.setCacheMode(CacheMode.IGNORE);
-        }
-
-    }
-
-    private void initSessionEx(int transactionIsolationLevel) throws Exception {
-        session = SosHibernateSession.getInstance(SosHibernateSession.configurationFile, transactionIsolationLevel);
-        if (session == null) {
-            String s = String.format("Could not initiate session for database using file %s and isolation_level %s", SosHibernateSession.configurationFile, transactionIsolationLevel);
-            throw new Exception(s);
-        } else {
-            session.setCacheMode(CacheMode.IGNORE);
-        }
-
-    }
-
-    public void initSession() {
-        try {
-            initSessionEx();
-        } catch (Exception e) {
-            String s = String.format("Could not initiate session for database using file %s", SosHibernateSession.configurationFile);
-            logger.error(s);
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void initSession(IHibernateOptions options) {
-        try {
-            initSessionEx(options);
-        } catch (Exception e) {
-            String s = String.format("Could not initiate session for database using options", options.gethibernate_connection_driver_class());
-            logger.error(s);
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void initSession(int transactionIsolationLevel) {
-        try {
-            initSessionEx(transactionIsolationLevel);
-        } catch (Exception e) {
-            String s = String.format("Could not initiate session for database using file %s and isolation_level %s", SosHibernateSession.configurationFile, transactionIsolationLevel);
-            logger.error(s);
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
-
-    public File getConfigurationFile() {
-        return SosHibernateSession.configurationFile;
-    }
-
-    public void save(Object dBItem) {
-        session.save(dBItem);
-        session.flush();
-    }
-
-    public void update(Object dBItem) {
-        session.update(dBItem);
-        session.flush();
-    }
-
-    public void saveOrUpdate(Object dBItem) {
-        session.saveOrUpdate(dBItem);
-        session.flush();
-    }
-
-    public Session getSession() {
-        if (session == null) {
-            initSession();
-        }
-        return session;
-    }
-
-    public void delete(Object dBItem) {
-        session.delete(dBItem);
-        session.flush();
-    }
-
-    public Query createQuery(String hQuery) {
-        return this.session.createQuery(hQuery);
-    }
-
-    public void beginTransaction() {
-        initSession();
-        transaction = session.beginTransaction();
-    }
-
-    public void beginTransaction(IHibernateOptions options) {
-        initSession(options);
-        transaction = session.beginTransaction();
-    }
-
-    public void beginTransaction(int transactionIsolationLevel) {
-        initSession(transactionIsolationLevel);
-        transaction = session.beginTransaction();
+    public void initConnection(){
+    	if (configurationFileName != null){
+    		initConnection(configurationFileName);
+    	}
     }
     
-    public void commit() {
-        if (transaction != null) {
-            session.flush();
-            transaction.commit();
-        }
-
+    public void initConnection(String configFileName){
+    	this.configurationFileName = configFileName;
+    	try {
+			connection = new SOSHibernateConnection(configurationFileName);
+			connection.addClassMapping(getDefaultClassMapping());
+			connection.connect();
+		} catch (Exception e) {
+			logger.error(String.format("Could not initiate hibernate connection for database using file %s", configurationFileName), e);
+		}
+    }
+    
+    public String getConfigurationFileName(){
+    	return configurationFileName;
+    }
+    
+    public void setConfigurationFileName(String configurationFileName) {
+        this.configurationFileName = configurationFileName;
     }
 
-    public void closeSession() {
-        if (session != null && session.isOpen()) {
-            SosHibernateSession.close();
-            session = null;
-        }
+    public SOSHibernateConnection getConnection(){
+    	return connection;
     }
 
-    public Transaction getTransaction() {
-        return transaction;
-    }
-
-    public void setTransaction(Transaction transaction) {
-        this.transaction = transaction;
-    }
-
-    public void setSession(Session session) {
-        this.session = session;
-    }
-
-    public void setSession(SOSHibernateDBLayer layer) {
-        this.session = layer.getSession();
-    }
-
-    public void setConfigurationFile(File configurationFile) {
-        SosHibernateSession.configurationFile = configurationFile;
+    private static ClassList getDefaultClassMapping() {
+        ClassList classList = new ClassList();
+        classList.addClassIfExist("com.sos.dailyschedule.db.DailyScheduleDBItem");
+        classList.addClassIfExist("com.sos.scheduler.history.db.SchedulerTaskHistoryDBItem");
+        classList.addClassIfExist("com.sos.scheduler.history.db.SchedulerOrderStepHistoryDBItem");
+        classList.addClassIfExist("com.sos.scheduler.history.db.SchedulerOrderHistoryDBItem");
+        classList.addClassIfExist("com.sos.scheduler.db.SchedulerInstancesDBItem");
+        classList.addClassIfExist("sos.jadehistory.db.JadeFilesDBItem");
+        classList.addClassIfExist("sos.jadehistory.db.JadeFilesHistoryDBItem");
+        classList.addClassIfExist("com.sos.eventing.db.SchedulerEventDBItem");
+        classList.addClassIfExist("com.sos.auth.shiro.db.SOSUserDBItem");
+        classList.addClassIfExist("com.sos.auth.shiro.db.SOSUserRightDBItem");
+        classList.addClassIfExist("com.sos.auth.shiro.db.SOSUserRoleDBItem");
+        classList.addClassIfExist("com.sos.auth.shiro.db.SOSUser2RoleDBItem");
+        classList.addClassIfExist("com.sos.tools.logback.db.LoggingEventDBItem");
+        classList.addClassIfExist("com.sos.tools.logback.db.LoggingEventExceptionDBItem");
+        classList.addClassIfExist("com.sos.tools.logback.db.LoggingEventPropertyDBItem");
+        //http://tasks.sos/browse/DVT-53
+        classList.addClassIfExist("com.sos.scheduler.notification.db.DBItemSchedulerOrderStepHistory");
+        classList.addClassIfExist("com.sos.scheduler.notification.db.DBItemSchedulerOrderHistory");
+        classList.addClassIfExist("com.sos.scheduler.notification.db.DBItemSchedulerVariables");
+        classList.addClassIfExist("com.sos.scheduler.notification.db.DBItemSchedulerHistory");
+        classList.addClassIfExist("com.sos.scheduler.notification.db.DBItemSchedulerMonNotifications");
+        classList.addClassIfExist("com.sos.scheduler.notification.db.DBItemSchedulerMonSystemNotifications");
+        classList.addClassIfExist("com.sos.scheduler.notification.db.DBItemSchedulerMonResults");
+        classList.addClassIfExist("com.sos.scheduler.notification.db.DBItemSchedulerMonChecks");
+        return classList;
     }
 
 }

@@ -3,8 +3,9 @@ package com.sos.auth.shiro.db;
 import java.io.File;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.hibernate.Query;
- 
+
 import com.sos.hibernate.layer.SOSHibernateDBLayer;
 
 
@@ -34,15 +35,15 @@ import com.sos.hibernate.layer.SOSHibernateDBLayer;
 
 public class SOSUserDBLayer extends SOSHibernateDBLayer {
 
-	@SuppressWarnings("unused")
-	private final String conClassName = "SOSUserDBLayer";
+	private Logger logger = Logger.getLogger(SOSUserDBLayer.class);
 
 	 
 	private SOSUserFilter filter = null;
 
-	public SOSUserDBLayer(final File configurationFile_) {
+	public SOSUserDBLayer(String configurationFileName) {
 		super();
-		this.setConfigurationFile(configurationFile_);
+		this.setConfigurationFileName(configurationFileName);
+		this.initConnection(this.getConfigurationFileName());
 		resetFilter();
 	}
  
@@ -52,65 +53,58 @@ public class SOSUserDBLayer extends SOSHibernateDBLayer {
 	}
 
 	public int delete() {
-
-		if (session== null) {
-			beginTransaction();
+		if (connection == null){
+			initConnection(getConfigurationFileName());
 		}
-
 		String hql = "delete from SOSUserDBItem " + getWhere();
-
-		Query query = session.createQuery(hql);
-
-		if (filter.getUserName() != null && !filter.getUserName().equals("")) {
-			query.setParameter("sosUserName", filter.getUserName());
+		Query query = null;
+		int row = 0;
+		try {
+			connection.connect();
+			connection.beginTransaction();
+			query = connection.createQuery(hql);
+			if (filter.getUserName() != null && !filter.getUserName().equals("")) {
+				query.setParameter("sosUserName", filter.getUserName());
+			}
+			row = query.executeUpdate();
+		} catch (Exception e) {
+			logger.error("Error occurred executing query: ", e);
 		}
-		 
-		int row = query.executeUpdate();
-
 		return row;
 	}
-
- 
 
 	private String getWhere() {
 		String where = "";
 		String and = "";
-
-	 
-
 		if (filter.getUserName() != null	&& !filter.getUserName().equals("")) {
 			where += and + " sosUserName = :sosUserName";
 			and = " and ";
 		}
-
-		if (where.trim().equals("")) {
-
-		} else {
+		if (!where.trim().equals("")) {
 			where = "where " + where;
 		}
 		return where;
-
 	}
 
 	public List<SOSUserDBItem> getSOSUserList(final int limit) {
-		initSession();
-
-		Query query = session.createQuery("from SOSUserDBItem " + getWhere() + filter.getOrderCriteria() + filter.getSortMode());
-	 
-		if (filter.getUserName() != null	&& !filter.getUserName().equals("")) {
-			query.setParameter("sosUserName", filter.getUserName());
+		initConnection(getConfigurationFileName());
+		List<SOSUserDBItem> sosUserList = null;
+		try {
+			connection.connect();
+			connection.beginTransaction();
+			Query query = connection.createQuery("from SOSUserDBItem " + getWhere() + filter.getOrderCriteria() + filter.getSortMode());
+			if (filter.getUserName() != null	&& !filter.getUserName().equals("")) {
+				query.setParameter("sosUserName", filter.getUserName());
+			}
+			if (limit > 0) {
+				query.setMaxResults(limit);
+			}
+			sosUserList = query.list();
+		} catch (Exception e) {
+			logger.error("Error occurred executing query: ", e);
 		}
-
-		if (limit > 0) {
-			query.setMaxResults(limit);
-		}
-
-		@SuppressWarnings("unchecked")
-		List<SOSUserDBItem> sosUserList = query.list();
 		return sosUserList;
-
 	}
-
 	  
     public void setFilter(SOSUserFilter filter) {
         this.filter = filter;
@@ -119,6 +113,5 @@ public class SOSUserDBLayer extends SOSHibernateDBLayer {
     public SOSUserFilter getFilter() {
         return filter;
     }
- 
 
 }

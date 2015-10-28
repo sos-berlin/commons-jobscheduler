@@ -25,28 +25,24 @@ public class SOSHibernateAuthorizingRealm extends AuthorizingRealm{
 
     
     public void setHibernateConfigurationFile(String filename) {
-        hibernateConfigurationFile = filename;
+        this.hibernateConfigurationFile = filename;
     }
         public boolean supports(AuthenticationToken token) {
             SOSHibernateAuthorizing authorizing = new SOSHibernateAuthorizing();
-            authorizing.setHibernateConfigurationFile(hibernateConfigurationFile);
+//            authorizing.setHibernateConfigurationFile(hibernateConfigurationFile);
+            authorizing.setConfigurationFileName(hibernateConfigurationFile);
             setAuthorizing(authorizing);
             return true;
         }
         
         @Override
         protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
-           
-     
-          
-                SimpleAuthorizationInfo authzInfo=null;  
-                if (authorizing != null) {
-                    authzInfo = authorizing.setRoles(authzInfo, principalCollection);
-                    authzInfo = authorizing.setPermittions(authzInfo,principalCollection);
-                }    
-                    
-                return  authzInfo;
-           
+            SimpleAuthorizationInfo authzInfo=null;  
+            if (authorizing != null) {
+                authzInfo = authorizing.setRoles(authzInfo, principalCollection);
+                authzInfo = authorizing.setPermissions(authzInfo,principalCollection);
+            }    
+            return  authzInfo;
         }
         
         public String MD5(String md5) {
@@ -66,22 +62,19 @@ public class SOSHibernateAuthorizingRealm extends AuthorizingRealm{
         @Override
         protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authcToken) throws AuthenticationException {
             authToken = (UsernamePasswordToken) authcToken;
-            
-            SOSUserDBLayer sosUserDBLayer = new SOSUserDBLayer(new File(hibernateConfigurationFile));
+            SOSUserDBLayer sosUserDBLayer = new SOSUserDBLayer(hibernateConfigurationFile);
             sosUserDBLayer.getFilter().setUserName(authToken.getUsername());
             List<SOSUserDBItem>  sosUserList  = sosUserDBLayer.getSOSUserList(0);
-         
             SOSUserDBItem sosUserDBItem = sosUserList.get(0);
             String s = sosUserDBItem.getSosUserPassword();
-             
             String pw = String.valueOf(authToken.getPassword());
-             
             if( s.equals(MD5(pw) )) {
                 return new SimpleAuthenticationInfo(authToken.getUsername(), authToken.getPassword(), getName());
             } else {
                 return null;
             }
         }
+
         public void setAuthorizing(ISOSAuthorizing authorizing) {
             this.authorizing = authorizing;
         }
