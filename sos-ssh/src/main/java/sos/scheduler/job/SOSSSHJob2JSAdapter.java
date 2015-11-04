@@ -19,7 +19,6 @@ import sos.spooler.Variable_set;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
 public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
-    private final String conClassName = this.getClass().getSimpleName();
     private static final String PARAM_SSH_JOB_TASK_ID = "SSH_JOB_TASK_ID";
     private static final String PARAM_SSH_JOB_NAME = "SSH_JOB_NAME";
     private static final String PARAM_JITL_SSH_USE_JSCH_IMPL = "jitl.ssh.use_jsch_impl";
@@ -32,7 +31,6 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
     private static final String PARAM_CLEANUP_JOBCHAIN = "cleanupJobchain";
     private boolean useTrilead = true;
     private String pidFileName;
-    private boolean envVarsCaseSensitive = true;
     private String envVarNamePrefix;
 
     @Override
@@ -71,9 +69,8 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
         objO.CurrentNodeName(this.getCurrentNodeName());
         HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(getJobOrOrderParameters());
         if (!useTrilead) {
-            ((SOSSSHJobJSch) objR).setAllParams(hsmParameters1);
-            if(objO.getCreateEnvironmentVariables().isTrue()){
-                Map allEnvVars = new HashMap();
+            if("true".equalsIgnoreCase(hsmParameters1.get("create_environment_variables"))){
+                Map<String, String> allEnvVars = new HashMap<String, String>();
                 allEnvVars.putAll(getSchedulerEnvironmentVariables());
                 allEnvVars.putAll(prefixSchedulerEnvVars(hsmParameters1));
                 ((SOSSSHJobJSch) objR).setSchedulerEnvVars(allEnvVars);
@@ -81,7 +78,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
         }
         objO.setAllOptions(objO.DeletePrefix(hsmParameters1, "ssh_"));
         objR.setJSJobUtilites(this);
-        if (!objO.commandSpecified()) {
+         if (!objO.commandSpecified()) {
             setJobScript(objO.command_script);
         }
         objO.CheckMandatory();
@@ -113,8 +110,10 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
 
     }
 
-    // creates a new order for the cleanup jobchain with all the options,
-    // params, values and the TaskId of the task which created this
+    /**
+     * creates a new order for the cleanup jobchain with all the options,
+     * params, values and the TaskId of the task which created this
+     */
     private void createOrderForWatchdog() {
         spooler_log.debug9("createOrderForWatchdog started");
         Order order = spooler.create_order();
@@ -144,13 +143,12 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
         return "sos-ssh-pid-" + uuid + ".txt";
     }
 
-    public Map getSchedulerEnvironmentVariables() {
+    public Map<String, String> getSchedulerEnvironmentVariables() {
         String os = System.getProperty("os.name").toLowerCase();
         boolean win = false;
-        Map envvars = new HashMap();
+        Map<String, String> envvars = new HashMap<String, String>();
         if (os.indexOf("nt") > -1 || os.indexOf("windows") > -1) {
             win = true;
-            envVarsCaseSensitive = false;
         }
         Variable_set env = spooler_task.create_subprocess().env();
         StringTokenizer t = new StringTokenizer(env.names(), ";");

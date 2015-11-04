@@ -117,7 +117,12 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
 			}
 			for (String strCmd : strCommands2Execute) {
 				executedCommand = strCmd;
-				completeCommand = getEnvCommand() + getPreCommand() + strCmd;
+				logger.debug("createEnvironmentVariables (Options) = " + objOptions.getCreateEnvironmentVariables().value()); 
+				if(objOptions.getCreateEnvironmentVariables().value()){
+	                completeCommand = getEnvCommand() + getPreCommand() + strCmd;
+				} else {
+	                completeCommand = getPreCommand() + strCmd;
+				}
 				try {
 					// see http://www.sos-berlin.com/jira/browse/JS-673
 					strCmd = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strCmd);
