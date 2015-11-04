@@ -13,8 +13,6 @@ import static com.sos.scheduler.messages.JSMessages.JSJ_I_0010;
 import static com.sos.scheduler.messages.JSMessages.JSJ_I_0020;
 import static com.sos.scheduler.messages.JSMessages.LOG_D_0020;
 import static com.sos.scheduler.messages.JSMessages.LOG_I_0010;
-
-import java.io.File;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -38,18 +36,14 @@ import sos.util.SOSSchedulerLogger;
 
 import com.sos.JSHelper.Basics.IJSCommands;
 import com.sos.JSHelper.Basics.JSJobUtilities;
-import com.sos.JSHelper.Logging.Log4JHelper;
 import com.sos.JSHelper.Basics.VersionInfo;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.JSHelper.Options.JSOptionsClass;
 import com.sos.JSHelper.Options.SOSOptionElement;
 import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.localization.Messages;
-import com.sos.localization.SOSMsg;
 import com.sos.scheduler.JobSchedulerLog4JAppender;
 
 
- 
 @I18NResourceBundle(
 					baseName = "com_sos_scheduler_messages",
 					defaultLocale = "en")
@@ -68,15 +62,10 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 	protected final String				EMPTY_STRING					= "";
 	protected final boolean				continue_with_spooler_process	= true;
 	protected final boolean				continue_with_task				= true;
-	
-	private         HashMap<String, String> paramsAsHashmap     = null;
-
-    private static boolean logbackWarningPublished = false;
+	private         HashMap<String, String> paramsAsHashmap             = null;
 
 	public JobSchedulerJobAdapter() {
 		Messages = new Messages(conMessageFilePath, Locale.getDefault());
-		//SOSMsg.flgShowFullMessageText = true; //viel blabla siehe SOSMsg
-		//rootLogger gets basis configuration if it doesn't have already an appender 
 		if( !Logger.getRootLogger().getAllAppenders().hasMoreElements() ) {
 			BasicConfigurator.configure();
 		}
@@ -94,7 +83,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 			super.spooler_process();
 			initializeLog4jAppenderClass();
 			logger.info(VersionInfo.VERSION_STRING);
-			//setStateText("*** running ***");
 		}
 		catch (JobSchedulerException e) {
 			return signalFailure();
@@ -107,7 +95,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		}
 		finally {
 		} // finally
-			// return (spooler_task.job().order_queue() != null);
 		return signalSuccess();
 	} // spooler_process
 
@@ -167,8 +154,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 			Appender consoleAppender = objJSAppender; // JobSchedulerLog4JAppender(layout);
 			logger.addAppender(consoleAppender);
 			// ALL | DEBUG | INFO | WARN | ERROR | FATAL | OFF:
-			//logger.setLevel(Level.INFO);
-			if (spooler_log.level() > 1) {
+ 			if (spooler_log.level() > 1) {
 				logger.setLevel(Level.ERROR);
 			}
 			if (spooler_log.level() == 1) {
@@ -188,18 +174,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		objJSAppender.setSchedulerLogger(sosLogger);
 	}
 
-	/** 
-	 *
-	 * \brief getSchedulerParameterAsProperties
-	 *
-	 * \details
-	 *
-	 * \return HashMap<String,String>
-	 *
-	 * @param pSchedulerParameterSet
-	 * @return
-	 * @throws Exception
-	 */
+	 
 	protected HashMap<String, String> getSchedulerParameterAsProperties(final Variable_set pSchedulerParameterSet) {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getSchedulerParameterAsProperties";
 		SchedulerParameters = new HashMap<String, String>();
@@ -294,6 +269,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 				String val = entry.getValue();
 				key = key.substring(intNNLen);
 				newSchedulerParameters.put(key, val);
+				objJobOrOrderParams.set_value(key, val);
 			}
 		}
 		return newSchedulerParameters;
@@ -301,7 +277,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 
 	protected HashMap<String, String> getSchedulerParameterAsProperties(final HashMap<String, String> pSchedulerParameterSet) {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getSchedulerParameterAsProperties";
-		// System.out.println(conClassName);
 		SchedulerParameters = new HashMap<String, String>();
 		try {
 			if (isNotNull(pSchedulerParameterSet)) {
@@ -333,18 +308,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		}
 	}
 
-	/**
-	 *
-	 * \brief getParameters
-	 *
-	 * \details
-	 * Returns a variable_set with all job and/or order-Parameters.
-	 * At the same time, the class-global variable objJobOrderParams is filled.
-	 * A Parameter is a   "key and value" tupel.
-	 *
-	 * \return Variable_set
-	 *
-	 */
+	
 	protected Variable_set getJobOrOrderParameters() {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::getParameters";
 		try {
@@ -368,17 +332,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		return spooler_task.params();
 	}
 
-	/**
-	 *
-	*
-	* \brief getOrder - returns the current order object
-	*
-	* \details
-	*  returns the order object if the job is running in a jobchain, otherwise null.
-	*
-	* \return Order
-	*
-	 */
+	
 	protected Order getOrder() {
 		if (spooler_task.order() == null) {
 			return null;
@@ -398,16 +352,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		}
 	}
 
-	/**
-	 *
-	 * \brief getParameters
-	 *
-	 * \details
-	 * Returns a Variable_set with either the job- or the order-parameters.
-	 *
-	 * \return Variable_set
-	 *
-	 */
+	
 	public Variable_set getParameters() {
 		Order order = null;
 		try {
@@ -442,48 +387,19 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		}
 	}
 
-	/**
-	 *
-	 * \brief getSchedulerParameters
-	 *
-	 * \details
-	 * Returns a Variable_set with the global parameters of scheduler.xml.
-	 * Environment variables in the parameter values are already replaced.
-	 *
-	 * \return Variable_set
-	 *
-	 */
+	
 	public Variable_set getGlobalSchedulerParameters() {
 		return spooler.variables();
 	}
 
-	/**
-	 *
-	 * \brief setParameters
-	 *
-	 * \details
-	 * Set all Job- or Order-Parameters as a Variable_set.
-	 *
-	 * \return void
-	 *
-	 * @param pVariableSet
-	 */
+	
 	public void setParameters(final Variable_set pVariableSet) {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setParameters";
 		objJobOrOrderParams = pVariableSet;
 		paramsAsHashmap = convertVariableSet2HashMap(objJobOrOrderParams);
 	} // private void setParameters
 
-	/**
-	 *
-	 * \brief setJSParam
-	 *
-	 * \details
-	 *
-	 * @param pstrKey
-	 * @param pstrValue
-	 * @return
-	 */
+	
 	@Override public void setJSParam(final String pstrKey, final String pstrValue) {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setJSParam";
 		if (isNotNull(spooler_task.params())) {
@@ -497,17 +413,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		}
 	} //
 
-	/**
-	 *
-	 * \brief setJSParam
-	 *
-	 * \details
-	 *
-	 * \return
-	 *
-	 * @param pstrKey
-	 * @param pstrValue - StringBuffer
-	 */
+	
 	@Override public void setJSParam(final String pstrKey, final StringBuffer pstrValue) {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::setJSParam";
 		setJSParam(pstrKey, pstrValue.toString());
@@ -536,27 +442,13 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		}
 		return pstrReplaceIn;
 	} // private String replaceVars
-
-	/**
-	 *
-	 * \brief replaceSchedulerVars
-	 *
-	 * \details
-	 *
-	 * \return void
-	 *
-	 * @param isWindows
-	 */
+	
 	@Override
 	public String replaceSchedulerVars(final boolean isWindows, final String pstrString2Modify) {
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::replaceSchedulerVars";
 		String strTemp = pstrString2Modify;
-		//logger.debug("strTemp = " + strTemp);
-
-		if (isNull(paramsAsHashmap)) {
-            paramsAsHashmap = convertVariableSet2HashMap(objJobOrOrderParams);
-        }
+        paramsAsHashmap = convertVariableSet2HashMap(objJobOrOrderParams);
 
 		if (isNotNull(objJobOrOrderParams)) {
 			strTemp = replaceSchedulerVarsInString(paramsAsHashmap,pstrString2Modify);
@@ -675,12 +567,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		return specialParams;
 	}
 
-	/**
-	 * \brief get all parameters for a task or order
-	 * \detail
-	 * This method is a combination of getSchedulerParameterAsProperties() and getSpecialParameters()
-	 * @return
-	 */
+	
 	public HashMap<String, String> getAllParametersAsProperties() {
 		HashMap<String, String> result = convertVariableSet2HashMap(getGlobalSchedulerParameters());
 		result.putAll(getSpecialParameters());
@@ -688,20 +575,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		return result;
 	}
 
-	/**
-	 *
-	 * \brief myReplaceAll
-	 *
-	 * \details
-		 * m) suche über mehrere Zeilen
-		 * i) case insensitive
-	 *
-	 * \return String
-	 *
-	 * @param source
-	 * @param what
-	 * @param replacement
-	 */
+	
 	@Override
 	public String myReplaceAll(final String source, final String what, final String replacement) {
 		String newReplacement = replacement.replaceAll("\\$", "\\\\\\$");
@@ -712,17 +586,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		return source.replaceAll("(?im)" + what, newReplacement);
 	}
 
-	/**
-	 *
-	 * \brief StackTrace2String
-	 *
-	 * \details
-	 * This Method creates a String with all infos from the stack as a trace.
-	 *
-	 * \return String
-	 *
-	 * @param e
-	 */
+	
 	public String StackTrace2String(final Exception e) {
 		String strT = null;
 		if (isNotNull(e)) {
@@ -744,64 +608,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		// TODO Auto-generated method stub
 	}
 
-	/**
-	 * moved to JSOptionsClass kb 2011-07-19
-	 */
-	/**
-	 *
-	 * \brief getCurrentNodeName
-	 *
-	 * \details
-	 *
-	 * \return
-	 *
-	 * @return
-	 */
-	// @SuppressWarnings("unchecked")
-	// protected HashMap<String, String> DeletePrefix(HashMap<String, String> phsmParameters, String pstrPrefix) {
-	//
-	// @SuppressWarnings("unused")
-	// final String conMethodName = conClassName + "::DeletePrefix";
-	// String strTemp;
-	// HashMap<String, String> hsmNewMap = new HashMap<String, String>();
-	//
-	// if (phsmParameters != null) {
-	// for (final Object element : phsmParameters.entrySet()) {
-	// final Map.Entry<String, String> mapItem = (Map.Entry<String, String>) element;
-	// String strMapKey = mapItem.getKey().toString();
-	//
-	// if (mapItem.getValue() != null) {
-	// strTemp = mapItem.getValue().toString();
-	// }
-	// else {
-	// strTemp = null;
-	// }
-	// // hsmNewMap.put(strMapKey, strTemp);
-	// // logger.debug("strMapKey:" + strMapKey + "   strTemp:" +strTemp + "pstrPrefix:" + pstrPrefix );
-	// if (strMapKey.startsWith(pstrPrefix)) {
-	// // TODO avoid java.util.ConcurrentModificationException
-	// // (http://java.sun.com/javase/6/docs/api/java/util/Iterator.html#remove() )
-	// // phsmParameters.remove(strMapKey);
-	// strMapKey = strMapKey.replaceAll(pstrPrefix, "");
-	// // logger.debug("strMapKey after replace:" + strMapKey );
-	// hsmNewMap.put(strMapKey, strTemp);
-	// mapItem.setValue("\n");
-	// }
-	// else { // possible case: <nodeName>/<prefix><name> -> <nodeName>/<name>
-	// String strP = "/" + pstrPrefix;
-	// if (strMapKey.contains(strP)) {
-	// strMapKey = strMapKey.replace(strP, "/");
-	// hsmNewMap.put(strMapKey, strTemp);
-	// mapItem.setValue("\n");
-	// }
-	// }
-	// }
-	// }
-	//
-	// return hsmNewMap;
-	// } // private HashMap <String, String> DeletePrefix
+	
 	@Override
-	// JSJobUtilities
 	public String getCurrentNodeName() {
 		return getCurrentNodeName(true);
 	} // public String getNodeName
@@ -874,18 +682,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		return flgIsJobChain;
 	} // private boolean isJobchain
 
-	/**
-	 *
-	 * \brief setOrderParameter
-	 *
-	 * \details
-	 *
-	 * \return String
-	 *
-	 * @param pstrParameterName
-	 * @param pstrParameterValue
-	 * @return
-	 */
+	
 	public String setOrderParameter(final String pstrParameterName, final String pstrParameterValue) {
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::setOrderParameter";
@@ -973,9 +770,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 	        }
 	    } // private boolean signalFailureNoLog
 	  
-	/*
-	 * setBack driven by JS
-	 */
+	
 	protected boolean isSetBackActive() {
 		boolean flgRet = false;
 		if (isJobchain()) {
@@ -986,61 +781,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		}
 		return flgRet;
 	}
-	private final boolean	flgUseOrderSetBack			= true;
-	private final String	conVarname_setback			= "setback";
-	private final String	conVarname_setback_count	= "setback_count";
 
-	/**
-	 *
-	 * \brief setSetbackCount
-	 *
-	 * \details
-	 * SetBack is driven by order parameters.
-	 *
-	 * \return boolean
-	 *
-	 * @return
-	 */
-	//	protected boolean setSetbackCount() {
-	//		if (isJobchain()) {
-	//			if (sosString.parseToString(schedulerParams.get("use_order_set_back")).length() > 0) {
-	//				flgUseOrderSetBack = sosString.parseToBoolean(schedulerParams.get("use_order_set_back"));
-	//			}
-	//
-	//			if (flgUseOrderSetBack) {
-	//				int iSetbackCount = spooler_task.order().setback_count();
-	//				Variable_set orderParams = spooler_task.order().params();
-	//				getLogger().info("setback_count is now: " + iSetbackCount + " , maximum number of setbacks: " + nrOfTries);
-	//				if (iSetbackCount >= nrOfTries) {
-	//					orderParams.set_var(conVarname_setback_count, "");
-	//					getLogger().info("max setbacks reached");
-	//				}
-	//				else {
-	//					spooler_job.set_delay_order_after_setback(1, delay);
-	//					/**
-	//					 * ist das eigentlich notwendig? der API-Job überwacht doch bereits die Anzahl setBack's
-	//					 * Ja, das ist notwendig. im Job werden die max Anzahl setbacks nicht gesetzt, sondern
-	//					 * nur über die Parameter im Order oder Job
-	//					 */
-	//					spooler_job.set_max_order_setbacks((int) nrOfTries);
-	//					spooler_task.order().setback();
-	//					iSetbackCount++;
-	//					return false;
-	//				}
-	//			}
-	//		}
-	//		return true;
-	//	}
-	/**
-	 * @brief Helperfunktion - liefert true, wenn String weder null noch leer
-	 *
-	 * \details
-	 * StringObjekt auf null/empty prüfen
-	 *
-	 * @param pstrValue zu prüfendes Stringobjekt
-	 *
-	 * @return boolean true, wenn String sinnvollen Wert enthält.
-	 */
+	
 	protected boolean isNotEmpty(final String pstrValue) {
 		return isNotNull(pstrValue) && pstrValue.trim().length() > 0;
 	}
@@ -1058,17 +800,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		return p;
 	}
 
-	/**
-	 *
-	*
-	* \brief getJobScript
-	*
-	* \details
-	*  Returns the content of the Script-Tag.
-	*
-	* \return String
-	*
-	 */
+
 	public String getJobScript() {
 		String strS = "";
 		Job objJob = getJob();
@@ -1086,17 +818,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 		return strS;
 	}
 
-	/**
-	 * 
-	*
-	* \brief setJobScript
-	*
-	* \details
-	* Check, if the script for the job is specified in the script-tag of the job.
-	* if true, copy the content of the script-tag to the given option.
-	* \return void
-	*
-	 */
+
 	public void setJobScript(final SOSOptionElement pobjOptionElement) {
 		if (pobjOptionElement.isNotDirty()) {
 			String strS = getJobScript();
