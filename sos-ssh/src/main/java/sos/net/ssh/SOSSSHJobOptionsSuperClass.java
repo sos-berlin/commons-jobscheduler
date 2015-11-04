@@ -825,7 +825,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
 //
   @JSOptionDefinition(name = "runWithWatchdog", description = "This parameter can be used to activate ssh session management", key = "runWithWatchdog", type = "SOSOptionBoolean", mandatory = false)
   public SOSOptionBoolean runWithWatchdog = new SOSOptionBoolean(this, conClassName + ".runWithWatchdog", 
-      "This parameter can be used to define os specific commands for the process monitoring", // Titel
+      "This parameter can be used to activate ssh session management", // Titel
       "false", // InitValue
       "false", // DefaultValue
       false // isMandatory
@@ -839,6 +839,22 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
     this.runWithWatchdog = runWithWatchdog;
   }
 
+  @JSOptionDefinition(name = "create_environment_variables", description = "This parameter can be used to activate ssh environment variables", key = "create_environment_variables", type = "SOSOptionBoolean", mandatory = false)
+  public SOSOptionBoolean createEnvironmentVariables = new SOSOptionBoolean(this, conClassName + ".createEnvironmentVariables", 
+      "This parameter can be used to activate ssh environment variables", // Titel
+      "true", // InitValue
+      "true", // DefaultValue
+      false // isMandatory
+  );
+
+  public SOSOptionBoolean getCreateEnvironmentVariables() {
+    return createEnvironmentVariables;
+  }
+
+  public void setCreateEnvironmentVariables(SOSOptionBoolean createEnvironmentVariables) {
+    this.createEnvironmentVariables = createEnvironmentVariables;
+  }
+  
   @JSOptionDefinition(name = "cleanupJobchain", description = "This parameter is used to determine the name of the jobchain for cleanup", key = "cleanupJobchain", type = "SOSOptionString", mandatory = false)
   public SOSOptionString cleanupJobchain = new SOSOptionString(this, conClassName + ".cleanupJobchain", 
       "This parameter is used to determine the name of the jobchain for cleanup", // Titel
