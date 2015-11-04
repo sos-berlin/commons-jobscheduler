@@ -60,18 +60,18 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
             // v1.10 [SP]
             useTrilead = true;
             objR = new SOSSSHJobTrilead();
-            objO = objR.Options();
+            objO = objR.getOptions();
             spooler_log.debug9("uses Trilead implementation of SSH");
         } else {
             useTrilead = false;
             objR = new SOSSSHJobJSch();
-            objO = objR.Options();
+            objO = objR.getOptions();
             spooler_log.debug9("uses JSch implementation of SSH");
         }
         objO.CurrentNodeName(this.getCurrentNodeName());
         HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(getJobOrOrderParameters());
         if (!useTrilead) {
-            ((SOSSSHJobJSch) objR).setAllParams(hsmParameters1);
+//            ((SOSSSHJobJSch) objR).setAllParams(hsmParameters1);
             if (objO.getCreateEnvironmentVariables().isTrue()) {
                 Map allEnvVars = new HashMap();
                 allEnvVars.putAll(getSchedulerEnvironmentVariables());
@@ -200,7 +200,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
             }
         }
 
-        return envVars;
+        return envVars; 
     }
 
     private boolean isActiveNodeParam(String key, String currentNodeName) {
