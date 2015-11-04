@@ -68,7 +68,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
         objO.CurrentNodeName(this.getCurrentNodeName());
         HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(getJobOrOrderParameters());
         if (!useTrilead) {
-            if("true".equalsIgnoreCase(hsmParameters1.get("create_environment_variables"))){
+            if(!"false".equalsIgnoreCase(hsmParameters1.get("create_environment_variables"))){
                 Map<String, String> allEnvVars = new HashMap<String, String>();
                 allEnvVars.putAll(getSchedulerEnvironmentVariables());
                 allEnvVars.putAll(prefixSchedulerEnvVars(hsmParameters1));
