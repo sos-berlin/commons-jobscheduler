@@ -431,11 +431,10 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 	public String createScriptFile(final String pstrContent) throws Exception {
 		try {
 			String commandScript = pstrContent;
-			logger.info("pstrContent = " + pstrContent);
 			if (flgIsRemoteOSWindows == false) {
 				commandScript = commandScript.replaceAll("(?m)\r", "");
 			}
-			logger.info(SOSVfs_I_233.params(pstrContent));
+			logger.debug(SOSVfs_I_233.params(pstrContent));
 			// TODO solve via callback
 			replaceSchedulerVars(flgIsRemoteOSWindows, commandScript);
 			// TODO script file prefix as option
