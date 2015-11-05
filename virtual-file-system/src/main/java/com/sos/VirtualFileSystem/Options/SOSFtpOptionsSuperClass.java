@@ -7294,7 +7294,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 
   public void setraise_exception_on_error(final SOSOptionBoolean raiseExceptionOnError) {
     this.raise_exception_on_error = raiseExceptionOnError;
-  } 
+  }
+  
+  @JSOptionDefinition(name = "ProtocolCommandListener", description = "Activate the logging for Apache ftp client", key = "protocol_command_listener", type = "SOSOptionBoolean", mandatory = true)
+  public SOSOptionBoolean	ProtocolCommandListener	= new SOSOptionBoolean(
+								this, conClassName + ".protocol_command_listener", "Activate the logging for Apache ftp client", // ...
+								"false", "false", true);
 
 } // public class SOSFtpOptionsSuperClass
 //

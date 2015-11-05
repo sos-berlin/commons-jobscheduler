@@ -394,6 +394,16 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			throw new JobSchedulerException(String.format("SOSVfs-E-0000: one of these parameters must be specified: '%1$s', '%2$s', '%3$s'",
 					file_path.getShortKey(), "source_dir", FileListName.getShortKey()));
 		}
+		
+		if( ProtocolCommandListener.isDirty()) {
+			if (Source().ProtocolCommandListener.isNotDirty() ) {
+				Source().ProtocolCommandListener.value(ProtocolCommandListener.value());
+			}
+			if (Target().ProtocolCommandListener.isNotDirty() ) {
+				Target().ProtocolCommandListener.value(ProtocolCommandListener.value());
+			}
+		}
+		
 		getDataSourceType();
 		getDataTargetType();
 		if (CheckNotProcessedOptions.value() == true) {
