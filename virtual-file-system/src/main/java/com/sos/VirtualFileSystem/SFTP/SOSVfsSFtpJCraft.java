@@ -1159,11 +1159,10 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
   public String createScriptFile(String pstrContent) throws Exception {
     try {
       String commandScript = pstrContent;
-      logger.info("pstrContent = " + pstrContent);
       if (isRemoteWindowsShell == false) {
         commandScript = commandScript.replaceAll("(?m)\r", "");
       }
-      logger.info(SOSVfs_I_233.params(pstrContent));
+      logger.debug(SOSVfs_I_233.params(pstrContent));
       File fleTempScriptFile = File.createTempFile("sos-sshscript", getScriptFileNameSuffix());
       BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fleTempScriptFile)));
       out.write(commandScript);
