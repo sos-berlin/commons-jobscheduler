@@ -431,11 +431,10 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 	public String createScriptFile(final String pstrContent) throws Exception {
 		try {
 			String commandScript = pstrContent;
-			logger.info("pstrContent = " + pstrContent);
 			if (flgIsRemoteOSWindows == false) {
 				commandScript = commandScript.replaceAll("(?m)\r", "");
 			}
-			logger.info(SOSVfs_I_233.params(pstrContent));
+			logger.debug(SOSVfs_I_233.params(pstrContent));
 			// TODO solve via callback
 			replaceSchedulerVars(flgIsRemoteOSWindows, commandScript);
 			// TODO script file prefix as option
@@ -974,8 +973,8 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 			}
 			strCurrentLine = "";
 			
-			logger.debug(SOSVfs_D_163.params("stdout", strCmd));
-			logger.debug(strbStdoutOutput.toString());		
+			logger.info(SOSVfs_D_163.params("stdout", strCmd));
+			logger.info(strbStdoutOutput.toString());		
 			stdoutConsumer.end();
 			stderrConsumer.end();
 			exitStatus = 0;
@@ -986,7 +985,7 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 			 	strCmd = "echo $$ && " + strCmd;
 			}
 
-            logger.debug(SOSVfs_D_163.params("stdout", strCmd));
+            logger.info(SOSVfs_D_163.params("stdout", strCmd));
 			this.getSshSession().execCommand(strCmd);
 
 			ipsStdOut = new StreamGobbler(this.getSshSession().getStdout());
@@ -999,7 +998,7 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 				//oh 2013-10-16: Wenn SignalInfo, dann loggt SSH-Job das Stdout zweimal (hier und in sos.net.ssh.SOSSSHJob2.java:440 (checkStdOut))
 				//siehe auch http://www.sos-berlin.com/jira/browse/JITL-66
 				//SignalInfo(line);
-				logger.debug(line);
+				logger.info(line);
 				strbStdoutOutput.append(line + strEndOfLine);
 
 			}
