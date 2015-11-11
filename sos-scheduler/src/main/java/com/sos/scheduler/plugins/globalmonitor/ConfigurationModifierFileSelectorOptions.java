@@ -67,7 +67,7 @@ public class ConfigurationModifierFileSelectorOptions {
     }
  
     public boolean isFileExclusions(File file){
-        if (listOfFileExclusions == null){
+        if (listOfFileExclusions == null || listOfFileExclusions.size() == 0){
             return false;
         }
         
@@ -82,12 +82,12 @@ public class ConfigurationModifierFileSelectorOptions {
         return false;    
     }
     
-    public boolean isDirExclusion(File directory){    	
-        if (listOfDirectoryExclusions == null){
+    public boolean isDirExclusion(File directory){    
+        if (listOfDirectoryExclusions == null || listOfDirectoryExclusions.size() == 0){
             return false;
         }
         for(String exclusion:listOfDirectoryExclusions)  {
-            if (directory.getAbsolutePath().replace('\\', '/').endsWith(exclusion)){
+                if (exclusion.trim().length() > 0 && directory.getAbsolutePath().replace('\\', '/').endsWith(exclusion)){
                 return true;
             }
         }

@@ -4,10 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-
-
-
-import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.DOMBuilder;
@@ -16,7 +12,6 @@ import org.w3c.dom.Document;
 
  
 public class JobConfigurationFileChanger {
-    private static Logger logger = Logger.getLogger(GlobalMonitorPlugin.class);
 
     private Document jobToChange;
     private HashMap<String,JobSchedulerFileElement> listOfMonitors;
