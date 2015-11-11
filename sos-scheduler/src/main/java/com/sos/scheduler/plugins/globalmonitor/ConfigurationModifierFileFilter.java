@@ -16,6 +16,7 @@ public abstract class ConfigurationModifierFileFilter implements FilenameFilter 
 
 
     private boolean isConfiguationFile(String filename){
+    	 
         boolean isJobSchedulerElement = filename.matches(getXmlRegex());
         return (isJobSchedulerElement);
     }
@@ -37,6 +38,7 @@ public abstract class ConfigurationModifierFileFilter implements FilenameFilter 
           if (options.isFileExclusions(f)){
               return false;
           }else{
+        	  
               if (isConfiguationFile(filename) && matchRegex(filename)){
                   return true;
               }else{

@@ -1,7 +1,6 @@
 package com.sos.scheduler.plugins.globalmonitor;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
@@ -37,15 +36,14 @@ public class ConfigurationModifierFileSelector {
            }else{
                files = d.listFiles();
            }
+        
            if (files != null){
                for(File file:files)  {
                    if (file.isFile()){
-                       logger.debug(file.getAbsolutePath() + " added");
                        JobSchedulerFileElement jobSchedulerFileElement = new JobSchedulerFileElement(file);
                        listOfSelectedConfigurationFiles.put(jobSchedulerFileElement.getJobSchedulerElementName(),jobSchedulerFileElement);
                    }else{
                        if (selectorOptions.isRecursive()){
-                           logger.debug("reading " + file.getAbsolutePath());
                            fillFiles(file.getAbsolutePath());
                        }
                    }
@@ -93,7 +91,6 @@ public class ConfigurationModifierFileSelector {
         if (files != null){
             for(File file:files)  {
                 if (file.isFile()){
-                	logger.debug(file.getAbsolutePath() + " -------------- monitor added");
                     JobSchedulerFileElement jobSchedulerFileElement = new JobSchedulerFileElement(file);
                     listOfMonitorConfigurationFiles.put(jobSchedulerFileElement.getJobSchedulerElementName(),jobSchedulerFileElement);
                 }

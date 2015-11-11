@@ -49,7 +49,7 @@ public class TestJobConfigurationFileChanger {
         //1.Create and initialize the options object
         ConfigurationModifierFileSelectorOptions configurationModifierFileSelectorOptions = new ConfigurationModifierFileSelectorOptions();
 
-        configurationModifierFileSelectorOptions.setConfigurationDirectory("C:/Users/ur/Documents/sos-berlin.com/jobscheduler/scheduler_4195/config");
+        configurationModifierFileSelectorOptions.setConfigurationDirectory("C:/Users/ur/Documents/sos-berlin.com/jobscheduler/scheduler_current/config");
         configurationModifierFileSelectorOptions.setDirectoryExclusions("/sos");
         configurationModifierFileSelectorOptions.setFileExclusions("");
         configurationModifierFileSelectorOptions.setRecursive(true);
@@ -59,7 +59,7 @@ public class TestJobConfigurationFileChanger {
         ConfigurationModifierFileSelector configurationModifierFileSelector = new ConfigurationModifierFileSelector(configurationModifierFileSelectorOptions);
         
         //3. Set the filter for jobs to an instance of ConfigurationModifierJobFileFilter
-        configurationModifierFileSelectorOptions.setConfigurationDirectory("C:/Users/ur/Documents/sos-berlin.com/jobscheduler/scheduler_4195/config");
+        configurationModifierFileSelectorOptions.setConfigurationDirectory("C:/Users/ur/Documents/sos-berlin.com/jobscheduler/scheduler_current/config");
         configurationModifierFileSelectorOptions.setDirectoryExclusions("/sos");
         configurationModifierFileSelectorOptions.setFileExclusions("");
         configurationModifierFileSelectorOptions.setRecursive(true);
@@ -69,7 +69,7 @@ public class TestJobConfigurationFileChanger {
 
         //4. getting the entire jobs
         configurationModifierFileSelector.fillSelectedFileList();
-        boolean jobIsToBeHandled = configurationModifierFileSelector.isInSelectedFileList("/Neuer Ordner/job1");
+        boolean jobIsToBeHandled = configurationModifierFileSelector.isInSelectedFileList("/parallel_job_instances/Job_1");
         assertEquals("testGetMonitorList",true, jobIsToBeHandled);
 
          if (jobIsToBeHandled){
@@ -80,7 +80,7 @@ public class TestJobConfigurationFileChanger {
 
             
             //5. if the current job is to be handled, create the list of monitors to add. 
-            JobSchedulerFileElement jobSchedulerFileElement= configurationModifierFileSelector.getJobSchedulerElement("/Neuer Ordner/job1");
+            JobSchedulerFileElement jobSchedulerFileElement= configurationModifierFileSelector.getJobSchedulerElement("/parallel_job_instances/Job_1");
 
             if (jobSchedulerFileElement != null){//always will be != null, as this is the then part of jobIsToBeHandled-if
                 //6.Create and initialize the options object for the monitors.

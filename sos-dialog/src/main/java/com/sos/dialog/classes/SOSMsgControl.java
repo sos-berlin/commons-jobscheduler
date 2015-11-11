@@ -1,7 +1,6 @@
 package com.sos.dialog.classes;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.FocusAdapter;
@@ -164,14 +163,6 @@ public abstract class SOSMsgControl extends SOSMsg {
 		setKeyListener(pobjC);
 		return pobjC;
 	} // public Tree Control
-
-	public Browser Control(final Browser pobjC) {
-		@SuppressWarnings("unused") final String conMethodName = conClassName + "::Control";
-		pobjC.setText(caption());
-		pobjC.setToolTipText(tooltip());
-		setKeyListener(pobjC);
-		return pobjC;
-	} // public Browser Control
 
 	public TreeColumn Control(final TreeColumn pobjC) {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::Control";

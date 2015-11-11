@@ -55,11 +55,11 @@ public class TestConfigurationModifierFileSelector {
     public void testConfigurationModifierFileSelector() {
         configurationModifierFileSelectorOptions = new ConfigurationModifierFileSelectorOptions();
 
-        configurationModifierFileSelectorOptions.setConfigurationDirectory("c:/temp/live");
+        configurationModifierFileSelectorOptions.setConfigurationDirectory("C:/Users/ur/Documents/sos-berlin.com/jobscheduler/scheduler_current/config");
         configurationModifierFileSelectorOptions.setDirectoryExclusions("/sos,test_event");
         configurationModifierFileSelectorOptions.setFileExclusions("/job_exercise1,/events2/ob_exercise3.job.xml");
         configurationModifierFileSelectorOptions.setRecursive(true);
-        configurationModifierFileSelectorOptions.setRegexSelector("^job.*$");
+        configurationModifierFileSelectorOptions.setRegexSelector("^Job_.*$");
 
         configurationModifierFileSelector = new ConfigurationModifierFileSelector(configurationModifierFileSelectorOptions);
         configurationModifierFileSelector.setSelectorFilter(new ConfigurationModifierJobFileFilter(configurationModifierFileSelectorOptions));
@@ -75,17 +75,17 @@ public class TestConfigurationModifierFileSelector {
     public void testIsInJoblist() {
         configurationModifierFileSelectorOptions = new ConfigurationModifierFileSelectorOptions();
 
-        configurationModifierFileSelectorOptions.setConfigurationDirectory("c:/temp");
+        configurationModifierFileSelectorOptions.setConfigurationDirectory("C:/Users/ur/Documents/sos-berlin.com/jobscheduler/scheduler_current/config");
         configurationModifierFileSelectorOptions.setDirectoryExclusions("/test_event");
         configurationModifierFileSelectorOptions.setFileExclusions("/job_exercise1,/events2/job_exercise3");
         configurationModifierFileSelectorOptions.setRecursive(true);
-        configurationModifierFileSelectorOptions.setRegexSelector("^job.*$");
+        configurationModifierFileSelectorOptions.setRegexSelector("^Job_.*$");
 
         configurationModifierFileSelector = new ConfigurationModifierFileSelector(configurationModifierFileSelectorOptions);
         configurationModifierFileSelector.setSelectorFilter(new ConfigurationModifierJobFileFilter(configurationModifierFileSelectorOptions));
 
         configurationModifierFileSelector.fillSelectedFileList();
-        boolean b = configurationModifierFileSelector.isInSelectedFileList("/sos/housekeeping/job6");
+        boolean b = configurationModifierFileSelector.isInSelectedFileList("/parallel_job_instances/Job_1");
 
         assertEquals("testIsInJoblist",true, b);
         configurationModifierFileSelectorOptions.setFileExclusions("/sos/housekeeping/job6,/events2/job_exercise3");
