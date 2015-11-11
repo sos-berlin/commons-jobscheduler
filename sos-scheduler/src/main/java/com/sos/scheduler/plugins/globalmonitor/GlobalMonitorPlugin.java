@@ -147,6 +147,7 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
         configurationModifierFileSelector.setSelectorFilter(new ConfigurationModifierJobFileFilter(configurationModifierFileSelectorJobOptions));
 
         // 3. getting the entire jobs
+        logger.debug("---------  fillSelectedFileList");
         configurationModifierFileSelector.fillSelectedFileList();
         boolean jobIsToBeHandled = configurationModifierFileSelector.isInSelectedFileList(jobname);
         logger.debug("---------  jobIsToBeHandled:" + jobIsToBeHandled);
