@@ -18,3 +18,5 @@
 # DOUBLE-CHECK GENERATED FILES
 *.class
 *.jar
+
+.sonar
