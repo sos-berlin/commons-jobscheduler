@@ -255,10 +255,10 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
 				if(flgIsWindowsShell){
 					envVarValue = envVarValue.replaceAll("\"", "\\\"");
 				}else{
+                    envVarValue = envVarValue.replaceAll("\\\\", "\\\\\\\\");
 					envVarValue = "\"" + envVarValue.replaceAll("\"", "\\\"") + "\"";
 				}
-				String replacedEnvVarValue = envVarValue.replaceAll("\\\\", "\0");
-				sb.append(String.format(objOptions.getPreCommand().Value(), keyVal, replacedEnvVarValue));
+				sb.append(String.format(objOptions.getPreCommand().Value(), keyVal, envVarValue));
 				sb.append(objOptions.command_delimiter.Value());
 			}
 		}
