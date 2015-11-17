@@ -85,6 +85,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 	private String proxyUser = null;
 	private String proxyPassword = null;
 	private int connectionTimeout = 0; //Millisekunden
+	private boolean simulateShell = false;
     
 	/**
 	 *
@@ -590,6 +591,8 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 				throw new JobSchedulerException(SOSVfs_E_190.params("sshSession"));
 			}
 			channelExec = (ChannelExec) sshSession.openChannel("exec");
+			logger.debug("****IMPL CLASS**** SIMULATE_SHELL_IS: " + isSimulateShell());
+			channelExec.setPty(isSimulateShell());
 			//JITL-157
 			cmd = cmd.replaceAll("\0", "\\\\\\\\").replaceAll("\"", "\\\"");
 			channelExec.setCommand(cmd);
@@ -1208,5 +1211,16 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
       getClient().chmod(chmod, strFileName);
     }
   }
+
+    @Override
+    public boolean isSimulateShell() {
+        return simulateShell;
+    }
+    
+    @Override
+    public void setSimulateShell(boolean simulateShell) {
+        this.simulateShell = simulateShell;
+    }
+    
 
 }

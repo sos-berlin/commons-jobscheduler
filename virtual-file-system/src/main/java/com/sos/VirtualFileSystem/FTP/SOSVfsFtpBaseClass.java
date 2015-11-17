@@ -118,7 +118,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 	private int proxyPort = 0;
 	private String proxyUser = null;
 	private String proxyPassword = null;
-	
+	private boolean simulateShell = false;
 	
 	public SOSVfsFtpBaseClass() {
 		super();
@@ -1862,4 +1862,14 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 			}
 		}
 	}
+
+    @Override
+    public boolean isSimulateShell() {
+        return this.simulateShell;
+    }
+
+    @Override
+    public void setSimulateShell(boolean simulateShell) {
+        this.simulateShell = simulateShell;
+    }
 }

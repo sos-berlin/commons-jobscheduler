@@ -50,6 +50,7 @@ public interface ISOSVFSHandler extends ISOSShell, ISOSConnection, ISOSSession  
 	public boolean isLoggedin ();
 	public boolean isSource ();
 	public boolean isTarget ();
+	public boolean isSimulateShell();
 
 	public void lock ();
 	public SOSFTPOptions Options();
@@ -65,5 +66,6 @@ public interface ISOSVFSHandler extends ISOSShell, ISOSConnection, ISOSSession  
 	public void setSource ();
 	public void setTarget ();
 	public enuSourceOrTarget SourceOrTarget ();
+	public void setSimulateShell(boolean simulateShell);
 
 }

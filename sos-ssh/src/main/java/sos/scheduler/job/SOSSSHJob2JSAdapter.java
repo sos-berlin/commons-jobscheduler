@@ -73,7 +73,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
                 allEnvVars.putAll(getSchedulerEnvironmentVariables());
                 allEnvVars.putAll(prefixSchedulerEnvVars(hsmParameters1));
                 ((SOSSSHJobJSch) objR).setSchedulerEnvVars(allEnvVars);
-            }
+           }
         }
         objO.setAllOptions(objO.DeletePrefix(hsmParameters1, "ssh_"));
         objR.setJSJobUtilites(this);
@@ -82,7 +82,6 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
         }
         objO.CheckMandatory();
         if (!useTrilead) {
-            // generate temporary file for remote pids for further usage
             spooler_log.debug9("Run with watchdog set to: " + objO.runWithWatchdog.Value());
             if (objO.runWithWatchdog.value()) {
                 pidFileName = generateTempPidFileName();
@@ -90,29 +89,21 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
                 createOrderForWatchdog();
             }
         }
-        // if command_delimiter is not set by customer then we override the
-        // default value due to compatibility issues
-        // the default command delimiter is used in the option class to split
-        // the commands with a delimiter not known by the os
-        // but here a command delimiter (known by the os) is needed to chain
-        // commands together
+        // if command_delimiter is not set by customer then we override the default value due to compatibility issues
+        // the default command delimiter is used in the option class to split the commands with a delimiter not known by the os
+        // but here a command delimiter (known by the os) is needed to chain commands together
         // TO DO: a solution which fits for both cases [SP]
         if (!useTrilead && objO.command_delimiter.isNotDirty()) {
             objO.command_delimiter.Value(";");
         }
-        objR.Execute();
+        objR.execute();
         if (!useTrilead && !((SOSSSHJobJSch) objR).getReturnValues().isEmpty()) {
             for (String key : ((SOSSSHJobJSch) objR).getReturnValues().keySet()) {
                 spooler_task.order().params().set_var(key, ((SOSSSHJobJSch) objR).getReturnValues().get(key));
             }
         }
-
     }
 
-    /**
-     * creates a new order for the cleanup jobchain with all the options,
-     * params, values and the TaskId of the task which created this
-     */
     private void createOrderForWatchdog() {
         spooler_log.debug9("createOrderForWatchdog started");
         Order order = spooler.create_order();
@@ -123,7 +114,6 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
         order.params().set_var(PARAM_SSH_JOB_TASK_ID, String.valueOf(spooler_task.id()));
         order.params().set_var(PARAM_PID_FILE_NAME_KEY, pidFileName);
         order.params().set_var(PARAM_SSH_JOB_NAME, spooler_job.name());
-        // delayed start after 15 seconds when the order is created
         order.set_at("now+15");
         Job_chain chain = null;
         if (spooler_task.params().value(PARAM_CLEANUP_JOBCHAIN) != null) {
@@ -167,7 +157,6 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
 
     private Map<String, String> prefixSchedulerEnvVars(Map<String, String> allEnvVars) {
         Map<String, String> envVars = new HashMap<String, String>();
-        // JTIL-224
         String currentNodeName = getCurrentNodeName();
         for (String key : allEnvVars.keySet()) {
             if (!"password".equalsIgnoreCase(key)) {
@@ -180,7 +169,6 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
                             }
                             spooler_log.debug9("node name [" + currentNodeName + "] stripped from parameter name!");
                         } else if (Pattern.compile("\\W").matcher(key).find()) {
-                            // is not active AND contains special characters
                             spooler_log.debug6("Parameter [" + key + "] not exported! Belongs to different node OR has special characters!");
                         } else {
                             envVars.put(envVarNamePrefix + key, allEnvVars.get(key));
@@ -196,7 +184,6 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
                 }
             }
         }
-
         return envVars; 
     }
 
@@ -208,8 +195,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
     }
 
     @Override
-    // TO DO remove if process is reviewed and fixed! Original in
-    // JobSchedulerJobAdapter puts duplicated key/Value pair
+    // TO DO remove if process is reviewed and fixed! Original in JobSchedulerJobAdapter puts duplicated key/Value pair
     protected HashMap<String, String> convertVariableSet2HashMap(final Variable_set variableSet) {
         HashMap<String, String> result = new HashMap<String, String>();
         try {
@@ -218,16 +204,6 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
                 String value = EMPTY_STRING;
                 for (String key : names) {
                     value = EMPTY_STRING;
-                    /**
-                     * the variable_set is able to handle the value of a
-                     * variable as an Object. In Java this class (the HashMap)
-                     * is defined as <String,String> but it is possible e.g. in
-                     * JavaScript to set a value as any object.
-                     *
-                     * Values with other types than string and integer are
-                     * ignored, e.g. the value of this parameter is set to
-                     * space.
-                     */
                     Object objO = variableSet.var(key);
                     if (objO instanceof String) {
                         value = variableSet.var(key);

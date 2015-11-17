@@ -39,7 +39,7 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
   }
 
   @Override
-  public SOSSSHJob2 Connect() {
+  public SOSSSHJob2 connect() {
     getVFS();
     getOptions().CheckMandatory();
     try {
@@ -57,7 +57,7 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
   } 
 
   @Override
-  public SOSSSHJob2 Execute() {
+  public SOSSSHJob2 execute() {
     vfsHandler.setJSJobUtilites(objJSJobUtilities);
     openSession();
     boolean configuredRaiseExeptionOnError = objOptions.raise_exception_on_error.value();
@@ -66,7 +66,7 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch{
     List<Integer> pidsStillRunning = new ArrayList<Integer>();
     try {
       if (isConnected == false) {
-        this.Connect();
+        this.connect();
       }
       objOptions.raise_exception_on_error.value(false);
       objOptions.ignore_error.value(true);

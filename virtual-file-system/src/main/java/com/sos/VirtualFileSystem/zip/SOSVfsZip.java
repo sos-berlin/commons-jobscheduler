@@ -79,6 +79,7 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
 	private String				strZipArchiveName		= "";
 	private String				strCurrentEntryName		= "";
 	private SOSVfsZipFileEntry	objCurrentZipFileEntry	= null;
+	private boolean simulateShell = false;
 
 	public SOSVfsZip() {
 		//
@@ -1064,4 +1065,15 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
 	@Override
 	public void reconnect(SOSConnection2OptionsAlternate options) {
 	}
+
+    @Override
+    public boolean isSimulateShell() {
+        return this.simulateShell;
+    }
+
+    @Override
+    public void setSimulateShell(boolean simulateShell) {
+        this.simulateShell = simulateShell;
+    }
+
 }

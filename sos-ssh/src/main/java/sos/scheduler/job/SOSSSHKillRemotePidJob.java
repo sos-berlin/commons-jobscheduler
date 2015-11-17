@@ -47,7 +47,7 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch{
   }
 
   @Override
-  public SOSSSHJob2 Connect() {
+  public SOSSSHJob2 connect() {
     getVFS();
     getOptions().CheckMandatory();
     try {
@@ -65,7 +65,7 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch{
   }
 
   @Override
-  public SOSSSHJob2 Execute() throws Exception {
+  public SOSSSHJob2 execute() throws Exception {
     vfsHandler.setJSJobUtilites(objJSJobUtilities);
     boolean configuredRaiseExeptionOnError = objOptions.raise_exception_on_error.value();
     boolean configuredIgnoreError = objOptions.ignore_error.value();
@@ -75,7 +75,7 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch{
     List<Integer> pidsToKillFromOrder = getPidsToKillFromOrder(); 
     try {
       if (isConnected == false) {
-        this.Connect();
+        this.connect();
       }
       logger.debug("try to kill remote PIDs");
       for(Integer pid : pidsToKillFromOrder){

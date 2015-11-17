@@ -58,9 +58,9 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         "-raise_exception_on_error", "true",
         "-command_delimiter", ";" };
     objOptions.CommandLineArgs(strArgs);
-    objSSH.Execute();
+    objSSH.execute();
     assertTrue(objSSH.getStdErr().toString().isEmpty());
-    objSSH.Clear();
+    objSSH.clear();
   }
 
   @Test
@@ -78,9 +78,9 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         "-proxy_password", "12345",
         "-command_delimiter", ";" };
     objOptions.CommandLineArgs(strArgs);
-    objSSH.Execute();
+    objSSH.execute();
     assertTrue(objSSH.getStdErr().toString().isEmpty());
-    objSSH.Clear();
+    objSSH.clear();
   }
 
   @Test
@@ -94,9 +94,9 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         "-password", "12345",
         "-command_delimiter", ";" };
     objOptions.CommandLineArgs(strArgs);
-    objSSH.Execute();
+    objSSH.execute();
     assertTrue(objSSH.getStdErr().toString().isEmpty());
-    objSSH.Clear();
+    objSSH.clear();
   }
 
   @Test(expected=SSHExecutionError.class)
@@ -110,9 +110,9 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         "-password", "12345",
         "-command_delimiter", ";"  };
     objOptions.CommandLineArgs(strArgs);
-    objSSH.Execute();
+    objSSH.execute();
     assertFalse(objSSH.getStdErr().toString().isEmpty());
-    objSSH.Clear();
+    objSSH.clear();
   }
 
 //  @Test
@@ -142,9 +142,9 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         "-user", "test",
         "-command_delimiter", ";" };
     objOptions.CommandLineArgs(strArgs);
-    objSSH.Execute();
+    objSSH.execute();
     assertTrue(objSSH.getStdErr().toString().isEmpty());
-    objSSH.Clear();
+    objSSH.clear();
   }
 
   @Test
@@ -161,9 +161,9 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         "-password", "12345",
         "-command_delimiter", ";"};
     objOptions.CommandLineArgs(strArgs);
-    objSSH.Execute();
+    objSSH.execute();
     assertTrue(objSSH.getStdErr().toString().isEmpty());
-    objSSH.Clear();
+    objSSH.clear();
   }
 
   @Test
@@ -177,9 +177,9 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         "-password", "12345",
         "-command_delimiter", ";" };
     objOptions.CommandLineArgs(strArgs);
-    objSSH.Execute();
+    objSSH.execute();
     assertTrue(objSSH.getStdErr().toString().isEmpty());
-    objSSH.Clear();
+    objSSH.clear();
   }
 
   @Test
@@ -193,9 +193,9 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         "-password", "12345",
         "-command_delimiter", ";" };
     objOptions.CommandLineArgs(strArgs);
-    objSSH.Execute();
+    objSSH.execute();
     assertTrue(objSSH.getStdErr().toString().isEmpty());
-    objSSH.Clear();
+    objSSH.clear();
   }
 
   @Test
@@ -209,9 +209,9 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         "-password", "12345",
         "-command_delimiter", ";" };
     objOptions.CommandLineArgs(strArgs);
-    objSSH.Execute();
+    objSSH.execute();
     assertTrue(objSSH.getStdErr().toString().isEmpty());
-    objSSH.Clear();
+    objSSH.clear();
   }
 
   @Test
@@ -228,9 +228,9 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         "-password", "12345",
         "-command_delimiter", ";"};
     objOptions.CommandLineArgs(strArgs);
-    objSSH.Execute();
+    objSSH.execute();
     assertTrue(objSSH.getStdErr().toString().isEmpty());
-    objSSH.Clear();
+    objSSH.clear();
   }
 
   @Test
@@ -244,9 +244,9 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         "-password", "12345",
         "-command_delimiter", ";"};
     objOptions.CommandLineArgs(strArgs);
-    objSSH.Execute();
+    objSSH.execute();
     assertTrue(objSSH.getStdErr().toString().isEmpty());
-    objSSH.Clear();
+    objSSH.clear();
   }
 
   @Test
@@ -260,9 +260,9 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         "-password", "12345",
         "-command_delimiter", ";" };
     objOptions.CommandLineArgs(strArgs);
-    objSSH.Execute();
+    objSSH.execute();
     assertTrue(objSSH.getStdErr().toString().isEmpty());
-    objSSH.Clear();
+    objSSH.clear();
   }
   
   @Test
@@ -280,9 +280,9 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         "-postCommandDelete", "del %s",
         "-command_delimiter", "&" };
     objOptions.CommandLineArgs(strArgs);
-    objSSH.Execute();
+    objSSH.execute();
     assertTrue(objSSH.getStdErr().toString().isEmpty());
-    objSSH.Clear();
+    objSSH.clear();
   }
   
   @Test
@@ -300,9 +300,9 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         "-postCommandDelete", "del %s",
         "-command_delimiter", "&&" };
     objOptions.CommandLineArgs(strArgs);
-    objSSH.Execute();
+    objSSH.execute();
     assertTrue(objSSH.getStdErr().toString().isEmpty());
-    objSSH.Clear();
+    objSSH.clear();
   }
 
 }

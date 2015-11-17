@@ -57,13 +57,13 @@ public class SOSSSHJobTrilead extends SOSSSHJob2 {
     return vfsHandler.getStdOut();
   } 
 
-  public SOSSSHJob2 Execute() throws Exception {
+  public SOSSSHJob2 execute() throws Exception {
     boolean flgScriptFileCreated = false; // http://www.sos-berlin.com/jira/browse/JITL-17
     vfsHandler.setJSJobUtilites(objJSJobUtilities);
 
     try {
       if (isConnected == false) {
-        this.Connect();
+        this.connect();
       }
       vfsHandler.OpenSession(objOptions);
       if (objOptions.command.IsEmpty() == false) {
@@ -96,10 +96,10 @@ public class SOSSSHJobTrilead extends SOSSSHJob2 {
           logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
           vfsHandler.ExecuteCommand(strCmd);
           objJSJobUtilities.setJSParam(conExit_code, "0");
-          CheckStdOut();
-          CheckStdErr();
-          CheckExitCode();
-          ChangeExitSignal();
+          checkStdOut();
+          checkStdErr();
+          checkExitCode();
+          changeExitSignal();
         } catch (Exception e) {
           //logger.error(this.StackTrace2String(e));
           throw new SSHExecutionError("Exception raised: " + e, e);
@@ -120,7 +120,7 @@ public class SOSSSHJobTrilead extends SOSSSHJob2 {
     }
     finally {
       if (keepConnected == false) {
-        DisConnect();
+        disconnect();
       }
     }
     return this;

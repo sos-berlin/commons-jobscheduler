@@ -57,7 +57,8 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
 	/** SFTP Client **/
 	private ChannelSftp			sftpClient									= null;
 	private JSch				secureChannel								= null;
-
+	private boolean simulateShell = false;
+	
 	/**
 	 *
 	 * \brief SOSVfsSFtpJCraft
@@ -945,5 +946,15 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
     @Override
     public SOSFileEntries getSOSFileEntries() {
         return sosFileEntries;
+    }
+
+    @Override
+    public boolean isSimulateShell() {
+        return this.simulateShell;
+    }
+
+    @Override
+    public void setSimulateShell(boolean simulateShell) {
+        this.simulateShell = simulateShell;
     }
 }

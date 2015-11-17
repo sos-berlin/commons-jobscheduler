@@ -43,7 +43,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 * Created on 17.05.2010 13:01:51
  */
 @I18NResourceBundle(baseName = "com.sos.net.messages", defaultLocale = "en")
-// oh 07.05.14 test haengt? [SP] testSimulateShellParam haengt, testExecuteWithCCAndDelimiter schlägt fehl
+// oh 07.05.14 test haengt? [SP] testSimulateShellParam haengt, testExecuteWithCCAndDelimiter schlï¿½gt fehl
 public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 	@SuppressWarnings({ "hiding" })
 	private static final Logger	logger			= Logger.getLogger(SOSSSHJob2Test.class);
@@ -72,7 +72,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 		String strArgs[] = new String[] { "-command", "ls", "-auth_method", "password", "-host", "wilma.sos", "-auth_file=test", "-user=test",
 				"-password", "12345" };
 		objOptions.CommandLineArgs(strArgs);
-		objSSH.Execute();
+		objSSH.execute();
 		assertEquals("auth_file", objOptions.auth_file.Value(), "test");
 		assertEquals("user", objOptions.user.Value(), "test");
 	}
@@ -83,7 +83,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 		String strArgs[] = new String[] { "-command", "ls", "-auth_method=publickey", "-host", "wilma.sos", "-auth_file=./src/test/resources/testing-key.key", "-user", "test",
 				"-password", "12345" };
 		objOptions.CommandLineArgs(strArgs);
-		objSSH.Execute();
+		objSSH.execute();
 		assertEquals("auth_file", objOptions.auth_file.Value(), "test");
 		assertEquals("user", objOptions.user.Value(), "test");
 	}
@@ -94,7 +94,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 		String strArgs[] = new String[] { "-command", "ls;exit 5", "-auth_method", "password", "-host", "wilma.sos", "-auth_file", "test", "-user", "kb",
 				"-password", "kb" };
 		objOptions.CommandLineArgs(strArgs);
-		objSSH.Execute();
+		objSSH.execute();
 		assertEquals("auth_file", objOptions.auth_file.Value(), "test");
 		assertEquals("user", objOptions.user.Value(), "test");
 		assertEquals("ExitCode not as expected", objSSH.getCC(), 5);
@@ -106,7 +106,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 		String strArgs[] = new String[] { "-command", "ls hallo;exit 0", "-auth_method", "password", "-host", "wilma.sos", "-auth_file", "test", "-user",
 				"test", "-password", "12345", "-ignore_stderr", "true" };
 		objOptions.CommandLineArgs(strArgs);
-		objSSH.Execute();
+		objSSH.execute();
 		assertEquals("auth_file", objOptions.auth_file.Value(), "test");
 		assertEquals("user", objOptions.user.Value(), "test");
 		assertEquals("ExitCode not as expected", objSSH.getCC(), 0);
@@ -118,7 +118,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 		String strArgs[] = new String[] { "-command", "ls hallo;exit 0", "-auth_method", "password", "-host", "wilma.sos", "-auth_file", "test", "-user",
 				"test", "-password", "12345", "-ignore_stderr", "false" };
 		objOptions.CommandLineArgs(strArgs);
-		objSSH.Execute();
+		objSSH.execute();
 		assertEquals("auth_file", objOptions.auth_file.Value(), "test");
 		assertEquals("user", objOptions.user.Value(), "test");
 		assertEquals("ExitCode not as expected", objSSH.getCC(), 0);
@@ -142,7 +142,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 		String strArgs[] = new String[] { "-command", "ls hallo%%exit 0", "-auth_method", "password", "-host", "wilma.sos", "-auth_file", "test", "-user",
 				"test", "-password", "12345", "-ignore_stderr", "false" };
 		objOptions.CommandLineArgs(strArgs);
-		objSSH.Execute();
+		objSSH.execute();
 		assertEquals("auth_file", objOptions.auth_file.Value(), "test");
 		assertEquals("user", objOptions.user.Value(), "test");
 		assertEquals("ExitCode not as expected", objSSH.getCC(), 0);
@@ -154,7 +154,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 		String strArgs[] = new String[] { "-command_script", "ps;ls", "-auth_method", "password", "-host", "wilma.sos", "-auth_file", "test", "-user", "test",
 				"-password", "12345" };
 		objOptions.CommandLineArgs(strArgs);
-		objSSH.Execute();
+		objSSH.execute();
 		assertEquals("auth_file", objOptions.auth_file.Value(), "test");
 		assertEquals("user", objOptions.user.Value(), "test");
 	}
@@ -165,7 +165,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 		String strArgs[] = new String[] { "-command_script_file", "R:/nobackup/junittests/testdata/SSH/hostname.sh", "-auth_method", "password", "-host", "wilma.sos", "-auth_file", "test",
 				"-user", "test", "-password", "12345" };
 		objOptions.CommandLineArgs(strArgs);
-		objSSH.Execute();
+		objSSH.execute();
 		assertEquals("auth_file", objOptions.auth_file.Value(), "test");
 		assertEquals("user", objOptions.user.Value(), "test");
 	}
@@ -178,7 +178,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 				"test", "-user", "test", "-password", "12345" };
 		objOptions.CommandLineArgs(strArgs);
 		objSSH.setJSJobUtilites(this);
-		objSSH.Execute();
+		objSSH.execute();
 
 		String strCmd[] = objSSH.getCommands2Execute();
 
@@ -200,7 +200,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 				"test", "-password", "12345" };
 		objOptions.CommandLineArgs(strArgs);
 		objSSH.setJSJobUtilites(this);
-		objSSH.Execute();
+		objSSH.execute();
 
 		String strCmd[] = objSSH.getCommands2Execute();
 
@@ -217,7 +217,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 		String strArgs[] = new String[] { "-command", "ls", "-auth_method", "password", "-host", "wilma.sos", "-port", "22", "-user", "test", "-password",
 				"12345", "-simulate_shell", "true", "-simulate_shell_prompt_trigger", "test@192:~>", "-simulate_shell_login_timeout", "100000" };
 		objOptions.CommandLineArgs(strArgs);
-		objSSH.Execute();
+		objSSH.execute();
 	}
 
 	@Override
@@ -235,23 +235,23 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 			//
 			/**
 			 * beides zulassen, % und $
-			 * mögliche Kombinationen sind:
+			 * mï¿½gliche Kombinationen sind:
 			 *
 			 * %SCHEDULER_PARAM_name%
 			 * %name%
 			 * ${SCHEDULER_PARAM_name}
 			 * $SCHEDULER_PARAM_name
-			 * §{SCHEDULER_PARAM_name}
-			 * §SCHEDULER_PARAM_name
+			 * ï¿½{SCHEDULER_PARAM_name}
+			 * ï¿½SCHEDULER_PARAM_name
 			 * ${name}
-			 * §{name}
+			 * ï¿½{name}
 			 * $name
-			 * §name
+			 * ï¿½name
 			 *
 			 * Managed-DB:
-			 *    §{...}
+			 *    ï¿½{...}
 			 */
-			String[] strPatterns = new String[] { "%%SCHEDULER_PARAM_%1$s%%", "%%%1$s%%", "(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?", "(\\$|§)\\{?%1$s\\}?" };
+			String[] strPatterns = new String[] { "%%SCHEDULER_PARAM_%1$s%%", "%%%1$s%%", "(\\$|ï¿½)\\{?SCHEDULER_PARAM_%1$s\\}?", "(\\$|ï¿½)\\{?%1$s\\}?" };
 			for (String strPattern : strPatterns) {
 				regExPattern = strPattern;
 				//				logger.debug("regExPattern = " + regExPattern);
