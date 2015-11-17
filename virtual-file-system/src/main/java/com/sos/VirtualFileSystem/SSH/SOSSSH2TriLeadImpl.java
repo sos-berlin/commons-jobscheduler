@@ -78,7 +78,8 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 	final private String	strEndOfLine	= System.getProperty("line.separator");
 
 	protected Msg			objMsg			= new Msg(new BundleBaseName(this.getClass().getAnnotation(I18NResourceBundle.class).baseName()));
-
+	private boolean simulateShell = false;
+	
 	public SOSSSH2TriLeadImpl() {
 		//
 	}
@@ -1209,4 +1210,14 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+    @Override
+    public boolean isSimulateShell() {
+        return this.simulateShell;
+    }
+
+    @Override
+    public void setSimulateShell(boolean simulateShell) {
+        this.simulateShell = simulateShell;
+    }
 }

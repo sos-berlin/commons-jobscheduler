@@ -96,6 +96,8 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
 
 	private final char[]					authenticationFile		= null;
 
+	private boolean simulateShell = false;
+	
 	/**
 	 *
 	 * \brief SOSVfsFtp
@@ -2108,4 +2110,14 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
 			}
 		}
 	}
+
+    @Override
+    public boolean isSimulateShell() {
+        return this.simulateShell;
+    }
+
+    @Override
+    public void setSimulateShell(boolean simulateShell) {
+        this.simulateShell = simulateShell;
+    }
 }

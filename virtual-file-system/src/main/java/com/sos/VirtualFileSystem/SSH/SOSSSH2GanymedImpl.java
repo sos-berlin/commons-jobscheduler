@@ -122,6 +122,8 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
 	private String						strExitSignal				= null;
 
 	private Vector<String>				vecFilesToDelete		= new Vector<String>();
+	
+	private boolean simulateShell = false;
 
 	private Vector<String> getFilesToDelete() {
 
@@ -1157,6 +1159,16 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
 		// TODO Auto-generated method stub
 		
 	}
+
+    @Override
+    public boolean isSimulateShell() {
+        return this.simulateShell;
+    }
+
+    @Override
+    public void setSimulateShell(boolean simulateShell) {
+        this.simulateShell = simulateShell;
+    }
 
 
 }

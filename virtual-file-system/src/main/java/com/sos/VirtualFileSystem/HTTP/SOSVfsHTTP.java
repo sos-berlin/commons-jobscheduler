@@ -62,7 +62,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 	private int				proxyPort		= 0;
 	private String			proxyUser		= null;
 	private String			proxyPassword	= null;
-
+	private boolean simulateShell = false;
 	
 	/**
 	 *
@@ -713,4 +713,13 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
     }
 	
 
+    @Override
+    public boolean isSimulateShell() {
+        return this.simulateShell;
+    }
+
+    @Override
+    public void setSimulateShell(boolean simulateShell) {
+        this.simulateShell = simulateShell;
+    }
 }
