@@ -60,7 +60,7 @@ public class SOSSSHJob2Main {
 			SOSSSHJobOptions objO = objM.Options();
 			
 			objO.CommandLineArgs(pstrArgs);
-			objM.Execute();
+			objM.execute();
 		}
 		catch (Exception e) {
 			System.out.println(conMethodName + ": " + "Error occured ..." + e.getMessage()); 

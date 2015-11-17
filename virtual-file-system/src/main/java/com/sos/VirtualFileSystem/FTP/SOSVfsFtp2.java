@@ -39,6 +39,7 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
 
 	@SuppressWarnings("unused")
 	private final ISOSAuthenticationOptions	objAO	= null;
+	private boolean simulateShell = false;
 
 	@Deprecated
 	/**
@@ -863,4 +864,14 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::write";
 	}
+
+    @Override
+    public boolean isSimulateShell() {
+        return this.simulateShell;
+    }
+
+    @Override
+    public void setSimulateShell(boolean simulateShell) {
+        this.simulateShell = simulateShell;
+    }
 }

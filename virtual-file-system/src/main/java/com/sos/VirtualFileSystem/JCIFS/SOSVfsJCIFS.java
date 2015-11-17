@@ -48,7 +48,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 	private boolean						isConnected		= false;
 	private String						domain			= null;
 	private String					    currentDirectory = "";
-
+	private boolean simulateShell = false;
 	/**
 	 *
 	 * \brief SOSVfsJCIFS
@@ -922,5 +922,15 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     @Override
     public SOSFileEntries getSOSFileEntries() {
         return sosFileEntries;
+    }
+
+    @Override
+    public boolean isSimulateShell() {
+        return this.simulateShell;
+    }
+
+    @Override
+    public void setSimulateShell(boolean simulateShell) {
+        this.simulateShell = simulateShell;
     }
 }

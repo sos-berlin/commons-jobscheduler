@@ -60,11 +60,11 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
   } 
 
   @Override
-  public SOSSSHJob2 Execute() throws Exception {
+  public SOSSSHJob2 execute() throws Exception {
     vfsHandler.setJSJobUtilites(objJSJobUtilities);
     try {
       if (isConnected == false) {
-        this.Connect();
+        this.connect();
       }
       add2Files2Delete(getTempPidFileName());
       try {
@@ -96,10 +96,10 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
             }
           }
         }
-        CheckStdOut();
-        CheckStdErr();
-        CheckExitCode();
-        ChangeExitSignal();
+        checkStdOut();
+        checkStdErr();
+        checkExitCode();
+        changeExitSignal();
       } catch (Exception e) {
         if(objOptions.raise_exception_on_error.value()){
           if(objOptions.ignore_error.value()){
@@ -153,14 +153,14 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
     }
     finally {
       if (keepConnected == false) {
-        DisConnect();
+        disconnect();
       }
     }
     return this;
   }
 
   @Override
-  public void DisConnect() {
+  public void disconnect() {
     if (isConnected == true) {
       try {
         vfsHandler.CloseConnection();
@@ -181,7 +181,7 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
   }
 
   @Override
-  public SOSSSHJob2 Connect() {
+  public SOSSSHJob2 connect() {
     getVFS();
     Options().CheckMandatory();
 

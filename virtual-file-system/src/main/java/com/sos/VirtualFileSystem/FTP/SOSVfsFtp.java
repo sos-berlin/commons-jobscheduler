@@ -44,6 +44,7 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 
 	private FTPClient		objFTPClient	= null;
 	private 			FTPFile[] objFTPFileList = null;
+	private boolean simulateShell = false;
 
 	@SuppressWarnings("unused")
 	private final ISOSAuthenticationOptions	objAO	= null;
@@ -1034,4 +1035,14 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 		@SuppressWarnings("unused")
 		final String conMethodName = conClassName + "::write";
 	}
+
+    @Override
+    public boolean isSimulateShell() {
+        return this.simulateShell;
+    }
+
+    @Override
+    public void setSimulateShell(boolean simulateShell) {
+        this.simulateShell = simulateShell;
+    }
 }

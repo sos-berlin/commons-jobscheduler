@@ -48,6 +48,8 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
 	private File				objWorkingDirectory	= null;
 
 	private cmdShell	objCmdShell	= null;
+	
+	private boolean simulateShell = false;
 
 	public SOSVfsLocal() {
 	}
@@ -731,4 +733,14 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
 	@Override
 	public void reconnect(SOSConnection2OptionsAlternate options) {
 	}
+
+    @Override
+    public boolean isSimulateShell() {
+        return this.simulateShell;
+    }
+
+    @Override
+    public void setSimulateShell(boolean simulateShell) {
+        this.simulateShell = simulateShell;
+    }
 }

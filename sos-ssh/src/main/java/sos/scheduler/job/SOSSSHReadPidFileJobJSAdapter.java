@@ -40,7 +40,7 @@ public class SOSSSHReadPidFileJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
       options.setAllOptions(options.DeletePrefix(hsmParameters1, "ssh_"));
       sshJob.setJSJobUtilites(this);
       options.CheckMandatory();
-      sshJob.Execute();
+      sshJob.execute();
     } catch (Exception e) {
       if(options.raise_exception_on_error.value()){
         if(options.ignore_error.value()){
