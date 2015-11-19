@@ -585,7 +585,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 				throw new JobSchedulerException(SOSVfs_E_190.params("sshSession"));
 			}
 			channelExec = (ChannelExec) sshSession.openChannel("exec");
-			logger.debug("****IMPL CLASS**** SIMULATE_SHELL_IS: " + isSimulateShell());
 			channelExec.setPty(isSimulateShell());
 			//JITL-157
 			cmd = cmd.replaceAll("\0", "\\\\\\\\").replaceAll("\"", "\\\"");
