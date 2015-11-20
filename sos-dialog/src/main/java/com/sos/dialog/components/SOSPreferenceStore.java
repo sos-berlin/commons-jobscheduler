@@ -63,6 +63,11 @@ public class SOSPreferenceStore implements ISOSPreferenceStore {
 		strKey = className;
 	}
 
+	public SOSPreferenceStore(String instance) {
+		className = instance;
+		strKey = instance;
+	}	
+	
 	public void setKey(final String pstrKey) {
 		strKey = gstrApplication + "/" + className + "/" + pstrKey;
 	}
