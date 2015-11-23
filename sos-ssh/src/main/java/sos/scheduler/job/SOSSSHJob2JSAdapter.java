@@ -65,7 +65,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
             objO = objR.Options();
             spooler_log.debug9("uses JSch implementation of SSH");
         }
-        objO.CurrentNodeName(this.getCurrentNodeName(false));
+        objO.CurrentNodeName(this.getCurrentNodeName(true));
         HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(getJobOrOrderParameters());
         if (!useTrilead) {
             if(!"false".equalsIgnoreCase(hsmParameters1.get("create_environment_variables"))){
