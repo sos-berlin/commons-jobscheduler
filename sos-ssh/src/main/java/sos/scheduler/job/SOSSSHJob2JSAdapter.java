@@ -65,7 +65,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
             objO = objR.getOptions();
             spooler_log.debug9("uses JSch implementation of SSH");
         }
-        objO.CurrentNodeName(this.getCurrentNodeName());
+        objO.CurrentNodeName(this.getCurrentNodeName(false));
         HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(getJobOrOrderParameters());
         if (!useTrilead) {
             if(!"false".equalsIgnoreCase(hsmParameters1.get("create_environment_variables"))){
@@ -157,7 +157,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
 
     private Map<String, String> prefixSchedulerEnvVars(Map<String, String> allEnvVars) {
         Map<String, String> envVars = new HashMap<String, String>();
-        String currentNodeName = getCurrentNodeName();
+        String currentNodeName = getCurrentNodeName(false);
         for (String key : allEnvVars.keySet()) {
             if (!"password".equalsIgnoreCase(key)) {
                 if (!key.startsWith(PARAM_SCHEDULER_VARIABLE_STARTS_WITH)) {
