@@ -4,8 +4,7 @@ import org.apache.log4j.Logger;
 
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
-/**
-* \class JSCmdLockRemove 
+  
 * 
 * \brief JSCmdLockRemove - 
 * 
@@ -32,10 +31,7 @@ import com.sos.scheduler.model.SchedulerObjectFactory;
 * Created on 08.02.2011 14:37:19
  */
 
-/**
- * @author oh
- *
- */
+ 
 public class JSCmdLockRemove extends LockRemove {
 
 	@SuppressWarnings("unused")

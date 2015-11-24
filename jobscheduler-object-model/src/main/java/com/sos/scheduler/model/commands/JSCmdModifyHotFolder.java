@@ -4,8 +4,7 @@ import org.apache.log4j.Logger;
 
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
-/**
-* \class JSCmdModifyHotFolder 
+ 
 * 
 * \brief JSCmdModifyHotFolder - 
 * 
@@ -32,10 +31,7 @@ import com.sos.scheduler.model.SchedulerObjectFactory;
 * Created on 08.02.2011 14:38:22
  */
 
-/**
- * @author oh
- *
- */
+ 
 public class JSCmdModifyHotFolder extends ModifyHotFolder {
 
 	@SuppressWarnings("unused")
