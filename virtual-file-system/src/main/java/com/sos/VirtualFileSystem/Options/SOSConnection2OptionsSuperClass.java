@@ -17,7 +17,6 @@ import com.sos.JSHelper.Options.SOSOptionInFileName;
 import com.sos.JSHelper.Options.SOSOptionInteger;
 import com.sos.JSHelper.Options.SOSOptionJavaClassName;
 import com.sos.JSHelper.Options.SOSOptionKeyStoreType;
-import com.sos.JSHelper.Options.SOSOptionPassphrase;
 import com.sos.JSHelper.Options.SOSOptionPassword;
 import com.sos.JSHelper.Options.SOSOptionPlatform;
 import com.sos.JSHelper.Options.SOSOptionPortNumber;
@@ -1014,40 +1013,6 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 	 */
 	@Override public void setPassword(final SOSOptionPassword p_password) {
 		password = p_password;
-	}
-	/**
-	* \var passphrase : passphrase for UserID passphrase for a
-	*
-	passphrase for authentication at the SFTP server. For SSH/SFTP connections that make use of public/private key authentication the passphrase parameter is specified for the passphrase that optionally secures a private key.
-	*
-	*/
-	@JSOptionDefinition(
-						name = "passphrase",
-						description = "passphrase for UserID passphrase for a",
-						key = "passphrase",
-						type = "SOSOptionpassphrase",
-						mandatory = false)
-	public SOSOptionPassphrase	passphrase	= new SOSOptionPassphrase(this, conClassName + ".passphrase", // HashMap-Key
-													"passphrase for UserID passphrase for a", // Titel
-													"", // InitValue
-													"", // DefaultValue
-													false // isMandatory
-											);
-
-	/* (non-Javadoc)
-	 * @see com.sos.VirtualFileSystem.Options.ISOSDataProviderOptions#getpassphrase()
-	 */
-	@Override
-	public SOSOptionPassphrase getpassphrase() {
-		return passphrase;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.sos.VirtualFileSystem.Options.ISOSDataProviderOptions#setpassphrase(com.sos.JSHelper.Options.SOSOptionPassphrase)
-	 */
-	@Override
-	public void setpassphrase(final SOSOptionPassphrase p_passphrase) {
-		passphrase = p_passphrase;
 	}
 
 	public SOSConnection2OptionsSuperClass() {

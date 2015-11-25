@@ -877,15 +877,17 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 			SOSOptionInFileName authenticationFile = authenticationOptions.getAuth_file();
 			authenticationFile.CheckMandatory(true);
 			if (authenticationFile.IsNotEmpty()) {
-				secureChannel.addIdentity(authenticationFile.JSFile().getPath());
+			    if(authenticationOptions.getPassword().IsNotEmpty()){
+	                secureChannel.addIdentity(authenticationFile.JSFile().getPath(), authenticationOptions.getPassword().Value());
+			    } else {
+	                secureChannel.addIdentity(authenticationFile.JSFile().getPath());
+			    }
 			}
-		}
-		else {
+		} else {
 			if (authenticationOptions.getAuth_method().isPassword()) {
 				logger.debug(SOSVfs_D_165.params("userid", "password"));
 				sshSession.setPassword(password);
-			}
-			else {
+			} else {
 				throw new JobSchedulerException(SOSVfs_E_166.params(authenticationOptions.getAuth_method().Value()));
 			}
 		}
@@ -894,8 +896,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 			sshSession.setConfig("PreferredAuthentications", authenticationOptions.getAuth_method().Value());
 			sshSession.connect();
 			this.createSftpClient();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			throw new JobSchedulerException(HostID(e.getClass().getName() + " - " + e.getLocalizedMessage()), e);
 		}
 		reply = "OK";
