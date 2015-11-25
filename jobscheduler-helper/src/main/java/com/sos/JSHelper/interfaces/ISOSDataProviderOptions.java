@@ -6,7 +6,6 @@ import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Options.SOSOptionHostName;
 import com.sos.JSHelper.Options.SOSOptionInFileName;
 import com.sos.JSHelper.Options.SOSOptionInteger;
-import com.sos.JSHelper.Options.SOSOptionPassphrase;
 import com.sos.JSHelper.Options.SOSOptionPassword;
 import com.sos.JSHelper.Options.SOSOptionPortNumber;
 import com.sos.JSHelper.Options.SOSOptionRegExp;
@@ -297,28 +296,6 @@ public interface ISOSDataProviderOptions {
 	 * @param p_password
 	 */
 	public abstract void setPassword(SOSOptionPassword p_password);
-
-	/**
-	 * \brief getpassphrase
-	 *
-	 * \details
-	 *
-	 * \return
-	 *
-	 * @return
-	 */
-	public abstract SOSOptionPassphrase getpassphrase();
-
-	/**
-	 * \brief setpassphrase
-	 *
-	 * \details
-	 *
-	 * \return
-	 *
-	 * @param p_passphrase
-	 */
-	public abstract void setpassphrase(SOSOptionPassphrase p_passphrase);
 
 	/**
 	 * \brief setAllOptions - übernimmt die OptionenWerte aus der HashMap
