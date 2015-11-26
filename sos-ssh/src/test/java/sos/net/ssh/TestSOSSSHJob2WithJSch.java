@@ -68,7 +68,7 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
 	    logger.info("****testExecutePublicKeyWithPasshraseLinux started****");
 	    String strArgs[] = new String[] { 
 	        "-command", "echo ****testExecutePublicKeyWithPasshraseLinux successfully processed!****", 
-	        "-auth_file", "C:\\sp\\testing\\ssh_passphrase_test\\id_rsapp"
+	        "-auth_file", "C:\\sp\\testing\\ssh_passphrase_test\\id_rsapp",
 	        "-auth_method", "publickey", 
 	        "-host", "homer.sos",
 	        "-port", "22",
