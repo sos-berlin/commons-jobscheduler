@@ -39,7 +39,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element ref="{}order"/>
  *         &lt;element ref="{}state"/>
  *         &lt;element ref="{}subsystems"/>
- *       &lt;/sequence>
+ *         &lt;element ref="{}job_chain"/> *       &lt;/sequence>
  *       &lt;attribute name="time" use="required" type="{http://www.w3.org/2001/XMLSchema}anySimpleType" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -58,8 +58,8 @@ import javax.xml.bind.annotation.XmlType;
     "ok",
     "order",
     "state",
-    "subsystems"
-})
+    "subsystems",
+    "jobChain"})
 @XmlRootElement(name = "answer")
 @Generated(value = "com.sun.tools.xjc.Driver", date = "2014-01-28T10:30:50+01:00", comments = "JAXB RI v2.2.3-hudson-jaxb-ri-2.2.3-3-")
 public class Answer implements Serializable {
@@ -95,6 +95,8 @@ public class Answer implements Serializable {
     @XmlElement(required = true)
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2014-01-28T10:30:50+01:00", comments = "JAXB RI v2.2.3-hudson-jaxb-ri-2.2.3-3-")
     protected Subsystems subsystems;
+    @XmlElement(name = "job_chain", required = true)
+    protected JobChain jobChain;
     @XmlAttribute(name = "time", required = true)
     @XmlSchemaType(name = "anySimpleType")
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2014-01-28T10:30:50+01:00", comments = "JAXB RI v2.2.3-hudson-jaxb-ri-2.2.3-3-")
@@ -334,6 +336,30 @@ public class Answer implements Serializable {
         this.subsystems = value;
     }
 
+    /**
+     * 
+     * @return
+     *     possible object is
+     *     {@link JobChain }
+     *     
+     */
+    public JobChain getJobChain() {
+        return jobChain;
+    }
+
+    /**
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link JobChain }
+     *     
+     */
+    public void setJobChain(JobChain value) {
+        this.jobChain = value;
+    }
+    
+    
+    
     /**
      * Gets the value of the time property.
      * 

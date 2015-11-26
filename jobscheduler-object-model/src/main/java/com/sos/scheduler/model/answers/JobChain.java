@@ -26,9 +26,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * <p>Java class for anonymous complex type.
+ * <p>Java-Klasse für anonymous complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
  * 
  * <pre>
  * &lt;complexType>
@@ -38,6 +38,38 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *         &lt;element ref="{}file_based"/>
  *         &lt;element ref="{}file_order_source" minOccurs="0"/>
  *         &lt;element ref="{}job_chain_node" maxOccurs="unbounded"/>
+ *         &lt;element name="order_history" minOccurs="0">
+ *           &lt;complexType>
+ *             &lt;complexContent>
+ *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                 &lt;sequence>
+ *                   &lt;element name="order">
+ *                     &lt;complexType>
+ *                       &lt;complexContent>
+ *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                           &lt;sequence>
+ *                             &lt;element ref="{}file_based"/>
+ *                           &lt;/sequence>
+ *                           &lt;attribute name="created" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *                           &lt;attribute name="end_time" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *                           &lt;attribute name="history_id" type="{http://www.w3.org/2001/XMLSchema}integer" />
+ *                           &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *                           &lt;attribute name="initial_state" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *                           &lt;attribute name="job_chain" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *                           &lt;attribute name="order" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *                           &lt;attribute name="path" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *                           &lt;attribute name="priority" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *                           &lt;attribute name="start_time" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *                           &lt;attribute name="state" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *                         &lt;/restriction>
+ *                       &lt;/complexContent>
+ *                     &lt;/complexType>
+ *                   &lt;/element>
+ *                 &lt;/sequence>
+ *               &lt;/restriction>
+ *             &lt;/complexContent>
+ *           &lt;/complexType>
+ *         &lt;/element>
  *       &lt;/sequence>
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}NCName" />
  *       &lt;attribute name="orders" use="required" type="{http://www.w3.org/2001/XMLSchema}integer" />
@@ -53,12 +85,13 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * 
  * 
  */
+ 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
     "fileBased",
     "fileOrderSource",
-    "jobChainNode"
-})
+    "jobChainNode",
+    "orderHistory"})
 @XmlRootElement(name = "job_chain")
 @Generated(value = "com.sun.tools.xjc.Driver", date = "2011-01-20T04:00:28+01:00", comments = "JAXB RI v2.2.3-hudson-jaxb-ri-2.2.3-3-")
 public class JobChain implements Serializable {
@@ -76,6 +109,9 @@ public class JobChain implements Serializable {
     @XmlElement(name = "job_chain_node", required = true)
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2011-01-20T04:00:28+01:00", comments = "JAXB RI v2.2.3-hudson-jaxb-ri-2.2.3-3-")
     protected List<JobChainNode> jobChainNode;
+    @XmlElement(name = "order_history")
+    protected JobChain.OrderHistory orderHistory;
+
     @XmlAttribute(name = "name", required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlSchemaType(name = "NCName")
@@ -188,6 +224,29 @@ public class JobChain implements Serializable {
         return this.jobChainNode;
     }
 
+    /**
+     * 
+     * @return
+     *     possible object is
+     *     {@link JobChain.OrderHistory }
+     *     
+     */
+    public JobChain.OrderHistory getOrderHistory() {
+        return orderHistory;
+    }
+
+    /**
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link JobChain.OrderHistory }
+     *     
+     */
+    public void setOrderHistory(JobChain.OrderHistory value) {
+        this.orderHistory = value;
+    }
+    
+    
     /**
      * Gets the value of the name property.
      * 
@@ -368,6 +427,413 @@ public class JobChain implements Serializable {
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2011-01-20T04:00:28+01:00", comments = "JAXB RI v2.2.3-hudson-jaxb-ri-2.2.3-3-")
     public void setTitle(String value) {
         this.title = value;
+    }
+
+
+    /**
+     * <p>Java-Klasse für anonymous complex type.
+     * 
+     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * 
+     * <pre>
+     * &lt;complexType>
+     *   &lt;complexContent>
+     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *       &lt;sequence>
+     *         &lt;element name="order">
+     *           &lt;complexType>
+     *             &lt;complexContent>
+     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                 &lt;sequence>
+     *                   &lt;element ref="{}file_based"/>
+     *                 &lt;/sequence>
+     *                 &lt;attribute name="created" type="{http://www.w3.org/2001/XMLSchema}string" />
+     *                 &lt;attribute name="end_time" type="{http://www.w3.org/2001/XMLSchema}string" />
+     *                 &lt;attribute name="history_id" type="{http://www.w3.org/2001/XMLSchema}integer" />
+     *                 &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}string" />
+     *                 &lt;attribute name="initial_state" type="{http://www.w3.org/2001/XMLSchema}string" />
+     *                 &lt;attribute name="job_chain" type="{http://www.w3.org/2001/XMLSchema}string" />
+     *                 &lt;attribute name="order" type="{http://www.w3.org/2001/XMLSchema}string" />
+     *                 &lt;attribute name="path" type="{http://www.w3.org/2001/XMLSchema}string" />
+     *                 &lt;attribute name="priority" type="{http://www.w3.org/2001/XMLSchema}string" />
+     *                 &lt;attribute name="start_time" type="{http://www.w3.org/2001/XMLSchema}string" />
+     *                 &lt;attribute name="state" type="{http://www.w3.org/2001/XMLSchema}string" />
+     *               &lt;/restriction>
+     *             &lt;/complexContent>
+     *           &lt;/complexType>
+     *         &lt;/element>
+     *       &lt;/sequence>
+     *     &lt;/restriction>
+     *   &lt;/complexContent>
+     * &lt;/complexType>
+     * </pre>
+     * 
+     * 
+     */
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "", propOrder = {
+        "order"
+    })
+    public static class OrderHistory {
+
+
+        protected List<JobChain.OrderHistory.Order> order;
+
+        /**
+         * Gets the value of the order property.
+         * 
+         * <p>
+         * This accessor method returns a reference to the live list,
+         * not a snapshot. Therefore any modification you make to the
+         * returned list will be present inside the JAXB object.
+         * This is why there is not a <CODE>set</CODE> method for the order property.
+         * 
+         * <p>
+         * For example, to add a new item, do as follows:
+         * <pre>
+         *    getOrder().add(newItem);
+         * </pre>
+         * 
+         * 
+         * <p>
+         * Objects of the following type(s) are allowed in the list
+         * {@link JobChain.OrderHistory.Order }
+         * 
+         * 
+         */
+        public List<JobChain.OrderHistory.Order> getOrder() {
+            if (order == null) {
+                order = new ArrayList<JobChain.OrderHistory.Order>();
+            }
+            return this.order;
+        }
+
+
+        /**
+         * 
+         * 
+         * <pre>
+         * &lt;complexType>
+         *   &lt;complexContent>
+         *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *       &lt;sequence>
+         *         &lt;element ref="{}file_based"/>
+         *       &lt;/sequence>
+         *       &lt;attribute name="created" type="{http://www.w3.org/2001/XMLSchema}string" />
+         *       &lt;attribute name="end_time" type="{http://www.w3.org/2001/XMLSchema}string" />
+         *       &lt;attribute name="history_id" type="{http://www.w3.org/2001/XMLSchema}integer" />
+         *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}string" />
+         *       &lt;attribute name="initial_state" type="{http://www.w3.org/2001/XMLSchema}string" />
+         *       &lt;attribute name="job_chain" type="{http://www.w3.org/2001/XMLSchema}string" />
+         *       &lt;attribute name="order" type="{http://www.w3.org/2001/XMLSchema}string" />
+         *       &lt;attribute name="path" type="{http://www.w3.org/2001/XMLSchema}string" />
+         *       &lt;attribute name="priority" type="{http://www.w3.org/2001/XMLSchema}string" />
+         *       &lt;attribute name="start_time" type="{http://www.w3.org/2001/XMLSchema}string" />
+         *       &lt;attribute name="state" type="{http://www.w3.org/2001/XMLSchema}string" />
+         *     &lt;/restriction>
+         *   &lt;/complexContent>
+         * &lt;/complexType>
+         * </pre>
+         * 
+         * 
+         */
+        @XmlAccessorType(XmlAccessType.FIELD)
+        @XmlType(name = "", propOrder = {
+            "fileBased"
+        })
+        public static class Order {
+
+            @XmlElement(name = "file_based", required = true)
+            protected FileBased fileBased;
+            @XmlAttribute(name = "created")
+            protected String created;
+            @XmlAttribute(name = "end_time")
+            protected String endTime;
+            @XmlAttribute(name = "history_id")
+            protected BigInteger historyId;
+            @XmlAttribute(name = "id")
+            protected String id;
+            @XmlAttribute(name = "initial_state")
+            protected String initialState;
+            @XmlAttribute(name = "job_chain")
+            protected String jobChain;
+            @XmlAttribute(name = "order")
+            protected String order;
+            @XmlAttribute(name = "path")
+            protected String path;
+            @XmlAttribute(name = "priority")
+            protected String priority;
+            @XmlAttribute(name = "start_time")
+            protected String startTime;
+            @XmlAttribute(name = "state")
+            protected String state;
+
+            /**
+             * 
+             * @return
+             *     possible object is
+             *     {@link FileBased }
+             *     
+             */
+            public FileBased getFileBased() {
+                return fileBased;
+            }
+
+            /**
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link FileBased }
+             *     
+             */
+            public void setFileBased(FileBased value) {
+                this.fileBased = value;
+            }
+
+            /**
+             * 
+             * @return
+             *     possible object is
+             *     {@link String }
+             *     
+             */
+            public String getCreated() {
+                return created;
+            }
+
+            /**
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link String }
+             *     
+             */
+            public void setCreated(String value) {
+                this.created = value;
+            }
+
+            /**
+             * 
+             * @return
+             *     possible object is
+             *     {@link String }
+             *     
+             */
+            public String getEndTime() {
+                return endTime;
+            }
+
+            /**
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link String }
+             *     
+             */
+            public void setEndTime(String value) {
+                this.endTime = value;
+            }
+
+            /**
+             * 
+             * @return
+             *     possible object is
+             *     {@link BigInteger }
+             *     
+             */
+            public BigInteger getHistoryId() {
+                return historyId;
+            }
+
+            /**
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link BigInteger }
+             *     
+             */
+            public void setHistoryId(BigInteger value) {
+                this.historyId = value;
+            }
+
+            /**
+             * 
+             * @return
+             *     possible object is
+             *     {@link String }
+             *     
+             */
+            public String getId() {
+                return id;
+            }
+
+            /**
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link String }
+             *     
+             */
+            public void setId(String value) {
+                this.id = value;
+            }
+
+            /**
+             * 
+             * @return
+             *     possible object is
+             *     {@link String }
+             *     
+             */
+            public String getInitialState() {
+                return initialState;
+            }
+
+            /**
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link String }
+             *     
+             */
+            public void setInitialState(String value) {
+                this.initialState = value;
+            }
+
+            /**
+             * 
+             * @return
+             *     possible object is
+             *     {@link String }
+             *     
+             */
+            public String getJobChain() {
+                return jobChain;
+            }
+
+            /**
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link String }
+             *     
+             */
+            public void setJobChain(String value) {
+                this.jobChain = value;
+            }
+
+            /**
+             * 
+             * @return
+             *     possible object is
+             *     {@link String }
+             *     
+             */
+            public String getOrder() {
+                return order;
+            }
+
+            /**
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link String }
+             *     
+             */
+            public void setOrder(String value) {
+                this.order = value;
+            }
+
+            /**
+             * 
+             * @return
+             *     possible object is
+             *     {@link String }
+             *     
+             */
+            public String getPath() {
+                return path;
+            }
+
+            /**
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link String }
+             *     
+             */
+            public void setPath(String value) {
+                this.path = value;
+            }
+
+            /**
+             * 
+             * @return
+             *     possible object is
+             *     {@link String }
+             *     
+             */
+            public String getPriority() {
+                return priority;
+            }
+
+            /**
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link String }
+             *     
+             */
+            public void setPriority(String value) {
+                this.priority = value;
+            }
+
+            /**
+             * 
+             * @return
+             *     possible object is
+             *     {@link String }
+             *     
+             */
+            public String getStartTime() {
+                return startTime;
+            }
+
+            /**
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link String }
+             *     
+             */
+            public void setStartTime(String value) {
+                this.startTime = value;
+            }
+
+            /**
+             * 
+             * @return
+             *     possible object is
+             *     {@link String }
+             *     
+             */
+            public String getState() {
+                return state;
+            }
+
+            /**
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link String }
+             *     
+             */
+            public void setState(String value) {
+                this.state = value;
+            }
+
+        }
+
     }
 
 }
