@@ -38,10 +38,6 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
 	private Map allParams = null;
 	private Map<String, String> returnValues = new HashMap<String, String>();
 	private Map schedulerEnvVars;
-    private static final String STD_ERR_OUTPUT = "std_err_output";
-    private static final String STD_OUT_OUTPUT = "std_out_output";
-    private static final String EXIT_CODE = "exit_code";
-    private static final String EXIT_SIGNAL = "exit_signal";
 
 	@Override
 	public ISOSVFSHandler getVFSSSH2Handler() {
@@ -88,10 +84,6 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
 	    clear();
 		boolean flgScriptFileCreated = false;
 		vfsHandler.setJSJobUtilites(objJSJobUtilities);
-        objJSJobUtilities.setJSParam(EXIT_SIGNAL, "");
-        objJSJobUtilities.setJSParam(EXIT_CODE, "");
-        objJSJobUtilities.setJSParam(STD_ERR_OUTPUT, "");
-        objJSJobUtilities.setJSParam(STD_OUT_OUTPUT, "");
 		String executedCommand = "";
 		String completeCommand = "";
 		try {
@@ -320,7 +312,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
 
 	public SOSConnection2OptionsAlternate getAlternateOptions(SOSSSHJobOptions options) {
 		SOSConnection2OptionsAlternate alternateOptions = new SOSConnection2OptionsAlternate();
-		alternateOptions.setStrict_HostKey_Checking("no");
+		alternateOptions.setstrict_hostKey_checking("no");
 		alternateOptions.host.Value(options.getHost().Value());
 		alternateOptions.port.value(options.getPort().value());
 		alternateOptions.user.Value(options.getUser().Value());

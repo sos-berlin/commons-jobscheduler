@@ -29,6 +29,10 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
     private static final String PARAM_SCHEDULER_VARIABLE_PREFIX_MASTER = "SCHEDULER_MASTER_";
     private static final String PARAM_SCHEDULER_VARIABLE_STARTS_WITH = "SCHEDULER_";
     private static final String PARAM_CLEANUP_JOBCHAIN = "cleanupJobchain";
+    private static final String STD_ERR_OUTPUT = "std_err_output";
+    private static final String STD_OUT_OUTPUT = "std_out_output";
+    private static final String EXIT_CODE = "exit_code";
+    private static final String EXIT_SIGNAL = "exit_signal";
     private boolean useTrilead = true;
     private String pidFileName;
     private String envVarNamePrefix;
@@ -46,6 +50,16 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
     }
 
     private void doProcessing() throws Exception {
+        if(this.isOrderJob()){
+            spooler_task.order().params().set_var(EXIT_SIGNAL, "");
+            spooler_task.order().params().set_var(EXIT_CODE, "");
+            spooler_task.order().params().set_var(STD_ERR_OUTPUT, "");
+            spooler_task.order().params().set_var(STD_OUT_OUTPUT, "");
+        }
+        spooler_task.params().set_var(EXIT_SIGNAL, "");
+        spooler_task.params().set_var(EXIT_CODE, "");
+        spooler_task.params().set_var(STD_ERR_OUTPUT, "");
+        spooler_task.params().set_var(STD_OUT_OUTPUT, "");
         SOSSSHJob2 objR;
         String useJSch = spooler.var(PARAM_JITL_SSH_USE_JSCH_IMPL);
         envVarNamePrefix = spooler.var(PARAM_SCHEDULER_VARIABLE_NAME_PREFIX);
