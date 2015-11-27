@@ -148,9 +148,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
         while (t.hasMoreTokens()) {
             String envname = t.nextToken();
             String envvalue = env.value(envname);
-            if (envname != null && envname.startsWith("SCHEDULER_")) {
-                envvars.put(PARAM_SCHEDULER_VARIABLE_PREFIX_MASTER + envname.toUpperCase(), envvalue);
-            }
+            envvars.put(PARAM_SCHEDULER_VARIABLE_PREFIX_MASTER + envname, envvalue);
         }
         return envvars;
     }
@@ -159,28 +157,32 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
         Map<String, String> envVars = new HashMap<String, String>();
         String currentNodeName = getCurrentNodeName(false);
         for (String key : allEnvVars.keySet()) {
+            String value = allEnvVars.get(key);
+            if(value.contains("\"")){
+                value = value.replaceAll("\"", "\\\"");
+            }
             if (!"password".equalsIgnoreCase(key)) {
                 if (!key.startsWith(PARAM_SCHEDULER_VARIABLE_STARTS_WITH)) {
                     if (!PARAM_SCHEDULER_VARIABLE_PREFIX_NONE_VALUE.equalsIgnoreCase(envVarNamePrefix)) {
                         if (isActiveNodeParam(key, currentNodeName)) {
                             String parameterName = key.substring(currentNodeName.length() + 1);
                             if (!"password".equalsIgnoreCase(parameterName)) {
-                                envVars.put(envVarNamePrefix + parameterName, allEnvVars.get(key));
+                                envVars.put(envVarNamePrefix + parameterName, value);
                             }
                             spooler_log.debug9("node name [" + currentNodeName + "] stripped from parameter name!");
                         } else if (Pattern.compile("\\W").matcher(key).find()) { 
                             spooler_log.debug6("Parameter [" + key + "] not exported! Belongs to different node OR has special characters!");
                         } else {
-                            envVars.put(envVarNamePrefix + key.toUpperCase(), allEnvVars.get(key));
+                            envVars.put(envVarNamePrefix + key, value);
                         }
                     } else {
-                        envVars.put(key.toUpperCase(), allEnvVars.get(key));
+                        envVars.put(key, value);
                     }
                 } else if (key.startsWith(PARAM_SCHEDULER_VARIABLE_STARTS_WITH) && !key.startsWith(PARAM_SCHEDULER_VARIABLE_PREFIX_DEFAULT_VALUE)
                         && !key.startsWith(PARAM_SCHEDULER_VARIABLE_PREFIX_MASTER)) {
-                    envVars.put(PARAM_SCHEDULER_VARIABLE_PREFIX_MASTER + key.toUpperCase(), allEnvVars.get(key));
+                    envVars.put(PARAM_SCHEDULER_VARIABLE_PREFIX_MASTER + key, value);
                 } else {
-                    envVars.put(key.toUpperCase(), allEnvVars.get(key));
+                    envVars.put(key, value);
                 }
             }
         }

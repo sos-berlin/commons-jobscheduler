@@ -246,7 +246,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
 		for(Object key : schedulerEnvVars.keySet()){
 			if (!"SCHEDULER_PARAM_JOBSCHEDULEREVENTJOB.EVENTS".equals(key.toString())) {
 				String envVarValue = schedulerEnvVars.get(key).toString();
-				String keyVal = key.toString().replaceAll("\\.", "_");
+                String keyVal = key.toString().replaceAll("\\.|\\(|\\)", "_");
 				if(flgIsWindowsShell){
 					envVarValue = envVarValue.replaceAll("\"", "\\\"");
 				}else{
@@ -254,7 +254,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
 					envVarValue = "\"" + envVarValue.replaceAll("\"", "\\\"") + "\"";
 				}
 				if(!"SCHEDULER_PARAM_std_out_output".equalsIgnoreCase(keyVal) && !"SCHEDULER_PARAM_std_err_output".equalsIgnoreCase(keyVal)){
-	                sb.append(String.format(objOptions.getPreCommand().Value(), keyVal, envVarValue));
+                    sb.append(String.format(objOptions.getPreCommand().Value(), keyVal.toUpperCase(), envVarValue));
 	                sb.append(objOptions.command_delimiter.Value());
 				}
 			}
