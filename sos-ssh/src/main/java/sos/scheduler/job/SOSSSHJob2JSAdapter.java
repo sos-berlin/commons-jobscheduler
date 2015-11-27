@@ -149,11 +149,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
             String envname = t.nextToken();
             String envvalue = env.value(envname);
             if (envname != null && envname.startsWith("SCHEDULER_")) {
-                if (win) {
-                    envvars.put(PARAM_SCHEDULER_VARIABLE_PREFIX_MASTER + envname.toUpperCase(), envvalue);
-                } else {
-                    envvars.put(PARAM_SCHEDULER_VARIABLE_PREFIX_MASTER + envname, envvalue);
-                }
+                envvars.put(PARAM_SCHEDULER_VARIABLE_PREFIX_MASTER + envname.toUpperCase(), envvalue);
             }
         }
         return envvars;
@@ -175,16 +171,16 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
                         } else if (Pattern.compile("\\W").matcher(key).find()) { 
                             spooler_log.debug6("Parameter [" + key + "] not exported! Belongs to different node OR has special characters!");
                         } else {
-                            envVars.put(envVarNamePrefix + key, allEnvVars.get(key));
+                            envVars.put(envVarNamePrefix + key.toUpperCase(), allEnvVars.get(key));
                         }
                     } else {
-                        envVars.put(key, allEnvVars.get(key));
+                        envVars.put(key.toUpperCase(), allEnvVars.get(key));
                     }
                 } else if (key.startsWith(PARAM_SCHEDULER_VARIABLE_STARTS_WITH) && !key.startsWith(PARAM_SCHEDULER_VARIABLE_PREFIX_DEFAULT_VALUE)
                         && !key.startsWith(PARAM_SCHEDULER_VARIABLE_PREFIX_MASTER)) {
-                    envVars.put(PARAM_SCHEDULER_VARIABLE_PREFIX_MASTER + key, allEnvVars.get(key));
+                    envVars.put(PARAM_SCHEDULER_VARIABLE_PREFIX_MASTER + key.toUpperCase(), allEnvVars.get(key));
                 } else {
-                    envVars.put(key, allEnvVars.get(key));
+                    envVars.put(key.toUpperCase(), allEnvVars.get(key));
                 }
             }
         }
