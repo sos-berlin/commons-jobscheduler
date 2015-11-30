@@ -234,11 +234,10 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             if (!"SCHEDULER_PARAM_JOBSCHEDULEREVENTJOB.EVENTS".equals(key.toString())) {
                 String envVarValue = schedulerEnvVars.get(key).toString();
                 String keyVal = key.toString().replaceAll("\\.|\\(|\\)", "_");
-                if (flgIsWindowsShell) {
-                    envVarValue = envVarValue.replaceAll("\"", "\\\"");
-                } else {
+                envVarValue = envVarValue.replaceAll("\"", "\\\"");
+                envVarValue = "'" + envVarValue + "'";
+				if(!flgIsWindowsShell){
                     envVarValue = envVarValue.replaceAll("\\\\", "\\\\\\\\");
-                    envVarValue = "\"" + envVarValue.replaceAll("\"", "\\\"") + "\"";
                 }
                 if (!"SCHEDULER_PARAM_std_out_output".equalsIgnoreCase(keyVal) && !"SCHEDULER_PARAM_std_err_output".equalsIgnoreCase(keyVal)) {
                     sb.append(String.format(objOptions.getPreCommand().Value(), keyVal.toUpperCase(), envVarValue));
