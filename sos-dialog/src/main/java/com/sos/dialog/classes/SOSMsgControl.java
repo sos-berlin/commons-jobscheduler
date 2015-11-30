@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 
+import com.sos.dialog.components.IntegerField;
 import com.sos.dialog.components.SOSDateTime;
 import com.sos.localization.SOSMsg;
 
@@ -40,8 +41,7 @@ public abstract class SOSMsgControl extends SOSMsg {
 
 	public Text Control(final Text pobjC) {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::Control";
-		// Text kommt im Normalfall nicht aus einer Propertie-Datei. Deswegen ergibt es keinen Sinn
-		//	pobjC.setText(label());
+		 
 		pobjC.setToolTipText(tooltip());
 		setKeyListener(pobjC);
 		pobjC.addFocusListener(new FocusAdapter() {
@@ -54,7 +54,23 @@ public abstract class SOSMsgControl extends SOSMsg {
 		});
 		return pobjC;
 	} // public Text Control
+	
+	public IntegerField integerField(final IntegerField pobjC) {
+		@SuppressWarnings("unused") final String conMethodName = conClassName + "::Control";
+		
+		pobjC.setToolTipText(tooltip());
+		setKeyListener(pobjC);
+		pobjC.addFocusListener(new FocusAdapter() {
+			@Override public void focusGained(final FocusEvent e) {
+				pobjC.selectAll();
+			}
 
+			@Override public void focusLost(final FocusEvent e) {
+			}
+		});
+		return pobjC;
+	} // public IntegerField Control
+	
 	public Label Control(final Label pobjC) {
 		@SuppressWarnings("unused") final String conMethodName = conClassName + "::Control";
 		pobjC.setText(label());
