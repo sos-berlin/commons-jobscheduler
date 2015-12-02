@@ -11,19 +11,7 @@ import org.junit.*;
 
 import java.io.File;
 
-/**
- * \class 		JobSchedulerXslTransformationJUnitTest - JUnit-Test for "JobSchedulerXslTransform"
- *
- * \brief MainClass to launch JobSchedulerXslTransform as an executable command-line program
- *
-
- *
- * see \see J:\E\java\development\com.sos.scheduler\src\sos\scheduler\jobdoc\JobSchedulerXslTransform.xml for (more) details.
- *
- * \verbatim ;
- * mechanicaly created by C:\Users\KB\eclipse\sos.scheduler.xsl\JSJobDoc2JSJUnitClass.xsl from http://www.sos-berlin.com at 20110815114248
- * \endverbatim
- */
+@Ignore("Class has to be reviewed")
 public class JobSchedulerXslTransformJUnitTest extends JSToolBox {
 	@SuppressWarnings("unused")
 	private final static String					conClassName	= "JobSchedulerXslTransformationJUnitTest";
