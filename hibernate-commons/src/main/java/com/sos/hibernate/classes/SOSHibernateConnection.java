@@ -167,7 +167,7 @@ public class SOSHibernateConnection implements Serializable {
 			
 			String connFile = (configFile == null) ? "without config file" : configFile.getCanonicalPath();
 			int isolationLevel = getTransactionIsolation();
-			logger.info(String.format("%s: autocommit = %s, transaction isolation = %s, %s, %s",
+			logger.debug(String.format("%s: autocommit = %s, transaction isolation = %s, %s, %s",
 						method,
 						getAutoCommit(),
 						getTransactionIsolationName(isolationLevel),
@@ -531,7 +531,7 @@ public class SOSHibernateConnection implements Serializable {
 	 */
 	public void disconnect() {
 		String method = getMethodName("disconnect");
-		logger.info(String.format("%s",method));
+		logger.debug(String.format("%s",method));
 		
 		closeTransaction();
 		closeSession();
