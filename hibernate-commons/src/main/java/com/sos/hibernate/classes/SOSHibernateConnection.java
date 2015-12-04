@@ -362,7 +362,7 @@ public class SOSHibernateConnection implements Serializable {
 
     public void disconnect() {
         String method = getMethodName("disconnect");
-        LOGGER.info(String.format("%s", method));
+        LOGGER.debug(String.format("%s", method));
 
         closeTransaction();
         closeSession();
