@@ -99,14 +99,11 @@ public class SOSHibernateResultSetProcessor implements Serializable {
         logger.debug(String.format("%s: sqlStatement = %s, scrollMode = %s, isReadOnly = %s, fetchSize= %s", method, sqlStatement, scrollMode.toString(), isReadOnly, fetchSize));
 
         statement = connection.getJdbcConnection().createStatement(getResultSetType(scrollMode), getConcurrencyMode(isReadOnly));
-
         if (fetchSize.isPresent()) {
-            // use default value if fetchSize != 0. for example Oracle = 10
-            // accept negative values. for example MySQL Integer.MIN_VALUE
-            // -2147483648
-            if (fetchSize.get() != 0) {
-                statement.setFetchSize(fetchSize.get());
-            }
+            statement.setFetchSize(fetchSize.get());
+        }
+        else if (connection.getJdbcFetchSize().isPresent()) {
+            statement.setFetchSize(connection.getJdbcFetchSize().get());
         }
         resultSet = statement.executeQuery(sqlStatement);
 
