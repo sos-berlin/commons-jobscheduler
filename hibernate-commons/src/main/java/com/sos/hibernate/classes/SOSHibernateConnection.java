@@ -124,7 +124,7 @@ public class SOSHibernateConnection implements Serializable {
 
             String connFile = (configFile.isPresent()) ? configFile.get().getCanonicalPath() : "without config file";
             int isolationLevel = getTransactionIsolation();
-            LOGGER.info(String.format("%s: autocommit = %s, transaction isolation = %s, %s, %s", method, getAutoCommit(), getTransactionIsolationName(isolationLevel), openSessionMethodName, connFile));
+            LOGGER.debug(String.format("%s: autocommit = %s, transaction isolation = %s, %s, %s", method, getAutoCommit(), getTransactionIsolationName(isolationLevel), openSessionMethodName, connFile));
 
         } catch (Exception ex) {
             throw new Exception(String.format("%s: %s", method, ex.toString()));
