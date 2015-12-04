@@ -56,6 +56,7 @@ public class SOSHibernateConnection implements Serializable {
     public static final String HIBERNATE_PROPERTY_AUTO_COMMIT = "hibernate.connection.autocommit";
     public static final String HIBERNATE_PROPERTY_USE_SCROLLABLE_RESULTSET = "hibernate.jdbc.use_scrollable_resultset";
     public static final String HIBERNATE_PROPERTY_CURRENT_SESSION_CONTEXT_CLASS = "hibernate.current_session_context_class";
+    public static final String HIBERNATE_PROPERTY_JDBC_FETCH_SIZE = "hibernate.jdbc.fetch_size";
     public static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     private Optional<File> configFile;
@@ -72,6 +73,7 @@ public class SOSHibernateConnection implements Serializable {
     private ClassList classMapping;
     private boolean useDefaultConfigurationProperties = true;
     private String connectionIdentifier;
+    private Optional<Integer> jdbcFetchSize = Optional.empty();
     private Enum<SOSHibernateConnection.Dbms> dbms = Dbms.UNKNOWN;
     /** ignore beginTransaction(), commit(), rollback() by
      * ignoreAutoCommitTransactions = true and autoCommit = true */
@@ -545,6 +547,13 @@ public class SOSHibernateConnection implements Serializable {
 
                 LOGGER.debug(String.format("%s: custom properties. property: %s = %s", method, key, value));
             }
+            
+            if(configuration.getProperty(HIBERNATE_PROPERTY_JDBC_FETCH_SIZE) != null){
+                try{
+                    jdbcFetchSize = Optional.of(Integer.parseInt(configuration.getProperty(HIBERNATE_PROPERTY_JDBC_FETCH_SIZE)));
+                }
+                catch(Exception ex){}
+            }
         }
     }
 
@@ -1005,4 +1014,8 @@ public class SOSHibernateConnection implements Serializable {
         return sessionFactory;
     }
 
+    public Optional<Integer> getJdbcFetchSize() {
+        return jdbcFetchSize;
+    }
+ 
 }
