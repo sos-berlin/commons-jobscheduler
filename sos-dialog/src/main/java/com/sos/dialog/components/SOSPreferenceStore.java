@@ -63,13 +63,19 @@ public class SOSPreferenceStore implements ISOSPreferenceStore {
 		strKey = className;
 	}
 
+	private String normalizeKey(String key){
+		key = key.replaceFirst("^\\/*(.*)","$1");
+		key = key.replaceAll("\\/", "_");
+		return key;
+	}
+
 	public SOSPreferenceStore(String instance) {
 		className = instance;
-		strKey = instance;
+		strKey = normalizeKey(instance);
 	}	
 	
 	public void setKey(final String pstrKey) {
-		strKey = gstrApplication + "/" + className + "/" + pstrKey;
+		strKey = gstrApplication + "/" + className + "/" + normalizeKey(pstrKey);
 	}
 
 	@Override
@@ -83,7 +89,7 @@ public class SOSPreferenceStore implements ISOSPreferenceStore {
 	}
 
 	public String getPropertyKey() {
-		String strT = "properties/" + strKey;
+		String strT = "properties/" + strKey; 
 		logger.trace("key = " + strT);
 		return strT;
 	}
