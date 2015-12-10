@@ -70,9 +70,14 @@ public class SOSPreferenceStore implements ISOSPreferenceStore {
 	}
 
 	public SOSPreferenceStore(String instance) {
-		className = instance;
-		strKey = normalizeKey(instance);
-	}	
+		className = normalizeKey(instance);
+		if (className.length() == 0){
+			className = normalizeKey(this.getClass().getName());
+			strKey = className;
+		}else{
+			strKey = className;		
+		}		
+ 	}	
 	
 	public void setKey(final String pstrKey) {
 		strKey = gstrApplication + "/" + className + "/" + normalizeKey(pstrKey);
