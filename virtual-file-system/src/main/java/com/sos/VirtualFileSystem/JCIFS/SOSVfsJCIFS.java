@@ -134,6 +134,9 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 			}
 			logINFO(HostID(SOSVfs_D_181.params("mkdir", path, getReplyString())));
 		}
+		catch (JobSchedulerException e) {
+            throw e;
+        }
 		catch (Exception e) {
 			reply = e.toString();
 			RaiseException(e, SOSVfs_E_134.params("[mkdir]"));
@@ -463,8 +466,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 			throw new JobSchedulerException(SOSVfs_E_193.params("cwd", path), ex);
 		}
 		finally {
-			String strM = SOSVfs_D_194.params(path, getReplyString());
-			logger.debug(strM);
+			logger.debug(SOSVfs_D_194.params(path, getReplyString()));
 		}
 		return true;
 	}
@@ -496,7 +498,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 	}
 
 	@Override
-	protected boolean fileExists(final String filename) {
+	protected boolean fileExists(String filename) {
 
 		SmbFile file = null;
 		try {
@@ -504,7 +506,8 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 			return file.exists();
 		}
 		catch (Exception e) {
-			return false;
+		    filename = file == null ? filename : file.getCanonicalPath();
+            throw new JobSchedulerException(SOSVfs_E_226.params(filename),e);
 		}
 	}
 
@@ -532,15 +535,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 	}
 
 	private void smbLogin(String domain,String host,int port,String user,String password) throws Exception{
-	    //Accessing a DFS link on Samba directly could result in an error. 
-        //This issue has been fixed. 
-        //Samba 3.0.x does not support raw NTLMSSP and therefore the new default JCIFS settings that use NTLMSSP break JCIFS and Samba 3.0.x compatibility. 
-        //To work-around, turn off extended security and use NTLMv1 by setting 
-        //jcifs.smb.client.useExtendedSecurity=false 
-        //and 
-        //jcifs.smb.lmCompatibility=0. 
-        jcifs.Config.setProperty("jcifs.smb.client.useExtendedSecurity", "false");
-        UniAddress hostAddress = UniAddress.getByName(host);
+	    UniAddress hostAddress = UniAddress.getByName(host);
         authentication = new NtlmPasswordAuthentication(domain, user, password);
         SmbSession.logon(hostAddress,port, authentication);
 	}
