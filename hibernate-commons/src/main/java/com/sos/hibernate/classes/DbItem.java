@@ -155,9 +155,7 @@ public  class DbItem {
  		 Calendar cal_1 = new GregorianCalendar( );
  		 Calendar cal_2 = new GregorianCalendar();
  		 
- 		 if (end==null) {
- 		     end = new Date();
- 		 }
+
  		 cal_1.setTime( start );                      
  		 cal_2.setTime( end );                  
  
