@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://jsonschema.net",
+  "type": "object",
+  "properties": {
+    "message": {
+      "id": "http://jsonschema.net/message",
+      "type": "null"
+    },
+    "jobSchedulerAnswer": {
+      "id": "http://jsonschema.net/jobSchedulerAnswer",
+      "type": "null"
+    },
+    "user": {
+      "id": "http://jsonschema.net/user",
+      "type": "null"
+    },
+    "resource": {
+      "id": "http://jsonschema.net/resource",
+      "type": "null"
+    },
+    "sessionId": {
+      "id": "http://jsonschema.net/sessionId",
+      "type": "null"
+    },
+    "isEnabled": {
+      "id": "http://jsonschema.net/isEnabled",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "message",
+    "jobSchedulerAnswer",
+    "user",
+    "resource",
+    "sessionId",
+    "isEnabled"
+  ]
+}
