@@ -229,11 +229,14 @@ public class SOSCommandSecurityWebservice {
 
     private SOSWebserviceAuthenticationRecord getAuthencationRecord(String sessionId, String permission) {
         SOSCommandSecurityWebserviceCurrentUser currentUser = getCurrentUser(sessionId);
+        
         SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord = new SOSWebserviceAuthenticationRecord();
-        sosWebserviceAuthenticationRecord.setResource(currentUser.getResource());
+        if (currentUser != null){
+        	sosWebserviceAuthenticationRecord.setResource(currentUser.getResource());
+        	sosWebserviceAuthenticationRecord.setUser(currentUser.getUsername());
+        }
         sosWebserviceAuthenticationRecord.setSessionId(sessionId);
         sosWebserviceAuthenticationRecord.setPermission(permission);
-        sosWebserviceAuthenticationRecord.setUser(currentUser.getUsername());
         return sosWebserviceAuthenticationRecord;
     }
 
