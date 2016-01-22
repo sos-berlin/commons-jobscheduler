@@ -14,6 +14,7 @@ import com.sos.VirtualFileSystem.HTTP.SOSVfsHTTP;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.JCIFS.SOSVfsJCIFS;
+import com.sos.VirtualFileSystem.JMS.SOSVfsJms;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 import com.sos.VirtualFileSystem.WebDAV.SOSVfsWebDAV;
@@ -243,10 +244,14 @@ public class VFSFactory extends SOSVfsMessageCodes {
 			objC = new SOSVfsHTTP();
 			logger.trace(SOSVfs_D_0201.params(conMethodName, SOSVfsHTTP.class.toString()));
 		}
-		if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.smb.Text())) {
-			objC = new SOSVfsJCIFS();
-			logger.trace(SOSVfs_D_0201.params(conMethodName, SOSVfsJCIFS.class.toString()));
-		}
+        if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.smb.Text())) {
+            objC = new SOSVfsJCIFS();
+            logger.trace(SOSVfs_D_0201.params(conMethodName, SOSVfsJCIFS.class.toString()));
+        }
+        if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.mq.Text())) {
+            objC = new SOSVfsJms();
+            logger.trace(SOSVfs_D_0201.params(conMethodName, SOSVfsJms.class.toString()));
+        }
 		if (objC == null) {
 			throw new Exception(SOSVfs_E_0203.params(strWhatSystem));
 		}
