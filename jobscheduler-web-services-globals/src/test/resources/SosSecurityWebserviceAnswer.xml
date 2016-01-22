@@ -1,0 +1,12 @@
+<sos_security_webservice_answer>
+	<isEnabled>true</isEnabled>
+	<jobSchedulerAnswer/>
+	<message>
+user: root, password: ********, resource: http://localhost:41000/jobscheduler/rest/sosPermission --> authenticated
+</message>
+	<resource>
+http://localhost:41000/jobscheduler/rest/sosPermission
+</resource>
+	<sessionId>7e071ee8-df98-4224-9a34-c2acff6998bb</sessionId>
+	<user>root</user>
+</sos_security_webservice_answer>

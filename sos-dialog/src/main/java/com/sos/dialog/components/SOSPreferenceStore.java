@@ -89,7 +89,12 @@ public class SOSPreferenceStore implements ISOSPreferenceStore {
 	}
 
 	public String getPropertyKey() {
-		String strT = "properties/" + strKey; 
+
+		if (strKey.equals("")){
+			strKey = "context";
+		}
+		String strT = "properties/" + strKey;
+
 		logger.trace("key = " + strT);
 		return strT;
 	}

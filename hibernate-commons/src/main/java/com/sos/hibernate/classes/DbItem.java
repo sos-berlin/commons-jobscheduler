@@ -155,9 +155,7 @@ public  class DbItem {
  		 Calendar cal_1 = new GregorianCalendar( );
  		 Calendar cal_2 = new GregorianCalendar();
  		 
- 		 if (end==null) {
- 		     end = new Date();
- 		 }
+
  		 cal_1.setTime( start );                      
  		 cal_2.setTime( end );                  
  
@@ -194,6 +192,34 @@ public  class DbItem {
  		}
  	}
  	
+    @Transient
+    public long getDateDiffSeconds(Date start,Date end){
+        if (start == null || end == null){
+            return 0;
+        }else{
+         Calendar cal_1 = new GregorianCalendar( );
+         Calendar cal_2 = new GregorianCalendar();
+         
+  
+         cal_1.setTime( start );                      
+         cal_2.setTime( end );                  
+ 
+         long time = cal_2.getTime().getTime() - cal_1.getTime().getTime(); 
+         
+        long millis = time % 1000;
+        time/=1000;
+        long seconds = time % 60;
+        time/=60;
+        long minutes = time % 60;
+        time/=60;
+        long hours = time % 24;
+        time/=24;
+        long days = time;
+
+        return seconds;
+        }
+    }
+    
  	public boolean haveError() {
  		return false;
  	}
