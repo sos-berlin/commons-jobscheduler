@@ -2,6 +2,7 @@ package com.sos.VirtualFileSystem.JMS;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -16,6 +17,7 @@ import javax.jms.TextMessage;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.log4j.Logger;
 
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
@@ -45,9 +47,20 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
     }
 
     private void connect(final String host, final int port) {
-        LOGGER.info(SOSVfs_D_0101.params(host, port));
-        if (this.isConnected() == false) {
-            this.LogReply();
+        if (!this.isConnected()) {
+            try{
+                this.port = port;
+                this.host = host;
+                if (host.toLowerCase().startsWith("tcp://")) {
+                    URL url = new URL(host);
+                    this.port = (url.getPort() == -1) ? url.getDefaultPort() : url.getPort();
+                    this.host = url.getHost();
+                }
+                LOGGER.info(SOSVfs_D_0101.params(host, port));
+                this.LogReply();
+            } catch(Exception ex){
+                throw new JobSchedulerException(ex);
+            }
         } else {
             logWARN(SOSVfs_D_0103.params(host, port));
         }
@@ -87,7 +100,7 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
     public Session createSession(Connection jmsConnection){
         session = null;
         try {
-            session = jmsConnection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            session = jmsConnection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
         } catch (JMSException e) {
             LOGGER.error("JMSException occurred while trying to create Session: " , e);
         }
@@ -146,15 +159,16 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
         return consumer;
     }
 
-    public String read(Connection jmsConnection, String queueName) {
+    public String read(Connection jmsConnection, String queueName, Boolean closeMessage) {
         String messageText = null;
         try {
             Session session = createSession(jmsConnection);
             Destination destination = createDestination(session, queueName);
             jmsConnection.start();
             MessageConsumer consumer = createMessageConsumer(session, destination);
+            Message receivedMessage = null;
             while (true) {
-                Message receivedMessage = consumer.receive(1);
+                receivedMessage = consumer.receive(1);
                 if (receivedMessage != null) {
                     if (receivedMessage instanceof TextMessage) {
                         TextMessage message = (TextMessage) receivedMessage;
@@ -165,6 +179,9 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
                         break;
                     }
                 }
+            }
+            if(closeMessage){
+                receivedMessage.acknowledge();
             }
         } catch (JMSException e) {
             LOGGER.error("JMSException occurred while trying to read from Destination: ", e);
