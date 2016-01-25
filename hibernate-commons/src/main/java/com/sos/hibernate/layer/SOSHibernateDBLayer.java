@@ -1,5 +1,7 @@
 package com.sos.hibernate.layer;
 
+import java.io.File;
+
 import org.apache.log4j.Logger;
 
 import com.sos.hibernate.classes.ClassList;
@@ -66,6 +68,10 @@ public class SOSHibernateDBLayer {
     
     public String getConfigurationFileName(){
     	return configurationFileName;
+    }
+
+    public File getConfigurationFile(){
+        return new File(configurationFileName);
     }
     
     public void setConfigurationFileName(String configurationFileName) {
