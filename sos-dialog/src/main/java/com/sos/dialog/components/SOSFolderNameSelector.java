@@ -1,7 +1,6 @@
 package com.sos.dialog.components;
 import java.io.File;
 
-import org.apache.activemq.broker.scheduler.JobListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
@@ -89,10 +88,7 @@ public class SOSFolderNameSelector extends SOSPreferenceStoreText {
 		return strI18NKey;
 	}
 
-	public void setDataProvider(final JobListener pobjDataProvider) {
-		//        objDataProvider = pobjDataProvider;
-		//        refreshContent();
-	}
+ 
 
 	// private Listener getSaveAsListener() {
 	//
