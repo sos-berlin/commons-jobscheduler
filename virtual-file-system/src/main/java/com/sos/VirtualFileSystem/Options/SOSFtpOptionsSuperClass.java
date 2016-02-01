@@ -3877,11 +3877,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	}
 	
 	@Override 
-	public void setAllOptions(final HashMap<String, String> pobjJSSettings) {
+	public void setAllOptions(final HashMap<String, String> settings) {
 		flgSetAllOptions = true;
-		objSettings = pobjJSSettings;
+		objSettings = settings;
 		super.Settings(objSettings);
-		super.setAllOptions(pobjJSSettings);
+		super.setAllOptions(settings);
 		flgSetAllOptions = false;
 	} 
 	
@@ -4047,4 +4047,17 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 								"false", 
 								true);
   
+  @JSOptionDefinition(
+			name = "java_property_files",
+			description = "List of the java property files separated by semicolon",
+			key = "java_property_files",
+			type = "SOSOptionString",
+			mandatory = false)
+  public SOSOptionString 	java_property_files	= new SOSOptionString(this, className + ".java_property_files", // HashMap-Key
+								"List of the java property files separated by semicolon", // Titel
+								"", // InitValue
+								"", // DefaultValue
+								false // isMandatory
+						);
+   
 } 
