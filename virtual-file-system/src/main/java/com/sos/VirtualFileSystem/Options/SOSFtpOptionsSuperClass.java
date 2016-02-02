@@ -2937,6 +2937,19 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	}
 	
 	@JSOptionDefinition(
+			name = "jump_configuration_files",
+			description = "Configuration file with JCraft settings located on the YADE client system",
+			key = "jump_configuration_files",
+			type = "SOSOptionString",
+			mandatory = false)
+	public SOSOptionString	jump_configuration_files	= new SOSOptionString(this, className + ".jump_configuration_files", // HashMap-Key
+										"Configuration file with JCraft settings located on the YADE client system", // Titel
+										"", // InitValue
+										"", // DefaultValue
+										false // isMandatory
+								);
+	
+	@JSOptionDefinition(
 						name = "local_dir",
 						description = "local_dir Local directory into which or from which",
 						key = "local_dir",
@@ -4048,16 +4061,16 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 								true);
   
   @JSOptionDefinition(
-			name = "java_property_files",
+			name = "system_property_files",
 			description = "List of the java property files separated by semicolon",
-			key = "java_property_files",
+			key = "system_property_files",
 			type = "SOSOptionString",
 			mandatory = false)
-  public SOSOptionString 	java_property_files	= new SOSOptionString(this, className + ".java_property_files", // HashMap-Key
+  public SOSOptionString 	system_property_files	= new SOSOptionString(this, className + ".system_property_files", // HashMap-Key
 								"List of the java property files separated by semicolon", // Titel
 								"", // InitValue
 								"", // DefaultValue
 								false // isMandatory
 						);
-   
+  
 } 

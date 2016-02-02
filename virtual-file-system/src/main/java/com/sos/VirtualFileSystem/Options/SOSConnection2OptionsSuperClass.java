@@ -1025,5 +1025,18 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
   public void setIgnore_error(final SOSOptionBoolean val) {
     this.ignore_error = val;
   }
+  
+  @JSOptionDefinition(
+			name = "configuration_files",
+			description = "List of the app configuration files separated by semicolon",
+			key = "configuration_files",
+			type = "SOSOptionString",
+			mandatory = false)
+  public SOSOptionString 	configuration_files	= new SOSOptionString(this, className + ".configuration_files", // HashMap-Key
+								"List of the app configuration files separated by semicolon", // Titel
+								"", // InitValue
+								"", // DefaultValue
+								false // isMandatory
+						);
    
 }

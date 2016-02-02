@@ -621,18 +621,18 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 			
 			conf = new SOSConfiguration(settings.Value(), "globals", sosLogger);
 			Properties globalsProps = conf.getParameterAsProperties();
-			String globalsJavaPropertiyFiles = globalsProps.getProperty(java_property_files.getShortKey());
+			String globalsJavaPropertiyFiles = globalsProps.getProperty(system_property_files.getShortKey());
 			globalsProps = resolveIncludes(globalsProps, sosLogger);
 			properties.putAll(globalsProps);
 			
 			profileProps = resolveIncludes(profileProps, sosLogger);
 			properties.putAll(profileProps);
 			
-			String currentJavaPropertyFiles = properties.getProperty(java_property_files.getShortKey());
+			String currentJavaPropertyFiles = properties.getProperty(system_property_files.getShortKey());
 			if(globalsJavaPropertiyFiles != null 
 			   && currentJavaPropertyFiles != null
 			   && !globalsJavaPropertiyFiles.equals(currentJavaPropertyFiles)){
-				properties.put(java_property_files.getShortKey(),globalsJavaPropertiyFiles+";"+currentJavaPropertyFiles);
+				properties.put(system_property_files.getShortKey(),globalsJavaPropertiyFiles+";"+currentJavaPropertyFiles);
 			}
 			
 			// Additional Variables

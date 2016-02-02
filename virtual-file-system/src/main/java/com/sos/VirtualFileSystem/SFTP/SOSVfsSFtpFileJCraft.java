@@ -7,43 +7,21 @@ import com.jcraft.jsch.ChannelSftp;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferFileBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
-/**
- * @author KB
- *
- */
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
-	/**
-	 *
-	 * \brief SOSVfsSFtpFileJCraft
-	 *
-	 * \details
-	 *
-	 * @param pstrFileName
-	 */
-	public SOSVfsSFtpFileJCraft(final String pstrFileName) {
-		super(pstrFileName);
+
+	public SOSVfsSFtpFileJCraft(final String fileName) {
+		super(fileName);
 	}
 
-	/**
-	 *
-	 * \brief read
-	 *
-	 * \details
-	 *
-	 * \return
-	 *
-	 * @param bteBuffer
-	 * @return
-	 */
 	@Override
-	public int read(final byte[] bteBuffer) {
+	public int read(final byte[] buffer) {
 		try {
 			InputStream is = this.getFileInputStream();
 			if (is == null) {
 				throw new Exception(SOSVfs_E_177.get());
 			}
-			return is.read(bteBuffer);
+			return is.read(buffer);
 		}
 		catch (Exception e) {
 			RaiseException(e, SOSVfs_E_173.params("read", fileName));
@@ -51,31 +29,22 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
 		}
 	}
 
-	/**
-	 * \brief getFileInputStream
-	 *
-	 * \details
-	 *
-	 * \return
-	 *
-	 * @return
-	 */
 	@Override
 	public InputStream getFileInputStream() {
 		try {
 			if (objInputStream == null) {
 				fileName = AdjustRelativePathName(fileName);
 
-				int intTransferMode = ChannelSftp.OVERWRITE;
+				int transferMode = ChannelSftp.OVERWRITE;
 				if (flgModeAppend) {
-					intTransferMode = ChannelSftp.APPEND;
+					transferMode = ChannelSftp.APPEND;
 				}
 				else if (flgModeRestart ){
-					intTransferMode = ChannelSftp.RESUME;
+					transferMode = ChannelSftp.RESUME;
 				}
 
-				SOSVfsSFtpJCraft objJ = (SOSVfsSFtpJCraft) objVFSHandler;
-				objInputStream = objJ.getClient().get(fileName, intTransferMode);
+				SOSVfsSFtpJCraft handler = (SOSVfsSFtpJCraft) objVFSHandler;
+				objInputStream = handler.getClient().get(fileName, transferMode);
 				if (objInputStream == null) {
 					objVFSHandler.openInputFile(fileName);
 				}
@@ -87,27 +56,14 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
 		return objInputStream;
 	}
 
-	/**
-	 *
-	 * \brief read
-	 *
-	 * \details
-	 *
-	 * \return
-	 *
-	 * @param bteBuffer
-	 * @param intOffset
-	 * @param intLength
-	 * @return
-	 */
 	@Override
-	public int read(final byte[] bteBuffer, final int intOffset, final int intLength) {
+	public int read(final byte[] buffer, final int offset, final int length) {
 		try {
 			InputStream is = this.getFileInputStream();
 			if (is == null) {
 				throw new Exception(SOSVfs_E_177.get());
 			}
-			return is.read(bteBuffer, intOffset, intLength);
+			return is.read(buffer, offset, length);
 		}
 		catch (Exception e) {
 			RaiseException(e, SOSVfs_E_173.params("read", fileName));
@@ -115,20 +71,8 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
 		}
 	}
 
-	/**
-	 *
-	 * \brief write
-	 *
-	 * \details
-	 *
-	 * \return
-	 *
-	 * @param bteBuffer
-	 * @param intOffset
-	 * @param intLength
-	 */
 	@Override
-	public void write(final byte[] bteBuffer, final int intOffset, final int intLength) {
+	public void write(final byte[] buffer, final int offset, final int length) {
 		try {
 
 			OutputStream os = this.getFileOutputStream();
@@ -136,7 +80,7 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
 
 				throw new Exception(SOSVfs_E_147.get());
 			}
-			os.write(bteBuffer, intOffset, intLength);
+			os.write(buffer, offset, length);
 		}
 		catch (Exception e) {
 			RaiseException(e, SOSVfs_E_173.params("write", fileName));
@@ -145,48 +89,30 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
 	
 	
 	@Override
-	public void write(final byte[] bteBuffer) {
+	public void write(final byte[] buffer) {
 		try {
-			this.getFileOutputStream().write(bteBuffer);
+			this.getFileOutputStream().write(buffer);
 		}
 		catch (IOException e) {
 			RaiseException(e, SOSVfs_E_134.params("write()"));
 		}
 	}
 
-	/**
-	 * \brief getFileOutputStream
-	 *
-	 * \details
-	 *
-	 * \return
-	 *
-	 * @return
-	 */
 	@Override
 	public OutputStream getFileOutputStream() {
 		try {
 			if (objOutputStream == null) {
 				fileName = super.AdjustRelativePathName(fileName);
-				int intTransferMode = ChannelSftp.OVERWRITE;
+				int transferMode = ChannelSftp.OVERWRITE;
 				if (flgModeAppend) {
-					intTransferMode = ChannelSftp.APPEND;
+					transferMode = ChannelSftp.APPEND;
 				}
 				else if (flgModeRestart ){
-					intTransferMode = ChannelSftp.RESUME;
+					transferMode = ChannelSftp.RESUME;
 				}
 				
-				SOSVfsSFtpJCraft objJ = (SOSVfsSFtpJCraft) objVFSHandler;
-				/**
-				 * kb 2014-07-21
-				 * warum wurde die folgende Zeile auskommentiert und durch die dahinter
-				 * stehende, jetzt auskkommentiert, ersetzt? Damit ist kein AppendMode
-				 * möglich und das ist ein schwerer Fehler.
-				 * siehe hierzu: https://change.sos-berlin.com/browse/SOSFTP-202
-				 */
-				objOutputStream = objJ.getClient().put(fileName, intTransferMode);
-//				objOutputStream = objJ.getClient().put(fileName);
-
+				SOSVfsSFtpJCraft handler = (SOSVfsSFtpJCraft) objVFSHandler;
+				objOutputStream = handler.getClient().put(fileName, transferMode);
 				if (objOutputStream == null) {
 					objVFSHandler.openOutputFile(fileName);
 				}
@@ -220,8 +146,6 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
 
 	@Override
 	public long setModificationDateTime(final long pdteDateTime) {
-
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
