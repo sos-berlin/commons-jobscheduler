@@ -773,6 +773,18 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 		sshSession = secureChannel.getSession(puser, phost, pport);
 		java.util.Properties config = new java.util.Properties();
 		config.put("StrictHostKeyChecking", getStrictHostKeyChecking(connection2OptionsAlternate.strictHostKeyChecking));
+		
+		if (connection2OptionsAlternate.use_zlib_compression.value() == true) {
+			config.put("compression.s2c", "zlib@openssh.com,zlib,none");
+			config.put("compression.c2s", "zlib@openssh.com,zlib,none");
+			config.put("compression_level", connection2OptionsAlternate.zlib_compression_level.Value());
+			
+			LOGGER.info(String.format("use zlib_compression: compression.s2c = %s, compression.c2s = %s, compression_level = %s", 
+					config.getProperty("compression.s2c"),
+					config.getProperty("compression.c2s"),
+					connection2OptionsAlternate.zlib_compression_level.Value()));
+		}
+		
 		sshSession.setConfig(config);
 		setCommandsTimeout();
 		setProxy();
@@ -857,11 +869,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 			throw new JobSchedulerException(SOSVfs_E_190.params("sshSession"));
 		}
 		sshConnection = sshSession.openChannel("sftp");
-		if (connection2OptionsAlternate.use_zlib_compression.value() == true) {
-			sshSession.setConfig("compression.s2c", "zlib@openssh.com,zlib,none");
-			sshSession.setConfig("compression.c2s", "zlib@openssh.com,zlib,none");
-			sshSession.setConfig("compression_level", connection2OptionsAlternate.zlib_compression_level.Value());
-		}
 		sshConnection.connect();
 		sftpClient = (ChannelSftp) sshConnection;
 	}

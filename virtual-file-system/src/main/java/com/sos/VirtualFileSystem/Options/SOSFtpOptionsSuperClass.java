@@ -2441,7 +2441,86 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	public void setjump_command_script_file(final SOSOptionCommandScriptFile val) {
 		jump_command_script_file = val;
 	}
-
+	
+	@JSOptionDefinition(
+			name = "jump_pre_command",
+			description = "Command, which has to be executed on the jump host for each file before the transfer started.",
+			key = "jump_pre_command",
+			type = "SOSOptionCommandString",
+			mandatory = false)
+	public SOSOptionCommandString	jump_pre_command	= new SOSOptionCommandString(
+														this, 
+														className + ".jump_pre_command",
+														"Commands, which has to be executed on the jump host for each file before the transfer started.", 
+														"", 
+														"", 
+														false);
+	@JSOptionDefinition(
+			name = "jump_post_command_on_success",
+			description = "Command, which has to be executed on the jump host for each file after the transfer of the file succesfull ended.",
+			key = "jump_post_command_on_success",
+			type = "SOSOptionCommandString",
+			mandatory = false)
+	public SOSOptionCommandString	jump_post_command_on_success	= new SOSOptionCommandString(
+														this, 
+														className + ".jump_post_command_on_success",
+														"Commands, which has to be executed on the jump host for each file after the transfer of the file succesfull ended.", 
+														"", 
+														"", 
+														false);
+	@JSOptionDefinition(
+			name = "jump_pre_transfer_commands",
+			description = "Commands, which has to be executed on the jump host before the transfer started.",
+			key = "jump_pre_transfer_commands",
+			type = "SOSOptionCommandString",
+			mandatory = false)
+	public SOSOptionCommandString	jump_pre_transfer_commands	= new SOSOptionCommandString(
+														this, 
+														className + ".jump_pre_transfer_commands",
+														"Commands, which has to be executed on the jump host before the transfer started.", 
+														"", 
+														"", 
+														false);
+	@JSOptionDefinition(
+			name = "jump_post_transfer_commands_on_success",
+			description = "Commands, which has to be executed on the jump host after the transfer ended successful.",
+			key = "jump_post_transfer_commands_on_success",
+			type = "SOSOptionCommandString",
+			mandatory = false)
+	public SOSOptionCommandString	jump_post_transfer_commands_on_success	= new SOSOptionCommandString(
+														this, 
+														className + ".jump_post_transfer_commands_on_success",
+														"Commands, which has to be executed on the jump host after the transfer ended successful.", 
+														"", 
+														"", 
+														false);
+	@JSOptionDefinition(
+			name = "jump_post_transfer_commands_on_error",
+			description = "Commands, which has to be executed on the jump host after the transfer ended with errors.",
+			key = "jump_post_transfer_commands_on_error",
+			type = "SOSOptionCommandString",
+			mandatory = false)
+	public SOSOptionCommandString	jump_post_transfer_commands_on_error	= new SOSOptionCommandString(
+														this, 
+														className + ".jump_post_transfer_commands_on_error",
+														"Commands, which has to be executed on the jump host after the transfer ended with errors.", 
+														"", 
+														"", 
+														false);
+	
+	@JSOptionDefinition(
+			name = "jump_post_transfer_commands_final",
+			description = "Commands, which has to be executed on the jump host after the transfer ended independet of the transfer status.",
+			key = "jump_post_transfer_commands_final",
+			type = "SOSOptionCommandString",
+			mandatory = false)
+	public SOSOptionCommandString	jump_post_transfer_commands_final	= new SOSOptionCommandString(
+														this, 
+														className + ".jump_post_transfer_commands_final",
+														"Commands, which has to be executed on the jump host after the transfer ended independet of the transfer status.", 
+														"", 
+														"", 
+														false);
 	@JSOptionDefinition(
 						name = "jump_host",
 						description = "When using a jump_host then files are first transf",

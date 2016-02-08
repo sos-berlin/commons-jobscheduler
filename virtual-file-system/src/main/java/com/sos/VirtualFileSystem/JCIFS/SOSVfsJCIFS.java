@@ -8,6 +8,8 @@ import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Properties;
+import java.util.Map.Entry;
 
 import jcifs.UniAddress;
 import jcifs.smb.NtlmPasswordAuthentication;
@@ -17,6 +19,8 @@ import jcifs.smb.SmbFileOutputStream;
 import jcifs.smb.SmbSession;
 
 import org.apache.log4j.Logger;
+
+import sos.util.SOSString;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
@@ -30,8 +34,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
-	@SuppressWarnings("unused")
-	private final Logger				logger			= Logger.getLogger(this.getClass());
+	private final static Logger			LOGGER			= Logger.getLogger(SOSVfsJCIFS.class);
 	private static final int DEFAULT_PORT = 445;
 	private NtlmPasswordAuthentication	authentication	= null;
 	private boolean						isConnected		= false;
@@ -84,14 +87,14 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 		try {
 			userName = user;
 
-			logger.debug(SOSVfs_D_132.params(userName));
+			LOGGER.debug(SOSVfs_D_132.params(userName));
 
 			smbLogin(domain, host,port, userName, password);
 			
 			isConnected = true;
 
 			reply = "OK";
-			logger.info(SOSVfs_D_133.params(userName));
+			LOGGER.info(SOSVfs_D_133.params(userName));
 			this.LogReply();
 		}
 		catch (Exception e) {
@@ -117,14 +120,14 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 		try {
 			SOSOptionFolderName folderName = new SOSOptionFolderName(path);
 			reply = "mkdir OK";
-			logger.debug(HostID(SOSVfs_D_179.params("mkdir", path)));
+			LOGGER.debug(HostID(SOSVfs_D_179.params("mkdir", path)));
 			for (String subFolder : folderName.getSubFolderArray()) {
 				subFolder = this.normalizePath(subFolder);
-				logger.debug(HostID(SOSVfs_D_179.params("mkdir", subFolder)));
+				LOGGER.debug(HostID(SOSVfs_D_179.params("mkdir", subFolder)));
 				if (this.fileExists(subFolder) == false) {
 					SmbFile f = getSmbFile(subFolder);
 					f.mkdir();
-					logger.debug(HostID(SOSVfs_D_181.params("mkdir", subFolder, getReplyString())));
+					LOGGER.debug(HostID(SOSVfs_D_181.params("mkdir", subFolder, getReplyString())));
 				}
 				else {
 					if (this.isDirectory(subFolder) == false) {
@@ -163,7 +166,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 			f.delete();
 
 			reply = "rmdir OK";
-			logger.info(HostID(SOSVfs_D_181.params("rmdir", path, getReplyString())));
+			LOGGER.info(HostID(SOSVfs_D_181.params("rmdir", path, getReplyString())));
 		}
 		catch (JobSchedulerException e) {
 			reply = e.toString();
@@ -409,12 +412,12 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 		}
 
 		reply = "mv OK";
-		logger.info(HostID(SOSVfs_I_189.params(from, to, getReplyString())));
+		LOGGER.info(HostID(SOSVfs_I_189.params(from, to, getReplyString())));
 	}
 
 	@Override
 	public void ExecuteCommand(final String cmd) {
-		logger.debug("not implemented yet");
+		LOGGER.debug("not implemented yet");
 	}
 
 	@Override
@@ -466,7 +469,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 			throw new JobSchedulerException(SOSVfs_E_193.params("cwd", path), ex);
 		}
 		finally {
-			logger.debug(SOSVfs_D_194.params(path, getReplyString()));
+			LOGGER.debug(SOSVfs_D_194.params(path, getReplyString()));
 		}
 		return true;
 	}
@@ -534,8 +537,44 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 		}
 	}
 
+	private void setConfigFromFiles(){
+		if(!SOSString.isEmpty(connection2OptionsAlternate.configuration_files.Value())){
+			String[] arr = connection2OptionsAlternate.configuration_files.Value().split(";");
+			for(int i=0;i<arr.length;i++){
+				String file = arr[i].trim();
+				LOGGER.info(String.format("use configuration file: %s",file));
+			
+				FileInputStream in = null;
+				try{
+					in = new FileInputStream(file);
+					Properties p = new Properties();
+					p.load(in);
+				
+					for (Entry<Object, Object> entry : p.entrySet()) {
+						String key = (String)entry.getKey();
+						String value = (String)entry.getValue();
+					
+						LOGGER.debug(String.format("set configuration setting: %s = %s",key,value));
+						jcifs.Config.setProperty(key, value);
+					}
+				}
+				catch(Exception ex){
+					LOGGER.warn(String.format("error on read configuration file[%s]: %s",file,ex.toString()));
+				}
+				finally{
+					if(in != null){
+						try{in.close();}catch(Exception ex){}
+					}
+				}
+			}
+		}
+	}
+	
+	
 	private void smbLogin(String domain,String host,int port,String user,String password) throws Exception{
-	    UniAddress hostAddress = UniAddress.getByName(host);
+		setConfigFromFiles();
+		
+		UniAddress hostAddress = UniAddress.getByName(host);
         authentication = new NtlmPasswordAuthentication(domain, user, password);
         SmbSession.logon(hostAddress,port, authentication);
 	}
@@ -546,7 +585,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 		
 		userName = authenticationOptions.getUser().Value();
 		String password = authenticationOptions.getPassword().Value();
-		logger.debug(SOSVfs_D_132.params(userName));
+		LOGGER.debug(SOSVfs_D_132.params(userName));
 
 		try {
 		    smbLogin(domain, host,port, userName, password);
@@ -558,7 +597,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 		}
 
 		reply = "OK";
-		logger.info(SOSVfs_D_133.params(userName));
+		LOGGER.info(SOSVfs_D_133.params(userName));
 		
 		this.LogReply();
 
@@ -570,7 +609,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 		host = phost;
 		port = pport;
 
-		logger.info(SOSVfs_D_0101.params(host, port));
+		LOGGER.info(SOSVfs_D_0101.params(host, port));
 
 		if (this.isConnected() == false) {
 
