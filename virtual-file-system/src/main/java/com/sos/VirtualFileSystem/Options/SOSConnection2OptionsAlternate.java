@@ -77,6 +77,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 																	false);
 
 	public SOSOptionCommandString	PostFtpCommands			= (SOSOptionCommandString) PostTransferCommands.SetAlias("post_Transfer_commands");
+	public SOSOptionCommandString	post_transfer_commands_on_success	= (SOSOptionCommandString) PostTransferCommands.SetAlias(className+".post_transfer_commands_on_success");
 
 	public String getPostTransferCommands() {
 		return PostTransferCommands.Value();
@@ -86,6 +87,34 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 		PostTransferCommands.Value(val);
 		return this;
 	} 
+	
+	@JSOptionDefinition(
+			name = "post_transfer_commands_on_error",
+			description = "Commands, which has to be executed after the transfer ended with errors.",
+			key = "post_transfer_commands_on_error",
+			type = "SOSOptionCommandString",
+			mandatory = false)
+	public SOSOptionCommandString	post_transfer_commands_on_error	= new SOSOptionCommandString(
+														this, 
+														className + ".post_transfer_commands_on_error",
+														"Commands, which has to be executed after the transfer ended with errors.", 
+														"", 
+														"", 
+														false);
+	
+	@JSOptionDefinition(
+			name = "post_transfer_commands_final",
+			description = "Commands, which has to be executed always after the transfer ended independent of the transfer status.",
+			key = "post_transfer_commands_final",
+			type = "SOSOptionCommandString",
+			mandatory = false)
+	public SOSOptionCommandString	post_transfer_commands_final	= new SOSOptionCommandString(
+														this, 
+														className + ".post_transfer_commands_final",
+														"Commands, which has to be executed always after the transfer ended independent of the transfer status.", 
+														"", 
+														"", 
+														false);
 	
 	@JSOptionDefinition(
 						name = "IgnoreCertificateError",
