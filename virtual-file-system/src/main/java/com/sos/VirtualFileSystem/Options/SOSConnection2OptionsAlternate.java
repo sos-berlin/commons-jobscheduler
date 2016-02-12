@@ -77,7 +77,6 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 																	false);
 
 	public SOSOptionCommandString	PostFtpCommands			= (SOSOptionCommandString) PostTransferCommands.SetAlias("post_Transfer_commands");
-	public SOSOptionCommandString	post_transfer_commands_on_success	= (SOSOptionCommandString) PostTransferCommands.SetAlias(className+".post_transfer_commands_on_success");
 
 	public String getPostTransferCommands() {
 		return PostTransferCommands.Value();
