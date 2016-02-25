@@ -1,21 +1,19 @@
 package com.sos.VirtualFileSystem.JMS.test;
 
-/**
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+/** Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements. See the NOTICE file distributed with this
+ * work for additional information regarding copyright ownership. The ASF
+ * licenses this file to You under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License. */
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -31,15 +29,11 @@ import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.protobuf.compiler.CommandLineSupport;
 import org.apache.activemq.util.IndentPrinter;
+import org.apache.log4j.Logger;
 
-
-/**
- * A simple tool for publishing messages
- * 
- * @version $Id$ $Revision: 1.2 $
- */
 public class ProducerTool extends Thread {
 
+    private static final Logger LOGGER = Logger.getLogger(ProducerTool.class);
     private Destination destination;
     private int messageCount = 10;
     private long sleepTime;
@@ -61,7 +55,7 @@ public class ProducerTool extends Thread {
         ProducerTool producerTool = new ProducerTool();
         String[] unknown = CommandLineSupport.setOptions(producerTool, args);
         if (unknown.length > 0) {
-            System.out.println("Unknown options: " + Arrays.toString(unknown));
+            LOGGER.debug("Unknown options: " + Arrays.toString(unknown));
             System.exit(-1);
         }
         producerTool.showParameters();
@@ -71,7 +65,6 @@ public class ProducerTool extends Thread {
             producerTool.start();
             threads.add(producerTool);
         }
-
         while (true) {
             Iterator<ProducerTool> itr = threads.iterator();
             int running = 0;
@@ -82,7 +75,7 @@ public class ProducerTool extends Thread {
                 }
             }
             if (running <= 0) {
-                System.out.println("All threads completed their work");
+                LOGGER.debug("All threads completed their work");
                 break;
             }
             try {
@@ -93,26 +86,23 @@ public class ProducerTool extends Thread {
     }
 
     public void showParameters() {
-        System.out.println("Connecting to URL: " + url);
-        System.out.println("Publishing a Message with size " + messageSize + " to " + (topic ? "topic" : "queue") + ": " + subject);
-        System.out.println("Using " + (persistent ? "persistent" : "non-persistent") + " messages");
-        System.out.println("Sleeping between publish " + sleepTime + " ms");
-        System.out.println("Running " + parallelThreads + " parallel threads");
-
+        LOGGER.debug("Connecting to URL: " + url);
+        LOGGER.debug("Publishing a Message with size " + messageSize + " to " + (topic ? "topic" : "queue") + ": " + subject);
+        LOGGER.debug("Using " + (persistent ? "persistent" : "non-persistent") + " messages");
+        LOGGER.debug("Sleeping between publish " + sleepTime + " ms");
+        LOGGER.debug("Running " + parallelThreads + " parallel threads");
         if (timeToLive != 0) {
-            System.out.println("Messages time to live " + timeToLive + " ms");
+            LOGGER.debug("Messages time to live " + timeToLive + " ms");
         }
     }
 
     public void run() {
-//        Connection connection = null;
-    	ActiveMQConnection  connection = null;
+        ActiveMQConnection connection = null;
         try {
             // Create the connection.
             ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(user, password, url);
             connection = (ActiveMQConnection) connectionFactory.createConnection();
             connection.start();
-
             // Create the session
             Session session = connection.createSession(transacted, Session.AUTO_ACKNOWLEDGE);
             if (topic) {
@@ -120,8 +110,6 @@ public class ProducerTool extends Thread {
             } else {
                 destination = session.createQueue(subject);
             }
-            
-            
             // Create the producer.
             MessageProducer producer = session.createProducer(destination);
             if (persistent) {
@@ -132,48 +120,37 @@ public class ProducerTool extends Thread {
             if (timeToLive != 0) {
                 producer.setTimeToLive(timeToLive);
             }
-
             // Start sending messages
             sendLoop(session, producer);
-
-            System.out.println("[" + this.getName() + "] Done.");
-
+            LOGGER.debug("[" + this.getName() + "] Done.");
             synchronized (lockResults) {
                 ActiveMQConnection c = (ActiveMQConnection) connection;
-                System.out.println("[" + this.getName() + "] Results:\n");
+                LOGGER.debug("[" + this.getName() + "] Results:\n");
                 c.getConnectionStats().dump(new IndentPrinter());
             }
-
         } catch (Exception e) {
-            System.out.println("[" + this.getName() + "] Caught: " + e);
-            e.printStackTrace();
+            LOGGER.error("[" + this.getName() + "] Caught: " + e.getMessage(), e);
         } finally {
             try {
                 connection.close();
-            } catch (Throwable ignore) {
+            } catch (Exception ignore) {
             }
         }
     }
 
     protected void sendLoop(Session session, MessageProducer producer) throws Exception {
-
         for (int i = 0; i < messageCount || messageCount == 0; i++) {
-
             TextMessage message = session.createTextMessage(createMessageText(i));
-//            StreamMessage message = session.createStreamMessage();
-
             if (verbose) {
                 String msg = message.getText();
                 if (msg.length() > 50) {
                     msg = msg.substring(0, 50) + "...";
                 }
-                System.out.println("[" + this.getName() + "] Sending message: '" + msg + "'");
+                LOGGER.debug("[" + this.getName() + "] Sending message: '" + msg + "'");
             }
-
             producer.send(message);
-
             if (transacted) {
-                System.out.println("[" + this.getName() + "] Committing " + messageCount + " messages");
+                LOGGER.debug("[" + this.getName() + "] Committing " + messageCount + " messages");
                 session.commit();
             }
             Thread.sleep(sleepTime);
@@ -181,15 +158,15 @@ public class ProducerTool extends Thread {
     }
 
     private String createMessageText(int index) {
-        StringBuffer buffer = new StringBuffer(messageSize);
-        buffer.append("Message: " + index + " sent at: " + new Date());
-        if (buffer.length() > messageSize) {
-            return buffer.substring(0, messageSize);
+        StringBuilder strb = new StringBuilder(messageSize);
+        strb.append("Message: " + index + " sent at: " + new Date());
+        if (strb.length() > messageSize) {
+            return strb.substring(0, messageSize);
         }
-        for (int i = buffer.length(); i < messageSize; i++) {
-            buffer.append(' ');
+        for (int i = strb.length(); i < messageSize; i++) {
+            strb.append(' ');
         }
-        return buffer.toString();
+        return strb.toString();
     }
 
     public void setPersistent(boolean durable) {
