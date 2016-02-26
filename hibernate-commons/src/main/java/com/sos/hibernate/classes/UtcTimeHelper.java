@@ -1,5 +1,6 @@
 package com.sos.hibernate.classes;
 
+import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -12,28 +13,22 @@ import java.util.TimeZone;
 
 public class UtcTimeHelper {
 
+    private static final Logger LOGGER = Logger.getLogger(UtcTimeHelper.class);
+    
     public static String localTimeZoneString() {
         return TimeZone.getDefault().getID();
     }
 
-
     public static String convertTimeZonesToString(String dateFormat, String fromTimeZone, String toTimeZone, DateTime fromDateTime) {
         DateTimeZone fromZone = DateTimeZone.forID(fromTimeZone);
         DateTimeZone toZone = DateTimeZone.forID(toTimeZone);
-
         DateTime dateTime = new DateTime(fromDateTime);
-
         dateTime = dateTime.withZoneRetainFields(fromZone);
-
         DateTime toDateTime = new DateTime(dateTime).withZone(toZone);
-
         DateTimeFormatter oFormatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'H:mm:ss.SSSZ");
         DateTimeFormatter oFormatter2 = DateTimeFormat.forPattern(dateFormat);
-
         DateTime newDate = oFormatter.withOffsetParsed().parseDateTime(toDateTime.toString());
-
         return oFormatter2.withZone(toZone).print(newDate.getMillis());
-
     }
 
     public static Date convertTimeZonesToDate(String fromTimeZone, String toTimeZone, DateTime fromDateTime) {
@@ -42,25 +37,18 @@ public class UtcTimeHelper {
         }
         DateTimeZone fromZone = DateTimeZone.forID(fromTimeZone);
         DateTimeZone toZone = DateTimeZone.forID(toTimeZone);
-
         DateTime dateTime = new DateTime(fromDateTime);
-
         dateTime = dateTime.withZoneRetainFields(fromZone);
-
         DateTime toDateTime = new DateTime(dateTime).withZone(toZone);
-
         DateTimeFormatter oFormatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'H:mm:ss.SSSZ");
         DateTimeFormatter oFormatter2 = DateTimeFormat.forPattern("yyyy-MM-dd H:mm:ss.ss");
-
         DateTime newDate = oFormatter.withOffsetParsed().parseDateTime(toDateTime.toString());
-
         try {
             return new SimpleDateFormat("yyyy-MM-dd H:mm:ss.ss").parse(oFormatter2.withZone(toZone).print(newDate.getMillis()));
         } catch (ParseException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
             return null;
         }
-
     }
 
     public Date getNowUtc() {

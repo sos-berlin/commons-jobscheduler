@@ -80,7 +80,7 @@ public class FileProducerTool extends Thread {
                 }
             }
             if (running <= 0) {
-                System.out.println("All threads completed their work");
+                LOGGER.debug("All threads completed their work");
                 break;
             }
             try {
@@ -188,7 +188,7 @@ public class FileProducerTool extends Thread {
     }
 
     private String createMessageText(int index) {
-        StringBuffer buffer = new StringBuffer(messageSize);
+        StringBuilder buffer = new StringBuilder(messageSize);
         buffer.append("Message: " + index + " sent at: " + new Date());
         if (buffer.length() > messageSize) {
             return buffer.substring(0, messageSize);
