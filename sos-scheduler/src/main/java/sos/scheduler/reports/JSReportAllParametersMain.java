@@ -1,66 +1,29 @@
-
-
 package sos.scheduler.reports;
 
 import com.sos.JSHelper.Basics.JSToolBox;
 import org.apache.log4j.Logger;
 
-
-/**
- * \class 		JSReportAllParametersMain - Main-Class for "Report all Parameters"
- *
- * \brief MainClass to launch JSReportAllParameters as an executable command-line program
- *
- * This Class JSReportAllParametersMain is the worker-class.
- *
-
- *
- * see \see J:\E\java\development\com.sos.scheduler\src\sos\scheduler\jobdoc\JSReportAllParameters.xml for (more) details.
- *
- * \verbatim ;
- * mechanicaly created by C:\Users\KB\eclipse\sos.scheduler.xsl\JSJobDoc2JSMainClass.xsl from http://www.sos-berlin.com at 20110516150420 
- * \endverbatim
- */
 public class JSReportAllParametersMain extends JSToolBox {
-	private final static String					conClassName						= "JSReportAllParametersMain"; //$NON-NLS-1$
-	private static Logger		logger			= Logger.getLogger(JSReportAllParametersMain.class);
 
-	protected JSReportAllParametersOptions	objOptions			= null;
+    private static final Logger LOGGER = Logger.getLogger(JSReportAllParametersMain.class);
 
-	/**
-	 * 
-	 * \brief main
-	 * 
-	 * \details
-	 *
-	 * \return void
-	 *
-	 * @param pstrArgs
-	 * @throws Exception
-	 */
-	public final static void main(String[] pstrArgs) {
+    protected JSReportAllParametersOptions objOptions = null;
 
-		final String conMethodName = conClassName + "::Main"; //$NON-NLS-1$
+    public final static void main(String[] pstrArgs) {
+        final String methodName = "JSReportAllParametersMain::Main";
+        LOGGER.info("JSReportAllParameters - Main");
+        try {
+            JSReportAllParameters objM = new JSReportAllParameters();
+            JSReportAllParametersOptions objO = objM.Options();
+            objO.CommandLineArgs(pstrArgs);
+            objM.Execute();
+        } catch (Exception e) {
+            LOGGER.error(methodName + ": " + "Error occured ..." + e.getMessage(), e);
+            int intExitCode = 99;
+            LOGGER.error(String.format("JSJ-E-105: %1$s - terminated with exit-code %2$d", methodName, intExitCode), e);
+            System.exit(intExitCode);
+        }
+        LOGGER.info(String.format("JSJ-I-106: %1$s - ended without errors", methodName));
+    }
 
-		logger.info("JSReportAllParameters - Main"); //$NON-NLS-1$
-
-		try {
-			JSReportAllParameters objM = new JSReportAllParameters();
-			JSReportAllParametersOptions objO = objM.Options();
-			
-			objO.CommandLineArgs(pstrArgs);
-			objM.Execute();
-		}
-		
-		catch (Exception e) {
-			System.err.println(conMethodName + ": " + "Error occured ..." + e.getMessage()); 
-			e.printStackTrace(System.err);
-			int intExitCode = 99;
-			logger.error(String.format("JSJ-E-105: %1$s - terminated with exit-code %2$d", conMethodName, intExitCode), e);		
-			System.exit(intExitCode);
-		}
-		
-		logger.info(String.format("JSJ-I-106: %1$s - ended without errors", conMethodName));		
-	}
-
-}  // class JSReportAllParametersMain
+}
