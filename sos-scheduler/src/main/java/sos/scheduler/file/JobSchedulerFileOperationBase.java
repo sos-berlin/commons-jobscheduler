@@ -112,12 +112,6 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
     private static final String PARAMETER_MERGE_ORDER_PARAMETER = "merge_order_parameter";
     private static final String JSJ_F_0110 = "JSJ_F_0110";
     private HashMap<String, String> params = null;
-    private String source = null;
-    private String target = null;
-    private int flags = 0;
-    private String replacing = null;
-    private String replacement = null;
-    private boolean count_files = false;
     private SOSOptionFileAge objOptionFileAge = null;
     private SOSOptionTime objOptionTime = null;
     public static final String conOrderParameterSCHEDULER_SOS_FILE_OPERATIONS_RESULT_SET = "scheduler_SOSFileOperations_ResultSet";
@@ -125,6 +119,12 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
     public static final String conOrderParameterSCHEDULER_SOS_FILE_OPERATIONS_FILE_COUNT = "scheduler_SOSFileOperations_file_count";
     public static final String conParameterGRACIOUS = "gracious";
     public int intNoOfHitsInResultSet = 0;
+    public String source = null;
+    public String target = null;
+    public int flags = 0;
+    public String replacing = null;
+    public String replacement = null;
+    public boolean count_files = false;
 
     public JobSchedulerFileOperationBase() {
         super();
@@ -263,8 +263,9 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
             if (strT.length() > 0) {
 				if(pstrParamName.contains("password")){
 					logger.info(JSJ_I_0040.params(pstrParamName, "*****"));
-				}else{
-                logger.info(JSJ_I_0040.params(pstrParamName, strT));
+				} else {
+					logger.info(JSJ_I_0040.params(pstrParamName, strT));
+				}
             }
         }
         return strT;
