@@ -1,11 +1,12 @@
 package sos.scheduler.file;
 
+import java.util.Locale;
+
+import org.apache.log4j.Logger;
+
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.localization.Messages;
-import org.apache.log4j.Logger;
-
-import java.util.Locale;
 
 @I18NResourceBundle(baseName = "com.sos.scheduler.messages", defaultLocale = "en")
 public class JobSchedulerFolderTreeMain extends JSToolBox {
