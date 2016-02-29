@@ -80,11 +80,15 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public void StrictHostKeyChecking(final String pstrStrictHostKeyCheckingValue) {
+    public void setStrictHostKeyChecking(final String pstrStrictHostKeyCheckingValue) {
         JSch.setConfig("StrictHostKeyChecking", pstrStrictHostKeyCheckingValue);
     }
 
-    @Override
+	private String getStrictHostKeyChecking(final SOSOptionBoolean val) {
+		return val.value() ? "yes" : "no";
+	}
+
+	@Override
     public ISOSConnection Connect() {
         this.Connect(connection2OptionsAlternate);
         return this;
@@ -96,7 +100,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         if (connection2OptionsAlternate == null) {
             RaiseException(SOSVfs_E_190.params("connection2OptionsAlternate"));
         }
-        this.StrictHostKeyChecking(connection2OptionsAlternate.StrictHostKeyChecking.Value());
+        this.setStrictHostKeyChecking(connection2OptionsAlternate.strictHostKeyChecking.Value());
         this.connect(connection2OptionsAlternate.host.Value(), connection2OptionsAlternate.port.value());
         return this;
     }
@@ -686,7 +690,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         }
         sshSession = secureChannel.getSession(puser, phost, pport);
         java.util.Properties config = new java.util.Properties();
-        config.put("StrictHostKeyChecking", connection2OptionsAlternate.StrictHostKeyChecking.Value());
+        config.put("StrictHostKeyChecking", connection2OptionsAlternate.strictHostKeyChecking.Value());
         sshSession.setConfig(config);
         setCommandsTimeout();
         setProxy();

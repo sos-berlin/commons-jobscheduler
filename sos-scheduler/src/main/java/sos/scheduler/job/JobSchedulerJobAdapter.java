@@ -14,6 +14,8 @@ import static com.sos.scheduler.messages.JSMessages.JSJ_I_0010;
 import static com.sos.scheduler.messages.JSMessages.JSJ_I_0020;
 import static com.sos.scheduler.messages.JSMessages.LOG_D_0020;
 import static com.sos.scheduler.messages.JSMessages.LOG_I_0010;
+
+import java.io.File;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -40,6 +42,7 @@ import com.sos.JSHelper.Basics.JSJobUtilities;
 import com.sos.JSHelper.Basics.VersionInfo;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Logging.Log4JHelper;
+import com.sos.JSHelper.Options.JSOptionsClass;
 import com.sos.JSHelper.Options.SOSOptionElement;
 import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.localization.Messages;

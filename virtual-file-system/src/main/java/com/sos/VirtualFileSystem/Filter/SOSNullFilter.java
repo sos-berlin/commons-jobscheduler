@@ -22,7 +22,7 @@ public class SOSNullFilter extends JSJobUtilitiesClass<SOSFilterOptions> impleme
     }
 
     @Override
-    public SOSFilterOptions Options() {
+    public SOSFilterOptions getOptions() {
         if (objOptions == null) {
             objOptions = new SOSFilterOptions();
         }
