@@ -539,7 +539,8 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
     public String replaceVars4(String pstrReplaceIn) {
         String strParamNameEnclosedInPercentSigns = "^.*%([^%]+)%.*$";
         if (isNotNull(pstrReplaceIn)) {
-            // To make orderparams available for substitution in orderparam value
+            // To make orderparams available for substitution in orderparam
+            // value
             while (pstrReplaceIn.matches(strParamNameEnclosedInPercentSigns)) {
                 String p = pstrReplaceIn.replaceFirst(strParamNameEnclosedInPercentSigns, "$1");
                 String strPP = "%" + p + "%";

@@ -39,7 +39,6 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
     private static final Logger LOGGER = Logger.getLogger(GlobalMonitorPlugin.class);
     ConfigurationModifierFileSelectorOptions configurationModifierFileSelectorJobOptions;
     ConfigurationModifierFileSelectorOptions configurationModifierFileSelectorMonitorOptions;
-
     private HashMap<String, String> parameters;
 
     @Inject
@@ -78,7 +77,7 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
             transformer.transform(domSource, result);
             return writer.toString();
         } catch (TransformerException ex) {
-            ex.printStackTrace();
+            LOGGER.error(ex.getMessage(), ex);
             return null;
         }
     }
@@ -129,9 +128,11 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
 
     private Document modifyJobElement(Document doc, String jobname) throws JDOMException {
         LOGGER.debug("---------  modifyJobElement:" + jobname);
-        // 1. Create a FileSelector for the jobs that are to be handled depending on the given options.
+        // 1. Create a FileSelector for the jobs that are to be handled
+        // depending on the given options.
         ConfigurationModifierFileSelector configurationModifierFileSelector = new ConfigurationModifierFileSelector(configurationModifierFileSelectorJobOptions);
-        // 2. Set the filter for jobs to an instance of ConfigurationModifierJobFileFilter
+        // 2. Set the filter for jobs to an instance of
+        // ConfigurationModifierJobFileFilter
         configurationModifierFileSelector.setSelectorFilter(new ConfigurationModifierJobFileFilter(configurationModifierFileSelectorJobOptions));
         // 3. getting the entire jobs
         LOGGER.debug("---------  fillSelectedFileList");
@@ -139,16 +140,21 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
         boolean jobIsToBeHandled = configurationModifierFileSelector.isInSelectedFileList(jobname);
         LOGGER.debug("---------  jobIsToBeHandled:" + jobIsToBeHandled);
         if (jobIsToBeHandled) {
-            // 4. if the current job is to be handled, create the list of monitors to add.
+            // 4. if the current job is to be handled, create the list of
+            // monitors to add.
             JobSchedulerFileElement jobSchedulerFileElement = configurationModifierFileSelector.getJobSchedulerElement(jobname);
             if (jobSchedulerFileElement != null) {
-                // always will be != null, as this is the then part of jobIsToBeHandled-if
-                // 5. Create a FileSelector for the monitors that are to be added to the monitor.use list depending on the given options.
+                // always will be != null, as this is the then part of
+                // jobIsToBeHandled-if
+                // 5. Create a FileSelector for the monitors that are to be
+                // added to the monitor.use list depending on the given options.
                 configurationModifierFileSelector = new ConfigurationModifierFileSelector(configurationModifierFileSelectorMonitorOptions);
-                // 6. Set the filter for jobs to an instance of ConfigurationModifierMonitorFileFilter
+                // 6. Set the filter for jobs to an instance of
+                // ConfigurationModifierMonitorFileFilter
                 configurationModifierFileSelector.setSelectorFilter(new ConfigurationModifierMonitorFileFilter(configurationModifierFileSelectorMonitorOptions));
                 configurationModifierFileSelector.fillParentMonitorList(jobSchedulerFileElement);
-                // 7. Create a jobConfiguration changer to read, parse, change (and write) the job.xml
+                // 7. Create a jobConfiguration changer to read, parse, change
+                // (and write) the job.xml
                 JobConfigurationFileChanger jobConfigurationFileChanger = new JobConfigurationFileChanger(doc);
                 jobConfigurationFileChanger.setListOfMonitors(configurationModifierFileSelector.getListOfMonitorConfigurationFiles());
                 doc = jobConfigurationFileChanger.addMonitorUse();
