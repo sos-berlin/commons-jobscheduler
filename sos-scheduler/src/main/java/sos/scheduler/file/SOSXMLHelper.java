@@ -109,7 +109,4 @@ public class SOSXMLHelper {
         }
     }
 
-    public void finalize() {
-        this.close();
-    }
 }
