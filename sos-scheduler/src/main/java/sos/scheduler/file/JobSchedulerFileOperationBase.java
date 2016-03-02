@@ -57,8 +57,6 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
     protected static final String conParameterREPLACING = "replacing";
     protected static final String conParameterRAISE_ERROR_IF_RESULT_SET_IS = "Raise_Error_If_Result_Set_Is";
     protected static final String conParameterEXPECTED_SIZE_OF_RESULT_SET = "Expected_Size_Of_Result_Set";
-    protected SOSSchedulerLogger objSOSLogger = null;
-    protected final Logger logger = Logger.getLogger(JobSchedulerFileOperationBase.class);
     protected static final String conParameterRESULT_LIST_FILE = "Result_List_File";
     protected static final String conParameterRECURSIVE = "recursive";
     protected static final String conParameterCREATE_DIR = "create_dir";
@@ -66,6 +64,8 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
     protected static final String conParameterCREATE_FILES = "create_files";
     protected static final String conParameterREMOVE_DIR = "remove_dir";
     protected static final String conValueYES = "yes";
+    protected final Logger logger = Logger.getLogger(JobSchedulerFileOperationBase.class);
+    protected SOSSchedulerLogger objSOSLogger = null;
     protected boolean flgOperationWasSuccessful = false;
     protected String name = null;
     protected String file = null;
