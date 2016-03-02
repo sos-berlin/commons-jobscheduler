@@ -18,7 +18,6 @@ import java.util.Vector;
 /** @author Ghassan Beydoun */
 public class SOSFTP extends FTPClient implements SOSFileTransfer {
 
-    private final String conClassName = "SOSFTP";
     private static final Logger LOGGER = Logger.getLogger(SOSFTP.class);
     protected static final String conRegExpBackslash = "\\\\";
     private ProtocolCommandListener listener = null;
@@ -168,7 +167,7 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
             LogReply();
             DoPWD();
         } catch (IOException e) {
-            // 
+            //
         }
         return 0;
     }
@@ -200,7 +199,7 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
     }
 
     public boolean isNotHiddenFile(final String strFileName) {
-        if (!"..".equalsIgnoreCase(strFileName)  && !".".equalsIgnoreCase(strFileName)) {
+        if (!"..".equalsIgnoreCase(strFileName) && !".".equalsIgnoreCase(strFileName)) {
             return true;
         }
         return false;
