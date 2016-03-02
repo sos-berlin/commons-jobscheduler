@@ -8,7 +8,6 @@ import static com.sos.scheduler.model.messages.JSMessages.JOM_D_0040;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -718,7 +717,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
 
             objOrder.setId(s);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
         }
         return objOrder;
     }
