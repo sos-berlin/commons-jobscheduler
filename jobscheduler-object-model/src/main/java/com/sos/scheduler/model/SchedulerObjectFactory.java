@@ -114,1450 +114,1101 @@ import com.sos.scheduler.model.objects.Param;
 import com.sos.scheduler.model.objects.Params;
 import com.sos.scheduler.model.objects.Spooler;
 
- 
 public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
-	public static enum enu4What {
-		remote_schedulers, all, folders, job_chains, job_chain_jobs, /* job-chains and jobs are requested */
-		running, no_subfolders, log, task_queue
-		/**/;
-		public String Text() {
-			String strT = this.name();
-			return strT;
-		}
-	}
-	private final String					conClassName			= "SchedulerObjectFactory";
-	private LiveConnector					liveConnector			= null;
-	private SchedulerHotFolder				liveFolder;
-	private static final Class<Spooler>		conDefaultMarshaller	= Spooler.class;
-	private static final Logger				logger					= Logger.getLogger(SchedulerObjectFactory.class);
-	private SchedulerObjectFactoryOptions	objOptions				= new SchedulerObjectFactoryOptions();
-	// static is due to:  http://jaxb.java.net/guide/Performance_and_thread_safety.html
-	private static JAXBContext				jc;
-	private static JAXBContext				jc4Answers				= null;
 
-	private Unmarshaller					u;
-	private Marshaller						objM;
-	private SchedulerSocket					objSchedulerSocket		= null;
-	private Unmarshaller					u4Answers				= null;
-	private Marshaller						objM4Answers			= null;
-	
-	private String							strLastAnswer			= null;
+    private static final Class<Spooler> conDefaultMarshaller = Spooler.class;
+    private static final Logger LOGGER = Logger.getLogger(SchedulerObjectFactory.class);
+    private SchedulerObjectFactoryOptions objOptions = new SchedulerObjectFactoryOptions();
+    private static JAXBContext jc;
+    private static JAXBContext jc4Answers = null;
+    private final JSJobUtilities objJSJobUtilities = null;
+    private LiveConnector liveConnector = null;
+    private SchedulerHotFolder liveFolder;
+    private Unmarshaller u;
+    private Marshaller objM;
+    private SchedulerSocket objSchedulerSocket = null;
+    private Unmarshaller u4Answers = null;
+    private Marshaller objM4Answers = null;
+    private String strLastAnswer = null;
+    private boolean useDefaultPeriod;
 
-	private final JSJobUtilities			objJSJobUtilities		= null;											// this;
-	private boolean							useDefaultPeriod;
+    public static enum enu4What {
+        remote_schedulers, all, folders, job_chains, job_chain_jobs, running, no_subfolders, log, task_queue;
 
-	public SchedulerObjectFactory() {
-		super("com_sos_scheduler_model");
-		initMarshaller(conDefaultMarshaller);
-		useDefaultPeriod = false;
-	}
-
-	public SchedulerObjectFactory(final LiveConnector liveConnector) {
-		this();
-		this.liveConnector = liveConnector;
-		liveFolder = createSchedulerHotFolder(liveConnector.getHotFolderHandle());
-	}
-
-	public String getLastAnswer() {
-
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getLastAnswer";
-
-		return strLastAnswer;
-	} // private String getLastAnswer
-
-	@Override
-	public void run() {}
-
-	private boolean isJSJobUtilitiesChanged() {
-
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::isJSJobUtilitiesChanged";
-
-		boolean flgRet = false;
-		if (objJSJobUtilities != this && objJSJobUtilities != null) {
-			flgRet = true;
-		}
-
-		return flgRet;
-	} // private boolean isJSJobUtilitiesChanged
-
- 
-	public Answer run(final JSCmdBase pobjJSCmd) {
-		final String conMethodName = conClassName + "::run";
-		Answer objAnswer = null;
-		String strT = pobjJSCmd.toXMLString();
-		String strA = "";
-		try {
-			logger.trace(JOM_D_0010.get(conMethodName, strT)); // JOM_D_0010=%1$s: Request: %n%2$s
-			if (isJSJobUtilitiesChanged()) {
-				// TODO Ausführen des Kommandos über das interne API
-				// IJSCommands.
-			}
-			else {
-				if (objOptions.TransferMethod.isTcp()) {
-					// setting timeout to prevent hang up if Server is not available [SP]
-					this.getSocket().setSoTimeout(30000);
-					this.getSocket().sendRequest(strT);
-					logger.trace("Request sended to JobScheduler:\n" + strT);
-					strA = getSocket().getResponse();
-					strLastAnswer = strA;
-					logger.trace("Answer from JobScheduler:\n" + strLastAnswer);
-					objAnswer = getAnswer(strA);
-				}
-				else
-					if (objOptions.TransferMethod.isUdp()) {
-						DatagramSocket udpSocket = null;
-						int intPortNumber = 0;
-						try {
-							udpSocket = new DatagramSocket();
-							intPortNumber = objOptions.PortNumber.value();
-							InetAddress objInetAddress = objOptions.ServerName.getInetAddress();
-							udpSocket.connect(objInetAddress, intPortNumber);
-							if (strT.indexOf("<?xml") == -1) {
-								// TODO Encoding variable and utf-8 as default
-								strT = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>" + strT;
-							}
-							byte[] btyBuffer = strT.getBytes();
-							udpSocket.send(new DatagramPacket(btyBuffer, btyBuffer.length, objInetAddress, intPortNumber));
-						}
-						catch (Exception e) {
-							e.printStackTrace();
-							throw e;
-						}
-						finally {
-							if (udpSocket != null) {
-//								logger.trace(Messages.getMsg("JOM_D_0020", objOptions.ServerName.toString(), intPortNumber)); // JOM_D_0020=Command
-								logger.trace(JOM_D_0020.get(objOptions.ServerName.toString(), intPortNumber)); // JOM_D_0020=Command
-								udpSocket.disconnect();
-								udpSocket = null;
-							}
-						}
-					}
-					else {
-						throw new JobSchedulerException(String.format("TransferMethod '%1$s' not supported (yet)", objOptions.TransferMethod.Value()));
-					}
-			}
-		}
-		catch (Exception e) {
-			throw new JobSchedulerException(String.format("%1$s: %2$s", conMethodName, e.getMessage()), e);
-		}
-		if (objAnswer != null) {
-			// TODO in Answer den original-response des js als string ablegen.
-			// TODO eigenstï¿½ndige BasisKlasse JSAnswerBase bauen. ableiten von JSCmdBase.
-			if (objAnswer.getERROR() != null) {
-				throw new JobSchedulerException(Messages.getMsg("JOM_E_0010") + "\n" +
-						"command:\n" + strT + "\n" +
-						"answer:\n" + strLastAnswer
-						); // JOM_E_0010=JobScheduler responds an error due to
-																						// an invalid or wrong command\n
-			}
-		}
-		return objAnswer;
-	} // private Object run
-	
-	public Answer getAnswerFromSpooler(sos.spooler.Spooler spooler, JSCmdBase pobjJSCmd) {
-		String command = pobjJSCmd.toXMLString();
-		strLastAnswer = spooler.execute_xml(command);
-		logger.trace("Answer from JobScheduler:\n" + strLastAnswer);
-		Answer objAnswer = getAnswer(strLastAnswer);
-		return objAnswer;
-		
-	}
-	 
-	public Answer getAnswer(final String pXMLStr) {
-		final String conMethodName = conClassName + "::getAnswer";
-		if (JSCmdBase.flgLogXML == true) {
-			logger.trace(String.format("%1$s: Response: %n%2$s", conMethodName, pXMLStr));
-		}
-		Answer objAnswer = null;
-		com.sos.scheduler.model.answers.Spooler objSpooler = null;
-		try {
-			/**
-			 * den speziellen Context fü½r die Answer brauchen wir, solange die Answer nicht in der scheduler.xsd enthalten ist.
-			 * dadurch ist das dann ein anderer Namespace und das passt nicht zusammen.
-			 */
-			if (jc4Answers == null) {
-				jc4Answers = JAXBContext
-						.newInstance(com.sos.scheduler.model.answers.Spooler.class);
-				// create an Unmarshaller
-			}
-			if (u4Answers == null) {
-				u4Answers = jc4Answers.createUnmarshaller();
-			}
-			objSpooler = (com.sos.scheduler.model.answers.Spooler) u4Answers.unmarshal(new StringReader(pXMLStr));
-			if (objM4Answers == null) {
-				objM4Answers = jc4Answers.createMarshaller();
-			}
-		}
-		catch (Exception e) {
-			throw new JobSchedulerException(String.format("can't get answer object from %n%1$s", pXMLStr), e);
-		}
-		if (objSpooler != null) {
-			objAnswer = objSpooler.getAnswer();
-		}
-		return objAnswer;
-	} // public Answer getAnswer
-
-	public void initMarshaller(final Class<?> objC) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::initMarshaller";
-		try {
-			if (jc == null) {
-				jc = JAXBContext.newInstance(objC);
-			}
-			// create an Unmarshaller
-			u = jc.createUnmarshaller();
-			objM = jc.createMarshaller();
-		}
-		catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	} // private void initMarshaller
-	
-	
-	public void initAnswerMarshaller() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::initAnswerMarshaller";
-		try {
-			if (jc4Answers == null) {
-				jc4Answers = JAXBContext
-						.newInstance(com.sos.scheduler.model.answers.Spooler.class);
-				// create an Unmarshaller
-			}
-			if (u4Answers == null) {
-				u4Answers = jc4Answers.createUnmarshaller();
-			}
-			if (objM4Answers == null) {
-				objM4Answers = jc4Answers.createMarshaller();
-			}
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	 
-	public Object unMarshall(final File pobjFile) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::unMarshall";
-		Object objC = null;
-		try {
-			objC = u.unmarshal(new FileInputStream(pobjFile));
-		}
-		catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        public String Text() {
+            String strT = this.name();
+            return strT;
         }
-		return objC;
-	} // private Object unMarshall
+    }
 
-	public Object unMarshall(final ISOSVirtualFile pobjVirtualFile) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::unMarshall";
-		Object objC = null;
-		if (pobjVirtualFile != null) {
-			InputStream objInputStream = pobjVirtualFile.getFileInputStream();
-			try {
-				if (objInputStream == null) {
-					logger.error(String.format("can't get inputstream for file '%1$s'.", pobjVirtualFile.getName()));
-					throw new JobSchedulerException(String.format("can't get inputstream for file '%1$s'.", pobjVirtualFile.getName()));
-				}
-				objC = u.unmarshal(objInputStream);
-			}
-			catch (JAXBException e) {
-				e.printStackTrace();
-				throw new JobSchedulerException("", e);
-			}
-			finally {
-				pobjVirtualFile.closeInput();
-			}
-		}
-		else {
-			logger.error("pobjVirtualFile is null");
-			throw new JobSchedulerException("pobjVirtualFile is null");
-		}
-		return objC;
-	} // private Object unMarshall
+    public SchedulerObjectFactory() {
+        super("com_sos_scheduler_model");
+        initMarshaller(conDefaultMarshaller);
+        useDefaultPeriod = false;
+    }
 
-	public Object unMarshall(final InputStream pobjInputStream) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::unMarshall";
-		Object objC = null;
-		try {
-			objC = u.unmarshal(pobjInputStream);
-		}
-		catch (JAXBException e) {
-			e.printStackTrace();
-			throw new JobSchedulerException("", e);
-		}
-		return objC;
-	} // private Object unMarshall
+    public SchedulerObjectFactory(final LiveConnector liveConnector) {
+        this();
+        this.liveConnector = liveConnector;
+        liveFolder = createSchedulerHotFolder(liveConnector.getHotFolderHandle());
+    }
 
-	public Object unMarshall(final String pstrXMLContent) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::unMarshall";
-		Object objC = null;
-		try {
-			objC = u.unmarshal(new StringReader(pstrXMLContent));
-		}
-		catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new JobSchedulerException("", e);
-		}
-		return objC;
-	} // private Object unMarshall
+    public String getLastAnswer() {
+        return strLastAnswer;
+    }
 
-	 
-	public Object marshal(final Object objO, final File objF) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::marshal";
-		try {
-			// get an Apache XMLSerializer configured to generate CDATA
-			XMLSerializer serializer = getXMLSerializer();
-			FileOutputStream objFOS = new FileOutputStream(objF);
-			serializer.setOutputByteStream(objFOS);
-			// marshal using the Apache XMLSerializer
-			objM.marshal(objO, serializer.asContentHandler());
- 
-		}
-		catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new JobSchedulerException("", e);
-		}
-		catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new JobSchedulerException("", e);
-		}
-		catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new JobSchedulerException("", e);
-		}
-		return objO;
-	} // private SchedulerObjectFactoryOptions marshal
+    @Override
+    public void run() {
+    }
 
-	public String marshal(final Object objO) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::marshal";
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		DataOutputStream out = new DataOutputStream(baos);
-		try {
-			// get an Apache XMLSerializer configured to generate CDATA
-			XMLSerializer serializer = getXMLSerializer();
+    private boolean isJSJobUtilitiesChanged() {
+        boolean flgRet = false;
+        if (objJSJobUtilities != this && objJSJobUtilities != null) {
+            flgRet = true;
+        }
+        return flgRet;
+    }
 
-			// FileOutputStream objFOS = new FileOutputStream(objFos);
-			serializer.setOutputByteStream(out);
-			// marshal using the Apache XMLSerializer
-			objM.marshal(objO, serializer.asContentHandler());
-			// objM.marshal(objO, objF);
-		}
-		catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new JobSchedulerException("", e);
-		}
-		catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new JobSchedulerException("", e);
-		}
-		catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new JobSchedulerException("", e);
-		}
-		return baos.toString();
-	} // private SchedulerObjectFactoryOptions marshal
+    public Answer run(final JSCmdBase pobjJSCmd) {
+        final String conMethodName = "SchedulerObjectFactory::run";
+        Answer objAnswer = null;
+        String strT = pobjJSCmd.toXMLString();
+        String strA = "";
+        try {
+            LOGGER.trace(JOM_D_0010.get(conMethodName, strT));
+            if (!isJSJobUtilitiesChanged()) {
+                if (objOptions.TransferMethod.isTcp()) {
+                    this.getSocket().setSoTimeout(30000);
+                    this.getSocket().sendRequest(strT);
+                    LOGGER.trace("Request sended to JobScheduler:\n" + strT);
+                    strA = getSocket().getResponse();
+                    strLastAnswer = strA;
+                    LOGGER.trace("Answer from JobScheduler:\n" + strLastAnswer);
+                    objAnswer = getAnswer(strA);
+                } else if (objOptions.TransferMethod.isUdp()) {
+                    DatagramSocket udpSocket = null;
+                    int intPortNumber = 0;
+                    try {
+                        udpSocket = new DatagramSocket();
+                        intPortNumber = objOptions.PortNumber.value();
+                        InetAddress objInetAddress = objOptions.ServerName.getInetAddress();
+                        udpSocket.connect(objInetAddress, intPortNumber);
+                        if (strT.indexOf("<?xml") == -1) {
+                            strT = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>" + strT;
+                        }
+                        byte[] btyBuffer = strT.getBytes();
+                        udpSocket.send(new DatagramPacket(btyBuffer, btyBuffer.length, objInetAddress, intPortNumber));
+                    } catch (Exception e) {
+                        LOGGER.error(e.getMessage(), e);
+                        throw e;
+                    } finally {
+                        if (udpSocket != null) {
+                            LOGGER.trace(JOM_D_0020.get(objOptions.ServerName.toString(), intPortNumber));
+                            udpSocket.disconnect();
+                            udpSocket = null;
+                        }
+                    }
+                } else {
+                    throw new JobSchedulerException(String.format("TransferMethod '%1$s' not supported (yet)", objOptions.TransferMethod.Value()));
+                }
+            }
+        } catch (Exception e) {
+            throw new JobSchedulerException(String.format("%1$s: %2$s", conMethodName, e.getMessage()), e);
+        }
+        if (objAnswer != null && objAnswer.getERROR() != null) {
+            throw new JobSchedulerException(Messages.getMsg("JOM_E_0010") + "\n" + "command:\n" + strT + "\n" + "answer:\n" + strLastAnswer);
+        }
+        return objAnswer;
+    }
 
-	public Object toXMLFile(final Object objO, final ISOSVirtualFile pobjVirtualFile) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::marshal";
-		if (pobjVirtualFile != null) {
-			OutputStream objOutputStream = pobjVirtualFile.getFileOutputStream();
-			try {
-				if (objOutputStream == null) {
-					logger.error(String.format("can't get outputstream for file '%1$s'.", pobjVirtualFile.getName()));
-					throw new JobSchedulerException(String.format("can't get outputstream for file '%1$s'.", pobjVirtualFile.getName()));
-				}
-				// get an Apache XMLSerializer configured to generate CDATA
-				XMLSerializer serializer = getXMLSerializer();
-				serializer.setOutputByteStream(objOutputStream);
-				// marshal using the Apache XMLSerializer
-				objM.marshal(objO, serializer.asContentHandler());
-			}
-			catch (JAXBException e) {
-				e.printStackTrace();
-				throw new JobSchedulerException("", e);
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-				throw new JobSchedulerException("", e);
-			}
-			finally {
-				pobjVirtualFile.closeOutput();
-			}
-		}
-		else {
-			logger.error("pobjVirtualFile is null");
-			throw new JobSchedulerException("pobjVirtualFile is null");
-		}
-		return objO;
-	} // private SchedulerObjectFactoryOptions marshal
+    public Answer getAnswerFromSpooler(sos.spooler.Spooler spooler, JSCmdBase pobjJSCmd) {
+        String command = pobjJSCmd.toXMLString();
+        strLastAnswer = spooler.execute_xml(command);
+        LOGGER.trace("Answer from JobScheduler:\n" + strLastAnswer);
+        Answer objAnswer = getAnswer(strLastAnswer);
+        return objAnswer;
+    }
 
-	 
-	private String toXMLString(final Object objO, final Marshaller objMarshaller) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::toXMLString";
-		String strT = "";
-		try {
-			// get an Apache XMLSerializer configured to generate CDATA
-			XMLSerializer serializer = getXMLSerializer();
-			OutputFormat objOutputFormat = new OutputFormat();
-			// TODO in die Optionclass
-			objOutputFormat.setEncoding("utf-8");
-			objOutputFormat.setIndenting(true);
-			objOutputFormat.setIndent(4);
-			objOutputFormat.setLineWidth(80);
-			serializer.setOutputFormat(objOutputFormat);
-			StringWriter objSW = new StringWriter();
-			serializer.setOutputCharStream(objSW);
-			// marshal using the Apache XMLSerializer
-			objMarshaller.marshal(objO, serializer.asContentHandler());
-			// objM.marshal(objO, objSW);
-			strT = objSW.getBuffer().toString();
-		}
-		catch (JAXBException e) {
-			e.printStackTrace();
-			throw new JobSchedulerException("", e);
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-			throw new JobSchedulerException("", e);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-			throw new JobSchedulerException("", e);
-		}
-		return strT;
-	} // private SchedulerObjectFactoryOptions marshal
-	
-	
-	 
-	public String toXMLString(final Object objO) {
-		if(objO.getClass().getName().startsWith("com.sos.scheduler.model.answers.")) {
-			return answerToXMLString(objO);
-		}
-		return toXMLString(objO, objM);
-	} // public SchedulerObjectFactoryOptions toXMLString
-	
-	
-	public String answerToXMLString(final Object objO) {
-		initAnswerMarshaller();
-		return toXMLString(objO, objM4Answers);
-	} // public SchedulerObjectFactoryOptions answerToXMLString
+    public Answer getAnswer(final String pXMLStr) {
+        final String conMethodName = "SchedulerObjectFactory::getAnswer";
+        if (JSCmdBase.flgLogXML == true) {
+            LOGGER.trace(String.format("%1$s: Response: %n%2$s", conMethodName, pXMLStr));
+        }
+        Answer objAnswer = null;
+        com.sos.scheduler.model.answers.Spooler objSpooler = null;
+        try {
+            if (jc4Answers == null) {
+                jc4Answers = JAXBContext.newInstance(com.sos.scheduler.model.answers.Spooler.class);
+            }
+            if (u4Answers == null) {
+                u4Answers = jc4Answers.createUnmarshaller();
+            }
+            objSpooler = (com.sos.scheduler.model.answers.Spooler) u4Answers.unmarshal(new StringReader(pXMLStr));
+            if (objM4Answers == null) {
+                objM4Answers = jc4Answers.createMarshaller();
+            }
+        } catch (Exception e) {
+            throw new JobSchedulerException(String.format("can't get answer object from %n%1$s", pXMLStr), e);
+        }
+        if (objSpooler != null) {
+            objAnswer = objSpooler.getAnswer();
+        }
+        return objAnswer;
+    }
 
-	 
-	private XMLSerializer getXMLSerializer() {
-		OutputFormat of = new OutputFormat();
-		of.setCDataElements(new String[] { "^description", "^script", "^scheduler_script", "^log_mail_to", "^log_mail_cc", "^log_mail_bcc" });
-		// TODO setIndenting should be an option
-		of.setIndenting(true);
-		XMLSerializer serializer = new XMLSerializer(of);
-		return serializer;
-	} // private XMLSerializer getXMLSerializer
+    public void initMarshaller(final Class<?> objC) {
+        try {
+            if (jc == null) {
+                jc = JAXBContext.newInstance(objC);
+            }
+            u = jc.createUnmarshaller();
+            objM = jc.createMarshaller();
+        } catch (JAXBException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+    }
 
-	 
-	public SchedulerObjectFactoryOptions Options() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::Options";
-		if (objOptions == null) {
-			objOptions = new SchedulerObjectFactoryOptions();
-		}
-		return objOptions;
-	} // private SchedulerObjectFactoryOptions Options
+    public void initAnswerMarshaller() {
+        try {
+            if (jc4Answers == null) {
+                jc4Answers = JAXBContext.newInstance(com.sos.scheduler.model.answers.Spooler.class);
+            }
+            if (u4Answers == null) {
+                u4Answers = jc4Answers.createUnmarshaller();
+            }
+            if (objM4Answers == null) {
+                objM4Answers = jc4Answers.createMarshaller();
+            }
+        } catch (JAXBException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+    }
 
-	 
-	public SchedulerObjectFactory(final String pstrServerName, final int pintPort) {
-		this();
-		this.Options().ServerName.Value(pstrServerName);
-		this.Options().PortNumber.value(pintPort);
-		initMarshaller(conDefaultMarshaller);
-	}
+    public Object unMarshall(final File pobjFile) {
+        Object objC = null;
+        try {
+            objC = u.unmarshal(pobjFile);
+        } catch (JAXBException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        return objC;
+    }
 
-	public SchedulerObjectFactory(final String pstrServerName, final int pintPort, final LiveConnector liveConnector) {
-		this(pstrServerName, pintPort);
-		this.liveConnector = liveConnector;
-		liveFolder = createSchedulerHotFolder(liveConnector.getHotFolderHandle());
-	}
+    public Object unMarshall(final ISOSVirtualFile pobjVirtualFile) {
+        Object objC = null;
+        if (pobjVirtualFile != null) {
+            InputStream objInputStream = pobjVirtualFile.getFileInputStream();
+            try {
+                if (objInputStream == null) {
+                    LOGGER.error(String.format("can't get inputstream for file '%1$s'.", pobjVirtualFile.getName()));
+                    throw new JobSchedulerException(String.format("can't get inputstream for file '%1$s'.", pobjVirtualFile.getName()));
+                }
+                objC = u.unmarshal(objInputStream);
+            } catch (JAXBException e) {
+                throw new JobSchedulerException(e.getMessage(), e);
+            } finally {
+                pobjVirtualFile.closeInput();
+            }
+        } else {
+            LOGGER.error("pobjVirtualFile is null");
+            throw new JobSchedulerException("pobjVirtualFile is null");
+        }
+        return objC;
+    }
 
-	public SchedulerSocket getSocket() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getSocket";
-		if (objSchedulerSocket == null) {
-			try {
-				logger.debug(objOptions.toXML());
-				objSchedulerSocket = new SchedulerSocket(objOptions);
-			}
-			catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				throw new JobSchedulerException(e.getMessage(), e);
-			}
-		}
-		return objSchedulerSocket;
-	} // private SchedulerSocket getSocket
+    public Object unMarshall(final InputStream pobjInputStream) {
+        Object objC = null;
+        try {
+            objC = u.unmarshal(pobjInputStream);
+        } catch (JAXBException e) {
+            throw new JobSchedulerException(e.getMessage(), e);
+        }
+        return objC;
+    }
 
-	public void closeSocket() {
+    public Object unMarshall(final String pstrXMLContent) {
+        Object objC = null;
+        try {
+            objC = u.unmarshal(new StringReader(pstrXMLContent));
+        } catch (JAXBException e) {
+            throw new JobSchedulerException(e.getMessage(), e);
+        }
+        return objC;
+    }
 
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::closeSocket";
+    public Object marshal(final Object objO, final File objF) {
+        try {
+            XMLSerializer serializer = getXMLSerializer();
+            FileOutputStream objFOS = new FileOutputStream(objF);
+            serializer.setOutputByteStream(objFOS);
+            objM.marshal(objO, serializer.asContentHandler());
+        } catch (JAXBException e) {
+            throw new JobSchedulerException(e.getMessage(), e);
+        } catch (FileNotFoundException e) {
+            throw new JobSchedulerException(e.getMessage(), e);
+        } catch (IOException e) {
+            throw new JobSchedulerException(e.getMessage(), e);
+        }
+        return objO;
+    }
 
-		if (objSchedulerSocket != null) {
-			try {
-				objSchedulerSocket.close();
-			}
-			catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			objSchedulerSocket = null;
-		}
+    public String marshal(final Object objO) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream out = new DataOutputStream(baos);
+        try {
+            XMLSerializer serializer = getXMLSerializer();
+            serializer.setOutputByteStream(out);
+            objM.marshal(objO, serializer.asContentHandler());
+        } catch (JAXBException e) {
+            throw new JobSchedulerException(e.getMessage(), e);
+        } catch (FileNotFoundException e) {
+            throw new JobSchedulerException(e.getMessage(), e);
+        } catch (IOException e) {
+            throw new JobSchedulerException(e.getMessage(), e);
+        }
+        return baos.toString();
+    }
 
-	} // private void closeSocket
+    public Object toXMLFile(final Object objO, final ISOSVirtualFile pobjVirtualFile) {
+        if (pobjVirtualFile != null) {
+            OutputStream objOutputStream = pobjVirtualFile.getFileOutputStream();
+            try {
+                if (objOutputStream == null) {
+                    LOGGER.error(String.format("can't get outputstream for file '%1$s'.", pobjVirtualFile.getName()));
+                    throw new JobSchedulerException(String.format("can't get outputstream for file '%1$s'.", pobjVirtualFile.getName()));
+                }
+                XMLSerializer serializer = getXMLSerializer();
+                serializer.setOutputByteStream(objOutputStream);
+                objM.marshal(objO, serializer.asContentHandler());
+            } catch (JAXBException e) {
+                throw new JobSchedulerException(e.getMessage(), e);
+            } catch (IOException e) {
+                throw new JobSchedulerException(e.getMessage(), e);
+            } finally {
+                pobjVirtualFile.closeOutput();
+            }
+        } else {
+            LOGGER.error("pobjVirtualFile is null");
+            throw new JobSchedulerException("pobjVirtualFile is null");
+        }
+        return objO;
+    }
 
-	public Params setParams(final Variable_set pobjProperties) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::setParams";
+    private String toXMLString(final Object objO, final Marshaller objMarshaller) {
+        String strT = "";
+        try {
+            XMLSerializer serializer = getXMLSerializer();
+            OutputFormat objOutputFormat = new OutputFormat();
+            objOutputFormat.setEncoding("utf-8");
+            objOutputFormat.setIndenting(true);
+            objOutputFormat.setIndent(4);
+            objOutputFormat.setLineWidth(80);
+            serializer.setOutputFormat(objOutputFormat);
+            StringWriter objSW = new StringWriter();
+            serializer.setOutputCharStream(objSW);
+            objMarshaller.marshal(objO, serializer.asContentHandler());
+            strT = objSW.getBuffer().toString();
+        } catch (JAXBException e) {
+            throw new JobSchedulerException(e.getMessage(), e);
+        } catch (IOException e) {
+            throw new JobSchedulerException(e.getMessage(), e);
+        } catch (Exception e) {
+            throw new JobSchedulerException(e.getMessage(), e);
+        }
+        return strT;
+    }
 
-		String strParamValue = "";
-		Params objParams = super.createParams();
+    public String toXMLString(final Object objO) {
+        if (objO.getClass().getName().startsWith("com.sos.scheduler.model.answers.")) {
+            return answerToXMLString(objO);
+        }
+        return toXMLString(objO, objM);
+    }
 
-		for (String strKey : pobjProperties.names().split(";")) {
-			strParamValue = pobjProperties.value(strKey);
-			Param objP = this.createParam(strKey, strParamValue);
-			objParams.getParamOrCopyParamsOrInclude().add(objP);
-		}
-		return objParams;
-	}
-	 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public Params setParams(final Properties pobjProperties) {
+    public String answerToXMLString(final Object objO) {
+        initAnswerMarshaller();
+        return toXMLString(objO, objM4Answers);
+    }
 
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::setParams";
+    private XMLSerializer getXMLSerializer() {
+        OutputFormat of = new OutputFormat();
+        of.setCDataElements(new String[] { "^description", "^script", "^scheduler_script", "^log_mail_to", "^log_mail_cc", "^log_mail_bcc" });
+        of.setIndenting(true);
+        XMLSerializer serializer = new XMLSerializer(of);
+        return serializer;
+    }
 
-		String strParamValue = "";
-		Params objParams = super.createParams();
+    public SchedulerObjectFactoryOptions Options() {
+        if (objOptions == null) {
+            objOptions = new SchedulerObjectFactoryOptions();
+        }
+        return objOptions;
+    }
 
-		for (final Entry element : pobjProperties.entrySet()) {
-			final Map.Entry<String, String> mapItem = element;
-			String key = mapItem.getKey().toString();
-			strParamValue = mapItem.getValue();
-			Param objP = this.createParam(key, strParamValue);
-			objParams.getParamOrCopyParamsOrInclude().add(objP);
-		}
+    public SchedulerObjectFactory(final String pstrServerName, final int pintPort) {
+        this();
+        this.Options().ServerName.Value(pstrServerName);
+        this.Options().PortNumber.value(pintPort);
+        initMarshaller(conDefaultMarshaller);
+    }
 
-		return objParams;
-	} // private Params setParams
-	
-	public Params setParams(final Map<String,String> params) {
+    public SchedulerObjectFactory(final String pstrServerName, final int pintPort, final LiveConnector liveConnector) {
+        this(pstrServerName, pintPort);
+        this.liveConnector = liveConnector;
+        liveFolder = createSchedulerHotFolder(liveConnector.getHotFolderHandle());
+    }
 
-		Params objParams = super.createParams();
-		for (Entry<String,String> element : params.entrySet()) {
-			Param param = this.createParam(element.getKey(), element.getValue());
-			objParams.getParamOrCopyParamsOrInclude().add(param);
-		}
-		return objParams;
-	} 
-	public Params setParams(final String[] pstrParamArray) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::setParams";
-		String strParamValue = "";
-		Params objParams = super.createParams();
-		for (int i = 0; i < pstrParamArray.length; i += 2) {
-			String strParamName = pstrParamArray[i];
-			if (i + 1 >= pstrParamArray.length) {
-				strParamValue = "";
-			}
-			else {
-				strParamValue = pstrParamArray[i + 1];
-			}
-			Param objP = this.createParam(strParamName, strParamValue);
-			objParams.getParamOrCopyParamsOrInclude().add(objP);
-		}
-		return objParams;
-	} // private Params setParams
+    public SchedulerSocket getSocket() {
+        if (objSchedulerSocket == null) {
+            try {
+                LOGGER.debug(objOptions.toXML());
+                objSchedulerSocket = new SchedulerSocket(objOptions);
+            } catch (Exception e) {
+                throw new JobSchedulerException(e.getMessage(), e);
+            }
+        }
+        return objSchedulerSocket;
+    }
 
-	 
-	@Override
-	public JSObjParam createParam() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createParam";
-		JSObjParam objParam = new JSObjParam(this);
-		return objParam;
-	} // JSObjParam createParam()
+    public void closeSocket() {
+        if (objSchedulerSocket != null) {
+            try {
+                objSchedulerSocket.close();
+            } catch (IOException e) {
+                LOGGER.error(e.getMessage(), e);
+            }
+            objSchedulerSocket = null;
+        }
+    }
 
-	public JSObjParam createParam(final Param param) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createParam";
-		JSObjParam objParam = new JSObjParam(this, param);
-		return objParam;
-	} // JSObjParam createParam()
+    public Params setParams(final Variable_set pobjProperties) {
+        String strParamValue = "";
+        Params objParams = super.createParams();
+        for (String strKey : pobjProperties.names().split(";")) {
+            strParamValue = pobjProperties.value(strKey);
+            Param objP = this.createParam(strKey, strParamValue);
+            objParams.getParamOrCopyParamsOrInclude().add(objP);
+        }
+        return objParams;
+    }
 
- 
-	public Param createParam(final String pstrParamName, final String pstrParamValue) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createParam";
-		Param objP = super.createParam();
-		objP.setName(pstrParamName);
-		objP.setValue(pstrParamValue);
-		return objP;
-	} // private Param createParam
+    public Params setParams(final Properties pobjProperties) {
+        String strParamValue = "";
+        Params objParams = super.createParams();
+        for (final Entry element : pobjProperties.entrySet()) {
+            final Map.Entry<String, String> mapItem = element;
+            String key = mapItem.getKey().toString();
+            strParamValue = mapItem.getValue();
+            Param objP = this.createParam(key, strParamValue);
+            objParams.getParamOrCopyParamsOrInclude().add(objP);
+        }
+        return objParams;
+    }
 
-	public JSConfiguration createJSConfiguration() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createJSConfiguration";
-		JSConfiguration objJSC = new JSConfiguration(this);
-		return objJSC;
-	} // public JSConfiguration newJSConfiguration
+    public Params setParams(final Map<String, String> params) {
+        Params objParams = super.createParams();
+        for (Entry<String, String> element : params.entrySet()) {
+            Param param = this.createParam(element.getKey(), element.getValue());
+            objParams.getParamOrCopyParamsOrInclude().add(param);
+        }
+        return objParams;
+    }
 
-	 
-	public JSConfiguration createJSConfiguration(final ISOSVirtualFile pobjVirtualFile) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createJSConfiguration";
-		JSConfiguration objJSC = new JSConfiguration(this, pobjVirtualFile);
-		return objJSC;
-	} // public JSConfiguration newJSConfiguration
+    public Params setParams(final String[] pstrParamArray) {
+        String strParamValue = "";
+        Params objParams = super.createParams();
+        for (int i = 0; i < pstrParamArray.length; i += 2) {
+            String strParamName = pstrParamArray[i];
+            if (i + 1 >= pstrParamArray.length) {
+                strParamValue = "";
+            } else {
+                strParamValue = pstrParamArray[i + 1];
+            }
+            Param objP = this.createParam(strParamName, strParamValue);
+            objParams.getParamOrCopyParamsOrInclude().add(objP);
+        }
+        return objParams;
+    }
 
-	 
-	public SchedulerHotFolder createSchedulerHotFolder(final ISOSVirtualFile objDir) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createSchedulerHotFolder";
-		SchedulerHotFolder objSchedulerHotFolder = new SchedulerHotFolder(this, objDir);
-		return objSchedulerHotFolder;
-	} // SchedulerHotFolder createSchedulerHotFolder()
+    @Override
+    public JSObjParam createParam() {
+        JSObjParam objParam = new JSObjParam(this);
+        return objParam;
+    }
 
-	 
-	@Override
-	public JSObjJob createJob() {
-		JSObjJob objJob = new JSObjJob(this);
-		return objJob;
-	}
+    public JSObjParam createParam(final Param param) {
+        JSObjParam objParam = new JSObjParam(this, param);
+        return objParam;
+    }
 
-	public JSObjJob createJob(final String pstrJobName) {
-		JSObjJob objJob = new JSObjJob(this);
-		objJob.setName(pstrJobName);
-		return objJob;
-	}
+    public Param createParam(final String pstrParamName, final String pstrParamValue) {
+        Param objP = super.createParam();
+        objP.setName(pstrParamName);
+        objP.setValue(pstrParamValue);
+        return objP;
+    }
 
-	public JSObjJob createStandAloneJob(final String pstrJobName) {
-		JSObjJob objJob = new JSObjJob(this);
-		objJob.setName(pstrJobName);
-		objJob.setOrder(false);
-		return objJob;
-	}
+    public JSConfiguration createJSConfiguration() {
+        JSConfiguration objJSC = new JSConfiguration(this);
+        return objJSC;
+    }
 
-	 
-	public JSObjJob createJob(final ISOSVirtualFile pobjVirtualFile) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createJob";
-		JSObjJob objJob = new JSObjJob(this, pobjVirtualFile);
-		return objJob;
-	} // JSObjJob createJob()
+    public JSConfiguration createJSConfiguration(final ISOSVirtualFile pobjVirtualFile) {
+        JSConfiguration objJSC = new JSConfiguration(this, pobjVirtualFile);
+        return objJSC;
+    }
 
-	 
-	public JSObjParams createParams(final ISOSVirtualFile pobjVirtualFile) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createParams";
-		JSObjParams objParams = new JSObjParams(this, pobjVirtualFile);
-		return objParams;
-	} // JSObjParams createParams()
+    public SchedulerHotFolder createSchedulerHotFolder(final ISOSVirtualFile objDir) {
+        SchedulerHotFolder objSchedulerHotFolder = new SchedulerHotFolder(this, objDir);
+        return objSchedulerHotFolder;
+    }
 
-	 
-	@Override
-	public JSObjParams createParams() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createParams";
-		JSObjParams objParams = new JSObjParams(this);
-		return objParams;
-	} // JSObjParams createParams()
+    @Override
+    public JSObjJob createJob() {
+        JSObjJob objJob = new JSObjJob(this);
+        return objJob;
+    }
 
-	 
-	public JSObjParams createParams(final Params params) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createParams";
-		JSObjParams objParams = new JSObjParams(this, params);
-		return objParams;
-	} // JSObjParams createParams()
+    public JSObjJob createJob(final String pstrJobName) {
+        JSObjJob objJob = new JSObjJob(this);
+        objJob.setName(pstrJobName);
+        return objJob;
+    }
 
-	 
-	@Override
-	public JSObjJobChain createJobChain() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createJobChain";
-		JSObjJobChain objJobChain = new JSObjJobChain(this);
-		return objJobChain;
-	} // JSObjJobChain createJobChain()
+    public JSObjJob createStandAloneJob(final String pstrJobName) {
+        JSObjJob objJob = new JSObjJob(this);
+        objJob.setName(pstrJobName);
+        objJob.setOrder(false);
+        return objJob;
+    }
 
-	 
-	public JSObjJobChain createJobChain(final ISOSVirtualFile pobjVirtualFile) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createJobChain";
-		JSObjJobChain objJobChain = new JSObjJobChain(this, pobjVirtualFile);
-		return objJobChain;
-	} // JSObjJobChain createJobChain()
+    public JSObjJob createJob(final ISOSVirtualFile pobjVirtualFile) {
+        JSObjJob objJob = new JSObjJob(this, pobjVirtualFile);
+        return objJob;
+    }
 
-	 
-	@Override
-	public JSObjJobChains createJobChains() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createJobChains";
-		JSObjJobChains objJobChains = new JSObjJobChains(this);
-		return objJobChains;
-	} // JSObjJobChains createJobChains()
+    public JSObjParams createParams(final ISOSVirtualFile pobjVirtualFile) {
+        JSObjParams objParams = new JSObjParams(this, pobjVirtualFile);
+        return objParams;
+    }
 
-	 
-	@Override
-	public JSObjJobChainNodeEnd createJobChainNodeEnd() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createJobChainNodeEnd";
-		JSObjJobChainNodeEnd objJobChainNodeEnd = new JSObjJobChainNodeEnd(this);
-		return objJobChainNodeEnd;
-	} // JSObjJobChainNodeEnd createJobChainNodeEnd()
+    @Override
+    public JSObjParams createParams() {
+        JSObjParams objParams = new JSObjParams(this);
+        return objParams;
+    }
 
-	@Override
-	public JSObjJobChainNodeJobChain createJobChainNodeJobChain() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createJobChainNodeJobChain";
-		JSObjJobChainNodeJobChain objJobChainNodeJobChain = new JSObjJobChainNodeJobChain(this);
-		return objJobChainNodeJobChain;
-	} // JSObjJobChainNodeJobChain createJobChainNodeJobChain()
+    public JSObjParams createParams(final Params params) {
+        JSObjParams objParams = new JSObjParams(this, params);
+        return objParams;
+    }
 
-	 
-	@Override
-	public JSObjJobs createJobs() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createJobs";
-		JSObjJobs objJobs = new JSObjJobs(this);
-		return objJobs;
-	} // JSObjJobs createJobs()
+    @Override
+    public JSObjJobChain createJobChain() {
+        JSObjJobChain objJobChain = new JSObjJobChain(this);
+        return objJobChain;
+    }
 
-	@Override
-	public JSObjJobSettings createJobSettings() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createJobSettings";
-		JSObjJobSettings objJobSettings = new JSObjJobSettings(this);
-		return objJobSettings;
-	} // JSObjJobSettings createJobSettings()
+    public JSObjJobChain createJobChain(final ISOSVirtualFile pobjVirtualFile) {
+        JSObjJobChain objJobChain = new JSObjJobChain(this, pobjVirtualFile);
+        return objJobChain;
+    }
 
-	 
-	@Override
-	public JSObjHolidays createHolidays() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createHolidays";
-		JSObjHolidays objHolidays = new JSObjHolidays(this);
-		return objHolidays;
-	} // JSObjHolidays createHolidays()
+    @Override
+    public JSObjJobChains createJobChains() {
+        JSObjJobChains objJobChains = new JSObjJobChains(this);
+        return objJobChains;
+    }
 
-	 
-	@Override
-	public JSObjHoliday createHoliday() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createHoliday";
-		JSObjHoliday objHoliday = new JSObjHoliday(this);
-		return objHoliday;
-	} // JSObjHoliday createHoliday()
+    @Override
+    public JSObjJobChainNodeEnd createJobChainNodeEnd() {
+        JSObjJobChainNodeEnd objJobChainNodeEnd = new JSObjJobChainNodeEnd(this);
+        return objJobChainNodeEnd;
+    }
 
-	 
-	@Override
-	public JSObjMonthdays createMonthdays() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createMonthdays";
-		JSObjMonthdays objMonthdays = new JSObjMonthdays(this);
-		return objMonthdays;
-	} // JSObjMonthDays createMonthDays()
+    @Override
+    public JSObjJobChainNodeJobChain createJobChainNodeJobChain() {
+        JSObjJobChainNodeJobChain objJobChainNodeJobChain = new JSObjJobChainNodeJobChain(this);
+        return objJobChainNodeJobChain;
+    }
 
-	 
-	@Override
-	public JSObjLock createLock() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createLock";
-		JSObjLock objLock = new JSObjLock(this);
-		return objLock;
-	} // JSObjLock createLock()
+    @Override
+    public JSObjJobs createJobs() {
+        JSObjJobs objJobs = new JSObjJobs(this);
+        return objJobs;
+    }
 
-	 
-	public JSObjLock createLock(final ISOSVirtualFile pobjVirtualFile) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createLock";
-		JSObjLock objLock = new JSObjLock(this, pobjVirtualFile);
-		return objLock;
-	} // JSObjLock createLock()
+    @Override
+    public JSObjJobSettings createJobSettings() {
+        JSObjJobSettings objJobSettings = new JSObjJobSettings(this);
+        return objJobSettings;
+    }
 
-	 
-	@Override
-	public JSObjCluster createCluster() {
-		JSObjCluster objCluster = new JSObjCluster(this);
-		return objCluster;
-	}
+    @Override
+    public JSObjHolidays createHolidays() {
+        JSObjHolidays objHolidays = new JSObjHolidays(this);
+        return objHolidays;
+    }
 
-	 
-	@Override
-	public JSCmdClusterMemberCommand createClusterMemberCommand() {
-		JSCmdClusterMemberCommand objCMC = new JSCmdClusterMemberCommand(this);
-		return objCMC;
-	}
+    @Override
+    public JSObjHoliday createHoliday() {
+        JSObjHoliday objHoliday = new JSObjHoliday(this);
+        return objHoliday;
+    }
 
-	 
-	@Override
-	public JSObjSecurity createSecurity() {
-		JSObjSecurity objSecurity = new JSObjSecurity(this);
-		return objSecurity;
-	}
+    @Override
+    public JSObjMonthdays createMonthdays() {
+        JSObjMonthdays objMonthdays = new JSObjMonthdays(this);
+        return objMonthdays;
+    }
 
- 
-	@Override
-	public JSObjSpooler createSpooler() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createSpooler";
-		JSObjSpooler objSpooler = new JSObjSpooler(this);
-		return objSpooler;
-	} // JSObjSpooler createSpooler()
+    @Override
+    public JSObjLock createLock() {
+        JSObjLock objLock = new JSObjLock(this);
+        return objLock;
+    }
 
-	 
-	public JSObjSpooler createSpooler(final ISOSVirtualFile pobjVirtualFile) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createSpooler";
-		JSObjSpooler objSpooler = new JSObjSpooler(this, pobjVirtualFile);
-		return objSpooler;
-	} // JSObjSpooler createSpooler()
+    public JSObjLock createLock(final ISOSVirtualFile pobjVirtualFile) {
+        JSObjLock objLock = new JSObjLock(this, pobjVirtualFile);
+        return objLock;
+    }
 
-	 
-	@Override
-	public JSObjOrder createOrder() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createOrder";
-		JSObjOrder objOrder = new JSObjOrder(this);
-		return objOrder;
-	} // JSObjOrder createOrder()
+    @Override
+    public JSObjCluster createCluster() {
+        JSObjCluster objCluster = new JSObjCluster(this);
+        return objCluster;
+    }
 
-	public JSObjOrder createOrder(final ISOSVirtualFile pobjVirtualFile) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createOrder";
-		JSObjOrder objOrder = new JSObjOrder(this, pobjVirtualFile);
-		String s;
+    @Override
+    public JSCmdClusterMemberCommand createClusterMemberCommand() {
+        JSCmdClusterMemberCommand objCMC = new JSCmdClusterMemberCommand(this);
+        return objCMC;
+    }
+
+    @Override
+    public JSObjSecurity createSecurity() {
+        JSObjSecurity objSecurity = new JSObjSecurity(this);
+        return objSecurity;
+    }
+
+    @Override
+    public JSObjSpooler createSpooler() {
+        JSObjSpooler objSpooler = new JSObjSpooler(this);
+        return objSpooler;
+    }
+
+    public JSObjSpooler createSpooler(final ISOSVirtualFile pobjVirtualFile) {
+        JSObjSpooler objSpooler = new JSObjSpooler(this, pobjVirtualFile);
+        return objSpooler;
+    }
+
+    @Override
+    public JSObjOrder createOrder() {
+        JSObjOrder objOrder = new JSObjOrder(this);
+        return objOrder;
+    }
+
+    public JSObjOrder createOrder(final ISOSVirtualFile pobjVirtualFile) {
+        JSObjOrder objOrder = new JSObjOrder(this, pobjVirtualFile);
+        String s;
         try {
             s = pobjVirtualFile.getFile().getName();
             s = new File(s).getName();
-            s = s.replaceFirst(".*,(.*)\\.order\\.xml","$1");
-            
+            s = s.replaceFirst(".*,(.*)\\.order\\.xml", "$1");
+
             objOrder.setId(s);
         } catch (Exception e) {
             e.printStackTrace();
         }
-		return objOrder;
-	} // JSObjJob JSObjOrder()
-
-	public JSObjHolidays createHolidays(final ISOSVirtualFile pobjVirtualFile) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createHolidays";
-		JSObjHolidays objHolidays = new JSObjHolidays(this, pobjVirtualFile);
-		return objHolidays;
-	} // JSObjJob JSObjOrder()
-
-	 
-	public JSObjSchedule createSchedule() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createSchedule";
-		JSObjSchedule objSchedule = new JSObjSchedule(this);
-		return objSchedule;
-	} // JSObjSchedule createSchedule()
-
-	 
-	public JSObjSchedule createSchedule(final ISOSVirtualFile pobjVirtualFile) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createSchedule";
-		JSObjSchedule objSchedule = new JSObjSchedule(this, pobjVirtualFile);
-		return objSchedule;
-	} // JSObjSchedule createSchedule()
-
-	 
-	@Override
-	public JSObjProcessClass createProcessClass() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createProcessClass";
-		JSObjProcessClass objProcessClass = new JSObjProcessClass(this);
-		return objProcessClass;
-	} // JSObjProcessClass createProcessClass()
-
-	 
-	public JSObjProcessClass createProcessClass(final ISOSVirtualFile pobjVirtualFile) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createProcessClass";
-		JSObjProcessClass objProcessClass = new JSObjProcessClass(this, pobjVirtualFile);
-		return objProcessClass;
-	} // JSObjProcessClass createProcessClass()
-
-	 
-	@Override
-	public JSObjProcessClasses createProcessClasses() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createProcessClasses";
-		JSObjProcessClasses objProcessClasses = new JSObjProcessClasses(this);
-		return objProcessClasses;
-	} // JSObjProcessClasses createProcessClasses()
-
-	 
-	@Override
-	public JSObjEnvironment createEnvironment() {
-		JSObjEnvironment objEnvironment = new JSObjEnvironment(this);
-		return objEnvironment;
-	}
-
-	@Override
-	public JSCmdScheduleRemove createScheduleRemove() {
-		JSCmdScheduleRemove objScheduleRemove = new JSCmdScheduleRemove(this);
-		return objScheduleRemove;
-	}
-
-	 
-	@Override
-	public JSCmdRemoteSchedulerStartRemoteTask createRemoteSchedulerStartRemoteTask() {
-		JSCmdRemoteSchedulerStartRemoteTask objRemoteSchedulerStartRemoteTask = new JSCmdRemoteSchedulerStartRemoteTask(this);
-		return objRemoteSchedulerStartRemoteTask;
-	}
-
-	 
-	@Override
-	public JSCmdKillTask createKillTask() {
-		JSCmdKillTask objKillTask = new JSCmdKillTask(this);
-		return objKillTask;
-	}
-
-	 
-	@Override
-	public JSObjScript createScript() {
-		JSObjScript objScript = new JSObjScript(this);
-		return objScript;
-	}
-
-	@Override
-	public JSObjInclude createInclude() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createInclude";
-		JSObjInclude objInclude = new JSObjInclude(this);
-		return objInclude;
-	} // JSObjInclude createInclude()
-
- 
-	@Override
-	public JSObjCommands createCommands() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createCommands";
-		JSObjCommands objCommands = new JSObjCommands(this);
-		return objCommands;
-	} // JSObjCommands createCommands()
-
-	 
-	@Override
-	public JSObjConfigurationDirectory createConfigurationDirectory() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createConfigurationDirectory";
-		JSObjConfigurationDirectory objConfigurationDirectory = new JSObjConfigurationDirectory(this);
-		return objConfigurationDirectory;
-	} // JSObjConfigurationDirectory createConfigurationDirectory()
-
-	 
-	@Override
-	public JSObjConfigurationFile createConfigurationFile() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createConfigurationFile";
-		JSObjConfigurationFile objConfigurationFile = new JSObjConfigurationFile(this);
-		return objConfigurationFile;
-	} // JSObjConfigurationFile createConfigurationFile()
-
-	@Override
-	public JSCmdSubsystemShow createSubsystemShow() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createSubsystemShow";
-		JSCmdSubsystemShow objSubsystemShow = new JSCmdSubsystemShow(this);
-		return objSubsystemShow;
-	} // JSCmdSubsystemShow createSubsystemShow()
-
- 
-	@Override
-	public JSCmdStartJob createStartJob() {
-		JSCmdStartJob objStartJobCmd = new JSCmdStartJob(this);
-		return objStartJobCmd;
-	}
-
-	public JSCmdStartJob createStartJob(final String pstrJobName) {
-		JSCmdStartJob objStartJobCmd = new JSCmdStartJob(this);
-		objStartJobCmd.setJob(pstrJobName);
-		return objStartJobCmd;
-	}
-
-	public JSCmdStartJob StartJob(final String pstrJobName) {
-		JSCmdStartJob objStartJobCmd = new JSCmdStartJob(this);
-		objStartJobCmd.setJob(pstrJobName);
-		objStartJobCmd.setForce(true);
-		objStartJobCmd.run();
-		objStartJobCmd.getAnswerWithException();
-		return objStartJobCmd;
-	}
-
-	public JSCmdStartJob StartJob(final String pstrJobName, final boolean raiseOk) {
-		JSCmdStartJob objStartJobCmd = new JSCmdStartJob(this);
-		objStartJobCmd.setJob(pstrJobName);
-		objStartJobCmd.setForce(true);
-		objStartJobCmd.run();
-		objStartJobCmd.flgRaiseOKException = raiseOk;
-		objStartJobCmd.getAnswerWithException();
-		return objStartJobCmd;
-	}
-
-	@Override
-	public JSCmdShowCalendar createShowCalendar() {
-		JSCmdShowCalendar objShowCalendarCmd = new JSCmdShowCalendar(this);
-		return objShowCalendarCmd;
-	}
-
-	@Override
-	public JSCmdShowState createShowState() {
-		JSCmdShowState objShowStateCmd = new JSCmdShowState(this);
-		return objShowStateCmd;
-	}
-
-	public JSCmdShowState createShowState(final enu4What enuWhat) {
-		JSCmdShowState objShowStateCmd = new JSCmdShowState(this);
-		objShowStateCmd.setWhat(enuWhat);
-		return objShowStateCmd;
-	}
-
-	public JSCmdShowState createShowState(final enu4What[] enuWhat) {
-		JSCmdShowState objShowStateCmd = new JSCmdShowState(this);
-		objShowStateCmd.setWhat(enuWhat);
-		return objShowStateCmd;
-	}
-
-	@Override
-	public JSCmdShowJob createShowJob() {
-		JSCmdShowJob objShowJobCmd = new JSCmdShowJob(this);
-		return objShowJobCmd;
-	}
-
-	public JSCmdShowJob createShowJob(final String pstrJobName) {
-		JSCmdShowJob objShowJobCmd = createShowJob();
-		objShowJobCmd.setJob(pstrJobName);
-		objShowJobCmd.setWhat(new JSCmdShowJob.enu4What[] { JSCmdShowJob.enu4What.log, JSCmdShowJob.enu4What.task_queue });
-		objShowJobCmd.MaxTaskHistory(1);
-		objShowJobCmd.MaxOrders(1);
-
-		return objShowJobCmd;
-	}
-
-	public JSCmdShowJob createShowJob(final String pstrJobName, final JSCmdShowJob.enu4What[] penuWhat) {
-		JSCmdShowJob objShowJobCmd = new JSCmdShowJob(this);
-		objShowJobCmd.setJob(pstrJobName);
-		objShowJobCmd.setWhat(penuWhat);
-		objShowJobCmd.MaxTaskHistory(1);
-		objShowJobCmd.MaxOrders(1);
-
-		return objShowJobCmd;
-	}
-
-	public JSCmdShowJob getTaskQueue(final String pstrJobName) {
-
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getTaskQueue";
-
-		JSCmdShowJob objShowJobCmd = createShowJob(pstrJobName, new JSCmdShowJob.enu4What[] { JSCmdShowJob.enu4What.task_queue });
-		objShowJobCmd = executeShowJob(objShowJobCmd);
-		return objShowJobCmd;
-
-	} // private JSCmdShowJob getTaskQueue
-
- 
-	public JSCmdShowJob isJobRunning(final String pstrJobName) {
-
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::isJobRunning";
-
-		JSCmdShowJob objShowJob = createShowJob(pstrJobName);
-		return executeShowJob(objShowJob);
-	}
-
-
-	public String getTaskLogFromShowHistory(final String pstrJobName, final int pintTaskId) {
-
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getTaskLogFromHistory";
-
-		String log = null;
-
-		JSCmdShowHistory objHist = this.createShowHistory();
-		objHist.setJob(pstrJobName);
-		objHist.setId(BigInteger.valueOf(pintTaskId));
-		objHist.setWhat("log");
-		objHist.run();
-		Answer objAnswer = objHist.getAnswer();
-		List<HistoryEntry> objEntries = objAnswer.getHistory().getHistoryEntry();
-		if (objEntries != null && objEntries.size() > 0) {
-			HistoryEntry objEntry = objEntries.get(0);
-			if (objEntry != null) {
-				log = objEntry.getLog().getContent();
-			}
-		}
-
-		return log;
-	}
-
-
-	 
-	public String getTaskLogFromShowJob(final String pstrJobName, final int pintTaskId) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getTaskLogFromShowJob";
-
-		String log = null;
-
-		JSCmdShowJob objShowJob = this.createShowJob();
-		objShowJob.setJob(pstrJobName);
-		objShowJob.setWhat(com.sos.scheduler.model.commands.JSCmdShowJob.enu4What.log);
-		objShowJob.run();
-		Answer objAnswer = objShowJob.getAnswer();
-		Job objJobAnswer = objAnswer.getJob();
-		List<Task> tasks = objJobAnswer.getTasks().getTask();
-		for (Task task : tasks) {
-			if (task.getId().compareTo(BigInteger.valueOf(pintTaskId)) == 0) {
-				log = task.getLog().getContent();
-				break;
-			}
-		}
-
-		return log;
-	}
-
-
-	 
-	public String getTaskLog(final String pstrJobName, final int pintTaskId, final boolean pbUseCurrentTaskLog) {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getTaskLog";
-
-		String log = null;
-		if (pbUseCurrentTaskLog == true) {
-			log = this.getTaskLogFromShowJob(pstrJobName, pintTaskId);
-			if (log == null) {
-				log = this.getTaskLogFromShowHistory(pstrJobName, pintTaskId);
-			}
-		}
-		else {
-			log = this.getTaskLogFromShowHistory(pstrJobName, pintTaskId);
-			if (log == null) {
-				log = this.getTaskLogFromShowJob(pstrJobName, pintTaskId);
-			}
-		}
-
-		return log;
-
-	} // getTaskLog
-
-
-	public JSCmdShowJob executeShowJob(final JSCmdShowJob pobjShowJob) {
-
-		boolean flgJobIsRunning = false;
-
-		pobjShowJob.run();
-
-		Answer objAnswer = pobjShowJob.getAnswer();
-		if (objAnswer != null) {
-			ERROR objError = objAnswer.getERROR();
-			if (objError != null) {
-				throw new JSCommandErrorException(objError.getText());
-			}
-			Job objJobAnswer = objAnswer.getJob();
-			String strJobState = objJobAnswer.getState();
-			String pstrJobName = pobjShowJob.getJobName();
-			if (strJobState.equalsIgnoreCase("running") == false) {
-				logger.debug(JOM_D_0030.get(pstrJobName, strJobState)); // JOM_D_0030=Job '%1$s' is *not* running, state =
-																						// '%2$s'
-				flgJobIsRunning = false;
-			}
-			else {
-				logger.debug(JOM_D_0040.get(pstrJobName)); // JOM_D_0040=Job '%1$s' is running
-				int intNoOfTasks = objJobAnswer.getTasks().getCount().intValue();
-
-				if (intNoOfTasks > 0) {
-					flgJobIsRunning = true;
-					 
-				}
-
-			}
-
-		}
-
-		if (flgJobIsRunning == false) {
-			return null;
-		}
-		return pobjShowJob;
-	} // private boolean isJobRunning
-
-	@Override
-	public JSCmdShowJobs createShowJobs() {
-		JSCmdShowJobs objShowJobsCmd = new JSCmdShowJobs(this);
-		return objShowJobsCmd;
-	}
-
-	 
-	public JSCmdShowJobs createShowJobs(final enu4What... enuWhat) {
-		JSCmdShowJobs objShowJobsCmd = new JSCmdShowJobs(this);
-		objShowJobsCmd.setWhat(enuWhat);
-		return objShowJobsCmd;
-	}
-
-	@Override
-	public JSCmdShowTask createShowTask() {
-		JSCmdShowTask objShowTaskCmd = new JSCmdShowTask(this);
-		return objShowTaskCmd;
-	}
-
-	public JSCmdShowTask createShowTask(final enu4What enuWhat) {
-		JSCmdShowTask objShowTaskCmd = new JSCmdShowTask(this);
-		objShowTaskCmd.setWhat(enuWhat);
-		return objShowTaskCmd;
-	}
-
-	public JSCmdShowTask createShowTask(final enu4What[] enuWhat) {
-		JSCmdShowTask objShowTaskCmd = new JSCmdShowTask(this);
-		objShowTaskCmd.setWhat(enuWhat);
-		return objShowTaskCmd;
-	}
-
-	@Override
-	public JSCmdShowOrder createShowOrder() {
-		JSCmdShowOrder objShowOrderCmd = new JSCmdShowOrder(this);
-		return objShowOrderCmd;
-	}
-
-	@Override
-	public JSCmdShowJobChain createShowJobChain() {
-		JSCmdShowJobChain objShowJobChainCmd = new JSCmdShowJobChain(this);
-		return objShowJobChainCmd;
-	}
-
-	@Override
-	public JSCmdShowJobChains createShowJobChains() {
-		JSCmdShowJobChains objShowJobChainsCmd = new JSCmdShowJobChains(this);
-		return objShowJobChainsCmd;
-	}
-
-	@Override
-	public JSCmdShowHistory createShowHistory() {
-		JSCmdShowHistory objShowHistoryCmd = new JSCmdShowHistory(this);
-		return objShowHistoryCmd;
-	}
-
-	 
-	@Override
-	public JSCmdModifyJob createModifyJob() {
-		JSCmdModifyJob objModifyJob = new JSCmdModifyJob(this);
-		return objModifyJob;
-	}
-
-	@Override
-	public JSCmdJobChainModify createJobChainModify() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createJobChainModify";
-		JSCmdJobChainModify objJobChainModify = new JSCmdJobChainModify(this);
-		return objJobChainModify;
-	} // JSCmdJobChainModify createJobChainModify()
-
-	 
-	@Override
-	public JSCmdRemoveJobChain createRemoveJobChain() {
-		JSCmdRemoveJobChain objRemoveJobChain = new JSCmdRemoveJobChain(this);
-		return objRemoveJobChain;
-	}
-
-	@Override
-	public JSCmdProcessClassRemove createProcessClassRemove() {
-		JSCmdProcessClassRemove objProcessClassRemove = new JSCmdProcessClassRemove(this);
-		return objProcessClassRemove;
-	}
-
-	 
-	@Override
-	public JSCmdCheckFolders createCheckFolders() {
-		JSCmdCheckFolders objCheckFolders = new JSCmdCheckFolders(this);
-		return objCheckFolders;
-	}
-
-	 
-	@Override
-	public JSCmdModifySpooler createModifySpooler() {
-		JSCmdModifySpooler objModifySpooler = new JSCmdModifySpooler(this);
-		return objModifySpooler;
-	}
-
-	 
-	@Override
-	public JSCmdEventsGet createEventsGet() {
-		JSCmdEventsGet objEventsGet = new JSCmdEventsGet(this);
-		return objEventsGet;
-	}
-
-	@Override
-	public JSCmdRemoveOrder createRemoveOrder() {
-		JSCmdRemoveOrder objRemoveOrder = new JSCmdRemoveOrder(this);
-		return objRemoveOrder;
-	}
-
-	 
-	@Override
-	public JSCmdSchedulerLogLogCategoriesReset createSchedulerLogLogCategoriesReset() {
-		JSCmdSchedulerLogLogCategoriesReset objSchedulerLogLogCategoriesReset = new JSCmdSchedulerLogLogCategoriesReset(this);
-		return objSchedulerLogLogCategoriesReset;
-	}
-
-	 
-	@Override
-	public JSCmdTerminate createTerminate() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createTerminate";
-		JSCmdTerminate objTerminate = new JSCmdTerminate(this);
-		return objTerminate;
-	} // JSCmdTerminate createTerminate()
-
-	@Override
-	public JSCmdRemoteSchedulerRemoteTaskClose createRemoteSchedulerRemoteTaskClose() {
-		JSCmdRemoteSchedulerRemoteTaskClose objRemoteSchedulerRemoteTaskClose = new JSCmdRemoteSchedulerRemoteTaskClose(this);
-		return objRemoteSchedulerRemoteTaskClose;
-	}
-
-	 
-	@Override
-	public JSCmdLockRemove createLockRemove() {
-		JSCmdLockRemove objLockRemove = new JSCmdLockRemove(this);
-		return objLockRemove;
-	}
-
-	 
-	@Override
-	public JSCmdSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles createSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles() {
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::createSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles";
-		JSCmdSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles objSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles = new JSCmdSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles(
-				this);
-		return objSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles;
-	} // JSCmdSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles createSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles()
-
-	public JSCmdJobChainNodeModify createJobChainNodeModify() {
-		JSCmdJobChainNodeModify objJobChainNodeModify = new JSCmdJobChainNodeModify(this);
-		return objJobChainNodeModify;
-	}
-
-	 
-	@Override
-	public JSCmdModifyOrder createModifyOrder() {
-		JSCmdModifyOrder objModifyOrder = new JSCmdModifyOrder(this);
-		return objModifyOrder;
-	}
-
- 
-	public JSCmdModifyOrder StartOrder(final String pstrJobChainName, final String pstrOrderName) {
-		JSCmdModifyOrder objModifyOrder = new JSCmdModifyOrder(this);
-		objModifyOrder.setJobChain(pstrJobChainName);
-		objModifyOrder.setOrder(pstrOrderName);
-		objModifyOrder.setAt("now");
-		objModifyOrder.run();
-		objModifyOrder.getAnswerWithException();
-		return objModifyOrder;
-	}
-
-	public JSCmdModifyOrder StartOrder(final String pstrJobChainName, final String pstrOrderName, final boolean raiseOk) {
-		JSCmdModifyOrder objModifyOrder = new JSCmdModifyOrder(this);
-		objModifyOrder.setJobChain(pstrJobChainName);
-		objModifyOrder.setOrder(pstrOrderName);
-		objModifyOrder.setAt("now");
-		objModifyOrder.run();
-		objModifyOrder.flgRaiseOKException = raiseOk;
-		objModifyOrder.getAnswerWithException();
-		return objModifyOrder;
-	}
-
-	 
-	@Override
-	public JSCmdParamGet createParamGet() {
-		JSCmdParamGet objParamGet = new JSCmdParamGet(this);
-		return objParamGet;
-	}
-
- 
-	@Override
-	public JSCmdModifyHotFolder createModifyHotFolder() {
-		JSCmdModifyHotFolder objModifyHotFolder = new JSCmdModifyHotFolder(this);
-		return objModifyHotFolder;
-	}
-
- 
-	@Override
-	public JSCmdAddJobs createAddJobs() {
-		JSCmdAddJobs objAddJobs = new JSCmdAddJobs(this);
-		return objAddJobs;
-	}
-
-	public JSCmdAddOrder createAddOrder() {
-		JSCmdAddOrder objAddOrder = new JSCmdAddOrder(this);
-		return objAddOrder;
-	}
-
- 
-	public JSCmdCommands createCmdCommands() {
-		JSCmdCommands objCommands = new JSCmdCommands(this);
-		return objCommands;
-	}
-
-	@Override
-	public JSCmdSchedulerLogLogCategoriesSet createSchedulerLogLogCategoriesSet() {
-		JSCmdSchedulerLogLogCategoriesSet objSchedulerLogLogCategoriesSet = new JSCmdSchedulerLogLogCategoriesSet(this);
-		return objSchedulerLogLogCategoriesSet;
-	}
-
-	 
-	@Override
-	public Spooler.Answer createSpoolerAnswer() {
-		return new Spooler.Answer();
-	}
-
-	 
-	@Override
-	public JSCmdLicenceUse createLicenceUse() {
-		JSCmdLicenceUse objLicenceUse = new JSCmdLicenceUse(this);
-		return objLicenceUse;
-	}
-
-	 
-	public boolean useDefaultPeriod() {
-		return useDefaultPeriod;
-	}
-
-	public void setUseDefaultPeriod(final boolean useDefaultPeriod) {
-		this.useDefaultPeriod = useDefaultPeriod;
-	}
-
-	public SchedulerHotFolder getLiveFolderOrNull() {
-		return liveFolder;
-	}
-
-	public ISOSVirtualFile getFileHandleOrNull(final String pstrFilename) {
-		return liveConnector != null ? liveConnector.getFileSystemHandler().getFileHandle(pstrFilename) : null;
-	}
+        return objOrder;
+    }
+
+    public JSObjHolidays createHolidays(final ISOSVirtualFile pobjVirtualFile) {
+        JSObjHolidays objHolidays = new JSObjHolidays(this, pobjVirtualFile);
+        return objHolidays;
+    }
+
+    public JSObjSchedule createSchedule() {
+        JSObjSchedule objSchedule = new JSObjSchedule(this);
+        return objSchedule;
+    }
+
+    public JSObjSchedule createSchedule(final ISOSVirtualFile pobjVirtualFile) {
+        JSObjSchedule objSchedule = new JSObjSchedule(this, pobjVirtualFile);
+        return objSchedule;
+    }
+
+    @Override
+    public JSObjProcessClass createProcessClass() {
+        JSObjProcessClass objProcessClass = new JSObjProcessClass(this);
+        return objProcessClass;
+    }
+
+    public JSObjProcessClass createProcessClass(final ISOSVirtualFile pobjVirtualFile) {
+        JSObjProcessClass objProcessClass = new JSObjProcessClass(this, pobjVirtualFile);
+        return objProcessClass;
+    }
+
+    @Override
+    public JSObjProcessClasses createProcessClasses() {
+        JSObjProcessClasses objProcessClasses = new JSObjProcessClasses(this);
+        return objProcessClasses;
+    }
+
+    @Override
+    public JSObjEnvironment createEnvironment() {
+        JSObjEnvironment objEnvironment = new JSObjEnvironment(this);
+        return objEnvironment;
+    }
+
+    @Override
+    public JSCmdScheduleRemove createScheduleRemove() {
+        JSCmdScheduleRemove objScheduleRemove = new JSCmdScheduleRemove(this);
+        return objScheduleRemove;
+    }
+
+    @Override
+    public JSCmdRemoteSchedulerStartRemoteTask createRemoteSchedulerStartRemoteTask() {
+        JSCmdRemoteSchedulerStartRemoteTask objRemoteSchedulerStartRemoteTask = new JSCmdRemoteSchedulerStartRemoteTask(this);
+        return objRemoteSchedulerStartRemoteTask;
+    }
+
+    @Override
+    public JSCmdKillTask createKillTask() {
+        JSCmdKillTask objKillTask = new JSCmdKillTask(this);
+        return objKillTask;
+    }
+
+    @Override
+    public JSObjScript createScript() {
+        JSObjScript objScript = new JSObjScript(this);
+        return objScript;
+    }
+
+    @Override
+    public JSObjInclude createInclude() {
+        JSObjInclude objInclude = new JSObjInclude(this);
+        return objInclude;
+    }
+
+    @Override
+    public JSObjCommands createCommands() {
+        JSObjCommands objCommands = new JSObjCommands(this);
+        return objCommands;
+    }
+
+    @Override
+    public JSObjConfigurationDirectory createConfigurationDirectory() {
+        JSObjConfigurationDirectory objConfigurationDirectory = new JSObjConfigurationDirectory(this);
+        return objConfigurationDirectory;
+    }
+
+    @Override
+    public JSObjConfigurationFile createConfigurationFile() {
+        JSObjConfigurationFile objConfigurationFile = new JSObjConfigurationFile(this);
+        return objConfigurationFile;
+    }
+
+    @Override
+    public JSCmdSubsystemShow createSubsystemShow() {
+        JSCmdSubsystemShow objSubsystemShow = new JSCmdSubsystemShow(this);
+        return objSubsystemShow;
+    }
+
+    @Override
+    public JSCmdStartJob createStartJob() {
+        JSCmdStartJob objStartJobCmd = new JSCmdStartJob(this);
+        return objStartJobCmd;
+    }
+
+    public JSCmdStartJob createStartJob(final String pstrJobName) {
+        JSCmdStartJob objStartJobCmd = new JSCmdStartJob(this);
+        objStartJobCmd.setJob(pstrJobName);
+        return objStartJobCmd;
+    }
+
+    public JSCmdStartJob StartJob(final String pstrJobName) {
+        JSCmdStartJob objStartJobCmd = new JSCmdStartJob(this);
+        objStartJobCmd.setJob(pstrJobName);
+        objStartJobCmd.setForce(true);
+        objStartJobCmd.run();
+        objStartJobCmd.getAnswerWithException();
+        return objStartJobCmd;
+    }
+
+    public JSCmdStartJob StartJob(final String pstrJobName, final boolean raiseOk) {
+        JSCmdStartJob objStartJobCmd = new JSCmdStartJob(this);
+        objStartJobCmd.setJob(pstrJobName);
+        objStartJobCmd.setForce(true);
+        objStartJobCmd.run();
+        objStartJobCmd.flgRaiseOKException = raiseOk;
+        objStartJobCmd.getAnswerWithException();
+        return objStartJobCmd;
+    }
+
+    @Override
+    public JSCmdShowCalendar createShowCalendar() {
+        JSCmdShowCalendar objShowCalendarCmd = new JSCmdShowCalendar(this);
+        return objShowCalendarCmd;
+    }
+
+    @Override
+    public JSCmdShowState createShowState() {
+        JSCmdShowState objShowStateCmd = new JSCmdShowState(this);
+        return objShowStateCmd;
+    }
+
+    public JSCmdShowState createShowState(final enu4What enuWhat) {
+        JSCmdShowState objShowStateCmd = new JSCmdShowState(this);
+        objShowStateCmd.setWhat(enuWhat);
+        return objShowStateCmd;
+    }
+
+    public JSCmdShowState createShowState(final enu4What[] enuWhat) {
+        JSCmdShowState objShowStateCmd = new JSCmdShowState(this);
+        objShowStateCmd.setWhat(enuWhat);
+        return objShowStateCmd;
+    }
+
+    @Override
+    public JSCmdShowJob createShowJob() {
+        JSCmdShowJob objShowJobCmd = new JSCmdShowJob(this);
+        return objShowJobCmd;
+    }
+
+    public JSCmdShowJob createShowJob(final String pstrJobName) {
+        JSCmdShowJob objShowJobCmd = createShowJob();
+        objShowJobCmd.setJob(pstrJobName);
+        objShowJobCmd.setWhat(new JSCmdShowJob.enu4What[] { JSCmdShowJob.enu4What.log, JSCmdShowJob.enu4What.task_queue });
+        objShowJobCmd.MaxTaskHistory(1);
+        objShowJobCmd.MaxOrders(1);
+        return objShowJobCmd;
+    }
+
+    public JSCmdShowJob createShowJob(final String pstrJobName, final JSCmdShowJob.enu4What[] penuWhat) {
+        JSCmdShowJob objShowJobCmd = new JSCmdShowJob(this);
+        objShowJobCmd.setJob(pstrJobName);
+        objShowJobCmd.setWhat(penuWhat);
+        objShowJobCmd.MaxTaskHistory(1);
+        objShowJobCmd.MaxOrders(1);
+        return objShowJobCmd;
+    }
+
+    public JSCmdShowJob getTaskQueue(final String pstrJobName) {
+        JSCmdShowJob objShowJobCmd = createShowJob(pstrJobName, new JSCmdShowJob.enu4What[] { JSCmdShowJob.enu4What.task_queue });
+        objShowJobCmd = executeShowJob(objShowJobCmd);
+        return objShowJobCmd;
+    }
+
+    public JSCmdShowJob isJobRunning(final String pstrJobName) {
+        JSCmdShowJob objShowJob = createShowJob(pstrJobName);
+        return executeShowJob(objShowJob);
+    }
+
+    public String getTaskLogFromShowHistory(final String pstrJobName, final int pintTaskId) {
+        String log = null;
+        JSCmdShowHistory objHist = this.createShowHistory();
+        objHist.setJob(pstrJobName);
+        objHist.setId(BigInteger.valueOf(pintTaskId));
+        objHist.setWhat("log");
+        objHist.run();
+        Answer objAnswer = objHist.getAnswer();
+        List<HistoryEntry> objEntries = objAnswer.getHistory().getHistoryEntry();
+        if (objEntries != null && objEntries.size() > 0) {
+            HistoryEntry objEntry = objEntries.get(0);
+            if (objEntry != null) {
+                log = objEntry.getLog().getContent();
+            }
+        }
+        return log;
+    }
+
+    public String getTaskLogFromShowJob(final String pstrJobName, final int pintTaskId) {
+        String log = null;
+        JSCmdShowJob objShowJob = this.createShowJob();
+        objShowJob.setJob(pstrJobName);
+        objShowJob.setWhat(com.sos.scheduler.model.commands.JSCmdShowJob.enu4What.log);
+        objShowJob.run();
+        Answer objAnswer = objShowJob.getAnswer();
+        Job objJobAnswer = objAnswer.getJob();
+        List<Task> tasks = objJobAnswer.getTasks().getTask();
+        for (Task task : tasks) {
+            if (task.getId().compareTo(BigInteger.valueOf(pintTaskId)) == 0) {
+                log = task.getLog().getContent();
+                break;
+            }
+        }
+        return log;
+    }
+
+    public String getTaskLog(final String pstrJobName, final int pintTaskId, final boolean pbUseCurrentTaskLog) {
+        String log = null;
+        if (pbUseCurrentTaskLog) {
+            log = this.getTaskLogFromShowJob(pstrJobName, pintTaskId);
+            if (log == null) {
+                log = this.getTaskLogFromShowHistory(pstrJobName, pintTaskId);
+            }
+        } else {
+            log = this.getTaskLogFromShowHistory(pstrJobName, pintTaskId);
+            if (log == null) {
+                log = this.getTaskLogFromShowJob(pstrJobName, pintTaskId);
+            }
+        }
+        return log;
+    }
+
+    public JSCmdShowJob executeShowJob(final JSCmdShowJob pobjShowJob) {
+        boolean flgJobIsRunning = false;
+        pobjShowJob.run();
+        Answer objAnswer = pobjShowJob.getAnswer();
+        if (objAnswer != null) {
+            ERROR objError = objAnswer.getERROR();
+            if (objError != null) {
+                throw new JSCommandErrorException(objError.getText());
+            }
+            Job objJobAnswer = objAnswer.getJob();
+            String strJobState = objJobAnswer.getState();
+            String pstrJobName = pobjShowJob.getJobName();
+            if (!"running".equalsIgnoreCase(strJobState)) {
+                LOGGER.debug(JOM_D_0030.get(pstrJobName, strJobState));
+                flgJobIsRunning = false;
+            } else {
+                LOGGER.debug(JOM_D_0040.get(pstrJobName));
+                int intNoOfTasks = objJobAnswer.getTasks().getCount().intValue();
+                if (intNoOfTasks > 0) {
+                    flgJobIsRunning = true;
+                }
+            }
+        }
+        if (!flgJobIsRunning) {
+            return null;
+        }
+        return pobjShowJob;
+    }
+
+    @Override
+    public JSCmdShowJobs createShowJobs() {
+        JSCmdShowJobs objShowJobsCmd = new JSCmdShowJobs(this);
+        return objShowJobsCmd;
+    }
+
+    public JSCmdShowJobs createShowJobs(final enu4What... enuWhat) {
+        JSCmdShowJobs objShowJobsCmd = new JSCmdShowJobs(this);
+        objShowJobsCmd.setWhat(enuWhat);
+        return objShowJobsCmd;
+    }
+
+    @Override
+    public JSCmdShowTask createShowTask() {
+        JSCmdShowTask objShowTaskCmd = new JSCmdShowTask(this);
+        return objShowTaskCmd;
+    }
+
+    public JSCmdShowTask createShowTask(final enu4What enuWhat) {
+        JSCmdShowTask objShowTaskCmd = new JSCmdShowTask(this);
+        objShowTaskCmd.setWhat(enuWhat);
+        return objShowTaskCmd;
+    }
+
+    public JSCmdShowTask createShowTask(final enu4What[] enuWhat) {
+        JSCmdShowTask objShowTaskCmd = new JSCmdShowTask(this);
+        objShowTaskCmd.setWhat(enuWhat);
+        return objShowTaskCmd;
+    }
+
+    @Override
+    public JSCmdShowOrder createShowOrder() {
+        JSCmdShowOrder objShowOrderCmd = new JSCmdShowOrder(this);
+        return objShowOrderCmd;
+    }
+
+    @Override
+    public JSCmdShowJobChain createShowJobChain() {
+        JSCmdShowJobChain objShowJobChainCmd = new JSCmdShowJobChain(this);
+        return objShowJobChainCmd;
+    }
+
+    @Override
+    public JSCmdShowJobChains createShowJobChains() {
+        JSCmdShowJobChains objShowJobChainsCmd = new JSCmdShowJobChains(this);
+        return objShowJobChainsCmd;
+    }
+
+    @Override
+    public JSCmdShowHistory createShowHistory() {
+        JSCmdShowHistory objShowHistoryCmd = new JSCmdShowHistory(this);
+        return objShowHistoryCmd;
+    }
+
+    @Override
+    public JSCmdModifyJob createModifyJob() {
+        JSCmdModifyJob objModifyJob = new JSCmdModifyJob(this);
+        return objModifyJob;
+    }
+
+    @Override
+    public JSCmdJobChainModify createJobChainModify() {
+        JSCmdJobChainModify objJobChainModify = new JSCmdJobChainModify(this);
+        return objJobChainModify;
+    }
+
+    @Override
+    public JSCmdRemoveJobChain createRemoveJobChain() {
+        JSCmdRemoveJobChain objRemoveJobChain = new JSCmdRemoveJobChain(this);
+        return objRemoveJobChain;
+    }
+
+    @Override
+    public JSCmdProcessClassRemove createProcessClassRemove() {
+        JSCmdProcessClassRemove objProcessClassRemove = new JSCmdProcessClassRemove(this);
+        return objProcessClassRemove;
+    }
+
+    @Override
+    public JSCmdCheckFolders createCheckFolders() {
+        JSCmdCheckFolders objCheckFolders = new JSCmdCheckFolders(this);
+        return objCheckFolders;
+    }
+
+    @Override
+    public JSCmdModifySpooler createModifySpooler() {
+        JSCmdModifySpooler objModifySpooler = new JSCmdModifySpooler(this);
+        return objModifySpooler;
+    }
+
+    @Override
+    public JSCmdEventsGet createEventsGet() {
+        JSCmdEventsGet objEventsGet = new JSCmdEventsGet(this);
+        return objEventsGet;
+    }
+
+    @Override
+    public JSCmdRemoveOrder createRemoveOrder() {
+        JSCmdRemoveOrder objRemoveOrder = new JSCmdRemoveOrder(this);
+        return objRemoveOrder;
+    }
+
+    @Override
+    public JSCmdSchedulerLogLogCategoriesReset createSchedulerLogLogCategoriesReset() {
+        JSCmdSchedulerLogLogCategoriesReset objSchedulerLogLogCategoriesReset = new JSCmdSchedulerLogLogCategoriesReset(this);
+        return objSchedulerLogLogCategoriesReset;
+    }
+
+    @Override
+    public JSCmdTerminate createTerminate() {
+        JSCmdTerminate objTerminate = new JSCmdTerminate(this);
+        return objTerminate;
+    }
+
+    @Override
+    public JSCmdRemoteSchedulerRemoteTaskClose createRemoteSchedulerRemoteTaskClose() {
+        JSCmdRemoteSchedulerRemoteTaskClose objRemoteSchedulerRemoteTaskClose = new JSCmdRemoteSchedulerRemoteTaskClose(this);
+        return objRemoteSchedulerRemoteTaskClose;
+    }
+
+    @Override
+    public JSCmdLockRemove createLockRemove() {
+        JSCmdLockRemove objLockRemove = new JSCmdLockRemove(this);
+        return objLockRemove;
+    }
+
+    @Override
+    public JSCmdSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles createSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles() {
+        JSCmdSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles objSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles = new JSCmdSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles(this);
+        return objSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles;
+    }
+
+    public JSCmdJobChainNodeModify createJobChainNodeModify() {
+        JSCmdJobChainNodeModify objJobChainNodeModify = new JSCmdJobChainNodeModify(this);
+        return objJobChainNodeModify;
+    }
+
+    @Override
+    public JSCmdModifyOrder createModifyOrder() {
+        JSCmdModifyOrder objModifyOrder = new JSCmdModifyOrder(this);
+        return objModifyOrder;
+    }
+
+    public JSCmdModifyOrder StartOrder(final String pstrJobChainName, final String pstrOrderName) {
+        JSCmdModifyOrder objModifyOrder = new JSCmdModifyOrder(this);
+        objModifyOrder.setJobChain(pstrJobChainName);
+        objModifyOrder.setOrder(pstrOrderName);
+        objModifyOrder.setAt("now");
+        objModifyOrder.run();
+        objModifyOrder.getAnswerWithException();
+        return objModifyOrder;
+    }
+
+    public JSCmdModifyOrder StartOrder(final String pstrJobChainName, final String pstrOrderName, final boolean raiseOk) {
+        JSCmdModifyOrder objModifyOrder = new JSCmdModifyOrder(this);
+        objModifyOrder.setJobChain(pstrJobChainName);
+        objModifyOrder.setOrder(pstrOrderName);
+        objModifyOrder.setAt("now");
+        objModifyOrder.run();
+        objModifyOrder.flgRaiseOKException = raiseOk;
+        objModifyOrder.getAnswerWithException();
+        return objModifyOrder;
+    }
+
+    @Override
+    public JSCmdParamGet createParamGet() {
+        JSCmdParamGet objParamGet = new JSCmdParamGet(this);
+        return objParamGet;
+    }
+
+    @Override
+    public JSCmdModifyHotFolder createModifyHotFolder() {
+        JSCmdModifyHotFolder objModifyHotFolder = new JSCmdModifyHotFolder(this);
+        return objModifyHotFolder;
+    }
+
+    @Override
+    public JSCmdAddJobs createAddJobs() {
+        JSCmdAddJobs objAddJobs = new JSCmdAddJobs(this);
+        return objAddJobs;
+    }
+
+    public JSCmdAddOrder createAddOrder() {
+        JSCmdAddOrder objAddOrder = new JSCmdAddOrder(this);
+        return objAddOrder;
+    }
+
+    public JSCmdCommands createCmdCommands() {
+        JSCmdCommands objCommands = new JSCmdCommands(this);
+        return objCommands;
+    }
+
+    @Override
+    public JSCmdSchedulerLogLogCategoriesSet createSchedulerLogLogCategoriesSet() {
+        JSCmdSchedulerLogLogCategoriesSet objSchedulerLogLogCategoriesSet = new JSCmdSchedulerLogLogCategoriesSet(this);
+        return objSchedulerLogLogCategoriesSet;
+    }
+
+    @Override
+    public Spooler.Answer createSpoolerAnswer() {
+        return new Spooler.Answer();
+    }
+
+    @Override
+    public JSCmdLicenceUse createLicenceUse() {
+        JSCmdLicenceUse objLicenceUse = new JSCmdLicenceUse(this);
+        return objLicenceUse;
+    }
+
+    public boolean useDefaultPeriod() {
+        return useDefaultPeriod;
+    }
+
+    public void setUseDefaultPeriod(final boolean useDefaultPeriod) {
+        this.useDefaultPeriod = useDefaultPeriod;
+    }
+
+    public SchedulerHotFolder getLiveFolderOrNull() {
+        return liveFolder;
+    }
+
+    public ISOSVirtualFile getFileHandleOrNull(final String pstrFilename) {
+        return liveConnector != null ? liveConnector.getFileSystemHandler().getFileHandle(pstrFilename) : null;
+    }
 
 }

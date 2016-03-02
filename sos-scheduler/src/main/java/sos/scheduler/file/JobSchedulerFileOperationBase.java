@@ -30,7 +30,6 @@ import static com.sos.scheduler.messages.JSMessages.*;
 public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
 
     protected static final String conPropertyJAVA_IO_TMPDIR = "java.io.tmpdir";
-    /** give a path for files to remove */
     protected static final String conParameterCHECK_STEADYSTATEOFFILE = "check_steady_state_of_files";
     protected static final String conParameterCHECK_STEADYSTATEINTERVAL = "check_steady_state_interval";
     protected static final String conParameterSTEADYSTATECOUNT = "steady_state_count";
@@ -70,11 +69,9 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
     protected boolean flgOperationWasSuccessful = false;
     protected String name = null;
     protected String file = null;
-    private final String strFileSpecDefault = ".*";
-    protected String fileSpec = strFileSpecDefault;
+    protected String fileSpec = ".*";
     protected String minFileAge = "0";
     protected String maxFileAge = "0";
-    private static final String FILESIZE_DEFAULT = "-1";
     protected String minFileSize = FILESIZE_DEFAULT;
     protected String maxFileSize = FILESIZE_DEFAULT;
     protected int skipFirstFiles = 0;
@@ -84,7 +81,6 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
     protected String strOnEmptyResultSet = null;
     protected String strResultList2File = null;
     protected int intExpectedSizeOfResultSet = 0;
-    // possible values equal, lt, le, eq, ge, gt, ne
     protected String strRaiseErrorIfResultSetIs = null;
     protected Vector<File> lstResultList = new Vector<File>();
     protected boolean flgCreateOrder = false;
@@ -98,9 +94,7 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
     protected boolean flgUseNIOLock = false;
     protected SOSFileSystemOperations SOSFileOperations = new SOSFileSystemOperations();
     protected String filePath = System.getProperty(conPropertyJAVA_IO_TMPDIR);
-    /** give the number of milliseconds, defaults to 24 hours */
     protected long lngFileAge = 86400000;
-    /** number of files which causes a warning */
     protected int warningFileLimit = 0;
     private static final String ORDER_PARAMETER_SCHEDULER_FILE_PATH = "scheduler_file_path";
     private static final String ORDER_PARAMETER_SCHEDULER_FILE_PARENT = "scheduler_file_parent";
@@ -111,6 +105,8 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
     private static final String PARAMETER_CREATE_ORDER = "create_order";
     private static final String PARAMETER_MERGE_ORDER_PARAMETER = "merge_order_parameter";
     private static final String JSJ_F_0110 = "JSJ_F_0110";
+    private static final String FILESIZE_DEFAULT = "-1";
+    private final String strFileSpecDefault = fileSpec;
     private HashMap<String, String> params = null;
     private SOSOptionFileAge objOptionFileAge = null;
     private SOSOptionTime objOptionTime = null;

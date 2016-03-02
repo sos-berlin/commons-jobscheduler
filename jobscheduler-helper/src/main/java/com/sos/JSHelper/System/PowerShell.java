@@ -135,12 +135,6 @@ public class PowerShell {
         return !inputThread.isAlive() || !source.exists();
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        detatch();
-        super.finalize();
-    }
-
     public static void main(String[] args) throws IOException {
         PowerShell powershell = new PowerShell();
         for (;;)
