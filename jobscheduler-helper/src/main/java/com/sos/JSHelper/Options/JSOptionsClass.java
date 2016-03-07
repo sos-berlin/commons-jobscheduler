@@ -1100,7 +1100,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
             } catch (final SecurityException exception) {
                 LOGGER.error(exception.getMessage(), exception);
             } catch (final NoSuchMethodException exception) {
-                LOGGER.error(exception.getMessage(), exception);
+                // no handling for NoSuchMethodException
             } catch (final IllegalArgumentException exception) {
                 LOGGER.error(exception.getMessage(), exception);
             } catch (final InvocationTargetException exception) {
