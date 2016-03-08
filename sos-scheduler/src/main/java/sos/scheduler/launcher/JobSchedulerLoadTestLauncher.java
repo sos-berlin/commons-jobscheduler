@@ -304,7 +304,7 @@ public class JobSchedulerLoadTestLauncher {
 			
 			SOSXMLXPath xpath = new SOSXMLXPath(this.configFile);
 						
-			org.w3c.dom.NodeList nl = xpath.selectNodeList(xpath.document.getElementsByTagName("param").item(0),"//param");
+			org.w3c.dom.NodeList nl = xpath.selectNodeList(xpath.getDocument().getElementsByTagName("param").item(0),"//param");
 			
 			for(int i =0; i < nl.getLength(); i++) {
 				Node nParam = nl.item(i);
