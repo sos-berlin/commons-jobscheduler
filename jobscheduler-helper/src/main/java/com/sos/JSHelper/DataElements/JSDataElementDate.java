@@ -50,8 +50,8 @@ public class JSDataElementDate extends JSDataElement {
         this.Value(objFormat.format(pdatDate));
     }
 
-    public JSDataElementDate(final String pPstrValue, final String pPstrDescription, final int pPintSize, final int pPintPos, final String pPstrFormatString,
-            final String pPstrColumnHeader, final String pPstrXMLTagName) {
+    public JSDataElementDate(final String pPstrValue, final String pPstrDescription, final int pPintSize, final int pPintPos,
+            final String pPstrFormatString, final String pPstrColumnHeader, final String pPstrXMLTagName) {
         super(pPstrValue, pPstrDescription, pPintSize, pPintPos, pPstrFormatString, pPstrColumnHeader, pPstrXMLTagName);
     }
 

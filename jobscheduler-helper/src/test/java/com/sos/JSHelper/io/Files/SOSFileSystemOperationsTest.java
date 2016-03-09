@@ -180,8 +180,8 @@ public class SOSFileSystemOperationsTest {
         doTest("FileName lowercase", ".*", "[filename:lowercase]", "1.txt", "1.txt");
     }
 
-    private void doTest(final String strText, final String strReplaceWhat, final String strReplaceWith, final String strWork, final String strExpectedResult)
-            throws Exception {
+    private void doTest(final String strText, final String strReplaceWhat, final String strReplaceWith, final String strWork,
+            final String strExpectedResult) throws Exception {
 
         @SuppressWarnings("unused")
         final String conMethodName = conClassName + "::doTest";

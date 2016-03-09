@@ -63,8 +63,8 @@ public class SOSOptionStringValueList extends JSOptionValueList {
      * @param pstrDescription
      * @param pstrDefaultValue
      * @param pflgIsMandatory */
-    public SOSOptionStringValueList(final JSOptionsClass pobjParent, final String pstrIndexedKey, final String pstrDescription, final String pstrDefaultValue,
-            final boolean pflgIsMandatory) {
+    public SOSOptionStringValueList(final JSOptionsClass pobjParent, final String pstrIndexedKey, final String pstrDescription,
+            final String pstrDefaultValue, final boolean pflgIsMandatory) {
         super(pobjParent, pstrIndexedKey, pstrDescription, pstrDefaultValue, pflgIsMandatory);
     }
 

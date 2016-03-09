@@ -227,10 +227,10 @@ public class SchedulerHotFolderTest {
                 objDotFile.WriteLine("];");
 
                 Hashtable<String, JobChainNode> tblNodes = new Hashtable<String, JobChainNode>();
-                objDotFile.WriteLine(getQuoted("start") + " [label = " + getQuoted("start" + ": " + strName) + ", shape = " + getQuoted("box") + ", style = "
-                        + getQuoted("solid") + "];");
-                objDotFile.WriteLine(getQuoted("end") + " [label = " + getQuoted("end" + ": " + strName) + ", shape = " + getQuoted("box") + ", style = "
-                        + getQuoted("solid") + "];");
+                objDotFile.WriteLine(getQuoted("start") + " [label = " + getQuoted("start" + ": " + strName) + ", shape = " + getQuoted("box")
+                        + ", style = " + getQuoted("solid") + "];");
+                objDotFile.WriteLine(getQuoted("end") + " [label = " + getQuoted("end" + ": " + strName) + ", shape = " + getQuoted("box")
+                        + ", style = " + getQuoted("solid") + "];");
 
                 for (JSObjOrder objOrder : tblOrders.values()) {
                     objDotFile.WriteLine(getQuoted(objOrder.getObjectName()) + " [label = " + getQuoted("Order - " + objOrder.getObjectName()) + "];");

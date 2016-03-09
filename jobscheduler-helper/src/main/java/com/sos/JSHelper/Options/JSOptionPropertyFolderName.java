@@ -42,8 +42,8 @@ public class JSOptionPropertyFolderName extends SOSOptionFolderName {
      * @param pPstrValue
      * @param pPstrDefaultValue
      * @param pPflgIsMandatory */
-    public JSOptionPropertyFolderName(final JSOptionsClass pPobjParent, final String pPstrKey, final String pPstrDescription, final String pPstrValue,
-            final String pPstrDefaultValue, final boolean pPflgIsMandatory) {
+    public JSOptionPropertyFolderName(final JSOptionsClass pPobjParent, final String pPstrKey, final String pPstrDescription,
+            final String pPstrValue, final String pPstrDefaultValue, final boolean pPflgIsMandatory) {
         super(pPobjParent, pPstrKey, "Java-Property user.dir", pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
 
         // strValue = this.Value();

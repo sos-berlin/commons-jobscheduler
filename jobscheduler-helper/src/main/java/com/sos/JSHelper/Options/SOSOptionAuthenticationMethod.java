@@ -55,8 +55,8 @@ public class SOSOptionAuthenticationMethod extends SOSOptionStringValueList {
         }
     }
 
-    public SOSOptionAuthenticationMethod(final JSOptionsClass pPobjParent, final String pPstrKey, final String pPstrDescription, final String pPstrValue,
-            final String pPstrDefaultValue, final boolean pPflgIsMandatory) {
+    public SOSOptionAuthenticationMethod(final JSOptionsClass pPobjParent, final String pPstrKey, final String pPstrDescription,
+            final String pPstrValue, final String pPstrDefaultValue, final boolean pPflgIsMandatory) {
         super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
         super.valueList(enuAuthenticationMethods.getArray());
     }
@@ -145,7 +145,8 @@ public class SOSOptionAuthenticationMethod extends SOSOptionStringValueList {
 
     public boolean isPublicKey() {
         this.Value(strValue);
-        return enuMethod == enuAuthenticationMethods.publicKey || enuMethod == enuAuthenticationMethods.ppk || enuMethod == enuAuthenticationMethods.privatekey;
+        return enuMethod == enuAuthenticationMethods.publicKey || enuMethod == enuAuthenticationMethods.ppk
+                || enuMethod == enuAuthenticationMethods.privatekey;
     }
 
     public enuAuthenticationMethods AuthenticationMethod() {

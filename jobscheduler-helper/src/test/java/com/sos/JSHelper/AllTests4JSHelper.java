@@ -36,12 +36,14 @@ import com.sos.JSHelper.io.Files.JSXMLFileTest;
  *
  * Created on 24.01.2011 12:28:30 */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ JSDataElementDateTest.class, JSDataElementDateTimeTest.class, JSDataElementNumericTest.class, JSDataElementTimeStampISOTest.class,
-/* */
-JSCsvFileTest.class, JSFileTest.class, JSToolBoxTest.class, JSXMLFileTest.class,
-/* */
-/* */
-JSOptionValueListTest.class, SOSOptionBooleanTest.class, SOSOptionElementTest.class, SOSOptionIntegerArrayTest.class, SOSOptionRegExpTest.class })
+@Suite.SuiteClasses({ JSDataElementDateTest.class, JSDataElementDateTimeTest.class, JSDataElementNumericTest.class,
+        JSDataElementTimeStampISOTest.class,
+        /* */
+        JSCsvFileTest.class, JSFileTest.class, JSToolBoxTest.class, JSXMLFileTest.class,
+        /* */
+        /* */
+        JSOptionValueListTest.class, SOSOptionBooleanTest.class, SOSOptionElementTest.class, SOSOptionIntegerArrayTest.class,
+        SOSOptionRegExpTest.class })
 public class AllTests4JSHelper {
     // the class remains completely empty,
     // being used only as a holder for the above annotations

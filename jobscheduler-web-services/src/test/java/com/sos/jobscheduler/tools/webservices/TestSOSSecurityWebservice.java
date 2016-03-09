@@ -65,7 +65,8 @@ public class TestSOSSecurityWebservice {
         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
         sosCommandSecurityClient.addParam("myName", "myValue");
 
-        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password=" + myPwd);
+        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password="
+                + myPwd);
         System.out.println(sosCommandSecurityClient.getAnswer());
         System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
         String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
@@ -90,7 +91,8 @@ public class TestSOSSecurityWebservice {
         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
         sosCommandSecurityClient.addParam("myName", "myValue");
 
-        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password=" + myPwd);
+        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password="
+                + myPwd);
         System.out.println(sosCommandSecurityClient.getAnswer());
         System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
         String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
@@ -117,7 +119,8 @@ public class TestSOSSecurityWebservice {
         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
         sosCommandSecurityClient.addParam("myName", "myValue");
 
-        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password=" + myPwd);
+        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password="
+                + myPwd);
         System.out.println(sosCommandSecurityClient.getAnswer());
         System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
         String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
@@ -141,7 +144,8 @@ public class TestSOSSecurityWebservice {
         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
         sosCommandSecurityClient.addParam("myName", "myValue");
 
-        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password=" + myPwd);
+        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password="
+                + myPwd);
         System.out.println(sosCommandSecurityClient.getAnswer());
         System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
         String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
@@ -167,7 +171,8 @@ public class TestSOSSecurityWebservice {
 
         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
 
-        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password=" + myPwd);
+        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password="
+                + myPwd);
         System.out.println(sosCommandSecurityClient.getAnswer());
         System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
         String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
@@ -193,7 +198,8 @@ public class TestSOSSecurityWebservice {
 
         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
 
-        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password=" + myPwd);
+        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password="
+                + myPwd);
         System.out.println(sosCommandSecurityClient.getAnswer());
         System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
         String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
@@ -223,7 +229,8 @@ public class TestSOSSecurityWebservice {
         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
         sosCommandSecurityClient.addParam("myName", "myValue");
 
-        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password=" + myPwd);
+        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password="
+                + myPwd);
         System.out.println(sosCommandSecurityClient.getAnswer());
         System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
         String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
@@ -257,16 +264,17 @@ public class TestSOSSecurityWebservice {
         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
         sosCommandSecurityClient.addParam("myName", "myValue");
 
-        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password=" + myPwd);
+        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password="
+                + myPwd);
         System.out.println(sosCommandSecurityClient.getAnswer());
         System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
         String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
 
-        sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/modify_spooler?cmd=pause&session_id="
-                + session);
+        sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER
+                + "jobscheduler/engine/plugin/security/modify_spooler?cmd=pause&session_id=" + session);
         java.lang.Thread.sleep(8000);
-        sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/modify_spooler?cmd=continue&session_id="
-                + session);
+        sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER
+                + "jobscheduler/engine/plugin/security/modify_spooler?cmd=continue&session_id=" + session);
         sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser();
 
         System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
@@ -283,7 +291,8 @@ public class TestSOSSecurityWebservice {
 
         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
 
-        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password=" + myPwd);
+        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password="
+                + myPwd);
         System.out.println(sosCommandSecurityClient.getAnswer());
         System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
         String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
@@ -307,16 +316,18 @@ public class TestSOSSecurityWebservice {
 
         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
 
-        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password=" + myPwd);
+        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password="
+                + myPwd);
         System.out.println(sosCommandSecurityClient.getAnswer());
         System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
         String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
 
         SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
 
-        sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/lock?name=mylock&session_id=" + session);
-        sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/lock_remove?lock=mylock&session_id="
+        sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/lock?name=mylock&session_id="
                 + session);
+        sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER
+                + "jobscheduler/engine/plugin/security/lock_remove?lock=mylock&session_id=" + session);
 
         sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser();
         System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
@@ -334,7 +345,8 @@ public class TestSOSSecurityWebservice {
 
         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
 
-        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password=" + myPwd);
+        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password="
+                + myPwd);
         System.out.println(sosCommandSecurityClient.getAnswer());
         System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
         String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
@@ -342,7 +354,8 @@ public class TestSOSSecurityWebservice {
         SOSCommandSecurityWebservice sosSecurityWebservice = new SOSCommandSecurityWebservice();
 
         // create a task
-        sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/start_job?job=test&session_id=" + session);
+        sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/start_job?job=test&session_id="
+                + session);
 
         String answer = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getJobSchedulerAnswer();
 
@@ -355,8 +368,8 @@ public class TestSOSSecurityWebservice {
         String job = n.getAttributes().getNamedItem("job").getNodeValue();
 
         // kill the task
-        sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/kill_task?id=" + id + "&job=" + job
-                + "&immediately=yes&session_id=" + session);
+        sosCommandSecurityClient.uncheckedExecuteCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/kill_task?id=" + id + "&job="
+                + job + "&immediately=yes&session_id=" + session);
 
         sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getUser();
         System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
@@ -373,7 +386,8 @@ public class TestSOSSecurityWebservice {
 
         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
 
-        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password=" + myPwd);
+        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password="
+                + myPwd);
         System.out.println(sosCommandSecurityClient.getAnswer());
         System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
         String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
@@ -399,7 +413,8 @@ public class TestSOSSecurityWebservice {
 
         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
 
-        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password=" + myPwd);
+        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password="
+                + myPwd);
         System.out.println(sosCommandSecurityClient.getAnswer());
         System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
         String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
@@ -427,7 +442,8 @@ public class TestSOSSecurityWebservice {
 
         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
 
-        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password=" + myPwd);
+        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password="
+                + myPwd);
         System.out.println(sosCommandSecurityClient.getAnswer());
         System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
         String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();
@@ -444,7 +460,8 @@ public class TestSOSSecurityWebservice {
 
         SOSCommandSecurityClient sosCommandSecurityClient = new SOSCommandSecurityClient();
 
-        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password=" + myPwd);
+        sosCommandSecurityClient.executeCommand(SOS_SECURITY_SERVER + "jobscheduler/engine/plugin/security/login?user=" + myUser + "&password="
+                + myPwd);
         System.out.println(sosCommandSecurityClient.getAnswer());
         System.out.println(sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getMessage());
         String session = sosCommandSecurityClient.getSosCommandSecurityWebserviceAnswer().getSessionId();

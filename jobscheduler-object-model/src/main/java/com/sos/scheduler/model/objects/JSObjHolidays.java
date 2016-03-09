@@ -137,7 +137,7 @@ public class JSObjHolidays extends Holidays {
         result.addAll(getDtHoliday(timeRange));
         result.addAll(getDtWeekdays(timeRange));
         result.addAll(getDtInclude(timeRange));		// holidays via the <include>
-                                                // element
+        // element
         return result;
     }
 

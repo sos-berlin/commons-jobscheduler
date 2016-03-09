@@ -94,8 +94,8 @@ public class JSOptionValueList extends SOSOptionString {
      * @param pPstrDescription
      * @param pPstrDefaultValue
      * @param pPflgIsMandatory */
-    public JSOptionValueList(final JSOptionsClass pobjParent, final String pstrIndexedKey, final String pstrDescription, final String pstrDefaultValue,
-            final boolean pflgIsMandatory) {
+    public JSOptionValueList(final JSOptionsClass pobjParent, final String pstrIndexedKey, final String pstrDescription,
+            final String pstrDefaultValue, final boolean pflgIsMandatory) {
         super(pobjParent, pstrIndexedKey, pstrDescription, null, pstrDefaultValue, pflgIsMandatory);
         // - <remark who='EQALS' when='Dienstag, 6. Oktober 2009'
         // id='PublishSQLStatement' >
@@ -175,7 +175,8 @@ public class JSOptionValueList extends SOSOptionString {
         }
         // JITL-93 oh 27.06.14, sonst strValueList immer leer nach
         // Constructor-Aufruf bei z.B. ignore_ora_messages
-        else if (isNotEmpty(pstrValueList) && (isNull(strValueList) || strValueList.length == 0 || (strValueList.length == 1 && isEmpty(strValueList[0])))) {
+        else if (isNotEmpty(pstrValueList)
+                && (isNull(strValueList) || strValueList.length == 0 || (strValueList.length == 1 && isEmpty(strValueList[0])))) {
             strValueList = new String[] { pstrValueList };
         }
         super.Value(strT);

@@ -40,7 +40,7 @@ public class LanguageDescriptorList {
     //
     // @formatter:off // avoid formatting
     private static List<LanguageDescriptor> lstLanguages = Arrays.asList(       // avoid
-                                                                          // formatting
+    // formatting
     new LanguageDescriptor(conLanguageSHELL, 0, false, conLanguageSHELL, "", "", true, false),   // avoid
                                                                                                // formatting
             new LanguageDescriptor(conLanguageJAVA, 1, false, conLanguageJAVA, "", "", true, true), // avoid

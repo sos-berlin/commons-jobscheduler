@@ -361,7 +361,8 @@ public class SOSFileSystemOperations {
      * @return true if file exists or false if not
      * @throws Exception */
     public boolean existsFile(final String file, final String fileSpec, final int fileSpecFlags, final String minFileAge, final String maxFileAge,
-            final String minFileSize, final String maxFileSize, final int skipFirstFiles, final int skipLastFiles, final Object objDummy) throws Exception {
+            final String minFileSize, final String maxFileSize, final int skipFirstFiles, final int skipLastFiles, final Object objDummy)
+            throws Exception {
         File filename = new File(file);
         return existsFile(filename, fileSpec, fileSpecFlags, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles, skipLastFiles, logger);
     }
@@ -506,7 +507,8 @@ public class SOSFileSystemOperations {
      * @return true if file exists or false if not
      * @throws Exception */
     public boolean existsFile(final File file, final String fileSpec, final int fileSpecFlags, final String minFileAge, final String maxFileAge,
-            final String minFileSize, final String maxFileSize, final int skipFirstFiles, final int skipLastFiles, final Object objDummy) throws Exception {
+            final String minFileSize, final String maxFileSize, final int skipFirstFiles, final int skipLastFiles, final Object objDummy)
+            throws Exception {
         return existsFile(file, fileSpec, fileSpecFlags, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles, skipLastFiles, -1, -1, logger);
     }
 
@@ -624,7 +626,8 @@ public class SOSFileSystemOperations {
                     if (minAge > 0) {
                         long interval = currentTime - file.lastModified();
                         if (interval < 0)
-                            throw new JobSchedulerException("Cannot filter by file age. File [" + file.getCanonicalPath() + "] was modified in the future.");
+                            throw new JobSchedulerException("Cannot filter by file age. File [" + file.getCanonicalPath()
+                                    + "] was modified in the future.");
                         if (interval < minAge) {
                             log("checking file age " + file.lastModified() + ": minimum age required is " + minAge, logger);
                             return false;
@@ -633,7 +636,8 @@ public class SOSFileSystemOperations {
                     if (maxAge > 0) {
                         long interval = currentTime - file.lastModified();
                         if (interval < 0)
-                            throw new JobSchedulerException("Cannot filter by file age. File [" + file.getCanonicalPath() + "] was modified in the future.");
+                            throw new JobSchedulerException("Cannot filter by file age. File [" + file.getCanonicalPath()
+                                    + "] was modified in the future.");
                         if (interval > maxAge) {
                             log("checking file age " + file.lastModified() + ": maximum age required is " + maxAge, logger);
                             return false;
@@ -775,7 +779,8 @@ public class SOSFileSystemOperations {
      * @return Returns true if at least one file or directory was removed.
      *         Returns false if zero files or directories were removed
      * @throws Exception */
-    public boolean removeFile(final File file, final String fileSpec, final int flags, final int fileSpecFlags, final Object objDummy) throws Exception {
+    public boolean removeFile(final File file, final String fileSpec, final int flags, final int fileSpecFlags, final Object objDummy)
+            throws Exception {
         return removeFile(file, fileSpec, flags, fileSpecFlags, "0", "0", "-1", "-1", 0, 0, logger);
     }
 
@@ -1186,7 +1191,8 @@ public class SOSFileSystemOperations {
      * @return Returns true if at least one file or directory was removed.
      *         Returns false if zero files or directories were removed
      * @throws Exception */
-    public boolean removeFile(final String file, final String fileSpec, final int flags, final int fileSpecFlags, final Object objDummy) throws Exception {
+    public boolean removeFile(final String file, final String fileSpec, final int flags, final int fileSpecFlags, final Object objDummy)
+            throws Exception {
         return removeFile(new File(file), fileSpec, flags, fileSpecFlags, logger);
     }
 
@@ -1415,8 +1421,8 @@ public class SOSFileSystemOperations {
      * @return Returns true if at least one file was copied. Returns false if
      *         zero files were copied
      * @throws Exception */
-    public boolean copyFile(final File source, final File target, final String fileSpec, final int flags, final int fileSpecFlags, final String replacing,
-            final String replacement, final Object objDummy) throws Exception {
+    public boolean copyFile(final File source, final File target, final String fileSpec, final int flags, final int fileSpecFlags,
+            final String replacing, final String replacement, final Object objDummy) throws Exception {
         return copyFile(source, target, fileSpec, flags, fileSpecFlags, replacing, replacement, "0", "0", "-1", "-1", 0, 0, logger);
     }
 
@@ -1475,9 +1481,9 @@ public class SOSFileSystemOperations {
      * @return Returns true if at least one file was copied. Returns false if
      *         zero files were copied
      * @throws Exception */
-    public boolean copyFile(final File source, final File target, final String fileSpec, final int flags, final int fileSpecFlags, final String replacing,
-            final String replacement, final String minFileAge, final String maxFileAge, final String minFileSize, final String maxFileSize,
-            final int skipFirstFiles, final int skipLastFiles, final Object objDummy) throws Exception {
+    public boolean copyFile(final File source, final File target, final String fileSpec, final int flags, final int fileSpecFlags,
+            final String replacing, final String replacement, final String minFileAge, final String maxFileAge, final String minFileSize,
+            final String maxFileSize, final int skipFirstFiles, final int skipLastFiles, final Object objDummy) throws Exception {
         String mode = "copy";
         return transferFile(source, target, fileSpec, flags, fileSpecFlags, replacing, replacement, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles, skipLastFiles, mode, logger);
     }
@@ -1570,8 +1576,8 @@ public class SOSFileSystemOperations {
      * @return Returns true if at least one file was copied. Returns false if
      *         zero files were copied
      * @throws Exception */
-    public boolean copyFile(final String source, final String target, final String fileSpec, final int flags, final int fileSpecFlags, final Object objDummy)
-            throws Exception {
+    public boolean copyFile(final String source, final String target, final String fileSpec, final int flags, final int fileSpecFlags,
+            final Object objDummy) throws Exception {
         File sourceFile = new File(source);
         File targetFile = target == null ? null : new File(target);
         return copyFile(sourceFile, targetFile, fileSpec, flags, fileSpecFlags, null, null, "0", "0", "-1", "-1", 0, 0, logger);
@@ -1635,8 +1641,8 @@ public class SOSFileSystemOperations {
      * @return Returns true if at least one file was copied. Returns false if
      *         zero files were copied
      * @throws Exception */
-    public boolean copyFile(final String source, final String target, final String fileSpec, final int flags, final int fileSpecFlags, final String replacing,
-            final String replacement, final Object objDummy) throws Exception {
+    public boolean copyFile(final String source, final String target, final String fileSpec, final int flags, final int fileSpecFlags,
+            final String replacing, final String replacement, final Object objDummy) throws Exception {
         File sourceFile = new File(source);
         File targetFile = target == null ? null : new File(target);
         return copyFile(sourceFile, targetFile, fileSpec, flags, fileSpecFlags, replacing, replacement, logger);
@@ -1697,9 +1703,9 @@ public class SOSFileSystemOperations {
      * @return Returns true if at least one file was copied. Returns false if
      *         zero files were copied
      * @throws Exception */
-    public boolean copyFile(final String source, final String target, final String fileSpec, final int flags, final int fileSpecFlags, final String replacing,
-            final String replacement, final String minFileAge, final String maxFileAge, final String minFileSize, final String maxFileSize,
-            final int skipFirstFiles, final int skipLastFiles, final Object objDummy) throws Exception {
+    public boolean copyFile(final String source, final String target, final String fileSpec, final int flags, final int fileSpecFlags,
+            final String replacing, final String replacement, final String minFileAge, final String maxFileAge, final String minFileSize,
+            final String maxFileSize, final int skipFirstFiles, final int skipLastFiles, final Object objDummy) throws Exception {
         File sourceFile = new File(source);
         File targetFile = target == null ? null : new File(target);
         return copyFile(sourceFile, targetFile, fileSpec, flags, fileSpecFlags, replacing, replacement, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles, skipLastFiles, logger);
@@ -1759,9 +1765,9 @@ public class SOSFileSystemOperations {
      * @param logger Object
      * @return Returns the number of copied files.
      * @throws Exception */
-    public int copyFileCnt(final String source, final String target, final String fileSpec, final int flags, final int fileSpecFlags, final String replacing,
-            final String replacement, final String minFileAge, final String maxFileAge, final String minFileSize, final String maxFileSize,
-            final int skipFirstFiles, final int skipLastFiles, final Object objDummy) throws Exception {
+    public int copyFileCnt(final String source, final String target, final String fileSpec, final int flags, final int fileSpecFlags,
+            final String replacing, final String replacement, final String minFileAge, final String maxFileAge, final String minFileSize,
+            final String maxFileSize, final int skipFirstFiles, final int skipLastFiles, final Object objDummy) throws Exception {
         File sourceFile = new File(source);
         File targetFile = target == null ? null : new File(target);
         String mode = "copy";
@@ -1848,8 +1854,8 @@ public class SOSFileSystemOperations {
      * @return Returns true if at least one file was moved. Returns false if
      *         zero files were moved
      * @throws Exception */
-    public boolean renameFile(final File source, final File target, final String fileSpec, final int flags, final int fileSpecFlags, final Object objDummy)
-            throws Exception {
+    public boolean renameFile(final File source, final File target, final String fileSpec, final int flags, final int fileSpecFlags,
+            final Object objDummy) throws Exception {
         return renameFile(source, target, fileSpec, flags, fileSpecFlags, null, null, "0", "0", "-1", "-1", 0, 0, logger);
     }
 
@@ -1899,8 +1905,8 @@ public class SOSFileSystemOperations {
      * @return Returns true if at least one file was moved. Returns false if
      *         zero files were moved
      * @throws Exception */
-    public boolean renameFile(final File source, final File target, final String fileSpec, final int flags, final String replacing, final String replacement,
-            final Object objDummy) throws Exception {
+    public boolean renameFile(final File source, final File target, final String fileSpec, final int flags, final String replacing,
+            final String replacement, final Object objDummy) throws Exception {
         return renameFile(source, target, fileSpec, flags, Pattern.CASE_INSENSITIVE, replacing, replacement, "0", "0", "-1", "-1", 0, 0, logger);
     }
 
@@ -1961,8 +1967,8 @@ public class SOSFileSystemOperations {
      * @return Returns true if at least one file was moved. Returns false if
      *         zero files were moved
      * @throws Exception */
-    public boolean renameFile(final File source, final File target, final String fileSpec, final int flags, final int fileSpecFlags, final String replacing,
-            final String replacement, final Object objDummy) throws Exception {
+    public boolean renameFile(final File source, final File target, final String fileSpec, final int flags, final int fileSpecFlags,
+            final String replacing, final String replacement, final Object objDummy) throws Exception {
         return renameFile(source, target, fileSpec, flags, fileSpecFlags, replacing, replacement, "0", "0", "-1", "-1", 0, 0, logger);
     }
 
@@ -2021,9 +2027,9 @@ public class SOSFileSystemOperations {
      * @return Returns true if at least one file was moved. Returns false if
      *         zero files were moved
      * @throws Exception */
-    public boolean renameFile(final File source, final File target, final String fileSpec, final int flags, final int fileSpecFlags, final String replacing,
-            final String replacement, final String minFileAge, final String maxFileAge, final String minFileSize, final String maxFileSize,
-            final int skipFirstFiles, final int skipLastFiles, final Object objDummy) throws Exception {
+    public boolean renameFile(final File source, final File target, final String fileSpec, final int flags, final int fileSpecFlags,
+            final String replacing, final String replacement, final String minFileAge, final String maxFileAge, final String minFileSize,
+            final String maxFileSize, final int skipFirstFiles, final int skipLastFiles, final Object objDummy) throws Exception {
         String mode = "rename";
         return transferFile(source, target, fileSpec, flags, fileSpecFlags, replacing, replacement, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles, skipLastFiles, mode, logger);
     }
@@ -2092,7 +2098,8 @@ public class SOSFileSystemOperations {
      * @return Returns true if at least one file was moved. Returns false if
      *         zero files were moved
      * @throws Exception */
-    public boolean renameFile(final String source, final String target, final String fileSpec, final int flags, final Object objDummy) throws Exception {
+    public boolean renameFile(final String source, final String target, final String fileSpec, final int flags, final Object objDummy)
+            throws Exception {
         File sourceFile = new File(source);
         File targetFile = target == null ? null : new File(target);
         return renameFile(sourceFile, targetFile, fileSpec, flags, logger);
@@ -2116,8 +2123,8 @@ public class SOSFileSystemOperations {
      * @return Returns true if at least one file was moved. Returns false if
      *         zero files were moved
      * @throws Exception */
-    public boolean renameFile(final String source, final String target, final String fileSpec, final int flags, final int fileSpecFlags, final Object objDummy)
-            throws Exception {
+    public boolean renameFile(final String source, final String target, final String fileSpec, final int flags, final int fileSpecFlags,
+            final Object objDummy) throws Exception {
         File sourceFile = new File(source);
         File targetFile = target == null ? null : new File(target);
         return renameFile(sourceFile, targetFile, fileSpec, flags, fileSpecFlags, logger);
@@ -2360,9 +2367,9 @@ public class SOSFileSystemOperations {
      * @param logger Object
      * @return Returns the number of renamed/moved files.
      * @throws Exception */
-    public int renameFileCnt(final String source, final String target, final String fileSpec, final int flags, final int fileSpecFlags, final String replacing,
-            final String replacement, final String minFileAge, final String maxFileAge, final String minFileSize, final String maxFileSize,
-            final int skipFirstFiles, final int skipLastFiles, final Object objDummy) throws Exception {
+    public int renameFileCnt(final String source, final String target, final String fileSpec, final int flags, final int fileSpecFlags,
+            final String replacing, final String replacement, final String minFileAge, final String maxFileAge, final String minFileSize,
+            final String maxFileSize, final int skipFirstFiles, final int skipLastFiles, final Object objDummy) throws Exception {
         File sourceFile = new File(source);
         File targetFile = target == null ? null : new File(target);
         String mode = "rename";
@@ -2373,9 +2380,9 @@ public class SOSFileSystemOperations {
      * 
      * Returns true if at least one file was copied or moved. Returns false if
      * zero files were copied or moved */
-    private boolean transferFile(final File source, final File target, final String fileSpec, final int flags, final int fileSpecFlags, final String replacing,
-            final String replacement, final String minFileAge, final String maxFileAge, final String minFileSize, final String maxFileSize,
-            final int skipFirstFiles, final int skipLastFiles, final String mode, final Object objDummy) throws Exception {
+    private boolean transferFile(final File source, final File target, final String fileSpec, final int flags, final int fileSpecFlags,
+            final String replacing, final String replacement, final String minFileAge, final String maxFileAge, final String minFileSize,
+            final String maxFileSize, final int skipFirstFiles, final int skipLastFiles, final String mode, final Object objDummy) throws Exception {
         int nrOfTransferedFiles = transferFileCnt(source, target, fileSpec, flags, fileSpecFlags, replacing, replacement, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles, skipLastFiles, mode, logger);
         return nrOfTransferedFiles > 0;
     }
@@ -2383,9 +2390,9 @@ public class SOSFileSystemOperations {
     /** Used for copyFile and renameFile. Transfers files.
      * 
      * Returns the number of the transferred files. */
-    private int transferFileCnt(final File source, File target, final String fileSpec, final int flags, final int fileSpecFlags, final String replacing,
-            final String replacement, final String minFileAge, final String maxFileAge, final String minFileSize, final String maxFileSize,
-            final int skipFirstFiles, final int skipLastFiles, final String mode, final Object objDummy) throws Exception {
+    private int transferFileCnt(final File source, File target, final String fileSpec, final int flags, final int fileSpecFlags,
+            final String replacing, final String replacement, final String minFileAge, final String maxFileAge, final String minFileSize,
+            final String maxFileSize, final int skipFirstFiles, final int skipLastFiles, final String mode, final Object objDummy) throws Exception {
         int nrOfTransferedFiles = 0;
         boolean create_dir;
         boolean gracious;
@@ -2680,7 +2687,8 @@ public class SOSFileSystemOperations {
         return filelist;
     }
 
-    private Vector<File> filelistSkipFiles(Vector<File> filelist, final int skipFirstFiles, final int skipLastFiles, final String sorting) throws Exception {
+    private Vector<File> filelistSkipFiles(Vector<File> filelist, final int skipFirstFiles, final int skipLastFiles, final String sorting)
+            throws Exception {
         Object[] oArr = filelist.toArray();
         class SizeComparator implements Comparator {
 
@@ -2788,7 +2796,8 @@ public class SOSFileSystemOperations {
      *      href="http://java.sun.com/j2se/1.4.2/docs/api/constant-values.html#java.util.regex.Pattern.UNIX_LINES">Constant
      *      Field Values</a> */
     private Vector<File> getFilelist(final String folder, final String regexp, final int flag, final boolean withSubFolder, final long minFileAge,
-            final long maxFileAge, final long minFileSize, final long maxFileSize, final int skipFirstFiles, final int skipLastFiles) throws Exception {
+            final long maxFileAge, final long minFileSize, final long maxFileSize, final int skipFirstFiles, final int skipLastFiles)
+            throws Exception {
         Vector<File> filelist = new Vector<File>();
         Vector<File> temp = new Vector<File>();
         File file = null;
@@ -3025,7 +3034,8 @@ public class SOSFileSystemOperations {
             return pstrSourceString;
         int intGroupCount = m.groupCount();
         if (replacements.length < intGroupCount)
-            throw new RuntimeException("replacements missing: " + replacements.length + " replacement(s) defined but " + intGroupCount + " groups found");
+            throw new RuntimeException("replacements missing: " + replacements.length + " replacement(s) defined but " + intGroupCount
+                    + " groups found");
         // no groups, exchange the whole string
         if (intGroupCount == 0) {
             result = pstrSourceString.substring(0, m.start()) + replacements[0] + pstrSourceString.substring(m.end());
@@ -3052,7 +3062,8 @@ public class SOSFileSystemOperations {
         return result;
     }
 
-    private boolean copyOneFile(final File source, final File target, final boolean overwrite, final boolean gracious, final Object objDummy) throws Exception {
+    private boolean copyOneFile(final File source, final File target, final boolean overwrite, final boolean gracious, final Object objDummy)
+            throws Exception {
         boolean rc = false;
         if (source.equals(target))
             throw new JobSchedulerException("cannot copy file to itself: " + source.getCanonicalPath());

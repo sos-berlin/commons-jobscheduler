@@ -44,7 +44,8 @@ public class JSOrderId extends SOSOptionElement {
      * @param pstrValue
      * @param pstrDefaultValue
      * @param pflgIsMandatory */
-    public JSOrderId(JSOptionsClass pobjParent, String pstrKey, String pstrDescription, String pstrValue, String pstrDefaultValue, boolean pflgIsMandatory) {
+    public JSOrderId(JSOptionsClass pobjParent, String pstrKey, String pstrDescription, String pstrValue, String pstrDefaultValue,
+            boolean pflgIsMandatory) {
         super(pobjParent, pstrKey, pstrDescription, pstrValue, pstrDefaultValue, pflgIsMandatory);
         // TODO Auto-generated constructor stub
     }

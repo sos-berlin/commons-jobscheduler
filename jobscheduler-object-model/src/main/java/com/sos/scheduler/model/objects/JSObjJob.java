@@ -656,8 +656,8 @@ public class JSObjJob extends Job {
     }
 
     // see class LogLevel
-    public final static String[] ValidLogLevels = new String[] { "info", "debug1", "debug2", "debug3", "debug4", "debug5", "debug6", "debug7", "debug8",
-            "debug9", "" };
+    public final static String[] ValidLogLevels = new String[] { "info", "debug1", "debug2", "debug3", "debug4", "debug5", "debug6", "debug7",
+            "debug8", "debug9", "" };
 
     public String getLogLevel() {
         JobSettings objS = this.getSettings();

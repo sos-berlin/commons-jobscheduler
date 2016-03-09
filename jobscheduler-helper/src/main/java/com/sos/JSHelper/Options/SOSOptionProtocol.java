@@ -27,7 +27,8 @@ public class SOSOptionProtocol extends JSOptionValueList {
         super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
     }
 
-    public SOSOptionProtocol(JSOptionsClass pobjParent, String pstrIndexedKey, String pstrDescription, String pstrDefaultValue, boolean pflgIsMandatory) {
+    public SOSOptionProtocol(JSOptionsClass pobjParent, String pstrIndexedKey, String pstrDescription, String pstrDefaultValue,
+            boolean pflgIsMandatory) {
         super(pobjParent, pstrIndexedKey, pstrDescription, pstrDefaultValue, pflgIsMandatory);
     }
 
