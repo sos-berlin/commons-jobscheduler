@@ -113,7 +113,7 @@ public class JSObjDayTest {
             date.setObjectFieldsFrom(d);
             List<DateTime> result = date.getRunTimeElements(nextWeek).getStartTimes();
             assertEquals(0, result.size());		// no entries, because period
-                                            // element is missing
+            // element is missing
         }
     }
 

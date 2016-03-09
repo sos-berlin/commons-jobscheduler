@@ -153,8 +153,8 @@ public class JSObjRunTimeTest extends TestBase {
         assertEquals(true, runtime.getRunTimePeriod().isInPeriod(dIn));
         assertEquals(false, runtime.getRunTimePeriod().isInPeriod(dOut));
         assertEquals(false, runtime.hasSubsequentRunTimes());		// period without
-                                                              // runtime
-                                                              // specification
+        // runtime
+        // specification
     }
 
     @Test
@@ -267,36 +267,36 @@ public class JSObjRunTimeTest extends TestBase {
         String timeString = " " + expectedTime;
         assertEquals(9, result.size());
         assertEquals("2012-03-06" + timeString, fmtDateTime.print(result.get(0)));			// 1st
-                                                                                   // Tuesday
-                                                                                   // in
-                                                                                   // March
-                                                                                   // 2012
+        // Tuesday
+        // in
+        // March
+        // 2012
         assertEquals("2012-03-13" + timeString, fmtDateTime.print(result.get(1)));			// 2nd
-                                                                                   // Tuesday
-                                                                                   // in
-                                                                                   // March
-                                                                                   // 2012
+        // Tuesday
+        // in
+        // March
+        // 2012
         assertEquals("2012-03-20" + timeString, fmtDateTime.print(result.get(2)));			// 3rd
-                                                                                   // Tuesday
-                                                                                   // in
-                                                                                   // March
-                                                                                   // 2012
+        // Tuesday
+        // in
+        // March
+        // 2012
         assertEquals("2012-03-21" + timeString, fmtDateTime.print(result.get(3)));			// ultimos
-                                                                                   // day='10'
+        // day='10'
         assertEquals("2012-03-22" + timeString, fmtDateTime.print(result.get(4)));			// monthdays
-                                                                                   // day='22'
+        // day='22'
         assertEquals("2012-03-23" + timeString, fmtDateTime.print(result.get(5)));			// weekday
-                                                                                   // day='friday'
-                                                                                   // which='4'
+        // day='friday'
+        // which='4'
         assertEquals("2012-03-27" + timeString, fmtDateTime.print(result.get(6)));			// 4th
-                                                                                   // Tuesday
-                                                                                   // in
-                                                                                   // March
-                                                                                   // 2012
+        // Tuesday
+        // in
+        // March
+        // 2012
         assertEquals("2012-03-28" + timeString, fmtDateTime.print(result.get(7)));			// specific
-                                                                                   // date
+        // date
         assertEquals("2012-03-31" + timeString, fmtDateTime.print(result.get(8)));			// ultimos
-                                                                                   // day='0'
+        // day='0'
     }
 
     @Test
