@@ -7,118 +7,106 @@ import org.apache.log4j.Logger;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.answers.Job;
 
- 
 public class JSCmdShowJob extends ShowJob {
 
-	private final String		conClassName	= "JSCmdShowJob";
-	@SuppressWarnings("unused")
-	private static final Logger	logger			= Logger.getLogger(JSCmdShowJob.class);
+    private final String conClassName = "JSCmdShowJob";
+    @SuppressWarnings("unused")
+    private static final Logger logger = Logger.getLogger(JSCmdShowJob.class);
 
-	public static enum enu4What {
-		task_queue, job_params, job_orders, job_commands, description, log, run_time, task_history, source
+    public static enum enu4What {
+        task_queue, job_params, job_orders, job_commands, description, log, run_time, task_history, source
 
-		/**/;
-		public String Text() {
-			String strT = this.name();
-			return strT;
-		}
-	}
+        /**/;
 
-	public JSCmdShowJob(SchedulerObjectFactory schedulerObjectFactory) {
-		super();
-		objFactory = schedulerObjectFactory;
-	}
+        public String Text() {
+            String strT = this.name();
+            return strT;
+        }
+    }
 
-	/**
-	 * 
-	 * \brief setWhat
-	 * 
-	 * \details
-	 *
-	 * @param penuT
-	 */
-	public void setWhat(enu4What penuT) {
+    public JSCmdShowJob(SchedulerObjectFactory schedulerObjectFactory) {
+        super();
+        objFactory = schedulerObjectFactory;
+    }
 
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::setWhat";
+    /** \brief setWhat
+     * 
+     * \details
+     *
+     * @param penuT */
+    public void setWhat(enu4What penuT) {
 
-		super.setWhat(penuT.Text());
+        @SuppressWarnings("unused")
+        final String conMethodName = conClassName + "::setWhat";
 
-	} // private void setWhat
+        super.setWhat(penuT.Text());
 
-	/**
-	 * 
-	 * \brief setWhat
-	 * 
-	 * \details
-	 *
-	 * @param penuT
-	 */
-	public void setWhat(enu4What[] penuT) {
+    } // private void setWhat
 
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::setWhat";
+    /** \brief setWhat
+     * 
+     * \details
+     *
+     * @param penuT */
+    public void setWhat(enu4What[] penuT) {
 
-		String strT = "";
-		for (enu4What enuState4What : penuT) {
-			strT += enuState4What.Text() + " ";
-		}
-		super.setWhat(strT);
+        @SuppressWarnings("unused")
+        final String conMethodName = conClassName + "::setWhat";
 
-	} // private JSCmdShowTask setWhat
+        String strT = "";
+        for (enu4What enuState4What : penuT) {
+            strT += enuState4What.Text() + " ";
+        }
+        super.setWhat(strT);
 
-	public Job getJobAnswer() {
+    } // private JSCmdShowTask setWhat
 
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getAnswer";
+    public Job getJobAnswer() {
 
-		Job objAnswer = null;
+        @SuppressWarnings("unused")
+        final String conMethodName = conClassName + "::getAnswer";
 
-		return objAnswer;
-	} // private Job getAnswer
+        Job objAnswer = null;
 
-	public JSCmdShowJob MaxOrders(final int pintMaxOrders) {
+        return objAnswer;
+    } // private Job getAnswer
 
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::MaxOrders";
+    public JSCmdShowJob MaxOrders(final int pintMaxOrders) {
 
-		super.setMaxOrders(BigInteger.valueOf(pintMaxOrders));
+        @SuppressWarnings("unused")
+        final String conMethodName = conClassName + "::MaxOrders";
 
-		return this;
-	} // private this MaxOrders
+        super.setMaxOrders(BigInteger.valueOf(pintMaxOrders));
 
-	public JSCmdShowJob MaxTaskHistory(final int pintMaxTaskHistory) {
+        return this;
+    } // private this MaxOrders
 
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::MaxTaskHistory";
+    public JSCmdShowJob MaxTaskHistory(final int pintMaxTaskHistory) {
 
-		super.setMaxTaskHistory(BigInteger.valueOf(pintMaxTaskHistory));
+        @SuppressWarnings("unused")
+        final String conMethodName = conClassName + "::MaxTaskHistory";
 
-		return this;
-	} // private this MaxTaskHistory
+        super.setMaxTaskHistory(BigInteger.valueOf(pintMaxTaskHistory));
 
-	/**
-	 * \brief getjobName
-	 *
-	 * \details
-	 * getter 
-	 *
-	 * @return the jobName
-	 */
-	public String getJobName() {
-		return super.getJob();
-	}
+        return this;
+    } // private this MaxTaskHistory
 
-	/**
-	 * \brief setjobName - 
-	 *
-	 * \details
-	 * setter 
-	 *
-	 * @param jobName the value for jobName to set
-	 */
-	public void setJobName(String jobName) {
-		super.setJob(jobName);
-	}
+    /** \brief getjobName
+     *
+     * \details getter
+     *
+     * @return the jobName */
+    public String getJobName() {
+        return super.getJob();
+    }
+
+    /** \brief setjobName -
+     *
+     * \details setter
+     *
+     * @param jobName the value for jobName to set */
+    public void setJobName(String jobName) {
+        super.setJob(jobName);
+    }
 
 }

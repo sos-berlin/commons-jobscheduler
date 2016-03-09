@@ -13,12 +13,12 @@ public class H2TemporaryConnection extends H2PersistentConnection {
     private static File databaseFile = null;
 
     public H2TemporaryConnection(ResourceList fileList) {
-        super(fileList.getWorkingDirectory(), createDBFile(fileList.getWorkingDirectory()),fileList);
+        super(fileList.getWorkingDirectory(), createDBFile(fileList.getWorkingDirectory()), fileList);
     }
 
     private static String createDBFile(File inDir) {
         try {
-            databaseFile = File.createTempFile("h2-","db",inDir);
+            databaseFile = File.createTempFile("h2-", "db", inDir);
         } catch (IOException e) {
             throw new RuntimeException("Error creating temporary file.");
         }
@@ -27,7 +27,7 @@ public class H2TemporaryConnection extends H2PersistentConnection {
 
     public void close() {
         super.close();
-        if(!databaseFile.delete())
+        if (!databaseFile.delete())
             logger.warn("Database at location " + databaseFile.getAbsolutePath() + " could not delete.");
         super.removeTemporaryFiles();
     }

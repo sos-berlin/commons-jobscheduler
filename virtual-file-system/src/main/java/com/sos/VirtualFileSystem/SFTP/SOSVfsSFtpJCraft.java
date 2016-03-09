@@ -84,11 +84,11 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         JSch.setConfig("StrictHostKeyChecking", pstrStrictHostKeyCheckingValue);
     }
 
-	private String getStrictHostKeyChecking(final SOSOptionBoolean val) {
-		return val.value() ? "yes" : "no";
-	}
+    private String getStrictHostKeyChecking(final SOSOptionBoolean val) {
+        return val.value() ? "yes" : "no";
+    }
 
-	@Override
+    @Override
     public ISOSConnection Connect() {
         this.Connect(connection2OptionsAlternate);
         return this;
@@ -309,7 +309,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 size = objAttr.getSize();
             }
         } catch (SftpException e) {
-            
+
         }
         return size;
     }
@@ -579,7 +579,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 dateTime = df.format(new Date(mt));
             }
         } catch (SftpException e) {
-            // 
+            //
         }
         return dateTime;
     }
@@ -616,7 +616,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         userName = authenticationOptions.getUser().Value();
         String password = authenticationOptions.getPassword().Value();
         LOGGER.debug(SOSVfs_D_132.params(userName));
-		setKnownHostsFile();
+        setKnownHostsFile();
         this.createSession(userName, host, port);
         if (authenticationOptions.getAuth_method().isPublicKey()) {
             LOGGER.debug(SOSVfs_D_165.params("userid", "publickey"));
@@ -638,8 +638,8 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             }
         }
         try {
-			// JITL-206
-			sshSession.setConfig("PreferredAuthentications", authenticationOptions.getAuth_method().Value());
+            // JITL-206
+            sshSession.setConfig("PreferredAuthentications", authenticationOptions.getAuth_method().Value());
             sshSession.connect();
             this.createSftpClient();
         } catch (Exception e) {
@@ -651,13 +651,12 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         return this;
     }
 
-	
-	private void setKnownHostsFile() throws JSchException {
-		if(secureChannel != null && connection2OptionsAlternate.strictHostKeyChecking.isTrue()) {
-			File knownHostsFile = new File(System.getProperty("user.home"), ".ssh/known_hosts");
-			secureChannel.setKnownHosts(knownHostsFile.getAbsolutePath());
-		}
-	}
+    private void setKnownHostsFile() throws JSchException {
+        if (secureChannel != null && connection2OptionsAlternate.strictHostKeyChecking.isTrue()) {
+            File knownHostsFile = new File(System.getProperty("user.home"), ".ssh/known_hosts");
+            secureChannel.setKnownHosts(knownHostsFile.getAbsolutePath());
+        }
+    }
 
     public ChannelSftp getClient() {
         if (sftpClient == null) {

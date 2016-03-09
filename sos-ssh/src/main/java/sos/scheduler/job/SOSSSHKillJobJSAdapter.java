@@ -10,6 +10,7 @@ import sos.spooler.Variable_set;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
 public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
+
     private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
     private static final String PARAM_SSH_JOB_TASK_ID = "SSH_JOB_TASK_ID";
     private static final String PARAM_SSH_JOB_NAME = "SSH_JOB_NAME";
@@ -64,8 +65,8 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
             // if task is still running but remote pid is not available anymore
             // (finished) --> kill task
             logger.info("Task is still active, try to end task!");
-            String killTaskXml = new String("<kill_task job=\"" + allParams.value(PARAM_SSH_JOB_NAME) + "\" id=\"" + allParams.value(PARAM_SSH_JOB_TASK_ID)
-                    + "\" immediately=\"yes\"/>");
+            String killTaskXml = new String("<kill_task job=\"" + allParams.value(PARAM_SSH_JOB_NAME) + "\" id=\""
+                    + allParams.value(PARAM_SSH_JOB_TASK_ID) + "\" immediately=\"yes\"/>");
             String killTaskXmlAnswer = spooler.execute_xml(killTaskXml);
             logger.debug("killTaskXmlAnswer:\n" + killTaskXmlAnswer);
             return true;

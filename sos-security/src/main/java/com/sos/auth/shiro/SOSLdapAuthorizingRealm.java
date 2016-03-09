@@ -2,7 +2,6 @@ package com.sos.auth.shiro;
 
 import java.util.Map;
 
-
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -10,88 +9,88 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.ldap.JndiLdapRealm;
 import org.apache.shiro.subject.PrincipalCollection;
- 
-public class SOSLdapAuthorizingRealm extends JndiLdapRealm{
+
+public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
+
     private SOSLdapAuthorizing authorizing;
-    private String searchBase ;
-    private Map<String, String>     groupRolesMap;
-    private Map<String, String>     permissions;
+    private String searchBase;
+    private Map<String, String> groupRolesMap;
+    private Map<String, String> permissions;
     private String groupNameAttribute;
     private String userNameAttribute;
 
-        public boolean supports(AuthenticationToken token) {
-            SOSLdapAuthorizing authorizing = new SOSLdapAuthorizing();
-            setAuthorizing(authorizing);
-         
-            return true;
-        }
-        
-        @Override
-        protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
-            SimpleAuthorizationInfo authzInfo=null;  
-            if (authorizing != null) {
-                authorizing.setSosLdapAuthorizingRealm(this);
-                authzInfo = authorizing.setRoles(authzInfo, principalCollection);
-//                authzInfo = authorizing.setPermittions(authzInfo,principalCollection);
-            }    
-           return  authzInfo;
-        }
+    public boolean supports(AuthenticationToken token) {
+        SOSLdapAuthorizing authorizing = new SOSLdapAuthorizing();
+        setAuthorizing(authorizing);
 
-        @Override
-        protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authcToken) throws AuthenticationException {
-            return super.doGetAuthenticationInfo(authcToken);
-        }
-        
-        public void setAuthorizing(SOSLdapAuthorizing authorizing) {
-            this.authorizing = authorizing;
-        }
+        return true;
+    }
 
-        public void setSearchBase(String searchBase) {
-            this.searchBase = searchBase;
+    @Override
+    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
+        SimpleAuthorizationInfo authzInfo = null;
+        if (authorizing != null) {
+            authorizing.setSosLdapAuthorizingRealm(this);
+            authzInfo = authorizing.setRoles(authzInfo, principalCollection);
+            // authzInfo =
+            // authorizing.setPermittions(authzInfo,principalCollection);
         }
+        return authzInfo;
+    }
 
-        public void setGroupRolesMap(Map<String, String>  groupRolesMap) {
-            // group1:SYSTEM_ADMINISTRATOR, group2:PARTICIPANT_MANAGER, group3:DATA_COLLECTION_OPERATOR, group4:PARTICIPANT_RECEPTIONIST
-            this.groupRolesMap = groupRolesMap;
-        }
+    @Override
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authcToken) throws AuthenticationException {
+        return super.doGetAuthenticationInfo(authcToken);
+    }
 
-        public SOSLdapAuthorizing getAuthorizing() {
-            return authorizing;
-        }
+    public void setAuthorizing(SOSLdapAuthorizing authorizing) {
+        this.authorizing = authorizing;
+    }
 
-        public String getSearchBase() {
-            return searchBase;
-        }
+    public void setSearchBase(String searchBase) {
+        this.searchBase = searchBase;
+    }
 
-        public Map<String, String>  getGroupRolesMap() {
-            return groupRolesMap;
-        }
+    public void setGroupRolesMap(Map<String, String> groupRolesMap) {
+        // group1:SYSTEM_ADMINISTRATOR, group2:PARTICIPANT_MANAGER,
+        // group3:DATA_COLLECTION_OPERATOR, group4:PARTICIPANT_RECEPTIONIST
+        this.groupRolesMap = groupRolesMap;
+    }
 
+    public SOSLdapAuthorizing getAuthorizing() {
+        return authorizing;
+    }
 
-        public String getGroupNameAttribute() {
-            return groupNameAttribute;
-        }
+    public String getSearchBase() {
+        return searchBase;
+    }
 
-        public void setGroupNameAttribute(String groupNameAttribute) {
-            this.groupNameAttribute = groupNameAttribute;
-        }
+    public Map<String, String> getGroupRolesMap() {
+        return groupRolesMap;
+    }
 
-        public String getUserNameAttribute() {
-            return userNameAttribute;
-        }
+    public String getGroupNameAttribute() {
+        return groupNameAttribute;
+    }
 
-        public void setUserNameAttribute(String userNameAttribute) {
-            this.userNameAttribute = userNameAttribute;
-        }
+    public void setGroupNameAttribute(String groupNameAttribute) {
+        this.groupNameAttribute = groupNameAttribute;
+    }
 
-        public Map<String, String> getPermissions() {
-            return permissions;
-        }
+    public String getUserNameAttribute() {
+        return userNameAttribute;
+    }
 
-        public void setPermissions(Map<String, String> permissions) {
-            this.permissions = permissions;
-        }
+    public void setUserNameAttribute(String userNameAttribute) {
+        this.userNameAttribute = userNameAttribute;
+    }
 
-      
-        
+    public Map<String, String> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(Map<String, String> permissions) {
+        this.permissions = permissions;
+    }
+
 }

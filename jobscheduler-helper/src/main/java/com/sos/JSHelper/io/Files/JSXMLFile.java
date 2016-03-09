@@ -44,7 +44,7 @@ public class JSXMLFile extends JSTextFile {
     protected HashMap<String, String> hsmParameters = null;
     private static final Logger LOGGER = Logger.getLogger(JSXMLFile.class);
     private static final long serialVersionUID = 1L;
-//    private final String conClassName = "JSXMLFile";
+    // private final String conClassName = "JSXMLFile";
     private Boolean flgFileIsOpen = false;
     private int intIndent = 0;
     private Boolean flgDecrIndent = false;
@@ -261,8 +261,8 @@ public class JSXMLFile extends JSTextFile {
         return this;
     }
 
-    public void Transform(final File xslFile, final File outputFile) throws TransformerException, TransformerConfigurationException,
-            FileNotFoundException, Exception {
+    public void Transform(final File xslFile, final File outputFile) throws TransformerException, TransformerConfigurationException, FileNotFoundException,
+            Exception {
         Transformer transformer = null;
         System.setProperty("javax.xml.transform.TransformerFactory", "net.sf.saxon.TransformerFactoryImpl");
         try {
@@ -416,8 +416,7 @@ public class JSXMLFile extends JSTextFile {
     public Document getDomDocument() throws ParserConfigurationException {
         if (document == null) {
             System.setProperty("javax.xml.parsers.DocumentBuilderFactory", conORG_APACHE_XERCES_JAXP_DOCUMENT_BUILDER_FACTORY_IMPL);
-            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance(conORG_APACHE_XERCES_JAXP_DOCUMENT_BUILDER_FACTORY_IMPL, 
-                    this.getClass().getClassLoader());
+            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance(conORG_APACHE_XERCES_JAXP_DOCUMENT_BUILDER_FACTORY_IMPL, this.getClass().getClassLoader());
             builderFactory.setNamespaceAware(true);
             builderFactory.setXIncludeAware(true);
             String strUserDir = System.getProperty("user.dir");
@@ -484,5 +483,5 @@ public class JSXMLFile extends JSTextFile {
             throw ex;
         }
     }
-    
+
 }

@@ -37,7 +37,7 @@ public class TestJobSchedulerFileElement {
         String s = jobSchedulerFileElement.getSchedulerLivePath();
         assertEquals("testGetSchedulerHome", "c:/config/live", s);
     }
-    
+
     @Test
     public void testGetJobSchedulerElementName() {
         File f = new File("c:\\config\\live\\xxx\\job.job.xml");
@@ -45,6 +45,5 @@ public class TestJobSchedulerFileElement {
         String s = jobSchedulerFileElement.getJobSchedulerElementName();
         assertEquals("testGetJobSchedulerElementName", "/xxx/job", s);
     }
-
 
 }

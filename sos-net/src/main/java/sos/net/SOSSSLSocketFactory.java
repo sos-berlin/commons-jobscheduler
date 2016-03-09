@@ -83,6 +83,7 @@ public class SOSSSLSocketFactory extends SSLSocketFactory {
             doTunnelHandshake(tunnel, host, port);
             SSLSocket sslSocket = (SSLSocket) sslFactory.createSocket(tunnel, host, port, autoClose);
             sslSocket.addHandshakeCompletedListener(new HandshakeCompletedListener() {
+
                 public void handshakeCompleted(HandshakeCompletedEvent event) {
                     done = true;
                 }

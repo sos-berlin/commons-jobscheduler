@@ -20,7 +20,7 @@ import java.math.BigInteger;
 /** @author KB */
 public class TestLoadSchedulerXML implements Runnable {
 
-//    private final String conClassName = "TestLoadSchedulerXML";
+    // private final String conClassName = "TestLoadSchedulerXML";
     private static final Logger LOGGER = Logger.getLogger(TestLoadSchedulerXML.class);
 
     TestLoadSchedulerXML() {

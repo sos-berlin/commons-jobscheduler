@@ -14,36 +14,34 @@ import org.eclipse.swt.widgets.Label;
 
 import com.sos.dialog.Globals;
 
-/**
- * @author KB
- *
- */
+/** @author KB */
 public class SOSLabel extends Label {
-	@SuppressWarnings("unused")
-	private final String			conClassName	= this.getClass().getSimpleName();
-	@SuppressWarnings("unused")
-	private static final String		conSVNVersion	= "$Id$";
-	@SuppressWarnings("unused")
-	private final Logger			logger			= Logger.getLogger(this.getClass());
 
-	private final Vector<Control>	objControlList	= new Vector<Control>();
+    @SuppressWarnings("unused")
+    private final String conClassName = this.getClass().getSimpleName();
+    @SuppressWarnings("unused")
+    private static final String conSVNVersion = "$Id$";
+    @SuppressWarnings("unused")
+    private final Logger logger = Logger.getLogger(this.getClass());
 
-	/**
+    private final Vector<Control> objControlList = new Vector<Control>();
+
+    /**
 	 *
 	 */
-	public SOSLabel(final Composite parent, final int style) {
-		super(parent, SWT.None);
-		this.setBackground(Globals.getCompositeBackground());
-		setLayoutData(new GridData(GridData.FILL, GridData.CENTER, false, false));
-	}
+    public SOSLabel(final Composite parent, final int style) {
+        super(parent, SWT.None);
+        this.setBackground(Globals.getCompositeBackground());
+        setLayoutData(new GridData(GridData.FILL, GridData.CENTER, false, false));
+    }
 
-	public void addChild(final SOSControl pobjC) {
-		objControlList.add(pobjC);
-	}
+    public void addChild(final SOSControl pobjC) {
+        objControlList.add(pobjC);
+    }
 
-	@Override
-	protected void checkSubclass() {
-		// Disable the check that prevents subclassing of SWT components
-	}
+    @Override
+    protected void checkSubclass() {
+        // Disable the check that prevents subclassing of SWT components
+    }
 
 }

@@ -1,6 +1,7 @@
 package com.sos.scheduler.model.objects.extendedchain;
 
 public class SimpleParam {
+
     public String name;
     public String value;
 

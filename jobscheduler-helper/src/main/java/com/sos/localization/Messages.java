@@ -24,6 +24,7 @@ public class Messages implements Serializable {
     private enuEncodings enuEncoding = enuEncodings.ISO_8859_1;
     private final enuEncodings enuEncodingDefault = enuEncodings.ISO_8859_1;
     private String strLastKey = "";
+
     public static enum enuEncodings {
         ISO_8859_1, UTF_8;
 
@@ -260,5 +261,5 @@ public class Messages implements Serializable {
         }
         return strM;
     }
-    
+
 }

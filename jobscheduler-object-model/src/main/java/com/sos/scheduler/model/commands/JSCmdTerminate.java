@@ -6,13 +6,12 @@ import org.apache.log4j.Logger;
 
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
- 
 public class JSCmdTerminate extends Terminate {
 
     @SuppressWarnings("unused")
-    private final String        conClassName = "JSCmdTerminate";
+    private final String conClassName = "JSCmdTerminate";
     @SuppressWarnings("unused")
-    private static final Logger logger       = Logger.getLogger(JSCmdTerminate.class);
+    private static final Logger logger = Logger.getLogger(JSCmdTerminate.class);
 
     public JSCmdTerminate(SchedulerObjectFactory schedulerObjectFactory) {
         super();

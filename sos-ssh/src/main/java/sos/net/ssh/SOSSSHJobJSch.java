@@ -236,7 +236,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                 String keyVal = key.toString().replaceAll("\\.|\\(|\\)", "_");
                 envVarValue = envVarValue.replaceAll("\"", "\\\"");
                 envVarValue = "'" + envVarValue + "'";
-				if(!flgIsWindowsShell){
+                if (!flgIsWindowsShell) {
                     envVarValue = envVarValue.replaceAll("\\\\", "\\\\\\\\");
                 }
                 if (!"SCHEDULER_PARAM_std_out_output".equalsIgnoreCase(keyVal) && !"SCHEDULER_PARAM_std_err_output".equalsIgnoreCase(keyVal)) {

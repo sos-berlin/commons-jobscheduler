@@ -124,12 +124,10 @@ public class SOSMailReadInbox extends Job_impl {
         sosLogger.debug3(".. current setting [mail_server_timeout]: " + mailServerTimeout);
         mailServerType = getParams("mail_server_type", "POP3");
         sosLogger.debug3(".. current setting [mail_server_type]: " + mailServerType);
-        mailUseSeen = "true".equalsIgnoreCase(getParams("mail_use_seen", "true")) 
-                || "1".equalsIgnoreCase(getParams("mail_use_seen", "true"))
+        mailUseSeen = "true".equalsIgnoreCase(getParams("mail_use_seen", "true")) || "1".equalsIgnoreCase(getParams("mail_use_seen", "true"))
                 || "yes".equalsIgnoreCase(getParams("mail_use_seen", "true"));
         mailSetSeen = mailUseSeen || "true".equalsIgnoreCase(getParams("mail_set_seen", "true"))
-                || "1".equalsIgnoreCase(getParams("mail_set_seen", "true")) 
-                || "yes".equalsIgnoreCase(getParams("mail_set_seen", "true"));
+                || "1".equalsIgnoreCase(getParams("mail_set_seen", "true")) || "yes".equalsIgnoreCase(getParams("mail_set_seen", "true"));
         sosLogger.debug3(".. current setting [mail_set_seen]: " + mailSetSeen);
         subjectPattern = Pattern.compile(mailSubjectPattern, 0);
         bodyPattern = Pattern.compile(mailBodyPattern, 0);
@@ -245,7 +243,8 @@ public class SOSMailReadInbox extends Job_impl {
                             continue;
                         }
                     }
-                    // skip mails whose body does not match the download link pattern
+                    // skip mails whose body does not match the download link
+                    // pattern
                     if (!"".equals(mailBodyPattern)) {
                         Matcher bodyMatcher = bodyPattern.matcher(message.getPlainTextBody());
                         if (!bodyMatcher.find()) {
@@ -390,5 +389,5 @@ public class SOSMailReadInbox extends Job_impl {
         sosLogger.debug3("Sending add_order command:\n" + xml);
         command.sendRequest(xml);
     }
-    
+
 }

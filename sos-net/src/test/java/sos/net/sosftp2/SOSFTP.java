@@ -443,5 +443,5 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
         LogReply();
         return true;
     }
-    
+
 }

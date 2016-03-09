@@ -753,31 +753,35 @@ public class CronConverter extends JSToolBox {
                         }
                         currentPeriodElement.setAttribute("begin", "00:" + currentMinute);
                         childElements.add(currentPeriodElement);
-                    } else { 
+                    } else {
                         // fixed hour(s) is set
                         String[] hourArray = hours.split(",");
                         for (String element2 : hourArray) {
                             currentPeriodElement = (Element) periodElement.cloneNode(true);
                             String currentHour = element2;
                             if (currentHour.indexOf("-") == -1) {
-                                // fixed hour and fixed minute --> create single_start
+                                // fixed hour and fixed minute --> create
+                                // single_start
                                 currentHour = formatTwoDigits(currentHour);
                                 currentPeriodElement.setAttribute("single_start", currentHour + ":" + currentMinute);
                             } else {
-                                // range of hours is set, create begin and end attributes
+                                // range of hours is set, create begin and end
+                                // attributes
                                 String[] currentHourArray = currentHour.split("[-/]");
                                 int beginHour = Integer.parseInt(currentHourArray[0]);
                                 int endHour = Integer.parseInt(currentHourArray[1]);
                                 int beginMinute = Integer.parseInt(currentMinute);
                                 int endMinute = beginMinute + 1;
-                                // workaround, bis endhour am nächsten Tag erlaubt
+                                // workaround, bis endhour am nächsten Tag
+                                // erlaubt
                                 endMinute = beginMinute;
                                 if (endMinute == 60) {
                                     endMinute = 0;
                                     endHour = endHour + 1;
                                 }
                                 endHour = endHour % 24;
-                                // workaround, bis endhour am nächsten Tag erlaubt
+                                // workaround, bis endhour am nächsten Tag
+                                // erlaubt
                                 if (endHour == 0) {
                                     endHour = 24;
                                 }
@@ -1100,7 +1104,7 @@ public class CronConverter extends JSToolBox {
     public void setChangeUserCommand(String changeUserCommand) {
         if ("su".equalsIgnoreCase(changeUserCommand)) {
             changeUserCommand = "su $SCHEDULER_CRONTAB_USER -c";
-        }else if ("sudo".equalsIgnoreCase(changeUserCommand)) {
+        } else if ("sudo".equalsIgnoreCase(changeUserCommand)) {
             changeUserCommand = "sudo -u $SCHEDULER_CRONTAB_USER";
         }
         this.changeUserCommand = changeUserCommand;

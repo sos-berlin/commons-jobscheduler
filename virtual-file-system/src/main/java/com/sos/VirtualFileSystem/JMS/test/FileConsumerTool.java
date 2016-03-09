@@ -361,5 +361,5 @@ public class FileConsumerTool extends Thread implements MessageListener, Excepti
     public void setVerbose(final boolean verbose) {
         this.verbose = verbose;
     }
-    
+
 }

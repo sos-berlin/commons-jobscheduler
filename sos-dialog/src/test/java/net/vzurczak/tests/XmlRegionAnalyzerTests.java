@@ -1,5 +1,4 @@
-/***************************************************************************
- * Copyright (c) 2012, Vincent Zurczak - All rights reserved. This source file
+/*************************************************************************** Copyright (c) 2012, Vincent Zurczak - All rights reserved. This source file
  * is released under the terms of the BSD license.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,8 +22,7 @@
  * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
- ******************************************************************************/
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. ******************************************************************************/
 
 package net.vzurczak.tests;
 

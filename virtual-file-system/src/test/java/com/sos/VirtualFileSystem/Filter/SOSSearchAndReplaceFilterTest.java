@@ -14,92 +14,92 @@ import com.sos.VirtualFileSystem.Filter.Options.SOSFilterOptions;
 
 public class SOSSearchAndReplaceFilterTest {
 
-	@SuppressWarnings("unused")
-	private final String conClassName = this.getClass().getSimpleName();
-	@SuppressWarnings("unused")
-	private static final String conSVNVersion = "$Id$";
-	private final Logger logger = Logger.getLogger(this.getClass());
+    @SuppressWarnings("unused")
+    private final String conClassName = this.getClass().getSimpleName();
+    @SuppressWarnings("unused")
+    private static final String conSVNVersion = "$Id$";
+    private final Logger logger = Logger.getLogger(this.getClass());
 
-	private SOSSearchAndReplaceFilter objF = null;
-	private SOSFilterOptions objFO = null;
+    private SOSSearchAndReplaceFilter objF = null;
+    private SOSFilterOptions objFO = null;
 
-	byte[] bteBuffer = null;
+    byte[] bteBuffer = null;
 
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
+    }
 
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception {
+    }
 
-	@Before
-	public void setUp() throws Exception {
-		objF = new SOSSearchAndReplaceFilter();
-		objFO = objF.getOptions();
-		BasicConfigurator.configure();
-		logger.setLevel(Level.DEBUG);
-	}
+    @Before
+    public void setUp() throws Exception {
+        objF = new SOSSearchAndReplaceFilter();
+        objFO = objF.getOptions();
+        BasicConfigurator.configure();
+        logger.setLevel(Level.DEBUG);
+    }
 
-	@After
-	public void tearDown() throws Exception {
-	}
+    @After
+    public void tearDown() throws Exception {
+    }
 
-	@Test
-	public void testOptions() {
-	}
+    @Test
+    public void testOptions() {
+    }
 
-	@Test
-	public void testOptionsSOSFTPOptions() {
-	}
+    @Test
+    public void testOptionsSOSFTPOptions() {
+    }
 
-	@Test
-	public void testWriteByteArrayIntInt() {
-	}
+    @Test
+    public void testWriteByteArrayIntInt() {
+    }
 
-	@Test
-	public void testWriteByteArray() {
-		String strT = "Hallo, Welt!";
-		objFO.replaceWhat.Value("(Hallo)");
-		objFO.replaceWith.Value("<b>$1</b>");
-		objF.write(strT.getBytes());
+    @Test
+    public void testWriteByteArray() {
+        String strT = "Hallo, Welt!";
+        objFO.replaceWhat.Value("(Hallo)");
+        objFO.replaceWith.Value("<b>$1</b>");
+        objF.write(strT.getBytes());
 
-		bteBuffer = objF.read();
-		String strX = new String(bteBuffer);
-		logger.debug(strX);
-		Assert.assertEquals("<b>Hallo</b>, Welt!", strX);
-	}
+        bteBuffer = objF.read();
+        String strX = new String(bteBuffer);
+        logger.debug(strX);
+        Assert.assertEquals("<b>Hallo</b>, Welt!", strX);
+    }
 
-	@Test
-	public void testWriteByteArray2() {
-		String strT = "Hallo, Welt!";
-		objFO.replaceWhat.Value("(Welt)");
-		objFO.replaceWith.Value("<b>$1</b>");
-		objF.write(strT);
+    @Test
+    public void testWriteByteArray2() {
+        String strT = "Hallo, Welt!";
+        objFO.replaceWhat.Value("(Welt)");
+        objFO.replaceWith.Value("<b>$1</b>");
+        objF.write(strT);
 
-		String strX = objF.readString();
-		logger.debug(strX);
-		Assert.assertEquals("Hallo, <b>Welt</b>!", strX);
-	}
+        String strX = objF.readString();
+        logger.debug(strX);
+        Assert.assertEquals("Hallo, <b>Welt</b>!", strX);
+    }
 
-	@Test
-	public void testReadByteArray() {
-	}
+    @Test
+    public void testReadByteArray() {
+    }
 
-	@Test
-	public void testReadByteArrayIntInt() {
-	}
+    @Test
+    public void testReadByteArrayIntInt() {
+    }
 
-	@Test
-	public void testReadBufferByteArray() {
-	}
+    @Test
+    public void testReadBufferByteArray() {
+    }
 
-	@Test
-	public void testReadBufferByteArrayIntInt() {
-	}
+    @Test
+    public void testReadBufferByteArrayIntInt() {
+    }
 
-	@Test
-	public void testClose() {
-	}
+    @Test
+    public void testClose() {
+    }
 
 }

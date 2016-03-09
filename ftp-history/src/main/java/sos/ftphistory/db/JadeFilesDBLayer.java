@@ -17,9 +17,7 @@ import sos.ftphistory.JadeFilesFilter;
 import com.sos.hibernate.classes.DbItem;
 import com.sos.hibernate.layer.SOSHibernateIntervalDBLayer;
 
-/**
- * 
- * \class JadeHistoryDBLayer \brief JadeHistoryDBLayer -
+/** \class JadeHistoryDBLayer \brief JadeHistoryDBLayer -
  * 
  * \details
  * 
@@ -38,17 +36,15 @@ import com.sos.hibernate.layer.SOSHibernateIntervalDBLayer;
  * </p>
  * \author Uwe Risse \version 27.09.2011 \see reference
  * 
- * Created on 12.12.2011 14:40:18
- */
+ * Created on 12.12.2011 14:40:18 */
 
-public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Serializable{
-	private static final long serialVersionUID = 1L;
+public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Serializable {
 
-	@SuppressWarnings("unused")
-    private final String      conClassName = "JadeFilesDBLayer";
-    protected JadeFilesFilter filter       = null;
- 
+    private static final long serialVersionUID = 1L;
 
+    @SuppressWarnings("unused")
+    private final String conClassName = "JadeFilesDBLayer";
+    protected JadeFilesFilter filter = null;
 
     public JadeFilesDBLayer(File configurationFile_) {
         super();
@@ -61,11 +57,10 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Ser
         if (id == null) {
             return null;
         }
-        
+
         try {
             return (JadeFilesDBItem) this.getSession().get(JadeFilesDBItem.class, id);
-        }
-        catch (ObjectNotFoundException e) {
+        } catch (ObjectNotFoundException e) {
             return null;
         }
     }
@@ -76,9 +71,9 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Ser
         this.filter.setDateFormat("yyyy-MM-dd HH:mm:ss");
         this.filter.setOrderCriteria("startTime");
         this.filter.setSortMode("desc");
-        
+
     }
-    
+
     protected String getWhere() {
 
         String where = "";
@@ -151,15 +146,13 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Ser
 
         if (where.trim().equals("")) {
 
-        }
-        else {
+        } else {
             where = "where " + where;
         }
         return where;
 
     }
 
-    
     protected String getWhereFromTo() {
 
         String where = "";
@@ -177,14 +170,13 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Ser
 
         if (where.trim().equals("")) {
 
-        }
-        else {
+        } else {
             where = "where " + where;
         }
         return where;
 
     }
-    
+
     private void setWhere(Query query) {
 
         if (filter.getCreatedFrom() != null && !filter.getCreatedFrom().equals("")) {
@@ -262,23 +254,21 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Ser
         return row;
     }
 
- 
-
-    public List<DbItem> getFilesFromTo(Date from, Date to)  {
+    public List<DbItem> getFilesFromTo(Date from, Date to) {
 
         Session session = getSession();
 
-        filter.setCreatedFrom(from); 
+        filter.setCreatedFrom(from);
         filter.setCreatedTo(to);
 
         Transaction transaction = session.beginTransaction();
         Query query = session.createQuery("  from JadeFilesDBItem " + getWhere());
 
         if (filter.getCreatedFrom() != null) {
-           query.setTimestamp("createdFrom", filter.getCreatedFrom());
+            query.setTimestamp("createdFrom", filter.getCreatedFrom());
         }
         if (filter.getCreatedTo() != null) {
-           query.setTimestamp("createdTo", filter.getCreatedTo());
+            query.setTimestamp("createdTo", filter.getCreatedTo());
         }
 
         List<DbItem> resultset = query.list();
@@ -286,8 +276,6 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Ser
         return resultset;
 
     }
-
- 
 
     public List<JadeFilesHistoryDBItem> getFilesHistoryById(Long sosftpId) throws ParseException {
         Session session = getSession();
@@ -299,11 +287,11 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Ser
 
         transaction.commit();
         return resultset;
-    	
+
     }
-    
+
     public List<JadeFilesDBItem> getFiles() throws ParseException {
-      
+
         Session session = getSession();
 
         Transaction transaction = session.beginTransaction();
@@ -315,8 +303,7 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Ser
         return resultset;
 
     }
-    
-    
+
     public void setCreatedFrom(Date createdFrom) {
         filter.setCreatedFrom(createdFrom);
     }
@@ -344,20 +331,18 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Ser
         return filter;
     }
 
-  
-
     public void setFilter(JadeFilesFilter filter) {
         this.filter = filter;
     }
 
     @Override
-    public void onAfterDeleting(DbItem h) {        
+    public void onAfterDeleting(DbItem h) {
     }
 
     @Override
-    public List<DbItem> getListOfItemsToDelete()  {
-         return getFilesFromTo(filter.getCreatedFrom(),filter.getCreatedTo());
-             
+    public List<DbItem> getListOfItemsToDelete() {
+        return getFilesFromTo(filter.getCreatedFrom(), filter.getCreatedTo());
+
     }
 
     @Override
@@ -367,16 +352,15 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Ser
         }
 
         String q = "delete from JadeFilesHistoryDBItem e where e.jadeFilesDBItem.id IN (select id from JadeFilesDBItem " + getWhereFromTo() + ")";
-        
-     
+
         Query query = session.createQuery(q);
         if (filter.getCreatedFrom() != null) {
             query.setTimestamp("createdFrom", filter.getCreatedFrom());
-         }
-         if (filter.getCreatedTo() != null) {
+        }
+        if (filter.getCreatedTo() != null) {
             query.setTimestamp("createdTo", filter.getCreatedTo());
-         }
-        
+        }
+
         int row = query.executeUpdate();
 
         String hql = "delete from JadeFilesDBItem " + getWhereFromTo();
@@ -384,16 +368,13 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Ser
 
         if (filter.getCreatedFrom() != null) {
             query.setTimestamp("createdFrom", filter.getCreatedFrom());
-         }
-         if (filter.getCreatedTo() != null) {
+        }
+        if (filter.getCreatedTo() != null) {
             query.setTimestamp("createdTo", filter.getCreatedTo());
-         }
-          
+        }
+
         row = query.executeUpdate();
-        return row;       
+        return row;
     }
-
-    
-
 
 }

@@ -200,12 +200,12 @@ public class JSObjBase implements Comparable<JSObjBase> {
     public boolean equals(Object obj) {
         return super.equals(obj);
     }
-    
+
     @Override
     public int hashCode() {
         return super.hashCode();
     }
-    
+
     /** \brief setObjectFieldsFrom
      *
      * \details set all fields of a subclass according to its superclass

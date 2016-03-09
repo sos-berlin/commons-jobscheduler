@@ -9,6 +9,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class SOSFileEntryTest {
+
     private static final String MYJOBCHAIN_CONFIG_XML = "myjobchain.config.xml";
     private static final String MYJOBCHAIN_JOB_CHAIN_XML = "myjobchain.job_chain.xml";
     private static final String INIT_PARENT_PATH = "/home/test";
@@ -18,7 +19,7 @@ public class SOSFileEntryTest {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        
+
     }
 
     @AfterClass
@@ -40,12 +41,10 @@ public class SOSFileEntryTest {
 
     @Test
     public void testGetFilename() {
-        
-     
+
         sosFileEntry.setFilename(INIT_FILENAME);
         assertEquals("testGetFilename unexpected value", INIT_FILENAME, sosFileEntry.getFilename());
     }
-
 
     @Test
     public void testSetFilename() {
@@ -62,7 +61,7 @@ public class SOSFileEntryTest {
     @Test
     public void testSetFilesize() {
         sosFileEntry.setFilesize(INIT_FILESIZE + 3);
-        assertEquals("testSetFilesize unexpected value", INIT_FILESIZE+3, sosFileEntry.getFilesize());
+        assertEquals("testSetFilesize unexpected value", INIT_FILESIZE + 3, sosFileEntry.getFilesize());
     }
 
     @Test
@@ -91,14 +90,14 @@ public class SOSFileEntryTest {
 
     @Test
     public void testGetFullPath() {
-        sosFileEntry.setParentPath(INIT_PARENT_PATH);        
+        sosFileEntry.setParentPath(INIT_PARENT_PATH);
         sosFileEntry.setFilename(INIT_FILENAME);
         assertEquals("testGetFullPath unexpected value", INIT_PARENT_PATH + "/" + INIT_FILENAME, sosFileEntry.getFullPath());
     }
 
     @Test
     public void testIsDirUp() {
-        sosFileEntry.setFilename("..");        
+        sosFileEntry.setFilename("..");
         assertEquals("testIsDirUp unexpected value", true, sosFileEntry.isDirUp());
     }
 
@@ -114,7 +113,7 @@ public class SOSFileEntryTest {
         assertEquals("testGetCategory unexpected value", "Folder", sosFileEntry.getCategory());
         sosFileEntry.setDirectory(false);
         assertEquals("testGetCategory unexpected value", "File", sosFileEntry.getCategory());
-   }
+    }
 
     @Test
     public void testIsFileOrFolder() {

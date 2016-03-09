@@ -14,7 +14,7 @@ import java.util.TimeZone;
 public class UtcTimeHelper {
 
     private static final Logger LOGGER = Logger.getLogger(UtcTimeHelper.class);
-    
+
     public static String localTimeZoneString() {
         return TimeZone.getDefault().getID();
     }

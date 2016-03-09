@@ -9,7 +9,6 @@ import org.hibernate.annotations.NotFoundAction;
 import javax.persistence.*;
 import java.util.List;
 
-
 @Entity
 @Table(name = "LOGGING_EVENT")
 public class LoggingEventDBItem extends DbItem {
@@ -189,26 +188,26 @@ public class LoggingEventDBItem extends DbItem {
     }
 
     @OneToMany
-    @NotFound( action = NotFoundAction.IGNORE )
+    @NotFound(action = NotFoundAction.IGNORE)
     @Cascade(CascadeType.ALL)
-    @JoinColumn (name="`EVENT_ID`", insertable = false, updatable = false)
+    @JoinColumn(name = "`EVENT_ID`", insertable = false, updatable = false)
     public List<LoggingEventPropertyDBItem> getLoggingEventProperties() {
         return loggingEventProperties;
     }
 
-    public void setLoggingEventProperties(List<LoggingEventPropertyDBItem> loggingEventProperties)  {
+    public void setLoggingEventProperties(List<LoggingEventPropertyDBItem> loggingEventProperties) {
         this.loggingEventProperties = loggingEventProperties;
     }
 
     @OneToMany
-    @NotFound( action = NotFoundAction.IGNORE )
+    @NotFound(action = NotFoundAction.IGNORE)
     @Cascade(CascadeType.ALL)
-    @JoinColumn (name="`EVENT_ID`", insertable = false, updatable = false)
+    @JoinColumn(name = "`EVENT_ID`", insertable = false, updatable = false)
     public List<LoggingEventExceptionDBItem> getLoggingEventExceptions() {
         return loggingEventExceptions;
     }
 
-    public void setLoggingEventExceptions(List<LoggingEventExceptionDBItem> loggingEventExceptions)  {
+    public void setLoggingEventExceptions(List<LoggingEventExceptionDBItem> loggingEventExceptions) {
         this.loggingEventExceptions = loggingEventExceptions;
     }
 

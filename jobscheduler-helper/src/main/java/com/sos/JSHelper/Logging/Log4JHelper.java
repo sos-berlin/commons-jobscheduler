@@ -175,8 +175,8 @@ public class Log4JHelper implements JSListener {
         Appender objApp = null;
         objApp = objRootLog.getAppender(pstrAppender);
         if (objApp == null) {
-            throw new MissingAppenderException("Kein Mailversand, da keine Mailkonfiguration in den log4j-properties definiert ist (Appender '"
-                    + pstrAppender + "' ist nicht in '" + getPropertyFile() + "' vorhanden.");
+            throw new MissingAppenderException("Kein Mailversand, da keine Mailkonfiguration in den log4j-properties definiert ist (Appender '" + pstrAppender
+                    + "' ist nicht in '" + getPropertyFile() + "' vorhanden.");
         }
         return objApp;
     }
@@ -197,5 +197,5 @@ public class Log4JHelper implements JSListener {
     public void setSubjectPraefix(final boolean pflgPrintComputerName) {
         flgPrintComputerName = pflgPrintComputerName;
     }
-    
+
 }

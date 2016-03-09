@@ -9,30 +9,26 @@ import com.sos.scheduler.model.objects.Params;
 import com.sos.scheduler.model.objects.RunTime;
 import com.sos.scheduler.model.objects.XmlPayload;
 
- 
 public class JSCmdModifyOrder extends ModifyOrder {
 
     @SuppressWarnings("unused")
-    private final String        conClassName = "JSCmdModifyOrder";
+    private final String conClassName = "JSCmdModifyOrder";
     @SuppressWarnings("unused")
-    private static final Logger logger       = Logger.getLogger(JSCmdModifyOrder.class);
+    private static final Logger logger = Logger.getLogger(JSCmdModifyOrder.class);
 
     public JSCmdModifyOrder(SchedulerObjectFactory schedulerObjectFactory) {
         super();
         objFactory = schedulerObjectFactory;
     }
 
-    /**
-    * 
-    * \brief setParams
-    * 
-    * \details
-    *
-    * \return Params
-    *
-    * @param pstrParamArray
-    * @return
-    */
+    /** \brief setParams
+     * 
+     * \details
+     *
+     * \return Params
+     *
+     * @param pstrParamArray
+     * @return */
     public Params setParams(String[] pstrParamArray) {
 
         @SuppressWarnings("unused")
@@ -44,44 +40,28 @@ public class JSCmdModifyOrder extends ModifyOrder {
         return objParams;
     } // private Params setParams
 
-  
-
-    /**
-     * Sets the value of the xmlPayload property.
-     * 
-     */
+    /** Sets the value of the xmlPayload property. */
     public void setXmlPayloadIfNotEmpty(XmlPayload value) {
         if (value != null) {
             super.setXmlPayload(value);
         }
     }
 
-   
-
-    /**
-     * Sets the value of the jobChain property.
-     * 
-     */
+    /** Sets the value of the jobChain property. */
     public void setJobChainIfNotEmpty(String value) {
         if (!isEmpty(value)) {
             super.setJobChain(value);
         }
     }
 
-    /**
-     * Sets the value of the order property.
-     * 
-     */
+    /** Sets the value of the order property. */
     public void setOrderIfNotEmpty(String value) {
         if (!isEmpty(value)) {
             super.setOrder(value);
         }
     }
 
-    /**
-     * Sets the value of the priority property.
-     * 
-     */
+    /** Sets the value of the priority property. */
     public void setPriorityIfNotEmpty(String value) {
         if (!isEmpty(value)) {
             BigInteger p = new BigInteger(value);
@@ -89,70 +69,49 @@ public class JSCmdModifyOrder extends ModifyOrder {
         }
     }
 
-    /**
-     * Sets the value of the title property.
-     * 
-     */
+    /** Sets the value of the title property. */
     public void setTitleIfNotEmpty(String value) {
         if (!isEmpty(value)) {
             super.setTitle(value);
         }
     }
 
-    /**
-     * Sets the value of the state property.
-     * 
-     */
+    /** Sets the value of the state property. */
     public void setStateIfNotEmpty(String value) {
         if (!isEmpty(value)) {
             super.setState(value);
         }
     }
 
-    /**
-     * Sets the value of the setback property.
-     * 
-     */
+    /** Sets the value of the setback property. */
     public void setSetbackIfNotEmpty(String value) {
         if (!isEmpty(value)) {
             super.setSetback(value);
         }
     }
 
-    /**
-     * Sets the value of the suspended property.
-     * 
-     */
+    /** Sets the value of the suspended property. */
     public void setSuspendedIfNotEmpty(String value) {
         if (!isEmpty(value)) {
             super.setSuspended(value);
         }
     }
 
-    /**
-     * Sets the value of the at property.
-     * 
-     */
+    /** Sets the value of the at property. */
     public void setAtIfNotEmpty(String value) {
         if (!isEmpty(value)) {
             super.setAt(value);
         }
     }
 
-    /**
-     * Sets the value of the endState property.
-     * 
-     */
+    /** Sets the value of the endState property. */
     public void setEndStateIfNotEmpty(String value) {
         if (!isEmpty(value)) {
             super.setEndState(value);
         }
     }
 
-    /**
-     * Sets the value of the action property.
-     * 
-     */
+    /** Sets the value of the action property. */
     public void setActionIfNotEmpty(String value) {
         if (!isEmpty(value)) {
             super.setAction(value);

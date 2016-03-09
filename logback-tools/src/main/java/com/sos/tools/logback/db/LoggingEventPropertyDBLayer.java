@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
-	
+
     private static final String EVENT_ID = "eventId";
     private static final String MAPPED_KEY = "mappedKey";
     private static final String MAPPED_VALUE = "mappedValue";
@@ -77,7 +77,7 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
     public List<LoggingEventDBItem> getProtocol(String mappedKey, String mappedValue, String loggerName) {
         List<LoggingEventDBItem> result = new ArrayList<LoggingEventDBItem>();
         List<LoggingEventPropertyDBItem> records = getListOfPropertyDBItems(mappedKey, mappedValue, loggerName);
-        for(LoggingEventPropertyDBItem item : records) {
+        for (LoggingEventPropertyDBItem item : records) {
             result.add(item.getLoggingEventDBItem());
         }
         return result;
@@ -86,10 +86,10 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
     public String asText(List<LoggingEventDBItem> records) {
         DateTimeFormatter fmt = DateTimeFormat.forPattern("HH:mm:ss,SSS");
         StringBuffer result = new StringBuffer();
-        for(LoggingEventDBItem record : records) {
+        for (LoggingEventDBItem record : records) {
             StringBuffer line = new StringBuffer();
             Long t = record.getTimeStmp();
-            line.append( fmt.print(t) );
+            line.append(fmt.print(t));
             line.append(" - ");
             line.append(record.getFormattedMessage());
             line.append("\n");
@@ -105,22 +105,23 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
         filter.setMappedKey(mappedKey);
         filter.setMappedValue(mappedValue);
         filter.setLoggerName(loggerName);
-        Query query = setQueryParams("from LoggingEventPropertyDBItem events " + getWhere() + this.filter.getOrderCriteria() + this.filter.getSortMode());
+        Query query = setQueryParams("from LoggingEventPropertyDBItem events " + getWhere() + this.filter.getOrderCriteria()
+                + this.filter.getSortMode());
         return query.list();
     }
 
-    /**
-     * Because LOGGING_EVENT_PROPERTY works with composite eventId + mappedKey and it is not clear how hibernate handle composites directly
-     * we read all records first and select the relevant afterwards.
+    /** Because LOGGING_EVENT_PROPERTY works with composite eventId + mappedKey
+     * and it is not clear how hibernate handle composites directly we read all
+     * records first and select the relevant afterwards.
      *
      * @param eventId
-     * @return List<LoggingEventPropertyDBItem>
-     */
+     * @return List<LoggingEventPropertyDBItem> */
     public List<LoggingEventPropertyDBItem> getListOfPropertyDBItems(Long eventId) {
         filter = new LoggingEventPropertyFilter();
         filter.setOrderCriteria(EVENT_ID);
         filter.setEventId(eventId);
-        Query query = setQueryParams("from LoggingEventPropertyDBItem events " + getWhere() + this.filter.getOrderCriteria() + this.filter.getSortMode());
+        Query query = setQueryParams("from LoggingEventPropertyDBItem events " + getWhere() + this.filter.getOrderCriteria()
+                + this.filter.getSortMode());
         return query.list();
     }
 
@@ -157,7 +158,7 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
     public void delete(String mappedKey, String mappedValue, String loggerName) {
         List<LoggingEventPropertyDBItem> records = getListOfPropertyDBItems(mappedKey, mappedValue, loggerName);
         beginTransaction();
-        for(LoggingEventPropertyDBItem item : records) {
+        for (LoggingEventPropertyDBItem item : records) {
             delete(item);
         }
         commit();

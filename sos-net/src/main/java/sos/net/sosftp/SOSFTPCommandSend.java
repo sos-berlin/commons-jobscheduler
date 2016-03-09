@@ -1576,5 +1576,5 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
         }
         return simpleTransfer;
     }
-    
+
 }

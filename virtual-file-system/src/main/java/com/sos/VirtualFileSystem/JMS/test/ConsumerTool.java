@@ -163,7 +163,7 @@ public class ConsumerTool extends Thread implements MessageListener, ExceptionLi
                     }
                     LOGGER.info("[" + this.getName() + "] Received: '" + msg + "' (length " + length + ")");
                 }
-            } else  if (verbose) {
+            } else if (verbose) {
                 LOGGER.info("[" + this.getName() + "] Received: '" + message + "'");
             }
             if (message.getJMSReplyTo() != null) {
