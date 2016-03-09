@@ -79,8 +79,8 @@ public class SOSOptionJSTransferMethod extends SOSOptionStringValueList {
      * @param pstrDescription
      * @param pstrDefaultValue
      * @param pflgIsMandatory */
-    public SOSOptionJSTransferMethod(final JSOptionsClass pobjParent, final String pstrIndexedKey, final String pstrDescription, final String pstrDefaultValue,
-            final boolean pflgIsMandatory) {
+    public SOSOptionJSTransferMethod(final JSOptionsClass pobjParent, final String pstrIndexedKey, final String pstrDescription,
+            final String pstrDefaultValue, final boolean pflgIsMandatory) {
         super(pobjParent, pstrIndexedKey, pstrDescription, pstrDefaultValue, pflgIsMandatory);
     }
 

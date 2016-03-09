@@ -172,8 +172,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * &lt;/complexType>
  * </pre> */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = { "settings", "description", "lockUse", "params", "environment", "script", "process", "monitor", "startWhenDirectoryChanged",
-        "delayAfterError", "delayOrderAfterSetback", "runTime", "commands" })
+@XmlType(name = "", propOrder = { "settings", "description", "lockUse", "params", "environment", "script", "process", "monitor",
+        "startWhenDirectoryChanged", "delayAfterError", "delayOrderAfterSetback", "runTime", "commands" })
 @XmlRootElement(name = "job")
 public class Job extends JSObjBase {
 

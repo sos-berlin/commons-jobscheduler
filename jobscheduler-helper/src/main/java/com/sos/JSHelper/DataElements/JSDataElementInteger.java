@@ -11,20 +11,20 @@ public class JSDataElementInteger extends JSDataElementNumeric {
 
     public JSDataElementInteger() {
         super.TrimValue(true);		// hier immer die blanks abschneiden, falls nicht
-                               // anders eingestellt.
+        // anders eingestellt.
     }
 
     public JSDataElementInteger(final String pstrValue) {
         super.Value(pstrValue);
         super.TrimValue(true);		// hier immer die blanks abschneiden, falls nicht
-                               // anders eingestellt.
+        // anders eingestellt.
         getInt();
     }
 
     public JSDataElementInteger(final int pintValue) {
         intValue = pintValue;
         super.TrimValue(true);		// hier immer die blanks abschneiden, falls nicht
-                               // anders eingestellt.
+        // anders eingestellt.
         this.Value(pintValue);
     }
 
@@ -105,7 +105,7 @@ public class JSDataElementInteger extends JSDataElementNumeric {
             String strFormatted = String.format("%1$" + strFormat, getInt());
             strFormatted = strFormatted.trim();
             if (super.MaxSize() != 0) {		// EQCPN-2009-04-22: führt bei 0 sonst
-                                        // zur leerer Ausgabe
+                // zur leerer Ausgabe
                 if (strFormatted.length() > super.MaxSize()) {
                     strFormatted = "";
                     for (int i = 0; i < super.MaxSize(); i++) {

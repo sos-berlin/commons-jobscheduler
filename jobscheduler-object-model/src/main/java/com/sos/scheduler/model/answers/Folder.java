@@ -63,7 +63,8 @@ public class Folder implements Serializable {
     private static final long serialVersionUID = -4575832926653584991L;
     @XmlElements({ @XmlElement(name = "file_based", type = FileBased.class), @XmlElement(name = "job_chains", type = JobChains.class),
             @XmlElement(name = "folders", type = Folders.class), @XmlElement(name = "process_classes", type = ProcessClasses.class),
-            @XmlElement(name = "orders", type = Orders.class), @XmlElement(name = "locks", type = Locks.class), @XmlElement(name = "jobs", type = Jobs.class) })
+            @XmlElement(name = "orders", type = Orders.class), @XmlElement(name = "locks", type = Locks.class),
+            @XmlElement(name = "jobs", type = Jobs.class) })
     @Generated(value = "com.sun.tools.xjc.Driver", date = "2011-01-20T04:00:28+01:00", comments = "JAXB RI v2.2.3-hudson-jaxb-ri-2.2.3-3-")
     protected List<Object> fileBasedOrJobsOrFolders;
     @XmlAttribute(name = "name")

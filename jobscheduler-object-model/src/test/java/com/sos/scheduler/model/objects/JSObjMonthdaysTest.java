@@ -155,8 +155,8 @@ public class JSObjMonthdaysTest {
 
     @Test
     public final void testMonthdays() {
-        xml = "<run_time>" + "<monthdays>" + "<weekday day=\"tuesday\" which=\"-2\">" + "<period single_start=\"15:00\" />" + "</weekday>" + "<day day=\"0\">"
-                + "<period single_start=\"23:59:59\" />" + "</day>" + "</monthdays>" + "</run_time>";
+        xml = "<run_time>" + "<monthdays>" + "<weekday day=\"tuesday\" which=\"-2\">" + "<period single_start=\"15:00\" />" + "</weekday>"
+                + "<day day=\"0\">" + "<period single_start=\"23:59:59\" />" + "</day>" + "</monthdays>" + "</run_time>";
         JSObjRunTime runtime = new JSObjRunTime(factory, xml);
 
         List<DateTime> dates = runtime.getJsObjMonthdays().getRunTimeElements(baseInterval).getStartTimes();

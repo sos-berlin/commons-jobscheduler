@@ -28,8 +28,8 @@ public class SOSOptionOperatingSystem extends SOSOptionStringValueList {
      * @param pstrDescription
      * @param pstrDefaultValue
      * @param pflgIsMandatory */
-    public SOSOptionOperatingSystem(final JSOptionsClass pobjParent, final String pstrIndexedKey, final String pstrDescription, final String pstrDefaultValue,
-            final boolean pflgIsMandatory) {
+    public SOSOptionOperatingSystem(final JSOptionsClass pobjParent, final String pstrIndexedKey, final String pstrDescription,
+            final String pstrDefaultValue, final boolean pflgIsMandatory) {
         super(pobjParent, pstrIndexedKey, pstrDescription, pstrDefaultValue, pflgIsMandatory);
         // TODO Auto-generated constructor stub
     }

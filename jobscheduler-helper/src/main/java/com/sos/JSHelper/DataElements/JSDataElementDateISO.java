@@ -44,8 +44,8 @@ public class JSDataElementDateISO extends JSDataElement {
         super(pstrValue, pstrDescription);
     }
 
-    public JSDataElementDateISO(String pstrValue, String pstrDescription, int pintSize, int pintPos, String pstrFormatString, String pstrColumnHeader,
-            String pstrXMLTagName) {
+    public JSDataElementDateISO(String pstrValue, String pstrDescription, int pintSize, int pintPos, String pstrFormatString,
+            String pstrColumnHeader, String pstrXMLTagName) {
         super(pstrValue, pstrDescription, pintSize, pintPos, pstrFormatString, pstrColumnHeader, pstrXMLTagName);
     }
 

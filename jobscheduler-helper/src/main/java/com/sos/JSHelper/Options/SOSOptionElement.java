@@ -57,11 +57,11 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
     protected boolean flgHideValue = false;
     protected boolean flgHideOption = false;
     protected boolean isCData = false;
-	public static boolean						flgShowPasswords					= false;
+    public static boolean flgShowPasswords = false;
     private final boolean flgSelecteDirtyOnly = true;
     private static final HashMap<String, String> defaultProposals = new HashMap<>();
-    private boolean	gflgProtected	= false;
-    
+    private boolean gflgProtected = false;
+
     public void addValueChangedListener(final IValueChangedListener pobjValueChangedListener) {
         if (lstValueChangedListeners == null) {
             lstValueChangedListeners = new ArrayList<IValueChangedListener>();
@@ -239,11 +239,11 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
         //
     }
 
-	public boolean isNotEmpty() {
+    public boolean isNotEmpty() {
 
-		return isNotEmpty(strValue);
+        return isNotEmpty(strValue);
 
-	}
+    }
 
     public boolean equalsIgnoreCase(final String strCompare) {
         if (strValue == null) {
@@ -339,9 +339,9 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
                     if (iTo != -1) {
                         String strEnvVarName = pstrValue.substring(iFrom + 2, iTo);
                         String strEnvVarValue = EnvironmentVariable(strEnvVarName);
-						if (strEnvVarValue == null) {
-							strEnvVarValue = "";
-						}
+                        if (strEnvVarValue == null) {
+                            strEnvVarValue = "";
+                        }
                         strRet = "";
                         if (iFrom > 0) {
                             strRet = pstrValue.substring(0, iFrom);

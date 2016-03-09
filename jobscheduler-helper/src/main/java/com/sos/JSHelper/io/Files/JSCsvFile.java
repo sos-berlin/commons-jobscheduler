@@ -238,7 +238,8 @@ public class JSCsvFile extends JSTextFile {
 
         if (intColumnCount != intFieldCount) {
             if (flgCheckColumnCount == true) {
-                message("WARN: problem in record " + intRecordCount + " - " + intFieldCount + " columns expected, but the record contains " + intColumnCount);
+                message("WARN: problem in record " + intRecordCount + " - " + intFieldCount + " columns expected, but the record contains "
+                        + intColumnCount);
             }
         }
 

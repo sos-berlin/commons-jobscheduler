@@ -45,8 +45,8 @@ public class SOSOptionCommandScriptFile extends SOSOptionInFileName {
      * @param pPstrValue
      * @param pPstrDefaultValue
      * @param pPflgIsMandatory */
-    public SOSOptionCommandScriptFile(final JSOptionsClass pPobjParent, final String pPstrKey, final String pPstrDescription, final String pPstrValue,
-            final String pPstrDefaultValue, final boolean pPflgIsMandatory) {
+    public SOSOptionCommandScriptFile(final JSOptionsClass pPobjParent, final String pPstrKey, final String pPstrDescription,
+            final String pPstrValue, final String pPstrDefaultValue, final boolean pPflgIsMandatory) {
         super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
         // TODO Auto-generated constructor stub
     }

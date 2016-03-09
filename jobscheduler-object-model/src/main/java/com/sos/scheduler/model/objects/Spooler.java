@@ -177,10 +177,10 @@ import com.sos.scheduler.model.commands.Terminate;
  * &lt;/complexType>
  * </pre> */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = { "config", "commands", "command", "answer", "addJobs", "addOrder", "checkFolders", "killTask", "modifyJob", "modifyOrder",
-        "modifySpooler", "registerRemoteScheduler", "removeJobChain", "removeOrder", "runTime", "showCalendar", "showHistory", "showJob", "showJobs",
-        "showJobChains", "showJobChain", "showOrder", "s", "showSchedulers", "showState", "showTask", "serviceRequest", "startJob", "subsystemShow",
-        "terminate", "eventsGet" })
+@XmlType(name = "", propOrder = { "config", "commands", "command", "answer", "addJobs", "addOrder", "checkFolders", "killTask", "modifyJob",
+        "modifyOrder", "modifySpooler", "registerRemoteScheduler", "removeJobChain", "removeOrder", "runTime", "showCalendar", "showHistory",
+        "showJob", "showJobs", "showJobChains", "showJobChain", "showOrder", "s", "showSchedulers", "showState", "showTask", "serviceRequest",
+        "startJob", "subsystemShow", "terminate", "eventsGet" })
 @XmlRootElement(name = "spooler")
 public class Spooler extends JSObjBase {
 

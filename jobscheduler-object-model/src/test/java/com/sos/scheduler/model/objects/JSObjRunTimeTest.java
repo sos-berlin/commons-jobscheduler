@@ -153,13 +153,14 @@ public class JSObjRunTimeTest extends TestBase {
         assertEquals(true, runtime.getRunTimePeriod().isInPeriod(dIn));
         assertEquals(false, runtime.getRunTimePeriod().isInPeriod(dOut));
         assertEquals(false, runtime.hasSubsequentRunTimes());		// period without
-                                                              // runtime
-                                                              // specification
+        // runtime
+        // specification
     }
 
     @Test
     public final void testWeekkdays() {
-        xml = "<run_time>" + "<weekdays>" + "<day day=\"1 2 3 4 5 6\">" + "<period end=\"24:00\" begin=\"00:00\"/>" + "</day>" + "</weekdays>" + "</run_time>";
+        xml = "<run_time>" + "<weekdays>" + "<day day=\"1 2 3 4 5 6\">" + "<period end=\"24:00\" begin=\"00:00\"/>" + "</day>" + "</weekdays>"
+                + "</run_time>";
         JSObjRunTime runtime = new JSObjRunTime(factoryWithDefaultPeriod, xml);
         List<DateTime> result = runtime.getDtSingleStarts(currentWeek);
         int weekday = DateTimeConstants.MONDAY;
@@ -226,9 +227,9 @@ public class JSObjRunTimeTest extends TestBase {
 
     @Test
     public final void testAll() {
-        xml = "<run_time>" + "<weekdays>" + "<day day=\"2\"/>" + "</weekdays>" + "<ultimos>" + "<day day=\"10\"/>" + "<day day=\"0\"/>" + "</ultimos>"
-                + "<monthdays>" + "<day day=\"22\"/>" + "<weekday day=\"friday\" which=\"4\"/>" + "</monthdays>" + "<date date=\"2012-03-28\"/>"
-                + "</run_time>";
+        xml = "<run_time>" + "<weekdays>" + "<day day=\"2\"/>" + "</weekdays>" + "<ultimos>" + "<day day=\"10\"/>" + "<day day=\"0\"/>"
+                + "</ultimos>" + "<monthdays>" + "<day day=\"22\"/>" + "<weekday day=\"friday\" which=\"4\"/>" + "</monthdays>"
+                + "<date date=\"2012-03-28\"/>" + "</run_time>";
 
         testRunTime4All(factoryWithDefaultPeriod, xml, "23:59");
     }
@@ -236,10 +237,10 @@ public class JSObjRunTimeTest extends TestBase {
     @Test
     public final void testAllWithDefaultPeriod() {
         final String defaultPeriod = "<period end=\"24:00\" begin=\"00:00\"/>";
-        xml = "<run_time>" + "<weekdays>" + "<day day=\"2\">" + defaultPeriod + "</day>" + "</weekdays>" + "<ultimos>" + "<day day=\"10\">" + defaultPeriod
-                + "</day>" + "<day day=\"0\">" + defaultPeriod + "</day>" + "</ultimos>" + "<monthdays>" + "<day day=\"22\">" + defaultPeriod + "</day>"
-                + "<weekday day=\"friday\" which=\"4\">" + defaultPeriod + "</weekday>" + "</monthdays>" + "<date date=\"2012-03-28\">" + defaultPeriod
-                + "</date>" + "</run_time>";
+        xml = "<run_time>" + "<weekdays>" + "<day day=\"2\">" + defaultPeriod + "</day>" + "</weekdays>" + "<ultimos>" + "<day day=\"10\">"
+                + defaultPeriod + "</day>" + "<day day=\"0\">" + defaultPeriod + "</day>" + "</ultimos>" + "<monthdays>" + "<day day=\"22\">"
+                + defaultPeriod + "</day>" + "<weekday day=\"friday\" which=\"4\">" + defaultPeriod + "</weekday>" + "</monthdays>"
+                + "<date date=\"2012-03-28\">" + defaultPeriod + "</date>" + "</run_time>";
 
         testRunTime4All(factoryWithDefaultPeriod, xml, "23:59");
     }
@@ -247,10 +248,10 @@ public class JSObjRunTimeTest extends TestBase {
     @Test
     public final void testAllWithSingleStart() {
         final String defaultPeriod = "<period single_start=\"10:02\"/>";
-        xml = "<run_time>" + "<weekdays>" + "<day day=\"2\">" + defaultPeriod + "</day>" + "</weekdays>" + "<ultimos>" + "<day day=\"10\">" + defaultPeriod
-                + "</day>" + "<day day=\"0\">" + defaultPeriod + "</day>" + "</ultimos>" + "<monthdays>" + "<day day=\"22\">" + defaultPeriod + "</day>"
-                + "<weekday day=\"friday\" which=\"4\">" + defaultPeriod + "</weekday>" + "</monthdays>" + "<date date=\"2012-03-28\">" + defaultPeriod
-                + "</date>" + "</run_time>";
+        xml = "<run_time>" + "<weekdays>" + "<day day=\"2\">" + defaultPeriod + "</day>" + "</weekdays>" + "<ultimos>" + "<day day=\"10\">"
+                + defaultPeriod + "</day>" + "<day day=\"0\">" + defaultPeriod + "</day>" + "</ultimos>" + "<monthdays>" + "<day day=\"22\">"
+                + defaultPeriod + "</day>" + "<weekday day=\"friday\" which=\"4\">" + defaultPeriod + "</weekday>" + "</monthdays>"
+                + "<date date=\"2012-03-28\">" + defaultPeriod + "</date>" + "</run_time>";
 
         testRunTime4All(factory, xml, "10:02");
     }
@@ -267,36 +268,36 @@ public class JSObjRunTimeTest extends TestBase {
         String timeString = " " + expectedTime;
         assertEquals(9, result.size());
         assertEquals("2012-03-06" + timeString, fmtDateTime.print(result.get(0)));			// 1st
-                                                                                   // Tuesday
-                                                                                   // in
-                                                                                   // March
-                                                                                   // 2012
+        // Tuesday
+        // in
+        // March
+        // 2012
         assertEquals("2012-03-13" + timeString, fmtDateTime.print(result.get(1)));			// 2nd
-                                                                                   // Tuesday
-                                                                                   // in
-                                                                                   // March
-                                                                                   // 2012
+        // Tuesday
+        // in
+        // March
+        // 2012
         assertEquals("2012-03-20" + timeString, fmtDateTime.print(result.get(2)));			// 3rd
-                                                                                   // Tuesday
-                                                                                   // in
-                                                                                   // March
-                                                                                   // 2012
+        // Tuesday
+        // in
+        // March
+        // 2012
         assertEquals("2012-03-21" + timeString, fmtDateTime.print(result.get(3)));			// ultimos
-                                                                                   // day='10'
+        // day='10'
         assertEquals("2012-03-22" + timeString, fmtDateTime.print(result.get(4)));			// monthdays
-                                                                                   // day='22'
+        // day='22'
         assertEquals("2012-03-23" + timeString, fmtDateTime.print(result.get(5)));			// weekday
-                                                                                   // day='friday'
-                                                                                   // which='4'
+        // day='friday'
+        // which='4'
         assertEquals("2012-03-27" + timeString, fmtDateTime.print(result.get(6)));			// 4th
-                                                                                   // Tuesday
-                                                                                   // in
-                                                                                   // March
-                                                                                   // 2012
+        // Tuesday
+        // in
+        // March
+        // 2012
         assertEquals("2012-03-28" + timeString, fmtDateTime.print(result.get(7)));			// specific
-                                                                                   // date
+        // date
         assertEquals("2012-03-31" + timeString, fmtDateTime.print(result.get(8)));			// ultimos
-                                                                                   // day='0'
+        // day='0'
     }
 
     @Test
@@ -333,9 +334,9 @@ public class JSObjRunTimeTest extends TestBase {
         DateTime from = new DateTime(2012, 3, 1, 0, 0, 0, 0);
         Interval march2012 = new Interval(from, from.plusMonths(1));
 
-        xml = "<run_time>" + "<weekdays>" + "<day day=\"6\">" + period + "</day>" + "<day day=\"7\">" + period + "</day>" + "</weekdays>" + "<holidays>"
-                + "<holiday date=\"2012-03-01\"/>" + "<holiday date=\"2012-03-02\"/>" + "<holiday date=\"2012-03-30\"/>" + "<weekdays>" + "<day day=\"6\"/>"
-                + "<day day=\"7\"/>" + "</weekdays>" + "</holidays>" + "</run_time>";
+        xml = "<run_time>" + "<weekdays>" + "<day day=\"6\">" + period + "</day>" + "<day day=\"7\">" + period + "</day>" + "</weekdays>"
+                + "<holidays>" + "<holiday date=\"2012-03-01\"/>" + "<holiday date=\"2012-03-02\"/>" + "<holiday date=\"2012-03-30\"/>"
+                + "<weekdays>" + "<day day=\"6\"/>" + "<day day=\"7\"/>" + "</weekdays>" + "</holidays>" + "</run_time>";
         JSObjRunTime runtime = new JSObjRunTime(factoryWithDefaultPeriod, xml);
         return runtime.getDtSingleStarts(march2012);
     }

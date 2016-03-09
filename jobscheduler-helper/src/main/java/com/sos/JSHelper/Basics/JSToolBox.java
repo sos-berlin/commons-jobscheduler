@@ -224,27 +224,27 @@ public class JSToolBox extends JSListenerClass {
         String strValue = null;
         if (isNotEmpty(pstrVariableName)) {
             strValue = System.getenv(pstrVariableName);
-			if (isEmpty(strValue)) {
-				strValue = System.getProperty(pstrVariableName);
-			}
+            if (isEmpty(strValue)) {
+                strValue = System.getProperty(pstrVariableName);
+            }
             if (isNotEmpty(strValue)) {
-				strValue = StripQuotes(strValue);
+                strValue = StripQuotes(strValue);
                 SignalDebug(String.format("%s: %s = %s", conMethodName, pstrVariableName, strValue));
             }
         }
         return strValue;
     }
 
-	public String StripQuotes(final String pstrS) {
-		String strR = pstrS;
-		//		if (pstrS.substring(0, 1).equals("\"") && pstrS.substring(pstrS.length() - 1).equals("\"")) {
-		if (pstrS.startsWith("\"") && pstrS.endsWith("\"")) {
-			strR = pstrS.substring(1, pstrS.length() - 1);
-			strR = strR.replaceAll("\"\"", "\"");
-		}
-		return strR;
-	}
-
+    public String StripQuotes(final String pstrS) {
+        String strR = pstrS;
+        // if (pstrS.substring(0, 1).equals("\"") &&
+        // pstrS.substring(pstrS.length() - 1).equals("\"")) {
+        if (pstrS.startsWith("\"") && pstrS.endsWith("\"")) {
+            strR = pstrS.substring(1, pstrS.length() - 1);
+            strR = strR.replaceAll("\"\"", "\"");
+        }
+        return strR;
+    }
 
     protected boolean isNotEqual(final String pstrActual, final String pstrNew) {
         Boolean flgT = false;

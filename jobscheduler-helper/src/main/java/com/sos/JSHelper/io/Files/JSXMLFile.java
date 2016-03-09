@@ -261,8 +261,8 @@ public class JSXMLFile extends JSTextFile {
         return this;
     }
 
-    public void Transform(final File xslFile, final File outputFile) throws TransformerException, TransformerConfigurationException, FileNotFoundException,
-            Exception {
+    public void Transform(final File xslFile, final File outputFile) throws TransformerException, TransformerConfigurationException,
+            FileNotFoundException, Exception {
         Transformer transformer = null;
         System.setProperty("javax.xml.transform.TransformerFactory", "net.sf.saxon.TransformerFactoryImpl");
         try {
