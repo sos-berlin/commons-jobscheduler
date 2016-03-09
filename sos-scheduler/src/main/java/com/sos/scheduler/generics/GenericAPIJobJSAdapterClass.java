@@ -26,7 +26,7 @@ public class GenericAPIJobJSAdapterClass extends JobSchedulerJobAdapter {
 
     private void doInitialize() {
         // doInitialize
-    } 
+    }
 
     @Override
     public boolean spooler_init() {

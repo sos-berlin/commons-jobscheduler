@@ -4,10 +4,7 @@ import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdRemoveOrder;
 import org.apache.log4j.Logger;
 
-/**
- * @uthor ss
- * at 17.09.13 19:52
- */
+/** @uthor ss at 17.09.13 19:52 */
 public class JSRemoveOrder extends JSCommand {
 
     private final Logger logger = Logger.getLogger(JSRemoveOrder.class);
@@ -29,7 +26,7 @@ public class JSRemoveOrder extends JSCommand {
         cmd.setJobChain(jobChain);
         cmd.setOrder(orderId);
         setCommand(cmd);
-        logger.info("Remove order for jobchain " + jobChain +" with orderId " + orderId);
+        logger.info("Remove order for jobchain " + jobChain + " with orderId " + orderId);
         return cmd;
     }
 

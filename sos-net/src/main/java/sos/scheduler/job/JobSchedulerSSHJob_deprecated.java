@@ -43,7 +43,7 @@ public class JobSchedulerSSHJob_deprecated extends JobSchedulerSSHBaseJob {
         public boolean equals(Object obj) {
             return super.equals(obj);
         }
-        
+
         @Override
         public int hashCode() {
             return super.hashCode();
@@ -57,9 +57,9 @@ public class JobSchedulerSSHJob_deprecated extends JobSchedulerSSHBaseJob {
                 spooler.job("scheduler_ssh_kill");
             } catch (Exception e) {
                 spooler_log.debug1("initializing ssh kill job");
-                spooler.execute_xml("<job name=\"scheduler_ssh_kill\" title=\"Kill processes launched by SSH\""
-                        + " order=\"no\" stop_on_error=\"no\">" + "<description>" + "<include file=\"jobs/JobSchedulerSSHJob.xml\"/>"
-                        + "</description>" + "<params>" + "<param name=\"is_kill_job\" value=\"true\"/>" + "</params>" + "<script language=\"java\""
+                spooler.execute_xml("<job name=\"scheduler_ssh_kill\" title=\"Kill processes launched by SSH\"" + " order=\"no\" stop_on_error=\"no\">"
+                        + "<description>" + "<include file=\"jobs/JobSchedulerSSHJob.xml\"/>" + "</description>" + "<params>"
+                        + "<param name=\"is_kill_job\" value=\"true\"/>" + "</params>" + "<script language=\"java\""
                         + " java_class=\"sos.scheduler.job.JobSchedulerSSHJob\"/>" + "</job>");
             }
         } catch (Exception e) {
@@ -130,8 +130,7 @@ public class JobSchedulerSSHJob_deprecated extends JobSchedulerSSHBaseJob {
                         remoteKill(sshKillPid);
                     }
                 } else {
-                    SOSConfiguration con = new SOSConfiguration(null, schedulerParameter, null, null, 
-                            "sos/net/sosftp/Configuration.xml", new SOSSchedulerLogger(spooler_log));
+                    SOSConfiguration con = new SOSConfiguration(null, schedulerParameter, null, null, "sos/net/sosftp/Configuration.xml", new SOSSchedulerLogger(spooler_log));
                     con.checkConfigurationItems();
                     ftpCommand = new sos.net.sosftp.SOSFTPCommandSSH(con, new SOSSchedulerLogger(spooler_log));
                     ftpCommand.setSchedulerJob(this);
@@ -150,7 +149,7 @@ public class JobSchedulerSSHJob_deprecated extends JobSchedulerSSHBaseJob {
                         this.setSshConnection(null);
                     } catch (Exception ex) {
                         // gracefully ignore this error
-                    } 
+                    }
                 }
             }
             return spooler_task.job().order_queue() != null;

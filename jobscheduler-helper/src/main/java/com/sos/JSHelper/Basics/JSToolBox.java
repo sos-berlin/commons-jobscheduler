@@ -27,7 +27,7 @@ public class JSToolBox extends JSListenerClass {
     protected boolean flgStackTracePrinted = false;
 
     public JSToolBox() {
-        // 
+        //
     }
 
     public JSToolBox(final String pstrResourceBundleName) {

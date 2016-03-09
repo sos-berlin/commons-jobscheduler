@@ -221,4 +221,4 @@ public class JobSchedulerLaunchAndObserveOptionsSuperClass extends JSOptionsClas
         this.setAllOptions(super.objSettings);
     }
 
-} 
+}

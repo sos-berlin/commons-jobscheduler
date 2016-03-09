@@ -161,7 +161,8 @@ public class SOSFileListEntryTest extends JSListenerClass {
 
     @Test
     public void testPid() {
-        /** this hack is tested for SUN-JVM only. No guarantee is made for other JVMs */
+        /** this hack is tested for SUN-JVM only. No guarantee is made for other
+         * JVMs */
         String pid = ManagementFactory.getRuntimeMXBean().getName();
         String strA[] = pid.split("@");
         LOGGER.info("name = " + pid + ", pid = " + strA[0]);

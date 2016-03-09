@@ -152,7 +152,7 @@ public class JobSchedulerCheckUpdates extends JobSchedulerJob {
                     if (spooler_task.params().var("ftp_automatic_download") != null && !spooler_task.params().var("ftp_automatic_download").isEmpty()) {
                         automatic_download = spooler_task.params().var("ftp_automatic_download");
                     }
-                    if (spooler_task.params().var("product") != null && !spooler_task.params().var("product").isEmpty()){
+                    if (spooler_task.params().var("product") != null && !spooler_task.params().var("product").isEmpty()) {
                         product = spooler_task.params().var("product");
                     }
                     if (spooler_task.params().var("http_proxy") != null && !spooler_task.params().var("http_proxy").isEmpty()) {
@@ -293,11 +293,9 @@ public class JobSchedulerCheckUpdates extends JobSchedulerJob {
             transferFile = new File(localDir, fileName);
             spooler_log_info("The new release will be automatically downloaded: " + schedulerUpdateAnswer.new_release);
             spooler_log_info("File will be saved to: " + transferFile.getAbsolutePath());
-            spooler_log_info_and_state("receiving file: " + transferFile.getAbsolutePath() + " with " + ftpClient.size(transferFile.getName())
-                    + " bytes");
+            spooler_log_info_and_state("receiving file: " + transferFile.getAbsolutePath() + " with " + ftpClient.size(transferFile.getName()) + " bytes");
             ftpClient.getFile(transferFile.getName(), transferFile.getAbsolutePath());
-            spooler_log_info_and_state("One file received:" + transferFile.getAbsolutePath() + " with " + ftpClient.size(transferFile.getName())
-                    + " bytes");
+            spooler_log_info_and_state("One file received:" + transferFile.getAbsolutePath() + " with " + ftpClient.size(transferFile.getName()) + " bytes");
         } catch (Exception e) {
             transferFile = null;
             spooler_log_warn("could not process file transfer: " + e.getMessage());
@@ -308,14 +306,14 @@ public class JobSchedulerCheckUpdates extends JobSchedulerJob {
                         ftpClient.logout();
                     } catch (Exception e) {
                         // no error handling
-                    } 
+                    }
                 }
                 if (ftpClient.isConnected()) {
                     try {
                         ftpClient.disconnect();
                     } catch (Exception e) {
                         // no error handling
-                    } 
+                    }
                 }
             }
         }
@@ -490,7 +488,7 @@ public class JobSchedulerCheckUpdates extends JobSchedulerJob {
                 }
             } catch (Exception ex) {
                 // ignore this error
-            } 
+            }
         }
     }
 

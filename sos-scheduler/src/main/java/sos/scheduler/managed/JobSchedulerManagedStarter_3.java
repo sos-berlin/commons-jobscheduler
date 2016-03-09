@@ -155,10 +155,9 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
         boolean rc = super.spooler_init();
         hotFolderRegExPattern = Pattern.compile(HOT_FOLDER_REG_EX);
         noSchedulerFileRegExPattern = Pattern.compile(NO_SCHEDULER_FILE_REG_EX);
-        try { 
+        try {
             // to check if the database interface is available
-            String available = this.getConnection().getSingleValue("SELECT COUNT(*) FROM " + JobSchedulerManagedObject.getTableLiveObjects()
-                    + " WHERE 1=0");
+            String available = this.getConnection().getSingleValue("SELECT COUNT(*) FROM " + JobSchedulerManagedObject.getTableLiveObjects() + " WHERE 1=0");
             if (available != null && "0".equals(available)) {
                 isDatabaseInterfaceSupported = true;
             }
@@ -221,12 +220,12 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                         this.getConnection().rollback();
                     } catch (Exception ex) {
                         // no error handling
-                    } 
+                    }
                     try {
                         this.getConnection().disconnect();
                     } catch (Exception ex) {
                         // no error handling
-                    } 
+                    }
                 }
             }
         }
@@ -260,8 +259,8 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                         File newFile = null;
                         String jobChainName = "";
                         if ("order".equalsIgnoreCase(getLiveValue(rec, "type"))) {
-                            jobChainName = this.getConnection().getSingleValue("SELECT \"JOB_CHAIN\" FROM "
-                                    + JobSchedulerManagedObject.getTableLiveOrders() + " WHERE \"OBJECT_ID\"=" + getLiveValue(rec, "object_id"));
+                            jobChainName = this.getConnection().getSingleValue("SELECT \"JOB_CHAIN\" FROM " + JobSchedulerManagedObject.getTableLiveOrders()
+                                    + " WHERE \"OBJECT_ID\"=" + getLiveValue(rec, "object_id"));
                             if (jobChainName != null && jobChainName.length() > 0) {
                                 currentFile = new File(liveFolder + "/" + getLiveValue(rec, "path"), jobChainName + "," + getLiveValue(rec, "name")
                                         + ".order.xml");
@@ -270,8 +269,8 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                                         + getLiveValue(rec, "type") + ".xml");
                             }
                         } else {
-                            currentFile = new File(liveFolder + "/" + getLiveValue(rec, "path"), getLiveValue(rec, "name") + "."
-                                    + getLiveValue(rec, "type") + ".xml");
+                            currentFile = new File(liveFolder + "/" + getLiveValue(rec, "path"), getLiveValue(rec, "name") + "." + getLiveValue(rec, "type")
+                                    + ".xml");
                         }
                         getLogger().debug7("current file: " + currentFile.getAbsolutePath());
                         if (currentFile.exists()) {
@@ -285,8 +284,8 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                             } else if ("rename".equalsIgnoreCase(getLiveValue(rec, "operation"))) {
                                 if ("order".equalsIgnoreCase(getLiveValue(rec, "type"))) {
                                     if (jobChainName != null && jobChainName.length() > 0) {
-                                        newFile = new File(liveFolder + "/" + getLiveValue(rec, "new_path"), jobChainName + ","
-                                                + getLiveValue(rec, "new_name") + ".order.xml");
+                                        newFile = new File(liveFolder + "/" + getLiveValue(rec, "new_path"), jobChainName + "," + getLiveValue(rec, "new_name")
+                                                + ".order.xml");
                                     } else {
                                         newFile = new File(liveFolder + "/" + getLiveValue(rec, "new_path"), getLiveValue(rec, "new_name") + "."
                                                 + getLiveValue(rec, "type") + ".xml");
@@ -314,8 +313,7 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                         + " SET \"SYNCHRONIZED\"=%now, \"IN_SYNC\"=1 WHERE \"PK_ID\"=" + getLiveValue(rec, "pk_id");
                 this.getConnection().executeUpdate(updString);
                 if ("delete".equalsIgnoreCase(getLiveValue(rec, "operation"))) {
-                    updString = "DELETE FROM " + JobSchedulerManagedObject.getTableLiveObjects() + " WHERE \"PK_ID\"="
-                            + getLiveValue(rec, "object_id");
+                    updString = "DELETE FROM " + JobSchedulerManagedObject.getTableLiveObjects() + " WHERE \"PK_ID\"=" + getLiveValue(rec, "object_id");
                     this.getConnection().executeUpdate(updString);
                 }
                 this.getConnection().commit();
@@ -336,8 +334,7 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
             while (submitIterator.hasNext()) {
                 HashMap submit = (HashMap) submitIterator.next();
                 String submitID = submit.get("id").toString();
-                String xml = getConnection().getClob("SELECT \"XML\" FROM " + JobSchedulerManagedObject.tableManagedSubmits + " WHERE \"ID\"="
-                        + submitID);
+                String xml = getConnection().getClob("SELECT \"XML\" FROM " + JobSchedulerManagedObject.tableManagedSubmits + " WHERE \"ID\"=" + submitID);
                 submit.put("xml", xml);
                 try {
                     processSubmit(submit);
@@ -466,8 +463,8 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
             }
             if (objectID != null && objectID.length() > 0) {
                 String fileHash = SOSCrypt.MD5encrypt(resultFile);
-                String sql = "UPDATE " + JobSchedulerManagedObject.tableManagedObjects + " SET \"HASH\"='" + fileHash + "', \"STATE\"=10 "
-                        + " WHERE \"ID\"=" + objectID;
+                String sql = "UPDATE " + JobSchedulerManagedObject.tableManagedObjects + " SET \"HASH\"='" + fileHash + "', \"STATE\"=10 " + " WHERE \"ID\"="
+                        + objectID;
                 getConnection().executeUpdate(sql);
                 getConnection().commit();
             }
@@ -590,8 +587,8 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
             if (!relativePath.endsWith("/"))
                 relativePath += "/";
             // find ids of all objects in this dir and subdirs
-            String sql = "SELECT \"ITEM_ID\" FROM " + JobSchedulerManagedObject.tableManagedTree + " WHERE \"PATH\" LIKE " + "'/" + spooler.id()
-                    + relativePath + "%'";
+            String sql = "SELECT \"ITEM_ID\" FROM " + JobSchedulerManagedObject.tableManagedTree + " WHERE \"PATH\" LIKE " + "'/" + spooler.id() + relativePath
+                    + "%'";
             ArrayList objectIDs = getConnection().getArrayValue(sql);
             if (objectIDs.size() > 0) {
                 Iterator iter = objectIDs.iterator();
@@ -603,8 +600,8 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                     objectIDList.append(objectID);
                     comma = ", ";
                 }
-                sql = "UPDATE " + JobSchedulerManagedObject.tableManagedObjects + " SET \"STATE\"=10 " + " WHERE \"ID\" IN ("
-                        + objectIDList.toString() + ") AND \"STATE\"=5";
+                sql = "UPDATE " + JobSchedulerManagedObject.tableManagedObjects + " SET \"STATE\"=10 " + " WHERE \"ID\" IN (" + objectIDList.toString()
+                        + ") AND \"STATE\"=5";
                 getConnection().executeUpdate(sql);
                 getConnection().commit();
             }
@@ -675,15 +672,13 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
             runtime = xpath.selectSingleNode(nodeQuery);
             if (runtime != null) {
                 start = false;
-                getLog().debug1("processActionAndStart:" + name + " once=yes. " + type
-                        + " will not be modified because 'repeat' is specified by <run_time>");
+                getLog().debug1("processActionAndStart:" + name + " once=yes. " + type + " will not be modified because 'repeat' is specified by <run_time>");
             }
             nodeQuery = "//run_time/period[@repeat]";
             runtime = xpath.selectSingleNode(nodeQuery);
             if (runtime != null && start) {
                 start = false;
-                getLog().debug1("processActionAndStart:" + name + " once=yes. " + type
-                        + " will not be started because 'repeat' is specified by <run_time>");
+                getLog().debug1("processActionAndStart:" + name + " once=yes. " + type + " will not be started because 'repeat' is specified by <run_time>");
             }
             if (start) {
                 String command = "";
@@ -840,7 +835,7 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
             }
         } catch (Exception e) {
             // do nothing
-        } 
+        }
     }
 
     private void processDirs() throws Exception {
@@ -849,9 +844,8 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
             String sql = "SELECT o.\"ID\", o.\"SUSPENDED\", o.\"HASH\", t.\"PATH\", t.\"TYPE\", t.\"OWNER\", t.\"GROUP\", "
                     + "t.\"ID\" AS \"TREE_ID\", t.\"PERMISSION\" ";
             if (!(getConnection() instanceof SOSOracleConnection)) {
-                sql += " FROM " + JobSchedulerManagedObject.tableManagedTree + " t LEFT OUTER JOIN " + " "
-                        + JobSchedulerManagedObject.tableManagedObjects + " o ON o.\"ID\"=t.\"ITEM_ID\""
-                        + " WHERE (t.\"LINK_ID\"=0 OR t.\"LINK_ID\" IS NULL) ";
+                sql += " FROM " + JobSchedulerManagedObject.tableManagedTree + " t LEFT OUTER JOIN " + " " + JobSchedulerManagedObject.tableManagedObjects
+                        + " o ON o.\"ID\"=t.\"ITEM_ID\"" + " WHERE (t.\"LINK_ID\"=0 OR t.\"LINK_ID\" IS NULL) ";
             } else {
                 sql += " FROM " + JobSchedulerManagedObject.tableManagedTree + " t," + " " + JobSchedulerManagedObject.tableManagedObjects + " o"
                         + " WHERE o.\"ID\"(+)=t.\"ITEM_ID\" ";
@@ -1018,8 +1012,8 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                     name = name.replaceAll("\\..*\\.xml$", "");
                 }
                 String dbPath = "/" + spooler.id() + name;
-                treeID = this.getConnection().getSingleValue("SELECT \"ID\" FROM " + JobSchedulerManagedObject.tableManagedTree + " WHERE \"PATH\"='"
-                        + dbPath + "'");
+                treeID = this.getConnection().getSingleValue("SELECT \"ID\" FROM " + JobSchedulerManagedObject.tableManagedTree + " WHERE \"PATH\"='" + dbPath
+                        + "'");
             }
             if ("".equals(treeID)) {
                 throw new Exception("element not found in tree: " + path);
@@ -1111,9 +1105,9 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                 throw new Exception("failed to find parent directory of " + path + " in database.");
             }
             parentID = (parent.get("tree_id") != null) ? parent.get("tree_id").toString() : "";
-            if ("".equals(parentID)){
-                parentID = this.getConnection().getSingleValue("SELECT \"ID\" FROM " + JobSchedulerManagedObject.tableManagedTree
-                        + " WHERE \"PATH\"='" + "/" + spooler.id() + parentPath + "'");
+            if ("".equals(parentID)) {
+                parentID = this.getConnection().getSingleValue("SELECT \"ID\" FROM " + JobSchedulerManagedObject.tableManagedTree + " WHERE \"PATH\"='" + "/"
+                        + spooler.id() + parentPath + "'");
             }
             owner = (parent.get("owner") != null) ? parent.get("owner").toString() : "";
             group = (parent.get("group") != null) ? parent.get("group").toString() : "";
@@ -1128,9 +1122,8 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
             }
             nextID = getConnectionSettings().getLockedSequence("scheduler", "counter", "scheduler_managed_tree.id");
             nextObjectID = getConnectionSettings().getLockedSequence("scheduler", "counter", "scheduler_managed_objects.id");
-            String sql = "INSERT INTO " + JobSchedulerManagedObject.tableManagedObjects
-                    + " (\"ID\", \"NAME\", \"TYPE\", \"HASH\", \"STATE\", \"REFERENCE\") " + "VALUES(" + nextObjectID + ", '" + name + "', '" + type
-                    + "', '" + fileHash + "', 10, 0)";
+            String sql = "INSERT INTO " + JobSchedulerManagedObject.tableManagedObjects + " (\"ID\", \"NAME\", \"TYPE\", \"HASH\", \"STATE\", \"REFERENCE\") "
+                    + "VALUES(" + nextObjectID + ", '" + name + "', '" + type + "', '" + fileHash + "', 10, 0)";
             getConnection().execute(sql);
             String fileContent = SOSFile.readFileUnicode(confFile);
             getConnection().updateClob(JobSchedulerManagedObject.tableManagedObjects, "XML", fileContent, "\"ID\"=" + nextObjectID);
@@ -1143,8 +1136,8 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
             sql = "INSERT INTO "
                     + JobSchedulerManagedObject.tableManagedTree
                     + " (\"ID\", \"PARENT\", \"LEAF\", \"TYPE\", \"ITEM_ID\", \"NAME\", \"OWNER\", \"GROUP\", \"PERMISSION\", \"CREATED\", \"CREATED_BY\", \"MODIFIED\", \"MODIFIED_BY\", \"PATH\") "
-                    + "VALUES(" + nextID + ", " + parentID + ", 1, '" + type + "', " + nextObjectID + ", '" + name + "', " + owner + ", " + group
-                    + ", " + permission + ", %now, 'Managed Starter 3', %now, 'Managed Starter 3', '" + dbPath + "')";
+                    + "VALUES(" + nextID + ", " + parentID + ", 1, '" + type + "', " + nextObjectID + ", '" + name + "', " + owner + ", " + group + ", "
+                    + permission + ", %now, 'Managed Starter 3', %now, 'Managed Starter 3', '" + dbPath + "')";
             getConnection().execute(sql);
             getConnection().commit();
             // log to submission table
@@ -1231,8 +1224,8 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                 }
                 parentID = (parent.get("tree_id") != null) ? parent.get("tree_id").toString() : "";
                 if ("".equals(parentID)) {
-                    parentID = this.getConnection().getSingleValue("SELECT \"ID\" FROM " + JobSchedulerManagedObject.tableManagedTree
-                            + " WHERE \"PATH\"='" + "/" + spooler.id() + parentPath + "'");
+                    parentID = this.getConnection().getSingleValue("SELECT \"ID\" FROM " + JobSchedulerManagedObject.tableManagedTree + " WHERE \"PATH\"='"
+                            + "/" + spooler.id() + parentPath + "'");
                 }
                 if ("".equals(parentID)) {
                     parentID = "0";
@@ -1307,11 +1300,10 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
             }
             getConnection().commit();
             int nextSubmissionID = getConnectionSettings().getLockedSequence("scheduler", "counter", "scheduler_managed_submissions.id");
-            sql = "INSERT INTO "
-                    + JobSchedulerManagedObject.tableManagedSubmits
+            sql = "INSERT INTO " + JobSchedulerManagedObject.tableManagedSubmits
                     + " (\"ID\", \"OBJECT_ID\", \"TREE_ID\", \"PATH\", \"OLD_PATH\", \"SPOOLER_ID\", \"ACTION\", \"STATE\",  \"MODIFIED\", \"MODIFIED_BY\") "
-                    + " VALUES(" + nextSubmissionID + ", " + objectID + ", " + treeID + ", '" + submitPath + "', '" + submitPath + "', '"
-                    + spooler.id() + "', '" + action + "', 'stored', %now, 'Managed Starter 3')";
+                    + " VALUES(" + nextSubmissionID + ", " + objectID + ", " + treeID + ", '" + submitPath + "', '" + submitPath + "', '" + spooler.id()
+                    + "', '" + action + "', 'stored', %now, 'Managed Starter 3')";
             getConnection().executeUpdate(sql);
             getConnection().commit();
         } catch (Exception e) {
@@ -1334,10 +1326,9 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
         boolean orderJob = true;
         boolean includeInterface = false;
         try {
-            if (spooler_task.params().value("include_interface") != null 
+            if (spooler_task.params().value("include_interface") != null
                     && ("yes".equalsIgnoreCase(spooler_task.params().value("include_interface"))
-                    || "true".equalsIgnoreCase(spooler_task.params().value("include_interface")) 
-                    || "1".equals(spooler_task.params().value("include_interface")))) {
+                            || "true".equalsIgnoreCase(spooler_task.params().value("include_interface")) || "1".equals(spooler_task.params().value("include_interface")))) {
                 includeInterface = true;
             }
             if (spooler_job.order_queue() != null) {
@@ -1347,10 +1338,8 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                 if (action == null) {
                     action = "";
                 }
-                if (orderParams.value("include_interface") != null 
-                        && ("yes".equalsIgnoreCase(orderParams.value("include_interface"))
-                        || "true".equalsIgnoreCase(orderParams.value("include_interface")) 
-                        || "1".equals(orderParams.value("include_interface")))) {
+                if (orderParams.value("include_interface") != null
+                        && ("yes".equalsIgnoreCase(orderParams.value("include_interface")) || "true".equalsIgnoreCase(orderParams.value("include_interface")) || "1".equals(orderParams.value("include_interface")))) {
                     includeInterface = true;
                 }
                 if ("read_submits".equalsIgnoreCase(action)) {
@@ -1382,7 +1371,7 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                     this.getConnection().rollback();
                 } catch (Exception ex) {
                     // no error handling
-                } 
+                }
             }
         }
     }
@@ -1395,9 +1384,8 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
         File currentFile = null;
         listOfElements = new LinkedHashSet();
         String selStr = "SELECT r.\"PK_ID\", r.\"PARENT_ID\", m.\"ELEMENT_PATH\", m.\"TABLE_NAME\", m.\"ELEMENT_NAME\", m.\"NESTING\"" + " FROM "
-                + JobSchedulerManagedObject.getTableLiveObjectMetadata() + " m LEFT JOIN " + JobSchedulerManagedObject.getTableLiveObjectReferences()
-                + " r" + " ON m.\"ELEMENT_PATH\"=r.\"OBJECT_PATH\" " + " WHERE r.\"OBJECT_ID\"=" + getLiveValue(rec, "object_id")
-                + " ORDER BY m.\"ORDERING\"";
+                + JobSchedulerManagedObject.getTableLiveObjectMetadata() + " m LEFT JOIN " + JobSchedulerManagedObject.getTableLiveObjectReferences() + " r"
+                + " ON m.\"ELEMENT_PATH\"=r.\"OBJECT_PATH\" " + " WHERE r.\"OBJECT_ID\"=" + getLiveValue(rec, "object_id") + " ORDER BY m.\"ORDERING\"";
         ArrayList arrayList = new ArrayList();
         arrayList = this.getConnection().getArray(selStr);
         Iterator xml_elements = arrayList.iterator();
@@ -1574,8 +1562,8 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                 Iterator fieldnames = rec.keySet().iterator();
                 while (fieldnames.hasNext()) {
                     String f = fieldnames.next().toString();
-                    if (!"object_path".equals(f) && !"cdata".equals(f) && !"parent_id".equals(f) 
-                            && !"object_id".equals(f) && rec.get(f) != null && !"".equals(rec.get(f))) {
+                    if (!"object_path".equals(f) && !"cdata".equals(f) && !"parent_id".equals(f) && !"object_id".equals(f) && rec.get(f) != null
+                            && !"".equals(rec.get(f))) {
                         attr += f;
                         attr += "=\"" + rec.get(f) + "\"" + " ";
                         element.attributes.put(f, rec.get(f).toString());

@@ -114,7 +114,7 @@ public class JobSchedulerFolderTree extends JSToolBox implements JSJobUtilities 
 
     private void doInitialize() {
         // doInitialize
-    } 
+    }
 
     @Override
     public String myReplaceAll(final String pstrSourceString, final String pstrReplaceWhat, final String pstrReplaceWith) {

@@ -40,7 +40,7 @@ public class GenericAPIJob extends JSJobUtilitiesClass<GenericAPIJobOptions> {
 
     private void doInitialize() {
         // doInitialize
-    } 
+    }
 
     @Override
     public String myReplaceAll(final String pstrSourceString, final String pstrReplaceWhat, final String pstrReplaceWith) {
@@ -48,4 +48,4 @@ public class GenericAPIJob extends JSJobUtilitiesClass<GenericAPIJobOptions> {
         return pstrSourceString.replaceAll("(?m)" + pstrReplaceWhat, newReplacement);
     }
 
-} 
+}

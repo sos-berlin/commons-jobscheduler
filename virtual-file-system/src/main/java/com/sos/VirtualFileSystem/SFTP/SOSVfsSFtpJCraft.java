@@ -303,7 +303,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 size = objAttr.getSize();
             }
         } catch (SftpException e) {
-            
+
         }
         return size;
     }
@@ -573,7 +573,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 dateTime = df.format(new Date(mt));
             }
         } catch (SftpException e) {
-            // 
+            //
         }
         return dateTime;
     }

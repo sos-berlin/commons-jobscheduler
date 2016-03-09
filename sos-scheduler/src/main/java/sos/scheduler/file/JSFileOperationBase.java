@@ -339,8 +339,7 @@ public class JSFileOperationBase extends JSToolBox implements JSJobUtilities {
                 if (maxAge > 0) {
                     long interval = currentTime - fleFile.lastModified();
                     if (interval < 0) {
-                        throw new JobSchedulerException("Cannot filter by file age. File [" + fleFile.getCanonicalPath()
-                                + "] was modified in the future.");
+                        throw new JobSchedulerException("Cannot filter by file age. File [" + fleFile.getCanonicalPath() + "] was modified in the future.");
                     }
                     if (interval > maxAge) {
                         log("checking file age " + fleFile.lastModified() + ": maximum age required is " + maxAge);
@@ -365,8 +364,7 @@ public class JSFileOperationBase extends JSToolBox implements JSJobUtilities {
                     log("checking file " + fleFile.getCanonicalPath() + ": directory exists");
                     return true;
                 }
-                Vector<File> fileList = getFilelist(fleFile.getPath(), fileSpec1, false, minAge, maxAge, minSize, maxSize, 
-                        skipFirstFiles1.value(), skipLastFiles1.value());
+                Vector<File> fileList = getFilelist(fleFile.getPath(), fileSpec1, false, minAge, maxAge, minSize, maxSize, skipFirstFiles1.value(), skipLastFiles1.value());
                 if (fileList.isEmpty()) {
                     log("checking file " + fleFile.getCanonicalPath() + ": directory contains no files matching " + fileSpec1);
                     return false;
@@ -392,8 +390,7 @@ public class JSFileOperationBase extends JSToolBox implements JSJobUtilities {
     }
 
     private Vector<File> getFilelist(final String folder, final SOSOptionRegExp regexp, final boolean withSubFolder, final long minFileAge1,
-            final long maxFileAge1, final long minFileSize1, final long maxFileSize1, final int skipFirstFiles1, final int skipLastFiles1)
-            throws Exception {
+            final long maxFileAge1, final long minFileSize1, final long maxFileSize1, final int skipFirstFiles1, final int skipLastFiles1) throws Exception {
         Vector<File> filelist = new Vector<File>();
         Vector<File> temp = new Vector<File>();
         File objFile = null;
@@ -502,8 +499,7 @@ public class JSFileOperationBase extends JSToolBox implements JSJobUtilities {
         return filelist;
     }
 
-    private Vector<File> filelistSkipFiles(Vector<File> filelist, final int skipFirstFiles1, final int skipLastFiles1, final String sorting)
-            throws Exception {
+    private Vector<File> filelistSkipFiles(Vector<File> filelist, final int skipFirstFiles1, final int skipLastFiles1, final String sorting) throws Exception {
         Object[] oArr = filelist.toArray();
 
         class SizeComparator implements Comparator {

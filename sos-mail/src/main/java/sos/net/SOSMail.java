@@ -391,8 +391,8 @@ public class SOSMail {
         this.sosSettings = sosSettings;
         templates = this.sosSettings.getSection(this.getApplicationMailTemplates(), this.getSectionMailTemplates() + "_" + language);
         if (templates.size() == 0) {
-            throw new Exception(SOSClassUtil.getMethodName() + ": missing settings entries for application \"" + applicationMailTemplates
-                    + "\" in section \"" + sectionMailTemplates + "\".");
+            throw new Exception(SOSClassUtil.getMethodName() + ": missing settings entries for application \"" + applicationMailTemplates + "\" in section \""
+                    + sectionMailTemplates + "\".");
         }
         return true;
     }
@@ -444,12 +444,11 @@ public class SOSMail {
                     value = replacements.get(key.toString());
                     if (value != null) {
                         try {
-                            content = content.replaceAll("&\\#\\(" + key.toString() + "\\)", 
-                                    SOSDate.getDateAsString(SOSDate.getDate(value.toString()), this.getDateFormat()));
-                            content = content.replaceAll("&\\#\\#\\(" + key.toString() + "\\)", 
-                                    SOSDate.getDateTimeAsString(SOSDate.getDate(value.toString()), this.getDatetimeFormat()));
+                            content = content.replaceAll("&\\#\\(" + key.toString() + "\\)", SOSDate.getDateAsString(SOSDate.getDate(value.toString()), this.getDateFormat()));
+                            content = content.replaceAll("&\\#\\#\\(" + key.toString() + "\\)", SOSDate.getDateTimeAsString(SOSDate.getDate(value.toString()), this.getDatetimeFormat()));
                         } catch (Exception ex) {
-                            // ignore this error: replacement is not convertible to date
+                            // ignore this error: replacement is not convertible
+                            // to date
                         }
                         Locale defaultLocale = Locale.getDefault();
                         try {
@@ -718,10 +717,8 @@ public class SOSMail {
             return false;
         } catch (javax.mail.MessagingException e) {
             // ist ein Fehler, bei dem es lohnt, zwischenzuspeichern?
-            if (queueDir.length() > 0 && e.getMessage().startsWith("Could not connect to SMTP host")
-                    || e.getMessage().startsWith("Unknown SMTP host") 
-                    || e.getMessage().startsWith("Read timed out")
-                    || e.getMessage().startsWith("Exception reading response")) {
+            if (queueDir.length() > 0 && e.getMessage().startsWith("Could not connect to SMTP host") || e.getMessage().startsWith("Unknown SMTP host")
+                    || e.getMessage().startsWith("Read timed out") || e.getMessage().startsWith("Exception reading response")) {
                 lastError = e.getMessage() + " ==> " + host + ":" + port + " " + user + "/********";
                 try {
                     dumpMessageToFile(true);
@@ -1611,8 +1608,8 @@ public class SOSMail {
             }
             if (!sosMail.send()) {
                 if (sosLogger != null) {
-                    sosLogger.warn("mail server is unavailable, mail for recipient [" + recipient + "] is queued in local directory ["
-                            + sosMail.getQueueDir() + "]:" + sosMail.getLastError());
+                    sosLogger.warn("mail server is unavailable, mail for recipient [" + recipient + "] is queued in local directory [" + sosMail.getQueueDir()
+                            + "]:" + sosMail.getLastError());
                 }
             }
         } catch (Exception e) {

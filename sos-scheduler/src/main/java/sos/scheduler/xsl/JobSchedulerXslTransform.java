@@ -67,6 +67,6 @@ public class JobSchedulerXslTransform extends JSJobUtilitiesClass<JobSchedulerXs
 
     private void doInitialize() {
         // doInitialize
-    } 
+    }
 
 }

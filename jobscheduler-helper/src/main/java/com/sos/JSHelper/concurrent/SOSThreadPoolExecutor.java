@@ -49,6 +49,7 @@ public class SOSThreadPoolExecutor {
     }
 
     private static class WorkerRunnable implements Runnable {
+
         private final int jobNr;
 
         public WorkerRunnable(final int jobNr) {
@@ -68,5 +69,5 @@ public class SOSThreadPoolExecutor {
             }
         }
     }
-    
+
 }

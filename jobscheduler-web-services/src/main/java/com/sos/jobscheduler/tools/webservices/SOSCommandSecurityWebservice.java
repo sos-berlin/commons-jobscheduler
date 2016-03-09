@@ -221,9 +221,8 @@ public class SOSCommandSecurityWebservice {
     @POST
     @Path("/start_job")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSCommandSecurityWebserviceAnswer startJob(@QueryParam("session_id") String sessionId, @QueryParam("job") String job,
-            @QueryParam("at") String at, @QueryParam("force") String force, @QueryParam("name") String name, @QueryParam("params") String params)
-            throws MalformedURLException {
+    public SOSCommandSecurityWebserviceAnswer startJob(@QueryParam("session_id") String sessionId, @QueryParam("job") String job, @QueryParam("at") String at,
+            @QueryParam("force") String force, @QueryParam("name") String name, @QueryParam("params") String params) throws MalformedURLException {
         SchedulerObjectFactory objFactory = new SchedulerObjectFactory();
         objFactory.initMarshaller(Spooler.class);
         JSCmdStartJob objStartJob = new JSCmdStartJob(objFactory);
@@ -250,10 +249,10 @@ public class SOSCommandSecurityWebservice {
     @Path("/modify_order")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public SOSCommandSecurityWebserviceAnswer modifyOrder(@QueryParam("session_id") String sessionId, @QueryParam("job_chain") String jobChain,
-            @QueryParam("order") String order, @QueryParam("action") String action, @QueryParam("at") String at,
-            @QueryParam("end_state") String endState, @QueryParam("priority") String priority, @QueryParam("setback") String setback,
-            @QueryParam("state") String state, @QueryParam("suspended") String suspended, @QueryParam("title") String title,
-            @QueryParam("params") String params, @QueryParam("runtime") String runtime) throws MalformedURLException {
+            @QueryParam("order") String order, @QueryParam("action") String action, @QueryParam("at") String at, @QueryParam("end_state") String endState,
+            @QueryParam("priority") String priority, @QueryParam("setback") String setback, @QueryParam("state") String state,
+            @QueryParam("suspended") String suspended, @QueryParam("title") String title, @QueryParam("params") String params,
+            @QueryParam("runtime") String runtime) throws MalformedURLException {
         String orderS = String.format("%s:%s", jobChain, order);
         SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord = getAuthencationRecord(sessionId, PERMISSION_MODIFY_ORDER);
         String s = checkAuthentication(sosWebserviceAuthenticationRecord, orderS);
@@ -291,10 +290,10 @@ public class SOSCommandSecurityWebservice {
     @Path("/add_order")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public SOSCommandSecurityWebserviceAnswer addOrder(@QueryParam("session_id") String sessionId, @QueryParam("job_chain") String jobChain,
-            @QueryParam("order") String order, @QueryParam("at") String at, @QueryParam("end_state") String endState,
-            @QueryParam("priority") String priority, @QueryParam("replace") String replace, @QueryParam("state") String state,
-            @QueryParam("title") String title, @QueryParam("web_service") String webService, @QueryParam("params") String params,
-            @QueryParam("runtime") String runtime) throws MalformedURLException {
+            @QueryParam("order") String order, @QueryParam("at") String at, @QueryParam("end_state") String endState, @QueryParam("priority") String priority,
+            @QueryParam("replace") String replace, @QueryParam("state") String state, @QueryParam("title") String title,
+            @QueryParam("web_service") String webService, @QueryParam("params") String params, @QueryParam("runtime") String runtime)
+            throws MalformedURLException {
         String orderId = order;
         if (order == null) {
             orderId = "";
@@ -381,9 +380,8 @@ public class SOSCommandSecurityWebservice {
     @POST
     @Path("/job_chain_node_modify")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSCommandSecurityWebserviceAnswer jobChainNodeModify(@QueryParam("session_id") String sessionId,
-            @QueryParam("job_chain") String jobChain, @QueryParam("action") String action, @QueryParam("state") String state)
-            throws MalformedURLException {
+    public SOSCommandSecurityWebserviceAnswer jobChainNodeModify(@QueryParam("session_id") String sessionId, @QueryParam("job_chain") String jobChain,
+            @QueryParam("action") String action, @QueryParam("state") String state) throws MalformedURLException {
         SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord = getAuthencationRecord(sessionId, PERMISSION_MODIFY_JOBCHAIN_NODE);
         String s = checkAuthentication(sosWebserviceAuthenticationRecord, jobChain);
         if ("".equals(s)) {
@@ -426,8 +424,8 @@ public class SOSCommandSecurityWebservice {
     @POST
     @Path("/modify_job")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSCommandSecurityWebserviceAnswer modifyJob(@QueryParam("session_id") String sessionId, @QueryParam("job") String job,
-            @QueryParam("cmd") String cmd) throws MalformedURLException {
+    public SOSCommandSecurityWebserviceAnswer modifyJob(@QueryParam("session_id") String sessionId, @QueryParam("job") String job, @QueryParam("cmd") String cmd)
+            throws MalformedURLException {
         SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord = getAuthencationRecord(sessionId, PERMISSION_MODIFY_JOB);
         String s = checkAuthentication(sosWebserviceAuthenticationRecord, cmd + ":" + job);
         if ("".equals(s)) {
@@ -468,9 +466,9 @@ public class SOSCommandSecurityWebservice {
     @POST
     @Path("/process_class")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSCommandSecurityWebserviceAnswer processClass(@QueryParam("session_id") String sessionId,
-            @QueryParam("scheduler_id") String schedulerId, @QueryParam("name") String name, @QueryParam("remote_scheduler") String remoteScheduler,
-            @QueryParam("replace") String replace, @QueryParam("max_processes") String maxProcesses) throws MalformedURLException {
+    public SOSCommandSecurityWebserviceAnswer processClass(@QueryParam("session_id") String sessionId, @QueryParam("scheduler_id") String schedulerId,
+            @QueryParam("name") String name, @QueryParam("remote_scheduler") String remoteScheduler, @QueryParam("replace") String replace,
+            @QueryParam("max_processes") String maxProcesses) throws MalformedURLException {
         SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord = getAuthencationRecord(sessionId, PERMISSION_ADD_PROCESS_CLASS);
         String s = checkAuthentication(sosWebserviceAuthenticationRecord, name);
         if ("".equals(s)) {
@@ -500,8 +498,8 @@ public class SOSCommandSecurityWebservice {
     @POST
     @Path("/process_class_remove")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSCommandSecurityWebserviceAnswer processClassRemove(@QueryParam("session_id") String sessionId,
-            @QueryParam("process_class") String processClass) throws MalformedURLException {
+    public SOSCommandSecurityWebserviceAnswer processClassRemove(@QueryParam("session_id") String sessionId, @QueryParam("process_class") String processClass)
+            throws MalformedURLException {
         SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord = getAuthencationRecord(sessionId, PERMISSION_REMOVE_PROCESS_CLASS);
         String s = checkAuthentication(sosWebserviceAuthenticationRecord, processClass);
         if ("".equals(s)) {
@@ -568,8 +566,8 @@ public class SOSCommandSecurityWebservice {
     @POST
     @Path("/lock")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSCommandSecurityWebserviceAnswer lock(@QueryParam("session_id") String sessionId,
-            @QueryParam("max_non_exclusive") String maxNonExclusive, @QueryParam("name") String name) throws MalformedURLException {
+    public SOSCommandSecurityWebserviceAnswer lock(@QueryParam("session_id") String sessionId, @QueryParam("max_non_exclusive") String maxNonExclusive,
+            @QueryParam("name") String name) throws MalformedURLException {
         SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord = getAuthencationRecord(sessionId, PERMISSION_LOCK);
         String s = checkAuthentication(sosWebserviceAuthenticationRecord, name);
         if ("".equals(s)) {
@@ -609,9 +607,9 @@ public class SOSCommandSecurityWebservice {
     @POST
     @Path("/terminate")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSCommandSecurityWebserviceAnswer terminate(@QueryParam("session_id") String sessionId,
-            @QueryParam("all_schedulers") String allSchedulers, @QueryParam("continue_exclusive_operation") String continueExclusiveOperation,
-            @QueryParam("restart") String restart, @QueryParam("timeout") String timeout) throws MalformedURLException {
+    public SOSCommandSecurityWebserviceAnswer terminate(@QueryParam("session_id") String sessionId, @QueryParam("all_schedulers") String allSchedulers,
+            @QueryParam("continue_exclusive_operation") String continueExclusiveOperation, @QueryParam("restart") String restart,
+            @QueryParam("timeout") String timeout) throws MalformedURLException {
         SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord = getAuthencationRecord(sessionId, PERMISSION_TERMINATE);
         String s = checkAuthentication(sosWebserviceAuthenticationRecord, "");
         if ("".equals(s)) {
@@ -673,10 +671,8 @@ public class SOSCommandSecurityWebservice {
         SOSRestShiroClient sosRestShiroClient = new SOSRestShiroClient();
         String resource = sosWebserviceAuthenticationRecord.getResource() + "/logout" + "?session_id=%s";
         sosWebserviceAuthenticationRecord.setResource(resource);
-        sosRestShiroClient.getSOSShiroCurrentUserAnswer(new URL(String.format(sosWebserviceAuthenticationRecord.getResource(), 
-                sosWebserviceAuthenticationRecord.getSessionId())));
-        SOSCommandSecurityWebserviceAnswer message = createAnswer("", String.format("%s --> Abgemeldet", sosWebserviceAuthenticationRecord.getSessionId()), 
-                sosWebserviceAuthenticationRecord);
+        sosRestShiroClient.getSOSShiroCurrentUserAnswer(new URL(String.format(sosWebserviceAuthenticationRecord.getResource(), sosWebserviceAuthenticationRecord.getSessionId())));
+        SOSCommandSecurityWebserviceAnswer message = createAnswer("", String.format("%s --> Abgemeldet", sosWebserviceAuthenticationRecord.getSessionId()), sosWebserviceAuthenticationRecord);
         if (currentUserList != null) {
             currentUserList.removeUser(sessionId);
         }

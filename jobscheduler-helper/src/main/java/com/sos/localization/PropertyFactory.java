@@ -91,6 +91,6 @@ public class PropertyFactory extends JSJobUtilitiesClass<PropertyFactoryOptions>
 
     private void doInitialize() {
         // doInitialize
-    } 
+    }
 
 }

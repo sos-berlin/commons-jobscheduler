@@ -163,5 +163,5 @@ public class SchedulerHotFolder extends JSObjBase {
     public SchedulerHotFolderFileList getHotFolderFileList() {
         return objHotFolderFileList;
     }
-    
+
 }

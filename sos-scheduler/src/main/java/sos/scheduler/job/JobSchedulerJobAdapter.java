@@ -389,8 +389,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         JSJ_D_0080.toLog();
         if (pstrString2Modify.matches("(?s).*%[^%]+%.*") || pstrString2Modify.matches("(?s).*(\\$|§)\\{[^{]+\\}.*")) {
             if (isNotNull(params)) {
-                String[] strPatterns = new String[] { "%SCHEDULER_PARAM_%1$s%", "%%1$s%", "(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?",
-                        "(\\$|§)\\{?%1$s\\}?" };
+                String[] strPatterns = new String[] { "%SCHEDULER_PARAM_%1$s%", "%%1$s%", "(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?", "(\\$|§)\\{?%1$s\\}?" };
                 String[] names = params.names().split(";");
                 for (String strPattern : strPatterns) {
                     String regExPattern = strPattern;
@@ -420,8 +419,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         JSJ_D_0080.toLog();
         if (pstrString2Modify.matches("(?s).*%[^%]+%.*") || pstrString2Modify.matches("(?s).*(\\$|§)\\{[^{]+\\}.*")) {
             if (isNotNull(params)) {
-                String[] strPatterns = new String[] { "%SCHEDULER_PARAM_%1$s%", "%%1$s%", "(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?",
-                        "(\\$|§)\\{?%1$s\\}?" };
+                String[] strPatterns = new String[] { "%SCHEDULER_PARAM_%1$s%", "%%1$s%", "(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?", "(\\$|§)\\{?%1$s\\}?" };
                 for (String strPattern : strPatterns) {
                     String regExPattern = strPattern;
                     for (String name : params.keySet()) {

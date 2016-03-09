@@ -5,64 +5,66 @@ import com.sos.JSHelper.Listener.JSListenerClass;
 import org.apache.log4j.Logger;
 import org.junit.*;
 
-/**
- * \class 		JobSchedulerFolderTreeJUnitTest - JUnit-Test for "check wether a file exist"
+/** \class JobSchedulerFolderTreeJUnitTest - JUnit-Test for
+ * "check wether a file exist"
  *
- * \brief MainClass to launch JobSchedulerFolderTree as an executable command-line program
+ * \brief MainClass to launch JobSchedulerFolderTree as an executable
+ * command-line program
  *
-
+ * 
  *
- * see \see J:\E\java\development\com.sos.scheduler\src\sos\scheduler\jobdoc\JobSchedulerFolderTree.xml for (more) details.
+ * see \see J:\E\java\development\com.sos.scheduler\src\sos\scheduler\jobdoc\
+ * JobSchedulerFolderTree.xml for (more) details.
  *
- * \verbatim ;
- * mechanicaly created by C:\Users\KB\eclipse\sos.scheduler.xsl\JSJobDoc2JSJUnitClass.xsl from http://www.sos-berlin.com at 20110805104838 
- * \endverbatim
- */
+ * \verbatim ; mechanicaly created by
+ * C:\Users\KB\eclipse\sos.scheduler.xsl\JSJobDoc2JSJUnitClass.xsl from
+ * http://www.sos-berlin.com at 20110805104838 \endverbatim */
 public class JobSchedulerFolderTreeJUnitTest extends JSToolBox {
-	@SuppressWarnings("unused")//$NON-NLS-1$
-	private final static String				conClassName	= "JobSchedulerFolderTreeJUnitTest";									//$NON-NLS-1$
-	@SuppressWarnings("unused")//$NON-NLS-1$
-	private static Logger					logger			= Logger.getLogger(JobSchedulerFolderTreeJUnitTest.class);
 
-	protected JobSchedulerFolderTreeOptions	objOptions		= null;
-	private JobSchedulerFolderTree			objE			= null;
-	private final String					conSVNVersion	= "$Id$";
+    @SuppressWarnings("unused")//$NON-NLS-1$
+    private final static String conClassName = "JobSchedulerFolderTreeJUnitTest";									//$NON-NLS-1$
+    @SuppressWarnings("unused")//$NON-NLS-1$
+    private static Logger logger = Logger.getLogger(JobSchedulerFolderTreeJUnitTest.class);
 
-	public JobSchedulerFolderTreeJUnitTest() {
-		//
-	}
+    protected JobSchedulerFolderTreeOptions objOptions = null;
+    private JobSchedulerFolderTree objE = null;
+    private final String conSVNVersion = "$Id$";
 
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
+    public JobSchedulerFolderTreeJUnitTest() {
+        //
+    }
 
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
+    }
 
-	@Before
-	public void setUp() throws Exception {
-		objE = new JobSchedulerFolderTree();
-		objE.registerMessageListener(this);
-		objOptions = objE.Options();
-		objOptions.registerMessageListener(this);
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception {
+    }
 
-		JSListenerClass.bolLogDebugInformation = true;
-		JSListenerClass.intMaxDebugLevel = 9;
+    @Before
+    public void setUp() throws Exception {
+        objE = new JobSchedulerFolderTree();
+        objE.registerMessageListener(this);
+        objOptions = objE.Options();
+        objOptions.registerMessageListener(this);
 
-	}
+        JSListenerClass.bolLogDebugInformation = true;
+        JSListenerClass.intMaxDebugLevel = 9;
 
-	@After
-	public void tearDown() throws Exception {
-	}
+    }
 
-	@Test
-	public void testExecute() throws Exception {
-		objOptions.file_path.Value("c:/KB/");
-		objE.Execute();
+    @After
+    public void tearDown() throws Exception {
+    }
 
-		//		assertEquals ("auth_file", objO.auth_file.Value(),"test"); //$NON-NLS-1$
-		//		assertEquals ("user", objO.user.Value(),"test"); //$NON-NLS-1$
+    @Test
+    public void testExecute() throws Exception {
+        objOptions.file_path.Value("c:/KB/");
+        objE.Execute();
 
-	}
+        //		assertEquals ("auth_file", objO.auth_file.Value(),"test"); //$NON-NLS-1$
+        //		assertEquals ("user", objO.user.Value(),"test"); //$NON-NLS-1$
+
+    }
 } // class JobSchedulerFolderTreeJUnitTest

@@ -277,12 +277,12 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
         try {
             in = retrieveFileStream(remoteFile);
             if (in == null) {
-                throw new JobSchedulerException("Could not open stream for " + remoteFile
-                        + ". Perhaps the file does not exist. Reply from ftp server: " + getReplyString());
+                throw new JobSchedulerException("Could not open stream for " + remoteFile + ". Perhaps the file does not exist. Reply from ftp server: "
+                        + getReplyString());
             }
             if (!isPositiveCommandCompletion()) {
-                throw new JobSchedulerException("..error occurred in getFile() [retrieveFileStream] on the FTP server for file [" + remoteFile
-                        + "]: " + getReplyString());
+                throw new JobSchedulerException("..error occurred in getFile() [retrieveFileStream] on the FTP server for file [" + remoteFile + "]: "
+                        + getReplyString());
             }
             byte[] buffer = new byte[4096];
             out = new FileOutputStream(new File(localFile), append);
@@ -357,8 +357,7 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
     public long putFile(String localFile, String remoteFile) throws Exception {
         java.io.OutputStream outputStream = storeFileStream(remoteFile);
         if (isNegativeCommandCompletion()) {
-            throw new JobSchedulerException("..error occurred in storeFileStream() on the FTP server for file [" + remoteFile + "]: "
-                    + getReplyString());
+            throw new JobSchedulerException("..error occurred in storeFileStream() on the FTP server for file [" + remoteFile + "]: " + getReplyString());
         }
         return putFile(localFile, outputStream);
     }
@@ -443,5 +442,5 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
         LogReply();
         return true;
     }
-    
+
 }

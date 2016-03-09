@@ -110,5 +110,5 @@ public class ManagedJobExport {
     public static void setSosLogger(SOSStandardLogger sosLogger) {
         ManagedJobExport.sosLogger = sosLogger;
     }
-    
+
 }

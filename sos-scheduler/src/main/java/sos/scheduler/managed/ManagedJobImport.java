@@ -21,8 +21,7 @@ public class ManagedJobImport extends SOSImport {
     private boolean modelExists = true;
     private String modelId = "";
 
-    public ManagedJobImport(SOSConnection conn, String file_name, String package_id, String package_element, String package_value,
-            SOSStandardLogger log) {
+    public ManagedJobImport(SOSConnection conn, String file_name, String package_id, String package_element, String package_value, SOSStandardLogger log) {
         super(conn, file_name, package_id, package_element, package_value, log);
     }
 
@@ -132,5 +131,5 @@ public class ManagedJobImport extends SOSImport {
     public boolean modelExists() {
         return modelExists;
     }
-    
+
 }

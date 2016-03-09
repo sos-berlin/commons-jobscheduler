@@ -25,7 +25,7 @@ public class SortNumberComparator extends SortBaseComparator implements Comparab
     public boolean equals(Object obj) {
         return super.equals(obj);
     }
-    
+
     @Override
     public int hashCode() {
         return super.hashCode();

@@ -296,8 +296,8 @@ public class ManagedConverter {
                     jobElement.setAttribute("force_idle_timeout", "yes");
                 }
             }
-            String jobDescription = oldConnection.getClob("SELECT \"DESCRIPTION\" FROM " + JobSchedulerManagedObject.getTableManagedJobs()
-                    + " WHERE \"ID\"=" + currJob.get("id"));
+            String jobDescription = oldConnection.getClob("SELECT \"DESCRIPTION\" FROM " + JobSchedulerManagedObject.getTableManagedJobs() + " WHERE \"ID\"="
+                    + currJob.get("id"));
             if (jobDescription != null && !jobDescription.isEmpty()) {
                 Element descriptionElement = jobDocument.createElement("description");
                 Text textNode = jobDocument.createTextNode(jobDescription);
@@ -320,8 +320,8 @@ public class ManagedConverter {
             jobElement.appendChild(jobElement.getOwnerDocument().importNode(scriptDocument.getDocumentElement(), true));
             String jobMonitor = null;
             try {
-                jobMonitor = oldConnection.getClob("SELECT \"MONITOR_SCRIPT\" FROM " + JobSchedulerManagedObject.getTableManagedJobs()
-                        + " WHERE \"ID\"=" + currJob.get("id"));
+                jobMonitor = oldConnection.getClob("SELECT \"MONITOR_SCRIPT\" FROM " + JobSchedulerManagedObject.getTableManagedJobs() + " WHERE \"ID\"="
+                        + currJob.get("id"));
             } catch (Exception e) {
                 logger.debug9("Table " + JobSchedulerManagedObject.getTableManagedJobs() + " does not have column \"MONITOR_SCRIPT\".");
             }
@@ -343,8 +343,8 @@ public class ManagedConverter {
                 }
                 jobElement.appendChild(jobElement.getOwnerDocument().importNode(monitorDocument.getDocumentElement(), true));
             }
-            String jobRuntime = oldConnection.getClob("SELECT \"RUN_TIME\" FROM " + JobSchedulerManagedObject.getTableManagedJobs()
-                    + " WHERE \"ID\"=" + currJob.get("id"));
+            String jobRuntime = oldConnection.getClob("SELECT \"RUN_TIME\" FROM " + JobSchedulerManagedObject.getTableManagedJobs() + " WHERE \"ID\"="
+                    + currJob.get("id"));
             if (jobRuntime != null && !jobRuntime.isEmpty()) {
                 String dummyRuntime = "<dummy>" + jobRuntime + "</dummy>";
                 Document dummyDocument = docBuilder.parse(new ByteArrayInputStream(dummyRuntime.getBytes()));
@@ -365,9 +365,9 @@ public class ManagedConverter {
             }
             int objectId = settings.getLockedSequence("scheduler", "counter", "scheduler_managed_objects.id");
             String sql = "INSERT INTO " + JobSchedulerManagedObject.tableManagedObjects
-                    + " ( \"ID\", \"NAME\", \"TITLE\", \"TYPE\", \"SUSPENDED\", \"JOB_TYPE\", \"SPOOLER_ID\" )" + "  VALUES (" + objectId + ", '"
-                    + name + "', '" + title + "', '" + managedType + "', " + currJob.get("suspended").toString() + ", '"
-                    + currJob.get("job_type").toString() + "', " + spoolerID + " )";
+                    + " ( \"ID\", \"NAME\", \"TITLE\", \"TYPE\", \"SUSPENDED\", \"JOB_TYPE\", \"SPOOLER_ID\" )" + "  VALUES (" + objectId + ", '" + name
+                    + "', '" + title + "', '" + managedType + "', " + currJob.get("suspended").toString() + ", '" + currJob.get("job_type").toString() + "', "
+                    + spoolerID + " )";
             newConnection.executeUpdate(sql);
             newConnection.updateClob(JobSchedulerManagedObject.tableManagedObjects, "XML", xmlString, "\"ID\"=" + objectId);
             createNode(parent, managedType, nameInTree, true, objectId);
@@ -385,8 +385,8 @@ public class ManagedConverter {
                 if (i + 1 < mappings.length)
                     omitChains += ",";
             }
-            String sql = "SELECT \"ID\", \"TITLE\", \"NAME\", \"SUSPENDED\", \"SPOOLER_ID\" FROM "
-                    + JobSchedulerManagedObject.getTableManagedModels() + " WHERE \"ID\">0 AND " + "\"NAME\" NOT IN (" + omitChains + ") ";
+            String sql = "SELECT \"ID\", \"TITLE\", \"NAME\", \"SUSPENDED\", \"SPOOLER_ID\" FROM " + JobSchedulerManagedObject.getTableManagedModels()
+                    + " WHERE \"ID\">0 AND " + "\"NAME\" NOT IN (" + omitChains + ") ";
             ArrayList jobChains = oldConnection.getArray(sql);
             if (jobChains != null && jobChains.size() > 0) {
                 logger.debug3("Found " + jobChains.size() + " job chains.");
@@ -431,8 +431,8 @@ public class ManagedConverter {
             Set errorLevels = new HashSet();
             while (itJobs.hasNext()) {
                 currJob = (HashMap) itJobs.next();
-                if (currJob.containsKey("job_name") && currJob.containsKey("input_level") 
-                        && currJob.containsKey("output_level") && currJob.containsKey("error_level")) {
+                if (currJob.containsKey("job_name") && currJob.containsKey("input_level") && currJob.containsKey("output_level")
+                        && currJob.containsKey("error_level")) {
                     convertJob(jobChainParent, currJob);
                     outputLevels.add(currJob.get("output_level").toString());
                     inputLevels.add(currJob.get("input_level").toString());
@@ -442,8 +442,8 @@ public class ManagedConverter {
             itJobs = currJobs.iterator();
             while (itJobs.hasNext()) {
                 currJob = (HashMap) itJobs.next();
-                if (currJob.containsKey("job_name") && currJob.containsKey("input_level") 
-                        && currJob.containsKey("output_level") && currJob.containsKey("error_level")) {
+                if (currJob.containsKey("job_name") && currJob.containsKey("input_level") && currJob.containsKey("output_level")
+                        && currJob.containsKey("error_level")) {
                     Element nodeElement = jobChainDocument.createElement("job_chain_node");
                     nodeElement.setAttribute("state", currJob.get("input_level").toString());
                     nodeElement.setAttribute("job", currJob.get("job_name").toString());
@@ -463,9 +463,9 @@ public class ManagedConverter {
             if (chain.get("spooler_id") != null && !chain.get("spooler_id").toString().isEmpty()) {
                 spoolerID = "'" + chain.get("spooler_id").toString() + "'";
             }
-            sql = "INSERT INTO " + JobSchedulerManagedObject.tableManagedObjects
-                    + " ( \"ID\", \"NAME\", \"TITLE\", \"TYPE\", \"SUSPENDED\", \"SPOOLER_ID\" )" + "  VALUES (" + objectId + ", '" + jobChainName
-                    + "', '" + jobChainTitle + "', 'c', " + chain.get("suspended").toString() + ", " + spoolerID + ")";
+            sql = "INSERT INTO " + JobSchedulerManagedObject.tableManagedObjects + " ( \"ID\", \"NAME\", \"TITLE\", \"TYPE\", \"SUSPENDED\", \"SPOOLER_ID\" )"
+                    + "  VALUES (" + objectId + ", '" + jobChainName + "', '" + jobChainTitle + "', 'c', " + chain.get("suspended").toString() + ", "
+                    + spoolerID + ")";
             newConnection.executeUpdate(sql);
             newConnection.updateClob(JobSchedulerManagedObject.tableManagedObjects, "XML", xmlString, "\"ID\"=" + objectId);
             createNode(jobChainParent, 'c', jobChainTitle, true, objectId);
@@ -490,8 +490,8 @@ public class ManagedConverter {
 
     private void convertOrders(int parent, String model) throws Exception {
         try {
-            String query = new String("SELECT o.\"ID\", o.\"SPOOLER_ID\", o.\"JOB_CHAIN\", o.\"ORDER_ID\"" + ", o.\"TITLE\", o.\"SUSPENDED\" "
-                    + " FROM " + JobSchedulerManagedObject.getTableManagedOrders() + " o " + " WHERE o.\"JOB_CHAIN\"='" + model + "' ");
+            String query = new String("SELECT o.\"ID\", o.\"SPOOLER_ID\", o.\"JOB_CHAIN\", o.\"ORDER_ID\"" + ", o.\"TITLE\", o.\"SUSPENDED\" " + " FROM "
+                    + JobSchedulerManagedObject.getTableManagedOrders() + " o " + " WHERE o.\"JOB_CHAIN\"='" + model + "' ");
             ArrayList orders = oldConnection.getArray(query);
             Iterator iter = orders.iterator();
             while (iter.hasNext()) {
@@ -507,9 +507,9 @@ public class ManagedConverter {
         for (int i = 0; i < mappings.length; i++) {
             JobChainMapping map = mappings[i];
             try {
-                String query = new String("SELECT o.\"ID\", o.\"SPOOLER_ID\", o.\"ORDER_ID\"" + ", o.\"TITLE\", 1 as \"SUSPENDED\", '"
-                        + map.managed2Name + "' as \"JOB_CHAIN\"" + " FROM " + JobSchedulerManagedObject.getTableManagedOrders() + " o "
-                        + " WHERE o.\"JOB_CHAIN\"='" + map.managed1Name + "' ");
+                String query = new String("SELECT o.\"ID\", o.\"SPOOLER_ID\", o.\"ORDER_ID\"" + ", o.\"TITLE\", 1 as \"SUSPENDED\", '" + map.managed2Name
+                        + "' as \"JOB_CHAIN\"" + " FROM " + JobSchedulerManagedObject.getTableManagedOrders() + " o " + " WHERE o.\"JOB_CHAIN\"='"
+                        + map.managed1Name + "' ");
                 ArrayList orders = oldConnection.getArray(query);
                 Iterator iter = orders.iterator();
                 if (orders.size() > 0) {
@@ -544,8 +544,7 @@ public class ManagedConverter {
                 orderTitle = order.get("title").toString();
             }
             String key = order.get("id").toString();
-            String payload = oldConnection.getClob("SELECT \"PARAMS\" FROM " + JobSchedulerManagedObject.getTableManagedOrders() + " WHERE \"ID\"="
-                    + key);
+            String payload = oldConnection.getClob("SELECT \"PARAMS\" FROM " + JobSchedulerManagedObject.getTableManagedOrders() + " WHERE \"ID\"=" + key);
             if (payload != null && !payload.isEmpty()) {
                 Document payloadDocument = docBuilder.parse(new ByteArrayInputStream(payload.getBytes()));
                 Node node = payloadDocument.getFirstChild();
@@ -562,8 +561,7 @@ public class ManagedConverter {
                 orderElement.appendChild(orderDocument.importNode(payloadElement, true));
             }
             try {
-                String runtime = oldConnection.getClob("SELECT \"RUN_TIME\" FROM " + JobSchedulerManagedObject.getTableManagedOrders()
-                        + " WHERE \"ID\"=" + key);
+                String runtime = oldConnection.getClob("SELECT \"RUN_TIME\" FROM " + JobSchedulerManagedObject.getTableManagedOrders() + " WHERE \"ID\"=" + key);
                 if (runtime != null && !runtime.isEmpty()) {
                     String runtimeXml = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>" + "<dummy>" + runtime + "</dummy>";
                     Document dummyDocument = docBuilder.parse(new ByteArrayInputStream(runtimeXml.getBytes()));
@@ -580,8 +578,7 @@ public class ManagedConverter {
                     if (children != null) {
                         for (int i = 0; i < children.getLength() && runtimeNode == null; i++) {
                             Node nextChild = children.item(i);
-                            if (nextChild != null && nextChild.getNodeType() == Node.ELEMENT_NODE
-                                    && "run_time".equalsIgnoreCase(nextChild.getNodeName())) {
+                            if (nextChild != null && nextChild.getNodeType() == Node.ELEMENT_NODE && "run_time".equalsIgnoreCase(nextChild.getNodeName())) {
                                 runtimeNode = nextChild;
                             }
                         }
@@ -601,8 +598,8 @@ public class ManagedConverter {
                 spoolerID = "'" + order.get("spooler_id").toString() + "'";
             }
             String sql = "INSERT INTO " + JobSchedulerManagedObject.tableManagedObjects
-                    + " ( \"ID\", \"NAME\", \"TITLE\", \"TYPE\", \"SUSPENDED\", \"SPOOLER_ID\" )" + "  VALUES (" + objectId + ", '" + orderId
-                    + "', '" + orderTitle + "', 'o', " + order.get("suspended").toString() + ", " + spoolerID + ")";
+                    + " ( \"ID\", \"NAME\", \"TITLE\", \"TYPE\", \"SUSPENDED\", \"SPOOLER_ID\" )" + "  VALUES (" + objectId + ", '" + orderId + "', '"
+                    + orderTitle + "', 'o', " + order.get("suspended").toString() + ", " + spoolerID + ")";
             newConnection.executeUpdate(sql);
             newConnection.updateClob(JobSchedulerManagedObject.tableManagedObjects, "XML", xmlString, "\"ID\"=" + objectId);
             createNode(parent, 'o', orderTitle, true, objectId);
@@ -637,14 +634,14 @@ public class ManagedConverter {
                 HashMap jobType = (HashMap) iter.next();
                 String type = jobType.get("type").toString();
                 String title = jobType.get("title").toString();
-                String count = newConnection.getSingleValue("SELECT COUNT(*) FROM " + JobSchedulerManagedObject.getTableManagedJobTypes()
-                        + " WHERE \"TYPE\"='" + type + "'");
+                String count = newConnection.getSingleValue("SELECT COUNT(*) FROM " + JobSchedulerManagedObject.getTableManagedJobTypes() + " WHERE \"TYPE\"='"
+                        + type + "'");
                 if ("0".equalsIgnoreCase(count)) {
                     logger.debug2("Converting job type " + type);
-                    newConnection.executeUpdate("INSERT INTO " + JobSchedulerManagedObject.getTableManagedJobTypes()
-                            + "(\"TYPE\", \"TITLE\") VALUES ('" + type + "','" + title + "')");
-                    byte[] script = oldConnection.getBlob("SELECT \"SCRIPT\" FROM " + JobSchedulerManagedObject.getTableManagedJobTypes()
-                            + " WHERE \"TYPE\"='" + type + "'");
+                    newConnection.executeUpdate("INSERT INTO " + JobSchedulerManagedObject.getTableManagedJobTypes() + "(\"TYPE\", \"TITLE\") VALUES ('" + type
+                            + "','" + title + "')");
+                    byte[] script = oldConnection.getBlob("SELECT \"SCRIPT\" FROM " + JobSchedulerManagedObject.getTableManagedJobTypes() + " WHERE \"TYPE\"='"
+                            + type + "'");
                     newConnection.updateBlob(JobSchedulerManagedObject.getTableManagedJobTypes(), "SCRIPT", script, "\"TYPE\"='" + type + "'");
                 } else {
                     logger.debug2("Job type '" + type + "' already exists in target Database");
@@ -671,8 +668,8 @@ public class ManagedConverter {
                     newConnection.executeUpdate("INSERT INTO "
                             + JobSchedulerManagedObject.getTableManagedConnections()
                             + "(\"CONNECTION\", \"TITLE\", \"DRIVER\", \"CLASS\", \"URL\", \"USERNAME\", \"PASSWORD\", \"CREATED\", \"CREATED_BY\", \"MODIFIED\", \"MODIFIED_BY\") VALUES ("
-                            + "'" + name + "'," + "'" + connection.get("title").toString() + "'," + "'" + connection.get("driver").toString() + "',"
-                            + "'" + connection.get("class").toString() + "'," + "'" + connection.get("url").toString() + "'," + "'"
+                            + "'" + name + "'," + "'" + connection.get("title").toString() + "'," + "'" + connection.get("driver").toString() + "'," + "'"
+                            + connection.get("class").toString() + "'," + "'" + connection.get("url").toString() + "'," + "'"
                             + connection.get("username").toString() + "'," + "'" + connection.get("password").toString() + "'," + "'"
                             + connection.get("created").toString() + "'," + "'" + connection.get("created_by").toString() + "'," + "'"
                             + connection.get("modified").toString() + "'," + "'" + connection.get("modified_by").toString() + "')");

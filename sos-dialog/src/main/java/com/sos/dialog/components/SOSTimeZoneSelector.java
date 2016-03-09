@@ -19,29 +19,24 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.graphics.Point;
 import org.joda.time.DateTimeZone;
 
-
-
 public class SOSTimeZoneSelector {
 
-    private Logger              logger         = Logger.getLogger(SOSTimeZoneSelector.class);
-    private Button              btnOk;
-    private CCombo              cbTimeZone;
-    private String              timeZone;
-    private Shell               dialogShell;
-    Composite                   parent;
+    private Logger logger = Logger.getLogger(SOSTimeZoneSelector.class);
+    private Button btnOk;
+    private CCombo cbTimeZone;
+    private String timeZone;
+    private Shell dialogShell;
+    Composite parent;
 
-    
-    public SOSTimeZoneSelector(Shell parentShell ) {
+    public SOSTimeZoneSelector(Shell parentShell) {
         this.dialogShell = parentShell;
-     }
+    }
 
-    
     public String execute(String timeZone) {
         this.timeZone = timeZone;
         Display display = Display.getDefault();
         Shell shell = showForm(display, dialogShell, timeZone);
-        
-       
+
         new Label(dialogShell, SWT.NONE);
 
         while (!shell.isDisposed()) {
@@ -51,10 +46,8 @@ public class SOSTimeZoneSelector {
         }
         return this.timeZone;
     }
-   
-    /**
-     * @wbp.parser.entryPoint
-     */
+
+    /** @wbp.parser.entryPoint */
     private Shell showForm(final Display display, Shell parentShell, String timeZone) {
         dialogShell = new Shell(parentShell, SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.OK | SWT.APPLICATION_MODAL);
         dialogShell.setMinimumSize(new Point(200, 100));
@@ -65,9 +58,10 @@ public class SOSTimeZoneSelector {
         createContent();
         cbTimeZone.setText(timeZone);
         dialogShell.addDisposeListener(new DisposeListener() {
+
             @Override
             public void widgetDisposed(DisposeEvent e) {
-                 
+
             }
         });
         dialogShell.pack();
@@ -75,7 +69,6 @@ public class SOSTimeZoneSelector {
         return dialogShell;
     }
 
-   
     private void createContent() {
 
         Label lblExpressionFor = new Label(dialogShell, SWT.NONE);
@@ -94,6 +87,7 @@ public class SOSTimeZoneSelector {
         btnOk.setLayoutData(gd_btnOk);
         btnOk.setText("Ok");
         btnOk.addSelectionListener(new SelectionAdapter() {
+
             @Override
             public void widgetSelected(SelectionEvent e) {
                 timeZone = cbTimeZone.getText();
@@ -101,18 +95,15 @@ public class SOSTimeZoneSelector {
             }
         });
         dialogShell.setDefaultButton(btnOk);
-     }
-
+    }
 
     public String getTimeZone() {
         return cbTimeZone.getText();
     }
-    
+
     private void fillTimeZones() {
         Set<String> setOfTimeZones = DateTimeZone.getAvailableIDs();
         cbTimeZone.setItems(setOfTimeZones.toArray(new String[setOfTimeZones.size()]));
     }
-
-  
 
 }

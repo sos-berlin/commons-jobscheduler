@@ -19,8 +19,7 @@ public class ExistsFileTest extends JSToolBox {
 
     private static final Logger LOGGER = Logger.getLogger(ExistsFileTest.class);
     private JSFile objFile = null;
-    private final String strTestFileName = System.getProperty(JobSchedulerFileOperationBase.conPropertyJAVA_IO_TMPDIR)
-            + "/testcheckSteadyStateOfFiles.t";
+    private final String strTestFileName = System.getProperty(JobSchedulerFileOperationBase.conPropertyJAVA_IO_TMPDIR) + "/testcheckSteadyStateOfFiles.t";
 
     public ExistsFileTest() {
         //

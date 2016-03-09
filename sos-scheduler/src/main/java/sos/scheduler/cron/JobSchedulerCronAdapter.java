@@ -189,8 +189,8 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
             if (!crontabFile.canRead()) {
                 logger.info("Failed to read crontab " + crontabFile.getAbsolutePath());
             }
-            HashMap<String, Element> previousMapping = (HashMap<String, Element>) SchedulerJavaObject.getObject(spooler.variables(), spooler_job.name()
-                    + "_" + crontabFile.getAbsolutePath() + "_cron2job_mapping");
+            HashMap<String, Element> previousMapping = (HashMap<String, Element>) SchedulerJavaObject.getObject(spooler.variables(), spooler_job.name() + "_"
+                    + crontabFile.getAbsolutePath() + "_cron2job_mapping");
             if (previousMapping == null) {
                 previousMapping = new HashMap<String, Element>();
             }
@@ -309,15 +309,13 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
             }
             previousMapping.putAll(updatedMapping);
             logger.debug3("Storing mapping to Scheduler variable");
-            SchedulerJavaObject.putObject(previousMapping, spooler.variables(), spooler_job.name() + "_" + crontabFile.getAbsolutePath()
-                    + "_cron2job_mapping");
+            SchedulerJavaObject.putObject(previousMapping, spooler.variables(), spooler_job.name() + "_" + crontabFile.getAbsolutePath() + "_cron2job_mapping");
             logger.debug3("Storing comments mapping to Scheduler variable");
             debugHashMap(currentCommentsMapping, "currentCommentsMapping");
             SchedulerJavaObject.putObject(currentCommentsMapping, spooler.variables(), spooler_job.name() + "_" + crontabFile.getAbsolutePath()
                     + "_cron2comments_mapping");
             logger.debug3("Storing environment variables to Scheduler variable");
-            SchedulerJavaObject.putObject(currentEnvVariables, spooler.variables(), spooler_job.name() + "_" + crontabFile.getAbsolutePath()
-                    + "_env_variables");
+            SchedulerJavaObject.putObject(currentEnvVariables, spooler.variables(), spooler_job.name() + "_" + crontabFile.getAbsolutePath() + "_env_variables");
         } catch (Exception e) {
             LOGGER.error("Error updating Job Scheduler configuration from crontab: " + e.getMessage(), e);
         }
@@ -445,7 +443,7 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
             if (jobFile != null) {
                 throw new Exception("Error occured updating job file \"" + jobFile.getAbsolutePath() + "\": " + e.getMessage(), e);
             } else {
-                throw new Exception("Error occured updating file for job \"" + jobName + "\": " + e. getMessage(), e);
+                throw new Exception("Error occured updating file for job \"" + jobName + "\": " + e.getMessage(), e);
             }
         }
     }

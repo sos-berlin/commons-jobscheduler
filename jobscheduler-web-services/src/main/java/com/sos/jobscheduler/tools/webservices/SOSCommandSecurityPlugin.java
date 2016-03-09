@@ -4,6 +4,6 @@ import com.sos.scheduler.engine.kernel.plugin.AbstractPlugin;
 import com.sos.scheduler.engine.kernel.plugin.UseGuiceModule;
 
 @UseGuiceModule(JobSchedulerCommandSecurityService.class)
-public class SOSCommandSecurityPlugin  extends AbstractPlugin{
-    
+public class SOSCommandSecurityPlugin extends AbstractPlugin {
+
 }

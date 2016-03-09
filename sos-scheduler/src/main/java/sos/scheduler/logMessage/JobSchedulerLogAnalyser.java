@@ -26,11 +26,9 @@ import sos.util.SOSLogger;
 import sos.util.SOSSchedulerLogger;
 import sos.util.SOSString;
 
-/** 
- * @author uwe.risse@sos-berlin.com
+/** @author uwe.risse@sos-berlin.com
  * @author andreas.pueschel@sos-berlin.com
- * @author mueruevet.oeksuez@sos-berlin.com
- */
+ * @author mueruevet.oeksuez@sos-berlin.com */
 public class JobSchedulerLogAnalyser extends JobSchedulerJob {
 
     private static final Logger LOGGER = Logger.getLogger(JobSchedulerLogAnalyser.class);
@@ -170,7 +168,8 @@ public class JobSchedulerLogAnalyser extends JobSchedulerJob {
                 if (logFilenameVariable != null && !logFilenameVariable.isEmpty()) {
                     logFilename = logFilenameVariable;
                 }
-                // on previous execution of this job a different log file may have been partially checked
+                // on previous execution of this job a different log file may
+                // have been partially checked
                 if (logFilename != null && logFilename.length() > 0 && !logFilename.equals(new File(spooler.log().filename()).getCanonicalPath())) {
                     prevLogFile = new File(logFilename);
                     if (!prevLogFile.exists()) {
@@ -179,8 +178,7 @@ public class JobSchedulerLogAnalyser extends JobSchedulerJob {
                     checkPrevFile = new RandomAccessFile(prevLogFile, "r");
                     if (logFilepointer > 0) {
                         checkPrevFile.seek(logFilepointer);
-                        spooler_log.debug3("starting to check previous log file [" + prevLogFile.getCanonicalPath() + "] from position: "
-                                + logFilepointer);
+                        spooler_log.debug3("starting to check previous log file [" + prevLogFile.getCanonicalPath() + "] from position: " + logFilepointer);
                     }
                     // alte Fehlermeldung merken
                     while ((logLine = checkPrevFile.readLine()) != null) {
@@ -203,8 +201,8 @@ public class JobSchedulerLogAnalyser extends JobSchedulerJob {
                     logFilepointer = 0;
                     logFilename = "";
                 }
-            } catch (Exception e) { 
-                // ignore all errors when processing previous log files 
+            } catch (Exception e) {
+                // ignore all errors when processing previous log files
                 // (log files may have been gzipped or removed)
                 spooler_log.info("previous log file [" + (prevLogFile != null ? prevLogFile.getCanonicalPath() : "") + "] processed with errors: "
                         + e.getMessage());
@@ -216,7 +214,7 @@ public class JobSchedulerLogAnalyser extends JobSchedulerJob {
                         checkPrevFile.close();
                     } catch (Exception ex) {
                         // gracefully ignore this error
-                    } 
+                    }
             }
             try {
                 if (sosString.parseToString(getLogFilename()).length() > 0) {
@@ -277,8 +275,7 @@ public class JobSchedulerLogAnalyser extends JobSchedulerJob {
                     try {
                         actlog_date = df.parse(m.logtime);
                     } catch (java.text.ParseException e) {
-                        spooler_log.warn("getLogMessages(): failed to check messages in log file [" + spooler.log().filename() + "]: "
-                                + e.getMessage());
+                        spooler_log.warn("getLogMessages(): failed to check messages in log file [" + spooler.log().filename() + "]: " + e.getMessage());
                         sosLogger.warn("Message Ignored: " + m.logFile);
                         continue;
                     }
@@ -389,8 +386,7 @@ public class JobSchedulerLogAnalyser extends JobSchedulerJob {
                 }
                 spooler.set_var(this.getMonitorJob() + ".filename", logFile.getCanonicalPath());
                 spooler.set_var(this.getMonitorJob() + ".filepointer", Long.toString(checkFile.getFilePointer()));
-                spooler_log.debug3("current log file [" + logFile.getCanonicalPath() + "] processed to position: "
-                        + Long.toString(checkFile.getFilePointer()));
+                spooler_log.debug3("current log file [" + logFile.getCanonicalPath() + "] processed to position: " + Long.toString(checkFile.getFilePointer()));
             } catch (Exception e) {
                 throw new Exception(e);
             } finally {
@@ -399,7 +395,7 @@ public class JobSchedulerLogAnalyser extends JobSchedulerJob {
                         checkFile.close();
                     } catch (Exception ex) {
                         // gracefully ignore this error
-                    } 
+                    }
             }
         } catch (Exception e) {
             spooler_log.warn("getLogMessages(): failed to check messages in log file [" + spooler.log().filename() + "]: " + e.getMessage());
@@ -491,8 +487,8 @@ public class JobSchedulerLogAnalyser extends JobSchedulerJob {
                         }
                     }
                     if (spooler_task.job().order_queue() != null) {
-                        order.set_xml_payload("<?xml version='1.0' encoding='iso-8859-1'?><xml_payload><messages errors='" + countErrors
-                                + "' warnings='" + countWarnings + "' infos='" + countInfos + "'>" + xml_payload + "</messages></xml_payload>");
+                        order.set_xml_payload("<?xml version='1.0' encoding='iso-8859-1'?><xml_payload><messages errors='" + countErrors + "' warnings='"
+                                + countWarnings + "' infos='" + countInfos + "'>" + xml_payload + "</messages></xml_payload>");
                     } else {
                         spooler_task.params().set_var("errors", Integer.toString(countErrors));
                         spooler_task.params().set_var("warnings", Integer.toString(countWarnings));
@@ -502,8 +498,7 @@ public class JobSchedulerLogAnalyser extends JobSchedulerJob {
                         spooler_task.params().set_var("newInfos", Integer.toString(countNewInfos));
                     }
                 }
-                spooler_log.info(countErrors + " errors (new:" + countNewErrors + "), " + countWarnings + " warnings (new: " + countNewWarnings
-                        + ") found");
+                spooler_log.info(countErrors + " errors (new:" + countNewErrors + "), " + countWarnings + " warnings (new: " + countNewWarnings + ") found");
                 this.getConnection().execute("COMMIT");
             } catch (Exception e) {
                 try {
@@ -659,8 +654,8 @@ public class JobSchedulerLogAnalyser extends JobSchedulerJob {
     private String transformString(final SchedulerMessage h) {
         String retVal = "";
         if (!"".equals(h.order_id)) {
-            retVal = "[Timestamp: " + h.logtime + "] " + "[" + h.severity + "] " + "[Job Chain:" + h.job_chain + ", " + "Job: " + h.job_name + ":"
-                    + h.task + "] " + h.getLog();
+            retVal = "[Timestamp: " + h.logtime + "] " + "[" + h.severity + "] " + "[Job Chain:" + h.job_chain + ", " + "Job: " + h.job_name + ":" + h.task
+                    + "] " + h.getLog();
         } else {
             retVal = "[Timestamp: " + h.logtime + "] [" + h.severity + "] [Job:" + h.job_name + "] " + h.getLog();
         }
@@ -750,8 +745,7 @@ public class JobSchedulerLogAnalyser extends JobSchedulerJob {
     private void removeJobFromMessages(final SchedulerMessage m, final GregorianCalendar gclast) throws Exception {
         // remove old messages cause successfully process
         this.getConnection().execute("update SCHEDULER_MESSAGES set \"STATUS\" = -3 where \"LOGTIME\" <= %timestamp_iso('"
-                + SOSDate.getISODateTimeAsString(gclast) + "') and \"STATUS\">=0 and \"JOB_NAME\" <> 'nil' and \"JOB_NAME\"='" + m.getJob_name()
-                + "'");
+                + SOSDate.getISODateTimeAsString(gclast) + "') and \"STATUS\">=0 and \"JOB_NAME\" <> 'nil' and \"JOB_NAME\"='" + m.getJob_name() + "'");
         Iterator msg = messages.iterator();
         SchedulerMessage h = null;
         while (msg.hasNext()) {
@@ -773,16 +767,14 @@ public class JobSchedulerLogAnalyser extends JobSchedulerJob {
     private void removeJobChainFromMessages(final SchedulerMessage m, final GregorianCalendar gclast) throws Exception {
         // remove old messages cause successfully process
         this.getConnection().execute("update SCHEDULER_MESSAGES set \"STATUS\" = -2 where \"LOGTIME\" <= %timestamp_iso('"
-                + SOSDate.getISODateTimeAsString(gclast) + "') and \"STATUS\">=0 and \"JOB_CHAIN\" <> 'nil' and \"JOB_CHAIN\"='" + m.getJob_chain()
-                + "' and " + "\"ORDER_ID\"='" + m.getOrder_id() + "'");
+                + SOSDate.getISODateTimeAsString(gclast) + "') and \"STATUS\">=0 and \"JOB_CHAIN\" <> 'nil' and \"JOB_CHAIN\"='" + m.getJob_chain() + "' and "
+                + "\"ORDER_ID\"='" + m.getOrder_id() + "'");
         Iterator msg = messages.iterator();
         SchedulerMessage h = null;
         while (msg.hasNext()) {
             try {
                 h = (SchedulerMessage) msg.next();
-                if (m != h && m.getJob_chain().equalsIgnoreCase(h.job_chain) 
-                        && !"".equals(m.getJob_chain())
-                        && m.getOrder_id().equals(h.getOrder_id())) {
+                if (m != h && m.getJob_chain().equalsIgnoreCase(h.job_chain) && !"".equals(m.getJob_chain()) && m.getOrder_id().equals(h.getOrder_id())) {
                     h.clear();
                 }
             } catch (ClassCastException e) {

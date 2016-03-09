@@ -184,13 +184,12 @@ public class JobSchedulerSynchronizeJobChains1 extends JobSchedulerJobAdapter {
                 throw new JobSchedulerException("could not pass through current order: " + ex.getMessage(), ex);
             }
             try {
-                nodes = currentStatusXPath.selectNodeList("/spooler/answer/state/job_chains/job_chain/job_chain_node[@job = '" 
-                        + currentJobPath + "']");
+                nodes = currentStatusXPath.selectNodeList("/spooler/answer/state/job_chains/job_chain/job_chain_node[@job = '" + currentJobPath + "']");
                 if (!(nodes != null && nodes.getLength() == 1)) {
                     LOGGER.info("no additional pending orders found");
                     if (SETBACK_TYPE_SETBACK.equalsIgnoreCase(this.setbackType) || spooler_task.order().job_chain_node().next_node().next_node() == null) {
                         spooler_task.order().setback();
-                    } else  if (!spooler_task.order().suspended()) {
+                    } else if (!spooler_task.order().suspended()) {
                         spooler_task.order().set_suspended(true);
                     }
                     LOGGER.info("order is set on hold: " + spooler_task.order().id() + ", " + spooler_task.order().title());
@@ -213,25 +212,23 @@ public class JobSchedulerSynchronizeJobChains1 extends JobSchedulerJobAdapter {
                         syncSessionCondition = " and not(payload/params/param[@name='sync_session_id'])";
                     }
                     String nodeCheck = "(order_queue/order[((@setback_count > 0 and @setback != '') or @suspended = 'yes')" + syncSessionCondition
-                            + "]) | (../job_chain_node[@state='" + dependentNodeName + "']/order_queue/order[@suspended = 'yes'"
-                            + syncSessionCondition + "])";
+                            + "]) | (../job_chain_node[@state='" + dependentNodeName + "']/order_queue/order[@suspended = 'yes'" + syncSessionCondition + "])";
                     LOGGER.debug(nodeCheck);
                     NodeList orderNodes = currentStatusXPath.selectNodeList(nodes.item(i), nodeCheck);
                     dependentJobChainOrders = orderNodes.getLength();
                     LOGGER.debug("node list length for currently suspended/set back orders in job chain [" + dependentJobChainPath + "], state ["
                             + dependentNodeName + "]" + syncSessionDebug + ": " + dependentJobChainOrders);
-                    LOGGER.debug("dependentJobChainPath=" + dependentJobChainPath + " currentJobChainPath=" + currentJobChainPath
-                            + " dependentNodeName=" + dependentNodeName + " currentNodeName=" + currentNodeName);
+                    LOGGER.debug("dependentJobChainPath=" + dependentJobChainPath + " currentJobChainPath=" + currentJobChainPath + " dependentNodeName="
+                            + dependentNodeName + " currentNodeName=" + currentNodeName);
                     if (dependentJobChainPath.equalsIgnoreCase(currentJobChainPath) && dependentNodeName.equalsIgnoreCase(currentNodeName)) {
                         dependentJobChainOrders++;
                     }
-                    LOGGER.debug(dependentJobChainOrders + " pending orders found for job chain [" + dependentJobChainPath + "], state ["
-                            + dependentNodeName + "]" + syncSessionDebug + "");
+                    LOGGER.debug(dependentJobChainOrders + " pending orders found for job chain [" + dependentJobChainPath + "], state [" + dependentNodeName
+                            + "]" + syncSessionDebug + "");
                     int requiredOrders = 1;
                     if (spooler_task.params().value(dependentJobChainName + ";" + dependentNodeName + "_required_orders") != null
                             && !spooler_task.params().value(dependentJobChainName + ";" + dependentNodeName + "_required_orders").isEmpty()) {
-                        requiredOrders = Integer.parseInt(spooler_task.params().value(dependentJobChainName + ";" + dependentNodeName
-                                + "_required_orders"));
+                        requiredOrders = Integer.parseInt(spooler_task.params().value(dependentJobChainName + ";" + dependentNodeName + "_required_orders"));
                     } else if (spooler_task.params().value(dependentJobChainName + "_required_orders") != null
                             && !spooler_task.params().value(dependentJobChainName + "_required_orders").isEmpty()) {
                         String s = spooler_task.params().value(dependentJobChainName + "_required_orders");
@@ -253,7 +250,7 @@ public class JobSchedulerSynchronizeJobChains1 extends JobSchedulerJobAdapter {
                     }
                     if (requiredOrders > dependentJobChainOrders) {
                         passOrders = false;
-                    } else  if (intMinimumSyncHits > 0) {
+                    } else if (intMinimumSyncHits > 0) {
                         satisfiedNode++;
                     }
                     LOGGER.info("job chain [" + dependentJobChainPath + "], state [" + dependentNodeName + "]" + syncSessionDebug + " requires "
@@ -323,26 +320,24 @@ public class JobSchedulerSynchronizeJobChains1 extends JobSchedulerJobAdapter {
                             LOGGER.debug("setting signal variable: " + signalVariable + "=" + Integer.toString(orders[1]));
                             spooler.set_var(signalVariable, Integer.toString(orders[1]));
                         }
-                        LOGGER.info("signalling next " + orders[1] + " orders to be passed through by job chain: " + dependentJobChainPath
-                                + ", state [" + dependentNodeName + "]");
+                        LOGGER.info("signalling next " + orders[1] + " orders to be passed through by job chain: " + dependentJobChainPath + ", state ["
+                                + dependentNodeName + "]");
                     }
                     try {
                         NodeList signalNodes = null;
                         if (this.setbackType.equalsIgnoreCase(SETBACK_TYPE_SETBACK)) {
-                            signalNodes = currentStatusXPath.selectNodeList("/spooler/answer/state/job_chains/job_chain[@path = '"
+                            signalNodes = currentStatusXPath.selectNodeList("/spooler/answer/state/job_chains/job_chain[@path = '" + dependentJobChainPath
+                                    + "']/job_chain_node[@state = '" + dependentNodeName + "']/order_queue/order[@setback_count > 0 and @setback != '' "
+                                    + syncSessionCondition + "]");
+                            LOGGER.debug("orders being set back: " + signalNodes.getLength() + " /spooler/answer/state/job_chains/job_chain[@path = '"
                                     + dependentJobChainPath + "']/job_chain_node[@state = '" + dependentNodeName
-                                    + "']/order_queue/order[@setback_count > 0 and @setback != '' " + syncSessionCondition + "]");
-                            LOGGER.debug("orders being set back: " + signalNodes.getLength()
-                                    + " /spooler/answer/state/job_chains/job_chain[@path = '" + dependentJobChainPath
-                                    + "']/job_chain_node[@state = '" + dependentNodeName
                                     + "']/order_queue/order[@setback_count > 0 and @setback != ''" + syncSessionCondition + "]");
                         } else {
-                            signalNodes = currentStatusXPath.selectNodeList("/spooler/answer/state/job_chains/job_chain[@path = '"
-                                    + dependentJobChainPath + "']/job_chain_node[@state = '" + dependentNodeName
-                                    + "']/order_queue/order[@suspended = 'yes' " + syncSessionCondition + "]");
-                            LOGGER.debug("orders being suspended: " + signalNodes.getLength()
-                                    + " /spooler/answer/state/job_chains/job_chain[@path = '" + dependentJobChainPath
-                                    + "']/job_chain_node[@state = '" + dependentNodeName + "']/order_queue/order[@suspended = 'yes' "
+                            signalNodes = currentStatusXPath.selectNodeList("/spooler/answer/state/job_chains/job_chain[@path = '" + dependentJobChainPath
+                                    + "']/job_chain_node[@state = '" + dependentNodeName + "']/order_queue/order[@suspended = 'yes' " + syncSessionCondition
+                                    + "]");
+                            LOGGER.debug("orders being suspended: " + signalNodes.getLength() + " /spooler/answer/state/job_chains/job_chain[@path = '"
+                                    + dependentJobChainPath + "']/job_chain_node[@state = '" + dependentNodeName + "']/order_queue/order[@suspended = 'yes' "
                                     + syncSessionCondition + "]");
                         }
                         if (signalNodes == null || signalNodes.getLength() < 1) {
@@ -381,8 +376,8 @@ public class JobSchedulerSynchronizeJobChains1 extends JobSchedulerJobAdapter {
                                     } else {
                                         spooler.set_var(signalVariable, Integer.toString(orders[1]));
                                     }
-                                    LOGGER.info("signalling next " + orders[1] + " orders to be passed through by job chain: "
-                                            + dependentJobChainPath + ", state [" + dependentNodeName + "]");
+                                    LOGGER.info("signalling next " + orders[1] + " orders to be passed through by job chain: " + dependentJobChainPath
+                                            + ", state [" + dependentNodeName + "]");
                                 }
                                 String strM = "<modify_order job_chain='" + dependentJobChainPath + "' order='"
                                         + signalNodes.item(i).getAttributes().getNamedItem("id").getNodeValue() + "' setback='no'/>";

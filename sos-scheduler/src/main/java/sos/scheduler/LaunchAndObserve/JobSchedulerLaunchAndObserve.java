@@ -236,8 +236,8 @@ public class JobSchedulerLaunchAndObserve extends JSToolBox implements JSJobUtil
             sosMail.setSOSLogger(sosLogger);
             LOGGER.debug("sending mail: \n" + sosMail.dumpMessageAsString());
             if (!sosMail.send()) {
-                LOGGER.warn("mail server is unavailable, mail for recipient [" + recipient + "] is queued in local directory ["
-                        + sosMail.getQueueDir() + "]:" + sosMail.getLastError());
+                LOGGER.warn("mail server is unavailable, mail for recipient [" + recipient + "] is queued in local directory [" + sosMail.getQueueDir() + "]:"
+                        + sosMail.getLastError());
             }
             sosMail.clearRecipients();
         } catch (Exception e) {
@@ -252,7 +252,7 @@ public class JobSchedulerLaunchAndObserve extends JSToolBox implements JSJobUtil
 
     private void doInitialize() {
         // doInitialize
-    } 
+    }
 
     @Override
     public String myReplaceAll(final String pstrSourceString, final String pstrReplaceWhat, final String pstrReplaceWith) {

@@ -166,12 +166,12 @@ public class JobSchedulerManagedStarter extends JobSchedulerJob {
                         this.getConnection().rollback();
                     } catch (Exception ex) {
                         // no error handling
-                    } 
+                    }
                     try {
                         this.getConnection().disconnect();
                     } catch (Exception ex) {
                         // no error handling
-                    } 
+                    }
                 }
                 return false;
             }
@@ -202,12 +202,12 @@ public class JobSchedulerManagedStarter extends JobSchedulerJob {
                         this.getConnection().rollback();
                     } catch (Exception ex) {
                         // no error handling
-                    } 
+                    }
                     try {
                         this.getConnection().disconnect();
                     } catch (Exception ex) {
                         // no error handling
-                    } 
+                    }
                 }
             }
         }
@@ -322,7 +322,7 @@ public class JobSchedulerManagedStarter extends JobSchedulerJob {
             }
         } catch (Exception e) {
             // gracefully ignore this error
-        } 
+        }
     }
 
     private void handleJobClose(String name, String path, String xml, String answer) throws Exception {
@@ -482,9 +482,8 @@ public class JobSchedulerManagedStarter extends JobSchedulerJob {
                 query += ", t.\"PATH\"";
             }
             if (!(getConnection() instanceof SOSOracleConnection)) {
-                query += " FROM " + JobSchedulerManagedObject.tableManagedObjects + " o LEFT OUTER JOIN " + " "
-                        + JobSchedulerManagedObject.tableManagedTree + " t ON o.\"ID\"=t.\"ITEM_ID\""
-                        + " WHERE (t.\"LINK_ID\"=0 OR t.\"LINK_ID\" IS NULL)";
+                query += " FROM " + JobSchedulerManagedObject.tableManagedObjects + " o LEFT OUTER JOIN " + " " + JobSchedulerManagedObject.tableManagedTree
+                        + " t ON o.\"ID\"=t.\"ITEM_ID\"" + " WHERE (t.\"LINK_ID\"=0 OR t.\"LINK_ID\" IS NULL)";
             } else {
                 query += " FROM " + JobSchedulerManagedObject.tableManagedObjects + " o," + " " + JobSchedulerManagedObject.tableManagedTree + " t"
                         + " WHERE o.\"ID\"=t.\"ITEM_ID\"(+) AND t.\"LINK_ID\"(+)=0";
@@ -538,9 +537,8 @@ public class JobSchedulerManagedStarter extends JobSchedulerJob {
             }
             String blob_query = "SELECT \"XML\"";
             if (!(getConnection() instanceof SOSOracleConnection)) {
-                query += " FROM " + JobSchedulerManagedObject.tableManagedObjects + " o LEFT OUTER JOIN " + " "
-                        + JobSchedulerManagedObject.tableManagedTree + " t ON o.\"ID\"=t.\"ITEM_ID\""
-                        + " WHERE (t.\"LINK_ID\"=0 OR t.\"LINK_ID\" IS NULL)";
+                query += " FROM " + JobSchedulerManagedObject.tableManagedObjects + " o LEFT OUTER JOIN " + " " + JobSchedulerManagedObject.tableManagedTree
+                        + " t ON o.\"ID\"=t.\"ITEM_ID\"" + " WHERE (t.\"LINK_ID\"=0 OR t.\"LINK_ID\" IS NULL)";
             } else {
                 query += " FROM " + JobSchedulerManagedObject.tableManagedObjects + " o," + " " + JobSchedulerManagedObject.tableManagedTree + " t"
                         + " WHERE o.\"ID\"=t.\"ITEM_ID\"(+) AND t.\"LINK_ID\"(+)=0";
@@ -963,7 +961,7 @@ public class JobSchedulerManagedStarter extends JobSchedulerJob {
                     this.getConnection().rollback();
                 } catch (Exception ex) {
                     // no error handling
-                } 
+                }
             }
         }
     }
@@ -971,8 +969,7 @@ public class JobSchedulerManagedStarter extends JobSchedulerJob {
     private void testOrder() {
         startscript = false;
         String name = "Testorder";
-        String xml = "<add_order id=\"myOrder\"  job_chain=\"jobchain\""
-                + "   title=\"Test fuer Managed Starter\"  state=\"100\">"
+        String xml = "<add_order id=\"myOrder\"  job_chain=\"jobchain\"" + "   title=\"Test fuer Managed Starter\"  state=\"100\">"
                 + "       <run_time let_run=\"no\"/></add_order>";
         try {
             handleOrderInit(name, xml);

@@ -117,5 +117,5 @@ public class ManagedJobChainExport {
         int settingsOrders = export.query(JobSchedulerManagedObject.getTableSettings(), "APPLICATION,SECTION,NAME", selSettings, "TYPE,TYPE,TYPE", jobTypes2);
         export.doExport();
     }
-    
+
 }

@@ -52,7 +52,7 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
     public boolean spooler_init() {
         if (!super.spooler_init()) {
             return false;
-            }
+        }
         return true;
     }
 
@@ -94,21 +94,20 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
             super.prepareParams();
             flgAdjust_column_names = objOptions.Adjust_column_names.value();
             flgColumn_names_case_sensitivity = objOptions.Column_names_case_sensitivity.value();
-            if (orderPayload != null 
-                    && orderPayload.var(PARAMETER_SCHEDULER_ORDER_IS_USER_JOB) != null
+            if (orderPayload != null && orderPayload.var(PARAMETER_SCHEDULER_ORDER_IS_USER_JOB) != null
                     && "1".equals(orderPayload.var(PARAMETER_SCHEDULER_ORDER_IS_USER_JOB))) {
                 userJob = true;
             }
-            if (orderPayload != null && orderPayload.var(PARAMETER_RESULTSET_AS_WARNING) != null
-                    && ("1".equals(orderPayload.var(PARAMETER_RESULTSET_AS_WARNING)) 
-                    || "true".equalsIgnoreCase(orderPayload.var(PARAMETER_RESULTSET_AS_WARNING)))) {
+            if (orderPayload != null
+                    && orderPayload.var(PARAMETER_RESULTSET_AS_WARNING) != null
+                    && ("1".equals(orderPayload.var(PARAMETER_RESULTSET_AS_WARNING)) || "true".equalsIgnoreCase(orderPayload.var(PARAMETER_RESULTSET_AS_WARNING)))) {
                 resultsetAsWarning = true;
             }
             execReturnsResultSet = objOptions.exec_returns_resultset.value();
-            if (orderPayload != null && orderPayload.var(PARAMETER_RESULTSET_AS_PARAMETERS) != null
-                        && ("1".equals(orderPayload.var(PARAMETER_RESULTSET_AS_PARAMETERS))
-                        || "true".equalsIgnoreCase(orderPayload.var(PARAMETER_RESULTSET_AS_PARAMETERS)) 
-                        || PARAMETER_NAME_VALUE.equalsIgnoreCase(orderPayload.var(PARAMETER_RESULTSET_AS_PARAMETERS)))) {
+            if (orderPayload != null
+                    && orderPayload.var(PARAMETER_RESULTSET_AS_PARAMETERS) != null
+                    && ("1".equals(orderPayload.var(PARAMETER_RESULTSET_AS_PARAMETERS))
+                            || "true".equalsIgnoreCase(orderPayload.var(PARAMETER_RESULTSET_AS_PARAMETERS)) || PARAMETER_NAME_VALUE.equalsIgnoreCase(orderPayload.var(PARAMETER_RESULTSET_AS_PARAMETERS)))) {
                 resultsetAsParameters = true;
                 if (PARAMETER_NAME_VALUE.equalsIgnoreCase(orderPayload.var(PARAMETER_RESULTSET_AS_PARAMETERS))) {
                     resultsetNameValue = true;
@@ -121,8 +120,7 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
             try {
                 if (userJob) {
                     checkOldTempUsers();
-                    localConnection = this.getUserConnection(orderPayload.var(PARAMETER_SCHEDULER_ORDER_USER_NAME), 
-                        orderPayload.var(PARAMETER_SCHEDULER_ORDER_SCHEMA));
+                    localConnection = this.getUserConnection(orderPayload.var(PARAMETER_SCHEDULER_ORDER_USER_NAME), orderPayload.var(PARAMETER_SCHEDULER_ORDER_SCHEMA));
                 } else {
                     localConnection = JobSchedulerManagedObject.getOrderConnection(this.getConnection(), this);
                     localConnection.connect();
@@ -213,7 +211,7 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
             }
             if (getLogger().hasWarnings() || getLogger().hasErrors()) {
                 spooler_task.end();
-                }
+            }
             return rc && orderJob;
         } catch (Exception e) {
             spooler_log.warn("error occurred processing managed order ["
@@ -234,7 +232,7 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
                 }
             } catch (Exception ex) {
                 // ignore this error
-            } 
+            }
             if (userJob) {
                 closeUserConnection(localConnection);
                 updateRunTime(order, getLogger(), getConnection());
@@ -249,8 +247,7 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
     static public void updateRunTime(final Order order, final SOSLogger logger, final SOSConnection conn) {
         try {
             String id = order.id();
-            String nextStart = conn.getSingleValue("SELECT \"NEXT_START\" FROM " + JobSchedulerManagedObject.getTableManagedUserJobs()
-                    + " WHERE \"ID\"=" + id);
+            String nextStart = conn.getSingleValue("SELECT \"NEXT_START\" FROM " + JobSchedulerManagedObject.getTableManagedUserJobs() + " WHERE \"ID\"=" + id);
             if (nextStart == null || nextStart.isEmpty()) {
                 try {
                     logger.debug3("No next start for order " + id + ". Deleting order.");
@@ -261,10 +258,10 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
             } else {
                 String nextTime = conn.getSingleValue("SELECT " + nextStart);
                 logger.debug3("next Start for this order: " + nextTime);
-                String jobRunTime = "CONCAT('<run_time let_run = \"yes\"><date date=\"',DATE('" + nextTime
-                        + "'),'\"><period single_start=\"', TIME('" + nextTime + "'), '\"/></date></run_time>')";
-                conn.execute("UPDATE " + JobSchedulerManagedObject.getTableManagedUserJobs() + " SET \"RUN_TIME\"=" + jobRunTime
-                        + ", \"NEXT_TIME\"='" + nextTime + "', UPDATED=1 WHERE " + " \"ID\"=" + id);
+                String jobRunTime = "CONCAT('<run_time let_run = \"yes\"><date date=\"',DATE('" + nextTime + "'),'\"><period single_start=\"', TIME('"
+                        + nextTime + "'), '\"/></date></run_time>')";
+                conn.execute("UPDATE " + JobSchedulerManagedObject.getTableManagedUserJobs() + " SET \"RUN_TIME\"=" + jobRunTime + ", \"NEXT_TIME\"='"
+                        + nextTime + "', UPDATED=1 WHERE " + " \"ID\"=" + id);
             }
         } catch (Exception e) {
             try {
@@ -340,8 +337,8 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
             grantCounter++;
         }
         try {
-            getConnection().execute("INSERT INTO " + JobSchedulerManagedObject.getTableManagedTempUsers()
-                    + "(\"NAME\", \"STATUS\", \"MODIFIED\") VALUES (" + "'" + revokeUserQuoted + "', 'BEFORE_CREATION', %now)");
+            getConnection().execute("INSERT INTO " + JobSchedulerManagedObject.getTableManagedTempUsers() + "(\"NAME\", \"STATUS\", \"MODIFIED\") VALUES ("
+                    + "'" + revokeUserQuoted + "', 'BEFORE_CREATION', %now)");
             getConnection().commit();
         } catch (Exception e) {
         }
@@ -353,8 +350,8 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
             this.getConnection().execute(newGrant);
         }
         try {
-            getConnection().execute("UPDATE " + JobSchedulerManagedObject.getTableManagedTempUsers()
-                    + " SET \"STATUS\"='CREATED', \"MODIFIED\"= %now WHERE " + "\"NAME\"='" + revokeUserQuoted + "'");
+            getConnection().execute("UPDATE " + JobSchedulerManagedObject.getTableManagedTempUsers() + " SET \"STATUS\"='CREATED', \"MODIFIED\"= %now WHERE "
+                    + "\"NAME\"='" + revokeUserQuoted + "'");
         } catch (Exception e) {
         }
         getConnection().commit();
@@ -366,8 +363,7 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
         SOSArguments arguments = new SOSArguments(dbProperty);
         try {
             spooler_log.debug6("..creating user connection object");
-            userConnection = SOSConnection.createInstance(spoolerProp.getProperty("db_class"), arguments.as_string("-class=", ""), 
-                arguments.as_string("-url=", ""), newUserName, password, getLogger());
+            userConnection = SOSConnection.createInstance(spoolerProp.getProperty("db_class"), arguments.as_string("-class=", ""), arguments.as_string("-url=", ""), newUserName, password, getLogger());
         } catch (Exception e) {
             throw new JobSchedulerException("error occurred establishing database connection: " + e.getMessage());
         }
@@ -406,8 +402,7 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
             } catch (Exception e) {
             }
             deleteUser(revokeUser);
-            getConnection().execute("DELETE FROM " + JobSchedulerManagedObject.getTableManagedTempUsers() + " WHERE \"NAME\"='" + revokeUserQuoted
-                    + "'");
+            getConnection().execute("DELETE FROM " + JobSchedulerManagedObject.getTableManagedTempUsers() + " WHERE \"NAME\"='" + revokeUserQuoted + "'");
         } catch (Exception e) {
             try {
                 getLogger().warn("Error occurred removing user: " + e);

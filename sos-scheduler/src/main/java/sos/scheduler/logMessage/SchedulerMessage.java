@@ -167,10 +167,10 @@ public class SchedulerMessage {
     public boolean equals(final Object o) {
         SchedulerMessage m = (SchedulerMessage) o;
         return m.scheduler_id.equals(scheduler_id) && m.cluster_member_id.equals(cluster_member_id) && m.job_chain.equals(job_chain)
-                && m.job_name.equals(job_name) && m.order_id.equals(order_id) && m.getLogFilename().equals(this.getLogFilename())
-                && m.logtime.equals(logtime) && m.log.equals(log);
+                && m.job_name.equals(job_name) && m.order_id.equals(order_id) && m.getLogFilename().equals(this.getLogFilename()) && m.logtime.equals(logtime)
+                && m.log.equals(log);
     }
-    
+
     @Override
     public int hashCode() {
         return super.hashCode();
@@ -186,8 +186,8 @@ public class SchedulerMessage {
 
     private String key() {
         String s = "\"SCHEDULER_ID\" = '" + scheduler_id + "' and " + "\"CLUSTER_MEMBER_ID\" = '" + cluster_member_id + "' and " + "\"ORDER_ID\" = '"
-                + order_id + "' and " + "\"JOB_CHAIN\" = '" + job_chain + "' and " + "\"JOB_NAME\" = '" + job_name + "' and " + "\"TASK\" = " + task
-                + " and " + "\"LOGTIME\" = " + "%timestamp_iso('" + logtime + "') and " + "\"SEVERITY\" = '" + severity + "'";
+                + order_id + "' and " + "\"JOB_CHAIN\" = '" + job_chain + "' and " + "\"JOB_NAME\" = '" + job_name + "' and " + "\"TASK\" = " + task + " and "
+                + "\"LOGTIME\" = " + "%timestamp_iso('" + logtime + "') and " + "\"SEVERITY\" = '" + severity + "'";
         return s;
     }
 
@@ -210,9 +210,9 @@ public class SchedulerMessage {
                             + "\"JOB_NAME\",\"TASK\",\"JOB_CHAIN\",\"ORDER_ID\",\"CNT\",\"STATUS\",\"CREATION_DATE\")";
                     sql += " values ";
                     sql += "(";
-                    sql += "'" + scheduler_id + "','" + cluster_member_id + "','" + this.getLogFilename() + "'," + "%timestamp_iso('" + logtime
-                            + "'),'" + severity + "','" + normalizeLog(log) + "','" + job_name + "'," + task + ",'" + job_chain + "','" + order_id
-                            + "'," + 0 + "," + status + "," + "%now";
+                    sql += "'" + scheduler_id + "','" + cluster_member_id + "','" + this.getLogFilename() + "'," + "%timestamp_iso('" + logtime + "'),'"
+                            + severity + "','" + normalizeLog(log) + "','" + job_name + "'," + task + ",'" + job_chain + "','" + order_id + "'," + 0 + ","
+                            + status + "," + "%now";
 
                     sql += ")";
                     sosLogger.debug3(sql);
@@ -258,8 +258,8 @@ public class SchedulerMessage {
     public String transformString(final SchedulerMessage h) {
         String retVal = "";
         if (!"".equals(h.order_id)) {
-            retVal = "[Timestamp: " + h.logtime + "] " + "[" + h.severity + "] " + "[Job Chain:" + h.job_chain + ", " + "Job: " + h.job_name + ":"
-                    + h.task + "] " + h.log;
+            retVal = "[Timestamp: " + h.logtime + "] " + "[" + h.severity + "] " + "[Job Chain:" + h.job_chain + ", " + "Job: " + h.job_name + ":" + h.task
+                    + "] " + h.log;
         } else {
             retVal = "[Timestamp: " + h.logtime + "] [" + h.severity + "] [Job:" + h.job_name + "] " + h.log;
         }

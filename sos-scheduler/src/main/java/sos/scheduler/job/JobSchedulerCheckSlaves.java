@@ -109,7 +109,7 @@ public class JobSchedulerCheckSlaves extends JobSchedulerJob {
             }
             return super.equals(other);
         }
-        
+
         @Override
         public int hashCode() {
             return super.hashCode();
@@ -290,7 +290,9 @@ public class JobSchedulerCheckSlaves extends JobSchedulerJob {
                             registeredSlaves.add(slave);
                         }
                     }
-                    // Wenn keine Slaves explizit angegeben sind, dann wenigstens gucken, ob alle registrierten auch connected sind.
+                    // Wenn keine Slaves explizit angegeben sind, dann
+                    // wenigstens gucken, ob alle registrierten auch connected
+                    // sind.
                     if (!hasRequests) {
                         if (slave.isConnected()) {
                             connectedSlaves.add(slave);

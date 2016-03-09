@@ -461,8 +461,7 @@ public class JobSchedulerLoadTestLauncher {
             terminateTimeInSec = System.currentTimeMillis() + (this.schedulerLauncherDuration * 1000);
             sosLogger.debug("..time until termination: " + terminateTimeInSec);
             while (loop) {
-                sosLogger.info("..sending request to job scheduler [" + this.schedulerLauncherHost + ":" + this.schedulerLauncherPort + "]: "
-                        + request);
+                sosLogger.info("..sending request to job scheduler [" + this.schedulerLauncherHost + ":" + this.schedulerLauncherPort + "]: " + request);
                 if (System.currentTimeMillis() > this.terminateTimeInSec) {
                     sosLogger.debug("..time until termination: " + terminateTimeInSec);
                     loop = false;
@@ -489,8 +488,7 @@ public class JobSchedulerLoadTestLauncher {
             stateText = "..number of jobs launched: " + (counter) + "(error=" + (counterError) + ";success=" + (counter - counterError) + ")";
             showSummary(counter, counterError, timeInSec);
         } catch (Exception e) {
-            stateText = "..number of jobs launched: " + (counter) + "(error=" + counterError + ";success=" + (counter - counterError) + ")"
-                    + e.getMessage();
+            stateText = "..number of jobs launched: " + (counter) + "(error=" + counterError + ";success=" + (counter - counterError) + ")" + e.getMessage();
             sosLogger.info("..error in " + SOSClassUtil.getClassName() + ": " + e.getMessage());
             throw new Exception("..error in " + SOSClassUtil.getClassName() + ": " + e.getMessage(), e);
         } finally {

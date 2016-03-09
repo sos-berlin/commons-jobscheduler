@@ -240,8 +240,8 @@ public class FileConsumerTool extends Thread implements MessageListener, Excepti
         return running;
     }
 
-    protected void consumeMessagesAndClose(final ActiveMQConnection connection, final Session session, final MessageConsumer consumer)
-            throws JMSException, IOException {
+    protected void consumeMessagesAndClose(final ActiveMQConnection connection, final Session session, final MessageConsumer consumer) throws JMSException,
+            IOException {
         LOGGER.debug("[" + this.getName() + "] We are about to wait until we consume: " + maxiumMessages + " message(s) then we will shutdown");
         for (int i = 0; i < maxiumMessages && isRunning();) {
             Message message = consumer.receive(1000);
@@ -361,5 +361,5 @@ public class FileConsumerTool extends Thread implements MessageListener, Excepti
     public void setVerbose(final boolean verbose) {
         this.verbose = verbose;
     }
-    
+
 }

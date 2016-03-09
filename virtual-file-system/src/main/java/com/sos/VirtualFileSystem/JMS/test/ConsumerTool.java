@@ -163,7 +163,7 @@ public class ConsumerTool extends Thread implements MessageListener, ExceptionLi
                     }
                     LOGGER.info("[" + this.getName() + "] Received: '" + msg + "' (length " + length + ")");
                 }
-            } else  if (verbose) {
+            } else if (verbose) {
                 LOGGER.info("[" + this.getName() + "] Received: '" + message + "'");
             }
             if (message.getJMSReplyTo() != null) {
@@ -196,8 +196,7 @@ public class ConsumerTool extends Thread implements MessageListener, ExceptionLi
         return running;
     }
 
-    protected void consumeMessagesAndClose(final Connection connection, final Session session, final MessageConsumer consumer) throws JMSException,
-            IOException {
+    protected void consumeMessagesAndClose(final Connection connection, final Session session, final MessageConsumer consumer) throws JMSException, IOException {
         LOGGER.info("[" + this.getName() + "] We are about to wait until we consume: " + maxiumMessages + " message(s) then we will shutdown");
         for (int i = 0; i < maxiumMessages && isRunning();) {
             Message message = consumer.receive(1000);

@@ -302,7 +302,7 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
     }
 
     public void RenameTimeStamp() {
-        // 
+        //
     }
 
     public void MustExist() throws Exception {
@@ -816,7 +816,7 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
             strTempFileName = objF.getAbsoluteFile().getAbsolutePath();
             strTempFileName = strTempFileName.replaceAll("\\\\", "/");
         } catch (IOException e) {
-            // 
+            //
         }
         return strTempFileName;
     }
@@ -1024,8 +1024,7 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
     }
 
     public String toXml() {
-        String strXml = String.format("<file name='%1$s' size='%2$d' modificationdate='%3$s' />", this.getAbsolutePath(), fleFile.length(), 
-                new Date(fleFile.lastModified()));
+        String strXml = String.format("<file name='%1$s' size='%2$d' modificationdate='%3$s' />", this.getAbsolutePath(), fleFile.length(), new Date(fleFile.lastModified()));
         return strXml;
     }
 
@@ -1094,5 +1093,5 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
     public void setCharSet4InputFile(final String strCharSet4InputFile) {
         this.strCharSet4InputFile = strCharSet4InputFile;
     }
-    
+
 }

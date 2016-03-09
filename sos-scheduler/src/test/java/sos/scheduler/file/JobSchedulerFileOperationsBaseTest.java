@@ -24,8 +24,7 @@ public class JobSchedulerFileOperationsBaseTest {
     private static JobSchedulerFileOperationBase objFOP = null;
     private static HashMap<String, String> params = new HashMap<String, String>();
     private JSFile objFile = null;
-    private final String strTestFileName = System.getProperty(JobSchedulerFileOperationBase.conPropertyJAVA_IO_TMPDIR)
-            + "/testcheckSteadyStateOfFiles.t";
+    private final String strTestFileName = System.getProperty(JobSchedulerFileOperationBase.conPropertyJAVA_IO_TMPDIR) + "/testcheckSteadyStateOfFiles.t";
 
     public JobSchedulerFileOperationsBaseTest() {
         //

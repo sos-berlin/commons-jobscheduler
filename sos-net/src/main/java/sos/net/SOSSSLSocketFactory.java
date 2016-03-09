@@ -83,6 +83,7 @@ public class SOSSSLSocketFactory extends SSLSocketFactory {
             doTunnelHandshake(tunnel, host, port);
             SSLSocket sslSocket = (SSLSocket) sslFactory.createSocket(tunnel, host, port, autoClose);
             sslSocket.addHandshakeCompletedListener(new HandshakeCompletedListener() {
+
                 public void handshakeCompleted(HandshakeCompletedEvent event) {
                     done = true;
                 }
@@ -98,8 +99,7 @@ public class SOSSSLSocketFactory extends SSLSocketFactory {
 
     private void doTunnelHandshake(Socket tunnel, String host, int port) throws IOException {
         OutputStream out = tunnel.getOutputStream();
-        String msg = "CONNECT " + host + ":" + port + " HTTP/1.0\n" + "User-Agent: " + sun.net.www.protocol.http.HttpURLConnection.userAgent
-                + "\r\n\r\n";
+        String msg = "CONNECT " + host + ":" + port + " HTTP/1.0\n" + "User-Agent: " + sun.net.www.protocol.http.HttpURLConnection.userAgent + "\r\n\r\n";
         byte b[];
         try {
             b = msg.getBytes("ASCII7");

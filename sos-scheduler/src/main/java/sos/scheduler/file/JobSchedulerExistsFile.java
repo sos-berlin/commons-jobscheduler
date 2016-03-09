@@ -28,8 +28,7 @@ public class JobSchedulerExistsFile extends JobSchedulerFileOperationBase {
             initialize(conSVNVersion);
             CheckMandatoryFile();
             SOSFileOperations = new SOSFileSystemOperations();
-            flgOperationWasSuccessful = SOSFileOperations.existsFile(file, fileSpec, Pattern.CASE_INSENSITIVE, minFileAge, 
-                    maxFileAge, minFileSize, maxFileSize, skipFirstFiles, skipLastFiles, objSOSLogger);
+            flgOperationWasSuccessful = SOSFileOperations.existsFile(file, fileSpec, Pattern.CASE_INSENSITIVE, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles, skipLastFiles, objSOSLogger);
             if (flgOperationWasSuccessful == true) {
                 flgOperationWasSuccessful = checkSteadyStateOfFiles();
             }
@@ -45,5 +44,5 @@ public class JobSchedulerExistsFile extends JobSchedulerFileOperationBase {
             return false;
         }
     }
-    
+
 }

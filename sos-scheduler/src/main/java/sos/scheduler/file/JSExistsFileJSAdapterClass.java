@@ -137,7 +137,7 @@ public class JSExistsFileJSAdapterClass extends JobSchedulerJobAdapter {
         boolean rc1 = pflgResult;
         if (!rc1 && objO.gracious.isGraciousAll()) {
             return signalSuccess();
-        } else  if (!rc1 && objO.gracious.isGraciousTrue()) {
+        } else if (!rc1 && objO.gracious.isGraciousTrue()) {
             if (isJobchain()) {
                 return conJobChainFailure;
             }

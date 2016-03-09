@@ -43,7 +43,6 @@ import com.sos.i18n.Msg;
 import com.sos.i18n.Msg.BundleBaseName;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
-
 @JSOptionClass(name = "JSOptionsClass", description = "JSOptionsClass")
 @I18NResourceBundle(baseName = "com_sos_JSHelper_Messages", defaultLocale = "en")
 public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Serializable {
@@ -88,9 +87,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     public Preferences objPreferenceStore = null;
 
     protected enum IterationTypes {
-        setRecord(1), getRecord(2), toOut(3), createXML(4), setDefaultValues(5), clearAllValues(6), countSegmentFields(7), CheckMandatory(12), setPrefix(
-                14), toString(13), getCommandLine(14), DirtyToString(15), getKeyValuePair(16), LoadValues(17), StoreValues(18), getQuotedCommandLine(
-                19);
+        setRecord(1), getRecord(2), toOut(3), createXML(4), setDefaultValues(5), clearAllValues(6), countSegmentFields(7), CheckMandatory(12), setPrefix(14), toString(
+                13), getCommandLine(14), DirtyToString(15), getKeyValuePair(16), LoadValues(17), StoreValues(18), getQuotedCommandLine(19);
 
         private int intType;
 
@@ -117,10 +115,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         ArchiverOptions();
     }
 
-    @JSOptionDefinition(name = "BaseDirectory", description = "A Base Directory for all relative FileNames used by SOSOptionFileName", 
-            key = "Base_Directory", type = "SOSOptionFolderName", mandatory = false)
-    public SOSOptionFolderName BaseDirectory = new SOSOptionFolderName(this, CLASS_NAME + ".Base_Directory", 
-            "A Base Directory for all relative FileNames used by SOSOptionFileName", "env:user.dir", "env:user.dir", false);
+    @JSOptionDefinition(name = "BaseDirectory", description = "A Base Directory for all relative FileNames used by SOSOptionFileName", key = "Base_Directory", type = "SOSOptionFolderName", mandatory = false)
+    public SOSOptionFolderName BaseDirectory = new SOSOptionFolderName(this, CLASS_NAME + ".Base_Directory", "A Base Directory for all relative FileNames used by SOSOptionFileName", "env:user.dir", "env:user.dir", false);
 
     public SOSOptionFolderName getBaseDirectory() {
         return BaseDirectory;
@@ -131,10 +127,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         return this;
     }
 
-    @JSOptionDefinition(name = "DateFormatMask", description = "General Mask for date fomatting", key = "Date_Format_Mask", type = "SOSOptionString", 
-            mandatory = false)
-    public SOSOptionString DateFormatMask = new SOSOptionString(this, CLASS_NAME + ".Date_Format_Mask", "General Mask for date fomatting", 
-            "yyyy-MM-dd", "yyyy-MM-dd", false);
+    @JSOptionDefinition(name = "DateFormatMask", description = "General Mask for date fomatting", key = "Date_Format_Mask", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString DateFormatMask = new SOSOptionString(this, CLASS_NAME + ".Date_Format_Mask", "General Mask for date fomatting", "yyyy-MM-dd", "yyyy-MM-dd", false);
 
     public SOSOptionString getDateFormatMask() {
         return DateFormatMask;
@@ -145,10 +139,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         return this;
     }
 
-    @JSOptionDefinition(name = "TimeFormatMask", description = "General Mask for time formatting", key = "Time_Format_Mask", type = "SOSOptionString", 
-            mandatory = false)
-    public SOSOptionString TimeFormatMask = new SOSOptionString(this, CLASS_NAME + ".Time_Format_Mask", "General Mask for time formatting", 
-            "HH:mm:ss", "HH:mm:ss", false);
+    @JSOptionDefinition(name = "TimeFormatMask", description = "General Mask for time formatting", key = "Time_Format_Mask", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString TimeFormatMask = new SOSOptionString(this, CLASS_NAME + ".Time_Format_Mask", "General Mask for time formatting", "HH:mm:ss", "HH:mm:ss", false);
 
     public SOSOptionString getTimeFormatMask() {
         return TimeFormatMask;
@@ -159,10 +151,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         return this;
     }
 
-    @JSOptionDefinition(name = "Scheduler_Hot_Folder", description = "Pathname to the JobScheduler live-folder", key = "Scheduler_Hot_Folder", 
-            type = "SOSOptionFolderName", mandatory = true)
-    public SOSOptionFolderName Scheduler_Hot_Folder = new SOSOptionFolderName(this, CLASS_NAME + ".Scheduler_Hot_Folder", 
-            "Pathname to the JobScheduler live-folder", "${SCHEDULER_DATA}/config/live", "", true);
+    @JSOptionDefinition(name = "Scheduler_Hot_Folder", description = "Pathname to the JobScheduler live-folder", key = "Scheduler_Hot_Folder", type = "SOSOptionFolderName", mandatory = true)
+    public SOSOptionFolderName Scheduler_Hot_Folder = new SOSOptionFolderName(this, CLASS_NAME + ".Scheduler_Hot_Folder", "Pathname to the JobScheduler live-folder", "${SCHEDULER_DATA}/config/live", "", true);
 
     public String getScheduler_Hot_Folder() {
         return Scheduler_Hot_Folder.Value();
@@ -173,10 +163,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         return this;
     }
 
-    @JSOptionDefinition(name = "Scheduler_Data", description = "Data Folder of JobScheduler Installation", key = "Scheduler_Data", 
-            type = "SOSOptionFolderName", mandatory = false)
-    public SOSOptionFolderName Scheduler_Data = new SOSOptionFolderName(this, CLASS_NAME + ".Scheduler_Data", "Data Folder of JobScheduler Installation", 
-            "env:SCHEDULER_DATA", "env:SCHEDULER_DATA", false);
+    @JSOptionDefinition(name = "Scheduler_Data", description = "Data Folder of JobScheduler Installation", key = "Scheduler_Data", type = "SOSOptionFolderName", mandatory = false)
+    public SOSOptionFolderName Scheduler_Data = new SOSOptionFolderName(this, CLASS_NAME + ".Scheduler_Data", "Data Folder of JobScheduler Installation", "env:SCHEDULER_DATA", "env:SCHEDULER_DATA", false);
 
     public String getScheduler_Data() {
         return Scheduler_Data.Value();
@@ -187,10 +175,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         return this;
     }
 
-    @JSOptionDefinition(name = "Scheduler_Home", description = "Home Root Folder of JobScheduler", key = "Scheduler_Home", type = "SOSOptionFileName", 
-            mandatory = true)
-    public SOSOptionFolderName Scheduler_Home = new SOSOptionFolderName(this, CLASS_NAME + ".Scheduler_Home", "Home Root Folder of JobScheduler", 
-            "env:SCHEDULER_HOME", "env:SCHEDULER_HOME", false);
+    @JSOptionDefinition(name = "Scheduler_Home", description = "Home Root Folder of JobScheduler", key = "Scheduler_Home", type = "SOSOptionFileName", mandatory = true)
+    public SOSOptionFolderName Scheduler_Home = new SOSOptionFolderName(this, CLASS_NAME + ".Scheduler_Home", "Home Root Folder of JobScheduler", "env:SCHEDULER_HOME", "env:SCHEDULER_HOME", false);
 
     public String getScheduler_Home() {
         return Scheduler_Home.Value();
@@ -201,15 +187,11 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         return this;
     }
 
-    @JSOptionDefinition(name = "Local_user", description = "I18N is for internationalization of Application", key = "Local_user", 
-            type = "SOSOptionUserName", mandatory = true)
-    public SOSOptionUserName UserName = new SOSOptionUserName(this, CLASS_NAME + ".local_user", "Name of local user", 
-            System.getProperty("user.name"), System.getProperty("user.name"), true);
-    
-    @JSOptionDefinition(name = "Locale", description = "I18N is for internationalization of Application", key = "Locale", 
-            type = "SOSOptionString", mandatory = true)
-    public SOSOptionLocale Locale = new SOSOptionLocale(this, CLASS_NAME + ".Locale", "I18N is for internationalization of Application", 
-            "env:SOS_LOCALE", java.util.Locale.getDefault().toString(), true);
+    @JSOptionDefinition(name = "Local_user", description = "I18N is for internationalization of Application", key = "Local_user", type = "SOSOptionUserName", mandatory = true)
+    public SOSOptionUserName UserName = new SOSOptionUserName(this, CLASS_NAME + ".local_user", "Name of local user", System.getProperty("user.name"), System.getProperty("user.name"), true);
+
+    @JSOptionDefinition(name = "Locale", description = "I18N is for internationalization of Application", key = "Locale", type = "SOSOptionString", mandatory = true)
+    public SOSOptionLocale Locale = new SOSOptionLocale(this, CLASS_NAME + ".Locale", "I18N is for internationalization of Application", "env:SOS_LOCALE", java.util.Locale.getDefault().toString(), true);
 
     public java.util.Locale getI18NLocale() {
         return new java.util.Locale(Locale.Value());
@@ -226,8 +208,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 
     @JSOptionDefinition(name = "CheckNotProcessedOptions", description = "If this Option is set to true, all not processed or recognized options "
             + "are reported as a warning", key = "CheckNotProcessedOptions", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean CheckNotProcessedOptions = new SOSOptionBoolean(this, CLASS_NAME + ".CheckNotProcessedOptions", 
-            "If this Option is set to true, all not processed or recognized options are reported as a warning", "false", "false", false);
+    public SOSOptionBoolean CheckNotProcessedOptions = new SOSOptionBoolean(this, CLASS_NAME + ".CheckNotProcessedOptions", "If this Option is set to true, all not processed or recognized options are reported as a warning", "false", "false", false);
 
     public String getCheckNotProcessedOptions() {
         return CheckNotProcessedOptions.Value();
@@ -250,24 +231,20 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         return this;
     }
 
-    @JSOptionDefinition(name = "ArchiverOptions", value = "", description = "Optionen f�r die Dateiarchivierung", key = "", type = "JSOptionClass", 
-            mandatory = false)
+    @JSOptionDefinition(name = "ArchiverOptions", value = "", description = "Optionen f�r die Dateiarchivierung", key = "", type = "JSOptionClass", mandatory = false)
     private JSArchiverOptions objArchiverOptions = null;
 
     @JSOptionDefinition(name = "TestMode", value = "false", description = "Test Modus schalten ", key = "TestMode", type = "JSOptionBoolean", mandatory = false)
     public SOSOptionBoolean TestMode = new SOSOptionBoolean(this, CLASS_NAME + ".TestMode", "Test Modus schalten ", "false", "false", false);
 
-    @JSOptionDefinition(name = "Debug", value = "false", description = "Debug-Modus schalten (true/false)", key = "Debug", type = "JSOptionBoolean", 
-            mandatory = false)
+    @JSOptionDefinition(name = "Debug", value = "false", description = "Debug-Modus schalten (true/false)", key = "Debug", type = "JSOptionBoolean", mandatory = false)
     public SOSOptionBoolean Debug = new SOSOptionBoolean(this, CLASS_NAME + ".Debug", "Debug-Modus schalten (true/false)", "false", "false", false);
 
     @JSOptionDefinition(name = "DebugLevel", value = "0", description = "DebugLevel", key = "DebugLevel", type = "JSOptionInteger", mandatory = false)
     public SOSOptionInteger DebugLevel = new SOSOptionInteger(this, CLASS_NAME + ".DebugLevel", "DebugLevel", "0", "0", false);
-    
-    @JSOptionDefinition(name = "log_filename", description = "Name der Datei mit den Logging-Eintr�gen", key = "log_filename", 
-            type = "SOSOptionFileName", mandatory = false)
-    public SOSOptionLogFileName log_filename = new SOSOptionLogFileName(this, CLASS_NAME + ".log_filename", "Name der Datei mit den Logging-Eintr�gen", 
-            "stdout", "stdout", false);
+
+    @JSOptionDefinition(name = "log_filename", description = "Name der Datei mit den Logging-Eintr�gen", key = "log_filename", type = "SOSOptionFileName", mandatory = false)
+    public SOSOptionLogFileName log_filename = new SOSOptionLogFileName(this, CLASS_NAME + ".log_filename", "Name der Datei mit den Logging-Eintr�gen", "stdout", "stdout", false);
 
     public SOSOptionLogFileName getlog_filename() {
         return log_filename;
@@ -277,10 +254,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         log_filename = pstrValue;
     }
 
-    @JSOptionDefinition(name = "log4jPropertyFileName", description = "Name of the LOG4J Property File", key = "log4j_Property_FileName", 
-            type = "SOSOptionInFileName", mandatory = false)
-    public SOSOptionInFileName log4jPropertyFileName = new SOSOptionInFileName(this, CLASS_NAME + ".log4j_Property_FileName", 
-            "Name of the LOG4J Property File", "env:log4j.configuration", "./log4j.properties", false);
+    @JSOptionDefinition(name = "log4jPropertyFileName", description = "Name of the LOG4J Property File", key = "log4j_Property_FileName", type = "SOSOptionInFileName", mandatory = false)
+    public SOSOptionInFileName log4jPropertyFileName = new SOSOptionInFileName(this, CLASS_NAME + ".log4j_Property_FileName", "Name of the LOG4J Property File", "env:log4j.configuration", "./log4j.properties", false);
 
     public String getlog4jPropertyFileName() {
         return log4jPropertyFileName.Value();
@@ -292,8 +267,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     }
 
     @JSOptionDefinition(name = "ApplicationName", description = "Name of the Application", key = "ApplicationName", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString ApplicationName = new SOSOptionString(this, CLASS_NAME + ".ApplicationName", "Name of the Application", 
-            "env:SOSApplicationName", "env:SOSApplicationName", false);
+    public SOSOptionString ApplicationName = new SOSOptionString(this, CLASS_NAME + ".ApplicationName", "Name of the Application", "env:SOSApplicationName", "env:SOSApplicationName", false);
 
     public SOSOptionString getApplicationName() {
         return ApplicationName;
@@ -304,10 +278,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         return this;
     }
 
-    @JSOptionDefinition(name = "ApplicationDocuUrl", description = "The Url of the Documentation of this Application", key = "ApplicationDocuUrl", 
-            type = "SOSOptionUrl", mandatory = false)
-    public SOSOptionUrl ApplicationDocuUrl = new SOSOptionUrl(this, CLASS_NAME + ".ApplicationDocuUrl", "The Url of the Documentation of this Application", 
-            "env:SOSApplicationDocuUrl", "env:SOSApplicationDocuUrl", false);
+    @JSOptionDefinition(name = "ApplicationDocuUrl", description = "The Url of the Documentation of this Application", key = "ApplicationDocuUrl", type = "SOSOptionUrl", mandatory = false)
+    public SOSOptionUrl ApplicationDocuUrl = new SOSOptionUrl(this, CLASS_NAME + ".ApplicationDocuUrl", "The Url of the Documentation of this Application", "env:SOSApplicationDocuUrl", "env:SOSApplicationDocuUrl", false);
 
     public SOSOptionUrl getApplicationDocuUrl() {
         return ApplicationDocuUrl;
@@ -318,10 +290,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         return this;
     }
 
-    @JSOptionDefinition(name = "AllowEmptyParameterList", description = "If true, an empty parameter list leads not into an error", key = "AllowEmptyParameterList", 
-            type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean AllowEmptyParameterList = new SOSOptionBoolean(this, CLASS_NAME + ".AllowEmptyParameterList", 
-            "If true, an empty parameter list leads not into an error", "true", "true", false);
+    @JSOptionDefinition(name = "AllowEmptyParameterList", description = "If true, an empty parameter list leads not into an error", key = "AllowEmptyParameterList", type = "SOSOptionBoolean", mandatory = false)
+    public SOSOptionBoolean AllowEmptyParameterList = new SOSOptionBoolean(this, CLASS_NAME + ".AllowEmptyParameterList", "If true, an empty parameter list leads not into an error", "true", "true", false);
 
     public SOSOptionBoolean getAllowEmptyParameterList() {
         return AllowEmptyParameterList;
@@ -331,7 +301,6 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         AllowEmptyParameterList = pstrValue;
         return this;
     }
-
 
     public String getPrefix() {
         return strAlternativePrefix;
@@ -796,8 +765,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
                 strT = strT.substring(2);
                 try {
                     strT = AbsolutFileName(strT);
-                }
-                catch (final Exception objException) {
+                } catch (final Exception objException) {
                     // handle exception
                 }
             }
@@ -1173,7 +1141,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
                     }
                     strNewString += string + "\n";
                 }
-            } catch (Exception e) { 
+            } catch (Exception e) {
                 // intentionally no error, wrong regexp ?
             }
         }
@@ -1235,8 +1203,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         return Iterate(intIt).toString();
     }
 
-    public StringBuffer IterateAllDataElementsByAnnotation(final Class<?> objC, final Object objP, final IterationTypes enuIterate4What,
-            StringBuffer pstrBuffer) {
+    public StringBuffer IterateAllDataElementsByAnnotation(final Class<?> objC, final Object objP, final IterationTypes enuIterate4What, StringBuffer pstrBuffer) {
         final String conMethodName = CLASS_NAME + "::IterateAllDataElementsByAnnotation";
         String strCommandLineOptions = "";
         if (objC == null) {
@@ -1314,7 +1281,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
                         }
                     }
                 } catch (final ClassCastException objException) {
-                    
+
                 } catch (final Exception objE) {
                     throw new RuntimeException(objE);
                 }

@@ -124,11 +124,9 @@ public class SOSMailReadInbox extends Job_impl {
         sosLogger.debug3(".. current setting [mail_server_timeout]: " + mailServerTimeout);
         mailServerType = getParams("mail_server_type", "POP3");
         sosLogger.debug3(".. current setting [mail_server_type]: " + mailServerType);
-        mailUseSeen = "true".equalsIgnoreCase(getParams("mail_use_seen", "true")) 
-                || "1".equalsIgnoreCase(getParams("mail_use_seen", "true"))
+        mailUseSeen = "true".equalsIgnoreCase(getParams("mail_use_seen", "true")) || "1".equalsIgnoreCase(getParams("mail_use_seen", "true"))
                 || "yes".equalsIgnoreCase(getParams("mail_use_seen", "true"));
-        mailSetSeen = mailUseSeen || "true".equalsIgnoreCase(getParams("mail_set_seen", "true"))
-                || "1".equalsIgnoreCase(getParams("mail_set_seen", "true")) 
+        mailSetSeen = mailUseSeen || "true".equalsIgnoreCase(getParams("mail_set_seen", "true")) || "1".equalsIgnoreCase(getParams("mail_set_seen", "true"))
                 || "yes".equalsIgnoreCase(getParams("mail_set_seen", "true"));
         sosLogger.debug3(".. current setting [mail_set_seen]: " + mailSetSeen);
         subjectPattern = Pattern.compile(mailSubjectPattern, 0);
@@ -245,7 +243,8 @@ public class SOSMailReadInbox extends Job_impl {
                             continue;
                         }
                     }
-                    // skip mails whose body does not match the download link pattern
+                    // skip mails whose body does not match the download link
+                    // pattern
                     if (!"".equals(mailBodyPattern)) {
                         Matcher bodyMatcher = bodyPattern.matcher(message.getPlainTextBody());
                         if (!bodyMatcher.find()) {
@@ -314,8 +313,8 @@ public class SOSMailReadInbox extends Job_impl {
         return s;
     }
 
-    private void startOrder(final SOSMimeMessage message, final String host_, final int port_, final String jobchain, final String id,
-            final String state, final String title) throws Exception {
+    private void startOrder(final SOSMimeMessage message, final String host_, final int port_, final String jobchain, final String id, final String state,
+            final String title) throws Exception {
         Variable_set order_params = spooler.create_variable_set();
         sosLogger.debug3("....merge");
         order_params.merge(spooler_task.params());
@@ -349,8 +348,8 @@ public class SOSMailReadInbox extends Job_impl {
         }
     }
 
-    private void startOrderXML(final String host_, final int port_, final String jobchain, String id, String state, String title,
-            final Variable_set params_) throws Exception {
+    private void startOrderXML(final String host_, final int port_, final String jobchain, String id, String state, String title, final Variable_set params_)
+            throws Exception {
         sosLogger.debug3("Starting order " + id + " at " + jobchain + " with xml-command");
         if ("".equals(host_)) {
             throw new Exception("Missing host while starting order.");
@@ -390,5 +389,5 @@ public class SOSMailReadInbox extends Job_impl {
         sosLogger.debug3("Sending add_order command:\n" + xml);
         command.sendRequest(xml);
     }
-    
+
 }

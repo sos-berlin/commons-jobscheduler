@@ -1,8 +1,5 @@
 /**
  * 
  */
-/**
- * @author ur
- *
- */
+/** @author ur */
 package com.sos.dialog.auth;

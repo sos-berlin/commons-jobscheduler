@@ -269,7 +269,8 @@ public class JobSchedulerTextProcessor extends Job_impl {
             String param = getParam(params, PARAMETER_COMMAND_PARAM, false);
             command = command + " " + param;
             String oldFile = fileName;
-            // To make orderparams available for substitution in orderparam value
+            // To make orderparams available for substitution in orderparam
+            // value
             while (fileName.matches("^.*%[^%]+%.*$")) {
                 String p = fileName.replaceFirst("^.*%([^%]+)%.*$", "$1");
                 String s = params.var(p);
@@ -348,5 +349,5 @@ public class JobSchedulerTextProcessor extends Job_impl {
             logger.error(e.getMessage());
         }
     }
-    
+
 }

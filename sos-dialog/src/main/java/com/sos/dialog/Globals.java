@@ -216,5 +216,5 @@ public class Globals {
             globalShell().setRedraw(false);
         }
     }
-    
+
 }

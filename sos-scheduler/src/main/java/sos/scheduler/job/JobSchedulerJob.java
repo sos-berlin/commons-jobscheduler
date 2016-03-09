@@ -45,8 +45,7 @@ public class JobSchedulerJob extends Job_impl {
                 throw new JobSchedulerException("no settings found for entry [db] in section [spooler] of configuration file: " + spooler.ini_path());
             }
             if (this.getJobProperties().getProperty("db_class") == null || this.getJobProperties().getProperty("db_class").isEmpty()) {
-                throw new JobSchedulerException("no settings found for entry [db_class] in section [spooler] of configuration file: "
-                        + spooler.ini_path());
+                throw new JobSchedulerException("no settings found for entry [db_class] in section [spooler] of configuration file: " + spooler.ini_path());
             }
             if (this.getLogger() != null) {
                 sosLogger.debug6("connecting to database...");
@@ -116,7 +115,7 @@ public class JobSchedulerJob extends Job_impl {
             spooler_log.info("Job " + this.getJobName() + " terminated.");
         } catch (Exception e) {
             // no error processing at job level
-        } 
+        }
     }
 
     public SOSSettings getJobSettings() {
@@ -231,13 +230,9 @@ public class JobSchedulerJob extends Job_impl {
         SOSArguments arguments = new SOSArguments(dbProperty);
         SOSConnection conn;
         if (log != null) {
-            conn = SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), 
-                    arguments.as_string("-class=", ""), arguments.as_string("-url=", ""), arguments.as_string("-user=", ""), 
-                    arguments.as_string("-password=", ""), log);
+            conn = SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.as_string("-class=", ""), arguments.as_string("-url=", ""), arguments.as_string("-user=", ""), arguments.as_string("-password=", ""), log);
         } else {
-            conn = SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), 
-                    arguments.as_string("-class=", ""), arguments.as_string("-url=", ""), arguments.as_string("-user=", ""), 
-                    arguments.as_string("-password=", ""));
+            conn = SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.as_string("-class=", ""), arguments.as_string("-url=", ""), arguments.as_string("-user=", ""), arguments.as_string("-password=", ""));
         }
         return conn;
     }

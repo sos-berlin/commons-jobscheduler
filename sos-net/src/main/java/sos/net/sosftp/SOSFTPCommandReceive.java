@@ -148,8 +148,8 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
                         RaiseException("local directory does not exist or is not accessible: " + localDir);
                     }
                 }
-                this.getLogger().debug1("connecting to host " + host + ", port " + port + ", local directory " + localDir + ", remote directory "
-                        + remoteDir + (isFilePath ? ", file " + filePath : ", file specification " + fileSpec));
+                this.getLogger().debug1("connecting to host " + host + ", port " + port + ", local directory " + localDir + ", remote directory " + remoteDir
+                        + (isFilePath ? ", file " + filePath : ", file specification " + fileSpec));
                 boolean alternativeUse = true;
                 int isAlternativeParameterUse = 0;
                 while (alternativeUse && isAlternativeParameterUse <= 1) {
@@ -171,22 +171,22 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
                                         ftpClient.logout();
                                     } catch (Exception e) {
                                         // no error handling
-                                    } 
+                                    }
                                 }
                                 if (ftpClient.isConnected()) {
                                     try {
                                         ftpClient.disconnect();
                                     } catch (Exception e) {
                                         // no error handling
-                                    } 
+                                    }
                                 }
                             }
                             isAlternativeParameterUse++;
                             setAlternativeParameter();
                             arguments.put("user", user);
-                            this.getLogger().debug1("..try login with alternative parameter [host=" + host + "], [port=" + port + "] " + "[user="
-                                    + user + "], [account=" + account + "], [remoteDir=" + remoteDir + "], [passiveMode=" + passiveMode + "], "
-                                    + "[transferMode=" + transferMode + "]");
+                            this.getLogger().debug1("..try login with alternative parameter [host=" + host + "], [port=" + port + "] " + "[user=" + user
+                                    + "], [account=" + account + "], [remoteDir=" + remoteDir + "], [passiveMode=" + passiveMode + "], " + "[transferMode="
+                                    + transferMode + "]");
                         } else {
                             RaiseException("..error in ftp server init with [host=" + host + "], [port=" + port + "] " + ex.getMessage());
                         }
@@ -211,16 +211,14 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
                             this.getLogger().debug("..using ASCII mode for file transfer");
                             this.getLogger().debug("..ftp server reply" + " [ascii]: " + ftpClient.getReplyString());
                         } else {
-                            RaiseException(".. could not switch to ASCII mode for file transfer ..ftp server reply [ascii]: "
-                                    + ftpClient.getReplyString());
+                            RaiseException(".. could not switch to ASCII mode for file transfer ..ftp server reply [ascii]: " + ftpClient.getReplyString());
                         }
                     } else {
                         if (sosftp.binary()) {
                             this.getLogger().debug("using binary mode for file transfers.");
                             this.getLogger().debug("..ftp server reply" + " [binary]: " + ftpClient.getReplyString());
                         } else {
-                            RaiseException(".. could not switch to binary mode for file transfer ..ftp server reply [ascii]: "
-                                    + ftpClient.getReplyString());
+                            RaiseException(".. could not switch to binary mode for file transfer ..ftp server reply [ascii]: " + ftpClient.getReplyString());
                         }
                     }
                     if (!strPreFtpCommands.isEmpty()) {
@@ -372,7 +370,7 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
                             ftpClient.logout();
                         } catch (Exception e) {
                             // no error handling
-                        } 
+                        }
                     }
                     if (ftpClient.isConnected()) {
                         try {
@@ -403,7 +401,7 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
         try {
             if (transActional) {
                 transActionalRemoteFiles = hlocalFile + ";" + sosString.parseToString(transActionalRemoteFiles);
-            } else  if (!removeFiles && flgJumpTransferDefined) {
+            } else if (!removeFiles && flgJumpTransferDefined) {
                 strFilesRemainingOnSource = hlocalFile + ";" + strFilesRemainingOnSource;
             }
             String strSourceFileName = sourceFile.getName();
@@ -421,8 +419,8 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
                 if (lngCurrentBytesReceived < 0) {
                     lngCurrentBytesReceived = 0;
                 }
-                this.getLogger().debug("..ftp server reply [getFile] [" + strTargetFileName + ", size=" + lngCurrentBytesReceived
-                        + conClosingBracketWithColon + pobjFtpClient.getReplyString());
+                this.getLogger().debug("..ftp server reply [getFile] [" + strTargetFileName + ", size=" + lngCurrentBytesReceived + conClosingBracketWithColon
+                        + pobjFtpClient.getReplyString());
                 if (!appendFiles1 && retry > 0 && lngCurrentBytesReceived != lngPreviousBytesReceived) {
                     this.getLogger().info("..retry " + (i + 2) + " of " + retry + " to wait " + interval
                             + "s for file transfer being completed, current file size: " + lngCurrentBytesReceived + " bytes");
@@ -437,8 +435,8 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
             }
             long lngTargetFileSize = targetFile.length();
             if (pflgCheckSize && lngTargetFileSize > 0 && lngSourceFileSize != lngCurrentBytesReceived) {
-                RaiseException("..error occurred receiving file, source file size [" + lngSourceFileSize
-                        + "] does not match number of bytes transferred [" + lngCurrentBytesReceived + "], target file size is " + lngTargetFileSize);
+                RaiseException("..error occurred receiving file, source file size [" + lngSourceFileSize + "] does not match number of bytes transferred ["
+                        + lngCurrentBytesReceived + "], target file size is " + lngTargetFileSize);
             }
             transActionalLocalFiles.add(htargetFile);
             return lngCurrentBytesReceived;
@@ -457,8 +455,8 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
                 }
                 getLogger().warn("error occurred processing command: " + normalizedPassword(s));
                 arguments.put("xx_make_temp_directory_xx", "ok");
-                String curCommands = sosString.parseToString(arguments.get("jump_command")) + " -operation=remove_temp_directory -input=\""
-                        + tempJumpRemoteDir + "\"";
+                String curCommands = sosString.parseToString(arguments.get("jump_command")) + " -operation=remove_temp_directory -input=\"" + tempJumpRemoteDir
+                        + "\"";
                 this.setCommands(curCommands.split(getCommandDelimiter()));
                 if (!execute()) {
                     RaiseException("error occurred processing command: " + curCommands);
@@ -526,8 +524,7 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
                         if (pos2 > postCommands.length()) {
                             pos2 = postCommands.length();
                         }
-                        curC = curC + " " + postCommands.substring(0, pos1 - len) + " " + postCommands.substring(pos2) + " -file_path=\"" + filen
-                                + "\" ";
+                        curC = curC + " " + postCommands.substring(0, pos1 - len) + " " + postCommands.substring(pos2) + " -file_path=\"" + filen + "\" ";
                         if (iterator.hasNext()) {
                             curC = curC + " " + getCommandDelimiter();
                         }
@@ -604,16 +601,15 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
                 try {
                     checkInterval = Long.parseLong(sosString.parseToString(arguments.get("check_interval")));
                 } catch (Exception e) {
-                    RaiseException("illegal value for parameter [check_interval]: " + sosString.parseToString(arguments.get("check_interval")) 
-                            + " " + e.getMessage(), e);
+                    RaiseException("illegal value for parameter [check_interval]: " + sosString.parseToString(arguments.get("check_interval")) + " "
+                            + e.getMessage(), e);
                 }
             }
             if (!sosString.parseToString(arguments.get("check_retry")).isEmpty()) {
                 try {
                     checkRetry = Long.parseLong(sosString.parseToString(arguments.get("check_retry")));
                 } catch (Exception e) {
-                    RaiseException("invalid value for parameter [check_retry]: " + sosString.parseToString(arguments.get("check_retry")) 
-                            + " " + e.getMessage(), e);
+                    RaiseException("invalid value for parameter [check_retry]: " + sosString.parseToString(arguments.get("check_retry")) + " " + e.getMessage(), e);
                 }
             }
             if (!sosString.parseToString(arguments.get("overwrite_files")).isEmpty()) {
@@ -730,8 +726,8 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
                     try {
                         proxyPort = Integer.parseInt(sosString.parseToString(arguments.get("ssh_proxy_port")));
                     } catch (Exception ex) {
-                        RaiseException("illegal non-numeric value for parameter [ssh_proxy_port]: "
-                                + sosString.parseToString(arguments.get("ssh_proxy_port")) + " " + ex.getMessage(), ex);
+                        RaiseException("illegal non-numeric value for parameter [ssh_proxy_port]: " + sosString.parseToString(arguments.get("ssh_proxy_port"))
+                                + " " + ex.getMessage(), ex);
                     }
                 } else {
                     proxyPort = 3128;
@@ -1178,11 +1174,11 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
             if (schedulerJob != null && pollTimeout > 0) {
                 Class cl = Class.forName("sos.scheduler.ftp.JobSchedulerFTPReceive");
                 if (cl.getName().indexOf("FTPReceive") > -1) {
-                    Method mthd1 = cl.getMethod("polling", new Class[] { Vector.class, Boolean.TYPE, String.class, SOSFileTransfer.class,
-                            String.class, Boolean.TYPE, Boolean.TYPE, int.class, int.class, int.class, String.class });
+                    Method mthd1 = cl.getMethod("polling", new Class[] { Vector.class, Boolean.TYPE, String.class, SOSFileTransfer.class, String.class,
+                            Boolean.TYPE, Boolean.TYPE, int.class, int.class, int.class, String.class });
                     boolean output1 = sosString.parseToBoolean(mthd1.invoke(schedulerJob, new Object[] { filelist, new Boolean(isFilePath), filePath,
-                            ftpClient, fileSpec, Boolean.valueOf(recursive), Boolean.valueOf(forceFiles), new Integer(pollTimeout),
-                            new Integer(pollIntervall), new Integer(pollMinFiles), pollFilesErrorState }));
+                            ftpClient, fileSpec, Boolean.valueOf(recursive), Boolean.valueOf(forceFiles), new Integer(pollTimeout), new Integer(pollIntervall),
+                            new Integer(pollMinFiles), pollFilesErrorState }));
                     return output1;
                 }
             }
@@ -1277,7 +1273,7 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
     }
 
     private void getDeleteTransferFiles() throws Exception {
-        if ((transActionalRemoteFiles != null || strFilesRemainingOnSource != null) 
+        if ((transActionalRemoteFiles != null || strFilesRemainingOnSource != null)
                 && (removeFiles && transActional || getBool(conParameterREMOVE_AFTER_JUMP_TRANSFER))) {
             getLogger().debug(".. mark transactional files to remove " + transActionalRemoteFiles);
             Properties p = (Properties) arguments.clone();

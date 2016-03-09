@@ -89,5 +89,5 @@ public class SOSOptionStringWVariables extends SOSOptionElement {
         strOriginalValue = pstrStringValue;
         super.Value(pstrStringValue);
     }
-    
+
 }

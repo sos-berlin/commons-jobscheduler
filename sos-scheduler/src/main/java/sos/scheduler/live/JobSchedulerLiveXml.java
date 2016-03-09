@@ -91,8 +91,8 @@ public class JobSchedulerLiveXml {
         }
         String sqlStmt = "DELETE FROM LIVE_OBJECTS WHERE \"TYPE\"='" + type + "' AND \"PATH\"='" + objectPath + "' AND \"NAME\"='" + objectName + "'";
         conn.executeUpdate(sqlStmt);
-        sqlStmt = "INSERT INTO LIVE_OBJECTS (" + "\"TYPE\", \"PATH\", \"NAME\", \"CREATED\", \"MODIFIED\" )" + "VALUES (" + "'" + type + "','"
-                + objectPath + "','" + objectName + "', GETDATE(), GETDATE())";
+        sqlStmt = "INSERT INTO LIVE_OBJECTS (" + "\"TYPE\", \"PATH\", \"NAME\", \"CREATED\", \"MODIFIED\" )" + "VALUES (" + "'" + type + "','" + objectPath
+                + "','" + objectName + "', GETDATE(), GETDATE())";
         log(sqlStmt);
         conn.execute(sqlStmt);
         String object_id = conn.getSingleValue("SELECT @@IDENTITY");

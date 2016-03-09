@@ -30,8 +30,8 @@ public class SOSOptionLog4JPropertyFile extends SOSOptionInFileName {
         objLoggingAppender = pobjLoggingAppender;
     }
 
-    public SOSOptionLog4JPropertyFile(JSOptionsClass pPobjParent, String pPstrKey, String pPstrDescription, String pPstrValue,
-            String pPstrDefaultValue, boolean pPflgIsMandatory) {
+    public SOSOptionLog4JPropertyFile(JSOptionsClass pPobjParent, String pPstrKey, String pPstrDescription, String pPstrValue, String pPstrDefaultValue,
+            boolean pPflgIsMandatory) {
         super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
     }
 
@@ -110,5 +110,5 @@ public class SOSOptionLog4JPropertyFile extends SOSOptionInFileName {
         objLevel = objCurrentLog.getLevel();
         return Logger.getRootLogger();
     }
-    
+
 }

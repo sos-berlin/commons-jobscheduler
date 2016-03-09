@@ -202,9 +202,9 @@ public class JobSchedulerSubmitEventJob extends JobSchedulerJobAdapter {
         }
     }
 
-    private static String createAddOrder(final String eventClass, final String eventId, final String jobChain, final String orderId,
-            final String jobName, final String schedulerHost, final String schedulerTCPPort, final String action, final String expires,
-            final String exitCode, final Map eventParameters, final String supervisorJobChain) throws Exception {
+    private static String createAddOrder(final String eventClass, final String eventId, final String jobChain, final String orderId, final String jobName,
+            final String schedulerHost, final String schedulerTCPPort, final String action, final String expires, final String exitCode,
+            final Map eventParameters, final String supervisorJobChain) throws Exception {
         try {
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -254,8 +254,7 @@ public class JobSchedulerSubmitEventJob extends JobSchedulerJobAdapter {
         }
     }
 
-    private static void submitToEventService(String xml, final Log spooler_log, final Spooler spooler, final String host, final int port)
-            throws Exception {
+    private static void submitToEventService(String xml, final Log spooler_log, final Spooler spooler, final String host, final int port) throws Exception {
         try {
             if (xml.indexOf("<?xml") == -1) {
                 xml = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>" + xml;
@@ -266,7 +265,7 @@ public class JobSchedulerSubmitEventJob extends JobSchedulerJobAdapter {
                 supervisor = spooler.supervisor_client();
             } catch (Exception e) {
                 // there is no supervisor
-            } 
+            }
             String answer;
             if (!host.isEmpty() && port != 0) {
                 SOSSchedulerCommand schedulerCommand = new SOSSchedulerCommand();
@@ -299,5 +298,5 @@ public class JobSchedulerSubmitEventJob extends JobSchedulerJobAdapter {
             throw new JobSchedulerException("Failed to submit event: " + e, e);
         }
     }
-    
+
 }

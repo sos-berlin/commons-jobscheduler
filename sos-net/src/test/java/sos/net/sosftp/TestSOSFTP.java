@@ -266,8 +266,8 @@ public class TestSOSFTP {
     @Test
     public void testSendUsingFilePathAndLocalDir6() {
         CreateTestFile();
-        String[] strArguments = { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
-                "-local_dir=\"\" ", "-file_path=" + strTestPathName + strTestFileName };
+        String[] strArguments = { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb", "-local_dir=\"\" ",
+                "-file_path=" + strTestPathName + strTestFileName };
         callSOSFtp(strArguments);
     }
 

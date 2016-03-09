@@ -12,9 +12,13 @@ public abstract class SOSHibernateIntervalFilter extends SOSHibernateFilter {
 
     private String timeZone;
     private static final Logger LOGGER = Logger.getLogger(SOSHibernateIntervalFilter.class);
+
     public abstract void setIntervalFromDate(Date d);
+
     public abstract void setIntervalToDate(Date d);
+
     public abstract void setIntervalFromDateIso(String s);
+
     public abstract void setIntervalToDateIso(String s);
 
     public SOSHibernateIntervalFilter() {

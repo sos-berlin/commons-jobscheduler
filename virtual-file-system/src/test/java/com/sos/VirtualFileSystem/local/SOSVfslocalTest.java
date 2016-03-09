@@ -25,6 +25,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 
 /** @author KB */
 public class SOSVfslocalTest {
+
     private static final Logger LOGGER = Logger.getLogger(SOSVfslocalTest.class);
     private ISOSVFSHandler objVFS = null;
     private ISOSVfsFileTransfer objFileSystemHandler = null;

@@ -53,8 +53,8 @@ public class SOSCTabFolder extends CTabFolder {
         this.setBorderVisible(false);
         setTabHeight(getTabHeight() + 6);
         this.setBackground(Globals.getCompositeBackground());
-        this.setSelectionBackground(new Color[] { Globals.getFieldHasFocusBackground(), Globals.getCompositeBackground(),
-                Globals.getCompositeBackground() }, new int[] { 50, 100 }, true);
+        this.setSelectionBackground(new Color[] { Globals.getFieldHasFocusBackground(), Globals.getCompositeBackground(), Globals.getCompositeBackground() }, new int[] {
+                50, 100 }, true);
         Gridlayout.set4ColumnLayout(this);
 
         addFocusListener(new FocusListener() {

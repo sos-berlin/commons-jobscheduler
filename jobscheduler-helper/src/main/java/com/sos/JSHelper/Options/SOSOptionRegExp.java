@@ -317,5 +317,5 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
         String[] proposals = SOSOptionRegExp.defaultProposals.keySet().toArray(new String[0]);
         return proposals;
     }
-    
+
 }

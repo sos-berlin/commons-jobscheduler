@@ -161,5 +161,5 @@ public class SosHibernateSession {
         session = null;
         sessionFactory = null;
     }
-    
+
 }
