@@ -854,7 +854,7 @@ public class JobSchedulerManagedStarter extends JobSchedulerJob {
             FileOutputStream fos = new FileOutputStream(xmlFile);
             DOMResult domResult = new DOMResult();
             StreamResult result = new StreamResult(fos);
-            DOMSource source = new DOMSource(xpath.document);
+            DOMSource source = new DOMSource(xpath.getDocument());
             getLog().debug9("managed2liveTransformer: " + managed2liveTransformer);
             managed2liveTransformer.transform(source, result);
         } catch (Exception e) {
