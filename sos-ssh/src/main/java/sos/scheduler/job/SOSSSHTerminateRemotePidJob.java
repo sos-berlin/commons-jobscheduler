@@ -206,7 +206,7 @@ public class SOSSSHTerminateRemotePidJob extends SOSSSHJobJSch {
                 Matcher regExMatcher = Pattern.compile("^([^\r\n]*)\r*\n*").matcher(line);
                 if (regExMatcher.find()) {
                     // key with leading and trailing whitespace removed
-                    String pid = regExMatcher.group(1).trim(); 
+                    String pid = regExMatcher.group(1).trim();
                     try {
                         LOGGER.debug("PID: " + pid);
                         allPids.add(Integer.parseInt(pid));

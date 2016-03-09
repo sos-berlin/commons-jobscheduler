@@ -23,9 +23,7 @@ import org.apache.log4j.Logger;
 /** FTP File Transfer
  *
  * @author Andreas Püschel
- * @author Mürüvet Öksüz
- * 
- */
+ * @author Mürüvet Öksüz */
 public class JobSchedulerFTPReceive extends JobSchedulerJob {
 
     private static final Logger LOGGER = Logger.getLogger(JobSchedulerFTPReceive.class);
@@ -104,7 +102,8 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
                     }
                     return bSuccess;
                 } else if (schedulerParams.get("parent_order_id") != null) {
-                    // Hauptauftrag wurde wegen Erreichens von ftp_parallel_check_retry beendet 
+                    // Hauptauftrag wurde wegen Erreichens von
+                    // ftp_parallel_check_retry beendet
                     // -> die restlichen Unterauftrüge sollen nicht durchlaufen
                     String state = spooler.variables().var("terminated_cause_max_order_setback_"
                             + normalize(sosString.parseToString(schedulerParams.get("ftp_parent_order_id"))));
@@ -127,12 +126,11 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
                 String remoteDir = sosString.parseToString(schedulerParams.get("remoteDir"));
                 // parallel Transfer
                 if (parallelTransfer && !isFilePath) {
-                    // nur die filelist holen um Parallelen transfer zu ermöglichen
+                    // nur die filelist holen um Parallelen transfer zu
+                    // ermöglichen
                     schedulerParams.put("skip_transfer", "yes");
                     // Parametern sind hier auch gültig
-                    SOSConfiguration con = new SOSConfiguration(null, schedulerParams, sosString.parseToString(schedulerParams.get("settings")), 
-                            sosString.parseToString(schedulerParams.get("profile")),
-                    null, new SOSSchedulerLogger(spooler_log));
+                    SOSConfiguration con = new SOSConfiguration(null, schedulerParams, sosString.parseToString(schedulerParams.get("settings")), sosString.parseToString(schedulerParams.get("profile")), null, new SOSSchedulerLogger(spooler_log));
                     con.checkConfigurationItems();
                     SOSFTPCommandReceive ftpCommand = new SOSFTPCommandReceive(con, new SOSSchedulerLogger(spooler_log));
                     ftpCommand.setSchedulerJob(this);
@@ -149,8 +147,9 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
                             Matcher matcher = pattern.matcher(fileName);
                             if (matcher.find()) {
                                 Variable_set newParams = params;
-                                newParams.set_var(VARNAME_FTP_FILE_PATH, (remoteDir.endsWith("/") || remoteDir.endsWith("\\") 
-                                        ? remoteDir : remoteDir + "/") + fileName);
+                                newParams.set_var(VARNAME_FTP_FILE_PATH, (remoteDir.endsWith("/") || remoteDir.endsWith("\\") ? remoteDir : remoteDir
+                                        + "/")
+                                        + fileName);
                                 spooler_log.info("launching job for parallel transfer with parameter: ftp_file_path "
                                         + (remoteDir.endsWith("/") || remoteDir.endsWith("\\") ? remoteDir : remoteDir + "/") + fileName);
                                 spooler.job(spooler_task.job().name()).start(params);
@@ -170,8 +169,9 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
                                 if (spooler_task.params() != null) {
                                     newParams.merge(params);
                                 }
-                                newParams.set_var(VARNAME_FTP_FILE_PATH, (remoteDir.endsWith("/") || remoteDir.endsWith("\\") 
-                                        ? remoteDir : remoteDir + "/") + fileName);
+                                newParams.set_var(VARNAME_FTP_FILE_PATH, (remoteDir.endsWith("/") || remoteDir.endsWith("\\") ? remoteDir : remoteDir
+                                        + "/")
+                                        + fileName);
                                 newParams.set_var("ftp_parent_order_id", spooler_task.order().id());
                                 newParams.set_var("ftp_order_self_destruct", "1");
                                 Order newOrder = spooler.create_order();
@@ -186,8 +186,9 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
                                         + normalize(newOrder.id()), "0");
                             }
                         }
-                        // am aktuellen Auftrag speichern, dass im Wiederholungsfall per setback() 
-                        // nicht erneut Aufträge erzeugt werden sollen, 
+                        // am aktuellen Auftrag speichern, dass im
+                        // Wiederholungsfall per setback()
+                        // nicht erneut Aufträge erzeugt werden sollen,
                         // sondern dass deren Erledigungszustand geprüftwird:
                         spooler_task.order().params().set_var(VARNAME_FTP_CHECK_PARALLEL, "yes");
                         spooler_job.set_delay_order_after_setback(1, parallelTransferCheckSetback);
@@ -197,9 +198,7 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
                         return false;
                     }
                 }
-                SOSConfiguration con = new SOSConfiguration(null, schedulerParams, sosString.parseToString(schedulerParams.get("settings")), 
-                        sosString.parseToString(schedulerParams.get("profile")),
-                null, new SOSSchedulerLogger(spooler_log));
+                SOSConfiguration con = new SOSConfiguration(null, schedulerParams, sosString.parseToString(schedulerParams.get("settings")), sosString.parseToString(schedulerParams.get("profile")), null, new SOSSchedulerLogger(spooler_log));
                 con.checkConfigurationItems();
                 sos.net.sosftp.SOSFTPCommandReceive ftpCommand = new sos.net.sosftp.SOSFTPCommandReceive(con, new SOSSchedulerLogger(spooler_log));
                 ftpCommand.setSchedulerJob(this);
@@ -223,7 +222,8 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
             } finally {
                 if (parallelTransfer) {
                     if (orderSelfDestruct) {
-                        // positiven Endzustand für den parallel gestarteten Auftrag finden
+                        // positiven Endzustand für den parallel gestarteten
+                        // Auftrag finden
                         String state = "";
                         sos.spooler.Job_chain_node node = spooler_task.order().job_chain_node();
                         while (node != null) {
@@ -298,11 +298,11 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
                 if (key.startsWith(PREFIX_FTP) && key.length() > PREFIX_FTP.length()) {
                     key = key.substring(PREFIX_FTP.length());
                 }
-				if(key.contains("password")){
-					getLogger().debug("param [" + key + "=*****]");
-				}else{
-                getLogger().debug("param [" + key + "=" + val + "]");
-				}
+                if (key.contains("password")) {
+                    getLogger().debug("param [" + key + "=*****]");
+                } else {
+                    getLogger().debug("param [" + key + "=" + val + "]");
+                }
                 schedulerParams.put(key, val);
             }
             if (!sosString.parseToString(schedulerParams.get("use_order_set_back")).isEmpty()) {
@@ -512,5 +512,5 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
         }
         return true;
     }
-    
+
 }

@@ -388,10 +388,10 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         JSJ_D_0080.toLog();
         if (pstrString2Modify.matches("(?s).*%[^%]+%.*") || pstrString2Modify.matches("(?s).*(\\$|§)\\{[^{]+\\}.*")) {
             if (isNotNull(params)) {
-                String[] strPatterns2 = new String[] { "%%SCHEDULER_PARAM_%1$s%%", "%%%1$s%%", 
-                        "(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?", "(\\$|§)\\{?%1$s\\}?" };
-                String[] strPatterns = new String[] { "%SCHEDULER_PARAM_%1$s%", "%%1$s%", 
-                        "(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?", "(\\$|§)\\{?%1$s\\}?" };
+                String[] strPatterns2 = new String[] { "%%SCHEDULER_PARAM_%1$s%%", "%%%1$s%%", "(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?",
+                        "(\\$|§)\\{?%1$s\\}?" };
+                String[] strPatterns = new String[] { "%SCHEDULER_PARAM_%1$s%", "%%1$s%", "(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?",
+                        "(\\$|§)\\{?%1$s\\}?" };
                 for (String strPattern : strPatterns) {
                     String regExPattern = strPattern;
                     for (String name : params.keySet()) {
@@ -652,8 +652,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             String strS = getJobScript();
             if (isNotEmpty(strS)) {
                 pobjOptionElement.Value(strS);
-                logger.debug(String.format("copy script from script-tag of job '%2$s' to option '%1$s'", 
-                        pobjOptionElement.getShortKey(), getJob().name()));
+                logger.debug(String.format("copy script from script-tag of job '%2$s' to option '%1$s'", pobjOptionElement.getShortKey(), getJob().name()));
             }
         }
     }
@@ -706,7 +705,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                 try {
                     spooler_task.order().set_state_text(stateText);
                 } catch (Exception e) {
-                    // 
+                    //
                 }
             }
             if (spooler_job != null) {

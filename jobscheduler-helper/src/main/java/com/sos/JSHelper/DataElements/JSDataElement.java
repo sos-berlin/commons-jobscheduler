@@ -67,8 +67,8 @@ public class JSDataElement extends JSToolBox {
         doInit();
     }
 
-    public JSDataElement(final String pstrValue, final String pstrDescription, final int pintSize, final int pintPos,
-            final String pstrFormatString, final String pstrColumnHeader, final String pstrXMLTagName) {
+    public JSDataElement(final String pstrValue, final String pstrDescription, final int pintSize, final int pintPos, final String pstrFormatString,
+            final String pstrColumnHeader, final String pstrXMLTagName) {
         doInit();
         this.Value(pstrValue);
         this.Description(pstrDescription);
@@ -374,7 +374,7 @@ public class JSDataElement extends JSToolBox {
         }
         return pobjO.equals(this);
     }
-    
+
     @Override
     public int hashCode() {
         return super.hashCode();

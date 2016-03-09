@@ -38,12 +38,10 @@ import sos.spooler.Variable_set;
 import sos.util.SOSClassUtil;
 import sos.util.SOSString;
 
-/**
- * baunced mail handler
+/** baunced mail handler
  * 
  * @author <a href="mailto:ghassan.beydoun@sos-berlin.com">Ghassan Beydoun</a>
- * @version $Id$
- */
+ * @version $Id$ */
 
 public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
 
@@ -105,15 +103,11 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
     private String xSOSMailDeliveryCounterHeader;
 
     private String jobChainName = "scheduler_send_bounced_mails";
-    
-    /** the id of the message in the MAILS table */ 
+
+    /** the id of the message in the MAILS table */
     private String mailId = null;
-    
- 
 
     /*
-     * 
-     * 
      * @see sos.spooler.Job_impl#spooler_init()
      */
     public boolean spooler_init() {
@@ -147,39 +141,27 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
                 this.setJobTitle(spooler_job.title());
 
             if (spooler_task.params().var("handle_bounced_mail_only") != null) {
-                if (spooler_task.params().var("handle_bounced_mail_only")
-                        .length() > 0) {
-                    if (spooler_task.params().var(
-                            "handle_bounced_mail_only").equalsIgnoreCase(
-                            "true"))
+                if (spooler_task.params().var("handle_bounced_mail_only").length() > 0) {
+                    if (spooler_task.params().var("handle_bounced_mail_only").equalsIgnoreCase("true"))
                         setHandleBouncedMailOnly(true);
-                    spooler_log
-                            .debug6(".. job parameter [handle_bounced_mail_only]: ["
-                                    + spooler_task.params().var(
-                                            "handle_bounced_mail_only")
-                                    + "]");
+                    spooler_log.debug6(".. job parameter [handle_bounced_mail_only]: [" + spooler_task.params().var("handle_bounced_mail_only") + "]");
                 }
             }
 
-            
-            if (spooler_task.params().var("bounce_directory") == null || 
-            		spooler_task.params().var("bounce_directory").length() ==  0) {
-            	
-            	throw new Exception("No bounce directory specified in entry [bounce_directory] of job section in file " + spooler.ini_path());
-            	
+            if (spooler_task.params().var("bounce_directory") == null || spooler_task.params().var("bounce_directory").length() == 0) {
+
+                throw new Exception("No bounce directory specified in entry [bounce_directory] of job section in file " + spooler.ini_path());
+
             }
-            
+
             setBounceDirectory(spooler_task.params().var("bounce_directory"));
-            
-            spooler_log.debug6(".. job parameter [bounce_directory]: ["
-                                        + spooler_task.params().var(
-                                                "bounce_directory") + "]");
+
+            spooler_log.debug6(".. job parameter [bounce_directory]: [" + spooler_task.params().var("bounce_directory") + "]");
             if (!(new File(getBounceDirectory()).exists()))
-                            ;
-              new File(getBounceDirectory()).mkdirs();
+                ;
+            new File(getBounceDirectory()).mkdirs();
 
-
-            //createJobChain();
+            // createJobChain();
 
         } catch (Exception e) {
             try {
@@ -190,24 +172,21 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         }
 
         return true;
-    }//spooler_init
+    }// spooler_init
 
-    /**
-     * this is our main program.
-     */
+    /** this is our main program. */
     public boolean spooler_process() throws Exception {
 
-    	boolean expunge		= false; // delete marked messages
-        Folder folder 		= null;
-        Message[] messages 	= {};
+        boolean expunge = false; // delete marked messages
+        Folder folder = null;
+        Message[] messages = {};
         SOSMimeMessage sosMimeMessage = null;
 
         try {
 
             this.getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
 
-            receiver = new SOSMailReceiver(receiverHost, receiverPort, pop3_user,
-                    pop3_password);
+            receiver = new SOSMailReceiver(receiverHost, receiverPort, pop3_user, pop3_password);
 
             receiver.setLogger(this.getLogger());
 
@@ -224,13 +203,12 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
             getLogger().debug5("total found messages: " + messages.length);
 
             for (int i = 0; i < messages.length; i++) {
-                sosMimeMessage = new SOSMimeMessage(messages[i], this
-                        .getLogger());
+                sosMimeMessage = new SOSMimeMessage(messages[i], this.getLogger());
                 if (sosMimeMessage.isBounce()) {
                     handleBounceMessage(sosMimeMessage);
                 }// if
             }// for
-            
+
             this.getConnection().commit();
             expunge = true;
 
@@ -251,15 +229,12 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         return false;
     }// spooler_process
 
-    /**
-     * sets the job properties.
+    /** sets the job properties.
      * 
-     * @throws Exception
-     */
+     * @throws Exception */
     private void setJobSettings() throws Exception {
 
-        this.setJobProperties(this.getJobSettings().getSection(
-                "job " + spooler_job.name()));
+        this.setJobProperties(this.getJobSettings().getSection("job " + spooler_job.name()));
 
         Properties ini = this.getJobProperties();
 
@@ -299,50 +274,37 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         pop3_password = ini.getProperty("pop3_password");
         this.getLogger().debug5("..pop3 password [****]");
 
-     /*   
-        // to
-        if (ini.getProperty("to") == null)
-            throw new Exception("[to] missing!!");
-        toArray = ini.getProperty("to").trim().split("[;,]");
-        this.getLogger().debug5("..to array [" + ini.getProperty("to") + "]");
-
-        // get cc
-        if (ini.getProperty("cc") == null)
-            throw new Exception("[cc] missing!!");
-        ccArray = ini.getProperty("cc").trim().split(";");
-        this.getLogger().debug5("..cc array [" + ini.getProperty("cc") + "]");
-
-        // get bcc
-        if (ini.getProperty("bcc") == null)
-            throw new Exception("[bcc] missing!!");
-        bccArray = ini.getProperty("bcc").trim().split(";");
-        this.getLogger().debug5("..bcc array [" + ini.getProperty("bcc") + "]");
-
-        // get from address
-        if (ini.getProperty("from") == null)
-            throw new Exception("[from] missing!!");
-        from = ini.getProperty("from");
-        this.getLogger().debug5("..bcc array [" + from + "]");
-
-        // get fromName
-        if (ini.getProperty("fromname") == null)
-            throw new Exception("[fromname] missing!!");
-        fromName = ini.getProperty("fromname");
-        this.getLogger().debug5("..from name [" + fromName + "]");
-*/
+        /*
+         * // to if (ini.getProperty("to") == null) throw new
+         * Exception("[to] missing!!"); toArray =
+         * ini.getProperty("to").trim().split("[;,]");
+         * this.getLogger().debug5("..to array [" + ini.getProperty("to") +
+         * "]"); // get cc if (ini.getProperty("cc") == null) throw new
+         * Exception("[cc] missing!!"); ccArray =
+         * ini.getProperty("cc").trim().split(";");
+         * this.getLogger().debug5("..cc array [" + ini.getProperty("cc") +
+         * "]"); // get bcc if (ini.getProperty("bcc") == null) throw new
+         * Exception("[bcc] missing!!"); bccArray =
+         * ini.getProperty("bcc").trim().split(";");
+         * this.getLogger().debug5("..bcc array [" + ini.getProperty("bcc") +
+         * "]"); // get from address if (ini.getProperty("from") == null) throw
+         * new Exception("[from] missing!!"); from = ini.getProperty("from");
+         * this.getLogger().debug5("..bcc array [" + from + "]"); // get
+         * fromName if (ini.getProperty("fromname") == null) throw new
+         * Exception("[fromname] missing!!"); fromName =
+         * ini.getProperty("fromname"); this.getLogger().debug5("..from name ["
+         * + fromName + "]");
+         */
         // get forwardSubject
         if (ini.getProperty("forward_subject") == null)
             throw new Exception("[forward_subject] missing!!");
-        
+
         forwardSubject = ini.getProperty("forward_subject");
         this.getLogger().debug5("..forward subject [" + forwardSubject + "]");
 
     }// setJobSettings
 
-    /**
-     * sets the proxy settings if needed.
-     * 
-     */
+    /** sets the proxy settings if needed. */
     private void setProxy() {
         // set proxy if needed
         /*
@@ -352,30 +314,23 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
          */
     }
 
-    /**
-     * return the search item for the bounced message.
+    /** return the search item for the bounced message.
      * 
      * Note: bounced messages should have: - an empty return-path -
      * Content-Type: multipart/report
      * 
-     * @throws Exception
-     * 
-     */
+     * @throws Exception */
     public final SearchTerm getBounceSerachTerm() throws Exception {
         this.getLogger().debug5("Calling " + SOSClassUtil.getMethodName());
-        return new AndTerm(new HeaderTerm("Return-Path", "<>"), new HeaderTerm(
-                "Content-Type", "multipart/report"));
+        return new AndTerm(new HeaderTerm("Return-Path", "<>"), new HeaderTerm("Content-Type", "multipart/report"));
     }// SearchTerm
 
-    /**
-     * returns the action for the specified bounced message.
+    /** returns the action for the specified bounced message.
      * 
      * @param sosMimeMessage
      * @return the action for the specified bounced message otherwise null
-     * @throws Exception
-     */
-    public String getPatternAction(SOSMimeMessage sosMimeMessage)
-            throws Exception {
+     * @throws Exception */
+    public String getPatternAction(SOSMimeMessage sosMimeMessage) throws Exception {
         this.getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
 
         String actionPattern = null;
@@ -386,26 +341,21 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
 
         inputString = sosMimeMessage.getPlainTextBody();
 
-        //for (Map.Entry entry : patternMap.entrySet()) {
+        // for (Map.Entry entry : patternMap.entrySet()) {
         Iterator iterator = patternMap.entrySet().iterator();
         Map.Entry entry = null;
-        for (;iterator.hasNext(); ) {
-        	entry= (Map.Entry)iterator.next();
-            patternId = (String)entry.getKey();
-            pattern = (Pattern)entry.getValue();
+        for (; iterator.hasNext();) {
+            entry = (Map.Entry) iterator.next();
+            patternId = (String) entry.getKey();
+            pattern = (Pattern) entry.getValue();
 
             matcher = pattern.matcher(inputString);
-            
-            this.getLogger().debug5(
-                    "..try find string matched [" + inputString + "]"
-                            + pattern.pattern());
+
+            this.getLogger().debug5("..try find string matched [" + inputString + "]" + pattern.pattern());
 
             if (matcher.find()) {
-                this.getLogger().debug5(
-                        "string matched [" + inputString + "]"
-                                + pattern.pattern());
-                this.getLogger().info(
-                        "..pattern captured \"" + pattern.pattern() + "\"");
+                this.getLogger().debug5("string matched [" + inputString + "]" + pattern.pattern());
+                this.getLogger().info("..pattern captured \"" + pattern.pattern() + "\"");
                 break;
             }// if
         } // for
@@ -424,52 +374,44 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
          * if ( actionPattern.equals(entry.getKey())) return entry.getValue();
          * }//for
          */
-        return (String)patternActions.get(actionPattern);
+        return (String) patternActions.get(actionPattern);
 
         // return null;
 
     }// getPatternAction
 
-    /**
-     * populate the mailBouncePatternTableList
+    /** populate the mailBouncePatternTableList
      * 
-     * @throws Exception
-     */
+     * @throws Exception */
     private void getMailBouncePatterns() throws Exception {
         this.getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
         StringBuffer query = new StringBuffer();
 
-        query
-                .append("SELECT \"PATTERN_ID\",\"PATTERN\",\"ACTION\",\"MAX_RETRIES\",");
-        query
-                .append("\"RETRY_INTERVAL\",\"MAIL_TO\",\"CC_TO\",\"BCC_TO\",\"REPLY_TO\",");
-        query
-                .append("\"SUBJECT\",\"SUBJECT_TEMPLATE\",\"SUBJECT_TEMPLATE_TYPE\" FROM ");
+        query.append("SELECT \"PATTERN_ID\",\"PATTERN\",\"ACTION\",\"MAX_RETRIES\",");
+        query.append("\"RETRY_INTERVAL\",\"MAIL_TO\",\"CC_TO\",\"BCC_TO\",\"REPLY_TO\",");
+        query.append("\"SUBJECT\",\"SUBJECT_TEMPLATE\",\"SUBJECT_TEMPLATE_TYPE\" FROM ");
         query.append(this.getTableMailBouncePatterns());
         query.append(" ORDER BY \"ORDERING\" ASC");
         this.getLogger().debug5("..query [" + query + "]");
-        mailBouncePatternTableList.addAll(this.getConnection().getArray(
-                query.toString()));
+        mailBouncePatternTableList.addAll(this.getConnection().getArray(query.toString()));
 
         if (mailBouncePatternTableList.isEmpty())
             throw new Exception(SOSClassUtil.getMethodName() + ": No entries found!!");
     }// getMailBouncePatterns
 
-    /**
-     * - reads all the entries of table MAIL_BOUNCE_PATTERNS_TABLE and populate
+    /** - reads all the entries of table MAIL_BOUNCE_PATTERNS_TABLE and populate
      * mailBouncePatternTableList -
      * 
      * 
-     * @throws Exception
-     */
+     * @throws Exception */
     private void setMailBouncePatterns() throws Exception {
         this.getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
         HashMap record = new HashMap();
 
-        //patternMap 	   = new LinkedHashMap<String, Pattern>();
-        patternMap 	   = new LinkedHashMap();
+        // patternMap = new LinkedHashMap<String, Pattern>();
+        patternMap = new LinkedHashMap();
 
-        String patternId 	 = "";
+        String patternId = "";
         String patternString = "";
         Pattern pattern = null;
 
@@ -477,19 +419,13 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
 
         for (int i = 0; i < mailBouncePatternTableList.size(); i++) {
             record = (HashMap) mailBouncePatternTableList.get(i);
-            if ((record.get("pattern_id") != null)
-                    && (record.get("pattern") != null)) {
-                getLogger().debug5(
-                        record.get("pattern_id") + "=" + "="
-                                + record.get("pattern").toString());
+            if ((record.get("pattern_id") != null) && (record.get("pattern") != null)) {
+                getLogger().debug5(record.get("pattern_id") + "=" + "=" + record.get("pattern").toString());
                 // compile the pattern string
                 patternId = record.get("pattern_id").toString();
                 patternString = record.get("pattern").toString();
-                pattern = Pattern.compile(patternString, Pattern.MULTILINE
-                        | Pattern.CASE_INSENSITIVE);
-                this.getLogger().debug6(
-                        "..pattern \"" + record.get("pattern").toString()
-                                + "\" compiled successfully.");
+                pattern = Pattern.compile(patternString, Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+                this.getLogger().debug6("..pattern \"" + record.get("pattern").toString() + "\" compiled successfully.");
                 patternMap.put(patternId, pattern);
 
             }// if
@@ -497,23 +433,18 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
 
     }// setMailBouncePatterns
 
-    /**
-     * 
-     * @param sosMimeMessage
-     * @throws Exception
-     */
-    public void handleBounceMessage(SOSMimeMessage sosMimeMessage)
-            throws Exception {
+    /** @param sosMimeMessage
+     * @throws Exception */
+    public void handleBounceMessage(SOSMimeMessage sosMimeMessage) throws Exception {
 
         String bouncedMailAction = "";
-        
 
         int bouncedMailStatus = -1;
 
         // java 1.5
-        //Vector<SOSMailAttachment> sosMailAttachmentList = sosMimeMessage
-         //       .getSosMailAttachments();
-        
+        // Vector<SOSMailAttachment> sosMailAttachmentList = sosMimeMessage
+        // .getSosMailAttachments();
+
         Vector sosMailAttachmentList = sosMimeMessage.getSosMailAttachments();
 
         this.getLogger().info("..bounced message found:");
@@ -521,103 +452,78 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         // get the original message ...
         Iterator it = sosMailAttachmentList.iterator();
         SOSMailAttachment sosMailAttachment = null;
-        for (;it.hasNext();) {
-        	sosMailAttachment = (SOSMailAttachment)it.next();
-        	// check if the attachment = message
-            if (sosMailAttachment.getContentType().equalsIgnoreCase(
-                    "message/rfc822")) {
-                SOSMimeMessage originalMessage = sosMimeMessage
-                        .getAttachedSosMimeMessage(receiver.getSession(),
-                        		sosMailAttachment.getContent());
+        for (; it.hasNext();) {
+            sosMailAttachment = (SOSMailAttachment) it.next();
+            // check if the attachment = message
+            if (sosMailAttachment.getContentType().equalsIgnoreCase("message/rfc822")) {
+                SOSMimeMessage originalMessage = sosMimeMessage.getAttachedSosMimeMessage(receiver.getSession(), sosMailAttachment.getContent());
 
-                this
-                        .setXSOSMailDeliveryCounterHeader(getXSOSMailDeliveryCounterHeader(originalMessage));
+                this.setXSOSMailDeliveryCounterHeader(getXSOSMailDeliveryCounterHeader(originalMessage));
 
                 this.getLogger().info("....originally message attributes:");
-                this.getLogger().info(
-                        "....message id [" + originalMessage.getMessageId()
-                                + "]");
-                this.getLogger().info(
-                        "....from [" + originalMessage.getFromAddress() + "]");
-                this
-                        .getLogger()
-                        .info(
-                                "....sent date ["
-                                        + originalMessage
-                                                .getSentDateAsString("yyyy-MM-dd HH:mm:ss")
-                                        + "]");
-                
-                // .. get the mails.id of the originalMessage.getMessageId if exists
+                this.getLogger().info("....message id [" + originalMessage.getMessageId() + "]");
+                this.getLogger().info("....from [" + originalMessage.getFromAddress() + "]");
+                this.getLogger().info("....sent date [" + originalMessage.getSentDateAsString("yyyy-MM-dd HH:mm:ss") + "]");
+
+                // .. get the mails.id of the originalMessage.getMessageId if
+                // exists
                 setMailId(getMailId(originalMessage.getMessageId()));
-                
-                if(SOSString.isEmpty(getMailId())) // .. skip if no entry available 
-                	continue;
-                
-                // .. then update the "MAILS" table 
+
+                if (SOSString.isEmpty(getMailId())) // .. skip if no entry
+                                                    // available
+                    continue;
+
+                // .. then update the "MAILS" table
                 this.updateTableMails(originalMessage.getMessageId());
-                
+
                 if (!SOSString.isEmpty(getXSOSMailDeliveryCounterHeader())) {
-                    this
-                            .getLogger()
-                            .info(
-                                    "...current "
-                                            + JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER
-                                            + " ["
-                                            + this
-                                                    .getXSOSMailDeliveryCounterHeader()
-                                            + "]");
-                }//if
+                    this.getLogger().info("...current " + JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER + " ["
+                            + this.getXSOSMailDeliveryCounterHeader() + "]");
+                }// if
 
-                bouncedMailAction = this
-                        .getPatternAction(sosMimeMessage);
+                bouncedMailAction = this.getPatternAction(sosMimeMessage);
 
-                this.getLogger().info(
-                        "..available pattern action for this bounce ["
-                                + bouncedMailAction + "]");
+                this.getLogger().info("..available pattern action for this bounce [" + bouncedMailAction + "]");
 
-                
                 // handle action...
                 if (bouncedMailAction.equalsIgnoreCase("drop")) { // delete
-                                                                        // bounced
-                                                                        // message
-                    this.getLogger().info(
-                            "..Message with ID ["
-                                    + sosMimeMessage.getMessageId()
-                                    + "] is marked for delete.");
+                                                                  // bounced
+                                                                  // message
+                    this.getLogger().info("..Message with ID [" + sosMimeMessage.getMessageId() + "] is marked for delete.");
                     sosMimeMessage.deleteMessage();
                     bouncedMailStatus = BounceMailStatus.CANCELLED;
                 } else if (bouncedMailAction.equalsIgnoreCase("store")) {
-                    String fileName = getLogDirectory() + File.separator
-                            + sosMimeMessage.getMessageId();
-                    sosMimeMessage.dumpMessageToFile(fileName, true,false);
-                    bouncedMailStatus = BounceMailStatus.REQUESTED;                    
-                    
+                    String fileName = getLogDirectory() + File.separator + sosMimeMessage.getMessageId();
+                    sosMimeMessage.dumpMessageToFile(fileName, true, false);
+                    bouncedMailStatus = BounceMailStatus.REQUESTED;
+
                 } else if (bouncedMailAction.equalsIgnoreCase("retry")) {
                     // check if retry sending allowed
                     if (isRetrySendingAllowed(originalMessage.getMessageId())) {
 
                         setRetryInterval(getRetryInterval(originalMessage));
- 
+
                         // incr. the X-Header if exists otherwise add a new one
                         int currentHeaderValue;
-                        if ( (currentHeaderValue=originalMessage.incrementHeader(JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER)) == -1) {
-                        	currentHeaderValue = 1;
-                        	originalMessage.setHeader(JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER,"1");
-                        	getLogger().debug5(".. [" + JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER + "] set.");
+                        if ((currentHeaderValue = originalMessage.incrementHeader(JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER)) == -1) {
+                            currentHeaderValue = 1;
+                            originalMessage.setHeader(JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER, "1");
+                            getLogger().debug5(".. [" + JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER + "] set.");
                         }
-                        getLogger().debug5("..current value of \"" + JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER + "\" [" +currentHeaderValue + "]");
-                        
+                        getLogger().debug5("..current value of \"" + JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER + "\" ["
+                                + currentHeaderValue + "]");
+
                         getLogger().debug5("..query directory [" + bounceDirectory + " ] set.");
                         originalMessage.setQueueDir(bounceDirectory);
-                        originalMessage.dumpMessageToFile(true,false);
-                        this.getLogger().debug5("..currently dumped message [" +originalMessage.getDumpedFileName() + "]" );
-                        
+                        originalMessage.dumpMessageToFile(true, false);
+                        this.getLogger().debug5("..currently dumped message [" + originalMessage.getDumpedFileName() + "]");
+
                         if (!orderRetrySend(originalMessage))
-                        	continue;
+                            continue;
                     }
                     bouncedMailStatus = BounceMailStatus.DELIVERED;
                 } else if (bouncedMailAction.equalsIgnoreCase("forward")) {
-                    forwardMessage(sosMimeMessage.getMessage(),receiver.getSession());
+                    forwardMessage(sosMimeMessage.getMessage(), receiver.getSession());
                     bouncedMailStatus = BounceMailStatus.DELIVERED;
                 }
                 updateMailBouncesTable(originalMessage, bouncedMailStatus);
@@ -625,30 +531,26 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         }// for
     } // handleBounceMessage
 
-    /**
-     * 
-     * @param sosMimeMessage
+    /** @param sosMimeMessage
      * @param bouncedMailStatusCode
-     * @throws Exception
-     */
-    public void updateMailBouncesTable(SOSMimeMessage sosMimeMessage, int bouncedMailStatusCode)
-            throws Exception {
-    	
-        StringBuffer query 				= new StringBuffer();
-        String bouncedMailStatusText  	= "";
+     * @throws Exception */
+    public void updateMailBouncesTable(SOSMimeMessage sosMimeMessage, int bouncedMailStatusCode) throws Exception {
 
-        getLogger().debug3("Calling " + SOSClassUtil.getMethodName());        
-        
-        if(bouncedMailStatusCode == BounceMailStatus.REQUESTED) {
-        	bouncedMailStatusText = "requested";
+        StringBuffer query = new StringBuffer();
+        String bouncedMailStatusText = "";
+
+        getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
+
+        if (bouncedMailStatusCode == BounceMailStatus.REQUESTED) {
+            bouncedMailStatusText = "requested";
         } else if (bouncedMailStatusCode == BounceMailStatus.CANCELLED) {
-        	bouncedMailStatusText = "CANCELLED";
+            bouncedMailStatusText = "CANCELLED";
         } else if (bouncedMailStatusCode == BounceMailStatus.DELIVERED) {
-        	bouncedMailStatusText = "DELIVERED";
+            bouncedMailStatusText = "DELIVERED";
         } else if (bouncedMailStatusCode == BounceMailStatus.HAS_ERRORS) {
-        	bouncedMailStatusText = "HAS_ERRORS";
-        } //if
-        
+            bouncedMailStatusText = "HAS_ERRORS";
+        } // if
+
         query = new StringBuffer();
         query.append("INSERT INTO ");
         query.append(this.getTableMailBounces());
@@ -668,7 +570,7 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         query.append(",");
         query.append(SOSString.isEmpty(getMailId()) ? "0" : getMailId());// inbound_id=mails.id
         query.append(",");
-        
+
         query.append(bouncedMailStatusCode);
         query.append(",'");
         query.append(bouncedMailStatusText);
@@ -683,30 +585,21 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         this.getConnection().commit();
     } // updateMailBouncesTable
 
-    /**
-     * @return Returns handleBouncedMailOnly.
-     */
+    /** @return Returns handleBouncedMailOnly. */
     public boolean isHandleBouncedMessagesOnly() {
         return handleBouncedMailOnly;
     }// isHandleBouncedMailOnly
 
-    /**
-     * @param handleBouncedMailOnly
-     *            The handleBouncedMessagesOnly to set.
-     */
+    /** @param handleBouncedMailOnly The handleBouncedMessagesOnly to set. */
     public void setHandleBouncedMailOnly(boolean handleBouncedMailOnly) {
         this.handleBouncedMailOnly = handleBouncedMailOnly;
     }// setHandleBouncedMessagesOnly
 
-    /**
-     *
-     * 
-     * @throws Exception
-     */
+    /** @throws Exception */
     public void setPatternActions() throws Exception {
         getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
 
-        //this.patternActions = new HashMap<String, String>();
+        // this.patternActions = new HashMap<String, String>();
         this.patternActions = new HashMap();
         this.patternActions.put("0", "drop");
         this.patternActions.put("10", "store");
@@ -714,15 +607,13 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         this.patternActions.put("200", "forward");
     }// setPatternActions
 
-    /**
-     * returns the retry count value of the message with the ID ="messageId"
+    /** returns the retry count value of the message with the ID ="messageId"
      * otherwise -1.
      * 
      * @param messageId
      * @return integer value represents the retry count value with the ID
      *         ="messageId" otherwise 0.
-     * @throws Exception
-     */
+     * @throws Exception */
     public int getRetryCounter(String messageId) throws Exception {
         this.getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
         HashMap result = new HashMap();
@@ -735,13 +626,9 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         getLogger().debug5("..query[" + query.toString() + "]");
         result = getConnection().getSingle(query.toString());
 
-        if (result.get("retry_count") != null
-                && !SOSString.isEmpty(result.get("retry_count").toString())) {
+        if (result.get("retry_count") != null && !SOSString.isEmpty(result.get("retry_count").toString())) {
             try {
-                getLogger().info(
-                        "..message with ID [" + messageId
-                                + "] is already delivered ["
-                                + result.get("retry_count").toString() + "] time(s)");
+                getLogger().info("..message with ID [" + messageId + "] is already delivered [" + result.get("retry_count").toString() + "] time(s)");
             } catch (Exception e) {
             }
             return Integer.parseInt(result.get("retry_count").toString());
@@ -749,13 +636,10 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         return -1;
     }// getRetryCount
 
-
-    /**
-     * update data in the MAILS table for the message with the ID "messageId"
+    /** update data in the MAILS table for the message with the ID "messageId"
      * 
      * @param messageId the message ID
-     * @throws Exception
-     */
+     * @throws Exception */
     public void updateTableMails(String messageId) throws Exception {
         StringBuffer query = new StringBuffer();
         getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
@@ -773,16 +657,13 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         this.getConnection().execute(query.toString());
 
     }// updateTableMails
-    
-    
-    /**
-     * returns the ID of the specified messageId from 
-     * the MAILS table if exists, -1 otherwise
+
+    /** returns the ID of the specified messageId from the MAILS table if exists,
+     * -1 otherwise
      * 
      * @param messageId
      * @return int represents the ID of the messageId in the "MAILS" table
-     * @throws Exception
-     */
+     * @throws Exception */
     private String getMailId(String messageId) throws Exception {
         StringBuffer query = new StringBuffer();
 
@@ -796,14 +677,10 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         return this.getConnection().getSingleValue(query.toString());
 
     }// getMailId
-    
 
-    /**
-     * 
-     * @param messageId
+    /** @param messageId
      * @return boolean
-     * @throws Exception
-     */
+     * @throws Exception */
     public boolean isRetrySendingAllowed(String messageId) throws Exception {
         int retryCounter = -1;
         HashMap patternEntry = new HashMap();
@@ -815,8 +692,7 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         // ..if not, may be it is set as X-SOSMAIL-delivery-counter
         if (retryCounter <= 0) {
             if (!SOSString.isEmpty(this.getXSOSMailDeliveryCounterHeader())) {
-                retryCounter = Integer.parseInt(this
-                        .getXSOSMailDeliveryCounterHeader());
+                retryCounter = Integer.parseInt(this.getXSOSMailDeliveryCounterHeader());
             }
         }
 
@@ -825,25 +701,19 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         if (retryCounter > 0) {
             for (int i = 0; i < this.mailBouncePatternTableList.size(); i++) {
                 patternEntry = (HashMap) this.mailBouncePatternTableList.get(i);
-                
-                if (patternEntry.get("pattern_id") != null
-                        && patternEntry.get("pattern_id").toString().equals(
-                                patternId)) {
-                	
+
+                if (patternEntry.get("pattern_id") != null && patternEntry.get("pattern_id").toString().equals(patternId)) {
+
                     if (patternEntry.get("max_retries") != null)
-                        return (Integer.parseInt(patternEntry
-                                .get("max_retries").toString()) > retryCounter);
+                        return (Integer.parseInt(patternEntry.get("max_retries").toString()) > retryCounter);
                 }// if
             }// for
         }// if
         return false;
     }// isRetrySendingAllowed
 
-    /**
-     * 
-     * @param sosMimeMessage
-     * @throws Exception
-     */
+    /** @param sosMimeMessage
+     * @throws Exception */
     public int getRetryInterval(SOSMimeMessage sosMimeMessage) throws Exception {
 
         StringBuffer query = new StringBuffer();
@@ -852,8 +722,7 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
 
         int atIndex = sosMimeMessage.getFromAddress().indexOf('@');
-        String domain = sosMimeMessage.getFromAddress().substring(atIndex + 1,
-                sosMimeMessage.getFromAddress().length());
+        String domain = sosMimeMessage.getFromAddress().substring(atIndex + 1, sosMimeMessage.getFromAddress().length());
         retryInterval = -1;
 
         query.append("SELECT \"RETRY_INTERVAL\" FROM ");
@@ -881,8 +750,7 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
 
             this.getLogger().debug5("..query [" + query + "]");
 
-            retryItervalString = getConnection().getSingleValue(
-                    query.toString());
+            retryItervalString = getConnection().getSingleValue(query.toString());
 
             // check if we got a valid retryIterval
             if (!SOSString.isEmpty(retryItervalString)) {
@@ -893,126 +761,97 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         return retryInterval;
     }// getRetryInterval
 
-    /**
-     * @return Returns the bounceDirectory.
-     */
+    /** @return Returns the bounceDirectory. */
     public String getBounceDirectory() {
         return bounceDirectory;
     }
 
-    /**
-     * @param bounceDirectory
-     *            The bounceDirectory to set.
-     */
+    /** @param bounceDirectory The bounceDirectory to set. */
     public void setBounceDirectory(String bounceDirectory) {
         this.bounceDirectory = bounceDirectory;
     }
 
-    /**
-     * @return Returns the retryInterval.
-     */
+    /** @return Returns the retryInterval. */
     public int getRetryInterval() {
         return retryInterval;
     }
 
-    /**
-     * @param retryInterval
-     *            The retryInterval to set.
-     */
+    /** @param retryInterval The retryInterval to set. */
     public void setRetryInterval(int retryInterval) {
         this.retryInterval = retryInterval;
     }
 
-    /**
-     * @return Returns the xSOSMailDeliveryCounterHeader.
-     */
+    /** @return Returns the xSOSMailDeliveryCounterHeader. */
     public String getXSOSMailDeliveryCounterHeader() {
         return xSOSMailDeliveryCounterHeader;
     }
 
-    /**
-     * returns the value of the X_SOSMAIL_DELIVERY_COUNTER_HEADER header if exists otherwise null.
+    /** returns the value of the X_SOSMAIL_DELIVERY_COUNTER_HEADER header if
+     * exists otherwise null.
      * 
      * @param sosMimeMessage
-     * @return String represents the value of the X_SOSMAIL_DELIVERY_COUNTER_HEADER
-     * @throws Exception
-     */
-    private String getXSOSMailDeliveryCounterHeader(
-            SOSMimeMessage sosMimeMessage) throws Exception {
+     * @return String represents the value of the
+     *         X_SOSMAIL_DELIVERY_COUNTER_HEADER
+     * @throws Exception */
+    private String getXSOSMailDeliveryCounterHeader(SOSMimeMessage sosMimeMessage) throws Exception {
         return sosMimeMessage.getHeaderValue(X_SOSMAIL_DELIVERY_COUNTER_HEADER);
     }// getXSOSMailDeliveryCounterHeader
 
-    /**
-     * @param mailDeliveryCounterHeader
-     *            The xSOSMailDeliveryCounterHeader to set.
-     */
-    private void setXSOSMailDeliveryCounterHeader(
-            String mailDeliveryCounterHeader) {
+    /** @param mailDeliveryCounterHeader The xSOSMailDeliveryCounterHeader to set. */
+    private void setXSOSMailDeliveryCounterHeader(String mailDeliveryCounterHeader) {
         xSOSMailDeliveryCounterHeader = mailDeliveryCounterHeader;
     }
 
-    /**
-     * 
-     * @param sosMimeMessage
+    /** @param sosMimeMessage
      * @return true if success otherwise false
-     * @throws Exception
-     */
+     * @throws Exception */
     public boolean orderRetrySend(SOSMimeMessage sosMimeMessage) throws Exception {
 
         getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
-        
+
         // create parameters
         Variable_set orderData = spooler.create_variable_set();
         orderData.set_var("file", new File(sosMimeMessage.getDumpedFileName()).getName());
-        
-        if(!SOSString.isEmpty(getMailId())) {
-        	orderData.set_var("id", getMailId());
+
+        if (!SOSString.isEmpty(getMailId())) {
+            orderData.set_var("id", getMailId());
         }
 
         Order order = spooler.create_order();
-        
-        //order.set_id(sosMimeMessage.getMessageId());
-        
+
+        // order.set_id(sosMimeMessage.getMessageId());
+
         order.set_title(this.getJobTitle() + "." + jobChainName);
-        
+
         order.set_payload(orderData);
 
-        if ( !spooler.job_chain_exists(jobChainName)) {
+        if (!spooler.job_chain_exists(jobChainName)) {
             getLogger().warn("could not find job chain: " + jobChainName);
-        	return false;
+            return false;
         }
-        
+
         spooler.job_chain(jobChainName).add_or_replace_order(order);
 
         // setback order
-        spooler_task.job().set_delay_order_after_setback(1,
-                this.getRetryInterval());
+        spooler_task.job().set_delay_order_after_setback(1, this.getRetryInterval());
 
         getLogger().debug3(".. order " + order.title() + " added.");
 
         return true;
-        
-    }//retrySend
 
-    /**
-     * @return Returns the jobChainName.
-     */
+    }// retrySend
+
+    /** @return Returns the jobChainName. */
     public String getJobChainName() {
         return jobChainName;
     }
 
-    /**
-     * @param jobChainName The jobChainName to be set.
-     */
+    /** @param jobChainName The jobChainName to be set. */
     public void setJobChainName(String jobChainName) {
         this.jobChainName = jobChainName;
     }
-    
 
-    /**
-     *  
-     * @throws Exception
-     */
+    /** @throws Exception */
     private void createJobChain() throws Exception {
         getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
         if (spooler.job_chain_exists(jobChainName))
@@ -1026,20 +865,17 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         jobChain.add_end_state("1100");// on error
         spooler.add_job_chain(jobChain);
         getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
-    }//createJobChain
-    
-    
-    /**
-     * forwards the spicified message
+    }// createJobChain
+
+    /** forwards the spicified message
      * 
      * @param message
      * @param session
-     * @throws Exception
-     */
-    public void forwardMessage(MimeMessage message,Session session) throws Exception {
-        
-        getLogger().debug3("Calling "+SOSClassUtil.getMethodName());
-        
+     * @throws Exception */
+    public void forwardMessage(MimeMessage message, Session session) throws Exception {
+
+        getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
+
         String[] toArray = {};
 
         String[] ccArray = {};
@@ -1047,32 +883,32 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         String[] bccArray = {};
 
         String mailFrom = "";
-        
+
         HashMap patternEntry = new HashMap();
-        
+
         // set the mail properties
         for (int i = 0; i < this.mailBouncePatternTableList.size(); i++) {
             patternEntry = (HashMap) this.mailBouncePatternTableList.get(i);
             if (patternEntry.get("pattern_id") != null && patternEntry.get("pattern_id").toString().equals(patternId)) {
-                
+
                 // get mail_to
                 if (patternEntry.get("mail_to") == null)
                     throw new Exception("[mail_to] missing!!");
                 toArray = patternEntry.get("mail_to").toString().trim().split("[;,]");
                 this.getLogger().debug6("..mail to  [" + patternEntry.get("mail_to").toString() + "]");
-                
+
                 // get mail_cc (optional)
                 if (patternEntry.get("mail_cc") != null) {
-                ccArray = patternEntry.get("mail_cc").toString().trim().split("[;,]");
-                this.getLogger().debug6("..mail cc [" + patternEntry.get("mail_cc").toString() + "]");
+                    ccArray = patternEntry.get("mail_cc").toString().trim().split("[;,]");
+                    this.getLogger().debug6("..mail cc [" + patternEntry.get("mail_cc").toString() + "]");
                 }
-                
+
                 // get mail_bcc (optionaö)
                 if (patternEntry.get("mail_bcc") != null) {
-               ccArray = patternEntry.get("mail_bcc").toString().trim().split("[;,]");
-                this.getLogger().debug6("..mail bcc [" + patternEntry.get("mail_bcc").toString() + "]");
+                    ccArray = patternEntry.get("mail_bcc").toString().trim().split("[;,]");
+                    this.getLogger().debug6("..mail bcc [" + patternEntry.get("mail_bcc").toString() + "]");
                 }
-                
+
                 // get mail_from
                 if (patternEntry.get("reply_to") == null)
                     throw new Exception("[reply_to] missing!!");
@@ -1082,30 +918,30 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
                 break;
             }// if
         }// for
-        
+
         // Setup the smtp mail server
         session.getProperties().put("mail.smtp.host", smtpHost);
-        
+
         session.getProperties().put("mail.smtp.port", smtpPort);
 
         MimeMessage forward = new MimeMessage(session);
-        
-        forward.setSubject("Fw. "+message.getSubject());
-        
+
+        forward.setSubject("Fw. " + message.getSubject());
+
         forward.setFrom(new InternetAddress(mailFrom));
-        
-        for(int i=0;i<toArray.length;i++) {
-          forward.addRecipient(Message.RecipientType.TO, new InternetAddress(toArray[i]));
+
+        for (int i = 0; i < toArray.length; i++) {
+            forward.addRecipient(Message.RecipientType.TO, new InternetAddress(toArray[i]));
         }
-        
-        for(int i=0;i<ccArray.length;i++) {
+
+        for (int i = 0; i < ccArray.length; i++) {
             forward.addRecipient(Message.RecipientType.CC, new InternetAddress(ccArray[i]));
         }
 
-        for(int i=0;i<bccArray.length;i++) {
+        for (int i = 0; i < bccArray.length; i++) {
             forward.addRecipient(Message.RecipientType.BCC, new InternetAddress(bccArray[i]));
         }
-       
+
         BodyPart messageBodyPart = new MimeBodyPart();
         messageBodyPart.setText(forwardSubject);
 
@@ -1120,29 +956,26 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         forward.setContent(multipart);
 
         Transport.send(forward);
-        
-       }//forwardMessage
 
-    /**
-     * returns the id of the message that could be find in the "MAILS" table.
+    }// forwardMessage
+
+    /** returns the id of the message that could be find in the "MAILS" table.
      * 
-     * @return String represents the message id from the "MAILS" table
-     */
-	public String getMailId() {
-		return mailId;
-	}
+     * @return String represents the message id from the "MAILS" table */
+    public String getMailId() {
+        return mailId;
+    }
 
-	public void setMailId(String mailId) {
-		this.mailId = mailId;
-	}
-    
+    public void setMailId(String mailId) {
+        this.mailId = mailId;
+    }
 
- 
-	final class BounceMailStatus {
-		public final static int REQUESTED = 0;
-		public final static int DELIVERED = 1;
-		public final static int CANCELLED = 1001;
-		public final static int HAS_ERRORS = 1002;
-	}
+    final class BounceMailStatus {
+
+        public final static int REQUESTED = 0;
+        public final static int DELIVERED = 1;
+        public final static int CANCELLED = 1001;
+        public final static int HAS_ERRORS = 1002;
+    }
 
 }

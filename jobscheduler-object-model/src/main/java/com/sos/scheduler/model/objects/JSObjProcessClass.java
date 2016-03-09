@@ -12,6 +12,7 @@ import com.sos.scheduler.model.SchedulerObjectFactory;
 
 /** @author oh */
 public class JSObjProcessClass extends ProcessClass {
+
     private static final Logger LOGGER = Logger.getLogger(JSObjProcessClass.class);
     public final static String fileNameExtension = ".process_class.xml";
 

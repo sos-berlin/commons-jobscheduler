@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import com.sos.hibernate.classes.SosSortTableItem;
 
 public class DateComperator extends SortBaseComparator implements Comparable {
-    
+
     private static final Logger LOGGER = Logger.getLogger(DateComperator.class);
 
     public DateComperator(SosSortTableItem tableItem, int rowNum, int colPos) {
@@ -87,7 +87,7 @@ public class DateComperator extends SortBaseComparator implements Comparable {
     public boolean equals(Object obj) {
         return super.equals(obj);
     }
-    
+
     @Override
     public int hashCode() {
         return super.hashCode();

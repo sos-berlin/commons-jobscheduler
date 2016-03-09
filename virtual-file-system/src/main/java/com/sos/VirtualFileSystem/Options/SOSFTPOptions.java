@@ -232,10 +232,8 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         setDefaultHostPort(protocol, port, host);
         setDefaultHostPort(this.Source().protocol, this.Source().port, this.Source().host);
         setDefaultHostPort(this.Target().protocol, this.Target().port, this.Target().host);
-        setDefaultHostPort(this.Source().Alternatives().protocol, this.Source().Alternatives().port, 
-                this.Source().Alternatives().host);
-        setDefaultHostPort(this.Target().Alternatives().protocol, this.Target().Alternatives().port, 
-                this.Target().Alternatives().host);
+        setDefaultHostPort(this.Source().Alternatives().protocol, this.Source().Alternatives().port, this.Source().Alternatives().host);
+        setDefaultHostPort(this.Target().Alternatives().protocol, this.Target().Alternatives().port, this.Target().Alternatives().host);
         getDataSourceType();
         getDataTargetType();
     }
@@ -671,8 +669,8 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 
     private boolean hasVariableToSubstitute(String value) {
         boolean result = false;
-        value = " " + value.toLowerCase().replaceAll("(\\$|%)\\{(source|target)(transfer)?filename\\}", "")
-                .replaceAll("%(source|target)(transfer)?filename%", "");
+        value = " "
+                + value.toLowerCase().replaceAll("(\\$|%)\\{(source|target)(transfer)?filename\\}", "").replaceAll("%(source|target)(transfer)?filename%", "");
         if (value.matches("^.*[^\\\\](\\$|%)\\{[^/\\}\\\\]+\\}.*$") || value.matches("^.*[^\\\\]%[^/%\\\\]+%.*$")) {
             result = true;
         }

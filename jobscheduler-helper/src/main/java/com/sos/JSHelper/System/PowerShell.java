@@ -46,6 +46,7 @@ public class PowerShell {
         source.deleteOnExit();
         sourceWriter = new PrintWriter(source);
         runtime.addShutdownHook(shutdownThread = new Thread() {
+
             @Override
             public void run() {
                 detatch();
@@ -53,6 +54,7 @@ public class PowerShell {
         });
         outputPipe = new PipedOutputStream(inputPipe = new PipedInputStream());
         (inputThread = new Thread(PowerShell.class.getSimpleName() + "Thread") {
+
             @Override
             public void run() {
                 InputStream stream = null;
@@ -69,7 +71,7 @@ public class PowerShell {
                     if (stream != null)
                         try {
                             stream.close();
-                        } catch (IOException e) { 
+                        } catch (IOException e) {
                             /* ... */
                         }
                     detatch();
@@ -77,6 +79,7 @@ public class PowerShell {
             }
         }).start();
         (garbageTimer = new Timer(PowerShell.class.getSimpleName() + "GarbageTimer", true)).scheduleAtFixedRate(new TimerTask() {
+
             @Override
             public void run() {
                 if (isDetatched()) {
@@ -108,7 +111,7 @@ public class PowerShell {
             sourceWriter.println(". JavaInitialize(\"" + newSource.getAbsolutePath() + "\")");
             sourceWriter.close();
             sourceWriter = new PrintWriter(source = newSource);
-        } catch (IOException e) { 
+        } catch (IOException e) {
             /* ... */
         }
     }
@@ -120,13 +123,13 @@ public class PowerShell {
         try {
             process.destroy();
             process.waitFor();
-        } catch (InterruptedException e) { 
+        } catch (InterruptedException e) {
             /* ... */
         }
         source.delete();
         try {
             outputPipe.close();
-        } catch (IOException e) { 
+        } catch (IOException e) {
             /* ... */
         }
     }

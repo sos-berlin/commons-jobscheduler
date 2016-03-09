@@ -13,9 +13,13 @@ import com.sos.hibernate.classes.SOSHibernateIntervalFilter;
 public abstract class SOSHibernateIntervalDBLayer extends SOSHibernateDBLayer {
 
     private static final Logger LOGGER = Logger.getLogger(SOSHibernateIntervalDBLayer.class);
+
     public abstract SOSHibernateIntervalFilter getFilter();
+
     public abstract void onAfterDeleting(DbItem h);
+
     public abstract List<DbItem> getListOfItemsToDelete();
+
     public abstract long deleteInterval();
 
     public SOSHibernateIntervalDBLayer() {

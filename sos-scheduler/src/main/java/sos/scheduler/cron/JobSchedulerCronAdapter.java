@@ -445,7 +445,7 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
             if (jobFile != null) {
                 throw new Exception("Error occured updating job file \"" + jobFile.getAbsolutePath() + "\": " + e.getMessage(), e);
             } else {
-                throw new Exception("Error occured updating file for job \"" + jobName + "\": " + e. getMessage(), e);
+                throw new Exception("Error occured updating file for job \"" + jobName + "\": " + e.getMessage(), e);
             }
         }
     }

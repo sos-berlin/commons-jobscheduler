@@ -109,7 +109,7 @@ public class SOSFilteredFileReader extends JSToolBox implements ISOSFilteredFile
 
     @Override
     public void processRecord(final String pstrRecord) {
-        // 
+        //
     }
 
     @Override

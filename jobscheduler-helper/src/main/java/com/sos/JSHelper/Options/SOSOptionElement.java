@@ -690,7 +690,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
         return strRet;
     }
 
-   public String Value() throws RuntimeException {
+    public String Value() throws RuntimeException {
         if (strValue == null) {
             strValue = "";
         }

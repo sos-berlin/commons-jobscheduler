@@ -26,4 +26,4 @@ public class JSObjects2GraphvizMain extends JSToolBox {
         System.exit(0);
     }
 
-} 
+}

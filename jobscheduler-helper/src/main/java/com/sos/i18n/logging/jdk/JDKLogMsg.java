@@ -1207,8 +1207,8 @@ public class JDKLogMsg {
 
     /** Logs the message, along with the given <code>throwable</code>, at the
      * error level. If {@link com.sos.i18n.Logger#getDumpStackTraces() stack
-     * traces are not to be dumped}, the logged message will be appended with
-     * the throwable's <code>Throwable.toString()</code> contents.
+     * traces are not to be dumped}, the logged message will be appended with the
+     * throwable's <code>Throwable.toString()</code> contents.
      *
      * @param log where to log the message
      * @param key the resource key that is associated with the message
@@ -1225,8 +1225,8 @@ public class JDKLogMsg {
 
     /** Logs the message, along with the given <code>throwable</code>, at the
      * warn level. If {@link com.sos.i18n.Logger#getDumpStackTraces() stack
-     * traces are not to be dumped}, the logged message will be appended with
-     * the throwable's <code>Throwable.toString()</code> contents.
+     * traces are not to be dumped}, the logged message will be appended with the
+     * throwable's <code>Throwable.toString()</code> contents.
      *
      * @param log where to log the message
      * @param key the resource key that is associated with the message
@@ -1243,8 +1243,8 @@ public class JDKLogMsg {
 
     /** Logs the message, along with the given <code>throwable</code>, at the
      * info level. If {@link com.sos.i18n.Logger#getDumpStackTraces() stack
-     * traces are not to be dumped}, the logged message will be appended with
-     * the throwable's <code>Throwable.toString()</code> contents.
+     * traces are not to be dumped}, the logged message will be appended with the
+     * throwable's <code>Throwable.toString()</code> contents.
      *
      * @param log where to log the message
      * @param key the resource key that is associated with the message
@@ -1261,8 +1261,8 @@ public class JDKLogMsg {
 
     /** Logs the message, along with the given <code>throwable</code>, at the
      * debug level. If {@link com.sos.i18n.Logger#getDumpStackTraces() stack
-     * traces are not to be dumped}, the logged message will be appended with
-     * the throwable's <code>Throwable.toString()</code> contents.
+     * traces are not to be dumped}, the logged message will be appended with the
+     * throwable's <code>Throwable.toString()</code> contents.
      *
      * @param log where to log the message
      * @param key the resource key that is associated with the message
@@ -1279,8 +1279,8 @@ public class JDKLogMsg {
 
     /** Logs the message, along with the given <code>throwable</code>, at the
      * trace level. If {@link com.sos.i18n.Logger#getDumpStackTraces() stack
-     * traces are not to be dumped}, the logged message will be appended with
-     * the throwable's <code>Throwable.toString()</code> contents.
+     * traces are not to be dumped}, the logged message will be appended with the
+     * throwable's <code>Throwable.toString()</code> contents.
      *
      * @param log where to log the message
      * @param key the resource key that is associated with the message

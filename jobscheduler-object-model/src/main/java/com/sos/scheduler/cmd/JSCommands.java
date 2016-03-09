@@ -9,9 +9,8 @@ import javax.xml.bind.JAXBElement;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A container class to collect commands and send them all together to an JobScheduler instance.
- */
+/** A container class to collect commands and send them all together to an
+ * JobScheduler instance. */
 public class JSCommands extends JSCommand {
 
     private static Logger logger = Logger.getLogger(JSCommands.class);
@@ -28,11 +27,11 @@ public class JSCommands extends JSCommand {
     }
 
     public void addCommand(JSCommand command) {
-        if(xmlHeader.isEmpty()) {
+        if (xmlHeader.isEmpty()) {
             String xml = command.getCommand().toXMLString();
-            xmlHeader = xml.substring(0,xml.indexOf("?>")+2);
+            xmlHeader = xml.substring(0, xml.indexOf("?>") + 2);
         }
-        listOfCommands.add(command.getCommand().toXMLString().replace(xmlHeader,""));
+        listOfCommands.add(command.getCommand().toXMLString().replace(xmlHeader, ""));
     }
 
     @Override
@@ -41,7 +40,7 @@ public class JSCommands extends JSCommand {
         StringBuffer xmlCmd = new StringBuffer();
         xmlCmd.append(xmlHeader);
         xmlCmd.append("<commands>");
-        for(String cmd : listOfCommands) {
+        for (String cmd : listOfCommands) {
             xmlCmd.append(cmd.trim());
         }
         xmlCmd.append("</commands>");
@@ -50,11 +49,11 @@ public class JSCommands extends JSCommand {
         cmdContainer.setObjectFieldsFrom(obj.getValue());
         logger.info(cmdContainer.toXMLString());
 
-        try{
+        try {
             super.run();
         } catch (Exception e) {
             String msg = "Error fetching commands object.";
-            throw new JobSchedulerException(msg,e);
+            throw new JobSchedulerException(msg, e);
         }
 
     }

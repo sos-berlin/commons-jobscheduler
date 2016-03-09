@@ -94,8 +94,9 @@ public class LoggerLocale {
         try {
             locale_prop = System.getProperty(LOG_LOCALE_SYSTEM_PROPERTY);
             locale_is_default_prop = Boolean.getBoolean(LOG_LOCALE_IS_DEFAULT_SYSTEM_PROPERTY);
-        } catch (Exception t) { 
-            // probably due to a security manager not allowing us to see the properties
+        } catch (Exception t) {
+            // probably due to a security manager not allowing us to see the
+            // properties
         }
         s_logLocale = parseLocaleString(locale_prop, locale_is_default_prop);
         return s_logLocale;

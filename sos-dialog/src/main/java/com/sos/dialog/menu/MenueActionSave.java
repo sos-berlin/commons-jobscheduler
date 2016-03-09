@@ -8,7 +8,7 @@ import com.sos.dialog.message.DialogMsg;
 public class MenueActionSave extends MenueActionBase {
 
     private static final Logger LOGGER = Logger.getLogger(MenueActionSave.class);
-    
+
     public MenueActionSave() {
         this("");
     }

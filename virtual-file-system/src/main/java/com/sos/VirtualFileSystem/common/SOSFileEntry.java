@@ -3,81 +3,83 @@ package com.sos.VirtualFileSystem.common;
 import java.io.File;
 
 public class SOSFileEntry {
-    
-    
+
     private static final String FILE = "File";
     private static final String FOLDER = "Folder";
-    private String     filename;
-    private long       filesize;
-    private boolean    directory;
-    private String     parentPath;
+    private String filename;
+    private long filesize;
+    private boolean directory;
+    private String parentPath;
 
-    
     public String getFilename() {
-           return filename;
+        return filename;
     }
-    
-   
-    
+
     public void setFilename(String filename) {
-            this.filename = filename;
+        this.filename = filename;
     }
+
     public long getFilesize() {
         return filesize;
     }
+
     public void setFilesize(long filesize) {
         this.filesize = filesize;
     }
+
     public boolean isDirectory() {
         return directory;
     }
+
     public void setDirectory(boolean directory) {
         this.directory = directory;
     }
+
     public String getParentPath() {
-        if (parentPath == null){
+        if (parentPath == null) {
             return "";
-        }else{
-           return parentPath;
+        } else {
+            return parentPath;
         }
     }
+
     public void setParentPath(String parentPath) {
-        if (parentPath == null){
+        if (parentPath == null) {
             parentPath = "/";
-        }else{
+        } else {
             parentPath = new File(parentPath).getPath();
-            if (parentPath != null){
-               this.parentPath = parentPath.replaceAll("\\\\","/"); 
-            }else{
-               this.parentPath = parentPath;
+            if (parentPath != null) {
+                this.parentPath = parentPath.replaceAll("\\\\", "/");
+            } else {
+                this.parentPath = parentPath;
             }
         }
     }
-    
-    public String getFullPath(){
-        File f = new File(parentPath,filename);
-        String p=f.getPath();
-        p = p.replaceAll("\\\\","/"); 
+
+    public String getFullPath() {
+        File f = new File(parentPath, filename);
+        String p = f.getPath();
+        p = p.replaceAll("\\\\", "/");
         return p;
     }
-    
-    public boolean isDirUp(){
+
+    public boolean isDirUp() {
         return (filename != null && filename.equals(".."));
     }
-    
-    public String getFilesizeAsString(){
+
+    public String getFilesizeAsString() {
         return String.valueOf(filesize);
     }
-    
-    public String getCategory(){
-        if (isDirectory()){
+
+    public String getCategory() {
+        if (isDirectory()) {
             return FOLDER;
-        }else{
+        } else {
             return FILE;
         }
     }
 
-    public boolean isFileOrFolder(){
+    public boolean isFileOrFolder() {
         return !(filename == null || filename.equals("..") || filename.equals(".") || filename.equals(""));
     }
 }

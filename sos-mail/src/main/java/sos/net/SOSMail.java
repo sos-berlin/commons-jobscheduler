@@ -444,12 +444,11 @@ public class SOSMail {
                     value = replacements.get(key.toString());
                     if (value != null) {
                         try {
-                            content = content.replaceAll("&\\#\\(" + key.toString() + "\\)", 
-                                    SOSDate.getDateAsString(SOSDate.getDate(value.toString()), this.getDateFormat()));
-                            content = content.replaceAll("&\\#\\#\\(" + key.toString() + "\\)", 
-                                    SOSDate.getDateTimeAsString(SOSDate.getDate(value.toString()), this.getDatetimeFormat()));
+                            content = content.replaceAll("&\\#\\(" + key.toString() + "\\)", SOSDate.getDateAsString(SOSDate.getDate(value.toString()), this.getDateFormat()));
+                            content = content.replaceAll("&\\#\\#\\(" + key.toString() + "\\)", SOSDate.getDateTimeAsString(SOSDate.getDate(value.toString()), this.getDatetimeFormat()));
                         } catch (Exception ex) {
-                            // ignore this error: replacement is not convertible to date
+                            // ignore this error: replacement is not convertible
+                            // to date
                         }
                         Locale defaultLocale = Locale.getDefault();
                         try {
@@ -719,8 +718,7 @@ public class SOSMail {
         } catch (javax.mail.MessagingException e) {
             // ist ein Fehler, bei dem es lohnt, zwischenzuspeichern?
             if (queueDir.length() > 0 && e.getMessage().startsWith("Could not connect to SMTP host")
-                    || e.getMessage().startsWith("Unknown SMTP host") 
-                    || e.getMessage().startsWith("Read timed out")
+                    || e.getMessage().startsWith("Unknown SMTP host") || e.getMessage().startsWith("Read timed out")
                     || e.getMessage().startsWith("Exception reading response")) {
                 lastError = e.getMessage() + " ==> " + host + ":" + port + " " + user + "/********";
                 try {

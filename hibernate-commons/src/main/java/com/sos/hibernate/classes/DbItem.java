@@ -9,8 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-/**
- * \class DbItem
+/** \class DbItem
  * 
  * \brief DbItem -
  * 
@@ -31,8 +30,7 @@ import java.util.GregorianCalendar;
  * </p>
  * \author Uwe Risse \version 19.01.2012 \see reference
  *
- * Created on 19.01.2012 12:57:02
- */
+ * Created on 19.01.2012 12:57:02 */
 public class DbItem {
 
     @SuppressWarnings("unused")

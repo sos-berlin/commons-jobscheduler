@@ -286,11 +286,11 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
                         Element param = getEvents().createElement("param");
                         param.setAttribute("name", parameterNames[i]);
                         param.setAttribute("value", this.getParameters().value(parameterNames[i]));
-						if(parameterNames[i].contains("password")){
-							getLogger().debug3("Event parameter [" + parameterNames[i] + "]: *****");
-						}else{
-                        getLogger().debug3("Event parameter [" + parameterNames[i] + "]: " + this.getParameters().value(parameterNames[i]));
-						}
+                        if (parameterNames[i].contains("password")) {
+                            getLogger().debug3("Event parameter [" + parameterNames[i] + "]: *****");
+                        } else {
+                            getLogger().debug3("Event parameter [" + parameterNames[i] + "]: " + this.getParameters().value(parameterNames[i]));
+                        }
                         this.getEventParameters().appendChild(param);
                     }
                 }
@@ -337,7 +337,8 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
                 cal.set(Calendar.HOUR_OF_DAY, hours);
                 cal.set(Calendar.MINUTE, minutes);
                 cal.set(Calendar.SECOND, seconds);
-                // add one day if the current timestamp is after the calculated cycle
+                // add one day if the current timestamp is after the calculated
+                // cycle
                 if (cal.after(SOSDate.getCurrentTime())) {
                     cal.add(Calendar.DAY_OF_MONTH, 1);
                 }
@@ -395,8 +396,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
                         continue;
                     }
                     Node curEventExpires = node.getAttributes().getNamedItem("expires");
-                    if (curEventExpires == null || curEventExpires.getNodeValue() == null 
-                            || curEventExpires.getNodeValue().length() == 0
+                    if (curEventExpires == null || curEventExpires.getNodeValue() == null || curEventExpires.getNodeValue().length() == 0
                             || "never".equalsIgnoreCase(curEventExpires.getNodeValue())) {
                         activeNodeCount++;
                         continue;
@@ -435,8 +435,8 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
             conn.commit();
             Vector<?> vEvents = conn.getArrayAsVector("SELECT \"SPOOLER_ID\", \"REMOTE_SCHEDULER_HOST\", \"REMOTE_SCHEDULER_PORT\", "
                     + "\"JOB_CHAIN\", \"ORDER_ID\", \"JOB_NAME\", \"EVENT_CLASS\", \"EVENT_ID\", \"EXIT_CODE\", \"CREATED\", \"EXPIRES\", \"PARAMETERS\" FROM "
-                    + tableEvents + " WHERE (\"SPOOLER_ID\" IS NULL OR \"SPOOLER_ID\"='' OR \"SPOOLER_ID\"='"
-                    + spooler.id() + "') ORDER BY \"ID\" ASC");
+                    + tableEvents + " WHERE (\"SPOOLER_ID\" IS NULL OR \"SPOOLER_ID\"='' OR \"SPOOLER_ID\"='" + spooler.id()
+                    + "') ORDER BY \"ID\" ASC");
             Iterator<?> vIterator = vEvents.iterator();
             int vCount = 0;
             while (vIterator.hasNext()) {
@@ -476,8 +476,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
         try {
             String eventsString = this.xmlDocumentToString(this.getEvents());
             this.getLogger().debug9("Updating events: " + eventsString);
-            spooler.set_var(JobSchedulerConstants.eventVariableName, eventsString.replaceAll("<", 
-                    String.valueOf((char) 254)).replaceAll(">", String.valueOf((char) 255)));
+            spooler.set_var(JobSchedulerConstants.eventVariableName, eventsString.replaceAll("<", String.valueOf((char) 254)).replaceAll(">", String.valueOf((char) 255)));
         } catch (Exception e) {
             throw new JobSchedulerException("events updated with errors: " + e.getMessage(), e);
         }
@@ -1045,7 +1044,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
                     this.getConnection().rollback();
                 } catch (Exception ex) {
                     // gracefully ignore this error
-                } 
+                }
             }
             throw new Exception(e);
         }
@@ -1200,7 +1199,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
                     this.getConnection().rollback();
                 } catch (Exception ex) {
                     // gracefully ignore this error
-                } 
+                }
             }
             throw new Exception(e);
         }
@@ -1490,5 +1489,5 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
             socket_timeout = 5;
         }
     }
-    
+
 }

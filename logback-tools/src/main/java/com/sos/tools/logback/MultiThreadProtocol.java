@@ -1,27 +1,27 @@
-    package com.sos.tools.logback;
+package com.sos.tools.logback;
 
-    import ch.qos.logback.classic.Logger;
-    import ch.qos.logback.classic.sift.SiftingAppender;
-    import ch.qos.logback.classic.spi.ILoggingEvent;
-    import ch.qos.logback.core.Appender;
-    import com.google.common.base.Strings;
-    import com.sos.tools.logback.db.LoggingEventDBItem;
-    import com.sos.tools.logback.db.LoggingEventPropertyDBLayer;
-    import org.slf4j.LoggerFactory;
-    import org.slf4j.MDC;
-    import org.slf4j.Marker;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.sift.SiftingAppender;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.Appender;
+import com.google.common.base.Strings;
+import com.sos.tools.logback.db.LoggingEventDBItem;
+import com.sos.tools.logback.db.LoggingEventPropertyDBLayer;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+import org.slf4j.Marker;
 
-    import java.io.File;
-    import java.util.Iterator;
-    import java.util.List;
+import java.io.File;
+import java.util.Iterator;
+import java.util.List;
 
-/**
- * Class for logging of multiple threads / JVM in one file
+/** Class for logging of multiple threads / JVM in one file
  *
- * This class works with the MDC feature of logback combined with the SiftingAppender to write to log files
- * with concurrent threads.
+ * This class works with the MDC feature of logback combined with the
+ * SiftingAppender to write to log files with concurrent threads.
  *
  * The logfiles will be created by using a fileIndicator in its names:
+ * 
  * <pre>
  * {@code
  * <appender name="SIFT-JOBNET" class="ch.qos.logback.classic.sift.SiftingAppender">
@@ -43,13 +43,16 @@
  * }
  * </pre>
  *
- * If the application is configured with a different logging api than this class will log a warning and the protocol
- * file will NOT be created.
+ * If the application is configured with a different logging api than this class
+ * will log a warning and the protocol file will NOT be created.
  *
- * The distinction of the log files will be realized with the first parameter <i>fileIndicator</i>. The second parameter
- * <i>itemIndicator</i> can be used in the layout pattern to identify log entries for a specific item of the log.
+ * The distinction of the log files will be realized with the first parameter
+ * <i>fileIndicator</i>. The second parameter <i>itemIndicator</i> can be used
+ * in the layout pattern to identify log entries for a specific item of the log.
  *
- * The logger which is specified by the third parameter <i>loggerName</i> must be present in your logback configuration, too:
+ * The logger which is specified by the third parameter <i>loggerName</i> must
+ * be present in your logback configuration, too:
+ * 
  * <pre>
  * {@code
  * <logger name="SOSJobnet" level="TRACE" additivity="false">
@@ -58,8 +61,7 @@
  * }
  * </pre>
  *
- * @author stefan.schaedlich@sos-berlin.com
- */
+ * @author stefan.schaedlich@sos-berlin.com */
 public class MultiThreadProtocol implements org.slf4j.Logger {
 
     private final static org.slf4j.Logger logger = LoggerFactory.getLogger(MultiThreadProtocol.class);
@@ -72,18 +74,19 @@ public class MultiThreadProtocol implements org.slf4j.Logger {
     public MultiThreadProtocol(String fileIndicator, String item, String loggerName) {
 
         this.item = item;
-        this.itemIndicator = getItemIndicator(fileIndicator,item);
+        this.itemIndicator = getItemIndicator(fileIndicator, item);
 
         if (LogbackHelper.isLogger(loggerName)) {
             this.threadLogger = (Logger) LoggerFactory.getLogger(loggerName);
             SiftingAppender appender = hasSiftingappender(threadLogger);
-            if(appender != null) {
+            if (appender != null) {
                 logger.info("The appender for the jobnet protocol is " + appender.getName());
                 MDC.put("fileIndicator", fileIndicator);
                 MDC.put("item", item);
                 MDC.put("itemIndicator", itemIndicator);
             } else {
-                logger.warn("No sifting appender is configured in logback configuration - no protocol file for fileIndicator=" + fileIndicator + ", item=" + item + " will be created.");
+                logger.warn("No sifting appender is configured in logback configuration - no protocol file for fileIndicator=" + fileIndicator
+                        + ", item=" + item + " will be created.");
             }
         } else {
             logger.warn("Logger '" + loggerName + "' not defined - no logback protocol will be created.");
@@ -96,7 +99,7 @@ public class MultiThreadProtocol implements org.slf4j.Logger {
         for (Iterator<Appender<ILoggingEvent>> index = logger.iteratorForAppenders(); index.hasNext();) {
             Appender<ILoggingEvent> appender = index.next();
             if (appender instanceof SiftingAppender) {
-                result = (SiftingAppender)appender;
+                result = (SiftingAppender) appender;
                 break;
             }
         }
@@ -104,7 +107,7 @@ public class MultiThreadProtocol implements org.slf4j.Logger {
     }
 
     private String formatMessage(String message) {
-        return "[" + Strings.padEnd(item,35,' ') + "] " + message;
+        return "[" + Strings.padEnd(item, 35, ' ') + "] " + message;
     }
 
     private static String getItemIndicator(String forUUID, String forItem) {
@@ -126,11 +129,9 @@ public class MultiThreadProtocol implements org.slf4j.Logger {
         return result;
     }
 
-    /**
-     * To get the logger object of the multiple thread log.
+    /** To get the logger object of the multiple thread log.
      *
-     * @return
-     */
+     * @return */
     public org.slf4j.Logger getLogger() {
         return threadLogger;
     }
@@ -147,12 +148,14 @@ public class MultiThreadProtocol implements org.slf4j.Logger {
 
     @Override
     public void trace(String message) {
-        if (threadLogger != null) threadLogger.trace(formatMessage(message));
+        if (threadLogger != null)
+            threadLogger.trace(formatMessage(message));
     }
 
     @Override
     public void trace(String message, Throwable error) {
-        if (threadLogger != null) threadLogger.trace(formatMessage(message), error);
+        if (threadLogger != null)
+            threadLogger.trace(formatMessage(message), error);
     }
 
     @Override
@@ -162,27 +165,32 @@ public class MultiThreadProtocol implements org.slf4j.Logger {
 
     @Override
     public void trace(Marker marker, String message) {
-        if (threadLogger != null) threadLogger.trace(marker, formatMessage(message));
+        if (threadLogger != null)
+            threadLogger.trace(marker, formatMessage(message));
     }
 
     @Override
     public void trace(Marker marker, String format, Object arg) {
-        if (threadLogger != null) threadLogger.trace(marker, format, arg);
+        if (threadLogger != null)
+            threadLogger.trace(marker, format, arg);
     }
 
     @Override
     public void trace(Marker marker, String format, Object arg1, Object arg2) {
-        if (threadLogger != null) threadLogger.trace(marker, format, arg1, arg2);
+        if (threadLogger != null)
+            threadLogger.trace(marker, format, arg1, arg2);
     }
 
     @Override
     public void trace(Marker marker, String format, Object[] argArray) {
-        if (threadLogger != null) threadLogger.trace(marker, format, argArray);
+        if (threadLogger != null)
+            threadLogger.trace(marker, format, argArray);
     }
 
     @Override
     public void trace(Marker marker, String message, Throwable t) {
-        if (threadLogger != null) threadLogger.trace(marker, formatMessage(message), t);
+        if (threadLogger != null)
+            threadLogger.trace(marker, formatMessage(message), t);
     }
 
     @Override
@@ -192,28 +200,32 @@ public class MultiThreadProtocol implements org.slf4j.Logger {
 
     @Override
     public void trace(String format, Object obj1) {
-        if (threadLogger != null) threadLogger.trace(format,obj1);
+        if (threadLogger != null)
+            threadLogger.trace(format, obj1);
     }
 
     @Override
     public void trace(String format, Object obj1, Object obj2) {
-        if (threadLogger != null) threadLogger.trace(format,obj1,obj2);
+        if (threadLogger != null)
+            threadLogger.trace(format, obj1, obj2);
     }
 
     @Override
     public void trace(String format, Object[] argArray) {
-        if (threadLogger != null) threadLogger.trace(format,argArray);
+        if (threadLogger != null)
+            threadLogger.trace(format, argArray);
     }
-
 
     @Override
     public void error(String message) {
-        if (threadLogger != null) threadLogger.error(formatMessage(message));
+        if (threadLogger != null)
+            threadLogger.error(formatMessage(message));
     }
 
     @Override
     public void error(String message, Throwable error) {
-        if (threadLogger != null) threadLogger.error(formatMessage(message), error);
+        if (threadLogger != null)
+            threadLogger.error(formatMessage(message), error);
     }
 
     @Override
@@ -223,68 +235,80 @@ public class MultiThreadProtocol implements org.slf4j.Logger {
 
     @Override
     public void error(Marker marker, String message) {
-        if (threadLogger != null) threadLogger.error(marker, formatMessage(message));
+        if (threadLogger != null)
+            threadLogger.error(marker, formatMessage(message));
     }
 
     @Override
     public void error(Marker marker, String format, Object arg) {
-        if (threadLogger != null) threadLogger.error(marker, format, arg);
+        if (threadLogger != null)
+            threadLogger.error(marker, format, arg);
     }
 
     @Override
     public void error(Marker marker, String format, Object arg1, Object arg2) {
-        if (threadLogger != null) threadLogger.error(marker, format, arg1, arg2);
+        if (threadLogger != null)
+            threadLogger.error(marker, format, arg1, arg2);
     }
 
     @Override
     public void error(Marker marker, String format, Object[] argArray) {
-        if (threadLogger != null) threadLogger.error(marker, format, argArray);
+        if (threadLogger != null)
+            threadLogger.error(marker, format, argArray);
     }
 
     @Override
     public void error(Marker marker, String message, Throwable t) {
-        if (threadLogger != null) threadLogger.error(marker, formatMessage(message), t);
+        if (threadLogger != null)
+            threadLogger.error(marker, formatMessage(message), t);
     }
 
     @Override
     public void error(String format, Object obj1) {
-        if (threadLogger != null) threadLogger.error(format,obj1);
+        if (threadLogger != null)
+            threadLogger.error(format, obj1);
     }
 
     @Override
     public void error(String format, Object obj1, Object obj2) {
-        if (threadLogger != null) threadLogger.error(format,obj1,obj2);
+        if (threadLogger != null)
+            threadLogger.error(format, obj1, obj2);
     }
 
     @Override
     public void error(String format, Object[] argArray) {
-        if (threadLogger != null) threadLogger.error(format,argArray);
+        if (threadLogger != null)
+            threadLogger.error(format, argArray);
     }
-
 
     @Override
     public void debug(String message) {
-        if (threadLogger != null) threadLogger.debug(formatMessage(message));
+        if (threadLogger != null)
+            threadLogger.debug(formatMessage(message));
     }
 
     @Override
     public void debug(String format, Object arg) {
-        if (threadLogger != null) threadLogger.debug(format, arg);
+        if (threadLogger != null)
+            threadLogger.debug(format, arg);
     }
 
     @Override
     public void debug(String format, Object arg1, Object arg2) {
-        if (threadLogger != null) threadLogger.debug(format, arg1, arg2);
+        if (threadLogger != null)
+            threadLogger.debug(format, arg1, arg2);
     }
 
     @Override
     public void debug(String format, Object[] argArray) {
-        if (threadLogger != null) threadLogger.debug(format, argArray);
+        if (threadLogger != null)
+            threadLogger.debug(format, argArray);
     }
 
     @Override
     public void debug(String message, Throwable t) {
-        if (threadLogger != null) threadLogger.debug(formatMessage(message), t);
+        if (threadLogger != null)
+            threadLogger.debug(formatMessage(message), t);
     }
 
     @Override
@@ -294,27 +318,32 @@ public class MultiThreadProtocol implements org.slf4j.Logger {
 
     @Override
     public void debug(Marker marker, String message) {
-        if (threadLogger != null) threadLogger.debug(marker, formatMessage(message));
+        if (threadLogger != null)
+            threadLogger.debug(marker, formatMessage(message));
     }
 
     @Override
     public void debug(Marker marker, String format, Object arg) {
-        if (threadLogger != null) threadLogger.debug(marker, format, arg);
+        if (threadLogger != null)
+            threadLogger.debug(marker, format, arg);
     }
 
     @Override
     public void debug(Marker marker, String format, Object arg1, Object arg2) {
-        if (threadLogger != null) threadLogger.debug(marker, format, arg1, arg2);
+        if (threadLogger != null)
+            threadLogger.debug(marker, format, arg1, arg2);
     }
 
     @Override
     public void debug(Marker marker, String format, Object[] argArray) {
-        if (threadLogger != null) threadLogger.debug(marker, format, argArray);
+        if (threadLogger != null)
+            threadLogger.debug(marker, format, argArray);
     }
 
     @Override
     public void debug(Marker marker, String message, Throwable t) {
-        if (threadLogger != null) threadLogger.debug(marker, formatMessage(message), t);
+        if (threadLogger != null)
+            threadLogger.debug(marker, formatMessage(message), t);
     }
 
     @Override
@@ -324,27 +353,32 @@ public class MultiThreadProtocol implements org.slf4j.Logger {
 
     @Override
     public void info(String message) {
-        if (threadLogger != null) threadLogger.info(formatMessage(message));
+        if (threadLogger != null)
+            threadLogger.info(formatMessage(message));
     }
 
     @Override
     public void info(String format, Object arg) {
-        if (threadLogger != null) threadLogger.info(format, arg);
+        if (threadLogger != null)
+            threadLogger.info(format, arg);
     }
 
     @Override
     public void info(String format, Object arg1, Object arg2) {
-        if (threadLogger != null) threadLogger.info(format, arg1, arg2);
+        if (threadLogger != null)
+            threadLogger.info(format, arg1, arg2);
     }
 
     @Override
     public void info(String format, Object[] argArray) {
-        if (threadLogger != null) threadLogger.info(format, argArray);
+        if (threadLogger != null)
+            threadLogger.info(format, argArray);
     }
 
     @Override
     public void info(String message, Throwable t) {
-        if (threadLogger != null) threadLogger.info(formatMessage(message), t);
+        if (threadLogger != null)
+            threadLogger.info(formatMessage(message), t);
     }
 
     @Override
@@ -354,27 +388,32 @@ public class MultiThreadProtocol implements org.slf4j.Logger {
 
     @Override
     public void info(Marker marker, String message) {
-        if (threadLogger != null) threadLogger.info(marker, formatMessage(message));
+        if (threadLogger != null)
+            threadLogger.info(marker, formatMessage(message));
     }
 
     @Override
     public void info(Marker marker, String format, Object arg) {
-        if (threadLogger != null) threadLogger.info(marker, format, arg);
+        if (threadLogger != null)
+            threadLogger.info(marker, format, arg);
     }
 
     @Override
     public void info(Marker marker, String format, Object arg1, Object arg2) {
-        if (threadLogger != null) threadLogger.info(marker, format, arg1, arg2);
+        if (threadLogger != null)
+            threadLogger.info(marker, format, arg1, arg2);
     }
 
     @Override
     public void info(Marker marker, String format, Object[] argArray) {
-        if (threadLogger != null) threadLogger.info(marker, format, argArray);
+        if (threadLogger != null)
+            threadLogger.info(marker, format, argArray);
     }
 
     @Override
     public void info(Marker marker, String message, Throwable t) {
-        if (threadLogger != null) threadLogger.info(marker, formatMessage(message), t);
+        if (threadLogger != null)
+            threadLogger.info(marker, formatMessage(message), t);
     }
 
     @Override
@@ -384,27 +423,32 @@ public class MultiThreadProtocol implements org.slf4j.Logger {
 
     @Override
     public void warn(String message) {
-        if (threadLogger != null) threadLogger.warn(formatMessage(message));
+        if (threadLogger != null)
+            threadLogger.warn(formatMessage(message));
     }
 
     @Override
     public void warn(String format, Object arg) {
-        if (threadLogger != null) threadLogger.warn(format, arg);
+        if (threadLogger != null)
+            threadLogger.warn(format, arg);
     }
 
     @Override
     public void warn(String format, Object[] argArray) {
-        if (threadLogger != null) threadLogger.warn(format, argArray);
+        if (threadLogger != null)
+            threadLogger.warn(format, argArray);
     }
 
     @Override
     public void warn(String format, Object arg1, Object arg2) {
-        if (threadLogger != null) threadLogger.warn(format, arg1, arg2);
+        if (threadLogger != null)
+            threadLogger.warn(format, arg1, arg2);
     }
 
     @Override
     public void warn(String message, Throwable t) {
-        if (threadLogger != null) threadLogger.warn(formatMessage(message), t);
+        if (threadLogger != null)
+            threadLogger.warn(formatMessage(message), t);
     }
 
     @Override
@@ -414,27 +458,32 @@ public class MultiThreadProtocol implements org.slf4j.Logger {
 
     @Override
     public void warn(Marker marker, String message) {
-        if (threadLogger != null) threadLogger.warn(marker, formatMessage(message));
+        if (threadLogger != null)
+            threadLogger.warn(marker, formatMessage(message));
     }
 
     @Override
     public void warn(Marker marker, String format, Object arg) {
-        if (threadLogger != null) threadLogger.warn(marker, format, arg);
+        if (threadLogger != null)
+            threadLogger.warn(marker, format, arg);
     }
 
     @Override
     public void warn(Marker marker, String format, Object arg1, Object arg2) {
-        if (threadLogger != null) threadLogger.warn(marker, format, arg1, arg2);
+        if (threadLogger != null)
+            threadLogger.warn(marker, format, arg1, arg2);
     }
 
     @Override
     public void warn(Marker marker, String format, Object[] argArray) {
-        if (threadLogger != null) threadLogger.warn(marker, format, argArray);
+        if (threadLogger != null)
+            threadLogger.warn(marker, format, argArray);
     }
 
     @Override
     public void warn(Marker marker, String message, Throwable t) {
-        if (threadLogger != null) threadLogger.warn(marker, formatMessage(message), t);
+        if (threadLogger != null)
+            threadLogger.warn(marker, formatMessage(message), t);
     }
 
     @Override

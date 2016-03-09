@@ -6,27 +6,27 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target( { FIELD } )
-@Retention( RetentionPolicy.RUNTIME )
-public @interface JSCsvField  {
+@Target({ FIELD })
+@Retention(RetentionPolicy.RUNTIME)
+public @interface JSCsvField {
 
-	String name();
+    String name();
 
-	String description();
+    String description();
 
-	String xmltagname() default "";
+    String xmltagname() default "";
 
-	int size() default -1;
+    int size() default -1;
 
-	int pos();
+    int pos();
 
-	String type() default "string";
+    String type() default "string";
 
-	String defaultvalue() default "";
+    String defaultvalue() default "";
 
-	boolean isReadOnly() default true;
+    boolean isReadOnly() default true;
 
-	boolean isFormField() default false;
-	
-	boolean isField4Rename() default false;
+    boolean isFormField() default false;
+
+    boolean isField4Rename() default false;
 }

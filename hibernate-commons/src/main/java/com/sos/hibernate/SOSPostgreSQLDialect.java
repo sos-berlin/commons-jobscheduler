@@ -1,7 +1,5 @@
 package com.sos.hibernate;
 
- 
- 
 import java.sql.Types;
 
 import org.hibernate.dialect.PostgreSQLDialect;

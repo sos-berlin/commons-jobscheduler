@@ -1,4 +1,5 @@
 package com.sos.dialog.components;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,8 +41,7 @@ import com.sos.dialog.Globals;
 import com.sos.dialog.classes.WindowsSaver;
 import com.sos.dialog.swtdesigner.SWTResourceManager;
 
-/**
- * \class LanguageSelector
+/** \class LanguageSelector
  *
  * \brief LanguageSelector -
  *
@@ -58,623 +58,638 @@ import com.sos.dialog.swtdesigner.SWTResourceManager;
  * </p>
  * \author Uwe Risse \version 25.08.2011 \see reference
  *
- * xml-syntax coloring:  https://github.com/vincent-zurczak/Xml-Region-Analyzer.git
- * http://vzurczak.wordpress.com/2012/09/07/xml-syntax-highlighting-with-a-styled-text/
- * see as an example: javalinestyler
+ * xml-syntax coloring:
+ * https://github.com/vincent-zurczak/Xml-Region-Analyzer.git
+ * http://vzurczak.wordpress
+ * .com/2012/09/07/xml-syntax-highlighting-with-a-styled-text/ see as an
+ * example: javalinestyler
  *
- * Created on 25.08.2011 13:54:32
- */
+ * Created on 25.08.2011 13:54:32 */
 public class TextArea extends StyledText /* Text */{
-	@SuppressWarnings("unused")
-	private final String	conClassName			= this.getClass().getSimpleName();
-	private Logger			logger					= Logger.getLogger(this.getClass());
-	@SuppressWarnings("unused")
-	private final String	conSVNVersion			= "$Id$";
-	private WindowsSaver	objFormPosSizeHandler	= null;
-	//	public static enum enuSourceTypes {
-	//		ScriptSource, MonitorSource, xmlSource, xmlComment, JobDocu;
-	//	}
-	//
-	private final String	strTagName				= "job";
-	private final String	strAttributeName		= "";
-	//	private enuSourceTypes	enuWhatSourceType	= TextArea.enuSourceTypes.ScriptSource;
-	boolean					flgInit					= false;
-	private String			strPreferenceStoreKey	= "";
-	private StyledText		objThis					= this;
 
-	public StyledText getControl() {
-		return this;
-	}
+    @SuppressWarnings("unused")
+    private final String conClassName = this.getClass().getSimpleName();
+    private Logger logger = Logger.getLogger(this.getClass());
+    @SuppressWarnings("unused")
+    private final String conSVNVersion = "$Id$";
+    private WindowsSaver objFormPosSizeHandler = null;
+    // public static enum enuSourceTypes {
+    // ScriptSource, MonitorSource, xmlSource, xmlComment, JobDocu;
+    // }
+    //
+    private final String strTagName = "job";
+    private final String strAttributeName = "";
+    // private enuSourceTypes enuWhatSourceType =
+    // TextArea.enuSourceTypes.ScriptSource;
+    boolean flgInit = false;
+    private String strPreferenceStoreKey = "";
+    private StyledText objThis = this;
 
-	public void setFormHandler(final WindowsSaver pobjFormHandler) {
-		objFormPosSizeHandler = pobjFormHandler;
-	}
+    public StyledText getControl() {
+        return this;
+    }
 
-	public void createContextMenue() {
-		// Menu objContextMenu = new Menu(this);
-		Menu objContextMenu = getMenu();
-		if (objContextMenu == null) {
-			objContextMenu = new Menu(this.getControl());
-		}
-		boolean flgIsEditable = getEditable();
-		MenuItem itemCopy = new MenuItem(objContextMenu, SWT.PUSH);
-		itemCopy.addListener(SWT.Selection, getCopyListener());
-		itemCopy.setText("Copy");
-		if (flgIsEditable) {
-			MenuItem itemCut = new MenuItem(objContextMenu, SWT.PUSH);
-			itemCut.addListener(SWT.Selection, getCutListener());
-			itemCut.setText("Cut");
-			MenuItem itemPaste = new MenuItem(objContextMenu, SWT.PUSH);
-			itemPaste.addListener(SWT.Selection, getPasteListener());
-			itemPaste.setText("Paste");
-		}
-		MenuItem itemSelectAll = new MenuItem(objContextMenu, SWT.PUSH);
-		itemSelectAll.addListener(SWT.Selection, getSelectAllListener());
-		itemSelectAll.setText("Select &All\tCtrl+A");
-		itemSelectAll.setAccelerator(SWT.MOD1 + 'A');
-		new MenuItem(objContextMenu, SWT.SEPARATOR);
-		MenuItem itemStartExternalEditor = new MenuItem(objContextMenu, SWT.PUSH);
-		itemStartExternalEditor.addListener(SWT.Selection, getStartExternalEditorListener());
-		itemStartExternalEditor.setText("Start external Editor\tCtrl+X");
-		itemSelectAll.setAccelerator(SWT.MOD1 + 'X');
-		setMenu(objContextMenu);
-		MenuItem itemSelectFont = new MenuItem(objContextMenu, SWT.PUSH);
-		itemSelectFont.addListener(SWT.Selection, getSelectFontListener());
-		itemSelectFont.setText("Select Font\tCtrl+F");
-		itemSelectAll.setAccelerator(SWT.MOD1 + 'F');
-		new MenuItem(objContextMenu, SWT.SEPARATOR);
-		MenuItem itemSaveAs = new MenuItem(objContextMenu, SWT.PUSH);
-		itemSaveAs.addListener(SWT.Selection, getSaveAsListener());
-		itemSaveAs.setText("Save as ...\tCtrl+Alt+S");
-		itemSelectAll.setAccelerator(SWT.MOD1 + SWT.ALT + 'S');
-		if (flgIsEditable) {
-			// TODO die letzten 10 Files als Submenue
-			MenuItem itemReadFrom = new MenuItem(objContextMenu, SWT.PUSH);
-			itemReadFrom.addListener(SWT.Selection, getReadFileListener());
-			itemReadFrom.setText("Read from ...\tCtrl+R");
-			itemSelectAll.setAccelerator(SWT.MOD1 + 'R');
-			MenuItem itemInsertFrom = new MenuItem(objContextMenu, SWT.PUSH);
-			itemInsertFrom.addListener(SWT.Selection, getInsertFileListener());
-			itemInsertFrom.setText("Insert from ...\tCtrl+I");
-			itemSelectAll.setAccelerator(SWT.MOD1 + 'I');
-		}
-	}
+    public void setFormHandler(final WindowsSaver pobjFormHandler) {
+        objFormPosSizeHandler = pobjFormHandler;
+    }
 
-	private Listener getSaveAsListener() {
-		return new Listener() {
-			@Override
-			public void handleEvent(final Event e) {
-				logger.debug("save as was pressed....");
-				saveFile();
-			}
-		};
-	}
+    public void createContextMenue() {
+        // Menu objContextMenu = new Menu(this);
+        Menu objContextMenu = getMenu();
+        if (objContextMenu == null) {
+            objContextMenu = new Menu(this.getControl());
+        }
+        boolean flgIsEditable = getEditable();
+        MenuItem itemCopy = new MenuItem(objContextMenu, SWT.PUSH);
+        itemCopy.addListener(SWT.Selection, getCopyListener());
+        itemCopy.setText("Copy");
+        if (flgIsEditable) {
+            MenuItem itemCut = new MenuItem(objContextMenu, SWT.PUSH);
+            itemCut.addListener(SWT.Selection, getCutListener());
+            itemCut.setText("Cut");
+            MenuItem itemPaste = new MenuItem(objContextMenu, SWT.PUSH);
+            itemPaste.addListener(SWT.Selection, getPasteListener());
+            itemPaste.setText("Paste");
+        }
+        MenuItem itemSelectAll = new MenuItem(objContextMenu, SWT.PUSH);
+        itemSelectAll.addListener(SWT.Selection, getSelectAllListener());
+        itemSelectAll.setText("Select &All\tCtrl+A");
+        itemSelectAll.setAccelerator(SWT.MOD1 + 'A');
+        new MenuItem(objContextMenu, SWT.SEPARATOR);
+        MenuItem itemStartExternalEditor = new MenuItem(objContextMenu, SWT.PUSH);
+        itemStartExternalEditor.addListener(SWT.Selection, getStartExternalEditorListener());
+        itemStartExternalEditor.setText("Start external Editor\tCtrl+X");
+        itemSelectAll.setAccelerator(SWT.MOD1 + 'X');
+        setMenu(objContextMenu);
+        MenuItem itemSelectFont = new MenuItem(objContextMenu, SWT.PUSH);
+        itemSelectFont.addListener(SWT.Selection, getSelectFontListener());
+        itemSelectFont.setText("Select Font\tCtrl+F");
+        itemSelectAll.setAccelerator(SWT.MOD1 + 'F');
+        new MenuItem(objContextMenu, SWT.SEPARATOR);
+        MenuItem itemSaveAs = new MenuItem(objContextMenu, SWT.PUSH);
+        itemSaveAs.addListener(SWT.Selection, getSaveAsListener());
+        itemSaveAs.setText("Save as ...\tCtrl+Alt+S");
+        itemSelectAll.setAccelerator(SWT.MOD1 + SWT.ALT + 'S');
+        if (flgIsEditable) {
+            // TODO die letzten 10 Files als Submenue
+            MenuItem itemReadFrom = new MenuItem(objContextMenu, SWT.PUSH);
+            itemReadFrom.addListener(SWT.Selection, getReadFileListener());
+            itemReadFrom.setText("Read from ...\tCtrl+R");
+            itemSelectAll.setAccelerator(SWT.MOD1 + 'R');
+            MenuItem itemInsertFrom = new MenuItem(objContextMenu, SWT.PUSH);
+            itemInsertFrom.addListener(SWT.Selection, getInsertFileListener());
+            itemInsertFrom.setText("Insert from ...\tCtrl+I");
+            itemSelectAll.setAccelerator(SWT.MOD1 + 'I');
+        }
+    }
 
-	private Listener getStartExternalEditorListener() {
-		return new Listener() {
-			@Override
-			public void handleEvent(final Event e) {
-				startExternalEditor();
-			}
-		};
-	}
+    private Listener getSaveAsListener() {
+        return new Listener() {
 
-	public void startExternalEditor() {
-		String text = getText();
-		try {
-			JSFile objTempF = new JSFile(File.createTempFile("SOS-JOE", ".xml").getAbsolutePath());
-			objTempF.Write(text);
-			cmdShell objShell = new cmdShell();
-			// TODO Option for external Editor, e.g. notepadd++
-			String strCommandString = String.format("uedit32.exe \"%1$s\"", objTempF);
-			objShell.setCommand(strCommandString);
-			objShell.run();
-			if (objShell.getCC() != 0) {
-				throw new JobSchedulerException(String.format("Command '%1$s' returns with error '%2$s'", strCommandString, objShell.getCC()));
-			}
-		}
-		catch (Exception e) {
-			throw new JobSchedulerException(e);
-		}
-		return;
-	}
+            @Override
+            public void handleEvent(final Event e) {
+                logger.debug("save as was pressed....");
+                saveFile();
+            }
+        };
+    }
 
-	private Listener getSelectFontListener() {
-		return new Listener() {
-			@Override
-			public void handleEvent(final Event e) {
-				logger.debug("'Select Font' was pressed....");
-				changeFont();
-			}
-		};
-	}
+    private Listener getStartExternalEditorListener() {
+        return new Listener() {
 
-	private Listener getReadFileListener() {
-		return new Listener() {
-			@Override
-			public void handleEvent(final Event e) {
-				logger.debug("getReadFileListener was pressed....");
-				doReadFile();
-			}
-		};
-	}
+            @Override
+            public void handleEvent(final Event e) {
+                startExternalEditor();
+            }
+        };
+    }
 
-	private Listener getInsertFileListener() {
-		return new Listener() {
-			@Override
-			public void handleEvent(final Event e) {
-				logger.debug("getInsertFileListener was pressed....");
-				doInsertFile();
-			}
-		};
-	}
+    public void startExternalEditor() {
+        String text = getText();
+        try {
+            JSFile objTempF = new JSFile(File.createTempFile("SOS-JOE", ".xml").getAbsolutePath());
+            objTempF.Write(text);
+            cmdShell objShell = new cmdShell();
+            // TODO Option for external Editor, e.g. notepadd++
+            String strCommandString = String.format("uedit32.exe \"%1$s\"", objTempF);
+            objShell.setCommand(strCommandString);
+            objShell.run();
+            if (objShell.getCC() != 0) {
+                throw new JobSchedulerException(String.format("Command '%1$s' returns with error '%2$s'", strCommandString, objShell.getCC()));
+            }
+        } catch (Exception e) {
+            throw new JobSchedulerException(e);
+        }
+        return;
+    }
 
-	private Listener getCopyListener() {
-		return new Listener() {
-			@Override
-			public void handleEvent(final Event e) {
-				logger.debug("getCopyListener was pressed....");
-				_copy();
-			}
-		};
-	}
+    private Listener getSelectFontListener() {
+        return new Listener() {
 
-	private Listener getPasteListener() {
-		return new Listener() {
-			@Override
-			public void handleEvent(final Event e) {
-				logger.debug("getCopyListener was pressed....");
-				_paste();
-			}
-		};
-	}
+            @Override
+            public void handleEvent(final Event e) {
+                logger.debug("'Select Font' was pressed....");
+                changeFont();
+            }
+        };
+    }
 
-	private Listener getCutListener() {
-		return new Listener() {
-			@Override
-			public void handleEvent(final Event e) {
-				logger.debug("getCopyListener was pressed....");
-				_cut();
-			}
-		};
-	}
+    private Listener getReadFileListener() {
+        return new Listener() {
 
-	private Listener getSelectAllListener() {
-		return new Listener() {
-			@Override
-			public void handleEvent(final Event e) {
-				logger.debug("getSelectAllListener was pressed....");
-				_selectAll();
-			}
-		};
-	}
+            @Override
+            public void handleEvent(final Event e) {
+                logger.debug("getReadFileListener was pressed....");
+                doReadFile();
+            }
+        };
+    }
 
-	private void _copy() {
-		this.copy();
-	}
+    private Listener getInsertFileListener() {
+        return new Listener() {
 
-	private void _paste() {
-		this.paste();
-	}
+            @Override
+            public void handleEvent(final Event e) {
+                logger.debug("getInsertFileListener was pressed....");
+                doInsertFile();
+            }
+        };
+    }
 
-	private void _cut() {
-		this.cut();
-	}
+    private Listener getCopyListener() {
+        return new Listener() {
 
-	private void _selectAll() {
-		this.selectAll();
-	}
+            @Override
+            public void handleEvent(final Event e) {
+                logger.debug("getCopyListener was pressed....");
+                _copy();
+            }
+        };
+    }
 
-	public void refreshContent() {
-		flgInit = true;
-		SOSFontDialog objFontDialog = new SOSFontDialog(getFont().getFontData()[0], getForeground().getRGB());
-		objFontDialog.setKey(strPreferenceStoreKey + "font");
-		objFontDialog.readFontData();
-		setFont(objFontDialog.getFontData(), objFontDialog.getForeGround());
-		flgInit = false;
-	}
+    private Listener getPasteListener() {
+        return new Listener() {
 
-	public TextArea(final Composite pobjComposite, final String pstrPreferenceStoreKey) {
-		this(pobjComposite);
-		objFormPosSizeHandler = new WindowsSaver(this.getClass(), pobjComposite.getShell(), 640, 480);
-		strPreferenceStoreKey = pstrPreferenceStoreKey;
-		objFormPosSizeHandler.setKey(pstrPreferenceStoreKey);
-		refreshContent();
-	}
+            @Override
+            public void handleEvent(final Event e) {
+                logger.debug("getCopyListener was pressed....");
+                _paste();
+            }
+        };
+    }
 
-	public TextArea(final Composite pobjComposite) {
-		this(pobjComposite, SWT.V_SCROLL | SWT.MULTI | SWT.BORDER | SWT.H_SCROLL);
-		createContextMenue();
-		this.setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
-	}
+    private Listener getCutListener() {
+        return new Listener() {
 
-	public TextArea(final Composite pobjComposite, final int arg1) {
-		super(pobjComposite, arg1);
-		this.setBackground(Globals.getFieldBackground());
-		addVerifyListener(new VerifyListener() {
-			@Override
-			public void verifyText(final VerifyEvent e) {
-			}
-		});
-		addMouseListener(new MouseListener() {
-			@Override
-			public void mouseUp(final MouseEvent event) {
-				if (event.button == 3) {
-					logger.debug("button2");
-				}
-			}
+            @Override
+            public void handleEvent(final Event e) {
+                logger.debug("getCopyListener was pressed....");
+                _cut();
+            }
+        };
+    }
 
-			@Override
-			public void mouseDown(final MouseEvent arg0) {
-			}
+    private Listener getSelectAllListener() {
+        return new Listener() {
 
-			@Override
-			public void mouseDoubleClick(final MouseEvent arg0) {
-				// startExternalEditor();
-			}
-		});
+            @Override
+            public void handleEvent(final Event e) {
+                logger.debug("getSelectAllListener was pressed....");
+                _selectAll();
+            }
+        };
+    }
 
-		addHelpListener(new HelpListener() {
-			@Override
-			public void helpRequested(final HelpEvent objHelpEvent) {
-				//				MainWindow.message(Messages.getString("OrderJob.Help"), SWT.ICON_INFORMATION);
-			}
-		});
+    private void _copy() {
+        this.copy();
+    }
 
-		addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyPressed(final KeyEvent e) {
-				e.doit = false;
-				//				if (objDataProvider.Check4HelpKey(e.keyCode, strTagName, strAttributeName)) {
-				//					return;
-				//				}
-				if ((e.stateMask & SWT.MOD1) == SWT.MOD1) {
-					switch (e.keyCode) {
-						case 'a':
-							_selectAll();
-							return;
-						case 'i':
-							doInsertFile();
-							return;
-						case 'r':
-							doReadFile();
-							return;
-						case 'f':
-							changeFont();
-							return;
-						case 'x':
-							startExternalEditor();
-							return;
-						default:
-							break;
-					}
-				}
-				if ((e.stateMask & (SWT.MOD1 | SWT.ALT)) == (SWT.MOD1 | SWT.ALT)) {
-					if (e.keyCode == 's') { // caution: lower case letters
-						saveFile();
-						return;
-					}
-				}
-				/*
-				 * getClipBoard();
-				 *
-				 * if (e.stateMask == SWT.CTRL) { if (e.keyCode == 97) { //
-				 * Ctrl-A Select all setSelection(0, getText().length()); e.doit
-				 * = false; return; }
-				 *
-				 * if (e.keyCode == 99) { // Ctrl-C Copy String strT =
-				 * getSelectionText(); TextTransfer textTransfer =
-				 * TextTransfer.getInstance(); cb.setContents(new Object[] {
-				 * strT }, new Transfer[] { textTransfer }); e.doit = false;
-				 * return; }
-				 *
-				 * if (e.keyCode == 118) { // Ctrl-V Paste TextTransfer transfer
-				 * = TextTransfer.getInstance(); String data = (String)
-				 * cb.getContents(transfer); if (data != null) { insert(data);
-				 * e.doit = false; return; } } }
-				 */
-				e.doit = true;
-				return;
-			}
-		});
-		final GridData gridData_1 = new GridData(GridData.FILL, GridData.FILL, true, true, 4, 1);
-		gridData_1.minimumHeight = 40;
-		gridData_1.widthHint = 454;
-		gridData_1.heightHint = 139;
-		setLayoutData(gridData_1);
-		addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(final ModifyEvent e) {
-			}
-		});
-	}
+    private void _paste() {
+        this.paste();
+    }
 
-	/*
-	 * private Clipboard getClipBoard() { if (cb == null) { cb = new
-	 * Clipboard(getDisplay()); } return cb; }
-	 */
-	public void setFont(final FontData f, final RGB foreGround) {
-		setFont(SWTResourceManager.getFont(f.getLocale(), f.getHeight(), f.getStyle()));
-		setForeground(SWTResourceManager.getColor(foreGround));
-	}
+    private void _cut() {
+        this.cut();
+    }
 
-	public void changeFont() {
-		SOSFontDialog fd = new SOSFontDialog(getFont().getFontData()[0], getForeground().getRGB());
-		fd.setKey(strPreferenceStoreKey + "font");
-		fd.setParent(getShell());
-		fd.show(getDisplay());
-		setFont(fd.getFontData(), fd.getForeGround());
-	}
+    private void _selectAll() {
+        this.selectAll();
+    }
 
-	private void doReadFile() {
-		String strFileName = doSelectFile("LastSelectedFile4Read");
-		String strContent = null;
-		if ((strContent = getFileContent(strFileName)) != null) {
-			setText(strContent);
-		}
-	}
+    public void refreshContent() {
+        flgInit = true;
+        SOSFontDialog objFontDialog = new SOSFontDialog(getFont().getFontData()[0], getForeground().getRGB());
+        objFontDialog.setKey(strPreferenceStoreKey + "font");
+        objFontDialog.readFontData();
+        setFont(objFontDialog.getFontData(), objFontDialog.getForeGround());
+        flgInit = false;
+    }
 
-	private void doInsertFile() {
-		String strFileName = doSelectFile("LastSelectedFile4Insert");
-		String strContent = null;
-		if ((strContent = getFileContent(strFileName)) != null) {
-			this.insert(strContent);
-		}
-	}
+    public TextArea(final Composite pobjComposite, final String pstrPreferenceStoreKey) {
+        this(pobjComposite);
+        objFormPosSizeHandler = new WindowsSaver(this.getClass(), pobjComposite.getShell(), 640, 480);
+        strPreferenceStoreKey = pstrPreferenceStoreKey;
+        objFormPosSizeHandler.setKey(pstrPreferenceStoreKey);
+        refreshContent();
+    }
 
-	private String getFileContent(final String pstrFileName) {
-		String strContent = null;
-		if (pstrFileName != null) {
-			JSFile objFile = new JSFile(pstrFileName);
-			strContent = objFile.getContent();
-		}
-		return strContent;
-	}
+    public TextArea(final Composite pobjComposite) {
+        this(pobjComposite, SWT.V_SCROLL | SWT.MULTI | SWT.BORDER | SWT.H_SCROLL);
+        createContextMenue();
+        this.setFont(JFaceResources.getFont(JFaceResources.TEXT_FONT));
+    }
 
-	private String doSelectFile(final String pstrLRUKey) {
-		String strSelectedFileName = "";
-		try {
-			FileDialog fdialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.OPEN);
-			if (objFormPosSizeHandler != null) {
-				fdialog.setFilterPath(objFormPosSizeHandler.getProperty(pstrLRUKey));
-			}
-			if ((strSelectedFileName = fdialog.open()) == null) {
-				return strSelectedFileName;
-			}
-			if (objFormPosSizeHandler != null) {
-				objFormPosSizeHandler.saveProperty(pstrLRUKey, strSelectedFileName);
-			}
-			return strSelectedFileName;
-		}
-		catch (Exception e) {
-			try {
-				//				new ErrorLog(String.format("error selecting file '%1$s'", strSelectedFileName), e);
-				new JobSchedulerException(String.format("error selecting file '%1$s'", strSelectedFileName), e);
-			}
-			catch (Exception ee) {
-			}
-			return null;
-		}
-	}
+    public TextArea(final Composite pobjComposite, final int arg1) {
+        super(pobjComposite, arg1);
+        this.setBackground(Globals.getFieldBackground());
+        addVerifyListener(new VerifyListener() {
 
-	private boolean saveFile() {
-		String strFilename4Save = "";
-		try {
-			FileDialog fdialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
-			if (objFormPosSizeHandler != null) {
-				fdialog.setFilterPath(objFormPosSizeHandler.getProperty("LastSelectedFile4Save"));
-			}
-			strFilename4Save = fdialog.open();
-			if (strFilename4Save == null) {
-				return false;
-			}
-			JSFile objFile = new JSFile(strFilename4Save);
-			if (objFile.exists()) {
-				//				String strM = Messages.getString("MainListener.doFileOverwrite") + ": " + strFilename4Save;
-				//				int ok = MainWindow.message(strM, SWT.ICON_QUESTION | SWT.YES | SWT.NO);
-				//				if (ok == SWT.NO) {
-				//					return false;
-				//				}
-				//				if (!objFile.canWrite()) {
-				//					strM = Messages.getString("MainListener.fileWriteProtected") + ":" + strFilename4Save;
-				//					MainWindow.message(strM, SWT.ICON_WARNING | SWT.OK);
-				//					return false;
-				//				}
-			}
-			objFile.WriteLine(getText());
-			objFile.close();
-			if (objFormPosSizeHandler != null) {
-				objFormPosSizeHandler.saveProperty("LastSelectedFile4Save", strFilename4Save);
-			}
-			return true;
-		}
-		catch (Exception e) {
-			//				new ErrorLog(String.format("error saving file '%1$s'", strFilename4Save), e);
-			new JobSchedulerException(String.format("error saving file '%1$s'", strFilename4Save), e);
-			return false;
-		}
-	}
+            @Override
+            public void verifyText(final VerifyEvent e) {
+            }
+        });
+        addMouseListener(new MouseListener() {
 
-	public void setXMLText(final String pstrXMLText) {
-		List<XmlRegion> regions = new XmlRegionAnalyzer().analyzeXml(pstrXMLText);
-		List<StyleRange> objStyleRanges = computeStyleRanges(regions);
-		setText(pstrXMLText);
-		verifyXMLText objVfT = new verifyXMLText();
-		addVerifyListener(objVfT);
-		addKeyListener(objVfT);
-		setStyleRanges(objStyleRanges.toArray(new StyleRange[objStyleRanges.size()]));
-		redraw();
-	}
+            @Override
+            public void mouseUp(final MouseEvent event) {
+                if (event.button == 3) {
+                    logger.debug("button2");
+                }
+            }
 
-	/**
-	 * Computes style ranges from XML regions.
-	 * @param regions an ordered list of XML regions
-	 * @return an ordered list of style ranges for SWT styled text
-	 */
-	public List<StyleRange> computeStyleRanges(List<XmlRegion> regions) {
+            @Override
+            public void mouseDown(final MouseEvent arg0) {
+            }
 
-		List<StyleRange> styleRanges = new ArrayList<StyleRange>();
-		for (XmlRegion xr : regions) {
+            @Override
+            public void mouseDoubleClick(final MouseEvent arg0) {
+                // startExternalEditor();
+            }
+        });
 
-			// The style itself depends on the region type
-			// In this example, we use colors from the system
-			StyleRange sr = new StyleRange();
-			switch (xr.getXmlRegionType()) {
-				case MARKUP:
-					sr.foreground = Display.getDefault().getSystemColor(SWT.COLOR_DARK_BLUE);
-					sr.fontStyle = SWT.BOLD;
-					break;
+        addHelpListener(new HelpListener() {
 
-				case ATTRIBUTE:
-					sr.foreground = Display.getDefault().getSystemColor(SWT.COLOR_DARK_RED);
-					break;
+            @Override
+            public void helpRequested(final HelpEvent objHelpEvent) {
+                // MainWindow.message(Messages.getString("OrderJob.Help"),
+                // SWT.ICON_INFORMATION);
+            }
+        });
 
-				// And so on...
-				case ATTRIBUTE_VALUE:
-					sr.foreground = Display.getDefault().getSystemColor(SWT.COLOR_DARK_CYAN);
-					break;
-				case MARKUP_VALUE:
-					sr.fontStyle = SWT.BOLD;
-					break;
-				case COMMENT:
-					sr.foreground = Display.getDefault().getSystemColor(SWT.COLOR_DARK_GREEN);
-					break;
-				case INSTRUCTION:
-					sr.foreground = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
-					break;
-				case CDATA:
-					sr.foreground = Display.getDefault().getSystemColor(SWT.COLOR_DARK_MAGENTA);
+        addKeyListener(new KeyAdapter() {
 
-					break;
-				case WHITESPACE:
-					break;
-				default:
-					break;
-			}
+            @Override
+            public void keyPressed(final KeyEvent e) {
+                e.doit = false;
+                // if (objDataProvider.Check4HelpKey(e.keyCode, strTagName,
+                // strAttributeName)) {
+                // return;
+                // }
+                if ((e.stateMask & SWT.MOD1) == SWT.MOD1) {
+                    switch (e.keyCode) {
+                    case 'a':
+                        _selectAll();
+                        return;
+                    case 'i':
+                        doInsertFile();
+                        return;
+                    case 'r':
+                        doReadFile();
+                        return;
+                    case 'f':
+                        changeFont();
+                        return;
+                    case 'x':
+                        startExternalEditor();
+                        return;
+                    default:
+                        break;
+                    }
+                }
+                if ((e.stateMask & (SWT.MOD1 | SWT.ALT)) == (SWT.MOD1 | SWT.ALT)) {
+                    if (e.keyCode == 's') { // caution: lower case letters
+                        saveFile();
+                        return;
+                    }
+                }
+                /*
+                 * getClipBoard(); if (e.stateMask == SWT.CTRL) { if (e.keyCode
+                 * == 97) { // Ctrl-A Select all setSelection(0,
+                 * getText().length()); e.doit = false; return; } if (e.keyCode
+                 * == 99) { // Ctrl-C Copy String strT = getSelectionText();
+                 * TextTransfer textTransfer = TextTransfer.getInstance();
+                 * cb.setContents(new Object[] { strT }, new Transfer[] {
+                 * textTransfer }); e.doit = false; return; } if (e.keyCode ==
+                 * 118) { // Ctrl-V Paste TextTransfer transfer =
+                 * TextTransfer.getInstance(); String data = (String)
+                 * cb.getContents(transfer); if (data != null) { insert(data);
+                 * e.doit = false; return; } } }
+                 */
+                e.doit = true;
+                return;
+            }
+        });
+        final GridData gridData_1 = new GridData(GridData.FILL, GridData.FILL, true, true, 4, 1);
+        gridData_1.minimumHeight = 40;
+        gridData_1.widthHint = 454;
+        gridData_1.heightHint = 139;
+        setLayoutData(gridData_1);
+        addModifyListener(new ModifyListener() {
 
-			// Define the position and limit
-			sr.start = xr.getStart();
-			sr.length = xr.getEnd() - xr.getStart();
-			styleRanges.add(sr);
-		}
+            @Override
+            public void modifyText(final ModifyEvent e) {
+            }
+        });
+    }
 
-		return styleRanges;
-	}
+    /*
+     * private Clipboard getClipBoard() { if (cb == null) { cb = new
+     * Clipboard(getDisplay()); } return cb; }
+     */
+    public void setFont(final FontData f, final RGB foreGround) {
+        setFont(SWTResourceManager.getFont(f.getLocale(), f.getHeight(), f.getStyle()));
+        setForeground(SWTResourceManager.getColor(foreGround));
+    }
 
-	public class verifyXMLText implements VerifyListener, KeyListener {
-		private String	strActualText	= "";
-		private boolean	flgInATag		= false;
-		private int		position		= -1;
+    public void changeFont() {
+        SOSFontDialog fd = new SOSFontDialog(getFont().getFontData()[0], getForeground().getRGB());
+        fd.setKey(strPreferenceStoreKey + "font");
+        fd.setParent(getShell());
+        fd.show(getDisplay());
+        setFont(fd.getFontData(), fd.getForeGround());
+    }
 
-		private void addActualText(final String pstrText) {
-			if (flgInATag == true) {
-				strActualText += pstrText;
-			}
-		}
+    private void doReadFile() {
+        String strFileName = doSelectFile("LastSelectedFile4Read");
+        String strContent = null;
+        if ((strContent = getFileContent(strFileName)) != null) {
+            setText(strContent);
+        }
+    }
 
-		@Override
-		public void verifyText(VerifyEvent event) {
-			// Only expand when text is inserted.
-			if (event.end - event.start == 0) {
-				String strEventText = event.text;
-				switch (strEventText) {
-					case "<":
-						if (flgInATag == true) {
-							strActualText = "";
-						}
-						flgInATag = true;
-						addActualText(strEventText);
-						break;
+    private void doInsertFile() {
+        String strFileName = doSelectFile("LastSelectedFile4Insert");
+        String strContent = null;
+        if ((strContent = getFileContent(strFileName)) != null) {
+            this.insert(strContent);
+        }
+    }
 
-					case ">":
-						if (flgInATag == true) {
-							addActualText(strEventText);
-							strActualText = strActualText.replace("<", " </");
-							event.text = strEventText + strActualText;
-							sendKeyEvent(0);
-						}
-						break;
+    private String getFileContent(final String pstrFileName) {
+        String strContent = null;
+        if (pstrFileName != null) {
+            JSFile objFile = new JSFile(pstrFileName);
+            strContent = objFile.getContent();
+        }
+        return strContent;
+    }
 
-					default:
-						addActualText(strEventText);
-						if (flgInATag == true) {
-							switch (strActualText) {
-								case "<![C":
-									event.text = "CDATA[ ]]>";
-									sendKeyEvent(5);
-									break;
+    private String doSelectFile(final String pstrLRUKey) {
+        String strSelectedFileName = "";
+        try {
+            FileDialog fdialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.OPEN);
+            if (objFormPosSizeHandler != null) {
+                fdialog.setFilterPath(objFormPosSizeHandler.getProperty(pstrLRUKey));
+            }
+            if ((strSelectedFileName = fdialog.open()) == null) {
+                return strSelectedFileName;
+            }
+            if (objFormPosSizeHandler != null) {
+                objFormPosSizeHandler.saveProperty(pstrLRUKey, strSelectedFileName);
+            }
+            return strSelectedFileName;
+        } catch (Exception e) {
+            try {
+                // new ErrorLog(String.format("error selecting file '%1$s'",
+                // strSelectedFileName), e);
+                new JobSchedulerException(String.format("error selecting file '%1$s'", strSelectedFileName), e);
+            } catch (Exception ee) {
+            }
+            return null;
+        }
+    }
 
-								default:
-									break;
-							}
-						}
-						break;
-				}
-				if (event.text.equals("<p>")) {
-					event.text = "<p></p>";
-				}
-			}
-		}
+    private boolean saveFile() {
+        String strFilename4Save = "";
+        try {
+            FileDialog fdialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
+            if (objFormPosSizeHandler != null) {
+                fdialog.setFilterPath(objFormPosSizeHandler.getProperty("LastSelectedFile4Save"));
+            }
+            strFilename4Save = fdialog.open();
+            if (strFilename4Save == null) {
+                return false;
+            }
+            JSFile objFile = new JSFile(strFilename4Save);
+            if (objFile.exists()) {
+                // String strM =
+                // Messages.getString("MainListener.doFileOverwrite") + ": " +
+                // strFilename4Save;
+                // int ok = MainWindow.message(strM, SWT.ICON_QUESTION | SWT.YES
+                // | SWT.NO);
+                // if (ok == SWT.NO) {
+                // return false;
+                // }
+                // if (!objFile.canWrite()) {
+                // strM = Messages.getString("MainListener.fileWriteProtected")
+                // + ":" + strFilename4Save;
+                // MainWindow.message(strM, SWT.ICON_WARNING | SWT.OK);
+                // return false;
+                // }
+            }
+            objFile.WriteLine(getText());
+            objFile.close();
+            if (objFormPosSizeHandler != null) {
+                objFormPosSizeHandler.saveProperty("LastSelectedFile4Save", strFilename4Save);
+            }
+            return true;
+        } catch (Exception e) {
+            // new ErrorLog(String.format("error saving file '%1$s'",
+            // strFilename4Save), e);
+            new JobSchedulerException(String.format("error saving file '%1$s'", strFilename4Save), e);
+            return false;
+        }
+    }
 
-		private void sendKeyEvent(final int intOffset) {
-			flgInATag = false;
-			strActualText = "";
-			position = getCaretOffset() + intOffset;
-			Event objEvent = new Event();
-			objEvent.type = SWT.KeyDown;
-			objEvent.keyCode = SWT.ARROW_LEFT;
-			objEvent.item = objThis;
-			Display.getCurrent().post(objEvent);
+    public void setXMLText(final String pstrXMLText) {
+        List<XmlRegion> regions = new XmlRegionAnalyzer().analyzeXml(pstrXMLText);
+        List<StyleRange> objStyleRanges = computeStyleRanges(regions);
+        setText(pstrXMLText);
+        verifyXMLText objVfT = new verifyXMLText();
+        addVerifyListener(objVfT);
+        addKeyListener(objVfT);
+        setStyleRanges(objStyleRanges.toArray(new StyleRange[objStyleRanges.size()]));
+        redraw();
+    }
 
-		}
+    /** Computes style ranges from XML regions.
+     * 
+     * @param regions an ordered list of XML regions
+     * @return an ordered list of style ranges for SWT styled text */
+    public List<StyleRange> computeStyleRanges(List<XmlRegion> regions) {
 
-		@Override
-		public void keyPressed(KeyEvent e) {
-			e.doit = true;
-			if (flgInATag == true || position > 0) {
-				switch (e.keyCode) {
-					case SWT.ARROW_LEFT:
-						if (position > 0) {
-							position++;
-							setSelection(position);
-							setCaretOffset(position);
-							position = -1;
-							e.doit = false;
-						}
-						break;
+        List<StyleRange> styleRanges = new ArrayList<StyleRange>();
+        for (XmlRegion xr : regions) {
 
-					case SWT.BS:
-						if (strActualText.equals("<")) {
-							strActualText = "";
-							flgInATag = false;
-						}
-						else {
-							strActualText = strActualText.substring(0, strActualText.length() - 1);
-							logger.debug(strActualText);
-						}
-						return;
+            // The style itself depends on the region type
+            // In this example, we use colors from the system
+            StyleRange sr = new StyleRange();
+            switch (xr.getXmlRegionType()) {
+            case MARKUP:
+                sr.foreground = Display.getDefault().getSystemColor(SWT.COLOR_DARK_BLUE);
+                sr.fontStyle = SWT.BOLD;
+                break;
 
-					default:
-						break;
-				}
-			}
-		}
+            case ATTRIBUTE:
+                sr.foreground = Display.getDefault().getSystemColor(SWT.COLOR_DARK_RED);
+                break;
 
-		@Override
-		public void keyReleased(KeyEvent e) {
-		}
-	}
+            // And so on...
+            case ATTRIBUTE_VALUE:
+                sr.foreground = Display.getDefault().getSystemColor(SWT.COLOR_DARK_CYAN);
+                break;
+            case MARKUP_VALUE:
+                sr.fontStyle = SWT.BOLD;
+                break;
+            case COMMENT:
+                sr.foreground = Display.getDefault().getSystemColor(SWT.COLOR_DARK_GREEN);
+                break;
+            case INSTRUCTION:
+                sr.foreground = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
+                break;
+            case CDATA:
+                sr.foreground = Display.getDefault().getSystemColor(SWT.COLOR_DARK_MAGENTA);
 
-	@Override
-	public void dispose() {
-		super.dispose();
-		logger = null;
-		objFormPosSizeHandler = null;
-		objThis = null;
-	}
+                break;
+            case WHITESPACE:
+                break;
+            default:
+                break;
+            }
 
-	@Override
-	protected void checkSubclass() {
-		// Disable the check that prevents subclassing of SWT components
-	}
+            // Define the position and limit
+            sr.start = xr.getStart();
+            sr.length = xr.getEnd() - xr.getStart();
+            styleRanges.add(sr);
+        }
+
+        return styleRanges;
+    }
+
+    public class verifyXMLText implements VerifyListener, KeyListener {
+
+        private String strActualText = "";
+        private boolean flgInATag = false;
+        private int position = -1;
+
+        private void addActualText(final String pstrText) {
+            if (flgInATag == true) {
+                strActualText += pstrText;
+            }
+        }
+
+        @Override
+        public void verifyText(VerifyEvent event) {
+            // Only expand when text is inserted.
+            if (event.end - event.start == 0) {
+                String strEventText = event.text;
+                switch (strEventText) {
+                case "<":
+                    if (flgInATag == true) {
+                        strActualText = "";
+                    }
+                    flgInATag = true;
+                    addActualText(strEventText);
+                    break;
+
+                case ">":
+                    if (flgInATag == true) {
+                        addActualText(strEventText);
+                        strActualText = strActualText.replace("<", " </");
+                        event.text = strEventText + strActualText;
+                        sendKeyEvent(0);
+                    }
+                    break;
+
+                default:
+                    addActualText(strEventText);
+                    if (flgInATag == true) {
+                        switch (strActualText) {
+                        case "<![C":
+                            event.text = "CDATA[ ]]>";
+                            sendKeyEvent(5);
+                            break;
+
+                        default:
+                            break;
+                        }
+                    }
+                    break;
+                }
+                if (event.text.equals("<p>")) {
+                    event.text = "<p></p>";
+                }
+            }
+        }
+
+        private void sendKeyEvent(final int intOffset) {
+            flgInATag = false;
+            strActualText = "";
+            position = getCaretOffset() + intOffset;
+            Event objEvent = new Event();
+            objEvent.type = SWT.KeyDown;
+            objEvent.keyCode = SWT.ARROW_LEFT;
+            objEvent.item = objThis;
+            Display.getCurrent().post(objEvent);
+
+        }
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            e.doit = true;
+            if (flgInATag == true || position > 0) {
+                switch (e.keyCode) {
+                case SWT.ARROW_LEFT:
+                    if (position > 0) {
+                        position++;
+                        setSelection(position);
+                        setCaretOffset(position);
+                        position = -1;
+                        e.doit = false;
+                    }
+                    break;
+
+                case SWT.BS:
+                    if (strActualText.equals("<")) {
+                        strActualText = "";
+                        flgInATag = false;
+                    } else {
+                        strActualText = strActualText.substring(0, strActualText.length() - 1);
+                        logger.debug(strActualText);
+                    }
+                    return;
+
+                default:
+                    break;
+                }
+            }
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+        }
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        logger = null;
+        objFormPosSizeHandler = null;
+        objThis = null;
+    }
+
+    @Override
+    protected void checkSubclass() {
+        // Disable the check that prevents subclassing of SWT components
+    }
 }

@@ -8,8 +8,7 @@ import com.sos.hibernate.classes.DbItem;
 import com.sos.hibernate.classes.SOSHibernateIntervalFilter;
 import com.sos.hibernate.interfaces.ISOSHibernateFilter;
 
-/**
- * \class SchedulerHistoryFilter
+/** \class SchedulerHistoryFilter
  *
  * \brief SchedulerHistoryFilter -
  *
@@ -30,291 +29,283 @@ import com.sos.hibernate.interfaces.ISOSHibernateFilter;
  * </p>
  * \author Uwe Risse \version 14.12.2011 \see reference
  *
- * Created on 14.12.2011 13:53:37
- */
+ * Created on 14.12.2011 13:53:37 */
 
 public class JadeFilesFilter extends SOSHibernateIntervalFilter implements ISOSHibernateFilter {
-	@SuppressWarnings("unused")
-	private final String	conClassName	= "JadeFilesFilter";
-	private String			dateFormat1		= "yyyy-MM-dd HH:mm:ss";
-	public final String			conSVNVersion					= "$Id: SOSDataExchangeEngine.java 19091 2013-02-08 12:49:32Z kb $";
 
-	private String			sourceHost;
-	private String			sourceHostIp;
-	private String			sourceUser;
-	private String			sourceDir;
-	private String			sourceFilename;
+    @SuppressWarnings("unused")
+    private final String conClassName = "JadeFilesFilter";
+    private String dateFormat1 = "yyyy-MM-dd HH:mm:ss";
+    public final String conSVNVersion = "$Id: SOSDataExchangeEngine.java 19091 2013-02-08 12:49:32Z kb $";
 
-	private Date			createdFrom;
-	private Date			createdTo;
+    private String sourceHost;
+    private String sourceHostIp;
+    private String sourceUser;
+    private String sourceDir;
+    private String sourceFilename;
 
-	private String			createdFromIso;
-	private String			createdToIso;
+    private Date createdFrom;
+    private Date createdTo;
 
-	private Date			modifiedFrom;
-	private Date			modifiedTo;
+    private String createdFromIso;
+    private String createdToIso;
 
-	private String			createdBy;
+    private Date modifiedFrom;
+    private Date modifiedTo;
 
-	private String			modifiedBy;
-	
-	private String			mandator;
-	
-	private Integer			fileSize;
-	
-	public String getCreatedFromIso() {
-		return createdFromIso;
-	}
+    private String createdBy;
 
-	public String getCreatedToIso() {
-		return createdToIso;
-	}
+    private String modifiedBy;
 
-	public JadeFilesFilter() {
-	}
+    private String mandator;
 
-	@Override
-	public String getDateFormat() {
-		return dateFormat1;
-	}
+    private Integer fileSize;
 
-	@Override
-	public void setDateFormat(final String dateFormat) {
-		dateFormat1 = dateFormat;
-	}
+    public String getCreatedFromIso() {
+        return createdFromIso;
+    }
 
-	public String getSourceHost() {
-		return sourceHost;
-	}
+    public String getCreatedToIso() {
+        return createdToIso;
+    }
 
-	public void setSourceHost(final String sourceHost) {
-		this.sourceHost = sourceHost;
-	}
+    public JadeFilesFilter() {
+    }
 
-	public String getSourceHostIp() {
-		return sourceHostIp;
-	}
+    @Override
+    public String getDateFormat() {
+        return dateFormat1;
+    }
 
-	public void setSourceHostIp(final String sourceHostIp) {
-		this.sourceHostIp = sourceHostIp;
-	}
+    @Override
+    public void setDateFormat(final String dateFormat) {
+        dateFormat1 = dateFormat;
+    }
 
-	public String getSourceUser() {
-		return sourceUser;
-	}
+    public String getSourceHost() {
+        return sourceHost;
+    }
 
-	public void setSourceUser(final String sourceUser) {
-		this.sourceUser = sourceUser;
-	}
+    public void setSourceHost(final String sourceHost) {
+        this.sourceHost = sourceHost;
+    }
 
-	public String getSourceDir() {
-		return sourceDir;
-	}
+    public String getSourceHostIp() {
+        return sourceHostIp;
+    }
 
-	public void setSourceDir(final String sourceDir) {
-		this.sourceDir = sourceDir;
-	}
+    public void setSourceHostIp(final String sourceHostIp) {
+        this.sourceHostIp = sourceHostIp;
+    }
 
-	public String getSourceFilename() {
-		return sourceFilename;
-	}
+    public String getSourceUser() {
+        return sourceUser;
+    }
 
-	public void setSourceFilename(final String sourceFilename) {
-		this.sourceFilename = sourceFilename;
-	}
+    public void setSourceUser(final String sourceUser) {
+        this.sourceUser = sourceUser;
+    }
 
-	public Date getCreatedFrom() {
-		return createdFrom;
-	}
+    public String getSourceDir() {
+        return sourceDir;
+    }
 
-	public void setCreatedFrom(final String createdFrom) throws ParseException {
-		if (createdFrom.equals("")) {
-			this.createdFrom = null;
-		}
-		else {
-			SimpleDateFormat formatter = new SimpleDateFormat(dateFormat1);
-			Date d = formatter.parse(createdFrom);
-			setCreatedFrom(d);
-		}
-	}
+    public void setSourceDir(final String sourceDir) {
+        this.sourceDir = sourceDir;
+    }
 
-	public Date getCreatedTo() {
-		return createdTo;
-	}
+    public String getSourceFilename() {
+        return sourceFilename;
+    }
 
-	public void setCreatedTo(final String createdTo) throws ParseException {
-		if (createdTo.equals("")) {
-			this.createdTo = null;
-		}
-		else {
-			SimpleDateFormat formatter = new SimpleDateFormat(dateFormat1);
-			Date d = formatter.parse(createdTo);
-			setCreatedTo(d);
-		}
-	}
+    public void setSourceFilename(final String sourceFilename) {
+        this.sourceFilename = sourceFilename;
+    }
 
-	public void setCreatedFrom(final Date from) {
-		if (from != null) {
-			SimpleDateFormat formatter = new SimpleDateFormat(
-					"yyyy-MM-dd 00:00:00");
-			String d = formatter.format(from);
-			try {
-				formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-				createdFrom = formatter.parse(d);
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
-			formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			createdFromIso = formatter.format(from);
-		}
-	}
+    public Date getCreatedFrom() {
+        return createdFrom;
+    }
 
-	public void setCreatedTo(final Date to) {
-		if (to != null) {
-			SimpleDateFormat formatter = new SimpleDateFormat(
-					"yyyy-MM-dd 23:59:59");
-			String d = formatter.format(to);
-			try {
-				formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-				createdTo = formatter.parse(d);
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
-			formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			createdToIso = formatter.format(to);
-		}
-	}
+    public void setCreatedFrom(final String createdFrom) throws ParseException {
+        if (createdFrom.equals("")) {
+            this.createdFrom = null;
+        } else {
+            SimpleDateFormat formatter = new SimpleDateFormat(dateFormat1);
+            Date d = formatter.parse(createdFrom);
+            setCreatedFrom(d);
+        }
+    }
 
-	@Override
-	public String getTitle() {
-		String s = "";
+    public Date getCreatedTo() {
+        return createdTo;
+    }
 
-		if (createdFrom != null) {
-			s += String.format("From: %s ", date2Iso(createdFrom));
-		}
-		if (createdTo != null) {
-			s += String.format("To: %s ", date2Iso(createdTo));
-		}
+    public void setCreatedTo(final String createdTo) throws ParseException {
+        if (createdTo.equals("")) {
+            this.createdTo = null;
+        } else {
+            SimpleDateFormat formatter = new SimpleDateFormat(dateFormat1);
+            Date d = formatter.parse(createdTo);
+            setCreatedTo(d);
+        }
+    }
 
-		String title = String.format("%1s ", s);
-		return title;
-	}
+    public void setCreatedFrom(final Date from) {
+        if (from != null) {
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
+            String d = formatter.format(from);
+            try {
+                formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                createdFrom = formatter.parse(d);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            createdFromIso = formatter.format(from);
+        }
+    }
 
-	@Override
-	public boolean isFiltered(final DbItem h) {
-		return false;
-	}
+    public void setCreatedTo(final Date to) {
+        if (to != null) {
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd 23:59:59");
+            String d = formatter.format(to);
+            try {
+                formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                createdTo = formatter.parse(d);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            createdToIso = formatter.format(to);
+        }
+    }
 
-	@Override
-	public void setIntervalFromDate(final Date d) {
-		createdFrom = d;
-	}
+    @Override
+    public String getTitle() {
+        String s = "";
 
-	@Override
-	public void setIntervalToDate(final Date d) {
-		createdTo = d;
-	}
+        if (createdFrom != null) {
+            s += String.format("From: %s ", date2Iso(createdFrom));
+        }
+        if (createdTo != null) {
+            s += String.format("To: %s ", date2Iso(createdTo));
+        }
 
-	@Override
-	public void setIntervalFromDateIso(final String s) {
-		createdFromIso = s;
-	}
+        String title = String.format("%1s ", s);
+        return title;
+    }
 
-	@Override
-	public void setIntervalToDateIso(final String s) {
-		createdToIso = s;
-	}
+    @Override
+    public boolean isFiltered(final DbItem h) {
+        return false;
+    }
 
-	public Date getModifiedFrom() {
-		return modifiedFrom;
-	}
+    @Override
+    public void setIntervalFromDate(final Date d) {
+        createdFrom = d;
+    }
 
-	public void setModifiedFrom(final String modifiedFrom) throws ParseException {
-		if (modifiedFrom.equals("")) {
-			this.modifiedFrom = null;
-		}
-		else {
-			SimpleDateFormat formatter = new SimpleDateFormat(dateFormat1);
-			Date d = formatter.parse(modifiedFrom);
-			setModifiedFrom(d);
-		}
-	}
+    @Override
+    public void setIntervalToDate(final Date d) {
+        createdTo = d;
+    }
 
-	public Date getModifiedTo() {
-		return modifiedTo;
-	}
+    @Override
+    public void setIntervalFromDateIso(final String s) {
+        createdFromIso = s;
+    }
 
-	public void setModifiedTo(final String modifiedTo) throws ParseException {
-		if (modifiedTo.equals("")) {
-			this.modifiedTo = null;
-		}
-		else {
-			SimpleDateFormat formatter = new SimpleDateFormat(dateFormat1);
-			Date d = formatter.parse(modifiedTo);
-			setModifiedTo(d);
-		}
-	}
+    @Override
+    public void setIntervalToDateIso(final String s) {
+        createdToIso = s;
+    }
 
-	public void setModifiedFrom(final Date from) {
-		if (from != null) {
-			SimpleDateFormat formatter = new SimpleDateFormat(
-					"yyyy-MM-dd 00:00:00");
-			String d = formatter.format(from);
-			try {
-				formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-				modifiedFrom = formatter.parse(d);
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
-		}
+    public Date getModifiedFrom() {
+        return modifiedFrom;
+    }
 
-	}
+    public void setModifiedFrom(final String modifiedFrom) throws ParseException {
+        if (modifiedFrom.equals("")) {
+            this.modifiedFrom = null;
+        } else {
+            SimpleDateFormat formatter = new SimpleDateFormat(dateFormat1);
+            Date d = formatter.parse(modifiedFrom);
+            setModifiedFrom(d);
+        }
+    }
 
-	public void setModifiedTo(final Date to) {
-		if (to != null) {
-			SimpleDateFormat formatter = new SimpleDateFormat(
-					"yyyy-MM-dd 23:59:59");
-			String d = formatter.format(to);
-			try {
-				formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-				modifiedTo = formatter.parse(d);
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
-		}
+    public Date getModifiedTo() {
+        return modifiedTo;
+    }
 
-	}
+    public void setModifiedTo(final String modifiedTo) throws ParseException {
+        if (modifiedTo.equals("")) {
+            this.modifiedTo = null;
+        } else {
+            SimpleDateFormat formatter = new SimpleDateFormat(dateFormat1);
+            Date d = formatter.parse(modifiedTo);
+            setModifiedTo(d);
+        }
+    }
 
-	public String getCreatedBy() {
-		return createdBy;
-	}
+    public void setModifiedFrom(final Date from) {
+        if (from != null) {
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
+            String d = formatter.format(from);
+            try {
+                formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                modifiedFrom = formatter.parse(d);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
 
-	public void setCreatedBy(String createdBy) {
-		this.createdBy = createdBy;
-	}
+    }
 
-	public String getMandator() {
-		return mandator;
-	}
+    public void setModifiedTo(final Date to) {
+        if (to != null) {
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd 23:59:59");
+            String d = formatter.format(to);
+            try {
+                formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                modifiedTo = formatter.parse(d);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
 
-	public void setMandator(String mandator) {
-		this.mandator = mandator;
-	}
+    }
 
-	public String getModifiedBy() {
-		return modifiedBy;
-	}
+    public String getCreatedBy() {
+        return createdBy;
+    }
 
-	public void setModifiedBy(String modifiedBy) {
-		this.modifiedBy = modifiedBy;
-	}
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
 
-	public Integer getFileSize() {
-		return fileSize;
-	}
+    public String getMandator() {
+        return mandator;
+    }
 
-	public void setFileSize(Integer fileSize) {
-		this.fileSize = fileSize;
-	}
-	
+    public void setMandator(String mandator) {
+        this.mandator = mandator;
+    }
+
+    public String getModifiedBy() {
+        return modifiedBy;
+    }
+
+    public void setModifiedBy(String modifiedBy) {
+        this.modifiedBy = modifiedBy;
+    }
+
+    public Integer getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(Integer fileSize) {
+        this.fileSize = fileSize;
+    }
+
 }

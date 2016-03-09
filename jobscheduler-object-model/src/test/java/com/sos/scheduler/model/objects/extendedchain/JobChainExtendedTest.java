@@ -66,10 +66,8 @@ public class JobChainExtendedTest {
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         Schema schema = null;
         try {
-            schema = schemaFactory.newSchema(new Source[] { 
-                    SOSResourceFactory.asStreamSource(SOSProductionResource.SCHEDULER_XSD),
-                    SOSResourceFactory.asStreamSource(SOSProductionResource.JOB_CHAIN_EXTENSIONS_XSD) 
-                    });
+            schema = schemaFactory.newSchema(new Source[] { SOSResourceFactory.asStreamSource(SOSProductionResource.SCHEDULER_XSD),
+                    SOSResourceFactory.asStreamSource(SOSProductionResource.JOB_CHAIN_EXTENSIONS_XSD) });
         } catch (SAXException e) {
             LOGGER.error(e.getMessage(), e);
         }

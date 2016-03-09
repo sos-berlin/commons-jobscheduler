@@ -35,6 +35,7 @@ public class SOSMsg {
     public static final String conPropertyExtensionAccelerator = ".acc";
     public static int VerbosityLevel = 0;
     public static boolean flgShowFullMessageText = false;
+
     public enum enuMsgTypes {
         undefined, error, info, fatal, debug, warning, text, trace, label;
     }

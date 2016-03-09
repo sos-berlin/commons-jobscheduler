@@ -171,14 +171,14 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
                                         ftpClient.logout();
                                     } catch (Exception e) {
                                         // no error handling
-                                    } 
+                                    }
                                 }
                                 if (ftpClient.isConnected()) {
                                     try {
                                         ftpClient.disconnect();
                                     } catch (Exception e) {
                                         // no error handling
-                                    } 
+                                    }
                                 }
                             }
                             isAlternativeParameterUse++;
@@ -372,7 +372,7 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
                             ftpClient.logout();
                         } catch (Exception e) {
                             // no error handling
-                        } 
+                        }
                     }
                     if (ftpClient.isConnected()) {
                         try {
@@ -403,7 +403,7 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
         try {
             if (transActional) {
                 transActionalRemoteFiles = hlocalFile + ";" + sosString.parseToString(transActionalRemoteFiles);
-            } else  if (!removeFiles && flgJumpTransferDefined) {
+            } else if (!removeFiles && flgJumpTransferDefined) {
                 strFilesRemainingOnSource = hlocalFile + ";" + strFilesRemainingOnSource;
             }
             String strSourceFileName = sourceFile.getName();
@@ -604,16 +604,16 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
                 try {
                     checkInterval = Long.parseLong(sosString.parseToString(arguments.get("check_interval")));
                 } catch (Exception e) {
-                    RaiseException("illegal value for parameter [check_interval]: " + sosString.parseToString(arguments.get("check_interval")) 
-                            + " " + e.getMessage(), e);
+                    RaiseException("illegal value for parameter [check_interval]: " + sosString.parseToString(arguments.get("check_interval")) + " "
+                            + e.getMessage(), e);
                 }
             }
             if (!sosString.parseToString(arguments.get("check_retry")).isEmpty()) {
                 try {
                     checkRetry = Long.parseLong(sosString.parseToString(arguments.get("check_retry")));
                 } catch (Exception e) {
-                    RaiseException("invalid value for parameter [check_retry]: " + sosString.parseToString(arguments.get("check_retry")) 
-                            + " " + e.getMessage(), e);
+                    RaiseException("invalid value for parameter [check_retry]: " + sosString.parseToString(arguments.get("check_retry")) + " "
+                            + e.getMessage(), e);
                 }
             }
             if (!sosString.parseToString(arguments.get("overwrite_files")).isEmpty()) {
@@ -1277,7 +1277,7 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
     }
 
     private void getDeleteTransferFiles() throws Exception {
-        if ((transActionalRemoteFiles != null || strFilesRemainingOnSource != null) 
+        if ((transActionalRemoteFiles != null || strFilesRemainingOnSource != null)
                 && (removeFiles && transActional || getBool(conParameterREMOVE_AFTER_JUMP_TRANSFER))) {
             getLogger().debug(".. mark transactional files to remove " + transActionalRemoteFiles);
             Properties p = (Properties) arguments.clone();

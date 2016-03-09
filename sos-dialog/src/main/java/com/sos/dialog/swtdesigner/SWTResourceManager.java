@@ -83,7 +83,6 @@ public class SWTResourceManager {
     // Color support
     // ////////////////////////////
 
-
     /** Returns the system color matching the specific ID
      * 
      * @param systemColorID int The ID value for the color
@@ -129,7 +128,6 @@ public class SWTResourceManager {
     // ////////////////////////////
     // Image support
     // ////////////////////////////
-
 
     /** Returns an image encoded by the specified input stream
      * 
@@ -319,7 +317,7 @@ public class SWTResourceManager {
     public static void disposeImages(String section) {
         for (Iterator I = m_ClassImageMap.keySet().iterator(); I.hasNext();) {
             String key = (String) I.next();
-            if (!key.startsWith(section + '|')){
+            if (!key.startsWith(section + '|')) {
                 continue;
             }
             Image image = m_ClassImageMap.get(key);
@@ -370,7 +368,7 @@ public class SWTResourceManager {
                         }
                     }
                 } catch (Exception e) {
-                   LOGGER.error("Unable to set underline or strikeout" + " (probably on a non-Windows platform). " + e.getMessage(), e);
+                    LOGGER.error("Unable to set underline or strikeout" + " (probably on a non-Windows platform). " + e.getMessage(), e);
                 }
             }
             font = new Font(Display.getCurrent(), fontData);
@@ -416,6 +414,7 @@ public class SWTResourceManager {
             CoolItem item = items[i];
             if (item.getControl() == null) {
                 item.setControl(new Canvas(bar, SWT.NONE) {
+
                     @Override
                     public Point computeSize(int wHint, int hHint, boolean changed) {
                         return new Point(20, 20);

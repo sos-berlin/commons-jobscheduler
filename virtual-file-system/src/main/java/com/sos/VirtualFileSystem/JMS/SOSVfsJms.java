@@ -48,7 +48,7 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
 
     private void connect(final String host, final int port) {
         if (!this.isConnected()) {
-            try{
+            try {
                 this.port = port;
                 this.host = host;
                 if (host.toLowerCase().startsWith("tcp://")) {
@@ -58,7 +58,7 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
                 }
                 LOGGER.info(SOSVfs_D_0101.params(host, port));
                 this.LogReply();
-            } catch(Exception ex){
+            } catch (Exception ex) {
                 throw new JobSchedulerException(ex);
             }
         } else {
@@ -66,7 +66,7 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
         }
     }
 
-    public String createConnectionUrl (String protocol, String hostName, String port){
+    public String createConnectionUrl(String protocol, String hostName, String port) {
         StringBuilder strb = new StringBuilder();
         strb.append(protocol).append("://").append(hostName).append(":").append(port);
         return strb.toString();
@@ -86,48 +86,48 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
         return jmsConnection != null;
     }
 
-    public Connection createConnection(String uri){
+    public Connection createConnection(String uri) {
         factory = new ActiveMQConnectionFactory(uri);
         jmsConnection = null;
         try {
             jmsConnection = factory.createConnection();
         } catch (JMSException e) {
-            LOGGER.error("JMSException occurred while trying to connect: " , e);
+            LOGGER.error("JMSException occurred while trying to connect: ", e);
         }
         return jmsConnection;
     }
-    
-    public Session createSession(Connection jmsConnection){
+
+    public Session createSession(Connection jmsConnection) {
         session = null;
         try {
             session = jmsConnection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
         } catch (JMSException e) {
-            LOGGER.error("JMSException occurred while trying to create Session: " , e);
+            LOGGER.error("JMSException occurred while trying to create Session: ", e);
         }
         return session;
     }
-    
-    public Destination createDestination(Session session, String queueName){
+
+    public Destination createDestination(Session session, String queueName) {
         Destination destination = null;
         try {
             destination = session.createQueue(queueName);
         } catch (JMSException e) {
-            LOGGER.error("JMSException occurred while trying to create Destination: " , e);
+            LOGGER.error("JMSException occurred while trying to create Destination: ", e);
         }
         return destination;
     }
-    
-    public MessageProducer createMessageProducer(Session session, Destination destination){
+
+    public MessageProducer createMessageProducer(Session session, Destination destination) {
         MessageProducer producer = null;
         try {
             producer = session.createProducer(destination);
         } catch (JMSException e) {
-            LOGGER.error("JMSException occurred while trying to create MessageProducer: " , e);
-        }        
+            LOGGER.error("JMSException occurred while trying to create MessageProducer: ", e);
+        }
         return producer;
     }
-    
-    public void write(String text, String connectionUrl, String queueName){
+
+    public void write(String text, String connectionUrl, String queueName) {
         Connection jmsConnection = createConnection(connectionUrl);
         Session session = createSession(jmsConnection);
         Destination destination = createDestination(session, queueName);
@@ -137,18 +137,18 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
             message = session.createTextMessage(text);
             producer.send(message);
         } catch (JMSException e) {
-            LOGGER.error("JMSException occurred in ProducerJob while trying to write Message to Destination: " , e);
+            LOGGER.error("JMSException occurred in ProducerJob while trying to write Message to Destination: ", e);
         } finally {
             if (jmsConnection != null) {
                 try {
                     jmsConnection.close();
                 } catch (JMSException e) {
-                    LOGGER.error("JMSException occurred in ProducerJob while trying to close the connection: " , e);
+                    LOGGER.error("JMSException occurred in ProducerJob while trying to close the connection: ", e);
                 }
             }
         }
     }
-    
+
     public MessageConsumer createMessageConsumer(Session session, Destination destination) {
         MessageConsumer consumer = null;
         try {
@@ -180,7 +180,7 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
                     }
                 }
             }
-            if(closeMessage){
+            if (closeMessage) {
                 receivedMessage.acknowledge();
             }
         } catch (JMSException e) {
@@ -190,10 +190,10 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
                 try {
                     jmsConnection.close();
                 } catch (JMSException e) {
-                    LOGGER.error("JMSException occurred while trying to close the connection: " , e);
+                    LOGGER.error("JMSException occurred while trying to close the connection: ", e);
                 }
             }
-         }
+        }
         return messageText;
     }
 
