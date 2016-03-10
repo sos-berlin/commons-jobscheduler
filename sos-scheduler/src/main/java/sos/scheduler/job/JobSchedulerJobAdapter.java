@@ -58,7 +58,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     protected final boolean continue_with_task = true;
     private final static int MAX_LENGTH_OF_STATUSTEXT = 100;
     private JobSchedulerLog4JAppender objJSAppender = null;
-    private HashMap<String, String> paramsAsHashmap = null;
     public final String conMessageFilePath = "com_sos_scheduler_messages";
     public final static boolean conJobSuccess = false;
     public final static boolean conJobFailure = false;
@@ -120,17 +119,17 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             LOG_D_0020.toLog();
             if (spooler_log.level() > 1) {
                 logger.setLevel(Level.ERROR);
-            }
-            if (spooler_log.level() == 1) {
+
+            } else if (spooler_log.level() == 1) {
                 logger.setLevel(Level.WARN);
-            }
-            if (spooler_log.level() == 0) {
+
+            } else if (spooler_log.level() == 0) {
                 logger.setLevel(Level.INFO);
-            }
-            if (spooler_log.level() < 0) {
+
+            } else if (spooler_log.level() < 0) {
                 logger.setLevel(Level.DEBUG);
-            }
-            if (spooler_log.level() == -9) {
+
+            } else if (spooler_log.level() == -9) {
                 logger.setLevel(Level.TRACE);
             }
         }
@@ -141,17 +140,17 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             logger.addAppender(consoleAppender);
             if (spooler_log.level() > 1) {
                 logger.setLevel(Level.ERROR);
-            }
-            if (spooler_log.level() == 1) {
+
+            } else if (spooler_log.level() == 1) {
                 logger.setLevel(Level.WARN);
-            }
-            if (spooler_log.level() == 0) {
+
+            } else if (spooler_log.level() == 0) {
                 logger.setLevel(Level.INFO);
-            }
-            if (spooler_log.level() < 0) {
+
+            } else if (spooler_log.level() < 0) {
                 logger.setLevel(Level.DEBUG);
-            }
-            if (spooler_log.level() == -9) {
+
+            } else if (spooler_log.level() == -9) {
                 logger.setLevel(Level.TRACE);
             }
             LOG_I_0010.toLog();
@@ -204,11 +203,11 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                     Object objO = variableSet.var(key);
                     if (objO instanceof String) {
                         value = variableSet.var(key);
-                    } else {
-                        if (objO instanceof Integer) {
-                            Integer intI = (Integer) objO;
-                            value = intI.toString();
-                        }
+
+                    } else if (objO instanceof Integer) {
+                        Integer intI = (Integer) objO;
+                        value = intI.toString();
+
                     }
                     result.put(key, value);
                     result.put(key.replaceAll("_", EMPTY_STRING).toLowerCase(), value);
@@ -254,7 +253,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                     String val = entry.getValue();
                     if (val != null) {
                         String strR = replaceVars(SchedulerParameters, key, val);
-                        if (strR.equalsIgnoreCase(val) == false) {
+                        if (!strR.equalsIgnoreCase(val)) {
                             SchedulerParameters.put(key, strR);
                         }
                     }
@@ -275,7 +274,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                 objJobOrOrderParameters.merge(getOrderParams());
             }
             objJobOrOrderParams = objJobOrOrderParameters;
-            paramsAsHashmap = convertVariableSet2HashMap(objJobOrOrderParams);
             JSJ_D_0070.toLog(objJobOrOrderParameters.count());
             return objJobOrOrderParameters;
         } catch (Exception e) {
@@ -288,11 +286,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     }
 
     protected Order getOrder() {
-        if (spooler_task.order() == null) {
-            return null;
-        } else {
-            return spooler_task.order();
-        }
+        return spooler_task.order();
     }
 
     protected Variable_set getOrderParams() {
@@ -317,7 +311,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                 }
             }
             objJobOrOrderParams = params;
-            paramsAsHashmap = convertVariableSet2HashMap(objJobOrOrderParams);
             return params;
         } catch (Exception e) {
             String strM = JSJ_F_0010.params(e.getMessage());
@@ -332,7 +325,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 
     public void setParameters(final Variable_set pVariableSet) {
         objJobOrOrderParams = pVariableSet;
-        paramsAsHashmap = convertVariableSet2HashMap(objJobOrOrderParams);
     }
 
     @Override
@@ -376,22 +368,52 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     @Override
     public String replaceSchedulerVars(final boolean isWindows, final String pstrString2Modify) {
         String strTemp = pstrString2Modify;
-        paramsAsHashmap = convertVariableSet2HashMap(objJobOrOrderParams);
         if (isNotNull(objJobOrOrderParams)) {
-            strTemp = replaceSchedulerVarsInString(paramsAsHashmap, pstrString2Modify);
+            strTemp = replaceSchedulerVarsInString(objJobOrOrderParams, pstrString2Modify);
         }
         return strTemp;
     }
 
+    public String replaceSchedulerVarsInString(Variable_set params, final String pstrString2Modify) {
+        String strTemp = pstrString2Modify;
+        JSJ_D_0080.toLog();
+        if (pstrString2Modify.matches("(?s).*%[^%]+%.*") || pstrString2Modify.matches("(?s).*(\\$|§)\\{[^{]+\\}.*")) {
+            if (isNotNull(params)) {
+                String[] strPatterns = new String[] { "%SCHEDULER_PARAM_%1$s%", "%%1$s%", "(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?",
+                        "(\\$|§)\\{?%1$s\\}?" };
+                String[] names = params.names().split(";");
+                outerloop:
+                for (String strPattern : strPatterns) {
+                    String regExPattern = strPattern;
+                    for (String name : names) {
+                        String strParamValue = params.value(name);
+                        if (strParamValue == null) {
+                            continue;
+                        }
+                        String regex = regExPattern.replaceAll("\\%1\\$s", name);
+                        strParamValue = Matcher.quoteReplacement(strParamValue);
+                        strTemp = myReplaceAll(strTemp, regex, strParamValue);
+                        if (!(strTemp.matches("(?s).*%[^%]+%.*") || strTemp.matches("(?s).*(\\$|§)\\{[^{]+\\}.*"))) {
+                            break outerloop;
+                        }
+                    }
+                }
+                JSJ_D_0030.toLog(strTemp);
+            } else {
+                JSJ_D_0040.toLog();
+            }
+        }
+        return strTemp;
+    }
+    
     public String replaceSchedulerVarsInString(HashMap<String, String> params, final String pstrString2Modify) {
         String strTemp = pstrString2Modify;
         JSJ_D_0080.toLog();
         if (pstrString2Modify.matches("(?s).*%[^%]+%.*") || pstrString2Modify.matches("(?s).*(\\$|§)\\{[^{]+\\}.*")) {
             if (isNotNull(params)) {
-                String[] strPatterns2 = new String[] { "%%SCHEDULER_PARAM_%1$s%%", "%%%1$s%%", "(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?",
-                        "(\\$|§)\\{?%1$s\\}?" };
                 String[] strPatterns = new String[] { "%SCHEDULER_PARAM_%1$s%", "%%1$s%", "(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?",
                         "(\\$|§)\\{?%1$s\\}?" };
+                outerloop:
                 for (String strPattern : strPatterns) {
                     String regExPattern = strPattern;
                     for (String name : params.keySet()) {
@@ -400,7 +422,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                         strParamValue = Matcher.quoteReplacement(strParamValue);
                         strTemp = myReplaceAll(strTemp, regex, strParamValue);
                         if (!(strTemp.matches("(?s).*%[^%]+%.*") || strTemp.matches("(?s).*(\\$|§)\\{[^{]+\\}.*"))) {
-                            break;
+                            break outerloop;
                         }
                     }
                 }
@@ -481,7 +503,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 
     @Override
     public void setJSJobUtilites(final JSJobUtilities pobjJSJobUtilities) {
-        // TODO Auto-generated method stub
     }
 
     @Override
