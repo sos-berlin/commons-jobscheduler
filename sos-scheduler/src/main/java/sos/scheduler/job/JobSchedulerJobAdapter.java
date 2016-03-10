@@ -15,7 +15,6 @@ import static com.sos.scheduler.messages.JSMessages.JSJ_I_0020;
 import static com.sos.scheduler.messages.JSMessages.LOG_D_0020;
 import static com.sos.scheduler.messages.JSMessages.LOG_I_0010;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -41,8 +40,6 @@ import com.sos.JSHelper.Basics.IJSCommands;
 import com.sos.JSHelper.Basics.JSJobUtilities;
 import com.sos.JSHelper.Basics.VersionInfo;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.JSHelper.Logging.Log4JHelper;
-import com.sos.JSHelper.Options.JSOptionsClass;
 import com.sos.JSHelper.Options.SOSOptionElement;
 import com.sos.i18n.annotation.I18NResourceBundle;
 import com.sos.localization.Messages;
@@ -51,19 +48,17 @@ import com.sos.scheduler.JobSchedulerLog4JAppender;
 @I18NResourceBundle(baseName = "com_sos_scheduler_messages", defaultLocale = "en")
 public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtilities, IJSCommands, IJobSchedulerMonitor_impl {
 
-    public final String conMessageFilePath = "com_sos_scheduler_messages";
     protected Variable_set objJobOrOrderParams = null;
     protected Logger logger = Logger.getLogger(JobSchedulerJobAdapter.class);
     protected Messages Messages = null;
-    private JobSchedulerLog4JAppender objJSAppender = null;
-    private final static int maxLengthOfStatusText = 100;
     protected HashMap<String, String> SchedulerParameters = new HashMap<String, String>();
     protected HashMap<String, String> hsmParameters = null;
     protected final String EMPTY_STRING = "";
     protected final boolean continue_with_spooler_process = true;
     protected final boolean continue_with_task = true;
-    private Log4JHelper objLogger;
-    private static boolean logbackWarningPublished = false;
+    private final static int MAX_LENGTH_OF_STATUSTEXT = 100;
+    private JobSchedulerLog4JAppender objJSAppender = null;
+    public final String conMessageFilePath = "com_sos_scheduler_messages";
     public final static boolean conJobSuccess = false;
     public final static boolean conJobFailure = false;
     public final static boolean conJobChainSuccess = true;
@@ -116,18 +111,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             strJobName = this.getJobName();
         }
         strJobName = strJobName.replace('/', '-');
-        Log4JHelper.flgUseJobSchedulerLog4JAppender = true;
-        File fleLog4JFile = null;
-        JSOptionsClass objOC = new JSOptionsClass();
-        if (!objOC.log4jPropertyFileName.isDefault()) {
-            fleLog4JFile = objOC.log4jPropertyFileName.JSFile();
-        } else {
-            fleLog4JFile = new File("./" + strJobName + "-log4j.properties");
-            if (!fleLog4JFile.exists()) {
-                fleLog4JFile = new File("./" + "log4j.properties");
-            }
-        }
-        objLogger = new Log4JHelper(fleLog4JFile.getAbsolutePath());
         logger = Logger.getRootLogger();
         Appender objStdoutAppender = logger.getAppender("stdout");
         if (objStdoutAppender instanceof JobSchedulerLog4JAppender) {
@@ -151,7 +134,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             objJSAppender = new JobSchedulerLog4JAppender(layout);
             Appender consoleAppender = objJSAppender;
             logger.addAppender(consoleAppender);
-            // ALL | DEBUG | INFO | WARN | ERROR | FATAL | OFF:
             if (spooler_log.level() > 1) {
                 logger.setLevel(Level.ERROR);
             } else if (spooler_log.level() == 1) {
@@ -321,7 +303,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             objJobOrOrderParams = params;
             return params;
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
             String strM = JSJ_F_0010.params(e.getMessage());
             logger.error(strM, e);
             throw new JobSchedulerException(strM, e);
@@ -355,7 +336,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     }
 
     @Deprecated
-    // use replaceSchedulerVars instead
     public String replaceVars(final HashMap<String, String> params, final String name, String pstrReplaceIn) {
         if (pstrReplaceIn != null) {
             if (pstrReplaceIn.matches(".*%[^%]+%.*")) {
@@ -616,7 +596,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         boolean RaiseErrorOnSetback = false;
         String strMsg = JSJ_E_0009.get(this.getJobName());
         if (isJobchain()) {
-            if (isSetBackActive() == false || RaiseErrorOnSetback) {
+            if (!isSetBackActive() || RaiseErrorOnSetback) {
                 logger.error(strMsg);
             }
             return conJobChainFailure;
@@ -644,11 +624,11 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     }
 
     protected boolean isNotEmpty(final String pstrValue) {
-        return isNotNull(pstrValue) && pstrValue.trim().length() > 0;
+        return isNotNull(pstrValue) && !pstrValue.trim().isEmpty();
     }
 
     protected boolean isEmpty(final String pstrValue) {
-        return isNull(pstrValue) || pstrValue.trim().length() <= 0;
+        return isNull(pstrValue) || pstrValue.trim().isEmpty();
     }
 
     public Properties mapToProperties(final Map<String, String> map) {
@@ -727,15 +707,14 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     public void setStateText(final String pstrStateText) {
         if (pstrStateText != null) {
             String stateText = pstrStateText;
-            if (stateText.length() > maxLengthOfStatusText) {
-                stateText = stateText.substring(0, maxLengthOfStatusText - 3) + "...";
+            if (stateText.length() > MAX_LENGTH_OF_STATUSTEXT) {
+                stateText = stateText.substring(0, MAX_LENGTH_OF_STATUSTEXT - 3) + "...";
             }
             if (isJobchain()) {
                 try {
                     spooler_task.order().set_state_text(stateText);
                 } catch (Exception e) {
-                    // i.e. in spooler_on_error and spooler_on_success is
-                    // spooler_task.order() == null
+                    //
                 }
             }
             if (spooler_job != null) {
