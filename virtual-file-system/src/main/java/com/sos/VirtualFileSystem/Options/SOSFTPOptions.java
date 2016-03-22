@@ -616,6 +616,18 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         setChildClasses(hshMap);
     }
 
+    private boolean isEmpty(HashMap<String, String> params,String key){
+       return ((params.get(key) == null) ||  params.get(key).length() == 0);
+    }
+    
+    private void handleFileOrderSource(HashMap<String, String> params){
+        boolean b=false;
+        b = (isEmpty(params,"file_path") && isEmpty(params,"source_dir")  && isEmpty(params,"local_dir")  && isEmpty(params,"file_spec"));
+        if (b && !isEmpty(params,"scheduler_file_path")){
+           logger.debug(String.format("Using value from parameter SCHEDULER_FILE_PATH %s for the parameter file_path, as no file_path, local_dir, file_spec or source_dir has been specified",params.get("scheduler_file_path")));
+           params.put("file_path", params.get("scheduler_file_path"));
+        }
+    }
     /** https://change.sos-berlin.com/browse/JITL-202
      * https://change.sos-berlin.com/browse/JADE-374 setAllOptions with
      * "settings" destroys params in JADE job
@@ -635,6 +647,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         }
         flgSetAllOptions = true;
         params.putAll(mapFromIniFile);
+        handleFileOrderSource(params);
         objSettings = params;
         super.Settings(params);
         super.setAllOptions(params);
