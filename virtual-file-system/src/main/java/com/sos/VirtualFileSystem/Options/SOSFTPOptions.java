@@ -38,7 +38,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 
     private static final String OPERATION_SEND = "send";
     private static final long serialVersionUID = -8219289268940238015L;
-    private static final Logger LOGGER = Logger.getLogger(VFSFactory.getLoggerName());
+    private static final Logger LOGGER = Logger.getLogger(SOSFTPOptions.class);
     private Map<String, String> dmzOptions = new HashMap<String, String>();
     private Properties propSOSFtpEnvironmentVars = null;
     private Properties schedulerParams = null;
