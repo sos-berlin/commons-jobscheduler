@@ -36,13 +36,10 @@ import com.sos.JSHelper.Options.SOSOptionTime;
 import com.sos.JSHelper.io.Files.JSTextFile;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
-/**
- */
 @I18NResourceBundle(baseName = "com_sos_scheduler_messages", defaultLocale = "en")
 public class JSFileOperationBase extends JSToolBox implements JSJobUtilities {
 
     protected JSExistsFileOptions objOptions = null;
-    private JSJobUtilities objJSJobUtilities = this;
     protected static final String conPropertyJAVA_IO_TMPDIR = "java.io.tmpdir";
     protected String filePath = System.getProperty(conPropertyJAVA_IO_TMPDIR);
     protected long lngFileAge = 86400000;
@@ -73,28 +70,18 @@ public class JSFileOperationBase extends JSToolBox implements JSJobUtilities {
     protected static final String conParameterRECURSIVE = "recursive";
     protected static final String conParameterCREATE_DIR = "create_dir";
     protected static final String conValueYES = "yes";
-    public static final String conParameterGRACIOUS = "gracious";
     protected boolean flgOperationWasSuccessful = false;
     protected String name = null;
     protected String file = null;
-    private final String strFileSpecDefault = ".*";
-    protected String fileSpec = strFileSpecDefault;
+    protected String fileSpec = ".*";
     protected String minFileAge = "0";
     protected String maxFileAge = "0";
-    private final String conFileSizeDefault = "-1";
-    protected String minFileSize = conFileSizeDefault;
-    protected String maxFileSize = conFileSizeDefault;
+    protected String minFileSize = "-1";
+    protected String maxFileSize = "-1";
     protected int skipFirstFiles = 0;
     protected int skipLastFiles = 0;
     protected String strGracious = "false";
-    String source = null;
-    String target = null;
-    int flags = 0;
-    String replacing = null;
-    String replacement = null;
-    boolean count_files = false;
     protected final int isCaseInsensitive = Pattern.CASE_INSENSITIVE;
-    public int intNoOfHitsInResultSet = 0;
     protected String strOnEmptyResultSet = null;
     protected String strResultList2File = null;
     protected int intExpectedSizeOfResultSet = 0;
@@ -104,6 +91,16 @@ public class JSFileOperationBase extends JSToolBox implements JSJobUtilities {
     protected boolean flgCreateOrders4AllFiles = false;
     protected String strOrderJobChainName = null;
     protected String strNextState = null;
+    private final String strFileSpecDefault = fileSpec;
+    private JSJobUtilities objJSJobUtilities = this;
+    public static final String conParameterGRACIOUS = "gracious";
+    public int intNoOfHitsInResultSet = 0;
+    String source = null;
+    String target = null;
+    int flags = 0;
+    String replacing = null;
+    String replacement = null;
+    boolean count_files = false;
 
     public JSFileOperationBase() {
         super("com_sos_scheduler_messages");
@@ -157,7 +154,7 @@ public class JSFileOperationBase extends JSToolBox implements JSJobUtilities {
     public boolean createResultListParam(final boolean pflgResult) {
         String strT = "";
         intNoOfHitsInResultSet = lstResultList.size();
-        if (isNotNull(lstResultList) && lstResultList.size() > 0) {
+        if (isNotNull(lstResultList) && !lstResultList.isEmpty()) {
             intNoOfHitsInResultSet = lstResultList.size();
             for (File objFile : lstResultList) {
                 strT += objFile.getAbsolutePath() + ";";
@@ -239,7 +236,7 @@ public class JSFileOperationBase extends JSToolBox implements JSJobUtilities {
 
     @Override
     public String getCurrentNodeName() {
-        // TODO Auto-generated method stub
+        // TO DO Auto-generated method stub
         return null;
     }
 
@@ -288,10 +285,8 @@ public class JSFileOperationBase extends JSToolBox implements JSJobUtilities {
      * @return true if file exists or false if not
      * @throws IOException
      * @throws Exception */
-    public boolean existsFile(final SOSOptionFileName objFile, final SOSOptionRegExp fileSpec1, //
-            final SOSOptionTime minFileAge1, final SOSOptionTime maxFileAge1, //
-            final SOSOptionFileSize minFileSize1, //
-            final SOSOptionFileSize maxFileSize1, final SOSOptionInteger skipFirstFiles1, final SOSOptionInteger skipLastFiles1, //
+    public boolean existsFile(final SOSOptionFileName objFile, final SOSOptionRegExp fileSpec1, final SOSOptionTime minFileAge1, final SOSOptionTime maxFileAge1,
+            final SOSOptionFileSize minFileSize1, final SOSOptionFileSize maxFileSize1, final SOSOptionInteger skipFirstFiles1, final SOSOptionInteger skipLastFiles1,
             final int minNumOfFiles, final int maxNumOfFiles) throws IOException, Exception {
         long minAge = 0;
         long maxAge = 0;
@@ -364,7 +359,8 @@ public class JSFileOperationBase extends JSToolBox implements JSJobUtilities {
                     log("checking file " + fleFile.getCanonicalPath() + ": directory exists");
                     return true;
                 }
-                Vector<File> fileList = getFilelist(fleFile.getPath(), fileSpec1, false, minAge, maxAge, minSize, maxSize, skipFirstFiles1.value(), skipLastFiles1.value());
+                Vector<File> fileList = getFilelist(fleFile.getPath(), fileSpec1, false, minAge, maxAge, minSize, maxSize, skipFirstFiles1.value(),
+                        skipLastFiles1.value());
                 if (fileList.isEmpty()) {
                     log("checking file " + fleFile.getCanonicalPath() + ": directory contains no files matching " + fileSpec1);
                     return false;
@@ -409,7 +405,8 @@ public class JSFileOperationBase extends JSToolBox implements JSJobUtilities {
         if (withSubFolder) {
             for (File element : subDir) {
                 if (element.isDirectory()) {
-                    filelist.addAll(getFilelist(element.getPath(), regexp, true, minFileAge1, maxFileAge1, minFileSize1, maxFileSize1, skipFirstFiles1, skipLastFiles1));
+                    filelist.addAll(getFilelist(element.getPath(), regexp, true, minFileAge1, maxFileAge1, minFileSize1, maxFileSize1, skipFirstFiles1, 
+                            skipLastFiles1));
                 }
             }
         }
@@ -430,8 +427,7 @@ public class JSFileOperationBase extends JSToolBox implements JSJobUtilities {
         filelist = new Vector<File>();
         File[] files = f.listFiles(new SOSFilelistFilter(regexp.Value(), regexp.getRegExpFlags()));
         for (File file2 : files) {
-            if (file2.isDirectory()) {
-            } else if (file2.isFile()) {
+            if (file2.isFile()) {
                 filelist.add(file2);
             }
         }
@@ -537,9 +533,9 @@ public class JSFileOperationBase extends JSToolBox implements JSJobUtilities {
                 return ret;
             }
         }
-        if (sorting.equals("sort_size")) {
+        if ("sort_size".equals(sorting)) {
             Arrays.sort(oArr, new SizeComparator());
-        } else if (sorting.equals("sort_age")) {
+        } else if ("sort_age".equals(sorting)) {
             Arrays.sort(oArr, new AgeComparator());
         }
         filelist = new Vector<File>();
@@ -558,25 +554,26 @@ public class JSFileOperationBase extends JSToolBox implements JSJobUtilities {
 
     private void log_debug1(final String msg) {
         try {
-            if (logger != null)
+            if (logger != null) {
                 logger.debug(msg);
+            }
         } catch (Exception e) {
         }
     }
 
     @Override
     public void setStateText(final String pstrStateText) {
-        // TODO Auto-generated method stub
+        // TO DO Auto-generated method stub
     }
 
     @Override
     public void setCC(final int pintCC) {
-        // TODO Auto-generated method stub
+        // TO DO Auto-generated method stub
     }
 
     @Override
     public void setNextNodeState(final String pstrNodeName) {
-        // TODO Auto-generated method stub
+        // TO DO Auto-generated method stub
     }
 
 }
