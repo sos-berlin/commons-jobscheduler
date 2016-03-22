@@ -38,7 +38,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 
     private static final String OPERATION_SEND = "send";
     private static final long serialVersionUID = -8219289268940238015L;
-    private static final Logger LOGGER = Logger.getLogger(VFSFactory.getLoggerName());
+    private static final Logger LOGGER = Logger.getLogger(SOSFTPOptions.class);
     private Map<String, String> dmzOptions = new HashMap<String, String>();
     private Properties propSOSFtpEnvironmentVars = null;
     private Properties schedulerParams = null;
@@ -508,7 +508,8 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         boolean b=false;
         b = (isEmpty(params,"file_path") && isEmpty(params,"source_dir")  && isEmpty(params,"local_dir")  && isEmpty(params,"file_spec"));
         if (b && !isEmpty(params,"scheduler_file_path")){
-           logger.debug(String.format("Using value from parameter SCHEDULER_FILE_PATH %s for the parameter file_path, as no file_path, local_dir, file_spec or source_dir has been specified",params.get("scheduler_file_path")));
+           LOGGER.debug(String.format("Using value from parameter SCHEDULER_FILE_PATH %s for the parameter file_path, as no file_path, local_dir, "
+                   + "file_spec or source_dir has been specified",params.get("scheduler_file_path")));
            params.put("file_path", params.get("scheduler_file_path"));
         }
     }
