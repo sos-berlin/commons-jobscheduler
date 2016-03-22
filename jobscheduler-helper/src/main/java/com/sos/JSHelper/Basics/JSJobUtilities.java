@@ -38,16 +38,7 @@ public interface JSJobUtilities {
      * @param what
      * @param replacement
      * @return */
-    public String myReplaceAll(String source, String what, String replacement);
-
-    /** \brief replaceSchedulerVars
-     *
-     * \details
-     *
-     * \return String - the modified String
-     *
-     * @param isWindows
-     * @param pstrString2Modify */
+  
     public String replaceSchedulerVars(boolean isWindows, final String pstrString2Modify);
 
     /** \brief setJSParam
