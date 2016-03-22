@@ -101,8 +101,7 @@ public class SOSHibernateResultSetProcessor implements Serializable {
         statement = connection.getJdbcConnection().createStatement(getResultSetType(scrollMode), getConcurrencyMode(isReadOnly));
         if (fetchSize.isPresent()) {
             statement.setFetchSize(fetchSize.get());
-        }
-        else if (connection.getJdbcFetchSize().isPresent()) {
+        } else if (connection.getJdbcFetchSize().isPresent()) {
             statement.setFetchSize(connection.getJdbcFetchSize().get());
         }
         resultSet = statement.executeQuery(sqlStatement);

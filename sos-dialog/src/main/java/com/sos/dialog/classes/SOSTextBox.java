@@ -1,6 +1,3 @@
-/**
- *
- */
 package com.sos.dialog.classes;
 
 import java.util.Vector;
@@ -20,129 +17,88 @@ import org.eclipse.swt.widgets.Text;
 
 import com.sos.JSHelper.interfaces.IAutoCompleteProposal;
 
-/**
- * @author KB
- *
- */
+/** @author KB */
 public class SOSTextBox extends Text {
-	@SuppressWarnings("unused")
-	private final String			conClassName	= this.getClass().getSimpleName();
-	@SuppressWarnings("unused")
-	private static final String		conSVNVersion	= "$Id: SOSTextBox.java 23878 2014-04-22 18:02:41Z kb $";
-	@SuppressWarnings("unused")
-	private Logger			logger			= Logger.getLogger(this.getClass());
 
-	private Vector<Control>	objControlList	= new Vector<>();
-	private Text objThisText = this;
-	
-	private  IAutoCompleteProposal objAutoCompleteHandler = null;
-	/**
-	 *
-	 */
-	
-	public void setAutoCompletehandler (final IAutoCompleteProposal pobjAC) {
-		objAutoCompleteHandler = pobjAC;
-	}
-	
-	public SOSTextBox(final Composite parent, final int style) {
-		super(parent, style);
-		addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				setEnabledDisabled();
-			}
-		});
+    private static final Logger LOGGER = Logger.getLogger(SOSTextBox.class);
+    private static final String KEY_PRESS = "Ctrl+Space";
+    private Vector<Control> objControlList = new Vector<>();
+    private Text objThisText = this;
+    private IAutoCompleteProposal objAutoCompleteHandler = null;
 
-		setAutoCompletion(this, null);
+    public void setAutoCompletehandler(final IAutoCompleteProposal pobjAC) {
+        objAutoCompleteHandler = pobjAC;
+    }
 
-		addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyReleased(KeyEvent ke) {
-				//Method for autocompletion
-				setAutoCompletion(objThisText, getText());
-			}
-		});
+    public SOSTextBox(final Composite parent, final int style) {
+        super(parent, style);
+        addSelectionListener(new SelectionAdapter() {
 
-	}
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                setEnabledDisabled();
+            }
+        });
+        setAutoCompletion(this, null);
+        addKeyListener(new KeyAdapter() {
 
-	public void addChild(final Control pobjC) {
-		objControlList.add(pobjC);
-	}
+            @Override
+            public void keyReleased(KeyEvent ke) {
+                setAutoCompletion(objThisText, getText());
+            }
+        });
+    }
 
-	public void setEnabledDisabled() {
-		boolean flgT = true;
-//		if (getSelection() == true) {
-//		}
-//		else {
-//			flgT = false;
-//		}
-		for (Control objC : objControlList) {
-			objC.setEnabled(flgT);
-		}
-	}
+    public void addChild(final Control pobjC) {
+        objControlList.add(pobjC);
+    }
 
-	/**
-	 * see http://bytes.com/topic/java/insights/879093-auto-completion-swt-text-field
-	 */
-	private static String	KEY_PRESS	= "Ctrl+Space";
+    public void setEnabledDisabled() {
+        boolean flgT = true;
+        for (Control objC : objControlList) {
+            objC.setEnabled(flgT);
+        }
+    }
 
-	private void setAutoCompletion(Text text, String value) {
-		if (objAutoCompleteHandler == null) {
-			return;
-		}
-		
-		try {
-			ContentProposalAdapter adapter = null;
-			String[] defaultProposals = objAutoCompleteHandler.getAllProposals(value);
-			SimpleContentProposalProvider scp = new SimpleContentProposalProvider(defaultProposals);
-			scp.setProposals(defaultProposals);
-			KeyStroke ks = KeyStroke.getInstance(KEY_PRESS);
-			adapter = new ContentProposalAdapter(text, new TextContentAdapter(), scp, ks, null);
-			adapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    private void setAutoCompletion(Text text, String value) {
+        if (objAutoCompleteHandler == null) {
+            return;
+        }
+        try {
+            ContentProposalAdapter adapter = null;
+            String[] defaultProposals = objAutoCompleteHandler.getAllProposals(value);
+            SimpleContentProposalProvider scp = new SimpleContentProposalProvider(defaultProposals);
+            scp.setProposals(defaultProposals);
+            KeyStroke ks = KeyStroke.getInstance(KEY_PRESS);
+            adapter = new ContentProposalAdapter(text, new TextContentAdapter(), scp, ks, null);
+            adapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+    }
 
-//	private final String[]	defaultProposals	= new String[] { "Assistance 1", "Assistance 2", "Assistance 3", "Assistance 4", "Assistance 5" };
-//	private static HashMap <String, String> defaultProposals = new HashMap<>();
-//	
-//	public void addProposal (final String pstrProposal) {
-//		if (pstrProposal != null && pstrProposal.trim().length() > 0) {
-//			defaultProposals.put(pstrProposal, pstrProposal);
-//		}
-//	}
-//	
-//	private String[] getAllProposals(String text) {
-//		String[] proposals = defaultProposals.keySet().toArray(new String[0]);
-//		return proposals;
-//	}
-//
-	@Override
-	public String getText() {
-		String strT = super.getText();
-//		addProposal(strT);
-		return strT;
-	}
-	
-	@Override
-	public void setText (final String pstrValue) {
-		super.setText(pstrValue);
-//		addProposal(pstrValue);
-	}
-	
-	@Override
-	public void dispose() {
-		super.dispose();
-		logger = null;
-		objControlList = null;
-		objAutoCompleteHandler = null;
-		objThisText = null;
-	}
-	@Override
-	protected void checkSubclass() {
-		// Disable the check that prevents subclassing of SWT components
-	}
+    @Override
+    public String getText() {
+        String strT = super.getText();
+        return strT;
+    }
+
+    @Override
+    public void setText(final String pstrValue) {
+        super.setText(pstrValue);
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        objControlList = null;
+        objAutoCompleteHandler = null;
+        objThisText = null;
+    }
+
+    @Override
+    protected void checkSubclass() {
+        // Disable the check that prevents subclassing of SWT components
+    }
 
 }

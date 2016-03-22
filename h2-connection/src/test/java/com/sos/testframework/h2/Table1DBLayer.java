@@ -11,7 +11,7 @@ import java.util.List;
 
 public class Table1DBLayer extends SOSHibernateDBLayer {
 
-	private final static Logger logger = LoggerFactory.getLogger(Table1DBLayer.class);
+    private final static Logger logger = LoggerFactory.getLogger(Table1DBLayer.class);
 
     private final static String FIELD1 = "name";
 
@@ -19,19 +19,19 @@ public class Table1DBLayer extends SOSHibernateDBLayer {
         super();
         this.setConfigurationFile(configurationFile);
         initSession();
-	}
-	
+    }
+
     private Query setQueryParams(Table1Filter filter, String hql) {
-		Query query = null;
-		try {
-			query = session.createQuery(hql);
-			if (filter.getName() != null)
-		        query.setParameter(FIELD1, filter.getName());
-		} catch(HibernateException e) {
-			throw new RuntimeException("Error creating Query",e);
-		}
-		return query;
-	}
+        Query query = null;
+        try {
+            query = session.createQuery(hql);
+            if (filter.getName() != null)
+                query.setParameter(FIELD1, filter.getName());
+        } catch (HibernateException e) {
+            throw new RuntimeException("Error creating Query", e);
+        }
+        return query;
+    }
 
     private String getWhere(Table1Filter filter) {
         String where = "";
@@ -46,23 +46,23 @@ public class Table1DBLayer extends SOSHibernateDBLayer {
 
     }
 
-	public Table1DBItem getByName(String name) {
-		Table1Filter filter = new Table1Filter();
-		filter.setName(name);
+    public Table1DBItem getByName(String name) {
+        Table1Filter filter = new Table1Filter();
+        filter.setName(name);
         logger.info("check name " + filter.getName());
         Query query = setQueryParams(filter, "from com.sos.testframework.h2.Table1DBItem table_1 " + getWhere(filter));
 
-		List<Table1DBItem> resultList = query.list();
+        List<Table1DBItem> resultList = query.list();
         Table1DBItem record = resultList.get(0);
         return record;
-	}
+    }
 
-	public long addRecord(String name) {
+    public long addRecord(String name) {
         Table1DBItem record = new Table1DBItem();
         record.setName(name);
         saveOrUpdate(record);
         commit();
-        return  record.getId();
-	}
+        return record.getId();
+    }
 
 }

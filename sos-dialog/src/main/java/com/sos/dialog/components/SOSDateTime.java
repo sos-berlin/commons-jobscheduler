@@ -11,8 +11,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DateTime;
 
-/**
- * \class SosDateTime
+/** \class SosDateTime
  * 
  * \brief SosDateTime -
  * 
@@ -33,8 +32,7 @@ import org.eclipse.swt.widgets.DateTime;
  * </p>
  * \author Uwe Risse \version 8.05.2012 \see reference
  * 
- * Created on 31.01.2012 09:59:28
- */
+ * Created on 31.01.2012 09:59:28 */
 
 public class SOSDateTime extends DateTime {
 
@@ -46,6 +44,7 @@ public class SOSDateTime extends DateTime {
     public SOSDateTime(Composite parent, int style) {
         super(parent, style);
         addSelectionListener(new SelectionAdapter() {
+
             public void widgetSelected(SelectionEvent e) {
                 setInternalDate();
             }
@@ -94,7 +93,7 @@ public class SOSDateTime extends DateTime {
 
     }
 
-    public String getISODate()  {
+    public String getISODate() {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         return formatter.format(date);
     }
@@ -154,18 +153,18 @@ public class SOSDateTime extends DateTime {
         super.setTime(getHour(), getMinute(), getSecond());
     }
 
-    public void setDate(String date) throws ParseException  {
-        if (!date.equals("")){
-           this.setDate(getDate(date));
-        }else{
+    public void setDate(String date) throws ParseException {
+        if (!date.equals("")) {
+            this.setDate(getDate(date));
+        } else {
             this.setDate(new Date());
         }
     }
 
     public void setTime(String time) throws ParseException {
-        if (!time.equals("")){
+        if (!time.equals("")) {
             this.setTime(getTime(time));
-        }else{
+        } else {
             this.setTime("00:00:00");
         }
     }

@@ -4,13 +4,10 @@ import java.io.File;
 import java.util.List;
 
 import org.hibernate.Query;
- 
+
 import com.sos.hibernate.layer.SOSHibernateDBLayer;
 
-
-/**
- * 
- * \class SOSUserDBLayer \brief SOSUserDBLayer -
+/** \class SOSUserDBLayer \brief SOSUserDBLayer -
  * 
  * \details
  * 
@@ -29,89 +26,82 @@ import com.sos.hibernate.layer.SOSHibernateDBLayer;
  * </p>
  * \author Uwe Risse \version 13.09.2011 \see reference
  * 
- * Created on 13.09.2011 14:40:18
- */
+ * Created on 13.09.2011 14:40:18 */
 
 public class SOSUserDBLayer extends SOSHibernateDBLayer {
 
-	@SuppressWarnings("unused")
-	private final String conClassName = "SOSUserDBLayer";
+    @SuppressWarnings("unused")
+    private final String conClassName = "SOSUserDBLayer";
 
-	 
-	private SOSUserFilter filter = null;
+    private SOSUserFilter filter = null;
 
-	public SOSUserDBLayer(final File configurationFile_) {
-		super();
-		this.setConfigurationFile(configurationFile_);
-		resetFilter();
-	}
- 
-	public void resetFilter() {
-		filter = new SOSUserFilter();
-		filter.setUserName("");
-	}
+    public SOSUserDBLayer(final File configurationFile_) {
+        super();
+        this.setConfigurationFile(configurationFile_);
+        resetFilter();
+    }
 
-	public int delete() {
+    public void resetFilter() {
+        filter = new SOSUserFilter();
+        filter.setUserName("");
+    }
 
-		if (session== null) {
-			beginTransaction();
-		}
+    public int delete() {
 
-		String hql = "delete from SOSUserDBItem " + getWhere();
+        if (session == null) {
+            beginTransaction();
+        }
 
-		Query query = session.createQuery(hql);
+        String hql = "delete from SOSUserDBItem " + getWhere();
 
-		if (filter.getUserName() != null && !filter.getUserName().equals("")) {
-			query.setParameter("sosUserName", filter.getUserName());
-		}
-		 
-		int row = query.executeUpdate();
+        Query query = session.createQuery(hql);
 
-		return row;
-	}
+        if (filter.getUserName() != null && !filter.getUserName().equals("")) {
+            query.setParameter("sosUserName", filter.getUserName());
+        }
 
- 
+        int row = query.executeUpdate();
 
-	private String getWhere() {
-		String where = "";
-		String and = "";
+        return row;
+    }
 
-	 
+    private String getWhere() {
+        String where = "";
+        String and = "";
 
-		if (filter.getUserName() != null	&& !filter.getUserName().equals("")) {
-			where += and + " sosUserName = :sosUserName";
-			and = " and ";
-		}
+        if (filter.getUserName() != null && !filter.getUserName().equals("")) {
+            where += and + " sosUserName = :sosUserName";
+            and = " and ";
+        }
 
-		if (where.trim().equals("")) {
+        if (where.trim().equals("")) {
 
-		} else {
-			where = "where " + where;
-		}
-		return where;
+        } else {
+            where = "where " + where;
+        }
+        return where;
 
-	}
+    }
 
-	public List<SOSUserDBItem> getSOSUserList(final int limit) {
-		initSession();
+    public List<SOSUserDBItem> getSOSUserList(final int limit) {
+        initSession();
 
-		Query query = session.createQuery("from SOSUserDBItem " + getWhere() + filter.getOrderCriteria() + filter.getSortMode());
-	 
-		if (filter.getUserName() != null	&& !filter.getUserName().equals("")) {
-			query.setParameter("sosUserName", filter.getUserName());
-		}
+        Query query = session.createQuery("from SOSUserDBItem " + getWhere() + filter.getOrderCriteria() + filter.getSortMode());
 
-		if (limit > 0) {
-			query.setMaxResults(limit);
-		}
+        if (filter.getUserName() != null && !filter.getUserName().equals("")) {
+            query.setParameter("sosUserName", filter.getUserName());
+        }
 
-		@SuppressWarnings("unchecked")
-		List<SOSUserDBItem> sosUserList = query.list();
-		return sosUserList;
+        if (limit > 0) {
+            query.setMaxResults(limit);
+        }
 
-	}
+        @SuppressWarnings("unchecked")
+        List<SOSUserDBItem> sosUserList = query.list();
+        return sosUserList;
 
-	  
+    }
+
     public void setFilter(SOSUserFilter filter) {
         this.filter = filter;
     }
@@ -119,6 +109,5 @@ public class SOSUserDBLayer extends SOSHibernateDBLayer {
     public SOSUserFilter getFilter() {
         return filter;
     }
- 
 
 }

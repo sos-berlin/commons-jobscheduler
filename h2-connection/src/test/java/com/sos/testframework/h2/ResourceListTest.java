@@ -17,14 +17,14 @@ public class ResourceListTest {
 
     @Test
     public void testFile() throws IOException {
-        File f = File.createTempFile("myFile",".txt");
-        Files.append("this is a test.",f,Charset.defaultCharset());
+        File f = File.createTempFile("myFile", ".txt");
+        Files.append("this is a test.", f, Charset.defaultCharset());
         ResourceList r = new ResourceList();
         r.add("com.sos.mypackage.TestFile.txt", f);
         String dir = normalize(r.getWorkingDirectory());
         File result = r.getFilelist().get(0);
-        assertEquals(normalize(f), normalize(result) );
-        assertEquals("this is a test.", Files.toString(result, Charset.defaultCharset()) );
+        assertEquals(normalize(f), normalize(result));
+        assertEquals("this is a test.", Files.toString(result, Charset.defaultCharset()));
         r.release();
     }
 
@@ -34,8 +34,8 @@ public class ResourceListTest {
         r.add("com.sos.testframework.h2.Table1DBItem", "com/sos/testframework/h2/TestResource.txt");
         String dir = normalize(r.getWorkingDirectory());
         File result = r.getFilelist().get(0);
-        assertEquals(dir + "/TestResource.txt", normalize(result) );
-        assertEquals("this is a test.", Files.toString(result, Charset.defaultCharset()) );
+        assertEquals(dir + "/TestResource.txt", normalize(result));
+        assertEquals("this is a test.", Files.toString(result, Charset.defaultCharset()));
         r.release();
     }
 
@@ -43,7 +43,7 @@ public class ResourceListTest {
     public void testURL() {
         URL url = Resources.getResource(testResource);
         ResourceList r = new ResourceList();
-        r.add("com.sos.testframework.h2.Table1DBItem",url);
+        r.add("com.sos.testframework.h2.Table1DBItem", url);
         String dir = normalize(r.getWorkingDirectory());
         File result = r.getFilelist().get(0);
         assertEquals(dir + "/Table1.sql", normalize(result));
@@ -51,6 +51,6 @@ public class ResourceListTest {
     }
 
     private String normalize(File file) {
-        return file.getAbsolutePath().replaceAll("\\\\","/");
+        return file.getAbsolutePath().replaceAll("\\\\", "/");
     }
 }

@@ -7,66 +7,60 @@ import java.io.File;
 
 import com.sos.JSHelper.io.Files.JSFile;
 
-/**
- * @author KB
- *
- */
+/** @author KB */
 public class SOSOptionMailSubject extends SOSOptionString {
 
-	@SuppressWarnings("unused")
-	private final String	conSVNVersion		= "$Id$";
-	private final String	conClassName		= this.getClass().getName();
+    @SuppressWarnings("unused")
+    private final String conSVNVersion = "$Id$";
+    private final String conClassName = this.getClass().getName();
 
-	private boolean			flgSubjectFromFile	= false;
-	private String			strSubjectFileName	= "";
+    private boolean flgSubjectFromFile = false;
+    private String strSubjectFileName = "";
 
-	/**
-	 * @param pPobjParent
-	 * @param pPstrKey
-	 * @param pPstrDescription
-	 * @param pPstrValue
-	 * @param pPstrDefaultValue
-	 * @param pPflgIsMandatory
-	 */
-	public SOSOptionMailSubject(JSOptionsClass pPobjParent, String pPstrKey, String pPstrDescription, String pPstrValue, String pPstrDefaultValue,
-			boolean pPflgIsMandatory) {
-		super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
-		// TODO Auto-generated constructor stub
-	}
+    /** @param pPobjParent
+     * @param pPstrKey
+     * @param pPstrDescription
+     * @param pPstrValue
+     * @param pPstrDefaultValue
+     * @param pPflgIsMandatory */
+    public SOSOptionMailSubject(JSOptionsClass pPobjParent, String pPstrKey, String pPstrDescription, String pPstrValue, String pPstrDefaultValue,
+            boolean pPflgIsMandatory) {
+        super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
+        // TODO Auto-generated constructor stub
+    }
 
-	@Override
-	public void Value(final String pstrValue) {
+    @Override
+    public void Value(final String pstrValue) {
 
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::Value";
+        @SuppressWarnings("unused")
+        final String conMethodName = conClassName + "::Value";
 
-		JSFile objF = new JSFile(pstrValue);
-		if (objF.exists()) {
-			this.strSubjectFileName = pstrValue;
-			flgSubjectFromFile = true;
-			super.Value(objF.getContent());
-		}
-		else {
-			super.Value(pstrValue);
-		}
+        JSFile objF = new JSFile(pstrValue);
+        if (objF.exists()) {
+            this.strSubjectFileName = pstrValue;
+            flgSubjectFromFile = true;
+            super.Value(objF.getContent());
+        } else {
+            super.Value(pstrValue);
+        }
 
-	} // public void Value
+    } // public void Value
 
-	public String getSubjectFile() {
+    public String getSubjectFile() {
 
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::getSubjectFile";
+        @SuppressWarnings("unused")
+        final String conMethodName = conClassName + "::getSubjectFile";
 
-		return strSubjectFileName;
+        return strSubjectFileName;
 
-	} // private String getSubjectFile
+    } // private String getSubjectFile
 
-	public boolean isSubjectFile() {
+    public boolean isSubjectFile() {
 
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::isSubjectFile";
+        @SuppressWarnings("unused")
+        final String conMethodName = conClassName + "::isSubjectFile";
 
-		return flgSubjectFromFile;
+        return flgSubjectFromFile;
 
-	} // private boolean isSubjectFile
+    } // private boolean isSubjectFile
 }

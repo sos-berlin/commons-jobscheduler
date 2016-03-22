@@ -1,21 +1,19 @@
 package com.sos.VirtualFileSystem.JMS.test;
-/**
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+
+/** Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements. See the NOTICE file distributed with this
+ * work for additional information regarding copyright ownership. The ASF
+ * licenses this file to You under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License. */
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,24 +35,22 @@ import javax.jms.Topic;
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.protobuf.compiler.CommandLineSupport;
+import org.apache.log4j.Logger;
 
-/**
- * A simple tool for consuming messages
+/** A simple tool for consuming messages
  *
- * @version $Id$ $Revision: 1.1.1.1 $
- */
+ * @version $Id$ $Revision: 1.1.1.1 $ */
 public class ConsumerTool extends Thread implements MessageListener, ExceptionListener {
 
+    private static final Logger LOGGER = Logger.getLogger(ConsumerTool.class);
+    private static int parallelThreads = 1;
     private boolean running;
-
     private Session session;
     private Destination destination;
     private MessageProducer replyProducer;
-
     private boolean pauseBeforeShutdown = false;
     private boolean verbose = true;
     private int maxiumMessages;
-    private static int parallelThreads = 1;
     private String subject = "TOOL.DEFAULT";
     private boolean topic;
     private String user = ActiveMQConnection.DEFAULT_USER;
@@ -69,11 +65,11 @@ public class ConsumerTool extends Thread implements MessageListener, ExceptionLi
     private long receiveTimeOut;
 
     public static void main(final String[] args) {
-        ArrayList<ConsumerTool> threads = new ArrayList<ConsumerTool> ();
+        ArrayList<ConsumerTool> threads = new ArrayList<ConsumerTool>();
         ConsumerTool consumerTool = new ConsumerTool();
         String[] unknown = CommandLineSupport.setOptions(consumerTool, args);
         if (unknown.length > 0) {
-            System.out.println("Unknown options: " + Arrays.toString(unknown));
+            LOGGER.info("Unknown options: " + Arrays.toString(unknown));
             System.exit(-1);
         }
         consumerTool.showParameters();
@@ -83,7 +79,6 @@ public class ConsumerTool extends Thread implements MessageListener, ExceptionLi
             consumerTool.start();
             threads.add(consumerTool);
         }
-
         while (true) {
             Iterator<ConsumerTool> itr = threads.iterator();
             int running = 0;
@@ -93,9 +88,8 @@ public class ConsumerTool extends Thread implements MessageListener, ExceptionLi
                     running++;
                 }
             }
-
             if (running <= 0) {
-                System.out.println("All threads completed their work");
+                LOGGER.debug("All threads completed their work");
                 break;
             }
 
@@ -106,23 +100,21 @@ public class ConsumerTool extends Thread implements MessageListener, ExceptionLi
         }
         Iterator<ConsumerTool> itr = threads.iterator();
         while (itr.hasNext()) {
-            @SuppressWarnings("unused")
-			ConsumerTool thread = itr.next();
+            ConsumerTool thread = itr.next();
         }
     }
 
     public void showParameters() {
-        System.out.println("Connecting to URL: " + url);
-        System.out.println("Consuming " + (topic ? "topic" : "queue") + ": " + subject);
-        System.out.println("Using a " + (durable ? "durable" : "non-durable") + " subscription");
-        System.out.println("Running " + parallelThreads + " parallel threads");
+        LOGGER.info("Connecting to URL: " + url);
+        LOGGER.info("Consuming " + (topic ? "topic" : "queue") + ": " + subject);
+        LOGGER.info("Using a " + (durable ? "durable" : "non-durable") + " subscription");
+        LOGGER.info("Running " + parallelThreads + " parallel threads");
     }
 
     @Override
-	public void run() {
+    public void run() {
         try {
             running = true;
-
             ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(user, password, url);
             Connection connection = connectionFactory.createConnection();
             if (durable && clientId != null && clientId.length() > 0 && !"null".equals(clientId)) {
@@ -130,24 +122,20 @@ public class ConsumerTool extends Thread implements MessageListener, ExceptionLi
             }
             connection.setExceptionListener(this);
             connection.start();
-
             session = connection.createSession(transacted, ackMode);
             if (topic) {
                 destination = session.createTopic(subject);
             } else {
                 destination = session.createQueue(subject);
             }
-
             replyProducer = session.createProducer(null);
             replyProducer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-
             MessageConsumer consumer = null;
             if (durable && topic) {
                 consumer = session.createDurableSubscriber((Topic) destination, consumerName);
             } else {
                 consumer = session.createConsumer(destination);
             }
-
             if (maxiumMessages > 0) {
                 consumeMessagesAndClose(connection, session, consumer);
             } else {
@@ -157,47 +145,37 @@ public class ConsumerTool extends Thread implements MessageListener, ExceptionLi
                     consumeMessagesAndClose(connection, session, consumer, receiveTimeOut);
                 }
             }
-
         } catch (Exception e) {
-            System.out.println("[" + this.getName() + "] Caught: " + e);
-            e.printStackTrace();
+            LOGGER.error("[" + this.getName() + "] Caught: " + e.getMessage(), e);
         }
     }
 
     @Override
-	public void onMessage(final Message message) {
+    public void onMessage(final Message message) {
         try {
-
             if (message instanceof TextMessage) {
                 TextMessage txtMsg = (TextMessage) message;
                 if (verbose) {
-
                     String msg = txtMsg.getText();
                     int length = msg.length();
                     if (length > 50) {
                         msg = msg.substring(0, 50) + "...";
                     }
-                    System.out.println("[" + this.getName() + "] Received: '" + msg + "' (length " + length + ")");
+                    LOGGER.info("[" + this.getName() + "] Received: '" + msg + "' (length " + length + ")");
                 }
-            } else {
-                if (verbose) {
-                    System.out.println("[" + this.getName() + "] Received: '" + message + "'");
-                }
+            } else if (verbose) {
+                LOGGER.info("[" + this.getName() + "] Received: '" + message + "'");
             }
-
             if (message.getJMSReplyTo() != null) {
                 replyProducer.send(message.getJMSReplyTo(), session.createTextMessage("Reply: " + message.getJMSMessageID()));
             }
-
             if (transacted) {
                 session.commit();
             } else if (ackMode == Session.CLIENT_ACKNOWLEDGE) {
                 message.acknowledge();
             }
-
         } catch (JMSException e) {
-            System.out.println("[" + this.getName() + "] Caught: " + e);
-            e.printStackTrace();
+            LOGGER.error("[" + this.getName() + "] Caught: " + e.getMessage(), e);
         } finally {
             if (sleepTime > 0) {
                 try {
@@ -209,8 +187,8 @@ public class ConsumerTool extends Thread implements MessageListener, ExceptionLi
     }
 
     @Override
-	public synchronized void onException(final JMSException ex) {
-        System.out.println("[" + this.getName() + "] JMS Exception occured.  Shutting down client.");
+    public synchronized void onException(final JMSException ex) {
+        LOGGER.info("[" + this.getName() + "] JMS Exception occured.  Shutting down client.");
         running = false;
     }
 
@@ -218,11 +196,8 @@ public class ConsumerTool extends Thread implements MessageListener, ExceptionLi
         return running;
     }
 
-    protected void consumeMessagesAndClose(final Connection connection, final Session session, final MessageConsumer consumer) throws JMSException,
-            IOException {
-        System.out.println("[" + this.getName() + "] We are about to wait until we consume: " + maxiumMessages
-                + " message(s) then we will shutdown");
-
+    protected void consumeMessagesAndClose(final Connection connection, final Session session, final MessageConsumer consumer) throws JMSException, IOException {
+        LOGGER.info("[" + this.getName() + "] We are about to wait until we consume: " + maxiumMessages + " message(s) then we will shutdown");
         for (int i = 0; i < maxiumMessages && isRunning();) {
             Message message = consumer.receive(1000);
             if (message != null) {
@@ -230,32 +205,30 @@ public class ConsumerTool extends Thread implements MessageListener, ExceptionLi
                 onMessage(message);
             }
         }
-        System.out.println("[" + this.getName() + "] Closing connection");
+        LOGGER.info("[" + this.getName() + "] Closing connection");
         consumer.close();
         session.close();
         connection.close();
         if (pauseBeforeShutdown) {
-            System.out.println("[" + this.getName() + "] Press return to shut down");
+            LOGGER.info("[" + this.getName() + "] Press return to shut down");
             System.in.read();
         }
     }
 
     protected void consumeMessagesAndClose(final Connection connection, final Session session, final MessageConsumer consumer, final long timeout)
             throws JMSException, IOException {
-        System.out.println("[" + this.getName() + "] We will consume messages while they continue to be delivered within: " + timeout
+        LOGGER.info("[" + this.getName() + "] We will consume messages while they continue to be delivered within: " + timeout
                 + " ms, and then we will shutdown");
-
         Message message;
         while ((message = consumer.receive(timeout)) != null) {
             onMessage(message);
         }
-
-        System.out.println("[" + this.getName() + "] Closing connection");
+        LOGGER.info("[" + this.getName() + "] Closing connection");
         consumer.close();
         session.close();
         connection.close();
         if (pauseBeforeShutdown) {
-            System.out.println("[" + this.getName() + "] Press return to shut down");
+            LOGGER.info("[" + this.getName() + "] Press return to shut down");
             System.in.read();
         }
     }
@@ -312,7 +285,7 @@ public class ConsumerTool extends Thread implements MessageListener, ExceptionLi
     }
 
     @SuppressWarnings("static-access")
-	public void setParallelThreads(int parallelThreads) {
+    public void setParallelThreads(int parallelThreads) {
         if (parallelThreads < 1) {
             parallelThreads = 1;
         }

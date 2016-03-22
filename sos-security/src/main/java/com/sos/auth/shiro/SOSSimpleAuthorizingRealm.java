@@ -11,7 +11,8 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 
 public class SOSSimpleAuthorizingRealm extends AuthorizingRealm {
-    private ISOSAuthorizing       authorizing;
+
+    private ISOSAuthorizing authorizing;
     private UsernamePasswordToken authToken;
 
     public boolean supports(AuthenticationToken token) {
@@ -37,8 +38,8 @@ public class SOSSimpleAuthorizingRealm extends AuthorizingRealm {
 
         if (true) {
             return new SimpleAuthenticationInfo(authToken.getUsername(), authToken.getPassword(), getName());
-        }else {
-           return null;
+        } else {
+            return null;
         }
     }
 

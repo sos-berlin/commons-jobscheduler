@@ -2,66 +2,65 @@ package com.sos.JSHelper.Options;
 
 public class SOSOptionPlatform extends SOSOptionStringValueList {
 
-	/**
+    /**
 	 *
 	 */
-	private static final long	serialVersionUID	= 1272813840437569113L;
+    private static final long serialVersionUID = 1272813840437569113L;
 
-	public enum enuValidPlatforms {
-		unix, linux, hpux, aix, windows, bs2000
-	}
-	private final enuValidPlatforms	enuPlatform	= null;
+    public enum enuValidPlatforms {
+        unix, linux, hpux, aix, windows, bs2000
+    }
 
-	public SOSOptionPlatform(final JSOptionsClass pPobjParent, final String pPstrKey, final String pPstrDescription, final String pPstrValue,
-			final String pPstrDefaultValue, final boolean pPflgIsMandatory) {
-		super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
-	}
+    private final enuValidPlatforms enuPlatform = null;
 
-	public boolean isBS2000() {
-		return enuPlatform == enuValidPlatforms.bs2000;
-	}
+    public SOSOptionPlatform(final JSOptionsClass pPobjParent, final String pPstrKey, final String pPstrDescription, final String pPstrValue,
+            final String pPstrDefaultValue, final boolean pPflgIsMandatory) {
+        super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
+    }
 
-	public boolean isWindows() {
-		return enuPlatform == enuValidPlatforms.windows;
-	}
+    public boolean isBS2000() {
+        return enuPlatform == enuValidPlatforms.bs2000;
+    }
 
-	public boolean isUnix() {
-		return enuPlatform == enuValidPlatforms.unix;
-	}
+    public boolean isWindows() {
+        return enuPlatform == enuValidPlatforms.windows;
+    }
 
-	public boolean isLinux() {
-		return enuPlatform == enuValidPlatforms.linux;
-	}
+    public boolean isUnix() {
+        return enuPlatform == enuValidPlatforms.unix;
+    }
 
-	public String getPathDelimiter() {
-		String strT = "/";
+    public boolean isLinux() {
+        return enuPlatform == enuValidPlatforms.linux;
+    }
 
-		if (isWindows() == true) {
-			strT = "\\";
-		}
-		else {
-			if (isBS2000() == true) {
-				strT = "";
-			}
-		}
-		return strT;
-	}
+    public String getPathDelimiter() {
+        String strT = "/";
 
-	@Override
-	public void Value(final String pstrValue) {
-		super.Value(pstrValue);
-	}
+        if (isWindows() == true) {
+            strT = "\\";
+        } else {
+            if (isBS2000() == true) {
+                strT = "";
+            }
+        }
+        return strT;
+    }
 
-	@Override
-	public String[] getValueList() {
+    @Override
+    public void Value(final String pstrValue) {
+        super.Value(pstrValue);
+    }
 
-		if (strValueList == null) {
-			strValueList = new String[] {};
-			createValueList("unix;linux;hpux;aix;windows;bs2000");
-		}
+    @Override
+    public String[] getValueList() {
 
-		return strValueList;
-	}
+        if (strValueList == null) {
+            strValueList = new String[] {};
+            createValueList("unix;linux;hpux;aix;windows;bs2000");
+        }
 
+        return strValueList;
+    }
 
 }

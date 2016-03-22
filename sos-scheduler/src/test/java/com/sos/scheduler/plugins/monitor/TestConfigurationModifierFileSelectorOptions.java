@@ -35,70 +35,70 @@ public class TestConfigurationModifierFileSelectorOptions {
         ConfigurationModifierFileSelectorOptions c = new ConfigurationModifierFileSelectorOptions();
         c.setConfigurationDirectory("test");
         c.getConfigurationDirectory();
-        assertEquals("testGetConfigurationDirectory","test", c.getConfigurationDirectory());
+        assertEquals("testGetConfigurationDirectory", "test", c.getConfigurationDirectory());
     }
 
     @Test
     public void testSetConfigurationDirectory() {
         ConfigurationModifierFileSelectorOptions c = new ConfigurationModifierFileSelectorOptions();
         c.setConfigurationDirectory("test");
-        assertEquals("testSetConfigurationDirectory","test", c.getConfigurationDirectory());
+        assertEquals("testSetConfigurationDirectory", "test", c.getConfigurationDirectory());
     }
 
     @Test
     public void testGetRegexSelector() {
         ConfigurationModifierFileSelectorOptions c = new ConfigurationModifierFileSelectorOptions();
         c.setRegexSelector("test");
-        assertEquals("testGetRegexSelector","test", c.getRegexSelector());
+        assertEquals("testGetRegexSelector", "test", c.getRegexSelector());
     }
 
     @Test
     public void testSetRegexSelector() {
         ConfigurationModifierFileSelectorOptions c = new ConfigurationModifierFileSelectorOptions();
         c.setRegexSelector("test");
-        assertEquals("testSetRegexSelector","test", c.getRegexSelector());
+        assertEquals("testSetRegexSelector", "test", c.getRegexSelector());
     }
 
     @Test
     public void testGetfileExclusions() {
         ConfigurationModifierFileSelectorOptions c = new ConfigurationModifierFileSelectorOptions();
         c.setFileExclusions("test");
-        assertEquals("testGetfileExclusions","test", c.getfileExclusions());
+        assertEquals("testGetfileExclusions", "test", c.getfileExclusions());
     }
 
     @Test
     public void testSetFileExclusions() {
         ConfigurationModifierFileSelectorOptions c = new ConfigurationModifierFileSelectorOptions();
         c.setFileExclusions("test");
-        assertEquals("testSetFileExclusions","test", c.getfileExclusions());
+        assertEquals("testSetFileExclusions", "test", c.getfileExclusions());
     }
 
     @Test
     public void testIsRecursiv() {
         ConfigurationModifierFileSelectorOptions c = new ConfigurationModifierFileSelectorOptions();
         c.setRecursive(true);
-        assertEquals("testIsRecursiv",true, c.isRecursive());
+        assertEquals("testIsRecursiv", true, c.isRecursive());
     }
 
     @Test
     public void testSetRecursivBoolean() {
         ConfigurationModifierFileSelectorOptions c = new ConfigurationModifierFileSelectorOptions();
         c.setRecursive(true);
-        assertEquals("testSetRecursivBoolean",true, c.isRecursive());
+        assertEquals("testSetRecursivBoolean", true, c.isRecursive());
     }
 
     @Test
     public void testSetRecursivString() {
         ConfigurationModifierFileSelectorOptions c = new ConfigurationModifierFileSelectorOptions();
         c.setRecursive("true");
-        assertEquals("testSetRecursivString",true, c.isRecursive());
+        assertEquals("testSetRecursivString", true, c.isRecursive());
     }
 
     @Test
     public void testSetDirectoryExclusions() {
         ConfigurationModifierFileSelectorOptions c = new ConfigurationModifierFileSelectorOptions();
         c.setDirectoryExclusions("/test/1,test/2");
-        assertEquals("testSetDirectoryExclusions",true, c.isDirExclusion(new File("c:/test/2")));
+        assertEquals("testSetDirectoryExclusions", true, c.isDirExclusion(new File("c:/test/2")));
     }
 
     @Test
@@ -106,14 +106,14 @@ public class TestConfigurationModifierFileSelectorOptions {
         ConfigurationModifierFileSelectorOptions c = new ConfigurationModifierFileSelectorOptions();
         c.setConfigurationDirectory("c:/temp");
         c.setFileExclusions("/job1");
-        assertEquals("testIsFileExclusions",true, c.isFileExclusions(new File("c:/temp/live/job1.job.xml")));
+        assertEquals("testIsFileExclusions", true, c.isFileExclusions(new File("c:/temp/live/job1.job.xml")));
     }
 
     @Test
     public void testIsDirExclusion() {
         ConfigurationModifierFileSelectorOptions c = new ConfigurationModifierFileSelectorOptions();
         c.setDirectoryExclusions("/test/1,test/2");
-        assertEquals("testIsDirExclusion",true, c.isDirExclusion(new File("c:/test/1")));
+        assertEquals("testIsDirExclusion", true, c.isDirExclusion(new File("c:/test/1")));
     }
 
 }

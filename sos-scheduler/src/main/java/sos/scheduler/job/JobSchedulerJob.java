@@ -6,6 +6,8 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
 import sos.connection.SOSConnection;
 import sos.settings.SOSConnectionSettings;
 import sos.settings.SOSProfileSettings;
@@ -17,470 +19,328 @@ import sos.util.SOSSchedulerLogger;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
-/**
- * Base class for Scheduler Jobs
- *
- * @author Andreas Liebert
- */
+/** @author Andreas Liebert */
 public class JobSchedulerJob extends Job_impl {
 
-	private static String			conClassName		= "JobSchedulerJob";
-	/** logging */
-	protected SOSSchedulerLogger	sosLogger			= null;
+    protected String application = new String("");
+    protected SOSSchedulerLogger sosLogger = null;
+    private static final Logger LOGGER = Logger.getLogger(JobSchedulerJob.class);
+    private SOSConnection sosConnection = null;
+    private SOSConnectionSettings connectionSettings = null;
+    private SOSSettings jobSettings = null;
+    private Properties jobProperties = null;
+    private int jobId = 0;
+    private String jobName = null;
+    private String jobFolder = null;
+    private String jobTitle = null;
 
-	/** Database connection */
-	private SOSConnection			sosConnection		= null;
+    public SOSConnection ConnectToJSDataBase() {
+        try {
+            this.setJobSettings(new SOSProfileSettings(spooler.ini_path()));
+            this.setJobProperties(jobSettings.getSection("spooler"));
+            if (this.getJobProperties().isEmpty()) {
+                throw new JobSchedulerException("no settings found in section [spooler] of configuration file: " + spooler.ini_path());
+            }
+            if (this.getJobProperties().getProperty("db") == null || this.getJobProperties().getProperty("db").isEmpty()) {
+                throw new JobSchedulerException("no settings found for entry [db] in section [spooler] of configuration file: " + spooler.ini_path());
+            }
+            if (this.getJobProperties().getProperty("db_class") == null || this.getJobProperties().getProperty("db_class").isEmpty()) {
+                throw new JobSchedulerException("no settings found for entry [db_class] in section [spooler] of configuration file: " + spooler.ini_path());
+            }
+            if (this.getLogger() != null) {
+                sosLogger.debug6("connecting to database...");
+            } else {
+                LOGGER.debug("connecting to database...");
+            }
+            this.setConnection(getSchedulerConnection(this.getJobSettings(), this.getLogger()));
+            this.getConnection().connect();
+            this.setConnectionSettings(new SOSConnectionSettings(this.getConnection(), "SETTINGS", this.getLogger()));
+            if (this.getLogger() != null) {
+                this.getLogger().debug6("..successfully connected to JobScheduler database.");
+            } else {
+                LOGGER.debug("..successfully connected to JobScheduler database.");
+            }
+        } catch (Exception e) {
+            spooler_log.info("connect to database failed: ");
+            spooler_log.info("running without database...");
+            LOGGER.info(e.getMessage(), e);
+        }
+        return sosConnection;
+    }
 
-	/** Settings from the database */
-	private SOSConnectionSettings	connectionSettings	= null;
+    @Override
+    public boolean spooler_init() {
+        try {
+            boolean rc = super.spooler_init();
+            if (!rc) {
+                return false;
+            }
+            this.setLogger(new SOSSchedulerLogger(spooler_log));
+            if (spooler_job != null && getJobSettings() != null) {
+                setJobProperties(getJobSettings().getSection("job " + spooler_job.name()));
+            }
+            if (spooler_task != null) {
+                this.setJobId(spooler_task.id());
+            }
+            if (spooler_job != null)
+                this.setJobName(spooler_job.name());
+            if (spooler_job != null) {
+                this.setJobFolder(spooler_job.folder_path());
+            }
+            if (spooler_job != null) {
+                this.setJobTitle(spooler_job.title());
+            }
+            this.getSettings();
+            return true;
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            return false;
+        }
+    }
 
-	/** job Settings */
-	private SOSSettings				jobSettings			= null;
+    @Override
+    public void spooler_exit() {
+        try {
+            try {
+                if (sosConnection != null) {
+                    spooler_log.debug6("spooler_exit(): disconnecting.. ..");
+                    sosConnection.disconnect();
+                    sosConnection = null;
+                }
+            } catch (Exception e) {
+                sosConnection = null;
+                spooler_log.warn("spooler_exit(): disconnect failed: ");
+                LOGGER.warn(e.getMessage(), e);
+            }
+            spooler_log.info("Job " + this.getJobName() + " terminated.");
+        } catch (Exception e) {
+            // no error processing at job level
+        }
+    }
 
-	/** Job Properties */
-	private Properties				jobProperties		= null;
+    public SOSSettings getJobSettings() {
+        return jobSettings;
+    }
 
-	/** task id assigned by the Job Scheduler */
-	private int						jobId				= 0;
+    public void setJobSettings(final SOSSettings jobSettings) {
+        this.jobSettings = jobSettings;
+    }
 
-	/** configured job name Scheduler */
-	private String					jobName				= null;
+    public SOSConnection getConnection() {
+        if (sosConnection == null) {
+            ConnectToJSDataBase();
+        }
+        return sosConnection;
+    }
 
-	/** configured job folder */
-	private String					jobFolder			= null;
+    public void setConnection(final SOSConnection psosConnection) {
+        if (sosConnection != null && !sosConnection.equals(psosConnection)) {
+            try {
+                sosConnection.disconnect();
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+            }
+            sosConnection = null;
+        }
+        sosConnection = psosConnection;
+    }
 
-	/** configured job title */
-	private String					jobTitle			= null;
+    public SOSSchedulerLogger getLogger() {
+        return sosLogger;
+    }
 
-	/** name of the application (for settings) */
-	protected String				application			= new String("");
+    public void setLogger(final SOSSchedulerLogger sosLogger1) {
+        sosLogger = sosLogger1;
+    }
 
-	public SOSConnection ConnectToJSDataBase() {
+    public Properties getJobProperties() {
+        return jobProperties;
+    }
 
-		@SuppressWarnings("unused")
-		final String conMethodName = conClassName + "::ConnectToJSDataBase";
+    public void setJobProperties(final Properties jobProperties) {
+        this.jobProperties = jobProperties;
+    }
 
-		try {
-			this.setJobSettings(new SOSProfileSettings(spooler.ini_path()));
-			this.setJobProperties(jobSettings.getSection("spooler"));
-			if (this.getJobProperties().isEmpty())
-				throw new JobSchedulerException("no settings found in section [spooler] of configuration file: " + spooler.ini_path());
-			if (this.getJobProperties().getProperty("db") == null || this.getJobProperties().getProperty("db").length() == 0)
-				throw new JobSchedulerException("no settings found for entry [db] in section [spooler] of configuration file: " + spooler.ini_path());
-			if (this.getJobProperties().getProperty("db_class") == null || this.getJobProperties().getProperty("db_class").length() == 0)
-				throw new JobSchedulerException("no settings found for entry [db_class] in section [spooler] of configuration file: " + spooler.ini_path());
+    public SOSConnectionSettings getConnectionSettings() {
+        return connectionSettings;
+    }
 
-			if (this.getLogger() != null)
-				sosLogger.debug6("connecting to database...");
+    public void setConnectionSettings(final SOSConnectionSettings connectionSettings) {
+        this.connectionSettings = connectionSettings;
+    }
 
-			this.setConnection(getSchedulerConnection(this.getJobSettings(), this.getLogger()));
-			this.getConnection().connect();
+    protected int getJobId() {
+        return jobId;
+    }
 
-			this.setConnectionSettings(new SOSConnectionSettings(this.getConnection(), "SETTINGS", this.getLogger()));
+    protected void setJobId(final int jobId) {
+        this.jobId = jobId;
+    }
 
-			if (this.getLogger() != null)
-				this.getLogger().debug6("..successfully connected to JobScheduler database.");
-		}
-		catch (Exception e) {
-			e.printStackTrace(System.err);
-			spooler_log.info("connect to database failed: " + e);
-			spooler_log.info("running without database...");
-		}
+    protected String getJobName() {
+        return jobName;
+    }
 
-		return sosConnection;
-	} // private SOSConnection ConnectToJSDataBase
+    protected void setJobName(final String jobName) {
+        this.jobName = jobName.replaceFirst(".*/([^/]+)$", "$1");
+    }
 
-	/*
-	 * initializes the database connection to the database configured
-	 * in config/factory.ini <br/>
-	 * @see sos.spooler.Job_impl#spooler_init()
-	 */
-	@Override
-	public boolean spooler_init() {
+    protected String getJobFolder() {
+        return jobFolder;
+    }
 
-		try {
-			boolean rc = super.spooler_init();
-			if (!rc) {
-				return false;
-			}
+    protected void setJobFolder(final String jobFolder) {
+        this.jobFolder = jobFolder;
+    }
 
-			this.setLogger(new SOSSchedulerLogger(spooler_log));
+    protected String getJobTitle() {
+        if (jobTitle == null) {
+            jobTitle = spooler_task.job().title();
+        }
+        return jobTitle;
+    }
 
-			if (spooler_job != null && getJobSettings() != null)
-				setJobProperties(getJobSettings().getSection("job " + spooler_job.name()));
-			if (spooler_task != null)
-				this.setJobId(spooler_task.id());
-			if (spooler_job != null)
-				this.setJobName(spooler_job.name());
-			if (spooler_job != null)
-				this.setJobFolder(spooler_job.folder_path());
-			if (spooler_job != null)
-				this.setJobTitle(spooler_job.title());
-			this.getSettings();
-			return true;
-		}
-		catch (Exception e) {
-			spooler_log.error(e.getMessage());
-			return false;
-		}
-	}
+    protected void setJobTitle(final String jobTitle) {
+        this.jobTitle = jobTitle;
+    }
 
-	/**
-	 * Closes the database connection
-	 */
-	@Override
-	public void spooler_exit() {
+    protected void setApplication(final String application) {
+        this.application = application;
+    }
 
-		try {
-			try { // to close the database connection
-				if (sosConnection != null) {
-					spooler_log.debug6("spooler_exit(): disconnecting.. ..");
-					sosConnection.disconnect();
-					sosConnection = null;
-				}
-			}
-			catch (Exception e) {
-				e.printStackTrace(System.err);
-				sosConnection = null;
-				spooler_log.warn("spooler_exit(): disconnect failed: " + e.toString());
-			}
+    protected String getApplication() {
+        return application;
+    }
 
-			spooler_log.info("Job " + this.getJobName() + " terminated.");
-		}
-		catch (Exception e) {
-		} // no errror processing at job level
-	}
+    public static SOSSettings getSchedulerSettings(final String factoryIni) throws Exception {
+        SOSSettings schedulerSettings = new SOSProfileSettings(factoryIni);
+        return schedulerSettings;
+    }
 
-	/**
-	 * @return Returns the jobSettings.
-	 */
-	public SOSSettings getJobSettings() {
-		return jobSettings;
-	}
+    public static SOSConnection getSchedulerConnection(final SOSSettings schedulerSettings) throws Exception {
+        return getSchedulerConnection(schedulerSettings, null);
+    }
 
-	/**
-	 * @param jobSettings
-	 *            The jobSettings to set.
-	 */
-	public void setJobSettings(final SOSSettings jobSettings) {
-		this.jobSettings = jobSettings;
-	}
+    public static SOSConnection getSchedulerConnection(final SOSSettings schedulerSettings, final SOSLogger log) throws Exception {
+        String dbProperty = schedulerSettings.getSection("spooler").getProperty("db").replaceAll("jdbc:", "-url=jdbc:");
+        dbProperty = dbProperty.substring(dbProperty.indexOf('-'));
+        if (dbProperty.endsWith("-password=")) {
+            dbProperty = dbProperty.substring(0, dbProperty.length() - 10);
+        }
+        SOSArguments arguments = new SOSArguments(dbProperty);
+        SOSConnection conn;
+        if (log != null) {
+            conn = SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.as_string("-class=", ""), arguments.as_string("-url=", ""), arguments.as_string("-user=", ""), arguments.as_string("-password=", ""), log);
+        } else {
+            conn = SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.as_string("-class=", ""), arguments.as_string("-url=", ""), arguments.as_string("-user=", ""), arguments.as_string("-password=", ""));
+        }
+        return conn;
+    }
 
-	/**
-	 * @return Returns the sosConnection.
-	 */
-	public SOSConnection getConnection() {
-		if (sosConnection == null) {
-			ConnectToJSDataBase();
-		}
-		return sosConnection;
-	}
+    private boolean getSettings() {
+        try {
+            if (spooler_job == null) {
+                return false;
+            }
+            setJobSettings(new SOSProfileSettings(spooler.ini_path()));
+            setJobProperties(getJobSettings().getSection("job " + spooler_job.name()));
+            if (getJobProperties().isEmpty()) {
+                return false;
+            }
+            if (getJobProperties().getProperty("delay_after_error") != null) {
+                String[] delays = getJobProperties().getProperty("delay_after_error").toString().split(";");
+                if (delays.length > 0) {
+                    spooler_job.clear_delay_after_error();
+                }
+                for (String delay2 : delays) {
+                    String[] delay = delay2.split(":");
+                    spooler_job.set_delay_after_error(Integer.parseInt(delay[0]), delay[1]);
+                }
+            }
+            return true;
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            return false;
+        }
+    }
 
-	/**
-	 * @param psosConnection
-	 *            The sosConnection to set.
-	 */
-	public void setConnection(final SOSConnection psosConnection) {
-		if (sosConnection != null && sosConnection.equals(psosConnection) == false) {
-			try {
-				sosConnection.disconnect();
-			}
-			catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace(System.err);
-			}
-			sosConnection = null;
+    protected URL createURL(final String fileName) throws Exception {
+        URL url = null;
+        try {
+            url = new URL(fileName);
+        } catch (MalformedURLException ex) {
+            try {
+                File f = new File(fileName);
+                String path = f.getCanonicalPath();
+                if (fileName.startsWith("/")) {
+                    path = fileName;
+                }
+                String fs = System.getProperty("file.separator");
+                if (fs.length() == 1) {
+                    char sep = fs.charAt(0);
+                    if (sep != '/') {
+                        path = path.replace(sep, '/');
+                    }
+                    if (path.charAt(0) != '/') {
+                        path = '/' + path;
+                    }
+                }
+                if (!path.startsWith("file://")) {
+                    path = "file://" + path;
+                }
+                url = new URL(path);
+            } catch (MalformedURLException e) {
+                throw new Exception("error in createURL(): " + e.getMessage());
+            }
+        }
+        return url;
+    }
 
-		}
-		sosConnection = psosConnection;
-	}
+    protected URI createURI(final String fileName) throws Exception {
+        URI uri = null;
+        try {
+            uri = new URI(fileName);
+        } catch (Exception e) {
+            try {
+                File f = new File(fileName);
+                String path = f.getCanonicalPath();
+                if (fileName.startsWith("/")) {
+                    path = fileName;
+                }
+                String fs = System.getProperty("file.separator");
+                if (fs.length() == 1) {
+                    char sep = fs.charAt(0);
+                    if (sep != '/') {
+                        path = path.replace(sep, '/');
+                    }
+                    if (path.charAt(0) != '/') {
+                        path = '/' + path;
+                    }
+                }
+                if (!path.startsWith("file://")) {
+                    path = "file://" + path;
+                }
+                uri = new URI(path);
+            } catch (Exception ex) {
+                throw new Exception("error in createURI(): " + e.getMessage(), e);
+            }
+        }
+        return uri;
+    }
 
-	/**
-	 * @return Returns the sosLogger.
-	 */
-	public SOSSchedulerLogger getLogger() {
-		return sosLogger;
-	}
-
-	/**
-	 * @param sosLogger1
-	 *            The sosLogger to set.
-	 */
-	public void setLogger(final SOSSchedulerLogger sosLogger1) {
-		sosLogger = sosLogger1;
-	}
-
-	/**
-	 * @return Returns the jobProperties.
-	 */
-	public Properties getJobProperties() {
-		return jobProperties;
-	}
-
-	/**
-	 * @param jobProperties
-	 *            The jobProperties to set.
-	 */
-	public void setJobProperties(final Properties jobProperties) {
-		this.jobProperties = jobProperties;
-	}
-
-	/**
-	 * @return Returns the connectionSettings.
-	 */
-	public SOSConnectionSettings getConnectionSettings() {
-		return connectionSettings;
-	}
-
-	/**
-	 * @param connectionSettings The connectionSettings to set.
-	 */
-	public void setConnectionSettings(final SOSConnectionSettings connectionSettings) {
-		this.connectionSettings = connectionSettings;
-	}
-
-	/**
-	 * @return Returns the jobId.
-	 */
-	protected int getJobId() {
-		return jobId;
-	}
-
-	/**
-	 * @param jobId The jobId to set.
-	 */
-	protected void setJobId(final int jobId) {
-		this.jobId = jobId;
-	}
-
-	/**
-	 * @return Returns the jobName.
-	 */
-	protected String getJobName() {
-		return jobName;
-	}
-
-	/**
-	 * @param jobName The jobName to set.
-	 */
-	protected void setJobName(final String jobName) {
-		this.jobName = jobName.replaceFirst(".*/([^/]+)$", "$1");
-	}
-	
-	/**
-	 * @return Returns the jobFolder.
-	 */
-	protected String getJobFolder() {
-		return jobFolder;
-	}
-
-	/**
-	 * @param jobFolder The jobFolder to set.
-	 */
-	protected void setJobFolder(final String jobFolder) {
-		this.jobFolder = jobFolder;
-	}
-
-	/**
-	 * @return Returns the jobTitle.
-	 */
-	protected String getJobTitle() {
-		if (jobTitle == null) {
-			jobTitle = spooler_task.job().title();
-		}
-		return jobTitle;
-	}
-
-	/**
-	 * @param jobTitle The jobTitle to set.
-	 */
-	protected void setJobTitle(final String jobTitle) {
-		this.jobTitle = jobTitle;
-	}
-
-	/**
-	 * @param application The application to set.
-	 */
-	protected void setApplication(final String application) {
-		this.application = application;
-	}
-
-	/**
-	 * @return Returns the application.
-	 */
-	protected String getApplication() {
-		return application;
-	}
-
-	/**
-	 * returns the Settings for the Job Scheduler as SOSSettings object
-	 * @param factoryIni Path to factory.ini (delivered by spooler.ini_path() )
-	 * @throws Exception
-	 */
-	public static SOSSettings getSchedulerSettings(final String factoryIni) throws Exception {
-		SOSSettings schedulerSettings = new SOSProfileSettings(factoryIni);
-		return schedulerSettings;
-	}
-
-	/**
-	 * Returns a SOSConnection object for the database connection of the Job Scheduler
-	 * The database connection must be opened with connect() and closed with disconnect()
-	 *
-	 * @param schedulerSettings Job Scheduler Settings
-	 * @throws Exception
-	 */
-	public static SOSConnection getSchedulerConnection(final SOSSettings schedulerSettings) throws Exception {
-		return getSchedulerConnection(schedulerSettings, null);
-	}
-
-	/**
-	 * Returns a SOSConnection object for the database connection of the Job Scheduler
-	 * The database connection must be opened with connect() and closed with disconnect()
-	 *
-	 * @param schedulerSettings Job Scheduler Settings
-	 * @param log SOSLogger, which will be used by the database connection
-	 * @throws Exception
-	 */
-	public static SOSConnection getSchedulerConnection(final SOSSettings schedulerSettings, final SOSLogger log) throws Exception {
-		String dbProperty = schedulerSettings.getSection("spooler").getProperty("db").replaceAll("jdbc:", "-url=jdbc:");
-		dbProperty = dbProperty.substring(dbProperty.indexOf('-'));
-		if (dbProperty.endsWith("-password="))
-			dbProperty = dbProperty.substring(0, dbProperty.length() - 10);
-		SOSArguments arguments = new SOSArguments(dbProperty);
-
-		SOSConnection conn;
-		if (log != null) {
-			conn = SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.as_string("-class=", ""),
-					arguments.as_string("-url=", ""), arguments.as_string("-user=", ""), arguments.as_string("-password=", ""), log);
-		}
-		else {
-			conn = SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.as_string("-class=", ""),
-					arguments.as_string("-url=", ""), arguments.as_string("-user=", ""), arguments.as_string("-password=", ""));
-		}
-
-		return conn;
-	}
-
-	/**
-	 * read initial job settings
-	 */
-	private boolean getSettings() {
-
-		try {
-			if (spooler_job == null) {
-				return false;
-			}
-
-			setJobSettings(new SOSProfileSettings(spooler.ini_path()));
-			setJobProperties(getJobSettings().getSection("job " + spooler_job.name()));
-
-			if (getJobProperties().isEmpty())
-				return false;
-
-			if (getJobProperties().getProperty("delay_after_error") != null) {
-				String[] delays = getJobProperties().getProperty("delay_after_error").toString().split(";");
-				if (delays.length > 0)
-					spooler_job.clear_delay_after_error();
-				for (String delay2 : delays) {
-					String[] delay = delay2.split(":");
-					spooler_job.set_delay_after_error(Integer.parseInt(delay[0]), delay[1]);
-				}
-			}
-
-			return true;
-
-		}
-		catch (Exception e) {
-			e.printStackTrace(System.err);
-			spooler_log.error(e.getMessage());
-			return false;
-		}
-	}
-
-	protected URL createURL(final String fileName) throws Exception {
-		URL url = null;
-		try {
-			url = new URL(fileName);
-		}
-		catch (MalformedURLException ex) {
-			try {
-				File f = new File(fileName);
-				String path = f.getCanonicalPath();
-				if (fileName.startsWith("/")) {
-					path = fileName;
-				}
-
-				String fs = System.getProperty("file.separator");
-				if (fs.length() == 1) {
-					char sep = fs.charAt(0);
-					if (sep != '/')
-						path = path.replace(sep, '/');
-					if (path.charAt(0) != '/')
-						path = '/' + path;
-				}
-				if (!path.startsWith("file://")) {
-					path = "file://" + path;
-				}
-				url = new URL(path);
-			}
-			catch (MalformedURLException e) {
-				throw new Exception("error in createURL(): " + e.getMessage());
-			}
-		}
-		return url;
-	}
-
-	protected URI createURI(final String fileName) throws Exception {
-		URI uri = null;
-		try {
-			uri = new URI(fileName);
-		}
-		// catch (URISyntaxException ex) {
-		catch (Exception e) {
-			try {
-				File f = new File(fileName);
-				String path = f.getCanonicalPath();
-				if (fileName.startsWith("/")) {
-					path = fileName;
-				}
-
-				String fs = System.getProperty("file.separator");
-				if (fs.length() == 1) {
-					char sep = fs.charAt(0);
-					if (sep != '/')
-						path = path.replace(sep, '/');
-					if (path.charAt(0) != '/')
-						path = '/' + path;
-				}
-				if (!path.startsWith("file://")) {
-					path = "file://" + path;
-				}
-				uri = new URI(path);
-			}
-			// catch (URISyntaxException ex) {
-			catch (Exception ex) {
-				throw new Exception("error in createURI(): " + e.getMessage());
-			}
-		}
-		return uri;
-	}
-
-	protected File createFile(final String fileName) throws Exception {
-		try {
-			if (fileName == null || fileName.length() == 0) {
-				throw new Exception("empty file name provided");
-			}
-
-			if (fileName.startsWith("file://")) {
-				return new File(createURI(fileName));
-			}
-			else {
-				return new File(fileName);
-			}
-		}
-		catch (Exception e) {
-			throw new Exception("error in createFile() [" + fileName + "]: " + e.getMessage());
-		}
-	}
+    protected File createFile(final String fileName) throws Exception {
+        try {
+            if (fileName == null || fileName.isEmpty()) {
+                throw new Exception("empty file name provided");
+            }
+            if (fileName.startsWith("file://")) {
+                return new File(createURI(fileName));
+            } else {
+                return new File(fileName);
+            }
+        } catch (Exception e) {
+            throw new Exception("error in createFile() [" + fileName + "]: " + e.getMessage(), e);
+        }
+    }
 
 }

@@ -20,9 +20,7 @@ import org.slf4j.LoggerFactory;
 public class SOSHibernateBatchProcessor implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
-    private static Logger logger = LoggerFactory.getLogger(SOSHibernateBatchProcessor.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateBatchProcessor.class);
     private SOSHibernateConnection connection;
     private PreparedStatement preparedStatement;
     private String sqlStatement;
@@ -35,28 +33,22 @@ public class SOSHibernateBatchProcessor implements Serializable {
     }
 
     public void createInsertBatch(Class<?> entity) throws Exception {
-
         String method = "createInsertBatch";
-        logger.debug(String.format("%s: entity = %s ", method, entity.getSimpleName()));
-
+        LOGGER.debug(String.format("%s: entity = %s ", method, entity.getSimpleName()));
         if (connection == null) {
             throw new Exception(String.format("%s: connection is NULL", method));
         }
         if (connection.getDialect() == null) {
             throw new Exception(String.format("%s: dialect is NULL", method));
         }
-
         Table t = entity.getAnnotation(Table.class);
         if (t == null) {
             throw new Exception(String.format("%s: missing table annotation in entity %s", method, entity.getSimpleName()));
         }
-
         Method[] ms = entity.getDeclaredMethods();
         LinkedHashMap<String, Method> fieldsMap = new LinkedHashMap<String, Method>();
-
         String identifier = null;
         String sequenceNextValString = null;
-
         for (Method m : ms) {
             if (m.getName().startsWith("get")) {
                 Column c = m.getAnnotation(Column.class);
@@ -68,9 +60,7 @@ public class SOSHibernateBatchProcessor implements Serializable {
                     } else {
                         GeneratedValue gv = m.getAnnotation(GeneratedValue.class);
                         if (gv == null) {
-                            fieldsMap.put(fieldName, m); // no extra
-                                                         // handling for ID
-                                                         // without sequence
+                            fieldsMap.put(fieldName, m);
                         } else {
                             try {
                                 sequenceNextValString = connection.getDialect().getSelectSequenceNextValString(gv.generator());
@@ -83,62 +73,56 @@ public class SOSHibernateBatchProcessor implements Serializable {
                 }
             }
         }
-
-        StringBuffer sql = new StringBuffer("insert into " + t.name() + " (");
-        StringBuffer sqlFields = new StringBuffer();
+        StringBuilder sql = new StringBuilder("insert into " + t.name() + " (");
+        StringBuilder sqlFields = new StringBuilder();
         if (identifier != null && sequenceNextValString != null) {
             sqlFields.append(connection.quoteFieldName(identifier));
         }
         for (Map.Entry<String, Method> entry : fieldsMap.entrySet()) {
-            if (sqlFields.length() > 0) {
+            if (!sqlFields.toString().isEmpty()) {
                 sqlFields.append(",");
             }
             sqlFields.append(connection.quoteFieldName(entry.getKey()));
         }
         sql.append(sqlFields);
-
         sql.append(") values (");
-        sqlFields = new StringBuffer();
+        sqlFields = new StringBuilder();
         if (identifier != null && sequenceNextValString != null) {
             sqlFields.append(sequenceNextValString);
         }
         for (int i = 0; i < fieldsMap.size(); i++) {
-            if (sqlFields.length() > 0) {
+            if (!sqlFields.toString().isEmpty()) {
                 sqlFields.append(",");
             }
             sqlFields.append("?");
         }
         sql.append(sqlFields);
         sql.append(")");
-
         sqlStatement = sql.toString();
         fieldsMetadata = fieldsMap;
         preparedStatement = connection.getJdbcConnection().prepareStatement(sqlStatement);
-
     }
 
     public void addBatch(Object entity) throws Exception {
         String method = "addBatch";
-        logger.debug(String.format("%s: entity = %s ", method, entity.getClass().getSimpleName()));
-
+        LOGGER.debug(String.format("%s: entity = %s ", method, entity.getClass().getSimpleName()));
         if (fieldsMetadata == null) {
             throw new Exception(String.format("%s: fieldsMetadata is NULL", method));
         }
         if (preparedStatement == null) {
             throw new Exception(String.format("%s: preparedStatement is NULL", method));
         }
-
         int index = 1;
         for (Map.Entry<String, Method> entry : fieldsMetadata.entrySet()) {
             Method m = entry.getValue();
             Object obj = m.invoke(entity);
             if (obj == null) {
                 String rt = m.getReturnType().getSimpleName();
-                if (rt.equalsIgnoreCase("boolean")) {
+                if ("boolean".equalsIgnoreCase(rt)) {
                     preparedStatement.setNull(index, java.sql.Types.INTEGER);
-                } else if (rt.equalsIgnoreCase("long")) {
+                } else if ("long".equalsIgnoreCase(rt)) {
                     preparedStatement.setNull(index, java.sql.Types.INTEGER);
-                } else if (rt.equalsIgnoreCase("date")) {
+                } else if ("date".equalsIgnoreCase(rt)) {
                     preparedStatement.setNull(index, java.sql.Types.TIMESTAMP);
                 } else {
                     preparedStatement.setString(index, null);
@@ -165,55 +149,37 @@ public class SOSHibernateBatchProcessor implements Serializable {
 
     public int[] executeBatch() throws Exception {
         String method = "executeBatch";
-        logger.debug(String.format("%s", method));
-
+        LOGGER.debug(String.format("%s", method));
         if (countCurrentBatches == 0) {
             return new int[0];
         }
-
         if (preparedStatement == null) {
             throw new Exception(String.format("%s: preparedStatement is NULL", method));
         }
         if (connection == null) {
             throw new Exception(String.format("%s: connection is NULL", method));
         }
-
         try {
             int[] result = preparedStatement.executeBatch();
             connection.getJdbcConnection().commit();
             return result;
         } catch (SQLException e) {
             connection.getJdbcConnection().rollback();
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
             if (e.getNextException() == null) {
                 throw e;
             }
             throw new Exception(e.getNextException());
-            // JDBCExceptionHelper;
         } finally {
             countCurrentBatches = 0;
         }
 
     }
 
-    /** can be executed before executeBatch()
-     * 
-     * @return */
     public int getCountCurrentBatches() {
         return countCurrentBatches;
     }
 
-    /** Oracle: A value of -2 indicates that a element was processed
-     * successfully, but that the number of effected rows is unknown. siehe
-     * http:
-     * //stackoverflow.com/questions/19022175/executebatch-method-return-array
-     * -of-value-2-in-java
-     * 
-     * Aufruf:
-     * SOSHibernateBatchProcessor.getExecutedBatchSize(bp.executeBatch());
-     * 
-     * @param arr
-     * @return */
     public static int getExecutedBatchSize(int[] arr) {
         int count = 0;
         if (arr != null) {
@@ -221,14 +187,12 @@ public class SOSHibernateBatchProcessor implements Serializable {
                 count += arr[i];
             }
         }
-
         return count;
     }
 
     public void close() {
         String method = "close";
-        logger.debug(String.format("%s", method));
-
+        LOGGER.debug(String.format("%s", method));
         if (preparedStatement != null) {
             try {
                 preparedStatement.close();
@@ -252,4 +216,5 @@ public class SOSHibernateBatchProcessor implements Serializable {
     public String getSqlStatement() {
         return sqlStatement;
     }
+
 }

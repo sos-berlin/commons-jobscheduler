@@ -1,16 +1,15 @@
 package com.sos.jobscheduler.tools.webservices;
 
- 
 public class SOSCommandSecurityWebserviceCurrentUser {
-    
+
     private String resource;
     private String username;
     private String password;
     private String sessionId;
-  
+
     public SOSCommandSecurityWebserviceCurrentUser() {
         super();
-     
+
     }
 
     public String getSessionId() {
@@ -21,8 +20,6 @@ public class SOSCommandSecurityWebserviceCurrentUser {
         this.sessionId = sessionId;
     }
 
-  
-
     public String getUsername() {
         return username;
     }
@@ -31,7 +28,6 @@ public class SOSCommandSecurityWebserviceCurrentUser {
         return password;
     }
 
-   
     public String getResource() {
         return resource;
     }
@@ -47,10 +43,5 @@ public class SOSCommandSecurityWebserviceCurrentUser {
     public void setPassword(String password) {
         this.password = password;
     }
-
-    
-       
-
-    
 
 }

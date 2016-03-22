@@ -85,6 +85,11 @@
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
         </dependency>
+        <!-- needed for the zlib feature of JCraft´s JSch -->
+        <dependency>
+			<groupId>com.jcraft</groupId>
+			<artifactId>jzlib</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>jcifs</groupId>

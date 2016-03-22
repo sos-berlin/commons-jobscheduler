@@ -36,10 +36,9 @@ import org.w3c.dom.Element;
 
 public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurationChangingPlugin {
 
-    private static final Logger logger = Logger.getLogger(GlobalMonitorPlugin.class);
+    private static final Logger LOGGER = Logger.getLogger(GlobalMonitorPlugin.class);
     ConfigurationModifierFileSelectorOptions configurationModifierFileSelectorJobOptions;
     ConfigurationModifierFileSelectorOptions configurationModifierFileSelectorMonitorOptions;
-
     private HashMap<String, String> parameters;
 
     @Inject
@@ -50,7 +49,7 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
 
     @Override
     public byte[] changeXmlConfiguration(FileBasedType typ, AbsolutePath path, byte[] xmlBytes) {
-        logger.debug("---------  changeXmlConfiguration");
+        LOGGER.debug("---------  changeXmlConfiguration");
         Document doc = null;
         if (typ == FileBasedType.job) {
             doc = xmlBytesToDom(xmlBytes);
@@ -58,7 +57,7 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
         try {
             doc = modifyJobElement(doc, path.string());
         } catch (JDOMException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
         }
         return domToXmlBytes(doc);
     }
@@ -78,44 +77,36 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
             transformer.transform(domSource, result);
             return writer.toString();
         } catch (TransformerException ex) {
-            ex.printStackTrace();
+            LOGGER.error(ex.getMessage(), ex);
             return null;
         }
     }
 
     private ConfigurationModifierFileSelectorOptions setParameters(Element e, String parent) {
-        logger.debug("---------  setParameters:" + parent);
+        LOGGER.debug("---------  setParameters:" + parent);
         ConfigurationModifierFileSelectorOptions c = new ConfigurationModifierFileSelectorOptions();
-
         parameters = new HashMap<String, String>();
         parameters.put("configuration_directory", "");
         parameters.put("exclude_dir", "");
         parameters.put("exclude_file", "");
         parameters.put("recursive", "true");
         parameters.put("regex_selector", "");
-
         DOMBuilder domBuilder = new DOMBuilder();
         org.jdom.Element pluginElement = domBuilder.build(e);
-
         List<org.jdom.Element> listOfParams = null;
-
         org.jdom.Element paramsElement = pluginElement.getChild(parent);
         if (paramsElement != null) {
             listOfParams = paramsElement.getChildren("param");
-
             Iterator<org.jdom.Element> it = listOfParams.iterator();
             while (it.hasNext()) {
                 org.jdom.Element param = it.next();
                 if (param.getAttributeValue("name") != null) {
                     String name = param.getAttributeValue("name").toLowerCase();
                     String value = param.getAttributeValue("value");
-                    logger.debug("---------  " + name + "=" + value);
-
+                    LOGGER.debug("---------  " + name + "=" + value);
                     parameters.put(name, value);
-
                 }
             }
-
             c.setConfigurationDirectory(parameters.get("configuration_directory"));
             c.setDirectoryExclusions(parameters.get("exclude_dir"));
             c.setFileExclusions(parameters.get("exclude_file"));
@@ -136,45 +127,38 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
     }
 
     private Document modifyJobElement(Document doc, String jobname) throws JDOMException {
-        logger.debug("---------  modifyJobElement:" + jobname);
-
+        LOGGER.debug("---------  modifyJobElement:" + jobname);
         // 1. Create a FileSelector for the jobs that are to be handled
         // depending on the given options.
         ConfigurationModifierFileSelector configurationModifierFileSelector = new ConfigurationModifierFileSelector(configurationModifierFileSelectorJobOptions);
-
         // 2. Set the filter for jobs to an instance of
         // ConfigurationModifierJobFileFilter
         configurationModifierFileSelector.setSelectorFilter(new ConfigurationModifierJobFileFilter(configurationModifierFileSelectorJobOptions));
-
         // 3. getting the entire jobs
-        logger.debug("---------  fillSelectedFileList");
+        LOGGER.debug("---------  fillSelectedFileList");
         configurationModifierFileSelector.fillSelectedFileList();
         boolean jobIsToBeHandled = configurationModifierFileSelector.isInSelectedFileList(jobname);
-        logger.debug("---------  jobIsToBeHandled:" + jobIsToBeHandled);
-
+        LOGGER.debug("---------  jobIsToBeHandled:" + jobIsToBeHandled);
         if (jobIsToBeHandled) {
             // 4. if the current job is to be handled, create the list of
             // monitors to add.
             JobSchedulerFileElement jobSchedulerFileElement = configurationModifierFileSelector.getJobSchedulerElement(jobname);
-
-            if (jobSchedulerFileElement != null) {// always will be != null, as this is the then part of jobIsToBeHandled-if
+            if (jobSchedulerFileElement != null) {
+                // always will be != null, as this is the then part of
+                // jobIsToBeHandled-if
                 // 5. Create a FileSelector for the monitors that are to be
                 // added to the monitor.use list depending on the given options.
                 configurationModifierFileSelector = new ConfigurationModifierFileSelector(configurationModifierFileSelectorMonitorOptions);
-
                 // 6. Set the filter for jobs to an instance of
                 // ConfigurationModifierMonitorFileFilter
                 configurationModifierFileSelector.setSelectorFilter(new ConfigurationModifierMonitorFileFilter(configurationModifierFileSelectorMonitorOptions));
                 configurationModifierFileSelector.fillParentMonitorList(jobSchedulerFileElement);
-
                 // 7. Create a jobConfiguration changer to read, parse, change
                 // (and write) the job.xml
                 JobConfigurationFileChanger jobConfigurationFileChanger = new JobConfigurationFileChanger(doc);
                 jobConfigurationFileChanger.setListOfMonitors(configurationModifierFileSelector.getListOfMonitorConfigurationFiles());
-
                 doc = jobConfigurationFileChanger.addMonitorUse();
-                logger.debug(getStringFromDocument(doc));
-
+                LOGGER.debug(getStringFromDocument(doc));
                 return doc;
             }
         }

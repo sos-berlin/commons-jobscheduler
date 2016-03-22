@@ -547,12 +547,12 @@ public class SOSHibernateConnection implements Serializable {
 
                 LOGGER.debug(String.format("%s: custom properties. property: %s = %s", method, key, value));
             }
-            
-            if(configuration.getProperty(HIBERNATE_PROPERTY_JDBC_FETCH_SIZE) != null){
-                try{
+
+            if (configuration.getProperty(HIBERNATE_PROPERTY_JDBC_FETCH_SIZE) != null) {
+                try {
                     jdbcFetchSize = Optional.of(Integer.parseInt(configuration.getProperty(HIBERNATE_PROPERTY_JDBC_FETCH_SIZE)));
+                } catch (Exception ex) {
                 }
-                catch(Exception ex){}
             }
         }
     }
@@ -1017,5 +1017,5 @@ public class SOSHibernateConnection implements Serializable {
     public Optional<Integer> getJdbcFetchSize() {
         return jdbcFetchSize;
     }
- 
+
 }

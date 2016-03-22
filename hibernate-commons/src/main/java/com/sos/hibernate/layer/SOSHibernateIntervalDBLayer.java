@@ -8,8 +8,7 @@ import java.util.List;
 import com.sos.hibernate.classes.DbItem;
 import com.sos.hibernate.classes.SOSHibernateIntervalFilter;
 
-/**
- * \class SOSHibernateDBLayer
+/** \class SOSHibernateDBLayer
  * 
  * \brief SOSHibernateDBLayer -
  * 
@@ -30,8 +29,7 @@ import com.sos.hibernate.classes.SOSHibernateIntervalFilter;
  * </p>
  * \author Uwe Risse \version 06.10.2011 \see reference
  * 
- * Created on 06.10.2011 14:23:43
- */
+ * Created on 06.10.2011 14:23:43 */
 
 public abstract class SOSHibernateIntervalDBLayer extends SOSHibernateDBLayer {
 

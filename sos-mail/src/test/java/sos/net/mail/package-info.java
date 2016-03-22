@@ -1,8 +1,5 @@
 /**
  * 
  */
-/**
- * @author KB
- *
- */
+/** @author KB */
 package sos.net.mail;

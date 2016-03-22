@@ -1,36 +1,38 @@
 package com.sos.dialog.menu;
 
+import org.apache.log4j.Logger;
+
 import com.sos.dialog.components.SOSCursor;
 import com.sos.dialog.message.DialogMsg;
 
 public class MenueActionSave extends MenueActionBase {
 
-	public MenueActionSave() {
-		this("");
-		//		this("Save", "Ctrl+S", "/org/freedesktop/tango/16x16/actions/document-save.png");
-	}
+    private static final Logger LOGGER = Logger.getLogger(MenueActionSave.class);
 
-	public MenueActionSave(String pstrMenueText, final String pstrAccText, final String pstrImageFileName) {
-		super(pstrMenueText, null);
-		init(pstrMenueText, pstrAccText, pstrImageFileName);
-	}
+    public MenueActionSave() {
+        this("");
+    }
 
-	public MenueActionSave(final String pstrMenueTextParameter) {
-		this(new DialogMsg("treenode_menue_save").params(pstrMenueTextParameter), "Ctrl+S", "/org/freedesktop/tango/16x16/actions/document-save.png");
-		strI18NKey = "treenode_menue_save";
-	}
+    public MenueActionSave(String pstrMenueText, final String pstrAccText, final String pstrImageFileName) {
+        super(pstrMenueText, null);
+        init(pstrMenueText, pstrAccText, pstrImageFileName);
+    }
 
-	@Override
-	public void run() {
-		try (SOSCursor objC = new SOSCursor().showWait()) {
-			executeSave();
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    public MenueActionSave(final String pstrMenueTextParameter) {
+        this(new DialogMsg("treenode_menue_save").params(pstrMenueTextParameter), "Ctrl+S", "/org/freedesktop/tango/16x16/actions/document-save.png");
+        strI18NKey = "treenode_menue_save";
+    }
 
-	public void executeSave() {
-	}
+    @Override
+    public void run() {
+        try (SOSCursor objC = new SOSCursor().showWait()) {
+            executeSave();
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+    }
+
+    public void executeSave() {
+    }
 
 }

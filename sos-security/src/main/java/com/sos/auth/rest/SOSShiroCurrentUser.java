@@ -3,12 +3,12 @@ package com.sos.auth.rest;
 import org.apache.shiro.subject.Subject;
 
 public class SOSShiroCurrentUser {
-    
+
     private Subject currentSubject;
     private String username;
     private String password;
     private String sessionId;
-  
+
     public SOSShiroCurrentUser(String username, String password) {
         super();
         this.username = username;
@@ -38,33 +38,29 @@ public class SOSShiroCurrentUser {
     public void setCurrentSubject(Subject currentSubject) {
         this.currentSubject = currentSubject;
     }
-    
+
     public boolean hasRole(String role) {
         if (currentSubject != null) {
             return currentSubject.hasRole(role);
-        }else {
+        } else {
             return false;
         }
     }
-    
+
     public boolean isPermitted(String permission) {
         if (currentSubject != null) {
             return currentSubject.isPermitted(permission) && !currentSubject.isPermitted("-" + permission);
-        }else {
+        } else {
             return false;
         }
     }
-    
+
     public boolean isAuthenticated() {
         if (currentSubject != null) {
             return currentSubject.isAuthenticated();
-        }else {
+        } else {
             return false;
         }
     }
-    
-       
-
-    
 
 }

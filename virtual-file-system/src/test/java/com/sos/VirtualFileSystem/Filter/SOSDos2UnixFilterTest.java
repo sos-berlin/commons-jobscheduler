@@ -4,29 +4,28 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class SOSDos2UnixFilterTest extends SOSNullFilterBase <SOSDos2UnixFilter> {
+public class SOSDos2UnixFilterTest extends SOSNullFilterBase<SOSDos2UnixFilter> {
 
-	@SuppressWarnings("unused")
-	private final String conClassName = this.getClass().getSimpleName();
-	@SuppressWarnings("unused")
-	private static final String conSVNVersion = "$Id$";
-	private final Logger logger = Logger.getLogger(this.getClass());
+    @SuppressWarnings("unused")
+    private final String conClassName = this.getClass().getSimpleName();
+    @SuppressWarnings("unused")
+    private static final String conSVNVersion = "$Id$";
+    private final Logger logger = Logger.getLogger(this.getClass());
 
+    public SOSDos2UnixFilterTest() {
+        super(new SOSDos2UnixFilter());
+    }
 
-	public SOSDos2UnixFilterTest() {
-		super (new SOSDos2UnixFilter());
-	}
+    @Test
+    public void testWriteByteArray() {
+        String strT = "abcdef\r\nabcdef";
+        String strT2 = "abcdef\nabcdef";
+        objF.write(strT.getBytes());
 
-	@Test
-	public void testWriteByteArray() {
-		String strT = "abcdef\r\nabcdef";
-		String strT2 = "abcdef\nabcdef";
-		objF.write(strT.getBytes());
-
-		bteBuffer = objF.read();
-		String strX = new String(bteBuffer);
-		logger.debug(strX);
-		Assert.assertEquals(strT2, strX);
-	}
+        bteBuffer = objF.read();
+        String strX = new String(bteBuffer);
+        logger.debug(strX);
+        Assert.assertEquals(strT2, strX);
+    }
 
 }
