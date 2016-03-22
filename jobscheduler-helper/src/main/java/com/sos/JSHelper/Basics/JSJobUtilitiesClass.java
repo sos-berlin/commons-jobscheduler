@@ -101,12 +101,6 @@ public class JSJobUtilitiesClass<T> extends JSToolBox implements JSJobUtilities,
         logger.trace("pobjJSCommands = " + pobjJSCommands.getClass().getName());
     }
 
-    @Override
-    public String myReplaceAll(final String pstrSourceString, final String pstrReplaceWhat, final String pstrReplaceWith) {
-
-        String newReplacement = pstrReplaceWith.replaceAll("\\$", "\\\\\\$");
-        return pstrSourceString.replaceAll("(?m)" + pstrReplaceWhat, newReplacement);
-    }
 
     /** \brief replaceSchedulerVars
      *

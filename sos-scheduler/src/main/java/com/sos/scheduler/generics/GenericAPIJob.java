@@ -42,10 +42,5 @@ public class GenericAPIJob extends JSJobUtilitiesClass<GenericAPIJobOptions> {
         // doInitialize
     }
 
-    @Override
-    public String myReplaceAll(final String pstrSourceString, final String pstrReplaceWhat, final String pstrReplaceWith) {
-        String newReplacement = pstrReplaceWith.replaceAll("\\$", "\\\\\\$");
-        return pstrSourceString.replaceAll("(?m)" + pstrReplaceWhat, newReplacement);
-    }
 
 }
