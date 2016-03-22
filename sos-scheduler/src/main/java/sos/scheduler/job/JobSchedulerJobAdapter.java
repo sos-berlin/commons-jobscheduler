@@ -400,7 +400,9 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                         }
                         String regex = regExPattern.replaceAll("\\%1\\$s", name);
                         strParamValue = Matcher.quoteReplacement(strParamValue);
-                        strTemp = myReplaceAll(strTemp, regex, strParamValue);
+                       
+                        strTemp = strTemp.replaceAll("(?im)"+regex, strParamValue);
+
                         if (!(strTemp.matches("(?s).*%[^%]+%.*") || strTemp.matches("(?s).*(\\$|§)\\{[^{]+\\}.*"))) {
                             break;
                         }
@@ -426,7 +428,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                         String strParamValue = params.get(name);
                         String regex = regExPattern.replaceAll("\\%1\\$s", name);
                         strParamValue = Matcher.quoteReplacement(strParamValue);
-                        strTemp = myReplaceAll(strTemp, regex, strParamValue);
+                        strTemp = strTemp.replaceAll("(?im)"+regex, strParamValue);
                         // End if no more variables in string for substitution
                         if (!(strTemp.matches("(?s).*%[^%]+%.*") || strTemp.matches("(?s).*(\\$|§)\\{[^{]+\\}.*"))) {
                             break;
@@ -486,12 +488,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         return result;
     }
 
-    @Override
-    public String myReplaceAll(final String source, final String what, final String replacement) {
-        String newReplacement = replacement.replaceAll("\\$", "\\\\\\$");
-        return source.replaceAll("(?im)" + what, newReplacement);
-    }
-
+   
     public String StackTrace2String(final Exception e) {
         String strT = null;
         if (isNotNull(e)) {

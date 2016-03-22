@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
 import java.util.Set;
+import java.util.regex.Matcher;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
@@ -247,7 +248,8 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                     }
                     regex = String.format(regExPattern, name);
                     logger.debug("regex = " + regex + ", strParamValue = " + strParamValue);
-                    strTemp = myReplaceAll(strTemp, regex, strParamValue);
+                    strParamValue = Matcher.quoteReplacement(strParamValue);
+                    strTemp = strTemp.replaceAll("(?im)"+regex, strParamValue);
                 }
                 logger.debug("String after replace = " + strTemp);
             }
@@ -255,20 +257,6 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         return strTemp;
     }
 
-    /** \brief myReplaceAll
-     *
-     * \details
-     *
-     * \return String
-     *
-     * @param source
-     * @param what
-     * @param replacement
-     * @return */
-    @Override
-    public String myReplaceAll(final String source, final String what, final String replacement) {
-        String newReplacement = replacement.replaceAll("\\$", "\\\\\\$");
-        return source.replaceAll("(?m)" + what, newReplacement);
-    }
+     
 
 }

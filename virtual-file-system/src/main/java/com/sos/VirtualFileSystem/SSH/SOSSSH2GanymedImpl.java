@@ -661,10 +661,6 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
         return false;
     }
 
-    @Override
-    public String myReplaceAll(final String source, final String what, final String replacement) {
-        return source;
-    }
 
     @Override
     public String replaceSchedulerVars(final boolean isWindows, final String pstrString2Modify) {

@@ -255,12 +255,6 @@ public class JobSchedulerLaunchAndObserve extends JSToolBox implements JSJobUtil
     }
 
     @Override
-    public String myReplaceAll(final String pstrSourceString, final String pstrReplaceWhat, final String pstrReplaceWith) {
-        String newReplacement = pstrReplaceWith.replaceAll("\\$", "\\\\\\$");
-        return pstrSourceString.replaceAll("(?m)" + pstrReplaceWhat, newReplacement);
-    }
-
-    @Override
     public String replaceSchedulerVars(final boolean isWindows, final String pstrString2Modify) {
         LOGGER.debug("replaceSchedulerVars as Dummy-call executed. No Instance of JobUtilites specified.");
         return pstrString2Modify;
