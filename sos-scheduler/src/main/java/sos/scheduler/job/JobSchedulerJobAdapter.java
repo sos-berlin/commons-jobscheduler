@@ -422,12 +422,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                         String strParamValue = params.get(name);
                         String regex = regExPattern.replaceAll("\\%1\\$s", name);
                         strParamValue = Matcher.quoteReplacement(strParamValue);
-<<<<<<< HEAD
-                        strTemp = myReplaceAll(strTemp, regex, strParamValue);
-=======
                         strTemp = strTemp.replaceAll("(?im)"+regex, strParamValue);
-                        // End if no more variables in string for substitution
->>>>>>> origin/release/1.10
                         if (!(strTemp.matches("(?s).*%[^%]+%.*") || strTemp.matches("(?s).*(\\$|§)\\{[^{]+\\}.*"))) {
                             break outerloop;
                         }
