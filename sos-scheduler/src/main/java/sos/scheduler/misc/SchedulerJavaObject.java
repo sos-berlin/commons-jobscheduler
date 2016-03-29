@@ -1,6 +1,3 @@
-/*
- * JobSchedulerJavaObject.java Created on 07.09.2007
- */
 package sos.scheduler.misc;
 
 import java.io.ByteArrayInputStream;
@@ -37,8 +34,9 @@ public class SchedulerJavaObject {
         try {
             Object schedulerObject;
             String encoded = set.value(name);
-            if (encoded == null || encoded.length() == 0)
+            if (encoded == null || encoded.isEmpty()) {
                 return null;
+            }
             byte[] serializedObject = Base64.decodeBase64(encoded.getBytes());
             ByteArrayInputStream bis = new ByteArrayInputStream(serializedObject);
             ObjectInputStream ois = new ObjectInputStream(bis);
@@ -49,4 +47,5 @@ public class SchedulerJavaObject {
             throw new Exception("Error occured reading object from variale: " + e);
         }
     }
+
 }

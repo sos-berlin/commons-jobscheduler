@@ -16,8 +16,9 @@ public class JodaTools {
      * @param weekday - the weekday
      * @return */
     public static DateTime getNextWeekday(DateTime date, int weekday) {
-        if (date.getDayOfWeek() > weekday)
+        if (date.getDayOfWeek() > weekday) {
             date = date.plusWeeks(1);
+        }
         return date.withDayOfWeek(weekday);
     }
 
@@ -28,8 +29,9 @@ public class JodaTools {
      * @param weekday
      * @return */
     public static DateTime getPreviousWeekday(DateTime date, int weekday) {
-        if (date.getDayOfWeek() < weekday)
+        if (date.getDayOfWeek() < weekday) {
             date = date.minusWeeks(1);
+        }
         return date.withDayOfWeek(weekday);
     }
 
@@ -40,18 +42,15 @@ public class JodaTools {
      * @param weekday - the weekday
      * @return */
     public static DateTime getWeekdayInMonth(DateTime date, int weekday, int which) {
-
         if (which < 0) {
             DateTime baseDate = getEndOfMonth(date);
             DateTime d = getPreviousWeekday(baseDate, weekday);
             int weeks = (which * -1) - 1;
             return d.minusWeeks(weeks);
         }
-
         DateTime baseDate = getStartOfMonth(date);
         DateTime d = getNextWeekday(baseDate, weekday);
         return d.plusWeeks(which - 1);
-
     }
 
     public static DateTime getWeekdayInIntervalOrNull(Interval interval, int weekday, int which) {
@@ -60,8 +59,9 @@ public class JodaTools {
         while (!interval.contains(result)) {
             currentDate = currentDate.plusMonths(1);
             result = getWeekdayInMonth(currentDate, weekday, which);
-            if (!result.isBefore(interval.getEnd()))
+            if (!result.isBefore(interval.getEnd())) {
                 return null;
+            }
         }
         return result;
     }
@@ -78,8 +78,9 @@ public class JodaTools {
         while (!interval.contains(result)) {
             currentDate = currentDate.plusMonths(1);
             result = getDayInMonth(currentDate, day);
-            if (!result.isBefore(interval.getEnd()))
+            if (!result.isBefore(interval.getEnd())) {
                 return null;
+            }
         }
         return result;
     }
@@ -104,20 +105,22 @@ public class JodaTools {
      * @return */
     public static int getJodaWeekday(String jsWeekday) {
         String d = jsWeekday.toLowerCase();
-        if (d.length() > 2)
+        if (d.length() > 2) {
             d = d.substring(0, 2);
-        if (d.equals("1") || d.equals("mo"))
+        }
+        if ("1".equals(d) || "mo".equals(d)) {
             return DateTimeConstants.MONDAY;
-        if (d.equals("2") || d.equals("tu") || d.equals("di"))
+        } else if ("2".equals(d) || "tu".equals(d) || "di".equals(d)) {
             return DateTimeConstants.TUESDAY;
-        if (d.equals("3") || d.equals("we") || d.equals("mi"))
+        } else if ("3".equals(d) || "we".equals(d) || "mi".equals(d)) {
             return DateTimeConstants.WEDNESDAY;
-        if (d.equals("4") || d.equals("th") || d.equals("do"))
+        } else if ("4".equals(d) || "th".equals(d) || "do".equals(d)) {
             return DateTimeConstants.THURSDAY;
-        if (d.equals("5") || d.equals("fr"))
+        } else if ("5".equals(d) || "fr".equals(d)) {
             return DateTimeConstants.FRIDAY;
-        if (d.equals("6") || d.equals("sa"))
+        } else if ("6".equals(d) || "sa".equals(d)) {
             return DateTimeConstants.SATURDAY;
+        }
         return DateTimeConstants.SUNDAY;
     }
 
@@ -132,4 +135,5 @@ public class JodaTools {
     public static DateTime getStartOfDay(DateTime base) {
         return base.minusMillis(base.getMillisOfDay());
     }
+
 }

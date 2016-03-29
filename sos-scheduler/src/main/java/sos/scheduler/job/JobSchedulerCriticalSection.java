@@ -1,6 +1,3 @@
-/*
- * JobSchedulerCriticalSection.java Created on 01.06.2006
- */
 package sos.scheduler.job;
 
 import sos.spooler.Job_impl;
@@ -8,23 +5,15 @@ import sos.spooler.Spooler;
 
 public class JobSchedulerCriticalSection {
 
-    // no real mutexes are used in this implementation
-    // a delay ensures the critical section to work
-    private long delay = 200;
-    private long dDelay = 2000;
-
-    // name of the mutex
-    private String mutex = "section";
-
-    // current task id
-    private String taskId = "";
-
-    private Spooler spooler;
-    private Job_impl job;
-
     private static final String GREEN = "GREEN";
     private static final String RED = "RED";
     private static final String ORANGE = "ORANGE";
+    private long delay = 200;
+    private long dDelay = 2000;
+    private String mutex = "section";
+    private String taskId = "";
+    private Spooler spooler;
+    private Job_impl job;
 
     public JobSchedulerCriticalSection(Job_impl job, String mutex) {
         this.spooler = job.spooler;
@@ -48,20 +37,15 @@ public class JobSchedulerCriticalSection {
      *            has passed without calling exit, other task may enter the
      *            critical section. */
     public void enter(long timeNeeded) {
-        // job.spooler_log.info("entered critical section");
         long now = System.currentTimeMillis();
         String status = spooler.var(mutex);
         try {
-            while (!(status == null || status.equalsIgnoreCase(GREEN) || status.length() == 0)) {
-                // job.spooler_log.info("Im while, Status: "+status);
+            while (!(status == null || GREEN.equalsIgnoreCase(status) || status.isEmpty())) {
                 String[] split = status.split(";");
-                // if not green, status has the form "color;taskid;time" e.g.
-                // ORANGE;3421;879879872
                 long timeout = Long.parseLong(split[2]);
-                // timeout eingetreten
-                if (timeout < now)
+                if (timeout < now) {
                     status = GREEN;
-                else { // weiter warten
+                } else {
                     try {
                         Thread.sleep(5);
                     } catch (Exception ex) {
@@ -70,26 +54,16 @@ public class JobSchedulerCriticalSection {
                     status = spooler.var(mutex);
                 }
             }
-            // job.spooler_log.info("go Orange!");
             goOrange(now + dDelay);
-            // jetzt nochmal überprüfen, ob kein anderer Orange gesetzt hat:
             status = spooler.var(mutex);
-            // job.spooler_log.info("go Orange: "+status);
-
             if (status.startsWith(GREEN)) {
-                // sollte nicht passieren, passiert aber bei zu engem delay
-                // nochmal probieren:
                 enter(timeNeeded);
                 return;
             }
             String[] split = status.split(";");
-
             if (split[1].equalsIgnoreCase(taskId)) {
-                // immer noch der gleiche Thread also auf Rot gehen:
                 goRed(timeNeeded);
             } else {
-                // ein anderer konkurriert und hat als letzter seine ID
-                // gesetzt. Also nochmal probieren
                 enter(timeNeeded);
             }
         } catch (ArrayIndexOutOfBoundsException e) {
@@ -118,7 +92,6 @@ public class JobSchedulerCriticalSection {
                 job.spooler_log.info("Trying to exit critical section \"" + mutex + "\", but" + " it is already GREEN");
                 return;
             }
-
             String[] split = status.split(";");
             if (split[1].equalsIgnoreCase(taskId)) {
                 spooler.set_var(mutex, GREEN);
@@ -127,6 +100,6 @@ public class JobSchedulerCriticalSection {
                 job.spooler_log.info("Trying to exit critical section \"" + mutex + "\", but" + " it already belongs to task " + split[1]);
             }
         }
-
     }
+
 }

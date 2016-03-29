@@ -8,8 +8,7 @@ import java.io.IOException;
 
 public class H2TemporaryConnection extends H2PersistentConnection {
 
-    private final Logger logger = LoggerFactory.getLogger(H2TemporaryConnection.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(H2TemporaryConnection.class);
     private static File databaseFile = null;
 
     public H2TemporaryConnection(ResourceList fileList) {
@@ -27,8 +26,9 @@ public class H2TemporaryConnection extends H2PersistentConnection {
 
     public void close() {
         super.close();
-        if (!databaseFile.delete())
-            logger.warn("Database at location " + databaseFile.getAbsolutePath() + " could not delete.");
+        if (!databaseFile.delete()) {
+            LOGGER.warn("Database at location " + databaseFile.getAbsolutePath() + " could not delete.");
+        }
         super.removeTemporaryFiles();
     }
 

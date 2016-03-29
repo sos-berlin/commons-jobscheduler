@@ -140,10 +140,12 @@ public class Log4JHelper implements JSListener {
         setLevel(Level.DEBUG);
         for (StackTraceElement s : objEle) {
             String strTarget = s.getFileName() + ":" + s.getLineNumber();
-            if (s.getLineNumber() == -1)
+            if (s.getLineNumber() == -1) {
                 strTarget = "Unknown Source";
-            if (s.getLineNumber() == -2)
+            }
+            if (s.getLineNumber() == -2) {
                 strTarget = "Native Method";
+            }
             objRootLog.debug("     at " + s.getClassName() + "." + s.getMethodName() + "(" + strTarget + ")");
         }
         restoreLevel();

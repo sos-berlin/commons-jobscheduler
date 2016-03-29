@@ -10,11 +10,12 @@ public class SOSOptionFTPSClientSecurity extends JSOptionValueList {
         explicit, implicit;
 
         public static String asString() {
-            StringBuffer result = new StringBuffer();
+            StringBuilder result = new StringBuilder();
             result.append("[");
             for (ClientSecurity t : values()) {
-                if (result.length() > 1)
+                if (result.length() > 1) {
                     result.append(", ");
+                }
                 result.append(t.name());
             }
             result.append("]");
@@ -43,7 +44,8 @@ public class SOSOptionFTPSClientSecurity extends JSOptionValueList {
         try {
             SOSOptionFTPSClientSecurity.ClientSecurity.valueOf(testValue);
         } catch (Exception e) {
-            throw new JobSchedulerException(String.format("Value \"%s\" is not valid for %s - valid values are %s : %s", testValue, strKey, ClientSecurity.asString(), e.toString()));
+            throw new JobSchedulerException(String.format("Value \"%s\" is not valid for %s - valid values are %s : %s", testValue, strKey,
+                    ClientSecurity.asString(), e.toString()));
         }
         super.Value(testValue);
     }

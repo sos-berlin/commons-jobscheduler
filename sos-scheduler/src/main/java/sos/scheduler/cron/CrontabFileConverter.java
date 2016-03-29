@@ -954,8 +954,9 @@ public class CrontabFileConverter extends JSToolBox {
     }
 
     private static String formatTwoDigits(final String number) {
-        if (number.length() == 1)
+        if (number.length() == 1) {
             return "0" + number;
+        }
         return number;
     }
 

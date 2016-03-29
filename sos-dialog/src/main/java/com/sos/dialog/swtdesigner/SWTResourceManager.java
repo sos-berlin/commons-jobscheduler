@@ -452,8 +452,9 @@ public class SWTResourceManager {
 
     /** Dispose all of the cached cursors */
     public static void disposeCursors() {
-        for (Iterator iter = m_IdToCursorMap.values().iterator(); iter.hasNext();)
+        for (Iterator iter = m_IdToCursorMap.values().iterator(); iter.hasNext();) {
             ((Cursor) iter.next()).dispose();
+        }
         m_IdToCursorMap.clear();
     }
 

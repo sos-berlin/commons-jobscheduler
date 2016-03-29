@@ -1,7 +1,5 @@
 package com.sos.VirtualFileSystem.TCPIP;
 
-// TCPClient.java
-// A client program implementing TCP socket
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
@@ -14,8 +12,7 @@ public class SOSVfsTcpIp {
     public SOSVfsTcpIp() {
     }
 
-    public static void main(final String args[]) {// arguments supply message
-                                                  // and hostname of destination
+    public static void main(final String args[]) {
         Socket s = null;
         try {
             int serverPort = 6880;
@@ -29,13 +26,15 @@ public class SOSVfsTcpIp {
             output.writeInt(data.length());
             // Step 2 send length
             System.out.println("Writing.......");
-            output.writeBytes(data); // UTF is a string encoding
+            output.writeBytes(data);
+            // UTF is a string encoding
             // Step 1 read length
             int nb = input.readInt();
             byte[] digit = new byte[nb];
             // Step 2 read byte
-            for (int i = 0; i < nb; i++)
+            for (int i = 0; i < nb; i++) {
                 digit[i] = input.readByte();
+            }
             String st = new String(digit);
             System.out.println("Received: " + st);
         } catch (UnknownHostException e) {
@@ -45,11 +44,14 @@ public class SOSVfsTcpIp {
         } catch (IOException e) {
             System.out.println("IO:" + e.getMessage());
         } finally {
-            if (s != null)
+            if (s != null) {
                 try {
                     s.close();
-                } catch (IOException e) {/* close failed */
+                } catch (IOException e) {
+                    // close failed
                 }
+            }
         }
     }
+
 }
