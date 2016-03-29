@@ -14,7 +14,6 @@ import java.util.Properties;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
@@ -32,7 +31,6 @@ import sos.settings.SOSProfileSettings;
 import sos.xml.SOSXMLXPath;
 
 /** @author uwe risse */
-
 public class JobSchedulerCheckUpdates extends JobSchedulerJob {
 
     private static final Logger LOGGER = Logger.getLogger(JobSchedulerCheckUpdates.class);
@@ -117,8 +115,9 @@ public class JobSchedulerCheckUpdates extends JobSchedulerJob {
     @Override
     public boolean spooler_init() {
         try {
-            if (!super.spooler_init())
+            if (!super.spooler_init()) {
                 return false;
+            }
             try {
                 if (spooler_task != null) {
                     if (spooler_task.params().var("webserviceUrl") != null && !spooler_task.params().var("webserviceUrl").isEmpty()) {
@@ -230,7 +229,7 @@ public class JobSchedulerCheckUpdates extends JobSchedulerJob {
             spooler_log_info("OS_INSTALL: " + schedulerUpdateAnswer.os_install);
             spooler_log_info("new_release: " + schedulerUpdateAnswer.new_release);
             spooler_log_info("old_release: " + schedulerUpdateAnswer.release);
-            if (schedulerUpdateAnswer.update_needed.equals("1")) {
+            if ("1".equals(schedulerUpdateAnswer.update_needed)) {
                 spooler_log_info_and_state("You need an update");
                 if ("1".equals(schedulerUpdateAnswer.automatic_download) || "true".equalsIgnoreCase(schedulerUpdateAnswer.automatic_download)) {
                     // Avoid double downloads
@@ -262,7 +261,6 @@ public class JobSchedulerCheckUpdates extends JobSchedulerJob {
     private void downloadFile() throws Exception {
         boolean isLoggedIn = false;
         SOSFTP ftpClient = null;
-
         if (ftp_port == -1) {
             ftpClient = new SOSFTP(host);
         } else {
@@ -344,7 +342,6 @@ public class JobSchedulerCheckUpdates extends JobSchedulerJob {
     }
 
     private void sendEmail() {
-        // Dem Admin eine email schicken, dass ein neues Release vorliegt
         String emailAddress = "";
         try {
             if (spooler != null) {
@@ -438,7 +435,7 @@ public class JobSchedulerCheckUpdates extends JobSchedulerJob {
             post.setRequestEntity(new InputStreamRequestEntity(new ByteArrayInputStream(contentType.getBytes())));
             post.setRequestHeader("Content-type", "xml");
             HttpClient httpClient = new HttpClient();
-            if (!http_proxy.equals("")) {
+            if (!"".equals(http_proxy)) {
                 httpClient.getHostConfiguration().setProxy(http_proxy, http_proxy_port);
             }
             httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(timeout);
@@ -475,8 +472,9 @@ public class JobSchedulerCheckUpdates extends JobSchedulerJob {
         try {
             byte buffer[] = new byte[1000];
             int numOfBytes = 0;
-            while ((numOfBytes = responseStream.read(buffer)) != -1)
+            while ((numOfBytes = responseStream.read(buffer)) != -1) {
                 outputStream.write(buffer, 0, numOfBytes);
+            }
             spooler_log_info(outputStream.toString());
             schedulerUpdateAnswer = new SchedulerUpdateAnswer(outputStream.toString());
         } catch (Exception e) {
@@ -493,10 +491,9 @@ public class JobSchedulerCheckUpdates extends JobSchedulerJob {
     }
 
     public static void main(final String[] args) throws Exception {
-        // Diese Testroutine erzeugt einen Request und schreibt ihn nach Stdout
         JobSchedulerCheckUpdates x = new JobSchedulerCheckUpdates();
         x.init_test();
-        if (x.schedulerUpdateAnswer.update_needed.equals("1")) {
+        if ("1".equals(x.schedulerUpdateAnswer.update_needed)) {
             LOGGER.info("Neue Version da");
         } else {
             LOGGER.info("Version ist aktuell");

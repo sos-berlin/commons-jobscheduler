@@ -16,96 +16,46 @@ import com.sos.JSHelper.Basics.JSJobUtilitiesClass;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.scheduler.messages.JSMessages;
 
-/** \class JobSchedulerPLSQLJob - Workerclass for "Launch Database Statement"
- *
- * \brief AdapterClass of JobSchedulerPLSQLJob for the SOSJobScheduler
- *
- * This Class JobSchedulerPLSQLJob is the worker-class.
- *
- * see: http://asktom.oracle.com/pls/asktom/f?p=100:11:0::::P11_QUESTION_ID:
- * 45027262935845
- *
- * see also:
- * http://berxblog.blogspot.de/2009/01/pipelined-function-vs-dbmsoutput.html
- *
- *
- * see \see
- * R:\backup\sos\java\development\com.sos.scheduler\src\sos\scheduler\jobdoc
- * \JobSchedulerPLSQLJob.xml for (more) details.
- *
- * \verbatim ; mechanicaly created by
- * C:\Users\KB\eclipse\xsl\JSJobDoc2JSWorkerClass.xsl from
- * http://www.sos-berlin.com at 20120905153544 \endverbatim */
+/** @author KB */
 public class JobSchedulerPLSQLJob extends JSJobUtilitiesClass<JobSchedulerPLSQLJobOptions> {
 
     protected static final String conSettingDBMS_OUTPUT = "dbmsOutput";
-    private final String conClassName = "JobSchedulerPLSQLJob";						//$NON-NLS-1$
-    private static Logger logger = Logger.getLogger(JobSchedulerPLSQLJob.class);
-
-    // protected JobSchedulerPLSQLJobOptions objOptions = null;
-    // private final JSJobUtilities objJSJobUtilities = this;
-
+    private static final Logger LOGGER = Logger.getLogger(JobSchedulerPLSQLJob.class);
     private CallableStatement cs = null;
     private Connection objConnection = null;
     private DbmsOutput dbmsOutput = null;
     private String strOutput = "";
     private String strSqlError = "";
 
-    /** \brief JobSchedulerPLSQLJob
-     *
-     * \details */
     public JobSchedulerPLSQLJob() {
         super(new JobSchedulerPLSQLJobOptions());
     }
 
-    /** \brief Execute - Start the Execution of JobSchedulerPLSQLJob
-     *
-     * \details
-     *
-     * For more details see
-     *
-     * \see JobSchedulerAdapterClass \see JobSchedulerPLSQLJobMain
-     *
-     * \return JobSchedulerPLSQLJob
-     *
-     * @return */
     public JobSchedulerPLSQLJob Execute() throws Exception {
-        final String conMethodName = conClassName + "::Execute"; //$NON-NLS-1$
-
-        JSJ_I_110.toLog(conMethodName);
-
+        final String methodName = "JobSchedulerPLSQLJob::Execute";
+        JSJ_I_110.toLog(methodName);
         objJSJobUtilities.setJSParam(conSettingSQL_ERROR, "");
-
         try {
             Options().CheckMandatory();
-            logger.debug(Options().dirtyString());
-
+            LOGGER.debug(Options().dirtyString());
             DriverManager.registerDriver(new oracle.jdbc.OracleDriver());
             objConnection = DriverManager.getConnection(objOptions.db_url.Value(), objOptions.db_user.Value(), objOptions.db_password.Value());
-
-            // pl/sql is expecting \n as newline.
-            // String plsql = objOptions.command.Value().replace("\r\n", "\n");
             String plsql = objOptions.command.unescapeXML().replace("\r\n", "\n");
             plsql = objJSJobUtilities.replaceSchedulerVars(false, plsql);
-
             objOptions.replaceVars(plsql);
-
             dbmsOutput = new DbmsOutput(objConnection);
-            // TODO Option Buffersize
             dbmsOutput.enable(1000000);
-
             cs = objConnection.prepareCall(plsql);
             cs.execute();
-
         } catch (SQLException e) {
-            logger.error(JSMessages.JSJ_F_107.get(conMethodName), e);
-            String strT = String.format("SQL Exception raised. Msg='%1$s', Status='%2$s'", e.getLocalizedMessage(), e.getSQLState());
-            logger.error(strT);
+            LOGGER.error(JSMessages.JSJ_F_107.get(methodName), e);
+            String strT = String.format("SQL Exception raised. Msg='%1$s', Status='%2$s'", e.getMessage(), e.getSQLState());
+            LOGGER.error(strT);
             strSqlError = strT;
             objJSJobUtilities.setJSParam(conSettingSQL_ERROR, strT);
             throw new JobSchedulerException(strT, e);
         } catch (Exception e) {
-            throw new JobSchedulerException(JSMessages.JSJ_F_107.get(conMethodName), e);
+            throw new JobSchedulerException(JSMessages.JSJ_F_107.get(methodName), e);
         } finally {
             objJSJobUtilities.setJSParam(conSettingDBMS_OUTPUT, "");
             objJSJobUtilities.setJSParam(conSettingSTD_OUT_OUTPUT, "");
@@ -113,30 +63,24 @@ public class JobSchedulerPLSQLJob extends JSJobUtilitiesClass<JobSchedulerPLSQLJ
             if (strOutput != null) {
                 objJSJobUtilities.setJSParam(conSettingDBMS_OUTPUT, strOutput);
                 objJSJobUtilities.setJSParam(conSettingSTD_OUT_OUTPUT, strOutput);
-
                 int intRegExpFlags = Pattern.CASE_INSENSITIVE + Pattern.MULTILINE + Pattern.DOTALL;
                 String strA[] = strOutput.split("\n");
-
                 boolean flgAVariableFound = false;
                 String strRegExp = objOptions.VariableParserRegExpr.Value();
-                if (strRegExp.length() >= 0) {
-                    // TODO check the number of groups. must be >= 2
+                if (!strRegExp.isEmpty()) {
                     Pattern objRegExprPattern = Pattern.compile(strRegExp, intRegExpFlags);
                     for (String string : strA) {
                         Matcher objMatch = objRegExprPattern.matcher(string);
-                        if (objMatch.matches() == true) {
+                        if (objMatch.matches()) {
                             objJSJobUtilities.setJSParam(objMatch.group(1), objMatch.group(2).trim());
                             flgAVariableFound = true;
                         }
                     }
                 }
-
                 dbmsOutput.close();
-
-                if (flgAVariableFound == false) {
-                    logger.info(String.format("no JS-variable definitions found using reg-exp '%1$s'.", strRegExp));
+                if (!flgAVariableFound) {
+                    LOGGER.info(String.format("no JS-variable definitions found using reg-exp '%1$s'.", strRegExp));
                 }
-
                 ResultSetMetaData csmd = cs.getMetaData();
                 if (csmd != null) {
                     int nCols;
@@ -144,8 +88,9 @@ public class JobSchedulerPLSQLJob extends JSJobUtilitiesClass<JobSchedulerPLSQLJ
                     for (int i = 1; i <= nCols; i++) {
                         System.out.print(csmd.getColumnName(i));
                         int colSize = csmd.getColumnDisplaySize(i);
-                        for (int k = 0; k < colSize - csmd.getColumnName(i).length(); k++)
+                        for (int k = 0; k < colSize - csmd.getColumnName(i).length(); k++) {
                             System.out.print(" ");
+                        }
                     }
                     System.out.println("");
                 }
@@ -159,19 +104,17 @@ public class JobSchedulerPLSQLJob extends JSJobUtilitiesClass<JobSchedulerPLSQLJ
                 objConnection = null;
             }
         }
-
-        logger.debug(JSMessages.JSJ_I_111.get(conMethodName));
+        LOGGER.debug(JSMessages.JSJ_I_111.get(methodName));
         return this;
     }
 
     public void init() {
-        @SuppressWarnings("unused")
-        final String conMethodName = conClassName + "::init"; //$NON-NLS-1$
         doInitialize();
     }
 
     private void doInitialize() {
-    } // doInitialize
+        // doInitialize
+    } 
 
     public String getSqlError() {
         return strSqlError;
@@ -180,4 +123,5 @@ public class JobSchedulerPLSQLJob extends JSJobUtilitiesClass<JobSchedulerPLSQLJ
     public String getOutput() {
         return strOutput;
     }
-} // class JobSchedulerPLSQLJob
+
+}

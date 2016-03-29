@@ -47,6 +47,18 @@ import sos.xml.SOSXMLXPath;
 /** @author Andreas Liebert */
 public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
 
+    protected Pattern hotFolderRegExPattern;
+    protected Pattern noSchedulerFileRegExPattern;
+    private static final String HOT_FOLDER_REG_EX = "(?:(.*),)?(.*)\\.(.*)\\.xml$";
+    private static final String NO_SCHEDULER_FILE_REG_EX = "^.*(?<!\\.(job|order|lock|job_chain|process_class|params|schedule)\\.xml)$";
+    private boolean startscript = true;
+    private File liveFolder;
+    private File remoteFolder;
+    private boolean isDatabaseInterfaceSupported = false;
+    private LinkedHashSet listOfElements = null;
+    private DocumentBuilderFactory docFactory;
+    private DocumentBuilder docBuilder;
+    private HashMap dbCache;
     public static final int ACTION_SUBMIT = 1;
     public static final int ACTION_SUBMIT_AND_START = 2;
     public static final int ACTION_TRY_OUT = 3;
@@ -55,19 +67,7 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
     public static final int ACTION_REMOVE_DIR = 6;
     public static final int ACTION_MOVE = 7;
     public static final int ACTION_MOVE_DIR = 8;
-    private boolean startscript = true;
-    private final static String HOT_FOLDER_REG_EX = "(?:(.*),)?(.*)\\.(.*)\\.xml$";
-    protected Pattern hotFolderRegExPattern;
-    private final static String NO_SCHEDULER_FILE_REG_EX = "^.*(?<!\\.(job|order|lock|job_chain|process_class|params|schedule)\\.xml)$";
-    protected Pattern noSchedulerFileRegExPattern;
     Variable_set orderParams = null;
-    private File liveFolder;
-    private File remoteFolder;
-    private boolean isDatabaseInterfaceSupported = false;
-    private LinkedHashSet listOfElements = null;
-    private DocumentBuilderFactory docFactory;
-    private DocumentBuilder docBuilder;
-    private HashMap dbCache;
 
     public static final int getAction(String action) throws Exception {
         if ("submit".equalsIgnoreCase(action)) {
@@ -150,19 +150,16 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
         return type;
     }
 
-    /** spooler_init() is called for startscripts on Job Scheduler start-up */
     public boolean spooler_init() {
         boolean rc = super.spooler_init();
         hotFolderRegExPattern = Pattern.compile(HOT_FOLDER_REG_EX);
         noSchedulerFileRegExPattern = Pattern.compile(NO_SCHEDULER_FILE_REG_EX);
         try {
-            // to check if the database interface is available
             String available = this.getConnection().getSingleValue("SELECT COUNT(*) FROM " + JobSchedulerManagedObject.getTableLiveObjects() + " WHERE 1=0");
             if (available != null && "0".equals(available)) {
                 isDatabaseInterfaceSupported = true;
             }
         } catch (Exception e) {
-            // ignore this error
             return false;
         } finally {
             try {
@@ -244,7 +241,7 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                     + " oh.\"OPERATION\", o.\"NAME\", o.\"PATH\", o.\"TYPE\"" + " FROM " + JobSchedulerManagedObject.getTableLiveObjectHistory()
                     + " oh LEFT OUTER JOIN " + JobSchedulerManagedObject.getTableLiveObjects() + " o" + " ON oh.\"OBJECT_ID\"=o.\"PK_ID\""
                     + " WHERE oh.\"IN_SYNC\"=0";
-            if (!startscript && orderParams.value("history_id") != null && orderParams.value("history_id").length() > 0) {
+            if (!startscript && orderParams.value("history_id") != null && !orderParams.value("history_id").isEmpty()) {
                 selStr += " AND oh.\"PK_ID\"=" + orderParams.value("history_id");
             }
             spooler_log.debug3("processLive: " + selStr);
@@ -253,7 +250,7 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
             resultset = arrayList.iterator();
             while (resultset.hasNext()) {
                 rec = (HashMap) resultset.next();
-                if (rec.get("name") != null && rec.get("name").toString().length() > 0) {
+                if (rec.get("name") != null && !rec.get("name").toString().isEmpty()) {
                     if ("delete".equalsIgnoreCase(getLiveValue(rec, "operation")) || "rename".equalsIgnoreCase(getLiveValue(rec, "operation"))) {
                         File currentFile = null;
                         File newFile = null;
@@ -301,7 +298,6 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                                 }
                             }
                             if (rc && !isWindows() && !startscript) {
-                                // notify Job Scheduler
                                 spooler.execute_xml("<check_folders/>");
                             }
                         }
@@ -349,8 +345,9 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
 
     private final static String getPathWithoutSupervisor(String path) {
         int index = path.indexOf('/', 1);
-        if (index == -1)
+        if (index == -1) {
             return "/";
+        }
         String pathWithoutSup = path.substring(index);
         return pathWithoutSup;
     }
@@ -359,10 +356,10 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
         String state = "stored";
         try {
             logSubmit(submit);
-            if (submit.get("path").toString().length() > 0) {
+            if (!submit.get("path").toString().isEmpty()) {
                 submit.put("path", getPathWithoutSupervisor(submit.get("path").toString()));
             }
-            if (submit.get("old_path").toString().length() > 0) {
+            if (!submit.get("old_path").toString().isEmpty()) {
                 submit.put("old_path", getPathWithoutSupervisor(submit.get("old_path").toString()));
             }
             String host = submit.get("host").toString();
@@ -372,11 +369,11 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
             File currentFile = new File(currentRoot, submit.get("path").toString());
             getLogger().debug7("current file: " + currentFile.getAbsolutePath());
             File oldFile = currentFile;
-            if (submit.get("old_path").toString().length() > 0) {
+            if (!submit.get("old_path").toString().isEmpty()) {
                 oldFile = new File(currentRoot, submit.get("old_path").toString());
             }
             String action = submit.get("action").toString();
-            if (action == null || action.length() == 0) {
+            if (action == null || action.isEmpty()) {
                 throw new Exception("submit has no action!");
             }
             switch (getAction(action)) {
@@ -433,10 +430,8 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                     throw new Exception("Failed to create directory " + file.getParent());
                 }
             }
-            if (hash.length() > 0) {
-                if (!hash.equals(fileHash)) {
-                    getLogger().debug1("File has changed, possible conflict. Database wins.");
-                }
+            if (!hash.isEmpty() && !hash.equals(fileHash)) {
+                getLogger().debug1("File has changed, possible conflict. Database wins.");
             }
             String xml = submit.get("xml").toString();
             String path = submit.get("path").toString();
@@ -461,7 +456,7 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                 Document xmlDoc = docBuilder.parse(bis);
                 writeXMLFile(xmlDoc, resultFile);
             }
-            if (objectID != null && objectID.length() > 0) {
+            if (objectID != null && !objectID.isEmpty()) {
                 String fileHash = SOSCrypt.MD5encrypt(resultFile);
                 String sql = "UPDATE " + JobSchedulerManagedObject.tableManagedObjects + " SET \"HASH\"='" + fileHash + "', \"STATE\"=10 " + " WHERE \"ID\"="
                         + objectID;
@@ -469,7 +464,7 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                 getConnection().commit();
             }
         } catch (Exception e) {
-            throw new Exception("Error updating live file: " + e, e);
+            throw new Exception("Error updating live file: " + e.getMessage(), e);
         }
     }
 
@@ -480,13 +475,12 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
             if (file.exists()) {
                 fileHash = SOSCrypt.MD5encrypt(file);
             }
-            if (hash.length() > 0 && !hash.equals(fileHash)) {
+            if (!hash.isEmpty() && !hash.equals(fileHash)) {
                 getLogger().debug1("File has changed, possible conflict. Database wins.");
             }
             if (file.exists()) {
                 getLogger().debug("deleting file " + file.getAbsolutePath());
                 boolean rc = file.delete();
-                // check if parent directory is empty
                 if (!file.getParentFile().equals(liveFolder) && !file.getParentFile().getParentFile().equals(remoteFolder)
                         && file.getParentFile().list().length == 0) {
                     getLogger().debug("Parent directory is now empty, deleting parent directory...");
@@ -495,7 +489,6 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                 if (!rc) {
                     getLogger().warn("failed to delete file " + file.getAbsolutePath());
                 } else if (!isWindows() && !startscript) {
-                    // notify Job Scheduler
                     spooler.execute_xml("<check_folders/>");
                 }
             }
@@ -523,7 +516,6 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                 }
             }
             if (!isWindows() && !startscript && dirChanged) {
-                // notify Job Scheduler
                 spooler.execute_xml("<check_folders/>");
             }
         } catch (Exception e) {
@@ -537,14 +529,13 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
             File d = new File(dir);
             boolean dirChanged = deleteDirectory(d);
             if (!isWindows() && !startscript && dirChanged) {
-                // notify Job Scheduler
                 spooler.execute_xml("<check_folders/>");
             }
             if (!dirChanged) {
                 throw new Exception("Directory " + d.getAbsolutePath() + " could not be removed.");
             }
         } catch (Exception e) {
-            throw new Exception("Error in remove directory action: " + e);
+            throw new Exception("Error in remove directory action: " + e.getMessage(), e);
         }
     }
 
@@ -554,13 +545,11 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
             getLogger().debug1("Moving " + oldFile.getAbsolutePath() + " to " + newFile.getAbsolutePath());
             SOSFileOperations.renameFile(oldFile, newFile, getLogger());
             dirChanged = true;
-            // update state in Managed Objects:
             String sql = "UPDATE " + JobSchedulerManagedObject.tableManagedObjects + " SET \"STATE\"=10 " + " WHERE \"ID\"="
                     + submit.get("object_id").toString();
             getConnection().executeUpdate(sql);
             getConnection().commit();
             if (!isWindows() && !startscript && dirChanged) {
-                // notify Job Scheduler
                 spooler.execute_xml("<check_folders/>");
             }
         } catch (Exception e) {
@@ -573,7 +562,7 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
             SOSFileOperations.renameFile(source, target, SOSFileOperations.GRACIOUS | SOSFileOperations.CREATE_DIR | SOSFileOperations.RECURSIVE, log);
             deleteDirectory(source);
         } catch (Exception e) {
-            throw new Exception("Failed to move " + source.getAbsolutePath() + " to " + target.getAbsolutePath() + ": " + e, e);
+            throw new Exception("Failed to move " + source.getAbsolutePath() + " to " + target.getAbsolutePath() + ": " + e.getMessage(), e);
         }
     }
 
@@ -584,16 +573,16 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
             moveDir(oldFile, newFile, getLogger());
             dirChanged = true;
             String relativePath = submit.get("path").toString();
-            if (!relativePath.endsWith("/"))
+            if (!relativePath.endsWith("/")) {
                 relativePath += "/";
-            // find ids of all objects in this dir and subdirs
+            }
             String sql = "SELECT \"ITEM_ID\" FROM " + JobSchedulerManagedObject.tableManagedTree + " WHERE \"PATH\" LIKE " + "'/" + spooler.id() + relativePath
                     + "%'";
             ArrayList objectIDs = getConnection().getArrayValue(sql);
-            if (objectIDs.size() > 0) {
+            if (!objectIDs.isEmpty()) {
                 Iterator iter = objectIDs.iterator();
                 String comma = "";
-                StringBuffer objectIDList = new StringBuffer();
+                StringBuilder objectIDList = new StringBuilder();
                 while (iter.hasNext()) {
                     String objectID = (String) iter.next();
                     objectIDList.append(comma);
@@ -606,7 +595,6 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                 getConnection().commit();
             }
             if (!isWindows() && !startscript && dirChanged) {
-                // notify Job Scheduler
                 spooler.execute_xml("<check_folders/>");
             }
         } catch (Exception e) {
@@ -634,7 +622,7 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                 }
             }
         }
-        return (path.delete());
+        return path.delete();
     }
 
     private void processActionAndStart(HashMap submit, String host, String port) throws Exception {
@@ -789,7 +777,6 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
             serializer.serialize(xml);
             out.close();
             if (!isWindows() && !startscript) {
-                // notify Job Scheduler
                 spooler.execute_xml("<check_folders/>");
             }
         } catch (Exception e) {
@@ -800,7 +787,7 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
     private static boolean isWindows() {
         String OS = System.getProperty("os.name").toLowerCase();
         boolean win = false;
-        if ((OS.indexOf("windows") > -1)) {
+        if (OS.indexOf("windows") > -1) {
             win = true;
         }
         return win;
@@ -808,8 +795,9 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
 
     private static final String extractRelativePath(String path) throws Exception {
         String relativePath = "";
-        if (path.startsWith("/live/"))
+        if (path.startsWith("/live/")) {
             relativePath = path.substring(4);
+        }
         if (path.startsWith("/remote/")) {
             int index = path.indexOf('/', 8);
             relativePath = path.substring(index);
@@ -852,7 +840,7 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
             }
             sql += "AND (t.\"PATH\" LIKE '/" + spooler.id() + "/%' OR t.\"PATH\"='/" + spooler.id() + "')";
             ArrayList dbContent = getConnection().getArray(sql);
-            if (dbContent.size() == 0) {
+            if (dbContent.isEmpty()) {
                 createDBSupervisorDir();
             }
             Iterator dbIterator = dbContent.iterator();
@@ -888,7 +876,6 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
         } catch (Exception e) {
             throw new Exception("Error creating local cache of managed objects in database: " + e, e);
         }
-
         try {
             processDir(remoteFolder, "/remote");
             processDir(liveFolder, "/live");
@@ -900,26 +887,24 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
     private void processDir(File directory, String dbDir) {
         try {
             getLogger().debug7("Processing directoy " + dbDir);
-            // check if current dir is in db
             Object obj = dbCache.get(dbDir);
             if (obj == null) {
                 getLogger().info("Directory " + dbDir + " does not exist in database. Creating directory...");
                 createDBDir(dbDir);
             }
-            // iterate over files in this dir
             Vector fileList = SOSFile.getFilelist(directory.getAbsolutePath(), ".*", java.util.regex.Pattern.CASE_INSENSITIVE);
             Iterator fileIterator = fileList.iterator();
             while (fileIterator.hasNext()) {
                 File confFile = (File) fileIterator.next();
                 processFile(confFile, dbDir + "/" + confFile.getName());
             }
-            // iterate over subfolders
             Vector folderList = SOSFile.getFolderlist(directory.getAbsolutePath(), ".*", 0, false);
             Iterator folderIterator = folderList.iterator();
             while (folderIterator.hasNext()) {
                 File currentDir = (File) folderIterator.next();
-                if (!currentDir.isDirectory())
+                if (!currentDir.isDirectory()) {
                     continue;
+                }
                 processDir(currentDir, dbDir + "/" + currentDir.getName());
             }
         } catch (Exception e) {
@@ -936,7 +921,6 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
             Matcher mat = noSchedulerFileRegExPattern.matcher(confFile.getName());
             boolean schedulerFile = !mat.matches();
             if (schedulerFile || !isBinary(confFile)) {
-                // check if current dir is in db
                 Object obj = dbCache.get(dbPath);
                 if (obj == null) {
                     getLogger().info("Configuration file " + dbPath + " does not exist in database. Adding file...");
@@ -948,7 +932,7 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                     if (dbHash.equalsIgnoreCase(fileHash)) {
                         getLogger().debug9("File is unchanged: " + dbPath);
                     } else {
-                        if (dbHash.length() == 0) {
+                        if (dbHash.isEmpty()) {
                             getLogger().debug1("File has been added to folder and database. Conflict->folder wins");
                         }
                         getLogger().info("Configuration file " + dbPath + " has changed. Updating database.");
@@ -969,7 +953,7 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
             boolean result = false;
             InputStream in = new FileInputStream(file);
             int curByte = in.read();
-            while (curByte != -1 && result == false) {
+            while (curByte != -1 && !result) {
                 if (curByte == 0) {
                     result = true;
                     break;
@@ -1022,16 +1006,14 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                     + "', \"MODIFIED\"=%now, \"MODIFIED_BY\"='Managed Starter 3' WHERE \"ID\"=" + treeID;
             getConnection().execute(sql);
             getConnection().commit();
-            // log to submission table
             int nextSubmissionID = getConnectionSettings().getLockedSequence("scheduler", "counter", "scheduler_managed_submissions.id");
             sql = "INSERT INTO "
                     + JobSchedulerManagedObject.tableManagedSubmits
-                    + " (\"ID\", \"OBJECT_ID\", \"TREE_ID\", \"PATH\", \"OLD_PATH\", \"SPOOLER_ID\", \"ACTION\", \"STATE\",  \"MODIFIED\", \"MODIFIED_BY\", \"HASH\") "
-                    + "VALUES(" + nextSubmissionID + ", " + dbObject.get("id").toString() + ", " + treeID + ", '" + path + "', '" + path + "', '"
+                    + " (\"ID\", \"OBJECT_ID\", \"TREE_ID\", \"PATH\", \"OLD_PATH\", \"SPOOLER_ID\", \"ACTION\", \"STATE\",  \"MODIFIED\", \"MODIFIED_BY\", "
+                    + "\"HASH\") VALUES(" + nextSubmissionID + ", " + dbObject.get("id").toString() + ", " + treeID + ", '" + path + "', '" + path + "', '"
                     + spooler.id() + "', 'submit', 'stored', %now, 'Managed Starter 3', '" + hash + "')";
             getConnection().executeUpdate(sql);
             getConnection().commit();
-            // update cache
             dbObject.put("hash", hash);
             dbObject.put("type", type);
         } catch (Exception e) {
@@ -1075,7 +1057,7 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
     private boolean isSubstituteSchedule(File configFile) throws Exception {
         SOSXMLXPath xp = new SOSXMLXPath(configFile.getAbsolutePath());
         String orderAtt = xp.selectSingleNodeValue("/schedule/@substitute");
-        if (orderAtt != null && orderAtt.length() > 0) {
+        if (orderAtt != null && !orderAtt.isEmpty()) {
             getLogger().debug8("File " + configFile + " is substitute schedule.");
             return true;
         }
@@ -1135,21 +1117,19 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
             }
             sql = "INSERT INTO "
                     + JobSchedulerManagedObject.tableManagedTree
-                    + " (\"ID\", \"PARENT\", \"LEAF\", \"TYPE\", \"ITEM_ID\", \"NAME\", \"OWNER\", \"GROUP\", \"PERMISSION\", \"CREATED\", \"CREATED_BY\", \"MODIFIED\", \"MODIFIED_BY\", \"PATH\") "
-                    + "VALUES(" + nextID + ", " + parentID + ", 1, '" + type + "', " + nextObjectID + ", '" + name + "', " + owner + ", " + group + ", "
-                    + permission + ", %now, 'Managed Starter 3', %now, 'Managed Starter 3', '" + dbPath + "')";
+                    + " (\"ID\", \"PARENT\", \"LEAF\", \"TYPE\", \"ITEM_ID\", \"NAME\", \"OWNER\", \"GROUP\", \"PERMISSION\", \"CREATED\", \"CREATED_BY\", "
+                    + "\"MODIFIED\", \"MODIFIED_BY\", \"PATH\") VALUES(" + nextID + ", " + parentID + ", 1, '" + type + "', " + nextObjectID + ", '" + name 
+                    + "', " + owner + ", " + group + ", " + permission + ", %now, 'Managed Starter 3', %now, 'Managed Starter 3', '" + dbPath + "')";
             getConnection().execute(sql);
             getConnection().commit();
-            // log to submission table
             int nextSubmissionID = getConnectionSettings().getLockedSequence("scheduler", "counter", "scheduler_managed_submissions.id");
             sql = "INSERT INTO "
                     + JobSchedulerManagedObject.tableManagedSubmits
-                    + " (\"ID\", \"OBJECT_ID\", \"TREE_ID\", \"PATH\", \"OLD_PATH\", \"SPOOLER_ID\", \"ACTION\", \"STATE\",  \"MODIFIED\", \"MODIFIED_BY\", \"HASH\") "
-                    + "VALUES(" + nextSubmissionID + ", " + nextObjectID + ", " + nextID + ", '" + path + "', '" + path + "', '" + spooler.id()
+                    + " (\"ID\", \"OBJECT_ID\", \"TREE_ID\", \"PATH\", \"OLD_PATH\", \"SPOOLER_ID\", \"ACTION\", \"STATE\",  \"MODIFIED\", \"MODIFIED_BY\", "
+                    + "\"HASH\") VALUES(" + nextSubmissionID + ", " + nextObjectID + ", " + nextID + ", '" + path + "', '" + path + "', '" + spooler.id()
                     + "', 'submit', 'stored', %now, 'Managed Starter 3', '" + fileHash + "')";
             getConnection().executeUpdate(sql);
             getConnection().commit();
-            // update cache
             HashMap newFile = new HashMap();
             newFile.put("id", "" + nextObjectID);
             newFile.put("suspended", "0");
@@ -1177,20 +1157,17 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
             String permission = "774";
             File dirFile = new File(dir);
             name = dirFile.getName();
-
             int nextID = 0;
-            // id must be at least 50
             while (nextID < 50) {
                 nextID = getConnectionSettings().getLockedSequence("scheduler", "counter", "scheduler_managed_tree.id");
             }
             String sql = "INSERT INTO "
                     + JobSchedulerManagedObject.tableManagedTree
-                    + "(\"ID\", \"PARENT\", \"TYPE\", \"NAME\", \"OWNER\", \"GROUP\", \"PERMISSION\", \"CREATED\", \"CREATED_BY\", \"MODIFIED\", \"MODIFIED_BY\", \"PATH\") "
-                    + "VALUES (" + nextID + ", " + parentID + ", 'd', '" + name + "', " + owner + ", " + group + ", " + permission
+                    + "(\"ID\", \"PARENT\", \"TYPE\", \"NAME\", \"OWNER\", \"GROUP\", \"PERMISSION\", \"CREATED\", \"CREATED_BY\", \"MODIFIED\", \"MODIFIED_BY\", "
+                    + "\"PATH\") VALUES (" + nextID + ", " + parentID + ", 'd', '" + name + "', " + owner + ", " + group + ", " + permission
                     + ", %now, 'Managed Starter 3', %now, 'Managed Starter 3', '" + dir + "')";
             getConnection().execute(sql);
             getConnection().commit();
-            // update cache
             HashMap newDir = new HashMap();
             newDir.put("id", "");
             newDir.put("suspended", "0");
@@ -1203,7 +1180,7 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
             newDir.put("permission", permission);
             dbCache.put("/", newDir);
         } catch (Exception e) {
-            throw new Exception("Failed to create supervisor root directory: " + e, e);
+            throw new Exception("Failed to create supervisor root directory: " + e.getMessage(), e);
         }
     }
 
@@ -1238,12 +1215,11 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
             nextID = getConnectionSettings().getLockedSequence("scheduler", "counter", "scheduler_managed_tree.id");
             String sql = "INSERT INTO "
                     + JobSchedulerManagedObject.tableManagedTree
-                    + "(\"ID\", \"PARENT\", \"TYPE\", \"NAME\", \"OWNER\", \"GROUP\", \"PERMISSION\", \"CREATED\", \"CREATED_BY\", \"MODIFIED\", \"MODIFIED_BY\", \"PATH\") "
-                    + "VALUES(" + nextID + ", " + parentID + ", 'd', '" + name + "', " + owner + ", " + group + ", " + permission
+                    + "(\"ID\", \"PARENT\", \"TYPE\", \"NAME\", \"OWNER\", \"GROUP\", \"PERMISSION\", \"CREATED\", \"CREATED_BY\", \"MODIFIED\", \"MODIFIED_BY\", "
+                    + "\"PATH\") VALUES(" + nextID + ", " + parentID + ", 'd', '" + name + "', " + owner + ", " + group + ", " + permission
                     + ", %now, 'Managed Starter 3', %now, 'Managed Starter 3', '/" + spooler.id() + dir + "')";
             getConnection().execute(sql);
             getConnection().commit();
-            // update cache
             HashMap newDir = new HashMap();
             newDir.put("id", "");
             newDir.put("suspended", "0");
@@ -1268,7 +1244,7 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                 File realPath = new File(liveFolder.getParentFile(), submitPath);
                 if (!realPath.exists()) {
                     HashMap dbObject = (HashMap) dbCache.get(submitPath);
-                    if (dbObject.get("hash") != null && dbObject.get("hash").toString().length() > 0) {
+                    if (dbObject.get("hash") != null && !dbObject.get("hash").toString().isEmpty()) {
                         getLogger().debug1("File " + submitPath + " has been deleted in file system and will be deleted from database.");
                         deleteDBFile(dbObject, submitPath);
                         iter.remove();
@@ -1278,7 +1254,7 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                 }
             }
         } catch (Exception e) {
-            throw new Exception("Error processing objects in database: " + e, e);
+            throw new Exception("Error processing objects in database: " + e.getMessage(), e);
         }
     }
 
@@ -1293,7 +1269,7 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
             String action = "remove_dir";
             String sql = "DELETE FROM " + JobSchedulerManagedObject.tableManagedTree + " WHERE \"ID\"=" + treeID;
             getConnection().execute(sql);
-            if (objectID.length() > 0) {
+            if (!objectID.isEmpty()) {
                 action = "remove";
                 sql = "DELETE FROM " + JobSchedulerManagedObject.tableManagedObjects + " WHERE \"ID\"=" + objectID;
                 getConnection().execute(sql);
@@ -1328,7 +1304,8 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
         try {
             if (spooler_task.params().value("include_interface") != null
                     && ("yes".equalsIgnoreCase(spooler_task.params().value("include_interface"))
-                            || "true".equalsIgnoreCase(spooler_task.params().value("include_interface")) || "1".equals(spooler_task.params().value("include_interface")))) {
+                            || "true".equalsIgnoreCase(spooler_task.params().value("include_interface")) 
+                            || "1".equals(spooler_task.params().value("include_interface")))) {
                 includeInterface = true;
             }
             if (spooler_job.order_queue() != null) {
@@ -1338,8 +1315,9 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                 if (action == null) {
                     action = "";
                 }
-                if (orderParams.value("include_interface") != null
-                        && ("yes".equalsIgnoreCase(orderParams.value("include_interface")) || "true".equalsIgnoreCase(orderParams.value("include_interface")) || "1".equals(orderParams.value("include_interface")))) {
+                if (orderParams.value("include_interface") != null && ("yes".equalsIgnoreCase(orderParams.value("include_interface")) 
+                        || "true".equalsIgnoreCase(orderParams.value("include_interface")) 
+                        || "1".equals(orderParams.value("include_interface")))) {
                     includeInterface = true;
                 }
                 if ("read_submits".equalsIgnoreCase(action)) {
@@ -1355,7 +1333,6 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                     processDatabase();
                 }
             } else {
-                // works only for live folder
                 orderJob = false;
             }
             return orderJob;
@@ -1377,7 +1354,6 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
     }
 
     private void liveExport(HashMap rec) throws Exception {
-        // Get all dependent elements
         String object_name = getLiveValue(rec, "name");
         String object_path = getLiveValue(rec, "path");
         String object_type = getLiveValue(rec, "type");
@@ -1405,7 +1381,7 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
         String jobChainName = xpath.selectSingleNodeValue("//order/@job_chain");
         File currentRoot = liveFolder.getParentFile();
         getLogger().debug7("current root folder: " + currentRoot.getAbsolutePath());
-        if (jobChainName != null && jobChainName.length() > 0) {
+        if (jobChainName != null && !jobChainName.isEmpty()) {
             xml = xml.replaceFirst(" job_chain=\"" + jobChainName + "\"", "");
             currentFile = new File(liveFolder + "/" + object_path, jobChainName + "," + object_name + "." + object_type + ".xml");
         } else {
@@ -1487,17 +1463,15 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
         String s = "";
         while (it.hasNext()) {
             element = (JobSchedulerMetadataElement) it.next();
-            if (element.nesting != -1) {
-                if (element.parent_id.equals(parent.pkid) && livePathContains(element, parent)) {
-                    aktEle = liveAddMissingNodes(root, element);
-                    s = element.element_name;
-                    spooler_log.debug3("adding depending node:" + s + "-->" + aktEle.getName());
-                    org.jdom.Element ele = new org.jdom.Element(s);
-                    setLiveXmlAttribute(element, ele);
-                    aktEle.addContent(ele);
-                    element.nesting = -1;
-                    liveAddDependendNodes(element, root, ele);
-                }
+            if (element.nesting != -1 && element.parent_id.equals(parent.pkid) && livePathContains(element, parent)) {
+                aktEle = liveAddMissingNodes(root, element);
+                s = element.element_name;
+                spooler_log.debug3("adding depending node:" + s + "-->" + aktEle.getName());
+                org.jdom.Element ele = new org.jdom.Element(s);
+                setLiveXmlAttribute(element, ele);
+                aktEle.addContent(ele);
+                element.nesting = -1;
+                liveAddDependendNodes(element, root, ele);
             }
         }
     }
@@ -1518,7 +1492,6 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                 if (children.size() == 1) {
                     aktEle = aktEle.getChild(s);
                 } else {
-                    // Looking up the current child.
                     Iterator itChildren = children.iterator();
                     while (itChildren.hasNext()) {
                         org.jdom.Element node = (org.jdom.Element) itChildren.next();
@@ -1547,7 +1520,6 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
     }
 
     private String getLiveAttributes(JobSchedulerMetadataElement element) throws Exception {
-        // To get the table name of the element
         HashMap rec = null;
         String attr = "";
         if ("".equals(element.table_name)) {

@@ -68,7 +68,7 @@ public class ManagedConverter {
     }
 
     public static void main(String[] args) {
-        if (args.length == 0 || args[0].equals("-?") || args[0].equals("/?") || args[0].equals("-h")) {
+        if (args.length == 0 || "-?".equals(args[0]) || "/?".equals(args[0]) || "-h".equals(args[0])) {
             showUsage();
             System.exit(0);
         }
@@ -96,7 +96,7 @@ public class ManagedConverter {
             if (logLevel == 0) {
                 logLevel = SOSLogger.INFO;
             }
-            if (logFile.length() > 0) {
+            if (!logFile.isEmpty()) {
                 sosLogger = new SOSStandardLogger(logFile, logLevel);
             } else {
                 sosLogger = new SOSStandardLogger(logLevel);
@@ -193,7 +193,8 @@ public class ManagedConverter {
         String dbProperty = props.getProperty("db").replaceAll("jdbc:", "-url=jdbc:");
         dbProperty = dbProperty.substring(dbProperty.indexOf('-'));
         SOSArguments dbArguments = new SOSArguments(dbProperty);
-        SOSConnection conn = SOSConnection.createInstance(props.getProperty("db_class"), dbArguments.as_string("-class=", ""), dbArguments.as_string("-url=", ""), dbArguments.as_string("-user=", ""), dbArguments.as_string("-password=", ""), sosLogger);
+        SOSConnection conn = SOSConnection.createInstance(props.getProperty("db_class"), dbArguments.as_string("-class=", ""),
+                dbArguments.as_string("-url=", ""), dbArguments.as_string("-user=", ""), dbArguments.as_string("-password=", ""), sosLogger);
         return conn;
     }
 
@@ -219,7 +220,7 @@ public class ManagedConverter {
                     + " j.\"TASKS\", j.\"IDLE_TIMEOUT\", j.\"MIN_TASKS\", j.\"FORCE_IDLE_TIMEOUT\"," + " j.\"SUSPENDED\", j.\"JOB_TYPE\" FROM  "
                     + JobSchedulerManagedObject.getTableManagedJobs() + " j" + " WHERE \"MODEL\"=0";
             ArrayList independentJobs = oldConnection.getArray(sql);
-            if (independentJobs != null && independentJobs.size() > 0) {
+            if (independentJobs != null && !independentJobs.isEmpty()) {
                 logger.debug3("Found " + independentJobs.size() + " independent Jobs.");
                 int independParent = createDirectoryNode(parent, "Independent Jobs");
                 Iterator iter = independentJobs.iterator();
@@ -382,13 +383,14 @@ public class ManagedConverter {
             String omitChains = "";
             for (int i = 0; i < mappings.length; i++) {
                 omitChains += "'" + mappings[i].managed1Name + "'";
-                if (i + 1 < mappings.length)
+                if (i + 1 < mappings.length) {
                     omitChains += ",";
+                }
             }
             String sql = "SELECT \"ID\", \"TITLE\", \"NAME\", \"SUSPENDED\", \"SPOOLER_ID\" FROM " + JobSchedulerManagedObject.getTableManagedModels()
                     + " WHERE \"ID\">0 AND " + "\"NAME\" NOT IN (" + omitChains + ") ";
             ArrayList jobChains = oldConnection.getArray(sql);
-            if (jobChains != null && jobChains.size() > 0) {
+            if (jobChains != null && !jobChains.isEmpty()) {
                 logger.debug3("Found " + jobChains.size() + " job chains.");
                 Iterator iter = jobChains.iterator();
                 while (iter.hasNext()) {
@@ -512,7 +514,7 @@ public class ManagedConverter {
                         + map.managed1Name + "' ");
                 ArrayList orders = oldConnection.getArray(query);
                 Iterator iter = orders.iterator();
-                if (orders.size() > 0) {
+                if (!orders.isEmpty()) {
                     logger.info("converting " + map.treeTitle + "...");
                     int dir = createDirectoryNode(parent, map.treeTitle);
                     while (iter.hasNext()) {
@@ -665,14 +667,15 @@ public class ManagedConverter {
                         + " WHERE \"CONNECTION\"='" + name + "'");
                 if ("0".equalsIgnoreCase(count)) {
                     logger.debug2("Converting connection " + name);
-                    newConnection.executeUpdate("INSERT INTO "
-                            + JobSchedulerManagedObject.getTableManagedConnections()
-                            + "(\"CONNECTION\", \"TITLE\", \"DRIVER\", \"CLASS\", \"URL\", \"USERNAME\", \"PASSWORD\", \"CREATED\", \"CREATED_BY\", \"MODIFIED\", \"MODIFIED_BY\") VALUES ("
-                            + "'" + name + "'," + "'" + connection.get("title").toString() + "'," + "'" + connection.get("driver").toString() + "'," + "'"
-                            + connection.get("class").toString() + "'," + "'" + connection.get("url").toString() + "'," + "'"
-                            + connection.get("username").toString() + "'," + "'" + connection.get("password").toString() + "'," + "'"
-                            + connection.get("created").toString() + "'," + "'" + connection.get("created_by").toString() + "'," + "'"
-                            + connection.get("modified").toString() + "'," + "'" + connection.get("modified_by").toString() + "')");
+                    newConnection
+                            .executeUpdate("INSERT INTO "
+                                    + JobSchedulerManagedObject.getTableManagedConnections()
+                                    + "(\"CONNECTION\", \"TITLE\", \"DRIVER\", \"CLASS\", \"URL\", \"USERNAME\", \"PASSWORD\", \"CREATED\", \"CREATED_BY\", \"MODIFIED\", \"MODIFIED_BY\") VALUES ("
+                                    + "'" + name + "'," + "'" + connection.get("title").toString() + "'," + "'" + connection.get("driver").toString() + "',"
+                                    + "'" + connection.get("class").toString() + "'," + "'" + connection.get("url").toString() + "'," + "'"
+                                    + connection.get("username").toString() + "'," + "'" + connection.get("password").toString() + "'," + "'"
+                                    + connection.get("created").toString() + "'," + "'" + connection.get("created_by").toString() + "'," + "'"
+                                    + connection.get("modified").toString() + "'," + "'" + connection.get("modified_by").toString() + "')");
                 } else {
                     logger.debug2("Connection '" + name + "' already exists in target Database");
                 }

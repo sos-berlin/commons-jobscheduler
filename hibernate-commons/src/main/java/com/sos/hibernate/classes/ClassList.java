@@ -3,8 +3,7 @@ package com.sos.hibernate.classes;
 import java.util.ArrayList;
 import java.util.List;
 
-/** @version 16.01.14 14:18
- * @uthor stefan.schaedlich@sos-berlin.com */
+/** @author stefan schaedlich */
 public class ClassList {
 
     private final ClassLoader classLoader;
@@ -24,13 +23,15 @@ public class ClassList {
     }
 
     public void add(Class c) {
-        if (!classes.contains(c))
+        if (!classes.contains(c)) {
             classes.add(c);
+        }
     }
 
     public void merge(List<Class> classesToMerge) {
-        for (Class c : classesToMerge)
+        for (Class c : classesToMerge) {
             add(c);
+        }
     }
 
     public List<Class> getClasses() {

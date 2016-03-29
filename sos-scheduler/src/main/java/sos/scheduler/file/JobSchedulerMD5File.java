@@ -31,13 +31,14 @@ public class JobSchedulerMD5File extends JobSchedulerJob {
             getLogger().debug(VersionInfo.VERSION_STRING);
             // Job oder Order
             Variable_set params = spooler.create_variable_set();
-            if (spooler_task.params() != null)
+            if (spooler_task.params() != null) {
                 params.merge(spooler_task.params());
-            if (spooler_job.order_queue() != null && spooler_task.order().params() != null)
+            }
+            if (spooler_job.order_queue() != null && spooler_task.order().params() != null) {
                 params.merge(spooler_task.order().params());
-            // mandatory parameters
+            }
             strParamName = JOB_PARAMETER_FILE;
-            if (params.var(strParamName) != null && params.var(strParamName).length() > 0) {
+            if (params.var(strParamName) != null && !params.var(strParamName).isEmpty()) {
                 fileName = params.var(strParamName);
                 // To make orderparams available for substitution in orderparam
                 // value
@@ -58,7 +59,7 @@ public class JobSchedulerMD5File extends JobSchedulerJob {
                 getLogger().info(".. job parameter [" + strParamName + "]: " + strMD5FilenameExtension);
             }
             strParamName = JOB_PARAM_MODE;
-            if (params.var(strParamName) != null && params.var(strParamName).length() > 0) {
+            if (params.var(strParamName) != null && !params.var(strParamName).isEmpty()) {
                 mode = params.var(strParamName);
                 getLogger().info(".. job parameter [" + strParamName + "]: " + mode);
             }
@@ -83,8 +84,9 @@ public class JobSchedulerMD5File extends JobSchedulerJob {
                 if (strMD5fromFile != null) {
                     // get only 1st part in case of md5sum format
                     strMD5fromFile = strMD5fromFile.split("\\s+")[0];
-                } else
+                } else {
                     strMD5fromFile = "";
+                }
                 getLogger().debug3("md5 from " + md5File.getAbsolutePath() + ": " + strMD5fromFile);
                 if (strMD5fromFile.equalsIgnoreCase(strFileMD5)) {
                     getLogger().info("md5 checksums are equal.");
@@ -102,4 +104,5 @@ public class JobSchedulerMD5File extends JobSchedulerJob {
             return false;
         }
     }
+
 }

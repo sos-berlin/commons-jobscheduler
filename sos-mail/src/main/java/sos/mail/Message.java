@@ -1,21 +1,4 @@
-// $Id$
-
 package sos.mail;
-
-// JavaMail 1.3: http://java.sun.com/products/javamail/
-// JavaBeans Activation Framework (JAF):
-// http://java.sun.com/products/javabeans/glasgow/jaf.html
-
-// Classpath zum Übersetzen:
-// mail.jar
-
-// Classpath zum Ablauf:
-// mail.jar
-// imap.jar
-// mailapi.jar
-// pop3.jar
-// smtp.jar
-// activation.jar
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -53,9 +36,18 @@ import javax.mail.internet.MimePart;
 
 public class Message {
 
+    private MimeMessage _msg;
+    private final Properties _properties = System.getProperties();
+    private Session _session = null;
+    private byte[] _body;
+    private final List _attachments = new LinkedList();
+    private final ArrayList file_input_streams = new ArrayList();
+    private String _smtp_user_name = "";
+    private String _smtp_password = "";
+    private String _encoding;
+    private String _content_type;
+    private boolean _built = false;
     static final int current_version = 2;
-
-    // -------------------------------------------------------------------------------My_data_source
 
     abstract class My_data_source implements DataSource {
 
@@ -83,8 +75,6 @@ public class Message {
         }
     }
 
-    // -----------------------------------------------------------------------Byte_array_data_source
-
     class Byte_array_data_source extends My_data_source {
 
         final byte[] byte_array;
@@ -100,10 +90,6 @@ public class Message {
         }
     }
 
-    // -----------------------------------------------------------------------------File_data_source
-    // Möglicherweise kann FileDataSource verwendet werden.
-    // Aber schließt die Klasse die Datei? Es gibt keinen close()
-
     class File_data_source extends My_data_source {
 
         final File file;
@@ -116,280 +102,206 @@ public class Message {
         @Override
         public InputStream getInputStream() throws IOException {
             FileInputStream f = new FileInputStream(file);
-            file_input_streams.add(f); // wird von Message.close() geschlossen
+            file_input_streams.add(f);
             return f;
         }
     }
-
-    // -----------------------------------------------------------------------------My_authenticator
 
     public class My_authenticator extends Authenticator {
 
         @Override
         public PasswordAuthentication getPasswordAuthentication() {
-            // System.err.print( "getPasswordAuthentication " + _smtp_user_name
-            // + ", " + _smtp_password + "\n" );
             return new PasswordAuthentication(_smtp_user_name, _smtp_password);
         }
     }
 
-    // ---------------------------------------------------------------------------------------------
-
-    private MimeMessage _msg;
-    private final Properties _properties = System.getProperties();
-    private Session _session = null;
-    private byte[] _body;
-    private final List _attachments = new LinkedList();
-    private final ArrayList file_input_streams = new ArrayList();			// Alle
-                                                                  // offenen
-                                                                  // Attachments,
-                                                                  // werden von
-                                                                  // close()
-                                                                  // geschlossen
-    private String _smtp_user_name = "";
-    private String _smtp_password = "";
-    private String _encoding;
-    private String _content_type;
-    private boolean _built = false;
-
-    // --------------------------------------------------------------------------------------Message
-
     public Message() {
-        _msg = new MimeMessage(get_session()); // s.a. set( "rfc822_text" )
+        _msg = new MimeMessage(get_session());
     }
-
-    // ---------------------------------------------------------------------------------------------
 
     public void close() throws Exception {
         Exception exception = null;
-
         for (int i = 0; i < file_input_streams.size(); i++) {
             try {
-                // System.err.print( getClass().getName() + ".close()\n" );
                 ((FileInputStream) file_input_streams.get(i)).close();
             } catch (Exception x) {
-                if (exception == null)
+                if (exception == null) {
                     exception = x;
+                }
             }
         }
-
-        if (exception != null)
+        if (exception != null) {
             throw exception;
+        }
     }
-
-    // ------------------------------------------------------------------------------------------set
 
     public void need_version(final int version) throws Exception {
-        if (version > current_version)
+        if (version > current_version) {
             throw new Exception("Class sos.mail.Message (sos.mail.jar) is not up to date");
+        }
     }
-
-    // ----------------------------------------------------------------------------------get_session
 
     private Session get_session() {
         if (_session == null) {
             _session = Session.getInstance(_properties, new My_authenticator());
         }
-
         return _session;
     }
 
-    // ------------------------------------------------------------------------------------------set
-
     public void set(final String what, final byte[] value) throws AddressException, MessagingException, UnsupportedEncodingException {
-        if (what.equals("smtp"))
+        if ("smtp".equals(what)) {
             _properties.put("mail.smtp.host", new String(value, "iso8859-1"));
-        else
-        // if( what.equals( "smtp.user" ) ) _smtp_user_name = new String( value,
-        // "iso8859-1" );
-        // else
-        // if( what.equals( "smtp.password" ) ) _smtp_password = new String(
-        // value, "iso8859-1" );
-        // else
-        if (what.equals("from")) {
+        } else if ("from".equals(what)) {
             InternetAddress[] addr = InternetAddress.parse(new String(value, "iso8859-1"));
-            if (addr.length != 0)
+            if (addr.length != 0) {
                 _msg.setFrom(addr[0]);
-        } else if (what.equals("reply-to"))
+            }
+        } else if ("reply-to".equals(what)) {
             _msg.setReplyTo(InternetAddress.parse(new String(value, "iso8859-1")));
-        else if (what.equals("to"))
+        } else if ("to".equals(what)) {
             _msg.setRecipients(RecipientType.TO, InternetAddress.parse(new String(value, "iso8859-1")));
-        else if (what.equals("cc"))
+        } else if ("cc".equals(what)) {
             _msg.setRecipients(RecipientType.CC, InternetAddress.parse(new String(value, "iso8859-1")));
-        else if (what.equals("bcc"))
+        } else if ("bcc".equals(what)) {
             _msg.setRecipients(RecipientType.BCC, InternetAddress.parse(new String(value, "iso8859-1")));
-        else if (what.equals("subject"))
+        } else if ("subject".equals(what)) {
             _msg.setSubject(new String(value, "iso8859-1"));
-        else if (what.equals("body")) {
-            // _body = new MimeBodyPart();
-            // _body.setText( new String(value,"iso8859-1") );
+        } else if ("body".equals(what)) {
             _body = value;
-        } else if (what.equals("content_type"))
+        } else if ("content_type".equals(what)) {
             _content_type = new String(value, "iso8859-1");
-        else if (what.equals("encoding"))
+        } else if ("encoding".equals(what)) {
             _encoding = new String(value, "iso8859-1");
-        else if (what.equals("send_rfc822")) {
+        } else if ("send_rfc822".equals(what)) {
             _msg = new MimeMessage(get_session(), new ByteArrayInputStream(value));
             send2();
-        } else if (what.equals("debug"))
+        } else if ("debug".equals(what)) {
             get_session().setDebug(new String(value, "iso8859-1").equals("1"));
-        else
+        } else {
             throw new RuntimeException("sos.mail.Message.set: what");
+        }
     }
-
-    // ---------------------------------------------------------------------------------set_property
 
     public void set_property(final String name, final String value) {
-        if (name.equals("mail.smtp.user"))
-            _smtp_user_name = value; // Keine Java-Property, Jira JS-136
-        else if (name.equals("mail.smtp.password"))
-            _smtp_password = value; // Keine Java-Property, Jira JS-136
-        else
+        if ("mail.smtp.user".equals(name)) {
+            _smtp_user_name = value;
+        } else if ("mail.smtp.password".equals(name)) {
+            _smtp_password = value;
+        } else {
             _properties.put(name, value);
+        }
     }
 
-    // ------------------------------------------------------------------------string_from_addresses
-
     private String string_from_addresses(final Address[] addresses) {
-        if (addresses == null)
+        if (addresses == null) {
             return "";
-
+        }
         String result = "";
-
         for (Address addresse : addresses) {
-            if (!result.equals(""))
+            if (!"".equals(result)) {
                 result = new String(result + ", ");
+            }
             result = new String(result + addresse);
         }
-
         return result;
     }
 
-    // ------------------------------------------------------------------------------------------get
-
     public String get(final String what) throws Exception {
-        if (what.equals("smtp"))
+        if ("smtp".equals(what)) {
             return (String) _properties.get("mail.smtp.host");
-        else if (what.equals("from"))
+        } else if ("from".equals(what)) {
             return string_from_addresses(_msg.getFrom());
-        else if (what.equals("reply-to"))
+        } else if ("reply-to".equals(what)) {
             return string_from_addresses(_msg.getReplyTo());
-        else if (what.equals("to"))
+        } else if ("to".equals(what)) {
             return string_from_addresses(_msg.getRecipients(RecipientType.TO));
-        else if (what.equals("cc"))
+        } else if ("cc".equals(what)) {
             return string_from_addresses(_msg.getRecipients(RecipientType.CC));
-        else if (what.equals("bcc"))
+        } else if ("bcc".equals(what)) {
             return string_from_addresses(_msg.getRecipients(RecipientType.BCC));
-        else if (what.equals("subject"))
+        } else if ("subject".equals(what)) {
             return _msg.getSubject();
-        else if (what.equals("body"))
+        } else if ("body".equals(what)) {
             return _body == null ? "" : new String(_body, "iso8859-1");
-        else if (what.equals("rfc822_text")) {
+        } else if ("rfc822_text".equals(what)) {
             build();
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             _msg.writeTo(os);
             return os.toString();
-        } else
+        } else {
             throw new RuntimeException("sos.mail.Message.get: what=\"" + what + "\" ist unbekannt");
+        }
     }
-
-    // -----------------------------------------------------------------------------add_header_field
 
     public void add_header_field(final String name, final String value) throws MessagingException {
         _msg.setHeader(name, value);
     }
 
-    // -------------------------------------------------------------------------------------add_file
-
     public void add_file(final String real_filename, String new_filename, String content_type, final String encoding) throws Exception {
-        if (new_filename == null || new_filename.length() == 0)
+        if (new_filename == null || new_filename.isEmpty()) {
             new_filename = real_filename;
-        if (content_type == null || content_type.length() == 0)
+        }
+        if (content_type == null || content_type.isEmpty()) {
             content_type = FileTypeMap.getDefaultFileTypeMap().getContentType(new_filename);
-
+        }
         MimeBodyPart attachment = new MimeBodyPart();
-
         DataSource data_source = new File_data_source(new File(real_filename), new File(new_filename), content_type);
         DataHandler data_handler = new DataHandler(data_source);
-
         attachment.setDataHandler(data_handler);
         attachment.setFileName(data_handler.getName());
-
         _attachments.add(attachment);
     }
-
-    // -------------------------------------------------------------------------------add_attachment
 
     public void add_attachment(final byte[] data, final String filename, String content_type, final String encoding) throws MessagingException {
-        if (content_type.length() == 0)
+        if (content_type.isEmpty()) {
             content_type = FileTypeMap.getDefaultFileTypeMap().getContentType(filename);
-
+        }
         MimeBodyPart attachment = new MimeBodyPart();
-
         DataSource data_source = new Byte_array_data_source(data, new File(filename), content_type);
         DataHandler data_handler = new DataHandler(data_source);
-
         attachment.setDataHandler(data_handler);
         attachment.setFileName(data_handler.getName());
-
         _attachments.add(attachment);
     }
-
-    // -----------------------------------------------------------------------------------------send
 
     public void send() throws Exception {
         build();
         send2();
     }
 
-    // ----------------------------------------------------------------------------------------build
-
     public void build() throws Exception {
-        if (_built)
+        if (_built) {
             return;
-
-        _msg.setSentDate(new Date()); // Damit rfc822_text das Datum liefert.
-                                      // Jira JS-81
-
-        if (_content_type == null || _content_type.equals(""))
+        }
+        _msg.setSentDate(new Date());
+        if (_content_type == null || "".equals(_content_type)) {
             _content_type = "text/plain";
-
-        if (_attachments.size() == 0) {
+        }
+        if (_attachments.isEmpty()) {
             set_body_in(_msg);
         } else {
             MimeMultipart multipart = new MimeMultipart();
-
             MimeBodyPart b = new MimeBodyPart();
             set_body_in(b);
             multipart.addBodyPart(b);
-
             ListIterator i = _attachments.listIterator();
-            while (i.hasNext())
+            while (i.hasNext()) {
                 multipart.addBodyPart((BodyPart) i.next());
-
+            }
             _msg.setContent(multipart);
         }
-
         _built = true;
     }
-
-    // ----------------------------------------------------------------------------------set_body_in
 
     private void set_body_in(final MimePart body_part) throws Exception {
         body_part.setContent(new String(_body, "iso8859-1"), _content_type);
     }
 
-    // ----------------------------------------------------------------------------------------send2
-
     protected void send2() throws MessagingException, NoSuchProviderException {
-        if (_smtp_user_name.length() > 0)
+        if (!_smtp_user_name.isEmpty()) {
             _properties.put("mail.smtp.auth", "true");
-
+        }
         Transport.send(_msg);
     }
 
-    // ---------------------------------------------------------------------------------------------
-    /*
-     * static void main( String[] args ) { new Message(); }
-     */
 }

@@ -44,33 +44,27 @@ public class SOSPrinter {
     public SOSPrinter(Shell shell_) {
         this.shell = shell_;
         Display display = shell.getDisplay();
-
         font = new Font(display, "Courier", 10, SWT.NORMAL);
         foregroundColor = display.getSystemColor(SWT.COLOR_BLACK);
         backgroundColor = display.getSystemColor(SWT.COLOR_WHITE);
-
     }
 
     public void print() throws IOException {
         PrintDialog printDialog = new PrintDialog(this.getShell(), SWT.NULL);
-
         PrinterData data = new PrinterData();
         if (data != null) {
             data.orientation = orientation;
             printDialog.setPrinterData(data);
         }
-
         printDialog.setText("Print");
         data = printDialog.open();
-
-        if (data == null)
+        if (data == null) {
             return;
+        }
         if (data.printToFile) {
             data.fileName = "print.out";
         }
-
         printer = new Printer(data);
-
         Thread printingThread = new Thread("Printing") {
 
             public void run() {
@@ -83,36 +77,21 @@ public class SOSPrinter {
     }
 
     private void print(Printer printer) {
-        if (printer.startJob("Text")) {   // the string is the job name - shows up
-                                        // in the printer's job list
+        if (printer.startJob("Text")) {
             Rectangle clientArea = printer.getClientArea();
             Rectangle trim = printer.computeTrim(0, 0, 0, 0);
             Point dpi = printer.getDPI();
-            leftMargin = dpi.x + trim.x; // one inch from left side of paper
-            rightMargin = clientArea.width - dpi.x + trim.x + trim.width; // one
-                                                                          // inch
-                                                                          // from
-                                                                          // right
-                                                                          // side
-                                                                          // of
-                                                                          // paper
-            topMargin = dpi.y + trim.y; // one inch from top edge of paper
-            bottomMargin = clientArea.height - dpi.y + trim.y + trim.height; // one
-                                                                             // inch
-                                                                             // from
-                                                                             // bottom
-                                                                             // edge
-                                                                             // of
-                                                                             // paper
-
-            int tabSize = 4; // is tab width a user setting in your UI?
-            StringBuffer tabBuffer = new StringBuffer(tabSize);
-            for (int i = 0; i < tabSize; i++)
-                tabBuffer.append(' ');
-            String tabs = tabBuffer.toString();
-
+            leftMargin = dpi.x + trim.x;
+            rightMargin = clientArea.width - dpi.x + trim.x + trim.width;
+            topMargin = dpi.y + trim.y;
+            bottomMargin = clientArea.height - dpi.y + trim.y + trim.height;
+            int tabSize = 4;
+            StringBuilder tabBuilder = new StringBuilder(tabSize);
+            for (int i = 0; i < tabSize; i++) {
+                tabBuilder.append(' ');
+            }
+            String tabs = tabBuilder.toString();
             gc = new GC(printer);
-
             FontData fontData = font.getFontData()[0];
             printerFont = new Font(printer, fontData.getName(), fontData.getHeight(), fontData.getStyle());
             gc.setFont(printerFont);
@@ -124,10 +103,8 @@ public class SOSPrinter {
             rgb = backgroundColor.getRGB();
             printerBackgroundColor = new Color(printer, rgb);
             gc.setBackground(printerBackgroundColor);
-
             printText();
             printer.endJob();
-
             printerFont.dispose();
             printerForegroundColor.dispose();
             printerBackgroundColor.dispose();
@@ -148,7 +125,7 @@ public class SOSPrinter {
             if (c != 0) {
                 if (c == 0x0a || c == 0x0d) {
                     if (c == 0x0d && index < end && textToPrint.charAt(index) == 0x0a) {
-                        index++; // if this is cr-lf, skip the lf
+                        index++;
                     }
                     printWordBuffer();
                     newline();
@@ -175,7 +152,6 @@ public class SOSPrinter {
             String word = wordBuffer.toString();
             int wordWidth = gc.stringExtent(word).x;
             if (x + wordWidth > rightMargin) {
-                /* word doesn't fit on current line, so wrap */
                 newline();
             }
             gc.drawString(word, x, y, false);

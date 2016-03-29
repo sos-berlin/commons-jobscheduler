@@ -143,8 +143,9 @@ public class XmlRegionAnalyzerTests {
         Assert.assertEquals(regions.size(), 11);
         int exceptionCpt = 0;
         for (XmlRegion xr : regions) {
-            if (xr.getXmlRegionType() != XmlRegionType.MARKUP)
+            if (xr.getXmlRegionType() != XmlRegionType.MARKUP) {
                 exceptionCpt++;
+            }
         }
         Assert.assertEquals(exceptionCpt, 2);
     }

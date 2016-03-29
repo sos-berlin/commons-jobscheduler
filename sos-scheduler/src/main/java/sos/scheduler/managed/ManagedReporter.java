@@ -1,6 +1,3 @@
-/*
- * ManagedReporter.java Created on 26.10.2005
- */
 package sos.scheduler.managed;
 
 import java.io.BufferedReader;
@@ -23,68 +20,28 @@ import sos.spooler.Variable_set;
 import sos.util.SOSDate;
 import sos.util.SOSLogger;
 
-/** Helper class for jobs which send out reports
- *
- * @author Andreas Liebert */
+/** @author Andreas Liebert */
 public class ManagedReporter {
 
-    // Job settings, used by the reporter
-    private SOSSettings jobSettings;
-
-    // mail settings from the database
-    private SOSSettings sosMailSettings;
-
     protected String tableMailSettings = "SETTINGS";
-
-    /** application name for mail settings */
     protected String applicationMail = "email";
-
-    /** section name for mail settings */
     protected String sectionMail = "mail_server";
-
-    // Logger object of the job
+    private SOSSettings jobSettings;
+    private SOSSettings sosMailSettings;
     private SOSLogger logger;
-
-    // Mail Object for sending out the report
     private SOSMail mail;
-
-    // Task object of the calling job
     private Task spooler_task;
-
-    // calling job
     private JobSchedulerManagedJob job;
-
-    // is the job running as an order job?
     private boolean orderJob;
-
-    // Hashmap containing replacements for body, subject...
     private HashMap replacements = new HashMap();
-
-    // body template
     private String body = "";
-
-    // subject template
     private String subject = "Report [taskid]";
-
-    // Payload of the order
     private Variable_set orderPayload;
-
-    // Report file
     private File attach;
-
-    // delete attachFile?
     private boolean deleteAttach = false;
-
-    // should reports be sent even if there is no result?
     private boolean sendIfNoResult = true;
-
-    // should reports be sent if there is a result?
     private boolean sendIfResult = true;
-
-    // does the current report have a result?
     private boolean hasResult = true;
-
-    // log dir (order or job parameter)
     private String logDirectory;
 
     /** instantiates a reporter object
@@ -96,31 +53,21 @@ public class ManagedReporter {
         this.setLogger(job.getLogger());
         this.job = job;
         spooler_task = job.spooler_task;
-
-        // sosMailSettings lesen: (wenn vorhanden)
-        if (spooler_task.params().var("application_mail") != null) {
-            if (spooler_task.params().var("application_mail").length() > 0) {
-                this.setApplicationMail(spooler_task.params().var("application_mail"));
-                getLogger().debug6(".. job parameter [application_mail]: " + this.getApplicationMail());
-            }
+        if (spooler_task.params().var("application_mail") != null && !spooler_task.params().var("application_mail").isEmpty()) {
+            this.setApplicationMail(spooler_task.params().var("application_mail"));
+            getLogger().debug6(".. job parameter [application_mail]: " + this.getApplicationMail());
         }
-
-        if (spooler_task.params().var("section_mail") != null) {
-            if (spooler_task.params().var("section_mail").length() > 0) {
-                this.setSectionMail(spooler_task.params().var("section_mail"));
-                getLogger().debug6(".. job parameter [section_mail]: " + this.getSectionMail());
-            }
+        if (spooler_task.params().var("section_mail") != null && !spooler_task.params().var("section_mail").isEmpty()) {
+            this.setSectionMail(spooler_task.params().var("section_mail"));
+            getLogger().debug6(".. job parameter [section_mail]: " + this.getSectionMail());
         }
-        if (spooler_task.params().var("table_settings") != null) {
-            if (spooler_task.params().var("table_settingss").length() > 0) {
-                this.setTableMailSettings(spooler_task.params().var("table_settings"));
-                getLogger().debug6(".. job parameter [table_settings]: " + this.getTableMailSettings());
-            }
+        if (spooler_task.params().var("table_settings") != null && !spooler_task.params().var("table_settingss").isEmpty()) {
+            this.setTableMailSettings(spooler_task.params().var("table_settings"));
+            getLogger().debug6(".. job parameter [table_settings]: " + this.getTableMailSettings());
         }
-
         try {
-            sosMailSettings = new SOSConnectionSettings(job.getConnection(), this.getTableMailSettings(), this.getApplicationMail(), this.getSectionMail(), getLogger());
-
+            sosMailSettings = new SOSConnectionSettings(job.getConnection(), this.getTableMailSettings(), this.getApplicationMail(), this.getSectionMail(), 
+                    getLogger());
             getLogger().debug3("MailSettings: " + sosMailSettings.getSection().size());
         } catch (Exception e) {
             getLogger().debug3("MailSettings were not found.");
@@ -135,24 +82,23 @@ public class ManagedReporter {
             Properties smtpProp = getJobSettings().getSection("smtp");
             mailServer = spoolProp.getProperty("smtp");
             logMailFrom = spoolProp.getProperty("log_mail_from");
-
             mailUser = smtpProp.getProperty("mail.smtp.user");
-            if (mailUser.equals("")) {
+            if ("".equals(mailUser)) {
                 mailUser = spoolProp.getProperty("mail.smtp.user");
             }
             mailPassword = smtpProp.getProperty("mail.smtp.password");
-            if (mailPassword.equals("")) {
+            if ("".equals(mailPassword)) {
                 mailPassword = spoolProp.getProperty("mail.smtp.password");
             }
-
         } catch (Exception e) {
         }
         boolean hasSOSMailOrder = false;
         if (job.getConnection() != null) {
             try {
                 String result = job.getConnection().getSingleValue("SELECT COUNT(*) FROM MAILS");
-                if (result.length() > 0)
+                if (!result.isEmpty()) {
                     hasSOSMailOrder = true;
+                }
             } catch (Exception e) {
                 getLogger().debug3("Table MAILS was not found.");
             }
@@ -167,7 +113,7 @@ public class ManagedReporter {
                 mail.setPassword(mailPassword);
                 mail.setCharset("ISO-8859-1");
                 mail.setQueueDir(job.spooler_log.mail().queue_dir());
-            } else if (sosMailSettings != null && sosMailSettings.getSection() != null && sosMailSettings.getSection().size() > 0) {
+            } else if (sosMailSettings != null && sosMailSettings.getSection() != null && !sosMailSettings.getSection().isEmpty()) {
                 if (hasSOSMailOrder) {
                     getLogger().debug7("Initializing SOSMailOrder with Mail Settings");
                     mail = new SOSMailOrder(sosMailSettings, job.getConnection());
@@ -214,21 +160,18 @@ public class ManagedReporter {
      * @throws Exception */
     public File getReportFile() throws Exception {
         orderJob = !(spooler_task.job().order_queue() == null);
-
         String fileName = "report_[date]_[taskid].xml";
         orderPayload = job.getOrderPayload();
-
         try {
-
             if (getOrderPayload() != null && getOrderPayload().var("scheduler_order_report_mailto") != null
-                    && getOrderPayload().var("scheduler_order_report_mailto").length() > 0) {
+                    && !getOrderPayload().var("scheduler_order_report_mailto").isEmpty()) {
                 String[] mails = getOrderPayload().var("scheduler_order_report_mailto").split(",");
                 for (int i = 0; i < mails.length; i++) {
                     mail.addRecipient(mails[i].trim());
                 }
                 job.debugParamter(getOrderPayload(), "scheduler_order_report_mailto");
                 if (getOrderPayload() != null && getOrderPayload().var("scheduler_order_report_mailcc") != null
-                        && getOrderPayload().var("scheduler_order_report_mailcc").length() > 0) {
+                        && !getOrderPayload().var("scheduler_order_report_mailcc").isEmpty()) {
                     String[] mailscc = getOrderPayload().var("scheduler_order_report_mailcc").split(",");
                     for (int i = 0; i < mailscc.length; i++) {
                         mail.addCC(mailscc[i].trim());
@@ -236,7 +179,7 @@ public class ManagedReporter {
                     job.debugParamter(getOrderPayload(), "scheduler_order_report_mailcc");
                 }
                 if (getOrderPayload() != null && getOrderPayload().var("scheduler_order_report_mailbcc") != null
-                        && getOrderPayload().var("scheduler_order_report_mailbcc").length() > 0) {
+                        && !getOrderPayload().var("scheduler_order_report_mailbcc").isEmpty()) {
                     String[] mailsbcc = getOrderPayload().var("scheduler_order_report_mailbcc").split(",");
                     for (int i = 0; i < mailsbcc.length; i++) {
                         mail.addBCC(mailsbcc[i].trim());
@@ -246,70 +189,71 @@ public class ManagedReporter {
             } else {
                 getLogger().debug6("Using mail recipients from job.");
                 mail.addRecipient(job.spooler_log.mail().to());
-                if (job.spooler_log.mail().cc() != null && job.spooler_log.mail().cc().length() > 0) {
+                if (job.spooler_log.mail().cc() != null && !job.spooler_log.mail().cc().isEmpty()) {
                     mail.addCC(job.spooler_log.mail().cc());
                 }
-                if (job.spooler_log.mail().bcc() != null && job.spooler_log.mail().bcc().length() > 0) {
+                if (job.spooler_log.mail().bcc() != null && !job.spooler_log.mail().bcc().isEmpty()) {
                     mail.addBCC(job.spooler_log.mail().bcc());
                 }
             }
-
             if (getOrderPayload() != null && getOrderPayload().var("scheduler_order_report_subject") != null
-                    && getOrderPayload().var("scheduler_order_report_subject").length() > 0) {
+                    && !getOrderPayload().var("scheduler_order_report_subject").isEmpty()) {
                 subject = (getOrderPayload().var("scheduler_order_report_subject"));
                 job.debugParamter(getOrderPayload(), "scheduler_order_report_subject");
             }
             subject = replace(subject);
             if (getOrderPayload() != null && getOrderPayload().var("scheduler_order_report_body") != null
-                    && getOrderPayload().var("scheduler_order_report_body").length() > 0) {
+                    && !getOrderPayload().var("scheduler_order_report_body").isEmpty()) {
                 body = (getOrderPayload().var("scheduler_order_report_body"));
                 job.debugParamter(getOrderPayload(), "scheduler_order_report_body");
             }
             body = replace(body);
             logDirectory = "";
-            if (getOrderPayload() != null && getOrderPayload().var("log_directory") != null && getOrderPayload().var("log_directory").length() > 0) {
+            if (getOrderPayload() != null && getOrderPayload().var("log_directory") != null && !getOrderPayload().var("log_directory").isEmpty()) {
                 logDirectory = getOrderPayload().var("log_directory");
                 job.debugParamter(getOrderPayload(), "log_directory");
             }
-
             if (getOrderPayload() != null && getOrderPayload().var("scheduler_order_report_filename") != null
-                    && getOrderPayload().var("scheduler_order_report_filename").length() > 0) {
+                    && !getOrderPayload().var("scheduler_order_report_filename").isEmpty()) {
                 fileName = getOrderPayload().var("scheduler_order_report_filename");
                 job.debugParamter(getOrderPayload(), "scheduler_order_report_filename");
             }
-
             fileName = replace(fileName);
             getLogger().debug6("Output filename: " + fileName);
             if (getOrderPayload() != null && getOrderPayload().var("scheduler_order_report_path") != null
-                    && getOrderPayload().var("scheduler_order_report_path").length() > 0) {
+                    && !getOrderPayload().var("scheduler_order_report_path").isEmpty()) {
                 String path = getOrderPayload().var("scheduler_order_report_path");
                 job.debugParamter(getOrderPayload(), "scheduler_order_report_path");
-                if (!path.endsWith("/") && !path.endsWith("\\") && path.length() > 0)
+                if (!path.endsWith("/") && !path.endsWith("\\") && !path.isEmpty()) {
                     path = path + "/";
+                }
                 path = replace(path);
                 File reportPath = new File(path);
-                if (!reportPath.exists())
+                if (!reportPath.exists()) {
                     reportPath.mkdirs();
+                }
                 attach = new File(path + fileName);
                 deleteAttach = false;
             } else {
                 String path = System.getProperty("java.io.tmpdir");
-                if (!path.endsWith("/") && !path.endsWith("\\") && path.length() > 0)
+                if (!path.endsWith("/") && !path.endsWith("\\") && !path.isEmpty()) {
                     path = path + "/";
+                }
                 attach = new File(path + fileName);
                 deleteAttach = true;
             }
             if (getOrderPayload() != null && getOrderPayload().var("scheduler_order_report_send_if_no_result") != null
-                    && getOrderPayload().var("scheduler_order_report_send_if_no_result").length() > 0) {
-                sendIfNoResult = (getOrderPayload().var("scheduler_order_report_send_if_no_result").equals("1") || getOrderPayload().var("scheduler_order_report_send_if_no_result").equalsIgnoreCase("true"));
+                    && !getOrderPayload().var("scheduler_order_report_send_if_no_result").isEmpty()) {
+                sendIfNoResult = ("1".equals(getOrderPayload().var("scheduler_order_report_send_if_no_result")) 
+                        || "true".equalsIgnoreCase(getOrderPayload().var("scheduler_order_report_send_if_no_result")));
                 job.debugParamter(getOrderPayload(), "scheduler_order_report_send_if_no_result");
             }
             if (getOrderPayload() != null && getOrderPayload().var("scheduler_order_report_send_if_result") != null
-                    && getOrderPayload().var("scheduler_order_report_send_if_result").length() > 0) {
-                sendIfResult = (getOrderPayload().var("scheduler_order_report_send_if_result").equals("1") || getOrderPayload().var("scheduler_order_report_send_if_result").equalsIgnoreCase("true"));
+                    && !getOrderPayload().var("scheduler_order_report_send_if_result").isEmpty()) {
+                sendIfResult = (getOrderPayload().var("scheduler_order_report_send_if_result").equals("1") 
+                        || "true".equalsIgnoreCase(getOrderPayload().var("scheduler_order_report_send_if_result")));
                 job.debugParamter(getOrderPayload(), "scheduler_order_report_send_if_result");
             }
-
             return attach;
         } catch (Exception e) {
             mail.clearAttachments();
@@ -329,38 +273,36 @@ public class ManagedReporter {
                 getLogger().info("Query returned no result. No report will be sent because " + "scheduler_order_send_if_no_result=false");
                 return;
             }
-
             boolean asbody = false;
-
             if (getOrderPayload() != null && getOrderPayload().var("scheduler_order_report_asbody") != null) {
-                asbody = (getOrderPayload().var("scheduler_order_report_asbody").equals("1") || getOrderPayload().var("scheduler_order_report_asbody").equalsIgnoreCase("true"));
+                asbody = ("1".equals(getOrderPayload().var("scheduler_order_report_asbody")) 
+                        || "true".equalsIgnoreCase(getOrderPayload().var("scheduler_order_report_asbody")));
                 job.debugParamter(getOrderPayload(), "scheduler_order_report_asbody");
             }
-            // wenn mit files!=null aufgerufen wurde, wurde nicht
-            // getReportFile()
-            // aufgerufen
             if (files != null) {
                 getReportFile();
                 deleteAttach = false;
                 attach = files[0];
             }
-            if (files != null && files.length > 1)
+            if (files != null && files.length > 1) {
                 asbody = false;
+            }
             if (asbody) {
                 BufferedReader reader = new BufferedReader(new FileReader(attach));
-                StringBuffer buffer = new StringBuffer();
+                StringBuilder builder = new StringBuilder();
                 String line = reader.readLine();
                 while (line != null) {
-                    buffer.append(line);
-                    buffer.append('\n');
+                    builder.append(line);
+                    builder.append('\n');
                     line = reader.readLine();
                 }
                 reader.close();
-                body = buffer.toString();
+                body = builder.toString();
                 mail.setContentType("text/html");
             }
-            if (body.trim().startsWith("<html"))
+            if (body.trim().startsWith("<html")) {
                 mail.setContentType("text/html");
+            }
             mail.setBody(body);
             mail.setSubject(subject);
             if (files != null) {
@@ -369,13 +311,15 @@ public class ManagedReporter {
                         mail.addAttachment(files[i].getAbsolutePath());
                     }
                 }
-            } else if (!asbody)
+            } else if (!asbody) {
                 mail.addAttachment(attach.getAbsolutePath());
-            if (logDirectory.length() == 0 && job.spooler_log.level() == -9) {
+            }
+            if (logDirectory.isEmpty() && job.spooler_log.level() == -9) {
                 logDirectory = job.spooler.log_dir();
             }
-            if (logDirectory.length() > 0)
+            if (!logDirectory.isEmpty()) {
                 dumpMessage();
+            }
             getLogger().info("Sending report email to: " + mail.getRecipientsAsString() + ", subject: " + mail.getSubject());
             if (mail instanceof SOSMailOrder) {
                 SOSMailOrder mo = (SOSMailOrder) mail;
@@ -401,9 +345,6 @@ public class ManagedReporter {
         }
     }
 
-    /** Sends the report
-     * 
-     * @throws Exception */
     public void report() throws Exception {
         report(null);
     }
@@ -417,14 +358,11 @@ public class ManagedReporter {
             target = target.replaceAll("\\[datetime_german\\]", SOSDate.getCurrentTimeAsString("dd.MM.yyyy HH:mm:ss"));
             target = target.replaceAll("\\[subject\\]", this.getSubject());
             target = target.replaceAll("\\[nl\\]", "\n");
-            if (isOrderJob())
+            if (isOrderJob()) {
                 target = target.replaceAll("\\[orderid\\]", spooler_task.order().id());
+            }
             target = target.replaceAll("\\[jobname\\]", spooler_task.job().name());
             target = target.replaceAll("\\[taskid\\]", Integer.toString(spooler_task.id()));
-            /*
-             * target = target.replaceAll("\\[sql\\]",sql); target =
-             * target.replaceAll("\\[xml\\]",xml);
-             */
             Set keys = replacements.keySet();
             Iterator keysIt = keys.iterator();
             while (keysIt.hasNext()) {
@@ -432,7 +370,6 @@ public class ManagedReporter {
                 String repl = replacements.get(key).toString();
                 target = target.replaceAll(key, repl);
             }
-
         } catch (Exception e) {
             try {
                 getLogger().warn("An error occurred replacing fields in String \"" + source + "\"");
@@ -443,79 +380,58 @@ public class ManagedReporter {
         return target;
     }
 
-    /** Adds a replacement
-     * 
-     * @param regex regular expression which will be replaced
-     * @param replacement String containing the replacement text */
     public void addReplacement(String regex, String replacement) {
         replacements.put(regex, replacement);
     }
 
-    /** clears replacements */
     public void clearReplacements() {
         replacements.clear();
     }
 
-    /** @return Returns the logger. */
     public SOSLogger getLogger() {
         return logger;
     }
 
-    /** @param logger The logger to set. */
     public void setLogger(SOSLogger logger) {
         this.logger = logger;
     }
 
-    /** @return Returns the jobSettings. */
     public SOSSettings getJobSettings() {
         return jobSettings;
     }
 
-    /** @param jobSettings The jobSettings to set. */
     public void setJobSettings(SOSSettings jobSettings) {
         this.jobSettings = jobSettings;
     }
 
-    /** @return Returns the orderJob. */
     public boolean isOrderJob() {
         return orderJob;
     }
 
-    /** @return Returns the body. */
     public String getBody() {
         return body;
     }
 
-    /** Sets the body for the mail. May contain replacement variables
-     * 
-     * @param body The body to set. */
     public void setBody(String body) {
         this.body = body;
     }
 
-    /** @return Returns the subject. */
     public String getSubject() {
         return subject;
     }
 
-    /** Sets the subject for the mail. May contain replacement variables
-     * 
-     * @param subject The subject to set. */
     public void setSubject(String subject) {
         this.subject = subject;
     }
 
-    /** @return Returns the orderPayload. */
     public Variable_set getOrderPayload() {
         return orderPayload;
     }
 
-    /** @return Returns the hasResult. */
     public boolean hasResult() {
         return hasResult;
     }
 
-    /** Sets if the report has a result */
     public void setHasResult(boolean hasResult) {
         this.hasResult = hasResult;
     }
@@ -549,10 +465,8 @@ public class ManagedReporter {
         Date d = new Date();
         StringBuffer bb = new StringBuffer();
         SimpleDateFormat s = new SimpleDateFormat(queuePattern);
-
         FieldPosition fp = new FieldPosition(0);
         StringBuffer b = s.format(d, bb, fp);
-
         String dumpFileName = logDirectory + "/" + "sos." + b + ".email";
         try {
             mail.dumpMessageToFile(dumpFileName, true);
@@ -563,4 +477,5 @@ public class ManagedReporter {
             }
         }
     }
+
 }

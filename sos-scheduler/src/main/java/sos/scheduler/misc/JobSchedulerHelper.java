@@ -1,6 +1,3 @@
-/*
- * JobSchedulerHelper.java Created on 03.03.2010
- */
 package sos.scheduler.misc;
 
 import java.sql.ResultSet;
@@ -17,7 +14,6 @@ import sos.spooler.Job_chain;
 import sos.spooler.Order;
 import sos.spooler.Spooler;
 import sos.util.SOSLogger;
-import sos.util.SOSString;
 import sos.xml.SOSXMLXPath;
 
 /** This class helps to do some tasks in Job Scheduler which are inconvenient
@@ -27,9 +23,7 @@ import sos.xml.SOSXMLXPath;
 public class JobSchedulerHelper {
 
     private Spooler spooler;
-
     private SOSLogger logger;
-
     private SimpleDateFormat schedulerDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
     public JobSchedulerHelper(Spooler spo, SOSLogger log) {
@@ -51,8 +45,9 @@ public class JobSchedulerHelper {
             jobChain = spooler.job_chain(jobChainName);
         } else {
             String jobChainCompletePath = currentJob.folder_path() + "/" + jobChainName;
-            if (!spooler.job_chain_exists(jobChainCompletePath))
+            if (!spooler.job_chain_exists(jobChainCompletePath)) {
                 throw new Exception("Job Chain " + jobChainName + " does not exist");
+            }
             jobChain = spooler.job_chain(jobChainCompletePath);
         }
         return jobChain;
@@ -72,8 +67,9 @@ public class JobSchedulerHelper {
             return jobChainName;
         } else {
             String jobChainCompletePath = currentJob.folder_path() + "/" + jobChainName;
-            if (!spooler.job_chain_exists(jobChainCompletePath))
+            if (!spooler.job_chain_exists(jobChainCompletePath)) {
                 throw new Exception("Job Chain " + jobChainName + " does not exist");
+            }
             return jobChainCompletePath;
         }
     }
@@ -90,12 +86,11 @@ public class JobSchedulerHelper {
         ResultSet rs = null;
         GregorianCalendar cal;
         try {
-            // remove leading slash
-            if (jobChainName.startsWith("/"))
+            if (jobChainName.startsWith("/")) {
                 jobChainName = jobChainName.substring(1);
+            }
             String maxQuery = "MAX(s.\"ERROR\")=0";
             if (connection instanceof SOSMSSQLConnection) {
-                // might be bit field
                 maxQuery = "MAX(CAST(s.\"ERROR\" AS INT))=0";
             }
             connection.executeStatements("SELECT MAX(h.\"START_TIME\") st FROM SCHEDULER_ORDER_HISTORY h " + "WHERE  h.\"SPOOLER_ID\"='" + spooler.id()
@@ -104,25 +99,29 @@ public class JobSchedulerHelper {
                     + ")");
 
             rs = connection.getResultSet();
-            if (rs == null)
+            if (rs == null) {
                 throw new Exception("Resultset is null");
+            }
             if (rs.next()) {
                 Timestamp ts = rs.getTimestamp(1);
-                if (ts == null)
+                if (ts == null) {
                     return null;
+                }
                 long milliseconds = ts.getTime() + (ts.getNanos() / 1000000);
                 cal = new GregorianCalendar();
                 cal.setTimeInMillis(milliseconds);
-            } else
+            } else {
                 return null;
+            }
         } catch (Exception e) {
             throw new Exception("Error retrieving last start of order:" + e);
         } finally {
-            if (rs != null)
+            if (rs != null) {
                 try {
                     rs.close();
                 } catch (Exception e) {
                 }
+            }
         }
         return cal;
     }
@@ -137,7 +136,7 @@ public class JobSchedulerHelper {
         StringBuffer xmlBuf = new StringBuffer(xml);
         SOSXMLXPath xp = new SOSXMLXPath(xmlBuf);
         String startTime = xp.selectSingleNodeValue("/order/@start_time");
-        if (startTime == null || startTime.length() == 0) {
+        if (startTime == null || startTime.isEmpty()) {
             throw new Exception("No start_time attribute was found for the current order");
         }
         Date dat = schedulerDateFormat.parse(startTime);
@@ -145,4 +144,5 @@ public class JobSchedulerHelper {
         cal.setTime(dat);
         return cal;
     }
+
 }

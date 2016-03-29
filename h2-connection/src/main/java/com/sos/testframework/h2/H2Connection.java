@@ -15,24 +15,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/** A general abstract class for a H2 connection.
- *
- * @uthor Stefan Schädlich
- * @version 29.05.13 12:57 */
+/** @author Stefan Schaedlich */
 public abstract class H2Connection {
 
     private static final URL HIBERNATE_CFG_TEMPLATE = Resources.getResource("com/sos/testframework/h2/hibernate-h2.cfg.xml.template");
-
-    private final static Logger logger = LoggerFactory.getLogger(H2Connection.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(H2Connection.class);
     private final String connectionPrefix;
     private final List<File> sqlFiles;
     private final List<String> classNames;
-
     private Connection connection = null;
     private String initString = null;
     private String connectionString = null;
-
     private File temporaryWorkingDirectory = null;
     private File temporaryConfigFile = null;
 
@@ -49,7 +42,7 @@ public abstract class H2Connection {
     }
 
     private String getClassList() {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         for (String className : classNames) {
             result.append("<mapping class=\"");
             result.append(className);
@@ -61,7 +54,7 @@ public abstract class H2Connection {
 
     public String getConnectionString() {
         if (connectionString == null) {
-            StringBuffer result = new StringBuffer();
+            StringBuilder result = new StringBuilder();
             result.append(getConnectionURL());
             result.append(";");
             result.append(getInitString());
@@ -72,10 +65,11 @@ public abstract class H2Connection {
 
     private String getInitString() {
         if (initString == null) {
-            StringBuffer result = new StringBuffer();
+            StringBuilder result = new StringBuilder();
             for (File sqlFile : sqlFiles) {
-                if (result.length() > 0)
+                if (result.length() > 0) {
                     result.append("\\;");
+                }
                 result.append("runscript from '" + getFilename(sqlFile) + "'");
             }
             if (result.length() > 0)
@@ -89,13 +83,13 @@ public abstract class H2Connection {
     public Connection connect() {
         if (connection == null) {
             try {
-                logger.info("Connecting to " + getConnectionString());
+                LOGGER.info("Connecting to " + getConnectionString());
                 this.connection = DriverManager.getConnection(getConnectionString());
             } catch (SQLException e) {
                 throw new RuntimeException("Error connecting DB: " + getConnectionString(), e);
             }
         } else {
-            logger.info("Connection to [" + getConnectionURL() + "] is already set.");
+            LOGGER.info("Connection to [" + getConnectionURL() + "] is already set.");
         }
         return connection;
     }
@@ -109,15 +103,12 @@ public abstract class H2Connection {
     }
 
     public void removeTemporaryFiles() {
-
-        if (temporaryConfigFile != null)
-            if (!temporaryConfigFile.delete())
-                logger.warn("Could not delete temporary configuration file [" + temporaryConfigFile.getAbsolutePath() + "]");
-
-        if (temporaryWorkingDirectory != null)
-            if (!temporaryWorkingDirectory.delete())
-                logger.warn("Could not delete temporary configuration file folder [" + temporaryWorkingDirectory.getAbsolutePath() + "]");
-
+        if (temporaryConfigFile != null && !temporaryConfigFile.delete()) {
+            LOGGER.warn("Could not delete temporary configuration file [" + temporaryConfigFile.getAbsolutePath() + "]");
+        }
+        if (temporaryWorkingDirectory != null && !temporaryWorkingDirectory.delete()) {
+            LOGGER.warn("Could not delete temporary configuration file folder [" + temporaryWorkingDirectory.getAbsolutePath() + "]");
+        }
     }
 
     public String getFilename(File file) {
@@ -140,8 +131,9 @@ public abstract class H2Connection {
      * @return */
     public File createTemporaryEnvironment() {
         if (temporaryConfigFile == null) {
-            if (temporaryWorkingDirectory == null)
+            if (temporaryWorkingDirectory == null) {
                 temporaryWorkingDirectory = Files.createTempDir();
+            }
             temporaryConfigFile = createTemporaryFile(temporaryWorkingDirectory);
         }
         return temporaryConfigFile;
@@ -166,12 +158,12 @@ public abstract class H2Connection {
             String content = Resources.toString(HIBERNATE_CFG_TEMPLATE, Charset.defaultCharset());
             content = content.replace("${connection.url}", getConnectionString());
             content = content.replace("${connection.classes}", getClassList());
-            logger.debug(content);
+            LOGGER.debug(content);
             Files.write(content, targetFile, Charset.defaultCharset());
-            logger.info("The hibernate configuration files placed at " + targetFile.getAbsolutePath());
+            LOGGER.info("The hibernate configuration files placed at " + targetFile.getAbsolutePath());
         } catch (IOException e) {
             String msg = "Error writing file " + targetFile.getAbsolutePath();
-            logger.error(msg, e);
+            LOGGER.error(msg, e);
             throw new RuntimeException(msg, e);
         }
         return targetFile;
@@ -187,10 +179,10 @@ public abstract class H2Connection {
         try {
             String content = Resources.toString(resource, Charset.defaultCharset());
             Files.write(content, temporaryConfigFile, Charset.defaultCharset());
-            logger.info("The hibernate configuration files placed at " + temporaryConfigFile.getAbsolutePath());
+            LOGGER.info("The hibernate configuration files placed at " + temporaryConfigFile.getAbsolutePath());
         } catch (IOException e) {
             String msg = "Error writing file " + temporaryConfigFile.getAbsolutePath();
-            logger.error(msg, e);
+            LOGGER.error(msg, e);
             throw new RuntimeException(msg, e);
         }
         return temporaryConfigFile;

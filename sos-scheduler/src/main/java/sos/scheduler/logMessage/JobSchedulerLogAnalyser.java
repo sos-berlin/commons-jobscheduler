@@ -31,27 +31,14 @@ import sos.util.SOSString;
  * @author mueruevet.oeksuez@sos-berlin.com */
 public class JobSchedulerLogAnalyser extends JobSchedulerJob {
 
+    protected String monitorJob = "JobSchedulerMonitorMessageJob";
+    protected String messageType = "status";
     private static final Logger LOGGER = Logger.getLogger(JobSchedulerLogAnalyser.class);
     private static final String REGULAR_EXPRESSION = "^\\d{4}-\\d{1,2}-\\d{1,2}\\s+\\d{1,2}:\\d{1,2}:\\d{1,2}(\\.\\d{1,3})?(\\+\\d{4})?\\s+\\[%s\\] +.*";
-    /** optional name for this job, defaults to scheduler job name */
-    protected String monitorJob = "JobSchedulerMonitorMessageJob";
-    /** optional message type: currently "status" and "reset" supported */
-    protected String messageType = "status";
-    /** sos.util.SOSString Object */
     private final SOSString sosString = new SOSString();
-    /** optional nur der Job-Name soll überprüft werden */
     private String monitorJobname = "";
-    /** optional nur der Jobkette soll überprüft werden */
     private String monitorJobChainname = "";
-    /** Parameter maximum_lifetime gibt die Lebensdauer einer Messages an. Die
-     * Messages kann in
-     * 
-     * maximum_lifetime=hh24 maximum_lifetime=hh24:mi
-     * maximum_lifetime=hh24:mi:ss
-     * 
-     * angegeben werden. */
     private String maxLifeTime = null;
-    /** optional, default = false, Loggen von Fehlern und Warnungen */
     private boolean logMessages = false;
     private String logFileName = "";
     private String dbProperty = "";
@@ -168,9 +155,7 @@ public class JobSchedulerLogAnalyser extends JobSchedulerJob {
                 if (logFilenameVariable != null && !logFilenameVariable.isEmpty()) {
                     logFilename = logFilenameVariable;
                 }
-                // on previous execution of this job a different log file may
-                // have been partially checked
-                if (logFilename != null && logFilename.length() > 0 && !logFilename.equals(new File(spooler.log().filename()).getCanonicalPath())) {
+                if (logFilename != null && !logFilename.isEmpty() && !logFilename.equals(new File(spooler.log().filename()).getCanonicalPath())) {
                     prevLogFile = new File(logFilename);
                     if (!prevLogFile.exists()) {
                         spooler_log.info("log file from previous job execution not found: " + prevLogFile.getCanonicalPath());
@@ -180,7 +165,6 @@ public class JobSchedulerLogAnalyser extends JobSchedulerJob {
                         checkPrevFile.seek(logFilepointer);
                         spooler_log.debug3("starting to check previous log file [" + prevLogFile.getCanonicalPath() + "] from position: " + logFilepointer);
                     }
-                    // alte Fehlermeldung merken
                     while ((logLine = checkPrevFile.readLine()) != null) {
                         logLine = normalizeLogline(logLine);
                         if (logLine.matches(getRegularExpression("WARN"))) {
@@ -202,22 +186,21 @@ public class JobSchedulerLogAnalyser extends JobSchedulerJob {
                     logFilename = "";
                 }
             } catch (Exception e) {
-                // ignore all errors when processing previous log files
-                // (log files may have been gzipped or removed)
                 spooler_log.info("previous log file [" + (prevLogFile != null ? prevLogFile.getCanonicalPath() : "") + "] processed with errors: "
                         + e.getMessage());
                 logFilepointer = 0;
                 logFilename = "";
             } finally {
-                if (checkPrevFile != null)
+                if (checkPrevFile != null) {
                     try {
                         checkPrevFile.close();
                     } catch (Exception ex) {
                         // gracefully ignore this error
                     }
+                }
             }
             try {
-                if (sosString.parseToString(getLogFilename()).length() > 0) {
+                if (!sosString.parseToString(getLogFilename()).isEmpty()) {
                     logFile = new File(sosString.parseToString(getLogFilename()));
                 } else {
                     logFile = new File(spooler.log().filename());
@@ -240,7 +223,6 @@ public class JobSchedulerLogAnalyser extends JobSchedulerJob {
                     }
                     spooler_log.debug("..monitoring job: " + getMonitorJobname());
                 }
-
                 ArrayList<String> listOfMonitoringJobChains = new ArrayList<String>();
                 if (!sosString.parseToString(getMonitorJobChainname()).isEmpty()) {
                     String[] split = getMonitorJobChainname().split(";");
@@ -347,7 +329,7 @@ public class JobSchedulerLogAnalyser extends JobSchedulerJob {
                         }
                         if ("WARN".equalsIgnoreCase(actMessage.severity) || msgLine.matches(getRegularExpression("WARN"))) {
                             message = new SchedulerMessage(logFile, "WARN", msgLine, spooler.id(), this.getConnection(), sosLogger);
-                            if (sosString.parseToString(currOrderName).length() > 0) {
+                            if (!sosString.parseToString(currOrderName).isEmpty()) {
                                 message.order_id = currOrderName;
                             }
                             spooler_log.debug9("..new WARN= " + msgLine);
@@ -390,12 +372,13 @@ public class JobSchedulerLogAnalyser extends JobSchedulerJob {
             } catch (Exception e) {
                 throw new Exception(e);
             } finally {
-                if (checkFile != null)
+                if (checkFile != null) {
                     try {
                         checkFile.close();
                     } catch (Exception ex) {
                         // gracefully ignore this error
                     }
+                }
             }
         } catch (Exception e) {
             spooler_log.warn("getLogMessages(): failed to check messages in log file [" + spooler.log().filename() + "]: " + e.getMessage());
@@ -521,7 +504,6 @@ public class JobSchedulerLogAnalyser extends JobSchedulerJob {
     private void getParameters() throws Exception {
         Variable_set orderData = null;
         try {
-            // start processing job parameters
             if (spooler_task.params().var("job") != null && !spooler_task.params().var("job").isEmpty()) {
                 this.setMonitorJob(spooler_task.params().var("job"));
                 spooler_log.debug1(".. job parameter [job]: " + this.getMonitorJob());
@@ -566,7 +548,6 @@ public class JobSchedulerLogAnalyser extends JobSchedulerJob {
             } else {
                 this.setLogFilename("");
             }
-            // now fetch the order parameters
             if (spooler_task.job().order_queue() != null) {
                 if (order != null) {
                     orderData = order.params();
@@ -743,7 +724,6 @@ public class JobSchedulerLogAnalyser extends JobSchedulerJob {
     }
 
     private void removeJobFromMessages(final SchedulerMessage m, final GregorianCalendar gclast) throws Exception {
-        // remove old messages cause successfully process
         this.getConnection().execute("update SCHEDULER_MESSAGES set \"STATUS\" = -3 where \"LOGTIME\" <= %timestamp_iso('"
                 + SOSDate.getISODateTimeAsString(gclast) + "') and \"STATUS\">=0 and \"JOB_NAME\" <> 'nil' and \"JOB_NAME\"='" + m.getJob_name() + "'");
         Iterator msg = messages.iterator();
@@ -765,7 +745,6 @@ public class JobSchedulerLogAnalyser extends JobSchedulerJob {
     }
 
     private void removeJobChainFromMessages(final SchedulerMessage m, final GregorianCalendar gclast) throws Exception {
-        // remove old messages cause successfully process
         this.getConnection().execute("update SCHEDULER_MESSAGES set \"STATUS\" = -2 where \"LOGTIME\" <= %timestamp_iso('"
                 + SOSDate.getISODateTimeAsString(gclast) + "') and \"STATUS\">=0 and \"JOB_CHAIN\" <> 'nil' and \"JOB_CHAIN\"='" + m.getJob_chain() + "' and "
                 + "\"ORDER_ID\"='" + m.getOrder_id() + "'");
@@ -815,4 +794,5 @@ public class JobSchedulerLogAnalyser extends JobSchedulerJob {
     public void setLogLineRegularExpression(String logLineRegularExpression) {
         this.logLineRegularExpression = logLineRegularExpression;
     }
+
 }

@@ -1,7 +1,3 @@
-/*
- * Created on 13.10.2008 To change the template for this generated file go to
- * Window - Preferences - Java - Code Generation - Code and Comments
- */
 package sos.scheduler.consoleviews.events;
 
 import java.util.LinkedHashSet;
@@ -28,11 +24,11 @@ public class SOSEventCommand {
         String erg = "";
         listOfCommandElements = new LinkedHashSet();
         NodeList c = command.getChildNodes();
-
         for (int i = 0; i < c.getLength(); i++) {
             Node node = c.item(i);
-            if (node == null || node.getNodeType() != Node.ELEMENT_NODE)
+            if (node == null || node.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
+            }
             SOSEventCommandElement ece = new SOSEventCommandElement();
             ece.command = node;
             listOfCommandElements.add(ece);
@@ -41,9 +37,10 @@ public class SOSEventCommand {
     }
 
     public String getAttribute(String a) {
-        if (command.getNodeName().equals("command")) {
-            if (attr == null)
+        if ("command".equals(command.getNodeName())) {
+            if (attr == null) {
                 attr = command.getAttributes();
+            }
             return getText(attr.getNamedItem(a));
         }
         return "";
@@ -61,4 +58,5 @@ public class SOSEventCommand {
     public LinkedHashSet getListOfCommandElements() {
         return listOfCommandElements;
     }
+
 }

@@ -34,29 +34,17 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTransfer, ISOSVFSHandler, ISOSVirtualFileSystem, ISOSConnection {
 
-    private final static Logger logger = Logger.getLogger(SOSVfsTransferBaseClass.class);
-
-    /** key file: ~/.ssh/id_rsa or ~/.ssh/id_dsa (must be OpenSSH-Format) */
     protected String authenticationFilename = "";
-    private Vector<String> directoryListing = null;
-
     protected String host = EMPTY_STRING;
     protected int port = 0;
     protected String userName = EMPTY_STRING;
-
     protected String reply = "OK";
-
-    // keep Track of current directory for ftp emulation
     protected String currentDirectory = "";
-
     protected SOSConnection2OptionsAlternate connection2OptionsAlternate = null;
-
-    @SuppressWarnings("unused")
     protected ISOSAuthenticationOptions authenticationOptions = null;
+    private static final Logger LOGGER = Logger.getLogger(SOSVfsTransferBaseClass.class);
+    private Vector<String> directoryListing = null;
 
-    /** \brief SOSVfsSFtpBaseClass
-     *
-     * \details */
     public SOSVfsTransferBaseClass() {
         super();
     }
@@ -65,9 +53,6 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
         return "(" + userName + "@" + host + ":" + port + ") " + msg;
     }
 
-    /** turn passive transfer mode on.
-     *
-     * @return The reply code received from the server. */
     @Override
     public int passive() {
         return 0;
@@ -82,117 +67,54 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
             RaiseException(e, SOSVfs_E_134.params("pwd"));
             return null;
         }
-    } // private int DoPWD
+    }
 
-    /** wird überschrieben
-     *
-     *
-     * \brief getCurrentPath
-     *
-     * \details
-     *
-     * \return String
-     *
-     * @return */
     protected String getCurrentPath() {
         return null;
     }
 
     protected boolean LogReply() {
         reply = getReplyString();
-        if (reply.trim().length() > 0) {
+        if (!reply.trim().isEmpty()) {
             logDEBUG(reply);
         }
-
         return true;
-    } // private boolean LogReply
+    }
 
     @Override
     public boolean isNegativeCommandCompletion() {
-
         int x = 0;
-        // TODO separate Routine draus machen
-
-        // try {
-        // if (Client().completePendingCommand() == false) {
-        // logout();
-        // disconnect();
-        // RaiseException("File transfer failed. completePendingCommand() returns false");
-        // }
-        // }
-        // catch (Exception e) {
-        // // TODO Auto-generated catch block
-        // e.printStackTrace();
-        // }
-
-        // int x = getReplyCode();
-
         return x > 300;
-    } // private boolean isNegativeCommandCompletion
+    }
 
     @Override
     public void CompletePendingCommand() {
-        // try {
-        // if (Client().completePendingCommand() == false) {
-        // logout();
-        // disconnect();
-        // RaiseException("File transfer failed. completePendingCommand() returns false");
-        // }
-        // }
-        // catch (IOException e) {
-        // // TODO Auto-generated catch block
-        // e.printStackTrace();
-        // RaiseException("File transfer failed. completePendingCommand() raised an exception");
-        // }
-
+        //
     }
 
-    /** Indicates what to do if the server's host key changed or the server is
-     * unknown. One of yes (refuse connection), ask (ask the user whether to
-     * add/change the key) and no (always insert the new key).
-     *
-     * @param pstrStrictHostKeyCheckingValue */
     public void StrictHostKeyChecking(final String pstrStrictHostKeyCheckingValue) {
 
     }
 
     private boolean isPositiveCommandCompletion() {
         int x = 0;
-
         return x <= 300;
-    } // private boolean isPositiveCommandCompletion
-
-    public boolean isNotHiddenFile(final String fileName) {
-        if (fileName == null || fileName.equals(".") || fileName.equals("..") || fileName.endsWith("/..") || fileName.endsWith("/.")) {
-            return false; // it is a hidden-file
-        }
-        return true; // it is not a hidden-file
     }
 
-    /** return a listing of the contents of a directory in short format on the
-     * remote machine
-     * 
-     * @param pathname on remote machine
-     * @return a listing of the contents of a directory on the remote machine
-     *
-     * @exception RuntimeException
-     * @see #dir() */
+    public boolean isNotHiddenFile(final String fileName) {
+        if (fileName == null || ".".equals(fileName) || "..".equals(fileName) || fileName.endsWith("/..") || fileName.endsWith("/.")) {
+            return false;
+        }
+        return true;
+    }
+
     @Override
     public Vector<String> nList(final String pathname) {
         return getFilenames(pathname);
-    } // nList
+    }
 
-    /** return a listing of the contents of a directory in short format on the
-     * remote machine
-     * 
-     * @param pathname on remote machine
-     * @return a listing of the contents of a directory on the remote machine
-     *
-     * @exception JobSchedulerException
-     * @see #dir() */
     @Override
     public Vector<String> nList(final String pathname, final boolean flgRecurseSubFolder) {
-
         Vector<String> result = null;
         try {
             result = getFilenames(pathname, flgRecurseSubFolder);
@@ -200,17 +122,8 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
             RaiseException(e, SOSVfs_E_134.params("nList"));
         }
         return result;
-    } // nList
+    }
 
-    /** return a listing of the contents of a directory in short format on the
-     * remote machine
-     *
-     * @return a listing of the contents of a directory on the remote machine
-     *
-     * @exception Exception
-     * @see #nList(String )
-     * @see #dir()
-     * @see #dir(String ) */
     @Override
     public Vector<String> nList() {
         Vector<String> result = null;
@@ -220,22 +133,10 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
             RaiseException(e, SOSVfs_E_134.params("nList"));
         }
         return result;
-
-    } // nList
-
-    /** return a listing of the contents of a directory in short format on the
-     * remote machine
-     *
-     * @return a listing of the contents of a directory on the remote machine
-     *
-     * @exception Exception
-     * @see #nList(String )
-     * @see #dir()
-     * @see #dir(String ) */
+    }
 
     @Override
     public Vector<String> nList(final boolean recursive) {
-
         Vector<String> result = null;
         try {
             result = getFilenames(recursive);
@@ -243,17 +144,8 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
             RaiseException(e, SOSVfs_E_134.params("nList"));
         }
         return result;
-    } // nList
+    }
 
-    /** return a listing of the files in a directory in long format on the remote
-     * machine
-     * 
-     * @param pathname on remote machine
-     * @return a listing of the contents of a directory on the remote machine
-     * @exception Exception
-     * @see #nList()
-     * @see #nList(String )
-     * @see #dir() */
     public SOSFileList dir(final String pathname) {
         Vector<String> strList = getFilenames(pathname);
         String[] strT = strList.toArray(new String[strList.size()]);
@@ -261,17 +153,8 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
         return objFileList;
     }
 
-    /** return a listing of a directory in long format on the remote machine
-     *
-     * @param pathname on remote machine
-     * @return a listing of the contents of a directory on the remote machine
-     * @exception Exception
-     * @see #nList()
-     * @see #nList(String )
-     * @see #dir() */
     @Override
     public SOSFileList dir(final String pathname, final int flag) {
-
         SOSFileList fileList = new SOSFileList();
         String[] listFiles = null;
         try {
@@ -295,42 +178,18 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
         return fileList;
     }
 
-    /** Checks if file is a directory
-     *
-     * @param filename
-     * @return true, if filename is a directory */
     @Override
     public boolean isDirectory(final String filename) {
         logINFO("not implemented yet");
         return false;
     }
 
-    /** wird überschrieben
-     *
-     * \brief listNames
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param pathname
-     * @return
-     * @throws IOException */
     @Override
     public String[] listNames(final String path) throws IOException {
         logINFO("not implemented yet");
         return null;
     }
 
-    /** return a listing of the files of the current directory in long format on
-     * the remote machine
-     * 
-     * @return a listing of the contents of the current directory on the remote
-     *         machine
-     * @exception Exception
-     * @see #nList()
-     * @see #nList(String )
-     * @see #dir(String ) */
     public SOSFileList dir() {
         try {
             return dir(".");
@@ -339,20 +198,14 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
         }
     }
 
-    /** @return The entire text from the last FTP response as a String. */
     public String getResponse() {
         return this.getReplyString();
     }
 
-    /** trim the response code at the beginning
-     * 
-     * @param response
-     * @return the response string without response code
-     * @throws Exception */
-    @SuppressWarnings("unused")
     protected String trimResponseCode(final String response) throws Exception {
-        if (response.length() < 5)
+        if (response.length() < 5) {
             return response;
+        }
         return response.substring(4).trim();
     }
 
@@ -365,7 +218,6 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
             }
         } catch (Exception e) {
         }
-
     }
 
     protected void closeInput(InputStream objO) {
@@ -379,13 +231,6 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 
     }
 
-    /** Retrieves a named file from the ftp server.
-     *
-     * @param localFile The name of the local file.
-     * @param remoteFile The name of the remote file.
-     * @return The total number of bytes retrieved.
-     * @see #get(String, String )
-     * @exception Exception */
     @Override
     public long getFile(final String remoteFile, final String localFile) {
         final boolean flgAppendLocalFile = false;
@@ -393,67 +238,32 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
         try {
             lngNoOfBytesRead = this.getFile(remoteFile, localFile, flgAppendLocalFile);
         } catch (Exception e) {
-            logger.error(e.getLocalizedMessage(), e);
+            LOGGER.error(e.getLocalizedMessage(), e);
         }
         return lngNoOfBytesRead;
     }
 
-    /** Retrieves a named file from the ftp server.
-     *
-     * @param localFile The name of the local file.
-     * @param remoteFile The name of the remote file.
-     * @param append Appends the remote file to the local file.
-     * @return The total number of bytes retrieved.
-     * @see #get(String, String )
-     * @exception Exception */
-    /** Stores a file on the server using the given name.
-     * 
-     * @param localFile The name of the local file.
-     * @param remoteFile The name of the remote file.
-     * @return True if successfully completed, false if not.
-     * @exception Exception
-     * @see #putFile(String, String ) */
     @Override
     public void put(final String localFile, final String remoteFile) {
 
         this.putFile(localFile, remoteFile);
     }
 
-    /** Stores a file on the server using the given name.
-     *
-     * @param localFile The name of the local file.
-     * @param remoteFile The name of the remote file.
-     * @return file size
-     *
-     * @exception Exception
-     * @see #put(String, String ) */
     @Override
-    // ISOSVfsFileTransfer
     public long putFile(final String localFile, final String remoteFile) {
         logINFO("not implemented yet");
         return 0;
     }
 
-    /** written to store a file on the server using the given name.
-     *
-     * @param localfile The name of the local file.
-     * @param an OutputStream through which data can be
-     * @return The total number of bytes written.
-     * @exception Exception */
-    @SuppressWarnings("null")
-    @Override
     public long putFile(final String localFile, final OutputStream out) {
         if (out == null) {
             RaiseException(SOSVfs_E_147.get());
         }
-
         FileInputStream in = null;
         long bytesWrittenTotal = 0;
         try {
-            // TODO Buffersize must be an Option
             byte[] buffer = new byte[4096];
             in = new FileInputStream(new File(localFile));
-            // TODO get progress info
             int bytesWritten;
             synchronized (this) {
                 while ((bytesWritten = in.read(buffer)) != -1) {
@@ -471,99 +281,33 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
             closeObject(out);
         }
         return bytesWrittenTotal;
-    } // putFile
+    }
 
-    /** append a local file to the remote one on the server
-     *
-     * @param localFile The name of the local file.
-     * @param remoteFile The name of the remote file.
-     *
-     * @return The total number of bytes appended.
-     *
-     * @exception Exception
-     * @see #put(String, String )
-     * @see #putFile(String, String ) */
     @Override
     public long appendFile(final String localFile, final String remoteFile) {
         notImplemented();
         return -1;
-    } // appendFile
+    }
 
-    /** Using ASCII mode for file transfers
-     * 
-     * @return True if successfully completed, false if not.
-     * @throws IOException If an I/O error occurs while either sending a command
-     *             to the server or receiving a reply from the server. */
     @Override
     public void ascii() {
-        // try {
-        // boolean flgResult = Client().setFileType(FTP.ASCII_FILE_TYPE);
-        // if (flgResult == false) {
-        // throw new JobSchedulerException("setFileType not possible, due to : "
-        // + getReplyString());
-        // }
-        // }
-        // catch (IOException e) {
-        // throw new JobSchedulerException("ascii returns an exception", e);
-        // }
+        //
     }
 
-    /** Using Binary mode for file transfers
-     * 
-     * @return True if successfully completed, false if not.
-     * @throws IOException If an I/O error occurs while either sending a command
-     *             to the server or receiving a reply from the server. */
     @Override
     public void binary() {
-        // try {
-        // boolean flgResult = Client().setFileType(FTP.BINARY_FILE_TYPE);
-        // if (flgResult == false) {
-        // throw new JobSchedulerException("setFileType not possible, due to : "
-        // + getReplyString());
-        // }
         //
-        // }
-        // catch (IOException e) {
-        // throw new
-        // JobSchedulerException("setFileType to binary returns an exception",
-        // e);
-        // }
     }
 
-    /** @param directory The new working directory.
-     * @return The reply code received from the server.
-     * @throws IOException If an I/O error occurs while either sending a command
-     *             to the server or receiving a reply from the server. */
     public int cd(final String directory) throws Exception {
         changeWorkingDirectory(directory);
         return 1;
     }
 
-    /** wird überschrieben
-     *
-     * \brief fileExists
-     *
-     * \details
-     *
-     * \return boolean
-     *
-     * @param filename
-     * @return */
     protected boolean fileExists(final String filename) {
         return false;
     }
 
-    /** wird überschrieben
-     *
-     * \brief changeWorkingDirectory
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param pathname
-     * @return
-     * @throws IOException */
     @Override
     public boolean changeWorkingDirectory(final String pathname) throws IOException {
         logINFO("not implemented yet");
@@ -571,15 +315,6 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     }
 
     protected String resolvePathname(String pathname) {
-        // currentDirectory is always empty
-        // if (!pathname.startsWith("./") && !pathname.startsWith("/") &&
-        // currentDirectory.length() > 0) {
-        // // if (!pathname.startsWith("/") && currentDirectory.length()>0){
-        // String slash = "";
-        // if (!currentDirectory.endsWith("/"))
-        // slash = "/";
-        // pathname = currentDirectory + slash + pathname;
-        // }
         pathname = pathname.replaceAll("\\\\", "/");
         return pathname;
     }
@@ -587,7 +322,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     @Override
     public void login(final String strUserName, final String strPassword) {
 
-    } // private boolean login
+    }
 
     @Override
     public void disconnect() {
@@ -595,43 +330,24 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 
     @Override
     public String getReplyString() {
-        String strT = reply;
-        return strT;
+        return reply;
     }
 
-    /** wird überschrieben
-     *
-     * \brief isConnected
-     *
-     * \details
-     *
-     * \return
-     *
-     * @return */
     @Override
     public boolean isConnected() {
         return false;
     }
 
-    // @Override
-    // public String[] listNames(String pathname) throws IOException {
-    // String strA[] = Client().listNames(pathname);
-    // logger.debug(String.format("reply from FTP-Server is %1$s, code = %2$d",
-    // Client().getReplyString(), Client().getReplyCode()));
-    // return strA;
-    // }
-
     @Override
     public void logout() {
         try {
-            if (isConnected() == true) {
+            if (isConnected()) {
                 disconnect();
                 logDEBUG(SOSVfs_D_138.params(host, getReplyString()));
             } else {
                 logINFO("not connected, logout useless.");
             }
-        } catch (Exception e) { // no error-handling needed, due to end-of
-                                // session
+        } catch (Exception e) {
             logWARN(SOSVfs_W_140.get() + e.getMessage());
         }
     }
@@ -680,29 +396,24 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 
     @Override
     public ISOSConnection Connect() throws Exception {
-        // this.connect(objConnection2Options.host.Value(),
-        // objConnection2Options.port.value());
         notImplemented();
         return this;
     }
 
     @Override
     public ISOSConnection Connect(final SOSConnection2OptionsAlternate pobjConnectionOptions) throws Exception {
-
         return this;
     }
 
     @Override
     public ISOSConnection Connect(final ISOSConnectionOptions pobjConnectionOptions) throws Exception {
         notImplemented();
-
         return this;
     }
 
     @Override
     public ISOSConnection Connect(final String pstrHostName, final int pintPortNumber) throws Exception {
         notImplemented();
-
         return this;
     }
 
@@ -719,7 +430,6 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 
     @Override
     public ISOSVirtualFile TransferMode(final SOSOptionTransferMode pobjFileTransferMode) {
-
         if (pobjFileTransferMode.isAscii()) {
             this.ascii();
         } else {
@@ -764,19 +474,16 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 
     @Override
     public StringBuffer getStdErr() throws Exception {
-
         return null;
     }
 
     @Override
     public StringBuffer getStdOut() throws Exception {
-
         return null;
     }
 
     @Override
     public boolean remoteIsWindowsShell() {
-
         return false;
     }
 
@@ -785,16 +492,6 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 
     }
 
-    /** wird überschrieben
-     *
-     * \brief getFileHandle
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param pstrFilename
-     * @return */
     @Override
     public ISOSVirtualFile getFileHandle(final String pstrFilename) {
         return null;
@@ -803,38 +500,28 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     @Override
     public String[] getFilelist(final String folder, final String regexp, final int flag, final boolean withSubFolder) {
         Vector<String> result = nList(folder, withSubFolder);
-
         Vector<String> newResult = new Vector<String>();
         Pattern pattern = Pattern.compile(regexp, flag);
         for (String strFile : result) {
-            /** the file_spec has to be compared to the filename only ...
-             * excluding the path */
-
             Matcher matcher = pattern.matcher(new File(strFile).getName());
-            if (matcher.find() == true) {
+            if (matcher.find()) {
                 newResult.add(strFile);
             }
         }
-
         return newResult.toArray(new String[newResult.size()]);
     }
 
     @Override
     public String[] getFolderlist(final String folder, final String regexp, final int flag, final boolean withSubFolder) {
         Vector<String> result = nList(folder, withSubFolder);
-
         Vector<String> newResult = new Vector<String>();
         Pattern pattern = Pattern.compile(regexp, flag);
         for (String strFile : result) {
-            /** the file_spec has to be compared to the filename only ...
-             * excluding the path */
-
             Matcher matcher = pattern.matcher(new File(strFile).getName());
-            if (matcher.find() == true) {
+            if (matcher.find()) {
                 newResult.add(strFile);
             }
         }
-
         return newResult.toArray(new String[newResult.size()]);
     }
 
@@ -856,18 +543,14 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
             String lstrFileName = strFileName.replaceAll("\\\\", "/");
             lngFileSize = this.size(lstrFileName);
         } catch (Exception e) {
-            logger.trace(SOSVfs_E_134.params("getFileSize()") + ":" + e.getMessage());
+            LOGGER.trace(SOSVfs_E_134.params("getFileSize()") + ":" + e.getMessage());
         }
-
         return lngFileSize;
     }
 
     @Override
     public InputStream getInputStream(final String strFileName) {
-
         InputStream objI = null;
-        // SFTPv3FileHandle objI = getClient().openFileRO(strFileName);
-
         return objI;
     }
 
@@ -879,11 +562,6 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 
     @Override
     public abstract OutputStream getOutputStream(final String fileName);
-
-    // {
-    // logINFO("not implemented yet");
-    // return null;
-    // }
 
     @Override
     public void close() {
@@ -932,29 +610,20 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 
     @Override
     public Vector<ISOSVirtualFile> getFiles(final String string) {
-
         return null;
     }
 
     @Override
     public Vector<ISOSVirtualFile> getFiles() {
-
         return null;
     }
 
     @Override
     public void putFile(final ISOSVirtualFile objVirtualFile) {
-
         String strName = objVirtualFile.getName();
-        // strName = new File(strName).getAbsolutePath();
-        // if (strName.startsWith("c:") == true) {
-        // strName = strName.substring(3);
-        // }
         ISOSVirtualFile objVF = this.getFileHandle(strName);
         OutputStream objOS = objVF.getFileOutputStream();
-
         InputStream objFI = objVirtualFile.getFileInputStream();
-
         int lngBufferSize = 1024;
         byte[] buffer = new byte[lngBufferSize];
         int intBytesTransferred;
@@ -973,7 +642,6 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
             throw new JobSchedulerException(SOSVfs_E_130.params("putfile()"), e);
         } finally {
         }
-
     }
 
     @Override
@@ -998,139 +666,61 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 
     @Override
     public long getFile(final String remoteFile, final String localFile, final boolean append) throws Exception {
-
         return 0;
     }
 
-    /** wird überschrieben
-     *
-     * \brief rename
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param strFileName
-     * @param pstrNewFileName */
     @Override
     public void rename(final String from, final String to) {
         logINFO("not implemented yet");
     }
 
-    /** \brief RaiseException
-     *
-     * \details
-     *
-     * \return void
-     *
-     * @param e
-     * @param msg */
     protected void RaiseException(final Exception e, final String msg) {
-        logger.error(msg + " (" + e.getLocalizedMessage() + ")");
+        LOGGER.error(msg + " (" + e.getLocalizedMessage() + ")");
         throw new JobSchedulerException(msg, e);
     }
 
-    /** \brief RaiseException
-     *
-     * \details
-     *
-     * \return void
-     *
-     * @param msg */
     protected void RaiseException(final String msg) {
         logEXCEPTION(msg);
         throw new JobSchedulerException(msg);
     }
 
-    /** \brief getLogPrefix
-     *
-     * \details
-     *
-     * \return String
-     *
-     * @return */
     private String getLogPrefix() {
         return getLogPrefix(4);
     }
 
-    /** \brief getLogPrefix
-     *
-     * \details
-     *
-     * \return String
-     *
-     * @return */
     private String getLogPrefix(final int level) {
         StackTraceElement ste = Thread.currentThread().getStackTrace()[level];
         String[] classNameArr = ste.getClassName().split("\\.");
-
         return "(" + classNameArr[classNameArr.length - 1] + "::" + ste.getMethodName() + ") ";
     }
 
-    /** \brief logINFO
-     *
-     * \details
-     *
-     * \return void
-     *
-     * @param msg */
     protected void logINFO(final Object msg) {
-        logger.info(this.getLogPrefix() + msg);
+        LOGGER.info(this.getLogPrefix() + msg);
     }
 
-    /** \brief logDEBUG
-     *
-     * \details
-     *
-     * \return void
-     *
-     * @param msg */
     protected void logDEBUG(final Object msg) {
-        logger.debug(this.getLogPrefix() + msg);
+        LOGGER.debug(this.getLogPrefix() + msg);
     }
 
-    /** \brief logWARN
-     *
-     * \details
-     *
-     * \return void
-     *
-     * @param msg */
     protected void logWARN(final Object msg) {
-        logger.warn(this.getLogPrefix() + msg);
+        LOGGER.warn(this.getLogPrefix() + msg);
     }
 
-    /** \brief logERROR
-     *
-     * \details
-     *
-     * \return void
-     *
-     * @param msg */
     protected void logERROR(final Object msg) {
-        logger.error(this.getLogPrefix() + msg);
+        LOGGER.error(this.getLogPrefix() + msg);
     }
 
     protected void logEXCEPTION(final Object msg) {
-        logger.error(this.getLogPrefix(4) + msg);
+        LOGGER.error(this.getLogPrefix(4) + msg);
     }
 
-    /** return a listing of the contents of a directory in short format on the
-     * remote machine (without subdirectory)
-     *
-     * @return a listing of the contents of a directory on the remote machine
-     *
-     * @exception Exception
-     * @see #nList(String )
-     * @see #dir()
-     * @see #dir(String ) */
     private Vector<String> getFilenames() throws Exception {
         return getFilenames("", false);
-    } // getFilenames
+    }
 
     private Vector<String> getFilenames(final boolean flgRecurseSubFolders) throws Exception {
         return getFilenames("", flgRecurseSubFolders);
-    } // getFilenames
+    }
 
     private Vector<String> getFilenames(final String pathname) {
         try {
@@ -1141,55 +731,38 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
         }
     }
 
-    /** return a listing of the contents of a directory in short format on the
-     * remote machine (without subdirectory)
-     *
-     * @param pathname on remote machine
-     * @return a listing of the contents of a directory on the remote machine
-     * @throws IOException
-     *
-     * @exception Exception
-     * @see #dir() */
     private Vector<String> getFilenames(final String path, final boolean recurseSubFolders) throws Exception {
         return getFilenames(path, recurseSubFolders, 0);
     }
 
     private Vector<String> getFilenames(String path, final boolean recurseSubFolders, int recLevel) throws Exception {
-
         String currentPath = "";
         if (recLevel == 0) {
             directoryListing = new Vector<String>();
             currentPath = this.DoPWD();
         }
-
         String[] fileList = null;
-
         path = path.trim();
-        if (path.length() <= 0) {
+        if (path.isEmpty()) {
             path = ".";
         }
         try {
             fileList = listNames(path);
         } catch (IOException e) {
-            logger.error(e.getLocalizedMessage());
+            LOGGER.error(e.getLocalizedMessage());
         }
-
         if (fileList == null) {
             return directoryListing;
         }
-
         for (String currentFile : fileList) {
-            if (!isNotHiddenFile(currentFile))
+            if (!isNotHiddenFile(currentFile)) {
                 continue;
-            // if strCurrentFile has only name without path
+            }
             if (currentFile.indexOf("/") == -1) {
                 currentFile = path + "/" + currentFile;
                 currentFile = currentFile.replaceAll("//+", "/");
             }
-
-            /** isDirectory is suboptiomal in this situation. think of links
-             * better is isRegularFile instead TODO create isRegularFile */
-            if (this.isDirectory(currentFile) == true) {
+            if (this.isDirectory(currentFile)) {
                 if (recurseSubFolders) {
                     recLevel++;
                     this.getFilenames(currentFile, recurseSubFolders, recLevel);
@@ -1213,11 +786,9 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
 
     @Override
     public OutputStream getFileOutputStream() {
-
         return null;
     }
 
-    /** @param options */
     @Override
     public void reconnect(SOSConnection2OptionsAlternate options) {
         if (!isConnected()) {

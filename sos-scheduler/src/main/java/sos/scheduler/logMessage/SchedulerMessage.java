@@ -17,13 +17,13 @@ public class SchedulerMessage {
     protected int task;
     protected String logtime;
     protected String severity = "nil";
-    private String log;
     protected int status = 0;
     protected String created;
     protected File logFile = null;
     protected SOSConnection conn = null;
     protected SOSLogger sosLogger = null;
     protected boolean isNew;
+    private String log;
 
     public SchedulerMessage(final File logFile_, final SOSConnection conn_, final SOSLogger sosLogger_, final String scheduler_id_) {
         conn = conn_;
@@ -144,8 +144,9 @@ public class SchedulerMessage {
             job_chain = log_.replaceFirst(".*\\(Order\\s+([^:)]+).*", "$1");
             if (job_chain.equals(log_)) {
                 job_chain = log_.replaceFirst(".*started - cause: Order\\s+([^:)]+).*", "$1");
-                if (job_chain.equals(log))
+                if (job_chain.equals(log)) {
                     job_chain = "nil";
+                }
             }
         }
         String s = "";
@@ -158,7 +159,7 @@ public class SchedulerMessage {
         if (!"".equals(s)) {
             job_name = s;
         }
-        if (job_name == null || job_name.equals("")) {
+        if (job_name == null || "".equals(job_name)) {
             job_name = "nil";
         }
     }
@@ -321,4 +322,5 @@ public class SchedulerMessage {
     public int getStatus() {
         return status;
     }
+
 }

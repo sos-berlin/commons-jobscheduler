@@ -1,6 +1,3 @@
-/*
- * SchedulerMailer.java Created on 21.08.2007
- */
 package sos.scheduler.misc;
 
 import java.util.Properties;
@@ -118,28 +115,18 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
  * @author Andreas Liebert */
 public class SchedulerMailer {
 
-    @SuppressWarnings("unused")
-    private final String conSVNVersion = "$Id$";
-
     private SOSMail sosMail;
-
     private SOSLogger logger;
-
     private final Spooler spooler;
 
-    /** constructs and initializes a SchedulerMailer, using the mail settings
-     * from factory.ini and job/order parameters
-     * 
-     * @param job the job which uses the SchedulerMailer (usually "
-     *            <code>this</code>")
-     * @throws Exception */
     public SchedulerMailer(final sos.spooler.Job_impl job) throws Exception {
         spooler = job.spooler;
         init(job.spooler_log);
         Variable_set params = job.spooler.create_variable_set();
         params.merge(job.spooler_task.params());
-        if (job.spooler_job.order_queue() != null)
+        if (job.spooler_job.order_queue() != null) {
             params.merge(job.spooler_task.order().params());
+        }
         readParams(params);
     }
 
@@ -154,8 +141,9 @@ public class SchedulerMailer {
         init(monitor.spooler_log);
         Variable_set params = monitor.spooler.create_variable_set();
         params.merge(monitor.spooler_task.params());
-        if (monitor.spooler_job.order_queue() != null)
+        if (monitor.spooler_job.order_queue() != null) {
             params.merge(monitor.spooler_task.order().params());
+        }
         readParams(params);
     }
 
@@ -180,8 +168,8 @@ public class SchedulerMailer {
             params.merge(job.spooler_task.order().params());
         }
         String readSettings = params.value("read_mail_settings");
-        if (readSettings != null && (readSettings.equalsIgnoreCase("yes") || readSettings.equalsIgnoreCase("1") || readSettings.equalsIgnoreCase("true"))) {
-            if (job.getConnectionSettings() != null && job.getConnectionSettings().getSection("email", "mail_server").size() > 0) {
+        if (readSettings != null && ("yes".equalsIgnoreCase(readSettings) || "1".equalsIgnoreCase(readSettings) || "true".equalsIgnoreCase(readSettings))) {
+            if (job.getConnectionSettings() != null && !job.getConnectionSettings().getSection("email", "mail_server").isEmpty()) {
                 sosMail = new SOSMail(job.getConnectionSettings());
                 sosMail.setSOSLogger(logger);
             } else {
@@ -196,8 +184,9 @@ public class SchedulerMailer {
     private void init(final sos.spooler.Log spooler_log) throws Exception {
         try {
             sosMail = new SOSMail(spooler_log.mail().smtp());
-            if (logger == null)
+            if (logger == null) {
                 logger = new SOSSchedulerLogger(spooler_log);
+            }
             sosMail.setSOSLogger(logger);
             sosMail.setQueueDir(spooler_log.mail().queue_dir());
             sosMail.setFrom(spooler_log.mail().from());
@@ -207,10 +196,10 @@ public class SchedulerMailer {
             SOSSettings smtpSettings = new SOSProfileSettings(spooler.ini_path());
             Properties smtpProperties = smtpSettings.getSection("smtp");
             if (!smtpProperties.isEmpty()) {
-                if (smtpProperties.getProperty("mail.smtp.user") != null && smtpProperties.getProperty("mail.smtp.user").length() > 0) {
+                if (smtpProperties.getProperty("mail.smtp.user") != null && !smtpProperties.getProperty("mail.smtp.user").isEmpty()) {
                     sosMail.setUser(smtpProperties.getProperty("mail.smtp.user"));
                 }
-                if (smtpProperties.getProperty("mail.smtp.password") != null && smtpProperties.getProperty("mail.smtp.password").length() > 0) {
+                if (smtpProperties.getProperty("mail.smtp.password") != null && !smtpProperties.getProperty("mail.smtp.password").isEmpty()) {
                     sosMail.setPassword(smtpProperties.getProperty("mail.smtp.password"));
                 }
             }
@@ -222,48 +211,40 @@ public class SchedulerMailer {
     private void readParams(final Variable_set params) throws Exception {
         try {
             logger.debug1("Setting mail parameters:");
-            if (params.value("to") != null && params.value("to").length() > 0) {
+            if (params.value("to") != null && !params.value("to").isEmpty()) {
                 sosMail.clearRecipients();
                 sosMail.addRecipient(params.value("to"));
                 debugParameter(params, "to");
             }
-
-            if (params.value("from") != null && params.value("from").length() > 0) {
+            if (params.value("from") != null && !params.value("from").isEmpty()) {
                 sosMail.setFrom(params.value("from"));
                 debugParameter(params, "from");
             }
-
-            if (params.value("from_name") != null && params.value("from_name").length() > 0) {
+            if (params.value("from_name") != null && !params.value("from_name").isEmpty()) {
                 sosMail.setFromName(params.value("from_name"));
                 debugParameter(params, "from_name");
             }
-
-            if (params.value("reply_to") != null && params.value("reply_to").length() > 0) {
+            if (params.value("reply_to") != null && !params.value("reply_to").isEmpty()) {
                 sosMail.setReplyTo(params.value("reply_to"));
                 debugParameter(params, "reply_to");
             }
-
-            if (params.value("cc") != null && params.value("cc").length() > 0) {
+            if (params.value("cc") != null && !params.value("cc").isEmpty()) {
                 sosMail.addCC(params.value("cc"));
                 debugParameter(params, "cc");
             }
-
-            if (params.value("bcc") != null && params.value("bcc").length() > 0) {
+            if (params.value("bcc") != null && !params.value("bcc").isEmpty()) {
                 sosMail.addBCC(params.value("bcc"));
                 debugParameter(params, "bcc");
             }
-
-            if (params.value("subject") != null && params.value("subject").length() > 0) {
+            if (params.value("subject") != null && !params.value("subject").isEmpty()) {
                 sosMail.setSubject(params.value("subject"));
                 debugParameter(params, "subject");
             }
-
-            if (params.value("host") != null && params.value("host").length() > 0) {
+            if (params.value("host") != null && !params.value("host").isEmpty()) {
                 sosMail.setHost(params.value("host"));
                 debugParameter(params, "host");
             }
-
-            if (params.value("port") != null && params.value("port").length() > 0) {
+            if (params.value("port") != null && !params.value("port").isEmpty()) {
                 try {
                     int port = Integer.parseInt(params.value("port"));
                     sosMail.setPort("" + port);
@@ -272,58 +253,47 @@ public class SchedulerMailer {
                     throw new Exception("illegal, non-numeric value [" + params.value("port") + "] for parameter [port]: " + e.getMessage());
                 }
             }
-
-            if (params.value("smtp_user") != null && params.value("smtp_user").length() > 0) {
+            if (params.value("smtp_user") != null && !params.value("smtp_user").isEmpty()) {
                 sosMail.setUser(params.value("smtp_user"));
                 debugParameter(params, "smtp_user");
             }
-
-            if (params.value("smtp_password") != null && params.value("smtp_password").length() > 0) {
+            if (params.value("smtp_password") != null && !params.value("smtp_password").isEmpty()) {
                 sosMail.setPassword(params.value("smtp_password"));
                 debugParameter(params, "smtp_password");
             }
-
-            if (params.value("queue_directory") != null && params.value("queue_directory").length() > 0) {
+            if (params.value("queue_directory") != null && !params.value("queue_directory").isEmpty()) {
                 sosMail.setQueueDir(params.value("queue_directory"));
                 debugParameter(params, "queue_director");
             }
-
-            if (params.value("body") != null && params.value("body").length() > 0) {
+            if (params.value("body") != null && !params.value("body").isEmpty()) {
                 sosMail.setBody(params.value("body"));
                 debugParameter(params, "body");
             }
-
-            if (params.value("content_type") != null && params.value("content_type").length() > 0) {
+            if (params.value("content_type") != null && !params.value("content_type").isEmpty()) {
                 sosMail.setContentType(params.value("content_type"));
                 debugParameter(params, "content_type");
             }
-
-            if (params.value("encoding") != null && params.value("encoding").length() > 0) {
+            if (params.value("encoding") != null && !params.value("encoding").isEmpty()) {
                 sosMail.setEncoding(params.value("encoding"));
                 debugParameter(params, "encoding");
             }
-
-            if (params.value("charset") != null && params.value("charset").length() > 0) {
+            if (params.value("charset") != null && !params.value("charset").isEmpty()) {
                 sosMail.setCharset(params.value("charset"));
                 debugParameter(params, "charset");
             }
-
-            if (params.value("attachment_charset") != null && params.value("attachment_charset").length() > 0) {
+            if (params.value("attachment_charset") != null && !params.value("attachment_charset").isEmpty()) {
                 sosMail.setAttachmentCharset(params.value("attachment_charset"));
                 debugParameter(params, "attachment_charset");
             }
-
-            if (params.value("attachment_content_type") != null && params.value("attachment_content_type").length() > 0) {
+            if (params.value("attachment_content_type") != null && !params.value("attachment_content_type").isEmpty()) {
                 sosMail.setAttachmentContentType(params.value("attachment_content_type"));
                 debugParameter(params, "attachment_content_type");
             }
-
-            if (params.value("attachment_encoding") != null && params.value("attachment_encoding").length() > 0) {
+            if (params.value("attachment_encoding") != null && !params.value("attachment_encoding").isEmpty()) {
                 sosMail.setAttachmentEncoding(params.value("attachment_encoding"));
                 debugParameter(params, "attachment_encoding");
             }
-
-            if (params.value("attachment") != null && params.value("attachment").length() > 0) {
+            if (params.value("attachment") != null && !params.value("attachment").isEmpty()) {
                 String[] attachments = params.value("attachment").split(";");
                 for (int i = 0; i < attachments.length; i++) {
                     String attFile = attachments[i];
@@ -341,7 +311,8 @@ public class SchedulerMailer {
         try {
             logger.debug1(".. mail parameter [" + paramName + "]: " + params.value(paramName));
         } catch (Exception e) {
-        } // No error handling
+            // No error handling
+        } 
 
     }
 
@@ -352,4 +323,5 @@ public class SchedulerMailer {
     public SOSMail getSosMail() {
         return sosMail;
     }
+
 }

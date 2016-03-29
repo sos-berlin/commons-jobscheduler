@@ -1,6 +1,3 @@
-/*
- * JobSchedulerMySQLMaintenanceMonitor.java Created on 30.05.2005
- */
 package sos.scheduler.mysql;
 
 import java.util.ArrayList;
@@ -28,7 +25,6 @@ public class JobSchedulerMySQLMaintenanceMonitor extends JobSchedulerJob {
         String[] operations = null;
         String[] tables = null;
         String[] attributes = null;
-
         this.setLogger(new SOSSchedulerLogger(spooler_log));
         try {
             if (getJobProperties().getProperty("config") != null) {
@@ -37,8 +33,9 @@ public class JobSchedulerMySQLMaintenanceMonitor extends JobSchedulerJob {
                 new_connection = true;
             } else if (getJobProperties().getProperty("database") != null) {
                 database = getJobProperties().getProperty("database").toString();
-                if (database != null && database.length() > 0)
+                if (database != null && !database.isEmpty()) {
                     connection.execute("USE " + database);
+                }
                 getLogger().info("database changed to: " + database);
             }
             if (!(connection instanceof SOSMySQLConnection)) {
@@ -60,11 +57,9 @@ public class JobSchedulerMySQLMaintenanceMonitor extends JobSchedulerJob {
                 operations[1] = "OPTIMIZE";
                 operations[2] = "REPAIR@QUICK";
             }
-
             if (getJobProperties().getProperty("tables") != null) {
                 tables = getJobProperties().getProperty("tables").split(",");
             }
-
             if (tables == null) {
                 ArrayList result = connection.getArrayValue("SHOW TABLES");
                 if (result != null && !result.isEmpty()) {
@@ -74,14 +69,13 @@ public class JobSchedulerMySQLMaintenanceMonitor extends JobSchedulerJob {
                     }
                 }
             }
-
-            if (tables == null)
+            if (tables == null) {
                 throw new Exception("no tables found for this database");
+            }
         } catch (Exception e) {
             this.getLogger().error("Error reading Settings: " + e);
             return false;
         }
-
         try {
             for (int i = 0; i < tables.length; i++) {
                 attributes = tables[i].split(":");
@@ -92,7 +86,6 @@ public class JobSchedulerMySQLMaintenanceMonitor extends JobSchedulerJob {
                         attributes[j + 1] = operations[j];
                     }
                 }
-
                 for (int j = 1; j < attributes.length; j++) {
                     String statement_suffix = "";
                     String statement;
@@ -103,21 +96,19 @@ public class JobSchedulerMySQLMaintenanceMonitor extends JobSchedulerJob {
                     } else {
                         statement_suffix = "";
                     }
-
-                    if (attributes[j].equalsIgnoreCase("ANALYZE"))
+                    if ("ANALYZE".equalsIgnoreCase(attributes[j])) {
                         statement = "ANALYZE TABLE " + attributes[0] + statement_suffix;
-                    else if (attributes[j].equalsIgnoreCase("OPTIMIZE"))
+                    } else if ("OPTIMIZE".equalsIgnoreCase(attributes[j])) {
                         statement = "OPTIMIZE TABLE " + attributes[0] + statement_suffix;
-                    else if (attributes[j].equalsIgnoreCase("REPAIR"))
+                    } else if ("REPAIR".equalsIgnoreCase(attributes[j])) {
                         statement = "REPAIR TABLE " + attributes[0] + statement_suffix;
-                    else if (attributes[j].equalsIgnoreCase("NOP"))
+                    } else if ("NOP".equalsIgnoreCase(attributes[j])) {
                         statement = "";
-                    else {
+                    } else {
                         getLogger().error("illegal operation was given for table [" + attributes[0] + "]: " + attributes[j]);
                         return false;
                     }
-
-                    if (statement.length() > 0) {
+                    if (!statement.isEmpty()) {
                         getLogger().debug3("processing statement: " + statement);
                         HashMap result = connection.getSingle(statement);
                         if (result == null || result.isEmpty()) {
@@ -129,12 +120,10 @@ public class JobSchedulerMySQLMaintenanceMonitor extends JobSchedulerJob {
                     }
                 }
             }
-
-            if (getJobProperties().getProperty("flush_tables") != null && getJobProperties().getProperty("flush_tables").toString().equalsIgnoreCase("yes")) {
+            if (getJobProperties().getProperty("flush_tables") != null && "yes".equalsIgnoreCase(getJobProperties().getProperty("flush_tables").toString())) {
                 getLogger().info("tables will be flushed to publish optimizations");
                 connection.execute("FLUSH TABLES");
             }
-
         } catch (Exception e) {
             getLogger().error("maintenance monitor failed: " + e);
             return false;
@@ -144,7 +133,7 @@ public class JobSchedulerMySQLMaintenanceMonitor extends JobSchedulerJob {
                 connection = null;
             }
         }
-
         return false;
     }
+
 }

@@ -61,11 +61,12 @@ public class ManagedJobChainImport extends SOSImport {
                 showUsage();
                 System.exit(0);
             }
-            if (logFile.length() > 0)
+            if (!logFile.isEmpty()) {
                 sosLogger = new SOSStandardLogger(logFile, logLevel);
-            else
+            } else {
                 sosLogger = new SOSStandardLogger(logLevel);
-            if (packages.length() > 0 && jobchains.length() > 0) {
+            }
+            if (!packages.isEmpty() && !jobchains.isEmpty()) {
                 LOGGER.info("jobchain und package dürfen nicht zusammen angegeben werden.");
                 showUsage();
                 System.exit(0);
@@ -74,9 +75,9 @@ public class ManagedJobChainImport extends SOSImport {
             conn = ManagedJobExport.getDBConnection(settingsFile);
             conn.connect();
             conn.setAutoCommit(false);
-            if (packages != null && packages.length() > 0) {
+            if (packages != null && !packages.isEmpty()) {
                 doMultipleImport(conn, xmlFile, "PACKAGE", packages);
-            } else if (jobchains != null && jobchains.length() > 0) {
+            } else if (jobchains != null && !jobchains.isEmpty()) {
                 doMultipleImport(conn, xmlFile, "NAME", jobchains);
             } else {
                 ManagedJobChainImport imp = new ManagedJobChainImport(conn, xmlFile, null, null, null, sosLogger);
@@ -101,7 +102,8 @@ public class ManagedJobChainImport extends SOSImport {
         String[] identArray = identifiers.split("\\+");
         for (int i = 0; i < identArray.length; i++) {
             String identifier = identArray[i];
-            ManagedJobChainImport imp = new ManagedJobChainImport(conn, xmlFile, JobSchedulerManagedObject.getTableManagedModels(), field, identifier, sosLogger);
+            ManagedJobChainImport imp = new ManagedJobChainImport(conn, xmlFile, JobSchedulerManagedObject.getTableManagedModels(), field, identifier,
+                    sosLogger);
             imp.setUpdate(false);
             imp.setHandler(JobSchedulerManagedObject.getTableManagedModels(), "key_handler_MANAGED_MODELS", "", "NAME");
             imp.setHandler(JobSchedulerManagedObject.getTableManagedJobs(), "key_handler_MANAGED_JOBS", "rec_handler_MANAGED_JOBS", null);

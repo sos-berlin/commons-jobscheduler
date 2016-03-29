@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.Vector;
@@ -117,7 +116,7 @@ public class JobSchedulerCheckSlaves extends JobSchedulerJob {
 
         public String toString() {
             String displayHost = this.host;
-            if (displayHost == null || displayHost.length() == 0) {
+            if (displayHost == null || displayHost.isEmpty()) {
                 displayHost = this.ip;
             }
             return displayHost + ":" + port;
@@ -230,9 +229,9 @@ public class JobSchedulerCheckSlaves extends JobSchedulerJob {
 
     public boolean spooler_process() throws Exception {
         String hasRun = spooler.var("CheckSlavesHasRun");
-        if (hasRun.length() == 0) {
-            getLogger().info("This is the first run of JobSchedulerCheckSlaves. Slave Schedulers may "
-                    + "not have registered yet. Delaying spooler_process() for 120s");
+        if (hasRun.isEmpty()) {
+            getLogger().info(
+                    "This is the first run of JobSchedulerCheckSlaves. Slave Schedulers may " + "not have registered yet. Delaying spooler_process() for 120s");
             getLogger().debug6("CheckSlavesHasRun: " + hasRun);
             spooler.set_var("CheckSlavesHasRun", "true");
             spooler_task.set_delay_spooler_process(120);
@@ -290,9 +289,6 @@ public class JobSchedulerCheckSlaves extends JobSchedulerJob {
                             registeredSlaves.add(slave);
                         }
                     }
-                    // Wenn keine Slaves explizit angegeben sind, dann
-                    // wenigstens gucken, ob alle registrierten auch connected
-                    // sind.
                     if (!hasRequests) {
                         if (slave.isConnected()) {
                             connectedSlaves.add(slave);
@@ -401,7 +397,6 @@ public class JobSchedulerCheckSlaves extends JobSchedulerJob {
                     } catch (Exception ex) {
                     }
                 }
-
             }
         }
     }
@@ -424,8 +419,9 @@ public class JobSchedulerCheckSlaves extends JobSchedulerJob {
         while (iter.hasNext()) {
             SlaveScheduler slave = (SlaveScheduler) iter.next();
             String eventTime = slave.getDisconnectedAt();
-            if (needsWarning(eventTime, schedulerDateTime))
+            if (needsWarning(eventTime, schedulerDateTime)) {
                 return true;
+            }
         }
         return false;
     }
@@ -450,4 +446,5 @@ public class JobSchedulerCheckSlaves extends JobSchedulerJob {
         }
         return false;
     }
+
 }

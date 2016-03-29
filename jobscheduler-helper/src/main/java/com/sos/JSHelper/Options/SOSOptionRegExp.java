@@ -43,20 +43,27 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 
     public String getRegExpFlagsText() {
         String msg = "";
-        if (has(intRegExpFlags, Pattern.CANON_EQ))
+        if (has(intRegExpFlags, Pattern.CANON_EQ)) {
             msg += "CANON_EQ ";
-        if (has(intRegExpFlags, Pattern.CASE_INSENSITIVE))
+        }
+        if (has(intRegExpFlags, Pattern.CASE_INSENSITIVE)) {
             msg += "CASE_INSENSITIVE ";
-        if (has(intRegExpFlags, Pattern.COMMENTS))
+        }
+        if (has(intRegExpFlags, Pattern.COMMENTS)) {
             msg += "COMMENTS ";
-        if (has(intRegExpFlags, Pattern.DOTALL))
+        }
+        if (has(intRegExpFlags, Pattern.DOTALL)) {
             msg += "DOTALL ";
-        if (has(intRegExpFlags, Pattern.MULTILINE))
+        }
+        if (has(intRegExpFlags, Pattern.MULTILINE)) {
             msg += "MULTILINE ";
-        if (has(intRegExpFlags, Pattern.UNICODE_CASE))
+        }
+        if (has(intRegExpFlags, Pattern.UNICODE_CASE)) {
             msg += "UNICODE_CASE ";
-        if (has(intRegExpFlags, Pattern.UNIX_LINES))
+        }
+        if (has(intRegExpFlags, Pattern.UNIX_LINES)) {
             msg += "UNIX_LINES";
+        }
         return msg;
     }
 
@@ -104,7 +111,7 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
                 int intStart = m.start(i);
                 if (intStart >= 0 && i <= replacements.length) {
                     String strRepl = replacements[i - 1].trim();
-                    if (strRepl.length() > 0) {
+                    if (!strRepl.isEmpty()) {
                         if (strRepl.contains("\\")) {
                             strRepl = strRepl.replaceAll("\\\\-", "");
                             for (int j = 1; j <= intGroupCount; j++) {
@@ -180,10 +187,8 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 
     private String substituteUUID(String strValue) throws Exception {
         Matcher matcher1 = Pattern.compile("\\[uuid:([^\\]]*)\\]", intRegExpFlags).matcher(strValue);
-        if (matcher1.find()) {
-            if ("".equals(matcher1.group(1))) {
-                strValue = strValue.replaceFirst("\\[uuid:\\]", getUUID());
-            }
+        if (matcher1.find() && "".equals(matcher1.group(1))) {
+            strValue = strValue.replaceFirst("\\[uuid:\\]", getUUID());
         }
         return strValue;
     }
@@ -194,10 +199,8 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 
     private String substituteTimeStamp(String pstrValue) throws Exception {
         Matcher matcher1 = Pattern.compile("\\[timestamp:([^\\]]*)\\]", intRegExpFlags).matcher(pstrValue);
-        if (matcher1.find()) {
-            if ("".equals(matcher1.group(1))) {
-                pstrValue = pstrValue.replaceFirst("\\[timestamp:\\]", getUnixTimeStamp());
-            }
+        if (matcher1.find() && "".equals(matcher1.group(1))) {
+            pstrValue = pstrValue.replaceFirst("\\[timestamp:\\]", getUnixTimeStamp());
         }
         return pstrValue;
     }
@@ -208,10 +211,8 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 
     private String substituteSQLTimeStamp(String strValue) throws Exception {
         Matcher matcher1 = Pattern.compile("\\[sqltimestamp:([^\\]]*)\\]", intRegExpFlags).matcher(strValue);
-        if (matcher1.find()) {
-            if ("".equals(matcher1.group(1))) {
-                strValue = strValue.replaceFirst("\\[sqltimestamp:\\]", new Timestamp(new Date().getTime()).toString());
-            }
+        if (matcher1.find() && "".equals(matcher1.group(1))) {
+            strValue = strValue.replaceFirst("\\[sqltimestamp:\\]", new Timestamp(new Date().getTime()).toString());
         }
         return strValue;
     }

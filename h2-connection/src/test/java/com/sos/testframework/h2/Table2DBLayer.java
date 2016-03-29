@@ -11,9 +11,8 @@ import java.util.List;
 
 public class Table2DBLayer extends SOSHibernateDBLayer {
 
-    private final static Logger logger = LoggerFactory.getLogger(Table2DBLayer.class);
-
-    private final static String FIELD1 = "name";
+    private static final Logger LOGGER = LoggerFactory.getLogger(Table2DBLayer.class);
+    private static final String FIELD1 = "name";
 
     public Table2DBLayer(File configurationFile) {
         super();
@@ -25,8 +24,9 @@ public class Table2DBLayer extends SOSHibernateDBLayer {
         Query query = null;
         try {
             query = session.createQuery(hql);
-            if (filter.getName() != null)
+            if (filter.getName() != null) {
                 query.setParameter(FIELD1, filter.getName());
+            }
         } catch (HibernateException e) {
             throw new RuntimeException("Error creating Query", e);
         }
@@ -36,22 +36,18 @@ public class Table2DBLayer extends SOSHibernateDBLayer {
     private String getWhere(Table2Filter filter) {
         String where = "";
         String and = "";
-
         if (filter.getName() != null) {
             where += and + " name = ( :name )";
             and = " and ";
         }
-
         return (where.isEmpty()) ? where : "where " + where;
-
     }
 
     public Table2DBItem getByName(String name) {
         Table2Filter filter = new Table2Filter();
         filter.setName(name);
-        logger.info("check name " + filter.getName());
+        LOGGER.info("check name " + filter.getName());
         Query query = setQueryParams(filter, "from com.sos.testframework.h2.Table2DBItem table_1 " + getWhere(filter));
-
         List<Table2DBItem> resultList = query.list();
         Table2DBItem record = resultList.get(0);
         return record;
