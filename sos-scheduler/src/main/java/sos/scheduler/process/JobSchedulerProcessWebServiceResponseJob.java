@@ -10,23 +10,22 @@ import sos.spooler.Xslt_stylesheet;
 public class JobSchedulerProcessWebServiceResponseJob extends Job_impl {
 
     public boolean spooler_process() {
-
         try {
             String xml_document = "";
             Order order = spooler_task.order();
             Web_service_operation operation = order.web_service_operation();
-
-            if (operation == null)
+            if (operation == null) {
                 throw new Exception("no web service operation available");
-
+            }
             Web_service_request request = operation.request();
-            if (request == null)
+            if (request == null) {
                 throw new Exception("no web service request available");
+            }
             Web_service_response response = operation.response();
-            if (response == null)
+            if (response == null) {
                 throw new Exception("no web service response available");
-
-            if (spooler_task.params().value("response_stylesheet") != null && spooler_task.params().value("response_stylesheet").length() > 0) {
+            }
+            if (spooler_task.params().value("response_stylesheet") != null && !spooler_task.params().value("response_stylesheet").isEmpty()) {
                 // .. either transform the response from order parameters and
                 // payload
                 Xslt_stylesheet stylesheet = spooler.create_xslt_stylesheet();
@@ -39,10 +38,8 @@ public class JobSchedulerProcessWebServiceResponseJob extends Job_impl {
                 // or order.xml_payload() to access order data)
                 response.set_string_content("<response state=\"success\">" + order.params().xml() + "</response>");
             }
-
             response.send();
             spooler_log.info("web service response successfully processed for order \"" + order.id() + "\"");
-
             return true;
         } catch (Exception e) {
             spooler_log.warn("error occurred processing web service response: " + e.getMessage());

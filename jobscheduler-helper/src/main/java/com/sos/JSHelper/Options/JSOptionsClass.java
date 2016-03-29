@@ -443,16 +443,14 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
                 final Map.Entry mapItem = (Map.Entry) element;
                 String strMapKey = mapItem.getKey().toString();
                 String lstrMapKey = strMapKey.replaceAll("_", "");
-                if (!strLSKey.isEmpty()) {
-                    if (strLSKey.equalsIgnoreCase(lstrMapKey)) {
-                        if (mapItem.getValue() != null) {
-                            strTemp = mapItem.getValue().toString();
-                        } else {
-                            strTemp = null;
-                        }
-                        objProcessedOptions.put(strMapKey, strTemp);
-                        return strTemp;
+                if (!strLSKey.isEmpty() && strLSKey.equalsIgnoreCase(lstrMapKey)) {
+                    if (mapItem.getValue() != null) {
+                        strTemp = mapItem.getValue().toString();
+                    } else {
+                        strTemp = null;
                     }
+                    objProcessedOptions.put(strMapKey, strTemp);
+                    return strTemp;
                 }
                 if (strKey.equalsIgnoreCase(lstrMapKey)) {
                     if (mapItem.getValue() != null) {
@@ -552,11 +550,9 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     @Override
     public boolean String2Bool(final String pstrVal) {
         boolean flgT = false;
-        if (isNotEmpty(pstrVal)) {
-            if ("1".equals(pstrVal) || "y".equalsIgnoreCase(pstrVal) || "yes".equalsIgnoreCase(pstrVal) || "j".equalsIgnoreCase(pstrVal)
-                    || "on".equalsIgnoreCase(pstrVal) || "true".equalsIgnoreCase(pstrVal) || "wahr".equalsIgnoreCase(pstrVal)) {
-                flgT = true;
-            }
+        if (isNotEmpty(pstrVal) && ("1".equals(pstrVal) || "y".equalsIgnoreCase(pstrVal) || "yes".equalsIgnoreCase(pstrVal) || "j".equalsIgnoreCase(pstrVal)
+                    || "on".equalsIgnoreCase(pstrVal) || "true".equalsIgnoreCase(pstrVal) || "wahr".equalsIgnoreCase(pstrVal))) {
+            flgT = true;
         }
         return flgT;
     }
@@ -868,10 +864,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 
     public void CommandLineArgs(final String[] pstrArgs) {
         final String conMethodName = CLASS_NAME + "::CommandLineArgs ";
-        if (AllowEmptyParameterList.isFalse()) {
-            if (pstrArgs.length <= 0) {
-                throw new ParametersMissingButRequiredException(ApplicationName.Value(), ApplicationDocuUrl.Value());
-            }
+        if (AllowEmptyParameterList.isFalse() && pstrArgs.length <= 0) {
+            throw new ParametersMissingButRequiredException(ApplicationName.Value(), ApplicationDocuUrl.Value());
         }
         strCommandLineArgs = pstrArgs;
         boolean flgOption = true;
@@ -1267,10 +1261,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
                             if (enuIterate4What == IterationTypes.toString) {
                                 pstrBuffer.append(objDE.toString() + "\n");
                             }
-                            if (enuIterate4What == IterationTypes.DirtyToString) {
-                                if (objDE.isDirty()) {
-                                    pstrBuffer.append(objDE.DirtyToString() + "\n");
-                                }
+                            if (enuIterate4What == IterationTypes.DirtyToString && objDE.isDirty()) {
+                                pstrBuffer.append(objDE.DirtyToString() + "\n");
                             }
                             if (enuIterate4What == IterationTypes.createXML) {
                                 strXML.append(objDE.toXml());
@@ -1414,7 +1406,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         try {
             parser.parse(pobjXMLFile.getAbsolutePath());
             Document document = parser.getDocument();
-            if (isEmpty(pstrXPathExpr) == true) {
+            if (isEmpty(pstrXPathExpr)) {
                 traverse(document, objProp);
             }
             LoadProperties(objProp);
@@ -1437,8 +1429,9 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
                 Node objN = children.item(i);
                 if (objN.getNodeType() == Node.TEXT_NODE) {
                     strNodeValue = objN.getNodeValue();
-                    if (isNotEmpty(strNodeValue))
+                    if (isNotEmpty(strNodeValue)) {
                         objProp.put(strNodeName, objN.getNodeValue());
+                    }
                     break;
                 }
             }

@@ -39,19 +39,16 @@ public class JobSchedulerMetadataElement {
 
     public String fieldnames() {
         String erg = "";
-
         Iterator i = attributes.keySet().iterator();
         while (i.hasNext()) {
             erg += "\"" + i.next().toString().toUpperCase() + "\",";
         }
-
         if (element_name.toLowerCase().equals("script")) {
             erg += "\"CDATA\",";
         }
-
-        if (erg.length() > 0)
+        if (!erg.isEmpty()) {
             erg = "," + erg.substring(0, erg.length() - 1);
-
+        }
         return erg;
     }
 
@@ -61,13 +58,12 @@ public class JobSchedulerMetadataElement {
         while (i.hasNext()) {
             erg += "'" + i.next().toString() + "',";
         }
-
-        if (element_name.toLowerCase().equals("script")) {
+        if ("script".equals(element_name.toLowerCase())) {
             erg += "'',";
         }
-
-        if (erg.length() > 0)
+        if (!erg.isEmpty()) {
             erg = "," + erg.substring(0, erg.length() - 1);
+        }
         return erg;
     }
 

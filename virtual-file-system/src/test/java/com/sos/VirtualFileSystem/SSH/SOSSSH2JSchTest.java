@@ -7,7 +7,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -36,12 +35,11 @@ public class SOSSSH2JSchTest {
     private static final String CONNECTION_TYPE_EXECUTE = "exec";
     private static final int TIMEOUT = 3 * 1000;
     private String command = "echo **Hallo world!**";
-    private Logger log = LoggerFactory.getLogger(SOSSSH2JSchTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SOSSSH2JSchTest.class);
     private SOSOptionUserName optionUserName;
     private SOSOptionPassword optionPassword;
     private SOSOptionAuthenticationMethod optionAuthenticationMethod;
     private SOSOptionInFileName optionAuthFileName;
-
     private Channel sshChannel = null;
     private ChannelExec executeChannel = null;
     private Session sshSession = null;
@@ -98,76 +96,71 @@ public class SOSSSH2JSchTest {
         secureChannel = new JSch();
     }
 
-    @After
-    public void tearDown() {
-
-    }
-
     @Test
     public void testSessionConnect() throws JSchException, RuntimeException {
-        log.debug("Test testSessionConnect started!");
+        LOG.debug("Test testSessionConnect started!");
         sessionConnect();
         assertTrue(sshSession.isConnected());
         sshSession.disconnect();
-        log.debug("Test testSessionConnect ended!");
+        LOG.debug("Test testSessionConnect ended!");
     }
 
     @Test
     public void testSessionDisconnect() throws JSchException, RuntimeException {
-        log.debug("Test testSessionDisconnect started!");
+        LOG.debug("Test testSessionDisconnect started!");
         sessionConnect();
         sshSession.disconnect();
         assertFalse(sshSession.isConnected());
-        log.debug("Test testSessionDisconnect ended!");
+        LOG.debug("Test testSessionDisconnect ended!");
     }
 
     @Test
     public void testShellChannelConnect() throws JSchException, RuntimeException {
-        log.debug("Test testShellChannelConnect started!");
+        LOG.debug("Test testShellChannelConnect started!");
         sessionConnect();
         shellChannelConnect();
         assertTrue(sshChannel.isConnected());
         sshChannel.disconnect();
         sshSession.disconnect();
-        log.debug("Test testShellChannelConnect ended!");
+        LOG.debug("Test testShellChannelConnect ended!");
     }
 
     @Test
     public void testShellChannelDisconnect() throws JSchException, RuntimeException {
-        log.debug("Test testShellChannelDisconnect started!");
+        LOG.debug("Test testShellChannelDisconnect started!");
         sessionConnect();
         shellChannelConnect();
         sshChannel.disconnect();
         sshSession.disconnect();
         assertFalse(sshChannel.isConnected());
-        log.debug("Test testShellChannelDisconnect ended!");
+        LOG.debug("Test testShellChannelDisconnect ended!");
     }
 
     @Test
     public void testExecuteChannelConnect() throws JSchException, RuntimeException {
-        log.debug("Test testExecuteChannelConnect started!");
+        LOG.debug("Test testExecuteChannelConnect started!");
         sessionConnect();
         executeChannelConnect();
         assertTrue(executeChannel.isConnected());
         executeChannel.disconnect();
         sshSession.disconnect();
-        log.debug("Test testExecuteChannelConnect ended!");
+        LOG.debug("Test testExecuteChannelConnect ended!");
     }
 
     @Test
     public void testExecuteChannelDisconnect() throws JSchException, RuntimeException {
-        log.debug("Test testExecuteChannelDisconnect started!");
+        LOG.debug("Test testExecuteChannelDisconnect started!");
         sessionConnect();
         executeChannelConnect();
         executeChannel.disconnect();
         sshSession.disconnect();
         assertFalse(executeChannel.isConnected());
-        log.debug("Test testExecuteChannelDisconnect ended!");
+        LOG.debug("Test testExecuteChannelDisconnect ended!");
     }
 
     @Test
     public void testExecuteCommand() throws JSchException, RuntimeException, IOException {
-        log.debug("Test testExecuteCommand started!");
+        LOG.debug("Test testExecuteCommand started!");
         sessionConnect();
         executeChannelWithCommandConnect();
         InputStream in = executeChannel.getInputStream();
@@ -177,14 +170,16 @@ public class SOSSSH2JSchTest {
         while (true) {
             while (in.available() > 0) {
                 int i = in.read(tmp, 0, 1024);
-                if (i < 0)
+                if (i < 0) {
                     break;
+                }
                 output += new String(tmp, 0, i);
             }
             if (executeChannel.isClosed()) {
-                if (in.available() > 0)
+                if (in.available() > 0) {
                     continue;
-                log.debug("exit-status: {}", exitCode = executeChannel.getExitStatus());
+                }
+                LOG.debug("exit-status: {}", exitCode = executeChannel.getExitStatus());
                 break;
             }
             try {
@@ -192,18 +187,18 @@ public class SOSSSH2JSchTest {
             } catch (Exception ee) {
             }
         }
-        log.debug("output = {}", output);
+        LOG.debug("output = {}", output);
         assertTrue(output.length() > 0);
         assertEquals("exit code as expected", 0, exitCode);
         assertEquals("output as expected", "**Hallo world!**\n", output);
         executeChannel.disconnect();
         sshSession.disconnect();
-        log.debug("Test testExecuteCommand ended!");
+        LOG.debug("Test testExecuteCommand ended!");
     }
 
     @Test
     public void testExecuteCommandOnWindows() throws JSchException, RuntimeException, IOException {
-        log.debug("Test testExecuteCommandOnWindows started!");
+        LOG.debug("Test testExecuteCommandOnWindows started!");
         sessionConnectWindows();
         executeChannelWithCommandConnect(command);
         InputStream in = executeChannel.getInputStream();
@@ -213,14 +208,16 @@ public class SOSSSH2JSchTest {
         while (true) {
             while (in.available() > 0) {
                 int i = in.read(tmp, 0, 1024);
-                if (i < 0)
+                if (i < 0) {
                     break;
+                }
                 output += new String(tmp, 0, i);
             }
             if (executeChannel.isClosed()) {
-                if (in.available() > 0)
+                if (in.available() > 0) {
                     continue;
-                log.debug("exit-status: {}", exitCode = executeChannel.getExitStatus());
+                }
+                LOG.debug("exit-status: {}", exitCode = executeChannel.getExitStatus());
                 break;
             }
             try {
@@ -228,13 +225,13 @@ public class SOSSSH2JSchTest {
             } catch (Exception ee) {
             }
         }
-        log.debug("output = {}", output);
+        LOG.debug("output = {}", output);
         assertTrue(output.length() > 0);
         assertEquals("exit code not as expected", 0, exitCode);
         assertEquals("output not as expected", "**Hallo world!**\r\n", output);
         executeChannel.disconnect();
         sshSession.disconnect();
-        log.debug("Test testExecuteCommandOnWindows ended!");
+        LOG.debug("Test testExecuteCommandOnWindows ended!");
     }
 
     private void sessionConnect() throws JSchException, RuntimeException {

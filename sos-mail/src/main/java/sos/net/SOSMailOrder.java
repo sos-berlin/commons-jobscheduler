@@ -1,6 +1,3 @@
-/*
- * SOSMailOrder.java Created on 02.06.2006
- */
 package sos.net;
 
 import java.io.BufferedInputStream;
@@ -24,155 +21,73 @@ import sos.textprocessor.SOSTextProcessor;
 
 public class SOSMailOrder extends SOSMail {
 
-    // Datenbankverbindung
     protected SOSConnection sosConnection;
-
-    // mailing identification
+    protected boolean hasLocalizedTemplates = true;
+    protected SOSPlainTextProcessor mailPlainTextProcessor = null;
+    protected SOSDocumentFactoryTextProcessor mailDocumentFactoryTextProcessor = null;
     private int mailingId = 0;
-
-    // job scheduler task id
     private int jobId;
-
-    /* unique message id returned by mailer */
     private String messageId;
-
-    /* topic: invoice, reminder */
     private String topic = null;
-
-    /* identification: invoice no, reminder no */
     private String topicIdentifier = null;
-
-    /* customer identification */
     private String clientIdentifier = null;
-
-    /* optional reference */
     private String reference = null;
-
-    /* optional subject template */
     private String subjectTemplate = null;
-
-    /* optional subject template type: 0=plain, 1=Document Factory */
     private int subjectTemplateType;
-
-    /* optional body template */
     private String bodyTemplate = null;
-
-    /* optional subject template type: 0=plain, 1=Document Factory */
     private int bodyTemplateType;
-
-    /* database primary key */
     private int id = -1;
-
-    /* Class or job who modified this order */;
     private String modifiedBy = "SOSMailOrder";
-
+    private HashMap replacements = new HashMap();
+    private int status = 0;
+    private String statusText = null;
+    private Date targeted = null;
+    private Date delivered = null;
     public final static int TEMPLATE_TYPE_PLAIN = 0;
     public final static int TEMPLATE_TYPE_FACTORY = 1;
     public final static int TEMPLATE_TYPE_PLAIN_FILE = 100;
     public final static int TEMPLATE_TYPE_FACTORY_FILE = 101;
-
-    private HashMap replacements = new HashMap();
-
-    /* email status: 0=requested, 1=delivered, 1001=with errors */
-    private int status = 0;
-
     public final static int EMAIL_STATUS_REQUESTED = 0;
     public final static int EMAIL_STATUS_DELIVERED = 1;
     public final static int EMAIL_STATUS_WITH_ERRORS = 1001;
 
-    /* email status message */
-    private String statusText = null;
-
-    /* email timestamp of forwarding */
-    private Date targeted = null;
-
-    /* email timestamp of delivery */
-    private Date delivered = null;
-
-    protected boolean hasLocalizedTemplates = true;
-
-    protected SOSPlainTextProcessor mailPlainTextProcessor = null;
-
-    protected SOSDocumentFactoryTextProcessor mailDocumentFactoryTextProcessor = null;
-
-    /** Konstruktor
-     * 
-     * @param sosSettings SOSSettings Einstellungen aus Profile Settings oder
-     *            Connection Settings
-     * @param conn Datenbankverbindung
-     * @throws java.lang.Exception */
     public SOSMailOrder(SOSSettings sosSettings, SOSConnection conn) throws Exception {
         super(sosSettings);
         sosConnection = conn;
     }
 
-    /** Konstruktor
-     * 
-     * @param sosSettings SOSSettings Einstellungen aus Profile Settings oder
-     *            Connection Settings
-     * @param conn Datenbankverbindung
-     * @param language Sprache für Einstellungen
-     * @throws java.lang.Exception */
     public SOSMailOrder(SOSSettings sosSettings, String language, SOSConnection conn) throws Exception {
         super(sosSettings, language);
         sosConnection = conn;
     }
 
-    /** Konstruktor
-     * 
-     * @param host string Hostname oder IP-Adresse des Mail-Servers Wird
-     *            verwendet bei smtp-server ohne Autentifierung Standardport 25
-     *            wird verwendet
-     * @param conn Datenbankverbindung
-     * @throws java.lang.Exception */
     public SOSMailOrder(String host, SOSConnection conn) throws Exception {
         super(host);
         sosConnection = conn;
     }
 
-    /** Konstruktor
-     * 
-     * @param host String Hostname oder IP-Adresse des Mail-Servers
-     * @param user String Name des SMTP-Benutzers
-     * @param pass String Kennwort des SMTP-Benutzers Wird verwendet bei
-     *            smtp-server mit Autentifierung Standardport 25 wird verwendet
-     * @param conn Datenbankverbindung
-     * 
-     * @throws java.lang.Exception */
     public SOSMailOrder(String host, String user, String password, SOSConnection conn) throws Exception {
         super(host, user, password);
         sosConnection = conn;
     }
 
-    /** Konstruktor
-     * 
-     * @param host String Hostname oder IP-Adresse des Mail-Servers
-     * @param port Port des SMTP-Servers
-     * @param user String Name des SMTP-Benutzers
-     * @param pass String Kennwort des SMTP-Benutzers Wird verwendet bei
-     *            smtp-server mit Autentifierung
-     * @param conn Datenbankverbindung
-     * 
-     * @throws java.lang.Exception */
     public SOSMailOrder(String host, String port, String user, String password, SOSConnection conn) throws Exception {
         super(host, port, user, password);
         sosConnection = conn;
     }
 
     public void initProcessors() throws Exception {
-        try { // initialize text processors with templates from settings
+        try {
             if (sosSettings != null && sosSettings instanceof SOSConnectionSettings) {
                 this.mailPlainTextProcessor = new SOSPlainTextProcessor((SOSConnectionSettings) sosSettings);
                 this.mailPlainTextProcessor.setHasLocalizedTemplates(this.hasLocalizedTemplates());
                 this.mailPlainTextProcessor.getTemplates(this.getSectionMailTemplates(), this.getApplicationMailTemplates());
                 this.mailPlainTextProcessor.getScripts(this.getSectionMailScripts(), this.getApplicationMailScripts());
-
                 this.mailDocumentFactoryTextProcessor = new SOSDocumentFactoryTextProcessor((SOSConnectionSettings) sosSettings);
                 this.mailDocumentFactoryTextProcessor.setHasLocalizedTemplates(this.hasLocalizedTemplates());
                 this.mailDocumentFactoryTextProcessor.getTemplates(this.getSectionMailTemplatesFactory(), this.getApplicationMailTemplatesFactory());
                 this.mailDocumentFactoryTextProcessor.getScripts(this.getSectionMailScripts(), this.getApplicationMailScripts());
             }
-
         } catch (Exception e) {
             throw new Exception("failed to initialize processors: " + e);
         }
@@ -180,7 +95,6 @@ public class SOSMailOrder extends SOSMail {
 
     public void load(int id) throws Exception {
         HashMap data = new HashMap();
-
         try {
             data = sosConnection.getSingle("SELECT " + "\"MAILING_ID\", \"JOB_ID\", \"MESSAGE_ID\", \"TOPIC\", "
                     + "\"TOPIC_IDENTIFIER\", \"CLIENT_IDENTIFIER\", \"REFERENCE\", \"MAIL_FROM\", "
@@ -189,33 +103,44 @@ public class SOSMailOrder extends SOSMail {
                     + "\"BODY_TEMPLATE\", \"BODY_TEMPLATE_TYPE\", \"REPLACEMENTS\", \"LANGUAGE\", "
                     + "\"CHARSET\", \"ENCODING\", \"CONTENT_TYPE\", \"STATUS\", \"STATUS_TEXT\", " + "\"TARGETED\", \"DELIVERED\" " + "FROM "
                     + SOSMail.tableMails + " " + "WHERE \"ID\"=" + id);
-
-            if (data.isEmpty())
+            if (data.isEmpty()) {
                 throw new Exception("Mail not found.");
+            }
             setMailingId(Integer.parseInt(data.get("mailing_id").toString()));
             setJobId(Integer.parseInt(data.get("job_id").toString()));
-            if (data.get("message_id") != null)
+            if (data.get("message_id") != null) {
                 setMessageId(data.get("message_id").toString());
-            if (data.get("topic") != null)
+            }
+            if (data.get("topic") != null) {
                 setTopic(data.get("topic").toString());
-            if (data.get("topic_identifier") != null)
+            }
+            if (data.get("topic_identifier") != null) {
                 setTopicIdentifier(data.get("topic_identifier").toString());
-            if (data.get("client_identifier") != null)
+            }
+            if (data.get("client_identifier") != null) {
                 setClientIdentifier(data.get("client_identifier").toString());
-            if (data.get("reference") != null)
+            }
+            if (data.get("reference") != null) {
                 setReference(data.get("reference").toString());
-            if (data.get("mail_from") != null)
+            }
+            if (data.get("mail_from") != null) {
                 setFrom(data.get("mail_from").toString());
-            if (data.get("from_name") != null)
+            }
+            if (data.get("from_name") != null) {
                 setFromName(data.get("from_name").toString());
-            if (data.get("mail_to") != null)
+            }
+            if (data.get("mail_to") != null) {
                 addRecipient(data.get("mail_to").toString());
-            if (data.get("cc_to") != null)
+            }
+            if (data.get("cc_to") != null) {
                 addCC(data.get("cc_to").toString());
-            if (data.get("bcc_to") != null)
+            }
+            if (data.get("bcc_to") != null) {
                 addBCC(data.get("bcc_to").toString());
-            if (data.get("reply_to") != null)
+            }
+            if (data.get("reply_to") != null) {
                 setReplyTo(data.get("reply_to").toString());
+            }
             int priority = Integer.parseInt(data.get("priority").toString());
             switch (priority) {
             case PRIORITY_HIGHEST:
@@ -234,59 +159,61 @@ public class SOSMailOrder extends SOSMail {
                 this.setPriorityNormal();
                 break;
             }
-            if (data.get("subject") != null)
+            if (data.get("subject") != null) {
                 setSubject(data.get("subject").toString());
-            if (data.get("subject_template") != null)
+            }
+            if (data.get("subject_template") != null) {
                 setSubjectTemplate(data.get("subject_template").toString());
-            if (data.get("subject_template_type") != null) {
+            }
+            if (data.get("subject_template_type") != null) { 
                 int tt = Integer.parseInt(data.get("subject_template_type").toString());
                 setSubjectTemplateType(tt);
             }
-            // if (data.get("body")!=null) setBody(data.get("body").toString());
-            if (data.get("body_template") != null)
+            if (data.get("body_template") != null) {
                 setBodyTemplate(data.get("body_template").toString());
+            }
             if (data.get("body_template_type") != null) {
                 int tt = Integer.parseInt(data.get("body_template_type").toString());
                 setBodyTemplateType(tt);
             }
             clearReplacements();
-            if (data.get("replacements") != null && data.get("replacements").toString().length() > 0) {
+            if (data.get("replacements") != null && !data.get("replacements").toString().isEmpty()) {
                 String[] replacementList = data.get("replacements").toString().split("\\|");
                 for (int i = 0; i < replacementList.length; i++) {
                     String[] replacementEntry = replacementList[i].split("\\^");
-                    if (replacementEntry.length == 2)
+                    if (replacementEntry.length == 2) {
                         addReplacement(replacementEntry[0], replacementEntry[1]);
+                    }
                 }
             }
-            if (data.get("language") != null && data.get("language").toString().length() > 0) {
+            if (data.get("language") != null && !data.get("language").toString().isEmpty()) {
                 setLanguage(data.get("language").toString());
             }
-            if (data.get("charset") != null && data.get("charset").toString().length() > 0) {
+            if (data.get("charset") != null && !data.get("charset").toString().isEmpty()) {
                 setCharset(data.get("charset").toString());
             }
-            if (data.get("encoding") != null && data.get("encoding").toString().length() > 0) {
+            if (data.get("encoding") != null && !data.get("encoding").toString().isEmpty()) {
                 setEncoding(data.get("encoding").toString());
             }
-            if (data.get("content_type") != null && data.get("content_type").toString().length() > 0) {
+            if (data.get("content_type") != null && !data.get("content_type").toString().isEmpty()) {
                 setContentType(data.get("content_type").toString());
             }
             if (data.get("status") != null) {
                 int st = Integer.parseInt(data.get("status").toString());
                 setStatus(st);
             }
-            if (data.get("status_text") != null)
+            if (data.get("status_text") != null) {
                 setStatusText(data.get("status_text").toString());
-            if (data.get("targeted") != null && data.get("targeted").toString().length() > 0) {
+            }
+            if (data.get("targeted") != null && !data.get("targeted").toString().isEmpty()) {
                 setTargeted(SOSDate.getTime(data.get("targeted").toString()));
             }
-            if (data.get("delivered") != null && data.get("delivered").toString().length() > 0) {
+            if (data.get("delivered") != null && !data.get("delivered").toString().isEmpty()) {
                 setDelivered(SOSDate.getTime(data.get("delivered").toString()));
             }
-            // load body
             String body = sosConnection.getClob("SELECT \"BODY\" FROM " + SOSMail.tableMails + " WHERE \"ID\"=" + id);
             setBody(body);
             this.id = id;
-
             loadAttachments();
         } catch (Exception e) {
             throw new Exception(SOSClassUtil.getMethodName() + ": could not load mail [" + id + "]: " + e);
@@ -306,13 +233,13 @@ public class SOSMailOrder extends SOSMail {
                     String filename = att.get("filename").toString();
                     File file = new File(filename);
                     SOSMailAttachment attachment = new SOSMailAttachment(this, file);
-                    if (att.get("charset") != null && att.get("charset").toString().length() > 0) {
+                    if (att.get("charset") != null && !att.get("charset").toString().isEmpty()) {
                         attachment.setCharset(att.get("charset").toString());
                     }
-                    if (att.get("encoding") != null && att.get("encoding").toString().length() > 0) {
+                    if (att.get("encoding") != null && !att.get("encoding").toString().isEmpty()) {
                         attachment.setEncoding(att.get("encoding").toString());
                     }
-                    if (att.get("content_type") != null && att.get("content_type").toString().length() > 0) {
+                    if (att.get("content_type") != null && !att.get("content_type").toString().isEmpty()) {
                         attachment.setContentType(att.get("content_type").toString());
                     }
                     addAttachment(attachment);
@@ -324,8 +251,9 @@ public class SOSMailOrder extends SOSMail {
     }
 
     public void store() throws Exception {
-        if (this.id == -1)
+        if (this.id == -1) {
             create();
+        }
         String statement = "UPDATE " + SOSMail.tableMails + " SET ";
         statement += updateField("MAILING_ID", getMailingId());
         statement += updateField("JOB_ID", getJobId());
@@ -341,17 +269,16 @@ public class SOSMailOrder extends SOSMail {
         statement += updateField("BCC_TO", getBCCsAsString());
         statement += updateField("REPLY_TO", getReplyTo());
         String prio = getMessage().getHeader("X-Priority", null);
-        if (prio != null && prio.length() > 0) {
+        if (prio != null && !prio.isEmpty()) {
             try {
                 int iPrio = Integer.parseInt(prio.substring(0, 1));
                 statement += updateField("PRIORITY", iPrio);
             } catch (Exception e) {
-            } // Waere verwunderlich, aber nicht so schlimm
+            }
         }
         statement += updateField("SUBJECT", getSubject());
         statement += updateField("SUBJECT_TEMPLATE", getSubjectTemplate());
         statement += updateField("SUBJECT_TEMPLATE_TYPE", getSubjectTemplateType());
-        // statement += updateField("BODY", getBody());
         statement += updateField("BODY_TEMPLATE", getBodyTemplate());
         statement += updateField("BODY_TEMPLATE_TYPE", getBodyTemplateType());
         statement += updateField("REPLACEMENTS", getReplacementsAsString());
@@ -365,23 +292,20 @@ public class SOSMailOrder extends SOSMail {
         statement += updateField("DELIVERED", getDelivered());
         statement += updateField("MODIFIED_BY", getModifiedBy());
         statement += "\"MODIFIED\"=%now WHERE \"ID\"=" + this.id;
-        /*
-         * log(SOSClassUtil.getMethodName() + ": .. try to update mail table: "
-         * + statement, SOSLogger.DEBUG6);
-         */
-
         try {
             sosConnection.execute(statement);
-            if (getBody() != null && getBody().length() > 0)
+            if (getBody() != null && !getBody().isEmpty()) {
                 sosConnection.updateClob(SOSMail.tableMails, "BODY", getBody(), "\"ID\"=" + this.id);
+            }
             storeAttachments();
             sosConnection.commit();
         } catch (Exception e) {
             try {
                 sosConnection.rollback();
             } catch (Exception ex) {
-            } // do not handle errors while error handling
-            throw new Exception("Error occured storing mail: " + e, e);
+                // do not handle errors while error handling
+            } 
+            throw new Exception("Error occured storing mail: " + e.getMessage(), e);
         }
     }
 
@@ -390,8 +314,9 @@ public class SOSMailOrder extends SOSMail {
     }
 
     private static final String updateField(String fieldname, Date value) throws Exception {
-        if (value == null)
+        if (value == null) {
             return ("\"" + fieldname + "\"=NULL, ");
+        }
         try {
             return ("\"" + fieldname + "\"=%timestamp_iso('" + SOSDate.getTimeAsString(value) + "'), ");
         } catch (Exception e) {
@@ -400,17 +325,17 @@ public class SOSMailOrder extends SOSMail {
     }
 
     private static final String updateField(String fieldname, String value) {
-        if (value == null)
+        if (value == null) {
             return "";
-        // value = (value.length() > 250 ? value.substring(value.length()-250) :
-        // value);
+        }
         value = value.replaceAll("'", "''");
         return ("\"" + fieldname + "\"='" + value + "', ");
     }
 
     private static final String updateField(String fieldname, String value, int limit) {
-        if (value == null)
+        if (value == null) {
             return "";
+        }
         value = (value.length() > limit ? value.substring(value.length() - limit) : value);
         return updateField(fieldname, value);
     }
@@ -421,7 +346,6 @@ public class SOSMailOrder extends SOSMail {
         try {
             while (iter.hasNext()) {
                 SOSMailAttachment attachment = (SOSMailAttachment) iter.next();
-
                 String statement = "INSERT INTO " + tableMailAttachments + " (\"ID\", \"FILENAME\", \"CHARSET\", \"ENCODING\","
                         + " \"CONTENT_TYPE\", \"CREATED\", \"CREATED_BY\", " + " \"MODIFIED\", \"MODIFIED_BY\") VALUES " + " (" + this.id + ", '"
                         + attachment.getFile().getAbsolutePath() + "', " + "'" + attachment.getCharset() + "', " + "'" + attachment.getEncoding()
@@ -447,61 +371,47 @@ public class SOSMailOrder extends SOSMail {
         }
     }
 
-    /** @return Returns the jobId. */
     public int getJobId() {
         return jobId;
     }
 
-    /** @param jobId The jobId to set. */
     public void setJobId(int jobId) {
         this.jobId = jobId;
     }
 
-    /** @return Returns the mailingId. */
     public int getMailingId() {
         return mailingId;
     }
 
-    /** @param mailingId The mailingId to set. */
     public void setMailingId(int mailingId) {
         this.mailingId = mailingId;
     }
 
-    /** @return Returns the topic. */
     public String getTopic() {
         return topic;
     }
 
-    /** @param topic The topic to set. */
     public void setTopic(String topic) {
         this.topic = topic;
     }
 
-    /** @return Returns the topicIdentifier. */
     public String getTopicIdentifier() {
         return topicIdentifier;
     }
 
-    /** @param topicIdentifier The topicIdentifier to set. */
     public void setTopicIdentifier(String topicIdentifier) {
         this.topicIdentifier = topicIdentifier;
     }
 
-    /** @return Returns the messageId. */
     public String getMessageId() {
         return messageId;
     }
 
-    /** @param messageId The messageId to set. */
     protected void setMessageId(String messageId) {
         this.messageId = messageId;
     }
 
-    /*
-     * Sends and stores a message in the Database
-     */
     public boolean send() throws Exception {
-
         String message = "";
         boolean rc = false;
         try {
@@ -515,10 +425,11 @@ public class SOSMailOrder extends SOSMail {
             setStatusText(message);
         } catch (Exception e) {
             setStatus(EMAIL_STATUS_WITH_ERRORS);
-            if (e.getMessage() != null)
+            if (e.getMessage() != null) {
                 setStatusText(e.getMessage());
-            else
+            } else {
                 setStatusText(e.toString());
+            }
             setDelivered(null);
             store();
             throw e;
@@ -528,10 +439,12 @@ public class SOSMailOrder extends SOSMail {
     }
 
     protected boolean prepareJavaMail() throws Exception {
-        if (getSubject() == null || getSubject().trim().length() == 0)
+        if (getSubject() == null || getSubject().trim().isEmpty()) {
             processSubject();
-        if (getBody() == null || getBody().trim().length() == 0)
+        }
+        if (getBody() == null || getBody().trim().isEmpty()) {
             processBody();
+        }
         return super.prepareJavaMail();
     }
 
@@ -554,18 +467,15 @@ public class SOSMailOrder extends SOSMail {
     }
 
     private void processSubject() throws Exception {
-        if (getSubjectTemplate() != null && getSubjectTemplate().length() > 0) {
-
-            if (mailDocumentFactoryTextProcessor == null)
+        if (getSubjectTemplate() != null && !getSubjectTemplate().isEmpty()) {
+            if (mailDocumentFactoryTextProcessor == null) {
                 initProcessors();
+            }
             SOSTextProcessor processor = null;
             if (getSubjectTemplateType() == TEMPLATE_TYPE_FACTORY || getSubjectTemplateType() == TEMPLATE_TYPE_FACTORY_FILE) {
-                // use Document Factory Text Processor
                 processor = mailDocumentFactoryTextProcessor;
             } else {
-                // use Plain Text Processor
                 processor = mailPlainTextProcessor;
-
             }
             if (getSubjectTemplateType() == TEMPLATE_TYPE_FACTORY_FILE || getSubjectTemplateType() == TEMPLATE_TYPE_PLAIN_FILE) {
                 File subjectTemplateFile = new File(getSubjectTemplate());
@@ -583,16 +493,14 @@ public class SOSMailOrder extends SOSMail {
     }
 
     private void processBody() throws Exception {
-        if (getBodyTemplate() != null && getBodyTemplate().trim().length() > 0) {
-
-            if (mailDocumentFactoryTextProcessor == null)
+        if (getBodyTemplate() != null && !getBodyTemplate().trim().isEmpty()) {
+            if (mailDocumentFactoryTextProcessor == null) {
                 initProcessors();
+            }
             SOSTextProcessor processor = null;
             if (getBodyTemplateType() == TEMPLATE_TYPE_FACTORY || getBodyTemplateType() == TEMPLATE_TYPE_FACTORY_FILE) {
-                // use Document Factory Text Processor
                 processor = mailDocumentFactoryTextProcessor;
             } else {
-                // use Plain Text Processor
                 processor = mailPlainTextProcessor;
             }
             if (getBodyTemplateType() == TEMPLATE_TYPE_FACTORY_FILE || getBodyTemplateType() == TEMPLATE_TYPE_PLAIN_FILE) {
@@ -612,7 +520,7 @@ public class SOSMailOrder extends SOSMail {
 
     private String readFile(File file) throws Exception {
         BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
-        StringBuffer content = new StringBuffer("");
+        StringBuilder content = new StringBuilder();
         byte buffer[] = new byte[1024];
         int bytesRead;
         while ((bytesRead = in.read(buffer)) != -1) {
@@ -622,22 +530,18 @@ public class SOSMailOrder extends SOSMail {
         return content.toString();
     }
 
-    /** @return Returns the clientIdentifier. */
     protected String getClientIdentifier() {
         return clientIdentifier;
     }
 
-    /** @param clientIdentifier The clientIdentifier to set. */
     protected void setClientIdentifier(String clientIdentifier) {
         this.clientIdentifier = clientIdentifier;
     }
 
-    /** @return Returns the reference. */
     protected String getReference() {
         return reference;
     }
 
-    /** @param reference The reference to set. */
     protected void setReference(String reference) {
         this.reference = reference;
     }
@@ -646,50 +550,38 @@ public class SOSMailOrder extends SOSMail {
         this.subjectTemplate = subjectTemplate;
     }
 
-    /** @return Returns the subjectTemplateType. */
     public int getSubjectTemplateType() {
         return subjectTemplateType;
     }
 
-    /** @param subjectTemplateType The subjectTemplateType to set. */
     public void setSubjectTemplateType(int subjectTemplateType) {
         this.subjectTemplateType = subjectTemplateType;
     }
 
-    /** @return Returns the subjectTemplate. */
     public String getSubjectTemplate() {
         return subjectTemplate;
     }
 
-    /** @return Returns the bodyTemplate. */
     public String getBodyTemplate() {
         return bodyTemplate;
     }
 
-    /** @param bodyTemplate The bodyTemplate to set. */
     public void setBodyTemplate(String bodyTemplate) {
         this.bodyTemplate = bodyTemplate;
     }
 
-    /** @return Returns the bodyTemplateType. */
     public int getBodyTemplateType() {
         return bodyTemplateType;
     }
 
-    /** @param bodyTemplateType The bodyTemplateType to set. */
     public void setBodyTemplateType(int bodyTemplateType) {
         this.bodyTemplateType = bodyTemplateType;
     }
 
-    /** Fügt eine Ersetzung für body und subject hinzu */
     public void addReplacement(String key, String value) {
         replacements.put(key, value);
     }
 
-    /** Gibt Ersetzungsstring für einen Schlüssel zurück
-     * 
-     * @param key Schlüssel
-     * @return Ersetzungsstring oder null */
     public String getReplacement(String key) {
         Object value = replacements.get(key);
         if (value != null) {
@@ -704,8 +596,9 @@ public class SOSMailOrder extends SOSMail {
         while (keys.hasNext()) {
             String key = (String) keys.next();
             rc += key + "^" + replacements.get(key).toString();
-            if (keys.hasNext())
+            if (keys.hasNext()) {
                 rc += "|";
+            }
         }
         return rc;
     }
@@ -714,47 +607,38 @@ public class SOSMailOrder extends SOSMail {
         replacements.clear();
     }
 
-    /** @return Returns the status. */
     public int getStatus() {
         return status;
     }
 
-    /** @param status The status to set. */
     public void setStatus(int status) {
         this.status = status;
     }
 
-    /** @return Returns the statusText. */
     public String getStatusText() {
         return statusText;
     }
 
-    /** @param statusText The statusText to set. */
     public void setStatusText(String statusText) {
         this.statusText = statusText;
     }
 
-    /** @return Returns the delivered. */
     public Date getDelivered() {
         return delivered;
     }
 
-    /** @param delivered The delivered to set. */
     public void setDelivered(Date delivered) {
         this.delivered = delivered;
     }
 
-    /** @return Returns the targeted. */
     public Date getTargeted() {
         return targeted;
     }
 
-    /** @param targeted The targeted to set. */
     public void setTargeted(Date targeted) {
         this.targeted = targeted;
     }
 
-    /** @return Returns the id (Database Primary Key) */
     public int getId() {
         return id;
     }
@@ -763,7 +647,6 @@ public class SOSMailOrder extends SOSMail {
         super.init();
         delivered = null;
         id = -1;
-        // jobId = 0; Kann ja eh nur von einem Job benutzt werden
         mailingId = 0;
         messageId = "";
         reference = null;
@@ -785,10 +668,9 @@ public class SOSMailOrder extends SOSMail {
 
     public static void main(String[] args) throws Exception {
         String mailto = "mo@sos-berlin.com";
-
         SOSLogger logger = new SOSStandardLogger(9);
-
-        SOSConnection conn = SOSConnection.createInstance("SOSMSSQLConnection", "com.microsoft.sqlserver.jdbc.SQLServerDriver", "jdbc:sqlserver://8of9:2433;sendStringParametersAsUnicode=false;selectMethod=cursor;databaseName=ehp_bkk", "ehp_bkk", "ehp_bkk", logger);
+        SOSConnection conn = SOSConnection.createInstance("SOSMSSQLConnection", "com.microsoft.sqlserver.jdbc.SQLServerDriver", 
+                "jdbc:sqlserver://8of9:2433;sendStringParametersAsUnicode=false;selectMethod=cursor;databaseName=ehp_bkk", "ehp_bkk", "ehp_bkk", logger);
         conn.connect();
         SOSSettings settings = new SOSConnectionSettings(conn, "SETTINGS", logger);
         SOSMailOrder order = new SOSMailOrder(settings, conn);
@@ -803,13 +685,12 @@ public class SOSMailOrder extends SOSMail {
         conn.disconnect();
     }
 
-    /** @return Returns the modifiedBy. */
     public String getModifiedBy() {
         return modifiedBy;
     }
 
-    /** @param modifiedBy The modifiedBy to set. */
     public void setModifiedBy(String modifiedBy) {
         this.modifiedBy = modifiedBy;
     }
+
 }

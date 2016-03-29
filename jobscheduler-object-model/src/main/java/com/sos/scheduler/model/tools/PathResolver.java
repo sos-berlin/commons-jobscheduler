@@ -7,21 +7,19 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
 public class PathResolver {
 
-    private final static Logger logger = Logger.getLogger(PathResolver.class);
+    private final static Logger LOGGER = Logger.getLogger(PathResolver.class);
 
     private PathResolver() {
     }
 
     public static String getRelativePath(String rootDir, String baseDir, String relativeName) {
-        // logger.debug("getRelativePath: rootDir = " + rootDir);
-        // logger.debug("getRelativePath: baseDir = " + baseDir);
-        // logger.debug("getRelativePath: relativePath = " + relativePath);
         String result = normalizePath(relativeName);
         if (!result.startsWith("/")) {
             result = getPath(baseDir, relativeName);
             String rootPath = resolvePath(rootDir);
-            if (!result.startsWith(rootPath))
+            if (!result.startsWith(rootPath)) {
                 throw new JobSchedulerException("the path " + result + " point outside the root " + rootPath);
+            }
             result = result.replace(normalizePath(rootDir), "");
         }
         return result;
@@ -32,17 +30,17 @@ public class PathResolver {
     }
 
     public static boolean isAbsolutePath(String path) {
-        return (isAbsoluteWindowsPath(path) || isAbsoluteUnixPath(path));
+        return isAbsoluteWindowsPath(path) || isAbsoluteUnixPath(path);
     }
 
     public static boolean isAbsoluteWindowsPath(String path) {
         String normalizedPath = normalizePath(path);
-        return (normalizedPath.substring(1, 3).equals(":/"));
+        return ":/".equals(normalizedPath.substring(1, 3));
     }
 
     public static boolean isAbsoluteUnixPath(String path) {
         String normalizedPath = normalizePath(path);
-        return (normalizedPath.substring(0, 1).equals("/"));
+        return "/".equals(normalizedPath.substring(0, 1));
     }
 
     private static String getPath(String basePath, String relativeName) {
@@ -58,9 +56,9 @@ public class PathResolver {
         basePath = normalizePath(basePath);
         testPath(basePath, throwException);
         relativePath = normalizePath(relativePath);
-        if (relativePath.startsWith("/"))
+        if (relativePath.startsWith("/")) {
             return relativePath;
-        // if (!relativePath.startsWith("/"))
+        }
         basePath += "/";
         String result = resolvePath(basePath + relativePath);
         testPath(result, throwException);
@@ -68,7 +66,7 @@ public class PathResolver {
     }
 
     private static String stripTrailingSlash(String text) {
-        return (text.endsWith("/")) ? text.substring(0, text.length() - 1) : text;
+        return text.endsWith("/") ? text.substring(0, text.length() - 1) : text;
     }
 
     private static String normalizeSlashes(String text) {
@@ -79,9 +77,10 @@ public class PathResolver {
         File f = new File(path);
         if (!f.exists()) {
             String message = "the directory " + path + " does not exist.";
-            if (throwException)
+            if (throwException) {
                 throw new FileNotFoundException(message);
-            logger.warn(message);
+            }
+            LOGGER.warn(message);
         }
     }
 
@@ -91,10 +90,12 @@ public class PathResolver {
 
     public static String resolvePath(String path) {
         String result = normalizePath(path);
-        if (result.startsWith("./"))
+        if (result.startsWith("./")) {
             result = result.substring(2);
-        if (result.endsWith("/."))
+        }
+        if (result.endsWith("/.")) {
             result = result.substring(0, result.length() - 2);
+        }
         String workingCopy = result.replace("/./", "/");
         do {
             result = workingCopy;
@@ -107,7 +108,7 @@ public class PathResolver {
         String result = path;
         String[] arr = path.split("/");
         for (int i = 0; i < arr.length; i++) {
-            if (arr[i].equals("..")) {
+            if ("..".equals(arr[i])) {
                 result = removePart(arr, i - 1, i);
                 break;
             }
@@ -116,7 +117,7 @@ public class PathResolver {
     }
 
     private static String removePart(String[] arr, int start, int end) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         for (int j = 0; j < arr.length; j++) {
             if (j < start || j > end) {
                 result.append(arr[j]);

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.sos.dialog.message;
 
 import org.apache.log4j.Logger;
@@ -11,62 +8,52 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
-public class ErrorLog /* extends Exception */{
+public class ErrorLog {
 
-    @SuppressWarnings("unused")
-    private static final long serialVersionUID = -4414810697191992062L;
-    @SuppressWarnings("unused")
-    private final String conClassName = this.getClass().getSimpleName();
-    @SuppressWarnings("unused")
-    private static final String conSVNVersion = "$Id: ErrorLog.java 20985 2013-09-04 09:13:12Z ur $";
-    private final Logger logger = Logger.getLogger(this.getClass());
-
+    private static final Logger LOGGER = Logger.getLogger(ErrorLog.class);
+    private static Shell sShell = null;
     public static String gstrApplication = "";
 
     public ErrorLog(final String msg) {
         super();
         try {
             message(msg, SWT.ERROR);
-            logger.info(msg);
+            LOGGER.info(msg);
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+            LOGGER.debug(ex.getMessage(), ex);
         }
     }
 
     public ErrorLog(final String msg, final Exception e) {
         super();
-
         try {
             JobSchedulerException objJSE = new JobSchedulerException(msg, e);
             String strMsg = msg + "\n" + objJSE.ExceptionText();
             message(strMsg, SWT.ERROR);
-            logger.error(strMsg);
+            LOGGER.error(strMsg);
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+            LOGGER.debug(ex.getMessage(), ex);
         }
     }
 
     public String getErrorMessage(final Exception ex) {
         String s = "";
-
         try {
             Throwable tr = ex.getCause();
-
-            if (ex.toString() != null)
+            if (ex.toString() != null) {
                 s = ex.toString();
-
+            }
             while (tr != null) {
-                if (s.indexOf(tr.toString()) == -1)
+                if (s.indexOf(tr.toString()) == -1) {
                     s = (s.length() > 0 ? s + ", " : "") + tr.toString();
+                }
                 tr = tr.getCause();
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            LOGGER.debug(e.getMessage(), e);
         }
         return s;
     }
-
-    private static Shell sShell = null;
 
     public static Shell getSShell() {
         if (sShell == null) {
@@ -99,29 +86,23 @@ public class ErrorLog /* extends Exception */{
         case SWT.ICON_ERROR:
             title = "error";
             break;
-
         case SWT.ICON_INFORMATION:
             title = "information";
             break;
-
         case SWT.ICON_QUESTION:
             title = "question";
             break;
-
         case SWT.ICON_WARNING:
             title = "warning";
             break;
-
         default:
             break;
         }
         return getLabel(title);
-
     }
 
     private static String getLabel(final String pstrI18NKey) {
-        String strR = "";
-        strR = new DialogMsg(pstrI18NKey).get();
-        return strR;
+        return new DialogMsg(pstrI18NKey).get();
     }
+
 }

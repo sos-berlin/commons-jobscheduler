@@ -84,8 +84,9 @@ public class JobSchedulerJob extends Job_impl {
             if (spooler_task != null) {
                 this.setJobId(spooler_task.id());
             }
-            if (spooler_job != null)
+            if (spooler_job != null) {
                 this.setJobName(spooler_job.name());
+            }
             if (spooler_job != null) {
                 this.setJobFolder(spooler_job.folder_path());
             }
