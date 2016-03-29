@@ -979,7 +979,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     public void login(final String strUserName, final String strPassword) {
         gstrUser = strUserName;
         try {
-            logger.debug(SOSVfs_D_132.params(strUserName));
+            LOGGER.debug(SOSVfs_D_132.params(strUserName));
             Client().login(strUserName, strPassword);
             LogReply();
             if (objFTPReply.isSuccessCode()) {
