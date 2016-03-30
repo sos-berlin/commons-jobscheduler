@@ -26,6 +26,7 @@ public class Table2DBLayer extends SOSHibernateDBLayer {
             query = getConnection().createQuery(hql);
             if (filter.getName() != null) {
                 query.setParameter(FIELD1, filter.getName());
+            }
         } catch (Exception e) {
             throw new RuntimeException("Error creating Query", e);
         }
@@ -61,7 +62,7 @@ public class Table2DBLayer extends SOSHibernateDBLayer {
             this.getConnection().saveOrUpdate(record);
             this.getConnection().commit();
         } catch (Exception e) {
-            logger.error("Error occurred adding record: ", e);
+            LOGGER.error("Error occurred adding record: ", e);
         }
         return record.getId();
     }

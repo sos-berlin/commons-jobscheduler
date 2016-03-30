@@ -62,7 +62,7 @@ public class Table1DBLayer extends SOSHibernateDBLayer {
             this.getConnection().saveOrUpdate(record);
             this.getConnection().commit();
         } catch (Exception e) {
-            logger.error("Error occurred adding record: ", e);
+            LOGGER.error("Error occurred adding record: ", e);
         }
         return record.getId();
     }
