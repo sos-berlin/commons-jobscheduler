@@ -30,10 +30,11 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
     private static SOSString sosString = new SOSString();
     private static String state = "";
     private final String defaultLocalDir = ".";
-    private final String installpaths = "%{local_dir}/xalan.jar;%{local_dir}/trilead-ssh2-build211.jar;%{local_dir}/commons-net-1.2.2.jar;%{local_dir}"
-            + "/readme.txt;%{local_dir}/ThirdParty.txt";
-    private final String installDocPaths = "%{local_dir}/doc/banner_english.gif;%{local_dir}/doc/banner_german.gif;%{local_dir}/doc/sosftp.xml;%{local_dir}"
-            + "/doc/sosftp.xsl";
+    private final String installpaths =
+            "%{local_dir}/xalan.jar;%{local_dir}/trilead-ssh2-build211.jar;%{local_dir}/commons-net-1.2.2.jar;%{local_dir}"
+                    + "/readme.txt;%{local_dir}/ThirdParty.txt";
+    private final String installDocPaths =
+            "%{local_dir}/doc/banner_english.gif;%{local_dir}/doc/banner_german.gif;%{local_dir}/doc/sosftp.xml;%{local_dir}" + "/doc/sosftp.xsl";
     private int intPosixPermissions = 0;
     private int successful_transfers = 0;
     private int failed_transfer = 0;
@@ -93,8 +94,9 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
     private String lastHost = "";
     private String lastUser = "";
     private String lastAccount = "";
-    private String installpathsWithRevNr = "%{local_dir}/com.sos.xml.*[.]jar$;%{local_dir}/com.sos.connection.*[.]jar$;%{local_dir}/com.sos.net.*[.]jar$;%{local_dir}"
-            + "/com.sos.settings.*[.]jar$;%{local_dir}/com.sos.util.*[.]jar$;%{local_dir}/com.sos.configuration.*[.]jar$";
+    private String installpathsWithRevNr =
+            "%{local_dir}/com.sos.xml.*[.]jar$;%{local_dir}/com.sos.connection.*[.]jar$;%{local_dir}/com.sos.net.*[.]jar$;%{local_dir}"
+                    + "/com.sos.settings.*[.]jar$;%{local_dir}/com.sos.util.*[.]jar$;%{local_dir}/com.sos.configuration.*[.]jar$";
     private String transActionalRemoteFiles = null;
     private ArrayList<File> transActionalLocalFiles = null;
     public static final String RECURSIVE = "recursive";
@@ -154,8 +156,8 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                         RaiseException("local directory does not exist or is not accessible: " + localDir);
                     }
                     this.getLogger().debug1(
-                            "connecting by " + protocol + " to host " + host + ", port " + port + ", local directory " + localDir + ", remote directory "
-                                    + remoteDir + (isFilePath ? ", file " + filePath : ", file specification " + fileSpec));
+                            "connecting by " + protocol + " to host " + host + ", port " + port + ", local directory " + localDir
+                                    + ", remote directory " + remoteDir + (isFilePath ? ", file " + filePath : ", file specification " + fileSpec));
                     boolean alternativeUse = true;
                     int isAlternativeParameterUse = 0;
                     while (alternativeUse && isAlternativeParameterUse <= 1) {
@@ -180,8 +182,9 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                         } catch (Exception ex) {
                             this.getLogger().debug1(
                                     "..error in ftp server init with [host=" + host + "], [port=" + port + "] " + SOSFTPCommand.getErrorMessage(ex));
-                            alternativeUse = !(alternativeHost.concat(alternativeUser).concat(alternativePassword).concat(alternativeAccount)).isEmpty()
-                                    || alternativePort != 0;
+                            alternativeUse =
+                                    !(alternativeHost.concat(alternativeUser).concat(alternativePassword).concat(alternativeAccount)).isEmpty()
+                                            || alternativePort != 0;
                             if (alternativeUse && isAlternativeParameterUse == 0) {
                                 getLogger().reset();
                                 if (ftpClient != null) {
@@ -208,9 +211,9 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                                 setAlternativeParameter();
                                 arguments.put("user", user);
                                 this.getLogger().debug1(
-                                        "..try login with alternative parameter [host=" + host + "], [port=" + port + "] " + "[user=" + user + "], [account="
-                                                + account + "], [remoteDir=" + remoteDir + "], [passiveMode=" + passiveMode + "], " + "[transferMode="
-                                                + transferMode + "]");
+                                        "..try login with alternative parameter [host=" + host + "], [port=" + port + "] " + "[user=" + user
+                                                + "], [account=" + account + "], [remoteDir=" + remoteDir + "], [passiveMode=" + passiveMode + "], "
+                                                + "[transferMode=" + transferMode + "]");
                             } else {
                                 RaiseException("..error in ftp server init with [host=" + host + "], [port=" + port + "] " + ex.getMessage());
                             }
@@ -270,8 +273,8 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                     filelist = getFilePaths();
                 } else {
                     if (this.createFile(localDir).isDirectory()) {
-                        this.getLogger().debug1("local directory: " + localDir + ", remote directory: " + remoteDir + ", file specification: "
-                                + fileSpec);
+                        this.getLogger().debug1(
+                                "local directory: " + localDir + ", remote directory: " + remoteDir + ", file specification: " + fileSpec);
                         filelist = SOSFile.getFilelist(this.createFile(localDir).getAbsolutePath(), fileSpec, 0, recursive);
                     } else {
                         this.getLogger().debug1("local file: " + localDir + ", remote directory: " + remoteDir + ", file specification: " + fileSpec);
@@ -285,8 +288,8 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                         File checkFile = (File) iterator.next();
                         if (checkFile.exists()) {
                             if (checkFile.length() == 0) {
-                                this.getLogger().debug1("skipping transfer of local file: " + checkFile.getAbsolutePath()
-                                        + " due to zero byte constraint");
+                                this.getLogger().debug1(
+                                        "skipping transfer of local file: " + checkFile.getAbsolutePath() + " due to zero byte constraint");
                                 filelist.remove(checkFile);
                                 if (removeFiles) {
                                     if (!checkFile.delete()) {
@@ -426,8 +429,9 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                 account = sosString.parseToString(arguments.get("account"));
             }
             if (keepConnection) {
-                sameConnection = ftpClient != null && ftpClient.isConnected() && lastHost.equalsIgnoreCase(host) && lastPort == port
-                        && lastUser.equalsIgnoreCase(user) && lastAccount.equalsIgnoreCase(account);
+                sameConnection =
+                        ftpClient != null && ftpClient.isConnected() && lastHost.equalsIgnoreCase(host) && lastPort == port
+                                && lastUser.equalsIgnoreCase(user) && lastAccount.equalsIgnoreCase(account);
             }
             if (ftpClient != null && ftpClient.isConnected() && !sameConnection) {
                 try {
@@ -461,19 +465,22 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                 atomicSuffix = sosString.parseToString(arguments.get("atomic_suffix"));
             }
             if (!sosString.parseToString(arguments.get("check_size")).isEmpty()) {
-                checkSize = !"1".equals(sosString.parseToString(arguments.get("check_size")))
-                        && !"true".equalsIgnoreCase(sosString.parseToString(arguments.get("check_size")))
-                        && !"yes".equalsIgnoreCase(sosString.parseToString(arguments.get("check_size"))) ? false : true;
+                checkSize =
+                        !"1".equals(sosString.parseToString(arguments.get("check_size")))
+                                && !"true".equalsIgnoreCase(sosString.parseToString(arguments.get("check_size")))
+                                && !"yes".equalsIgnoreCase(sosString.parseToString(arguments.get("check_size"))) ? false : true;
             }
             if (!sosString.parseToString(arguments.get("overwrite_files")).isEmpty()) {
-                overwriteFiles = !"1".equals(sosString.parseToString(arguments.get("overwrite_files")))
-                        && !"true".equalsIgnoreCase(sosString.parseToString(arguments.get("overwrite_files")))
-                        && !"yes".equalsIgnoreCase(sosString.parseToString(arguments.get("overwrite_files"))) ? false : true;
+                overwriteFiles =
+                        !"1".equals(sosString.parseToString(arguments.get("overwrite_files")))
+                                && !"true".equalsIgnoreCase(sosString.parseToString(arguments.get("overwrite_files")))
+                                && !"yes".equalsIgnoreCase(sosString.parseToString(arguments.get("overwrite_files"))) ? false : true;
             }
             if (!sosString.parseToString(arguments.get("append_files")).isEmpty()) {
-                appendFiles = "1".equals(sosString.parseToString(arguments.get("append_files")))
-                        || "true".equalsIgnoreCase(sosString.parseToString(arguments.get("append_files")))
-                        || "yes".equalsIgnoreCase(sosString.parseToString(arguments.get("append_files"))) ? true : false;
+                appendFiles =
+                        "1".equals(sosString.parseToString(arguments.get("append_files")))
+                                || "true".equalsIgnoreCase(sosString.parseToString(arguments.get("append_files")))
+                                || "yes".equalsIgnoreCase(sosString.parseToString(arguments.get("append_files"))) ? true : false;
             }
             if (!sosString.parseToString(arguments.get("remove_files")).isEmpty()) {
                 removeFiles = sosString.parseToBoolean(arguments.get("remove_files"));
@@ -482,14 +489,16 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                 skipTransfer = sosString.parseToBoolean(arguments.get("skip_transfer"));
             }
             if (!sosString.parseToString(arguments.get(PARAMETER_MAKE_DIRS)).isEmpty()) {
-                flgMakeDirs = "1".equals(sosString.parseToString(arguments.get(PARAMETER_MAKE_DIRS)))
-                        || "true".equalsIgnoreCase(sosString.parseToString(arguments.get(PARAMETER_MAKE_DIRS)))
-                        || "yes".equalsIgnoreCase(sosString.parseToString(arguments.get(PARAMETER_MAKE_DIRS))) ? true : false;
+                flgMakeDirs =
+                        "1".equals(sosString.parseToString(arguments.get(PARAMETER_MAKE_DIRS)))
+                                || "true".equalsIgnoreCase(sosString.parseToString(arguments.get(PARAMETER_MAKE_DIRS)))
+                                || "yes".equalsIgnoreCase(sosString.parseToString(arguments.get(PARAMETER_MAKE_DIRS))) ? true : false;
             }
             if (!sosString.parseToString(arguments.get(conParamFORCE_FILES)).isEmpty()) {
-                forceFiles = !"1".equals(sosString.parseToString(arguments.get(conParamFORCE_FILES)))
-                        && !"true".equalsIgnoreCase(sosString.parseToString(arguments.get(conParamFORCE_FILES)))
-                        && !"yes".equalsIgnoreCase(sosString.parseToString(arguments.get(conParamFORCE_FILES))) ? false : true;
+                forceFiles =
+                        !"1".equals(sosString.parseToString(arguments.get(conParamFORCE_FILES)))
+                                && !"true".equalsIgnoreCase(sosString.parseToString(arguments.get(conParamFORCE_FILES)))
+                                && !"yes".equalsIgnoreCase(sosString.parseToString(arguments.get(conParamFORCE_FILES))) ? false : true;
             } else {
                 forceFiles = true;
             }
@@ -866,7 +875,8 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                                             + ftpClient.getReplyString());
                                 } else {
                                     this.getLogger().debug(
-                                            "..ftp server reply [mkdir sub-directory] [" + remoteDir + "/" + subPath + "]: " + ftpClient.getReplyString());
+                                            "..ftp server reply [mkdir sub-directory] [" + remoteDir + "/" + subPath + "]: "
+                                                    + ftpClient.getReplyString());
                                 }
                             }
                         }
@@ -891,8 +901,8 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                 transferFilename = transferFile.getName();
                 if (replacement != null && replacing != null && !replacing.isEmpty()) {
                     String currTransferFilename = SOSFileOperations.getReplacementFilename(transferFile.getName(), replacing, replacement);
-                    String currPath = transferFile.getParent() != null && !transferFile.getParent().isEmpty() ? normalized(transferFile.getParent())
-                            : "";
+                    String currPath =
+                            transferFile.getParent() != null && !transferFile.getParent().isEmpty() ? normalized(transferFile.getParent()) : "";
                     this.getLogger().debug1("source filename [" + transferFile.getName() + "] is renamed to: " + currTransferFilename);
                     transferFile = new File(currPath + currTransferFilename);
                     transferFilename = transferFile.getName();
@@ -914,7 +924,8 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                         SOSGZip.compressFile(localFile, sourceFile);
                     }
                     this.getLogger().info(
-                            "sending file : " + transferFile.getAbsolutePath() + atomicSuffix + " from source/temp file " + sourceFile.getAbsolutePath());
+                            "sending file : " + transferFile.getAbsolutePath() + atomicSuffix + " from source/temp file "
+                                    + sourceFile.getAbsolutePath());
                     bytesSend = ftpClient.putFile(sourceFile.getAbsolutePath(), transferFilename + atomicSuffix);
                     transActionalRemoteFiles = transferFilename + atomicSuffix + ";" + sosString.parseToString(transActionalRemoteFiles);
                     this.getLogger().info("file_size    : " + bytesSend + " bytes");
@@ -974,8 +985,8 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                         }
                     } else {
                         if (compressFiles) {
-                            this.getLogger().info("sending file : " + transferFile.getAbsolutePath() + " from temporary file "
-                                    + sourceFile.getAbsolutePath());
+                            this.getLogger().info(
+                                    "sending file : " + transferFile.getAbsolutePath() + " from temporary file " + sourceFile.getAbsolutePath());
                         } else {
                             this.getLogger().info("sending file : " + transferFile.getAbsolutePath());
                         }
@@ -993,8 +1004,8 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                         RaiseException("..error occurred sending file [" + transferFile.getAbsolutePath() + "]: " + ftpClient.getReplyString());
                     } else {
                         this.getLogger().debug(
-                                "..ftp server reply [put] [" + transferFilename + "---" + transferFile.getAbsolutePath() + ", size=" + bytesSend + "]: "
-                                        + ftpClient.getReplyString());
+                                "..ftp server reply [put] [" + transferFilename + "---" + transferFile.getAbsolutePath() + ", size=" + bytesSend
+                                        + "]: " + ftpClient.getReplyString());
                     }
                 }
                 long lngTransferFileSize = transferFile.length();
@@ -1022,7 +1033,8 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                 count++;
             }
         } catch (Exception e) {
-            throw new JobSchedulerException("error in  " + sos.util.SOSClassUtil.getMethodName() + " could not send files, cause: " + e.getMessage(), e);
+            throw new JobSchedulerException("error in  " + sos.util.SOSClassUtil.getMethodName() + " could not send files, cause: " + e.getMessage(),
+                    e);
         }
     }
 
@@ -1038,8 +1050,8 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                     }
                 }
             }
-            String com = sosString.parseToString(arguments.get("jump_command")) + " -operation=remove_temp_directory -input=\"" + tempJumpRemoteDir
-                    + "\"";
+            String com =
+                    sosString.parseToString(arguments.get("jump_command")) + " -operation=remove_temp_directory -input=\"" + tempJumpRemoteDir + "\"";
             this.setCommands(com.split(getCommandDelimiter()));
             if (!execute()) {
                 arguments.remove("xx_make_temp_directory_xx");
@@ -1331,8 +1343,9 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                         newarg = newarg + " -" + split[i];
                     }
                 }
-                newarg = newarg + " " + transActionalRemoteFiles.replaceAll(";", " ")
-                        + " -skip_transfer=\"yes\" -transactional=\"false\" -operation=\"remove\"" + " -remove_files=\"yes\"";
+                newarg =
+                        newarg + " " + transActionalRemoteFiles.replaceAll(";", " ")
+                                + " -skip_transfer=\"yes\" -transactional=\"false\" -operation=\"remove\"" + " -remove_files=\"yes\"";
                 p.put("command", newarg);
                 p.put("operation", "execute");
                 p.put("xx_make_temp_directory_success_transfer_xx", "ok");
@@ -1397,9 +1410,10 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                             newarg = newarg + " -" + split[i];
                         }
                     }
-                    newarg = newarg + " " + transActionalRemoteFiles.replaceAll(";", " ") + " -replacement=\"" + atomicSuffix + "\""
-                            + " -skip_transfer=\"yes\" -replacing=\"\" -transactional=\"false\" -operation=\"send\""
-                            + " -atomic_suffix=\"\" -remove_files=\"no\"";
+                    newarg =
+                            newarg + " " + transActionalRemoteFiles.replaceAll(";", " ") + " -replacement=\"" + atomicSuffix + "\""
+                                    + " -skip_transfer=\"yes\" -replacing=\"\" -transactional=\"false\" -operation=\"send\""
+                                    + " -atomic_suffix=\"\" -remove_files=\"no\"";
                     p.put("command", newarg);
                     p.put("operation", "execute");
                     p.put("xx_make_temp_directory_success_transfer_xx", "ok");
@@ -1426,8 +1440,9 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
             Iterator iterator = filelist.iterator();
             while (iterator.hasNext()) {
                 String transferFilename = sosString.parseToString(iterator.next());
-                String rTransferFilename = transferFilename.length() > replacement.length() ? transferFilename.substring(0, transferFilename.length()
-                        - replacement.length()) : "";
+                String rTransferFilename =
+                        transferFilename.length() > replacement.length() ? transferFilename.substring(0, transferFilename.length()
+                                - replacement.length()) : "";
                 if (!transferFilename.trim().isEmpty()) {
                     transferFilename = new File(transferFilename).getName();
                     rTransferFilename = new File(rTransferFilename).getName();
@@ -1442,7 +1457,8 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                                         + ftpClient.getReplyString());
                             } else {
                                 this.getLogger().debug(
-                                        "..ftp server reply [rename] " + transferFilename + " in " + rTransferFilename + ": " + ftpClient.getReplyString());
+                                        "..ftp server reply [rename] " + transferFilename + " in " + rTransferFilename + ": "
+                                                + ftpClient.getReplyString());
                             }
                         }
                     } else {
@@ -1549,7 +1565,8 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                 remoteDir = "";
             }
             String localFile = new File(localDir, filePath).getPath();
-            String targetFile = new File(sosString.parseToString(remoteDir), new File(filePath).getName()).getPath().replaceAll(conRegExpBackslash, "/");
+            String targetFile =
+                    new File(sosString.parseToString(remoteDir), new File(filePath).getName()).getPath().replaceAll(conRegExpBackslash, "/");
             if (!new File(localFile).exists()) {
                 RaiseException(".. file [" + localFile + "] does not exist ");
             }

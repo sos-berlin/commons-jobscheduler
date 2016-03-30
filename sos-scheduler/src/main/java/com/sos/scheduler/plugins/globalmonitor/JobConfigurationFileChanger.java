@@ -52,8 +52,9 @@ public class JobConfigurationFileChanger {
 
     protected void reorderDOM(Element element) {
 
-        String[] ordering4Elements = { "settings", "description", "lock.use", "params", "environment", "script", "process", "monitor.use", "monitor",
-                "start_when_directory_changed", "delay_after_error", "delay_order_after_setback", "run_time", "commands" };
+        String[] ordering4Elements =
+                { "settings", "description", "lock.use", "params", "environment", "script", "process", "monitor.use", "monitor",
+                        "start_when_directory_changed", "delay_after_error", "delay_order_after_setback", "run_time", "commands" };
         for (int i = 0; i < ordering4Elements.length; i++) {
             List<Element> listOfElements = new ArrayList<Element>(element.getChildren(ordering4Elements[i]));
             if (listOfElements.size() > 0) {

@@ -123,7 +123,8 @@ public class JobSchedulerSignalJob extends Job_impl {
                     spooler_log.info(".. job parameter [scheduler_remote_job_start_after]: " + this.getAfter());
                 }
             }
-            if (spooler_task.params().var("scheduler_remote_order_replace") != null && !spooler_task.params().var("scheduler_remote_order_replace").isEmpty()) {
+            if (spooler_task.params().var("scheduler_remote_order_replace") != null
+                    && !spooler_task.params().var("scheduler_remote_order_replace").isEmpty()) {
                 if ("yes".equalsIgnoreCase(spooler_task.params().var("scheduler_remote_order_replace"))
                         || "true".equalsIgnoreCase(spooler_task.params().var("scheduler_remote_order_replace"))
                         || "1".equals(spooler_task.params().var("scheduler_remote_order_replace"))) {
@@ -149,13 +150,15 @@ public class JobSchedulerSignalJob extends Job_impl {
                     spooler_log.info(".. job parameter [scheduler_remote_order_priority]: " + this.getPriority());
                 }
             }
-            if (spooler_task.params().var("scheduler_remote_order_state") != null && !spooler_task.params().var("scheduler_remote_order_state").isEmpty()) {
+            if (spooler_task.params().var("scheduler_remote_order_state") != null
+                    && !spooler_task.params().var("scheduler_remote_order_state").isEmpty()) {
                 this.setState(spooler_task.params().var("scheduler_remote_order_state"));
                 if (logValue) {
                     spooler_log.info(".. job parameter [scheduler_remote_order_state]: " + this.getState());
                 }
             }
-            if (spooler_task.params().var("scheduler_remote_order_title") != null && !spooler_task.params().var("scheduler_remote_order_title").isEmpty()) {
+            if (spooler_task.params().var("scheduler_remote_order_title") != null
+                    && !spooler_task.params().var("scheduler_remote_order_title").isEmpty()) {
                 this.setTitle(spooler_task.params().var("scheduler_remote_order_title"));
                 if (logValue) {
                     spooler_log.info(".. job parameter [scheduler_remote_order_title]: " + this.getTitle());
@@ -185,8 +188,9 @@ public class JobSchedulerSignalJob extends Job_impl {
             this.initParameters();
             this.getTaskParameters(true);
             sosConnection = getConnection();
-            String selStr = "SELECT \"SIGNAL_ID\"," + "  \"JOB_CHAIN\",  " + "  \"OPERATION\"  " + "  FROM " + TABLE_SCHEDULER_SIGNAL_OBECTS
-                    + "  WHERE  \"STATUS\" = 0";
+            String selStr =
+                    "SELECT \"SIGNAL_ID\"," + "  \"JOB_CHAIN\",  " + "  \"OPERATION\"  " + "  FROM " + TABLE_SCHEDULER_SIGNAL_OBECTS
+                            + "  WHERE  \"STATUS\" = 0";
             ArrayList list = sosConnection.getArray(selStr);
             listOfSignalObject = list.iterator();
             if (listOfSignalObject.hasNext()) {
@@ -212,7 +216,8 @@ public class JobSchedulerSignalJob extends Job_impl {
             if (listOfSignalObject.hasNext()) {
                 res = (HashMap) listOfSignalObject.next();
                 parameters = spooler_task.params();
-                if ((sosString.parseToString(getHost()).isEmpty() || "localhost".equalsIgnoreCase(sosString.parseToString(getHost()))) && getPort() == 4444) {
+                if ((sosString.parseToString(getHost()).isEmpty() || "localhost".equalsIgnoreCase(sosString.parseToString(getHost())))
+                        && getPort() == 4444) {
                     SOSConnectionSettings settings = new SOSConnectionSettings(sosConnection, "SETTINGS", new SOSSchedulerLogger(this.spooler.log()));
                     Properties section = settings.getSection(application, sectionname);
                     if (!sosString.parseToString(section, "scheduler.host").isEmpty()) {
@@ -263,8 +268,8 @@ public class JobSchedulerSignalJob extends Job_impl {
                         request += "<param name=\"" + params[i] + "\" value=\"" + parameters.var(params[i]) + "\"/>";
                     }
                 }
-                String selParameters = "SELECT \"NAME\", \"VALUE\", \"LONG_VALUE\" FROM " + TABLE_SCHEDULER_SIGNAL_PARAMETERS
-                        + " WHERE \"SIGNAL_ID\" = " + signalId;
+                String selParameters =
+                        "SELECT \"NAME\", \"VALUE\", \"LONG_VALUE\" FROM " + TABLE_SCHEDULER_SIGNAL_PARAMETERS + " WHERE \"SIGNAL_ID\" = " + signalId;
                 if (!sosString.parseToString(res.get("operation")).isEmpty()) {
                     String value = sosString.parseToString(res.get("operation")).toLowerCase();
                     request += "<param name=\"operation\" value=\"" + value + "\"/>";
@@ -272,8 +277,9 @@ public class JobSchedulerSignalJob extends Job_impl {
                 ArrayList listOfParams = sosConnection.getArray(selParameters);
                 for (int i = 0; i < listOfParams.size(); i++) {
                     HashMap h = (HashMap) listOfParams.get(i);
-                    String value = !sosString.parseToString(h.get("value")).isEmpty() ? sosString.parseToString(h.get("value"))
-                            : sosString.parseToString(h.get("long_value"));
+                    String value =
+                            !sosString.parseToString(h.get("value")).isEmpty() ? sosString.parseToString(h.get("value"))
+                                    : sosString.parseToString(h.get("long_value"));
                     request += "<param name=\"" + h.get("name") + "\" value=\"" + value + "\"/>";
                 }
                 request += "</params>";
@@ -514,8 +520,9 @@ public class JobSchedulerSignalJob extends Job_impl {
             spooler_log.info("..time elapsed in seconds                         : " + Math.round((System.currentTimeMillis() - timeInSec) / 1000)
                     + "s");
             spooler_log.info("---------------------------------------------------------------");
-            String stateText = "..number of create order: " + (countProcessOk + countProcessError) + "(error=" + countProcessError + ";successfully="
-                    + countProcessOk + ")";
+            String stateText =
+                    "..number of create order: " + (countProcessOk + countProcessError) + "(error=" + countProcessError + ";successfully="
+                            + countProcessOk + ")";
             spooler_log.info(stateText);
             spooler_job.set_state_text(stateText);
         } catch (Exception e) {

@@ -119,16 +119,12 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             LOG_D_0020.toLog();
             if (spooler_log.level() > 1) {
                 logger.setLevel(Level.ERROR);
-
             } else if (spooler_log.level() == 1) {
                 logger.setLevel(Level.WARN);
-
             } else if (spooler_log.level() == 0) {
                 logger.setLevel(Level.INFO);
-
             } else if (spooler_log.level() < 0) {
                 logger.setLevel(Level.DEBUG);
-
             } else if (spooler_log.level() == -9) {
                 logger.setLevel(Level.TRACE);
             }
@@ -140,16 +136,12 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             logger.addAppender(consoleAppender);
             if (spooler_log.level() > 1) {
                 logger.setLevel(Level.ERROR);
-
             } else if (spooler_log.level() == 1) {
                 logger.setLevel(Level.WARN);
-
             } else if (spooler_log.level() == 0) {
                 logger.setLevel(Level.INFO);
-
             } else if (spooler_log.level() < 0) {
                 logger.setLevel(Level.DEBUG);
-
             } else if (spooler_log.level() == -9) {
                 logger.setLevel(Level.TRACE);
             }
@@ -203,11 +195,9 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                     Object objO = variableSet.var(key);
                     if (objO instanceof String) {
                         value = variableSet.var(key);
-
                     } else if (objO instanceof Integer) {
                         Integer intI = (Integer) objO;
                         value = intI.toString();
-
                     }
                     result.put(key, value);
                     result.put(key.replaceAll("_", EMPTY_STRING).toLowerCase(), value);
@@ -379,8 +369,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         JSJ_D_0080.toLog();
         if (pstrString2Modify.matches("(?s).*%[^%]+%.*") || pstrString2Modify.matches("(?s).*(\\$|§)\\{[^{]+\\}.*")) {
             if (isNotNull(params)) {
-                String[] strPatterns = new String[] { "%SCHEDULER_PARAM_%1$s%", "%%1$s%", "(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?",
-                        "(\\$|§)\\{?%1$s\\}?" };
+                String[] strPatterns =
+                        new String[] { "%SCHEDULER_PARAM_%1$s%", "%%1$s%", "(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?", "(\\$|§)\\{?%1$s\\}?" };
                 String[] names = params.names().split(";");
                 outerloop:
                 for (String strPattern : strPatterns) {
@@ -392,8 +382,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                         }
                         String regex = regExPattern.replaceAll("\\%1\\$s", name);
                         strParamValue = Matcher.quoteReplacement(strParamValue);
-                       
-                        strTemp = strTemp.replaceAll("(?im)"+regex, strParamValue);
+
+                        strTemp = strTemp.replaceAll("(?im)" + regex, strParamValue);
 
                         if (!(strTemp.matches("(?s).*%[^%]+%.*") || strTemp.matches("(?s).*(\\$|§)\\{[^{]+\\}.*"))) {
                             break outerloop;
@@ -413,8 +403,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         JSJ_D_0080.toLog();
         if (pstrString2Modify.matches("(?s).*%[^%]+%.*") || pstrString2Modify.matches("(?s).*(\\$|§)\\{[^{]+\\}.*")) {
             if (isNotNull(params)) {
-                String[] strPatterns = new String[] { "%SCHEDULER_PARAM_%1$s%", "%%1$s%", "(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?",
-                        "(\\$|§)\\{?%1$s\\}?" };
+                String[] strPatterns =
+                        new String[] { "%SCHEDULER_PARAM_%1$s%", "%%1$s%", "(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?", "(\\$|§)\\{?%1$s\\}?" };
                 outerloop:
                 for (String strPattern : strPatterns) {
                     String regExPattern = strPattern;
@@ -422,7 +412,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                         String strParamValue = params.get(name);
                         String regex = regExPattern.replaceAll("\\%1\\$s", name);
                         strParamValue = Matcher.quoteReplacement(strParamValue);
-                        strTemp = strTemp.replaceAll("(?im)"+regex, strParamValue);
+                        strTemp = strTemp.replaceAll("(?im)" + regex, strParamValue);
                         if (!(strTemp.matches("(?s).*%[^%]+%.*") || strTemp.matches("(?s).*(\\$|§)\\{[^{]+\\}.*"))) {
                             break outerloop;
                         }
@@ -481,7 +471,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         return result;
     }
 
-   
     public String StackTrace2String(final Exception e) {
         String strT = null;
         if (isNotNull(e)) {
@@ -670,7 +659,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             String strS = getJobScript();
             if (isNotEmpty(strS)) {
                 pobjOptionElement.Value(strS);
-                logger.debug(String.format("copy script from script-tag of job '%2$s' to option '%1$s'", pobjOptionElement.getShortKey(), getJob().name()));
+                logger.debug(String.format("copy script from script-tag of job '%2$s' to option '%1$s'", pobjOptionElement.getShortKey(),
+                        getJob().name()));
             }
         }
     }

@@ -63,7 +63,8 @@ public class JSOptionValueList extends SOSOptionString {
         if (isNotEmpty(pstrValueList) && (pstrValueList.contains(";") || pstrValueList.contains("|") || pstrValueList.contains(","))) {
             strValueList = strT.split(conValueListDelimiters);
             strT = strValueList[0];
-        } else if (isNotEmpty(pstrValueList) && (isNull(strValueList) || strValueList.length == 0 || (strValueList.length == 1 && isEmpty(strValueList[0])))) {
+        } else if (isNotEmpty(pstrValueList)
+                && (isNull(strValueList) || strValueList.length == 0 || (strValueList.length == 1 && isEmpty(strValueList[0])))) {
             strValueList = new String[] { pstrValueList };
         }
         super.Value(strT);

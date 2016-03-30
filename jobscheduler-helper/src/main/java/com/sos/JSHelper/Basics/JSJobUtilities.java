@@ -38,7 +38,7 @@ public interface JSJobUtilities {
      * @param what
      * @param replacement
      * @return */
-  
+
     public String replaceSchedulerVars(boolean isWindows, final String pstrString2Modify);
 
     /** \brief setJSParam

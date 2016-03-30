@@ -234,10 +234,14 @@ public class Messages implements Serializable {
             }
             return strM;
         } catch (MissingFormatArgumentException e) {
-            strM = String.format("%1$s (%2$s): %3$s | missing format specifer: %4$s", pstrKey, objCurrentLocale.getDisplayName(), strM, e.getFormatSpecifier());
+            strM =
+                    String.format("%1$s (%2$s): %3$s | missing format specifer: %4$s", pstrKey, objCurrentLocale.getDisplayName(), strM,
+                            e.getFormatSpecifier());
             return strM;
         } catch (UnknownFormatConversionException e) {
-            strM = String.format("%1$s (%2$s): %3$s | unknown format conversion: %4$s", pstrKey, objCurrentLocale.getDisplayName(), strM, e.getConversion());
+            strM =
+                    String.format("%1$s (%2$s): %3$s | unknown format conversion: %4$s", pstrKey, objCurrentLocale.getDisplayName(), strM,
+                            e.getConversion());
             return strM;
         } catch (MissingResourceException e) {
             strM = String.format("%1$s (%2$s): %3$s", pstrKey, objCurrentLocale.getDisplayName(), strM);

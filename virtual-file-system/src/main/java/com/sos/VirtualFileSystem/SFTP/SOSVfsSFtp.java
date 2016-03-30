@@ -576,7 +576,7 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
                         fos = null;
                     } catch (Exception ex) {
                         // gracefully ignore this error
-                    } 
+                    }
                 }
             }
             objFTPClient.closeFile(sftpFileHandle);
@@ -1140,7 +1140,8 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
             if (objConnectionOptions.getalternative_host().IsNotEmpty() && objConnectionOptions.getalternative_port().IsNotEmpty()) {
                 logger.info(SOSVfs_E_204.get());
                 this.connect(objConnectionOptions.getalternative_host().Value(), objConnectionOptions.getalternative_port().value());
-                logger.info(SOSVfs_D_0102.params(objConnectionOptions.getalternative_host().Value(), objConnectionOptions.getalternative_port().value()));
+                logger.info(SOSVfs_D_0102.params(objConnectionOptions.getalternative_host().Value(),
+                        objConnectionOptions.getalternative_port().value()));
             } else {
                 throw e;
             }

@@ -56,7 +56,8 @@ public class SOSOptionJdbcUrl extends SOSOptionString {
     public void Value(final String pstrValue) {
         @SuppressWarnings("unused")
         final String conMethodName = conClassName + "::Value";
-        String patternString = "jdbc:(mysql|postgresql|oracle:[^:]+|sqlserver|jtds:sqlserver|jtds:sybase|sybase:Tds|firebirdsql|db2):(@|@?//|)?[^:]+(:[0-9]{1,5})?((:|/)[^:;\\?]+)?((\\?|:|;)[^=]+=[^&;]+)?(?:(&|;)[^=]+=[^&;]+)*";
+        String patternString =
+                "jdbc:(mysql|postgresql|oracle:[^:]+|sqlserver|jtds:sqlserver|jtds:sybase|sybase:Tds|firebirdsql|db2):(@|@?//|)?[^:]+(:[0-9]{1,5})?((:|/)[^:;\\?]+)?((\\?|:|;)[^=]+=[^&;]+)?(?:(&|;)[^=]+=[^&;]+)*";
         Pattern pattern = Pattern.compile(patternString);
         super.Value(pstrValue);
         if (this.isNotEmpty(this.strValue) && !pattern.matcher(this.strValue).matches()) {

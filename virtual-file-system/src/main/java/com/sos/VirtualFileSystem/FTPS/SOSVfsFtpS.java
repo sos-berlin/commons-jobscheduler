@@ -45,14 +45,16 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
 
                 client = new FTPSClient(objConnection2Options.FtpS_protocol.Value(), objConnection2Options.ftps_client_security.isImplicit());
                 if (usingProxy()) {
-                    logger.info(String.format("using proxy: protocol = %s, host = %s, port = %s, user = %s, pass = ?", getProxyProtocol().Value(), getProxyHost(), getProxyPort(), getProxyUser()));
+                    logger.info(String.format("using proxy: protocol = %s, host = %s, port = %s, user = %s, pass = ?", getProxyProtocol().Value(),
+                            getProxyHost(), getProxyPort(), getProxyUser()));
 
                     if (usingHttpProxy()) {
                         client.setProxy(getHTTPProxy());
                     } else {
                         // client.setProxy(getSocksProxy());
                         SOSOptionProxyProtocol.Protocol proxyProtocol = getProxyProtocol().isSocks4() ? Protocol.socks4 : Protocol.socks5;
-                        SOSVfsFtpSProxySelector ps = new SOSVfsFtpSProxySelector(proxyProtocol, getProxyHost(), getProxyPort(), getProxyUser(), getProxyPassword());
+                        SOSVfsFtpSProxySelector ps =
+                                new SOSVfsFtpSProxySelector(proxyProtocol, getProxyHost(), getProxyPort(), getProxyUser(), getProxyPassword());
                         ProxySelector.setDefault(ps);
                     }
                 }
@@ -113,9 +115,12 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
     /** @param client
      * @throws Exception */
     private void setTrustManager(FTPSClient client) throws Exception {
-        logger.info(String.format("using keystore: type = %s, file = %s", objConnection2Options.keystore_type.Value(), objConnection2Options.keystore_file.Value()));
+        logger.info(String.format("using keystore: type = %s, file = %s", objConnection2Options.keystore_type.Value(),
+                objConnection2Options.keystore_file.Value()));
 
-        KeyStore ks = loadKeyStore(objConnection2Options.keystore_type.Value(), new File(objConnection2Options.keystore_file.Value()), objConnection2Options.keystore_password.Value());
+        KeyStore ks =
+                loadKeyStore(objConnection2Options.keystore_type.Value(), new File(objConnection2Options.keystore_file.Value()),
+                        objConnection2Options.keystore_password.Value());
 
         client.setTrustManager(TrustManagerUtils.getDefaultTrustManager(ks));
     }

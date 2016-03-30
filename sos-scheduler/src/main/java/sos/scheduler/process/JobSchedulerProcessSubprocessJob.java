@@ -18,12 +18,14 @@ public class JobSchedulerProcessSubprocessJob extends ProcessOrderJob {
                     orderId = order.id();
                     if (order.params().value("configuration_path") != null && !order.params().value("configuration_path").isEmpty()) {
                         this.setConfigurationPath(order.params().value("configuration_path"));
-                    } else if (spooler_task.params().value("configuration_path") != null && !spooler_task.params().value("configuration_path").isEmpty()) {
+                    } else if (spooler_task.params().value("configuration_path") != null
+                            && !spooler_task.params().value("configuration_path").isEmpty()) {
                         this.setConfigurationPath(spooler_task.params().value("configuration_path"));
                     }
                     if (order.params().value("configuration_file") != null && !order.params().value("configuration_file").isEmpty()) {
                         this.setConfigurationFilename(order.params().value("configuration_file"));
-                    } else if (spooler_task.params().value("configuration_file") != null && !spooler_task.params().value("configuration_file").isEmpty()) {
+                    } else if (spooler_task.params().value("configuration_file") != null
+                            && !spooler_task.params().value("configuration_file").isEmpty()) {
                         this.setConfigurationFilename(spooler_task.params().value("configuration_file"));
                     }
                     this.initConfiguration();

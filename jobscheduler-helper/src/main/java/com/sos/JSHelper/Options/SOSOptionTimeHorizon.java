@@ -25,7 +25,8 @@ public class SOSOptionTimeHorizon extends SOSOptionString {
         Matcher objPeriodMatcher = Pattern.compile(PERIOD_PATTERN).matcher(strValue);
         int seconds = 0;
         if (objIsoDateMatcher.find()) {
-            objCal.set(Integer.parseInt(objIsoDateMatcher.group(1)), Integer.parseInt(objIsoDateMatcher.group(2)) - 1, Integer.parseInt(objIsoDateMatcher.group(3)));
+            objCal.set(Integer.parseInt(objIsoDateMatcher.group(1)), Integer.parseInt(objIsoDateMatcher.group(2)) - 1,
+                    Integer.parseInt(objIsoDateMatcher.group(3)));
             if (isNotEmpty(objIsoDateMatcher.group(4))) {
                 objCal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(objIsoDateMatcher.group(4)));
                 objCal.set(Calendar.MINUTE, Integer.parseInt(objIsoDateMatcher.group(5)));
@@ -47,7 +48,8 @@ public class SOSOptionTimeHorizon extends SOSOptionString {
                 objCal.set(Calendar.MILLISECOND, 0);
             }
         } else {
-            throw new JobSchedulerException(String.format("%1$s must be in the format yyyy-MM-dd[ HH:mm[:ss]] or <+/-number of days from now>[:HH:mm[:ss]]", strValue));
+            throw new JobSchedulerException(String.format(
+                    "%1$s must be in the format yyyy-MM-dd[ HH:mm[:ss]] or <+/-number of days from now>[:HH:mm[:ss]]", strValue));
         }
         return objCal.getTime();
     }

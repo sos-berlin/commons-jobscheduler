@@ -32,7 +32,6 @@ public class SOSMailReceiver {
     public int READ_WRITE = Folder.READ_WRITE;
     SOSLogger logger = null;
 
-
     public SOSMailReceiver(final String host, final String port, final String user, final String password) throws Exception {
         this.host = host;
         this.port = port;
@@ -71,7 +70,8 @@ public class SOSMailReceiver {
         logger.debug5("..connected to host [" + host + ":" + port + "] successfully done.");
     }
 
-    /** opens the given folder 
+    /** opens the given folder
+     * 
      * @param folderName1
      * @param mode The open mode of this folder. The open mode is
      *            Folder.READ_ONLY, Folder.READ_WRITE, or -1 if not known.

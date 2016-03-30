@@ -43,7 +43,6 @@ public class JSJobUtilitiesClass<T> extends JSToolBox implements JSJobUtilities,
         LOGGER.trace("pobjJSCommands = " + pobjJSCommands.getClass().getName());
     }
 
-
     @Override
     public String replaceSchedulerVars(final boolean isWindows, final String pstrString2Modify) {
         LOGGER.debug("replaceSchedulerVars as Dummy-call executed. No Instance of JobUtilites specified.");
@@ -52,12 +51,12 @@ public class JSJobUtilitiesClass<T> extends JSToolBox implements JSJobUtilities,
 
     @Override
     public void setJSParam(final String pstrKey, final String pstrValue) {
-        // 
+        //
     }
 
     @Override
     public void setJSParam(final String pstrKey, final StringBuffer pstrValue) {
-        // 
+        //
     }
 
     @Override
@@ -77,7 +76,7 @@ public class JSJobUtilitiesClass<T> extends JSToolBox implements JSJobUtilities,
 
     @Override
     public void setStateText(final String pstrStateText) {
-        // 
+        //
     }
 
     @Override
@@ -101,7 +100,7 @@ public class JSJobUtilitiesClass<T> extends JSToolBox implements JSJobUtilities,
 
     @Override
     public void setNextNodeState(final String pstrNodeName) {
-        // 
+        //
     }
 
 }

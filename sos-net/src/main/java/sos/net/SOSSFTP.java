@@ -57,7 +57,8 @@ public class SOSSFTP implements SOSFileTransfer {
             sshConnection = new Connection(this.getHost(), this.getPort());
             if (this.getProxyHost() != null && !this.getProxyHost().isEmpty()) {
                 if (this.getProxyUser() != null && !this.getProxyUser().isEmpty()) {
-                    sshConnection.setProxyData(new HTTPProxyData(this.getProxyHost(), this.getProxyPort(), this.getProxyUser(), this.getProxyPassword()));
+                    sshConnection.setProxyData(new HTTPProxyData(this.getProxyHost(), this.getProxyPort(), this.getProxyUser(),
+                            this.getProxyPassword()));
                 } else {
                     sshConnection.setProxyData(new HTTPProxyData(this.getProxyHost(), this.getProxyPort()));
                 }
@@ -71,8 +72,9 @@ public class SOSSFTP implements SOSFileTransfer {
                     String text = sos.util.SOSFile.readFile(new File(filename));
                     isAuthenticated = sshConnection.authenticateWithPublicKey(this.getUser(), text.toCharArray(), this.getPassword());
                 } else if (getAuthenticationFilename() != null && getAuthenticationFilename().startsWith("filecontent:")) {
-                    isAuthenticated = sshConnection.authenticateWithPublicKey(this.getUser(), getAuthenticationFilename().substring("filecontent:".length())
-                            .toCharArray(), this.getPassword());
+                    isAuthenticated =
+                            sshConnection.authenticateWithPublicKey(this.getUser(),
+                                    getAuthenticationFilename().substring("filecontent:".length()).toCharArray(), this.getPassword());
                 } else {
                     File authenticationFile = new File(this.getAuthenticationFilename());
                     if (!authenticationFile.exists()) {

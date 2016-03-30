@@ -70,5 +70,5 @@ public class JSDataElementDouble extends JSDataElementNumeric {
             // TO DO: handle exception
         }
     }
-    
+
 }

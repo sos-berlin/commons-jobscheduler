@@ -181,12 +181,13 @@ public class cmdShell extends SOSVfsMessageCodes implements Runnable {
                     strStartShellCommandParameter = objShellOptions.getStart_Shell_command_Parameter().Value();
                     command[intCmdIndex++] = strStartShellCommandParameter;
                 }
-                command[intCmdIndex++] = objShellOptions.getshell_command().Value() + " " + objShellOptions.getCommand_Line_options().Value() + " "
-                        + objShellOptions.getShell_command_Parameter().Value();
+                command[intCmdIndex++] =
+                        objShellOptions.getshell_command().Value() + " " + objShellOptions.getCommand_Line_options().Value() + " "
+                                + objShellOptions.getShell_command_Parameter().Value();
             } else {
                 command[intCmdIndex++] = objShellOptions.getshell_command().Value();
-                command[intCmdIndex++] = objShellOptions.getCommand_Line_options().Value() + " "
-                        + objShellOptions.getShell_command_Parameter().Value();
+                command[intCmdIndex++] =
+                        objShellOptions.getCommand_Line_options().Value() + " " + objShellOptions.getShell_command_Parameter().Value();
             }
         } else {
             strComSpec = System.getenv(pstrComSpec);  // "SHELL");
@@ -195,8 +196,9 @@ public class cmdShell extends SOSVfsMessageCodes implements Runnable {
             }
             command[intCmdIndex++] = strComSpec;
             command[intCmdIndex++] = strStartShellCommandParameter;
-            command[intCmdIndex++] = objShellOptions.getshell_command().Value() + " " + objShellOptions.getCommand_Line_options().Value() + " "
-                    + objShellOptions.getShell_command_Parameter().Value();
+            command[intCmdIndex++] =
+                    objShellOptions.getshell_command().Value() + " " + objShellOptions.getCommand_Line_options().Value() + " "
+                            + objShellOptions.getShell_command_Parameter().Value();
         }
         logger.debug(SOSVfs_D_230.params(strComSpec));
         return command;

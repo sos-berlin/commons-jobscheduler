@@ -138,7 +138,8 @@ public class SOSFontDialog extends SOSPreferenceStore {
 
         final Display d = pobjDisplay;
         // final Shell s1 = new Shell(d);
-        final Shell objCurrentShell = new Shell(pobjDisplay.getCurrent().getActiveShell(), SWT.CLOSE | SWT.TITLE | SWT.APPLICATION_MODAL | SWT.BORDER);
+        final Shell objCurrentShell =
+                new Shell(pobjDisplay.getCurrent().getActiveShell(), SWT.CLOSE | SWT.TITLE | SWT.APPLICATION_MODAL | SWT.BORDER);
         final RGB aktForeGround = foreGround;
 
         objCurrentShell.setSize(302, 160);

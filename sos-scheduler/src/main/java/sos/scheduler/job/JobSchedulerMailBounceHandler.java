@@ -294,8 +294,9 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
                 }
                 this.updateTableMails(originalMessage.getMessageId());
                 if (!SOSString.isEmpty(getXSOSMailDeliveryCounterHeader())) {
-                    this.getLogger().info("...current " + JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER + " ["
-                            + this.getXSOSMailDeliveryCounterHeader() + "]");
+                    this.getLogger().info(
+                            "...current " + JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER + " ["
+                                    + this.getXSOSMailDeliveryCounterHeader() + "]");
                 }
                 bouncedMailAction = this.getPatternAction(sosMimeMessage);
                 this.getLogger().info("..available pattern action for this bounce [" + bouncedMailAction + "]");
@@ -316,8 +317,9 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
                             originalMessage.setHeader(JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER, "1");
                             getLogger().debug5(".. [" + JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER + "] set.");
                         }
-                        getLogger().debug5("..current value of \"" + JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER + "\" ["
-                                + currentHeaderValue + "]");
+                        getLogger().debug5(
+                                "..current value of \"" + JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER + "\" ["
+                                        + currentHeaderValue + "]");
                         getLogger().debug5("..query directory [" + bounceDirectory + " ] set.");
                         originalMessage.setQueueDir(bounceDirectory);
                         originalMessage.dumpMessageToFile(true, false);
@@ -461,8 +463,8 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         if (retryCounter > 0) {
             for (int i = 0; i < this.mailBouncePatternTableList.size(); i++) {
                 patternEntry = (HashMap) this.mailBouncePatternTableList.get(i);
-                if (patternEntry.get("pattern_id") != null && patternEntry.get("pattern_id").toString().equals(patternId) 
-                        && patternEntry.get("max_retries") != null) { 
+                if (patternEntry.get("pattern_id") != null && patternEntry.get("pattern_id").toString().equals(patternId)
+                        && patternEntry.get("max_retries") != null) {
                     return (Integer.parseInt(patternEntry.get("max_retries").toString()) > retryCounter);
                 }
             }

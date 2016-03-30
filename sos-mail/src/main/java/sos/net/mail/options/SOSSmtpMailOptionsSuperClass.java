@@ -66,11 +66,11 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
      * attachment(s) (multiple attachments separated by ";") */
     @JSOptionDefinition(name = "attachment", description = "title Filename and path", key = "attachment", type = "SOSOptionString", mandatory = false)
     public SOSOptionString attachment = new SOSOptionString(this, conClassName + ".attachment", // HashMap-Key
-    "title Filename and path", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "title Filename and path", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getattachment
      *
@@ -99,11 +99,11 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
     /** \var attachment_charset : title charset of attac charset of attachments */
     @JSOptionDefinition(name = "attachment_charset", description = "title charset of attac", key = "attachment_charset", type = "SOSOptionString", mandatory = false)
     public SOSOptionString attachment_charset = new SOSOptionString(this, conClassName + ".attachment_charset", // HashMap-Key
-    "title charset of attac", // Titel
-    "iso-8859-1", // InitValue
-    "iso-8859-1", // DefaultValue
-    false // isMandatory
-    );
+            "title charset of attac", // Titel
+            "iso-8859-1", // InitValue
+            "iso-8859-1", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getattachment_charset
      *
@@ -133,11 +133,11 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
      * attachments (application/octet-stream, application/pdf...) */
     @JSOptionDefinition(name = "attachment_content_type", description = "title content_type of", key = "attachment_content_type", type = "SOSOptionString", mandatory = false)
     public SOSOptionString attachment_content_type = new SOSOptionString(this, conClassName + ".attachment_content_type", // HashMap-Key
-    "title content_type of", // Titel
-    "application/octet-stream", // InitValue
-    "application/octet-stream", // DefaultValue
-    false // isMandatory
-    );
+            "title content_type of", // Titel
+            "application/octet-stream", // InitValue
+            "application/octet-stream", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getattachment_content_type
      *
@@ -167,11 +167,11 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
      * (7bit, Quoted-Printable, Base64) */
     @JSOptionDefinition(name = "attachment_encoding", description = "title encoding of atta", key = "attachment_encoding", type = "SOSOptionString", mandatory = false)
     public SOSOptionString attachment_encoding = new SOSOptionString(this, conClassName + ".attachment_encoding", // HashMap-Key
-    "title encoding of atta", // Titel
-    "Base64", // InitValue
-    "Base64", // DefaultValue
-    false // isMandatory
-    );
+            "title encoding of atta", // Titel
+            "Base64", // InitValue
+            "Base64", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getattachment_encoding
      *
@@ -200,11 +200,11 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
     /** \var bcc : title bcc recipient(s) bcc recipient(s) */
     @JSOptionDefinition(name = "bcc", description = "title bcc recipient(s)", key = "bcc", type = "SOSOptionMailAdress", mandatory = false)
     public SOSOptionMailAdress bcc = new SOSOptionMailAdress(this, conClassName + ".bcc", // HashMap-Key
-    "title bcc recipient(s)", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "title bcc recipient(s)", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     public SOSOptionMailAdress FileNotificationBCC = (SOSOptionMailAdress) bcc.SetAlias("file_notification_bcc");
 
@@ -235,11 +235,11 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
     /** \var body : title Mail body Mail body */
     @JSOptionDefinition(name = "body", description = "title Mail body", key = "body", type = "SOSOptionString", mandatory = false)
     public SOSOptionString body = new SOSOptionString(this, conClassName + ".body", // HashMap-Key
-    "title Mail body", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "title Mail body", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     public SOSOptionString FileNotificationBody = (SOSOptionString) body.SetAlias("file_notification_body");
 
@@ -270,11 +270,11 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
     /** \var cc : title cc recipient(s) cc recipient(s) */
     @JSOptionDefinition(name = "cc", description = "title cc recipient(s)", key = "cc", type = "SOSOptionMailAdress", mandatory = false)
     public SOSOptionMailAdress cc = new SOSOptionMailAdress(this, conClassName + ".cc", // HashMap-Key
-    "title cc recipient(s)", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "title cc recipient(s)", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
     public SOSOptionMailAdress FileNotificationCC = (SOSOptionMailAdress) cc.SetAlias("file_notification_cc");
 
     /** \brief getcc
@@ -304,11 +304,11 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
     /** \var charset : title charset of the m charset of the mail */
     @JSOptionDefinition(name = "charset", description = "title charset of the m", key = "charset", type = "SOSOptionString", mandatory = false)
     public SOSOptionString charset = new SOSOptionString(this, conClassName + ".charset", // HashMap-Key
-    "title charset of the m", // Titel
-    "iso-8859-1", // InitValue
-    "iso-8859-1", // DefaultValue
-    false // isMandatory
-    );
+            "title charset of the m", // Titel
+            "iso-8859-1", // InitValue
+            "iso-8859-1", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getcharset
      *
@@ -338,11 +338,11 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
      * (text/plain, text/html...) */
     @JSOptionDefinition(name = "content_type", description = "title content_type of", key = "content_type", type = "SOSOptionString", mandatory = false)
     public SOSOptionString content_type = new SOSOptionString(this, conClassName + ".content_type", // HashMap-Key
-    "title content_type of", // Titel
-    "text/plain", // InitValue
-    "text/plain", // DefaultValue
-    false // isMandatory
-    );
+            "title content_type of", // Titel
+            "text/plain", // InitValue
+            "text/plain", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getcontent_type
      *
@@ -372,11 +372,11 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
      * Quoted-Printable, Base64) */
     @JSOptionDefinition(name = "encoding", description = "title encoding of the", key = "encoding", type = "SOSOptionString", mandatory = false)
     public SOSOptionString encoding = new SOSOptionString(this, conClassName + ".encoding", // HashMap-Key
-    "title encoding of the", // Titel
-    "7bit", // InitValue
-    "7bit", // DefaultValue
-    false // isMandatory
-    );
+            "title encoding of the", // Titel
+            "7bit", // InitValue
+            "7bit", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getencoding
      *
@@ -405,11 +405,11 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
     /** \var from : title mail sender mail sender */
     @JSOptionDefinition(name = "from", description = "title mail sender", key = "from", type = "SOSOptionMailAdress", mandatory = false)
     public SOSOptionMailAdress from = new SOSOptionMailAdress(this, conClassName + ".from", // HashMap-Key
-    "title mail sender", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "title mail sender", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
     public SOSOptionMailAdress MailFrom = (SOSOptionMailAdress) from.SetAlias("mail_from");
 
     /** \brief getfrom
@@ -439,11 +439,11 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
     /** \var from_name : title name of the send name of the sender */
     @JSOptionDefinition(name = "from_name", description = "title name of the send", key = "from_name", type = "SOSOptionString", mandatory = false)
     public SOSOptionString from_name = new SOSOptionString(this, conClassName + ".from_name", // HashMap-Key
-    "title name of the send", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "title name of the send", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getfrom_name
      *
@@ -472,11 +472,11 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
     /** \var host : title mail server host mail server host */
     @JSOptionDefinition(name = "host", description = "title mail server host", key = "host", type = "SOSOptionHostName", mandatory = false)
     public SOSOptionHostName host = new SOSOptionHostName(this, conClassName + ".host", // HashMap-Key
-    "title mail server host", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "title mail server host", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
     public SOSOptionHostName SMTPHost = (SOSOptionHostName) host.SetAlias("mail_smtp", "smtp_host");
 
     /** \brief gethost
@@ -506,11 +506,11 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
     /** \var port : title mail server port mail server port */
     @JSOptionDefinition(name = "port", description = "title mail server port", key = "port", type = "SOSOptionPortNumber", mandatory = false)
     public SOSOptionPortNumber port = new SOSOptionPortNumber(this, conClassName + ".port", // HashMap-Key
-    "title mail server port", // Titel
-    "25", // InitValue
-    "25", // DefaultValue
-    false // isMandatory
-    );
+            "title mail server port", // Titel
+            "25", // InitValue
+            "25", // DefaultValue
+            false // isMandatory
+            );
 
     public SOSOptionPortNumber MailPort = (SOSOptionPortNumber) port.SetAlias("mail_port", "smtp_port");
 
@@ -543,11 +543,11 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
      * later retry to send these mails. */
     @JSOptionDefinition(name = "queue_directory", description = "title Mail queue direc", key = "queue_directory", type = "SOSOptionString", mandatory = false)
     public SOSOptionString queue_directory = new SOSOptionString(this, conClassName + ".queue_directory", // HashMap-Key
-    "title Mail queue direc", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "title Mail queue direc", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     public SOSOptionString MailQueueDir = (SOSOptionString) queue_directory.SetAlias("mail_queue_dir");
 
@@ -578,11 +578,11 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
     /** \var reply_to : title reply address reply address */
     @JSOptionDefinition(name = "reply_to", description = "title reply address", key = "reply_to", type = "SOSOptionMailAdress", mandatory = false)
     public SOSOptionMailAdress reply_to = new SOSOptionMailAdress(this, conClassName + ".reply_to", // HashMap-Key
-    "title reply address", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "title reply address", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getreply_to
      *
@@ -611,11 +611,11 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
     /** \var smtp_password : title smtp user passwo smtp user password */
     @JSOptionDefinition(name = "smtp_password", description = "title smtp user passwo", key = "smtp_password", type = "SOSOptionPassword", mandatory = false)
     public SOSOptionPassword smtp_password = new SOSOptionPassword(this, conClassName + ".smtp_password", // HashMap-Key
-    "title smtp user passwo", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "title smtp user passwo", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getsmtp_password
      *
@@ -644,11 +644,11 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
     /** \var smtp_user : title smtp username smtp username */
     @JSOptionDefinition(name = "smtp_user", description = "title smtp username", key = "smtp_user", type = "SOSOptionString", mandatory = false)
     public SOSOptionString smtp_user = new SOSOptionString(this, conClassName + ".smtp_user", // HashMap-Key
-    "title smtp username", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "title smtp username", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getsmtp_user
      *
@@ -677,11 +677,11 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
     /** \var subject : title Mail Subject Mail Subject */
     @JSOptionDefinition(name = "subject", description = "title Mail Subject", key = "subject", type = "SOSOptionString", mandatory = false)
     public SOSOptionMailSubject subject = new SOSOptionMailSubject(this, conClassName + ".subject", // HashMap-Key
-    "title Mail Subject", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "title Mail Subject", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
     public SOSOptionMailSubject FileNotificationSubject = (SOSOptionMailSubject) subject.SetAlias("file_notification_subject");
 
     /** \brief getsubject
@@ -711,11 +711,11 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
     /** \var to : title mail recipient(s mail recipient(s) */
     @JSOptionDefinition(name = "to", description = "title mail recipient(s", key = "to", type = "SOSOptionMailAdress", mandatory = true)
     public SOSOptionMailAdress to = new SOSOptionMailAdress(this, conClassName + ".to", // HashMap-Key
-    "title mail recipient(s", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    true // isMandatory
-    );
+            "title mail recipient(s", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            true // isMandatory
+            );
     public SOSOptionMailAdress FileNotificationTo = (SOSOptionMailAdress) to.SetAlias("file_notification_to");
 
     /** \brief getto

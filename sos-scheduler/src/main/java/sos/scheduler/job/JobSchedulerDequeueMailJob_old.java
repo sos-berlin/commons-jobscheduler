@@ -64,8 +64,10 @@ public class JobSchedulerDequeueMailJob_old extends JobSchedulerMailJob {
                 if (parameters.var("file") == null || parameters.var("file").toString().isEmpty()) {
                     throw new Exception("no filename was given in payload");
                 }
-                listFile = new File(this.getQueueDirectory()
-                        + (!this.getQueueDirectory().endsWith("/") && !this.getQueueDirectory().endsWith("\\") ? "/" : "") + parameters.var("file"));
+                listFile =
+                        new File(this.getQueueDirectory()
+                                + (!this.getQueueDirectory().endsWith("/") && !this.getQueueDirectory().endsWith("\\") ? "/" : "")
+                                + parameters.var("file"));
             }
             File workFile = new File(listFile.getAbsolutePath());
             if (this.getLogger() != null) {
@@ -137,9 +139,12 @@ public class JobSchedulerDequeueMailJob_old extends JobSchedulerMailJob {
             }
             try {
                 if (this.getConnection() != null && this.hasDatabase()) {
-                    String id = this.getConnection().getSingleValue("SELECT \"ID\" FROM " + this.getTableMails() + " WHERE \"MESSAGE_ID\"='" + messageId + "'");
+                    String id =
+                            this.getConnection().getSingleValue(
+                                    "SELECT \"ID\" FROM " + this.getTableMails() + " WHERE \"MESSAGE_ID\"='" + messageId + "'");
                     if (id == null || id.isEmpty()) {
-                        this.getLogger().debug1("no entry found in database for message id [" + messageId + "] of mail file: " + workFile.getAbsolutePath());
+                        this.getLogger().debug1(
+                                "no entry found in database for message id [" + messageId + "] of mail file: " + workFile.getAbsolutePath());
                     } else {
                         mailOrderId = Integer.parseInt(id);
                     }
@@ -159,8 +164,9 @@ public class JobSchedulerDequeueMailJob_old extends JobSchedulerMailJob {
                     }
                     if (++curDeliveryCounter > this.getMaxDeliveryCounter() && this.getMaxDeliveryCounter() > 0) {
                         if (this.getLogger() != null) {
-                            this.getLogger().debug3("mail file [" + workFile.getAbsolutePath() + "] exceeds number of trials [" + this.getMaxDeliveryCounter()
-                                    + "] to send mail and will not be dequeued");
+                            this.getLogger().debug3(
+                                    "mail file [" + workFile.getAbsolutePath() + "] exceeds number of trials [" + this.getMaxDeliveryCounter()
+                                            + "] to send mail and will not be dequeued");
                         }
                         sosMail.setQueueDir("");
                     }
@@ -179,9 +185,10 @@ public class JobSchedulerDequeueMailJob_old extends JobSchedulerMailJob {
                     sosMail.dumpMessageToFile(mailFile, true);
                 }
                 if (this.isLogOnly()) {
-                    message = "mail was NOT sent"
-                            + (this.getMaxDeliveryCounter() > 0 ? " (trial " + curDeliveryCounter + " of " + this.getMaxDeliveryCounter() + ")" : "")
-                            + " but stored to file: " + mailFile.getAbsolutePath();
+                    message =
+                            "mail was NOT sent"
+                                    + (this.getMaxDeliveryCounter() > 0 ? " (trial " + curDeliveryCounter + " of " + this.getMaxDeliveryCounter()
+                                            + ")" : "") + " but stored to file: " + mailFile.getAbsolutePath();
                     if (this.getLogger() != null) {
                         this.getLogger().info(message);
                     }
@@ -189,9 +196,10 @@ public class JobSchedulerDequeueMailJob_old extends JobSchedulerMailJob {
                     message = message.replaceAll("'", "''");
                     shouldSend = false;
                 } else if (!sosMail.send()) {
-                    message = "mail was NOT sent but stored for later dequeueing"
-                            + (this.getMaxDeliveryCounter() > 0 ? " (trial " + curDeliveryCounter + " of " + this.getMaxDeliveryCounter() + ")" : "")
-                            + ", reason was: " + sosMail.getLastError();
+                    message =
+                            "mail was NOT sent but stored for later dequeueing"
+                                    + (this.getMaxDeliveryCounter() > 0 ? " (trial " + curDeliveryCounter + " of " + this.getMaxDeliveryCounter()
+                                            + ")" : "") + ", reason was: " + sosMail.getLastError();
                     if (this.getLogger() != null) {
                         this.getLogger().info(message);
                     }
@@ -209,17 +217,19 @@ public class JobSchedulerDequeueMailJob_old extends JobSchedulerMailJob {
                 }
                 if (this.getLogger() != null) {
                     if (this.isLogOnly()) {
-                        this.getLogger().info("mail was processed from file [" + workFile.getAbsolutePath() + "] to: "
-                                + sosMail.getRecipientsAsString() + " into: " + mailFile.getAbsolutePath());
+                        this.getLogger().info(
+                                "mail was processed from file [" + workFile.getAbsolutePath() + "] to: " + sosMail.getRecipientsAsString()
+                                        + " into: " + mailFile.getAbsolutePath());
                     } else {
                         this.getLogger().info("mail was sent from file [" + workFile.getAbsolutePath() + "] to: " + sosMail.getRecipientsAsString());
                     }
                 }
                 if (this.getConnection() != null && this.hasDatabase() && mailOrderId > 0) {
-                    this.getConnection().executeUpdate("UPDATE " + this.getTableMails() + " SET \"JOB_ID\"=" + spooler_task.id() + ", \"STATUS\"="
-                            + STATE_SUCCESS + ", \"STATUS_TEXT\"='" + message + "'" + ", \"MESSAGE_ID\"='" + sosMail.getMessage().getMessageID()
-                            + "'" + ", \"MODIFIED\"=%now, \"MODIFIED_BY\"='" + spooler_task.job().name() + "', \"DELIVERED\"=%now" + " WHERE \"ID\"="
-                            + mailOrderId);
+                    this.getConnection().executeUpdate(
+                            "UPDATE " + this.getTableMails() + " SET \"JOB_ID\"=" + spooler_task.id() + ", \"STATUS\"=" + STATE_SUCCESS
+                                    + ", \"STATUS_TEXT\"='" + message + "'" + ", \"MESSAGE_ID\"='" + sosMail.getMessage().getMessageID() + "'"
+                                    + ", \"MODIFIED\"=%now, \"MODIFIED_BY\"='" + spooler_task.job().name() + "', \"DELIVERED\"=%now"
+                                    + " WHERE \"ID\"=" + mailOrderId);
                     this.getConnection().commit();
                 }
                 if (this.getLogger() != null) {
@@ -252,9 +262,10 @@ public class JobSchedulerDequeueMailJob_old extends JobSchedulerMailJob {
                 if (this.getConnection() != null && this.hasDatabase() && mailOrderId > 0) {
                     message = e.getMessage().length() > 250 ? e.getMessage().substring(e.getMessage().length() - 250) : e.getMessage();
                     message = message.replaceAll("'", "''");
-                    this.getConnection().executeUpdate("UPDATE " + this.getTableMails() + " SET \"JOB_ID\"=" + spooler_task.id() + ", \"STATUS\"="
-                            + STATE_ERROR + ", \"STATUS_TEXT\"='" + message + "'," + "\"MODIFIED\"=%now, \"MODIFIED_BY\"='"
-                            + spooler_task.job().name() + "', \"DELIVERED\"=NULL" + " WHERE \"ID\"=" + mailOrderId);
+                    this.getConnection().executeUpdate(
+                            "UPDATE " + this.getTableMails() + " SET \"JOB_ID\"=" + spooler_task.id() + ", \"STATUS\"=" + STATE_ERROR
+                                    + ", \"STATUS_TEXT\"='" + message + "'," + "\"MODIFIED\"=%now, \"MODIFIED_BY\"='" + spooler_task.job().name()
+                                    + "', \"DELIVERED\"=NULL" + " WHERE \"ID\"=" + mailOrderId);
                     this.getConnection().commit();
                 }
             } catch (Exception ex) {
@@ -272,15 +283,17 @@ public class JobSchedulerDequeueMailJob_old extends JobSchedulerMailJob {
                     messageFile.renameTo(failedFile);
                 }
             } catch (Exception ex) {
-                // gracefully ignore this error to preserve the original exception
+                // gracefully ignore this error to preserve the original
+                // exception
             }
             try {
                 if (this.getConnection() != null) {
                     this.getConnection().rollback();
                 }
             } catch (Exception ex) {
-                // gracefully ignore this error to preserve the original exception
-            } 
+                // gracefully ignore this error to preserve the original
+                // exception
+            }
         }
     }
 

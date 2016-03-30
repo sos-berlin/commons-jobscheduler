@@ -79,7 +79,8 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
     public static final String conPropertySOS_JSFILE_EXTENSION_4_TEMPFILE = "sos.jsfile.extension.4.tempfile";
     public static final String conPropertySOS_JSFILE_EXTENSION_4_EXCLUSIVEFILE = "sos.jsfile.extension.4.exclusivefile";
     public static final String conPropertySOS_JSFILE_EXTENSION_4_BACKUPFILE = "sos.jsfile.extension.4.backupfile";
-    public SOSOptionFolderName BackupFolderName = new SOSOptionFolderName(null, "BackupFolderName", "Name of Folder for Backup of this file", "", "", false);
+    public SOSOptionFolderName BackupFolderName = new SOSOptionFolderName(null, "BackupFolderName", "Name of Folder for Backup of this file", "", "",
+            false);
     final String JSH_E_0010 = "JSH_E_0010";
     final String JSH_E_0020 = "JSH_E_0020";
     final String JSH_E_0040 = "JSH_E_0040";
@@ -1034,7 +1035,9 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
     }
 
     public String toXml() {
-        String strXml = String.format("<file name='%1$s' size='%2$d' modificationdate='%3$s' />", this.getAbsolutePath(), fleFile.length(), new Date(fleFile.lastModified()));
+        String strXml =
+                String.format("<file name='%1$s' size='%2$d' modificationdate='%3$s' />", this.getAbsolutePath(), fleFile.length(), new Date(
+                        fleFile.lastModified()));
         return strXml;
     }
 

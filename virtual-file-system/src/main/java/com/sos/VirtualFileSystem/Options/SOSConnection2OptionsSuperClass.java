@@ -109,11 +109,11 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @JSOptionDefinition(name = "account", description = "Optional account info for authentication with an", key = "account", type = "SOSOptionString", mandatory = false)
     public SOSOptionString account = new SOSOptionString(this, className + ".account", // HashMap-Key
-    "Optional account info for authentication with an", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "Optional account info for authentication with an", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     @Override
     public SOSOptionString getaccount() {
@@ -145,11 +145,11 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @JSOptionDefinition(name = "dir", description = "Optional account info for authentication with an", key = "dir", type = "SOSOptionFolderName", mandatory = false)
     public SOSOptionFolderName Directory = new SOSOptionFolderName(this, className + ".dir", // HashMap-Key
-    "local_dir Local directory into which or from which", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "local_dir Local directory into which or from which", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     public SOSOptionFolderName FolderName = (SOSOptionFolderName) Directory.SetAlias("Folder_Name");
 
@@ -169,11 +169,11 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @JSOptionDefinition(name = "replacement", description = "String for replacement of matching character seque", key = "replacement", type = "SOSOptionString", mandatory = false)
     public SOSOptionString replacement = new SOSOptionString(this, className + ".replacement", // HashMap-Key
-    "String for replacement of matching character seque", // Titel
-    null, // InitValue
-    null, // DefaultValue
-    false // isMandatory
-    );
+            "String for replacement of matching character seque", // Titel
+            null, // InitValue
+            null, // DefaultValue
+            false // isMandatory
+            );
 
     @Override
     public SOSOptionString getreplacement() {
@@ -189,11 +189,11 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @JSOptionDefinition(name = "replacing", description = "Regular expression for filename replacement with", key = "replacing", type = "SOSOptionRegExp", mandatory = false)
     public SOSOptionRegExp replacing = new SOSOptionRegExp(this, className + ".replacing", // HashMap-Key
-    "Regular expression for filename replacement with", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "Regular expression for filename replacement with", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     @Override
     public SOSOptionRegExp getreplacing() {
@@ -294,11 +294,11 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @JSOptionDefinition(name = "javaClassPath", description = "", key = "javaClassPath", type = "SOSOptionString", mandatory = false)
     public SOSOptionString javaClassPath = new SOSOptionString(this, className + ".javaClassPath", // HashMap-Key
-    "", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     @Override
     public SOSOptionString getjavaClassPath() {
@@ -312,11 +312,11 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @JSOptionDefinition(name = "host", description = "Host-Name This parameter specifies th", key = "host", type = "SOSOptionHostName", mandatory = false)
     public SOSOptionHostName host = new SOSOptionHostName(this, className + ".host", // HashMap-Key
-    "Host-Name This parameter specifies th", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "Host-Name This parameter specifies th", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     @Override
     public SOSOptionHostName getHost() {
@@ -334,11 +334,11 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @JSOptionDefinition(name = "passive_mode", description = "passive_mode Passive mode for FTP is often used wit", key = "passive_mode", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean passive_mode = new SOSOptionBoolean(this, className + ".passive_mode", // HashMap-Key
-    "passive_mode Passive mode for FTP is often used wit", // Titel
-    "false", // InitValue
-    "false", // DefaultValue
-    false // isMandatory
-    );
+            "passive_mode Passive mode for FTP is often used wit", // Titel
+            "false", // InitValue
+            "false", // DefaultValue
+            false // isMandatory
+            );
 
     @Override
     public SOSOptionBoolean getpassive_mode() {
@@ -356,11 +356,11 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @JSOptionDefinition(name = "port", description = "Port-Number to be used for Data-Transfer", key = "port", type = "SOSOptionPortNumber", mandatory = true)
     public SOSOptionPortNumber port = new SOSOptionPortNumber(this, className + ".port", // HashMap-Key
-    "Port-Number to be used for Data-Transfer", // Titel
-    "21", // InitValue
-    "21", // DefaultValue
-    true // isMandatory
-    );
+            "Port-Number to be used for Data-Transfer", // Titel
+            "21", // InitValue
+            "21", // DefaultValue
+            true // isMandatory
+            );
 
     public SOSOptionPortNumber ftp_port = (SOSOptionPortNumber) port.SetAlias("ftp_port");
 
@@ -376,11 +376,11 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @JSOptionDefinition(name = "protocol", description = "Type of requested Datatransfer The values ftp, sftp, htttp ...", key = "protocol", type = "SOSOptionStringValueList", mandatory = true)
     public SOSOptionTransferType protocol = new SOSOptionTransferType(this, className + ".protocol", // HashMap-Key
-    "Type of requested Datatransfer The values ftp, sftp", // Titel
-    "", // InitValue
-    "ftp", // DefaultValue
-    true // isMandatory
-    );
+            "Type of requested Datatransfer The values ftp, sftp", // Titel
+            "", // InitValue
+            "ftp", // DefaultValue
+            true // isMandatory
+            );
 
     public SOSOptionTransferType ftp_protocol = (SOSOptionTransferType) protocol.SetAlias("ftp_protocol");
 
@@ -398,11 +398,11 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @JSOptionDefinition(name = "transfer_mode", description = "Type of Character-Encoding Transfe", key = "transfer_mode", type = "SOSOptionTransferMode", mandatory = false)
     public SOSOptionTransferMode transfer_mode = new SOSOptionTransferMode(this, className + ".transfer_mode", // HashMap-Key
-    "Type of Character-Encoding Transfe", // Titel
-    "ascii;binary;text", // InitValue
-    "binary", // DefaultValue
-    false // isMandatory
-    );
+            "Type of Character-Encoding Transfe", // Titel
+            "ascii;binary;text", // InitValue
+            "binary", // DefaultValue
+            false // isMandatory
+            );
 
     public SOSOptionTransferMode ftp_transfer_mode = (SOSOptionTransferMode) transfer_mode.SetAlias("ftp_transfer_mode");
 
@@ -418,11 +418,11 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @JSOptionDefinition(name = "user", description = "UserID of user in charge User name", key = "user", type = "SOSOptionUserName", mandatory = true)
     public SOSOptionUserName user = new SOSOptionUserName(this, className + ".user", // HashMap-Key
-    "UserID of user in charge User name", // Titel
-    "", // InitValue
-    "anonymous", // DefaultValue
-    false // isMandatory
-    );
+            "UserID of user in charge User name", // Titel
+            "", // InitValue
+            "anonymous", // DefaultValue
+            false // isMandatory
+            );
 
     @Override
     public SOSOptionUserName getUser() {
@@ -431,11 +431,11 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @JSOptionDefinition(name = "password", description = "Password for UserID Password for a", key = "password", type = "SOSOptionPassword", mandatory = false)
     public SOSOptionPassword password = new SOSOptionPassword(this, className + ".password", // HashMap-Key
-    "Password for UserID Password for a", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "Password for UserID Password for a", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     @Override
     public SOSOptionPassword getPassword() {
@@ -486,11 +486,11 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @JSOptionDefinition(name = "ssh_auth_file", description = "This parameter specifies the path and name of a us", key = "ssh_auth_file", type = "SOSOptionInFileName", mandatory = false)
     public SOSOptionInFileName ssh_auth_file = new SOSOptionInFileName(this, className + ".ssh_auth_file", // HashMap-Key
-    "This parameter specifies the path and name of a us", // Titel
-    " ", // InitValue
-    " ", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies the path and name of a us", // Titel
+            " ", // InitValue
+            " ", // DefaultValue
+            false // isMandatory
+            );
 
     public SOSOptionInFileName auth_file = (SOSOptionInFileName) ssh_auth_file.SetAlias(className + ".auth_file");
 
@@ -506,11 +506,11 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @JSOptionDefinition(name = "ssh_auth_method", description = "This parameter specifies the authentication method", key = "ssh_auth_method", type = "SOSOptionStringValueList", mandatory = false)
     public SOSOptionAuthenticationMethod ssh_auth_method = new SOSOptionAuthenticationMethod(this, className + ".ssh_auth_method", // HashMap-Key
-    "This parameter specifies the authentication method", // Titel
-    "publickey", // InitValue
-    "publickey", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies the authentication method", // Titel
+            "publickey", // InitValue
+            "publickey", // DefaultValue
+            false // isMandatory
+            );
 
     public SOSOptionAuthenticationMethod auth_method = (SOSOptionAuthenticationMethod) ssh_auth_method.SetAlias(className + ".auth_method");
 
@@ -531,11 +531,11 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @JSOptionDefinition(name = "ftps_client_security", description = "FTPS Client Security", key = "ftps_client_secutity", type = "SOSOptionFTPSClientSecurity", mandatory = false)
     public SOSOptionFTPSClientSecurity ftps_client_security = new SOSOptionFTPSClientSecurity(this, className + ".ftps_client_security", // HashMap-Key
-    "FTPS Client Security", // Titel
-    SOSOptionFTPSClientSecurity.ClientSecurity.explicit.name(), // InitValue
-    SOSOptionFTPSClientSecurity.ClientSecurity.explicit.name(), // DefaultValue
-    false // isMandatory
-    );
+            "FTPS Client Security", // Titel
+            SOSOptionFTPSClientSecurity.ClientSecurity.explicit.name(), // InitValue
+            SOSOptionFTPSClientSecurity.ClientSecurity.explicit.name(), // DefaultValue
+            false // isMandatory
+            );
 
     public SOSOptionFTPSClientSecurity getftps_client_security() {
         return ftps_client_security;
@@ -547,11 +547,11 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @JSOptionDefinition(name = "proxy_protocol", description = "Proxy protocol http, socks4 or socks5", key = "proxy_protocol", type = "SOSOptionProxyProtocol", mandatory = false)
     public SOSOptionProxyProtocol proxy_protocol = new SOSOptionProxyProtocol(this, className + ".proxy_protocol", // HashMap-Key
-    "Proxy protocol", // Titel
-    SOSOptionProxyProtocol.Protocol.http.name(), // InitValue
-    SOSOptionProxyProtocol.Protocol.http.name(), // DefaultValue
-    false // isMandatory
-    );
+            "Proxy protocol", // Titel
+            SOSOptionProxyProtocol.Protocol.http.name(), // InitValue
+            SOSOptionProxyProtocol.Protocol.http.name(), // DefaultValue
+            false // isMandatory
+            );
 
     public SOSOptionProxyProtocol getproxy_protocol() {
         return proxy_protocol;
@@ -563,11 +563,11 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @JSOptionDefinition(name = "accept_untrusted_certificate", description = "Accept a valid certificat that could not be verified to be trusted", key = "accept_untrusted_certificate", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean accept_untrusted_certificate = new SOSOptionBoolean(this, className + ".accept_untrusted_certificate", // HashMap-Key
-    "Accept a valid certificat that could not be verified to be trusted", // Titel
-    "", // InitValue
-    "false", // DefaultValue
-    false // isMandatory
-    );
+            "Accept a valid certificat that could not be verified to be trusted", // Titel
+            "", // InitValue
+            "false", // DefaultValue
+            false // isMandatory
+            );
 
     public SOSOptionBoolean getaccept_untrusted_certificate() {
         return accept_untrusted_certificate;
@@ -595,11 +595,11 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @JSOptionDefinition(name = "proxy_host", description = "Host name or the IP address of a proxy", key = "proxy_host", type = "SOSOptionHostName", mandatory = false)
     public SOSOptionHostName proxy_host = new SOSOptionHostName(this, className + ".proxy_host", // HashMap-Key
-    "The value of this parameter is the host name or th", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "The value of this parameter is the host name or th", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     public SOSOptionHostName getproxy_host() {
         return proxy_host;
@@ -611,11 +611,11 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @JSOptionDefinition(name = "proxy_port", description = "Port-Number to be used for a proxy", key = "proxy_port", type = "SOSOptionPortNumber", mandatory = false)
     public SOSOptionPortNumber proxy_port = new SOSOptionPortNumber(this, className + ".proxy_port", // HashMap-Key
-    "This parameter specifies the port of a proxy that", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies the port of a proxy that", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     public SOSOptionPortNumber getproxy_port() {
         return proxy_port;
@@ -627,11 +627,11 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @JSOptionDefinition(name = "proxy_user", description = "User name to be used for a proxy", key = "proxy_user", type = "SOSOptionUserName", mandatory = false)
     public SOSOptionUserName proxy_user = new SOSOptionUserName(this, className + ".proxy_user", // HashMap-Key
-    "This parameter specifies the user name of a proxy that", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies the user name of a proxy that", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     public SOSOptionUserName getproxy_user() {
         return proxy_user;
@@ -643,11 +643,11 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @JSOptionDefinition(name = "proxy_password", description = "Password to be used for a proxy", key = "proxy_password", type = "SOSOptionPassword", mandatory = false)
     public SOSOptionPassword proxy_password = new SOSOptionPassword(this, className + ".proxy_password", // HashMap-Key
-    "This parameter specifies the password of a proxy that", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies the password of a proxy that", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     public SOSOptionPassword getproxy_password() {
         return proxy_password;
@@ -659,11 +659,11 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @JSOptionDefinition(name = "domain", description = "Domain", key = "domain", type = "SOSOptionString", mandatory = false)
     public SOSOptionString domain = new SOSOptionString(this, className + ".domain", // HashMap-Key
-    "This parameter specifies the domain", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies the domain", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     @Override
     public SOSOptionString getdomain() {
@@ -677,11 +677,11 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @JSOptionDefinition(name = "keystore_type", description = "keystore type. e.g. JKS,JCEKS,PKCS12,PKCS11,DKS", key = "keystore_type", type = "SOSOptionKeyStoreType", mandatory = false)
     public SOSOptionKeyStoreType keystore_type = new SOSOptionKeyStoreType(this, className + ".keystore_type", // HashMap-Key
-    "This parameter specifies the keystore type", // Titel
-    SOSOptionKeyStoreType.Type.JKS.name(), // InitValue
-    SOSOptionKeyStoreType.Type.JKS.name(), // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies the keystore type", // Titel
+            SOSOptionKeyStoreType.Type.JKS.name(), // InitValue
+            SOSOptionKeyStoreType.Type.JKS.name(), // DefaultValue
+            false // isMandatory
+            );
 
     public SOSOptionKeyStoreType getkeystore_type() {
         return keystore_type;
@@ -693,11 +693,11 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @JSOptionDefinition(name = "keystore_file", description = "keystore file", key = "keystore_file", type = "SOSOptionString", mandatory = false)
     public SOSOptionString keystore_file = new SOSOptionString(this, className + ".keystore_file", // HashMap-Key
-    "This parameter specifies the keystore file path", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies the keystore file path", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     public SOSOptionString getkeystore_file() {
         return keystore_file;
@@ -709,11 +709,11 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @JSOptionDefinition(name = "keystore_password", description = "Password to be used for a keystore", key = "keystore_password", type = "SOSOptionPassword", mandatory = false)
     public SOSOptionPassword keystore_password = new SOSOptionPassword(this, className + ".keystore_password", // HashMap-Key
-    "This parameter specifies the password of a keystore", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies the password of a keystore", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     public SOSOptionPassword getkeystore_password() {
         return keystore_password;
@@ -736,11 +736,11 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @JSOptionDefinition(name = "ignore_error", description = "Should the value true be specified, then execution errors", key = "ignore_error", type = "SOSOptionString", mandatory = false)
     public SOSOptionBoolean ignore_error = new SOSOptionBoolean(this, className + ".ignore_error", // HashMap-Key
-    "Should the value true be specified, then execution errors", // Titel
-    "false", // InitiValue
-    "false", // DefaultValue
-    false // isMandatory
-    );  // Should the value true be specified, then execution errors
+            "Should the value true be specified, then execution errors", // Titel
+            "false", // InitiValue
+            "false", // DefaultValue
+            false // isMandatory
+            );  // Should the value true be specified, then execution errors
 
     public SOSOptionBoolean getIgnore_error() {
         return ignore_error;

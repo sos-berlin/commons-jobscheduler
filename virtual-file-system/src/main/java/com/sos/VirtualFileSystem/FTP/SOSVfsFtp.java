@@ -136,8 +136,8 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
     protected final FTPClient Client() {
         if (objFTPClient == null) {
             if (usingProxy()) {
-                LOGGER.info(String.format("using proxy: protocol = %s, host = %s, port = %s, user = %s, pass = ?", getProxyProtocol().Value(), getProxyHost(),
-                        getProxyPort(), getProxyUser()));
+                LOGGER.info(String.format("using proxy: protocol = %s, host = %s, port = %s, user = %s, pass = ?", getProxyProtocol().Value(),
+                        getProxyHost(), getProxyPort(), getProxyUser()));
                 if (usingHttpProxy()) {
                     if (SOSString.isEmpty(getProxyUser())) {
                         objFTPClient = new FTPHTTPClient(getProxyHost(), getProxyPort());

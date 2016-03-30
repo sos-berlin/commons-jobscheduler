@@ -63,11 +63,11 @@ public class JSObjects2GraphvizOptionsSuperClass extends JSOptionsClass {
     /** \var live_folder_name : */
     @JSOptionDefinition(name = "live_folder_name", description = "", key = "live_folder_name", type = "SOSOptionString", mandatory = true)
     public SOSOptionFolderName live_folder_name = new SOSOptionFolderName(this, conClassName + ".live_folder_name", // HashMap-Key
-    "", // Titel
-    " ", // InitValue
-    " ", // DefaultValue
-    true // isMandatory
-    );
+            "", // Titel
+            " ", // InitValue
+            " ", // DefaultValue
+            true // isMandatory
+            );
 
     /** \brief getlive_folder_name :
      *
@@ -92,11 +92,11 @@ public class JSObjects2GraphvizOptionsSuperClass extends JSOptionsClass {
     /** \var output_folder_name : */
     @JSOptionDefinition(name = "output_folder_name", description = "", key = "output_folder_name", type = "SOSOptionString", mandatory = true)
     public SOSOptionFolderName output_folder_name = new SOSOptionFolderName(this, conClassName + ".output_folder_name", // HashMap-Key
-    "", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    true // isMandatory
-    );
+            "", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            true // isMandatory
+            );
 
     /** \brief getoutput_folder_name :
      *

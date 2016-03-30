@@ -51,12 +51,14 @@ public class ProcessSendMailOrderMonitor extends ProcessOrderMonitor {
                     orderId = order.id();
                     if (order.params().value("configuration_path") != null && !order.params().value("configuration_path").isEmpty()) {
                         this.setConfigurationPath(order.params().value("configuration_path"));
-                    } else if (spooler_task.params().value("configuration_path") != null && !spooler_task.params().value("configuration_path").isEmpty()) {
+                    } else if (spooler_task.params().value("configuration_path") != null
+                            && !spooler_task.params().value("configuration_path").isEmpty()) {
                         this.setConfigurationPath(spooler_task.params().value("configuration_path"));
                     }
                     if (order.params().value("configuration_file") != null && !order.params().value("configuration_file").isEmpty()) {
                         this.setConfigurationFilename(order.params().value("configuration_file"));
-                    } else if (spooler_task.params().value("configuration_file") != null && !spooler_task.params().value("configuration_file").isEmpty()) {
+                    } else if (spooler_task.params().value("configuration_file") != null
+                            && !spooler_task.params().value("configuration_file").isEmpty()) {
                         this.setConfigurationFilename(spooler_task.params().value("configuration_file"));
                     }
                     this.initConfiguration();
@@ -122,7 +124,8 @@ public class ProcessSendMailOrderMonitor extends ProcessOrderMonitor {
                         attachments = order.params().value("attachment").split(";");
                     }
                     if (!SOSString.isEmpty(order.params().value("cleanup_attachment"))) {
-                        if ("1".equals(order.params().value("cleanup_attachment")) || "true".equalsIgnoreCase(order.params().value("cleanup_attachment"))
+                        if ("1".equals(order.params().value("cleanup_attachment"))
+                                || "true".equalsIgnoreCase(order.params().value("cleanup_attachment"))
                                 || "yes".equalsIgnoreCase(order.params().value("cleanup_attachment"))) {
                             cleanupAttachment = true;
                         }
@@ -169,8 +172,8 @@ public class ProcessSendMailOrderMonitor extends ProcessOrderMonitor {
                     this.getLogger().info("sending mail: \n" + sosMail.dumpMessageAsString());
                     if (!sosMail.send()) {
                         this.getLogger().warn(
-                                "mail server is unavailable, mail for recipient [" + to + "] is queued in local directory [" + sosMail.getQueueDir() + "]:"
-                                        + sosMail.getLastError());
+                                "mail server is unavailable, mail for recipient [" + to + "] is queued in local directory [" + sosMail.getQueueDir()
+                                        + "]:" + sosMail.getLastError());
                     }
                     if (cleanupAttachment) {
                         for (int i = 0; i < attachments.length; i++) {

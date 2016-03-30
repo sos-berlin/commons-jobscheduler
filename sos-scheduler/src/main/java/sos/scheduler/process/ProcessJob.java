@@ -94,7 +94,7 @@ public class ProcessJob extends Job_impl {
             spooler_log.info("Job " + this.getJobName() + " terminated.");
         } catch (Exception e) {
             // no errror processing at job level
-        } 
+        }
     }
 
     public SOSSettings getJobSettings() {
@@ -187,11 +187,13 @@ public class ProcessJob extends Job_impl {
         SOSArguments arguments = new SOSArguments(dbProperty);
         SOSConnection conn;
         if (log != null) {
-            conn = SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.as_string("-class=", ""),
-                    arguments.as_string("-url=", ""), arguments.as_string("-user=", ""), arguments.as_string("-password=", ""), log);
+            conn =
+                    SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.as_string("-class=", ""),
+                            arguments.as_string("-url=", ""), arguments.as_string("-user=", ""), arguments.as_string("-password=", ""), log);
         } else {
-            conn = SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.as_string("-class=", ""),
-                    arguments.as_string("-url=", ""), arguments.as_string("-user=", ""), arguments.as_string("-password=", ""));
+            conn =
+                    SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.as_string("-class=", ""),
+                            arguments.as_string("-url=", ""), arguments.as_string("-user=", ""), arguments.as_string("-password=", ""));
         }
         return conn;
     }

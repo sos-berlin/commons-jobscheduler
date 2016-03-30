@@ -126,7 +126,8 @@ public class SOSHibernateConnection implements Serializable {
 
             String connFile = (configFile.isPresent()) ? configFile.get().getCanonicalPath() : "without config file";
             int isolationLevel = getTransactionIsolation();
-            LOGGER.debug(String.format("%s: autocommit = %s, transaction isolation = %s, %s, %s", method, getAutoCommit(), getTransactionIsolationName(isolationLevel), openSessionMethodName, connFile));
+            LOGGER.debug(String.format("%s: autocommit = %s, transaction isolation = %s, %s, %s", method, getAutoCommit(),
+                    getTransactionIsolationName(isolationLevel), openSessionMethodName, connFile));
 
         } catch (Exception ex) {
             throw new Exception(String.format("%s: %s", method, ex.toString()));
@@ -170,7 +171,8 @@ public class SOSHibernateConnection implements Serializable {
     private void openSession() {
         String method = getMethodName("openSession");
 
-        LOGGER.debug(String.format("%s: useOpenStatelessSession = %s, useGetCurrentSession = %s", method, useOpenStatelessSession, useGetCurrentSession));
+        LOGGER.debug(String.format("%s: useOpenStatelessSession = %s, useGetCurrentSession = %s", method, useOpenStatelessSession,
+                useGetCurrentSession));
 
         openSessionMethodName = "";
         if (useOpenStatelessSession) {
@@ -347,7 +349,8 @@ public class SOSHibernateConnection implements Serializable {
             SQLGrammarException sqlGrEx = (SQLGrammarException) ex;
             SQLException sqlEx = sqlGrEx.getSQLException();
 
-            return new Exception(String.format("%s [exception: %s, sql: %s]", ex.getMessage(), sqlEx == null ? "" : sqlEx.getMessage(), sqlGrEx.getSQL()), sqlEx);
+            return new Exception(String.format("%s [exception: %s, sql: %s]", ex.getMessage(), sqlEx == null ? "" : sqlEx.getMessage(),
+                    sqlGrEx.getSQL()), sqlEx);
         } else if (ex.getCause() != null) {
             return ex.getCause();
         }
@@ -412,7 +415,8 @@ public class SOSHibernateConnection implements Serializable {
             Session session = (Session) currentSession;
             session.doWork(work);
         } else {
-            LOGGER.warn(String.format("%s: this method will be ignored for current openSessionMethodName : %s (%s)", method, openSessionMethodName, currentSession.getClass().getSimpleName()));
+            LOGGER.warn(String.format("%s: this method will be ignored for current openSessionMethodName : %s (%s)", method, openSessionMethodName,
+                    currentSession.getClass().getSimpleName()));
         }
     }
 
@@ -916,10 +920,13 @@ public class SOSHibernateConnection implements Serializable {
         CriteriaImpl criteriaImpl = (CriteriaImpl) criteria;
         SessionImplementor session = criteriaImpl.getSession();
         SessionFactoryImplementor factory = session.getFactory();
-        CriteriaQueryTranslator translator = new CriteriaQueryTranslator(factory, criteriaImpl, criteriaImpl.getEntityOrClassName(), CriteriaQueryTranslator.ROOT_SQL_ALIAS);
+        CriteriaQueryTranslator translator =
+                new CriteriaQueryTranslator(factory, criteriaImpl, criteriaImpl.getEntityOrClassName(), CriteriaQueryTranslator.ROOT_SQL_ALIAS);
         String[] implementors = factory.getImplementors(criteriaImpl.getEntityOrClassName());
 
-        CriteriaJoinWalker walker = new CriteriaJoinWalker((OuterJoinLoadable) factory.getEntityPersister(implementors[0]), translator, factory, criteriaImpl, criteriaImpl.getEntityOrClassName(), session.getLoadQueryInfluencers());
+        CriteriaJoinWalker walker =
+                new CriteriaJoinWalker((OuterJoinLoadable) factory.getEntityPersister(implementors[0]), translator, factory, criteriaImpl,
+                        criteriaImpl.getEntityOrClassName(), session.getLoadQueryInfluencers());
 
         return walker.getSQLString();
     }

@@ -145,7 +145,8 @@ public class JobSchedulerSCPJob extends JobSchedulerSSHBaseJob {
                             v.add(new File(filename));
                         } else {
                             filename = this.normalizePath(filename);
-                            if (this.getLocalDir() != null && !".".equals(this.getLocalDir()) && !filename.startsWith("/") && !filename.startsWith(":/", 1)) {
+                            if (this.getLocalDir() != null && !".".equals(this.getLocalDir()) && !filename.startsWith("/")
+                                    && !filename.startsWith(":/", 1)) {
                                 filename = this.getLocalDir() + "/" + filename;
                             }
                             File fobj = new File(filename);
@@ -162,7 +163,8 @@ public class JobSchedulerSCPJob extends JobSchedulerSSHBaseJob {
                     }
                     this.setFilenames(v);
                 } else {
-                    this.setFilenames(new SOSFileSystemOperations().listFiles(this.getLocalDir(), this.getFileSpec(), Pattern.MULTILINE, this.isRecursive()));
+                    this.setFilenames(new SOSFileSystemOperations().listFiles(this.getLocalDir(), this.getFileSpec(), Pattern.MULTILINE,
+                            this.isRecursive()));
                 }
                 int count = 0;
                 String[] files = new String[this.getFilenames().size()];
@@ -170,7 +172,8 @@ public class JobSchedulerSCPJob extends JobSchedulerSSHBaseJob {
                     String filename = null;
                     if ("get".equals(this.getAction())) {
                         filename = this.normalizePath(file.getPath());
-                        if (this.getRemoteDir() != null && !".".equals(this.getRemoteDir()) && !filename.startsWith("/") && !filename.startsWith(":/", 1)) {
+                        if (this.getRemoteDir() != null && !".".equals(this.getRemoteDir()) && !filename.startsWith("/")
+                                && !filename.startsWith(":/", 1)) {
                             filename = this.getRemoteDir() + "/" + filename;
                         }
                         spooler_log.info("file to receive: " + filename);
@@ -325,7 +328,7 @@ public class JobSchedulerSCPJob extends JobSchedulerSSHBaseJob {
                     this.setSshSession(null);
                 } catch (Exception ex) {
                     // gracefully ignore this error
-                } 
+                }
             }
         }
     }
