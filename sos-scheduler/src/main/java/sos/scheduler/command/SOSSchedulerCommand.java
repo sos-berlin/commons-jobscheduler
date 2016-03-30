@@ -247,8 +247,9 @@ public class SOSSchedulerCommand {
     }
 
     public static void main(final String[] args) throws Exception {
-        final String USAGE = "\nUsage: java -cp com.sos.scheduler-xxx.jar:log4j-xxx.jar sos.scheduler.command.SOSSchedulerCommand"
-                + "  -host <host> -port <port> [-timeout <timeout>]  \"<xml-command>\"";
+        final String USAGE =
+                "\nUsage: java -cp com.sos.scheduler-xxx.jar:log4j-xxx.jar sos.scheduler.command.SOSSchedulerCommand"
+                        + "  -host <host> -port <port> [-timeout <timeout>]  \"<xml-command>\"";
         String host = "localhost";
         String command = null;
         String schedulerXml = null;

@@ -299,8 +299,10 @@ public class JobSchedulerLoadTestLauncher {
                 sosLogger.debug3("..parameter[scheduler_launcher_start_increment] = " + schedulerLauncherStartIncrement);
                 if (sosString.parseToString(allParam, "scheduler_launcher_start_increment").trim().startsWith("+")
                         || sosString.parseToString(allParam, "scheduler_launcher_start_increment").trim().startsWith("*")) {
-                    schedulerLauncherStartIncrement = Integer.parseInt(sosString.parseToString(allParam, "scheduler_launcher_start_increment").trim().substring(1));
-                    schedulerLauncherStartIncrementFactor = sosString.parseToString(allParam, "scheduler_launcher_start_increment").trim().substring(0, 1);
+                    schedulerLauncherStartIncrement =
+                            Integer.parseInt(sosString.parseToString(allParam, "scheduler_launcher_start_increment").trim().substring(1));
+                    schedulerLauncherStartIncrementFactor =
+                            sosString.parseToString(allParam, "scheduler_launcher_start_increment").trim().substring(0, 1);
                 } else {
                     schedulerLauncherStartIncrement = Integer.parseInt(sosString.parseToString(allParam, "scheduler_launcher_start_increment"));
                 }
@@ -405,8 +407,9 @@ public class JobSchedulerLoadTestLauncher {
                 Object[] params = this.allParam.entrySet().toArray();
                 for (int i = 0; i < params.length; i++) {
                     if (!sosString.parseToString(params[i]).startsWith("scheduler_launcher_")) {
-                        request += "<param name=\"" + sosString.parseToString(params[i]).split("=")[0] + "\" value=\""
-                                + sosString.parseToString(params[i]).split("=")[1] + "\"/>";
+                        request +=
+                                "<param name=\"" + sosString.parseToString(params[i]).split("=")[0] + "\" value=\""
+                                        + sosString.parseToString(params[i]).split("=")[1] + "\"/>";
                     }
                 }
                 request += "</params>";
@@ -429,8 +432,9 @@ public class JobSchedulerLoadTestLauncher {
                 Object[] params = this.allParam.entrySet().toArray();
                 for (int i = 0; i < params.length; i++) {
                     if (!sosString.parseToString(params[i]).startsWith("scheduler_launcher_")) {
-                        request += "<param name=\"" + sosString.parseToString(params[i]).split("=")[0] + "\" value=\""
-                                + sosString.parseToString(params[i]).split("=")[1] + "\"/>";
+                        request +=
+                                "<param name=\"" + sosString.parseToString(params[i]).split("=")[0] + "\" value=\""
+                                        + sosString.parseToString(params[i]).split("=")[1] + "\"/>";
                     }
                 }
                 request += "</params>";
@@ -489,8 +493,9 @@ public class JobSchedulerLoadTestLauncher {
             stateText = "..number of jobs launched: " + (counter) + "(error=" + (counterError) + ";success=" + (counter - counterError) + ")";
             showSummary(counter, counterError, timeInSec);
         } catch (Exception e) {
-            stateText = "..number of jobs launched: " + (counter) + "(error=" + counterError + ";success=" + (counter - counterError) + ")"
-                    + e.getMessage();
+            stateText =
+                    "..number of jobs launched: " + (counter) + "(error=" + counterError + ";success=" + (counter - counterError) + ")"
+                            + e.getMessage();
             sosLogger.info("..error in " + SOSClassUtil.getClassName() + ": " + e.getMessage());
             throw new Exception("..error in " + SOSClassUtil.getClassName() + ": " + e.getMessage(), e);
         } finally {

@@ -13,9 +13,7 @@ import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 
-/**
- * source code from http://kra.lc/blog/2014/02/powershell-java-bridge/
- */
+/** source code from http://kra.lc/blog/2014/02/powershell-java-bridge/ */
 public class PowerShell {
 
     private static final Logger LOGGER = Logger.getLogger(PowerShell.class);
@@ -42,8 +40,9 @@ public class PowerShell {
 
     public PowerShell() throws IOException {
         Runtime runtime = Runtime.getRuntime();
-        process = runtime.exec("PowerShell -NoLogo -File " + powershell.getAbsolutePath() + " -Source "
-                + (source = File.createTempFile(PowerShell.class.getSimpleName() + "Source", ".ps1")));
+        process =
+                runtime.exec("PowerShell -NoLogo -File " + powershell.getAbsolutePath() + " -Source "
+                        + (source = File.createTempFile(PowerShell.class.getSimpleName() + "Source", ".ps1")));
         source.deleteOnExit();
         sourceWriter = new PrintWriter(source);
         runtime.addShutdownHook(shutdownThread = new Thread() {

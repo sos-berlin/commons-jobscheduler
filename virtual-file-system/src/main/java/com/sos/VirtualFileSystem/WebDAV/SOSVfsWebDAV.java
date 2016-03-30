@@ -928,7 +928,8 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
         } catch (JobSchedulerException ex) {
             throw ex;
         } catch (Exception ex) {
-            throw new JobSchedulerException(SOSVfs_E_167.params(authenticationOptions.getAuth_method().Value(), authenticationOptions.getAuth_file().Value()), ex);
+            throw new JobSchedulerException(SOSVfs_E_167.params(authenticationOptions.getAuth_method().Value(),
+                    authenticationOptions.getAuth_file().Value()), ex);
         }
 
         reply = "OK";

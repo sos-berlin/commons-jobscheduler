@@ -88,8 +88,10 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
             this.Source().auth_method.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
             this.Target().auth_method.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
             protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.webdav.Text(), SOSOptionTransferType.enuTransferTypes.webdav.Text());
-            this.Source().protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.webdav.Text(), SOSOptionTransferType.enuTransferTypes.webdav.Text());
-            this.Target().protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.webdav.Text(), SOSOptionTransferType.enuTransferTypes.webdav.Text());
+            this.Source().protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.webdav.Text(),
+                    SOSOptionTransferType.enuTransferTypes.webdav.Text());
+            this.Target().protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.webdav.Text(),
+                    SOSOptionTransferType.enuTransferTypes.webdav.Text());
             port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
             this.Source().port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
             this.Target().port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
@@ -99,8 +101,10 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
             this.Source().auth_method.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
             this.Target().auth_method.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
             protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.http.Text(), SOSOptionTransferType.enuTransferTypes.http.Text());
-            this.Source().protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.http.Text(), SOSOptionTransferType.enuTransferTypes.http.Text());
-            this.Target().protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.http.Text(), SOSOptionTransferType.enuTransferTypes.http.Text());
+            this.Source().protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.http.Text(),
+                    SOSOptionTransferType.enuTransferTypes.http.Text());
+            this.Target().protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.http.Text(),
+                    SOSOptionTransferType.enuTransferTypes.http.Text());
             port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
             this.Source().port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
             this.Target().port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
@@ -130,7 +134,8 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         switch (penuTransferType) {
         case webdav:
             pobjOpt.auth_method.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
-            pobjOpt.protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.webdav.Text(), SOSOptionTransferType.enuTransferTypes.webdav.Text());
+            pobjOpt.protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.webdav.Text(),
+                    SOSOptionTransferType.enuTransferTypes.webdav.Text());
             pobjOpt.port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
             break;
         case local:
@@ -500,19 +505,20 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         setChildClasses(hshMap);
     }
 
-    private boolean isEmpty(HashMap<String, String> params,String key){
-       return ((params.get(key) == null) ||  params.get(key).length() == 0);
+    private boolean isEmpty(HashMap<String, String> params, String key) {
+        return ((params.get(key) == null) || params.get(key).length() == 0);
     }
-    
-    private void handleFileOrderSource(HashMap<String, String> params){
-        boolean b=false;
-        b = (isEmpty(params,"file_path") && isEmpty(params,"source_dir")  && isEmpty(params,"local_dir")  && isEmpty(params,"file_spec"));
-        if (b && !isEmpty(params,"scheduler_file_path")){
-           LOGGER.debug(String.format("Using value from parameter SCHEDULER_FILE_PATH %s for the parameter file_path, as no file_path, local_dir, "
-                   + "file_spec or source_dir has been specified",params.get("scheduler_file_path")));
-           params.put("file_path", params.get("scheduler_file_path"));
+
+    private void handleFileOrderSource(HashMap<String, String> params) {
+        boolean b = false;
+        b = (isEmpty(params, "file_path") && isEmpty(params, "source_dir") && isEmpty(params, "local_dir") && isEmpty(params, "file_spec"));
+        if (b && !isEmpty(params, "scheduler_file_path")) {
+            LOGGER.debug(String.format("Using value from parameter SCHEDULER_FILE_PATH %s for the parameter file_path, as no file_path, local_dir, "
+                    + "file_spec or source_dir has been specified", params.get("scheduler_file_path")));
+            params.put("file_path", params.get("scheduler_file_path"));
         }
     }
+
     public void setAllOptions2(HashMap<String, String> params) {
         Map<String, String> mapFromIniFile = new HashMap<String, String>();
         if (!flgSettingsFileProcessed && !flgReadSettingsFileIsActive && params.containsKey("settings") && params.containsKey("profile")) {
@@ -652,8 +658,10 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 
     private boolean hasVariableToSubstitute(String value) {
         boolean flgResult = false;
-        value = " "
-                + value.toLowerCase().replaceAll("(\\$|%)\\{(source|target)(transfer)?filename\\}", "").replaceAll("%(source|target)(transfer)?filename%", "");
+        value =
+                " "
+                        + value.toLowerCase().replaceAll("(\\$|%)\\{(source|target)(transfer)?filename\\}", "").replaceAll(
+                                "%(source|target)(transfer)?filename%", "");
         if (value.matches("^.*[^\\\\](\\$|%)\\{[^/\\}\\\\]+\\}.*$") || value.matches("^.*[^\\\\]%[^/%\\\\]+%.*$")) {
             flgResult = true;
         }

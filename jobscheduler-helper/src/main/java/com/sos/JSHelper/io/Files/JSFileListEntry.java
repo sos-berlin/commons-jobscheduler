@@ -66,7 +66,9 @@ public class JSFileListEntry extends JSListenerClass {
     }
 
     public String toString() {
-        String strT = String.format("RemoteFile = %1$s, LocalFile = %2$s, BytesTransferred = %3$s", this.RemoteFileName(), this.LocalFileName(), this.NoOfBytesTransferred());
+        String strT =
+                String.format("RemoteFile = %1$s, LocalFile = %2$s, BytesTransferred = %3$s", this.RemoteFileName(), this.LocalFileName(),
+                        this.NoOfBytesTransferred());
         return strT;
     }
 

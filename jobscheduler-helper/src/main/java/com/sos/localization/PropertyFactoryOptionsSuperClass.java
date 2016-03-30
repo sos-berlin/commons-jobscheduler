@@ -59,11 +59,11 @@ public class PropertyFactoryOptionsSuperClass extends JSOptionsClass {
     /** \var Operation : */
     @JSOptionDefinition(name = "Operation", description = "", key = "Operation", type = "SOSOptionString", mandatory = false)
     public SOSOptionString Operation = new SOSOptionString(this, conClassName + ".Operation", // HashMap-Key
-    "", // Titel
-    "merge", // InitValue
-    "merge", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "merge", // InitValue
+            "merge", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getOperation :
      * 
@@ -96,11 +96,11 @@ public class PropertyFactoryOptionsSuperClass extends JSOptionsClass {
     /** \var PropertyFileNamePrefix : */
     @JSOptionDefinition(name = "PropertyFileNamePrefix", description = "", key = "PropertyFileNamePrefix", type = "SOSOptionString", mandatory = true)
     public SOSOptionString PropertyFileNamePrefix = new SOSOptionString(this, conClassName + ".PropertyFileNamePrefix", // HashMap-Key
-    "", // Titel
-    " ", // InitValue
-    " ", // DefaultValue
-    true // isMandatory
-    );
+            "", // Titel
+            " ", // InitValue
+            " ", // DefaultValue
+            true // isMandatory
+            );
 
     /** \brief getPropertyFileNamePrefix :
      * 
@@ -134,11 +134,11 @@ public class PropertyFactoryOptionsSuperClass extends JSOptionsClass {
      * files. The Folder, which has all the I18N Property files. */
     @JSOptionDefinition(name = "SourceFolderName", description = "The Folder, which has all the I18N Property files.", key = "SourceFolderName", type = "SOSOptionFolderName", mandatory = true)
     public SOSOptionFolderName SourceFolderName = new SOSOptionFolderName(this, conClassName + ".SourceFolderName", // HashMap-Key
-    "The Folder, which has all the I18N Property files.", // Titel
-    " ", // InitValue
-    " ", // DefaultValue
-    true // isMandatory
-    );
+            "The Folder, which has all the I18N Property files.", // Titel
+            " ", // InitValue
+            " ", // DefaultValue
+            true // isMandatory
+            );
 
     /** \brief getSourceFolderName : The Folder, which has all the I18N Property
      * files.

@@ -36,13 +36,15 @@ public class JobSchedulerProcessSendMailJob extends ProcessOrderJob {
                     orderId = order.id();
                     if (order.params().value("configuration_path") != null && !order.params().value("configuration_path").isEmpty()) {
                         this.setConfigurationPath(order.params().value("configuration_path"));
-                    } else if (spooler_task.params().value("configuration_path") != null && !spooler_task.params().value("configuration_path").isEmpty()) {
+                    } else if (spooler_task.params().value("configuration_path") != null
+                            && !spooler_task.params().value("configuration_path").isEmpty()) {
                         this.setConfigurationPath(spooler_task.params().value("configuration_path"));
                     }
 
                     if (order.params().value("configuration_file") != null && !order.params().value("configuration_file").isEmpty()) {
                         this.setConfigurationFilename(order.params().value("configuration_file"));
-                    } else if (spooler_task.params().value("configuration_file") != null && !spooler_task.params().value("configuration_file").isEmpty()) {
+                    } else if (spooler_task.params().value("configuration_file") != null
+                            && !spooler_task.params().value("configuration_file").isEmpty()) {
                         this.setConfigurationFilename(spooler_task.params().value("configuration_file"));
                     }
                     this.initConfiguration();
@@ -98,7 +100,8 @@ public class JobSchedulerProcessSendMailJob extends ProcessOrderJob {
                     if (this.getParameters().value("attachment_charset") != null && !this.getParameters().value("attachment_charset").isEmpty()) {
                         attachmentCharset = this.getParameters().value("attachment_charset");
                     }
-                    if (this.getParameters().value("attachment_content_type") != null && !this.getParameters().value("attachment_content_type").isEmpty()) {
+                    if (this.getParameters().value("attachment_content_type") != null
+                            && !this.getParameters().value("attachment_content_type").isEmpty()) {
                         attachmentContentType = this.getParameters().value("attachment_content_type");
                     }
                     if (this.getParameters().value("attachment_encoding") != null && !this.getParameters().value("attachment_encoding").isEmpty()) {
@@ -156,8 +159,8 @@ public class JobSchedulerProcessSendMailJob extends ProcessOrderJob {
                     this.getLogger().info("sending mail: \n" + sosMail.dumpMessageAsString());
                     if (!sosMail.send()) {
                         this.getLogger().warn(
-                                "mail server is unavailable, mail for recipient [" + to + "] is queued in local directory [" + sosMail.getQueueDir() + "]:"
-                                        + sosMail.getLastError());
+                                "mail server is unavailable, mail for recipient [" + to + "] is queued in local directory [" + sosMail.getQueueDir()
+                                        + "]:" + sosMail.getLastError());
                     }
                     if (cleanupAttachment) {
                         for (int i = 0; i < attachments.length; i++) {

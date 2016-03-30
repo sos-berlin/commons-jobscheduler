@@ -53,9 +53,10 @@ public class JobSchedulerMailJob extends JobSchedulerJob {
             this.setQueueDirectory(spooler_log.mail().queue_dir());
             try {
                 if (spooler_task != null) {
-                    if (spooler_task.params().var("db") != null && !spooler_task.params().var("db").isEmpty() 
-                            && ("true".equalsIgnoreCase(spooler_task.params().var("db")) || "yes".equalsIgnoreCase(spooler_task.params().var("db"))
-                                || "1".equals(spooler_task.params().var("db")))) {
+                    if (spooler_task.params().var("db") != null
+                            && !spooler_task.params().var("db").isEmpty()
+                            && ("true".equalsIgnoreCase(spooler_task.params().var("db")) || "yes".equalsIgnoreCase(spooler_task.params().var("db")) || "1".equals(spooler_task.params().var(
+                                    "db")))) {
                         this.setHasDatabase(true);
                         spooler_log.debug6(".. job parameter [db]: " + this.hasDatabase());
                     }
@@ -79,7 +80,8 @@ public class JobSchedulerMailJob extends JobSchedulerJob {
                         this.setSectionMail(spooler_task.params().var("section_mail"));
                         spooler_log.debug6(".. job parameter [section_mail]: " + this.getSectionMail());
                     }
-                    if (spooler_task.params().var("application_mail_templates") != null && !spooler_task.params().var("application_mail_templates").isEmpty()) {
+                    if (spooler_task.params().var("application_mail_templates") != null
+                            && !spooler_task.params().var("application_mail_templates").isEmpty()) {
                         this.setApplicationMailTemplates(spooler_task.params().var("application_mail_templates"));
                         spooler_log.debug6(".. job parameter [application_mail_templates]: " + this.getApplicationMailTemplates());
                     }
@@ -87,12 +89,13 @@ public class JobSchedulerMailJob extends JobSchedulerJob {
                         this.setSectionMailTemplates(spooler_task.params().var("section_mail_templates"));
                         spooler_log.debug6(".. job parameter [section_mail_templates]: " + this.getSectionMailTemplates());
                     }
-                    if (spooler_task.params().var("application_mail_templates_factory") != null 
+                    if (spooler_task.params().var("application_mail_templates_factory") != null
                             && !spooler_task.params().var("application_mail_templates_factory").isEmpty()) {
                         this.setApplicationMailTemplatesFactory(spooler_task.params().var("application_mail_templates_factory"));
                         spooler_log.debug6(".. job parameter [application_mail_templates_factory]: " + this.getApplicationMailTemplatesFactory());
                     }
-                    if (spooler_task.params().var("section_mail_templates_factory") != null && !spooler_task.params().var("section_mail_templates_factory").isEmpty()) {
+                    if (spooler_task.params().var("section_mail_templates_factory") != null
+                            && !spooler_task.params().var("section_mail_templates_factory").isEmpty()) {
                         this.setSectionMailTemplatesFactory(spooler_task.params().var("section_mail_templates_factory"));
                         spooler_log.debug6(".. job parameter [section_mail_templates_factory]: " + this.getSectionMailTemplatesFactory());
                     }
@@ -117,7 +120,8 @@ public class JobSchedulerMailJob extends JobSchedulerJob {
                         spooler_log.debug6(".. job parameter [log_directory]: " + this.getLogDirectory());
                     }
                     if (spooler_task.params().var("log_only") != null && !spooler_task.params().var("log_only").isEmpty()) {
-                        this.setLogOnly("1".equals(spooler_task.params().var("log_only")) || "true".equalsIgnoreCase(spooler_task.params().var("log_only")) 
+                        this.setLogOnly("1".equals(spooler_task.params().var("log_only"))
+                                || "true".equalsIgnoreCase(spooler_task.params().var("log_only"))
                                 || "yes".equalsIgnoreCase(spooler_task.params().var("log_only")) ? true : false);
                         spooler_log.debug6(".. job parameter [log_only]: " + this.isLogOnly());
                     }
@@ -131,8 +135,9 @@ public class JobSchedulerMailJob extends JobSchedulerJob {
             }
             try {
                 if (this.getConnection() != null && this.hasDatabase()) {
-                    this.sosMailSettings = new SOSConnectionSettings(this.getConnection(), this.getTableMailSettings(), this.getApplicationMail(),
-                            this.getSectionMail(), this.getLogger());
+                    this.sosMailSettings =
+                            new SOSConnectionSettings(this.getConnection(), this.getTableMailSettings(), this.getApplicationMail(),
+                                    this.getSectionMail(), this.getLogger());
                     if (this.sosMailSettings.getSectionEntry("mail_to") != null && !this.sosMailSettings.getSectionEntry("mail_to").isEmpty()) {
                         this.setMailTo(this.sosMailSettings.getSectionEntry("mail_to"));
                         spooler_log.debug6(".. job settings [mail_to]: " + this.getMailTo());
@@ -142,7 +147,8 @@ public class JobSchedulerMailJob extends JobSchedulerJob {
                         this.setQueuePrefix(this.sosMailSettings.getSectionEntry("mail_queue_prefix"));
                         spooler_log.debug6(".. job settings [mail_queue_prefix]: " + this.getQueuePrefix());
                     }
-                    if (this.sosMailSettings.getSectionEntry("queue_prefix") != null && !this.sosMailSettings.getSectionEntry("queue_prefix").isEmpty()) {
+                    if (this.sosMailSettings.getSectionEntry("queue_prefix") != null
+                            && !this.sosMailSettings.getSectionEntry("queue_prefix").isEmpty()) {
                         this.setQueuePrefix(this.sosMailSettings.getSectionEntry("queue_prefix"));
                         spooler_log.debug6(".. job settings [queue_prefix]: " + this.getQueuePrefix());
                     }
@@ -161,7 +167,8 @@ public class JobSchedulerMailJob extends JobSchedulerJob {
                         this.setQueueDirectory(this.sosMailSettings.getSectionEntry("mail_queue_directory"));
                         spooler_log.debug6(".. job settings [mail_queue_directory]: " + this.getQueueDirectory());
                     }
-                    if (this.sosMailSettings.getSectionEntry("queue_directory") != null && !this.sosMailSettings.getSectionEntry("queue_directory").isEmpty()) {
+                    if (this.sosMailSettings.getSectionEntry("queue_directory") != null
+                            && !this.sosMailSettings.getSectionEntry("queue_directory").isEmpty()) {
                         this.setQueueDirectory(this.sosMailSettings.getSectionEntry("queue_directory"));
                         spooler_log.debug6(".. job settings [queue_directory]: " + this.getQueueDirectory());
                     }
@@ -170,23 +177,26 @@ public class JobSchedulerMailJob extends JobSchedulerJob {
                         this.setLogDirectory(this.sosMailSettings.getSectionEntry("mail_log_directory"));
                         spooler_log.debug6(".. job settings [mail_log_directory]: " + this.getLogDirectory());
                     }
-                    if (this.sosMailSettings.getSectionEntry("log_directory") != null && !this.sosMailSettings.getSectionEntry("log_directory").isEmpty()) {
+                    if (this.sosMailSettings.getSectionEntry("log_directory") != null
+                            && !this.sosMailSettings.getSectionEntry("log_directory").isEmpty()) {
                         this.setLogDirectory(this.sosMailSettings.getSectionEntry("log_directory"));
                         spooler_log.debug6(".. job settings [log_directory]: " + this.getLogDirectory());
                     }
-                    if (this.sosMailSettings.getSectionEntry("mail_log_only") != null && !this.sosMailSettings.getSectionEntry("mail_log_only").isEmpty()) {
+                    if (this.sosMailSettings.getSectionEntry("mail_log_only") != null
+                            && !this.sosMailSettings.getSectionEntry("mail_log_only").isEmpty()) {
                         this.setLogOnly(("1".equalsIgnoreCase(this.sosMailSettings.getSectionEntry("mail_log_only"))
-                                || "true".equalsIgnoreCase(this.sosMailSettings.getSectionEntry("mail_log_only")) 
-                                || "yes".equalsIgnoreCase(this.sosMailSettings.getSectionEntry("mail_log_only"))) ? true : false);
+                                || "true".equalsIgnoreCase(this.sosMailSettings.getSectionEntry("mail_log_only")) || "yes".equalsIgnoreCase(this.sosMailSettings.getSectionEntry("mail_log_only")))
+                                ? true : false);
                         spooler_log.debug6(".. job settings [mail_log_only]: " + this.isLogOnly());
                     }
                     if (this.sosMailSettings.getSectionEntry("log_only") != null && !this.sosMailSettings.getSectionEntry("log_only").isEmpty()) {
                         this.setLogOnly(("1".equalsIgnoreCase(this.sosMailSettings.getSectionEntry("log_only"))
-                                || "true".equalsIgnoreCase(this.sosMailSettings.getSectionEntry("log_only")) 
-                                || "yes".equalsIgnoreCase(this.sosMailSettings.getSectionEntry("log_only"))) ? true : false);
+                                || "true".equalsIgnoreCase(this.sosMailSettings.getSectionEntry("log_only")) || "yes".equalsIgnoreCase(this.sosMailSettings.getSectionEntry("log_only")))
+                                ? true : false);
                         spooler_log.debug6(".. job settings [log_only]: " + this.isLogOnly());
                     }
-                    if (this.sosMailSettings.getSectionEntry("max_delivery") != null && !this.sosMailSettings.getSectionEntry("max_delivery").isEmpty()) {
+                    if (this.sosMailSettings.getSectionEntry("max_delivery") != null
+                            && !this.sosMailSettings.getSectionEntry("max_delivery").isEmpty()) {
                         this.setMaxDeliveryCounter(Long.parseLong(this.sosMailSettings.getSectionEntry("max_delivery")));
                         spooler_log.debug6(".. job settings [max_delivery]: " + this.getMaxDeliveryCounter());
                     }

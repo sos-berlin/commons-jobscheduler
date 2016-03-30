@@ -56,8 +56,8 @@ public class SOSOptionKeyStoreType extends JSOptionValueList {
         try {
             SOSOptionKeyStoreType.Type.valueOf(testValue);
         } catch (Exception e) {
-            throw new JobSchedulerException(String.format("Value \"%s\" is not valid for %s - valid values are %s : %s", testValue, strKey, Type.asString(),
-                    e.toString()));
+            throw new JobSchedulerException(String.format("Value \"%s\" is not valid for %s - valid values are %s : %s", testValue, strKey,
+                    Type.asString(), e.toString()));
         }
         super.Value(testValue);
     }

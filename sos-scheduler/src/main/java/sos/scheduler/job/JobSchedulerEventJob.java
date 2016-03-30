@@ -395,10 +395,11 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
             conn.executeUpdate("DELETE FROM " + tableEvents
                     + " WHERE \"EXPIRES\"<=%now AND (\"SPOOLER_ID\" IS NULL OR \"SPOOLER_ID\"='' OR \"SPOOLER_ID\"='" + spooler.id() + "')");
             conn.commit();
-            Vector<?> vEvents = conn.getArrayAsVector("SELECT \"SPOOLER_ID\", \"REMOTE_SCHEDULER_HOST\", \"REMOTE_SCHEDULER_PORT\", "
-                    + "\"JOB_CHAIN\", \"ORDER_ID\", \"JOB_NAME\", \"EVENT_CLASS\", \"EVENT_ID\", \"EXIT_CODE\", \"CREATED\", \"EXPIRES\", \"PARAMETERS\" FROM "
-                    + tableEvents + " WHERE (\"SPOOLER_ID\" IS NULL OR \"SPOOLER_ID\"='' OR \"SPOOLER_ID\"='" + spooler.id()
-                    + "') ORDER BY \"ID\" ASC");
+            Vector<?> vEvents =
+                    conn.getArrayAsVector("SELECT \"SPOOLER_ID\", \"REMOTE_SCHEDULER_HOST\", \"REMOTE_SCHEDULER_PORT\", "
+                            + "\"JOB_CHAIN\", \"ORDER_ID\", \"JOB_NAME\", \"EVENT_CLASS\", \"EVENT_ID\", \"EXIT_CODE\", \"CREATED\", \"EXPIRES\", \"PARAMETERS\" FROM "
+                            + tableEvents + " WHERE (\"SPOOLER_ID\" IS NULL OR \"SPOOLER_ID\"='' OR \"SPOOLER_ID\"='" + spooler.id()
+                            + "') ORDER BY \"ID\" ASC");
             Iterator<?> vIterator = vEvents.iterator();
             int vCount = 0;
             while (vIterator.hasNext()) {
@@ -437,8 +438,8 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
         try {
             String eventsString = this.xmlDocumentToString(this.getEvents());
             this.getLogger().debug9("Updating events: " + eventsString);
-            spooler.set_var(JobSchedulerConstants.eventVariableName,
-                    eventsString.replaceAll("<", String.valueOf((char) 254)).replaceAll(">", String.valueOf((char) 255)));
+            spooler.set_var(JobSchedulerConstants.eventVariableName, eventsString.replaceAll("<", String.valueOf((char) 254)).replaceAll(">",
+                    String.valueOf((char) 255)));
         } catch (Exception e) {
             throw new JobSchedulerException("events updated with errors: " + e.getMessage(), e);
         }
@@ -577,8 +578,9 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
                     if (!eventHandlerFile.canRead()) {
                         throw new Exception("event handler directory is not accessible: " + eventHandlerFile.getCanonicalPath());
                     }
-                    this.getLogger().debug6("retrieving event handlers from directory: " + this.getEventHandlerFilepath()
-                            + " for file specification: " + this.getEventHandlerFilespec());
+                    this.getLogger().debug6(
+                            "retrieving event handlers from directory: " + this.getEventHandlerFilepath() + " for file specification: "
+                                    + this.getEventHandlerFilespec());
                     if (!this.getEventJobChainName().isEmpty()) {
                         String fileSpec = this.getEventJobChainName() + "(\\..*)?\\.job_chain\\.sos.scheduler.xsl$";
                         this.getLogger().debug6(".. looking for special event handler for job chain: " + fileSpec);
@@ -683,11 +685,13 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
                         String commandPort = Integer.toString(spooler.tcp_port());
                         String commandProtocol = "tcp";
                         for (int j = 0; j < commandAttributes.getLength(); j++) {
-                            if ("scheduler_host".equals(commandAttributes.item(j).getNodeName()) && !commandAttributes.item(j).getNodeValue().isEmpty()) {
+                            if ("scheduler_host".equals(commandAttributes.item(j).getNodeName())
+                                    && !commandAttributes.item(j).getNodeValue().isEmpty()) {
                                 this.getLogger().debug7("using host from command: " + commandAttributes.item(j).getNodeValue());
                                 commandHost = commandAttributes.item(j).getNodeValue();
                             }
-                            if ("scheduler_port".equals(commandAttributes.item(j).getNodeName()) && !commandAttributes.item(j).getNodeValue().isEmpty()) {
+                            if ("scheduler_port".equals(commandAttributes.item(j).getNodeName())
+                                    && !commandAttributes.item(j).getNodeValue().isEmpty()) {
                                 commandPort = commandAttributes.item(j).getNodeValue();
                             }
                             if ("protocol".equals(commandAttributes.item(j).getNodeName()) && !commandAttributes.item(j).getNodeValue().isEmpty()) {
@@ -721,8 +725,8 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
                                 commandRequest = parameterSubstitutor.replace(commandRequest);
                                 commandRequest = parameterSubstitutor.replaceEnvVars(commandRequest);
                                 commandRequest = parameterSubstitutor.replaceSystemProperties(commandRequest);
-                                this.getLogger().info(".. sending command to remote JobScheduler [" + commandHost + ":" + commandPort + "]: "
-                                        + commandRequest);
+                                this.getLogger().info(
+                                        ".. sending command to remote JobScheduler [" + commandHost + ":" + commandPort + "]: " + commandRequest);
                                 schedulerCommand.sendRequest(commandRequest);
                                 SOSXMLXPath answer = new SOSXMLXPath(new StringBuffer(schedulerCommand.getResponse()));
                                 String errorText = answer.selectSingleNodeValue("//ERROR/@text");
@@ -823,7 +827,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
                     Object result = this.getEventHandlerResultFileListIterator().next();
                     if (result instanceof File) {
                         File resultFile = (File) result;
-                        if (resultFile != null  && !resultFile.delete()) {
+                        if (resultFile != null && !resultFile.delete()) {
                             resultFile.deleteOnExit();
                         }
                     }
@@ -961,21 +965,24 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
                 this.getLogger().debug3(".. --> curEventExpires:" + curEventExpires);
             }
             this.getLogger().info(
-                    ".. adding event ...: scheduler id=" + curEventSchedulerId + ", event class=" + curEventClass + ", event id=" + curEventId + ", exit code="
-                            + curEventExitCode + ", job chain=" + curEventJobChainName + ", order id=" + curEventOrderId + ", job=" + curEventJobName);
+                    ".. adding event ...: scheduler id=" + curEventSchedulerId + ", event class=" + curEventClass + ", event id=" + curEventId
+                            + ", exit code=" + curEventExitCode + ", job chain=" + curEventJobChainName + ", order id=" + curEventOrderId + ", job="
+                            + curEventJobName);
             if (curEventId.isEmpty()) {
                 throw new Exception("Empty event_id is not allowed.");
             }
             this.getEvents().getLastChild().appendChild(event);
             if (this.getConnection() != null) {
-                String stmt = "INSERT INTO "
-                        + tableEvents
-                        + " (\"SPOOLER_ID\", \"REMOTE_SCHEDULER_HOST\", \"REMOTE_SCHEDULER_PORT\", \"JOB_CHAIN\", \"ORDER_ID\", \"JOB_NAME\", \"EVENT_CLASS\","
-                        + " \"EVENT_ID\", \"EXIT_CODE\", \"CREATED\", \"EXPIRES\") VALUES ('" + curEventSchedulerId + "', '" + curEventRemoteSchedulerHost + "', "
-                        + (curEventRemoteSchedulerPort.length() == 0 ? "0" : curEventRemoteSchedulerPort) + ", '" + curEventJobChainName + "', '"
-                        + curEventOrderId + "', '" + curEventJobName + "', '" + curEventClass + "', '" + curEventId + "', '" + curEventExitCode
-                        + "', " + (curEventCreated.length() > 0 ? "%timestamp_iso('" + curEventCreated + "')" : "%now") + ", "
-                        + (curEventExpires.length() > 0 ? "%timestamp_iso('" + curEventExpires + "')" : "NULL") + ")";
+                String stmt =
+                        "INSERT INTO "
+                                + tableEvents
+                                + " (\"SPOOLER_ID\", \"REMOTE_SCHEDULER_HOST\", \"REMOTE_SCHEDULER_PORT\", \"JOB_CHAIN\", \"ORDER_ID\", \"JOB_NAME\", \"EVENT_CLASS\","
+                                + " \"EVENT_ID\", \"EXIT_CODE\", \"CREATED\", \"EXPIRES\") VALUES ('" + curEventSchedulerId + "', '"
+                                + curEventRemoteSchedulerHost + "', "
+                                + (curEventRemoteSchedulerPort.length() == 0 ? "0" : curEventRemoteSchedulerPort) + ", '" + curEventJobChainName
+                                + "', '" + curEventOrderId + "', '" + curEventJobName + "', '" + curEventClass + "', '" + curEventId + "', '"
+                                + curEventExitCode + "', " + (curEventCreated.length() > 0 ? "%timestamp_iso('" + curEventCreated + "')" : "%now")
+                                + ", " + (curEventExpires.length() > 0 ? "%timestamp_iso('" + curEventExpires + "')" : "NULL") + ")";
                 this.getConnection().executeUpdate(stmt);
                 NodeList nodes = XPathAPI.selectNodeList(event, "params");
                 if (nodes != null && nodes.getLength() > 0) {

@@ -61,7 +61,8 @@ public class JSArchiver extends JSListenerClass {
         String strFName = null;
         String strFileName = null;
 
-        SignalInfo(String.format("%1$s: starting, file to archive: '%2$s', archive-folder: '%3$s'.", conMethodName, objOptions.FileName(), objOptions.ArchiveFolderName()));
+        SignalInfo(String.format("%1$s: starting, file to archive: '%2$s', archive-folder: '%3$s'.", conMethodName, objOptions.FileName(),
+                objOptions.ArchiveFolderName()));
 
         if (objOptions == null) {
             SignalAbort(String.format("%1$s: no Options specified. Archive aborted.", conMethodName));
@@ -96,7 +97,8 @@ public class JSArchiver extends JSListenerClass {
             if (fleArchiveFile.exists()) {
                 SignalAbort(String.format("%1$s: file '%2$s' already exist.", conMethodName, nameOfArchiveFile));
             }
-            SignalInfo(String.format("%3$s: Zip '%1$s' into Zip-File '%2$s'", fileToArchive.getAbsoluteFile(), fleArchiveFile.getAbsoluteFile(), conMethodName));
+            SignalInfo(String.format("%3$s: Zip '%1$s' into Zip-File '%2$s'", fileToArchive.getAbsoluteFile(), fleArchiveFile.getAbsoluteFile(),
+                    conMethodName));
 
             final BufferedInputStream in = new BufferedInputStream(new FileInputStream(fileToArchive));
             final GZIPOutputStream out = new GZIPOutputStream(new FileOutputStream(fleArchiveFile));

@@ -31,11 +31,11 @@ public class SOSOptionCommandString extends SOSOptionHexString {
     private static final long serialVersionUID = 2326011361040152247L;
     private final String conClassName = "SOSOptionCommandString";
     public SOSOptionRegExp command_delimiter = new SOSOptionRegExp(null, conClassName + ".command_delimiter", // HashMap-Key
-    "Command delimiter characters are specified using this par", // Titel
-    "%%", // InitiValue
-    "%%", // DefaultValue
-    true // isMandatory
-    );							// Command delimiter characters are specified using this par
+            "Command delimiter characters are specified using this par", // Titel
+            "%%", // InitiValue
+            "%%", // DefaultValue
+            true // isMandatory
+            );							// Command delimiter characters are specified using this par
 
     /** \brief SOSOptionCommandString
      *

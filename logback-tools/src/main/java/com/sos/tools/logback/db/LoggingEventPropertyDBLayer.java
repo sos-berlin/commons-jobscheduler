@@ -105,8 +105,8 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
         filter.setMappedKey(mappedKey);
         filter.setMappedValue(mappedValue);
         filter.setLoggerName(loggerName);
-        Query query = setQueryParams("from LoggingEventPropertyDBItem events " + getWhere() + this.filter.getOrderCriteria()
-                + this.filter.getSortMode());
+        Query query =
+                setQueryParams("from LoggingEventPropertyDBItem events " + getWhere() + this.filter.getOrderCriteria() + this.filter.getSortMode());
         return query.list();
     }
 
@@ -120,8 +120,8 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
         filter = new LoggingEventPropertyFilter();
         filter.setOrderCriteria(EVENT_ID);
         filter.setEventId(eventId);
-        Query query = setQueryParams("from LoggingEventPropertyDBItem events " + getWhere() + this.filter.getOrderCriteria()
-                + this.filter.getSortMode());
+        Query query =
+                setQueryParams("from LoggingEventPropertyDBItem events " + getWhere() + this.filter.getOrderCriteria() + this.filter.getSortMode());
         return query.list();
     }
 

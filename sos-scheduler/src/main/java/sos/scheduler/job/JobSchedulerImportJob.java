@@ -154,8 +154,8 @@ public class JobSchedulerImportJob extends JobSchedulerJob {
                     getLogger().debug7("signal_id is: " + signalId);
                 }
                 importfile(triggerfile);
-                String upStr = "UPDATE " + JobSchedulerSignalJob.TABLE_SCHEDULER_SIGNAL_OBECTS + " SET \"STATUS\" = 3 WHERE  \"SIGNAL_ID\" = "
-                        + signalId;
+                String upStr =
+                        "UPDATE " + JobSchedulerSignalJob.TABLE_SCHEDULER_SIGNAL_OBECTS + " SET \"STATUS\" = 3 WHERE  \"SIGNAL_ID\" = " + signalId;
                 sosUpdateStateConnection.executeUpdate(upStr);
                 sosUpdateStateConnection.commit();
                 String time = Math.round((System.currentTimeMillis() - timeInSec) / 1000) + "s";
@@ -171,8 +171,9 @@ public class JobSchedulerImportJob extends JobSchedulerJob {
                 }
                 if (sosUpdateStateConnection != null) {
                     sosUpdateStateConnection.rollback();
-                    String upStr = "UPDATE " + JobSchedulerSignalJob.TABLE_SCHEDULER_SIGNAL_OBECTS + " SET \"STATUS\" = 1003 WHERE  \"SIGNAL_ID\" = "
-                            + signalId;
+                    String upStr =
+                            "UPDATE " + JobSchedulerSignalJob.TABLE_SCHEDULER_SIGNAL_OBECTS + " SET \"STATUS\" = 1003 WHERE  \"SIGNAL_ID\" = "
+                                    + signalId;
                     sosUpdateStateConnection.executeUpdate(upStr);
                     sosUpdateStateConnection.commit();
                 }

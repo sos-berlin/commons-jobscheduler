@@ -114,18 +114,18 @@ public class SOSVfsMessageCodes extends JSToolBox {
     public static final SOSMsgVfs SOSVfs_D_181 = new SOSMsgVfs("SOSVfs_D_181");								// "...sftp server reply ['%1$s'] ['%2$s']: '%3$s'";
     @I18NMsg
     public static final SOSMsgVfs SOSVfs_I_182 = new SOSMsgVfs("SOSVfs_I_182");								// "...sftp server reply ['%1$s'] remote ['%2$s'"]
-                                                                                // local
-                                                                                // ['%3$s']:
-                                                                                // '%4$s'";
+    // local
+    // ['%3$s']:
+    // '%4$s'";
     @I18NMsg
     public static final SOSMsgVfs SOSVfs_I_183 = new SOSMsgVfs("SOSVfs_I_183");								// "..sftp server reply ['%1$s'] local ['%2$s'] remote ['%3$s']: '%4$s'";
     @I18NMsg
     public static final SOSMsgVfs SOSVfs_E_184 = new SOSMsgVfs("SOSVfs_E_184");								// ['%1$s']
-                                                                                // remote
-                                                                                // ['%2$s']
-                                                                                // local
-                                                                                // ['%3$s']
-                                                                                // failed;
+    // remote
+    // ['%2$s']
+    // local
+    // ['%3$s']
+    // failed;
     @I18NMsg
     public static final SOSMsgVfs SOSVfs_E_185 = new SOSMsgVfs("SOSVfs_E_185");								// "['%1$s'] local ['%2$s'] remote ['%3$s'] failed";
     @I18NMsg

@@ -31,11 +31,11 @@ public class HibernateOptions extends JSOptionsClass implements IHibernateOption
     /** \var hibernate_connection_isolation : */
     @JSOptionDefinition(name = "hibernate_connection_isolation", description = "", key = "hibernate_connection_isolation", type = "SOSOptionString", mandatory = false)
     public SOSOptionString hibernate_connection_isolation = new SOSOptionString(this, conClassName + ".hibernate_connection_isolation", // HashMap-Key
-    "", // Titel
-    "2", // InitValue
-    "2", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "2", // InitValue
+            "2", // DefaultValue
+            false // isMandatory
+            );
 
     /*
      * (non-Javadoc)
@@ -61,11 +61,11 @@ public class HibernateOptions extends JSOptionsClass implements IHibernateOption
     /** \var hibernate_connection_autocommit : */
     @JSOptionDefinition(name = "hibernate_connection_autocommit", description = "", key = "hibernate_connection_autocommit", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean hibernate_connection_autocommit = new SOSOptionBoolean(this, conClassName + ".hibernate_connection_autocommit", // HashMap-Key
-    "", // Titel
-    "false", // InitValue
-    "false", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "false", // InitValue
+            "false", // DefaultValue
+            false // isMandatory
+            );
 
     /*
      * (non-Javadoc)
@@ -92,11 +92,11 @@ public class HibernateOptions extends JSOptionsClass implements IHibernateOption
      * the database connection */
     @JSOptionDefinition(name = "hibernate_connection_config_file", description = "", key = "hibernate_connection_config_file", type = "SOSOptionInFileName", mandatory = false)
     public SOSOptionInFileName hibernate_connection_config_file = new SOSOptionInFileName(this, conClassName + ".hibernate_connection_config_file", // HashMap-Key
-    "", // Titel
-    "config/hibernate.cfg.xml", // InitValue
-    "config/hibernate.cfg.xml", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "config/hibernate.cfg.xml", // InitValue
+            "config/hibernate.cfg.xml", // DefaultValue
+            false // isMandatory
+            );
 
     /*
      * (non-Javadoc)
@@ -123,11 +123,11 @@ public class HibernateOptions extends JSOptionsClass implements IHibernateOption
      * database connection */
     @JSOptionDefinition(name = "hibernate_connection_driver_class", description = "", key = "hibernate_connection_driver_class", type = "SOSOptionDBDriver", mandatory = false)
     public SOSOptionDBDriver hibernate_connection_driver_class = new SOSOptionDBDriver(this, conClassName + ".hibernate_connection_driver_class", // HashMap-Key
-    "", // Titel
-    "oracle.jdbc.driver.OracleDriver", // InitValue
-    "oracle.jdbc.driver.OracleDriver", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "oracle.jdbc.driver.OracleDriver", // InitValue
+            "oracle.jdbc.driver.OracleDriver", // DefaultValue
+            false // isMandatory
+            );
 
     /*
      * (non-Javadoc)
@@ -153,11 +153,11 @@ public class HibernateOptions extends JSOptionsClass implements IHibernateOption
     /** \var hibernate_connection_password : Password of the database connection */
     @JSOptionDefinition(name = "hibernate_connection_password", description = "", key = "hibernate_connection_password", type = "SOSOptionPassword", mandatory = false)
     public SOSOptionPassword hibernate_connection_password = new SOSOptionPassword(this, conClassName + ".hibernate_connection_password", // HashMap-Key
-    "", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /*
      * (non-Javadoc)
@@ -183,11 +183,11 @@ public class HibernateOptions extends JSOptionsClass implements IHibernateOption
     /** \var hibernate_connection_url : JDBC URL of the database connection */
     @JSOptionDefinition(name = "hibernate_connection_url", description = "", key = "hibernate_connection_url", type = "SOSOptionJdbcUrl", mandatory = false)
     public SOSOptionJdbcUrl hibernate_connection_url = new SOSOptionJdbcUrl(this, conClassName + ".hibernate_connection_url", // HashMap-Key
-    "", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /*
      * (non-Javadoc)
@@ -214,11 +214,11 @@ public class HibernateOptions extends JSOptionsClass implements IHibernateOption
     /** \var hibernate_connection_username : User of the database connection */
     @JSOptionDefinition(name = "hibernate_connection_username", description = "", key = "hibernate_connection_username", type = "SOSOptionString", mandatory = false)
     public SOSOptionString hibernate_connection_username = new SOSOptionString(this, conClassName + ".hibernate_connection_username", // HashMap-Key
-    "", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /*
      * (non-Javadoc)
@@ -244,11 +244,11 @@ public class HibernateOptions extends JSOptionsClass implements IHibernateOption
     /** \var hibernate_dialect : Hibernate dialect of the database connection */
     @JSOptionDefinition(name = "hibernate_dialect", description = "", key = "hibernate_dialect", type = "SOSOptionString", mandatory = false)
     public SOSOptionString hibernate_dialect = new SOSOptionString(this, conClassName + ".hibernate_dialect", // HashMap-Key
-    "", // Titel
-    "org.hibernate.dialect.Oracle10gDialect", // InitValue
-    "org.hibernate.dialect.Oracle10gDialect", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "org.hibernate.dialect.Oracle10gDialect", // InitValue
+            "org.hibernate.dialect.Oracle10gDialect", // DefaultValue
+            false // isMandatory
+            );
 
     /*
      * (non-Javadoc)
@@ -273,11 +273,11 @@ public class HibernateOptions extends JSOptionsClass implements IHibernateOption
     /** \var hibernate_format_sql : */
     @JSOptionDefinition(name = "hibernate_format_sql", description = "", key = "hibernate_format_sql", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean hibernate_format_sql = new SOSOptionBoolean(this, conClassName + ".hibernate_format_sql", // HashMap-Key
-    "", // Titel
-    "false", // InitValue
-    "false", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "false", // InitValue
+            "false", // DefaultValue
+            false // isMandatory
+            );
 
     /*
      * (non-Javadoc)
@@ -303,11 +303,11 @@ public class HibernateOptions extends JSOptionsClass implements IHibernateOption
     /** \var hibernate_show_sql : */
     @JSOptionDefinition(name = "hibernate_show_sql", description = "", key = "hibernate_show_sql", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean hibernate_show_sql = new SOSOptionBoolean(this, conClassName + ".hibernate_show_sql", // HashMap-Key
-    "", // Titel
-    "false", // InitValue
-    "false", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "false", // InitValue
+            "false", // DefaultValue
+            false // isMandatory
+            );
 
     /*
      * (non-Javadoc)
@@ -334,11 +334,11 @@ public class HibernateOptions extends JSOptionsClass implements IHibernateOption
     @JSOptionDefinition(name = "hibernate_jdbc_use_scrollable_resultset", description = "", key = "hibernate_jdbc_use_scrollable_resultset", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean hibernate_jdbc_use_scrollable_resultset = new SOSOptionBoolean(this, conClassName
             + ".hibernate_jdbc_use_scrollable_resultset", // HashMap-Key
-    "", // Titel
-    "true", // InitValue
-    "true", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "true", // InitValue
+            "true", // DefaultValue
+            false // isMandatory
+            );
 
     /*
      * (non-Javadoc)

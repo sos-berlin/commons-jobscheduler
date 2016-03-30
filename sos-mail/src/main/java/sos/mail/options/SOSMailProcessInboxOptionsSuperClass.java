@@ -75,11 +75,11 @@ public class SOSMailProcessInboxOptionsSuperClass extends JSOptionsClass {
     /** \var mailPassword : The password for login at the mail server. */
     @JSOptionDefinition(name = "mailPassword", description = "", key = "mailPassword", type = "SOSOptionPassword", mandatory = false)
     public SOSOptionPassword mailPassword = new SOSOptionPassword(this, conClassName + ".mailPassword", // HashMap-Key
-    "", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getmailPassword :
      *
@@ -106,11 +106,11 @@ public class SOSMailProcessInboxOptionsSuperClass extends JSOptionsClass {
      * commands by using a comma. They will be handles one ofter the other. */
     @JSOptionDefinition(name = "mail_action", description = "", key = "mail_action", type = "SOSOptionString", mandatory = false)
     public SOSOptionString mail_action = new SOSOptionString(this, conClassName + ".mail_action", // HashMap-Key
-    "", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getmail_action :
      *
@@ -142,11 +142,11 @@ public class SOSMailProcessInboxOptionsSuperClass extends JSOptionsClass {
      * mails matching this filter in the body. */
     @JSOptionDefinition(name = "mail_body_pattern", description = "", key = "mail_body_pattern", type = "SOSOptionRegExp", mandatory = false)
     public SOSOptionRegExp mail_body_pattern = new SOSOptionRegExp(this, conClassName + ".mail_body_pattern", // HashMap-Key
-    "", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getmail_body_pattern :
      *
@@ -171,11 +171,11 @@ public class SOSMailProcessInboxOptionsSuperClass extends JSOptionsClass {
     /** \var mail_dump_dir : */
     @JSOptionDefinition(name = "mail_dump_dir", description = "", key = "mail_dump_dir", type = "SOSOptionFolderName", mandatory = false)
     public SOSOptionFolderName mail_dump_dir = new SOSOptionFolderName(this, conClassName + ".mail_dump_dir", // HashMap-Key
-    "", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getmail_dump_dir :
      *
@@ -200,11 +200,11 @@ public class SOSMailProcessInboxOptionsSuperClass extends JSOptionsClass {
     /** \var mail_host : The host name of the mail server. */
     @JSOptionDefinition(name = "mail_host", description = "", key = "mail_host", type = "SOSOptionHostName", mandatory = true)
     public SOSOptionHostName mail_host = new SOSOptionHostName(this, conClassName + ".mail_host", // HashMap-Key
-    "", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    true // isMandatory
-    );
+            "", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            true // isMandatory
+            );
 
     /** \brief getmail_host :
      *
@@ -232,11 +232,11 @@ public class SOSMailProcessInboxOptionsSuperClass extends JSOptionsClass {
      * "mail_send_at": Date of sending the mail */
     @JSOptionDefinition(name = "mail_jobchain", description = "", key = "mail_jobchain", type = "JSJobChainName", mandatory = false)
     public JSJobChainName mail_jobchain = new JSJobChainName(this, conClassName + ".mail_jobchain", // HashMap-Key
-    "", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getmail_jobchain :
      *
@@ -270,11 +270,11 @@ public class SOSMailProcessInboxOptionsSuperClass extends JSOptionsClass {
      * polled. */
     @JSOptionDefinition(name = "mail_message_folder", description = "", key = "mail_message_folder", type = "SOSOptionString", mandatory = false)
     public SOSOptionString mail_message_folder = new SOSOptionString(this, conClassName + ".mail_message_folder", // HashMap-Key
-    "", // Titel
-    "INBOX", // InitValue
-    "INBOX", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "INBOX", // InitValue
+            "INBOX", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getmail_message_folder :
      *
@@ -300,11 +300,11 @@ public class SOSMailProcessInboxOptionsSuperClass extends JSOptionsClass {
      * automatically generated order id and leave this parameter empty. */
     @JSOptionDefinition(name = "mail_order_id", description = "", key = "mail_order_id", type = "JSOrderId", mandatory = false)
     public JSOrderId mail_order_id = new JSOrderId(this, conClassName + ".mail_order_id", // HashMap-Key
-    "", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getmail_order_id :
      *
@@ -337,11 +337,11 @@ public class SOSMailProcessInboxOptionsSuperClass extends JSOptionsClass {
      * leave this empty, the order will start at the beginning of the job chain. */
     @JSOptionDefinition(name = "mail_order_state", description = "", key = "mail_order_state", type = "SOSOptionJobChainNode", mandatory = false)
     public SOSOptionJobChainNode mail_order_state = new SOSOptionJobChainNode(this, conClassName + ".mail_order_state", // HashMap-Key
-    "", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getmail_order_state :
      *
@@ -375,11 +375,11 @@ public class SOSMailProcessInboxOptionsSuperClass extends JSOptionsClass {
      * title in the operations gui of Job Scheduler. */
     @JSOptionDefinition(name = "mail_order_title", description = "", key = "mail_order_title", type = "SOSOptionString", mandatory = false)
     public SOSOptionString mail_order_title = new SOSOptionString(this, conClassName + ".mail_order_title", // HashMap-Key
-    "", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getmail_order_title :
      *
@@ -408,11 +408,11 @@ public class SOSMailProcessInboxOptionsSuperClass extends JSOptionsClass {
     /** \var mail_port : The port of the mail server . */
     @JSOptionDefinition(name = "mail_port", description = "", key = "mail_port", type = "SOSOptionPortNumber", mandatory = false)
     public SOSOptionPortNumber mail_port = new SOSOptionPortNumber(this, conClassName + ".mail_port", // HashMap-Key
-    "", // Titel
-    "110", // InitValue
-    "110", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "110", // InitValue
+            "110", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getmail_port :
      *
@@ -437,11 +437,11 @@ public class SOSMailProcessInboxOptionsSuperClass extends JSOptionsClass {
      * this job will be uses. */
     @JSOptionDefinition(name = "mail_scheduler_host", description = "", key = "mail_scheduler_host", type = "SOSOptionHostName", mandatory = false)
     public SOSOptionHostName mail_scheduler_host = new SOSOptionHostName(this, conClassName + ".mail_scheduler_host", // HashMap-Key
-    "", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getmail_scheduler_host :
      *
@@ -470,11 +470,11 @@ public class SOSMailProcessInboxOptionsSuperClass extends JSOptionsClass {
      * job will be uses. */
     @JSOptionDefinition(name = "mail_scheduler_port", description = "", key = "mail_scheduler_port", type = "SOSOptionPortNumber", mandatory = false)
     public SOSOptionPortNumber mail_scheduler_port = new SOSOptionPortNumber(this, conClassName + ".mail_scheduler_port", // HashMap-Key
-    "", // Titel
-    "0", // InitValue
-    "0", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "0", // InitValue
+            "0", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getmail_scheduler_port :
      *
@@ -499,11 +499,11 @@ public class SOSMailProcessInboxOptionsSuperClass extends JSOptionsClass {
     /** \var max_mails_to_process : */
     @JSOptionDefinition(name = "max_mails_to_process", description = "", key = "max_mails_to_process", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionInteger max_mails_to_process = new SOSOptionInteger(this, conClassName + ".max_mails_to_process", // HashMap-Key
-    "", // Titel
-    "0", // InitValue
-    "1000", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "0", // InitValue
+            "1000", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getmax_mails_to_process :
      *
@@ -528,11 +528,11 @@ public class SOSMailProcessInboxOptionsSuperClass extends JSOptionsClass {
     /** \var mail_server_timeout : */
     @JSOptionDefinition(name = "mail_server_timeout", description = "", key = "mail_server_timeout", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionInteger mail_server_timeout = new SOSOptionInteger(this, conClassName + ".mail_server_timeout", // HashMap-Key
-    "", // Titel
-    "0", // InitValue
-    "0", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "0", // InitValue
+            "0", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getmail_server_timeout :
      *
@@ -557,11 +557,11 @@ public class SOSMailProcessInboxOptionsSuperClass extends JSOptionsClass {
     /** \var mail_server_type : Possible values: -IMAP -POP3 */
     @JSOptionDefinition(name = "mail_server_type", description = "", key = "mail_server_type", type = "SOSOptionString", mandatory = false)
     public SOSOptionString mail_server_type = new SOSOptionString(this, conClassName + ".mail_server_type", // HashMap-Key
-    "", // Titel
-    "POP3", // InitValue
-    "POP3", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "POP3", // InitValue
+            "POP3", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getmail_server_type :
      *
@@ -585,11 +585,11 @@ public class SOSMailProcessInboxOptionsSuperClass extends JSOptionsClass {
      * "readed" */
     @JSOptionDefinition(name = "mail_set_seen", description = "", key = "mail_set_seen", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean mail_set_seen = new SOSOptionBoolean(this, conClassName + ".mail_set_seen", // HashMap-Key
-    "", // Titel
-    "false", // InitValue
-    "false", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "false", // InitValue
+            "false", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getmail_set_seen :
      *
@@ -614,11 +614,11 @@ public class SOSMailProcessInboxOptionsSuperClass extends JSOptionsClass {
      * expressions, you can use the parameter mail_subject_pattern. */
     @JSOptionDefinition(name = "mail_subject_filter", description = "", key = "mail_subject_filter", type = "SOSOptionString", mandatory = false)
     public SOSOptionString mail_subject_filter = new SOSOptionString(this, conClassName + ".mail_subject_filter", // HashMap-Key
-    "", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getmail_subject_filter :
      *
@@ -646,11 +646,11 @@ public class SOSMailProcessInboxOptionsSuperClass extends JSOptionsClass {
      * only mails matching this expression. */
     @JSOptionDefinition(name = "mail_subject_pattern", description = "", key = "mail_subject_pattern", type = "SOSOptionRegExp", mandatory = false)
     public SOSOptionRegExp mail_subject_pattern = new SOSOptionRegExp(this, conClassName + ".mail_subject_pattern", // HashMap-Key
-    "", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getmail_subject_pattern :
      *
@@ -677,11 +677,11 @@ public class SOSMailProcessInboxOptionsSuperClass extends JSOptionsClass {
      * readed. */
     @JSOptionDefinition(name = "mail_use_seen", description = "", key = "mail_use_seen", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean mail_use_seen = new SOSOptionBoolean(this, conClassName + ".mail_use_seen", // HashMap-Key
-    "", // Titel
-    "true", // InitValue
-    "true", // DefaultValue
-    false // isMandatory
-    );
+            "", // Titel
+            "true", // InitValue
+            "true", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getmail_use_seen :
      *
@@ -706,11 +706,11 @@ public class SOSMailProcessInboxOptionsSuperClass extends JSOptionsClass {
     /** \var mail_user : The user for login at the mailserver. */
     @JSOptionDefinition(name = "mail_user", description = "", key = "mail_user", type = "SOSOptionUserName", mandatory = true)
     public SOSOptionUserName mail_user = new SOSOptionUserName(this, conClassName + ".mail_user", // HashMap-Key
-    "", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    true // isMandatory
-    );
+            "", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            true // isMandatory
+            );
 
     /** \brief getmail_user :
      *
@@ -740,12 +740,12 @@ public class SOSMailProcessInboxOptionsSuperClass extends JSOptionsClass {
      * \created 31.12.2012 15:48:02 by KB */
     @JSOptionDefinition(name = "min_file_age", description = "Objects, which are younger than min_file_age are not processed", key = "min_file_age", type = "SOSOptionTime", mandatory = false)
     public SOSOptionTimeHorizon min_file_age = new SOSOptionTimeHorizon( // ...
-    this, // ....
-    conClassName + ".min_file_age", // ...
-    "Objects, which are younger than min_file_age are not processed", // ...
-    "", // ...
-    "", // ...
-    false);
+            this, // ....
+            conClassName + ".min_file_age", // ...
+            "Objects, which are younger than min_file_age are not processed", // ...
+            "", // ...
+            "", // ...
+            false);
     public SOSOptionTimeHorizon MinAge = (SOSOptionTimeHorizon) min_file_age.SetAlias("min_age");
 
     public String getmin_file_age() {

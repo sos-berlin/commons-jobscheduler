@@ -163,8 +163,9 @@ public class JobSchedulerExportJob extends JobSchedulerJob {
                 } catch (Exception ex) {
                 }
                 try {
-                    String upStr = "UPDATE " + JobSchedulerSignalJob.TABLE_SCHEDULER_SIGNAL_OBECTS + " SET \"STATUS\" = 1002 WHERE  \"SIGNAL_ID\" = "
-                            + signalId;
+                    String upStr =
+                            "UPDATE " + JobSchedulerSignalJob.TABLE_SCHEDULER_SIGNAL_OBECTS + " SET \"STATUS\" = 1002 WHERE  \"SIGNAL_ID\" = "
+                                    + signalId;
                     sosUpdateStateConnection.executeUpdate(upStr);
                     sosUpdateStateConnection.commit();
                 } catch (Exception x) {

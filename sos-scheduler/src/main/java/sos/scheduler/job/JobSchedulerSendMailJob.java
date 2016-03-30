@@ -38,9 +38,10 @@ public class JobSchedulerSendMailJob extends JobSchedulerMailJob {
     public boolean spooler_open() {
         try {
             if (spooler_task.job().order_queue() == null) {
-                this.mailOrders = this.getConnection().getArrayValue(
-                        "SELECT \"ID\" FROM " + this.getTableMails() + " WHERE \"STATUS\"=" + STATE_READY
-                                + " AND (\"TARGETED\" IS NULL OR \"TARGETED\"<=%now) ORDER BY \"ID\" ASC");
+                this.mailOrders =
+                        this.getConnection().getArrayValue(
+                                "SELECT \"ID\" FROM " + this.getTableMails() + " WHERE \"STATUS\"=" + STATE_READY
+                                        + " AND (\"TARGETED\" IS NULL OR \"TARGETED\"<=%now) ORDER BY \"ID\" ASC");
                 this.mailOrderIterator = this.mailOrders.iterator();
                 return this.mailOrderIterator.hasNext();
             } else {
@@ -55,8 +56,9 @@ public class JobSchedulerSendMailJob extends JobSchedulerMailJob {
                     this.getConnection().rollback();
                 }
             } catch (Exception ex) {
-                // gracefully ignore this error to preserve the original exception
-            } 
+                // gracefully ignore this error to preserve the original
+                // exception
+            }
         }
     }
 
@@ -159,7 +161,8 @@ public class JobSchedulerSendMailJob extends JobSchedulerMailJob {
                 String message = "";
                 if (this.getMailTo() != null && !this.getMailTo().isEmpty()) {
                     if (this.getLogger() != null) {
-                        this.getLogger().info("mail recipients [" + mailOrder.getRecipientsAsString() + "] are replaced by settings: " + this.getMailTo());
+                        this.getLogger().info(
+                                "mail recipients [" + mailOrder.getRecipientsAsString() + "] are replaced by settings: " + this.getMailTo());
                     }
                     mailOrder.clearRecipients();
                     mailOrder.addRecipient(this.getMailTo());
@@ -181,8 +184,8 @@ public class JobSchedulerSendMailJob extends JobSchedulerMailJob {
                     mailOrder.send();
                 }
                 if (this.getLogger() != null) {
-                    this.getLogger()
-                            .info("mail was " + (this.isLogOnly() ? "processed" : "sent") + " for order " + mailOrderId + " to: "
+                    this.getLogger().info(
+                            "mail was " + (this.isLogOnly() ? "processed" : "sent") + " for order " + mailOrderId + " to: "
                                     + mailOrder.getRecipientsAsString());
                 }
                 if (this.getLogger() != null) {
@@ -215,8 +218,9 @@ public class JobSchedulerSendMailJob extends JobSchedulerMailJob {
                     this.getConnection().rollback();
                 }
             } catch (Exception ex) {
-                // gracefully ignore this error to preserve the original exception
-            } 
+                // gracefully ignore this error to preserve the original
+                // exception
+            }
         }
     }
 

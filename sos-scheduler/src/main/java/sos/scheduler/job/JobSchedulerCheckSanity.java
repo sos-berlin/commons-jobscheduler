@@ -109,10 +109,14 @@ public class JobSchedulerCheckSanity extends JobSchedulerJob {
         }
         SOSString sosString = new SOSString();
         try {
-            ArrayList results = this.getConnection().getArray("SELECT \"CATEGORY\", \"VALUE\", \"SUBTYPE\" FROM SCHEDULER_SANITY_REFERENCES WHERE "
-                    + "\"SPOOLER_ID\" IS NULL AND \"CATEGORY\"='disk_space'");
-            ArrayList results2 = this.getConnection().getArray("SELECT \"CATEGORY\", \"VALUE\", \"SUBTYPE\" FROM SCHEDULER_SANITY_REFERENCES WHERE "
-                    + "\"SPOOLER_ID\"='" + spooler.id() + "' AND \"CATEGORY\"='disk_space' ");
+            ArrayList results =
+                    this.getConnection().getArray(
+                            "SELECT \"CATEGORY\", \"VALUE\", \"SUBTYPE\" FROM SCHEDULER_SANITY_REFERENCES WHERE "
+                                    + "\"SPOOLER_ID\" IS NULL AND \"CATEGORY\"='disk_space'");
+            ArrayList results2 =
+                    this.getConnection().getArray(
+                            "SELECT \"CATEGORY\", \"VALUE\", \"SUBTYPE\" FROM SCHEDULER_SANITY_REFERENCES WHERE " + "\"SPOOLER_ID\"='" + spooler.id()
+                                    + "' AND \"CATEGORY\"='disk_space' ");
             results.addAll(results2);
             Iterator iter = results.iterator();
             while (iter.hasNext()) {
@@ -129,10 +133,14 @@ public class JobSchedulerCheckSanity extends JobSchedulerJob {
                 }
             }
             spooler_log.debug3("Found " + diskChecks.size() + " drives/directories to check in database.");
-            results = this.getConnection().getArray("SELECT \"CATEGORY\", \"VALUE\", \"SUBTYPE\" FROM SCHEDULER_SANITY_REFERENCES WHERE "
-                    + "\"SPOOLER_ID\" IS NULL AND \"CATEGORY\"='disk_space_user'");
-            results2 = this.getConnection().getArray("SELECT \"CATEGORY\", \"VALUE\", \"SUBTYPE\" FROM SCHEDULER_SANITY_REFERENCES WHERE "
-                    + "\"SPOOLER_ID\"='" + spooler.id() + "' AND \"CATEGORY\"='disk_space_user' ");
+            results =
+                    this.getConnection().getArray(
+                            "SELECT \"CATEGORY\", \"VALUE\", \"SUBTYPE\" FROM SCHEDULER_SANITY_REFERENCES WHERE "
+                                    + "\"SPOOLER_ID\" IS NULL AND \"CATEGORY\"='disk_space_user'");
+            results2 =
+                    this.getConnection().getArray(
+                            "SELECT \"CATEGORY\", \"VALUE\", \"SUBTYPE\" FROM SCHEDULER_SANITY_REFERENCES WHERE " + "\"SPOOLER_ID\"='" + spooler.id()
+                                    + "' AND \"CATEGORY\"='disk_space_user' ");
             results.addAll(results2);
             iter = results.iterator();
             while (iter.hasNext()) {
@@ -149,10 +157,14 @@ public class JobSchedulerCheckSanity extends JobSchedulerJob {
                 }
             }
             spooler_log.debug3("Found " + diskChecksUser.size() + " drives/directories for Scheduler user to check in database.");
-            results = this.getConnection().getArray("SELECT \"CATEGORY\", \"VALUE\", \"SUBTYPE\" FROM SCHEDULER_SANITY_REFERENCES WHERE \"SPOOLER_ID\" IS NULL "
-                    + "AND \"CATEGORY\"='free_memory' ");
-            results2 = this.getConnection().getArray("SELECT \"CATEGORY\", \"VALUE\", \"SUBTYPE\" FROM SCHEDULER_SANITY_REFERENCES WHERE \"SPOOLER_ID\"='"
-                    + spooler.id() + "' AND \"CATEGORY\"='free_memory' ");
+            results =
+                    this.getConnection().getArray(
+                            "SELECT \"CATEGORY\", \"VALUE\", \"SUBTYPE\" FROM SCHEDULER_SANITY_REFERENCES WHERE \"SPOOLER_ID\" IS NULL "
+                                    + "AND \"CATEGORY\"='free_memory' ");
+            results2 =
+                    this.getConnection().getArray(
+                            "SELECT \"CATEGORY\", \"VALUE\", \"SUBTYPE\" FROM SCHEDULER_SANITY_REFERENCES WHERE \"SPOOLER_ID\"='" + spooler.id()
+                                    + "' AND \"CATEGORY\"='free_memory' ");
             results.addAll(results2);
             iter = results.iterator();
             while (iter.hasNext()) {
@@ -356,8 +368,9 @@ public class JobSchedulerCheckSanity extends JobSchedulerJob {
                 }
                 val = "" + freeDiskSpace;
                 if (freeDiskSpace <= minDS) {
-                    String message = "free disk space on partition " + location + sUser + " has fallen below minimum value [" + minDS / 1048576
-                            + "MB]: " + freeDiskSpace / 1048576 + "MB";
+                    String message =
+                            "free disk space on partition " + location + sUser + " has fallen below minimum value [" + minDS / 1048576 + "MB]: "
+                                    + freeDiskSpace / 1048576 + "MB";
                     if (spooler_log != null) {
                         spooler_log.error(message);
                     }
@@ -468,14 +481,16 @@ public class JobSchedulerCheckSanity extends JobSchedulerJob {
                 }
                 val = "" + freeMemory;
                 if (freeMemory <= minMem) {
-                    String message = "free memory [" + type + "] has fallen below minimum value [" + minMem / 1048576 + "MB]: " + freeMemory / 1048576 + "MB";
+                    String message =
+                            "free memory [" + type + "] has fallen below minimum value [" + minMem / 1048576 + "MB]: " + freeMemory / 1048576 + "MB";
                     if (spooler_log != null) {
                         spooler_log.error(message);
                     }
                     writeHistory("free_memory", type, "" + freeMemory, "" + minMem, true, message);
                 } else {
                     if (spooler_log != null) {
-                        spooler_log.info("minimum memory [" + type + "]: " + minMem / 1048576 + "MB" + ", free memory: " + freeMemory / 1048576 + "MB");
+                        spooler_log.info("minimum memory [" + type + "]: " + minMem / 1048576 + "MB" + ", free memory: " + freeMemory / 1048576
+                                + "MB");
                     }
                     writeHistory("free_memory", type, "" + freeMemory, "" + minMem, false, "");
                 }
@@ -506,10 +521,12 @@ public class JobSchedulerCheckSanity extends JobSchedulerJob {
         }
         subType = subType.replaceAll("\\\\", "\\\\\\\\");
         currentStateText = currentStateText.replaceAll("'", "''");
-        String query = "INSERT INTO SCHEDULER_SANITY_HISTORY (\"SPOOLER_ID\", \"JOB_ID\","
-                + " \"CATEGORY\", \"SUBTYPE\", \"VALUE\", \"REFERENCE_VALUE\", \"FAILED\"," + " \"MESSAGE\", \"CREATED\", \"CREATED_BY\") VALUES ("
-                + "'" + spooler.id() + "', '" + id + "', '" + category + "', '" + subType + "', '" + value + "', '" + refValue + "', " + sFailed
-                + ", '" + currentStateText + "', %now, '" + spooler_job.name() + "')";
+        String query =
+                "INSERT INTO SCHEDULER_SANITY_HISTORY (\"SPOOLER_ID\", \"JOB_ID\","
+                        + " \"CATEGORY\", \"SUBTYPE\", \"VALUE\", \"REFERENCE_VALUE\", \"FAILED\","
+                        + " \"MESSAGE\", \"CREATED\", \"CREATED_BY\") VALUES (" + "'" + spooler.id() + "', '" + id + "', '" + category + "', '"
+                        + subType + "', '" + value + "', '" + refValue + "', " + sFailed + ", '" + currentStateText + "', %now, '"
+                        + spooler_job.name() + "')";
         try {
             getConnection().execute(query);
             getConnection().commit();

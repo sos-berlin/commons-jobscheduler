@@ -91,8 +91,9 @@ public class JobSchedulerLiveXml {
         }
         String sqlStmt = "DELETE FROM LIVE_OBJECTS WHERE \"TYPE\"='" + type + "' AND \"PATH\"='" + objectPath + "' AND \"NAME\"='" + objectName + "'";
         conn.executeUpdate(sqlStmt);
-        sqlStmt = "INSERT INTO LIVE_OBJECTS (" + "\"TYPE\", \"PATH\", \"NAME\", \"CREATED\", \"MODIFIED\" )" + "VALUES (" + "'" + type + "','"
-                + objectPath + "','" + objectName + "', GETDATE(), GETDATE())";
+        sqlStmt =
+                "INSERT INTO LIVE_OBJECTS (" + "\"TYPE\", \"PATH\", \"NAME\", \"CREATED\", \"MODIFIED\" )" + "VALUES (" + "'" + type + "','"
+                        + objectPath + "','" + objectName + "', GETDATE(), GETDATE())";
         log(sqlStmt);
         conn.execute(sqlStmt);
         String object_id = conn.getSingleValue("SELECT @@IDENTITY");
@@ -111,9 +112,11 @@ public class JobSchedulerLiveXml {
                     s = "\"OBJECT_ID\", \"PARENT_ID\", \"OBJECT_PATH\"";
                     sv = object_id + "," + getParentId(parents, element) + ",'" + element.element_path + "'";
                 }
-                sqlStmt = "Insert into " + element.table_name + " (" + s
-                        + ((jobChainName.length() > 0) ? element.fieldnames() + ", \"JOB_CHAIN\" " : element.fieldnames()) + ") values (" + sv
-                        + ((jobChainName.length() > 0) ? element.fieldvalues() + ", '" + jobChainName + "'" : element.fieldvalues()) + ")";
+                sqlStmt =
+                        "Insert into " + element.table_name + " (" + s
+                                + ((jobChainName.length() > 0) ? element.fieldnames() + ", \"JOB_CHAIN\" " : element.fieldnames()) + ") values ("
+                                + sv + ((jobChainName.length() > 0) ? element.fieldvalues() + ", '" + jobChainName + "'" : element.fieldvalues())
+                                + ")";
                 log(sqlStmt);
                 conn.execute(sqlStmt);
                 jobChainName = "";

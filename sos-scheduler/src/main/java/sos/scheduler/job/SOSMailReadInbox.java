@@ -100,9 +100,10 @@ public class SOSMailReadInbox extends Job_impl {
         sosLogger.debug3(".. current setting [mail_subject_pattern]: " + mailSubjectPattern);
         mailBodyPattern = getParams("mail_body_pattern", "");
         sosLogger.debug3(".. current setting [mail_body_pattern]: " + mailBodyPattern);
-        mailBodyAsSchedulerCommand = "true".equalsIgnoreCase(getParams("mail_body_as_scheduler_command", "true"))
-                || "1".equalsIgnoreCase(getParams("mail_body_as_scheduler_command", "true"))
-                || "yes".equalsIgnoreCase(getParams("mail_body_as_scheduler_command", "true"));
+        mailBodyAsSchedulerCommand =
+                "true".equalsIgnoreCase(getParams("mail_body_as_scheduler_command", "true"))
+                        || "1".equalsIgnoreCase(getParams("mail_body_as_scheduler_command", "true"))
+                        || "yes".equalsIgnoreCase(getParams("mail_body_as_scheduler_command", "true"));
         sosLogger.debug3(".. current setting [mail_body_as_scheduler_command]: " + mailBodyAsSchedulerCommand);
         mailJobchain = getParams("mail_jobchain", "");
         sosLogger.debug3(".. current setting [mail_jobchain]: " + mailJobchain);
@@ -124,10 +125,12 @@ public class SOSMailReadInbox extends Job_impl {
         sosLogger.debug3(".. current setting [mail_server_timeout]: " + mailServerTimeout);
         mailServerType = getParams("mail_server_type", "POP3");
         sosLogger.debug3(".. current setting [mail_server_type]: " + mailServerType);
-        mailUseSeen = "true".equalsIgnoreCase(getParams("mail_use_seen", "true")) || "1".equalsIgnoreCase(getParams("mail_use_seen", "true"))
-                || "yes".equalsIgnoreCase(getParams("mail_use_seen", "true"));
-        mailSetSeen = mailUseSeen || "true".equalsIgnoreCase(getParams("mail_set_seen", "true"))
-                || "1".equalsIgnoreCase(getParams("mail_set_seen", "true")) || "yes".equalsIgnoreCase(getParams("mail_set_seen", "true"));
+        mailUseSeen =
+                "true".equalsIgnoreCase(getParams("mail_use_seen", "true")) || "1".equalsIgnoreCase(getParams("mail_use_seen", "true"))
+                        || "yes".equalsIgnoreCase(getParams("mail_use_seen", "true"));
+        mailSetSeen =
+                mailUseSeen || "true".equalsIgnoreCase(getParams("mail_set_seen", "true"))
+                        || "1".equalsIgnoreCase(getParams("mail_set_seen", "true")) || "yes".equalsIgnoreCase(getParams("mail_set_seen", "true"));
         sosLogger.debug3(".. current setting [mail_set_seen]: " + mailSetSeen);
         subjectPattern = Pattern.compile(mailSubjectPattern, 0);
         bodyPattern = Pattern.compile(mailBodyPattern, 0);

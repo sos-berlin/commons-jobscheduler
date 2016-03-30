@@ -47,7 +47,8 @@ public class JobSchedulerCleanupHistory extends Job_impl {
                 deleteHistoryInterval = Integer.parseInt(spooler_task.params().var("delete_history_interval"));
                 spooler_log.info(".. job parameter [delete_history_interval]: " + deleteHistoryInterval);
             }
-            if (spooler_task.params().var("delete_ftp_history_interval") != null && !spooler_task.params().var("delete_ftp_history_interval").isEmpty()) {
+            if (spooler_task.params().var("delete_ftp_history_interval") != null
+                    && !spooler_task.params().var("delete_ftp_history_interval").isEmpty()) {
                 deleteFTPHistoryInterval = Integer.parseInt(spooler_task.params().var("delete_ftp_history_interval"));
                 spooler_log.info(".. job parameter [delete_ftp_history_interval]: " + deleteFTPHistoryInterval);
             }
@@ -61,7 +62,8 @@ public class JobSchedulerCleanupHistory extends Job_impl {
             } else {
                 cleanupHistoryTable = spooler.db_history_table_name();
             }
-            if (spooler_task.params().var("cleanup_order_history_table") != null && !spooler_task.params().var("cleanup_order_history_table").isEmpty()) {
+            if (spooler_task.params().var("cleanup_order_history_table") != null
+                    && !spooler_task.params().var("cleanup_order_history_table").isEmpty()) {
                 cleanupOrderHistoryTable = spooler_task.params().var("cleanup_order_history_table");
                 spooler_log.info(".. job parameter [cleanup_order_history_table]: " + cleanupOrderHistoryTable);
             } else {
@@ -94,7 +96,8 @@ public class JobSchedulerCleanupHistory extends Job_impl {
                 cleanupHistoryLogLevel = Integer.parseInt(spooler_task.params().var("cleanup_history_log_level"));
                 spooler_log.info(".. job parameter [cleanup_history_log_level]: " + cleanupHistoryLogLevel);
             }
-            if (spooler_task.params().var("cleanup_history_log_compressed") != null && !spooler_task.params().var("cleanup_history_log_compressed").isEmpty()) {
+            if (spooler_task.params().var("cleanup_history_log_compressed") != null
+                    && !spooler_task.params().var("cleanup_history_log_compressed").isEmpty()) {
                 cleanupHistoryLogCompressed = Boolean.valueOf(spooler_task.params().var("cleanup_history_log_compressed")).booleanValue();
                 spooler_log.info(".. job parameter [cleanup_history_log_compressed]: " + cleanupHistoryLogCompressed);
             }
@@ -215,8 +218,9 @@ public class JobSchedulerCleanupHistory extends Job_impl {
                 record.destruct();
             }
             if (cleanupHistoryOrderId != null && !cleanupHistoryOrderId.isEmpty()) {
-                orderHistoryQuery = " SELECT \"HISTORY_ID\" AS \"ID\" FROM " + cleanupOrderHistoryTable + " WHERE \"ORDER_ID\"='"
-                        + cleanupHistoryOrderId + "' ORDER BY 1 ASC";
+                orderHistoryQuery =
+                        " SELECT \"HISTORY_ID\" AS \"ID\" FROM " + cleanupOrderHistoryTable + " WHERE \"ORDER_ID\"='" + cleanupHistoryOrderId
+                                + "' ORDER BY 1 ASC";
             } else {
                 orderHistoryQuery = " SELECT \"HISTORY_ID\" AS \"ID\" FROM " + cleanupOrderHistoryTable + " " + sqlCondition + " ORDER BY 1 ASC";
             }
@@ -250,7 +254,8 @@ public class JobSchedulerCleanupHistory extends Job_impl {
             if (cleanupHistoryItemIndex < cleanupHistoryItemMaxHistory) {
                 cleanupHistory(Integer.parseInt(cleanupHistoryItems.get(cleanupHistoryItemIndex++).toString()), cleanupHistoryLogLevel);
             } else {
-                cleanupOrderHistory(Integer.parseInt(cleanupHistoryOrderItems.get(cleanupHistoryItemIndex++ - cleanupHistoryItemMaxHistory).toString()),
+                cleanupOrderHistory(
+                        Integer.parseInt(cleanupHistoryOrderItems.get(cleanupHistoryItemIndex++ - cleanupHistoryItemMaxHistory).toString()),
                         cleanupHistoryLogLevel);
             }
         } catch (Exception e) {
@@ -332,8 +337,8 @@ public class JobSchedulerCleanupHistory extends Job_impl {
         }
         try {
             sos.hostware.File cleanupHistoryDb = new sos.hostware.File();
-            cleanupHistoryDb
-                    .open("-out nl | " + logCompressed + spooler.db_name() + " -commit -table=" + cleanupHistoryTable + " -blob=LOG WHERE \"ID\"=" + id);
+            cleanupHistoryDb.open("-out nl | " + logCompressed + spooler.db_name() + " -commit -table=" + cleanupHistoryTable
+                    + " -blob=LOG WHERE \"ID\"=" + id);
             cleanupHistoryDb.put_line(log_string);
             try {
                 cleanupHistoryDb.close();

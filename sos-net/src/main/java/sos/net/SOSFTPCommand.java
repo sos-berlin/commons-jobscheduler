@@ -129,8 +129,9 @@ abstract public class SOSFTPCommand {
     private static Properties schedulerParams = new Properties();
     private static SOSConfiguration sosConfiguration = null;
     private static SOSFTPCommand ftpCommand = null;
-    private String historyFields = "guid;mandator;transfer_timestamp;pid;ppid;operation;localhost;localhost_ip;local_user;remote_host;remote_host_ip;"
-            + "remote_user;protocol;port;local_dir;remote_dir;local_filename;remote_filename;file_size;md5;status;last_error_message;log_filename";
+    private String historyFields =
+            "guid;mandator;transfer_timestamp;pid;ppid;operation;localhost;localhost_ip;local_user;remote_host;remote_host_ip;"
+                    + "remote_user;protocol;port;local_dir;remote_dir;local_filename;remote_filename;file_size;md5;status;last_error_message;log_filename";
     private String newHistoryFields = "jump_host;jump_host_ip;jump_port;jump_protocol;jump_user";
     private boolean writeBannerHeader = false;
     private boolean sendSchedulerSignale = false;
@@ -339,7 +340,7 @@ abstract public class SOSFTPCommand {
                             if (line == null) {
                                 break;
                             }
-                            if (!windows && pid == 0 && schedulerJob != null && Class.forName(SSHJOBNAME) != null 
+                            if (!windows && pid == 0 && schedulerJob != null && Class.forName(SSHJOBNAME) != null
                                     && schedulerJob.getClass().getName().equals(cl_.getName())) {
                                 pid = Integer.parseInt(line);
                                 if (cl_ != null) {
@@ -383,7 +384,7 @@ abstract public class SOSFTPCommand {
                                 getLogger().info(line.substring(line.indexOf("[info]") + "[info]".length()));
                             }
                         }
-                        if (!windows && schedulerJob != null && cl_ != null && Class.forName(SSHJOBNAME) != null 
+                        if (!windows && schedulerJob != null && cl_ != null && Class.forName(SSHJOBNAME) != null
                                 && schedulerJob.getClass().getName().equals(cl_.getName())) {
                             Method method = cl_.getMethod("setSchedulerSSHKillPid", new Class[] { int.class });
                             method.invoke(schedulerJob, new Object[] { new Integer(0) });
@@ -618,8 +619,8 @@ abstract public class SOSFTPCommand {
             this.getLogger().debug1("sending mail: \n" + sosMail.dumpMessageAsString());
             if (!sosMail.send()) {
                 this.getLogger().warn(
-                        "mail server is unavailable, mail for recipient [" + recipient + "] is queued in local directory [" + sosMail.getQueueDir() + "]:"
-                                + sosMail.getLastError());
+                        "mail server is unavailable, mail for recipient [" + recipient + "] is queued in local directory [" + sosMail.getQueueDir()
+                                + "]:" + sosMail.getLastError());
             }
             sosMail.clearRecipients();
         } catch (Exception e) {
@@ -1092,8 +1093,8 @@ abstract public class SOSFTPCommand {
             }
             arguments.put("xx_make_temp_directory_xx", "ok");
             if (!conOperationREMOVE.equalsIgnoreCase(getString(conSettingOPERATION))) {
-                curCommands = getString(conSettingsJUMP_COMMAND) + " -operation=make_temp_directory -root="
-                        + sosString.parseToString(arguments, "root");
+                curCommands =
+                        getString(conSettingsJUMP_COMMAND) + " -operation=make_temp_directory -root=" + sosString.parseToString(arguments, "root");
                 this.setCommands(curCommands.split(getCommandDelimiter()));
                 if (!execute()) {
                     RaiseException("error occurred processing command: " + normalizedPassword(curCommands));
@@ -1368,8 +1369,9 @@ abstract public class SOSFTPCommand {
                             pos1 = curBannerHeader.indexOf("%{" + key + "}");
                             pos2 = pos1 + ("%{" + key + "}").length();
                             if (pos1 > -1 && pos2 > pos1) {
-                                curBannerHeader = curBannerHeader.substring(0, pos1) + sosString.parseToString(arguments, key)
-                                        + curBannerHeader.substring(pos2);
+                                curBannerHeader =
+                                        curBannerHeader.substring(0, pos1) + sosString.parseToString(arguments, key)
+                                                + curBannerHeader.substring(pos2);
                             }
                             pos1 = curBannerHeader.indexOf("%{" + key + "}", pos2);
                             if (pos1 == -1) {
@@ -1405,8 +1407,9 @@ abstract public class SOSFTPCommand {
                             pos3 = curBannerFooter.indexOf("%{" + key + "}");
                             pos4 = pos3 + ("%{" + key + "}").length();
                             if (pos3 > -1 && pos4 > pos3) {
-                                curBannerFooter = curBannerFooter.substring(0, pos3) + sosString.parseToString(arguments, key)
-                                        + curBannerFooter.substring(pos4);
+                                curBannerFooter =
+                                        curBannerFooter.substring(0, pos3) + sosString.parseToString(arguments, key)
+                                                + curBannerFooter.substring(pos4);
                             }
                             pos3 = curBannerFooter.indexOf("%{" + key + "}", pos4);
                             if (pos3 == -1) {
@@ -1533,7 +1536,8 @@ abstract public class SOSFTPCommand {
             isLoggedIn = sosftp.login(user, new SOSCommandline().getExternalPassword(password, logger));
             this.getLogger().debug("..ftps server reply [login] [user=" + user + "]: " + ftpClient.getReplyString());
             if (!isLoggedIn || sosftp.getReplyCode() > ERROR_CODE) {
-                throw new Exception("..ftps server reply [login failed] [user=" + user + "], [account=" + account + "]: " + ftpClient.getReplyString());
+                throw new Exception("..ftps server reply [login failed] [user=" + user + "], [account=" + account + "]: "
+                        + ftpClient.getReplyString());
             }
         } catch (Exception e) {
             logger.info("..sftp server login failed [user=" + user + "], [host=" + host + "]: " + e);
@@ -1621,8 +1625,9 @@ abstract public class SOSFTPCommand {
             }
             port = sosString.parseToString(arguments, conParamPORT);
             if (conOperationSEND.equals(sosString.parseToString(arguments, conSettingOPERATION))) {
-                local_dir = localFile != null && localFile.getParent() != null ? clearCRLF(localFile.getParent()) : clearCRLF(sosString.parseToString(
-                        arguments, conSettingLOCAL_DIR));
+                local_dir =
+                        localFile != null && localFile.getParent() != null ? clearCRLF(localFile.getParent()) : clearCRLF(sosString.parseToString(
+                                arguments, conSettingLOCAL_DIR));
             } else {
                 local_dir = clearCRLF(sosString.parseToString(arguments, conSettingLOCAL_DIR));
             }
@@ -1640,9 +1645,11 @@ abstract public class SOSFTPCommand {
             if (sosString.parseToString(localFilename).isEmpty() || sosString.parseToString(remoteFilename).isEmpty()) {
                 md5 = EMPTY;
             } else {
-                File f4md5 = localFile.getName().equals(new File(remoteFilename).getName()) ? new File(remoteFilename) : conOperationRECEIVE.equals(sosString
-                        .parseToString(arguments, conSettingOPERATION)) ? new File(normalized(local_dir) + new File(remoteFilename).getName()) : new File(
-                        normalized(local_dir) + localFile.getName());
+                File f4md5 =
+                        localFile.getName().equals(new File(remoteFilename).getName()) ? new File(remoteFilename)
+                                : conOperationRECEIVE.equals(sosString.parseToString(arguments, conSettingOPERATION)) ? new File(
+                                        normalized(local_dir) + new File(remoteFilename).getName()) : new File(normalized(local_dir)
+                                        + localFile.getName());
                 if (f4md5.exists()) {
                     getLogger().debug9("md5 for " + f4md5.getAbsolutePath());
                     md5 = sos.util.SOSCrypt.MD5encrypt(f4md5);
@@ -1650,10 +1657,11 @@ abstract public class SOSFTPCommand {
                     md5 = EMPTY;
                 }
             }
-            status = sosString.parseToString(arguments, conParameterSTATUS).isEmpty() ? conParamValueSUCCESS : sosString.parseToString(arguments,
-                    conParameterSTATUS);
-            last_error_message = clearCRLF(getLogger().getError() != null && !getLogger().getError().isEmpty() ? getLogger().getError() : getLogger()
-                    .getWarning());
+            status =
+                    sosString.parseToString(arguments, conParameterSTATUS).isEmpty() ? conParamValueSUCCESS : sosString.parseToString(arguments,
+                            conParameterSTATUS);
+            last_error_message =
+                    clearCRLF(getLogger().getError() != null && !getLogger().getError().isEmpty() ? getLogger().getError() : getLogger().getWarning());
             last_error_message = normalizedPassword(sosString.parseToString(last_error_message));
             log_filename = sosString.parseToString(arguments, "log_filename");
             jump_host = sosString.parseToString(arguments, conParamJUMP_HOST);
@@ -1696,8 +1704,9 @@ abstract public class SOSFTPCommand {
                 String[] splitHistFields = historyFields.split(";");
                 for (int i = 0; i < splitHistFields.length; i++) {
                     String key = sosString.parseToString(splitHistFields[i]);
-                    String value = sosString.parseToString(objSchedulerOrderParameterSet, key).length() == 0 ? sosString.parseToString(arguments,
-                            "history_entry_".concat(key)) : sosString.parseToString(objSchedulerOrderParameterSet, key);
+                    String value =
+                            sosString.parseToString(objSchedulerOrderParameterSet, key).length() == 0 ? sosString.parseToString(arguments,
+                                    "history_entry_".concat(key)) : sosString.parseToString(objSchedulerOrderParameterSet, key);
                     hist = hist + (i == 0 ? "" : ";") + value; //
                 }
                 getLogger().debug9("history entry: " + hist);
@@ -1768,8 +1777,10 @@ abstract public class SOSFTPCommand {
                 for (int j = 0; transactionalHistoryFile != null && j < transactionalHistoryFile.size(); j++) {
                     String hist = sosString.parseToString(transactionalHistoryFile.get(j));
                     if (hasError) {
-                        hist = hist.replaceAll(";success;;", ";error;" + clearCRLF(getLogger().getError() != null && !getLogger().getError().isEmpty() 
-                                ? getLogger().getError() : getLogger().getWarning()) + ";");
+                        hist =
+                                hist.replaceAll(";success;;", ";error;"
+                                        + clearCRLF(getLogger().getError() != null && !getLogger().getError().isEmpty() ? getLogger().getError()
+                                                : getLogger().getWarning()) + ";");
                     }
                     history.write(hist);
                     history.newLine();
@@ -1813,9 +1824,10 @@ abstract public class SOSFTPCommand {
                 boolean hasError = getLogger().hasErrors() || getLogger().hasWarnings();
                 if (hasError) {
                     msg = msg.replaceAll("<param name='status' value='success'/>", "<param name='status' value='error'/>");
-                    msg = msg.replaceAll("<param name='last_error_message' value=''/>", "<param name='last_error_message' value='"
-                            + clearCRLF(getLogger().getError() != null && getLogger().getError().length() > 0 ? getLogger().getError() : getLogger()
-                                    .getWarning()) + "'/>");
+                    msg =
+                            msg.replaceAll("<param name='last_error_message' value=''/>", "<param name='last_error_message' value='"
+                                    + clearCRLF(getLogger().getError() != null && getLogger().getError().length() > 0 ? getLogger().getError()
+                                            : getLogger().getWarning()) + "'/>");
                 }
                 sendSchedulerRequest(msg);
             }
@@ -2033,8 +2045,9 @@ abstract public class SOSFTPCommand {
                 if (!authenticationFile.canRead()) {
                     RaiseException("authentication file not accessible: " + authenticationFile.getCanonicalPath());
                 }
-                isAuthenticated = this.getSshConnection().authenticateWithPublicKey(user, authenticationFile,
-                        new SOSCommandline().getExternalPassword(password, logger));
+                isAuthenticated =
+                        this.getSshConnection().authenticateWithPublicKey(user, authenticationFile,
+                                new SOSCommandline().getExternalPassword(password, logger));
             } else if (authenticationMethod.equalsIgnoreCase(conParamPASSWORD)) {
                 isAuthenticated = this.getSshConnection().authenticateWithPassword(user, new SOSCommandline().getExternalPassword(password, logger));
             }
@@ -2295,7 +2308,8 @@ abstract public class SOSFTPCommand {
                             String s = sosString.parseToString(splitParam2);
                             if (!s.isEmpty()) {
                                 String[] splitParam = s.split("=");
-                                newArg.put(sosString.parseToString(splitParam[0]), splitParam.length == 1 ? "" : sosString.parseToString(splitParam[1]));
+                                newArg.put(sosString.parseToString(splitParam[0]), splitParam.length == 1 ? ""
+                                        : sosString.parseToString(splitParam[1]));
                             }
                         }
                     }
@@ -2421,13 +2435,14 @@ abstract public class SOSFTPCommand {
     }
 
     private static String getUsage() {
-        String usage = "Usage: sos.net.SOSFTPCommand -operation= -settings= -profile= -verbose=" + conNewLine
-                + "        -operation   =[send|receive|execute|remove|install]   FTP operation" + conNewLine
-                + "        -settings    =[file]                   Configuration file" + conNewLine
-                + "        -profile     =[profile]                 Section/Profile for FTP settings" + conNewLine
-                + "                                           in configuration file" + conNewLine
-                + "        -verbose     =[1..9]                    Verbosity level" + conNewLine
-                + "        -log_filename=[filename]               log file name    ";
+        String usage =
+                "Usage: sos.net.SOSFTPCommand -operation= -settings= -profile= -verbose=" + conNewLine
+                        + "        -operation   =[send|receive|execute|remove|install]   FTP operation" + conNewLine
+                        + "        -settings    =[file]                   Configuration file" + conNewLine
+                        + "        -profile     =[profile]                 Section/Profile for FTP settings" + conNewLine
+                        + "                                           in configuration file" + conNewLine
+                        + "        -verbose     =[1..9]                    Verbosity level" + conNewLine
+                        + "        -log_filename=[filename]               log file name    ";
         return usage;
     }
 
@@ -2445,7 +2460,8 @@ abstract public class SOSFTPCommand {
                     if (banner) {
                         logger.info("SOSFTP-I-0440: Transfer for file set no. " + i + " is being completed");
                     } else {
-                        logger.debug1("SOSFTP-I-0441: All files have been transferred successfully. Transaction for file set no. " + i + " is being completed");
+                        logger.debug1("SOSFTP-I-0441: All files have been transferred successfully. Transaction for file set no. " + i
+                                + " is being completed");
                     }
                 }
                 if (sosString.parseToBoolean(arg.get("testmode"))) {
@@ -2821,8 +2837,9 @@ abstract public class SOSFTPCommand {
         try {
             Properties arg_s = sosConfiguration.getParameterAsProperties();
             if (!sosString.parseToString(arg_s.get("settings")).isEmpty() && !sosString.parseToString(arg_s.get("include")).isEmpty()) {
-                sos.configuration.SOSConfiguration config_ = new sos.configuration.SOSConfiguration(sosString.parseToString(arg_s.get("settings")),
-                        sosString.parseToString(arg_s.get("include")), logger);
+                sos.configuration.SOSConfiguration config_ =
+                        new sos.configuration.SOSConfiguration(sosString.parseToString(arg_s.get("settings")),
+                                sosString.parseToString(arg_s.get("include")), logger);
                 SOSConfigurationItem[] items = config_.checkConfigurationItems(null);
                 arg_s.putAll(config_.getParameterAsProperties());
             }

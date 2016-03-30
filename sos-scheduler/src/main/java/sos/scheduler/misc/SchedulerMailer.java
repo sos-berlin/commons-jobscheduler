@@ -168,7 +168,8 @@ public class SchedulerMailer {
             params.merge(job.spooler_task.order().params());
         }
         String readSettings = params.value("read_mail_settings");
-        if (readSettings != null && ("yes".equalsIgnoreCase(readSettings) || "1".equalsIgnoreCase(readSettings) || "true".equalsIgnoreCase(readSettings))) {
+        if (readSettings != null
+                && ("yes".equalsIgnoreCase(readSettings) || "1".equalsIgnoreCase(readSettings) || "true".equalsIgnoreCase(readSettings))) {
             if (job.getConnectionSettings() != null && !job.getConnectionSettings().getSection("email", "mail_server").isEmpty()) {
                 sosMail = new SOSMail(job.getConnectionSettings());
                 sosMail.setSOSLogger(logger);
@@ -316,7 +317,7 @@ public class SchedulerMailer {
             }
         } catch (Exception e) {
             // No error handling
-        } 
+        }
 
     }
 

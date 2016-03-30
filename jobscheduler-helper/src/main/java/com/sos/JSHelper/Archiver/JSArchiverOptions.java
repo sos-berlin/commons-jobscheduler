@@ -39,13 +39,14 @@ public class JSArchiverOptions extends JSOptionsClass {
                                                                                  // auf
                                                                                  // die
                                                                                  // SOSOptionClass-Instanz
-    this.conClassName + ".ArchiveFolderName", // Schlüssel, i.d.r. identisch mit
-                                              // dem Namen der Option
-    "Name des Folder mit den archivierten Dateien", // Kurzbeschreibung
-    "./archive/", // Wert
-    "./archive/", // defaultwert
-    true // Option muss einen Wert haben
-    );
+            this.conClassName + ".ArchiveFolderName", // Schlüssel, i.d.r.
+                                                      // identisch mit
+                                                      // dem Namen der Option
+            "Name des Folder mit den archivierten Dateien", // Kurzbeschreibung
+            "./archive/", // Wert
+            "./archive/", // defaultwert
+            true // Option muss einen Wert haben
+            );
 
     /** String ArchiveFolderName: Name of Archive-Folder */
     private String strArchiveFolderName = "./archive/";

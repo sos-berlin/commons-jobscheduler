@@ -111,7 +111,8 @@ public class JobSchedulerExtractJob extends JobSchedulerJob {
                 } else {
                     this.setOutputFieldDelimiter("");
                 }
-                if (this.getParameters().value("output_field_delimiter_quote") != null && !this.getParameters().value("output_field_delimiter_quote").isEmpty()) {
+                if (this.getParameters().value("output_field_delimiter_quote") != null
+                        && !this.getParameters().value("output_field_delimiter_quote").isEmpty()) {
                     this.setOutputFieldDelimiterQuote(this.getParameters().value("output_field_delimiter_quote"));
                     spooler_log.debug1(".. parameter [output_field_delimiter_quote]: " + this.getOutputFieldDelimiterQuote());
                 } else {
@@ -150,8 +151,9 @@ public class JobSchedulerExtractJob extends JobSchedulerJob {
                 this.getLogger().info("extracting records from database query: " + this.getInputFilenamePrefix() + " " + this.getInputFilePath());
                 File outputFile = new File(this.getOutputFilePath());
                 if (outputFile.isDirectory())
-                    throw new Exception("for an input database query specified by the parameter [input_file] an output file instead of a directory must be "
-                            + "specified by the parameter [output_file]");
+                    throw new Exception(
+                            "for an input database query specified by the parameter [input_file] an output file instead of a directory must be "
+                                    + "specified by the parameter [output_file]");
                 recordCount = this.extract(null, outputFile);
             } else if ("file".equals(this.getInputFileType())) {
                 File inputFile = new File(this.getInputFilePath());
@@ -172,8 +174,9 @@ public class JobSchedulerExtractJob extends JobSchedulerJob {
                     int count = 0;
                     while (iterator.hasNext()) {
                         File extractFile = (File) iterator.next();
-                        outputFile = new File(this.getOutputFilePath() + "/"
-                                + extractFile.getName().substring(0, extractFile.getName().lastIndexOf(".")) + this.getOutputFilenameExtension());
+                        outputFile =
+                                new File(this.getOutputFilePath() + "/" + extractFile.getName().substring(0, extractFile.getName().lastIndexOf("."))
+                                        + this.getOutputFilenameExtension());
                         spooler_log.debug("starting extraction for input file [" + extractFile.getAbsolutePath() + "] to output file ["
                                 + outputFile.getAbsolutePath() + "]");
                         recordCount = this.extract(extractFile, outputFile);
@@ -195,8 +198,8 @@ public class JobSchedulerExtractJob extends JobSchedulerJob {
             }
             return spooler_job.order_queue() != null ? rc : false;
         } catch (Exception e) {
-            spooler_log.error("error occurred extracting records from " + ("file".equals(this.getInputFileType()) ? this.getInputFilePath() : "database query")
-                    + ": " + e.getMessage());
+            spooler_log.error("error occurred extracting records from "
+                    + ("file".equals(this.getInputFileType()) ? this.getInputFilePath() : "database query") + ": " + e.getMessage());
             return false;
         }
     }
@@ -356,9 +359,11 @@ public class JobSchedulerExtractJob extends JobSchedulerJob {
                                     if (outputFieldCount > 0) {
                                         line += this.getOutputFieldSeparator();
                                     }
-                                    line += this.getOutputFieldDelimiter()
-                                            + record.string(fieldName).replaceAll("\\" + this.getOutputFieldDelimiter(),
-                                                    this.getOutputFieldDelimiterQuote() + this.getOutputFieldDelimiter()) + this.getOutputFieldDelimiter();
+                                    line +=
+                                            this.getOutputFieldDelimiter()
+                                                    + record.string(fieldName).replaceAll("\\" + this.getOutputFieldDelimiter(),
+                                                            this.getOutputFieldDelimiterQuote() + this.getOutputFieldDelimiter())
+                                                    + this.getOutputFieldDelimiter();
                                     outputFieldCount++;
                                 } else {
                                     if (outputFieldCount > 0) {
@@ -372,9 +377,10 @@ public class JobSchedulerExtractJob extends JobSchedulerJob {
                                     if (outputFieldCount > 0) {
                                         line += this.getOutputFieldSeparator();
                                     }
-                                    line += this.getOutputFieldDelimiter()
-                                            + SOSDate.getDateAsString(SOSDate.getDate(record.string(fieldName), this.getInputDateFormat()),
-                                                    this.getOutputDateFormat()) + this.getOutputFieldDelimiter();
+                                    line +=
+                                            this.getOutputFieldDelimiter()
+                                                    + SOSDate.getDateAsString(SOSDate.getDate(record.string(fieldName), this.getInputDateFormat()),
+                                                            this.getOutputDateFormat()) + this.getOutputFieldDelimiter();
                                     outputFieldCount++;
                                 } catch (Exception e) {
                                     throw new Exception("could not convert date using output date format [" + this.getOutputDateFormat() + "]: "
@@ -421,7 +427,7 @@ public class JobSchedulerExtractJob extends JobSchedulerJob {
                     }
                 } catch (Exception ex) {
                     // ignore this error
-                } 
+                }
             }
             if (outFile != null) {
                 try {

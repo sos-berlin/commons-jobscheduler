@@ -161,7 +161,8 @@ public class SOSFileSystemOperations {
                         log("checking file " + file.getCanonicalPath() + ": directory contains no files matching " + fileSpec, logger);
                         return false;
                     } else {
-                        log("checking file " + file.getCanonicalPath() + ": directory contains " + fileList.size() + " file(s) matching " + fileSpec, logger);
+                        log("checking file " + file.getCanonicalPath() + ": directory contains " + fileList.size() + " file(s) matching " + fileSpec,
+                                logger);
                         for (int i = 0; i < fileList.size(); i++) {
                             File checkFile = fileList.get(i);
                             log("found " + checkFile.getCanonicalPath(), logger);
@@ -213,8 +214,8 @@ public class SOSFileSystemOperations {
             final String minFileSize, final String maxFileSize, final int skipFirstFiles, final int skipLastFiles, final int minNumOfFiles,
             final int maxNumOfFiles, final Object objDummy) throws Exception {
         File filename = new File(file);
-        return existsFile(filename, fileSpec, fileSpecFlags, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles, skipLastFiles, minNumOfFiles,
-                maxNumOfFiles, logger);
+        return existsFile(filename, fileSpec, fileSpecFlags, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles, skipLastFiles,
+                minNumOfFiles, maxNumOfFiles, logger);
     }
 
     public boolean existsFile(final File file, final Object objDummy) throws Exception {
@@ -232,7 +233,8 @@ public class SOSFileSystemOperations {
     public boolean existsFile(final File file, final String fileSpec, final int fileSpecFlags, final String minFileAge, final String maxFileAge,
             final String minFileSize, final String maxFileSize, final int skipFirstFiles, final int skipLastFiles, final Object objDummy)
             throws Exception {
-        return existsFile(file, fileSpec, fileSpecFlags, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles, skipLastFiles, -1, -1, logger);
+        return existsFile(file, fileSpec, fileSpecFlags, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles, skipLastFiles, -1, -1,
+                logger);
     }
 
     public boolean existsFile(File file, final String fileSpec, final int fileSpecFlags, final String minFileAge, final String maxFileAge,
@@ -310,7 +312,8 @@ public class SOSFileSystemOperations {
                     if (minAge > 0) {
                         long interval = currentTime - file.lastModified();
                         if (interval < 0) {
-                            throw new JobSchedulerException("Cannot filter by file age. File [" + file.getCanonicalPath() + "] was modified in the future.");
+                            throw new JobSchedulerException("Cannot filter by file age. File [" + file.getCanonicalPath()
+                                    + "] was modified in the future.");
                         }
                         if (interval < minAge) {
                             log("checking file age " + file.lastModified() + ": minimum age required is " + minAge, logger);
@@ -320,7 +323,8 @@ public class SOSFileSystemOperations {
                     if (maxAge > 0) {
                         long interval = currentTime - file.lastModified();
                         if (interval < 0) {
-                            throw new JobSchedulerException("Cannot filter by file age. File [" + file.getCanonicalPath() + "] was modified in the future.");
+                            throw new JobSchedulerException("Cannot filter by file age. File [" + file.getCanonicalPath()
+                                    + "] was modified in the future.");
                         }
                         if (interval > maxAge) {
                             log("checking file age " + file.lastModified() + ": maximum age required is " + maxAge, logger);
@@ -347,13 +351,15 @@ public class SOSFileSystemOperations {
                         log("checking file " + file.getCanonicalPath() + ": directory exists", logger);
                         return true;
                     }
-                    Vector<File> fileList = getFilelist(file.getPath(), fileSpec, fileSpecFlags, false, minAge, maxAge, minSize, maxSize, skipFirstFiles,
-                            skipLastFiles);
+                    Vector<File> fileList =
+                            getFilelist(file.getPath(), fileSpec, fileSpecFlags, false, minAge, maxAge, minSize, maxSize, skipFirstFiles,
+                                    skipLastFiles);
                     if (fileList.isEmpty()) {
                         log("checking file " + file.getCanonicalPath() + ": directory contains no files matching " + fileSpec, logger);
                         return false;
                     } else {
-                        log("checking file " + file.getCanonicalPath() + ": directory contains " + fileList.size() + " file(s) matching " + fileSpec, logger);
+                        log("checking file " + file.getCanonicalPath() + ": directory contains " + fileList.size() + " file(s) matching " + fileSpec,
+                                logger);
                         for (int i = 0; i < fileList.size(); i++) {
                             File checkFile = fileList.get(i);
                             log("found " + checkFile.getCanonicalPath(), logger);
@@ -400,8 +406,9 @@ public class SOSFileSystemOperations {
     public boolean removeFile(final File file, final String fileSpec, final int flags, final int fileSpecFlags, final String minFileAge,
             final String maxFileAge, final String minFileSize, final String maxFileSize, final int skipFirstFiles, final int skipLastFiles,
             final Object objDummy) throws Exception {
-        int nrOfRemovedObjects = removeFileCnt(file, fileSpec, flags, fileSpecFlags, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles,
-                skipLastFiles, logger);
+        int nrOfRemovedObjects =
+                removeFileCnt(file, fileSpec, flags, fileSpecFlags, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles, skipLastFiles,
+                        logger);
         return nrOfRemovedObjects > 0;
     }
 
@@ -499,8 +506,9 @@ public class SOSFileSystemOperations {
                     throw new JobSchedulerException("directory is not readable: " + file.getCanonicalPath());
                 }
                 log("remove [" + fileSpec + "] from " + file.getCanonicalPath() + (recursive ? " (recursive)" : ""), logger);
-                fileList = getFilelist(file.getPath(), fileSpec, fileSpecFlags, has(flags, SOSFileSystemOperations.RECURSIVE), minAge, maxAge, minSize,
-                        maxSize, skipFirstFiles, skipLastFiles);
+                fileList =
+                        getFilelist(file.getPath(), fileSpec, fileSpecFlags, has(flags, SOSFileSystemOperations.RECURSIVE), minAge, maxAge, minSize,
+                                maxSize, skipFirstFiles, skipLastFiles);
             } else {
                 fileList = new Vector<File>();
                 fileList.add(file);
@@ -669,15 +677,15 @@ public class SOSFileSystemOperations {
     public boolean removeFile(final String file, final String fileSpec, final int flags, final int fileSpecFlags, final String minFileAge,
             final String maxFileAge, final String minFileSize, final String maxFileSize, final int skipFirstFiles, final int skipLastFiles,
             final Object objDummy) throws Exception {
-        return removeFile(new File(file), fileSpec, flags, fileSpecFlags, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles, skipLastFiles,
-                logger);
+        return removeFile(new File(file), fileSpec, flags, fileSpecFlags, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles,
+                skipLastFiles, logger);
     }
 
     public int removeFileCnt(final String file, final String fileSpec, final int flags, final int fileSpecFlags, final String minFileAge,
             final String maxFileAge, final String minFileSize, final String maxFileSize, final int skipFirstFiles, final int skipLastFiles,
             final Object objDummy) throws Exception {
-        return removeFileCnt(new File(file), fileSpec, flags, fileSpecFlags, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles, skipLastFiles,
-                logger);
+        return removeFileCnt(new File(file), fileSpec, flags, fileSpecFlags, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles,
+                skipLastFiles, logger);
     }
 
     public boolean copyFile(final File source, final File target, final Object objDummy) throws Exception {
@@ -763,8 +771,8 @@ public class SOSFileSystemOperations {
             final String maxFileSize, final int skipFirstFiles, final int skipLastFiles, final Object objDummy) throws Exception {
         File sourceFile = new File(source);
         File targetFile = target == null ? null : new File(target);
-        return copyFile(sourceFile, targetFile, fileSpec, flags, fileSpecFlags, replacing, replacement, minFileAge, maxFileAge, minFileSize, maxFileSize,
-                skipFirstFiles, skipLastFiles, logger);
+        return copyFile(sourceFile, targetFile, fileSpec, flags, fileSpecFlags, replacing, replacement, minFileAge, maxFileAge, minFileSize,
+                maxFileSize, skipFirstFiles, skipLastFiles, logger);
     }
 
     public int copyFileCnt(final String source, final String target, final String fileSpec, final int flags, final int fileSpecFlags,
@@ -890,8 +898,8 @@ public class SOSFileSystemOperations {
             final String maxFileSize, final int skipFirstFiles, final int skipLastFiles, final Object objDummy) throws Exception {
         File sourceFile = new File(source);
         File targetFile = target == null ? null : new File(target);
-        return renameFile(sourceFile, targetFile, fileSpec, flags, fileSpecFlags, replacing, replacement, minFileAge, maxFileAge, minFileSize, maxFileSize,
-                skipFirstFiles, skipLastFiles, logger);
+        return renameFile(sourceFile, targetFile, fileSpec, flags, fileSpecFlags, replacing, replacement, minFileAge, maxFileAge, minFileSize,
+                maxFileSize, skipFirstFiles, skipLastFiles, logger);
     }
 
     public int renameFileCnt(final String source, final String target, final String fileSpec, final int flags, final int fileSpecFlags,
@@ -907,8 +915,9 @@ public class SOSFileSystemOperations {
     private boolean transferFile(final File source, final File target, final String fileSpec, final int flags, final int fileSpecFlags,
             final String replacing, final String replacement, final String minFileAge, final String maxFileAge, final String minFileSize,
             final String maxFileSize, final int skipFirstFiles, final int skipLastFiles, final String mode, final Object objDummy) throws Exception {
-        int nrOfTransferedFiles = transferFileCnt(source, target, fileSpec, flags, fileSpecFlags, replacing, replacement, minFileAge, maxFileAge, minFileSize,
-                maxFileSize, skipFirstFiles, skipLastFiles, mode, logger);
+        int nrOfTransferedFiles =
+                transferFileCnt(source, target, fileSpec, flags, fileSpecFlags, replacing, replacement, minFileAge, maxFileAge, minFileSize,
+                        maxFileSize, skipFirstFiles, skipLastFiles, mode, logger);
         return nrOfTransferedFiles > 0;
     }
 
@@ -1068,8 +1077,9 @@ public class SOSFileSystemOperations {
                         throw new JobSchedulerException("target is no directory: " + target.getCanonicalPath());
                     }
                 }
-                list = getFilelist(source.getPath(), fileSpec, fileSpecFlags, has(flags, SOSFileSystemOperations.RECURSIVE), minAge, maxAge, minSize, maxSize,
-                        skipFirstFiles, skipLastFiles);
+                list =
+                        getFilelist(source.getPath(), fileSpec, fileSpecFlags, has(flags, SOSFileSystemOperations.RECURSIVE), minAge, maxAge,
+                                minSize, maxSize, skipFirstFiles, skipLastFiles);
             } else {
                 list = new Vector<File>();
                 list.add(source);
@@ -1325,8 +1335,8 @@ public class SOSFileSystemOperations {
         if (withSubFolder) {
             for (File element : subDir) {
                 if (element.isDirectory()) {
-                    filelist.addAll(getFilelist(element.getPath(), regexp, flag, true, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles,
-                            skipLastFiles));
+                    filelist.addAll(getFilelist(element.getPath(), regexp, flag, true, minFileAge, maxFileAge, minFileSize, maxFileSize,
+                            skipFirstFiles, skipLastFiles));
                 }
             }
         }
@@ -1525,7 +1535,8 @@ public class SOSFileSystemOperations {
         }
         int intGroupCount = m.groupCount();
         if (replacements.length < intGroupCount) {
-            throw new RuntimeException("replacements missing: " + replacements.length + " replacement(s) defined but " + intGroupCount + " groups found");
+            throw new RuntimeException("replacements missing: " + replacements.length + " replacement(s) defined but " + intGroupCount
+                    + " groups found");
         }
         if (intGroupCount == 0) {
             result = pstrSourceString.substring(0, m.start()) + replacements[0] + pstrSourceString.substring(m.end());
@@ -1694,7 +1705,7 @@ public class SOSFileSystemOperations {
             byte[] bytes = new byte[(int) rwFile.length()];
             int i = 0;
             while ((bytes[i++] = (byte) rwFile.read()) != -1) {
-                
+
             }
             rwFile.seek(0);
             for (i = 0; i < bytes.length; i++) {

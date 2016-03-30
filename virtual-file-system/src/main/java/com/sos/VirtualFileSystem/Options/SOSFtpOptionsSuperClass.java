@@ -97,12 +97,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * \created 08.04.2014 16:23:51 by KB */
     @JSOptionDefinition(name = "TFN_Post_Command", description = "Post commands executed after creating the final TargetFile", key = "TFN_Post_Command", type = "SOSOptionString", mandatory = false)
     public SOSOptionString TFN_Post_Command = new SOSOptionString( // ...
-    this, // ....
-    conClassName + ".TFN_Post_Command", // ...
-    "Post commands executed after creating the final TargetFileName", // ...
-    "", // ...
-    "", // ...
-    false);
+            this, // ....
+            conClassName + ".TFN_Post_Command", // ...
+            "Post commands executed after creating the final TargetFileName", // ...
+            "", // ...
+            "", // ...
+            false);
 
     public SOSOptionString getTFN_Post_Command() {
         @SuppressWarnings("unused")
@@ -129,12 +129,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "polling_wait_4_Source_Folder", description = "During polling", key = "polling_wait_4_Source_Folder", type = "SOSOptionBoolean", mandatory = true)
     public SOSOptionBoolean pollingWait4SourceFolder = new SOSOptionBoolean(
     // ...
-    this, // ....
-    conClassName + ".polling_wait_4_Source_Folder", // ...
-    "During polling", // ...
-    "false", // ...
-    "false", // ...
-    true);
+            this, // ....
+            conClassName + ".polling_wait_4_Source_Folder", // ...
+            "During polling", // ...
+            "false", // ...
+            "false", // ...
+            true);
 
     public String getPollingWait4SourceFolder() {
         @SuppressWarnings("unused")
@@ -160,12 +160,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "include", description = "the include directive as an option", key = "include", type = "SOSOptionString", mandatory = false)
     public SOSOptionString include = new SOSOptionString(
     // ...
-    this, // ....
-    conClassName + ".include", // ...
-    "the include directive as an option", // ...
-    "", // ...
-    "", // ...
-    false);
+            this, // ....
+            conClassName + ".include", // ...
+            "the include directive as an option", // ...
+            "", // ...
+            "", // ...
+            false);
 
     public String getinclude() {
         @SuppressWarnings("unused")
@@ -190,12 +190,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * \created 14.05.2014 15:13:19 by KB */
     @JSOptionDefinition(name = "use_filters", description = "Use filters for source and/or Targe", key = "use_filters", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean use_filters = new SOSOptionBoolean( // ...
-    this, // ....
-    conClassName + ".use_filters", // ...
-    "Use filters for source and/or Targe", // ...
-    "false", // ...
-    "false", // ...
-    false);
+            this, // ....
+            conClassName + ".use_filters", // ...
+            "Use filters for source and/or Targe", // ...
+            "false", // ...
+            "false", // ...
+            false);
 
     public SOSOptionBoolean getuse_filters() {
         @SuppressWarnings("unused")
@@ -221,12 +221,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "is_fragment", description = "Mark an profile as a fragment", key = "is_fragment", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean isFragment = new SOSOptionBoolean(
     // ...
-    this, // ....
-    conClassName + ".is_fragment", // ...
-    "Mark an profile as a fragment", // ...
-    "false", // ...
-    "false", // ...
-    false);
+            this, // ....
+            conClassName + ".is_fragment", // ...
+            "Mark an profile as a fragment", // ...
+            "false", // ...
+            "false", // ...
+            false);
 
     public String getis_fragment() {
         @SuppressWarnings("unused")
@@ -252,12 +252,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "reuse_connection", description = "reuse the current connections for all transfers", key = "reuse_connection", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean reuseConnection = new SOSOptionBoolean(
     // ...
-    this, // ....
-    conClassName + ".reuse_connection", // ...
-    "reuse the current connections for all transfers", // ...
-    "false", // ...
-    "false", // ...
-    false);
+            this, // ....
+            conClassName + ".reuse_connection", // ...
+            "reuse the current connections for all transfers", // ...
+            "false", // ...
+            "false", // ...
+            false);
 
     public String getreuse_connection() {
         @SuppressWarnings("unused")
@@ -283,12 +283,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "polling_server", description = "act as a polling server", key = "polling_server", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean PollingServer = new SOSOptionBoolean(
     // ...
-    this, // ....
-    conClassName + ".polling_server", // ...
-    "act as a polling server", // ...
-    "false", // ...
-    "false", // ...
-    false);
+            this, // ....
+            conClassName + ".polling_server", // ...
+            "act as a polling server", // ...
+            "false", // ...
+            "false", // ...
+            false);
 
     public String getpolling_server() {
         @SuppressWarnings("unused")
@@ -314,12 +314,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "polling_end_at", description = "PollingServer should stop at the specified date/time", key = "polling_end_at", type = "SOSOptionTime", mandatory = false)
     public SOSOptionTime pollingEndAt = new SOSOptionTime(
     // ...
-    this, // ....
-    conClassName + ".polling_end_at", // ...
-    "Polling should stop at the specified date/time", // ...
-    "0", // ...
-    "0", // ...
-    false);
+            this, // ....
+            conClassName + ".polling_end_at", // ...
+            "Polling should stop at the specified date/time", // ...
+            "0", // ...
+            "0", // ...
+            false);
 
     public String getpolling_end_at() {
         @SuppressWarnings("unused")
@@ -345,12 +345,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "polling_server_poll_forever", description = "poll forever", key = "polling_server_poll_forever", type = "SOSOptionBoolean", mandatory = true)
     public SOSOptionBoolean PollingServerPollForever = new SOSOptionBoolean(
     // ...
-    this, // ....
-    conClassName + ".polling_server_poll_forever", // ...
-    "poll forever", // ...
-    "false", // ...
-    "false", // ...
-    true);
+            this, // ....
+            conClassName + ".polling_server_poll_forever", // ...
+            "poll forever", // ...
+            "false", // ...
+            "false", // ...
+            true);
 
     public String getpolling_server_poll_forever() {
         @SuppressWarnings("unused")
@@ -376,12 +376,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "polling_server_duration", description = "How long the PollingServer should run", key = "polling_server_duration", type = "SOSOptionTime", mandatory = false)
     public SOSOptionTime pollingServerDuration = new SOSOptionTime(
     // ...
-    this, // ....
-    conClassName + ".polling_server_duration", // ...
-    "How long the PollingServer should run", // ...
-    "0", // ...
-    "0", // ...
-    false);
+            this, // ....
+            conClassName + ".polling_server_duration", // ...
+            "How long the PollingServer should run", // ...
+            "0", // ...
+            "0", // ...
+            false);
 
     public String getpolling_server_duration() {
         @SuppressWarnings("unused")
@@ -407,12 +407,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "Lazy_Connection_Mode", description = "Connect to Target as late as possible", key = "Lazy_Connection_Mode", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean LazyConnectionMode = new SOSOptionBoolean(
     // ...
-    this, // ....
-    conClassName + ".Lazy_Connection_Mode", // ...
-    "Connect to Target as late as possible", // ...
-    "false", // ...
-    "false", // ...
-    false);
+            this, // ....
+            conClassName + ".Lazy_Connection_Mode", // ...
+            "Connect to Target as late as possible", // ...
+            "false", // ...
+            "false", // ...
+            false);
 
     public String getLazy_Connection_Mode() {
         @SuppressWarnings("unused")
@@ -438,12 +438,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "platform", description = "platform on which the app is running", key = "platform", type = "SOSOptionString", mandatory = false)
     public SOSOptionPlatform platform = new SOSOptionPlatform(
     // ...
-    this, // ....
-    conClassName + ".platform", // ...
-    "platform on which the app is running", // ...
-    "", // ...
-    "", // ...
-    false);
+            this, // ....
+            conClassName + ".platform", // ...
+            "platform on which the app is running", // ...
+            "", // ...
+            "", // ...
+            false);
 
     public String getplatform() {
         @SuppressWarnings("unused")
@@ -469,12 +469,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "mail_on_success", description = "Send a Mail in case of sucess", key = "mail_on_success", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean mail_on_success = new SOSOptionBoolean(
     // ...
-    this, // ....
-    conClassName + ".mail_on_success", // ...
-    "Send a Mail in case of sucess", // ...
-    "false", // ...
-    "false", // ...
-    false);
+            this, // ....
+            conClassName + ".mail_on_success", // ...
+            "Send a Mail in case of sucess", // ...
+            "false", // ...
+            "false", // ...
+            false);
 
     public String getmail_on_success() {
         @SuppressWarnings("unused")
@@ -500,12 +500,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "mail_on_error", description = "Send a Mail in case of error", key = "mail_on_error", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean mail_on_error = new SOSOptionBoolean(
     // ...
-    this, // ....
-    conClassName + ".mail_on_error", // ...
-    "Send a Mail in case of sucess", // ...
-    "false", // ...
-    "false", // ...
-    false);
+            this, // ....
+            conClassName + ".mail_on_error", // ...
+            "Send a Mail in case of sucess", // ...
+            "false", // ...
+            "false", // ...
+            false);
 
     public String getmail_on_error() {
         @SuppressWarnings("unused")
@@ -531,12 +531,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "mail_on_empty_files", description = "Send a Mail in case of empty files", key = "mail_on_empty_files", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean mail_on_empty_files = new SOSOptionBoolean(
     // ...
-    this, // ....
-    conClassName + ".mail_on_empty_files", // ...
-    "Send a Mail in case of empty files", // ...
-    "false", // ...
-    "false", // ...
-    false);
+            this, // ....
+            conClassName + ".mail_on_empty_files", // ...
+            "Send a Mail in case of empty files", // ...
+            "false", // ...
+            "false", // ...
+            false);
 
     public String getmail_on_empty_files() {
         @SuppressWarnings("unused")
@@ -562,12 +562,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "title", description = "The Title for a section /profile", key = "title", type = "SOSOptionString", mandatory = false)
     public SOSOptionString title = new SOSOptionString(
     // ...
-    this, // ....
-    conClassName + ".title", // ...
-    "The Title for a section /profile", // ...
-    "", // ...
-    "", // ...
-    false);
+            this, // ....
+            conClassName + ".title", // ...
+            "The Title for a section /profile", // ...
+            "", // ...
+            "", // ...
+            false);
 
     public String gettitle() {
         @SuppressWarnings("unused")
@@ -593,12 +593,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "keep_modification_date", description = "Keep Modification Date of File", key = "keep_modification_date", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean keep_modification_date = new SOSOptionBoolean(
     // ...
-    this, // ....
-    conClassName + ".keep_modification_date", // ...
-    "Keep Modification Date of File", // ...
-    "false", // ...
-    "false", // ...
-    false);
+            this, // ....
+            conClassName + ".keep_modification_date", // ...
+            "Keep Modification Date of File", // ...
+            "false", // ...
+            "false", // ...
+            false);
     public SOSOptionBoolean KeepModificationDate = (SOSOptionBoolean) keep_modification_date.SetAlias("KeepModificationate");
 
     public String getkeep_modification_date() {
@@ -625,12 +625,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "cumulate_files", description = "cumulate (all) files into one file by append", key = "cumulate_files", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean CumulateFiles = new SOSOptionBoolean(
     // ...
-    this, // ....
-    conClassName + ".cumulate_files", // ...
-    "cumulate (all) files into one file by append", // ...
-    "false", // ...
-    "false", // ...
-    false);
+            this, // ....
+            conClassName + ".cumulate_files", // ...
+            "cumulate (all) files into one file by append", // ...
+            "false", // ...
+            "false", // ...
+            false);
 
     public String getcumulate_files() {
         @SuppressWarnings("unused")
@@ -657,12 +657,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "cumulative_filename", description = "Name of File into which all files hat to be cumulated", key = "cumulative_filename", type = "SOSOptionFileName", mandatory = true)
     public SOSOptionFileName CumulativeFileName = new SOSOptionFileName(
     // ...
-    this, // ....
-    conClassName + ".cumulative_filename", // ...
-    "Name of File into which all files hat to be cumulated", // ...
-    "", // ...
-    "", // ...
-    false);
+            this, // ....
+            conClassName + ".cumulative_filename", // ...
+            "Name of File into which all files hat to be cumulated", // ...
+            "", // ...
+            "", // ...
+            false);
 
     public String getcumulative_filename() {
         @SuppressWarnings("unused")
@@ -691,12 +691,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "cumulative_file_separator", description = "Text which has to beplaced between cumulated files", key = "cumulative_file_separator", type = "SOSOptionString", mandatory = false)
     public SOSOptionString CumulativeFileSeparator = new SOSOptionString(
     // ...
-    this, // ....
-    conClassName + ".cumulative_file_separator", // ...
-    "Text which has to beplaced between cumulated files", // ...
-    "", // ...
-    "", // ...
-    false);
+            this, // ....
+            conClassName + ".cumulative_file_separator", // ...
+            "Text which has to beplaced between cumulated files", // ...
+            "", // ...
+            "", // ...
+            false);
 
     public String getcumulative_file_separator() {
         @SuppressWarnings("unused")
@@ -722,12 +722,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "cumulative_file_delete", description = "Delete cumulative file before starting transfer", key = "cumulative_file_delete", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean CumulativeFileDelete = new SOSOptionBoolean(
     // ...
-    this, // ....
-    conClassName + ".cumulative_file_delete", // ...
-    "Delete cumulative file before starting transfer", // ...
-    "false", // ...
-    "false", // ...
-    false);
+            this, // ....
+            conClassName + ".cumulative_file_delete", // ...
+            "Delete cumulative file before starting transfer", // ...
+            "false", // ...
+            "false", // ...
+            false);
 
     public String getcumulative_file_delete() {
         @SuppressWarnings("unused")
@@ -753,12 +753,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "Post_Command", description = "FTP-Command to be executed after transfer", key = "Post_Command", type = "SOSOptionString", mandatory = false)
     public SOSOptionCommandString Post_Command = new SOSOptionCommandString(
     // ...
-    this, // ....
-    conClassName + ".Post_Command", // ...
-    "FTP-Command to be executed after transfer", // ...
-    "", // ...
-    "", // ...
-    false);
+            this, // ....
+            conClassName + ".Post_Command", // ...
+            "FTP-Command to be executed after transfer", // ...
+            "", // ...
+            "", // ...
+            false);
 
     public String getPost_Command() {
         @SuppressWarnings("unused")
@@ -785,12 +785,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "Pre_Command", description = "FTP-Command to be execute before transfer", key = "Pre_Command", type = "SOSOptionString  ", mandatory = false)
     public SOSOptionCommandString Pre_Command = new SOSOptionCommandString(
     // ...
-    this, // ....
-    conClassName + ".Pre_Command", // ...
-    "", // ...
-    "", // ...
-    "", // ...
-    false);
+            this, // ....
+            conClassName + ".Pre_Command", // ...
+            "", // ...
+            "", // ...
+            "", // ...
+            false);
 
     public String getPre_Command() {
         @SuppressWarnings("unused")
@@ -816,12 +816,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "CheckServerFeatures", description = "The available features of a ftp-server", key = "Check_Server_Features", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean CheckServerFeatures = new SOSOptionBoolean(
     // ...
-    this, // ....
-    conClassName + ".Check_Server_Features", // ...
-    "The available features of a ftp-server", // ...
-    "false", // ...
-    "false", // ...
-    false);
+            this, // ....
+            conClassName + ".Check_Server_Features", // ...
+            "The available features of a ftp-server", // ...
+            "false", // ...
+            "false", // ...
+            false);
 
     @Override
     public SOSOptionBoolean CheckServerFeatures() {
@@ -856,12 +856,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "PollKeepConnection", description = "Keep connection while polling", key = "PollKeepConnection", type = "SOSOptionBoolean", mandatory = true)
     public SOSOptionBoolean PollKeepConnection = new SOSOptionBoolean(
     // ...
-    this, // ....
-    conClassName + ".PollKeepConnection", // ...
-    "Keep connection while polling", // ...
-    "false", // ...
-    "false", // ...
-    true);
+            this, // ....
+            conClassName + ".PollKeepConnection", // ...
+            "Keep connection while polling", // ...
+            "false", // ...
+            "false", // ...
+            true);
 
     public String getPollKeepConnection() {
         @SuppressWarnings("unused")
@@ -887,12 +887,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "FileNameEncoding", description = "Set the encoding-type of a file name", key = "FileNameEncoding", type = "SOSOptionString", mandatory = false)
     public SOSOptionString FileNameEncoding = new SOSOptionString(
     // ...
-    this, // ....
-    conClassName + ".FileNameEncoding", // ...
-    "Set the encoding-type of a file name", // ...
-    "", // ...
-    "ISO-8859-1", // ...
-    false);
+            this, // ....
+            conClassName + ".FileNameEncoding", // ...
+            "Set the encoding-type of a file name", // ...
+            "", // ...
+            "ISO-8859-1", // ...
+            false);
 
     public String getFileNameEncoding() {
         @SuppressWarnings("unused")
@@ -919,12 +919,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "ControlEncoding", description = "Specify the encoding-type, e.g. utf-8, used by the server", key = "ControlEncoding", type = "SOSOptionString", mandatory = false)
     public SOSOptionEncoding ControlEncoding = new SOSOptionEncoding(
     // ...
-    this, // ....
-    conClassName + ".ControlEncoding", // ...
-    "Specify the encoding-type, e.g. utf-8, used by the server", // ...
-    "", // ...
-    "", // ...
-    false);
+            this, // ....
+            conClassName + ".ControlEncoding", // ...
+            "Specify the encoding-type, e.g. utf-8, used by the server", // ...
+            "", // ...
+            "", // ...
+            false);
 
     public String getControlEncoding() {
         @SuppressWarnings("unused")
@@ -951,12 +951,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * \created 04.04.2014 17:38:52 by KB */
     @JSOptionDefinition(name = "History_File_Append_Mode", description = "Specifies wether the History File has to be written in append mode", key = "History_File_Append_Mode", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean HistoryFileAppendMode = new SOSOptionBoolean( // ...
-    this, // ....
-    conClassName + ".History_File_Append_Mode", // ...
-    "Specifies wether the History File has to be written in append mode", // ...
-    "true", // ...
-    "true", // ...
-    false);
+            this, // ....
+            conClassName + ".History_File_Append_Mode", // ...
+            "Specifies wether the History File has to be written in append mode", // ...
+            "true", // ...
+            "true", // ...
+            false);
 
     public SOSOptionBoolean getHistoryFileAppendMode() {
         @SuppressWarnings("unused")
@@ -982,12 +982,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "HistoryEntries", description = "List of additional entries for the transfer history record.", key = "HistoryEntries", type = "SOSOptionArrayList", mandatory = false)
     public SOSOptionArrayList HistoryEntries = new SOSOptionArrayList(
     // ...
-    this, // ....
-    conClassName + ".HistoryEntries", // ...
-    "List of additional entries for the transfer history record.", // ...
-    "", // ...
-    "", // ...
-    false);
+            this, // ....
+            conClassName + ".HistoryEntries", // ...
+            "List of additional entries for the transfer history record.", // ...
+            "", // ...
+            "", // ...
+            false);
 
     public String getHistoryEntries() {
         @SuppressWarnings("unused")
@@ -1014,12 +1014,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "SendTransferHistory", description = "If this option is set to true, the transfer history will be sent to the background service.", key = "SendTransferHistory", type = "SOSOptionBoolean", mandatory = true)
     public SOSOptionBoolean SendTransferHistory = new SOSOptionBoolean(
     // ...
-    this, // ....
-    conClassName + ".SendTransferHistory", // ...
-    "If this option is set to true, the transfer history will be sent to the background service.", // ...
-    "false", // ...
-    "false", // ...
-    false);
+            this, // ....
+            conClassName + ".SendTransferHistory", // ...
+            "If this option is set to true, the transfer history will be sent to the background service.", // ...
+            "false", // ...
+            "false", // ...
+            false);
 
     public String getSendTransferHistory() {
         @SuppressWarnings("unused")
@@ -1045,12 +1045,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "Scheduler_Transfer_Method", description = "The technical method of how to communicate with the JobScheduler", key = "Scheduler_Transfer_Method", type = "SOSOptionJSTransferMethod", mandatory = true)
     public SOSOptionBackgroundServiceTransferMethod Scheduler_Transfer_Method = new SOSOptionBackgroundServiceTransferMethod(
     // ...
-    this, // ....
-    conClassName + ".Scheduler_Transfer_Method", // ...
-    "The technical method of how to communicate with the JobScheduler", // ...
-    enuJSTransferModes.udp.description, // ...
-    enuJSTransferModes.udp.description, // ...
-    true);
+            this, // ....
+            conClassName + ".Scheduler_Transfer_Method", // ...
+            "The technical method of how to communicate with the JobScheduler", // ...
+            enuJSTransferModes.udp.description, // ...
+            enuJSTransferModes.udp.description, // ...
+            true);
 
     public String getScheduler_Transfer_Method() {
         @SuppressWarnings("unused")
@@ -1079,12 +1079,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "PreFtpCommands", description = "FTP commands, which has to be executed before the transfer started.", key = "PreFtpCommands", type = "SOSOptionString", mandatory = false)
     public SOSOptionCommandString PreFtpCommands = new SOSOptionCommandString(
     // ...
-    this, // ....
-    conClassName + ".Pre_Ftp_Commands", // ...
-    "FTP commands, which has to be executed before the transfer started.", // ...
-    "", // ...
-    "", // ...
-    false);
+            this, // ....
+            conClassName + ".Pre_Ftp_Commands", // ...
+            "FTP commands, which has to be executed before the transfer started.", // ...
+            "", // ...
+            "", // ...
+            false);
     /** \see PreFtpCommands */
     public SOSOptionCommandString PreTransferCommands = (SOSOptionCommandString) PreFtpCommands.SetAlias("pre_transfer_commands");
 
@@ -1115,12 +1115,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "PostTransferCommands", description = "FTP commands, which has to be executed after the transfer ended.", key = "PostTransferCommands", type = "SOSOptionString", mandatory = false)
     public SOSOptionCommandString PostTransferCommands = new SOSOptionCommandString(
     // ...
-    this, // ....
-    conClassName + ".post_transfer_Commands", // ...
-    "FTP commands, which has to be executed after the transfer ended.", // ...
-    "", // ...
-    "", // ...
-    false);
+            this, // ....
+            conClassName + ".post_transfer_Commands", // ...
+            "FTP commands, which has to be executed after the transfer ended.", // ...
+            "", // ...
+            "", // ...
+            false);
     /** \see PostTransferCommands */
     public SOSOptionString PostFtpCommands = (SOSOptionString) PostTransferCommands.SetAlias("post_Transfer_commands");
 
@@ -1141,69 +1141,69 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 
     @JSOptionDefinition(name = "IntegrityHashType", description = "", key = "integrity_hash_type", type = "SOSOptionString", mandatory = false)
     public SOSOptionString IntegrityHashType = new SOSOptionString(this, conClassName + ".integrity_hash_type", // HashMap-Key
-    "The Type of the integrity hash, e.g. md5", // Titel
-    "md5", // InitValue
-    "md5", // DefaultValue
-    false // isMandatory
-    );
+            "The Type of the integrity hash, e.g. md5", // Titel
+            "md5", // InitValue
+            "md5", // DefaultValue
+            false // isMandatory
+            );
     public SOSOptionString SecurityHashType = (SOSOptionString) IntegrityHashType.SetAlias("security_hash_type");
 
     @JSOptionDefinition(name = "DecompressAfterTransfer", description = "", key = "Decompress_After_Transfer", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean DecompressAfterTransfer = new SOSOptionBoolean(this, conClassName + ".Decompress_After_Transfer", // HashMap-Key
-    "Decompress zipped-files after transfer", // Titel
-    "false", // InitValue
-    "false", // DefaultValue
-    false // isMandatory
-    );
+            "Decompress zipped-files after transfer", // Titel
+            "false", // InitValue
+            "false", // DefaultValue
+            false // isMandatory
+            );
     @JSOptionDefinition(name = "ConcurrentTransfer", description = "", key = "Concurrent_Transfer", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean ConcurrentTransfer = new SOSOptionBoolean(this, conClassName + ".Concurrent_Transfer", // HashMap-Key
-    "Process transfers simultaneously", // Titel
-    "false", // InitValue
-    "false", // DefaultValue
-    false // isMandatory
-    );
+            "Process transfers simultaneously", // Titel
+            "false", // InitValue
+            "false", // DefaultValue
+            false // isMandatory
+            );
     @JSOptionDefinition(name = "CheckIntegrityHash", description = "", key = "check_integrity_hash", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean CheckIntegrityHash = new SOSOptionBoolean(this, conClassName + ".check_integrity_hash", // HashMap-Key
-    "Calculates the integrity hash", // Titel
-    "false", // InitValue
-    "false", // DefaultValue
-    false // isMandatory
-    );
+            "Calculates the integrity hash", // Titel
+            "false", // InitValue
+            "false", // DefaultValue
+            false // isMandatory
+            );
     public SOSOptionBoolean CheckSecurityHash = (SOSOptionBoolean) CheckIntegrityHash.SetAlias("check_security_hash");
 
     @JSOptionDefinition(name = "MaxConcurrentTransfers", description = "", key = "Max_Concurrent_Transfers", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionInteger MaxConcurrentTransfers = new SOSOptionInteger(this, conClassName + ".Max_Concurrent_Transfers", // HashMap-Key
-    "Maximum Numbers of parallel transfers", // Titel
-    "5", // InitValue
-    "1", // DefaultValue
-    false // isMandatory
-    );
+            "Maximum Numbers of parallel transfers", // Titel
+            "5", // InitValue
+            "1", // DefaultValue
+            false // isMandatory
+            );
     @JSOptionDefinition(name = "CreateIntegrityHashFile", description = "", key = "create_integrity_hash_file", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean CreateIntegrityHashFile = new SOSOptionBoolean(this, conClassName + ".create_integrity_hash_file", // HashMap-Key
-    "Flag if an integrity hash file will be created on the target", // Titel
-    "false", // InitValue
-    "false", // DefaultValue
-    false // isMandatory
-    );
+            "Flag if an integrity hash file will be created on the target", // Titel
+            "false", // InitValue
+            "false", // DefaultValue
+            false // isMandatory
+            );
 
     public SOSOptionBoolean CreateSecurityHashFile = (SOSOptionBoolean) CreateIntegrityHashFile.SetAlias("create_security_hash_file");
 
     @JSOptionDefinition(name = "BufferSize", description = "", key = "buffer_Size", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionInteger BufferSize = new SOSOptionInteger(this, conClassName + ".buffer_Size", // HashMap-Key
-    "This parameter specifies the interval in seconds", // Titel
-    "32000", // InitValue
-    "4096", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies the interval in seconds", // Titel
+            "32000", // InitValue
+            "4096", // DefaultValue
+            false // isMandatory
+            );
     /** \var create_order : Activate file-order creation With this parameter it
      * is possible to specif */
     @JSOptionDefinition(name = "create_order", description = "Activate file-order creation With this parameter it is possible to specif", key = "create_order", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean create_order = new SOSOptionBoolean(this, conClassName + ".create_order", // HashMap-Key
-    "Activate file-order creation With this parameter it is possible to specif", // Titel
-    "false", // InitValue
-    "false", // DefaultValue
-    false // isMandatory
-    );
+            "Activate file-order creation With this parameter it is possible to specif", // Titel
+            "false", // InitValue
+            "false", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getcreate_order : Activate file-order creation With this parameter
      * it is possible to specif
@@ -1233,11 +1233,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * the result-list */
     @JSOptionDefinition(name = "create_orders_for_all_files", description = "Create a file-order for every file in the result-list", key = "create_orders_for_all_files", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean create_orders_for_all_files = new SOSOptionBoolean(this, conClassName + ".create_orders_for_all_files", // HashMap-Key
-    "Create a file-order for every file in the result-list", // Titel
-    "false", // InitValue
-    "false", // DefaultValue
-    false // isMandatory
-    );
+            "Create a file-order for every file in the result-list", // Titel
+            "false", // InitValue
+            "false", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getcreate_orders_for_all_files : Create a file-order for every
      * file in the result-list
@@ -1265,11 +1265,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     /** \var expected_size_of_result_set : number of expected hits in result-list */
     @JSOptionDefinition(name = "expected_size_of_result_set", description = "number of expected hits in result-list", key = "expected_size_of_result_set", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionInteger expected_size_of_result_set = new SOSOptionInteger(this, conClassName + ".expected_size_of_result_set", // HashMap-Key
-    "number of expected hits in result-list", // Titel
-    "0", // InitValue
-    "0", // DefaultValue
-    false // isMandatory
-    );
+            "number of expected hits in result-list", // Titel
+            "0", // InitValue
+            "0", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getexpected_size_of_result_set : number of expected hits in
      * result-list
@@ -1298,18 +1298,18 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * Supports */
     @JSOptionDefinition(name = "file", description = "File or Folder to watch for Checked file or directory Supports", key = "file", type = "SOSOptionString", mandatory = true)
     public SOSOptionFileName file = new SOSOptionFileName(this, conClassName + ".file", // HashMap-Key
-    "File or Folder to watch for Checked file or directory Supports", // Titel
-    ".", // InitValue
-    ".", // DefaultValue
-    true // isMandatory
-    );
+            "File or Folder to watch for Checked file or directory Supports", // Titel
+            ".", // InitValue
+            ".", // DefaultValue
+            true // isMandatory
+            );
     @JSOptionDefinition(name = "target", description = "target or Folder to watch for Checked target or directory Supports", key = "target", type = "SOSOptionString", mandatory = true)
     public SOSOptionFileName target = new SOSOptionFileName(this, conClassName + ".target", // HashMap-Key
-    "target or Folder to watch for Checked target or directory Supports", // Titel
-    ".", // InitValue
-    ".", // DefaultValue
-    true // isMandatory
-    );
+            "target or Folder to watch for Checked target or directory Supports", // Titel
+            ".", // InitValue
+            ".", // DefaultValue
+            true // isMandatory
+            );
 
     /** \brief getfile : File or Folder to watch for Checked file or directory
      * Supports
@@ -1389,11 +1389,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * file. If a file */
     @JSOptionDefinition(name = "max_file_age", description = "maximum age of a file Specifies the maximum age of a file. If a file", key = "max_file_age", type = "SOSOptionTime", mandatory = false)
     public SOSOptionTime max_file_age = new SOSOptionTime(this, conClassName + ".max_file_age", // HashMap-Key
-    "maximum age of a file Specifies the maximum age of a file. If a file", // Titel
-    "0", // InitValue
-    "0", // DefaultValue
-    false // isMandatory
-    );
+            "maximum age of a file Specifies the maximum age of a file. If a file", // Titel
+            "0", // InitValue
+            "0", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getmax_file_age : maximum age of a file Specifies the maximum age
      * of a file. If a file
@@ -1426,11 +1426,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * non-existing. */
     @JSOptionDefinition(name = "max_file_size", description = "maximum size of a file Specifies the maximum size of a file in", key = "max_file_size", type = "SOSOptionFileSize", mandatory = false)
     public SOSOptionFileSize max_file_size = new SOSOptionFileSize(this, conClassName + ".max_file_size", // HashMap-Key
-    "maximum size of a file Specifies the maximum size of a file in", // Titel
-    "-1", // InitValue
-    "-1", // DefaultValue
-    false // isMandatory
-    );
+            "maximum size of a file Specifies the maximum size of a file in", // Titel
+            "-1", // InitValue
+            "-1", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getmax_file_size : maximum size of a file Specifies the maximum
      * size of a file in
@@ -1464,11 +1464,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * the result-list. */
     @JSOptionDefinition(name = "min_file_age", description = "minimum age of a file Specifies the minimum age of a files. If the fi", key = "min_file_age", type = "SOSOptionTime", mandatory = false)
     public SOSOptionTime min_file_age = new SOSOptionTime(this, conClassName + ".min_file_age", // HashMap-Key
-    "minimum age of a file Specifies the minimum age of a files. If the fi", // Titel
-    "0", // InitValue
-    "0", // DefaultValue
-    false // isMandatory
-    );
+            "minimum age of a file Specifies the minimum age of a files. If the fi", // Titel
+            "0", // InitValue
+            "0", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getmin_file_age : minimum age of a file Specifies the minimum age
      * of a files. If the fi
@@ -1501,11 +1501,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * minimum size of one */
     @JSOptionDefinition(name = "min_file_size", description = "minimum size of one or multiple files Specifies the minimum size of one", key = "min_file_size", type = "SOSOptionFileSize", mandatory = false)
     public SOSOptionFileSize min_file_size = new SOSOptionFileSize(this, conClassName + ".min_file_size", // HashMap-Key
-    "minimum size of one or multiple files Specifies the minimum size of one", // Titel
-    "-1", // InitValue
-    "-1", // DefaultValue
-    false // isMandatory
-    );
+            "minimum size of one or multiple files Specifies the minimum size of one", // Titel
+            "-1", // InitValue
+            "-1", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getmin_file_size : minimum size of one or multiple files Specifies
      * the minimum size of one
@@ -1544,12 +1544,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "MergeOrderParameter", description = "Merge created order parameter with parameter of current order", key = "MergeOrderParameter", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean MergeOrderParameter = new SOSOptionBoolean(
     // ...
-    this, // ....
-    conClassName + ".MergeOrderParameter", // ...
-    "Merge created order parameter with parameter of current order", // ...
-    "false", // ...
-    "false", // ...
-    false);
+            this, // ....
+            conClassName + ".MergeOrderParameter", // ...
+            "Merge created order parameter with parameter of current order", // ...
+            "false", // ...
+            "false", // ...
+            false);
 
     public String getMergeOrderParameter() {
         @SuppressWarnings("unused")
@@ -1568,11 +1568,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * node of a jobchai */
     @JSOptionDefinition(name = "next_state", description = "The first node to execute in a jobchain The name of the node of a jobchai", key = "next_state", type = "SOSOptionJobChainNode", mandatory = false)
     public SOSOptionJobChainNode next_state = new SOSOptionJobChainNode(this, conClassName + ".next_state", // HashMap-Key
-    "The first node to execute in a jobchain The name of the node of a jobchai", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "The first node to execute in a jobchain The name of the node of a jobchai", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getnext_state : The first node to execute in a jobchain The name
      * of the node of a jobchai
@@ -1602,11 +1602,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * Node (Step, Job) to execute i */
     @JSOptionDefinition(name = "on_empty_result_set", description = "Set next node on empty result set The next Node (Step, Job) to execute i", key = "on_empty_result_set", type = "SOSOptionJobChainNode", mandatory = false)
     public SOSOptionJobChainNode on_empty_result_set = new SOSOptionJobChainNode(this, conClassName + ".on_empty_result_set", // HashMap-Key
-    "Set next node on empty result set The next Node (Step, Job) to execute i", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "Set next node on empty result set The next Node (Step, Job) to execute i", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief geton_empty_result_set : Set next node on empty result set The
      * next Node (Step, Job) to execute i
@@ -1635,12 +1635,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     /** Name of Jobscheduler Host where the order have to be started */
     @JSOptionDefinition(name = "order_jobscheduler_host", description = "Name of Jobscheduler Host where the order have to be started", key = "order_jobscheduler_host", type = "SOSOptionHostName", mandatory = false)
     public SOSOptionHostName order_jobscheduler_host = new SOSOptionHostName( // ...
-    this, // ....
-    conClassName + ".order_jobscheduler_host", // ...
-    "Name of Jobscheduler Host where the order have to be started", // ...
-    "", // ...
-    "", // ...
-    false);
+            this, // ....
+            conClassName + ".order_jobscheduler_host", // ...
+            "Name of Jobscheduler Host where the order have to be started", // ...
+            "", // ...
+            "", // ...
+            false);
 
     /** @return */
     public SOSOptionHostName getorder_jobscheduler_host() {
@@ -1655,12 +1655,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     /** The port of the JobScheduler Node */
     @JSOptionDefinition(name = "order_jobscheduler_port", description = "The port of the JobScheduler node", key = "order_jobscheduler_port", type = "SOSOptionPortNumber", mandatory = false)
     public SOSOptionPortNumber order_jobscheduler_port = new SOSOptionPortNumber( // ...
-    this, // ....
-    conClassName + ".order_jobscheduler_port", // ...
-    "The port of the JobScheduler node", // ...
-    "", // ...
-    "4444", // ...
-    false);
+            this, // ....
+            conClassName + ".order_jobscheduler_port", // ...
+            "The port of the JobScheduler node", // ...
+            "", // ...
+            "4444", // ...
+            false);
 
     /** @return */
     public SOSOptionPortNumber getorder_jobscheduler_port() {
@@ -1676,11 +1676,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * order The name of the jobch */
     @JSOptionDefinition(name = "order_jobchain_name", description = "The name of the jobchain which belongs to the order The name of the jobch", key = "order_jobchain_name", type = "SOSOptionString", mandatory = false)
     public SOSOptionString order_jobchain_name = new SOSOptionString(this, conClassName + ".order_jobchain_name", // HashMap-Key
-    "The name of the jobchain which belongs to the order The name of the jobch", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "The name of the jobchain which belongs to the order The name of the jobch", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getorder_jobchain_name : The name of the jobchain which belongs to
      * the order The name of the jobch
@@ -1710,11 +1710,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * result-set With this parameter it is poss */
     @JSOptionDefinition(name = "raise_error_if_result_set_is", description = "raise error on expected size of result-set With this parameter it is poss", key = "raise_error_if_result_set_is", type = "SOSOptionRelOp", mandatory = false)
     public SOSOptionRelOp raise_error_if_result_set_is = new SOSOptionRelOp(this, conClassName + ".raise_error_if_result_set_is", // HashMap-Key
-    "raise error on expected size of result-set With this parameter it is poss", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "raise error on expected size of result-set With this parameter it is poss", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getraise_error_if_result_set_is : raise error on expected size of
      * result-set With this parameter it is poss
@@ -1744,11 +1744,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * parameter specifies a v */
     @JSOptionDefinition(name = "result_list_file", description = "Name of the result-list file If the value of this parameter specifies a v", key = "result_list_file", type = "SOSOptionFileName", mandatory = false)
     public SOSOptionFileName result_list_file = new SOSOptionFileName(this, conClassName + ".result_list_file", // HashMap-Key
-    "Name of the result-list file If the value of this parameter specifies a v", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "Name of the result-list file If the value of this parameter specifies a v", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getresult_list_file : Name of the result-list file If the value of
      * this parameter specifies a v
@@ -1777,11 +1777,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     /** \var scheduler_file_name : Name of the file to process for a file-order */
     @JSOptionDefinition(name = "scheduler_file_name", description = "Name of the file to process for a file-order", key = "scheduler_file_name", type = "SOSOptionFileName", mandatory = false)
     public SOSOptionFileName scheduler_file_name = new SOSOptionFileName(this, conClassName + ".scheduler_file_name", // HashMap-Key
-    "Name of the file to process for a file-order", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "Name of the file to process for a file-order", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getscheduler_file_name : Name of the file to process for a
      * file-order
@@ -1809,11 +1809,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * file-order */
     @JSOptionDefinition(name = "scheduler_file_parent", description = "pathanme of the file to process for a file-order", key = "scheduler_file_parent", type = "SOSOptionFileName", mandatory = false)
     public SOSOptionFileName scheduler_file_parent = new SOSOptionFileName(this, conClassName + ".scheduler_file_parent", // HashMap-Key
-    "pathanme of the file to process for a file-order", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "pathanme of the file to process for a file-order", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getscheduler_file_parent : pathanme of the file to process for a
      * file-order
@@ -1842,11 +1842,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * Directory Monitoring with */
     @JSOptionDefinition(name = "scheduler_file_path", description = "file to process for a file-order Using Directory Monitoring with", key = "scheduler_file_path", type = "SOSOptionFileName", mandatory = false)
     public SOSOptionFileName scheduler_file_path = new SOSOptionFileName(this, conClassName + ".scheduler_file_path", // HashMap-Key
-    "file to process for a file-order Using Directory Monitoring with", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "file to process for a file-order Using Directory Monitoring with", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getscheduler_file_path : file to process for a file-order Using
      * Directory Monitoring with
@@ -1929,11 +1929,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "scheduler_sosfileoperations_resultsetsize", description = "The amount of hits in the result set of the operation", key = "scheduler_sosfileoperations_resultsetsize", type = "SOSOptionsInteger", mandatory = false)
     public SOSOptionInteger scheduler_sosfileoperations_resultsetsize = new SOSOptionInteger(this, conClassName
             + ".scheduler_sosfileoperations_resultsetsize", // HashMap-Key
-    "The amount of hits in the result set of the operation", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "The amount of hits in the result set of the operation", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getscheduler_sosfileoperations_resultsetsize : The amount of hits
      * in the result set of the operation
@@ -1963,11 +1963,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * result-set The numbe */
     @JSOptionDefinition(name = "skip_first_files", description = "number of files to remove from the top of the result-set The numbe", key = "skip_first_files", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionInteger skip_first_files = new SOSOptionInteger(this, conClassName + ".skip_first_files", // HashMap-Key
-    "number of files to remove from the top of the result-set The numbe", // Titel
-    "0", // InitValue
-    "0", // DefaultValue
-    false // isMandatory
-    );
+            "number of files to remove from the top of the result-set The numbe", // Titel
+            "0", // InitValue
+            "0", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getskip_first_files : number of files to remove from the top of
      * the result-set The numbe
@@ -1998,11 +1998,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * result-set The numbe */
     @JSOptionDefinition(name = "skip_last_files", description = "number of files to remove from the bottom of the result-set The numbe", key = "skip_last_files", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionInteger skip_last_files = new SOSOptionInteger(this, conClassName + ".skip_last_files", // HashMap-Key
-    "number of files to remove from the bottom of the result-set The numbe", // Titel
-    "0", // InitValue
-    "0", // DefaultValue
-    false // isMandatory
-    );
+            "number of files to remove from the bottom of the result-set The numbe", // Titel
+            "0", // InitValue
+            "0", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getskip_last_files : number of files to remove from the bottom of
      * the result-set The numbe
@@ -2040,12 +2040,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "Max_Files", description = "Maximum number of files to process", key = "Max_Files", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionInteger MaxFiles = new SOSOptionInteger(
     // ...
-    this, // ....
-    conClassName + ".Max_Files", // ...
-    "Maximum number of files to process", // ...
-    "-1", // ...
-    "-1", // ...
-    false);
+            this, // ....
+            conClassName + ".Max_Files", // ...
+            "Maximum number of files to process", // ...
+            "-1", // ...
+            "-1", // ...
+            false);
 
     public String getMax_Files() {
         @SuppressWarnings("unused")
@@ -2071,12 +2071,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "check_steady_count", description = "Number of tries for Steady check", key = "check_steady_count", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionInteger CheckSteadyCount = new SOSOptionInteger(
     // ...
-    this, // ....
-    conClassName + ".check_steady_count", // ...
-    "Number of tries for Steady check", // ...
-    "10", // ...
-    "10", // ...
-    false);
+            this, // ....
+            conClassName + ".check_steady_count", // ...
+            "Number of tries for Steady check", // ...
+            "10", // ...
+            "10", // ...
+            false);
 
     public String getcheck_steady_count() {
         @SuppressWarnings("unused")
@@ -2102,12 +2102,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "check_steady_state_interval", description = "The intervall for steady state checking", key = "check_steady_state_interval", type = "SOSOptionFileTime", mandatory = false)
     public SOSOptionTime check_steady_state_interval = new SOSOptionTime(
     // ...
-    this, // ....
-    conClassName + ".check_steady_state_interval", // ...
-    "The intervall for steady state checking", // ...
-    "1", // ...
-    "1", // ...
-    false);
+            this, // ....
+            conClassName + ".check_steady_state_interval", // ...
+            "The intervall for steady state checking", // ...
+            "1", // ...
+            "1", // ...
+            false);
     public SOSOptionTime CheckSteadyStateInterval = (SOSOptionTime) check_steady_state_interval.SetAlias("check_steady_state_interval");
 
     public String getcheck_steady_state_interval() {
@@ -2134,12 +2134,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "Check_Steady_State_Of_Files", description = "Check wether a file is beeing modified", key = "Check_Steady_State_Of_Files", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean CheckSteadyStateOfFiles = new SOSOptionBoolean(
     // ...
-    this, // ....
-    conClassName + ".Check_Steady_State_Of_Files", // ...
-    "Check wether a file is beeing modified", // ...
-    "false", // ...
-    "false", // ...
-    false);
+            this, // ....
+            conClassName + ".Check_Steady_State_Of_Files", // ...
+            "Check wether a file is beeing modified", // ...
+            "false", // ...
+            "false", // ...
+            false);
 
     public String getCheckSteadyStateOfFiles() {
         @SuppressWarnings("unused")
@@ -2165,12 +2165,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "PollErrorState", description = "Next state in Chain if no files found", key = "Poll_Error_State", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionJobChainNode PollErrorState = new SOSOptionJobChainNode(
     // ...
-    this, // ....
-    conClassName + ".Poll_Error_State", // ...
-    "Next state in Chain if no files found", // ...
-    "", // ...
-    "", // ...
-    false);
+            this, // ....
+            conClassName + ".Poll_Error_State", // ...
+            "Next state in Chain if no files found", // ...
+            "", // ...
+            "", // ...
+            false);
     public SOSOptionJobChainNode NoFilesState = (SOSOptionJobChainNode) PollErrorState.SetAlias("No_files_state");
 
     public String getPollErrorState() {
@@ -2198,12 +2198,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * \created 25.02.2014 20:18:18 by KB */
     @JSOptionDefinition(name = "Steady_state_error_state", description = "Next state in JobChain if check steady state did not comes to an normal end", key = "Steady_state_error_state", type = "SOSOptionJobChainNode", mandatory = false)
     public SOSOptionJobChainNode Steady_state_error_state = new SOSOptionJobChainNode( // ...
-    this, // ....
-    conClassName + ".Steady_state_error_state", // ...
-    "Next state in JobChain if check steady state did not comes to an normal end", // ...
-    "", // ...
-    "", // ...
-    false);
+            this, // ....
+            conClassName + ".Steady_state_error_state", // ...
+            "Next state in JobChain if check steady state did not comes to an normal end", // ...
+            "", // ...
+            "", // ...
+            false);
     public SOSOptionJobChainNode SteadyStateErrorState = (SOSOptionJobChainNode) Steady_state_error_state.SetAlias("SteadyErrorState");
 
     public String getSteady_state_error_state() {
@@ -2230,12 +2230,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "make_Dirs", description = "Create missing Directory on Target", key = "make_Dirs", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean makeDirs = new SOSOptionBoolean(
     // ...
-    this, // ....
-    conClassName + ".make_Dirs", // ...
-    "Create missing Directory on Target", // ...
-    "true", // ...
-    "true", // ...
-    false);
+            this, // ....
+            conClassName + ".make_Dirs", // ...
+            "Create missing Directory on Target", // ...
+            "true", // ...
+            "true", // ...
+            false);
     public SOSOptionBoolean createFoldersOnTarget = (SOSOptionBoolean) makeDirs.SetAlias("create_folders_on_target");
 
     public String getmake_Dirs() {
@@ -2262,12 +2262,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "File_List_Name", description = "File with a list of file names", key = "File_List_Name", type = "SOSOptionInFileName", mandatory = false)
     public SOSOptionInFileName FileListName = new SOSOptionInFileName(
     // ...
-    this, // ....
-    conClassName + ".File_List_Name", // ...
-    "File with a list of file names", // ...
-    "", // ...
-    "", // ...
-    false);
+            this, // ....
+            conClassName + ".File_List_Name", // ...
+            "File with a list of file names", // ...
+            "", // ...
+            "", // ...
+            false);
 
     public String getFileListName() {
         @SuppressWarnings("unused")
@@ -2293,12 +2293,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "Create_Result_Set", description = "Write the ResultSet to a file", key = "Create_Result_Set", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean CreateResultSet = new SOSOptionBoolean(
     // ...
-    this, // ....
-    conClassName + ".Create_Result_Set", // ...
-    "Write the ResultSet to a file", // ...
-    "false", // ...
-    "false", // ...
-    false);
+            this, // ....
+            conClassName + ".Create_Result_Set", // ...
+            "Write the ResultSet to a file", // ...
+            "false", // ...
+            "false", // ...
+            false);
     public SOSOptionBoolean CreateResultList = (SOSOptionBoolean) CreateResultSet.SetAlias("create_result_list");
 
     public String getCreateResultSet() {
@@ -2325,12 +2325,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "ResultSetFileName", description = "Name of a File with a filelist or a resultlist", key = "Result_Set_FileName", type = "SOSOptionFileName", mandatory = false)
     public SOSOptionOutFileName ResultSetFileName = new SOSOptionOutFileName(
     // ...
-    this, // ....
-    conClassName + ".Result_Set_File_Name", // ...
-    "Name of a File with a filelist or a resultlist", // ...
-    "", // ...
-    "", // ...
-    false);
+            this, // ....
+            conClassName + ".Result_Set_File_Name", // ...
+            "Name of a File with a filelist or a resultlist", // ...
+            "", // ...
+            "", // ...
+            false);
 
     public String getResultSetFileName() {
         @SuppressWarnings("unused")
@@ -2347,28 +2347,28 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 
     @JSOptionDefinition(name = "source_dir", description = "Optional account info for authentication with an", key = "account", type = "SOSOptionString", mandatory = false)
     public SOSOptionFolderName SourceDir = new SOSOptionFolderName(this, conClassName + ".source_dir", // HashMap-Key
-    "local_dir Local directory into which or from which", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "local_dir Local directory into which or from which", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
     @JSOptionDefinition(name = "target_dir", description = "Optional account info for authentication with an", key = "account", type = "SOSOptionString", mandatory = false)
     public SOSOptionFolderName TargetDir = new SOSOptionFolderName(this, conClassName + ".target_dir", // HashMap-Key
-    "target_dir directory into which or from which", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "target_dir directory into which or from which", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
     /** \var account : Optional account info for authentication with an
      *
      * Optional account info for authentication with an (FTP) server. */
     @JSOptionDefinition(name = "account", description = "Optional account info for authentication with an", key = "account", type = "SOSOptionString", mandatory = false)
     public SOSOptionString account = new SOSOptionString(this, conClassName + ".account", // HashMap-Key
-    "Optional account info for authentication with an", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "Optional account info for authentication with an", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getaccount
      *
@@ -2403,11 +2403,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * were used. */
     @JSOptionDefinition(name = "alternative_account", description = "Alternative parameter for the primary parameter", key = "alternative_account", type = "SOSOptionString", mandatory = false)
     public SOSOptionString alternative_account = new SOSOptionString(this, conClassName + ".alternative_account", // HashMap-Key
-    "Alternative parameter for the primary parameter", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "Alternative parameter for the primary parameter", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getalternative_account
      *
@@ -2441,11 +2441,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * were used. */
     @JSOptionDefinition(name = "alternative_host", description = "Alternative parameter for the primary parameter", key = "alternative_host", type = "SOSOptionHostName", mandatory = false)
     public SOSOptionHostName alternative_host = new SOSOptionHostName(this, conClassName + ".alternative_host", // HashMap-Key
-    "Alternative parameter for the primary parameter", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "Alternative parameter for the primary parameter", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getalternative_host
      *
@@ -2480,11 +2480,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * credentials were used. */
     @JSOptionDefinition(name = "alternative_passive_mode", description = "Alternative parameter for the primary parameter", key = "alternative_passive_mode", type = "SOSOptionString", mandatory = false)
     public SOSOptionString alternative_passive_mode = new SOSOptionString(this, conClassName + ".alternative_passive_mode", // HashMap-Key
-    "Alternative parameter for the primary parameter", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "Alternative parameter for the primary parameter", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getalternative_passive_mode
      *
@@ -2519,11 +2519,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * were used. */
     @JSOptionDefinition(name = "alternative_password", description = "Alternative parameter for the primary parameter", key = "alternative_password", type = "SOSOptionString", mandatory = false)
     public SOSOptionPassword alternative_password = new SOSOptionPassword(this, conClassName + ".alternative_password", // HashMap-Key
-    "Alternative parameter for the primary parameter", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "Alternative parameter for the primary parameter", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getalternative_password
      *
@@ -2557,11 +2557,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * were used. */
     @JSOptionDefinition(name = "alternative_port", description = "Alternative parameter for the primary parameter", key = "alternative_port", type = "SOSOptionPortNumber", mandatory = false)
     public SOSOptionPortNumber alternative_port = new SOSOptionPortNumber(this, conClassName + ".alternative_port", // HashMap-Key
-    "Alternative parameter for the primary parameter", // Titel
-    "21", // InitValue
-    "21", // DefaultValue
-    false // isMandatory
-    );
+            "Alternative parameter for the primary parameter", // Titel
+            "21", // InitValue
+            "21", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getalternative_port
      *
@@ -2597,11 +2597,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * credentials were used. */
     @JSOptionDefinition(name = "alternative_remote_dir", description = "Alternative parameter for the primary parameter", key = "alternative_remote_dir", type = "SOSOptionString", mandatory = false)
     public SOSOptionString alternative_remote_dir = new SOSOptionString(this, conClassName + ".alternative_remote_dir", // HashMap-Key
-    "Alternative parameter for the primary parameter", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "Alternative parameter for the primary parameter", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getalternative_remote_dir
      *
@@ -2636,11 +2636,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * credentials were used. */
     @JSOptionDefinition(name = "alternative_transfer_mode", description = "Alternative parameter for the primary parameter", key = "alternative_transfer_mode", type = "SOSOptionString", mandatory = false)
     public SOSOptionString alternative_transfer_mode = new SOSOptionString(this, conClassName + ".alternative_transfer_mode", // HashMap-Key
-    "Alternative parameter for the primary parameter", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "Alternative parameter for the primary parameter", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getalternative_transfer_mode
      *
@@ -2674,11 +2674,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * were used. */
     @JSOptionDefinition(name = "alternative_user", description = "Alternative parameter for the primary parameter", key = "alternative_user", type = "SOSOptionString", mandatory = false)
     public SOSOptionUserName alternative_user = new SOSOptionUserName(this, conClassName + ".alternative_user", // HashMap-Key
-    "Alternative parameter for the primary parameter", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "Alternative parameter for the primary parameter", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getalternative_user
      *
@@ -2712,11 +2712,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * value true. */
     @JSOptionDefinition(name = "append_files", description = "This parameter specifies whether the content of a", key = "append_files", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean append_files = new SOSOptionBoolean(this, conClassName + ".append_files", // HashMap-Key
-    "This parameter specifies whether the content of a", // Titel
-    "false", // InitValue
-    "false", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies whether the content of a", // Titel
+            "false", // InitValue
+            "false", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getappend_files
      *
@@ -2754,11 +2754,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * be monitored by an application or a JobScheduler. */
     @JSOptionDefinition(name = "atomic_prefix", description = "This parameter specifies whether target files shou", key = "atomic_prefix", type = "SOSOptionString", mandatory = false)
     public SOSOptionString atomic_prefix = new SOSOptionString(this, conClassName + ".atomic_prefix", // HashMap-Key
-    "This parameter specifies whether target files shou", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies whether target files shou", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getatomic_prefix
      *
@@ -2796,11 +2796,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * monitored by an application or a Job Scheduler. */
     @JSOptionDefinition(name = "atomic_suffix", description = "This parameter specifies whether target files shou", key = "atomic_suffix", type = "SOSOptionString", mandatory = false)
     public SOSOptionString atomic_suffix = new SOSOptionString(this, conClassName + ".atomic_suffix", // HashMap-Key
-    "This parameter specifies whether target files shou", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies whether target files shou", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getatomic_suffix
      *
@@ -2842,11 +2842,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * ************************************************************************* */
     @JSOptionDefinition(name = "banner_footer", description = "Name der Template-Datei für Protokoll-Ende This p", key = "banner_footer", type = "SOSOptionInFileName", mandatory = false)
     public SOSOptionInFileName banner_footer = new SOSOptionInFileName(this, conClassName + ".banner_footer", // HashMap-Key
-    "Name der Template-Datei für Protokoll-Ende This p", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "Name der Template-Datei für Protokoll-Ende This p", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getbanner_footer
      *
@@ -2894,11 +2894,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * ************************************************************************* */
     @JSOptionDefinition(name = "banner_header", description = "Name of Template-File for log-File", key = "banner_header", type = "SOSOptionInFileName", mandatory = false)
     public SOSOptionInFileName banner_header = new SOSOptionInFileName(this, conClassName + ".banner_header", // HashMap-Key
-    "Name of Template-File for log-File", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "Name of Template-File for log-File", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getbanner_header
      *
@@ -2931,11 +2931,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * the check_retry parameter. */
     @JSOptionDefinition(name = "check_interval", description = "This parameter specifies the interval in seconds", key = "check_interval", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionInteger check_interval = new SOSOptionInteger(this, conClassName + ".check_interval", // HashMap-Key
-    "This parameter specifies the interval in seconds", // Titel
-    "60", // InitValue
-    "60", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies the interval in seconds", // Titel
+            "60", // InitValue
+            "60", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getcheck_interval
      *
@@ -2975,11 +2975,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * check_interval parameter. */
     @JSOptionDefinition(name = "check_retry", description = "This parameter specifies whether a file transfer", key = "check_retry", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionInteger check_retry = new SOSOptionInteger(this, conClassName + ".check_retry", // HashMap-Key
-    "This parameter specifies whether a file transfer", // Titel
-    "0", // InitValue
-    "0", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies whether a file transfer", // Titel
+            "0", // InitValue
+            "0", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getcheck_retry
      *
@@ -3012,11 +3012,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * an error should be raised if they would not match. */
     @JSOptionDefinition(name = "check_size", description = "This parameter determines whether the original f", key = "check_size", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean check_size = new SOSOptionBoolean(this, conClassName + ".check_size", // HashMap-Key
-    "This parameter determines whether the original f", // Titel
-    "true", // InitValue
-    "true", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter determines whether the original f", // Titel
+            "true", // InitValue
+            "true", // DefaultValue
+            false // isMandatory
+            );
 
     public SOSOptionBoolean CheckFileSizeAfterTransfer = (SOSOptionBoolean) check_size.SetAlias(conClassName + ".CheckFileSizeAfterTransfer");
     /** \var classpath_base : The parameter is used during installation of this
@@ -3029,11 +3029,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * at the remote server (sosftp.cmd respectively sosftp.sh). */
     @JSOptionDefinition(name = "classpath_base", description = "The parameter is used during installation of this", key = "classpath_base", type = "SOSOptionFolderName", mandatory = false)
     public SOSOptionFolderName classpath_base = new SOSOptionFolderName(this, conClassName + ".classpath_base", // HashMap-Key
-    "The parameter is used during installation of this", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "The parameter is used during installation of this", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getclasspath_base
      *
@@ -3067,11 +3067,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * the files to be sent will be compressed. */
     @JSOptionDefinition(name = "compress_files", description = "This parameter specifies whether the content of the source files", key = "compress_files", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean compress_files = new SOSOptionBoolean(this, conClassName + ".compress_files", // HashMap-Key
-    "This parameter specifies whether the content of the source files", // Titel
-    "false", // InitValue
-    "false", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies whether the content of the source files", // Titel
+            "false", // InitValue
+            "false", // DefaultValue
+            false // isMandatory
+            );
 
     /** \var compressed_file_extension : Additional file-name extension for
      * compressed files This parameter spe
@@ -3080,11 +3080,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * compression be specified using the compress_files parameter. */
     @JSOptionDefinition(name = "compressed_file_extension", description = "Additional file-name extension for compressed files This parameter spe", key = "compressed_file_extension", type = "SOSOptionString", mandatory = false)
     public SOSOptionString compressed_file_extension = new SOSOptionString(this, conClassName + ".compressed_file_extension", // HashMap-Key
-    "Additional file-name extension for compressed files This parameter spe", // Titel
-    ".gz", // InitValue
-    ".gz", // DefaultValue
-    false // isMandatory
-    );
+            "Additional file-name extension for compressed files This parameter spe", // Titel
+            ".gz", // InitValue
+            ".gz", // DefaultValue
+            false // isMandatory
+            );
 
     /** \var current_pid : This parameter is used for Unix systems and - as o
      *
@@ -3095,11 +3095,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * a history file for each transfer (see parameter history). */
     @JSOptionDefinition(name = "current_pid", description = "This parameter is used for Unix systems and - as o", key = "current_pid", type = "SOSOptionProcessID", mandatory = false)
     public SOSOptionProcessID current_pid = new SOSOptionProcessID(this, conClassName + ".current_pid", // HashMap-Key
-    "This parameter is used for Unix systems and - as o", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter is used for Unix systems and - as o", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getcurrent_pid
      *
@@ -3142,11 +3142,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * ignored should this parameter be used: file_spec and local_dir. */
     @JSOptionDefinition(name = "file_path", description = "This parameter is used alternatively to the parame", key = "file_path", type = "SOSOptionFileName", mandatory = false)
     public SOSOptionFileName file_path = new SOSOptionFileName(this, conClassName + ".file_path", // HashMap-Key
-    "This parameter is used alternatively to the parame", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter is used alternatively to the parame", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getfile_path
      *
@@ -3181,11 +3181,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * parameter file_path or a list of file names as additional parameters. */
     @JSOptionDefinition(name = "file_spec", description = "file_spec This parameter expects a regular expressi", key = "file_spec", type = "SOSOptionRegExp", mandatory = false)
     public SOSOptionRegExp file_spec = new SOSOptionRegExp(this, conClassName + ".file_spec", // HashMap-Key
-    "file_spec This parameter expects a regular expressi", // Titel
-    "^.*$", // InitValue
-    "^.*$", // DefaultValue
-    false // isMandatory
-    );
+            "file_spec This parameter expects a regular expressi", // Titel
+            "^.*$", // InitValue
+            "^.*$", // DefaultValue
+            false // isMandatory
+            );
     public SOSOptionRegExp FileNameRegExp = (SOSOptionRegExp) file_spec.SetAlias(conClassName + ".FileNameRegExp");
 
     /** \brief getfile_spec
@@ -3289,11 +3289,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * false. */
     @JSOptionDefinition(name = "force_files", description = "This parameter specifies whether an error should b", key = "force_files", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean force_files = new SOSOptionBoolean(this, conClassName + ".force_files", // HashMap-Key
-    "This parameter specifies whether an error should b", // Titel
-    "true", // InitValue
-    "true", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies whether an error should b", // Titel
+            "true", // InitValue
+            "true", // DefaultValue
+            false // isMandatory
+            );
     public SOSOptionBoolean ErrorOnNoDataFound = (SOSOptionBoolean) force_files.SetAlias("error_on_no_data_found", "error_when_no_data_found");
 
     /** \brief getforce_files
@@ -3361,11 +3361,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * parameter. */
     @JSOptionDefinition(name = "history", description = "This parameter causes a history file to be written", key = "history", type = "SOSOptionOutFileName", mandatory = false)
     public SOSOptionOutFileName history = new SOSOptionOutFileName(this, conClassName + ".history", // HashMap-Key
-    "This parameter causes a history file to be written", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter causes a history file to be written", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
     public SOSOptionOutFileName HistoryFileName = (SOSOptionOutFileName) history.SetAlias("history_file_name");
 
     /** \brief gethistory
@@ -3402,11 +3402,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * of this program. */
     @JSOptionDefinition(name = "history_repeat", description = "The parameter is used in order to synchronize para", key = "history_repeat", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionInteger history_repeat = new SOSOptionInteger(this, conClassName + ".history_repeat", // HashMap-Key
-    "The parameter is used in order to synchronize para", // Titel
-    "3", // InitValue
-    "3", // DefaultValue
-    false // isMandatory
-    );
+            "The parameter is used in order to synchronize para", // Titel
+            "3", // InitValue
+            "3", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief gethistory_repeat
      *
@@ -3442,11 +3442,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * this program. */
     @JSOptionDefinition(name = "history_repeat_interval", description = "The parameter is used in order to synchronize para", key = "history_repeat_interval", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionInteger history_repeat_interval = new SOSOptionInteger(this, conClassName + ".history_repeat_interval", // HashMap-Key
-    "The parameter is used in order to synchronize para", // Titel
-    "1", // InitValue
-    "1", // DefaultValue
-    false // isMandatory
-    );
+            "The parameter is used in order to synchronize para", // Titel
+            "1", // InitValue
+            "1", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief gethistory_repeat_interval
      *
@@ -3478,11 +3478,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * which a connection has to be made. */
     @JSOptionDefinition(name = "host", description = "Host-Name This parameter specifies th", key = "host", type = "SOSOptionHostName", mandatory = false)
     public SOSOptionHostName host = new SOSOptionHostName(this, conClassName + ".host", // HashMap-Key
-    "Host-Name This parameter specifies th", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "Host-Name This parameter specifies th", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief gethost
      *
@@ -3517,11 +3517,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * parameter protocol=ftps is used. */
     @JSOptionDefinition(name = "http_proxy_host", description = "The value of this parameter is the host name or th", key = "http_proxy_host", type = "SOSOptionString", mandatory = false)
     public SOSOptionString http_proxy_host = new SOSOptionString(this, conClassName + ".http_proxy_host", // HashMap-Key
-    "The value of this parameter is the host name or th", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "The value of this parameter is the host name or th", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief gethttp_proxy_host
      *
@@ -3554,11 +3554,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * http_proxy_host. */
     @JSOptionDefinition(name = "http_proxy_port", description = "This parameter specifies the port of a proxy that", key = "http_proxy_port", type = "SOSOptionString", mandatory = false)
     public SOSOptionString http_proxy_port = new SOSOptionString(this, conClassName + ".http_proxy_port", // HashMap-Key
-    "This parameter specifies the port of a proxy that", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies the port of a proxy that", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief gethttp_proxy_port
      *
@@ -3591,11 +3591,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * is specified using the jump_command_delimiter parameter. */
     @JSOptionDefinition(name = "jump_command", description = "This parameter specifies a command that is to be e", key = "jump_command", type = "SOSOptionString", mandatory = false)
     public SOSOptionString jump_command = new SOSOptionString(this, conClassName + ".jump_command", // HashMap-Key
-    "This parameter specifies a command that is to be e", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies a command that is to be e", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getjump_command
      *
@@ -3630,11 +3630,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * sessions. */
     @JSOptionDefinition(name = "jump_command_delimiter", description = "Command delimiter characters are specified using t", key = "jump_command_delimiter", type = "SOSOptionString", mandatory = true)
     public SOSOptionString jump_command_delimiter = new SOSOptionString(this, conClassName + ".jump_command_delimiter", // HashMap-Key
-    "Command delimiter characters are specified using t", // Titel
-    "%%", // InitValue
-    "%%", // DefaultValue
-    true // isMandatory
-    );
+            "Command delimiter characters are specified using t", // Titel
+            "%%", // InitValue
+            "%%", // DefaultValue
+            true // isMandatory
+            );
 
     /** \brief getjump_command_delimiter
      *
@@ -3669,11 +3669,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * be executed there. */
     @JSOptionDefinition(name = "jump_command_script", description = "This parameter can be used as an alternative to ju", key = "jump_command_script", type = "SOSOptionCommandScript", mandatory = false)
     public SOSOptionCommandScript jump_command_script = new SOSOptionCommandScript(this, conClassName + ".jump_command_script", // HashMap-Key
-    "This parameter can be used as an alternative to ju", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter can be used as an alternative to ju", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getjump_command_script
      *
@@ -3708,11 +3708,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * be executed there. */
     @JSOptionDefinition(name = "jump_command_script_file", description = "This parameter can be used as an alternative to ju", key = "jump_command_script_file", type = "SOSOptionCommandScriptFile", mandatory = false)
     public SOSOptionCommandScriptFile jump_command_script_file = new SOSOptionCommandScriptFile(this, conClassName + ".jump_command_script_file", // HashMap-Key
-    "This parameter can be used as an alternative to ju", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter can be used as an alternative to ju", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getjump_command_script_file
      *
@@ -3746,11 +3746,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * or to which files should be transferred in a first operation. */
     @JSOptionDefinition(name = "jump_host", description = "When using a jump_host then files are first transf", key = "jump_host", type = "SOSOptionString", mandatory = false)
     public SOSOptionHostName jump_host = new SOSOptionHostName(this, conClassName + ".jump_host", // HashMap-Key
-    "When using a jump_host then files are first transf", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "When using a jump_host then files are first transf", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getjump_host
      *
@@ -3784,11 +3784,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * will be reported. */
     @JSOptionDefinition(name = "jump_ignore_error", description = "Should the value true be specified, then execution", key = "jump_ignore_error", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean jump_ignore_error = new SOSOptionBoolean(this, conClassName + ".jump_ignore_error", // HashMap-Key
-    "Should the value true be specified, then execution", // Titel
-    "false", // InitValue
-    "false", // DefaultValue
-    false // isMandatory
-    );
+            "Should the value true be specified, then execution", // Titel
+            "false", // InitValue
+            "false", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getjump_ignore_error
      *
@@ -3822,11 +3822,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * errors will be reported for commands that are terminated by signals. */
     @JSOptionDefinition(name = "jump_ignore_signal", description = "Should the value true be specified, t", key = "jump_ignore_signal", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean jump_ignore_signal = new SOSOptionBoolean(this, conClassName + ".jump_ignore_signal", // HashMap-Key
-    "Should the value true be specified, t", // Titel
-    "false", // InitValue
-    "false", // DefaultValue
-    false // isMandatory
-    );
+            "Should the value true be specified, t", // Titel
+            "false", // InitValue
+            "false", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getjump_ignore_signal
      *
@@ -3861,11 +3861,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * stderr will not be reported as an error by the Job Scheduler. */
     @JSOptionDefinition(name = "jump_ignore_stderr", description = "This job checks if any output to stderr has been c", key = "jump_ignore_stderr", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean jump_ignore_stderr = new SOSOptionBoolean(this, conClassName + ".jump_ignore_stderr", // HashMap-Key
-    "This job checks if any output to stderr has been c", // Titel
-    "false", // InitValue
-    "false", // DefaultValue
-    false // isMandatory
-    );
+            "This job checks if any output to stderr has been c", // Titel
+            "false", // InitValue
+            "false", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getjump_ignore_stderr
      *
@@ -3896,11 +3896,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * Password for authentication with the jump_host. */
     @JSOptionDefinition(name = "jump_password", description = "Password for authentication with the jump_host.", key = "jump_password", type = "SOSOptionString", mandatory = false)
     public SOSOptionPassword jump_password = new SOSOptionPassword(this, conClassName + ".jump_password", // HashMap-Key
-    "Password for authentication with the jump_host.", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "Password for authentication with the jump_host.", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getjump_password
      *
@@ -3932,11 +3932,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * is usually port 21, for SFTP this is usually port 22. */
     @JSOptionDefinition(name = "jump_port", description = "Port on the jump_host by which files should be tra", key = "jump_port", type = "SOSOptionString", mandatory = false)
     public SOSOptionPortNumber jump_port = new SOSOptionPortNumber(this, conClassName + ".jump_port", // HashMap-Key
-    "Port on the jump_host by which files should be tra", // Titel
-    "22", // InitValue
-    "22", // DefaultValue
-    false // isMandatory
-    );
+            "Port on the jump_host by which files should be tra", // Titel
+            "22", // InitValue
+            "22", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getjump_port
      *
@@ -3971,11 +3971,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * considered. */
     @JSOptionDefinition(name = "jump_protocol", description = "When using a jump_host then files are first transf", key = "jump_protocol", type = "SOSOptionString", mandatory = false)
     public SOSOptionString jump_protocol = new SOSOptionString(this, conClassName + ".jump_protocol", // HashMap-Key
-    "When using a jump_host then files are first transf", // Titel
-    "sftp", // InitValue
-    "sftp", // DefaultValue
-    false // isMandatory
-    );
+            "When using a jump_host then files are first transf", // Titel
+            "sftp", // InitValue
+            "sftp", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getjump_protocol
      *
@@ -4008,11 +4008,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * proxy is optional. */
     @JSOptionDefinition(name = "jump_proxy_host", description = "The value of this parameter is the host name or th", key = "jump_proxy_host", type = "SOSOptionString", mandatory = false)
     public SOSOptionString jump_proxy_host = new SOSOptionString(this, conClassName + ".jump_proxy_host", // HashMap-Key
-    "The value of this parameter is the host name or th", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "The value of this parameter is the host name or th", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getjump_proxy_host
      *
@@ -4046,11 +4046,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * parameter jump_proxy_host. */
     @JSOptionDefinition(name = "jump_proxy_password", description = "This parameter specifies the password for the prox", key = "jump_proxy_password", type = "SOSOptionString", mandatory = false)
     public SOSOptionString jump_proxy_password = new SOSOptionString(this, conClassName + ".jump_proxy_password", // HashMap-Key
-    "This parameter specifies the password for the prox", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies the password for the prox", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getjump_proxy_password
      *
@@ -4082,11 +4082,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * establish a connection to the jump host, see parameter jump_proxy_host. */
     @JSOptionDefinition(name = "jump_proxy_port", description = "This parameter specifies the port of a proxy that", key = "jump_proxy_port", type = "SOSOptionString", mandatory = false)
     public SOSOptionString jump_proxy_port = new SOSOptionString(this, conClassName + ".jump_proxy_port", // HashMap-Key
-    "This parameter specifies the port of a proxy that", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies the port of a proxy that", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getjump_proxy_port
      *
@@ -4119,11 +4119,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * jump host, see parameter jump_proxy_host. */
     @JSOptionDefinition(name = "jump_proxy_user", description = "The value of this parameter specifies the user acc", key = "jump_proxy_user", type = "SOSOptionString", mandatory = false)
     public SOSOptionUserName jump_proxy_user = new SOSOptionUserName(this, conClassName + ".jump_proxy_user", // HashMap-Key
-    "The value of this parameter specifies the user acc", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "The value of this parameter specifies the user acc", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getjump_proxy_user
      *
@@ -4152,11 +4152,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     /** \var proxy_protocol : http, socks4 oder socks5 */
     @JSOptionDefinition(name = "jump_proxy_protocol", description = "Jump Proxy protocol", key = "jump_proxy_protocol", type = "SOSOptionProxyProtocol", mandatory = false)
     public SOSOptionProxyProtocol jump_proxy_protocol = new SOSOptionProxyProtocol(this, conClassName + ".jump_proxy_protocol", // HashMap-Key
-    "Jump Proxy protocol", // Titel
-    SOSOptionProxyProtocol.Protocol.http.name(), // InitValue
-    SOSOptionProxyProtocol.Protocol.http.name(), // DefaultValue
-    false // isMandatory
-    );
+            "Jump Proxy protocol", // Titel
+            SOSOptionProxyProtocol.Protocol.http.name(), // InitValue
+            SOSOptionProxyProtocol.Protocol.http.name(), // DefaultValue
+            false // isMandatory
+            );
 
     public SOSOptionProxyProtocol getjump_proxy_protocol() {
         return jump_proxy_protocol;
@@ -4174,11 +4174,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * if no shell is present. */
     @JSOptionDefinition(name = "jump_simulate_shell", description = "Should the value true be specified for this parame", key = "jump_simulate_shell", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean jump_simulate_shell = new SOSOptionBoolean(this, conClassName + ".jump_simulate_shell", // HashMap-Key
-    "Should the value true be specified for this parame", // Titel
-    "false", // InitValue
-    "false", // DefaultValue
-    false // isMandatory
-    );
+            "Should the value true be specified for this parame", // Titel
+            "false", // InitValue
+            "false", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getjump_simulate_shell
      *
@@ -4213,11 +4213,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "jump_simulate_shell_inactivity_timeout", description = "If no new characters are written to stdout or stde", key = "jump_simulate_shell_inactivity_timeout", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionInteger jump_simulate_shell_inactivity_timeout = new SOSOptionInteger(this, conClassName
             + ".jump_simulate_shell_inactivity_timeout", // HashMap-Key
-    "If no new characters are written to stdout or stde", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "If no new characters are written to stdout or stde", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getjump_simulate_shell_inactivity_timeout
      *
@@ -4251,11 +4251,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * carried out and that the shell is waiting for the next command. */
     @JSOptionDefinition(name = "jump_simulate_shell_login_timeout", description = "If no new characters are written to stdout or stde", key = "jump_simulate_shell_login_timeout", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionInteger jump_simulate_shell_login_timeout = new SOSOptionInteger(this, conClassName + ".jump_simulate_shell_login_timeout", // HashMap-Key
-    "If no new characters are written to stdout or stde", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "If no new characters are written to stdout or stde", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getjump_simulate_shell_login_timeout
      *
@@ -4290,11 +4290,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * order to check if the shell is ready to accept commands. */
     @JSOptionDefinition(name = "jump_simulate_shell_prompt_trigger", description = "The expected command line prompt. Using this promp", key = "jump_simulate_shell_prompt_trigger", type = "SOSOptionString", mandatory = false)
     public SOSOptionString jump_simulate_shell_prompt_trigger = new SOSOptionString(this, conClassName + ".jump_simulate_shell_prompt_trigger", // HashMap-Key
-    "The expected command line prompt. Using this promp", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "The expected command line prompt. Using this promp", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getjump_simulate_shell_prompt_trigger
      *
@@ -4331,11 +4331,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * jump_password parameter. */
     @JSOptionDefinition(name = "jump_ssh_auth_file", description = "This parameter specifies the path and name of a us", key = "jump_ssh_auth_file", type = "SOSOptionString", mandatory = false)
     public SOSOptionInFileName jump_ssh_auth_file = new SOSOptionInFileName(this, conClassName + ".jump_ssh_auth_file", // HashMap-Key
-    "This parameter specifies the path and name of a us", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies the path and name of a us", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getjump_ssh_auth_file
      *
@@ -4376,11 +4376,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * configured for password authentication. */
     @JSOptionDefinition(name = "jump_ssh_auth_method", description = "This parameter specifies the authentication method", key = "jump_ssh_auth_method", type = "SOSOptionString", mandatory = false)
     public SOSOptionAuthenticationMethod jump_ssh_auth_method = new SOSOptionAuthenticationMethod(this, conClassName + ".jump_ssh_auth_method", // HashMap-Key
-    "This parameter specifies the authentication method", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies the authentication method", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getjump_ssh_auth_method
      *
@@ -4411,11 +4411,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * User name for authentication with the jump_host. */
     @JSOptionDefinition(name = "jump_user", description = "User name for authentication with the jump_host.", key = "jump_user", type = "SOSOptionString", mandatory = false)
     public SOSOptionUserName jump_user = new SOSOptionUserName(this, conClassName + ".jump_user", // HashMap-Key
-    "User name for authentication with the jump_host.", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "User name for authentication with the jump_host.", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getjump_user
      *
@@ -4446,11 +4446,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	 */
     @JSOptionDefinition(name = "jump_dir", description = "This parameter specifies the directory on the jump host", key = "jump_dir", type = "SOSOptionString", mandatory = false)
     public SOSOptionString jump_dir = new SOSOptionString(this, conClassName + ".jump_dir", // HashMap-Key
-    "This parameter specifies the directory on the jump host", // Titel
-    "/tmp", // InitValue
-    "/tmp", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies the directory on the jump host", // Titel
+            "/tmp", // InitValue
+            "/tmp", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getjump_dir
      *
@@ -4478,7 +4478,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	 * 
 	 */
     @JSOptionDefinition(name = "jump_strict_hostKey_checking", description = "Check the hostkey against known hosts for SSH", key = "jump_strict_hostKey_checking", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean jump_strict_hostkey_checking = new SOSOptionBoolean(this, conClassName + ".jump_strict_hostkey_checking", "Check the hostkey against known hosts for SSH", "false", "false", false);
+    public SOSOptionBoolean jump_strict_hostkey_checking = new SOSOptionBoolean(this, conClassName + ".jump_strict_hostkey_checking",
+            "Check the hostkey against known hosts for SSH", "false", "false", false);
 
     public SOSOptionBoolean getjump_strict_hostKey_checking() {
         return jump_strict_hostkey_checking;
@@ -4493,11 +4494,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 	 */
     @JSOptionDefinition(name = "jump_platform", description = "This parameter specifies the platform on the jump host", key = "jump_dir", type = "SOSOptionPlatform", mandatory = false)
     public SOSOptionPlatform jump_platform = new SOSOptionPlatform(this, conClassName + ".jump_platform", // HashMap-Key
-    "This parameter specifies the platform on the jump host", // Titel
-    SOSOptionPlatform.enuValidPlatforms.unix.name(), // InitValue
-    SOSOptionPlatform.enuValidPlatforms.unix.name(), // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies the platform on the jump host", // Titel
+            SOSOptionPlatform.enuValidPlatforms.unix.name(), // InitValue
+            SOSOptionPlatform.enuValidPlatforms.unix.name(), // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getjump_platform
      *
@@ -4537,11 +4538,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * supported. */
     @JSOptionDefinition(name = "local_dir", description = "local_dir Local directory into which or from which", key = "local_dir", type = "SOSOptionFolderName", mandatory = true)
     public SOSOptionFolderName local_dir = new SOSOptionFolderName(this, conClassName + ".local_dir", // HashMap-Key
-    "local_dir Local directory into which or from which", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "local_dir Local directory into which or from which", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getlocal_dir
      *
@@ -4574,11 +4575,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * parameter history and has no technical relevance for the transfer. */
     @JSOptionDefinition(name = "mandator", description = "This parameter specifies the mandator for which a", key = "mandator", type = "SOSOptionString", mandatory = false)
     public SOSOptionString mandator = new SOSOptionString(this, conClassName + ".mandator", // HashMap-Key
-    "This parameter specifies the mandator for which a", // Titel
-    "SOS", // InitValue
-    "SOS", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies the mandator for which a", // Titel
+            "SOS", // InitValue
+            "SOS", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getmandator
      *
@@ -4613,11 +4614,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * SOSFTP on a remote server */
     @JSOptionDefinition(name = "operation", description = "Operation to be executed send, receive, remove,", key = "operation", type = "SOSOptionStringValueList", mandatory = true)
     public SOSOptionJadeOperation operation = new SOSOptionJadeOperation(this, conClassName + ".operation", // HashMap-Key
-    "Operation to be executed send, receive, remove,", // Titel
-    "send", // InitValue
-    "send", // DefaultValue
-    true // isMandatory
-    );
+            "Operation to be executed send, receive, remove,", // Titel
+            "send", // InitValue
+            "send", // DefaultValue
+            true // isMandatory
+            );
 
     /** \brief getoperation
      *
@@ -4651,11 +4652,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * stating that "no matching files" could be found. */
     @JSOptionDefinition(name = "overwrite_files", description = "This parameter specifies if existing files should", key = "overwrite_files", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean overwrite_files = new SOSOptionBoolean(this, conClassName + ".overwrite_files", // HashMap-Key
-    "This parameter specifies if existing files should", // Titel
-    "true", // InitValue
-    "true", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies if existing files should", // Titel
+            "true", // InitValue
+            "true", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getoverwrite_files
      *
@@ -4687,11 +4688,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * 1. */
     @JSOptionDefinition(name = "passive_mode", description = "passive_mode Passive mode for FTP is often used wit", key = "passive_mode", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean passive_mode = new SOSOptionBoolean(this, conClassName + ".passive_mode", // HashMap-Key
-    "passive_mode Passive mode for FTP is often used wit", // Titel
-    "false", // InitValue
-    "false", // DefaultValue
-    false // isMandatory
-    );
+            "passive_mode Passive mode for FTP is often used wit", // Titel
+            "false", // InitValue
+            "false", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getpassive_mode
      *
@@ -4726,11 +4727,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * secures a private key. */
     @JSOptionDefinition(name = "password", description = "Password for UserID Password for a", key = "password", type = "SOSOptionPassword", mandatory = false)
     public SOSOptionPassword password = new SOSOptionPassword(this, conClassName + ".password", // HashMap-Key
-    "Password for UserID Password for a", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "Password for UserID Password for a", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getpassword
      *
@@ -4763,11 +4764,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * poll_timeout. */
     @JSOptionDefinition(name = "poll_interval", description = "This parameter specifies the interval in seconds", key = "poll_interval", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionTime poll_interval = new SOSOptionTime(this, conClassName + ".poll_interval", // HashMap-Key
-    "This parameter specifies the interval in seconds", // Titel
-    "60", // InitValue
-    "60", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies the interval in seconds", // Titel
+            "60", // InitValue
+            "60", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getpoll_interval
      *
@@ -4804,12 +4805,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "Waiting_for_Late_comers", description = "Wait an additional interval for late comers", key = "Waiting_for_Late_comers", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean WaitingForLateComers = new SOSOptionBoolean(
     // ...
-    this, // ....
-    conClassName + ".Waiting_for_Late_comers", // ...
-    "Wait an additional interval for late comers", // ...
-    "false", // ...
-    "false", // ...
-    false);
+            this, // ....
+            conClassName + ".Waiting_for_Late_comers", // ...
+            "Wait an additional interval for late comers", // ...
+            "false", // ...
+            "false", // ...
+            false);
 
     public String getWaiting_for_Late_comers() {
         @SuppressWarnings("unused")
@@ -4831,11 +4832,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * parameter is used exclusively with the parameters poll_timeout. */
     @JSOptionDefinition(name = "poll_minfiles", description = "This parameter specifies the number of files tha", key = "poll_minfiles", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionInteger poll_minfiles = new SOSOptionInteger(this, conClassName + ".poll_minfiles", // HashMap-Key
-    "This parameter specifies the number of files tha", // Titel
-    "0", // InitValue
-    "0", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies the number of files tha", // Titel
+            "0", // InitValue
+            "0", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getpoll_minfiles
      *
@@ -4872,12 +4873,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "PollingDuration", description = "The duration of the polling period", key = "PollingDuration", type = "SOSOptionTime", mandatory = false)
     public SOSOptionTime PollingDuration = new SOSOptionTime(
     // ...
-    this, // ....
-    conClassName + ".PollingDuration", // ...
-    "The duration of the polling period", // ...
-    "0", // ...
-    "0", // ...
-    false);
+            this, // ....
+            conClassName + ".PollingDuration", // ...
+            "The duration of the polling period", // ...
+            "0", // ...
+            "0", // ...
+            false);
 
     public String getPollingDuration() {
         @SuppressWarnings("unused")
@@ -4899,11 +4900,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * be transferred, otherwise an error "no matching files" will be raised. */
     @JSOptionDefinition(name = "poll_timeout", description = "This parameter specifies the time in minutes, how", key = "poll_timeout", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionInteger poll_timeout = new SOSOptionInteger(this, conClassName + ".poll_timeout", // HashMap-Key
-    "This parameter specifies the time in minutes, how", // Titel
-    "0", // InitValue
-    "0", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies the time in minutes, how", // Titel
+            "0", // InitValue
+            "0", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getpoll_timeout
      *
@@ -4935,11 +4936,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * 21, for SFTP this is usually port 22. */
     @JSOptionDefinition(name = "port", description = "Port-Number to be used for Data-Transfer", key = "port", type = "SOSOptionPortNumber", mandatory = true)
     public SOSOptionPortNumber port = new SOSOptionPortNumber(this, conClassName + ".port", // HashMap-Key
-    "Port-Number to be used for Data-Transfer", // Titel
-    "21", // InitValue
-    "21", // DefaultValue
-    true // isMandatory
-    );
+            "Port-Number to be used for Data-Transfer", // Titel
+            "21", // InitValue
+            "21", // DefaultValue
+            true // isMandatory
+            );
 
     /** \brief getport
      *
@@ -4975,11 +4976,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * parameter history). */
     @JSOptionDefinition(name = "ppid", description = "This parameter is used for Unix systems and - as o", key = "ppid", type = "SOSOptionProcessID", mandatory = false)
     public SOSOptionProcessID ppid = new SOSOptionProcessID(this, conClassName + ".ppid", // HashMap-Key
-    "This parameter is used for Unix systems and - as o", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter is used for Unix systems and - as o", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getppid
      *
@@ -5017,11 +5018,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * -profile=sample_transfer ... */
     @JSOptionDefinition(name = "profile", description = "The Name of a Profile-Section to be executed", key = "profile", type = "SOSOptionString", mandatory = false)
     public SOSOptionString profile = new SOSOptionString(this, conClassName + ".profile", // HashMap-Key
-    "The Name of a Profile-Section to be executed", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "The Name of a Profile-Section to be executed", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getprofile
      *
@@ -5054,11 +5055,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * used, then the ssh_* parameters will be applied. */
     @JSOptionDefinition(name = "protocol", description = "Type of requested Datatransfer The values ftp, sftp", key = "protocol", type = "SOSOptionStringValueList", mandatory = true)
     public SOSOptionTransferType protocol = new SOSOptionTransferType(this, conClassName + ".protocol", // HashMap-Key
-    "Type of requested Datatransfer The values ftp, sftp", // Titel
-    "ftp", // InitValue
-    "ftp", // DefaultValue
-    true // isMandatory
-    );
+            "Type of requested Datatransfer The values ftp, sftp", // Titel
+            "ftp", // InitValue
+            "ftp", // DefaultValue
+            true // isMandatory
+            );
 
     /** \brief getprotocol
      *
@@ -5093,11 +5094,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * subdirectories as specified by the parameter file_spec. */
     @JSOptionDefinition(name = "recursive", description = "This parameter specifies if files from subdirector", key = "recursive", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean recursive = new SOSOptionBoolean(this, conClassName + ".recursive", // HashMap-Key
-    "This parameter specifies if files from subdirector", // Titel
-    "false", // InitValue
-    "false", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies if files from subdirector", // Titel
+            "false", // InitValue
+            "false", // DefaultValue
+            false // isMandatory
+            );
     public SOSOptionBoolean IncludeSubdirectories = (SOSOptionBoolean) recursive.SetAlias("include_sub_directories");
 
     /** \brief getrecursive
@@ -5132,11 +5133,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * server is used. */
     @JSOptionDefinition(name = "remote_dir", description = "remote_dir Directory at the FTP/SFTP server from wh", key = "remote_dir", type = "SOSOptionFolderName", mandatory = true)
     public SOSOptionFolderName remote_dir = new SOSOptionFolderName(this, conClassName + ".remote_dir", // HashMap-Key
-    "remote_dir Directory at the FTP/SFTP server from wh", // Titel
-    ".", // InitValue
-    ".", // DefaultValue
-    false // isMandatory
-    );
+            "remote_dir Directory at the FTP/SFTP server from wh", // Titel
+            ".", // InitValue
+            ".", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getremote_dir
      *
@@ -5168,11 +5169,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * removed after transfer. */
     @JSOptionDefinition(name = "remove_files", description = "This parameter specifies whether files on the FTP/", key = "remove_files", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean remove_files = new SOSOptionBoolean(this, conClassName + ".remove_files", // HashMap-Key
-    "This parameter specifies whether files on the FTP/", // Titel
-    "false", // InitValue
-    "false", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies whether files on the FTP/", // Titel
+            "false", // InitValue
+            "false", // DefaultValue
+            false // isMandatory
+            );
     public SOSOptionBoolean DeleteFilesAfterTransfer = (SOSOptionBoolean) remove_files.SetAlias(conClassName + ".DeleteFilesAfterTransfer");
     public SOSOptionBoolean DeleteFilesOnSource = (SOSOptionBoolean) remove_files.SetAlias(conClassName + ".DeleteFilesOnSource");
 
@@ -5219,11 +5220,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * to be specified. */
     @JSOptionDefinition(name = "replacement", description = "String for replacement of matching character seque", key = "replacement", type = "SOSOptionString", mandatory = false)
     public SOSOptionString replacement = new SOSOptionString(this, conClassName + ".replacement", // HashMap-Key
-    "String for replacement of matching character seque", // Titel
-    null, // InitValue
-    null, // DefaultValue
-    false // isMandatory
-    );
+            "String for replacement of matching character seque", // Titel
+            null, // InitValue
+            null, // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getreplacement
      *
@@ -5264,11 +5265,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * replacement to be specified. */
     @JSOptionDefinition(name = "replacing", description = "Regular expression for filename replacement with", key = "replacing", type = "SOSOptionRegExp", mandatory = false)
     public SOSOptionRegExp replacing = new SOSOptionRegExp(this, conClassName + ".replacing", // HashMap-Key
-    "Regular expression for filename replacement with", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "Regular expression for filename replacement with", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getreplacing
      *
@@ -5305,11 +5306,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * system. */
     @JSOptionDefinition(name = "root", description = "The parameter specifies the directory in which thi", key = "root", type = "SOSOptionFolderName", mandatory = false)
     public SOSOptionFolderName root = new SOSOptionFolderName(this, conClassName + ".root", // HashMap-Key
-    "The parameter specifies the directory in which thi", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "The parameter specifies the directory in which thi", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getroot
      *
@@ -5348,11 +5349,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * on. */
     @JSOptionDefinition(name = "scheduler_host", description = "This parameter specifies the host name or IP addre", key = "scheduler_host", type = "SOSOptionString", mandatory = false)
     public SOSOptionHostName scheduler_host = new SOSOptionHostName(this, conClassName + ".scheduler_host", // HashMap-Key
-    "This parameter specifies the host name or IP addre", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies the host name or IP addre", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
     public SOSOptionHostName BackgroundServiceHost = (SOSOptionHostName) scheduler_host.SetAlias("Background_Service_Host");
 
     /** \brief getscheduler_host
@@ -5387,11 +5388,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * performs an import into a central database. */
     @JSOptionDefinition(name = "scheduler_job_chain", description = "The name of a job chain for Managed File Transfer", key = "scheduler_job_chain", type = "JSJobChain", mandatory = false)
     public JSJobChain scheduler_job_chain = new JSJobChain(this, conClassName + ".scheduler_job_chain", // HashMap-Key
-    "The name of a job chain for Background Service", // Titel
-    "/sos/jade/jade_history", // InitValue
-    "/sos/jade/jade_history", // DefaultValue
-    false // isMandatory
-    );
+            "The name of a job chain for Background Service", // Titel
+            "/sos/jade/jade_history", // InitValue
+            "/sos/jade/jade_history", // DefaultValue
+            false // isMandatory
+            );
     public JSJobChain BackgroundServiceJobChainName = (JSJobChain) scheduler_job_chain.SetAlias("BackgroundService_Job_Chain_Name");
 
     /** \brief getscheduler_job_chain
@@ -5425,12 +5426,13 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * see parameter scheduler_host. */
     @JSOptionDefinition(name = "scheduler_port", description = "The port for which a Job Scheduler for Managed File Trans", key = "scheduler_port", type = "SOSOptionString", mandatory = false)
     public SOSOptionPortNumber scheduler_port = new SOSOptionPortNumber(this, conClassName + ".scheduler_port", // HashMap-Key
-    "The port for which a Job Scheduler for Managed File Trans", // Titel
-    "0", // InitValue
-    "4444", // DefaultValue
-    false // isMandatory
-    );
-    public SOSOptionPortNumber BackgroundServicePort = (SOSOptionPortNumber) scheduler_port.SetAlias("Background_Service_Port", "Background_Service_PortNumber");
+            "The port for which a Job Scheduler for Managed File Trans", // Titel
+            "0", // InitValue
+            "4444", // DefaultValue
+            false // isMandatory
+            );
+    public SOSOptionPortNumber BackgroundServicePort = (SOSOptionPortNumber) scheduler_port.SetAlias("Background_Service_Port",
+            "Background_Service_PortNumber");
 
     /** \brief getscheduler_port
      *
@@ -5467,12 +5469,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "Restart", description = "Set Restart/Resume Mode for Transfer", key = "Restart", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean Restart = new SOSOptionBoolean(
     // ...
-    this, // ....
-    conClassName + ".Restart", // ...
-    "Set Restart/Resume Mode for Transfer", // ...
-    "false", // ...
-    "false", // ...
-    false);
+            this, // ....
+            conClassName + ".Restart", // ...
+            "Set Restart/Resume Mode for Transfer", // ...
+            "false", // ...
+            "false", // ...
+            false);
     public SOSOptionBoolean ResumeTransfer = (SOSOptionBoolean) Restart.SetAlias(conClassName + "Resume", conClassName + "Resume_Transfer");
 
     public String getRestart() {
@@ -5505,12 +5507,13 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * settings. */
     @JSOptionDefinition(name = "settings", description = "Name of INI-File which contains the transfer profiles to execute", key = "settings", type = "SOSOptionIniFileName", mandatory = false)
     public SOSOptionIniFileName settings = new SOSOptionIniFileName(this, conClassName + ".settings", // HashMap-Key
-    "Name of INI-File which contains the transfer profiles to execute", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
-    public SOSOptionIniFileName ConfigurationFile = (SOSOptionIniFileName) settings.SetAlias("JADE_Configuration_File", "JADE_Config_File", "Configuration", "JADE_Configuration", "JADE_INI_FILE");
+            "Name of INI-File which contains the transfer profiles to execute", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
+    public SOSOptionIniFileName ConfigurationFile = (SOSOptionIniFileName) settings.SetAlias("JADE_Configuration_File", "JADE_Config_File",
+            "Configuration", "JADE_Configuration", "JADE_INI_FILE");
     public SOSOptionIniFileName SOSIniFileName = (SOSOptionIniFileName) settings.SetAlias(conClassName + ".SOSIniFileName");
 
     /** \brief getsettings
@@ -5544,11 +5547,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * files or to only delete files on the FTP/SFTP server. */
     @JSOptionDefinition(name = "skip_transfer", description = "If this Parameter is set to true then", key = "skip_transfer", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean skip_transfer = new SOSOptionBoolean(this, conClassName + ".skip_transfer", // HashMap-Key
-    "If this Parameter is set to true then", // Titel
-    "false", // InitValue
-    "false", // DefaultValue
-    false // isMandatory
-    );
+            "If this Parameter is set to true then", // Titel
+            "false", // InitValue
+            "false", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getskip_transfer
      *
@@ -5584,11 +5587,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * the password parameter. */
     @JSOptionDefinition(name = "ssh_auth_file", description = "This parameter specifies the path and name of a us", key = "ssh_auth_file", type = "SOSOptionInFileName", mandatory = false)
     public SOSOptionInFileName ssh_auth_file = new SOSOptionInFileName(this, conClassName + ".ssh_auth_file", // HashMap-Key
-    "This parameter specifies the path and name of a us", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies the path and name of a us", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
     public SOSOptionInFileName auth_file = (SOSOptionInFileName) ssh_auth_file.SetAlias(conClassName + ".auth_file");
 
     /** \brief getssh_auth_file
@@ -5629,11 +5632,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * password authentication. */
     @JSOptionDefinition(name = "ssh_auth_method", description = "This parameter specifies the authentication method", key = "ssh_auth_method", type = "SOSOptionStringValueList", mandatory = false)
     public SOSOptionAuthenticationMethod ssh_auth_method = new SOSOptionAuthenticationMethod(this, conClassName + ".ssh_auth_method", // HashMap-Key
-    "This parameter specifies the authentication method", // Titel
-    "publickey", // InitValue
-    "publickey", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies the authentication method", // Titel
+            "publickey", // InitValue
+            "publickey", // DefaultValue
+            false // isMandatory
+            );
     public SOSOptionAuthenticationMethod auth_method = (SOSOptionAuthenticationMethod) ssh_auth_method.SetAlias(conClassName + ".auth_method");
 
     /** \brief getssh_auth_method
@@ -5667,11 +5670,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * use of a proxy is optional. */
     @JSOptionDefinition(name = "ssh_proxy_host", description = "The value of this parameter is the host name or th", key = "ssh_proxy_host", type = "SOSOptionString", mandatory = false)
     public SOSOptionString ssh_proxy_host = new SOSOptionString(this, conClassName + ".ssh_proxy_host", // HashMap-Key
-    "The value of this parameter is the host name or th", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "The value of this parameter is the host name or th", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getssh_proxy_host
      *
@@ -5704,11 +5707,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * should a proxy be used in order to connect to the SSH server. */
     @JSOptionDefinition(name = "ssh_proxy_password", description = "This parameter specifies the password for the prox", key = "ssh_proxy_password", type = "SOSOptionString", mandatory = false)
     public SOSOptionString ssh_proxy_password = new SOSOptionString(this, conClassName + ".ssh_proxy_password", // HashMap-Key
-    "This parameter specifies the password for the prox", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies the password for the prox", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getssh_proxy_password
      *
@@ -5740,11 +5743,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * used in order to establish a connection to the SSH server. */
     @JSOptionDefinition(name = "ssh_proxy_port", description = "This parameter specifies the port number of the pr", key = "ssh_proxy_port", type = "SOSOptionString", mandatory = false)
     public SOSOptionString ssh_proxy_port = new SOSOptionString(this, conClassName + ".ssh_proxy_port", // HashMap-Key
-    "This parameter specifies the port number of the pr", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies the port number of the pr", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getssh_proxy_port
      *
@@ -5777,11 +5780,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * server. */
     @JSOptionDefinition(name = "ssh_proxy_user", description = "The value of this parameter specifies the user acc", key = "ssh_proxy_user", type = "SOSOptionString", mandatory = false)
     public SOSOptionString ssh_proxy_user = new SOSOptionString(this, conClassName + ".ssh_proxy_user", // HashMap-Key
-    "The value of this parameter specifies the user acc", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "The value of this parameter specifies the user acc", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getssh_proxy_user
      *
@@ -5825,11 +5828,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * removed. */
     @JSOptionDefinition(name = "transactional", description = "This parameter specifies if file transfers should", key = "transactional", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean transactional = new SOSOptionBoolean(this, conClassName + ".transactional", // HashMap-Key
-    "This parameter specifies if file transfers should", // Titel
-    "false", // InitValue
-    "false", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies if file transfers should", // Titel
+            "false", // InitValue
+            "false", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief gettransactional
      *
@@ -5862,11 +5865,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * binary. */
     @JSOptionDefinition(name = "transfer_mode", description = "Type of Character-Encoding Transfe", key = "transfer_mode", type = "SOSOptionTransferMode", mandatory = false)
     public SOSOptionTransferMode transfer_mode = new SOSOptionTransferMode(this, conClassName + ".transfer_mode", // HashMap-Key
-    "Type of Character-Encoding Transfe", // Titel
-    "binary", // InitValue
-    "binary", // DefaultValue
-    false // isMandatory
-    );
+            "Type of Character-Encoding Transfe", // Titel
+            "binary", // InitValue
+            "binary", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief gettransfer_mode
      *
@@ -5897,11 +5900,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * User name for authentication at the (FTP/SFTP) server. */
     @JSOptionDefinition(name = "user", description = "UserID of user in charge User name", key = "user", type = "SOSOptionUserName", mandatory = true)
     public SOSOptionUserName user = new SOSOptionUserName(this, conClassName + ".user", // HashMap-Key
-    "UserID of user in charge User name", // Titel
-    "", // InitValue
-    "anonymous", // DefaultValue
-    false // isMandatory
-    );
+            "UserID of user in charge User name", // Titel
+            "", // InitValue
+            "anonymous", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getuser
      *
@@ -5935,11 +5938,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * that has been specified with the parameter log_filename. */
     @JSOptionDefinition(name = "verbose", description = "The granuality of (Debug-)Messages The verbosit", key = "verbose", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionInteger verbose = new SOSOptionInteger(this, conClassName + ".verbose", // HashMap-Key
-    "The granuality of (Debug-)Messages The verbosit", // Titel
-    "1", // InitValue
-    "10", // DefaultValue
-    false // isMandatory
-    );
+            "The granuality of (Debug-)Messages The verbosit", // Titel
+            "1", // InitValue
+            "10", // DefaultValue
+            false // isMandatory
+            );
 
     /** \brief getverbose
      *
@@ -5978,11 +5981,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
      * transferred. */
     @JSOptionDefinition(name = "zero_byte_transfer", description = "This parameter specifies whether zero byte files", key = "zero_byte_transfer", type = "SOSOptionZeroByteTransfer", mandatory = false)
     public SOSOptionZeroByteTransfer zero_byte_transfer = new SOSOptionZeroByteTransfer(this, conClassName + ".zero_byte_transfer", // HashMap-Key
-    "This parameter specifies whether zero byte files", // Titel
-    "yes", // InitValue
-    "yes", // DefaultValue
-    false // isMandatory
-    );
+            "This parameter specifies whether zero byte files", // Titel
+            "yes", // InitValue
+            "yes", // DefaultValue
+            false // isMandatory
+            );
     public SOSOptionZeroByteTransfer TransferZeroByteFiles = (SOSOptionZeroByteTransfer) zero_byte_transfer.SetAlias("transfer_zero_byte_files");
 
     public SOSFtpOptionsSuperClass() {
@@ -6349,12 +6352,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 
     @JSOptionDefinition(name = "raise_exception_on_error", description = "Raise an Exception if an error occured", key = "raise_exception_on_error", type = "SOSOptionBoolean", mandatory = true)
     public SOSOptionBoolean raise_exception_on_error = new SOSOptionBoolean( // ...
-    this, // ....
-    conClassName + ".raise_exception_on_error", // ...
-    "Raise an Exception if an error occured", // ...
-    "true", // ...
-    "true", // ...
-    true);
+            this, // ....
+            conClassName + ".raise_exception_on_error", // ...
+            "Raise an Exception if an error occured", // ...
+            "true", // ...
+            "true", // ...
+            true);
 
     public SOSOptionBoolean getraise_exception_on_error() {
         return raise_exception_on_error;
@@ -6365,8 +6368,9 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     }
 
     @JSOptionDefinition(name = "ProtocolCommandListener", description = "Activate the logging for Apache ftp client", key = "protocol_command_listener", type = "SOSOptionBoolean", mandatory = true)
-    public SOSOptionBoolean ProtocolCommandListener = new SOSOptionBoolean(this, conClassName + ".protocol_command_listener", "Activate the logging for Apache ftp client", // ...
-    "false", "false", true);
+    public SOSOptionBoolean ProtocolCommandListener = new SOSOptionBoolean(this, conClassName + ".protocol_command_listener",
+            "Activate the logging for Apache ftp client", // ...
+            "false", "false", true);
 
 } // public class SOSFtpOptionsSuperClass
 //

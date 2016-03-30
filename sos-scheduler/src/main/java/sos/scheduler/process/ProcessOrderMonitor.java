@@ -75,7 +75,8 @@ public class ProcessOrderMonitor extends ProcessBaseMonitor {
             if (rc == false) {
                 if (order.params() != null
                         && order.params().value("setback") != null
-                        && (order.params().value("setback").equalsIgnoreCase("false") || order.params().value("setback").equalsIgnoreCase("no") || order.params().value("setback").equals("0"))) {
+                        && (order.params().value("setback").equalsIgnoreCase("false") || order.params().value("setback").equalsIgnoreCase("no") || order.params().value(
+                                "setback").equals("0"))) {
                     // nop
                 } else {
                     spooler_task.order().setback();

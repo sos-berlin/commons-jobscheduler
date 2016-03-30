@@ -351,11 +351,14 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                         } catch (Exception ex) {
                             logger.debug(ex.toString(), ex);
                         }
-                        String strT = String.format("Integrity Hash violation. File %1$s, checksum read: '%2$s', checksum calculated: '%3$s'", sourceChecksumFileName, origChecksum, checksum4check);
+                        String strT =
+                                String.format("Integrity Hash violation. File %1$s, checksum read: '%2$s', checksum calculated: '%3$s'",
+                                        sourceChecksumFileName, origChecksum, checksum4check);
                         setStatus(enuTransferStatus.transfer_aborted);
                         throw new JobSchedulerException(strT);
                     } else {
-                        logger.info(String.format("Integrity Hash is OK: File %1$s, checksum read '%2$s', checksum calculated '%3$s'", sourceChecksumFileName, origChecksum, checksum4check));
+                        logger.info(String.format("Integrity Hash is OK: File %1$s, checksum read '%2$s', checksum calculated '%3$s'",
+                                sourceChecksumFileName, origChecksum, checksum4check));
                     }
                 } else {
                     logger.info(String.format("Checksum file '%1$s' not found", sourceChecksumFileName));
@@ -1023,7 +1026,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                 objTargetTransferFile.setModeRestart(objOptions.ResumeTransfer.value());
             }
             strSourceTransferName = getFileNameWithoutPath(strSourceTransferName);
-            objSourceTransferFile = objDataSourceClient.getFileHandle(MakeFullPathName(getPathWithoutFileName(strSourceFileName), strSourceTransferName));
+            objSourceTransferFile =
+                    objDataSourceClient.getFileHandle(MakeFullPathName(getPathWithoutFileName(strSourceFileName), strSourceTransferName));
             if (eTransferStatus == enuTransferStatus.ignoredDueToZerobyteConstraint) {
                 String strM = SOSVfs_D_0110.params(strSourceFileName);
                 logger.debug(strM);
@@ -1543,7 +1547,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                 fileAttributes.put(FIELD_STATUS, jumpHistoryRecord.getOrDefault(FIELD_STATUS, "")); // 21-
                                                                                                     // status=success|error
                 if (recordType.equals(HistoryRecordType.XML)) {
-                    last_error_message = normalizeErrorMessageForXml(StringEscapeUtils.unescapeXml(jumpHistoryRecord.getOrDefault(FIELD_LAST_ERROR_MESSAGE, "")));
+                    last_error_message =
+                            normalizeErrorMessageForXml(StringEscapeUtils.unescapeXml(jumpHistoryRecord.getOrDefault(FIELD_LAST_ERROR_MESSAGE, "")));
                 } else {
                     last_error_message = jumpHistoryRecord.getOrDefault(FIELD_LAST_ERROR_MESSAGE, "");
                 }
@@ -1645,7 +1650,9 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     public String toString() {
         String strT;
         try {
-            strT = SOSVfs_D_214.params(this.getTargetFileNameAndPath(), this.SourceFileName(), this.NoOfBytesTransferred(), objOptions.operation.Value());
+            strT =
+                    SOSVfs_D_214.params(this.getTargetFileNameAndPath(), this.SourceFileName(), this.NoOfBytesTransferred(),
+                            objOptions.operation.Value());
         } catch (RuntimeException e) {
             logger.error(e.toString());
             strT = "???";

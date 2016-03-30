@@ -112,7 +112,8 @@ public class SOSOptionJadeOperation extends SOSOptionStringValueList {
             }
 
             if (flgOperationIsValid == false) {
-                throw new JobSchedulerException(String.format("unknown or invalid value for parameter '%1$s' specified: '%2$s'", this.getShortKey(), pstrValue));
+                throw new JobSchedulerException(String.format("unknown or invalid value for parameter '%1$s' specified: '%2$s'", this.getShortKey(),
+                        pstrValue));
             }
         }
         super.Value(pstrValue);

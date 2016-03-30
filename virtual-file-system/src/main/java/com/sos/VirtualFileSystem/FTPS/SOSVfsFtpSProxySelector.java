@@ -47,7 +47,8 @@ public class SOSVfsFtpSProxySelector extends ProxySelector {
         Proxy proxy = null;
         List<Proxy> result = null;
 
-        logger.debug(String.format("using proxy [%s]. protocol = %s, host = %s:%s, user = %s ", uri.getScheme(), proxyProtocol, proxyHost, proxyPort, proxyUser));
+        logger.debug(String.format("using proxy [%s]. protocol = %s, host = %s:%s, user = %s ", uri.getScheme(), proxyProtocol, proxyHost, proxyPort,
+                proxyUser));
 
         if (!SOSString.isEmpty(proxyUser)) {
             Authenticator.setDefault(new Authenticator() {
@@ -77,7 +78,8 @@ public class SOSVfsFtpSProxySelector extends ProxySelector {
         if (uri == null || addr == null || ex == null) {
             throw new IllegalArgumentException("Arguments can't be null.");
         }
-        throw new UnsupportedOperationException(String.format("connect failed[uri: %s][socket address: %s]: %s", uri.toString(), addr.toString(), ex.toString()));
+        throw new UnsupportedOperationException(String.format("connect failed[uri: %s][socket address: %s]: %s", uri.toString(), addr.toString(),
+                ex.toString()));
     }
 
 }

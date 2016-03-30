@@ -26,12 +26,14 @@ public class JobSchedulerProcessDatabaseJob extends ProcessOrderJob {
                     orderId = order.id();
                     if (order.params().value("configuration_path") != null && !order.params().value("configuration_path").isEmpty()) {
                         this.setConfigurationPath(order.params().value("configuration_path"));
-                    } else if (spooler_task.params().value("configuration_path") != null && !spooler_task.params().value("configuration_path").isEmpty()) {
+                    } else if (spooler_task.params().value("configuration_path") != null
+                            && !spooler_task.params().value("configuration_path").isEmpty()) {
                         this.setConfigurationPath(spooler_task.params().value("configuration_path"));
                     }
                     if (order.params().value("configuration_file") != null && !order.params().value("configuration_file").isEmpty()) {
                         this.setConfigurationFilename(order.params().value("configuration_file"));
-                    } else if (spooler_task.params().value("configuration_file") != null && !spooler_task.params().value("configuration_file").isEmpty()) {
+                    } else if (spooler_task.params().value("configuration_file") != null
+                            && !spooler_task.params().value("configuration_file").isEmpty()) {
                         this.setConfigurationFilename(spooler_task.params().value("configuration_file"));
                     }
                     this.initConfiguration();
@@ -71,9 +73,9 @@ public class JobSchedulerProcessDatabaseJob extends ProcessOrderJob {
                         }
                     }
                     this.getLogger().debug3("connecting to database ...");
-                    this.setConnection(SOSConnection.createInstance(this.getParameters().value("db_class"), this.getParameters().value("db_driver"), this
-                            .getParameters().value("db_url"), this.getParameters().value("db_user"), this.getParameters().value("db_password"), this
-                            .getLogger()));
+                    this.setConnection(SOSConnection.createInstance(this.getParameters().value("db_class"), this.getParameters().value("db_driver"),
+                            this.getParameters().value("db_url"), this.getParameters().value("db_user"), this.getParameters().value("db_password"),
+                            this.getLogger()));
                     this.getConnection().connect();
                     this.getLogger().debug3("connected to database");
                 } catch (Exception e) {
@@ -82,7 +84,8 @@ public class JobSchedulerProcessDatabaseJob extends ProcessOrderJob {
                 try {
                     String[] parameterNames = this.getParameters().names().split(";");
                     for (int i = 0; i < parameterNames.length; i++) {
-                        this.setCommand(this.getCommand().replaceAll("\\$\\{" + parameterNames[i] + "\\}", this.getParameters().value(parameterNames[i])));
+                        this.setCommand(this.getCommand().replaceAll("\\$\\{" + parameterNames[i] + "\\}",
+                                this.getParameters().value(parameterNames[i])));
                     }
                     this.getLogger().info("executing database command: " + this.getCommand());
                     this.executeStatements(this.getConnection(), this.getCommand());
@@ -151,7 +154,7 @@ public class JobSchedulerProcessDatabaseJob extends ProcessOrderJob {
             }
         } catch (Exception e) {
             // gracefully ignore errors from dbms output processing
-        } 
+        }
         if (exception != null) {
             throw new Exception(exception);
         }

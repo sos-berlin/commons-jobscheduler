@@ -189,21 +189,24 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
             if (!crontabFile.canRead()) {
                 logger.info("Failed to read crontab " + crontabFile.getAbsolutePath());
             }
-            HashMap<String, Element> previousMapping = (HashMap<String, Element>) SchedulerJavaObject.getObject(spooler.variables(), spooler_job.name()
-                    + "_" + crontabFile.getAbsolutePath() + "_cron2job_mapping");
+            HashMap<String, Element> previousMapping =
+                    (HashMap<String, Element>) SchedulerJavaObject.getObject(spooler.variables(), spooler_job.name() + "_"
+                            + crontabFile.getAbsolutePath() + "_cron2job_mapping");
             if (previousMapping == null) {
                 previousMapping = new HashMap<String, Element>();
             }
-            HashMap<String, String> previousCommentsMapping = (HashMap<String, String>) SchedulerJavaObject.getObject(spooler.variables(), spooler_job.name()
-                    + "_" + crontabFile.getAbsolutePath() + "_cron2comments_mapping");
+            HashMap<String, String> previousCommentsMapping =
+                    (HashMap<String, String>) SchedulerJavaObject.getObject(spooler.variables(), spooler_job.name() + "_"
+                            + crontabFile.getAbsolutePath() + "_cron2comments_mapping");
             if (previousCommentsMapping == null) {
                 previousCommentsMapping = new HashMap<String, String>();
             }
             debugHashMap(previousCommentsMapping, "previousCommentsMapping");
             HashMap<String, String> currentCommentsMapping = new HashMap<String, String>();
             HashMap<String, Element> changedJobs = new HashMap<String, Element>();
-            HashSet<?> previousEnvVariables = (HashSet<?>) SchedulerJavaObject.getObject(spooler.variables(),
-                    spooler_job.name() + "_" + crontabFile.getAbsolutePath() + "_env_variables");
+            HashSet<?> previousEnvVariables =
+                    (HashSet<?>) SchedulerJavaObject.getObject(spooler.variables(), spooler_job.name() + "_" + crontabFile.getAbsolutePath()
+                            + "_env_variables");
             HashSet<String> currentEnvVariables = new HashSet<String>();
             boolean environmentChanged = false;
             if (previousEnvVariables == null) {
@@ -316,8 +319,8 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
             SchedulerJavaObject.putObject(currentCommentsMapping, spooler.variables(), spooler_job.name() + "_" + crontabFile.getAbsolutePath()
                     + "_cron2comments_mapping");
             logger.debug3("Storing environment variables to Scheduler variable");
-            SchedulerJavaObject
-                    .putObject(currentEnvVariables, spooler.variables(), spooler_job.name() + "_" + crontabFile.getAbsolutePath() + "_env_variables");
+            SchedulerJavaObject.putObject(currentEnvVariables, spooler.variables(), spooler_job.name() + "_" + crontabFile.getAbsolutePath()
+                    + "_env_variables");
         } catch (Exception e) {
             LOGGER.error("Error updating Job Scheduler configuration from crontab: " + e.getMessage(), e);
         }
