@@ -2950,4 +2950,30 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     false // isMandatory
     );
 
+    @JSOptionDefinition(
+            name = "updateConfiguration", description = "determines if a YADE configuration should be updated with the given XML snippet", key = "updateConfiguration", 
+            type = "SOSOptionBoolean", mandatory = false)
+    public SOSOptionBoolean updateConfiguration = new SOSOptionBoolean(this, className + ".updateConfiguration", 
+            "determines if a YADE configuration should be updated with the given XML snippet", "", "", false);
+
+    public SOSOptionBoolean getUpdateConfiguration() {
+        return updateConfiguration;
+    }
+
+    public void setUpdateConfiguration(SOSOptionBoolean updateConfiguration) {
+        this.updateConfiguration = updateConfiguration;
+    }
+
+    @JSOptionDefinition(
+            name = "xmlUpdate", description = "the XML configuration snippet to update a YADE configuration with", key = "xmlUpdate", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString xmlUpdate = new SOSOptionString(this, className + ".xmlUpdate", "the XML configuration snippet to update a YADE configuration with", "", "", false);
+
+    public SOSOptionString getXmlUpdate() {
+        return xmlUpdate;
+    }
+
+    public void setXmlUpdate(SOSOptionString xmlUpdate) {
+        this.xmlUpdate = xmlUpdate;
+    }
+
 }
