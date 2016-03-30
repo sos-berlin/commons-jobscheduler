@@ -653,8 +653,9 @@ public class SOSFileList extends SOSVfsMessageCodes {
             throw new JobSchedulerException(e);
         } finally {
             try {
-                if (hwFile != null)
+                if (hwFile != null) {
                     hwFile.close();
+                }
             } catch (IOException e) {
             }
         }
@@ -671,7 +672,6 @@ public class SOSFileList extends SOSVfsMessageCodes {
                 localTempHistory = File.createTempFile("jade-", null);
                 localTempHistory.deleteOnExit();
                 fos = new FileOutputStream(localTempHistory);
-
                 while ((bytesTransferred = jumpHistoryFile.read(buffer)) != -1) {
                     fos.write(buffer, 0, bytesTransferred);
                 }
@@ -679,8 +679,9 @@ public class SOSFileList extends SOSVfsMessageCodes {
                 throw new JobSchedulerException(e);
             } finally {
                 try {
-                    if (fos != null)
+                    if (fos != null) {
                         fos.close();
+                    }
                 } catch (IOException e) {
                 }
                 try {

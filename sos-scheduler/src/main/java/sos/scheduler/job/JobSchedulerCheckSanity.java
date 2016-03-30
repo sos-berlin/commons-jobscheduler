@@ -74,11 +74,12 @@ public class JobSchedulerCheckSanity extends JobSchedulerJob {
                 writeHistory("Job", "init", "0", "0", true, e.getMessage());
             } catch (Exception f) {
             }
-            if (spooler_log != null)
+            if (spooler_log != null) {
                 try {
                     spooler_log.error(e.getMessage());
                 } catch (Exception ex) {
                 }
+            }
             return false;
         }
     }

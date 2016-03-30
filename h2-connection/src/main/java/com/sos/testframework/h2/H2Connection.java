@@ -72,8 +72,9 @@ public abstract class H2Connection {
                 }
                 result.append("runscript from '" + getFilename(sqlFile) + "'");
             }
-            if (result.length() > 0)
+            if (!result.toString().isEmpty()) {
                 result.insert(0, "INIT=");
+            }
             initString = result.toString();
 
         }
@@ -115,20 +116,12 @@ public abstract class H2Connection {
         return file.getAbsolutePath().replace("\\", "/");
     }
 
-    /** The file with the hibernate configuration takes placed in a (temporary)
-     * folder selected by this class.
-     * 
-     * @return */
     public File createTemporaryHibernateConfiguration() {
         File configFile = createTemporaryEnvironment();
         createHibernateConfiguration(configFile);
         return configFile;
     }
 
-    /** The file with the hibernate configuration takes placed in a (temporary)
-     * folder selected by this class.
-     * 
-     * @return */
     public File createTemporaryEnvironment() {
         if (temporaryConfigFile == null) {
             if (temporaryWorkingDirectory == null) {
@@ -149,10 +142,6 @@ public abstract class H2Connection {
         return tempFile;
     }
 
-    /** The file with the hibernate configuration takes place in a given file.
-     * 
-     * @param targetFile
-     * @return */
     public File createHibernateConfiguration(File targetFile) {
         try {
             String content = Resources.toString(HIBERNATE_CFG_TEMPLATE, Charset.defaultCharset());
@@ -169,10 +158,6 @@ public abstract class H2Connection {
         return targetFile;
     }
 
-    /** The file with the hibernate configuration takes place in a given file.
-     * 
-     * @param resource
-     * @return */
     public File createHibernateConfigurationFromResource(URL resource, File targetDir) {
         temporaryWorkingDirectory = targetDir;
         temporaryConfigFile = createTemporaryFile(targetDir);
@@ -188,10 +173,6 @@ public abstract class H2Connection {
         return temporaryConfigFile;
     }
 
-    /** To build a connection with a specific database location this methood
-     * might be override.
-     *
-     * @return */
     protected String getConnectionURL() {
         return connectionPrefix;
     }
