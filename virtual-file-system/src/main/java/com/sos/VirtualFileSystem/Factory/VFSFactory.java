@@ -152,7 +152,7 @@ public class VFSFactory extends SOSVfsMessageCodes {
         }
         if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.mq.Text())) {
             objC = new SOSVfsJms();
-            logger.trace(SOSVfs_D_0201.params(conMethodName, SOSVfsJms.class.toString()));
+            logger.trace(SOSVfs_D_0201.params(methodName, SOSVfsJms.class.toString()));
         }
         if (objC == null) {
             throw new Exception(SOSVfs_E_0203.params(strWhatSystem));
