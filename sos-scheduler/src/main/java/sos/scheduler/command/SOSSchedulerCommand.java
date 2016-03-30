@@ -17,7 +17,6 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
-import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
@@ -59,18 +58,12 @@ public class SOSSchedulerCommand {
         this.setPort(port);
     }
 
-    /** @param host the hostname (or ip address) of the Job Scheduler
-     * @param port the port of the Job Scheduler
-     * @param protocol the connection protocol ("tcp" or "udp") */
     public SOSSchedulerCommand(final String host, final int port, final String protocol) {
         this.setHost(host);
         this.setPort(port);
         this.setProtocol(protocol);
     }
 
-    /** Sets the hostname (or ip address) of the Job Scheduler
-     * 
-     * @param host */
     public void setHost(final String host) {
         this.host = host;
     }
@@ -79,9 +72,6 @@ public class SOSSchedulerCommand {
         return host;
     }
 
-    /** Sets the port of the Job Scheduler
-     * 
-     * @param port */
     public void setPort(final int port) {
         this.port = port;
     }
@@ -90,26 +80,18 @@ public class SOSSchedulerCommand {
         return port;
     }
 
-    /** @param timeout */
     public void setTimeout(final int timeout) {
         this.timeout = timeout;
     }
 
-    /** @return Returns the protocol. */
     public String getProtocol() {
         return protocol;
     }
 
-    /** @param protocol sets the protocol to "tcp" or "udp" */
     public void setProtocol(final String protocol) {
         this.protocol = protocol;
     }
 
-    /** connects to the scheduler
-     *
-     * @param host Job Scheduler host
-     * @param port Job Scheduler port
-     * @throws java.lang.Exception */
     public void connect(final String host, final int port) throws Exception {
         if (host == null || host.isEmpty()) {
             throw new Exception("hostname missing.");
@@ -130,17 +112,10 @@ public class SOSSchedulerCommand {
         }
     }
 
-    /** connects to the scheduler
-     *
-     * @throws java.lang.Exception */
     public void connect() throws Exception {
         this.connect(host, port);
     }
 
-    /** sends a command to the scheduler
-     *
-     * @param command XML String containing the command
-     * @throws java.lang.Exception */
     public void sendRequest(String command) throws Exception {
         if ("udp".equalsIgnoreCase(protocol)) {
             if (command.indexOf("<?xml") == -1) {
@@ -158,29 +133,20 @@ public class SOSSchedulerCommand {
         }
     }
 
-    /** returns the scheduler reply.
-     *
-     * @return String represents the reply of the scheduler on success,
-     *         otherwise empty string
-     * @throws IOException
-     * @throws RuntimeException */
     public String getResponse() throws IOException, RuntimeException {
         int b;
         StringBuffer response = new StringBuffer();
         if (in != null) {
             while ((b = in.read()) != -1) {
-                if (b == 0)
+                if (b == 0) {
                     break;
+                }
                 response.append((char) b);
             }
         }
         return response.toString();
     }
 
-    /** @param host Job Scheduler host
-     * @param port Job Scheduler port
-     * @param xmlCommand XML String containing the command
-     * @throws Exception */
     public static void sendCommand(final String host, final int port, final String xmlCommand) throws Exception {
         SOSSchedulerCommand command = null;
         try {
@@ -231,9 +197,6 @@ public class SOSSchedulerCommand {
         return iPort;
     }
 
-    /** close the connection
-     *
-     * @throws java.lang.Exception */
     public void disconnect() throws Exception {
         if (socket != null) {
             socket.close();

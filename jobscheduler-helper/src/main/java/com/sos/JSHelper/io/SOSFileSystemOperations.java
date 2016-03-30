@@ -68,7 +68,7 @@ public class SOSFileSystemOperations {
             if (bool == null) {
                 throw new JobSchedulerException("\"" + value + "\"");
             }
-            return bool.equals("true");
+            return "true".equals(bool);
         } catch (Exception e) {
             throw new JobSchedulerException("cannot evaluate to boolean: " + e.getMessage());
         }
@@ -1483,8 +1483,9 @@ public class SOSFileSystemOperations {
                     } else {
                         String[] dirs = new String[st.countTokens()];
                         int n = 0;
-                        while (st.hasMoreTokens())
+                        while (st.hasMoreTokens()) {
                             dirs[n++] = st.nextToken();
+                        }
                         if (depth > 0) {
                             while (depth > 0) {
                                 substitute = dirs[--depth] + "/" + substitute;
