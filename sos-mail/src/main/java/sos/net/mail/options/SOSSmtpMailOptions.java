@@ -9,18 +9,6 @@ import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
 import com.sos.JSHelper.Listener.JSListener;
 import com.sos.JSHelper.interfaces.ISOSSmtpMailOptions;
 
-/** \class SOSSmtpMailOptions - SMTP Mail Options
- *
- * \brief An Options as a container for the Options super class. The Option
- * class will hold all the things, which would be otherwise overwritten at a
- * re-creation of the super-class.
- *
- *
- * see \see J:\E\java\development\com.sos.scheduler\src\sos\scheduler\jobdoc\
- * JobSchedulerSmtpMail.xml for (more) details.
- *
- * \verbatim ; mechanicaly created by JobDocu2OptionsClass.xslt from
- * http://www.sos-berlin.com at 20111124184709 \endverbatim */
 @JSOptionClass(name = "SOSSmtpMailOptions", description = "Launch and observe any given job or job chain")
 public class SOSSmtpMailOptions extends SOSSmtpMailOptionsSuperClass implements ISOSSmtpMailOptions {
 
@@ -42,7 +30,6 @@ public class SOSSmtpMailOptions extends SOSSmtpMailOptionsSuperClass implements 
         MailDefault, MailOnError, MailOnSuccess, MailOnEmptyFiles;
     }
 
-    /** constructors */
     public SOSSmtpMailOptions() {
         super();
     } // public SOSSmtpMailOptions
@@ -98,14 +85,7 @@ public class SOSSmtpMailOptions extends SOSSmtpMailOptionsSuperClass implements 
         logger.trace(this.dirtyString());
     } // public SOSSmtpMailOptions (HashMap JSSettings)
 
-    /** \brief CheckMandatory - prüft alle Muss-Optionen auf Werte
-     *
-     * \details
-     * 
-     * @throws Exception
-     *
-     * @throws Exception - wird ausgelöst, wenn eine mandatory-Option keinen
-     *             Wert hat */
+ 
     @Override
     // SOSSmtpMailOptionsSuperClass
     public void CheckMandatory() {
