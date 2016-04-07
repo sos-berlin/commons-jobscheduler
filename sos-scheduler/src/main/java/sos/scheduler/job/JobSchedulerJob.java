@@ -37,30 +37,36 @@ public class JobSchedulerJob extends Job_impl {
 
     public SOSConnection ConnectToJSDataBase() {
         try {
-            this.setJobSettings(new SOSProfileSettings(spooler.ini_path()));
-            this.setJobProperties(jobSettings.getSection("spooler"));
-            if (this.getJobProperties().isEmpty()) {
-                throw new JobSchedulerException("no settings found in section [spooler] of configuration file: " + spooler.ini_path());
+            boolean isUniversalAgent = false;
+            try {
+                this.setJobSettings(new SOSProfileSettings(spooler.ini_path()));
+            } catch (Exception e) {
+                isUniversalAgent = true;
             }
-            if (this.getJobProperties().getProperty("db") == null || this.getJobProperties().getProperty("db").isEmpty()) {
-                throw new JobSchedulerException("no settings found for entry [db] in section [spooler] of configuration file: " + spooler.ini_path());
-            }
-            if (this.getJobProperties().getProperty("db_class") == null || this.getJobProperties().getProperty("db_class").isEmpty()) {
-                throw new JobSchedulerException("no settings found for entry [db_class] in section [spooler] of configuration file: "
-                        + spooler.ini_path());
-            }
-            if (this.getLogger() != null) {
-                sosLogger.debug6("connecting to database...");
-            } else {
-                LOGGER.debug("connecting to database...");
-            }
-            this.setConnection(getSchedulerConnection(this.getJobSettings(), this.getLogger()));
-            this.getConnection().connect();
-            this.setConnectionSettings(new SOSConnectionSettings(this.getConnection(), "SETTINGS", this.getLogger()));
-            if (this.getLogger() != null) {
-                this.getLogger().debug6("..successfully connected to JobScheduler database.");
-            } else {
-                LOGGER.debug("..successfully connected to JobScheduler database.");
+            if (!isUniversalAgent) {
+                this.setJobProperties(jobSettings.getSection("spooler"));
+                if (this.getJobProperties().isEmpty()) {
+                    throw new JobSchedulerException("no settings found in section [spooler] of configuration file: " + spooler.ini_path());
+                }
+                if (this.getJobProperties().getProperty("db") == null || this.getJobProperties().getProperty("db").isEmpty()) {
+                    throw new JobSchedulerException("no settings found for entry [db] in section [spooler] of configuration file: " + spooler.ini_path());
+                }
+                if (this.getJobProperties().getProperty("db_class") == null || this.getJobProperties().getProperty("db_class").isEmpty()) {
+                    throw new JobSchedulerException("no settings found for entry [db_class] in section [spooler] of configuration file: " + spooler.ini_path());
+                }
+                if (this.getLogger() != null) {
+                    sosLogger.debug6("connecting to database...");
+                } else {
+                    LOGGER.debug("connecting to database...");
+                }
+                this.setConnection(getSchedulerConnection(this.getJobSettings(), this.getLogger()));
+                this.getConnection().connect();
+                this.setConnectionSettings(new SOSConnectionSettings(this.getConnection(), "SETTINGS", this.getLogger()));
+                if (this.getLogger() != null) {
+                    this.getLogger().debug6("..successfully connected to JobScheduler database.");
+                } else {
+                    LOGGER.debug("..successfully connected to JobScheduler database.");
+                }
             }
         } catch (Exception e) {
             spooler_log.info("connect to database failed: ");
@@ -131,10 +137,10 @@ public class JobSchedulerJob extends Job_impl {
     public SOSConnection getConnection() {
         if (sosConnection == null) {
             ConnectToJSDataBase();
-        }
+        } 
         return sosConnection;
     }
-
+ 
     public void setConnection(final SOSConnection psosConnection) {
         if (sosConnection != null && !sosConnection.equals(psosConnection)) {
             try {
@@ -232,9 +238,11 @@ public class JobSchedulerJob extends Job_impl {
         SOSArguments arguments = new SOSArguments(dbProperty);
         SOSConnection conn;
         if (log != null) {
-            conn = SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.as_string("-class=", ""), arguments.as_string("-url=", ""), arguments.as_string("-user=", ""), arguments.as_string("-password=", ""), log);
+            conn = SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.as_string("-class=", ""),
+                    arguments.as_string("-url=", ""), arguments.as_string("-user=", ""), arguments.as_string("-password=", ""), log);
         } else {
-            conn = SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.as_string("-class=", ""), arguments.as_string("-url=", ""), arguments.as_string("-user=", ""), arguments.as_string("-password=", ""));
+            conn = SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.as_string("-class=", ""),
+                    arguments.as_string("-url=", ""), arguments.as_string("-user=", ""), arguments.as_string("-password=", ""));
         }
         return conn;
     }
