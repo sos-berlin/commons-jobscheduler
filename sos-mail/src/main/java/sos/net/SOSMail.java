@@ -15,7 +15,7 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.text.DecimalFormat;
-import java.text.FieldPosition;
+import java.text.FieldPosition; 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -113,6 +113,8 @@ public class SOSMail {
     private String loadedMessageId = "";
     private boolean messageReady = false;
     private int priority = -1;
+    
+    private String securityProtocol="";
     private Session session = null;
     public static String tableMails = "MAILS";
     public static String tableMailAttachments = "MAIL_ATTACHMENTS";
@@ -259,9 +261,27 @@ public class SOSMail {
         } else {
             props.put("mail.smtp.auth", "false");
         }
+        
+        if (securityProtocol.equalsIgnoreCase("ssl")){
+            props.put("mail.smtp.ssl.enable", "true");
+            if (port.equals("25")){
+                props.put("mail.smtp.port", "465"); 
+            }
+        }
+        
         authenticator = new SOSMailAuthenticator(user, password);
         session = Session.getInstance(props, authenticator);
         return session;
+    }
+
+    
+    public String getSecurityProtocol() {
+        return securityProtocol;
+    }
+
+    
+    public void setSecurityProtocol(String securityProtocol) {
+        this.securityProtocol = securityProtocol;
     }
 
     public void createMessage(final Session session) throws Exception {
