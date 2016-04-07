@@ -10,11 +10,12 @@ public class SOSOptionProtocol extends JSOptionValueList {
         tcp, udp;
 
         public static String asString() {
-            StringBuffer result = new StringBuffer();
+            StringBuilder result = new StringBuilder();
             result.append("[");
             for (Type t : values()) {
-                if (result.length() > 1)
+                if (result.length() > 1) {
                     result.append(", ");
+                }
                 result.append(t.name());
             }
             result.append("]");
@@ -33,11 +34,11 @@ public class SOSOptionProtocol extends JSOptionValueList {
     }
 
     public boolean isTcp() {
-        return (this.Value().equalsIgnoreCase(Type.tcp.name()));
+        return this.Value().equalsIgnoreCase(Type.tcp.name());
     }
 
     public boolean isUdp() {
-        return (this.Value().equalsIgnoreCase(Type.udp.name()));
+        return this.Value().equalsIgnoreCase(Type.udp.name());
     }
 
     public void Value(String value) {

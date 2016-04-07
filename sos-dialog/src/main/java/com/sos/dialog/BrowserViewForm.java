@@ -1,11 +1,7 @@
 package com.sos.dialog;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
-
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.CloseWindowListener;
 import org.eclipse.swt.browser.OpenWindowListener;
@@ -39,7 +35,6 @@ public class BrowserViewForm {
         parent = parent_;
         url = new SOSUrl(url_);
         showBrowser();
-
     }
 
     public BrowserViewForm(final Composite parent_, final int style, final String host, final int port) {
@@ -58,14 +53,10 @@ public class BrowserViewForm {
         gridLayout = new GridLayout();
         gridLayout.numColumns = 2;
         parent.setLayout(gridLayout);
-
         try {
-
             browser = new Browser(parent, SWT.NONE);
             initialize(parent.getDisplay(), browser);
-
             logger.debug("load url = " + url.getUrlValue());
-
             browser.setUrl(url.getUrlValue());
             browser.addProgressListener(new ProgressAdapter() {
 
@@ -81,14 +72,12 @@ public class BrowserViewForm {
                     logger.trace("status = " + event.text);
                 }
             });
-
             data = new GridData();
             data.horizontalAlignment = GridData.FILL;
             data.verticalAlignment = GridData.FILL;
             data.horizontalSpan = 2;
             data.grabExcessHorizontalSpace = true;
             data.grabExcessVerticalSpace = true;
-
             browser.setLayoutData(data);
             browser.layout();
         } catch (Exception E) {
@@ -98,24 +87,16 @@ public class BrowserViewForm {
 
     }
 
-    /* register WindowEvent listeners */
     static void initialize(final Display display, final Browser browser) {
         browser.addOpenWindowListener(new OpenWindowListener() {
 
             @Override
             public void open(final WindowEvent event) {
-
-                // JID-59 if ( false && !event.required) {
-                // return; /* only do it if necessary */
-
-                // }else {
                 Shell shell = new Shell(display);
                 shell.setLayout(new FillLayout());
                 Browser browser = new Browser(shell, SWT.NONE);
-
                 initialize(display, browser);
                 event.browser = browser;
-                // }
             }
         });
         browser.addVisibilityWindowListener(new VisibilityWindowListener() {
@@ -131,8 +112,9 @@ public class BrowserViewForm {
             public void show(final WindowEvent event) {
                 Browser browser = (Browser) event.widget;
                 final Shell shell = browser.getShell();
-                if (event.location != null)
+                if (event.location != null) {
                     shell.setLocation(event.location);
+                }
                 if (event.size != null) {
                     Point size = event.size;
                     shell.setSize(shell.computeSize(size.x, size.y));
@@ -146,7 +128,6 @@ public class BrowserViewForm {
             public void close(final WindowEvent event) {
                 Browser browser = (Browser) event.widget;
                 Shell shell = browser.getShell();
-
                 shell.close();
             }
         });

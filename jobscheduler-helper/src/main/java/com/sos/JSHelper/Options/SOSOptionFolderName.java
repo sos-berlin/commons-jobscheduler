@@ -26,12 +26,13 @@ public class SOSOptionFolderName extends SOSOptionFileName {
                                                                                 // auf
                                                                                 // die
                                                                                 // SOSOptionClass-Instanz
-    ".CreateFolder", // Schlüssel, i.d.r. identisch mit dem Namen der Option
-    "Folder anlegen, wenn noch nicht vorhanden", // Kurzbeschreibung
-    "true", // Wert
-    "true", // defaultwert
-    false // Option muss einen Wert haben
-    );
+            ".CreateFolder", // Schlüssel, i.d.r. identisch mit dem Namen der
+                             // Option
+            "Folder anlegen, wenn noch nicht vorhanden", // Kurzbeschreibung
+            "true", // Wert
+            "true", // defaultwert
+            false // Option muss einen Wert haben
+            );
 
     /** \brief JSOptionFolderName
      *

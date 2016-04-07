@@ -40,8 +40,8 @@ public class JSCmdBase extends JSObjBase {
     private static final Logger logger = Logger.getLogger(JSCmdBase.class);
     protected Answer objAnswer = null;
     public static boolean flgRaiseOKException = true;								// raise an exception if
-                                                      // the command was
-                                                      // successfull
+    // the command was
+    // successfull
     public static boolean flgLogXML = true;
 
     public JSCmdBase() {

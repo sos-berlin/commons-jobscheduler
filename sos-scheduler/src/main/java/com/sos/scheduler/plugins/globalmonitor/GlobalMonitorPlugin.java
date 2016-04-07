@@ -130,7 +130,8 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
         LOGGER.debug("---------  modifyJobElement:" + jobname);
         // 1. Create a FileSelector for the jobs that are to be handled
         // depending on the given options.
-        ConfigurationModifierFileSelector configurationModifierFileSelector = new ConfigurationModifierFileSelector(configurationModifierFileSelectorJobOptions);
+        ConfigurationModifierFileSelector configurationModifierFileSelector =
+                new ConfigurationModifierFileSelector(configurationModifierFileSelectorJobOptions);
         // 2. Set the filter for jobs to an instance of
         // ConfigurationModifierJobFileFilter
         configurationModifierFileSelector.setSelectorFilter(new ConfigurationModifierJobFileFilter(configurationModifierFileSelectorJobOptions));
@@ -151,7 +152,8 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
                 configurationModifierFileSelector = new ConfigurationModifierFileSelector(configurationModifierFileSelectorMonitorOptions);
                 // 6. Set the filter for jobs to an instance of
                 // ConfigurationModifierMonitorFileFilter
-                configurationModifierFileSelector.setSelectorFilter(new ConfigurationModifierMonitorFileFilter(configurationModifierFileSelectorMonitorOptions));
+                configurationModifierFileSelector.setSelectorFilter(new ConfigurationModifierMonitorFileFilter(
+                        configurationModifierFileSelectorMonitorOptions));
                 configurationModifierFileSelector.fillParentMonitorList(jobSchedulerFileElement);
                 // 7. Create a jobConfiguration changer to read, parse, change
                 // (and write) the job.xml

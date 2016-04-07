@@ -31,7 +31,6 @@ import sos.util.SOSLogger;
 import sos.util.SOSSchedulerLogger;
 import sos.xml.SOSXMLXPath;
 
-@SuppressWarnings("deprecation")
 public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
 
     private static final Logger LOGGER = Logger.getLogger(JobSchedulerCronAdapter.class);
@@ -57,8 +56,9 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
         if (monitoredLiveDir != null && !monitoredLiveDir.isEmpty()) {
             spooler_log.info("parameter cron_adapter_dynamic_configuration_dir: " + monitoredLiveDir);
             monitoredLiveDirs = monitoredLiveDir.split(";");
-        } else
+        } else {
             monitoredLiveDir = null;
+        }
         if (spooler_task == null) {
             spooler.variables().set_var("cron_adapter_use_dynamic_configuration", "1");
             if (monitoredLiveDir == null) {
@@ -189,21 +189,24 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
             if (!crontabFile.canRead()) {
                 logger.info("Failed to read crontab " + crontabFile.getAbsolutePath());
             }
-            HashMap<String, Element> previousMapping = (HashMap<String, Element>) SchedulerJavaObject.getObject(spooler.variables(), spooler_job.name()
-                    + "_" + crontabFile.getAbsolutePath() + "_cron2job_mapping");
+            HashMap<String, Element> previousMapping =
+                    (HashMap<String, Element>) SchedulerJavaObject.getObject(spooler.variables(), spooler_job.name() + "_"
+                            + crontabFile.getAbsolutePath() + "_cron2job_mapping");
             if (previousMapping == null) {
                 previousMapping = new HashMap<String, Element>();
             }
-            HashMap<String, String> previousCommentsMapping = (HashMap<String, String>) SchedulerJavaObject.getObject(spooler.variables(), spooler_job.name()
-                    + "_" + crontabFile.getAbsolutePath() + "_cron2comments_mapping");
+            HashMap<String, String> previousCommentsMapping =
+                    (HashMap<String, String>) SchedulerJavaObject.getObject(spooler.variables(), spooler_job.name() + "_"
+                            + crontabFile.getAbsolutePath() + "_cron2comments_mapping");
             if (previousCommentsMapping == null) {
                 previousCommentsMapping = new HashMap<String, String>();
             }
             debugHashMap(previousCommentsMapping, "previousCommentsMapping");
             HashMap<String, String> currentCommentsMapping = new HashMap<String, String>();
             HashMap<String, Element> changedJobs = new HashMap<String, Element>();
-            HashSet<?> previousEnvVariables = (HashSet<?>) SchedulerJavaObject.getObject(spooler.variables(), spooler_job.name() + "_"
-                    + crontabFile.getAbsolutePath() + "_env_variables");
+            HashSet<?> previousEnvVariables =
+                    (HashSet<?>) SchedulerJavaObject.getObject(spooler.variables(), spooler_job.name() + "_" + crontabFile.getAbsolutePath()
+                            + "_env_variables");
             HashSet<String> currentEnvVariables = new HashSet<String>();
             boolean environmentChanged = false;
             if (previousEnvVariables == null) {

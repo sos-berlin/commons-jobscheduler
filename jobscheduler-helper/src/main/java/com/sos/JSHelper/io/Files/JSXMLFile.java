@@ -416,7 +416,8 @@ public class JSXMLFile extends JSTextFile {
     public Document getDomDocument() throws ParserConfigurationException {
         if (document == null) {
             System.setProperty("javax.xml.parsers.DocumentBuilderFactory", conORG_APACHE_XERCES_JAXP_DOCUMENT_BUILDER_FACTORY_IMPL);
-            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance(conORG_APACHE_XERCES_JAXP_DOCUMENT_BUILDER_FACTORY_IMPL, this.getClass().getClassLoader());
+            DocumentBuilderFactory builderFactory =
+                    DocumentBuilderFactory.newInstance(conORG_APACHE_XERCES_JAXP_DOCUMENT_BUILDER_FACTORY_IMPL, this.getClass().getClassLoader());
             builderFactory.setNamespaceAware(true);
             builderFactory.setXIncludeAware(true);
             String strUserDir = System.getProperty("user.dir");

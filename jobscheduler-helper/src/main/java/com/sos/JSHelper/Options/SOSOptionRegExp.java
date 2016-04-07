@@ -117,7 +117,7 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
                 int intStart = m.start(i);
                 if (intStart >= 0 && i <= replacements.length) {
                     String strRepl = replacements[i - 1].trim();
-                    if (strRepl.length() > 0) {
+                    if (!strRepl.isEmpty()) {
                         if (strRepl.contains("\\")) {
                             strRepl = strRepl.replaceAll("\\\\-", "");
                             for (int j = 1; j <= intGroupCount; j++) {
@@ -193,10 +193,8 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 
     private String substituteUUID(String strValue) throws Exception {
         Matcher matcher1 = Pattern.compile("\\[uuid:([^\\]]*)\\]", intRegExpFlags).matcher(strValue);
-        if (matcher1.find()) {
-            if ("".equals(matcher1.group(1))) {
-                strValue = strValue.replaceFirst("\\[uuid:\\]", getUUID());
-            }
+        if (matcher1.find() && "".equals(matcher1.group(1))) {
+            strValue = strValue.replaceFirst("\\[uuid:\\]", getUUID());
         }
         return strValue;
     }
@@ -207,10 +205,8 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 
     private String substituteTimeStamp(String pstrValue) throws Exception {
         Matcher matcher1 = Pattern.compile("\\[timestamp:([^\\]]*)\\]", intRegExpFlags).matcher(pstrValue);
-        if (matcher1.find()) {
-            if ("".equals(matcher1.group(1))) {
-                pstrValue = pstrValue.replaceFirst("\\[timestamp:\\]", getUnixTimeStamp());
-            }
+        if (matcher1.find() && "".equals(matcher1.group(1))) {
+            pstrValue = pstrValue.replaceFirst("\\[timestamp:\\]", getUnixTimeStamp());
         }
         return pstrValue;
     }
@@ -221,10 +217,8 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
 
     private String substituteSQLTimeStamp(String strValue) throws Exception {
         Matcher matcher1 = Pattern.compile("\\[sqltimestamp:([^\\]]*)\\]", intRegExpFlags).matcher(strValue);
-        if (matcher1.find()) {
-            if ("".equals(matcher1.group(1))) {
-                strValue = strValue.replaceFirst("\\[sqltimestamp:\\]", new Timestamp(new Date().getTime()).toString());
-            }
+        if (matcher1.find() && "".equals(matcher1.group(1))) {
+            strValue = strValue.replaceFirst("\\[sqltimestamp:\\]", new Timestamp(new Date().getTime()).toString());
         }
         return strValue;
     }

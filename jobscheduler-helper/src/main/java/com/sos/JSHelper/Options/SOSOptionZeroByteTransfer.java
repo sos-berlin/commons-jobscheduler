@@ -4,7 +4,6 @@ public class SOSOptionZeroByteTransfer extends SOSOptionStringValueList {
 
     private static final long serialVersionUID = 8210111365807808464L;
     private enuZeroByteTransfer enu = enuZeroByteTransfer.yes;
-    private boolean transfer = true;
 
     public static enum enuZeroByteTransfer {
         yes, no, strict, relaxed;
@@ -23,7 +22,6 @@ public class SOSOptionZeroByteTransfer extends SOSOptionStringValueList {
                 if (enuItem.name().equalsIgnoreCase(str)) {
                     return true;
                 }
-                ;
             }
             return false;
         }
@@ -42,13 +40,12 @@ public class SOSOptionZeroByteTransfer extends SOSOptionStringValueList {
 
     public void Value(String enu) {
         enu = enu.toLowerCase();
-        if (enu.equalsIgnoreCase("true"))
+        if ("true".equalsIgnoreCase(enu)) {
             enu = "yes";
-        if (enu.equalsIgnoreCase("false"))
+        } else if ("false".equalsIgnoreCase(enu)) {
             enu = "no";
-        if (!enuZeroByteTransfer.contains(enu)) {
-            // TODO error message
-        } else {
+        }
+        if (enuZeroByteTransfer.contains(enu)) {
             this.enu = enuZeroByteTransfer.valueOf(enu);
         }
         super.Value(this.enu.name());

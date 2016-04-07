@@ -1,29 +1,57 @@
 package sos.scheduler.cron;
 
-import com.sos.JSHelper.Basics.JSToolBox;
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
-import com.sos.scheduler.model.SchedulerObjectFactory;
-import com.sos.scheduler.model.objects.*;
-import com.sos.scheduler.model.objects.Spooler.Config;
-import org.apache.commons.cli.*;
-import org.apache.log4j.Logger;
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.XMLSerializer;
-import org.w3c.dom.*;
-import sos.util.SOSDate;
-import sos.util.SOSLogger;
-import sos.util.SOSStandardLogger;
-
-import javax.xml.bind.JAXBElement;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.log4j.Logger;
+import org.apache.xml.serialize.OutputFormat;
+import org.apache.xml.serialize.XMLSerializer;
+import org.w3c.dom.Comment;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+import sos.util.SOSDate;
+import sos.util.SOSLogger;
+import sos.util.SOSStandardLogger;
+
+import com.sos.JSHelper.Basics.JSToolBox;
+import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.scheduler.model.SchedulerObjectFactory;
+import com.sos.scheduler.model.objects.Commands;
+import com.sos.scheduler.model.objects.JSObjJob;
+import com.sos.scheduler.model.objects.JSObjJobChain;
+import com.sos.scheduler.model.objects.JSObjOrder;
+import com.sos.scheduler.model.objects.Job;
+import com.sos.scheduler.model.objects.JobChain;
+import com.sos.scheduler.model.objects.JobChains;
+import com.sos.scheduler.model.objects.Jobs;
+import com.sos.scheduler.model.objects.Order;
+import com.sos.scheduler.model.objects.Spooler;
+import com.sos.scheduler.model.objects.Spooler.Config;
 
 /** @author Andreas Liebert */
 public class CronConverter extends JSToolBox {
@@ -41,7 +69,6 @@ public class CronConverter extends JSToolBox {
     protected Pattern currentCronPattern;
     protected String strBaseDirectory = "CronTabConverter";
     protected String strMockCommand = "ping -n 20 localhost";
-
     private static final String CLASSNAME = "CronConverter";
     private static final String TRUE = "true";
     private static final String NEWLINE = "\n";
@@ -198,8 +225,9 @@ public class CronConverter extends JSToolBox {
                 changeUser = getWholeArgument(line.getOptionValues(OPTION_CHANGEUSER));
             }
             jobTimeout = line.getOptionValue(OPTION_TIMEOUT);
-            if (logLevel == 0)
+            if (logLevel == 0) {
                 logLevel = SOSLogger.INFO;
+            }
             sosLogger = new SOSStandardLogger(logLevel);
             target = new File(targetFile);
             source = new File(sourceFile);
@@ -833,9 +861,10 @@ public class CronConverter extends JSToolBox {
             } else {
                 logger.debug("processing weekdays [" + weekdays + "]");
                 weekdays = replaceDayNames(weekdays);
-                if (weekdays.startsWith("*/"))
+                if (weekdays.startsWith("*/")) {
                     throw new JobSchedulerException("Repeat intervals for the weekdays column [" + weekdays
                             + "] are not supported. Please use the days column.");
+                }
                 if (!"*".equals(weekdays)) {
                     Element weekDaysElement = runTimeElement.getOwnerDocument().createElement("weekdays");
                     String[] daysArray = getArrayFromColumn(weekdays);
@@ -1117,4 +1146,5 @@ public class CronConverter extends JSToolBox {
     public void setTimeout(final String timeout) {
         this.timeout = timeout;
     }
+
 }

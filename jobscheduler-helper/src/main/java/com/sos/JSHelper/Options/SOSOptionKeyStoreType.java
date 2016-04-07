@@ -10,11 +10,12 @@ public class SOSOptionKeyStoreType extends JSOptionValueList {
         JKS, JCEKS, PKCS12, PKCS11, DKS;
 
         public static String asString() {
-            StringBuffer result = new StringBuffer();
+            StringBuilder result = new StringBuilder();
             result.append("[");
             for (Type t : values()) {
-                if (result.length() > 1)
+                if (result.length() > 1) {
                     result.append(", ");
+                }
                 result.append(t.name());
             }
             result.append("]");
@@ -55,7 +56,8 @@ public class SOSOptionKeyStoreType extends JSOptionValueList {
         try {
             SOSOptionKeyStoreType.Type.valueOf(testValue);
         } catch (Exception e) {
-            throw new JobSchedulerException(String.format("Value \"%s\" is not valid for %s - valid values are %s : %s", testValue, strKey, Type.asString(), e.toString()));
+            throw new JobSchedulerException(String.format("Value \"%s\" is not valid for %s - valid values are %s : %s", testValue, strKey,
+                    Type.asString(), e.toString()));
         }
         super.Value(testValue);
     }

@@ -110,7 +110,11 @@ public class SOSVfsCsvExport extends SOSVfsMessageCodes implements ISOSTransferH
             // transfer_timestamp
             .AddCellValue(pid).AddCellValue("0")
             // ppid
-            .AddCellValue(objOptions.operation.Value()).AddCellValue(objOptions.Source().host.Value()).AddCellValue(objOptions.Source().host.getHostAdress()).AddCellValue(objOptions.Source().user.Value()).AddCellValue(objOptions.Target().host.Value()).AddCellValue(objOptions.Target().host.getHostAdress()).AddCellValue(objOptions.Target().user.Value()).AddCellValue(objOptions.protocol.Value()).AddCellValue(objOptions.port.Value()).AddCellValue(objOptions.SourceDir.Value()).AddCellValue(objOptions.TargetDir.Value()).AddCellValue(" ")
+            .AddCellValue(objOptions.operation.Value()).AddCellValue(objOptions.Source().host.Value()).AddCellValue(
+                    objOptions.Source().host.getHostAdress()).AddCellValue(objOptions.Source().user.Value()).AddCellValue(
+                    objOptions.Target().host.Value()).AddCellValue(objOptions.Target().host.getHostAdress()).AddCellValue(
+                    objOptions.Target().user.Value()).AddCellValue(objOptions.protocol.Value()).AddCellValue(objOptions.port.Value()).AddCellValue(
+                    objOptions.SourceDir.Value()).AddCellValue(objOptions.TargetDir.Value()).AddCellValue(" ")
             // local_filename
             .AddCellValue(" ")
             // remote_filename

@@ -10,11 +10,12 @@ public class SOSOptionProxyProtocol extends JSOptionValueList {
         http, socks4, socks5;
 
         public static String asString() {
-            StringBuffer result = new StringBuffer();
+            StringBuilder result = new StringBuilder();
             result.append("[");
             for (Protocol t : values()) {
-                if (result.length() > 1)
+                if (result.length() > 1) {
                     result.append(", ");
+                }
                 result.append(t.name());
             }
             result.append("]");
@@ -31,15 +32,15 @@ public class SOSOptionProxyProtocol extends JSOptionValueList {
     }
 
     public boolean isHttp() {
-        return (this.Value().equalsIgnoreCase(Protocol.http.name()));
+        return this.Value().equalsIgnoreCase(Protocol.http.name());
     }
 
     public boolean isSocks4() {
-        return (this.Value().equalsIgnoreCase(Protocol.socks4.name()));
+        return this.Value().equalsIgnoreCase(Protocol.socks4.name());
     }
 
     public boolean isSocks5() {
-        return (this.Value().equalsIgnoreCase(Protocol.socks5.name()));
+        return this.Value().equalsIgnoreCase(Protocol.socks5.name());
     }
 
     public void Value(String value) {
@@ -47,7 +48,8 @@ public class SOSOptionProxyProtocol extends JSOptionValueList {
         try {
             SOSOptionProxyProtocol.Protocol.valueOf(testValue);
         } catch (Exception e) {
-            throw new JobSchedulerException(String.format("Value \"%s\" is not valid for %s - valid values are %s : %s", testValue, strKey, Protocol.asString(), e.toString()));
+            throw new JobSchedulerException(String.format("Value \"%s\" is not valid for %s - valid values are %s : %s", testValue, strKey,
+                    Protocol.asString(), e.toString()));
         }
         super.Value(testValue);
     }

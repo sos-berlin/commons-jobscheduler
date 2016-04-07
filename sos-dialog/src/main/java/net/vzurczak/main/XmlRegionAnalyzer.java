@@ -52,42 +52,44 @@ public class XmlRegionAnalyzer {
 
             // White spaces
             analyzeWhitespaces(xml, positions);
-            if (this.offset >= xml.length())
+            if (this.offset >= xml.length()) {
                 break;
-
+            }
             // "<" can be several things
             char c = xml.charAt(this.offset);
             if (c == '<') {
-                if (analyzeInstruction(xml, positions))
+                if (analyzeInstruction(xml, positions)) {
                     continue;
-                if (analyzeComment(xml, positions))
+                }
+                if (analyzeComment(xml, positions)) {
                     continue;
-                if (analyzeMarkup(xml, positions))
+                }
+                if (analyzeMarkup(xml, positions)) {
                     continue;
-                if (analyzeCData(xml, positions))
+                }
+                if (analyzeCData(xml, positions)) {
                     continue;
-
+                }
                 positions.add(new XmlRegion(XmlRegionType.UNEXPECTED, this.offset, xml.length()));
                 break;
-            }
-
-            // "/" and "/>" can only indicate a mark-up
-            else if (c == '/' && xml.charAt(this.offset + 1) == '>' || c == '>') {
-                if (analyzeMarkup(xml, positions))
+            } else if (c == '/' && xml.charAt(this.offset + 1) == '>' || c == '>') {
+                if (analyzeMarkup(xml, positions)) {
                     continue;
-
+                }
                 positions.add(new XmlRegion(XmlRegionType.UNEXPECTED, this.offset, xml.length()));
                 break;
             }
 
             // Other things can be...
-            if (analyzeAttribute(xml, positions))
+            if (analyzeAttribute(xml, positions)) {
                 continue;
-            if (analyzeAttributeValue(xml, positions))
+            }
+            if (analyzeAttributeValue(xml, positions)) {
                 continue;
-            if (analyzeMarkupValue(xml, positions))
+            }
+            if (analyzeMarkupValue(xml, positions)) {
                 continue;
-
+            }
             positions.add(new XmlRegion(XmlRegionType.UNEXPECTED, this.offset, xml.length()));
             break;
         }
@@ -106,9 +108,9 @@ public class XmlRegionAnalyzer {
         int newPos = this.offset;
         if (newPos < xml.length() && xml.charAt(newPos) == '<' && ++newPos < xml.length() && xml.charAt(newPos) == '?') {
 
-            while (++newPos < xml.length() && xml.charAt(newPos) != '>')
+            while (++newPos < xml.length() && xml.charAt(newPos) != '>') {
                 newPos = xml.indexOf('?', newPos);
-
+            }
             if (xml.charAt(newPos) == '>') {
                 positions.add(new XmlRegion(XmlRegionType.INSTRUCTION, this.offset, newPos + 1));
                 this.offset = newPos + 1;
@@ -137,9 +139,9 @@ public class XmlRegionAnalyzer {
                 seq = c == '-' && seq < 2 || c == '>' && seq == 2 ? seq + 1 : 0;
             }
 
-            if (seq == 3)
+            if (seq == 3) {
                 newPos++;
-
+            }
             positions.add(new XmlRegion(XmlRegionType.COMMENT, this.offset, newPos));
             this.offset = newPos;
             result = true;
@@ -162,32 +164,26 @@ public class XmlRegionAnalyzer {
         if (xml.charAt(newPos) == '<') {
 
             // Do not process a CData section or a comment as a mark-up
-            if (newPos + 1 < xml.length() && xml.charAt(newPos + 1) == '!')
+            if (newPos + 1 < xml.length() && xml.charAt(newPos + 1) == '!') {
                 return false;
-
+            }
             // Mark-up name
             char c = '!';
-            while (newPos < xml.length() && (c = xml.charAt(newPos)) != '>' && !Character.isWhitespace(c))
+            while (newPos < xml.length() && (c = xml.charAt(newPos)) != '>' && !Character.isWhitespace(c)) {
                 newPos++;
-
-            if (c == '>')
+            }
+            if (c == '>') {
                 newPos++;
-
+            }
             positions.add(new XmlRegion(XmlRegionType.MARKUP, this.offset, newPos));
             this.offset = newPos;
             result = true;
-        }
-
-        // "/>"
-        else if (xml.charAt(newPos) == '/' && ++newPos < xml.length() && xml.charAt(newPos) == '>') {
+        } else if (xml.charAt(newPos) == '/' && ++newPos < xml.length() && xml.charAt(newPos) == '>') {
 
             positions.add(new XmlRegion(XmlRegionType.MARKUP, this.offset, ++newPos));
             this.offset = newPos;
             result = true;
-        }
-
-        // "attributes... >"
-        else if (xml.charAt(newPos) == '>') {
+        } else if (xml.charAt(newPos) == '>') {
             positions.add(new XmlRegion(XmlRegionType.MARKUP, this.offset, ++newPos));
             this.offset = newPos;
             result = true;
@@ -206,16 +202,17 @@ public class XmlRegionAnalyzer {
         // An attribute value follows a mark-up
         for (int i = positions.size() - 1; i >= 0; i--) {
             XmlRegion xr = positions.get(i);
-            if (xr.getXmlRegionType() == XmlRegionType.WHITESPACE)
+            if (xr.getXmlRegionType() == XmlRegionType.WHITESPACE) {
                 continue;
-
-            if (xr.getXmlRegionType() == XmlRegionType.ATTRIBUTE_VALUE)
+            }
+            if (xr.getXmlRegionType() == XmlRegionType.ATTRIBUTE_VALUE) {
                 break;
-
+            }
             if (xr.getXmlRegionType() == XmlRegionType.MARKUP) {
                 char c = xml.charAt(xr.getEnd() - 1);
-                if (c != '>')
+                if (c != '>') {
                     break;
+                }
             }
 
             return false;
@@ -225,9 +222,9 @@ public class XmlRegionAnalyzer {
         boolean result = false;
         int newPos = this.offset;
         char c;
-        while (newPos < xml.length() && (c = xml.charAt(newPos)) != '=' && c != '/' && c != '>' && !Character.isWhitespace(c))
+        while (newPos < xml.length() && (c = xml.charAt(newPos)) != '=' && c != '/' && c != '>' && !Character.isWhitespace(c)) {
             newPos++;
-
+        }
         // Found one?
         if (newPos != this.offset) {
             positions.add(new XmlRegion(XmlRegionType.ATTRIBUTE, this.offset, newPos));
@@ -248,13 +245,14 @@ public class XmlRegionAnalyzer {
         // A mark-up value follows a mark-up
         for (int i = positions.size() - 1; i >= 0; i--) {
             XmlRegion xr = positions.get(i);
-            if (xr.getXmlRegionType() == XmlRegionType.WHITESPACE)
+            if (xr.getXmlRegionType() == XmlRegionType.WHITESPACE) {
                 continue;
-
+            }
             if (xr.getXmlRegionType() == XmlRegionType.MARKUP || xr.getXmlRegionType() == XmlRegionType.COMMENT) {
                 char c = xml.charAt(xr.getEnd() - 1);
-                if (c == '>')
+                if (c == '>') {
                     break;
+                }
             }
 
             return false;
@@ -263,9 +261,9 @@ public class XmlRegionAnalyzer {
         // Read...
         boolean result = false;
         int newPos = this.offset;
-        while (newPos < xml.length() && xml.charAt(newPos) != '<')
+        while (newPos < xml.length() && xml.charAt(newPos) != '<') {
             newPos++;
-
+        }
         // We read something and this something is not only made up of white
         // spaces
         if (this.offset != newPos) {
@@ -297,12 +295,12 @@ public class XmlRegionAnalyzer {
         // An attribute value follows an attribute
         for (int i = positions.size() - 1; i >= 0; i--) {
             XmlRegion xr = positions.get(i);
-            if (xr.getXmlRegionType() == XmlRegionType.WHITESPACE)
+            if (xr.getXmlRegionType() == XmlRegionType.WHITESPACE) {
                 continue;
-
-            if (xr.getXmlRegionType() == XmlRegionType.ATTRIBUTE)
+            }
+            if (xr.getXmlRegionType() == XmlRegionType.ATTRIBUTE) {
                 break;
-
+            }
             return false;
         }
 
@@ -316,9 +314,9 @@ public class XmlRegionAnalyzer {
             char previous = '!';
             while (++newPos < xml.length()) {
                 char c = xml.charAt(newPos);
-                if (previous != '\\' && c == '"')
+                if (previous != '\\' && c == '"') {
                     cpt++;
-
+                }
                 previous = c;
                 if (cpt == 2) {
                     newPos++;
@@ -351,11 +349,11 @@ public class XmlRegionAnalyzer {
             int cpt = 0;
             while (++newPos < xml.length()) {
                 char c = xml.charAt(newPos);
-                if (cpt < 2 && c == ']' || cpt == 2 && c == '>')
+                if (cpt < 2 && c == ']' || cpt == 2 && c == '>') {
                     cpt++;
-                else
+                } else {
                     cpt = 0;
-
+                }
                 if (cpt == 3) {
                     newPos++;
                     break;
@@ -381,12 +379,13 @@ public class XmlRegionAnalyzer {
     void analyzeWhitespaces(String xml, List<XmlRegion> positions) {
 
         int i = this.offset;
-        while (i < xml.length() && Character.isWhitespace(xml.charAt(i)))
+        while (i < xml.length() && Character.isWhitespace(xml.charAt(i))) {
             i++;
-
+        }
         if (i != this.offset) {
             positions.add(new XmlRegion(XmlRegionType.WHITESPACE, this.offset, i));
             this.offset = i;
         }
     }
+
 }

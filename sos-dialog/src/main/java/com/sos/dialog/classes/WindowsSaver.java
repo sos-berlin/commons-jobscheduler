@@ -186,7 +186,8 @@ public class WindowsSaver extends SOSPreferenceStore {
     public void centerScreen() {
         flgClassIsActive = true;
         java.awt.Dimension screen = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        shell.setBounds((screen.width - shell.getBounds().width) / 2, (screen.height - shell.getBounds().height) / 2, shell.getBounds().width, shell.getBounds().height);
+        shell.setBounds((screen.width - shell.getBounds().width) / 2, (screen.height - shell.getBounds().height) / 2, shell.getBounds().width,
+                shell.getBounds().height);
         flgClassIsActive = false;
     }
 

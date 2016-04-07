@@ -1113,7 +1113,8 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
 
     @Override
     public JSCmdSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles createSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles() {
-        JSCmdSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles objSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles = new JSCmdSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles(this);
+        JSCmdSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles objSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles =
+                new JSCmdSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles(this);
         return objSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles;
     }
 

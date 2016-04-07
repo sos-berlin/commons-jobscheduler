@@ -72,8 +72,9 @@ class Connection extends Thread {
             byte[] digit = new byte[nb];
             // Step 2 read byte
             LOGGER.debug("Writing.......");
-            for (int i = 0; i < nb; i++)
+            for (int i = 0; i < nb; i++) {
                 digit[i] = input.readByte();
+            }
             String st = new String(digit);
             bufWriter.append(st);
             bufWriter.close();
@@ -104,8 +105,9 @@ class Connection extends Thread {
         } while (input1[k] != 0);
         k--;
         byte[] toConvert = new byte[k];
-        for (int i = 0; i < k; i++)
+        for (int i = 0; i < k; i++) {
             toConvert[i] = input1[i];
+        }
         return new String(toConvert);
     }
 

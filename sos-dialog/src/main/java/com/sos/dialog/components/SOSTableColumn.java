@@ -108,7 +108,8 @@ public class SOSTableColumn extends TableColumn {
         });
         if (text != null) {
             this.setText(text);
-            this.setWidth(this.getIntValue(prefs.node(table.getClass().getName() + "/col/" + this.getText()).get("width", String.valueOf(width)), width));
+            this.setWidth(this.getIntValue(prefs.node(table.getClass().getName() + "/col/" + this.getText()).get("width", String.valueOf(width)),
+                    width));
         }
         if (strToolTip != null) {
             this.setToolTipText(strToolTip);

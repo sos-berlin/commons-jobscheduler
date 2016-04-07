@@ -738,7 +738,8 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
             sshSession.connect();
             this.createSftpClient();
         } catch (Exception ex) {
-            throw new JobSchedulerException(SOSVfs_E_167.params(authenticationOptions.getAuth_method().Value(), authenticationOptions.getAuth_file().Value()));
+            throw new JobSchedulerException(SOSVfs_E_167.params(authenticationOptions.getAuth_method().Value(),
+                    authenticationOptions.getAuth_file().Value()));
         }
         reply = "OK";
         logger.info(SOSVfs_D_133.params(userName));

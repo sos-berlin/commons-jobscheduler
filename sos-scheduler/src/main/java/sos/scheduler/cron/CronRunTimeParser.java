@@ -224,9 +224,10 @@ public class CronRunTimeParser extends JSToolBox {
             } else {
                 LOGGER.debug("processing weekdays [" + weekdays + "]");
                 weekdays = replaceDayNames(weekdays);
-                if (weekdays.startsWith("*/"))
+                if (weekdays.startsWith("*/")) {
                     throw new JobSchedulerException("Repeat intervals for the weekdays column [" + weekdays
                             + "] are not supported. Please use the days column.");
+                }
                 if (!"*".equals(weekdays)) {
                     Element weekDaysElement = runTimeElement.getOwnerDocument().createElement("weekdays");
                     String[] daysArray = getArrayFromColumn(weekdays);

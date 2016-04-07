@@ -16,7 +16,8 @@ public class MenueActionOpenBase extends MenueActionBase {
     }
 
     public MenueActionOpenBase(final String pstrMenueTextParameter) {
-        this(new DialogMsg(conI18NKeyTREENODE_MENU_OPEN).params(pstrMenueTextParameter), "Ctrl+O", "/org/freedesktop/tango/16x16/actions/document-open");
+        this(new DialogMsg(conI18NKeyTREENODE_MENU_OPEN).params(pstrMenueTextParameter), "Ctrl+O",
+                "/org/freedesktop/tango/16x16/actions/document-open");
     }
 
     @Override

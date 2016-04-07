@@ -149,6 +149,7 @@ package com.sos.i18n;
  * 
  * 
  * 
+ * 
  * public static final Logger LOG = LoggerFactory.getLogger(MyClass.class);
  * </pre>
  * 
@@ -447,6 +448,7 @@ package com.sos.i18n;
  * 
  * 
  * 
+ * 
  * &#064;I18NMessage(&quot;This is my en_CA version of the third message that should go in a en_CA bundle&quot;)
  * &#064;I18NResourceBundle(baseName = &quot;example-messages-for-third&quot;, defaultLocale = &quot;en_CA&quot;)
  * public static final String MESSAGE_THREE_KEY = &quot;Example.message3-key&quot;;
@@ -468,6 +470,7 @@ package com.sos.i18n;
  * </p>
  * 
  * <pre>
+ * 
  * 
  * 
  * 

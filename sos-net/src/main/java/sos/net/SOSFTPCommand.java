@@ -23,56 +23,20 @@ import java.util.Map.Entry;
  * @author mueruevet.oeksuez@sos-berlin.com **/
 abstract public class SOSFTPCommand {
 
-    private static final String conParamValueSUCCESS = "success";
-    private static final String conParameterSTATUS = "status";
-    private static final String conOperationDELETE = "delete";
-    public static final String conParamPORT = "port";
-    public static final String conParamPROTOCOL = "protocol";
-    private static final Logger LOGGER = Logger.getLogger(SOSFTPCommand.class);
-    public static final String conParamSSH_AUTH_METHOD = "ssh_auth_method";
-    public static final String conParamPASSWORD = "password";
-    public static final String conParamUSER = "user";
-    public static final String conParamHOST = "host";
-    public static final String conParamJUMP_HOST = "jump_host";
-    public static final String conParamSSH_AUTH_FILE = "ssh_auth_file";
-    public static final String conParamJUMP_PROTOCOL = "jump_protocol";
-    public static final String conSettingREMOVE_FILES = "remove_files";
-    private static final String conSettingsJUMP_COMMAND = "jump_command";
-    public static final String conParameterREMOVE_AFTER_JUMP_TRANSFER = "remove_after_jump_transfer";
     protected static final String conParamFORCE_FILES = "force_files";
-    public static final String conParamREPLACEMENT = "replacement";
-    public static final String conParamREPLACING = "replacing";
-    private static final String conParamMAKE_DIRS = "make_dirs";
-    private static final String conJobChainNameSCHEDULER_SOSFTP_HISTORY = "scheduler_sosftp_history";
-    private static final String conParamSCHEDULER_JOB_CHAIN = "scheduler_job_chain";
-    private static final String conParamSCHEDULER_PORT = "scheduler_port";
-    private static final String conParamSCHEDULER_HOST = "scheduler_host";
-    public static final String FILE_MODIFICATION_DATE = "FILE_MODIFICATION_DATE";
-    private static final String conParamSCHEDULER_MESSAGE = "scheduler_message";
-    private static final String conOperationRECEIVE = "receive";
-    private static final String conOperationSEND = "send";
-    public static final String conOperationEXECUTE = "execute";
-    public static final String conOperationREMOVE = "remove";
-    public static final String conSettingOPERATION = "operation";
-    public static final String conSettingLOCAL_DIR = "local_dir";
-    public static final String conSettingFILE_PATH = "file_path";
-    public static final String conSettingFILE_SPEC = "file_spec";
-    public static final String USE_PATH_AND_FILE_NAME_4_MATCHING = "use_path_and_file_name_4_matching";
-    public static final String CHECK_SERVER_FEATURES = "check_server_features";
-    public static final String CONVERT_UMLAUTE = "convert_umlaute";
-    public static final String FILENAME_ENCODING = "Filename_encoding";
-    public static final String CONTROL_ENCODING = "control_encoding";
-    public static final String PRE_FTP_COMMANDS = "pre_ftp_commands";
-    public static final String conStatusERROR = "error";
-    public static final String conStatusSUCCESS = conParamValueSUCCESS;
-    public static final String conSettingSTATUS = conParameterSTATUS;
-    public static final String conSettingREMOTE_DIR = "remote_dir";
-    public static final String conSettingTRANSFER_MODE = "transfer_mode";
-    public static final String conSettingFILE_SIZE = "file_size";
-    private static String conClassName = "SOSFTPCommand";
     protected static final String conNewLine = "\n";
     protected static final String conRegExpBackslash = "\\\\";
     protected static final String conRegExpAllChars = ".*";
+    protected final static String DEFAULT_COMMAND_DELIMITER = "%%";
+    protected static ArrayList listOfSuccessTransfer = null;
+    protected static ArrayList listOfErrorTransfer = null;
+    protected static boolean banner = true;
+    protected static Object schedulerJob = null;
+    protected static String SSHJOBNAME = "sos.scheduler.job.JobSchedulerSSHJob";
+    protected static SOSString sosString = new SOSString();
+    protected static String tempJumpRemoteDir = "";
+    protected Vector<File> transferFileList = new Vector<File>();
+    protected Vector<String> filelisttmp = null;
     protected SOSFTP sosftp = null;
     protected String strPreFtpCommands = "";
     protected boolean flgCheckServerFeatures = false;
@@ -82,10 +46,6 @@ abstract public class SOSFTPCommand {
     protected boolean flgConvertUmlaute = false;
     protected String replacing = null;
     protected String replacement = null;
-    public static final int ERROR_CODE = 300;
-    protected final static String DEFAULT_COMMAND_DELIMITER = "%%";
-    protected static SOSString sosString = new SOSString();
-    private static SOSLogger logger = null;
     protected String mailSMTP = "localhost";
     protected String mailPortNumber = "25";
     protected String mailFrom = "SOSFTP";
@@ -96,14 +56,13 @@ abstract public class SOSFTPCommand {
     protected boolean ignoreStderr = false;
     protected long lasttime = 0;
     protected String commandDelimiter = DEFAULT_COMMAND_DELIMITER;
-    private Connection sshConnection = null;
     protected Session sshSession = null;
     protected InputStream stdout = null;
     protected InputStream stderr = null;
     protected String commandScript = "";
     protected String currentLine = "";
     protected String host = "";
-    protected int port = 21;																																																														// JS-649
+    protected int port = 21;                                                                                                                                                                                                                                                        // JS-649
     protected String user = "";
     protected String password = "";
     protected String proxyHost = "";
@@ -114,19 +73,8 @@ abstract public class SOSFTPCommand {
     protected String authenticationMethod = "publickey";
     protected Properties arguments = null;
     protected Properties savedArguments = null;
-    private static Properties originalParam = null;
     protected boolean flgJumpTransferDefined = false;
-    protected static String tempJumpRemoteDir = "";
     protected String postCommands = "";
-    private static File tempHistoryFile = null;
-    private static File historyFile = null;
-    private static BufferedWriter history = null;
-    private final String defaultMandator = "SOS";
-    private String historyFields = "guid;mandator;transfer_timestamp;pid;ppid;operation;localhost;localhost_ip;local_user;remote_host;remote_host_ip;remote_user;protocol;port;local_dir;remote_dir;local_filename;remote_filename;file_size;md5;status;last_error_message;log_filename";
-    private String newHistoryFields = "jump_host;jump_host_ip;jump_port;jump_protocol;jump_user";
-    private static ArrayList historyEntrys = new ArrayList();
-    private boolean writeBannerHeader = false;
-    private boolean sendSchedulerSignale = false;
     protected String account = "";
     protected SOSFileTransfer ftpClient = null;
     protected boolean isLoggedIn = false;
@@ -154,21 +102,75 @@ abstract public class SOSFTPCommand {
     protected static ArrayList transactionalHistoryFile = null;
     protected ArrayList transactionalSchedulerRequestFile = null;
     protected static boolean transActional = false;
+    private static final String conParamValueSUCCESS = "success";
+    private static final String conParameterSTATUS = "status";
+    private static final String conOperationDELETE = "delete";
+    private static final Logger LOGGER = Logger.getLogger(SOSFTPCommand.class);
+    private static final String conSettingsJUMP_COMMAND = "jump_command";
+    private static final String conParamMAKE_DIRS = "make_dirs";
+    private static final String conJobChainNameSCHEDULER_SOSFTP_HISTORY = "scheduler_sosftp_history";
+    private static final String conParamSCHEDULER_JOB_CHAIN = "scheduler_job_chain";
+    private static final String conParamSCHEDULER_PORT = "scheduler_port";
+    private static final String conParamSCHEDULER_HOST = "scheduler_host";
+    private static final String conParamSCHEDULER_MESSAGE = "scheduler_message";
+    private static final String conOperationRECEIVE = "receive";
+    private static final String conOperationSEND = "send";
+    private static Integer exitStatus = null;
+    private static SOSLogger logger = null;
+    private static String conClassName = "SOSFTPCommand";
+    private static Properties originalParam = null;
+    private static File tempHistoryFile = null;
+    private static File historyFile = null;
+    private static BufferedWriter history = null;
+    private final String defaultMandator = "SOS";
+    private static ArrayList historyEntrys = new ArrayList();
     private static ArrayList noJumpParameter = new ArrayList();
     private static Properties environment = null;
-    protected static ArrayList listOfSuccessTransfer = null;
-    protected static ArrayList listOfErrorTransfer = null;
-    private static SOSFTPCommand ftpCommand = null;
-    protected static boolean banner = true;
-    private File lockHistoryFile = null;
     private static Properties schedulerParams = new Properties();
     private static SOSConfiguration sosConfiguration = null;
-    protected Vector<File> transferFileList = new Vector<File>();
+    private static SOSFTPCommand ftpCommand = null;
+    private String historyFields =
+            "guid;mandator;transfer_timestamp;pid;ppid;operation;localhost;localhost_ip;local_user;remote_host;remote_host_ip;"
+                    + "remote_user;protocol;port;local_dir;remote_dir;local_filename;remote_filename;file_size;md5;status;last_error_message;log_filename";
+    private String newHistoryFields = "jump_host;jump_host_ip;jump_port;jump_protocol;jump_user";
+    private boolean writeBannerHeader = false;
+    private boolean sendSchedulerSignale = false;
+    private Connection sshConnection = null;
+    private File lockHistoryFile = null;
+    public static final String conParamPORT = "port";
+    public static final String conParamPROTOCOL = "protocol";
+    public static final String conParamSSH_AUTH_METHOD = "ssh_auth_method";
+    public static final String conParamPASSWORD = "password";
+    public static final String conParamUSER = "user";
+    public static final String conParamHOST = "host";
+    public static final String conParamJUMP_HOST = "jump_host";
+    public static final String conParamSSH_AUTH_FILE = "ssh_auth_file";
+    public static final String conParamJUMP_PROTOCOL = "jump_protocol";
+    public static final String conSettingREMOVE_FILES = "remove_files";
+    public static final String conParameterREMOVE_AFTER_JUMP_TRANSFER = "remove_after_jump_transfer";
+    public static final String conParamREPLACEMENT = "replacement";
+    public static final String conParamREPLACING = "replacing";
+    public static final String FILE_MODIFICATION_DATE = "FILE_MODIFICATION_DATE";
+    public static final String conOperationEXECUTE = "execute";
+    public static final String conOperationREMOVE = "remove";
+    public static final String conSettingOPERATION = "operation";
+    public static final String conSettingLOCAL_DIR = "local_dir";
+    public static final String conSettingFILE_PATH = "file_path";
+    public static final String conSettingFILE_SPEC = "file_spec";
+    public static final String USE_PATH_AND_FILE_NAME_4_MATCHING = "use_path_and_file_name_4_matching";
+    public static final String CHECK_SERVER_FEATURES = "check_server_features";
+    public static final String CONVERT_UMLAUTE = "convert_umlaute";
+    public static final String FILENAME_ENCODING = "Filename_encoding";
+    public static final String CONTROL_ENCODING = "control_encoding";
+    public static final String PRE_FTP_COMMANDS = "pre_ftp_commands";
+    public static final String conStatusERROR = "error";
+    public static final String conStatusSUCCESS = conParamValueSUCCESS;
+    public static final String conSettingSTATUS = conParameterSTATUS;
+    public static final String conSettingREMOTE_DIR = "remote_dir";
+    public static final String conSettingTRANSFER_MODE = "transfer_mode";
+    public static final String conSettingFILE_SIZE = "file_size";
+    public static final int ERROR_CODE = 300;
     public static Vector<String> filelist = null;
-    protected Vector<String> filelisttmp = null;
-    protected static Object schedulerJob = null;
-    protected static String SSHJOBNAME = "sos.scheduler.job.JobSchedulerSSHJob";
-    private static Integer exitStatus = null;
     public static boolean gflgUseSystemExit = true;
 
     public SOSFTPCommand(final SOSLogger logger, final Properties arguments_) throws Exception {
@@ -213,7 +215,7 @@ abstract public class SOSFTPCommand {
     }
 
     public boolean execute() throws Exception {
-        StringBuffer stderrOutput = new StringBuffer();
+        StringBuilder stderrOutput = new StringBuilder();
         String commandScriptFileName = "";
         try {
             getLogger().debug1("calling " + sos.util.SOSClassUtil.getMethodName());
@@ -230,7 +232,6 @@ abstract public class SOSFTPCommand {
                     } else {
                         this.setCommandDelimiter(DEFAULT_COMMAND_DELIMITER);
                     }
-
                     if (!getString("jump_command_script").isEmpty()) {
                         commandScript = getString("jump_command_script");
                         getLogger().debug1(".. parameter [jump_command_script]: " + commandScript);
@@ -339,24 +340,23 @@ abstract public class SOSFTPCommand {
                             if (line == null) {
                                 break;
                             }
-                            if (!windows && pid == 0 && schedulerJob != null && Class.forName(SSHJOBNAME) != null) {
-                                if (schedulerJob.getClass().getName().equals(cl_.getName())) {
-                                    pid = Integer.parseInt(line);
-                                    if (cl_ != null) {
-                                        Method method = cl_.getMethod("setSchedulerSSHKillPid", new Class[] { int.class });
-                                        method.invoke(schedulerJob, new Object[] { new Integer(pid) });
-                                    }
-                                    getLogger().debug5("Parent pid: " + pid);
-                                    continue;
+                            if (!windows && pid == 0 && schedulerJob != null && Class.forName(SSHJOBNAME) != null
+                                    && schedulerJob.getClass().getName().equals(cl_.getName())) {
+                                pid = Integer.parseInt(line);
+                                if (cl_ != null) {
+                                    Method method = cl_.getMethod("setSchedulerSSHKillPid", new Class[] { int.class });
+                                    method.invoke(schedulerJob, new Object[] { new Integer(pid) });
                                 }
+                                getLogger().debug5("Parent pid: " + pid);
+                                continue;
                             }
                             if (getString(conSettingOPERATION).equalsIgnoreCase(conOperationEXECUTE) && banner) {
                                 getLogger().info(line);
-                            } else if (getString(conSettingOPERATION).equalsIgnoreCase(conOperationRECEIVE)
+                            } else if (conOperationRECEIVE.equalsIgnoreCase(getString(conSettingOPERATION))
                                     && sosString.parseToString(line).indexOf("files found.") > -1
                                     && sosString.parseToBoolean(getString("skip_transfer"))) {
                                 getLogger().info(line.substring(line.indexOf("[info]") + "[info]".length()));
-                            } else if (getString(conSettingOPERATION).equalsIgnoreCase(conOperationRECEIVE)
+                            } else if (conOperationRECEIVE.equalsIgnoreCase(getString(conSettingOPERATION))
                                     && sosString.parseToString(line).indexOf("Processing file") > -1
                                     && sosString.parseToBoolean(getString("skip_transfer"))) {
                                 String s = line.substring(line.indexOf("Processing file") + "Processing file".length() + 1);
@@ -375,26 +375,23 @@ abstract public class SOSFTPCommand {
                                 tempJumpRemoteDir = line.substring(pos1, pos2);
                             }
                             if (line.indexOf("[info]") > -1 && line.indexOf("files found.") > -1 && getBool("testmode")
-                                    && getString(conSettingOPERATION).equals(conOperationRECEIVE)) {
+                                    && conOperationRECEIVE.equals(getString(conSettingOPERATION))) {
                                 getLogger().info(line.substring(line.indexOf("[info]") + "[info]".length()));
                             }
                             if (line.indexOf("[info]") > -1
                                     && (line.indexOf("removing remote file:") > -1 || line.indexOf("files remove.") > -1)
-                                    && (getString(conSettingOPERATION).equals(conOperationREMOVE) || getString(conSettingOPERATION).equals(conOperationRECEIVE))) {
+                                    && (conOperationREMOVE.equals(getString(conSettingOPERATION)) || conOperationRECEIVE.equals(getString(conSettingOPERATION)))) {
                                 getLogger().info(line.substring(line.indexOf("[info]") + "[info]".length()));
                             }
                         }
-                        if (!windows && schedulerJob != null) {
-                            if (cl_ != null && Class.forName(SSHJOBNAME) != null) {
-                                if (schedulerJob.getClass().getName().equals(cl_.getName())) {
-                                    Method method = cl_.getMethod("setSchedulerSSHKillPid", new Class[] { int.class });
-                                    method.invoke(schedulerJob, new Object[] { new Integer(0) });
-                                }
-                            }
+                        if (!windows && schedulerJob != null && cl_ != null && Class.forName(SSHJOBNAME) != null
+                                && schedulerJob.getClass().getName().equals(cl_.getName())) {
+                            Method method = cl_.getMethod("setSchedulerSSHKillPid", new Class[] { int.class });
+                            method.invoke(schedulerJob, new Object[] { new Integer(0) });
                         }
                         getLogger().debug1("output to stderr for remote command: " + normalizedPassword(this.getCommands()[i]));
                         BufferedReader stderrReader = new BufferedReader(new InputStreamReader(stderr));
-                        stderrOutput = new StringBuffer();
+                        stderrOutput = new StringBuilder();
                         while (true) {
                             String line = stderrReader.readLine();
                             if (line == null) {
@@ -403,7 +400,7 @@ abstract public class SOSFTPCommand {
                             getLogger().error(line);
                             stderrOutput.append(line + conNewLine);
                         }
-                        if (stderrOutput != null && stderrOutput.length() > 0) {
+                        if (stderrOutput != null && !stderrOutput.toString().isEmpty()) {
                             if (ignoreStderr) {
                                 if (flgJumpTransferDefined) {
                                     getLogger().error("output to stderr is ignored: " + stderrOutput);
@@ -420,14 +417,12 @@ abstract public class SOSFTPCommand {
                         } catch (Exception e) {
                             getLogger().debug1("could not retrieve exit status, possibly not supported by remote ssh server");
                         }
-                        if (exitStatus != null) {
-                            if (!exitStatus.equals(new Integer(0))) {
-                                if (ignoreError) {
-                                    getLogger().debug1("exit status is ignored: " + exitStatus);
-                                } else {
-                                    RaiseException("remote command terminated with exit status: " + exitStatus
-                                            + (logger.hasWarnings() ? " error: " + logger.getWarning() : ""));
-                                }
+                        if (exitStatus != null && !exitStatus.equals(new Integer(0))) {
+                            if (ignoreError) {
+                                getLogger().debug1("exit status is ignored: " + exitStatus);
+                            } else {
+                                RaiseException("remote command terminated with exit status: " + exitStatus
+                                        + (logger.hasWarnings() ? " error: " + logger.getWarning() : ""));
                             }
                         }
                         try {
@@ -435,19 +430,17 @@ abstract public class SOSFTPCommand {
                         } catch (Exception e) {
                             getLogger().debug1("could not retrieve exit signal, possibly not supported by remote ssh server");
                         }
-                        if (exitSignal != null) {
-                            if (!exitSignal.isEmpty()) {
-                                if (ignoreSignal) {
-                                    getLogger().debug1("exit signal is ignored: " + exitSignal);
-                                } else {
-                                    RaiseException("remote command terminated with exit signal: " + exitSignal);
-                                }
+                        if (exitSignal != null && !exitSignal.isEmpty()) {
+                            if (ignoreSignal) {
+                                getLogger().debug1("exit signal is ignored: " + exitSignal);
+                            } else {
+                                RaiseException("remote command terminated with exit signal: " + exitSignal);
                             }
                         }
                     } catch (Exception e) {
                         throw e;
                     } finally {
-                        if (remoteCommandScriptFileName != null && remoteCommandScriptFileName.length() > 0) {
+                        if (remoteCommandScriptFileName != null && !remoteCommandScriptFileName.isEmpty()) {
                             deleteCommandScript(remoteCommandScriptFileName);
                         }
                         if (this.getSshSession() != null) {
@@ -529,13 +522,14 @@ abstract public class SOSFTPCommand {
             } catch (Exception e) {
                 RaiseException("error occurred writing file [" + commandFile.getName() + "]: " + e.getMessage(), e);
             } finally {
-                if (fis != null)
+                if (fis != null) {
                     try {
                         fis.close();
                         fis = null;
                     } catch (Exception ex) {
                         // gracefully ignore this error
                     }
+                }
             }
             sftpClient.closeFile(fileHandle);
             fileHandle = null;
@@ -624,8 +618,9 @@ abstract public class SOSFTPCommand {
             sosMail.setSOSLogger(this.getLogger());
             this.getLogger().debug1("sending mail: \n" + sosMail.dumpMessageAsString());
             if (!sosMail.send()) {
-                this.getLogger().warn("mail server is unavailable, mail for recipient [" + recipient + "] is queued in local directory ["
-                        + sosMail.getQueueDir() + "]:" + sosMail.getLastError());
+                this.getLogger().warn(
+                        "mail server is unavailable, mail for recipient [" + recipient + "] is queued in local directory [" + sosMail.getQueueDir()
+                                + "]:" + sosMail.getLastError());
             }
             sosMail.clearRecipients();
         } catch (Exception e) {
@@ -681,10 +676,12 @@ abstract public class SOSFTPCommand {
                 String fs = System.getProperty("file.separator");
                 if (fs.length() == 1) {
                     char sep = fs.charAt(0);
-                    if (sep != '/')
+                    if (sep != '/') {
                         path = path.replace(sep, '/');
-                    if (path.charAt(0) != '/')
+                    }
+                    if (path.charAt(0) != '/') {
                         path = '/' + path;
+                    }
                 }
                 if (!path.startsWith("file://")) {
                     path = "file://" + path;
@@ -986,13 +983,11 @@ abstract public class SOSFTPCommand {
                         }
                     }
                     historyFields = thisLine;
-                    if (historyFilesChanged) {
-                        if (!existHistoryLockFile()) {
-                            createHistoryLockFile();
-                            bw = new BufferedWriter(new FileWriter(historyFile));
-                            bw.write(thisLine);
-                            bw.newLine();
-                        }
+                    if (historyFilesChanged && !existHistoryLockFile()) {
+                        createHistoryLockFile();
+                        bw = new BufferedWriter(new FileWriter(historyFile));
+                        bw.write(thisLine);
+                        bw.newLine();
                     }
                 } else {
                     bw.write(thisLine);
@@ -1033,13 +1028,11 @@ abstract public class SOSFTPCommand {
         try {
             getLogger().debug1("calling " + sos.util.SOSClassUtil.getMethodName());
             getLogger().debug9("lockHistoryFile=" + lockHistoryFile.getCanonicalPath());
-            if (lockHistoryFile != null && lockHistoryFile.exists()) {
+            if (lockHistoryFile != null && lockHistoryFile.exists() && !lockHistoryFile.delete()) {
+                getLogger().debug3("history lock file could not be deleted: " + lockHistoryFile.getCanonicalPath());
+                Thread.sleep(1000);
                 if (!lockHistoryFile.delete()) {
-                    getLogger().debug3("history lock file could not be deleted: " + lockHistoryFile.getCanonicalPath());
-                    Thread.sleep(1000);
-                    if (!lockHistoryFile.delete()) {
-                        RaiseException("history lock file could not be deleted: " + lockHistoryFile.getCanonicalPath());
-                    }
+                    RaiseException("history lock file could not be deleted: " + lockHistoryFile.getCanonicalPath());
                 }
             }
         } catch (Exception e) {
@@ -1100,8 +1093,8 @@ abstract public class SOSFTPCommand {
             }
             arguments.put("xx_make_temp_directory_xx", "ok");
             if (!conOperationREMOVE.equalsIgnoreCase(getString(conSettingOPERATION))) {
-                curCommands = getString(conSettingsJUMP_COMMAND) + " -operation=make_temp_directory -root="
-                        + sosString.parseToString(arguments, "root");
+                curCommands =
+                        getString(conSettingsJUMP_COMMAND) + " -operation=make_temp_directory -root=" + sosString.parseToString(arguments, "root");
                 this.setCommands(curCommands.split(getCommandDelimiter()));
                 if (!execute()) {
                     RaiseException("error occurred processing command: " + normalizedPassword(curCommands));
@@ -1265,8 +1258,9 @@ abstract public class SOSFTPCommand {
             }
             return envVars;
         } catch (Exception e) {
-            if (logger != null)
+            if (logger != null) {
                 logger.warn("[ERROR] could not read environment, cause: " + e.getMessage());
+            }
             RaiseException("error occurred reading environment: " + e.getMessage(), e);
         }
         return envVars;
@@ -1280,7 +1274,7 @@ abstract public class SOSFTPCommand {
             for (String element : split) {
                 inputFile = sosString.parseToString(element);
                 getLogger().debug5("remove: " + inputFile);
-                if (inputFile.length() == 0) {
+                if (inputFile.isEmpty()) {
                     getLogger().debug1("no directory/file has been specified for removal: " + inputFile);
                     return false;
                 }
@@ -1375,8 +1369,9 @@ abstract public class SOSFTPCommand {
                             pos1 = curBannerHeader.indexOf("%{" + key + "}");
                             pos2 = pos1 + ("%{" + key + "}").length();
                             if (pos1 > -1 && pos2 > pos1) {
-                                curBannerHeader = curBannerHeader.substring(0, pos1) + sosString.parseToString(arguments, key)
-                                        + curBannerHeader.substring(pos2);
+                                curBannerHeader =
+                                        curBannerHeader.substring(0, pos1) + sosString.parseToString(arguments, key)
+                                                + curBannerHeader.substring(pos2);
                             }
                             pos1 = curBannerHeader.indexOf("%{" + key + "}", pos2);
                             if (pos1 == -1) {
@@ -1412,8 +1407,9 @@ abstract public class SOSFTPCommand {
                             pos3 = curBannerFooter.indexOf("%{" + key + "}");
                             pos4 = pos3 + ("%{" + key + "}").length();
                             if (pos3 > -1 && pos4 > pos3) {
-                                curBannerFooter = curBannerFooter.substring(0, pos3) + sosString.parseToString(arguments, key)
-                                        + curBannerFooter.substring(pos4);
+                                curBannerFooter =
+                                        curBannerFooter.substring(0, pos3) + sosString.parseToString(arguments, key)
+                                                + curBannerFooter.substring(pos4);
                             }
                             pos3 = curBannerFooter.indexOf("%{" + key + "}", pos4);
                             if (pos3 == -1) {
@@ -1629,8 +1625,9 @@ abstract public class SOSFTPCommand {
             }
             port = sosString.parseToString(arguments, conParamPORT);
             if (conOperationSEND.equals(sosString.parseToString(arguments, conSettingOPERATION))) {
-                local_dir = localFile != null && localFile.getParent() != null ? clearCRLF(localFile.getParent())
-                        : clearCRLF(sosString.parseToString(arguments, conSettingLOCAL_DIR));
+                local_dir =
+                        localFile != null && localFile.getParent() != null ? clearCRLF(localFile.getParent()) : clearCRLF(sosString.parseToString(
+                                arguments, conSettingLOCAL_DIR));
             } else {
                 local_dir = clearCRLF(sosString.parseToString(arguments, conSettingLOCAL_DIR));
             }
@@ -1648,9 +1645,11 @@ abstract public class SOSFTPCommand {
             if (sosString.parseToString(localFilename).isEmpty() || sosString.parseToString(remoteFilename).isEmpty()) {
                 md5 = EMPTY;
             } else {
-                File f4md5 = localFile.getName().equals(new File(remoteFilename).getName()) ? new File(remoteFilename)
-                        : conOperationRECEIVE.equals(sosString.parseToString(arguments, conSettingOPERATION)) ? new File(normalized(local_dir)
-                                + new File(remoteFilename).getName()) : new File(normalized(local_dir) + localFile.getName());
+                File f4md5 =
+                        localFile.getName().equals(new File(remoteFilename).getName()) ? new File(remoteFilename)
+                                : conOperationRECEIVE.equals(sosString.parseToString(arguments, conSettingOPERATION)) ? new File(
+                                        normalized(local_dir) + new File(remoteFilename).getName()) : new File(normalized(local_dir)
+                                        + localFile.getName());
                 if (f4md5.exists()) {
                     getLogger().debug9("md5 for " + f4md5.getAbsolutePath());
                     md5 = sos.util.SOSCrypt.MD5encrypt(f4md5);
@@ -1658,10 +1657,11 @@ abstract public class SOSFTPCommand {
                     md5 = EMPTY;
                 }
             }
-            status = sosString.parseToString(arguments, conParameterSTATUS).isEmpty() ? conParamValueSUCCESS
-                    : sosString.parseToString(arguments, conParameterSTATUS);
-            last_error_message = clearCRLF(getLogger().getError() != null && !getLogger().getError().isEmpty() ? getLogger().getError()
-                    : getLogger().getWarning());
+            status =
+                    sosString.parseToString(arguments, conParameterSTATUS).isEmpty() ? conParamValueSUCCESS : sosString.parseToString(arguments,
+                            conParameterSTATUS);
+            last_error_message =
+                    clearCRLF(getLogger().getError() != null && !getLogger().getError().isEmpty() ? getLogger().getError() : getLogger().getWarning());
             last_error_message = normalizedPassword(sosString.parseToString(last_error_message));
             log_filename = sosString.parseToString(arguments, "log_filename");
             jump_host = sosString.parseToString(arguments, conParamJUMP_HOST);
@@ -1704,8 +1704,9 @@ abstract public class SOSFTPCommand {
                 String[] splitHistFields = historyFields.split(";");
                 for (int i = 0; i < splitHistFields.length; i++) {
                     String key = sosString.parseToString(splitHistFields[i]);
-                    String value = sosString.parseToString(objSchedulerOrderParameterSet, key).length() == 0 ? sosString.parseToString(arguments, "history_entry_".concat(key))
-                            : sosString.parseToString(objSchedulerOrderParameterSet, key);
+                    String value =
+                            sosString.parseToString(objSchedulerOrderParameterSet, key).length() == 0 ? sosString.parseToString(arguments,
+                                    "history_entry_".concat(key)) : sosString.parseToString(objSchedulerOrderParameterSet, key);
                     hist = hist + (i == 0 ? "" : ";") + value; //
                 }
                 getLogger().debug9("history entry: " + hist);
@@ -1776,9 +1777,10 @@ abstract public class SOSFTPCommand {
                 for (int j = 0; transactionalHistoryFile != null && j < transactionalHistoryFile.size(); j++) {
                     String hist = sosString.parseToString(transactionalHistoryFile.get(j));
                     if (hasError) {
-                        hist = hist.replaceAll(";success;;", ";error;"
-                                + clearCRLF(getLogger().getError() != null && getLogger().getError().length() > 0 ? getLogger().getError()
-                                        : getLogger().getWarning()) + ";");
+                        hist =
+                                hist.replaceAll(";success;;", ";error;"
+                                        + clearCRLF(getLogger().getError() != null && !getLogger().getError().isEmpty() ? getLogger().getError()
+                                                : getLogger().getWarning()) + ";");
                     }
                     history.write(hist);
                     history.newLine();
@@ -1816,19 +1818,18 @@ abstract public class SOSFTPCommand {
     }
 
     private void sendTransactionalSchedulerRequestFile() throws Exception {
-        if (transActional) {
-            if (transactionalSchedulerRequestFile != null) {
-                for (int i = 0; i < transactionalSchedulerRequestFile.size(); i++) {
-                    String msg = sosString.parseToString(transactionalSchedulerRequestFile.get(i));
-                    boolean hasError = getLogger().hasErrors() || getLogger().hasWarnings();
-                    if (hasError) {
-                        msg = msg.replaceAll("<param name='status' value='success'/>", "<param name='status' value='error'/>");
-                        msg = msg.replaceAll("<param name='last_error_message' value=''/>", "<param name='last_error_message' value='"
-                                + clearCRLF(getLogger().getError() != null && getLogger().getError().length() > 0 ? getLogger().getError()
-                                        : getLogger().getWarning()) + "'/>");
-                    }
-                    sendSchedulerRequest(msg);
+        if (transActional && transactionalSchedulerRequestFile != null) {
+            for (int i = 0; i < transactionalSchedulerRequestFile.size(); i++) {
+                String msg = sosString.parseToString(transactionalSchedulerRequestFile.get(i));
+                boolean hasError = getLogger().hasErrors() || getLogger().hasWarnings();
+                if (hasError) {
+                    msg = msg.replaceAll("<param name='status' value='success'/>", "<param name='status' value='error'/>");
+                    msg =
+                            msg.replaceAll("<param name='last_error_message' value=''/>", "<param name='last_error_message' value='"
+                                    + clearCRLF(getLogger().getError() != null && getLogger().getError().length() > 0 ? getLogger().getError()
+                                            : getLogger().getWarning()) + "'/>");
                 }
+                sendSchedulerRequest(msg);
             }
         }
     }
@@ -2003,24 +2004,20 @@ abstract public class SOSFTPCommand {
 
     protected boolean remoteIsWindowsShell(final boolean withConn) throws Exception {
         try {
-            if (withConn) {
-                if (getSshConnection() == null) {
-                    readJumpSettings();
-                    this.getBaseAuthentication();
-                }
+            if (withConn && getSshConnection() == null) {
+                readJumpSettings();
+                this.getBaseAuthentication();
             }
             return remoteIsWindowsShell();
         } catch (Exception e) {
             RaiseException("Failed to check if remote system has windows shell: " + e.getMessage(), e);
         } finally {
-            if (withConn) {
-                if (this.getSshConnection() != null) {
-                    try {
-                        this.getSshConnection().close();
-                        this.setSshConnection(null);
-                    } catch (Exception ex) {
-                        // gracefully ignore this error
-                    }
+            if (withConn && this.getSshConnection() != null) {
+                try {
+                    this.getSshConnection().close();
+                    this.setSshConnection(null);
+                } catch (Exception ex) {
+                    // gracefully ignore this error
                 }
             }
         }
@@ -2035,7 +2032,8 @@ abstract public class SOSFTPCommand {
                 if (proxyUser != null && !proxyUser.isEmpty()) {
                     this.getSshConnection().setProxyData(new HTTPProxyData(proxyHost, proxyPort));
                 } else {
-                    this.getSshConnection().setProxyData(new HTTPProxyData(proxyHost, proxyPort, proxyUser, new SOSCommandline().getExternalPassword(proxyPassword, logger)));
+                    this.getSshConnection().setProxyData(
+                            new HTTPProxyData(proxyHost, proxyPort, proxyUser, new SOSCommandline().getExternalPassword(proxyPassword, logger)));
                 }
             }
             this.getSshConnection().connect();
@@ -2047,7 +2045,9 @@ abstract public class SOSFTPCommand {
                 if (!authenticationFile.canRead()) {
                     RaiseException("authentication file not accessible: " + authenticationFile.getCanonicalPath());
                 }
-                isAuthenticated = this.getSshConnection().authenticateWithPublicKey(user, authenticationFile, new SOSCommandline().getExternalPassword(password, logger));
+                isAuthenticated =
+                        this.getSshConnection().authenticateWithPublicKey(user, authenticationFile,
+                                new SOSCommandline().getExternalPassword(password, logger));
             } else if (authenticationMethod.equalsIgnoreCase(conParamPASSWORD)) {
                 isAuthenticated = this.getSshConnection().authenticateWithPassword(user, new SOSCommandline().getExternalPassword(password, logger));
             }
@@ -2237,8 +2237,9 @@ abstract public class SOSFTPCommand {
                 if (newlineIndex > -1) {
                     String stringAfterNewline = outstring.substring(newlineIndex);
                     currentLine = stringAfterNewline;
-                } else
+                } else {
                     currentLine += outstring;
+                }
             }
         }
 
@@ -2326,19 +2327,16 @@ abstract public class SOSFTPCommand {
                             newArg.put(sosString.parseToString(splitParam[0]), splitParam.length == 1 ? "" : sosString.parseToString(splitParam[1]));
                         }
                         listOfSuccessTransfer.add(newArg);
-                    } else {
-                        if ("transfer_error".equalsIgnoreCase(key)) {
-                            Properties newArg = (Properties) arg.clone();
-                            String newParameterSet = sosString.parseToString(arg.get(value));
-                            String[] splitParams = newParameterSet.split("::");
-                            for (String splitParam2 : splitParams) {
-                                String s = sosString.parseToString(splitParam2);
-                                String[] splitParam = s.split("=");
-                                newArg.put(sosString.parseToString(splitParam[0]), splitParam.length == 1 ? ""
-                                        : sosString.parseToString(splitParam[1]));
-                            }
-                            listOfErrorTransfer.add(newArg);
+                    } else if ("transfer_error".equalsIgnoreCase(key)) {
+                        Properties newArg = (Properties) arg.clone();
+                        String newParameterSet = sosString.parseToString(arg.get(value));
+                        String[] splitParams = newParameterSet.split("::");
+                        for (String splitParam2 : splitParams) {
+                            String s = sosString.parseToString(splitParam2);
+                            String[] splitParam = s.split("=");
+                            newArg.put(sosString.parseToString(splitParam[0]), splitParam.length == 1 ? "" : sosString.parseToString(splitParam[1]));
                         }
+                        listOfErrorTransfer.add(newArg);
                     }
                 }
             }
@@ -2437,13 +2435,14 @@ abstract public class SOSFTPCommand {
     }
 
     private static String getUsage() {
-        String usage = "Usage: sos.net.SOSFTPCommand -operation= -settings= -profile= -verbose=" + conNewLine
-                + "        -operation   =[send|receive|execute|remove|install]   FTP operation" + conNewLine
-                + "        -settings    =[file]                   Configuration file" + conNewLine
-                + "        -profile     =[profile]                 Section/Profile for FTP settings" + conNewLine
-                + "                                           in configuration file" + conNewLine
-                + "        -verbose     =[1..9]                    Verbosity level" + conNewLine
-                + "        -log_filename=[filename]               log file name    ";
+        String usage =
+                "Usage: sos.net.SOSFTPCommand -operation= -settings= -profile= -verbose=" + conNewLine
+                        + "        -operation   =[send|receive|execute|remove|install]   FTP operation" + conNewLine
+                        + "        -settings    =[file]                   Configuration file" + conNewLine
+                        + "        -profile     =[profile]                 Section/Profile for FTP settings" + conNewLine
+                        + "                                           in configuration file" + conNewLine
+                        + "        -verbose     =[1..9]                    Verbosity level" + conNewLine
+                        + "        -log_filename=[filename]               log file name    ";
         return usage;
     }
 
@@ -2573,11 +2572,9 @@ abstract public class SOSFTPCommand {
     }
 
     private static boolean onlyVersion(final Properties arg) throws Exception {
-        if (arg.containsKey("version")) {
-            if (!arg.containsKey(conSettingOPERATION)) {
-                logger.info("sosftp version \"" + getVersion() + "\"");
-                return true;
-            }
+        if (arg.containsKey("version") && !arg.containsKey(conSettingOPERATION)) {
+            logger.info("sosftp version \"" + getVersion() + "\"");
+            return true;
         }
         return false;
     }
@@ -2641,7 +2638,7 @@ abstract public class SOSFTPCommand {
         try {
             boolean rc = true;
             banner = false;
-            if (listOfSuccessTransfer.size() > 0) {
+            if (!listOfSuccessTransfer.isEmpty()) {
                 Properties p = (Properties) listOfSuccessTransfer.get(0);
                 String operation = sosString.parseToString(p.get(conSettingOPERATION));
                 rc = transfer(listOfSuccessTransfer, operation, p, true, false);
@@ -2665,7 +2662,7 @@ abstract public class SOSFTPCommand {
         try {
             boolean rc = false;
             banner = false;
-            if (listOfErrorTransfer.size() > 0) {
+            if (!listOfErrorTransfer.isEmpty()) {
                 Properties p = (Properties) listOfErrorTransfer.get(0);
                 String operation = sosString.parseToString(p.get(conSettingOPERATION));
                 transfer(listOfErrorTransfer, operation, p, rc, true);
@@ -2727,45 +2724,43 @@ abstract public class SOSFTPCommand {
         if (getBool("testmode")) {
             return "";
         }
-        if (System.getProperty("os.name").toLowerCase().indexOf("wind") > -1) {
-            if (getPidsExe == null || getPidsExe.isEmpty()) {
-                if (new File("getParentId.exe").exists()) {
-                    getPidsExe = new File("getParentId.exe").getCanonicalPath();
-                } else {
-                    getLogger().debug5("creating getParentId.exe ");
-                    java.net.URL url = ClassLoader.getSystemResource("getParentId.exe");
-                    getLogger().debug1("found url=" + url);
-                    InputStream in = getClass().getClassLoader().getSystemResourceAsStream("getParentId.exe");
-                    getLogger().debug9("get InputStream to create new getParentId.exe=" + in);
-                    if (in == null) {
-                        getLogger().debug9("try again to get InputStream to create new getParentId.exe=" + in);
-                        in = getClass().getClassLoader().getResourceAsStream("getParentId.exe");
-                        getLogger().debug9("InputStream is =" + in);
-                    }
-                    if (in != null) {
-                        OutputStream out = null;
-                        byte[] buffer = new byte[1024];
-                        try {
-                            out = new FileOutputStream("getParentId.exe", false);
-                            while (true) {
-                                synchronized (buffer) {
-                                    int amountRead = in.read(buffer);
-                                    if (amountRead == -1) {
-                                        break;
-                                    }
-                                    out.write(buffer, 0, amountRead);
+        if (System.getProperty("os.name").toLowerCase().indexOf("wind") > -1 && (getPidsExe == null || getPidsExe.isEmpty())) {
+            if (new File("getParentId.exe").exists()) {
+                getPidsExe = new File("getParentId.exe").getCanonicalPath();
+            } else {
+                getLogger().debug5("creating getParentId.exe ");
+                java.net.URL url = ClassLoader.getSystemResource("getParentId.exe");
+                getLogger().debug1("found url=" + url);
+                InputStream in = getClass().getClassLoader().getSystemResourceAsStream("getParentId.exe");
+                getLogger().debug9("get InputStream to create new getParentId.exe=" + in);
+                if (in == null) {
+                    getLogger().debug9("try again to get InputStream to create new getParentId.exe=" + in);
+                    in = getClass().getClassLoader().getResourceAsStream("getParentId.exe");
+                    getLogger().debug9("InputStream is =" + in);
+                }
+                if (in != null) {
+                    OutputStream out = null;
+                    byte[] buffer = new byte[1024];
+                    try {
+                        out = new FileOutputStream("getParentId.exe", false);
+                        while (true) {
+                            synchronized (buffer) {
+                                int amountRead = in.read(buffer);
+                                if (amountRead == -1) {
+                                    break;
                                 }
-                            }
-                        } finally {
-                            if (in != null) {
-                                in.close();
-                            }
-                            if (out != null) {
-                                out.close();
+                                out.write(buffer, 0, amountRead);
                             }
                         }
-                        return getPids();
+                    } finally {
+                        if (in != null) {
+                            in.close();
+                        }
+                        if (out != null) {
+                            out.close();
+                        }
                     }
+                    return getPids();
                 }
             }
         }
@@ -2842,7 +2837,9 @@ abstract public class SOSFTPCommand {
         try {
             Properties arg_s = sosConfiguration.getParameterAsProperties();
             if (!sosString.parseToString(arg_s.get("settings")).isEmpty() && !sosString.parseToString(arg_s.get("include")).isEmpty()) {
-                sos.configuration.SOSConfiguration config_ = new sos.configuration.SOSConfiguration(sosString.parseToString(arg_s.get("settings")), sosString.parseToString(arg_s.get("include")), logger);
+                sos.configuration.SOSConfiguration config_ =
+                        new sos.configuration.SOSConfiguration(sosString.parseToString(arg_s.get("settings")),
+                                sosString.parseToString(arg_s.get("include")), logger);
                 SOSConfigurationItem[] items = config_.checkConfigurationItems(null);
                 arg_s.putAll(config_.getParameterAsProperties());
             }
@@ -3108,21 +3105,15 @@ abstract public class SOSFTPCommand {
     }
 
     protected String getQuotedString(final String pstrParameterName) {
-        String strR = "";
-        strR = "\"" + getString(pstrParameterName) + "\"";
-        return strR;
+        return "\"" + getString(pstrParameterName) + "\"";
     }
 
     protected String getKeywordValuePair(final String pstrParameterName) {
-        String strR = " -" + pstrParameterName + "=";
-        strR += getQuotedString(pstrParameterName);
-        return strR;
+        return " -" + pstrParameterName + "=" + getQuotedString(pstrParameterName);
     }
 
     protected String getKeywordValuePair(final String pstrParameterName, final String pstrParameterValue) {
-        String strR = " -" + pstrParameterName + "=";
-        strR += "\"" + pstrParameterValue + "\"";
-        return strR;
+        return " -" + pstrParameterName + "=" + "\"" + pstrParameterValue + "\"";
     }
 
     protected String doEncoding(final String pstrStringToEncode, final String pstrEncoding) throws Exception {

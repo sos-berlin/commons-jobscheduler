@@ -11,7 +11,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 
 import com.sos.dialog.components.IntegerField;
 
@@ -35,18 +34,15 @@ public class SOSIntegerInputDialog extends Dialog {
         Shell parent = getParent();
         shell = new Shell(parent, SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL);
         shell.setSize(152, 90);
-
         shell.setLayout(new GridLayout(2, true));
         Point pt = shell.getDisplay().getCursorLocation();
         shell.setLocation(pt.x, pt.y);
-
         lbNumber = new Label(shell, SWT.NULL);
         lbNumber.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 1, 1));
         lbNumber.setText("Number");
         final IntegerField integerValue = new IntegerField(shell, SWT.SINGLE | SWT.BORDER);
         integerValue.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
         integerValue.setText(value);
-
         final Button buttonOK = new Button(shell, SWT.PUSH);
         buttonOK.setText(CAPTION_OK);
         GridData gd_buttonOK = new GridData(GridData.HORIZONTAL_ALIGN_END);
@@ -55,7 +51,6 @@ public class SOSIntegerInputDialog extends Dialog {
         buttonOK.setEnabled(true);
         Button buttonCancel = new Button(shell, SWT.PUSH);
         buttonCancel.setText(CAPTION_CANCEL);
-
         buttonOK.addListener(SWT.Selection, new Listener() {
 
             public void handleEvent(Event event) {
@@ -63,7 +58,6 @@ public class SOSIntegerInputDialog extends Dialog {
                 shell.dispose();
             }
         });
-
         buttonCancel.addListener(SWT.Selection, new Listener() {
 
             public void handleEvent(Event event) {
@@ -74,21 +68,20 @@ public class SOSIntegerInputDialog extends Dialog {
         shell.addListener(SWT.Traverse, new Listener() {
 
             public void handleEvent(Event event) {
-                if (event.detail == SWT.TRAVERSE_ESCAPE)
+                if (event.detail == SWT.TRAVERSE_ESCAPE) {
                     event.doit = false;
+                }
             }
         });
-
         integerValue.setText(value);
         shell.pack();
         shell.open();
-
         Display display = parent.getDisplay();
         while (!shell.isDisposed()) {
-            if (!display.readAndDispatch())
+            if (!display.readAndDispatch()) {
                 display.sleep();
+            }
         }
-
         return value;
     }
 
@@ -98,7 +91,6 @@ public class SOSIntegerInputDialog extends Dialog {
 
     public void setLableCaption(String caption) {
         lbNumber.setText(caption);
-
     }
 
     public static void main(String[] args) {
@@ -110,4 +102,5 @@ public class SOSIntegerInputDialog extends Dialog {
     public void setValue(Integer value) {
         this.value = value;
     }
+
 }

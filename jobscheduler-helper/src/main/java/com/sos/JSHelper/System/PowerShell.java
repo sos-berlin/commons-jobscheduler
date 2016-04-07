@@ -13,21 +13,20 @@ import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 
-/*
- * source code from http://kra.lc/blog/2014/02/powershell-java-bridge/
- */
+/** source code from http://kra.lc/blog/2014/02/powershell-java-bridge/ */
 public class PowerShell {
 
     private static final Logger LOGGER = Logger.getLogger(PowerShell.class);
     private static final int GARBAGE_INTERVAL = 60 * 1000;
     private static File powershell = null;
     private final Process process;
-    private Thread inputThread, shutdownThread;
+    private final PipedOutputStream outputPipe;
+    private Thread inputThread;
+    private Thread shutdownThread;
     private Timer garbageTimer;
     private File source;
     private PrintWriter sourceWriter;
     private PipedInputStream inputPipe;
-    private final PipedOutputStream outputPipe;
 
     static {
         try {
@@ -41,8 +40,9 @@ public class PowerShell {
 
     public PowerShell() throws IOException {
         Runtime runtime = Runtime.getRuntime();
-        process = runtime.exec("PowerShell -NoLogo -File " + powershell.getAbsolutePath() + " -Source "
-                + (source = File.createTempFile(PowerShell.class.getSimpleName() + "Source", ".ps1")));
+        process =
+                runtime.exec("PowerShell -NoLogo -File " + powershell.getAbsolutePath() + " -Source "
+                        + (source = File.createTempFile(PowerShell.class.getSimpleName() + "Source", ".ps1")));
         source.deleteOnExit();
         sourceWriter = new PrintWriter(source);
         runtime.addShutdownHook(shutdownThread = new Thread() {
@@ -53,7 +53,7 @@ public class PowerShell {
             }
         });
         outputPipe = new PipedOutputStream(inputPipe = new PipedInputStream());
-        (inputThread = new Thread(PowerShell.class.getSimpleName() + "Thread") {
+        inputThread = new Thread(PowerShell.class.getSimpleName() + "Thread") {
 
             @Override
             public void run() {
@@ -66,19 +66,22 @@ public class PowerShell {
                         outputPipe.write(buffer, 0, length);
                     }
                 } catch (IOException e) {
-                    /* ... */
+                    //
                 } finally {
-                    if (stream != null)
+                    if (stream != null) {
                         try {
                             stream.close();
                         } catch (IOException e) {
-                            /* ... */
+                            //
                         }
+                    }
                     detatch();
                 }
             }
-        }).start();
-        (garbageTimer = new Timer(PowerShell.class.getSimpleName() + "GarbageTimer", true)).scheduleAtFixedRate(new TimerTask() {
+        };
+        inputThread.start();
+        garbageTimer = new Timer(PowerShell.class.getSimpleName() + "GarbageTimer", true);
+        garbageTimer.scheduleAtFixedRate(new TimerTask() {
 
             @Override
             public void run() {
@@ -112,7 +115,7 @@ public class PowerShell {
             sourceWriter.close();
             sourceWriter = new PrintWriter(source = newSource);
         } catch (IOException e) {
-            /* ... */
+            //
         }
     }
 
@@ -124,13 +127,13 @@ public class PowerShell {
             process.destroy();
             process.waitFor();
         } catch (InterruptedException e) {
-            /* ... */
+            //
         }
         source.delete();
         try {
             outputPipe.close();
         } catch (IOException e) {
-            /* ... */
+            //
         }
     }
 
@@ -140,12 +143,14 @@ public class PowerShell {
 
     public static void main(String[] args) throws IOException {
         PowerShell powershell = new PowerShell();
-        for (;;)
+        for (;;) {
             try {
                 powershell.execute("[console]::beep(500,300)");
                 Thread.sleep(1000);
             } catch (IOException | InterruptedException e) {
                 LOGGER.error(e.getMessage(), e);
             }
+        }
     }
+
 }
