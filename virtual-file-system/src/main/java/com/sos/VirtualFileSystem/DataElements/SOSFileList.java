@@ -34,9 +34,9 @@ public class SOSFileList extends SOSVfsMessageCodes {
     private final static Logger logger = Logger.getLogger(SOSFileList.class);
     private final static Logger objJadeReportLogger = Logger.getLogger(VFSFactory.getLoggerName());
     private final String historyFields =
-            "guid;mandator;transfer_timestamp;pid;ppid;operation;localhost;localhost_ip;local_user;remote_host;remote_host_ip"
-                    + ";remote_user;protocol;port;local_dir;remote_dir;local_filename;remote_filename;file_size;md5;status;last_error_message;log_filename";
-    private final String newHistoryFields = "jump_host;jump_host_ip;jump_port;jump_protocol;jump_user;modification_timestamp";
+            "guid;mandator;transfer_end;pid;ppid;operation;localhost;localhost_ip;local_user;remote_host;remote_host_ip;remote_user;protocol;"
+            + "port;local_dir;remote_dir;local_filename;remote_filename;file_size;md5;status;last_error_message;log_filename";
+    private final String newHistoryFields = "jump_host;jump_host_ip;jump_port;jump_protocol;jump_user;transfer_start;modification_date";
     private SOSFTPOptions objOptions = null;
     private Vector<SOSFileListEntry> objFileListEntries = new Vector<>();
     private boolean transferCountersCounted = false;
