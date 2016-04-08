@@ -704,7 +704,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         if (pathName == null) {
             pathName = "";
         }
-        if (!pathName.isEmpty()) {
+        if (pathName.isEmpty()) {
             pathName = ".";
         }
         try {
