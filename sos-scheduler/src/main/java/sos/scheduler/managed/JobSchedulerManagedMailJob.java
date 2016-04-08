@@ -45,7 +45,6 @@ public class JobSchedulerManagedMailJob extends JobSchedulerManagedJob {
         String smtpPass = "";
         String securityProtocol = "";
 
-
         try {
             try {
                 super.prepareParams();
@@ -133,8 +132,10 @@ public class JobSchedulerManagedMailJob extends JobSchedulerManagedJob {
                         if (this.getParameters().value("cleanup_attachment").equals("1")
                                 || this.getParameters().value("cleanup_attachment").equalsIgnoreCase("true")
                                 || this.getParameters().value("cleanup_attachment").equalsIgnoreCase("yes")) {
-                        cleanupAttachment = true;
+                            cleanupAttachment = true;
+                        }
                     }
+
                 } catch (Exception e) {
                     throw new Exception("error occurred checking parameters: " + e.getMessage());
                 }
@@ -166,7 +167,7 @@ public class JobSchedulerManagedMailJob extends JobSchedulerManagedJob {
                         sosMail = new SOSMail(host);
                         sosMail.setQueueDir(queueDir);
                         sosMail.setFrom(from);
-                       
+
                         SOSSettings smtpSettings = new SOSProfileSettings(spooler.ini_path());
                         Properties smtpProperties = smtpSettings.getSection("smtp");
                         if (!smtpProperties.isEmpty()) {
