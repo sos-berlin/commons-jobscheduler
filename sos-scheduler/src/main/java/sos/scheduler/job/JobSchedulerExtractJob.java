@@ -360,11 +360,9 @@ public class JobSchedulerExtractJob extends JobSchedulerJob {
                                     if (outputFieldCount > 0) {
                                         line += this.getOutputFieldSeparator();
                                     }
-                                    line +=
-                                            this.getOutputFieldDelimiter()
-                                                    + record.string(fieldName).replaceAll("\\" + this.getOutputFieldDelimiter(),
-                                                            this.getOutputFieldDelimiterQuote() + this.getOutputFieldDelimiter())
-                                                    + this.getOutputFieldDelimiter();
+                                    line += this.getOutputFieldDelimiter()
+                                            + record.string(fieldName).replaceAll("\\" + this.getOutputFieldDelimiter(),
+                                                    this.getOutputFieldDelimiterQuote() + this.getOutputFieldDelimiter()) + this.getOutputFieldDelimiter();
                                     outputFieldCount++;
                                 } else {
                                     if (outputFieldCount > 0) {
@@ -378,10 +376,9 @@ public class JobSchedulerExtractJob extends JobSchedulerJob {
                                     if (outputFieldCount > 0) {
                                         line += this.getOutputFieldSeparator();
                                     }
-                                    line +=
-                                            this.getOutputFieldDelimiter()
-                                                    + SOSDate.getDateAsString(SOSDate.getDate(record.string(fieldName), this.getInputDateFormat()),
-                                                            this.getOutputDateFormat()) + this.getOutputFieldDelimiter();
+                                    line += this.getOutputFieldDelimiter()
+                                            + SOSDate.getDateAsString(SOSDate.getDate(record.string(fieldName), this.getInputDateFormat()),
+                                                    this.getOutputDateFormat()) + this.getOutputFieldDelimiter();
                                     outputFieldCount++;
                                 } catch (Exception e) {
                                     throw new Exception("could not convert date using output date format [" + this.getOutputDateFormat() + "]: "

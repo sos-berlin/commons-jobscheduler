@@ -135,7 +135,7 @@ public class SOSSchedulerCommand {
 
     public String getResponse() throws IOException, RuntimeException {
         int b;
-        StringBuffer response = new StringBuffer();
+        StringBuilder response = new StringBuilder();
         if (in != null) {
             while ((b = in.read()) != -1) {
                 if (b == 0) {

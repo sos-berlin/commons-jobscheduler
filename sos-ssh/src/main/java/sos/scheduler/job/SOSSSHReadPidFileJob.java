@@ -26,12 +26,10 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "com_sos_net_messages", defaultLocale = "en")
 public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
 
-    private final Logger logger = Logger.getLogger(this.getClass());
-
+    private static final Logger LOGGER = Logger.getLogger(SOSSSHReadPidFileJob.class);
     private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
     private static final String PID_PLACEHOLDER = "${pid}";
     private String tempPidFileName;
-
     private List<Integer> pids = new ArrayList<Integer>();
 
     private void openSession() {
@@ -42,7 +40,7 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
                 vfsHandler.Connect(postAlternateOptions);
             }
             vfsHandler.Authenticate(objOptions);
-            logger.debug("connection established");
+            LOGGER.debug("connection established");
         } catch (Exception e) {
             throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
         }
@@ -69,34 +67,26 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
             add2Files2Delete(getTempPidFileName());
             try {
                 String strCmd = String.format(objOptions.getPostCommandRead().Value(), getTempPidFileName());
-                // see http://www.sos-berlin.com/jira/browse/JS-673
-                logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
+                LOGGER.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
                 strCmd = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strCmd);
-                logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
-                logger.debug("***Execute read pid file command!***");
+                LOGGER.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
+                LOGGER.debug("***Execute read pid file command!***");
                 vfsHandler.ExecuteCommand(strCmd);
                 objJSJobUtilities.setJSParam(conExit_code, "0");
                 String pid = null;
                 BufferedReader reader = new BufferedReader(new StringReader(new String(vfsHandler.getStdOut())));
                 String line = null;
                 while ((line = reader.readLine()) != null) {
-                    // get the first line via a regex matcher,
-                    // if first line is parseable to an Integer we have the pid
-                    // for the execute channel [SP]
-                    logger.debug(line);
+                    LOGGER.debug(line);
                     Matcher regExMatcher = Pattern.compile("^([^\r\n]*)\r*\n*").matcher(line);
                     if (regExMatcher.find()) {
-                        pid = regExMatcher.group(1).trim(); // key with leading
-                                                            // and trailing
-                                                            // whitespace
-                                                            // removed
+                        pid = regExMatcher.group(1).trim();
                         try {
                             pids.add(Integer.parseInt(pid));
-                            logger.debug("PID: " + pid);
-                            // break;
+                            LOGGER.debug("PID: " + pid);
                             continue;
                         } catch (Exception e) {
-                            logger.debug("no parseable pid received in line:\n" + pid);
+                            LOGGER.debug("no parseable pid received in line:\n" + pid);
                         }
                     }
                 }
@@ -108,22 +98,20 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
                 if (objOptions.raise_exception_on_error.value()) {
                     if (objOptions.ignore_error.value()) {
                         if (objOptions.ignore_stderr.value()) {
-                            logger.debug(this.StackTrace2String(e));
+                            LOGGER.debug(this.StackTrace2String(e));
                         } else {
-                            logger.error(this.StackTrace2String(e));
+                            LOGGER.error(this.StackTrace2String(e));
                             throw new SSHExecutionError("Exception raised: " + e, e);
                         }
                     } else {
-                        logger.error(this.StackTrace2String(e));
+                        LOGGER.error(this.StackTrace2String(e));
                         throw new SSHExecutionError("Exception raised: " + e, e);
                     }
                 }
             } finally {
-                if (pids.size() > 0) {
+                if (!pids.isEmpty()) {
                     StringBuilder strb = new StringBuilder();
                     boolean first = true;
-                    // create a String with the comma separated pids to put in
-                    // one Param
                     for (Integer pid : pids) {
                         if (first) {
                             strb.append(pid.toString());
@@ -135,28 +123,27 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
                     objJSJobUtilities.setJSParam(PARAM_PIDS_TO_KILL, strb.toString());
                 }
             }
-            // http://www.sos-berlin.com/jira/browse/JITL-112
             processPostCommands(getTempPidFileName());
         } catch (Exception e) {
             if (objOptions.raise_exception_on_error.value()) {
                 String strErrMsg = "SOS-SSH-E-120: error occurred processing ssh command: ";
                 if (objOptions.ignore_error.value()) {
                     if (objOptions.ignore_stderr.value()) {
-                        logger.debug(this.StackTrace2String(e));
-                        logger.debug(strErrMsg, e);
+                        LOGGER.debug(this.StackTrace2String(e));
+                        LOGGER.debug(strErrMsg, e);
                     } else {
-                        logger.error(this.StackTrace2String(e));
-                        logger.error(strErrMsg, e);
+                        LOGGER.error(this.StackTrace2String(e));
+                        LOGGER.error(strErrMsg, e);
                         throw new SSHExecutionError(strErrMsg, e);
                     }
                 } else {
-                    logger.error(this.StackTrace2String(e));
-                    logger.error(strErrMsg, e);
+                    LOGGER.error(this.StackTrace2String(e));
+                    LOGGER.error(strErrMsg, e);
                     throw new SSHExecutionError(strErrMsg, e);
                 }
             }
         } finally {
-            if (keepConnected == false) {
+            if (!keepConnected) {
                 disconnect();
             }
         }
@@ -165,7 +152,7 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
 
     @Override
     public void disconnect() {
-        if (isConnected == true) {
+        if (isConnected) {
             try {
                 vfsHandler.CloseConnection();
             } catch (Exception e) {
@@ -175,36 +162,30 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
         }
     }
 
-    // http://www.sos-berlin.com/jira/browse/JITL-123
     private void add2Files2Delete(final String fileNameToDelete) {
         if (tempFilesToDelete == null) {
             tempFilesToDelete = new Vector<String>();
         }
         tempFilesToDelete.add(fileNameToDelete);
-        logger.debug(String.format(SOSVfsMessageCodes.SOSVfs_D_254.params(fileNameToDelete)));
+        LOGGER.debug(String.format(SOSVfsMessageCodes.SOSVfs_D_254.params(fileNameToDelete)));
     }
 
     @Override
     public SOSSSHJob2 connect() {
         getVFS();
         getOptions().CheckMandatory();
-
         try {
             SOSConnection2OptionsAlternate alternateOptions = getAlternateOptions(objOptions);
             vfsHandler.Connect(alternateOptions);
             vfsHandler.Authenticate(objOptions);
-            logger.debug("connection established");
+            LOGGER.debug("connection established");
         } catch (Exception e) {
             throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
         }
         isConnected = true;
-
-        // http://www.sos-berlin.com/jira/browse/JITL-112:
-        // preparePostCommandHandler() has to be called once to generate a
-        // second instance for post processing of stored return values
         preparePostCommandHandler();
         return this;
-    } // private SOSSSHJob2 Connect
+    }
 
     @Override
     public void preparePostCommandHandler() {
@@ -223,7 +204,7 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
         if (tempFilesToDelete != null && !tempFilesToDelete.isEmpty()) {
             for (String tempFileName : tempFilesToDelete) {
                 ((SOSVfsSFtpJCraft) vfsHandler).delete(tempFileName);
-                logger.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tempFileName));
+                LOGGER.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tempFileName));
             }
         }
         tempFilesToDelete = null;
