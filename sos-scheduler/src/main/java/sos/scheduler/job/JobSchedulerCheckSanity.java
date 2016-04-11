@@ -85,8 +85,6 @@ public class JobSchedulerCheckSanity extends JobSchedulerJob {
     }
 
     public boolean spooler_process() {
-        long freeDiskSpace = 0;
-        long feeMemorySize = 0;
         try {
             if (checkDiskSpace) {
                 checkDiskSpace(false);

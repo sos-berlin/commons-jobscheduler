@@ -734,7 +734,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
                     dirListing.add(currentFile);
                 } else if (ftpFile.isDirectory() && withRecurseSubFolders) {
                     Vector<String> filelist = getFilenames(currentFile + "/", withRecurseSubFolders);
-                    if (filelist != null && filelist.size() > 0) {
+                    if (filelist != null && !filelist.isEmpty()) {
                         dirListing.addAll(filelist);
                     }
                 }

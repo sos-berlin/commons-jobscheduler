@@ -273,7 +273,7 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
                 }
             }
             if (environmentChanged) {
-                if (previousMapping.size() > 0) {
+                if (!previousMapping.isEmpty()) {
                     logger.info("Environment has changed, all jobs need to be submitted again.");
                 }
                 converter.getSkipLines().clear();

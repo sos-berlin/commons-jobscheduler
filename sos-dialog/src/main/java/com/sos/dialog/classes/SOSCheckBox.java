@@ -5,7 +5,6 @@ package com.sos.dialog.classes;
 
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -19,25 +18,19 @@ import com.sos.dialog.Globals;
 /** @author KB */
 public class SOSCheckBox extends Button {
 
-    @SuppressWarnings("unused")
-    private final String conClassName = this.getClass().getSimpleName();
-    @SuppressWarnings("unused")
-    private static final String conSVNVersion = "$Id$";
-    @SuppressWarnings("unused")
-    private final Logger logger = Logger.getLogger(this.getClass());
+//    private final String conClassName = this.getClass().getSimpleName();
+//    private static final String conSVNVersion = "$Id$";
+//    private final Logger logger = Logger.getLogger(this.getClass());
 
     private final Vector<Object> objControlList = new Vector<>();
 
-    /**
-	 *
-	 */
     public SOSCheckBox(final Composite parent, final int style) {
         super(parent, SWT.CHECK | SWT.FLAT);
         addSelectionListener(new SelectionAdapter() {
 
             @Override
             public void widgetSelected(final SelectionEvent e) {
-                // setEnabledDisabled();
+                //
             }
         });
     }
@@ -57,26 +50,20 @@ public class SOSCheckBox extends Button {
     }
 
     public void setOneOfUs() {
-        if (getSelection() == true) {
+        if (getSelection()) {
             for (Object objC : objControlList) {
-                if (objC == this) {
-                    // nothing to do
-                } else {
-                    if (objC instanceof SOSCheckBox) {
-                        SOSCheckBox objBx = (SOSCheckBox) objC;
-                        objBx.setSelection(false);
-                    }
+                if (!objC.equals(this) && objC instanceof SOSCheckBox) {
+                    SOSCheckBox objBx = (SOSCheckBox) objC;
+                    objBx.setSelection(false);
                 }
             }
         }
 
     }
 
-    // disable all fields which are "childs" of this checkbox.
     public void setEnabledDisabled() {
         boolean flgT = true;
-        if (getSelection() == true) {
-        } else {
+        if (!getSelection()) {
             flgT = false;
         }
         for (Object objO : objControlList) {
@@ -90,7 +77,7 @@ public class SOSCheckBox extends Button {
 
     public void setNoFocusColor(final Control objControl) {
         SOSOptionElement objOptionElement1 = (SOSOptionElement) objControl.getData();
-        if (objOptionElement1.isProtected() == true || objControl.isEnabled() == false) {
+        if (objOptionElement1.isProtected() || !objControl.isEnabled()) {
             objControl.setBackground(Globals.getProtectedFieldColor());
         } else {
             if (objControl.isEnabled()) {
@@ -100,13 +87,14 @@ public class SOSCheckBox extends Button {
 
             }
         }
-        if (objOptionElement1.getControlType().equals("checkbox")) {
+        if ("checkbox".equals(objOptionElement1.getControlType())) {
             objControl.setBackground(Globals.getCompositeBackground());
         }
     }
 
     @Override
     protected void checkSubclass() {
-        // Disable the check that prevents subclassing of SWT components
+        //
     }
+    
 }

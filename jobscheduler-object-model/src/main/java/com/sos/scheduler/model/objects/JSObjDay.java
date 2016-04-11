@@ -14,23 +14,10 @@ import com.sos.scheduler.model.tools.JodaTools;
 import com.sos.scheduler.model.tools.RunTimeElement;
 import com.sos.scheduler.model.tools.RunTimeElements;
 
-/** \file JSObjDay.java \brief runtime defintions for specific weekdays
- * 
- * \class JSObjDay \brief runtime defintions for specific weekdays
- * 
- * \details
- *
- * \code \endcode
- *
- * \author ss \version 1.0 - 14.03.2012 08:25:39 <div class="sos_branding">
- * <p>
- * © 2010 SOS GmbH - Berlin (<a style='color:silver'
- * href='http://www.sos-berlin.com'>http://www.sos-berlin.com</a>)
- * </p>
- * </div> */
+/** @author ss */
 public class JSObjDay extends Weekdays.Day implements ISOSJsObjStartTimes {
 
-    private static final Logger logger = Logger.getLogger(JSObjDay.class);
+    private static final Logger LOGGER = Logger.getLogger(JSObjDay.class);
 
     public JSObjDay(SchedulerObjectFactory schedulerObjectFactory) {
         super();
@@ -50,7 +37,6 @@ public class JSObjDay extends Weekdays.Day implements ISOSJsObjStartTimes {
                 }
             }
         }
-        // Collections.sort(result, DateTimeComparator.getInstance());
         return result;
     }
 
@@ -58,35 +44,34 @@ public class JSObjDay extends Weekdays.Day implements ISOSJsObjStartTimes {
         DateTimeFormatter fmtDate = DateTimeFormat.forPattern("yyyy-MM-dd");
         DateTimeFormatter fmtDateTime = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
         RunTimeElements result = new RunTimeElements(baseDate);
-        logger.debug(getDay().size() + " day elements detected.");
+        LOGGER.debug(getDay().size() + " day elements detected.");
         Iterator<String> it = getDay().iterator();
         while (it.hasNext()) {
             String dayString = it.next();
-            logger.debug("parsing day string " + dayString);
+            LOGGER.debug("parsing day string " + dayString);
             List<Integer> days = JodaTools.getJodaWeekdays(dayString);
             for (int i = 0; i < days.size(); i++) {
                 DateTime nextWeekDay = JodaTools.getNextWeekday(baseDate, days.get(i));
-                logger.debug("calculated date " + fmtDate.print(nextWeekDay));
+                LOGGER.debug("calculated date " + fmtDate.print(nextWeekDay));
                 List<Period> periods = getPeriod();
                 Iterator<Period> itP = periods.iterator();
-                logger.debug(periods.size() + " periods found.");
+                LOGGER.debug(periods.size() + " periods found.");
                 while (itP.hasNext()) {
                     Period p = itP.next();
                     JSObjPeriod period = new JSObjPeriod(objFactory);
                     period.setObjectFieldsFrom(p);
                     DateTime start = period.getDtSingleStartOrNull(nextWeekDay);
                     if (start != null) {
-                        logger.debug("start from period " + fmtDateTime.print(start));
+                        LOGGER.debug("start from period " + fmtDateTime.print(start));
                         if (start.isBefore(baseDate)) {
                             start = start.plusWeeks(1);
-                            logger.debug("start is corrected to " + fmtDateTime.print(start));
+                            LOGGER.debug("start is corrected to " + fmtDateTime.print(start));
                         }
                         RunTimeElement e = new RunTimeElement(start, period.getWhenHoliday());
                         result.add(e);
                     }
                 }
             }
-            // Collections.sort(result, DateTimeComparator.getInstance());
         }
         return result;
     }
@@ -101,8 +86,8 @@ public class JSObjDay extends Weekdays.Day implements ISOSJsObjStartTimes {
     @Override
     public List<Period> getPeriod() {
         List<Period> list = super.getPeriod();
-        WhenHoliday h = (list != null && list.size() > 0) ? list.get(0).getWhenHoliday() : WhenHoliday.SUPPRESS;
-        return (objFactory.useDefaultPeriod()) ? JSObjRunTime.getDefaultPeriod(objFactory, h) : list;
+        WhenHoliday h = (list != null && !list.isEmpty()) ? list.get(0).getWhenHoliday() : WhenHoliday.SUPPRESS;
+        return objFactory.useDefaultPeriod() ? JSObjRunTime.getDefaultPeriod(objFactory, h) : list;
     }
 
 }

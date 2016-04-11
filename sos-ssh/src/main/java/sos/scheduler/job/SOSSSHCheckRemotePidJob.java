@@ -17,11 +17,11 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "com_sos_net_messages", defaultLocale = "en")
 public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch {
 
-    private final Logger logger = Logger.getLogger(this.getClass());
+    private static final Logger LOGGER = Logger.getLogger(SOSSSHCheckRemotePidJob.class);
     private static final String PARAM_PIDS_TO_KILL = "PIDS_TO_KILL";
     private static final String DEFAULT_LINUX_GET_ACTIVE_PROCESSES_COMMAND = "/bin/ps -ef | grep ${pid} | grep ${user} | grep -v grep";
     private static final String DEFAULT_WINDOWS_GET_ACTIVE_PROCESSES_COMMAND = "Qprocess ${pid}";
-    private String ssh_job_get_active_processes_command = "/bin/ps -ef | grep ${pid} | grep ${user} | grep -v grep";// default
+    private String ssh_job_get_active_processes_command = "/bin/ps -ef | grep ${pid} | grep ${user} | grep -v grep";
     private String pids = null;
 
     private void openSession() {
@@ -32,9 +32,9 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch {
                 vfsHandler.Connect(postAlternateOptions);
             }
             vfsHandler.Authenticate(objOptions);
-            logger.debug("connection for kill commands established");
+            LOGGER.debug("connection for kill commands established");
         } catch (Exception e) {
-            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
+            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getMessage(), e);
         }
         vfsHandler.setJSJobUtilites(objJSJobUtilities);
     }
@@ -47,9 +47,9 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch {
             SOSConnection2OptionsAlternate alternateOptions = getAlternateOptions(objOptions);
             vfsHandler.Connect(alternateOptions);
             vfsHandler.Authenticate(objOptions);
-            logger.debug("connection established");
+            LOGGER.debug("connection established");
         } catch (Exception e) {
-            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
+            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getMessage(), e);
         }
         flgIsWindowsShell = vfsHandler.remoteIsWindowsShell();
         readCheckIfProcessesIsStillActiveCommandFromPropertiesFile();
@@ -81,19 +81,16 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch {
                 }
                 vfsHandler.ExecuteCommand(checkPidCommand);
                 if (vfsHandler.getExitCode() == 0) {
-                    // process found
                     pidsStillRunning.add(pid);
-                    logger.debug("PID " + pid + " is still running");
+                    LOGGER.debug("PID " + pid + " is still running");
                 } else {
-                    logger.debug("PID " + pid + " is not running anymore");
+                    LOGGER.debug("PID " + pid + " is not running anymore");
                 }
             }
             if (pidsStillRunning.size() > 0) {
                 StringBuilder strb = new StringBuilder();
-                logger.debug("Overriding param " + PARAM_PIDS_TO_KILL);
+                LOGGER.debug("Overriding param " + PARAM_PIDS_TO_KILL);
                 boolean first = true;
-                // create a String with the comma separated pids to put in one
-                // Param
                 for (Integer pid : pidsStillRunning) {
                     if (first) {
                         strb.append(pid.toString());
@@ -102,34 +99,27 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch {
                         strb.append(",").append(pid.toString());
                     }
                 }
-                logger.debug("still running PIDs to kill: " + strb.toString());
-                // and override the order param with the resulting (still
-                // running) pids only to later kill them
-                // objJSJobUtilities.setJSParam(PARAM_PIDS_TO_KILL,
-                // strb.toString());
+                LOGGER.debug("still running PIDs to kill: " + strb.toString());
                 pids = strb.toString();
             } else {
-                // no (still running) pids available, override Param with empty
-                // String
-                // objJSJobUtilities.setJSParam(PARAM_PIDS_TO_KILL, "");
                 pids = null;
             }
         } catch (JobSchedulerException ex) {
-            if (pidsStillRunning.size() == 0) {
-                logger.debug("Overriding PARAM_PIDS_TO_KILL with empty String");
+            if (pidsStillRunning.isEmpty()) {
+                LOGGER.debug("Overriding PARAM_PIDS_TO_KILL with empty String");
                 objJSJobUtilities.setJSParam(PARAM_PIDS_TO_KILL, "");
             }
         } catch (Exception e) {
             if (objOptions.raise_exception_on_error.value()) {
                 if (objOptions.ignore_error.value()) {
                     if (objOptions.ignore_stderr.value()) {
-                        logger.debug(this.StackTrace2String(e));
+                        LOGGER.debug(this.StackTrace2String(e));
                     } else {
-                        logger.error(this.StackTrace2String(e));
+                        LOGGER.error(this.StackTrace2String(e));
                         throw new SSHExecutionError("Exception raised: " + e, e);
                     }
                 } else {
-                    logger.error(this.StackTrace2String(e));
+                    LOGGER.error(this.StackTrace2String(e));
                     throw new SSHExecutionError("Exception raised: " + e, e);
                 }
             }
@@ -141,7 +131,7 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch {
     }
 
     private List<Integer> getPidsToKill() {
-        logger.debug("PIDs to kill From Order: " + objOptions.getItem(PARAM_PIDS_TO_KILL));
+        LOGGER.debug("PIDs to kill From Order: " + objOptions.getItem(PARAM_PIDS_TO_KILL));
         String[] pidsFromOrder = null;
         if (objOptions.getItem(PARAM_PIDS_TO_KILL) != null && objOptions.getItem(PARAM_PIDS_TO_KILL).length() > 0) {
             pidsFromOrder = objOptions.getItem(PARAM_PIDS_TO_KILL).split(",");
@@ -149,10 +139,10 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch {
         List<Integer> pidsToKill = new ArrayList<Integer>();
         if (pidsFromOrder != null) {
             for (String pid : pidsFromOrder) {
-                if (pid != null && pid.length() > 0) {
+                if (pid != null && !pid.isEmpty()) {
                     pidsToKill.add(Integer.parseInt(pid));
                 } else {
-                    logger.debug("PID is empty!");
+                    LOGGER.debug("PID is empty!");
                 }
             }
         }
@@ -162,14 +152,14 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch {
     private void readCheckIfProcessesIsStillActiveCommandFromPropertiesFile() {
         if (objOptions.ssh_job_get_active_processes_command.isDirty() && !objOptions.ssh_job_get_active_processes_command.Value().isEmpty()) {
             ssh_job_get_active_processes_command = objOptions.ssh_job_get_active_processes_command.Value();
-            logger.debug("Command to check if PID is still running from Job Parameter used!");
+            LOGGER.debug("Command to check if PID is still running from Job Parameter used!");
         } else {
             if (flgIsWindowsShell) {
                 ssh_job_get_active_processes_command = DEFAULT_WINDOWS_GET_ACTIVE_PROCESSES_COMMAND;
-                logger.debug("Default Windows command used to check if PID is still running!");
+                LOGGER.debug("Default Windows command used to check if PID is still running!");
             } else {
                 ssh_job_get_active_processes_command = DEFAULT_LINUX_GET_ACTIVE_PROCESSES_COMMAND;
-                logger.debug("Default Linux command used to check if PID is still running!");
+                LOGGER.debug("Default Linux command used to check if PID is still running!");
             }
         }
     }
