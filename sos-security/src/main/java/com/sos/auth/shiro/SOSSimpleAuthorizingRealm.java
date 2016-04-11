@@ -35,12 +35,7 @@ public class SOSSimpleAuthorizingRealm extends AuthorizingRealm {
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authcToken) throws AuthenticationException {
         authToken = (UsernamePasswordToken) authcToken;
-
-        if (true) {
-            return new SimpleAuthenticationInfo(authToken.getUsername(), authToken.getPassword(), getName());
-        } else {
-            return null;
-        }
+        return new SimpleAuthenticationInfo(authToken.getUsername(), authToken.getPassword(), getName());
     }
 
     public void setAuthorizing(ISOSAuthorizing authorizing) {

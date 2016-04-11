@@ -379,9 +379,9 @@ public class XmlRegionAnalyzer {
     void analyzeWhitespaces(String xml, List<XmlRegion> positions) {
 
         int i = this.offset;
-        while (i < xml.length() && Character.isWhitespace(xml.charAt(i)))
+        while (i < xml.length() && Character.isWhitespace(xml.charAt(i))) {
             i++;
-
+        }
         if (i != this.offset) {
             positions.add(new XmlRegion(XmlRegionType.WHITESPACE, this.offset, i));
             this.offset = i;

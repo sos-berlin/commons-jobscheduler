@@ -171,7 +171,6 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
         strOnEmptyResultSet = null;
         strResultList2File = null;
         intExpectedSizeOfResultSet = 0;
-        // possible values equal, lt, le, eq, ge, gt, ne
         strRaiseErrorIfResultSetIs = null;
         lstResultList = null;
         flgCreateOrder = false;
@@ -256,7 +255,7 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
         }
         if (isNotNull(strT)) {
             strT = strT.trim();
-            if (strT.length() > 0) {
+            if (!strT.isEmpty()) {
                 logger.info(JSJ_I_0040.params(pstrParamName, strT));
             }
         }
@@ -386,7 +385,7 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
             lstResultList = new Vector<File>();
         }
         Vector<File> lstR = SOSFileOperations.lstResultList;
-        if (isNotNull(lstR) && lstR.size() > 0) {
+        if (isNotNull(lstR) && !lstR.isEmpty()) {
             lstResultList.addAll(lstR);
         }
     }
@@ -398,7 +397,7 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
             saveResultList();
         }
         intNoOfHitsInResultSet = 0;
-        if (isNotNull(lstResultList) && lstResultList.size() > 0) {
+        if (isNotNull(lstResultList) && !lstResultList.isEmpty()) {
             intNoOfHitsInResultSet = lstResultList.size();
             strFirstFile = lstResultList.get(0).getAbsolutePath();
             for (File objFile : lstResultList) {
@@ -511,7 +510,7 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
         final String conMethodName = "JobSchedulerFileOperationBase::createOrder";
         Order objOrder = spooler.create_order();
         Variable_set objOrderParams = spooler.create_variable_set();
-        if (flgMergeOrderParameter == true && isOrderJob() == true) {
+        if (flgMergeOrderParameter && isOrderJob()) {
             objOrderParams.merge(getOrderParams());
         }
         objOrderParams.set_value(ORDER_PARAMETER_SCHEDULER_FILE_PATH, pstrOrder4FileName);
@@ -535,8 +534,6 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
     public String replaceVars4(String pstrReplaceIn) {
         String strParamNameEnclosedInPercentSigns = "^.*%([^%]+)%.*$";
         if (isNotNull(pstrReplaceIn)) {
-            // To make orderparams available for substitution in orderparam
-            // value
             while (pstrReplaceIn.matches(strParamNameEnclosedInPercentSigns)) {
                 String p = pstrReplaceIn.replaceFirst(strParamNameEnclosedInPercentSigns, "$1");
                 String strPP = "%" + p + "%";
@@ -668,7 +665,6 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
                             try {
                                 lock = channel.tryLock();
                                 logger.debug(String.format("lock for file '%1$s' ok", objActFile.getAbsolutePath()));
-                                // Ok. You got the lock
                                 break;
                             } catch (OverlappingFileLockException e) {
                                 flgAllFilesAreSteady = false;

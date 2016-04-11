@@ -115,7 +115,7 @@ import com.sos.scheduler.model.objects.Spooler;
 
 public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
 
-    private static final Class<Spooler> conDefaultMarshaller = Spooler.class;
+    private static final Class<Spooler> DEFAULT_MARSHALLER = Spooler.class;
     private static final Logger LOGGER = Logger.getLogger(SchedulerObjectFactory.class);
     private SchedulerObjectFactoryOptions objOptions = new SchedulerObjectFactoryOptions();
     private static JAXBContext jc;
@@ -142,7 +142,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
 
     public SchedulerObjectFactory() {
         super("com_sos_scheduler_model");
-        initMarshaller(conDefaultMarshaller);
+        initMarshaller(DEFAULT_MARSHALLER);
         useDefaultPeriod = false;
     }
 
@@ -162,7 +162,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
 
     private boolean isJSJobUtilitiesChanged() {
         boolean flgRet = false;
-        if (objJSJobUtilities != this && objJSJobUtilities != null) {
+        if (objJSJobUtilities != null && !objJSJobUtilities.equals(this)) {
             flgRet = true;
         }
         return flgRet;
@@ -448,7 +448,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         this();
         this.Options().ServerName.Value(pstrServerName);
         this.Options().PortNumber.value(pintPort);
-        initMarshaller(conDefaultMarshaller);
+        initMarshaller(DEFAULT_MARSHALLER);
     }
 
     public SchedulerObjectFactory(final String pstrServerName, final int pintPort, final LiveConnector liveConnector) {
@@ -894,7 +894,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         objHist.run();
         Answer objAnswer = objHist.getAnswer();
         List<HistoryEntry> objEntries = objAnswer.getHistory().getHistoryEntry();
-        if (objEntries != null && objEntries.size() > 0) {
+        if (objEntries != null && !objEntries.isEmpty()) {
             HistoryEntry objEntry = objEntries.get(0);
             if (objEntry != null) {
                 log = objEntry.getLog().getContent();
@@ -1094,7 +1094,8 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
 
     @Override
     public JSCmdSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles createSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles() {
-        JSCmdSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles objSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles = new JSCmdSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles(this);
+        JSCmdSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles objSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles = new JSCmdSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles(
+                this);
         return objSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles;
     }
 

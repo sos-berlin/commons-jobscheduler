@@ -26,8 +26,7 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
  * In that case the executeStatements function has to be overwritten.
  *
  * @see JobSchedulerManagedDatabaseJob#executeStatements(SOSConnection, String)
- * @author andreas.pueschel@sos-berlin.com
- * @since 1.0 2005-03-05 */
+ * @author andreas pueschel */
 public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 
     protected boolean flgColumn_names_case_sensitivity = false;
@@ -60,10 +59,8 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
         boolean flgRet = pflgDefaultValue;
         if (orderPayload != null) {
             String strValue = orderPayload.var(pstrParamName);
-            if (strValue != null) {
-                if ("1".equals(strValue) || "true".equalsIgnoreCase(strValue)) {
-                    flgRet = true;
-                }
+            if (strValue != null && ("1".equals(strValue) || "true".equalsIgnoreCase(strValue))) {
+                flgRet = true;
             }
         }
         return flgRet;
@@ -100,14 +97,16 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
             }
             if (orderPayload != null
                     && orderPayload.var(PARAMETER_RESULTSET_AS_WARNING) != null
-                    && ("1".equals(orderPayload.var(PARAMETER_RESULTSET_AS_WARNING)) || "true".equalsIgnoreCase(orderPayload.var(PARAMETER_RESULTSET_AS_WARNING)))) {
+                    && ("1".equals(orderPayload.var(PARAMETER_RESULTSET_AS_WARNING)) 
+                            || "true".equalsIgnoreCase(orderPayload.var(PARAMETER_RESULTSET_AS_WARNING)))) {
                 resultsetAsWarning = true;
             }
             execReturnsResultSet = objOptions.exec_returns_resultset.value();
             if (orderPayload != null
                     && orderPayload.var(PARAMETER_RESULTSET_AS_PARAMETERS) != null
                     && ("1".equals(orderPayload.var(PARAMETER_RESULTSET_AS_PARAMETERS))
-                            || "true".equalsIgnoreCase(orderPayload.var(PARAMETER_RESULTSET_AS_PARAMETERS)) || PARAMETER_NAME_VALUE.equalsIgnoreCase(orderPayload.var(PARAMETER_RESULTSET_AS_PARAMETERS)))) {
+                            || "true".equalsIgnoreCase(orderPayload.var(PARAMETER_RESULTSET_AS_PARAMETERS)) 
+                            || PARAMETER_NAME_VALUE.equalsIgnoreCase(orderPayload.var(PARAMETER_RESULTSET_AS_PARAMETERS)))) {
                 resultsetAsParameters = true;
                 if (PARAMETER_NAME_VALUE.equalsIgnoreCase(orderPayload.var(PARAMETER_RESULTSET_AS_PARAMETERS))) {
                     resultsetNameValue = true;
@@ -120,7 +119,8 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
             try {
                 if (userJob) {
                     checkOldTempUsers();
-                    localConnection = this.getUserConnection(orderPayload.var(PARAMETER_SCHEDULER_ORDER_USER_NAME), orderPayload.var(PARAMETER_SCHEDULER_ORDER_SCHEMA));
+                    localConnection = this.getUserConnection(orderPayload.var(PARAMETER_SCHEDULER_ORDER_USER_NAME),
+                            orderPayload.var(PARAMETER_SCHEDULER_ORDER_SCHEMA));
                 } else {
                     localConnection = JobSchedulerManagedObject.getOrderConnection(this.getConnection(), this);
                     localConnection.connect();
@@ -144,15 +144,12 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
             } catch (Exception e) {
                 throw new JobSchedulerException("no database command found: " + e);
             }
-            // replace job-specific placeholders
             command = command.replaceAll("(\\$|§)\\{scheduler_order_job_name\\}", this.getJobName());
             command = command.replaceAll("(\\$|§)\\{scheduler_order_job_id\\}", Integer.toString(this.getJobId()));
             command = command.replaceAll("(\\$|§)\\{scheduler_id\\}", spooler.id());
-            // replace parameters
             if (orderPayload != null) {
                 command = JobSchedulerManagedObject.replaceVariablesInCommand(command, orderPayload, getLogger());
             }
-            // replace order-specific placeholders
             if (orderJob) {
                 order = spooler_task.order();
                 realOrderParams = order.params();
@@ -290,8 +287,9 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
                 currentErrorText = currentErrorText.substring(currentErrorText.length() - 250);
 
             }
-            getConnection().execute("UPDATE " + JobSchedulerManagedObject.getTableManagedUserJobs() + " SET \"ERROR\"=1, \"ERROR_TEXT\"='"
-                    + currentErrorText.replaceAll("'", "''") + "'," + " \"ERROR_CODE\"='" + errCode + "' WHERE " + " \"ID\"='" + order.id() + "'");
+            getConnection().execute(
+                    "UPDATE " + JobSchedulerManagedObject.getTableManagedUserJobs() + " SET \"ERROR\"=1, \"ERROR_TEXT\"='"
+                            + currentErrorText.replaceAll("'", "''") + "'," + " \"ERROR_CODE\"='" + errCode + "' WHERE " + " \"ID\"='" + order.id() + "'");
             getConnection().commit();
         } catch (Exception ex) {
             try {
@@ -337,8 +335,9 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
             grantCounter++;
         }
         try {
-            getConnection().execute("INSERT INTO " + JobSchedulerManagedObject.getTableManagedTempUsers() + "(\"NAME\", \"STATUS\", \"MODIFIED\") VALUES ("
-                    + "'" + revokeUserQuoted + "', 'BEFORE_CREATION', %now)");
+            getConnection().execute(
+                    "INSERT INTO " + JobSchedulerManagedObject.getTableManagedTempUsers() + "(\"NAME\", \"STATUS\", \"MODIFIED\") VALUES (" + "'"
+                            + revokeUserQuoted + "', 'BEFORE_CREATION', %now)");
             getConnection().commit();
         } catch (Exception e) {
         }
@@ -350,12 +349,12 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
             this.getConnection().execute(newGrant);
         }
         try {
-            getConnection().execute("UPDATE " + JobSchedulerManagedObject.getTableManagedTempUsers() + " SET \"STATUS\"='CREATED', \"MODIFIED\"= %now WHERE "
-                    + "\"NAME\"='" + revokeUserQuoted + "'");
+            getConnection().execute(
+                    "UPDATE " + JobSchedulerManagedObject.getTableManagedTempUsers() + " SET \"STATUS\"='CREATED', \"MODIFIED\"= %now WHERE " + "\"NAME\"='"
+                            + revokeUserQuoted + "'");
         } catch (Exception e) {
         }
         getConnection().commit();
-        // als neuer user connecten
         SOSConnection userConnection;
         Properties spoolerProp = this.getJobSettings().getSection("spooler");
         String dbProperty = spoolerProp.getProperty("db").replaceAll("jdbc:", "-url=jdbc:");
@@ -363,7 +362,8 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
         SOSArguments arguments = new SOSArguments(dbProperty);
         try {
             spooler_log.debug6("..creating user connection object");
-            userConnection = SOSConnection.createInstance(spoolerProp.getProperty("db_class"), arguments.as_string("-class=", ""), arguments.as_string("-url=", ""), newUserName, password, getLogger());
+            userConnection = SOSConnection.createInstance(spoolerProp.getProperty("db_class"), arguments.as_string("-class=", ""),
+                    arguments.as_string("-url=", ""), newUserName, password, getLogger());
         } catch (Exception e) {
             throw new JobSchedulerException("error occurred establishing database connection: " + e.getMessage());
         }
@@ -396,8 +396,9 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
             } catch (Exception e) {
             }
             try {
-                getConnection().execute("UPDATE " + JobSchedulerManagedObject.getTableManagedTempUsers()
-                        + " SET \"STATUS\"='BEFORE_DELETION', \"MODIFIED\"= %now WHERE " + "\"NAME\"='" + revokeUserQuoted + "'");
+                getConnection().execute(
+                        "UPDATE " + JobSchedulerManagedObject.getTableManagedTempUsers() + " SET \"STATUS\"='BEFORE_DELETION', \"MODIFIED\"= %now WHERE "
+                                + "\"NAME\"='" + revokeUserQuoted + "'");
                 getConnection().commit();
             } catch (Exception e) {
             }
@@ -438,8 +439,8 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
 
     private void checkOldTempUsers() {
         try {
-            ArrayList users = getConnection().getArray("SELECT \"NAME\", \"STATUS\" FROM " + JobSchedulerManagedObject.getTableManagedTempUsers()
-                    + " WHERE DATEDIFF(%now,\"MODIFIED\")>1");
+            ArrayList users = getConnection().getArray(
+                    "SELECT \"NAME\", \"STATUS\" FROM " + JobSchedulerManagedObject.getTableManagedTempUsers() + " WHERE DATEDIFF(%now,\"MODIFIED\")>1");
             getConnection().commit();
             Iterator iter = users.iterator();
             while (iter.hasNext()) {
@@ -447,8 +448,8 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
                 String userName = map.get("name").toString();
                 String status = map.get("status").toString();
                 try {
-                    getLogger().debug3("User " + userName + " has not been properly deleted and" + " was left with status " + status
-                            + ". Trying to delete him now...");
+                    getLogger().debug3(
+                            "User " + userName + " has not been properly deleted and" + " was left with status " + status + ". Trying to delete him now...");
                     deleteUser(userName);
                 } catch (Exception e) {
                     try {
@@ -477,7 +478,7 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
         }
         try {
             Vector output = conn.getOutput();
-            if (output.size() > 0) {
+            if (!output.isEmpty()) {
                 getLogger().info("Output from Database Server:");
                 Iterator it = output.iterator();
                 while (it.hasNext()) {

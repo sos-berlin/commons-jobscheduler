@@ -147,9 +147,10 @@ public class JobSchedulerExtractJob extends JobSchedulerJob {
             if ("database".equals(this.getInputFileType())) {
                 this.getLogger().info("extracting records from database query: " + this.getInputFilenamePrefix() + " " + this.getInputFilePath());
                 File outputFile = new File(this.getOutputFilePath());
-                if (outputFile.isDirectory())
+                if (outputFile.isDirectory()) {
                     throw new Exception("for an input database query specified by the parameter [input_file] an output file instead of a directory must be "
                             + "specified by the parameter [output_file]");
+                }
                 recordCount = this.extract(null, outputFile);
             } else if ("file".equals(this.getInputFileType())) {
                 File inputFile = new File(this.getInputFilePath());
@@ -422,8 +423,9 @@ public class JobSchedulerExtractJob extends JobSchedulerJob {
             }
             if (outFile != null) {
                 try {
-                    if (outFile.opened())
+                    if (outFile.opened()) {
                         outFile.close();
+                    }
                 } catch (Exception ex) {
                     // ignore this error
                 }

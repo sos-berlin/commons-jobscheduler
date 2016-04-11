@@ -37,7 +37,6 @@ public class JSObjDate extends RunTime.Date implements ISOSJsObjStartTimes {
                 result.add(new RunTimeElement(singleStart, period.getWhenHoliday()));
             }
         }
-        // Collections.sort(result, DateTimeComparator.getInstance());
         return result;
     }
 
@@ -51,8 +50,8 @@ public class JSObjDate extends RunTime.Date implements ISOSJsObjStartTimes {
     @Override
     public List<Period> getPeriod() {
         List<Period> list = super.getPeriod();
-        WhenHoliday h = (list != null && list.size() > 0) ? list.get(0).getWhenHoliday() : WhenHoliday.SUPPRESS;
-        return (objFactory.useDefaultPeriod()) ? JSObjRunTime.getDefaultPeriod(objFactory, h) : list;
+        WhenHoliday h = (list != null && !list.isEmpty()) ? list.get(0).getWhenHoliday() : WhenHoliday.SUPPRESS;
+        return objFactory.useDefaultPeriod() ? JSObjRunTime.getDefaultPeriod(objFactory, h) : list;
     }
 
 }

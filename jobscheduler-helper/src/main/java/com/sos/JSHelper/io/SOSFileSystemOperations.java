@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
@@ -1466,8 +1465,9 @@ public class SOSFileSystemOperations {
                     } else {
                         String[] dirs = new String[st.countTokens()];
                         int n = 0;
-                        while (st.hasMoreTokens())
+                        while (st.hasMoreTokens()) {
                             dirs[n++] = st.nextToken();
+                        }
                         if (depth > 0) {
                             while (depth > 0) {
                                 substitute = dirs[--depth] + "/" + substitute;
