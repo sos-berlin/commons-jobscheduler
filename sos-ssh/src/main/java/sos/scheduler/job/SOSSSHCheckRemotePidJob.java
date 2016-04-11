@@ -66,7 +66,7 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch {
         List<Integer> pidsToKillFromOrder = getPidsToKill();
         List<Integer> pidsStillRunning = new ArrayList<Integer>();
         try {
-            if (isConnected == false) {
+            if (!isConnected) {
                 this.connect();
             }
             objOptions.raise_exception_on_error.value(false);
@@ -87,7 +87,7 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch {
                     LOGGER.debug("PID " + pid + " is not running anymore");
                 }
             }
-            if (pidsStillRunning.size() > 0) {
+            if (!pidsStillRunning.isEmpty()) {
                 StringBuilder strb = new StringBuilder();
                 LOGGER.debug("Overriding param " + PARAM_PIDS_TO_KILL);
                 boolean first = true;
