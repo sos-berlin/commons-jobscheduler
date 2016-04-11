@@ -251,7 +251,7 @@ public class SOSMail {
 
     public Session createSession() throws Exception {
         Properties props = System.getProperties();
-        props.put("mail.host", host);
+        props.put("mail.host", host); 
         props.put("mail.port", port);
         props.put("mail.smtp.timeout", String.valueOf(timeout));
         props.put("mail.transport.protocol", "smtp");
@@ -264,9 +264,12 @@ public class SOSMail {
         
         if (securityProtocol.equalsIgnoreCase("ssl")){
             props.put("mail.smtp.ssl.enable", "true");
-            if (port.equals("25")){
-                props.put("mail.smtp.port", "465"); 
-            }
+            props.put("mail.transport.protocol", "smtps");
+        }
+        
+        if (securityProtocol.equalsIgnoreCase("starttls")){
+            props.put("mail.smtp.starttls.enable", "true");
+            props.put("mail.transport.protocol", "smtps");
         }
         
         authenticator = new SOSMailAuthenticator(user, password);
@@ -280,8 +283,9 @@ public class SOSMail {
     }
 
     
-    public void setSecurityProtocol(String securityProtocol) {
+    public void setSecurityProtocol(String securityProtocol) throws Exception {
         this.securityProtocol = securityProtocol;
+        this.initMessage();
     }
 
     public void createMessage(final Session session) throws Exception {
@@ -710,7 +714,12 @@ public class SOSMail {
             log(SOSClassUtil.getMethodName() + "-->" + dumpHeaders(), SOSLogger.DEBUG6);
             log(SOSClassUtil.getMethodName() + "-->" + dumpMessageAsString(false), SOSLogger.DEBUG9);
             if (!sendToOutputStream) {
-                Transport t = session.getTransport("smtp");
+                Transport t;
+                if (securityProtocol.equalsIgnoreCase("ssl") || securityProtocol.equalsIgnoreCase("starttls")){
+                    t = session.getTransport("smtps");
+                }else{
+                    t = session.getTransport("smtp");
+                }
                 message.setSentDate(new Date());
                 System.setProperty("mail.smtp.port", port);
                 System.setProperty("mail.smtp.host", host);

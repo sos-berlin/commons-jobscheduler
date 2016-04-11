@@ -91,6 +91,7 @@ public class ManagedReporter {
     private String logMailFrom = "";
     private String mailUser = "";
     private String mailPassword = "";
+    private String mailPort = "";
     private String securityProtocol="";
     private boolean isUniversalAgent;
 
@@ -157,32 +158,77 @@ public class ManagedReporter {
                 if (mailPassword.equals("")) {
                     mailPassword = spoolProp.getProperty("mail.smtp.password");
                 }
-                securityProtocol = smtpProp.getProperty("mail.smtp.securityProtocol");
+                securityProtocol = smtpProp.getProperty("mail.smtp.security_protocol");
                 if (securityProtocol.equals("")) {
-                    securityProtocol = spoolProp.getProperty("mail.smtp.securityProtocol");
+                    securityProtocol = spoolProp.getProperty("mail.smtp.security_protocol");
                 }
     
             } catch (Exception e) {
             }
         }
         
-
-        if (mailServer.length() == 0){
-            mailServer = spooler_task.params().var("host");
+        if (mailServer == null) {
+            mailServer = "";
         }
-        if (logMailFrom.length() == 0){
+        
+        if (mailPort == null) {
+            mailPort = "";
+        }
+        
+        if (logMailFrom == null) {
+            logMailFrom = "";
+        }
+        
+        if (mailUser == null) {
+            mailUser = "";
+        }
+        
+        if (mailPassword == null) {
+            mailPassword = "";
+        }
+        
+        if (securityProtocol == null) {
+            securityProtocol = "";
+        }
+        
+        if (spooler_task.params().var("smtp_port").length() > 0){
+            mailPort = spooler_task.params().var("smtp_port");
+        }
+        if (spooler_task.params().var("from").length() > 0){
             logMailFrom = spooler_task.params().var("from");
         }
-        if (mailUser.length() == 0){
+        if (spooler_task.params().var("smtp_user").length() > 0){
             mailUser = spooler_task.params().var("smtp_user");
         }
-        if (mailPassword.length() == 0){
+        if (spooler_task.params().var("smtp_password").length() == 0){
             mailPassword = spooler_task.params().var("smtp_password");
         }
 
-        if (securityProtocol.length() == 0){
-            securityProtocol = spooler_task.params().var("securityProtocol");
+        if (spooler_task.params().var("security_protocol").length() == 0){
+            securityProtocol = spooler_task.params().var("security_protocol");
         }
+        
+        
+
+        if (spooler_task.params().var("host").length() > 0){
+            mailServer = spooler_task.params().var("host");
+        }
+        if (spooler_task.params().var("smtp_port").length() > 0){
+            mailPort = spooler_task.params().var("smtp_port");
+        }
+        if (spooler_task.params().var("from").length() > 0){
+            logMailFrom = spooler_task.params().var("from");
+        }
+        if (spooler_task.params().var("smtp_user").length() > 0){
+            mailUser = spooler_task.params().var("smtp_user");
+        }
+        if (spooler_task.params().var("smtp_password").length() > 0){
+            mailPassword = spooler_task.params().var("smtp_password");
+        }
+
+        if (spooler_task.params().var("security_protocol").length() > 0){
+            securityProtocol = spooler_task.params().var("security_protocol");
+        } 
         
         boolean hasSOSMailOrder = false;
         if (job.getConnection() != null) {
@@ -219,7 +265,7 @@ public class ManagedReporter {
                 } else {
                     getLogger().debug7("Initializing SOSMail without Mail Settings");
                     mail = new SOSMail(mailServer);
-                }
+                } 
                 getLogger().debug9("Setting mail sender: " + logMailFrom);
                 mail.setFrom(logMailFrom);
                 if (mailUser != null) {
@@ -236,6 +282,11 @@ public class ManagedReporter {
                     mail.setQueueDir(job.spooler_log.mail().queue_dir());
                 }
                 
+                if (mailPort.length() > 0) {
+                    getLogger().debug9("Setting mail smtp port:" + mailPort);
+                    mail.setPort(mailPort);
+                }
+            
                 if (securityProtocol.length() > 0) {
                     getLogger().debug9("Setting mail securityProtocol:" + securityProtocol);
                     mail.setSecurityProtocol(securityProtocol);
