@@ -358,12 +358,16 @@ public class JSObjJobChain extends JobChain {
         }
     }
 
+    private String  escapeQuote(String s){
+        return s.replaceAll("(\")", "\\\\$1");
+    }
+    
     public String createGraphVizImageFile(File imageOutputFolder, boolean showErrorNodes) throws Exception {
         File liveFolder = new File(new File(this.getHotFolderSrc().getName()).getParent());
         JSObjJobChain jobchain = this;
         graph = new Graph();
         graph.getGraphProperties().setDirection(RankDir.TB);
-        graph.getGraphProperties().setLabel(jobchain.getTitle());
+        graph.getGraphProperties().setLabel(escapeQuote(jobchain.getTitle()));
         graph.getGraphProperties().setFontSize("8");
         graph.getGlobalNodeProperties().setFontsize("8");
         graph.getGlobalNodeProperties().setShape(Shape.box);
