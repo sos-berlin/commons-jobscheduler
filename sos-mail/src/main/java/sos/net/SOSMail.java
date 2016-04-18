@@ -15,7 +15,7 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.text.DecimalFormat;
-import java.text.FieldPosition;
+import java.text.FieldPosition; 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -112,8 +112,9 @@ public class SOSMail {
     private String lastGeneratedFileName = "";
     private String loadedMessageId = "";
     private boolean messageReady = false;
+    private boolean queueMailOnError=true;
     private int priority = -1;
-    private String securityProtocol = "";
+    private String securityProtocol="";
     private Session session = null;
     public static String tableMails = "MAILS";
     public static String tableMailAttachments = "MAIL_ATTACHMENTS";
@@ -250,7 +251,7 @@ public class SOSMail {
 
     public Session createSession() throws Exception {
         Properties props = System.getProperties();
-        props.put("mail.host", host);
+        props.put("mail.host", host); 
         props.put("mail.port", port);
         props.put("mail.smtp.timeout", String.valueOf(timeout));
         props.put("mail.transport.protocol", "smtp");
@@ -349,8 +350,8 @@ public class SOSMail {
     private String getEntry(final String val, final Properties entries, final String key) {
         String erg = val;
         if (entries.containsKey(key) && !entries.getProperty(key).isEmpty()) {
-            erg = entries.getProperty(key);
-        }
+                erg = entries.getProperty(key);
+            }
         return erg;
     }
 
@@ -571,6 +572,11 @@ public class SOSMail {
         changed = true;
     }
 
+    
+    public void setQueueMailOnError(boolean queueMailOnError) {
+        this.queueMailOnError = queueMailOnError;
+    }
+
     public void addAttachment(final String filename) throws Exception {
         warn("addAttachment", filename);
         File f = new File(filename);
@@ -709,7 +715,7 @@ public class SOSMail {
                 Transport t;
                 if ("ssl".equalsIgnoreCase(securityProtocol) || "starttls".equalsIgnoreCase(securityProtocol)) {
                     t = session.getTransport("smtps");
-                } else {
+                }else{
                     t = session.getTransport("smtp");
                 }
                 message.setSentDate(new Date());
@@ -730,40 +736,53 @@ public class SOSMail {
             return true;
         } catch (javax.mail.AuthenticationFailedException ee) {
             lastError = "AuthenticationFailedException while connecting to " + host + ":" + port + " " + user + "/******** -->" + ee.getMessage();
-            try {
-                dumpMessageToFile(true);
-            } catch (Exception e) {
-                log(SOSClassUtil.getMethodName() + ":" + e.getMessage(), SOSLogger.WARN);
-            }
-            return false;
-        } catch (javax.mail.MessagingException e) {
-            if (!queueDir.isEmpty() && e.getMessage().startsWith("Could not connect to SMTP host") || e.getMessage().startsWith("Unknown SMTP host")
-                    || e.getMessage().startsWith("Read timed out") || e.getMessage().startsWith("Exception reading response")) {
-                lastError = e.getMessage() + " ==> " + host + ":" + port + " " + user + "/********";
+            if (queueMailOnError){
                 try {
                     dumpMessageToFile(true);
-                } catch (Exception ee) {
+                } catch (Exception e) {
                     log(SOSClassUtil.getMethodName() + ":" + e.getMessage(), SOSLogger.WARN);
                 }
                 return false;
-            } else {
+            }else{
+                throw new Exception(SOSClassUtil.getMethodName() + ":" + lastError + ": error occurred on send: "  + ee.toString());
+            }
+        } catch (javax.mail.MessagingException e) {
+            if (queueMailOnError){
+                if (!queueDir.isEmpty() && e.getMessage().startsWith("Could not connect to SMTP host") || e.getMessage().startsWith("Unknown SMTP host")
+                        || e.getMessage().startsWith("Read timed out") || e.getMessage().startsWith("Exception reading response")) {
+                    lastError = e.getMessage() + " ==> " + host + ":" + port + " " + user + "/********";
+                    try {
+                        dumpMessageToFile(true);
+                    } catch (Exception ee) {
+                        log(SOSClassUtil.getMethodName() + ":" + e.getMessage(), SOSLogger.WARN);
+                    }
+                    return false;
+                    
+                } else {
+                    throw new Exception(SOSClassUtil.getMethodName() + ": error occurred on send: " + e.toString());
+                }
+            }else{
                 throw new Exception(SOSClassUtil.getMethodName() + ": error occurred on send: " + e.toString());
             }
         } catch (SocketTimeoutException e) {
-            if (!queueDir.isEmpty()) {
-                lastError = e.getMessage() + " ==> " + host + ":" + port + " " + user + "/********";
-                try {
-                    dumpMessageToFile(true);
-                } catch (Exception ee) {
-                    log(SOSClassUtil.getMethodName() + ":" + e.getMessage(), SOSLogger.WARN);
+            if (queueMailOnError){
+                if (!queueDir.isEmpty()) {
+                    lastError = e.getMessage() + " ==> " + host + ":" + port + " " + user + "/********";
+                    try {
+                        dumpMessageToFile(true);
+                    } catch (Exception ee) {
+                        log(SOSClassUtil.getMethodName() + ":" + e.getMessage(), SOSLogger.WARN);
+                    }
+                    return false;
+                } else {
+                    throw new Exception(SOSClassUtil.getMethodName() + ": error occurred on send: " + e.toString());
                 }
-                return false;
-            } else {
-                throw new Exception(SOSClassUtil.getMethodName() + ": error occurred on send: " + e.toString());
             }
         } catch (Exception e) {
             throw new Exception(SOSClassUtil.getMethodName() + ": error occurred on send: " + e.toString());
         }
+        return true;
+
     }
 
     private boolean haveAlternative() {
