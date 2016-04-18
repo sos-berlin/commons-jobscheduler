@@ -251,7 +251,7 @@ public class Messages implements Serializable {
     public String getMsg(final String pstrKey, final Locale pobjLocale) {
         String strM = "";
         try {
-            if (objCurrentLocale != pobjLocale) {
+            if (objCurrentLocale.equals(pobjLocale)) {
                 objResource_Bundle = null;
             }
             objCurrentLocale = pobjLocale;

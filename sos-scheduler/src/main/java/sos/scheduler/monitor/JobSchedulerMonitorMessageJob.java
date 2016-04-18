@@ -1109,9 +1109,9 @@ public class JobSchedulerMonitorMessageJob extends Job_impl {
 
     private boolean isMonitorJobname(String logLine, ArrayList listOfMonitoringJobs) {
         try {
-            if (listOfMonitoringJobs.isEmpty())
+            if (listOfMonitoringJobs.isEmpty()) {
                 return true;
-            else {
+            } else {
                 String jobname = getCurrentJobname(logLine, false);
                 if (listOfMonitoringJobs.contains(jobname)) {
                     return true;

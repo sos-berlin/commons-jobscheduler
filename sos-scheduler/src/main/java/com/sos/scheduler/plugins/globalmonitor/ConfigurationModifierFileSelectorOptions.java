@@ -36,7 +36,6 @@ public class ConfigurationModifierFileSelectorOptions {
     private void fillExclusionsList() {
         listOfFileExclusions = new ArrayList<String>();
         listOfDirectoryExclusions = new ArrayList<String>();
-
         String[] filenames = fileExclusions.split(",");
         for (int i = 0; i < filenames.length; i++) {
             listOfFileExclusions.add(filenames[i]);
@@ -70,13 +69,11 @@ public class ConfigurationModifierFileSelectorOptions {
     }
 
     public boolean isFileExclusions(File file) {
-        if (listOfFileExclusions == null || listOfFileExclusions.size() == 0) {
+        if (listOfFileExclusions == null || listOfFileExclusions.isEmpty()) {
             return false;
         }
-
         String s = file.getAbsolutePath().replace('\\', '/');
         s = s.replaceAll("^.*" + configurationDirectory + "/(live|cache)(.*)\\.(job|monitor)\\.xml$", "$2");
-
         for (String exclusion : listOfFileExclusions) {
             if (s.equals(exclusion)) {
                 return true;
@@ -86,7 +83,7 @@ public class ConfigurationModifierFileSelectorOptions {
     }
 
     public boolean isDirExclusion(File directory) {
-        if (listOfDirectoryExclusions == null || listOfDirectoryExclusions.size() == 0) {
+        if (listOfDirectoryExclusions == null || listOfDirectoryExclusions.isEmpty()) {
             return false;
         }
         for (String exclusion : listOfDirectoryExclusions) {
@@ -96,4 +93,5 @@ public class ConfigurationModifierFileSelectorOptions {
         }
         return false;
     }
+    
 }

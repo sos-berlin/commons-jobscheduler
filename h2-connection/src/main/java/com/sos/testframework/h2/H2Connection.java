@@ -72,8 +72,9 @@ public abstract class H2Connection {
                 }
                 result.append("runscript from '" + getFilename(sqlFile) + "'");
             }
-            if (result.length() > 0)
+            if (result.length() > 0) {
                 result.insert(0, "INIT=");
+            }
             initString = result.toString();
 
         }

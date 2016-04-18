@@ -31,11 +31,13 @@ public class JSFolderSync extends JSFileOperationBase {
             Options().file.CheckMandatory();
             Options().target.CheckMandatory();
             Options().file_spec.setRegExpFlags(Pattern.CASE_INSENSITIVE);
-            flgOperationWasSuccessful = existsFile(Options().file, Options().file_spec, Options().min_file_age, Options().max_file_age, Options().min_file_size, Options().max_file_size, Options().skip_first_files, Options().skip_last_files, -1, -1);
+            flgOperationWasSuccessful = existsFile(Options().file, Options().file_spec, Options().min_file_age, Options().max_file_age,
+                    Options().min_file_size, Options().max_file_size, Options().skip_first_files, Options().skip_last_files, -1, -1);
             Vector<File> vecSourceList = new Vector<File>();
             vecSourceList.addAll(lstResultList);
             lstResultList = new Vector<File>();
-            flgOperationWasSuccessful = existsFile(Options().target, Options().file_spec, Options().min_file_age, Options().max_file_age, Options().min_file_size, Options().max_file_size, Options().skip_first_files, Options().skip_last_files, -1, -1);
+            flgOperationWasSuccessful = existsFile(Options().target, Options().file_spec, Options().min_file_age, Options().max_file_age,
+                    Options().min_file_size, Options().max_file_size, Options().skip_first_files, Options().skip_last_files, -1, -1);
             Vector<File> vecTargetList = new Vector<File>();
             vecTargetList.addAll(lstResultList);
             Vector<File> vecSyncList = new Vector<File>();
@@ -71,7 +73,7 @@ public class JSFolderSync extends JSFileOperationBase {
                 JSFile objTarget = new JSFile(strTargetFileName);
                 objTarget.setLastModified(objFile2Copy.lastModified());
             }
-            if (vecSyncList.size() > 0) {
+            if (!vecSyncList.isEmpty()) {
                 flgOperationWasSuccessful = true;
             }
         } catch (Exception e) {

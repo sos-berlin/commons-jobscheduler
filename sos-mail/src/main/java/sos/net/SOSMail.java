@@ -114,7 +114,6 @@ public class SOSMail {
     private boolean messageReady = false;
     private boolean queueMailOnError=true;
     private int priority = -1;
-    
     private String securityProtocol="";
     private Session session = null;
     public static String tableMails = "MAILS";
@@ -262,28 +261,22 @@ public class SOSMail {
         } else {
             props.put("mail.smtp.auth", "false");
         }
-        
-        if (securityProtocol.equalsIgnoreCase("ssl")){
+        if ("ssl".equalsIgnoreCase(securityProtocol)) {
             props.put("mail.smtp.ssl.enable", "true");
             props.put("mail.transport.protocol", "smtps");
-        }
-        
-        if (securityProtocol.equalsIgnoreCase("starttls")){
+        } else if ("starttls".equalsIgnoreCase(securityProtocol)) {
             props.put("mail.smtp.starttls.enable", "true");
             props.put("mail.transport.protocol", "smtps");
         }
-        
         authenticator = new SOSMailAuthenticator(user, password);
         session = Session.getInstance(props, authenticator);
         return session;
     }
 
-    
     public String getSecurityProtocol() {
         return securityProtocol;
     }
 
-    
     public void setSecurityProtocol(String securityProtocol) throws Exception {
         this.securityProtocol = securityProtocol;
         this.initMessage();
@@ -356,11 +349,9 @@ public class SOSMail {
 
     private String getEntry(final String val, final Properties entries, final String key) {
         String erg = val;
-        if (entries.containsKey(key)) {
-            if (!entries.getProperty(key).isEmpty()) {
+        if (entries.containsKey(key) && !entries.getProperty(key).isEmpty()) {
                 erg = entries.getProperty(key);
             }
-        }
         return erg;
     }
 
@@ -370,7 +361,7 @@ public class SOSMail {
         }
         this.sosSettings = sosSettings;
         Properties entries = this.sosSettings.getSection(applicationMail, sectionMail);
-        if (entries.size() == 0) {
+        if (entries.isEmpty()) {
             throw new Exception(SOSClassUtil.getMethodName() + ": missing settings entries in section \"" + sectionMail + "\".");
         }
         host = getEntry(host, entries, "host");
@@ -397,7 +388,7 @@ public class SOSMail {
         if (entries.getProperty("smtp_timeout") != null && !entries.getProperty("smtp_timeout").isEmpty()) {
             timeout = 1000 * Integer.parseInt(entries.getProperty("smtp_timeout"));
         }
-        if (from == null && entries.containsKey("mail_from") && entries.getProperty("mail_from").length() > 0) {
+        if (from == null && entries.containsKey("mail_from") && !entries.getProperty("mail_from").isEmpty()) {
             from = entries.getProperty("mail_from");
         }
     }
@@ -415,7 +406,7 @@ public class SOSMail {
         }
         this.sosSettings = sosSettings;
         templates = this.sosSettings.getSection(this.getApplicationMailTemplates(), this.getSectionMailTemplates() + "_" + language);
-        if (templates.size() == 0) {
+        if (templates.isEmpty()) {
             throw new Exception(SOSClassUtil.getMethodName() + ": missing settings entries for application \"" + applicationMailTemplates + "\" in section \""
                     + sectionMailTemplates + "\".");
         }
@@ -469,11 +460,12 @@ public class SOSMail {
                     value = replacements.get(key.toString());
                     if (value != null) {
                         try {
-                            content = content.replaceAll("&\\#\\(" + key.toString() + "\\)", SOSDate.getDateAsString(SOSDate.getDate(value.toString()), this.getDateFormat()));
-                            content = content.replaceAll("&\\#\\#\\(" + key.toString() + "\\)", SOSDate.getDateTimeAsString(SOSDate.getDate(value.toString()), this.getDatetimeFormat()));
+                            content = content.replaceAll("&\\#\\(" + key.toString() + "\\)",
+                                    SOSDate.getDateAsString(SOSDate.getDate(value.toString()), this.getDateFormat()));
+                            content = content.replaceAll("&\\#\\#\\(" + key.toString() + "\\)",
+                                    SOSDate.getDateTimeAsString(SOSDate.getDate(value.toString()), this.getDatetimeFormat()));
                         } catch (Exception ex) {
-                            // ignore this error: replacement is not convertible
-                            // to date
+                            // ignore this error: replacement is not convertible to date
                         }
                         Locale defaultLocale = Locale.getDefault();
                         try {
@@ -721,7 +713,7 @@ public class SOSMail {
             log(SOSClassUtil.getMethodName() + "-->" + dumpMessageAsString(false), SOSLogger.DEBUG9);
             if (!sendToOutputStream) {
                 Transport t;
-                if (securityProtocol.equalsIgnoreCase("ssl") || securityProtocol.equalsIgnoreCase("starttls")){
+                if ("ssl".equalsIgnoreCase(securityProtocol) || "starttls".equalsIgnoreCase(securityProtocol)) {
                     t = session.getTransport("smtps");
                 }else{
                     t = session.getTransport("smtp");
@@ -756,7 +748,7 @@ public class SOSMail {
             }
         } catch (javax.mail.MessagingException e) {
             if (queueMailOnError){
-                if (queueDir.length() > 0 && e.getMessage().startsWith("Could not connect to SMTP host") || e.getMessage().startsWith("Unknown SMTP host")
+                if (!queueDir.isEmpty() && e.getMessage().startsWith("Could not connect to SMTP host") || e.getMessage().startsWith("Unknown SMTP host")
                         || e.getMessage().startsWith("Read timed out") || e.getMessage().startsWith("Exception reading response")) {
                     lastError = e.getMessage() + " ==> " + host + ":" + port + " " + user + "/********";
                     try {
@@ -774,7 +766,7 @@ public class SOSMail {
             }
         } catch (SocketTimeoutException e) {
             if (queueMailOnError){
-                if (queueDir.length() > 0) {
+                if (!queueDir.isEmpty()) {
                     lastError = e.getMessage() + " ==> " + host + ":" + port + " " + user + "/********";
                     try {
                         dumpMessageToFile(true);
@@ -928,8 +920,7 @@ public class SOSMail {
         Object mmpo = mm.getContent();
         if (mmpo instanceof MimeMultipart) {
             MimeMultipart mmp = (MimeMultipart) mmpo;
-            if (mm.isMimeType("text/plain")) {
-            } else if (mm.isMimeType("multipart/*")) {
+            if (mm.isMimeType("multipart/*")) {
                 mmp = (MimeMultipart) mm.getContent();
                 for (int i = 1; i < mmp.getCount(); i++) {
                     BodyPart part = mmp.getBodyPart(i);
@@ -998,8 +989,7 @@ public class SOSMail {
         } else {
             bytes = raw_email_byte_stream_without_attachment.toByteArray();
         }
-        String s = new String(bytes);
-        return s;
+        return new String(bytes);
     }
 
     public byte[] dumpMessage() throws Exception {
@@ -1379,7 +1369,6 @@ public class SOSMail {
         this.attachmentEncoding = attachmentEncoding;
         warn("attachmentEncoding", attachmentEncoding);
         changed = true;
-
     }
 
     public void setHost(final String host) throws Exception {
@@ -1485,7 +1474,6 @@ public class SOSMail {
         String boundary = "DataSeparatorString";
         StringBuilder sb = new StringBuilder();
         try {
-
             if (host == null || host.isEmpty()) {
                 throw new Exception(SOSClassUtil.getMethodName() + ": host has no value.");
             }
@@ -1537,7 +1525,6 @@ public class SOSMail {
                 }
                 sendLine(out, "Cc: " + sb);
             }
-
             if (!bccList.isEmpty()) {
                 sb = new StringBuilder();
                 for (ListIterator e = bccList.listIterator(); e.hasNext();) {

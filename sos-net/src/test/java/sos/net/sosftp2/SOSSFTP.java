@@ -522,47 +522,7 @@ public class SOSSFTP implements SOSFileTransfer {
 
     public static void main(String[] args) throws Exception {
         test2();
-        if (true) {
-            return;
-        }
-        if (args.length < 1) {
-            showUsage();
-            System.exit(0);
-        }
-        if ("-t".equalsIgnoreCase(args[0].trim())) {
-            test();
-            System.exit(0);
-        }
-        File file = new File(args[0]);
-        String host = args[1];
-        int port = Integer.parseInt(args[2]);
-        String user = args[3];
-        String password = args[4];
-        SOSSFTP sftp = new SOSSFTP(host, port);
-        sftp.setAuthenticationMethod("password");
-        sftp.setUser(user);
-        sftp.setPassword(password);
-        if (args.length > 5) {
-            System.out.println("Using proxy Server " + args[5]);
-            sftp.setProxyHost(args[5]);
-            sftp.setProxyPort(Integer.parseInt(args[6]));
-            if (args.length > 7) {
-                System.out.println("Using proxy Server with username and password");
-                sftp.setProxyUser(args[7]);
-                sftp.setProxyPassword(args[8]);
-            }
-        }
-        System.out.println("Connecting...");
-        sftp.connect();
-        System.out.println("isConnected: " + sftp.isConnected());
-        String[] files = sftp.listNames("");
-        System.out.println("files in remote directory: ");
-        dumpArray(files);
-        System.out.println("Transferring file " + file.getAbsolutePath());
-        sftp.putFile(file.getAbsolutePath(), file.getName());
-        System.out.println("Disconnecting...");
-        sftp.disconnect();
-        System.out.println("isConnected: " + sftp.isConnected());
+        return;
     }
 
     public static void test() throws Exception {

@@ -166,11 +166,12 @@ public class SOSSchedulerCommand {
      * @throws RuntimeException */
     public String getResponse() throws IOException, RuntimeException {
         int b;
-        StringBuffer response = new StringBuffer();
+        StringBuilder response = new StringBuilder();
         if (in != null) {
             while ((b = in.read()) != -1) {
-                if (b == 0)
+                if (b == 0) {
                     break;
+                }
                 response.append((char) b);
             }
         }

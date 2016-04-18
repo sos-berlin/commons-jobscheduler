@@ -19,20 +19,9 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "com_sos_JSHelper_Messages", defaultLocale = "en")
 public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOptions, IAutoCompleteProposal {
 
-    private static final String constPrefixForEnviromentVariables = "env:";
-    private static final long serialVersionUID = -7652466722187678671L;
-    public final String ControlType = "text";
-    private static final String conClassName = "JSOptionElement";
     protected static final Logger logger = Logger.getLogger(SOSOptionElement.class);
-    public static boolean gflgProcessHashMap = true;
-    public static boolean gflgCreateShortXML = false;
-    private Stack<String> objValueStack = null;
-    private ArrayList<IValueChangedListener> lstValueChangedListeners = null;
-    public IValueChangedListener objParentControl = null;
     protected String strKey = "";
     protected String strValue = "";
-    private String strDefaultValue = "";
-    private boolean flgIsDirty = false;
     protected boolean flgValue = false;
     protected JSOptionsClass objOptions = null;
     protected Vector<String> objAliase = new Vector<String>();
@@ -41,9 +30,20 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
     protected static final int isOptionTypeBoolean = 1;
     protected static final int isOptionTypeFileName = 2;
     protected static final int isOptionTypeInteger = 3;
-    public static final int isOptionTypeOptions = 4;
     protected static final int isOptionTypeFolder = 5;
     protected int intOptionType = 0;
+    protected JSOptionsClass objParentClass = null;
+    protected static final String conNullButMandatory = "JSO-D-0011";
+    protected static final String conChangedMsg = "JSO-D-0010";
+    protected boolean flgHideValue = false;
+    protected boolean flgHideOption = false;
+    protected boolean isCData = false;
+    private static final String PREFIX_FOR_ENVIROMENT_VARIABLES = "env:";
+    private static final long serialVersionUID = -7652466722187678671L;
+    private Stack<String> objValueStack = null;
+    private ArrayList<IValueChangedListener> lstValueChangedListeners = null;
+    private String strDefaultValue = "";
+    private boolean flgIsDirty = false;
     private boolean flgIsMandatory = false;
     private String strDescription = "";
     private int intSize = 0;
@@ -51,15 +51,14 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
     private String strColumnHeader = "";
     private String strXMLTagName = "";
     private String strFormatString = "";
-    protected JSOptionsClass objParentClass = null;
-    protected static final String conNullButMandatory = "JSO-D-0011";
-    protected static final String conChangedMsg = "JSO-D-0010";
-    protected boolean flgHideValue = false;
-    protected boolean flgHideOption = false;
-    protected boolean isCData = false;
     private boolean gflgProtected = false;
     private final boolean flgSelecteDirtyOnly = true;
     private static final HashMap<String, String> defaultProposals = new HashMap<>();
+    public final String ControlType = "text";
+    public static boolean gflgProcessHashMap = true;
+    public static boolean gflgCreateShortXML = false;
+    public IValueChangedListener objParentControl = null;
+    public static final int isOptionTypeOptions = 4;
 
     public void addValueChangedListener(final IValueChangedListener pobjValueChangedListener) {
         if (lstValueChangedListeners == null) {
@@ -132,7 +131,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
     public String getToolTip() {
         String strT = Description();
         strT = strT + "\nKey=  " + getShortKey();
-        if (objAliase.size() > 0) {
+        if (!objAliase.isEmpty()) {
             strT += ", Alias ";
             for (String strAlias : objAliase) {
                 strT += strAlias + ", ";
@@ -166,10 +165,8 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 
     public void CheckMandatory() {
         try {
-            if (flgIsMandatory) {
-                if (this.isEmpty(strValue)) {
-                    this.SignalError(Messages.getMsg(SOSOptionElement.conNullButMandatory, strDescription, strKey));
-                }
+            if (flgIsMandatory && this.isEmpty(strValue)) {
+                this.SignalError(Messages.getMsg(SOSOptionElement.conNullButMandatory, strDescription, strKey));
             }
         } catch (final Exception e) {
             throw new JSExceptionMandatoryOptionMissing(e.toString());
@@ -283,10 +280,8 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
             strT = strT.substring(i + 1);
             if (objParentClass != null) {
                 String strPrefix = objParentClass.getPrefix();
-                if (isNotEmpty(strPrefix)) {
-                    if (!strT.startsWith(strPrefix)) {
-                        strT = strPrefix + "_" + strT;
-                    }
+                if (isNotEmpty(strPrefix) && !strT.startsWith(strPrefix)) {
+                    strT = strPrefix + "_" + strT;
                 }
             }
         }
@@ -314,7 +309,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
         if (pstrValue == null) {
             strRet = null;
         } else {
-            if (pstrValue.toLowerCase().startsWith(constPrefixForEnviromentVariables)) {
+            if (pstrValue.toLowerCase().startsWith(PREFIX_FOR_ENVIROMENT_VARIABLES)) {
                 String strEnvVarName = pstrValue.substring(4);
                 String strEnvVarValue = EnvironmentVariable(strEnvVarName);
                 if (isEmpty(strEnvVarValue)) {
@@ -473,8 +468,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
     }
 
     public String QuotedValue(final String pstrValue) {
-        String strRet = "\"" + pstrValue.replaceAll("\"", "\"\"") + "\"";
-        return strRet;
+        return "\"" + pstrValue.replaceAll("\"", "\"\"") + "\"";
     }
 
     private void raiseValueChangedListener() {
@@ -559,18 +553,16 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
     public boolean String2Bool() {
         boolean flgT = false;
         String pstrVal = strValue;
-        if (isNotEmpty(pstrVal)) {
-            if ("1".equals(pstrVal) || "y".equalsIgnoreCase(pstrVal) || "yes".equalsIgnoreCase(pstrVal) || "j".equalsIgnoreCase(pstrVal)
-                    || "on".equalsIgnoreCase(pstrVal) || "true".equalsIgnoreCase(pstrVal) || "wahr".equalsIgnoreCase(pstrVal)) {
-                flgT = true;
-            }
+        if (isNotEmpty(pstrVal) && ("1".equals(pstrVal) || "y".equalsIgnoreCase(pstrVal) || "yes".equalsIgnoreCase(pstrVal) || "j".equalsIgnoreCase(pstrVal)
+                    || "on".equalsIgnoreCase(pstrVal) || "true".equalsIgnoreCase(pstrVal) || "wahr".equalsIgnoreCase(pstrVal))) {
+            flgT = true;
         }
         return flgT;
     }
 
     public String StripQuotes(final String pstrS) {
         String strR = pstrS;
-        if (pstrS.substring(0, 1).equals("\"") && pstrS.substring(pstrS.length() - 1).equals("\"")) {
+        if ("\"".equals(pstrS.substring(0, 1)) && "\"".equals(pstrS.substring(pstrS.length() - 1))) {
             strR = pstrS.substring(1, pstrS.length() - 1);
         }
         return strR;
@@ -618,9 +610,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
     }
 
     public String toOut() throws Exception {
-        String strT = "";
-        strT = String.format("%1$s %2$s: %3$s \n", strTitle, strDescription, this.Value());
-        return strT;
+        return String.format("%1$s %2$s: %3$s \n", strTitle, strDescription, this.Value());
     }
 
     @Override
@@ -689,12 +679,8 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 
     @Override
     public void Value(final String pstrValue) {
-        if (flgIsMandatory) {
-            if (pstrValue == null) {
-                if (gflgProcessHashMap) {
-                    return;
-                }
-            }
+        if (flgIsMandatory && pstrValue == null && gflgProcessHashMap) {
+            return;
         }
         if (pstrValue != null) {
             if (objParentClass != null) {
@@ -753,4 +739,5 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
         String[] proposals = defaultProposals.keySet().toArray(new String[0]);
         return proposals;
     }
+
 }

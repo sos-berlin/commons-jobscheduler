@@ -76,10 +76,11 @@ public class JobSchedulerSSHJob_deprecated extends JobSchedulerSSHBaseJob {
         try {
             try {
                 params = getParameters();
+                String command = "";
                 String commandScript = "";
                 String commandScriptFileName = "";
                 schedulerParameter = getSchedulerParameterAsProperties(params);
-                if (params.value("is_kill_job") != null && params.value("is_kill_job").length() > 0) {
+                if (params.value("is_kill_job") != null && !params.value("is_kill_job").isEmpty()) {
                     if ("true".equalsIgnoreCase(params.value("is_kill_job")) || "yes".equalsIgnoreCase(params.value("is_kill_job"))
                             || "1".equals(params.value("is_kill_job"))) {
                         isSSHKillJob = true;
@@ -89,19 +90,19 @@ public class JobSchedulerSSHJob_deprecated extends JobSchedulerSSHBaseJob {
                     spooler_log.info(".. parameter [is_kill_job]: " + isSSHKillJob);
                 }
                 if (isSSHKillJob) {
-                    if (params.value("job_scheduler_ssh_kill_pid") != null && params.value("job_scheduler_ssh_kill_pid").length() > 0) {
+                    if (params.value("job_scheduler_ssh_kill_pid") != null && !params.value("job_scheduler_ssh_kill_pid").isEmpty()) {
                         sshKillPid = params.value("job_scheduler_ssh_kill_pid");
                         spooler_log.debug(".. parameter [job_scheduler_ssh_kill_pid]: " + sshKillPid);
                     } else {
                         spooler_log.info("Process doesn't need to be killed. Doing nothing");
                         return false;
                     }
-                    if (sshKillPid.equals("0")) {
+                    if ("0".equals(sshKillPid)) {
                         spooler_log.info("Process doesn't need to be killed. Doing nothing");
                         return false;
                     }
                 }
-                if (params.value("command_script") != null && params.value("command_script").length() > 0) {
+                if (params.value("command_script") != null && !params.value("command_script").isEmpty()) {
                     commandScript = params.value("command_script");
                     if (JobSchedulerManagedObject.isHex(commandScript)) {
                         commandScript = new String(JobSchedulerManagedObject.fromHexString(commandScript), "US-ASCII");
@@ -109,14 +110,14 @@ public class JobSchedulerSSHJob_deprecated extends JobSchedulerSSHBaseJob {
                     }
                     spooler_log.info(".. parameter [command_script]: " + commandScript);
                 }
-                if (params.value("command") != null && params.value("command").length() > 0) {
-                    String sCommand = params.value("command");
-                    if (JobSchedulerManagedObject.isHex(sCommand)) {
-                        sCommand = new String(JobSchedulerManagedObject.fromHexString(sCommand), "US-ASCII");
-                        schedulerParameter.put("jump_command", sCommand);
+                if (params.value("command") != null && !params.value("command").isEmpty()) {
+                    command = params.value("command");
+                    if (JobSchedulerManagedObject.isHex(command)) {
+                        command = new String(JobSchedulerManagedObject.fromHexString(command), "US-ASCII");
+                        schedulerParameter.put("jump_command", command);
                     }
-                    spooler_log.info(".. parameter [command]: " + sCommand);
-                } else if (commandScriptFileName.length() == 0 && commandScriptFileName.length() == 0) {
+                    spooler_log.info(".. parameter [command]: " + command);
+                } else if (command.isEmpty() && commandScript.isEmpty() && commandScriptFileName.isEmpty()) {
                     throw new Exception("no command (or command_script or command_script_file) has been specified for parameter [command]");
                 }
             } catch (Exception e) {
@@ -126,11 +127,12 @@ public class JobSchedulerSSHJob_deprecated extends JobSchedulerSSHBaseJob {
                 if (isSSHKillJob) {
                     this.getBaseParameters();
                     this.getBaseAuthentication();
-                    if (sshKillPid.length() > 0) {
+                    if (!sshKillPid.isEmpty()) {
                         remoteKill(sshKillPid);
                     }
                 } else {
-                    SOSConfiguration con = new SOSConfiguration(null, schedulerParameter, null, null, "sos/net/sosftp/Configuration.xml", new SOSSchedulerLogger(spooler_log));
+                    SOSConfiguration con = new SOSConfiguration(null, schedulerParameter, null, null, "sos/net/sosftp/Configuration.xml",
+                            new SOSSchedulerLogger(spooler_log));
                     con.checkConfigurationItems();
                     ftpCommand = new sos.net.sosftp.SOSFTPCommandSSH(con, new SOSSchedulerLogger(spooler_log));
                     ftpCommand.setSchedulerJob(this);
@@ -203,7 +205,6 @@ public class JobSchedulerSSHJob_deprecated extends JobSchedulerSSHBaseJob {
                 spooler_log.debug9(line);
                 stderrOutput.append(line + "\n");
             }
-            // get children of parent pid
             Iterator pelIter = pidMap.values().iterator();
             while (pelIter.hasNext()) {
                 PsEfLine current = (PsEfLine) pelIter.next();
@@ -218,7 +219,7 @@ public class JobSchedulerSSHJob_deprecated extends JobSchedulerSSHBaseJob {
             Integer parentPid = new Integer(pid);
             if (pidMap.containsKey(parentPid)) {
                 PsEfLine pel = (PsEfLine) pidMap.get(parentPid);
-                if (pel.children.size() > 0) {
+                if (!pel.children.isEmpty()) {
                     spooler_log.debug("killing children of pid " + pid);
                     killChildrenOfPid(pel, pidMap);
                 }
@@ -237,7 +238,7 @@ public class JobSchedulerSSHJob_deprecated extends JobSchedulerSSHBaseJob {
 
     private void killChildrenOfPid(final PsEfLine pel, final HashMap pidMap) throws Exception {
         try {
-            if (pel.children.size() == 0) {
+            if (pel.children.isEmpty()) {
                 return;
             }
             Iterator iter = pel.children.iterator();
@@ -316,13 +317,12 @@ public class JobSchedulerSSHJob_deprecated extends JobSchedulerSSHBaseJob {
             for (String name : names) {
                 String key = name;
                 String val = params.var(name);
-                if (key.length() > 0) {
+                if (!key.isEmpty()) {
                     key = "jump_" + key;
                 }
                 spooler_log.debug1("param [" + key + "=" + val + "]");
                 schedulerParams.put(key, val);
             }
-            // Einige Defaults hinzufügen
             schedulerParams.put("operation", "execute");
             schedulerParams.put("check_params_names", "no");
             return schedulerParams;
@@ -337,11 +337,8 @@ public class JobSchedulerSSHJob_deprecated extends JobSchedulerSSHBaseJob {
 
     private void createOrderParameter(final Integer exitstatus) throws Exception {
         try {
-            // return the number of transferred files and filenames
-            if (spooler_job.order_queue() != null) {
-                if (spooler_task.order() != null && spooler_task.order().params() != null) {
-                    spooler_task.order().params().set_var("job_scheduler_ssh_exit_code", Integer.toString(exitstatus.intValue()));
-                }
+            if (spooler_job.order_queue() != null && spooler_task.order() != null && spooler_task.order().params() != null) {
+                spooler_task.order().params().set_var("job_scheduler_ssh_exit_code", Integer.toString(exitstatus.intValue()));
             }
         } catch (Exception e) {
             throw new Exception("error occurred creating order Parameter: " + e.getMessage());
