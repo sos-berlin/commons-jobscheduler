@@ -27,6 +27,7 @@ public class JobSchedulerManagedMailJob extends JobSchedulerManagedJob {
         boolean queueDirChanged = false;
         String from = spooler_log.mail().from();
         boolean fromChanged = false;
+        boolean queueMailOnError=true;
         String fromName = "";
         String replyTo = "";
         String to = "";
@@ -126,6 +127,10 @@ public class JobSchedulerManagedMailJob extends JobSchedulerManagedJob {
 
                     if (this.getParameters().value("security_protocol") != null && this.getParameters().value("security_protocol").length() > 0) {
                         securityProtocol = this.getParameters().value("security_protocol");
+                    }
+
+                    if (this.getParameters().value("queue_mail_on_error") != null && this.getParameters().value("queue_mail_on_error").length() > 0) {
+                        queueMailOnError = !this.getParameters().value("queue_mail_on_error").equalsIgnoreCase("false");
                     }
 
                     if (this.getParameters().value("cleanup_attachment") != null && this.getParameters().value("cleanup_attachment").length() > 0) {
@@ -231,6 +236,7 @@ public class JobSchedulerManagedMailJob extends JobSchedulerManagedJob {
                     }
                     sosMail.setSOSLogger(this.getLogger());
                     this.getLogger().info("sending mail: \n" + sosMail.dumpMessageAsString());
+                    sosMail.setQueueMailOnError(queueMailOnError);
                     if (!sosMail.send()) {
                         this.getLogger().warn(
                                 "mail server is unavailable, mail for recipient [" + to + "] is queued in local directory [" + sosMail.getQueueDir() + "]:"
@@ -251,7 +257,11 @@ public class JobSchedulerManagedMailJob extends JobSchedulerManagedJob {
             }
             return spooler_task.job().order_queue() != null ? true : false;
         } catch (Exception e) {
-            spooler_log.warn("error occurred processing order [" + orderId + "]: " + e.getMessage());
+            if (queueMailOnError){
+                spooler_log.warn("error occurred processing order [" + orderId + "]: " + e.getMessage());
+            }else{
+                spooler_log.error("error occurred processing order [" + orderId + "]: " + e.getMessage());
+            }
             spooler_task.end();
             return false;
         }

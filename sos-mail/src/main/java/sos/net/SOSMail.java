@@ -112,6 +112,7 @@ public class SOSMail {
     private String lastGeneratedFileName = "";
     private String loadedMessageId = "";
     private boolean messageReady = false;
+    private boolean queueMailOnError=true;
     private int priority = -1;
     
     private String securityProtocol="";
@@ -579,6 +580,11 @@ public class SOSMail {
         changed = true;
     }
 
+    
+    public void setQueueMailOnError(boolean queueMailOnError) {
+        this.queueMailOnError = queueMailOnError;
+    }
+
     public void addAttachment(final String filename) throws Exception {
         warn("addAttachment", filename);
         File f = new File(filename);
@@ -738,41 +744,52 @@ public class SOSMail {
             return true;
         } catch (javax.mail.AuthenticationFailedException ee) {
             lastError = "AuthenticationFailedException while connecting to " + host + ":" + port + " " + user + "/******** -->" + ee.getMessage();
-            try {
-                dumpMessageToFile(true);
-            } catch (Exception e) {
-                log(SOSClassUtil.getMethodName() + ":" + e.getMessage(), SOSLogger.WARN);
-            }
-            return false;
-        } catch (javax.mail.MessagingException e) {
-            // ist ein Fehler, bei dem es lohnt, zwischenzuspeichern?
-            if (queueDir.length() > 0 && e.getMessage().startsWith("Could not connect to SMTP host") || e.getMessage().startsWith("Unknown SMTP host")
-                    || e.getMessage().startsWith("Read timed out") || e.getMessage().startsWith("Exception reading response")) {
-                lastError = e.getMessage() + " ==> " + host + ":" + port + " " + user + "/********";
+            if (queueMailOnError){
                 try {
                     dumpMessageToFile(true);
-                } catch (Exception ee) {
+                } catch (Exception e) {
                     log(SOSClassUtil.getMethodName() + ":" + e.getMessage(), SOSLogger.WARN);
                 }
                 return false;
-            } else {
+            }else{
+                throw new Exception(SOSClassUtil.getMethodName() + ":" + lastError + ": error occurred on send: "  + ee.toString());
+            }
+        } catch (javax.mail.MessagingException e) {
+            if (queueMailOnError){
+                if (queueDir.length() > 0 && e.getMessage().startsWith("Could not connect to SMTP host") || e.getMessage().startsWith("Unknown SMTP host")
+                        || e.getMessage().startsWith("Read timed out") || e.getMessage().startsWith("Exception reading response")) {
+                    lastError = e.getMessage() + " ==> " + host + ":" + port + " " + user + "/********";
+                    try {
+                        dumpMessageToFile(true);
+                    } catch (Exception ee) {
+                        log(SOSClassUtil.getMethodName() + ":" + e.getMessage(), SOSLogger.WARN);
+                    }
+                    return false;
+                    
+                } else {
+                    throw new Exception(SOSClassUtil.getMethodName() + ": error occurred on send: " + e.toString());
+                }
+            }else{
                 throw new Exception(SOSClassUtil.getMethodName() + ": error occurred on send: " + e.toString());
             }
         } catch (SocketTimeoutException e) {
-            if (queueDir.length() > 0) {
-                lastError = e.getMessage() + " ==> " + host + ":" + port + " " + user + "/********";
-                try {
-                    dumpMessageToFile(true);
-                } catch (Exception ee) {
-                    log(SOSClassUtil.getMethodName() + ":" + e.getMessage(), SOSLogger.WARN);
+            if (queueMailOnError){
+                if (queueDir.length() > 0) {
+                    lastError = e.getMessage() + " ==> " + host + ":" + port + " " + user + "/********";
+                    try {
+                        dumpMessageToFile(true);
+                    } catch (Exception ee) {
+                        log(SOSClassUtil.getMethodName() + ":" + e.getMessage(), SOSLogger.WARN);
+                    }
+                    return false;
+                } else {
+                    throw new Exception(SOSClassUtil.getMethodName() + ": error occurred on send: " + e.toString());
                 }
-                return false;
-            } else {
-                throw new Exception(SOSClassUtil.getMethodName() + ": error occurred on send: " + e.toString());
             }
         } catch (Exception e) {
             throw new Exception(SOSClassUtil.getMethodName() + ": error occurred on send: " + e.toString());
         }
+        return true;
 
     }
 
