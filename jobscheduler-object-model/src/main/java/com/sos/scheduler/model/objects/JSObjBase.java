@@ -55,7 +55,7 @@ public class JSObjBase implements Comparable<JSObjBase> {
     }
 
     public boolean isEmpty(final String value) {
-        return value == null || value.length() == 0;
+        return value == null || value.isEmpty();
     }
 
     public void setDirty() {
@@ -136,12 +136,12 @@ public class JSObjBase implements Comparable<JSObjBase> {
     }
 
     public Object saveAs(final String pstrSaveAsFileName) {
-        // TODO implement saveAs
+        // TO DO implement saveAs
         return null;
     }
 
     public Object Rename(final String pstrRenameFileName) {
-        // TODO implement Rename
+        // TO DO implement Rename
         return null;
     }
 
@@ -176,7 +176,7 @@ public class JSObjBase implements Comparable<JSObjBase> {
     @Override
     public int compareTo(final JSObjBase o) {
         int compareRet = 0;
-        boolean thisIsFolder = this.getClass().getSimpleName().equals("SchedulerHotFolder");
+        boolean thisIsFolder = "SchedulerHotFolder".equals(this.getClass().getSimpleName());
         boolean oIsFolder = o instanceof SchedulerHotFolder;
         if (thisIsFolder && !oIsFolder) {
             compareRet = -1;
@@ -194,23 +194,6 @@ public class JSObjBase implements Comparable<JSObjBase> {
         return compareRet;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
-    /** \brief setObjectFieldsFrom
-     *
-     * \details set all fields of a subclass according to its superclass
-     *
-     * \return void
-     *
-     * @param origObj */
     public void setObjectFieldsFrom(final JSObjBase origObj) {
         Field[] fields;
         Class<?> origClass = origObj.getClass();
@@ -285,7 +268,7 @@ public class JSObjBase implements Comparable<JSObjBase> {
 
     public boolean isEnabled() {
         boolean flgT = true;
-        // TODO implement canWrite()
+        // TO DO implement canWrite()
         return flgT;
     }
 

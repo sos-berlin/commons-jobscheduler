@@ -120,7 +120,8 @@ public class SOSFileListEntryTest extends JSListenerClass {
         CreateTestFile();
         assertEquals("Source-File Name", PATHNAME + FILENAME, objE.SourceFileName());
         assertEquals("Source-Transfer-File Name", PATHNAME + FILENAME, objE.SourceTransferName());
-        assertEquals("intermediate Atomic-File TargetTransferName", objOptions.atomic_prefix.Value() + FILENAME + objOptions.atomic_suffix.Value(), objE.TargetTransferName());
+        assertEquals("intermediate Atomic-File TargetTransferName", objOptions.atomic_prefix.Value() + FILENAME + objOptions.atomic_suffix.Value(),
+                objE.TargetTransferName());
         assertEquals("final TargetFileName", FILENAME, objE.TargetFileName());
     }
 

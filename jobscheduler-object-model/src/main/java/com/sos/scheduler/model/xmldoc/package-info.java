@@ -7,6 +7,7 @@
 // Generated on: 2011.03.08 at 02:48:08 PM MEZ
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.sos-berlin.com/schema/scheduler_job_documentation_v1.1",
+        elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package com.sos.scheduler.model.xmldoc;
 

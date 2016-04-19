@@ -25,11 +25,11 @@ public class JSJobUtilitiesClass<T> extends JSToolBox implements JSJobUtilities,
         objOptions = pobjO;
     }
 
-    public T getOptions() {
+    public T Options() {
         return objOptions;
     }
 
-    public T getOptions(final T pobjOptions) {
+    public T Options(final T pobjOptions) {
         objOptions = pobjOptions;
         return objOptions;
     }
@@ -76,7 +76,7 @@ public class JSJobUtilitiesClass<T> extends JSToolBox implements JSJobUtilities,
 
     @Override
     public void setStateText(final String pstrStateText) {
-        //
+        // 
     }
 
     @Override
@@ -100,7 +100,7 @@ public class JSJobUtilitiesClass<T> extends JSToolBox implements JSJobUtilities,
 
     @Override
     public void setNextNodeState(final String pstrNodeName) {
-        //
+        // 
     }
 
 }

@@ -126,9 +126,8 @@ public class JobSchedulerFTPSend extends JobSchedulerJobAdapter {
                     p.putAll((Properties) schedulerParams.clone());
                     p.put("skip_transfer", "yes");
                     // Parametern sind hier auch gültig
-                    SOSConfiguration con =
-                            new SOSConfiguration(null, p, sosString.parseToString(schedulerParams.get(PARAMETER_SETTINGS)),
-                                    sosString.parseToString(schedulerParams.get(PARAMETER_PROFILE)), null, new SOSSchedulerLogger(spooler_log));
+                    SOSConfiguration con = new SOSConfiguration(null, p, sosString.parseToString(schedulerParams.get(PARAMETER_SETTINGS)),
+                            sosString.parseToString(schedulerParams.get(PARAMETER_PROFILE)), null, new SOSSchedulerLogger(spooler_log));
                     con.checkConfigurationItems();
                     sos.net.sosftp.SOSFTPCommandSend ftpCommand = new sos.net.sosftp.SOSFTPCommandSend(con, new SOSSchedulerLogger(spooler_log));
                     ftpCommand.setSchedulerJob(this);
@@ -177,15 +176,12 @@ public class JobSchedulerFTPSend extends JobSchedulerJobAdapter {
                         spooler_job.set_delay_order_after_setback(1, parallelTransferCheckSetback);
                         spooler_job.set_max_order_setbacks(parallelTransferCheckRetry);
                         spooler_task.order().setback();
-                        spooler.variables().set_var("cur_transfer_retry" + normalize(spooler_task.order().id()),
-                                String.valueOf(parallelTransferCheckRetry));
+                        spooler.variables().set_var("cur_transfer_retry" + normalize(spooler_task.order().id()), String.valueOf(parallelTransferCheckRetry));
                         return false;
                     }
                 }
-                SOSConfiguration con =
-                        new SOSConfiguration(null, mapToProperties(schedulerParams),
-                                sosString.parseToString(schedulerParams.get(PARAMETER_SETTINGS)),
-                                sosString.parseToString(schedulerParams.get(PARAMETER_PROFILE)), null, new SOSSchedulerLogger(spooler_log));
+                SOSConfiguration con = new SOSConfiguration(null, mapToProperties(schedulerParams), sosString.parseToString(schedulerParams
+                        .get(PARAMETER_SETTINGS)), sosString.parseToString(schedulerParams.get(PARAMETER_PROFILE)), null, new SOSSchedulerLogger(spooler_log));
                 con.checkConfigurationItems();
                 sos.net.sosftp.SOSFTPCommandSend ftpCommand = new sos.net.sosftp.SOSFTPCommandSend(con, new SOSSchedulerLogger(spooler_log));
                 ftpCommand.setSchedulerJob(this);
@@ -193,8 +189,8 @@ public class JobSchedulerFTPSend extends JobSchedulerJobAdapter {
                 // return the number of transferred files
                 createReturnParameter(ftpCommand);
                 if (parallelTransfer && isFilePath && spooler_job.order_queue() != null) {
-                    spooler.variables().set_var(
-                            "ftp_check_send_" + normalize(params.var("ftp_parent_order_id")) + "." + normalize(spooler_task.order().id()), "1");
+                    spooler.variables().set_var("ftp_check_send_" + normalize(params.var("ftp_parent_order_id")) + "." + normalize(spooler_task.order().id()),
+                            "1");
                 }
                 processResult(rc, "");
                 spooler_job.set_state_text(ftpCommand.getState() != null ? ftpCommand.getState() : "");
@@ -202,8 +198,8 @@ public class JobSchedulerFTPSend extends JobSchedulerJobAdapter {
             } catch (Exception e) {
                 rc = false;
                 if (parallelTransfer && isFilePath && spooler_job.order_queue() != null) {
-                    spooler.variables().set_var(
-                            "ftp_check_send_" + normalize(params.var("ftp_parent_order_id")) + "." + normalize(spooler_task.order().id()), "2");
+                    spooler.variables().set_var("ftp_check_send_" + normalize(params.var("ftp_parent_order_id")) + "." + normalize(spooler_task.order().id()),
+                            "2");
                 }
                 throw (new Exception("could not process file transfer: " + e, e));
             } finally {

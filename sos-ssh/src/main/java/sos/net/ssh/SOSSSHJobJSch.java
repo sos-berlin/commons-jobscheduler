@@ -222,10 +222,12 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         if (objOptions.runWithWatchdog.value()) {
             readGetPidCommandFromPropertiesFile();
             return String.format(ssh_job_get_pid_command + objOptions.command_delimiter.Value() + ssh_job_get_pid_command + " >> " + pidFileName
-                    + objOptions.command_delimiter.Value() + objOptions.getPreCommand().Value() + objOptions.command_delimiter.Value(), SCHEDULER_RETURN_VALUES, tempFileName);
+                    + objOptions.command_delimiter.Value() + objOptions.getPreCommand().Value() + objOptions.command_delimiter.Value(),
+                    SCHEDULER_RETURN_VALUES, tempFileName);
         }
-        return String.format(ssh_job_get_pid_command + objOptions.command_delimiter.Value() + objOptions.getPreCommand().Value()
-                + objOptions.command_delimiter.Value(), SCHEDULER_RETURN_VALUES, tempFileName);
+        return String.format(
+                ssh_job_get_pid_command + objOptions.command_delimiter.Value() + objOptions.getPreCommand().Value() + objOptions.command_delimiter.Value(),
+                SCHEDULER_RETURN_VALUES, tempFileName);
     }
 
     private String getEnvCommand() {

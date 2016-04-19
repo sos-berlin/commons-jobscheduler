@@ -105,7 +105,8 @@ public class SOSSchedulerCommand {
     }
 
     public static void main(final String[] args) throws Exception {
-        int argc = 0, i = 0;
+        int argc = 0;
+        int i = 0;
         final String CLASS_NAME = "sos.net.SOSSchedulerCommand";
         final String USAGE = "\nUSAGE: java " + CLASS_NAME + " [ -host <host> -port <port ] <xml-command>";
         boolean params = false;

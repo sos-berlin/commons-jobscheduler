@@ -117,7 +117,7 @@ public class SOSMsg {
     }
 
     public String icon() {
-        String key = strMessageCode.trim().replaceAll(" ", ""); // .toLowerCase();
+        String key = strMessageCode.trim().replaceAll(" ", "");
         String strI = Messages.getLabel(key + conPropertyExtensionICon);
         if (strI == null) {
             strI = "noIcon";
@@ -248,7 +248,7 @@ public class SOSMsg {
                     }
                 }
             }
-            return msg != null && !msg.equals("") ? msg : key;
+            return msg != null && !"".equals(msg) ? msg : key;
         } catch (Exception e) {
             return strMessageCode;
         }
@@ -277,13 +277,12 @@ public class SOSMsg {
 
     public String getFullMessage() {
         String strMsgText = Messages.getMsg(strMessageCode);
-        String strT = getFullMessage(strMsgText);
-        return strT;
+        return getFullMessage(strMsgText);
     }
 
     private String getFullMessage(final String pstrMsgText) {
         String strT = pstrMsgText;
-        if (flgShowFullMessageText == true && flgFullMessageReported == false) {
+        if (flgShowFullMessageText && !flgFullMessageReported) {
             switch (enuMsgType) {
             case error:
             case fatal:
@@ -309,8 +308,7 @@ public class SOSMsg {
 
     public String get(final Object... pstrArgs) {
         String strT = Messages.getMsg(strMessageCode, pstrArgs);
-        strT = getFullMessage(strT);
-        return strT;
+        return getFullMessage(strT);
     }
 
     public String getFullMessage(final Object... pstrArgs) {
@@ -380,4 +378,5 @@ public class SOSMsg {
 
     protected void checkVerbosityLevel() {
     }
+
 }

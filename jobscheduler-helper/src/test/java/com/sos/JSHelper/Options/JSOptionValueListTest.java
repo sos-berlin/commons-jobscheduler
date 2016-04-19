@@ -135,7 +135,8 @@ public class JSOptionValueListTest {
         settings.put(strKey, strStatements[0]);
         settings.put(strKey + "1", strStatements[1]);
         optionValueList = new JSOptionValueList(objOptions, strKey, strDescr + "5", "", true);
-        assertEquals("ConcatenatedValue::Multiple SQL Stmt2", strStatements[0] + strDelimiter + strStatements[1], optionValueList.concatenatedValue(strDelimiter));
+        assertEquals("ConcatenatedValue::Multiple SQL Stmt2", strStatements[0] + strDelimiter + strStatements[1],
+                optionValueList.concatenatedValue(strDelimiter));
     }
 
     @Test
@@ -150,7 +151,8 @@ public class JSOptionValueListTest {
         settings.put(strKey + "2", strStatements[1]);
         settings.put(strKey + "3", strStatements[2]);
         optionValueList = new JSOptionValueList(objOptions, strKey, strDescr + "6", "", true);
-        assertEquals("ConcatenatedValue::Multiple SQL Stmt2b", strStatements[0] + strStatements[1] + strDelimiter + strStatements[2], optionValueList.concatenatedValue(strDelimiter));
+        assertEquals("ConcatenatedValue::Multiple SQL Stmt2b", strStatements[0] + strStatements[1] + strDelimiter + strStatements[2],
+                optionValueList.concatenatedValue(strDelimiter));
     }
 
     @Test

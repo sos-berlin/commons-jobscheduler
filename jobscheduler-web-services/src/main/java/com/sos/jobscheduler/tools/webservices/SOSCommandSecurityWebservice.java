@@ -190,7 +190,8 @@ public class SOSCommandSecurityWebservice {
             }
             boolean isPermitted = (sosShiroCurrentUserAnswer != null && sosShiroCurrentUserAnswer.isPermitted() && sosShiroCurrentUserAnswer.isAuthenticated());
             if (!isPermitted) {
-                return String.format("%s,User %s is not permitted. Missing permission: %s", "SOSSEC002", sosWebserviceAuthenticationRecord.getUser(), permission);
+                return String.format("%s,User %s is not permitted. Missing permission: %s", "SOSSEC002", sosWebserviceAuthenticationRecord.getUser(),
+                        permission);
             }
             return "";
         } else {
@@ -375,7 +376,8 @@ public class SOSCommandSecurityWebservice {
             objModifyJobChain.setStateIfNotEmpte(state);
             String xml = objFactory.toXMLString(objModifyJobChain);
             String answer = executeXml(xml);
-            return createAnswer(answer, String.format("%s:job chain %s modified with state %s", "SOSSEC006", jobChain, state), sosWebserviceAuthenticationRecord);
+            return createAnswer(answer, String.format("%s:job chain %s modified with state %s", "SOSSEC006", jobChain, state),
+                    sosWebserviceAuthenticationRecord);
         } else {
             return createAnswer("", s, sosWebserviceAuthenticationRecord);
         }
@@ -398,7 +400,8 @@ public class SOSCommandSecurityWebservice {
             objModifyJobChainNode.setActionIfNotEmpty(action);
             String xml = objFactory.toXMLString(objModifyJobChainNode);
             String answer = executeXml(xml);
-            return createAnswer(answer, String.format("%s:job chain %s modified with state %s", "SOSSEC007", jobChain, state), sosWebserviceAuthenticationRecord);
+            return createAnswer(answer, String.format("%s:job chain %s modified with state %s", "SOSSEC007", jobChain, state),
+                    sosWebserviceAuthenticationRecord);
         } else {
             return createAnswer("", s, sosWebserviceAuthenticationRecord);
         }
@@ -562,7 +565,8 @@ public class SOSCommandSecurityWebservice {
             objRemoveOrder.setOrderIfNotEmpty(order);
             String xml = objRemoveOrder.toXMLString();
             String answer = executeXml(xml);
-            return createAnswer(answer, String.format("%s: Order %s removed from job chain %s", "SOSSEC014", order, jobChain), sosWebserviceAuthenticationRecord);
+            return createAnswer(answer, String.format("%s: Order %s removed from job chain %s", "SOSSEC014", order, jobChain),
+                    sosWebserviceAuthenticationRecord);
         } else {
             return createAnswer("", s, sosWebserviceAuthenticationRecord);
         }
@@ -676,8 +680,10 @@ public class SOSCommandSecurityWebservice {
         SOSRestShiroClient sosRestShiroClient = new SOSRestShiroClient();
         String resource = sosWebserviceAuthenticationRecord.getResource() + "/logout" + "?session_id=%s";
         sosWebserviceAuthenticationRecord.setResource(resource);
-        sosRestShiroClient.getSOSShiroCurrentUserAnswer(new URL(String.format(sosWebserviceAuthenticationRecord.getResource(), sosWebserviceAuthenticationRecord.getSessionId())));
-        SOSCommandSecurityWebserviceAnswer message = createAnswer("", String.format("%s --> Abgemeldet", sosWebserviceAuthenticationRecord.getSessionId()), sosWebserviceAuthenticationRecord);
+        sosRestShiroClient.getSOSShiroCurrentUserAnswer(new URL(String.format(sosWebserviceAuthenticationRecord.getResource(),
+                sosWebserviceAuthenticationRecord.getSessionId())));
+        SOSCommandSecurityWebserviceAnswer message = createAnswer("", String.format("%s --> Abgemeldet", sosWebserviceAuthenticationRecord.getSessionId()),
+                sosWebserviceAuthenticationRecord);
         if (currentUserList != null) {
             currentUserList.removeUser(sessionId);
         }

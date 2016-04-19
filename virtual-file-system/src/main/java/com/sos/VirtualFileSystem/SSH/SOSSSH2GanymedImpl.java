@@ -112,9 +112,8 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
                 if (objCO.getProxy_user().IsEmpty()) {
                     objProxy = new HTTPProxyData(objCO.getProxy_host().Value(), objCO.getProxy_port().value());
                 } else {
-                    objProxy =
-                            new HTTPProxyData(objCO.getProxy_host().Value(), objCO.getProxy_port().value(), objCO.getProxy_user().Value(),
-                                    objCO.getProxy_password().Value());
+                    objProxy = new HTTPProxyData(objCO.getProxy_host().Value(), objCO.getProxy_port().value(), objCO.getProxy_user().Value(), objCO
+                            .getProxy_password().Value());
                 }
                 this.getSshConnection().setProxyData(objProxy);
             }

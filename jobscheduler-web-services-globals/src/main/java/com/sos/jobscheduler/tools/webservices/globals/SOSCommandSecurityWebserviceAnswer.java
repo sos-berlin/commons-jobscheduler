@@ -90,6 +90,7 @@ public class SOSCommandSecurityWebserviceAnswer {
 
     @Override
     public String toString() {
-        return new StringBuffer(" message: ").append(this.message).append(" user: ").append(this.user).append(" sessionId: ").append(this.sessionId).append(" -> ").append(this.resource).toString();
+        return new StringBuilder(" message: ").append(this.message).append(" user: ").append(this.user).append(" sessionId: ").append(this.sessionId)
+                .append(" -> ").append(this.resource).toString();
     }
 }
