@@ -160,7 +160,7 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
                 }
             }
             String strAddFTPProtocol = System.getenv("AddFTPProtocol");
-            if (strAddFTPProtocol != null && strAddFTPProtocol.equalsIgnoreCase("true")) {
+            if (strAddFTPProtocol != null && "true".equalsIgnoreCase(strAddFTPProtocol)) {
                 objFTPClient.addProtocolCommandListener(objProtocolCommandListener);
             }
         }
@@ -248,8 +248,7 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
     public SOSFileList dir(final String pathname) {
         Vector<String> strList = getFilenames(pathname);
         String[] strT = strList.toArray(new String[strList.size()]);
-        SOSFileList objFileList = new SOSFileList(strT);
-        return objFileList;
+        return new SOSFileList(strT);
     }
 
     /** return a listing of a directory in long format on the remote machine
@@ -406,7 +405,7 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
             if (in == null) {
                 throw new JobSchedulerException(SOSVfs_E_143.params(getReplyString()));
             }
-            if (isPositiveCommandCompletion() == false) {
+            if (!isPositiveCommandCompletion()) {
                 throw new JobSchedulerException(SOSVfs_E_144.params("getFile()", remoteFile, getReplyString()));
             }
             byte[] buffer = new byte[4096];

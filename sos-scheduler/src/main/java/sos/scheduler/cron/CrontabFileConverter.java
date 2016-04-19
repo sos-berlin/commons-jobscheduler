@@ -127,7 +127,7 @@ public class CrontabFileConverter extends JSToolBox {
     }
 
     public static void main(final String[] args) {
-        LOGGER.info("SOS CronConverter - Main"); //$NON-NLS-1$
+        LOGGER.info("SOS CronConverter - Main");
         try {
             SOSLogger sosLogger;
             String sourceFile = "";
@@ -198,7 +198,7 @@ public class CrontabFileConverter extends JSToolBox {
             String ll = line.getOptionValue(OPTION_VERBOSE, "" + SOSStandardLogger.INFO);
             logLevel = Integer.parseInt(ll);
             if (line.hasOption(optSysTab.getOpt())) {
-                sysTab = line.getOptionValue(optSysTab.getOpt()).trim().equals("1");
+                sysTab = "1".equals(line.getOptionValue(optSysTab.getOpt()).trim());
             }
             useOldRunTime = line.hasOption("oldRunTime");
             changeUser = "";
@@ -213,7 +213,7 @@ public class CrontabFileConverter extends JSToolBox {
             target = new File(targetFile);
             source = new File(sourceFile);
             CrontabFileConverter cc = new CrontabFileConverter(sosLogger);
-            if (jobTimeout != null && jobTimeout.length() > 0) {
+            if (jobTimeout != null && !jobTimeout.isEmpty()) {
                 cc.setTimeout(jobTimeout);
             }
             cc.setChangeUserCommand(changeUser);
@@ -300,7 +300,7 @@ public class CrontabFileConverter extends JSToolBox {
             String lastCommentJobTitle = "";
             String lastCommentJobTimeout = "";
             while ((strCronLine = in.readLine()) != null) {
-                if (strCronLine.trim().length() == 0) {
+                if (strCronLine.trim().isEmpty()) {
                     lastComment = "";
                     continue;
                 }

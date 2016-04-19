@@ -53,7 +53,7 @@ public class SOSMenuItem extends MenuItem {
             defaultS = "true";
         }
         String sel = prefs.node(SOS_SCHEDULER).get(prefKey(), defaultS);
-        return sel.equals("true");
+        return "true".equals(sel);
     }
 
     public void setText(String menuName_, String text) {
@@ -73,4 +73,5 @@ public class SOSMenuItem extends MenuItem {
     protected void checkSubclass() {
         // Disable the check that prevents subclassing of SWT components
     }
+
 }

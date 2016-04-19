@@ -57,7 +57,9 @@ public class SOSRestShiroClient {
     }
 
     public SOSPermissionShiro getPermissions(SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord) throws MalformedURLException {
-        return getSOSPermissionShiro(new URL(String.format(sosWebserviceAuthenticationRecord.getResource(), sosWebserviceAuthenticationRecord.getUser(), sosWebserviceAuthenticationRecord.getPassword(), sosWebserviceAuthenticationRecord.getPermission(), sosWebserviceAuthenticationRecord.getSessionId())));
+        return getSOSPermissionShiro(new URL(String.format(sosWebserviceAuthenticationRecord.getResource(), sosWebserviceAuthenticationRecord.getUser(),
+                sosWebserviceAuthenticationRecord.getPassword(), sosWebserviceAuthenticationRecord.getPermission(),
+                sosWebserviceAuthenticationRecord.getSessionId())));
     }
 
     public boolean isEnabled(URL url) throws Exception {
@@ -70,7 +72,9 @@ public class SOSRestShiroClient {
     }
 
     public SOSShiroCurrentUserAnswer getSOSShiroCurrentUserAnswer(SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord) {
-        String url = String.format(sosWebserviceAuthenticationRecord.getResource(), sosWebserviceAuthenticationRecord.getUser(), sosWebserviceAuthenticationRecord.getPassword(), sosWebserviceAuthenticationRecord.getPermission(), sosWebserviceAuthenticationRecord.getSessionId());
+        String url = String.format(sosWebserviceAuthenticationRecord.getResource(), sosWebserviceAuthenticationRecord.getUser(),
+                sosWebserviceAuthenticationRecord.getPassword(), sosWebserviceAuthenticationRecord.getPermission(),
+                sosWebserviceAuthenticationRecord.getSessionId());
         try {
             return getSOSShiroCurrentUserAnswer(new URL(url));
         } catch (MalformedURLException e) {

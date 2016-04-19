@@ -13,11 +13,7 @@ import com.sos.JSHelper.interfaces.ISOSSmtpMailOptions;
 public class SOSSmtpMailOptions extends SOSSmtpMailOptionsSuperClass implements ISOSSmtpMailOptions {
 
     private static final long serialVersionUID = 6441074884525254517L;
-    private final String conClassName = "SOSSmtpMailOptions";						//$NON-NLS-1$
-    private static Logger logger = Logger.getLogger(SOSSmtpMailOptions.class);
-    @SuppressWarnings("unused")
-    private static final String conSVNVersion = "$Id$";
-    // TODO über Prefix OnError_, OnSuccess_, OnEmptyFiles_ adressieren
+    private static final Logger LOGGER = Logger.getLogger(SOSSmtpMailOptions.class);
     @JSOptionClass(description = "", name = "SOSSmtpMailOptions")
     private SOSSmtpMailOptions objMailOnError = null;
     @JSOptionClass(description = "", name = "SOSSmtpMailOptions")
@@ -32,16 +28,14 @@ public class SOSSmtpMailOptions extends SOSSmtpMailOptionsSuperClass implements 
 
     public SOSSmtpMailOptions() {
         super();
-    } // public SOSSmtpMailOptions
+    }
 
     public SOSSmtpMailOptions(final JSListener pobjListener) {
         this();
         this.registerMessageListener(pobjListener);
-    } // public SOSSmtpMailOptions
+    }
 
     public SOSSmtpMailOptions getOptions(final enuMailClasses penuMailClass) {
-        @SuppressWarnings("unused")
-        final String conMethodName = conClassName + "::getOptions";
         SOSSmtpMailOptions objO = objMailOnError;
         switch (penuMailClass) {
         case MailOnError:
@@ -57,7 +51,7 @@ public class SOSSmtpMailOptions extends SOSSmtpMailOptionsSuperClass implements 
             break;
         }
         return objO;
-    } // private SOSSmtpMailOptions getOptions
+    }
 
     private void initChildOptions() {
         if (objMailOnError == null) {
@@ -77,22 +71,21 @@ public class SOSSmtpMailOptions extends SOSSmtpMailOptionsSuperClass implements 
         super(JSSettings);
         initChildOptions();
         setPrefixedValues(JSSettings);
-    } // public SOSSmtpMailOptions (HashMap JSSettings)
+    }
 
     public SOSSmtpMailOptions(final HashMap<String, String> JSSettings, final String pstrPrefix) throws Exception {
         strAlternativePrefix = pstrPrefix;
         setAllOptions(JSSettings, strAlternativePrefix);
-        logger.trace(this.dirtyString());
-    } // public SOSSmtpMailOptions (HashMap JSSettings)
+        LOGGER.trace(this.dirtyString());
+    }
 
- 
     @Override
-    // SOSSmtpMailOptionsSuperClass
     public void CheckMandatory() {
         try {
             super.CheckMandatory();
         } catch (Exception e) {
             throw new JSExceptionMandatoryOptionMissing(e.toString());
         }
-    } // public void CheckMandatory ()
+    }
+
 }

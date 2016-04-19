@@ -45,9 +45,8 @@ public class SOSHibernateDBLayer {
     private void initSessionEx(int transactionIsolationLevel) throws Exception {
         session = SosHibernateSession.getInstance(SosHibernateSession.configurationFile, transactionIsolationLevel);
         if (session == null) {
-            String s =
-                    String.format("Could not initiate session for database using file %s and isolation_level %s",
-                            SosHibernateSession.configurationFile, transactionIsolationLevel);
+            String s = String.format("Could not initiate session for database using file %s and isolation_level %s", SosHibernateSession.configurationFile,
+                    transactionIsolationLevel);
             throw new Exception(s);
         } else {
             session.setCacheMode(CacheMode.IGNORE);
@@ -78,9 +77,8 @@ public class SOSHibernateDBLayer {
         try {
             initSessionEx(transactionIsolationLevel);
         } catch (Exception e) {
-            String s =
-                    String.format("Could not initiate session for database using file %s and isolation_level %s",
-                            SosHibernateSession.configurationFile, transactionIsolationLevel);
+            String s = String.format("Could not initiate session for database using file %s and isolation_level %s", SosHibernateSession.configurationFile,
+                    transactionIsolationLevel);
             LOGGER.error(s + e.getMessage(), e);
             throw new RuntimeException(e);
         }

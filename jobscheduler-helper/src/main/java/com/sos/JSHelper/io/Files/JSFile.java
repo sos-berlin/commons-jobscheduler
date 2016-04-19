@@ -905,7 +905,8 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
     public boolean compare(final JSFile pfleFile) throws Exception {
         final BufferedReader objReader1 = Reader();
         final BufferedReader objReader2 = pfleFile.Reader();
-        int char1, char2;
+        int char1;
+        int char2;
         if (pfleFile.length() != length()) {
             return false;
         }
@@ -1035,9 +1036,8 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
     }
 
     public String toXml() {
-        String strXml =
-                String.format("<file name='%1$s' size='%2$d' modificationdate='%3$s' />", this.getAbsolutePath(), fleFile.length(), new Date(
-                        fleFile.lastModified()));
+        String strXml = String.format("<file name='%1$s' size='%2$d' modificationdate='%3$s' />", this.getAbsolutePath(), fleFile.length(),
+                new Date(fleFile.lastModified()));
         return strXml;
     }
 

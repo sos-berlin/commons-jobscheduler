@@ -25,8 +25,14 @@ public final class FTPSExample {
 
     public static final void main(String[] args) throws NoSuchAlgorithmException {
         int base = 0;
-        boolean storeFile = false, binaryTransfer = false, error = false;
-        String server, username, password, remote, local;
+        boolean storeFile = false;
+        boolean binaryTransfer = false;
+        boolean error = false;
+        String server;
+        String username;
+        String password;
+        String remote;
+        String local;
         String protocol = "TLS";
         FTPSClient ftps;
         for (base = 0; base < args.length; base++) {

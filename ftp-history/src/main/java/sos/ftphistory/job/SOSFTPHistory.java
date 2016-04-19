@@ -82,7 +82,8 @@ public class SOSFTPHistory {
                 }
 
                 log.debug3("connecting to database using order params ...");
-                conn = SOSConnection.createInstance(parameters.value("db_class"), parameters.value("db_driver"), parameters.value("db_url"), parameters.value("db_user"), parameters.value("db_password"), log);
+                conn = SOSConnection.createInstance(parameters.value("db_class"), parameters.value("db_driver"), parameters.value("db_url"),
+                        parameters.value("db_user"), parameters.value("db_password"), log);
 
                 conn.connect();
                 log.debug3("connected to database using order params");

@@ -18,8 +18,8 @@ public class JSDataElementDouble extends JSDataElementNumeric {
         this.Description(pstrDescription);
     }
 
-    public JSDataElementDouble(String pPstrValue, String pPstrDescription, int pPintSize, int pPintPos, String pPstrFormatString,
-            String pPstrColumnHeader, String pPstrXMLTagName) {
+    public JSDataElementDouble(String pPstrValue, String pPstrDescription, int pPintSize, int pPintPos, String pPstrFormatString, String pPstrColumnHeader,
+            String pPstrXMLTagName) {
         super(pPstrValue, pPstrDescription, pPintSize, pPintPos, pPstrFormatString, pPstrColumnHeader, pPstrXMLTagName);
     }
 

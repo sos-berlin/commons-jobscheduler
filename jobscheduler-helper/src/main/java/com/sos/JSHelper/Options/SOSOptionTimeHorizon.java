@@ -48,8 +48,8 @@ public class SOSOptionTimeHorizon extends SOSOptionString {
                 objCal.set(Calendar.MILLISECOND, 0);
             }
         } else {
-            throw new JobSchedulerException(String.format(
-                    "%1$s must be in the format yyyy-MM-dd[ HH:mm[:ss]] or <+/-number of days from now>[:HH:mm[:ss]]", strValue));
+            throw new JobSchedulerException(String.format("%1$s must be in the format yyyy-MM-dd[ HH:mm[:ss]] or <+/-number of days from now>[:HH:mm[:ss]]",
+                    strValue));
         }
         return objCal.getTime();
     }

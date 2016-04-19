@@ -66,8 +66,8 @@ public class SOSSFTP implements SOSFileTransfer {
                     String text = sos.util.SOSFile.readFile(new File(filename));
                     isAuthenticated = sshConnection.authenticateWithPublicKey(this.getUser(), text.toCharArray(), this.getPassword());
                 } else if (getAuthenticationFilename() != null && getAuthenticationFilename().startsWith("filecontent:")) {
-                    isAuthenticated = sshConnection.authenticateWithPublicKey(this.getUser(), 
-                            getAuthenticationFilename().substring("filecontent:".length()).toCharArray(), this.getPassword());
+                    isAuthenticated = sshConnection.authenticateWithPublicKey(this.getUser(), getAuthenticationFilename().substring("filecontent:".length())
+                            .toCharArray(), this.getPassword());
                 } else {
                     File authenticationFile = new File(this.getAuthenticationFilename());
                     if (!authenticationFile.exists()) {
@@ -78,7 +78,7 @@ public class SOSSFTP implements SOSFileTransfer {
                     }
                     isAuthenticated = sshConnection.authenticateWithPublicKey(this.getUser(), authenticationFile, this.getPassword());
                 }
-            } else if (this.getAuthenticationMethod().equalsIgnoreCase("password")) {
+            } else if ("password".equalsIgnoreCase(this.getAuthenticationMethod())) {
                 isAuthenticated = sshConnection.authenticateWithPassword(this.getUser(), this.getPassword());
             } else {
                 throw new Exception("Unknown authentication method: " + getAuthenticationMethod());

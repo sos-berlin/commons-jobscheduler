@@ -99,11 +99,7 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
         String showTaskXml = new String("<show_task id=\"" + taskId + "\"/>");
         String showTaskAnswerXml = spooler.execute_xml(showTaskXml);
         logger.debug("showTaskAnswer:\n" + showTaskAnswerXml);
-        if (showTaskAnswerXml.contains("state=\"running")) {
-            return true;
-        } else {
-            return false;
-        }
+        return showTaskAnswerXml.contains("state=\"running");
     }
 
     private SOSSSHJob2 executeCheckPids() {

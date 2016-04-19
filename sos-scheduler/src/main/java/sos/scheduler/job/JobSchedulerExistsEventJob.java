@@ -79,13 +79,10 @@ public class JobSchedulerExistsEventJob extends JobSchedulerJob {
                     + " WHERE \"EXPIRES\"<=%now AND (\"SPOOLER_ID\" IS NULL OR \"SPOOLER_ID\"='' OR \"SPOOLER_ID\"='" + scheduler_event_service_id
                     + "')");
             conn.commit();
-            Vector<?> vEvents =
-                    conn.getArrayAsVector("SELECT \"SPOOLER_ID\", \"REMOTE_SCHEDULER_HOST\", \"REMOTE_SCHEDULER_PORT\", \"JOB_CHAIN\", \"ORDER_ID\", "
-                            + "\"JOB_NAME\", \"EVENT_CLASS\", \"EVENT_ID\", \"EXIT_CODE\", \"CREATED\", \"EXPIRES\", \"PARAMETERS\" FROM "
-                            + tableEvents
-                            + " WHERE (\"SPOOLER_ID\" IS NULL OR \"SPOOLER_ID\"='' OR \"SPOOLER_ID\"='"
-                            + scheduler_event_service_id
-                            + "') ORDER BY \"ID\" ASC");
+            Vector<?> vEvents = conn
+                    .getArrayAsVector("SELECT \"SPOOLER_ID\", \"REMOTE_SCHEDULER_HOST\", \"REMOTE_SCHEDULER_PORT\", \"JOB_CHAIN\", \"ORDER_ID\", "
+                            + "\"JOB_NAME\", \"EVENT_CLASS\", \"EVENT_ID\", \"EXIT_CODE\", \"CREATED\", \"EXPIRES\", \"PARAMETERS\" FROM " + tableEvents
+                            + " WHERE (\"SPOOLER_ID\" IS NULL OR \"SPOOLER_ID\"='' OR \"SPOOLER_ID\"='" + scheduler_event_service_id + "') ORDER BY \"ID\" ASC");
             Iterator<?> vIterator = vEvents.iterator();
             int vCount = 0;
             while (vIterator.hasNext()) {

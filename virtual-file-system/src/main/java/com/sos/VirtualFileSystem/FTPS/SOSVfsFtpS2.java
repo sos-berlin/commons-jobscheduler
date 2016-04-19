@@ -12,16 +12,9 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsFtpS2 extends SOSVfsFtpBaseClass2 {
 
-    @SuppressWarnings("unused")
-    private final String conClassName = this.getClass().getSimpleName();
-    @SuppressWarnings("unused")
-    private static final String conSVNVersion = "$Id$";
-    private final Logger logger = Logger.getLogger(this.getClass());
+    private static final Logger LOGGER = Logger.getLogger(SOSVfsFtpS2.class);
     private FTPSClient objFTPClient = null;
 
-    /** \brief SOSVfsFtpS
-     *
-     * \details */
     public SOSVfsFtpS2() {
     }
 
@@ -39,23 +32,14 @@ public class SOSVfsFtpS2 extends SOSVfsFtpBaseClass2 {
                 throw new JobSchedulerException("can not create FTPS-Client", e);
             }
             FTPClientConfig conf = new FTPClientConfig();
-            // conf.setServerLanguageCode("fr");
-            // objFTPClient.configure(conf);
-            /** This listener is to write all commands and response from commands
-             * to system.out */
             objProtocolCommandListener = new SOSFtpClientLogger(HostID(""));
-            // TODO create a hidden debug-option to activate this listener
-            if (objConnection2Options != null) {
-                if (objConnection2Options.ProtocolCommandListener.isTrue()) {
-                    objFTPClient.addProtocolCommandListener(objProtocolCommandListener);
-                }
-            }
-
-            String strAddFTPProtocol = System.getenv("AddFTPProtocol");
-            if (strAddFTPProtocol != null && strAddFTPProtocol.equalsIgnoreCase("true")) {
+            if (objConnection2Options != null && objConnection2Options.ProtocolCommandListener.isTrue()) {
                 objFTPClient.addProtocolCommandListener(objProtocolCommandListener);
             }
-
+            String strAddFTPProtocol = System.getenv("AddFTPProtocol");
+            if (strAddFTPProtocol != null && "true".equalsIgnoreCase(strAddFTPProtocol)) {
+                objFTPClient.addProtocolCommandListener(objProtocolCommandListener);
+            }
         }
         return objFTPClient;
     }
@@ -63,24 +47,20 @@ public class SOSVfsFtpS2 extends SOSVfsFtpBaseClass2 {
     @Override
     public void connect(final String phost, final int pport) {
         try {
-            if (isConnected() == false) {
+            if (!isConnected()) {
                 super.connect(phost, pport);
-
-                /** PBSZ (protection buffer size) command, as detailed in
-                 * [RFC-2228], is compulsory prior to any PROT command. */
                 Client().execPBSZ(0);
                 LogReply();
-                Client().execPROT("P"); // Secure Data channel, see
-                                        // http://www.faqs.org/rfcs/rfc2228.html
+                Client().execPROT("P");
                 LogReply();
                 Client().enterLocalPassiveMode();
-
             } else {
-                logger.warn(SOSVfs_D_0102.params(host, port));
+                LOGGER.warn(SOSVfs_D_0102.params(host, port));
             }
         } catch (Exception e) {
             String strM = HostID("connect returns an exception");
-            logger.error(strM, e);
+            LOGGER.error(strM, e);
         }
     }
+
 }

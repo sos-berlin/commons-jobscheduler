@@ -11,55 +11,25 @@ import com.sos.JSHelper.io.Files.JSFolder;
 public class SOSOptionFolderName extends SOSOptionFileName {
 
     private static final long serialVersionUID = 1197392401084895147L;
-    private final String conClassName = "JSOptionFolderName";
-    public final String ControlType = "folder";
+    private static final HashMap<String, String> defaultProposals = new HashMap<>();
 
     public SOSOptionFolderName(final String pstrFolderName) {
         super(null, "", "description", pstrFolderName, "", false);
     }
 
-    /** \brief CreateFolder - Option: Folder anlegen, wenn noch nicht vorhanden
-     *
-     * \details */
-    @JSOptionDefinition(name = "CreateFolder", value = "true", description = "Folder anlegen, wenn noch nicht vorhanden", key = "CreateFolder", type = "JSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean CreateFolder = new SOSOptionBoolean(objParentClass, // Verweis
-                                                                                // auf
-                                                                                // die
-                                                                                // SOSOptionClass-Instanz
-            ".CreateFolder", // Schlüssel, i.d.r. identisch mit dem Namen der
-                             // Option
-            "Folder anlegen, wenn noch nicht vorhanden", // Kurzbeschreibung
-            "true", // Wert
-            "true", // defaultwert
-            false // Option muss einen Wert haben
-            );
-
-    /** \brief JSOptionFolderName
-     *
-     * \details
-     *
-     * @param pobjParent
-     * @param pstrKey
-     * @param pstrDescription
-     * @param pstrValue
-     * @param pstrDefaultValue
-     * @param pflgIsMandatory */
     public SOSOptionFolderName(final JSOptionsClass pobjParent, final String pstrKey, final String pstrDescription, final String pstrValue,
             final String pstrDefaultValue, final boolean pflgIsMandatory) {
         super(pobjParent, pstrKey, pstrDescription, pstrValue, pstrDefaultValue, pflgIsMandatory);
         intOptionType = isOptionTypeFolder;
     }
 
-    /** \brief Value - Wert der Option liefern
-     *
-     * \details
-     *
-     * @param pstrValue
-     * @return */
+    @JSOptionDefinition(name = "CreateFolder", value = "true", description = "Folder anlegen, wenn noch nicht vorhanden", key = "CreateFolder",
+            type = "JSOptionBoolean", mandatory = false)
+    public SOSOptionBoolean CreateFolder = new SOSOptionBoolean(objParentClass, ".CreateFolder", "Folder anlegen, wenn noch nicht vorhanden", "true", "true",
+            false);
+
     @Override
     public String Value() {
-        @SuppressWarnings("unused")
-        final String conMethodName = conClassName + "::Value";
         if (strValue == null) {
             strValue = "";
         }
@@ -69,19 +39,13 @@ public class SOSOptionFolderName extends SOSOptionFileName {
             } else {
                 strLValue = strLValue + "/";
             }
-            if (objParentClass != null) {
-                // prüfen, ob es den Folder gibt ...
-                // this.strValue =
-                // this.objParentClass.CheckFolder(this.strValue, conMethodName,
-                // this.CreateFolder.flgValue);
-            }
         }
         return strLValue;
     }
 
     public boolean isDotFolder() {
         String strT = super.Value();
-        return strT.equals(".") || strT.equals("..");
+        return ".".equals(strT) || "..".equals(strT);
     }
 
     public File[] listFiles() {
@@ -147,11 +111,9 @@ public class SOSOptionFolderName extends SOSOptionFileName {
         return new JSFolder(strValue);
     }
 
-    private static final HashMap<String, String> defaultProposals = new HashMap<>();
-
     @Override
     public void addProposal(final String pstrProposal) {
-        if (pstrProposal != null && pstrProposal.trim().length() > 0) {
+        if (pstrProposal != null && !pstrProposal.trim().isEmpty()) {
             String strT = pstrProposal.trim();
             SOSOptionFolderName.defaultProposals.put(strT, strT);
         }

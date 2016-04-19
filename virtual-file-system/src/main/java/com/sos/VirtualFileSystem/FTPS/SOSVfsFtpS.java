@@ -20,16 +20,9 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
 
-    @SuppressWarnings("unused")
-    private final String conClassName = this.getClass().getSimpleName();
-    @SuppressWarnings("unused")
-    private static final String conSVNVersion = "$Id$";
-    private final Logger logger = Logger.getLogger(this.getClass());
+    private static final Logger LOGGER = Logger.getLogger(SOSVfsFtpS.class);
     private FTPSClient client = null;
 
-    /** \brief SOSVfsFtpS
-     *
-     * \details */
     public SOSVfsFtpS() {
     }
 
@@ -41,52 +34,36 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
     protected FTPSClient Client() {
         if (client == null) {
             try {
-                logger.info(String.format("use %s client security", objConnection2Options.ftps_client_security.Value()));
-
+                LOGGER.info(String.format("use %s client security", objConnection2Options.ftps_client_security.Value()));
                 client = new FTPSClient(objConnection2Options.FtpS_protocol.Value(), objConnection2Options.ftps_client_security.isImplicit());
                 if (usingProxy()) {
-                    logger.info(String.format("using proxy: protocol = %s, host = %s, port = %s, user = %s, pass = ?", getProxyProtocol().Value(),
+                    LOGGER.info(String.format("using proxy: protocol = %s, host = %s, port = %s, user = %s, pass = ?", getProxyProtocol().Value(),
                             getProxyHost(), getProxyPort(), getProxyUser()));
-
                     if (usingHttpProxy()) {
-                        // JADE-351
-                        // client.setProxy(getHTTPProxy());
                         throw new Exception("FTPS via HTTP Proxy not implemented yet");
                     } else {
-                        // client.setProxy(getSocksProxy());
                         SOSOptionProxyProtocol.Protocol proxyProtocol = getProxyProtocol().isSocks4() ? Protocol.socks4 : Protocol.socks5;
-                        SOSVfsFtpSProxySelector ps =
-                                new SOSVfsFtpSProxySelector(proxyProtocol, getProxyHost(), getProxyPort(), getProxyUser(), getProxyPassword());
+                        SOSVfsFtpSProxySelector ps = new SOSVfsFtpSProxySelector(proxyProtocol, getProxyHost(), getProxyPort(), getProxyUser(),
+                                getProxyPassword());
                         ProxySelector.setDefault(ps);
                     }
                 }
-
                 if (!SOSString.isEmpty(objConnection2Options.keystore_file.Value())) {
                     setTrustManager(client);
                 }
-
             } catch (Exception e) {
                 throw new JobSchedulerException("can not create FTPS-Client", e);
             }
-
-            // FTPClientConfig conf = new FTPClientConfig();
-            // conf.setServerLanguageCode("fr");
-            // objFTPClient.configure(conf);
-            /** This listener is to write all commands and response from commands
-             * to system.out */
             objProtocolCommandListener = new SOSFtpClientLogger(HostID(""));
-            // TODO create a hidden debug-option to activate this listener
             if (objConnection2Options != null) {
                 if (objConnection2Options.ProtocolCommandListener.isTrue()) {
                     client.addProtocolCommandListener(objProtocolCommandListener);
                 }
             }
-
             String addFTPProtocol = System.getenv("AddFTPProtocol");
-            if (addFTPProtocol != null && addFTPProtocol.equalsIgnoreCase("true")) {
+            if (addFTPProtocol != null && "true".equalsIgnoreCase(addFTPProtocol)) {
                 client.addProtocolCommandListener(objProtocolCommandListener);
             }
-
         }
         return client;
     }
@@ -94,36 +71,28 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
     @Override
     public void connect(final String phost, final int pport) {
         try {
-            if (isConnected() == false) {
+            if (!isConnected()) {
                 super.connect(phost, pport);
-
-                /** PBSZ (protection buffer size) command, as detailed in
-                 * [RFC-2228], is compulsory prior to any PROT command. */
                 Client().execPBSZ(0);
                 LogReply();
-                Client().execPROT("P"); // Secure Data channel, see
-                                        // http://www.faqs.org/rfcs/rfc2228.html
+                Client().execPROT("P");
                 LogReply();
                 Client().enterLocalPassiveMode();
             } else {
-                logger.warn(SOSVfs_D_0102.params(host, port));
+                LOGGER.warn(SOSVfs_D_0102.params(host, port));
             }
         } catch (Exception e) {
             String msg = HostID("connect returns an exception");
-            logger.error(msg, e);
+            LOGGER.error(msg, e);
         }
     }
 
-    /** @param client
-     * @throws Exception */
     private void setTrustManager(FTPSClient client) throws Exception {
-        logger.info(String.format("using keystore: type = %s, file = %s", objConnection2Options.keystore_type.Value(),
+        LOGGER.info(String.format("using keystore: type = %s, file = %s", objConnection2Options.keystore_type.Value(),
                 objConnection2Options.keystore_file.Value()));
-
-        KeyStore ks =
-                loadKeyStore(objConnection2Options.keystore_type.Value(), new File(objConnection2Options.keystore_file.Value()),
-                        objConnection2Options.keystore_password.Value());
-
+        KeyStore ks = loadKeyStore(objConnection2Options.keystore_type.Value(), new File(objConnection2Options.keystore_file.Value()),
+                objConnection2Options.keystore_password.Value());
         client.setTrustManager(TrustManagerUtils.getDefaultTrustManager(ks));
     }
+
 }

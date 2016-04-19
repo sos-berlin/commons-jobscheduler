@@ -24,20 +24,16 @@ import com.sos.dialog.layouts.Gridlayout;
 /** @author KB */
 public abstract class CompositeBaseClass<T> extends Composite implements ISOSTabItem, ICompositeBaseAbstract {
 
-    private final String conClassName = this.getClass().getSimpleName();
-    @SuppressWarnings("unused")
-    private static final String conSVNVersion = "$Id$";
     protected Logger logger = Logger.getLogger(this.getClass());
     protected Composite objParent = null;
     protected T objJadeOptions = null;
     protected ControlCreator objCC = null;
     protected Composite composite = this;
+    protected boolean flgCompositeIsCreated = false;
+    private final String conClassName = this.getClass().getSimpleName();
+    private static int intCompositeStyle = SWT.None;
+    private String strWindowTitle = "WindowTitle";
     public static boolean gflgCreateControlsImmediate = true;
-
-    private static int intCompositeStyle = SWT.None;														// .H_SCROLL |
-    // SWT.V_SCROLL;
-
-    protected WaitCursor objC = null;
 
     public CompositeBaseClass(final SOSCTabFolder pobjCTabFolder, final T objOptions) {
         super(pobjCTabFolder, intCompositeStyle);
@@ -70,13 +66,11 @@ public abstract class CompositeBaseClass<T> extends Composite implements ISOSTab
         return true;
     }
 
-    protected boolean flgCompositeIsCreated = false;
-
     @Override
     public void createTabItemComposite() {
         try (WaitCursor objWC = new WaitCursor()) {
             Globals.redraw(false);
-            if (flgCompositeIsCreated == false) {
+            if (!flgCompositeIsCreated) {
                 objCC = new ControlCreator(composite);
                 createComposite();
                 logger.debug("createTabItemComposite " + conClassName);
@@ -105,11 +99,11 @@ public abstract class CompositeBaseClass<T> extends Composite implements ISOSTab
         Object objO = e.getSource();
         if (objO instanceof SOSCheckBox) {
             SOSCheckBox objCB = (SOSCheckBox) objO;
-            if (objCB.getSelection() == true) {
+            if (objCB.getSelection()) {
                 for (Object objC1 : objCB.getControlList()) {
                     if (objC1 instanceof SOSOptionElement) {
                         SOSOptionElement objBx = (SOSOptionElement) objC1;
-                        if (objBx.Value().equalsIgnoreCase("true")) {
+                        if ("true".equalsIgnoreCase(objBx.Value())) {
                             objBx.Value("false");
                         }
                     }
@@ -137,12 +131,8 @@ public abstract class CompositeBaseClass<T> extends Composite implements ISOSTab
 
     @Override
     public void dispose() {
-        if (composite.isDisposed() == false) {
+        if (!composite.isDisposed()) {
             for (Control objContr : composite.getChildren()) {
-                // Object objO = objContr.getData();
-                // if (objO != null && objO instanceof SOSOptionElement) {
-                //
-                // }
                 Object objO = objContr.getData();
                 if (objO instanceof IValueChangedListener) {
                     SOSOptionElement objV = (SOSOptionElement) objO;
@@ -152,7 +142,6 @@ public abstract class CompositeBaseClass<T> extends Composite implements ISOSTab
                 for (Listener listener : objL) {
                     objContr.removeListener(SWT.ALL, listener);
                 }
-                //
             }
             super.dispose();
             logger = null;
@@ -182,8 +171,6 @@ public abstract class CompositeBaseClass<T> extends Composite implements ISOSTab
         return this;
     }
 
-    private String strWindowTitle = "WindowTitle";
-
     @Override
     public String getWindowTitle() {
         return strWindowTitle;
@@ -198,4 +185,5 @@ public abstract class CompositeBaseClass<T> extends Composite implements ISOSTab
     protected void checkSubclass() {
         // Disable the check that prevents subclassing of SWT components
     }
+
 }

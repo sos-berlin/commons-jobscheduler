@@ -569,18 +569,17 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
     public boolean String2Bool() {
         boolean flgT = false;
         String pstrVal = strValue;
-        if (isNotEmpty(pstrVal)) {
-            if ("1".equals(pstrVal) || "y".equalsIgnoreCase(pstrVal) || "yes".equalsIgnoreCase(pstrVal) || "j".equalsIgnoreCase(pstrVal)
-                    || "on".equalsIgnoreCase(pstrVal) || "true".equalsIgnoreCase(pstrVal) || "wahr".equalsIgnoreCase(pstrVal)) {
-                flgT = true;
-            }
+        if (isNotEmpty(pstrVal)
+                && ("1".equals(pstrVal) || "y".equalsIgnoreCase(pstrVal) || "yes".equalsIgnoreCase(pstrVal) || "j".equalsIgnoreCase(pstrVal)
+                        || "on".equalsIgnoreCase(pstrVal) || "true".equalsIgnoreCase(pstrVal) || "wahr".equalsIgnoreCase(pstrVal))) {
+            flgT = true;
         }
         return flgT;
     }
 
     public String StripQuotes(final String pstrS) {
         String strR = pstrS;
-        if (pstrS.substring(0, 1).equals("\"") && pstrS.substring(pstrS.length() - 1).equals("\"")) {
+        if ("\"".equals(pstrS.substring(0, 1)) && "\"".equals(pstrS.substring(pstrS.length() - 1))) {
             strR = pstrS.substring(1, pstrS.length() - 1);
         }
         return strR;
@@ -628,9 +627,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
     }
 
     public String toOut() throws Exception {
-        String strT = "";
-        strT = String.format("%1$s %2$s: %3$s \n", strTitle, strDescription, this.Value());
-        return strT;
+        return String.format("%1$s %2$s: %3$s \n", strTitle, strDescription, this.Value());
     }
 
     @Override
@@ -699,12 +696,8 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
 
     @Override
     public void Value(final String pstrValue) {
-        if (flgIsMandatory) {
-            if (pstrValue == null) {
-                if (gflgProcessHashMap) {
-                    return;
-                }
-            }
+        if (flgIsMandatory && pstrValue == null && gflgProcessHashMap) {
+            return;
         }
         if (pstrValue != null) {
             if (objParentClass != null) {
@@ -763,4 +756,5 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
         String[] proposals = defaultProposals.keySet().toArray(new String[0]);
         return proposals;
     }
+
 }

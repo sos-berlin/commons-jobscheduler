@@ -148,8 +148,7 @@ public class SOSVfsFtpBaseClass2 extends SOSVfsFtpBaseClass implements ISOSVfsFi
     }
 
     @Override
-    public SOSFileList getFileListEntries(final SOSFileList pobjSOSFileList, final String folder, final String regexp,
-            final boolean flgRecurseSubFolder) {
+    public SOSFileList getFileListEntries(final SOSFileList pobjSOSFileList, final String folder, final String regexp, final boolean flgRecurseSubFolder) {
         getFilenames(folder, flgRecurseSubFolder, regexp);
         for (SOSFileListEntry objEntry : objFileListEntries) {
             pobjSOSFileList.add(objEntry);
@@ -247,5 +246,5 @@ public class SOSVfsFtpBaseClass2 extends SOSVfsFtpBaseClass implements ISOSVfsFi
         }
         return lngSize;
     }
-    
+
 }

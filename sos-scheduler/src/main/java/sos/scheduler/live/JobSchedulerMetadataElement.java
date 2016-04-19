@@ -43,7 +43,7 @@ public class JobSchedulerMetadataElement {
         while (i.hasNext()) {
             erg += "\"" + i.next().toString().toUpperCase() + "\",";
         }
-        if (element_name.toLowerCase().equals("script")) {
+        if ("script".equals(element_name.toLowerCase())) {
             erg += "\"CDATA\",";
         }
         if (!erg.isEmpty()) {

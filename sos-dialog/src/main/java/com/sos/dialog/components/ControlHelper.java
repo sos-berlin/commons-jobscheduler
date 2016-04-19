@@ -38,36 +38,19 @@ import com.sos.dialog.classes.SOSCheckBox;
 /** @author KB */
 public class ControlHelper implements IValueChangedListener {
 
+    private static final Logger LOGGER = Logger.getLogger(ControlHelper.class);
+    private Control objControl = null;
+    private boolean flgIsDirty = false;
+    private Label objLabel = null;
+    private SOSOptionElement objOptionElement = null;
     public static final String conColor4TEXT = "text";
     public static final String conColor4DirtyField = "dirty-text";
     public static final String conColor4INCLUDED_OPTION = "IncludedOption";
     public static final String conMANDATORY_FIELD_COLOR = "MandatoryFieldColor";
     public static final String conCOLOR4_FIELD_HAS_FOCUS = "Color4FieldHasFocus";
-    @SuppressWarnings("unused")
-    private final String conClassName = this.getClass().getSimpleName();
-    @SuppressWarnings("unused")
-    private static final String conSVNVersion = "$Id$";
-    private final Logger logger = Logger.getLogger(this.getClass());
-    private Control objControl = null;
-    private boolean flgIsDirty = false;
-    private Label objLabel = null;
-    private SOSOptionElement objOptionElement = null;
-
-    // a dirty hack
     public static IValueChangedListener objValueChangedListener = null;
+    boolean flgControlValueInError = false;
 
-    // parent für callbacks fehlt ...
-    /**
-	 *
-	 */
-    // private CTabItem getTabItem(final CTabFolder pobjTabFolder, final String
-    // pstrCaption) {
-    // CTabItem tbtmItemOperation = new CTabItem(pobjTabFolder, SWT.NONE);
-    // tbtmItemOperation.setText(pstrCaption);
-    // tbtmItemOperation.setFont(Globals.stFontRegistry.get("tabitem-text"));
-    // return tbtmItemOperation;
-    // }
-    //
     public ControlHelper(final Label plblLabel, final Control pobjControl, final SOSOptionElement pobjOptionElement) {
         this(plblLabel, pobjControl, pobjOptionElement, 1, 1);
     }
@@ -84,7 +67,7 @@ public class ControlHelper implements IValueChangedListener {
         objControl.setData(objOptionElement);
         objControl.setFont(Globals.stFontRegistry.get(conColor4TEXT));
         objLabel.setBackground(Globals.getCompositeBackground());
-        if (objOptionElement.isMandatory() == true) {
+        if (objOptionElement.isMandatory()) {
             objLabel.setForeground(Globals.getMandatoryFieldColor());
         } else {
             objLabel.setForeground(null);
@@ -93,7 +76,7 @@ public class ControlHelper implements IValueChangedListener {
         objLabel.setLayoutData(objGD);
         objLabel.setFont(Globals.stFontRegistry.get(conColor4TEXT));
         objLabel.setBackground(Globals.getCompositeBackground());
-        if (objOptionElement.isProtected() == true) {
+        if (objOptionElement.isProtected()) {
             objControl.setBackground(Globals.getProtectedFieldColor());
         } else {
             objControl.setBackground(Globals.getFieldBackground());
@@ -104,7 +87,7 @@ public class ControlHelper implements IValueChangedListener {
             objText.setText(objOptionElement.Value());
             setNoFocusColor(objControl);
             objText.setToolTipText(getToolTip());
-            if (objOptionElement.isProtected() == true) {
+            if (objOptionElement.isProtected()) {
                 objText.setEditable(false);
             }
             objText.addModifyListener(new ModifyListener() {
@@ -136,7 +119,7 @@ public class ControlHelper implements IValueChangedListener {
         }
         if (objControl instanceof CCombo) {
             CCombo objCombo = (CCombo) objControl;
-            if (objOptionElement.isProtected() == true) {
+            if (objOptionElement.isProtected()) {
                 objCombo.setEditable(false);
                 objCombo.setBackground(Globals.getProtectedFieldColor());
             }
@@ -170,7 +153,6 @@ public class ControlHelper implements IValueChangedListener {
                 objControl.addTraverseListener(changeReturn2Tab());
             }
             createControlDecoration(objControl, SWT.LEFT);
-
         }
         objControl.addDisposeListener(new DisposeListener() {
 
@@ -192,16 +174,13 @@ public class ControlHelper implements IValueChangedListener {
             public void focusLost(final FocusEvent e) {
                 flgControlValueInError = false;
                 final Control objC = (Control) e.getSource();
-                logger.debug("focusLost: " + objC.getToolTipText());
+                LOGGER.debug("focusLost: " + objC.getToolTipText());
                 setNoFocusColor(objC);
                 Globals.setStatus("");
-                if (objC instanceof Text) {
-                    if (flgIsDirty) {
-                        Text objText = (Text) objC;
-                        objOptionElement.Value(objText.getText());
-                    }
+                if (objC instanceof Text && flgIsDirty) {
+                    Text objText = (Text) objC;
+                    objOptionElement.Value(objText.getText());
                 }
-                // objControl.doValidation();
                 if (objC instanceof SOSCheckBox) {
                     SOSCheckBox objCheck = (SOSCheckBox) objC;
                     ((SOSOptionBoolean) objOptionElement).value(objCheck.getSelection());
@@ -214,7 +193,7 @@ public class ControlHelper implements IValueChangedListener {
                     CCombo objCheck = (CCombo) objC;
                     objOptionElement.Value(objCheck.getText());
                 }
-                if (flgControlValueInError == true) {
+                if (flgControlValueInError) {
                     Display.getCurrent().asyncExec(new Runnable() {
 
                         @Override
@@ -225,7 +204,6 @@ public class ControlHelper implements IValueChangedListener {
                 }
             }
         };
-
         objControl.addFocusListener(objFocusListener);
         flgIsDirty = false;
     }
@@ -252,11 +230,6 @@ public class ControlHelper implements IValueChangedListener {
         return tl;
     }
 
-    /** \brief removeListeners
-     *
-     * \details
-     * 
-     * \return void */
     private void removeListeners(final Control pobjControl) {
         SOSOptionElement lobjOptionElement = (SOSOptionElement) pobjControl.getData("option");
         pobjControl.setData("option", null);
@@ -267,18 +240,12 @@ public class ControlHelper implements IValueChangedListener {
         }
         if (lobjOptionElement != null) {
             lobjOptionElement.removeValueChangedListener(this);
-            logger.debug("listeners disposed: " + lobjOptionElement.getShortKey());
+            LOGGER.debug("listeners disposed: " + lobjOptionElement.getShortKey());
         }
     }
 
-    /** \brief setFocusColor
-     *
-     * \details
-     * 
-     * \return void */
     public void setFocusColor(final Control objControl) {
-        if (objControl instanceof Button) {
-        } else {
+        if (!(objControl instanceof Button)) {
             if (objControl.isEnabled()) {
                 objControl.setBackground(Globals.getFieldHasFocusBackground());
                 if (objControl instanceof Text) {
@@ -294,19 +261,14 @@ public class ControlHelper implements IValueChangedListener {
         objControl.setFont(Globals.stFontRegistry.get(conColor4DirtyField));
     }
 
-    /** \brief setNoFocusColor
-     *
-     * \details
-     * 
-     * \return void */
     public void setNoFocusColor(final Control objControl) {
         SOSOptionElement objOptionElement1 = (SOSOptionElement) objControl.getData();
-        if (objOptionElement1.isProtected() == true || objControl.isEnabled() == false) {
+        if (objOptionElement1.isProtected() || !objControl.isEnabled()) {
             objControl.setBackground(Globals.getProtectedFieldColor());
         } else {
             objControl.setBackground(Globals.getFieldBackground());
         }
-        if (objOptionElement1.getControlType().equals("checkbox")) {
+        if ("checkbox".equals(objOptionElement1.getControlType())) {
             objControl.setBackground(Globals.getCompositeBackground());
         }
         if (flgIsDirty) {
@@ -315,20 +277,16 @@ public class ControlHelper implements IValueChangedListener {
     }
 
     @Override
-    // IValueChangedListener from SOSOptionElement (every time an option is
-    // changed this listener is called)
     public void ValueHasChanged(final SOSOptionElement pobjOptionElement) {
-        if (objControl.isDisposed() == true) {
-            logger.debug("Control is disposed");
+        if (objControl.isDisposed()) {
+            LOGGER.debug("Control is disposed");
             return;
         }
-
         String strCurrValue = pobjOptionElement.Value();
-        logger.debug("value changed to " + strCurrValue + " (name of control is:  " + objControl.getClass().getName());
-
+        LOGGER.debug("value changed to " + strCurrValue + " (name of control is:  " + objControl.getClass().getName());
         if (objControl instanceof Text) {
             Text objText = (Text) objControl;
-            if (objText.isDisposed() == false) {
+            if (!objText.isDisposed()) {
                 objText.setText(strCurrValue);
             }
         }
@@ -339,7 +297,6 @@ public class ControlHelper implements IValueChangedListener {
                 if (objControl instanceof SOSCheckBox) {
                     ((SOSCheckBox) objControl).setEnabledDisabled();
                 }
-                // objBoolean.value(((Button) objControl).getSelection());
             }
         }
         if (objControl instanceof CCombo) {
@@ -352,14 +309,6 @@ public class ControlHelper implements IValueChangedListener {
         }
     }
 
-    // private void setFont(final FontData f, final RGB foreGround) {
-    // objControl.setFont(new Font(objControl.getDisplay(), f));
-    // objControl.setForeground(new Color(objControl.getDisplay(), foreGround));
-    // }
-    boolean flgControlValueInError = false;
-
-    // IValueChangedListener from SOSOptionElement (every time an option is
-    // validated and is in error this listener is called)
     @Override
     public void ValidationError(final SOSValidationError pobjVE) {
         flgControlValueInError = true;
@@ -367,11 +316,10 @@ public class ControlHelper implements IValueChangedListener {
     }
 
     private void createControlDecoration(final Control pobjControl, final int intOrientation) {
-        // http://javawiki.sowas.com/doku.php?id=swt-jface:control-decoration
         Image image = FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION).getImage();
-
         ControlDecoration decoration = new ControlDecoration(pobjControl, intOrientation | SWT.TOP);
         decoration.setImage(image);
         decoration.setDescriptionText(getToolTip());
     }
+
 }

@@ -28,7 +28,7 @@ public class SOSActions {
 
     public boolean isActive(final LinkedHashSet listOfActiveEvents) {
         String tmp = logic;
-        if (logic.length() == 0 || logic.equalsIgnoreCase("or")) {
+        if (logic.isEmpty() || "or".equalsIgnoreCase(logic)) {
             logic = "";
             Iterator i = listOfEventGroups.iterator();
             while (i.hasNext()) {
@@ -37,8 +37,7 @@ public class SOSActions {
             }
             logic += " false";
         }
-
-        if (logic.equalsIgnoreCase("and")) {
+        if ("and".equalsIgnoreCase(logic)) {
             logic = "";
             Iterator i = listOfEventGroups.iterator();
             while (i.hasNext()) {
@@ -47,7 +46,6 @@ public class SOSActions {
             }
             logic += " true";
         }
-
         BooleanExp exp = new BooleanExp(logic);
         Iterator i = listOfEventGroups.iterator();
         while (i.hasNext()) {
@@ -56,7 +54,6 @@ public class SOSActions {
         }
         logic = tmp;
         return exp.evaluateExpression();
-
     }
 
     public LinkedHashSet getListOfCommands() {

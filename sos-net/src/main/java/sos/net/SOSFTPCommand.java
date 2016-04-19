@@ -1777,10 +1777,9 @@ abstract public class SOSFTPCommand {
                 for (int j = 0; transactionalHistoryFile != null && j < transactionalHistoryFile.size(); j++) {
                     String hist = sosString.parseToString(transactionalHistoryFile.get(j));
                     if (hasError) {
-                        hist =
-                                hist.replaceAll(";success;;", ";error;"
-                                        + clearCRLF(getLogger().getError() != null && !getLogger().getError().isEmpty() ? getLogger().getError()
-                                                : getLogger().getWarning()) + ";");
+                        hist = hist.replaceAll(";success;;", ";error;"
+                                + clearCRLF(getLogger().getError() != null && !getLogger().getError().isEmpty() ? getLogger().getError() : getLogger()
+                                        .getWarning()) + ";");
                     }
                     history.write(hist);
                     history.newLine();

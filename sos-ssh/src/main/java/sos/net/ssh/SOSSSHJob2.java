@@ -39,13 +39,16 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
     @I18NMessages(value = {
             @I18NMessage("neither Commands nor Script(file) specified. Abort."),
-            @I18NMessage(value = "neither Commands nor Script(file) specified. Abort.", locale = "en_UK", explanation = "neither Commands nor Script(file) specified. Abort."),
-            @I18NMessage(value = "Es wurde weder ein Kommando noch eine Kommandodatei angegeben. Abbruch.", locale = "de", explanation = "neither Commands nor Script(file) specified. Abort.") }, msgnum = "SOS-SSH-E-100", msgurl = "msgurl")
+            @I18NMessage(value = "neither Commands nor Script(file) specified. Abort.", locale = "en_UK",
+                    explanation = "neither Commands nor Script(file) specified. Abort."),
+            @I18NMessage(value = "Es wurde weder ein Kommando noch eine Kommandodatei angegeben. Abbruch.", locale = "de",
+                    explanation = "neither Commands nor Script(file) specified. Abort.") }, msgnum = "SOS-SSH-E-100", msgurl = "msgurl")
     public static final String SOS_SSH_E_100 = "SOS-SSH-E-100";
 
     @I18NMessages(value = { @I18NMessage("executing remote command: '%1$s'."),
             @I18NMessage(value = "executing remote command: '%1$s'.", locale = "en_UK", explanation = "executing remote command: '%1$s'."),
-            @I18NMessage(value = "starte am remote-server das Kommando: '%1$s'.", locale = "de", explanation = "executing remote command: '%1$s'.") }, msgnum = "SOS-SSH-D-110", msgurl = "msgurl")
+            @I18NMessage(value = "starte am remote-server das Kommando: '%1$s'.", locale = "de", explanation = "executing remote command: '%1$s'.") },
+            msgnum = "SOS-SSH-D-110", msgurl = "msgurl")
     protected static final String SOS_SSH_D_110 = "SOS-SSH-D-110";
 
     public String[] getCommands2Execute() {
