@@ -115,7 +115,7 @@ public class ProcessOrderJob extends ProcessJob {
             String commandLine = command + " " + commandParameters;
             String[] parameterNames = this.getParameters().names().split(";");
             for (int i = 0; i < parameterNames.length; i++) {
-                commandLine = myReplaceAll(commandLine, "\\$\\{" + parameterNames[i] + "\\}", 
+                commandLine = myReplaceAll(commandLine, "\\$\\{" + parameterNames[i] + "\\}",
                         this.getParameters().value(parameterNames[i]).replaceAll("[\\\\]", "\\\\\\\\"));
             }
             subprocess.set_environment("SCHEDULER_TRIGGER_FILE", this.getTriggerFilename());
@@ -154,10 +154,10 @@ public class ProcessOrderJob extends ProcessJob {
                             }
                             if (this.getParameters().value(varName) != null) {
                                 if (hasBasename) {
-                                    envValue = myReplaceAll(envValue, "\\$\\{basename:" + varName + "\\}", 
-                                            new File(this.getParameters().value(varName)).getName().replaceAll("[\\\\]", "\\\\\\\\"));
+                                    envValue = myReplaceAll(envValue, "\\$\\{basename:" + varName + "\\}", new File(this.getParameters().value(varName))
+                                            .getName().replaceAll("[\\\\]", "\\\\\\\\"));
                                 } else {
-                                    envValue = myReplaceAll(envValue, "\\$\\{" + varName + "\\}", 
+                                    envValue = myReplaceAll(envValue, "\\$\\{" + varName + "\\}",
                                             this.getParameters().value(varName).replaceAll("[\\\\]", "\\\\\\\\"));
                                 }
                                 this.getLogger().debug9("environment variable substituted: " + varName);
@@ -351,8 +351,7 @@ public class ProcessOrderJob extends ProcessJob {
             } else {
                 this.setIgnoreSignal(false);
             }
-            if (this.getParameters().value("scheduler_order_priority_class") != null
-                    && !this.getParameters().value("scheduler_order_priority_class").isEmpty()) {
+            if (this.getParameters().value("scheduler_order_priority_class") != null && !this.getParameters().value("scheduler_order_priority_class").isEmpty()) {
                 this.setPriorityClass(this.getParameters().value("scheduler_order_priority_class"));
                 this.getLogger().debug1(".. parameter [scheduler_order_priority_class]: " + this.getPriorityClass());
             } else {
@@ -497,8 +496,9 @@ public class ProcessOrderJob extends ProcessJob {
                 if (nodeSettings != null) {
                     nodeMapSettings = nodeSettings.getAttributes();
                     if (nodeMapSettings != null && nodeMapSettings.getNamedItem("value") != null) {
-                        this.getLogger().debug1("Log Level is: " + nodeMapSettings.getNamedItem("value").getNodeValue() + "("
-                                + this.logLevel2Int(nodeMapSettings.getNamedItem("value").getNodeValue()) + ")");
+                        this.getLogger().debug1(
+                                "Log Level is: " + nodeMapSettings.getNamedItem("value").getNodeValue() + "("
+                                        + this.logLevel2Int(nodeMapSettings.getNamedItem("value").getNodeValue()) + ")");
                         this.getLogger().setLogLevel(this.logLevel2Int(nodeMapSettings.getNamedItem("value").getNodeValue()));
                     }
                 }
@@ -549,8 +549,8 @@ public class ProcessOrderJob extends ProcessJob {
                                 if (nodeMap.getNamedItem("env") != null) {
                                     env = nodeMap.getNamedItem("env").getNodeValue();
                                 }
-                                boolean setEnv = globalEnv
-                                        || "yes".equalsIgnoreCase(env) || "1".equals(env) || "on".equalsIgnoreCase(env) || "true".equalsIgnoreCase(env);
+                                boolean setEnv = globalEnv || "yes".equalsIgnoreCase(env) || "1".equals(env) || "on".equalsIgnoreCase(env)
+                                        || "true".equalsIgnoreCase(env);
                                 if (setEnv) {
                                     if (this.additional_envvars == null) {
                                         this.additional_envvars = new TreeMap();
@@ -608,17 +608,17 @@ public class ProcessOrderJob extends ProcessJob {
                         while (parameterValue.indexOf("${") != -1 && trials <= 1) {
                             this.getLogger().debug1("substitution trial:" + trials + " --> " + parameterValue);
                             for (int j = 0; j < parameterNames.length; j++) {
-                                this.getLogger().debug9("parameterNames[j]=" + parameterNames[j] + " -->"
-                                        + parameterValue.indexOf("${" + parameterNames[j] + "}"));
+                                this.getLogger().debug9(
+                                        "parameterNames[j]=" + parameterNames[j] + " -->" + parameterValue.indexOf("${" + parameterNames[j] + "}"));
                                 if (!parameterNames[i].equals(parameterNames[j])
                                         && (parameterValue.indexOf("${" + parameterNames[j] + "}") != -1 || parameterValue.indexOf("${basename:"
                                                 + parameterNames[j] + "}") != -1)) {
                                     if (parameterValue.indexOf("${basename:") != -1) {
-                                        parameterValue = myReplaceAll(parameterValue, "\\$\\{basename:" + parameterNames[j] + "\\}", 
-                                                new File(spooler_task.order().params().value(parameterNames[j])).getName().replaceAll("[\\\\]", "\\\\\\\\"));
+                                        parameterValue = myReplaceAll(parameterValue, "\\$\\{basename:" + parameterNames[j] + "\\}", new File(spooler_task
+                                                .order().params().value(parameterNames[j])).getName().replaceAll("[\\\\]", "\\\\\\\\"));
                                     } else {
-                                        parameterValue = myReplaceAll(parameterValue, "\\$\\{" + parameterNames[j] + "\\}", 
-                                                spooler_task.order().params().value(parameterNames[j]).replaceAll("[\\\\]", "\\\\\\\\"));
+                                        parameterValue = myReplaceAll(parameterValue, "\\$\\{" + parameterNames[j] + "\\}", spooler_task.order().params()
+                                                .value(parameterNames[j]).replaceAll("[\\\\]", "\\\\\\\\"));
                                     }
                                     parameterFound = true;
                                     trials = 0;
@@ -632,12 +632,12 @@ public class ProcessOrderJob extends ProcessJob {
                                 Object envName = envIterator.next();
                                 Object envValue = this.envvars.get(envName.toString());
                                 if (parameterValue.indexOf("${" + envName.toString() + "}") != -1) {
-                                    parameterValue = myReplaceAll(parameterValue, "\\$\\{" + envName.toString() + "\\}", 
+                                    parameterValue = myReplaceAll(parameterValue, "\\$\\{" + envName.toString() + "\\}",
                                             envValue.toString().replaceAll("[\\\\]", "\\\\\\\\"));
                                     envFound = true;
                                 } else if (parameterValue.indexOf("${basename:" + envName.toString() + "}") != -1) {
-                                    parameterValue = myReplaceAll(parameterValue, "\\$\\{basename:" + envName.toString() + "\\}", 
-                                            new File(envValue.toString()).getName().replaceAll("[\\\\]", "\\\\\\\\"));
+                                    parameterValue = myReplaceAll(parameterValue, "\\$\\{basename:" + envName.toString() + "\\}", new File(envValue.toString())
+                                            .getName().replaceAll("[\\\\]", "\\\\\\\\"));
                                     envFound = true;
                                 }
                             }
@@ -648,12 +648,12 @@ public class ProcessOrderJob extends ProcessJob {
                                 Object envName = envIterator.next();
                                 Object envValue = this.additional_envvars.get(envName.toString());
                                 if (parameterValue.indexOf("${" + envName + "}") != -1) {
-                                    parameterValue = myReplaceAll(parameterValue, "\\$\\{" + envName.toString() + "\\}", 
+                                    parameterValue = myReplaceAll(parameterValue, "\\$\\{" + envName.toString() + "\\}",
                                             envValue.toString().replaceAll("[\\\\]", "\\\\\\\\"));
                                     additionalEnvFound = true;
                                 } else if (parameterValue.indexOf("${basename:" + envName.toString() + "}") != -1) {
-                                    parameterValue = myReplaceAll(parameterValue, "\\$\\{basename:" + envName.toString() + "\\}", 
-                                            new File(envValue.toString()).getName().replaceAll("[\\\\]", "\\\\\\\\"));
+                                    parameterValue = myReplaceAll(parameterValue, "\\$\\{basename:" + envName.toString() + "\\}", new File(envValue.toString())
+                                            .getName().replaceAll("[\\\\]", "\\\\\\\\"));
                                     additionalEnvFound = true;
                                 }
                             }

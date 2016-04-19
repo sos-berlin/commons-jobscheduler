@@ -249,14 +249,12 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
                     regex = String.format(regExPattern, name);
                     logger.debug("regex = " + regex + ", strParamValue = " + strParamValue);
                     strParamValue = Matcher.quoteReplacement(strParamValue);
-                    strTemp = strTemp.replaceAll("(?im)"+regex, strParamValue);
+                    strTemp = strTemp.replaceAll("(?im)" + regex, strParamValue);
                 }
                 logger.debug("String after replace = " + strTemp);
             }
         }
         return strTemp;
     }
-
-     
 
 }

@@ -97,16 +97,16 @@ public class JobSchedulerManagedDatabaseJob extends JobSchedulerManagedJob {
             }
             if (orderPayload != null
                     && orderPayload.var(PARAMETER_RESULTSET_AS_WARNING) != null
-                    && ("1".equals(orderPayload.var(PARAMETER_RESULTSET_AS_WARNING)) 
-                            || "true".equalsIgnoreCase(orderPayload.var(PARAMETER_RESULTSET_AS_WARNING)))) {
+                    && ("1".equals(orderPayload.var(PARAMETER_RESULTSET_AS_WARNING)) || "true".equalsIgnoreCase(orderPayload
+                            .var(PARAMETER_RESULTSET_AS_WARNING)))) {
                 resultsetAsWarning = true;
             }
             execReturnsResultSet = objOptions.exec_returns_resultset.value();
             if (orderPayload != null
                     && orderPayload.var(PARAMETER_RESULTSET_AS_PARAMETERS) != null
                     && ("1".equals(orderPayload.var(PARAMETER_RESULTSET_AS_PARAMETERS))
-                            || "true".equalsIgnoreCase(orderPayload.var(PARAMETER_RESULTSET_AS_PARAMETERS)) 
-                            || PARAMETER_NAME_VALUE.equalsIgnoreCase(orderPayload.var(PARAMETER_RESULTSET_AS_PARAMETERS)))) {
+                            || "true".equalsIgnoreCase(orderPayload.var(PARAMETER_RESULTSET_AS_PARAMETERS)) || PARAMETER_NAME_VALUE
+                                .equalsIgnoreCase(orderPayload.var(PARAMETER_RESULTSET_AS_PARAMETERS)))) {
                 resultsetAsParameters = true;
                 if (PARAMETER_NAME_VALUE.equalsIgnoreCase(orderPayload.var(PARAMETER_RESULTSET_AS_PARAMETERS))) {
                     resultsetNameValue = true;

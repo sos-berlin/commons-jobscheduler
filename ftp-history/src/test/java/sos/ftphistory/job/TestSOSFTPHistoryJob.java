@@ -40,7 +40,8 @@ public class TestSOSFTPHistoryJob {
 
         SOSFTPHistoryJob ftpHistoryJob = new SOSFTPHistoryJob();
         ftpHistoryJob.init();
-        ftpHistoryJob.setConnection(SOSConnection.createInstance("SOSOracleConnection", "oracle.jdbc.driver.OracleDriver", "jdbc:oracle:thin:@localhost:1521:test", "test", "test"));
+        ftpHistoryJob.setConnection(SOSConnection.createInstance("SOSOracleConnection", "oracle.jdbc.driver.OracleDriver",
+                "jdbc:oracle:thin:@localhost:1521:test", "test", "test"));
         String randomUUIDString = UUID.randomUUID().toString();
         HashMap<String, String> parameters = new HashMap<String, String>();
         parameters.put("guid", randomUUIDString);

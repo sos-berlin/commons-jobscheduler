@@ -24,7 +24,7 @@ public class JobSchedulerWebServiceShellJob extends Job_impl {
             if (parameters != null) {
                 String[] parameter_names = parameters.names().split(";");
                 for (int i = 0; i < parameter_names.length; i++) {
-                    if (parameter_names[i].equalsIgnoreCase("shell_command")) {
+                    if ("shell_command".equalsIgnoreCase(parameter_names[i])) {
                         continue;
                     }
                     subprocess.set_environment(parameter_names[i], parameters.value(parameter_names[i]));

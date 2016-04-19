@@ -64,7 +64,7 @@ public class SOSFileEntry {
     }
 
     public boolean isDirUp() {
-        return (filename != null && filename.equals(".."));
+        return filename != null && "..".equals(filename);
     }
 
     public String getFilesizeAsString() {
@@ -80,6 +80,6 @@ public class SOSFileEntry {
     }
 
     public boolean isFileOrFolder() {
-        return !(filename == null || filename.equals("..") || filename.equals(".") || filename.equals(""));
+        return !(filename == null || "..".equals(filename) || ".".equals(filename) || "".equals(filename));
     }
 }

@@ -337,7 +337,7 @@ abstract public class SOSFTPCommand {
                             if (line == null) {
                                 break;
                             }
-                            if (!windows && pid == 0 && schedulerJob != null && Class.forName(SSHJOBNAME) != null 
+                            if (!windows && pid == 0 && schedulerJob != null && Class.forName(SSHJOBNAME) != null
                                     && schedulerJob.getClass().getName().equals(cl_.getName())) {
                                 pid = Integer.parseInt(line);
                                 if (cl_ != null) {
@@ -379,7 +379,7 @@ abstract public class SOSFTPCommand {
                                 getLogger().info(line.substring(line.indexOf("[info]") + "[info]".length()));
                             }
                         }
-                        if (!windows && schedulerJob != null && cl_ != null && Class.forName(SSHJOBNAME) != null 
+                        if (!windows && schedulerJob != null && cl_ != null && Class.forName(SSHJOBNAME) != null
                                 && schedulerJob.getClass().getName().equals(cl_.getName())) {
                             Method method = cl_.getMethod("setSchedulerSSHKillPid", new Class[] { int.class });
                             method.invoke(schedulerJob, new Object[] { new Integer(0) });
@@ -1760,8 +1760,9 @@ abstract public class SOSFTPCommand {
                 for (int j = 0; transactionalHistoryFile != null && j < transactionalHistoryFile.size(); j++) {
                     String hist = sosString.parseToString(transactionalHistoryFile.get(j));
                     if (hasError) {
-                        hist = hist.replaceAll(";success;;", ";error;" + clearCRLF(getLogger().getError() != null && !getLogger().getError().isEmpty() 
-                                ? getLogger().getError() : getLogger().getWarning()) + ";");
+                        hist = hist.replaceAll(";success;;", ";error;"
+                                + clearCRLF(getLogger().getError() != null && !getLogger().getError().isEmpty() ? getLogger().getError() : getLogger()
+                                        .getWarning()) + ";");
                     }
                     history.write(hist);
                     history.newLine();

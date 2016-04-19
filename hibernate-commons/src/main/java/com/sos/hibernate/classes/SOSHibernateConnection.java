@@ -314,7 +314,8 @@ public class SOSHibernateConnection implements Serializable {
         if (ex instanceof SQLGrammarException) {
             SQLGrammarException sqlGrEx = (SQLGrammarException) ex;
             SQLException sqlEx = sqlGrEx.getSQLException();
-            return new Exception(String.format("%s [exception: %s, sql: %s]", ex.getMessage(), sqlEx == null ? "" : sqlEx.getMessage(), sqlGrEx.getSQL()), sqlEx);
+            return new Exception(String.format("%s [exception: %s, sql: %s]", ex.getMessage(), sqlEx == null ? "" : sqlEx.getMessage(), sqlGrEx.getSQL()),
+                    sqlEx);
         } else if (ex.getCause() != null) {
             return ex.getCause();
         }

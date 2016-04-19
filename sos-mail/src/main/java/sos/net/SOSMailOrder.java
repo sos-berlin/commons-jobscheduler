@@ -165,7 +165,7 @@ public class SOSMailOrder extends SOSMail {
             if (data.get("subject_template") != null) {
                 setSubjectTemplate(data.get("subject_template").toString());
             }
-            if (data.get("subject_template_type") != null) { 
+            if (data.get("subject_template_type") != null) {
                 int tt = Integer.parseInt(data.get("subject_template_type").toString());
                 setSubjectTemplateType(tt);
             }
@@ -304,7 +304,7 @@ public class SOSMailOrder extends SOSMail {
                 sosConnection.rollback();
             } catch (Exception ex) {
                 // do not handle errors while error handling
-            } 
+            }
             throw new Exception("Error occured storing mail: " + e.getMessage(), e);
         }
     }
@@ -668,7 +668,7 @@ public class SOSMailOrder extends SOSMail {
     public static void main(String[] args) throws Exception {
         String mailto = "mo@sos-berlin.com";
         SOSLogger logger = new SOSStandardLogger(9);
-        SOSConnection conn = SOSConnection.createInstance("SOSMSSQLConnection", "com.microsoft.sqlserver.jdbc.SQLServerDriver", 
+        SOSConnection conn = SOSConnection.createInstance("SOSMSSQLConnection", "com.microsoft.sqlserver.jdbc.SQLServerDriver",
                 "jdbc:sqlserver://8of9:2433;sendStringParametersAsUnicode=false;selectMethod=cursor;databaseName=ehp_bkk", "ehp_bkk", "ehp_bkk", logger);
         conn.connect();
         SOSSettings settings = new SOSConnectionSettings(conn, "SETTINGS", logger);

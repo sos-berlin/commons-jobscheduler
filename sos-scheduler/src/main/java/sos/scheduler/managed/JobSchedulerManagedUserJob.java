@@ -157,12 +157,12 @@ public class JobSchedulerManagedUserJob extends JobSchedulerManagedJob {
             boolean deleted = false;
             if (orderAttributes.get("deleted") != null) {
                 String sDeleted = orderAttributes.get("deleted").toString();
-                deleted = !(sDeleted.trim().equals("0"));
+                deleted = !("0".equals(sDeleted.trim()));
             }
             boolean suspended = false;
             if (orderAttributes.get("suspended") != null) {
                 String sSuspended = orderAttributes.get("suspended").toString();
-                suspended = !(sSuspended.trim().equals("0"));
+                suspended = !("0".equals(sSuspended.trim()));
             }
             if (deleted) {
                 getLogger().debug6("deleted=1, deleting order...");
@@ -259,7 +259,7 @@ public class JobSchedulerManagedUserJob extends JobSchedulerManagedJob {
                 }
             } catch (Exception ex) {
                 // ignore this errror
-            } 
+            }
         }
     }
 
@@ -326,7 +326,7 @@ public class JobSchedulerManagedUserJob extends JobSchedulerManagedJob {
             }
             Date scheduledRuntime = SOSDate.getTime(date + " " + time);
             Date now = SOSDate.getTime();
-            return (now.after(scheduledRuntime));
+            return now.after(scheduledRuntime);
         } catch (Exception e) {
         }
         return false;

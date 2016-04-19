@@ -95,18 +95,27 @@ public class JobSchedulerFileOperationsBaseTest {
         params.put(JobSchedulerFileOperationBase.conParameterFILE, "4711");
         params.put(JobSchedulerFileOperationBase.conParameterFILE_PATH, "");
         params.put(JobSchedulerFileOperationBase.conParameterSOURCE_FILE, "");
-        assertEquals("must be 4711", "4711", objFOP.getParamValue(new String[] { JobSchedulerFileOperationBase.conParameterFILE,
-                JobSchedulerFileOperationBase.conParameterFILE_PATH, JobSchedulerFileOperationBase.conParameterSOURCE_FILE }, ""));
+        assertEquals(
+                "must be 4711",
+                "4711",
+                objFOP.getParamValue(new String[] { JobSchedulerFileOperationBase.conParameterFILE, JobSchedulerFileOperationBase.conParameterFILE_PATH,
+                        JobSchedulerFileOperationBase.conParameterSOURCE_FILE }, ""));
         params.put(JobSchedulerFileOperationBase.conParameterFILE, "");
         params.put(JobSchedulerFileOperationBase.conParameterFILE_PATH, "4711");
         params.put(JobSchedulerFileOperationBase.conParameterSOURCE_FILE, "");
-        assertEquals("must be 4711", "4711", objFOP.getParamValue(new String[] { JobSchedulerFileOperationBase.conParameterFILE,
-                JobSchedulerFileOperationBase.conParameterFILE_PATH, JobSchedulerFileOperationBase.conParameterSOURCE_FILE }, ""));
+        assertEquals(
+                "must be 4711",
+                "4711",
+                objFOP.getParamValue(new String[] { JobSchedulerFileOperationBase.conParameterFILE, JobSchedulerFileOperationBase.conParameterFILE_PATH,
+                        JobSchedulerFileOperationBase.conParameterSOURCE_FILE }, ""));
         params.put(JobSchedulerFileOperationBase.conParameterFILE, "");
         params.put(JobSchedulerFileOperationBase.conParameterFILE_PATH, "");
         params.put(JobSchedulerFileOperationBase.conParameterSOURCE_FILE, "4711");
-        assertEquals("must be 4711", "4711", objFOP.getParamValue(new String[] { JobSchedulerFileOperationBase.conParameterFILE,
-                JobSchedulerFileOperationBase.conParameterFILE_PATH, JobSchedulerFileOperationBase.conParameterSOURCE_FILE }, ""));
+        assertEquals(
+                "must be 4711",
+                "4711",
+                objFOP.getParamValue(new String[] { JobSchedulerFileOperationBase.conParameterFILE, JobSchedulerFileOperationBase.conParameterFILE_PATH,
+                        JobSchedulerFileOperationBase.conParameterSOURCE_FILE }, ""));
     }
 
     @Test
@@ -114,8 +123,11 @@ public class JobSchedulerFileOperationsBaseTest {
         params.put(JobSchedulerFileOperationBase.conParameterFILE.replaceAll("_", ""), "");
         params.put(JobSchedulerFileOperationBase.conParameterFILE_PATH.replaceAll("_", ""), "4711");
         params.put(JobSchedulerFileOperationBase.conParameterSOURCE_FILE.replaceAll("_", ""), "");
-        assertEquals("must be 4711", "4711", objFOP.getParamValue(new String[] { JobSchedulerFileOperationBase.conParameterFILE,
-                JobSchedulerFileOperationBase.conParameterFILE_PATH, JobSchedulerFileOperationBase.conParameterSOURCE_FILE }, ""));
+        assertEquals(
+                "must be 4711",
+                "4711",
+                objFOP.getParamValue(new String[] { JobSchedulerFileOperationBase.conParameterFILE, JobSchedulerFileOperationBase.conParameterFILE_PATH,
+                        JobSchedulerFileOperationBase.conParameterSOURCE_FILE }, ""));
     }
 
     @Test

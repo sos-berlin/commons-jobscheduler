@@ -399,7 +399,7 @@ public class JobSchedulerManagedStarter extends JobSchedulerJob {
         addParam(xmlDoc, p, "scheduler_order_state", scheduler_order_state);
         boolean ignore_runtime = false;
         if (orderParams != null) {
-            ignore_runtime = orderParams.var("ignore_runtime") != null && orderParams.var("ignore_runtime").equalsIgnoreCase("yes");
+            ignore_runtime = orderParams.var("ignore_runtime") != null && "yes".equalsIgnoreCase(orderParams.var("ignore_runtime"));
         }
         if (ignore_runtime) {
             getLog().debug3("ignore_runtime: yes");

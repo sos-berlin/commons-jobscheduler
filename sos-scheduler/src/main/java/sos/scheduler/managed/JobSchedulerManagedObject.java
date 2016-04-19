@@ -185,7 +185,7 @@ public class JobSchedulerManagedObject {
         }
         try {
             job.spooler_log.debug6("..creating local connection object");
-            localConnection = SOSConnection.createInstance(result.get("class").toString(), result.get("driver").toString(), result.get("url").toString(), 
+            localConnection = SOSConnection.createInstance(result.get("class").toString(), result.get("driver").toString(), result.get("url").toString(),
                     result.get("username").toString(), result.get("password").toString(), new SOSSchedulerLogger(job.spooler_log));
         } catch (Exception e) {
             throw new Exception("error occurred establishing database connection: " + e.getMessage());
@@ -219,10 +219,10 @@ public class JobSchedulerManagedObject {
         try {
             if (log != null) {
                 log.debug6("..creating local connection object");
-                localConnection = SOSConnection.createInstance(result.get("class").toString(), result.get("driver").toString(), result.get("url").toString(), 
+                localConnection = SOSConnection.createInstance(result.get("class").toString(), result.get("driver").toString(), result.get("url").toString(),
                         result.get("username").toString(), result.get("password").toString(), log);
             } else {
-                localConnection = SOSConnection.createInstance(result.get("class").toString(), result.get("driver").toString(), result.get("url").toString(), 
+                localConnection = SOSConnection.createInstance(result.get("class").toString(), result.get("driver").toString(), result.get("url").toString(),
                         result.get("username").toString(), result.get("password").toString());
             }
         } catch (Exception e) {
@@ -272,10 +272,10 @@ public class JobSchedulerManagedObject {
         try {
             if (log != null) {
                 log.debug6("..creating local connection object");
-                localConnection = SOSConnection.createInstance(result.get("class").toString(), result.get("driver").toString(), result.get("url").toString(), 
+                localConnection = SOSConnection.createInstance(result.get("class").toString(), result.get("driver").toString(), result.get("url").toString(),
                         result.get("username").toString(), result.get("password").toString(), log);
             } else {
-                localConnection = SOSConnection.createInstance(result.get("class").toString(), result.get("driver").toString(), result.get("url").toString(), 
+                localConnection = SOSConnection.createInstance(result.get("class").toString(), result.get("driver").toString(), result.get("url").toString(),
                         result.get("username").toString(), result.get("password").toString());
             }
         } catch (Exception e) {
@@ -362,8 +362,9 @@ public class JobSchedulerManagedObject {
             if ((command == null || command.isEmpty()) && "1".equalsIgnoreCase(managedVersion)) {
                 job.spooler_log.debug9("trying to get Command from table " + getTableManagedOrders() + " ...");
                 if (!order.id().startsWith("-")) {
-                    command = connection.getClob("SELECT \"COMMAND\" FROM " + getTableManagedOrders() + " WHERE \"SPOOLER_ID\"='"
-                            + job.spooler.id().toLowerCase() + "' AND \"JOB_CHAIN\"='" + order.job_chain().name() + "'" + " AND \"ORDER_ID\"='" + orderID + "'");
+                    command = connection
+                            .getClob("SELECT \"COMMAND\" FROM " + getTableManagedOrders() + " WHERE \"SPOOLER_ID\"='" + job.spooler.id().toLowerCase()
+                                    + "' AND \"JOB_CHAIN\"='" + order.job_chain().name() + "'" + " AND \"ORDER_ID\"='" + orderID + "'");
                 } else {
                     command = connection.getClob("SELECT \"COMMAND\" FROM " + getTableManagedOrders() + " WHERE \"SPOOLER_ID\" IS NULL AND \"JOB_CHAIN\"='"
                             + order.job_chain().name() + "'" + " AND \"ORDER_ID\"='" + orderID + "'");

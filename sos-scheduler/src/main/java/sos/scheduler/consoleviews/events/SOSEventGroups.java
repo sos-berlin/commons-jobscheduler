@@ -22,17 +22,17 @@ public class SOSEventGroups {
 
     public boolean isActiv(final LinkedHashSet listOfActiveEvents) {
         boolean erg = false;
-        if (logic.length() == 0) {
+        if (logic.isEmpty()) {
             logic = "or";
         }
         Iterator i = listOfEvents.iterator();
-        if (logic.equalsIgnoreCase("or")) {
+        if ("or".equalsIgnoreCase(logic)) {
             while (i.hasNext() && !erg) {
                 SchedulerEvent e = (SchedulerEvent) i.next();
                 erg = e.isIn(listOfActiveEvents);
             }
         } else {
-            if (logic.equalsIgnoreCase("and")) {
+            if ("and".equalsIgnoreCase(logic)) {
                 erg = true;
                 while (i.hasNext() && erg) {
                     SchedulerEvent e = (SchedulerEvent) i.next();
@@ -42,13 +42,11 @@ public class SOSEventGroups {
                 BooleanExp exp = new BooleanExp(logic);
                 while (i.hasNext()) {
                     SchedulerEvent e = (SchedulerEvent) i.next();
-
                     exp.replace(e.getEvent_name(), exp.trueFalse(e.isIn(listOfActiveEvents)));
                 }
                 erg = exp.evaluateExpression();
             }
         }
-
         return erg;
     }
 
@@ -63,4 +61,5 @@ public class SOSEventGroups {
     public String getLogic() {
         return logic;
     }
+
 }

@@ -49,8 +49,10 @@ public class JobChainExtendedTest {
     private final static SimpleParam PARAM1 = new SimpleParam("param1", "value1");
     private final static SimpleParam PARAM2 = new SimpleParam("param2", "value2");
     private final static SimpleParam PARAM3 = new SimpleParam("param3", "value3");
-    private final static ImmutableMap<String, SimpleChainNode> EXPECTED_NODES = new ImmutableMap.Builder<String, SimpleChainNode>().put("100", NODE1).put("200", NODE2).put("success", NODE3).put("error", NODE4).build();
-    private final static ImmutableMap<String, SimpleParam> EXPECTED_PARAMS = new ImmutableMap.Builder<String, SimpleParam>().put("param1", PARAM1).put("param2", PARAM2).put("param3", PARAM3).build();
+    private final static ImmutableMap<String, SimpleChainNode> EXPECTED_NODES = new ImmutableMap.Builder<String, SimpleChainNode>().put("100", NODE1)
+            .put("200", NODE2).put("success", NODE3).put("error", NODE4).build();
+    private final static ImmutableMap<String, SimpleParam> EXPECTED_PARAMS = new ImmutableMap.Builder<String, SimpleParam>().put("param1", PARAM1)
+            .put("param2", PARAM2).put("param3", PARAM3).build();
     private Schema schema;
 
     public JobChainExtendedTest() {
@@ -111,7 +113,7 @@ public class JobChainExtendedTest {
             SimpleChainNode expected = EXPECTED_NODES.get(n.getState());
             assertEquals(expected.state, n.getState());
             assertEquals(expected.previousState, n.getPreviousState());
-            if (n.getState().equals("200")) {
+            if ("200".equals(n.getState())) {
                 assertEquals(EXPECTED_PARAMS.size(), n.getParams().getParam().size());
                 for (ParamsExtended.Param p : n.getParams().getParam()) {
                     assertTrue(EXPECTED_PARAMS.containsKey(p.getName()));

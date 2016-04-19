@@ -115,8 +115,9 @@ public class JobSchedulerMySQLMaintenanceMonitor extends JobSchedulerJob {
                             getLogger().error("database returned no result for statement: " + statement);
                             return false;
                         }
-                        getLogger().info("table: " + result.get("table").toString() + ", operation: " + result.get("op").toString() + ", Message Type: "
-                                + result.get("msg_type").toString() + ", Message Text: " + result.get("msg_text").toString());
+                        getLogger().info(
+                                "table: " + result.get("table").toString() + ", operation: " + result.get("op").toString() + ", Message Type: "
+                                        + result.get("msg_type").toString() + ", Message Text: " + result.get("msg_text").toString());
                     }
                 }
             }

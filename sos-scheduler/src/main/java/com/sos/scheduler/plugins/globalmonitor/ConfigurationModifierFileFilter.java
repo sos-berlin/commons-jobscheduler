@@ -15,33 +15,23 @@ public abstract class ConfigurationModifierFileFilter implements FilenameFilter 
     }
 
     private boolean isConfiguationFile(String filename) {
-
-        boolean isJobSchedulerElement = filename.matches(getXmlRegex());
-        return (isJobSchedulerElement);
+        return filename.matches(getXmlRegex());
     }
 
     private boolean matchRegex(String filename) {
-        boolean isMatch = options.getRegexSelector().trim().length() == 0 || filename.matches(options.getRegexSelector());
-        return (isMatch);
+        return (options.getRegexSelector().trim().isEmpty() || filename.matches(options.getRegexSelector()));
     }
 
     @Override
     public boolean accept(File directory, String filename) {
         File f = new File(directory, filename);
-
         if (f.isDirectory()) {
             return !options.isDirExclusion(directory);
         }
-
         if (options.isFileExclusions(f)) {
             return false;
         } else {
-
-            if (isConfiguationFile(filename) && matchRegex(filename)) {
-                return true;
-            } else {
-                return false;
-            }
+            return isConfiguationFile(filename) && matchRegex(filename);
         }
     }
 

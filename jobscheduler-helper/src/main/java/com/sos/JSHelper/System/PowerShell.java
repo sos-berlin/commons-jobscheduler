@@ -13,9 +13,7 @@ import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 
-/**
- * source code from http://kra.lc/blog/2014/02/powershell-java-bridge/
- */
+/** source code from http://kra.lc/blog/2014/02/powershell-java-bridge/ */
 public class PowerShell {
 
     private static final Logger LOGGER = Logger.getLogger(PowerShell.class);

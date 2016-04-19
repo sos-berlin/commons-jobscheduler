@@ -29,7 +29,8 @@ public class JobSchedulerRemoveFile extends JobSchedulerFileOperationBase {
             }
             CheckMandatoryFile();
 
-            intNoOfHitsInResultSet = SOSFileOperations.removeFileCnt(file, fileSpec, flags, isCaseInsensitive, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles, skipLastFiles, objSOSLogger);
+            intNoOfHitsInResultSet = SOSFileOperations.removeFileCnt(file, fileSpec, flags, isCaseInsensitive, minFileAge, maxFileAge, minFileSize,
+                    maxFileSize, skipFirstFiles, skipLastFiles, objSOSLogger);
 
             flgOperationWasSuccessful = intNoOfHitsInResultSet > 0;
             return setReturnResult(flgOperationWasSuccessful);

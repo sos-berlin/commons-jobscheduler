@@ -20,18 +20,10 @@ import com.sos.scheduler.model.objects.Weekdays.Day;
 
 public class JSObjDayTest {
 
-    private final static Logger logger = Logger.getLogger(JSObjDayTest.class);
-
-    @SuppressWarnings("unused")
-    private final static DateTimeFormatter fmtDateTime = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
-    private final static DateTimeFormatter fmtTime = DateTimeFormat.forPattern("HH:mm:ss");
-
-    @SuppressWarnings("unused")
-    private final static Interval next24H = IntervalConstants.NEXT_24H.getInterval();
-    private final static Interval nextWeek = IntervalConstants.NEXT_WEEK.getInterval();
-
+    private static final Logger LOGGER = Logger.getLogger(JSObjDayTest.class);
+    private static final DateTimeFormatter FMT_TIME = DateTimeFormat.forPattern("HH:mm:ss");
+    private static final Interval NEXT_WEEK = IntervalConstants.NEXT_WEEK.getInterval();
     private static SchedulerObjectFactory factory = null;
-
     private String xml;
 
     @BeforeClass
@@ -53,7 +45,7 @@ public class JSObjDayTest {
     public final void testSetInvalidXmlContent() {
         xml = "<invalid date />";
         JSObjPeriod period = new JSObjPeriod(factory, xml);
-        logger.debug(period.toXMLString());
+        LOGGER.debug(period.toXMLString());
     }
 
     @Test
@@ -61,20 +53,19 @@ public class JSObjDayTest {
         xml = "<run_time>" + "<weekdays>" + "<day day=\"1 2\">" + "<period single_start=\"15:00\" />" + "<period single_start=\"19:00:05\" />"
                 + "<period single_start=\"11:00\" />" + "</day>" + "</weekdays>" + "</run_time>";
         JSObjRunTime runtime = new JSObjRunTime(factory, xml);
-
         Iterator<Day> itD = runtime.getWeekdays().getDay().iterator();
         while (itD.hasNext()) {
             Day d = itD.next();
             JSObjWeekdaysDay date = new JSObjWeekdaysDay(factory);
             date.setObjectFieldsFrom(d);
-            List<DateTime> result = date.getRunTimeElements(nextWeek).getStartTimes();
-            assertEquals(6, result.size());			// six entries expected
+            List<DateTime> result = date.getRunTimeElements(NEXT_WEEK).getStartTimes();
+            assertEquals(6, result.size());
             Iterator<DateTime> it = result.iterator();
             while (it.hasNext()) {
                 DateTime dt = it.next();
-                String time = fmtTime.print(dt);
-                assertEquals(true, (dt.getDayOfWeek() == DateTimeConstants.MONDAY || dt.getDayOfWeek() == DateTimeConstants.TUESDAY));
-                assertEquals(true, (time.equals("15:00:00") || time.equals("19:00:05") || time.equals("11:00:00")));
+                String time = FMT_TIME.print(dt);
+                assertEquals(true, dt.getDayOfWeek() == DateTimeConstants.MONDAY || dt.getDayOfWeek() == DateTimeConstants.TUESDAY);
+                assertEquals(true, "15:00:00".equals(time) || "19:00:05".equals(time) || "11:00:00".equals(time));
             }
         }
     }
@@ -84,19 +75,18 @@ public class JSObjDayTest {
         xml = "<run_time>" + "<weekdays>" + "<day day=\"1\">" + "<period single_start=\"15:00\" />" + "</day>" + "<day day=\"3\">"
                 + "<period single_start=\"17:00\" />" + "</day>" + "</weekdays>" + "</run_time>";
         JSObjRunTime runtime = new JSObjRunTime(factory, xml);
-
         Iterator<Day> itD = runtime.getWeekdays().getDay().iterator();
         while (itD.hasNext()) {
             Day d = itD.next();
             JSObjWeekdaysDay date = new JSObjWeekdaysDay(factory);
             date.setObjectFieldsFrom(d);
-            List<DateTime> result = date.getRunTimeElements(nextWeek).getStartTimes();
+            List<DateTime> result = date.getRunTimeElements(NEXT_WEEK).getStartTimes();
             Iterator<DateTime> it = result.iterator();
             while (it.hasNext()) {
                 DateTime dt = it.next();
-                String time = fmtTime.print(dt);
-                assertEquals(true, (dt.getDayOfWeek() == DateTimeConstants.MONDAY || dt.getDayOfWeek() == DateTimeConstants.WEDNESDAY));
-                assertEquals(true, (time.equals("15:00:00") || time.equals("17:00:00")));
+                String time = FMT_TIME.print(dt);
+                assertEquals(true, dt.getDayOfWeek() == DateTimeConstants.MONDAY || dt.getDayOfWeek() == DateTimeConstants.WEDNESDAY);
+                assertEquals(true, "15:00:00".equals(time) || "17:00:00".equals(time));
             }
         }
     }
@@ -105,15 +95,13 @@ public class JSObjDayTest {
     public final void testMissingPeriod() {
         xml = "<run_time>" + "<weekdays>" + "<day day=\"3\"/>" + "</weekdays>" + "</run_time>";
         JSObjRunTime runtime = new JSObjRunTime(factory, xml);
-
         Iterator<Day> itD = runtime.getWeekdays().getDay().iterator();
         while (itD.hasNext()) {
             Day d = itD.next();
             JSObjWeekdaysDay date = new JSObjWeekdaysDay(factory);
             date.setObjectFieldsFrom(d);
-            List<DateTime> result = date.getRunTimeElements(nextWeek).getStartTimes();
-            assertEquals(0, result.size());		// no entries, because period
-            // element is missing
+            List<DateTime> result = date.getRunTimeElements(NEXT_WEEK).getStartTimes();
+            assertEquals(0, result.size());
         }
     }
 

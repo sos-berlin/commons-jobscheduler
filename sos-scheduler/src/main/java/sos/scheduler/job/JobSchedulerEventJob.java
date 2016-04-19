@@ -817,7 +817,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
                     Object result = this.getEventHandlerResultFileListIterator().next();
                     if (result instanceof File) {
                         File resultFile = (File) result;
-                        if (resultFile != null  && !resultFile.delete()) {
+                        if (resultFile != null && !resultFile.delete()) {
                             resultFile.deleteOnExit();
                         }
                     }
@@ -962,11 +962,10 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
             }
             this.getEvents().getLastChild().appendChild(event);
             if (this.getConnection() != null) {
-                String stmt = "INSERT INTO "
-                        + tableEvents
+                String stmt = "INSERT INTO " + tableEvents
                         + " (\"SPOOLER_ID\", \"REMOTE_SCHEDULER_HOST\", \"REMOTE_SCHEDULER_PORT\", \"JOB_CHAIN\", \"ORDER_ID\", \"JOB_NAME\", \"EVENT_CLASS\","
-                        + " \"EVENT_ID\", \"EXIT_CODE\", \"CREATED\", \"EXPIRES\") VALUES ('" + curEventSchedulerId + "', '" + curEventRemoteSchedulerHost + "', "
-                        + (curEventRemoteSchedulerPort.length() == 0 ? "0" : curEventRemoteSchedulerPort) + ", '" + curEventJobChainName + "', '"
+                        + " \"EVENT_ID\", \"EXIT_CODE\", \"CREATED\", \"EXPIRES\") VALUES ('" + curEventSchedulerId + "', '" + curEventRemoteSchedulerHost
+                        + "', " + (curEventRemoteSchedulerPort.length() == 0 ? "0" : curEventRemoteSchedulerPort) + ", '" + curEventJobChainName + "', '"
                         + curEventOrderId + "', '" + curEventJobName + "', '" + curEventClass + "', '" + curEventId + "', '" + curEventExitCode + "', "
                         + (curEventCreated.length() > 0 ? "%timestamp_iso('" + curEventCreated + "')" : "%now") + ", "
                         + (curEventExpires.length() > 0 ? "%timestamp_iso('" + curEventExpires + "')" : "NULL") + ")";

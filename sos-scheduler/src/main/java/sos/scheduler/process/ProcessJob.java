@@ -94,7 +94,7 @@ public class ProcessJob extends Job_impl {
             spooler_log.info("Job " + this.getJobName() + " terminated.");
         } catch (Exception e) {
             // no errror processing at job level
-        } 
+        }
     }
 
     public SOSSettings getJobSettings() {

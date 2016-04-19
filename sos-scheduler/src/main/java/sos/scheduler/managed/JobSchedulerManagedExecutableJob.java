@@ -74,33 +74,33 @@ public class JobSchedulerManagedExecutableJob extends JobSchedulerManagedJob {
             if (orderPayload != null) {
                 replaceAliases(orderPayload, inputParameterAliases);
                 if (orderPayload.var("ignore_error") != null
-                        && ("true".equalsIgnoreCase(orderPayload.var("ignore_error").toString()) 
-                                || "1".equalsIgnoreCase(orderPayload.var("ignore_error").toString()) 
-                                || "yes".equalsIgnoreCase(orderPayload.var("ignore_error").toString()))) {
+                        && ("true".equalsIgnoreCase(orderPayload.var("ignore_error").toString())
+                                || "1".equalsIgnoreCase(orderPayload.var("ignore_error").toString()) || "yes".equalsIgnoreCase(orderPayload.var("ignore_error")
+                                .toString()))) {
                     ignoreError = true;
                 }
                 if (orderPayload.var("ignore_signal") != null
-                        && ("true".equalsIgnoreCase(orderPayload.var("ignore_signal").toString()) 
-                                || "1".equalsIgnoreCase(orderPayload.var("ignore_signal").toString()) 
-                                || "yes".equalsIgnoreCase(orderPayload.var("ignore_signal").toString()))) {
+                        && ("true".equalsIgnoreCase(orderPayload.var("ignore_signal").toString())
+                                || "1".equalsIgnoreCase(orderPayload.var("ignore_signal").toString()) || "yes".equalsIgnoreCase(orderPayload.var(
+                                "ignore_signal").toString()))) {
                     ignoreSignal = true;
                 }
                 if (orderPayload.var("ignore_stderr") != null
-                        && ("true".equalsIgnoreCase(orderPayload.var("ignore_stderr").toString()) 
-                                || "1".equalsIgnoreCase(orderPayload.var("ignore_stderr").toString()) 
-                                || "yes".equalsIgnoreCase(orderPayload.var("ignore_stderr").toString()))) {
+                        && ("true".equalsIgnoreCase(orderPayload.var("ignore_stderr").toString())
+                                || "1".equalsIgnoreCase(orderPayload.var("ignore_stderr").toString()) || "yes".equalsIgnoreCase(orderPayload.var(
+                                "ignore_stderr").toString()))) {
                     ignoreStderr = true;
                 }
                 if (orderPayload.var("ignore_timeout") != null
-                        && ("true".equalsIgnoreCase(orderPayload.var("ignore_timeout").toString()) 
-                                || "1".equalsIgnoreCase(orderPayload.var("ignore_timeout").toString()) 
-                                || "yes".equalsIgnoreCase(orderPayload.var("ignore_timeout").toString()))) {
+                        && ("true".equalsIgnoreCase(orderPayload.var("ignore_timeout").toString())
+                                || "1".equalsIgnoreCase(orderPayload.var("ignore_timeout").toString()) || "yes".equalsIgnoreCase(orderPayload.var(
+                                "ignore_timeout").toString()))) {
                     ignoreTimeout = true;
                 }
                 if (orderPayload.var("own_process_group") != null
                         && ("true".equalsIgnoreCase(orderPayload.var("own_process_group").toString())
-                                || "1".equalsIgnoreCase(orderPayload.var("own_process_group").toString()) 
-                                || "yes".equalsIgnoreCase(orderPayload.var("own_process_group").toString()))) {
+                                || "1".equalsIgnoreCase(orderPayload.var("own_process_group").toString()) || "yes".equalsIgnoreCase(orderPayload.var(
+                                "own_process_group").toString()))) {
                     ownProcessGroup = true;
                 }
                 if (orderPayload.var("log_file") != null && !orderPayload.var("log_file").toString().isEmpty()) {

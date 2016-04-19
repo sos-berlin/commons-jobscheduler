@@ -144,8 +144,9 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
                 if (localDir.startsWith("file://") && !new File(createURI(localDir)).exists()) {
                     RaiseException("local directory does not exist or is not accessible: " + localDir);
                 }
-                this.getLogger().debug1("connecting to host " + host + ", port " + port + ", local directory " + localDir + ", remote directory " + remoteDir
-                        + (isFilePath ? ", file " + filePath : ", file specification " + fileSpec));
+                this.getLogger().debug1(
+                        "connecting to host " + host + ", port " + port + ", local directory " + localDir + ", remote directory " + remoteDir
+                                + (isFilePath ? ", file " + filePath : ", file specification " + fileSpec));
                 boolean alternativeUse = true;
                 int isAlternativeParameterUse = 0;
                 while (alternativeUse && isAlternativeParameterUse <= 1) {
@@ -180,9 +181,10 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
                             isAlternativeParameterUse++;
                             setAlternativeParameter();
                             arguments.put("user", user);
-                            this.getLogger().debug1("..try login with alternative parameter [host=" + host + "], [port=" + port + "] " + "[user=" + user
-                                    + "], [account=" + account + "], [remoteDir=" + remoteDir + "], [passiveMode=" + passiveMode + "], " + "[transferMode="
-                                    + transferMode + "]");
+                            this.getLogger().debug1(
+                                    "..try login with alternative parameter [host=" + host + "], [port=" + port + "] " + "[user=" + user + "], [account="
+                                            + account + "], [remoteDir=" + remoteDir + "], [passiveMode=" + passiveMode + "], " + "[transferMode="
+                                            + transferMode + "]");
                         } else {
                             RaiseException("..error in ftp server init with [host=" + host + "], [port=" + port + "] " + ex.getMessage());
                         }
@@ -243,8 +245,9 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
                             RaiseException("..ftp server reply" + " [cd] [directory file_path=" + currRemoteDir + conClosingBracketWithColon
                                     + ftpClient.getReplyString());
                         } else {
-                            getLogger().debug("..ftp server reply" + " [cd] [directory file_path=" + currRemoteDir + conClosingBracketWithColon
-                                    + ftpClient.getReplyString());
+                            getLogger().debug(
+                                    "..ftp server reply" + " [cd] [directory file_path=" + currRemoteDir + conClosingBracketWithColon
+                                            + ftpClient.getReplyString());
                         }
                     }
                 } else if (!sosString.parseToString(remoteDir).isEmpty()) {
@@ -415,11 +418,13 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
                 if (lngCurrentBytesReceived < 0) {
                     lngCurrentBytesReceived = 0;
                 }
-                this.getLogger().debug("..ftp server reply [getFile] [" + strTargetFileName + ", size=" + lngCurrentBytesReceived + conClosingBracketWithColon
-                        + pobjFtpClient.getReplyString());
+                this.getLogger().debug(
+                        "..ftp server reply [getFile] [" + strTargetFileName + ", size=" + lngCurrentBytesReceived + conClosingBracketWithColon
+                                + pobjFtpClient.getReplyString());
                 if (!appendFiles1 && retry > 0 && lngCurrentBytesReceived != lngPreviousBytesReceived) {
-                    this.getLogger().info("..retry " + (i + 2) + " of " + retry + " to wait " + interval
-                            + "s for file transfer being completed, current file size: " + lngCurrentBytesReceived + " bytes");
+                    this.getLogger().info(
+                            "..retry " + (i + 2) + " of " + retry + " to wait " + interval + "s for file transfer being completed, current file size: "
+                                    + lngCurrentBytesReceived + " bytes");
                     try {
                         Thread.sleep(interval * 1000);
                     } catch (InterruptedException e) {
@@ -597,15 +602,17 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
                 try {
                     checkInterval = Long.parseLong(sosString.parseToString(arguments.get("check_interval")));
                 } catch (Exception e) {
-                    RaiseException("illegal value for parameter [check_interval]: " + sosString.parseToString(arguments.get("check_interval")) + " "
-                            + e.getMessage(), e);
+                    RaiseException(
+                            "illegal value for parameter [check_interval]: " + sosString.parseToString(arguments.get("check_interval")) + " " + e.getMessage(),
+                            e);
                 }
             }
             if (!sosString.parseToString(arguments.get("check_retry")).isEmpty()) {
                 try {
                     checkRetry = Long.parseLong(sosString.parseToString(arguments.get("check_retry")));
                 } catch (Exception e) {
-                    RaiseException("invalid value for parameter [check_retry]: " + sosString.parseToString(arguments.get("check_retry")) + " " + e.getMessage(), e);
+                    RaiseException(
+                            "invalid value for parameter [check_retry]: " + sosString.parseToString(arguments.get("check_retry")) + " " + e.getMessage(), e);
                 }
             }
             if (!sosString.parseToString(arguments.get("overwrite_files")).isEmpty()) {
@@ -866,8 +873,8 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
             this.getLogger().debug(".. job parameter [alternative_host]                   : " + alternativeHost);
             this.getLogger().debug(".. job parameter [alternative_port]                   : " + alternativePort);
             this.getLogger().debug(".. job parameter [alternative_user]                   : " + alternativeUser);
-            this.getLogger().debug(".. job parameter [alternative_password]               : "
-                    + normalizedPassword(sosString.parseToString(alternativePassword)));
+            this.getLogger().debug(
+                    ".. job parameter [alternative_password]               : " + normalizedPassword(sosString.parseToString(alternativePassword)));
             this.getLogger().debug(".. job parameter [alternative_account]                : " + alternativeAccount);
             this.getLogger().debug(".. job parameter [alternative_remote_dir]             : " + alternativeRemoteDir);
             this.getLogger().debug(".. job parameter [alternative_passive_mode]           : " + alternativePassiveMode);
@@ -973,11 +980,10 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
                         for (int i = 0; i < splitParent.length; i++) {
                             if (!sosString.parseToString(splitParent[i]).isEmpty()) {
                                 if (!ftpClient.changeWorkingDirectory(splitParent[i])) {
-                                    RaiseException(FTP_SERVER_REPLY_CD_REMOTE_DIR + splitParent[i] + conClosingBracketWithColon
-                                            + ftpClient.getReplyString());
+                                    RaiseException(FTP_SERVER_REPLY_CD_REMOTE_DIR + splitParent[i] + conClosingBracketWithColon + ftpClient.getReplyString());
                                 } else {
-                                    getLogger().debug(FTP_SERVER_REPLY_CD_REMOTE_DIR + splitParent[i] + conClosingBracketWithColon
-                                            + ftpClient.getReplyString());
+                                    getLogger()
+                                            .debug(FTP_SERVER_REPLY_CD_REMOTE_DIR + splitParent[i] + conClosingBracketWithColon + ftpClient.getReplyString());
                                 }
                             }
                         }
@@ -1014,8 +1020,8 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
                                 checkFileList.put(atomicFile, transferFile);
                             } else {
                                 if (!transActional) {
-                                    this.getLogger().debug1("renaming local temporary file '" + atomicFile.getAbsolutePath() + "' to '"
-                                            + transferFile.getAbsolutePath() + "'");
+                                    this.getLogger().debug1(
+                                            "renaming local temporary file '" + atomicFile.getAbsolutePath() + "' to '" + transferFile.getAbsolutePath() + "'");
                                     if (!atomicFile.renameTo(transferFile)) {
                                         RaiseException("could not rename temporary file [" + atomicFile.getCanonicalPath() + "] to: "
                                                 + transferFile.getAbsolutePath());
@@ -1097,7 +1103,7 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
 
     private void sendMails() throws Exception {
         if (zeroByteCount > 0 && fileZeroByteNotificationTo != null && !fileZeroByteNotificationTo.isEmpty()) {
-            sendMail(fileZeroByteNotificationTo, fileZeroByteNotificationCC, fileZeroByteNotificationBCC, fileZeroByteNotificationSubject, 
+            sendMail(fileZeroByteNotificationTo, fileZeroByteNotificationCC, fileZeroByteNotificationBCC, fileZeroByteNotificationSubject,
                     fileZeroByteNotificationBody);
         }
         if (count > 0 && fileNotificationTo != null && !fileNotificationTo.isEmpty()) {
@@ -1374,8 +1380,8 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
             }
             SOSFileTransfer ftpClient = initFTPServer();
             long currentBytesSent = ftpClient.getFile(targetFile, localFile, appendFiles);
-            this.getLogger().debug("..ftp server reply [getFile] [" + localFile + ", size=" + currentBytesSent + conClosingBracketWithColon
-                    + ftpClient.getReplyString());
+            this.getLogger().debug(
+                    "..ftp server reply [getFile] [" + localFile + ", size=" + currentBytesSent + conClosingBracketWithColon + ftpClient.getReplyString());
             this.getLogger().debug("1 file received " + localFile);
             getLogger().info("receiving file: " + localFile + " " + ftpClient.size(targetFile) + " bytes");
             transferFileList.add(new File(filePath));

@@ -100,9 +100,6 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
             }
             setBounceDirectory(spooler_task.params().var("bounce_directory"));
             spooler_log.debug6(".. job parameter [bounce_directory]: [" + spooler_task.params().var("bounce_directory") + "]");
-            if (!(new File(getBounceDirectory()).exists())) {
-                ;
-            }
             new File(getBounceDirectory()).mkdirs();
         } catch (Exception e) {
             try {
@@ -281,7 +278,7 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         SOSMailAttachment sosMailAttachment = null;
         for (; it.hasNext();) {
             sosMailAttachment = (SOSMailAttachment) it.next();
-            if (sosMailAttachment.getContentType().equalsIgnoreCase("message/rfc822")) {
+            if ("message/rfc822".equalsIgnoreCase(sosMailAttachment.getContentType())) {
                 SOSMimeMessage originalMessage = sosMimeMessage.getAttachedSosMimeMessage(receiver.getSession(), sosMailAttachment.getContent());
                 this.setXSOSMailDeliveryCounterHeader(getXSOSMailDeliveryCounterHeader(originalMessage));
                 this.getLogger().info("....originally message attributes:");
@@ -294,8 +291,9 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
                 }
                 this.updateTableMails(originalMessage.getMessageId());
                 if (!SOSString.isEmpty(getXSOSMailDeliveryCounterHeader())) {
-                    this.getLogger().info("...current " + JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER + " ["
-                            + this.getXSOSMailDeliveryCounterHeader() + "]");
+                    this.getLogger().info(
+                            "...current " + JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER + " [" + this.getXSOSMailDeliveryCounterHeader()
+                                    + "]");
                 }
                 bouncedMailAction = this.getPatternAction(sosMimeMessage);
                 this.getLogger().info("..available pattern action for this bounce [" + bouncedMailAction + "]");
@@ -316,8 +314,8 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
                             originalMessage.setHeader(JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER, "1");
                             getLogger().debug5(".. [" + JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER + "] set.");
                         }
-                        getLogger().debug5("..current value of \"" + JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER + "\" ["
-                                + currentHeaderValue + "]");
+                        getLogger().debug5(
+                                "..current value of \"" + JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER + "\" [" + currentHeaderValue + "]");
                         getLogger().debug5("..query directory [" + bounceDirectory + " ] set.");
                         originalMessage.setQueueDir(bounceDirectory);
                         originalMessage.dumpMessageToFile(true, false);
@@ -327,7 +325,7 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
                         }
                     }
                     bouncedMailStatus = BounceMailStatus.DELIVERED;
-                } else if (bouncedMailAction.equalsIgnoreCase("forward")) {
+                } else if ("forward".equalsIgnoreCase(bouncedMailAction)) {
                     forwardMessage(sosMimeMessage.getMessage(), receiver.getSession());
                     bouncedMailStatus = BounceMailStatus.DELIVERED;
                 }
@@ -461,9 +459,9 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         if (retryCounter > 0) {
             for (int i = 0; i < this.mailBouncePatternTableList.size(); i++) {
                 patternEntry = (HashMap) this.mailBouncePatternTableList.get(i);
-                if (patternEntry.get("pattern_id") != null && patternEntry.get("pattern_id").toString().equals(patternId) 
-                        && patternEntry.get("max_retries") != null) { 
-                    return (Integer.parseInt(patternEntry.get("max_retries").toString()) > retryCounter);
+                if (patternEntry.get("pattern_id") != null && patternEntry.get("pattern_id").toString().equals(patternId)
+                        && patternEntry.get("max_retries") != null) {
+                    return Integer.parseInt(patternEntry.get("max_retries").toString()) > retryCounter;
                 }
             }
         }

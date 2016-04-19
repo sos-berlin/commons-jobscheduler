@@ -12,8 +12,7 @@ import sos.spooler.Order;
 import sos.spooler.Variable_set;
 import sos.xml.SOSXMLXPath;
 
-/**
- * @author andreas pueschel */
+/** @author andreas pueschel */
 public class JobSchedulerSynchronizeJobChains_old extends Job_impl {
 
     private int setbackInterval = 600;
@@ -292,7 +291,7 @@ public class JobSchedulerSynchronizeJobChains_old extends Job_impl {
                         continue;
                     }
                     spooler_log.debug6("checking job chain: " + dependentJobChainPath + ", state [" + dependentNodeName + "]");
-                    if (setbackType.equalsIgnoreCase("setback")) {
+                    if ("setback".equalsIgnoreCase(setbackType)) {
                         String signalVariable = keyName + "_pass_through_next_order";
                         if (dependentJobChainPath.equals(currentJobChainPath) && dependentNodeName.equals(currentNodeName)) {
                             if (orders[1] - 1 > 0) {

@@ -48,7 +48,7 @@ public class ProcessBaseMonitor extends Monitor_impl {
     }
 
     public void initConfiguration(String configurationPath, String configurationFilename) throws Exception {
-        if (spooler_job.order_queue() != null && spooler_task.order().params().value("configuration_path") != null 
+        if (spooler_job.order_queue() != null && spooler_task.order().params().value("configuration_path") != null
                 && !spooler_task.order().params().value("configuration_path").isEmpty()) {
             this.setConfigurationPath(spooler_task.order().params().value("configuration_path"));
         }
@@ -185,9 +185,11 @@ public class ProcessBaseMonitor extends Monitor_impl {
                         NamedNodeMap nodeMap = node.getAttributes();
                         if (nodeMap != null && nodeMap.getNamedItem("name") != null) {
                             if (nodeMap.getNamedItem("value") != null) {
-                                this.getLogger().debug1(".. monitor: configuration parameter [" + nodeMap.getNamedItem("name").getNodeValue() + "]: "
-                                        + nodeMap.getNamedItem("value").getNodeValue());
-                                spooler_task.order().params().set_var(nodeMap.getNamedItem("name").getNodeValue(), nodeMap.getNamedItem("value").getNodeValue());
+                                this.getLogger().debug1(
+                                        ".. monitor: configuration parameter [" + nodeMap.getNamedItem("name").getNodeValue() + "]: "
+                                                + nodeMap.getNamedItem("value").getNodeValue());
+                                spooler_task.order().params()
+                                        .set_var(nodeMap.getNamedItem("name").getNodeValue(), nodeMap.getNamedItem("value").getNodeValue());
                                 this.orderParameterKeys.add(nodeMap.getNamedItem("name").getNodeValue());
                             } else {
                                 NodeList children = node.getChildNodes();
@@ -217,17 +219,17 @@ public class ProcessBaseMonitor extends Monitor_impl {
                         while (parameterValue.indexOf("${") != -1 && trials <= 1) {
                             this.getLogger().debug1("substitution trials: " + trials + " --> " + parameterValue);
                             for (int j = 0; j < parameterNames.length; j++) {
-                                this.getLogger().debug9("parameterNames[j]=" + parameterNames[j] + " -->"
-                                        + parameterValue.indexOf("${" + parameterNames[j] + "}"));
+                                this.getLogger().debug9(
+                                        "parameterNames[j]=" + parameterNames[j] + " -->" + parameterValue.indexOf("${" + parameterNames[j] + "}"));
                                 if (!parameterNames[i].equals(parameterNames[j])
                                         && (parameterValue.indexOf("${" + parameterNames[j] + "}") != -1 || parameterValue.indexOf("${basename:"
                                                 + parameterNames[j] + "}") != -1)) {
                                     if (parameterValue.indexOf("${basename:") != -1) {
-                                        parameterValue = myReplaceAll(parameterValue, "\\$\\{basename:" + parameterNames[j] + "\\}", 
-                                                new File(spooler_task.order().params().value(parameterNames[j])).getName().replaceAll("[\\\\]", "\\\\\\\\"));
+                                        parameterValue = myReplaceAll(parameterValue, "\\$\\{basename:" + parameterNames[j] + "\\}", new File(spooler_task
+                                                .order().params().value(parameterNames[j])).getName().replaceAll("[\\\\]", "\\\\\\\\"));
                                     } else {
-                                        parameterValue = myReplaceAll(parameterValue, "\\$\\{" + parameterNames[j] + "\\}", 
-                                                spooler_task.order().params().value(parameterNames[j]).replaceAll("[\\\\]", "\\\\\\\\"));
+                                        parameterValue = myReplaceAll(parameterValue, "\\$\\{" + parameterNames[j] + "\\}", spooler_task.order().params()
+                                                .value(parameterNames[j]).replaceAll("[\\\\]", "\\\\\\\\"));
                                     }
                                     parameterFound = true;
                                     trials = 0;
@@ -241,12 +243,12 @@ public class ProcessBaseMonitor extends Monitor_impl {
                                 Object envName = envIterator.next();
                                 Object envValue = this.envvars.get(envName.toString());
                                 if (parameterValue.indexOf("${" + envName.toString() + "}") != -1) {
-                                    parameterValue = myReplaceAll(parameterValue, "\\$\\{" + envName.toString() + "\\}", 
+                                    parameterValue = myReplaceAll(parameterValue, "\\$\\{" + envName.toString() + "\\}",
                                             envValue.toString().replaceAll("[\\\\]", "\\\\\\\\"));
                                     envFound = true;
                                 } else if (parameterValue.indexOf("${basename:" + envName.toString() + "}") != -1) {
-                                    parameterValue = myReplaceAll(parameterValue, "\\$\\{basename:" + envName.toString() + "\\}", 
-                                            new File(envValue.toString()).getName().replaceAll("[\\\\]", "\\\\\\\\"));
+                                    parameterValue = myReplaceAll(parameterValue, "\\$\\{basename:" + envName.toString() + "\\}", new File(envValue.toString())
+                                            .getName().replaceAll("[\\\\]", "\\\\\\\\"));
                                     envFound = true;
                                 }
                             }
@@ -313,8 +315,9 @@ public class ProcessBaseMonitor extends Monitor_impl {
             sosMail.setSOSLogger(this.getLogger());
             this.getLogger().info("sending mail: \n" + sosMail.dumpMessageAsString());
             if (!sosMail.send()) {
-                this.getLogger().warn("mail server is unavailable, mail for recipient [" + recipient + "] is queued in local directory ["
-                        + sosMail.getQueueDir() + "]:" + sosMail.getLastError());
+                this.getLogger().warn(
+                        "mail server is unavailable, mail for recipient [" + recipient + "] is queued in local directory [" + sosMail.getQueueDir() + "]:"
+                                + sosMail.getLastError());
             }
             sosMail.clearRecipients();
         } catch (Exception e) {

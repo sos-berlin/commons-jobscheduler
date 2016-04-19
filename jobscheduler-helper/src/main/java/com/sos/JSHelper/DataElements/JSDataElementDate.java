@@ -25,7 +25,7 @@ public class JSDataElementDate extends JSDataElement {
     public JSDataElementDate(final JSDataElement pelemDate, final JSDataElement pelemTime) {
         final String strD = pelemDate.Value();
         String strT = pelemTime.Value();
-        if (strT.trim().length() <= 0) {
+        if (strT.trim().isEmpty()) {
             strT = "000000";
         }
         super.Value(strD + strT);
@@ -112,7 +112,7 @@ public class JSDataElementDate extends JSDataElement {
     @Override
     public String FormattedValue() {
         String strFormat = super.FormatString();
-        if (strFormat.length() <= 0) {
+        if (strFormat.isEmpty()) {
             strFormat = JSDateFormat.dfDATE_N8.toPattern();
         }
         if (isNotEmpty(strFormat) && HasAValue()) {
@@ -139,11 +139,7 @@ public class JSDataElementDate extends JSDataElement {
     }
 
     public boolean isEmpty() {
-        if (super.Value().trim().length() <= 0 || "00000000".equals(super.Value().trim())) {
-            return true;
-        } else {
-            return false;
-        }
+        return super.Value().trim().isEmpty() || "00000000".equals(super.Value().trim());
     }
 
     @Override

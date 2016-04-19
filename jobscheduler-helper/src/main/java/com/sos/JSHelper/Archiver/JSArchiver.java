@@ -61,7 +61,8 @@ public class JSArchiver extends JSListenerClass {
         String strFName = null;
         String strFileName = null;
 
-        SignalInfo(String.format("%1$s: starting, file to archive: '%2$s', archive-folder: '%3$s'.", conMethodName, objOptions.FileName(), objOptions.ArchiveFolderName()));
+        SignalInfo(String.format("%1$s: starting, file to archive: '%2$s', archive-folder: '%3$s'.", conMethodName, objOptions.FileName(),
+                objOptions.ArchiveFolderName()));
 
         if (objOptions == null) {
             SignalAbort(String.format("%1$s: no Options specified. Archive aborted.", conMethodName));

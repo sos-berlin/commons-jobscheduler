@@ -23,7 +23,7 @@ public class JSObjJob extends Job {
     public static final String MonitorMethodNames = "spooler_task_before;spooler_task_after;spooler_process_before;spooler_process_after";
     public final static String fileNameExtension = ".job.xml";
     public final static String[] ValidLogLevels = new String[] { "info", "debug1", "debug2", "debug3", "debug4", "debug5", "debug6", "debug7", "debug8",
-        "debug9", "" };
+            "debug9", "" };
     JobSettings objSettings = null;
 
     public static enum enuVisibilityTypes {
@@ -606,7 +606,7 @@ public class JSObjJob extends Job {
     }
 
     public void setMonitorName(final String name) {
-        // TO DO 
+        // TO DO
     }
 
     public void setMailOnError(final String pstrValue, final String pstrDefaultValue) {

@@ -26,8 +26,10 @@ public class JobSchedulerLaunchAndObserveOptionsSuperClass extends JSOptionsClas
     private final String conClassName = "JobSchedulerLaunchAndObserveOptionsSuperClass";
     private static final Logger LOGGER = Logger.getLogger(JobSchedulerLaunchAndObserveOptionsSuperClass.class);
 
-    @JSOptionDefinition(name = "check_for_regexp", description = "Text pattern to search for in log file", key = "check_for_regexp", type = "SOSOptionRegExp", mandatory = false)
-    public SOSOptionRegExp check_for_regexp = new SOSOptionRegExp(this, conClassName + ".check_for_regexp", "Text pattern to search for in log file", "true", "true", false);
+    @JSOptionDefinition(name = "check_for_regexp", description = "Text pattern to search for in log file", key = "check_for_regexp", type = "SOSOptionRegExp",
+            mandatory = false)
+    public SOSOptionRegExp check_for_regexp = new SOSOptionRegExp(this, conClassName + ".check_for_regexp", "Text pattern to search for in log file", "true",
+            "true", false);
 
     public SOSOptionRegExp getcheck_for_regexp() {
         return check_for_regexp;
@@ -37,7 +39,8 @@ public class JobSchedulerLaunchAndObserveOptionsSuperClass extends JSOptionsClas
         this.check_for_regexp = p_check_for_regexp;
     }
 
-    @JSOptionDefinition(name = "check_inactivity", description = "Check job for inactivity", key = "check_inactivity", type = "SOSOptionBoolean", mandatory = false)
+    @JSOptionDefinition(name = "check_inactivity", description = "Check job for inactivity", key = "check_inactivity", type = "SOSOptionBoolean",
+            mandatory = false)
     public SOSOptionBoolean check_inactivity = new SOSOptionBoolean(this, conClassName + ".check_inactivity", "Check job for inactivity", "true", "true", false);
 
     public SOSOptionBoolean getcheck_inactivity() {
@@ -48,8 +51,10 @@ public class JobSchedulerLaunchAndObserveOptionsSuperClass extends JSOptionsClas
         this.check_inactivity = p_check_log_file;
     }
 
-    @JSOptionDefinition(name = "check_interval", description = "This parameter specifies the interval in seconds", key = "check_interval", type = "SOSOptionInteger", mandatory = false)
-    public SOSOptionInteger check_interval = new SOSOptionInteger(this, conClassName + ".check_interval", "This parameter specifies the interval in seconds", "60", "60", false);
+    @JSOptionDefinition(name = "check_interval", description = "This parameter specifies the interval in seconds", key = "check_interval",
+            type = "SOSOptionInteger", mandatory = false)
+    public SOSOptionInteger check_interval = new SOSOptionInteger(this, conClassName + ".check_interval", "This parameter specifies the interval in seconds",
+            "60", "60", false);
 
     public SOSOptionInteger getcheck_interval() {
         return check_interval;
@@ -92,8 +97,10 @@ public class JobSchedulerLaunchAndObserveOptionsSuperClass extends JSOptionsClas
         this.lifetime = p_lifetime;
     }
 
-    @JSOptionDefinition(name = "mail_on_nonactivity", description = "send eMail due to Inactivity", key = "mail_on_nonactivity", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean mail_on_nonactivity = new SOSOptionBoolean(this, conClassName + ".mail_on_nonactivity", "send eMail due to Inactivity", "true", "true", false);
+    @JSOptionDefinition(name = "mail_on_nonactivity", description = "send eMail due to Inactivity", key = "mail_on_nonactivity", type = "SOSOptionBoolean",
+            mandatory = false)
+    public SOSOptionBoolean mail_on_nonactivity = new SOSOptionBoolean(this, conClassName + ".mail_on_nonactivity", "send eMail due to Inactivity", "true",
+            "true", false);
 
     public SOSOptionBoolean getmail_on_nonactivity() {
         return mail_on_nonactivity;
@@ -103,8 +110,10 @@ public class JobSchedulerLaunchAndObserveOptionsSuperClass extends JSOptionsClas
         this.mail_on_nonactivity = p_mail_on_nonactivity;
     }
 
-    @JSOptionDefinition(name = "mail_on_restart", description = "send eMail with restart of job", key = "mail_on_restart", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean mail_on_restart = new SOSOptionBoolean(this, conClassName + ".mail_on_restart", "send eMail with restart of job", "true", "true", false);
+    @JSOptionDefinition(name = "mail_on_restart", description = "send eMail with restart of job", key = "mail_on_restart", type = "SOSOptionBoolean",
+            mandatory = false)
+    public SOSOptionBoolean mail_on_restart = new SOSOptionBoolean(this, conClassName + ".mail_on_restart", "send eMail with restart of job", "true", "true",
+            false);
 
     public SOSOptionBoolean getmail_on_restart() {
         return mail_on_restart;
@@ -114,8 +123,10 @@ public class JobSchedulerLaunchAndObserveOptionsSuperClass extends JSOptionsClas
         this.mail_on_restart = p_mail_on_restart;
     }
 
-    @JSOptionDefinition(name = "order_jobchain_name", description = "The name of the jobchain which belongs to the order The name of the jobch", key = "order_jobchain_name", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString order_jobchain_name = new SOSOptionString(this, conClassName + ".order_jobchain_name", "The name of the jobchain which belongs to the order The name of the jobch", " ", " ", false);
+    @JSOptionDefinition(name = "order_jobchain_name", description = "The name of the jobchain which belongs to the order The name of the jobch",
+            key = "order_jobchain_name", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString order_jobchain_name = new SOSOptionString(this, conClassName + ".order_jobchain_name",
+            "The name of the jobchain which belongs to the order The name of the jobch", " ", " ", false);
 
     public SOSOptionString getorder_jobchain_name() {
         return order_jobchain_name;
@@ -147,8 +158,10 @@ public class JobSchedulerLaunchAndObserveOptionsSuperClass extends JSOptionsClas
         this.restart = p_restart;
     }
 
-    @JSOptionDefinition(name = "scheduler_host", description = "This parameter specifies the host name or IP addre", key = "scheduler_host", type = "SOSOptionHostName", mandatory = false)
-    public SOSOptionHostName scheduler_host = new SOSOptionHostName(this, conClassName + ".scheduler_host", "This parameter specifies the host name or IP addre", "", "localhost", true);
+    @JSOptionDefinition(name = "scheduler_host", description = "This parameter specifies the host name or IP addre", key = "scheduler_host",
+            type = "SOSOptionHostName", mandatory = false)
+    public SOSOptionHostName scheduler_host = new SOSOptionHostName(this, conClassName + ".scheduler_host",
+            "This parameter specifies the host name or IP addre", "", "localhost", true);
 
     public SOSOptionHostName getscheduler_host() {
         return scheduler_host;
@@ -158,8 +171,10 @@ public class JobSchedulerLaunchAndObserveOptionsSuperClass extends JSOptionsClas
         this.scheduler_host = p_scheduler_host;
     }
 
-    @JSOptionDefinition(name = "scheduler_port", description = "The TCP-port for which a JobScheduler, see parameter sche", key = "scheduler_port", type = "SOSOptionPortNumber", mandatory = false)
-    public SOSOptionPortNumber scheduler_port = new SOSOptionPortNumber(this, conClassName + ".scheduler_port", "The TCP-port for which a JobScheduler, see parameter sche", "0", "4444", true);
+    @JSOptionDefinition(name = "scheduler_port", description = "The TCP-port for which a JobScheduler, see parameter sche", key = "scheduler_port",
+            type = "SOSOptionPortNumber", mandatory = false)
+    public SOSOptionPortNumber scheduler_port = new SOSOptionPortNumber(this, conClassName + ".scheduler_port",
+            "The TCP-port for which a JobScheduler, see parameter sche", "0", "4444", true);
 
     public SOSOptionPortNumber getscheduler_port() {
         return scheduler_port;

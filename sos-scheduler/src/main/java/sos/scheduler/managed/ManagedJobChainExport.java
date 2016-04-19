@@ -15,7 +15,7 @@ public class ManagedJobChainExport {
     private static SOSStandardLogger sosLogger = null;
 
     public static void main(String[] args) {
-        if (args.length == 0 || args[0].equals("-?") || args[0].equals("/?") || args[0].equals("-h")) {
+        if (args.length == 0 || "-?".equals(args[0]) || "/?".equals(args[0]) || "-h".equals(args[0])) {
             showUsage();
             System.exit(0);
         }
@@ -39,17 +39,17 @@ public class ManagedJobChainExport {
                 showUsage();
                 System.exit(0);
             }
-            if (packageName.length() > 0 && modelID.length() > 0) {
+            if (!packageName.isEmpty() && !modelID.isEmpty()) {
                 LOGGER.info("jobchain und package dürfen nicht zusammen angegeben werden.");
                 showUsage();
                 System.exit(0);
             }
-            if (packageName.length() == 0 && modelID.length() == 0) {
+            if (packageName.isEmpty() && modelID.isEmpty()) {
                 LOGGER.info("Entweder jobchain oder package muss angegeben werden.");
                 showUsage();
                 System.exit(0);
             }
-            if (logFile.length() > 0) {
+            if (!logFile.isEmpty()) {
                 sosLogger = new SOSStandardLogger(logFile, logLevel);
             } else {
                 sosLogger = new SOSStandardLogger(logLevel);
@@ -83,7 +83,7 @@ public class ManagedJobChainExport {
 
     private static void export(String xmlFile, String modelID, String packageName) throws Exception {
         String selManagedModel = "";
-        if (modelID.length() > 0) {
+        if (!modelID.isEmpty()) {
             if (modelID.indexOf("+") > 0) {
                 String models = "('" + modelID.replaceAll("\\+", "','") + "')";
                 selManagedModel = "SELECT * FROM " + JobSchedulerManagedObject.getTableManagedModels() + " WHERE \"NAME\" IN " + models;
@@ -91,7 +91,7 @@ public class ManagedJobChainExport {
                 selManagedModel = "SELECT * FROM " + JobSchedulerManagedObject.getTableManagedModels() + " WHERE \"NAME\"='" + modelID + "'";
             }
         }
-        if (packageName.length() > 0) {
+        if (!packageName.isEmpty()) {
             if (packageName.indexOf("+") > 0) {
                 String packages = "('" + packageName.replaceAll("\\+", "','") + "')";
                 selManagedModel = "SELECT * FROM " + JobSchedulerManagedObject.getTableManagedModels() + " WHERE \"PACKAGE\" IN " + packages;
@@ -106,7 +106,6 @@ public class ManagedJobChainExport {
         String selSettingsOrders = "SELECT * FROM " + JobSchedulerManagedObject.getTableSettings()
                 + " WHERE \"APPLICATION\" IN ('order_type/local/?', 'order_type/global/?', 'order_type/mixed/?')";
         String selOrders = "SELECT * FROM " + JobSchedulerManagedObject.getTableManagedOrders() + " WHERE \"JOB_CHAIN\"='?'";
-        // TODO: wofuer ist 3. Parameter?
         SOSExport export = new SOSExport(conn, xmlFile, "DOCUMENT", sosLogger);
         int model = export.query(JobSchedulerManagedObject.getTableManagedModels(), "ID", selManagedModel);
         int job = export.query(JobSchedulerManagedObject.getTableManagedJobs(), "ID", selManagedJobs, "ID", model);

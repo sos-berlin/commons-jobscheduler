@@ -19,14 +19,13 @@ public class ManagedJobImport extends SOSImport {
     private int workflow = -1;
     private boolean jobExists = false;
     private boolean modelExists = true;
-    private String modelId = "";
 
     public ManagedJobImport(SOSConnection conn, String file_name, String package_id, String package_element, String package_value, SOSStandardLogger log) {
         super(conn, file_name, package_id, package_element, package_value, log);
     }
 
     public static void main(String[] args) {
-        if (args.length == 0 || args[0].equals("-?") || args[0].equals("-h")) {
+        if (args.length == 0 || "-?".equals(args[0]) || "-h".equals(args[0])) {
             showUsage();
             System.exit(0);
         }
@@ -49,7 +48,7 @@ public class ManagedJobImport extends SOSImport {
                 showUsage();
                 System.exit(0);
             }
-            if (logFile.length() > 0) {
+            if (!logFile.isEmpty()) {
                 sosLogger = new SOSStandardLogger(logFile, logLevel);
             } else {
                 sosLogger = new SOSStandardLogger(logLevel);
@@ -113,7 +112,7 @@ public class ManagedJobImport extends SOSImport {
         }
         String test = conn.getSingleValue("SELECT \"ID\" FROM " + JobSchedulerManagedObject.getTableManagedJobs() + " WHERE \"MODEL\"=" + model
                 + " AND \"JOB_NAME\"='" + record.get("JOB_NAME").toString() + "'");
-        if (test != null && test.length() > 0) {
+        if (test != null && !test.isEmpty()) {
             jobExists = true;
         }
         String modelTest = conn.getSingleValue("SELECT \"ID\" FROM " + JobSchedulerManagedObject.getTableManagedModels() + " WHERE \"ID\"=" + model);

@@ -324,7 +324,7 @@ public class JobSchedulerSCPJob extends JobSchedulerSSHBaseJob {
                     this.setSshSession(null);
                 } catch (Exception ex) {
                     // gracefully ignore this error
-                } 
+                }
             }
         }
     }

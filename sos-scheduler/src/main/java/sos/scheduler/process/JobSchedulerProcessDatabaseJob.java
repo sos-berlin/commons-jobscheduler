@@ -151,7 +151,7 @@ public class JobSchedulerProcessDatabaseJob extends ProcessOrderJob {
             }
         } catch (Exception e) {
             // gracefully ignore errors from dbms output processing
-        } 
+        }
         if (exception != null) {
             throw new Exception(exception);
         }

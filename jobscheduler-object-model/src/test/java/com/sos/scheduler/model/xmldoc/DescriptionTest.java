@@ -304,7 +304,7 @@ public class DescriptionTest {
         Description description = (Description) unmarshaller.unmarshal(documentationFile);
         ArrayList<Object> resources = (ArrayList<Object>) description.getResources().getDatabaseAndMemoryAndSpace();
         Object o = resources.get(2);
-        if (o.getClass().getName().equals("com.sos.scheduler.model.xmldoc.Description$Resources$File")) {
+        if ("com.sos.scheduler.model.xmldoc.Description$Resources$File".equals(o.getClass().getName())) {
             Description.Resources.File f = (Description.Resources.File) o;
             str = f.getFile();
             assertEquals("SOSResource.File.file must be sos.util.jar", "sos.util.jar", str);
@@ -339,7 +339,7 @@ public class DescriptionTest {
         Description description = (Description) unmarshaller.unmarshal(documentationFile);
         ArrayList<Object> resources = (ArrayList<Object>) description.getResources().getDatabaseAndMemoryAndSpace();
         Object o = resources.get(1);
-        if (o.getClass().getName().equals("com.sos.scheduler.model.xmldoc.Description$Resources$File")) {
+        if ("com.sos.scheduler.model.xmldoc.Description$Resources$File".equals(o.getClass().getName())) {
             Description.Resources.File f = (Description.Resources.File) o;
             f.setFile("myFile");
         }
@@ -357,7 +357,7 @@ public class DescriptionTest {
         description = (Description) unmarshaller.unmarshal(output);
         ArrayList<Object> resources_reread = (ArrayList<Object>) description.getResources().getDatabaseAndMemoryAndSpace();
         o = resources_reread.get(3);
-        if (o.getClass().getName().equals("com.sos.scheduler.model.xmldoc.Description$Resources$File")) {
+        if ("com.sos.scheduler.model.xmldoc.Description$Resources$File".equals(o.getClass().getName())) {
             Description.Resources.File f = (Description.Resources.File) o;
             str = f.getFile();
             assertEquals("SOSResource.File.file must be myNewFile", "myNewFile", str);
@@ -391,7 +391,7 @@ public class DescriptionTest {
                 Note objNote = objParam.getNote().get(j);
                 objNote.content.size();
                 for (int k = 0; k < objNote.content.size(); k++) {
-                    if (objNote.getLanguage().equalsIgnoreCase("en")) {
+                    if ("en".equalsIgnoreCase(objNote.getLanguage())) {
                         Object objO = objNote.content.get(k);
                         if (objO instanceof org.apache.xerces.dom.ElementNSImpl) {
                             org.apache.xerces.dom.ElementNSImpl objElem = (org.apache.xerces.dom.ElementNSImpl) objO;
@@ -419,5 +419,5 @@ public class DescriptionTest {
     public void testGetDocumentation() {
         //
     }
-    
+
 }

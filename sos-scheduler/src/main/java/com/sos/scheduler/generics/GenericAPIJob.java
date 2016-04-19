@@ -42,5 +42,4 @@ public class GenericAPIJob extends JSJobUtilitiesClass<GenericAPIJobOptions> {
         // doInitialize
     }
 
-
 }

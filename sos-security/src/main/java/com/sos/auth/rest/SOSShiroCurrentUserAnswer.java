@@ -106,6 +106,7 @@ public class SOSShiroCurrentUserAnswer {
 
     @Override
     public String toString() {
-        return String.format("User: %s Role: %s hasRole: %s Permission: %s isPermitted: %s -- SessionId=%s", this.user, this.role, this.hasRole, this.permission, this.isPermittet, this.sessionId);
+        return String.format("User: %s Role: %s hasRole: %s Permission: %s isPermitted: %s -- SessionId=%s", this.user, this.role, this.hasRole,
+                this.permission, this.isPermittet, this.sessionId);
     }
 }

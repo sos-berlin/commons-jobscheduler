@@ -176,7 +176,7 @@ public class Message {
             _msg = new MimeMessage(get_session(), new ByteArrayInputStream(value));
             send2();
         } else if ("debug".equals(what)) {
-            get_session().setDebug(new String(value, "iso8859-1").equals("1"));
+            get_session().setDebug("1".equals(new String(value, "iso8859-1")));
         } else {
             throw new RuntimeException("sos.mail.Message.set: what");
         }

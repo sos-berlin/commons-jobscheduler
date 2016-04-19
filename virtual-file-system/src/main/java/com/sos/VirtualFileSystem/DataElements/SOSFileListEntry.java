@@ -981,7 +981,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     }
 
     private boolean skipTransfer() {
-        return eTransferStatus == enuTransferStatus.notOverwritten || eTransferStatus == enuTransferStatus.transfer_skipped 
+        return eTransferStatus == enuTransferStatus.notOverwritten || eTransferStatus == enuTransferStatus.transfer_skipped
                 || eTransferStatus == enuTransferStatus.ignoredDueToZerobyteConstraint;
     }
 

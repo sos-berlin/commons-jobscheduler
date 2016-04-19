@@ -400,8 +400,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                         }
                         String regex = regExPattern.replaceAll("\\%1\\$s", name);
                         strParamValue = Matcher.quoteReplacement(strParamValue);
-                       
-                        strTemp = strTemp.replaceAll("(?im)"+regex, strParamValue);
+
+                        strTemp = strTemp.replaceAll("(?im)" + regex, strParamValue);
 
                         if (!(strTemp.matches("(?s).*%[^%]+%.*") || strTemp.matches("(?s).*(\\$|§)\\{[^{]+\\}.*"))) {
                             break;
@@ -428,7 +428,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                         String strParamValue = params.get(name);
                         String regex = regExPattern.replaceAll("\\%1\\$s", name);
                         strParamValue = Matcher.quoteReplacement(strParamValue);
-                        strTemp = strTemp.replaceAll("(?im)"+regex, strParamValue);
+                        strTemp = strTemp.replaceAll("(?im)" + regex, strParamValue);
                         // End if no more variables in string for substitution
                         if (!(strTemp.matches("(?s).*%[^%]+%.*") || strTemp.matches("(?s).*(\\$|§)\\{[^{]+\\}.*"))) {
                             break;
@@ -488,7 +488,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         return result;
     }
 
-   
     public String StackTrace2String(final Exception e) {
         String strT = null;
         if (isNotNull(e)) {
