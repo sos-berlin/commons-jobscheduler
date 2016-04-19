@@ -25,11 +25,11 @@ public class JSJobUtilitiesClass<T> extends JSToolBox implements JSJobUtilities,
         objOptions = pobjO;
     }
 
-    public T Options() {
+    public T getOptions() {
         return objOptions;
     }
 
-    public T Options(final T pobjOptions) {
+    public T getOptions(final T pobjOptions) {
         objOptions = pobjOptions;
         return objOptions;
     }
