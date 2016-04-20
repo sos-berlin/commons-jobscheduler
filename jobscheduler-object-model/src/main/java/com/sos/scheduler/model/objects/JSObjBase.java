@@ -193,6 +193,11 @@ public class JSObjBase implements Comparable<JSObjBase> {
         }
         return compareRet;
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
 
     public void setObjectFieldsFrom(final JSObjBase origObj) {
         Field[] fields;
