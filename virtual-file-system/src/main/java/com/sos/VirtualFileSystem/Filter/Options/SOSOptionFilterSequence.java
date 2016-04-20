@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.sos.VirtualFileSystem.Filter.Options;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
@@ -10,24 +7,19 @@ import com.sos.JSHelper.Options.SOSOptionStringValueList;
 /** @author KB */
 public class SOSOptionFilterSequence extends SOSOptionStringValueList {
 
-    public enum enuFilterCodes {
-        dos2unix, //
-        unix2dos, //
-        searchreplace, //
-        excludeinclude, //
-        base64encode, //
-        base64decode, //
-        md5filter, //
-        records, //
-        nullfilter
-    };
-
-    private final enuFilterCodes objFC = null;
-
-    /**
-	 * 
-	 */
     private static final long serialVersionUID = -3306255818817394338L;
+
+    public enum enuFilterCodes {
+        dos2unix,
+        unix2dos,
+        searchreplace,
+        excludeinclude,
+        base64encode,
+        base64decode,
+        md5filter,
+        records,
+        nullfilter
+    }
 
     public SOSOptionFilterSequence(final String pstrValue) {
         super(null, "nullFilter", "description", "", false);
@@ -57,7 +49,6 @@ public class SOSOptionFilterSequence extends SOSOptionStringValueList {
                         break;
                     }
                 }
-
                 if (flgFound == false) {
                     String strM = String.format("Invalid Filter name found '%1$s'.", strSingleValue);
                     String strT = "\nValid Filter names are: ";
@@ -72,4 +63,5 @@ public class SOSOptionFilterSequence extends SOSOptionStringValueList {
             throw new JobSchedulerException("An empty Filter list is not supported");
         }
     }
+    
 }
