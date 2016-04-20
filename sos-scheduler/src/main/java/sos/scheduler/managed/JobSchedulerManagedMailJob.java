@@ -16,7 +16,6 @@ public class JobSchedulerManagedMailJob extends JobSchedulerManagedJob {
 
     @Override
     public boolean spooler_process() {
-        Order order = null;
         orderPayload = null;
         String orderId = "(none)";
         String host = spooler_log.mail().smtp();
@@ -127,7 +126,7 @@ public class JobSchedulerManagedMailJob extends JobSchedulerManagedJob {
                         securityProtocol = this.getParameters().value("security_protocol");
                     }
                     if (this.getParameters().value("queue_mail_on_error") != null && !this.getParameters().value("queue_mail_on_error").isEmpty()) {
-                        queueMailOnError = !this.getParameters().value("queue_mail_on_error").equalsIgnoreCase("false");
+                        queueMailOnError = !"false".equalsIgnoreCase(this.getParameters().value("queue_mail_on_error"));
                     }
                     if (this.getParameters().value("cleanup_attachment") != null
                             && !this.getParameters().value("cleanup_attachment").isEmpty()
@@ -208,7 +207,7 @@ public class JobSchedulerManagedMailJob extends JobSchedulerManagedJob {
                         sosMail.setFromName(fromName);
                     }
                     sosMail.setSecurityProtocol(securityProtocol);
-                    String recipientsTo[] = to.split(";|,");
+                    String[] recipientsTo = to.split(";|,");
                     for (int i = 0; i < recipientsTo.length; i++) {
                         if (i == 0) {
                             sosMail.setReplyTo(recipientsTo[i].trim());

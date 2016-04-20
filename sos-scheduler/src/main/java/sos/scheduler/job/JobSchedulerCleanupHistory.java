@@ -255,7 +255,7 @@ public class JobSchedulerCleanupHistory extends Job_impl {
             spooler_log.warn("an error occurred: " + e.toString());
             spooler_task.end();
         }
-        return (cleanupHistoryItemIndex < cleanupHistoryItemMax);
+        return cleanupHistoryItemIndex < cleanupHistoryItemMax;
     }
 
     public void spooler_exit() {
@@ -295,12 +295,12 @@ public class JobSchedulerCleanupHistory extends Job_impl {
                                 if (pos_type == -1) {
                                     pos_type = log_line.length();
                                 }
-                                String log_type = log_line.substring((pos_time + 2), (pos_time + 2 + pos_type - pos_time - 3));
+                                String log_type = log_line.substring(pos_time + 2, pos_time + 2 + pos_type - pos_time - 3);
                                 try {
                                     int log_level_value = Integer.parseInt(log_type.substring(log_type.length() - 1));
                                     line_ok = (log_level_value <= cleanupHistoryLogLevel);
                                 } catch (Exception e) {
-                                    line_ok = !(cleanupHistoryLogLevel == 0 && log_type.equalsIgnoreCase("debug"));
+                                    line_ok = !(cleanupHistoryLogLevel == 0 && "debug".equalsIgnoreCase(log_type));
                                 }
                             }
                         }
@@ -370,12 +370,12 @@ public class JobSchedulerCleanupHistory extends Job_impl {
                                 if (pos_type == -1) {
                                     pos_type = log_line.length();
                                 }
-                                String log_type = log_line.substring((pos_time + 2), (pos_time + 2 + pos_type - pos_time - 3));
+                                String log_type = log_line.substring(pos_time + 2, pos_time + 2 + pos_type - pos_time - 3);
                                 try {
                                     int log_level_value = Integer.parseInt(log_type.substring(log_type.length() - 1));
                                     line_ok = (log_level_value <= cleanupHistoryLogLevel);
                                 } catch (Exception e) {
-                                    line_ok = !(cleanupHistoryLogLevel == 0 && log_type.equalsIgnoreCase("debug"));
+                                    line_ok = !(cleanupHistoryLogLevel == 0 && "debug".equalsIgnoreCase(log_type));
                                 }
                             }
                         }
