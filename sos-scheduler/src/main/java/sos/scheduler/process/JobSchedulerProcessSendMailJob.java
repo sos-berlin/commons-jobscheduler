@@ -40,7 +40,6 @@ public class JobSchedulerProcessSendMailJob extends ProcessOrderJob {
                             && !spooler_task.params().value("configuration_path").isEmpty()) {
                         this.setConfigurationPath(spooler_task.params().value("configuration_path"));
                     }
-
                     if (order.params().value("configuration_file") != null && !order.params().value("configuration_file").isEmpty()) {
                         this.setConfigurationFilename(order.params().value("configuration_file"));
                     } else if (spooler_task.params().value("configuration_file") != null
@@ -110,12 +109,11 @@ public class JobSchedulerProcessSendMailJob extends ProcessOrderJob {
                     if (this.getParameters().value("attachment") != null && !this.getParameters().value("attachment").isEmpty()) {
                         attachments = this.getParameters().value("attachment").split(";");
                     }
-                    if (this.getParameters().value("cleanup_attachment") != null && !this.getParameters().value("cleanup_attachment").isEmpty()) {
-                        if ("1".equals(this.getParameters().value("cleanup_attachment"))
-                                || "true".equalsIgnoreCase(this.getParameters().value("cleanup_attachment"))
-                                || "yes".equalsIgnoreCase(this.getParameters().value("cleanup_attachment"))) {
-                            cleanupAttachment = true;
-                        }
+                    if (this.getParameters().value("cleanup_attachment") != null && !this.getParameters().value("cleanup_attachment").isEmpty()
+                            && ("1".equals(this.getParameters().value("cleanup_attachment"))
+                            || "true".equalsIgnoreCase(this.getParameters().value("cleanup_attachment"))
+                            || "yes".equalsIgnoreCase(this.getParameters().value("cleanup_attachment")))) {
+                        cleanupAttachment = true;
                     }
                 } catch (Exception e) {
                     throw new Exception("error occurred checking parameters: " + e.getMessage());

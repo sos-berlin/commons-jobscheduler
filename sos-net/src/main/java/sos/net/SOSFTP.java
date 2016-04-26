@@ -116,10 +116,8 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
             if (isNotHiddenFile(strCurrentFileName)) {
                 DoCD(strCurrentFileName);
                 if (isNegativeCommandCompletion()) {
-                    if (flgRecurseSubFolders && !strCurrentFileName.startsWith(strCurrentDirectoryName)) {
-                        if (!strCurrentDirectoryName.isEmpty()) {
-                            strCurrentFileName = strCurrentDirectoryName + "/" + strCurrentFileName;
-                        }
+                    if (flgRecurseSubFolders && !strCurrentFileName.startsWith(strCurrentDirectoryName) && !strCurrentDirectoryName.isEmpty()) {
+                        strCurrentFileName = strCurrentDirectoryName + "/" + strCurrentFileName;
                     }
                     strCurrentFileName = strCurrentFileName.replaceAll(conRegExpBackslash, "/");
                     vecListFileItems.add(strCurrentFileName);
@@ -176,26 +174,22 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
         int x = 0;
         try {
             x = cd(strFolderName);
-            String strReply = getReplyString();
         } catch (IOException e) {
         }
         return x;
     }
 
     private boolean LogReply() {
-        String strReply = getReplyString();
-        LOGGER.debug(strReply);
+        LOGGER.debug(getReplyString());
         return true;
     }
 
     private boolean isNegativeCommandCompletion() {
-        int x = getReplyCode();
-        return x > 300;
+        return getReplyCode() > 300;
     }
 
     private boolean isPositiveCommandCompletion() {
-        int x = getReplyCode();
-        return x <= 300;
+        return getReplyCode() <= 300;
     }
 
     public boolean isNotHiddenFile(final String strFileName) {

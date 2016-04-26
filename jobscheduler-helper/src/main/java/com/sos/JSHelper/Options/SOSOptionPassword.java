@@ -2,8 +2,6 @@ package com.sos.JSHelper.Options;
 
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
-
 import com.sos.JSHelper.System.SOSCommandline;
 
 /** @author KB */
@@ -25,16 +23,14 @@ public class SOSOptionPassword extends SOSOptionString {
         if (strValue != null) {
             try {
                 if (ExecuteCommandToGetPassword()) {
-                    if (strCachedPW.length() <= 0) {
+                    if (strCachedPW.isEmpty()) {
                         String command = strValue.substring(1, strValue.length() - 1);
                         Vector returnValues = new SOSCommandline().execute(command);
                         logger.debug(returnValues);
                         Integer exitValue = (Integer) returnValues.elementAt(0);
-                        if (exitValue.compareTo(new Integer(0)) == 0) {
-                            if (returnValues.elementAt(1) != null) {
-                                strReturnPassword = (String) returnValues.elementAt(1);
-                                strCachedPW = strReturnPassword;
-                            }
+                        if (exitValue.compareTo(new Integer(0)) == 0 && returnValues.elementAt(1) != null) {
+                            strReturnPassword = (String) returnValues.elementAt(1);
+                            strCachedPW = strReturnPassword;
                         }
                     } else {
                         strReturnPassword = strCachedPW;

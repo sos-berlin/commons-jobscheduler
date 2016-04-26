@@ -52,7 +52,7 @@ public class SOSCommandline {
                     resultString = "";
                 }
             }
-            if (resultString.trim().length() > 0) {
+            if (!resultString.trim().isEmpty()) {
                 resultVector.add(resultIndex++, resultString);
             }
             resultArguments = new String[resultIndex];
@@ -149,10 +149,8 @@ public class SOSCommandline {
                 LOGGER.debug("Trying to get password by executing command in backticks: " + command);
                 Vector returnValues = execute(command, LOGGER);
                 Integer exitValue = (Integer) returnValues.elementAt(0);
-                if (exitValue.compareTo(new Integer(0)) == 0) {
-                    if ((String) returnValues.elementAt(1) != null) {
-                        returnPassword = (String) returnValues.elementAt(1);
-                    }
+                if (exitValue.compareTo(new Integer(0)) == 0 && (String) returnValues.elementAt(1) != null) {
+                    returnPassword = (String) returnValues.elementAt(1);
                 }
             }
         } catch (Exception e) {

@@ -237,8 +237,6 @@ public class JSToolBox extends JSListenerClass {
 
     public String StripQuotes(final String pstrS) {
         String strR = pstrS;
-        // if (pstrS.substring(0, 1).equals("\"") &&
-        // pstrS.substring(pstrS.length() - 1).equals("\"")) {
         if (pstrS.startsWith("\"") && pstrS.endsWith("\"")) {
             strR = pstrS.substring(1, pstrS.length() - 1);
             strR = strR.replaceAll("\"\"", "\"");
@@ -259,7 +257,7 @@ public class JSToolBox extends JSListenerClass {
     }
 
     public boolean isNotEmpty(final String pstrValue) {
-        return pstrValue != null && pstrValue.trim().length() > 0;
+        return pstrValue != null && !pstrValue.trim().isEmpty();
     }
 
     public boolean isNotEmpty(final StringBuffer pstrS) {
@@ -360,11 +358,10 @@ public class JSToolBox extends JSListenerClass {
 
     public boolean String2Bool(final String pstrVal) {
         boolean flgT = false;
-        if (isNotEmpty(pstrVal)) {
-            if ("1".equals(pstrVal) || "y".equalsIgnoreCase(pstrVal) || "yes".equalsIgnoreCase(pstrVal) || "j".equalsIgnoreCase(pstrVal)
-                    || "on".equalsIgnoreCase(pstrVal) || "true".equalsIgnoreCase(pstrVal) || "wahr".equalsIgnoreCase(pstrVal)) {
-                flgT = true;
-            }
+        if (isNotEmpty(pstrVal)
+                && ("1".equals(pstrVal) || "y".equalsIgnoreCase(pstrVal) || "yes".equalsIgnoreCase(pstrVal) || "j".equalsIgnoreCase(pstrVal)
+                        || "on".equalsIgnoreCase(pstrVal) || "true".equalsIgnoreCase(pstrVal) || "wahr".equalsIgnoreCase(pstrVal))) {
+            flgT = true;
         }
         return flgT;
     }

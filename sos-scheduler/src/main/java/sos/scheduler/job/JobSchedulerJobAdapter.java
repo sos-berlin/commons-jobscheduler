@@ -94,13 +94,11 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     }
 
     protected void initializeLog4jAppenderClass() {
-        if (sosLogger == null) {
-            if (spooler_log != null) {
-                try {
-                    this.setLogger(new SOSSchedulerLogger(spooler_log));
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
-                }
+        if (sosLogger == null && spooler_log != null) {
+            try {
+                this.setLogger(new SOSSchedulerLogger(spooler_log));
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
             }
         }
         String strJobName = this.getJobName();
@@ -337,18 +335,16 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 
     @Deprecated
     public String replaceVars(final HashMap<String, String> params, final String name, String pstrReplaceIn) {
-        if (pstrReplaceIn != null) {
-            if (pstrReplaceIn.matches(".*%[^%]+%.*")) {
-                for (String param : params.keySet()) {
-                    String paramValue = params.get(param);
-                    if (isNotNull(paramValue)) {
-                        String paramPattern = "%" + Pattern.quote(param) + "%";
-                        paramValue = paramValue.replace('\\', '/');
-                        paramValue = Matcher.quoteReplacement(paramValue);
-                        pstrReplaceIn = pstrReplaceIn.replaceAll(paramPattern, paramValue);
-                    } else {
-                        JSJ_D_0032.toLog(param);
-                    }
+        if (pstrReplaceIn != null && pstrReplaceIn.matches(".*%[^%]+%.*")) {
+            for (String param : params.keySet()) {
+                String paramValue = params.get(param);
+                if (isNotNull(paramValue)) {
+                    String paramPattern = "%" + Pattern.quote(param) + "%";
+                    paramValue = paramValue.replace('\\', '/');
+                    paramValue = Matcher.quoteReplacement(paramValue);
+                    pstrReplaceIn = pstrReplaceIn.replaceAll(paramPattern, paramValue);
+                } else {
+                    JSJ_D_0032.toLog(param);
                 }
             }
         }
@@ -381,9 +377,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                         }
                         String regex = regExPattern.replaceAll("\\%1\\$s", name);
                         strParamValue = Matcher.quoteReplacement(strParamValue);
-
                         strTemp = strTemp.replaceAll("(?im)" + regex, strParamValue);
-
                         if (!(strTemp.matches("(?s).*%[^%]+%.*") || strTemp.matches("(?s).*(\\$|§)\\{[^{]+\\}.*"))) {
                             break;
                         }
@@ -526,8 +520,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 
     @Override
     public String executeXML(final String pstrJSXmlCommand) {
-        String strX = spooler.execute_xml(pstrJSXmlCommand);
-        return strX;
+        return spooler.execute_xml(pstrJSXmlCommand);
     }
 
     public boolean isOrderJob() {
@@ -546,10 +539,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         if (isNotNull(spooler_job)) {
             flgIsJobChain = isNotNull(spooler_job.order_queue());
         }
-        if (!flgIsJobChain) {
-            if (isNotNull(spooler_task)) {
-                flgIsJobChain = isNotNull(spooler_task.order());
-            }
+        if (!flgIsJobChain && isNotNull(spooler_task)) {
+            flgIsJobChain = isNotNull(spooler_task.order());
         }
         return flgIsJobChain;
     }
@@ -668,9 +659,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         final String conMethodName = "JobSchedulerJobAdapter::spooler_task_before";
         initializeLog4jAppenderClass();
         getJobOrOrderParameters();
-        boolean ret = continueWithProcessBefore;
-        logger.info(String.format("%1$s is running and returns %2$s", conMethodName, ret));
-        return ret;
+        logger.info(String.format("%1$s is running and returns %2$s", conMethodName, continueWithProcessBefore));
+        return continueWithProcessBefore;
     }
 
     @Override
@@ -686,9 +676,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         final String conMethodName = "JobSchedulerJobAdapter::spooler_process_before";
         initializeLog4jAppenderClass();
         getJobOrOrderParameters();
-        boolean ret = continueWithProcess;
-        logger.info(String.format("%1$s is running and returns %2$s", conMethodName, ret));
-        return ret;
+        logger.info(String.format("%1$s is running and returns %2$s", conMethodName, continueWithProcess));
+        return continueWithProcess;
     }
 
     @Override

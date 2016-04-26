@@ -33,7 +33,6 @@ import java.util.TreeMap;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.mail.Address;
-import javax.mail.BodyPart;
 import javax.mail.Header;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -460,12 +459,15 @@ public class SOSMail {
                     value = replacements.get(key.toString());
                     if (value != null) {
                         try {
-                            content = content.replaceAll("&\\#\\(" + key.toString() + "\\)",
-                                    SOSDate.getDateAsString(SOSDate.getDate(value.toString()), this.getDateFormat()));
-                            content = content.replaceAll("&\\#\\#\\(" + key.toString() + "\\)",
-                                    SOSDate.getDateTimeAsString(SOSDate.getDate(value.toString()), this.getDatetimeFormat()));
+                            content =
+                                    content.replaceAll("&\\#\\(" + key.toString() + "\\)", SOSDate.getDateAsString(SOSDate.getDate(value.toString()),
+                                            this.getDateFormat()));
+                            content =
+                                    content.replaceAll("&\\#\\#\\(" + key.toString() + "\\)", SOSDate.getDateTimeAsString(
+                                            SOSDate.getDate(value.toString()), this.getDatetimeFormat()));
                         } catch (Exception ex) {
-                            // ignore this error: replacement is not convertible to date
+                            // ignore this error: replacement is not convertible
+                            // to date
                         }
                         Locale defaultLocale = Locale.getDefault();
                         try {
@@ -747,8 +749,9 @@ public class SOSMail {
             }
         } catch (javax.mail.MessagingException e) {
             if (queueMailOnError) {
-                if (!queueDir.isEmpty() && e.getMessage().startsWith("Could not connect to SMTP host") || e.getMessage().startsWith("Unknown SMTP host")
-                        || e.getMessage().startsWith("Read timed out") || e.getMessage().startsWith("Exception reading response")) {
+                if (!queueDir.isEmpty() && e.getMessage().startsWith("Could not connect to SMTP host")
+                        || e.getMessage().startsWith("Unknown SMTP host") || e.getMessage().startsWith("Read timed out")
+                        || e.getMessage().startsWith("Exception reading response")) {
                     lastError = e.getMessage() + " ==> " + host + ":" + port + " " + user + "/********";
                     try {
                         dumpMessageToFile(true);
@@ -922,7 +925,6 @@ public class SOSMail {
             if (mm.isMimeType("multipart/*")) {
                 mmp = (MimeMultipart) mm.getContent();
                 for (int i = 1; i < mmp.getCount(); i++) {
-                    BodyPart part = mmp.getBodyPart(i);
                     mmp.removeBodyPart(i);
                     i--;
                 }
@@ -1638,11 +1640,9 @@ public class SOSMail {
             if (sosLogger != null) {
                 sosLogger.debug("sending mail: \n" + sosMail.dumpMessageAsString());
             }
-            if (!sosMail.send()) {
-                if (sosLogger != null) {
-                    sosLogger.warn("mail server is unavailable, mail for recipient [" + recipient + "] is queued in local directory [" + sosMail.getQueueDir()
-                            + "]:" + sosMail.getLastError());
-                }
+            if (!sosMail.send() && sosLogger != null) {
+                sosLogger.warn("mail server is unavailable, mail for recipient [" + recipient + "] is queued in local directory ["
+                        + sosMail.getQueueDir() + "]:" + sosMail.getLastError());
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);

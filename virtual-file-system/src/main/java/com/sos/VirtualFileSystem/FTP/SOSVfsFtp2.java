@@ -69,13 +69,10 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
     protected final FTPClient Client() {
         if (objFTPClient == null) {
             objFTPClient = new FTPClient();
-            FTPClientConfig conf = new FTPClientConfig();
             objProtocolCommandListener = new SOSFtpClientLogger(HostID(""));
-            if (objConnection2Options != null) {
-                if (objConnection2Options.ProtocolCommandListener.isTrue()) {
-                    objFTPClient.addProtocolCommandListener(objProtocolCommandListener);
-                    LOGGER.debug("ProtocolcommandListener added and activated");
-                }
+            if (objConnection2Options != null && objConnection2Options.ProtocolCommandListener.isTrue()) {
+                objFTPClient.addProtocolCommandListener(objProtocolCommandListener);
+                LOGGER.debug("ProtocolcommandListener added and activated");
             }
             String strAddFTPProtocol = System.getenv("AddFTPProtocol");
             if (strAddFTPProtocol != null && "true".equalsIgnoreCase(strAddFTPProtocol)) {

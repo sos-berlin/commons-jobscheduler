@@ -55,10 +55,8 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
                 throw new JobSchedulerException("can not create FTPS-Client", e);
             }
             objProtocolCommandListener = new SOSFtpClientLogger(HostID(""));
-            if (objConnection2Options != null) {
-                if (objConnection2Options.ProtocolCommandListener.isTrue()) {
-                    client.addProtocolCommandListener(objProtocolCommandListener);
-                }
+            if (objConnection2Options != null && objConnection2Options.ProtocolCommandListener.isTrue()) {
+                client.addProtocolCommandListener(objProtocolCommandListener);
             }
             String addFTPProtocol = System.getenv("AddFTPProtocol");
             if (addFTPProtocol != null && "true".equalsIgnoreCase(addFTPProtocol)) {

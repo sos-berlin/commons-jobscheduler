@@ -1038,10 +1038,8 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
         logger.debug(strbStderrOutput);
         int res = sshSession.waitForCondition(ChannelCondition.EOF, 30 * 1000);
         Integer intExitCode = sshSession.getExitStatus();
-        if (intExitCode != null) {
-            if (!intExitCode.equals(new Integer(0))) {
-                throw new JobSchedulerException(SOSVfs_E_164.params(intExitCode));
-            }
+        if (intExitCode != null && !intExitCode.equals(new Integer(0))) {
+            throw new JobSchedulerException(SOSVfs_E_164.params(intExitCode));
         }
         sshSession.close();
         sshSession = null;
@@ -1079,7 +1077,6 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
             String strPW = pobjAO.getPassword().Value();
             String strUserName = gstrUser;
             logger.debug(SOSVfs_D_132.params(strUserName));
-            String strAuthMethod = pobjAO.getAuth_method().Value();
             if (pobjAO.getAuth_method().isPublicKey()) {
                 logger.debug(SOSVfs_D_165.params("userid", "publickey"));
                 SOSOptionInFileName objAF = pobjAO.getAuth_file();

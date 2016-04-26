@@ -11,16 +11,11 @@ import com.sos.VirtualFileSystem.Filter.Options.SOSFilterOptions;
 public class SOSExcludeIncludeRecordsFilter extends SOSNullFilter {
 
     private final String conClassName = this.getClass().getSimpleName();
-    @SuppressWarnings("unused")
-    private static final String conSVNVersion = "$Id$";
     private final Logger logger = Logger.getLogger(this.getClass());
     private boolean flgIncludeRecord = false;
     private long lngRecordsIncluded = 0;
     private long lngRecordsExcluded = 0;
 
-    /**
-	 *
-	 */
     public SOSExcludeIncludeRecordsFilter() {
         super();
     }
@@ -32,40 +27,33 @@ public class SOSExcludeIncludeRecordsFilter extends SOSNullFilter {
 
     @Override
     protected void doProcess() {
-        @SuppressWarnings("unused")
-        final String conMethodName = conClassName + "::doProcess";
         if (bteBuffer == null) {
             return;
         }
         String strT = byte2String(bteBuffer);
         flgIncludeRecord = true;
-        if (objOptions.excludeEmptyLines.isDirty()) {
-            if (strT.trim().length() <= 0) {
-                flgIncludeRecord = false;
-            }
+        if (objOptions.excludeEmptyLines.isDirty() && strT.trim().isEmpty()) {
+            flgIncludeRecord = false;
         }
-        if (objOptions.excludeLines.IsNotEmpty()) {
-            if (flgIncludeRecord == true && objOptions.excludeLines.match(strT)) {
-                flgIncludeRecord = false;
-            }
+        if (objOptions.excludeLines.IsNotEmpty() && flgIncludeRecord && objOptions.excludeLines.match(strT)) {
+            flgIncludeRecord = false;
         }
-        if (objOptions.includeLines.IsNotEmpty()) {
-            if (flgIncludeRecord == true && objOptions.includeLines.match(strT) == false) {
-                flgIncludeRecord = false;
-            }
+        if (objOptions.includeLines.IsNotEmpty() && flgIncludeRecord && !objOptions.includeLines.match(strT)) {
+            flgIncludeRecord = false;
         }
-        if (flgIncludeRecord == true) {
+        if (flgIncludeRecord) {
             bteBuffer = strT.getBytes();
             lngRecordsIncluded++;
         } else {
             bteBuffer = null;
             lngRecordsExcluded++;
         }
-    } // private void doProcess
+    }
 
     @Override
     public void close() {
         objJSJobUtilities.setJSParam(conClassName + ".records_included", String.valueOf(lngRecordsIncluded));
         objJSJobUtilities.setJSParam(conClassName + ".records_excluded", String.valueOf(lngRecordsExcluded));
     }
+
 }

@@ -198,7 +198,7 @@ public class JSDataElement extends JSToolBox {
     }
 
     public String toXml(final String pstrTagName) {
-        if (OmittXMLTag() == true) {
+        if (OmittXMLTag()) {
             if (this instanceof JSDataElementDouble) {
                 final JSDataElementDouble objT = (JSDataElementDouble) this;
                 if (objT.dblValue == 0.0) {
@@ -211,12 +211,12 @@ public class JSDataElement extends JSToolBox {
                     return "";
                 }
             }
-            if (FormattedValue().length() <= 0) {
+            if (FormattedValue().isEmpty()) {
                 return "";
             }
         }
         String strT = "";
-        if (this.Value().length() > 0) {
+        if (!this.Value().isEmpty()) {
             strT = "<" + pstrTagName + ">";
             if (this.isCData()) {
                 strT += "<![CDATA[" + FormattedValue() + "]]>";
@@ -284,7 +284,7 @@ public class JSDataElement extends JSToolBox {
     }
 
     public boolean IsEmpty() {
-        return this.Value().trim().length() == 0;
+        return this.Value().trim().isEmpty();
     }
 
     public boolean IsNotEmpty() {
@@ -292,7 +292,7 @@ public class JSDataElement extends JSToolBox {
     }
 
     public boolean hasValue() {
-        return this.Value().trim().length() > 0;
+        return !this.Value().trim().isEmpty();
     }
 
     public void TrimValue(final boolean pflgTrimValue) {
@@ -305,7 +305,7 @@ public class JSDataElement extends JSToolBox {
 
     public void BuildRecord(final StringBuffer pstrRecord) throws Exception {
         String strVal = this.Value();
-        if (strVal.length() > intSize || this.FormatString().length() > 0) {
+        if (strVal.length() > intSize || !this.FormatString().isEmpty()) {
             strVal = FormattedValue();
             if (strVal.length() > intSize && flgExceptionOnFieldTruncation) {
                 throw new Exception("Value truncated. max " + intSize + ", actual " + this.Value().length() + ". Description:" + this.Description()
@@ -338,13 +338,11 @@ public class JSDataElement extends JSToolBox {
     }
 
     public void checkFormatPattern() throws FormatPatternException {
-        if (isNotEmpty(strFormatPattern)) {
-            if (!flgAllowEmptyValue || !"".equals(this.Value().trim())) {
-                final Pattern objP = Pattern.compile(strFormatPattern);
-                final Matcher objM = objP.matcher(this.Value());
-                if (!objM.find()) {
-                    throw new FormatPatternException("the value '" + this.Value() + "' does not correspond with the pattern " + strFormatPattern);
-                }
+        if (isNotEmpty(strFormatPattern) && (!flgAllowEmptyValue || !"".equals(this.Value().trim()))) {
+            final Pattern objP = Pattern.compile(strFormatPattern);
+            final Matcher objM = objP.matcher(this.Value());
+            if (!objM.find()) {
+                throw new FormatPatternException("the value '" + this.Value() + "' does not correspond with the pattern " + strFormatPattern);
             }
         }
     }
@@ -379,4 +377,5 @@ public class JSDataElement extends JSToolBox {
     public int hashCode() {
         return super.hashCode();
     }
+
 }
