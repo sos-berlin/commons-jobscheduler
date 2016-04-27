@@ -61,26 +61,31 @@ public class JSXMLInstallationFile {
         entryLicencOptions.setValue(installation.getLicenceOptions());
         licences.getUserInput().getEntry().add(entryLicencOptions);
 
-        automatedInstallation.getComIzforgeIzpackPanelsUserInputPanelOrComIzforgeIzpackPanelsHTMLLicencePanelOrComIzforgeIzpackPanelsTargetPanel().add(licences);
+        automatedInstallation.getComIzforgeIzpackPanelsUserInputPanelOrComIzforgeIzpackPanelsHTMLLicencePanelOrComIzforgeIzpackPanelsTargetPanel()
+                .add(licences);
 
         ComIzforgeIzpackPanelsHTMLLicencePanel comIzforgeIzpackPanelsHTMLLicencePanelGpl = o.createComIzforgeIzpackPanelsHTMLLicencePanel();
         comIzforgeIzpackPanelsHTMLLicencePanelGpl.setId("gpl_licence");
-        automatedInstallation.getComIzforgeIzpackPanelsUserInputPanelOrComIzforgeIzpackPanelsHTMLLicencePanelOrComIzforgeIzpackPanelsTargetPanel().add(comIzforgeIzpackPanelsHTMLLicencePanelGpl);
+        automatedInstallation.getComIzforgeIzpackPanelsUserInputPanelOrComIzforgeIzpackPanelsHTMLLicencePanelOrComIzforgeIzpackPanelsTargetPanel().add(
+                comIzforgeIzpackPanelsHTMLLicencePanelGpl);
 
         ComIzforgeIzpackPanelsHTMLLicencePanel comIzforgeIzpackPanelsHTMLLicencePanelCommercial = o.createComIzforgeIzpackPanelsHTMLLicencePanel();
         comIzforgeIzpackPanelsHTMLLicencePanelGpl.setId("commercial_licence");
-        automatedInstallation.getComIzforgeIzpackPanelsUserInputPanelOrComIzforgeIzpackPanelsHTMLLicencePanelOrComIzforgeIzpackPanelsTargetPanel().add(comIzforgeIzpackPanelsHTMLLicencePanelCommercial);
+        automatedInstallation.getComIzforgeIzpackPanelsUserInputPanelOrComIzforgeIzpackPanelsHTMLLicencePanelOrComIzforgeIzpackPanelsTargetPanel().add(
+                comIzforgeIzpackPanelsHTMLLicencePanelCommercial);
 
         ComIzforgeIzpackPanelsTargetPanel comIzforgeIzpackPanelsTargetPanel = o.createComIzforgeIzpackPanelsTargetPanel();
         comIzforgeIzpackPanelsTargetPanel.setId("target");
 
         comIzforgeIzpackPanelsTargetPanel.setInstallpath(installation.getInstallPath());
-        automatedInstallation.getComIzforgeIzpackPanelsUserInputPanelOrComIzforgeIzpackPanelsHTMLLicencePanelOrComIzforgeIzpackPanelsTargetPanel().add(comIzforgeIzpackPanelsTargetPanel);
+        automatedInstallation.getComIzforgeIzpackPanelsUserInputPanelOrComIzforgeIzpackPanelsHTMLLicencePanelOrComIzforgeIzpackPanelsTargetPanel().add(
+                comIzforgeIzpackPanelsTargetPanel);
 
         ComIzforgeIzpackPanelsUserPathPanel comIzforgeIzpackPanelsUserPathPanel = o.createComIzforgeIzpackPanelsUserPathPanel();
         comIzforgeIzpackPanelsUserPathPanel.setId("userpath");
         comIzforgeIzpackPanelsUserPathPanel.setUserPathPanelElement(installation.getUserPathPanelElement());
-        automatedInstallation.getComIzforgeIzpackPanelsUserInputPanelOrComIzforgeIzpackPanelsHTMLLicencePanelOrComIzforgeIzpackPanelsTargetPanel().add(comIzforgeIzpackPanelsUserPathPanel);
+        automatedInstallation.getComIzforgeIzpackPanelsUserInputPanelOrComIzforgeIzpackPanelsHTMLLicencePanelOrComIzforgeIzpackPanelsTargetPanel().add(
+                comIzforgeIzpackPanelsUserPathPanel);
 
         ComIzforgeIzpackPanelsUserInputPanel network = o.createComIzforgeIzpackPanelsUserInputPanel();
         UserInput userInput_network = o.createUserInput();
@@ -110,15 +115,18 @@ public class JSXMLInstallationFile {
 
         ComIzforgeIzpackPanelsInstallPanel comIzforgeIzpackPanelsInstallPanel = o.createComIzforgeIzpackPanelsInstallPanel();
         comIzforgeIzpackPanelsInstallPanel.setId("install");
-        automatedInstallation.getComIzforgeIzpackPanelsUserInputPanelOrComIzforgeIzpackPanelsHTMLLicencePanelOrComIzforgeIzpackPanelsTargetPanel().add(comIzforgeIzpackPanelsInstallPanel);
+        automatedInstallation.getComIzforgeIzpackPanelsUserInputPanelOrComIzforgeIzpackPanelsHTMLLicencePanelOrComIzforgeIzpackPanelsTargetPanel().add(
+                comIzforgeIzpackPanelsInstallPanel);
 
         ComIzforgeIzpackPanelsProcessPanel comIzforgeIzpackPanelsProcessPanel = o.createComIzforgeIzpackPanelsProcessPanel();
         comIzforgeIzpackPanelsProcessPanel.setId("process");
-        automatedInstallation.getComIzforgeIzpackPanelsUserInputPanelOrComIzforgeIzpackPanelsHTMLLicencePanelOrComIzforgeIzpackPanelsTargetPanel().add(comIzforgeIzpackPanelsProcessPanel);
+        automatedInstallation.getComIzforgeIzpackPanelsUserInputPanelOrComIzforgeIzpackPanelsHTMLLicencePanelOrComIzforgeIzpackPanelsTargetPanel().add(
+                comIzforgeIzpackPanelsProcessPanel);
 
         ComIzforgeIzpackPanelsFinishPanel comIzforgeIzpackPanelsFinishPanel = o.createComIzforgeIzpackPanelsFinishPanel();
         comIzforgeIzpackPanelsFinishPanel.setId("finish");
-        automatedInstallation.getComIzforgeIzpackPanelsUserInputPanelOrComIzforgeIzpackPanelsHTMLLicencePanelOrComIzforgeIzpackPanelsTargetPanel().add(comIzforgeIzpackPanelsFinishPanel);
+        automatedInstallation.getComIzforgeIzpackPanelsUserInputPanelOrComIzforgeIzpackPanelsHTMLLicencePanelOrComIzforgeIzpackPanelsTargetPanel().add(
+                comIzforgeIzpackPanelsFinishPanel);
 
     }
 

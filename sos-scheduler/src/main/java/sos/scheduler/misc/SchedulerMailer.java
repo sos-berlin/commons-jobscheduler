@@ -312,7 +312,7 @@ public class SchedulerMailer {
             logger.debug1(".. mail parameter [" + paramName + "]: " + params.value(paramName));
         } catch (Exception e) {
             // No error handling
-        } 
+        }
 
     }
 

@@ -314,14 +314,14 @@ public class ManagedReporter {
             }
             if (getOrderPayload() != null && getOrderPayload().var("scheduler_order_report_send_if_no_result") != null
                     && !getOrderPayload().var("scheduler_order_report_send_if_no_result").isEmpty()) {
-                sendIfNoResult = ("1".equals(getOrderPayload().var("scheduler_order_report_send_if_no_result")) 
-                        || "true".equalsIgnoreCase(getOrderPayload().var("scheduler_order_report_send_if_no_result")));
+                sendIfNoResult = ("1".equals(getOrderPayload().var("scheduler_order_report_send_if_no_result")) || "true".equalsIgnoreCase(getOrderPayload()
+                        .var("scheduler_order_report_send_if_no_result")));
                 job.debugParamter(getOrderPayload(), "scheduler_order_report_send_if_no_result");
             }
             if (getOrderPayload() != null && getOrderPayload().var("scheduler_order_report_send_if_result") != null
                     && !getOrderPayload().var("scheduler_order_report_send_if_result").isEmpty()) {
-                sendIfResult = ("1".equals(getOrderPayload().var("scheduler_order_report_send_if_result")) 
-                        || "true".equalsIgnoreCase(getOrderPayload().var("scheduler_order_report_send_if_result")));
+                sendIfResult = ("1".equals(getOrderPayload().var("scheduler_order_report_send_if_result")) || "true".equalsIgnoreCase(getOrderPayload().var(
+                        "scheduler_order_report_send_if_result")));
                 job.debugParamter(getOrderPayload(), "scheduler_order_report_send_if_result");
             }
             return attach;
@@ -345,8 +345,8 @@ public class ManagedReporter {
             }
             boolean asbody = false;
             if (getOrderPayload() != null && getOrderPayload().var("scheduler_order_report_asbody") != null) {
-                asbody = ("1".equals(getOrderPayload().var("scheduler_order_report_asbody")) 
-                        || "true".equalsIgnoreCase(getOrderPayload().var("scheduler_order_report_asbody")));
+                asbody = ("1".equals(getOrderPayload().var("scheduler_order_report_asbody")) || "true".equalsIgnoreCase(getOrderPayload().var(
+                        "scheduler_order_report_asbody")));
                 job.debugParamter(getOrderPayload(), "scheduler_order_report_asbody");
             }
             if (files != null) {

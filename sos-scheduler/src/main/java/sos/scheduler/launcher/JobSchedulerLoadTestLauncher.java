@@ -299,7 +299,8 @@ public class JobSchedulerLoadTestLauncher {
                 sosLogger.debug3("..parameter[scheduler_launcher_start_increment] = " + schedulerLauncherStartIncrement);
                 if (sosString.parseToString(allParam, "scheduler_launcher_start_increment").trim().startsWith("+")
                         || sosString.parseToString(allParam, "scheduler_launcher_start_increment").trim().startsWith("*")) {
-                    schedulerLauncherStartIncrement = Integer.parseInt(sosString.parseToString(allParam, "scheduler_launcher_start_increment").trim().substring(1));
+                    schedulerLauncherStartIncrement = Integer.parseInt(sosString.parseToString(allParam, "scheduler_launcher_start_increment").trim()
+                            .substring(1));
                     schedulerLauncherStartIncrementFactor = sosString.parseToString(allParam, "scheduler_launcher_start_increment").trim().substring(0, 1);
                 } else {
                     schedulerLauncherStartIncrement = Integer.parseInt(sosString.parseToString(allParam, "scheduler_launcher_start_increment"));

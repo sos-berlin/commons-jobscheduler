@@ -105,8 +105,9 @@ public class JobSchedulerManagedDBReportJob extends JobSchedulerManagedDatabaseJ
             reporter.report();
         } catch (Exception e) {
             Order order = spooler_task.order();
-            getLogger().warn("An error occured creating database report"
-                    + (order != null ? "  [Job Chain: " + order.job_chain().name() + ", Order:" + order.id() + "]" : "") + ": " + e);
+            getLogger().warn(
+                    "An error occured creating database report"
+                            + (order != null ? "  [Job Chain: " + order.job_chain().name() + ", Order:" + order.id() + "]" : "") + ": " + e);
             spooler_task.end();
         }
     }

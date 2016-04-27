@@ -183,7 +183,8 @@ public class JobSchedulerSubmitEventJob extends JobSchedulerJobAdapter {
         try {
             String strA[] = eventId.split(";");
             for (String strEventID : strA) {
-                String addOrder = createAddOrder(eventClass, strEventID, jobChain, orderId, jobName, schedulerHost, schedulerTCPPort, action, expires, exitCode, eventParameters, supervisorJobChain);
+                String addOrder = createAddOrder(eventClass, strEventID, jobChain, orderId, jobName, schedulerHost, schedulerTCPPort, action, expires,
+                        exitCode, eventParameters, supervisorJobChain);
                 submitToEventService(addOrder, spooler_log, spooler, eventHandlerHost, eventHandlerTCPPort);
             }
             // Check for del_events
@@ -193,7 +194,8 @@ public class JobSchedulerSubmitEventJob extends JobSchedulerJobAdapter {
                 action = ACTION_REMOVE;
                 expires = "";
                 for (String strEventID : strA) {
-                    String addOrder = createAddOrder(eventClass, strEventID, jobChain, orderId, jobName, schedulerHost, schedulerTCPPort, action, expires, exitCode, eventParameters, supervisorJobChain);
+                    String addOrder = createAddOrder(eventClass, strEventID, jobChain, orderId, jobName, schedulerHost, schedulerTCPPort, action, expires,
+                            exitCode, eventParameters, supervisorJobChain);
                     submitToEventService(addOrder, spooler_log, spooler, eventHandlerHost, eventHandlerTCPPort);
                 }
             }

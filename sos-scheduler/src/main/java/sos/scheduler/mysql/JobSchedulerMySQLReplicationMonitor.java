@@ -55,7 +55,8 @@ public class JobSchedulerMySQLReplicationMonitor extends Job_impl {
 
         try {
             if (!hasMasterSettingsFile) {
-                this.masterConnection = new SOSMySQLConnection(this.masterProperties.getProperty("driver"), this.masterProperties.getProperty("url"), this.masterProperties.getProperty("user"), this.masterProperties.getProperty("password"));
+                this.masterConnection = new SOSMySQLConnection(this.masterProperties.getProperty("driver"), this.masterProperties.getProperty("url"),
+                        this.masterProperties.getProperty("user"), this.masterProperties.getProperty("password"));
             } else {
                 this.masterConnection = SOSConnection.createInstance(connectionSettingsFilename, (SOSLogger) new SOSSchedulerLogger(spooler_log));
                 masterProperties.setProperty("url", this.masterConnection.getUrl());
@@ -111,7 +112,8 @@ public class JobSchedulerMySQLReplicationMonitor extends Job_impl {
         }
         try {
             if (!hasSlaveSettingsFile) {
-                slaveConnection = new SOSMySQLConnection(masterProperties.getProperty("driver"), slaveProperties.getProperty("url"), slaveProperties.getProperty("user"), slaveProperties.getProperty("password"));
+                slaveConnection = new SOSMySQLConnection(masterProperties.getProperty("driver"), slaveProperties.getProperty("url"),
+                        slaveProperties.getProperty("user"), slaveProperties.getProperty("password"));
             } else {
                 slaveConnection = SOSConnection.createInstance(connectionSettingsFilename, (SOSLogger) new SOSSchedulerLogger(spooler_log));
                 slaveProperties.setProperty("url", slaveConnection.getUrl());
@@ -208,7 +210,7 @@ public class JobSchedulerMySQLReplicationMonitor extends Job_impl {
             }
         } catch (Exception e) {
             // ignore this error
-        } 
+        }
         try {
             if (this.masterProperties.getProperty("delay_after_error") != null) {
                 String[] delays = this.masterProperties.getProperty("delay_after_error").toString().split(";");
@@ -228,7 +230,7 @@ public class JobSchedulerMySQLReplicationMonitor extends Job_impl {
             }
         } catch (Exception e) {
             // ignore this error
-        } 
+        }
     }
 
 }

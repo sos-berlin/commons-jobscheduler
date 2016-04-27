@@ -256,8 +256,9 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                         File newFile = null;
                         String jobChainName = "";
                         if ("order".equalsIgnoreCase(getLiveValue(rec, "type"))) {
-                            jobChainName = this.getConnection().getSingleValue("SELECT \"JOB_CHAIN\" FROM " + JobSchedulerManagedObject.getTableLiveOrders()
-                                    + " WHERE \"OBJECT_ID\"=" + getLiveValue(rec, "object_id"));
+                            jobChainName = this.getConnection().getSingleValue(
+                                    "SELECT \"JOB_CHAIN\" FROM " + JobSchedulerManagedObject.getTableLiveOrders() + " WHERE \"OBJECT_ID\"="
+                                            + getLiveValue(rec, "object_id"));
                             if (jobChainName != null && jobChainName.length() > 0) {
                                 currentFile = new File(liveFolder + "/" + getLiveValue(rec, "path"), jobChainName + "," + getLiveValue(rec, "name")
                                         + ".order.xml");
@@ -652,8 +653,9 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                 runtime = xpath.selectSingleNode(nodeQuery);
                 if (atNode == null && runtime == null) {
                     start = false;
-                    getLog().debug1("processActionAndStart:" + name
-                            + " once=yes. Order will not be modified because 'no at and no run_time' is specified by <add_order>");
+                    getLog().debug1(
+                            "processActionAndStart:" + name
+                                    + " once=yes. Order will not be modified because 'no at and no run_time' is specified by <add_order>");
                 }
             }
             nodeQuery = "//run_time[@repeat]";
@@ -996,8 +998,8 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                     name = name.replaceAll("\\..*\\.xml$", "");
                 }
                 String dbPath = "/" + spooler.id() + name;
-                treeID = this.getConnection().getSingleValue("SELECT \"ID\" FROM " + JobSchedulerManagedObject.tableManagedTree + " WHERE \"PATH\"='" + dbPath
-                        + "'");
+                treeID = this.getConnection().getSingleValue(
+                        "SELECT \"ID\" FROM " + JobSchedulerManagedObject.tableManagedTree + " WHERE \"PATH\"='" + dbPath + "'");
             }
             if ("".equals(treeID)) {
                 throw new Exception("element not found in tree: " + path);
@@ -1007,8 +1009,7 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
             getConnection().execute(sql);
             getConnection().commit();
             int nextSubmissionID = getConnectionSettings().getLockedSequence("scheduler", "counter", "scheduler_managed_submissions.id");
-            sql = "INSERT INTO "
-                    + JobSchedulerManagedObject.tableManagedSubmits
+            sql = "INSERT INTO " + JobSchedulerManagedObject.tableManagedSubmits
                     + " (\"ID\", \"OBJECT_ID\", \"TREE_ID\", \"PATH\", \"OLD_PATH\", \"SPOOLER_ID\", \"ACTION\", \"STATE\",  \"MODIFIED\", \"MODIFIED_BY\", "
                     + "\"HASH\") VALUES(" + nextSubmissionID + ", " + dbObject.get("id").toString() + ", " + treeID + ", '" + path + "', '" + path + "', '"
                     + spooler.id() + "', 'submit', 'stored', %now, 'Managed Starter 3', '" + hash + "')";
@@ -1088,8 +1089,8 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
             }
             parentID = (parent.get("tree_id") != null) ? parent.get("tree_id").toString() : "";
             if ("".equals(parentID)) {
-                parentID = this.getConnection().getSingleValue("SELECT \"ID\" FROM " + JobSchedulerManagedObject.tableManagedTree + " WHERE \"PATH\"='" + "/"
-                        + spooler.id() + parentPath + "'");
+                parentID = this.getConnection().getSingleValue(
+                        "SELECT \"ID\" FROM " + JobSchedulerManagedObject.tableManagedTree + " WHERE \"PATH\"='" + "/" + spooler.id() + parentPath + "'");
             }
             owner = (parent.get("owner") != null) ? parent.get("owner").toString() : "";
             group = (parent.get("group") != null) ? parent.get("group").toString() : "";
@@ -1115,16 +1116,14 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                 JobSchedulerLiveXml liveXml = new JobSchedulerLiveXml(this.getConnection(), this.getLogger(), confFile);
                 liveXml.store(path.substring(6));
             }
-            sql = "INSERT INTO "
-                    + JobSchedulerManagedObject.tableManagedTree
+            sql = "INSERT INTO " + JobSchedulerManagedObject.tableManagedTree
                     + " (\"ID\", \"PARENT\", \"LEAF\", \"TYPE\", \"ITEM_ID\", \"NAME\", \"OWNER\", \"GROUP\", \"PERMISSION\", \"CREATED\", \"CREATED_BY\", "
-                    + "\"MODIFIED\", \"MODIFIED_BY\", \"PATH\") VALUES(" + nextID + ", " + parentID + ", 1, '" + type + "', " + nextObjectID + ", '" + name 
+                    + "\"MODIFIED\", \"MODIFIED_BY\", \"PATH\") VALUES(" + nextID + ", " + parentID + ", 1, '" + type + "', " + nextObjectID + ", '" + name
                     + "', " + owner + ", " + group + ", " + permission + ", %now, 'Managed Starter 3', %now, 'Managed Starter 3', '" + dbPath + "')";
             getConnection().execute(sql);
             getConnection().commit();
             int nextSubmissionID = getConnectionSettings().getLockedSequence("scheduler", "counter", "scheduler_managed_submissions.id");
-            sql = "INSERT INTO "
-                    + JobSchedulerManagedObject.tableManagedSubmits
+            sql = "INSERT INTO " + JobSchedulerManagedObject.tableManagedSubmits
                     + " (\"ID\", \"OBJECT_ID\", \"TREE_ID\", \"PATH\", \"OLD_PATH\", \"SPOOLER_ID\", \"ACTION\", \"STATE\",  \"MODIFIED\", \"MODIFIED_BY\", "
                     + "\"HASH\") VALUES(" + nextSubmissionID + ", " + nextObjectID + ", " + nextID + ", '" + path + "', '" + path + "', '" + spooler.id()
                     + "', 'submit', 'stored', %now, 'Managed Starter 3', '" + fileHash + "')";
@@ -1201,8 +1200,8 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                 }
                 parentID = (parent.get("tree_id") != null) ? parent.get("tree_id").toString() : "";
                 if ("".equals(parentID)) {
-                    parentID = this.getConnection().getSingleValue("SELECT \"ID\" FROM " + JobSchedulerManagedObject.tableManagedTree + " WHERE \"PATH\"='"
-                            + "/" + spooler.id() + parentPath + "'");
+                    parentID = this.getConnection().getSingleValue(
+                            "SELECT \"ID\" FROM " + JobSchedulerManagedObject.tableManagedTree + " WHERE \"PATH\"='" + "/" + spooler.id() + parentPath + "'");
                 }
                 if ("".equals(parentID)) {
                     parentID = "0";
@@ -1304,8 +1303,8 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
         try {
             if (spooler_task.params().value("include_interface") != null
                     && ("yes".equalsIgnoreCase(spooler_task.params().value("include_interface"))
-                            || "true".equalsIgnoreCase(spooler_task.params().value("include_interface")) 
-                            || "1".equals(spooler_task.params().value("include_interface")))) {
+                            || "true".equalsIgnoreCase(spooler_task.params().value("include_interface")) || "1".equals(spooler_task.params().value(
+                            "include_interface")))) {
                 includeInterface = true;
             }
             if (spooler_job.order_queue() != null) {
@@ -1315,9 +1314,9 @@ public class JobSchedulerManagedStarter_3 extends JobSchedulerJob {
                 if (action == null) {
                     action = "";
                 }
-                if (orderParams.value("include_interface") != null && ("yes".equalsIgnoreCase(orderParams.value("include_interface")) 
-                        || "true".equalsIgnoreCase(orderParams.value("include_interface")) 
-                        || "1".equals(orderParams.value("include_interface")))) {
+                if (orderParams.value("include_interface") != null
+                        && ("yes".equalsIgnoreCase(orderParams.value("include_interface")) || "true".equalsIgnoreCase(orderParams.value("include_interface")) || "1"
+                                .equals(orderParams.value("include_interface")))) {
                     includeInterface = true;
                 }
                 if ("read_submits".equalsIgnoreCase(action)) {

@@ -189,8 +189,8 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
                 rc = ftpCommand.transfer();
                 createOrderParameter(ftpCommand);
                 if (parallelTransfer && isFilePath && spooler_job.order_queue() != null) {
-                    spooler.variables().set_var("ftp_check_receive_" + normalize(params.var("ftp_parent_order_id")) + "." 
-                            + normalize(spooler_task.order().id()), "1");
+                    spooler.variables().set_var(
+                            "ftp_check_receive_" + normalize(params.var("ftp_parent_order_id")) + "." + normalize(spooler_task.order().id()), "1");
                 }
                 processResult(rc, "");
                 spooler_job.set_state_text(ftpCommand.getState() != null ? ftpCommand.getState() : "");
@@ -198,8 +198,8 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
             } catch (Exception e) {
                 rc = false;
                 if (parallelTransfer && isFilePath && spooler_job.order_queue() != null) {
-                    spooler.variables().set_var("ftp_check_receive_" + normalize(normalize(params.var("ftp_parent_order_id"))) + "." 
-                            + normalize(spooler_task.order().id()), "2");
+                    spooler.variables().set_var(
+                            "ftp_check_receive_" + normalize(normalize(params.var("ftp_parent_order_id"))) + "." + normalize(spooler_task.order().id()), "2");
                 }
                 spooler_job.set_state_text("could not process file transfer: " + e);
                 throw (new Exception("could not process file transfer: " + e, e));

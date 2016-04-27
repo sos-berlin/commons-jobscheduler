@@ -92,9 +92,9 @@ public class JobSchedulerMonitorMessageJob extends Job_impl {
                                 if (item == null) {
                                     continue;
                                 }
-                                if (item.getNodeName().equals("severity") && item.getFirstChild() != null) {
+                                if ("severity".equals(item.getNodeName()) && item.getFirstChild() != null) {
                                     curSeverity = item.getFirstChild().getNodeValue();
-                                } else if (item.getNodeName().equals("content") && item.getFirstChild() != null) {
+                                } else if ("content".equals(item.getNodeName()) && item.getFirstChild() != null) {
                                     curContent = item.getFirstChild().getNodeValue();
                                 }
                             }
@@ -158,7 +158,7 @@ public class JobSchedulerMonitorMessageJob extends Job_impl {
                         checkPrevFile.close();
                     } catch (Exception ex) {
                         // gracefully ignore this error
-                    } 
+                    }
                 }
             }
             try {
@@ -428,8 +428,7 @@ public class JobSchedulerMonitorMessageJob extends Job_impl {
                     spooler_log.debug1(".. job parameter [type]: " + this.getMessageType());
                 }
                 if (spooler_task.params().var("persistent") != null && !spooler_task.params().var("persistent").isEmpty()) {
-                    if ("0".equals(spooler_task.params().var("persistent")) 
-                            || "false".equalsIgnoreCase(spooler_task.params().var("persistent"))
+                    if ("0".equals(spooler_task.params().var("persistent")) || "false".equalsIgnoreCase(spooler_task.params().var("persistent"))
                             || "no".equalsIgnoreCase(spooler_task.params().var("persistent"))) {
                         this.setMessagePersistent(false);
                         spooler_log.debug1(".. job parameter [persistent]: " + this.isMessagePersistent());
@@ -509,8 +508,7 @@ public class JobSchedulerMonitorMessageJob extends Job_impl {
                     if (order.web_service_operation_or_null() != null) {
                         SOSXMLXPath xpath = null;
                         Web_service_request request = order.web_service_operation().request();
-                        if (order.web_service().params().var("request_stylesheet") != null
-                                && !order.web_service().params().var("request_stylesheet").isEmpty()) {
+                        if (order.web_service().params().var("request_stylesheet") != null && !order.web_service().params().var("request_stylesheet").isEmpty()) {
                             Xslt_stylesheet stylesheet = spooler.create_xslt_stylesheet();
                             stylesheet.load_file(order.web_service().params().var("request_stylesheet"));
                             String xml_document = stylesheet.apply_xml(request.string_content());
@@ -603,10 +601,10 @@ public class JobSchedulerMonitorMessageJob extends Job_impl {
                             this.setMessageType(orderData.var("type").toString());
                             spooler_log.debug1(".. order parameter [type]: " + this.getMessageType());
                         }
-                        if (orderData.var("persistent") != null && !orderData.var("persistent").toString().isEmpty() 
-                                && ("0".equals(orderData.var("persistent")) 
-                                    || "false".equalsIgnoreCase(orderData.var("persistent"))
-                                    || "no".equalsIgnoreCase(orderData.var("persistent")))) {
+                        if (orderData.var("persistent") != null
+                                && !orderData.var("persistent").toString().isEmpty()
+                                && ("0".equals(orderData.var("persistent")) || "false".equalsIgnoreCase(orderData.var("persistent")) || "no"
+                                        .equalsIgnoreCase(orderData.var("persistent")))) {
                             this.setMessagePersistent(false);
                             spooler_log.debug1(".. order parameter [persistent]: " + this.isMessagePersistent());
                         }
@@ -705,15 +703,15 @@ public class JobSchedulerMonitorMessageJob extends Job_impl {
                                 xml_payload += "<message id='"
                                         + countMessages
                                         + "' severity='WARN'><![CDATA["
-                                        + this.normalizeItem(message.get("WARN").toString()).substring(0, message.get("WARN").toString().indexOf("[report_counter="))
-                                        + "]]></message>";
+                                        + this.normalizeItem(message.get("WARN").toString()).substring(0,
+                                                message.get("WARN").toString().indexOf("[report_counter=")) + "]]></message>";
                             } else if (message.get("ERROR") != null) {
                                 countErrors++;
                                 xml_payload += "<message id='"
                                         + countMessages
                                         + "' severity='ERROR'><![CDATA["
-                                        + this.normalizeItem(message.get("ERROR").toString()).substring(0, message.get("ERROR").toString().indexOf("[report_counter="))
-                                        + "]]></message>";
+                                        + this.normalizeItem(message.get("ERROR").toString()).substring(0,
+                                                message.get("ERROR").toString().indexOf("[report_counter=")) + "]]></message>";
                             } else if (message.get("info") != null) {
                                 countInfos++;
                                 xml_payload += "<message id='" + countMessages + "' severity='info'><![CDATA["
@@ -806,22 +804,22 @@ public class JobSchedulerMonitorMessageJob extends Job_impl {
                         }
                         if (!messageSet.isEmpty()) {
                             messageSet = "<messages>" + messageSet + "</messages>";
-                            spooler.set_var(this.getMonitorJob() + ".messages", messageSet.replaceAll("<", 
-                                    String.valueOf((char) 254)).replaceAll(">", String.valueOf((char) 255)));
+                            spooler.set_var(this.getMonitorJob() + ".messages",
+                                    messageSet.replaceAll("<", String.valueOf((char) 254)).replaceAll(">", String.valueOf((char) 255)));
                         }
                     }
                 }
             } catch (Exception e) {
                 throw new Exception("error occurred updating scheduler variables: " + e.getMessage());
             }
-            return (spooler_task.job().order_queue() != null);
+            return spooler_task.job().order_queue() != null;
         } catch (Exception e) {
             spooler_log.info("spooler_process(): " + e.getMessage());
             return false;
         }
     }
 
-   public int getVerbosity() {
+    public int getVerbosity() {
         return verbosity;
     }
 
@@ -904,8 +902,8 @@ public class JobSchedulerMonitorMessageJob extends Job_impl {
                     return "[Timestamp: " + sTimestamp + "]" + sosString.parseToString(h.get(logtype));
                 }
                 retVal = "[Timestamp: " + currStr.substring(startTS, endTS) + "] " + "[" + logtype + "] " + "[Job Chain:"
-                        + currStr.substring(startOrdername, endOrdername) + ", " +
-                        "Job: " + this.getCurrentJobname(currStr, true) + "] " + currStr.substring(currStr.indexOf(")") + 1, currStr.length());
+                        + currStr.substring(startOrdername, endOrdername) + ", " + "Job: " + this.getCurrentJobname(currStr, true) + "] "
+                        + currStr.substring(currStr.indexOf(")") + 1, currStr.length());
             } else {
                 sTimestamp = (sosString.parseToString(currStr).length() > 23 ? currStr.substring(0, 23) : "");
                 msg = (sosString.parseToString(currStr).indexOf("]") > -1 ? currStr.substring(currStr.indexOf("]") + 1) : sosString.parseToString(currStr));
@@ -1113,11 +1111,7 @@ public class JobSchedulerMonitorMessageJob extends Job_impl {
                 return true;
             } else {
                 String jobname = getCurrentJobname(logLine, false);
-                if (listOfMonitoringJobs.contains(jobname)) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return listOfMonitoringJobs.contains(jobname);
             }
         } catch (Exception e) {
             return true;
@@ -1130,11 +1124,7 @@ public class JobSchedulerMonitorMessageJob extends Job_impl {
                 return true;
             } else {
                 String ordername = getCurrentOrdername(logLine);
-                if (listOfMonitoringJobChains.contains(ordername)) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return listOfMonitoringJobChains.contains(ordername);
             }
         } catch (Exception e) {
             return true;

@@ -55,8 +55,9 @@ public class JobSchedulerSendMailJob extends JobSchedulerMailJob {
                     this.getConnection().rollback();
                 }
             } catch (Exception ex) {
-                // gracefully ignore this error to preserve the original exception
-            } 
+                // gracefully ignore this error to preserve the original
+                // exception
+            }
         }
     }
 
@@ -215,8 +216,9 @@ public class JobSchedulerSendMailJob extends JobSchedulerMailJob {
                     this.getConnection().rollback();
                 }
             } catch (Exception ex) {
-                // gracefully ignore this error to preserve the original exception
-            } 
+                // gracefully ignore this error to preserve the original
+                // exception
+            }
         }
     }
 

@@ -29,7 +29,8 @@ public class JobSchedulerRenameFile extends JobSchedulerFileOperationBase {
                 file = source;
             }
             CheckMandatoryFile();
-            intNoOfHitsInResultSet = SOSFileOperations.renameFileCnt(file, target, fileSpec, flags, isCaseInsensitive, replacing, replacement, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles, skipLastFiles, objSOSLogger);
+            intNoOfHitsInResultSet = SOSFileOperations.renameFileCnt(file, target, fileSpec, flags, isCaseInsensitive, replacing, replacement, minFileAge,
+                    maxFileAge, minFileSize, maxFileSize, skipFirstFiles, skipLastFiles, objSOSLogger);
             flgOperationWasSuccessful = intNoOfHitsInResultSet > 0;
             processResult(flgOperationWasSuccessful, source);
             return setReturnResult(flgOperationWasSuccessful);

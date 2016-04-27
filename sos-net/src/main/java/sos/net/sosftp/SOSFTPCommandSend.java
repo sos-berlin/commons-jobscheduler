@@ -10,8 +10,6 @@ import java.util.Properties;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
-import org.apache.commons.httpclient.methods.GetMethod;
-
 import sos.net.SOSFTP;
 import sos.net.SOSFTPCommand;
 import sos.util.SOSFile;
@@ -279,20 +277,18 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                 if (!zeroByteFiles) {
                     while (iterator.hasNext()) {
                         File checkFile = (File) iterator.next();
-                        if (checkFile.exists()) {
-                            if (checkFile.length() == 0) {
-                                this.getLogger().debug1("skipping transfer of local file: " + checkFile.getAbsolutePath() + " due to zero byte constraint");
-                                filelist.remove(checkFile);
-                                if (removeFiles) {
-                                    if (!checkFile.delete()) {
-                                        RaiseException("..error occurred, could not remove local file: " + checkFile.getAbsolutePath());
-                                    } else {
-                                        this.getLogger().debug1("removing file: " + checkFile.getAbsolutePath());
-                                    }
+                        if (checkFile.exists() && checkFile.length() == 0) {
+                            this.getLogger().debug1("skipping transfer of local file: " + checkFile.getAbsolutePath() + " due to zero byte constraint");
+                            filelist.remove(checkFile);
+                            if (removeFiles) {
+                                if (!checkFile.delete()) {
+                                    RaiseException("..error occurred, could not remove local file: " + checkFile.getAbsolutePath());
+                                } else {
+                                    this.getLogger().debug1("removing file: " + checkFile.getAbsolutePath());
                                 }
-                                zeroByteCount++;
-                                fileZeroByteNotificationBody += checkFile.getName() + "\n";
                             }
+                            zeroByteCount++;
+                            fileZeroByteNotificationBody += checkFile.getName() + "\n";
                         }
                     }
                 }
@@ -844,23 +840,21 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                 if (!localFile.exists()) {
                     RaiseException(".. file [" + localFile + "] does not exist ");
                 }
-                if (recursive && !isFilePath) {
-                    if (localFile.getParent() != null && localFile.getParentFile().isDirectory()) {
-                        subPath = fn.toString().substring(localDir.length());
-                        subParent = new File(subPath).getParentFile();
-                        if (subParent != null) {
-                            subPath = subPath.replaceAll(conRegExpBackslash, "/");
-                            subPath = subPath.substring(0, subPath.length() - new File(fn.toString()).getName().length() - 1);
-                            this.getLogger().debug4(".. creating sub-directory on remote host: " + subPath);
-                            String[] ftpFiles = ftpClient.listNames(remoteDir + "/" + subPath);
-                            if (ftpFiles == null || ftpFiles.length == 0) {
-                                boolean ok = ftpClient.mkdir(remoteDir + "/" + subPath, intPosixPermissions);
-                                if (!ok) {
-                                    RaiseException("..error occurred creating sub-directory [" + remoteDir + "/" + subPath + "]: " + ftpClient.getReplyString());
-                                } else {
-                                    this.getLogger().debug(
-                                            "..ftp server reply [mkdir sub-directory] [" + remoteDir + "/" + subPath + "]: " + ftpClient.getReplyString());
-                                }
+                if (recursive && !isFilePath && localFile.getParent() != null && localFile.getParentFile().isDirectory()) {
+                    subPath = fn.toString().substring(localDir.length());
+                    subParent = new File(subPath).getParentFile();
+                    if (subParent != null) {
+                        subPath = subPath.replaceAll(conRegExpBackslash, "/");
+                        subPath = subPath.substring(0, subPath.length() - new File(fn.toString()).getName().length() - 1);
+                        this.getLogger().debug4(".. creating sub-directory on remote host: " + subPath);
+                        String[] ftpFiles = ftpClient.listNames(remoteDir + "/" + subPath);
+                        if (ftpFiles == null || ftpFiles.length == 0) {
+                            boolean ok = ftpClient.mkdir(remoteDir + "/" + subPath, intPosixPermissions);
+                            if (!ok) {
+                                RaiseException("..error occurred creating sub-directory [" + remoteDir + "/" + subPath + "]: " + ftpClient.getReplyString());
+                            } else {
+                                this.getLogger().debug(
+                                        "..ftp server reply [mkdir sub-directory] [" + remoteDir + "/" + subPath + "]: " + ftpClient.getReplyString());
                             }
                         }
                     }
@@ -1021,12 +1015,10 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
         try {
             getLogger().debug1("calling " + sos.util.SOSClassUtil.getMethodName());
             setParam("xx_make_temp_directory_xx", "ok");
-            if (!getLogger().hasWarnings()) {
-                if (!sosString.parseToString(postCommands).isEmpty()) {
-                    this.setCommands(postCommands.split(getCommandDelimiter()));
-                    if (!execute()) {
-                        RaiseException("error occurred processing command:" + normalizedPassword(postCommands));
-                    }
+            if (!getLogger().hasWarnings() && !sosString.parseToString(postCommands).isEmpty()) {
+                this.setCommands(postCommands.split(getCommandDelimiter()));
+                if (!execute()) {
+                    RaiseException("error occurred processing command:" + normalizedPassword(postCommands));
                 }
             }
             String com = sosString.parseToString(arguments.get("jump_command")) + " -operation=remove_temp_directory -input=\"" + tempJumpRemoteDir + "\"";
@@ -1076,10 +1068,8 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
             for (String element : split) {
                 String strT = element;
                 if (strT != null && !strT.isEmpty()) {
-                    if (intLocalDirLen > 0 && !sosString.parseToString(localDir).equalsIgnoreCase(defaultLocalDir)) {
-                        if (isAPathName(strT) == false) {
-                            strT = strLocalDir + strT;
-                        }
+                    if (intLocalDirLen > 0 && !sosString.parseToString(localDir).equalsIgnoreCase(defaultLocalDir) && !isAPathName(strT)) {
+                        strT = strLocalDir + strT;
                     }
                     filelist1.add(strT);
                 }
@@ -1221,7 +1211,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
             if (!sosString.parseToString(arguments, "local_dir").isEmpty()) {
                 localDir1 = sosString.parseToString(arguments, "local_dir") + "/";
             }
-            if (sosString.parseToString(arguments, "operation").equals("install_doc")) {
+            if ("install_doc".equals(sosString.parseToString(arguments, "operation"))) {
                 filePath1 = installDocPaths.replaceAll("%\\{local_dir\\}/", localDir1);
             } else {
                 installpathsWithRevNr = installpathsWithRevNr.replaceAll("%\\{local_dir\\}/", localDir1);
@@ -1311,7 +1301,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
         if (transActional && !sosString.parseToString(transActionalRemoteFiles).isEmpty()) {
             if (flgJumpTransferDefined) {
                 String com = getCommands()[0];
-                String split[] = com.split(" -");
+                String[] split = com.split(" -");
                 String newarg = split[0];
                 Properties p = (Properties) arguments.clone();
                 for (int i = 1; i < split.length; i++) {
@@ -1378,7 +1368,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                 }
                 if (flgJumpTransferDefined) {
                     String com = getCommands()[0];
-                    String split[] = com.split(" -");
+                    String[] split = com.split(" -");
                     String newarg = split[0];
                     for (int i = 1; i < split.length; i++) {
                         if (split[i].indexOf("skip_transfer") == -1 && split[i].indexOf("replacement") == -1 && split[i].indexOf("file_path") == -1

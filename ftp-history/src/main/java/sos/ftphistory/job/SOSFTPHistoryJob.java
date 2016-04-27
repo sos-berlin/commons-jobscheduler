@@ -18,40 +18,18 @@ import com.sos.JSHelper.Exceptions.JSNotImplementedException;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.io.Files.JSCsvFile;
 
-// import sos.hostware.Record;
-
-/** @author robert.ehrlich@sos-berlin.com
- *
- *         This job is used to import sosftphistory records from a csv file or
- *         from a database or directly from orders */
+/** @author robert ehrlich */
 public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
 
-    /** file name samples: - default with field names : -in tab -csv -field-names
-     * -> separator=; delimiter=" - sample without field names: -in
-     * -type=(guid,mandator,transfer_timestamp:Datetime('yyyy-mm-dd HH:MM:SS
-     * '),pid,ppid,operation,localhost,localhost_ip,local_user,remote_host,remote_host_ip,remote_user,protocol,port,local_dir,remote_dir,local_filename,remote_filename,md5,status,last_error_message,log_filename,file_size,jump_host,jump_host_ip,jump_user,jump_protocol,jump_port
-     * ) tab -csv | - sample: -in tab -quote='x' -tab='y' -field-names ->
-     * separator=y delimiter=x - sample for ODBC: -in odbc
-     * -conn-str='DRIVER=Microsoft Access Driver (*.mdb);DBQ=c:\my_app\app.mdb'
-     * SELECT <FIELDS> FROM
-     * <TABLE>
-     * - sample for JDBC: -in jdbc -class=oracle.jdbc.driver.OracleDriver
-     * jdbc:oracle:thin:@localhost:1521:orcl -user=appman -password=appman
-     * SELECT <FIELDS> FROM
-     * <TABLE> */
-    @SuppressWarnings("unused")
-    private final String conClassName = "SOSFTPHistoryJob";
-    public final String conSVNVersion = "$Id: SOSDataExchangeEngine.java 19091 2013-02-08 12:49:32Z kb $";
-
+    private static final String OPERATION_SEND = "send";
+    private static final String OPERATION_RECEIVE = "receive";
+    private static final String PARAM_FILE_NAME = "scheduler_file_path";
+    private static final String NULL_VALUE = "n/a";
+    private static final String CREATED_BY = "sos";
+    private static final int POSITION_REPEAT_COUNT = 3;
+    private static final int POSITION_REPEAT_INTERVAL = 1;
     private String _filePath = "";
-    /** hostWare file name prefix for info file */
     private String _filePrefix = "-in tab -csv -field-names";
-    /** Anzahl Wiederholungen, um die File Position in der DB zu lesen */
-    /** kann als paramater "position_repeat_count" übergeben werden */
-    private final int _positionRepeatCount = 3;
-    /** Zeit (in Sekunden) zwischen der Wiederholundgen */
-    /** kann als paramater "position_repeat_interval" übergeben werden */
-    private final int _positionRepeatInterval = 1;
     private LinkedHashMap<String, String> _mappings = null;
     private LinkedHashMap<String, String> _recordExcludedParameterNames = null;
     private LinkedHashMap<String, String> _recordExtraParameterNames = null;
@@ -59,21 +37,6 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
     private int _recordSkippedErrorCount = 0;
     private int _recordFoundCount = 0;
     private boolean _exit = false;
-    /** zum Switchen source-target */
-    private final String _operationSend = "send";
-    /** zum Switchen source-target */
-    private final String _operationReceive = "receive";
-    /** wenn diese parameter gesetz - import file ausführen, sonst import order */
-    // private String _paramFileName = "sosftp_history_file";
-    private final String _paramFileName = "scheduler_file_path";
-    /** fehlende Werte bei den einigen Spalten
-     * (remote_host_ip,localhost_ip,local_filename
-     * ,remote_filename,file_size,md5) mit diesem Wert füllen */
-    private final String _nullValue = "n/a";
-    /** Status in der letzten import Zeil : success oder error */
-    private String _lastStatus = "";
-    private final String _errorStatus = "error";
-    private final String _createdBy = "sos";
 
     @Override
     public boolean spooler_process() {
@@ -83,14 +46,16 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
         try {
             init();
             parameters = spooler.create_variable_set();
-            if (spooler_task.params() != null)
+            if (spooler_task.params() != null) {
                 parameters.merge(spooler_task.params());
-            if (spooler_job.order_queue() != null)
+            }
+            if (spooler_job.order_queue() != null) {
                 parameters.merge(spooler_task.order().params());
+            }
             setConnection(SOSFTPHistory.getConnection(spooler, getConnection(), parameters, getLogger()));
             recordCount = this.doImport(parameters);
-            getLogger().info("records: imported = " + recordCount + " ( found = " + _recordFoundCount + " skipped = " + _recordSkippedCount
-                    + " skipped [error] = " + _recordSkippedErrorCount + " )");
+            getLogger().info("records: imported = " + recordCount + " ( found = " + _recordFoundCount + " skipped = " + _recordSkippedCount + " skipped [error] = "
+                            + _recordSkippedErrorCount + " )");
             return spooler_job.order_queue() != null ? rc : false;
         } catch (Exception e) {
             spooler_log.error("error occurred " + e.getMessage());
@@ -98,7 +63,6 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
         }
     }
 
-    /** @throws Exception */
     public void init() throws Exception {
         initRecordMappings();
         initRecordExcludedParameterNames();
@@ -109,14 +73,8 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
         _exit = false;
     }
 
-    /** Feldermapping
-     *
-     * Auflistung von Felder, die immer geliefert werden müssen - per UDP(als
-     * Auftragparameter) oder .CSV */
     private void initRecordMappings() {
         _mappings = new LinkedHashMap<String, String>();
-        // key -
-        // value - Order Parameter oder Spalte in der CSV Datei
         _mappings.put("mapping_operation", "operation");
         _mappings.put("mapping_mandator", "mandator");
         _mappings.put("mapping_source_host", "localhost");
@@ -147,13 +105,6 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
         _mappings.put("mapping_jump_port", "jump_port");
     }
 
-    /** bei SOSFTP ist es möglich "custom" Felder zu definieren, die bei UDP als
-     * Auftragsparameter mitgeschickt werden. Damit man diese Felder
-     * identifizieren kann, werden hier Parameter defininiert, die beim Auftrag
-     * dabei sind, aber keine "custom" Felder sind
-     *
-     * ? alternativ Metadaten der Tabelle lesen (Spalten) und mit den
-     * Auftragsparameter vergleichen */
     private void initRecordExcludedParameterNames() {
         _recordExcludedParameterNames = new LinkedHashMap<String, String>();
         _recordExcludedParameterNames.put("db_driver", "1");
@@ -166,21 +117,16 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
         _recordExcludedParameterNames.put("file_prefix", "1");
     }
 
-    /** Auftrag oder CSV Import
-     *
-     * @param parameters
-     * @return
-     * @throws Exception */
     public long doImport(final Variable_set parameters) throws Exception {
         long recordCount = 0;
         boolean isImportFile = false;
         try {
-            isImportFile = parameters.value(_paramFileName) != null && parameters.value(_paramFileName).length() > 0;
+            isImportFile = parameters.value(PARAM_FILE_NAME) != null && !parameters.value(PARAM_FILE_NAME).isEmpty();
             if (isImportFile) {
-                getLogger().debug1("parameter [" + _paramFileName + "] found. make import file");
+                getLogger().debug1("parameter [" + PARAM_FILE_NAME + "] found. make import file");
                 recordCount = importFile(parameters);
-            } else {// from order
-                getLogger().debug1("parameter [" + _paramFileName + "] not found. make import order");
+            } else {
+                getLogger().debug1("parameter [" + PARAM_FILE_NAME + "] not found. make import order");
                 _recordFoundCount++;
                 recordCount = importOrder(parameters);
             }
@@ -190,18 +136,12 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
         return recordCount;
     }
 
-    /** UDP Auftrag importieren
-     *
-     * @param parameters
-     * @return
-     * @throws Exception */
     public long importOrder(final Variable_set parameters) throws Exception {
         long recordCount = 0;
         LinkedHashMap<String, String> recordParameters = new LinkedHashMap<String, String>();
         LinkedHashMap<String, String> recordExtraParameters = new LinkedHashMap<String, String>();
         LinkedHashMap<String, String> allParameters = new LinkedHashMap<String, String>();
         String[] params_names = parameters.names().split(";");
-
         for (int i = 0; i < params_names.length; i++) {
             if (_mappings.containsValue(params_names[i])) {
                 recordParameters.put(params_names[i], parameters.value(params_names[i]));
@@ -212,7 +152,6 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
             }
             allParameters.put(params_names[i], parameters.value(params_names[i]));
         }
-
         if (recordParameters != null && _mappings != null && recordParameters.size() == _mappings.size()) {
             recordExtraParameters = checkRecordeCustomFields(recordExtraParameters);
             try {
@@ -241,7 +180,7 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
                 Entry<String, String> entry = it.next();
                 String mappings_val = entry.getValue();
                 if (!allParameters.containsKey(mappings_val)) {
-                    params += params.length() > 0 ? "," + mappings_val : mappings_val;
+                    params += !params.isEmpty() ? "," + mappings_val : mappings_val;
                 }
             }
             throw new JobSchedulerException(SOSClassUtil.getMethodName() + " : missing parameters for import order = " + params);
@@ -249,15 +188,9 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
         return recordCount;
     }
 
-    /** .CSV Datei importieren
-     *
-     * @param parameters
-     * @return
-     * @throws Exception */
     public long importFile(final Variable_set parameters) throws Exception {
         long recordCount = 0;
         String filePrefix = _filePrefix;
-        // sos.hostware.File hwFile = null;
         JSCsvFile hwFile = null;
         LinkedHashMap<String, String> hshRecordFields = null;
         LinkedHashMap<String, String> hshRecordExtraFields = null;
@@ -265,83 +198,70 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
         long position = 0;
         long fileSize = 0;
         boolean foundPosition = false;
-        int positionRepeatCount = _positionRepeatCount;
-        int positionRepeatInterval = _positionRepeatInterval;
+        int positionRepeatCount = POSITION_REPEAT_COUNT;
+        int positionRepeatInterval = POSITION_REPEAT_INTERVAL;
         long importFileSize = 0;
-        StringBuffer sql = null;
+        StringBuilder sql = null;
         try {
-            if (parameters.value("file_prefix") != null && parameters.value("file_prefix").length() > 0) {
+            if (parameters.value("file_prefix") != null && !parameters.value("file_prefix").isEmpty()) {
                 filePrefix = parameters.value("file_prefix");
             }
             if (filePrefix.toLowerCase().indexOf("-class=") != -1 || filePrefix.toLowerCase().indexOf("-conn-str=") > -1) {
-                // this.getLogger().info("importing entries from database query ["
-                // + filePrefix + "]");
-                // this.getLogger().debug("opening database source: " +
-                // filePrefix);
-                // hwFile.open(filePrefix);
                 throw new JSNotImplementedException("Database queries not supported anymore");
             } else {
-                // erwartet wird eine
-                // <filename>{sos[date:yyyyMMddHHmmssSSS]sos}.csv Datei
-                // siehe SOSFTPHistoryReceiveMonitor.spooler_process_before()
-                String fileName = parameters.value(_paramFileName);
-                if (fileName == null || fileName.length() == 0) {
-                    throw new JobSchedulerException("missing parameter \"" + _paramFileName + "\" for importFile");
+                String fileName = parameters.value(PARAM_FILE_NAME);
+                if (fileName == null || fileName.isEmpty()) {
+                    throw new JobSchedulerException("missing parameter \"" + PARAM_FILE_NAME + "\" for importFile");
                 }
                 hwFile = new JSCsvFile(fileName);
                 hwFile.CheckColumnCount(false);
-                if (!hwFile.exists())
+                if (!hwFile.exists()) {
                     throw new JobSchedulerException("file does not exist: " + hwFile.getAbsolutePath());
-                if (!hwFile.canRead())
+                }
+                if (!hwFile.canRead()) {
                     throw new JobSchedulerException("cannot access file: " + hwFile.getAbsolutePath());
-
+                }
                 this.getLogger().info("importing entries from file [" + hwFile.getAbsolutePath() + "]");
                 this.getLogger().debug("opening file source: " + filePrefix + hwFile.getAbsolutePath());
-                // hwFile.open(filePrefix.trim() + " " +
-                // hwFile.getAbsolutePath());
-                // <filename>{sos[date:yyyyMMddHHmmssSSS]sos}.csv
                 localFilename = hwFile.getName().toLowerCase();
                 importFileSize = hwFile.length();
                 this.getLogger().info("getting file position for  local filename = " + localFilename + " (current import file size = " + importFileSize + ")");
-                // Position wurde in der
-                // SOSFTPHistoryReceiveMonitor.fillPosition() inserted
-                sql = new StringBuffer("select \"POSITION\",\"FILE_SIZE\" from " + SOSFTPHistory.TABLE_FILES_POSITIONS + " ").append("where \"LOCAL_FILENAME\" = '"
-                        + SOSFTPHistory.getNormalizedField(getConnection(), localFilename, 255) + "'");
+                sql = new StringBuilder("select \"POSITION\",\"FILE_SIZE\" from ").append(SOSFTPHistory.TABLE_FILES_POSITIONS).append(" ")
+                        .append("where \"LOCAL_FILENAME\" = '").append(SOSFTPHistory.getNormalizedField(getConnection(), localFilename, 255)).append("'");
                 try {
-                    if (parameters.value("position_repeat_count") != null && parameters.value("position_repeat_count").length() > 0) {
+                    if (parameters.value("position_repeat_count") != null && !parameters.value("position_repeat_count").isEmpty()) {
                         positionRepeatCount = Integer.parseInt(parameters.value("position_repeat_count"));
                         if (positionRepeatCount <= 0) {
-                            positionRepeatCount = _positionRepeatCount;
+                            positionRepeatCount = POSITION_REPEAT_COUNT;
                         }
                     }
                 } catch (Exception e) {
-                    positionRepeatCount = _positionRepeatCount;
+                    positionRepeatCount = POSITION_REPEAT_COUNT;
                 }
                 try {
-                    if (parameters.value("position_repeat_interval") != null && parameters.value("position_repeat_interval").length() > 0) {
+                    if (parameters.value("position_repeat_interval") != null && !parameters.value("position_repeat_interval").isEmpty()) {
                         positionRepeatInterval = Integer.parseInt(parameters.value("position_repeat_interval"));
                         if (positionRepeatInterval <= 0) {
-                            positionRepeatInterval = _positionRepeatInterval;
+                            positionRepeatInterval = POSITION_REPEAT_INTERVAL;
                         }
                     }
                 } catch (Exception e) {
-                    positionRepeatInterval = _positionRepeatInterval;
+                    positionRepeatInterval = POSITION_REPEAT_INTERVAL;
                 }
                 for (int p = 0; p < positionRepeatCount; p++) {
                     HashMap<?, ?> recordPos = this.getConnection().getSingle(sql.toString());
-                    if (recordPos != null && recordPos.size() > 0) {
+                    if (recordPos != null && !recordPos.isEmpty()) {
                         fileSize = Long.parseLong(recordPos.get("file_size").toString());
                         if (importFileSize < fileSize) {
                             this.getLogger().debug1("last found file position in database: " + recordPos.get("position").toString()
-                                    + " (position will be not used : current import file size(" + importFileSize + ") < db file size(" + fileSize + ") )");
+                                + " (position will be not used : current import file size(" + importFileSize + ") < db file size(" + fileSize + ") )");
                         } else {
                             position = Long.parseLong(recordPos.get("position").toString());
                             this.getLogger().debug1("last found file position in database: " + position + " (position will be used)");
                         }
                         foundPosition = true;
                     } else {
-                        this.getLogger().debug1("not found file position for \"" + localFilename + "\" in database : try in " + positionRepeatInterval
-                                + "s again");
+                        this.getLogger().debug1("not found file position for \"" + localFilename + "\" in database : try in " + positionRepeatInterval + "s again");
                     }
                     if (foundPosition) {
                         break;
@@ -353,18 +273,14 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
                     this.getLogger().debug1("not found file position for \"" + localFilename + "\" in database : position will be skipped");
                 }
             }
-
             String[] strValues = null;
             hwFile.loadHeaders();
             String[] strHeader = hwFile.Headers();
-
             for (String header : strHeader) {
                 getLogger().debug1("Header-Field:" + header);
             }
-
             while ((strValues = hwFile.readCSVLine()) != null) {
                 _recordFoundCount++;
-                // position ?
                 if (position >= _recordFoundCount) {
                     _recordSkippedCount++;
                     continue;
@@ -396,8 +312,7 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
                     }
                 } catch (Exception e) {
                     _recordSkippedErrorCount++;
-                    getLogger().error("error occurred importing file line " + (_recordFoundCount + 1) + " (record " + _recordFoundCount + ") : "
-                            + e.getMessage());
+                    getLogger().error("error occurred importing file line " + (_recordFoundCount + 1) + " (record " + _recordFoundCount + ") : " + e.getMessage());
                     try {
                         getConnection().rollback();
                     } catch (Exception ex) {
@@ -408,12 +323,11 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
                 }
             }
             hwFile.close();
-            // wird auch upgedated, wenn aktuelle FileSize < als DB FileSize
             if (foundPosition && position < _recordFoundCount) {
                 try {
-                    sql = new StringBuffer("update " + SOSFTPHistory.TABLE_FILES_POSITIONS + " ").append("set \"FILE_SIZE\" = " + importFileSize + ", ").append("    \"POSITION\" = "
-                            + _recordFoundCount + " ").append("where \"LOCAL_FILENAME\" = '"
-                            + SOSFTPHistory.getNormalizedField(getConnection(), localFilename, 255) + "'");
+                    sql = new StringBuilder("update ").append(SOSFTPHistory.TABLE_FILES_POSITIONS).append(" ").append("set \"FILE_SIZE\" = ")
+                            .append(importFileSize).append(", ").append("    \"POSITION\" = ").append(_recordFoundCount).append(" ")
+                            .append("where \"LOCAL_FILENAME\" = '").append(SOSFTPHistory.getNormalizedField(getConnection(), localFilename, 255)).append("'");
                     getConnection().execute(sql.toString());
                     getConnection().commit();
                 } catch (Exception ee) {
@@ -427,22 +341,18 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
                 try {
                     hwFile.close();
                 } catch (Exception ex) {
-                } // ignore this error
+                    // ignore this error
+                }
         }
         return recordCount;
     }
 
-    /** Prüfen, ob "custom" Felder in der Datenbank vorhanden sind
-     *
-     * @param recordExtraParameters
-     * @return
-     * @throws Exception */
     public LinkedHashMap<String, String> checkRecordeCustomFields(final LinkedHashMap<String, String> recordExtraParameters) throws Exception {
         LinkedHashMap<String, String> paramsExtra = new LinkedHashMap<String, String>();
         if (_recordExtraParameterNames == null)
             _recordExtraParameterNames = new LinkedHashMap<String, String>();
         try {
-            if (recordExtraParameters != null && recordExtraParameters.size() > 0) {
+            if (recordExtraParameters != null && !recordExtraParameters.isEmpty()) {
                 Iterator<Entry<String, String>> it = recordExtraParameters.entrySet().iterator();
                 while (it.hasNext()) {
                     Entry<String, String> entry = it.next();
@@ -451,7 +361,7 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
                     try {
                         String checkedField = _recordExtraParameterNames.get(field);
                         if (checkedField != null) {
-                            if (checkedField.equals("1")) {
+                            if ("1".equals(checkedField)) {
                                 paramsExtra.put(field, val);
                             }
                         } else {
@@ -473,9 +383,6 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
         return paramsExtra;
     }
 
-    /** @param isOrder
-     * @param msg
-     * @throws Exception */
     private void doLineDebug(final boolean isOrder, final String msg) throws Exception {
         if (isOrder) {
             getLogger().debug2(msg);
@@ -484,24 +391,14 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
         }
     }
 
-    /** Ein Auftrag bzw eine Zeile der .CSV Datei importieren
-     *
-     * @param hstRecordFields
-     * @param phshRecordCustomFields
-     * @param isOrder
-     * @return
-     * @throws Exception */
     private boolean importLine(final LinkedHashMap<String, String> hstRecordFields, final LinkedHashMap<String, String> phshRecordCustomFields,
             final boolean isOrder) throws Exception {
-        StringBuffer sql = new StringBuffer();
-        try { // to import the order parameters
-              // Operation als 1te
+        StringBuilder sql = new StringBuilder();
+        try {
             String operation = getRecordValue(hstRecordFields, "mapping_operation");
             doLineDebug(isOrder, "record " + _recordFoundCount + ": operation = " + operation);
-            // status als 2te
             String status = getRecordValue(hstRecordFields, "mapping_status");
             doLineDebug(isOrder, "record " + _recordFoundCount + ": status = " + status);
-            _lastStatus = status.toLowerCase();
             String mandator = getRecordValue(hstRecordFields, "mapping_mandator");
             doLineDebug(isOrder, "record " + _recordFoundCount + ": mandator = " + mandator);
             String source_host = getRecordValue(hstRecordFields, "mapping_source_host", operation);
@@ -554,29 +451,19 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
             doLineDebug(isOrder, "record " + _recordFoundCount + ": jump_protocol = " + jump_protocol);
             String jump_port = getRecordValue(hstRecordFields, "mapping_jump_port");
             doLineDebug(isOrder, "record " + _recordFoundCount + ": jump_port = " + jump_port);
-
-            if (phshRecordCustomFields != null && phshRecordCustomFields.size() > 0) {
+            if (phshRecordCustomFields != null && !phshRecordCustomFields.isEmpty()) {
                 for (String key : phshRecordCustomFields.keySet()) {
                     String entry = phshRecordCustomFields.get(key);
                     doLineDebug(isOrder, "record " + _recordFoundCount + ": " + key.toLowerCase() + " = " + entry);
                 }
-                // Iterator<?> it =
-                // phshRecordCustomFields.entrySet().iterator();
-                // while (it.hasNext()) {
-                // Map.Entry entry = (Map.Entry) it.next();
-                // doLineDebug(isOrder, "record " + _recordFoundCount + ": " +
-                // entry.getKey().toString().toLowerCase() + " = " +
-                // entry.getValue());
-                // }
             }
-            sql.append("select \"ID\" ").append("from " + SOSFTPHistory.TABLE_FILES + " ").append("where \"MANDATOR\" = '" + mandator + "' and ").append("       \"SOURCE_HOST\" = '"
-                    + source_host + "' and ").append("       \"SOURCE_HOST_IP\" = '" + source_host_ip + "' and ").append("       \"SOURCE_DIR\" = '"
-                    + source_dir + "' and ").append("       \"SOURCE_FILENAME\" = '" + source_filename + "' and ").append("       \"SOURCE_USER\" = '"
-                    + source_user + "' and ").append("       \"MD5\" = '" + md5 + "'");
-
+            sql.append("select \"ID\" ").append("from ").append(SOSFTPHistory.TABLE_FILES).append(" ").append("where \"MANDATOR\" = '").append(mandator)
+                .append("' and ").append("       \"SOURCE_HOST\" = '").append(source_host).append("' and ").append("       \"SOURCE_HOST_IP\" = '")
+                .append(source_host_ip + "' and ").append("       \"SOURCE_DIR\" = '").append(source_dir).append("' and ").append("       \"SOURCE_FILENAME\" = '")
+                .append(source_filename).append("' and ").append("       \"SOURCE_USER\" = '").append(source_user).append("' and ").append("       \"MD5\" = '")
+                .append(md5).append("'");
             String files_id = getConnection().getSingleValue(sql.toString());
-
-            if (files_id == null || files_id.length() == 0 || files_id.equals("0")) {
+            if (files_id == null || files_id.isEmpty() || "0".equals(files_id)) {
                 Insert_cmd insert1 = new Insert_cmd(getConnection(), getLogger(), SOSFTPHistory.TABLE_FILES);
                 insert1.withQuote = true;
                 insert1.set("MANDATOR", mandator);
@@ -588,22 +475,20 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
                 insert1.set("MD5", md5);
                 insert1.set_num("FILE_SIZE", file_size);
                 insert1.set_direct("CREATED", "%now");
-                insert1.set("CREATED_BY", _createdBy);
+                insert1.set("CREATED_BY", CREATED_BY);
                 insert1.set_direct("MODIFIED", "%now");
-                insert1.set("MODIFIED_BY", _createdBy);
+                insert1.set("MODIFIED_BY", CREATED_BY);
                 getConnection().execute(insert1.make_cmd());
-
                 if (getConnection() instanceof SOSDB2Connection) {
                     files_id = getConnection().getSingleValue("values identity_val_local()");
                 } else {
                     files_id = getConnection().getLastSequenceValue(SOSFTPHistory.SEQ_TABLE_FILES);
                 }
-                if (files_id == null || files_id.length() == 0 || files_id.equals("0")) {
+                if (files_id == null || files_id.isEmpty() || "0".equals(files_id)) {
                     throw new JobSchedulerException("not found lastSequenceValue: SEQ [" + SOSFTPHistory.SEQ_TABLE_FILES + "] for table "
                             + SOSFTPHistory.TABLE_FILES);
                 }
             }
-
             Insert_cmd insert2 = new Insert_cmd(getConnection(), getLogger(), SOSFTPHistory.TABLE_FILES_HISTORY);
             insert2.withQuote = true;
             insert2.set("GUID", guid);
@@ -627,13 +512,12 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
             insert2.setNull("JUMP_USER", jump_user);
             insert2.setNull("JUMP_PROTOCOL", jump_protocol);
             insert2.set_numNull("JUMP_PORT", jump_port);
-
-            if (phshRecordCustomFields != null && phshRecordCustomFields.size() > 0) {
+            if (phshRecordCustomFields != null && !phshRecordCustomFields.isEmpty()) {
                 Iterator<Entry<String, String>> it = phshRecordCustomFields.entrySet().iterator();
                 while (it.hasNext()) {
                     Entry<String, String> entry = it.next();
                     String val = entry.getValue();
-                    if (val == null || val.length() == 0) {
+                    if (val == null || val.isEmpty()) {
                         val = "NULL";
                     } else {
                         val = SOSFTPHistory.getNormalizedField(getConnection(), val, 255);
@@ -641,29 +525,24 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
                     insert2.set(entry.getKey(), val);
                 }
             }
-
             String g = getConnection().getSingleValue("select \"GUID\" from " + SOSFTPHistory.TABLE_FILES_HISTORY + " where \"GUID\" = '" + guid + "'");
-            if (g == null || g.length() == 0 || isOrder) {
+            if (g == null || g.isEmpty() || isOrder) {
                 insert2.set_direct("MODIFIED", "%now");
-                insert2.set("MODIFIED_BY", _createdBy);
+                insert2.set("MODIFIED_BY", CREATED_BY);
                 insert2.set_direct("CREATED", "%now");
-                insert2.set("CREATED_BY", _createdBy);
+                insert2.set("CREATED_BY", CREATED_BY);
                 getConnection().execute(insert2.make_cmd());
                 return true;
             } else {
                 if (isOrder) {
                     Update_cmd update1 = new Update_cmd(getConnection(), getLogger(), SOSFTPHistory.TABLE_FILES_HISTORY);
                     update1.withQuote = true;
-
                     update1.set_where("GUID='" + guid + "'");
                     update1.copyFieldsFrom(insert2);
-
                     update1.set_direct("MODIFIED", "%now");
-                    update1.set("MODIFIED_BY", _createdBy);
+                    update1.set("MODIFIED_BY", CREATED_BY);
                     getConnection().execute(update1.make_cmd());
-
                 }
-                // bei order warning, bei file skip
             }
         } catch (Exception e) {
             throw new JobSchedulerException(SOSClassUtil.getMethodName() + " : " + e.getMessage());
@@ -671,26 +550,10 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
         return false;
     }
 
-    /** @param parameters
-     * @param mappingName
-     * @return
-     * @throws Exception */
     protected String getRecordValue(final HashMap<String, String> parameters, final String mappingName) throws Exception {
         return getRecordValue(parameters, mappingName, null);
     }
 
-    /** Prüfung ob bestimmte Felder leer, numerisch ... sind Der Wert wird an die
-     * Tabellenfeldlänge abgeschnitten(manuell definiert todo - Metadaten lesen)
-     *
-     * Folgende Felder dürfen leer sein:
-     *
-     * remote_host_ip localhost_ip local_filename, remote_filename file_size md5
-     *
-     * @param record
-     * @param mappingName
-     * @param operation
-     * @return
-     * @throws Exception */
     private String getRecordValue(final HashMap<String, String> record, final String mappingName, final String operation) throws Exception {
         int len = -1;
         String attr_name = _mappings.get(mappingName);
@@ -703,52 +566,51 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
             throw new JobSchedulerException("no found attr name \"" + attr_name + "\"");
         }
         attr_val = attr_val.trim();
-        if (mappingName.equals("mapping_operation")) {
+        if ("mapping_operation".equals(mappingName)) {
             len = 30;
             attr_val = attr_val.toLowerCase();
-        } else if (mappingName.equals("mapping_mandator")) {
+        } else if ("mapping_mandator".equals(mappingName)) {
             len = 30;
-            if (attr_val.length() == 0) {
+            if (attr_val.isEmpty()) {
                 attr_val = "sos";
             }
             attr_val = attr_val.toLowerCase();
-        } else if (mappingName.equals("mapping_source_host")) {
+        } else if ("mapping_source_host".equals(mappingName)) {
             len = 128;
-            if (operation != null && operation.equals(_operationReceive)) {
-                attr_val = getRecordValue(record, "mapping_target_host", _operationSend);
+            if (operation != null && OPERATION_RECEIVE.equals(operation)) {
+                attr_val = getRecordValue(record, "mapping_target_host", OPERATION_SEND);
             }
-        } else if (mappingName.equals("mapping_source_host_ip")) {
+        } else if ("mapping_source_host_ip".equals(mappingName)) {
             len = 30;
-            if (operation != null && operation.equals(_operationReceive)) {
-                attr_val = getRecordValue(record, "mapping_target_host_ip", _operationSend);
+            if (operation != null && OPERATION_RECEIVE.equals(operation)) {
+                attr_val = getRecordValue(record, "mapping_target_host_ip", OPERATION_SEND);
             }
-        } else if (mappingName.equals("mapping_source_user")) {
+        } else if ("mapping_source_user".equals(mappingName)) {
             len = 128;
-            if (operation != null && operation.equals(_operationReceive)) {
-                attr_val = getRecordValue(record, "mapping_target_user", _operationSend);
+            if (operation != null && OPERATION_RECEIVE.equals(operation)) {
+                attr_val = getRecordValue(record, "mapping_target_user", OPERATION_SEND);
             }
-        } else if (mappingName.equals("mapping_source_dir")) {
+        } else if ("mapping_source_dir".equals(mappingName)) {
             len = 255;
-            // is possibly empty for file path selection
-            if (operation != null && operation.equals(_operationReceive)) {
-                attr_val = getRecordValue(record, "mapping_target_dir", _operationSend);
+            if (operation != null && OPERATION_RECEIVE.equals(operation)) {
+                attr_val = getRecordValue(record, "mapping_target_dir", OPERATION_SEND);
             }
-        } else if (mappingName.equals("mapping_source_filename")) {
+        } else if ("mapping_source_filename".equals(mappingName)) {
             len = 255;
-            if (operation != null && operation.equals(_operationReceive)) {
-                attr_val = getRecordValue(record, "mapping_target_filename", _operationSend);
+            if (operation != null && OPERATION_RECEIVE.equals(operation)) {
+                attr_val = getRecordValue(record, "mapping_target_filename", OPERATION_SEND);
             }
-        } else if (mappingName.equals("mapping_guid")) {
+        } else if ("mapping_guid".equals(mappingName)) {
             len = 40;
-        } else if (mappingName.equals("mapping_transfer_timestamp")) {
+        } else if ("mapping_transfer_timestamp".equals(mappingName)) {
             try {
                 SOSDate.getDateTimeAsString(attr_val, "yyyy-MM-dd HH:mm:ss");
             } catch (Exception e) {
                 throw new JobSchedulerException("illegal value for parameter [" + attr_name + "] found [yyyy-MM-dd HH:mm:ss]: " + attr_val);
             }
-        } else if (mappingName.equals("mapping_file_size") || mappingName.equals("mapping_pid") || mappingName.equals("mapping_ppid")
-                || mappingName.equals("mapping_port") || mappingName.equals("mapping_jump_port")) {
-            if (attr_val.length() == 0) {
+        } else if ("mapping_file_size".equals(mappingName) || "mapping_pid".equals(mappingName) || "mapping_ppid".equals(mappingName)
+                || "mapping_port".equals(mappingName) || "mapping_jump_port".equals(mappingName)) {
+            if (attr_val.isEmpty()) {
                 attr_val = "0";
             } else {
                 try {
@@ -757,52 +619,52 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
                     throw new JobSchedulerException("illegal non-numeric value for parameter [" + attr_name + "]: " + attr_val);
                 }
             }
-        } else if (mappingName.equals("mapping_target_host")) {
+        } else if ("mapping_target_host".equals(mappingName)) {
             len = 128;
-            if (operation != null && operation.equals(_operationReceive)) {
-                attr_val = getRecordValue(record, "mapping_source_host", _operationSend);
+            if (operation != null && OPERATION_RECEIVE.equals(operation)) {
+                attr_val = getRecordValue(record, "mapping_source_host", OPERATION_SEND);
             }
-        } else if (mappingName.equals("mapping_target_host_ip")) {
+        } else if ("mapping_target_host_ip".equals(mappingName)) {
             len = 30;
-            if (operation != null && operation.equals(_operationReceive)) {
-                attr_val = getRecordValue(record, "mapping_source_host_ip", _operationSend);
+            if (operation != null && OPERATION_RECEIVE.equals(operation)) {
+                attr_val = getRecordValue(record, "mapping_source_host_ip", OPERATION_SEND);
             }
-        } else if (mappingName.equals("mapping_target_user")) {
+        } else if ("mapping_target_user".equals(mappingName)) {
             len = 128;
-            if (operation != null && operation.equals(_operationReceive)) {
-                attr_val = getRecordValue(record, "mapping_source_user", _operationSend);
+            if (operation != null && OPERATION_RECEIVE.equals(operation)) {
+                attr_val = getRecordValue(record, "mapping_source_user", OPERATION_SEND);
             }
-        } else if (mappingName.equals("mapping_target_dir")) {
+        } else if ("mapping_target_dir".equals(mappingName)) {
             len = 255;
-            if (operation != null && operation.equals(_operationReceive)) {
-                attr_val = getRecordValue(record, "mapping_source_dir", _operationSend);
+            if (operation != null && OPERATION_RECEIVE.equals(operation)) {
+                attr_val = getRecordValue(record, "mapping_source_dir", OPERATION_SEND);
             }
-        } else if (mappingName.equals("mapping_target_filename")) {
+        } else if ("mapping_target_filename".equals(mappingName)) {
             len = 255;
-            if (operation != null && operation.equals(_operationReceive)) {
-                attr_val = getRecordValue(record, "mapping_source_filename", _operationSend);
+            if (operation != null && OPERATION_RECEIVE.equals(operation)) {
+                attr_val = getRecordValue(record, "mapping_source_filename", OPERATION_SEND);
             }
-        } else if (mappingName.equals("mapping_protocol")) {
+        } else if ("mapping_protocol".equals(mappingName)) {
             len = 10;
-        } else if (mappingName.equals("mapping_md5")) {
+        } else if ("mapping_md5".equals(mappingName)) {
             len = 50;
-        } else if (mappingName.equals("mapping_status")) {
+        } else if ("mapping_status".equals(mappingName)) {
             len = 30;
-        } else if (mappingName.equals("mapping_last_error_message")) {
+        } else if ("mapping_last_error_message".equals(mappingName)) {
             len = 255;
-        } else if (mappingName.equals("mapping_log_filename")) {
+        } else if ("mapping_log_filename".equals(mappingName)) {
             len = 255;
-        } else if (mappingName.equals("mapping_jump_host")) {
+        } else if ("mapping_jump_host".equals(mappingName)) {
             len = 128;
-        } else if (mappingName.equals("mapping_jump_host_ip")) {
+        } else if ("mapping_jump_host_ip".equals(mappingName)) {
             len = 30;
-        } else if (mappingName.equals("mapping_jump_user")) {
+        } else if ("mapping_jump_user".equals(mappingName)) {
             len = 128;
-        } else if (mappingName.equals("mapping_jump_protocol")) {
+        } else if ("mapping_jump_protocol".equals(mappingName)) {
             len = 10;
         }
-        if (attr_val.length() == 0) {
-            attr_val = _nullValue;
+        if (attr_val.isEmpty()) {
+            attr_val = NULL_VALUE;
         }
         return len > 0 ? SOSFTPHistory.getNormalizedField(getConnection(), attr_val, len) : attr_val;
     }
@@ -830,4 +692,5 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
     public void setMappings(final LinkedHashMap<String, String> mappings) {
         _mappings = mappings;
     }
+    
 }

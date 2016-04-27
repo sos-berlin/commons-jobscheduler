@@ -175,7 +175,7 @@ public class SchedulerMessage {
     @Override
     public int hashCode() {
         return super.hashCode();
-    };
+    }
 
     private String normalizeLog(final String s) {
         String retVal = "";

@@ -77,7 +77,8 @@ public class ManagedJobExport {
         String dbProperty = props.getProperty("db").replaceAll("jdbc:", "-url=jdbc:");
         dbProperty = dbProperty.substring(dbProperty.indexOf('-'));
         SOSArguments dbArguments = new SOSArguments(dbProperty);
-        conn = SOSConnection.createInstance(props.getProperty("db_class"), dbArguments.as_string("-class=", ""), dbArguments.as_string("-url=", ""), dbArguments.as_string("-user=", ""), dbArguments.as_string("-password=", ""), sosLogger);
+        conn = SOSConnection.createInstance(props.getProperty("db_class"), dbArguments.as_string("-class=", ""), dbArguments.as_string("-url=", ""),
+                dbArguments.as_string("-user=", ""), dbArguments.as_string("-password=", ""), sosLogger);
         return conn;
     }
 

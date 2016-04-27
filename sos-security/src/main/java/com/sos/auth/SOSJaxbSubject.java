@@ -16,27 +16,24 @@ public class SOSJaxbSubject {
     }
 
     public boolean isPermitted(String permission) {
-
-        if (permission.equals("sos:products:jid:jobstart")) {
-            return (sosPermissionShiro != null && sosPermissionShiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionDashboard().getSOSPermission().contains(permission));
+        if ("sos:products:jid:jobstart".equals(permission)) {
+            return (sosPermissionShiro != null && sosPermissionShiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionDashboard().getSOSPermission()
+                    .contains(permission));
         }
         if (permission.startsWith("sos:products:jid:")) {
             return (sosPermissionShiro != null && sosPermissionShiro.getSOSPermissions().getSOSPermissionJid().getSOSPermission().contains(permission));
         }
-
         if (permission.startsWith("sos:products:joc:")) {
             return (sosPermissionShiro != null && sosPermissionShiro.getSOSPermissions().getSOSPermissionJoc().getSOSPermission().contains(permission));
         }
-
         if (permission.startsWith("sos:products:joe:")) {
             return (sosPermissionShiro != null && sosPermissionShiro.getSOSPermissions().getSOSPermissionJoe().getSOSPermission().contains(permission));
         }
-
         return false;
     }
 
     public boolean isAuthenticated() {
-        return (sosPermissionShiro != null && sosPermissionShiro.isAuthenticated() != null && sosPermissionShiro.isAuthenticated());
+        return sosPermissionShiro != null && sosPermissionShiro.isAuthenticated() != null && sosPermissionShiro.isAuthenticated();
     }
 
     public String getSessionId() {

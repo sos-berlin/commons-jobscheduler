@@ -246,5 +246,5 @@ public class SOSVfsFtpBaseClass2 extends SOSVfsFtpBaseClass implements ISOSVfsFi
         }
         return lngSize;
     }
-    
+
 }

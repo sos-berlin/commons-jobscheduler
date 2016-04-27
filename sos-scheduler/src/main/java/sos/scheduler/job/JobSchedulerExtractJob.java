@@ -407,7 +407,7 @@ public class JobSchedulerExtractJob extends JobSchedulerJob {
             }
             this.getLogger().info(
                     recordCount + " records found, " + errorRecordCount + " errors, " + successRecordCount + " records extracted from "
-                            + (this.getInputFileType().equals("file") ? inputFile.getAbsolutePath() : "database query"));
+                            + ("file".equals(this.getInputFileType()) ? inputFile.getAbsolutePath() : "database query"));
             return successRecordCount;
         } catch (Exception e) {
             throw new Exception("error occurred [record " + recordCount + ", field index " + fieldCount + "]: " + e.getMessage());
@@ -419,7 +419,7 @@ public class JobSchedulerExtractJob extends JobSchedulerJob {
                     }
                 } catch (Exception ex) {
                     // ignore this error
-                } 
+                }
             }
             if (outFile != null) {
                 try {

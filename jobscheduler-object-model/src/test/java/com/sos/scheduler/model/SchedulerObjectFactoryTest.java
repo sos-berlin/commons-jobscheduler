@@ -412,7 +412,8 @@ public class SchedulerObjectFactoryTest extends JSToolBox {
                                 objKiller.setImmediately("true");
                                 objKiller.setJob(strJobName);
                                 objKiller.run();
-                                LOGGER.info(String.format("Job '%1$s' killed due to missing heartbeats '%2$s'. Count is '%3$d', LastCount was '%4$s'", strJobName, strRegExp, intHeartBeatCount, intLastHeartBeatCount));
+                                LOGGER.info(String.format("Job '%1$s' killed due to missing heartbeats '%2$s'. Count is '%3$d', LastCount was '%4$s'",
+                                        strJobName, strRegExp, intHeartBeatCount, intLastHeartBeatCount));
                             }
                             intLastHeartBeatCount = intHeartBeatCount;
                         }
@@ -555,7 +556,8 @@ public class SchedulerObjectFactoryTest extends JSToolBox {
         XmlPayload pl = objSchedulerObjectFactory.createXmlPayload();
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
-        InputSource is = new InputSource(new StringReader("<Xml_payload><params><param name=\"p1\" value=\"V1\"/><param name=\"p2\" value=\"V2\"/></params></Xml_payload>"));
+        InputSource is = new InputSource(new StringReader(
+                "<Xml_payload><params><param name=\"p1\" value=\"V1\"/><param name=\"p2\" value=\"V2\"/></params></Xml_payload>"));
         Document d = builder.parse(is);
         System.out.println(d);
         pl.setAny(d.getDocumentElement());

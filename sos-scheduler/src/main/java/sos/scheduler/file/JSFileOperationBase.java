@@ -279,9 +279,10 @@ public class JSFileOperationBase extends JSToolBox implements JSJobUtilities {
      * @return true if file exists or false if not
      * @throws IOException
      * @throws Exception */
-    public boolean existsFile(final SOSOptionFileName objFile, final SOSOptionRegExp fileSpec1, final SOSOptionTime minFileAge1, final SOSOptionTime maxFileAge1,
-            final SOSOptionFileSize minFileSize1, final SOSOptionFileSize maxFileSize1, final SOSOptionInteger skipFirstFiles1, final SOSOptionInteger skipLastFiles1,
-            final int minNumOfFiles, final int maxNumOfFiles) throws IOException, Exception {
+    public boolean existsFile(final SOSOptionFileName objFile, final SOSOptionRegExp fileSpec1, final SOSOptionTime minFileAge1,
+            final SOSOptionTime maxFileAge1, final SOSOptionFileSize minFileSize1, final SOSOptionFileSize maxFileSize1,
+            final SOSOptionInteger skipFirstFiles1, final SOSOptionInteger skipLastFiles1, final int minNumOfFiles, final int maxNumOfFiles)
+            throws IOException, Exception {
         long minAge = 0;
         long maxAge = 0;
         long minSize = -1;
@@ -399,7 +400,7 @@ public class JSFileOperationBase extends JSToolBox implements JSJobUtilities {
         if (withSubFolder) {
             for (File element : subDir) {
                 if (element.isDirectory()) {
-                    filelist.addAll(getFilelist(element.getPath(), regexp, true, minFileAge1, maxFileAge1, minFileSize1, maxFileSize1, skipFirstFiles1, 
+                    filelist.addAll(getFilelist(element.getPath(), regexp, true, minFileAge1, maxFileAge1, minFileSize1, maxFileSize1, skipFirstFiles1,
                             skipLastFiles1));
                 }
             }

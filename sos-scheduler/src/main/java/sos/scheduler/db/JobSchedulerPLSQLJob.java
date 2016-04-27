@@ -114,7 +114,7 @@ public class JobSchedulerPLSQLJob extends JSJobUtilitiesClass<JobSchedulerPLSQLJ
 
     private void doInitialize() {
         // doInitialize
-    } 
+    }
 
     public String getSqlError() {
         return strSqlError;

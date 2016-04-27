@@ -1,6 +1,3 @@
-/**
- *
- */
 package com.sos.dialog.classes;
 
 import java.util.Vector;
@@ -17,10 +14,6 @@ import com.sos.dialog.Globals;
 
 /** @author KB */
 public class SOSCheckBox extends Button {
-
-//    private final String conClassName = this.getClass().getSimpleName();
-//    private static final String conSVNVersion = "$Id$";
-//    private final Logger logger = Logger.getLogger(this.getClass());
 
     private final Vector<Object> objControlList = new Vector<>();
 
@@ -84,7 +77,6 @@ public class SOSCheckBox extends Button {
                 objControl.setBackground(Globals.getFieldBackground());
             } else {
                 objControl.setBackground(Globals.getFieldBackground4Disabled());
-
             }
         }
         if ("checkbox".equals(objOptionElement1.getControlType())) {
@@ -96,5 +88,5 @@ public class SOSCheckBox extends Button {
     protected void checkSubclass() {
         //
     }
-    
+
 }

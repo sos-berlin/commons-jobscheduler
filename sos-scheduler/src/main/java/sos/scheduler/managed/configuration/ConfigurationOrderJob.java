@@ -114,7 +114,8 @@ public class ConfigurationOrderJob extends ConfigurationJob {
             String commandLine = command + " " + commandParameters;
             String[] parameterNames = this.getParameters().names().split(";");
             for (String parameterName : parameterNames) {
-                commandLine = myReplaceAll(commandLine, "\\$\\{" + parameterName + "\\}", this.getParameters().value(parameterName).replaceAll("[\\\\]", "\\\\\\\\"));
+                commandLine = myReplaceAll(commandLine, "\\$\\{" + parameterName + "\\}",
+                        this.getParameters().value(parameterName).replaceAll("[\\\\]", "\\\\\\\\"));
             }
             subprocess.set_environment("SCHEDULER_TRIGGER_FILE", this.getTriggerFilename());
             if (environment != null) {
@@ -152,10 +153,10 @@ public class ConfigurationOrderJob extends ConfigurationJob {
                             }
                             if (this.getParameters().value(varName) != null) {
                                 if (hasBasename) {
-                                    envValue = myReplaceAll(envValue, "\\$\\{basename:" + varName + "\\}", 
-                                            new File(this.getParameters().value(varName)).getName().replaceAll("[\\\\]", "\\\\\\\\"));
+                                    envValue = myReplaceAll(envValue, "\\$\\{basename:" + varName + "\\}", new File(this.getParameters().value(varName))
+                                            .getName().replaceAll("[\\\\]", "\\\\\\\\"));
                                 } else {
-                                    envValue = myReplaceAll(envValue, "\\$\\{" + varName + "\\}", 
+                                    envValue = myReplaceAll(envValue, "\\$\\{" + varName + "\\}",
                                             this.getParameters().value(varName).replaceAll("[\\\\]", "\\\\\\\\"));
                                 }
                                 this.getLogger().debug9("environment variable substituted: " + varName);
@@ -347,8 +348,7 @@ public class ConfigurationOrderJob extends ConfigurationJob {
             } else {
                 this.setIgnoreSignal(false);
             }
-            if (this.getParameters().value("scheduler_order_priority_class") != null
-                    && !this.getParameters().value("scheduler_order_priority_class").isEmpty()) {
+            if (this.getParameters().value("scheduler_order_priority_class") != null && !this.getParameters().value("scheduler_order_priority_class").isEmpty()) {
                 this.setPriorityClass(this.getParameters().value("scheduler_order_priority_class"));
                 this.getLogger().debug1(".. parameter [scheduler_order_priority_class]: " + this.getPriorityClass());
             } else {
@@ -407,7 +407,7 @@ public class ConfigurationOrderJob extends ConfigurationJob {
     }
 
     public void initConfiguration(final String configurationPath, final String configurationFilename) throws Exception {
-        if (spooler_job.order_queue() != null && spooler_task.order().params() != null && spooler_task.order().params().value("configuration_path") != null 
+        if (spooler_job.order_queue() != null && spooler_task.order().params() != null && spooler_task.order().params().value("configuration_path") != null
                 && !spooler_task.order().params().value("configuration_path").isEmpty()) {
             this.setConfigurationPath(spooler_task.order().params().value("configuration_path"));
         }
@@ -490,8 +490,9 @@ public class ConfigurationOrderJob extends ConfigurationJob {
                 if (nodeSettings != null) {
                     nodeMapSettings = nodeSettings.getAttributes();
                     if (nodeMapSettings != null && nodeMapSettings.getNamedItem("value") != null) {
-                        this.getLogger().debug1("Log Level is: " + nodeMapSettings.getNamedItem("value").getNodeValue() + "("
-                                + this.logLevel2Int(nodeMapSettings.getNamedItem("value").getNodeValue()) + ")");
+                        this.getLogger().debug1(
+                                "Log Level is: " + nodeMapSettings.getNamedItem("value").getNodeValue() + "("
+                                        + this.logLevel2Int(nodeMapSettings.getNamedItem("value").getNodeValue()) + ")");
                         this.getLogger().setLogLevel(this.logLevel2Int(nodeMapSettings.getNamedItem("value").getNodeValue()));
                     }
                 }
@@ -511,7 +512,7 @@ public class ConfigurationOrderJob extends ConfigurationJob {
                     if (nodeMapParams != null && nodeMapParams.getNamedItem("env") != null) {
                         env = nodeMapParams.getNamedItem("env").getNodeValue();
                         this.getLogger().debug3(".. parameter section with env=" + env + " found");
-                        globalEnv = env.equalsIgnoreCase("yes") || env.equals("1") || env.equalsIgnoreCase("on") || env.equalsIgnoreCase("true");
+                        globalEnv = "yes".equalsIgnoreCase(env) || "1".equals(env) || "on".equalsIgnoreCase(env) || "true".equalsIgnoreCase(env);
                     }
                 }
                 nodeList = xpath.selectNodeList(nodeQuery + "/params/param");
@@ -570,9 +571,11 @@ public class ConfigurationOrderJob extends ConfigurationJob {
                         NamedNodeMap nodeMap = node.getAttributes();
                         if (nodeMap != null && nodeMap.getNamedItem("name") != null) {
                             if (nodeMap.getNamedItem("value") != null) {
-                                this.getLogger().debug1(".. configuration parameter [" + nodeMap.getNamedItem("name").getNodeValue() + "]: "
-                                        + nodeMap.getNamedItem("value").getNodeValue());
-                                spooler_task.order().params().set_var(nodeMap.getNamedItem("name").getNodeValue(), nodeMap.getNamedItem("value").getNodeValue());
+                                this.getLogger().debug1(
+                                        ".. configuration parameter [" + nodeMap.getNamedItem("name").getNodeValue() + "]: "
+                                                + nodeMap.getNamedItem("value").getNodeValue());
+                                spooler_task.order().params()
+                                        .set_var(nodeMap.getNamedItem("name").getNodeValue(), nodeMap.getNamedItem("value").getNodeValue());
                                 orderParameterKeys.add(nodeMap.getNamedItem("name").getNodeValue());
                             } else {
                                 NodeList children = node.getChildNodes();
@@ -603,17 +606,17 @@ public class ConfigurationOrderJob extends ConfigurationJob {
                         while (parameterValue.indexOf("${") != -1 && trials <= 1) {
                             this.getLogger().debug1("substitution trial:" + trials + " --> " + parameterValue);
                             for (int j = 0; j < parameterNames.length; j++) {
-                                this.getLogger().debug9("parameterNames[j]=" + parameterNames[j] + " -->"
-                                        + parameterValue.indexOf("${" + parameterNames[j] + "}"));
+                                this.getLogger().debug9(
+                                        "parameterNames[j]=" + parameterNames[j] + " -->" + parameterValue.indexOf("${" + parameterNames[j] + "}"));
                                 if (!parameterNames[i].equals(parameterNames[j])
                                         && (parameterValue.indexOf("${" + parameterNames[j] + "}") != -1 || parameterValue.indexOf("${basename:"
                                                 + parameterNames[j] + "}") != -1)) {
                                     if (parameterValue.indexOf("${basename:") != -1) {
-                                        parameterValue = myReplaceAll(parameterValue, "\\$\\{basename:" + parameterNames[j] + "\\}", 
-                                                new File(spooler_task.order().params().value(parameterNames[j])).getName().replaceAll("[\\\\]", "\\\\\\\\"));
+                                        parameterValue = myReplaceAll(parameterValue, "\\$\\{basename:" + parameterNames[j] + "\\}", new File(spooler_task
+                                                .order().params().value(parameterNames[j])).getName().replaceAll("[\\\\]", "\\\\\\\\"));
                                     } else {
-                                        parameterValue = myReplaceAll(parameterValue, "\\$\\{" + parameterNames[j] + "\\}", 
-                                                spooler_task.order().params().value(parameterNames[j]).replaceAll("[\\\\]", "\\\\\\\\"));
+                                        parameterValue = myReplaceAll(parameterValue, "\\$\\{" + parameterNames[j] + "\\}", spooler_task.order().params()
+                                                .value(parameterNames[j]).replaceAll("[\\\\]", "\\\\\\\\"));
                                     }
                                     parameterFound = true;
                                     trials = 0;
@@ -627,12 +630,12 @@ public class ConfigurationOrderJob extends ConfigurationJob {
                                 Object envName = envIterator.next();
                                 Object envValue = envvars.get(envName.toString());
                                 if (parameterValue.indexOf("${" + envName.toString() + "}") != -1) {
-                                    parameterValue = myReplaceAll(parameterValue, "\\$\\{" + envName.toString() + "\\}", 
+                                    parameterValue = myReplaceAll(parameterValue, "\\$\\{" + envName.toString() + "\\}",
                                             envValue.toString().replaceAll("[\\\\]", "\\\\\\\\"));
                                     envFound = true;
                                 } else if (parameterValue.indexOf("${basename:" + envName.toString() + "}") != -1) {
-                                    parameterValue = myReplaceAll(parameterValue, "\\$\\{basename:" + envName.toString() + "\\}", 
-                                            new File(envValue.toString()).getName().replaceAll("[\\\\]", "\\\\\\\\"));
+                                    parameterValue = myReplaceAll(parameterValue, "\\$\\{basename:" + envName.toString() + "\\}", new File(envValue.toString())
+                                            .getName().replaceAll("[\\\\]", "\\\\\\\\"));
                                     envFound = true;
                                 }
                             }
@@ -643,12 +646,12 @@ public class ConfigurationOrderJob extends ConfigurationJob {
                                 Object envName = envIterator.next();
                                 Object envValue = additional_envvars.get(envName.toString());
                                 if (parameterValue.indexOf("${" + envName + "}") != -1) {
-                                    parameterValue = myReplaceAll(parameterValue, "\\$\\{" + envName.toString() + "\\}", 
+                                    parameterValue = myReplaceAll(parameterValue, "\\$\\{" + envName.toString() + "\\}",
                                             envValue.toString().replaceAll("[\\\\]", "\\\\\\\\"));
                                     additionalEnvFound = true;
                                 } else if (parameterValue.indexOf("${basename:" + envName.toString() + "}") != -1) {
-                                    parameterValue = myReplaceAll(parameterValue, "\\$\\{basename:" + envName.toString() + "\\}", 
-                                            new File(envValue.toString()).getName().replaceAll("[\\\\]", "\\\\\\\\"));
+                                    parameterValue = myReplaceAll(parameterValue, "\\$\\{basename:" + envName.toString() + "\\}", new File(envValue.toString())
+                                            .getName().replaceAll("[\\\\]", "\\\\\\\\"));
                                     additionalEnvFound = true;
                                 }
                             }

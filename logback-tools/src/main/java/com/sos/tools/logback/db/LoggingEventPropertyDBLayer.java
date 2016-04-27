@@ -15,7 +15,6 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
     private static final String MAPPED_KEY = "mappedKey";
     private static final String MAPPED_VALUE = "mappedValue";
     private static final String LOGGER_NAME = "loggerName";
-
     private LoggingEventPropertyFilter filter = null;
 
     public LoggingEventPropertyDBLayer(File configurationFile) {
@@ -28,20 +27,16 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
 
     private Query setQueryParams(String hql) {
         Query query = session.createQuery(hql);
-
         if (filter.getEventId() != null) {
             query.setLong(EVENT_ID, filter.getEventId());
         }
-
-        if (filter.getMappedKey() != null && !filter.getMappedKey().equals("")) {
+        if (filter.getMappedKey() != null && !"".equals(filter.getMappedKey())) {
             query.setParameter(MAPPED_KEY, filter.getMappedKey());
         }
-
-        if (filter.getMappedValue() != null && !filter.getMappedValue().equals("")) {
+        if (filter.getMappedValue() != null && !"".equals(filter.getMappedValue())) {
             query.setParameter(MAPPED_VALUE, filter.getMappedValue());
         }
-
-        if (filter.getLoggerName() != null && !filter.getLoggerName().equals("")) {
+        if (filter.getLoggerName() != null && !"".equals(filter.getLoggerName())) {
             query.setParameter(LOGGER_NAME, filter.getLoggerName());
         }
         return query;
@@ -50,27 +45,22 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
     private String getWhere() {
         String where = "";
         String and = "";
-
         if (filter.getEventId() != null) {
             where += and + " eventId = :eventId";
             and = " and ";
         }
-
-        if (filter.getMappedKey() != null && !filter.getMappedKey().equals("")) {
+        if (filter.getMappedKey() != null && !"".equals(filter.getMappedKey())) {
             where += and + " mappedKey = :mappedKey";
             and = " and ";
         }
-
-        if (filter.getMappedValue() != null && !filter.getMappedValue().equals("")) {
+        if (filter.getMappedValue() != null && !"".equals(filter.getMappedValue())) {
             where += and + " mappedValue = :mappedValue";
             and = " and ";
         }
-
-        if (filter.getLoggerName() != null && !filter.getLoggerName().equals("")) {
+        if (filter.getLoggerName() != null && !"".equals(filter.getLoggerName())) {
             where += and + " events.loggingEventDBItem.loggerName = :loggerName";
             and = " and ";
         }
-
         return (where.isEmpty()) ? where : "where " + where;
     }
 
@@ -85,7 +75,7 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
 
     public String asText(List<LoggingEventDBItem> records) {
         DateTimeFormatter fmt = DateTimeFormat.forPattern("HH:mm:ss,SSS");
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         for (LoggingEventDBItem record : records) {
             StringBuffer line = new StringBuffer();
             Long t = record.getTimeStmp();
@@ -96,7 +86,6 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
             result.append(line);
         }
         return result.toString();
-
     }
 
     public List<LoggingEventPropertyDBItem> getListOfPropertyDBItems(String mappedKey, String mappedValue, String loggerName) {
@@ -109,12 +98,6 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
         return query.list();
     }
 
-    /** Because LOGGING_EVENT_PROPERTY works with composite eventId + mappedKey
-     * and it is not clear how hibernate handle composites directly we read all
-     * records first and select the relevant afterwards.
-     *
-     * @param eventId
-     * @return List<LoggingEventPropertyDBItem> */
     public List<LoggingEventPropertyDBItem> getListOfPropertyDBItems(Long eventId) {
         filter = new LoggingEventPropertyFilter();
         filter.setOrderCriteria(EVENT_ID);
@@ -140,17 +123,14 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
         filter = new LoggingEventPropertyFilter();
         filter.setOrderCriteria(EVENT_ID);
         filter.setEventId(eventId);
-        String hql = "delete from LoggingEventPropertyDBItem" + getWhere();
-        Query query = setQueryParams(hql);
-        int row = query.executeUpdate();
-        return row;
+        Query query = setQueryParams("delete from LoggingEventPropertyDBItem" + getWhere());
+        return query.executeUpdate();
     }
 
     public int deleteAll() {
         String hql = "delete from LoggingEventPropertyDBItem";
         Query query = setQueryParams(hql);
-        int row = query.executeUpdate();
-        return row;
+        return query.executeUpdate();
     }
 
     public void delete(String mappedKey, String mappedValue, String loggerName) {

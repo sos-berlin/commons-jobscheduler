@@ -211,7 +211,7 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
     public void close() {
         if (objOutputStream != null) {
             this.closeOutput();
-        } else  if (objInputStream != null) {
+        } else if (objInputStream != null) {
             this.closeInput();
         }
     }

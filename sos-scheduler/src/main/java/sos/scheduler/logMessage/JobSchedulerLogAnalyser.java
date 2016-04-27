@@ -87,9 +87,11 @@ public class JobSchedulerLogAnalyser extends JobSchedulerJob {
             }
             if (spooler_task.params().var("db") != null && !spooler_task.params().var("db").isEmpty()) {
                 if (sosLogger != null) {
-                    conn = SOSConnection.createInstance(dbClass, arguments.as_string("-class=", ""), arguments.as_string("-url=", ""), arguments.as_string("-user=", ""), arguments.as_string("-password=", ""), sosLogger);
+                    conn = SOSConnection.createInstance(dbClass, arguments.as_string("-class=", ""), arguments.as_string("-url=", ""),
+                            arguments.as_string("-user=", ""), arguments.as_string("-password=", ""), sosLogger);
                 } else {
-                    conn = SOSConnection.createInstance(dbClass, arguments.as_string("-class=", ""), arguments.as_string("-url=", ""), arguments.as_string("-user=", ""), arguments.as_string("-password=", ""));
+                    conn = SOSConnection.createInstance(dbClass, arguments.as_string("-class=", ""), arguments.as_string("-url=", ""),
+                            arguments.as_string("-user=", ""), arguments.as_string("-password=", ""));
                 }
             }
             if (spooler_job != null && getJobSettings() != null) {
@@ -145,7 +147,8 @@ public class JobSchedulerLogAnalyser extends JobSchedulerJob {
             } catch (Exception e) {
                 lastLog_date = df.parse("2000-01-01 00:00:00");
             }
-            GregorianCalendar gclast = new GregorianCalendar(lastLog_date.getYear() + 1900, lastLog_date.getMonth(), lastLog_date.getDate(), lastLog_date.getHours(), lastLog_date.getMinutes(), lastLog_date.getSeconds());
+            GregorianCalendar gclast = new GregorianCalendar(lastLog_date.getYear() + 1900, lastLog_date.getMonth(), lastLog_date.getDate(),
+                    lastLog_date.getHours(), lastLog_date.getMinutes(), lastLog_date.getSeconds());
             try {
                 String logFilepointerVariable = spooler.var(this.getMonitorJob() + ".filepointer");
                 String logFilenameVariable = spooler.var(this.getMonitorJob() + ".filename");
@@ -724,8 +727,9 @@ public class JobSchedulerLogAnalyser extends JobSchedulerJob {
     }
 
     private void removeJobFromMessages(final SchedulerMessage m, final GregorianCalendar gclast) throws Exception {
-        this.getConnection().execute("update SCHEDULER_MESSAGES set \"STATUS\" = -3 where \"LOGTIME\" <= %timestamp_iso('"
-                + SOSDate.getISODateTimeAsString(gclast) + "') and \"STATUS\">=0 and \"JOB_NAME\" <> 'nil' and \"JOB_NAME\"='" + m.getJob_name() + "'");
+        this.getConnection().execute(
+                "update SCHEDULER_MESSAGES set \"STATUS\" = -3 where \"LOGTIME\" <= %timestamp_iso('" + SOSDate.getISODateTimeAsString(gclast)
+                        + "') and \"STATUS\">=0 and \"JOB_NAME\" <> 'nil' and \"JOB_NAME\"='" + m.getJob_name() + "'");
         Iterator msg = messages.iterator();
         SchedulerMessage h = null;
         while (msg.hasNext()) {
@@ -745,9 +749,10 @@ public class JobSchedulerLogAnalyser extends JobSchedulerJob {
     }
 
     private void removeJobChainFromMessages(final SchedulerMessage m, final GregorianCalendar gclast) throws Exception {
-        this.getConnection().execute("update SCHEDULER_MESSAGES set \"STATUS\" = -2 where \"LOGTIME\" <= %timestamp_iso('"
-                + SOSDate.getISODateTimeAsString(gclast) + "') and \"STATUS\">=0 and \"JOB_CHAIN\" <> 'nil' and \"JOB_CHAIN\"='" + m.getJob_chain() + "' and "
-                + "\"ORDER_ID\"='" + m.getOrder_id() + "'");
+        this.getConnection().execute(
+                "update SCHEDULER_MESSAGES set \"STATUS\" = -2 where \"LOGTIME\" <= %timestamp_iso('" + SOSDate.getISODateTimeAsString(gclast)
+                        + "') and \"STATUS\">=0 and \"JOB_CHAIN\" <> 'nil' and \"JOB_CHAIN\"='" + m.getJob_chain() + "' and " + "\"ORDER_ID\"='"
+                        + m.getOrder_id() + "'");
         Iterator msg = messages.iterator();
         SchedulerMessage h = null;
         while (msg.hasNext()) {

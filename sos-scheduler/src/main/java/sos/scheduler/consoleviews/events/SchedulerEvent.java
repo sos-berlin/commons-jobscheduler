@@ -1,7 +1,3 @@
-/*
- * Created on 30.09.2008 To change the template for this generated file go to
- * Window - Preferences - Java - Code Generation - Code and Comments
- */
 package sos.scheduler.consoleviews.events;
 
 import java.util.HashMap;
@@ -10,7 +6,6 @@ import java.util.LinkedHashSet;
 
 public class SchedulerEvent {
 
-    private String event_name;
     protected String event_title;
     protected String event_class;
     protected String event_id;
@@ -25,6 +20,7 @@ public class SchedulerEvent {
     protected String scheduler_id;
     protected String logic = "";
     protected String comment = "";
+    private String event_name;
 
     public String getEvent_title() {
         return event_title;
@@ -80,10 +76,6 @@ public class SchedulerEvent {
 
     private HashMap properties() {
         HashMap attr = new HashMap();
-        // Id und class müssen bei der Prüfung auf Ungleichheit unbedingt
-        // einfließen
-        // if (event_class.equals(""))event_class = "*nodef";
-        // if (event_id.equals(""))event_id = "*nodef";
         attr.put("event_title", event_title);
         attr.put("event_class", event_class);
         attr.put("event_id", event_id);
@@ -91,12 +83,9 @@ public class SchedulerEvent {
         attr.put("job_chain", job_chain);
         attr.put("order_id", order_id);
         attr.put("exit_code", exit_code);
-        // attr.put("created",created);
-        // attr.put("expires",expires);
         attr.put("remote_scheduler_host", remote_scheduler_host);
         attr.put("remote_scheduler_port", remote_scheduler_port);
         attr.put("scheduler_id", scheduler_id);
-        // attr.put("comment",comment);
         return attr;
     }
 
@@ -105,23 +94,17 @@ public class SchedulerEvent {
         Iterator iProperties = properties().keySet().iterator();
         while (iProperties.hasNext()) {
             String trigger = iProperties.next().toString();
-            if (!properties().get(trigger).equals("")) {
-                if (eActive.properties().get(trigger) != null) {
-                    if (!trigger.equalsIgnoreCase("expires") && !trigger.equalsIgnoreCase("created")
-                            && !(eActive.properties().get(trigger).equals(properties().get(trigger)))) {
-                        erg = false;
-                    }
-                }
+            if (!"".equals(properties().get(trigger)) && eActive.properties().get(trigger) != null && !"expires".equalsIgnoreCase(trigger)
+                    && !"created".equalsIgnoreCase(trigger) && !eActive.properties().get(trigger).equals(properties().get(trigger))) {
+                erg = false;
             }
         }
         return erg;
     }
 
-    // True if this is in list of active events
     public boolean isIn(LinkedHashSet listOfActiveEvents) {
         boolean erg = false;
         Iterator i = listOfActiveEvents.iterator();
-
         while (i.hasNext() && !erg) {
             if (this.isEqual((SchedulerEvent) i.next())) {
                 erg = true;
@@ -143,8 +126,8 @@ public class SchedulerEvent {
     }
 
     public String getEvent_name() {
-        if (this.event_name.equals("")) {
-            if (this.event_class.equals("")) {
+        if ("".equals(this.event_name)) {
+            if ("".equals(this.event_class)) {
                 return this.event_id;
             } else {
                 return this.event_class + "." + this.event_id;
@@ -153,4 +136,5 @@ public class SchedulerEvent {
             return event_name;
         }
     }
+
 }

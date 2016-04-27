@@ -212,7 +212,11 @@ public class XmlRegionAnalyzerTests {
         regions = analyzer.analyzeXml(sb.toString());
         testRegionsContiguity(regions, sb.toString());
         Assert.assertEquals(regions.size(), 19);
-        int commentCpt = 0, markupCpt = 0, instrCpt = 0, whitespacesCpt = 0, otherCpt = 0;
+        int commentCpt = 0;
+        int markupCpt = 0;
+        int instrCpt = 0;
+        int whitespacesCpt = 0;
+        int otherCpt = 0;
         int end = 0;
         for (XmlRegion xr : regions) {
             switch (xr.getXmlRegionType()) {

@@ -60,7 +60,7 @@ public class ConfigurationModifierFileSelectorOptions {
     }
 
     public void setRecursive(String recursive) {
-        this.recursive = recursive.equalsIgnoreCase("true");
+        this.recursive = "true".equalsIgnoreCase(recursive);
     }
 
     public void setDirectoryExclusions(String directoryExclusions) {
@@ -93,5 +93,5 @@ public class ConfigurationModifierFileSelectorOptions {
         }
         return false;
     }
-    
+
 }

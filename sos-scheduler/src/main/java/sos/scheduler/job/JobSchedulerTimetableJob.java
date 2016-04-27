@@ -143,14 +143,15 @@ public class JobSchedulerTimetableJob extends JobSchedulerJob {
                         + (errorCode != null && !errorCode.isEmpty() ? " error code: " + errorCode : "")
                         + (errorText != null && !errorText.isEmpty() ? " error text: " + errorText : ""));
             }
-            this.getConnection().executeUpdate("DELETE FROM " + this.getTableTimetable() + " WHERE \"ID\" NOT IN (SELECT \"ID\" FROM "
-                    + this.getTableTimetableHistory() + ")" + " AND \"START_TIME\" BETWEEN %timestamp_iso('" + SOSDate.getTimeAsString(scheduleFrom)
-                    + "') AND %timestamp_iso('" + SOSDate.getTimeAsString(scheduleTo) + "')");
+            this.getConnection().executeUpdate(
+                    "DELETE FROM " + this.getTableTimetable() + " WHERE \"ID\" NOT IN (SELECT \"ID\" FROM " + this.getTableTimetableHistory() + ")"
+                            + " AND \"START_TIME\" BETWEEN %timestamp_iso('" + SOSDate.getTimeAsString(scheduleFrom) + "') AND %timestamp_iso('"
+                            + SOSDate.getTimeAsString(scheduleTo) + "')");
             itemID = this.getConnection().getSingleValue("SELECT \"WERT\" FROM " + this.getTableVariables() + " WHERE \"NAME\"='scheduler_timetable_id'");
             if (itemID == null || itemID.isEmpty()) {
                 itemID = "0";
-                this.getConnection().executeUpdate("INSERT INTO " + this.getTableVariables() + " (\"NAME\", \"WERT\") VALUES ('scheduler_timetable_id', "
-                        + itemID + ")");
+                this.getConnection().executeUpdate(
+                        "INSERT INTO " + this.getTableVariables() + " (\"NAME\", \"WERT\") VALUES ('scheduler_timetable_id', " + itemID + ")");
             }
             try {
                 timetableID = Long.parseLong(itemID);
@@ -190,16 +191,17 @@ public class JobSchedulerTimetableJob extends JobSchedulerJob {
                     }
                     this.getLogger().debug6("calendar item " + itemCount + ": at=" + at + ", job=" + job + ", job_chain=" + jobChain + ", order=" + orderID);
                     if (!at.isEmpty()) {
-                        this.getConnection().executeUpdate("INSERT INTO " + this.getTableTimetable()
-                                + " (\"ID\", \"SPOOLER_ID\", \"JOB_CHAIN\", \"ORDER_ID\", \"JOB_NAME\", \"START_TIME\") " + "VALUES (" + ++timetableID + ","
-                                + "'" + spooler.id() + "'," + "'" + (!jobChain.isEmpty() ? jobChain : "null") + "'," + "'"
-                                + (!orderID.isEmpty() ? orderID : "null") + "', " + "'" + (!job.isEmpty() ? job : "null") + "', "
-                                + ("now".equalsIgnoreCase(at) ? "%now" : "%timestamp_iso('" + at + "')") + ")");
+                        this.getConnection().executeUpdate(
+                                "INSERT INTO " + this.getTableTimetable()
+                                        + " (\"ID\", \"SPOOLER_ID\", \"JOB_CHAIN\", \"ORDER_ID\", \"JOB_NAME\", \"START_TIME\") " + "VALUES (" + ++timetableID
+                                        + "," + "'" + spooler.id() + "'," + "'" + (!jobChain.isEmpty() ? jobChain : "null") + "'," + "'"
+                                        + (!orderID.isEmpty() ? orderID : "null") + "', " + "'" + (!job.isEmpty() ? job : "null") + "', "
+                                        + ("now".equalsIgnoreCase(at) ? "%now" : "%timestamp_iso('" + at + "')") + ")");
                     }
                 }
             }
-            this.getConnection().executeUpdate("UPDATE " + this.getTableVariables() + " SET \"WERT\"=" + timetableID
-                    + " WHERE \"NAME\"='scheduler_timetable_id'");
+            this.getConnection().executeUpdate(
+                    "UPDATE " + this.getTableVariables() + " SET \"WERT\"=" + timetableID + " WHERE \"NAME\"='scheduler_timetable_id'");
             this.getConnection().commit();
             itemsCreated += itemCount;
             if (itemCount >= this.getOperationDefaultLimit() && at != null && !at.isEmpty() && SOSDate.getTime(at).before(scheduleTo)) {
@@ -219,20 +221,20 @@ public class JobSchedulerTimetableJob extends JobSchedulerJob {
     public long createTimetableHistory() throws Exception {
         long itemsCreated = 0;
         try {
-            this.getConnection().executeUpdate("INSERT INTO " + this.getTableTimetableHistory() + " (\"ID\", \"HISTORY_ID\") "
-                    + "SELECT t.\"ID\", h.\"ID\" as \"HISTORY_ID\" " + "FROM " + this.getTableTimetable() + " t, " + this.getTableJobHistory() + " h "
-                    + "WHERE (t.\"ID\") NOT IN (SELECT th.\"ID\" FROM " + this.getTableTimetableHistory()
-                    + " th WHERE th.\"ID\"=t.\"ID\" AND th.\"HISTORY_ID\"=h.\"ID\") " + "AND t.\"SPOOLER_ID\"=h.\"SPOOLER_ID\" "
-                    + "AND t.\"JOB_NAME\"=h.\"JOB_NAME\" " + "AND t.\"START_TIME\"<=h.\"START_TIME\" " + "AND t.\"START_TIME\" <= "
-                    + "(SELECT MIN(\"START_TIME\") FROM " + this.getTableTimetable() + " t2 " + "WHERE t.\"SPOOLER_ID\"=t2.\"SPOOLER_ID\" "
-                    + "AND t.\"JOB_NAME\"=t2.\"JOB_NAME\" " + "AND t.\"START_TIME\"<=t2.\"START_TIME\")");
-            this.getConnection().executeUpdate("INSERT INTO " + this.getTableTimetableHistory() + " (\"ID\", \"HISTORY_ID\") "
-                    + "SELECT t.\"ID\", h.\"HISTORY_ID\" " + "FROM " + this.getTableTimetable() + " t, " + this.getTableOrderHistory() + " h "
-                    + "WHERE (t.\"ID\") NOT IN (SELECT th.\"ID\" FROM " + this.getTableTimetableHistory()
-                    + " th WHERE th.\"ID\"=t.\"ID\" AND th.\"HISTORY_ID\"=h.\"HISTORY_ID\") " + "AND t.\"SPOOLER_ID\"=h.\"SPOOLER_ID\" "
-                    + "AND t.\"JOB_CHAIN\"=h.\"JOB_CHAIN\" " + "AND t.\"START_TIME\"<=h.\"START_TIME\" " + "AND t.\"START_TIME\" <= "
-                    + "(SELECT MIN(\"START_TIME\") FROM " + this.getTableTimetable() + " t2 " + "WHERE t.\"SPOOLER_ID\"=t2.\"SPOOLER_ID\" "
-                    + "AND t.\"JOB_NAME\"=t2.\"JOB_NAME\" " + "AND t.\"START_TIME\"<=t2.\"START_TIME\")");
+            this.getConnection().executeUpdate(
+                    "INSERT INTO " + this.getTableTimetableHistory() + " (\"ID\", \"HISTORY_ID\") " + "SELECT t.\"ID\", h.\"ID\" as \"HISTORY_ID\" " + "FROM "
+                            + this.getTableTimetable() + " t, " + this.getTableJobHistory() + " h " + "WHERE (t.\"ID\") NOT IN (SELECT th.\"ID\" FROM "
+                            + this.getTableTimetableHistory() + " th WHERE th.\"ID\"=t.\"ID\" AND th.\"HISTORY_ID\"=h.\"ID\") "
+                            + "AND t.\"SPOOLER_ID\"=h.\"SPOOLER_ID\" " + "AND t.\"JOB_NAME\"=h.\"JOB_NAME\" " + "AND t.\"START_TIME\"<=h.\"START_TIME\" "
+                            + "AND t.\"START_TIME\" <= " + "(SELECT MIN(\"START_TIME\") FROM " + this.getTableTimetable() + " t2 "
+                            + "WHERE t.\"SPOOLER_ID\"=t2.\"SPOOLER_ID\" " + "AND t.\"JOB_NAME\"=t2.\"JOB_NAME\" " + "AND t.\"START_TIME\"<=t2.\"START_TIME\")");
+            this.getConnection().executeUpdate(
+                    "INSERT INTO " + this.getTableTimetableHistory() + " (\"ID\", \"HISTORY_ID\") " + "SELECT t.\"ID\", h.\"HISTORY_ID\" " + "FROM "
+                            + this.getTableTimetable() + " t, " + this.getTableOrderHistory() + " h " + "WHERE (t.\"ID\") NOT IN (SELECT th.\"ID\" FROM "
+                            + this.getTableTimetableHistory() + " th WHERE th.\"ID\"=t.\"ID\" AND th.\"HISTORY_ID\"=h.\"HISTORY_ID\") "
+                            + "AND t.\"SPOOLER_ID\"=h.\"SPOOLER_ID\" " + "AND t.\"JOB_CHAIN\"=h.\"JOB_CHAIN\" " + "AND t.\"START_TIME\"<=h.\"START_TIME\" "
+                            + "AND t.\"START_TIME\" <= " + "(SELECT MIN(\"START_TIME\") FROM " + this.getTableTimetable() + " t2 "
+                            + "WHERE t.\"SPOOLER_ID\"=t2.\"SPOOLER_ID\" " + "AND t.\"JOB_NAME\"=t2.\"JOB_NAME\" " + "AND t.\"START_TIME\"<=t2.\"START_TIME\")");
             this.getConnection().commit();
             return itemsCreated;
         } catch (Exception e) {

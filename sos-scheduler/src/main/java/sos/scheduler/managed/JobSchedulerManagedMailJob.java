@@ -16,7 +16,6 @@ public class JobSchedulerManagedMailJob extends JobSchedulerManagedJob {
 
     @Override
     public boolean spooler_process() {
-        Order order = null;
         orderPayload = null;
         String orderId = "(none)";
         String host = spooler_log.mail().smtp();
@@ -27,7 +26,7 @@ public class JobSchedulerManagedMailJob extends JobSchedulerManagedJob {
         boolean queueDirChanged = false;
         String from = spooler_log.mail().from();
         boolean fromChanged = false;
-        boolean queueMailOnError=true;
+        boolean queueMailOnError = true;
         String fromName = "";
         String replyTo = "";
         String to = "";
@@ -45,7 +44,6 @@ public class JobSchedulerManagedMailJob extends JobSchedulerManagedJob {
         String smtpUser = "";
         String smtpPass = "";
         String securityProtocol = "";
-
         try {
             try {
                 super.prepareParams();
@@ -124,21 +122,18 @@ public class JobSchedulerManagedMailJob extends JobSchedulerManagedJob {
                     if (this.getParameters().value("attachment") != null && !this.getParameters().value("attachment").isEmpty()) {
                         attachments = this.getParameters().value("attachment").split(";");
                     }
-
-                    if (this.getParameters().value("security_protocol") != null && this.getParameters().value("security_protocol").length() > 0) {
+                    if (this.getParameters().value("security_protocol") != null && !this.getParameters().value("security_protocol").isEmpty()) {
                         securityProtocol = this.getParameters().value("security_protocol");
                     }
-
-                    if (this.getParameters().value("queue_mail_on_error") != null && this.getParameters().value("queue_mail_on_error").length() > 0) {
-                        queueMailOnError = !this.getParameters().value("queue_mail_on_error").equalsIgnoreCase("false");
+                    if (this.getParameters().value("queue_mail_on_error") != null && !this.getParameters().value("queue_mail_on_error").isEmpty()) {
+                        queueMailOnError = !"false".equalsIgnoreCase(this.getParameters().value("queue_mail_on_error"));
                     }
-
-                    if (this.getParameters().value("cleanup_attachment") != null && this.getParameters().value("cleanup_attachment").length() > 0) {
-                        if (this.getParameters().value("cleanup_attachment").equals("1")
-                                || this.getParameters().value("cleanup_attachment").equalsIgnoreCase("true")
-                                || this.getParameters().value("cleanup_attachment").equalsIgnoreCase("yes")) {
-                            cleanupAttachment = true;
-                        }
+                    if (this.getParameters().value("cleanup_attachment") != null
+                            && !this.getParameters().value("cleanup_attachment").isEmpty()
+                            && ("1".equals(this.getParameters().value("cleanup_attachment"))
+                                    || "true".equalsIgnoreCase(this.getParameters().value("cleanup_attachment")) || "yes".equalsIgnoreCase(this.getParameters()
+                                    .value("cleanup_attachment")))) {
+                        cleanupAttachment = true;
                     }
 
                 } catch (Exception e) {
@@ -212,7 +207,7 @@ public class JobSchedulerManagedMailJob extends JobSchedulerManagedJob {
                         sosMail.setFromName(fromName);
                     }
                     sosMail.setSecurityProtocol(securityProtocol);
-                    String recipientsTo[] = to.split(";|,");
+                    String[] recipientsTo = to.split(";|,");
                     for (int i = 0; i < recipientsTo.length; i++) {
                         if (i == 0) {
                             sosMail.setReplyTo(recipientsTo[i].trim());
@@ -257,9 +252,9 @@ public class JobSchedulerManagedMailJob extends JobSchedulerManagedJob {
             }
             return spooler_task.job().order_queue() != null ? true : false;
         } catch (Exception e) {
-            if (queueMailOnError){
+            if (queueMailOnError) {
                 spooler_log.warn("error occurred processing order [" + orderId + "]: " + e.getMessage());
-            }else{
+            } else {
                 spooler_log.error("error occurred processing order [" + orderId + "]: " + e.getMessage());
             }
             spooler_task.end();

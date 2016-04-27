@@ -149,11 +149,11 @@ class SOSSchedulerTextProcessor {
                 i = 0;
             }
         }
-        while ((rec = reader.readLine()) != null && (param.equals("last") || i > 0)) {
+        while ((rec = reader.readLine()) != null && ("last".equals(param) || i > 0)) {
             erg = rec;
             i--;
         }
-        if (!param.equals("last") && rec == null && i > 0) {
+        if (!"last".equals(param) && rec == null && i > 0) {
             erg = "(eof)";
         }
         reader.close();

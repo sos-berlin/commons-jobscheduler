@@ -576,7 +576,7 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
                         fos = null;
                     } catch (Exception ex) {
                         // gracefully ignore this error
-                    } 
+                    }
                 }
             }
             objFTPClient.closeFile(sftpFileHandle);

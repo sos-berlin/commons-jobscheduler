@@ -553,8 +553,9 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
     public boolean String2Bool() {
         boolean flgT = false;
         String pstrVal = strValue;
-        if (isNotEmpty(pstrVal) && ("1".equals(pstrVal) || "y".equalsIgnoreCase(pstrVal) || "yes".equalsIgnoreCase(pstrVal) || "j".equalsIgnoreCase(pstrVal)
-                    || "on".equalsIgnoreCase(pstrVal) || "true".equalsIgnoreCase(pstrVal) || "wahr".equalsIgnoreCase(pstrVal))) {
+        if (isNotEmpty(pstrVal)
+                && ("1".equals(pstrVal) || "y".equalsIgnoreCase(pstrVal) || "yes".equalsIgnoreCase(pstrVal) || "j".equalsIgnoreCase(pstrVal)
+                        || "on".equalsIgnoreCase(pstrVal) || "true".equalsIgnoreCase(pstrVal) || "wahr".equalsIgnoreCase(pstrVal))) {
             flgT = true;
         }
         return flgT;

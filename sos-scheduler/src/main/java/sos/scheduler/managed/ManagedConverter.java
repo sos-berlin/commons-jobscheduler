@@ -563,7 +563,8 @@ public class ManagedConverter {
                 orderElement.appendChild(orderDocument.importNode(payloadElement, true));
             }
             try {
-                String runtime = oldConnection.getClob("SELECT \"RUN_TIME\" FROM " + JobSchedulerManagedObject.getTableManagedOrders() + " WHERE \"ID\"=" + key);
+                String runtime = oldConnection
+                        .getClob("SELECT \"RUN_TIME\" FROM " + JobSchedulerManagedObject.getTableManagedOrders() + " WHERE \"ID\"=" + key);
                 if (runtime != null && !runtime.isEmpty()) {
                     String runtimeXml = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>" + "<dummy>" + runtime + "</dummy>";
                     Document dummyDocument = docBuilder.parse(new ByteArrayInputStream(runtimeXml.getBytes()));

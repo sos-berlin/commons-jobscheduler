@@ -79,5 +79,5 @@ public class JSDataElementNumeric extends JSDataElement {
         }
         return this.Value();
     }
-    
+
 }

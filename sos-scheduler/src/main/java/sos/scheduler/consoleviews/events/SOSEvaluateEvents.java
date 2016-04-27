@@ -31,7 +31,6 @@ public class SOSEvaluateEvents {
     private String host;
     private int port;
     private Document activeEvents = null;
-    private final static String conSVNVersion = "$Id$";
     private static final Logger LOGGER = Logger.getLogger(SOSEvaluateEvents.class);
 
     public SOSEvaluateEvents(final String host_, final int port_) {
@@ -127,7 +126,7 @@ public class SOSEvaluateEvents {
                             activeNodeCount++;
                             continue;
                         }
-                        boolean isNever = curEventExpires.getNodeValue().equalsIgnoreCase("never");
+                        boolean isNever = "never".equalsIgnoreCase(curEventExpires.getNodeValue());
                         Calendar expiresDate = GregorianCalendar.getInstance();
                         Calendar now = GregorianCalendar.getInstance();
                         if (!isNever) {
@@ -182,7 +181,7 @@ public class SOSEvaluateEvents {
         NodeList events = eventGroup.getChildNodes();
         for (int i = 0; i < events.getLength(); i++) {
             Node event = events.item(i);
-            if (event.getNodeName().equals("event")) {
+            if ("event".equals(event.getNodeName())) {
                 NamedNodeMap attr = event.getAttributes();
                 SchedulerEvent e = new SchedulerEvent();
                 e.event_class = getTextDefault("", attr.getNamedItem("event_class"));

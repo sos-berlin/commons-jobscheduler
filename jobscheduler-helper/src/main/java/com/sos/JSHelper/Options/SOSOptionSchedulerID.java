@@ -60,7 +60,8 @@ public class SOSOptionSchedulerID extends SOSOptionString {
         Pattern pattern = Pattern.compile(patternString);
         super.Value(pstrValue);
         if (isNotEmpty(this.strValue) && !pattern.matcher(this.strValue).matches()) {
-            throw new JobSchedulerException(String.format("invalid special characters in SchedulerID (\"%2$s\"). Please omit:\n%1$s", "/ \\ : ; * ? ! $ % & \" < > ( ) | ^", this.strValue));
+            throw new JobSchedulerException(String.format("invalid special characters in SchedulerID (\"%2$s\"). Please omit:\n%1$s",
+                    "/ \\ : ; * ? ! $ % & \" < > ( ) | ^", this.strValue));
         }
     } // private void Value
 }

@@ -620,7 +620,7 @@ public class CronConverter extends JSToolBox {
                 jobElement.setAttribute(ATTRIBUTE_ORDER, "no");
             }
             jobElement.setAttribute(ATTRIBUTE_TITLE, "Cron Job " + cronRegExMatcher.group(commandIndex).trim());
-            if (timeout != null && !timeout.equals("0")) {
+            if (timeout != null && !"0".equals(timeout)) {
                 jobElement.setAttribute(OPTION_TIMEOUT, timeout);
             }
             String schedulerUser = "";
@@ -717,7 +717,7 @@ public class CronConverter extends JSToolBox {
             Element periodElement = runTimeElement.getOwnerDocument().createElement("period");
             logger.debug("processing hours [" + hours + "] and minutes [" + minutes + "]");
             if (minutes.startsWith("*")) {
-                if (minutes.equalsIgnoreCase("*")) {
+                if ("*".equalsIgnoreCase(minutes)) {
                     // every minute
                     periodElement.setAttribute("repeat", "60");
                 } else {
@@ -800,16 +800,12 @@ public class CronConverter extends JSToolBox {
                                 int endHour = Integer.parseInt(currentHourArray[1]);
                                 int beginMinute = Integer.parseInt(currentMinute);
                                 int endMinute = beginMinute + 1;
-                                // workaround, bis endhour am nächsten Tag
-                                // erlaubt
                                 endMinute = beginMinute;
                                 if (endMinute == 60) {
                                     endMinute = 0;
                                     endHour = endHour + 1;
                                 }
                                 endHour = endHour % 24;
-                                // workaround, bis endhour am nächsten Tag
-                                // erlaubt
                                 if (endHour == 0) {
                                     endHour = 24;
                                 }

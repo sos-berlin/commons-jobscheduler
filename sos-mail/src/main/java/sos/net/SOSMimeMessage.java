@@ -488,7 +488,8 @@ public class SOSMimeMessage {
 
     public void dumpMessageToFile(final File file, final boolean withAttachment, final boolean append) throws Exception {
         FileOutputStream out = null;
-        File tmpFile, targetFile;
+        File tmpFile;
+        File targetFile;
         try {
             tmpFile = new File(file.getAbsolutePath() + "~");
             out = new FileOutputStream(file, append);
