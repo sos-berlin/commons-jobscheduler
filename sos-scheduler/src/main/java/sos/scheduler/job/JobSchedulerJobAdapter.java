@@ -656,35 +656,27 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 
     @Override
     public boolean spooler_task_before() throws Exception {
-        final String conMethodName = "JobSchedulerJobAdapter::spooler_task_before";
         initializeLog4jAppenderClass();
         getJobOrOrderParameters();
-        logger.info(String.format("%1$s is running and returns %2$s", conMethodName, continueWithProcessBefore));
         return continueWithProcessBefore;
     }
 
     @Override
     public void spooler_task_after() throws Exception {
-        final String conMethodName = "JobSchedulerJobAdapter::spooler_task_after";
         initializeLog4jAppenderClass();
         getJobOrOrderParameters();
-        logger.info(String.format("%1$s is running", conMethodName));
     }
 
     @Override
     public boolean spooler_process_before() throws Exception {
-        final String conMethodName = "JobSchedulerJobAdapter::spooler_process_before";
         initializeLog4jAppenderClass();
         getJobOrOrderParameters();
-        logger.info(String.format("%1$s is running and returns %2$s", conMethodName, continueWithProcess));
-        return continueWithProcess;
+        return  continueWithProcess;
     }
 
     @Override
     public boolean spooler_process_after(final boolean spooler_process_result) throws Exception {
-        final String conMethodName = "JobSchedulerJobAdapter::spooler_process_after";
         initializeLog4jAppenderClass();
-        logger.info(String.format("%1$s is running and returns %2$s", conMethodName, spooler_process_result));
         getJobOrOrderParameters();
         return spooler_process_result;
     }
