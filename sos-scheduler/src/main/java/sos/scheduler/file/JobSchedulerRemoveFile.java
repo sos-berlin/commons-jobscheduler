@@ -23,7 +23,7 @@ public class JobSchedulerRemoveFile extends JobSchedulerFileOperationBase {
     @Override
     public boolean spooler_process() {
         try {
-            initialize("");
+            initialize();
             if (file == null) { // alias
                 file = source;
             }

@@ -12,7 +12,6 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 public class JobSchedulerCanWrite extends JobSchedulerFileOperationBase {
 
     private static final Logger LOGGER = Logger.getLogger(JobSchedulerCanWrite.class);
-    private final String conSVNVersion = "$Id$";
 
     @Override
     public boolean spooler_init() {
@@ -22,7 +21,7 @@ public class JobSchedulerCanWrite extends JobSchedulerFileOperationBase {
     @Override
     public boolean spooler_process() {
         try {
-            initialize(conSVNVersion);
+            initialize();
             CheckMandatoryFile();
             flgOperationWasSuccessful = SOSFileOperations.canWrite(file, fileSpec, isCaseInsensitive, objSOSLogger);
             return setReturnResult(flgOperationWasSuccessful);

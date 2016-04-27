@@ -262,7 +262,7 @@ public class JobSchedulerFileOperationBase extends JobSchedulerJobAdapter {
         return strT;
     }
 
-    public boolean initialize(final String pstrVersionInfo) {
+    public boolean initialize() {
         try {
             super.spooler_process();
             params = null;

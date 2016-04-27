@@ -20,7 +20,6 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "com_sos_scheduler_messages", defaultLocale = "en")
 public class JobSchedulerCleanupFiles extends JobSchedulerFileOperationBase {
 
-    private final String conSVNVersion = "$Id$";
     private final static String conClassName = "JobSchedulerCleanupFiles";
 
     @Override
@@ -30,7 +29,7 @@ public class JobSchedulerCleanupFiles extends JobSchedulerFileOperationBase {
 
     @Override
     public boolean spooler_process() {
-        initialize(conSVNVersion);
+        initialize();
         try {
             if (isEmpty(filePath)) {
                 filePath = conPropertyJAVA_IO_TMPDIR;

@@ -15,7 +15,6 @@ public class JobSchedulerExistsFile extends JobSchedulerFileOperationBase {
 
     private static final Logger LOGGER = Logger.getLogger(JobSchedulerExistsFile.class);
     private static final String CLASSNAME = "JobSchedulerExistsFile";
-    private final String conSVNVersion = "$Id$";
 
     @Override
     public boolean spooler_init() {
@@ -25,7 +24,7 @@ public class JobSchedulerExistsFile extends JobSchedulerFileOperationBase {
     @Override
     public boolean spooler_process() {
         try {
-            initialize(conSVNVersion);
+            initialize();
             CheckMandatoryFile();
             SOSFileOperations = new SOSFileSystemOperations();
             flgOperationWasSuccessful = SOSFileOperations.existsFile(file, fileSpec, Pattern.CASE_INSENSITIVE, minFileAge, maxFileAge, minFileSize,

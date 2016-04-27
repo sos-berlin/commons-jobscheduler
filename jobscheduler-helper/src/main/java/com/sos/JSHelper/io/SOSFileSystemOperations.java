@@ -124,10 +124,7 @@ public class SOSFileSystemOperations {
             log_debug1("argument fileSpecFlags=" + msg, LOGGER);
             String filename = file.getPath();
             filename = substituteAllDate(filename);
-            Matcher m = Pattern.compile("\\[[^]]*\\]").matcher(filename);
-            if (m.find()) {
-                throw new JobSchedulerException("unsupported file mask found: " + m.group());
-            }
+            
             file = new File(filename);
             if (!file.exists()) {
                 log("checking file " + file.getAbsolutePath() + ": no such file or directory", LOGGER);
@@ -290,10 +287,7 @@ public class SOSFileSystemOperations {
             }
             String filename = file.getPath();
             filename = substituteAllDate(filename);
-            Matcher m = Pattern.compile("\\[[^]]*\\]").matcher(filename);
-            if (m.find()) {
-                throw new JobSchedulerException("unsupported file mask found: " + m.group());
-            }
+            
             file = new File(filename);
             if (!file.exists()) {
                 log("checking file " + file.getAbsolutePath() + ": no such file or directory", LOGGER);
@@ -1037,10 +1031,7 @@ public class SOSFileSystemOperations {
             if (target != null) {
                 targetFilename = substituteAllDate(target.getPath());
                 targetFilename = substituteAllDirectory(targetFilename, source.getPath());
-                Matcher m = Pattern.compile("\\[[^]]*\\]").matcher(targetFilename);
-                if (m.find()) {
-                    throw new JobSchedulerException("unsupported file mask found: " + m.group());
-                }
+                 
                 target = new File(targetFilename);
             }
             if (create_dir && target != null && !target.exists()) {
@@ -1098,10 +1089,7 @@ public class SOSFileSystemOperations {
                         targetFilename = replaceGroups(targetFilename, replacing, replacement);
                         targetFilename = substituteAllDate(targetFilename);
                         targetFilename = substituteAllFilename(targetFilename, targetFile.getName());
-                        Matcher matcher = Pattern.compile("\\[[^]]*\\]").matcher(targetFilename);
-                        if (matcher.find()) {
-                            throw new JobSchedulerException("unsupported file mask found: " + matcher.group());
-                        }
+                        
                         targetFile = new File(targetFile.getParent() + "/" + targetFilename);
                     }
                 } catch (Exception re) {
@@ -1669,10 +1657,7 @@ public class SOSFileSystemOperations {
             targetFilename = replaceGroups(targetFilename, replacing, replacements.split(";"));
             targetFilename = substituteAllDate(targetFilename);
             targetFilename = substituteAllFilename(targetFilename, input);
-            Matcher m = Pattern.compile("\\[[^\\]]*\\]").matcher(targetFilename);
-            if (m.find()) {
-                throw new JobSchedulerException("unsupported file mask found:" + m.group());
-            }
+            
             return targetFilename;
         } catch (Exception e) {
             throw new JobSchedulerException("getReplacementFilename: " + e.getMessage());

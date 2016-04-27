@@ -13,7 +13,6 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "com.sos.scheduler.messages", defaultLocale = "en")
 public class JobSchedulerRenameFile extends JobSchedulerFileOperationBase {
 
-    private final String conSVNVersion = "$Id$";
     private static final String conClassName = "JobSchedulerRenameFile";
 
     @Override
@@ -24,7 +23,7 @@ public class JobSchedulerRenameFile extends JobSchedulerFileOperationBase {
     @Override
     public boolean spooler_process() {
         try {
-            initialize(conSVNVersion);
+            initialize();
             if (file == null) {
                 file = source;
             }
