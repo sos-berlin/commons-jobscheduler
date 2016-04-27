@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 
 import com.sos.JSHelper.io.Files.JSFile;
 
-/** @author eqbfd */
 public class SOSOptionOutFileName extends SOSOptionFileName {
 
     private static final long serialVersionUID = -8227806083390668082L;
@@ -47,10 +46,8 @@ public class SOSOptionOutFileName extends SOSOptionFileName {
 
     @Override
     public JSFile JSFile() {
-        if (objFile == null) {
-            if (isNotEmpty(strValue)) {
-                objFile = new JSFile(strValue);
-            }
+        if (objFile == null && isNotEmpty(strValue)) {
+            objFile = new JSFile(strValue);
         }
         return objFile;
     }

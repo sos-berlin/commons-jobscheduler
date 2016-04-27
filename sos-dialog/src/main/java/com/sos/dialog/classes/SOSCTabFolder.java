@@ -37,10 +37,10 @@ import com.sos.dialog.swtdesigner.SWTResourceManager;
 /** @author KB */
 public class SOSCTabFolder extends CTabFolder {
 
+    private static final Logger LOGGER = Logger.getLogger(SOSCTabFolder.class);
     public static final String conTABITEM_I18NKEY = "key";
     public static final String conTABITEM_SOSITEM = "SOSCTABITEM";
     public static final String conCOMPOSITE_OBJECT_KEY = "composite";
-    private static final Logger LOGGER = Logger.getLogger(SOSCTabFolder.class);
     public boolean ItemsHasClose = true;
     public boolean gflgCreateControlsImmediate = true;
     public boolean flgRejectTabItemSelection = false;
@@ -53,15 +53,15 @@ public class SOSCTabFolder extends CTabFolder {
         this.setBorderVisible(false);
         setTabHeight(getTabHeight() + 6);
         this.setBackground(Globals.getCompositeBackground());
-        this.setSelectionBackground(new Color[] { Globals.getFieldHasFocusBackground(), Globals.getCompositeBackground(), Globals.getCompositeBackground() },
-                new int[] { 50, 100 }, true);
+        this.setSelectionBackground(new Color[] { Globals.getFieldHasFocusBackground(), Globals.getCompositeBackground(),
+                Globals.getCompositeBackground() }, new int[] { 50, 100 }, true);
         Gridlayout.set4ColumnLayout(this);
 
         addFocusListener(new FocusListener() {
 
             @Override
             public void focusLost(final FocusEvent e) {
-                // TODO validate?
+                // TO DO validate?
             }
 
             @Override
@@ -79,17 +79,15 @@ public class SOSCTabFolder extends CTabFolder {
             @Override
             public void widgetSelected(final SelectionEvent event) {
                 LOGGER.trace("CTabFolder Item selected");
-                if (flgRejectTabItemSelection == true) {
+                if (flgRejectTabItemSelection) {
                     return;
                 }
                 CTabItem objSelectedItem = getSelection();
                 Composite objCurrComposite = (Composite) objSelectedItem.getControl();
-                if (objCurrComposite instanceof ISOSTabItem) {
-                    if (!CompositeBaseClass.gflgCreateControlsImmediate) {
-                        CompositeBaseClass<?> objBC = (CompositeBaseClass<?>) objCurrComposite;
-                        objBC.createTabItemComposite();
-                        doResize();
-                    }
+                if (objCurrComposite instanceof ISOSTabItem && !CompositeBaseClass.gflgCreateControlsImmediate) {
+                    CompositeBaseClass<?> objBC = (CompositeBaseClass<?>) objCurrComposite;
+                    objBC.createTabItemComposite();
+                    doResize();
                 }
                 CTabItem tbiLastSelected = (CTabItem) getData("lastSelected");
                 if (tbiLastSelected == objSelectedItem) {
@@ -110,7 +108,7 @@ public class SOSCTabFolder extends CTabFolder {
 
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
-                // TODO Auto-generated method stub
+                // TO DO Auto-generated method stub
             }
         });
         this.addListener(SWT.MouseDoubleClick, Globals.listener);
@@ -168,7 +166,6 @@ public class SOSCTabFolder extends CTabFolder {
         this.addCTabFolder2Listener(new CTabFolder2Adapter() {
 
             public void itemClosed(final CTabFolderEvent event) {
-
             }
 
             @Override
@@ -207,7 +204,6 @@ public class SOSCTabFolder extends CTabFolder {
         boolean flgDoClose = true;
         try {
             int buttonID = SWT.NO;
-
             if (pobjTabItem != null) {
                 Object objO = pobjTabItem.getData();
                 if (objO instanceof IDirty) {
@@ -264,7 +260,6 @@ public class SOSCTabFolder extends CTabFolder {
             doResize();
         } catch (Exception e) {
             new ErrorLog("problem", e);
-        } finally {
         }
     }
 
@@ -326,20 +321,6 @@ public class SOSCTabFolder extends CTabFolder {
         return null;
     }
 
-    private void doHandleEvent(final SelectionEvent arg0) {
-        CTabItem objTI = (CTabItem) arg0.item;
-        LOGGER.debug(objTI.getText() + " selected");
-        Object objCP = objTI.getData();
-        if (objCP != null && objCP instanceof ISOSControlProperties) {
-            ISOSControlProperties objC2 = (ISOSControlProperties) objCP;
-            objC2.selectChild();
-        }
-        handleSelection();
-        if ((arg0.stateMask & SWT.CTRL) != 0) {
-            maximizeToSashForm();
-        }
-    }
-
     private void maximizeToSashForm() {
         Object objO1 = this.getParent();
         if (objO1 instanceof SashForm) {
@@ -395,4 +376,5 @@ public class SOSCTabFolder extends CTabFolder {
     protected void checkSubclass() {
         // Disable the check that prevents subclassing of SWT components
     }
+
 }

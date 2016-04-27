@@ -118,10 +118,8 @@ public class JSObjOrder extends Order {
         name = new File(name).getName();
         i = name.indexOf(",");
         String strJobChain = "???";
-        if (i > -1 && i + 1 < name.length()) {
-            if (i > 0) {
-                strJobChain = name.substring(0, i);
-            }
+        if (i > -1 && i + 1 < name.length() && i > 0) {
+            strJobChain = name.substring(0, i);
         }
         return strJobChain;
     }

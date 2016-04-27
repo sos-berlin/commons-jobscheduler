@@ -1126,10 +1126,8 @@ public class SOSFileSystemOperations {
                     if (!copyOneFile(sourceFile, targetFile, overwrite, gracious, LOGGER)) {
                         continue;
                     }
-                } else if (renaming) {
-                    if (!renameOneFile(sourceFile, targetFile, overwrite, gracious, LOGGER)) {
-                        continue;
-                    }
+                } else if (renaming && !renameOneFile(sourceFile, targetFile, overwrite, gracious, LOGGER)) {
+                    continue;
                 }
                 nrOfTransferedFiles++;
             }

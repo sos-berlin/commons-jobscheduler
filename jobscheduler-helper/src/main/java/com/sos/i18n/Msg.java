@@ -307,25 +307,20 @@ public class Msg implements Serializable {
         // If bundle was not yet set, we've either never retreived a message or
         // we've been serialized to another VM or someone set a new locale.
         // In either of these cases, we need to get the message again.
-        if (m_bundle == null) {
-            // Note that if the last varargs is null, that means the
-            // deserialization of the varargs
-            // failed. In this case, we don't want to get the message since
-            // we've now lost some of the
-            // message data. We will rely on the last message that hopefully
-            // contains all the data, albeit
-            // in a different locale (but at least the data isn't lost).
-            if (m_lastVarargs != null) {
-                String lastMessageBackup = m_lastMessage;
-
-                getMsg(m_lastKey, m_lastVarargs);
-
-                if (m_getFailed) {
-                    m_lastMessage = lastMessageBackup;
-                }
+        // Note that if the last varargs is null, that means the
+        // deserialization of the varargs
+        // failed. In this case, we don't want to get the message since
+        // we've now lost some of the
+        // message data. We will rely on the last message that hopefully
+        // contains all the data, albeit
+        // in a different locale (but at least the data isn't lost).
+        if (m_bundle == null && m_lastVarargs != null) {
+            String lastMessageBackup = m_lastMessage;
+            getMsg(m_lastKey, m_lastVarargs);
+            if (m_getFailed) {
+                m_lastMessage = lastMessageBackup;
             }
         }
-
         return m_lastMessage;
     }
 

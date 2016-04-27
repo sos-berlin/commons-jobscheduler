@@ -15,30 +15,12 @@ import com.sos.dialog.interfaces.ISOSPreferenceStore;
 /** @author KB */
 public class SOSPreferenceStore implements ISOSPreferenceStore {
 
-    @SuppressWarnings("unused")
-    private final String conClassName = this.getClass().getSimpleName();
-    @SuppressWarnings("unused")
-    private static final String conSVNVersion = "$Id$";
-    @SuppressWarnings("unused")
-    private final Logger logger = Logger.getLogger(this.getClass());
-
-    // TODO make class variable
-    public Preferences prefs = Preferences.userRoot().node(this.getClass().getName());
-    public static String gstrApplication = "SOS";
     protected String strKey = "";
     protected String className = "";
     protected Shell shell = null;
-    private static final int MAX_KEY_LENGTH = Preferences.MAX_KEY_LENGTH;
-
-    // Get maximum value length
-    private final int valueMax = Preferences.MAX_VALUE_LENGTH;
-
-    // Get maximum length of byte array values
-    private final int bytesMax = Preferences.MAX_VALUE_LENGTH * 3 / 4;
-
-    /**
-	 *
-	 */
+    private static final Logger logger = Logger.getLogger(SOSPreferenceStore.class);
+    public static String gstrApplication = "SOS";
+    public Preferences prefs = Preferences.userRoot().node(this.getClass().getName());
 
     protected int getInt(final String s, final int def) {
         try {
@@ -66,8 +48,12 @@ public class SOSPreferenceStore implements ISOSPreferenceStore {
     }
 
     public SOSPreferenceStore(String instance) {
-        className = instance;
-        strKey = normalizeKey(instance);
+        className = normalizeKey(instance);
+        if (className.isEmpty()) {
+            className = normalizeKey(this.getClass().getName());
+            strKey = className;
+        } else {
+            strKey = className;
     }
 
     public void setKey(final String pstrKey) {
@@ -85,14 +71,11 @@ public class SOSPreferenceStore implements ISOSPreferenceStore {
     }
 
     public String getPropertyKey() {
-
-        if (strKey.equals("")) {
+        if ("".equals(strKey)) {
             strKey = "context";
         }
-        String strT = "properties/" + strKey;
-
-        logger.trace("key = " + strT);
-        return strT;
+        logger.trace("key = " + "properties/" + strKey);
+        return "properties/" + strKey;
     }
 
     public void saveProperty(final String pstrPropName, final String pstrPropValue) {
@@ -120,7 +103,7 @@ public class SOSPreferenceStore implements ISOSPreferenceStore {
     @Override
     public String readPreferenceStore() {
         String strT = "";
-        if (prefs != null && gstrApplication.length() > 0) {
+        if (prefs != null && !gstrApplication.isEmpty()) {
             strT = prefs.get(gstrApplication, "");
         }
         return strT;
@@ -128,7 +111,7 @@ public class SOSPreferenceStore implements ISOSPreferenceStore {
 
     @Override
     public String writePreferenceStore(final String strT) {
-        if (prefs != null && gstrApplication.length() > 0) {
+        if (prefs != null && !gstrApplication.isEmpty()) {
             prefs.put(gstrApplication, strT);
         }
         return strT;

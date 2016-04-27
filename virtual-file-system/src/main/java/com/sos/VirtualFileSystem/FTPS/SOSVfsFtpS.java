@@ -73,12 +73,9 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
             /** This listener is to write all commands and response from commands
              * to system.out */
             objProtocolCommandListener = new SOSFtpClientLogger(HostID(""));
-            // TODO create a hidden debug-option to activate this listener
-            if (objConnection2Options != null) {
-                if (objConnection2Options.ProtocolCommandListener.isTrue()) {
+            if (objConnection2Options != null && objConnection2Options.ProtocolCommandListener.isTrue()) {
                     client.addProtocolCommandListener(objProtocolCommandListener);
                 }
-            }
 
             String addFTPProtocol = System.getenv("AddFTPProtocol");
             if (addFTPProtocol != null && addFTPProtocol.equalsIgnoreCase("true")) {

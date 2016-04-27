@@ -112,11 +112,9 @@ public class JSCsvFile extends JSTextFile {
             }
             list.add(str);
         }
-        if (intColumnCount != intFieldCount) {
-            if (flgCheckColumnCount) {
-                message("WARN: problem in record " + intRecordCount + " - " + intFieldCount + " columns expected, but the record contains "
-                        + intColumnCount);
-            }
+        if (intColumnCount != intFieldCount && flgCheckColumnCount) {
+            message("WARN: problem in record " + intRecordCount + " - " + intFieldCount + " columns expected, but the record contains "
+                    + intColumnCount);
         }
         if (list.isEmpty() || intColumnCount != intFieldCount && flgCheckColumnCount) {
             return null;
@@ -152,26 +150,22 @@ public class JSCsvFile extends JSTextFile {
         while ((ch = Reader().read()) != -1) {
             if (ch == chrRecordDelimiter && !flgFieldIsQuoted) {
                 final int intL = stbBuilder.length();
-                if (intL > 1) {
-                    if (stbBuilder.charAt(stbBuilder.length() - 1) == '\r') {
-                        final String strB = stbBuilder.substring(0, stbBuilder.length() - 1);
-                        stbBuilder = new StringBuilder(strB);
-                        lngNoOfLinesRead++;
-                    }
+                if (intL > 1 && stbBuilder.charAt(stbBuilder.length() - 1) == '\r') {
+                    final String strB = stbBuilder.substring(0, stbBuilder.length() - 1);
+                    stbBuilder = new StringBuilder(strB);
+                    lngNoOfLinesRead++;
                 }
                 flgIsNewline = true;
                 break;
             }
-            if (flgFieldIsQuoted) {
-                if (ch == chrValueDelimiter) {
-                    if (intLast == ch) {
-                        intLast = -1;
-                        stbBuilder.append(chrValueDelimiter);
-                        continue;
-                    }
-                    intLast = ch;
+            if (flgFieldIsQuoted && ch == chrValueDelimiter) {
+                if (intLast == ch) {
+                    intLast = -1;
+                    stbBuilder.append(chrValueDelimiter);
                     continue;
                 }
+                intLast = ch;
+                continue;
             }
             if (ch == chrColumnDelimiter) {
                 if (flgFieldIsQuoted) {

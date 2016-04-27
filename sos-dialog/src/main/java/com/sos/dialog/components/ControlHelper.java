@@ -130,7 +130,6 @@ public class ControlHelper implements IValueChangedListener {
             // set this after setting the items of the combobox, otherwise text
             // will be deleted
             objCombo.setText(objOptionElement.Value());
-            String str1 = objCombo.getText();
             objCombo.addModifyListener(new ModifyListener() {
 
                 @Override
@@ -290,13 +289,11 @@ public class ControlHelper implements IValueChangedListener {
                 objText.setText(strCurrValue);
             }
         }
-        if (objControl instanceof Button) {
-            if (pobjOptionElement instanceof SOSOptionBoolean) {
-                SOSOptionBoolean objBoolean = (SOSOptionBoolean) pobjOptionElement;
-                ((Button) objControl).setSelection(objBoolean.value());
-                if (objControl instanceof SOSCheckBox) {
-                    ((SOSCheckBox) objControl).setEnabledDisabled();
-                }
+        if (objControl instanceof Button && pobjOptionElement instanceof SOSOptionBoolean) {
+            SOSOptionBoolean objBoolean = (SOSOptionBoolean) pobjOptionElement;
+            ((Button) objControl).setSelection(objBoolean.value());
+            if (objControl instanceof SOSCheckBox) {
+                ((SOSCheckBox) objControl).setEnabledDisabled();
             }
         }
         if (objControl instanceof CCombo) {

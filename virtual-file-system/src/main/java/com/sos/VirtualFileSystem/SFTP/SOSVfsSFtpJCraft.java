@@ -329,10 +329,8 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             fos.close();
             fos = null;
             transferFile = new File(localFile);
-            if (!append) {
-                if (remoteFileSize > 0 && remoteFileSize != transferFile.length()) {
-                    throw new JobSchedulerException(SOSVfs_E_162.params(remoteFileSize, transferFile.length()));
-                }
+            if (!append && remoteFileSize > 0 && remoteFileSize != transferFile.length()) {
+                throw new JobSchedulerException(SOSVfs_E_162.params(remoteFileSize, transferFile.length()));
             }
             remoteFileSize = transferFile.length();
             reply = "get OK";
@@ -862,8 +860,13 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     @Override
     public String createScriptFile(String content) throws Exception {
         try {
+<<<<<<< HEAD
             String commandScript = content;
             if (isRemoteWindowsShell == false) {
+=======
+            String commandScript = pstrContent;
+            if (!isRemoteWindowsShell) {
+>>>>>>> origin/release/1.10
                 commandScript = commandScript.replaceAll("(?m)\r", "");
             }
             LOGGER.debug(SOSVfs_I_233.params(content));
@@ -873,11 +876,19 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             out.write(commandScript);
             out.flush();
             out.close();
+<<<<<<< HEAD
             tempScriptFile.deleteOnExit();
             putFile(tempScriptFile, 0700);
             String name = tempScriptFile.getName();
             if (isRemoteWindowsShell == false) {
                 name = "./" + name;
+=======
+            fleTempScriptFile.deleteOnExit();
+            putFile(fleTempScriptFile, 0700);
+            String strFileName2Return = fleTempScriptFile.getName();
+            if (!isRemoteWindowsShell) {
+                strFileName2Return = "./" + strFileName2Return;
+>>>>>>> origin/release/1.10
             }
             LOGGER.info(SOSVfs_I_253.params(tempScriptFile.getAbsolutePath()));
             return name;

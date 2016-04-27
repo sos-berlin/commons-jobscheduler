@@ -174,12 +174,10 @@ public class FileConsumerTool extends Thread implements MessageListener, Excepti
                 LOGGER.debug("TargetFileName = " + strTargetFileName);
                 try {
                     String messageId = ((ActiveMQBytesMessage) message).getGroupID();
-                    if (!strTargetFileName.equalsIgnoreCase(strTargetFileNameSave)) {
-                        if (fos != null) {
-                            fos.close();
-                            fos = null;
-                            LOGGER.debug("filename changed " + strTargetFileName + ", " + strTargetFileNameSave);
-                        }
+                    if (!strTargetFileName.equalsIgnoreCase(strTargetFileNameSave) && fos != null) {
+                        fos.close();
+                        fos = null;
+                        LOGGER.debug("filename changed " + strTargetFileName + ", " + strTargetFileNameSave);
                     }
                     if (fos == null) {
                         File outFile = new File("c:/temp/", strTargetFileName);

@@ -9,7 +9,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import sos.util.SOSFile;
-import sos.util.SOSLogger;
 
 public class JobSchedulerProcessCheckFileMailJob extends JobSchedulerProcessSendMailJob {
 
@@ -66,11 +65,9 @@ public class JobSchedulerProcessCheckFileMailJob extends JobSchedulerProcessSend
                     found = true;
                     break;
                 }
-                if (pattern != null && curFile.exists()) {
-                    if (grep(curFile, pattern)) {
-                        found = true;
-                        break;
-                    }
+                if (pattern != null && curFile.exists() && grep(curFile, pattern)) {
+                    found = true;
+                    break;
                 }
             }
         } catch (Exception e) {

@@ -44,7 +44,6 @@ public class JSXMLFile extends JSTextFile {
     protected HashMap<String, String> hsmParameters = null;
     private static final Logger LOGGER = Logger.getLogger(JSXMLFile.class);
     private static final long serialVersionUID = 1L;
-    // private final String conClassName = "JSXMLFile";
     private Boolean flgFileIsOpen = false;
     private int intIndent = 0;
     private Boolean flgDecrIndent = false;
@@ -177,7 +176,7 @@ public class JSXMLFile extends JSTextFile {
         if (intIndent > 0) {
             strT = "";
             for (int i = 0; i < intIndent; i++) {
-                strT += "\t"; // " ";
+                strT += "\t";
             }
         }
         return strT;
@@ -233,10 +232,8 @@ public class JSXMLFile extends JSTextFile {
     }
 
     public JSXMLFile newCDataTag(final String pstrTagName, final String pstrTagValue) throws Exception {
-        if (pstrTagValue != null && pstrTagName != null) {
-            if (!pstrTagValue.isEmpty()) {
-                this.newTag(pstrTagName, MakeCData(pstrTagValue));
-            }
+        if (pstrTagValue != null && pstrTagName != null && !pstrTagValue.isEmpty()) {
+            this.newTag(pstrTagName, MakeCData(pstrTagValue));
         }
         return this;
     }
@@ -416,8 +413,8 @@ public class JSXMLFile extends JSTextFile {
     public Document getDomDocument() throws ParserConfigurationException {
         if (document == null) {
             System.setProperty("javax.xml.parsers.DocumentBuilderFactory", conORG_APACHE_XERCES_JAXP_DOCUMENT_BUILDER_FACTORY_IMPL);
-            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance(conORG_APACHE_XERCES_JAXP_DOCUMENT_BUILDER_FACTORY_IMPL, this.getClass()
-                    .getClassLoader());
+            DocumentBuilderFactory builderFactory =
+                    DocumentBuilderFactory.newInstance(conORG_APACHE_XERCES_JAXP_DOCUMENT_BUILDER_FACTORY_IMPL, this.getClass().getClassLoader());
             builderFactory.setNamespaceAware(true);
             builderFactory.setXIncludeAware(true);
             String strUserDir = System.getProperty("user.dir");
