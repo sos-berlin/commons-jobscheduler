@@ -54,6 +54,7 @@ public class SOSPreferenceStore implements ISOSPreferenceStore {
             strKey = className;
         } else {
             strKey = className;
+        }
     }
 
     public void setKey(final String pstrKey) {
