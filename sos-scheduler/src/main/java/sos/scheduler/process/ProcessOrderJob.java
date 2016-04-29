@@ -205,16 +205,16 @@ public class ProcessOrderJob extends ProcessJob {
                 spooler_task.order().params().set_var("scheduler_order_stderr_output", stdErrString);
                 spooler_task.order().params().set_var("scheduler_order_stdout_output", stdOutString);
                 spooler_task.order().params().set_var("scheduler_order_exit_code", String.valueOf(subprocess.exit_code()));
-                spooler_task.order().params().set_var("scheduler_order_terminated", (terminated ? "true" : "false"));
+                spooler_task.order().params().set_var("scheduler_order_terminated", terminated ? "true" : "false");
             }
-            if ((subprocess.exit_code() != 0)) {
+            if (subprocess.exit_code() != 0) {
                 if (this.isIgnoreError()) {
                     this.getLogger().info("command terminated with exit code: " + subprocess.exit_code());
                 } else {
                     throw new Exception("command terminated with exit code: " + subprocess.exit_code());
                 }
             }
-            if ((subprocess.termination_signal() != 0)) {
+            if (subprocess.termination_signal() != 0) {
                 if (this.isIgnoreSignal()) {
                     this.getLogger().info("command terminated with signal: " + subprocess.termination_signal());
                 } else {
@@ -415,11 +415,10 @@ public class ProcessOrderJob extends ProcessJob {
     }
 
     public void initConfiguration(String configurationPath, String configurationFilename) throws Exception {
-        if (spooler_job.order_queue() != null && spooler_task.order().params() != null) {
-            if (spooler_task.order().params().value("configuration_path") != null
-                    && !spooler_task.order().params().value("configuration_path").isEmpty()) {
-                this.setConfigurationPath(spooler_task.order().params().value("configuration_path"));
-            }
+        if (spooler_job.order_queue() != null && spooler_task.order().params() != null 
+                && spooler_task.order().params().value("configuration_path") != null
+                && !spooler_task.order().params().value("configuration_path").isEmpty()) {
+            this.setConfigurationPath(spooler_task.order().params().value("configuration_path"));
         }
         if (configurationFilename.startsWith(".") || configurationFilename.startsWith("/") || configurationFilename.startsWith("\\")
                 || configurationPath == null || configurationPath.isEmpty()) {

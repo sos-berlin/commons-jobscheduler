@@ -151,13 +151,10 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
             } else {
                 objFTPClient = new FTPClient();
             }
-            FTPClientConfig conf = new FTPClientConfig();
             objProtocolCommandListener = new SOSFtpClientLogger(HostID(""));
-            if (objConnection2Options != null) {
-                if (objConnection2Options.ProtocolCommandListener.isTrue()) {
-                    objFTPClient.addProtocolCommandListener(objProtocolCommandListener);
-                    LOGGER.debug("ProtocolcommandListener added and activated");
-                }
+            if (objConnection2Options != null && objConnection2Options.ProtocolCommandListener.isTrue()) {
+                objFTPClient.addProtocolCommandListener(objProtocolCommandListener);
+                LOGGER.debug("ProtocolcommandListener added and activated");
             }
             String strAddFTPProtocol = System.getenv("AddFTPProtocol");
             if (strAddFTPProtocol != null && "true".equalsIgnoreCase(strAddFTPProtocol)) {
@@ -302,18 +299,6 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
         }
     }
 
-    private int DoCD(final String strFolderName) {
-        int x = 0;
-        try {
-            String strT = strFolderName.replaceAll("\\\\", "/");
-            LOGGER.debug(SOSVfs_D_127.params(strT));
-            x = cd(strT);
-            LogReply();
-        } catch (IOException e) {
-        }
-        return x;
-    }
-
     @Override
     public void ExecuteCommand(final String strCmd) throws Exception {
         String command = strCmd.endsWith("\n") ? strCmd : strCmd + "\n";
@@ -453,7 +438,6 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 
         for (String strFile : vecDirectoryListing) {
             String strFileName = new File(strFile).getName();
-            // file list should not contain the checksum files
             if (integrityHashType != null && strFileName.endsWith(integrityHashType)) {
                 continue;
             }
@@ -519,7 +503,6 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
             this.getSOSFileEntries().add(sosFileEntry);
             String currentFile = ftpFile.getName();
             if (isNotHiddenFile(currentFile) && !currentFile.trim().isEmpty()) {
-                // if ftp server returns filename without path
                 if (currentFile.indexOf("/") == -1) {
                     currentFile = pathName + "/" + currentFile;
                     currentFile = currentFile.replaceAll("//+", "/");

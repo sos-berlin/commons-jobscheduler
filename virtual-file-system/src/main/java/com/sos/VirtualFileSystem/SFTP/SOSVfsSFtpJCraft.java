@@ -329,10 +329,8 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             fos.close();
             fos = null;
             transferFile = new File(localFile);
-            if (!append) {
-                if (remoteFileSize > 0 && remoteFileSize != transferFile.length()) {
-                    throw new JobSchedulerException(SOSVfs_E_162.params(remoteFileSize, transferFile.length()));
-                }
+            if (!append && remoteFileSize > 0 && remoteFileSize != transferFile.length()) {
+                throw new JobSchedulerException(SOSVfs_E_162.params(remoteFileSize, transferFile.length()));
             }
             remoteFileSize = transferFile.length();
             reply = "get OK";
@@ -863,7 +861,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     public String createScriptFile(String content) throws Exception {
         try {
             String commandScript = content;
-            if (isRemoteWindowsShell == false) {
+            if (!isRemoteWindowsShell) {
                 commandScript = commandScript.replaceAll("(?m)\r", "");
             }
             LOGGER.debug(SOSVfs_I_233.params(content));
@@ -876,7 +874,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             tempScriptFile.deleteOnExit();
             putFile(tempScriptFile, 0700);
             String name = tempScriptFile.getName();
-            if (isRemoteWindowsShell == false) {
+            if (!isRemoteWindowsShell) {
                 name = "./" + name;
             }
             LOGGER.info(SOSVfs_I_253.params(tempScriptFile.getAbsolutePath()));

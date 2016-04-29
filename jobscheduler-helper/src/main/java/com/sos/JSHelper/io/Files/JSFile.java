@@ -236,8 +236,7 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
 
     public String CreateBackup() {
         String strExtension4BackupFile = System.getProperty(conPropertySOS_JSFILE_EXTENSION_4_BACKUPFILE, ConDefaultExtension4BackupFile);
-        String strR = this.doCreateBackUp(strExtension4BackupFile);
-        return strR;
+        return this.doCreateBackUp(strExtension4BackupFile);
     }
 
     public String CreateBackup(final String pstrExtension4BackupFile) throws Exception {
@@ -262,13 +261,9 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
     }
 
     private String getTimeStamp() {
-        final Date now = new Date();
-        String strT = null;
-        SimpleDateFormat formatter;
         final Locale currentLocale = new Locale("de", "DE");
-        formatter = new SimpleDateFormat("yyyy-MM-dd-H-mm-ss", currentLocale);
-        strT = formatter.format(now);
-        return strT;
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd-H-mm-ss", currentLocale);
+        return formatter.format(new Date());
     }
 
     public boolean isOlderThan(final long plngCompareTo) {
@@ -609,8 +604,7 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
                 fin = null;
             }
         }
-        final String strT = strB.substring(0, lngFileSize);
-        return strT;
+        return strB.substring(0, lngFileSize);
     }
 
     public void dumpAscii(final PrintStream out) {
@@ -993,16 +987,14 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
             return flgIsExclusive;
         }
         flgIsExclusive = pflgIsExclusive;
-        if (flgIsExclusive) {
-            if (!this.checkExclusiveDeny()) {
-                InetAddress ia = InetAddress.getLocalHost();
-                String strUserName = System.getProperty("user.name");
-                JSDataElementTimeStampISO tstIso = new JSDataElementTimeStampISO(new JSDataElementDate(new Date()));
-                String strValues = strFileName + ";" + strUserName + ";" + tstIso.FormattedValue() + ";" + ia.getHostAddress();
-                fleExclusiveFile.WriteLine(strValues);
-                LOGGER.debug(Messages.getMsg(JSH_I_0110, strValues));
-                fleExclusiveFile.close();
-            }
+        if (flgIsExclusive && !this.checkExclusiveDeny()) {
+            InetAddress ia = InetAddress.getLocalHost();
+            String strUserName = System.getProperty("user.name");
+            JSDataElementTimeStampISO tstIso = new JSDataElementTimeStampISO(new JSDataElementDate(new Date()));
+            String strValues = strFileName + ";" + strUserName + ";" + tstIso.FormattedValue() + ";" + ia.getHostAddress();
+            fleExclusiveFile.WriteLine(strValues);
+            LOGGER.debug(Messages.getMsg(JSH_I_0110, strValues));
+            fleExclusiveFile.close();
         }
         return flgIsExclusive;
     }
@@ -1036,8 +1028,9 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
     }
 
     public String toXml() {
-        String strXml = String.format("<file name='%1$s' size='%2$d' modificationdate='%3$s' />", this.getAbsolutePath(), fleFile.length(),
-                new Date(fleFile.lastModified()));
+        String strXml =
+                String.format("<file name='%1$s' size='%2$d' modificationdate='%3$s' />", this.getAbsolutePath(), fleFile.length(), new Date(
+                        fleFile.lastModified()));
         return strXml;
     }
 
@@ -1048,7 +1041,6 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
     public String getUniqueFileName() {
         String strUniqueFileName = strFileName;
         String strE = getFileExtensionName();
-        String strF = getName();
         if (this.exists()) {
             for (int i = 2;; i++) {
                 String strN = "(" + String.valueOf(i) + ")";

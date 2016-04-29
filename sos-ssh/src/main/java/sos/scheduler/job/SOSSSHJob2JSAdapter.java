@@ -82,13 +82,11 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
         }
         objO.CurrentNodeName(this.getCurrentNodeName(true));
         HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(getJobOrOrderParameters());
-        if (!useTrilead) {
-            if (!"false".equalsIgnoreCase(hsmParameters1.get("create_environment_variables"))) {
-                Map<String, String> allEnvVars = new HashMap<String, String>();
-                allEnvVars.putAll(getSchedulerEnvironmentVariables());
-                allEnvVars.putAll(prefixSchedulerEnvVars(hsmParameters1));
-                ((SOSSSHJobJSch) objR).setSchedulerEnvVars(allEnvVars);
-            }
+        if (!useTrilead && !"false".equalsIgnoreCase(hsmParameters1.get("create_environment_variables"))) {
+            Map<String, String> allEnvVars = new HashMap<String, String>();
+            allEnvVars.putAll(getSchedulerEnvironmentVariables());
+            allEnvVars.putAll(prefixSchedulerEnvVars(hsmParameters1));
+            ((SOSSSHJobJSch) objR).setSchedulerEnvVars(allEnvVars);
         }
         objO.setAllOptions(objO.DeletePrefix(hsmParameters1, "ssh_"));
         objR.setJSJobUtilites(this);

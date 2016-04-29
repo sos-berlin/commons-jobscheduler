@@ -152,21 +152,19 @@ public class SWTResourceManager {
 
     public static Image getImageFromResource(String pstrFileName) {
         Image image = null;
-        if (!"noicon".equalsIgnoreCase(pstrFileName)) {
-            if ((image = getImageFromCache("default", pstrFileName)) == null) {
-                String strResource = pstrFileName;
-                if (strResource.startsWith("/")) {
-                    strResource = strResource.substring(1);
-                }
-                InputStream objFIS = Thread.currentThread().getContextClassLoader().getResourceAsStream(strResource);
-                try {
-                    image = new Image(Display.getCurrent(), new ImageData(objFIS));
-                } catch (Exception e) {
-                    image = getMissingImage();
-                } finally {
-                    putImageToCache("default", pstrFileName, image);
-                    objFIS = closeFIS(objFIS);
-                }
+        if (!"noicon".equalsIgnoreCase(pstrFileName) && (image = getImageFromCache("default", pstrFileName)) == null) {
+            String strResource = pstrFileName;
+            if (strResource.startsWith("/")) {
+                strResource = strResource.substring(1);
+            }
+            InputStream objFIS = Thread.currentThread().getContextClassLoader().getResourceAsStream(strResource);
+            try {
+                image = new Image(Display.getCurrent(), new ImageData(objFIS));
+            } catch (Exception e) {
+                image = getMissingImage();
+            } finally {
+                putImageToCache("default", pstrFileName, image);
+                objFIS = closeFIS(objFIS);
             }
         }
         return image;

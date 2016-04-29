@@ -13,7 +13,6 @@ import java.util.Date;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.omg.SendingContext.RunTime;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
@@ -24,43 +23,31 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpATTRS;
 import com.jcraft.jsch.SftpException;
 import com.jcraft.jsch.SftpProgressMonitor;
-import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
+import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
 import com.sos.JSHelper.Options.SOSOptionInFileName;
 import com.sos.VirtualFileSystem.Interfaces.ISOSAuthenticationOptions;
 import com.sos.VirtualFileSystem.Interfaces.ISOSConnection;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
-import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsSuperClass;
 import com.sos.VirtualFileSystem.SFTP.SOSVfsSFtpFileJCraft;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
 import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
-/** @ressources jsch-0.1.48.jar
- *
- * @author Robert Ehrlich
- *
- *         http://kickjava.com/src/org.apache.tools.ant.taskdefs.optional.ssh.
- *         index.htm */
+/** @author Robert Ehrlich */
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
 
     public static final String conConfigurationSTRICT_HOST_KEY_CHECKING = "StrictHostKeyChecking";
     private final Logger logger = Logger.getLogger(SOSVfsScpJCraft.class);
-    /** ssh connection object */
     private Channel sshConnection = null;
-    /** ssh session object */
     private Session sshSession = null;
-    /** SFTP Client **/
     private ChannelSftp sftpClient = null;
     private JSch secureChannel = null;
     private boolean simulateShell = false;
 
-    /** \brief SOSVfsSFtpJCraft
-     *
-     * \details */
     public SOSVfsScpJCraft() {
         super();
         secureChannel = new JSch();
@@ -75,13 +62,6 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         return strictHostKeyChecking.value() ? "yes" : "no";
     }
 
-    /** \brief Connect
-     *
-     * \details
-     *
-     * \return
-     *
-     * @return */
     @Override
     public ISOSConnection Connect() {
         SOSConnection2OptionsAlternate pConnection2OptionsAlternate = null;
@@ -89,14 +69,6 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         return this;
     }
 
-    /** \brief Connect
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param pobjConnectionOptions
-     * @return */
     @Override
     public ISOSConnection Connect(final SOSConnection2OptionsAlternate pConnection2OptionsAlternate) {
         connection2OptionsAlternate = pConnection2OptionsAlternate;
@@ -108,14 +80,6 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         return this;
     }
 
-    /** \brief Authenticate
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param authenticationOptions
-     * @return */
     @Override
     public ISOSConnection Authenticate(final ISOSAuthenticationOptions pAuthenticationOptions) {
         authenticationOptions = pAuthenticationOptions;
@@ -129,14 +93,6 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         return this;
     }
 
-    /** \brief login
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param strUserName
-     * @param strPassword */
     @Override
     public void login(final String pUserName, final String pPassword) {
         try {
@@ -152,13 +108,8 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         } catch (Exception e) {
             RaiseException(e, SOSVfs_E_134.params("authentication"));
         }
-    } // private boolean login
+    }
 
-    /** \brief disconnect
-     *
-     * \details
-     *
-     * \return */
     @Override
     public void disconnect() {
         reply = "disconnect OK";
@@ -189,10 +140,6 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         return sftpClient != null && sftpClient.isConnected();
     }
 
-    /** Creates a new subdirectory on the FTP server in the current directory .
-     * 
-     * @param pstrPathName The pathname of the directory to create.
-     * @exception JobSchedulerException */
     @Override
     public void mkdir(final String path) {
         try {
@@ -203,15 +150,12 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
                 SftpATTRS attributes = getAttributes(strSubFolder);
                 if (attributes == null) {
                     this.getClient().mkdir(strSubFolder);
-                    // this.getClient().chmod(484, strSubFolder); //was ist
-                    // chmod 484?
                 } else {
-                    if (attributes.isDir() == false) {
+                    if (!attributes.isDir()) {
                         RaiseException(SOSVfs_E_277.params(strSubFolder));
                     }
                 }
             }
-            // DoCD(strCurrentDir);
             logger.debug(HostID(SOSVfs_D_181.params("mkdir", path, getReplyString())));
         } catch (Exception e) {
             reply = e.toString();
@@ -219,10 +163,6 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         }
     }
 
-    /** Removes a directory on the FTP server (if empty).
-     * 
-     * @param path The pathname of the directory to remove.
-     * @exception JobSchedulerException */
     @Override
     public void rmdir(final String path) {
         try {
@@ -235,19 +175,6 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
                 reply = "rmdir OK";
                 logger.debug(HostID(SOSVfs_D_181.params("rmdir", strT, getReplyString())));
             }
-            // String[] pathArray = path.split("/");
-            // for (int i = pathArray.length; i > 0; i--) {
-            // String strT = "";
-            // for (int j = 0; j < i; j++) {
-            // strT += pathArray[j] + "/";
-            // }
-            // logger.debug(HostID(SOSVfs_D_179.params("rmdir", strT)));
-            // this.getClient().rmdir(strT);
-            //
-            // reply = "rmdir OK";
-            // logger.debug(HostID(SOSVfs_D_181.params("rmdir", strT,
-            // getReplyString())));
-            // }
             logINFO(HostID(SOSVfs_D_181.params("rmdir", path, getReplyString())));
         } catch (Exception e) {
             reply = e.toString();
@@ -255,10 +182,6 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         }
     }
 
-    /** returns attributes
-     *
-     * @param filename
-     * @return SftpATTRS */
     public SftpATTRS getAttributes(final String filename) {
         SftpATTRS attributes = null;
         try {
@@ -268,20 +191,14 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         return attributes;
     }
 
-    /** Check and return "true" if file is a directory
-     *
-     * @param filename
-     * @return true, if filename is a directory */
     @Override
     public boolean isDirectory(final String filename) {
-        /** Problem: the concept of links is not considered in the Concept of
-         * SOSVfs Therefore: wie return here "true" if the filename is a link */
         boolean flgR = false;
         try {
             SftpATTRS attributes = this.getClient().stat(filename);
             if (attributes != null) {
                 flgR = attributes.isDir();
-                if (flgR == false) {
+                if (!flgR) {
                     flgR = attributes.isLink();
                 }
             }
@@ -290,20 +207,11 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         return flgR;
     }
 
-    /** \brief listNames
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param path
-     * @return
-     * @throws IOException */
     @Override
     public String[] listNames(String path) throws IOException {
         path = resolvePathname(path);
         try {
-            if (path.length() == 0) {
+            if (path.isEmpty()) {
                 path = ".";
             }
             if (!this.fileExists(path)) {
@@ -320,9 +228,7 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
             for (int i = 0, j = 0; i < lsResult.size(); i++) {
                 LsEntry entry = lsResult.get(i);
                 String strFileName = path + sep + entry.getFilename();
-                // if (isDirectory(strFileName) == false) {
                 result[j++] = strFileName;
-                // }
             }
             reply = "ls OK";
             return result;
@@ -332,11 +238,6 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         }
     }
 
-    /** return the size of remote-file on the remote machine on success,
-     * otherwise -1
-     * 
-     * @param remoteFile the file on remote machine
-     * @return the size of remote-file on remote machine */
     @Override
     public long size(String remoteFile) throws Exception {
         remoteFile = this.resolvePathname(remoteFile);
@@ -348,21 +249,11 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
                 size = objAttr.getSize();
             }
         } catch (SftpException e) {
-            // e.printStackTrace();
+            //
         }
         return size;
     }
 
-    /** \brief getFile
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param remoteFile
-     * @param localFile
-     * @param append
-     * @return */
     @Override
     public long getFile(final String remoteFile, final String localFile, final boolean append) {
         String sourceLocation = this.resolvePathname(remoteFile);
@@ -377,10 +268,8 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
             fos.close();
             fos = null;
             transferFile = new File(localFile);
-            if (!append) {
-                if (remoteFileSize > 0 && remoteFileSize != transferFile.length()) {
-                    throw new JobSchedulerException(SOSVfs_E_162.params(remoteFileSize, transferFile.length()));
-                }
+            if (!append && remoteFileSize > 0 && remoteFileSize != transferFile.length()) {
+                throw new JobSchedulerException(SOSVfs_E_162.params(remoteFileSize, transferFile.length()));
             }
             remoteFileSize = transferFile.length();
             reply = "get OK";
@@ -399,23 +288,10 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         return remoteFileSize;
     }
 
-    /** Stores a file on the server using the given name.
-     *
-     * @param localFile The name of the local file.
-     * @param remoteFile The name of the remote file.
-     * @return file size
-     *
-     * @exception Exception
-     * @see #put(String, String ) */
     @Override
-    // ISOSVfsFileTransfer
     public long putFile(final String localFile, final String remoteFile) {
         long size = 0;
         try {
-            // mit Progress Monitor
-            // SftpProgressMonitor monitor = new ProgressMonitor();
-            // this.getClient().put(localFile,
-            // this.resolvePathname(remoteFile),monitor,ChannelSftp.OVERWRITE);
             this.getClient().put(localFile, this.resolvePathname(remoteFile), ChannelSftp.OVERWRITE);
             reply = "put OK";
             logINFO(HostID(SOSVfs_I_183.params("putFile", localFile, remoteFile, getReplyString())));
@@ -427,12 +303,6 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         return size;
     }
 
-    /** Deletes a file on the FTP server.
-     * 
-     * @param The path of the file to be deleted.
-     * @return True if successfully completed, false if not.
-     * @throws RunTime error occurs while either sending a command to the server
-     *             or receiving a reply from the server. */
     @Override
     public void delete(final String path) {
         try {
@@ -448,14 +318,6 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         logINFO(HostID(SOSVfs_D_181.params("delete", path, getReplyString())));
     }
 
-    /** \brief rename
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param from
-     * @param to */
     @Override
     public void rename(String from, String to) {
         from = this.resolvePathname(from);
@@ -470,13 +332,6 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         logger.info(HostID(SOSVfs_I_189.params(from, to, getReplyString())));
     }
 
-    /** \brief ExecuteCommand
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param strCmd */
     @Override
     public void ExecuteCommand(final String cmd) {
         final String strEndOfLine = System.getProperty("line.separator");
@@ -487,8 +342,6 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         BufferedReader errReader = null;
         try {
             if (sshSession == null) {
-                // sshSession = sshConnection.openSession();
-                // TODO create Session ??
                 throw new JobSchedulerException(SOSVfs_E_190.params("sshSession"));
             }
             channelExec = (ChannelExec) sshSession.openChannel("exec");
@@ -507,7 +360,6 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
                     if (i < 0) {
                         break;
                     }
-                    // output line
                     outContent.append(new String(tmp, 0, i) + strEndOfLine);
                 }
                 if (channelExec.isClosed()) {
@@ -531,10 +383,8 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
                 errContent.append(line + strEndOfLine);
             }
             logger.debug(errContent);
-            if (exitCode != null) {
-                if (!exitCode.equals(new Integer(0))) {
-                    throw new JobSchedulerException(SOSVfs_E_164.params(exitCode));
-                }
+            if (exitCode != null && !exitCode.equals(new Integer(0))) {
+                throw new JobSchedulerException(SOSVfs_E_164.params(exitCode));
             }
             reply = "OK";
             logINFO(HostID(SOSVfs_I_192.params(getReplyString())));
@@ -569,14 +419,6 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         }
     }
 
-    /** \brief getInputStream
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param fileName
-     * @return */
     @Override
     public InputStream getInputStream(final String fileName) {
         try {
@@ -587,14 +429,6 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         }
     }
 
-    /** \brief getOutputStream
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param fileName
-     * @return */
     @Override
     public OutputStream getOutputStream(final String fileName) {
         try {
@@ -641,18 +475,9 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         fileName = adjustFileSeparator(fileName);
         ISOSVirtualFile file = new SOSVfsSFtpFileJCraft(fileName);
         file.setHandler(this);
-        // logger.debug(SOSVfs_D_196.params(fileName));
         return file;
     }
 
-    /** \brief getModificationTime
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param path
-     * @return */
     @Override
     public String getModificationTime(final String path) {
         String dateTime = null;
@@ -664,19 +489,11 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
                 dateTime = df.format(new Date(mt));
             }
         } catch (SftpException e) {
-            // e.printStackTrace();
+            //
         }
         return dateTime;
     }
 
-    /** \brief fileExists
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param filename
-     * @return */
     @Override
     protected boolean fileExists(final String filename) {
         try {
@@ -704,15 +521,6 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         return path;
     }
 
-    /** \brief doAuthenticate
-     *
-     * \details
-     *
-     * \return ISOSConnection
-     *
-     * @param authenticationOptions
-     * @return
-     * @throws Exception */
     private ISOSConnection doAuthenticate(final ISOSAuthenticationOptions pAuthenticationOptions) throws Exception {
         authenticationOptions = pAuthenticationOptions;
         userName = authenticationOptions.getUser().Value();
@@ -761,35 +569,17 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         return sftpClient;
     }
 
-    /** \brief connect
-     *
-     * \details
-     *
-     * \return void
-     *
-     * @param phost
-     * @param pport */
     private void connect(final String phost, final int pport) {
         host = phost;
         port = pport;
         logger.info(SOSVfs_D_0101.params(host, port));
-        if (this.isConnected() == false) {
+        if (!this.isConnected()) {
             this.LogReply();
         } else {
             logWARN(SOSVfs_D_0103.params(host, port));
         }
     }
 
-    /** \brief createSession
-     *
-     * \details
-     *
-     * \return void
-     *
-     * @param puser
-     * @param phost
-     * @param pport
-     * @throws Exception */
     private void createSession(final String puser, final String phost, final int pport) throws Exception {
         if (secureChannel == null) {
             throw new JobSchedulerException(SOSVfs_E_190.params("secureChannel"));
@@ -800,13 +590,6 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         sshSession.setConfig(config);
     }
 
-    /** \brief createObjFTPClient
-     *
-     * \details
-     *
-     * \return void
-     *
-     * @throws Exception */
     private void createSftpClient() throws Exception {
         if (sshSession == null) {
             throw new JobSchedulerException(SOSVfs_E_190.params("sshSession"));
@@ -816,9 +599,6 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         sftpClient = (ChannelSftp) sshConnection;
     }
 
-    /** @author re
-     *
-     *         Progress monitor (sftp operations GET & PUT) */
     private static class ProgressMonitor implements SftpProgressMonitor {
 
         long totalSize = 0;
@@ -881,4 +661,5 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
     public void setSimulateShell(boolean simulateShell) {
         this.simulateShell = simulateShell;
     }
+
 }

@@ -163,10 +163,8 @@ public class SOSOptionHostName extends SOSOptionElement {
 
     public String getHostFromUrl() {
         String host = this.Value();
-        if (this.IsNotEmpty()) {
-            if (this.Value().matches("[^:]+:/+([^/@]+@)?([^/:]+).*")) {
-                host = this.Value().replaceFirst("[^:]+:/+([^/@]+@)?([^/:]+).*", "$2");
-            }
+        if (this.IsNotEmpty() && this.Value().matches("[^:]+:/+([^/@]+@)?([^/:]+).*")) {
+            host = this.Value().replaceFirst("[^:]+:/+([^/@]+@)?([^/:]+).*", "$2");
         }
         return host;
     }

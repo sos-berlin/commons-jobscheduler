@@ -9,7 +9,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.HttpURL;
 import org.apache.commons.httpclient.HttpsURL;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
@@ -19,7 +18,6 @@ import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.apache.commons.ssl.TrustMaterial;
 import org.apache.log4j.Logger;
 import org.apache.webdav.lib.WebdavResource;
-import org.omg.SendingContext.RunTime;
 
 import sos.util.SOSString;
 
@@ -34,7 +32,6 @@ import com.sos.VirtualFileSystem.common.SOSVfsTransferBaseClass;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 /** @ressources webdavclient4j-core-0.92.jar
- *
  * @author Robert Ehrlich */
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
@@ -79,14 +76,12 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
             proxyPort = connection2OptionsAlternate.proxy_port.value();
             proxyUser = connection2OptionsAlternate.proxy_user.Value();
             proxyPassword = connection2OptionsAlternate.proxy_password.Value();
-
             this.doAuthenticate(authenticationOptions);
         } catch (JobSchedulerException ex) {
             throw ex;
         } catch (Exception ex) {
             throw new JobSchedulerException(ex);
         }
-
         return this;
     }
 
@@ -184,7 +179,6 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
             } else {
                 throw new JobSchedulerException(getStatusMessage(davClient));
             }
-
             LOGGER.info(HostID(SOSVfs_D_181.params("rmdir", path, getReplyString())));
         } catch (Exception e) {
             reply = e.toString();
@@ -508,13 +502,6 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
         return res;
     }
 
-    private boolean isSuccessStatusCode(int statusCode) {
-        if (statusCode == HttpStatus.SC_OK) {
-            return true;
-        }
-        return false;
-    }
-
     private WebdavResource getResource(String path, final boolean flgTryWithTrailingSlash) throws Exception {
         path = this.normalizePath(path);
         WebdavResource res = getWebdavResource(getWebdavRessourceURL(path));
@@ -637,8 +624,8 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
         } catch (JobSchedulerException ex) {
             throw ex;
         } catch (Exception ex) {
-            throw new JobSchedulerException(SOSVfs_E_167.params(authenticationOptions.getAuth_method().Value(), authenticationOptions.getAuth_file().Value()),
-                    ex);
+            throw new JobSchedulerException(SOSVfs_E_167.params(authenticationOptions.getAuth_method().Value(),
+                    authenticationOptions.getAuth_file().Value()), ex);
         }
         reply = "OK";
         LOGGER.info(SOSVfs_D_133.params(userName));
@@ -656,10 +643,9 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
         }
         if (SOSString.isEmpty(msg)) {
             msg = "no details provided.";
-            if (uri.toLowerCase().startsWith("https://") && client.getStatusCode() == 0) {
-                if (!connection2OptionsAlternate.accept_untrusted_certificate.value()) {
-                    msg += " maybe is this the problem by using of a self-signed certificate (option accept_untrusted_certificate = false)";
-                }
+            if (uri.toLowerCase().startsWith("https://") && client.getStatusCode() == 0
+                    && !connection2OptionsAlternate.accept_untrusted_certificate.value()) {
+                msg += " maybe is this the problem by using of a self-signed certificate (option accept_untrusted_certificate = false)";
             }
         }
         String proxy = "";

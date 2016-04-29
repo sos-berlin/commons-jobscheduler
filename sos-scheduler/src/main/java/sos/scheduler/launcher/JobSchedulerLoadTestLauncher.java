@@ -10,118 +10,7 @@ import sos.util.SOSLogger;
 import sos.util.SOSString;
 import sos.xml.SOSXMLXPath;
 
-/** Klasse JobSchedulerLoadTestLauncher Diese Klasse kann die Ausführung
- * paralleler Jobs skalieren und beliebig viele Jobs können parallel laufen. Die
- * Klasse kann beliebig viele individuelle Jobs starten und kann mit dem Namen
- * eines anderen Jobs oder Auftrages parametrisiert werden, die gestartet werden
- * soll. Die Anzahl zu startenden Jobs in konfigurierbaren Zeitabständen sowie
- * die Erhöhung der Anzahl zu startenden Jobs beim Erreichen jedes Intervalls
- * sind konfigurierbar.
- * 
- * resourcen: * sos.mail.jar, sos.util.jar, sos.xml.jar, xercesImpl.jar,
- * xml-apis.jar, xalan.jar
- *
- * 
- *
- * a) Aufruf über Kommandozeile
- *
- * java -cp=. JobSchedulerLoadTestLauncher -config=<Konfigurationsdatei> -job=
- * -host= -port=
- *
- * Wenn host= bzw. port= gesetzt sind, dann überschreiben sie die Werte der
- * Konfigurationsdatei Ist ein Job-Name angegeben, dann wird versucht aus der
- * Konfigurationsdatei die Parameter dieses Jobs zu extrahieren. Ist kein
- * Job-Name angegeben, dann wird das erste Element <params> aus der
- * Konfigurationsdatei ausgelesen.
- *
- * Inhalt der Konfigurationsdatei. Es kann auch hier ein XML-Konfigurationsdatei
- * eines Schedulers sein. <params> <param name="" value=""/> </params>
- *
- *
- * 2. Parameter
- *
- * 2.1 Allgemeine Parameter für den Launcher
- *
- * a) <param name="scheduler_launcher_host" value="localhost"/>
- *
- * Der Host des Job Schedulers, der den Job ausführt, Default: localhost
- *
- * b) <param name="scheduler_launcher_port" value="4444"/>
- *
- * Der Port des Job Schedulers, der den Job ausführt, Default: 4444
- *
- * c) <param name="scheduler_launcher_protocol" value="tcp|udp"/>
- *
- * Das Protokoll zum Versenden via JobSchedulerCommand, Default: tcp
- *
- * c) <param name="scheduler_launcher_min_starts" value="5"/>
- *
- * Die minimale Anzahl von Jobs oder Aufträgen, die gleichzeitig gestartet
- * werden. Default=1
- *
- * d) <param name="scheduler_launcher_max_starts" value="100"/>
- *
- * Die maximale Anzahl von Jobs oder Aufträgen, die gleichzeitig gestartet
- * werden.
- *
- * e) <param name="scheduler_launcher_start_increment" value="+10|*2"/>
- *
- * Die Anzahl zu startender Job oder Aufträge wird pro Start um diese Zahl
- * erhöht. Ein Wert 3 ist gleichbedeutend mit +3, d.h. die Zahl wird um 3
- * erhöht. Ein Wert *2 bedeutet, dass sich die Anzahl verdoppelt. Das Inkrement
- * gilt nicht beim ersten Start. Die mit dem Parameter max_starts gesetzte
- * Anzahl darf nicht überschritten werden. Wird sie überschritten, dann werden
- * alle weiteren Starts mit dem Wert von max_starts ausgeführt.
- *
- * f) alle Parameter, deren Namen nicht mit scheduler_launcher_ beginnen, werden
- * an den Job oder Auftrag durchgereicht.
- * 
- * g) <param name="scheduler_launcher_duration" value="120"/> Kriterium um das
- * Programm zu beenden
- * 
- *
- * 2.2 Spezielle Parameter für Jobs, siehe Beispiel <param
- * name="scheduler_launcher_job" value="job_name"/> Wenn dieser Parameter
- * übergeben wurde, dann handelt es sich um einen Job. Der hier übergebene
- * Job-Name ist der Wert des Attributs job= in <start_job job="..."/>
- *
- * In diesem Fall werden ausgewertet:
- *
- * a) mandatory keine
- *
- * b) optional, d.h. bitte keine eigenen Defaults, sondern im Fall des Fehlens
- * einfach nicht übergeben <param name="scheduler_launcher_job_after"
- * value="..."/> <param name="scheduler_launcher_job_at" value="..."/> <param
- * name="scheduler_launcher_job_web_service" value="..."/>
- *
- * 2.3 Spezielle Parameter für Aufträge, siehe Beispiel <param
- * name="scheduler_launcher_order" value="order_id"/> Wenn dieser Parameter
- * übergeben wurde, dann handelt es sich um einen Auftrag. Die hier übergebene
- * Auftragskennung ist der Wert des Attributs id= in <add_order id="..."/>
- *
- * In diesem Fall werden ausgewertet:
- *
- * a) mandatory <param name="scheduler_launcher_order_job_chain" value="..."/>
- *
- * b) optional, d.h. bitte keine eigenen Defaults, sondern im Fall des Fehlens
- * einfach nicht übergeben <param name="scheduler_launcher_order_replace"
- * value="yes|no"/> <param name="scheduler_launcher_order_state" value="..."/>
- * <param name="scheduler_launcher_order_title" value="..."/> <param
- * name="scheduler_launcher_order_at" value="..."/> <param
- * name="scheduler_launcher_order_priority" value="..."/> <param
- * name="scheduler_launcher_order_web_service" value="..."/> <param
- * name="scheduler_launcher_interval" value="..."/>
- * 
- *
- * 2.4 Alle anderen Parameter werden durchgereicht. Genauer: alle Parameter, die
- * nicht mit scheduler_launcher_ beginnen, werden den Jobs oder Aufträgen
- * durchgereicht, die gestartet werden sollen.
- *
- *
- * @author Mürüvet Öksüz
- * 
- *         mueruevet.oeksuez@sos-berlin.com */
-
+/** @author Mürüvet Öksüz */
 public class JobSchedulerLoadTestLauncher {
 
     private String schedulerLauncherHost = "localhost";
@@ -277,11 +166,9 @@ public class JobSchedulerLoadTestLauncher {
         sosLogger.debug3("get parameters ...");
         try {
 
-            if (sosString.parseToString(schedulerLauncherHost).isEmpty()) {
-                if (!sosString.parseToString(allParam, "scheduler_launcher_host").isEmpty()) {
-                    schedulerLauncherHost = sosString.parseToString(allParam, "scheduler_launcher_host");
-                    sosLogger.debug3("..parameter[scheduler_launcher_host] = " + schedulerLauncherHost);
-                }
+            if (sosString.parseToString(schedulerLauncherHost).isEmpty() && !sosString.parseToString(allParam, "scheduler_launcher_host").isEmpty()) {
+                schedulerLauncherHost = sosString.parseToString(allParam, "scheduler_launcher_host");
+                sosLogger.debug3("..parameter[scheduler_launcher_host] = " + schedulerLauncherHost);
             }
             if (!sosString.parseToString(allParam, "scheduler_launcher_port").isEmpty()) {
                 schedulerLauncherPort = Integer.parseInt(sosString.parseToString(allParam, "scheduler_launcher_port"));
@@ -299,9 +186,10 @@ public class JobSchedulerLoadTestLauncher {
                 sosLogger.debug3("..parameter[scheduler_launcher_start_increment] = " + schedulerLauncherStartIncrement);
                 if (sosString.parseToString(allParam, "scheduler_launcher_start_increment").trim().startsWith("+")
                         || sosString.parseToString(allParam, "scheduler_launcher_start_increment").trim().startsWith("*")) {
-                    schedulerLauncherStartIncrement = Integer.parseInt(sosString.parseToString(allParam, "scheduler_launcher_start_increment").trim()
-                            .substring(1));
-                    schedulerLauncherStartIncrementFactor = sosString.parseToString(allParam, "scheduler_launcher_start_increment").trim().substring(0, 1);
+                    schedulerLauncherStartIncrement =
+                            Integer.parseInt(sosString.parseToString(allParam, "scheduler_launcher_start_increment").trim().substring(1));
+                    schedulerLauncherStartIncrementFactor =
+                            sosString.parseToString(allParam, "scheduler_launcher_start_increment").trim().substring(0, 1);
                 } else {
                     schedulerLauncherStartIncrement = Integer.parseInt(sosString.parseToString(allParam, "scheduler_launcher_start_increment"));
                 }

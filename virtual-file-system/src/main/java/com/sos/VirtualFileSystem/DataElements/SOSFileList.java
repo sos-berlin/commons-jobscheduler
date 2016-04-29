@@ -1,6 +1,3 @@
-/**
- *
- */
 package com.sos.VirtualFileSystem.DataElements;
 
 import java.io.File;
@@ -35,7 +32,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
     private final static Logger objJadeReportLogger = Logger.getLogger(VFSFactory.getLoggerName());
     private final String historyFields =
             "guid;mandator;transfer_end;pid;ppid;operation;localhost;localhost_ip;local_user;remote_host;remote_host_ip;remote_user;protocol;"
-            + "port;local_dir;remote_dir;local_filename;remote_filename;file_size;md5;status;last_error_message;log_filename";
+                    + "port;local_dir;remote_dir;local_filename;remote_filename;file_size;md5;status;last_error_message;log_filename";
     private final String newHistoryFields = "jump_host;jump_host_ip;jump_port;jump_protocol;jump_user;transfer_start;modification_date";
     private SOSFTPOptions objOptions = null;
     private Vector<SOSFileListEntry> objFileListEntries = new Vector<>();
@@ -454,10 +451,8 @@ public class SOSFileList extends SOSVfsMessageCodes {
         objJadeReportLogger.info(msg);
         if (objOptions.isAtomicTransfer()) {
             for (SOSFileListEntry entry : objFileListEntries) {
-                if (!objOptions.transactional.value()) {
-                    if (entry.getTransferStatus().equals(enuTransferStatus.transferred)) {
-                        continue;
-                    }
+                if (!objOptions.transactional.value() && entry.getTransferStatus().equals(enuTransferStatus.transferred)) {
+                    continue;
                 }
                 entry.setStatus(enuTransferStatus.transfer_aborted);
                 String atomicFileName = entry.getAtomicFileName();
@@ -582,11 +577,11 @@ public class SOSFileList extends SOSVfsMessageCodes {
     public void getJumpHistoryFile() {
         String operation = this.objOptions.getDmzOption("operation");
         String historyFilename = this.objOptions.getDmzOption("history");
-        if (operation.length() > 0 && historyFilename.length() > 0) {
+        if (!operation.isEmpty() && !historyFilename.isEmpty()) {
             File localTempHistory = null;
             Map<String, Map<String, String>> jumpHistoryRecords = null;
             try {
-                if (operation.equals("copyFromInternet")) {
+                if ("copyFromInternet".equals(operation)) {
                     ISOSVirtualFile historyFile = this.objDataSourceClient.getFileHandle(historyFilename);
                     if (historyFile.FileExists()) {
                         localTempHistory = transferJumpHistoryFile(historyFile);
@@ -597,7 +592,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
                             }
                         }
                     }
-                } else if (operation.equals("copyToInternet")) {
+                } else if ("copyToInternet".equals(operation)) {
                     ISOSVirtualFile historyFile = this.objDataTargetClient.getFileHandle(historyFilename);
                     if (historyFile.FileExists()) {
                         localTempHistory = transferJumpHistoryFile(historyFile);
@@ -621,7 +616,6 @@ public class SOSFileList extends SOSVfsMessageCodes {
 
     private Map<String, Map<String, String>> readJumpHistory(File localTempHistory, String primaryKey) {
         Map<String, Map<String, String>> records = new HashMap<String, Map<String, String>>();
-        ;
         Map<String, String> recordFields = null;
         String primaryKeyValue = "";
         JSCsvFile hwFile = null;
@@ -645,7 +639,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
                         primaryKeyValue = adjustFileSeparator(val);
                     }
                 }
-                if (primaryKeyValue.length() > 0) {
+                if (!primaryKeyValue.isEmpty()) {
                     records.put(primaryKeyValue, recordFields);
                 }
             }
