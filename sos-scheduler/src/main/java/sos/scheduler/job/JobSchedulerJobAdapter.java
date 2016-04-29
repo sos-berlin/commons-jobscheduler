@@ -389,7 +389,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         JSJ_D_0080.toLog();
         if (pstrString2Modify.matches("(?s).*%[^%]+%.*") || pstrString2Modify.matches("(?s).*(\\$|§)\\{[^{]+\\}.*")) {
             if (isNotNull(params)) {
-                String[] strPatterns = new String[] { "%SCHEDULER_PARAM_%1$s%", "%%1$s%", "(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?", "(\\$|§)\\{?%1$s\\}?" };
+                String[] strPatterns = new String[] { "%SCHEDULER_PARAM_%1$s%", "%%1$s%", "(\\$|§)\\{SCHEDULER_PARAM_%1$s\\}", "(\\$|§)\\{%1$s\\}" };
                 String[] names = params.names().split(";");
                 for (String strPattern : strPatterns) {
                     String regExPattern = strPattern;
@@ -400,8 +400,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                         }
                         String regex = regExPattern.replaceAll("\\%1\\$s", name);
                         strParamValue = Matcher.quoteReplacement(strParamValue);
-
-                        strTemp = strTemp.replaceAll("(?im)" + regex, strParamValue);
+                       
+                        strTemp = strTemp.replaceAll("(?im)"+regex, strParamValue);
 
                         if (!(strTemp.matches("(?s).*%[^%]+%.*") || strTemp.matches("(?s).*(\\$|§)\\{[^{]+\\}.*"))) {
                             break;
@@ -416,32 +416,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         return strTemp;
     }
 
-    public String replaceSchedulerVarsInString(HashMap<String, String> params, final String pstrString2Modify) {
-        String strTemp = pstrString2Modify;
-        JSJ_D_0080.toLog();
-        if (pstrString2Modify.matches("(?s).*%[^%]+%.*") || pstrString2Modify.matches("(?s).*(\\$|§)\\{[^{]+\\}.*")) {
-            if (isNotNull(params)) {
-                String[] strPatterns = new String[] { "%SCHEDULER_PARAM_%1$s%", "%%1$s%", "(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?", "(\\$|§)\\{?%1$s\\}?" };
-                for (String strPattern : strPatterns) {
-                    String regExPattern = strPattern;
-                    for (String name : params.keySet()) {
-                        String strParamValue = params.get(name);
-                        String regex = regExPattern.replaceAll("\\%1\\$s", name);
-                        strParamValue = Matcher.quoteReplacement(strParamValue);
-                        strTemp = strTemp.replaceAll("(?im)" + regex, strParamValue);
-                        // End if no more variables in string for substitution
-                        if (!(strTemp.matches("(?s).*%[^%]+%.*") || strTemp.matches("(?s).*(\\$|§)\\{[^{]+\\}.*"))) {
-                            break;
-                        }
-                    }
-                }
-                JSJ_D_0030.toLog(strTemp);
-            } else {
-                JSJ_D_0040.toLog();
-            }
-        }
-        return strTemp;
-    }
+   
 
     public HashMap<String, String> getSpecialParameters() {
         HashMap<String, String> specialParams = new HashMap<String, String>();
@@ -488,6 +463,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         return result;
     }
 
+   
     public String StackTrace2String(final Exception e) {
         String strT = null;
         if (isNotNull(e)) {
