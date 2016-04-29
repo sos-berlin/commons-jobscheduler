@@ -60,8 +60,8 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
             }
             objProtocolCommandListener = new SOSFtpClientLogger(HostID(""));
             if (objConnection2Options != null && objConnection2Options.ProtocolCommandListener.isTrue()) {
-                client.addProtocolCommandListener(objProtocolCommandListener);
-            }
+                    client.addProtocolCommandListener(objProtocolCommandListener);
+                }
 
             String addFTPProtocol = System.getenv("AddFTPProtocol");
             if (addFTPProtocol != null && "true".equalsIgnoreCase(addFTPProtocol)) {
