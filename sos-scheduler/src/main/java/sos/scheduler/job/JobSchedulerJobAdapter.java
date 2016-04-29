@@ -1,13 +1,8 @@
 package sos.scheduler.job;
 
 import static com.sos.scheduler.messages.JSMessages.JSJ_D_0010;
-import static com.sos.scheduler.messages.JSMessages.JSJ_D_0030;
-import static com.sos.scheduler.messages.JSMessages.JSJ_D_0032;
-import static com.sos.scheduler.messages.JSMessages.JSJ_D_0040;
 import static com.sos.scheduler.messages.JSMessages.JSJ_D_0070;
-import static com.sos.scheduler.messages.JSMessages.JSJ_D_0080;
 import static com.sos.scheduler.messages.JSMessages.JSJ_E_0009;
-import static com.sos.scheduler.messages.JSMessages.JSJ_F_0010;
 import static com.sos.scheduler.messages.JSMessages.JSJ_F_0050;
 import static com.sos.scheduler.messages.JSMessages.JSJ_F_0060;
 import static com.sos.scheduler.messages.JSMessages.JSJ_I_0010;
@@ -20,8 +15,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.BasicConfigurator;
@@ -30,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 
 import sos.scheduler.interfaces.IJobSchedulerMonitor_impl;
+import sos.scheduler.misc.ParameterSubstitutor;
 import sos.spooler.Job;
 import sos.spooler.Order;
 import sos.spooler.Supervisor_client;
@@ -48,10 +43,9 @@ import com.sos.scheduler.JobSchedulerLog4JAppender;
 @I18NResourceBundle(baseName = "com_sos_scheduler_messages", defaultLocale = "en")
 public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtilities, IJSCommands, IJobSchedulerMonitor_impl {
 
-    protected Variable_set objJobOrOrderParams = null;
     protected Logger logger = Logger.getLogger(JobSchedulerJobAdapter.class);
     protected Messages Messages = null;
-    protected HashMap<String, String> SchedulerParameters = new HashMap<String, String>();
+    protected HashMap<String, String> schedulerParameters = new HashMap<String, String>();
     protected HashMap<String, String> hsmParameters = null;
     protected final String EMPTY_STRING = "";
     protected final boolean continue_with_spooler_process = true;
@@ -63,6 +57,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     public final static boolean conJobFailure = false;
     public final static boolean conJobChainSuccess = true;
     public final static boolean conJobChainFailure = false;
+    private ParameterSubstitutor parameterSubstitutor;
 
     public JobSchedulerJobAdapter() {
         Messages = new Messages(conMessageFilePath, Locale.getDefault());
@@ -149,17 +144,17 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     }
 
     protected HashMap<String, String> getSchedulerParameterAsProperties(final Variable_set pSchedulerParameterSet) {
-        SchedulerParameters = new HashMap<String, String>();
+        schedulerParameters = new HashMap<String, String>();
         try {
             if (isNotNull(pSchedulerParameterSet)) {
-                SchedulerParameters = convertVariableSet2HashMap(pSchedulerParameterSet);
-                SchedulerParameters.putAll(getSpecialParameters());
-                for (String key : SchedulerParameters.keySet()) {
-                    String value = SchedulerParameters.get(key);
+                schedulerParameters = convertVariableSet2HashMap(pSchedulerParameterSet);
+                schedulerParameters.putAll(getSpecialParameters());
+                for (String key : schedulerParameters.keySet()) {
+                    String value = schedulerParameters.get(key);
                     if (value != null) {
                         String replacedValue = replaceSchedulerVars(false, value);
                         if (!replacedValue.equalsIgnoreCase(value)) {
-                            SchedulerParameters.put(key, replacedValue);
+                            schedulerParameters.put(key, replacedValue);
                             if (key.contains("password")) {
                                 logger.trace(String.format("%1$s = *****", key));
                             } else {
@@ -175,13 +170,19 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                     }
                 }
             }
-            SchedulerParameters = DeleteCurrentNodeNameFromKeys(SchedulerParameters);
+            schedulerParameters = DeleteCurrentNodeNameFromKeys(schedulerParameters);
         } catch (Exception e) {
             throw new JobSchedulerException(JSJ_F_0060.params(StackTrace2String(e)), e);
         }
-        return SchedulerParameters;
+        return schedulerParameters;
     }
 
+
+    protected HashMap<String, String> getSchedulerParameterAsProperties() {
+        return getSchedulerParameterAsProperties(getJobOrOrderParameters());
+    }
+
+    
     protected HashMap<String, String> convertVariableSet2HashMap(final Variable_set variableSet) {
         HashMap<String, String> result = new HashMap<String, String>();
         try {
@@ -219,41 +220,13 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                 String val = entry.getValue();
                 key = key.substring(intNNLen);
                 newSchedulerParameters.put(key, val);
-                objJobOrOrderParams.set_value(key, val);
+                schedulerParameters.put(key, val);
             }
         }
         return newSchedulerParameters;
     }
 
-    protected HashMap<String, String> getSchedulerParameterAsProperties(final HashMap<String, String> pSchedulerParameterSet) {
-        SchedulerParameters = new HashMap<String, String>();
-        try {
-            if (isNotNull(pSchedulerParameterSet)) {
-                Set<Map.Entry<String, String>> set = pSchedulerParameterSet.entrySet();
-                for (Map.Entry<String, String> entry : set) {
-                    SchedulerParameters.put(entry.getKey(), entry.getValue());
-                    SchedulerParameters.put(entry.getKey().replaceAll("_", EMPTY_STRING), entry.getValue());
-                }
-                set = SchedulerParameters.entrySet();
-                SchedulerParameters.putAll(getSpecialParameters());
-                for (Map.Entry<String, String> entry : set) {
-                    String key = entry.getKey();
-                    String val = entry.getValue();
-                    if (val != null) {
-                        String strR = replaceVars(SchedulerParameters, key, val);
-                        if (!strR.equalsIgnoreCase(val)) {
-                            SchedulerParameters.put(key, strR);
-                        }
-                    }
-                }
-            }
-            SchedulerParameters = DeleteCurrentNodeNameFromKeys(SchedulerParameters);
-            return SchedulerParameters;
-        } catch (Exception e) {
-            throw new JobSchedulerException(JSJ_F_0060.params(e.getMessage()), e);
-        }
-    }
-
+   
     protected Variable_set getJobOrOrderParameters() {
         try {
             Variable_set objJobOrOrderParameters = spooler.create_variable_set();
@@ -261,7 +234,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             if (isJobchain() && hasOrderParameters()) {
                 objJobOrOrderParameters.merge(getOrderParams());
             }
-            objJobOrOrderParams = objJobOrOrderParameters;
             JSJ_D_0070.toLog(objJobOrOrderParameters.count());
             return objJobOrOrderParameters;
         } catch (Exception e) {
@@ -269,6 +241,12 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         }
     }
 
+    
+    public Variable_set getParameters() {
+        return getJobOrOrderParameters();
+    }
+
+    
     protected Variable_set getTaskParams() {
         return spooler_task.params();
     }
@@ -285,34 +263,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         }
     }
 
-    public Variable_set getParameters() {
-        Order order = null;
-        try {
-            Variable_set params = spooler.create_variable_set();
-            if (isNotNull(spooler_task.params())) {
-                params.merge(spooler_task.params());
-            }
-            if (isJobchain()) {
-                order = spooler_task.order();
-                if (isNotNull(order.params())) {
-                    params.merge(order.params());
-                }
-            }
-            objJobOrOrderParams = params;
-            return params;
-        } catch (Exception e) {
-            String strM = JSJ_F_0010.params(e.getMessage());
-            logger.error(strM, e);
-            throw new JobSchedulerException(strM, e);
-        }
-    }
-
     public Variable_set getGlobalSchedulerParameters() {
         return spooler.variables();
-    }
-
-    public void setParameters(final Variable_set pVariableSet) {
-        objJobOrOrderParams = pVariableSet;
     }
 
     @Override
@@ -323,8 +275,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         if (hasOrderParameters()) {
             spooler_task.order().params().set_var(pstrKey, pstrValue);
         }
-        if (isNotNull(objJobOrOrderParams)) {
-            objJobOrOrderParams.set_var(pstrKey, pstrValue);
+        if (isNotNull(schedulerParameters)) {
+            schedulerParameters.put(pstrKey, pstrValue);
         }
     }
 
@@ -333,94 +285,42 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         setJSParam(pstrKey, pstrValue.toString());
     }
 
-    @Deprecated
-    public String replaceVars(final HashMap<String, String> params, final String name, String pstrReplaceIn) {
-        if (pstrReplaceIn != null && pstrReplaceIn.matches(".*%[^%]+%.*")) {
-            for (String param : params.keySet()) {
-                String paramValue = params.get(param);
-                if (isNotNull(paramValue)) {
-                    String paramPattern = "%" + Pattern.quote(param) + "%";
-                    paramValue = paramValue.replace('\\', '/');
-                    paramValue = Matcher.quoteReplacement(paramValue);
-                    pstrReplaceIn = pstrReplaceIn.replaceAll(paramPattern, paramValue);
-                } else {
-                    JSJ_D_0032.toLog(param);
-                }
-            }
-        }
-        return pstrReplaceIn;
-    }
-
     @Override
-    public String replaceSchedulerVars(final boolean isWindows, final String pstrString2Modify) {
-        String strTemp = pstrString2Modify;
-        if (isNotNull(objJobOrOrderParams)) {
-            strTemp = replaceSchedulerVarsInString(objJobOrOrderParams, pstrString2Modify);
-        }
-        return strTemp;
-    }
-
-    public String replaceSchedulerVarsInString(Variable_set params, final String pstrString2Modify) {
-        String strTemp = pstrString2Modify;
-        JSJ_D_0080.toLog();
-        if (pstrString2Modify.matches("(?s).*%[^%]+%.*") || pstrString2Modify.matches("(?s).*(\\$|§)\\{[^{]+\\}.*")) {
-            if (isNotNull(params)) {
-                String[] strPatterns =
-                        new String[] { "%SCHEDULER_PARAM_%1$s%", "%%1$s%", "(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?", "(\\$|§)\\{?%1$s\\}?" };
-                String[] names = params.names().split(";");
-                outerloop:
-                for (String strPattern : strPatterns) {
-                    String regExPattern = strPattern;
-                    for (String name : names) {
-                        String strParamValue = params.value(name);
-                        if (strParamValue == null) {
-                            continue;
-                        }
-                        String regex = regExPattern.replaceAll("\\%1\\$s", name);
-                        strParamValue = Matcher.quoteReplacement(strParamValue);
-                        strTemp = strTemp.replaceAll("(?im)" + regex, strParamValue);
-                        if (!(strTemp.matches("(?s).*%[^%]+%.*") || strTemp.matches("(?s).*(\\$|§)\\{[^{]+\\}.*"))) {
-                            break outerloop;
+    public String replaceSchedulerVars(final boolean isWindows, final String string2Modify) {
+        String resultString = string2Modify;
+        if (isNotNull(schedulerParameters)) {
+         //   if (string2Modify.matches("(?s).*\\$\\{[^\\{]+\\}.*")) {
+             if (string2Modify.matches("(?s).*%[^%]+%.*") || string2Modify.matches("(?s).*\\$\\{[^{]+\\}.*")) {
+                if (parameterSubstitutor == null) {
+                    parameterSubstitutor = new ParameterSubstitutor();
+                    for (Entry<String, String> entry : schedulerParameters.entrySet()) {
+                        String value = entry.getValue();
+                        String paramName = entry.getKey();
+                        if (!value.isEmpty()) {
+                            parameterSubstitutor.addKey(paramName, value);
                         }
                     }
                 }
-                JSJ_D_0030.toLog(strTemp);
-            } else {
-                JSJ_D_0040.toLog();
+                if (string2Modify.matches("(?s).*\\$\\{[^\\{]+\\}.*")) {
+                    resultString = parameterSubstitutor.replace(string2Modify);
+                }
+                 if (string2Modify.matches("(?s).*%[^%]+%.*")) {
+                    parameterSubstitutor.setOpenTag("%");
+                    parameterSubstitutor.setCloseTag("%");
+                    resultString = parameterSubstitutor.replace(string2Modify);
+                }
+                 
             }
         }
-        return strTemp;
+        return resultString;
     }
+
+    public String replaceSchedulerVars(final String string2Modify) {
+        return replaceSchedulerVars(true,string2Modify);
+    }
+
     
-    public String replaceSchedulerVarsInString(HashMap<String, String> params, final String pstrString2Modify) {
-        String strTemp = pstrString2Modify;
-        JSJ_D_0080.toLog();
-        if (pstrString2Modify.matches("(?s).*%[^%]+%.*") || pstrString2Modify.matches("(?s).*(\\$|§)\\{[^{]+\\}.*")) {
-            if (isNotNull(params)) {
-                String[] strPatterns =
-                        new String[] { "%SCHEDULER_PARAM_%1$s%", "%%1$s%", "(\\$|§)\\{?SCHEDULER_PARAM_%1$s\\}?", "(\\$|§)\\{?%1$s\\}?" };
-                outerloop:
-                for (String strPattern : strPatterns) {
-                    String regExPattern = strPattern;
-                    for (String name : params.keySet()) {
-                        String strParamValue = params.get(name);
-                        String regex = regExPattern.replaceAll("\\%1\\$s", name);
-                        strParamValue = Matcher.quoteReplacement(strParamValue);
-                        strTemp = strTemp.replaceAll("(?im)" + regex, strParamValue);
-                        if (!(strTemp.matches("(?s).*%[^%]+%.*") || strTemp.matches("(?s).*(\\$|§)\\{[^{]+\\}.*"))) {
-                            break outerloop;
-                        }
-                    }
-                }
-                JSJ_D_0030.toLog(strTemp);
-            } else {
-                JSJ_D_0040.toLog();
-            }
-        }
-        return strTemp;
-    }
-
-    public HashMap<String, String> getSpecialParameters() {
+    private HashMap<String, String> getSpecialParameters() {
         HashMap<String, String> specialParams = new HashMap<String, String>();
         if (spooler == null) {
             return specialParams;
@@ -458,7 +358,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         return specialParams;
     }
 
-    public HashMap<String, String> getAllParametersAsProperties() {
+    private HashMap<String, String> getAllParametersAsProperties() {
         HashMap<String, String> result = convertVariableSet2HashMap(getGlobalSchedulerParameters());
         result.putAll(getSpecialParameters());
         result.putAll(getSchedulerParameterAsProperties(getParameters()));
@@ -650,8 +550,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             String strS = getJobScript();
             if (isNotEmpty(strS)) {
                 pobjOptionElement.Value(strS);
-                logger.debug(String.format("copy script from script-tag of job '%2$s' to option '%1$s'", pobjOptionElement.getShortKey(),
-                        getJob().name()));
+                logger.debug(String.format("copy script from script-tag of job '%2$s' to option '%1$s'", pobjOptionElement.getShortKey(), getJob().name()));
             }
         }
     }
@@ -659,27 +558,27 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     @Override
     public boolean spooler_task_before() throws Exception {
         initializeLog4jAppenderClass();
-        getJobOrOrderParameters();
+        getSchedulerParameterAsProperties();
         return continueWithProcessBefore;
     }
 
     @Override
     public void spooler_task_after() throws Exception {
         initializeLog4jAppenderClass();
-        getJobOrOrderParameters();
+        getSchedulerParameterAsProperties();
     }
 
     @Override
     public boolean spooler_process_before() throws Exception {
         initializeLog4jAppenderClass();
-        getJobOrOrderParameters();
-        return  continueWithProcess;
+        getSchedulerParameterAsProperties();
+        return continueWithProcess;
     }
 
     @Override
     public boolean spooler_process_after(final boolean spooler_process_result) throws Exception {
         initializeLog4jAppenderClass();
-        getJobOrOrderParameters();
+        getSchedulerParameterAsProperties();
         return spooler_process_result;
     }
 

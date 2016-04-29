@@ -860,14 +860,10 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     @Override
     public String createScriptFile(String content) throws Exception {
         try {
-<<<<<<< HEAD
+ 
             String commandScript = content;
-            if (isRemoteWindowsShell == false) {
-=======
-            String commandScript = pstrContent;
             if (!isRemoteWindowsShell) {
->>>>>>> origin/release/1.10
-                commandScript = commandScript.replaceAll("(?m)\r", "");
+                 commandScript = commandScript.replaceAll("(?m)\r", "");
             }
             LOGGER.debug(SOSVfs_I_233.params(content));
             File tempScriptFile = File.createTempFile("sos-sshscript", getScriptFileNameSuffix());
@@ -876,19 +872,13 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             out.write(commandScript);
             out.flush();
             out.close();
-<<<<<<< HEAD
+             
             tempScriptFile.deleteOnExit();
             putFile(tempScriptFile, 0700);
             String name = tempScriptFile.getName();
-            if (isRemoteWindowsShell == false) {
-                name = "./" + name;
-=======
-            fleTempScriptFile.deleteOnExit();
-            putFile(fleTempScriptFile, 0700);
-            String strFileName2Return = fleTempScriptFile.getName();
             if (!isRemoteWindowsShell) {
-                strFileName2Return = "./" + strFileName2Return;
->>>>>>> origin/release/1.10
+                name = "./" + name;
+ 
             }
             LOGGER.info(SOSVfs_I_253.params(tempScriptFile.getAbsolutePath()));
             return name;
