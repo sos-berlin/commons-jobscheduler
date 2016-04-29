@@ -237,7 +237,7 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
                 commandScript = commandScript.replaceAll("(?m)\r", "");
             }
             LOGGER.info(SOSVfs_I_233.params("commandScript"));
-            commandScript = objJSJobUtilities.replaceSchedulerVars(flgIsRemoteOSWindows, commandScript);
+            commandScript = objJSJobUtilities.replaceSchedulerVars(commandScript);
             String suffix = flgIsRemoteOSWindows ? ".cmd" : ".sh";
             File resultFile = File.createTempFile("sos", suffix);
             BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(resultFile)));
@@ -663,7 +663,7 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
     }
 
     @Override
-    public String replaceSchedulerVars(final boolean isWindows, final String pstrString2Modify) {
+    public String replaceSchedulerVars(final String pstrString2Modify) {
         LOGGER.debug(SOSVfs_D_251.get());
         return pstrString2Modify;
     }

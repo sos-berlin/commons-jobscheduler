@@ -152,7 +152,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                 for (String key : schedulerParameters.keySet()) {
                     String value = schedulerParameters.get(key);
                     if (value != null) {
-                        String replacedValue = replaceSchedulerVars(false, value);
+                        String replacedValue = replaceSchedulerVars(value);
                         if (!replacedValue.equalsIgnoreCase(value)) {
                             schedulerParameters.put(key, replacedValue);
                             if (key.contains("password")) {
@@ -286,7 +286,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     }
 
     @Override
-    public String replaceSchedulerVars(final boolean isWindows, final String string2Modify) {
+    public String replaceSchedulerVars(final String string2Modify) {
         String resultString = string2Modify;
         if (isNotNull(schedulerParameters)) {
          //   if (string2Modify.matches("(?s).*\\$\\{[^\\{]+\\}.*")) {
@@ -315,10 +315,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         return resultString;
     }
 
-    public String replaceSchedulerVars(final String string2Modify) {
-        return replaceSchedulerVars(true,string2Modify);
-    }
-
+    
     
     private HashMap<String, String> getSpecialParameters() {
         HashMap<String, String> specialParams = new HashMap<String, String>();

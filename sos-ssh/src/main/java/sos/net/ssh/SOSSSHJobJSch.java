@@ -101,7 +101,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                     if (objOptions.command_script.IsEmpty()) {
                         strTemp = objOptions.command_script_file.JSFile().File2String();
                     }
-                    strTemp = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strTemp);
+                    strTemp = objJSJobUtilities.replaceSchedulerVars(strTemp);
                     strCommands2Execute[0] = vfsHandler.createScriptFile(strTemp);
                     add2Files2Delete(strCommands2Execute[0]);
                     flgScriptFileCreated = true; // http://www.sos-berlin.com/jira/browse/JITL-17
@@ -119,7 +119,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                     completeCommand = getPreCommand() + strCmd;
                 }
                 try {
-                    strCmd = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strCmd);
+                    strCmd = objJSJobUtilities.replaceSchedulerVars(strCmd);
                     logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
                     vfsHandler.setSimulateShell(objOptions.simulate_shell.value());
                     vfsHandler.ExecuteCommand(completeCommand);

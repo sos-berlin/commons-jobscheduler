@@ -219,7 +219,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     }
 
     @Override
-    public String replaceSchedulerVars(final boolean isWindows, final String pstrString2Modify) {
+    public String replaceSchedulerVars(final String pstrString2Modify) {
         String strTemp = pstrString2Modify;
         HashMap<String, String> objJobOrOrderParams = new HashMap<String, String>();
         objJobOrOrderParams.put("host", "wilma");

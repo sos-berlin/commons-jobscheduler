@@ -3,7 +3,7 @@ package com.sos.JSHelper.Basics;
 /** @author KB */
 public interface JSJobUtilities {
 
-    public String replaceSchedulerVars(boolean isWindows, final String pstrString2Modify);
+    public String replaceSchedulerVars(final String pstrString2Modify);
 
     public void setJSParam(final String pstrKey, final String pstrValue);
 

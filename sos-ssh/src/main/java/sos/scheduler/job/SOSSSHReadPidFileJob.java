@@ -68,7 +68,7 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
             try {
                 String strCmd = String.format(objOptions.getPostCommandRead().Value(), getTempPidFileName());
                 LOGGER.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
-                strCmd = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strCmd);
+                strCmd = objJSJobUtilities.replaceSchedulerVars(strCmd);
                 LOGGER.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
                 LOGGER.debug("***Execute read pid file command!***");
                 vfsHandler.ExecuteCommand(strCmd);

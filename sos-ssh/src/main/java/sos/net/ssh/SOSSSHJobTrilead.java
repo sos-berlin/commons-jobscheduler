@@ -73,7 +73,7 @@ public class SOSSSHJobTrilead extends SOSSSHJob2 {
                     if (objOptions.command_script.IsEmpty()) {
                         strTemp = objOptions.command_script_file.JSFile().File2String();
                     }
-                    strTemp = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strTemp);
+                    strTemp = objJSJobUtilities.replaceSchedulerVars(strTemp);
                     strCommands2Execute[0] = vfsHandler.createScriptFile(strTemp);
                     flgScriptFileCreated = true; // http://www.sos-berlin.com/jira/browse/JITL-17
                     strCommands2Execute[0] += " " + objOptions.command_script_param.Value();
@@ -87,7 +87,7 @@ public class SOSSSHJobTrilead extends SOSSSHJob2 {
                     /** \change Substitution of variables enabled
                      *
                      * see http://www.sos-berlin.com/jira/browse/JS-673 */
-                    strCmd = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strCmd);
+                    strCmd = objJSJobUtilities.replaceSchedulerVars(strCmd);
                     logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
                     vfsHandler.ExecuteCommand(strCmd);
                     objJSJobUtilities.setJSParam(conExit_code, "0");
