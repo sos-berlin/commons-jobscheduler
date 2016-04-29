@@ -860,7 +860,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     @Override
     public String createScriptFile(String content) throws Exception {
         try {
- 
             String commandScript = content;
             if (!isRemoteWindowsShell) {
                  commandScript = commandScript.replaceAll("(?m)\r", "");
@@ -872,13 +871,11 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             out.write(commandScript);
             out.flush();
             out.close();
-             
             tempScriptFile.deleteOnExit();
             putFile(tempScriptFile, 0700);
             String name = tempScriptFile.getName();
             if (!isRemoteWindowsShell) {
                 name = "./" + name;
- 
             }
             LOGGER.info(SOSVfs_I_253.params(tempScriptFile.getAbsolutePath()));
             return name;
