@@ -289,7 +289,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     public String replaceSchedulerVars(final String string2Modify) {
         String resultString = string2Modify;
         if (isNotNull(schedulerParameters)) {
-         //   if (string2Modify.matches("(?s).*\\$\\{[^\\{]+\\}.*")) {
              if (string2Modify.matches("(?s).*%[^%]+%.*") || string2Modify.matches("(?s).*\\$\\{[^{]+\\}.*")) {
                 if (parameterSubstitutor == null) {
                     parameterSubstitutor = new ParameterSubstitutor();
