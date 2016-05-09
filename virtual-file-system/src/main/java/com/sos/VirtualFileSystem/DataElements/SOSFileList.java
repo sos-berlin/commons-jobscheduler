@@ -698,7 +698,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
     private boolean fileNamesAreEqual(String filenameA, String filenameB, boolean caseSensitiv) {
         String a = filenameA.replaceAll("[\\\\/]+", "/");
         String b = filenameB.replaceAll("[\\\\/]+", "/");
-        return (caseSensitiv) ? a.equals(b) : a.equalsIgnoreCase(b);
+        return caseSensitiv ? a.equals(b) : a.equalsIgnoreCase(b);
     }
 
     public void handleZeroByteFiles() {
@@ -735,5 +735,8 @@ public class SOSFileList extends SOSVfsMessageCodes {
             }
         }
     }
-
+    
+    public boolean isEmpty() {
+        return this.List().isEmpty();
+    }
 }
