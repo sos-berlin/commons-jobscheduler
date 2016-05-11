@@ -450,6 +450,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
             x = cd(strT);
             LogReply();
         } catch (IOException e) {
+            //
         }
         return x;
     }
@@ -795,7 +796,6 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
             }
         } catch (Exception e) {
             RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
-        } finally {
         }
         return objFTPFile;
     }
@@ -815,8 +815,6 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         final String conMethodName = CLASS_NAME + "::getInputStream";
         InputStream objI = null;
         try {
-            if (modezSupported) {
-            }
             strFileName = strFileName.replaceAll("\\\\", "/");
             objI = Client().retrieveFileStream(strFileName);
             if (objI == null) {
@@ -908,6 +906,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
                 Client().sendCommand("NOOP");
                 isConnected = true;
             } catch (IOException e) {
+                //
             }
         }
         return isConnected;
@@ -980,6 +979,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
                 try {
                     doPostLoginOperations();
                 } catch (Exception e) {
+                    //
                 }
             } else {
                 LOGGER.info(SOSVfs_D_132.params(strUserName));
@@ -1148,7 +1148,6 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
             }
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_130.params("putfile"), e);
-        } finally {
         }
     }
 

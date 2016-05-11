@@ -405,6 +405,7 @@ public class SOSSFTP implements SOSFileTransfer {
             try {
                 sftpClient.closeFile(sftpFileHandle);
             } catch (Exception e) {
+                //
             }
         }
     }
@@ -514,6 +515,7 @@ public class SOSSFTP implements SOSFileTransfer {
         try {
             return sftpClient.stat(filename).isDirectory();
         } catch (Exception e) {
+            //
         }
         return false;
     }
