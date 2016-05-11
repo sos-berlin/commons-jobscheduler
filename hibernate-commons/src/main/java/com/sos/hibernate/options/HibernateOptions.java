@@ -409,11 +409,8 @@ public class HibernateOptions extends JSOptionsClass implements IHibernateOption
     public void setAllOptions(HashMap<String, String> pobjJSSettings) {
         @SuppressWarnings("unused")
         final String conMethodName = conClassName + "::setAllOptions";
-        flgSetAllOptions = true;
         objSettings = pobjJSSettings;
-        super.Settings(objSettings);
         super.setAllOptions(pobjJSSettings);
-        flgSetAllOptions = false;
     } // public void setAllOptions (HashMap <String, String> JSSettings)
 
     /** \brief CheckMandatory - prüft alle Muss-Optionen auf Werte

@@ -490,11 +490,8 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 
     @Override
     public void setAllOptions(final HashMap<String, String> pobjJSSettings) {
-        flgSetAllOptions = true;
         objSettings = pobjJSSettings;
-        super.Settings(objSettings);
         super.setAllOptions(pobjJSSettings);
-        flgSetAllOptions = false;
         HashMap<String, String> hshMap = pobjJSSettings;
         if (!flgSettingsFileProcessed && !flgReadSettingsFileIsActive && ConfigurationFile.IsNotEmpty()) {
             flgReadSettingsFileIsActive = true;
@@ -529,14 +526,12 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
             flgReadSettingsFileIsActive = false;
             flgSettingsFileProcessed = true;
         }
-        flgSetAllOptions = true;
         params.putAll(mapFromIniFile);
         handleFileOrderSource(params);
         objSettings = params;
         super.Settings(params);
         super.setAllOptions(params);
         setChildClasses(params);
-        flgSetAllOptions = false;
     }
 
     public HashMap<String, String> ReadSettingsFile() {

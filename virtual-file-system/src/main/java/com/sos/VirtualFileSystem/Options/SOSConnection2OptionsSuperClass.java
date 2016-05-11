@@ -462,11 +462,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @Override
     public void setAllOptions(final HashMap<String, String> settings) {
-        flgSetAllOptions = true;
         objSettings = settings;
-        super.Settings(objSettings);
         super.setAllOptions(settings);
-        flgSetAllOptions = false;
     }
 
     @Override

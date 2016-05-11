@@ -23,11 +23,6 @@ public class SOSOptionFolderName extends SOSOptionFileName {
         intOptionType = isOptionTypeFolder;
     }
 
-    @JSOptionDefinition(name = "CreateFolder", value = "true", description = "Folder anlegen, wenn noch nicht vorhanden", key = "CreateFolder",
-            type = "JSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean CreateFolder = new SOSOptionBoolean(objParentClass, ".CreateFolder", "Folder anlegen, wenn noch nicht vorhanden", "true", "true",
-            false);
-
     @Override
     public String Value() {
         if (strValue == null) {

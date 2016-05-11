@@ -124,7 +124,6 @@ public class JSCsvFileOptions extends JSOptionsClass {
             objSettings = JSSettings;
             super.Settings(objSettings);
 
-            flgSetAllOptions = true;
 
             final String strT = super.getItem(conDelimiterSettingsKey);
             if (isNotEmpty(strT)) {
@@ -135,7 +134,6 @@ public class JSCsvFileOptions extends JSOptionsClass {
             this.SkipFirstLine(super.getBoolItem(conSkipFirstLineSettingsKey));
             this.IgnoreValueDelimiter(super.getBoolItem(conIgnoreValueDelimiterSettingsKey));
 
-            flgSetAllOptions = false;
         } catch (Exception e) {
             throw new JobSchedulerException(e);
         }

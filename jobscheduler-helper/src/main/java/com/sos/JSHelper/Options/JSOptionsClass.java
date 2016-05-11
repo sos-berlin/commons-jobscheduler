@@ -58,7 +58,6 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     protected Class objClassName4PreferenceStore = this.getClass();
     protected Msg objMsg = null;
     protected String strAlternativePrefix = "";
-    protected boolean flgSetAllOptions = false;
     private static final String CLASS_NAME = "JSOptionsClass";
     private static final Logger LOGGER = Logger.getLogger(JSOptionsClass.class);
     private static final long serialVersionUID = 8497293387023797049L;
@@ -643,7 +642,6 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     protected void setAllCommonOptions(final HashMap<String, String> JSSettings) {
         objSettings = JSSettings;
         if (objParentClass != null) {
-            IterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.countSegmentFields, strBuffer);
             IterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.setRecord, strBuffer);
         }
         UserDir.MapValue();
@@ -842,8 +840,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         if (strT == null) {
             return null;
         }
-        int i = -1;
-        i = strT.indexOf("$");
+        
         strT = strT.replace("//", "/");
         return strT;
     }
@@ -1231,14 +1228,13 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         return Iterate(intIt).toString();
     }
 
-    public StringBuffer IterateAllDataElementsByAnnotation(final Class<?> objC, final Object objP, final IterationTypes enuIterate4What,
-            StringBuffer pstrBuffer) {
-        final String conMethodName = CLASS_NAME + "::IterateAllDataElementsByAnnotation";
-        String strCommandLineOptions = "";
+    public StringBuffer IterateAllDataElementsByAnnotation(final Class<?> objC, final Object objP, final IterationTypes enuIterate4What, StringBuffer pstrBuffer) {
+        final String METHODNAME = CLASS_NAME + "::IterateAllDataElementsByAnnotation";
+        
         if (objC == null) {
-            throw new JobSchedulerException(conMethodName + ": objSegment is null, but must be not null");
+            throw new JobSchedulerException(METHODNAME + ": objSegment is null, but must be not null");
         }
-        Field objField = null;
+ 
         SOSOptionElement.gflgProcessHashMap = true;
         try {
             final Field objFields[] = objC.getFields();
@@ -1247,10 +1243,11 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
             if (enuIterate4What == IterationTypes.createXML) {
                 strXML.append("<" + strT + " id=" + XmlId.QuotedValue() + ">");
             }
-            for (final Field objField2 : objFields) {
-                objField = objField2;
+            for (final Field objField : objFields) {
+
                 try {
                     if (objField.isAnnotationPresent(JSOptionDefinition.class)) {
+                        
                         final SOSOptionElement objDE = (SOSOptionElement) objField.get(objP);
                         if (objDE != null) {
                             if (enuIterate4What == IterationTypes.LoadValues) {
@@ -1304,7 +1301,6 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
                                     pstrBuffer.append(strT + "\n");
                                 }
                             }
-                            IterateAllDataElementsByAnnotation(objDE.getClass(), objDE, enuIterate4What, pstrBuffer);
                         }
                     }
                 } catch (final ClassCastException objException) {
@@ -1325,12 +1321,6 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         return pstrBuffer;
     }
 
-    private String addNewLine(final String pstrV) {
-        if (isNotEmpty(pstrV)) {
-            return pstrV + "\n";
-        }
-        return pstrV;
-    }
 
     public StringBuffer Iterate(final IterationTypes enuIterate4What) {
         StringBuffer strB = new StringBuffer();

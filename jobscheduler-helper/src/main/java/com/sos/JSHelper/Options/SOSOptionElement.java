@@ -687,7 +687,6 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
         }
         if (pstrValue != null) {
             if (objParentClass != null) {
-                final String strTemp = objParentClass.SubstituteVariables(pstrValue);
                 Properties objP = objParentClass.getTextProperties();
                 objP.put(getShortKey(), pstrValue);
             }

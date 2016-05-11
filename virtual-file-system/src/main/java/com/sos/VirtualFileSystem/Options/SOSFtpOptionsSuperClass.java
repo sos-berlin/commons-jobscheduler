@@ -2481,11 +2481,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 
     @Override
     public void setAllOptions(final HashMap<String, String> settings) {
-        flgSetAllOptions = true;
         objSettings = settings;
-        super.Settings(objSettings);
         super.setAllOptions(settings);
-        flgSetAllOptions = false;
     }
 
     @Override

@@ -177,12 +177,10 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         return schedulerParameters;
     }
 
-
     protected HashMap<String, String> getSchedulerParameterAsProperties() {
         return getSchedulerParameterAsProperties(getJobOrOrderParameters());
     }
 
-    
     protected HashMap<String, String> convertVariableSet2HashMap(final Variable_set variableSet) {
         HashMap<String, String> result = new HashMap<String, String>();
         try {
@@ -190,16 +188,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                 String[] names = variableSet.names().split(";");
                 String value = EMPTY_STRING;
                 for (String key : names) {
-                    value = EMPTY_STRING;
-                    Object objO = variableSet.var(key);
-                    if (objO instanceof String) {
-                        value = variableSet.var(key);
-                    } else if (objO instanceof Integer) {
-                        Integer intI = (Integer) objO;
-                        value = intI.toString();
-                    }
+                    value = variableSet.var(key);
                     result.put(key, value);
-                    result.put(key.replaceAll("_", EMPTY_STRING).toLowerCase(), value);
                 }
             }
             return result;
@@ -226,7 +216,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         return newSchedulerParameters;
     }
 
-   
     protected Variable_set getJobOrOrderParameters() {
         try {
             Variable_set objJobOrOrderParameters = spooler.create_variable_set();
@@ -241,12 +230,10 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         }
     }
 
-    
     public Variable_set getParameters() {
         return getJobOrOrderParameters();
     }
 
-    
     protected Variable_set getTaskParams() {
         return spooler_task.params();
     }
@@ -289,33 +276,35 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     public String replaceSchedulerVars(final String string2Modify) {
         String resultString = string2Modify;
         if (isNotNull(schedulerParameters)) {
-             if (string2Modify.matches("(?s).*%[^%]+%.*") || string2Modify.matches("(?s).*\\$\\{[^{]+\\}.*")) {
+            // if (string2Modify.matches("(?s).*%[^%]+%.*") ||
+            // string2Modify.matches("(?s).*\\$\\{[^{]+\\}.*")) {
+            if (string2Modify.matches("(?s).*\\$\\{[^{]+\\}.*")) {
                 if (parameterSubstitutor == null) {
                     parameterSubstitutor = new ParameterSubstitutor();
                     for (Entry<String, String> entry : schedulerParameters.entrySet()) {
                         String value = entry.getValue();
                         String paramName = entry.getKey();
-                        if (!value.isEmpty()) {
+
+                        if (value != null && !value.isEmpty()) {
                             parameterSubstitutor.addKey(paramName, value);
                         }
                     }
                 }
-                if (string2Modify.matches("(?s).*\\$\\{[^\\{]+\\}.*")) {
-                    resultString = parameterSubstitutor.replace(string2Modify);
-                }
-                 if (string2Modify.matches("(?s).*%[^%]+%.*")) {
-                    parameterSubstitutor.setOpenTag("%");
-                    parameterSubstitutor.setCloseTag("%");
-                    resultString = parameterSubstitutor.replace(string2Modify);
-                }
-                 
+                // if (string2Modify.matches("(?s).*\\$\\{[^\\{]+\\}.*")) {
+                resultString = parameterSubstitutor.replace(string2Modify);
+                // }
+                /*
+                 * if (string2Modify.matches("(?s).*%[^%]+%.*")) {
+                 * parameterSubstitutor.setOpenTag("%");
+                 * parameterSubstitutor.setCloseTag("%"); resultString =
+                 * parameterSubstitutor.replace(string2Modify); }
+                 */
+
             }
         }
         return resultString;
     }
 
-    
-    
     private HashMap<String, String> getSpecialParameters() {
         HashMap<String, String> specialParams = new HashMap<String, String>();
         if (spooler == null) {
