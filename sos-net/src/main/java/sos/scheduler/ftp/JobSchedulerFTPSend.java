@@ -162,7 +162,8 @@ public class JobSchedulerFTPSend extends JobSchedulerJobAdapter {
                     }
                 }
                 SOSConfiguration con =
-                        new SOSConfiguration(null, mapToProperties(schedulerParams), sosString.parseToString(schedulerParams.get(PARAMETER_SETTINGS)),
+                        new SOSConfiguration(null, mapToProperties(schedulerParams),
+                                sosString.parseToString(schedulerParams.get(PARAMETER_SETTINGS)),
                                 sosString.parseToString(schedulerParams.get(PARAMETER_PROFILE)), null, new SOSSchedulerLogger(spooler_log));
                 con.checkConfigurationItems();
                 sos.net.sosftp.SOSFTPCommandSend ftpCommand = new sos.net.sosftp.SOSFTPCommandSend(con, new SOSSchedulerLogger(spooler_log));

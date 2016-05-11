@@ -15,6 +15,7 @@ public class SOSSSHJobTrilead extends SOSSSHJob2 {
 
     @Override
     public void generateTemporaryFilename() {
+        //
     }
 
     @Override
@@ -24,10 +25,12 @@ public class SOSSSHJobTrilead extends SOSSSHJob2 {
 
     @Override
     public void processPostCommands(String tmpReturnValueFileName) {
+        //
     }
 
     @Override
     public void preparePostCommandHandler() {
+        //
     }
 
     @Override
@@ -56,18 +59,16 @@ public class SOSSSHJobTrilead extends SOSSSHJob2 {
     }
 
     public SOSSSHJob2 execute() throws Exception {
-        boolean flgScriptFileCreated = false; // http://www.sos-berlin.com/jira/browse/JITL-17
         vfsHandler.setJSJobUtilites(objJSJobUtilities);
-
         try {
-            if (isConnected == false) {
+            if (!isConnected) {
                 this.connect();
             }
             vfsHandler.OpenSession(objOptions);
-            if (objOptions.command.IsEmpty() == false) {
+            if (!objOptions.command.IsEmpty()) {
                 strCommands2Execute = objOptions.command.values();
             } else {
-                if (objOptions.isScript() == true) {
+                if (objOptions.isScript()) {
                     strCommands2Execute = new String[1];
                     String strTemp = objOptions.command_script.Value();
                     if (objOptions.command_script.IsEmpty()) {
@@ -75,18 +76,13 @@ public class SOSSSHJobTrilead extends SOSSSHJob2 {
                     }
                     strTemp = objJSJobUtilities.replaceSchedulerVars(strTemp);
                     strCommands2Execute[0] = vfsHandler.createScriptFile(strTemp);
-                    flgScriptFileCreated = true; // http://www.sos-berlin.com/jira/browse/JITL-17
                     strCommands2Execute[0] += " " + objOptions.command_script_param.Value();
                 } else {
-                    throw new SSHMissingCommandError(objMsg.getMsg(SOS_SSH_E_100)); // "SOS-SSH-E-100: neither Commands nor Script(file) specified. Abort.");
+                    throw new SSHMissingCommandError(objMsg.getMsg(SOS_SSH_E_100));
                 }
             }
-
             for (String strCmd : strCommands2Execute) {
                 try {
-                    /** \change Substitution of variables enabled
-                     *
-                     * see http://www.sos-berlin.com/jira/browse/JS-673 */
                     strCmd = objJSJobUtilities.replaceSchedulerVars(strCmd);
                     logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
                     vfsHandler.ExecuteCommand(strCmd);
@@ -96,26 +92,18 @@ public class SOSSSHJobTrilead extends SOSSSHJob2 {
                     checkExitCode();
                     changeExitSignal();
                 } catch (Exception e) {
-                    // logger.error(this.StackTrace2String(e));
                     throw new SSHExecutionError("Exception raised: " + e, e);
-                } finally {
-                    if (flgScriptFileCreated == true) {
-                        // http://www.sos-berlin.com/jira/browse/JITL-17
-                        // file will be deleted by the Vfs Component.
-                    }
                 }
             }
-            // http://www.sos-berlin.com/jira/browse/JITL-112
         } catch (Exception e) {
-            // logger.error(this.StackTrace2String(e));
             String strErrMsg = "SOS-SSH-E-120: error occurred processing ssh command: ";
-            // logger.error(strErrMsg, e);
             throw new SSHExecutionError(strErrMsg, e);
         } finally {
-            if (keepConnected == false) {
+            if (!keepConnected) {
                 disconnect();
             }
         }
         return this;
     }
+
 }

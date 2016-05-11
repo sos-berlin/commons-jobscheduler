@@ -121,6 +121,7 @@ public class JobSchedulerProcessDatabaseJob extends ProcessOrderJob {
             try {
                 this.cleanup();
             } catch (Exception e) {
+                //
             }
             if (this.getConnection() != null) {
                 try {

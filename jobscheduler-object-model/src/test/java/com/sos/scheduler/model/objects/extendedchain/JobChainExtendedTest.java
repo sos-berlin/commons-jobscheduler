@@ -49,10 +49,10 @@ public class JobChainExtendedTest {
     private final static SimpleParam PARAM1 = new SimpleParam("param1", "value1");
     private final static SimpleParam PARAM2 = new SimpleParam("param2", "value2");
     private final static SimpleParam PARAM3 = new SimpleParam("param3", "value3");
-    private final static ImmutableMap<String, SimpleChainNode> EXPECTED_NODES = new ImmutableMap.Builder<String, SimpleChainNode>().put("100", NODE1)
-            .put("200", NODE2).put("success", NODE3).put("error", NODE4).build();
-    private final static ImmutableMap<String, SimpleParam> EXPECTED_PARAMS = new ImmutableMap.Builder<String, SimpleParam>().put("param1", PARAM1)
-            .put("param2", PARAM2).put("param3", PARAM3).build();
+    private final static ImmutableMap<String, SimpleChainNode> EXPECTED_NODES =
+            new ImmutableMap.Builder<String, SimpleChainNode>().put("100", NODE1).put("200", NODE2).put("success", NODE3).put("error", NODE4).build();
+    private final static ImmutableMap<String, SimpleParam> EXPECTED_PARAMS =
+            new ImmutableMap.Builder<String, SimpleParam>().put("param1", PARAM1).put("param2", PARAM2).put("param3", PARAM3).build();
     private Schema schema;
 
     public JobChainExtendedTest() {
@@ -68,8 +68,9 @@ public class JobChainExtendedTest {
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         Schema schema = null;
         try {
-            schema = schemaFactory.newSchema(new Source[] { SOSResourceFactory.asStreamSource(SOSProductionResource.SCHEDULER_XSD),
-                    SOSResourceFactory.asStreamSource(SOSProductionResource.JOB_CHAIN_EXTENSIONS_XSD) });
+            schema =
+                    schemaFactory.newSchema(new Source[] { SOSResourceFactory.asStreamSource(SOSProductionResource.SCHEDULER_XSD),
+                            SOSResourceFactory.asStreamSource(SOSProductionResource.JOB_CHAIN_EXTENSIONS_XSD) });
         } catch (SAXException e) {
             LOGGER.error(e.getMessage(), e);
         }

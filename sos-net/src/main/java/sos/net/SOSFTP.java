@@ -23,6 +23,7 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
     private ProtocolCommandListener listener = null;
 
     public SOSFTP() {
+        //
     }
 
     public SOSFTP(final String host) throws SocketException, IOException, UnknownHostException {
@@ -35,6 +36,7 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
 
     public SOSFTP(final String host, final int port, final SOSLogger logger) {
         try {
+            connect(host, port);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -175,6 +177,7 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
         try {
             x = cd(strFolderName);
         } catch (IOException e) {
+            //
         }
         return x;
     }
@@ -284,6 +287,7 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
                     out.close();
                 }
             } catch (Exception e) {
+                //
             }
         }
     }
@@ -342,18 +346,21 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
                     in.close();
                 }
             } catch (Exception e) {
+                //
             }
             try {
                 if (out != null) {
                     out.flush();
                 }
             } catch (Exception e) {
+                //
             }
             try {
                 if (out != null) {
                     out.close();
                 }
             } catch (Exception e) {
+                //
             }
         }
     }
@@ -374,6 +381,7 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
                     in.close();
                 }
             } catch (Exception e) {
+                //
             }
         }
     }
@@ -424,16 +432,19 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
                     in.close();
                 }
             } catch (Exception e) {
+                //
             }
             try {
                 out.flush();
             } catch (Exception e) {
+                //
             }
             try {
                 if (out != null) {
                     out.close();
                 }
             } catch (Exception e) {
+                //
             }
         }
     }

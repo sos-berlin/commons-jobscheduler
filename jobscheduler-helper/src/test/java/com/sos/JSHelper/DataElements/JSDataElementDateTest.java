@@ -33,5 +33,5 @@ public class JSDataElementDateTest {
             System.out.println(String.format("Month %1$d: last Friday = %2$d", i, ilastfriday));
         }
     }
-    
+
 }

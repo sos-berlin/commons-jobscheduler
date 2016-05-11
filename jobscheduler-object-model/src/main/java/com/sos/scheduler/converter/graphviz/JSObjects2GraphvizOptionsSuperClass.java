@@ -74,5 +74,5 @@ public class JSObjects2GraphvizOptionsSuperClass extends JSOptionsClass {
         super.CommandLineArgs(pstrArgs);
         this.setAllOptions(super.objSettings);
     }
-    
+
 }

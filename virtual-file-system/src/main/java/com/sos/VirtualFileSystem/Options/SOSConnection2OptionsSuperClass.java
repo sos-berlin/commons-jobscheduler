@@ -66,7 +66,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @JSOptionDefinition(name = "use_zlib_compression", description = "Use the zlib cmpression on sftp", key = "use_zlib_compression", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean use_zlib_compression = new SOSOptionBoolean(this, className + ".use_zlib_compression", "Use the zlib cmpression on sftp", "false", "false", false);
+    public SOSOptionBoolean use_zlib_compression = new SOSOptionBoolean(this, className + ".use_zlib_compression", "Use the zlib cmpression on sftp",
+            "false", "false", false);
 
     @Override
     public SOSOptionBoolean getuse_zlib_compression() {
@@ -80,7 +81,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @JSOptionDefinition(name = "zlib_compression_level", description = "the compression level to use", key = "zlib_compression_level", type = "SOSOptionInteger", mandatory = false)
-    public SOSOptionInteger zlib_compression_level = new SOSOptionInteger(this, className + ".zlib_compression_level", "the compression level to use", "1", "1", false);
+    public SOSOptionInteger zlib_compression_level = new SOSOptionInteger(this, className + ".zlib_compression_level",
+            "the compression level to use", "1", "1", false);
 
     @Override
     public SOSOptionInteger getzlib_compression_level() {
@@ -94,7 +96,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @JSOptionDefinition(name = "ProtocolCommandListener", description = "Activate the logging for Apache ftp client", key = "Protocol_Command_Listener", type = "SOSOptionBoolean", mandatory = true)
-    public SOSOptionBoolean ProtocolCommandListener = new SOSOptionBoolean(this, className + ".Protocol_Command_Listener", "Activate the logging for Apache ftp client", "false", "false", true);
+    public SOSOptionBoolean ProtocolCommandListener = new SOSOptionBoolean(this, className + ".Protocol_Command_Listener",
+            "Activate the logging for Apache ftp client", "false", "false", true);
 
     @Override
     public String getProtocolCommandListener() {
@@ -126,7 +129,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @JSOptionDefinition(name = "make_Dirs", description = "Create missing Directory on Target", key = "make_Dirs", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean makeDirs = new SOSOptionBoolean(this, className + ".make_Dirs", "Create missing Directory on Source/Target", "true", "true", false);
+    public SOSOptionBoolean makeDirs = new SOSOptionBoolean(this, className + ".make_Dirs", "Create missing Directory on Source/Target", "true",
+            "true", false);
 
     public SOSOptionBoolean createFoldersOnTarget = (SOSOptionBoolean) makeDirs.SetAlias("create_folders_on_target");
 
@@ -208,7 +212,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     public SOSOptionRegExp ReplaceWhat = (SOSOptionRegExp) replacing.SetAlias(className + ".ReplaceWhat");
 
     @JSOptionDefinition(name = "strict_hostKey_checking", description = "Check the hostkey against known hosts for SSH", key = "strict_hostKey_checking", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean strictHostKeyChecking = new SOSOptionBoolean(this, className + ".strict_hostkey_checking", "Check the hostkey against known hosts for SSH", "false", "false", false);
+    public SOSOptionBoolean strictHostKeyChecking = new SOSOptionBoolean(this, className + ".strict_hostkey_checking",
+            "Check the hostkey against known hosts for SSH", "false", "false", false);
 
     @Override
     public SOSOptionBoolean getstrict_hostKey_checking() {
@@ -221,7 +226,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @JSOptionDefinition(name = "TFN_Post_Command", description = "Post commands executed after creating the final TargetFile", key = "TFN_Post_Command", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString TFN_Post_Command = new SOSOptionString(this, className + ".TFN_Post_Command", "Post commands executed after creating the final TargetFileName", "", "", false);
+    public SOSOptionString TFN_Post_Command = new SOSOptionString(this, className + ".TFN_Post_Command",
+            "Post commands executed after creating the final TargetFileName", "", "", false);
 
     @Override
     public SOSOptionString getTFN_Post_Command() {
@@ -235,7 +241,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @JSOptionDefinition(name = "Post_Command", description = "FTP-Command to be executed after transfer", key = "Post_Command", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString Post_Command = new SOSOptionString(this, className + ".Post_Command", "FTP-Command to be executed after transfer", "", "", false);
+    public SOSOptionString Post_Command = new SOSOptionString(this, className + ".Post_Command", "FTP-Command to be executed after transfer", "", "",
+            false);
 
     @Override
     public String getPost_Command() {
@@ -263,7 +270,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @JSOptionDefinition(name = "FtpS_protocol", description = "Type of FTPS-Protocol, e.g. SSL, TLS", key = "FtpS_protocol", type = "SOSOptionString", mandatory = true)
-    public SOSOptionString FtpS_protocol = new SOSOptionString(this, className + ".FtpS_protocol", "Type of FTPS-Protocol, e.g. SSL, TLS", "SSL", "SSL", true);
+    public SOSOptionString FtpS_protocol = new SOSOptionString(this, className + ".FtpS_protocol", "Type of FTPS-Protocol, e.g. SSL, TLS", "SSL",
+            "SSL", true);
 
     @Override
     public String getFtpS_protocol() {
@@ -277,7 +285,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @JSOptionDefinition(name = "loadClassName", description = "Java Class which implements the ISOSVFSHandlerInterface", key = "load_Class_Name", type = "SOSOptionString ", mandatory = false)
-    public SOSOptionJavaClassName loadClassName = new SOSOptionJavaClassName(this, className + ".load_Class_Name", "Java Class which implements the ISOSVFSHandlerInterface", "", "", false);
+    public SOSOptionJavaClassName loadClassName = new SOSOptionJavaClassName(this, className + ".load_Class_Name",
+            "Java Class which implements the ISOSVFSHandlerInterface", "", "", false);
 
     public SOSOptionJavaClassName DataProviderClassName = (SOSOptionJavaClassName) loadClassName.SetAlias("Data_provider_class_name");
 
@@ -578,12 +587,14 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @JSOptionDefinition(name = "verify_certificate_hostname", description = "The certificate verification process will always verify the DNS name of the certificate presented by the server, with the hostname of the server in the URL used by the client.", key = "verify_certificate_hostname", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean verify_certificate_hostname = new SOSOptionBoolean(this, className + ".verify_certificate_hostname", // HashMap-Key
-    "The certificate verification process will always verify the DNS name of the certificate presented by the server, with the hostname of the server in the URL used by the client", // Titel
-    "true", // InitValue
-    "true", // DefaultValue
-    false // isMandatory
-    );
+    public SOSOptionBoolean verify_certificate_hostname =
+            new SOSOptionBoolean(this,
+                    className + ".verify_certificate_hostname", // HashMap-Key
+                    "The certificate verification process will always verify the DNS name of the certificate presented by the server, with the hostname of the server in the URL used by the client", // Titel
+                    "true", // InitValue
+                    "true", // DefaultValue
+                    false // isMandatory
+            );
 
     public SOSOptionBoolean getverify_certificate_hostname() {
         return verify_certificate_hostname;
@@ -724,7 +735,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     }
 
     @JSOptionDefinition(name = "raise_exception_on_error", description = "Raise an Exception if an error occured", key = "raise_exception_on_error", type = "SOSOptionBoolean", mandatory = true)
-    public SOSOptionBoolean raise_exception_on_error = new SOSOptionBoolean(this, className + ".raise_exception_on_error", "Raise an Exception if an error occured", "true", "true", true);
+    public SOSOptionBoolean raise_exception_on_error = new SOSOptionBoolean(this, className + ".raise_exception_on_error",
+            "Raise an Exception if an error occured", "true", "true", true);
 
     public SOSOptionBoolean getraise_exception_on_error() {
         return raise_exception_on_error;
@@ -752,10 +764,10 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @JSOptionDefinition(name = "configuration_files", description = "List of the app configuration files separated by semicolon", key = "configuration_files", type = "SOSOptionString", mandatory = false)
     public SOSOptionString configuration_files = new SOSOptionString(this, className + ".configuration_files", // HashMap-Key
-    "List of the app configuration files separated by semicolon", // Titel
-    "", // InitValue
-    "", // DefaultValue
-    false // isMandatory
-    );
+            "List of the app configuration files separated by semicolon", // Titel
+            "", // InitValue
+            "", // DefaultValue
+            false // isMandatory
+            );
 
 }

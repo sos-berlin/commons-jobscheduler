@@ -105,6 +105,7 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
             try {
                 this.getLogger().error(SOSClassUtil.getMethodName() + ": " + e.getMessage());
             } catch (Exception ex) {
+                //
             }
             return false;
         }
@@ -140,14 +141,17 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
             try {
                 receiver.closeFolder(expunge);
             } catch (Exception e) {
+                //
             }
             try {
                 receiver.disconnect();
             } catch (Exception e) {
+                //
             }
             try {
                 this.getConnection().disconnect();
             } catch (Exception e) {
+                //
             }
         }
         return false;
@@ -292,8 +296,8 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
                 this.updateTableMails(originalMessage.getMessageId());
                 if (!SOSString.isEmpty(getXSOSMailDeliveryCounterHeader())) {
                     this.getLogger().info(
-                            "...current " + JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER + " [" + this.getXSOSMailDeliveryCounterHeader()
-                                    + "]");
+                            "...current " + JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER + " ["
+                                    + this.getXSOSMailDeliveryCounterHeader() + "]");
                 }
                 bouncedMailAction = this.getPatternAction(sosMimeMessage);
                 this.getLogger().info("..available pattern action for this bounce [" + bouncedMailAction + "]");
@@ -315,7 +319,8 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
                             getLogger().debug5(".. [" + JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER + "] set.");
                         }
                         getLogger().debug5(
-                                "..current value of \"" + JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER + "\" [" + currentHeaderValue + "]");
+                                "..current value of \"" + JobSchedulerMailBounceHandler.X_SOSMAIL_DELIVERY_COUNTER_HEADER + "\" ["
+                                        + currentHeaderValue + "]");
                         getLogger().debug5("..query directory [" + bounceDirectory + " ] set.");
                         originalMessage.setQueueDir(bounceDirectory);
                         originalMessage.dumpMessageToFile(true, false);
@@ -412,6 +417,7 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
             try {
                 getLogger().info("..message with ID [" + messageId + "] is already delivered [" + result.get("retry_count").toString() + "] time(s)");
             } catch (Exception e) {
+                //
             }
             return Integer.parseInt(result.get("retry_count").toString());
         }

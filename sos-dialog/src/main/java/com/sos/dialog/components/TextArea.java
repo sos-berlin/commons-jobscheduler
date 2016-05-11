@@ -71,6 +71,7 @@ public class TextArea extends StyledText {
 
             @Override
             public void verifyText(final VerifyEvent e) {
+                //
             }
         });
         addMouseListener(new MouseListener() {
@@ -84,6 +85,7 @@ public class TextArea extends StyledText {
 
             @Override
             public void mouseDown(final MouseEvent arg0) {
+                //
             }
 
             @Override
@@ -141,6 +143,7 @@ public class TextArea extends StyledText {
 
             @Override
             public void modifyText(final ModifyEvent e) {
+                //
             }
         });
     }
@@ -518,7 +521,6 @@ public class TextArea extends StyledText {
                             event.text = "CDATA[ ]]>";
                             sendKeyEvent(5);
                             break;
-
                         default:
                             break;
                         }
@@ -573,6 +575,7 @@ public class TextArea extends StyledText {
 
         @Override
         public void keyReleased(KeyEvent e) {
+            //
         }
     }
 

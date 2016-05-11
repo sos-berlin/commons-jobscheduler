@@ -620,6 +620,7 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
                     fin.close();
                 }
             } catch (final IOException e) {
+                //
             }
         }
     }
@@ -637,6 +638,7 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
                     fin.close();
                 }
             } catch (final IOException e) {
+                //
             }
         }
     }
@@ -690,6 +692,7 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
                     fin.close();
                 }
             } catch (final IOException e) {
+                //
             }
         }
     }
@@ -733,6 +736,7 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
                     fin = null;
                 }
             } catch (final IOException e) {
+                //
             }
         }
     }
@@ -965,6 +969,7 @@ public class JSFile extends java.io.File implements JSListener, IJSArchiver {
                 }
                 randomFile.getChannel().close();
             } catch (Exception e) {
+                //
             }
             randomFile = null;
             flgFileIsLocked = false;

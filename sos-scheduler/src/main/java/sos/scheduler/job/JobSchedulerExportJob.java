@@ -75,6 +75,7 @@ public class JobSchedulerExportJob extends JobSchedulerJob {
                     try {
                         this.getLogger().error(e.getMessage());
                     } catch (Exception ex) {
+                        //
                     }
                 }
                 return false;
@@ -161,6 +162,7 @@ public class JobSchedulerExportJob extends JobSchedulerJob {
                 try {
                     sosConnection.rollback();
                 } catch (Exception ex) {
+                    //
                 }
                 try {
                     String upStr =
@@ -169,6 +171,7 @@ public class JobSchedulerExportJob extends JobSchedulerJob {
                     sosUpdateStateConnection.executeUpdate(upStr);
                     sosUpdateStateConnection.commit();
                 } catch (Exception x) {
+                    //
                 }
             }
             String stateText = "error occurred export filename : " + filename + " cause: " + e.getMessage();

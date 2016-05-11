@@ -5,6 +5,7 @@ import java.util.Map;
 import org.apache.commons.lang3.text.StrLookup;
 
 public class CaseInsensitivLookupForParameter<V> extends StrLookup<V> {
+
     private final Map<String, V> map;
 
     CaseInsensitivLookupForParameter(final Map<String, V> map) {
@@ -13,7 +14,7 @@ public class CaseInsensitivLookupForParameter<V> extends StrLookup<V> {
 
     @Override
     public String lookup(final String key) {
-        String lowercaseKey = key.toLowerCase();  
+        String lowercaseKey = key.toLowerCase();
         if (map == null) {
             return null;
         }

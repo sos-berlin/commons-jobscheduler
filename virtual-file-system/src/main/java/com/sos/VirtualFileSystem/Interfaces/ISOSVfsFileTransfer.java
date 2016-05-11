@@ -1,6 +1,3 @@
-/*
- * SOSFileTransfer.java Created on 19.12.2007
- */
 package com.sos.VirtualFileSystem.Interfaces;
 
 import java.io.IOException;
@@ -82,7 +79,7 @@ public interface ISOSVfsFileTransfer {
      *
      * @exception Exception
      * @see #dir() */
-    public Vector<String> nList(String pathname); // throws Exception;
+    public Vector<String> nList(String pathname);
 
     public Vector<String> nList(String pathname, final boolean flgRecurseSubFolder);
 

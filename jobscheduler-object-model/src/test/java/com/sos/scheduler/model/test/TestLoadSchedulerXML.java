@@ -20,11 +20,7 @@ import java.math.BigInteger;
 /** @author KB */
 public class TestLoadSchedulerXML implements Runnable {
 
-    // private final String conClassName = "TestLoadSchedulerXML";
     private static final Logger LOGGER = Logger.getLogger(TestLoadSchedulerXML.class);
-
-    TestLoadSchedulerXML() {
-    }
 
     @Override
     public void run() {
@@ -60,9 +56,9 @@ public class TestLoadSchedulerXML implements Runnable {
             try {
                 objStartJob.run();
             } catch (JobSchedulerException e) {
-                // TODO: handle exception
+                // TO DO: handle exception
             } catch (Exception e) {
-                // TODO: handle exception
+                // TO DO: handle exception
             }
             Task objTask = objStartJob.getTask();
             LOGGER.info("task-id  = " + objTask.getTaskId());
@@ -71,9 +67,9 @@ public class TestLoadSchedulerXML implements Runnable {
             try {
                 objStartJob.run();
             } catch (JobSchedulerException e) {
-                // TODO: handle exception
+                // TO DO: handle exception
             } catch (Exception e) {
-                // TODO: handle exception
+                // TO DO: handle exception
             }
             JSCmdShowState objShowState = objFactory.createShowState();
             objShowState.setWhat("all");

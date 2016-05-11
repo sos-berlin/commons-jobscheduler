@@ -100,6 +100,7 @@ public class FileConsumerTool extends Thread implements MessageListener, Excepti
             try {
                 Thread.sleep(1000);
             } catch (Exception e) {
+                //
             }
         }
         Iterator<FileConsumerTool> itr = threads.iterator();
@@ -201,7 +202,6 @@ public class FileConsumerTool extends Thread implements MessageListener, Excepti
                 } catch (IOException e) {
                     LOGGER.error(e.getMessage(), e);
                     throw new RuntimeException("Problems with inputStream");
-                } finally {
                 }
             } else {
                 if (verbose) {

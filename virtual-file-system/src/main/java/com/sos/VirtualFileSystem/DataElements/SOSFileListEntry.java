@@ -66,8 +66,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     private static final String FIELD_MANDATOR = "mandator";
     private static final String FIELD_GUID = "guid";
     private static final String FIELD_MODIFICATION_DATE = "modification_date";
-    private final static Logger logger = Logger.getLogger(SOSFileListEntry.class);
-    private final static Logger objJadeReportLogger = Logger.getLogger(VFSFactory.getLoggerName());
+    private static final Logger LOGGER = Logger.getLogger(SOSFileListEntry.class);
+    private static final Logger objJadeReportLogger = Logger.getLogger(VFSFactory.getLoggerName());
     private ISOSVirtualFile fleSourceFile = null;
     private String strSourceFileName = null;
     private String strSourceTransferName = null;
@@ -92,7 +92,6 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     private String checksum4check = "N/A";
     private Date dteStartTransfer = null;
     private Date dteEndTransfer = null;
-    @SuppressWarnings("unused")
     private ISOSVfsFileTransfer objVfsHandler = null;
     private final String guid = UUID.randomUUID().toString();
     private boolean flgSteadyFlag = false;
@@ -108,7 +107,8 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     public long zeroByteCount = 0;
 
     public enum enuTransferStatus {
-        transferUndefined, waiting4transfer, transferring, transferInProgress, transferred, transfer_skipped, transfer_has_errors, transfer_aborted, compressed, notOverwritten, deleted, renamed, ignoredDueToZerobyteConstraint, setBack, polling
+        transferUndefined, waiting4transfer, transferring, transferInProgress, transferred, transfer_skipped, transfer_has_errors, transfer_aborted, compressed,
+        notOverwritten, deleted, renamed, ignoredDueToZerobyteConstraint, setBack, polling
     }
 
     public enum HistoryRecordType {
@@ -169,7 +169,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         String file = strSourceFileName;
         objDataSourceClient.getFileHandle(file).delete();
         String msg = SOSVfs_I_0113.params(file);
-        logger.info(msg);
+        LOGGER.info(msg);
         objJadeReportLogger.info(msg);
     }
 
@@ -188,7 +188,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             try {
                 md4create = MessageDigest.getInstance(objOptions.IntegrityHashType.Value());
             } catch (NoSuchAlgorithmException e1) {
-                logger.error(e1.toString());
+                LOGGER.error(e1.toString());
                 objOptions.CreateIntegrityHashFile.value(false);
                 calculateIntegrityHash4Create = false;
             }
@@ -198,7 +198,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             try {
                 md4check = MessageDigest.getInstance(objOptions.IntegrityHashType.Value());
             } catch (NoSuchAlgorithmException e1) {
-                logger.error(e1.toString());
+                LOGGER.error(e1.toString());
                 objOptions.CheckIntegrityHash.value(false);
                 calculateIntegrityHash4Check = false;
             }
@@ -248,7 +248,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                             }
                         } catch (JobSchedulerException e) {
                             setEntryErrorMessage(e);
-                            logger.error(errorMessage);
+                            LOGGER.error(errorMessage);
                             break;
                         }
                         totalBytesTransferred += bytesTransferred;
@@ -265,11 +265,11 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             if (calculateIntegrityHash4Create) {
                 checksum = toHexString(md4create.digest());
                 checksum4check = checksum;
-                logger.debug(SOSVfs_I_274.params(checksum, strTargetFileName, objOptions.IntegrityHashType.Value()));
+                LOGGER.debug(SOSVfs_I_274.params(checksum, strTargetFileName, objOptions.IntegrityHashType.Value()));
             }
             if (calculateIntegrityHash4Check) {
                 checksum4check = toHexString(md4check.digest());
-                logger.debug(SOSVfs_I_274.params(checksum4check, strSourceFileName, objOptions.IntegrityHashType.Value()));
+                LOGGER.debug(SOSVfs_I_274.params(checksum4check, strSourceFileName, objOptions.IntegrityHashType.Value()));
             }
             this.setNoOfBytesTransferred(totalBytesTransferred);
             totalBytesTransferred += cumulativeFileSeperatorLength;
@@ -302,7 +302,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             try {
                 checksumFile = objDataTargetClient.getFileHandle(targetFileName + "." + objOptions.IntegrityHashType.Value());
                 checksumFile.write(checksum.getBytes());
-                logger.info(SOSVfs_I_285.params(checksumFile.getName()));
+                LOGGER.info(SOSVfs_I_285.params(checksumFile.getName()));
                 setChecksumFile(checksumFile);
             } catch (JobSchedulerException e) {
                 throw e;
@@ -328,7 +328,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                                 target.delete();
                             }
                         } catch (Exception ex) {
-                            logger.debug(ex.toString(), ex);
+                            LOGGER.debug(ex.toString(), ex);
                         }
                         String strT =
                                 String.format("Integrity Hash violation. File %1$s, checksum read: '%2$s', checksum calculated: '%3$s'",
@@ -336,16 +336,16 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                         setStatus(enuTransferStatus.transfer_aborted);
                         throw new JobSchedulerException(strT);
                     } else {
-                        logger.info(String.format("Integrity Hash is OK: File %1$s, checksum read '%2$s', checksum calculated '%3$s'",
+                        LOGGER.info(String.format("Integrity Hash is OK: File %1$s, checksum read '%2$s', checksum calculated '%3$s'",
                                 sourceChecksumFileName, origChecksum, checksum4check));
                     }
                 } else {
-                    logger.info(String.format("Checksum file '%1$s' not found", sourceChecksumFileName));
+                    LOGGER.info(String.format("Checksum file '%1$s' not found", sourceChecksumFileName));
                 }
             } catch (JobSchedulerException e) {
                 throw e;
             } catch (Exception e) {
-                logger.error(e.toString(), e);
+                LOGGER.error(e.toString(), e);
             }
         }
     }
@@ -366,16 +366,16 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
             String strT = pstrCommandString.Value();
             strT = replaceVariables(strT);
             String strM = SOSVfs_D_0151.params(strT);
-            logger.debug(strM);
+            LOGGER.debug(strM);
             String[] strA = strT.split(";");
             for (String strCmd : strA) {
                 try {
                     pobjDataClient.getHandler().ExecuteCommand(strCmd);
                 } catch (JobSchedulerException e) {
-                    logger.error(e.toString());
+                    LOGGER.error(e.toString());
                     throw e;
                 } catch (Exception e) {
-                    logger.error(e.toString());
+                    LOGGER.error(e.toString());
                     throw new JobSchedulerException(conMethodName, e);
                 }
             }
@@ -687,10 +687,10 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     }
 
     public void Log4Debug() {
-        logger.debug(SOSVfs_D_218.params(this.SourceFileName()));
-        logger.debug(SOSVfs_D_219.params(this.SourceTransferName()));
-        logger.debug(SOSVfs_D_220.params(this.TargetTransferName()));
-        logger.debug(SOSVfs_D_221.params(this.TargetFileName()));
+        LOGGER.debug(SOSVfs_D_218.params(this.SourceFileName()));
+        LOGGER.debug(SOSVfs_D_219.params(this.SourceTransferName()));
+        LOGGER.debug(SOSVfs_D_220.params(this.TargetTransferName()));
+        LOGGER.debug(SOSVfs_D_221.params(this.TargetFileName()));
     }
 
     public String MakeAtomicFileName(final ISOSFtpOptions objO) {
@@ -708,7 +708,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         try {
             strR = objOptions.getreplacing().doReplace(strR, strReplaceWith);
         } catch (Exception e) {
-            logger.error(e.toString(), new JobSchedulerException(SOSVfs_E_0150.get(), e));
+            LOGGER.error(e.toString(), new JobSchedulerException(SOSVfs_E_0150.get(), e));
             throw new JobSchedulerException(SOSVfs_E_0150.get(), e);
         }
         return strR;
@@ -720,7 +720,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
     public void NoOfBytesTransferred(final long plngNoOfBytesTransferred) {
         lngNoOfBytesTransferred = plngNoOfBytesTransferred;
-        logger.info(SOSVfs_D_0112.params(plngNoOfBytesTransferred));
+        LOGGER.info(SOSVfs_D_0112.params(plngNoOfBytesTransferred));
     }
 
     protected String normalized(String str) {
@@ -743,7 +743,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
 
     private void RaiseException(final String pstrM) {
         this.TransferStatus(enuTransferStatus.transfer_aborted);
-        logger.error(pstrM);
+        LOGGER.error(pstrM);
         throw new JobSchedulerException(pstrM);
     }
 
@@ -880,7 +880,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                 return;
             case delete:
                 objSourceFile.delete();
-                logger.debug(SOSVfs_I_0113.params(strSourceFileName));
+                LOGGER.debug(SOSVfs_I_0113.params(strSourceFileName));
                 this.setStatus(enuTransferStatus.deleted);
                 return;
             case rename:
@@ -892,7 +892,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                     objDataSourceClient.mkdir(strP);
                 }
                 strNewFileName = changeBackslashes(addFileSeparator(strParent) + strNewFileName);
-                logger.debug(SOSVfs_I_150.params(strSourceFileName, strNewFileName));
+                LOGGER.debug(SOSVfs_I_150.params(strSourceFileName, strNewFileName));
                 strTargetFileName = strNewFileName;
                 objSourceFile.rename(strNewFileName);
                 this.setStatus(enuTransferStatus.renamed);
@@ -905,7 +905,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                 if (objOptions.CumulativeFileDelete.isTrue() && !objOptions.flgCumulativeTargetDeleted) {
                     objTargetFile.delete();
                     objOptions.flgCumulativeTargetDeleted = true;
-                    logger.debug(String.format("cumulative file '%1$s' deleted.", strTargetFileName));
+                    LOGGER.debug(String.format("cumulative file '%1$s' deleted.", strTargetFileName));
                 }
             }
             objTargetFile.setModeAppend(objOptions.append_files.value());
@@ -924,14 +924,14 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                     objDataSourceClient.getFileHandle(MakeFullPathName(getPathWithoutFileName(strSourceFileName), strSourceTransferName));
             if (eTransferStatus == enuTransferStatus.ignoredDueToZerobyteConstraint) {
                 String strM = SOSVfs_D_0110.params(strSourceFileName);
-                logger.debug(strM);
+                LOGGER.debug(strM);
                 objJadeReportLogger.info(strM);
             }
             if (objOptions.DoNotOverwrite()) {
                 flgFileExists = objTargetFile.FileExists();
                 if (flgFileExists) {
                     this.setTargetFileAlreadyExists(true);
-                    logger.debug(SOSVfs_E_228.params(strTargetFileName));
+                    LOGGER.debug(SOSVfs_E_228.params(strTargetFileName));
                     this.setNotOverwritten();
                 }
             }
@@ -955,11 +955,11 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                 }
             }
         } catch (JobSchedulerException e) {
-            logger.error(SOSVfs_E_229.params(e));
+            LOGGER.error(SOSVfs_E_229.params(e));
             throw e;
         } catch (Exception e) {
             String strT = SOSVfs_E_229.params(e);
-            logger.error(strT);
+            LOGGER.error(strT);
             throw new JobSchedulerException(strT, e);
         } finally {
             try {
@@ -1025,7 +1025,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                 lngFileSize = objDataSourceClient.getFileHandle(strSourceFileName).getFileSize();
             }
             if (lngFileSize != plngNoOfBytesTransferred) {
-                logger.error(SOSVfs_E_216.params(plngNoOfBytesTransferred, lngFileSize, strSourceFileName));
+                LOGGER.error(SOSVfs_E_216.params(plngNoOfBytesTransferred, lngFileSize, strSourceFileName));
                 this.setStatus(enuTransferStatus.transfer_aborted);
                 throw new JobSchedulerException(SOSVfs_E_271.get());
             }
@@ -1041,7 +1041,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     public void setNotOverwritten() {
         eTransferStatus = enuTransferStatus.notOverwritten;
         dteEndTransfer = Now();
-        logger.warn(SOSVfs_D_0111.params(strSourceFileName));
+        LOGGER.warn(SOSVfs_D_0111.params(strSourceFileName));
     }
 
     public boolean isNotOverwritten() {
@@ -1140,7 +1140,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         eTransferStatus = enuTransferStatus.transfer_skipped;
         dteEndTransfer = Now();
         String strM = SOSVfs_D_0110.params(strSourceFileName);
-        logger.debug(strM);
+        LOGGER.debug(strM);
         objJadeReportLogger.info(strM);
     }
 
@@ -1154,6 +1154,7 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
         try {
             flgT = objDataSourceClient.getFileHandle(strSourceFileName).FileExists();
         } catch (Exception e) {
+            //
         }
         return flgT;
     }
@@ -1398,10 +1399,11 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     public String toString() {
         String strT;
         try {
-            strT = SOSVfs_D_214.params(this.getTargetFileNameAndPath(), this.SourceFileName(), this.NoOfBytesTransferred(),
+            strT =
+                    SOSVfs_D_214.params(this.getTargetFileNameAndPath(), this.SourceFileName(), this.NoOfBytesTransferred(),
                             objOptions.operation.Value());
         } catch (RuntimeException e) {
-            logger.error(e.toString());
+            LOGGER.error(e.toString());
             strT = "???";
         }
         return strT;

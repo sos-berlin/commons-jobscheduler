@@ -66,6 +66,7 @@ public class SOSSchedulerCommand {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
+                //
             }
             if (sec++ == timeout) {
                 throw new RuntimeException("timeout reached");
@@ -85,6 +86,7 @@ public class SOSSchedulerCommand {
                     avail = in.available();
                     trial++;
                 } catch (InterruptedException e) {
+                    //
                 }
             }
             buffer = new byte[avail];

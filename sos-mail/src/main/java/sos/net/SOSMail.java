@@ -480,6 +480,7 @@ public class SOSMail {
                             DecimalFormat formatter = new DecimalFormat("#,###.00");
                             content = content.replaceAll("&\\$\\(" + key.toString() + "\\)", formatter.format(doubleValue).toString());
                         } catch (Exception ex) {
+                            //
                         } finally {
                             Locale.setDefault(defaultLocale);
                         }
@@ -902,7 +903,6 @@ public class SOSMail {
             return true;
         } catch (Exception e) {
             throw new Exception(SOSClassUtil.getMethodName() + ": error occurred on send: " + e.getMessage(), e);
-        } finally {
         }
     }
 

@@ -105,7 +105,8 @@ public class SOSFTPOptionsTest {
         try {
             SOSFTPOptions objO = new SOSFTPOptions(objH);
             LOGGER.info(objO.DirtyString());
-            String strReplaceIn = "--- %{source_protocol} --- %{dirname} --- %{TargetFileName} --- %{source_dir} ---  %{user} --- %{password} --- ${date} --- %{date} --- ${time} --- %{time} ---";
+            String strReplaceIn =
+                    "--- %{source_protocol} --- %{dirname} --- %{TargetFileName} --- %{source_dir} ---  %{user} --- %{password} --- ${date} --- %{date} --- ${time} --- %{time} ---";
             strReplaceIn = objO.replaceVars(strReplaceIn);
             LOGGER.info(strReplaceIn);
         } catch (Exception e) {

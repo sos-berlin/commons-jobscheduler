@@ -1,10 +1,14 @@
 package com.sos.JSHelper.DataElements;
 
+import org.apache.log4j.Logger;
+
 public class JSDataElementNumeric extends JSDataElement {
 
+    private static final Logger LOGGER = Logger.getLogger(JSDataElementNumeric.class);
     private int intDecimal = 0;
 
     public JSDataElementNumeric() {
+        //
     }
 
     public JSDataElementNumeric(final String pstrValue) {
@@ -21,7 +25,7 @@ public class JSDataElementNumeric extends JSDataElement {
     }
 
     public void MinSize(final int pintMinSize) {
-
+        //
     }
 
     public int MaxSize() {
@@ -29,7 +33,7 @@ public class JSDataElementNumeric extends JSDataElement {
     }
 
     public void MaxSize(final int pintMaxSize) {
-
+        //
     }
 
     @Override
@@ -48,7 +52,7 @@ public class JSDataElementNumeric extends JSDataElement {
     }
 
     public void Decimal(final int pintDecimal) {
-        System.out.println("JSDataElementNumeric.Decimal()" + pintDecimal);
+        LOGGER.info("JSDataElementNumeric.Decimal()" + pintDecimal);
         intDecimal = pintDecimal;
     }
 

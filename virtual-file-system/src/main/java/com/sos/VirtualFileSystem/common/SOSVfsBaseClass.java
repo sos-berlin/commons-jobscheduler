@@ -15,6 +15,7 @@ public class SOSVfsBaseClass extends SOSVfsMessageCodes {
     protected SOSFTPOptions objOptions = null;
     protected SOSFileEntries sosFileEntries = null;
     private enuSourceOrTarget intSourceOrTarget = enuSourceOrTarget.isUndefined;
+
     public static enum enuSourceOrTarget {
         isUndefined, isSource, isTarget
     }

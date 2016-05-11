@@ -3,18 +3,14 @@ package com.sos.VirtualFileSystem.FTP;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -33,7 +29,6 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsFtpTest {
 
-    // private final String conClassName = "SOSVfsFtpTest";
     private static final Logger LOGGER = Logger.getLogger(SOSVfsFtpTest.class);
     private SOSFTPOptions objOptions = null;
     private ISOSVFSHandler objVFS = null;
@@ -41,10 +36,6 @@ public class SOSVfsFtpTest {
     private final String strTestFileName = "text.txt";
     private final String strTestPathName = "R:/nobackup/junittests/testdata/JADE";
     private String constrSettingsTestFile = strTestPathName + "/SOSDEx-test.ini";
-
-    public SOSVfsFtpTest() {
-        //
-    }
 
     @Before
     public void setUp() throws Exception {

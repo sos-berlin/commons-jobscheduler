@@ -27,6 +27,7 @@ public class SOSOptionTime extends SOSOptionString {
         try {
             strT = getCurrentTimeAsString(dateTimeFormat);
         } catch (Exception e) {
+            //
         }
         return strT;
     }
@@ -112,11 +113,8 @@ public class SOSOptionTime extends SOSOptionString {
 
     public String adjust2TimeFormat() {
         if (isNotEmpty(strValue)) {
-            if (strValue.indexOf(":") > -1) {
-            } else {
-                if (isNotEmpty(strDefaultUoM)) {
-                    strValue = strValue + strDefaultUoM;
-                }
+            if (!(strValue.indexOf(":") > -1) && isNotEmpty(strDefaultUoM)) {
+                strValue = strValue + strDefaultUoM;
             }
             int intL = strValue.length();
             if (!"0".equals(strValue)) {

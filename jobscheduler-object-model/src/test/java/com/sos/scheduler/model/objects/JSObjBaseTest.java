@@ -1,18 +1,10 @@
 package com.sos.scheduler.model.objects;
 
 import static org.junit.Assert.assertEquals;
-import org.apache.log4j.Logger;
-import org.junit.BeforeClass;
+
 import org.junit.Test;
 
 public class JSObjBaseTest {
-
-    @SuppressWarnings("unused")
-    private final static Logger logger = Logger.getLogger(JSObjBaseTest.class);
-
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-    }
 
     @Test
     public final void testConvertYesNo() {

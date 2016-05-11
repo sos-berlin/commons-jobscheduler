@@ -47,9 +47,8 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
         security_protocol = p_security_protocol;
     }
 
-    @JSOptionDefinition(name = "attachment_charset", description = "title charset of attac", key = "attachment_charset", type = "SOSOptionString",
-            mandatory = false)
-    public SOSOptionString attachment_charset = new SOSOptionString(this, CLASSNAME + ".attachment_charset", "title charset of attac", "iso-8859-1", 
+    @JSOptionDefinition(name = "attachment_charset", description = "title charset of attac", key = "attachment_charset", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString attachment_charset = new SOSOptionString(this, CLASSNAME + ".attachment_charset", "title charset of attac", "iso-8859-1",
             "iso-8859-1", false);
 
     @Override
@@ -62,9 +61,8 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
         attachment_charset = p_attachment_charset;
     }
 
-    @JSOptionDefinition(name = "attachment_content_type", description = "title content_type of", key = "attachment_content_type", type = "SOSOptionString",
-            mandatory = false)
-    public SOSOptionString attachment_content_type = new SOSOptionString(this, CLASSNAME + ".attachment_content_type", "title content_type of", 
+    @JSOptionDefinition(name = "attachment_content_type", description = "title content_type of", key = "attachment_content_type", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString attachment_content_type = new SOSOptionString(this, CLASSNAME + ".attachment_content_type", "title content_type of",
             "application/octet-stream", "application/octet-stream", false);
 
     @Override
@@ -77,9 +75,9 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
         attachment_content_type = p_attachment_content_type;
     }
 
-    @JSOptionDefinition(name = "attachment_encoding", description = "title encoding of atta", key = "attachment_encoding", type = "SOSOptionString",
-            mandatory = false)
-    public SOSOptionString attachment_encoding = new SOSOptionString(this, CLASSNAME + ".attachment_encoding", "title encoding of atta", "Base64", "Base64", false);
+    @JSOptionDefinition(name = "attachment_encoding", description = "title encoding of atta", key = "attachment_encoding", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString attachment_encoding = new SOSOptionString(this, CLASSNAME + ".attachment_encoding", "title encoding of atta", "Base64",
+            "Base64", false);
 
     @Override
     public SOSOptionString getattachment_encoding() {
@@ -147,7 +145,8 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
     }
 
     @JSOptionDefinition(name = "content_type", description = "title content_type of", key = "content_type", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString content_type = new SOSOptionString(this, CLASSNAME + ".content_type", "title content_type of", "text/plain", "text/plain", false);
+    public SOSOptionString content_type = new SOSOptionString(this, CLASSNAME + ".content_type", "title content_type of", "text/plain", "text/plain",
+            false);
 
     @Override
     public SOSOptionString getcontent_type() {
@@ -346,5 +345,5 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
         super.CommandLineArgs(pstrArgs);
         this.setAllOptions(super.objSettings);
     }
-    
+
 }

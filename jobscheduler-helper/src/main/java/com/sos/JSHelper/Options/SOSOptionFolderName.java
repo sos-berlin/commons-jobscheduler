@@ -23,10 +23,9 @@ public class SOSOptionFolderName extends SOSOptionFileName {
         intOptionType = isOptionTypeFolder;
     }
 
-    @JSOptionDefinition(name = "CreateFolder", value = "true", description = "Folder anlegen, wenn noch nicht vorhanden", key = "CreateFolder",
-            type = "JSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean CreateFolder = new SOSOptionBoolean(objParentClass, ".CreateFolder", "Folder anlegen, wenn noch nicht vorhanden", "true", "true",
-            false);
+    @JSOptionDefinition(name = "CreateFolder", value = "true", description = "Folder anlegen, wenn noch nicht vorhanden", key = "CreateFolder", type = "JSOptionBoolean", mandatory = false)
+    public SOSOptionBoolean CreateFolder = new SOSOptionBoolean(objParentClass, ".CreateFolder", "Folder anlegen, wenn noch nicht vorhanden", "true",
+            "true", false);
 
     @Override
     public String Value() {
@@ -34,11 +33,8 @@ public class SOSOptionFolderName extends SOSOptionFileName {
             strValue = "";
         }
         String strLValue = super.Value();
-        if (IsNotEmpty()) {
-            if (strLValue.endsWith("/") || strLValue.endsWith("\\") || isDotFolder()) {
-            } else {
-                strLValue = strLValue + "/";
-            }
+        if (IsNotEmpty() && !(strLValue.endsWith("/") || strLValue.endsWith("\\") || isDotFolder())) {
+            strLValue = strLValue + "/";
         }
         return strLValue;
     }
@@ -50,8 +46,7 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 
     public File[] listFiles() {
         File[] objFL = this.JSFile().listFiles();
-        if (objFL != null) {
-        } else {
+        if (objFL == null) {
             throw new JobSchedulerException(String.format("No Files found for pathname '%1$s'", strValue));
         }
         return objFL;
@@ -78,6 +73,7 @@ public class SOSOptionFolderName extends SOSOptionFileName {
                 i++;
             }
         } catch (Exception e) {
+            //
         }
         return strRet;
     }
@@ -103,6 +99,7 @@ public class SOSOptionFolderName extends SOSOptionFileName {
                 i--;
             }
         } catch (Exception e) {
+            //
         }
         return strRet;
     }
@@ -121,8 +118,7 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 
     @Override
     public String[] getAllProposals(String text) {
-        String[] proposals = SOSOptionFolderName.defaultProposals.keySet().toArray(new String[0]);
-        return proposals;
+        return SOSOptionFolderName.defaultProposals.keySet().toArray(new String[0]);
     }
 
 }

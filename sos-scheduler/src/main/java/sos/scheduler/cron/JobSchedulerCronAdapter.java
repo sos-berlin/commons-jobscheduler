@@ -355,6 +355,7 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
             try {
                 logger.warn("Failed to remove job \"" + jobName + "\": " + e);
             } catch (Exception ex) {
+                //
             }
         }
     }

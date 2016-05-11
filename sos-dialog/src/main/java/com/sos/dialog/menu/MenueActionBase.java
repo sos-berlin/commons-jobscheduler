@@ -65,6 +65,7 @@ public class MenueActionBase extends Action implements IDialogActionHandler {
 
     @Override
     public void setDialogActionHandler(IDialogActionHandler pobjDialogActionHandler) {
+        //
     }
 
     @Override
@@ -72,4 +73,5 @@ public class MenueActionBase extends Action implements IDialogActionHandler {
         objE.doIt = true;
         return false;
     }
+
 }

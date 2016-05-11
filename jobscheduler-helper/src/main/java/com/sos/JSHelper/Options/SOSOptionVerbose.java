@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.sos.JSHelper.Options;
 
 import java.util.Enumeration;
@@ -13,26 +10,15 @@ import org.apache.log4j.PatternLayout;
 /** @author KB */
 public class SOSOptionVerbose extends SOSOptionInteger {
 
-    /**
-	 * 
-	 */
     private static final long serialVersionUID = -5484261268617623809L;
 
-    /** @param pPobjParent
-     * @param pPstrKey
-     * @param pPstrDescription
-     * @param pPstrValue
-     * @param pPstrDefaultValue
-     * @param pPflgIsMandatory */
     public SOSOptionVerbose(JSOptionsClass pPobjParent, String pPstrKey, String pPstrDescription, String pPstrValue, String pPstrDefaultValue,
             boolean pPflgIsMandatory) {
         super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
     }
 
     public void initializeLog4jLevels() {
-
         PatternLayout layout = new PatternLayout("[%-5p] %d{ABSOLUTE} (%F:%L) - %m%n");
-
         int intVerbose = this.value();
         switch (intVerbose) {
         case -1:
@@ -54,7 +40,6 @@ public class SOSOptionVerbose extends SOSOptionInteger {
             logger.debug("set loglevel to DEBUG due to option verbose = " + intVerbose);
             break;
         }
-
         for (Enumeration appenders = Logger.getRootLogger().getAllAppenders(); appenders.hasMoreElements();) {
             Appender appender = (Appender) appenders.nextElement();
             appender.setLayout(layout);
@@ -69,6 +54,6 @@ public class SOSOptionVerbose extends SOSOptionInteger {
     @Override
     public void Value(final String pstrValue) {
         super.Value(pstrValue);
-        // initializeLog4jLevels();
     }
+
 }

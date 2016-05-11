@@ -40,8 +40,7 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
 
     @Override
     public boolean FileExists() throws Exception {
-        boolean flgResult = super.exists();
-        return flgResult;
+        return super.exists();
     }
 
     @Override
@@ -203,6 +202,7 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
                     out.close();
                 }
             } catch (Exception e) {
+                //
             }
         }
     }

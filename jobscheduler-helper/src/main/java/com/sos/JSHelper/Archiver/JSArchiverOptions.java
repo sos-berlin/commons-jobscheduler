@@ -26,9 +26,8 @@ public class JSArchiverOptions extends JSOptionsClass {
     private boolean flgUseArchive = false;
     private final String conUseArchiveSettingsKey = this.CLASSNAME + ".UseArchive";
 
-    @JSOptionDefinition(name = "ArchiveFolderName", value = "./archive/", description = "Name des Folder mit den archivierten Dateien",
-            key = "ArchiveFolderName", type = "JSOptionFolderName", mandatory = true)
-    public SOSOptionFolderName ArchiveFolderName = new SOSOptionFolderName(this, this.CLASSNAME + ".ArchiveFolderName", 
+    @JSOptionDefinition(name = "ArchiveFolderName", value = "./archive/", description = "Name des Folder mit den archivierten Dateien", key = "ArchiveFolderName", type = "JSOptionFolderName", mandatory = true)
+    public SOSOptionFolderName ArchiveFolderName = new SOSOptionFolderName(this, this.CLASSNAME + ".ArchiveFolderName",
             "Name des Folder mit den archivierten Dateien", "./archive/", "./archive/", true);
 
     public JSArchiverOptions() {

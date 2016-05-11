@@ -34,14 +34,12 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
         try {
             if (objInputStream == null) {
                 fileName = AdjustRelativePathName(fileName);
-
                 int transferMode = ChannelSftp.OVERWRITE;
                 if (flgModeAppend) {
                     transferMode = ChannelSftp.APPEND;
                 } else if (flgModeRestart) {
                     transferMode = ChannelSftp.RESUME;
                 }
-
                 SOSVfsSFtpJCraft handler = (SOSVfsSFtpJCraft) objVFSHandler;
                 objInputStream = handler.getClient().get(fileName, transferMode);
                 if (objInputStream == null) {
@@ -71,10 +69,8 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
     @Override
     public void write(final byte[] buffer, final int offset, final int length) {
         try {
-
             OutputStream os = this.getFileOutputStream();
             if (os == null) {
-
                 throw new Exception(SOSVfs_E_147.get());
             }
             os.write(buffer, offset, length);
@@ -103,7 +99,6 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
                 } else if (flgModeRestart) {
                     transferMode = ChannelSftp.RESUME;
                 }
-
                 SOSVfsSFtpJCraft handler = (SOSVfsSFtpJCraft) objVFSHandler;
                 objOutputStream = handler.getClient().put(fileName, transferMode);
                 if (objOutputStream == null) {
@@ -118,21 +113,7 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
 
     @Override
     public long getModificationDateTime() {
-
-        String dateTime = null;
         long mt = 0;
-
-        // try {
-        // SftpATTRS objAttr = objVFSHandler. (fileName);
-        // if (objAttr != null) {
-        // mt = objAttr.getMTime();
-        // DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        // dateTime = df.format(new Date(mt));
-        // }
-        // }
-        // catch (SftpException e) {
-        // // e.printStackTrace();
-        // }
         return mt;
     }
 

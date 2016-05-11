@@ -72,8 +72,7 @@ public class JSIniFile extends JSTextFile {
 
     public SOSProfileEntry addEntry(final String strKey, final String strValue) {
         SOSProfileEntry objE = null;
-        if (this.objCurrentSection == null) {
-        } else {
+        if (this.objCurrentSection != null) {
             objE = this.objCurrentSection.addEntry(strKey, strValue);
         }
         return objE;

@@ -79,8 +79,9 @@ public class SOSOptionHostNameTest {
     @Ignore("Test set to Ignore for later examination")
     public final void testPortOpen() {
         objHostName.Value(SOSOptionHostName.conLocalHostName);
-        SOSOptionPortNumber objPort = new SOSOptionPortNumber(null, "port", "", String.valueOf(SOSOptionPortNumber.conPort4http),
-                String.valueOf(SOSOptionPortNumber.conPort4http), false);
+        SOSOptionPortNumber objPort =
+                new SOSOptionPortNumber(null, "port", "", String.valueOf(SOSOptionPortNumber.conPort4http),
+                        String.valueOf(SOSOptionPortNumber.conPort4http), false);
         objHostName.setPort(objPort);
         assertTrue("Port 80 is available", objHostName.checkPortAvailable());
         objPort.value(4711);

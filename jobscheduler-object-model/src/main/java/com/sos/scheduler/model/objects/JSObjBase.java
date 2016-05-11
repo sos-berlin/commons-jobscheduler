@@ -193,25 +193,23 @@ public class JSObjBase implements Comparable<JSObjBase> {
         }
         return compareRet;
     }
-    
-    /**
-     * This method has to be implemented in this class, because of the Override of the compareTo Method above
-     * Sonar Rule: "equals(Object obj)" should be overridden along with the "compareTo(T obj)" method
-     */
+
+    /** This method has to be implemented in this class, because of the Override
+     * of the compareTo Method above Sonar Rule: "equals(Object obj)" should be
+     * overridden along with the "compareTo(T obj)" method */
     @Override
     public boolean equals(Object obj) {
         return super.equals(obj);
     }
 
-    /**
-     * This method has to be implemented in this class, because of the Override of the equals Method above
-     * Sonar Rule: "equals(Object obj)" and "hashCode()" should be overridden in pairs
-     */
+    /** This method has to be implemented in this class, because of the Override
+     * of the equals Method above Sonar Rule: "equals(Object obj)" and
+     * "hashCode()" should be overridden in pairs */
     @Override
     public int hashCode() {
         return super.hashCode();
     }
-    
+
     public void setObjectFieldsFrom(final JSObjBase origObj) {
         Field[] fields;
         Class<?> origClass = origObj.getClass();

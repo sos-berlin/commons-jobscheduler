@@ -152,7 +152,7 @@ public class SOSSFTP implements SOSFileTransfer {
             sftpClient.rm(pathname);
             reply = "rm OK";
         } catch (SFTPException e) {
-
+            //
         } catch (Exception e) {
             reply = e.toString();
             return false;
@@ -463,6 +463,7 @@ public class SOSSFTP implements SOSFileTransfer {
             try {
                 sftpClient.closeFile(sftpFileHandle);
             } catch (Exception e) {
+                //
             }
         }
     }
@@ -586,42 +587,37 @@ public class SOSSFTP implements SOSFileTransfer {
     }
 
     public static void showUsage() {
-        System.out.println("usage: SOSSFTP file sftphost sftpport sftpuser sftppassword [proxyhost] [proxyport] [proxyuser] [proxypassword]");
+        LOGGER.info("usage: SOSSFTP file sftphost sftpport sftpuser sftppassword [proxyhost] [proxyport] [proxyuser] [proxypassword]");
     }
 
     public static void dumpArray(final Object[] array) {
         for (Object element : array) {
-            System.out.println("  " + element.toString());
+            LOGGER.info("  " + element.toString());
         }
     }
 
     @Override
     public long getFile(final String remoteFile, final String localFile) throws Exception {
-        // TO DO Auto-generated method stub
         return 0;
     }
 
     @Override
     public Vector<String> nList() throws Exception {
-        // TO DO Auto-generated method stub
         return null;
     }
 
     @Override
     public Vector<String> nList(final String pathname, final boolean flgRecurseSubFolder) throws Exception {
-        // TO DO Auto-generated method stub
         return null;
     }
 
     @Override
     public boolean put(final String localFile, final String remoteFile) throws Exception {
-        // TO DO Auto-generated method stub
         return false;
     }
 
     @Override
     public long putFile(final String localFile, final OutputStream out) throws Exception {
-        // TO DO Auto-generated method stub
         return 0;
     }
 

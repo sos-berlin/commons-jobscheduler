@@ -4,10 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.io.Files;
@@ -32,13 +29,6 @@ public class SOSFilteredFileReaderTest implements ISOSFilteredFileReader {
     HashMap<String, Integer> mapXref = new HashMap<String, Integer>();
     HashMap<String, HashMap<String, String>> mapEvents = new HashMap();
     HashMap<String, String> mapEvent = new HashMap();
-
-    @Before
-    public void setUp() throws Exception {
-        BasicConfigurator.configure();
-        Logger.getRootLogger().setLevel(Level.INFO);
-        LOGGER.setLevel(Level.DEBUG);
-    }
 
     @Test
     public void testRun() {
@@ -197,15 +187,17 @@ public class SOSFilteredFileReaderTest implements ISOSFilteredFileReader {
 
     @Override
     public void atStartOfData() {
+        //
     }
 
     @Override
     public void atEndOfData() {
+        //
     }
 
     @Override
     public void atStartOfNewFile(JSFile file) {
-        // TODO Auto-generated method stub
+        //
     }
 
 }

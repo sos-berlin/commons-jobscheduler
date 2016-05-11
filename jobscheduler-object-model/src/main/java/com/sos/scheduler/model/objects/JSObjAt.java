@@ -22,19 +22,10 @@ public class JSObjAt extends RunTime.At implements ISOSJsObjStartTimes {
         return fmtDate.parseDateTime(getAt());
     }
 
-    // @Override
-    // public List<DateTime> getDtNextSingleStarts() {
-    // List<DateTime> result = new ArrayList<DateTime>();
-    // result.add(getDtAt());
-    // return result;
-    // }
-
     @Override
     public RunTimeElements getRunTimeElements(Interval timeRange) {
         RunTimeElements result = new RunTimeElements(timeRange);
         if (timeRange.contains(getDtAt())) {
-            // The at element does not have a subsequent period element,
-            // therefore we use IGNORE_HOLIDAY anyway.
             RunTimeElement e = new RunTimeElement(getDtAt(), WhenHoliday.IGNORE_HOLIDAY);
             result.add(e);
         }

@@ -81,6 +81,7 @@ public class ProducerTool extends Thread {
             try {
                 Thread.sleep(1000);
             } catch (Exception e) {
+                //
             }
         }
     }
@@ -134,6 +135,7 @@ public class ProducerTool extends Thread {
             try {
                 connection.close();
             } catch (Exception ignore) {
+                //
             }
         }
     }

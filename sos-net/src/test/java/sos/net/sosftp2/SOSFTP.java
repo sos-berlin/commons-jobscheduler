@@ -24,6 +24,7 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
     private static final Logger LOGGER = Logger.getLogger(SOSFTP.class);
 
     public SOSFTP() {
+        //
     }
 
     public SOSFTP(String host) throws SocketException, IOException, UnknownHostException {
@@ -148,6 +149,7 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
             x = cd(strFolderName);
             LogReply();
         } catch (IOException e) {
+            //
         }
         return x;
     }
@@ -160,12 +162,12 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
 
     private boolean isNegativeCommandCompletion() {
         int x = getReplyCode();
-        return (x > 300);
+        return x > 300;
     }
 
     private boolean isPositiveCommandCompletion() {
         int x = getReplyCode();
-        return (x <= 300);
+        return x <= 300;
     }
 
     public boolean isNotHiddenFile(final String strFileName) {
@@ -259,6 +261,7 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
                     out.close();
                 }
             } catch (Exception e) {
+                //
             }
         }
     }
@@ -317,18 +320,21 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
                     in.close();
                 }
             } catch (Exception e) {
+                //
             }
             try {
                 if (out != null) {
                     out.flush();
                 }
             } catch (Exception e) {
+                //
             }
             try {
                 if (out != null) {
                     out.close();
                 }
             } catch (Exception e) {
+                //
             }
         }
     }
@@ -349,6 +355,7 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
                     in.close();
                 }
             } catch (Exception e) {
+                //
             }
         }
     }
@@ -399,16 +406,19 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
                     in.close();
                 }
             } catch (Exception e) {
+                //
             }
             try {
                 out.flush();
             } catch (Exception e) {
+                //
             }
             try {
                 if (out != null) {
                     out.close();
                 }
             } catch (Exception e) {
+                //
             }
         }
     }

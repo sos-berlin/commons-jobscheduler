@@ -120,6 +120,7 @@ public class JobSchedulerHelper {
                 try {
                     rs.close();
                 } catch (Exception e) {
+                    //
                 }
             }
         }

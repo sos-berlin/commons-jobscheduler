@@ -377,6 +377,7 @@ public class SOSMsg {
     }
 
     protected void checkVerbosityLevel() {
+        //
     }
 
 }

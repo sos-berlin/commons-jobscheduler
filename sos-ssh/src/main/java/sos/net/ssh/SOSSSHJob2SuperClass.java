@@ -71,6 +71,7 @@ public class SOSSSHJob2SuperClass extends JSToolBox {
                     this.getSshConnection().close();
                     this.setSshConnection(null);
                 } catch (Exception ex) {
+                    //
                 }
             }
             throw new Exception(e.getMessage());
@@ -94,6 +95,7 @@ public class SOSSSHJob2SuperClass extends JSToolBox {
         try {
             return sftpClient.stat(filename).isDirectory();
         } catch (Exception e) {
+            //
         }
         return false;
     }

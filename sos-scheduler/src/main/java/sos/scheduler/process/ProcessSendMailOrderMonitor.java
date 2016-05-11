@@ -123,9 +123,10 @@ public class ProcessSendMailOrderMonitor extends ProcessOrderMonitor {
                     if (!SOSString.isEmpty(order.params().value("attachment"))) {
                         attachments = order.params().value("attachment").split(";");
                     }
-                    if (!SOSString.isEmpty(order.params().value("cleanup_attachment")) && ("1".equals(order.params().value("cleanup_attachment"))
-                            || "true".equalsIgnoreCase(order.params().value("cleanup_attachment"))
-                            || "yes".equalsIgnoreCase(order.params().value("cleanup_attachment")))) {
+                    if (!SOSString.isEmpty(order.params().value("cleanup_attachment"))
+                            && ("1".equals(order.params().value("cleanup_attachment"))
+                                    || "true".equalsIgnoreCase(order.params().value("cleanup_attachment")) || "yes".equalsIgnoreCase(order.params().value(
+                                    "cleanup_attachment")))) {
                         cleanupAttachment = true;
                     }
                 } catch (Exception e) {

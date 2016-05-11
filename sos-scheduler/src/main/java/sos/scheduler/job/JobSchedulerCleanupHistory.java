@@ -326,6 +326,7 @@ public class JobSchedulerCleanupHistory extends Job_impl {
             try {
                 cleanupHistoryDb.close();
             } catch (Exception e) {
+                //
             }
             cleanupHistoryDb.destruct();
             if (linesSuppressed <= 0) {
@@ -343,6 +344,7 @@ public class JobSchedulerCleanupHistory extends Job_impl {
             try {
                 cleanupHistoryDb.close();
             } catch (Exception e) {
+                //
             }
             cleanupHistoryDb.destruct();
             cleanupHistoryItemsProcessed++;
@@ -402,6 +404,7 @@ public class JobSchedulerCleanupHistory extends Job_impl {
             try {
                 cleanupHistoryDb.close();
             } catch (Exception e) {
+                //
             }
             cleanupHistoryDb.destruct();
             if (linesSuppressed <= 0) {
@@ -419,6 +422,7 @@ public class JobSchedulerCleanupHistory extends Job_impl {
             try {
                 cleanupHistoryDb.close();
             } catch (Exception e) {
+                //
             }
             cleanupHistoryDb.destruct();
             cleanupHistoryItemsProcessed++;

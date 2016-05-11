@@ -19,17 +19,10 @@ public class SOSLoginDialog extends Dialog {
     private boolean cancel;
     private String message = "";
 
-    /** Create the dialog.
-     * 
-     * @param parent
-     * @param style */
     public SOSLoginDialog(Shell parent, int style) {
         super(parent, style);
     }
 
-    /** Open the dialog.
-     * 
-     * @return the result */
     public Object open() {
         createContents();
         shell.open();
@@ -43,16 +36,12 @@ public class SOSLoginDialog extends Dialog {
         return result;
     }
 
-    /** Create contents of the dialog. */
     private void createContents() {
         cancel = false;
-        // shell = new Shell(getParent(), SWT.ON_TOP | SWT.DIALOG_TRIM |
-        // SWT.APPLICATION_MODAL);
         shell = new Shell(getParent(), SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.OK | SWT.APPLICATION_MODAL);
         shell.setSize(300, 180);
         shell.setText(getText());
         shell.setLayout(new FillLayout(SWT.HORIZONTAL));
-
         loginForm = new SOSLoginForm(shell, SWT.NONE);
         loginForm.setMsg(message);
         loginForm.getBtnOk().addSelectionListener(new SelectionAdapter() {
@@ -62,8 +51,6 @@ public class SOSLoginDialog extends Dialog {
                 user = loginForm.getUser().getText();
                 password = loginForm.getPassword().getText();
                 shell.close();
-                // rememberMe = loginForm.getBtnRememberMe().getSelection();
-
             }
         });
 

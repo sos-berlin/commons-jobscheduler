@@ -60,8 +60,7 @@ public class JobSchedulerImportJob extends JobSchedulerJob {
                     regEx = this.getParameters().value("reg_ex");
                     getLogger().debug1(".. parameter [reg_ex]: " + regEx);
                 }
-
-                if (this.getParameters().value("filename") != null && this.getParameters().value("filename").length() > 0) {
+                if (this.getParameters().value("filename") != null && !this.getParameters().value("filename").isEmpty()) {
                     filename = this.getParameters().value("filename");
                     getLogger().debug1(".. parameter [filename]: " + filename);
                 }
@@ -105,6 +104,7 @@ public class JobSchedulerImportJob extends JobSchedulerJob {
                 try {
                     this.getLogger().error(e.getMessage());
                 } catch (Exception ex) {
+                    //
                 }
             }
             return false;
@@ -178,6 +178,7 @@ public class JobSchedulerImportJob extends JobSchedulerJob {
                     sosUpdateStateConnection.commit();
                 }
             } catch (Exception xe) {
+                //
             }
             String stateText = "could not import Database to XML-File " + triggerfile + " cause: " + e.getMessage();
             spooler_job.set_state_text(stateText);
@@ -185,6 +186,7 @@ public class JobSchedulerImportJob extends JobSchedulerJob {
                 getLogger().warn(stateText);
                 getLogger().error(stateText);
             } catch (Exception ea) {
+                //
             }
             return spooler_job.order_queue() != null ? rc : listOfFiles.hasNext();
         }
@@ -204,6 +206,7 @@ public class JobSchedulerImportJob extends JobSchedulerJob {
             try {
                 getLogger().warn("spooler_exit(): disconnect failed: " + e.toString());
             } catch (Exception es) {
+                //
             }
         }
     }

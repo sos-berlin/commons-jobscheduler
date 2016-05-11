@@ -187,6 +187,7 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         try {
             attributes = this.getClient().stat(filename);
         } catch (Exception e) {
+            //
         }
         return attributes;
     }
@@ -203,6 +204,7 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
                 }
             }
         } catch (Exception e) {
+            //
         }
         return flgR;
     }
@@ -369,6 +371,7 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
                 try {
                     Thread.sleep(1000);
                 } catch (Exception ee) {
+                    //
                 }
             }
             logger.debug(outContent);
@@ -396,24 +399,28 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
                 try {
                     out.close();
                 } catch (Exception e) {
+                    //
                 }
             }
             if (errReader != null) {
                 try {
                     errReader.close();
                 } catch (Exception e) {
+                    //
                 }
             }
             if (err != null) {
                 try {
                     err.close();
                 } catch (Exception e) {
+                    //
                 }
             }
             if (channelExec != null) {
                 try {
                     channelExec.disconnect();
                 } catch (Exception e) {
+                    //
                 }
             }
         }
@@ -634,6 +641,7 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
     public void close() {
         try {
         } catch (Exception e) {
+            //
         }
     }
 

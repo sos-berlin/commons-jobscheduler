@@ -22,5 +22,7 @@ public class MenueActionNewBase extends MenueActionBase {
 
     @Override
     public void run() {
+        //
     }
+
 }

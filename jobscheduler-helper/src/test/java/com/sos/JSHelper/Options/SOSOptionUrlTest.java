@@ -15,10 +15,8 @@ public class SOSOptionUrlTest {
     public void testValueString() {
         objU.Value("ftp://kb:kb@homer.sos/home/test/test.txt");
         assertEquals("folder name", "/home/test/test.txt", objU.getFolderName());
-
         objU.Value("ftp://kb:kb@homer.sos/./test/test.txt");
         assertEquals("folder name", "/./test/test.txt", objU.getFolderName());
-
     }
 
     @Test
@@ -40,8 +38,4 @@ public class SOSOptionUrlTest {
         objU = new SOSOptionUrl(null, "url", "descr", "", "", false);
     }
 
-    @Test
-    public void testGetOptions() {
-        // fail("Not yet implemented");
-    }
 }

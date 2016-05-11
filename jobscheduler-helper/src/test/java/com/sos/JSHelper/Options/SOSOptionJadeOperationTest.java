@@ -7,6 +7,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -17,33 +18,15 @@ import com.sos.JSHelper.Options.SOSOptionJadeOperation.enuJadeOperations;
 
 /** @author KB */
 public class SOSOptionJadeOperationTest {
-
+    
+    private static final Logger LOGGER = Logger.getLogger(SOSOptionJadeOperationTest.class); 
     private SOSOptionJadeOperation objOperation = null;
 
-    /** @throws java.lang.Exception */
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-    }
-
-    /** @throws java.lang.Exception */
-    @AfterClass
-    public static void tearDownAfterClass() throws Exception {
-    }
-
-    /** @throws java.lang.Exception */
-    @Before
     public void setUp() throws Exception {
-        objOperation = new SOSOptionJadeOperation(null, "operation", "operation", enuJadeOperations.undefined.Text(), enuJadeOperations.copy.Text(), true);
+        objOperation =
+                new SOSOptionJadeOperation(null, "operation", "operation", enuJadeOperations.undefined.Text(), enuJadeOperations.copy.Text(), true);
     }
 
-    /** @throws java.lang.Exception */
-    @After
-    public void tearDown() throws Exception {
-    }
-
-    /** Test method for
-     * {@link com.sos.JSHelper.Options.SOSOptionJadeOperation#Value(java.lang.String)}
-     * . */
     @Test
     public void testValueString() {
         objOperation.Value("send");
@@ -56,26 +39,18 @@ public class SOSOptionJadeOperationTest {
         assertEquals("operation send", "xxxxx", objOperation.Value());
     }
 
-    /** Test method for
-     * {@link com.sos.JSHelper.Options.SOSOptionJadeOperation#Value(com.sos.JSHelper.Options.SOSOptionJadeOperation.enuJadeOperations)}
-     * . */
     @Test
     public void testValueEnuJadeOperations() {
         objOperation.Value(enuJadeOperations.copy);
         assertEquals("operation send", enuJadeOperations.copy, objOperation.value());
     }
 
-    /** Test method for
-     * {@link com.sos.JSHelper.Options.SOSOptionJadeOperation#value()}. */
     @Test
     public void testValue() {
         objOperation.Value(enuJadeOperations.copy);
         assertEquals("test Value", enuJadeOperations.copy.Text(), objOperation.Value());
     }
 
-    /** Test method for
-     * {@link com.sos.JSHelper.Options.SOSOptionJadeOperation#isOperationSend()}
-     * . */
     @Test
     public void testIsOperationSend() {
         objOperation.Value("send");
@@ -84,9 +59,6 @@ public class SOSOptionJadeOperationTest {
         assertFalse("operation send", objOperation.isOperationSend());
     }
 
-    /** Test method for
-     * {@link com.sos.JSHelper.Options.SOSOptionJadeOperation#isOperationReceive()}
-     * . */
     @Test
     public void testIsOperationReceive() {
         objOperation.Value("receive");
@@ -112,11 +84,11 @@ public class SOSOptionJadeOperationTest {
     @Test
     public void testGetValues() {
         objOperation.Value(enuJadeOperations.copy);
-
         String[] strL = objOperation.getValueList();
         for (String string : strL) {
-            System.out.println("----" + string);
+            LOGGER.info("----" + string);
         }
-        System.out.println(strL.toString());
+        LOGGER.info(strL.toString());
     }
+
 }

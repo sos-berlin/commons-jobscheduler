@@ -76,7 +76,7 @@ public class JSJobUtilitiesClass<T> extends JSToolBox implements JSJobUtilities,
 
     @Override
     public void setStateText(final String pstrStateText) {
-        // 
+        //
     }
 
     @Override
@@ -100,7 +100,7 @@ public class JSJobUtilitiesClass<T> extends JSToolBox implements JSJobUtilities,
 
     @Override
     public void setNextNodeState(final String pstrNodeName) {
-        // 
+        //
     }
 
 }

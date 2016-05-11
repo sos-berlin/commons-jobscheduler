@@ -99,6 +99,7 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
                     this.getSshConnection().close();
                     this.setSshConnection(null);
                 } catch (Exception ex) {
+                    //
                 }
             }
             throw new Exception(e.getMessage());
@@ -121,8 +122,7 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
                 if (objCO.getProxy_user().IsEmpty()) {
                     objProxy = new HTTPProxyData(objCO.getProxy_host().Value(), objCO.getProxy_port().value());
                 } else {
-                    objProxy =
-                            new HTTPProxyData(objCO.getProxy_host().Value(), objCO.getProxy_port().value(), objCO.getProxy_user().Value(),
+                    objProxy = new HTTPProxyData(objCO.getProxy_host().Value(), objCO.getProxy_port().value(), objCO.getProxy_user().Value(),
                                     objCO.getProxy_password().Value());
                 }
                 this.getSshConnection().setProxyData(objProxy);
@@ -134,6 +134,7 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
             try {
                 this.setSshConnection(null);
             } catch (Exception ex) {
+                //
             }
             throw e;
         }
@@ -157,6 +158,7 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
         try {
             return psftpClient.stat(filename).isDirectory();
         } catch (Exception e) {
+            //
         }
         return false;
     }
@@ -453,6 +455,7 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
                         fis.close();
                         fis = null;
                     } catch (Exception ex) {
+                        //
                     }
                 }
             }
@@ -498,7 +501,7 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 
     @Override
     public void CloseSession() throws Exception {
-
+        //
     }
 
     @Override
@@ -701,6 +704,7 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
                 }
                 LOGGER.debug("run loop ended");
             } catch (Exception e) {
+                //
             }
         }
 
@@ -711,49 +715,41 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
 
     @Override
     public SOSFileList dir(final SOSFolderName pobjFolderName) {
-        // TO DO Auto-generated method stub
         return null;
     }
 
     @Override
     public SOSFileList dir(final String pathname, final int flag) {
-        // TO DO Auto-generated method stub
         return null;
     }
 
     @Override
     public ISOSVirtualFolder mkdir(final SOSFolderName pobjFolderName) throws IOException {
-        // TO DO Auto-generated method stub
         return null;
     }
 
     @Override
     public boolean rmdir(final SOSFolderName pobjFolderName) throws IOException {
-        // TO DO Auto-generated method stub
         return false;
     }
 
     @Override
     public void setJSJobUtilites(final JSJobUtilities pobjJSJobUtilities) {
-        // TO DO Auto-generated method stub
-
+        //
     }
 
     @Override
     public ISOSConnection Connect(final SOSConnection2OptionsAlternate pobjConnectionOptions) throws Exception {
-        // TO DO Auto-generated method stub
         return null;
     }
 
     @Override
     public void doPostLoginOperations() {
-        // TO DO Auto-generated method stub
-
+        //
     }
 
     @Override
     public ISOSConnection Connect(final ISOSDataProviderOptions pobjConnectionOptions) throws Exception {
-        // TO DO Auto-generated method stub
         return null;
     }
 

@@ -77,6 +77,7 @@ public abstract class CompositeBaseClass<T> extends Composite implements ISOSTab
                 doResize();
             }
         } catch (Exception e) {
+            //
         } finally {
             flgCompositeIsCreated = true;
             Globals.redraw(true);

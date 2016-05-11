@@ -276,6 +276,7 @@ public class SOSMailOrder extends SOSMail {
                 int iPrio = Integer.parseInt(prio.substring(0, 1));
                 statement += updateField("PRIORITY", iPrio);
             } catch (Exception e) {
+                //
             }
         }
         statement += updateField("SUBJECT", getSubject());
@@ -673,8 +674,10 @@ public class SOSMailOrder extends SOSMail {
     public static void main(String[] args) throws Exception {
         String mailto = "mo@sos-berlin.com";
         SOSLogger logger = new SOSStandardLogger(9);
-        SOSConnection conn = SOSConnection.createInstance("SOSMSSQLConnection", "com.microsoft.sqlserver.jdbc.SQLServerDriver",
-                "jdbc:sqlserver://8of9:2433;sendStringParametersAsUnicode=false;selectMethod=cursor;databaseName=ehp_bkk", "ehp_bkk", "ehp_bkk", logger);
+        SOSConnection conn =
+                SOSConnection.createInstance("SOSMSSQLConnection", "com.microsoft.sqlserver.jdbc.SQLServerDriver",
+                        "jdbc:sqlserver://8of9:2433;sendStringParametersAsUnicode=false;selectMethod=cursor;databaseName=ehp_bkk", "ehp_bkk",
+                        "ehp_bkk", logger);
         conn.connect();
         SOSSettings settings = new SOSConnectionSettings(conn, "SETTINGS", logger);
         SOSMailOrder order = new SOSMailOrder(settings, conn);

@@ -166,7 +166,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     public void logout() {
         try {
 
-            if (sshSession != null && sshSession.isConnected() == true) {
+            if (sshSession != null && sshSession.isConnected()) {
                 sshSession.disconnect();
                 logDEBUG(SOSVfs_D_138.params(host, getReplyString()));
             } else {
@@ -241,11 +241,12 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             SftpATTRS attributes = this.getClient().stat(filename);
             if (attributes != null) {
                 result = attributes.isDir();
-                if (result == false) {
+                if (!result) {
                     result = attributes.isLink();
                 }
             }
         } catch (Exception e) {
+            //
         }
         return result;
     }
@@ -255,6 +256,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         try {
             attributes = this.getClient().stat(filename);
         } catch (Exception e) {
+            //
         }
         return attributes;
     }
@@ -263,7 +265,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     public String[] listNames(String path) throws IOException {
         path = resolvePathname(path);
         try {
-            if (path.length() == 0) {
+            if (path.isEmpty()) {
                 path = ".";
             }
             if (!this.fileExists(path)) {
@@ -273,11 +275,8 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 reply = "ls OK";
                 return new String[] { path };
             }
-            @SuppressWarnings("unchecked")
             Vector<LsEntry> lsResult = this.getClient().ls(path);
-
             this.getSOSFileEntries().clear();
-
             String[] result = new String[lsResult.size()];
             String sep = path.endsWith("/") ? "" : "/";
             for (int i = 0, j = 0; i < lsResult.size(); i++) {
@@ -288,7 +287,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 sosFileEntry.setFilesize(entry.getAttrs().getSize());
                 sosFileEntry.setParentPath(path);
                 this.getSOSFileEntries().add(sosFileEntry);
-
                 String fileName = path + sep + entry.getFilename();
                 result[j++] = fileName;
             }
@@ -311,6 +309,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 size = objAttr.getSize();
             }
         } catch (SftpException e) {
+            //
         }
         return size;
     }
@@ -343,6 +342,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 try {
                     fos.close();
                 } catch (Exception ex) {
+                    //
                 }
             }
         }
@@ -403,20 +403,16 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         BufferedReader errReader = null;
         try {
             if (sshSession == null) {
-                // sshSession = sshConnection.openSession();
-                // TODO create Session ??
                 throw new JobSchedulerException(SOSVfs_E_190.params("sshSession"));
             }
             channelExec = (ChannelExec) sshSession.openChannel("exec");
             channelExec.setPty(isSimulateShell());
-            // JITL-157
             cmd = cmd.replaceAll("\0", "\\\\\\\\").replaceAll("\"", "\\\"");
             channelExec.setCommand(cmd);
             channelExec.setInputStream(null);
             channelExec.setErrStream(null);
             out = channelExec.getInputStream();
             err = channelExec.getErrStream();
-            // https://change.sos-berlin.com/browse/JITL-157
             channelExec.connect();
             LOGGER.debug(SOSVfs_D_163.params("stdout", cmd));
             outContent = new StringBuffer();
@@ -427,7 +423,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                     if (i < 0) {
                         break;
                     }
-                    // output line
                     outContent.append(new String(tmp, 0, i));
                 }
                 if (channelExec.isClosed()) {
@@ -437,9 +432,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 try {
                     Thread.sleep(1000);
                 } catch (Exception ee) {
+                    //
                 }
             }
-            // sdout output will be used from another applications
             if (outContent.length() > 0) {
                 LOGGER.info(outContent);
             }
@@ -464,43 +459,44 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 }
                 throw new JobSchedulerException(SOSVfs_E_164.params(errMsg));
             }
-
             reply = "OK";
         } catch (JobSchedulerException ex) {
             reply = ex.toString();
             if (connection2OptionsAlternate.raise_exception_on_error.value()) {
                 throw ex;
             }
-
         } catch (Exception ex) {
             reply = ex.toString();
             if (connection2OptionsAlternate.raise_exception_on_error.value()) {
                 RaiseException(ex, SOSVfs_E_134.params("ExecuteCommand"));
             }
-
         } finally {
             if (out != null) {
                 try {
                     out.close();
                 } catch (Exception e) {
+                    //
                 }
             }
             if (errReader != null) {
                 try {
                     errReader.close();
                 } catch (Exception e) {
+                    //
                 }
             }
             if (err != null) {
                 try {
                     err.close();
                 } catch (Exception e) {
+                    //
                 }
             }
             if (channelExec != null) {
                 try {
                     channelExec.disconnect();
                 } catch (Exception e) {
+                    //
                 }
             }
             logINFO(HostID(SOSVfs_I_192.params(getReplyString())));
@@ -580,6 +576,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 dateTime = df.format(new Date(mt));
             }
         } catch (SftpException e) {
+            //
         }
         return dateTime;
     }
@@ -638,13 +635,12 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             }
         }
         try {
-            // JITL-206
             sshSession.setConfig("PreferredAuthentications", authenticationOptions.getAuth_method().Value());
             setConfigFromFiles();
             sshSession.connect();
             this.createSftpClient();
         } catch (Exception e) {
-            throw new JobSchedulerException(HostID(e.getClass().getName() + " - " + e.getLocalizedMessage()), e);
+            throw new JobSchedulerException(HostID(e.getClass().getName() + " - " + e.getMessage()), e);
         }
         reply = "OK";
         LOGGER.info(SOSVfs_D_133.params(userName));
@@ -658,17 +654,14 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             for (int i = 0; i < arr.length; i++) {
                 String file = arr[i].trim();
                 LOGGER.info(String.format("use configuration file: %s", file));
-
                 FileInputStream in = null;
                 try {
                     in = new FileInputStream(file);
                     Properties p = new Properties();
                     p.load(in);
-
                     for (Entry<Object, Object> entry : p.entrySet()) {
                         String key = (String) entry.getKey();
                         String value = (String) entry.getValue();
-
                         LOGGER.debug(String.format("set configuration setting: %s = %s", key, value));
                         sshSession.setConfig(key, value);
                     }
@@ -679,6 +672,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                         try {
                             in.close();
                         } catch (Exception ex) {
+                            //
                         }
                     }
                 }
@@ -711,7 +705,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         host = phost;
         port = pport;
         LOGGER.info(SOSVfs_D_0101.params(host, port));
-        if (this.isConnected() == false) {
+        if (!this.isConnected()) {
             this.LogReply();
         } else {
             logWARN(SOSVfs_D_0103.params(host, port));
@@ -725,48 +719,29 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         sshSession = secureChannel.getSession(puser, phost, pport);
         java.util.Properties config = new java.util.Properties();
         config.put("StrictHostKeyChecking", connection2OptionsAlternate.strictHostKeyChecking.Value());
-
-        if (connection2OptionsAlternate.use_zlib_compression.value() == true) {
+        if (connection2OptionsAlternate.use_zlib_compression.value()) {
             config.put("compression.s2c", "zlib@openssh.com,zlib,none");
             config.put("compression.c2s", "zlib@openssh.com,zlib,none");
             config.put("compression_level", connection2OptionsAlternate.zlib_compression_level.Value());
-
-            LOGGER.info(String.format("use zlib_compression: compression.s2c = %s, compression.c2s = %s, compression_level = %s", config.getProperty("compression.s2c"), config.getProperty("compression.c2s"), connection2OptionsAlternate.zlib_compression_level.Value()));
+            LOGGER.info(String.format("use zlib_compression: compression.s2c = %s, compression.c2s = %s, compression_level = %s",
+                    config.getProperty("compression.s2c"), config.getProperty("compression.c2s"),
+                    connection2OptionsAlternate.zlib_compression_level.Value()));
         }
-
         sshSession.setConfig(config);
         setCommandsTimeout();
         setProxy();
-
-        // am Ende
         setConnectionTimeout();
     }
 
-    /** @TODO missing connection_timeout option
-     * 
-     *       used only for the proxy type socks4 and socks5 */
     private void setConnectionTimeout() throws Exception {
         if (connectionTimeout > 0) {
-            // in milliseconds
             LOGGER.info(String.format("connection timeout = %s ms", connectionTimeout));
             sshSession.setTimeout(connectionTimeout);
         }
     }
 
-    /** See
-     * http://stackoverflow.com/questions/16546198/configuring-timeout-on-jsch
-     * -channelsftp-operations
-     * 
-     * Sets the interval to send a keep-alive message. If zero is specified, any
-     * keep-alive message must not be sent. The default interval is zero
-     * 
-     * @TODO not used
-     * 
-     * @throws Exception */
     private void setCommandsTimeout() throws Exception {
-        // specified interval, in milliseconds
-        // int interval = 0;
-        // sshSession.setServerAliveInterval(interval);
+        //
     }
 
     private void setProxy() throws Exception {
@@ -774,7 +749,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             int connTimeout = 30000; // 0,5 Minute
             LOGGER.info(String.format("using proxy: protocol = %s, host = %s, port = %s, user = %s, pass = ?", proxyProtocol.Value(), proxyHost,
                     proxyPort, proxyUser));
-
             if (proxyProtocol.isHttp()) {
                 ProxyHTTP proxy = new ProxyHTTP(proxyHost, proxyPort);
                 if (!SOSString.isEmpty(proxyUser)) {
@@ -787,7 +761,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                     proxy.setUserPasswd(proxyUser, proxyPassword);
                 }
                 sshSession.setProxy(proxy);
-
                 connectionTimeout = connTimeout;
             } else if (proxyProtocol.isSocks4()) {
                 ProxySOCKS4 proxy = new ProxySOCKS4(proxyHost, proxyPort);
@@ -795,7 +768,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                     proxy.setUserPasswd(proxyUser, proxyPassword);
                 }
                 sshSession.setProxy(proxy);
-
                 connectionTimeout = connTimeout;
             } else {
                 throw new Exception(String.format("unknown proxy protocol = %s", proxyProtocol.Value()));
@@ -814,12 +786,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     @Override
     public void close() {
-        try {
-            // sshSession.disconnect(); // see SOSFTP-122
-            // sshSession = null;
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
+        //
     }
 
     @Override
@@ -856,17 +823,15 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         return exitSignal;
     }
 
-    // https://change.sos-berlin.com/browse/JITL-123
     @Override
     public String createScriptFile(String content) throws Exception {
         try {
             String commandScript = content;
             if (!isRemoteWindowsShell) {
-                 commandScript = commandScript.replaceAll("(?m)\r", "");
+                commandScript = commandScript.replaceAll("(?m)\r", "");
             }
             LOGGER.debug(SOSVfs_I_233.params(content));
             File tempScriptFile = File.createTempFile("sos-sshscript", getScriptFileNameSuffix());
-
             BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tempScriptFile)));
             out.write(commandScript);
             out.flush();
@@ -921,4 +886,5 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     public void setSimulateShell(boolean simulateShell) {
         this.simulateShell = simulateShell;
     }
+
 }

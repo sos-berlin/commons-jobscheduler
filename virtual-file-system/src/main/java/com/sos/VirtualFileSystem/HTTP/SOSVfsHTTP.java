@@ -163,6 +163,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
                     outputStream.close();
                 }
             } catch (Exception e) {
+                //
             }
         }
         return fileSize;
@@ -187,6 +188,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
             try {
                 method.releaseConnection();
             } catch (Exception ex) {
+                //
             }
         }
         return false;
@@ -215,6 +217,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
             try {
                 method.releaseConnection();
             } catch (Exception ex) {
+                //
             }
         }
     }
@@ -305,7 +308,6 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 
     @Override
     public OutputStream getOutputStream() {
-        // TO DO Auto-generated method stub
         return null;
     }
 
@@ -342,6 +344,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
             try {
                 is.close();
             } catch (Exception ex) {
+                //
             }
         }
         return new Long(total);
@@ -371,6 +374,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
             try {
                 method.releaseConnection();
             } catch (Exception ex) {
+                //
             }
         }
         return size;
@@ -408,13 +412,11 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 
     @Override
     public OutputStream getOutputStream(final String fileName) {
-        // TO DO Auto-generated method stub
         return null;
     }
 
     @Override
     public InputStream getInputStream() {
-        // TO DO Auto-generated method stub
         return null;
     }
 
@@ -437,6 +439,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
         try {
             val = method.getStatusCode();
         } catch (Exception ex) {
+            //
         }
         return val;
     }
@@ -446,6 +449,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
         try {
             val = method.getStatusText();
         } catch (Exception ex) {
+            //
         }
         return val;
     }

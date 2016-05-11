@@ -177,6 +177,7 @@ public class JobSchedulerSSHBaseJob extends Job_impl {
         try {
             return sftpClient.stat(filename).isDirectory();
         } catch (Exception e) {
+            //
         }
         return false;
     }

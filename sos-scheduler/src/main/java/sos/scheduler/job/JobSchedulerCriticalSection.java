@@ -49,6 +49,7 @@ public class JobSchedulerCriticalSection {
                     try {
                         Thread.sleep(5);
                     } catch (Exception ex) {
+                        //
                     }
                     now = System.currentTimeMillis();
                     status = spooler.var(mutex);
@@ -77,6 +78,7 @@ public class JobSchedulerCriticalSection {
         try {
             Thread.sleep(delay);
         } catch (Exception e) {
+            //
         }
     }
 

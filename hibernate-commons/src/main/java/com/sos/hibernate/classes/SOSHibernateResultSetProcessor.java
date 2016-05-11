@@ -62,11 +62,12 @@ public class SOSHibernateResultSetProcessor implements Serializable {
             }
             SessionImplementor session = criteriaImpl.getSession();
             SessionFactoryImplementor factory = session.getFactory();
-            CriteriaQueryTranslator translator = new CriteriaQueryTranslator(factory, criteriaImpl, criteriaImpl.getEntityOrClassName(),
-                    CriteriaQueryTranslator.ROOT_SQL_ALIAS);
+            CriteriaQueryTranslator translator =
+                    new CriteriaQueryTranslator(factory, criteriaImpl, criteriaImpl.getEntityOrClassName(), CriteriaQueryTranslator.ROOT_SQL_ALIAS);
             String[] implementors = factory.getImplementors(criteriaImpl.getEntityOrClassName());
-            CriteriaJoinWalker walker = new CriteriaJoinWalker((OuterJoinLoadable) factory.getEntityPersister(implementors[0]), translator, factory,
-                    criteriaImpl, criteriaImpl.getEntityOrClassName(), session.getLoadQueryInfluencers());
+            CriteriaJoinWalker walker =
+                    new CriteriaJoinWalker((OuterJoinLoadable) factory.getEntityPersister(implementors[0]), translator, factory, criteriaImpl,
+                            criteriaImpl.getEntityOrClassName(), session.getLoadQueryInfluencers());
             String sql = createSqlStatement(translator, walker.getSQLString());
             createMetadata(translator);
             resultSet = createResultSet(sql, scrollMode, criteria.isReadOnly(), fetchSize);
@@ -83,8 +84,8 @@ public class SOSHibernateResultSetProcessor implements Serializable {
     public ResultSet createResultSet(String sql, ScrollMode scrollMode, boolean isReadOnly, Optional<Integer> fetchSize) throws Exception {
         String method = "createResultSet";
         sqlStatement = sql;
-        LOGGER.debug(String.format("%s: sqlStatement = %s, scrollMode = %s, isReadOnly = %s, fetchSize= %s", method, sqlStatement, scrollMode.toString(),
-                isReadOnly, fetchSize));
+        LOGGER.debug(String.format("%s: sqlStatement = %s, scrollMode = %s, isReadOnly = %s, fetchSize= %s", method, sqlStatement,
+                scrollMode.toString(), isReadOnly, fetchSize));
         statement = connection.getJdbcConnection().createStatement(getResultSetType(scrollMode), getConcurrencyMode(isReadOnly));
         if (fetchSize.isPresent()) {
             statement.setFetchSize(fetchSize.get());
@@ -114,8 +115,8 @@ public class SOSHibernateResultSetProcessor implements Serializable {
     private void createMetadata(CriteriaQueryTranslator translator) throws Exception {
         String method = "createMetadata";
         if (translator.getRootCriteria().getProjection() == null) {
-            throw new Exception(String.format("%s: translator.getRootCriteria().getProjection() is NULL. Please use the Projection in the criteria definition",
-                    method));
+            throw new Exception(String.format(
+                    "%s: translator.getRootCriteria().getProjection() is NULL. Please use the Projection in the criteria definition", method));
         }
         entityGetMethods = new HashMap<String, Method>();
         entitySetMethods = new HashMap<String, Method>();
@@ -206,12 +207,14 @@ public class SOSHibernateResultSetProcessor implements Serializable {
             try {
                 resultSet.close();
             } catch (Exception ex) {
+                //
             }
         }
         if (statement != null) {
             try {
                 statement.close();
             } catch (Exception ex) {
+                //
             }
         }
         dispose();

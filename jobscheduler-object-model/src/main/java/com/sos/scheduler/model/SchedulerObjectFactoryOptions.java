@@ -13,9 +13,8 @@ public class SchedulerObjectFactoryOptions extends JSOptionsClass implements ISO
     private static final long serialVersionUID = 1L;
     private static final String CLASSNAME = "SchedulerObjectFactoryOptions";
 
-    @JSOptionDefinition(name = "tcp_time_out", description = "The time out in seconds for a tcp connection", key = "tcp_time_out", type = "SOSOptionInteger",
-            mandatory = false)
-    public SOSOptionInteger TCPTimeoutValue = new SOSOptionInteger(this, CLASSNAME + ".tcp_time_out", "The time out in seconds for a tcp connection", 
+    @JSOptionDefinition(name = "tcp_time_out", description = "The time out in seconds for a tcp connection", key = "tcp_time_out", type = "SOSOptionInteger", mandatory = false)
+    public SOSOptionInteger TCPTimeoutValue = new SOSOptionInteger(this, CLASSNAME + ".tcp_time_out", "The time out in seconds for a tcp connection",
             "60", "60", false);
     public SOSOptionInteger TimeOut = (SOSOptionInteger) TCPTimeoutValue.SetAlias("time_out");
 
@@ -30,10 +29,9 @@ public class SchedulerObjectFactoryOptions extends JSOptionsClass implements ISO
         return this;
     }
 
-    @JSOptionDefinition(name = "UDPPortNumber", description = "The scheduler communication port for UDP", key = "UDPPortNumber", type = "SOSOptionPortNumber",
-            mandatory = true)
-    public SOSOptionPortNumber UDPPortNumber = new SOSOptionPortNumber(this, CLASSNAME + ".UDPPortNumber", "The scheduler communication port for UDP", 
-            "4444", "4444", true);
+    @JSOptionDefinition(name = "UDPPortNumber", description = "The scheduler communication port for UDP", key = "UDPPortNumber", type = "SOSOptionPortNumber", mandatory = true)
+    public SOSOptionPortNumber UDPPortNumber = new SOSOptionPortNumber(this, CLASSNAME + ".UDPPortNumber",
+            "The scheduler communication port for UDP", "4444", "4444", true);
 
     @Override
     public int getUDPPortNumber() {
@@ -46,9 +44,9 @@ public class SchedulerObjectFactoryOptions extends JSOptionsClass implements ISO
         return this;
     }
 
-    @JSOptionDefinition(name = "PortNumber", description = "The scheduler communication port", key = "PortNumber", type = "SOSOptionPortNumber",
-            mandatory = true)
-    public SOSOptionPortNumber PortNumber = new SOSOptionPortNumber(this, CLASSNAME + ".PortNumber", "The scheduler communication port", "0", "4444", true);
+    @JSOptionDefinition(name = "PortNumber", description = "The scheduler communication port", key = "PortNumber", type = "SOSOptionPortNumber", mandatory = true)
+    public SOSOptionPortNumber PortNumber = new SOSOptionPortNumber(this, CLASSNAME + ".PortNumber", "The scheduler communication port", "0", "4444",
+            true);
     public SOSOptionPortNumber TCPPortNumber = (SOSOptionPortNumber) PortNumber.SetAlias("tcp_port_number");
 
     @Override
@@ -63,12 +61,12 @@ public class SchedulerObjectFactoryOptions extends JSOptionsClass implements ISO
     }
 
     @JSOptionDefinition(name = "ServerName", description = "The Name of the Server", key = "ServerName", type = "SOSOptionString", mandatory = true)
-    public SOSOptionHostName ServerName = new SOSOptionHostName(this, CLASSNAME + ".ServerName", "The Name of the Server", "0.0.0.0", "localhost", true);
+    public SOSOptionHostName ServerName = new SOSOptionHostName(this, CLASSNAME + ".ServerName", "The Name of the Server", "0.0.0.0", "localhost",
+            true);
     public SOSOptionHostName ServerIPv4 = (SOSOptionHostName) ServerName.SetAlias("Server_IPv4_Name");
 
-    @JSOptionDefinition(name = "TransferMethod", description = "The technical method of how to communicate with the JobScheduler", key = "TransferMethod",
-            type = "SOSOptionJSTransferMethod", mandatory = true)
-    public SOSOptionJSTransferMethod TransferMethod = new SOSOptionJSTransferMethod(this, CLASSNAME + ".TransferMethod", 
+    @JSOptionDefinition(name = "TransferMethod", description = "The technical method of how to communicate with the JobScheduler", key = "TransferMethod", type = "SOSOptionJSTransferMethod", mandatory = true)
+    public SOSOptionJSTransferMethod TransferMethod = new SOSOptionJSTransferMethod(this, CLASSNAME + ".TransferMethod",
             "The technical method of how to communicate with the JobScheduler", "tcp", "tcp", true);
 
     @Override

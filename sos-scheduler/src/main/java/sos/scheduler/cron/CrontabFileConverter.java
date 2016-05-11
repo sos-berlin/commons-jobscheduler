@@ -844,6 +844,7 @@ public class CrontabFileConverter extends JSToolBox {
                     try {
                         LOGGER.warn("unknown crontab synthax: " + element);
                     } catch (Exception e) {
+                        //
                     }
                 } else {
                     int from = Integer.parseInt(range[0]);

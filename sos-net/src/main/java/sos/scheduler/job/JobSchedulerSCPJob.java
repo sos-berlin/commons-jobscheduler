@@ -314,12 +314,14 @@ public class JobSchedulerSCPJob extends JobSchedulerSSHBaseJob {
                 try {
                     stdoutReader.close();
                 } catch (Exception e) {
+                    //
                 }
             }
             if (stderrReader != null) {
                 try {
                     stderrReader.close();
                 } catch (Exception e) {
+                    //
                 }
             }
             if (this.getSshSession() != null) {

@@ -104,8 +104,9 @@ public class SOSOptionElementTest {
 
     @Test
     public void testSOSLocale() {
-        SOSOptionLocale Locale = new SOSOptionLocale(null, CLASSNAME + ".Locale", "I18N is for internationalization of Application", "env:SOS_LOCALE", 
-                java.util.Locale.getDefault().toString(), true);
+        SOSOptionLocale Locale =
+                new SOSOptionLocale(null, CLASSNAME + ".Locale", "I18N is for internationalization of Application", "env:SOS_LOCALE",
+                        java.util.Locale.getDefault().toString(), true);
         LOGGER.info("Locale = " + Locale.Value());
     }
 

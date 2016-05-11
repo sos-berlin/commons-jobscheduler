@@ -55,8 +55,7 @@ public class PropertyFactoryOptionsSuperClass extends JSOptionsClass {
         this.PropertyFileNamePrefix = p_PropertyFileNamePrefix;
     }
 
-    @JSOptionDefinition(name = "SourceFolderName", description = "The Folder, which has all the I18N Property files.", key = "SourceFolderName",
-            type = "SOSOptionFolderName", mandatory = true)
+    @JSOptionDefinition(name = "SourceFolderName", description = "The Folder, which has all the I18N Property files.", key = "SourceFolderName", type = "SOSOptionFolderName", mandatory = true)
     public SOSOptionFolderName SourceFolderName = new SOSOptionFolderName(this, CLASSNAME + ".SourceFolderName",
             "The Folder, which has all the I18N Property files.", " ", " ", true);
 
@@ -108,5 +107,5 @@ public class PropertyFactoryOptionsSuperClass extends JSOptionsClass {
         super.CommandLineArgs(pstrArgs);
         this.setAllOptions(super.objSettings);
     }
-    
+
 }
