@@ -258,9 +258,8 @@ public class SOSMailProcessInboxOptionsSuperClass extends JSOptionsClass {
         mail_user = p_mail_user;
     }
 
-    @JSOptionDefinition(name = "min_file_age", description = "Objects, which are younger than min_file_age are not processed", key = "min_file_age",
-            type = "SOSOptionTime", mandatory = false)
-    public SOSOptionTimeHorizon min_file_age = new SOSOptionTimeHorizon(this, CLASSNAME + ".min_file_age", 
+    @JSOptionDefinition(name = "min_file_age", description = "Objects, which are younger than min_file_age are not processed", key = "min_file_age", type = "SOSOptionTime", mandatory = false)
+    public SOSOptionTimeHorizon min_file_age = new SOSOptionTimeHorizon(this, CLASSNAME + ".min_file_age",
             "Objects, which are younger than min_file_age are not processed", "", "", false);
     public SOSOptionTimeHorizon MinAge = (SOSOptionTimeHorizon) min_file_age.SetAlias("min_age");
 

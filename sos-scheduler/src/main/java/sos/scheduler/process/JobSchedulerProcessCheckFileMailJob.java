@@ -35,12 +35,14 @@ public class JobSchedulerProcessCheckFileMailJob extends JobSchedulerProcessSend
             try {
                 this.getLogger().warn("error occurred checking parameters: " + e.getMessage());
             } catch (Exception ex) {
+                //
             }
         }
         if (fileSpec.isEmpty() && fileContent.isEmpty() && filePath.isEmpty()) {
             try {
                 getLogger().info("JobSchedulerProcessCheckFileMailJob is not configured, suppressing mail.");
             } catch (Exception e) {
+                //
             }
             return false;
         }
@@ -74,6 +76,7 @@ public class JobSchedulerProcessCheckFileMailJob extends JobSchedulerProcessSend
             try {
                 this.getLogger().warn("error occurred checking file(s): " + e.getMessage());
             } catch (Exception ex) {
+                //
             }
         }
         return found;

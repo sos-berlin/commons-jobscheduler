@@ -276,8 +276,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     public String replaceSchedulerVars(final String string2Modify) {
         String resultString = string2Modify;
         if (isNotNull(schedulerParameters)) {
-            // if (string2Modify.matches("(?s).*%[^%]+%.*") ||
-            // string2Modify.matches("(?s).*\\$\\{[^{]+\\}.*")) {
             if (string2Modify.matches("(?s).*\\$\\{[^{]+\\}.*")) {
                 if (parameterSubstitutor == null) {
                     parameterSubstitutor = new ParameterSubstitutor();
@@ -290,16 +288,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                         }
                     }
                 }
-                // if (string2Modify.matches("(?s).*\\$\\{[^\\{]+\\}.*")) {
                 resultString = parameterSubstitutor.replace(string2Modify);
-                // }
-                /*
-                 * if (string2Modify.matches("(?s).*%[^%]+%.*")) {
-                 * parameterSubstitutor.setOpenTag("%");
-                 * parameterSubstitutor.setCloseTag("%"); resultString =
-                 * parameterSubstitutor.replace(string2Modify); }
-                 */
-
             }
         }
         return resultString;
@@ -368,6 +357,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
 
     @Override
     public void setJSJobUtilites(final JSJobUtilities pobjJSJobUtilities) {
+        //
     }
 
     @Override
@@ -535,7 +525,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             String strS = getJobScript();
             if (isNotEmpty(strS)) {
                 pobjOptionElement.Value(strS);
-                logger.debug(String.format("copy script from script-tag of job '%2$s' to option '%1$s'", pobjOptionElement.getShortKey(), getJob().name()));
+                logger.debug(String.format("copy script from script-tag of job '%2$s' to option '%1$s'", pobjOptionElement.getShortKey(),
+                        getJob().name()));
             }
         }
     }

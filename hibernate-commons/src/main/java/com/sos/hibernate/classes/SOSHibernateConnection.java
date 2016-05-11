@@ -315,8 +315,8 @@ public class SOSHibernateConnection implements Serializable {
         if (ex instanceof SQLGrammarException) {
             SQLGrammarException sqlGrEx = (SQLGrammarException) ex;
             SQLException sqlEx = sqlGrEx.getSQLException();
-            return new Exception(String.format("%s [exception: %s, sql: %s]", ex.getMessage(), sqlEx == null ? "" : sqlEx.getMessage(), sqlGrEx.getSQL()),
-                    sqlEx);
+            return new Exception(String.format("%s [exception: %s, sql: %s]", ex.getMessage(), sqlEx == null ? "" : sqlEx.getMessage(),
+                    sqlGrEx.getSQL()), sqlEx);
         } else if (ex.getCause() != null) {
             return ex.getCause();
         }
@@ -348,6 +348,7 @@ public class SOSHibernateConnection implements Serializable {
             try {
                 jdbcConnection.close();
             } catch (Exception ex) {
+                //
             }
         }
         jdbcConnection = null;
@@ -426,6 +427,7 @@ public class SOSHibernateConnection implements Serializable {
                 }
             }
         } catch (Exception ex) {
+            //
         }
 
     }
@@ -498,6 +500,7 @@ public class SOSHibernateConnection implements Serializable {
                 try {
                     jdbcFetchSize = Optional.of(Integer.parseInt(configuration.getProperty(HIBERNATE_PROPERTY_JDBC_FETCH_SIZE)));
                 } catch (Exception ex) {
+                    //
                 }
             }
         }
@@ -818,11 +821,12 @@ public class SOSHibernateConnection implements Serializable {
         CriteriaImpl criteriaImpl = (CriteriaImpl) criteria;
         SessionImplementor session = criteriaImpl.getSession();
         SessionFactoryImplementor factory = session.getFactory();
-        CriteriaQueryTranslator translator = new CriteriaQueryTranslator(factory, criteriaImpl, criteriaImpl.getEntityOrClassName(),
-                CriteriaQueryTranslator.ROOT_SQL_ALIAS);
+        CriteriaQueryTranslator translator =
+                new CriteriaQueryTranslator(factory, criteriaImpl, criteriaImpl.getEntityOrClassName(), CriteriaQueryTranslator.ROOT_SQL_ALIAS);
         String[] implementors = factory.getImplementors(criteriaImpl.getEntityOrClassName());
-        CriteriaJoinWalker walker = new CriteriaJoinWalker((OuterJoinLoadable) factory.getEntityPersister(implementors[0]), translator, factory, criteriaImpl,
-                criteriaImpl.getEntityOrClassName(), session.getLoadQueryInfluencers());
+        CriteriaJoinWalker walker =
+                new CriteriaJoinWalker((OuterJoinLoadable) factory.getEntityPersister(implementors[0]), translator, factory, criteriaImpl,
+                        criteriaImpl.getEntityOrClassName(), session.getLoadQueryInfluencers());
         return walker.getSQLString();
     }
 

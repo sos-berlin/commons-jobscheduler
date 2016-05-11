@@ -5,7 +5,7 @@ public class SOSOptionCommandString extends SOSOptionHexString {
 
     private static final long serialVersionUID = 2326011361040152247L;
     private final String conClassName = "SOSOptionCommandString";
-    public SOSOptionRegExp command_delimiter = new SOSOptionRegExp(null, conClassName + ".command_delimiter", 
+    public SOSOptionRegExp command_delimiter = new SOSOptionRegExp(null, conClassName + ".command_delimiter",
             "Command delimiter characters are specified using this par", "%%", "%%", true);
 
     public SOSOptionCommandString(final JSOptionsClass pPobjParent, final String pPstrKey, final String pPstrDescription, final String pPstrValue,

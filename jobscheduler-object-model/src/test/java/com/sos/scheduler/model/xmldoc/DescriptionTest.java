@@ -33,13 +33,6 @@ public class DescriptionTest {
     static JAXBContext context = null;
     static Unmarshaller unmarshaller = null;
 
-    public DescriptionTest() {
-        //
-    }
-
-    public static void setUpBeforeClass() throws Exception {
-    }
-
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
         LOGGER.debug("test ended");
@@ -51,10 +44,6 @@ public class DescriptionTest {
         documentationFile = new File(TEST_FILENAME);
         context = JAXBContext.newInstance(Description.class);
         unmarshaller = context.createUnmarshaller();
-    }
-
-    @After
-    public void tearDown() throws Exception {
     }
 
     @Test
@@ -406,18 +395,6 @@ public class DescriptionTest {
                 }
             }
         }
-    }
-
-    @Test
-    @Ignore("Not yet implemented")
-    public void testSetConfiguration() {
-        //
-    }
-
-    @Test
-    @Ignore("Not yet implemented")
-    public void testGetDocumentation() {
-        //
     }
 
 }

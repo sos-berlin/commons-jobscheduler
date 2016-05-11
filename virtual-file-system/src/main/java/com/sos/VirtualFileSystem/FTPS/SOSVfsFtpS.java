@@ -60,8 +60,8 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
             }
             objProtocolCommandListener = new SOSFtpClientLogger(HostID(""));
             if (objConnection2Options != null && objConnection2Options.ProtocolCommandListener.isTrue()) {
-                    client.addProtocolCommandListener(objProtocolCommandListener);
-                }
+                client.addProtocolCommandListener(objProtocolCommandListener);
+            }
 
             String addFTPProtocol = System.getenv("AddFTPProtocol");
             if (addFTPProtocol != null && "true".equalsIgnoreCase(addFTPProtocol)) {
@@ -94,8 +94,9 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
     private void setTrustManager(FTPSClient client) throws Exception {
         LOGGER.info(String.format("using keystore: type = %s, file = %s", objConnection2Options.keystore_type.Value(),
                 objConnection2Options.keystore_file.Value()));
-        KeyStore ks = loadKeyStore(objConnection2Options.keystore_type.Value(), new File(objConnection2Options.keystore_file.Value()),
-                objConnection2Options.keystore_password.Value());
+        KeyStore ks =
+                loadKeyStore(objConnection2Options.keystore_type.Value(), new File(objConnection2Options.keystore_file.Value()),
+                        objConnection2Options.keystore_password.Value());
         client.setTrustManager(TrustManagerUtils.getDefaultTrustManager(ks));
     }
 }

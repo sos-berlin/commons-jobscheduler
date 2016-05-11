@@ -22,12 +22,11 @@ public class LanguageDescriptorList {
     public static final String SSH = "ssh";
 
     private static List<LanguageDescriptor> lstLanguages = Arrays.asList(new LanguageDescriptor(SHELL, 0, false, SHELL, "", "", true, false),
-            new LanguageDescriptor(JAVA, 1, false, JAVA, "", "", true, true), new LanguageDescriptor(JAVASCRIPT, 2, false, JAVASCRIPT, "", "", true, true),
-            new LanguageDescriptor(VB_SCRIPT, 3, false, VB_SCRIPT, "", "", true, true), 
-            new LanguageDescriptor(PERL_SCRIPT, 4, false, PERL_SCRIPT, "", "",true, true), 
-            new LanguageDescriptor(JAVAX_SCRIPT_RHINO, 5, false, JAVAX_SCRIPT_RHINO, "", "", true, true), 
-            new LanguageDescriptor(JAVAX_SCRIPT_ECMASCRIPT, 6, false, JAVAX_SCRIPT_ECMASCRIPT, "", "", true, true), 
-            new LanguageDescriptor(JAVAX_JAVASCRIPT, 7, false, JAVAX_JAVASCRIPT, "", "", true, true));
+            new LanguageDescriptor(JAVA, 1, false, JAVA, "", "", true, true), new LanguageDescriptor(JAVASCRIPT, 2, false, JAVASCRIPT, "", "", true,
+                    true), new LanguageDescriptor(VB_SCRIPT, 3, false, VB_SCRIPT, "", "", true, true), new LanguageDescriptor(PERL_SCRIPT, 4, false,
+                    PERL_SCRIPT, "", "", true, true), new LanguageDescriptor(JAVAX_SCRIPT_RHINO, 5, false, JAVAX_SCRIPT_RHINO, "", "", true, true),
+            new LanguageDescriptor(JAVAX_SCRIPT_ECMASCRIPT, 6, false, JAVAX_SCRIPT_ECMASCRIPT, "", "", true, true), new LanguageDescriptor(
+                    JAVAX_JAVASCRIPT, 7, false, JAVAX_JAVASCRIPT, "", "", true, true));
 
     public LanguageDescriptorList() {
     }

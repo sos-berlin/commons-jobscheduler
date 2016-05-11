@@ -5,8 +5,6 @@ package com.sos.VirtualFileSystem.Filter.Options;
 
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
-
 import com.sos.VirtualFileSystem.Filter.SOSBase64DecodeFilter;
 import com.sos.VirtualFileSystem.Filter.SOSBase64EncodeFilter;
 import com.sos.VirtualFileSystem.Filter.SOSDos2UnixFilter;
@@ -21,24 +19,10 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 /** @author KB */
 public class SOSFilterOptions extends SOSFilterOptionsSuperClass {
 
-    private final String conClassName = this.getClass().getSimpleName();
-    @SuppressWarnings("unused")
-    private static final String conSVNVersion = "$Id$";
-    @SuppressWarnings("unused")
-    private final Logger logger = Logger.getLogger(this.getClass());
-
+    private static final long serialVersionUID = 555337165999031797L;
     private Vector<SOSNullFilter> lstFilters = null;
 
-    /**
-	 *
-	 */
-    private static final long serialVersionUID = 555337165999031797L;
-
     public Vector<SOSNullFilter> getFilter() {
-
-        @SuppressWarnings("unused")
-        final String conMethodName = conClassName + "::getFilter";
-
         if (lstFilters == null) {
             lstFilters = new Vector();
             if (FilterSequence.isDirty() == true) {
@@ -46,21 +30,18 @@ public class SOSFilterOptions extends SOSFilterOptionsSuperClass {
                     lstFilters.add(getFilterInstance(strFilterName));
                 }
             } else {
-                if (exclude_lines_after.isDirty() || excludeLinesBefore.isDirty()) { // name:
-                                                                                     // records
+                if (exclude_lines_after.isDirty() || excludeLinesBefore.isDirty()) {
                     SOSNullFilter objF = new SOSRecordsFilter(this);
                     lstFilters.add(objF);
                 }
-                if (excludeEmptyLines.isDirty() || excludeLines.isDirty() || includeLines.isDirty()) { // name:
-                                                                                                       // excludeinclude
+                if (excludeEmptyLines.isDirty() || excludeLines.isDirty() || includeLines.isDirty()) {
                     SOSNullFilter objF = new SOSExcludeIncludeRecordsFilter(this);
                     lstFilters.add(objF);
                 }
             }
         }
         return lstFilters;
-
-    } // private Vector <SOSNullFilter> getFilter
+    }
 
     public void startPostProcessing(final ISOSVirtualFile objOutput) {
         for (SOSNullFilter sosNullFilter : lstFilters) {
@@ -77,50 +58,44 @@ public class SOSFilterOptions extends SOSFilterOptionsSuperClass {
         }
     }
 
-    // TODO in die Klasse SOSFilterOption verschieben.
     public SOSNullFilter getFilterInstance(final String pstrFilterName) {
         SOSNullFilter objF = null;
         for (enuFilterCodes enuFC : enuFilterCodes.values()) {
             if (enuFC.name().equalsIgnoreCase(pstrFilterName)) {
                 switch (enuFC) {
-                // TODO eine Klasse, die die Filter Instanz liefert und auch den
-                // Filter-Type liefert: stream, endpoint, startpoint, ... Ebenso
-                // für Validator einsetzen
-                case dos2unix: //
+                case dos2unix:
                     objF = new SOSDos2UnixFilter(this);
                     break;
-                case unix2dos: //
+                case unix2dos:
                     objF = new SOSUnix2DosFilter(this);
                     break;
-                case searchreplace: //
+                case searchreplace:
                     objF = new SOSSearchAndReplaceFilter(this);
                     break;
-                case excludeinclude: //
+                case excludeinclude:
                     objF = new SOSExcludeIncludeRecordsFilter(this);
                     break;
-                case base64encode: //
+                case base64encode:
                     objF = new SOSBase64EncodeFilter(this);
                     break;
-                case base64decode: //
+                case base64decode:
                     objF = new SOSBase64DecodeFilter(this);
                     break;
-                case md5filter: //
-                    // objF = new SOSMd5Filter(this);
+                case md5filter:
                     break;
                 case nullfilter:
                     objF = new SOSNullFilter(this);
                     break;
-
                 case records:
                     objF = new SOSRecordsFilter(this);
                     break;
-
                 default:
                     break;
                 }
-                break;  // leave for
+                break;
             }
         }
         return objF;
     }
+
 }

@@ -10,15 +10,7 @@ public class SOSOptionFilterSequence extends SOSOptionStringValueList {
     private static final long serialVersionUID = -3306255818817394338L;
 
     public enum enuFilterCodes {
-        dos2unix,
-        unix2dos,
-        searchreplace,
-        excludeinclude,
-        base64encode,
-        base64decode,
-        md5filter,
-        records,
-        nullfilter
+        dos2unix, unix2dos, searchreplace, excludeinclude, base64encode, base64decode, md5filter, records, nullfilter
     }
 
     public SOSOptionFilterSequence(final String pstrValue) {
@@ -63,5 +55,5 @@ public class SOSOptionFilterSequence extends SOSOptionStringValueList {
             throw new JobSchedulerException("An empty Filter list is not supported");
         }
     }
-    
+
 }

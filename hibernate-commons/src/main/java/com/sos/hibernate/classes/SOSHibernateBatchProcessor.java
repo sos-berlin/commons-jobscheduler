@@ -197,6 +197,7 @@ public class SOSHibernateBatchProcessor implements Serializable {
             try {
                 preparedStatement.close();
             } catch (Exception ex) {
+                //
             }
         }
         dispose();

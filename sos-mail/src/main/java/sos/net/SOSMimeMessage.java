@@ -302,12 +302,14 @@ public class SOSMimeMessage {
                     in.close();
                 }
             } catch (Exception e) {
+                //
             }
             try {
                 if (bos != null) {
                     bos.close();
                 }
             } catch (Exception e) {
+                //
             }
         }
         return bos.toByteArray();
@@ -371,6 +373,7 @@ public class SOSMimeMessage {
                 try {
                     bos.flush();
                 } catch (Exception e) {
+                    //
                 }
             }
             if (bos != null) {
@@ -378,6 +381,7 @@ public class SOSMimeMessage {
                     bos.close();
                     bos = null;
                 } catch (Exception e) {
+                    //
                 }
             }
         }
@@ -504,6 +508,7 @@ public class SOSMimeMessage {
                 try {
                     out.close();
                 } catch (Exception e) {
+                    //
                 }
             }
         }

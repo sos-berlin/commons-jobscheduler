@@ -86,6 +86,7 @@ public class FileProducerTool extends Thread {
             try {
                 Thread.sleep(1000);
             } catch (Exception e) {
+                //
             }
         }
     }
@@ -139,6 +140,7 @@ public class FileProducerTool extends Thread {
             try {
                 connection.close();
             } catch (Exception ignore) {
+                //
             }
         }
     }

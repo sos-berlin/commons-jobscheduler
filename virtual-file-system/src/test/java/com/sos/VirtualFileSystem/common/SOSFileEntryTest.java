@@ -1,30 +1,16 @@
 package com.sos.VirtualFileSystem.common;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class SOSFileEntryTest {
 
-    private static final String MYJOBCHAIN_CONFIG_XML = "myjobchain.config.xml";
-    private static final String MYJOBCHAIN_JOB_CHAIN_XML = "myjobchain.job_chain.xml";
     private static final String INIT_PARENT_PATH = "/home/test";
     private static final int INIT_FILESIZE = 8888;
     private static final String INIT_FILENAME = "my_filename.txt";
     private SOSFileEntry sosFileEntry;
-
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-
-    }
-
-    @AfterClass
-    public static void tearDownAfterClass() throws Exception {
-    }
 
     @Before
     public void setUp() throws Exception {
@@ -35,13 +21,8 @@ public class SOSFileEntryTest {
         sosFileEntry.setParentPath(INIT_PARENT_PATH);
     }
 
-    @After
-    public void tearDown() throws Exception {
-    }
-
     @Test
     public void testGetFilename() {
-
         sosFileEntry.setFilename(INIT_FILENAME);
         assertEquals("testGetFilename unexpected value", INIT_FILENAME, sosFileEntry.getFilename());
     }

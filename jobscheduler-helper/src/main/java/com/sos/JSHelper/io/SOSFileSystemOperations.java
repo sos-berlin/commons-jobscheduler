@@ -124,7 +124,7 @@ public class SOSFileSystemOperations {
             log_debug1("argument fileSpecFlags=" + msg, LOGGER);
             String filename = file.getPath();
             filename = substituteAllDate(filename);
-            
+
             file = new File(filename);
             if (!file.exists()) {
                 log("checking file " + file.getAbsolutePath() + ": no such file or directory", LOGGER);
@@ -138,6 +138,7 @@ public class SOSFileSystemOperations {
                         f.close();
                         writable = true;
                     } catch (Exception e) {
+                        //
                     }
                     if (!writable) {
                         log("file " + file.getCanonicalPath() + ": cannot be written ", LOGGER);
@@ -155,7 +156,8 @@ public class SOSFileSystemOperations {
                         log("checking file " + file.getCanonicalPath() + ": directory contains no files matching " + fileSpec, LOGGER);
                         return false;
                     } else {
-                        log("checking file " + file.getCanonicalPath() + ": directory contains " + fileList.size() + " file(s) matching " + fileSpec, LOGGER);
+                        log("checking file " + file.getCanonicalPath() + ": directory contains " + fileList.size() + " file(s) matching " + fileSpec,
+                                LOGGER);
                         for (int i = 0; i < fileList.size(); i++) {
                             File checkFile = fileList.get(i);
                             log("found " + checkFile.getCanonicalPath(), LOGGER);
@@ -165,6 +167,7 @@ public class SOSFileSystemOperations {
                                 f.close();
                                 writable = true;
                             } catch (Exception e) {
+                                //
                             }
                             if (!writable) {
                                 log("file " + checkFile.getCanonicalPath() + ": cannot be written ", LOGGER);
@@ -207,8 +210,8 @@ public class SOSFileSystemOperations {
             final String minFileSize, final String maxFileSize, final int skipFirstFiles, final int skipLastFiles, final int minNumOfFiles,
             final int maxNumOfFiles, final Object objDummy) throws Exception {
         File filename = new File(file);
-        return existsFile(filename, fileSpec, fileSpecFlags, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles, skipLastFiles, minNumOfFiles,
-                maxNumOfFiles, LOGGER);
+        return existsFile(filename, fileSpec, fileSpecFlags, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles, skipLastFiles,
+                minNumOfFiles, maxNumOfFiles, LOGGER);
     }
 
     public boolean existsFile(final File file, final Object objDummy) throws Exception {
@@ -224,8 +227,10 @@ public class SOSFileSystemOperations {
     }
 
     public boolean existsFile(final File file, final String fileSpec, final int fileSpecFlags, final String minFileAge, final String maxFileAge,
-            final String minFileSize, final String maxFileSize, final int skipFirstFiles, final int skipLastFiles, final Object objDummy) throws Exception {
-        return existsFile(file, fileSpec, fileSpecFlags, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles, skipLastFiles, -1, -1, LOGGER);
+            final String minFileSize, final String maxFileSize, final int skipFirstFiles, final int skipLastFiles, final Object objDummy)
+            throws Exception {
+        return existsFile(file, fileSpec, fileSpecFlags, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles, skipLastFiles, -1, -1,
+                LOGGER);
     }
 
     public boolean existsFile(File file, final String fileSpec, final int fileSpecFlags, final String minFileAge, final String maxFileAge,
@@ -288,7 +293,7 @@ public class SOSFileSystemOperations {
             }
             String filename = file.getPath();
             filename = substituteAllDate(filename);
-            
+
             file = new File(filename);
             if (!file.exists()) {
                 log("checking file " + file.getAbsolutePath() + ": no such file or directory", LOGGER);
@@ -346,7 +351,8 @@ public class SOSFileSystemOperations {
                         log("checking file " + file.getCanonicalPath() + ": directory contains no files matching " + fileSpec, LOGGER);
                         return false;
                     } else {
-                        log("checking file " + file.getCanonicalPath() + ": directory contains " + fileList.size() + " file(s) matching " + fileSpec, LOGGER);
+                        log("checking file " + file.getCanonicalPath() + ": directory contains " + fileList.size() + " file(s) matching " + fileSpec,
+                                LOGGER);
                         for (int i = 0; i < fileList.size(); i++) {
                             File checkFile = fileList.get(i);
                             log("found " + checkFile.getCanonicalPath(), LOGGER);
@@ -385,15 +391,17 @@ public class SOSFileSystemOperations {
         return removeFile(file, fileSpec, flags, Pattern.CASE_INSENSITIVE, "0", "0", "-1", "-1", 0, 0, LOGGER);
     }
 
-    public boolean removeFile(final File file, final String fileSpec, final int flags, final int fileSpecFlags, final Object objDummy) throws Exception {
+    public boolean removeFile(final File file, final String fileSpec, final int flags, final int fileSpecFlags, final Object objDummy)
+            throws Exception {
         return removeFile(file, fileSpec, flags, fileSpecFlags, "0", "0", "-1", "-1", 0, 0, LOGGER);
     }
 
     public boolean removeFile(final File file, final String fileSpec, final int flags, final int fileSpecFlags, final String minFileAge,
             final String maxFileAge, final String minFileSize, final String maxFileSize, final int skipFirstFiles, final int skipLastFiles,
             final Object objDummy) throws Exception {
-        int nrOfRemovedObjects = removeFileCnt(file, fileSpec, flags, fileSpecFlags, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles,
-                skipLastFiles, LOGGER);
+        int nrOfRemovedObjects =
+                removeFileCnt(file, fileSpec, flags, fileSpecFlags, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles, skipLastFiles,
+                        LOGGER);
         return nrOfRemovedObjects > 0;
     }
 
@@ -654,22 +662,23 @@ public class SOSFileSystemOperations {
         return removeFile(new File(file), fileSpec, flags, LOGGER);
     }
 
-    public boolean removeFile(final String file, final String fileSpec, final int flags, final int fileSpecFlags, final Object objDummy) throws Exception {
+    public boolean removeFile(final String file, final String fileSpec, final int flags, final int fileSpecFlags, final Object objDummy)
+            throws Exception {
         return removeFile(new File(file), fileSpec, flags, fileSpecFlags, LOGGER);
     }
 
     public boolean removeFile(final String file, final String fileSpec, final int flags, final int fileSpecFlags, final String minFileAge,
             final String maxFileAge, final String minFileSize, final String maxFileSize, final int skipFirstFiles, final int skipLastFiles,
             final Object objDummy) throws Exception {
-        return removeFile(new File(file), fileSpec, flags, fileSpecFlags, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles, skipLastFiles,
-                LOGGER);
+        return removeFile(new File(file), fileSpec, flags, fileSpecFlags, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles,
+                skipLastFiles, LOGGER);
     }
 
     public int removeFileCnt(final String file, final String fileSpec, final int flags, final int fileSpecFlags, final String minFileAge,
             final String maxFileAge, final String minFileSize, final String maxFileSize, final int skipFirstFiles, final int skipLastFiles,
             final Object objDummy) throws Exception {
-        return removeFileCnt(new File(file), fileSpec, flags, fileSpecFlags, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles, skipLastFiles,
-                LOGGER);
+        return removeFileCnt(new File(file), fileSpec, flags, fileSpecFlags, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles,
+                skipLastFiles, LOGGER);
     }
 
     public boolean copyFile(final File source, final File target, final Object objDummy) throws Exception {
@@ -755,8 +764,8 @@ public class SOSFileSystemOperations {
             final String maxFileSize, final int skipFirstFiles, final int skipLastFiles, final Object objDummy) throws Exception {
         File sourceFile = new File(source);
         File targetFile = target == null ? null : new File(target);
-        return copyFile(sourceFile, targetFile, fileSpec, flags, fileSpecFlags, replacing, replacement, minFileAge, maxFileAge, minFileSize, maxFileSize,
-                skipFirstFiles, skipLastFiles, LOGGER);
+        return copyFile(sourceFile, targetFile, fileSpec, flags, fileSpecFlags, replacing, replacement, minFileAge, maxFileAge, minFileSize,
+                maxFileSize, skipFirstFiles, skipLastFiles, LOGGER);
     }
 
     public int copyFileCnt(final String source, final String target, final String fileSpec, final int flags, final int fileSpecFlags,
@@ -882,8 +891,8 @@ public class SOSFileSystemOperations {
             final String maxFileSize, final int skipFirstFiles, final int skipLastFiles, final Object objDummy) throws Exception {
         File sourceFile = new File(source);
         File targetFile = target == null ? null : new File(target);
-        return renameFile(sourceFile, targetFile, fileSpec, flags, fileSpecFlags, replacing, replacement, minFileAge, maxFileAge, minFileSize, maxFileSize,
-                skipFirstFiles, skipLastFiles, LOGGER);
+        return renameFile(sourceFile, targetFile, fileSpec, flags, fileSpecFlags, replacing, replacement, minFileAge, maxFileAge, minFileSize,
+                maxFileSize, skipFirstFiles, skipLastFiles, LOGGER);
     }
 
     public int renameFileCnt(final String source, final String target, final String fileSpec, final int flags, final int fileSpecFlags,
@@ -896,11 +905,12 @@ public class SOSFileSystemOperations {
                 maxFileSize, skipFirstFiles, skipLastFiles, mode, LOGGER);
     }
 
-    private boolean transferFile(final File source, final File target, final String fileSpec, final int flags, final int fileSpecFlags, final String replacing,
-            final String replacement, final String minFileAge, final String maxFileAge, final String minFileSize, final String maxFileSize,
-            final int skipFirstFiles, final int skipLastFiles, final String mode, final Object objDummy) throws Exception {
-        int nrOfTransferedFiles = transferFileCnt(source, target, fileSpec, flags, fileSpecFlags, replacing, replacement, minFileAge, maxFileAge, minFileSize,
-                maxFileSize, skipFirstFiles, skipLastFiles, mode, LOGGER);
+    private boolean transferFile(final File source, final File target, final String fileSpec, final int flags, final int fileSpecFlags,
+            final String replacing, final String replacement, final String minFileAge, final String maxFileAge, final String minFileSize,
+            final String maxFileSize, final int skipFirstFiles, final int skipLastFiles, final String mode, final Object objDummy) throws Exception {
+        int nrOfTransferedFiles =
+                transferFileCnt(source, target, fileSpec, flags, fileSpecFlags, replacing, replacement, minFileAge, maxFileAge, minFileSize,
+                        maxFileSize, skipFirstFiles, skipLastFiles, mode, LOGGER);
         return nrOfTransferedFiles > 0;
     }
 
@@ -1037,7 +1047,7 @@ public class SOSFileSystemOperations {
             if (target != null) {
                 targetFilename = substituteAllDate(target.getPath());
                 targetFilename = substituteAllDirectory(targetFilename, source.getPath());
-                 
+
                 target = new File(targetFilename);
             }
             if (create_dir && target != null && !target.exists()) {
@@ -1096,7 +1106,7 @@ public class SOSFileSystemOperations {
                         targetFilename = replaceGroups(targetFilename, replacing, replacement);
                         targetFilename = substituteAllDate(targetFilename);
                         targetFilename = substituteAllFilename(targetFilename, targetFile.getName());
-                        
+
                         targetFile = new File(targetFile.getParent() + "/" + targetFilename);
                     }
                 } catch (Exception re) {
@@ -1600,6 +1610,7 @@ public class SOSFileSystemOperations {
                 LOGGER.info(msg);
             }
         } catch (Exception e) {
+            //
         }
     }
 
@@ -1609,6 +1620,7 @@ public class SOSFileSystemOperations {
                 logger.debug(msg);
             }
         } catch (Exception e) {
+            //
         }
     }
 
@@ -1618,6 +1630,7 @@ public class SOSFileSystemOperations {
                 LOGGER.debug(msg);
             }
         } catch (Exception e) {
+            //
         }
     }
 
@@ -1627,6 +1640,7 @@ public class SOSFileSystemOperations {
                 LOGGER.debug(msg);
             }
         } catch (Exception e) {
+            //
         }
     }
 
@@ -1666,7 +1680,7 @@ public class SOSFileSystemOperations {
             targetFilename = replaceGroups(targetFilename, replacing, replacements.split(";"));
             targetFilename = substituteAllDate(targetFilename);
             targetFilename = substituteAllFilename(targetFilename, input);
-            
+
             return targetFilename;
         } catch (Exception e) {
             throw new JobSchedulerException("getReplacementFilename: " + e.getMessage());
@@ -1679,7 +1693,7 @@ public class SOSFileSystemOperations {
             byte[] bytes = new byte[(int) rwFile.length()];
             int i = 0;
             while ((bytes[i++] = (byte) rwFile.read()) != -1) {
-
+                //
             }
             rwFile.seek(0);
             for (i = 0; i < bytes.length; i++) {
@@ -1695,6 +1709,7 @@ public class SOSFileSystemOperations {
             try {
                 LOGGER.warn("Failed to wipe file: " + e);
             } catch (Exception ex) {
+                //
             }
             return false;
         }

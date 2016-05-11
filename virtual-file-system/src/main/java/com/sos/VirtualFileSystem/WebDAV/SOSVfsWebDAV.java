@@ -162,6 +162,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
                 try {
                     res.close();
                 } catch (Exception ex) {
+                    //
                 }
             }
         }
@@ -193,12 +194,14 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
             res = this.getResource(path);
             return res.isCollection();
         } catch (Exception e) {
+            //
         } finally {
             try {
                 if (res != null) {
                     res.close();
                 }
             } catch (Exception ex) {
+                //
             }
         }
         return false;
@@ -239,6 +242,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
                 try {
                     res.close();
                 } catch (Exception ex) {
+                    //
                 }
             }
         }
@@ -260,6 +264,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
                 try {
                     res.close();
                 } catch (Exception ex) {
+                    //
                 }
             }
         }
@@ -301,6 +306,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
                     res.close();
                 }
             } catch (Exception e) {
+                //
             }
         }
         return remoteFileSize;
@@ -396,6 +402,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
                     res.close();
                 }
             } catch (Exception e) {
+                //
             }
         }
     }
@@ -442,12 +449,13 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
                 dateTime = df.format(new Date(lm));
             }
         } catch (Exception ex) {
-
+            //
         } finally {
             if (res != null) {
                 try {
                     res.close();
                 } catch (Exception e) {
+                    //
                 }
             }
         }
@@ -468,6 +476,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
                     res.close();
                 }
             } catch (Exception e) {
+                //
             }
         }
     }
@@ -513,12 +522,14 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
                     res = res2;
                 }
             } catch (Exception e) {
+                //
             } finally {
                 try {
                     if (res2 != null) {
                         res2.close();
                     }
                 } catch (Exception e) {
+                    //
                 }
             }
         }

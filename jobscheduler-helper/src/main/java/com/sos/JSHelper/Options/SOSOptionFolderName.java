@@ -29,12 +29,9 @@ public class SOSOptionFolderName extends SOSOptionFileName {
             strValue = "";
         }
         String strLValue = super.Value();
-        if (IsNotEmpty()) {
-            if (strLValue.endsWith("/") || strLValue.endsWith("\\") || isDotFolder()) {
-            } else {
+        if (IsNotEmpty() && !(strLValue.endsWith("/") || strLValue.endsWith("\\") || isDotFolder())) {
                 strLValue = strLValue + "/";
             }
-        }
         return strLValue;
     }
 
@@ -45,8 +42,7 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 
     public File[] listFiles() {
         File[] objFL = this.JSFile().listFiles();
-        if (objFL != null) {
-        } else {
+        if (objFL == null) {
             throw new JobSchedulerException(String.format("No Files found for pathname '%1$s'", strValue));
         }
         return objFL;
@@ -73,6 +69,7 @@ public class SOSOptionFolderName extends SOSOptionFileName {
                 i++;
             }
         } catch (Exception e) {
+            //
         }
         return strRet;
     }
@@ -98,6 +95,7 @@ public class SOSOptionFolderName extends SOSOptionFileName {
                 i--;
             }
         } catch (Exception e) {
+            //
         }
         return strRet;
     }
@@ -116,8 +114,7 @@ public class SOSOptionFolderName extends SOSOptionFileName {
 
     @Override
     public String[] getAllProposals(String text) {
-        String[] proposals = SOSOptionFolderName.defaultProposals.keySet().toArray(new String[0]);
-        return proposals;
+        return SOSOptionFolderName.defaultProposals.keySet().toArray(new String[0]);
     }
 
 }

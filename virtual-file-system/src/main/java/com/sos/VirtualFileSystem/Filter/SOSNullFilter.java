@@ -86,7 +86,7 @@ public class SOSNullFilter extends JSJobUtilitiesClass<SOSFilterOptions> impleme
 
     @Override
     public void close() {
-
+        //
     }
 
     @Override
@@ -129,7 +129,7 @@ public class SOSNullFilter extends JSJobUtilitiesClass<SOSFilterOptions> impleme
 
     @Override
     public void open() {
-
+        //
     }
 
     @Override

@@ -10,8 +10,6 @@ import java.net.Authenticator;
 import java.net.InetSocketAddress;
 import java.net.PasswordAuthentication;
 import java.net.Proxy;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -157,7 +155,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 
     @Override
     public void close() {
-
+        //
     }
 
     @Override
@@ -173,7 +171,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 
     @Override
     public void closeInput() {
-
+        //
     }
 
     private void closeInput(InputStream objO) {
@@ -184,6 +182,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
                 LOGGER.debug("InputStream closed");
             }
         } catch (IOException e) {
+            //
         }
     }
 
@@ -196,6 +195,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
                 LOGGER.debug("OutputStream closed");
             }
         } catch (Exception e) {
+            //
         }
     }
 
@@ -450,6 +450,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
             x = cd(strT);
             LogReply();
         } catch (IOException e) {
+            //
         }
         return x;
     }
@@ -504,9 +505,6 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
             } else {
                 LOGGER.info("no valid response for FEAT command received: " + objFTPReply.toString());
             }
-            if (utf8Supported && 1 == 0) {
-                sendCommand("OPTS UTF8 ON");
-            }
             sendCommand("NOOP");
         }
     }
@@ -536,7 +534,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 
     @Override
     public void flush() {
-        // TO DO Auto-generated method stub
+        //
     }
 
     public void get(final String remoteFile, final String localFile) {
@@ -750,13 +748,11 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 
     @Override
     public Vector<ISOSVirtualFile> getFiles() {
-        // TO DO Auto-generated method stub
         return null;
     }
 
     @Override
     public Vector<ISOSVirtualFile> getFiles(final String string) {
-        // TO DO Auto-generated method stub
         return null;
     }
 
@@ -800,7 +796,6 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
             }
         } catch (Exception e) {
             RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
-        } finally {
         }
         return objFTPFile;
     }
@@ -812,7 +807,6 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 
     @Override
     public InputStream getInputStream() {
-        // TO DO Auto-generated method stub
         return null;
     }
 
@@ -821,8 +815,6 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         final String conMethodName = CLASS_NAME + "::getInputStream";
         InputStream objI = null;
         try {
-            if (modezSupported) {
-            }
             strFileName = strFileName.replaceAll("\\\\", "/");
             objI = Client().retrieveFileStream(strFileName);
             if (objI == null) {
@@ -858,7 +850,6 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 
     @Override
     public OutputStream getOutputStream() {
-        // TO DO Auto-generated method stub
         return null;
     }
 
@@ -895,13 +886,11 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 
     @Override
     public StringBuffer getStdErr() throws Exception {
-        // TO DO Auto-generated method stub
         return null;
     }
 
     @Override
     public StringBuffer getStdOut() throws Exception {
-        // TO DO Auto-generated method stub
         return null;
     }
 
@@ -917,6 +906,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
                 Client().sendCommand("NOOP");
                 isConnected = true;
             } catch (IOException e) {
+                //
             }
         }
         return isConnected;
@@ -989,6 +979,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
                 try {
                     doPostLoginOperations();
                 } catch (Exception e) {
+                    //
                 }
             } else {
                 LOGGER.info(SOSVfs_D_132.params(strUserName));
@@ -1084,12 +1075,12 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 
     @Override
     public void openInputFile(final String pstrFileName) {
-        // TO DO Auto-generated method stub
+        //
     }
 
     @Override
     public void openOutputFile(final String pstrFileName) {
-        // TO DO Auto-generated method stub
+        //
     }
 
     @Override
@@ -1157,11 +1148,9 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
             }
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_130.params("putfile"), e);
-        } finally {
         }
     }
 
-    @SuppressWarnings("null")
     @Override
     public long putFile(final String localFile, final OutputStream out) {
         if (out == null) {
@@ -1224,19 +1213,16 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 
     @Override
     public int read(final byte[] bteBuffer) {
-        // TO DO Auto-generated method stub
         return 0;
     }
 
     @Override
     public int read(final byte[] bteBuffer, final int intOffset, final int intLength) {
-        // TO DO Auto-generated method stub
         return 0;
     }
 
     @Override
     public boolean remoteIsWindowsShell() {
-        // TO DO Auto-generated method stub
         return false;
     }
 
@@ -1292,7 +1278,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 
     @Override
     public void setJSJobUtilites(final JSJobUtilities pobjJSJobUtilities) {
-        // TO DO Auto-generated method stub
+        //
     }
 
     @Override
@@ -1339,12 +1325,12 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 
     @Override
     public void write(final byte[] bteBuffer) {
-        // TO DO Auto-generated method stub
+        //
     }
 
     @Override
     public void write(final byte[] bteBuffer, final int intOffset, final int intLength) {
-
+        //
     }
 
     @Override

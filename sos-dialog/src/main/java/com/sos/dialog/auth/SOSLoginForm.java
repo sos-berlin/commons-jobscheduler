@@ -12,10 +12,6 @@ import com.sos.dialog.swtdesigner.SWTResourceManager;
 
 public class SOSLoginForm extends Composite {
 
-    /** Create the composite.
-     * 
-     * @param parent
-     * @param style */
     private Button btnOk;
     private Button btnCancel;
     private Label lblUser;
@@ -32,31 +28,24 @@ public class SOSLoginForm extends Composite {
     }
 
     private void createContent() {
-
         lblUser = new Label(this, SWT.NONE);
         lblUser.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
         lblUser.setText("User");
-
         user = new Text(this, SWT.BORDER);
         user.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-
         lblPassword = new Label(this, SWT.NONE);
         lblPassword.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
         lblPassword.setText("Password");
-
         password = new Text(this, SWT.BORDER + SWT.PASSWORD);
         password.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
         new Label(this, SWT.NONE);
-
         btnOk = new Button(this, SWT.NONE);
-
         GridData gd_btnOk = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
         gd_btnOk.widthHint = 91;
         gd_btnOk.minimumWidth = 100;
         btnOk.setLayoutData(gd_btnOk);
         btnOk.setText("Ok");
         this.getShell().setDefaultButton(btnOk);
-
         btnCancel = new Button(this, SWT.NONE);
         GridData gd_btnCancel = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
         gd_btnCancel.minimumWidth = 100;
@@ -67,7 +56,6 @@ public class SOSLoginForm extends Composite {
         new Label(this, SWT.NONE);
         new Label(this, SWT.NONE);
         new Label(this, SWT.NONE);
-
         lbMessage = new Label(this, SWT.NONE);
         lbMessage.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
         lbMessage.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.BOLD));
@@ -93,10 +81,6 @@ public class SOSLoginForm extends Composite {
     public Text getPassword() {
         return password;
     }
-
-    // public Button getBtnRememberMe() {
-    // return btnRememberMe;
-    // }
 
     public void setMsg(String msg) {
         lbMessage.setText(msg);

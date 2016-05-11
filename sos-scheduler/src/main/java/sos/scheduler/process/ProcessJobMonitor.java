@@ -36,6 +36,7 @@ public class ProcessJobMonitor extends ProcessBaseMonitor {
             try {
                 this.cleanupConfiguration();
             } catch (Exception e) {
+                //
             }
         }
     }

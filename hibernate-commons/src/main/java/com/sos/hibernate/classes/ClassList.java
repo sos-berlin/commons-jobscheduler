@@ -19,6 +19,7 @@ public class ClassList {
             Class c = classLoader.loadClass(className);
             add(c);
         } catch (ClassNotFoundException e) {
+            //
         }
     }
 

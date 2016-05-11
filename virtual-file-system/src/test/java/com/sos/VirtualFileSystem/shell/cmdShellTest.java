@@ -29,8 +29,9 @@ public class cmdShellTest {
     public void testExecuteSQLPlus() throws Exception {
         objShell = new cmdShell();
         int intCC = 0;
-        intCC = objShell.executeCommand("echo 1 | \"C:/oraclexe/app/oracle/product/11.2.0/server/bin/sqlplus.exe\" -S -L "
-                + "sys/scheduler@localhost as sysdba @c:/temp/mycmd.sql");
+        intCC =
+                objShell.executeCommand("echo 1 | \"C:/oraclexe/app/oracle/product/11.2.0/server/bin/sqlplus.exe\" -S -L "
+                        + "sys/scheduler@localhost as sysdba @c:/temp/mycmd.sql");
         LOGGER.info("intCC = " + intCC);
     }
 

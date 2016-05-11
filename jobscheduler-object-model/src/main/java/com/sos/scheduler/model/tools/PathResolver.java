@@ -48,6 +48,7 @@ public class PathResolver {
         try {
             result = getPath(basePath, relativeName, false);
         } catch (FileNotFoundException e) {
+            //
         }
         return result;
     }

@@ -633,25 +633,21 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
 
     @Override
     public SOSOptionString getalternative_account() {
-        // TO DO Auto-generated method stub
         return null;
     }
 
     @Override
     public SOSOptionHostName getalternative_host() {
-        // TO DO Auto-generated method stub
         return null;
     }
 
     @Override
     public SOSOptionString getalternative_passive_mode() {
-        // TO DO Auto-generated method stub
         return null;
     }
 
     @Override
     public SOSOptionPassword getalternative_password() {
-        // TO DO Auto-generated method stub
         return null;
     }
 
@@ -662,12 +658,12 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
 
     @Override
     public void setalternative_host(final SOSOptionHostName pAlternativeHost) {
-
+        //
     }
 
     @Override
     public void setalternative_password(final SOSOptionPassword pAlternativePassword) {
-
+        //
     }
 
     public SOSCredentialStoreImpl getCredentialStore() {

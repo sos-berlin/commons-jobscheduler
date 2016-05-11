@@ -50,11 +50,13 @@ public class JobSchedulerProcessSubprocessJob extends ProcessOrderJob {
             try {
                 this.cleanup();
             } catch (Exception e) {
+                //
             }
             if (subprocess != null) {
                 try {
                     subprocess.close();
                 } catch (Exception e) {
+                    //
                 }
             }
         }

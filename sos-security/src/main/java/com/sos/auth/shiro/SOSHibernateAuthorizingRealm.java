@@ -1,6 +1,5 @@
 package com.sos.auth.shiro;
 
-import java.io.File;
 import java.util.List;
 
 import org.apache.shiro.authc.AuthenticationException;
@@ -13,10 +12,8 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 
-import com.sos.auth.shiro.db.SOSUser2RoleDBItem;
 import com.sos.auth.shiro.db.SOSUserDBItem;
 import com.sos.auth.shiro.db.SOSUserDBLayer;
-import com.sos.auth.shiro.db.SOSUserRightDBItem;
 
 public class SOSHibernateAuthorizingRealm extends AuthorizingRealm {
 
@@ -30,7 +27,6 @@ public class SOSHibernateAuthorizingRealm extends AuthorizingRealm {
 
     public boolean supports(AuthenticationToken token) {
         SOSHibernateAuthorizing authorizing = new SOSHibernateAuthorizing();
-        // authorizing.setHibernateConfigurationFile(hibernateConfigurationFile);
         authorizing.setConfigurationFileName(hibernateConfigurationFile);
         setAuthorizing(authorizing);
         return true;
@@ -50,12 +46,13 @@ public class SOSHibernateAuthorizingRealm extends AuthorizingRealm {
         try {
             java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
             byte[] array = md.digest(md5.getBytes());
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             for (int i = 0; i < array.length; ++i) {
                 sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
             }
             return sb.toString();
         } catch (java.security.NoSuchAlgorithmException e) {
+            //
         }
         return null;
     }

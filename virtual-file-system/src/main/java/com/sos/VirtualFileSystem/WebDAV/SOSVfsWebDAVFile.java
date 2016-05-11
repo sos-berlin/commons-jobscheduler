@@ -12,29 +12,15 @@ public class SOSVfsWebDAVFile extends SOSVfsTransferFileBaseClass {
 
     private String strFileName = null;
 
-    /** \brief SOSVfsWebDAVFile
-     *
-     * \details
-     *
-     * @param pstrFileName */
     public SOSVfsWebDAVFile(final String pstrFileName) {
         super(pstrFileName);
         strFileName = pstrFileName;
     }
 
-    /** \brief read
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param bteBuffer
-     * @return */
     @Override
     public int read(final byte[] bteBuffer) {
         try {
             InputStream is = this.getFileInputStream();
-
             if (is == null) {
                 throw new JobSchedulerException(SOSVfs_E_177.get());
             }
@@ -45,16 +31,6 @@ public class SOSVfsWebDAVFile extends SOSVfsTransferFileBaseClass {
         }
     }
 
-    /** \brief read
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param bteBuffer
-     * @param intOffset
-     * @param intLength
-     * @return */
     @Override
     public int read(final byte[] bteBuffer, final int intOffset, final int intLength) {
         try {
@@ -68,18 +44,6 @@ public class SOSVfsWebDAVFile extends SOSVfsTransferFileBaseClass {
             return 0;
         }
     }
-
-    /** \brief write
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param bteBuffer
-     * @param intOffset
-     * @param intLength */
-
-    // private final OutputStream os = null;
 
     @Override
     public void write(final byte[] bteBuffer, final int intOffset, final int intLength) {

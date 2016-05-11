@@ -23,5 +23,5 @@ public class ClassListTest {
             assertTrue(EXPECTED_CLASSES.contains(c.getName()));
         }
     }
-    
+
 }

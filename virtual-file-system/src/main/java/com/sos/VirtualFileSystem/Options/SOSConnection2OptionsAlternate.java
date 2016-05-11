@@ -30,18 +30,17 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperClass {
 
-    public boolean isSource = false;
-
     private static final long serialVersionUID = 5924032437179660014L;
+    private static final Logger LOGGER = Logger.getLogger(SOSConnection2OptionsAlternate.class);
     private final String className = this.getClass().getSimpleName();
     private KeePassDataBase keePassDb = null;
     private KeePassDataBaseV1 kdb1 = null;
-    private final Logger LOGGER = Logger.getLogger(this.getClass());
     private String strAlternativePrefix = "";
+    public boolean isSource = false;
 
     @JSOptionDefinition(name = "PreTransferCommands", description = "FTP commands, which has to be executed before the transfer started.", key = "PreTransferCommands", type = "SOSOptionCommandString", mandatory = false)
-    public SOSOptionCommandString PreTransferCommands = new SOSOptionCommandString(this, className + ".pre_transfer_commands", "FTP commands, which has to be executed before the transfer started.", "", "", false);
-
+    public SOSOptionCommandString PreTransferCommands = new SOSOptionCommandString(this, className + ".pre_transfer_commands",
+            "FTP commands, which has to be executed before the transfer started.", "", "", false);
     public SOSOptionCommandString PreFtpCommands = (SOSOptionCommandString) PreTransferCommands.SetAlias("pre_transfer_commands");
 
     public String getPreTransferCommands() {
@@ -54,8 +53,8 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
     }
 
     @JSOptionDefinition(name = "PostTransferCommands", description = "FTP commands, which has to be executed after the transfer ended.", key = "PostTransferCommands", type = "SOSOptionCommandString", mandatory = false)
-    public SOSOptionCommandString PostTransferCommands = new SOSOptionCommandString(this, className + ".post_transfer_Commands", "FTP commands, which has to be executed after the transfer ended.", "", "", false);
-
+    public SOSOptionCommandString PostTransferCommands = new SOSOptionCommandString(this, className + ".post_transfer_Commands",
+            "FTP commands, which has to be executed after the transfer ended.", "", "", false);
     public SOSOptionCommandString PostFtpCommands = (SOSOptionCommandString) PostTransferCommands.SetAlias("post_Transfer_commands");
 
     public String getPostTransferCommands() {
@@ -68,13 +67,17 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
     }
 
     @JSOptionDefinition(name = "post_transfer_commands_on_error", description = "Commands, which has to be executed after the transfer ended with errors.", key = "post_transfer_commands_on_error", type = "SOSOptionCommandString", mandatory = false)
-    public SOSOptionCommandString post_transfer_commands_on_error = new SOSOptionCommandString(this, className + ".post_transfer_commands_on_error", "Commands, which has to be executed after the transfer ended with errors.", "", "", false);
+    public SOSOptionCommandString post_transfer_commands_on_error = new SOSOptionCommandString(this, className + ".post_transfer_commands_on_error",
+            "Commands, which has to be executed after the transfer ended with errors.", "", "", false);
 
-    @JSOptionDefinition(name = "post_transfer_commands_final", description = "Commands, which has to be executed always after the transfer ended independent of the transfer status.", key = "post_transfer_commands_final", type = "SOSOptionCommandString", mandatory = false)
-    public SOSOptionCommandString post_transfer_commands_final = new SOSOptionCommandString(this, className + ".post_transfer_commands_final", "Commands, which has to be executed always after the transfer ended independent of the transfer status.", "", "", false);
+    @JSOptionDefinition(name = "post_transfer_commands_final", description = "Commands, which has to be executed always after the transfer ended independent of "
+            + "the transfer status.", key = "post_transfer_commands_final", type = "SOSOptionCommandString", mandatory = false)
+    public SOSOptionCommandString post_transfer_commands_final = new SOSOptionCommandString(this, className + ".post_transfer_commands_final",
+            "Commands, which has to be executed always after the transfer ended independent of the transfer status.", "", "", false);
 
     @JSOptionDefinition(name = "IgnoreCertificateError", description = "Ignore a SSL Certificate Error", key = "IgnoreCertificateError", type = "SOSOptionBoolean", mandatory = true)
-    public SOSOptionBoolean IgnoreCertificateError = new SOSOptionBoolean(this, className + ".IgnoreCertificateError", "Ignore a SSL Certificate Error", "true", "true", true);
+    public SOSOptionBoolean IgnoreCertificateError = new SOSOptionBoolean(this, className + ".IgnoreCertificateError",
+            "Ignore a SSL Certificate Error", "true", "true", true);
 
     public boolean getIgnoreCertificateError() {
         return IgnoreCertificateError.value();
@@ -86,7 +89,8 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
     }
 
     @JSOptionDefinition(name = "AlternateOptionsUsed", description = "Alternate Options used for connection and/or authentication", key = "AlternateOptionsUsed", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean AlternateOptionsUsed = new SOSOptionBoolean(this, className + ".AlternateOptionsUsed", "Alternate Options used for connection and/or authentication", "false", "false", false);
+    public SOSOptionBoolean AlternateOptionsUsed = new SOSOptionBoolean(this, className + ".AlternateOptionsUsed",
+            "Alternate Options used for connection and/or authentication", "false", "false", false);
 
     public String getAlternateOptionsUsed() {
         return AlternateOptionsUsed.Value();
@@ -125,18 +129,12 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
     }
 
     public SOSConnection2OptionsAlternate(final HashMap<String, String> settings, final String prefix) throws Exception {
-        // super(pobjJSSettings);
-        // wrong, because every options which has not the prefix will be set as
-        // well.
         strAlternativePrefix = prefix;
         setAllOptions(settings, strAlternativePrefix);
         setChildClasses(settings, prefix);
     }
 
     public void setChildClasses(final HashMap<String, String> settings, final String prefix) throws Exception {
-        // super(pobjJSSettings);
-        // wrong, because every options which has not the prefix will be set as
-        // well.
         strAlternativePrefix = prefix;
         getCredentialStore().setAllOptions(settings, strAlternativePrefix);
         getAlternativeOptions().setAllOptions(settings, "alternative_" + strAlternativePrefix);
@@ -189,7 +187,6 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
             }
             File keePassDataBase = new File(objCredentialStoreOptions.CredentialStore_FileName.Value());
             try {
-                // TODO keePassDB als Pool um evtl. mehrfachladen zu vermeiden.
                 keePassDb = KeePassDataBaseManager.openDataBase(keePassDataBase, keyFile, keyPassword);
             } catch (Exception e) {
                 LOGGER.error(e.getLocalizedMessage());
@@ -200,26 +197,12 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
             if (entry == null) {
                 throw new CredentialStoreKeyNotFound(objCredentialStoreOptions);
             }
-
             Date expDate = entry.ExpirationDate();
             if (new Date().after(expDate)) {
                 throw new CredentialStoreEntryExpired(expDate);
             }
-
             boolean hideValuesFromCredentialStore = false;
-            if (entry.Url().length() > 0) {
-                // Possible Elements of an URL are:
-                //
-                // http://hans:geheim@www.example.org:80/demo/example.cgi?land=de&stadt=aa#geschichte
-                // | | | | | | | |
-                // | | | host | url-path searchpart fragment
-                // | | password port
-                // | user
-                // protocol
-                //
-                // ftp://<user>:<password>@<host>:<port>/<url-path>;type=<typecode>
-                // see
-                // http://docs.oracle.com/javase/7/docs/api/java/net/URL.html
+            if (!entry.Url().isEmpty()) {
                 try {
                     URL url = new URL(entry.Url());
                     setIfNotDirty(host, url.getHost());
@@ -236,10 +219,9 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
                         setIfNotDirty(password, arr[1]);
                     }
                     String entryAuthority = url.getAuthority();
-                    arr = entryAuthority.split("@"); // user:pw host
+                    arr = entryAuthority.split("@");
                 } catch (MalformedURLException e) {
-                    // not a valid url. ignore it, because it could be a host
-                    // name only
+                    //
                 }
             }
             if (isNotEmpty(entry.UserName())) {
@@ -255,7 +237,6 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
                 host.setHideValue(hideValuesFromCredentialStore);
             }
             entry.ExpirationDate();
-
             if (HostName.isNotDirty()) {
                 HostName.Value(entry.getUrl().toString());
             }
@@ -265,11 +246,9 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
                     fleO.deleteOnExit();
                 }
             }
-
             if (objCredentialStoreOptions.CredentialStore_ProcessNotesParams.isTrue()) {
                 CommandLineArgs(entry.getNotesText());
             }
-
         }
     }
 
@@ -308,7 +287,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
         if (AlternateOptionsUsed.isTrue()) {
             return false;
         }
-        if (protocol.Value().equalsIgnoreCase("local")) {
+        if ("local".equalsIgnoreCase(protocol.Value())) {
             return true;
         }
         if (host.isNotDirty() || host.IsEmpty()) {
@@ -322,4 +301,5 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
         }
         return true;
     }
+
 }

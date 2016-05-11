@@ -476,6 +476,7 @@ abstract public class SOSFTPCommand {
             try {
                 getLogger().warn(e.getMessage());
             } catch (Exception ex) {
+                //
             }
             return false;
         }
@@ -778,6 +779,7 @@ abstract public class SOSFTPCommand {
                     arguments.put("remote_host_ip", java.net.InetAddress.getByName(host).getHostAddress());
                 }
             } catch (java.net.UnknownHostException uhe) {
+                //
             }
             if (!writeBannerHeader && !sosString.parseToString(arguments, conSettingOPERATION).startsWith("install")) {
                 if (banner) {
@@ -1304,7 +1306,7 @@ abstract public class SOSFTPCommand {
             try {
                 getLogger().warn("error deleting temporary directory, cause: " + e.toString());
             } catch (Exception ex) {
-
+                //
             }
         }
         return true;
@@ -1777,9 +1779,10 @@ abstract public class SOSFTPCommand {
                 for (int j = 0; transactionalHistoryFile != null && j < transactionalHistoryFile.size(); j++) {
                     String hist = sosString.parseToString(transactionalHistoryFile.get(j));
                     if (hasError) {
-                        hist = hist.replaceAll(";success;;", ";error;"
-                                + clearCRLF(getLogger().getError() != null && !getLogger().getError().isEmpty() ? getLogger().getError() : getLogger()
-                                        .getWarning()) + ";");
+                        hist =
+                                hist.replaceAll(";success;;", ";error;"
+                                        + clearCRLF(getLogger().getError() != null && !getLogger().getError().isEmpty() ? getLogger().getError()
+                                                : getLogger().getWarning()) + ";");
                     }
                     history.write(hist);
                     history.newLine();
@@ -2255,6 +2258,7 @@ abstract public class SOSFTPCommand {
                     addText(buff, len);
                 }
             } catch (Exception e) {
+                //
             }
         }
 
@@ -2359,6 +2363,7 @@ abstract public class SOSFTPCommand {
             try {
                 intIndex = new Integer(strFileSpecIndex);
             } catch (NumberFormatException e) {
+                //
             }
             if (intIndex > 0) {
                 flgMultipleFileSpecs = true;
@@ -2651,6 +2656,7 @@ abstract public class SOSFTPCommand {
             try {
                 logger.warn("error in doPostTransactionalOnSuccess, cause: " + e.toString());
             } catch (Exception ex) {
+                //
             }
             doPostTransactionalOnError();
             return false;
@@ -2670,6 +2676,7 @@ abstract public class SOSFTPCommand {
             try {
                 logger.warn("error in doPostTransactionalOnError, cause: " + e.toString());
             } catch (Exception ex) {
+                //
             }
         } finally {
             banner = true;
@@ -3080,6 +3087,7 @@ abstract public class SOSFTPCommand {
                 }
             }
         } catch (Exception e) {
+            //
         }
         this.getLogger().debug(String.format(".. get Parameter '%1$s' with value '%2$s', default is '%3$s'", pstrParamName, strVal, pstrDefaultvalue));
         if (!strVal.isEmpty()) {

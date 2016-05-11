@@ -99,8 +99,10 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
                     }
                     return bSuccess;
                 } else if (schedulerParams.get("parent_order_id") != null) {
-                    String state = spooler.variables().var( "terminated_cause_max_order_setback_"
-                        + normalize(sosString.parseToString(schedulerParams.get("ftp_parent_order_id"))));
+                    String state =
+                            spooler.variables().var(
+                                    "terminated_cause_max_order_setback_"
+                                            + normalize(sosString.parseToString(schedulerParams.get("ftp_parent_order_id"))));
                     if ("1".equals(state)) {
                         return false;
                     }
@@ -120,8 +122,9 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
                 String remoteDir = sosString.parseToString(schedulerParams.get("remoteDir"));
                 if (parallelTransfer && !isFilePath) {
                     schedulerParams.put("skip_transfer", "yes");
-                    SOSConfiguration con = new SOSConfiguration(null, schedulerParams, sosString.parseToString(schedulerParams.get("settings")),
-                        sosString.parseToString(schedulerParams.get("profile")), null, new SOSSchedulerLogger(spooler_log));
+                    SOSConfiguration con =
+                            new SOSConfiguration(null, schedulerParams, sosString.parseToString(schedulerParams.get("settings")),
+                                    sosString.parseToString(schedulerParams.get("profile")), null, new SOSSchedulerLogger(spooler_log));
                     con.checkConfigurationItems();
                     SOSFTPCommandReceive ftpCommand = new SOSFTPCommandReceive(con, new SOSSchedulerLogger(spooler_log));
                     ftpCommand.setSchedulerJob(this);
@@ -139,7 +142,8 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
                             if (matcher.find()) {
                                 Variable_set newParams = params;
                                 newParams.set_var(VARNAME_FTP_FILE_PATH, (remoteDir.endsWith("/") || remoteDir.endsWith("\\") ? remoteDir : remoteDir
-                                        + "/") + fileName);
+                                        + "/")
+                                        + fileName);
                                 spooler_log.info("launching job for parallel transfer with parameter: ftp_file_path "
                                         + (remoteDir.endsWith("/") || remoteDir.endsWith("\\") ? remoteDir : remoteDir + "/") + fileName);
                                 spooler.job(spooler_task.job().name()).start(params);
@@ -160,15 +164,17 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
                                     newParams.merge(params);
                                 }
                                 newParams.set_var(VARNAME_FTP_FILE_PATH, (remoteDir.endsWith("/") || remoteDir.endsWith("\\") ? remoteDir : remoteDir
-                                        + "/") + fileName);
+                                        + "/")
+                                        + fileName);
                                 newParams.set_var("ftp_parent_order_id", spooler_task.order().id());
                                 newParams.set_var("ftp_order_self_destruct", "1");
                                 Order newOrder = spooler.create_order();
                                 newOrder.set_state(spooler_task.order().state());
                                 newOrder.set_params(newParams);
                                 spooler_task.order().job_chain().add_order(newOrder);
-                                getLogger().info("launching order for parallel transfer with parameter: ftp_file_path "
-                                        + (remoteDir.endsWith("/") || remoteDir.endsWith("\\") ? remoteDir : remoteDir + "/") + fileName);
+                                getLogger().info(
+                                        "launching order for parallel transfer with parameter: ftp_file_path "
+                                                + (remoteDir.endsWith("/") || remoteDir.endsWith("\\") ? remoteDir : remoteDir + "/") + fileName);
                                 spooler.variables().set_var("ftp_order",
                                         normalize(spooler_task.order().id()) + "." + normalize(newOrder.id()) + "." + "0");
                                 spooler.variables().set_var(
@@ -184,8 +190,9 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
                         return false;
                     }
                 }
-                SOSConfiguration con = new SOSConfiguration(null, schedulerParams, sosString.parseToString(schedulerParams.get("settings")),
-                        sosString.parseToString(schedulerParams.get("profile")), null, new SOSSchedulerLogger(spooler_log));
+                SOSConfiguration con =
+                        new SOSConfiguration(null, schedulerParams, sosString.parseToString(schedulerParams.get("settings")),
+                                sosString.parseToString(schedulerParams.get("profile")), null, new SOSSchedulerLogger(spooler_log));
                 con.checkConfigurationItems();
                 sos.net.sosftp.SOSFTPCommandReceive ftpCommand = new sos.net.sosftp.SOSFTPCommandReceive(con, new SOSSchedulerLogger(spooler_log));
                 ftpCommand.setSchedulerJob(this);
@@ -201,7 +208,8 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
             } catch (Exception e) {
                 rc = false;
                 if (parallelTransfer && isFilePath && spooler_job.order_queue() != null) {
-                    spooler.variables().set_var("ftp_check_receive_" + normalize(normalize(params.var("ftp_parent_order_id"))) + "."
+                    spooler.variables().set_var(
+                            "ftp_check_receive_" + normalize(normalize(params.var("ftp_parent_order_id"))) + "."
                                     + normalize(spooler_task.order().id()), "2");
                 }
                 spooler_job.set_state_text("could not process file transfer: " + e);
@@ -300,9 +308,9 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
             if (fileNotificationTo != null && !fileNotificationTo.isEmpty()) {
                 if (fileNotificationSubject == null || fileNotificationSubject.isEmpty()) {
                     if (spooler_job.order_queue() != null) {
-                        fileNotificationSubject = "[info] Job Chain: " + spooler_task.order().job_chain().name() + ", Order: " 
-                                + spooler_task.order().id() + ", Job: " + spooler_job.name() + " (" + spooler_job.title() + "), Task: " 
-                                + spooler_task.id();
+                        fileNotificationSubject =
+                                "[info] Job Chain: " + spooler_task.order().job_chain().name() + ", Order: " + spooler_task.order().id() + ", Job: "
+                                        + spooler_job.name() + " (" + spooler_job.title() + "), Task: " + spooler_task.id();
                     } else {
                         fileNotificationSubject = "[info] Job: " + spooler_job.name() + " (" + spooler_job.title() + "), Task: " + spooler_task.id();
                     }
@@ -319,9 +327,9 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
             if (fileZeroByteNotificationTo != null && !fileZeroByteNotificationTo.isEmpty()) {
                 if (fileZeroByteNotificationSubject == null || fileZeroByteNotificationSubject.isEmpty()) {
                     if (spooler_job.order_queue() != null) {
-                        fileZeroByteNotificationSubject = "[warning] Job Chain: " + spooler_task.order().job_chain().name() + ", Order: " 
-                                + spooler_task.order().id() + ", Job: " + spooler_job.name() + " (" + spooler_job.title() + "), Task: " 
-                                + spooler_task.id();
+                        fileZeroByteNotificationSubject =
+                                "[warning] Job Chain: " + spooler_task.order().job_chain().name() + ", Order: " + spooler_task.order().id()
+                                        + ", Job: " + spooler_job.name() + " (" + spooler_job.title() + "), Task: " + spooler_task.id();
                     } else {
                         fileZeroByteNotificationSubject =
                                 "[warning] Job: " + spooler_job.name() + " (" + spooler_job.title() + "), Task: " + spooler_task.id();

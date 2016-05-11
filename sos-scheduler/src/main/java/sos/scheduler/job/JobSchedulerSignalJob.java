@@ -143,7 +143,8 @@ public class JobSchedulerSignalJob extends Job_impl {
                     spooler_log.info(".. job parameter [scheduler_remote_order_job_chain]: " + this.getJobChain());
                 }
             }
-            if (spooler_task.params().var("scheduler_remote_order_priority") != null && !spooler_task.params().var("scheduler_remote_order_priority").isEmpty()) {
+            if (spooler_task.params().var("scheduler_remote_order_priority") != null
+                    && !spooler_task.params().var("scheduler_remote_order_priority").isEmpty()) {
                 this.setPriority(spooler_task.params().var("scheduler_remote_order_priority"));
                 if (logValue) {
                     spooler_log.info(".. job parameter [scheduler_remote_order_priority]: " + this.getPriority());
@@ -163,7 +164,8 @@ public class JobSchedulerSignalJob extends Job_impl {
                     spooler_log.info(".. job parameter [scheduler_remote_order_title]: " + this.getTitle());
                 }
             }
-            if (spooler_task.params().var("scheduler_remote_order_run_time") != null && !spooler_task.params().var("scheduler_remote_order_run_time").isEmpty()) {
+            if (spooler_task.params().var("scheduler_remote_order_run_time") != null
+                    && !spooler_task.params().var("scheduler_remote_order_run_time").isEmpty()) {
                 this.setRunTime(spooler_task.params().var("scheduler_remote_order_run_time"));
                 if (logValue) {
                     spooler_log.info(".. job parameter [scheduler_remote_order_run_time]: " + this.getRunTime());
@@ -275,8 +277,9 @@ public class JobSchedulerSignalJob extends Job_impl {
                 ArrayList listOfParams = sosConnection.getArray(selParameters);
                 for (int i = 0; i < listOfParams.size(); i++) {
                     HashMap h = (HashMap) listOfParams.get(i);
-                    String value = !sosString.parseToString(h.get("value")).isEmpty() ? sosString.parseToString(h.get("value")) : sosString.parseToString(h
-                            .get("long_value"));
+                    String value =
+                            !sosString.parseToString(h.get("value")).isEmpty() ? sosString.parseToString(h.get("value"))
+                                    : sosString.parseToString(h.get("long_value"));
                     request += "<param name=\"" + h.get("name") + "\" value=\"" + value + "\"/>";
                 }
                 request += "</params>";
@@ -314,6 +317,7 @@ public class JobSchedulerSignalJob extends Job_impl {
                     sosConnection.executeUpdate(upStr);
                     sosConnection.commit();
                 } catch (Exception x) {
+                    //
                 }
             }
             return false;
@@ -499,11 +503,13 @@ public class JobSchedulerSignalJob extends Job_impl {
             try {
                 sosConnection.disconnect();
             } catch (Exception x) {
+                //
             }
         }
         try {
             showSummary();
         } catch (Exception x) {
+            //
         }
     }
 

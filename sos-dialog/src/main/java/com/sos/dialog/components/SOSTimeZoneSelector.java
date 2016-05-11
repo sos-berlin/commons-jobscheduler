@@ -21,7 +21,6 @@ import org.joda.time.DateTimeZone;
 
 public class SOSTimeZoneSelector {
 
-    private Logger logger = Logger.getLogger(SOSTimeZoneSelector.class);
     private Button btnOk;
     private CCombo cbTimeZone;
     private String timeZone;
@@ -36,9 +35,7 @@ public class SOSTimeZoneSelector {
         this.timeZone = timeZone;
         Display display = Display.getDefault();
         Shell shell = showForm(display, dialogShell, timeZone);
-
         new Label(dialogShell, SWT.NONE);
-
         while (!shell.isDisposed()) {
             if (!display.readAndDispatch()) {
                 display.sleep();
@@ -47,13 +44,11 @@ public class SOSTimeZoneSelector {
         return this.timeZone;
     }
 
-    /** @wbp.parser.entryPoint */
     private Shell showForm(final Display display, Shell parentShell, String timeZone) {
         dialogShell = new Shell(parentShell, SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.OK | SWT.APPLICATION_MODAL);
         dialogShell.setMinimumSize(new Point(200, 100));
         dialogShell.setSize(200, 100);
         dialogShell.setLayout(new GridLayout(2, false));
-
         parent = dialogShell;
         createContent();
         cbTimeZone.setText(timeZone);
@@ -70,11 +65,9 @@ public class SOSTimeZoneSelector {
     }
 
     private void createContent() {
-
         Label lblExpressionFor = new Label(dialogShell, SWT.NONE);
         lblExpressionFor.setText("Timezone");
         new Label(dialogShell, SWT.NONE);
-
         cbTimeZone = new CCombo(parent, SWT.BORDER);
         GridData gdTimeZone = new GridData(SWT.LEFT, SWT.FILL, false, false, 1, 1);
         gdTimeZone.widthHint = 200;

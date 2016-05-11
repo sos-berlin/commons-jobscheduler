@@ -95,6 +95,7 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
                     this.getSshConnection().close();
                     this.setSshConnection(null);
                 } catch (Exception ex) {
+                    //
                 }
             }
             throw new Exception(e.getMessage(), e);
@@ -112,8 +113,9 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
                 if (objCO.getProxy_user().IsEmpty()) {
                     objProxy = new HTTPProxyData(objCO.getProxy_host().Value(), objCO.getProxy_port().value());
                 } else {
-                    objProxy = new HTTPProxyData(objCO.getProxy_host().Value(), objCO.getProxy_port().value(), objCO.getProxy_user().Value(), objCO
-                            .getProxy_password().Value());
+                    objProxy =
+                            new HTTPProxyData(objCO.getProxy_host().Value(), objCO.getProxy_port().value(), objCO.getProxy_user().Value(),
+                                    objCO.getProxy_password().Value());
                 }
                 this.getSshConnection().setProxyData(objProxy);
             }
@@ -124,6 +126,7 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
             try {
                 this.setSshConnection(null);
             } catch (Exception ex) {
+                //
             }
             throw e;
         }
@@ -147,6 +150,7 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
         try {
             return psftpClient.stat(filename).isDirectory();
         } catch (Exception e) {
+            //
         }
         return false;
     }
@@ -166,14 +170,6 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
         } catch (Exception e) {
             return 0;
         }
-    }
-
-    private String normalizePath(final String path) throws Exception {
-        String normalizedPath = path.replaceAll("\\\\", "/");
-        while (normalizedPath.endsWith("\\") || normalizedPath.endsWith("/")) {
-            normalizedPath = normalizedPath.substring(0, normalizedPath.length() - 1);
-        }
-        return normalizedPath;
     }
 
     protected Connection getSshConnection() {
@@ -406,6 +402,7 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
                         fis.close();
                         fis = null;
                     } catch (Exception ex) {
+                        //
                     }
                 }
             }
@@ -451,7 +448,7 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
 
     @Override
     public void CloseSession() throws Exception {
-
+        //
     }
 
     @Override
@@ -636,6 +633,7 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
                     addText(buff, len);
                 }
             } catch (Exception e) {
+                //
             }
         }
 
@@ -646,19 +644,16 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
 
     @Override
     public SOSFileList dir(final SOSFolderName pobjFolderName) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public ISOSVirtualFolder mkdir(final SOSFolderName pobjFolderName) throws IOException {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public boolean rmdir(final SOSFolderName pobjFolderName) throws IOException {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -670,7 +665,7 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
 
     @Override
     public void setJSParam(final String pstrKey, final String pstrValue) {
-
+        //
     }
 
     @Override
@@ -700,13 +695,11 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
 
     @Override
     public SOSFileList dir(final String pathname, final int flag) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public ISOSConnection Connect(final SOSConnection2OptionsAlternate pobjConnectionOptions) throws Exception {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -717,28 +710,27 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
 
     @Override
     public void setStateText(final String pstrStateText) {
-        // TODO Auto-generated method stub
+        //
     }
 
     @Override
     public void doPostLoginOperations() {
-        // TODO Auto-generated method stub
+        //
     }
 
     @Override
     public void setCC(final int pintCC) {
-        // TODO Auto-generated method stub
+        //
     }
 
     @Override
     public ISOSConnection Connect(final ISOSDataProviderOptions pobjConnectionOptions) throws Exception {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public void setNextNodeState(final String pstrNodeName) {
-        // TODO Auto-generated method stub
+        //
     }
 
     @Override

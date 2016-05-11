@@ -9,8 +9,8 @@ public class SOSOptionTimeHorizonTest {
 
     private static final Logger LOGGER = Logger.getLogger(SOSOptionTimeHorizonTest.class);
 
-    public SOSOptionTimeHorizon timeHorizon = new SOSOptionTimeHorizon(null, "SOSOptionTimeHorizonTest.variablename", "OptionDescription", "1:00:00:00", 
-            "1:00:00:00", true);
+    public SOSOptionTimeHorizon timeHorizon = new SOSOptionTimeHorizon(null, "SOSOptionTimeHorizonTest.variablename", "OptionDescription",
+            "1:00:00:00", "1:00:00:00", true);
 
     @Test
     public final void testValueString() {

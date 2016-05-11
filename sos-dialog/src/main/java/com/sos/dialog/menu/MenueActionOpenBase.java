@@ -31,6 +31,7 @@ public class MenueActionOpenBase extends MenueActionBase {
     }
 
     protected void executeOpen() {
-
+        //
     }
+    
 }

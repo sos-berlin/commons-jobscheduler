@@ -109,10 +109,11 @@ public class JobSchedulerProcessSendMailJob extends ProcessOrderJob {
                     if (this.getParameters().value("attachment") != null && !this.getParameters().value("attachment").isEmpty()) {
                         attachments = this.getParameters().value("attachment").split(";");
                     }
-                    if (this.getParameters().value("cleanup_attachment") != null && !this.getParameters().value("cleanup_attachment").isEmpty()
+                    if (this.getParameters().value("cleanup_attachment") != null
+                            && !this.getParameters().value("cleanup_attachment").isEmpty()
                             && ("1".equals(this.getParameters().value("cleanup_attachment"))
-                            || "true".equalsIgnoreCase(this.getParameters().value("cleanup_attachment"))
-                            || "yes".equalsIgnoreCase(this.getParameters().value("cleanup_attachment")))) {
+                                    || "true".equalsIgnoreCase(this.getParameters().value("cleanup_attachment")) || "yes".equalsIgnoreCase(this.getParameters().value(
+                                    "cleanup_attachment")))) {
                         cleanupAttachment = true;
                     }
                 } catch (Exception e) {
@@ -181,6 +182,7 @@ public class JobSchedulerProcessSendMailJob extends ProcessOrderJob {
             try {
                 this.cleanup();
             } catch (Exception e) {
+                //
             }
         }
     }

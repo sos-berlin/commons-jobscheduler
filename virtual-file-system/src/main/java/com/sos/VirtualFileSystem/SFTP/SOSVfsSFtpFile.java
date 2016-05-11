@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
 
@@ -20,24 +19,19 @@ import com.trilead.ssh2.SFTPv3FileHandle;
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsSFtpFile extends SOSVfsCommonFile {
 
-    private final String conClassName = "SOSVfsSFtpFile";
-    private final Logger logger = Logger.getLogger(SOSVfsSFtpFile.class);
-    // private SOSVfsFtp objVfsHandler = null;
-    // private ISOSVfsFileTransfer objVfsHandler = null;
-    // private InputStream objInputStream = null;
-    // private OutputStream objOutputStream = null;
+    private static final String CLASSNAME = "SOSVfsSFtpFile";
+    private static final Logger LOGGER = Logger.getLogger(SOSVfsSFtpFile.class);
     private SFTPv3FileHandle objFileHandle = null;
     private String strFileName = EMPTY_STRING;
     private long lngFileReadOffset = 0;
-    private long lngFileWriteOffset = 0;										// write operation in progress
+    private long lngFileWriteOffset = 0;
 
     public SOSVfsSFtpFile(final String pstrFileName) {
-        final String conMethodName = conClassName + "::SOSVfsSFtpFile";
+        final String conMethodName = CLASSNAME + "::SOSVfsSFtpFile";
         String strF = pstrFileName;
         if (objVFSHandler != null) {
             String strCurrDir = objVFSHandler.DoPWD();
-            // logger.debug(SOSVfs_D_171.params( conMethodName, strCurrDir));
-            logger.debug(SOSVfs_D_171.params(conMethodName, strCurrDir));
+            LOGGER.debug(SOSVfs_D_171.params(conMethodName, strCurrDir));
             if (strF.startsWith("./") == true) {
                 strF = strF.replace("./", strCurrDir + "/");
             }
@@ -45,71 +39,21 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
         strFileName = adjustFileSeparator(strF);
     }
 
-    /** \brief FileExists
-     *
-     * \details
-     *
-     * \return
-     *
-     * @return
-     * @throws Exception */
     @Override
     public boolean FileExists() {
-        final String conMethodName = conClassName + "::FileExists";
+        final String conMethodName = CLASSNAME + "::FileExists";
         boolean flgResult = false;
-        logger.debug(SOSVfs_D_172.params(conMethodName, strFileName));
-        // TODO hier wird im aktuellen Verzeichnis gesucht. geht schief, wenn
-        // die datei im Subfolder ist
-        // TODO Der Dateiname darf hier nur aus dem Namen der Datei bestehen.
-        // Ist die Datei in einem Subfolder, dann muß der Subfolder
-        // ebenfalls Namensbestandteil sein.
-        // TODO im Moment kommt der Dateiname mal mit und mal ohne Pfadname hier
-        // an.
-        // TODO Methoden bauen: GibDateiNameOhnePFad und GibDateiNameMitPfad
-        // if (1 == 1) {
-        // File fleF = new File(AdjustRelativePathName(strFileName));
-        // String strP = fleF.getParent();
-        // if (strP == null) {
-        // strP = ".";
-        // }
-        // strP = ".";
-        // String strN = fleF.getName();
+        LOGGER.debug(SOSVfs_D_172.params(conMethodName, strFileName));
         if (objVFSHandler.getFileSize(strFileName) >= 0) {
             flgResult = true;
         }
-        /** inperformant. the approach with size is much more better and faster. */
-        // Vector<String> vecTargetFileNamesList = objVFSHandler.nList(strP);
-        // flgResult = vecTargetFileNamesList.contains(strFileName);
-        // if (flgResult == false) {
-        // flgResult = vecTargetFileNamesList.contains(strN);
-        // }
-        // }
-        // else {
-        // Vector<String> vecTargetFileNamesList = objVFSHandler.nList(".");
-        // String strCurrDir = objVFSHandler.DoPWD();
-        // logger.debug(SOSVfs_D_171.get(conMethodName, strCurrDir));
-        // String strT = strFileName;
-        // if (strT.startsWith(strCurrDir) == false) {
-        // strT = strCurrDir + "/" + strFileName;
-        // }
-        // flgResult = vecTargetFileNamesList.contains(strT);
-        // if (flgResult == false) { // Evtl. Windows?
-        // flgResult = vecTargetFileNamesList.contains(strCurrDir + "\\" +
-        // strFileName);
-        // }
-        // }
-        logger.debug(SOSVfs_D_157.params(conMethodName, flgResult, strFileName));
+        LOGGER.debug(SOSVfs_D_157.params(conMethodName, flgResult, strFileName));
         return flgResult;
     }
 
-    /** \brief delete
-     *
-     * \details
-     *
-     * \return */
     @Override
     public boolean delete() {
-        final String conMethodName = conClassName + "::delete";
+        final String conMethodName = CLASSNAME + "::delete";
         try {
             objVFSHandler.delete(strFileName);
         } catch (IOException e) {
@@ -118,16 +62,9 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
         return true;
     }
 
-    /** \brief getFileAppendStream
-     *
-     * \details
-     *
-     * \return
-     *
-     * @return */
     @Override
     public OutputStream getFileAppendStream() {
-        final String conMethodName = conClassName + "::getFileAppendStream";
+        final String conMethodName = CLASSNAME + "::getFileAppendStream";
         OutputStream objO = null;
         try {
             strFileName = AdjustRelativePathName(strFileName);
@@ -138,16 +75,9 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
         return objO;
     }
 
-    /** \brief getFileInputStream
-     *
-     * \details
-     *
-     * \return
-     *
-     * @return */
     @Override
     public InputStream getFileInputStream() {
-        final String conMethodName = conClassName + "::getFileInputStream";
+        final String conMethodName = CLASSNAME + "::getFileInputStream";
         try {
             if (objInputStream == null) {
                 strFileName = AdjustRelativePathName(strFileName);
@@ -162,16 +92,9 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
         return objInputStream;
     }
 
-    /** \brief getFileOutputStream
-     *
-     * \details
-     *
-     * \return
-     *
-     * @return */
     @Override
     public OutputStream getFileOutputStream() {
-        final String conMethodName = conClassName + "::getFileOutputStream";
+        final String conMethodName = CLASSNAME + "::getFileOutputStream";
         try {
             if (objOutputStream == null) {
                 strFileName = AdjustRelativePathName(strFileName);
@@ -185,7 +108,7 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
                 }
             }
         } catch (Exception e) {
-            logger.error(e.getLocalizedMessage());
+            LOGGER.error(e.getLocalizedMessage());
             throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);
         }
         return objOutputStream;
@@ -193,43 +116,22 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
 
     private String AdjustRelativePathName(final String pstrPathName) {
         String strT = pstrPathName;
-
         if (pstrPathName.startsWith("./") || pstrPathName.startsWith(".\\")) {
             String strPath = objVFSHandler.DoPWD() + "/";
             strT = new File(pstrPathName).getName();
             strT = strPath + strT;
-            logger.debug(SOSVfs_D_159.params(pstrPathName, strT));
+            LOGGER.debug(SOSVfs_D_159.params(pstrPathName, strT));
         }
-
         return strT;
     }
 
-    /** \brief getFilePermissions
-     *
-     * \details
-     *
-     * \return
-     *
-     * @return
-     * @throws Exception */
     @Override
     public Integer getFilePermissions() throws Exception {
-        // TODO Auto-generated method stub
         return 0;
     }
 
-    /** \brief getFileSize
-     *
-     * \details
-     *
-     * \return
-     *
-     * @return
-     * @throws Exception */
     @Override
     public long getFileSize() {
-        @SuppressWarnings("unused")
-        final String conMethodName = conClassName + "::getFileSize";
         long lngFileSize = -1;
         try {
             lngFileSize = objVFSHandler.getFileSize(strFileName);
@@ -239,156 +141,71 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
         return lngFileSize;
     }
 
-    /** \brief getName
-     *
-     * \details
-     *
-     * \return
-     *
-     * @return */
     @Override
     public String getName() {
         return strFileName;
     }
 
-    /** \brief getParent
-     *
-     * \details
-     *
-     * \return
-     *
-     * @return */
     @Override
     public String getParentVfs() {
         return null;
     }
 
-    /** \brief getParentFile
-     *
-     * \details
-     *
-     * \return
-     *
-     * @return */
     @Override
     public ISOSVirtualFile getParentVfsFile() {
-        // TODO Auto-generated method stub
         return null;
     }
 
-    /** \brief isDirectory
-     *
-     * \details
-     *
-     * \return
-     *
-     * @return
-     * @throws Exception */
     @Override
     public boolean isDirectory() {
-        boolean flgResult = objVFSHandler.isDirectory(strFileName);
-        return flgResult;
+        return objVFSHandler.isDirectory(strFileName);
     }
 
-    /** \brief isEmptyFile
-     *
-     * \details
-     *
-     * \return
-     *
-     * @return */
     @Override
     public boolean isEmptyFile() {
-        boolean flgResult = this.getFileSize() <= 0;
-        return flgResult;
+        return this.getFileSize() <= 0;
     }
 
-    /** \brief notExists
-     *
-     * \details
-     *
-     * \return
-     *
-     * @return */
     @Override
     public boolean notExists() {
-        final String conMethodName = conClassName + "::notExists";
+        final String conMethodName = CLASSNAME + "::notExists";
         boolean flgResult = false;
         try {
-            flgResult = this.FileExists() == false;
+            flgResult = !this.FileExists();
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);
         }
         return flgResult;
     }
 
-    /** \brief putFile
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param fleFile
-     * @throws Exception */
     @Override
     public void putFile(final File fleFile) {
         notImplemented();
     }
 
-    /** \brief putFile
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param strFileName
-     * @throws Exception */
     @Override
-    public void putFile(@SuppressWarnings("hiding") final String strFileName) {
+    public void putFile(final String strFileName) {
         notImplemented();
     }
 
-    /** \brief rename
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param pstrNewFileName */
     @Override
     public void rename(final String pstrNewFileName) {
         objVFSHandler.rename(adjustFileSeparator(strFileName), adjustFileSeparator(pstrNewFileName));
     }
 
-    /** \brief setFilePermissions
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param pintNewPermission
-     * @throws Exception */
     @Override
     public void setFilePermissions(final Integer pintNewPermission) {
         notImplemented();
     }
 
-    /** \brief setHandler
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param pobjVFSHandler */
     @Override
     public void setHandler(final ISOSVfsFileTransfer pobjVFSHandler) {
-        // this.objVFSHandler = (SOSVfsFtp) pobjVFSHandler;
         objVFSHandler = pobjVFSHandler;
     }
 
     @Override
     public String getModificationTime() {
-        final String conMethodName = conClassName + "::getModificationTime";
+        final String conMethodName = CLASSNAME + "::getModificationTime";
         String strT = "";
         try {
             strT = objVFSHandler.getModificationTime(strFileName);
@@ -400,8 +217,7 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
 
     @Override
     public void close() {
-        @SuppressWarnings("unused")
-        final String conMethodName = conClassName + "::close";
+        final String conMethodName = CLASSNAME + "::close";
         try {
             if (objFileHandle != null) {
                 objFileHandle.getClient().closeFile(objFileHandle);
@@ -417,21 +233,17 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
 
     @Override
     public void closeInput() {
-        @SuppressWarnings("unused")
-        final String conMethodName = conClassName + "::closeInput";
         close();
     }
 
     @Override
     public void closeOutput() {
-        @SuppressWarnings("unused")
-        final String conMethodName = conClassName + "::closeOutput";
         close();
     }
 
     @Override
     public void flush() {
-        final String conMethodName = conClassName + "::flush";
+        final String conMethodName = CLASSNAME + "::flush";
         try {
             this.getFileOutputStream().flush();
         } catch (IOException e) {
@@ -441,31 +253,15 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
 
     @Override
     public int read(final byte[] bteBuffer) {
-        final String conMethodName = conClassName + "::read";
         int intLength = bteBuffer.length;
-        // TODO Filesize is max 2 GB, due to intoffset
         int lngBytesRed = read(bteBuffer, (int) lngFileReadOffset, intLength);
-        // try {
-        // InputStream objI = this.getFileInputStream();
-        // if (objI != null) {
-        // lngBytesRed = objI.read(bteBuffer);
-        // }
-        // else {
-        // lngBytesRed = objVFSHandler.read(bteBuffer);
-        // }
-        // }
-        // catch (IOException e) {
-        // e.printStackTrace();
-        // throw new JobSchedulerException(String.format("%1$s failed",
-        // conMethodName), e);
-        // }
         lngFileReadOffset += lngBytesRed;
         return lngBytesRed;
     }
 
     @Override
     public int read(final byte[] bteBuffer, final int intOffset, final int intLength) {
-        final String conMethodName = conClassName + "::read";
+        final String conMethodName = CLASSNAME + "::read";
         int lngBytesRed = 0;
         try {
             if (objFileHandle == null) {
@@ -481,7 +277,7 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
 
     @Override
     public void write(final byte[] bteBuffer, final int intOffset, final int intLength) {
-        final String conMethodName = conClassName + "::write";
+        final String conMethodName = CLASSNAME + "::write";
         try {
             if (objFileHandle == null) {
                 SOSVfsSFtp objT = (SOSVfsSFtp) objVFSHandler;
@@ -497,7 +293,7 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
 
     @Override
     public void write(final byte[] bteBuffer) {
-        final String conMethodName = conClassName + "::write";
+        final String conMethodName = CLASSNAME + "::write";
         notImplemented();
         try {
             this.getFileOutputStream().write(bteBuffer);
@@ -508,7 +304,6 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
 
     @Override
     public void putFile(final ISOSVirtualFile pobjVirtualFile) throws Exception {
-        // TODO Auto-generated method stub
         notImplemented();
     }
 
@@ -520,10 +315,9 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
                 SFTPv3FileAttributes objFA = objFileHandle.getClient().fstat(objFileHandle);
                 lngR = objFA.mtime;
             } catch (IOException e) {
-                logger.error(e.getLocalizedMessage());
+                LOGGER.error(e.getLocalizedMessage());
             }
         }
-        // TODO Auto-generated method stub
         return lngR;
     }
 
@@ -536,9 +330,10 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
                 objFA.mtime = new Integer((int) pdteDateTime);
                 lngR = pdteDateTime;
             } catch (IOException e) {
-                logger.error(e.getLocalizedMessage());
+                LOGGER.error(e.getLocalizedMessage());
             }
         }
         return lngR;
     }
+
 }

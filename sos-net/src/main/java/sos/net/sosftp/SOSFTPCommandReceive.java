@@ -431,6 +431,7 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
                     try {
                         Thread.sleep(interval * 1000);
                     } catch (InterruptedException e) {
+                        //
                     }
                 } else {
                     break;
@@ -901,6 +902,7 @@ public class SOSFTPCommandReceive extends SOSFTPCommand {
                 this.getLogger().debug(".. job parameter [http_proxy_host]                : " + proxyHost);
                 this.getLogger().debug(".. job parameter [http_proxy_port]                : " + proxyPort);
             } catch (Exception e) {
+                //
             }
         } catch (Exception e) {
             RaiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " could not read parameters, cause: " + e.getMessage(), e);

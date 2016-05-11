@@ -1,6 +1,5 @@
 package com.sos.dialog.classes;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -23,26 +22,17 @@ import com.sos.dialog.interfaces.IDialogActionHandler;
 import com.sos.dialog.menu.SOSMenueEvent;
 import com.sos.dialog.message.ErrorLog;
 
-/** \Example:
- *
- * @author KB */
+/** @author KB */
 public class DialogAdapter extends Dialog {
 
-    @SuppressWarnings("unused")
-    private final String conClassName = this.getClass().getSimpleName();
-    @SuppressWarnings("unused")
-    private static final String conSVNVersion = "$Id$";
-    @SuppressWarnings("unused")
-    private final Logger logger = Logger.getLogger(this.getClass());
     protected Object result;
     protected Shell shell;
     private WindowsSaver objFormHelper;
     private IDialogActionHandler objDialogActionHandler = null;
+    private GridLayout gridLayout = null;
+    private GridData GridData4Column = null;
+    private Composite objC = null;
 
-    /** Create the dialog.
-     * 
-     * @param parent
-     * @param style */
     public DialogAdapter(final Shell parent, final int style) {
         super(parent, style);
         init(parent);
@@ -58,10 +48,7 @@ public class DialogAdapter extends Dialog {
         shell = new Shell(parent, SWT.ON_TOP | SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
         objFormHelper = new WindowsSaver(this.getClass(), shell, 643, 600);
         setText("SWT Dialog");
-
     }
-
-    private Composite objC = null;
 
     public Object open(final IDialogActionHandler pobjDialogActionHandler, final ICompositeBaseAbstract objChildComposite) {
         shell.setRedraw(false);
@@ -78,8 +65,6 @@ public class DialogAdapter extends Dialog {
         objC.layout(true, true);
         shell.layout(true, true);
         shell.setRedraw(true);
-        // shell.forceActive();
-        // Object objO = open();
         Object objO = null;
         return objO;
     }
@@ -93,9 +78,6 @@ public class DialogAdapter extends Dialog {
         objFormHelper.saveWindow();
     }
 
-    /** Open the dialog.
-     * 
-     * @return the result */
     public Object open() {
         Display display = getParent().getDisplay();
         while (!shell.isDisposed()) {
@@ -106,7 +88,6 @@ public class DialogAdapter extends Dialog {
         return result;
     }
 
-    /** Create contents of the dialog. */
     public Composite createContents() {
         objFormHelper = new WindowsSaver(this.getClass(), shell, 400, 200);
         objFormHelper.restoreWindow();
@@ -137,21 +118,17 @@ public class DialogAdapter extends Dialog {
         });
         Composite composite = new Group(shell, SWT.NONE | SWT.RESIZE);
         set4ColumnLayout(composite);
-
-        // setGridLayout(composite);
         composite.addDisposeListener(new DisposeListener() {
 
             @Override
             public void widgetDisposed(final DisposeEvent e) {
-
+                //
             }
         });
         composite.layout(true, true);
         Group grp2 = new Group(shell, SWT.None);
         grp2.setLayout(new GridLayout(4, false));
         grp2.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1));
-        // set4ColumnLayout(grp2);
-        // grp2.setLayout(new RowLayout());
         SOSButton btnOK = new SOSButton(grp2, "Dialog_L_ok");
         shell.setDefaultButton(btnOK);
         btnOK.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, true, 2, 1));
@@ -162,10 +139,8 @@ public class DialogAdapter extends Dialog {
                 doOK();
             }
         });
-
         SOSButton btnCancel = new SOSButton(grp2, "Dialog_L_cancel");
         btnCancel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, true, 2, 1));
-
         btnCancel.addSelectionListener(new SelectionAdapter() {
 
             @Override
@@ -173,7 +148,6 @@ public class DialogAdapter extends Dialog {
                 doCancel();
             }
         });
-
         objC = composite;
         return composite;
     }
@@ -181,9 +155,6 @@ public class DialogAdapter extends Dialog {
     public Shell getShell() {
         return shell;
     }
-
-    private GridLayout gridLayout = null;
-    private GridData GridData4Column = null;
 
     public void set4ColumnLayout(final Composite objC) {
         objC.setLayout(get4ColumnLayout());
@@ -208,35 +179,26 @@ public class DialogAdapter extends Dialog {
         return gridLayout;
     }
 
-    private void setGridLayout(final Composite pobjComposite) {
-        pobjComposite.setLayout(new GridLayout());
-        pobjComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    }
-
     public void doCancel() {
         SOSMenueEvent objME = new SOSMenueEvent();
         objDialogActionHandler.doCancel(objME);
-        if (objME.doIt == true) {
+        if (objME.doIt) {
             closeShell();
-        } else {
-
         }
     }
 
     public void doEdit() {
         SOSMenueEvent objME = new SOSMenueEvent();
         objDialogActionHandler.doEdit(objME);
-        if (objME.doIt == true) {
+        if (objME.doIt) {
             closeShell();
-        } else {
-
         }
     }
 
     public void doOK() {
         SOSMenueEvent objME = new SOSMenueEvent();
         objDialogActionHandler.doOK(objME);
-        if (objME.doIt == true) {
+        if (objME.doIt) {
             closeShell();
         } else {
             new ErrorLog(objME.getMessage());
@@ -246,20 +208,16 @@ public class DialogAdapter extends Dialog {
     public void doDelete() {
         SOSMenueEvent objME = new SOSMenueEvent();
         objDialogActionHandler.doDelete(objME);
-        if (objME.doIt == true) {
+        if (objME.doIt) {
             closeShell();
-        } else {
-
         }
     }
 
     public void doClose() {
         SOSMenueEvent objME = new SOSMenueEvent();
         objDialogActionHandler.doClose(objME);
-        if (objME.doIt == true) {
+        if (objME.doIt) {
             closeShell();
-        } else {
-
         }
     }
 
@@ -270,12 +228,11 @@ public class DialogAdapter extends Dialog {
     public boolean doValidation() {
         SOSMenueEvent objME = new SOSMenueEvent();
         objDialogActionHandler.doValidation(objME);
-        if (objME.doIt == true) {
+        if (objME.doIt) {
             closeShell();
             return true;
-        } else {
-
         }
         return true;
     }
+
 }

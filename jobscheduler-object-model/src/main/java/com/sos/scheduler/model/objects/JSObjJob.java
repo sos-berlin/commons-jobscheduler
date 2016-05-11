@@ -12,18 +12,18 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.scheduler.model.LanguageDescriptorList;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
-/** /** @author oh */
+/** @author oh */
 public class JSObjJob extends Job {
 
-    private static final Logger logger = Logger.getLogger(JSObjJob.class);
+    private static final Logger LOGGER = Logger.getLogger(JSObjJob.class);
     private Script objScript = null;
     public static final String[] ValidLanguages4Job = LanguageDescriptorList.getLanguages4APIJobs();
     public static final String[] ValidLanguages4Monitor = LanguageDescriptorList.getLanguages4Monitor();
     public static final String InternalAPIMethodNames = "spooler_process_before;spooler_process_after;spooler_task_before;spooler_task_after;";
     public static final String MonitorMethodNames = "spooler_task_before;spooler_task_after;spooler_process_before;spooler_process_after";
     public final static String fileNameExtension = ".job.xml";
-    public final static String[] ValidLogLevels = new String[] { "info", "debug1", "debug2", "debug3", "debug4", "debug5", "debug6", "debug7", "debug8",
-            "debug9", "" };
+    public final static String[] ValidLogLevels = new String[] { "info", "debug1", "debug2", "debug3", "debug4", "debug5", "debug6", "debug7",
+            "debug8", "debug9", "" };
     JobSettings objSettings = null;
 
     public static enum enuVisibilityTypes {
@@ -169,7 +169,7 @@ public class JSObjJob extends Job {
         objScript = getScript();
         if (objScript == null) {
             final JobSchedulerException objJSException = new JobSchedulerException("Job has no script.");
-            logger.error("", objJSException);
+            LOGGER.error("", objJSException);
             throw objJSException;
         }
         return true;
@@ -635,6 +635,7 @@ public class JSObjJob extends Job {
         try {
             return avoidNull(getSettings().getMailOnError());
         } catch (Exception e) {
+            //
         }
         return "";
     }
@@ -648,6 +649,7 @@ public class JSObjJob extends Job {
         try {
             return avoidNull(getSettings().getMailOnWarning());
         } catch (Exception e) {
+            //
         }
         return "";
     }
@@ -661,6 +663,7 @@ public class JSObjJob extends Job {
         try {
             return avoidNull(getSettings().getMailOnProcess());
         } catch (Exception e) {
+            //
         }
         return "";
     }
@@ -674,6 +677,7 @@ public class JSObjJob extends Job {
         try {
             return avoidNull(getSettings().getMailOnSuccess());
         } catch (Exception e) {
+            //
         }
         return "";
     }
@@ -687,6 +691,7 @@ public class JSObjJob extends Job {
         try {
             return avoidNull(getSettings().getMailOnDelayAfterError());
         } catch (Exception e) {
+            //
         }
         return "";
     }
@@ -700,6 +705,7 @@ public class JSObjJob extends Job {
         try {
             return avoidNull(getSettings().getLogMailTo());
         } catch (Exception e) {
+            //
         }
         return "";
     }
@@ -713,6 +719,7 @@ public class JSObjJob extends Job {
         try {
             return avoidNull(getSettings().getLogMailCc());
         } catch (Exception e) {
+            //
         }
         return "";
     }
@@ -726,6 +733,7 @@ public class JSObjJob extends Job {
         try {
             return avoidNull(getSettings().getLogMailBcc());
         } catch (Exception e) {
+            //
         }
         return "";
     }

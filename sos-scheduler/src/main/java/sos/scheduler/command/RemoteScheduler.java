@@ -1,11 +1,6 @@
-/*
- * RemoteScheduler.java Created on 30.05.2008
- */
 package sos.scheduler.command;
 
-/*
- * @Deprecated use SOSJobSchedulerModel
- */
+/** @Deprecated use SOSJobSchedulerModel */
 @Deprecated
 public class RemoteScheduler {
 
@@ -40,42 +35,37 @@ public class RemoteScheduler {
             try {
                 schedulerCommand.disconnect();
             } catch (Exception ex) {
+                //
             }
         }
     }
 
-    /** @return the host */
     public String getHost() {
         return host;
     }
 
-    /** @param host the host to set */
     public void setHost(final String host) {
         this.host = host;
     }
 
-    /** @return the tcpPort */
     public int getTcpPort() {
         return tcpPort;
     }
 
-    /** @param tcpPort the tcpPort to set */
     public void setTcpPort(final int tcpPort) {
         this.tcpPort = tcpPort;
     }
 
-    /** @return the udpPort */
     public int getUdpPort() {
         return udpPort;
     }
 
-    /** @param udpPort the udpPort to set */
     public void setUdpPort(final int udpPort) {
         this.udpPort = udpPort;
     }
 
-    @Override
     public String toString() {
         return host + ":" + tcpPort;
     }
+
 }

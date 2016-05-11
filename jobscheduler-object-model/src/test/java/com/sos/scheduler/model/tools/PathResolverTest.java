@@ -22,9 +22,11 @@ public class PathResolverTest {
         assertEquals("/folder/folder2", PathResolver.resolvePath("/folder/./folder2"));
         assertEquals("/folder", PathResolver.getRelativePath("", "", "./folder/.././folder/./"));
         logger.debug(PathResolver.getRelativePath("C:/scheduler/ncfast/com.sos.jobnet/testdata",
-                "C:/scheduler/ncfast/com.sos.jobnet/testdata/subfolder/folder1/..", "") + "/job_chain_multiple_inheritance_sample,H");
-        String result = PathResolver.getRelativePath("C:/scheduler/ncfast/com.sos.jobnet/testdata", "C:/scheduler/ncfast/com.sos.jobnet/testdata",
-                "//CloseofBusinessIndicator");
+                "C:/scheduler/ncfast/com.sos.jobnet/testdata/subfolder/folder1/..", "")
+                + "/job_chain_multiple_inheritance_sample,H");
+        String result =
+                PathResolver.getRelativePath("C:/scheduler/ncfast/com.sos.jobnet/testdata", "C:/scheduler/ncfast/com.sos.jobnet/testdata",
+                        "//CloseofBusinessIndicator");
         logger.debug(result);
         logger.debug(PathResolver.getRelativePath("C:/Users/eqcpn/java/ncfast/com.sos.jobnet/testdata",
                 "C:/Users/eqcpn/java/ncfast/com.sos.jobnet/testdata/subfolder/folder1", "../../myInclude.txt"));

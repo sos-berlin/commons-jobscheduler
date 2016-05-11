@@ -175,6 +175,7 @@ public class SWTResourceManager {
             try {
                 objFIS.close();
             } catch (IOException e) {
+                //
             }
         }
         return null;

@@ -11,7 +11,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPClientConfig;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.log4j.Logger;
 
@@ -41,10 +40,6 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
         super();
     }
 
-    /** @param directory The new working directory.
-     * @return The reply code received from the server.
-     * @throws IOException If an I/O error occurs while either sending a command
-     *             to the server or receiving a reply from the server. */
     @Override
     public int cd(final String directory) throws IOException {
         return Client().cwd(directory);
@@ -84,6 +79,7 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
 
     @Override
     public void closeInput() {
+        //
     }
 
     private void closeInput(InputStream objO) {
@@ -93,6 +89,7 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
                 objO = null;
             }
         } catch (IOException e) {
+            //
         }
     }
 
@@ -104,6 +101,7 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
                 objO = null;
             }
         } catch (Exception e) {
+            //
         }
     }
 
@@ -113,15 +111,6 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
         return null;
     }
 
-    /** return a listing of the files of the current directory in long format on
-     * the remote machine
-     * 
-     * @return a listing of the contents of the current directory on the remote
-     *         machine
-     * @exception Exception
-     * @see #nList()
-     * @see #nList(String )
-     * @see #dir(String ) */
     @Override
     public SOSFileList dir() {
         final String conMethodName = CLASS_NAME + "::dir";
@@ -139,15 +128,6 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
         return null;
     }
 
-    /** return a listing of the files in a directory in long format on the remote
-     * machine
-     * 
-     * @param pathname on remote machine
-     * @return a listing of the contents of a directory on the remote machine
-     * @exception Exception
-     * @see #nList()
-     * @see #nList(String )
-     * @see #dir() */
     @Override
     public SOSFileList dir(final String pathname) {
         Vector<String> strList = getFilenames(pathname);
@@ -156,14 +136,6 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
         return objFileList;
     }
 
-    /** return a listing of a directory in long format on the remote machine
-     *
-     * @param pathname on remote machine
-     * @return a listing of the contents of a directory on the remote machine
-     * @exception Exception
-     * @see #nList()
-     * @see #nList(String )
-     * @see #dir() */
     @Override
     public SOSFileList dir(final String pathname, final int flag) {
         final String conMethodName = CLASS_NAME + "::dir";
@@ -211,18 +183,12 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
 
     @Override
     public void flush() {
+        //
     }
 
-    /** Retrieves a named file from the ftp server.
-     *
-     * @param localFile The name of the local file.
-     * @param remoteFile The name of the remote file.
-     * @exception Exception
-     * @see #getFile(String, String ) */
     @Override
     public void get(final String remoteFile, final String localFile) {
         final String conMethodName = CLASS_NAME + "::get";
-
         FileOutputStream out = null;
         boolean rc = false;
         try {
@@ -259,27 +225,12 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
         return null;
     }
 
-    /** Retrieves a named file from the ftp server.
-     *
-     * @param localFile The name of the local file.
-     * @param remoteFile The name of the remote file.
-     * @return The total number of bytes retrieved.
-     * @see #get(String, String )
-     * @exception Exception */
     @Override
     public long getFile(final String remoteFile, final String localFile) {
         final boolean flgAppendLocalFile = false;
         return this.getFile(remoteFile, localFile, flgAppendLocalFile);
     }
 
-    /** Retrieves a named file from the ftp server.
-     *
-     * @param localFile The name of the local file.
-     * @param remoteFile The name of the remote file.
-     * @param append Appends the remote file to the local file.
-     * @return The total number of bytes retrieved.
-     * @see #get(String, String )
-     * @exception Exception */
     @Override
     public long getFile(final String remoteFile, final String localFile, final boolean append) {
         final String conMethodName = CLASS_NAME + "::getFile";
@@ -349,15 +300,6 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
         return strB.toArray(new String[strB.size()]);
     }
 
-    /** return a listing of the contents of a directory in short format on the
-     * remote machine (without subdirectory)
-     *
-     * @return a listing of the contents of a directory on the remote machine
-     *
-     * @exception Exception
-     * @see #nList(String )
-     * @see #dir()
-     * @see #dir(String ) */
     private Vector<String> getFilenames() throws Exception {
         return getFilenames("", false, null);
     }
@@ -399,13 +341,11 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
 
     @Override
     public StringBuffer getStdErr() throws Exception {
-        // TO DO Auto-generated method stub
         return null;
     }
 
     @Override
     public StringBuffer getStdOut() throws Exception {
-        // TO DO Auto-generated method stub
         return null;
     }
 
@@ -424,42 +364,16 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
         return strA;
     }
 
-    /** return a listing of the contents of a directory in short format on the
-     * remote machine
-     *
-     * @return a listing of the contents of a directory on the remote machine
-     *
-     * @exception Exception
-     * @see #nList(String )
-     * @see #dir()
-     * @see #dir(String ) */
     @Override
     public Vector<String> nList() throws Exception {
         return getFilenames();
     }
 
-    /** return a listing of the contents of a directory in short format on the
-     * remote machine
-     *
-     * @return a listing of the contents of a directory on the remote machine
-     *
-     * @exception Exception
-     * @see #nList(String )
-     * @see #dir()
-     * @see #dir(String ) */
     @Override
     public Vector<String> nList(final boolean recursive) throws Exception {
         return getFilenames(recursive);
     }
 
-    /** return a listing of the contents of a directory in short format on the
-     * remote machine
-     * 
-     * @param pathname on remote machine
-     * @return a listing of the contents of a directory on the remote machine
-     *
-     * @exception Exception
-     * @see #dir() */
     @Override
     public Vector<String> nList(final String pathname) {
         return getFilenames(pathname);
@@ -478,19 +392,14 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
 
     @Override
     public void openInputFile(final String pstrFileName) {
+        //
     }
 
     @Override
     public void openOutputFile(final String pstrFileName) {
+        //
     }
 
-    /** Stores a file on the server using the given name.
-     * 
-     * @param localFile The name of the local file.
-     * @param remoteFile The name of the remote file.
-     * @return True if successfully completed, false if not.
-     * @exception Exception
-     * @see #putFile(String, String ) */
     @Override
     public void put(final String localFile, final String remoteFile) {
         final String conMethodName = CLASS_NAME + "::put";
@@ -535,12 +444,6 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
         }
     }
 
-    /** written to store a file on the server using the given name.
-     *
-     * @param localfile The name of the local file.
-     * @param an OutputStream through which data can be
-     * @return The total number of bytes written.
-     * @exception Exception */
     @Override
     public long putFile(final String localFile, final OutputStream out) {
         final String conMethodName = CLASS_NAME + "::putFile";
@@ -572,14 +475,6 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
         return lngTotalBytesWritten;
     }
 
-    /** Stores a file on the server using the given name.
-     *
-     * @param localFile The name of the local file.
-     * @param remoteFile The name of the remote file.
-     * @return The total number of bytes written.
-     *
-     * @exception Exception
-     * @see #put(String, String ) */
     @Override
     public long putFile(final String localFile, final String remoteFile) throws Exception {
         OutputStream outputStream = Client().storeFileStream(remoteFile);
@@ -603,7 +498,6 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
 
     @Override
     public boolean remoteIsWindowsShell() {
-        // TO DO Auto-generated method stub
         return false;
     }
 
@@ -619,16 +513,17 @@ public class SOSVfsFtp2 extends SOSVfsFtpBaseClass2 implements ISOSVfsFileTransf
 
     @Override
     public void setJSJobUtilites(final JSJobUtilities pobjJSJobUtilities) {
-        // TO DO Auto-generated method stub
+        //
     }
 
     @Override
     public void write(final byte[] bteBuffer) {
+        //
     }
 
     @Override
     public void write(final byte[] bteBuffer, final int intOffset, final int intLength) {
-
+        //
     }
 
     @Override

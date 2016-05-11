@@ -123,6 +123,7 @@ public class Messages implements Serializable {
                 }
             }
         } catch (MissingResourceException e) {
+            //
         }
     }
 

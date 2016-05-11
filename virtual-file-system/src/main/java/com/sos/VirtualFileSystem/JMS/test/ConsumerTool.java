@@ -96,6 +96,7 @@ public class ConsumerTool extends Thread implements MessageListener, ExceptionLi
             try {
                 Thread.sleep(1000);
             } catch (Exception e) {
+                //
             }
         }
         Iterator<ConsumerTool> itr = threads.iterator();
@@ -181,6 +182,7 @@ public class ConsumerTool extends Thread implements MessageListener, ExceptionLi
                 try {
                     Thread.sleep(sleepTime);
                 } catch (InterruptedException e) {
+                    //
                 }
             }
         }

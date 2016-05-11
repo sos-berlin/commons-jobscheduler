@@ -105,6 +105,7 @@ public class SchedulerHotFolder extends JSObjBase {
                         result.add(obj);
                     }
                 } catch (Exception e) {
+                    //
                 }
             }
         }

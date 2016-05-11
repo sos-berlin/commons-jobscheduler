@@ -68,7 +68,7 @@ public class JSXMLFile extends JSTextFile {
     }
 
     public void open(final String pstrOutputFileName) throws Exception {
-
+        //
     }
 
     public JSXMLFile XMLTagV(final String pstrTagName, final String pstrTagValue) throws Exception {
@@ -113,8 +113,7 @@ public class JSXMLFile extends JSTextFile {
 
     private String getEndTag(final String strTagName) {
         flgDecrIndent = true;
-        final String strT = addBraces("/" + adjustTagName(strTagName));
-        return strT;
+        return addBraces("/" + adjustTagName(strTagName));
     }
 
     public String tag(final String pstrTagName, final String pstrTagValue) {
@@ -403,11 +402,11 @@ public class JSXMLFile extends JSTextFile {
     }
 
     public void fatalError(final SAXParseException arg0) throws SAXException {
-
+        //
     }
 
     public void warning(final SAXParseException arg0) throws SAXException {
-
+        //
     }
 
     public Document getDomDocument() throws ParserConfigurationException {

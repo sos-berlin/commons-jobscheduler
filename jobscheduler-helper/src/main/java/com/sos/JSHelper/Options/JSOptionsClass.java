@@ -1131,6 +1131,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
             objP.put("weekofyear", SOSOptionTime.getCurrentDateAsString("yyyyw"));
             objP.put("currentweek", SOSOptionTime.getCurrentDateAsString("w"));
         } catch (Exception uhe) {
+            //
         }
         String strVal = "";
         String strKey = "";
@@ -1304,7 +1305,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
                         }
                     }
                 } catch (final ClassCastException objException) {
-
+                    //
                 } catch (final Exception objE) {
                     throw new RuntimeException(objE);
                 }

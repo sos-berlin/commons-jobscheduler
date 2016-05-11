@@ -78,8 +78,8 @@ public class SOSVfsFtpSProxySelector extends ProxySelector {
         if (uri == null || addr == null || ex == null) {
             throw new IllegalArgumentException("Arguments can't be null.");
         }
-        throw new UnsupportedOperationException(
-                String.format("connect failed[uri: %s][socket address: %s]: %s", uri.toString(), addr.toString(), ex.toString()));
+        throw new UnsupportedOperationException(String.format("connect failed[uri: %s][socket address: %s]: %s", uri.toString(), addr.toString(),
+                ex.toString()));
     }
 
 }

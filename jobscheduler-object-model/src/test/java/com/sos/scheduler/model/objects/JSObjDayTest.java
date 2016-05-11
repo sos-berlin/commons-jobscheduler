@@ -35,8 +35,9 @@ public class JSObjDayTest {
     @Test
     public final void testSetValidXmlContent() {
         String xmlHeader = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
-        xml = "<run_time xmlns:ns2=\"job-chain-extensions\">\n" + "    <date date=\"2012-03-12\">\n" + "        <period single_start=\"15:00\"/>\n"
-                + "    </date>\n" + "</run_time>\n";
+        xml =
+                "<run_time xmlns:ns2=\"job-chain-extensions\">\n" + "    <date date=\"2012-03-12\">\n" + "        <period single_start=\"15:00\"/>\n"
+                        + "    </date>\n" + "</run_time>\n";
         JSObjRunTime runtime = new JSObjRunTime(factory, xml);
         assertEquals(xmlHeader + xml, runtime.toXMLString());
     }
@@ -50,8 +51,9 @@ public class JSObjDayTest {
 
     @Test
     public final void testSingleStarts() {
-        xml = "<run_time>" + "<weekdays>" + "<day day=\"1 2\">" + "<period single_start=\"15:00\" />" + "<period single_start=\"19:00:05\" />"
-                + "<period single_start=\"11:00\" />" + "</day>" + "</weekdays>" + "</run_time>";
+        xml =
+                "<run_time>" + "<weekdays>" + "<day day=\"1 2\">" + "<period single_start=\"15:00\" />" + "<period single_start=\"19:00:05\" />"
+                        + "<period single_start=\"11:00\" />" + "</day>" + "</weekdays>" + "</run_time>";
         JSObjRunTime runtime = new JSObjRunTime(factory, xml);
         Iterator<Day> itD = runtime.getWeekdays().getDay().iterator();
         while (itD.hasNext()) {
@@ -72,8 +74,9 @@ public class JSObjDayTest {
 
     @Test
     public final void testMultipleDays() {
-        xml = "<run_time>" + "<weekdays>" + "<day day=\"1\">" + "<period single_start=\"15:00\" />" + "</day>" + "<day day=\"3\">"
-                + "<period single_start=\"17:00\" />" + "</day>" + "</weekdays>" + "</run_time>";
+        xml =
+                "<run_time>" + "<weekdays>" + "<day day=\"1\">" + "<period single_start=\"15:00\" />" + "</day>" + "<day day=\"3\">"
+                        + "<period single_start=\"17:00\" />" + "</day>" + "</weekdays>" + "</run_time>";
         JSObjRunTime runtime = new JSObjRunTime(factory, xml);
         Iterator<Day> itD = runtime.getWeekdays().getDay().iterator();
         while (itD.hasNext()) {

@@ -192,6 +192,7 @@ public class cmdShell extends SOSVfsMessageCodes implements Runnable {
                         dest.flush();
                     }
                 } catch (IOException e) {
+                    //
                 }
             }
         }).start();

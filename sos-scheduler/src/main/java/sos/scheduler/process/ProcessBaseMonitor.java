@@ -98,6 +98,7 @@ public class ProcessBaseMonitor extends Monitor_impl {
                     fis = null;
                 }
             } catch (Exception ex) {
+                //
             }
         }
     }
@@ -194,8 +195,8 @@ public class ProcessBaseMonitor extends Monitor_impl {
                                 this.getLogger().debug1(
                                         ".. monitor: configuration parameter [" + nodeMap.getNamedItem("name").getNodeValue() + "]: "
                                                 + nodeMap.getNamedItem("value").getNodeValue());
-                                spooler_task.order().params()
-                                        .set_var(nodeMap.getNamedItem("name").getNodeValue(), nodeMap.getNamedItem("value").getNodeValue());
+                                spooler_task.order().params().set_var(nodeMap.getNamedItem("name").getNodeValue(),
+                                        nodeMap.getNamedItem("value").getNodeValue());
                                 this.orderParameterKeys.add(nodeMap.getNamedItem("name").getNodeValue());
                             } else {
                                 NodeList children = node.getChildNodes();
@@ -232,11 +233,14 @@ public class ProcessBaseMonitor extends Monitor_impl {
                                         && (parameterValue.indexOf("${" + parameterNames[j] + "}") != -1 || parameterValue.indexOf("${basename:"
                                                 + parameterNames[j] + "}") != -1)) {
                                     if (parameterValue.indexOf("${basename:") != -1) {
-                                        parameterValue = myReplaceAll(parameterValue, "\\$\\{basename:" + parameterNames[j] + "\\}", new File(spooler_task
-                                                .order().params().value(parameterNames[j])).getName().replaceAll("[\\\\]", "\\\\\\\\"));
+                                        parameterValue =
+                                                myReplaceAll(parameterValue, "\\$\\{basename:" + parameterNames[j] + "\\}", new File(
+                                                        spooler_task.order().params().value(parameterNames[j])).getName().replaceAll("[\\\\]",
+                                                        "\\\\\\\\"));
                                     } else {
-                                        parameterValue = myReplaceAll(parameterValue, "\\$\\{" + parameterNames[j] + "\\}", spooler_task.order().params()
-                                                .value(parameterNames[j]).replaceAll("[\\\\]", "\\\\\\\\"));
+                                        parameterValue =
+                                                myReplaceAll(parameterValue, "\\$\\{" + parameterNames[j] + "\\}",
+                                                        spooler_task.order().params().value(parameterNames[j]).replaceAll("[\\\\]", "\\\\\\\\"));
                                     }
                                     parameterFound = true;
                                     trials = 0;
@@ -250,12 +254,14 @@ public class ProcessBaseMonitor extends Monitor_impl {
                                 Object envName = envIterator.next();
                                 Object envValue = this.envvars.get(envName.toString());
                                 if (parameterValue.indexOf("${" + envName.toString() + "}") != -1) {
-                                    parameterValue = myReplaceAll(parameterValue, "\\$\\{" + envName.toString() + "\\}",
-                                            envValue.toString().replaceAll("[\\\\]", "\\\\\\\\"));
+                                    parameterValue =
+                                            myReplaceAll(parameterValue, "\\$\\{" + envName.toString() + "\\}", envValue.toString().replaceAll(
+                                                    "[\\\\]", "\\\\\\\\"));
                                     envFound = true;
                                 } else if (parameterValue.indexOf("${basename:" + envName.toString() + "}") != -1) {
-                                    parameterValue = myReplaceAll(parameterValue, "\\$\\{basename:" + envName.toString() + "\\}", new File(envValue.toString())
-                                            .getName().replaceAll("[\\\\]", "\\\\\\\\"));
+                                    parameterValue =
+                                            myReplaceAll(parameterValue, "\\$\\{basename:" + envName.toString() + "\\}",
+                                                    new File(envValue.toString()).getName().replaceAll("[\\\\]", "\\\\\\\\"));
                                     envFound = true;
                                 }
                             }
@@ -323,8 +329,8 @@ public class ProcessBaseMonitor extends Monitor_impl {
             this.getLogger().info("sending mail: \n" + sosMail.dumpMessageAsString());
             if (!sosMail.send()) {
                 this.getLogger().warn(
-                        "mail server is unavailable, mail for recipient [" + recipient + "] is queued in local directory [" + sosMail.getQueueDir() + "]:"
-                                + sosMail.getLastError());
+                        "mail server is unavailable, mail for recipient [" + recipient + "] is queued in local directory [" + sosMail.getQueueDir()
+                                + "]:" + sosMail.getLastError());
             }
             sosMail.clearRecipients();
         } catch (Exception e) {

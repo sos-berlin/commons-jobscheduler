@@ -47,7 +47,7 @@ import java.io.IOException;
  * or equal the log level specified in factory.ini. </b>
  * </p>
  * 
- * @author stefan.schaedlich@sos-berlin.com at 10.05.13 15:40 */
+ * @author stefan schaedlich */
 public class JobSchedulerLogbackAppender<E> extends ConsoleAppender<ILoggingEvent> {
 
     private Log jobSchedulerLogger = null;
@@ -56,7 +56,6 @@ public class JobSchedulerLogbackAppender<E> extends ConsoleAppender<ILoggingEven
     @Override
     public void start() {
         super.start();
-
         // to redirect the console output to an output stream
         outputStream = new ByteArrayOutputStream();
         try {
@@ -69,14 +68,12 @@ public class JobSchedulerLogbackAppender<E> extends ConsoleAppender<ILoggingEven
 
     @Override
     protected void append(ILoggingEvent event) {
-
         // The presence of the spooler logger can not be tested in start(),
         // because it is set dynamically.
         if (!hasLogger()) {
             addError("No JobschedulerLogger (spooler_log object) set for the appender named [" + name + "].");
             return;
         }
-
         // Apply the encoder an get the formatted message from outputstream.
         String messageText = "";
         try {
@@ -87,7 +84,6 @@ public class JobSchedulerLogbackAppender<E> extends ConsoleAppender<ILoggingEven
         } catch (IOException e) {
             addError("Error applying the encoder of the appender [" + name + "].");
         }
-
         // Redirect the message to JobScheduler
         try {
             int level = event.getLevel().toInt();
@@ -111,6 +107,7 @@ public class JobSchedulerLogbackAppender<E> extends ConsoleAppender<ILoggingEven
                 break;
             }
         } catch (Exception ex) {
+            //
         }
     }
 
@@ -119,6 +116,7 @@ public class JobSchedulerLogbackAppender<E> extends ConsoleAppender<ILoggingEven
     }
 
     public boolean hasLogger() {
-        return (jobSchedulerLogger != null) ? true : false;
+        return jobSchedulerLogger != null;
     }
+
 }

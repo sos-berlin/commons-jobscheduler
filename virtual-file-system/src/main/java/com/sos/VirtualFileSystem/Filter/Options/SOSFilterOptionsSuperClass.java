@@ -24,10 +24,9 @@ public abstract class SOSFilterOptionsSuperClass extends JSOptionsClass {
         this.setAllOptions(JSSettings);
     }
 
-    @JSOptionDefinition(name = "Line_numbering_position", description = "Insert line number at position", key = "Line_numbering_position",
-            type = "SOSOptionInteger", mandatory = false)
-    public SOSOptionInteger Line_numbering_position = new SOSOptionInteger(this, CLASSNAME + ".Line_numbering_position", "Insert line number at position", "1", "1",
-            false);
+    @JSOptionDefinition(name = "Line_numbering_position", description = "Insert line number at position", key = "Line_numbering_position", type = "SOSOptionInteger", mandatory = false)
+    public SOSOptionInteger Line_numbering_position = new SOSOptionInteger(this, CLASSNAME + ".Line_numbering_position",
+            "Insert line number at position", "1", "1", false);
 
     public SOSOptionInteger getLine_numbering_position() {
         return Line_numbering_position;
@@ -38,10 +37,9 @@ public abstract class SOSFilterOptionsSuperClass extends JSOptionsClass {
         return this;
     }
 
-    @JSOptionDefinition(name = "Line_Numbering_Format", description = "Format mask of line numbering value", key = "Line_Numbering_Format",
-            type = "SOSOptionString", mandatory = false)
-    public SOSOptionString Line_Numbering_Format = new SOSOptionString(this, CLASSNAME + ".Line_Numbering_Format", "Format mask of line numbering value", 
-            "%08d", "%08d", false);
+    @JSOptionDefinition(name = "Line_Numbering_Format", description = "Format mask of line numbering value", key = "Line_Numbering_Format", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString Line_Numbering_Format = new SOSOptionString(this, CLASSNAME + ".Line_Numbering_Format",
+            "Format mask of line numbering value", "%08d", "%08d", false);
 
     public SOSOptionString getLine_Numbering_Format() {
         return Line_Numbering_Format;
@@ -52,9 +50,8 @@ public abstract class SOSFilterOptionsSuperClass extends JSOptionsClass {
         return this;
     }
 
-    @JSOptionDefinition(name = "Line_Numbering_Increment_Value", description = "Increment value for line-numbering", key = "Line_Numbering_Increment_Value",
-            type = "SOSOptionInteger", mandatory = false)
-    public SOSOptionInteger Line_Numbering_Increment_Value = new SOSOptionInteger(this, CLASSNAME + ".Line_Numbering_Increment_Value", 
+    @JSOptionDefinition(name = "Line_Numbering_Increment_Value", description = "Increment value for line-numbering", key = "Line_Numbering_Increment_Value", type = "SOSOptionInteger", mandatory = false)
+    public SOSOptionInteger Line_Numbering_Increment_Value = new SOSOptionInteger(this, CLASSNAME + ".Line_Numbering_Increment_Value",
             "Increment value for line-numbering", "1", "1", false);
 
     public SOSOptionInteger getLine_Numbering_Increment_Value() {
@@ -66,10 +63,9 @@ public abstract class SOSFilterOptionsSuperClass extends JSOptionsClass {
         return this;
     }
 
-    @JSOptionDefinition(name = "Line_numbering_start_value", description = "STart value for line numbering", key = "Line_numbering_start_value",
-            type = "SOSOptionInteger", mandatory = false)
-    public SOSOptionInteger Line_numbering_start_value = new SOSOptionInteger(this, CLASSNAME + ".Line_numbering_start_value", "Start value for line numbering",
-            "1", "1", false);
+    @JSOptionDefinition(name = "Line_numbering_start_value", description = "STart value for line numbering", key = "Line_numbering_start_value", type = "SOSOptionInteger", mandatory = false)
+    public SOSOptionInteger Line_numbering_start_value = new SOSOptionInteger(this, CLASSNAME + ".Line_numbering_start_value",
+            "Start value for line numbering", "1", "1", false);
 
     public SOSOptionInteger getLine_numbering_start_value() {
         return Line_numbering_start_value;
@@ -80,10 +76,9 @@ public abstract class SOSFilterOptionsSuperClass extends JSOptionsClass {
         return this;
     }
 
-    @JSOptionDefinition(name = "create_line_numbers", description = "Create line number for all lines of a file", key = "create_line_numbers",
-            type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean create_line_numbers = new SOSOptionBoolean(this, CLASSNAME + ".create_line_numbers", "Create line number for all lines of a file",
-            "false", "false", false);
+    @JSOptionDefinition(name = "create_line_numbers", description = "Create line number for all lines of a file", key = "create_line_numbers", type = "SOSOptionBoolean", mandatory = false)
+    public SOSOptionBoolean create_line_numbers = new SOSOptionBoolean(this, CLASSNAME + ".create_line_numbers",
+            "Create line number for all lines of a file", "false", "false", false);
 
     public SOSOptionBoolean getcreate_line_numbers() {
         return create_line_numbers;
@@ -94,10 +89,9 @@ public abstract class SOSFilterOptionsSuperClass extends JSOptionsClass {
         return this;
     }
 
-    @JSOptionDefinition(name = "renumber_lines", description = "Make a renumbering of all lines in a file", key = "renumber_lines", type = "SOSOptionBoolean",
-            mandatory = false)
-    public SOSOptionBoolean renumber_lines = new SOSOptionBoolean(this, CLASSNAME + ".renumber_lines", "Make a renumbering of all lines in a file", "false", 
-            "false", false);
+    @JSOptionDefinition(name = "renumber_lines", description = "Make a renumbering of all lines in a file", key = "renumber_lines", type = "SOSOptionBoolean", mandatory = false)
+    public SOSOptionBoolean renumber_lines = new SOSOptionBoolean(this, CLASSNAME + ".renumber_lines", "Make a renumbering of all lines in a file",
+            "false", "false", false);
 
     public SOSOptionBoolean getrenumber_lines() {
         return renumber_lines;
@@ -108,9 +102,8 @@ public abstract class SOSFilterOptionsSuperClass extends JSOptionsClass {
         return this;
     }
 
-    @JSOptionDefinition(name = "Filter_sequence", description = "Filter definitions: what to process and in what sequence", key = "Filter_sequence",
-            type = "SOSOptionValueList", mandatory = false)
-    public SOSOptionFilterSequence FilterSequence = new SOSOptionFilterSequence(this, CLASSNAME + ".Filter_sequence", 
+    @JSOptionDefinition(name = "Filter_sequence", description = "Filter definitions: what to process and in what sequence", key = "Filter_sequence", type = "SOSOptionValueList", mandatory = false)
+    public SOSOptionFilterSequence FilterSequence = new SOSOptionFilterSequence(this, CLASSNAME + ".Filter_sequence",
             "Filter definitions: what to process and in what sequence", "nullFilter", "", true);
 
     public String getFilter_sequence() {
@@ -158,8 +151,7 @@ public abstract class SOSFilterOptionsSuperClass extends JSOptionsClass {
         return this;
     }
 
-    @JSOptionDefinition(name = "exclude_lines_before", description = "exclude_lines_before", key = "exclude_lines_before", type = "SOSOptionRegExp",
-            mandatory = false)
+    @JSOptionDefinition(name = "exclude_lines_before", description = "exclude_lines_before", key = "exclude_lines_before", type = "SOSOptionRegExp", mandatory = false)
     public SOSOptionRegExp excludeLinesBefore = new SOSOptionRegExp(this, CLASSNAME + ".exclude_lines_before", "exclude_lines_before", "", "", false);
 
     public String getexclude_lines_before() {
@@ -171,8 +163,7 @@ public abstract class SOSFilterOptionsSuperClass extends JSOptionsClass {
         return this;
     }
 
-    @JSOptionDefinition(name = "exclude_lines_after", description = "exclude_lines_after", key = "exclude_lines_after", type = "SOSOptionRegExp",
-            mandatory = false)
+    @JSOptionDefinition(name = "exclude_lines_after", description = "exclude_lines_after", key = "exclude_lines_after", type = "SOSOptionRegExp", mandatory = false)
     public SOSOptionRegExp exclude_lines_after = new SOSOptionRegExp(this, CLASSNAME + ".exclude_lines_after", "exclude_lines_after", "", "", false);
 
     public String getexclude_lines_after() {
@@ -196,9 +187,9 @@ public abstract class SOSFilterOptionsSuperClass extends JSOptionsClass {
         return this;
     }
 
-    @JSOptionDefinition(name = "exclude_empty_lines", description = "exclude empty lines", key = "exclude_empty_lines", type = "SOSOptionRegExp",
-            mandatory = false)
-    public SOSOptionBoolean excludeEmptyLines = new SOSOptionBoolean(this, CLASSNAME + ".exclude_empty_lines", "exclude empty lines", "false", "false", false);
+    @JSOptionDefinition(name = "exclude_empty_lines", description = "exclude empty lines", key = "exclude_empty_lines", type = "SOSOptionRegExp", mandatory = false)
+    public SOSOptionBoolean excludeEmptyLines = new SOSOptionBoolean(this, CLASSNAME + ".exclude_empty_lines", "exclude empty lines", "false",
+            "false", false);
 
     public String getexclude_empty_lines() {
         return excludeEmptyLines.Value();

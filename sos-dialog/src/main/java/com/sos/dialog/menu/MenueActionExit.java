@@ -18,7 +18,6 @@ public class MenueActionExit extends MenueActionBase {
     public void run() {
         Shell sShell = Display.getCurrent().getActiveShell();
         sShell.close();
-        // sShell.dispose();
     }
 
 }

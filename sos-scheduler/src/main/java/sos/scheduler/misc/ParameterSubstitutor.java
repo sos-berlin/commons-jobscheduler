@@ -1,7 +1,7 @@
 package sos.scheduler.misc;
 
 import java.io.File;
- 
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -14,10 +14,11 @@ import org.apache.commons.lang3.text.StrSubstitutor;
 public class ParameterSubstitutor {
 
     private HashMap<String, String> keylist;
-    private StrSubstitutor strSubstitutorEnv; 
+    private StrSubstitutor strSubstitutorEnv;
     private StrSubstitutor strSubstitutor;
-    private boolean caseSensitive=false; 
-    private String openTag="${";
+    private boolean caseSensitive = false;
+    private String openTag = "${";
+
     public void setOpenTag(String openTag) {
         this.openTag = openTag;
     }
@@ -26,46 +27,46 @@ public class ParameterSubstitutor {
         this.closeTag = closeTag;
     }
 
-    private String closeTag="}";
-    
+    private String closeTag = "}";
+
     public ParameterSubstitutor() {
         super();
     }
-    
+
     public ParameterSubstitutor(boolean caseSensitive_) {
         super();
         this.caseSensitive = caseSensitive_;
     }
-    
-    public ParameterSubstitutor(boolean caseSensitive_,String openTag_, String closeTag_) {
+
+    public ParameterSubstitutor(boolean caseSensitive_, String openTag_, String closeTag_) {
         super();
         this.openTag = openTag_;
         this.closeTag = closeTag_;
         this.caseSensitive = caseSensitive_;
     }
-    
+
     public ParameterSubstitutor(String openTag_, String closeTag_) {
         super();
         this.openTag = openTag_;
         this.closeTag = closeTag_;
     }
-    
+
     public void addKey(String k, String v) {
         if (keylist == null) {
             keylist = new HashMap<String, String>();
-         }
-        if (caseSensitive){
+        }
+        if (caseSensitive) {
             keylist.put(k, v);
-        }else{
+        } else {
             keylist.put(k.toLowerCase(), v);
         }
     }
 
     public String replaceEnvVars(String source) {
-        if (strSubstitutorEnv==null){
-            if (caseSensitive){
+        if (strSubstitutorEnv == null) {
+            if (caseSensitive) {
                 strSubstitutorEnv = new StrSubstitutor(System.getenv());
-            }else{
+            } else {
                 strSubstitutorEnv = new StrSubstitutor(new CaseInsensitivLookupForParameter<String>(System.getenv()));
             }
         }
@@ -77,11 +78,11 @@ public class ParameterSubstitutor {
     }
 
     public String replace(final String source) {
-        if (strSubstitutor == null){
-            if (caseSensitive){
+        if (strSubstitutor == null) {
+            if (caseSensitive) {
                 strSubstitutor = new StrSubstitutor(keylist);
-            }else{
-               strSubstitutor = new StrSubstitutor(new CaseInsensitivLookupForParameter<String>(keylist));
+            } else {
+                strSubstitutor = new StrSubstitutor(new CaseInsensitivLookupForParameter<String>(keylist));
             }
         }
         strSubstitutor.setVariablePrefix(openTag);
@@ -98,10 +99,9 @@ public class ParameterSubstitutor {
         content = replace(content);
         Files.write(outPath, content.getBytes(charset));
     }
-    
+
     public void setCaseSensitive(boolean caseSensitive) {
         this.caseSensitive = caseSensitive;
     }
-
 
 }

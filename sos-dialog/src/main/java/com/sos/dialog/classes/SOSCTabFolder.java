@@ -61,7 +61,7 @@ public class SOSCTabFolder extends CTabFolder {
 
             @Override
             public void focusLost(final FocusEvent e) {
-                // TO DO validate?
+                //
             }
 
             @Override
@@ -100,6 +100,7 @@ public class SOSCTabFolder extends CTabFolder {
                             objC.dispose();
                         }
                     } catch (Exception e) {
+                        //
                     }
                 }
                 setData("lastSelected", objSelectedItem);
@@ -108,7 +109,7 @@ public class SOSCTabFolder extends CTabFolder {
 
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
-                // TO DO Auto-generated method stub
+                //
             }
         });
         this.addListener(SWT.MouseDoubleClick, Globals.listener);
@@ -166,6 +167,7 @@ public class SOSCTabFolder extends CTabFolder {
         this.addCTabFolder2Listener(new CTabFolder2Adapter() {
 
             public void itemClosed(final CTabFolderEvent event) {
+                //
             }
 
             @Override
@@ -178,18 +180,22 @@ public class SOSCTabFolder extends CTabFolder {
 
             @Override
             public void minimize(final CTabFolderEvent event) {
+                //
             }
 
             @Override
             public void maximize(final CTabFolderEvent event) {
+                //
             }
 
             @Override
             public void restore(final CTabFolderEvent event) {
+                //
             }
 
             @Override
             public void showList(final CTabFolderEvent event) {
+                //
             }
         });
     }
@@ -208,8 +214,7 @@ public class SOSCTabFolder extends CTabFolder {
                 Object objO = pobjTabItem.getData();
                 if (objO instanceof IDirty) {
                     IDirty objDH = (IDirty) objO;
-                    if (objDH.isDirty()) {
-                    } else {
+                    if (!objDH.isDirty()) {
                         buttonID = SWT.NO;
                     }
                 }

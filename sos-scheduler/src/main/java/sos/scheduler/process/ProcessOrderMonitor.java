@@ -46,7 +46,8 @@ public class ProcessOrderMonitor extends ProcessBaseMonitor {
             this.setLogger(new SOSSchedulerLogger(spooler_log));
             Order order = spooler_task.order();
             if (!rc
-                    && !(order.params() != null && order.params().value("setback") != null && ("false".equalsIgnoreCase(order.params().value("setback"))
+                    && !(order.params() != null && order.params().value("setback") != null && ("false".equalsIgnoreCase(order.params().value(
+                            "setback"))
                             || "no".equalsIgnoreCase(order.params().value("setback")) || "0".equals(order.params().value("setback"))))) {
                 spooler_task.order().setback();
             }
@@ -58,6 +59,7 @@ public class ProcessOrderMonitor extends ProcessBaseMonitor {
             try {
                 this.cleanupConfiguration();
             } catch (Exception e) {
+                //
             }
         }
     }

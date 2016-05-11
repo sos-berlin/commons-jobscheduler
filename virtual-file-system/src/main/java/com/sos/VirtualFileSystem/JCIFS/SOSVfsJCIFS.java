@@ -36,7 +36,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 
-    private final static Logger LOGGER = Logger.getLogger(SOSVfsJCIFS.class);
+    private static final Logger LOGGER = Logger.getLogger(SOSVfsJCIFS.class);
     private static final int DEFAULT_PORT = 445;
     private NtlmPasswordAuthentication authentication = null;
     private boolean isConnected = false;
@@ -57,11 +57,9 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     @Override
     public ISOSConnection Connect(final SOSConnection2OptionsAlternate options) {
         connection2OptionsAlternate = options;
-
         if (connection2OptionsAlternate == null) {
             RaiseException(SOSVfs_E_190.params("connection2OptionsAlternate"));
         }
-
         int port = connection2OptionsAlternate.port.isDirty() ? connection2OptionsAlternate.port.value() : DEFAULT_PORT;
         this.connect(connection2OptionsAlternate.host.Value(), port);
         return this;
@@ -70,10 +68,8 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     @Override
     public ISOSConnection Authenticate(final ISOSAuthenticationOptions options) {
         authenticationOptions = options;
-
         try {
             domain = connection2OptionsAlternate.domain.Value();
-
             this.doAuthenticate(authenticationOptions);
         } catch (Exception ex) {
             throw new JobSchedulerException(ex);
@@ -83,17 +79,12 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 
     @Override
     public void login(String user, final String password) {
-
         isConnected = false;
         try {
             userName = user;
-
             LOGGER.debug(SOSVfs_D_132.params(userName));
-
             smbLogin(domain, host, port, userName, password);
-
             isConnected = true;
-
             reply = "OK";
             LOGGER.info(SOSVfs_D_133.params(userName));
             this.LogReply();
@@ -105,7 +96,6 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     @Override
     public void disconnect() {
         reply = "disconnect OK";
-
         isConnected = false;
         this.logINFO(reply);
     }
@@ -124,12 +114,12 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
             for (String subFolder : folderName.getSubFolderArray()) {
                 subFolder = this.normalizePath(subFolder);
                 LOGGER.debug(HostID(SOSVfs_D_179.params("mkdir", subFolder)));
-                if (this.fileExists(subFolder) == false) {
+                if (!this.fileExists(subFolder)) {
                     SmbFile f = getSmbFile(subFolder);
                     f.mkdir();
                     LOGGER.debug(HostID(SOSVfs_D_181.params("mkdir", subFolder, getReplyString())));
                 } else {
-                    if (this.isDirectory(subFolder) == false) {
+                    if (!this.isDirectory(subFolder)) {
                         RaiseException(SOSVfs_E_277.params(subFolder));
                     }
                 }
@@ -147,13 +137,11 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     public void rmdir(String path) {
         try {
             reply = "rmdir OK";
-
             path = this.normalizePath(path);
             if (!path.endsWith("/")) {
                 path += "/";
             }
             SmbFile f = getSmbFile(path);
-
             if (!f.exists()) {
                 throw new JobSchedulerException(String.format("[rmdir] failed. Filepath '%1$s' does not exist.", f.getPath()));
             }
@@ -161,7 +149,6 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
                 throw new JobSchedulerException(String.format("[rmdir] failed.  Filepath '%1$s' is not a directory.", f.getPath()));
             }
             f.delete();
-
             reply = "rmdir OK";
             LOGGER.info(HostID(SOSVfs_D_181.params("rmdir", path, getReplyString())));
         } catch (JobSchedulerException e) {
@@ -176,53 +163,46 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     @Override
     public boolean isDirectory(final String path) {
         SmbFile f = null;
-
         try {
             f = getSmbFile(this.normalizePath(path));
             return f.isDirectory();
         } catch (Exception e) {
+            //
         }
-
         return false;
     }
 
     public boolean isHidden(final String path) {
         SmbFile f = null;
-
         try {
             f = getSmbFile(this.normalizePath(path));
             return f.isHidden();
         } catch (Exception e) {
+            //
         }
-
         return false;
     }
 
     @Override
     public String[] listNames(String path) throws IOException {
-
         SmbFile f = null;
         try {
-            if (path.length() == 0) {
+            if (path.isEmpty()) {
                 path = ".";
             }
             if (!this.fileExists(path)) {
                 throw new JobSchedulerException(SOSVfs_E_226.params(path));
             }
-
             if (!this.isDirectory(path)) {
                 reply = "ls OK";
                 return new String[] { path };
             }
-
             f = getSmbFile(this.normalizePath(path));
             String sep = path.endsWith("/") ? "" : "/";
-
             SmbFile[] lsResult = f.listFiles();
             String[] result = new String[lsResult.length];
             for (int i = 0; i < lsResult.length; i++) {
                 SmbFile entry = lsResult[i];
-
                 String fileName = path + sep + entry.getName();
                 result[i] = fileName;
             }
@@ -262,33 +242,25 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
         SmbFileInputStream in = null;
         try {
             remoteFileSize = this.size(this.normalizePath(remoteFile));
-
             f = getSmbFile(this.normalizePath(remoteFile));
             in = new SmbFileInputStream(f);
             fos = new FileOutputStream(localFile, append);
-
             byte[] b = new byte[8192];
-            int n, tot = 0;
+            int n = 0;
+            int tot = 0;
             while ((n = in.read(b)) > 0) {
                 fos.write(b, 0, n);
                 tot += n;
             }
-
             in.close();
             in = null;
-
             fos.flush();
             fos.close();
             fos = null;
-
             transferFile = new File(localFile);
-
-            if (!append) {
-                if (remoteFileSize > 0 && remoteFileSize != transferFile.length()) {
-                    throw new JobSchedulerException(SOSVfs_E_162.params(remoteFileSize, transferFile.length()));
-                }
+            if (!append && remoteFileSize > 0 && remoteFileSize != transferFile.length()) {
+                throw new JobSchedulerException(SOSVfs_E_162.params(remoteFileSize, transferFile.length()));
             }
-
             remoteFileSize = transferFile.length();
             reply = "get OK";
             logINFO(HostID(SOSVfs_I_182.params("getFile", this.normalizePath(remoteFile), localFile, getReplyString())));
@@ -300,41 +272,37 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
                 try {
                     in.close();
                 } catch (Exception ex) {
+                    //
                 }
             }
             if (fos != null) {
                 try {
                     fos.close();
                 } catch (Exception ex) {
+                    //
                 }
             }
         }
-
         return remoteFileSize;
-
     }
 
     @Override
     public long putFile(final String localFilePath, final String remoteFilePath) {
         long size = 0;
-
         SmbFile remoteFile = null;
         SmbFileOutputStream out = null;
         FileInputStream in = null;
-
         try {
             remoteFile = getSmbFile(this.normalizePath(remoteFilePath));
-
             in = new FileInputStream(localFilePath);
             out = new SmbFileOutputStream(remoteFile);
-
             byte[] b = new byte[8192];
-            int n, tot = 0;
+            int n = 0;
+            int tot = 0;
             while ((n = in.read(b)) > 0) {
                 out.write(b, 0, n);
                 tot += n;
             }
-
             reply = "put OK";
             logINFO(HostID(SOSVfs_I_183.params("putFile", localFilePath, remoteFile.getPath(), getReplyString())));
             size = this.size(this.normalizePath(remoteFilePath));
@@ -346,16 +314,17 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
                 try {
                     in.close();
                 } catch (Exception e) {
+                    //
                 }
             }
             if (out != null) {
                 try {
                     out.close();
                 } catch (Exception e) {
+                    //
                 }
             }
         }
-
         return size;
     }
 
@@ -365,14 +334,12 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
             if (this.isDirectory(this.normalizePath(path))) {
                 throw new JobSchedulerException(SOSVfs_E_186.params(path));
             }
-
             SmbFile f = getSmbFile(this.normalizePath(path));
             f.delete();
         } catch (Exception ex) {
             reply = ex.toString();
             RaiseException(ex, SOSVfs_E_187.params("delete", path));
         }
-
         reply = "rm OK";
         logINFO(HostID(SOSVfs_D_181.params("delete", path, getReplyString())));
     }
@@ -384,13 +351,11 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
         try {
             fromF = getSmbFile(this.normalizePath(from));
             toF = getSmbFile(this.normalizePath(to));
-
             fromF.renameTo(toF);
         } catch (Exception e) {
             reply = e.toString();
             throw new JobSchedulerException(SOSVfs_E_188.params("rename", from, to), e);
         }
-
         reply = "mv OK";
         LOGGER.info(HostID(SOSVfs_I_189.params(from, to, getReplyString())));
     }
@@ -402,7 +367,6 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 
     @Override
     public InputStream getInputStream(final String path) {
-
         SmbFile f = null;
         try {
             f = getSmbFile(this.normalizePath(path));
@@ -430,7 +394,6 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
         SmbFile f = null;
         try {
             f = getSmbFile(this.normalizePath(path));
-
             if (!f.exists()) {
                 reply = String.format("Filepath '%1$s' does not exist.", f.getPath());
                 return false;
@@ -439,7 +402,6 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
                 reply = String.format("Filepath '%1$s' is not a directory.", f.getPath());
                 return false;
             }
-
             currentDirectory = f.getPath();
             reply = "cwd OK";
         } catch (Exception ex) {
@@ -470,14 +432,13 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
                 dateTime = df.format(new Date(lm));
             }
         } catch (Exception ex) {
-
+            //
         }
         return dateTime;
     }
 
     @Override
     protected boolean fileExists(String filename) {
-
         SmbFile file = null;
         try {
             file = getSmbFile(this.normalizePath(filename));
@@ -516,17 +477,14 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
             for (int i = 0; i < arr.length; i++) {
                 String file = arr[i].trim();
                 LOGGER.info(String.format("use configuration file: %s", file));
-
                 FileInputStream in = null;
                 try {
                     in = new FileInputStream(file);
                     Properties p = new Properties();
                     p.load(in);
-
                     for (Entry<Object, Object> entry : p.entrySet()) {
                         String key = (String) entry.getKey();
                         String value = (String) entry.getValue();
-
                         LOGGER.debug(String.format("set configuration setting: %s = %s", key, value));
                         jcifs.Config.setProperty(key, value);
                     }
@@ -537,6 +495,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
                         try {
                             in.close();
                         } catch (Exception ex) {
+                            //
                         }
                     }
                 }
@@ -546,46 +505,34 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
 
     private void smbLogin(String domain, String host, int port, String user, String password) throws Exception {
         setConfigFromFiles();
-
         UniAddress hostAddress = UniAddress.getByName(host);
         authentication = new NtlmPasswordAuthentication(domain, user, password);
         SmbSession.logon(hostAddress, port, authentication);
     }
 
     private ISOSConnection doAuthenticate(final ISOSAuthenticationOptions options) throws Exception {
-
         authenticationOptions = options;
         isConnected = false;
-
         userName = authenticationOptions.getUser().Value();
         String password = authenticationOptions.getPassword().Value();
         LOGGER.debug(SOSVfs_D_132.params(userName));
-
         try {
             smbLogin(domain, host, port, userName, password);
-
             isConnected = true;
         } catch (Exception ex) {
             throw new JobSchedulerException(ex);
         }
-
         reply = "OK";
         LOGGER.info(SOSVfs_D_133.params(userName));
-
         this.LogReply();
-
         return this;
     }
 
     private void connect(final String phost, final int pport) {
-
         host = phost;
         port = pport;
-
         LOGGER.info(SOSVfs_D_0101.params(host, port));
-
-        if (this.isConnected() == false) {
-
+        if (!this.isConnected()) {
             this.LogReply();
         } else {
             logWARN(SOSVfs_D_0103.params(host, port));
@@ -616,4 +563,5 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     public void setSimulateShell(boolean simulateShell) {
         this.simulateShell = simulateShell;
     }
+
 }

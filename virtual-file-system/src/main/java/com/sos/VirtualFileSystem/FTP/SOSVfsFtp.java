@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPClientConfig;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPHTTPClient;
 import org.apache.log4j.Logger;
@@ -46,16 +45,6 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
         super();
     }
 
-    /** append a local file to the remote one on the server
-     *
-     * @param localFile The name of the local file.
-     * @param remoteFile The name of the remote file.
-     *
-     * @return The total number of bytes appended.
-     *
-     * @exception Exception
-     * @see #put(String, String )
-     * @see #putFile(String, String ) */
     @Override
     public long appendFile(final String localFile, final String remoteFile) {
         final String conMethodName = CLASS_NAME + "::appendFile";
@@ -69,11 +58,6 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
         return i;
     }
 
-    /** Using ASCII mode for file transfers
-     * 
-     * @return True if successfully completed, false if not.
-     * @throws IOException If an I/O error occurs while either sending a command
-     *             to the server or receiving a reply from the server. */
     @Override
     public void ascii() {
         final String conMethodName = CLASS_NAME + "::ascii";
@@ -87,11 +71,6 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
         }
     }
 
-    /** Using Binary mode for file transfers
-     * 
-     * @return True if successfully completed, false if not.
-     * @throws IOException If an I/O error occurs while either sending a command
-     *             to the server or receiving a reply from the server. */
     @Override
     public void binary() {
         final String conMethodName = CLASS_NAME + "::binary";
@@ -105,10 +84,6 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
         }
     }
 
-    /** @param directory The new working directory.
-     * @return The reply code received from the server.
-     * @throws IOException If an I/O error occurs while either sending a command
-     *             to the server or receiving a reply from the server. */
     @Override
     public int cd(final String directory) throws IOException {
         return Client().cwd(directory);
@@ -175,6 +150,7 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 
     @Override
     public void closeInput() {
+        //
     }
 
     private void closeInput(InputStream objO) {
@@ -184,6 +160,7 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
                 objO = null;
             }
         } catch (IOException e) {
+            //
         }
     }
 
@@ -195,6 +172,7 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
                 objO = null;
             }
         } catch (Exception e) {
+            //
         }
     }
 
@@ -204,15 +182,6 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
         return null;
     }
 
-    /** return a listing of the files of the current directory in long format on
-     * the remote machine
-     * 
-     * @return a listing of the contents of the current directory on the remote
-     *         machine
-     * @exception Exception
-     * @see #nList()
-     * @see #nList(String )
-     * @see #dir(String ) */
     @Override
     public SOSFileList dir() {
         final String conMethodName = CLASS_NAME + "::dir";
@@ -232,15 +201,6 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
         return null;
     }
 
-    /** return a listing of the files in a directory in long format on the remote
-     * machine
-     * 
-     * @param pathname on remote machine
-     * @return a listing of the contents of a directory on the remote machine
-     * @exception Exception
-     * @see #nList()
-     * @see #nList(String )
-     * @see #dir() */
     @Override
     public SOSFileList dir(final String pathname) {
         Vector<String> strList = getFilenames(pathname);
@@ -248,14 +208,6 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
         return new SOSFileList(strT);
     }
 
-    /** return a listing of a directory in long format on the remote machine
-     *
-     * @param pathname on remote machine
-     * @return a listing of the contents of a directory on the remote machine
-     * @exception Exception
-     * @see #nList()
-     * @see #nList(String )
-     * @see #dir() */
     @Override
     public SOSFileList dir(final String pathname, final int flag) {
         final String conMethodName = CLASS_NAME + "::dir";
@@ -309,14 +261,9 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 
     @Override
     public void flush() {
+        //
     }
 
-    /** Retrieves a named file from the ftp server.
-     *
-     * @param localFile The name of the local file.
-     * @param remoteFile The name of the remote file.
-     * @exception Exception
-     * @see #getFile(String, String ) */
     @Override
     public void get(final String remoteFile, final String localFile) {
         final String conMethodName = CLASS_NAME + "::get";
@@ -358,27 +305,12 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
         return null;
     }
 
-    /** Retrieves a named file from the ftp server.
-     *
-     * @param localFile The name of the local file.
-     * @param remoteFile The name of the remote file.
-     * @return The total number of bytes retrieved.
-     * @see #get(String, String )
-     * @exception Exception */
     @Override
     public long getFile(final String remoteFile, final String localFile) {
         final boolean flgAppendLocalFile = false;
         return this.getFile(remoteFile, localFile, flgAppendLocalFile);
     }
 
-    /** Retrieves a named file from the ftp server.
-     *
-     * @param localFile The name of the local file.
-     * @param remoteFile The name of the remote file.
-     * @param append Appends the remote file to the local file.
-     * @return The total number of bytes retrieved.
-     * @see #get(String, String )
-     * @exception Exception */
     @Override
     public long getFile(final String remoteFile, final String localFile, final boolean append) {
         final String conMethodName = CLASS_NAME + "::getFile";
@@ -435,7 +367,6 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
         Vector<String> vecDirectoryListing = nList(folder, flgRecurseSubFolder);
         Vector<String> strB = new Vector<String>();
         Pattern pattern = Pattern.compile(regexp, flag);
-
         for (String strFile : vecDirectoryListing) {
             String strFileName = new File(strFile).getName();
             if (integrityHashType != null && strFileName.endsWith(integrityHashType)) {
@@ -493,7 +424,6 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
             }
             return dirListing;
         }
-
         for (FTPFile ftpFile : ftpFileList) {
             SOSFileEntry sosFileEntry = new SOSFileEntry();
             sosFileEntry.setDirectory(ftpFile.isDirectory());
@@ -554,13 +484,11 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 
     @Override
     public StringBuffer getStdErr() throws Exception {
-        // TO DO Auto-generated method stub
         return null;
     }
 
     @Override
     public StringBuffer getStdOut() throws Exception {
-        // TO DO Auto-generated method stub
         return null;
     }
 
@@ -629,19 +557,14 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 
     @Override
     public void openInputFile(final String pstrFileName) {
+        //
     }
 
     @Override
     public void openOutputFile(final String pstrFileName) {
+        //
     }
 
-    /** Stores a file on the server using the given name.
-     * 
-     * @param localFile The name of the local file.
-     * @param remoteFile The name of the remote file.
-     * @return True if successfully completed, false if not.
-     * @exception Exception
-     * @see #putFile(String, String ) */
     @Override
     public void put(final String localFile, final String remoteFile) {
         final String conMethodName = CLASS_NAME + "::put";
@@ -683,16 +606,9 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
             }
         } catch (Exception e) {
             RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
-        } finally {
         }
     }
 
-    /** written to store a file on the server using the given name.
-     *
-     * @param localFile The name of the local file.
-     * @param out OutputStream through which data can be
-     * @return The total number of bytes written.
-     * @exception Exception */
     @Override
     public long putFile(final String localFile, final OutputStream out) {
         final String conMethodName = CLASS_NAME + "::putFile";
@@ -724,14 +640,6 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
         return lngTotalBytesWritten;
     }
 
-    /** Stores a file on the server using the given name.
-     *
-     * @param localFile The name of the local file.
-     * @param remoteFile The name of the remote file.
-     * @return The total number of bytes written.
-     *
-     * @exception Exception
-     * @see #put(String, String ) */
     @Override
     public long putFile(final String localFile, final String remoteFile) throws Exception {
         OutputStream outputStream = Client().storeFileStream(remoteFile);
@@ -755,7 +663,6 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 
     @Override
     public boolean remoteIsWindowsShell() {
-        // TO DO Auto-generated method stub
         return false;
     }
 
@@ -775,18 +682,12 @@ public class SOSVfsFtp extends SOSVfsFtpBaseClass implements ISOSVfsFileTransfer
 
     @Override
     public void setJSJobUtilites(final JSJobUtilities pobjJSJobUtilities) {
-        // TO DO Auto-generated method stub
-    }
-
-    private String trimResponseCode(final String response) throws Exception {
-        if (response.length() < 5) {
-            return response;
-        }
-        return response.substring(4).trim();
+        //
     }
 
     @Override
     public void write(final byte[] bteBuffer) {
+        //
     }
 
     @Override

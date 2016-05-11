@@ -112,7 +112,6 @@ public class TestSOSFTP {
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-        } finally {
         }
     }
 
@@ -132,7 +131,6 @@ public class TestSOSFTP {
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-        } finally {
         }
     }
 
@@ -193,6 +191,7 @@ public class TestSOSFTP {
             try {
                 intIndex = new Integer(strFileSpecIndex);
             } catch (NumberFormatException e) {
+                //
             }
             if (intIndex > 0) {
                 flgMultipleFileSpecs = true;
@@ -221,8 +220,9 @@ public class TestSOSFTP {
     @Test
     public void testSendUsingFilePathAndLocalDir() {
         CreateTestFile();
-        strArguments = new String[] { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
-                "-local_dir=" + strTestPathName, "-file_path=" + strTestPathName + strTestFileName };
+        strArguments =
+                new String[] { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
+                        "-local_dir=" + strTestPathName, "-file_path=" + strTestPathName + strTestFileName };
         callSOSFtp(strArguments);
     }
 
@@ -234,40 +234,45 @@ public class TestSOSFTP {
     @Test
     public void testSendUsingFilePathAndLocalDir2() {
         CreateTestFile();
-        String[] strArguments = { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
-                "-local_dir=" + strTestPathName + "hugo/", "-file_path=" + strTestPathName + strTestFileName };
+        String[] strArguments =
+                { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
+                        "-local_dir=" + strTestPathName + "hugo/", "-file_path=" + strTestPathName + strTestFileName };
         callSOSFtp(strArguments);
     }
 
     @Test
     public void testSendUsingFilePathAndLocalDir3() {
         CreateTestFile();
-        String[] strArguments = { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
-                "-local_dir=" + strTestPathName, "-file_path=" + strTestFileName };
+        String[] strArguments =
+                { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
+                        "-local_dir=" + strTestPathName, "-file_path=" + strTestFileName };
         callSOSFtp(strArguments);
     }
 
     @Test
     public void testSendUsingFilePathAndLocalDir4() {
         CreateTestFile();
-        String[] strArguments = { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
-                "-local_dir=R:/backup/sos/java/junittests/testdata/", "-file_path=./SOSDataExchange/" + strTestFileName };
+        String[] strArguments =
+                { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
+                        "-local_dir=R:/backup/sos/java/junittests/testdata/", "-file_path=./SOSDataExchange/" + strTestFileName };
         callSOSFtp(strArguments);
     }
 
     @Test
     public void testSendUsingFilePathAndLocalDir5() {
         CreateTestFile();
-        String[] strArguments = { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
-                "-file_path=" + strTestPathName + strTestFileName };
+        String[] strArguments =
+                { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
+                        "-file_path=" + strTestPathName + strTestFileName };
         callSOSFtp(strArguments);
     }
 
     @Test
     public void testSendUsingFilePathAndLocalDir6() {
         CreateTestFile();
-        String[] strArguments = { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
-                "-local_dir=\"\" ", "-file_path=" + strTestPathName + strTestFileName };
+        String[] strArguments =
+                { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb", "-local_dir=\"\" ",
+                        "-file_path=" + strTestPathName + strTestFileName };
         callSOSFtp(strArguments);
     }
 

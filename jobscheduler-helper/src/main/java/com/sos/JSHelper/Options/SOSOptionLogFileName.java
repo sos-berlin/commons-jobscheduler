@@ -41,6 +41,7 @@ public class SOSOptionLogFileName extends SOSOptionOutFileName {
                 objF.replaceString("&lt;", "<");
                 objF.replaceString("&gt;", ">");
             } catch (IOException e) {
+                //
             }
         }
     }

@@ -358,10 +358,10 @@ public class JSObjJobChain extends JobChain {
         }
     }
 
-    private String  escapeQuote(String s){
+    private String escapeQuote(String s) {
         return s.replaceAll("(\")", "\\\\$1");
     }
-    
+
     public String createGraphVizImageFile(File imageOutputFolder, boolean showErrorNodes) throws Exception {
         File liveFolder = new File(new File(this.getHotFolderSrc().getName()).getParent());
         JSObjJobChain jobchain = this;

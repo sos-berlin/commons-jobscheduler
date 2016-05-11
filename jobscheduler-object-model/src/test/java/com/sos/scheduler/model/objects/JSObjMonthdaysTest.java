@@ -40,16 +40,18 @@ public class JSObjMonthdaysTest {
     @Test
     public final void testSetValidXmlContent() {
         String xmlHeader = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
-        xml = "<run_time xmlns:ns2=\"job-chain-extensions\">\n" + "    <monthdays>\n" + "        <weekday day=\"tuesday\" which=\"2\">\n"
-                + "            <period single_start=\"15:00\"/>\n" + "        </weekday>\n" + "    </monthdays>\n" + "</run_time>\n";
+        xml =
+                "<run_time xmlns:ns2=\"job-chain-extensions\">\n" + "    <monthdays>\n" + "        <weekday day=\"tuesday\" which=\"2\">\n"
+                        + "            <period single_start=\"15:00\"/>\n" + "        </weekday>\n" + "    </monthdays>\n" + "</run_time>\n";
         JSObjRunTime runtime = new JSObjRunTime(factory, xml);
         assertEquals(xmlHeader + xml, runtime.toXMLString());
     }
 
     @Test
     public final void testWeekday() {
-        xml = "<run_time>" + "<monthdays>" + "<weekday day=\"tuesday thursday\" which=\"2\">" + "<period single_start=\"15:00\" />" + "</weekday>"
-                + "</monthdays>" + "</run_time>";
+        xml =
+                "<run_time>" + "<monthdays>" + "<weekday day=\"tuesday thursday\" which=\"2\">" + "<period single_start=\"15:00\" />" + "</weekday>"
+                        + "</monthdays>" + "</run_time>";
         JSObjRunTime runtime = new JSObjRunTime(factory, xml);
 
         Iterator<Object> it = runtime.getMonthdays().getDayOrWeekday().iterator();
@@ -75,8 +77,10 @@ public class JSObjMonthdaysTest {
 
     @Test
     public final void testWeekday2() {
-        xml = "<run_time>" + "<monthdays>" + "<weekday day=\"tuesday\" which=\"-2\">" + "<period single_start=\"15:00\" />" + "</weekday>"
-                + "<weekday day=\"monday\" which=\"-3\">" + "<period single_start=\"13:00\" />" + "</weekday>" + "</monthdays>" + "</run_time>";
+        xml =
+                "<run_time>" + "<monthdays>" + "<weekday day=\"tuesday\" which=\"-2\">" + "<period single_start=\"15:00\" />" + "</weekday>"
+                        + "<weekday day=\"monday\" which=\"-3\">" + "<period single_start=\"13:00\" />" + "</weekday>" + "</monthdays>"
+                        + "</run_time>";
         JSObjRunTime runtime = new JSObjRunTime(factory, xml);
 
         Iterator<Object> it = runtime.getMonthdays().getDayOrWeekday().iterator();
@@ -115,8 +119,9 @@ public class JSObjMonthdaysTest {
 
     @Test
     public final void testMonthdaysDay() {
-        xml = "<run_time>" + "<monthdays>" + "<day day=\"5\">" + "<period single_start=\"15:00\" />" + "</day>" + "<day day=\"0\">"
-                + "<period single_start=\"11:00\" />" + "</day>" + "</monthdays>" + "</run_time>";
+        xml =
+                "<run_time>" + "<monthdays>" + "<day day=\"5\">" + "<period single_start=\"15:00\" />" + "</day>" + "<day day=\"0\">"
+                        + "<period single_start=\"11:00\" />" + "</day>" + "</monthdays>" + "</run_time>";
         JSObjRunTime runtime = new JSObjRunTime(factory, xml);
 
         Iterator<Object> it = runtime.getMonthdays().getDayOrWeekday().iterator();
@@ -155,8 +160,9 @@ public class JSObjMonthdaysTest {
 
     @Test
     public final void testMonthdays() {
-        xml = "<run_time>" + "<monthdays>" + "<weekday day=\"tuesday\" which=\"-2\">" + "<period single_start=\"15:00\" />" + "</weekday>"
-                + "<day day=\"0\">" + "<period single_start=\"23:59:59\" />" + "</day>" + "</monthdays>" + "</run_time>";
+        xml =
+                "<run_time>" + "<monthdays>" + "<weekday day=\"tuesday\" which=\"-2\">" + "<period single_start=\"15:00\" />" + "</weekday>"
+                        + "<day day=\"0\">" + "<period single_start=\"23:59:59\" />" + "</day>" + "</monthdays>" + "</run_time>";
         JSObjRunTime runtime = new JSObjRunTime(factory, xml);
 
         List<DateTime> dates = runtime.getJsObjMonthdays().getRunTimeElements(baseInterval).getStartTimes();

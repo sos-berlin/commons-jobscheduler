@@ -1,34 +1,22 @@
 package com.sos.scheduler.model.objects;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.Interval;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.sos.scheduler.model.tools.JodaTools;
 
 public class JodaToolsTest {
 
-    @SuppressWarnings("unused")
-    private final static Logger logger = Logger.getLogger(JodaToolsTest.class);
-
     private final static DateTimeFormatter fmtDate = DateTimeFormat.forPattern("yyyy-MM-dd");
-    // private final static DateTimeFormatter fmtDateTime =
-    // DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
-
     private final static DateTime baseDate = new DateTime(2012, 3, 12, 0, 0, 0, 0);
-
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-    }
 
     @Test
     public final void testStartOfMonth() {
@@ -67,7 +55,6 @@ public class JodaToolsTest {
         Interval baseInterval = new Interval(baseDate, baseDate.plusDays(31));
         DateTime result = JodaTools.getWeekdayInIntervalOrNull(baseInterval, DateTimeConstants.WEDNESDAY, 1);
         assertEquals("2012-04-04", fmtDate.print(result));
-
         baseInterval = new Interval(baseDate, baseDate.plusDays(5));
         result = JodaTools.getWeekdayInIntervalOrNull(baseInterval, DateTimeConstants.WEDNESDAY, 1);
         assertEquals(null, result);
@@ -90,7 +77,6 @@ public class JodaToolsTest {
         Interval baseInterval = new Interval(baseDate, baseDate.plusDays(31));
         DateTime result = JodaTools.getDayInIntervalOrNull(baseInterval, 12);
         assertEquals("2012-03-12", fmtDate.print(result));
-
         baseInterval = new Interval(baseDate, baseDate.plusDays(5));
         result = JodaTools.getDayInIntervalOrNull(baseInterval, -5);
         assertEquals(null, result);

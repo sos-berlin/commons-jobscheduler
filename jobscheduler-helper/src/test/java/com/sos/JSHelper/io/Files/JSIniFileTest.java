@@ -33,105 +33,32 @@ import static org.junit.Assert.assertTrue;
 public class JSIniFileTest {
 
     private static final String conIniFileName = "R:/backup/sos/java/development/SOSDataExchange/examples/jade_settings.ini";
-    @SuppressWarnings("unused")
-    private final String conClassName = "JSIniFileTest";
-    private static final String conSVNVersion = "$Id$";
-    private static final Logger logger = Logger.getLogger(JSIniFileTest.class);
-
+    private static final Logger LOGGER = Logger.getLogger(JSIniFileTest.class);
     private JSIniFile objF = null;
 
-    public JSIniFileTest() {
-        //
-    }
-
-    /** \brief setUpBeforeClass
-     * 
-     * \details
-     *
-     * \return void
-     *
-     * @throws java.lang.Exception */
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-    }
-
-    /** \brief tearDownAfterClass
-     * 
-     * \details
-     *
-     * \return void
-     *
-     * @throws java.lang.Exception */
-    @AfterClass
-    public static void tearDownAfterClass() throws Exception {
-    }
-
-    /** \brief setUp
-     * 
-     * \details
-     *
-     * \return void
-     *
-     * @throws java.lang.Exception */
     @Before
     public void setUp() throws Exception {
         objF = new JSIniFile(conIniFileName);
     }
 
-    /** \brief tearDown
-     * 
-     * \details
-     *
-     * \return void
-     *
-     * @throws java.lang.Exception */
-    @After
-    public void tearDown() throws Exception {
-    }
-
-    /** Test method for
-     * {@link com.sos.JSHelper.io.Files.JSIniFile#JSIniFile(java.lang.String)}. */
     @Test
     public final void testJSIniFile() {
         assertTrue("is not null", objF != null);
     }
 
-    /** Test method for {@link com.sos.JSHelper.io.Files.JSIniFile#isDirty()}. */
-    @Test
-    public final void testIsDirty() {
-        // fail("Not yet implemented"); // TODO
-    }
-
-    /** Test method for {@link com.sos.JSHelper.io.Files.JSIniFile#Sections()}. */
     @Test
     public final void testSections() {
         Map<String, SOSProfileSection> objS = objF.Sections();
         assertTrue("is not null", objS != null);
-        logger.debug("number of sections = " + objS.size());
+        LOGGER.debug("number of sections = " + objS.size());
         for (SOSProfileSection objPS : objS.values()) {
-            logger.debug(objPS.Name());
+            LOGGER.debug(objPS.Name());
             for (SOSProfileEntry objEntry : objPS.Entries().values()) {
-                logger.debug("     " + objEntry.Name() + " = " + objEntry.Value());
+                LOGGER.debug("     " + objEntry.Name() + " = " + objEntry.Value());
             }
         }
     }
 
-    /** Test method for
-     * {@link com.sos.JSHelper.io.Files.JSIniFile#Value(java.lang.String)}. */
-    @Test
-    public final void testValueString() {
-    }
-
-    /** Test method for
-     * {@link com.sos.JSHelper.io.Files.JSIniFile#Value(java.lang.String, java.lang.String)}
-     * . */
-    @Test
-    public final void testValueStringString() {
-    }
-
-    /** Test method for
-     * {@link com.sos.JSHelper.io.Files.JSIniFile#setValue(java.lang.String, java.lang.String)}
-     * . */
     @Test
     @Ignore("Test set to Ignore for later examination, fails in Jenkins build")
     public final void testSetValue() {
@@ -154,9 +81,6 @@ public class JSIniFileTest {
         assertEquals("Entry delete failed", null, objE);
     }
 
-    /** Test method for
-     * {@link com.sos.JSHelper.io.Files.JSIniFile#SectionName(java.lang.String)}
-     * . */
     @Test
     @Ignore("Test set to Ignore for later examination, fails in Jenkins build")
     public final void testSectionNameString() {
@@ -164,52 +88,15 @@ public class JSIniFileTest {
         assertEquals("section name not ok", "do_sftp", obj.strSectionName);
     }
 
-    /** Test method for {@link com.sos.JSHelper.io.Files.JSIniFile#SectionName()}
-     * . */
-    @Test
-    public final void testSectionName() {
-    }
-
-    /** Test method for
-     * {@link com.sos.JSHelper.io.Files.JSIniFile#getPropertyString(java.lang.String, java.lang.String, java.lang.String)}
-     * . */
-    @Test
-    public final void testGetPropertyString() {
-    }
-
-    /** Test method for
-     * {@link com.sos.JSHelper.io.Files.JSIniFile#getPropertyInt(java.lang.String, java.lang.String, int)}
-     * . */
-    @Test
-    public final void testGetPropertyInt() {
-    }
-
-    /** Test method for
-     * {@link com.sos.JSHelper.io.Files.JSIniFile#getPropertyBool(java.lang.String, java.lang.String, boolean)}
-     * . */
-    @Test
-    public final void testGetPropertyBool() {
-    }
-
-    /** Test method for {@link com.sos.JSHelper.io.Files.JSIniFile#ProfileName()}
-     * . */
     @Test
     public final void testProfileName() {
         String strName = objF.strFileName;
         assertTrue("name is identisch", strName.replace('\\', '/').equals(conIniFileName.replace('\\', '/')));
     }
 
-    /** Test method for
-     * {@link com.sos.JSHelper.io.Files.JSIniFile#ProfileName(java.lang.String)}
-     * . */
-    @Test
-    public final void testProfileNameString() {
-    }
-
-    /** Test method for {@link com.sos.JSHelper.io.Files.JSIniFile#toString()}. */
     @Test
     public final void testToString() {
-        logger.debug(objF.toString());
+        LOGGER.debug(objF.toString());
     }
 
     @Test
@@ -233,4 +120,5 @@ public class JSIniFileTest {
         objNew.save();
         assertTrue("File exists ", new File(strNewIniFileName).exists());
     }
+
 }

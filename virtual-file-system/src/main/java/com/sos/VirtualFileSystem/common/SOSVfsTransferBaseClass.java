@@ -218,6 +218,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
                 objO = null;
             }
         } catch (Exception e) {
+            //
         }
     }
 
@@ -228,6 +229,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
                 objO = null;
             }
         } catch (IOException e) {
+            //
         }
 
     }
@@ -641,7 +643,6 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
             }
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_130.params("putfile()"), e);
-        } finally {
         }
     }
 

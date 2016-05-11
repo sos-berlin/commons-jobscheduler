@@ -392,10 +392,12 @@ public class SOSFileList extends SOSVfsMessageCodes {
                     fos.close();
                 }
             } catch (IOException e) {
+                //
             }
             try {
                 jumpResultSetFile.closeInput();
             } catch (Exception e) {
+                //
             }
         }
         return countLines;
@@ -562,6 +564,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
                 try {
                     historyFile.close();
                 } catch (Exception ex) {
+                    //
                 }
             }
         }
@@ -651,6 +654,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
                     hwFile.close();
                 }
             } catch (IOException e) {
+                //
             }
         }
         return records;
@@ -677,10 +681,12 @@ public class SOSFileList extends SOSVfsMessageCodes {
                         fos.close();
                     }
                 } catch (IOException e) {
+                    //
                 }
                 try {
                     jumpHistoryFile.closeInput();
                 } catch (Exception e) {
+                    //
                 }
             }
         }
@@ -735,7 +741,7 @@ public class SOSFileList extends SOSVfsMessageCodes {
             }
         }
     }
-    
+
     public boolean isEmpty() {
         return this.List().isEmpty();
     }

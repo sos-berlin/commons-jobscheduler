@@ -185,6 +185,7 @@ public class SOSSSH2JSchTest {
             try {
                 Thread.sleep(1000);
             } catch (Exception ee) {
+                //
             }
         }
         LOG.debug("output = {}", output);
@@ -223,6 +224,7 @@ public class SOSSSH2JSchTest {
             try {
                 Thread.sleep(1000);
             } catch (Exception ee) {
+                //
             }
         }
         LOG.debug("output = {}", output);

@@ -58,6 +58,7 @@ public class SOSHtmlLayout extends Layout {
 
     /** No options to activate. */
     public void activateOptions() {
+        //
     }
 
     public String format(LoggingEvent event) {
