@@ -1,5 +1,6 @@
 package sos.net.sosftp;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -7,8 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.Vector;
-
-import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
 import org.junit.AfterClass;
@@ -28,7 +27,6 @@ public class TestSOSFTP {
     private final String strTestFolderName = "./TestSOSFtp";
     private final String strTestFileName = "text.txt";
     private final String strTestPathName = "R:\\backup\\sos\\java\\junittests\\testdata\\SOSDataExchange/";
-    private final String strKBHome = "/home/kb/";
     private String[] strArguments = null;
     public static final String conSettingFILE_SPEC = "file_spec";
 
@@ -59,9 +57,9 @@ public class TestSOSFTP {
 
     @Test
     public void TestHiddenFile() {
-        Assert.assertEquals("Ist hidden file", false, sosftp.isNotHiddenFile(".."));
-        Assert.assertEquals("Ist hidden file", false, sosftp.isNotHiddenFile("."));
-        Assert.assertEquals("Ist nothidden file", true, sosftp.isNotHiddenFile("/home/kb"));
+        assertEquals("Ist hidden file", false, sosftp.isNotHiddenFile(".."));
+        assertEquals("Ist hidden file", false, sosftp.isNotHiddenFile("."));
+        assertEquals("Ist nothidden file", true, sosftp.isNotHiddenFile("/home/kb"));
     }
 
     @Test
@@ -78,7 +76,7 @@ public class TestSOSFTP {
             boolean flgOK = sosftp.mkdir(strTestFolderName);
             assertTrue("Folder created", flgOK);
             flgOK = sosftp.changeWorkingDirectory(strTestFolderName);
-            Assert.assertTrue("CD is possible", flgOK);
+            assertTrue("CD is possible", flgOK);
             if (flgOK) {
                 sosftp.cdup();
             }
@@ -92,7 +90,7 @@ public class TestSOSFTP {
         try {
             sosftp.rmdir(strTestFolderName);
             boolean flgOK = sosftp.changeWorkingDirectory(strTestFolderName);
-            Assert.assertFalse("Folder is deleted", flgOK);
+            assertFalse("Folder is deleted", flgOK);
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -117,7 +115,6 @@ public class TestSOSFTP {
 
     @Test
     public void TestnListRecurseSubFolder() throws Exception {
-        String[] strExpectedFileNames = new String[] { "/home/kb/testdir/file1.txt", "/home/kb/wake.pl", "/home/kb/wake_kb.sh" };
         try {
             long s1 = System.currentTimeMillis();
             Vector<String> strListOfAllFiles = sosftp.nList(".", false);
@@ -138,11 +135,11 @@ public class TestSOSFTP {
     public void testStripRemoteDirName() throws Exception {
         String strT = "";
         strT = stripRemoteDirName(C_TEMP_TEST, C_TEMP_TEST + "huhu.txt");
-        Assert.assertEquals("FileName expected", "huhu.txt", strT);
+        assertEquals("FileName expected", "huhu.txt", strT);
         strT = stripRemoteDirName(C_TEMP_TEST, C_TEMP_TEST + "1/huhu.txt");
-        Assert.assertEquals("FileName expected", "." + File.separator + "1" + File.separator + "huhu.txt", strT);
+        assertEquals("FileName expected", "." + File.separator + "1" + File.separator + "huhu.txt", strT);
         strT = stripRemoteDirName(C_TEMP_TEST, C_TEMP_TEST + "1/2/3/huhu.txt");
-        Assert.assertEquals("FileName expected", adjustSeparator("./1/2//3/huhu.txt"), strT);
+        assertEquals("FileName expected", adjustSeparator("./1/2//3/huhu.txt"), strT);
     }
 
     private String stripRemoteDirName(final String pstrRootPath, final String pstrPathName) throws Exception {

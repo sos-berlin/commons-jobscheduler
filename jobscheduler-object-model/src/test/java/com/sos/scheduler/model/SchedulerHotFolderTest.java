@@ -1,5 +1,16 @@
 package com.sos.scheduler.model;
 
+import java.io.File;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Hashtable;
+
+import org.apache.log4j.Logger;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import com.sos.JSHelper.DataElements.JSDataElementDate;
 import com.sos.JSHelper.DataElements.JSDateFormat;
 import com.sos.JSHelper.io.Files.JSTextFile;
@@ -10,16 +21,14 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 import com.sos.VirtualFileSystem.shell.cmdShell;
 import com.sos.scheduler.converter.graphviz.Dot;
-import com.sos.scheduler.model.objects.*;
+import com.sos.scheduler.model.objects.JSObjBase;
+import com.sos.scheduler.model.objects.JSObjHolidays;
+import com.sos.scheduler.model.objects.JSObjJob;
+import com.sos.scheduler.model.objects.JSObjJobChain;
+import com.sos.scheduler.model.objects.JSObjLock;
+import com.sos.scheduler.model.objects.JSObjOrder;
 import com.sos.scheduler.model.objects.JobChain.JobChainNode;
-
-import org.apache.log4j.Logger;
-import org.junit.*;
-
-import java.io.File;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Hashtable;
+import com.sos.scheduler.model.objects.Spooler;
 
 /** @author oh */
 public class SchedulerHotFolderTest {

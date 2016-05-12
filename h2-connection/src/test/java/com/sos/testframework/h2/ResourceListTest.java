@@ -1,15 +1,16 @@
 package com.sos.testframework.h2;
 
-import com.google.common.io.Files;
-import com.google.common.io.Resources;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
 
-import static junit.framework.Assert.assertEquals;
+import org.junit.Test;
+
+import com.google.common.io.Files;
+import com.google.common.io.Resources;
 
 public class ResourceListTest {
 
