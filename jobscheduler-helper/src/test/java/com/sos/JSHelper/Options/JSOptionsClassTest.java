@@ -1,17 +1,17 @@
 package com.sos.JSHelper.Options;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.junit.Assert;
 import org.junit.Test;
 
 /** @author KB */
 public class JSOptionsClassTest {
-
+    
     private static final Logger LOGGER = Logger.getLogger(JSOptionsClassTest.class);
 
     @Test
@@ -60,9 +60,7 @@ public class JSOptionsClassTest {
         objOC.CurrentNodeName("test");
         objOC.setAllOptions(objHsh);
         HashMap<String, String> objS4SN = objOC.Settings4StepName();
-        String strS = objS4SN.get("source/source_user");
-        String strS2 = objS4SN.get("target_user");
-        LOGGER.info(strS + " / " + strS2);
+        LOGGER.info(objS4SN.get("source/source_user") + " / " + objS4SN.get("target_user"));
     }
 
     @Test
@@ -72,7 +70,7 @@ public class JSOptionsClassTest {
         objOC.storeOptionValues();
         objOC = new JSOptionsClass();
         objOC.initializeOptionValues();
-        Assert.assertEquals("locale is wrong", "en_EN", objOC.Locale.Value());
+        assertEquals("locale is wrong", "en_EN", objOC.Locale.Value());
     }
 
 }

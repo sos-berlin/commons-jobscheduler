@@ -23,16 +23,12 @@ public class TestSOSFTP {
 
     private static final String C_TEMP_TEST = "c:/temp/test";
     private static final Logger LOGGER = Logger.getLogger(TestSOSFTP.class);
+    private static final String TEST_FOLDER_NAME = "./TestSOSFtp";
+    private static final String TEST_FILE_NAME = "text.txt";
+    private static final String TEST_PATH_NAME = "R:\\backup\\sos\\java\\junittests\\testdata\\SOSDataExchange/";
     private static SOSFTP sosftp = null;
-    private final String strTestFolderName = "./TestSOSFtp";
-    private final String strTestFileName = "text.txt";
-    private final String strTestPathName = "R:\\backup\\sos\\java\\junittests\\testdata\\SOSDataExchange/";
     private String[] strArguments = null;
     public static final String conSettingFILE_SPEC = "file_spec";
-
-    public TestSOSFTP() {
-        //
-    }
 
     @Test
     public void testUml() {
@@ -73,9 +69,9 @@ public class TestSOSFTP {
     @Test
     public void TestMKDIR() {
         try {
-            boolean flgOK = sosftp.mkdir(strTestFolderName);
+            boolean flgOK = sosftp.mkdir(TEST_FOLDER_NAME);
             assertTrue("Folder created", flgOK);
-            flgOK = sosftp.changeWorkingDirectory(strTestFolderName);
+            flgOK = sosftp.changeWorkingDirectory(TEST_FOLDER_NAME);
             assertTrue("CD is possible", flgOK);
             if (flgOK) {
                 sosftp.cdup();
@@ -88,8 +84,8 @@ public class TestSOSFTP {
     @Test
     public void TestRMDIR() {
         try {
-            sosftp.rmdir(strTestFolderName);
-            boolean flgOK = sosftp.changeWorkingDirectory(strTestFolderName);
+            sosftp.rmdir(TEST_FOLDER_NAME);
+            boolean flgOK = sosftp.changeWorkingDirectory(TEST_FOLDER_NAME);
             assertFalse("Folder is deleted", flgOK);
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
@@ -217,9 +213,8 @@ public class TestSOSFTP {
     @Test
     public void testSendUsingFilePathAndLocalDir() {
         CreateTestFile();
-        strArguments =
-                new String[] { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
-                        "-local_dir=" + strTestPathName, "-file_path=" + strTestPathName + strTestFileName };
+        strArguments = new String[] { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
+                "-local_dir=" + TEST_PATH_NAME, "-file_path=" + TEST_PATH_NAME + TEST_FILE_NAME };
         callSOSFtp(strArguments);
     }
 
@@ -231,54 +226,49 @@ public class TestSOSFTP {
     @Test
     public void testSendUsingFilePathAndLocalDir2() {
         CreateTestFile();
-        String[] strArguments =
-                { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
-                        "-local_dir=" + strTestPathName + "hugo/", "-file_path=" + strTestPathName + strTestFileName };
+        String[] strArguments = { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
+                "-local_dir=" + TEST_PATH_NAME + "hugo/", "-file_path=" + TEST_PATH_NAME + TEST_FILE_NAME };
         callSOSFtp(strArguments);
     }
 
     @Test
     public void testSendUsingFilePathAndLocalDir3() {
         CreateTestFile();
-        String[] strArguments =
-                { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
-                        "-local_dir=" + strTestPathName, "-file_path=" + strTestFileName };
+        String[] strArguments = { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
+                "-local_dir=" + TEST_PATH_NAME, "-file_path=" + TEST_FILE_NAME };
         callSOSFtp(strArguments);
     }
 
     @Test
     public void testSendUsingFilePathAndLocalDir4() {
         CreateTestFile();
-        String[] strArguments =
-                { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
-                        "-local_dir=R:/backup/sos/java/junittests/testdata/", "-file_path=./SOSDataExchange/" + strTestFileName };
+        String[] strArguments = { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
+                "-local_dir=R:/backup/sos/java/junittests/testdata/", "-file_path=./SOSDataExchange/" + TEST_FILE_NAME };
         callSOSFtp(strArguments);
     }
 
     @Test
     public void testSendUsingFilePathAndLocalDir5() {
         CreateTestFile();
-        String[] strArguments =
-                { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
-                        "-file_path=" + strTestPathName + strTestFileName };
+        String[] strArguments = { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
+                "-file_path=" + TEST_PATH_NAME + TEST_FILE_NAME };
         callSOSFtp(strArguments);
     }
 
     @Test
     public void testSendUsingFilePathAndLocalDir6() {
         CreateTestFile();
-        String[] strArguments =
-                { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb", "-local_dir=\"\" ",
-                        "-file_path=" + strTestPathName + strTestFileName };
+        String[] strArguments = { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
+                "-local_dir=\"\" ", "-file_path=" + TEST_PATH_NAME + TEST_FILE_NAME };
         callSOSFtp(strArguments);
     }
 
     private void CreateTestFile() {
-        CreateTestFile(strTestFileName);
+        CreateTestFile(TEST_FILE_NAME);
     }
 
     private void CreateTestFile(final String pstrFileName) {
-        JSFile objFile = new JSFile(strTestPathName, pstrFileName);
+        JSFile objFile = new JSFile(TEST_PATH_NAME, pstrFileName);
         try {
             objFile.WriteLine("This is a simple Testfile. nothing else.");
             objFile.close();

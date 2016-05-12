@@ -85,9 +85,8 @@ public class SOSFileSystemOperationsTest {
         String minFileSize = "-1";
         String maxFileSize = "-1";
         SOSFileSystemOperations objFSO = new SOSFileSystemOperations();
-        boolean flgOperationWasSuccessful =
-                objFSO.existsFile(file, fileSpec, Pattern.CASE_INSENSITIVE, minFileAge, maxFileAge, minFileSize, maxFileSize, skipFirstFiles,
-                        skipLastFiles, null);
+        boolean flgOperationWasSuccessful = objFSO.existsFile(file, fileSpec, Pattern.CASE_INSENSITIVE, minFileAge, maxFileAge, minFileSize,
+                maxFileSize, skipFirstFiles, skipLastFiles, null);
         LOGGER.info("flgOperationWasSuccessful: " + flgOperationWasSuccessful);
         if (flgOperationWasSuccessful) {
             Vector<File> lstR = objFSO.lstResultList;
