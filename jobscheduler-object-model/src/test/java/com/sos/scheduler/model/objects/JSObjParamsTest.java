@@ -1,19 +1,16 @@
 package com.sos.scheduler.model.objects;
 
-import com.sos.scheduler.model.SchedulerObjectFactory;
-import org.apache.log4j.Logger;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import com.sos.scheduler.model.SchedulerObjectFactory;
 
 public class JSObjParamsTest {
 
-    private final static Logger logger = Logger.getLogger(JSObjParamsTest.class);
-
     private static SchedulerObjectFactory factory = null;
-
     private final String xml = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>" + "" + "<params>" + "<param name=\"param1\" value=\"value1\"/>"
             + "<param name=\"param2\" value=\"value2\"/>" + "</params>";
     private final String xmlToMerge = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>" + "" + "<params>"
@@ -64,4 +61,5 @@ public class JSObjParamsTest {
         assertTrue(params.hasParameterValue("param2"));
         assertEquals("value2", params.getParameterValue("param2"));
     }
+
 }

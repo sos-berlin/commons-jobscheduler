@@ -1,12 +1,12 @@
 package com.sos.hibernate.classes;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import org.junit.Test;
 
 /** @author stefan schaedlich */
 public class ClassListTest {

@@ -1,12 +1,10 @@
 package com.sos.hibernate.classes;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.joda.time.DateTime;
 import org.junit.Test;
-
-import java.text.SimpleDateFormat;
-
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
 
 public class UtcTimeHelperTest {
 
@@ -14,7 +12,6 @@ public class UtcTimeHelperTest {
 
     @Test
     public void testIsToday() {
-        SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd");
         DateTime d1 = new DateTime().minusSeconds(333);
         DateTime d2 = new DateTime().minusDays(333);
         assertTrue(h.isToday(d1));
