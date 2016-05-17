@@ -42,13 +42,13 @@ public class SOSVfsConnectionFactory {
     }
 
     public void createConnectionPool() {
-        if (objConnPoolSource != null && objOptions.PollingServer.isTrue()) {
+        if (objConnPoolSource != null && objOptions.pollingServer.isTrue()) {
             // dann nehmen wir genau diesen Pool
             logger.debug("use existing connection pool");
         } else {
             int intMaxParallelTransfers = 1;
-            if (objOptions.ConcurrentTransfer.isTrue()) {
-                intMaxParallelTransfers = objOptions.MaxConcurrentTransfers.value() + 1;
+            if (objOptions.concurrentTransfer.isTrue()) {
+                intMaxParallelTransfers = objOptions.maxConcurrentTransfers.value() + 1;
             }
             if (objConnPoolSource == null || objOptions.reuseConnection.isFalse()) {
                 logger.debug("create connection pool");
@@ -145,26 +145,26 @@ public class SOSVfsConnectionFactory {
     /** @param client
      * @throws Exception */
     private void handleClient(ISOSVfsFileTransfer client, SOSConnection2OptionsAlternate options, boolean isSource) throws Exception {
-        if (options.Directory.isDirty()) {
+        if (options.directory.isDirty()) {
             if (isSource) {
-                objOptions.SourceDir = options.Directory;
-                objOptions.local_dir = options.Directory;
+                objOptions.sourceDir = options.directory;
+                objOptions.localDir = options.directory;
             } else {
-                objOptions.TargetDir = options.Directory;
-                objOptions.remote_dir = options.Directory;
+                objOptions.targetDir = options.directory;
+                objOptions.remoteDir = options.directory;
             }
         }
 
-        if (objOptions.passive_mode.value() || options.passive_mode.isTrue()) {
+        if (objOptions.passiveMode.value() || options.passiveMode.isTrue()) {
             client.passive();
         }
         // objConnectOptions.transfer_mode is not used?
-        if (options.transfer_mode.isDirty() && options.transfer_mode.IsNotEmpty()) {
-            client.TransferMode(options.transfer_mode);
+        if (options.transferMode.isDirty() && options.transferMode.IsNotEmpty()) {
+            client.TransferMode(options.transferMode);
         } else {
-            client.TransferMode(objOptions.transfer_mode);
+            client.TransferMode(objOptions.transferMode);
         }
-        client.ControlEncoding(objOptions.ControlEncoding.Value());
+        client.ControlEncoding(objOptions.controlEncoding.Value());
 
         // TODO pre-commands for source and target separately
         /** RE wird durch SOSDataExchangeEngine.executePreTransferCommands()

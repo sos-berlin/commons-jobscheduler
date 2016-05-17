@@ -106,7 +106,7 @@ public class SOSVfsFtpTest {
         LOGGER.info("*********************************************** SOSVfsFtpTest::CreateIniFile******************");
         String[] strCmdLineParameters = new String[] { "-settings=" + constrSettingsTestFile, "-profile=globals" };
         CreateIniFile();
-        objOptions.CommandLineArgs(strCmdLineParameters);
+        objOptions.commandLineArgs(strCmdLineParameters);
         Assert.assertEquals("User ID", "kb", objOptions.user.Value());
         Assert.assertEquals("password", "kb", objOptions.password.Value());
     }
@@ -131,13 +131,13 @@ public class SOSVfsFtpTest {
         objOptions.settings.Value(constrSettingsTestFile);
         objOptions.profile.Value("include-Test");
         objOptions.ReadSettingsFile();
-        objOptions.local_dir.Value(".");
+        objOptions.localDir.Value(".");
         Assert.assertEquals("User ID", "kb", objOptions.user.Value());
         Assert.assertEquals("password", "kb", objOptions.password.Value());
         Assert.assertEquals("Hostname", "hostFromInclude1", objOptions.host.Value());
         Assert.assertEquals("port", 88, objOptions.port.value());
         Assert.assertEquals("protocol", "scp", objOptions.protocol.Value());
-        objOptions.CheckMandatory();
+        objOptions.checkMandatory();
     }
 
     @Test(expected = com.sos.JSHelper.Exceptions.JobSchedulerException.class)
@@ -163,7 +163,7 @@ public class SOSVfsFtpTest {
         String strComputerName = System.getenv("computername");
         Assert.assertEquals("User ID", System.getenv("username"), objOptions.user.Value());
         Assert.assertEquals("Hostname", strComputerName, objOptions.host.Value());
-        Assert.assertEquals("Hostnameon Target ", strComputerName + "-abc", objOptions.getConnectionOptions().Target().HostName.Value());
+        Assert.assertEquals("Hostnameon Target ", strComputerName + "-abc", objOptions.getConnectionOptions().Target().hostName.Value());
     }
 
     private void CreateIniFile() throws Exception {
@@ -197,7 +197,7 @@ public class SOSVfsFtpTest {
         System.setProperty("AddFTPProtocol", "true");
         objOptions.host.Value("wilma.sos");
         objOptions.user.Value("kbxsy");
-        objOptions.passive_mode.setTrue();
+        objOptions.passiveMode.setTrue();
         objVFS.Connect(objOptions);
     }
 
@@ -209,12 +209,12 @@ public class SOSVfsFtpTest {
         options.user.Value("kb");
         options.password.Value("kb");
         options.protocol.Value("ftp");
-        options.ssh_auth_method.isPassword(true);
-        options.proxy_protocol.Value(SOSOptionProxyProtocol.Protocol.http.name());
-        options.proxy_host.Value("homer.sos");
-        options.proxy_port.value(3128);
-        options.proxy_user.Value("proxy_user");
-        options.proxy_password.Value("12345");
+        options.sshAuthMethod.isPassword(true);
+        options.proxyProtocol.Value(SOSOptionProxyProtocol.Protocol.http.name());
+        options.proxyHost.Value("homer.sos");
+        options.proxyPort.value(3128);
+        options.proxyUser.Value("proxy_user");
+        options.proxyPassword.Value("12345");
         objOptions.operation.Value("send");
         objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
         ftpClient = (ISOSVfsFileTransfer) objVFS;
@@ -231,12 +231,12 @@ public class SOSVfsFtpTest {
         options.user.Value("kb");
         options.password.Value("kb");
         options.protocol.Value("ftp");
-        options.ssh_auth_method.isPassword(true);
-        options.proxy_protocol.Value(SOSOptionProxyProtocol.Protocol.socks5.name());
-        options.proxy_host.Value("homer.sos");
-        options.proxy_port.value(1080);
-        options.proxy_user.Value("sos");
-        options.proxy_password.Value("sos");
+        options.sshAuthMethod.isPassword(true);
+        options.proxyProtocol.Value(SOSOptionProxyProtocol.Protocol.socks5.name());
+        options.proxyHost.Value("homer.sos");
+        options.proxyPort.value(1080);
+        options.proxyUser.Value("sos");
+        options.proxyPassword.Value("sos");
         objOptions.operation.Value("send");
         objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
         ftpClient = (ISOSVfsFileTransfer) objVFS;
@@ -255,7 +255,7 @@ public class SOSVfsFtpTest {
     @Test(expected = com.sos.JSHelper.Exceptions.JobSchedulerException.class)
     public void testConnectAlternateFailed() throws Exception {
         objOptions.host.Value("wilmaxxx.sos");
-        objOptions.alternative_host.Value("kwkwkwk.sos");
+        objOptions.alternativeHost.Value("kwkwkwk.sos");
         objVFS.Options(objOptions);
         objVFS.Connect(objOptions);
     }

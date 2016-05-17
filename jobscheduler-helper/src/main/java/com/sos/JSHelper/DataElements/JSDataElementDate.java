@@ -151,7 +151,7 @@ public class JSDataElementDate extends JSDataElement {
         return "to_date(" + strV + ", '" + strMask + "')";
     }
 
-    public Date Now() {
+    public Date now() {
         final java.util.Calendar now = java.util.Calendar.getInstance();
         return now.getTime();
     }

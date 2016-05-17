@@ -170,19 +170,19 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
     }
 
     public void checkCredentialStoreOptions() {
-        if (objCredentialStoreOptions.use_credential_Store.isTrue()) {
+        if (objCredentialStoreOptions.useCredentialStore.isTrue()) {
             LOGGER.trace("entering checkCredentialStoreOptions ");
-            objCredentialStoreOptions.CredentialStore_FileName.CheckMandatory(true);
-            objCredentialStoreOptions.CredentialStore_KeyPath.CheckMandatory(true);
+            objCredentialStoreOptions.credentialStoreFileName.CheckMandatory(true);
+            objCredentialStoreOptions.credentialStoreKeyPath.CheckMandatory(true);
             String strPassword = null;
             File fleKeyFile = null;
-            if (objCredentialStoreOptions.CredentialStore_KeyFileName.isDirty()) {
-                fleKeyFile = new File(objCredentialStoreOptions.CredentialStore_KeyFileName.Value());
+            if (objCredentialStoreOptions.credentialStoreKeyFileName.isDirty()) {
+                fleKeyFile = new File(objCredentialStoreOptions.credentialStoreKeyFileName.Value());
             }
-            if (objCredentialStoreOptions.CredentialStore_password.isDirty()) {
-                strPassword = objCredentialStoreOptions.CredentialStore_password.Value();
+            if (objCredentialStoreOptions.credentialStorePassword.isDirty()) {
+                strPassword = objCredentialStoreOptions.credentialStorePassword.Value();
             }
-            File fleKeePassDataBase = new File(objCredentialStoreOptions.CredentialStore_FileName.Value());
+            File fleKeePassDataBase = new File(objCredentialStoreOptions.credentialStoreFileName.Value());
             try {
                 keePassDb = KeePassDataBaseManager.openDataBase(fleKeePassDataBase, fleKeyFile, strPassword);
             } catch (Exception e) {
@@ -190,7 +190,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
                 throw new JobSchedulerException(e);
             }
             kdb1 = (KeePassDataBaseV1) keePassDb;
-            Entry objEntry = kdb1.getEntry(objCredentialStoreOptions.CredentialStore_KeyPath.Value());
+            Entry objEntry = kdb1.getEntry(objCredentialStoreOptions.credentialStoreKeyPath.Value());
             if (objEntry == null) {
                 throw new CredentialStoreKeyNotFound(objCredentialStoreOptions);
             }
@@ -237,17 +237,17 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
                 host.setHideValue(flgHideValuesFromCredentialStore);
             }
             objEntry.ExpirationDate();
-            if (HostName.isNotDirty()) {
-                HostName.Value(objEntry.getUrl().toString());
+            if (hostName.isNotDirty()) {
+                hostName.Value(objEntry.getUrl().toString());
             }
-            if (objCredentialStoreOptions.CredentialStore_ExportAttachment.isTrue()) {
-                File fleO = objEntry.saveAttachmentAsFile(objCredentialStoreOptions.CredentialStore_ExportAttachment2FileName.Value());
-                if (objCredentialStoreOptions.CredentialStore_DeleteExportedFileOnExit.isTrue()) {
+            if (objCredentialStoreOptions.credentialStoreExportAttachment.isTrue()) {
+                File fleO = objEntry.saveAttachmentAsFile(objCredentialStoreOptions.credentialStoreExportAttachment2FileName.Value());
+                if (objCredentialStoreOptions.credentialStoreDeleteExportedFileOnExit.isTrue()) {
                     fleO.deleteOnExit();
                 }
             }
-            if (objCredentialStoreOptions.CredentialStore_ProcessNotesParams.isTrue()) {
-                CommandLineArgs(objEntry.getNotesText());
+            if (objCredentialStoreOptions.credentialStoreProcessNotesParams.isTrue()) {
+                commandLineArgs(objEntry.getNotesText());
             }
         }
     }
@@ -260,9 +260,9 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
     }
 
     @Override
-    public void CheckMandatory() {
+    public void checkMandatory() {
         try {
-            super.CheckMandatory();
+            super.checkMandatory();
         } catch (Exception e) {
             throw new JSExceptionMandatoryOptionMissing(e.toString());
         }

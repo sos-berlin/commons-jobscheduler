@@ -73,10 +73,10 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
         if (connection2OptionsAlternate == null) {
             RaiseException(SOSVfs_E_190.params("connection2OptionsAlternate"));
         }
-        proxyHost = connection2OptionsAlternate.proxy_host.Value();
-        proxyPort = connection2OptionsAlternate.proxy_port.value();
-        proxyUser = connection2OptionsAlternate.proxy_user.Value();
-        proxyPassword = connection2OptionsAlternate.proxy_password.Value();
+        proxyHost = connection2OptionsAlternate.proxyHost.Value();
+        proxyPort = connection2OptionsAlternate.proxyPort.value();
+        proxyUser = connection2OptionsAlternate.proxyUser.Value();
+        proxyPassword = connection2OptionsAlternate.proxyPassword.Value();
         this.connect(connection2OptionsAlternate.host.Value(), connection2OptionsAlternate.port.value());
         return this;
     }
@@ -242,7 +242,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
                     if ("https".equalsIgnoreCase(url.getProtocol())) {
                         this.rootUrl = new HttpsURL(_rootUrl);
                         StrictSSLProtocolSocketFactory psf = new StrictSSLProtocolSocketFactory();
-                        psf.setCheckHostname(connection2OptionsAlternate.verify_certificate_hostname.value());
+                        psf.setCheckHostname(connection2OptionsAlternate.verifyCertificateHostname.value());
                         if (!psf.getCheckHostname()) {
                             LOGGER.info("*********************** Security warning *********************************************************************");
                             LOGGER.info("Jade option \"verify_certificate_hostname\" is currently \"false\". ");
@@ -250,7 +250,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
                             LOGGER.info("with the hostname of the server in the URL used by the Jade client.");
                             LOGGER.info("**************************************************************************************************************");
                         }
-                        if (connection2OptionsAlternate.accept_untrusted_certificate.value()) {
+                        if (connection2OptionsAlternate.acceptUntrustedCertificate.value()) {
                             psf.useDefaultJavaCiphers();
                             psf.addTrustMaterial(TrustMaterial.TRUST_ALL);
                         }

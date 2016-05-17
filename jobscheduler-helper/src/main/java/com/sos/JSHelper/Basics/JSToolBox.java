@@ -67,7 +67,7 @@ public class JSToolBox extends JSListenerClass {
         }
     }
 
-    protected String MakeFullPathName(final String pstrPathname, final String pstrFileName) {
+    protected String makeFullPathName(final String pstrPathname, final String pstrFileName) {
         String strT = pstrFileName;
         String normalizedFilename = pstrFileName.replace('\\', '/');
         String normalizedPathname = pstrPathname.replace('\\', '/');
@@ -95,16 +95,16 @@ public class JSToolBox extends JSListenerClass {
         return strRet;
     }
 
-    public String AddSingleQuotes(final String pstrS) {
+    public String addSingleQuotes(final String pstrS) {
         final String strT = "'" + pstrS.replaceAll("'", "''") + "'";
         return strT;
     }
 
-    protected String AddQuotes(final String pstrS) {
-        return "\"" + Quotes2DoubleQuotes(pstrS) + "\"";
+    protected String addQuotes(final String pstrS) {
+        return "\"" + quotes2DoubleQuotes(pstrS) + "\"";
     }
 
-    protected String Quotes2DoubleQuotes(final String pstrS) {
+    protected String quotes2DoubleQuotes(final String pstrS) {
         String strT = pstrS;
         if (strT != null) {
             strT = pstrS.replaceAll("\"", "\"\"");
@@ -160,15 +160,15 @@ public class JSToolBox extends JSListenerClass {
         return dblT;
     }
 
-    public String CreationTimeStamp() {
+    public String creationTimeStamp() {
         return getISODate();
     }
 
-    public String CreationTimeStamp(final String pstrDate) throws Exception {
-        return this.CreationTimeStamp(pstrDate, "010203");
+    public String creationTimeStamp(final String pstrDate) throws Exception {
+        return this.creationTimeStamp(pstrDate, "010203");
     }
 
-    public String CreationTimeStamp(final String pstrDate, final String pstrTime) throws Exception {
+    public String creationTimeStamp(final String pstrDate, final String pstrTime) throws Exception {
         String strD = "";
         String strT = "";
         if (!pstrDate.isEmpty() && !pstrTime.isEmpty()) {
@@ -192,7 +192,7 @@ public class JSToolBox extends JSListenerClass {
         return formatter.format(now.getTime()).toString();
     }
 
-    public Date Now() {
+    public Date now() {
         final java.util.Calendar now = java.util.Calendar.getInstance();
         return now.getTime();
     }
@@ -219,7 +219,7 @@ public class JSToolBox extends JSListenerClass {
         return getDateTimeFormatted("yyyyMMdd");
     }
 
-    public String EnvironmentVariable(final String pstrVariableName) {
+    public String environmentVariable(final String pstrVariableName) {
         final String conMethodName = conClassName + "::EnvironmentVariable";
         String strValue = null;
         if (isNotEmpty(pstrVariableName)) {
@@ -228,14 +228,14 @@ public class JSToolBox extends JSListenerClass {
                 strValue = System.getProperty(pstrVariableName);
             }
             if (isNotEmpty(strValue)) {
-                strValue = StripQuotes(strValue);
+                strValue = stripQuotes(strValue);
                 SignalDebug(String.format("%s: %s = %s", conMethodName, pstrVariableName, strValue));
             }
         }
         return strValue;
     }
 
-    public String StripQuotes(final String pstrS) {
+    public String stripQuotes(final String pstrS) {
         String strR = pstrS;
         if (pstrS.startsWith("\"") && pstrS.endsWith("\"")) {
             strR = pstrS.substring(1, pstrS.length() - 1);
@@ -302,7 +302,7 @@ public class JSToolBox extends JSListenerClass {
         throw new JobSchedulerException(pstrExceptionText);
     }
 
-    public String StackTrace2String(final Exception e) {
+    public String stackTrace2String(final Exception e) {
         String strT = e.getMessage() + "\n";
         final StackTraceElement arrStack[] = e.getStackTrace();
         for (final StackTraceElement objS : arrStack) {
@@ -348,7 +348,7 @@ public class JSToolBox extends JSListenerClass {
         return result;
     }
 
-    protected String BigInt2String(final BigInteger pbigI) {
+    protected String bigInt2String(final BigInteger pbigI) {
         if (pbigI != null) {
             long lngT = pbigI.longValue();
             return String.valueOf(lngT);
@@ -356,7 +356,7 @@ public class JSToolBox extends JSListenerClass {
         return "";
     }
 
-    public boolean String2Bool(final String pstrVal) {
+    public boolean string2Bool(final String pstrVal) {
         boolean flgT = false;
         if (isNotEmpty(pstrVal)
                 && ("1".equals(pstrVal) || "y".equalsIgnoreCase(pstrVal) || "yes".equalsIgnoreCase(pstrVal) || "j".equalsIgnoreCase(pstrVal)

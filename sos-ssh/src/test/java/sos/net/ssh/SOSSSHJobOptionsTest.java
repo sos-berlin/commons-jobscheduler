@@ -55,7 +55,7 @@ public class SOSSSHJobOptionsTest {
         String strCmdLineArgs[] = { "-" + strParameterName, strParameterValue };
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
 
-        objOptions.CommandLineArgs(strCmdLineArgs);
+        objOptions.commandLineArgs(strCmdLineArgs);
         assertEquals(strParameterName, strParameterValue, objOptions.user.Value());
 
         // String strTempFileName = JSFile.createTempFile("JSTest",
@@ -73,7 +73,7 @@ public class SOSSSHJobOptionsTest {
     public void testCommand_Script() {
 
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
-        objOptions.command_script.Value();
+        objOptions.commandScript.Value();
         objOptions.command.Value();
     }
 
@@ -88,7 +88,7 @@ public class SOSSSHJobOptionsTest {
         String strCmdLineArgs[] = { "-" + strParameterName, "JunitTestUser" };
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
 
-        objOptions.CommandLineArgs(strCmdLineArgs);
+        objOptions.commandLineArgs(strCmdLineArgs);
         assertEquals(strParameterName, "JunitTestUser", objOptions.user.Value());
 
         String strSerializedFileName = "c:/temp/test.object";
@@ -125,7 +125,7 @@ public class SOSSSHJobOptionsTest {
         assertEquals(USER, SOS_USER, objOptions.user.Value());
         System.setProperty("SOSSSHJobOptions.user", "");
 
-        objOptions.CommandLineArgs(strCmdLineArgs);
+        objOptions.commandLineArgs(strCmdLineArgs);
         assertEquals(USER, "JunitTestUser", objOptions.user.Value());
 
         System.setProperty(USER, "sos-user2");
@@ -143,7 +143,7 @@ public class SOSSSHJobOptionsTest {
         // objOptions.password.Value("pw");
         // objOptions.CheckMandatory();
 
-        assertEquals(AUTH_FILE, "test", objOptions.auth_file.Value());
+        assertEquals(AUTH_FILE, "test", objOptions.authFile.Value());
         assertEquals(USER, "test", objOptions.user.Value());
 
         objOptions.CurrentNodeName("step1");
@@ -164,13 +164,13 @@ public class SOSSSHJobOptionsTest {
 
         String strArgs[] = new String[] { "-command", "ls", "-auth_method", "password", "-host", "8of9.sos", "-auth_file", "test", "-user", "kb",
                 "-password", "huhu" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
 
-        objOptions.CheckMandatory();
-        assertEquals(AUTH_FILE, objOptions.auth_file.Value(), "test");
+        objOptions.checkMandatory();
+        assertEquals(AUTH_FILE, objOptions.authFile.Value(), "test");
         assertEquals(USER, objOptions.user.Value(), "kb");
 
-        objOptions.CommandLineArgs(new String[] { "-user", "testtest" });
+        objOptions.commandLineArgs(new String[] { "-user", "testtest" });
         assertEquals(USER, "testtest", objOptions.user.Value());
 
         System.out.println(objOptions.toString());
@@ -182,10 +182,10 @@ public class SOSSSHJobOptionsTest {
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
 
         String strArgs[] = new String[] { "-command=ls", "-auth_method=password", "-host=8of9.sos", "-AuthFile=test", "-user=kb", "-password=huhu" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
 
-        objOptions.CheckMandatory();
-        assertEquals(AUTH_FILE, objOptions.auth_file.Value(), "test");
+        objOptions.checkMandatory();
+        assertEquals(AUTH_FILE, objOptions.authFile.Value(), "test");
         assertEquals(USER, objOptions.user.Value(), "kb");
 
         System.out.println(objOptions.toString());
@@ -197,10 +197,10 @@ public class SOSSSHJobOptionsTest {
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
 
         String strArgs = new String("-command=ls -auth_method=password -host=8of9.sos -AuthFile=test -user=kb -password=huhu");
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
 
-        objOptions.CheckMandatory();
-        assertEquals(AUTH_FILE, objOptions.auth_file.Value(), "test");
+        objOptions.checkMandatory();
+        assertEquals(AUTH_FILE, objOptions.authFile.Value(), "test");
         assertEquals(USER, objOptions.user.Value(), "kb");
 
         System.out.println(objOptions.toString());
@@ -231,10 +231,10 @@ public class SOSSSHJobOptionsTest {
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
 
         String strArgs[] = new String[] { "-auth_method=password", "-host=ftphost", "-auth_file=test", "-user=kb", "-password=" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
 
-        objOptions.CheckMandatory();
-        assertEquals(AUTH_FILE, objOptions.auth_file.Value(), "test");
+        objOptions.checkMandatory();
+        assertEquals(AUTH_FILE, objOptions.authFile.Value(), "test");
         assertEquals(USER, objOptions.user.Value(), "kb");
 
         System.out.println(objOptions.toString());
@@ -518,10 +518,10 @@ public class SOSSSHJobOptionsTest {
     @Test(expected = java.lang.RuntimeException.class)
     public void testCredentialStore1() {
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
-        SOSCredentialStoreOptions objCSO = objOptions.getCredentialStore().Options();
+        SOSCredentialStoreOptions objCSO = objOptions.getCredentialStore().getOptions();
         assertTrue("not null", objCSO != null);
-        objCSO.use_credential_Store.setTrue();
-        objCSO.CredentialStore_FileName.Value("c:/temp/t.1");
+        objCSO.useCredentialStore.setTrue();
+        objCSO.credentialStoreFileName.Value("c:/temp/t.1");
         objOptions.getCredentialStore().checkCredentialStoreOptions();
     }
 
@@ -536,12 +536,12 @@ public class SOSSSHJobOptionsTest {
     // exception occurs [SP]
     public void testCredentialStore2() {
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
-        SOSCredentialStoreOptions objCSO = objOptions.getCredentialStore().Options();
+        SOSCredentialStoreOptions objCSO = objOptions.getCredentialStore().getOptions();
         assertTrue("not null", objCSO != null);
-        objCSO.use_credential_Store.setTrue();
-        objCSO.CredentialStore_FileName.Value(strKeePassDBFileName);
-        objCSO.CredentialStore_password.Value("testing");
-        objCSO.CredentialStore_KeyPath.Value("/sos/server/wilma.sos");
+        objCSO.useCredentialStore.setTrue();
+        objCSO.credentialStoreFileName.Value(strKeePassDBFileName);
+        objCSO.credentialStorePassword.Value("testing");
+        objCSO.credentialStoreKeyPath.Value("/sos/server/wilma.sos");
         objOptions.getCredentialStore().checkCredentialStoreOptions();
         assertEquals("userid", "test", objOptions.user.Value());
         assertEquals("password", "12345", objOptions.password.Value());

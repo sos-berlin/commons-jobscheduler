@@ -18,356 +18,114 @@ import com.sos.JSHelper.Options.SOSOptionUserName;
 
 public interface ISOSDataProviderOptions {
 
-    // @SuppressWarnings("unused") private static final String conSVNVersion =
-    // "$Id$";
+    public abstract SOSOptionUrl getUrl();
 
-    public abstract SOSOptionUrl geturl(); // public String geturl
+    public abstract ISOSDataProviderOptions setUrl(SOSOptionUrl pstrValue);
 
-    public abstract ISOSDataProviderOptions seturl(SOSOptionUrl pstrValue); // public
-                                                                            // SOSConnection2OptionsSuperClass
-                                                                            // seturl
+    public abstract String getInclude();
 
-    public abstract String getinclude(); // public String getinclude
+    public abstract ISOSDataProviderOptions setInclude(String pstrValue);
 
-    public abstract ISOSDataProviderOptions setinclude(String pstrValue); // public
-                                                                          // SOSFtpOptionsSuperClass
-                                                                          // setinclude
+    public abstract SOSOptionBoolean getUseZlibCompression();
 
-    public abstract SOSOptionBoolean getuse_zlib_compression(); // public String
-                                                                // getuse_zlib_compression
+    public abstract ISOSDataProviderOptions setUseZlibCompression(SOSOptionBoolean pstrValue);
 
-    public abstract ISOSDataProviderOptions setuse_zlib_compression(SOSOptionBoolean pstrValue); // public
-                                                                                                 // SOSConnection2OptionsSuperClass
-                                                                                                 // setuse_zlib_compression
+    public abstract SOSOptionInteger getZlibCompressionLevel();
 
-    public abstract SOSOptionInteger getzlib_compression_level(); // public
-                                                                  // String
-                                                                  // getzlib_compression_level
+    public abstract ISOSDataProviderOptions setZlibCompressionLevel(SOSOptionInteger pstrValue);
 
-    public abstract ISOSDataProviderOptions setzlib_compression_level(SOSOptionInteger pstrValue); // public
-                                                                                                   // SOSConnection2OptionsSuperClass
-                                                                                                   // setzlib_compression_level
+    public abstract String getProtocolCommandListener();
 
-    public abstract String getProtocolCommandListener(); // public String
-                                                         // getProtocolCommandListener
+    public abstract ISOSDataProviderOptions setProtocolCommandListener(String pstrValue);
 
-    public abstract ISOSDataProviderOptions setProtocolCommandListener(String pstrValue); // public
-                                                                                          // SOSConnection2OptionsSuperClass
-                                                                                          // setProtocolCommandListener
+    public abstract SOSOptionString getAccount();
 
-    /** \brief getaccount
-     *
-     * \details
-     *
-     * \return
-     *
-     * @return */
-    public abstract SOSOptionString getaccount();
+    public abstract void setAccount(SOSOptionString pAccount);
 
-    /** \brief setaccount
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param p_account */
-    public abstract void setaccount(SOSOptionString p_account);
+    public abstract String getMakeDirs();
 
-    public abstract String getmake_Dirs(); // public String getmake_Dirs
+    public abstract ISOSDataProviderOptions setMakeDirs(String pstrValue);
 
-    public abstract ISOSDataProviderOptions setmake_Dirs(String pstrValue); // public
-                                                                            // SOSFtpOptionsSuperClass
-                                                                            // setmake_Dirs
+    public abstract String getPlatform();
 
-    public abstract String getplatform(); // public String getplatform
+    public abstract ISOSDataProviderOptions setPlatform(String pstrValue);
 
-    public abstract ISOSDataProviderOptions setplatform(String pstrValue); // public
-                                                                           // SOSFtpOptionsSuperClass
-                                                                           // setplatform
+    public abstract SOSOptionString getReplacement();
 
-    /** \brief getreplacement
-     *
-     * \details
-     *
-     * \return
-     *
-     * @return */
-    public abstract SOSOptionString getreplacement();
+    public abstract void setReplacement(SOSOptionString pReplacement);
 
-    /** \brief setreplacement
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param p_replacement */
-    public abstract void setreplacement(SOSOptionString p_replacement);
+    public abstract SOSOptionRegExp getReplacing();
 
-    /** \brief getreplacing
-     *
-     * \details
-     *
-     * \return
-     *
-     * @return */
-    public abstract SOSOptionRegExp getreplacing();
+    public abstract void setReplacing(SOSOptionRegExp pReplacing);
 
-    /** \brief setreplacing
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param p_replacing */
-    public abstract void setreplacing(SOSOptionRegExp p_replacing);
+    public abstract SOSOptionBoolean getStrictHostKeyChecking();
 
-    public abstract SOSOptionBoolean getstrict_hostKey_checking(); // public
-                                                                   // SOSOptionBoolean
-                                                                   // getStrict_HostKey_Checking
+    public abstract void setStrictHostKeyChecking(String pstrValue);
 
-    public abstract void setstrict_hostKey_checking(String pstrValue); // public
-                                                                       // SOSFtpOptionsSuperClass
-                                                                       // setStrict_HostKey_Checking
+    public abstract SOSOptionString getTfnPostCommand();
 
-    public abstract SOSOptionString getTFN_Post_Command(); // public String
-                                                           // getTFN_Post_Command
+    public abstract ISOSDataProviderOptions setTfnPostCommand(SOSOptionString pstrValue);
 
-    public abstract ISOSDataProviderOptions setTFN_Post_Command(SOSOptionString pstrValue); // public
-                                                                                            // SOSConnection2OptionsSuperClass
-                                                                                            // setTFN_Post_Command
+    public abstract String getPostCommand();
 
-    public abstract String getPost_Command(); // public String getPost_Command
+    public abstract ISOSDataProviderOptions setPostCommand(String pstrValue);
 
-    public abstract ISOSDataProviderOptions setPost_Command(String pstrValue); // public
-                                                                               // SOSFTPOptions
-                                                                               // setPost_Command
+    public abstract String getPreCommand();
 
-    public abstract String getPre_Command(); // public String getPre_Command
+    public abstract ISOSDataProviderOptions setPreCommand(String pstrValue);
 
-    public abstract ISOSDataProviderOptions setPre_Command(String pstrValue); // public
-                                                                              // SOSFTPOptions
-                                                                              // setPre_Command
+    public abstract String getFtpsProtocol();
 
-    public abstract String getFtpS_protocol(); // public String getFtpS_protocol
+    public abstract ISOSDataProviderOptions setFtpsProtocol(String pstrValue);
 
-    public abstract ISOSDataProviderOptions setFtpS_protocol(String pstrValue); // public
-                                                                                // SOSConnection2OptionsAlternate
-                                                                                // setFtpS_protocol
+    public abstract String getLoadClassName();
 
-    public abstract String getloadClassName(); // public String getloadClassName
+    public abstract ISOSDataProviderOptions setLoadClassName(String pstrValue);
 
-    public abstract ISOSDataProviderOptions setloadClassName(String pstrValue); // public
-                                                                                // SOSConnection2OptionsSuperClass
-                                                                                // setloadClassName
+    public abstract SOSOptionString getJavaClassPath();
 
-    /** \brief getjavaClassPath :
-     *
-     * \details
-     *
-     *
-     * \return */
-    public abstract SOSOptionString getjavaClassPath();
+    public abstract void setJavaClassPath(SOSOptionString pJavaClassPath);
 
-    /** \brief setjavaClassPath :
-     *
-     * \details
-     *
-     *
-     * @param javaClassPath : */
-    public abstract void setjavaClassPath(SOSOptionString p_javaClassPath);
-
-    /** \brief gethost : Host-Name This parameter specifies th
-     *
-     * \details This parameter specifies the hostname or IP address of the
-     * server to which a connection has to be made.
-     *
-     * \return Host-Name This parameter specifies th */
     public abstract SOSOptionHostName getHost();
 
-    /** \brief sethost : Host-Name This parameter specifies th
-     *
-     * \details This parameter specifies the hostname or IP address of the
-     * server to which a connection has to be made.
-     *
-     * @param host : Host-Name This parameter specifies th */
-    public abstract void setHost(SOSOptionHostName p_host);
+    public abstract void setHost(SOSOptionHostName pHost);
 
-    /** \brief getpassive_mode : passive_mode Passive mode for FTP is often used
-     * wit
-     *
-     * \details Passive mode for FTP is often used with firewalls. Valid values
-     * are 0 or 1.
-     *
-     * \return passive_mode Passive mode for FTP is often used wit */
-    public abstract SOSOptionBoolean getpassive_mode();
+    public abstract SOSOptionBoolean getPassiveMode();
 
-    /** \brief setpassive_mode : passive_mode Passive mode for FTP is often used
-     * wit
-     *
-     * \details Passive mode for FTP is often used with firewalls. Valid values
-     * are 0 or 1.
-     *
-     * @param passive_mode : passive_mode Passive mode for FTP is often used wit */
-    public abstract void setpassive_mode(SOSOptionBoolean p_passive_mode);
+    public abstract void setPassiveMode(SOSOptionBoolean pPassiveMode);
 
-    /** \brief getport : Port-Number to be used for Data-Transfer
-     *
-     * \details Port by which files should be transferred. For FTP this is
-     * usually port 21, for SFTP this is usually port 22.
-     *
-     * \return Port-Number to be used for Data-Transfer */
-    public abstract SOSOptionPortNumber getport();
+    public abstract SOSOptionPortNumber getPort();
 
-    /** \brief setport : Port-Number to be used for Data-Transfer
-     *
-     * \details Port by which files should be transferred. For FTP this is
-     * usually port 21, for SFTP this is usually port 22.
-     *
-     * @param port : Port-Number to be used for Data-Transfer */
-    public abstract void setport(SOSOptionPortNumber p_port);
+    public abstract void setPort(SOSOptionPortNumber pPort);
 
-    /** \brief getprotocol : Type of requested Datatransfer The values ftp, sftp
-     *
-     * \details The values ftp, sftp or ftps are valid for this parameter. If
-     * sftp is used, then the ssh_* parameters will be applied.
-     *
-     * \return Type of requested Datatransfer The values ftp, sftp */
-    public abstract SOSOptionTransferType getprotocol();
+    public abstract SOSOptionTransferType getProtocol();
 
-    /** \brief setprotocol : Type of requested Datatransfer The values ftp, sftp
-     *
-     * \details The values ftp, sftp or ftps are valid for this parameter. If
-     * sftp is used, then the ssh_* parameters will be applied.
-     *
-     * @param protocol : Type of requested Datatransfer The values ftp, sftp */
-    public abstract void setprotocol(SOSOptionTransferType p_protocol);
+    public abstract void setProtocol(SOSOptionTransferType pProtocol);
 
-    /** \brief gettransfer_mode : Type of Character-Encoding Transfe
-     *
-     * \details Transfer mode is used for FTP exclusively and can be either
-     * ascii or binary.
-     *
-     * \return Type of Character-Encoding Transfe */
-    public abstract SOSOptionTransferMode gettransfer_mode();
+    public abstract SOSOptionTransferMode getTransferMode();
 
-    /** \brief settransfer_mode : Type of Character-Encoding Transfe
-     *
-     * \details Transfer mode is used for FTP exclusively and can be either
-     * ascii or binary.
-     *
-     * @param transfer_mode : Type of Character-Encoding Transfe */
-    public abstract void settransfer_mode(SOSOptionTransferMode p_transfer_mode);
+    public abstract void setTransferMode(SOSOptionTransferMode pTransferMode);
 
-    /** \brief getuser
-     *
-     * \details
-     *
-     * \return
-     *
-     * @return */
     public abstract SOSOptionUserName getUser();
 
-    /** \brief getpassword
-     *
-     * \details
-     *
-     * \return
-     *
-     * @return */
     public abstract SOSOptionPassword getPassword();
 
-    /** \brief setpassword
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param p_password */
-    public abstract void setPassword(SOSOptionPassword p_password);
+    public abstract void setPassword(SOSOptionPassword pPassword);
 
-    /** \brief setAllOptions - übernimmt die OptionenWerte aus der HashMap
-     *
-     * \details In der als Parameter anzugebenden HashMap sind Schlüssel (Name)
-     * und Wert der jeweiligen Option als Paar angegeben. Ein Beispiel für den
-     * Aufbau einer solchen HashMap findet sich in der Beschreibung dieser
-     * Klasse (\ref TestData "setJobSchedulerSSHJobOptions"). In dieser Routine
-     * werden die Schlüssel analysiert und, falls gefunden, werden die
-     * dazugehörigen Werte den Properties dieser Klasse zugewiesen.
-     *
-     * Nicht bekannte Schlüssel werden ignoriert.
-     *
-     * \see JSOptionsClass::getItem
-     *
-     * @param pobjJSSettings
-     * @throws Exception */
-    public abstract void setAllOptions(HashMap<String, String> pobjJSSettings) throws Exception; // public
-                                                                                                 // void
-                                                                                                 // setAllOptions
-                                                                                                 // (HashMap
-                                                                                                 // <String,
-                                                                                                 // String>
-                                                                                                 // JSSettings)
+    public abstract void setAllOptions(HashMap<String, String> pobjJSSettings) throws Exception;
 
-    /** \brief getssh_auth_file
-     *
-     * \details
-     *
-     * \return
-     *
-     * @return */
-    public abstract SOSOptionInFileName getAuth_file();
+    public abstract SOSOptionInFileName getAuthFile();
 
-    /** \brief setssh_auth_file
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param p_ssh_auth_file */
-    public abstract void setAuth_file(SOSOptionInFileName p_ssh_auth_file);
+    public abstract void setAuthFile(SOSOptionInFileName pSshAuthFile);
 
-    /** \brief getssh_auth_method
-     *
-     * \details
-     *
-     * \return
-     *
-     * @return */
-    public abstract SOSOptionAuthenticationMethod getAuth_method();
+    public abstract SOSOptionAuthenticationMethod getAuthMethod();
 
-    /** \brief setssh_auth_method
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param p_ssh_auth_method */
-    public abstract void setAuth_method(SOSOptionAuthenticationMethod p_ssh_auth_method);
+    public abstract void setAuthMethod(SOSOptionAuthenticationMethod pSshAuthMethod);
 
-    /** \brief setUser
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param pobjUser */
     public abstract void setUser(SOSOptionUserName pobjUser);
 
-    /** \brief getdomain
-     *
-     * \details
-     *
-     * \return
-     *
-     * @return */
-    public abstract SOSOptionString getdomain();
+    public abstract SOSOptionString getDomain();
 
-    /** \brief setdomain
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param p_domain */
-    public abstract void setdomain(SOSOptionString p_domain);
+    public abstract void setDomain(SOSOptionString pDomain);
+
 }

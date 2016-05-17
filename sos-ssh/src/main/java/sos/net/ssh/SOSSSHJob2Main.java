@@ -17,7 +17,7 @@ public class SOSSSHJob2Main {
         try {
             SOSSSHJob2 objM = new SOSSSHJobTrilead();
             SOSSSHJobOptions objO = objM.getOptions();
-            objO.CommandLineArgs(pstrArgs);
+            objO.commandLineArgs(pstrArgs);
             objM.execute();
         } catch (Exception e) {
             LOGGER.error(conMethodName + ": " + "Error occured ..." + e.getMessage(), e);

@@ -53,7 +53,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         try {
             if (!prePostCommandVFSHandler.isConnected()) {
                 SOSConnection2OptionsAlternate postAlternateOptions = getAlternateOptions(objOptions);
-                postAlternateOptions.raise_exception_on_error.value(false);
+                postAlternateOptions.raiseExceptionOnError.value(false);
                 prePostCommandVFSHandler.Connect(postAlternateOptions);
             }
             prePostCommandVFSHandler.Authenticate(objOptions);
@@ -97,15 +97,15 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             } else {
                 if (objOptions.isScript() == true) {
                     strCommands2Execute = new String[1];
-                    String strTemp = objOptions.command_script.Value();
-                    if (objOptions.command_script.IsEmpty()) {
-                        strTemp = objOptions.command_script_file.JSFile().File2String();
+                    String strTemp = objOptions.commandScript.Value();
+                    if (objOptions.commandScript.IsEmpty()) {
+                        strTemp = objOptions.commandScriptFile.JSFile().File2String();
                     }
                     strTemp = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strTemp);
                     strCommands2Execute[0] = vfsHandler.createScriptFile(strTemp);
                     add2Files2Delete(strCommands2Execute[0]);
                     flgScriptFileCreated = true; // http://www.sos-berlin.com/jira/browse/JITL-17
-                    strCommands2Execute[0] += " " + objOptions.command_script_param.Value();
+                    strCommands2Execute[0] += " " + objOptions.commandScriptParam.Value();
                 } else {
                     throw new SSHMissingCommandError(objMsg.getMsg(SOS_SSH_E_100));
                 }
@@ -121,7 +121,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                 try {
                     strCmd = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strCmd);
                     logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
-                    vfsHandler.setSimulateShell(objOptions.simulate_shell.value());
+                    vfsHandler.setSimulateShell(objOptions.simulateShell.value());
                     vfsHandler.ExecuteCommand(completeCommand);
                     objJSJobUtilities.setJSParam(conExit_code, "0");
                     checkStdOut();
@@ -129,16 +129,16 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                     checkExitCode();
                     changeExitSignal();
                 } catch (Exception e) {
-                    if (objOptions.raise_exception_on_error.value()) {
-                        if (objOptions.ignore_error.value()) {
-                            if (objOptions.ignore_stderr.value()) {
-                                logger.debug(this.StackTrace2String(e));
+                    if (objOptions.raiseExceptionOnError.value()) {
+                        if (objOptions.ignoreError.value()) {
+                            if (objOptions.ignoreStderr.value()) {
+                                logger.debug(this.stackTrace2String(e));
                             } else {
-                                logger.error(this.StackTrace2String(e));
+                                logger.error(this.stackTrace2String(e));
                                 throw new SSHExecutionError("Exception raised: " + e, e);
                             }
                         } else {
-                            logger.error(this.StackTrace2String(e));
+                            logger.error(this.stackTrace2String(e));
                             throw new SSHExecutionError("Exception raised: " + e, e);
                         }
                     }
@@ -146,20 +146,20 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             }
             processPostCommands(getTempFileName());
         } catch (Exception e) {
-            if (objOptions.raise_exception_on_error.value()) {
+            if (objOptions.raiseExceptionOnError.value()) {
                 String strErrMsg = "SOS-SSH-E-120: error occurred processing ssh command: \"" + executedCommand + "\""
                         + "\nSOS-SSH-E-120: full command String: \"" + completeCommand + "\"";
-                if (objOptions.ignore_error.value()) {
-                    if (objOptions.ignore_stderr.value()) {
-                        logger.debug(this.StackTrace2String(e));
+                if (objOptions.ignoreError.value()) {
+                    if (objOptions.ignoreStderr.value()) {
+                        logger.debug(this.stackTrace2String(e));
                         logger.debug(strErrMsg, e);
                     } else {
-                        logger.error(this.StackTrace2String(e));
+                        logger.error(this.stackTrace2String(e));
                         logger.error(strErrMsg, e);
                         throw new SSHExecutionError(strErrMsg, e);
                     }
                 } else {
-                    logger.error(this.StackTrace2String(e));
+                    logger.error(this.stackTrace2String(e));
                     logger.error(strErrMsg, e);
                     throw new SSHExecutionError(strErrMsg, e);
                 }
@@ -197,7 +197,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     @Override
     public SOSSSHJob2 connect() {
         getVFS();
-        getOptions().CheckMandatory();
+        getOptions().checkMandatory();
         try {
             SOSConnection2OptionsAlternate alternateOptions = getAlternateOptions(objOptions);
             vfsHandler.Connect(alternateOptions);
@@ -221,12 +221,12 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     public String getPreCommand() {
         if (objOptions.runWithWatchdog.value()) {
             readGetPidCommandFromPropertiesFile();
-            return String.format(ssh_job_get_pid_command + objOptions.command_delimiter.Value() + ssh_job_get_pid_command + " >> " + pidFileName
-                    + objOptions.command_delimiter.Value() + objOptions.getPreCommand().Value() + objOptions.command_delimiter.Value(),
+            return String.format(ssh_job_get_pid_command + objOptions.commandDelimiter.Value() + ssh_job_get_pid_command + " >> " + pidFileName
+                    + objOptions.commandDelimiter.Value() + objOptions.getPreCommand().Value() + objOptions.commandDelimiter.Value(),
                     SCHEDULER_RETURN_VALUES, tempFileName);
         }
         return String.format(
-                ssh_job_get_pid_command + objOptions.command_delimiter.Value() + objOptions.getPreCommand().Value() + objOptions.command_delimiter.Value(),
+                ssh_job_get_pid_command + objOptions.commandDelimiter.Value() + objOptions.getPreCommand().Value() + objOptions.commandDelimiter.Value(),
                 SCHEDULER_RETURN_VALUES, tempFileName);
     }
 
@@ -243,7 +243,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                 }
                 if (!"SCHEDULER_PARAM_std_out_output".equalsIgnoreCase(keyVal) && !"SCHEDULER_PARAM_std_err_output".equalsIgnoreCase(keyVal)) {
                     sb.append(String.format(objOptions.getPreCommand().Value(), keyVal.toUpperCase(), envVarValue));
-                    sb.append(objOptions.command_delimiter.Value());
+                    sb.append(objOptions.commandDelimiter.Value());
                 }
             }
         }
@@ -313,13 +313,13 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         alternateOptions.port.value(options.getPort().value());
         alternateOptions.user.Value(options.getUser().Value());
         alternateOptions.password.Value(options.getPassword().Value());
-        alternateOptions.proxy_protocol.Value(options.getproxy_protocol().Value());
-        alternateOptions.proxy_host.Value(options.getProxy_host().Value());
-        alternateOptions.proxy_port.value(options.getProxy_port().value());
-        alternateOptions.proxy_user.Value(options.getProxy_user().Value());
-        alternateOptions.proxy_password.Value(options.getProxy_password().Value());
-        alternateOptions.raise_exception_on_error.value(options.getraise_exception_on_error().value());
-        alternateOptions.ignore_error.value(options.getIgnore_error().value());
+        alternateOptions.proxyProtocol.Value(options.getproxy_protocol().Value());
+        alternateOptions.proxyHost.Value(options.getProxyHost().Value());
+        alternateOptions.proxyPort.value(options.getProxyPort().value());
+        alternateOptions.proxyUser.Value(options.getProxyUser().Value());
+        alternateOptions.proxyPassword.Value(options.getProxyPassword().Value());
+        alternateOptions.raiseExceptionOnError.value(options.getRaiseExceptionOnError().value());
+        alternateOptions.ignoreError.value(options.getIgnoreError().value());
         return alternateOptions;
     }
 
@@ -332,8 +332,8 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     }
 
     private void readGetPidCommandFromPropertiesFile() {
-        if (objOptions.ssh_job_get_pid_command.isDirty() && !objOptions.ssh_job_get_pid_command.Value().isEmpty()) {
-            ssh_job_get_pid_command = objOptions.ssh_job_get_pid_command.Value();
+        if (objOptions.sshJobGetPidCommand.isDirty() && !objOptions.sshJobGetPidCommand.Value().isEmpty()) {
+            ssh_job_get_pid_command = objOptions.sshJobGetPidCommand.Value();
             logger.debug("Command to receive PID of the active shell from Job Parameter used!");
         } else {
             if (flgIsWindowsShell) {

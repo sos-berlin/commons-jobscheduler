@@ -84,9 +84,9 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         super();
         switch (penuTransferType) {
         case webdav:
-            auth_method.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
-            this.Source().auth_method.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
-            this.Target().auth_method.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
+            authMethod.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
+            this.Source().authMethod.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
+            this.Target().authMethod.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
             protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.webdav.Text(), SOSOptionTransferType.enuTransferTypes.webdav.Text());
             this.Source().protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.webdav.Text(),
                     SOSOptionTransferType.enuTransferTypes.webdav.Text());
@@ -97,9 +97,9 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
             this.Target().port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
             break;
         case http:
-            auth_method.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
-            this.Source().auth_method.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
-            this.Target().auth_method.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
+            authMethod.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
+            this.Source().authMethod.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
+            this.Target().authMethod.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
             protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.http.Text(), SOSOptionTransferType.enuTransferTypes.http.Text());
             this.Source().protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.http.Text(),
                     SOSOptionTransferType.enuTransferTypes.http.Text());
@@ -119,7 +119,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         super();
         switch (penuTransferTypeSource) {
         case webdav:
-            auth_method.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
+            authMethod.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
             protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.webdav.Text(), SOSOptionTransferType.enuTransferTypes.webdav.Text());
             port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
             break;
@@ -133,29 +133,29 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     private void changeDefaults(final SOSOptionTransferType.enuTransferTypes penuTransferType, final SOSConnection2OptionsAlternate pobjOpt) {
         switch (penuTransferType) {
         case webdav:
-            pobjOpt.auth_method.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
+            pobjOpt.authMethod.changeDefaults(enuAuthenticationMethods.url.text, enuAuthenticationMethods.url.text);
             pobjOpt.protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.webdav.Text(),
                     SOSOptionTransferType.enuTransferTypes.webdav.Text());
             pobjOpt.port.changeDefaults(SOSOptionPortNumber.conPort4http, SOSOptionPortNumber.conPort4http);
             break;
         case local:
         case file:
-            pobjOpt.auth_method.changeDefaults(enuAuthenticationMethods.password.text, enuAuthenticationMethods.password.text);
+            pobjOpt.authMethod.changeDefaults(enuAuthenticationMethods.password.text, enuAuthenticationMethods.password.text);
             pobjOpt.protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.local.Text(), SOSOptionTransferType.enuTransferTypes.local.Text());
             pobjOpt.port.changeDefaults(0, 0);
             break;
         case ftp:
-            pobjOpt.auth_method.changeDefaults(enuAuthenticationMethods.password.text, enuAuthenticationMethods.password.text);
+            pobjOpt.authMethod.changeDefaults(enuAuthenticationMethods.password.text, enuAuthenticationMethods.password.text);
             pobjOpt.protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.ftp.Text(), SOSOptionTransferType.enuTransferTypes.ftp.Text());
             pobjOpt.port.changeDefaults(SOSOptionPortNumber.conPort4FTP, SOSOptionPortNumber.conPort4FTP);
             break;
         case sftp:
-            pobjOpt.auth_method.changeDefaults(enuAuthenticationMethods.password.text, enuAuthenticationMethods.password.text);
+            pobjOpt.authMethod.changeDefaults(enuAuthenticationMethods.password.text, enuAuthenticationMethods.password.text);
             pobjOpt.protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.sftp.Text(), SOSOptionTransferType.enuTransferTypes.sftp.Text());
             pobjOpt.port.changeDefaults(SOSOptionPortNumber.conPort4SFTP, SOSOptionPortNumber.conPort4SFTP);
             break;
         case ftps:
-            pobjOpt.auth_method.changeDefaults(enuAuthenticationMethods.password.text, enuAuthenticationMethods.password.text);
+            pobjOpt.authMethod.changeDefaults(enuAuthenticationMethods.password.text, enuAuthenticationMethods.password.text);
             pobjOpt.protocol.changeDefaults(SOSOptionTransferType.enuTransferTypes.ftps.Text(), SOSOptionTransferType.enuTransferTypes.ftps.Text());
             pobjOpt.port.changeDefaults(SOSOptionPortNumber.conPort4FTPS, SOSOptionPortNumber.conPort4FTPS);
             break;
@@ -208,19 +208,19 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 
     public void adjustDefaults() {
         if (operation.Value().equalsIgnoreCase(enuJadeOperations.move.Text())) {
-            remove_files.value(true);
-            remove_files.setProtected(operation.isProtected());
+            removeFiles.value(true);
+            removeFiles.setProtected(operation.isProtected());
         }
-        if (TransactionMode.isTrue() && !isAtomicTransfer()) {
-            atomic_suffix.Value("~");
+        if (transactionMode.isTrue() && !isAtomicTransfer()) {
+            atomicSuffix.Value("~");
         }
         if (operation.Value().equalsIgnoreCase(enuJadeOperations.getlist.Text())) {
-            remove_files.value(false);
+            removeFiles.value(false);
         }
-        String localDir = local_dir.Value();
+        String localDir = this.localDir.Value();
         if (isEmpty(localDir)) {
-            local_dir.Set(SourceDir);
-            localDir = local_dir.Value();
+            this.localDir.Set(sourceDir);
+            localDir = this.localDir.Value();
         }
         checkReplaceAndReplacing(Target());
         checkReplaceAndReplacing(Source());
@@ -240,46 +240,46 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     }
 
     @Override
-    public void CheckMandatory() {
+    public void checkMandatory() {
         if (flgCheckMandatoryDone) {
             return;
         }
         operation.CheckMandatory();
         if (operation.Value().equalsIgnoreCase(enuJadeOperations.move.Text())) {
-            remove_files.value(true);
+            removeFiles.value(true);
         }
-        if (TransactionMode.isTrue() && !isAtomicTransfer()) {
-            atomic_suffix.Value("~");
+        if (transactionMode.isTrue() && !isAtomicTransfer()) {
+            atomicSuffix.Value("~");
         }
         if (operation.Value().equalsIgnoreCase(enuJadeOperations.getlist.Text())) {
-            remove_files.setFalse();
+            removeFiles.setFalse();
         }
         checkURLParameter(this.getConnectionOptions().Source());
         checkURLParameter(this.getConnectionOptions().Target());
-        String localDir = local_dir.Value();
+        String localDir = this.localDir.Value();
         if (isEmpty(localDir)) {
-            local_dir.Value(SourceDir.Value());
-            localDir = local_dir.Value();
+            this.localDir.Value(sourceDir.Value());
+            localDir = this.localDir.Value();
             localDir += "";
         }
-        if (Source().url.isDirty() && SourceDir.isNotDirty()) {
-            SourceDir.Value(Source().url.getFolderName());
+        if (Source().url.isDirty() && sourceDir.isNotDirty()) {
+            sourceDir.Value(Source().url.getFolderName());
         }
-        if (Target().url.isDirty() && TargetDir.isNotDirty()) {
-            TargetDir.Value(Target().url.getFolderName());
+        if (Target().url.isDirty() && targetDir.isNotDirty()) {
+            targetDir.Value(Target().url.getFolderName());
         }
         checkCredentialStore(Source());
         checkCredentialStore(Target());
         if (Source().replacing.IsNotEmpty() && Source().replacement.IsNotEmpty()) {
-            remove_files.setFalse();
+            removeFiles.setFalse();
         }
-        super.CheckMandatory();
+        super.checkMandatory();
         if (localDir.startsWith("\\\\")) {
             while (localDir.indexOf("\\") != -1) {
                 localDir = localDir.replace('\\', '/');
             }
         }
-        local_dir.Value(localDir);
+        this.localDir.Value(localDir);
         if (localDir.startsWith(conURIPrefixFILE) && !(new File(createURI(localDir)).exists())) {
             throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_0010.params(localDir));
         }
@@ -291,14 +291,14 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         if (replacing.IsEmpty() && replacement.IsNotEmpty()) {
             throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_0020.params(replacement.getKey(), replacing.getKey()));
         }
-        if (append_files.value()) {
-            String strAppendFilesKey = append_files.getKey();
+        if (appendFiles.value()) {
+            String strAppendFilesKey = appendFiles.getKey();
             if (isAtomicTransfer()) {
-                String strT = getOptionNamesAsString(new SOSOptionElement[] { atomic_prefix, atomic_suffix });
+                String strT = getOptionNamesAsString(new SOSOptionElement[] { atomicPrefix, atomicSuffix });
                 throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_0050.params(strAppendFilesKey, strT));
             }
-            if (compress_files.value()) {
-                String strT = getOptionNamesAsString(new SOSOptionElement[] { compress_files });
+            if (compressFiles.value()) {
+                String strT = getOptionNamesAsString(new SOSOptionElement[] { compressFiles });
                 throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_0050.params(strAppendFilesKey, strT));
             }
             if (!"ftp".equalsIgnoreCase(protocol.Value())) {
@@ -317,20 +317,20 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         setDefaultAuth(this.Target().protocol, this.Target());
         setDefaultAuth(this.Source().Alternatives().protocol, this.Source().Alternatives());
         setDefaultAuth(this.Target().Alternatives().protocol, this.Target().Alternatives());
-        if (file_path.isDirty() && file_spec.isDirty()) {
-            file_path.Value("");
+        if (filePath.isDirty() && fileSpec.isDirty()) {
+            filePath.Value("");
         }
-        if (file_path.IsEmpty() && SourceDir.IsEmpty() && this.Source().Directory.IsEmpty() && FileListName.IsEmpty()) {
+        if (filePath.IsEmpty() && sourceDir.IsEmpty() && this.Source().directory.IsEmpty() && fileListName.IsEmpty()) {
             throw new JobSchedulerException(String.format("SOSVfs-E-0000: one of these parameters must be specified: '%1$s', '%2$s', '%3$s'",
-                    file_path.getShortKey(), "source_dir", FileListName.getShortKey()));
+                    filePath.getShortKey(), "source_dir", fileListName.getShortKey()));
         }
 
-        if (ProtocolCommandListener.isDirty()) {
-            if (Source().ProtocolCommandListener.isNotDirty()) {
-                Source().ProtocolCommandListener.value(ProtocolCommandListener.value());
+        if (protocolCommandListener.isDirty()) {
+            if (Source().protocolCommandListener.isNotDirty()) {
+                Source().protocolCommandListener.value(protocolCommandListener.value());
             }
-            if (Target().ProtocolCommandListener.isNotDirty()) {
-                Target().ProtocolCommandListener.value(ProtocolCommandListener.value());
+            if (Target().protocolCommandListener.isNotDirty()) {
+                Target().protocolCommandListener.value(protocolCommandListener.value());
             }
         }
 
@@ -366,9 +366,9 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     private void setDefaultAuth(final SOSOptionTransferType pobjTransferTyp, final SOSConnection2OptionsAlternate objConn) {
         enuTransferTypes transferType = pobjTransferTyp.getEnum();
         if ((transferType == enuTransferTypes.http || transferType == enuTransferTypes.https || transferType == enuTransferTypes.webdav)
-                && !objConn.auth_method.isDirty() && !objConn.ssh_auth_method.isDirty()) {
-            objConn.auth_method.Value(enuAuthenticationMethods.url);
-            objConn.ssh_auth_method.Value(enuAuthenticationMethods.url);
+                && !objConn.authMethod.isDirty() && !objConn.sshAuthMethod.isDirty()) {
+            objConn.authMethod.Value(enuAuthenticationMethods.url);
+            objConn.sshAuthMethod.Value(enuAuthenticationMethods.url);
         }
     }
 
@@ -424,7 +424,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 
     @Override
     public boolean isAtomicTransfer() {
-        boolean flgIsAtomicTransfer = atomic_prefix.IsNotEmpty() || atomic_suffix.IsNotEmpty();
+        boolean flgIsAtomicTransfer = atomicPrefix.IsNotEmpty() || atomicSuffix.IsNotEmpty();
         return flgIsAtomicTransfer;
     }
 
@@ -462,8 +462,8 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     }
 
     @Override
-    public void CommandLineArgs(final String[] pstrArgs) {
-        super.CommandLineArgs(pstrArgs);
+    public void commandLineArgs(final String[] pstrArgs) {
+        super.commandLineArgs(pstrArgs);
         this.setAllOptions(super.objSettings);
         boolean flgFound = false;
         for (int i = 0; i < pstrArgs.length; i++) {
@@ -474,14 +474,14 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
             }
         }
         if (flgFound) {
-            super.CommandLineArgs(pstrArgs);
+            super.commandLineArgs(pstrArgs);
         }
     }
 
     @Override
-    public void CommandLineArgs(final String pstrArgs) {
+    public void commandLineArgs(final String pstrArgs) {
         try {
-            this.CommandLineArgs(pstrArgs.split(" "));
+            this.commandLineArgs(pstrArgs.split(" "));
         } catch (Exception e) {
             LOGGER.error(e.getLocalizedMessage());
             throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_153.params("command lines args"), e);
@@ -496,7 +496,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         super.setAllOptions(pobjJSSettings);
         flgSetAllOptions = false;
         HashMap<String, String> hshMap = pobjJSSettings;
-        if (!flgSettingsFileProcessed && !flgReadSettingsFileIsActive && ConfigurationFile.IsNotEmpty()) {
+        if (!flgSettingsFileProcessed && !flgReadSettingsFileIsActive && configurationFile.IsNotEmpty()) {
             flgReadSettingsFileIsActive = true;
             hshMap = ReadSettingsFile();
             flgReadSettingsFileIsActive = false;
@@ -753,7 +753,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     }
 
     public boolean OneOrMoreSingleFilesSpecified() {
-        return file_path.IsNotEmpty() || FileListName.IsNotEmpty();
+        return filePath.IsNotEmpty() || fileListName.IsNotEmpty();
     }
 
     public String getDataTargetType() {
@@ -763,17 +763,17 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
             if (strDataTargetType.isEmpty()) {
                 strDataTargetType = enuTransferTypes.local.Text();
             }
-            CopyValue(SourceDir, local_dir);
-            CopyValue(TargetDir, remote_dir);
-            CopyValue(this.Source().Directory, local_dir);
-            CopyValue(this.Target().Directory, remote_dir);
+            CopyValue(sourceDir, localDir);
+            CopyValue(targetDir, remoteDir);
+            CopyValue(this.Source().directory, localDir);
+            CopyValue(this.Target().directory, remoteDir);
             changeOptions(this.getConnectionOptions().Target());
         } else if (conOperationRECEIVE.equalsIgnoreCase(operation.Value())) {
             strDataTargetType = enuTransferTypes.local.Text();
-            CopyValue(SourceDir, remote_dir);
-            CopyValue(TargetDir, local_dir);
-            CopyValue(this.Source().Directory, remote_dir);
-            CopyValue(this.Target().Directory, local_dir);
+            CopyValue(sourceDir, remoteDir);
+            CopyValue(targetDir, localDir);
+            CopyValue(this.Source().directory, remoteDir);
+            CopyValue(this.Target().directory, localDir);
             changeOptions2Local(this.getConnectionOptions().Target());
         } else {
             strDataTargetType = this.getConnectionOptions().Target().protocol.Value();
@@ -793,16 +793,16 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         objT.password.Set(password);
         objT.port.Set(port);
         objT.protocol.Set(protocol);
-        objT.passive_mode.Set(passive_mode);
-        objT.transfer_mode.Set(transfer_mode);
-        objT.ssh_auth_file.SetIfNotDirty(ssh_auth_file);
-        objT.ssh_auth_method.SetIfNotDirty(ssh_auth_method);
+        objT.passiveMode.Set(passiveMode);
+        objT.transferMode.Set(transferMode);
+        objT.sshAuthFile.SetIfNotDirty(sshAuthFile);
+        objT.sshAuthMethod.SetIfNotDirty(sshAuthMethod);
         SOSConnection2OptionsSuperClass objAlt = objT.Alternatives();
-        objAlt.host.Value(alternative_host.Value());
-        objAlt.port.value(alternative_port.value());
+        objAlt.host.Value(alternativeHost.Value());
+        objAlt.port.value(alternativePort.value());
         objAlt.protocol.Value(protocol.Value());
-        objAlt.passive_mode.Value(alternative_passive_mode.Value());
-        objAlt.transfer_mode.Value(alternative_transfer_mode.Value());
+        objAlt.passiveMode.Value(alternativePassiveMode.Value());
+        objAlt.transferMode.Value(alternativeTransferMode.Value());
     }
 
     private void changeOptions2Local(final SOSConnection2OptionsAlternate objT) {
@@ -811,14 +811,14 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         objT.password.Value("");
         objT.port.value(0);
         objT.protocol.Value("local");
-        objT.passive_mode.Value("");
-        objT.transfer_mode.Value("");
+        objT.passiveMode.Value("");
+        objT.transferMode.Value("");
         SOSConnection2OptionsSuperClass objAlt = objT.Alternatives();
         objAlt.host.Value(objT.host.Value());
         objAlt.port.value(0);
         objAlt.protocol.Value("local");
-        objAlt.passive_mode.Value("");
-        objAlt.transfer_mode.Value("");
+        objAlt.passiveMode.Value("");
+        objAlt.transferMode.Value("");
     }
 
     private void CopyValue(final SOSOptionElement objTo, final SOSOptionElement objFrom) {
@@ -842,14 +842,14 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
             objT.protocol = protocol;
             objT.user = user;
             objT.password = password;
-            objT.ssh_auth_file = ssh_auth_file;
-            objT.ssh_auth_method = ssh_auth_method;
-            objT.passive_mode = passive_mode;
+            objT.sshAuthFile = sshAuthFile;
+            objT.sshAuthMethod = sshAuthMethod;
+            objT.passiveMode = passiveMode;
             SOSConnection2OptionsSuperClass objAlt = objT.Alternatives();
-            objAlt.host.Value(alternative_host.Value());
-            objAlt.port.value(alternative_port.value());
+            objAlt.host.Value(alternativeHost.Value());
+            objAlt.port.value(alternativePort.value());
             objAlt.protocol.Value(protocol.Value());
-            objAlt.passive_mode.Value(alternative_passive_mode.Value());
+            objAlt.passiveMode.Value(alternativePassiveMode.Value());
         } else if (conOperationRECEIVE.equalsIgnoreCase(operation.Value())) {
             strDataSourceType = protocol.Value();
             if (strDataSourceType.isEmpty()) {
@@ -860,20 +860,20 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
             objT.host.Value(host.Value());
             objT.port.value(port.value());
             objT.protocol.Value(protocol.Value());
-            objT.passive_mode.Value(passive_mode.Value());
+            objT.passiveMode.Value(passiveMode.Value());
             objT.user = user;
             objT.password = password;
-            objT.ssh_auth_file = ssh_auth_file;
-            objT.ssh_auth_method = ssh_auth_method;
+            objT.sshAuthFile = sshAuthFile;
+            objT.sshAuthMethod = sshAuthMethod;
             objT = this.getConnectionOptions().Target();
             objT.host.Value(SOSOptionHostName.getLocalHost());
             objT.port.value(0);
             objT.protocol.Value(enuTransferTypes.local.Text());
             SOSConnection2OptionsSuperClass objAlt = objT.Alternatives();
-            objAlt.host.Value(alternative_host.Value());
-            objAlt.port.value(alternative_port.value());
+            objAlt.host.Value(alternativeHost.Value());
+            objAlt.port.value(alternativePort.value());
             objAlt.protocol.Value(protocol.Value());
-            objAlt.passive_mode.Value(alternative_passive_mode.Value());
+            objAlt.passiveMode.Value(alternativePassiveMode.Value());
         } else {
             strDataSourceType = this.getConnectionOptions().Source().protocol.Value();
             if (strDataSourceType.isEmpty()) {
@@ -886,17 +886,17 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     }
 
     private void changeDirValues() {
-        ChangeValue(SourceDir, local_dir);
-        ChangeValue(TargetDir, remote_dir);
-        ChangeValue(local_dir, SourceDir);
-        ChangeValue(remote_dir, TargetDir);
-        ChangeValue(Source().FolderName, SourceDir);
-        ChangeValue(Target().FolderName, TargetDir);
+        ChangeValue(sourceDir, localDir);
+        ChangeValue(targetDir, remoteDir);
+        ChangeValue(localDir, sourceDir);
+        ChangeValue(remoteDir, targetDir);
+        ChangeValue(Source().folderName, sourceDir);
+        ChangeValue(Target().folderName, targetDir);
     }
 
     private void changeDirValues4Receive() {
-        ChangeValue(SourceDir, remote_dir);
-        ChangeValue(TargetDir, local_dir);
+        ChangeValue(sourceDir, remoteDir);
+        ChangeValue(targetDir, localDir);
     }
 
     private void ChangeValue(final SOSOptionElement pobjTarget, final SOSOptionElement pobjSource) {
@@ -911,7 +911,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     }
 
     public boolean DoNotOverwrite() {
-        return !overwrite_files.value() && !append_files.value();
+        return !overwriteFiles.value() && !appendFiles.value();
     }
 
     public SOSConnection2Options getConnectionOptions() {
@@ -926,7 +926,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     }
 
     public boolean isReplaceReplacingInEffect() {
-        return this.getreplacing().IsNotEmpty();
+        return this.getReplacing().IsNotEmpty();
     }
 
     public SOSConnection2OptionsAlternate Source() {
@@ -954,24 +954,24 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     public SOSFTPOptions getClone() {
         SOSFTPOptions objClone = new SOSFTPOptions();
         String strB = this.getOptionsAsCommandLine();
-        objClone.CommandLineArgs(strB);
+        objClone.commandLineArgs(strB);
         return objClone;
     }
 
     public void ClearJumpParameter() {
         String strNullString = null;
-        jump_user.Value(strNullString);
-        jump_password.Value(strNullString);
-        jump_protocol.Value(strNullString);
-        jump_host.Value(strNullString);
-        jump_ssh_auth_method.Value(strNullString);
-        jump_command.Value(strNullString);
+        jumpUser.Value(strNullString);
+        jumpPassword.Value(strNullString);
+        jumpProtocol.Value(strNullString);
+        jumpHost.Value(strNullString);
+        jumpSshAuthMethod.Value(strNullString);
+        jumpCommand.Value(strNullString);
         host.Value(strNullString);
     }
 
     public boolean isFilePollingEnabled() {
         boolean flgFilePollingEnabled = false;
-        if ((poll_timeout.isDirty() || PollingDuration.isDirty()) && skip_transfer.isFalse()) {
+        if ((pollTimeout.isDirty() || pollingDuration.isDirty()) && skipTransfer.isFalse()) {
             flgFilePollingEnabled = true;
         }
         return flgFilePollingEnabled;
@@ -985,26 +985,26 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     }
 
     @Override
-    public SOSOptionRegExp getreplacing() {
-        SOSOptionRegExp objR = super.getreplacing();
-        if (Target().getreplacing().isDirty()) {
-            objR = Target().getreplacing();
+    public SOSOptionRegExp getReplacing() {
+        SOSOptionRegExp objR = super.getReplacing();
+        if (Target().getReplacing().isDirty()) {
+            objR = Target().getReplacing();
         }
         return objR;
     }
 
     @Override
-    public SOSOptionString getreplacement() {
-        SOSOptionString objR = super.getreplacement();
-        if (Target().getreplacement().isDirty()) {
-            objR = Target().getreplacement();
+    public SOSOptionString getReplacement() {
+        SOSOptionString objR = super.getReplacement();
+        if (Target().getReplacement().isDirty()) {
+            objR = Target().getReplacement();
         }
         return objR;
     }
 
     @Override
-    public SOSOptionBoolean getraise_exception_on_error() {
-        return super.getraise_exception_on_error();
+    public SOSOptionBoolean getRaiseExceptionOnError() {
+        return super.getRaiseExceptionOnError();
     }
 
     public Map<String, String> getDmzOptions() {

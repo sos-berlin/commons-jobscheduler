@@ -14,7 +14,7 @@ public class JSObjects2GraphvizMain extends JSToolBox {
         try {
             JSObjects2Graphviz objM = new JSObjects2Graphviz();
             JSObjects2GraphvizOptions objO = objM.getOptions();
-            objO.CommandLineArgs(pstrArgs);
+            objO.commandLineArgs(pstrArgs);
             objM.Execute();
         } catch (Exception e) {
             LOGGER.error(conMethodName + ": " + "Error occured ..." + e.getMessage(), e);

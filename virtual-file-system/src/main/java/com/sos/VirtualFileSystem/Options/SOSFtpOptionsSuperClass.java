@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Listener.JSListener;
 import com.sos.JSHelper.Options.JSJobChain;
 import com.sos.JSHelper.Options.JSOptionsClass;
@@ -28,7 +27,6 @@ import com.sos.JSHelper.Options.SOSOptionHostName;
 import com.sos.JSHelper.Options.SOSOptionInFileName;
 import com.sos.JSHelper.Options.SOSOptionIniFileName;
 import com.sos.JSHelper.Options.SOSOptionInteger;
-import com.sos.JSHelper.Options.SOSOptionProxyProtocol;
 import com.sos.JSHelper.Options.SOSOptionJSTransferMethod.enuJSTransferModes;
 import com.sos.JSHelper.Options.SOSOptionJadeOperation;
 import com.sos.JSHelper.Options.SOSOptionJobChainNode;
@@ -37,10 +35,10 @@ import com.sos.JSHelper.Options.SOSOptionPassword;
 import com.sos.JSHelper.Options.SOSOptionPlatform;
 import com.sos.JSHelper.Options.SOSOptionPortNumber;
 import com.sos.JSHelper.Options.SOSOptionProcessID;
+import com.sos.JSHelper.Options.SOSOptionProxyProtocol;
 import com.sos.JSHelper.Options.SOSOptionRegExp;
 import com.sos.JSHelper.Options.SOSOptionRelOp;
 import com.sos.JSHelper.Options.SOSOptionString;
-import com.sos.JSHelper.Options.SOSOptionStringValueList;
 import com.sos.JSHelper.Options.SOSOptionTime;
 import com.sos.JSHelper.Options.SOSOptionTransferMode;
 import com.sos.JSHelper.Options.SOSOptionTransferType;
@@ -59,7 +57,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     protected Messages objMsg = new Messages(this.getClass().getAnnotation(I18NResourceBundle.class).baseName());
     private static final long serialVersionUID = -4445655877481869778L;
     private static final String CLASSNAME = "SOSFtpOptionsSuperClass";
-    private final static Logger logger = Logger.getLogger(SOSFtpOptionsSuperClass.class);
+    private static final Logger LOGGER = Logger.getLogger(SOSFtpOptionsSuperClass.class);
 
     public SOSFtpOptionsSuperClass() {
         objParentClass = this.getClass();
@@ -77,15 +75,15 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 
     @JSOptionDefinition(name = "TFN_Post_Command", description = "Post commands executed after creating the final TargetFile", 
             key = "TFN_Post_Command", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString TFN_Post_Command = new SOSOptionString(this, CLASSNAME + ".TFN_Post_Command", 
+    public SOSOptionString tfnPostCommand = new SOSOptionString(this, CLASSNAME + ".TFN_Post_Command", 
             "Post commands executed after creating the final TargetFileName", "", "", false);
 
-    public SOSOptionString getTFN_Post_Command() {
-        return TFN_Post_Command;
+    public SOSOptionString getTfnPostCommand() {
+        return tfnPostCommand;
     }
 
-    public SOSFtpOptionsSuperClass setTFN_Post_Command(final SOSOptionString pstrValue) {
-        TFN_Post_Command = pstrValue;
+    public SOSFtpOptionsSuperClass setTfnPostCommand(final SOSOptionString pstrValue) {
+        tfnPostCommand = pstrValue;
         return this;
     }
 
@@ -118,15 +116,15 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 
     @JSOptionDefinition(name = "use_filters", description = "Use filters for source and/or Targe", key = "use_filters", type = "SOSOptionBoolean", 
             mandatory = false)
-    public SOSOptionBoolean use_filters = new SOSOptionBoolean(this, CLASSNAME + ".use_filters", "Use filters for source and/or Targe", "false", 
+    public SOSOptionBoolean useFilters = new SOSOptionBoolean(this, CLASSNAME + ".use_filters", "Use filters for source and/or Targe", "false", 
             "false", false);
 
-    public SOSOptionBoolean getuse_filters() {
-        return use_filters;
+    public SOSOptionBoolean getUseFilters() {
+        return useFilters;
     }
 
-    public SOSFtpOptionsSuperClass setuse_filters(final SOSOptionBoolean pstrValue) {
-        use_filters = pstrValue;
+    public SOSFtpOptionsSuperClass setUseFilters(final SOSOptionBoolean pstrValue) {
+        useFilters = pstrValue;
         return this;
     }
 
@@ -135,11 +133,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     public SOSOptionBoolean isFragment = new SOSOptionBoolean(this, CLASSNAME + ".is_fragment", "Mark an profile as a fragment", "false", "false", 
             false);
 
-    public String getis_fragment() {
+    public String getIsFragment() {
         return isFragment.Value();
     }
 
-    public SOSFtpOptionsSuperClass setis_fragment(final String pstrValue) {
+    public SOSFtpOptionsSuperClass setIsFragment(final String pstrValue) {
         isFragment.Value(pstrValue);
         return this;
     }
@@ -149,26 +147,26 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     public SOSOptionBoolean reuseConnection = new SOSOptionBoolean(this, CLASSNAME + ".reuse_connection", 
             "reuse the current connections for all transfers", "false", "false", false);
 
-    public String getreuse_connection() {
+    public String getReuseConnection() {
         return reuseConnection.Value();
     }
 
-    public SOSFtpOptionsSuperClass setreuse_connection(final String pstrValue) {
+    public SOSFtpOptionsSuperClass setReuseConnection(final String pstrValue) {
         reuseConnection.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "polling_server", description = "act as a polling server", key = "polling_server", type = "SOSOptionBoolean", 
             mandatory = false)
-    public SOSOptionBoolean PollingServer = new SOSOptionBoolean(this, CLASSNAME + ".polling_server", "act as a polling server", "false", "false", 
+    public SOSOptionBoolean pollingServer = new SOSOptionBoolean(this, CLASSNAME + ".polling_server", "act as a polling server", "false", "false", 
             false);
 
-    public String getpolling_server() {
-        return PollingServer.Value();
+    public String getPollingServer() {
+        return pollingServer.Value();
     }
 
-    public SOSFtpOptionsSuperClass setpolling_server(final String pstrValue) {
-        PollingServer.Value(pstrValue);
+    public SOSFtpOptionsSuperClass setPollingServer(final String pstrValue) {
+        pollingServer.Value(pstrValue);
         return this;
     }
 
@@ -177,26 +175,26 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     public SOSOptionTime pollingEndAt = new SOSOptionTime(this, CLASSNAME + ".polling_end_at", "Polling should stop at the specified date/time", 
             "0", "0", false);
 
-    public String getpolling_end_at() {
+    public String getPollingEndAt() {
         return pollingEndAt.Value();
     }
 
-    public SOSFtpOptionsSuperClass setpolling_end_at(final String pstrValue) {
+    public SOSFtpOptionsSuperClass setPollingEndAt(final String pstrValue) {
         pollingEndAt.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "polling_server_poll_forever", description = "poll forever", key = "polling_server_poll_forever", 
             type = "SOSOptionBoolean", mandatory = true)
-    public SOSOptionBoolean PollingServerPollForever = new SOSOptionBoolean(this, CLASSNAME + ".polling_server_poll_forever", "poll forever", 
+    public SOSOptionBoolean pollingServerPollForever = new SOSOptionBoolean(this, CLASSNAME + ".polling_server_poll_forever", "poll forever", 
             "false", "false", true);
 
-    public String getpolling_server_poll_forever() {
-        return PollingServerPollForever.Value();
+    public String getPollingServerPollForever() {
+        return pollingServerPollForever.Value();
     }
 
-    public SOSFtpOptionsSuperClass setpolling_server_poll_forever(final String pstrValue) {
-        PollingServerPollForever.Value(pstrValue);
+    public SOSFtpOptionsSuperClass setPollingServerPollForever(final String pstrValue) {
+        pollingServerPollForever.Value(pstrValue);
         return this;
     }
 
@@ -205,26 +203,26 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     public SOSOptionTime pollingServerDuration = new SOSOptionTime(this, CLASSNAME + ".polling_server_duration", 
             "How long the PollingServer should run", "0", "0", false);
 
-    public String getpolling_server_duration() {
+    public String getPollingServerDuration() {
         return pollingServerDuration.Value();
     }
 
-    public SOSFtpOptionsSuperClass setpolling_server_duration(final String pstrValue) {
+    public SOSFtpOptionsSuperClass setPollingServerDuration(final String pstrValue) {
         pollingServerDuration.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "Lazy_Connection_Mode", description = "Connect to Target as late as possible", key = "Lazy_Connection_Mode", 
             type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean LazyConnectionMode = new SOSOptionBoolean(this, CLASSNAME + ".Lazy_Connection_Mode", 
+    public SOSOptionBoolean lazyConnectionMode = new SOSOptionBoolean(this, CLASSNAME + ".Lazy_Connection_Mode", 
             "Connect to Target as late as possible", "false", "false", false);
 
-    public String getLazy_Connection_Mode() {
-        return LazyConnectionMode.Value();
+    public String getLazyConnectionMode() {
+        return lazyConnectionMode.Value();
     }
 
-    public SOSFtpOptionsSuperClass setLazy_Connection_Mode(final String pstrValue) {
-        LazyConnectionMode.Value(pstrValue);
+    public SOSFtpOptionsSuperClass setLazyConnectionMode(final String pstrValue) {
+        lazyConnectionMode.Value(pstrValue);
         return this;
     }
 
@@ -232,393 +230,393 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
             mandatory = false)
     public SOSOptionPlatform platform = new SOSOptionPlatform(this, CLASSNAME + ".platform", "platform on which the app is running", "", "", false);
 
-    public String getplatform() {
+    public String getPlatform() {
         return platform.Value();
     }
 
-    public SOSFtpOptionsSuperClass setplatform(final String pstrValue) {
+    public SOSFtpOptionsSuperClass setPlatform(final String pstrValue) {
         platform.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "mail_on_success", description = "Send a Mail in case of sucess", key = "mail_on_success", 
             type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean mail_on_success = new SOSOptionBoolean(this, CLASSNAME + ".mail_on_success", "Send a Mail in case of sucess", "false", 
+    public SOSOptionBoolean mailOnSuccess = new SOSOptionBoolean(this, CLASSNAME + ".mail_on_success", "Send a Mail in case of sucess", "false", 
             "false", false);
 
-    public String getmail_on_success() {
-        return mail_on_success.Value();
+    public String getMailOnSuccess() {
+        return mailOnSuccess.Value();
     }
 
-    public SOSFtpOptionsSuperClass setmail_on_success(final String pstrValue) {
-        mail_on_success.Value(pstrValue);
+    public SOSFtpOptionsSuperClass setMailOnSuccess(final String pstrValue) {
+        mailOnSuccess.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "mail_on_error", description = "Send a Mail in case of error", key = "mail_on_error", type = "SOSOptionBoolean", 
             mandatory = false)
-    public SOSOptionBoolean mail_on_error = new SOSOptionBoolean(this, CLASSNAME + ".mail_on_error", "Send a Mail in case of sucess", "false", 
+    public SOSOptionBoolean mailOnError = new SOSOptionBoolean(this, CLASSNAME + ".mail_on_error", "Send a Mail in case of sucess", "false", 
             "false", false);
 
-    public String getmail_on_error() {
-        return mail_on_error.Value();
+    public String getMailOnError() {
+        return mailOnError.Value();
     }
 
-    public SOSFtpOptionsSuperClass setmail_on_error(final String pstrValue) {
-        mail_on_error.Value(pstrValue);
+    public SOSFtpOptionsSuperClass setMailOnError(final String pstrValue) {
+        mailOnError.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "mail_on_empty_files", description = "Send a Mail in case of empty files", key = "mail_on_empty_files", 
             type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean mail_on_empty_files = new SOSOptionBoolean(this, CLASSNAME + ".mail_on_empty_files", 
+    public SOSOptionBoolean mailOnEmptyFiles = new SOSOptionBoolean(this, CLASSNAME + ".mail_on_empty_files", 
             "Send a Mail in case of empty files", "false", "false", false);
 
-    public String getmail_on_empty_files() {
-        return mail_on_empty_files.Value();
+    public String getMailOnEmptyFiles() {
+        return mailOnEmptyFiles.Value();
     }
 
-    public SOSFtpOptionsSuperClass setmail_on_empty_files(final String pstrValue) {
-        mail_on_empty_files.Value(pstrValue);
+    public SOSFtpOptionsSuperClass setMailOnEmptyFiles(final String pstrValue) {
+        mailOnEmptyFiles.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "title", description = "The Title for a section /profile", key = "title", type = "SOSOptionString", mandatory = false)
     public SOSOptionString title = new SOSOptionString(this, CLASSNAME + ".title", "The Title for a section /profile", "", "", false);
 
-    public String gettitle() {
+    public String getTitle() {
         return title.Value();
     }
 
-    public SOSFtpOptionsSuperClass settitle(final String pstrValue) {
+    public SOSFtpOptionsSuperClass setTitle(final String pstrValue) {
         title.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "keep_modification_date", description = "Keep Modification Date of File", key = "keep_modification_date", 
             type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean keep_modification_date = new SOSOptionBoolean(this, CLASSNAME + ".keep_modification_date", 
+    public SOSOptionBoolean keepModificationDate = new SOSOptionBoolean(this, CLASSNAME + ".keep_modification_date", 
             "Keep Modification Date of File", "false", "false", false);
     
-    public SOSOptionBoolean KeepModificationDate = (SOSOptionBoolean) keep_modification_date.SetAlias("KeepModificationate");
+//    public SOSOptionBoolean keepModificationDate = (SOSOptionBoolean) keepModificationDate.SetAlias("KeepModificationate");
 
-    public String getkeep_modification_date() {
-        return keep_modification_date.Value();
+    public String getKeepModificationDate() {
+        return keepModificationDate.Value();
     }
 
-    public SOSFtpOptionsSuperClass setkeep_modification_date(final String pstrValue) {
-        keep_modification_date.Value(pstrValue);
+    public SOSFtpOptionsSuperClass setKeepModificationDate(final String pstrValue) {
+        keepModificationDate.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "cumulate_files", description = "cumulate (all) files into one file by append", key = "cumulate_files", 
             type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean CumulateFiles = new SOSOptionBoolean(this, CLASSNAME + ".cumulate_files", 
+    public SOSOptionBoolean cumulateFiles = new SOSOptionBoolean(this, CLASSNAME + ".cumulate_files", 
             "cumulate (all) files into one file by append", "false", "false", false);
 
-    public String getcumulate_files() {
-        return CumulateFiles.Value();
+    public String getCumulateFiles() {
+        return cumulateFiles.Value();
     }
 
-    public SOSFtpOptionsSuperClass setcumulate_files(final String pstrValue) {
-        CumulateFiles.Value(pstrValue);
+    public SOSFtpOptionsSuperClass setCumulateFiles(final String pstrValue) {
+        cumulateFiles.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "cumulative_filename", description = "Name of File into which all files hat to be cumulated", 
             key = "cumulative_filename", type = "SOSOptionFileName", mandatory = true)
-    public SOSOptionFileName CumulativeFileName = new SOSOptionFileName(this, CLASSNAME + ".cumulative_filename", 
+    public SOSOptionFileName cumulativeFileName = new SOSOptionFileName(this, CLASSNAME + ".cumulative_filename", 
             "Name of File into which all files hat to be cumulated", "", "", false);
 
-    public String getcumulative_filename() {
-        return CumulativeFileName.Value();
+    public String getCumulativeFilename() {
+        return cumulativeFileName.Value();
     }
 
-    public SOSFtpOptionsSuperClass setcumulative_filename(final String pstrValue) {
-        CumulativeFileName.Value(pstrValue);
+    public SOSFtpOptionsSuperClass setCumulativeFilename(final String pstrValue) {
+        cumulativeFileName.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "cumulative_file_separator", description = "Text which has to beplaced between cumulated files", 
             key = "cumulative_file_separator", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString CumulativeFileSeparator = new SOSOptionString(this, CLASSNAME + ".cumulative_file_separator", 
+    public SOSOptionString cumulativeFileSeparator = new SOSOptionString(this, CLASSNAME + ".cumulative_file_separator", 
             "Text which has to beplaced between cumulated files", "", "", false);
 
-    public String getcumulative_file_separator() {
-        return CumulativeFileSeparator.Value();
+    public String getCumulativeFileSeparator() {
+        return cumulativeFileSeparator.Value();
     }
 
-    public SOSFtpOptionsSuperClass setcumulative_file_separator(final String pstrValue) {
-        CumulativeFileSeparator.Value(pstrValue);
+    public SOSFtpOptionsSuperClass setCumulativeFileSeparator(final String pstrValue) {
+        cumulativeFileSeparator.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "cumulative_file_delete", description = "Delete cumulative file before starting transfer", 
             key = "cumulative_file_delete", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean CumulativeFileDelete = new SOSOptionBoolean(this, CLASSNAME + ".cumulative_file_delete", 
+    public SOSOptionBoolean cumulativeFileDelete = new SOSOptionBoolean(this, CLASSNAME + ".cumulative_file_delete", 
             "Delete cumulative file before starting transfer", "false", "false", false);
 
-    public String getcumulative_file_delete() {
-        return CumulativeFileDelete.Value();
+    public String getCumulativeFileDelete() {
+        return cumulativeFileDelete.Value();
     }
 
-    public SOSFtpOptionsSuperClass setcumulative_file_delete(final String pstrValue) {
-        CumulativeFileDelete.Value(pstrValue);
+    public SOSFtpOptionsSuperClass setCumulativeFileDelete(final String pstrValue) {
+        cumulativeFileDelete.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "Post_Command", description = "FTP-Command to be executed after transfer", key = "Post_Command", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionCommandString Post_Command = new SOSOptionCommandString(this, CLASSNAME + ".Post_Command", 
+    public SOSOptionCommandString postCommand = new SOSOptionCommandString(this, CLASSNAME + ".Post_Command", 
             "FTP-Command to be executed after transfer", "", "", false);
 
-    public String getPost_Command() {
-        return Post_Command.Value();
+    public String getPostCommand() {
+        return postCommand.Value();
     }
 
-    public SOSFtpOptionsSuperClass setPost_Command(final String pstrValue) {
-        Post_Command.Value(pstrValue);
+    public SOSFtpOptionsSuperClass setPostCommand(final String pstrValue) {
+        postCommand.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "Pre_Command", description = "FTP-Command to be execute before transfer", key = "Pre_Command", 
             type = "SOSOptionString  ", mandatory = false)
-    public SOSOptionCommandString Pre_Command = new SOSOptionCommandString(this, CLASSNAME + ".Pre_Command", "", "", "", false);
+    public SOSOptionCommandString preCommand = new SOSOptionCommandString(this, CLASSNAME + ".Pre_Command", "", "", "", false);
 
-    public String getPre_Command() {
-        return Pre_Command.Value();
+    public String getPreCommand() {
+        return preCommand.Value();
     }
 
-    public SOSFtpOptionsSuperClass setPre_Command(final String pstrValue) {
-        Pre_Command.Value(pstrValue);
+    public SOSFtpOptionsSuperClass setPreCommand(final String pstrValue) {
+        preCommand.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "CheckServerFeatures", description = "The available features of a ftp-server", key = "Check_Server_Features", 
             type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean CheckServerFeatures = new SOSOptionBoolean(this, CLASSNAME + ".Check_Server_Features", 
+    public SOSOptionBoolean checkServerFeatures = new SOSOptionBoolean(this, CLASSNAME + ".Check_Server_Features", 
             "The available features of a ftp-server", "false", "false", false);
 
     @Override
-    public SOSOptionBoolean CheckServerFeatures() {
-        return CheckServerFeatures;
+    public SOSOptionBoolean checkServerFeatures() {
+        return checkServerFeatures;
     }
 
     public String getCheckServerFeatures() {
-        return CheckServerFeatures.Value();
+        return checkServerFeatures.Value();
     }
 
     public SOSFtpOptionsSuperClass setCheckServerFeatures(final String pstrValue) {
-        CheckServerFeatures.Value(pstrValue);
+        checkServerFeatures.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "PollKeepConnection", description = "Keep connection while polling", key = "PollKeepConnection", 
             type = "SOSOptionBoolean", mandatory = true)
-    public SOSOptionBoolean PollKeepConnection = new SOSOptionBoolean(this, CLASSNAME + ".PollKeepConnection", "Keep connection while polling", 
+    public SOSOptionBoolean pollKeepConnection = new SOSOptionBoolean(this, CLASSNAME + ".PollKeepConnection", "Keep connection while polling", 
             "false", "false", true);
 
     public String getPollKeepConnection() {
-        return PollKeepConnection.Value();
+        return pollKeepConnection.Value();
     }
 
     public SOSFtpOptionsSuperClass setPollKeepConnection(final String pstrValue) {
-        PollKeepConnection.Value(pstrValue);
+        pollKeepConnection.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "FileNameEncoding", description = "Set the encoding-type of a file name", key = "FileNameEncoding", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionString FileNameEncoding = new SOSOptionString(this, CLASSNAME + ".FileNameEncoding", "Set the encoding-type of a file name", 
+    public SOSOptionString fileNameEncoding = new SOSOptionString(this, CLASSNAME + ".FileNameEncoding", "Set the encoding-type of a file name", 
             "", "ISO-8859-1", false);
 
     public String getFileNameEncoding() {
-        return FileNameEncoding.Value();
+        return fileNameEncoding.Value();
     }
 
     public SOSFtpOptionsSuperClass setFileNameEncoding(final String pstrValue) {
-        FileNameEncoding.Value(pstrValue);
+        fileNameEncoding.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "ControlEncoding", description = "Specify the encoding-type, e.g. utf-8, used by the server", 
             key = "ControlEncoding", type = "SOSOptionString", mandatory = false)
-    public SOSOptionEncoding ControlEncoding = new SOSOptionEncoding(this, CLASSNAME + ".ControlEncoding", 
+    public SOSOptionEncoding controlEncoding = new SOSOptionEncoding(this, CLASSNAME + ".ControlEncoding", 
             "Specify the encoding-type, e.g. utf-8, used by the server", "", "", false);
 
     public String getControlEncoding() {
-        return ControlEncoding.Value();
+        return controlEncoding.Value();
     }
 
     public SOSFtpOptionsSuperClass setControlEncoding(final String pstrValue) {
-        ControlEncoding.Value(pstrValue);
+        controlEncoding.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "History_File_Append_Mode", description = "Specifies wether the History File has to be written in append mode", 
             key = "History_File_Append_Mode", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean HistoryFileAppendMode = new SOSOptionBoolean(this, CLASSNAME + ".History_File_Append_Mode", 
+    public SOSOptionBoolean historyFileAppendMode = new SOSOptionBoolean(this, CLASSNAME + ".History_File_Append_Mode", 
             "Specifies wether the History File has to be written in append mode", "true", "true", false);
 
     public SOSOptionBoolean getHistoryFileAppendMode() {
-        return HistoryFileAppendMode;
+        return historyFileAppendMode;
     }
 
     public SOSFtpOptionsSuperClass setHistoryFileAppendMode(final SOSOptionBoolean pstrValue) {
-        HistoryFileAppendMode = pstrValue;
+        historyFileAppendMode = pstrValue;
         return this;
     }
 
     @JSOptionDefinition(name = "HistoryEntries", description = "List of additional entries for the transfer history record.", 
             key = "HistoryEntries", type = "SOSOptionArrayList", mandatory = false)
-    public SOSOptionArrayList HistoryEntries = new SOSOptionArrayList(this, CLASSNAME + ".HistoryEntries", 
+    public SOSOptionArrayList historyEntries = new SOSOptionArrayList(this, CLASSNAME + ".HistoryEntries", 
             "List of additional entries for the transfer history record.", "", "", false);
 
     public String getHistoryEntries() {
-        return HistoryEntries.Value();
+        return historyEntries.Value();
     }
 
     public SOSFtpOptionsSuperClass setHistoryEntries(final String pstrValue) {
-        HistoryEntries.Value(pstrValue);
+        historyEntries.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "SendTransferHistory", 
             description = "If this option is set to true, the transfer history will be sent to the background service.", 
             key = "SendTransferHistory", type = "SOSOptionBoolean", mandatory = true)
-    public SOSOptionBoolean SendTransferHistory = new SOSOptionBoolean(this, CLASSNAME + ".SendTransferHistory", 
+    public SOSOptionBoolean sendTransferHistory = new SOSOptionBoolean(this, CLASSNAME + ".SendTransferHistory", 
             "If this option is set to true, the transfer history will be sent to the background service.", "false", "false", false);
 
     public String getSendTransferHistory() {
-        return SendTransferHistory.Value();
+        return sendTransferHistory.Value();
     }
 
     public SOSFtpOptionsSuperClass setSendTransferHistory(final String pstrValue) {
-        SendTransferHistory.Value(pstrValue);
+        sendTransferHistory.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "Scheduler_Transfer_Method", description = "The technical method of how to communicate with the JobScheduler", 
             key = "Scheduler_Transfer_Method", type = "SOSOptionJSTransferMethod", mandatory = true)
-    public SOSOptionBackgroundServiceTransferMethod Scheduler_Transfer_Method = new SOSOptionBackgroundServiceTransferMethod(this, 
+    public SOSOptionBackgroundServiceTransferMethod schedulerTransferMethod = new SOSOptionBackgroundServiceTransferMethod(this, 
             CLASSNAME + ".Scheduler_Transfer_Method", "The technical method of how to communicate with the JobScheduler", 
             enuJSTransferModes.udp.description, enuJSTransferModes.udp.description, true);
 
-    public String getScheduler_Transfer_Method() {
-        return Scheduler_Transfer_Method.Value();
+    public String getSchedulerTransferMethod() {
+        return schedulerTransferMethod.Value();
     }
 
-    public SOSFtpOptionsSuperClass setScheduler_Transfer_Method(final String pstrValue) {
-        Scheduler_Transfer_Method.Value(pstrValue);
+    public SOSFtpOptionsSuperClass setSchedulerTransferMethod(final String pstrValue) {
+        schedulerTransferMethod.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "PreFtpCommands", description = "FTP commands, which has to be executed before the transfer started.", 
             key = "PreFtpCommands", type = "SOSOptionString", mandatory = false)
-    public SOSOptionCommandString PreFtpCommands = new SOSOptionCommandString(this, CLASSNAME + ".Pre_Ftp_Commands", 
+    public SOSOptionCommandString preFtpCommands = new SOSOptionCommandString(this, CLASSNAME + ".Pre_Ftp_Commands", 
             "FTP commands, which has to be executed before the transfer started.", "", "", false);
     
-    public SOSOptionCommandString PreTransferCommands = (SOSOptionCommandString) PreFtpCommands.SetAlias("pre_transfer_commands");
+    public SOSOptionCommandString PreTransferCommands = (SOSOptionCommandString) preFtpCommands.SetAlias("pre_transfer_commands");
 
     public String getPreFtpCommands() {
-        return PreFtpCommands.Value();
+        return preFtpCommands.Value();
     }
 
     public SOSFtpOptionsSuperClass setPreFtpCommands(final String pstrValue) {
-        PreFtpCommands.Value(pstrValue);
+        preFtpCommands.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "PostTransferCommands", description = "FTP commands, which has to be executed after the transfer ended.", 
             key = "PostTransferCommands", type = "SOSOptionString", mandatory = false)
-    public SOSOptionCommandString PostTransferCommands = new SOSOptionCommandString(this, CLASSNAME + ".post_transfer_Commands", 
+    public SOSOptionCommandString postTransferCommands = new SOSOptionCommandString(this, CLASSNAME + ".post_transfer_Commands", 
             "FTP commands, which has to be executed after the transfer ended.", "", "", false);
     
-    public SOSOptionString PostFtpCommands = (SOSOptionString) PostTransferCommands.SetAlias("post_Transfer_commands");
+    public SOSOptionString postFtpCommands = (SOSOptionString) postTransferCommands.SetAlias("post_Transfer_commands");
 
     public String getPostTransferCommands() {
-        return PostTransferCommands.Value();
+        return postTransferCommands.Value();
     }
 
     public SOSFtpOptionsSuperClass setPostTransferCommands(final String pstrValue) {
-        PostTransferCommands.Value(pstrValue);
+        postTransferCommands.Value(pstrValue);
         return this;
     }
     
     @JSOptionDefinition(name = "IntegrityHashType", description = "", key = "integrity_hash_type", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString IntegrityHashType = new SOSOptionString(this, CLASSNAME + ".integrity_hash_type", 
+    public SOSOptionString integrityHashType = new SOSOptionString(this, CLASSNAME + ".integrity_hash_type", 
             "The Type of the integrity hash, e.g. md5", "md5", "md5", false);
     
-    public SOSOptionString SecurityHashType = (SOSOptionString) IntegrityHashType.SetAlias("security_hash_type");
+    public SOSOptionString securityHashType = (SOSOptionString) integrityHashType.SetAlias("security_hash_type");
 
     @JSOptionDefinition(name = "DecompressAfterTransfer", description = "", key = "Decompress_After_Transfer", type = "SOSOptionBoolean", 
             mandatory = false)
-    public SOSOptionBoolean DecompressAfterTransfer = new SOSOptionBoolean(this, CLASSNAME + ".Decompress_After_Transfer", 
+    public SOSOptionBoolean decompressAfterTransfer = new SOSOptionBoolean(this, CLASSNAME + ".Decompress_After_Transfer", 
             "Decompress zipped-files after transfer", "false", "false", false);
     
     @JSOptionDefinition(name = "ConcurrentTransfer", description = "", key = "Concurrent_Transfer", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean ConcurrentTransfer = new SOSOptionBoolean(this, CLASSNAME + ".Concurrent_Transfer", "Process transfers simultaneously", 
+    public SOSOptionBoolean concurrentTransfer = new SOSOptionBoolean(this, CLASSNAME + ".Concurrent_Transfer", "Process transfers simultaneously", 
             "false", "false", false);
     
     @JSOptionDefinition(name = "CheckIntegrityHash", description = "", key = "check_integrity_hash", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean CheckIntegrityHash = new SOSOptionBoolean(this, CLASSNAME + ".check_integrity_hash", 
+    public SOSOptionBoolean checkIntegrityHash = new SOSOptionBoolean(this, CLASSNAME + ".check_integrity_hash", 
             "Calculates the integrity hash", "false", "false", false);
     
-    public SOSOptionBoolean CheckSecurityHash = (SOSOptionBoolean) CheckIntegrityHash.SetAlias("check_security_hash");
+    public SOSOptionBoolean checkSecurityHash = (SOSOptionBoolean) checkIntegrityHash.SetAlias("check_security_hash");
 
     @JSOptionDefinition(name = "MaxConcurrentTransfers", description = "", key = "Max_Concurrent_Transfers", type = "SOSOptionInteger", 
             mandatory = false)
-    public SOSOptionInteger MaxConcurrentTransfers = new SOSOptionInteger(this, CLASSNAME + ".Max_Concurrent_Transfers", 
+    public SOSOptionInteger maxConcurrentTransfers = new SOSOptionInteger(this, CLASSNAME + ".Max_Concurrent_Transfers", 
             "Maximum Numbers of parallel transfers", "5", "1", false);
     
     @JSOptionDefinition(name = "CreateIntegrityHashFile", description = "", key = "create_integrity_hash_file", type = "SOSOptionBoolean", 
             mandatory = false)
-    public SOSOptionBoolean CreateIntegrityHashFile = new SOSOptionBoolean(this, CLASSNAME + ".create_integrity_hash_file", 
+    public SOSOptionBoolean createIntegrityHashFile = new SOSOptionBoolean(this, CLASSNAME + ".create_integrity_hash_file", 
             "Flag if an integrity hash file will be created on the target", "false", "false", false);
 
-    public SOSOptionBoolean CreateSecurityHashFile = (SOSOptionBoolean) CreateIntegrityHashFile.SetAlias("create_security_hash_file");
+    public SOSOptionBoolean createSecurityHashFile = (SOSOptionBoolean) createIntegrityHashFile.SetAlias("create_security_hash_file");
 
     @JSOptionDefinition(name = "BufferSize", description = "", key = "buffer_Size", type = "SOSOptionInteger", mandatory = false)
-    public SOSOptionInteger BufferSize = new SOSOptionInteger(this, CLASSNAME + ".buffer_Size", "This parameter specifies the interval in seconds", 
+    public SOSOptionInteger bufferSize = new SOSOptionInteger(this, CLASSNAME + ".buffer_Size", "This parameter specifies the interval in seconds", 
             "32000", "4096", false);
 
     @JSOptionDefinition(name = "create_order", description = "Activate file-order creation With this parameter it is possible to specif", 
             key = "create_order", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean create_order = new SOSOptionBoolean(this, CLASSNAME + ".create_order", 
+    public SOSOptionBoolean createOrder = new SOSOptionBoolean(this, CLASSNAME + ".create_order", 
             "Activate file-order creation With this parameter it is possible to specif", "false", "false", false);
 
-    public SOSOptionBoolean getcreate_order() {
-        return create_order;
+    public SOSOptionBoolean getCreateOrder() {
+        return createOrder;
     }
 
-    public void setcreate_order(final SOSOptionBoolean p_create_order) {
-        create_order = p_create_order;
+    public void setCreateOrder(final SOSOptionBoolean pCreateOrder) {
+        createOrder = pCreateOrder;
     }
 
     @JSOptionDefinition(name = "create_orders_for_all_files", description = "Create a file-order for every file in the result-list", 
             key = "create_orders_for_all_files", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean create_orders_for_all_files = new SOSOptionBoolean(this, CLASSNAME + ".create_orders_for_all_files", 
+    public SOSOptionBoolean createOrdersForAllFiles = new SOSOptionBoolean(this, CLASSNAME + ".create_orders_for_all_files", 
             "Create a file-order for every file in the result-list", "false", "false", false);
 
-    public SOSOptionBoolean getcreate_orders_for_all_files() {
-        return create_orders_for_all_files;
+    public SOSOptionBoolean getCreateOrdersForAllFiles() {
+        return createOrdersForAllFiles;
     }
 
-    public void setcreate_orders_for_all_files(final SOSOptionBoolean p_create_orders_for_all_files) {
-        create_orders_for_all_files = p_create_orders_for_all_files;
+    public void setCreateOrdersForAllFiles(final SOSOptionBoolean pCreateOrdersForAllFiles) {
+        createOrdersForAllFiles = pCreateOrdersForAllFiles;
     }
 
     @JSOptionDefinition(name = "expected_size_of_result_set", description = "number of expected hits in result-list", 
             key = "expected_size_of_result_set", type = "SOSOptionInteger", mandatory = false)
-    public SOSOptionInteger expected_size_of_result_set = new SOSOptionInteger(this, CLASSNAME + ".expected_size_of_result_set", 
+    public SOSOptionInteger expectedSizeOfResultSet = new SOSOptionInteger(this, CLASSNAME + ".expected_size_of_result_set", 
             "number of expected hits in result-list", "0", "0", false);
 
-    public SOSOptionInteger getexpected_size_of_result_set() {
-        return expected_size_of_result_set;
+    public SOSOptionInteger getExpectedSizeOfResultSet() {
+        return expectedSizeOfResultSet;
     }
 
-    public void setexpected_size_of_result_set(final SOSOptionInteger p_expected_size_of_result_set) {
-        expected_size_of_result_set = p_expected_size_of_result_set;
+    public void setExpectedSizeOfResultSet(final SOSOptionInteger pExpectedSizeOfResultSet) {
+        expectedSizeOfResultSet = pExpectedSizeOfResultSet;
     }
 
     @JSOptionDefinition(name = "file", description = "File or Folder to watch for Checked file or directory Supports", key = "file", 
@@ -631,352 +629,352 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     public SOSOptionFileName target = new SOSOptionFileName(this, CLASSNAME + ".target", 
             "target or Folder to watch for Checked target or directory Supports", ".", ".", true);
 
-    public SOSOptionFileName getfile() {
+    public SOSOptionFileName getFile() {
         return file;
     }
 
-    public void setfile(final SOSOptionFileName p_file) {
-        file = p_file;
+    public void setFile(final SOSOptionFileName pFile) {
+        file = pFile;
     }
 
     public SOSOptionFileName FileName = (SOSOptionFileName) file.SetAlias(CLASSNAME + ".FileName");
     @JSOptionDefinition(name = "max_file_age", description = "maximum age of a file Specifies the maximum age of a file. If a file", 
             key = "max_file_age", type = "SOSOptionTime", mandatory = false)
-    public SOSOptionTime max_file_age = new SOSOptionTime(this, CLASSNAME + ".max_file_age", 
+    public SOSOptionTime maxFileAge = new SOSOptionTime(this, CLASSNAME + ".max_file_age", 
             "maximum age of a file Specifies the maximum age of a file. If a file", "0", "0", false);
 
-    public SOSOptionTime getmax_file_age() {
-        return max_file_age;
+    public SOSOptionTime getMaxFileAge() {
+        return maxFileAge;
     }
 
-    public void setmax_file_age(final SOSOptionTime p_max_file_age) {
-        max_file_age = p_max_file_age;
+    public void setMaxFileAge(final SOSOptionTime pMaxFileAge) {
+        maxFileAge = pMaxFileAge;
     }
 
-    public SOSOptionTime FileAgeMaximum = (SOSOptionTime) max_file_age.SetAlias(CLASSNAME + ".FileAgeMaximum");
+    public SOSOptionTime fileAgeMaximum = (SOSOptionTime) maxFileAge.SetAlias(CLASSNAME + ".FileAgeMaximum");
 
     @JSOptionDefinition(name = "max_file_size", description = "maximum size of a file Specifies the maximum size of a file in", 
             key = "max_file_size", type = "SOSOptionFileSize", mandatory = false)
-    public SOSOptionFileSize max_file_size = new SOSOptionFileSize(this, CLASSNAME + ".max_file_size", 
+    public SOSOptionFileSize maxFileSize = new SOSOptionFileSize(this, CLASSNAME + ".max_file_size", 
             "maximum size of a file Specifies the maximum size of a file in", "-1", "-1", false);
 
-    public SOSOptionFileSize getmax_file_size() {
-        return max_file_size;
+    public SOSOptionFileSize getMaxFileSize() {
+        return maxFileSize;
     }
 
-    public void setmax_file_size(final SOSOptionFileSize p_max_file_size) {
-        max_file_size = p_max_file_size;
+    public void setMaxFileSize(final SOSOptionFileSize pMaxFileSize) {
+        maxFileSize = pMaxFileSize;
     }
 
-    public SOSOptionFileSize FileSizeMaximum = (SOSOptionFileSize) max_file_size.SetAlias(CLASSNAME + ".FileSizeMaximum");
+    public SOSOptionFileSize fileSizeMaximum = (SOSOptionFileSize) maxFileSize.SetAlias(CLASSNAME + ".FileSizeMaximum");
 
     @JSOptionDefinition(name = "min_file_age", description = "minimum age of a file Specifies the minimum age of a files. If the fi", 
             key = "min_file_age", type = "SOSOptionTime", mandatory = false)
-    public SOSOptionTime min_file_age = new SOSOptionTime(this, CLASSNAME + ".min_file_age", 
+    public SOSOptionTime minFileAge = new SOSOptionTime(this, CLASSNAME + ".min_file_age", 
             "minimum age of a file Specifies the minimum age of a files. If the fi", "0", "0", false);
 
-    public SOSOptionTime getmin_file_age() {
-        return min_file_age;
+    public SOSOptionTime getMinFileAge() {
+        return minFileAge;
     }
 
-    public void setmin_file_age(final SOSOptionTime p_min_file_age) {
-        min_file_age = p_min_file_age;
+    public void setMinFileAge(final SOSOptionTime pMinFileAge) {
+        minFileAge = pMinFileAge;
     }
 
-    public SOSOptionTime FileAgeMinimum = (SOSOptionTime) min_file_age.SetAlias(CLASSNAME + ".FileAgeMinimum");
+    public SOSOptionTime fileAgeMinimum = (SOSOptionTime) minFileAge.SetAlias(CLASSNAME + ".FileAgeMinimum");
 
     @JSOptionDefinition(name = "min_file_size", description = "minimum size of one or multiple files Specifies the minimum size of one", 
             key = "min_file_size", type = "SOSOptionFileSize", mandatory = false)
-    public SOSOptionFileSize min_file_size = new SOSOptionFileSize(this, CLASSNAME + ".min_file_size", 
+    public SOSOptionFileSize minFileSize = new SOSOptionFileSize(this, CLASSNAME + ".min_file_size", 
             "minimum size of one or multiple files Specifies the minimum size of one", "-1", "-1", false);
 
-    public SOSOptionFileSize getmin_file_size() {
-        return min_file_size;
+    public SOSOptionFileSize getMinFileSize() {
+        return minFileSize;
     }
 
-    public void setmin_file_size(final SOSOptionFileSize p_min_file_size) {
-        min_file_size = p_min_file_size;
+    public void setMinFileSize(final SOSOptionFileSize pMinFileSize) {
+        minFileSize = pMinFileSize;
     }
 
-    public SOSOptionFileSize FileSizeMinimum = (SOSOptionFileSize) min_file_size.SetAlias(CLASSNAME + ".FileSizeMinimum");
+    public SOSOptionFileSize fileSizeMinimum = (SOSOptionFileSize) minFileSize.SetAlias(CLASSNAME + ".FileSizeMinimum");
 
     @JSOptionDefinition(name = "MergeOrderParameter", description = "Merge created order parameter with parameter of current order", 
             key = "MergeOrderParameter", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean MergeOrderParameter = new SOSOptionBoolean(this, CLASSNAME + ".MergeOrderParameter", 
+    public SOSOptionBoolean mergeOrderParameter = new SOSOptionBoolean(this, CLASSNAME + ".MergeOrderParameter", 
             "Merge created order parameter with parameter of current order", "false", "false", false);
 
     public String getMergeOrderParameter() {
-        return MergeOrderParameter.Value();
+        return mergeOrderParameter.Value();
     }
 
     public SOSFtpOptionsSuperClass setMergeOrderParameter(final String pstrValue) {
-        MergeOrderParameter.Value(pstrValue);
+        mergeOrderParameter.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "next_state", description = "The first node to execute in a jobchain The name of the node of a jobchai", 
             key = "next_state", type = "SOSOptionJobChainNode", mandatory = false)
-    public SOSOptionJobChainNode next_state = new SOSOptionJobChainNode(this, CLASSNAME + ".next_state", 
+    public SOSOptionJobChainNode nextState = new SOSOptionJobChainNode(this, CLASSNAME + ".next_state", 
             "The first node to execute in a jobchain The name of the node of a jobchai", "", "", false);
 
-    public SOSOptionJobChainNode getnext_state() {
-        return next_state;
+    public SOSOptionJobChainNode getNextState() {
+        return nextState;
     }
 
-    public void setnext_state(final SOSOptionJobChainNode p_next_state) {
-        next_state = p_next_state;
+    public void setNextState(final SOSOptionJobChainNode pNextState) {
+        nextState = pNextState;
     }
 
     @JSOptionDefinition(name = "on_empty_result_set", description = "Set next node on empty result set The next Node (Step, Job) to execute i", 
             key = "on_empty_result_set", type = "SOSOptionJobChainNode", mandatory = false)
-    public SOSOptionJobChainNode on_empty_result_set = new SOSOptionJobChainNode(this, CLASSNAME + ".on_empty_result_set", 
+    public SOSOptionJobChainNode onEmptyResultSet = new SOSOptionJobChainNode(this, CLASSNAME + ".on_empty_result_set", 
             "Set next node on empty result set The next Node (Step, Job) to execute i", "", "", false);
 
-    public SOSOptionJobChainNode geton_empty_result_set() {
-        return on_empty_result_set;
+    public SOSOptionJobChainNode getOnEmptyResultSet() {
+        return onEmptyResultSet;
     }
 
-    public void seton_empty_result_set(final SOSOptionJobChainNode p_on_empty_result_set) {
-        on_empty_result_set = p_on_empty_result_set;
+    public void setOnEmptyResultSet(final SOSOptionJobChainNode pOnEmptyResultSet) {
+        onEmptyResultSet = pOnEmptyResultSet;
     }
 
     @JSOptionDefinition(name = "order_jobscheduler_host", description = "Name of Jobscheduler Host where the order have to be started", 
             key = "order_jobscheduler_host", type = "SOSOptionHostName", mandatory = false)
-    public SOSOptionHostName order_jobscheduler_host = new SOSOptionHostName(this, CLASSNAME + ".order_jobscheduler_host", 
+    public SOSOptionHostName orderJobschedulerHost = new SOSOptionHostName(this, CLASSNAME + ".order_jobscheduler_host", 
             "Name of Jobscheduler Host where the order have to be started", "", "", false);
 
-    public SOSOptionHostName getorder_jobscheduler_host() {
-        return order_jobscheduler_host;
+    public SOSOptionHostName getOrderJobschedulerHost() {
+        return orderJobschedulerHost;
     }
 
-    public void setorder_jobscheduler_host(final SOSOptionHostName hostName) {
-        order_jobscheduler_host = hostName;
+    public void setOrderJobschedulerHost(final SOSOptionHostName hostName) {
+        orderJobschedulerHost = hostName;
     }
 
     @JSOptionDefinition(name = "order_jobscheduler_port", description = "The port of the JobScheduler node", key = "order_jobscheduler_port", 
             type = "SOSOptionPortNumber", mandatory = false)
-    public SOSOptionPortNumber order_jobscheduler_port = new SOSOptionPortNumber(this, CLASSNAME + ".order_jobscheduler_port", 
+    public SOSOptionPortNumber orderJobschedulerPort = new SOSOptionPortNumber(this, CLASSNAME + ".order_jobscheduler_port", 
             "The port of the JobScheduler node", "", "4444", false);
 
-    public SOSOptionPortNumber getorder_jobscheduler_port() {
-        return order_jobscheduler_port;
+    public SOSOptionPortNumber getOrderJobschedulerPort() {
+        return orderJobschedulerPort;
     }
 
-    public void setorder_jobscheduler_port(final SOSOptionPortNumber portNumber) {
-        order_jobscheduler_port = portNumber;
+    public void setOrderJobschedulerPort(final SOSOptionPortNumber portNumber) {
+        orderJobschedulerPort = portNumber;
     }
 
     @JSOptionDefinition(name = "order_jobchain_name", description = "The name of the jobchain which belongs to the order The name of the jobch", 
             key = "order_jobchain_name", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString order_jobchain_name = new SOSOptionString(this, CLASSNAME + ".order_jobchain_name", 
+    public SOSOptionString orderJobchainName = new SOSOptionString(this, CLASSNAME + ".order_jobchain_name", 
             "The name of the jobchain which belongs to the order The name of the jobch", "", "", false);
 
-    public SOSOptionString getorder_jobchain_name() {
-        return order_jobchain_name;
+    public SOSOptionString getOrderJobchainName() {
+        return orderJobchainName;
     }
 
-    public void setorder_jobchain_name(final SOSOptionString p_order_jobchain_name) {
-        order_jobchain_name = p_order_jobchain_name;
+    public void setOrderJobchainName(final SOSOptionString pOrderJobchainName) {
+        orderJobchainName = pOrderJobchainName;
     }
 
     @JSOptionDefinition(name = "raise_error_if_result_set_is", 
             description = "raise error on expected size of result-set With this parameter it is poss", key = "raise_error_if_result_set_is", 
             type = "SOSOptionRelOp", mandatory = false)
-    public SOSOptionRelOp raise_error_if_result_set_is = new SOSOptionRelOp(this, CLASSNAME + ".raise_error_if_result_set_is", 
+    public SOSOptionRelOp raiseErrorIfResultSetIs = new SOSOptionRelOp(this, CLASSNAME + ".raise_error_if_result_set_is", 
             "raise error on expected size of result-set With this parameter it is poss", "", "", false);
 
-    public SOSOptionRelOp getraise_error_if_result_set_is() {
-        return raise_error_if_result_set_is;
+    public SOSOptionRelOp getRaiseErrorIfResultSetIs() {
+        return raiseErrorIfResultSetIs;
     }
 
-    public void setraise_error_if_result_set_is(final SOSOptionRelOp p_raise_error_if_result_set_is) {
-        raise_error_if_result_set_is = p_raise_error_if_result_set_is;
+    public void setRaiseErrorIfResultSetIs(final SOSOptionRelOp pRaiseErrorIfResultSetIs) {
+        raiseErrorIfResultSetIs = pRaiseErrorIfResultSetIs;
     }
 
     @JSOptionDefinition(name = "result_list_file", description = "Name of the result-list file If the value of this parameter specifies a v", 
             key = "result_list_file", type = "SOSOptionFileName", mandatory = false)
-    public SOSOptionFileName result_list_file = new SOSOptionFileName(this, CLASSNAME + ".result_list_file", 
+    public SOSOptionFileName resultListFile = new SOSOptionFileName(this, CLASSNAME + ".result_list_file", 
             "Name of the result-list file If the value of this parameter specifies a v", "", "", false);
 
-    public SOSOptionFileName getresult_list_file() {
-        return result_list_file;
+    public SOSOptionFileName getResultListFile() {
+        return resultListFile;
     }
 
-    public void setresult_list_file(final SOSOptionFileName p_result_list_file) {
-        result_list_file = p_result_list_file;
+    public void setResultListFile(final SOSOptionFileName pResultListFile) {
+        resultListFile = pResultListFile;
     }
 
     @JSOptionDefinition(name = "scheduler_file_name", description = "Name of the file to process for a file-order", key = "scheduler_file_name", 
             type = "SOSOptionFileName", mandatory = false)
-    public SOSOptionFileName scheduler_file_name = new SOSOptionFileName(this, CLASSNAME + ".scheduler_file_name", 
+    public SOSOptionFileName schedulerFileName = new SOSOptionFileName(this, CLASSNAME + ".scheduler_file_name", 
             "Name of the file to process for a file-order", "", "", false);
 
-    public SOSOptionFileName getscheduler_file_name() {
-        return scheduler_file_name;
+    public SOSOptionFileName getSchedulerFileName() {
+        return schedulerFileName;
     }
 
-    public void setscheduler_file_name(final SOSOptionFileName p_scheduler_file_name) {
-        scheduler_file_name = p_scheduler_file_name;
+    public void setSchedulerFileName(final SOSOptionFileName pSchedulerFileName) {
+        schedulerFileName = pSchedulerFileName;
     }
 
     @JSOptionDefinition(name = "scheduler_file_parent", description = "pathanme of the file to process for a file-order", 
             key = "scheduler_file_parent", type = "SOSOptionFileName", mandatory = false)
-    public SOSOptionFileName scheduler_file_parent = new SOSOptionFileName(this, CLASSNAME + ".scheduler_file_parent", 
+    public SOSOptionFileName schedulerFileParent = new SOSOptionFileName(this, CLASSNAME + ".scheduler_file_parent", 
             "pathanme of the file to process for a file-order", "", "", false);
 
-    public SOSOptionFileName getscheduler_file_parent() {
-        return scheduler_file_parent;
+    public SOSOptionFileName getSchedulerFileParent() {
+        return schedulerFileParent;
     }
 
-    public void setscheduler_file_parent(final SOSOptionFileName p_scheduler_file_parent) {
-        scheduler_file_parent = p_scheduler_file_parent;
+    public void setSchedulerFileParent(final SOSOptionFileName pSchedulerFileParent) {
+        schedulerFileParent = pSchedulerFileParent;
     }
 
     @JSOptionDefinition(name = "scheduler_file_path", description = "file to process for a file-order Using Directory Monitoring with", 
             key = "scheduler_file_path", type = "SOSOptionFileName", mandatory = false)
-    public SOSOptionFileName scheduler_file_path = new SOSOptionFileName(this, CLASSNAME + ".scheduler_file_path", 
+    public SOSOptionFileName schedulerFilePath = new SOSOptionFileName(this, CLASSNAME + ".scheduler_file_path", 
             "file to process for a file-order Using Directory Monitoring with", "", "", false);
 
-    public SOSOptionFileName getscheduler_file_path() {
-        return scheduler_file_path;
+    public SOSOptionFileName getSchedulerFilePath() {
+        return schedulerFilePath;
     }
 
-    public void setscheduler_file_path(final SOSOptionFileName p_scheduler_file_path) {
-        scheduler_file_path = p_scheduler_file_path;
+    public void setSchedulerFilePath(final SOSOptionFileName pSchedulerFilePath) {
+        schedulerFilePath = pSchedulerFilePath;
     }
 
     @JSOptionDefinition(name = "scheduler_sosfileoperations_resultsetsize", description = "The amount of hits in the result set of the operation", 
             key = "scheduler_sosfileoperations_resultsetsize", type = "SOSOptionsInteger", mandatory = false)
-    public SOSOptionInteger scheduler_sosfileoperations_resultsetsize = new SOSOptionInteger(this, 
+    public SOSOptionInteger schedulerSosFileOperationsResultsetSize = new SOSOptionInteger(this, 
             CLASSNAME + ".scheduler_sosfileoperations_resultsetsize", "The amount of hits in the result set of the operation", "", "", false);
 
-    public SOSOptionInteger getscheduler_sosfileoperations_resultsetsize() {
-        return scheduler_sosfileoperations_resultsetsize;
+    public SOSOptionInteger getSchedulerSosFileOperationsResultsetSize() {
+        return schedulerSosFileOperationsResultsetSize;
     }
 
-    public void setscheduler_sosfileoperations_resultsetsize(final SOSOptionInteger p_scheduler_sosfileoperations_resultsetsize) {
-        scheduler_sosfileoperations_resultsetsize = p_scheduler_sosfileoperations_resultsetsize;
+    public void setSchedulerSosFileOperationsResultsetSize(final SOSOptionInteger pSchedulerSosFileOperationsResultsetSize) {
+        schedulerSosFileOperationsResultsetSize = pSchedulerSosFileOperationsResultsetSize;
     }
 
-    public SOSOptionInteger ResultSetSize = (SOSOptionInteger) scheduler_sosfileoperations_resultsetsize.SetAlias(CLASSNAME + ".ResultSetSize");
+    public SOSOptionInteger resultSetSize = (SOSOptionInteger) schedulerSosFileOperationsResultsetSize.SetAlias(CLASSNAME + ".ResultSetSize");
 
     @JSOptionDefinition(name = "skip_first_files", description = "number of files to remove from the top of the result-set The numbe", 
             key = "skip_first_files", type = "SOSOptionInteger", mandatory = false)
-    public SOSOptionInteger skip_first_files = new SOSOptionInteger(this, CLASSNAME + ".skip_first_files", 
+    public SOSOptionInteger skipFirstFiles = new SOSOptionInteger(this, CLASSNAME + ".skip_first_files", 
             "number of files to remove from the top of the result-set The numbe", "0", "0", false);
 
-    public SOSOptionInteger getskip_first_files() {
-        return skip_first_files;
+    public SOSOptionInteger getSkipFirstFiles() {
+        return skipFirstFiles;
     }
 
-    public void setskip_first_files(final SOSOptionInteger p_skip_first_files) {
-        skip_first_files = p_skip_first_files;
+    public void setSkipFirstFiles(final SOSOptionInteger pSkipFirstFiles) {
+        skipFirstFiles = pSkipFirstFiles;
     }
 
-    public SOSOptionInteger NoOfFirstFiles2Skip = (SOSOptionInteger) skip_first_files.SetAlias(CLASSNAME + ".NoOfFirstFiles2Skip");
+    public SOSOptionInteger noOfFirstFiles2Skip = (SOSOptionInteger) skipFirstFiles.SetAlias(CLASSNAME + ".NoOfFirstFiles2Skip");
 
     @JSOptionDefinition(name = "skip_last_files", description = "number of files to remove from the bottom of the result-set The numbe", 
             key = "skip_last_files", type = "SOSOptionInteger", mandatory = false)
-    public SOSOptionInteger skip_last_files = new SOSOptionInteger(this, CLASSNAME + ".skip_last_files", 
+    public SOSOptionInteger skipLastFiles = new SOSOptionInteger(this, CLASSNAME + ".skip_last_files", 
             "number of files to remove from the bottom of the result-set The numbe", "0", "0", false);
 
-    public SOSOptionInteger getskip_last_files() {
-        return skip_last_files;
+    public SOSOptionInteger getSkipLastFiles() {
+        return skipLastFiles;
     }
 
-    public void setskip_last_files(final SOSOptionInteger p_skip_last_files) {
-        skip_last_files = p_skip_last_files;
+    public void setSkipLastFiles(final SOSOptionInteger pSkipLastFiles) {
+        skipLastFiles = pSkipLastFiles;
     }
 
-    public SOSOptionInteger NoOfLastFiles2Skip = (SOSOptionInteger) skip_last_files.SetAlias(CLASSNAME + ".NoOfLastFiles2Skip");
+    public SOSOptionInteger noOfLastFiles2Skip = (SOSOptionInteger) skipLastFiles.SetAlias(CLASSNAME + ".NoOfLastFiles2Skip");
 
     @JSOptionDefinition(name = "Max_Files", description = "Maximum number of files to process", key = "Max_Files", type = "SOSOptionInteger", 
             mandatory = false)
-    public SOSOptionInteger MaxFiles = new SOSOptionInteger(this, CLASSNAME + ".Max_Files", "Maximum number of files to process", "-1", "-1", false);
+    public SOSOptionInteger maxFiles = new SOSOptionInteger(this, CLASSNAME + ".Max_Files", "Maximum number of files to process", "-1", "-1", false);
 
-    public String getMax_Files() {
-        return MaxFiles.Value();
+    public String getMaxFiles() {
+        return maxFiles.Value();
     }
 
-    public SOSFtpOptionsSuperClass setMax_Files(final String pstrValue) {
-        MaxFiles.Value(pstrValue);
+    public SOSFtpOptionsSuperClass setMaxFiles(final String pstrValue) {
+        maxFiles.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "check_steady_count", description = "Number of tries for Steady check", key = "check_steady_count", 
             type = "SOSOptionInteger", mandatory = false)
-    public SOSOptionInteger CheckSteadyCount = new SOSOptionInteger(this, CLASSNAME + ".check_steady_count", "Number of tries for Steady check", 
+    public SOSOptionInteger checkSteadyCount = new SOSOptionInteger(this, CLASSNAME + ".check_steady_count", "Number of tries for Steady check", 
             "10", "10", false);
 
-    public String getcheck_steady_count() {
-        return CheckSteadyCount.Value();
+    public String getCheckSteadyCount() {
+        return checkSteadyCount.Value();
     }
 
-    public SOSFtpOptionsSuperClass setcheck_steady_count(final String pstrValue) {
-        CheckSteadyCount.Value(pstrValue);
+    public SOSFtpOptionsSuperClass setCheckSteadyCount(final String pstrValue) {
+        checkSteadyCount.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "check_steady_state_interval", description = "The intervall for steady state checking", 
             key = "check_steady_state_interval", type = "SOSOptionFileTime", mandatory = false)
-    public SOSOptionTime check_steady_state_interval = new SOSOptionTime(this, CLASSNAME + ".check_steady_state_interval", 
+    public SOSOptionTime checkSteadyStateInterval = new SOSOptionTime(this, CLASSNAME + ".check_steady_state_interval", 
             "The intervall for steady state checking", "1", "1", false);
     
-    public SOSOptionTime CheckSteadyStateInterval = (SOSOptionTime) check_steady_state_interval.SetAlias("check_steady_state_interval");
+//    public SOSOptionTime checkSteadyStateInterval = (SOSOptionTime) checkSteadyStateInterval.SetAlias("check_steady_state_interval");
 
-    public String getcheck_steady_state_interval() {
-        return check_steady_state_interval.Value();
+    public String getCheckSteadyStateInterval() {
+        return checkSteadyStateInterval.Value();
     }
 
-    public SOSFtpOptionsSuperClass setcheck_steady_state_interval(final String pstrValue) {
-        check_steady_state_interval.Value(pstrValue);
+    public SOSFtpOptionsSuperClass setCheckSteadyStateInterval(final String pstrValue) {
+        checkSteadyStateInterval.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "Check_Steady_State_Of_Files", description = "Check wether a file is beeing modified", 
             key = "Check_Steady_State_Of_Files", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean CheckSteadyStateOfFiles = new SOSOptionBoolean(this, CLASSNAME + ".Check_Steady_State_Of_Files", 
+    public SOSOptionBoolean checkSteadyStateOfFiles = new SOSOptionBoolean(this, CLASSNAME + ".Check_Steady_State_Of_Files", 
             "Check wether a file is beeing modified", "false", "false", false);
 
     public String getCheckSteadyStateOfFiles() {
-        return CheckSteadyStateOfFiles.Value();
+        return checkSteadyStateOfFiles.Value();
     }
 
     public SOSFtpOptionsSuperClass setCheckSteadyStateOfFiles(final String pstrValue) {
-        CheckSteadyStateOfFiles.Value(pstrValue);
+        checkSteadyStateOfFiles.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "PollErrorState", description = "Next state in Chain if no files found", key = "Poll_Error_State", 
             type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionJobChainNode PollErrorState = new SOSOptionJobChainNode(this, CLASSNAME + ".Poll_Error_State", 
+    public SOSOptionJobChainNode pollErrorState = new SOSOptionJobChainNode(this, CLASSNAME + ".Poll_Error_State", 
             "Next state in Chain if no files found", "", "", false);
     
-    public SOSOptionJobChainNode NoFilesState = (SOSOptionJobChainNode) PollErrorState.SetAlias("No_files_state");
+    public SOSOptionJobChainNode noFilesState = (SOSOptionJobChainNode) pollErrorState.SetAlias("No_files_state");
 
     public String getPollErrorState() {
-        return PollErrorState.Value();
+        return pollErrorState.Value();
     }
 
     public SOSFtpOptionsSuperClass setPollErrorState(final String pstrValue) {
-        PollErrorState.Value(pstrValue);
+        pollErrorState.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "Steady_state_error_state", description = 
             "Next state in JobChain if check steady state did not comes to an normal end", key = "Steady_state_error_state", 
             type = "SOSOptionJobChainNode", mandatory = false)
-    public SOSOptionJobChainNode Steady_state_error_state = new SOSOptionJobChainNode(this, CLASSNAME + ".Steady_state_error_state", 
+    public SOSOptionJobChainNode steadyStateErrorState = new SOSOptionJobChainNode(this, CLASSNAME + ".Steady_state_error_state", 
             "Next state in JobChain if check steady state did not comes to an normal end", "", "", false);
     
-    public SOSOptionJobChainNode SteadyStateErrorState = (SOSOptionJobChainNode) Steady_state_error_state.SetAlias("SteadyErrorState");
+//    public SOSOptionJobChainNode SteadyStateErrorState = (SOSOptionJobChainNode) steadyStateErrorState.SetAlias("SteadyErrorState");
 
-    public String getSteady_state_error_state() {
-        return Steady_state_error_state.Value();
+    public String getSteadyStateErrorState() {
+        return steadyStateErrorState.Value();
     }
 
-    public SOSFtpOptionsSuperClass setSteady_state_error_state(final String pstrValue) {
-        Steady_state_error_state.Value(pstrValue);
+    public SOSFtpOptionsSuperClass setSteadyStateErrorState(final String pstrValue) {
+        steadyStateErrorState.Value(pstrValue);
         return this;
     }
 
@@ -987,67 +985,67 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     
     public SOSOptionBoolean createFoldersOnTarget = (SOSOptionBoolean) makeDirs.SetAlias("create_folders_on_target");
 
-    public String getmake_Dirs() {
+    public String getMakeDirs() {
         return makeDirs.Value();
     }
 
-    public SOSFtpOptionsSuperClass setmake_Dirs(final String pstrValue) {
+    public SOSFtpOptionsSuperClass setMakeDirs(final String pstrValue) {
         makeDirs.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "File_List_Name", description = "File with a list of file names", key = "File_List_Name", 
             type = "SOSOptionInFileName", mandatory = false)
-    public SOSOptionInFileName FileListName = new SOSOptionInFileName(this, CLASSNAME + ".File_List_Name", "File with a list of file names", 
+    public SOSOptionInFileName fileListName = new SOSOptionInFileName(this, CLASSNAME + ".File_List_Name", "File with a list of file names", 
             "", "", false);
 
     public String getFileListName() {
-        return FileListName.Value();
+        return fileListName.Value();
     }
 
     public SOSFtpOptionsSuperClass setFileListName(final String pstrValue) {
-        FileListName.Value(pstrValue);
+        fileListName.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "Create_Result_Set", description = "Write the ResultSet to a file", key = "Create_Result_Set", 
             type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean CreateResultSet = new SOSOptionBoolean(this, CLASSNAME + ".Create_Result_Set", "Write the ResultSet to a file", 
+    public SOSOptionBoolean createResultSet = new SOSOptionBoolean(this, CLASSNAME + ".Create_Result_Set", "Write the ResultSet to a file", 
             "false", "false", false);
     
-    public SOSOptionBoolean CreateResultList = (SOSOptionBoolean) CreateResultSet.SetAlias("create_result_list");
+    public SOSOptionBoolean createResultList = (SOSOptionBoolean) createResultSet.SetAlias("create_result_list");
 
     public String getCreateResultSet() {
-        return CreateResultSet.Value();
+        return createResultSet.Value();
     }
 
     public SOSFtpOptionsSuperClass setCreateResultSet(final String pstrValue) {
-        CreateResultSet.Value(pstrValue);
+        createResultSet.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "ResultSetFileName", description = "Name of a File with a filelist or a resultlist", key = "Result_Set_FileName", 
             type = "SOSOptionFileName", mandatory = false)
-    public SOSOptionOutFileName ResultSetFileName = new SOSOptionOutFileName(this, CLASSNAME + ".Result_Set_File_Name", 
+    public SOSOptionOutFileName resultSetFileName = new SOSOptionOutFileName(this, CLASSNAME + ".Result_Set_File_Name", 
             "Name of a File with a filelist or a resultlist", "", "", false);
 
     public String getResultSetFileName() {
-        return ResultSetFileName.Value();
+        return resultSetFileName.Value();
     }
 
     public SOSFtpOptionsSuperClass setResultSetFileName(final String pstrValue) {
-        ResultSetFileName.Value(pstrValue);
+        resultSetFileName.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "source_dir", description = "Optional account info for authentication with an", key = "account", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionFolderName SourceDir = new SOSOptionFolderName(this, CLASSNAME + ".source_dir", 
+    public SOSOptionFolderName sourceDir = new SOSOptionFolderName(this, CLASSNAME + ".source_dir", 
             "local_dir Local directory into which or from which", "", "", false);
     
     @JSOptionDefinition(name = "target_dir", description = "Optional account info for authentication with an", key = "account", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionFolderName TargetDir = new SOSOptionFolderName(this, CLASSNAME + ".target_dir", "target_dir directory into which or from which",
+    public SOSOptionFolderName targetDir = new SOSOptionFolderName(this, CLASSNAME + ".target_dir", "target_dir directory into which or from which",
             "", "", false);
     
     @JSOptionDefinition(name = "account", description = "Optional account info for authentication with an", key = "account", 
@@ -1056,338 +1054,338 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
             "", "", false);
 
     @Override
-    public SOSOptionString getaccount() {
+    public SOSOptionString getAccount() {
         return account;
     }
 
     @Override
-    public void setaccount(final SOSOptionString p_account) {
+    public void setAccount(final SOSOptionString p_account) {
         account = p_account;
     }
 
     @JSOptionDefinition(name = "alternative_account", description = "Alternative parameter for the primary parameter", key = "alternative_account", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionString alternative_account = new SOSOptionString(this, CLASSNAME + ".alternative_account", 
+    public SOSOptionString alternativeAccount = new SOSOptionString(this, CLASSNAME + ".alternative_account", 
             "Alternative parameter for the primary parameter", "", "", false);
 
     @Override
-    public SOSOptionString getalternative_account() {
-        return alternative_account;
+    public SOSOptionString getAlternativeAccount() {
+        return alternativeAccount;
     }
 
     @Override
-    public void setalternative_account(final SOSOptionString p_alternative_account) {
-        alternative_account = p_alternative_account;
+    public void setAlternativeAccount(final SOSOptionString pAlternativeAccount) {
+        alternativeAccount = pAlternativeAccount;
     }
 
     @JSOptionDefinition(name = "alternative_host", description = "Alternative parameter for the primary parameter", key = "alternative_host", 
             type = "SOSOptionHostName", mandatory = false)
-    public SOSOptionHostName alternative_host = new SOSOptionHostName(this, CLASSNAME + ".alternative_host", 
+    public SOSOptionHostName alternativeHost = new SOSOptionHostName(this, CLASSNAME + ".alternative_host", 
             "Alternative parameter for the primary parameter", "", "", false);
 
     @Override
-    public SOSOptionHostName getalternative_host() {
-        return alternative_host;
+    public SOSOptionHostName getAlternativeHost() {
+        return alternativeHost;
     }
 
     @Override
-    public void setalternative_host(final SOSOptionHostName p_alternative_host) {
-        alternative_host = p_alternative_host;
+    public void setAlternativeHost(final SOSOptionHostName pAlternativeHost) {
+        alternativeHost = pAlternativeHost;
     }
 
     @JSOptionDefinition(name = "alternative_passive_mode", description = "Alternative parameter for the primary parameter", 
             key = "alternative_passive_mode", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString alternative_passive_mode = new SOSOptionString(this, CLASSNAME + ".alternative_passive_mode", 
+    public SOSOptionString alternativePassiveMode = new SOSOptionString(this, CLASSNAME + ".alternative_passive_mode", 
             "Alternative parameter for the primary parameter", "", "", false);
 
     @Override
-    public SOSOptionString getalternative_passive_mode() {
-        return alternative_passive_mode;
+    public SOSOptionString getAlternativePassiveMode() {
+        return alternativePassiveMode;
     }
 
     @Override
-    public void setalternative_passive_mode(final SOSOptionString p_alternative_passive_mode) {
-        alternative_passive_mode = p_alternative_passive_mode;
+    public void setAlternativePassiveMode(final SOSOptionString pAlternativePassiveMode) {
+        alternativePassiveMode = pAlternativePassiveMode;
     }
 
     @JSOptionDefinition(name = "alternative_password", description = "Alternative parameter for the primary parameter", 
             key = "alternative_password", type = "SOSOptionString", mandatory = false)
-    public SOSOptionPassword alternative_password = new SOSOptionPassword(this, CLASSNAME + ".alternative_password", 
+    public SOSOptionPassword alternativePassword = new SOSOptionPassword(this, CLASSNAME + ".alternative_password", 
             "Alternative parameter for the primary parameter", "", "", false);
 
     @Override
-    public SOSOptionPassword getalternative_password() {
-        return alternative_password;
+    public SOSOptionPassword getAlternativePassword() {
+        return alternativePassword;
     }
 
     @Override
-    public void setalternative_password(final SOSOptionPassword p_alternative_password) {
-        alternative_password = p_alternative_password;
+    public void setAlternativePassword(final SOSOptionPassword pAlternativePassword) {
+        alternativePassword = pAlternativePassword;
     }
 
     @JSOptionDefinition(name = "alternative_port", description = "Alternative parameter for the primary parameter", key = "alternative_port", 
             type = "SOSOptionPortNumber", mandatory = false)
-    public SOSOptionPortNumber alternative_port = new SOSOptionPortNumber(this, CLASSNAME + ".alternative_port", 
+    public SOSOptionPortNumber alternativePort = new SOSOptionPortNumber(this, CLASSNAME + ".alternative_port", 
             "Alternative parameter for the primary parameter", "21", "21", false);
 
     @Override
-    public SOSOptionPortNumber getalternative_port() {
-        return alternative_port;
+    public SOSOptionPortNumber getAlternativePort() {
+        return alternativePort;
     }
 
     @Override
-    public void setalternative_port(final SOSOptionPortNumber p_alternative_port) {
-        alternative_port = p_alternative_port;
+    public void setAlternativePort(final SOSOptionPortNumber pAlternativePort) {
+        alternativePort = pAlternativePort;
     }
 
-    public SOSOptionPortNumber AlternativePortNumber = (SOSOptionPortNumber) alternative_port.SetAlias(CLASSNAME + ".AlternativePortNumber");
+    public SOSOptionPortNumber AlternativePortNumber = (SOSOptionPortNumber) alternativePort.SetAlias(CLASSNAME + ".AlternativePortNumber");
 
     @JSOptionDefinition(name = "alternative_remote_dir", description = "Alternative parameter for the primary parameter", 
             key = "alternative_remote_dir", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString alternative_remote_dir = new SOSOptionString(this, CLASSNAME + ".alternative_remote_dir", 
+    public SOSOptionString alternativeRemoteDir = new SOSOptionString(this, CLASSNAME + ".alternative_remote_dir", 
             "Alternative parameter for the primary parameter", "", "", false);
 
     @Override
-    public SOSOptionString getalternative_remote_dir() {
-        return alternative_remote_dir;
+    public SOSOptionString getAlternativeRemoteDir() {
+        return alternativeRemoteDir;
     }
 
     @Override
-    public void setalternative_remote_dir(final SOSOptionString p_alternative_remote_dir) {
-        alternative_remote_dir = p_alternative_remote_dir;
+    public void setAlternativeRemoteDir(final SOSOptionString pAlternativeRemoteDir) {
+        alternativeRemoteDir = pAlternativeRemoteDir;
     }
 
     @JSOptionDefinition(name = "alternative_transfer_mode", description = "Alternative parameter for the primary parameter", 
             key = "alternative_transfer_mode", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString alternative_transfer_mode = new SOSOptionString(this, CLASSNAME + ".alternative_transfer_mode", 
+    public SOSOptionString alternativeTransferMode = new SOSOptionString(this, CLASSNAME + ".alternative_transfer_mode", 
             "Alternative parameter for the primary parameter", "", "", false);
 
     @Override
-    public SOSOptionString getalternative_transfer_mode() {
-        return alternative_transfer_mode;
+    public SOSOptionString getAlternativeTransferMode() {
+        return alternativeTransferMode;
     }
 
     @Override
-    public void setalternative_transfer_mode(final SOSOptionString p_alternative_transfer_mode) {
-        alternative_transfer_mode = p_alternative_transfer_mode;
+    public void setAlternativeTransferMode(final SOSOptionString pAlternativeTransferMode) {
+        alternativeTransferMode = pAlternativeTransferMode;
     }
 
     @JSOptionDefinition(name = "alternative_user", description = "Alternative parameter for the primary parameter", key = "alternative_user", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionUserName alternative_user = new SOSOptionUserName(this, CLASSNAME + ".alternative_user", 
+    public SOSOptionUserName alternativeUser = new SOSOptionUserName(this, CLASSNAME + ".alternative_user", 
             "Alternative parameter for the primary parameter", "", "", false);
 
     @Override
-    public SOSOptionUserName getalternative_user() {
-        return alternative_user;
+    public SOSOptionUserName getAlternativeUser() {
+        return alternativeUser;
     }
 
     @Override
-    public void setalternative_user(final SOSOptionUserName p_alternative_user) {
-        alternative_user = p_alternative_user;
+    public void setAlternativeUser(final SOSOptionUserName pAlternativeUser) {
+        alternativeUser = pAlternativeUser;
     }
 
     @JSOptionDefinition(name = "append_files", description = "This parameter specifies whether the content of a", key = "append_files", 
             type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean append_files = new SOSOptionBoolean(this, CLASSNAME + ".append_files", 
+    public SOSOptionBoolean appendFiles = new SOSOptionBoolean(this, CLASSNAME + ".append_files", 
             "This parameter specifies whether the content of a", "false", "false", false);
 
     @Override
-    public SOSOptionBoolean getappend_files() {
-        return append_files;
+    public SOSOptionBoolean getAppendFiles() {
+        return appendFiles;
     }
 
     @Override
-    public void setappend_files(final SOSOptionBoolean p_append_files) {
-        append_files = p_append_files;
+    public void setAppendFiles(final SOSOptionBoolean pAppendFiles) {
+        appendFiles = pAppendFiles;
     }
 
     @JSOptionDefinition(name = "atomic_prefix", description = "This parameter specifies whether target files shou", key = "atomic_prefix", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionString atomic_prefix = new SOSOptionString(this, CLASSNAME + ".atomic_prefix", 
+    public SOSOptionString atomicPrefix = new SOSOptionString(this, CLASSNAME + ".atomic_prefix", 
             "This parameter specifies whether target files shou", "", "", false);
 
     @Override
-    public SOSOptionString getatomic_prefix() {
-        return atomic_prefix;
+    public SOSOptionString getAtomicPrefix() {
+        return atomicPrefix;
     }
 
     @Override
-    public void setatomic_prefix(final SOSOptionString p_atomic_prefix) {
-        atomic_prefix = p_atomic_prefix;
+    public void setAtomicPrefix(final SOSOptionString pAtomicPrefix) {
+        atomicPrefix = pAtomicPrefix;
     }
 
     @JSOptionDefinition(name = "atomic_suffix", description = "This parameter specifies whether target files shou", key = "atomic_suffix", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionString atomic_suffix = new SOSOptionString(this, CLASSNAME + ".atomic_suffix", 
+    public SOSOptionString atomicSuffix = new SOSOptionString(this, CLASSNAME + ".atomic_suffix", 
             "This parameter specifies whether target files shou", "", "", false);
 
     @Override
-    public SOSOptionString getatomic_suffix() {
-        return atomic_suffix;
+    public SOSOptionString getAtomicSuffix() {
+        return atomicSuffix;
     }
 
     @Override
-    public void setatomic_suffix(final SOSOptionString p_atomic_suffix) {
-        atomic_suffix = p_atomic_suffix;
+    public void setAtomicSuffix(final SOSOptionString pAtomicSuffix) {
+        atomicSuffix = pAtomicSuffix;
     }
 
     @JSOptionDefinition(name = "banner_footer", description = "Name der Template-Datei für Protokoll-Ende This p", key = "banner_footer", 
             type = "SOSOptionInFileName", mandatory = false)
-    public SOSOptionInFileName banner_footer = new SOSOptionInFileName(this, CLASSNAME + ".banner_footer", 
+    public SOSOptionInFileName bannerFooter = new SOSOptionInFileName(this, CLASSNAME + ".banner_footer", 
             "Name der Template-Datei für Protokoll-Ende This p", "", "", false);
 
     @Override
-    public SOSOptionInFileName getbanner_footer() {
-        return banner_footer;
+    public SOSOptionInFileName getBannerFooter() {
+        return bannerFooter;
     }
 
     @Override
-    public void setbanner_footer(final SOSOptionInFileName p_banner_footer) {
-        banner_footer = p_banner_footer;
+    public void setBannerFooter(final SOSOptionInFileName pBannerFooter) {
+        bannerFooter = pBannerFooter;
     }
 
     @JSOptionDefinition(name = "banner_header", description = "Name of Template-File for log-File", key = "banner_header", 
             type = "SOSOptionInFileName", mandatory = false)
-    public SOSOptionInFileName banner_header = new SOSOptionInFileName(this, CLASSNAME + ".banner_header", "Name of Template-File for log-File", 
+    public SOSOptionInFileName bannerHeader = new SOSOptionInFileName(this, CLASSNAME + ".banner_header", "Name of Template-File for log-File", 
             "", "", false);
 
     @Override
-    public SOSOptionInFileName getbanner_header() {
-        return banner_header;
+    public SOSOptionInFileName getBannerHeader() {
+        return bannerHeader;
     }
 
     @Override
-    public void setbanner_header(final SOSOptionInFileName p_banner_header) {
-        banner_header = p_banner_header;
+    public void setBannerHeader(final SOSOptionInFileName pBannerHeader) {
+        bannerHeader = pBannerHeader;
     }
 
     @JSOptionDefinition(name = "check_interval", description = "This parameter specifies the interval in seconds", key = "check_interval", 
             type = "SOSOptionInteger", mandatory = false)
-    public SOSOptionInteger check_interval = new SOSOptionInteger(this, CLASSNAME + ".check_interval", 
+    public SOSOptionInteger checkInterval = new SOSOptionInteger(this, CLASSNAME + ".check_interval", 
             "This parameter specifies the interval in seconds", "60", "60", false);
 
     @Override
-    public SOSOptionInteger getcheck_interval() {
-        return check_interval;
+    public SOSOptionInteger getCheckInterval() {
+        return checkInterval;
     }
 
     @Override
-    public void setcheck_interval(final SOSOptionInteger p_check_interval) {
-        check_interval = p_check_interval;
+    public void setCheckInterval(final SOSOptionInteger pCheckInterval) {
+        checkInterval = pCheckInterval;
     }
 
     @JSOptionDefinition(name = "check_retry", description = "This parameter specifies whether a file transfer", key = "check_retry", 
             type = "SOSOptionInteger", mandatory = false)
-    public SOSOptionInteger check_retry = new SOSOptionInteger(this, CLASSNAME + ".check_retry", "This parameter specifies whether a file transfer",
+    public SOSOptionInteger checkRetry = new SOSOptionInteger(this, CLASSNAME + ".check_retry", "This parameter specifies whether a file transfer",
             "0", "0", false);
 
     @Override
-    public SOSOptionInteger getcheck_retry() {
-        return check_retry;
+    public SOSOptionInteger getCheckRetry() {
+        return checkRetry;
     }
 
     @Override
-    public void setcheck_retry(final SOSOptionInteger p_check_retry) {
-        check_retry = p_check_retry;
+    public void setCheckRetry(final SOSOptionInteger pCheckRetry) {
+        checkRetry = pCheckRetry;
     }
 
     @JSOptionDefinition(name = "check_size", description = "This parameter determines whether the original f", key = "check_size", 
             type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean check_size = new SOSOptionBoolean(this, CLASSNAME + ".check_size", "This parameter determines whether the original f", 
+    public SOSOptionBoolean checkSize = new SOSOptionBoolean(this, CLASSNAME + ".check_size", "This parameter determines whether the original f", 
             "true", "true", false);
 
-    public SOSOptionBoolean CheckFileSizeAfterTransfer = (SOSOptionBoolean) check_size.SetAlias(CLASSNAME + ".CheckFileSizeAfterTransfer");
+    public SOSOptionBoolean checkFileSizeAfterTransfer = (SOSOptionBoolean) checkSize.SetAlias(CLASSNAME + ".CheckFileSizeAfterTransfer");
 
     @JSOptionDefinition(name = "classpath_base", description = "The parameter is used during installation of this", key = "classpath_base", 
             type = "SOSOptionFolderName", mandatory = false)
-    public SOSOptionFolderName classpath_base = new SOSOptionFolderName(this, CLASSNAME + ".classpath_base", 
+    public SOSOptionFolderName classpathBase = new SOSOptionFolderName(this, CLASSNAME + ".classpath_base", 
             "The parameter is used during installation of this", "", "", false);
 
     @Override
-    public SOSOptionFolderName getclasspath_base() {
-        return classpath_base;
+    public SOSOptionFolderName getClasspathBase() {
+        return classpathBase;
     }
 
     @Override
-    public void setclasspath_base(final SOSOptionFolderName p_classpath_base) {
-        classpath_base = p_classpath_base;
+    public void setClasspathBase(final SOSOptionFolderName pClasspathBase) {
+        classpathBase = pClasspathBase;
     }
 
     @JSOptionDefinition(name = "compress_files", description = "This parameter specifies whether the content of the source files", 
             key = "compress_files", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean compress_files = new SOSOptionBoolean(this, CLASSNAME + ".compress_files", 
+    public SOSOptionBoolean compressFiles = new SOSOptionBoolean(this, CLASSNAME + ".compress_files", 
             "This parameter specifies whether the content of the source files", "false", "false", false);
 
     @JSOptionDefinition(name = "compressed_file_extension", description = "Additional file-name extension for compressed files This parameter spe", 
             key = "compressed_file_extension", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString compressed_file_extension = new SOSOptionString(this, CLASSNAME + ".compressed_file_extension", 
+    public SOSOptionString compressedFileExtension = new SOSOptionString(this, CLASSNAME + ".compressed_file_extension", 
             "Additional file-name extension for compressed files This parameter spe", ".gz", ".gz", false);
 
     @JSOptionDefinition(name = "current_pid", description = "This parameter is used for Unix systems and - as o", key = "current_pid", 
             type = "SOSOptionProcessID", mandatory = false)
-    public SOSOptionProcessID current_pid = new SOSOptionProcessID(this, CLASSNAME + ".current_pid", 
+    public SOSOptionProcessID currentPid = new SOSOptionProcessID(this, CLASSNAME + ".current_pid", 
             "This parameter is used for Unix systems and - as o", "", "", false);
 
     @Override
-    public SOSOptionProcessID getcurrent_pid() {
-        return current_pid;
+    public SOSOptionProcessID getCurrentPid() {
+        return currentPid;
     }
 
     @Override
-    public void setcurrent_pid(final SOSOptionProcessID p_current_pid) {
-        current_pid = p_current_pid;
+    public void setCurrentPid(final SOSOptionProcessID pCurrentPid) {
+        currentPid = pCurrentPid;
     }
 
     @JSOptionDefinition(name = "file_path", description = "This parameter is used alternatively to the parame", key = "file_path", 
             type = "SOSOptionFileName", mandatory = false)
-    public SOSOptionFileName file_path = new SOSOptionFileName(this, CLASSNAME + ".file_path", "This parameter is used alternatively to the parame",
+    public SOSOptionFileName filePath = new SOSOptionFileName(this, CLASSNAME + ".file_path", "This parameter is used alternatively to the parame",
             "", "", false);
 
     @Override
-    public SOSOptionFileName getfile_path() {
-        return file_path;
+    public SOSOptionFileName getFilePath() {
+        return filePath;
     }
 
     @Override
-    public void setfile_path(final SOSOptionFileName p_file_path) {
-        file_path = p_file_path;
+    public void setFilePath(final SOSOptionFileName pFilePath) {
+        filePath = pFilePath;
     }
 
     @JSOptionDefinition(name = "file_spec", description = "file_spec This parameter expects a regular expressi", key = "file_spec", 
             type = "SOSOptionRegExp", mandatory = false)
-    public SOSOptionRegExp file_spec = new SOSOptionRegExp(this, CLASSNAME + ".file_spec", "file_spec This parameter expects a regular expressi", 
+    public SOSOptionRegExp fileSpec = new SOSOptionRegExp(this, CLASSNAME + ".file_spec", "file_spec This parameter expects a regular expressi", 
             "^.*$", "^.*$", false);
     
-    public SOSOptionRegExp FileNameRegExp = (SOSOptionRegExp) file_spec.SetAlias(CLASSNAME + ".FileNameRegExp");
+    public SOSOptionRegExp fileNameRegExp = (SOSOptionRegExp) fileSpec.SetAlias(CLASSNAME + ".FileNameRegExp");
 
     @Override
-    public SOSOptionRegExp getfile_spec() {
-        return file_spec;
+    public SOSOptionRegExp getFileSpec() {
+        return fileSpec;
     }
 
     @Override
-    public void setfile_spec(final SOSOptionRegExp p_file_spec) {
-        file_spec = p_file_spec;
+    public void setFileSpec(final SOSOptionRegExp pFileSpec) {
+        fileSpec = pFileSpec;
     }
 
-    public SOSOptionRegExp FileNamePatternRegExp = (SOSOptionRegExp) file_spec.SetAlias(CLASSNAME + ".FileNamePatternRegExp");
+    public SOSOptionRegExp fileNamePatternRegExp = (SOSOptionRegExp) fileSpec.SetAlias(CLASSNAME + ".FileNamePatternRegExp");
 
     @JSOptionDefinition(name = "force_files", description = "This parameter specifies whether an error should b", key = "force_files", 
             type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean force_files = new SOSOptionBoolean(this, CLASSNAME + ".force_files", 
+    public SOSOptionBoolean forceFiles = new SOSOptionBoolean(this, CLASSNAME + ".force_files", 
             "This parameter specifies whether an error should b", "true", "true", false);
     
-    public SOSOptionBoolean ErrorOnNoDataFound = (SOSOptionBoolean) force_files.SetAlias("error_on_no_data_found", "error_when_no_data_found");
+    public SOSOptionBoolean errorOnNoDataFound = (SOSOptionBoolean) forceFiles.SetAlias("error_on_no_data_found", "error_when_no_data_found");
 
     @Override
-    public SOSOptionBoolean getforce_files() {
-        return force_files;
+    public SOSOptionBoolean getForceFiles() {
+        return forceFiles;
     }
 
     @Override
-    public void setforce_files(final SOSOptionBoolean p_force_files) {
-        force_files = p_force_files;
+    public void setForceFiles(final SOSOptionBoolean pForceFiles) {
+        forceFiles = pForceFiles;
     }
 
     @JSOptionDefinition(name = "history", description = "This parameter causes a history file to be written", key = "history", 
@@ -1395,48 +1393,48 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     public SOSOptionOutFileName history = new SOSOptionOutFileName(this, CLASSNAME + ".history", 
             "This parameter causes a history file to be written", "", "", false);
 
-    public SOSOptionOutFileName HistoryFileName = (SOSOptionOutFileName) history.SetAlias("history_file_name");
+    public SOSOptionOutFileName historyFileName = (SOSOptionOutFileName) history.SetAlias("history_file_name");
 
     @Override
-    public SOSOptionOutFileName gethistory() {
+    public SOSOptionOutFileName getHistory() {
         return history;
     }
 
     @Override
-    public void sethistory(final SOSOptionOutFileName p_history) {
-        history = p_history;
+    public void setHistory(final SOSOptionOutFileName pHistory) {
+        history = pHistory;
     }
 
     public SOSOptionOutFileName SOSFtpHistoryFileName = (SOSOptionOutFileName) history.SetAlias(CLASSNAME + ".SOSFtpHistoryFileName");
 
     @JSOptionDefinition(name = "history_repeat", description = "The parameter is used in order to synchronize para", key = "history_repeat", 
             type = "SOSOptionInteger", mandatory = false)
-    public SOSOptionInteger history_repeat = new SOSOptionInteger(this, CLASSNAME + ".history_repeat", 
+    public SOSOptionInteger historyRepeat = new SOSOptionInteger(this, CLASSNAME + ".history_repeat", 
             "The parameter is used in order to synchronize para", "3", "3", false);
 
     @Override
-    public SOSOptionInteger gethistory_repeat() {
-        return history_repeat;
+    public SOSOptionInteger getHistoryRepeat() {
+        return historyRepeat;
     }
 
     @Override
-    public void sethistory_repeat(final SOSOptionInteger p_history_repeat) {
-        history_repeat = p_history_repeat;
+    public void setHistoryRepeat(final SOSOptionInteger pHistoryRepeat) {
+        historyRepeat = pHistoryRepeat;
     }
 
     @JSOptionDefinition(name = "history_repeat_interval", description = "The parameter is used in order to synchronize para", 
             key = "history_repeat_interval", type = "SOSOptionInteger", mandatory = false)
-    public SOSOptionInteger history_repeat_interval = new SOSOptionInteger(this, CLASSNAME + ".history_repeat_interval", 
+    public SOSOptionInteger historyRepeatInterval = new SOSOptionInteger(this, CLASSNAME + ".history_repeat_interval", 
             "The parameter is used in order to synchronize para", "1", "1", false);
 
     @Override
-    public SOSOptionInteger gethistory_repeat_interval() {
-        return history_repeat_interval;
+    public SOSOptionInteger getHistoryRepeatInterval() {
+        return historyRepeatInterval;
     }
 
     @Override
-    public void sethistory_repeat_interval(final SOSOptionInteger p_history_repeat_interval) {
-        history_repeat_interval = p_history_repeat_interval;
+    public void setHistoryRepeatInterval(final SOSOptionInteger pHistoryRepeatInterval) {
+        historyRepeatInterval = pHistoryRepeatInterval;
     }
 
     @JSOptionDefinition(name = "host", description = "Host-Name This parameter specifies th", key = "host", type = "SOSOptionHostName", 
@@ -1444,443 +1442,443 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     public SOSOptionHostName host = new SOSOptionHostName(this, CLASSNAME + ".host", "Host-Name This parameter specifies th", "", "", false);
 
     @Override
-    public SOSOptionHostName gethost() {
+    public SOSOptionHostName getHost() {
         return host;
     }
 
     @Override
-    public void sethost(final SOSOptionHostName p_host) {
-        host = p_host;
+    public void setHost(final SOSOptionHostName pHost) {
+        host = pHost;
     }
 
-    public SOSOptionHostName HostName = (SOSOptionHostName) host.SetAlias(CLASSNAME + ".HostName");
+    public SOSOptionHostName hostName = (SOSOptionHostName) host.SetAlias(CLASSNAME + ".HostName");
 
     @JSOptionDefinition(name = "http_proxy_host", description = "The value of this parameter is the host name or th", key = "http_proxy_host", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionString http_proxy_host = new SOSOptionString(this, CLASSNAME + ".http_proxy_host", 
+    public SOSOptionString httpProxyHost = new SOSOptionString(this, CLASSNAME + ".http_proxy_host", 
             "The value of this parameter is the host name or th", "", "", false);
 
     @Override
-    public SOSOptionString gethttp_proxy_host() {
-        return http_proxy_host;
+    public SOSOptionString getHttpProxyHost() {
+        return httpProxyHost;
     }
 
     @Override
-    public void sethttp_proxy_host(final SOSOptionString p_http_proxy_host) {
-        http_proxy_host = p_http_proxy_host;
+    public void setHttpProxyHost(final SOSOptionString pHttpProxyHost) {
+        httpProxyHost = pHttpProxyHost;
     }
 
     @JSOptionDefinition(name = "http_proxy_port", description = "This parameter specifies the port of a proxy that", key = "http_proxy_port", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionString http_proxy_port = new SOSOptionString(this, CLASSNAME + ".http_proxy_port", 
+    public SOSOptionString httpProxyPort = new SOSOptionString(this, CLASSNAME + ".http_proxy_port", 
             "This parameter specifies the port of a proxy that", "", "", false);
 
     @Override
-    public SOSOptionString gethttp_proxy_port() {
-        return http_proxy_port;
+    public SOSOptionString getHttpProxyPort() {
+        return httpProxyPort;
     }
 
     @Override
-    public void sethttp_proxy_port(final SOSOptionString p_http_proxy_port) {
-        http_proxy_port = p_http_proxy_port;
+    public void setHttpProxyPort(final SOSOptionString pHttpProxyPort) {
+        httpProxyPort = pHttpProxyPort;
     }
 
     @JSOptionDefinition(name = "jump_command", description = "This parameter specifies a command that is to be e", key = "jump_command", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionString jump_command = new SOSOptionString(this, CLASSNAME + ".jump_command", 
+    public SOSOptionString jumpCommand = new SOSOptionString(this, CLASSNAME + ".jump_command", 
             "This parameter specifies a command that is to be e", "", "", false);
 
     @Override
-    public SOSOptionString getjump_command() {
-        return jump_command;
+    public SOSOptionString getJumpCommand() {
+        return jumpCommand;
     }
 
     @Override
-    public void setjump_command(final SOSOptionString p_jump_command) {
-        jump_command = p_jump_command;
+    public void setJumpCommand(final SOSOptionString pJumpCommand) {
+        jumpCommand = pJumpCommand;
     }
 
     @JSOptionDefinition(name = "jump_command_delimiter", description = "Command delimiter characters are specified using t", 
             key = "jump_command_delimiter", type = "SOSOptionString", mandatory = true)
-    public SOSOptionString jump_command_delimiter = new SOSOptionString(this, CLASSNAME + ".jump_command_delimiter", 
+    public SOSOptionString jumpCommandDelimiter = new SOSOptionString(this, CLASSNAME + ".jump_command_delimiter", 
             "Command delimiter characters are specified using t", "%%", "%%", true);
 
     @Override
-    public SOSOptionString getjump_command_delimiter() {
-        return jump_command_delimiter;
+    public SOSOptionString getJumpCommandDelimiter() {
+        return jumpCommandDelimiter;
     }
 
     @Override
-    public void setjump_command_delimiter(final SOSOptionString p_jump_command_delimiter) {
-        jump_command_delimiter = p_jump_command_delimiter;
+    public void setJumpCommandDelimiter(final SOSOptionString pJumpCommandDelimiter) {
+        jumpCommandDelimiter = pJumpCommandDelimiter;
     }
 
     @JSOptionDefinition(name = "jump_command_script", description = "This parameter can be used as an alternative to ju", 
             key = "jump_command_script", type = "SOSOptionCommandScript", mandatory = false)
-    public SOSOptionCommandScript jump_command_script = new SOSOptionCommandScript(this, CLASSNAME + ".jump_command_script", 
+    public SOSOptionCommandScript jumpCommandScript = new SOSOptionCommandScript(this, CLASSNAME + ".jump_command_script", 
             "This parameter can be used as an alternative to ju", "", "", false);
 
     @Override
-    public SOSOptionCommandScript getjump_command_script() {
-        return jump_command_script;
+    public SOSOptionCommandScript getJumpCommandScript() {
+        return jumpCommandScript;
     }
 
     @Override
-    public void setjump_command_script(final SOSOptionCommandScript p_jump_command_script) {
-        jump_command_script = p_jump_command_script;
+    public void setJumpCommandScript(final SOSOptionCommandScript pJumpCommandScript) {
+        jumpCommandScript = pJumpCommandScript;
     }
 
     @JSOptionDefinition(name = "jump_command_script_file", description = "This parameter can be used as an alternative to ju", 
             key = "jump_command_script_file", type = "SOSOptionCommandScriptFile", mandatory = false)
-    public SOSOptionCommandScriptFile jump_command_script_file = new SOSOptionCommandScriptFile(this, CLASSNAME + ".jump_command_script_file", 
+    public SOSOptionCommandScriptFile jumpCommandScriptFile = new SOSOptionCommandScriptFile(this, CLASSNAME + ".jump_command_script_file", 
             "This parameter can be used as an alternative to ju", "", "", false);
 
     @Override
-    public SOSOptionCommandScriptFile getjump_command_script_file() {
-        return jump_command_script_file;
+    public SOSOptionCommandScriptFile getJumpCommandScriptFile() {
+        return jumpCommandScriptFile;
     }
 
     @Override
-    public void setjump_command_script_file(final SOSOptionCommandScriptFile p_jump_command_script_file) {
-        jump_command_script_file = p_jump_command_script_file;
+    public void setJumpCommandScriptFile(final SOSOptionCommandScriptFile pJumpCommandScriptFile) {
+        jumpCommandScriptFile = pJumpCommandScriptFile;
     }
 
     @JSOptionDefinition(name = "jump_host", description = "When using a jump_host then files are first transf", key = "jump_host", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionHostName jump_host = new SOSOptionHostName(this, CLASSNAME + ".jump_host", 
+    public SOSOptionHostName jumpHost = new SOSOptionHostName(this, CLASSNAME + ".jump_host", 
             "When using a jump_host then files are first transf", "", "", false);
 
     @Override
-    public SOSOptionHostName getjump_host() {
-        return jump_host;
+    public SOSOptionHostName getJumpHost() {
+        return jumpHost;
     }
 
     @Override
-    public void setjump_host(final SOSOptionHostName p_jump_host) {
-        jump_host = p_jump_host;
+    public void setJumpHost(final SOSOptionHostName pJumpHost) {
+        jumpHost = pJumpHost;
     }
 
     @JSOptionDefinition(name = "jump_ignore_error", description = "Should the value true be specified, then execution", key = "jump_ignore_error", 
             type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean jump_ignore_error = new SOSOptionBoolean(this, CLASSNAME + ".jump_ignore_error", 
+    public SOSOptionBoolean jumpIgnoreError = new SOSOptionBoolean(this, CLASSNAME + ".jump_ignore_error", 
             "Should the value true be specified, then execution", "false", "false", false);
 
     @Override
-    public SOSOptionBoolean getjump_ignore_error() {
-        return jump_ignore_error;
+    public SOSOptionBoolean getJumpIgnoreError() {
+        return jumpIgnoreError;
     }
 
     @Override
-    public void setjump_ignore_error(final SOSOptionBoolean p_jump_ignore_error) {
-        jump_ignore_error = p_jump_ignore_error;
+    public void setJumpIgnoreError(final SOSOptionBoolean pJumpIgnoreError) {
+        jumpIgnoreError = pJumpIgnoreError;
     }
 
     @JSOptionDefinition(name = "jump_ignore_signal", description = "Should the value true be specified, t", key = "jump_ignore_signal", 
             type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean jump_ignore_signal = new SOSOptionBoolean(this, CLASSNAME + ".jump_ignore_signal", 
+    public SOSOptionBoolean jumpIgnoreSignal = new SOSOptionBoolean(this, CLASSNAME + ".jump_ignore_signal", 
             "Should the value true be specified, t", "false", "false", false);
 
     @Override
-    public SOSOptionBoolean getjump_ignore_signal() {
-        return jump_ignore_signal;
+    public SOSOptionBoolean getJumpIgnoreSignal() {
+        return jumpIgnoreSignal;
     }
 
     @Override
-    public void setjump_ignore_signal(final SOSOptionBoolean p_jump_ignore_signal) {
-        jump_ignore_signal = p_jump_ignore_signal;
+    public void setJumpIgnoreSignal(final SOSOptionBoolean pJumpIgnoreSignal) {
+        jumpIgnoreSignal = pJumpIgnoreSignal;
     }
 
     @JSOptionDefinition(name = "jump_ignore_stderr", description = "This job checks if any output to stderr has been c", key = "jump_ignore_stderr", 
             type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean jump_ignore_stderr = new SOSOptionBoolean(this, CLASSNAME + ".jump_ignore_stderr", 
+    public SOSOptionBoolean jumpIgnoreStderr = new SOSOptionBoolean(this, CLASSNAME + ".jump_ignore_stderr", 
             "This job checks if any output to stderr has been c", "false", "false", false);
 
     @Override
-    public SOSOptionBoolean getjump_ignore_stderr() {
-        return jump_ignore_stderr;
+    public SOSOptionBoolean getJumpIgnoreStderr() {
+        return jumpIgnoreStderr;
     }
 
     @Override
-    public void setjump_ignore_stderr(final SOSOptionBoolean p_jump_ignore_stderr) {
-        jump_ignore_stderr = p_jump_ignore_stderr;
+    public void setJumpIgnoreStderr(final SOSOptionBoolean pJumpIgnoreStderr) {
+        jumpIgnoreStderr = pJumpIgnoreStderr;
     }
 
     @JSOptionDefinition(name = "jump_password", description = "Password for authentication with the jump_host.", key = "jump_password", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionPassword jump_password = new SOSOptionPassword(this, CLASSNAME + ".jump_password", 
+    public SOSOptionPassword jumpPassword = new SOSOptionPassword(this, CLASSNAME + ".jump_password", 
             "Password for authentication with the jump_host.", "", "", false);
 
     @Override
-    public SOSOptionPassword getjump_password() {
-        return jump_password;
+    public SOSOptionPassword getJumpPassword() {
+        return jumpPassword;
     }
 
     @Override
-    public void setjump_password(final SOSOptionPassword p_jump_password) {
-        jump_password = p_jump_password;
+    public void setJumpPassword(final SOSOptionPassword pJumpPassword) {
+        jumpPassword = pJumpPassword;
     }
 
     @JSOptionDefinition(name = "jump_port", description = "Port on the jump_host by which files should be tra", key = "jump_port", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionPortNumber jump_port = new SOSOptionPortNumber(this, CLASSNAME + ".jump_port", 
+    public SOSOptionPortNumber jumpPort = new SOSOptionPortNumber(this, CLASSNAME + ".jump_port", 
             "Port on the jump_host by which files should be tra", "22", "22", false);
 
     @Override
-    public SOSOptionPortNumber getjump_port() {
-        return jump_port;
+    public SOSOptionPortNumber getJumpPort() {
+        return jumpPort;
     }
 
     @Override
-    public void setjump_port(final SOSOptionPortNumber p_jump_port) {
-        jump_port = p_jump_port;
+    public void setJumpPort(final SOSOptionPortNumber pJumpPort) {
+        jumpPort = pJumpPort;
     }
 
     @JSOptionDefinition(name = "jump_protocol", description = "When using a jump_host then files are first transf", key = "jump_protocol", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionString jump_protocol = new SOSOptionString(this, CLASSNAME + ".jump_protocol", 
+    public SOSOptionString jumpProtocol = new SOSOptionString(this, CLASSNAME + ".jump_protocol", 
             "When using a jump_host then files are first transf", "sftp", "sftp", false);
 
     @Override
-    public SOSOptionString getjump_protocol() {
-        return jump_protocol;
+    public SOSOptionString getJumpProtocol() {
+        return jumpProtocol;
     }
 
     @Override
-    public void setjump_protocol(final SOSOptionString p_jump_protocol) {
-        jump_protocol = p_jump_protocol;
+    public void setJumpProtocol(final SOSOptionString pJumpProtocol) {
+        jumpProtocol = pJumpProtocol;
     }
 
     @JSOptionDefinition(name = "jump_proxy_host", description = "The value of this parameter is the host name or th", key = "jump_proxy_host", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionString jump_proxy_host = new SOSOptionString(this, CLASSNAME + ".jump_proxy_host", 
+    public SOSOptionString jumpProxyHost = new SOSOptionString(this, CLASSNAME + ".jump_proxy_host", 
             "The value of this parameter is the host name or th", "", "", false);
 
     @Override
-    public SOSOptionString getjump_proxy_host() {
-        return jump_proxy_host;
+    public SOSOptionString getJumpProxyHost() {
+        return jumpProxyHost;
     }
 
     @Override
-    public void setjump_proxy_host(final SOSOptionString p_jump_proxy_host) {
-        jump_proxy_host = p_jump_proxy_host;
+    public void setJumpProxyHost(final SOSOptionString pJumpProxyHost) {
+        jumpProxyHost = pJumpProxyHost;
     }
 
     @JSOptionDefinition(name = "jump_proxy_password", description = "This parameter specifies the password for the prox", 
             key = "jump_proxy_password", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString jump_proxy_password = new SOSOptionString(this, CLASSNAME + ".jump_proxy_password", 
+    public SOSOptionString jumpProxyPassword = new SOSOptionString(this, CLASSNAME + ".jump_proxy_password", 
             "This parameter specifies the password for the prox", "", "", false);
 
     @Override
-    public SOSOptionString getjump_proxy_password() {
-        return jump_proxy_password;
+    public SOSOptionString getJumpProxyPassword() {
+        return jumpProxyPassword;
     }
 
     @Override
-    public void setjump_proxy_password(final SOSOptionString p_jump_proxy_password) {
-        jump_proxy_password = p_jump_proxy_password;
+    public void setJumpProxyPassword(final SOSOptionString pJumpProxyPassword) {
+        jumpProxyPassword = pJumpProxyPassword;
     }
 
     @JSOptionDefinition(name = "jump_proxy_port", description = "This parameter specifies the port of a proxy that", key = "jump_proxy_port", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionString jump_proxy_port = new SOSOptionString(this, CLASSNAME + ".jump_proxy_port", 
+    public SOSOptionString jumpProxyPort = new SOSOptionString(this, CLASSNAME + ".jump_proxy_port", 
             "This parameter specifies the port of a proxy that", "", "", false);
 
     @Override
-    public SOSOptionString getjump_proxy_port() {
-        return jump_proxy_port;
+    public SOSOptionString getJumpProxyPort() {
+        return jumpProxyPort;
     }
 
     @Override
-    public void setjump_proxy_port(final SOSOptionString p_jump_proxy_port) {
-        jump_proxy_port = p_jump_proxy_port;
+    public void setJumpProxyPort(final SOSOptionString pJumpProxyPort) {
+        jumpProxyPort = pJumpProxyPort;
     }
 
     @JSOptionDefinition(name = "jump_proxy_user", description = "The value of this parameter specifies the user acc", key = "jump_proxy_user", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionUserName jump_proxy_user = new SOSOptionUserName(this, CLASSNAME + ".jump_proxy_user", 
+    public SOSOptionUserName jumpProxyUser = new SOSOptionUserName(this, CLASSNAME + ".jump_proxy_user", 
             "The value of this parameter specifies the user acc", "", "", false);
 
     @Override
-    public SOSOptionUserName getjump_proxy_user() {
-        return jump_proxy_user;
+    public SOSOptionUserName getJumpProxyUser() {
+        return jumpProxyUser;
     }
 
     @Override
-    public void setjump_proxy_user(final SOSOptionUserName p_jump_proxy_user) {
-        jump_proxy_user = p_jump_proxy_user;
+    public void setJumpProxyUser(final SOSOptionUserName pJumpProxyUser) {
+        jumpProxyUser = pJumpProxyUser;
     }
 
     @JSOptionDefinition(name = "jump_proxy_protocol", description = "Jump Proxy protocol", key = "jump_proxy_protocol", 
             type = "SOSOptionProxyProtocol", mandatory = false)
-    public SOSOptionProxyProtocol jump_proxy_protocol = new SOSOptionProxyProtocol(this, CLASSNAME + ".jump_proxy_protocol", "Jump Proxy protocol", 
+    public SOSOptionProxyProtocol jumpProxyProtocol = new SOSOptionProxyProtocol(this, CLASSNAME + ".jump_proxy_protocol", "Jump Proxy protocol", 
             SOSOptionProxyProtocol.Protocol.http.name(), SOSOptionProxyProtocol.Protocol.http.name(), false);
 
-    public SOSOptionProxyProtocol getjump_proxy_protocol() {
-        return jump_proxy_protocol;
+    public SOSOptionProxyProtocol getJumpProxyProtocol() {
+        return jumpProxyProtocol;
     }
 
-    public void setjump_proxy_protocol(SOSOptionProxyProtocol val) {
-        jump_proxy_protocol = val;
+    public void setJumpProxyProtocol(SOSOptionProxyProtocol val) {
+        jumpProxyProtocol = val;
     }
 
     @JSOptionDefinition(name = "jump_simulate_shell", description = "Should the value true be specified for this parame", 
             key = "jump_simulate_shell", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean jump_simulate_shell = new SOSOptionBoolean(this, CLASSNAME + ".jump_simulate_shell", 
+    public SOSOptionBoolean jumpSimulateShell = new SOSOptionBoolean(this, CLASSNAME + ".jump_simulate_shell", 
             "Should the value true be specified for this parame", "false", "false", false);
 
     @Override
-    public SOSOptionBoolean getjump_simulate_shell() {
-        return jump_simulate_shell;
+    public SOSOptionBoolean getJumpSimulateShell() {
+        return jumpSimulateShell;
     }
 
     @Override
-    public void setjump_simulate_shell(final SOSOptionBoolean p_jump_simulate_shell) {
-        jump_simulate_shell = p_jump_simulate_shell;
+    public void setJumpSimulateShell(final SOSOptionBoolean pJumpSimulateShell) {
+        jumpSimulateShell = pJumpSimulateShell;
     }
 
     @JSOptionDefinition(name = "jump_simulate_shell_inactivity_timeout", description = "If no new characters are written to stdout or stde", 
             key = "jump_simulate_shell_inactivity_timeout", type = "SOSOptionInteger", mandatory = false)
-    public SOSOptionInteger jump_simulate_shell_inactivity_timeout = new SOSOptionInteger(this, CLASSNAME + ".jump_simulate_shell_inactivity_timeout",
+    public SOSOptionInteger jumpSimulateShellInactivityTimeout = new SOSOptionInteger(this, CLASSNAME + ".jump_simulate_shell_inactivity_timeout",
             "If no new characters are written to stdout or stde", "", "", false);
 
     @Override
-    public SOSOptionInteger getjump_simulate_shell_inactivity_timeout() {
-        return jump_simulate_shell_inactivity_timeout;
+    public SOSOptionInteger getJumpSimulateShellInactivityTimeout() {
+        return jumpSimulateShellInactivityTimeout;
     }
 
     @Override
-    public void setjump_simulate_shell_inactivity_timeout(final SOSOptionInteger p_jump_simulate_shell_inactivity_timeout) {
-        jump_simulate_shell_inactivity_timeout = p_jump_simulate_shell_inactivity_timeout;
+    public void setJumpSimulateShellInactivityTimeout(final SOSOptionInteger pJumpSimulateShellInactivityTimeout) {
+        jumpSimulateShellInactivityTimeout = pJumpSimulateShellInactivityTimeout;
     }
 
     @JSOptionDefinition(name = "jump_simulate_shell_login_timeout", description = "If no new characters are written to stdout or stde", 
             key = "jump_simulate_shell_login_timeout", type = "SOSOptionInteger", mandatory = false)
-    public SOSOptionInteger jump_simulate_shell_login_timeout = new SOSOptionInteger(this, CLASSNAME + ".jump_simulate_shell_login_timeout",
+    public SOSOptionInteger jumpSimulateShellLoginTimeout = new SOSOptionInteger(this, CLASSNAME + ".jump_simulate_shell_login_timeout",
             "If no new characters are written to stdout or stde", "", "", false);
 
     @Override
-    public SOSOptionInteger getjump_simulate_shell_login_timeout() {
-        return jump_simulate_shell_login_timeout;
+    public SOSOptionInteger getJumpSimulateShellLoginTimeout() {
+        return jumpSimulateShellLoginTimeout;
     }
 
     @Override
-    public void setjump_simulate_shell_login_timeout(final SOSOptionInteger p_jump_simulate_shell_login_timeout) {
-        jump_simulate_shell_login_timeout = p_jump_simulate_shell_login_timeout;
+    public void setJumpSimulateShellLoginTimeout(final SOSOptionInteger pJumpSimulateShellLoginTimeout) {
+        jumpSimulateShellLoginTimeout = pJumpSimulateShellLoginTimeout;
     }
 
     @JSOptionDefinition(name = "jump_simulate_shell_prompt_trigger", description = "The expected command line prompt. Using this promp", 
             key = "jump_simulate_shell_prompt_trigger", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString jump_simulate_shell_prompt_trigger = new SOSOptionString(this, CLASSNAME + ".jump_simulate_shell_prompt_trigger", 
+    public SOSOptionString jumpSimulateShellPromptTrigger = new SOSOptionString(this, CLASSNAME + ".jump_simulate_shell_prompt_trigger", 
             "The expected command line prompt. Using this promp", "", "", false);
 
     @Override
-    public SOSOptionString getjump_simulate_shell_prompt_trigger() {
-        return jump_simulate_shell_prompt_trigger;
+    public SOSOptionString getJumpSimulateShellPromptTrigger() {
+        return jumpSimulateShellPromptTrigger;
     }
 
     @Override
-    public void setjump_simulate_shell_prompt_trigger(final SOSOptionString p_jump_simulate_shell_prompt_trigger) {
-        jump_simulate_shell_prompt_trigger = p_jump_simulate_shell_prompt_trigger;
+    public void setJumpSimulateShellPromptTrigger(final SOSOptionString pJumpSimulateShellPromptTrigger) {
+        jumpSimulateShellPromptTrigger = pJumpSimulateShellPromptTrigger;
     }
 
     @JSOptionDefinition(name = "jump_ssh_auth_file", description = "This parameter specifies the path and name of a us", 
             key = "jump_ssh_auth_file", type = "SOSOptionString", mandatory = false)
-    public SOSOptionInFileName jump_ssh_auth_file = new SOSOptionInFileName(this, CLASSNAME + ".jump_ssh_auth_file", 
+    public SOSOptionInFileName jumpSshAuthFile = new SOSOptionInFileName(this, CLASSNAME + ".jump_ssh_auth_file", 
             "This parameter specifies the path and name of a us", "", "", false);
 
     @Override
-    public SOSOptionInFileName getjump_ssh_auth_file() {
-        return jump_ssh_auth_file;
+    public SOSOptionInFileName getJumpSshAuthFile() {
+        return jumpSshAuthFile;
     }
 
     @Override
-    public void setjump_ssh_auth_file(final SOSOptionInFileName p_jump_ssh_auth_file) {
-        jump_ssh_auth_file = p_jump_ssh_auth_file;
+    public void setJumpSshAuthFile(final SOSOptionInFileName pJumpSshAuthFile) {
+        jumpSshAuthFile = pJumpSshAuthFile;
     }
 
     @JSOptionDefinition(name = "jump_ssh_auth_method", description = "This parameter specifies the authentication method", 
             key = "jump_ssh_auth_method", type = "SOSOptionString", mandatory = false)
-    public SOSOptionAuthenticationMethod jump_ssh_auth_method = new SOSOptionAuthenticationMethod(this, CLASSNAME + ".jump_ssh_auth_method", 
+    public SOSOptionAuthenticationMethod jumpSshAuthMethod = new SOSOptionAuthenticationMethod(this, CLASSNAME + ".jump_ssh_auth_method", 
             "This parameter specifies the authentication method", "", "", false);
 
     @Override
-    public SOSOptionAuthenticationMethod getjump_ssh_auth_method() {
-        return jump_ssh_auth_method;
+    public SOSOptionAuthenticationMethod getJumpSshAuthMethod() {
+        return jumpSshAuthMethod;
     }
 
     @Override
-    public void setjump_ssh_auth_method(final SOSOptionAuthenticationMethod p_jump_ssh_auth_method) {
-        jump_ssh_auth_method = p_jump_ssh_auth_method;
+    public void setJumpSshAuthMethod(final SOSOptionAuthenticationMethod pJumpSshAuthMethod) {
+        jumpSshAuthMethod = pJumpSshAuthMethod;
     }
 
     @JSOptionDefinition(name = "jump_user", description = "User name for authentication with the jump_host.", key = "jump_user", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionUserName jump_user = new SOSOptionUserName(this, CLASSNAME + ".jump_user", "User name for authentication with the jump_host.",
+    public SOSOptionUserName jumpUser = new SOSOptionUserName(this, CLASSNAME + ".jump_user", "User name for authentication with the jump_host.",
             "", "", false);
 
     @Override
-    public SOSOptionUserName getjump_user() {
-        return jump_user;
+    public SOSOptionUserName getJumpUser() {
+        return jumpUser;
     }
 
     @Override
-    public void setjump_user(final SOSOptionUserName p_jump_user) {
-        jump_user = p_jump_user;
+    public void setJumpUser(final SOSOptionUserName pJumpUser) {
+        jumpUser = pJumpUser;
     }
 
     @JSOptionDefinition(name = "jump_dir", description = "This parameter specifies the directory on the jump host", key = "jump_dir", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionString jump_dir = new SOSOptionString(this, CLASSNAME + ".jump_dir", "This parameter specifies the directory on the jump host",
+    public SOSOptionString jumpDir = new SOSOptionString(this, CLASSNAME + ".jump_dir", "This parameter specifies the directory on the jump host",
             "/tmp", "/tmp", false);
 
-    public SOSOptionString getjump_dir() {
-        return jump_dir;
+    public SOSOptionString getJumpDir() {
+        return jumpDir;
     }
 
-    public void setjump_dir(final SOSOptionString val) {
-        jump_dir = val;
+    public void setJumpDir(final SOSOptionString val) {
+        jumpDir = val;
     }
 
     @JSOptionDefinition(name = "jump_strict_hostKey_checking", description = "Check the hostkey against known hosts for SSH", 
             key = "jump_strict_hostKey_checking", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean jump_strict_hostkey_checking = new SOSOptionBoolean(this, CLASSNAME + ".jump_strict_hostkey_checking",
+    public SOSOptionBoolean jumpStrictHostkeyChecking = new SOSOptionBoolean(this, CLASSNAME + ".jump_strict_hostkey_checking",
             "Check the hostkey against known hosts for SSH", "false", "false", false);
 
-    public SOSOptionBoolean getjump_strict_hostKey_checking() {
-        return jump_strict_hostkey_checking;
+    public SOSOptionBoolean getJumpStrictHostKeyChecking() {
+        return jumpStrictHostkeyChecking;
     }
 
-    public void setjump_strict_hostKey_checking(final String value) {
-        jump_strict_hostkey_checking.Value(value);
+    public void setJumpStrictHostKeyChecking(final String value) {
+        jumpStrictHostkeyChecking.Value(value);
     }
 
     @JSOptionDefinition(name = "jump_platform", description = "This parameter specifies the platform on the jump host", key = "jump_dir", 
             type = "SOSOptionPlatform", mandatory = false)
-    public SOSOptionPlatform jump_platform = new SOSOptionPlatform(this, CLASSNAME + ".jump_platform", 
+    public SOSOptionPlatform jumpPlatform = new SOSOptionPlatform(this, CLASSNAME + ".jump_platform", 
             "This parameter specifies the platform on the jump host", SOSOptionPlatform.enuValidPlatforms.unix.name(), 
             SOSOptionPlatform.enuValidPlatforms.unix.name(), false);
 
-    public SOSOptionPlatform getjump_platform() {
-        return jump_platform;
+    public SOSOptionPlatform getJumpPlatform() {
+        return jumpPlatform;
     }
 
-    public void setjump_platform(final SOSOptionPlatform val) {
-        jump_platform = val;
+    public void setJumpPlatform(final SOSOptionPlatform val) {
+        jumpPlatform = val;
     }
 
     @JSOptionDefinition(name = "local_dir", description = "local_dir Local directory into which or from which", key = "local_dir", 
             type = "SOSOptionFolderName", mandatory = true)
-    public SOSOptionFolderName local_dir = new SOSOptionFolderName(this, CLASSNAME + ".local_dir", 
+    public SOSOptionFolderName localDir = new SOSOptionFolderName(this, CLASSNAME + ".local_dir", 
             "local_dir Local directory into which or from which", "", "", false);
 
     @Override
-    public SOSOptionFolderName getlocal_dir() {
-        return local_dir;
+    public SOSOptionFolderName getLocalDir() {
+        return localDir;
     }
 
     @Override
-    public void setlocal_dir(final SOSOptionFolderName p_local_dir) {
-        local_dir = p_local_dir;
+    public void setLocalDir(final SOSOptionFolderName pLocalDir) {
+        localDir = pLocalDir;
     }
 
     @JSOptionDefinition(name = "mandator", description = "This parameter specifies the mandator for which a", key = "mandator", 
@@ -1889,13 +1887,13 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
             "SOS", "SOS", false);
 
     @Override
-    public SOSOptionString getmandator() {
+    public SOSOptionString getMandator() {
         return mandator;
     }
 
     @Override
-    public void setmandator(final SOSOptionString p_mandator) {
-        mandator = p_mandator;
+    public void setMandator(final SOSOptionString pMandator) {
+        mandator = pMandator;
     }
 
     @JSOptionDefinition(name = "operation", description = "Operation to be executed send, receive, remove,", key = "operation", 
@@ -1904,132 +1902,132 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
             "Operation to be executed send, receive, remove,", "send", "send", true);
 
     @Override
-    public SOSOptionJadeOperation getoperation() {
+    public SOSOptionJadeOperation getOperation() {
         return operation;
     }
 
     @Override
-    public void setoperation(final SOSOptionJadeOperation p_operation) {
-        operation = p_operation;
+    public void setOperation(final SOSOptionJadeOperation pOperation) {
+        operation = pOperation;
     }
 
     @JSOptionDefinition(name = "overwrite_files", description = "This parameter specifies if existing files should", key = "overwrite_files", 
             type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean overwrite_files = new SOSOptionBoolean(this, CLASSNAME + ".overwrite_files", 
+    public SOSOptionBoolean overwriteFiles = new SOSOptionBoolean(this, CLASSNAME + ".overwrite_files", 
             "This parameter specifies if existing files should", "true", "true", false);
 
     @Override
-    public SOSOptionBoolean getoverwrite_files() {
-        return overwrite_files;
+    public SOSOptionBoolean getOverwriteFiles() {
+        return overwriteFiles;
     }
 
     @Override
-    public void setoverwrite_files(final SOSOptionBoolean p_overwrite_files) {
-        overwrite_files = p_overwrite_files;
+    public void setOverwriteFiles(final SOSOptionBoolean pOverwriteFiles) {
+        overwriteFiles = pOverwriteFiles;
     }
 
     @JSOptionDefinition(name = "passive_mode", description = "passive_mode Passive mode for FTP is often used wit", key = "passive_mode", 
             type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean passive_mode = new SOSOptionBoolean(this, CLASSNAME + ".passive_mode",
+    public SOSOptionBoolean passiveMode = new SOSOptionBoolean(this, CLASSNAME + ".passive_mode",
             "passive_mode Passive mode for FTP is often used wit", "false", "false", false);
 
     @Override
-    public SOSOptionBoolean getpassive_mode() {
-        return passive_mode;
+    public SOSOptionBoolean getPassiveMode() {
+        return passiveMode;
     }
 
     @Override
-    public void setpassive_mode(final SOSOptionBoolean p_passive_mode) {
-        passive_mode = p_passive_mode;
+    public void setPassiveMode(final SOSOptionBoolean pPassiveMode) {
+        passiveMode = pPassiveMode;
     }
 
-    public SOSOptionBoolean FTPTransferModeIsPassive = (SOSOptionBoolean) passive_mode.SetAlias(CLASSNAME + ".FTPTransferModeIsPassive");
+    public SOSOptionBoolean FTPTransferModeIsPassive = (SOSOptionBoolean) passiveMode.SetAlias(CLASSNAME + ".FTPTransferModeIsPassive");
 
     @JSOptionDefinition(name = "password", description = "Password for UserID Password for a", key = "password", type = "SOSOptionPassword", 
             mandatory = false)
     public SOSOptionPassword password = new SOSOptionPassword(this, CLASSNAME + ".password", "Password for UserID Password for a", "", "", false);
 
     @Override
-    public SOSOptionPassword getpassword() {
+    public SOSOptionPassword getPassword() {
         return password;
     }
 
     @Override
-    public void setpassword(final SOSOptionPassword p_password) {
-        password = p_password;
+    public void setPassword(final SOSOptionPassword pPassword) {
+        password = pPassword;
     }
 
     @JSOptionDefinition(name = "poll_interval", description = "This parameter specifies the interval in seconds", key = "poll_interval", 
             type = "SOSOptionInteger", mandatory = false)
-    public SOSOptionTime poll_interval = new SOSOptionTime(this, CLASSNAME + ".poll_interval",
+    public SOSOptionTime pollInterval = new SOSOptionTime(this, CLASSNAME + ".poll_interval",
             "This parameter specifies the interval in seconds", "60", "60", false);
 
     @Override
-    public SOSOptionTime getpoll_interval() {
-        return poll_interval;
+    public SOSOptionTime getPollInterval() {
+        return pollInterval;
     }
 
     @Override
-    public void setpoll_interval(final SOSOptionTime p_poll_interval) {
-        poll_interval = p_poll_interval;
+    public void setPollInterval(final SOSOptionTime pPollInterval) {
+        pollInterval = pPollInterval;
     }
 
     @JSOptionDefinition(name = "Waiting_for_Late_comers", description = "Wait an additional interval for late comers", 
             key = "Waiting_for_Late_comers", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean WaitingForLateComers = new SOSOptionBoolean(this, CLASSNAME + ".Waiting_for_Late_comers",
+    public SOSOptionBoolean waitingForLateComers = new SOSOptionBoolean(this, CLASSNAME + ".Waiting_for_Late_comers",
             "Wait an additional interval for late comers", "false", "false", false);
 
-    public String getWaiting_for_Late_comers() {
-        return WaitingForLateComers.Value();
+    public String getWaitingForLateComers() {
+        return waitingForLateComers.Value();
     }
 
-    public SOSFtpOptionsSuperClass setWaiting_for_Late_comers(final String pstrValue) {
-        WaitingForLateComers.Value(pstrValue);
+    public SOSFtpOptionsSuperClass setWaitingForLateComers(final String pstrValue) {
+        waitingForLateComers.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "poll_minfiles", description = "This parameter specifies the number of files tha", key = "poll_minfiles", 
             type = "SOSOptionInteger", mandatory = false)
-    public SOSOptionInteger poll_minfiles = new SOSOptionInteger(this, CLASSNAME + ".poll_minfiles", 
+    public SOSOptionInteger pollMinfiles = new SOSOptionInteger(this, CLASSNAME + ".poll_minfiles", 
             "This parameter specifies the number of files tha", "0", "0", false);
 
     @Override
-    public SOSOptionInteger getpoll_minfiles() {
-        return poll_minfiles;
+    public SOSOptionInteger getPollMinfiles() {
+        return pollMinfiles;
     }
 
     @Override
-    public void setpoll_minfiles(final SOSOptionInteger p_poll_minfiles) {
-        poll_minfiles = p_poll_minfiles;
+    public void setPollMinfiles(final SOSOptionInteger pPollMinfiles) {
+        pollMinfiles = pPollMinfiles;
     }
 
     @JSOptionDefinition(name = "PollingDuration", description = "The duration of the polling period", key = "PollingDuration", 
             type = "SOSOptionTime", mandatory = false)
-    public SOSOptionTime PollingDuration = new SOSOptionTime(this, CLASSNAME + ".PollingDuration", "The duration of the polling period", "0", "0", 
+    public SOSOptionTime pollingDuration = new SOSOptionTime(this, CLASSNAME + ".PollingDuration", "The duration of the polling period", "0", "0", 
             false);
 
     public String getPollingDuration() {
-        return PollingDuration.Value();
+        return pollingDuration.Value();
     }
 
     public SOSFtpOptionsSuperClass setPollingDuration(final String pstrValue) {
-        PollingDuration.Value(pstrValue);
+        pollingDuration.Value(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "poll_timeout", description = "This parameter specifies the time in minutes, how", key = "poll_timeout", 
             type = "SOSOptionInteger", mandatory = false)
-    public SOSOptionInteger poll_timeout = new SOSOptionInteger(this, CLASSNAME + ".poll_timeout", 
+    public SOSOptionInteger pollTimeout = new SOSOptionInteger(this, CLASSNAME + ".poll_timeout", 
             "This parameter specifies the time in minutes, how", "0", "0", false);
 
     @Override
-    public SOSOptionInteger getpoll_timeout() {
-        return poll_timeout;
+    public SOSOptionInteger getPollTimeout() {
+        return pollTimeout;
     }
 
     @Override
-    public void setpoll_timeout(final SOSOptionInteger p_poll_timeout) {
-        poll_timeout = p_poll_timeout;
+    public void setPollTimeout(final SOSOptionInteger pPollTimeout) {
+        pollTimeout = pPollTimeout;
     }
 
     @JSOptionDefinition(name = "port", description = "Port-Number to be used for Data-Transfer", key = "port", type = "SOSOptionPortNumber", 
@@ -2038,13 +2036,13 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
             "21", true);
 
     @Override
-    public SOSOptionPortNumber getport() {
+    public SOSOptionPortNumber getPort() {
         return port;
     }
 
     @Override
-    public void setport(final SOSOptionPortNumber p_port) {
-        port = p_port;
+    public void setPort(final SOSOptionPortNumber pPort) {
+        port = pPort;
     }
 
     @JSOptionDefinition(name = "ppid", description = "This parameter is used for Unix systems and - as o", key = "ppid", 
@@ -2053,13 +2051,13 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
             "This parameter is used for Unix systems and - as o", "", "", false);
 
     @Override
-    public SOSOptionProcessID getppid() {
+    public SOSOptionProcessID getPpid() {
         return ppid;
     }
 
     @Override
-    public void setppid(final SOSOptionProcessID p_ppid) {
-        ppid = p_ppid;
+    public void setPpid(final SOSOptionProcessID pPpid) {
+        ppid = pPpid;
     }
 
     public SOSOptionProcessID ParentProcessID = (SOSOptionProcessID) ppid.SetAlias(CLASSNAME + ".ParentProcessID");
@@ -2069,16 +2067,16 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     public SOSOptionString profile = new SOSOptionString(this, CLASSNAME + ".profile", "The Name of a Profile-Section to be executed", "", "", false);
 
     @Override
-    public SOSOptionString getprofile() {
+    public SOSOptionString getProfile() {
         return profile;
     }
 
     @Override
-    public void setprofile(final SOSOptionString p_profile) {
-        profile = p_profile;
+    public void setProfile(final SOSOptionString pProfile) {
+        profile = pProfile;
     }
 
-    public SOSOptionString SectionName = (SOSOptionString) profile.SetAlias(CLASSNAME + ".SectionName");
+    public SOSOptionString sectionName = (SOSOptionString) profile.SetAlias(CLASSNAME + ".SectionName");
 
     @JSOptionDefinition(name = "protocol", description = "Type of requested Datatransfer The values ftp, sftp", key = "protocol", 
             type = "SOSOptionStringValueList", mandatory = true)
@@ -2086,16 +2084,16 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
             "Type of requested Datatransfer The values ftp, sftp", "ftp", "ftp", true);
 
     @Override
-    public SOSOptionTransferType getprotocol() {
+    public SOSOptionTransferType getProtocol() {
         return protocol;
     }
 
     @Override
-    public void setprotocol(final SOSOptionTransferType p_protocol) {
-        protocol = p_protocol;
+    public void setProtocol(final SOSOptionTransferType pProtocol) {
+        protocol = pProtocol;
     }
 
-    public SOSOptionTransferType TransferProtocol = (SOSOptionTransferType) protocol.SetAlias(CLASSNAME + ".TransferProtocol");
+    public SOSOptionTransferType transferProtocol = (SOSOptionTransferType) protocol.SetAlias(CLASSNAME + ".TransferProtocol");
 
     @JSOptionDefinition(name = "recursive", description = "This parameter specifies if files from subdirector", key = "recursive", 
             type = "SOSOptionBoolean", mandatory = false)
@@ -2105,49 +2103,49 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     public SOSOptionBoolean IncludeSubdirectories = (SOSOptionBoolean) recursive.SetAlias("include_sub_directories");
 
     @Override
-    public SOSOptionBoolean getrecursive() {
+    public SOSOptionBoolean getRecursive() {
         return recursive;
     }
 
     @Override
-    public void setrecursive(final SOSOptionBoolean p_recursive) {
-        recursive = p_recursive;
+    public void setRecursive(final SOSOptionBoolean pRecursive) {
+        recursive = pRecursive;
     }
 
-    public SOSOptionBoolean RecurseSubFolders = (SOSOptionBoolean) recursive.SetAlias(CLASSNAME + ".RecurseSubFolders");
+    public SOSOptionBoolean recurseSubFolders = (SOSOptionBoolean) recursive.SetAlias(CLASSNAME + ".RecurseSubFolders");
 
     @JSOptionDefinition(name = "remote_dir", description = "remote_dir Directory at the FTP/SFTP server from wh", key = "remote_dir", 
             type = "SOSOptionFolderName", mandatory = true)
-    public SOSOptionFolderName remote_dir = new SOSOptionFolderName(this, CLASSNAME + ".remote_dir", 
+    public SOSOptionFolderName remoteDir = new SOSOptionFolderName(this, CLASSNAME + ".remote_dir", 
             "remote_dir Directory at the FTP/SFTP server from wh", ".", ".", false);
 
     @Override
-    public SOSOptionFolderName getremote_dir() {
-        return remote_dir;
+    public SOSOptionFolderName getRemoteDir() {
+        return remoteDir;
     }
 
     @Override
-    public void setremote_dir(final SOSOptionFolderName p_remote_dir) {
-        remote_dir = p_remote_dir;
+    public void setRemoteDir(final SOSOptionFolderName pRemoteDir) {
+        remoteDir = pRemoteDir;
     }
 
     @JSOptionDefinition(name = "remove_files", description = "This parameter specifies whether files on the FTP/", key = "remove_files", 
             type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean remove_files = new SOSOptionBoolean(this, CLASSNAME + ".remove_files", 
+    public SOSOptionBoolean removeFiles = new SOSOptionBoolean(this, CLASSNAME + ".remove_files", 
             "This parameter specifies whether files on the FTP/", "false", "false", false);
     
-    public SOSOptionBoolean DeleteFilesAfterTransfer = (SOSOptionBoolean) remove_files.SetAlias(CLASSNAME + ".DeleteFilesAfterTransfer");
+    public SOSOptionBoolean deleteFilesAfterTransfer = (SOSOptionBoolean) removeFiles.SetAlias(CLASSNAME + ".DeleteFilesAfterTransfer");
     
-    public SOSOptionBoolean DeleteFilesOnSource = (SOSOptionBoolean) remove_files.SetAlias(CLASSNAME + ".DeleteFilesOnSource");
+    public SOSOptionBoolean deleteFilesOnSource = (SOSOptionBoolean) removeFiles.SetAlias(CLASSNAME + ".DeleteFilesOnSource");
 
     @Override
-    public SOSOptionBoolean getremove_files() {
-        return remove_files;
+    public SOSOptionBoolean getRemoveFiles() {
+        return removeFiles;
     }
 
     @Override
-    public void setremove_files(final SOSOptionBoolean p_remove_files) {
-        remove_files = p_remove_files;
+    public void setRemoveFiles(final SOSOptionBoolean pRemoveFiles) {
+        removeFiles = pRemoveFiles;
     }
 
     @JSOptionDefinition(name = "replacement", description = "String for replacement of matching character seque", key = "replacement", 
@@ -2156,13 +2154,13 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
             null, null, false);
 
     @Override
-    public SOSOptionString getreplacement() {
+    public SOSOptionString getReplacement() {
         return replacement;
     }
 
     @Override
-    public void setreplacement(final SOSOptionString p_replacement) {
-        replacement = p_replacement;
+    public void setReplacement(final SOSOptionString pReplacement) {
+        replacement = pReplacement;
     }
 
     public SOSOptionString ReplaceWith = (SOSOptionString) replacement.SetAlias(CLASSNAME + ".ReplaceWith");
@@ -2173,13 +2171,13 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
             "", "", false);
 
     @Override
-    public SOSOptionRegExp getreplacing() {
+    public SOSOptionRegExp getReplacing() {
         return replacing;
     }
 
     @Override
-    public void setreplacing(final SOSOptionRegExp p_replacing) {
-        replacing = p_replacing;
+    public void setReplacing(final SOSOptionRegExp pReplacing) {
+        replacing = pReplacing;
     }
 
     public SOSOptionRegExp ReplaceWhat = (SOSOptionRegExp) replacing.SetAlias(CLASSNAME + ".ReplaceWhat");
@@ -2190,82 +2188,82 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
             "", "", false);
 
     @Override
-    public SOSOptionFolderName getroot() {
+    public SOSOptionFolderName getRoot() {
         return root;
     }
 
     @Override
-    public void setroot(final SOSOptionFolderName p_root) {
-        root = p_root;
+    public void setRoot(final SOSOptionFolderName pRoot) {
+        root = pRoot;
     }
 
-    public SOSOptionFolderName TempFolderName = (SOSOptionFolderName) root.SetAlias(CLASSNAME + ".TempFolderName");
+    public SOSOptionFolderName tempFolderName = (SOSOptionFolderName) root.SetAlias(CLASSNAME + ".TempFolderName");
 
     @JSOptionDefinition(name = "scheduler_host", description = "This parameter specifies the host name or IP addre", key = "scheduler_host", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionHostName scheduler_host = new SOSOptionHostName(this, CLASSNAME + ".scheduler_host", 
+    public SOSOptionHostName schedulerHost = new SOSOptionHostName(this, CLASSNAME + ".scheduler_host", 
             "This parameter specifies the host name or IP addre", "", "", false);
 
-    public SOSOptionHostName BackgroundServiceHost = (SOSOptionHostName) scheduler_host.SetAlias("Background_Service_Host");
+    public SOSOptionHostName backgroundServiceHost = (SOSOptionHostName) schedulerHost.SetAlias("Background_Service_Host");
 
     @Override
-    public SOSOptionHostName getscheduler_host() {
-        return scheduler_host;
+    public SOSOptionHostName getSchedulerHost() {
+        return schedulerHost;
     }
 
     @Override
-    public void setscheduler_host(final SOSOptionHostName p_scheduler_host) {
-        scheduler_host = p_scheduler_host;
+    public void setSchedulerHost(final SOSOptionHostName pSchedulerHost) {
+        schedulerHost = pSchedulerHost;
     }
 
     @JSOptionDefinition(name = "scheduler_job_chain", description = "The name of a job chain for Managed File Transfer", 
             key = "scheduler_job_chain", type = "JSJobChain", mandatory = false)
-    public JSJobChain scheduler_job_chain = new JSJobChain(this, CLASSNAME + ".scheduler_job_chain", 
+    public JSJobChain schedulerJobChain = new JSJobChain(this, CLASSNAME + ".scheduler_job_chain", 
             "The name of a job chain for Background Service", "/sos/jade/jade_history", "/sos/jade/jade_history", false);
     
-    public JSJobChain BackgroundServiceJobChainName = (JSJobChain) scheduler_job_chain.SetAlias("BackgroundService_Job_Chain_Name");
+    public JSJobChain backgroundServiceJobChainName = (JSJobChain) schedulerJobChain.SetAlias("BackgroundService_Job_Chain_Name");
 
     @Override
-    public JSJobChain getscheduler_job_chain() {
-        return scheduler_job_chain;
+    public JSJobChain getSchedulerJobChain() {
+        return schedulerJobChain;
     }
 
     @Override
-    public void setscheduler_job_chain(final JSJobChain p_scheduler_job_chain) {
-        scheduler_job_chain = p_scheduler_job_chain;
+    public void setSchedulerJobChain(final JSJobChain pSchedulerJobChain) {
+        schedulerJobChain = pSchedulerJobChain;
     }
 
     @JSOptionDefinition(name = "scheduler_port", description = "The port for which a Job Scheduler for Managed File Trans", key = "scheduler_port", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionPortNumber scheduler_port = new SOSOptionPortNumber(this, CLASSNAME + ".scheduler_port", 
+    public SOSOptionPortNumber schedulerPort = new SOSOptionPortNumber(this, CLASSNAME + ".scheduler_port", 
             "The port for which a Job Scheduler for Managed File Trans", "0", "4444", false);
     
-    public SOSOptionPortNumber BackgroundServicePort = (SOSOptionPortNumber) scheduler_port.SetAlias("Background_Service_Port",
+    public SOSOptionPortNumber backgroundServicePort = (SOSOptionPortNumber) schedulerPort.SetAlias("Background_Service_Port",
             "Background_Service_PortNumber");
 
     @Override
-    public SOSOptionPortNumber getscheduler_port() {
-        return scheduler_port;
+    public SOSOptionPortNumber getSchedulerPort() {
+        return schedulerPort;
     }
 
     @Override
-    public void setscheduler_port(final SOSOptionPortNumber p_scheduler_port) {
-        scheduler_port = p_scheduler_port;
+    public void setSchedulerPort(final SOSOptionPortNumber pSchedulerPort) {
+        schedulerPort = pSchedulerPort;
     }
 
     @JSOptionDefinition(name = "Restart", description = "Set Restart/Resume Mode for Transfer", key = "Restart", type = "SOSOptionBoolean", 
             mandatory = false)
-    public SOSOptionBoolean Restart = new SOSOptionBoolean(this, CLASSNAME + ".Restart", "Set Restart/Resume Mode for Transfer", "false", 
+    public SOSOptionBoolean restart = new SOSOptionBoolean(this, CLASSNAME + ".Restart", "Set Restart/Resume Mode for Transfer", "false", 
             "false", false);
     
-    public SOSOptionBoolean ResumeTransfer = (SOSOptionBoolean) Restart.SetAlias(CLASSNAME + "Resume", CLASSNAME + "Resume_Transfer");
+    public SOSOptionBoolean resumeTransfer = (SOSOptionBoolean) restart.SetAlias(CLASSNAME + "Resume", CLASSNAME + "Resume_Transfer");
 
     public String getRestart() {
-        return Restart.Value();
+        return restart.Value();
     }
 
     public SOSFtpOptionsSuperClass setRestart(final String pstrValue) {
-        Restart.Value(pstrValue);
+        restart.Value(pstrValue);
         return this;
     }
 
@@ -2274,128 +2272,128 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     public SOSOptionIniFileName settings = new SOSOptionIniFileName(this, CLASSNAME + ".settings", 
             "Name of INI-File which contains the transfer profiles to execute", "", "", false);
     
-    public SOSOptionIniFileName ConfigurationFile = (SOSOptionIniFileName) settings.SetAlias("JADE_Configuration_File", "JADE_Config_File",
+    public SOSOptionIniFileName configurationFile = (SOSOptionIniFileName) settings.SetAlias("JADE_Configuration_File", "JADE_Config_File",
             "Configuration", "JADE_Configuration", "JADE_INI_FILE");
     
-    public SOSOptionIniFileName SOSIniFileName = (SOSOptionIniFileName) settings.SetAlias(CLASSNAME + ".SOSIniFileName");
+    public SOSOptionIniFileName sosIniFileName = (SOSOptionIniFileName) settings.SetAlias(CLASSNAME + ".SOSIniFileName");
 
     @Override
-    public SOSOptionIniFileName getsettings() {
+    public SOSOptionIniFileName getSettings() {
         return settings;
     }
 
     @Override
-    public void setsettings(final SOSOptionIniFileName p_settings) {
-        settings = p_settings;
+    public void setSettings(final SOSOptionIniFileName pSettings) {
+        settings = pSettings;
     }
 
     @JSOptionDefinition(name = "skip_transfer", description = "If this Parameter is set to true then", key = "skip_transfer", 
             type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean skip_transfer = new SOSOptionBoolean(this, CLASSNAME + ".skip_transfer", "If this Parameter is set to true then", 
+    public SOSOptionBoolean skipTransfer = new SOSOptionBoolean(this, CLASSNAME + ".skip_transfer", "If this Parameter is set to true then", 
             "false", "false", false);
 
     @Override
-    public SOSOptionBoolean getskip_transfer() {
-        return skip_transfer;
+    public SOSOptionBoolean getSkipTransfer() {
+        return skipTransfer;
     }
 
     @Override
-    public void setskip_transfer(final SOSOptionBoolean p_skip_transfer) {
-        skip_transfer = p_skip_transfer;
+    public void setSkipTransfer(final SOSOptionBoolean pSkipTransfer) {
+        skipTransfer = pSkipTransfer;
     }
 
     @JSOptionDefinition(name = "ssh_auth_file", description = "This parameter specifies the path and name of a us", key = "ssh_auth_file", 
             type = "SOSOptionInFileName", mandatory = false)
-    public SOSOptionInFileName ssh_auth_file = new SOSOptionInFileName(this, CLASSNAME + ".ssh_auth_file", 
+    public SOSOptionInFileName sshAuthFile = new SOSOptionInFileName(this, CLASSNAME + ".ssh_auth_file", 
             "This parameter specifies the path and name of a us", "", "", false);
     
-    public SOSOptionInFileName auth_file = (SOSOptionInFileName) ssh_auth_file.SetAlias(CLASSNAME + ".auth_file");
+    public SOSOptionInFileName authFile = (SOSOptionInFileName) sshAuthFile.SetAlias(CLASSNAME + ".auth_file");
 
     @Override
-    public SOSOptionInFileName getssh_auth_file() {
-        return ssh_auth_file;
+    public SOSOptionInFileName getSshAuthFile() {
+        return sshAuthFile;
     }
 
     @Override
-    public void setssh_auth_file(final SOSOptionInFileName p_ssh_auth_file) {
-        ssh_auth_file = p_ssh_auth_file;
+    public void setSshAuthFile(final SOSOptionInFileName pSshAuthFile) {
+        sshAuthFile = pSshAuthFile;
     }
 
     @JSOptionDefinition(name = "ssh_auth_method", description = "This parameter specifies the authentication method", key = "ssh_auth_method", 
             type = "SOSOptionStringValueList", mandatory = false)
-    public SOSOptionAuthenticationMethod ssh_auth_method = new SOSOptionAuthenticationMethod(this, CLASSNAME + ".ssh_auth_method", 
+    public SOSOptionAuthenticationMethod sshAuthMethod = new SOSOptionAuthenticationMethod(this, CLASSNAME + ".ssh_auth_method", 
             "This parameter specifies the authentication method", "publickey", "publickey", false);
     
-    public SOSOptionAuthenticationMethod auth_method = (SOSOptionAuthenticationMethod) ssh_auth_method.SetAlias(CLASSNAME + ".auth_method");
+    public SOSOptionAuthenticationMethod authMethod = (SOSOptionAuthenticationMethod) sshAuthMethod.SetAlias(CLASSNAME + ".auth_method");
 
     @Override
-    public SOSOptionAuthenticationMethod getssh_auth_method() {
-        return ssh_auth_method;
+    public SOSOptionAuthenticationMethod getSshAuthMethod() {
+        return sshAuthMethod;
     }
 
     @Override
-    public void setssh_auth_method(final SOSOptionAuthenticationMethod p_ssh_auth_method) {
-        ssh_auth_method = p_ssh_auth_method;
+    public void setSshAuthMethod(final SOSOptionAuthenticationMethod pSshAuthMethod) {
+        sshAuthMethod = pSshAuthMethod;
     }
 
     @JSOptionDefinition(name = "ssh_proxy_host", description = "The value of this parameter is the host name or th", key = "ssh_proxy_host", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionString ssh_proxy_host = new SOSOptionString(this, CLASSNAME + ".ssh_proxy_host", 
+    public SOSOptionString sshProxyHost = new SOSOptionString(this, CLASSNAME + ".ssh_proxy_host", 
             "The value of this parameter is the host name or th", "", "", false);
 
     @Override
-    public SOSOptionString getssh_proxy_host() {
-        return ssh_proxy_host;
+    public SOSOptionString getSshProxyHost() {
+        return sshProxyHost;
     }
 
     @Override
-    public void setssh_proxy_host(final SOSOptionString p_ssh_proxy_host) {
-        ssh_proxy_host = p_ssh_proxy_host;
+    public void setSshProxyHost(final SOSOptionString pSshProxyHost) {
+        sshProxyHost = pSshProxyHost;
     }
 
     @JSOptionDefinition(name = "ssh_proxy_password", description = "This parameter specifies the password for the prox", key = "ssh_proxy_password",
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionString ssh_proxy_password = new SOSOptionString(this, CLASSNAME + ".ssh_proxy_password", 
+    public SOSOptionString sshProxyPassword = new SOSOptionString(this, CLASSNAME + ".ssh_proxy_password", 
             "This parameter specifies the password for the prox", "", "", false);
 
     @Override
-    public SOSOptionString getssh_proxy_password() {
-        return ssh_proxy_password;
+    public SOSOptionString getSshProxyPassword() {
+        return sshProxyPassword;
     }
 
     @Override
-    public void setssh_proxy_password(final SOSOptionString p_ssh_proxy_password) {
-        ssh_proxy_password = p_ssh_proxy_password;
+    public void setSshProxyPassword(final SOSOptionString pSshProxyPassword) {
+        sshProxyPassword = pSshProxyPassword;
     }
 
     @JSOptionDefinition(name = "ssh_proxy_port", description = "This parameter specifies the port number of the pr", key = "ssh_proxy_port", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionString ssh_proxy_port = new SOSOptionString(this, CLASSNAME + ".ssh_proxy_port", 
+    public SOSOptionString sshProxyPort = new SOSOptionString(this, CLASSNAME + ".ssh_proxy_port", 
             "This parameter specifies the port number of the pr", "", "", false);
 
     @Override
-    public SOSOptionString getssh_proxy_port() {
-        return ssh_proxy_port;
+    public SOSOptionString getSshProxyPort() {
+        return sshProxyPort;
     }
 
     @Override
-    public void setssh_proxy_port(final SOSOptionString p_ssh_proxy_port) {
-        ssh_proxy_port = p_ssh_proxy_port;
+    public void setSshProxyPort(final SOSOptionString pSshProxyPort) {
+        sshProxyPort = pSshProxyPort;
     }
 
     @JSOptionDefinition(name = "ssh_proxy_user", description = "The value of this parameter specifies the user acc", key = "ssh_proxy_user", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionString ssh_proxy_user = new SOSOptionString(this, CLASSNAME + ".ssh_proxy_user", 
+    public SOSOptionString sshProxyUser = new SOSOptionString(this, CLASSNAME + ".ssh_proxy_user", 
             "The value of this parameter specifies the user acc", "", "", false);
 
     @Override
-    public SOSOptionString getssh_proxy_user() {
-        return ssh_proxy_user;
+    public SOSOptionString getSshProxyUser() {
+        return sshProxyUser;
     }
 
     @Override
-    public void setssh_proxy_user(final SOSOptionString p_ssh_proxy_user) {
-        ssh_proxy_user = p_ssh_proxy_user;
+    public void setSshProxyUser(final SOSOptionString pSshProxyUser) {
+        sshProxyUser = pSshProxyUser;
     }
 
     @JSOptionDefinition(name = "transactional", description = "This parameter specifies if file transfers should", key = "transactional", 
@@ -2404,43 +2402,43 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
             "This parameter specifies if file transfers should", "false", "false", false);
 
     @Override
-    public SOSOptionBoolean gettransactional() {
+    public SOSOptionBoolean getTransactional() {
         return transactional;
     }
 
     @Override
-    public void settransactional(final SOSOptionBoolean p_transactional) {
-        transactional = p_transactional;
+    public void setTransactional(final SOSOptionBoolean pTransactional) {
+        transactional = pTransactional;
     }
 
-    public SOSOptionBoolean TransactionMode = (SOSOptionBoolean) transactional.SetAlias(CLASSNAME + ".TransactionMode");
+    public SOSOptionBoolean transactionMode = (SOSOptionBoolean) transactional.SetAlias(CLASSNAME + ".TransactionMode");
 
     @JSOptionDefinition(name = "transfer_mode", description = "Type of Character-Encoding Transfe", key = "transfer_mode", 
             type = "SOSOptionTransferMode", mandatory = false)
-    public SOSOptionTransferMode transfer_mode = new SOSOptionTransferMode(this, CLASSNAME + ".transfer_mode", "Type of Character-Encoding Transfe",
+    public SOSOptionTransferMode transferMode = new SOSOptionTransferMode(this, CLASSNAME + ".transfer_mode", "Type of Character-Encoding Transfe",
             "binary", "binary", false);
 
     @Override
-    public SOSOptionTransferMode gettransfer_mode() {
-        return transfer_mode;
+    public SOSOptionTransferMode getTransferMode() {
+        return transferMode;
     }
 
     @Override
-    public void settransfer_mode(final SOSOptionTransferMode p_transfer_mode) {
-        transfer_mode = p_transfer_mode;
+    public void setTransferMode(final SOSOptionTransferMode pTransferMode) {
+        transferMode = pTransferMode;
     }
 
     @JSOptionDefinition(name = "user", description = "UserID of user in charge User name", key = "user", type = "SOSOptionUserName", mandatory = true)
     public SOSOptionUserName user = new SOSOptionUserName(this, CLASSNAME + ".user", "UserID of user in charge User name", "", "anonymous", false);
 
     @Override
-    public SOSOptionUserName getuser() {
+    public SOSOptionUserName getUser() {
         return user;
     }
 
     @Override
-    public void setuser(final SOSOptionUserName p_user) {
-        user = p_user;
+    public void setUser(final SOSOptionUserName pUser) {
+        user = pUser;
     }
 
     @JSOptionDefinition(name = "verbose", description = "The granuality of (Debug-)Messages The verbosit", key = "verbose", 
@@ -2449,30 +2447,30 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
             "1", "10", false);
 
     @Override
-    public SOSOptionInteger getverbose() {
+    public SOSOptionInteger getVerbose() {
         return verbose;
     }
 
     @Override
-    public void setverbose(final SOSOptionInteger p_verbose) {
-        verbose = p_verbose;
+    public void setVerbose(final SOSOptionInteger pVerbose) {
+        verbose = pVerbose;
     }
 
-    public SOSOptionInteger VerbosityLevel = (SOSOptionInteger) verbose.SetAlias(CLASSNAME + ".VerbosityLevel");
+    public SOSOptionInteger verbosityLevel = (SOSOptionInteger) verbose.SetAlias(CLASSNAME + ".VerbosityLevel");
 
     @JSOptionDefinition(name = "zero_byte_transfer", description = "This parameter specifies whether zero byte files", key = "zero_byte_transfer", 
             type = "SOSOptionZeroByteTransfer", mandatory = false)
-    public SOSOptionZeroByteTransfer zero_byte_transfer = new SOSOptionZeroByteTransfer(this, CLASSNAME + ".zero_byte_transfer", 
+    public SOSOptionZeroByteTransfer zeroByteTransfer = new SOSOptionZeroByteTransfer(this, CLASSNAME + ".zero_byte_transfer", 
             "This parameter specifies whether zero byte files", "yes", "yes", false);
     
-    public SOSOptionZeroByteTransfer TransferZeroByteFiles = (SOSOptionZeroByteTransfer) zero_byte_transfer.SetAlias("transfer_zero_byte_files");
+    public SOSOptionZeroByteTransfer transferZeroByteFiles = (SOSOptionZeroByteTransfer) zeroByteTransfer.SetAlias("transfer_zero_byte_files");
 
     public void setAllOptions(final Properties pobjProperties) {
         HashMap<String, String> map = new HashMap<String, String>((Map) pobjProperties);
         try {
             super.setAllOptions(map);
         } catch (Exception e) {
-            logger.error(e.getLocalizedMessage());
+            LOGGER.error(e.getLocalizedMessage());
         }
     }
 
@@ -2486,158 +2484,118 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     }
 
     @Override
-    public void CheckMandatory() throws com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing {
+    public void checkMandatory() throws com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing {
         try {
-            super.CheckMandatory();
+            super.checkMandatory();
         } catch (Exception e) {
             throw new JSExceptionMandatoryOptionMissing(e.toString());
         }
     }
 
     @Override
-    public void CommandLineArgs(final String[] pstrArgs) {
-        super.CommandLineArgs(pstrArgs);
+    public void commandLineArgs(final String[] pstrArgs) {
+        super.commandLineArgs(pstrArgs);
         this.setAllOptions(super.objSettings);
     }
 
     @Override
-    public SOSOptionHostName getHost() {
-        return host;
-    }
-
-    @Override
-    public SOSOptionPortNumber getPort() {
-        return port;
-    }
-
-    @Override
-    public SOSOptionString getProxy_host() {
+    public SOSOptionString getProxyHost() {
         return null;
     }
 
     @Override
-    public SOSOptionPassword getProxy_password() {
+    public SOSOptionPassword getProxyPassword() {
         // TO DO Auto-generated method stub
         return null;
     }
 
     @Override
-    public SOSOptionPortNumber getProxy_port() {
+    public SOSOptionPortNumber getProxyPort() {
         // TO DO Auto-generated method stub
         return null;
     }
 
     @Override
-    public SOSOptionUserName getProxy_user() {
+    public SOSOptionUserName getProxyUser() {
         // TO DO Auto-generated method stub
         return null;
     }
 
     @Override
-    public void setHost(final SOSOptionHostName host) {
-        this.sethost(host);
-    }
-
-    @Override
-    public void setPort(final SOSOptionPortNumber port) {
+    public void setProxyHost(final SOSOptionString proxyHost) {
         // TO DO Auto-generated method stub
     }
 
     @Override
-    public void setProxy_host(final SOSOptionString proxyHost) {
+    public void setProxyPassword(final SOSOptionPassword proxyPassword) {
+    }
+
+    @Override
+    public void setProxyPort(final SOSOptionPortNumber proxyPort) {
+    }
+
+    @Override
+    public void setProxyUser(final SOSOptionUserName proxyUser) {
         // TO DO Auto-generated method stub
     }
 
     @Override
-    public void setProxy_password(final SOSOptionPassword proxyPassword) {
+    public SOSOptionInFileName getAuthFile() {
+        return sshAuthFile;
     }
 
     @Override
-    public void setProxy_port(final SOSOptionPortNumber proxyPort) {
+    public SOSOptionAuthenticationMethod getAuthMethod() {
+        return sshAuthMethod;
     }
 
     @Override
-    public void setProxy_user(final SOSOptionUserName proxyUser) {
+    public void setAuthFile(final SOSOptionInFileName authFile) {
+        sshAuthFile = authFile;
+    }
+
+    @Override
+    public void setAuthMethod(final SOSOptionAuthenticationMethod authMethod) {
         // TO DO Auto-generated method stub
     }
 
     @Override
-    public SOSOptionInFileName getAuth_file() {
-        return ssh_auth_file;
-    }
-
-    @Override
-    public SOSOptionAuthenticationMethod getAuth_method() {
-        return ssh_auth_method;
-    }
-
-    @Override
-    public SOSOptionPassword getPassword() {
-        return password;
-    }
-
-    @Override
-    public SOSOptionUserName getUser() {
-        return user;
-    }
-
-    @Override
-    public void setAuth_file(final SOSOptionInFileName authFile) {
-        ssh_auth_file = authFile;
-    }
-
-    @Override
-    public void setAuth_method(final SOSOptionAuthenticationMethod authMethod) {
-        // TO DO Auto-generated method stub
-    }
-
-    @Override
-    public void setPassword(final SOSOptionPassword password) {
-        // TO DO Auto-generated method stub
-    }
-
-    @Override
-    public void setUser(final SOSOptionUserName pobjUser) {
-        user.Value(pobjUser.Value());
-    }
-
-    @Override
-    public SOSOptionRegExp getfile_spec2() {
+    public SOSOptionRegExp getFileSpec2() {
         // TO DO Auto-generated method stub
         return null;
     }
 
     @Override
-    public void setfile_spec2(final SOSOptionRegExp p_file_spec2) {
+    public void setFileSpec2(final SOSOptionRegExp p_file_spec2) {
         // TO DO Auto-generated method stub
     }
 
     @Override
-    public SOSOptionFolderName SourceDir() {
-        return SourceDir;
+    public SOSOptionFolderName sourceDir() {
+        return sourceDir;
     }
 
     @Override
-    public SOSOptionFolderName TargetDir() {
-        return TargetDir;
+    public SOSOptionFolderName targetDir() {
+        return targetDir;
     }
 
     @JSOptionDefinition(name = "raise_exception_on_error", description = "Raise an Exception if an error occured", key = "raise_exception_on_error",
             type = "SOSOptionBoolean", mandatory = true)
-    public SOSOptionBoolean raise_exception_on_error = new SOSOptionBoolean(this, CLASSNAME + ".raise_exception_on_error", 
+    public SOSOptionBoolean raiseExceptionOnError = new SOSOptionBoolean(this, CLASSNAME + ".raise_exception_on_error", 
             "Raise an Exception if an error occured", "true", "true", true);
 
-    public SOSOptionBoolean getraise_exception_on_error() {
-        return raise_exception_on_error;
+    public SOSOptionBoolean getRaiseExceptionOnError() {
+        return raiseExceptionOnError;
     }
 
-    public void setraise_exception_on_error(final SOSOptionBoolean raiseExceptionOnError) {
-        this.raise_exception_on_error = raiseExceptionOnError;
+    public void setRaiseExceptionOnError(final SOSOptionBoolean raiseExceptionOnError) {
+        this.raiseExceptionOnError = raiseExceptionOnError;
     }
 
     @JSOptionDefinition(name = "ProtocolCommandListener", description = "Activate the logging for Apache ftp client", 
             key = "protocol_command_listener", type = "SOSOptionBoolean", mandatory = true)
-    public SOSOptionBoolean ProtocolCommandListener = new SOSOptionBoolean(this, CLASSNAME + ".protocol_command_listener",
+    public SOSOptionBoolean protocolCommandListener = new SOSOptionBoolean(this, CLASSNAME + ".protocol_command_listener",
             "Activate the logging for Apache ftp client", "false", "false", true);
 
 }

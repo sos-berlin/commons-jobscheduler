@@ -257,11 +257,11 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     public SOSOptionLogFileName log_filename = new SOSOptionLogFileName(this, CLASS_NAME + ".log_filename",
             "Name der Datei mit den Logging-Eintr�gen", "stdout", "stdout", false);
 
-    public SOSOptionLogFileName getlog_filename() {
+    public SOSOptionLogFileName getLogFilename() {
         return log_filename;
     }
 
-    public void setlog_filename(final SOSOptionLogFileName pstrValue) {
+    public void setLogFilename(final SOSOptionLogFileName pstrValue) {
         log_filename = pstrValue;
     }
 
@@ -546,7 +546,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     protected boolean getBoolItem(final String pstrKey) {
         boolean flgT = false;
         if (isNotEmpty(pstrKey)) {
-            flgT = String2Bool(this.getItem(pstrKey));
+            flgT = string2Bool(this.getItem(pstrKey));
         }
         return flgT;
     }
@@ -554,7 +554,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     protected boolean getBoolItem(final String pstrKey, final boolean pflgDefault) {
         boolean flgT = false;
         if (isNotEmpty(pstrKey)) {
-            flgT = String2Bool(this.getItem(pstrKey));
+            flgT = string2Bool(this.getItem(pstrKey));
         } else {
             flgT = pflgDefault;
         }
@@ -562,7 +562,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     }
 
     @Override
-    public boolean String2Bool(final String pstrVal) {
+    public boolean string2Bool(final String pstrVal) {
         boolean flgT = false;
         if (isNotEmpty(pstrVal)
                 && ("1".equals(pstrVal) || "y".equalsIgnoreCase(pstrVal) || "yes".equalsIgnoreCase(pstrVal) || "j".equalsIgnoreCase(pstrVal)
@@ -653,22 +653,22 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     }
 
     public JSOptionsClass getEnvironmentVariables() {
-        String strT = EnvironmentVariable(JSOptionsClass.conEnvVarJS_TEST_MODE);
+        String strT = environmentVariable(JSOptionsClass.conEnvVarJS_TEST_MODE);
         if (isNotEmpty(strT)) {
-            this.TestMode(String2Bool(strT));
+            this.TestMode(string2Bool(strT));
         }
-        strT = EnvironmentVariable("JS_DEBUG");
+        strT = environmentVariable("JS_DEBUG");
         if (isNotEmpty(strT)) {
-            this.Debug(String2Bool(strT));
+            this.Debug(string2Bool(strT));
         }
-        strT = EnvironmentVariable("JS_DEBUG_LEVEL");
+        strT = environmentVariable("JS_DEBUG_LEVEL");
         if (isNotEmpty(strT)) {
             this.DebugLevel(String2Integer(strT));
         }
         return this;
     }
 
-    public void CheckMandatory() throws Exception {
+    public void checkMandatory() throws Exception {
         if (objParentClass != null) {
             IterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.CheckMandatory, strBuffer);
         }
@@ -871,13 +871,13 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         }
     }
 
-    public void CommandLineArgs(final String pstrArgs) {
+    public void commandLineArgs(final String pstrArgs) {
         StrTokenizer objT = new StrTokenizer(pstrArgs);
         String[] strA = objT.getTokenArray();
-        CommandLineArgs(strA);
+        commandLineArgs(strA);
     }
 
-    public void CommandLineArgs(final String[] pstrArgs) {
+    public void commandLineArgs(final String[] pstrArgs) {
         final String conMethodName = CLASS_NAME + "::CommandLineArgs ";
         if (AllowEmptyParameterList.isFalse() && pstrArgs.length <= 0) {
             throw new ParametersMissingButRequiredException(ApplicationName.Value(), ApplicationDocuUrl.Value());
@@ -900,7 +900,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
                     int intESPos = strOptionName.indexOf("=");
                     if (intESPos > 0) {
                         strOptionValue = strOptionName.substring(intESPos + 1);
-                        strOptionValue = StripQuotes(strOptionValue);
+                        strOptionValue = stripQuotes(strOptionValue);
                         strOptionName = strOptionName.substring(0, intESPos);
                         objSettings.put(strOptionName, strOptionValue);
                         if ("password".equalsIgnoreCase(strOptionName) || "proxy_password".equalsIgnoreCase(strOptionName)) {

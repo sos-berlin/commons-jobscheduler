@@ -51,7 +51,7 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         String strArgs[] = new String[] { "-command", "echo ****testExecuteLinux successfully processed!****", "-auth_method", "password", "-host",
                 "homer.sos", "-user", "test", "-password", "12345", "-strict_hostkey_checking", "no", "-ignore_stderr", "false", "-ignore_error",
                 "true", "-raise_exception_on_error", "true", "-command_delimiter", ";" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
         objSSH.execute();
         assertTrue(objSSH.getStdErr().toString().isEmpty());
         objSSH.clear();
@@ -63,7 +63,7 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         String strArgs[] = new String[] { "-command", "echo ****testExecutePublicKeyWithPasshraseLinux successfully processed!****", "-auth_file",
                 "C:\\sp\\testing\\ssh_passphrase_test\\id_rsapp", "-auth_method", "publickey", "-host", "homer.sos", "-port", "22", "-user", "test",
                 "-password", "sosapl", "-command_delimiter", ";" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
         objSSH.execute();
         assertTrue(objSSH.getStdErr().toString().isEmpty());
         objSSH.clear();
@@ -75,7 +75,7 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         String strArgs[] = new String[] { "-command", "echo ****testExecuteLinux successfully processed!****", "-auth_method", "password", "-host",
                 "wilma.sos", "-user", "test", "-password", "12345", "-proxy_host", "homer.sos", "-proxy_port", "3128", "-proxy_user", "proxy_user",
                 "-proxy_password", "12345", "-command_delimiter", ";" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
         objSSH.execute();
         assertTrue(objSSH.getStdErr().toString().isEmpty());
         objSSH.clear();
@@ -86,7 +86,7 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         logger.info("****testExecuteGetShellPidLinux started****");
         String strArgs[] = new String[] { "-command", "echo $$; echo $$", "-auth_method", "password", "-host", "homer.sos", "-user", "test",
                 "-password", "12345", "-command_delimiter", ";" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
         objSSH.execute();
         assertTrue(objSSH.getStdErr().toString().isEmpty());
         objSSH.clear();
@@ -97,7 +97,7 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         logger.info("****testExecuteWithErrors started****");
         String strArgs[] = new String[] { "-command", "ls unknownPath", "-auth_method", "password", "-host", "homer.sos", "-user", "test",
                 "-password", "12345", "-command_delimiter", ";" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
         objSSH.execute();
         assertFalse(objSSH.getStdErr().toString().isEmpty());
         objSSH.clear();
@@ -108,7 +108,7 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         logger.info("****testExecuteUsingKeyFile started****");
         String strArgs[] = new String[] { "-command", "echo ****testExecuteUsingKeyFile successfully processed!****", "-auth_method", "publickey",
                 "-host", "homer.sos", "-auth_file", "src/test/resources/id_rsa", "-user", "test", "-command_delimiter", ";" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
         objSSH.execute();
         assertTrue(objSSH.getStdErr().toString().isEmpty());
         objSSH.clear();
@@ -122,7 +122,7 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
                 "echo MY_PARAM=myParam >> $SCHEDULER_RETURN_VALUES; " + "echo MY_OTHER_PARAM=myOtherParam >> $SCHEDULER_RETURN_VALUES; "
                         + "echo =myParamWithoutKey >> $SCHEDULER_RETURN_VALUES", "-auth_method", "password", "-host", "homer.sos", "-user", "test",
                 "-password", "12345", "-command_delimiter", ";" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
         objSSH.execute();
         assertTrue(objSSH.getStdErr().toString().isEmpty());
         objSSH.clear();
@@ -133,7 +133,7 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         logger.info("****testExecuteWithReturnValues started****");
         String strArgs[] = new String[] { "-command", "echo MY_PARAM=myParam >> $SCHEDULER_RETURN_VALUES", "-auth_method", "password", "-host",
                 "homer.sos", "-user", "test", "-password", "12345", "-command_delimiter", ";" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
         objSSH.execute();
         assertTrue(objSSH.getStdErr().toString().isEmpty());
         objSSH.clear();
@@ -144,7 +144,7 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         logger.info("****testExecuteRemoteScriptWithReturnValues started****");
         String strArgs[] = new String[] { "-command", "./myCommandSp.sh", "-auth_method", "password", "-host", "homer.sos", "-user", "test",
                 "-password", "12345", "-command_delimiter", ";" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
         objSSH.execute();
         assertTrue(objSSH.getStdErr().toString().isEmpty());
         objSSH.clear();
@@ -155,7 +155,7 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         logger.info("****testExecute on Windows started****");
         String strArgs[] = new String[] { "-command", "echo ****testExecuteWindows successfully processed!****", "-auth_method", "password", "-host",
                 "lutest.sos", "-user", "test", "-password", "12345", "-command_delimiter", ";" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
         objSSH.execute();
         assertTrue(objSSH.getStdErr().toString().isEmpty());
         objSSH.clear();
@@ -169,7 +169,7 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
                 "echo MY_PARAM=myParam >> $SCHEDULER_RETURN_VALUES;" + "echo MY_OTHER_PARAM=myOtherParam >> $SCHEDULER_RETURN_VALUES;"
                         + "echo =myParamWithoutKey >> $SCHEDULER_RETURN_VALUES", "-auth_method", "password", "-host", "lutest.sos", "-user", "test",
                 "-password", "12345", "-command_delimiter", ";" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
         objSSH.execute();
         assertTrue(objSSH.getStdErr().toString().isEmpty());
         objSSH.clear();
@@ -180,7 +180,7 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         logger.info("****testExecuteRemoteScriptWithReturnValuesOnWindows started****");
         String strArgs[] = new String[] { "-command", "./test.sh", "-auth_method", "password", "-host", "lutest.sos", "-user", "test", "-password",
                 "12345", "-command_delimiter", ";" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
         objSSH.execute();
         assertTrue(objSSH.getStdErr().toString().isEmpty());
         objSSH.clear();
@@ -191,7 +191,7 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         logger.info("****testExecuteCmdScriptFileOnWindows with OpenSSH via cygwin (CopSSH) started****");
         String strArgs[] = new String[] { "-command_script_file", "src/test/resources/test.sh", "-auth_method", "password", "-host", "lutest.sos",
                 "-user", "test", "-password", "12345", "-command_delimiter", ";" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
         objSSH.execute();
         assertTrue(objSSH.getStdErr().toString().isEmpty());
         objSSH.clear();
@@ -204,7 +204,7 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         String strArgs[] = new String[] { "-command_script_file", "src/test/resources/test.cmd", "-auth_method", "password", "-host", "sp.sos",
                 "-user", "test", "-password", "12345", "-preCommand", "set %1s=%2s", "-postCommandRead", "type %s", "-postCommandDelete", "del %s",
                 "-command_delimiter", "&" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
         objSSH.execute();
         assertTrue(objSSH.getStdErr().toString().isEmpty());
         objSSH.clear();
@@ -217,7 +217,7 @@ public class TestSOSSSHJob2WithJSch extends JSJobUtilitiesClass<SOSSSHJobOptions
         String strArgs[] = new String[] { "-command", "echo ADD='Hallo Welt!' >> %SCHEDULER_RETURN_VALUES%", "-auth_method", "password", "-host",
                 "sp.sos", "-user", "test", "-password", "12345", "-preCommand", "set %1s=%2s", "-postCommandRead", "type %s", "-postCommandDelete",
                 "del %s", "-command_delimiter", "&&" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
         objSSH.execute();
         assertTrue(objSSH.getStdErr().toString().isEmpty());
         objSSH.clear();

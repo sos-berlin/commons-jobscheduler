@@ -259,20 +259,20 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         LOGGER.debug(SOSVfs_D_0101.params(strH, intP));
         try {
             if (objConnection2Options != null) {
-                proxyProtocol = objConnection2Options.proxy_protocol;
-                proxyHost = objConnection2Options.proxy_host.Value();
-                proxyPort = objConnection2Options.proxy_port.value();
-                proxyUser = objConnection2Options.proxy_user.Value();
-                proxyPassword = objConnection2Options.proxy_password.Value();
+                proxyProtocol = objConnection2Options.proxyProtocol;
+                proxyHost = objConnection2Options.proxyHost.Value();
+                proxyPort = objConnection2Options.proxyPort.value();
+                proxyUser = objConnection2Options.proxyUser.Value();
+                proxyPassword = objConnection2Options.proxyPassword.Value();
             }
             this.connect(strH, intP);
             LOGGER.info(SOSVfs_D_0102.params(strH, intP));
             Client().setControlKeepAliveTimeout(180);
         } catch (RuntimeException e) {
             LOGGER.info(SOSVfs_E_0107.params(host, port, e.getMessage()));
-            if (objConnectionOptions.getalternative_host().isDirty()) {
-                String strAltHost = host = objConnectionOptions.getalternative_host().Value();
-                int intAltPort = port = objConnectionOptions.getalternative_port().value();
+            if (objConnectionOptions.getAlternativeHost().isDirty()) {
+                String strAltHost = host = objConnectionOptions.getAlternativeHost().Value();
+                int intAltPort = port = objConnectionOptions.getAlternativePort().value();
                 if (isNotEmpty(strAltHost) && intAltPort > 0) {
                     try {
                         JobSchedulerException.gflgStackTracePrinted = false;
@@ -312,22 +312,22 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         objConnection2Options = pobjConnectionOptions;
         try {
             objHost = objConnection2Options.getHost();
-            objPort = objConnection2Options.getport();
-            proxyProtocol = objConnection2Options.proxy_protocol;
-            proxyHost = objConnection2Options.proxy_host.Value();
-            proxyPort = objConnection2Options.proxy_port.value();
-            proxyUser = objConnection2Options.proxy_user.Value();
-            proxyPassword = objConnection2Options.proxy_password.Value();
+            objPort = objConnection2Options.getPort();
+            proxyProtocol = objConnection2Options.proxyProtocol;
+            proxyHost = objConnection2Options.proxyHost.Value();
+            proxyPort = objConnection2Options.proxyPort.value();
+            proxyUser = objConnection2Options.proxyUser.Value();
+            proxyPassword = objConnection2Options.proxyPassword.Value();
             this.connect(objHost.Value(), objPort.value());
             if (!Client().isConnected()) {
                 SOSConnection2OptionsSuperClass objAlternate = objConnection2Options.Alternatives();
                 objHost = objAlternate.host;
                 objPort = objAlternate.port;
-                proxyProtocol = objAlternate.proxy_protocol;
-                proxyHost = objAlternate.proxy_host.Value();
-                proxyPort = objAlternate.proxy_port.value();
-                proxyUser = objAlternate.proxy_user.Value();
-                proxyPassword = objAlternate.proxy_password.Value();
+                proxyProtocol = objAlternate.proxyProtocol;
+                proxyHost = objAlternate.proxyHost.Value();
+                proxyPort = objAlternate.proxyPort.value();
+                proxyUser = objAlternate.proxyUser.Value();
+                proxyPassword = objAlternate.proxyPassword.Value();
                 LOGGER.info(SOSVfs_I_0121.params(host));
                 this.connect(objHost.Value(), objPort.value());
                 if (!Client().isConnected()) {
@@ -477,7 +477,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         } catch (IOException e) {
             LOGGER.info(e.getLocalizedMessage());
         }
-        if (objOptions.CheckServerFeatures().isTrue()) {
+        if (objOptions.checkServerFeatures().isTrue()) {
             sendCommand("FEAT");
             if (objFTPReply.getCode() == FTPReply.SYSTEM_STATUS) {
                 String[] lines = objFTPReply.getMessages();
@@ -1021,7 +1021,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 
     protected boolean LogReply() {
         strReply = getReplyString();
-        if (objConnection2Options.ProtocolCommandListener.isFalse()) {
+        if (objConnection2Options.protocolCommandListener.isFalse()) {
             LOGGER.trace(strReply);
         }
         return true;
@@ -1422,11 +1422,11 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
             try {
                 Connect(options);
                 Authenticate(options);
-                if (options.passive_mode.value()) {
+                if (options.passiveMode.value()) {
                     passive();
                 }
-                if (options.transfer_mode.isDirty() && options.transfer_mode.IsNotEmpty()) {
-                    TransferMode(options.transfer_mode);
+                if (options.transferMode.isDirty() && options.transferMode.IsNotEmpty()) {
+                    TransferMode(options.transferMode);
                 }
             } catch (JobSchedulerException e) {
                 throw e;

@@ -73,9 +73,9 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         initializeClazz();
         String strArgs[] = new String[] { "-command", "ls", "-auth_method", "password", "-host", "wilma.sos", "-auth_file=test", "-user=test",
                 "-password", "12345" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
         objSSH.execute();
-        assertEquals("auth_file", objOptions.auth_file.Value(), "test");
+        assertEquals("auth_file", objOptions.authFile.Value(), "test");
         assertEquals("user", objOptions.user.Value(), "test");
     }
 
@@ -85,9 +85,9 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         initializeClazz();
         String strArgs[] = new String[] { "-command", "ls", "-auth_method=publickey", "-host", "wilma.sos",
                 "-auth_file=./src/test/resources/testing-key.key", "-user", "test", "-password", "12345" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
         objSSH.execute();
-        assertEquals("auth_file", objOptions.auth_file.Value(), "test");
+        assertEquals("auth_file", objOptions.authFile.Value(), "test");
         assertEquals("user", objOptions.user.Value(), "test");
     }
 
@@ -96,9 +96,9 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         initializeClazz();
         String strArgs[] = new String[] { "-command", "ls;exit 5", "-auth_method", "password", "-host", "wilma.sos", "-auth_file", "test", "-user",
                 "kb", "-password", "kb" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
         objSSH.execute();
-        assertEquals("auth_file", objOptions.auth_file.Value(), "test");
+        assertEquals("auth_file", objOptions.authFile.Value(), "test");
         assertEquals("user", objOptions.user.Value(), "test");
         assertEquals("ExitCode not as expected", objSSH.getCC(), 5);
     }
@@ -108,9 +108,9 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         initializeClazz();
         String strArgs[] = new String[] { "-command", "ls hallo;exit 0", "-auth_method", "password", "-host", "wilma.sos", "-auth_file", "test",
                 "-user", "test", "-password", "12345", "-ignore_stderr", "true" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
         objSSH.execute();
-        assertEquals("auth_file", objOptions.auth_file.Value(), "test");
+        assertEquals("auth_file", objOptions.authFile.Value(), "test");
         assertEquals("user", objOptions.user.Value(), "test");
         assertEquals("ExitCode not as expected", objSSH.getCC(), 0);
     }
@@ -120,9 +120,9 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         initializeClazz();
         String strArgs[] = new String[] { "-command", "ls hallo;exit 0", "-auth_method", "password", "-host", "wilma.sos", "-auth_file", "test",
                 "-user", "test", "-password", "12345", "-ignore_stderr", "false" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
         objSSH.execute();
-        assertEquals("auth_file", objOptions.auth_file.Value(), "test");
+        assertEquals("auth_file", objOptions.authFile.Value(), "test");
         assertEquals("user", objOptions.user.Value(), "test");
         assertEquals("ExitCode not as expected", objSSH.getCC(), 0);
     }
@@ -139,9 +139,9 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         initializeClazz();
         String strArgs[] = new String[] { "-command", "ls hallo%%exit 0", "-auth_method", "password", "-host", "wilma.sos", "-auth_file", "test",
                 "-user", "test", "-password", "12345", "-ignore_stderr", "false" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
         objSSH.execute();
-        assertEquals("auth_file", objOptions.auth_file.Value(), "test");
+        assertEquals("auth_file", objOptions.authFile.Value(), "test");
         assertEquals("user", objOptions.user.Value(), "test");
         assertEquals("ExitCode not as expected", objSSH.getCC(), 0);
     }
@@ -151,9 +151,9 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         initializeClazz();
         String strArgs[] = new String[] { "-command_script", "ps;ls", "-auth_method", "password", "-host", "wilma.sos", "-auth_file", "test",
                 "-user", "test", "-password", "12345" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
         objSSH.execute();
-        assertEquals("auth_file", objOptions.auth_file.Value(), "test");
+        assertEquals("auth_file", objOptions.authFile.Value(), "test");
         assertEquals("user", objOptions.user.Value(), "test");
     }
 
@@ -162,9 +162,9 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         initializeClazz();
         String strArgs[] = new String[] { "-command_script_file", "R:/nobackup/junittests/testdata/SSH/hostname.sh", "-auth_method", "password",
                 "-host", "wilma.sos", "-auth_file", "test", "-user", "test", "-password", "12345" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
         objSSH.execute();
-        assertEquals("auth_file", objOptions.auth_file.Value(), "test");
+        assertEquals("auth_file", objOptions.authFile.Value(), "test");
         assertEquals("user", objOptions.user.Value(), "test");
     }
 
@@ -173,7 +173,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         initializeClazz();
         String strArgs[] = new String[] { "-command_script", "ps;ls $SCHEDULER_PARAM_test", "-auth_method", "password", "-host", "wilma.sos",
                 "-auth_file", "test", "-user", "test", "-password", "12345" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
         objSSH.setJSJobUtilites(this);
         objSSH.execute();
 
@@ -181,7 +181,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
         // assertEquals("strCmd", "ps", strCmd[0]);
         // assertEquals("strCmd", "ls .", strCmd[1]);
-        assertEquals("auth_file", objOptions.auth_file.Value(), "test");
+        assertEquals("auth_file", objOptions.authFile.Value(), "test");
         assertEquals("user", objOptions.user.Value(), "test");
     }
 
@@ -195,7 +195,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
         String strArgs[] = new String[] { "-command_script_file", "t.1", "-auth_method", "password", "-host", "wilma.sos", "-auth_file", "test",
                 "-user", "test", "-password", "12345" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
         objSSH.setJSJobUtilites(this);
         objSSH.execute();
 
@@ -203,7 +203,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
         // assertEquals("strCmd", "ps", strCmd[0]);
         // assertEquals("strCmd", "ls .", strCmd[1]);
-        assertEquals("auth_file", objOptions.auth_file.Value(), "test");
+        assertEquals("auth_file", objOptions.authFile.Value(), "test");
         assertEquals("user", objOptions.user.Value(), "test");
     }
 
@@ -214,7 +214,7 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         String strArgs[] = new String[] { "-command", "ls", "-auth_method", "password", "-host", "wilma.sos", "-port", "22", "-user", "test",
                 "-password", "12345", "-simulate_shell", "true", "-simulate_shell_prompt_trigger", "test@192:~>", "-simulate_shell_login_timeout",
                 "100000" };
-        objOptions.CommandLineArgs(strArgs);
+        objOptions.commandLineArgs(strArgs);
         objSSH.execute();
     }
 

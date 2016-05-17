@@ -127,7 +127,7 @@ public class SOSVfsWebDAVTest {
         // objSource.proxy_port.value(3128);
         objSource.password.Value(WEB_PASS);
         objSource.protocol.Value("webdav");
-        objSource.ssh_auth_method.isURL(true);
+        objSource.sshAuthMethod.isURL(true);
 
         objVFS.Authenticate(objSource);
     }

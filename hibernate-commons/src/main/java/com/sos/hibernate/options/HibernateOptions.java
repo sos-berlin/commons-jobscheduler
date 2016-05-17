@@ -425,10 +425,10 @@ public class HibernateOptions extends JSOptionsClass implements IHibernateOption
      * @throws Exception - wird ausgelöst, wenn eine mandatory-Option keinen
      *             Wert hat */
     @Override
-    public void CheckMandatory() throws JSExceptionMandatoryOptionMissing //
+    public void checkMandatory() throws JSExceptionMandatoryOptionMissing //
             , Exception {
         try {
-            super.CheckMandatory();
+            super.checkMandatory();
         } catch (Exception e) {
             throw new JSExceptionMandatoryOptionMissing(e.toString());
         }
@@ -446,8 +446,8 @@ public class HibernateOptions extends JSOptionsClass implements IHibernateOption
      * @param pstrArgs
      * @throws Exception */
     @Override
-    public void CommandLineArgs(String[] pstrArgs) {
-        super.CommandLineArgs(pstrArgs);
+    public void commandLineArgs(String[] pstrArgs) {
+        super.commandLineArgs(pstrArgs);
         this.setAllOptions(super.objSettings);
     }
 

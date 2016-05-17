@@ -43,7 +43,7 @@ public class SOSVfsCsvExport extends SOSVfsMessageCodes implements ISOSTransferH
                     .AddCellValue(objOptions.Source().host.getHostAdress()).AddCellValue(objOptions.Source().user.Value())
                     .AddCellValue(objOptions.Target().host.Value()).AddCellValue(objOptions.Target().host.getHostAdress())
                     .AddCellValue(objOptions.Target().user.Value()).AddCellValue(objOptions.protocol.Value()).AddCellValue(objOptions.port.Value())
-                    .AddCellValue(objOptions.SourceDir.Value()).AddCellValue(objOptions.TargetDir.Value()).AddCellValue(" ")
+                    .AddCellValue(objOptions.sourceDir.Value()).AddCellValue(objOptions.targetDir.Value()).AddCellValue(" ")
                     .AddCellValue(" ").AddCellValue(" ").AddCellValue(" ").AddCellValue(" ").AddCellValue(last_error_message)
                     .AddCellValue(objOptions.log_filename.Value()).AddCellValue(" ").AddCellValue(" ").AddCellValue(" ").AddCellValue(" ").AddCellValue(" ")
                     .NewLine();

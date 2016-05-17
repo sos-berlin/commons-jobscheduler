@@ -71,7 +71,7 @@ public class SOSVfsHTTPTest {
     public void setUp() throws Exception {
         objOptions = new SOSFTPOptions(SOSOptionTransferType.enuTransferTypes.http);
         objOptions.protocol.Value(SOSOptionTransferType.enuTransferTypes.http);
-        objOptions.auth_method.isURL(true);
+        objOptions.authMethod.isURL(true);
         objSource = objOptions.getConnectionOptions().Source();
         objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
         objVfsClient = (ISOSVfsFileTransfer) objVFS;

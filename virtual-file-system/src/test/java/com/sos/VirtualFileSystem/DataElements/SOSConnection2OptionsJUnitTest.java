@@ -32,10 +32,10 @@ public class SOSConnection2OptionsJUnitTest extends JSToolBox {
     @Test
     public void testPreCommand() {
         String strCmd = "chmod $TargetfileName 777";
-        objOptions.Source().Pre_Command.Value(strCmd);
-        assertEquals("chmod ", strCmd, objOptions.Source().Pre_Command.Value());
-        objOptions.Target().Pre_Command.Value(strCmd);
-        assertEquals("chmod ", strCmd, objOptions.Target().Pre_Command.Value());
+        objOptions.Source().preCommand.Value(strCmd);
+        assertEquals("chmod ", strCmd, objOptions.Source().preCommand.Value());
+        objOptions.Target().preCommand.Value(strCmd);
+        assertEquals("chmod ", strCmd, objOptions.Target().preCommand.Value());
     }
 
     @Test
@@ -46,10 +46,10 @@ public class SOSConnection2OptionsJUnitTest extends JSToolBox {
 
     @Test
     public void testpassive_mode() {
-        objOptions.passive_mode.Value("true");
-        assertTrue("passive_mode Passive mode for FTP is often used wit", objOptions.passive_mode.value());
-        objOptions.passive_mode.Value("false");
-        assertFalse("passive_mode Passive mode for FTP is often used wit", objOptions.passive_mode.value());
+        objOptions.passiveMode.Value("true");
+        assertTrue("passive_mode Passive mode for FTP is often used wit", objOptions.passiveMode.value());
+        objOptions.passiveMode.Value("false");
+        assertFalse("passive_mode Passive mode for FTP is often used wit", objOptions.passiveMode.value());
     }
 
     @Test
@@ -66,8 +66,8 @@ public class SOSConnection2OptionsJUnitTest extends JSToolBox {
 
     @Test
     public void testtransfer_mode() {
-        objOptions.transfer_mode.Value("++binary++");
-        assertEquals("Type of Character-Encoding Transfe", objOptions.transfer_mode.Value(), "++binary++");
+        objOptions.transferMode.Value("++binary++");
+        assertEquals("Type of Character-Encoding Transfe", objOptions.transferMode.Value(), "++binary++");
     }
 
     @Test

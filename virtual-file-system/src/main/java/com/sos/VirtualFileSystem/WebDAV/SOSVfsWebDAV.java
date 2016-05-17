@@ -72,10 +72,10 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
     public ISOSConnection Authenticate(final ISOSAuthenticationOptions options) {
         authenticationOptions = options;
         try {
-            proxyHost = connection2OptionsAlternate.proxy_host.Value();
-            proxyPort = connection2OptionsAlternate.proxy_port.value();
-            proxyUser = connection2OptionsAlternate.proxy_user.Value();
-            proxyPassword = connection2OptionsAlternate.proxy_password.Value();
+            proxyHost = connection2OptionsAlternate.proxyHost.Value();
+            proxyPort = connection2OptionsAlternate.proxyPort.value();
+            proxyUser = connection2OptionsAlternate.proxyUser.Value();
+            proxyPassword = connection2OptionsAlternate.proxyPassword.Value();
             this.doAuthenticate(authenticationOptions);
         } catch (JobSchedulerException ex) {
             throw ex;
@@ -533,7 +533,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
         rootUrl = null;
         HttpURL httpUrl = null;
         String path = "/";
-        if (connection2OptionsAlternate.auth_method.isURL()) {
+        if (connection2OptionsAlternate.authMethod.isURL()) {
             URL url = new URL(phost);
             String phostRootUrl = url.getProtocol() + "://" + url.getAuthority();
             if (url.getPort() == -1) {
@@ -552,7 +552,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
             if ("https".equalsIgnoreCase(httpUrl.getScheme())) {
                 rootUrl = new HttpsURL(phostRootUrl);
                 StrictSSLProtocolSocketFactory psf = new StrictSSLProtocolSocketFactory();
-                psf.setCheckHostname(connection2OptionsAlternate.verify_certificate_hostname.value());
+                psf.setCheckHostname(connection2OptionsAlternate.verifyCertificateHostname.value());
                 if (!psf.getCheckHostname()) {
                     LOGGER.info("*********************** Security warning *********************************************************************");
                     LOGGER.info("Jade option \"verify_certificate_hostname\" is currently \"false\". ");
@@ -560,7 +560,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
                     LOGGER.info("with the hostname of the server in the URL used by the Jade client.");
                     LOGGER.info("**************************************************************************************************************");
                 }
-                if (connection2OptionsAlternate.accept_untrusted_certificate.value()) {
+                if (connection2OptionsAlternate.acceptUntrustedCertificate.value()) {
                     psf.useDefaultJavaCiphers();
                     psf.addTrustMaterial(TrustMaterial.TRUST_ALL);
                 }
@@ -624,8 +624,8 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
         } catch (JobSchedulerException ex) {
             throw ex;
         } catch (Exception ex) {
-            throw new JobSchedulerException(SOSVfs_E_167.params(authenticationOptions.getAuth_method().Value(),
-                    authenticationOptions.getAuth_file().Value()), ex);
+            throw new JobSchedulerException(SOSVfs_E_167.params(authenticationOptions.getAuthMethod().Value(),
+                    authenticationOptions.getAuthFile().Value()), ex);
         }
         reply = "OK";
         LOGGER.info(SOSVfs_D_133.params(userName));
@@ -644,7 +644,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
         if (SOSString.isEmpty(msg)) {
             msg = "no details provided.";
             if (uri.toLowerCase().startsWith("https://") && client.getStatusCode() == 0
-                    && !connection2OptionsAlternate.accept_untrusted_certificate.value()) {
+                    && !connection2OptionsAlternate.acceptUntrustedCertificate.value()) {
                 msg += " maybe is this the problem by using of a self-signed certificate (option accept_untrusted_certificate = false)";
             }
         }
@@ -658,7 +658,7 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
     private void connect(final String phost, final int pport) throws Exception {
         host = phost;
         port = pport;
-        if (connection2OptionsAlternate.auth_method.isURL()) {
+        if (connection2OptionsAlternate.authMethod.isURL()) {
             URL url = new URL(phost);
             port = (url.getPort() == -1) ? url.getDefaultPort() : url.getPort();
         }

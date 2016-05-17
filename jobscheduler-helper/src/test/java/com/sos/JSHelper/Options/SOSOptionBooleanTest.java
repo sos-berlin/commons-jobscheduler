@@ -133,20 +133,20 @@ public class SOSOptionBooleanTest {
     }
 
     /** Test method for
-     * {@link com.sos.JSHelper.Options.SOSOptionBoolean#String2Bool(java.lang.String)}
+     * {@link com.sos.JSHelper.Options.SOSOptionBoolean#string2Bool(java.lang.String)}
      * . */
     @Test
     public void testString2Bool() {
         // fail("Not yet implemented");
-        assertTrue("Must be true", objOption.String2Bool("on"));
-        assertTrue("Must be true", objOption.String2Bool("true"));
-        assertTrue("Must be true", objOption.String2Bool("1"));
-        assertTrue("Must be true", objOption.String2Bool("yes"));
+        assertTrue("Must be true", objOption.string2Bool("on"));
+        assertTrue("Must be true", objOption.string2Bool("true"));
+        assertTrue("Must be true", objOption.string2Bool("1"));
+        assertTrue("Must be true", objOption.string2Bool("yes"));
 
-        assertFalse("Must be false", objOption.String2Bool("no"));
-        assertFalse("Must be false", objOption.String2Bool("false"));
-        assertFalse("Must be false", objOption.String2Bool("0"));
-        assertFalse("Must be false", objOption.String2Bool("off"));
+        assertFalse("Must be false", objOption.string2Bool("no"));
+        assertFalse("Must be false", objOption.string2Bool("false"));
+        assertFalse("Must be false", objOption.string2Bool("0"));
+        assertFalse("Must be false", objOption.string2Bool("off"));
     }
 
     /** Test method for

@@ -128,9 +128,9 @@ public class SOSConnection2Options extends SOSConnection2OptionsSuperClass {
      *             Wert hat */
     @Override
     // SOSConnection2OptionsSuperClass
-    public void CheckMandatory() {
+    public void checkMandatory() {
         try {
-            super.CheckMandatory();
+            super.checkMandatory();
         } catch (Exception e) {
             throw new JSExceptionMandatoryOptionMissing(e.toString());
         }

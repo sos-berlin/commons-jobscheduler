@@ -35,7 +35,7 @@ public class JSArchiver extends JSListenerClass {
 
     public void Options(final JSArchiverOptions pobjOptions) throws Exception {
         objOptions = pobjOptions;
-        objOptions.CheckMandatory();
+        objOptions.checkMandatory();
     }
 
     public void Archive(final JSArchiverOptions pobjArchiveOptions) throws Exception {
@@ -68,7 +68,7 @@ public class JSArchiver extends JSListenerClass {
             SignalAbort(String.format("%1$s: no Options specified. Archive aborted.", conMethodName));
         }
 
-        objOptions.CheckMandatory();
+        objOptions.checkMandatory();
 
         strFileName = objOptions.FileName();
         JSFile fileToArchive = new JSFile(strFileName);

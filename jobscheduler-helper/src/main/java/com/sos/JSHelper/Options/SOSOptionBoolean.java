@@ -72,7 +72,7 @@ public class SOSOptionBoolean extends SOSOptionElement {
         } else {
             super.Value("");
         }
-        flgValue = String2Bool(strValue);
+        flgValue = string2Bool(strValue);
     }
 
     public void value(final boolean pflgValue) {

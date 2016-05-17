@@ -142,7 +142,7 @@ public class JSCsvFileOptions extends JSOptionsClass {
     } // public void setAllOptions (HashMap <String, String> JSSettings)
 
     @Override
-    public void CheckMandatory() throws Exception {
+    public void checkMandatory() throws Exception {
 
         try {
             this.Delimiter(this.Delimiter());
