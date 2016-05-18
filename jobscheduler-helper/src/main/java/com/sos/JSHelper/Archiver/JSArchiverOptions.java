@@ -73,7 +73,7 @@ public class JSArchiverOptions extends JSOptionsClass {
     }
 
     @Override
-    public void CheckMandatory() throws Exception {
+    public void checkMandatory() throws Exception {
         this.FileName(this.FileName());
         this.ArchiveFolderName(this.ArchiveFolderName());
     }

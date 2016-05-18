@@ -313,7 +313,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
         } else {
             if (pstrValue.toLowerCase().startsWith(constPrefixForEnviromentVariables)) {
                 String strEnvVarName = pstrValue.substring(4);
-                String strEnvVarValue = EnvironmentVariable(strEnvVarName);
+                String strEnvVarValue = environmentVariable(strEnvVarName);
                 if (isEmpty(strEnvVarValue)) {
                     strRet = System.getProperty(strEnvVarName);
                     if (isEmpty(strRet)) {
@@ -328,7 +328,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
                     int iTo = pstrValue.indexOf("}");
                     if (iTo != -1) {
                         String strEnvVarName = pstrValue.substring(iFrom + 2, iTo);
-                        String strEnvVarValue = EnvironmentVariable(strEnvVarName);
+                        String strEnvVarValue = environmentVariable(strEnvVarName);
                         if (strEnvVarValue == null) {
                             strEnvVarValue = "";
                         }
@@ -563,7 +563,7 @@ public class SOSOptionElement extends JSToolBox implements Serializable, ISOSOpt
         return flgT;
     }
 
-    public String StripQuotes(final String pstrS) {
+    public String stripQuotes(final String pstrS) {
         String strR = pstrS;
         if ("\"".equals(pstrS.substring(0, 1)) && "\"".equals(pstrS.substring(pstrS.length() - 1))) {
             strR = pstrS.substring(1, pstrS.length() - 1);

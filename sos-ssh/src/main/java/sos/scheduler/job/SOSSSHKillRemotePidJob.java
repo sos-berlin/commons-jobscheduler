@@ -35,7 +35,7 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch {
         try {
             if (!vfsHandler.isConnected()) {
                 SOSConnection2OptionsAlternate postAlternateOptions = getAlternateOptions(objOptions);
-                postAlternateOptions.raise_exception_on_error.value(false);
+                postAlternateOptions.raiseExceptionOnError.value(false);
                 vfsHandler.Connect(postAlternateOptions);
             }
             vfsHandler.Authenticate(objOptions);
@@ -49,7 +49,7 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch {
     @Override
     public SOSSSHJob2 connect() {
         getVFS();
-        getOptions().CheckMandatory();
+        getOptions().checkMandatory();
         try {
             SOSConnection2OptionsAlternate alternateOptions = getAlternateOptions(objOptions);
             vfsHandler.Connect(alternateOptions);
@@ -67,10 +67,10 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch {
     @Override
     public SOSSSHJob2 execute() throws Exception {
         vfsHandler.setJSJobUtilites(objJSJobUtilities);
-        boolean configuredRaiseExeptionOnError = objOptions.raise_exception_on_error.value();
-        boolean configuredIgnoreError = objOptions.ignore_error.value();
-        objOptions.raise_exception_on_error.value(false);
-        objOptions.ignore_error.value(true);
+        boolean configuredRaiseExeptionOnError = objOptions.raiseExceptionOnError.value();
+        boolean configuredIgnoreError = objOptions.ignoreError.value();
+        objOptions.raiseExceptionOnError.value(false);
+        objOptions.ignoreError.value(true);
         openSession();
         List<Integer> pidsToKillFromOrder = getPidsToKillFromOrder();
         try {
@@ -86,22 +86,22 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch {
                 processKillCommand(pid);
             }
         } catch (Exception e) {
-            if (objOptions.raise_exception_on_error.value()) {
-                if (objOptions.ignore_error.value()) {
-                    if (objOptions.ignore_stderr.value()) {
-                        LOGGER.debug(this.StackTrace2String(e));
+            if (objOptions.raiseExceptionOnError.value()) {
+                if (objOptions.ignoreError.value()) {
+                    if (objOptions.ignoreStderr.value()) {
+                        LOGGER.debug(this.stackTrace2String(e));
                     } else {
-                        LOGGER.error(this.StackTrace2String(e));
+                        LOGGER.error(this.stackTrace2String(e));
                         throw new SSHExecutionError("Exception raised: " + e, e);
                     }
                 } else {
-                    LOGGER.error(this.StackTrace2String(e));
+                    LOGGER.error(this.stackTrace2String(e));
                     throw new SSHExecutionError("Exception raised: " + e, e);
                 }
             }
         } finally {
-            objOptions.raise_exception_on_error.value(configuredRaiseExeptionOnError);
-            objOptions.ignore_error.value(configuredIgnoreError);
+            objOptions.raiseExceptionOnError.value(configuredRaiseExeptionOnError);
+            objOptions.ignoreError.value(configuredIgnoreError);
         }
         return this;
     }
@@ -137,9 +137,9 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch {
                     if (stdErr.contains("No such process")) {
                         LOGGER.debug("meanwhile the remote process is not available anymore!");
                     } else {
-                        if (objOptions.raise_exception_on_error.value()) {
-                            if (objOptions.ignore_error.value()) {
-                                if (objOptions.ignore_stderr.value()) {
+                        if (objOptions.raiseExceptionOnError.value()) {
+                            if (objOptions.ignoreError.value()) {
+                                if (objOptions.ignoreStderr.value()) {
                                     LOGGER.debug("error occured while trying to execute command");
                                 } else {
                                     LOGGER.error("error occured while trying to execute command");
@@ -159,8 +159,8 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch {
     }
 
     private void getKillCommandFromJobParameters() {
-        if (objOptions.ssh_job_kill_pid_command.isDirty() && !objOptions.ssh_job_kill_pid_command.Value().isEmpty()) {
-            ssh_job_kill_pid_command = objOptions.ssh_job_kill_pid_command.Value();
+        if (objOptions.sshJobKillPidCommand.isDirty() && !objOptions.sshJobKillPidCommand.Value().isEmpty()) {
+            ssh_job_kill_pid_command = objOptions.sshJobKillPidCommand.Value();
             LOGGER.debug("Command to kill from Job Parameter used!");
         } else {
             if (flgIsWindowsShell) {
@@ -174,16 +174,16 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch {
     }
 
     private boolean executeGetAllChildProcesses(Integer pPid) {
-        boolean configuredRaiseExeptionOnError = objOptions.raise_exception_on_error.value();
-        boolean configuredIgnoreError = objOptions.ignore_error.value();
-        objOptions.raise_exception_on_error.value(false);
-        objOptions.ignore_error.value(true);
+        boolean configuredRaiseExeptionOnError = objOptions.raiseExceptionOnError.value();
+        boolean configuredIgnoreError = objOptions.ignoreError.value();
+        objOptions.raiseExceptionOnError.value(false);
+        objOptions.ignoreError.value(true);
         try {
             String command;
-            if (objOptions.getssh_job_get_child_processes_command().Value().contains(PID_PLACEHOLDER)) {
-                command = objOptions.getssh_job_get_child_processes_command().Value().replace(PID_PLACEHOLDER, pPid.toString());
+            if (objOptions.getSshJobGetChildProcessesCommand().Value().contains(PID_PLACEHOLDER)) {
+                command = objOptions.getSshJobGetChildProcessesCommand().Value().replace(PID_PLACEHOLDER, pPid.toString());
             } else {
-                command = objOptions.getssh_job_get_child_processes_command().Value();
+                command = objOptions.getSshJobGetChildProcessesCommand().Value();
             }
             LOGGER.debug("***Execute read children of pid command!***");
             vfsHandler.ExecuteCommand(command);
@@ -213,8 +213,8 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch {
             LOGGER.error(e.getMessage(), e);
             return false;
         } finally {
-            objOptions.raise_exception_on_error.value(configuredRaiseExeptionOnError);
-            objOptions.ignore_error.value(configuredIgnoreError);
+            objOptions.raiseExceptionOnError.value(configuredRaiseExeptionOnError);
+            objOptions.ignoreError.value(configuredIgnoreError);
         }
     }
 

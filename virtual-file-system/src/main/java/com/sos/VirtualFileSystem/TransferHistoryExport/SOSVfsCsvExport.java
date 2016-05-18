@@ -38,14 +38,15 @@ public class SOSVfsCsvExport extends SOSVfsMessageCodes implements ISOSTransferH
         pid = strA[0];
         String last_error_message = "";
         try {
-            objCSVFile.AddCellValue(" ").AddCellValue(objOptions.mandator.Value()).AddCellValue(" ").AddCellValue(pid).AddCellValue("0").AddCellValue(
-                    objOptions.operation.Value()).AddCellValue(objOptions.Source().host.Value()).AddCellValue(
-                    objOptions.Source().host.getHostAdress()).AddCellValue(objOptions.Source().user.Value()).AddCellValue(
-                    objOptions.Target().host.Value()).AddCellValue(objOptions.Target().host.getHostAdress()).AddCellValue(
-                    objOptions.Target().user.Value()).AddCellValue(objOptions.protocol.Value()).AddCellValue(objOptions.port.Value()).AddCellValue(
-                    objOptions.SourceDir.Value()).AddCellValue(objOptions.TargetDir.Value()).AddCellValue(" ").AddCellValue(" ").AddCellValue(" ").AddCellValue(
-                    " ").AddCellValue(" ").AddCellValue(last_error_message).AddCellValue(objOptions.log_filename.Value()).AddCellValue(" ").AddCellValue(
-                    " ").AddCellValue(" ").AddCellValue(" ").AddCellValue(" ").NewLine();
+            objCSVFile.AddCellValue(" ").AddCellValue(objOptions.mandator.Value()).AddCellValue(" ").AddCellValue(pid).AddCellValue("0")
+                    .AddCellValue(objOptions.operation.Value()).AddCellValue(objOptions.Source().host.Value())
+                    .AddCellValue(objOptions.Source().host.getHostAdress()).AddCellValue(objOptions.Source().user.Value())
+                    .AddCellValue(objOptions.Target().host.Value()).AddCellValue(objOptions.Target().host.getHostAdress())
+                    .AddCellValue(objOptions.Target().user.Value()).AddCellValue(objOptions.protocol.Value()).AddCellValue(objOptions.port.Value())
+                    .AddCellValue(objOptions.sourceDir.Value()).AddCellValue(objOptions.targetDir.Value()).AddCellValue(" ")
+                    .AddCellValue(" ").AddCellValue(" ").AddCellValue(" ").AddCellValue(" ").AddCellValue(last_error_message)
+                    .AddCellValue(objOptions.log_filename.Value()).AddCellValue(" ").AddCellValue(" ").AddCellValue(" ").AddCellValue(" ").AddCellValue(" ")
+                    .NewLine();
         } catch (Exception e) {
             LOGGER.error(e.getLocalizedMessage());
             throw new JobSchedulerException(SOSVfs_E_260.params(conMethodName), e);

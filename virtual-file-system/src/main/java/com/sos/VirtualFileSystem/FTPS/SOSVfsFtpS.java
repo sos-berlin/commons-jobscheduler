@@ -34,9 +34,8 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
     protected FTPSClient Client() {
         if (client == null) {
             try {
-                LOGGER.info(String.format("use %s client security", objConnection2Options.ftps_client_security.Value()));
-
-                client = new FTPSClient(objConnection2Options.FtpS_protocol.Value(), objConnection2Options.ftps_client_security.isImplicit());
+                LOGGER.info(String.format("use %s client security", objConnection2Options.ftpsClientSecurity.Value()));
+                client = new FTPSClient(objConnection2Options.ftpsProtocol.Value(), objConnection2Options.ftpsClientSecurity.isImplicit());
                 if (usingProxy()) {
                     LOGGER.info(String.format("using proxy: protocol = %s, host = %s, port = %s, user = %s, pass = ?", getProxyProtocol().Value(),
                             getProxyHost(), getProxyPort(), getProxyUser()));
@@ -50,8 +49,7 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
                         ProxySelector.setDefault(ps);
                     }
                 }
-
-                if (!SOSString.isEmpty(objConnection2Options.keystore_file.Value())) {
+                if (!SOSString.isEmpty(objConnection2Options.keystoreFile.Value())) {
                     setTrustManager(client);
                 }
 
@@ -59,7 +57,7 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
                 throw new JobSchedulerException("can not create FTPS-Client", e);
             }
             objProtocolCommandListener = new SOSFtpClientLogger(HostID(""));
-            if (objConnection2Options != null && objConnection2Options.ProtocolCommandListener.isTrue()) {
+            if (objConnection2Options != null && objConnection2Options.protocolCommandListener.isTrue()) {
                 client.addProtocolCommandListener(objProtocolCommandListener);
             }
 
@@ -92,11 +90,10 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
     }
 
     private void setTrustManager(FTPSClient client) throws Exception {
-        LOGGER.info(String.format("using keystore: type = %s, file = %s", objConnection2Options.keystore_type.Value(),
-                objConnection2Options.keystore_file.Value()));
-        KeyStore ks =
-                loadKeyStore(objConnection2Options.keystore_type.Value(), new File(objConnection2Options.keystore_file.Value()),
-                        objConnection2Options.keystore_password.Value());
+        LOGGER.info(String.format("using keystore: type = %s, file = %s", objConnection2Options.keystoreType.Value(),
+                objConnection2Options.keystoreFile.Value()));
+        KeyStore ks = loadKeyStore(objConnection2Options.keystoreType.Value(), new File(objConnection2Options.keystoreFile.Value()),
+                objConnection2Options.keystorePassword.Value());
         client.setTrustManager(TrustManagerUtils.getDefaultTrustManager(ks));
     }
 }

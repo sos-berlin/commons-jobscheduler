@@ -108,14 +108,13 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
         try {
             isConnected = false;
             this.setSshConnection(new Connection(objCO.getHost().Value(), objCO.getPort().value()));
-            if (objCO.getProxy_host().IsNotEmpty()) {
+            if (objCO.getProxyHost().IsNotEmpty()) {
                 HTTPProxyData objProxy = null;
-                if (objCO.getProxy_user().IsEmpty()) {
-                    objProxy = new HTTPProxyData(objCO.getProxy_host().Value(), objCO.getProxy_port().value());
+                if (objCO.getProxyUser().IsEmpty()) {
+                    objProxy = new HTTPProxyData(objCO.getProxyHost().Value(), objCO.getProxyPort().value());
                 } else {
-                    objProxy =
-                            new HTTPProxyData(objCO.getProxy_host().Value(), objCO.getProxy_port().value(), objCO.getProxy_user().Value(),
-                                    objCO.getProxy_password().Value());
+                    objProxy = new HTTPProxyData(objCO.getProxyHost().Value(), objCO.getProxyPort().value(), objCO.getProxyUser().Value(), objCO
+                            .getProxyPassword().Value());
                 }
                 this.getSshConnection().setProxyData(objProxy);
             }
@@ -286,11 +285,11 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
         objAO = pobjAO;
         String strUserID = objAO.getUser().Value();
         String strPW = objAO.getPassword().Value();
-        if (objAO.getAuth_method().isPublicKey()) {
-            objAO.getAuth_file().CheckMandatory(true);
-            File authenticationFile = objAO.getAuth_file().JSFile();
+        if (objAO.getAuthMethod().isPublicKey()) {
+            objAO.getAuthFile().CheckMandatory(true);
+            File authenticationFile = objAO.getAuthFile().JSFile();
             isAuthenticated = getSshConnection().authenticateWithPublicKey(strUserID, authenticationFile, strPW);
-        } else if (objAO.getAuth_method().isPassword()) {
+        } else if (objAO.getAuthMethod().isPassword()) {
             isAuthenticated = getSshConnection().authenticateWithPassword(strUserID, strPW);
         }
         if (!isAuthenticated) {
@@ -459,9 +458,9 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
         }
         try {
             this.setSshSession(this.getSshConnection().openSession());
-            if (objSO.getSimulate_shell().value()) {
-                long loginTimeout = objSO.getSimulate_shell_login_timeout().value();
-                String strPromptTrigger = objSO.getSimulate_shell_prompt_trigger().Value();
+            if (objSO.getSimulateShell().value()) {
+                long loginTimeout = objSO.getSimulateShellLoginTimeout().value();
+                String strPromptTrigger = objSO.getSimulateShellPromptTrigger().Value();
                 LOGGER.debug(SOSVfs_D_246.params("PTY"));
                 this.getSshSession().requestDumbPTY();
                 LOGGER.debug(SOSVfs_D_247.params("shell"));
@@ -482,7 +481,7 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
                     }
                 }
             } else {
-                if (!objSO.getIgnore_hangup_signal().value()) {
+                if (!objSO.getIgnoreHangupSignal().value()) {
                     sshSession.requestPTY("vt100");
                 }
             }
@@ -510,9 +509,9 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
         intExitStatus = null;
         strExitSignal = null;
         String strCmd = pstrCmd;
-        if (!objSO.getSimulate_shell().value()) {
-            long lngInactivityTimeout = objSO.getSimulate_shell_inactivity_timeout().value();
-            String strPromptTrigger = objSO.getSimulate_shell_prompt_trigger().Value();
+        if (!objSO.getSimulateShell().value()) {
+            long lngInactivityTimeout = objSO.getSimulateShellInactivityTimeout().value();
+            String strPromptTrigger = objSO.getSimulateShellPromptTrigger().Value();
             stdinWriter.write(strCmd + "\n");
             stdinWriter.flush();
             boolean prompt = false;

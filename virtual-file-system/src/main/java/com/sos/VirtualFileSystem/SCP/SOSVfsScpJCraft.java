@@ -534,27 +534,27 @@ public class SOSVfsScpJCraft extends SOSVfsTransferBaseClass {
         String password = authenticationOptions.getPassword().Value();
         logger.debug(SOSVfs_D_132.params(userName));
         this.createSession(userName, host, port);
-        if (authenticationOptions.getAuth_method().isPublicKey()) {
+        if (authenticationOptions.getAuthMethod().isPublicKey()) {
             logger.debug(SOSVfs_D_165.params("userid", "publickey"));
-            SOSOptionInFileName authenticationFile = authenticationOptions.getAuth_file();
+            SOSOptionInFileName authenticationFile = authenticationOptions.getAuthFile();
             authenticationFile.CheckMandatory(true);
             if (authenticationFile.IsNotEmpty()) {
                 secureChannel.addIdentity(authenticationFile.JSFile().getPath());
             }
         } else {
-            if (authenticationOptions.getAuth_method().isPassword()) {
+            if (authenticationOptions.getAuthMethod().isPassword()) {
                 logger.debug(SOSVfs_D_165.params("userid", "password"));
                 sshSession.setPassword(password);
             } else {
-                throw new JobSchedulerException(SOSVfs_E_166.params(authenticationOptions.getAuth_method().Value()));
+                throw new JobSchedulerException(SOSVfs_E_166.params(authenticationOptions.getAuthMethod().Value()));
             }
         }
         try {
             sshSession.connect();
             this.createSftpClient();
         } catch (Exception ex) {
-            throw new JobSchedulerException(SOSVfs_E_167.params(authenticationOptions.getAuth_method().Value(),
-                    authenticationOptions.getAuth_file().Value()));
+            throw new JobSchedulerException(SOSVfs_E_167.params(authenticationOptions.getAuthMethod().Value(),
+                    authenticationOptions.getAuthFile().Value()));
         }
         reply = "OK";
         logger.info(SOSVfs_D_133.params(userName));

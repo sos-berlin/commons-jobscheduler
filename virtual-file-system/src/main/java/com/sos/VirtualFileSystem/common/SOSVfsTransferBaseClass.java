@@ -797,11 +797,11 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
             try {
                 Connect(options);
                 Authenticate(options);
-                if (options.passive_mode.value()) {
+                if (options.passiveMode.value()) {
                     passive();
                 }
-                if (options.transfer_mode.isDirty() && options.transfer_mode.IsNotEmpty()) {
-                    TransferMode(options.transfer_mode);
+                if (options.transferMode.isDirty() && options.transferMode.IsNotEmpty()) {
+                    TransferMode(options.transferMode);
                 }
             } catch (JobSchedulerException e) {
                 throw e;

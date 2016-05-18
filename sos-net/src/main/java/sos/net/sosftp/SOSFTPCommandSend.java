@@ -1472,11 +1472,11 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                 int tries = 0;
                 boolean found = true;
                 getLogger().info("polling for file: " + fileName);
-                lastmd5file = sos.util.SOSCrypt.MD5encrypt(new File(fileName));
+                lastmd5file = sos.util.SOSCrypt.md5encrypt(new File(fileName));
                 Thread.sleep((long) delay * 1000);
                 for (int i = 0; i < nrOfTries; i++) {
                     tries++;
-                    String newMD5File = sos.util.SOSCrypt.MD5encrypt(new File(fileName));
+                    String newMD5File = sos.util.SOSCrypt.md5encrypt(new File(fileName));
                     getLogger().debug3(i + " polling and checking md5 hash: " + newMD5File);
                     if (!lastmd5file.equals(newMD5File)) {
                         lastmd5file = newMD5File;

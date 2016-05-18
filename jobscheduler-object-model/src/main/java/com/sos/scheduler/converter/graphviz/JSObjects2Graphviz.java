@@ -31,7 +31,7 @@ public class JSObjects2Graphviz extends JSJobUtilitiesClass<JSObjects2GraphvizOp
     }
 
     public JSObjects2Graphviz initialize() throws Exception {
-        getOptions().CheckMandatory();
+        getOptions().checkMandatory();
         LOGGER.debug(getOptions().dirtyString());
         String liveFolderName = objOptions.live_folder_name.Value();
         objVFS = VFSFactory.getHandler("local");

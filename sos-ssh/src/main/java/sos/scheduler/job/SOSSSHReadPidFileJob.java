@@ -36,7 +36,7 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
         try {
             if (!vfsHandler.isConnected()) {
                 SOSConnection2OptionsAlternate postAlternateOptions = getAlternateOptions(objOptions);
-                postAlternateOptions.raise_exception_on_error.value(false);
+                postAlternateOptions.raiseExceptionOnError.value(false);
                 vfsHandler.Connect(postAlternateOptions);
             }
             vfsHandler.Authenticate(objOptions);
@@ -95,16 +95,16 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
                 checkExitCode();
                 changeExitSignal();
             } catch (Exception e) {
-                if (objOptions.raise_exception_on_error.value()) {
-                    if (objOptions.ignore_error.value()) {
-                        if (objOptions.ignore_stderr.value()) {
-                            LOGGER.debug(this.StackTrace2String(e));
+                if (objOptions.raiseExceptionOnError.value()) {
+                    if (objOptions.ignoreError.value()) {
+                        if (objOptions.ignoreStderr.value()) {
+                            LOGGER.debug(this.stackTrace2String(e));
                         } else {
-                            LOGGER.error(this.StackTrace2String(e));
+                            LOGGER.error(this.stackTrace2String(e));
                             throw new SSHExecutionError("Exception raised: " + e, e);
                         }
                     } else {
-                        LOGGER.error(this.StackTrace2String(e));
+                        LOGGER.error(this.stackTrace2String(e));
                         throw new SSHExecutionError("Exception raised: " + e, e);
                     }
                 }
@@ -125,19 +125,19 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
             }
             processPostCommands(getTempPidFileName());
         } catch (Exception e) {
-            if (objOptions.raise_exception_on_error.value()) {
+            if (objOptions.raiseExceptionOnError.value()) {
                 String strErrMsg = "SOS-SSH-E-120: error occurred processing ssh command: ";
-                if (objOptions.ignore_error.value()) {
-                    if (objOptions.ignore_stderr.value()) {
-                        LOGGER.debug(this.StackTrace2String(e));
+                if (objOptions.ignoreError.value()) {
+                    if (objOptions.ignoreStderr.value()) {
+                        LOGGER.debug(this.stackTrace2String(e));
                         LOGGER.debug(strErrMsg, e);
                     } else {
-                        LOGGER.error(this.StackTrace2String(e));
+                        LOGGER.error(this.stackTrace2String(e));
                         LOGGER.error(strErrMsg, e);
                         throw new SSHExecutionError(strErrMsg, e);
                     }
                 } else {
-                    LOGGER.error(this.StackTrace2String(e));
+                    LOGGER.error(this.stackTrace2String(e));
                     LOGGER.error(strErrMsg, e);
                     throw new SSHExecutionError(strErrMsg, e);
                 }
@@ -173,7 +173,7 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
     @Override
     public SOSSSHJob2 connect() {
         getVFS();
-        getOptions().CheckMandatory();
+        getOptions().checkMandatory();
         try {
             SOSConnection2OptionsAlternate alternateOptions = getAlternateOptions(objOptions);
             vfsHandler.Connect(alternateOptions);
@@ -212,18 +212,18 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
 
     public SOSConnection2OptionsAlternate getAlternateOptions(SOSSSHJobOptions options) {
         SOSConnection2OptionsAlternate alternateOptions = new SOSConnection2OptionsAlternate();
-        alternateOptions.setstrict_hostKey_checking("no");
+        alternateOptions.setStrictHostKeyChecking("no");
         alternateOptions.host.Value(options.getHost().Value());
         alternateOptions.port.value(options.getPort().value());
         alternateOptions.user.Value(options.getUser().Value());
         alternateOptions.password.Value(options.getPassword().Value());
-        alternateOptions.proxy_protocol.Value(options.getproxy_protocol().Value());
-        alternateOptions.proxy_host.Value(options.getProxy_host().Value());
-        alternateOptions.proxy_port.value(options.getProxy_port().value());
-        alternateOptions.proxy_user.Value(options.getProxy_user().Value());
-        alternateOptions.proxy_password.Value(options.getProxy_password().Value());
-        alternateOptions.raise_exception_on_error.value(options.getraise_exception_on_error().value());
-        alternateOptions.ignore_error.value(options.getIgnore_error().value());
+        alternateOptions.proxyProtocol.Value(options.getproxy_protocol().Value());
+        alternateOptions.proxyHost.Value(options.getProxyHost().Value());
+        alternateOptions.proxyPort.value(options.getProxyPort().value());
+        alternateOptions.proxyUser.Value(options.getProxyUser().Value());
+        alternateOptions.proxyPassword.Value(options.getProxyPassword().Value());
+        alternateOptions.raiseExceptionOnError.value(options.getRaiseExceptionOnError().value());
+        alternateOptions.ignoreError.value(options.getIgnoreError().value());
         return alternateOptions;
     }
 

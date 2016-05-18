@@ -70,13 +70,13 @@ public class SOSSSHJobTrilead extends SOSSSHJob2 {
             } else {
                 if (objOptions.isScript()) {
                     strCommands2Execute = new String[1];
-                    String strTemp = objOptions.command_script.Value();
-                    if (objOptions.command_script.IsEmpty()) {
-                        strTemp = objOptions.command_script_file.JSFile().File2String();
+                    String strTemp = objOptions.commandScript.Value();
+                    if (objOptions.commandScript.IsEmpty()) {
+                        strTemp = objOptions.commandScriptFile.JSFile().File2String();
                     }
                     strTemp = objJSJobUtilities.replaceSchedulerVars(strTemp);
                     strCommands2Execute[0] = vfsHandler.createScriptFile(strTemp);
-                    strCommands2Execute[0] += " " + objOptions.command_script_param.Value();
+                    strCommands2Execute[0] += " " + objOptions.commandScriptParam.Value();
                 } else {
                     throw new SSHMissingCommandError(objMsg.getMsg(SOS_SSH_E_100));
                 }

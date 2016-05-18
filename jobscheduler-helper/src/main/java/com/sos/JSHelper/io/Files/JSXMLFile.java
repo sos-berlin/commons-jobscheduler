@@ -281,9 +281,9 @@ public class JSXMLFile extends JSTextFile {
             }
         }
         JSDataElementDateISO objISODate = new JSDataElementDateISO();
-        objISODate.Now();
-        transf.setParameter("sos.timestamp", objISODate.Now());
-        transformer.setParameter("sos.timestamp", objISODate.Now());
+        objISODate.now();
+        transf.setParameter("sos.timestamp", objISODate.now());
+        transformer.setParameter("sos.timestamp", objISODate.now());
         StringWriter writer = new StringWriter();
         StreamResult result = new StreamResult(writer);
         transf.transform(objDS, result);

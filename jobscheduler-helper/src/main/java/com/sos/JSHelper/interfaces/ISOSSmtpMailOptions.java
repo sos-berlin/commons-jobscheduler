@@ -98,7 +98,7 @@ public interface ISOSSmtpMailOptions {
 
     public abstract void setAllOptions(HashMap<String, String> pobjJSSettings) throws Exception;
 
-    public abstract void CheckMandatory() throws JSExceptionMandatoryOptionMissing, Exception;
+    public abstract void checkMandatory() throws JSExceptionMandatoryOptionMissing, Exception;
 
-    public abstract void CommandLineArgs(String[] pstrArgs) throws Exception;
+    public abstract void commandLineArgs(String[] pstrArgs) throws Exception;
 }

@@ -60,8 +60,8 @@ public class SOSOptionUrl extends SOSOptionString {
         if (isEmpty(strPort) || "-1".equals(strPort)) {
             strPort = String.valueOf(objURL.getDefaultPort());
         }
-        setIfNotDirty(pobjO.getport(), strPort);
-        pobjO.getprotocol().Value(objURL.getProtocol());
+        setIfNotDirty(pobjO.getPort(), strPort);
+        pobjO.getProtocol().Value(objURL.getProtocol());
         String strUserInfo = objURL.getUserInfo();
         String[] strU = strUserInfo.split(":");
         setIfNotDirty(pobjO.getUser(), strU[0]);

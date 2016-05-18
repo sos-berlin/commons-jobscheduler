@@ -26,14 +26,14 @@ public class SOSVfsFtpS2 extends SOSVfsFtpBaseClass2 {
     protected FTPSClient Client() {
         if (objFTPClient == null) {
             try {
-                String strProtocol = objConnection2Options.FtpS_protocol.Value();
+                String strProtocol = objConnection2Options.ftpsProtocol.Value();
                 objFTPClient = new FTPSClient(strProtocol);
             } catch (Exception e) {
                 throw new JobSchedulerException("can not create FTPS-Client", e);
             }
             FTPClientConfig conf = new FTPClientConfig();
             objProtocolCommandListener = new SOSFtpClientLogger(HostID(""));
-            if (objConnection2Options != null && objConnection2Options.ProtocolCommandListener.isTrue()) {
+            if (objConnection2Options != null && objConnection2Options.protocolCommandListener.isTrue()) {
                 objFTPClient.addProtocolCommandListener(objProtocolCommandListener);
             }
             String strAddFTPProtocol = System.getenv("AddFTPProtocol");

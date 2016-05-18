@@ -91,9 +91,9 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
         objO.setAllOptions(objO.DeletePrefix(hsmParameters1, "ssh_"));
         objR.setJSJobUtilites(this);
         if (!objO.commandSpecified()) {
-            setJobScript(objO.command_script);
+            setJobScript(objO.commandScript);
         }
-        objO.CheckMandatory();
+        objO.checkMandatory();
         if (!useTrilead) {
             spooler_log.debug9("Run with watchdog set to: " + objO.runWithWatchdog.Value());
             if (objO.runWithWatchdog.value()) {
@@ -109,8 +109,8 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
         // but here a command delimiter (known by the os) is needed to chain
         // commands together
         // TO DO: a solution which fits for both cases [SP]
-        if (!useTrilead && objO.command_delimiter.isNotDirty()) {
-            objO.command_delimiter.Value(";");
+        if (!useTrilead && objO.commandDelimiter.isNotDirty()) {
+            objO.commandDelimiter.Value(";");
         }
         objR.execute();
         if (!useTrilead && !((SOSSSHJobJSch) objR).getReturnValues().isEmpty()) {

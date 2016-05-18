@@ -105,11 +105,11 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     public ISOSConnection Authenticate(final ISOSAuthenticationOptions options) {
         authenticationOptions = options;
         try {
-            proxyProtocol = connection2OptionsAlternate.proxy_protocol;
-            proxyHost = connection2OptionsAlternate.proxy_host.Value();
-            proxyPort = connection2OptionsAlternate.proxy_port.value();
-            proxyUser = connection2OptionsAlternate.proxy_user.Value();
-            proxyPassword = connection2OptionsAlternate.proxy_password.Value();
+            proxyProtocol = connection2OptionsAlternate.proxyProtocol;
+            proxyHost = connection2OptionsAlternate.proxyHost.Value();
+            proxyPort = connection2OptionsAlternate.proxyPort.value();
+            proxyUser = connection2OptionsAlternate.proxyUser.Value();
+            proxyPassword = connection2OptionsAlternate.proxyPassword.Value();
             this.doAuthenticate(authenticationOptions);
         } catch (JobSchedulerException ex) {
             throw ex;
@@ -462,12 +462,12 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             reply = "OK";
         } catch (JobSchedulerException ex) {
             reply = ex.toString();
-            if (connection2OptionsAlternate.raise_exception_on_error.value()) {
+            if (connection2OptionsAlternate.raiseExceptionOnError.value()) {
                 throw ex;
             }
         } catch (Exception ex) {
             reply = ex.toString();
-            if (connection2OptionsAlternate.raise_exception_on_error.value()) {
+            if (connection2OptionsAlternate.raiseExceptionOnError.value()) {
                 RaiseException(ex, SOSVfs_E_134.params("ExecuteCommand"));
             }
         } finally {
@@ -615,9 +615,9 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         LOGGER.debug(SOSVfs_D_132.params(userName));
         setKnownHostsFile();
         this.createSession(userName, host, port);
-        if (authenticationOptions.getAuth_method().isPublicKey()) {
+        if (authenticationOptions.getAuthMethod().isPublicKey()) {
             LOGGER.debug(SOSVfs_D_165.params("userid", "publickey"));
-            SOSOptionInFileName authenticationFile = authenticationOptions.getAuth_file();
+            SOSOptionInFileName authenticationFile = authenticationOptions.getAuthFile();
             authenticationFile.CheckMandatory(true);
             if (authenticationFile.IsNotEmpty()) {
                 if (authenticationOptions.getPassword().IsNotEmpty()) {
@@ -627,15 +627,15 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 }
             }
         } else {
-            if (authenticationOptions.getAuth_method().isPassword()) {
+            if (authenticationOptions.getAuthMethod().isPassword()) {
                 LOGGER.debug(SOSVfs_D_165.params("userid", "password"));
                 sshSession.setPassword(password);
             } else {
-                throw new JobSchedulerException(SOSVfs_E_166.params(authenticationOptions.getAuth_method().Value()));
+                throw new JobSchedulerException(SOSVfs_E_166.params(authenticationOptions.getAuthMethod().Value()));
             }
         }
         try {
-            sshSession.setConfig("PreferredAuthentications", authenticationOptions.getAuth_method().Value());
+            sshSession.setConfig("PreferredAuthentications", authenticationOptions.getAuthMethod().Value());
             setConfigFromFiles();
             sshSession.connect();
             this.createSftpClient();
@@ -719,13 +719,13 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         sshSession = secureChannel.getSession(puser, phost, pport);
         java.util.Properties config = new java.util.Properties();
         config.put("StrictHostKeyChecking", connection2OptionsAlternate.strictHostKeyChecking.Value());
-        if (connection2OptionsAlternate.use_zlib_compression.value()) {
+        if (connection2OptionsAlternate.useZlibCompression.value()) {
             config.put("compression.s2c", "zlib@openssh.com,zlib,none");
             config.put("compression.c2s", "zlib@openssh.com,zlib,none");
-            config.put("compression_level", connection2OptionsAlternate.zlib_compression_level.Value());
+            config.put("compression_level", connection2OptionsAlternate.zlibCompressionLevel.Value());
             LOGGER.info(String.format("use zlib_compression: compression.s2c = %s, compression.c2s = %s, compression_level = %s",
                     config.getProperty("compression.s2c"), config.getProperty("compression.c2s"),
-                    connection2OptionsAlternate.zlib_compression_level.Value()));
+                    connection2OptionsAlternate.zlibCompressionLevel.Value()));
         }
         sshSession.setConfig(config);
         setCommandsTimeout();

@@ -1654,7 +1654,7 @@ abstract public class SOSFTPCommand {
                                         + localFile.getName());
                 if (f4md5.exists()) {
                     getLogger().debug9("md5 for " + f4md5.getAbsolutePath());
-                    md5 = sos.util.SOSCrypt.MD5encrypt(f4md5);
+                    md5 = sos.util.SOSCrypt.md5encrypt(f4md5);
                 } else {
                     md5 = EMPTY;
                 }
@@ -2967,11 +2967,11 @@ abstract public class SOSFTPCommand {
             SOSArguments arguments = null;
             try {
                 arguments = new SOSArguments(args, true);
-                operation = arguments.as_string("-operation=", "");
-                settingsFile = arguments.as_string("-settings=", "");
-                settingsSection = arguments.as_string("-profile=", "");
-                logLevel = arguments.as_int("-verbose=", SOSLogger.INFO);
-                logFile = arguments.as_string("-log_filename=", "");
+                operation = arguments.asString("-operation=", "");
+                settingsFile = arguments.asString("-settings=", "");
+                settingsSection = arguments.asString("-profile=", "");
+                logLevel = arguments.asInt("-verbose=", SOSLogger.INFO);
+                logFile = arguments.asString("-log_filename=", "");
             } catch (Exception e) {
                 LOGGER.error("[ERROR] could not init SOSArguments, cause: " + e.getMessage(), e);
                 throw e;

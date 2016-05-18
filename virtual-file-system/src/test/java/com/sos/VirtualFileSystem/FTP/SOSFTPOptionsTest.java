@@ -27,7 +27,7 @@ public class SOSFTPOptionsTest {
         objH.put("source_Protocol_Command_Listener", "true");
         objH.put("Protocol_Command_Listener", "true");
         SOSFTPOptions objO = new SOSFTPOptions(objH);
-        assertTrue("ProtocolCommandListeneris not true", objO.getConnectionOptions().Source().ProtocolCommandListener.value());
+        assertTrue("ProtocolCommandListeneris not true", objO.getConnectionOptions().Source().protocolCommandListener.value());
     }
 
     @Test
@@ -54,11 +54,11 @@ public class SOSFTPOptionsTest {
             SOSCredentialStoreOptions objCS = objSource.getCredentialStore();
             LOGGER.debug("objSource.UserName.Value() = " + objSource.user.Value());
             LOGGER.debug("objSource.passwrod.Value() = " + objSource.password.Value());
-            LOGGER.debug("objSource.getAlternativeOptions().Directory.Value() = " + objSource.getAlternativeOptions().Directory.Value());
+            LOGGER.debug("objSource.getAlternativeOptions().Directory.Value() = " + objSource.getAlternativeOptions().directory.Value());
             LOGGER.debug("objSource.dirtyString() = " + objSource.dirtyString());
             LOGGER.debug("objSource.getAlternativeOptions().dirtyString() = " + objSource.getAlternativeOptions().dirtyString());
             LOGGER.debug("testSOSCredentialStore1 " + objCS.dirtyString());
-            assertEquals("source_CredentialStore_use_credential_Store", "./keepassX-test.kdb", objCS.CredentialStore_FileName.Value());
+            assertEquals("source_CredentialStore_use_credential_Store", "./keepassX-test.kdb", objCS.credentialStoreFileName.Value());
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -70,7 +70,7 @@ public class SOSFTPOptionsTest {
         objH.put("source_Protocol_Command_Listener", "true");
         objH.put("Protocol_Command_Listener", "true");
         SOSFTPOptions objO = new SOSFTPOptions(objH);
-        assertTrue("ProtocolCommandListeneris not true", objO.getConnectionOptions().Source().ProtocolCommandListener.value());
+        assertTrue("ProtocolCommandListeneris not true", objO.getConnectionOptions().Source().protocolCommandListener.value());
         String strT = objO.getOptionsAsKeyValuePairs();
         LOGGER.info(strT);
     }

@@ -48,9 +48,9 @@ public class SOSFileListEntryTest extends JSListenerClass {
         objFile.deleteOnExit();
         objFile.WriteLine("Das ist eine Testdatei. Weiter nichts");
         objFile.close();
-        objOptions.atomic_prefix.Value(APREFIX);
-        objOptions.compress_files.value(true);
-        objOptions.compressed_file_extension.Value(".zip");
+        objOptions.atomicPrefix.Value(APREFIX);
+        objOptions.compressFiles.value(true);
+        objOptions.compressedFileExtension.Value(".zip");
         SOSFileListEntry objE = new SOSFileListEntry(PATHNAME + FILENAME);
         objE.setDataSourceClient(objFileSystemHandler);
         objE.Options(objOptions);
@@ -60,7 +60,7 @@ public class SOSFileListEntryTest extends JSListenerClass {
         LOGGER.info("TargetTransferFileName = " + objE.TargetTransferName());
         LOGGER.info("TargetFileName         = " + objE.TargetFileName());
         assertEquals("Source-File Name", PATHNAME + FILENAME, objE.SourceFileName());
-        assertEquals("final TargetFileName", FILENAME + objOptions.compressed_file_extension.Value(), objE.TargetFileName());
+        assertEquals("final TargetFileName", FILENAME + objOptions.compressedFileExtension.Value(), objE.TargetFileName());
     }
 
     private void CreateTestFile() {
@@ -80,15 +80,15 @@ public class SOSFileListEntryTest extends JSListenerClass {
 
     @Test
     public void testGetTargetFile2() throws IOException {
-        objOptions.atomic_prefix.Value(APREFIX);
-        objOptions.compress_files.value(true);
-        objOptions.compressed_file_extension.Value(".zip");
+        objOptions.atomicPrefix.Value(APREFIX);
+        objOptions.compressFiles.value(true);
+        objOptions.compressedFileExtension.Value(".zip");
         objOptions.ReplaceWhat.Value("(t)ext\\.t(x)t");
         objOptions.ReplaceWith.Value("u;u");
         CreateTestFile();
         objE.Log4Debug();
         assertEquals("Source-File Name", PATHNAME + FILENAME, objE.SourceFileName());
-        assertEquals("final TargetFileName", "uext.tut" + objOptions.compressed_file_extension.Value(), objE.TargetFileName());
+        assertEquals("final TargetFileName", "uext.tut" + objOptions.compressedFileExtension.Value(), objE.TargetFileName());
     }
 
     @Test
@@ -101,7 +101,7 @@ public class SOSFileListEntryTest extends JSListenerClass {
 
     @Test
     public void testMakeAtomicFileName() {
-        objOptions.atomic_prefix.Value(APREFIX);
+        objOptions.atomicPrefix.Value(APREFIX);
         SOSFileListEntry objE = new SOSFileListEntry(PATHNAME + FILENAME);
         objE.setDataSourceClient(objFileSystemHandler);
         objE.Options(objOptions);
@@ -109,18 +109,18 @@ public class SOSFileListEntryTest extends JSListenerClass {
         objE.Log4Debug();
         assertEquals("Source-File Name", PATHNAME + FILENAME, objE.SourceFileName());
         assertEquals("Source-Transfer-File Name", PATHNAME + FILENAME, objE.SourceTransferName());
-        assertEquals("intermediate Atomic-File TargetTransferName", objOptions.atomic_prefix.Value() + FILENAME, objE.TargetTransferName());
+        assertEquals("intermediate Atomic-File TargetTransferName", objOptions.atomicPrefix.Value() + FILENAME, objE.TargetTransferName());
         assertEquals("final TargetFileName", FILENAME, objE.TargetFileName());
     }
 
     @Test
     public void testMakeAtomicFileName2() {
-        objOptions.atomic_prefix.Value(APREFIX);
-        objOptions.atomic_suffix.Value(APREFIX + APREFIX);
+        objOptions.atomicPrefix.Value(APREFIX);
+        objOptions.atomicSuffix.Value(APREFIX + APREFIX);
         CreateTestFile();
         assertEquals("Source-File Name", PATHNAME + FILENAME, objE.SourceFileName());
         assertEquals("Source-Transfer-File Name", PATHNAME + FILENAME, objE.SourceTransferName());
-        assertEquals("intermediate Atomic-File TargetTransferName", objOptions.atomic_prefix.Value() + FILENAME + objOptions.atomic_suffix.Value(),
+        assertEquals("intermediate Atomic-File TargetTransferName", objOptions.atomicPrefix.Value() + FILENAME + objOptions.atomicSuffix.Value(),
                 objE.TargetTransferName());
         assertEquals("final TargetFileName", FILENAME, objE.TargetFileName());
     }

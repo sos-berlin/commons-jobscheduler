@@ -53,7 +53,7 @@ public class SOSVfsSFtpTest extends JSToolBox {
         objSource.port.value(SOSOptionPortNumber.getStandardSFTPPort());
         objSource.user.Value("kb");
         objSource.protocol.Value("sftp");
-        objSource.ssh_auth_method.isPassword(true);
+        objSource.sshAuthMethod.isPassword(true);
         objOptions.operation.Value("send");
         objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
         ftpClient = (ISOSVfsFileTransfer) objVFS;
@@ -71,12 +71,12 @@ public class SOSVfsSFtpTest extends JSToolBox {
         options.user.Value("kb");
         options.password.Value("kb");
         options.protocol.Value("sftp");
-        options.ssh_auth_method.isPassword(true);
-        options.proxy_protocol.Value(SOSOptionProxyProtocol.Protocol.http.name());
-        options.proxy_host.Value("homer.sos");
-        options.proxy_port.value(3128);
-        options.proxy_user.Value("proxy_user");
-        options.proxy_password.Value("12345");
+        options.sshAuthMethod.isPassword(true);
+        options.proxyProtocol.Value(SOSOptionProxyProtocol.Protocol.http.name());
+        options.proxyHost.Value("homer.sos");
+        options.proxyPort.value(3128);
+        options.proxyUser.Value("proxy_user");
+        options.proxyPassword.Value("12345");
         objOptions.operation.Value("send");
         objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
         ftpClient = (ISOSVfsFileTransfer) objVFS;
@@ -95,12 +95,12 @@ public class SOSVfsSFtpTest extends JSToolBox {
         options.user.Value("kb");
         options.password.Value("kb");
         options.protocol.Value("sftp");
-        options.ssh_auth_method.isPassword(true);
-        options.proxy_protocol.Value(SOSOptionProxyProtocol.Protocol.socks5.name());
-        options.proxy_host.Value("homer.sos");
-        options.proxy_port.value(1080);
-        options.proxy_user.Value("sos");
-        options.proxy_password.Value("sos");
+        options.sshAuthMethod.isPassword(true);
+        options.proxyProtocol.Value(SOSOptionProxyProtocol.Protocol.socks5.name());
+        options.proxyHost.Value("homer.sos");
+        options.proxyPort.value(1080);
+        options.proxyUser.Value("sos");
+        options.proxyPassword.Value("sos");
         objOptions.operation.Value("send");
         objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
         ftpClient = (ISOSVfsFileTransfer) objVFS;
@@ -123,7 +123,7 @@ public class SOSVfsSFtpTest extends JSToolBox {
         objSource.host.Value("wilma.sos");
         objSource.port.value(SOSOptionPortNumber.getStandardSFTPPort());
         objSource.protocol.Value("sftp");
-        objSource.ssh_auth_method.isPassword(false);
+        objSource.sshAuthMethod.isPassword(false);
         objOptions.operation.Value("send");
         objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
         ftpClient = (ISOSVfsFileTransfer) objVFS;
@@ -139,7 +139,7 @@ public class SOSVfsSFtpTest extends JSToolBox {
         objSource.port.value(SOSOptionPortNumber.getStandardSFTPPort());
         objSource.user.Value("kb");
         objSource.protocol.Value("sftp");
-        objSource.ssh_auth_method.isPassword(true);
+        objSource.sshAuthMethod.isPassword(true);
         objOptions.operation.Value("send");
         objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
         ftpClient = (ISOSVfsFileTransfer) objVFS;
@@ -157,7 +157,7 @@ public class SOSVfsSFtpTest extends JSToolBox {
         objSource.port.value(45678);
         objSource.user.Value("kb");
         objSource.protocol.Value("sftp");
-        objSource.ssh_auth_method.isPassword(true);
+        objSource.sshAuthMethod.isPassword(true);
         objOptions.operation.Value(enuJadeOperations.send);
         objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
         ftpClient = (ISOSVfsFileTransfer) objVFS;
@@ -178,7 +178,7 @@ public class SOSVfsSFtpTest extends JSToolBox {
         objSource.user.Value("kb");
         objSource.password.Value("kb");
         objSource.protocol.Value("sftp");
-        objSource.ssh_auth_method.isPassword(true);
+        objSource.sshAuthMethod.isPassword(true);
         objVFS.Authenticate(objSource);
     }
 

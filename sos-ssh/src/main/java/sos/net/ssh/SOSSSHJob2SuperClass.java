@@ -24,7 +24,7 @@ public class SOSSSHJob2SuperClass extends JSToolBox {
 
     public void Options(final SOSSSHJobOptions pobjOptions) throws Exception {
         objOptions = pobjOptions;
-        objOptions.CheckMandatory();
+        objOptions.checkMandatory();
     }
 
     public SOSSSHJobOptions Options() {
@@ -39,18 +39,18 @@ public class SOSSSHJob2SuperClass extends JSToolBox {
         try {
             boolean isAuthenticated = false;
             this.setSshConnection(new Connection(Options().host.Value(), objOptions.port.value()));
-            if (!objOptions.proxy_host.IsEmpty()) {
-                if (!objOptions.proxy_user.IsEmpty()) {
-                    this.getSshConnection().setProxyData(new HTTPProxyData(objOptions.proxy_host.Value(), objOptions.proxy_port.value()));
+            if (!objOptions.proxyHost.IsEmpty()) {
+                if (!objOptions.proxyUser.IsEmpty()) {
+                    this.getSshConnection().setProxyData(new HTTPProxyData(objOptions.proxyHost.Value(), objOptions.proxyPort.value()));
                 } else {
                     this.getSshConnection().setProxyData(
-                            new HTTPProxyData(objOptions.proxy_host.Value(), objOptions.proxy_port.value(), objOptions.proxy_user.Value(),
-                                    objOptions.proxy_password.Value()));
+                            new HTTPProxyData(objOptions.proxyHost.Value(), objOptions.proxyPort.value(), objOptions.proxyUser.Value(),
+                                    objOptions.proxyPassword.Value()));
                 }
             }
             this.getSshConnection().connect();
-            if (objOptions.auth_method.isPublicKey()) {
-                File authenticationFile = new File(objOptions.auth_file.Value());
+            if (objOptions.authMethod.isPublicKey()) {
+                File authenticationFile = new File(objOptions.authFile.Value());
                 if (!authenticationFile.exists()) {
                     throw new Exception("authentication file does not exist: " + authenticationFile.getCanonicalPath());
                 }
@@ -58,7 +58,7 @@ public class SOSSSHJob2SuperClass extends JSToolBox {
                     throw new Exception("authentication file not accessible: " + authenticationFile.getCanonicalPath());
                 }
                 isAuthenticated = this.getSshConnection().authenticateWithPublicKey(objOptions.user.Value(), authenticationFile, objOptions.password.Value());
-            } else if (objOptions.auth_method.isPassword()) {
+            } else if (objOptions.authMethod.isPassword()) {
                 isAuthenticated = this.getSshConnection().authenticateWithPassword(objOptions.user.Value(), objOptions.password.Value());
             }
             if (!isAuthenticated) {

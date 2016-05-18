@@ -30,7 +30,7 @@ public class PropertyFactory extends JSJobUtilitiesClass<PropertyFactoryOptions>
 
     public PropertyFactory Execute() throws Exception {
         try {
-            getOptions().CheckMandatory();
+            getOptions().checkMandatory();
             LOGGER.debug(getOptions().dirtyString());
             String strPropertyFileName = objOptions.PropertyFileNamePrefix.Value();
             HashMap<String, HashMap<String, I18NObject>> allKeys = new HashMap<>();

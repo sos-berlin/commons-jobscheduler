@@ -67,8 +67,8 @@ public class SOSVfsFtpBaseClass2 extends SOSVfsFtpBaseClass implements ISOSVfsFi
             LOGGER.info(SOSVfs_D_0102.params(strH, intP));
         } catch (RuntimeException e) {
             LOGGER.info(SOSVfs_E_0107.params(host, port) + e.getMessage());
-            String strAltHost = host = objConnectionOptions.getalternative_host().Value();
-            int intAltPort = port = objConnectionOptions.getalternative_port().value();
+            String strAltHost = host = objConnectionOptions.getAlternativeHost().Value();
+            int intAltPort = port = objConnectionOptions.getAlternativePort().value();
             if (isNotEmpty(strAltHost) && intAltPort > 0) {
                 LOGGER.debug(SOSVfs_D_0101.params(strAltHost, intAltPort));
                 this.connect(strAltHost, intAltPort);
@@ -102,7 +102,7 @@ public class SOSVfsFtpBaseClass2 extends SOSVfsFtpBaseClass implements ISOSVfsFi
         objConnection2Options = pobjConnectionOptions;
         try {
             objHost = objConnection2Options.getHost();
-            objPort = objConnection2Options.getport();
+            objPort = objConnection2Options.getPort();
             this.connect(objHost.Value(), objPort.value());
             if (!Client().isConnected()) {
                 SOSConnection2OptionsSuperClass objAlternate = objConnection2Options.Alternatives();

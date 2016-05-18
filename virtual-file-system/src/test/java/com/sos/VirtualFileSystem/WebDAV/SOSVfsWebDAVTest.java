@@ -56,7 +56,7 @@ public class SOSVfsWebDAVTest {
         objSource.user.Value(WEB_USER);
         objSource.password.Value(WEB_PASS);
         objSource.protocol.Value("webdav");
-        objSource.ssh_auth_method.isURL(true);
+        objSource.sshAuthMethod.isURL(true);
         objVFS.Authenticate(objSource);
     }
 

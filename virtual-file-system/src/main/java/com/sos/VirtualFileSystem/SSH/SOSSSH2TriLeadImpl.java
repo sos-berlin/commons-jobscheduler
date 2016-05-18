@@ -117,13 +117,14 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
             String strHostName = objCO.getHost().Value();
             int intPortNo = objCO.getPort().value();
             this.setSshConnection(new Connection(strHostName, intPortNo));
-            if (objCO.getProxy_host().IsNotEmpty()) {
+            if (objCO.getProxyHost().IsNotEmpty()) {
                 HTTPProxyData objProxy = null;
-                if (objCO.getProxy_user().IsEmpty()) {
-                    objProxy = new HTTPProxyData(objCO.getProxy_host().Value(), objCO.getProxy_port().value());
+                if (objCO.getProxyUser().IsEmpty()) {
+                    objProxy = new HTTPProxyData(objCO.getProxyHost().Value(), objCO.getProxyPort().value());
                 } else {
-                    objProxy = new HTTPProxyData(objCO.getProxy_host().Value(), objCO.getProxy_port().value(), objCO.getProxy_user().Value(),
-                                    objCO.getProxy_password().Value());
+                    objProxy =
+                            new HTTPProxyData(objCO.getProxyHost().Value(), objCO.getProxyPort().value(), objCO.getProxyUser().Value(),
+                                    objCO.getProxyPassword().Value());
                 }
                 this.getSshConnection().setProxyData(objProxy);
             }
@@ -331,8 +332,8 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
     public ISOSConnection Authenticate(final ISOSAuthenticationOptions pobjAO) throws Exception {
         final String conMethodName = "SOSSSH2TriLeadImpl::Authenticate";
         objAO = pobjAO;
-        if (objAO.getAuth_method().isPublicKey()) {
-            File authenticationFile = new File(objAO.getAuth_file().Value());
+        if (objAO.getAuthMethod().isPublicKey()) {
+            File authenticationFile = new File(objAO.getAuthFile().Value());
             if (!authenticationFile.exists()) {
                 throw new JobSchedulerException(SOSVfs_E_257.params(authenticationFile.getCanonicalPath()));
             }
@@ -341,7 +342,7 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
             }
             isAuthenticated =
                     this.getSshConnection().authenticateWithPublicKey(objAO.getUser().Value(), authenticationFile, objAO.getPassword().Value());
-        } else if (objAO.getAuth_method().isPassword()) {
+        } else if (objAO.getAuthMethod().isPassword()) {
             isAuthenticated = getSshConnection().authenticateWithPassword(objAO.getUser().Value(), objAO.getPassword().Value());
         }
         if (!isAuthenticated) {
@@ -510,10 +511,10 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
         if (objSO == null) {
             throw new JobSchedulerException(SOSVfs_E_245.get());
         }
-        long loginTimeout = objSO.getSimulate_shell_login_timeout().value();
-        String strPromptTrigger = objSO.getSimulate_shell_prompt_trigger().Value();
+        long loginTimeout = objSO.getSimulateShellLoginTimeout().value();
+        String strPromptTrigger = objSO.getSimulateShellPromptTrigger().Value();
         this.setSshSession(this.getSshConnection().openSession());
-        if (objSO.getSimulate_shell().value()) {
+        if (objSO.getSimulateShell().value()) {
             LOGGER.debug(SOSVfs_D_246.params("PTY"));
             this.getSshSession().requestDumbPTY();
             LOGGER.debug(SOSVfs_D_247.params("shell"));
@@ -536,7 +537,7 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
                 }
             }
         } else {
-            if (!objSO.getIgnore_hangup_signal().value()) {
+            if (!objSO.getIgnoreHangupSignal().value()) {
                 sshSession.requestPTY("vt100");
             }
         }
@@ -564,11 +565,11 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
         exitSignal = null;
         int retval = 0;
         String strCmd = pstrCmd;
-        long loginTimeout = objSO.getSimulate_shell_login_timeout().value();
-        String strPromptTrigger = objSO.getSimulate_shell_prompt_trigger().Value();
+        long loginTimeout = objSO.getSimulateShellLoginTimeout().value();
+        String strPromptTrigger = objSO.getSimulateShellPromptTrigger().Value();
         strbStderrOutput = new StringBuffer();
         strbStdoutOutput = new StringBuffer();
-        if (objSO.getSimulate_shell().value()) {
+        if (objSO.getSimulateShell().value()) {
             LOGGER.debug("executing: " + strCmd);
             stdinWriter.write(strCmd + strEndOfLine);
             stdinWriter.flush();

@@ -1062,24 +1062,24 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
             String strPW = pobjAO.getPassword().Value();
             String strUserName = gstrUser;
             LOGGER.debug(SOSVfs_D_132.params(strUserName));
-            if (pobjAO.getAuth_method().isPublicKey()) {
+            if (pobjAO.getAuthMethod().isPublicKey()) {
                 LOGGER.debug(SOSVfs_D_165.params("userid", "publickey"));
-                SOSOptionInFileName objAF = pobjAO.getAuth_file();
+                SOSOptionInFileName objAF = pobjAO.getAuthFile();
                 objAF.CheckMandatory(true);
                 if (objAF.IsNotEmpty()) {
                     char[] chrAFContent = objAF.JSFile().File2String().toCharArray();
                     isAuthenticated = sshConnection.authenticateWithPublicKey(strUserName, chrAFContent, strPW);
                 }
             } else {
-                if (pobjAO.getAuth_method().isPassword()) {
+                if (pobjAO.getAuthMethod().isPassword()) {
                     LOGGER.debug(SOSVfs_D_165.params("userid", "password"));
                     isAuthenticated = sshConnection.authenticateWithPassword(gstrUser, strPW);
                 } else {
-                    throw new Exception(SOSVfs_E_166.params(pobjAO.getAuth_method().Value()));
+                    throw new Exception(SOSVfs_E_166.params(pobjAO.getAuthMethod().Value()));
                 }
             }
             if (!isAuthenticated) {
-                throw new JobSchedulerException(SOSVfs_E_167.params(pobjAO.getAuth_method().Value(), pobjAO.getAuth_file().Value()));
+                throw new JobSchedulerException(SOSVfs_E_167.params(pobjAO.getAuthMethod().Value(), pobjAO.getAuthFile().Value()));
             }
             reply = "OK";
             LOGGER.info(SOSVfs_D_133.params(strUserName));
@@ -1117,11 +1117,11 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
             this.connect(objConnectionOptions.getHost().Value(), objConnectionOptions.getPort().value());
             LOGGER.info(SOSVfs_D_0102.params(objConnectionOptions.getHost().Value(), objConnectionOptions.getPort().value()));
         } catch (RuntimeException e) {
-            if (objConnectionOptions.getalternative_host().IsNotEmpty() && objConnectionOptions.getalternative_port().IsNotEmpty()) {
+            if (objConnectionOptions.getAlternativeHost().IsNotEmpty() && objConnectionOptions.getAlternativePort().IsNotEmpty()) {
                 LOGGER.info(SOSVfs_E_204.get());
-                this.connect(objConnectionOptions.getalternative_host().Value(), objConnectionOptions.getalternative_port().value());
-                LOGGER.info(SOSVfs_D_0102.params(objConnectionOptions.getalternative_host().Value(),
-                        objConnectionOptions.getalternative_port().value()));
+                this.connect(objConnectionOptions.getAlternativeHost().Value(), objConnectionOptions.getAlternativePort().value());
+                LOGGER.info(SOSVfs_D_0102.params(objConnectionOptions.getAlternativeHost().Value(),
+                        objConnectionOptions.getAlternativePort().value()));
             } else {
                 throw e;
             }
@@ -1137,7 +1137,7 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
         try {
             objHost = objConnection2Options.getHost();
             objHost.CheckMandatory();
-            objPort = objConnection2Options.getport();
+            objPort = objConnection2Options.getPort();
             objPort.CheckMandatory();
             host = objHost.Value();
             port = objPort.value();
@@ -1168,8 +1168,8 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
     @Override
     public void Options(final SOSFTPOptions pobjOptions) {
         super.Options(pobjOptions);
-        if (pobjOptions.BufferSize.isDirty()) {
-            int intBufferSize = pobjOptions.BufferSize.value();
+        if (pobjOptions.bufferSize.isDirty()) {
+            int intBufferSize = pobjOptions.bufferSize.value();
             Channel.CHANNEL_BUFFER_SIZE = intBufferSize;
             SFTPv3Client.MAX_RECEIVE_BUFFER_SIZE = intBufferSize;
         }
@@ -1527,11 +1527,11 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
             try {
                 Connect(options);
                 Authenticate(options);
-                if (options.passive_mode.value()) {
+                if (options.passiveMode.value()) {
                     passive();
                 }
-                if (options.transfer_mode.isDirty() && options.transfer_mode.IsNotEmpty()) {
-                    TransferMode(options.transfer_mode);
+                if (options.transferMode.isDirty() && options.transferMode.IsNotEmpty()) {
+                    TransferMode(options.transferMode);
                 }
             } catch (JobSchedulerException e) {
                 throw e;

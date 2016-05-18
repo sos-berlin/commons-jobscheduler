@@ -188,12 +188,12 @@ public class ProcessJob extends Job_impl {
         SOSConnection conn;
         if (log != null) {
             conn =
-                    SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.as_string("-class=", ""),
-                            arguments.as_string("-url=", ""), arguments.as_string("-user=", ""), arguments.as_string("-password=", ""), log);
+                    SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.asString("-class=", ""),
+                            arguments.asString("-url=", ""), arguments.asString("-user=", ""), arguments.asString("-password=", ""), log);
         } else {
             conn =
-                    SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.as_string("-class=", ""),
-                            arguments.as_string("-url=", ""), arguments.as_string("-user=", ""), arguments.as_string("-password=", ""));
+                    SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.asString("-class=", ""),
+                            arguments.asString("-url=", ""), arguments.asString("-user=", ""), arguments.asString("-password=", ""));
         }
         return conn;
     }

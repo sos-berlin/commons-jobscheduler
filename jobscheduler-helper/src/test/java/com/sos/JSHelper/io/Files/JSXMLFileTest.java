@@ -78,7 +78,7 @@ public class JSXMLFileTest extends JSToolBox {
         JSXSLTFile objXSLTFile = new JSXSLTFile(strXSLTFile);
         setGeneralParameters();
         JSToolBox objTools = new JSToolBox();
-        JSDataElementDate objDate = new JSDataElementDate(objTools.Now());
+        JSDataElementDate objDate = new JSDataElementDate(objTools.now());
         objDate.setFormatPattern(JSDateFormat.dfTIMESTAMPS24);
         objDate.setParsePattern(JSDateFormat.dfTIMESTAMPS24);
         String strTimeStamp = objDate.FormattedValue();

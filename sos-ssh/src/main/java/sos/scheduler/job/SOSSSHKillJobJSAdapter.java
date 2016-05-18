@@ -113,12 +113,12 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
             HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(allParams);
             options.setAllOptions(options.DeletePrefix(hsmParameters1, "ssh_"));
             sshJob.setJSJobUtilites(this);
-            options.CheckMandatory();
+            options.checkMandatory();
             sshJob.execute();
         } catch (Exception e) {
-            if (options.raise_exception_on_error.value()) {
-                if (options.ignore_error.value()) {
-                    if (options.ignore_stderr.value()) {
+            if (options.raiseExceptionOnError.value()) {
+                if (options.ignoreError.value()) {
+                    if (options.ignoreStderr.value()) {
                         logger.debug(this.StackTrace2String(e));
                     } else {
                         logger.error(this.StackTrace2String(e));
@@ -144,12 +144,12 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
             HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(allParams);
             options.setAllOptions(options.DeletePrefix(hsmParameters1, "ssh_"));
             sshJob.setJSJobUtilites(this);
-            options.CheckMandatory();
+            options.checkMandatory();
             sshJob.execute();
         } catch (Exception e) {
-            if (options.raise_exception_on_error.value()) {
-                if (options.ignore_error.value()) {
-                    if (options.ignore_stderr.value()) {
+            if (options.raiseExceptionOnError.value()) {
+                if (options.ignoreError.value()) {
+                    if (options.ignoreStderr.value()) {
                         logger.debug(this.StackTrace2String(e));
                     } else {
                         logger.error(this.StackTrace2String(e));
@@ -175,12 +175,12 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
             HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(allParams);
             options.setAllOptions(options.DeletePrefix(hsmParameters1, "ssh_"));
             sshJob.setJSJobUtilites(this);
-            options.CheckMandatory();
+            options.checkMandatory();
             sshJob.execute();
         } catch (Exception e) {
-            if (options.raise_exception_on_error.value()) {
-                if (options.ignore_error.value()) {
-                    if (options.ignore_stderr.value()) {
+            if (options.raiseExceptionOnError.value()) {
+                if (options.ignoreError.value()) {
+                    if (options.ignoreStderr.value()) {
                         logger.debug(this.StackTrace2String(e));
                     } else {
                         logger.error(this.StackTrace2String(e));

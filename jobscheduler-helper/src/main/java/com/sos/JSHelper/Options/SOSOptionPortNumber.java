@@ -44,7 +44,7 @@ public class SOSOptionPortNumber extends SOSOptionInteger {
         }
         try {
             if (isNotEmpty(strP)) {
-                strP = StripQuotes(strP);
+                strP = stripQuotes(strP);
                 int portNum = Integer.parseInt(strP);
                 if (portNum >= 0 && portNum <= 65535) {
                     super.Value(strP);

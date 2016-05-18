@@ -39,30 +39,30 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
     public boolean isSource = false;
 
     @JSOptionDefinition(name = "PreTransferCommands", description = "FTP commands, which has to be executed before the transfer started.", key = "PreTransferCommands", type = "SOSOptionCommandString", mandatory = false)
-    public SOSOptionCommandString PreTransferCommands = new SOSOptionCommandString(this, className + ".pre_transfer_commands",
+    public SOSOptionCommandString preTransferCommands = new SOSOptionCommandString(this, className + ".pre_transfer_commands",
             "FTP commands, which has to be executed before the transfer started.", "", "", false);
-    public SOSOptionCommandString PreFtpCommands = (SOSOptionCommandString) PreTransferCommands.SetAlias("pre_transfer_commands");
+    public SOSOptionCommandString PreFtpCommands = (SOSOptionCommandString) preTransferCommands.SetAlias("pre_transfer_commands");
 
     public String getPreTransferCommands() {
-        return PreTransferCommands.Value();
+        return preTransferCommands.Value();
     }
 
     public SOSConnection2OptionsAlternate setPreTransferCommands(final String val) {
-        PreTransferCommands.Value(val);
+        preTransferCommands.Value(val);
         return this;
     }
 
     @JSOptionDefinition(name = "PostTransferCommands", description = "FTP commands, which has to be executed after the transfer ended.", key = "PostTransferCommands", type = "SOSOptionCommandString", mandatory = false)
-    public SOSOptionCommandString PostTransferCommands = new SOSOptionCommandString(this, className + ".post_transfer_Commands",
+    public SOSOptionCommandString postTransferCommands = new SOSOptionCommandString(this, className + ".post_transfer_Commands",
             "FTP commands, which has to be executed after the transfer ended.", "", "", false);
-    public SOSOptionCommandString PostFtpCommands = (SOSOptionCommandString) PostTransferCommands.SetAlias("post_Transfer_commands");
+    public SOSOptionCommandString PostFtpCommands = (SOSOptionCommandString) postTransferCommands.SetAlias("post_Transfer_commands");
 
     public String getPostTransferCommands() {
-        return PostTransferCommands.Value();
+        return postTransferCommands.Value();
     }
 
     public SOSConnection2OptionsAlternate setPostTransferCommands(final String val) {
-        PostTransferCommands.Value(val);
+        postTransferCommands.Value(val);
         return this;
     }
 
@@ -173,19 +173,19 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
     }
 
     public void checkCredentialStoreOptions() {
-        if (objCredentialStoreOptions.use_credential_Store.isTrue()) {
+        if (objCredentialStoreOptions.useCredentialStore.isTrue()) {
             LOGGER.trace("entering checkCredentialStoreOptions ");
-            objCredentialStoreOptions.CredentialStore_FileName.CheckMandatory(true);
-            objCredentialStoreOptions.CredentialStore_KeyPath.CheckMandatory(true);
+            objCredentialStoreOptions.credentialStoreFileName.CheckMandatory(true);
+            objCredentialStoreOptions.credentialStoreKeyPath.CheckMandatory(true);
             String keyPassword = null;
             File keyFile = null;
-            if (objCredentialStoreOptions.CredentialStore_KeyFileName.isDirty()) {
-                keyFile = new File(objCredentialStoreOptions.CredentialStore_KeyFileName.Value());
+            if (objCredentialStoreOptions.credentialStoreKeyFileName.isDirty()) {
+                keyFile = new File(objCredentialStoreOptions.credentialStoreKeyFileName.Value());
             }
-            if (objCredentialStoreOptions.CredentialStore_password.isDirty()) {
-                keyPassword = objCredentialStoreOptions.CredentialStore_password.Value();
+            if (objCredentialStoreOptions.credentialStorePassword.isDirty()) {
+                keyPassword = objCredentialStoreOptions.credentialStorePassword.Value();
             }
-            File keePassDataBase = new File(objCredentialStoreOptions.CredentialStore_FileName.Value());
+            File keePassDataBase = new File(objCredentialStoreOptions.credentialStoreFileName.Value());
             try {
                 keePassDb = KeePassDataBaseManager.openDataBase(keePassDataBase, keyFile, keyPassword);
             } catch (Exception e) {
@@ -193,7 +193,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
                 throw new JobSchedulerException(e);
             }
             kdb1 = (KeePassDataBaseV1) keePassDb;
-            Entry entry = kdb1.getEntry(objCredentialStoreOptions.CredentialStore_KeyPath.Value());
+            Entry entry = kdb1.getEntry(objCredentialStoreOptions.credentialStoreKeyPath.Value());
             if (entry == null) {
                 throw new CredentialStoreKeyNotFound(objCredentialStoreOptions);
             }
@@ -237,17 +237,17 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
                 host.setHideValue(hideValuesFromCredentialStore);
             }
             entry.ExpirationDate();
-            if (HostName.isNotDirty()) {
-                HostName.Value(entry.getUrl().toString());
+            if (hostName.isNotDirty()) {
+                hostName.Value(entry.getUrl().toString());
             }
-            if (objCredentialStoreOptions.CredentialStore_ExportAttachment.isTrue()) {
-                File fleO = entry.saveAttachmentAsFile(objCredentialStoreOptions.CredentialStore_ExportAttachment2FileName.Value());
-                if (objCredentialStoreOptions.CredentialStore_DeleteExportedFileOnExit.isTrue()) {
+            if (objCredentialStoreOptions.credentialStoreExportAttachment.isTrue()) {
+                File fleO = entry.saveAttachmentAsFile(objCredentialStoreOptions.credentialStoreExportAttachment2FileName.Value());
+                if (objCredentialStoreOptions.credentialStoreDeleteExportedFileOnExit.isTrue()) {
                     fleO.deleteOnExit();
                 }
             }
-            if (objCredentialStoreOptions.CredentialStore_ProcessNotesParams.isTrue()) {
-                CommandLineArgs(entry.getNotesText());
+            if (objCredentialStoreOptions.credentialStoreProcessNotesParams.isTrue()) {
+                commandLineArgs(entry.getNotesText());
             }
         }
     }
@@ -264,9 +264,9 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
     }
 
     @Override
-    public void CheckMandatory() {
+    public void checkMandatory() {
         try {
-            super.CheckMandatory();
+            super.checkMandatory();
         } catch (Exception e) {
             throw new JSExceptionMandatoryOptionMissing(e.toString());
         }

@@ -71,7 +71,7 @@ public class JSCsvFileOptions extends JSOptionsClass {
     }
 
     @Override
-    public void CheckMandatory() throws Exception {
+    public void checkMandatory() throws Exception {
         try {
             this.Delimiter(this.Delimiter());
         } catch (final Exception e) {
