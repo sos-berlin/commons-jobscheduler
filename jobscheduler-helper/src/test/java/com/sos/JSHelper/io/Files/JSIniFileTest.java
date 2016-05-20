@@ -102,28 +102,28 @@ public class JSIniFileTest {
         // fail("Not yet implemented"); // TODO
     }
 
-    /** Test method for {@link com.sos.JSHelper.io.Files.JSIniFile#Sections()}. */
+    /** Test method for {@link com.sos.JSHelper.io.Files.JSIniFile#getSections()}. */
     @Test
     public final void testSections() {
-        Map<String, SOSProfileSection> objS = objF.Sections();
+        Map<String, SOSProfileSection> objS = objF.getSections();
         assertTrue("is not null", objS != null);
         logger.debug("number of sections = " + objS.size());
         for (SOSProfileSection objPS : objS.values()) {
-            logger.debug(objPS.Name());
-            for (SOSProfileEntry objEntry : objPS.Entries().values()) {
-                logger.debug("     " + objEntry.Name() + " = " + objEntry.Value());
+            logger.debug(objPS.getName());
+            for (SOSProfileEntry objEntry : objPS.getEntries().values()) {
+                logger.debug("     " + objEntry.getName() + " = " + objEntry.getValue());
             }
         }
     }
 
     /** Test method for
-     * {@link com.sos.JSHelper.io.Files.JSIniFile#Value(java.lang.String)}. */
+     * {@link com.sos.JSHelper.io.Files.JSIniFile#getValue(java.lang.String)}. */
     @Test
     public final void testValueString() {
     }
 
     /** Test method for
-     * {@link com.sos.JSHelper.io.Files.JSIniFile#Value(java.lang.String, java.lang.String)}
+     * {@link com.sos.JSHelper.io.Files.JSIniFile#getValue(java.lang.String, java.lang.String)}
      * . */
     @Test
     public final void testValueStringString() {
@@ -138,8 +138,8 @@ public class JSIniFileTest {
         SOSProfileSection obj = objF.getSection("do_sftp");
         assertEquals("section name not ok", "do_sftp", obj.strSectionName);
         obj.addEntry("Test", "HalloTest");
-        SOSProfileEntry objE = obj.Entry("protocol");
-        String strT = objE.Value();
+        SOSProfileEntry objE = obj.getEntry("protocol");
+        String strT = objE.getValue();
         assertEquals("Entry Value test failed", "sftp", strT);
     }
 
@@ -150,12 +150,12 @@ public class JSIniFileTest {
         assertEquals("section name not ok", "do_sftp", obj.strSectionName);
         obj.addEntry("Test", "HalloTest");
         obj.deleteEntry("protocol");
-        SOSProfileEntry objE = obj.Entry("protocol");
+        SOSProfileEntry objE = obj.getEntry("protocol");
         assertEquals("Entry delete failed", null, objE);
     }
 
     /** Test method for
-     * {@link com.sos.JSHelper.io.Files.JSIniFile#SectionName(java.lang.String)}
+     * {@link com.sos.JSHelper.io.Files.JSIniFile#setSectionName(java.lang.String)}
      * . */
     @Test
     @Ignore("Test set to Ignore for later examination, fails in Jenkins build")
@@ -164,7 +164,7 @@ public class JSIniFileTest {
         assertEquals("section name not ok", "do_sftp", obj.strSectionName);
     }
 
-    /** Test method for {@link com.sos.JSHelper.io.Files.JSIniFile#SectionName()}
+    /** Test method for {@link com.sos.JSHelper.io.Files.JSIniFile#getSectionName()}
      * . */
     @Test
     public final void testSectionName() {
@@ -191,7 +191,7 @@ public class JSIniFileTest {
     public final void testGetPropertyBool() {
     }
 
-    /** Test method for {@link com.sos.JSHelper.io.Files.JSIniFile#ProfileName()}
+    /** Test method for {@link com.sos.JSHelper.io.Files.JSIniFile#getProfileName()}
      * . */
     @Test
     public final void testProfileName() {
@@ -200,7 +200,7 @@ public class JSIniFileTest {
     }
 
     /** Test method for
-     * {@link com.sos.JSHelper.io.Files.JSIniFile#ProfileName(java.lang.String)}
+     * {@link com.sos.JSHelper.io.Files.JSIniFile#setProfileName(java.lang.String)}
      * . */
     @Test
     public final void testProfileNameString() {

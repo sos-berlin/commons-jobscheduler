@@ -63,7 +63,7 @@ public class PropertyFactoryJUnitTest extends JSToolBox {
     @Ignore("Test set to Ignore for later examination")
     public void testExecute() throws Exception {
 
-        objE.Execute();
+        objE.execute();
 
         //		assertEquals ("auth_file", objOptions.auth_file.Value(),"test"); //$NON-NLS-1$
         //		assertEquals ("user", objOptions.user.Value(),"test"); //$NON-NLS-1$

@@ -36,7 +36,7 @@ public class SOSVfsFtpBaseClass2 extends SOSVfsFtpBaseClass implements ISOSVfsFi
     }
 
     @Override
-    public void connect(final String phost, final int pport) {
+    public void doConnect(final String phost, final int pport) {
         final String conMethodName = "SOSVfsFtpBaseClass2::connect";
         try {
             host = phost;
@@ -46,36 +46,46 @@ public class SOSVfsFtpBaseClass2 extends SOSVfsFtpBaseClass implements ISOSVfsFi
             if (!isConnected()) {
                 Client().connect(host, port);
                 LOGGER.info(SOSVfs_D_0102.params(host, port));
-                LogReply();
+                logReply();
             } else {
                 LOGGER.warn(SOSVfs_D_0103.params(host, port));
 
             }
         } catch (Exception e) {
-            RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
+            raiseException(e, getHostID(SOSVfs_E_0105.params(conMethodName)));
         }
     }
 
     @Override
-    public final ISOSConnection Connect() {
+    public ISOSConnection connect(final String pstrHostName, final int pintPortNumber) throws Exception {
+        this.connect(pstrHostName, pintPortNumber);
+        if (objConnectionOptions != null) {
+            objConnectionOptions.getHost().setValue(pstrHostName);
+            objConnectionOptions.getPort().value(pintPortNumber);
+        }
+        return this;
+    }
+
+    @Override
+    public final ISOSConnection connect() {
         final String conMethodName = "SOSVfsFtpBaseClass2::Connect";
-        String strH = host = objConnectionOptions.getHost().Value();
+        String strH = host = objConnectionOptions.getHost().getValue();
         int intP = port = objConnectionOptions.getPort().value();
         LOGGER.debug(SOSVfs_D_0101.params(strH, intP));
         try {
-            this.connect(strH, intP);
+            this.doConnect(strH, intP);
             LOGGER.info(SOSVfs_D_0102.params(strH, intP));
         } catch (RuntimeException e) {
             LOGGER.info(SOSVfs_E_0107.params(host, port) + e.getMessage());
-            String strAltHost = host = objConnectionOptions.getAlternativeHost().Value();
+            String strAltHost = host = objConnectionOptions.getAlternativeHost().getValue();
             int intAltPort = port = objConnectionOptions.getAlternativePort().value();
             if (isNotEmpty(strAltHost) && intAltPort > 0) {
                 LOGGER.debug(SOSVfs_D_0101.params(strAltHost, intAltPort));
-                this.connect(strAltHost, intAltPort);
+                this.doConnect(strAltHost, intAltPort);
                 LOGGER.info(SOSVfs_D_0102.params(strAltHost, intAltPort));
             } else {
                 LOGGER.info(SOSVfs_E_0107.params(host, port, e.getMessage()));
-                RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
+                raiseException(e, getHostID(SOSVfs_E_0105.params(conMethodName)));
             }
         }
         return this;
@@ -83,60 +93,50 @@ public class SOSVfsFtpBaseClass2 extends SOSVfsFtpBaseClass implements ISOSVfsFi
 
     @Deprecated
     @Override
-    public ISOSConnection Connect(final ISOSConnectionOptions pobjConnectionOptions) throws Exception {
+    public ISOSConnection connect(final ISOSConnectionOptions pobjConnectionOptions) throws Exception {
         final String conMethodName = "SOSVfsFtpBaseClass2::Connect";
         objConnectionOptions = pobjConnectionOptions;
         try {
-            host = objConnectionOptions.getHost().Value();
+            host = objConnectionOptions.getHost().getValue();
             port = objConnectionOptions.getPort().value();
             this.connect(host, port);
         } catch (Exception e) {
-            RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
+            raiseException(e, getHostID(SOSVfs_E_0105.params(conMethodName)));
         }
         return this;
     }
 
     @Override
-    public final ISOSConnection Connect(final SOSConnection2OptionsAlternate pobjConnectionOptions) {
+    public final ISOSConnection connect(final SOSConnection2OptionsAlternate pobjConnectionOptions) {
         final String conMethodName = "SOSVfsFtpBaseClass2::Connect";
         objConnection2Options = pobjConnectionOptions;
         try {
             objHost = objConnection2Options.getHost();
             objPort = objConnection2Options.getPort();
-            this.connect(objHost.Value(), objPort.value());
+            this.connect(objHost.getValue(), objPort.value());
             if (!Client().isConnected()) {
-                SOSConnection2OptionsSuperClass objAlternate = objConnection2Options.Alternatives();
+                SOSConnection2OptionsSuperClass objAlternate = objConnection2Options.getAlternatives();
                 objHost = objAlternate.host;
                 objPort = objAlternate.port;
                 LOGGER.info(SOSVfs_I_0121.params(host));
-                this.connect(objHost.Value(), objPort.value());
+                this.connect(objHost.getValue(), objPort.value());
                 if (!Client().isConnected()) {
                     objHost = null;
                     objPort = null;
                     host = "";
                     port = -1;
-                    RaiseException(SOSVfs_E_204.get());
+                    raiseException(SOSVfs_E_204.get());
                 }
             }
         } catch (Exception e) {
-            RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
+            raiseException(e, getHostID(SOSVfs_E_0105.params(conMethodName)));
         }
         return this;
     }
 
     @Override
-    public ISOSConnection Connect(final ISOSDataProviderOptions pobjConnectionOptions) throws Exception {
+    public ISOSConnection connect(final ISOSDataProviderOptions pobjConnectionOptions) throws Exception {
         return null;
-    }
-
-    @Override
-    public ISOSConnection Connect(final String pstrHostName, final int pintPortNumber) throws Exception {
-        this.connect(pstrHostName, pintPortNumber);
-        if (objConnectionOptions != null) {
-            objConnectionOptions.getHost().Value(pstrHostName);
-            objConnectionOptions.getPort().value(pintPortNumber);
-        }
-        return this;
     }
 
     @Override
@@ -165,7 +165,7 @@ public class SOSVfsFtpBaseClass2 extends SOSVfsFtpBaseClass implements ISOSVfsFi
             lstrPathName = ".";
         }
         if (".".equals(lstrPathName)) {
-            lstrPathName = DoPWD();
+            lstrPathName = doPWD();
             strCurrentDirectory = lstrPathName;
         }
         FTPFile[] objFTPFileList = null;
@@ -202,8 +202,8 @@ public class SOSVfsFtpBaseClass2 extends SOSVfsFtpBaseClass implements ISOSVfsFi
                         vecDirectoryListing.add(strCurrentFile);
                         objFTPFile.setName(strCurrentFile);
                         SOSFileListEntry objF = new SOSFileListEntry(objFTPFile);
-                        objF.VfsHandler(this);
-                        objF.Options(objOptions);
+                        objF.setVfsHandler(this);
+                        objF.setOptions(objOptions);
                         objFileListEntries.add(objF);
                     }
                 } else {

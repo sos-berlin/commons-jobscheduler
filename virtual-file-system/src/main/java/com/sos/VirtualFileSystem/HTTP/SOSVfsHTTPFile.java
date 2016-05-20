@@ -16,7 +16,7 @@ public class SOSVfsHTTPFile extends SOSVfsTransferFileBaseClass {
     }
 
     @Override
-    public boolean FileExists() {
+    public boolean fileExists() {
 
         Long fs = objVFSHandler.getFileSize(fileName);
 
@@ -41,7 +41,7 @@ public class SOSVfsHTTPFile extends SOSVfsTransferFileBaseClass {
             }
             return is.read(buffer);
         } catch (Exception e) {
-            RaiseException(e, SOSVfs_E_173.params("read", this.fileName));
+            raiseException(e, SOSVfs_E_173.params("read", this.fileName));
             return 0;
         }
     }
@@ -65,7 +65,7 @@ public class SOSVfsHTTPFile extends SOSVfsTransferFileBaseClass {
             }
             return is.read(buffer, offset, len);
         } catch (Exception e) {
-            RaiseException(e, SOSVfs_E_173.params("read", this.fileName));
+            raiseException(e, SOSVfs_E_173.params("read", this.fileName));
             return 0;
         }
     }

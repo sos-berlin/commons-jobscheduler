@@ -70,10 +70,10 @@ public class SOSVfsHTTPTest {
     @Before
     public void setUp() throws Exception {
         objOptions = new SOSFTPOptions(SOSOptionTransferType.enuTransferTypes.http);
-        objOptions.protocol.Value(SOSOptionTransferType.enuTransferTypes.http);
+        objOptions.protocol.setValue(SOSOptionTransferType.enuTransferTypes.http);
         objOptions.authMethod.isURL(true);
-        objSource = objOptions.getConnectionOptions().Source();
-        objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
+        objSource = objOptions.getConnectionOptions().getSource();
+        objVFS = VFSFactory.getHandler(objOptions.protocol.getValue());
         objVfsClient = (ISOSVfsFileTransfer) objVFS;
     }
 
@@ -82,22 +82,22 @@ public class SOSVfsHTTPTest {
     }
 
     private void connect() throws RuntimeException, Exception {
-        objSource.host.Value(HTTP_URI);
+        objSource.host.setValue(HTTP_URI);
         objSource.port.value(HTTP_PORT);
-        objVFS.Connect(objSource);
+        objVFS.connect(objSource);
 
     }
 
     private void authenticate() throws Exception {
-        objSource.user.Value("xxx");
-        objSource.password.Value("xxx");
+        objSource.user.setValue("xxx");
+        objSource.password.setValue("xxx");
 
-        objVFS.Authenticate(objSource);
+        objVFS.authenticate(objSource);
     }
 
     private void disconnect() throws Exception {
         objVfsClient.disconnect();
-        objVFS.CloseConnection();
+        objVFS.closeConnection();
     }
 
     @Test
@@ -249,7 +249,7 @@ public class SOSVfsHTTPTest {
         connect();
         authenticate();
         String lineSeparator = "\n";
-        objVFS.ExecuteCommand("cd /home/test" + lineSeparator + "cd /home/kb");
+        objVFS.executeCommand("cd /home/test" + lineSeparator + "cd /home/kb");
         disconnect();
     }
 

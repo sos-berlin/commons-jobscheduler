@@ -23,7 +23,7 @@ public class SOSOptionHostName extends SOSOptionElement {
     public SOSOptionHostName(final JSOptionsClass pobjParent, final String pstrKey, final String pstrDescription, final String pstrValue,
             final String pstrDefaultValue, final boolean pflgIsMandatory) {
         super(pobjParent, pstrKey, pstrDescription, pstrValue, pstrDefaultValue, pflgIsMandatory);
-        objH = new SOSOptionString(null, this.XMLTagName() + "_ip", "Description", this.getHostAdress(), "0.0.0.0", false);
+        objH = new SOSOptionString(null, this.getXMLTagName() + "_ip", "Description", this.getHostAdress(), "0.0.0.0", false);
     }
 
     public SOSOptionHostName(final String pstrHostName) {
@@ -31,17 +31,17 @@ public class SOSOptionHostName extends SOSOptionElement {
     }
 
     @Override
-    public void Value(final String pstrHostName) {
+    public void setValue(final String pstrHostName) {
         if ("local".equalsIgnoreCase(pstrHostName)) {
-            super.Value("localhost");
+            super.setValue("localhost");
         } else {
-            super.Value(pstrHostName);
+            super.setValue(pstrHostName);
         }
     }
 
     public String getHostAdress() {
         String strIpAdress = "";
-        if (this.IsNotEmpty()) {
+        if (this.isNotEmpty()) {
             try {
                 strIpAdress = this.getInetAddress().getHostAddress();
             } catch (RuntimeException e) {
@@ -70,14 +70,14 @@ public class SOSOptionHostName extends SOSOptionElement {
     @Override
     public String toString() {
         String strToString = "";
-        if (this.IsNotEmpty()) {
+        if (this.isNotEmpty()) {
             String strHostAdress = "n.a.";
             try {
                 strHostAdress = this.getHostAdress();
             } catch (Exception e) {
                 //
             }
-            strToString = this.Value() + " (" + strHostAdress + ")";
+            strToString = this.getValue() + " (" + strHostAdress + ")";
         }
         return strToString;
     }
@@ -109,14 +109,14 @@ public class SOSOptionHostName extends SOSOptionElement {
 
     public String toXML(final String pstrXMLTagName) throws Exception {
         String strRet = "";
-        String strT = this.XMLTagName();
+        String strT = this.getXMLTagName();
         try {
-            this.XMLTagName(pstrXMLTagName);
+            this.xmlTagName(pstrXMLTagName);
             strRet = toXml();
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         } finally {
-            this.XMLTagName(strT);
+            this.xmlTagName(strT);
         }
         return strRet;
     }
@@ -127,26 +127,26 @@ public class SOSOptionHostName extends SOSOptionElement {
         if (gflgCreateShortXML) {
             strT = super.toXml();
         } else {
-            strT = "<" + this.XMLTagName();
-            strT += " mandatory=" + QuotedValue(boolean2String(this.isMandatory()));
-            if (isNotEmpty(this.DefaultValue())) {
-                strT += " default=" + QuotedValue(this.DefaultValue());
+            strT = "<" + this.getXMLTagName();
+            strT += " mandatory=" + getQuotedValue(boolean2String(this.isMandatory()));
+            if (isNotEmpty(this.getDefaultValue())) {
+                strT += " default=" + getQuotedValue(this.getDefaultValue());
             }
-            if (isNotEmpty(this.Title())) {
-                strT += " title=" + QuotedValue(this.Title());
+            if (isNotEmpty(this.getTitle())) {
+                strT += " title=" + getQuotedValue(this.getTitle());
             }
             strT += ">";
-            if (!this.Value().isEmpty()) {
+            if (!this.getValue().isEmpty()) {
                 if (isCData) {
-                    strT += "<![CDATA[" + this.FormattedValue() + "]]>";
+                    strT += "<![CDATA[" + this.getFormattedValue() + "]]>";
                 } else {
-                    strT += this.Value();
+                    strT += this.getValue();
                 }
             }
             if (objPortNumber != null) {
                 strT = strT + objPortNumber.toXml();
             }
-            strT += "</" + this.XMLTagName() + ">";
+            strT += "</" + this.getXMLTagName() + ">";
             strT += objH.toXml();
         }
         return strT;
@@ -162,9 +162,9 @@ public class SOSOptionHostName extends SOSOptionElement {
     }
 
     public String getHostFromUrl() {
-        String host = this.Value();
-        if (this.IsNotEmpty() && this.Value().matches("[^:]+:/+([^/@]+@)?([^/:]+).*")) {
-            host = this.Value().replaceFirst("[^:]+:/+([^/@]+@)?([^/:]+).*", "$2");
+        String host = this.getValue();
+        if (this.isNotEmpty() && this.getValue().matches("[^:]+:/+([^/@]+@)?([^/:]+).*")) {
+            host = this.getValue().replaceFirst("[^:]+:/+([^/@]+@)?([^/:]+).*", "$2");
         }
         return host;
     }

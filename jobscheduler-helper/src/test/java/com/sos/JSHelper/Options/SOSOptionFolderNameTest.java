@@ -56,23 +56,23 @@ public class SOSOptionFolderNameTest {
     //
     @Test
     public void testRelativeFolderNames() {
-        objCS.Value(".");
-        assertEquals("relative .", ".", objCS.Value());
+        objCS.setValue(".");
+        assertEquals("relative .", ".", objCS.getValue());
     }
 
     @Test
     public void testisDotFolder() {
-        objCS.Value(".");
+        objCS.setValue(".");
         assertTrue("relative .", objCS.isDotFolder());
-        objCS.Value("..");
+        objCS.setValue("..");
         assertTrue("relative ..", objCS.isDotFolder());
-        objCS.Value("/tmp/test");
+        objCS.setValue("/tmp/test");
         assertFalse("absolute .", objCS.isDotFolder());
     }
 
     @Test
     public void getSubFolderArrayTest() {
-        objCS.Value("/a/b/c/d");
+        objCS.setValue("/a/b/c/d");
         String[] strT = objCS.getSubFolderArray();
         assertTrue("wrong number of folders", strT.length == 4);
 

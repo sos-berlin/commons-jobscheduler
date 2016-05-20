@@ -23,22 +23,22 @@ import com.sos.JSHelper.Listener.JSListener;
 import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Options.SOSOptionCommandString;
 import com.sos.JSHelper.Options.SOSOptionElement;
-import com.sos.JSHelper.Options.SOSOptionPassword;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @JSOptionClass(name = "SOSConnection2OptionsAlternate", description = "Options for a connection to an uri (server, site, e.g.)")
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperClass {
 
-    private final String conClassName = this.getClass().getSimpleName();
-    private KeePassDataBase keePassDb = null;
-    private KeePassDataBaseV1 kdb1 = null;
+    private static final String CLASSNAME = "SOSConnection2OptionsAlternate";
     private static final Logger LOGGER = Logger.getLogger(SOSConnection2OptionsAlternate.class);
     private static final long serialVersionUID = 5924032437179660014L;
+    private KeePassDataBase keePassDb = null;
+    private KeePassDataBaseV1 kdb1 = null;
     private String strAlternativePrefix = "";
     public boolean isSource = false;
 
     public SOSConnection2OptionsAlternate() {
+        //
     }
 
     public SOSConnection2OptionsAlternate(final String pstrPrefix) {
@@ -64,61 +64,61 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
 
     @JSOptionDefinition(name = "PreTransferCommands", description = "FTP commands, which has to be executed before the transfer started.",
             key = "PreTransferCommands", type = "SOSOptionCommandString", mandatory = false)
-    public SOSOptionCommandString PreTransferCommands = new SOSOptionCommandString(this, conClassName + ".pre_transfer_commands",
+    public SOSOptionCommandString preTransferCommands = new SOSOptionCommandString(this, CLASSNAME + ".pre_transfer_commands",
             "FTP commands, which has to be executed before the transfer started.", "", "", false);
 
-    public SOSOptionCommandString PreFtpCommands = (SOSOptionCommandString) PreTransferCommands.SetAlias("pre_transfer_commands");
+    public SOSOptionCommandString preFtpCommands = (SOSOptionCommandString) preTransferCommands.setAlias("pre_transfer_commands");
 
     public String getPreTransferCommands() {
-        return PreTransferCommands.Value();
+        return preTransferCommands.getValue();
     }
 
     public SOSConnection2OptionsAlternate setPreTransferCommands(final String pstrValue) {
-        PreTransferCommands.Value(pstrValue);
+        preTransferCommands.setValue(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "PostTransferCommands", description = "FTP commands, which has to be executed after the transfer ended.",
             key = "PostTransferCommands", type = "SOSOptionCommandString", mandatory = false)
-    public SOSOptionCommandString PostTransferCommands = new SOSOptionCommandString(this, conClassName + ".post_transfer_Commands",
+    public SOSOptionCommandString postTransferCommands = new SOSOptionCommandString(this, CLASSNAME + ".post_transfer_Commands",
             "FTP commands, which has to be executed after the transfer ended.", "", "", false);
 
-    public SOSOptionCommandString PostFtpCommands = (SOSOptionCommandString) PostTransferCommands.SetAlias("post_Transfer_commands");
+    public SOSOptionCommandString postFtpCommands = (SOSOptionCommandString) postTransferCommands.setAlias("post_Transfer_commands");
 
     public String getPostTransferCommands() {
-        return PostTransferCommands.Value();
+        return postTransferCommands.getValue();
     }
 
     public SOSConnection2OptionsAlternate setPostTransferCommands(final String pstrValue) {
-        PostTransferCommands.Value(pstrValue);
+        postTransferCommands.setValue(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "IgnoreCertificateError", description = "Ignore a SSL Certificate Error", key = "IgnoreCertificateError",
             type = "SOSOptionBoolean", mandatory = true)
-    public SOSOptionBoolean IgnoreCertificateError = new SOSOptionBoolean(this, conClassName + ".IgnoreCertificateError", "Ignore a SSL Certificate Error",
+    public SOSOptionBoolean ignoreCertificateError = new SOSOptionBoolean(this, CLASSNAME + ".IgnoreCertificateError", "Ignore a SSL Certificate Error",
             "true", "true", true);
 
     public boolean getIgnoreCertificateError() {
-        return IgnoreCertificateError.value();
+        return ignoreCertificateError.value();
     }
 
     public SOSConnection2OptionsAlternate setIgnoreCertificateError(final boolean pflgValue) {
-        IgnoreCertificateError.value(pflgValue);
+        ignoreCertificateError.value(pflgValue);
         return this;
     }
 
     @JSOptionDefinition(name = "AlternateOptionsUsed", description = "Alternate Options used for connection and/or authentication",
             key = "AlternateOptionsUsed", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean AlternateOptionsUsed = new SOSOptionBoolean(this, conClassName + ".AlternateOptionsUsed",
+    public SOSOptionBoolean alternateOptionsUsed = new SOSOptionBoolean(this, CLASSNAME + ".AlternateOptionsUsed",
             "Alternate Options used for connection and/or authentication", "false", "false", false);
 
     public String getAlternateOptionsUsed() {
-        return AlternateOptionsUsed.Value();
+        return alternateOptionsUsed.getValue();
     }
 
     public SOSConnection2OptionsAlternate setAlternateOptionsUsed(final String pstrValue) {
-        AlternateOptionsUsed.Value(pstrValue);
+        alternateOptionsUsed.setValue(pstrValue);
         return this;
     }
 
@@ -172,17 +172,17 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
     public void checkCredentialStoreOptions() {
         if (objCredentialStoreOptions.useCredentialStore.isTrue()) {
             LOGGER.trace("entering checkCredentialStoreOptions ");
-            objCredentialStoreOptions.credentialStoreFileName.CheckMandatory(true);
-            objCredentialStoreOptions.credentialStoreKeyPath.CheckMandatory(true);
+            objCredentialStoreOptions.credentialStoreFileName.checkMandatory(true);
+            objCredentialStoreOptions.credentialStoreKeyPath.checkMandatory(true);
             String strPassword = null;
             File fleKeyFile = null;
             if (objCredentialStoreOptions.credentialStoreKeyFileName.isDirty()) {
-                fleKeyFile = new File(objCredentialStoreOptions.credentialStoreKeyFileName.Value());
+                fleKeyFile = new File(objCredentialStoreOptions.credentialStoreKeyFileName.getValue());
             }
             if (objCredentialStoreOptions.credentialStorePassword.isDirty()) {
-                strPassword = objCredentialStoreOptions.credentialStorePassword.Value();
+                strPassword = objCredentialStoreOptions.credentialStorePassword.getValue();
             }
-            File fleKeePassDataBase = new File(objCredentialStoreOptions.credentialStoreFileName.Value());
+            File fleKeePassDataBase = new File(objCredentialStoreOptions.credentialStoreFileName.getValue());
             try {
                 keePassDb = KeePassDataBaseManager.openDataBase(fleKeePassDataBase, fleKeyFile, strPassword);
             } catch (Exception e) {
@@ -190,7 +190,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
                 throw new JobSchedulerException(e);
             }
             kdb1 = (KeePassDataBaseV1) keePassDb;
-            Entry objEntry = kdb1.getEntry(objCredentialStoreOptions.credentialStoreKeyPath.Value());
+            Entry objEntry = kdb1.getEntry(objCredentialStoreOptions.credentialStoreKeyPath.getValue());
             if (objEntry == null) {
                 throw new CredentialStoreKeyNotFound(objCredentialStoreOptions);
             }
@@ -225,11 +225,11 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
                 }
             }
             if (isNotEmpty(objEntry.UserName())) {
-                user.Value(objEntry.UserName());
+                user.setValue(objEntry.UserName());
                 user.setHideValue(flgHideValuesFromCredentialStore);
             }
             if (isNotEmpty(objEntry.Password())) {
-                password.Value(objEntry.Password());
+                password.setValue(objEntry.Password());
                 password.setHideValue(flgHideValuesFromCredentialStore);
             }
             if (isNotEmpty(objEntry.Url())) {
@@ -238,10 +238,10 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
             }
             objEntry.ExpirationDate();
             if (hostName.isNotDirty()) {
-                hostName.Value(objEntry.getUrl().toString());
+                hostName.setValue(objEntry.getUrl().toString());
             }
             if (objCredentialStoreOptions.credentialStoreExportAttachment.isTrue()) {
-                File fleO = objEntry.saveAttachmentAsFile(objCredentialStoreOptions.credentialStoreExportAttachment2FileName.Value());
+                File fleO = objEntry.saveAttachmentAsFile(objCredentialStoreOptions.credentialStoreExportAttachment2FileName.getValue());
                 if (objCredentialStoreOptions.credentialStoreDeleteExportedFileOnExit.isTrue()) {
                     fleO.deleteOnExit();
                 }
@@ -255,7 +255,7 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
     protected void setIfNotDirty(final SOSOptionElement objOption, final String pstrValue) {
         if (objOption.isNotDirty() && isNotEmpty(pstrValue)) {
             LOGGER.trace("setValue = " + pstrValue);
-            objOption.Value(pstrValue);
+            objOption.setValue(pstrValue);
         }
     }
 
@@ -268,28 +268,28 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
         }
     }
 
-    public SOSConnection2OptionsAlternate Alternatives() {
+    public SOSConnection2OptionsAlternate getAlternatives() {
         if (objAlternativeOptions == null) {
             objAlternativeOptions = new SOSConnection2OptionsAlternate("");
         }
         return objAlternativeOptions;
     }
 
-    public void AlternativeOptions(final SOSConnection2OptionsAlternate pobjAlternativeOptions) {
+    public void setAlternativeOptions(final SOSConnection2OptionsAlternate pobjAlternativeOptions) {
         objAlternativeOptions = pobjAlternativeOptions;
     }
 
     public boolean optionsHaveMinRequirements() {
-        if (AlternateOptionsUsed.isTrue()) {
+        if (alternateOptionsUsed.isTrue()) {
             return false;
         }
-        if ("local".equalsIgnoreCase(protocol.Value())) {
+        if ("local".equalsIgnoreCase(protocol.getValue())) {
             return true;
         }
         if (host.isNotDirty() || host.IsEmpty()) {
             return false;
         }
-        if (protocol.Value().matches("https?")) {
+        if (protocol.getValue().matches("https?")) {
             return true;
         }
         if (user.isNotDirty() || user.IsEmpty()) {

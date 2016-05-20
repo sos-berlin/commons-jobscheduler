@@ -67,8 +67,8 @@ public class SOSOptionCommandStringTest {
     @Test
     public final void testValue() {
         String strT = "Hello, world ...";
-        objCS.Value(strT);
-        assertEquals("strT", strT, objCS.Value());
+        objCS.setValue(strT);
+        assertEquals("strT", strT, objCS.getValue());
     }
 
     @Test
@@ -78,26 +78,26 @@ public class SOSOptionCommandStringTest {
     @Test
     public final void testFromHexString() {
         String strV = "61626364";
-        objCS.Value(strV);
+        objCS.setValue(strV);
         String strT = new String(objCS.fromHexString());
         assertEquals("must be equal", strT, "abcd");
     }
 
     @Test
     public final void testIsHex() {
-        objCS.Value("ABCDEF");
+        objCS.setValue("ABCDEF");
         boolean flgT = objCS.isHex();
         assertTrue("must be true", flgT);
 
-        objCS.Value("Hello");
+        objCS.setValue("Hello");
         assertFalse("must be false", objCS.isHex());
 
-        objCS.Value(null);
+        objCS.setValue(null);
         assertFalse("must be false", objCS.isHex());
 
-        objCS.Value("3132333435");
-        System.out.println("Value is " + objCS.Value());
-        assertEquals("Value is hex", "12345", objCS.Value());
+        objCS.setValue("3132333435");
+        System.out.println("Value is " + objCS.getValue());
+        assertEquals("Value is hex", "12345", objCS.getValue());
     }
 
     @Test
@@ -113,15 +113,15 @@ public class SOSOptionCommandStringTest {
     @Test
     public void testValueString() throws Exception {
         JSOptionsClass objO = new JSOptionsClass();
-        String strF = objO.TempDir() + "testSOSOptionFileString.txt";
+        String strF = objO.getTempDir() + "testSOSOptionFileString.txt";
         JSFile objF = new JSFile(strF);
         objF.deleteOnExit();
         String strT = "Select * from table;";
-        objF.Write(strT);
+        objF.write(strT);
         objF.close();
 
-        objCS.Value(strF); // the filename is the value
-        System.out.println(objCS.Value());
-        assertEquals("select", strT, objCS.Value());
+        objCS.setValue(strF); // the filename is the value
+        System.out.println(objCS.getValue());
+        assertEquals("select", strT, objCS.getValue());
     }
 }

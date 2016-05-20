@@ -5,10 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -19,501 +16,190 @@ import com.sos.JSHelper.io.Files.JSXMLFile;
 /** @author KB */
 public class SOSSSHJobOptionsTest {
 
+    private static final Logger LOGGER = Logger.getLogger(SOSSSHJobOptionsTest.class);
     private static final String SOS_USER = "sos-user";
     private static final String USER = "user";
     private static final String AUTH_FILE = "auth_file";
-    private final String conClassName = "SOSSSHJobOptionsTest";
+    private static final String CLASSNAME = "SOSSSHJobOptionsTest";
+    private static final String KEE_PASS_DB_FILE_NAME = "R:/backup/sos/java/junittests/testdata/keepassX-test.kdb";
 
-    /** @throws java.lang.Exception */
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-    }
-
-    /** @throws java.lang.Exception */
-    @AfterClass
-    public static void tearDownAfterClass() throws Exception {
-    }
-
-    /** @throws java.lang.Exception */
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    /** @throws java.lang.Exception */
-    @After
-    public void tearDown() throws Exception {
-    }
 
     @Test
     public void TestToXml() throws Exception {
-
-        @SuppressWarnings("unused")
-        final String conMethodName = conClassName + "::TestToXml";
-
         String strParameterName = USER;
         String strParameterValue = "JunitTestUser";
         String strCmdLineArgs[] = { "-" + strParameterName, strParameterValue };
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
-
         objOptions.commandLineArgs(strCmdLineArgs);
-        assertEquals(strParameterName, strParameterValue, objOptions.user.Value());
-
-        // String strTempFileName = JSFile.createTempFile("JSTest",
-        // ".xml").getAbsolutePath();
-        String strTempFileName = "C:/temp/" + conClassName + ".xml";
+        assertEquals(strParameterName, strParameterValue, objOptions.user.getValue());
+        String strTempFileName = "C:/temp/" + CLASSNAME + ".xml";
         JSXMLFile objXF = objOptions.toXMLFile(strTempFileName);
-
         SOSSSHJobOptions objO2 = new SOSSSHJobOptions();
-        objO2.LoadXML(objXF);
-        assertEquals(strParameterName, strParameterValue, objO2.user.Value());
-
-    } // private void TestToXml
+        objO2.loadXML(objXF);
+        assertEquals(strParameterName, strParameterValue, objO2.user.getValue());
+    }
 
     @Test
     public void testCommand_Script() {
-
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
-        objOptions.commandScript.Value();
-        objOptions.command.Value();
+        objOptions.commandScript.getValue();
+        objOptions.command.getValue();
     }
 
     @Test
     @Ignore("Test set to Ignore for later examination")
-    public void TestSerialize() throws Exception {
-
-        @SuppressWarnings("unused")
-        final String conMethodName = conClassName + "::TestSerialize";
-
+    public void testSerialize() throws Exception {
         String strParameterName = USER;
         String strCmdLineArgs[] = { "-" + strParameterName, "JunitTestUser" };
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
-
         objOptions.commandLineArgs(strCmdLineArgs);
-        assertEquals(strParameterName, "JunitTestUser", objOptions.user.Value());
-
+        assertEquals(strParameterName, "JunitTestUser", objOptions.user.getValue());
         String strSerializedFileName = "c:/temp/test.object";
         objOptions.putObject(strSerializedFileName);
-
         System.setProperty(strParameterName, "sos-user2");
-        objOptions.LoadSystemProperties();
-        assertEquals(strParameterName, "sos-user2", objOptions.user.Value());
-
+        objOptions.loadSystemProperties();
+        assertEquals(strParameterName, "sos-user2", objOptions.user.getValue());
         SOSSSHJobOptions objO2 = new SOSSSHJobOptions();
         objO2 = (SOSSSHJobOptions) JSOptionsClass.getObject(strSerializedFileName);
-        assertEquals(strParameterName, "JunitTestUser", objO2.user.Value());
-
-    } // private void TestSerialize
-
-    @Test
-    public void TestSystemProperties() throws Exception {
-
-        @SuppressWarnings("unused")
-        final String conMethodName = conClassName + "::TestSystemProperties";
-
-        String strCmdLineArgs[] = { "-user", "JunitTestUser" };
-        SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
-
-        System.setProperty("SOSSSHJobOptions.user", SOS_USER);
-        objOptions.LoadSystemProperties();
-        assertEquals(USER, System.getProperty("SOSSSHJobOptions.user"), objOptions.user.Value());
-        System.setProperty("SOSSSHJobOptions.user", "");
-
-        objOptions.setAllOptions(new HashMap<String, String>());
-
-        System.setProperty(USER, SOS_USER);
-        objOptions.LoadSystemProperties();
-        assertEquals(USER, SOS_USER, objOptions.user.Value());
-        System.setProperty("SOSSSHJobOptions.user", "");
-
-        objOptions.commandLineArgs(strCmdLineArgs);
-        assertEquals(USER, "JunitTestUser", objOptions.user.Value());
-
-        System.setProperty(USER, "sos-user2");
-        objOptions.LoadSystemProperties();
-        assertEquals(USER, "sos-user2", objOptions.user.Value());
-
-    } // private void TestSystemProperties
-
-    @Test
-    public void SetHashMap() throws Exception {
-
-        SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
-        objOptions.setAllOptions(this.SetJobSchedulerSSHJobOptions(new HashMap<String, String>()));
-        // objOptions.auth_method.Value(enuAuthenticationMethods.password);
-        // objOptions.password.Value("pw");
-        // objOptions.CheckMandatory();
-
-        assertEquals(AUTH_FILE, "test", objOptions.authFile.Value());
-        assertEquals(USER, "test", objOptions.user.Value());
-
-        objOptions.CurrentNodeName("step1");
-        objOptions.setAllOptions(this.SetJobSchedulerSSHJobOptions(new HashMap<String, String>()));
-        assertEquals(USER, "step1user", objOptions.user.Value());
-
-        objOptions.CurrentNodeName("step2");
-        objOptions.setAllOptions(this.SetJobSchedulerSSHJobOptions(new HashMap<String, String>()));
-        assertEquals(USER, "userofstep2", objOptions.user.Value());
-
-        System.out.println(objOptions.toString());
+        assertEquals(strParameterName, "JunitTestUser", objO2.user.getValue());
     }
 
     @Test
-    public void SetCmdArgs() throws Exception {
-
+    public void testSystemProperties() throws Exception {
+        String strCmdLineArgs[] = { "-user", "JunitTestUser" };
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
+        System.setProperty("SOSSSHJobOptions.user", SOS_USER);
+        objOptions.loadSystemProperties();
+        assertEquals(USER, System.getProperty("SOSSSHJobOptions.user"), objOptions.user.getValue());
+        System.setProperty("SOSSSHJobOptions.user", "");
+        objOptions.setAllOptions(new HashMap<String, String>());
+        System.setProperty(USER, SOS_USER);
+        objOptions.loadSystemProperties();
+        assertEquals(USER, SOS_USER, objOptions.user.getValue());
+        System.setProperty("SOSSSHJobOptions.user", "");
+        objOptions.commandLineArgs(strCmdLineArgs);
+        assertEquals(USER, "JunitTestUser", objOptions.user.getValue());
+        System.setProperty(USER, "sos-user2");
+        objOptions.loadSystemProperties();
+        assertEquals(USER, "sos-user2", objOptions.user.getValue());
+    }
 
+    @Test
+    public void setHashMap() throws Exception {
+        SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
+        objOptions.setAllOptions(this.setJobSchedulerSSHJobOptions(new HashMap<String, String>()));
+        assertEquals(AUTH_FILE, "test", objOptions.authFile.getValue());
+        assertEquals(USER, "test", objOptions.user.getValue());
+        objOptions.setCurrentNodeName("step1");
+        objOptions.setAllOptions(this.setJobSchedulerSSHJobOptions(new HashMap<String, String>()));
+        assertEquals(USER, "step1user", objOptions.user.getValue());
+        objOptions.setCurrentNodeName("step2");
+        objOptions.setAllOptions(this.setJobSchedulerSSHJobOptions(new HashMap<String, String>()));
+        assertEquals(USER, "userofstep2", objOptions.user.getValue());
+        LOGGER.info(objOptions.toString());
+    }
+
+    @Test
+    public void setCmdArgs() throws Exception {
+        SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
         String strArgs[] = new String[] { "-command", "ls", "-auth_method", "password", "-host", "8of9.sos", "-auth_file", "test", "-user", "kb",
                 "-password", "huhu" };
         objOptions.commandLineArgs(strArgs);
-
         objOptions.checkMandatory();
-        assertEquals(AUTH_FILE, objOptions.authFile.Value(), "test");
-        assertEquals(USER, objOptions.user.Value(), "kb");
-
+        assertEquals(AUTH_FILE, objOptions.authFile.getValue(), "test");
+        assertEquals(USER, objOptions.user.getValue(), "kb");
         objOptions.commandLineArgs(new String[] { "-user", "testtest" });
-        assertEquals(USER, "testtest", objOptions.user.Value());
-
-        System.out.println(objOptions.toString());
+        assertEquals(USER, "testtest", objOptions.user.getValue());
+        LOGGER.info(objOptions.toString());
     }
 
     @Test
-    public void SetCmdArgs2() throws Exception {
-
+    public void setCmdArgs2() throws Exception {
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
-
         String strArgs[] = new String[] { "-command=ls", "-auth_method=password", "-host=8of9.sos", "-AuthFile=test", "-user=kb", "-password=huhu" };
         objOptions.commandLineArgs(strArgs);
-
         objOptions.checkMandatory();
-        assertEquals(AUTH_FILE, objOptions.authFile.Value(), "test");
-        assertEquals(USER, objOptions.user.Value(), "kb");
-
-        System.out.println(objOptions.toString());
+        assertEquals(AUTH_FILE, objOptions.authFile.getValue(), "test");
+        assertEquals(USER, objOptions.user.getValue(), "kb");
+        LOGGER.info(objOptions.toString());
     }
 
     @Test
-    public void SetCmdArgsString() throws Exception {
-
+    public void setCmdArgsString() throws Exception {
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
-
         String strArgs = new String("-command=ls -auth_method=password -host=8of9.sos -AuthFile=test -user=kb -password=huhu");
         objOptions.commandLineArgs(strArgs);
-
         objOptions.checkMandatory();
-        assertEquals(AUTH_FILE, objOptions.authFile.Value(), "test");
-        assertEquals(USER, objOptions.user.Value(), "kb");
-
-        System.out.println(objOptions.toString());
+        assertEquals(AUTH_FILE, objOptions.authFile.getValue(), "test");
+        assertEquals(USER, objOptions.user.getValue(), "kb");
+        LOGGER.info(objOptions.toString());
     }
-
-    /*
-     * Test ueberfluessig, da CheckMandatory keine Exception mehr schmeisst,
-     * wenn command leer ist if (command.IsEmpty() && command_script.IsEmpty()
-     * && command_script_file.IsEmpty()) { throw new
-     * JSExceptionMandatoryOptionMissing(
-     * "ErrSSH060 no command, command_script or command_script_file has been specified"
-     * ); }
-     * @Test(expected =
-     * com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing.class)
-     * public void SetEmptyCmd() throws Exception { SOSSSHJobOptions objOptions
-     * = new SOSSSHJobOptions(); String strArgs[] = new String[] {
-     * "-auth_method=password", "-host=ftphost", "-auth_file=test", "-user=kb",
-     * "-password=huhu" }; objOptions.CommandLineArgs(strArgs);
-     * objOptions.CheckMandatory(); assertEquals(AUTH_FILE,
-     * objOptions.auth_file.Value(), "test"); assertEquals(USER,
-     * objOptions.user.Value(), "kb");
-     * System.out.println(objOptions.toString()); }
-     */
 
     @Test(expected = com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing.class)
-    public void SetEmptyPassw() throws Exception {
-
+    public void setEmptyPassw() throws Exception {
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
-
         String strArgs[] = new String[] { "-auth_method=password", "-host=ftphost", "-auth_file=test", "-user=kb", "-password=" };
         objOptions.commandLineArgs(strArgs);
-
         objOptions.checkMandatory();
-        assertEquals(AUTH_FILE, objOptions.authFile.Value(), "test");
-        assertEquals(USER, objOptions.user.Value(), "kb");
-
-        System.out.println(objOptions.toString());
+        assertEquals(AUTH_FILE, objOptions.authFile.getValue(), "test");
+        assertEquals(USER, objOptions.user.getValue(), "kb");
+        LOGGER.info(objOptions.toString());
     }
 
-    private HashMap<String, String> SetJobSchedulerSSHJobOptions(final HashMap<String, String> pobjHM) {
-        pobjHM.put("step1/user", "step1user"); // This parameter specifies the
-                                               // user account to be used when
-        pobjHM.put("step2/user", "userofstep2"); // This parameter specifies the
-                                                 // user account to be used when
-        pobjHM.put("SOSSSHJobOptions.authfile", "test"); // This parameter
-                                                         // specifies the path
-                                                         // and name of a user's
-                                                         // pr
-        pobjHM.put(AUTH_FILE, "test"); // This parameter specifies the path and
-                                       // name of a user's pr
-        pobjHM.put("SOSSSHJobOptions.auth_file", "test"); // This parameter
-                                                          // specifies the path
-                                                          // and name of a
-                                                          // user's pr
-        // pobjHM.put ("SOSSSHJobOptions.auth_method", "publickey"); // This
-        // parameter specifies the authorization method for the
-        pobjHM.put("SOSSSHJobOptions.auth_method", "password"); // This
-                                                                // parameter
-                                                                // specifies the
-                                                                // authorization
-                                                                // method for
-                                                                // the
-        pobjHM.put("SOSSSHJobOptions.command", "test"); // This parameter
-                                                        // specifies a command
-                                                        // that is to be
-                                                        // executed
-        pobjHM.put("SOSSSHJobOptions.command_delimiter", "%%"); // Command
-                                                                // delimiter
-                                                                // characters
-                                                                // are specified
-                                                                // using this
-                                                                // par
-        pobjHM.put("SOSSSHJobOptions.command_script", "test"); // This parameter
-                                                               // can be used as
-                                                               // an alternative
-                                                               // to command,
-        pobjHM.put("SOSSSHJobOptions.command_script_file", "test"); // This
-                                                                    // parameter
-                                                                    // can be
-                                                                    // used as
-                                                                    // an
-                                                                    // alternative
-                                                                    // to
-                                                                    // command,
-        pobjHM.put("SOSSSHJobOptions.command_script_param", "test"); // This
-                                                                     // parameter
-                                                                     // contains
-                                                                     // a
-                                                                     // parameterstring,
-                                                                     // which
-                                                                     // will be
-        pobjHM.put("SOSSSHJobOptions.host", "wilma.sos"); // This parameter
-                                                          // specifies the
-                                                          // hostname or IP
-                                                          // address of th
-        pobjHM.put("SOSSSHJobOptions.ignore_error", "false"); // Should the
-                                                              // value true be
-                                                              // specified, then
-                                                              // execution
-                                                              // errors
-        pobjHM.put("SOSSSHJobOptions.ignore_exit_code", "12,33-47"); // This
-                                                                     // parameter
-                                                                     // configures
-                                                                     // one or
-                                                                     // more
-                                                                     // exit
-                                                                     // codes
-                                                                     // which wi
-        pobjHM.put("SOSSSHJobOptions.ignore_signal", "false"); // Should the
-                                                               // value true be
-                                                               // specified,
-                                                               // then on
-        pobjHM.put("SOSSSHJobOptions.ignore_stderr", "false"); // This job
-                                                               // checks if any
-                                                               // output to
-                                                               // stderr has
-                                                               // been created
-        // pobjHM.put("SOSSSHJobOptions.password", "test"); // This parameter
-        // specifies the user account password for au
-        pobjHM.put("SOSSSHJobOptions.port", "22"); // This parameter specifies
-                                                   // the port number of the SSH
-                                                   // serve
-        pobjHM.put("SOSSSHJobOptions.proxy_host", "test"); // The value of this
-                                                           // parameter is the
-                                                           // host name or the
-                                                           // IP ad
-        pobjHM.put("SOSSSHJobOptions.proxy_password", "test"); // This parameter
-                                                               // specifies the
-                                                               // password for
-                                                               // the proxy
-                                                               // serve
-        pobjHM.put("SOSSSHJobOptions.proxy_port", "22"); // This parameter
-                                                         // specifies the port
-                                                         // number of the proxy,
-        pobjHM.put("SOSSSHJobOptions.proxy_user", "test"); // The value of this
-                                                           // parameter
-                                                           // specifies the user
-                                                           // account fo
-        pobjHM.put("SOSSSHJobOptions.simulate_shell", "false"); // Should the
-                                                                // value true be
-                                                                // specified for
-                                                                // this
-                                                                // parameter,
-        pobjHM.put("SOSSSHJobOptions.simulate_shell_inactivity_timeout", "22"); // If
-                                                                                // no
-                                                                                // new
-                                                                                // characters
-                                                                                // are
-                                                                                // written
-                                                                                // to
-                                                                                // stdout
-                                                                                // or
-                                                                                // stderr
-                                                                                // afte
-        pobjHM.put("SOSSSHJobOptions.simulate_shell_login_timeout", "22"); // If
-                                                                           // no
-                                                                           // new
-                                                                           // characters
-                                                                           // are
-                                                                           // written
-                                                                           // to
-                                                                           // stdout
-                                                                           // or
-                                                                           // stderr
-                                                                           // afte
-        pobjHM.put("SOSSSHJobOptions.simulate_shell_prompt_trigger", "test"); // The
-                                                                              // expected
-                                                                              // comman
-                                                                              // line
-                                                                              // prompt.
-                                                                              // Using
-                                                                              // this
-                                                                              // prompt
-                                                                              // the
-                                                                              // jo
-        pobjHM.put("SOSSSHJobOptions.user", "test"); // This parameter specifies
-                                                     // the user account to be
-                                                     // used when
-        pobjHM.put("SOSSSHJobOptions.user", "test"); // This parameter specifies
-                                                     // the user account to be
-                                                     // used when
-        pobjHM.put(USER, "test"); // This parameter specifies the user account
-                                  // to be used when
-        pobjHM.put("step1/SOSSSHJobOptions.user", "step1user"); // This
-                                                                // parameter
-                                                                // specifies the
-                                                                // user account
-                                                                // to be used
-                                                                // when
-        pobjHM.put("step2/SOSSSHJobOptions.user", "userofstep2"); // This
-                                                                  // parameter
-                                                                  // specifies
-                                                                  // the user
-                                                                  // account to
-                                                                  // be used
-                                                                  // when
-
-        pobjHM.put("UseCredentialStore", "true"); // This parameter specifies
-                                                  // the user account to be used
-                                                  // when
-        pobjHM.put("CredentialStoreFileName", strKeePassDBFileName); // This
-                                                                     // parameter
-                                                                     // specifies
-                                                                     // the user
-                                                                     // account
-                                                                     // to be
-                                                                     // used
-                                                                     // when
-        pobjHM.put("CredentialStorePassword", "testing"); // This parameter
-                                                          // specifies the user
-                                                          // account to be used
-                                                          // when
-        pobjHM.put("CredentialStoreKeyPath", "sos/server/wilma.sos"); // This
-                                                                      // parameter
-                                                                      // specifies
-                                                                      // the
-                                                                      // user
-                                                                      // account
-                                                                      // to be
-                                                                      // used
-                                                                      // when
-
+    private HashMap<String, String> setJobSchedulerSSHJobOptions(final HashMap<String, String> pobjHM) {
+        pobjHM.put("step1/user", "step1user");
+        pobjHM.put("step2/user", "userofstep2");
+        pobjHM.put("SOSSSHJobOptions.authfile", "test");
+        pobjHM.put(AUTH_FILE, "test");
+        pobjHM.put("SOSSSHJobOptions.auth_file", "test");
+        pobjHM.put("SOSSSHJobOptions.auth_method", "password");
+        pobjHM.put("SOSSSHJobOptions.command", "test");
+        pobjHM.put("SOSSSHJobOptions.command_delimiter", "%%");
+        pobjHM.put("SOSSSHJobOptions.command_script", "test");
+        pobjHM.put("SOSSSHJobOptions.command_script_file", "test");
+        pobjHM.put("SOSSSHJobOptions.command_script_param", "test");
+        pobjHM.put("SOSSSHJobOptions.host", "wilma.sos");
+        pobjHM.put("SOSSSHJobOptions.ignore_error", "false");
+        pobjHM.put("SOSSSHJobOptions.ignore_exit_code", "12,33-47");
+        pobjHM.put("SOSSSHJobOptions.ignore_signal", "false");
+        pobjHM.put("SOSSSHJobOptions.ignore_stderr", "false");
+        pobjHM.put("SOSSSHJobOptions.port", "22");
+        pobjHM.put("SOSSSHJobOptions.proxy_host", "test");
+        pobjHM.put("SOSSSHJobOptions.proxy_password", "test");
+        pobjHM.put("SOSSSHJobOptions.proxy_port", "22");
+        pobjHM.put("SOSSSHJobOptions.proxy_user", "test");
+        pobjHM.put("SOSSSHJobOptions.simulate_shell", "false");
+        pobjHM.put("SOSSSHJobOptions.simulate_shell_inactivity_timeout", "22");
+        pobjHM.put("SOSSSHJobOptions.simulate_shell_login_timeout", "22");
+        pobjHM.put("SOSSSHJobOptions.simulate_shell_prompt_trigger", "test");
+        pobjHM.put("SOSSSHJobOptions.user", "test");
+        pobjHM.put("SOSSSHJobOptions.user", "test");
+        pobjHM.put(USER, "test");
+        pobjHM.put("step1/SOSSSHJobOptions.user", "step1user");
+        pobjHM.put("step2/SOSSSHJobOptions.user", "userofstep2");
+        pobjHM.put("UseCredentialStore", "true"); 
+        pobjHM.put("CredentialStoreFileName", KEE_PASS_DB_FILE_NAME);
+        pobjHM.put("CredentialStorePassword", "testing");
+        pobjHM.put("CredentialStoreKeyPath", "sos/server/wilma.sos");
         return pobjHM;
-    } // private void SetJobSchedulerSSHJobOptions (HashMap <String, String>
-      // pobjHM)
+    }
 
-    private HashMap<String, String> SetSSHJobOptionsUsingCredentialStore(final HashMap<String, String> pobjHM) {
-        // pobjHM.put("SOSSSHJobOptions.command", "test"); // This parameter
-        // specifies a command that is to be executed
-        pobjHM.put("SOSSSHJobOptions.command_delimiter", "%%"); // Command
-                                                                // delimiter
-                                                                // characters
-                                                                // are specified
-                                                                // using this
-                                                                // par
-        pobjHM.put("SOSSSHJobOptions.command_script", "test"); // This parameter
-                                                               // can be used as
-                                                               // an alternative
-                                                               // to command,
-        pobjHM.put("SOSSSHJobOptions.command_script_file", "test"); // This
-                                                                    // parameter
-                                                                    // can be
-                                                                    // used as
-                                                                    // an
-                                                                    // alternative
-                                                                    // to
-                                                                    // command,
-        pobjHM.put("SOSSSHJobOptions.command_script_param", "test"); // This
-                                                                     // parameter
-                                                                     // contains
-                                                                     // a
-                                                                     // parameterstring,
-                                                                     // which
-                                                                     // will be
-        pobjHM.put("SOSSSHJobOptions.ignore_error", "false"); // Should the
-                                                              // value true be
-                                                              // specified, then
-                                                              // execution
-                                                              // errors
-        pobjHM.put("SOSSSHJobOptions.ignore_exit_code", "12,33-47"); // This
-                                                                     // parameter
-                                                                     // configures
-                                                                     // one or
-                                                                     // more
-                                                                     // exit
-                                                                     // codes
-                                                                     // which wi
-        pobjHM.put("SOSSSHJobOptions.ignore_signal", "false"); // Should the
-                                                               // value true be
-                                                               // specified,
-                                                               // then on
-        pobjHM.put("SOSSSHJobOptions.ignore_stderr", "false"); // This job
-                                                               // checks if any
-                                                               // output to
-                                                               // stderr has
-                                                               // been created
-
-        pobjHM.put("UseCredentialStore", "true"); // This parameter specifies
-                                                  // the user account to be used
-                                                  // when
-        pobjHM.put("CredentialStore_FileName", strKeePassDBFileName); // This
-                                                                      // parameter
-                                                                      // specifies
-                                                                      // the
-                                                                      // user
-                                                                      // account
-                                                                      // to be
-                                                                      // used
-                                                                      // when
-        pobjHM.put("CredentialStore_Password", "testing"); // This parameter
-                                                           // specifies the user
-                                                           // account to be used
-                                                           // when
-        pobjHM.put("CredentialStore_KeyPath", "/sos/server/wilma.sos"); // This
-                                                                        // parameter
-                                                                        // specifies
-                                                                        // the
-                                                                        // user
-                                                                        // account
-                                                                        // to be
-                                                                        // used
-                                                                        // when
-        pobjHM.put("CredentialStore_ProcessNotesParams", "true"); // This
-                                                                  // parameter
-                                                                  // specifies
-                                                                  // the user
-                                                                  // account to
-                                                                  // be used
-                                                                  // when
-
+    private HashMap<String, String> setSSHJobOptionsUsingCredentialStore(final HashMap<String, String> pobjHM) {
+        pobjHM.put("SOSSSHJobOptions.command_delimiter", "%%");
+        pobjHM.put("SOSSSHJobOptions.command_script", "test");
+        pobjHM.put("SOSSSHJobOptions.command_script_file", "test");
+        pobjHM.put("SOSSSHJobOptions.command_script_param", "test");
+        pobjHM.put("SOSSSHJobOptions.ignore_error", "false");
+        pobjHM.put("SOSSSHJobOptions.ignore_exit_code", "12,33-47");
+        pobjHM.put("SOSSSHJobOptions.ignore_signal", "false");
+        pobjHM.put("SOSSSHJobOptions.ignore_stderr", "false");
+        pobjHM.put("UseCredentialStore", "true");
+        pobjHM.put("CredentialStore_FileName", KEE_PASS_DB_FILE_NAME);
+        pobjHM.put("CredentialStore_Password", "testing");
+        pobjHM.put("CredentialStore_KeyPath", "/sos/server/wilma.sos");
+        pobjHM.put("CredentialStore_ProcessNotesParams", "true");
         return pobjHM;
-    } // private void SetJobSchedulerSSHJobOptions (HashMap <String, String>
-      // pobjHM)
+    }
 
     @Test(expected = java.lang.RuntimeException.class)
     public void testCredentialStore1() {
@@ -521,42 +207,33 @@ public class SOSSSHJobOptionsTest {
         SOSCredentialStoreOptions objCSO = objOptions.getCredentialStore().getOptions();
         assertTrue("not null", objCSO != null);
         objCSO.useCredentialStore.setTrue();
-        objCSO.credentialStoreFileName.Value("c:/temp/t.1");
+        objCSO.credentialStoreFileName.setValue("c:/temp/t.1");
         objOptions.getCredentialStore().checkCredentialStoreOptions();
     }
 
-    // "C:/Users/KB/workspace-kepler/credentialstore/src/test/resources/keepassX-test.kdb"
-    // private final String strKeePassDBFileName =
-    // "R:/java.sources/trunk/products/jobscheduler/virtual-file-system/src/test/resources/keepassX-test.kdb";
-    private final String strKeePassDBFileName = "R:/backup/sos/java/junittests/testdata/keepassX-test.kdb";
-
     @Test
     @Ignore("Test set to Ignore for later examination")
-    // Entry in used credentialStore is expired since 17.07.14, therfore an
-    // exception occurs [SP]
     public void testCredentialStore2() {
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
         SOSCredentialStoreOptions objCSO = objOptions.getCredentialStore().getOptions();
         assertTrue("not null", objCSO != null);
         objCSO.useCredentialStore.setTrue();
-        objCSO.credentialStoreFileName.Value(strKeePassDBFileName);
-        objCSO.credentialStorePassword.Value("testing");
-        objCSO.credentialStoreKeyPath.Value("/sos/server/wilma.sos");
+        objCSO.credentialStoreFileName.setValue(KEE_PASS_DB_FILE_NAME);
+        objCSO.credentialStorePassword.setValue("testing");
+        objCSO.credentialStoreKeyPath.setValue("/sos/server/wilma.sos");
         objOptions.getCredentialStore().checkCredentialStoreOptions();
-        assertEquals("userid", "test", objOptions.user.Value());
-        assertEquals("password", "12345", objOptions.password.Value());
+        assertEquals("userid", "test", objOptions.user.getValue());
+        assertEquals("password", "12345", objOptions.password.getValue());
     }
 
     @Test
     @Ignore("Test set to Ignore for later examination")
-    // Entry in used credentialStore is expired since 17.07.14, therfore an
-    // exception occurs [SP]
     public void testCredentialStore3() throws Exception {
-        SOSSSHJobOptions objOptions = new SOSSSHJobOptions(SetSSHJobOptionsUsingCredentialStore(new HashMap<String, String>()));
+        SOSSSHJobOptions objOptions = new SOSSSHJobOptions(setSSHJobOptionsUsingCredentialStore(new HashMap<String, String>()));
         assertTrue("not null", objOptions != null);
-        assertEquals("userid", "test", objOptions.user.Value());
-        assertEquals("password", "12345", objOptions.password.Value());
-        assertEquals("command", "test.bsh", objOptions.command.Value());
+        assertEquals("userid", "test", objOptions.user.getValue());
+        assertEquals("password", "12345", objOptions.password.getValue());
+        assertEquals("command", "test.bsh", objOptions.command.getValue());
     }
 
 }

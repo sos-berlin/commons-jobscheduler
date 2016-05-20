@@ -67,7 +67,7 @@ public class SOSHibernateDBLayer {
         try {
             initSessionEx(options);
         } catch (Exception e) {
-            String s = String.format("Could not initiate session for database using options", options.gethibernate_connection_driver_class());
+            String s = String.format("Could not initiate session for database using options", options.getHibernateConnectionDriverClass());
             LOGGER.error(s + e.getMessage(), e);
             throw new RuntimeException(e);
         }

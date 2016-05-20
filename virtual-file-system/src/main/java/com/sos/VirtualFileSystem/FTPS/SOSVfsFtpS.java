@@ -34,10 +34,10 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
     protected FTPSClient Client() {
         if (client == null) {
             try {
-                LOGGER.info(String.format("use %s client security", objConnection2Options.ftpsClientSecurity.Value()));
-                client = new FTPSClient(objConnection2Options.ftpsProtocol.Value(), objConnection2Options.ftpsClientSecurity.isImplicit());
+                LOGGER.info(String.format("use %s client security", objConnection2Options.ftpsClientSecurity.getValue()));
+                client = new FTPSClient(objConnection2Options.ftpsProtocol.getValue(), objConnection2Options.ftpsClientSecurity.isImplicit());
                 if (usingProxy()) {
-                    LOGGER.info(String.format("using proxy: protocol = %s, host = %s, port = %s, user = %s, pass = ?", getProxyProtocol().Value(),
+                    LOGGER.info(String.format("using proxy: protocol = %s, host = %s, port = %s, user = %s, pass = ?", getProxyProtocol().getValue(),
                             getProxyHost(), getProxyPort(), getProxyUser()));
                     if (usingHttpProxy()) {
                         throw new Exception("FTPS via HTTP Proxy not implemented yet");
@@ -48,13 +48,13 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
                         ProxySelector.setDefault(ps);
                     }
                 }
-                if (!SOSString.isEmpty(objConnection2Options.keystoreFile.Value())) {
+                if (!SOSString.isEmpty(objConnection2Options.keystoreFile.getValue())) {
                     setTrustManager(client);
                 }
             } catch (Exception e) {
                 throw new JobSchedulerException("can not create FTPS-Client", e);
             }
-            objProtocolCommandListener = new SOSFtpClientLogger(HostID(""));
+            objProtocolCommandListener = new SOSFtpClientLogger(getHostID(""));
             if (objConnection2Options != null && objConnection2Options.protocolCommandListener.isTrue()) {
                 client.addProtocolCommandListener(objProtocolCommandListener);
             }
@@ -67,29 +67,29 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
     }
 
     @Override
-    public void connect(final String phost, final int pport) {
+    public void doConnect(final String phost, final int pport) {
         try {
             if (!isConnected()) {
                 super.connect(phost, pport);
                 Client().execPBSZ(0);
-                LogReply();
+                logReply();
                 Client().execPROT("P");
-                LogReply();
+                logReply();
                 Client().enterLocalPassiveMode();
             } else {
                 LOGGER.warn(SOSVfs_D_0102.params(host, port));
             }
         } catch (Exception e) {
-            String msg = HostID("connect returns an exception");
+            String msg = getHostID("connect returns an exception");
             LOGGER.error(msg, e);
         }
     }
 
     private void setTrustManager(FTPSClient client) throws Exception {
-        LOGGER.info(String.format("using keystore: type = %s, file = %s", objConnection2Options.keystoreType.Value(),
-                objConnection2Options.keystoreFile.Value()));
-        KeyStore ks = loadKeyStore(objConnection2Options.keystoreType.Value(), new File(objConnection2Options.keystoreFile.Value()),
-                objConnection2Options.keystorePassword.Value());
+        LOGGER.info(String.format("using keystore: type = %s, file = %s", objConnection2Options.keystoreType.getValue(),
+                objConnection2Options.keystoreFile.getValue()));
+        KeyStore ks = loadKeyStore(objConnection2Options.keystoreType.getValue(), new File(objConnection2Options.keystoreFile.getValue()),
+                objConnection2Options.keystorePassword.getValue());
         client.setTrustManager(TrustManagerUtils.getDefaultTrustManager(ks));
     }
 

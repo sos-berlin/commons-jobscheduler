@@ -114,7 +114,7 @@ public class SOSOptionPortNumber extends SOSOptionInteger {
     }
 
     @Override
-    public void Value(final String pstrPortNo) {
+    public void setValue(final String pstrPortNo) {
         @SuppressWarnings("unused")
         final String conMethodName = conClassName + "::Value";
         String strP = pstrPortNo;
@@ -128,7 +128,7 @@ public class SOSOptionPortNumber extends SOSOptionInteger {
                 strP = stripQuotes(strP);
                 int portNum = Integer.parseInt(strP);
                 if (portNum >= 0 && portNum <= 65535) {
-                    super.Value(strP);
+                    super.setValue(strP);
                 } else {
                     throw new JobSchedulerException(String.format("invalid port number: %1$s", strP));
                 }

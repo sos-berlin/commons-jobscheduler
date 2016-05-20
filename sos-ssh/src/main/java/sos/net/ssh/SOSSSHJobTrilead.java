@@ -63,20 +63,20 @@ public class SOSSSHJobTrilead extends SOSSSHJob2 {
             if (isConnected == false) {
                 this.connect();
             }
-            vfsHandler.OpenSession(objOptions);
+            vfsHandler.openSession(objOptions);
             if (objOptions.command.IsEmpty() == false) {
                 strCommands2Execute = objOptions.command.values();
             } else {
                 if (objOptions.isScript() == true) {
                     strCommands2Execute = new String[1];
-                    String strTemp = objOptions.commandScript.Value();
+                    String strTemp = objOptions.commandScript.getValue();
                     if (objOptions.commandScript.IsEmpty()) {
-                        strTemp = objOptions.commandScriptFile.JSFile().File2String();
+                        strTemp = objOptions.commandScriptFile.getJSFile().file2String();
                     }
                     strTemp = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strTemp);
                     strCommands2Execute[0] = vfsHandler.createScriptFile(strTemp);
                     flgScriptFileCreated = true; // http://www.sos-berlin.com/jira/browse/JITL-17
-                    strCommands2Execute[0] += " " + objOptions.commandScriptParam.Value();
+                    strCommands2Execute[0] += " " + objOptions.commandScriptParam.getValue();
                 } else {
                     throw new SSHMissingCommandError(objMsg.getMsg(SOS_SSH_E_100)); // "SOS-SSH-E-100: neither Commands nor Script(file) specified. Abort.");
                 }
@@ -89,7 +89,7 @@ public class SOSSSHJobTrilead extends SOSSSHJob2 {
                      * see http://www.sos-berlin.com/jira/browse/JS-673 */
                     strCmd = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strCmd);
                     logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
-                    vfsHandler.ExecuteCommand(strCmd);
+                    vfsHandler.executeCommand(strCmd);
                     objJSJobUtilities.setJSParam(conExit_code, "0");
                     checkStdOut();
                     checkStdErr();

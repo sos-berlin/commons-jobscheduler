@@ -106,7 +106,7 @@ public class SOSSSH2BaseImpl extends SOSVfsBaseClass {
             logger.debug(SOSVfs_D_255.get());
             String[] paramNames = params.names().split(";");
             for (String name : paramNames) {
-                SignalDebug(SOSVfs_D_256.params(name));
+                signalDebug(SOSVfs_D_256.params(name));
                 String regex = "(?i)";
                 /** \todo TODO os-abhängigkeit besser herstellen als hier gemacht
                  * 

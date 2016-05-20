@@ -41,7 +41,7 @@ public class JSMailOptions extends JSOptionsClass {
         @SuppressWarnings("unused")
         final String conMethodName = conClassName + "::setAllOptions";
         objSettings = pobjJSSettings;
-        super.Settings(objSettings);
+        super.setSettings(objSettings);
         // super.setAllOptions(pobjJSSettings);
         flgSetAllOptions = true;
 

@@ -44,7 +44,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
             super.spooler_process();
             doProcessing();
         } catch (Exception e) {
-            logger.fatal(StackTrace2String(e));
+            logger.fatal(stackTrace2String(e));
             throw new JobSchedulerException(e);
         }
         return signalSuccess();
@@ -80,7 +80,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
             objO = objR.getOptions();
             spooler_log.debug9("uses JSch implementation of SSH");
         }
-        objO.CurrentNodeName(this.getCurrentNodeName(true));
+        objO.setCurrentNodeName(this.getCurrentNodeName(true));
         HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(getJobOrOrderParameters());
         if (!useTrilead && !"false".equalsIgnoreCase(hsmParameters1.get("create_environment_variables"))) {
             Map<String, String> allEnvVars = new HashMap<String, String>();
@@ -88,14 +88,14 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
             allEnvVars.putAll(prefixSchedulerEnvVars(hsmParameters1));
             ((SOSSSHJobJSch) objR).setSchedulerEnvVars(allEnvVars);
         }
-        objO.setAllOptions(objO.DeletePrefix(hsmParameters1, "ssh_"));
+        objO.setAllOptions(objO.deletePrefix(hsmParameters1, "ssh_"));
         objR.setJSJobUtilites(this);
         if (!objO.commandSpecified()) {
             setJobScript(objO.commandScript);
         }
         objO.checkMandatory();
         if (!useTrilead) {
-            spooler_log.debug9("Run with watchdog set to: " + objO.runWithWatchdog.Value());
+            spooler_log.debug9("Run with watchdog set to: " + objO.runWithWatchdog.getValue());
             if (objO.runWithWatchdog.value()) {
                 pidFileName = generateTempPidFileName();
                 ((SOSSSHJobJSch) objR).setPidFileName(pidFileName);
@@ -110,7 +110,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
         // commands together
         // TO DO: a solution which fits for both cases [SP]
         if (!useTrilead && objO.commandDelimiter.isNotDirty()) {
-            objO.commandDelimiter.Value(";");
+            objO.commandDelimiter.setValue(";");
         }
         objR.execute();
         if (!useTrilead && !((SOSSSHJobJSch) objR).getReturnValues().isEmpty()) {
@@ -231,7 +231,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
             }
             return result;
         } catch (Exception e) {
-            throw new JobSchedulerException(JSJ_F_0060.params(StackTrace2String(e)), e);
+            throw new JobSchedulerException(JSJ_F_0060.params(stackTrace2String(e)), e);
         }
     }
 

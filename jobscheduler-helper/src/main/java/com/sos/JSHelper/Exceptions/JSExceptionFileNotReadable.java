@@ -42,7 +42,7 @@ public class JSExceptionFileNotReadable extends JobSchedulerException {
      * @param pstrMessage */
     public JSExceptionFileNotReadable(String pstrMessage) {
         super(pstrMessage);
-        this.Status(JobSchedulerException.PENDING);
+        this.setStatus(JobSchedulerException.PENDING);
     }
 
     /** \brief JSExceptionFileNotReadable
@@ -50,7 +50,7 @@ public class JSExceptionFileNotReadable extends JobSchedulerException {
      * \details Construtor without message. */
     public JSExceptionFileNotReadable() {
         super("File is not readable");
-        this.Status(JobSchedulerException.PENDING);
+        this.setStatus(JobSchedulerException.PENDING);
     }
 
 }

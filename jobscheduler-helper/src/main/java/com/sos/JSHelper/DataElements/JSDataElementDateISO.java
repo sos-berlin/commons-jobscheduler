@@ -57,11 +57,11 @@ public class JSDataElementDateISO extends JSDataElement {
     @Override
     public void doInit() {
         // super.Size(10);
-        super.Description("DateISO");
-        super.ColumnHeader("DateISO");
-        super.XMLTagName("DateISO");
+        super.description("DateISO");
+        super.columnHeader("DateISO");
+        super.xmlTagName("DateISO");
         // super.setFormatPattern(JSDateFormat.dfDATE_SHORT);
-        super.OmitXMLTag(true);
+        super.omitXMLTag(true);
 
     }
 }

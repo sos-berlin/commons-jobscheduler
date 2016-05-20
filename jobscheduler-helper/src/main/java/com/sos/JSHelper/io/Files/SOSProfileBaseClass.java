@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.sos.JSHelper.io.Files;
 
 import com.sos.JSHelper.Basics.JSToolBox;
@@ -9,26 +6,20 @@ import com.sos.JSHelper.Basics.JSToolBox;
 public class SOSProfileBaseClass<T> extends JSToolBox {
 
     protected T objParent = null;
-
     protected StringBuffer strComment = null;
     protected boolean flgIsDirty = false;
-
     protected String strName = "";
     protected String strValue;
 
-    /**
-	 * 
-	 */
     public SOSProfileBaseClass() {
+        //
     }
 
-    /** @return */
-    public String Name() {
+    public String getName() {
         return strName;
     }
 
-    /** @param string */
-    public void Name(String string) {
+    public void setName(String string) {
         strName = string;
         setDirty();
     }
@@ -38,7 +29,6 @@ public class SOSProfileBaseClass<T> extends JSToolBox {
         return flgIsDirty;
     }
 
-    @SuppressWarnings("unchecked")
     public boolean setDirty() {
         this.flgIsDirty = true;
         ((SOSProfileBaseClass<T>) objParent).setDirty();
@@ -57,13 +47,12 @@ public class SOSProfileBaseClass<T> extends JSToolBox {
         return this.strComment;
     }
 
-    /** @return the objParent */
     public T getObjParent() {
         return objParent;
     }
 
-    /** @param objParent the objParent to set */
     public void setObjParent(T objParent) {
         this.objParent = objParent;
     }
+
 }

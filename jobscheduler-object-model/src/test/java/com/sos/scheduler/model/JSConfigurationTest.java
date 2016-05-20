@@ -112,15 +112,15 @@ public class JSConfigurationTest {
     @SuppressWarnings("deprecation")
     private final void prepareFtpVfs() {
         objOptions = new SOSFTPOptions();
-        objOptions.host.Value("8of9.sos");
+        objOptions.host.setValue("8of9.sos");
         // objOptions.protocol.Value("ftp");
         // objOptions.port.Value("21");
-        objOptions.user.Value("sos");
-        objOptions.password.Value("sos");
+        objOptions.user.setValue("sos");
+        objOptions.password.setValue("sos");
         try {
-            objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
-            objVFS.Connect(objOptions);
-            objVFS.Authenticate(objOptions);
+            objVFS = VFSFactory.getHandler(objOptions.protocol.getValue());
+            objVFS.connect(objOptions);
+            objVFS.authenticate(objOptions);
             objFileSystemHandler = (ISOSVfsFileTransfer) objVFS;
         } catch (Exception e) {
             logger.error(e);

@@ -75,8 +75,8 @@ public class PropertyFactoryOptionsJUnitTest extends JSToolBox {
      * \details */
     @Test
     public void testOperation() {  // SOSOptionString
-        objOptions.Operation.Value("++merge++");
-        assertEquals("", objOptions.Operation.Value(), "++merge++");
+        objOptions.Operation.setValue("++merge++");
+        assertEquals("", objOptions.Operation.getValue(), "++merge++");
 
     }
 
@@ -85,8 +85,8 @@ public class PropertyFactoryOptionsJUnitTest extends JSToolBox {
      * \details */
     @Test
     public void testPropertyFileNamePrefix() {  // SOSOptionString
-        objOptions.PropertyFileNamePrefix.Value("++----++");
-        assertEquals("", objOptions.PropertyFileNamePrefix.Value(), "++----++");
+        objOptions.propertyFileNamePrefix.setValue("++----++");
+        assertEquals("", objOptions.propertyFileNamePrefix.getValue(), "++----++");
 
     }
 
@@ -96,8 +96,8 @@ public class PropertyFactoryOptionsJUnitTest extends JSToolBox {
      * \details The Folder, which has all the I18N Property files. */
     @Test
     public void testSourceFolderName() {  // SOSOptionFolderName
-        objOptions.SourceFolderName.Value("++----++");
-        assertEquals("The Folder, which has all the I18N Property files.", "++----++" + "/", objOptions.SourceFolderName.Value());
+        objOptions.sourceFolderName.setValue("++----++");
+        assertEquals("The Folder, which has all the I18N Property files.", "++----++" + "/", objOptions.sourceFolderName.getValue());
 
     }
 

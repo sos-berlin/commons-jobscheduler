@@ -82,7 +82,7 @@ public class JSObjProcessClass extends ProcessClass {
     }
 
     public void setMaxProcesses(final int value) {
-        maxProcesses = Int2BigInteger(value);
+        maxProcesses = int2BigInteger(value);
     }
 
 }

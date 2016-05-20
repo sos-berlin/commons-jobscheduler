@@ -20,15 +20,15 @@ public class SOSOptionTransferMode extends SOSOptionStringValueList {
     }
 
     public boolean isAscii() {
-        return this.Value().equalsIgnoreCase(enuTransferModes.ascii.description) || this.Value().equalsIgnoreCase(enuTransferModes.text.description);
+        return this.getValue().equalsIgnoreCase(enuTransferModes.ascii.description) || this.getValue().equalsIgnoreCase(enuTransferModes.text.description);
     }
 
     public boolean isBinary() {
-        return this.Value().equalsIgnoreCase(enuTransferModes.binary.description);
+        return this.getValue().equalsIgnoreCase(enuTransferModes.binary.description);
     }
 
     public boolean isText() {
-        return this.Value().equalsIgnoreCase(enuTransferModes.text.description);
+        return this.getValue().equalsIgnoreCase(enuTransferModes.text.description);
     }
 
     public String getDescription() {

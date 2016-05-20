@@ -20,8 +20,8 @@ public class JSDataElementDateTest {
     @Test
     public void testISO() throws Exception {
         JSDataElementDate objDate = new JSDataElementDate(" ", "Date as of which the price is valid", 8, 20, " ", "ValidFromDate", "ValidFromDate");
-        objDate.FormatString(JSDateFormat.dfDATE_SHORT);
-        objDate.Value("20091101");
+        objDate.setFormatString(JSDateFormat.dfDATE_SHORT);
+        objDate.setValue("20091101");
         assertEquals("Date as XML is", "<ValidFromDate>2009-11-01</ValidFromDate>", objDate.toXml());
     }
 

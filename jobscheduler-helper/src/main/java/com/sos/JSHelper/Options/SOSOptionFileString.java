@@ -28,21 +28,21 @@ public class SOSOptionFileString extends SOSOptionString {
     }
 
     @Override
-    public void Value(final String pstrValue) {
+    public void setValue(final String pstrValue) {
 
         @SuppressWarnings("unused")
         final String conMethodName = conClassName + "::Value";
 
         strFileName = pstrValue;
         if (pstrValue == null) {
-            super.Value(pstrValue);
+            super.setValue(pstrValue);
         } else {
             if (pstrValue.toLowerCase().startsWith("file:")) {
                 strFileName = pstrValue.substring(5);
 
                 JSFile objFle = new JSFile(strFileName);
                 try {
-                    objFle.MustExist();
+                    objFle.mustExist();
                 } catch (Exception e) {
                     throw new JobSchedulerException(String.format("File '%1$s' does not exist", strFileName), e);
                 }
@@ -53,10 +53,10 @@ public class SOSOptionFileString extends SOSOptionString {
             JSFile objF = new JSFile(strFileName);
             if (objF.canRead() == true) {
                 String strT = objF.getContent().trim();
-                super.Value(strT);
+                super.setValue(strT);
             } else {
                 // TODO unescape html/xml entities
-                super.Value(pstrValue);
+                super.setValue(pstrValue);
             }
         }
 

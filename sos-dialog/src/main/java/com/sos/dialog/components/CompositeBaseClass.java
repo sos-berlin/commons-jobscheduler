@@ -103,8 +103,8 @@ public abstract class CompositeBaseClass<T> extends Composite implements ISOSTab
                 for (Object objC1 : objCB.getControlList()) {
                     if (objC1 instanceof SOSOptionElement) {
                         SOSOptionElement objBx = (SOSOptionElement) objC1;
-                        if ("true".equalsIgnoreCase(objBx.Value())) {
-                            objBx.Value("false");
+                        if ("true".equalsIgnoreCase(objBx.getValue())) {
+                            objBx.setValue("false");
                         }
                     }
                 }

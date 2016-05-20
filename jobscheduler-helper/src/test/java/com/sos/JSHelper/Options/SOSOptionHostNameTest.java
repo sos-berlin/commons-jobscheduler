@@ -21,41 +21,41 @@ public class SOSOptionHostNameTest {
 
     @Test
     public final void testValueString() {
-        objHostName.Value(SOSOptionHostName.conLocalHostName);
-        assertEquals("host is localhost", "localhost", objHostName.Value());
+        objHostName.setValue(SOSOptionHostName.conLocalHostName);
+        assertEquals("host is localhost", "localhost", objHostName.getValue());
     }
 
     @Test
     public final void testGetHostAdress() {
-        objHostName.Value(SOSOptionHostName.conLocalHostName);
+        objHostName.setValue(SOSOptionHostName.conLocalHostName);
         String strIPAdress = objHostName.getHostAdress();
         assertEquals("ip is 127.0.0.1", "127.0.0.1", strIPAdress);
     }
 
     @Test
     public final void testGetHostAdress2() {
-        objHostName.Value("http://homer.sos/jade");
+        objHostName.setValue("http://homer.sos/jade");
         String strIPAdress = objHostName.getHostAdress();
         assertEquals("ip is 192.11.0.95", "192.11.0.95", strIPAdress);
     }
 
     @Test
     public final void testToString() {
-        objHostName.Value(SOSOptionHostName.conLocalHostName);
+        objHostName.setValue(SOSOptionHostName.conLocalHostName);
         String strIPAdress = objHostName.toString();
         assertEquals("expected: localhost (127.0.0.1)", "localhost (127.0.0.1)", strIPAdress);
     }
 
     @Test
     public final void testPing() {
-        objHostName.Value(SOSOptionHostName.conLocalHostName);
+        objHostName.setValue(SOSOptionHostName.conLocalHostName);
         boolean flgHostIsReachable = objHostName.ping();
         assertTrue("Host is reachable", flgHostIsReachable);
     }
 
     @Test
     public final void testEmptyHostName() {
-        objHostName.Value("");
+        objHostName.setValue("");
         String strIPAdress = objHostName.toString();
         assertEquals("", "", strIPAdress);
         strIPAdress = objHostName.getHostAdress();
@@ -68,7 +68,7 @@ public class SOSOptionHostNameTest {
 
     @Test
     public final void testgetLocalHostIfHostIsEmpty() {
-        objHostName.Value("");
+        objHostName.setValue("");
         String strIPAdress = objHostName.toString();
         assertEquals("", "", strIPAdress);
         strIPAdress = objHostName.getLocalHostIfHostIsEmpty();
@@ -78,7 +78,7 @@ public class SOSOptionHostNameTest {
     @Test
     @Ignore("Test set to Ignore for later examination")
     public final void testPortOpen() {
-        objHostName.Value(SOSOptionHostName.conLocalHostName);
+        objHostName.setValue(SOSOptionHostName.conLocalHostName);
         SOSOptionPortNumber objPort = new SOSOptionPortNumber(null, "port", "", String.valueOf(SOSOptionPortNumber.conPort4http),
                 String.valueOf(SOSOptionPortNumber.conPort4http), false);
         objHostName.setPort(objPort);

@@ -73,7 +73,7 @@ public class JSObjInclude extends Include {
     }
 
     public String getContent() {
-        return getHotFolderSrc().File2String();
+        return getHotFolderSrc().file2String();
     }
 
 }

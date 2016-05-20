@@ -60,8 +60,8 @@ public class SOSSearchAndReplaceFilterTest {
     @Test
     public void testWriteByteArray() {
         String strT = "Hallo, Welt!";
-        objFO.replaceWhat.Value("(Hallo)");
-        objFO.replaceWith.Value("<b>$1</b>");
+        objFO.replaceWhat.setValue("(Hallo)");
+        objFO.replaceWith.setValue("<b>$1</b>");
         objF.write(strT.getBytes());
 
         bteBuffer = objF.read();
@@ -73,8 +73,8 @@ public class SOSSearchAndReplaceFilterTest {
     @Test
     public void testWriteByteArray2() {
         String strT = "Hallo, Welt!";
-        objFO.replaceWhat.Value("(Welt)");
-        objFO.replaceWith.Value("<b>$1</b>");
+        objFO.replaceWhat.setValue("(Welt)");
+        objFO.replaceWith.setValue("<b>$1</b>");
         objF.write(strT);
 
         String strX = objF.readString();

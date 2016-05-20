@@ -71,9 +71,9 @@ public class JSObjects2GraphvizJUnitTest extends JSToolBox {
     @Ignore("Test set to Ignore for later examination")
     public void testExecute() throws Exception {
 
-        objOptions.output_folder_name.Value("c:/temp");
-        objOptions.live_folder_name.Value(conLiveLocalFolderLocation);
-        objE.Execute();
+        objOptions.outputFolderName.setValue("c:/temp");
+        objOptions.liveFolderName.setValue(conLiveLocalFolderLocation);
+        objE.execute();
 
     }
 }  // class JSObjects2GraphvizJUnitTest

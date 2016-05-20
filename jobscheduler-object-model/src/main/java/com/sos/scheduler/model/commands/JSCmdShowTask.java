@@ -28,7 +28,7 @@ public class JSCmdShowTask extends ShowTask {
         @SuppressWarnings("unused")
         final String conMethodName = conClassName + "::setWhat";
 
-        super.setWhat(penuT.Text());
+        super.setWhat(penuT.getText());
 
     } // private void setWhat
 
@@ -46,7 +46,7 @@ public class JSCmdShowTask extends ShowTask {
 
         String strT = "";
         for (enu4What enuState4What : penuT) {
-            strT += enuState4What.Text() + " ";
+            strT += enuState4What.getText() + " ";
         }
         super.setWhat(strT);
 

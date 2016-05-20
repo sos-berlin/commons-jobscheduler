@@ -70,16 +70,16 @@ public class SosHibernateSession {
         if (session == null) {
             try {
                 Configuration configuration = getConfiguration(getDefaultClassMapping());
-                configuration.setProperty("hibernate.connection.url", options.gethibernate_connection_url().Value());
-                configuration.setProperty("hibernate.connection.password", options.gethibernate_connection_password().Value());
-                configuration.setProperty("hibernate.connection.url", options.gethibernate_connection_url().Value());
-                configuration.setProperty("hibernate.connection.username", options.gethibernate_connection_username().Value());
-                configuration.setProperty("hibernate.dialect", options.gethibernate_dialect().Value());
-                configuration.setProperty("hibernate.show_sql", options.gethibernate_show_sql().Value());
-                configuration.setProperty("hibernate.connection.autocommit", options.gethibernate_connection_autocommit().Value());
-                configuration.setProperty("hibernate.connection.isolation", options.gethibernate_connection_isolation().Value());
-                configuration.setProperty("hibernate.format_sql", options.gethibernate_format_sql().Value());
-                configuration.setProperty("hibernate.jdbc.use_scrollable_resultset", options.gethibernate_jdbc_use_scrollable_resultset().Value());
+                configuration.setProperty("hibernate.connection.url", options.getHibernateConnectionUrl().getValue());
+                configuration.setProperty("hibernate.connection.password", options.getHibernateConnectionPassword().getValue());
+                configuration.setProperty("hibernate.connection.url", options.getHibernateConnectionUrl().getValue());
+                configuration.setProperty("hibernate.connection.username", options.getHibernateConnectionUsername().getValue());
+                configuration.setProperty("hibernate.dialect", options.getHibernateDialect().getValue());
+                configuration.setProperty("hibernate.show_sql", options.getHibernateShowSql().getValue());
+                configuration.setProperty("hibernate.connection.autocommit", options.getHibernateConnectionAutocommit().getValue());
+                configuration.setProperty("hibernate.connection.isolation", options.getHibernateConnectionIsolation().getValue());
+                configuration.setProperty("hibernate.format_sql", options.getHibernateFormatSql().getValue());
+                configuration.setProperty("hibernate.jdbc.use_scrollable_resultset", options.getHibernateJdbcUseScrollableResultset().getValue());
                 openSession(configuration);
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);

@@ -39,7 +39,7 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
     }
 
     @Override
-    public boolean FileExists() throws Exception {
+    public boolean fileExists() throws Exception {
         boolean flgResult = super.exists();
         return flgResult;
     }
@@ -119,7 +119,7 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
     @Override
     public String getModificationTime() {
         Date dteModificationTime = new Date(super.lastModified());
-        return new JSDataElementDateTime(dteModificationTime).FormattedValue();
+        return new JSDataElementDateTime(dteModificationTime).getFormattedValue();
     }
 
     @Override
@@ -300,7 +300,7 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
     }
 
     @Override
-    public void String2File(final String pstrContent) {
+    public void string2File(final String pstrContent) {
         try {
             OutputStream objOS = this.getFileOutputStream();
             objOS.write(pstrContent.getBytes());
@@ -312,7 +312,7 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
     }
 
     @Override
-    public String File2String() {
+    public String file2String() {
         InputStream objFI = this.getFileInputStream();
         if (objFI == null) {
             throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_265.get());

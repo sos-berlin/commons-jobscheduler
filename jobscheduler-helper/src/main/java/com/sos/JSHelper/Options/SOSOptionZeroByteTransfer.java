@@ -33,12 +33,12 @@ public class SOSOptionZeroByteTransfer extends SOSOptionStringValueList {
         super.valueList(enuZeroByteTransfer.getArray());
     }
 
-    public void Value(final enuZeroByteTransfer enu) {
+    public void setValue(final enuZeroByteTransfer enu) {
         this.enu = enu;
-        super.Value(this.enu.name());
+        super.setValue(this.enu.name());
     }
 
-    public void Value(String enu) {
+    public void setValue(String enu) {
         enu = enu.toLowerCase();
         if ("true".equalsIgnoreCase(enu)) {
             enu = "yes";
@@ -48,7 +48,7 @@ public class SOSOptionZeroByteTransfer extends SOSOptionStringValueList {
         if (enuZeroByteTransfer.contains(enu)) {
             this.enu = enuZeroByteTransfer.valueOf(enu);
         }
-        super.Value(this.enu.name());
+        super.setValue(this.enu.name());
     }
 
     public enuZeroByteTransfer getEnum() {

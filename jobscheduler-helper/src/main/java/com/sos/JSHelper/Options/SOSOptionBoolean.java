@@ -51,7 +51,7 @@ public class SOSOptionBoolean extends SOSOptionElement {
             final String pPstrDefaultValue, final boolean pPflgIsMandatory) {
         super(pobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
         intOptionType = isOptionTypeBoolean; // Boolean
-        this.Value(pPstrValue);
+        this.setValue(pPstrValue);
         this.setNotDirty();
     }
 
@@ -63,14 +63,14 @@ public class SOSOptionBoolean extends SOSOptionElement {
      * @return
      * @throws Exception */
     @Override
-    public void Value(final String pstrValue) {
+    public void setValue(final String pstrValue) {
         if (isNotEmpty(pstrValue)) {
             /** \todo über den regexp prüfen, ob die Werte syntaktisch korrekt
              * sind */
-            super.Value(pstrValue);
-            flgValue = String2Bool();
+            super.setValue(pstrValue);
+            flgValue = string2Bool();
         } else {
-            super.Value("");
+            super.setValue("");
         }
         flgValue = string2Bool(strValue);
     }
@@ -81,9 +81,9 @@ public class SOSOptionBoolean extends SOSOptionElement {
         if (pflgValue != flgValue) {
             flgValue = pflgValue;
             if (pflgValue) {
-                this.Value("true");
+                this.setValue("true");
             } else {
-                this.Value("false");
+                this.setValue("false");
             }
         }
     } // public void value}

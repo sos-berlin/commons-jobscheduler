@@ -289,7 +289,7 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
                     throw new JobSchedulerException("missing parameter \"" + _paramFileName + "\" for importFile");
                 }
                 hwFile = new JSCsvFile(fileName);
-                hwFile.CheckColumnCount(false);
+                hwFile.setCheckColumnCount(false);
                 if (!hwFile.exists())
                     throw new JobSchedulerException("file does not exist: " + hwFile.getAbsolutePath());
                 if (!hwFile.canRead())
@@ -358,7 +358,7 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
 
             String[] strValues = null;
             hwFile.loadHeaders();
-            String[] strHeader = hwFile.Headers();
+            String[] strHeader = hwFile.getHeaders();
 
             for (String header : strHeader) {
                 getLogger().debug1("Header-Field:" + header);

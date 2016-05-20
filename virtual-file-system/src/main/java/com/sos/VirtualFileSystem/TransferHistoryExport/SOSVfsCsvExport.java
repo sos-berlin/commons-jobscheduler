@@ -38,15 +38,15 @@ public class SOSVfsCsvExport extends SOSVfsMessageCodes implements ISOSTransferH
         pid = strA[0];
         String last_error_message = "";
         try {
-            objCSVFile.AddCellValue(" ").AddCellValue(objOptions.mandator.Value()).AddCellValue(" ").AddCellValue(pid).AddCellValue("0")
-                    .AddCellValue(objOptions.operation.Value()).AddCellValue(objOptions.Source().host.Value())
-                    .AddCellValue(objOptions.Source().host.getHostAdress()).AddCellValue(objOptions.Source().user.Value())
-                    .AddCellValue(objOptions.Target().host.Value()).AddCellValue(objOptions.Target().host.getHostAdress())
-                    .AddCellValue(objOptions.Target().user.Value()).AddCellValue(objOptions.protocol.Value()).AddCellValue(objOptions.port.Value())
-                    .AddCellValue(objOptions.sourceDir.Value()).AddCellValue(objOptions.targetDir.Value()).AddCellValue(" ")
-                    .AddCellValue(" ").AddCellValue(" ").AddCellValue(" ").AddCellValue(" ").AddCellValue(last_error_message)
-                    .AddCellValue(objOptions.log_filename.Value()).AddCellValue(" ").AddCellValue(" ").AddCellValue(" ").AddCellValue(" ").AddCellValue(" ")
-                    .NewLine();
+            objCSVFile.addCellValue(" ").addCellValue(objOptions.mandator.getValue()).addCellValue(" ").addCellValue(pid).addCellValue("0")
+                    .addCellValue(objOptions.operation.getValue()).addCellValue(objOptions.getSource().host.getValue())
+                    .addCellValue(objOptions.getSource().host.getHostAdress()).addCellValue(objOptions.getSource().user.getValue())
+                    .addCellValue(objOptions.getTarget().host.getValue()).addCellValue(objOptions.getTarget().host.getHostAdress())
+                    .addCellValue(objOptions.getTarget().user.getValue()).addCellValue(objOptions.protocol.getValue()).addCellValue(objOptions.port.getValue())
+                    .addCellValue(objOptions.sourceDir.getValue()).addCellValue(objOptions.targetDir.getValue()).addCellValue(" ")
+                    .addCellValue(" ").addCellValue(" ").addCellValue(" ").addCellValue(" ").addCellValue(last_error_message)
+                    .addCellValue(objOptions.logFilename.getValue()).addCellValue(" ").addCellValue(" ").addCellValue(" ").addCellValue(" ").addCellValue(" ")
+                    .newLine();
         } catch (Exception e) {
             LOGGER.error(e.getLocalizedMessage());
             throw new JobSchedulerException(SOSVfs_E_260.params(conMethodName), e);

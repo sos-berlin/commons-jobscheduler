@@ -316,7 +316,7 @@ public class SOSVfsXmlExport extends SOSVfsMessageCodes implements ISOSTransferH
             sectionName = jadeTransferExportData.getProfile();
         }
         if (isEmpty(sectionName)) {
-            sectionName = objOptions.profile.Value().trim();
+            sectionName = objOptions.profile.getValue().trim();
         }
         if (isNull(sectionName)) {
             sectionName = "";
@@ -324,7 +324,7 @@ public class SOSVfsXmlExport extends SOSVfsMessageCodes implements ISOSTransferH
         if (isNotEmpty(sectionName)) {
             sectionName += "-";
         }
-        return objOptions.TempDir() + rootElementName + "-" + sectionName + getDateTimeFormatted("yyyyMMddHHmmssSSSS") + ".xml";
+        return objOptions.getTempDir() + rootElementName + "-" + sectionName + getDateTimeFormatted("yyyyMMddHHmmssSSSS") + ".xml";
     }
 
     private void open() {

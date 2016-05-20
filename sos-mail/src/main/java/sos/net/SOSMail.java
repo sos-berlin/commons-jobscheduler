@@ -124,12 +124,12 @@ public class SOSMail {
     public static final int PRIORITY_LOW = 4;
     public static final int PRIORITY_LOWEST = 5;
 
-    abstract class My_data_source implements DataSource {
+    abstract class MydataSource implements DataSource {
 
         final String name;
         final String content_type;
 
-        public My_data_source(final File new_filename, final String content_type) {
+        public MydataSource(final File new_filename, final String content_type) {
             name = new_filename.getName();
             this.content_type = content_type;
         }
@@ -150,11 +150,11 @@ public class SOSMail {
         }
     }
 
-    class File_data_source extends My_data_source {
+    class FileDataSource extends MydataSource {
 
         final File file;
 
-        public File_data_source(final File file, final String content_type) {
+        public FileDataSource(final File file, final String content_type) {
             super(file, content_type);
             this.file = file;
         }
@@ -174,31 +174,31 @@ public class SOSMail {
         this.init();
     }
 
-    public SOSMail(final String host_, final String user_, final String password_) throws Exception {
-        if (host_ != null) {
-            host = host_;
+    public SOSMail(final String host, final String user, final String password) throws Exception {
+        if (host != null) {
+            this.host = host;
         }
-        if (user_ != null) {
-            user = user_;
+        if (user != null) {
+            this.user = user;
         }
-        if (password_ != null) {
-            password = password_;
+        if (password != null) {
+            this.password = password;
         }
         this.init();
     }
 
-    public SOSMail(final String host_, final String port_, final String user_, final String password_) throws Exception {
-        if (host_ != null) {
-            host = host_;
+    public SOSMail(final String host, final String port, final String user, final String password) throws Exception {
+        if (host != null) {
+            this.host = host;
         }
-        if (port_ != null) {
-            port = port_;
+        if (port != null) {
+            this.port = port;
         }
-        if (user_ != null) {
-            user = user_;
+        if (user != null) {
+            this.user = user;
         }
-        if (password_ != null) {
-            password = password_;
+        if (password != null) {
+            this.password = password;
         }
         this.init();
     }
@@ -632,12 +632,12 @@ public class SOSMail {
         changed = true;
     }
 
-    private void add_file(final SOSMailAttachment att) throws Exception {
+    private void addFile(final SOSMailAttachment att) throws Exception {
         if (!att.getFile().exists()) {
             throw new Exception("Datei " + att.getFile().getAbsolutePath() + " fehlt");
         }
         MimeBodyPart attachment = new MimeBodyPart();
-        DataSource data_source = new File_data_source(att.getFile(), att.getContentType());
+        DataSource data_source = new FileDataSource(att.getFile(), att.getContentType());
         DataHandler data_handler = new DataHandler(data_source);
         attachment.setDataHandler(data_handler);
         attachment.setFileName(att.getFile().getName());
@@ -887,7 +887,7 @@ public class SOSMail {
                         throw new Exception("content_type ist null");
                     }
                     log(SOSClassUtil.getMethodName() + "-->" + "Attachment=" + attachment.getFile(), SOSLogger.DEBUG6);
-                    add_file(attachment);
+                    addFile(attachment);
                 }
             } else {
                 message.setHeader("Content-Transfer-Encoding", encoding);
@@ -1603,40 +1603,40 @@ public class SOSMail {
         try {
             SOSMail sosMail = this;
             sosMail.init();
-            sosMail.setHost(pobjO.gethost().Value());
-            sosMail.setPort(pobjO.getport().Value());
-            sosMail.setQueueDir(pobjO.getqueue_directory().Value());
-            sosMail.setFrom(pobjO.getfrom().Value());
-            sosMail.setContentType(pobjO.getcontent_type().Value());
-            sosMail.setEncoding(pobjO.getencoding().Value());
-            String recipient = pobjO.getto().Value();
+            sosMail.setHost(pobjO.getHost().getValue());
+            sosMail.setPort(pobjO.getPort().getValue());
+            sosMail.setQueueDir(pobjO.getQueueDirectory().getValue());
+            sosMail.setFrom(pobjO.getFrom().getValue());
+            sosMail.setContentType(pobjO.getContentType().getValue());
+            sosMail.setEncoding(pobjO.getEncoding().getValue());
+            String recipient = pobjO.getTo().getValue();
             String recipients[] = recipient.trim().split(strDelims);
             for (String recipient2 : recipients) {
                 sosMail.addRecipient(recipient2.trim());
             }
-            String recipientCC = pobjO.getcc().Value();
+            String recipientCC = pobjO.getCc().getValue();
             if (!recipientCC.trim().isEmpty()) {
                 String recipientsCC[] = recipientCC.trim().split(strDelims);
                 for (String element : recipientsCC) {
                     sosMail.addCC(element.trim());
                 }
             }
-            String recipientBCC = pobjO.getbcc().Value().trim();
+            String recipientBCC = pobjO.getBcc().getValue().trim();
             if (!recipientBCC.isEmpty()) {
                 String recipientsBCC[] = recipientBCC.trim().split(strDelims);
                 for (String element : recipientsBCC) {
                     sosMail.addBCC(element.trim());
                 }
             }
-            String strAttachments = pobjO.getattachment().Value().trim();
+            String strAttachments = pobjO.getAttachment().getValue().trim();
             if (!strAttachments.isEmpty()) {
                 String strAttachmentsA[] = strAttachments.trim().split(strDelims);
                 for (String element : strAttachmentsA) {
                     sosMail.addAttachment(element.trim());
                 }
             }
-            sosMail.setSubject(pobjO.getsubject().Value());
-            sosMail.setBody(pobjO.getbody().Value());
+            sosMail.setSubject(pobjO.getSubject().getValue());
+            sosMail.setBody(pobjO.getBody().getValue());
             if (sosLogger != null) {
                 sosLogger.debug("sending mail: \n" + sosMail.dumpMessageAsString());
             }

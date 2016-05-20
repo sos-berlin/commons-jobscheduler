@@ -36,7 +36,7 @@ public class JSCmdShowJobs extends ShowJobs {
         @SuppressWarnings("unused")
         final String conMethodName = conClassName + "::setWhat";
 
-        super.setWhat(penuT.Text());
+        super.setWhat(penuT.getText());
 
     } // private void setWhat
 
@@ -52,7 +52,7 @@ public class JSCmdShowJobs extends ShowJobs {
 
         String strT = "";
         for (enu4What enuState4What : penuT) {
-            strT += enuState4What.Text() + " ";
+            strT += enuState4What.getText() + " ";
         }
         super.setWhat(strT);
 

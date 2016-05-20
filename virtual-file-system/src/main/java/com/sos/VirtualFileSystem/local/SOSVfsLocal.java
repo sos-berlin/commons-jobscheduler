@@ -32,7 +32,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFolder;
 import com.sos.VirtualFileSystem.Options.SOSConnection2OptionsAlternate;
 import com.sos.VirtualFileSystem.common.SOSFileEntries;
 import com.sos.VirtualFileSystem.common.SOSVfsBaseClass;
-import com.sos.VirtualFileSystem.shell.cmdShell;
+import com.sos.VirtualFileSystem.shell.CmdShell;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
@@ -46,7 +46,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     @SuppressWarnings("unused")
     private File objWorkingDirectory = null;
 
-    private cmdShell objCmdShell = null;
+    private CmdShell objCmdShell = null;
 
     private boolean simulateShell = false;
 
@@ -69,7 +69,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
         JSFile objTargetFile = new JSFile(strTargetFileName);
         long lngFileSize = 0;
         try {
-            lngFileSize = objTargetFile.AppendFile(strSourceFileName);
+            lngFileSize = objTargetFile.appendFile(strSourceFileName);
         } catch (Exception e) {
             String strM = SOSVfs_E_134.params("appendFile()");
             logger.error(strM, e);
@@ -83,7 +83,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public ISOSConnection Authenticate(final ISOSAuthenticationOptions pobjAO) throws Exception {
+    public ISOSConnection authenticate(final ISOSAuthenticationOptions pobjAO) throws Exception {
         strReplyString = "230 Login successful.";
         return this;
     }
@@ -114,7 +114,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public void CloseConnection() throws Exception {
+    public void closeConnection() throws Exception {
         strReplyString = "ok";
     }
 
@@ -127,43 +127,43 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public void CloseSession() throws Exception {
+    public void closeSession() throws Exception {
         strReplyString = "221 Goodbye.";
     }
 
     @Override
-    public void CompletePendingCommand() {
+    public void completePendingCommand() {
     }
 
     @Override
-    public ISOSConnection Connect() throws Exception {
+    public ISOSConnection connect() throws Exception {
         strReplyString = "ok";
         return this;
     }
 
     @Override
-    public ISOSConnection Connect(final ISOSConnectionOptions pobjConnectionOptions) throws Exception {
-        this.Connect();
+    public ISOSConnection connect(final ISOSConnectionOptions pobjConnectionOptions) throws Exception {
+        this.connect();
         return this;
     }
 
     @Override
-    public ISOSConnection Connect(final SOSConnection2OptionsAlternate pobjConnectionOptions) throws Exception {
+    public ISOSConnection connect(final SOSConnection2OptionsAlternate pobjConnectionOptions) throws Exception {
         return null;
     }
 
     @Override
-    public ISOSConnection Connect(final ISOSDataProviderOptions pobjConnectionOptions) throws Exception {
+    public ISOSConnection connect(final ISOSDataProviderOptions pobjConnectionOptions) throws Exception {
         return null;
     }
 
     @Override
-    public ISOSConnection Connect(final String pstrHostName, final int pintPortNumber) throws Exception {
+    public ISOSConnection connect(final String pstrHostName, final int pintPortNumber) throws Exception {
         return null;
     }
 
     @Override
-    public void ControlEncoding(final String pstrControlEncoding) {
+    public void controlEncoding(final String pstrControlEncoding) {
     }
 
     @Override
@@ -197,14 +197,14 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public String DoPWD() {
+    public String doPWD() {
         return null;
     }
 
     @Override
-    public void ExecuteCommand(final String strCmd) throws Exception {
+    public void executeCommand(final String strCmd) throws Exception {
         if (objCmdShell == null) {
-            objCmdShell = new cmdShell();
+            objCmdShell = new CmdShell();
         }
         String strT = strCmd;
         if (objCmdShell.isWindows() == true) {
@@ -525,7 +525,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
      * @throws IOException */
     @Override
     public ISOSVirtualFolder mkdir(final SOSFolderName pobjFolderName) throws IOException {
-        new File(pobjFolderName.Value()).mkdir();
+        new File(pobjFolderName.getValue()).mkdir();
         return null;
     }
 
@@ -584,7 +584,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public ISOSSession OpenSession(final ISOSShellOptions pobjShellOptions) throws Exception {
+    public ISOSSession openSession(final ISOSShellOptions pobjShellOptions) throws Exception {
         return null;
     }
 
@@ -670,7 +670,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
 
     @Override
     public boolean rmdir(final SOSFolderName pobjFolderName) throws IOException {
-        new File(pobjFolderName.Value()).delete();
+        new File(pobjFolderName.getValue()).delete();
         return true;
     }
 
@@ -688,7 +688,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public ISOSVirtualFile TransferMode(final SOSOptionTransferMode pobjFileTransferMode) {
+    public ISOSVirtualFile transferMode(final SOSOptionTransferMode pobjFileTransferMode) {
         return null;
     }
 

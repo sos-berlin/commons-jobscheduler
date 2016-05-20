@@ -41,8 +41,8 @@ public class FormatPatternException extends JobSchedulerException {
      */
     public FormatPatternException(String pstrMessage) {
         super(pstrMessage);
-        this.Message(pstrMessage);
-        this.Status(JobSchedulerException.PENDING);
+        this.message(pstrMessage);
+        this.setStatus(JobSchedulerException.PENDING);
         // this.Category(CategoryOptions);
         // this.Typ(TypeOptionMissing);
     }
@@ -52,9 +52,9 @@ public class FormatPatternException extends JobSchedulerException {
     } // public DuplicateKeyException
 
     @Override
-    public String ExceptionText() {
+    public String getExceptionText() {
         String strT = null;
-        strT = super.ExceptionText();
+        strT = super.getExceptionText();
         return strT;
     }
 

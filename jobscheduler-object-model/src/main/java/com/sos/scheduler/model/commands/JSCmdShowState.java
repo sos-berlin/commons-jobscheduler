@@ -39,7 +39,7 @@ public class JSCmdShowState extends ShowState {
         @SuppressWarnings("unused")
         final String conMethodName = conClassName + "::setWhat";
 
-        super.setWhat(penuT.Text());
+        super.setWhat(penuT.getText());
 
     } // private void setWhat
 
@@ -57,7 +57,7 @@ public class JSCmdShowState extends ShowState {
 
         String strT = "";
         for (enu4What enuState4What : penuT) {
-            strT += enuState4What.Text() + " ";
+            strT += enuState4What.getText() + " ";
         }
         super.setWhat(strT);
 

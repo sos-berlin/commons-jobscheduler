@@ -30,32 +30,32 @@ public class JSObjects2GraphvizOptionsSuperClass extends JSOptionsClass {
     }
 
     @JSOptionDefinition(name = "live_folder_name", description = "", key = "live_folder_name", type = "SOSOptionString", mandatory = true)
-    public SOSOptionFolderName live_folder_name = new SOSOptionFolderName(this, CLASSNAME + ".live_folder_name", "", " ", " ", true);
+    public SOSOptionFolderName liveFolderName = new SOSOptionFolderName(this, CLASSNAME + ".live_folder_name", "", " ", " ", true);
 
-    public SOSOptionFolderName getlive_folder_name() {
-        return live_folder_name;
+    public SOSOptionFolderName getLiveFolderName() {
+        return liveFolderName;
     }
 
-    public void setlive_folder_name(final SOSOptionFolderName p_live_folder_name) {
-        live_folder_name = p_live_folder_name;
+    public void setLiveFolderName(final SOSOptionFolderName pLiveFolderName) {
+        liveFolderName = pLiveFolderName;
     }
 
     @JSOptionDefinition(name = "output_folder_name", description = "", key = "output_folder_name", type = "SOSOptionString", mandatory = true)
-    public SOSOptionFolderName output_folder_name = new SOSOptionFolderName(this, CLASSNAME + ".output_folder_name", "", "", "", true);
+    public SOSOptionFolderName outputFolderName = new SOSOptionFolderName(this, CLASSNAME + ".output_folder_name", "", "", "", true);
 
-    public SOSOptionFolderName getoutput_folder_name() {
-        return output_folder_name;
+    public SOSOptionFolderName getOutputFolderName() {
+        return outputFolderName;
     }
 
-    public void setoutput_folder_name(final SOSOptionFolderName p_output_folder_name) {
-        output_folder_name = p_output_folder_name;
+    public void setOutputFolderName(final SOSOptionFolderName pOutputFolderName) {
+        outputFolderName = pOutputFolderName;
     }
 
     @Override
     public void setAllOptions(final HashMap<String, String> pobjJSSettings) {
         flgSetAllOptions = true;
         objSettings = pobjJSSettings;
-        super.Settings(objSettings);
+        super.setSettings(objSettings);
         super.setAllOptions(pobjJSSettings);
         flgSetAllOptions = false;
     }

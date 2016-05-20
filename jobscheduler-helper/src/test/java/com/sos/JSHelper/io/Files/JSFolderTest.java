@@ -46,14 +46,14 @@ public class JSFolderTest {
     }
 
     /** Test method for
-     * {@link com.sos.JSHelper.io.Files.JSFolder#newFile(java.lang.String)}.
+     * {@link com.sos.JSHelper.io.Files.JSFolder#getNewFile(java.lang.String)}.
      * 
      * @throws IOException */
     @Test
     public void testNewFile() throws IOException {
         JSFolder objF = JSFolder.getTempDir();
-        JSFile objFle = objF.newFile("testNewFile.tmp");
-        objFle.WriteLine("testNewFile.tmp");
+        JSFile objFle = objF.getNewFile("testNewFile.tmp");
+        objFle.writeLine("testNewFile.tmp");
         assertTrue("File must exist", objFle.exists());
         objFle.delete();
     }

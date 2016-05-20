@@ -32,14 +32,14 @@ public class SOSOptionFTPSClientSecurity extends JSOptionValueList {
     }
 
     public boolean isExplicit() {
-        return (this.Value().equalsIgnoreCase(ClientSecurity.explicit.name()));
+        return (this.getValue().equalsIgnoreCase(ClientSecurity.explicit.name()));
     }
 
     public boolean isImplicit() {
-        return (this.Value().equalsIgnoreCase(ClientSecurity.implicit.name()));
+        return (this.getValue().equalsIgnoreCase(ClientSecurity.implicit.name()));
     }
 
-    public void Value(String value) {
+    public void setValue(String value) {
         String testValue = value.toLowerCase();
         try {
             SOSOptionFTPSClientSecurity.ClientSecurity.valueOf(testValue);
@@ -47,7 +47,7 @@ public class SOSOptionFTPSClientSecurity extends JSOptionValueList {
             throw new JobSchedulerException(String.format("Value \"%s\" is not valid for %s - valid values are %s : %s", testValue, strKey,
                     ClientSecurity.asString(), e.toString()));
         }
-        super.Value(testValue);
+        super.setValue(testValue);
     }
 
 }

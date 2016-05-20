@@ -32,7 +32,7 @@ public class FTPCommandPendingException extends JobSchedulerException {
 
     public FTPCommandPendingException(String pstrMessage) {
         super(pstrMessage);
-        this.Status(JobSchedulerException.PENDING);
+        this.setStatus(JobSchedulerException.PENDING);
         // this.MesFunction(pstrMesFunction);
         // this.MesType(pstrMesType);
         // this.Category(DataswitchException.CategoryIDocProcessing);

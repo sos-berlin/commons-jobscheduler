@@ -55,17 +55,17 @@ public class SOSRecordsFilter extends SOSNullFilter {
             bteBuffer = null;
             lngRecordsExcluded++;
         }
-        if (objOptions.exclude_lines_after.match(strT)) {
+        if (objOptions.excludeLinesAfter.match(strT)) {
             flgIncludeRecord = false;
         }
     } // private void doProcess
 
     private String createLineNumbers(final String pstrT) {
         String strT = pstrT;
-        if (objOptions.create_line_numbers.isTrue()) {
-            String strF = objOptions.Line_Numbering_Format.Value();
+        if (objOptions.createLineNumbers.isTrue()) {
+            String strF = objOptions.lineNumberingFormat.getValue();
             String strN = String.format(strF, lngRecordsIncluded);
-            int intP = objOptions.Line_numbering_position.value();
+            int intP = objOptions.lineNumberingPosition.value();
             if (intP <= 1) {
                 strT = strN + strT.substring(intP - 1);
             } else {

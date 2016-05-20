@@ -51,7 +51,7 @@ public class SOSMsg {
     }
 
     public void toLog() {
-        Write2Log(this.get());
+        write2Log(this.get());
     }
 
     private void setMsgType() {
@@ -78,10 +78,10 @@ public class SOSMsg {
     public void toLog(final Object... pstrArgs) {
         String strT = Messages.getMsg(strMessageCode, pstrArgs);
         strT = getFullMessage(strT);
-        Write2Log(strT);
+        write2Log(strT);
     }
 
-    private void Write2Log(final String pstrLogMsg) {
+    private void write2Log(final String pstrLogMsg) {
         switch (enuMsgType) {
         case error:
             logger.error(pstrLogMsg);
@@ -171,13 +171,13 @@ public class SOSMsg {
         }
         if (objMC.get(strMessageCode) == null) {
             try {
-                objMissingCodesPropertiesFile.WriteLine(strMessageCode + ".label = " + strMessageCode);
-                objMissingCodesPropertiesFile.WriteLine(strMessageCode + ".tooltip = " + strMessageCode);
-                objMissingCodesPropertiesFile.WriteLine(strMessageCode + ".shorttext = " + strMessageCode);
-                objMissingCodesPropertiesFile.WriteLine(strMessageCode + ".F1 = ");
-                objMissingCodesPropertiesFile.WriteLine(strMessageCode + ".F10 = ");
-                objMissingCodesPropertiesFile.WriteLine(strMessageCode + ".icon = ");
-                objMissingCodesPropertiesFile.WriteLine(strMessageCode + ".acc = ");
+                objMissingCodesPropertiesFile.writeLine(strMessageCode + ".label = " + strMessageCode);
+                objMissingCodesPropertiesFile.writeLine(strMessageCode + ".tooltip = " + strMessageCode);
+                objMissingCodesPropertiesFile.writeLine(strMessageCode + ".shorttext = " + strMessageCode);
+                objMissingCodesPropertiesFile.writeLine(strMessageCode + ".F1 = ");
+                objMissingCodesPropertiesFile.writeLine(strMessageCode + ".F10 = ");
+                objMissingCodesPropertiesFile.writeLine(strMessageCode + ".icon = ");
+                objMissingCodesPropertiesFile.writeLine(strMessageCode + ".acc = ");
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
             }
@@ -287,7 +287,6 @@ public class SOSMsg {
             case error:
             case fatal:
             case warning:
-                String strMsgAction = Messages.getLabel(strMessageCode + ".action");
                 String strMsgDesc = Messages.getLabel(strMessageCode + ".description");
                 if (strMsgDesc == null) {
                     strMsgDesc = "*** no detailed description available ***";
@@ -307,8 +306,7 @@ public class SOSMsg {
     }
 
     public String get(final Object... pstrArgs) {
-        String strT = Messages.getMsg(strMessageCode, pstrArgs);
-        return getFullMessage(strT);
+        return getFullMessage(Messages.getMsg(strMessageCode, pstrArgs));
     }
 
     public String getFullMessage(final Object... pstrArgs) {
@@ -319,10 +317,6 @@ public class SOSMsg {
         strT = String.format(strT, pstrArgs);
         flgShowFullMessageText = flgT;
         return strT;
-    }
-
-    public String params_(final Object... pstrArgs) {
-        return Messages.getMsg(strMessageCode, pstrArgs);
     }
 
     public String params(final Object... pstrArgs) {
@@ -377,6 +371,7 @@ public class SOSMsg {
     }
 
     protected void checkVerbosityLevel() {
+        //
     }
 
 }

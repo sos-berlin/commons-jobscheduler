@@ -12,29 +12,29 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.scheduler.model.LanguageDescriptorList;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
-/** /** @author oh */
+/** @author oh */
 public class JSObjJob extends Job {
 
-    private static final Logger logger = Logger.getLogger(JSObjJob.class);
+    private static final Logger LOGGER = Logger.getLogger(JSObjJob.class);
     private Script objScript = null;
     public static final String[] ValidLanguages4Job = LanguageDescriptorList.getLanguages4APIJobs();
     public static final String[] ValidLanguages4Monitor = LanguageDescriptorList.getLanguages4Monitor();
     public static final String InternalAPIMethodNames = "spooler_process_before;spooler_process_after;spooler_task_before;spooler_task_after;";
     public static final String MonitorMethodNames = "spooler_task_before;spooler_task_after;spooler_process_before;spooler_process_after";
-    public final static String fileNameExtension = ".job.xml";
-    public final static String[] ValidLogLevels = new String[] { "info", "debug1", "debug2", "debug3", "debug4", "debug5", "debug6", "debug7", "debug8",
-            "debug9", "" };
+    public static final String fileNameExtension = ".job.xml";
+    public static final String[] ValidLogLevels = new String[] { "info", "debug1", "debug2", "debug3", "debug4", "debug5", "debug6", "debug7",
+            "debug8", "debug9", "" };
     JobSettings objSettings = null;
 
     public static enum enuVisibilityTypes {
         enuIsVisible, enuIsNotVisible, enuIsNeverVisible;
 
-        private static String[] strVisibilityText = new String[] { "", "yes", "no", "never" };
-        public static boolean IsMandatory = false;
-        public static String I18nKey = "job.visible";
+        private static final String[] VISIBILITY_TEXT = new String[] { "", "yes", "no", "never" };
+        public static boolean isMandatory = false;
+        public static String i18nKey = "job.visible";
 
         public static String[] getTexts() {
-            return strVisibilityText;
+            return VISIBILITY_TEXT;
         }
     }
 
@@ -101,15 +101,6 @@ public class JSObjJob extends Job {
         return script;
     }
 
-    /** \brief removeEmptyContentsFrom
-     *
-     * \details Some objects contain cdata as well as other objects, so that
-     * unmarshalling creates for every spaces around the other objects empty
-     * cdata nodes. These empty cdata nodes are removed.
-     *
-     * \return void
-     *
-     * @param objList */
     private void removeEmptyContentsFrom(final List<Object> objList) {
         final List<String> emptyContents = new ArrayList<String>();
         for (final Object listItem : objList) {
@@ -169,7 +160,7 @@ public class JSObjJob extends Job {
         objScript = getScript();
         if (objScript == null) {
             final JobSchedulerException objJSException = new JobSchedulerException("Job has no script.");
-            logger.error("", objJSException);
+            LOGGER.error("", objJSException);
             throw objJSException;
         }
         return true;
@@ -202,8 +193,7 @@ public class JSObjJob extends Job {
 
     @Override
     public JSObjParams getParams() {
-        JSObjParams objP = new JSObjParams(objFactory, super.getParams());
-        return objP;
+        return new JSObjParams(objFactory, super.getParams());
     }
 
     @Override
@@ -227,11 +217,11 @@ public class JSObjJob extends Job {
     }
 
     public String getMintasks() {
-        return BigInt2String(super.getMinTasks());
+        return bigInt2String(super.getMinTasks());
     }
 
     public String getTasksAsString() {
-        return BigInt2String(super.getTasks());
+        return bigInt2String(super.getTasks());
     }
 
     public void setMintasks(final String mintasks) {
@@ -261,8 +251,7 @@ public class JSObjJob extends Job {
             objP = super.getRunTime();
             setDirty();
         }
-        JSObjRunTime objR = new JSObjRunTime(objFactory, objP);
-        return objR;
+        return new JSObjRunTime(objFactory, objP);
     }
 
     public String getJobName() {
@@ -340,8 +329,7 @@ public class JSObjJob extends Job {
     }
 
     public int getLanguage() {
-        String strT = this.getScript().getLanguage();
-        return languageAsInt(strT);
+        return languageAsInt(this.getScript().getLanguage());
     }
 
     public String getLanguageAsString(final int language) {
@@ -606,11 +594,11 @@ public class JSObjJob extends Job {
     }
 
     public void setMonitorName(final String name) {
-        // TO DO
+        //
     }
 
     public void setMailOnError(final String pstrValue, final String pstrDefaultValue) {
-        this.getSettings().setMailOnError(OneOfUs(pstrValue, pstrDefaultValue));
+        this.getSettings().setMailOnError(oneOfUs(pstrValue, pstrDefaultValue));
         setDirty();
     }
 
@@ -635,12 +623,13 @@ public class JSObjJob extends Job {
         try {
             return avoidNull(getSettings().getMailOnError());
         } catch (Exception e) {
+            //
         }
         return "";
     }
 
     public void setMailOnWarning(final String pstrValue, final String pstrDefaultValue) {
-        this.setSettings().setMailOnWarning(OneOfUs(pstrValue, pstrDefaultValue));
+        this.setSettings().setMailOnWarning(oneOfUs(pstrValue, pstrDefaultValue));
         setDirty();
     }
 
@@ -648,12 +637,13 @@ public class JSObjJob extends Job {
         try {
             return avoidNull(getSettings().getMailOnWarning());
         } catch (Exception e) {
+            //
         }
         return "";
     }
 
     public void setMailOnProcess(final String pstrValue, final String pstrDefaultValue) {
-        this.setSettings().setMailOnProcess(OneOfUs(pstrValue, pstrDefaultValue));
+        this.setSettings().setMailOnProcess(oneOfUs(pstrValue, pstrDefaultValue));
         setDirty();
     }
 
@@ -661,12 +651,13 @@ public class JSObjJob extends Job {
         try {
             return avoidNull(getSettings().getMailOnProcess());
         } catch (Exception e) {
+            //
         }
         return "";
     }
 
     public void setMailOnSuccess(final String pstrValue, final String pstrDefaultValue) {
-        this.setSettings().setMailOnSuccess(OneOfUs(pstrValue, pstrDefaultValue));
+        this.setSettings().setMailOnSuccess(oneOfUs(pstrValue, pstrDefaultValue));
         setDirty();
     }
 
@@ -674,12 +665,13 @@ public class JSObjJob extends Job {
         try {
             return avoidNull(getSettings().getMailOnSuccess());
         } catch (Exception e) {
+            //
         }
         return "";
     }
 
     public void setMailOnDelayAfterError(final String pstrValue, final String pstrDefaultValue) {
-        this.setSettings().setMailOnDelayAfterError(OneOfUs(pstrValue, pstrDefaultValue));
+        this.setSettings().setMailOnDelayAfterError(oneOfUs(pstrValue, pstrDefaultValue));
         setDirty();
     }
 
@@ -687,12 +679,13 @@ public class JSObjJob extends Job {
         try {
             return avoidNull(getSettings().getMailOnDelayAfterError());
         } catch (Exception e) {
+            //
         }
         return "";
     }
 
     public void setLogMailTo(final String pstrValue, final String pstrDefaultValue) {
-        this.setSettings().setLogMailTo(OneOfUs(pstrValue, pstrDefaultValue));
+        this.setSettings().setLogMailTo(oneOfUs(pstrValue, pstrDefaultValue));
         setDirty();
     }
 
@@ -700,12 +693,13 @@ public class JSObjJob extends Job {
         try {
             return avoidNull(getSettings().getLogMailTo());
         } catch (Exception e) {
+            //
         }
         return "";
     }
 
     public void setLogMailCC(final String pstrValue, final String pstrDefaultValue) {
-        this.setSettings().setLogMailCc(OneOfUs(pstrValue, pstrDefaultValue));
+        this.setSettings().setLogMailCc(oneOfUs(pstrValue, pstrDefaultValue));
         setDirty();
     }
 
@@ -713,12 +707,13 @@ public class JSObjJob extends Job {
         try {
             return avoidNull(getSettings().getLogMailCc());
         } catch (Exception e) {
+            //
         }
         return "";
     }
 
     public void setLogMailBcc(final String pstrValue, final String pstrDefaultValue) {
-        this.setSettings().setLogMailBcc(OneOfUs(pstrValue, pstrDefaultValue));
+        this.setSettings().setLogMailBcc(oneOfUs(pstrValue, pstrDefaultValue));
         setDirty();
     }
 
@@ -726,11 +721,12 @@ public class JSObjJob extends Job {
         try {
             return avoidNull(getSettings().getLogMailBcc());
         } catch (Exception e) {
+            //
         }
         return "";
     }
 
-    public String OneOfUs(final String pstrValue, final String pstrDefaultValue) {
+    public String oneOfUs(final String pstrValue, final String pstrDefaultValue) {
         if (isNotEmpty(pstrValue)) {
             return pstrValue;
         }
@@ -744,4 +740,5 @@ public class JSObjJob extends Job {
     public boolean isNotEmpty(final String pstrValue) {
         return pstrValue != null && !pstrValue.trim().isEmpty();
     }
+
 }

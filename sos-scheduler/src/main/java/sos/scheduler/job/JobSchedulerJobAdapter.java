@@ -56,13 +56,13 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     protected final String EMPTY_STRING = "";
     protected final boolean continue_with_spooler_process = true;
     protected final boolean continue_with_task = true;
-    private final static int MAX_LENGTH_OF_STATUSTEXT = 100;
+    private static final int MAX_LENGTH_OF_STATUSTEXT = 100;
     private JobSchedulerLog4JAppender objJSAppender = null;
+    public static final boolean conJobSuccess = false;
+    public static final boolean conJobFailure = false;
+    public static final boolean conJobChainSuccess = true;
+    public static final boolean conJobChainFailure = false;
     public final String conMessageFilePath = "com_sos_scheduler_messages";
-    public final static boolean conJobSuccess = false;
-    public final static boolean conJobFailure = false;
-    public final static boolean conJobChainSuccess = true;
-    public final static boolean conJobChainFailure = false;
 
     public JobSchedulerJobAdapter() {
         Messages = new Messages(conMessageFilePath, Locale.getDefault());
@@ -175,9 +175,9 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                     }
                 }
             }
-            SchedulerParameters = DeleteCurrentNodeNameFromKeys(SchedulerParameters);
+            SchedulerParameters = deleteCurrentNodeNameFromKeys(SchedulerParameters);
         } catch (Exception e) {
-            throw new JobSchedulerException(JSJ_F_0060.params(StackTrace2String(e)), e);
+            throw new JobSchedulerException(JSJ_F_0060.params(stackTrace2String(e)), e);
         }
         return SchedulerParameters;
     }
@@ -203,11 +203,11 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             }
             return result;
         } catch (Exception e) {
-            throw new JobSchedulerException(JSJ_F_0060.params(StackTrace2String(e)), e);
+            throw new JobSchedulerException(JSJ_F_0060.params(stackTrace2String(e)), e);
         }
     }
 
-    public HashMap<String, String> DeleteCurrentNodeNameFromKeys(final HashMap<String, String> pSchedulerParameterSet) {
+    public HashMap<String, String> deleteCurrentNodeNameFromKeys(final HashMap<String, String> pSchedulerParameterSet) {
         String strCurrentNodeName = getCurrentNodeName(false) + "/";
         int intNNLen = strCurrentNodeName.length();
         HashMap<String, String> newSchedulerParameters = new HashMap<String, String>();
@@ -247,7 +247,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                     }
                 }
             }
-            SchedulerParameters = DeleteCurrentNodeNameFromKeys(SchedulerParameters);
+            SchedulerParameters = deleteCurrentNodeNameFromKeys(SchedulerParameters);
             return SchedulerParameters;
         } catch (Exception e) {
             throw new JobSchedulerException(JSJ_F_0060.params(e.getMessage()), e);
@@ -438,7 +438,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     }
 
    
-    public String StackTrace2String(final Exception e) {
+    public String stackTrace2String(final Exception e) {
         String strT = null;
         if (isNotNull(e)) {
             strT = e.getMessage() + "\n";
@@ -621,7 +621,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         if (pobjOptionElement.isNotDirty()) {
             String strS = getJobScript();
             if (isNotEmpty(strS)) {
-                pobjOptionElement.Value(strS);
+                pobjOptionElement.setValue(strS);
                 logger.debug(String.format("copy script from script-tag of job '%2$s' to option '%1$s'", pobjOptionElement.getShortKey(),
                         getJob().name()));
             }

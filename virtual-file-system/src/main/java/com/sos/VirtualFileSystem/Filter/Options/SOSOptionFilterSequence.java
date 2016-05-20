@@ -23,7 +23,7 @@ public class SOSOptionFilterSequence extends SOSOptionStringValueList {
 
     public SOSOptionFilterSequence(final String pstrValue) {
         super(null, "nullFilter", "description", "", false);
-        this.Value(pstrValue);
+        this.setValue(pstrValue);
     }
 
     public SOSOptionFilterSequence(final JSOptionsClass pPobjParent, final String pPstrKey, final String pPstrDescription, final String pPstrValue,
@@ -38,9 +38,9 @@ public class SOSOptionFilterSequence extends SOSOptionStringValueList {
     }
 
     @Override
-    public void Value(final String pstrValueList) {
+    public void setValue(final String pstrValueList) {
         if (isNotEmpty(pstrValueList)) {
-            super.Value(pstrValueList);
+            super.setValue(pstrValueList);
             for (String strSingleValue : strValueList) {
                 boolean flgFound = false;
                 for (enuFilterCodes enuFC : enuFilterCodes.values()) {

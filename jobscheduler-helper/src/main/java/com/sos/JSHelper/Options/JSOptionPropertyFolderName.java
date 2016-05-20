@@ -58,13 +58,13 @@ public class JSOptionPropertyFolderName extends SOSOptionFolderName {
      * @param pstrFolderName
      * @throws Exception */
     @Override
-    public void Value(String pstrFolderName) {
+    public void setValue(String pstrFolderName) {
 
         @SuppressWarnings("unused")
         final String conMethodName = conClassName + "::Value";
         // prüfen, ob es den Folder gibt ...
-        pstrFolderName = objParentClass.CheckIsFileWritable(pstrFolderName, conMethodName);
-        super.Value(pstrFolderName);
+        pstrFolderName = objParentClass.checkIsFileWritable(pstrFolderName, conMethodName);
+        super.setValue(pstrFolderName);
         if (isNotEmpty(strValue)) {
             System.setProperty("user.dir", strValue);
         }
@@ -73,7 +73,7 @@ public class JSOptionPropertyFolderName extends SOSOptionFolderName {
     } // public void Value
 
     @Override
-    public String Value() {
+    public String getValue() {
 
         @SuppressWarnings("unused")
         final String conMethodName = conClassName + "::Value";

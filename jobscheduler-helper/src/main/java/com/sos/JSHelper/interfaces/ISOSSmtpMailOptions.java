@@ -12,93 +12,94 @@ import com.sos.JSHelper.Options.SOSOptionString;
 
 public interface ISOSSmtpMailOptions {
 
-    public abstract SOSOptionString getattachment();
+    public abstract SOSOptionString getAttachment();
 
-    public abstract void setattachment(SOSOptionString p_attachment);
+    public abstract void setAttachment(SOSOptionString pAttachment);
 
-    public abstract SOSOptionString getattachment_charset();
+    public abstract SOSOptionString getAttachmentCharset();
 
-    public abstract void setattachment_charset(SOSOptionString p_attachment_charset);
+    public abstract void setAttachmentCharset(SOSOptionString pAttachmentCharset);
 
-    public abstract SOSOptionString getattachment_content_type();
+    public abstract SOSOptionString getAttachmentContentType();
 
-    public abstract void setattachment_content_type(SOSOptionString p_attachment_content_type);
+    public abstract void setAttachmentContentType(SOSOptionString pAttachmentContentType);
 
-    public abstract SOSOptionString getattachment_encoding();
+    public abstract SOSOptionString getAttachmentEncoding();
 
-    public abstract void setattachment_encoding(SOSOptionString p_attachment_encoding);
+    public abstract void setAttachmentEncoding(SOSOptionString pAttachmentEncoding);
 
-    public abstract SOSOptionMailAdress getbcc();
+    public abstract SOSOptionMailAdress getBcc();
 
-    public abstract void setbcc(SOSOptionMailAdress p_bcc);
+    public abstract void setBcc(SOSOptionMailAdress pBcc);
 
-    public abstract SOSOptionString getbody();
+    public abstract SOSOptionString getBody();
 
-    public abstract void setbody(SOSOptionString p_body);
+    public abstract void setBody(SOSOptionString pBody);
 
-    public abstract SOSOptionMailAdress getcc();
+    public abstract SOSOptionMailAdress getCc();
 
-    public abstract void setcc(SOSOptionMailAdress p_cc);
+    public abstract void setCc(SOSOptionMailAdress pCc);
 
-    public abstract SOSOptionString getcharset();
+    public abstract SOSOptionString getCharset();
 
-    public abstract void setcharset(SOSOptionString p_charset);
+    public abstract void setCharset(SOSOptionString pCharset);
 
-    public abstract SOSOptionString getcontent_type();
+    public abstract SOSOptionString getContentType();
 
-    public abstract void setcontent_type(SOSOptionString p_content_type);
+    public abstract void setContentType(SOSOptionString pContentType);
 
-    public abstract SOSOptionString getencoding();
+    public abstract SOSOptionString getEncoding();
 
-    public abstract void setencoding(SOSOptionString p_encoding);
+    public abstract void setEncoding(SOSOptionString pEncoding);
 
-    public abstract SOSOptionMailAdress getfrom();
+    public abstract SOSOptionMailAdress getFrom();
 
-    public abstract void setfrom(SOSOptionMailAdress p_from);
+    public abstract void setFrom(SOSOptionMailAdress pFrom);
 
-    public abstract SOSOptionString getfrom_name();
+    public abstract SOSOptionString getFromName();
 
-    public abstract void setfrom_name(SOSOptionString p_from_name);
+    public abstract void setFromName(SOSOptionString pFromName);
 
-    public abstract SOSOptionHostName gethost();
+    public abstract SOSOptionHostName getHost();
 
-    public abstract void sethost(SOSOptionHostName p_host);
+    public abstract void setHost(SOSOptionHostName pHost);
 
-    public abstract SOSOptionPortNumber getport();
+    public abstract SOSOptionPortNumber getPort();
 
-    public abstract void setport(SOSOptionPortNumber p_port);
+    public abstract void setPort(SOSOptionPortNumber pPort);
 
-    public abstract SOSOptionString getqueue_directory();
+    public abstract SOSOptionString getQueueDirectory();
 
-    public abstract void setqueue_directory(SOSOptionString p_queue_directory);
+    public abstract void setQueueDirectory(SOSOptionString pQueueDirectory);
 
-    public abstract SOSOptionMailAdress getreply_to();
+    public abstract SOSOptionMailAdress getReplyTo();
 
-    public abstract void setreply_to(SOSOptionMailAdress p_reply_to);
+    public abstract void setReplyTo(SOSOptionMailAdress pReplyTo);
 
-    public abstract SOSOptionPassword getsmtp_password();
+    public abstract SOSOptionPassword getSmtpPassword();
 
-    public abstract void setsmtp_password(SOSOptionPassword p_smtp_password);
+    public abstract void setSmtpPassword(SOSOptionPassword pSmtpPassword);
 
-    public abstract SOSOptionString getsmtp_user();
+    public abstract SOSOptionString getSmtpUser();
 
-    public abstract void setsmtp_user(SOSOptionString p_smtp_user);
+    public abstract void setSmtpUser(SOSOptionString pSmtpUser);
 
-    public abstract SOSOptionString getsecurity_protocol();
+    public abstract SOSOptionString getSecurityProtocol();
 
-    public abstract void setsecurity_protocol(SOSOptionString p_security_protocol);
+    public abstract void setSecurityProtocol(SOSOptionString pSecurityProtocol);
 
-    public abstract SOSOptionMailSubject getsubject();
+    public abstract SOSOptionMailSubject getSubject();
 
-    public abstract void setsubject(SOSOptionMailSubject p_subject);
+    public abstract void setSubject(SOSOptionMailSubject pSubject);
 
-    public abstract SOSOptionMailAdress getto();
+    public abstract SOSOptionMailAdress getTo();
 
-    public abstract void setto(SOSOptionMailAdress p_to);
+    public abstract void setTo(SOSOptionMailAdress pTo);
 
     public abstract void setAllOptions(HashMap<String, String> pobjJSSettings) throws Exception;
 
     public abstract void checkMandatory() throws JSExceptionMandatoryOptionMissing, Exception;
 
     public abstract void commandLineArgs(String[] pstrArgs) throws Exception;
+    
 }

@@ -24,40 +24,40 @@ public class JSDataElementDateTime extends JSDataElement {
 
     public JSDataElementDateTime(final String pstrValue) {
         super(pstrValue);
-        String2Date(pstrValue);
-    }
-
-    private void String2Date(final String pstrDateTime) {
-        DateFormat objDF = DateFormat.getDateTimeInstance();
-        try {
-            dteDateTime = objDF.parse(pstrDateTime);
-        } catch (Exception objException) {
-            super.Value("");
-            dteDateTime = null;
-        }
+        string2Date(pstrValue);
     }
 
     public JSDataElementDateTime(final String pPstrValue, final String pPstrDescription) {
         super(pPstrValue, pPstrDescription);
     }
 
+    private void string2Date(final String pstrDateTime) {
+        DateFormat objDF = DateFormat.getDateTimeInstance();
+        try {
+            dteDateTime = objDF.parse(pstrDateTime);
+        } catch (Exception objException) {
+            super.setValue("");
+            dteDateTime = null;
+        }
+    }
+
     @Override
     public void doInit() {
-        super.FormatString(strDateFormat);
-        super.Description("DateAndTime");
-        super.ColumnHeader("DateTime");
-        super.XMLTagName("DateTime");
+        super.setFormatString(strDateFormat);
+        super.description("DateAndTime");
+        super.columnHeader("DateTime");
+        super.xmlTagName("DateTime");
     }
 
     @Override
-    public void Value(final String pstrDateTime) {
-        String2Date(pstrDateTime);
-        super.Value(pstrDateTime);
+    public void setValue(final String pstrDateTime) {
+        string2Date(pstrDateTime);
+        super.setValue(pstrDateTime);
     }
 
-    public void Value(final Date pdteDateTime) {
+    public void setValue(final Date pdteDateTime) {
         dteDateTime = pdteDateTime;
-        super.Value(this.FormattedValue());
+        super.setValue(this.getFormattedValue());
     }
 
     public Date value() {
@@ -65,22 +65,21 @@ public class JSDataElementDateTime extends JSDataElement {
     }
 
     @Override
-    public String FormattedValue() {
+    public String getFormattedValue() {
         if (dteDateTime == null) {
             strTimestamp = "";
         } else {
-            if (isEmpty(this.FormatString())) {
-                this.FormatString(FULL_DATETIME_FORMAT);
+            if (isEmpty(this.getFormatString())) {
+                this.setFormatString(FULL_DATETIME_FORMAT);
             }
-            dateFormatter = new SimpleDateFormat(this.FormatString());
+            dateFormatter = new SimpleDateFormat(this.getFormatString());
             strTimestamp = dateFormatter.format(dteDateTime);
         }
         return strTimestamp;
     }
 
-    public Date ActualDateTime() {
-        Calendar now = Calendar.getInstance();
-        return now.getTime();
+    public Date getActualDateTime() {
+        return Calendar.getInstance().getTime();
     }
 
 }

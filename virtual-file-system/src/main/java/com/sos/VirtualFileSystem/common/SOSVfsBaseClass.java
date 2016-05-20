@@ -54,11 +54,11 @@ public class SOSVfsBaseClass extends SOSVfsMessageCodes {
         flgIsLocked = true;
     }
 
-    final public SOSFTPOptions Options() {
+    final public SOSFTPOptions getOptions() {
         return objOptions;
     }
 
-    public void Options(final SOSFTPOptions pobjOptions) {
+    public void getOptions(final SOSFTPOptions pobjOptions) {
         objOptions = pobjOptions;
     }
 
@@ -82,7 +82,7 @@ public class SOSVfsBaseClass extends SOSVfsMessageCodes {
         intSourceOrTarget = enuSourceOrTarget.isTarget;
     }
 
-    final public enuSourceOrTarget SourceOrTarget() {
+    final public enuSourceOrTarget sourceOrTarget() {
         return intSourceOrTarget;
     }
 

@@ -34,7 +34,7 @@ public class JSIniFile extends JSTextFile {
         String line = null;
         try {
             StringBuffer strB = new StringBuffer();
-            while ((strB = this.GetLine()) != null) {
+            while ((strB = this.getLine()) != null) {
                 line = strB.toString().trim();
                 LOGGER.debug(line);
                 int intLineLength = line.length();
@@ -102,16 +102,16 @@ public class JSIniFile extends JSTextFile {
         return this.flgIsDirty;
     }
 
-    public Map<String, SOSProfileSection> Sections() {
+    public Map<String, SOSProfileSection> getSections() {
         return this.mapSections;
     }
 
-    public String Value(final String pstrEntryName) throws IOException {
+    public String getValue(final String pstrEntryName) throws IOException {
         final String strDefaultValue = null;
         return this.getPropertyString(this.strSectionName, pstrEntryName, strDefaultValue);
     }
 
-    public String Value(final String pstrEntryName, final String pstrDefaultValue) throws IOException {
+    public String getValue(final String pstrEntryName, final String pstrDefaultValue) throws IOException {
         return this.getPropertyString(this.strSectionName, pstrEntryName, pstrDefaultValue);
     }
 
@@ -119,11 +119,11 @@ public class JSIniFile extends JSTextFile {
         //
     }
 
-    public void SectionName(final String pstrSectionName) {
+    public void setSectionName(final String pstrSectionName) {
         this.strSectionName = pstrSectionName;
     }
 
-    public String SectionName() {
+    public String getSectionName() {
         return this.strSectionName;
     }
 
@@ -133,9 +133,9 @@ public class JSIniFile extends JSTextFile {
         }
         final SOSProfileSection map = (SOSProfileSection) this.mapSections.get(pstrSection.toLowerCase());
         if (map != null) {
-            final SOSProfileEntry objPE = map.Entry(key.toLowerCase());
+            final SOSProfileEntry objPE = map.getEntry(key.toLowerCase());
             if (objPE != null) {
-                return objPE.Value();
+                return objPE.getValue();
             }
         }
         return defaultValue;
@@ -157,11 +157,11 @@ public class JSIniFile extends JSTextFile {
         return defaultValue;
     }
 
-    public String ProfileName() {
+    public String getProfileName() {
         return this.strFileName;
     }
 
-    public void ProfileName(final String pstrProfileName) {
+    public void setProfileName(final String pstrProfileName) {
         this.strFileName = pstrProfileName;
     }
 
@@ -169,11 +169,11 @@ public class JSIniFile extends JSTextFile {
     public String toString() {
         String strT = "";
         int j = 0;
-        for (final Iterator i = this.Sections().entrySet().iterator(); i.hasNext();) {
+        for (final Iterator i = this.getSections().entrySet().iterator(); i.hasNext();) {
             final Map.Entry e = (Map.Entry) i.next();
             LOGGER.debug(j++ + ": " + e.getKey());
             final SOSProfileSection objPS = (SOSProfileSection) e.getValue();
-            LOGGER.debug(objPS.Name() + " - " + objPS.Entries().size());
+            LOGGER.debug(objPS.getName() + " - " + objPS.getEntries().size());
             strT = strT.concat(objPS.toString());
         }
         return strT;
@@ -191,16 +191,16 @@ public class JSIniFile extends JSTextFile {
     }
 
     public void save(final JSTextFile pobjSaveFile1) {
-        Map<String, SOSProfileSection> objS = this.Sections();
+        Map<String, SOSProfileSection> objS = this.getSections();
         LOGGER.debug("number of sections = " + objS.size());
         try {
             for (SOSProfileSection objPS : objS.values()) {
-                pobjSaveFile1.WriteLine(" ");
-                pobjSaveFile1.WriteLine("[" + objPS.Name() + "]");
-                LOGGER.debug(objPS.Name());
-                for (SOSProfileEntry objEntry : objPS.Entries().values()) {
-                    pobjSaveFile1.WriteLine(objEntry.Name() + "=" + objEntry.Value());
-                    LOGGER.debug("     " + objEntry.Name() + " = " + objEntry.Value());
+                pobjSaveFile1.writeLine(" ");
+                pobjSaveFile1.writeLine("[" + objPS.getName() + "]");
+                LOGGER.debug(objPS.getName());
+                for (SOSProfileEntry objEntry : objPS.getEntries().values()) {
+                    pobjSaveFile1.writeLine(objEntry.getName() + "=" + objEntry.getValue());
+                    LOGGER.debug("     " + objEntry.getName() + " = " + objEntry.getValue());
                 }
             }
             pobjSaveFile1.close();
@@ -208,7 +208,6 @@ public class JSIniFile extends JSTextFile {
         } catch (Exception e) {
             throw new JobSchedulerException(e.getMessage());
         }
-
     }
 
 }

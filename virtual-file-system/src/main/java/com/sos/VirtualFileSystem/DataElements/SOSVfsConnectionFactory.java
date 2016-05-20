@@ -57,7 +57,7 @@ public class SOSVfsConnectionFactory {
                 for (int i = 0; i < intMaxParallelTransfers; i++) {
                     objConnPoolSource.add(getVfsHandler(true));
                     // TODO handle multiple targets
-                    if (objOptions.NeedTargetClient() == true) {
+                    if (objOptions.isNeedTargetClient() == true) {
                         objConnPoolTarget.add(getVfsHandler(false));
                     }
                 }
@@ -76,24 +76,24 @@ public class SOSVfsConnectionFactory {
             SOSConnection2OptionsAlternate options;
             String dataType;
             if (isSource) {
-                options = objOptions.getConnectionOptions().Source();
+                options = objOptions.getConnectionOptions().getSource();
                 dataType = objOptions.getDataSourceType();
             } else {
-                options = objOptions.getConnectionOptions().Target();
+                options = objOptions.getConnectionOptions().getTarget();
                 dataType = objOptions.getDataTargetType();
             }
-            options.loadClassName.SetIfNotDirty(objOptions.getConnectionOptions().loadClassName);
+            options.loadClassName.setIfNotDirty(objOptions.getConnectionOptions().loadClassName);
             VFSFactory.setConnectionOptions(options);
             handler = prepareVFSHandler(handler, dataType, isSource);
 
             ISOSVfsFileTransfer client = (ISOSVfsFileTransfer) handler;
             try {
-                handler.Connect(options);
-                handler.Authenticate(options);
+                handler.connect(options);
+                handler.authenticate(options);
                 handleClient(client, options, isSource);
             } catch (Exception e) {
 
-                SOSConnection2OptionsAlternate alternatives = options.Alternatives();
+                SOSConnection2OptionsAlternate alternatives = options.getAlternatives();
                 if (alternatives.optionsHaveMinRequirements()) {
                     // TODO respect alternate authentication, eg password and/or
                     // public key
@@ -109,12 +109,12 @@ public class SOSVfsConnectionFactory {
                         logger.warn(String.format("client disconnect failed : %s", ce.toString()));
                     }
 
-                    handler = prepareVFSHandler(handler, alternatives.protocol.Value(), isSource);
+                    handler = prepareVFSHandler(handler, alternatives.protocol.getValue(), isSource);
                     client = (ISOSVfsFileTransfer) handler;
-                    handler.Connect(alternatives);
-                    handler.Authenticate(alternatives);
+                    handler.connect(alternatives);
+                    handler.authenticate(alternatives);
 
-                    options.AlternateOptionsUsed.value(true);
+                    options.alternateOptionsUsed.value(true);
                     handleClient(client, alternatives, isSource);
                     // alternatives.AlternateOptionsUsed.value(true);
                 } else {
@@ -133,7 +133,7 @@ public class SOSVfsConnectionFactory {
 
     private ISOSVFSHandler prepareVFSHandler(ISOSVFSHandler handler, final String dataType, final boolean isSource) throws Exception {
         handler = VFSFactory.getHandler(dataType);
-        handler.Options(objOptions);
+        handler.getOptions(objOptions);
         if (isSource) {
             handler.setSource();
         } else {
@@ -159,12 +159,12 @@ public class SOSVfsConnectionFactory {
             client.passive();
         }
         // objConnectOptions.transfer_mode is not used?
-        if (options.transferMode.isDirty() && options.transferMode.IsNotEmpty()) {
-            client.TransferMode(options.transferMode);
+        if (options.transferMode.isDirty() && options.transferMode.isNotEmpty()) {
+            client.transferMode(options.transferMode);
         } else {
-            client.TransferMode(objOptions.transferMode);
+            client.transferMode(objOptions.transferMode);
         }
-        client.ControlEncoding(objOptions.controlEncoding.Value());
+        client.controlEncoding(objOptions.controlEncoding.getValue());
 
         // TODO pre-commands for source and target separately
         /** RE wird durch SOSDataExchangeEngine.executePreTransferCommands()

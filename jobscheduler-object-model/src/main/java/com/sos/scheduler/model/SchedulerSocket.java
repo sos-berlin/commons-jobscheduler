@@ -24,7 +24,7 @@ public class SchedulerSocket extends Socket {
     }
 
     public SchedulerSocket(final SchedulerObjectFactoryOptions pobjOptions) throws Exception {
-        super(pobjOptions.ServerName.Value(), pobjOptions.PortNumber.value());
+        super(pobjOptions.ServerName.getValue(), pobjOptions.PortNumber.value());
         LOGGER.debug("super() is executed ...");
         objOptions = pobjOptions;
         LOGGER.debug("try to connect ...");
@@ -38,7 +38,7 @@ public class SchedulerSocket extends Socket {
     public void connect() {
         InetAddress addr;
         try {
-            String strHost = objOptions.ServerName.Value();
+            String strHost = objOptions.ServerName.getValue();
             addr = InetAddress.getByName(strHost);
             int intPortnumber = objOptions.PortNumber.value();
             if (!objOptions.TransferMethod.isTcp()) {

@@ -20,7 +20,7 @@ public class NoNewDataException extends JobSchedulerException {
     public NoNewDataException(String pstrMessage) {
         super(pstrMessage);
         // this.Status(DataswitchException.PENDING);
-        this.Status(JobSchedulerException.WARNING);
+        this.setStatus(JobSchedulerException.WARNING);
         // this.Category(CategoryJobStart);
         // this.Typ(CategoryJobStart);
 

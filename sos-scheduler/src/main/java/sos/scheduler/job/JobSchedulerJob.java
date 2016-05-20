@@ -35,7 +35,7 @@ public class JobSchedulerJob extends Job_impl {
     private String jobFolder = null;
     private String jobTitle = null;
 
-    public SOSConnection ConnectToJSDataBase() {
+    public SOSConnection connectToJSDataBase() {
         try {
             boolean isUniversalAgent = false;
             try {
@@ -137,7 +137,7 @@ public class JobSchedulerJob extends Job_impl {
 
     public SOSConnection getConnection() {
         if (sosConnection == null) {
-            ConnectToJSDataBase();
+            connectToJSDataBase();
         } 
         return sosConnection;
     }

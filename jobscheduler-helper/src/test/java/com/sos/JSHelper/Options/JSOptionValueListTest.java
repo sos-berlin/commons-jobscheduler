@@ -174,7 +174,7 @@ public class JSOptionValueListTest {
     // @Ignore
     public void testAppendValue2EmptyValueList() throws Exception {
         JSOptionValueList objVL = new JSOptionValueList(objOptions, "ValueList", "Descr", "", "", false);
-        objVL.AppendValue("SELECT * FROM HALLO1;SELECT * FROM HALLO2");
+        objVL.appendValue("SELECT * FROM HALLO1;SELECT * FROM HALLO2");
         assertTrue("contains SELECT * FROM HALLO1", objVL.contains("SELECT * FROM HALLO1"));
 
     }
@@ -184,21 +184,21 @@ public class JSOptionValueListTest {
     public void testAppendValue() throws Exception {
         JSOptionValueList objVL = new JSOptionValueList(objOptions, "ValueList", "Descr", "SELECT * FROM HALLO", "", false);
         assertTrue("contains SELECT * FROM HALLO", objVL.contains("SELECT * FROM HALLO"));
-        objVL.AppendValue("SELECT * FROM HALLO1;SELECT * FROM HALLO2");
+        objVL.appendValue("SELECT * FROM HALLO1;SELECT * FROM HALLO2");
         assertTrue("contains SELECT * FROM HALLO", objVL.contains("SELECT * FROM HALLO"));
         System.out.println("JSOptionValueListTest.testAppendValue()" + objVL.concatenatedValue(";"));
         assertTrue("contains SELECT * FROM HALLO1", objVL.contains("SELECT * FROM HALLO1"));
         assertTrue("contains SELECT * FROM HALLO2", objVL.contains("SELECT * FROM HALLO2"));
         assertTrue("contains SELECT * FROM HALLO", objVL.contains("SELECT * FROM HALLO"));
         objVL = new JSOptionValueList(objOptions, "ValueList", "Descr", "", false);
-        objVL.AppendValue("SELECT * FROM HALLO1;SELECT * FROM HALLO2");
+        objVL.appendValue("SELECT * FROM HALLO1;SELECT * FROM HALLO2");
         assertTrue("contains SELECT * FROM HALLO1", objVL.contains("SELECT * FROM HALLO1"));
         assertTrue("contains SELECT * FROM HALLO2", objVL.contains("SELECT * FROM HALLO2"));
-        objVL.AppendValue("HUHU");
+        objVL.appendValue("HUHU");
         assertTrue("contains SELECT * FROM HALLO1", objVL.contains("HUHU"));
         // Erster Konstruktor
         objVL = new JSOptionValueList(objOptions, "ValueList", "Descr", "", "", false);
-        objVL.AppendValue("SELECT * FROM HALLO1;SELECT * FROM HALLO2");
+        objVL.appendValue("SELECT * FROM HALLO1;SELECT * FROM HALLO2");
         assertTrue("contains SELECT * FROM HALLO1", objVL.contains("SELECT * FROM HALLO1"));
         assertTrue("contains SELECT * FROM HALLO2", objVL.contains("SELECT * FROM HALLO2"));
     }
@@ -213,7 +213,7 @@ public class JSOptionValueListTest {
         int intActualLength = objVL.valueList().length;
         int intExpectedLength = 2;
         assertEquals("Anzahl indexed Options ist korrekt", intExpectedLength, intActualLength);
-        objVL.Value(objVL.concatenatedValue(strKey));
+        objVL.setValue(objVL.concatenatedValue(strKey));
         intActualLength = objVL.valueList().length;
         intExpectedLength = 3;
         assertEquals("Anzahl indexed Options ist korrekt", intExpectedLength, intActualLength);
@@ -223,13 +223,13 @@ public class JSOptionValueListTest {
     @Ignore("Test set to Ignore for later examination")
     public void testValue2() {
         JSOptionValueList optionValueList1 = new JSOptionValueList(objOptions, strKey, "eins;zwei;drei", "eins", "", true);
-        assertEquals("Value must be 'eins'", "eins", optionValueList1.Value());
-        optionValueList1.Value("zwei,drei,vier");
-        assertEquals("Value must be 'zwei'", "zwei", optionValueList1.Value());
+        assertEquals("Value must be 'eins'", "eins", optionValueList1.getValue());
+        optionValueList1.setValue("zwei,drei,vier");
+        assertEquals("Value must be 'zwei'", "zwei", optionValueList1.getValue());
         String strT = optionValueList1.concatenatedValue(",");
         assertEquals("ValueList is wrong", "zwei,drei,vier", strT);
-        optionValueList1.Value("sieben");
-        assertEquals("Value must be 'sieben'", "sieben", optionValueList1.Value());
+        optionValueList1.setValue("sieben");
+        assertEquals("Value must be 'sieben'", "sieben", optionValueList1.getValue());
         // the following assertTrue fails, because the JSOptionValueList doesn't
         // work with an one-value-list
         assertTrue("Value must have value 'sieben'", optionValueList1.contains("sieben"));
@@ -255,13 +255,13 @@ public class JSOptionValueListTest {
         JSOptionValueList objVL = new JSOptionValueList(objOptions, "ValueList", "Descr", "Das|ist|das|Haus|vom|Nikolaus", "", false);
         assertTrue("contains Nikolaus", objVL.contains("Nikolaus"));
         assertFalse("contains Nikolaus", objVL.contains("kolaus"));
-        objVL.Value("Das|ist|das|Haus|vom|Nikolaus");
+        objVL.setValue("Das|ist|das|Haus|vom|Nikolaus");
         assertTrue("contains Nikolaus", objVL.contains("Nikolaus"));
         assertFalse("contains Nikolaus", objVL.contains("kolaus"));
-        objVL.Value("Das;ist;das;Haus;vom;Nikolaus");
+        objVL.setValue("Das;ist;das;Haus;vom;Nikolaus");
         assertTrue("contains Nikolaus", objVL.contains("Nikolaus"));
         assertFalse("contains Nikolaus", objVL.contains("kolaus"));
-        objVL.Value("Das|ist;das|Haus;vom|Nikolaus");
+        objVL.setValue("Das|ist;das|Haus;vom|Nikolaus");
         assertTrue("contains Nikolaus", objVL.contains("Nikolaus"));
         assertFalse("contains Nikolaus", objVL.contains("kolaus"));
     }
@@ -269,11 +269,11 @@ public class JSOptionValueListTest {
     @Test
     public void testElementAt() throws Exception {
         JSOptionValueList objVL = new JSOptionValueList(objOptions, "ValueList", "Descr", "Das|ist|das|Haus|vom|Nikolaus", "", false);
-        assertEquals("Element 1", "Das", objVL.ElementAt(0));
-        assertEquals("Element 2", "ist", objVL.ElementAt(1));
-        assertEquals("Element 3", "das", objVL.ElementAt(2));
-        assertEquals("Element 4", "Haus", objVL.ElementAt(3));
-        assertEquals("Element 5", "vom", objVL.ElementAt(4));
-        assertEquals("Element 6", "Nikolaus", objVL.ElementAt(5));
+        assertEquals("Element 1", "Das", objVL.getElementAt(0));
+        assertEquals("Element 2", "ist", objVL.getElementAt(1));
+        assertEquals("Element 3", "das", objVL.getElementAt(2));
+        assertEquals("Element 4", "Haus", objVL.getElementAt(3));
+        assertEquals("Element 5", "vom", objVL.getElementAt(4));
+        assertEquals("Element 6", "Nikolaus", objVL.getElementAt(5));
     }
 }

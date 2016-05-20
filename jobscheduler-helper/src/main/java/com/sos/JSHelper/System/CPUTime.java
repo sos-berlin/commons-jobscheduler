@@ -11,14 +11,14 @@ public class CPUTime {
 
     public CPUTime() {
         tb = ManagementFactory.getThreadMXBean();
-        StartTimer();
+        startTimer();
     }
 
-    public void StartTimer() {
+    public void startTimer() {
         starttime = tb.getCurrentThreadCpuTime();
     }
 
-    public void StopTimer() {
+    public void stopTimer() {
         stoptime = tb.getCurrentThreadCpuTime();
     }
 
@@ -26,7 +26,7 @@ public class CPUTime {
         return stoptime;
     }
 
-    public long TimeUsed() {
+    public long timeUsed() {
         long lngTimeDiff = 0;
         long lngT = 0;
         lngT = tb.getCurrentThreadCpuTime();
@@ -35,7 +35,7 @@ public class CPUTime {
     }
 
     public String toString() {
-        return String.format("CPU-time used %1$8.4f ms", (double) this.TimeUsed() / 1000000);
+        return String.format("CPU-time used %1$8.4f ms", (double) this.timeUsed() / 1000000);
     }
 
 }

@@ -51,17 +51,17 @@ public class SOSOptionHexStringTest {
     }
 
     /** Test method for
-     * {@link com.sos.JSHelper.Options.SOSOptionHexString#Value()}. */
+     * {@link com.sos.JSHelper.Options.SOSOptionHexString#getValue()}. */
     @Test
     public void testValue() {
         SOSOptionHexString objHS = new SOSOptionHexString(null, "key", "desc", "value", "", false);
-        objHS.Value("das&#x0d; ist&#x0a; das&#x0d; Haus&#x0a; vom&#x0d; Nikolaus");
-        System.out.println(objHS.Value());
-        assertEquals("unescapeXMLEntities", "das\r ist\n das\r Haus\n vom\r Nikolaus", objHS.Value());
+        objHS.setValue("das&#x0d; ist&#x0a; das&#x0d; Haus&#x0a; vom&#x0d; Nikolaus");
+        System.out.println(objHS.getValue());
+        assertEquals("unescapeXMLEntities", "das\r ist\n das\r Haus\n vom\r Nikolaus", objHS.getValue());
     }
 
     /** Test method for
-     * {@link com.sos.JSHelper.Options.SOSOptionFileString#Value(java.lang.String)}
+     * {@link com.sos.JSHelper.Options.SOSOptionFileString#setValue(java.lang.String)}
      * . */
     @Test
     public void testValueString() {

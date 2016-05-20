@@ -32,26 +32,26 @@ public class SOSOptionKeyStoreType extends JSOptionValueList {
     }
 
     public boolean isJKS() {
-        return (this.Value().equalsIgnoreCase(Type.JKS.name()));
+        return this.getValue().equalsIgnoreCase(Type.JKS.name());
     }
 
     public boolean isJCEKS() {
-        return (this.Value().equalsIgnoreCase(Type.JCEKS.name()));
+        return this.getValue().equalsIgnoreCase(Type.JCEKS.name());
     }
 
     public boolean isPKCS12() {
-        return (this.Value().equalsIgnoreCase(Type.PKCS12.name()));
+        return this.getValue().equalsIgnoreCase(Type.PKCS12.name());
     }
 
     public boolean isPKCS11() {
-        return (this.Value().equalsIgnoreCase(Type.PKCS11.name()));
+        return this.getValue().equalsIgnoreCase(Type.PKCS11.name());
     }
 
     public boolean isDKS() {
-        return (this.Value().equalsIgnoreCase(Type.DKS.name()));
+        return this.getValue().equalsIgnoreCase(Type.DKS.name());
     }
 
-    public void Value(String value) {
+    public void setValue(String value) {
         String testValue = value.toUpperCase();
         try {
             SOSOptionKeyStoreType.Type.valueOf(testValue);
@@ -59,7 +59,7 @@ public class SOSOptionKeyStoreType extends JSOptionValueList {
             throw new JobSchedulerException(String.format("Value \"%s\" is not valid for %s - valid values are %s : %s", testValue, strKey,
                     Type.asString(), e.toString()));
         }
-        super.Value(testValue);
+        super.setValue(testValue);
     }
 
 }

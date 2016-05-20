@@ -23,7 +23,7 @@ public class SOSSSHJob2JSBaseAdapter extends JobSchedulerJobAdapter {
         try {
             super.spooler_process();
         } catch (Exception e) {
-            logger.fatal(StackTrace2String(e));
+            logger.fatal(stackTrace2String(e));
             throw new JobSchedulerException(e);
         }
         return signalSuccess();

@@ -1,23 +1,10 @@
-/**
- *
- */
 package com.sos.JSHelper.Options;
 
 /** @author KB */
 public interface IValueChangedListener {
 
-    /** \brief ValueHasChanged
-     *
-     * \details
-     * 
-     * \return void */
-    // public void ValueHasChanged (final String pstrNewValue);
-    public void ValueHasChanged(final SOSOptionElement pobjOptionElement);
+    public void valueHasChanged(final SOSOptionElement pobjOptionElement);
 
-    /** \brief ValidationError
-     *
-     * \details
-     * 
-     * \return void */
-    public void ValidationError(final SOSValidationError pobjVE);
+    public void validationError(final SOSValidationError pobjVE);
+
 }

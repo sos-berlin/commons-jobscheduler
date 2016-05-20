@@ -71,8 +71,8 @@ public class SOSVfsWebDAVTest {
     @Before
     public void setUp() throws Exception {
         objOptions = new SOSFTPOptions(SOSOptionTransferType.enuTransferTypes.webdav);
-        objOptions.protocol.Value(SOSOptionTransferType.enuTransferTypes.webdav);
-        objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
+        objOptions.protocol.setValue(SOSOptionTransferType.enuTransferTypes.webdav);
+        objVFS = VFSFactory.getHandler(objOptions.protocol.getValue());
         objVfsClient = (ISOSVfsFileTransfer) objVFS;
     }
 
@@ -101,35 +101,35 @@ public class SOSVfsWebDAVTest {
      *       authenticate(); objVfsClient.disconnect(); } */
 
     private void connect() throws Exception {
-        objOptions.host.Value(WEB_URI);
+        objOptions.host.setValue(WEB_URI);
         objOptions.port.value(8080);
         // objOptions.local_dir.Value("/temp");
-        SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().Source();
-        objSource.host.Value(WEB_URI);
-        objSource.user.Value(WEB_USER);
+        SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().getSource();
+        objSource.host.setValue(WEB_URI);
+        objSource.user.setValue(WEB_USER);
         objSource.port.value(8080);
-        objSource.protocol.Value("webdav");
+        objSource.protocol.setValue("webdav");
         // objSource.proxy_host.Value("proxy.sos");
         // objSource.proxy_port.value(3128);
 
-        objOptions.operation.Value("send");
+        objOptions.operation.setValue("send");
         VFSFactory.setConnectionOptions(objSource);
-        objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
+        objVFS = VFSFactory.getHandler(objOptions.protocol.getValue());
         objVfsClient = (ISOSVfsFileTransfer) objVFS;
-        objVFS.Connect(objOptions.getConnectionOptions().Source());
+        objVFS.connect(objOptions.getConnectionOptions().getSource());
     }
 
     private void authenticate() throws Exception {
-        SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().Source();
-        objSource.host.Value(WEB_URI);
-        objSource.user.Value(WEB_USER);
+        SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().getSource();
+        objSource.host.setValue(WEB_URI);
+        objSource.user.setValue(WEB_USER);
         // objSource.proxy_host.Value("proxy.sos");
         // objSource.proxy_port.value(3128);
-        objSource.password.Value(WEB_PASS);
-        objSource.protocol.Value("webdav");
+        objSource.password.setValue(WEB_PASS);
+        objSource.protocol.setValue("webdav");
         objSource.sshAuthMethod.isURL(true);
 
-        objVFS.Authenticate(objSource);
+        objVFS.authenticate(objSource);
     }
 
     @Test
@@ -240,7 +240,7 @@ public class SOSVfsWebDAVTest {
 
         String strTestFileName = LOCAL_BASE_PATH + "webdav-test.dat";
         JSTextFile objF = new JSTextFile(strTestFileName);
-        objF.WriteLine("Die Basis ist das Fundament der Grundlage");
+        objF.writeLine("Die Basis ist das Fundament der Grundlage");
         objF.deleteOnExit();
         objF.close();
 
@@ -419,7 +419,7 @@ public class SOSVfsWebDAVTest {
 
         String lineSeparator = "\n";
 
-        objVFS.ExecuteCommand("cd /home/test" + lineSeparator + "cd /home/kb");
+        objVFS.executeCommand("cd /home/test" + lineSeparator + "cd /home/kb");
 
         objVfsClient.disconnect();
     }

@@ -14,16 +14,16 @@ public class SOSOptionInFileName extends JSOptionInFileName {
         intOptionType = isOptionTypeFileName;
     }
 
-    public void CheckMandatory(final boolean pflgSetMandatory) {
+    public void checkMandatory(final boolean pflgSetMandatory) {
         this.isMandatory(pflgSetMandatory);
-        this.CheckMandatory();
+        this.checkMandatory();
     }
 
     @Override
-    public void CheckMandatory() {
+    public void checkMandatory() {
         final String conMethodName = "SOSOptionInFileName::CheckMandatory";
         if (this.isMandatory()) {
-            this.JSFile();
+            this.getJSFile();
             if (objFile != null) {
                 String lstrFileName = objFile.getPath();
                 if (!objFile.exists()) {
@@ -36,7 +36,7 @@ public class SOSOptionInFileName extends JSOptionInFileName {
         }
     }
 
-    public JSFile JSFile() {
+    public JSFile getJSFile() {
         if (objFile == null && isNotEmpty(strValue)) {
             objFile = new JSFile(strValue);
         }

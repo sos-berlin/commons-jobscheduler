@@ -2,6 +2,8 @@ package com.sos.JSHelper.Archiver;
 
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
+
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.Options.SOSOptionFolderName;
@@ -13,25 +15,27 @@ public class JSArchiverOptions extends JSOptionsClass {
 
     private static final long serialVersionUID = 1L;
     private static final String CLASSNAME = "JSArchiverOptions";
+    private static final Logger LOGGER = Logger.getLogger(JSArchiverOptions.class);
+    private static final String ARCHIVE_FOLDER_NAME_SETTINGS_KEY = CLASSNAME + ".ArchiveFolderName";
+    private static final String FILE_NAME_SETTINGS_KEY = CLASSNAME + ".FileName";
+    private static final String COMPRESS_ARCHIVED_FILE_SETTINGS_KEY = CLASSNAME + ".CompressArchivedFile";
+    private static final String DELETE_FILE_AFTER_ARCHIVING_SETTINGS_KEY = CLASSNAME + ".DeleteFileAfterArchiving";
+    private static final String CREATE_TIME_STAMP_SETTINGS_KEY = CLASSNAME + ".CreateTimeStamp";
+    private static final String USE_ARCHIVE_SETTINGS_KEY = CLASSNAME + ".UseArchive";
     private String strArchiveFolderName = "./archive/";
-    private final String conArchiveFolderNameSettingsKey = this.CLASSNAME + ".ArchiveFolderName";
     private String strFileName = null;
-    private final String conFileNameSettingsKey = this.CLASSNAME + ".FileName";
     private boolean flgCompressArchivedFile = false;
-    private final String conCompressArchivedFileSettingsKey = this.CLASSNAME + ".CompressArchivedFile";
     private boolean flgDeleteFileAfterArchiving = false;
-    private final String conDeleteFileAfterArchivingSettingsKey = this.CLASSNAME + ".DeleteFileAfterArchiving";
     private boolean flgCreateTimeStamp = true;
-    private final String conCreateTimeStampSettingsKey = this.CLASSNAME + ".CreateTimeStamp";
     private boolean flgUseArchive = false;
-    private final String conUseArchiveSettingsKey = this.CLASSNAME + ".UseArchive";
 
     @JSOptionDefinition(name = "ArchiveFolderName", value = "./archive/", description = "Name des Folder mit den archivierten Dateien",
             key = "ArchiveFolderName", type = "JSOptionFolderName", mandatory = true)
-    public SOSOptionFolderName ArchiveFolderName = new SOSOptionFolderName(this, this.CLASSNAME + ".ArchiveFolderName", 
+    public SOSOptionFolderName archiveFolderName = new SOSOptionFolderName(this, CLASSNAME + ".ArchiveFolderName", 
             "Name des Folder mit den archivierten Dateien", "./archive/", "./archive/", true);
 
     public JSArchiverOptions() {
+        //
     }
 
     public JSArchiverOptions(final HashMap<String, String> JSSettings) throws Exception {
@@ -40,7 +44,7 @@ public class JSArchiverOptions extends JSOptionsClass {
 
     @Override
     public void toOut() {
-        System.out.println(this.getAllOptionsAsString());
+        LOGGER.info(this.getAllOptionsAsString());
     }
 
     @Override
@@ -50,95 +54,95 @@ public class JSArchiverOptions extends JSOptionsClass {
 
     private String getAllOptionsAsString() {
         String strT = CLASSNAME + "\n";
-        strT += "Create the archive-file-name using a timestamp : " + this.CreateTimeStamp() + "\n";
-        strT += "File has to be archived after processing : " + this.UseArchive() + "\n";
+        strT += "Create the archive-file-name using a timestamp : " + this.isCreateTimeStamp() + "\n";
+        strT += "File has to be archived after processing : " + this.isUseArchive() + "\n";
         return strT;
     }
 
     @Override
     public void setAllOptions(final HashMap<String, String> JSSettings) {
         this.objSettings = JSSettings;
-        super.Settings(this.objSettings);
-        String strT = super.getItem(this.conArchiveFolderNameSettingsKey);
+        super.setSettings(this.objSettings);
+        String strT = super.getItem(ARCHIVE_FOLDER_NAME_SETTINGS_KEY);
         if (!this.isEmpty(strT)) {
-            this.ArchiveFolderName(super.getItem(this.conArchiveFolderNameSettingsKey));
+            this.setArchiveFolderName(super.getItem(ARCHIVE_FOLDER_NAME_SETTINGS_KEY));
         }
-        strT = super.getItem(this.conFileNameSettingsKey);
+        strT = super.getItem(FILE_NAME_SETTINGS_KEY);
         if (!this.isEmpty(strT)) {
-            this.FileName(super.getItem(this.conFileNameSettingsKey));
+            this.setFileName(super.getItem(FILE_NAME_SETTINGS_KEY));
         }
-        this.CompressArchivedFile(super.getBoolItem(this.conCompressArchivedFileSettingsKey));
-        this.DeleteFileAfterArchiving(super.getBoolItem(this.conDeleteFileAfterArchivingSettingsKey));
-        this.CreateTimeStamp(super.getBoolItem(this.conCreateTimeStampSettingsKey));
-        this.UseArchive(super.getBoolItem(this.conUseArchiveSettingsKey));
+        this.setCompressArchivedFile(super.getBoolItem(COMPRESS_ARCHIVED_FILE_SETTINGS_KEY));
+        this.setDeleteFileAfterArchiving(super.getBoolItem(DELETE_FILE_AFTER_ARCHIVING_SETTINGS_KEY));
+        this.setCreateTimeStamp(super.getBoolItem(CREATE_TIME_STAMP_SETTINGS_KEY));
+        this.setUseArchive(super.getBoolItem(USE_ARCHIVE_SETTINGS_KEY));
     }
 
     @Override
     public void checkMandatory() throws Exception {
-        this.FileName(this.FileName());
-        this.ArchiveFolderName(this.ArchiveFolderName());
+        this.setFileName(this.getFileName());
+        this.setArchiveFolderName(this.getArchiveFolderName());
     }
 
-    public String ArchiveFolderName() {
+    public String getArchiveFolderName() {
         if (this.strArchiveFolderName == null) {
             this.strArchiveFolderName = "./";
         }
         return this.strArchiveFolderName;
     }
 
-    public JSArchiverOptions ArchiveFolderName(final String pstrArchiveFolderName) {
-        final String conMethodName = this.CLASSNAME + "::ArchiveFolderName";
-        this.strArchiveFolderName = this.CheckFolder(pstrArchiveFolderName, conMethodName, true);
+    public JSArchiverOptions setArchiveFolderName(final String pstrArchiveFolderName) {
+        final String conMethodName = CLASSNAME + "::ArchiveFolderName";
+        this.strArchiveFolderName = this.checkFolder(pstrArchiveFolderName, conMethodName, true);
         return this;
     }
 
-    public String FileName() {
+    public String getFileName() {
         return this.strFileName;
     }
 
-    public JSArchiverOptions FileName(final String pstrFileName) {
-        final String conMethodName = this.CLASSNAME + "::FileName";
+    public JSArchiverOptions setFileName(final String pstrFileName) {
+        final String conMethodName = CLASSNAME + "::FileName";
         if (this.isEmpty(pstrFileName)) {
-            this.SignalError(String.format(this.conNullButMandatory, "FileName", this.conFileNameSettingsKey, conMethodName));
+            this.signalError(String.format(this.conNullButMandatory, "FileName", FILE_NAME_SETTINGS_KEY, conMethodName));
         }
         if (this.isNotEqual(this.strFileName, pstrFileName)) {
-            this.strFileName = this.CheckFileIsReadable(pstrFileName, conMethodName);
+            this.strFileName = this.checkFileIsReadable(pstrFileName, conMethodName);
         }
         return this;
     }
 
-    public boolean CompressArchivedFile() {
+    public boolean isCompressArchivedFile() {
         return this.flgCompressArchivedFile;
     }
 
-    public JSArchiverOptions CompressArchivedFile(final boolean pflgCompressArchivedFile) {
+    public JSArchiverOptions setCompressArchivedFile(final boolean pflgCompressArchivedFile) {
         this.flgCompressArchivedFile = pflgCompressArchivedFile;
         return this;
     }
 
-    public boolean DeleteFileAfterArchiving() {
+    public boolean isDeleteFileAfterArchiving() {
         return this.flgDeleteFileAfterArchiving;
     }
 
-    public JSArchiverOptions DeleteFileAfterArchiving(final boolean pflgDeleteFileAfterArchiving) {
+    public JSArchiverOptions setDeleteFileAfterArchiving(final boolean pflgDeleteFileAfterArchiving) {
         this.flgDeleteFileAfterArchiving = pflgDeleteFileAfterArchiving;
         return this;
     }
 
-    public boolean CreateTimeStamp() {
+    public boolean isCreateTimeStamp() {
         return this.flgCreateTimeStamp;
     }
 
-    public JSArchiverOptions CreateTimeStamp(final boolean pflgCreateTimeStamp) {
+    public JSArchiverOptions setCreateTimeStamp(final boolean pflgCreateTimeStamp) {
         this.flgCreateTimeStamp = pflgCreateTimeStamp;
         return this;
     }
 
-    public boolean UseArchive() {
+    public boolean isUseArchive() {
         return this.flgUseArchive;
     }
 
-    public JSArchiverOptions UseArchive(final boolean pflgUseArchive) {
+    public JSArchiverOptions setUseArchive(final boolean pflgUseArchive) {
         this.flgUseArchive = pflgUseArchive;
         return this;
     }
@@ -146,7 +150,7 @@ public class JSArchiverOptions extends JSOptionsClass {
     public String getFileNameSettingsKey() throws Exception {
         String RetVal = null;
         try {
-            RetVal = this.conFileNameSettingsKey;
+            RetVal = FILE_NAME_SETTINGS_KEY;
         } catch (final Exception e) {
             throw e;
         }

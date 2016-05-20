@@ -34,11 +34,11 @@ public class SOSFilteredFileReader extends JSToolBox implements ISOSFilteredFile
         objFile2Read = pobjJSFile;
     }
 
-    public void Options(final SOSFilterOptions pobjOptions) {
+    public void setOptions(final SOSFilterOptions pobjOptions) {
         objFilterOptions = pobjOptions;
     }
 
-    public SOSFilterOptions Options() {
+    public SOSFilterOptions getOptions() {
         if (objFilterOptions == null) {
             objFilterOptions = new SOSFilterOptions();
         }
@@ -58,7 +58,7 @@ public class SOSFilteredFileReader extends JSToolBox implements ISOSFilteredFile
     }
 
     public void runMultipleFiles(final SOSOptionFolderName pobjFolderName) {
-        this.runMultipleFiles(pobjFolderName.JSFile().getAbsolutePath());
+        this.runMultipleFiles(pobjFolderName.getJSFile().getAbsolutePath());
     }
 
     public void runMultipleFiles(final String pstrPathName) {
@@ -71,7 +71,7 @@ public class SOSFilteredFileReader extends JSToolBox implements ISOSFilteredFile
 
     public String getFilteredLine() {
         String strB = null;
-        StringBuffer strBF = objFile2Read.GetLine();
+        StringBuffer strBF = objFile2Read.getLine();
         if (strBF != null) {
             strB = strBF.toString();
             for (SOSNullFilter sosNullFilter : lstFilters) {
@@ -88,7 +88,7 @@ public class SOSFilteredFileReader extends JSToolBox implements ISOSFilteredFile
             lstFilters = objFilterOptions.getFilter();
         }
         StringBuffer strBuffer = null;
-        while ((strBuffer = objFile2Read.GetLine()) != null) {
+        while ((strBuffer = objFile2Read.getLine()) != null) {
             String strB = strBuffer.toString();
             for (SOSNullFilter sosNullFilter : lstFilters) {
                 sosNullFilter.write(strB);
@@ -114,17 +114,17 @@ public class SOSFilteredFileReader extends JSToolBox implements ISOSFilteredFile
 
     @Override
     public void atStartOfData() {
-
+        //
     }
 
     @Override
     public void atEndOfData() {
-
+        //
     }
 
     @Override
     public void atStartOfNewFile(JSFile file) {
-        // TODO Auto-generated method stub
+        //
     }
 
 }

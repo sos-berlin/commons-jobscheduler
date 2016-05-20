@@ -63,7 +63,7 @@ public class SOSOptionLogFileName extends SOSOptionOutFileName {
                         if (currAppender instanceof FileAppender || currAppender instanceof RollingFileAppender) {
                             objFileAppender = (FileAppender) currAppender;
                             if (objFileAppender != null) {
-                                String strLogFileName = this.Value();
+                                String strLogFileName = this.getValue();
                                 if (objFileAppender.getLayout() instanceof SOSHtmlLayout) {
                                     if (isNotNull(objParentClass)) {
                                         /** This is a dirty trick: get the
@@ -72,9 +72,9 @@ public class SOSOptionLogFileName extends SOSOptionOutFileName {
                                          * title will not changed This coding
                                          * below, with profile and settings, is
                                          * for JADE */
-                                        String strProfile = objParentClass.OptionByName("profile");
+                                        String strProfile = objParentClass.getOptionByName("profile");
                                         if (isNotEmpty(strProfile)) {
-                                            String strSettings = objParentClass.OptionByName("settings");
+                                            String strSettings = objParentClass.getOptionByName("settings");
                                             if (isNotEmpty(strSettings)) {
                                                 strSettings += ":";
                                             } else {

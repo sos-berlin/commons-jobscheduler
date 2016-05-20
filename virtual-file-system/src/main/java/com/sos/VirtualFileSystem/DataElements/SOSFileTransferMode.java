@@ -25,11 +25,11 @@ public class SOSFileTransferMode extends JSDataElement {
     }
 
     public boolean isAscii() {
-        return ("ascii".equalsIgnoreCase(this.Value()) || "text".equalsIgnoreCase(this.Value()));
+        return ("ascii".equalsIgnoreCase(this.getValue()) || "text".equalsIgnoreCase(this.getValue()));
     }
 
     public boolean isBinary() {
-        return "binary".equalsIgnoreCase(this.Value());
+        return "binary".equalsIgnoreCase(this.getValue());
     }
 
 }

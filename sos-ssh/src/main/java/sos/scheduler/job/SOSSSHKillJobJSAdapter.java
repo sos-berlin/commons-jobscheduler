@@ -24,7 +24,7 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
             super.spooler_process();
             successfull = doProcessing();
         } catch (Exception e) {
-            logger.fatal(StackTrace2String(e));
+            logger.fatal(stackTrace2String(e));
             throw new JobSchedulerException(e);
         }
         if (successfull) {
@@ -109,9 +109,9 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
             sshJob = new SOSSSHCheckRemotePidJob();
             logger.debug("SOSSSHCheckRemotePidJob instantiated!");
             options = sshJob.getOptions();
-            options.CurrentNodeName(this.getCurrentNodeName(false));
+            options.setCurrentNodeName(this.getCurrentNodeName(false));
             HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(allParams);
-            options.setAllOptions(options.DeletePrefix(hsmParameters1, "ssh_"));
+            options.setAllOptions(options.deletePrefix(hsmParameters1, "ssh_"));
             sshJob.setJSJobUtilites(this);
             options.checkMandatory();
             sshJob.execute();
@@ -119,13 +119,13 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
             if (options.raiseExceptionOnError.value()) {
                 if (options.ignoreError.value()) {
                     if (options.ignoreStderr.value()) {
-                        logger.debug(this.StackTrace2String(e));
+                        logger.debug(this.stackTrace2String(e));
                     } else {
-                        logger.error(this.StackTrace2String(e));
+                        logger.error(this.stackTrace2String(e));
                         throw new SSHExecutionError("Exception raised: " + e, e);
                     }
                 } else {
-                    logger.error(this.StackTrace2String(e));
+                    logger.error(this.stackTrace2String(e));
                     throw new SSHExecutionError("Exception raised: " + e, e);
                 }
             }
@@ -140,9 +140,9 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
             sshJob = new SOSSSHKillRemotePidJob();
             logger.debug("SOSSSHKillRemotePidJob instantiated!");
             options = sshJob.getOptions();
-            options.CurrentNodeName(this.getCurrentNodeName(false));
+            options.setCurrentNodeName(this.getCurrentNodeName(false));
             HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(allParams);
-            options.setAllOptions(options.DeletePrefix(hsmParameters1, "ssh_"));
+            options.setAllOptions(options.deletePrefix(hsmParameters1, "ssh_"));
             sshJob.setJSJobUtilites(this);
             options.checkMandatory();
             sshJob.execute();
@@ -150,13 +150,13 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
             if (options.raiseExceptionOnError.value()) {
                 if (options.ignoreError.value()) {
                     if (options.ignoreStderr.value()) {
-                        logger.debug(this.StackTrace2String(e));
+                        logger.debug(this.stackTrace2String(e));
                     } else {
-                        logger.error(this.StackTrace2String(e));
+                        logger.error(this.stackTrace2String(e));
                         throw new SSHExecutionError("Exception raised: " + e, e);
                     }
                 } else {
-                    logger.error(this.StackTrace2String(e));
+                    logger.error(this.stackTrace2String(e));
                     throw new SSHExecutionError("Exception raised: " + e, e);
                 }
             }
@@ -171,9 +171,9 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
             sshJob = new SOSSSHTerminateRemotePidJob();
             logger.debug("SOSSSHTerminateRemotePidJob instantiated!");
             options = sshJob.getOptions();
-            options.CurrentNodeName(this.getCurrentNodeName(false));
+            options.setCurrentNodeName(this.getCurrentNodeName(false));
             HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(allParams);
-            options.setAllOptions(options.DeletePrefix(hsmParameters1, "ssh_"));
+            options.setAllOptions(options.deletePrefix(hsmParameters1, "ssh_"));
             sshJob.setJSJobUtilites(this);
             options.checkMandatory();
             sshJob.execute();
@@ -181,13 +181,13 @@ public class SOSSSHKillJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
             if (options.raiseExceptionOnError.value()) {
                 if (options.ignoreError.value()) {
                     if (options.ignoreStderr.value()) {
-                        logger.debug(this.StackTrace2String(e));
+                        logger.debug(this.stackTrace2String(e));
                     } else {
-                        logger.error(this.StackTrace2String(e));
+                        logger.error(this.stackTrace2String(e));
                         throw new SSHExecutionError("Exception raised: " + e, e);
                     }
                 } else {
-                    logger.error(this.StackTrace2String(e));
+                    logger.error(this.stackTrace2String(e));
                     throw new SSHExecutionError("Exception raised: " + e, e);
                 }
             }

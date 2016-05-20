@@ -33,7 +33,7 @@ public class SOSOptionJadeOperationTest {
     /** @throws java.lang.Exception */
     @Before
     public void setUp() throws Exception {
-        objOperation = new SOSOptionJadeOperation(null, "operation", "operation", enuJadeOperations.undefined.Text(), enuJadeOperations.copy.Text(), true);
+        objOperation = new SOSOptionJadeOperation(null, "operation", "operation", enuJadeOperations.undefined.getText(), enuJadeOperations.copy.getText(), true);
     }
 
     /** @throws java.lang.Exception */
@@ -42,26 +42,26 @@ public class SOSOptionJadeOperationTest {
     }
 
     /** Test method for
-     * {@link com.sos.JSHelper.Options.SOSOptionJadeOperation#Value(java.lang.String)}
+     * {@link com.sos.JSHelper.Options.SOSOptionJadeOperation#setValue(java.lang.String)}
      * . */
     @Test
     public void testValueString() {
-        objOperation.Value("send");
-        assertEquals("operation send", "send", objOperation.Value());
+        objOperation.setValue("send");
+        assertEquals("operation send", "send", objOperation.getValue());
     }
 
     @Test(expected = com.sos.JSHelper.Exceptions.JobSchedulerException.class)
     public void testWrongValueString() {
-        objOperation.Value("xxxxx");
-        assertEquals("operation send", "xxxxx", objOperation.Value());
+        objOperation.setValue("xxxxx");
+        assertEquals("operation send", "xxxxx", objOperation.getValue());
     }
 
     /** Test method for
-     * {@link com.sos.JSHelper.Options.SOSOptionJadeOperation#Value(com.sos.JSHelper.Options.SOSOptionJadeOperation.enuJadeOperations)}
+     * {@link com.sos.JSHelper.Options.SOSOptionJadeOperation#setValue(com.sos.JSHelper.Options.SOSOptionJadeOperation.enuJadeOperations)}
      * . */
     @Test
     public void testValueEnuJadeOperations() {
-        objOperation.Value(enuJadeOperations.copy);
+        objOperation.setValue(enuJadeOperations.copy);
         assertEquals("operation send", enuJadeOperations.copy, objOperation.value());
     }
 
@@ -69,8 +69,8 @@ public class SOSOptionJadeOperationTest {
      * {@link com.sos.JSHelper.Options.SOSOptionJadeOperation#value()}. */
     @Test
     public void testValue() {
-        objOperation.Value(enuJadeOperations.copy);
-        assertEquals("test Value", enuJadeOperations.copy.Text(), objOperation.Value());
+        objOperation.setValue(enuJadeOperations.copy);
+        assertEquals("test Value", enuJadeOperations.copy.getText(), objOperation.getValue());
     }
 
     /** Test method for
@@ -78,9 +78,9 @@ public class SOSOptionJadeOperationTest {
      * . */
     @Test
     public void testIsOperationSend() {
-        objOperation.Value("send");
+        objOperation.setValue("send");
         assertTrue("operation send", objOperation.isOperationSend());
-        objOperation.Value(enuJadeOperations.copy);
+        objOperation.setValue(enuJadeOperations.copy);
         assertFalse("operation send", objOperation.isOperationSend());
     }
 
@@ -89,29 +89,29 @@ public class SOSOptionJadeOperationTest {
      * . */
     @Test
     public void testIsOperationReceive() {
-        objOperation.Value("receive");
+        objOperation.setValue("receive");
         assertTrue("operation send", objOperation.isOperationReceive());
-        objOperation.Value(enuJadeOperations.copy);
+        objOperation.setValue(enuJadeOperations.copy);
         assertFalse("operation send", objOperation.isOperationReceive());
     }
 
     @Test(expected = com.sos.JSHelper.Exceptions.JobSchedulerException.class)
     public void testCheckMandatory() {
         String strValue = null;
-        objOperation.Value(strValue);
-        objOperation.CheckMandatory();
+        objOperation.setValue(strValue);
+        objOperation.checkMandatory();
     }
 
     @Test
     public void testCheckMandatory2() {
         String strValue = "send";
-        objOperation.Value(strValue);
-        objOperation.CheckMandatory();
+        objOperation.setValue(strValue);
+        objOperation.checkMandatory();
     }
 
     @Test
     public void testGetValues() {
-        objOperation.Value(enuJadeOperations.copy);
+        objOperation.setValue(enuJadeOperations.copy);
 
         String[] strL = objOperation.getValueList();
         for (String string : strL) {

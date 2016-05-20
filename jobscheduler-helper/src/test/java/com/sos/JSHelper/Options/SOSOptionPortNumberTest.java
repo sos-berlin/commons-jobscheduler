@@ -16,13 +16,13 @@ public class SOSOptionPortNumberTest {
 
     @Test
     public final void testValueString() {
-        objPortNumber.Value("4711");
+        objPortNumber.setValue("4711");
         assertEquals("port is 4711", 4711, objPortNumber.value());
     }
 
     @Test(expected = com.sos.JSHelper.Exceptions.JobSchedulerException.class)
     public final void testValueString2() {
-        objPortNumber.Value("471111");
+        objPortNumber.setValue("471111");
         assertEquals("port is 471111", 4711, objPortNumber.value());
     }
 

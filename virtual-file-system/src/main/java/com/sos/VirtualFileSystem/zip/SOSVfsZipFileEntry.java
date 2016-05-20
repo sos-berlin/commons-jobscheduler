@@ -61,7 +61,7 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
      * @return
      * @throws Exception */
     @Override
-    public boolean FileExists() throws Exception {
+    public boolean fileExists() throws Exception {
         boolean flgResult = true;
         return flgResult;
     }
@@ -205,7 +205,7 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
     @Override
     public String getModificationTime() {
         Date dteModificationTime = new Date(objZipEntry.getTime());
-        String strMod = new JSDataElementDateTime(dteModificationTime).FormattedValue();
+        String strMod = new JSDataElementDateTime(dteModificationTime).getFormattedValue();
         return strMod;
     }
 

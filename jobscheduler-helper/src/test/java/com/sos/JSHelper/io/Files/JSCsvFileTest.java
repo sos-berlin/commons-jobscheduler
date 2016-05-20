@@ -77,20 +77,20 @@ public class JSCsvFileTest extends JSListenerClass {
 
         String strF = fleTestdataDirectory + "/StoppageList.csv";
         JSCsvFile objF = new JSCsvFile(strF);
-        objF.CheckColumnCount(false);
+        objF.setCheckColumnCount(false);
         objF.deleteOnExit();
-        objF.WriteLine("Reporter;StoppageType;FromDate;ToDate");
-        objF.WriteLine("## StoppageType: S=Stop, R=Run; ; ; ");
-        objF.WriteLine("### Inbound; ");
-        objF.WriteLine("# P2R             ; ; ; ");
-        objF.WriteLine("2001            ;S;        13.02.2009 23:00:00;15.02.2009 22:00:00");
+        objF.writeLine("Reporter;StoppageType;FromDate;ToDate");
+        objF.writeLine("## StoppageType: S=Stop, R=Run; ; ; ");
+        objF.writeLine("### Inbound; ");
+        objF.writeLine("# P2R             ; ; ; ");
+        objF.writeLine("2001            ;S;        13.02.2009 23:00:00;15.02.2009 22:00:00");
 
         objF.close();
 
         JSCsvFile objCsvFile = new JSCsvFile(fleTestdataDirectory + "/StoppageList.csv");
-        objCsvFile.CheckColumnCount(false);
+        objCsvFile.setCheckColumnCount(false);
         objCsvFile.loadHeaders();
-        headers = objCsvFile.Headers();
+        headers = objCsvFile.getHeaders();
         assertEquals("Header1 must be Reporter", headers[0], "Reporter");
         assertEquals("Header2 must be StoppageType", headers[1], "StoppageType");
         assertEquals("Header3 must be FromDate", headers[2], "FromDate");
@@ -128,7 +128,7 @@ public class JSCsvFileTest extends JSListenerClass {
         JSCsvFile objCsvFile = new JSCsvFile(fleTestdataDirectory + "/test.csv");
         objCsvFile.registerMessageListener(this);
         objCsvFile.loadHeaders();
-        headers = objCsvFile.Headers();
+        headers = objCsvFile.getHeaders();
         assertEquals("Header1 must be Reporter", headers[0], "Reporter");
         assertEquals("Header2 must be StoppageType", headers[1], "StoppageType");
         assertEquals("Header3 must be FromDate", headers[2], "FromDate");

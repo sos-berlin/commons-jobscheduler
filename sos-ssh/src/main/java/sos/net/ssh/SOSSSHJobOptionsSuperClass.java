@@ -114,24 +114,24 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
     public SOSOptionHostName host = new SOSOptionHostName(this, CLASSNAME + ".host", "This parameter specifies the hostname or IP address of th", 
             "localhost", null, true);
     
-    public SOSOptionHostName HostName = (SOSOptionHostName) host.SetAlias("host_name", "ssh_server_name");
+    public SOSOptionHostName hostName = (SOSOptionHostName) host.setAlias("host_name", "ssh_server_name");
 
     @JSOptionDefinition(name = "protocol", description = "Type of requested Datatransfer The values ftp, sftp", key = "protocol", 
             type = "SOSOptionStringValueList", mandatory = true)
     public SOSOptionTransferType protocol = new SOSOptionTransferType(this, CLASSNAME + ".protocol", 
             "Type of requested Datatransfer The values ftp, sftp", "ssh", "ssh", true);
     
-    public SOSOptionTransferType ftp_protocol = (SOSOptionTransferType) protocol.SetAlias("ftp_protocol");
+    public SOSOptionTransferType ftpProtocol = (SOSOptionTransferType) protocol.setAlias("ftp_protocol");
 
     public SOSOptionTransferType getProtocol() {
         return protocol;
     }
 
-    public void setProtocol(final SOSOptionTransferType p_protocol) {
-        protocol = p_protocol;
+    public void setProtocol(final SOSOptionTransferType pProtocol) {
+        protocol = pProtocol;
     }
 
-    public SOSOptionTransferType transferProtocol = (SOSOptionTransferType) protocol.SetAlias(CLASSNAME + ".TransferProtocol");
+    public SOSOptionTransferType transferProtocol = (SOSOptionTransferType) protocol.setAlias(CLASSNAME + ".TransferProtocol");
 
     @JSOptionDefinition(name = "ignore_error", description = "Should the value true be specified, then execution errors", key = "ignore_error", 
             type = "SOSOptionString", mandatory = false)
@@ -216,7 +216,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
     @JSOptionDefinition(name = "preCommand", description = "the preCommand to set an environmental variable on the remote host", key = "preCommand", 
             type = "SOSOptionString", mandatory = false)
     public SOSOptionString preCommand = new SOSOptionString(this, CLASSNAME + ".preCommand", 
-            "the preCommand to set an environmental variable on the remote host", "export %1s=%2s", "export %1s=%2s", false);
+            "the preCommand to set an environmental variable on the remote host", "export %1$s=%2$s", "export %1$s=%2$s", false);
 
     public SOSOptionString getPreCommand() {
         return preCommand;
@@ -373,7 +373,7 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
     public void setAllOptions(final HashMap<String, String> pobjJSSettings) {
         flgSetAllOptions = true;
         objSettings = pobjJSSettings;
-        super.Settings(objSettings);
+        super.setSettings(objSettings);
         super.setAllOptions(pobjJSSettings);
         flgSetAllOptions = false;
     }
@@ -642,25 +642,21 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
 
     @Override
     public SOSOptionString getAlternativeAccount() {
-        // TO DO Auto-generated method stub
         return null;
     }
 
     @Override
     public SOSOptionHostName getAlternativeHost() {
-        // TO DO Auto-generated method stub
         return null;
     }
 
     @Override
     public SOSOptionString getAlternativePassiveMode() {
-        // TO DO Auto-generated method stub
         return null;
     }
 
     @Override
     public SOSOptionPassword getAlternativePassword() {
-        // TO DO Auto-generated method stub
         return null;
     }
 
@@ -671,12 +667,12 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
 
     @Override
     public void setAlternativeHost(final SOSOptionHostName pAlternativeHost) {
-
+        //
     }
 
     @Override
     public void setAlternativePassword(final SOSOptionPassword pAlternativePassword) {
-
+        //
     }
 
     public SOSCredentialStoreImpl getCredentialStore() {
@@ -696,25 +692,25 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
     public SOSOptionBoolean strictHostKeyChecking = new SOSOptionBoolean(this, CLASSNAME + ".strict_hostkey_checking", 
             "Check the hostkey against known hosts for SSH", "false", "false", false);
 
-    public String getstrict_hostKey_checking() {
-        return strictHostKeyChecking.Value();
+    public String getStrictHostKeyChecking() {
+        return strictHostKeyChecking.getValue();
     }
 
-    public void setstrict_hostKey_checking(final String pstrValue) {
-        strictHostKeyChecking.Value(pstrValue);
+    public void setStrictHostKeyChecking(final String pstrValue) {
+        strictHostKeyChecking.setValue(pstrValue);
     }
 
     @JSOptionDefinition(name = "proxy_protocol", description = "Proxy protocol", key = "proxy_protocol", type = "SOSOptionProxyProtocol", 
             mandatory = false)
-    public SOSOptionProxyProtocol proxy_protocol = new SOSOptionProxyProtocol(this, CLASSNAME + ".proxy_protocol", "Proxy protocol", 
+    public SOSOptionProxyProtocol proxyProtocol = new SOSOptionProxyProtocol(this, CLASSNAME + ".proxy_protocol", "Proxy protocol", 
             SOSOptionProxyProtocol.Protocol.http.name(), SOSOptionProxyProtocol.Protocol.http.name(), false);
 
-    public SOSOptionProxyProtocol getproxy_protocol() {
-        return proxy_protocol;
+    public SOSOptionProxyProtocol getProxyProtocol() {
+        return proxyProtocol;
     }
 
-    public void setproxy_host(SOSOptionProxyProtocol val) {
-        proxy_protocol = val;
+    public void setProxyHost(SOSOptionProxyProtocol val) {
+        proxyProtocol = val;
     }
 
 }

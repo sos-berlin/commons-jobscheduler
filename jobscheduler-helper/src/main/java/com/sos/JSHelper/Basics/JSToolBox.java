@@ -149,10 +149,10 @@ public class JSToolBox extends JSListenerClass {
                         dblT = number instanceof Double ? number.doubleValue() : new Double(number.doubleValue());
                     } catch (final ParseException e1) {
                         LOGGER.error(e1.getMessage(), e1);
-                        SignalError(conMethodName + ": could not convert '" + strT + "' to double");
+                        signalError(conMethodName + ": could not convert '" + strT + "' to double");
                     }
                 } catch (final NumberFormatException e) {
-                    SignalError(conMethodName + ": could not convert '" + strT + "' to double");
+                    signalError(conMethodName + ": could not convert '" + strT + "' to double");
                     dblT = 0.0;
                 }
             }
@@ -229,7 +229,7 @@ public class JSToolBox extends JSListenerClass {
             }
             if (isNotEmpty(strValue)) {
                 strValue = stripQuotes(strValue);
-                SignalDebug(String.format("%s: %s = %s", conMethodName, pstrVariableName, strValue));
+                signalDebug(String.format("%s: %s = %s", conMethodName, pstrVariableName, strValue));
             }
         }
         return strValue;

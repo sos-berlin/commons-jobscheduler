@@ -25,12 +25,6 @@ public class WindowsSaver extends SOSPreferenceStore {
     private final Point defaultLocation;
     private boolean flgClassIsActive = false;
 
-    @Override
-    public void setKey(final String pstrKey) {
-        super.setKey(pstrKey);
-        restoreWindow();
-    }
-
     public WindowsSaver(final Class<?> c, final Shell s, final int x, final int y) {
         super(c);
         shell = s;
@@ -63,6 +57,12 @@ public class WindowsSaver extends SOSPreferenceStore {
                 }
             });
         }
+    }
+
+    @Override
+    public void setKey(final String pstrKey) {
+        super.setKey(pstrKey);
+        restoreWindow();
     }
 
     public WindowsSaver restoreWindow() {
@@ -166,7 +166,7 @@ public class WindowsSaver extends SOSPreferenceStore {
         prefs.node(name).put(WIDTH, String.valueOf(t.getWidth()));
     }
 
-    public void TableColumnOrderRestore(final Table pobjTable) {
+    public void tableColumnOrderRestore(final Table pobjTable) {
         String name = pobjTable.getData("caption") + "/colorder/default";
         String strNoOfColumn = prefs.node(name).get("NoOfColumns", "");
         if (!strNoOfColumn.isEmpty()) {
@@ -187,7 +187,7 @@ public class WindowsSaver extends SOSPreferenceStore {
         }
     }
 
-    public void TableColumnOrderSave(final Table pobjTable) {
+    public void tableColumnOrderSave(final Table pobjTable) {
         String strOrder = "";
         int intSize = pobjTable.getColumnOrder().length;
         for (int i : pobjTable.getColumnOrder()) {

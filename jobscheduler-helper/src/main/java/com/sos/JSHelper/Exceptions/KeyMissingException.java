@@ -19,7 +19,7 @@ public class KeyMissingException extends JobSchedulerException {
      * @param message the message of the exception */
     public KeyMissingException(String message) {
         super(message);
-        this.Status(JobSchedulerException.PENDING);
+        this.setStatus(JobSchedulerException.PENDING);
         this.eMailSubject("required settings-entry not found.");
     }
 

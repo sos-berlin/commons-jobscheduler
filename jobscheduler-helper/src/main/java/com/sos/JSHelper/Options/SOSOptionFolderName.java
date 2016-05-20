@@ -29,12 +29,12 @@ public class SOSOptionFolderName extends SOSOptionFileName {
             false);
 
     @Override
-    public String Value() {
+    public String getValue() {
         if (strValue == null) {
             strValue = "";
         }
-        String strLValue = super.Value();
-        if (IsNotEmpty()) {
+        String strLValue = super.getValue();
+        if (isNotEmpty()) {
             if (strLValue.endsWith("/") || strLValue.endsWith("\\") || isDotFolder()) {
             } else {
                 strLValue = strLValue + "/";
@@ -44,12 +44,12 @@ public class SOSOptionFolderName extends SOSOptionFileName {
     }
 
     public boolean isDotFolder() {
-        String strT = super.Value();
+        String strT = super.getValue();
         return ".".equals(strT) || "..".equals(strT);
     }
 
     public File[] listFiles() {
-        File[] objFL = this.JSFile().listFiles();
+        File[] objFL = this.getJSFile().listFiles();
         if (objFL != null) {
         } else {
             throw new JobSchedulerException(String.format("No Files found for pathname '%1$s'", strValue));

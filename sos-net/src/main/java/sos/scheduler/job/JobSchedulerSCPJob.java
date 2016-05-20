@@ -191,7 +191,7 @@ public class JobSchedulerSCPJob extends JobSchedulerSSHBaseJob {
                         execCommand("if [ ! -d " + this.getRemoteDir() + " ]; then mkdir -p " + this.getRemoteDir() + "; fi");
                     }
                     if (isRecursive()) {
-                        scp_recursive(localCheckDir, this.getRemoteDir(), scpClient, this.getPermissions());
+                        scpRecursive(localCheckDir, this.getRemoteDir(), scpClient, this.getPermissions());
                     } else {
                         scpClient.put(files, this.getRemoteDir(), this.getPermissions());
                     }
@@ -231,11 +231,11 @@ public class JobSchedulerSCPJob extends JobSchedulerSSHBaseJob {
         }
     }
 
-    private void scp_recursive(final File sourceFile, String targetFile, final SCPClient scpClient, final String perms) throws Exception {
-        scp_recursive(sourceFile, targetFile, scpClient, perms, true);
+    private void scpRecursive(final File sourceFile, String targetFile, final SCPClient scpClient, final String perms) throws Exception {
+        scpRecursive(sourceFile, targetFile, scpClient, perms, true);
     }
 
-    private void scp_recursive(final File sourceFile, String targetFile, final SCPClient scpClient, final String perms, boolean firstLevel)
+    private void scpRecursive(final File sourceFile, String targetFile, final SCPClient scpClient, final String perms, boolean firstLevel)
             throws Exception {
         if (sourceFile.isDirectory()) {
             if (!firstLevel) {
@@ -244,7 +244,7 @@ public class JobSchedulerSCPJob extends JobSchedulerSSHBaseJob {
             }
             String[] children = sourceFile.list();
             for (String element : children) {
-                scp_recursive(new File(sourceFile, element), targetFile, scpClient, perms, false);
+                scpRecursive(new File(sourceFile, element), targetFile, scpClient, perms, false);
             }
         } else {
             if (this.getFileSpec() != null && !this.getFileSpec().isEmpty()) {
