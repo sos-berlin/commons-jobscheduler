@@ -78,10 +78,10 @@ public class SOSSFTP implements SOSFileTransfer {
                 } else {
                     File authenticationFile = new File(this.getAuthenticationFilename());
                     if (!authenticationFile.exists()) {
-                        RaiseException("authentication file does not exist: " + authenticationFile.getCanonicalPath());
+                        raiseException("authentication file does not exist: " + authenticationFile.getCanonicalPath());
                     }
                     if (!authenticationFile.canRead()) {
-                        RaiseException("authentication file not accessible: " + authenticationFile.getCanonicalPath());
+                        raiseException("authentication file not accessible: " + authenticationFile.getCanonicalPath());
                     }
                     isAuthenticated = sshConnection.authenticateWithPublicKey(this.getUser(), authenticationFile, this.getPassword());
                 }
@@ -277,15 +277,6 @@ public class SOSSFTP implements SOSFileTransfer {
         return rvVector;
     }
 
-    /** return a listing of the contents of a directory in short format on the
-     * remote machine
-     *
-     * @return a listing of the contents of a directory on the remote machine
-     *
-     * @exception Exception
-     * @see #nList(String )
-     * @see #dir()
-     * @see #dir(String ) */
     @Override
     public Vector nList(final boolean recursive) throws Exception {
         String pathname = currentDirectory;
@@ -348,7 +339,7 @@ public class SOSSFTP implements SOSFileTransfer {
                 fis.close();
                 fis = null;
             } catch (Exception e) {
-                RaiseException("error occurred writing file [" + localFile + "]: " + e.getMessage());
+                raiseException("error occurred writing file [" + localFile + "]: " + e.getMessage());
             } finally {
                 if (fis != null) {
                     try {
@@ -365,7 +356,7 @@ public class SOSSFTP implements SOSFileTransfer {
             return offset;
         } catch (Exception e) {
             reply = e.toString();
-            RaiseException("Error during putFile: " + e, e);
+            raiseException("Error during putFile: " + e, e);
         }
         return 0;
     }
@@ -384,11 +375,6 @@ public class SOSSFTP implements SOSFileTransfer {
         return true;
     }
 
-    /** return the size of remote-file on the remote machine on success,
-     * otherwise -1
-     * 
-     * @param remoteFile the file on remote machine
-     * @return the size of remote-file on remote machine */
     @Override
     public long size(String remoteFile) throws Exception {
         remoteFile = resolvePathname(remoteFile);
@@ -398,19 +384,11 @@ public class SOSSFTP implements SOSFileTransfer {
         } catch (SFTPException e) {
             // File not found: ignore
         } catch (Exception e) {
-            RaiseException("Error occured checking size: " + e, e);
+            raiseException("Error occured checking size: " + e, e);
         }
         return lngFileSize;
     }
 
-    /** Retrieves a named file from the ftp server.
-     *
-     * @param localFile The name of the local file.
-     * @param remoteFile The name of the remote file.
-     * @param append Appends the remote file to the local file.
-     * @return The total number of bytes retrieved.
-     * @see #get(String, String )
-     * @exception Exception */
     @Override
     public long getFile(final String remoteFile, final String localFile, final boolean append) throws Exception {
         String sourceLocation = resolvePathname(remoteFile);
@@ -439,7 +417,7 @@ public class SOSSFTP implements SOSFileTransfer {
                 fos.close();
                 fos = null;
             } catch (Exception e) {
-                RaiseException("error occurred writing file [" + transferFile.getAbsolutePath() + "]: " + e.getMessage());
+                raiseException("error occurred writing file [" + transferFile.getAbsolutePath() + "]: " + e.getMessage());
             } finally {
                 if (fos != null) {
                     try {
@@ -453,7 +431,7 @@ public class SOSSFTP implements SOSFileTransfer {
             sftpClient.closeFile(sftpFileHandle);
             sftpFileHandle = null;
             if (remoteFileSize > 0 && remoteFileSize != transferFile.length()) {
-                RaiseException("remote file size [" + remoteFileSize + "] and local file size [" + transferFile.length()
+                raiseException("remote file size [" + remoteFileSize + "] and local file size [" + transferFile.length()
                         + "] are different. Number of bytes written to local file: " + offset);
             }
             return transferFile.length();
@@ -556,11 +534,6 @@ public class SOSSFTP implements SOSFileTransfer {
         return authenticationFile;
     }
 
-    /** Check existence of a file or directory
-     *
-     * @param filename
-     * @return true, if file exists
-     * @throws Exception */
     private boolean fileExists(final String filename) {
         try {
             SFTPv3FileAttributes attributes = sftpClient.stat(filename);
@@ -574,10 +547,6 @@ public class SOSSFTP implements SOSFileTransfer {
         }
     }
 
-    /** Checks if file is a directory
-     *
-     * @param filename
-     * @return true, if filename is a directory */
     private boolean isDirectory(final String filename) {
         try {
             return sftpClient.stat(filename).isDirectory();
@@ -621,7 +590,7 @@ public class SOSSFTP implements SOSFileTransfer {
         return 0;
     }
 
-    private void RaiseException(final Exception e, final String pstrM) {
+    private void raiseException(final Exception e, final String pstrM) {
         LOGGER.error(pstrM);
         if (e != null) {
             throw new JobSchedulerException(pstrM, e);
@@ -630,12 +599,12 @@ public class SOSSFTP implements SOSFileTransfer {
         }
     }
 
-    private void RaiseException(final String pstrM, final Exception e) {
-        RaiseException(e, pstrM);
+    private void raiseException(final String pstrM, final Exception e) {
+        raiseException(e, pstrM);
     }
 
-    private void RaiseException(final String pstrM) {
-        RaiseException(null, pstrM);
+    private void raiseException(final String pstrM) {
+        raiseException(null, pstrM);
     }
 
 }

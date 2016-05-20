@@ -39,7 +39,7 @@ public class SOSSSHJobOptions extends SOSSSHJobOptionsSuperClass {
 
     @Override
     public void checkMandatory() {
-        command.command_delimiter.Value(commandDelimiter.Value());
+        command.command_delimiter.setValue(commandDelimiter.getValue());
         super.checkMandatory();
         if (!(authMethod.isPassword() || authMethod.isPublicKey())) {
             throw new JSExceptionMandatoryOptionMissing("ErrSSH010 invalid or no AuthenticationMethod specified");
@@ -49,8 +49,8 @@ public class SOSSSHJobOptions extends SOSSSHJobOptionsSuperClass {
                     "ErrSSH020 AuthenticationMethod 'password' requires a Password, but no password was specified");
         }
         if (authMethod.isPublicKey()) {
-            if (authFile.IsNotEmpty()) {
-                authFile.CheckMandatory(true);
+            if (authFile.isNotEmpty()) {
+                authFile.checkMandatory(true);
             } else {
                 throw new JSExceptionMandatoryOptionMissing(
                         "ErrSSH050 AuthenticationMethod 'publickey' requires a keyfile, but no keyfile was specified");

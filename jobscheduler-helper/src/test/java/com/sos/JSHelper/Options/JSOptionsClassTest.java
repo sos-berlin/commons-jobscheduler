@@ -24,7 +24,7 @@ public class JSOptionsClassTest {
     @Test
     public void testGetValuePairs() throws Exception {
         JSOptionsClass objOC = new JSOptionsClass();
-        objOC.Locale.Value("DE");
+        objOC.locale.setValue("DE");
         LOGGER.info(objOC.getOptionsAsKeyValuePairs());
     }
 
@@ -57,20 +57,20 @@ public class JSOptionsClassTest {
         String strCmd = "SITE chmod 777 $SourceFileName";
         objHsh.put("source_pre_command", strCmd);
         objHsh.put("target_pre_command", strCmd);
-        objOC.CurrentNodeName("test");
+        objOC.setCurrentNodeName("test");
         objOC.setAllOptions(objHsh);
-        HashMap<String, String> objS4SN = objOC.Settings4StepName();
+        HashMap<String, String> objS4SN = objOC.getSettings4StepName();
         LOGGER.info(objS4SN.get("source/source_user") + " / " + objS4SN.get("target_user"));
     }
 
     @Test
     public final void testStoreOptionValues() {
         JSOptionsClass objOC = new JSOptionsClass();
-        objOC.Locale.Value("en_EN");
+        objOC.locale.setValue("en_EN");
         objOC.storeOptionValues();
         objOC = new JSOptionsClass();
         objOC.initializeOptionValues();
-        assertEquals("locale is wrong", "en_EN", objOC.Locale.Value());
+        assertEquals("locale is wrong", "en_EN", objOC.locale.getValue());
     }
 
 }

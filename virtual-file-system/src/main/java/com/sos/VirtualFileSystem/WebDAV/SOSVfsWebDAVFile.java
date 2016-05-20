@@ -26,7 +26,7 @@ public class SOSVfsWebDAVFile extends SOSVfsTransferFileBaseClass {
             }
             return is.read(bteBuffer);
         } catch (Exception e) {
-            RaiseException(e, SOSVfs_E_173.params("read", fileName));
+            raiseException(e, SOSVfs_E_173.params("read", fileName));
             return 0;
         }
     }
@@ -40,7 +40,7 @@ public class SOSVfsWebDAVFile extends SOSVfsTransferFileBaseClass {
             }
             return is.read(bteBuffer, intOffset, intLength);
         } catch (Exception e) {
-            RaiseException(e, SOSVfs_E_173.params("read", fileName));
+            raiseException(e, SOSVfs_E_173.params("read", fileName));
             return 0;
         }
     }
@@ -57,7 +57,7 @@ public class SOSVfsWebDAVFile extends SOSVfsTransferFileBaseClass {
             objOutputStream.write(bteBuffer, intOffset, intLength);
             ((SOSVfsWebDAVOutputStream) objOutputStream).put();
         } catch (Exception e) {
-            RaiseException(e, SOSVfs_E_173.params("write", fileName));
+            raiseException(e, SOSVfs_E_173.params("write", fileName));
         }
     }
 
@@ -73,7 +73,7 @@ public class SOSVfsWebDAVFile extends SOSVfsTransferFileBaseClass {
             objOutputStream.write(bteBuffer);
             ((SOSVfsWebDAVOutputStream) objOutputStream).put();
         } catch (Exception e) {
-            RaiseException(e, SOSVfs_E_173.params("write", fileName));
+            raiseException(e, SOSVfs_E_173.params("write", fileName));
         }
     }
 

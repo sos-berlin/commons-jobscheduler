@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.sos.VirtualFileSystem.exceptions;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
@@ -9,30 +6,28 @@ import com.sos.VirtualFileSystem.enums.JADEExitCodes;
 /** @author KB */
 public final class JADEExceptionFactory {
 
-    /**
-	 * 
-	 */
     public JADEExceptionFactory() {
+        //
     }
 
-    public static void RaiseDeleteException(final String pstrS) {
-        RaiseJadeException(pstrS);
+    public static void raiseDeleteException(final String pstrS) {
+        raiseJadeException(pstrS);
     }
 
-    public static void RaiseJadeException(final String pstrS) {
+    public static void raiseJadeException(final String pstrS) {
         JADEException objJ = new JADEException(pstrS);
         objJ.setExitCode(JADEExitCodes.someUnspecificError);
         objJ.setMessage(pstrS);
         throw objJ;
     }
 
-    public static void RaiseJadeException(final JADEExitCodes penuExitCode, final String pstrS, final Exception e) {
+    public static void raiseJadeException(final JADEExitCodes penuExitCode, final String pstrS, final Exception e) {
         JADEException objJ = createJadeException(penuExitCode, e);
         objJ.setMessage(pstrS);
         throw objJ;
     }
 
-    public static void RaiseJadeException(final JADEExitCodes penuExitCode, final Exception e) {
+    public static void raiseJadeException(final JADEExitCodes penuExitCode, final Exception e) {
         throw createJadeException(penuExitCode, e);
     }
 
@@ -55,4 +50,5 @@ public final class JADEExceptionFactory {
     public static void resetLastErrorMessage() {
         JobSchedulerException.LastErrorMessage = "";
     }
+
 }

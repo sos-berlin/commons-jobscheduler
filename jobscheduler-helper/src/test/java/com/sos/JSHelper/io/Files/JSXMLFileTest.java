@@ -32,13 +32,14 @@ import com.sos.JSHelper.DataElements.JSDateFormat;
 
 public class JSXMLFileTest extends JSToolBox {
 
-    private static final Logger LOGGER = Logger.getLogger(JSXMLFileTest.class);
+    private static final String CLASSNAME = "JSXMLFileTest";
     private static final String XSLT_PARM_EXTENDS_CLASSNAME = "ExtendsClassName";
     private static final String XSLT_PARM_CLASSNAME_EXTENSION = "ClassNameExtension";
     private static final String XSLT_PARM_VERSION = "version";
     private static final String XSLT_PARM_SOURCE_TYPE = "sourcetype";
     private static final String XSLT_PARM_CLASSNAME = "ClassName";
     private static final String XSLT_PARM_WORKER_CLASSNAME = "WorkerClassName";
+    private static final Logger LOGGER = Logger.getLogger(JSXMLFileTest.class);
     private HashMap<String, String> pobjHshMap = null;
     String strBaseFolder = "R:/backup/sos/";
     String strBaseDirName = strBaseFolder + "java/development/com.sos.scheduler/src/sos/scheduler/jobdoc";
@@ -81,7 +82,7 @@ public class JSXMLFileTest extends JSToolBox {
         JSDataElementDate objDate = new JSDataElementDate(objTools.now());
         objDate.setFormatPattern(JSDateFormat.dfTIMESTAMPS24);
         objDate.setParsePattern(JSDateFormat.dfTIMESTAMPS24);
-        String strTimeStamp = objDate.FormattedValue();
+        String strTimeStamp = objDate.getFormattedValue();
         setXSLTParameter("timestamp", strTimeStamp);
         String strClassNameExtension = "OptionsSuperClass";
         String strWorkerClassName = "SOSSSHJob2JSAdapter";
@@ -95,7 +96,7 @@ public class JSXMLFileTest extends JSToolBox {
         setXSLTParameter("XSLTFilename", objXSLTFile.getAbsolutePath());
         fleFile.setParameters(pobjHshMap);
         JSTextFile objOutputFile = new JSTextFile("c:/temp/test.java");
-        fleFile.Transform(objXSLTFile, objOutputFile);
+        fleFile.transform(objXSLTFile, objOutputFile);
         LOGGER.info(objOutputFile.getContent());
     }
 
@@ -111,12 +112,14 @@ public class JSXMLFileTest extends JSToolBox {
         Document objDoc = fleXMLFile.getDomDocument();
         LOGGER.info("objDoc has " + objDoc.getChildNodes().getLength() + " childs");
         JSTextFile objOutputFile = new JSTextFile("c:/temp/test.mediaWiki");
-        fleXMLFile.Transform(objXSLTFile, objOutputFile);
+        fleXMLFile.transform(objXSLTFile, objOutputFile);
         LOGGER.info(objOutputFile.getContent());
     }
 
     private void setXSLTParameter(final String strVarName, final String strVarValue) {
-        pobjHshMap.put(strVarName, strVarValue);
+        final String conMethodName = CLASSNAME + "::setXSLTParameter";
+        String strV = strVarValue;
+        pobjHshMap.put(strVarName, strV);
     }
 
     private void setGeneralParameters() {
@@ -128,10 +131,9 @@ public class JSXMLFileTest extends JSToolBox {
     }
 
     @Test
-    public void XIncludeExample() throws Exception {
-        final String XML =
-                "<?xml version=\"1.0\"?>\n" + "<data xmlns=\"foo\" xmlns:xi=\"http://www.w3.org/2001/XInclude\">\n"
-                        + "<xi:include href=\"include.txt\" parse=\"text\"/>\n" + "</data>\n";
+    public void xIncludeExample() throws Exception {
+        final String XML = "<?xml version=\"1.0\"?>\n" + "<data xmlns=\"foo\" xmlns:xi=\"http://www.w3.org/2001/XInclude\">\n"
+                + "<xi:include href=\"include.txt\" parse=\"text\"/>\n" + "</data>\n";
         final String INCLUDE = "Hello, World!";
         final InputStream xmlStream = new ByteArrayInputStream(XML.getBytes("UTF-8"));
         final InputStream includeStream = new ByteArrayInputStream(INCLUDE.getBytes("UTF-8"));

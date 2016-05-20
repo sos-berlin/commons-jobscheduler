@@ -26,19 +26,19 @@ public class SOSProfileEntry {
         return strT.concat("</" + strName + ">\n");
     }
 
-    public String Name() {
+    public String getName() {
         return strName;
     }
 
-    public String Value() {
+    public String getValue() {
         return strValue;
     }
 
-    public void Name(String string) {
+    public void setName(String string) {
         strName = string;
     }
 
-    public void Value(String string) {
+    public void setValue(String string) {
         strValue = string;
     }
 

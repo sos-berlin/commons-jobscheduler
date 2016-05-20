@@ -37,9 +37,9 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
             if (!vfsHandler.isConnected()) {
                 SOSConnection2OptionsAlternate postAlternateOptions = getAlternateOptions(objOptions);
                 postAlternateOptions.raiseExceptionOnError.value(false);
-                vfsHandler.Connect(postAlternateOptions);
+                vfsHandler.connect(postAlternateOptions);
             }
-            vfsHandler.Authenticate(objOptions);
+            vfsHandler.authenticate(objOptions);
             LOGGER.debug("connection established");
         } catch (Exception e) {
             throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
@@ -66,12 +66,12 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
             }
             add2Files2Delete(getTempPidFileName());
             try {
-                String strCmd = String.format(objOptions.getPostCommandRead().Value(), getTempPidFileName());
+                String strCmd = String.format(objOptions.getPostCommandRead().getValue(), getTempPidFileName());
                 LOGGER.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
                 strCmd = objJSJobUtilities.replaceSchedulerVars(strCmd);
                 LOGGER.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
                 LOGGER.debug("***Execute read pid file command!***");
-                vfsHandler.ExecuteCommand(strCmd);
+                vfsHandler.executeCommand(strCmd);
                 objJSJobUtilities.setJSParam(conExit_code, "0");
                 String pid = null;
                 BufferedReader reader = new BufferedReader(new StringReader(new String(vfsHandler.getStdOut())));
@@ -154,7 +154,7 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
     public void disconnect() {
         if (isConnected) {
             try {
-                vfsHandler.CloseConnection();
+                vfsHandler.closeConnection();
             } catch (Exception e) {
                 throw new SSHConnectionError("problems closing connection", e);
             }
@@ -176,8 +176,8 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
         getOptions().checkMandatory();
         try {
             SOSConnection2OptionsAlternate alternateOptions = getAlternateOptions(objOptions);
-            vfsHandler.Connect(alternateOptions);
-            vfsHandler.Authenticate(objOptions);
+            vfsHandler.connect(alternateOptions);
+            vfsHandler.authenticate(objOptions);
             LOGGER.debug("connection established");
         } catch (Exception e) {
             throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
@@ -213,15 +213,15 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
     public SOSConnection2OptionsAlternate getAlternateOptions(SOSSSHJobOptions options) {
         SOSConnection2OptionsAlternate alternateOptions = new SOSConnection2OptionsAlternate();
         alternateOptions.setStrictHostKeyChecking("no");
-        alternateOptions.host.Value(options.getHost().Value());
+        alternateOptions.host.setValue(options.getHost().getValue());
         alternateOptions.port.value(options.getPort().value());
-        alternateOptions.user.Value(options.getUser().Value());
-        alternateOptions.password.Value(options.getPassword().Value());
-        alternateOptions.proxyProtocol.Value(options.getproxy_protocol().Value());
-        alternateOptions.proxyHost.Value(options.getProxyHost().Value());
+        alternateOptions.user.setValue(options.getUser().getValue());
+        alternateOptions.password.setValue(options.getPassword().getValue());
+        alternateOptions.proxyProtocol.setValue(options.getProxyProtocol().getValue());
+        alternateOptions.proxyHost.setValue(options.getProxyHost().getValue());
         alternateOptions.proxyPort.value(options.getProxyPort().value());
-        alternateOptions.proxyUser.Value(options.getProxyUser().Value());
-        alternateOptions.proxyPassword.Value(options.getProxyPassword().Value());
+        alternateOptions.proxyUser.setValue(options.getProxyUser().getValue());
+        alternateOptions.proxyPassword.setValue(options.getProxyPassword().getValue());
         alternateOptions.raiseExceptionOnError.value(options.getRaiseExceptionOnError().value());
         alternateOptions.ignoreError.value(options.getIgnoreError().value());
         return alternateOptions;

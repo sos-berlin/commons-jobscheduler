@@ -18,13 +18,13 @@ public class JSCmdShowState extends ShowState {
     }
 
     public void setWhat(enu4What penuT) {
-        super.setWhat(penuT.Text());
+        super.setWhat(penuT.getText());
     }
 
     public void setWhat(enu4What[] penuT) {
         String strT = "";
         for (enu4What enuState4What : penuT) {
-            strT += enuState4What.Text() + " ";
+            strT += enuState4What.getText() + " ";
         }
         super.setWhat(strT);
     }

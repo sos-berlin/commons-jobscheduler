@@ -12,11 +12,11 @@ public class ParametersMissingButRequiredException extends JobSchedulerException
 
     public ParametersMissingButRequiredException(final String pstrApplSystem, final String pstrApplDocuUrl) {
         super(new SOSMsgJsh("SOSVfs_E_278").getFullMessage(pstrApplSystem, pstrApplDocuUrl));
-        this.Status(JobSchedulerException.ERROR);
-        this.Category(CategoryOptions);
-        this.Typ(TypeOptionMissing);
+        this.setStatus(JobSchedulerException.ERROR);
+        this.setCategory(CategoryOptions);
+        this.setType(TypeOptionMissing);
         this.eMailSubject(this.getMessage());
-        LOGGER.error(this.ExceptionText());
+        LOGGER.error(this.getExceptionText());
     }
 
 }

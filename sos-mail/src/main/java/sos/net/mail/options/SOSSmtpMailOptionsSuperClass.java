@@ -25,12 +25,12 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
     public SOSOptionString attachment = new SOSOptionString(this, CLASSNAME + ".attachment", "title Filename and path", "", "", false);
 
     @Override
-    public SOSOptionString getattachment() {
+    public SOSOptionString getAttachment() {
         return attachment;
     }
 
     @Override
-    public void setattachment(final SOSOptionString p_attachment) {
+    public void setAttachment(final SOSOptionString p_attachment) {
         attachment = p_attachment;
     }
 
@@ -38,12 +38,12 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
     public SOSOptionString security_protocol = new SOSOptionString(this, CLASSNAME + ".security_protocol", "title security_protocol", "", "", false);
 
     @Override
-    public SOSOptionString getsecurity_protocol() {
+    public SOSOptionString getSecurityProtocol() {
         return security_protocol;
     }
 
     @Override
-    public void setsecurity_protocol(final SOSOptionString p_security_protocol) {
+    public void setSecurityProtocol(final SOSOptionString p_security_protocol) {
         security_protocol = p_security_protocol;
     }
 
@@ -52,12 +52,12 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
             "iso-8859-1", false);
 
     @Override
-    public SOSOptionString getattachment_charset() {
+    public SOSOptionString getAttachmentCharset() {
         return attachment_charset;
     }
 
     @Override
-    public void setattachment_charset(final SOSOptionString p_attachment_charset) {
+    public void setAttachmentCharset(final SOSOptionString p_attachment_charset) {
         attachment_charset = p_attachment_charset;
     }
 
@@ -66,12 +66,12 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
             "application/octet-stream", "application/octet-stream", false);
 
     @Override
-    public SOSOptionString getattachment_content_type() {
+    public SOSOptionString getAttachmentContentType() {
         return attachment_content_type;
     }
 
     @Override
-    public void setattachment_content_type(final SOSOptionString p_attachment_content_type) {
+    public void setAttachmentContentType(final SOSOptionString p_attachment_content_type) {
         attachment_content_type = p_attachment_content_type;
     }
 
@@ -80,54 +80,54 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
             "Base64", false);
 
     @Override
-    public SOSOptionString getattachment_encoding() {
+    public SOSOptionString getAttachmentEncoding() {
         return attachment_encoding;
     }
 
     @Override
-    public void setattachment_encoding(final SOSOptionString p_attachment_encoding) {
+    public void setAttachmentEncoding(final SOSOptionString p_attachment_encoding) {
         attachment_encoding = p_attachment_encoding;
     }
 
     @JSOptionDefinition(name = "bcc", description = "title bcc recipient(s)", key = "bcc", type = "SOSOptionMailAdress", mandatory = false)
     public SOSOptionMailAdress bcc = new SOSOptionMailAdress(this, CLASSNAME + ".bcc", "title bcc recipient(s)", "", "", false);
-    public SOSOptionMailAdress FileNotificationBCC = (SOSOptionMailAdress) bcc.SetAlias("file_notification_bcc");
+    public SOSOptionMailAdress FileNotificationBCC = (SOSOptionMailAdress) bcc.setAlias("file_notification_bcc");
 
     @Override
-    public SOSOptionMailAdress getbcc() {
+    public SOSOptionMailAdress getBcc() {
         return bcc;
     }
 
     @Override
-    public void setbcc(final SOSOptionMailAdress p_bcc) {
+    public void setBcc(final SOSOptionMailAdress p_bcc) {
         bcc = p_bcc;
     }
 
     @JSOptionDefinition(name = "body", description = "title Mail body", key = "body", type = "SOSOptionString", mandatory = false)
     public SOSOptionString body = new SOSOptionString(this, CLASSNAME + ".body", "title Mail body", "", "", false);
-    public SOSOptionString FileNotificationBody = (SOSOptionString) body.SetAlias("file_notification_body");
+    public SOSOptionString FileNotificationBody = (SOSOptionString) body.setAlias("file_notification_body");
 
     @Override
-    public SOSOptionString getbody() {
+    public SOSOptionString getBody() {
         return body;
     }
 
     @Override
-    public void setbody(final SOSOptionString p_body) {
+    public void setBody(final SOSOptionString p_body) {
         body = p_body;
     }
 
     @JSOptionDefinition(name = "cc", description = "title cc recipient(s)", key = "cc", type = "SOSOptionMailAdress", mandatory = false)
     public SOSOptionMailAdress cc = new SOSOptionMailAdress(this, CLASSNAME + ".cc", "title cc recipient(s)", "", "", false);
-    public SOSOptionMailAdress FileNotificationCC = (SOSOptionMailAdress) cc.SetAlias("file_notification_cc");
+    public SOSOptionMailAdress FileNotificationCC = (SOSOptionMailAdress) cc.setAlias("file_notification_cc");
 
     @Override
-    public SOSOptionMailAdress getcc() {
+    public SOSOptionMailAdress getCc() {
         return cc;
     }
 
     @Override
-    public void setcc(final SOSOptionMailAdress p_cc) {
+    public void setCc(final SOSOptionMailAdress p_cc) {
         cc = p_cc;
     }
 
@@ -135,12 +135,12 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
     public SOSOptionString charset = new SOSOptionString(this, CLASSNAME + ".charset", "title charset of the m", "iso-8859-1", "iso-8859-1", false);
 
     @Override
-    public SOSOptionString getcharset() {
+    public SOSOptionString getCharset() {
         return charset;
     }
 
     @Override
-    public void setcharset(final SOSOptionString p_charset) {
+    public void setCharset(final SOSOptionString p_charset) {
         charset = p_charset;
     }
 
@@ -149,12 +149,12 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
             false);
 
     @Override
-    public SOSOptionString getcontent_type() {
+    public SOSOptionString getContentType() {
         return content_type;
     }
 
     @Override
-    public void setcontent_type(final SOSOptionString p_content_type) {
+    public void setContentType(final SOSOptionString p_content_type) {
         content_type = p_content_type;
     }
 
@@ -162,26 +162,26 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
     public SOSOptionString encoding = new SOSOptionString(this, CLASSNAME + ".encoding", "title encoding of the", "7bit", "7bit", false);
 
     @Override
-    public SOSOptionString getencoding() {
+    public SOSOptionString getEncoding() {
         return encoding;
     }
 
     @Override
-    public void setencoding(final SOSOptionString p_encoding) {
+    public void setEncoding(final SOSOptionString p_encoding) {
         encoding = p_encoding;
     }
 
     @JSOptionDefinition(name = "from", description = "title mail sender", key = "from", type = "SOSOptionMailAdress", mandatory = false)
     public SOSOptionMailAdress from = new SOSOptionMailAdress(this, CLASSNAME + ".from", "title mail sender", "", "", false);
-    public SOSOptionMailAdress MailFrom = (SOSOptionMailAdress) from.SetAlias("mail_from");
+    public SOSOptionMailAdress MailFrom = (SOSOptionMailAdress) from.setAlias("mail_from");
 
     @Override
-    public SOSOptionMailAdress getfrom() {
+    public SOSOptionMailAdress getFrom() {
         return from;
     }
 
     @Override
-    public void setfrom(final SOSOptionMailAdress p_from) {
+    public void setFrom(final SOSOptionMailAdress p_from) {
         from = p_from;
     }
 
@@ -189,55 +189,55 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
     public SOSOptionString from_name = new SOSOptionString(this, CLASSNAME + ".from_name", "title name of the send", "", "", false);
 
     @Override
-    public SOSOptionString getfrom_name() {
+    public SOSOptionString getFromName() {
         return from_name;
     }
 
     @Override
-    public void setfrom_name(final SOSOptionString p_from_name) {
+    public void setFromName(final SOSOptionString p_from_name) {
         from_name = p_from_name;
     }
 
     @JSOptionDefinition(name = "host", description = "title mail server host", key = "host", type = "SOSOptionHostName", mandatory = false)
     public SOSOptionHostName host = new SOSOptionHostName(this, CLASSNAME + ".host", "title mail server host", "", "", false);
-    public SOSOptionHostName SMTPHost = (SOSOptionHostName) host.SetAlias("mail_smtp", "smtp_host");
+    public SOSOptionHostName SMTPHost = (SOSOptionHostName) host.setAlias("mail_smtp", "smtp_host");
 
     @Override
-    public SOSOptionHostName gethost() {
+    public SOSOptionHostName getHost() {
         return host;
     }
 
     @Override
-    public void sethost(final SOSOptionHostName p_host) {
+    public void setHost(final SOSOptionHostName p_host) {
         host = p_host;
     }
 
     @JSOptionDefinition(name = "port", description = "title mail server port", key = "port", type = "SOSOptionPortNumber", mandatory = false)
     public SOSOptionPortNumber port = new SOSOptionPortNumber(this, CLASSNAME + ".port", "title mail server port", "25", "25", false);
 
-    public SOSOptionPortNumber MailPort = (SOSOptionPortNumber) port.SetAlias("mail_port", "smtp_port");
+    public SOSOptionPortNumber MailPort = (SOSOptionPortNumber) port.setAlias("mail_port", "smtp_port");
 
     @Override
-    public SOSOptionPortNumber getport() {
+    public SOSOptionPortNumber getPort() {
         return port;
     }
 
     @Override
-    public void setport(final SOSOptionPortNumber p_port) {
+    public void setPort(final SOSOptionPortNumber p_port) {
         port = p_port;
     }
 
     @JSOptionDefinition(name = "queue_directory", description = "title Mail queue direc", key = "queue_directory", type = "SOSOptionString", mandatory = false)
     public SOSOptionString queue_directory = new SOSOptionString(this, CLASSNAME + ".queue_directory", "title Mail queue direc", "", "", false);
-    public SOSOptionString MailQueueDir = (SOSOptionString) queue_directory.SetAlias("mail_queue_dir");
+    public SOSOptionString MailQueueDir = (SOSOptionString) queue_directory.setAlias("mail_queue_dir");
 
     @Override
-    public SOSOptionString getqueue_directory() {
+    public SOSOptionString getQueueDirectory() {
         return queue_directory;
     }
 
     @Override
-    public void setqueue_directory(final SOSOptionString p_queue_directory) {
+    public void setQueueDirectory(final SOSOptionString p_queue_directory) {
         queue_directory = p_queue_directory;
     }
 
@@ -245,12 +245,12 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
     public SOSOptionMailAdress reply_to = new SOSOptionMailAdress(this, CLASSNAME + ".reply_to", "title reply address", "", "", false);
 
     @Override
-    public SOSOptionMailAdress getreply_to() {
+    public SOSOptionMailAdress getReplyTo() {
         return reply_to;
     }
 
     @Override
-    public void setreply_to(final SOSOptionMailAdress p_reply_to) {
+    public void setReplyTo(final SOSOptionMailAdress p_reply_to) {
         reply_to = p_reply_to;
     }
 
@@ -258,12 +258,12 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
     public SOSOptionPassword smtp_password = new SOSOptionPassword(this, CLASSNAME + ".smtp_password", "title smtp user passwo", "", "", false);
 
     @Override
-    public SOSOptionPassword getsmtp_password() {
+    public SOSOptionPassword getSmtpPassword() {
         return smtp_password;
     }
 
     @Override
-    public void setsmtp_password(final SOSOptionPassword p_smtp_password) {
+    public void setSmtpPassword(final SOSOptionPassword p_smtp_password) {
         smtp_password = p_smtp_password;
     }
 
@@ -271,40 +271,40 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
     public SOSOptionString smtp_user = new SOSOptionString(this, CLASSNAME + ".smtp_user", "title smtp username", "", "", false);
 
     @Override
-    public SOSOptionString getsmtp_user() {
+    public SOSOptionString getSmtpUser() {
         return smtp_user;
     }
 
     @Override
-    public void setsmtp_user(final SOSOptionString p_smtp_user) {
+    public void setSmtpUser(final SOSOptionString p_smtp_user) {
         smtp_user = p_smtp_user;
     }
 
     @JSOptionDefinition(name = "subject", description = "title Mail Subject", key = "subject", type = "SOSOptionString", mandatory = false)
     public SOSOptionMailSubject subject = new SOSOptionMailSubject(this, CLASSNAME + ".subject", "title Mail Subject", "", "", false);
-    public SOSOptionMailSubject FileNotificationSubject = (SOSOptionMailSubject) subject.SetAlias("file_notification_subject");
+    public SOSOptionMailSubject FileNotificationSubject = (SOSOptionMailSubject) subject.setAlias("file_notification_subject");
 
     @Override
-    public SOSOptionMailSubject getsubject() {
+    public SOSOptionMailSubject getSubject() {
         return subject;
     }
 
     @Override
-    public void setsubject(final SOSOptionMailSubject p_subject) {
+    public void setSubject(final SOSOptionMailSubject p_subject) {
         subject = p_subject;
     }
 
     @JSOptionDefinition(name = "to", description = "title mail recipient(s", key = "to", type = "SOSOptionMailAdress", mandatory = true)
     public SOSOptionMailAdress to = new SOSOptionMailAdress(this, CLASSNAME + ".to", "title mail recipient(s", "", "", true);
-    public SOSOptionMailAdress FileNotificationTo = (SOSOptionMailAdress) to.SetAlias("file_notification_to");
+    public SOSOptionMailAdress FileNotificationTo = (SOSOptionMailAdress) to.setAlias("file_notification_to");
 
     @Override
-    public SOSOptionMailAdress getto() {
+    public SOSOptionMailAdress getTo() {
         return to;
     }
 
     @Override
-    public void setto(final SOSOptionMailAdress p_to) {
+    public void setTo(final SOSOptionMailAdress p_to) {
         to = p_to;
     }
 
@@ -325,6 +325,7 @@ abstract public class SOSSmtpMailOptionsSuperClass extends JSOptionsClass implem
     @Override
     public void setAllOptions(final HashMap<String, String> pobjJSSettings) {
         objSettings = pobjJSSettings;
+        super.setSettings(objSettings);
         super.setAllOptions(pobjJSSettings);
     }
 

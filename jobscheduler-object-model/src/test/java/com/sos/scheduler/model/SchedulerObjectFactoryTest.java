@@ -184,7 +184,7 @@ public class SchedulerObjectFactoryTest extends JSToolBox {
     @Test
     @Ignore
     public final void testStartOrder() {
-        JSCmdModifyOrder objOrder = objSchedulerObjectFactory.StartOrder("BuildJars", "1");
+        JSCmdModifyOrder objOrder = objSchedulerObjectFactory.startOrder("BuildJars", "1");
         try {
             objOrder.getAnswerWithException();
         } catch (JSCommandErrorException e) {
@@ -198,7 +198,7 @@ public class SchedulerObjectFactoryTest extends JSToolBox {
     @Test(expected = JSCommandOKException.class)
     @Ignore("Test set to Ignore for later examination")
     public final void testStartJob() {
-        JSCmdStartJob objOrder = objSchedulerObjectFactory.StartJob("/sos/dailyschedule/CheckDaysSchedule");
+        JSCmdStartJob objOrder = objSchedulerObjectFactory.startJob("/sos/dailyschedule/CheckDaysSchedule");
 
     }
 
@@ -365,9 +365,9 @@ public class SchedulerObjectFactoryTest extends JSToolBox {
         JSCmdShowJob objShowJob = objSchedulerObjectFactory.isJobRunning(strJobName);
         if (objShowJob == null) {
             if (isNotEmpty(strOrderName)) {
-                objSchedulerObjectFactory.StartOrder(strJobChainName, strOrderName);
+                objSchedulerObjectFactory.startOrder(strJobChainName, strOrderName);
             } else {
-                objSchedulerObjectFactory.StartJob(strJobName);
+                objSchedulerObjectFactory.startJob(strJobName);
             }
             LOGGER.info(String.format("Job '%1$s' was started.", strJobName));
             sleep(intTimeBetweenCheck * 1000);
@@ -406,7 +406,7 @@ public class SchedulerObjectFactoryTest extends JSToolBox {
                         String strT = objTaskLog.getContent();
                         // count Heartbeats
                         if (isNotEmpty(strRegExp)) {
-                            int intHeartBeatCount = GrepCount(strT, strRegExp);
+                            int intHeartBeatCount = grepCount(strT, strRegExp);
                             if (intHeartBeatCount <= intLastHeartBeatCount) {
                                 JSCmdKillTask objKiller = objSchedulerObjectFactory.createKillTask();
                                 objKiller.setId(objTask.getId());
@@ -426,9 +426,9 @@ public class SchedulerObjectFactoryTest extends JSToolBox {
             }
             if (!flgIsJobRunning) {
                 if (isNotEmpty(strOrderName)) {
-                    objSchedulerObjectFactory.StartOrder(strJobChainName, strOrderName);
+                    objSchedulerObjectFactory.startOrder(strJobChainName, strOrderName);
                 } else {
-                    objSchedulerObjectFactory.StartJob(strJobName);
+                    objSchedulerObjectFactory.startJob(strJobName);
                 }
                 intNoOfRestarts++;
                 LOGGER.info(String.format("Job started again. Number of restarts is '%1$d'", intNoOfRestarts));
@@ -442,7 +442,7 @@ public class SchedulerObjectFactoryTest extends JSToolBox {
         }
     }
 
-    private int GrepCount(final String pstrText, final String pstrRegExp) {
+    private int grepCount(final String pstrText, final String pstrRegExp) {
         Pattern p = Pattern.compile(pstrRegExp);
         BufferedReader buff = new BufferedReader(new StringReader(pstrText));
         int intCount = 0;
@@ -487,11 +487,11 @@ public class SchedulerObjectFactoryTest extends JSToolBox {
         State objState = objCmdShowState.getState();
         Folder objFolder = objState.getFolder();
         if (objFolder != null) {
-            TraverseFolders(objFolder);
+            traverseFolders(objFolder);
         }
     }
 
-    private void TraverseFolders(final Folder pobjFolder) {
+    private void traverseFolders(final Folder pobjFolder) {
         for (Object objAnObject : pobjFolder.getFileBasedOrJobsOrFolders()) {
             if (objAnObject instanceof FileBased) {
                 FileBased objFB = (FileBased) objAnObject;
@@ -509,7 +509,7 @@ public class SchedulerObjectFactoryTest extends JSToolBox {
             } else if (objAnObject instanceof Folders) {
                 Folders objFolders = (Folders) objAnObject;
                 for (Folder objFolder : objFolders.getFolder()) {
-                    TraverseFolders(objFolder);
+                    traverseFolders(objFolder);
                 }
             } else if (objAnObject instanceof Orders) {
                 Orders objOrders = (Orders) objAnObject;
@@ -575,7 +575,7 @@ public class SchedulerObjectFactoryTest extends JSToolBox {
         objOrder.setTitle("Test for UDP communication method");
         Params objParams = objSchedulerObjectFactory.setParams(new String[] { "Test1", "Test1", "scheduler_job_chain", "scheduler_sosftp_history" });
         objOrder.setParams(objParams);
-        objSchedulerObjectFactory.Options().TransferMethod.Value(enuJSTransferModes.udp.description);
+        objSchedulerObjectFactory.Options().TransferMethod.setValue(enuJSTransferModes.udp.description);
         LOGGER.info(objOrder.toXMLString());
         objOrder.run();
     }

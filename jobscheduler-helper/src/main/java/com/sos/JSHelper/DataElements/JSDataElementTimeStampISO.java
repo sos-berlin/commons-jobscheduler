@@ -12,18 +12,13 @@ public class JSDataElementTimeStampISO extends JSDataElementDate {
         init();
     }
 
-    private void init() {
-        setParsePattern(JSDateFormat.dfTIMESTAMPS);
-        setFormatPattern(JSDateFormat.dfISO);
-    }
-
     public JSDataElementTimeStampISO(final String pPstrValue) {
         super(pPstrValue);
         init();
     }
 
     public JSDataElementTimeStampISO(final JSDataElementDate pdteDate) {
-        this(pdteDate.Value());
+        this(pdteDate.getValue());
     }
 
     public JSDataElementTimeStampISO(final String pPstrValue, final String pPstrDescription) {
@@ -36,24 +31,29 @@ public class JSDataElementTimeStampISO extends JSDataElementDate {
         super(pPstrValue, pPstrDescription, pPintSize, pPintPos, pPstrFormatString, pPstrColumnHeader, pPstrXMLTagName);
     }
 
+    private void init() {
+        setParsePattern(JSDateFormat.dfTIMESTAMPS);
+        setFormatPattern(JSDateFormat.dfISO);
+    }
+
     @Override
-    public String FormattedValue() {
+    public String getFormattedValue() {
         try {
-            this.Value(ValueISO());
+            this.setValue(getValueISO());
         } catch (final Exception objException) {
             //
         }
-        return this.Value();
+        return this.getValue();
     }
 
-    public String ValueISO() throws Exception {
-        final String methodName = CLASSNAME + "::Value";
+    public String getValueISO() throws Exception {
+        final String conMethodName = CLASSNAME + "::Value";
         setParsePattern(JSDateFormat.dfTIMESTAMPS);
         setFormatPattern(JSDateFormat.dfISO);
         try {
-            getParsePattern().parse(this.Value());
+            getParsePattern().parse(this.getValue());
         } catch (final ParseException e) {
-            throw new FormatPatternException(methodName + ": the value '" + this.Value() + "' does not correspond with the pattern "
+            throw new FormatPatternException(conMethodName + ": the value '" + this.getValue() + "' does not correspond with the pattern "
                     + getParsePattern().toPattern());
         }
         final JSDateFormat df = new JSDateFormat(JSDateFormat.dfISO.toPattern());

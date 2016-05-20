@@ -19,44 +19,42 @@ public class SOSProfileSection {
     }
 
     public SOSProfileEntry addEntry(String pstrEntryName, String pstrEntryValue) {
-
-        SOSProfileEntry objPE = this.Entry(pstrEntryName);
+        SOSProfileEntry objPE = this.getEntry(pstrEntryName);
         if (objPE == null) {
             objPE = new SOSProfileEntry(pstrEntryName, pstrEntryValue);
-            Map m = this.Entries();
+            Map m = this.getEntries();
             m.put(pstrEntryName.toLowerCase(), objPE);
         } else {
-            objPE.Value(pstrEntryValue);
+            objPE.setValue(pstrEntryValue);
         }
         return objPE;
     }
 
     public SOSProfileEntry deleteEntry(String pstrEntryName) {
-
-        SOSProfileEntry objPE = this.Entry(pstrEntryName);
+        SOSProfileEntry objPE = this.getEntry(pstrEntryName);
         if (objPE != null) {
-            Map m = this.Entries();
+            Map m = this.getEntries();
             m.remove(pstrEntryName.toLowerCase());
         }
         return objPE;
     }
 
-    public Map<String, SOSProfileEntry> Entries() {
+    public Map<String, SOSProfileEntry> getEntries() {
         if (mapEntries == null) {
             mapEntries = new HashMap<String, SOSProfileEntry>();
         }
         return mapEntries;
     }
 
-    public SOSProfileEntry Entry(String pstrKey) {
+    public SOSProfileEntry getEntry(String pstrKey) {
         return (SOSProfileEntry) mapEntries.get(pstrKey.toLowerCase());
     }
 
-    public String Name() {
+    public String getName() {
         return strSectionName;
     }
 
-    public void Name(String string) {
+    public void setName(String string) {
         strSectionName = string;
     }
 

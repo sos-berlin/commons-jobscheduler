@@ -49,27 +49,27 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public ISOSConnection Connect() {
-        this.Connect(connection2OptionsAlternate);
+    public ISOSConnection connect() {
+        this.connect(connection2OptionsAlternate);
         return this;
     }
 
     @Override
-    public ISOSConnection Connect(final SOSConnection2OptionsAlternate options) {
+    public ISOSConnection connect(final SOSConnection2OptionsAlternate options) {
         connection2OptionsAlternate = options;
         if (connection2OptionsAlternate == null) {
-            RaiseException(SOSVfs_E_190.params("connection2OptionsAlternate"));
+            raiseException(SOSVfs_E_190.params("connection2OptionsAlternate"));
         }
         int port = connection2OptionsAlternate.port.isDirty() ? connection2OptionsAlternate.port.value() : DEFAULT_PORT;
-        this.connect(connection2OptionsAlternate.host.Value(), port);
+        this.doConnect(connection2OptionsAlternate.host.getValue(), port);
         return this;
     }
 
     @Override
-    public ISOSConnection Authenticate(final ISOSAuthenticationOptions options) {
+    public ISOSConnection authenticate(final ISOSAuthenticationOptions options) {
         authenticationOptions = options;
         try {
-            domain = connection2OptionsAlternate.domain.Value();
+            domain = connection2OptionsAlternate.domain.getValue();
             this.doAuthenticate(authenticationOptions);
         } catch (Exception ex) {
             throw new JobSchedulerException(ex);
@@ -87,9 +87,9 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
             isConnected = true;
             reply = "OK";
             LOGGER.info(SOSVfs_D_133.params(userName));
-            this.LogReply();
+            this.logReply();
         } catch (Exception e) {
-            RaiseException(e, SOSVfs_E_134.params("authentication"));
+            raiseException(e, SOSVfs_E_134.params("authentication"));
         }
     }
 
@@ -110,26 +110,26 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
         try {
             SOSOptionFolderName folderName = new SOSOptionFolderName(path);
             reply = "mkdir OK";
-            LOGGER.debug(HostID(SOSVfs_D_179.params("mkdir", path)));
+            LOGGER.debug(getHostID(SOSVfs_D_179.params("mkdir", path)));
             for (String subFolder : folderName.getSubFolderArray()) {
                 subFolder = this.normalizePath(subFolder);
-                LOGGER.debug(HostID(SOSVfs_D_179.params("mkdir", subFolder)));
+                LOGGER.debug(getHostID(SOSVfs_D_179.params("mkdir", subFolder)));
                 if (!this.fileExists(subFolder)) {
                     SmbFile f = getSmbFile(subFolder);
                     f.mkdir();
-                    LOGGER.debug(HostID(SOSVfs_D_181.params("mkdir", subFolder, getReplyString())));
+                    LOGGER.debug(getHostID(SOSVfs_D_181.params("mkdir", subFolder, getReplyString())));
                 } else {
                     if (!this.isDirectory(subFolder)) {
-                        RaiseException(SOSVfs_E_277.params(subFolder));
+                        raiseException(SOSVfs_E_277.params(subFolder));
                     }
                 }
             }
-            logINFO(HostID(SOSVfs_D_181.params("mkdir", path, getReplyString())));
+            logINFO(getHostID(SOSVfs_D_181.params("mkdir", path, getReplyString())));
         } catch (JobSchedulerException e) {
             throw e;
         } catch (Exception e) {
             reply = e.toString();
-            RaiseException(e, SOSVfs_E_134.params("[mkdir]"));
+            raiseException(e, SOSVfs_E_134.params("[mkdir]"));
         }
     }
 
@@ -150,7 +150,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
             }
             f.delete();
             reply = "rmdir OK";
-            LOGGER.info(HostID(SOSVfs_D_181.params("rmdir", path, getReplyString())));
+            LOGGER.info(getHostID(SOSVfs_D_181.params("rmdir", path, getReplyString())));
         } catch (JobSchedulerException e) {
             reply = e.toString();
             throw e;
@@ -263,10 +263,10 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
             }
             remoteFileSize = transferFile.length();
             reply = "get OK";
-            logINFO(HostID(SOSVfs_I_182.params("getFile", this.normalizePath(remoteFile), localFile, getReplyString())));
+            logINFO(getHostID(SOSVfs_I_182.params("getFile", this.normalizePath(remoteFile), localFile, getReplyString())));
         } catch (Exception ex) {
             reply = ex.toString();
-            RaiseException(ex, SOSVfs_E_184.params("getFile", this.normalizePath(remoteFile), localFile));
+            raiseException(ex, SOSVfs_E_184.params("getFile", this.normalizePath(remoteFile), localFile));
         } finally {
             if (in != null) {
                 try {
@@ -304,11 +304,11 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
                 tot += n;
             }
             reply = "put OK";
-            logINFO(HostID(SOSVfs_I_183.params("putFile", localFilePath, remoteFile.getPath(), getReplyString())));
+            logINFO(getHostID(SOSVfs_I_183.params("putFile", localFilePath, remoteFile.getPath(), getReplyString())));
             size = this.size(this.normalizePath(remoteFilePath));
         } catch (Exception e) {
             reply = e.toString();
-            RaiseException(e, SOSVfs_E_185.params("putFile()", localFilePath, remoteFilePath));
+            raiseException(e, SOSVfs_E_185.params("putFile()", localFilePath, remoteFilePath));
         } finally {
             if (in != null) {
                 try {
@@ -338,10 +338,10 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
             f.delete();
         } catch (Exception ex) {
             reply = ex.toString();
-            RaiseException(ex, SOSVfs_E_187.params("delete", path));
+            raiseException(ex, SOSVfs_E_187.params("delete", path));
         }
         reply = "rm OK";
-        logINFO(HostID(SOSVfs_D_181.params("delete", path, getReplyString())));
+        logINFO(getHostID(SOSVfs_D_181.params("delete", path, getReplyString())));
     }
 
     @Override
@@ -357,11 +357,11 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
             throw new JobSchedulerException(SOSVfs_E_188.params("rename", from, to), e);
         }
         reply = "mv OK";
-        LOGGER.info(HostID(SOSVfs_I_189.params(from, to, getReplyString())));
+        LOGGER.info(getHostID(SOSVfs_I_189.params(from, to, getReplyString())));
     }
 
     @Override
-    public void ExecuteCommand(final String cmd) {
+    public void executeCommand(final String cmd) {
         LOGGER.debug("not implemented yet");
     }
 
@@ -372,7 +372,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
             f = getSmbFile(this.normalizePath(path));
             return new SmbFileInputStream(f);
         } catch (Exception ex) {
-            RaiseException(ex, SOSVfs_E_193.params("getInputStream()", path));
+            raiseException(ex, SOSVfs_E_193.params("getInputStream()", path));
             return null;
         }
     }
@@ -384,7 +384,7 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
             f = getSmbFile(this.normalizePath(path));
             return new SmbFileOutputStream(f);
         } catch (Exception ex) {
-            RaiseException(ex, SOSVfs_E_193.params("getOutputStream()", path));
+            raiseException(ex, SOSVfs_E_193.params("getOutputStream()", path));
             return null;
         }
     }
@@ -472,8 +472,8 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     }
 
     private void setConfigFromFiles() {
-        if (!SOSString.isEmpty(connection2OptionsAlternate.configuration_files.Value())) {
-            String[] arr = connection2OptionsAlternate.configuration_files.Value().split(";");
+        if (!SOSString.isEmpty(connection2OptionsAlternate.configuration_files.getValue())) {
+            String[] arr = connection2OptionsAlternate.configuration_files.getValue().split(";");
             for (int i = 0; i < arr.length; i++) {
                 String file = arr[i].trim();
                 LOGGER.info(String.format("use configuration file: %s", file));
@@ -513,8 +513,8 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
     private ISOSConnection doAuthenticate(final ISOSAuthenticationOptions options) throws Exception {
         authenticationOptions = options;
         isConnected = false;
-        userName = authenticationOptions.getUser().Value();
-        String password = authenticationOptions.getPassword().Value();
+        userName = authenticationOptions.getUser().getValue();
+        String password = authenticationOptions.getPassword().getValue();
         LOGGER.debug(SOSVfs_D_132.params(userName));
         try {
             smbLogin(domain, host, port, userName, password);
@@ -524,16 +524,16 @@ public class SOSVfsJCIFS extends SOSVfsTransferBaseClass {
         }
         reply = "OK";
         LOGGER.info(SOSVfs_D_133.params(userName));
-        this.LogReply();
+        this.logReply();
         return this;
     }
 
-    private void connect(final String phost, final int pport) {
+    private void doConnect(final String phost, final int pport) {
         host = phost;
         port = pport;
         LOGGER.info(SOSVfs_D_0101.params(host, port));
         if (!this.isConnected()) {
-            this.LogReply();
+            this.logReply();
         } else {
             logWARN(SOSVfs_D_0103.params(host, port));
         }

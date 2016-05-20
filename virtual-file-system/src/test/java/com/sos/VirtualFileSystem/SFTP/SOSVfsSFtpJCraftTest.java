@@ -60,7 +60,7 @@ public class SOSVfsSFtpJCraftTest extends SOSVfsSFtpTest {
 
     @Test
     public void testAuthenticateWithZlib() throws Exception {
-        SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().Source();
+        SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().getSource();
         objSource.useZlibCompression.value(true);
         objSource.zlibCompressionLevel.value(2);
         super.testAuthenticate();

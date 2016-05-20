@@ -7,37 +7,38 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 /** @author KB */
 public class SOSOptionIntegerArray extends SOSOptionElement {
 
+    private static final long serialVersionUID = -7864986512950989666L;
     private Vector<Integer> result = new Vector<Integer>();
 
     public SOSOptionIntegerArray(JSOptionsClass pobjParent, String pstrKey, String pstrDescription, String pstrValue, String pstrDefaultValue,
             boolean pflgIsMandatory) {
         super(pobjParent, pstrKey, pstrDescription, pstrValue, pstrDefaultValue, pflgIsMandatory);
-        this.Value(pstrValue);
-        this.Description(pstrDescription);
+        this.setValue(pstrValue);
+        this.description(pstrDescription);
     }
 
-    public void Value(final String pstrValue) {
+    public void setValue(final String pstrValue) {
         try {
-            super.Value(pstrValue);
+            super.setValue(pstrValue);
             parseValue2Vector();
         } catch (Exception e) {
-            throw new JobSchedulerException("Illegal/Invalid value '" + pstrValue + "' for Option " + this.Description() + ", " + this.strKey, e);
+            throw new JobSchedulerException("Illegal/Invalid value '" + pstrValue + "' for Option " + this.getDescription() + ", " + this.strKey, e);
         }
     }
 
     public boolean contains(final int pintValue) {
         boolean flgContains = false;
-        flgContains = this.Values().contains(new Integer(pintValue));
+        flgContains = this.getValues().contains(new Integer(pintValue));
         return flgContains;
     }
 
-    public Vector<Integer> Values() {
+    public Vector<Integer> getValues() {
         return result;
     }
 
     private void parseValue2Vector() throws Exception {
-        if (this.Value() != null) {
-            String[] elements = this.Value().split("[,| |;]");
+        if (this.getValue() != null) {
+            String[] elements = this.getValue().split("[,| |;]");
             result = new Vector<Integer>();
             for (String element : elements) {
                 element = element.trim();

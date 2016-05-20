@@ -22,7 +22,7 @@ public class LiveConnector {
     private String workingDirectory;
 
     public LiveConnector(SOSOptionFolderName folderName) throws MalformedURLException {
-        this(LiveConnector.getUrl(folderName.Value()));
+        this(LiveConnector.getUrl(folderName.getValue()));
     }
 
     public LiveConnector(File folderName) throws MalformedURLException {

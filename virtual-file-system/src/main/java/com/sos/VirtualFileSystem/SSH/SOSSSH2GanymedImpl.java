@@ -85,7 +85,7 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
     }
 
     @Override
-    public ISOSConnection Connect(final String pstrHostName, final int pintPortNumber) throws Exception {
+    public ISOSConnection connect(final String pstrHostName, final int pintPortNumber) throws Exception {
         try {
             isConnected = false;
             this.setSshConnection(new Connection(pstrHostName, pintPortNumber));
@@ -104,23 +104,23 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
     }
 
     @Override
-    public ISOSConnection Connect() throws Exception {
+    public ISOSConnection connect() throws Exception {
         try {
             isConnected = false;
-            this.setSshConnection(new Connection(objCO.getHost().Value(), objCO.getPort().value()));
-            if (objCO.getProxyHost().IsNotEmpty()) {
+            this.setSshConnection(new Connection(objCO.getHost().getValue(), objCO.getPort().value()));
+            if (objCO.getProxyHost().isNotEmpty()) {
                 HTTPProxyData objProxy = null;
                 if (objCO.getProxyUser().IsEmpty()) {
-                    objProxy = new HTTPProxyData(objCO.getProxyHost().Value(), objCO.getProxyPort().value());
+                    objProxy = new HTTPProxyData(objCO.getProxyHost().getValue(), objCO.getProxyPort().value());
                 } else {
-                    objProxy = new HTTPProxyData(objCO.getProxyHost().Value(), objCO.getProxyPort().value(), objCO.getProxyUser().Value(), objCO
-                            .getProxyPassword().Value());
+                    objProxy = new HTTPProxyData(objCO.getProxyHost().getValue(), objCO.getProxyPort().value(), objCO.getProxyUser().getValue(),
+                            objCO.getProxyPassword().getValue());
                 }
                 this.getSshConnection().setProxyData(objProxy);
             }
             this.getSshConnection().connect();
             isConnected = true;
-            LOGGER.debug(SOSVfs_D_0102.params(objCO.getHost().Value(), objCO.getPort().value()));
+            LOGGER.debug(SOSVfs_D_0102.params(objCO.getHost().getValue(), objCO.getPort().value()));
         } catch (Exception e) {
             try {
                 this.setSshConnection(null);
@@ -263,31 +263,31 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
     }
 
     @Override
-    public ISOSConnection Connect(final ISOSConnectionOptions pobjConnectionOptions) throws Exception {
+    public ISOSConnection connect(final ISOSConnectionOptions pobjConnectionOptions) throws Exception {
         objCO = pobjConnectionOptions;
         if (objCO != null) {
-            this.Connect();
+            this.connect();
         }
         return this;
     }
 
     @Override
-    public void CloseConnection() throws Exception {
+    public void closeConnection() throws Exception {
         this.setSshConnection(null);
     }
 
     @Override
-    public ISOSConnection Authenticate(final ISOSAuthenticationOptions pobjAO) throws Exception {
+    public ISOSConnection authenticate(final ISOSAuthenticationOptions pobjAO) throws Exception {
         final String conMethodName = "SOSSSH2GanymedImpl::Authenticate";
         if (pobjAO == null) {
             throw new Exception(SOSVfs_E_234.params("SOSSSH2GanymedImpl"));
         }
         objAO = pobjAO;
-        String strUserID = objAO.getUser().Value();
-        String strPW = objAO.getPassword().Value();
+        String strUserID = objAO.getUser().getValue();
+        String strPW = objAO.getPassword().getValue();
         if (objAO.getAuthMethod().isPublicKey()) {
-            objAO.getAuthFile().CheckMandatory(true);
-            File authenticationFile = objAO.getAuthFile().JSFile();
+            objAO.getAuthFile().checkMandatory(true);
+            File authenticationFile = objAO.getAuthFile().getJSFile();
             isAuthenticated = getSshConnection().authenticateWithPublicKey(strUserID, authenticationFile, strPW);
         } else if (objAO.getAuthMethod().isPassword()) {
             isAuthenticated = getSshConnection().authenticateWithPassword(strUserID, strPW);
@@ -446,12 +446,12 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
     }
 
     @Override
-    public void CloseSession() throws Exception {
+    public void closeSession() throws Exception {
         //
     }
 
     @Override
-    public ISOSSession OpenSession(final ISOSShellOptions pobjShellOptions) {
+    public ISOSSession openSession(final ISOSShellOptions pobjShellOptions) {
         objSO = pobjShellOptions;
         if (objSO == null) {
             throw new RuntimeException(SOSVfs_E_245.get());
@@ -460,7 +460,7 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
             this.setSshSession(this.getSshConnection().openSession());
             if (objSO.getSimulateShell().value()) {
                 long loginTimeout = objSO.getSimulateShellLoginTimeout().value();
-                String strPromptTrigger = objSO.getSimulateShellPromptTrigger().Value();
+                String strPromptTrigger = objSO.getSimulateShellPromptTrigger().getValue();
                 LOGGER.debug(SOSVfs_D_246.params("PTY"));
                 this.getSshSession().requestDumbPTY();
                 LOGGER.debug(SOSVfs_D_247.params("shell"));
@@ -477,7 +477,7 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
                 boolean loggedIn = false;
                 while (!loggedIn) {
                     if (lngLastTime > 0) {
-                        loggedIn = Check4TimeOutOrPrompt(loginTimeout, strPromptTrigger);
+                        loggedIn = check4TimeOutOrPrompt(loginTimeout, strPromptTrigger);
                     }
                 }
             } else {
@@ -491,7 +491,7 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
         return this;
     }
 
-    private boolean Check4TimeOutOrPrompt(final long plngTimeOut, final String pstrPromptTrigger) {
+    private boolean check4TimeOutOrPrompt(final long plngTimeOut, final String pstrPromptTrigger) {
         long currentTimeMillis = System.currentTimeMillis();
         if (plngTimeOut > 0 && lngLastTime + plngTimeOut < currentTimeMillis) {
             return true;
@@ -505,18 +505,18 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
     }
 
     @Override
-    public void ExecuteCommand(final String pstrCmd) throws Exception {
+    public void executeCommand(final String pstrCmd) throws Exception {
         intExitStatus = null;
         strExitSignal = null;
         String strCmd = pstrCmd;
         if (!objSO.getSimulateShell().value()) {
             long lngInactivityTimeout = objSO.getSimulateShellInactivityTimeout().value();
-            String strPromptTrigger = objSO.getSimulateShellPromptTrigger().Value();
+            String strPromptTrigger = objSO.getSimulateShellPromptTrigger().getValue();
             stdinWriter.write(strCmd + "\n");
             stdinWriter.flush();
             boolean prompt = false;
             while (!prompt) {
-                prompt = Check4TimeOutOrPrompt(lngInactivityTimeout, strPromptTrigger);
+                prompt = check4TimeOutOrPrompt(lngInactivityTimeout, strPromptTrigger);
             }
             strCurrentLine = "";
             LOGGER.debug(SOSVfs_D_163.params("stdout", strCmd));
@@ -698,7 +698,7 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
     }
 
     @Override
-    public ISOSConnection Connect(final SOSConnection2OptionsAlternate pobjConnectionOptions) throws Exception {
+    public ISOSConnection connect(final SOSConnection2OptionsAlternate pobjConnectionOptions) throws Exception {
         return null;
     }
 
@@ -723,7 +723,8 @@ public class SOSSSH2GanymedImpl extends SOSVfsBaseClass implements JSJobUtilitie
     }
 
     @Override
-    public ISOSConnection Connect(final ISOSDataProviderOptions pobjConnectionOptions) throws Exception {
+    public ISOSConnection connect(final ISOSDataProviderOptions pobjConnectionOptions) throws Exception {
+        //
         return null;
     }
 

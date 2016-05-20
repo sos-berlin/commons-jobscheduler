@@ -16,12 +16,8 @@ public class SOSOptionRegExpTest {
     private static final Logger LOGGER = Logger.getLogger(SOSOptionRegExpTest.class);
     private SOSOptionRegExp objRE = null;
 
-    public SOSOptionRegExpTest() {
-        //
-    }
-
     @Test
-    public void WrongRegExp() {
+    public void wrongRegExp() {
         objRE = new SOSOptionRegExp(null, "test", "TestOption", "^test_dh000000.err", "", false);
         Pattern p = objRE.getPattern();
         p = objRE.getPattern("/\\.swf(\\?\\.*)?$/i");
@@ -50,7 +46,7 @@ public class SOSOptionRegExpTest {
         String strDate = JSDataElementDate.getCurrentTimeAsString(strDateformat);
         LOGGER.info(strDate);
         objRE = new SOSOptionRegExp(new JSOptionsClass(), "test", "TestOption", String.format("^.*_[date:%1$s]_\\.txt$", strDateformat), "", false);
-        String strV = objRE.Value();
+        String strV = objRE.getValue();
         LOGGER.info("value after replace is: " + strV);
         assertEquals("place holders 1", String.format("^.*_%1$s_\\.txt$", strDate), strV);
     }
@@ -64,32 +60,32 @@ public class SOSOptionRegExpTest {
         strReplaceWhat = "Hello";
         strReplaceWith = "World";
         strStringToWorkOn = "Hello";
-        objRE.Value(strReplaceWhat);
-        assertEquals("RegExp Value failed", strReplaceWhat, objRE.Value());
+        objRE.setValue(strReplaceWhat);
+        assertEquals("RegExp Value failed", strReplaceWhat, objRE.getValue());
         assertEquals("replace failed", strReplaceWith, objRE.doReplace(strStringToWorkOn, strReplaceWith));
         strReplaceWhat = "Hello";
         strReplaceWith = "";
         strStringToWorkOn = "Hello  World";
-        objRE.Value(strReplaceWhat);
-        assertEquals("RegExp Value failed", strReplaceWhat, objRE.Value());
+        objRE.setValue(strReplaceWhat);
+        assertEquals("RegExp Value failed", strReplaceWhat, objRE.getValue());
         assertEquals("replace failed", "  World", objRE.doReplace(strStringToWorkOn, strReplaceWith));
         strReplaceWhat = "(1)abc(12)def(.*)";
         strReplaceWith = "A;BB;CCC";
         strStringToWorkOn = "1abc12def123.txt";
-        objRE.Value(strReplaceWhat);
-        assertEquals("RegExp Value failed", strReplaceWhat, objRE.Value());
+        objRE.setValue(strReplaceWhat);
+        assertEquals("RegExp Value failed", strReplaceWhat, objRE.getValue());
         assertEquals("replace failed", "AabcBBdefCCC", objRE.doReplace(strStringToWorkOn, strReplaceWith));
         strReplaceWhat = "(INT_)(.*)";
         strReplaceWith = "\\-;\\2";
         strStringToWorkOn = "INT_4711-0815.txt";
-        objRE.Value(strReplaceWhat);
-        assertEquals("RegExp Value failed", strReplaceWhat, objRE.Value());
+        objRE.setValue(strReplaceWhat);
+        assertEquals("RegExp Value failed", strReplaceWhat, objRE.getValue());
         assertEquals("replace failed", "4711-0815.txt", objRE.doReplace(strStringToWorkOn, strReplaceWith));
         strReplaceWhat = "(.{5})(.{6})(.*)";
         strReplaceWith = "\\1;;\\3;";
         strStringToWorkOn = "abcba123456hallo.txt";
-        objRE.Value(strReplaceWhat);
-        assertEquals("RegExp Value failed", strReplaceWhat, objRE.Value());
+        objRE.setValue(strReplaceWhat);
+        assertEquals("RegExp Value failed", strReplaceWhat, objRE.getValue());
         assertEquals("replace failed", "abcbahallo.txt", objRE.doReplace(strStringToWorkOn, strReplaceWith));
         doTestReplace("Swapping", "(1)abc(12)def(.*)", "\\2;\\1;CCC", "1abc12def123.txt", "12abc1defCCC");
         doTestReplace("Swapping", "(1)abc(12)def(.*)", "\\2;\\1;\\-", "1abc12def123.txt", "12abc1def");
@@ -156,8 +152,8 @@ public class SOSOptionRegExpTest {
 
     private void doTestReplace(final String strText, final String strReplaceWhat, final String strReplaceWith, final String strWork,
             final String strExpectedResult) throws Exception {
-        objRE.Value(strReplaceWhat);
-        assertEquals(strText, strReplaceWhat, objRE.Value());
+        objRE.setValue(strReplaceWhat);
+        assertEquals(strText, strReplaceWhat, objRE.getValue());
         String strResult = objRE.doReplace(strWork, strReplaceWith);
         if (strExpectedResult != null) {
             assertEquals(strText, strExpectedResult, strResult);
@@ -167,8 +163,8 @@ public class SOSOptionRegExpTest {
 
     private void doRegExTest(final String strText, final String strReplaceWhat, final String strReplaceWith, final String strWork,
             final String strExpectedResult) throws Exception {
-        objRE.Value(strReplaceWhat);
-        assertEquals(strText, strReplaceWhat, objRE.Value());
+        objRE.setValue(strReplaceWhat);
+        assertEquals(strText, strReplaceWhat, objRE.getValue());
         String strResult = objRE.doRegExpReplace(strWork, strReplaceWith);
         if (strExpectedResult != null) {
             assertEquals(strText, strExpectedResult, strResult);

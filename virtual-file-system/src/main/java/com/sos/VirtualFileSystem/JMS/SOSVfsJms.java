@@ -31,33 +31,33 @@ public class SOSVfsJms extends SOSVfsTransferBaseClass {
     private Session session = null;
 
     @Override
-    public ISOSConnection Connect() {
-        this.Connect(connection2OptionsAlternate);
+    public ISOSConnection connect() {
+        this.connect(connection2OptionsAlternate);
         return this;
     }
 
     @Override
-    public ISOSConnection Connect(final SOSConnection2OptionsAlternate pConnection2OptionsAlternate) {
+    public ISOSConnection connect(final SOSConnection2OptionsAlternate pConnection2OptionsAlternate) {
         connection2OptionsAlternate = pConnection2OptionsAlternate;
         if (connection2OptionsAlternate == null) {
-            RaiseException(SOSVfs_E_190.params("connection2OptionsAlternate"));
+            raiseException(SOSVfs_E_190.params("connection2OptionsAlternate"));
         }
-        this.connect(connection2OptionsAlternate.host.Value(), connection2OptionsAlternate.port.value());
+        this.doConnect(connection2OptionsAlternate.host.getValue(), connection2OptionsAlternate.port.value());
         return this;
     }
 
-    private void connect(final String host, final int port) {
+    private void doConnect(final String host, final int port) {
         if (!this.isConnected()) {
             try {
                 this.port = port;
                 this.host = host;
                 if (host.toLowerCase().startsWith("tcp://")) {
                     URL url = new URL(host);
-                    this.port = (url.getPort() == -1) ? url.getDefaultPort() : url.getPort();
+                    this.port = url.getPort() == -1 ? url.getDefaultPort() : url.getPort();
                     this.host = url.getHost();
                 }
                 LOGGER.info(SOSVfs_D_0101.params(host, port));
-                this.LogReply();
+                this.logReply();
             } catch (Exception ex) {
                 throw new JobSchedulerException(ex);
             }

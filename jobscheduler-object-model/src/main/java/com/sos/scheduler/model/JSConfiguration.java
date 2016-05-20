@@ -60,7 +60,7 @@ public class JSConfiguration extends JSObjBase {
     }
 
     public SOSOptionPortNumber getPort() {
-        Port.Value(objConfig.getPort().toString());
+        Port.setValue(objConfig.getPort().toString());
         return Port;
     }
 
@@ -73,7 +73,7 @@ public class JSConfiguration extends JSObjBase {
     }
 
     public void setPort(SOSOptionPortNumber pobjPortNumber) {
-        String value = pobjPortNumber.Value();
+        String value = pobjPortNumber.getValue();
         if (value == null) {
             objConfig.setPort(BigInteger.valueOf(0));
         } else {

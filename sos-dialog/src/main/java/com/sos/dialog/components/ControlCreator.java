@@ -32,7 +32,7 @@ public class ControlCreator {
         SOSGroup group_source = new SOSGroup(objParentComposite, SWT.NONE);
         Gridlayout.set4ColumnGroupLayout(group_source);
         group_source.setLayout(Gridlayout.get4ColumnLayout());
-        MsgHandler.newMsg(pstrText).Control(group_source);
+        MsgHandler.newMsg(pstrText).control(group_source);
         group_source.setBackground(Globals.getCompositeBackground());
         return group_source;
     }
@@ -92,7 +92,7 @@ public class ControlCreator {
         Label lblNewLabel = new Label(objParentComposite, SWT.NONE);
         GridData lblGridData = new GridData(SWT.LEFT, SWT.CENTER, false, false);
         lblNewLabel.setLayoutData(lblGridData);
-        MsgHandler.newMsg(pobjOption.getShortKey()).Control(lblNewLabel);
+        MsgHandler.newMsg(pobjOption.getShortKey()).control(lblNewLabel);
         String strControlType = pobjOption.getControlType();
         if ("text".equalsIgnoreCase(strControlType)) {
             SOSTextBox tbxText = new SOSTextBox(objParentComposite, Globals.gTextBoxStyle);

@@ -28,7 +28,7 @@ public class ErrorLog {
         super();
         try {
             JobSchedulerException objJSE = new JobSchedulerException(msg, e);
-            String strMsg = msg + "\n" + objJSE.ExceptionText();
+            String strMsg = msg + "\n" + objJSE.getExceptionText();
             message(strMsg, SWT.ERROR);
             LOGGER.error(strMsg);
         } catch (Exception ex) {

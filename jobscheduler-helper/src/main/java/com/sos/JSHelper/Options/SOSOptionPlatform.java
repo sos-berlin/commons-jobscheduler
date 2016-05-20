@@ -48,8 +48,8 @@ public class SOSOptionPlatform extends SOSOptionStringValueList {
     }
 
     @Override
-    public void Value(final String pstrValue) {
-        super.Value(pstrValue);
+    public void setValue(final String pstrValue) {
+        super.setValue(pstrValue);
     }
 
     @Override

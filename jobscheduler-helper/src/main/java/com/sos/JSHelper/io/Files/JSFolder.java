@@ -23,6 +23,11 @@ public class JSFolder extends File {
     public long IncludeNewerThan = UNDEFINED;
     public int intNoOfObjectsDeleted = 0;
 
+    public JSFolder(String pathname) {
+        super(pathname);
+        init();
+    }
+
     public class SOSFilelistFilter implements FilenameFilter {
 
         Pattern pattern = null;
@@ -59,11 +64,6 @@ public class JSFolder extends File {
             }
         }
         return flgR;
-    }
-
-    public JSFolder(String pathname) {
-        super(pathname);
-        init();
     }
 
     public String getFolderName() {
@@ -128,7 +128,7 @@ public class JSFolder extends File {
         return objFolderList;
     }
 
-    public JSFile newFile(final String pstrFileName) {
+    public JSFile getNewFile(final String pstrFileName) {
         return new JSFile(strFolderName + pstrFileName);
     }
 
@@ -156,7 +156,7 @@ public class JSFolder extends File {
         return intNoOfObjectsDeleted;
     }
 
-    public String CheckFolder(final Boolean flgCreateIfNotExist) {
+    public String checkFolder(final Boolean flgCreateIfNotExist) {
         if (!this.exists()) {
             if (!flgCreateIfNotExist) {
                 LOGGER.error(String.format("Folder '%1$s' does not exist.", strFolderName));
@@ -172,7 +172,7 @@ public class JSFolder extends File {
     }
 
     public Vector<String> deleteFileList(final SOSOptionRegExp objRegExpr4Files2Delete) {
-        return deleteFileList(objRegExpr4Files2Delete.Value());
+        return deleteFileList(objRegExpr4Files2Delete.getValue());
     }
 
     public int deleteFiles(final String strRegExpr4Files2Delete) {
@@ -198,7 +198,7 @@ public class JSFolder extends File {
     }
 
     public Vector<String> compressFileList(final SOSOptionRegExp objRegExpr4Files2Compress) {
-        return compressFileList(objRegExpr4Files2Compress.Value());
+        return compressFileList(objRegExpr4Files2Compress.getValue());
     }
 
     public Vector<String> compressFileList(final String strRegExpr4Files2Compress) {

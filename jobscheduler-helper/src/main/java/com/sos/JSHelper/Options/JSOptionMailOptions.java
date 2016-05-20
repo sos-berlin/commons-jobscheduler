@@ -3,7 +3,6 @@ package com.sos.JSHelper.Options;
 public class JSOptionMailOptions extends SOSOptionElement {
 
     private static final long serialVersionUID = 6484264503878247054L;
-    private static final String CLASSNAME = "JSOptionMailOptions";
     private JSMailOptions objMailOptions = null;
 
     public JSOptionMailOptions(JSOptionsClass pPobjParent, String pPstrKey, String pPstrDescription, String pPstrValue, String pPstrDefaultValue,
@@ -13,7 +12,7 @@ public class JSOptionMailOptions extends SOSOptionElement {
         objMailOptions = new JSMailOptions();
     }
 
-    public void Value(JSMailOptions pobjOptionsClass) {
+    public void setValue(JSMailOptions pobjOptionsClass) {
         objMailOptions = pobjOptionsClass;
     }
 

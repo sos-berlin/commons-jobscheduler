@@ -16,7 +16,7 @@ public class SchedulerObjectFactoryOptions extends JSOptionsClass implements ISO
     @JSOptionDefinition(name = "tcp_time_out", description = "The time out in seconds for a tcp connection", key = "tcp_time_out", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionInteger TCPTimeoutValue = new SOSOptionInteger(this, CLASSNAME + ".tcp_time_out", "The time out in seconds for a tcp connection",
             "60", "60", false);
-    public SOSOptionInteger TimeOut = (SOSOptionInteger) TCPTimeoutValue.SetAlias("time_out");
+    public SOSOptionInteger TimeOut = (SOSOptionInteger) TCPTimeoutValue.setAlias("time_out");
 
     @Override
     public int getTCPTimeoutValue() {
@@ -25,7 +25,7 @@ public class SchedulerObjectFactoryOptions extends JSOptionsClass implements ISO
 
     @Override
     public ISOSSchedulerSocket setTCPTimeoutValue(final String pstrValue) {
-        TCPTimeoutValue.Value(pstrValue);
+        TCPTimeoutValue.setValue(pstrValue);
         return this;
     }
 
@@ -40,14 +40,14 @@ public class SchedulerObjectFactoryOptions extends JSOptionsClass implements ISO
 
     @Override
     public ISOSSchedulerSocket setUDPPortNumber(final String pstrValue) {
-        UDPPortNumber.Value(pstrValue);
+        UDPPortNumber.setValue(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "PortNumber", description = "The scheduler communication port", key = "PortNumber", type = "SOSOptionPortNumber", mandatory = true)
     public SOSOptionPortNumber PortNumber = new SOSOptionPortNumber(this, CLASSNAME + ".PortNumber", "The scheduler communication port", "0", "4444",
             true);
-    public SOSOptionPortNumber TCPPortNumber = (SOSOptionPortNumber) PortNumber.SetAlias("tcp_port_number");
+    public SOSOptionPortNumber TCPPortNumber = (SOSOptionPortNumber) PortNumber.setAlias("tcp_port_number");
 
     @Override
     public int getPortNumber() {
@@ -56,38 +56,38 @@ public class SchedulerObjectFactoryOptions extends JSOptionsClass implements ISO
 
     @Override
     public ISOSSchedulerSocket setPortNumber(final String pstrValue) {
-        PortNumber.Value(pstrValue);
+        PortNumber.setValue(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "ServerName", description = "The Name of the Server", key = "ServerName", type = "SOSOptionString", mandatory = true)
-    public SOSOptionHostName ServerName = new SOSOptionHostName(this, CLASSNAME + ".ServerName", "The Name of the Server", "0.0.0.0", "localhost",
-            true);
-    public SOSOptionHostName ServerIPv4 = (SOSOptionHostName) ServerName.SetAlias("Server_IPv4_Name");
+    public SOSOptionHostName ServerName = new SOSOptionHostName(this, CLASSNAME + ".ServerName", "The Name of the Server", "0.0.0.0", "localhost", true);
+    public SOSOptionHostName ServerIPv4 = (SOSOptionHostName) ServerName.setAlias("Server_IPv4_Name");
 
-    @JSOptionDefinition(name = "TransferMethod", description = "The technical method of how to communicate with the JobScheduler", key = "TransferMethod", type = "SOSOptionJSTransferMethod", mandatory = true)
-    public SOSOptionJSTransferMethod TransferMethod = new SOSOptionJSTransferMethod(this, CLASSNAME + ".TransferMethod",
+    @JSOptionDefinition(name = "TransferMethod", description = "The technical method of how to communicate with the JobScheduler", key = "TransferMethod",
+            type = "SOSOptionJSTransferMethod", mandatory = true)
+    public SOSOptionJSTransferMethod TransferMethod = new SOSOptionJSTransferMethod(this, CLASSNAME + ".TransferMethod", 
             "The technical method of how to communicate with the JobScheduler", "tcp", "tcp", true);
 
     @Override
     public String getTransferMethod() {
-        return TransferMethod.Value();
+        return TransferMethod.getValue();
     }
 
     @Override
     public ISOSSchedulerSocket setTransferMethod(final String pstrValue) {
-        TransferMethod.Value(pstrValue);
+        TransferMethod.setValue(pstrValue);
         return this;
     }
 
     @Override
     public String getServerName() {
-        return ServerName.Value();
+        return ServerName.getValue();
     }
 
     @Override
     public ISOSSchedulerSocket setServerName(final String pstrValue) {
-        ServerName.Value(pstrValue);
+        ServerName.setValue(pstrValue);
         return this;
     }
 

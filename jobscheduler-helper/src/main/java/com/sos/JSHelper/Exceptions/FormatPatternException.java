@@ -6,8 +6,8 @@ public class FormatPatternException extends JobSchedulerException {
 
     public FormatPatternException(String pstrMessage) {
         super(pstrMessage);
-        this.Message(pstrMessage);
-        this.Status(JobSchedulerException.PENDING);
+        this.message(pstrMessage);
+        this.setStatus(JobSchedulerException.PENDING);
     }
 
     public FormatPatternException() {
@@ -15,8 +15,8 @@ public class FormatPatternException extends JobSchedulerException {
     }
 
     @Override
-    public String ExceptionText() {
-        return super.ExceptionText();
+    public String getExceptionText() {
+        return super.getExceptionText();
     }
 
 }

@@ -55,7 +55,7 @@ public class SOSFileSystemOperationsTest {
     }
 
     @Test
-    public void VariableFileNameTest() throws Exception {
+    public void variableFileNameTest() throws Exception {
         doTest("FileName uppercase", ".*", "[filename:uppercase]", "1.txt", "1.TXT");
         doTest("FileName lowercase", ".*", "[filename:lowercase]", "1.txt", "1.txt");
     }
@@ -68,12 +68,12 @@ public class SOSFileSystemOperationsTest {
     }
 
     @Test
-    public void ResultListTest() throws Exception {
+    public void resultListTest() throws Exception {
         String file = "c:/temp";
         String fileSpec = "^.*\\.kb$";
         for (int j = 0; j < 10; j++) {
             JSFile objTestFile = new JSFile(file + "/test" + j + ".kb");
-            objTestFile.WriteLine("This is a line for testing");
+            objTestFile.writeLine("This is a line for testing");
             objTestFile.deleteOnExit();
             objTestFile.close();
             LOGGER.info("File created: " + objTestFile.getAbsolutePath());

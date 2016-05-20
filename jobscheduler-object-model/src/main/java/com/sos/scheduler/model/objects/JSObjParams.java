@@ -13,7 +13,7 @@ import com.sos.scheduler.model.SchedulerObjectFactory;
 public class JSObjParams extends Params {
 
     private static final Logger LOGGER = Logger.getLogger(JSObjParams.class);
-    public final static String fileNameExtension = ".params.xml";
+    public static final String fileNameExtension = ".params.xml";
 
     public JSObjParams(final SchedulerObjectFactory schedulerObjectFactory) {
         objFactory = schedulerObjectFactory;
@@ -31,7 +31,7 @@ public class JSObjParams extends Params {
         setHotFolderSrc(pobjVirtualFile);
     }
 
-    public HashMap<String, String> ParamList() {
+    public HashMap<String, String> getParamList() {
         return values();
     }
 
@@ -105,8 +105,7 @@ public class JSObjParams extends Params {
     }
 
     public int size() {
-        int intSize = ParamList().size();
-        return intSize;
+        return getParamList().size();
     }
 
 }

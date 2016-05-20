@@ -53,53 +53,53 @@ public class SOSOptionElementTest {
     public void testSOSOptionElement() {
         SOSOptionElement objOpt = new SOSOptionElement(null, "key", "Description", "value", "DefaultValue", true);
         assertEquals("Key failed", "key", objOpt.getKey());
-        assertEquals("Description failed", "Description", objOpt.Description());
-        assertEquals("Value failed", "value", objOpt.Value());
-        assertEquals("DefaultValue failed", "DefaultValue", objOpt.DefaultValue());
+        assertEquals("Description failed", "Description", objOpt.getDescription());
+        assertEquals("Value failed", "value", objOpt.getValue());
+        assertEquals("DefaultValue failed", "DefaultValue", objOpt.getDefaultValue());
         assertTrue("Is Mandatory failed", objOpt.isMandatory());
     }
 
     @Test
     public void testColumnHeaderString() {
-        assertEquals("ColumnHeader failed", "key", objOption.ColumnHeader());
-        objOption.ColumnHeader("Column");
-        assertEquals("ColumnHeader failed", "Column", objOption.ColumnHeader());
+        assertEquals("ColumnHeader failed", "key", objOption.getColumnHeader());
+        objOption.columnHeader("Column");
+        assertEquals("ColumnHeader failed", "Column", objOption.getColumnHeader());
     }
 
     @Test
     public void testSetAlias() {
-        objOption.SetAlias("newKey");
-        objOption.SetAlias("AliasKey");
+        objOption.setAlias("newKey");
+        objOption.setAlias("AliasKey");
     }
 
     @Test
     public void testSetDirty() {
         assertFalse("Must be not Dirty", objOption.isDirty());
-        objOption.Value("Dirty");
+        objOption.setValue("Dirty");
         assertTrue("Must be Dirty", objOption.isDirty());
     }
 
     @Test
     public void testEnvVarAsValue() {
         SOSOptionElement objOpt = new SOSOptionElement(null, "key", "Description", "env:APPDATA", "env:LOCALAPPDATA", true);
-        LOGGER.info("value = " + objOpt.Value());
-        LOGGER.info("default value = " + objOpt.DefaultValue());
+        LOGGER.info("value = " + objOpt.getValue());
+        LOGGER.info("default value = " + objOpt.getDefaultValue());
     }
 
     @Test
     public void testEnvVarAsValue2() {
         SOSOptionElement objOpt = new SOSOptionElement(null, "key", "Description", "file:${APPDATA}", "env:LOCALAPPDATA", true);
-        LOGGER.info("value = " + objOpt.Value());
-        LOGGER.info("default value = " + objOpt.DefaultValue());
+        LOGGER.info("value = " + objOpt.getValue());
+        LOGGER.info("default value = " + objOpt.getDefaultValue());
         objOpt = new SOSOptionElement(null, "key", "Description", "file:${APPDATA}/config/live", "env:LOCALAPPDATA", true);
-        LOGGER.info("value = " + objOpt.Value());
-        LOGGER.info("default value = " + objOpt.DefaultValue());
+        LOGGER.info("value = " + objOpt.getValue());
+        LOGGER.info("default value = " + objOpt.getDefaultValue());
         objOpt = new SOSOptionElement(null, "key", "Description", "${APPDATA}/config/live", "env:LOCALAPPDATA", true);
-        LOGGER.info("value = " + objOpt.Value());
-        LOGGER.info("default value = " + objOpt.DefaultValue());
+        LOGGER.info("value = " + objOpt.getValue());
+        LOGGER.info("default value = " + objOpt.getDefaultValue());
         objOpt = new SOSOptionElement(null, "key", "Description", "${APPDATA}", "env:LOCALAPPDATA", true);
-        LOGGER.info("value = " + objOpt.Value());
-        LOGGER.info("default value = " + objOpt.DefaultValue());
+        LOGGER.info("value = " + objOpt.getValue());
+        LOGGER.info("default value = " + objOpt.getDefaultValue());
     }
 
     @Test
@@ -107,13 +107,13 @@ public class SOSOptionElementTest {
         SOSOptionLocale Locale =
                 new SOSOptionLocale(null, CLASSNAME + ".Locale", "I18N is for internationalization of Application", "env:SOS_LOCALE",
                         java.util.Locale.getDefault().toString(), true);
-        LOGGER.info("Locale = " + Locale.Value());
+        LOGGER.info("Locale = " + Locale.getValue());
     }
 
     public void testSystemProperty() {
         System.setProperty("log4j.configuration", "test-config.properties");
         JSOptionsClass objO = new JSOptionsClass();
-        assertEquals("propertyfile name", "test-config.properties", objO.log4jPropertyFileName.Value());
+        assertEquals("propertyfile name", "test-config.properties", objO.log4jPropertyFileName.getValue());
     }
 
 }

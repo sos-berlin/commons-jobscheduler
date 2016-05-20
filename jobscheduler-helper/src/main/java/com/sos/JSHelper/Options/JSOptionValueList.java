@@ -24,11 +24,11 @@ public class JSOptionValueList extends SOSOptionString {
             final String pstrDefaultValue, final boolean pflgIsMandatory) {
         super(pobjParent, pstrIndexedKey, pstrDescription, null, pstrDefaultValue, pflgIsMandatory);
         if (isNotEmpty(pstrIndexedKey)) {
-            IndexedKey(pstrIndexedKey);
+            setIndexedKey(pstrIndexedKey);
         }
     }
 
-    private void IndexedKey(final String pstrIndexedKey) {
+    private void setIndexedKey(final String pstrIndexedKey) {
         String strT;
         final Vector<String> objValueList = new Vector<String>();
         final StringBuffer sb = new StringBuffer();
@@ -47,7 +47,7 @@ public class JSOptionValueList extends SOSOptionString {
         strValueList = objValueList.toArray(new String[0]);
     }
 
-    public String ElementAt(final int pintIdx) {
+    public String getElementAt(final int pintIdx) {
         if (strValueList == null) {
             return "";
         }
@@ -58,7 +58,7 @@ public class JSOptionValueList extends SOSOptionString {
     }
 
     @Override
-    public void Value(final String pstrValueList) {
+    public void setValue(final String pstrValueList) {
         String strT = pstrValueList;
         if (isNotEmpty(pstrValueList) && (pstrValueList.contains(";") || pstrValueList.contains("|") || pstrValueList.contains(","))) {
             strValueList = strT.split(conValueListDelimiters);
@@ -67,12 +67,12 @@ public class JSOptionValueList extends SOSOptionString {
                 && (isNull(strValueList) || strValueList.length == 0 || (strValueList.length == 1 && isEmpty(strValueList[0])))) {
             strValueList = new String[] { pstrValueList };
         }
-        super.Value(strT);
+        super.setValue(strT);
     }
 
-    public void AppendValue(final String pstrValueList) throws Exception {
+    public void appendValue(final String pstrValueList) throws Exception {
         if (isNotEmpty(pstrValueList)) {
-            if (isNotEmpty(super.Value())) {
+            if (isNotEmpty(super.getValue())) {
                 strValue += ";" + pstrValueList;
                 String[] strarrT = pstrValueList.split(conValueListDelimiters);
                 int intLengthT = strarrT.length;
@@ -82,7 +82,7 @@ public class JSOptionValueList extends SOSOptionString {
                 System.arraycopy(strarrT, 0, strNew, intLengthActual, intLengthT);
                 strValueList = strNew;
             } else {
-                super.Value(pstrValueList);
+                super.setValue(pstrValueList);
                 strValueList = pstrValueList.split(conValueListDelimiters);
             }
         }
@@ -128,7 +128,7 @@ public class JSOptionValueList extends SOSOptionString {
         return flgFound;
     }
 
-    public int IndexOf(final String pstrValue2Find) {
+    public int getIndexOf(final String pstrValue2Find) {
         for (int i = 0; i < strValueList.length; i++) {
             if (pstrValue2Find.equalsIgnoreCase(strValueList[i])) {
                 return i;
@@ -137,7 +137,7 @@ public class JSOptionValueList extends SOSOptionString {
         return -1;
     }
 
-    public String[] ValueList() {
+    public String[] getValueList() {
         return strValueList;
     }
 

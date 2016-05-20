@@ -48,7 +48,7 @@ public class SOSOptionRelOp extends SOSOptionString {
     }
 
     @Override
-    public void Value(final String pstrValue) {
+    public void setValue(final String pstrValue) {
         if (objRelOp == null) {
             setRelOpTab();
         }

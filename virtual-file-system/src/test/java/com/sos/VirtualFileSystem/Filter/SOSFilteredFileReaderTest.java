@@ -36,11 +36,11 @@ public class SOSFilteredFileReaderTest implements ISOSFilteredFileReader {
         JSFile objFile = new JSFile("R:/backup/projects/anubex/Events/10P9I029.09249.000");
         SOSFilteredFileReader objR = new SOSFilteredFileReader(objFile);
         objR.setProcesshandler(this);
-        SOSFilterOptions objFO = objR.Options();
-        objFO.excludeLinesBefore.Value("^(\\$EVENT_START).*$");
-        objFO.exclude_lines_after.Value("^\\$EVENT_END");
+        SOSFilterOptions objFO = objR.getOptions();
+        objFO.excludeLinesBefore.setValue("^(\\$EVENT_START).*$");
+        objFO.excludeLinesAfter.setValue("^\\$EVENT_END");
         objFO.excludeEmptyLines.value(true);
-        objFO.excludeLines.Value("^(\\*.*)|^(JOB  ).*|.*(LIST ALL FOR).*$");
+        objFO.excludeLines.setValue("^(\\*.*)|^(JOB  ).*|.*(LIST ALL FOR).*$");
         objR.run();
     }
 
@@ -62,7 +62,7 @@ public class SOSFilteredFileReaderTest implements ISOSFilteredFileReader {
                     String[] strESUCC_GROUP = objH.get("ESUCC_GROUP").split(",");
                     for (int i = 0; i < strESUCC_EVENT.length; i++) {
                         String strToObject = strESUCC_GROUP[i] + strESUCC_EVENT[i];
-                        Node n1 = g.newNode(Quoted(strFromObject));
+                        Node n1 = g.newNode(quoted(strFromObject));
                         SingleNodeProperties p = n1.getSingleNodeProperties();
                         String strLabel = objH.get("DESCR");
                         if (strLabel == null) {
@@ -70,15 +70,15 @@ public class SOSFilteredFileReaderTest implements ISOSFilteredFileReader {
                         }
                         strLabel = "<" + strLabel + "<br/>" + strFromObject + ">";
                         p.setLabel(strLabel);
-                        Node n2 = g.newNode(Quoted(strToObject));
+                        Node n2 = g.newNode(quoted(strToObject));
                         SingleNodeProperties p2 = n2.getSingleNodeProperties();
                         g.newEdge(n1, n2);
                     }
                 }
                 String strPrim = objH.get("WHEN_PRIM");
                 if (strPrim != null) {
-                    Node n1 = g.newNode(Quoted(objH.get("WHEN_QNAM") + objH.get("WHEN_PRIM")));
-                    Node n2 = g.newNode(Quoted(strFromObject));
+                    Node n1 = g.newNode(quoted(objH.get("WHEN_QNAM") + objH.get("WHEN_PRIM")));
+                    Node n2 = g.newNode(quoted(strFromObject));
                     g.newEdge(n1, n2);
                 }
             }
@@ -94,7 +94,7 @@ public class SOSFilteredFileReaderTest implements ISOSFilteredFileReader {
         }
     }
 
-    private String Quoted(final String pstrV) {
+    private String quoted(final String pstrV) {
         String strR = pstrV.trim();
         if (strR != null) {
             strR = "\"" + strR + "\"";
@@ -130,12 +130,12 @@ public class SOSFilteredFileReaderTest implements ISOSFilteredFileReader {
     public void processRecord(final String pstrRecord) {
         try {
             if (pstrRecord.startsWith("$")) {
-                if (strLastRecord.trim().length() > 0) {
-                    objOutput.WriteLine(strLastRecord);
+                if (!strLastRecord.trim().isEmpty()) {
+                    objOutput.writeLine(strLastRecord);
                     strLastRecord = "";
                     strLastTooken = "";
                 }
-                objOutput.WriteLine(pstrRecord);
+                objOutput.writeLine(pstrRecord);
                 if (pstrRecord.startsWith("$GENERAL_PARM_START")) {
                     String strKey = mapEvent.get("EVENTNAME");
                     if (strKey != null) {
@@ -157,7 +157,7 @@ public class SOSFilteredFileReaderTest implements ISOSFilteredFileReader {
                     addEventAttribut(strTooken, getValue(pstrRecord));
                     if (!strLastTooken.equals(strTooken)) {
                         if (!strLastRecord.trim().isEmpty()) {
-                            objOutput.WriteLine(strLastRecord);
+                            objOutput.writeLine(strLastRecord);
                         }
                         strLastRecord = pstrRecord;
                         strLastTooken = strTooken;

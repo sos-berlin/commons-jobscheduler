@@ -48,13 +48,13 @@ public class JSIniFileTest {
 
     @Test
     public final void testSections() {
-        Map<String, SOSProfileSection> objS = objF.Sections();
+        Map<String, SOSProfileSection> objS = objF.getSections();
         assertTrue("is not null", objS != null);
         LOGGER.debug("number of sections = " + objS.size());
         for (SOSProfileSection objPS : objS.values()) {
-            LOGGER.debug(objPS.Name());
-            for (SOSProfileEntry objEntry : objPS.Entries().values()) {
-                LOGGER.debug("     " + objEntry.Name() + " = " + objEntry.Value());
+            LOGGER.debug(objPS.getName());
+            for (SOSProfileEntry objEntry : objPS.getEntries().values()) {
+                LOGGER.debug("     " + objEntry.getName() + " = " + objEntry.getValue());
             }
         }
     }
@@ -65,8 +65,8 @@ public class JSIniFileTest {
         SOSProfileSection obj = objF.getSection("do_sftp");
         assertEquals("section name not ok", "do_sftp", obj.strSectionName);
         obj.addEntry("Test", "HalloTest");
-        SOSProfileEntry objE = obj.Entry("protocol");
-        String strT = objE.Value();
+        SOSProfileEntry objE = obj.getEntry("protocol");
+        String strT = objE.getValue();
         assertEquals("Entry Value test failed", "sftp", strT);
     }
 
@@ -77,7 +77,7 @@ public class JSIniFileTest {
         assertEquals("section name not ok", "do_sftp", obj.strSectionName);
         obj.addEntry("Test", "HalloTest");
         obj.deleteEntry("protocol");
-        SOSProfileEntry objE = obj.Entry("protocol");
+        SOSProfileEntry objE = obj.getEntry("protocol");
         assertEquals("Entry delete failed", null, objE);
     }
 

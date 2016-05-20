@@ -237,15 +237,15 @@ public class SOSSSH2JSchTest {
     }
 
     private void sessionConnect() throws JSchException, RuntimeException {
-        sshSession = secureChannel.getSession(authenticationOptions.getUser().Value(), HOST, PORT);
-        sshSession.setPassword(authenticationOptions.getPassword().Value().toString());
+        sshSession = secureChannel.getSession(authenticationOptions.getUser().getValue(), HOST, PORT);
+        sshSession.setPassword(authenticationOptions.getPassword().getValue().toString());
         sshSession.setConfig("StrictHostKeyChecking", "no");
         sshSession.connect();
     }
 
     private void sessionConnectWindows() throws JSchException, RuntimeException {
-        sshSession = secureChannel.getSession(authenticationOptions.getUser().Value(), WINDOWS_HOST, PORT);
-        sshSession.setPassword(authenticationOptions.getPassword().Value().toString());
+        sshSession = secureChannel.getSession(authenticationOptions.getUser().getValue(), WINDOWS_HOST, PORT);
+        sshSession.setPassword(authenticationOptions.getPassword().getValue().toString());
         sshSession.setConfig("StrictHostKeyChecking", "no");
         sshSession.connect();
     }

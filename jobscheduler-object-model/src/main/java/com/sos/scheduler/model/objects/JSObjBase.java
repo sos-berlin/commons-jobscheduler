@@ -40,6 +40,10 @@ public class JSObjBase implements Comparable<JSObjBase> {
     @XmlTransient
     protected boolean flgIsInit = false;
 
+    public JSObjBase() {
+        //
+    }
+
     @XmlTransient
     public void setInit(final boolean flgF) {
         flgIsInit = flgF;
@@ -64,10 +68,6 @@ public class JSObjBase implements Comparable<JSObjBase> {
 
     public boolean isDirty() {
         return flgIsDirty;
-    }
-
-    public JSObjBase() {
-        //
     }
 
     public void setParent(final SchedulerObjectFactory objParent) {
@@ -136,12 +136,10 @@ public class JSObjBase implements Comparable<JSObjBase> {
     }
 
     public Object saveAs(final String pstrSaveAsFileName) {
-        // TO DO implement saveAs
         return null;
     }
 
-    public Object Rename(final String pstrRenameFileName) {
-        // TO DO implement Rename
+    public Object rename(final String pstrRenameFileName) {
         return null;
     }
 
@@ -283,9 +281,7 @@ public class JSObjBase implements Comparable<JSObjBase> {
     }
 
     public boolean isEnabled() {
-        boolean flgT = true;
-        // TO DO implement canWrite()
-        return flgT;
+        return true;
     }
 
     protected void changeSourceName(final String pstrName) {
@@ -305,7 +301,7 @@ public class JSObjBase implements Comparable<JSObjBase> {
         return pstrV;
     }
 
-    protected String BigInt2String(final BigInteger pbigI) {
+    protected String bigInt2String(final BigInteger pbigI) {
         if (pbigI != null) {
             long lngT = pbigI.longValue();
             return String.valueOf(lngT);
@@ -313,7 +309,7 @@ public class JSObjBase implements Comparable<JSObjBase> {
         return "";
     }
 
-    protected BigInteger Int2BigInteger(final int pintVal) {
+    protected BigInteger int2BigInteger(final int pintVal) {
         return BigInteger.valueOf(pintVal);
     }
 
@@ -467,8 +463,7 @@ public class JSObjBase implements Comparable<JSObjBase> {
 
     protected String[] arrayListToStringArray(final List<String> pobjArray) {
         String[] strA = new String[pobjArray.size()];
-        strA = pobjArray.toArray(strA);
-        return strA;
+        return pobjArray.toArray(strA);
     }
 
 }

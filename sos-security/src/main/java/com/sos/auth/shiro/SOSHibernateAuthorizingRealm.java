@@ -42,7 +42,7 @@ public class SOSHibernateAuthorizingRealm extends AuthorizingRealm {
         return authzInfo;
     }
 
-    public String MD5(String md5) {
+    public String getMD5(String md5) {
         try {
             java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
             byte[] array = md.digest(md5.getBytes());
@@ -66,7 +66,7 @@ public class SOSHibernateAuthorizingRealm extends AuthorizingRealm {
         SOSUserDBItem sosUserDBItem = sosUserList.get(0);
         String s = sosUserDBItem.getSosUserPassword();
         String pw = String.valueOf(authToken.getPassword());
-        if (s.equals(MD5(pw))) {
+        if (s.equals(getMD5(pw))) {
             return new SimpleAuthenticationInfo(authToken.getUsername(), authToken.getPassword(), getName());
         } else {
             return null;

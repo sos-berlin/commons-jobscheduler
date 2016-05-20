@@ -19,7 +19,7 @@ import com.sos.VirtualFileSystem.Interfaces.ISOSVFSHandler;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVfsFileTransfer;
 import com.sos.VirtualFileSystem.Interfaces.ISOSVirtualFile;
 import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
-import com.sos.VirtualFileSystem.shell.cmdShell;
+import com.sos.VirtualFileSystem.shell.CmdShell;
 import com.sos.scheduler.converter.graphviz.Dot;
 import com.sos.scheduler.model.objects.JSObjBase;
 import com.sos.scheduler.model.objects.JSObjHolidays;
@@ -64,13 +64,13 @@ public class SchedulerHotFolderTest {
 
     private final void prepareFtpVfs() {
         objOptions = new SOSFTPOptions();
-        objOptions.host.Value("8of9.sos");
-        objOptions.user.Value("sos");
-        objOptions.password.Value("sos");
+        objOptions.host.setValue("8of9.sos");
+        objOptions.user.setValue("sos");
+        objOptions.password.setValue("sos");
         try {
-            objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
-            objVFS.Connect(objOptions);
-            objVFS.Authenticate(objOptions);
+            objVFS = VFSFactory.getHandler(objOptions.protocol.getValue());
+            objVFS.connect(objOptions);
+            objVFS.authenticate(objOptions);
             objFileSystemHandler = (ISOSVfsFileTransfer) objVFS;
         } catch (Exception e) {
             LOGGER.error(e);
@@ -103,7 +103,7 @@ public class SchedulerHotFolderTest {
 
     @Test
     @Ignore("Test set to Ignore for later examination")
-    public final void CreateDOTFileFromChain() throws Exception {
+    public final void createDOTFileFromChain() throws Exception {
         boolean flgCreateCluster = false;
         prepareLocalVfs();
         SchedulerHotFolderFileList objSchedulerHotFolderFileList = loadHotFolder(LIVE_LOCAL_FOLDER_LOCATION);
@@ -127,27 +127,26 @@ public class SchedulerHotFolderTest {
                         }
                     }
                 }
-                objDotFile.WriteLine("digraph " + getQuoted(strName) + " {");
-                objDotFile.WriteLine("rankdir = TB;");
-                objDotFile.WriteLine("graph [");
-                objDotFile.WriteLine("label = " + getQuoted(objChain.getTitle()));
-                objDotFile.WriteLine("fontsize = 14");
-                objDotFile.WriteLine("];");
-                objDotFile.WriteLine("node [");
-                objDotFile.WriteLine("fontsize = 10");
-                objDotFile.WriteLine("shape = " + getQuoted("box"));
-                objDotFile.WriteLine("style = " + getQuoted("rounded"));
-                objDotFile.WriteLine("fontname = " + getQuoted("Arial"));
-                objDotFile.WriteLine("];");
+                objDotFile.writeLine("digraph " + getQuoted(strName) + " {");
+                objDotFile.writeLine("rankdir = TB;");
+                objDotFile.writeLine("graph [");
+                objDotFile.writeLine("label = " + getQuoted(objChain.getTitle()));
+                objDotFile.writeLine("fontsize = 14");
+                objDotFile.writeLine("];");
+                objDotFile.writeLine("node [");
+                objDotFile.writeLine("fontsize = 10");
+                objDotFile.writeLine("shape = " + getQuoted("box"));
+                objDotFile.writeLine("style = " + getQuoted("rounded"));
+                objDotFile.writeLine("fontname = " + getQuoted("Arial"));
+                objDotFile.writeLine("];");
                 Hashtable<String, JobChainNode> tblNodes = new Hashtable<String, JobChainNode>();
-                objDotFile.WriteLine(getQuoted("start") + " [label = " + getQuoted("start" + ": " + strName) + ", shape = " + getQuoted("box")
+                objDotFile.writeLine(getQuoted("start") + " [label = " + getQuoted("start" + ": " + strName) + ", shape = " + getQuoted("box")
                         + ", style = " + getQuoted("solid") + "];");
-                objDotFile.WriteLine(getQuoted("end") + " [label = " + getQuoted("end" + ": " + strName) + ", shape = " + getQuoted("box")
+                objDotFile.writeLine(getQuoted("end") + " [label = " + getQuoted("end" + ": " + strName) + ", shape = " + getQuoted("box")
                         + ", style = " + getQuoted("solid") + "];");
                 for (JSObjOrder objOrder : tblOrders.values()) {
-                    objDotFile.WriteLine(getQuoted(objOrder.getObjectName()) + " [label = " + getQuoted("Order - " + objOrder.getObjectName()) + "];");
+                    objDotFile.writeLine(getQuoted(objOrder.getObjectName()) + " [label = " + getQuoted("Order - " + objOrder.getObjectName()) + "];");
                 }
-
                 for (Object objO : objChain.getJobChainNodeOrFileOrderSinkOrJobChainNodeEnd()) {
                     if (objO instanceof JobChainNode) {
                         JobChainNode objNode = (JobChainNode) objO;
@@ -162,18 +161,18 @@ public class SchedulerHotFolderTest {
                             if (!strState.equalsIgnoreCase(strJobName)) {
                                 strT = strState + ": " + strJobName;
                             }
-                            objDotFile.WriteLine(getQuoted(strState) + " [label = " + getQuoted(strT) + "];");
+                            objDotFile.writeLine(getQuoted(strState) + " [label = " + getQuoted(strT) + "];");
                             String strErrorState = objNode.getErrorState();
                             if (strErrorState != null && tblNodes.get(strErrorState) == null) {
                                 tblNodes.put(strErrorState, objNode);
-                                objDotFile.WriteLine(getQuoted(strErrorState) + " [label = " + getQuoted(strErrorState)
+                                objDotFile.writeLine(getQuoted(strErrorState) + " [label = " + getQuoted(strErrorState)
                                         + ", color=\"red\", fillcolor=\"yellow\", style=\"filled\", fontcolor=\"blue\"];");
                             }
                         }
                     }
                 }
                 for (JSObjOrder objOrder : tblOrders.values()) {
-                    objDotFile.WriteLine(getQuoted(objOrder.getObjectName()) + " -> " + getQuoted("start"));
+                    objDotFile.writeLine(getQuoted(objOrder.getObjectName()) + " -> " + getQuoted("start"));
                 }
                 boolean flgStart = true;
                 String strState = null;
@@ -185,25 +184,25 @@ public class SchedulerHotFolderTest {
                         strState = objNode.getState();
                         if (flgStart) {
                             flgStart = false;
-                            objDotFile.WriteLine(getQuoted("start") + " -> " + strState);
+                            objDotFile.writeLine(getQuoted("start") + " -> " + strState);
                             if (flgCreateCluster) {
-                                objDotFile.WriteLine("subgraph cluster_0 {");
-                                objDotFile.WriteLine("    style=filled;");
-                                objDotFile.WriteLine("color=lightgrey;");
-                                objDotFile.WriteLine("node [style=filled,color=white];");
+                                objDotFile.writeLine("subgraph cluster_0 {");
+                                objDotFile.writeLine("    style=filled;");
+                                objDotFile.writeLine("color=lightgrey;");
+                                objDotFile.writeLine("node [style=filled,color=white];");
                             }
                         }
                         strNextState = objNode.getNextState();
                         if (strNextState != null) {
-                            objDotFile.WriteLine(getQuoted(strState) + " -> " + getQuoted(strNextState));
+                            objDotFile.writeLine(getQuoted(strState) + " -> " + getQuoted(strNextState));
                             strLastNextState = strNextState;
                         }
                     }
                 }
-                objDotFile.WriteLine(getQuoted(strLastNextState) + " -> " + "end");
+                objDotFile.writeLine(getQuoted(strLastNextState) + " -> " + "end");
                 if (flgCreateCluster) {
-                    objDotFile.WriteLine("label = \"Process\";");
-                    objDotFile.WriteLine("}");
+                    objDotFile.writeLine("label = \"Process\";");
+                    objDotFile.writeLine("}");
                 }
                 Hashtable<String, JobChainNode> tblErrNodes = new Hashtable<String, JobChainNode>();
                 for (Object objO : objChain.getJobChainNodeOrFileOrderSinkOrJobChainNodeEnd()) {
@@ -212,16 +211,16 @@ public class SchedulerHotFolderTest {
                         strState = objNode.getState();
                         String strErrorState = objNode.getErrorState();
                         if (strErrorState != null) {
-                            objDotFile.WriteLine(getQuoted(strState) + " -> " + getQuoted(strErrorState) + " [style=\"dotted\", constraint=false]");
+                            objDotFile.writeLine(getQuoted(strState) + " -> " + getQuoted(strErrorState) + " [style=\"dotted\", constraint=false]");
                             tblErrNodes.put(strErrorState, objNode);
                         }
                     }
                 }
                 if (flgCreateCluster) {
-                    objDotFile.WriteLine("subgraph cluster_1 {");
-                    objDotFile.WriteLine("    style=filled;");
-                    objDotFile.WriteLine("color=lightgrey;");
-                    objDotFile.WriteLine("node [style=filled,color=white];");
+                    objDotFile.writeLine("subgraph cluster_1 {");
+                    objDotFile.writeLine("    style=filled;");
+                    objDotFile.writeLine("color=lightgrey;");
+                    objDotFile.writeLine("node [style=filled,color=white];");
                 }
                 String strLastErrNode = "";
                 for (JobChainNode objErrNode : tblErrNodes.values()) {
@@ -230,19 +229,19 @@ public class SchedulerHotFolderTest {
                         if (strLastErrNode.isEmpty()) {
                             strLastErrNode = strErrNodeName;
                         } else {
-                            objDotFile.WriteLine(getQuoted(strLastErrNode) + " -> " + getQuoted(strErrNodeName) + " [style=invis]");
+                            objDotFile.writeLine(getQuoted(strLastErrNode) + " -> " + getQuoted(strErrNodeName) + " [style=invis]");
                             strLastErrNode = strErrNodeName;
                         }
                     }
-                    objDotFile.WriteLine(getQuoted(strErrNodeName) + " -> " + getQuoted("end"));
+                    objDotFile.writeLine(getQuoted(strErrNodeName) + " -> " + getQuoted("end"));
                 }
                 if (flgCreateCluster) {
-                    objDotFile.WriteLine("label = \"Error\";");
-                    objDotFile.WriteLine("}");
+                    objDotFile.writeLine("label = \"Error\";");
+                    objDotFile.writeLine("}");
                 }
-                objDotFile.WriteLine("}");
+                objDotFile.writeLine("}");
                 objDotFile.close();
-                cmdShell objShell = new cmdShell();
+                CmdShell objShell = new CmdShell();
                 String strCommandString = String.format(Dot.Command + " -x -T%1$s %2$s.dot > %2$s.%1$s", "jpg", strFileName);
                 objShell.setCommand(strCommandString);
                 objShell.run();
@@ -351,7 +350,7 @@ public class SchedulerHotFolderTest {
         String xmlStr = objHolidays.toXMLString();
         LOGGER.info(xmlStr);
         JSDataElementDate objD = new JSDataElementDate("2011-11-27", JSDateFormat.dfDATE_SHORT);
-        LOGGER.info(objD.Value());
+        LOGGER.info(objD.getValue());
         if (objHolidays.isAHoliday(objD.getDateObject())) {
             LOGGER.info("is a Holiday");
         }

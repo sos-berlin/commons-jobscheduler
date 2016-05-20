@@ -11,17 +11,17 @@ public class JSOptionPropertyFolderName extends SOSOptionFolderName {
     }
 
     @Override
-    public void Value(String pstrFolderName) {
+    public void setValue(String pstrFolderName) {
         final String conMethodName = CLASSNAME + "::Value";
-        pstrFolderName = objParentClass.CheckIsFileWritable(pstrFolderName, conMethodName);
-        super.Value(pstrFolderName);
+        pstrFolderName = objParentClass.checkIsFileWritable(pstrFolderName, conMethodName);
+        super.setValue(pstrFolderName);
         if (isNotEmpty(strValue)) {
             System.setProperty("user.dir", strValue);
         }
     }
 
     @Override
-    public String Value() {
+    public String getValue() {
         return System.getProperty("user.dir");
     }
 

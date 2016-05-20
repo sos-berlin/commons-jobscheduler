@@ -56,11 +56,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @Override
     public String getInclude() {
-        return include.Value();
+        return include.getValue();
     }
 
     @Override
     public ISOSDataProviderOptions setInclude(final String pstrValue) {
+        include.setValue(pstrValue);
         return this;
     }
 
@@ -103,12 +104,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @Override
     public String getProtocolCommandListener() {
-        return protocolCommandListener.Value();
+        return protocolCommandListener.getValue();
     }
 
     @Override
     public ISOSDataProviderOptions setProtocolCommandListener(final String val) {
-        protocolCommandListener.Value(val);
+        protocolCommandListener.setValue(val);
         return this;
     }
 
@@ -131,17 +132,17 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
         mandatory = false)
     public SOSOptionBoolean makeDirs = new SOSOptionBoolean(this, CLASSNAME + ".make_Dirs", "Create missing Directory on Source/Target", "true",
             "true", false);
-    public SOSOptionBoolean createFoldersOnTarget = (SOSOptionBoolean) makeDirs.SetAlias("create_folders_on_target");
-
-    public SOSOptionBoolean createFolders = (SOSOptionBoolean) makeDirs.SetAlias("create_folders");
+    public SOSOptionBoolean createFoldersOnTarget = (SOSOptionBoolean) makeDirs.setAlias("create_folders_on_target");
+    public SOSOptionBoolean createFolders = (SOSOptionBoolean) makeDirs.setAlias("create_folders");
 
     @Override
     public String getMakeDirs() {
-        return makeDirs.Value();
+        return makeDirs.getValue();
     }
 
     @Override
     public ISOSDataProviderOptions setMakeDirs(final String pstrValue) {
+        makeDirs.setValue(pstrValue);
         return this;
     }
 
@@ -149,7 +150,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
         mandatory = false)
     public SOSOptionFolderName directory = new SOSOptionFolderName(this, CLASSNAME + ".dir", "local_dir Local directory into which or from which",
             "", "", false);
-    public SOSOptionFolderName folderName = (SOSOptionFolderName) directory.SetAlias("Folder_Name");
+    public SOSOptionFolderName folderName = (SOSOptionFolderName) directory.setAlias("Folder_Name");
 
     @JSOptionDefinition(name = "platform", description = "platform on which the app is running", key = "platform", type = "SOSOptionString",
         mandatory = false)
@@ -157,11 +158,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @Override
     public String getPlatform() {
-        return platform.Value();
+        return platform.getValue();
     }
 
     @Override
     public ISOSDataProviderOptions setPlatform(final String pstrValue) {
+        platform.setValue(pstrValue);
         return this;
     }
 
@@ -180,7 +182,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
         replacement = pReplacement;
     }
 
-    public SOSOptionString replaceWith = (SOSOptionString) replacement.SetAlias(CLASSNAME + ".ReplaceWith");
+    public SOSOptionString replaceWith = (SOSOptionString) replacement.setAlias(CLASSNAME + ".ReplaceWith");
 
     @JSOptionDefinition(name = "replacing", description = "Regular expression for filename replacement with", key = "replacing",
         type = "SOSOptionRegExp", mandatory = false)
@@ -197,7 +199,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
         replacing = pReplacing;
     }
 
-    public SOSOptionRegExp replaceWhat = (SOSOptionRegExp) replacing.SetAlias(CLASSNAME + ".ReplaceWhat");
+    public SOSOptionRegExp replaceWhat = (SOSOptionRegExp) replacing.setAlias(CLASSNAME + ".ReplaceWhat");
 
     @JSOptionDefinition(name = "strict_hostKey_checking", description = "Check the hostkey against known hosts for SSH",
         key = "strict_hostKey_checking", type = "SOSOptionBoolean", mandatory = false)
@@ -211,7 +213,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @Override
     public void setStrictHostKeyChecking(final String pstrValue) {
-        strictHostKeyChecking.Value(pstrValue);
+        strictHostKeyChecking.setValue(pstrValue);
     }
 
     @JSOptionDefinition(name = "TFN_Post_Command", description = "Post commands executed after creating the final TargetFile",
@@ -237,12 +239,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @Override
     public String getPostCommand() {
-        return postCommand.Value();
+        return postCommand.getValue();
     }
 
     @Override
     public ISOSDataProviderOptions setPostCommand(final String pstrValue) {
-        postCommand.Value(pstrValue);
+        postCommand.setValue(pstrValue);
         return this;
     }
 
@@ -252,12 +254,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @Override
     public String getPreCommand() {
-        return preCommand.Value();
+        return preCommand.getValue();
     }
 
     @Override
     public ISOSDataProviderOptions setPreCommand(final String pstrValue) {
-        preCommand.Value(pstrValue);
+        preCommand.setValue(pstrValue);
         return this;
     }
 
@@ -268,12 +270,12 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @Override
     public String getFtpsProtocol() {
-        return ftpsProtocol.Value();
+        return ftpsProtocol.getValue();
     }
 
     @Override
     public ISOSDataProviderOptions setFtpsProtocol(final String pstrValue) {
-        ftpsProtocol.Value(pstrValue);
+        ftpsProtocol.setValue(pstrValue);
         return this;
     }
 
@@ -281,15 +283,16 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
         type = "SOSOptionString ", mandatory = false)
     public SOSOptionJavaClassName loadClassName = new SOSOptionJavaClassName(this, CLASSNAME + ".load_Class_Name",
             "Java Class which implements the ISOSVFSHandlerInterface", "", "", false);
-    public SOSOptionJavaClassName dataProviderClassName = (SOSOptionJavaClassName) loadClassName.SetAlias("Data_provider_class_name");
+    public SOSOptionJavaClassName dataProviderClassName = (SOSOptionJavaClassName) loadClassName.setAlias("Data_provider_class_name");
 
     @Override
     public String getLoadClassName() {
-        return loadClassName.Value();
+        return loadClassName.getValue();
     }
 
     @Override
     public ISOSDataProviderOptions setLoadClassName(final String pstrValue) {
+        loadClassName.setValue(pstrValue);
         return this;
     }
 
@@ -320,8 +323,8 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
         host = pHost;
     }
 
-    public SOSOptionHostName hostName = (SOSOptionHostName) host.SetAlias(CLASSNAME + ".HostName");
-    public SOSOptionHostName ftpHostName = (SOSOptionHostName) host.SetAlias(CLASSNAME + ".ftp_host");
+    public SOSOptionHostName hostName = (SOSOptionHostName) host.setAlias(CLASSNAME + ".HostName");
+    public SOSOptionHostName ftpHostName = (SOSOptionHostName) host.setAlias(CLASSNAME + ".ftp_host");
 
     @JSOptionDefinition(name = "passive_mode", description = "passive_mode Passive mode for FTP is often used wit", key = "passive_mode",
         type = "SOSOptionBoolean", mandatory = false)
@@ -338,14 +341,14 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
         passiveMode = pPassiveMode;
     }
 
-    public SOSOptionBoolean ftpTransferModeIsPassive = (SOSOptionBoolean) passiveMode.SetAlias(CLASSNAME + ".FTPTransferModeIsPassive");
-    public SOSOptionBoolean ftpPassiveMode = (SOSOptionBoolean) passiveMode.SetAlias(CLASSNAME + ".ftp_passive_mode");
+    public SOSOptionBoolean ftpTransferModeIsPassive = (SOSOptionBoolean) passiveMode.setAlias(CLASSNAME + ".FTPTransferModeIsPassive");
+    public SOSOptionBoolean ftpPassiveMode = (SOSOptionBoolean) passiveMode.setAlias(CLASSNAME + ".ftp_passive_mode");
 
     @JSOptionDefinition(name = "port", description = "Port-Number to be used for Data-Transfer", key = "port", type = "SOSOptionPortNumber",
         mandatory = true)
     public SOSOptionPortNumber port =
             new SOSOptionPortNumber(this, CLASSNAME + ".port", "Port-Number to be used for Data-Transfer", "21", "21", true);
-    public SOSOptionPortNumber ftpPort = (SOSOptionPortNumber) port.SetAlias("ftp_port");
+    public SOSOptionPortNumber ftpPort = (SOSOptionPortNumber) port.setAlias("ftp_port");
 
 
     @Override
@@ -362,7 +365,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
         type = "SOSOptionStringValueList", mandatory = true)
     public SOSOptionTransferType protocol = new SOSOptionTransferType(this, CLASSNAME + ".protocol",
             "Type of requested Datatransfer The values ftp, sftp", "", "ftp", true);
-    public SOSOptionTransferType ftpProtocol = (SOSOptionTransferType) protocol.SetAlias("ftp_protocol");
+    public SOSOptionTransferType ftpProtocol = (SOSOptionTransferType) protocol.setAlias("ftp_protocol");
 
 
     @Override
@@ -375,13 +378,13 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
         protocol = pProtocol;
     }
 
-    public SOSOptionTransferType transferProtocol = (SOSOptionTransferType) protocol.SetAlias(CLASSNAME + ".TransferProtocol");
+    public SOSOptionTransferType transferProtocol = (SOSOptionTransferType) protocol.setAlias(CLASSNAME + ".TransferProtocol");
 
     @JSOptionDefinition(name = "transfer_mode", description = "Type of Character-Encoding Transfe", key = "transfer_mode",
         type = "SOSOptionTransferMode", mandatory = false)
     public SOSOptionTransferMode transferMode = new SOSOptionTransferMode(this, CLASSNAME + ".transfer_mode", "Type of Character-Encoding Transfe",
             "ascii;binary;text", "binary", false);
-    public SOSOptionTransferMode ftpTransferMode = (SOSOptionTransferMode) transferMode.SetAlias("ftp_transfer_mode");
+    public SOSOptionTransferMode ftpTransferMode = (SOSOptionTransferMode) transferMode.setAlias("ftp_transfer_mode");
 
 
     @Override
@@ -433,6 +436,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
     public void setAllOptions(final HashMap<String, String> settings) {
         objSettings = settings;
         super.setAllOptions(settings);
+        super.setSettings(objSettings);
     }
 
     @Override
@@ -454,7 +458,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
         type = "SOSOptionInFileName", mandatory = false)
     public SOSOptionInFileName sshAuthFile = new SOSOptionInFileName(this, CLASSNAME + ".ssh_auth_file",
             "This parameter specifies the path and name of a us", " ", " ", false);
-    public SOSOptionInFileName authFile = (SOSOptionInFileName) sshAuthFile.SetAlias(CLASSNAME + ".auth_file");
+    public SOSOptionInFileName authFile = (SOSOptionInFileName) sshAuthFile.setAlias(CLASSNAME + ".auth_file");
 
     @Override
     public SOSOptionInFileName getAuthFile() {
@@ -470,7 +474,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
         type = "SOSOptionStringValueList", mandatory = false)
     public SOSOptionAuthenticationMethod sshAuthMethod = new SOSOptionAuthenticationMethod(this, CLASSNAME + ".ssh_auth_method",
             "This parameter specifies the authentication method", "publickey", "publickey", false);
-    public SOSOptionAuthenticationMethod authMethod = (SOSOptionAuthenticationMethod) sshAuthMethod.SetAlias(CLASSNAME + ".auth_method");
+    public SOSOptionAuthenticationMethod authMethod = (SOSOptionAuthenticationMethod) sshAuthMethod.setAlias(CLASSNAME + ".auth_method");
 
     @Override
     public SOSOptionAuthenticationMethod getAuthMethod() {
@@ -484,7 +488,7 @@ public class SOSConnection2OptionsSuperClass extends JSOptionsClass implements I
 
     @Override
     public void setUser(final SOSOptionUserName pobjUser) {
-        user.Value(pobjUser.Value());
+        user.setValue(pobjUser.getValue());
     }
 
     @JSOptionDefinition(name = "ftps_client_security", description = "FTPS Client Security", key = "ftps_client_secutity",

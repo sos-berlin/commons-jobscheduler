@@ -16,23 +16,23 @@ public class SOSOptionBooleanTest {
     public void setUp() throws Exception {
         objOption = new SOSOptionBoolean(null, ".TestOption", "Title", "true", "true", true);
         objOption.value(true);
-        objOption.Value("true");
+        objOption.setValue("true");
     }
 
     @Test
     public void testValueString() {
-        assertEquals("Value must be true", "true", objOption.Value());
-        objOption.Value("false");
-        assertEquals("Value must be false", "false", objOption.Value());
+        assertEquals("Value must be true", "true", objOption.getValue());
+        objOption.setValue("false");
+        assertEquals("Value must be false", "false", objOption.getValue());
     }
 
     @Test
     public void testValue() {
-        objOption.Value("true");
+        objOption.setValue("true");
         assertTrue("Value must be true", objOption.value());
-        objOption.Value("1");
+        objOption.setValue("1");
         assertTrue("Value must be true", objOption.value());
-        objOption.Value("false");
+        objOption.setValue("false");
         assertFalse("Value must be false", objOption.value());
     }
 

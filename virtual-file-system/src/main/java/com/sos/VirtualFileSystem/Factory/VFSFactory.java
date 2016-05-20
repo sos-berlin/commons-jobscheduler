@@ -66,7 +66,7 @@ public class VFSFactory extends SOSVfsMessageCodes {
     }
 
     public static ISOSVFSHandler getHandler(final SOSOptionTransferType.enuTransferTypes penuTType) throws Exception {
-        return getHandler(penuTType.Text());
+        return getHandler(penuTType.getText());
     }
 
     public static ISOSVFSHandler getHandler(String pstrWhatURL) throws Exception {
@@ -94,7 +94,7 @@ public class VFSFactory extends SOSVfsMessageCodes {
             //
         }
         classLoader = Thread.currentThread().getContextClassLoader();
-        if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.ssh2.Text())) {
+        if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.ssh2.getText())) {
             Class objA;
             if (useTrilead) {
                 objA = classLoader.loadClass("com.sos.VirtualFileSystem.SSH.SOSSSH2TriLeadImpl");
@@ -110,39 +110,39 @@ public class VFSFactory extends SOSVfsMessageCodes {
                 LOGGER.error("ISOSVFSHandler not part of class");
             }
         }
-        if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.ftp.Text())) {
+        if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.ftp.getText())) {
             objC = getDynamicVFSHandler("com.sos.VirtualFileSystem.FTP.SOSVfsFtp");
         }
-        if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.ftps.Text())) {
+        if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.ftps.getText())) {
             objC = new SOSVfsFtpS();
             LOGGER.trace(SOSVfs_D_0201.params(methodName, SOSVfsFtpS.class.toString()));
         }
-        if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.sftp.Text())) {
+        if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.sftp.getText())) {
             objC = getDynamicVFSHandler(sFTPHandlerClassName);
         }
-        if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.local.Text())
-                || strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.file.Text())) {
+        if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.local.getText())
+                || strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.file.getText())) {
             objC = new SOSVfsLocal();
             LOGGER.trace(SOSVfs_D_0201.params(methodName, SOSVfsLocal.class.toString()));
             authenticate = false;
         }
-        if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.zip.Text())) {
+        if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.zip.getText())) {
             objC = new SOSVfsZip();
             LOGGER.trace(SOSVfs_D_0201.params(methodName, SOSVfsZip.class.toString()));
         }
-        if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.webdav.Text())) {
+        if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.webdav.getText())) {
             objC = new SOSVfsWebDAV();
             LOGGER.trace(SOSVfs_D_0201.params(methodName, SOSVfsWebDAV.class.toString()));
         }
-        if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.http.Text())) {
+        if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.http.getText())) {
             objC = new SOSVfsHTTP();
             LOGGER.trace(SOSVfs_D_0201.params(methodName, SOSVfsHTTP.class.toString()));
         }
-        if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.smb.Text())) {
+        if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.smb.getText())) {
             objC = new SOSVfsJCIFS();
             LOGGER.trace(SOSVfs_D_0201.params(methodName, SOSVfsJCIFS.class.toString()));
         }
-        if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.mq.Text())) {
+        if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.mq.getText())) {
             objC = new SOSVfsJms();
             LOGGER.trace(SOSVfs_D_0201.params(methodName, SOSVfsJms.class.toString()));
         }
@@ -153,16 +153,16 @@ public class VFSFactory extends SOSVfsMessageCodes {
             String strHost = objURL.getHost();
             if (strHost != null) {
                 int intPort = objURL.getPort();
-                objC.Connect(strHost, intPort);
+                objC.connect(strHost, intPort);
                 ISOSAuthenticationOptions objAO = new SOSFTPOptions();
                 String strUserInfo = objURL.getUserInfo();
                 String[] strUI = strUserInfo.split(":");
-                objAO.getUser().Value(strUI[0]);
-                objAO.getPassword().Value("");
+                objAO.getUser().setValue(strUI[0]);
+                objAO.getPassword().setValue("");
                 if (strUI.length > 1) {
-                    objAO.getPassword().Value(strUI[1]);
+                    objAO.getPassword().setValue(strUI[1]);
                 }
-                objC.Authenticate(objAO);
+                objC.authenticate(objAO);
                 objAO = null;
                 LOGGER.info("objURL.getAuthority() : " + objURL.getAuthority());
                 LOGGER.info("objURL.getFile()" + objURL.getFile());
@@ -178,7 +178,7 @@ public class VFSFactory extends SOSVfsMessageCodes {
     private static ISOSVFSHandler getDynamicVFSHandler(final String pstrLoadClassNameDefault) {
         String strLoadClassName = pstrLoadClassNameDefault;
         if (objConnectionOptions != null && objConnectionOptions.loadClassName.isDirty()) {
-            strLoadClassName = objConnectionOptions.loadClassName.Value();
+            strLoadClassName = objConnectionOptions.loadClassName.getValue();
             if (strLoadClassName.isEmpty()) {
                 strLoadClassName = pstrLoadClassNameDefault;
             } else {
@@ -189,7 +189,7 @@ public class VFSFactory extends SOSVfsMessageCodes {
         try {
             Class objA = null;
             if (objConnectionOptions != null && objConnectionOptions.javaClassPath.isDirty()) {
-                String[] strJars = objConnectionOptions.javaClassPath.Value().split(";");
+                String[] strJars = objConnectionOptions.javaClassPath.getValue().split(";");
                 for (String strJarFileName : strJars) {
                     File objF = new File(strJarFileName);
                     if (objF.isFile() && objF.canExecute()) {

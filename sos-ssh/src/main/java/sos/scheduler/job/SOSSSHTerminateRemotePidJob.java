@@ -36,9 +36,9 @@ public class SOSSSHTerminateRemotePidJob extends SOSSSHJobJSch {
             if (!vfsHandler.isConnected()) {
                 SOSConnection2OptionsAlternate postAlternateOptions = getAlternateOptions(objOptions);
                 postAlternateOptions.raiseExceptionOnError.value(false);
-                vfsHandler.Connect(postAlternateOptions);
+                vfsHandler.connect(postAlternateOptions);
             }
-            vfsHandler.Authenticate(objOptions);
+            vfsHandler.authenticate(objOptions);
             LOGGER.debug("connection for kill commands established");
         } catch (Exception e) {
             throw new SSHConnectionError("Error occured during connection/authentication: " + e.getMessage(), e);
@@ -52,11 +52,11 @@ public class SOSSSHTerminateRemotePidJob extends SOSSSHJobJSch {
         getOptions().checkMandatory();
         try {
             SOSConnection2OptionsAlternate alternateOptions = getAlternateOptions(objOptions);
-            vfsHandler.Connect(alternateOptions);
-            vfsHandler.Authenticate(objOptions);
+            vfsHandler.connect(alternateOptions);
+            vfsHandler.authenticate(objOptions);
             LOGGER.debug("connection established");
         } catch (Exception e) {
-            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
+            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getMessage(), e);
         }
         flgIsWindowsShell = vfsHandler.remoteIsWindowsShell();
         getTerminateCommandFromJobParameters();
@@ -126,14 +126,14 @@ public class SOSSSHTerminateRemotePidJob extends SOSSSHJobJSch {
             terminateCommand = ssh_job_terminate_pid_command.replace(PID_PLACEHOLDER, pid.toString());
         }
         if (ssh_job_terminate_pid_command.contains(USER_PLACEHOLDER)) {
-            terminateCommand = terminateCommand.replace(USER_PLACEHOLDER, objOptions.UserName.Value());
+            terminateCommand = terminateCommand.replace(USER_PLACEHOLDER, objOptions.userName.getValue());
         }
         if (ssh_job_terminate_pid_command.contains(COMMAND_PLACEHOLDER)) {
-            terminateCommand = terminateCommand.replace(COMMAND_PLACEHOLDER, objOptions.command.Value());
+            terminateCommand = terminateCommand.replace(COMMAND_PLACEHOLDER, objOptions.command.getValue());
         }
         String stdErr = "";
         try {
-            vfsHandler.ExecuteCommand(terminateCommand);
+            vfsHandler.executeCommand(terminateCommand);
         } catch (Exception e) {
             // check if command was processed correctly
             if (vfsHandler.getExitCode() != 0) {
@@ -168,8 +168,8 @@ public class SOSSSHTerminateRemotePidJob extends SOSSSHJobJSch {
     }
 
     private void getTerminateCommandFromJobParameters() {
-        if (objOptions.sshJobTerminatePidCommand.isDirty() && !objOptions.sshJobTerminatePidCommand.Value().isEmpty()) {
-            ssh_job_terminate_pid_command = objOptions.sshJobTerminatePidCommand.Value();
+        if (objOptions.sshJobTerminatePidCommand.isDirty() && !objOptions.sshJobTerminatePidCommand.getValue().isEmpty()) {
+            ssh_job_terminate_pid_command = objOptions.sshJobTerminatePidCommand.getValue();
             LOGGER.debug("Commands to terminate from Job Parameter used!");
         } else {
             if (flgIsWindowsShell) {
@@ -189,13 +189,13 @@ public class SOSSSHTerminateRemotePidJob extends SOSSSHJobJSch {
         objOptions.ignoreError.value(true);
         try {
             String command;
-            if (objOptions.getSshJobGetChildProcessesCommand().Value().contains(PID_PLACEHOLDER)) {
-                command = objOptions.getSshJobGetChildProcessesCommand().Value().replace(PID_PLACEHOLDER, pPid.toString());
+            if (objOptions.getSshJobGetChildProcessesCommand().getValue().contains(PID_PLACEHOLDER)) {
+                command = objOptions.getSshJobGetChildProcessesCommand().getValue().replace(PID_PLACEHOLDER, pPid.toString());
             } else {
-                command = objOptions.getSshJobGetChildProcessesCommand().Value();
+                command = objOptions.getSshJobGetChildProcessesCommand().getValue();
             }
             LOGGER.debug("***Execute read children of pid command!***");
-            vfsHandler.ExecuteCommand(command);
+            vfsHandler.executeCommand(command);
             BufferedReader reader = new BufferedReader(new StringReader(new String(vfsHandler.getStdOut())));
             String line = null;
             while ((line = reader.readLine()) != null) {

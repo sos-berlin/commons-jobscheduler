@@ -59,7 +59,7 @@ public class SOSOptionLocale extends SOSOptionString {
     }
 
     public java.util.Locale getI18NLocale() {
-        return new java.util.Locale(this.Value());
+        return new java.util.Locale(this.getValue());
     }
 
     public void setLocale(final java.util.Locale pobjLocale) {
@@ -75,7 +75,7 @@ public class SOSOptionLocale extends SOSOptionString {
      *
      * @param pstrLocale */
     @Override
-    public void Value(final String pstrLocale) {
+    public void setValue(final String pstrLocale) {
 
         @SuppressWarnings("unused")
         final String conMethodName = conClassName + "::Value";

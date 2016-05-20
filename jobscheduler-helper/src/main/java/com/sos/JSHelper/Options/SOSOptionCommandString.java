@@ -14,11 +14,11 @@ public class SOSOptionCommandString extends SOSOptionHexString {
     }
 
     public String[] values() throws Exception {
-        return this.Value().split(command_delimiter.Value());
+        return this.getValue().split(command_delimiter.getValue());
     }
 
     public String[] split() throws Exception {
-        return this.Value().split(";");
+        return this.getValue().split(";");
     }
 
 }

@@ -248,7 +248,7 @@ abstract public class SOSFTPCommand {
                             this.setCommands(getString(conSettingsJUMP_COMMAND).split(this.getCommandDelimiter()));
                             getLogger().debug1(".. parameter [jump_command]: " + getString(conSettingsJUMP_COMMAND));
                         } else if (commandScript.isEmpty() && commandScriptFileName.isEmpty()) {
-                            RaiseException("no command (or jump_command_script or jump_command_script_file) has been specified for parameter [jump_command]");
+                            raiseException("no command (or jump_command_script or jump_command_script_file) has been specified for parameter [jump_command]");
                         }
                     }
                 }
@@ -283,7 +283,7 @@ abstract public class SOSFTPCommand {
                     ignoreStderr = false;
                 }
             } catch (Exception e) {
-                RaiseException("error occurred processing parameters: " + e.getMessage(), e);
+                raiseException("error occurred processing parameters: " + e.getMessage(), e);
             }
             RemoteConsumer stdoutConsumer = null;
             RemoteConsumer stderrConsumer = null;
@@ -409,7 +409,7 @@ abstract public class SOSFTPCommand {
                                     getLogger().info("output to stderr is ignored: " + stderrOutput);
                                 }
                             } else {
-                                RaiseException("remote execution reports error: " + stderrOutput);
+                                raiseException("remote execution reports error: " + stderrOutput);
                             }
                         }
                         try {
@@ -421,7 +421,7 @@ abstract public class SOSFTPCommand {
                             if (ignoreError) {
                                 getLogger().debug1("exit status is ignored: " + exitStatus);
                             } else {
-                                RaiseException("remote command terminated with exit status: " + exitStatus
+                                raiseException("remote command terminated with exit status: " + exitStatus
                                         + (logger.hasWarnings() ? " error: " + logger.getWarning() : ""));
                             }
                         }
@@ -434,7 +434,7 @@ abstract public class SOSFTPCommand {
                             if (ignoreSignal) {
                                 getLogger().debug1("exit signal is ignored: " + exitSignal);
                             } else {
-                                RaiseException("remote command terminated with exit signal: " + exitSignal);
+                                raiseException("remote command terminated with exit signal: " + exitSignal);
                             }
                         }
                     } catch (Exception e) {
@@ -454,7 +454,7 @@ abstract public class SOSFTPCommand {
                     }
                 }
             } catch (Exception e) {
-                RaiseException("error occurred processing ssh command: " + e.getMessage(), e);
+                raiseException("error occurred processing ssh command: " + e.getMessage(), e);
             } finally {
                 if (stderrConsumer != null) {
                     stderrConsumer.end();
@@ -521,7 +521,7 @@ abstract public class SOSFTPCommand {
                 fis.close();
                 fis = null;
             } catch (Exception e) {
-                RaiseException("error occurred writing file [" + commandFile.getName() + "]: " + e.getMessage(), e);
+                raiseException("error occurred writing file [" + commandFile.getName() + "]: " + e.getMessage(), e);
             } finally {
                 if (fis != null) {
                     try {
@@ -536,7 +536,7 @@ abstract public class SOSFTPCommand {
             fileHandle = null;
             sftpClient.close();
         } catch (Exception e) {
-            RaiseException("Error transferring command script: " + e.getMessage(), e);
+            raiseException("Error transferring command script: " + e.getMessage(), e);
         }
         return commandFile;
     }
@@ -553,7 +553,7 @@ abstract public class SOSFTPCommand {
             out.write(commandScript);
             out.close();
         } catch (Exception e) {
-            RaiseException("Error creating command script: " + e.getMessage(), e);
+            raiseException("Error creating command script: " + e.getMessage(), e);
         }
         return resultFile;
     }
@@ -563,7 +563,7 @@ abstract public class SOSFTPCommand {
             commandScript = sos.util.SOSFile.readFileUnicode(scriptFile);
             return createCommandScript(isWindows);
         } catch (Exception e) {
-            RaiseException("Error creating command script: " + e.getMessage(), e);
+            raiseException("Error creating command script: " + e.getMessage(), e);
         }
         return null;
     }
@@ -625,7 +625,7 @@ abstract public class SOSFTPCommand {
             }
             sosMail.clearRecipients();
         } catch (Exception e) {
-            RaiseException("error occurred sending mai: " + e.getMessage(), e);
+            raiseException("error occurred sending mai: " + e.getMessage(), e);
         }
     }
 
@@ -698,7 +698,7 @@ abstract public class SOSFTPCommand {
     protected File createFile(final String fileName) throws Exception {
         try {
             if (fileName == null || fileName.isEmpty()) {
-                RaiseException("empty file name provided");
+                raiseException("empty file name provided");
             }
             if (fileName.startsWith("file://")) {
                 return new File(createURI(fileName));
@@ -706,7 +706,7 @@ abstract public class SOSFTPCommand {
                 return new File(fileName);
             }
         } catch (Exception e) {
-            RaiseException("error in createFile() [" + fileName + "]: " + e.getMessage(), e);
+            raiseException("error in createFile() [" + fileName + "]: " + e.getMessage(), e);
         }
         return null;
     }
@@ -799,7 +799,7 @@ abstract public class SOSFTPCommand {
             createHistoryFile();
             checkSchedulerRequest();
         } catch (Exception e) {
-            RaiseException("Failed to merge program arguments and settings: " + e.getMessage(), e);
+            raiseException("Failed to merge program arguments and settings: " + e.getMessage(), e);
         }
     }
 
@@ -875,7 +875,7 @@ abstract public class SOSFTPCommand {
                 }
             }
         } catch (Exception e) {
-            RaiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " could not create history file, cause: " + e.getMessage(), e);
+            raiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " could not create history file, cause: " + e.getMessage(), e);
         }
     }
 
@@ -935,18 +935,18 @@ abstract public class SOSFTPCommand {
                 if (lockHistoryFile.delete()) {
                     getLogger().info("History lock File successfully deleted, cause Process ID not exist.");
                 } else {
-                    RaiseException("History lock File " + lockHistoryFile.getCanonicalPath() + " could not delete. There is no Process Id exist[pid="
+                    raiseException("History lock File " + lockHistoryFile.getCanonicalPath() + " could not delete. There is no Process Id exist[pid="
                             + pid + "]");
                 }
                 existPID = false;
             }
 
             if (existPID) {
-                RaiseException("Could not write in History File, cause there is existing History Lock File.");
+                raiseException("Could not write in History File, cause there is existing History Lock File.");
             }
             return existPID;
         } catch (Exception e) {
-            RaiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " while looking-up existing history lock file, cause: "
+            raiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " while looking-up existing history lock file, cause: "
                     + e.getMessage(), e);
         } finally {
             if (bra != null) {
@@ -998,7 +998,7 @@ abstract public class SOSFTPCommand {
                 line++;
             }
         } catch (Exception e) {
-            RaiseException("\n -> ..error in " + SOSClassUtil.getMethodName() + " " + e.getMessage(), e);
+            raiseException("\n -> ..error in " + SOSClassUtil.getMethodName() + " " + e.getMessage(), e);
         } finally {
             if (bw != null) {
                 bw.close();
@@ -1018,7 +1018,7 @@ abstract public class SOSFTPCommand {
             lockBW = new BufferedWriter(new FileWriter(lockHistoryFile));
             lockBW.write(sosString.parseToString(arguments, "current_pid"));
         } catch (Exception e) {
-            RaiseException("could not create a history lock file, cause: " + e.getMessage(), e);
+            raiseException("could not create a history lock file, cause: " + e.getMessage(), e);
         } finally {
             if (lockBW != null) {
                 lockBW.close();
@@ -1034,11 +1034,11 @@ abstract public class SOSFTPCommand {
                 getLogger().debug3("history lock file could not be deleted: " + lockHistoryFile.getCanonicalPath());
                 Thread.sleep(1000);
                 if (!lockHistoryFile.delete()) {
-                    RaiseException("history lock file could not be deleted: " + lockHistoryFile.getCanonicalPath());
+                    raiseException("history lock file could not be deleted: " + lockHistoryFile.getCanonicalPath());
                 }
             }
         } catch (Exception e) {
-            RaiseException("could not delete a history lock file, cause: " + e.getMessage(), e);
+            raiseException("could not delete a history lock file, cause: " + e.getMessage(), e);
         }
     }
 
@@ -1099,7 +1099,7 @@ abstract public class SOSFTPCommand {
                         getString(conSettingsJUMP_COMMAND) + " -operation=make_temp_directory -root=" + sosString.parseToString(arguments, "root");
                 this.setCommands(curCommands.split(getCommandDelimiter()));
                 if (!execute()) {
-                    RaiseException("error occurred processing command: " + normalizedPassword(curCommands));
+                    raiseException("error occurred processing command: " + normalizedPassword(curCommands));
                 }
             }
             arguments.remove("xx_make_temp_directory_xx");
@@ -1182,7 +1182,7 @@ abstract public class SOSFTPCommand {
             }
             arguments.putAll(prop);
         } catch (Exception e) {
-            RaiseException("Failed to jump to: " + e.getMessage(), e);
+            raiseException("Failed to jump to: " + e.getMessage(), e);
         }
     }
 
@@ -1263,7 +1263,7 @@ abstract public class SOSFTPCommand {
             if (logger != null) {
                 logger.warn("[ERROR] could not read environment, cause: " + e.getMessage());
             }
-            RaiseException("error occurred reading environment: " + e.getMessage(), e);
+            raiseException("error occurred reading environment: " + e.getMessage(), e);
         }
         return envVars;
     }
@@ -1327,11 +1327,11 @@ abstract public class SOSFTPCommand {
                 new File(output).getCanonicalFile().delete();
             }
             if (!new File(output).getCanonicalFile().mkdirs()) {
-                RaiseException("could not create temporary directory");
+                raiseException("could not create temporary directory");
             }
         } catch (Exception e) {
             getLogger().warn("error creating temporary directory, cause: " + e.toString());
-            RaiseException("error creating temporary directory, cause: " + e.getMessage(), e);
+            raiseException("error creating temporary directory, cause: " + e.getMessage(), e);
         }
         return true;
     }
@@ -1424,7 +1424,7 @@ abstract public class SOSFTPCommand {
                 banner = curBannerFooter;
             }
         } catch (Exception e) {
-            RaiseException("error occurred getting banner: " + e.getMessage(), e);
+            raiseException("error occurred getting banner: " + e.getMessage(), e);
         }
         return banner;
     }
@@ -1923,7 +1923,7 @@ abstract public class SOSFTPCommand {
                 }
             }
         } catch (Exception e) {
-            RaiseException("could not substitute parameters in: " + txt + ", cause: " + e.getMessage(), e);
+            raiseException("could not substitute parameters in: " + txt + ", cause: " + e.getMessage(), e);
         }
         return txt;
     }
@@ -1990,7 +1990,7 @@ abstract public class SOSFTPCommand {
                 ignoreStderr = false;
             }
         } catch (Exception e) {
-            RaiseException("error occurred processing parameters: " + e.getMessage(), e);
+            raiseException("error occurred processing parameters: " + e.getMessage(), e);
         }
     }
 
@@ -2012,7 +2012,7 @@ abstract public class SOSFTPCommand {
             }
             return remoteIsWindowsShell();
         } catch (Exception e) {
-            RaiseException("Failed to check if remote system has windows shell: " + e.getMessage(), e);
+            raiseException("Failed to check if remote system has windows shell: " + e.getMessage(), e);
         } finally {
             if (withConn && this.getSshConnection() != null) {
                 try {
@@ -2042,10 +2042,10 @@ abstract public class SOSFTPCommand {
             if ("publickey".equalsIgnoreCase(authenticationMethod)) {
                 File authenticationFile = new File(authenticationFilename);
                 if (!authenticationFile.exists()) {
-                    RaiseException("authentication file does not exist: " + authenticationFile.getCanonicalPath());
+                    raiseException("authentication file does not exist: " + authenticationFile.getCanonicalPath());
                 }
                 if (!authenticationFile.canRead()) {
-                    RaiseException("authentication file not accessible: " + authenticationFile.getCanonicalPath());
+                    raiseException("authentication file not accessible: " + authenticationFile.getCanonicalPath());
                 }
                 isAuthenticated =
                         this.getSshConnection().authenticateWithPublicKey(user, authenticationFile,
@@ -2054,7 +2054,7 @@ abstract public class SOSFTPCommand {
                 isAuthenticated = this.getSshConnection().authenticateWithPassword(user, new SOSCommandline().getExternalPassword(password, logger));
             }
             if (!isAuthenticated) {
-                RaiseException("authentication failed [jump_host=" + host + ", jump_port=" + port + ", jump_user:" + user + ", jump_ssh_auth_method="
+                raiseException("authentication failed [jump_host=" + host + ", jump_port=" + port + ", jump_user:" + user + ", jump_ssh_auth_method="
                         + authenticationMethod + ", jump_ssh_auth_file=" + authenticationFilename);
             }
             return this.getSshConnection();
@@ -2067,7 +2067,7 @@ abstract public class SOSFTPCommand {
                     // gracefully ignore this error
                 }
             }
-            RaiseException(e.getMessage());
+            raiseException(e.getMessage());
         }
         return null;
     }
@@ -2076,7 +2076,7 @@ abstract public class SOSFTPCommand {
         try {
             host = getParam(conParamJUMP_HOST, "");
             if (getString(conParamJUMP_HOST).isEmpty()) {
-                RaiseException("no host name or ip address was specified as parameter [jump_host]");
+                raiseException("no host name or ip address was specified as parameter [jump_host]");
             }
             if (getString("jump_port").isEmpty()) {
                 arguments.put("jump_port", "22");
@@ -2085,13 +2085,13 @@ abstract public class SOSFTPCommand {
                 port = Integer.parseInt(getString("jump_port"));
                 getLogger().debug1(".. parameter [jump_port]: " + port);
             } catch (Exception ex) {
-                RaiseException("illegal non-numeric value for parameter [jump_port]: " + getString("jump_port"));
+                raiseException("illegal non-numeric value for parameter [jump_port]: " + getString("jump_port"));
             }
             if (!getString("jump_user").isEmpty()) {
                 user = getString("jump_user");
                 getLogger().debug1(".. parameter [jump_user]: " + user);
             } else {
-                RaiseException("no user name was specified as parameter [jump_user]");
+                raiseException("no user name was specified as parameter [jump_user]");
             }
             if (!getString("jump_password").isEmpty()) {
                 password = getString("jump_password");
@@ -2110,7 +2110,7 @@ abstract public class SOSFTPCommand {
                     proxyPort = Integer.parseInt(getString("jump_proxy_port"));
                     getLogger().debug1(".. parameter [jump_proxy_port]: " + proxyPort);
                 } catch (Exception ex) {
-                    RaiseException("illegal non-numeric value for parameter [jump_proxy_port]: " + getString("jump_proxy_port"));
+                    raiseException("illegal non-numeric value for parameter [jump_proxy_port]: " + getString("jump_proxy_port"));
                 }
             } else {
                 proxyPort = 3128;
@@ -2138,7 +2138,7 @@ abstract public class SOSFTPCommand {
                     authenticationMethod = authMeth;
                     getLogger().debug1(".. parameter [jump_ssh_auth_method]: " + authenticationMethod);
                 } else {
-                    RaiseException("invalid authentication method [publickey, password] specified: " + authMeth);
+                    raiseException("invalid authentication method [publickey, password] specified: " + authMeth);
                 }
             } else {
                 authenticationMethod = "publickey";
@@ -2149,11 +2149,11 @@ abstract public class SOSFTPCommand {
                 getLogger().debug1(".. parameter [jump_ssh_auth_file]: " + authenticationFilename);
             } else {
                 if ("publickey".equalsIgnoreCase(authenticationMethod)) {
-                    RaiseException("no authentication filename was specified as parameter [jump_ssh_auth_file");
+                    raiseException("no authentication filename was specified as parameter [jump_ssh_auth_file");
                 }
             }
         } catch (Exception e) {
-            RaiseException("error occurred processing parameters: " + e.getMessage());
+            raiseException("error occurred processing parameters: " + e.getMessage());
         }
     }
 
@@ -2274,7 +2274,7 @@ abstract public class SOSFTPCommand {
                 hasJumpArguments();
             }
         } catch (Exception e) {
-            RaiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " , cause: " + e.getMessage(), e);
+            raiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " , cause: " + e.getMessage(), e);
         }
     }
 
@@ -2297,7 +2297,7 @@ abstract public class SOSFTPCommand {
             while (it.hasNext()) {
                 key = sosString.parseToString(it.next());
                 value = sosString.parseToString(arg, key);
-                if (Check4MultipleFileSpecs(key)) {
+                if (check4MultipleFileSpecs(key)) {
                     String[] split = value.split("::");
                     Properties newArg = (Properties) arg.clone();
                     newArg.put(conSettingFILE_SPEC, split[0]);
@@ -2345,13 +2345,13 @@ abstract public class SOSFTPCommand {
             }
             list = prepareInstall(list);
         } catch (Exception e) {
-            RaiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " , cause: " + e.getMessage(), e);
+            raiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " , cause: " + e.getMessage(), e);
         }
         list = sortListAtFileSpecNum(list);
         return list;
     }
 
-    private static boolean Check4MultipleFileSpecs(final String pstrRegExp) {
+    private static boolean check4MultipleFileSpecs(final String pstrRegExp) {
         boolean flgMultipleFileSpecs = false;
         int intFileSpecSize = conSettingFILE_SPEC.length();
         if (pstrRegExp.startsWith(conSettingFILE_SPEC) && pstrRegExp.length() > intFileSpecSize) {
@@ -2383,7 +2383,7 @@ abstract public class SOSFTPCommand {
                 }
             }
         } catch (Exception e) {
-            RaiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " , cause: " + e.getMessage(), e);
+            raiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " , cause: " + e.getMessage(), e);
         }
         return sort;
     }
@@ -2411,7 +2411,7 @@ abstract public class SOSFTPCommand {
             }
             return list;
         } catch (Exception e) {
-            RaiseException("..error in " + SOSClassUtil.getMethodName() + " " + e.getMessage(), e);
+            raiseException("..error in " + SOSClassUtil.getMethodName() + " " + e.getMessage(), e);
         }
         return null;
     }
@@ -2508,7 +2508,7 @@ abstract public class SOSFTPCommand {
                     pflgRC = ftpCommand.renameAtomicSuffixTransferFiles();
                 } else {
                     LOGGER.debug(getUsage());
-                    RaiseException("[ERROR] no valid operation was specified, use send|receive|remove|execute|install: " + operation);
+                    raiseException("[ERROR] no valid operation was specified, use send|receive|remove|execute|install: " + operation);
                 }
                 if (logger.hasWarnings()) {
                     ftpCommand.getArguments().put(conParameterSTATUS, "error");
@@ -2627,7 +2627,7 @@ abstract public class SOSFTPCommand {
                     }
                     getLogger().debug("..rename " + f.getCanonicalPath() + " to " + nf.getName());
                     if (!f.renameTo(nf)) {
-                        RaiseException("could not rename temporary file [" + f.getCanonicalPath() + "] to: " + nf.getAbsolutePath());
+                        raiseException("could not rename temporary file [" + f.getCanonicalPath() + "] to: " + nf.getAbsolutePath());
                     }
                 }
             }
@@ -2649,7 +2649,7 @@ abstract public class SOSFTPCommand {
             }
             banner = true;
             if (!rc) {
-                RaiseException("All files have been transferred successfully, however, the transaction could not be completed");
+                raiseException("All files have been transferred successfully, however, the transaction could not be completed");
             }
             return true;
         } catch (Exception e) {
@@ -2855,7 +2855,7 @@ abstract public class SOSFTPCommand {
             arg_s = substituteEnvironment(arg_s);
             return arg_s;
         } catch (Exception e) {
-            RaiseException("error in " + sos.util.SOSClassUtil.getMethodName() + ": cause: " + e.getMessage(), e);
+            raiseException("error in " + sos.util.SOSClassUtil.getMethodName() + ": cause: " + e.getMessage(), e);
         }
         return null;
     }
@@ -2865,11 +2865,11 @@ abstract public class SOSFTPCommand {
             String operation = sosConfiguration.getConfigurationItemByName(conSettingOPERATION).getValue();
             if (sosString.parseToString(operation).isEmpty()) {
                 logger.warn(getUsage());
-                RaiseException("missing command line parameter: operation");
+                raiseException("missing command line parameter: operation");
             }
             return operation;
         } catch (Exception e) {
-            RaiseException("error in " + sos.util.SOSClassUtil.getMethodName() + ": cause: " + e.getMessage(), e);
+            raiseException("error in " + sos.util.SOSClassUtil.getMethodName() + ": cause: " + e.getMessage(), e);
         }
         return null;
     }
@@ -3219,7 +3219,7 @@ abstract public class SOSFTPCommand {
         return strRet;
     }
 
-    protected static void RaiseException(final Exception e, final String pstrM) {
+    protected static void raiseException(final Exception e, final String pstrM) {
         try {
             logger.error(pstrM);
         } catch (Exception e1) {
@@ -3232,12 +3232,12 @@ abstract public class SOSFTPCommand {
         }
     }
 
-    protected static void RaiseException(final String pstrM, final Exception e) throws Exception {
-        RaiseException(e, pstrM);
+    protected static void raiseException(final String pstrM, final Exception e) throws Exception {
+        raiseException(e, pstrM);
     }
 
-    protected static void RaiseException(final String pstrM) throws Exception {
-        RaiseException(null, pstrM);
+    protected static void raiseException(final String pstrM) throws Exception {
+        raiseException(null, pstrM);
     }
 
     protected boolean isAPathName(final String pstrFileAndPathName) {
@@ -3249,7 +3249,7 @@ abstract public class SOSFTPCommand {
             if (lstrPathName.contains(":/") || lstrPathName.startsWith("/")) {
                 flgOK = true;
             } else {
-                flgOK = lstrPathName.contains("/") == true;
+                flgOK = lstrPathName.contains("/");
             }
         }
         return flgOK;

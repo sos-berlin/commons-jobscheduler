@@ -36,9 +36,9 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch {
             if (!vfsHandler.isConnected()) {
                 SOSConnection2OptionsAlternate postAlternateOptions = getAlternateOptions(objOptions);
                 postAlternateOptions.raiseExceptionOnError.value(false);
-                vfsHandler.Connect(postAlternateOptions);
+                vfsHandler.connect(postAlternateOptions);
             }
-            vfsHandler.Authenticate(objOptions);
+            vfsHandler.authenticate(objOptions);
             LOGGER.debug("connection for kill commands established");
         } catch (Exception e) {
             throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
@@ -52,8 +52,8 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch {
         getOptions().checkMandatory();
         try {
             SOSConnection2OptionsAlternate alternateOptions = getAlternateOptions(objOptions);
-            vfsHandler.Connect(alternateOptions);
-            vfsHandler.Authenticate(objOptions);
+            vfsHandler.connect(alternateOptions);
+            vfsHandler.authenticate(objOptions);
             LOGGER.debug("connection established");
         } catch (Exception e) {
             throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
@@ -122,14 +122,14 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch {
             killCommand = ssh_job_kill_pid_command.replace(PID_PLACEHOLDER, pid.toString());
         }
         if (ssh_job_kill_pid_command.contains(USER_PLACEHOLDER)) {
-            killCommand = killCommand.replace(USER_PLACEHOLDER, objOptions.UserName.Value());
+            killCommand = killCommand.replace(USER_PLACEHOLDER, objOptions.userName.getValue());
         }
         if (ssh_job_kill_pid_command.contains(COMMAND_PLACEHOLDER)) {
-            killCommand = killCommand.replace(COMMAND_PLACEHOLDER, objOptions.command.Value());
+            killCommand = killCommand.replace(COMMAND_PLACEHOLDER, objOptions.command.getValue());
         }
         String stdErr = "";
         try {
-            vfsHandler.ExecuteCommand(killCommand);
+            vfsHandler.executeCommand(killCommand);
         } catch (Exception e) {
             if (vfsHandler.getExitCode() != 0) {
                 try {
@@ -159,8 +159,8 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch {
     }
 
     private void getKillCommandFromJobParameters() {
-        if (objOptions.sshJobKillPidCommand.isDirty() && !objOptions.sshJobKillPidCommand.Value().isEmpty()) {
-            ssh_job_kill_pid_command = objOptions.sshJobKillPidCommand.Value();
+        if (objOptions.sshJobKillPidCommand.isDirty() && !objOptions.sshJobKillPidCommand.getValue().isEmpty()) {
+            ssh_job_kill_pid_command = objOptions.sshJobKillPidCommand.getValue();
             LOGGER.debug("Command to kill from Job Parameter used!");
         } else {
             if (flgIsWindowsShell) {
@@ -180,13 +180,13 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch {
         objOptions.ignoreError.value(true);
         try {
             String command;
-            if (objOptions.getSshJobGetChildProcessesCommand().Value().contains(PID_PLACEHOLDER)) {
-                command = objOptions.getSshJobGetChildProcessesCommand().Value().replace(PID_PLACEHOLDER, pPid.toString());
+            if (objOptions.getSshJobGetChildProcessesCommand().getValue().contains(PID_PLACEHOLDER)) {
+                command = objOptions.getSshJobGetChildProcessesCommand().getValue().replace(PID_PLACEHOLDER, pPid.toString());
             } else {
-                command = objOptions.getSshJobGetChildProcessesCommand().Value();
+                command = objOptions.getSshJobGetChildProcessesCommand().getValue();
             }
             LOGGER.debug("***Execute read children of pid command!***");
-            vfsHandler.ExecuteCommand(command);
+            vfsHandler.executeCommand(command);
             BufferedReader reader = new BufferedReader(new StringReader(new String(vfsHandler.getStdOut())));
             String line = null;
             while ((line = reader.readLine()) != null) {

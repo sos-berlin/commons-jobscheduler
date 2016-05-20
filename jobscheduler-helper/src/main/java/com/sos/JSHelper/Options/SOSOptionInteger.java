@@ -19,7 +19,7 @@ public class SOSOptionInteger extends SOSOptionElement {
     public void value(final int pintval) {
         try {
             intValue = pintval;
-            this.Value(new Integer(pintval).toString());
+            this.setValue(new Integer(pintval).toString());
         } catch (final Exception e) {
             //
         }

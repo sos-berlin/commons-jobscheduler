@@ -45,7 +45,7 @@ public class SOSVfsConnectionFactory {
                 objConnPoolTarget = new SOSVfsConnectionPool();
                 for (int i = 0; i < intMaxParallelTransfers; i++) {
                     objConnPoolSource.add(getVfsHandler(true));
-                    if (objOptions.NeedTargetClient()) {
+                    if (objOptions.isNeedTargetClient()) {
                         objConnPoolTarget.add(getVfsHandler(false));
                     }
                 }
@@ -61,22 +61,22 @@ public class SOSVfsConnectionFactory {
             SOSConnection2OptionsAlternate options;
             String dataType;
             if (isSource) {
-                options = objOptions.getConnectionOptions().Source();
+                options = objOptions.getConnectionOptions().getSource();
                 dataType = objOptions.getDataSourceType();
             } else {
-                options = objOptions.getConnectionOptions().Target();
+                options = objOptions.getConnectionOptions().getTarget();
                 dataType = objOptions.getDataTargetType();
             }
-            options.loadClassName.SetIfNotDirty(objOptions.getConnectionOptions().loadClassName);
+            options.loadClassName.setIfNotDirty(objOptions.getConnectionOptions().loadClassName);
             VFSFactory.setConnectionOptions(options);
             handler = prepareVFSHandler(handler, dataType, isSource);
             ISOSVfsFileTransfer client = (ISOSVfsFileTransfer) handler;
             try {
-                handler.Connect(options);
-                handler.Authenticate(options);
+                handler.connect(options);
+                handler.authenticate(options);
                 handleClient(client, options, isSource);
             } catch (Exception e) {
-                SOSConnection2OptionsAlternate alternatives = options.Alternatives();
+                SOSConnection2OptionsAlternate alternatives = options.getAlternatives();
                 if (alternatives.optionsHaveMinRequirements()) {
                     LOGGER.warn(String.format("Connection failed : %s", e.toString()));
                     LOGGER.info(String.format("Try again using the alternate options ..."));
@@ -87,11 +87,11 @@ public class SOSVfsConnectionFactory {
                     } catch (Exception ce) {
                         LOGGER.warn(String.format("client disconnect failed : %s", ce.toString()));
                     }
-                    handler = prepareVFSHandler(handler, alternatives.protocol.Value(), isSource);
+                    handler = prepareVFSHandler(handler, alternatives.protocol.getValue(), isSource);
                     client = (ISOSVfsFileTransfer) handler;
-                    handler.Connect(alternatives);
-                    handler.Authenticate(alternatives);
-                    options.AlternateOptionsUsed.value(true);
+                    handler.connect(alternatives);
+                    handler.authenticate(alternatives);
+                    options.alternateOptionsUsed.value(true);
                     handleClient(client, alternatives, isSource);
                 } else {
                     LOGGER.error(String.format("Connection failed : %s", e.toString()));
@@ -109,7 +109,7 @@ public class SOSVfsConnectionFactory {
 
     private ISOSVFSHandler prepareVFSHandler(ISOSVFSHandler handler, final String dataType, final boolean isSource) throws Exception {
         handler = VFSFactory.getHandler(dataType);
-        handler.Options(objOptions);
+        handler.getOptions(objOptions);
         if (isSource) {
             handler.setSource();
         } else {
@@ -131,12 +131,12 @@ public class SOSVfsConnectionFactory {
         if (objOptions.passiveMode.value() || options.passiveMode.isTrue()) {
             client.passive();
         }
-        if (options.transferMode.isDirty() && options.transferMode.IsNotEmpty()) {
-            client.TransferMode(options.transferMode);
+        if (options.transferMode.isDirty() && options.transferMode.isNotEmpty()) {
+            client.transferMode(options.transferMode);
         } else {
-            client.TransferMode(objOptions.transferMode);
+            client.transferMode(objOptions.transferMode);
         }
-        client.ControlEncoding(objOptions.controlEncoding.Value());
+        client.controlEncoding(objOptions.controlEncoding.getValue());
     }
 
     public void clear() {

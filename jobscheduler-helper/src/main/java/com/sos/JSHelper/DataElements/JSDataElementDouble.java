@@ -9,13 +9,13 @@ public class JSDataElementDouble extends JSDataElementNumeric {
     }
 
     public JSDataElementDouble(String pstrValue) {
-        super.Value(pstrValue);
+        super.setValue(pstrValue);
         dblValue = getDouble();
     }
 
     public JSDataElementDouble(String pPstrValue, String pstrDescription) {
         this(pPstrValue);
-        this.Description(pstrDescription);
+        this.description(pstrDescription);
     }
 
     public JSDataElementDouble(String pPstrValue, String pPstrDescription, int pPintSize, int pPintPos, String pPstrFormatString,
@@ -29,7 +29,7 @@ public class JSDataElementDouble extends JSDataElementNumeric {
     }
 
     public void Value(double pdblValue) {
-        super.Value(new Double(pdblValue).toString());
+        super.setValue(new Double(pdblValue).toString());
         dblValue = pdblValue;
     }
 
@@ -39,33 +39,33 @@ public class JSDataElementDouble extends JSDataElementNumeric {
 
     @Override
     public void doInit() {
-        super.FormatString("15.3f");
-        super.Description("Double");
-        super.ColumnHeader("Double");
-        super.XMLTagName("Double");
+        super.setFormatString("15.3f");
+        super.description("Double");
+        super.columnHeader("Double");
+        super.xmlTagName("Double");
     }
 
     protected double toDouble() throws Exception {
-        dblValue = toDouble(this.Value());
+        dblValue = toDouble(this.getValue());
         return dblValue;
     }
 
     @Override
-    public String FormattedValue() {
-        String strFormat = super.FormatString();
+    public String getFormattedValue() {
+        String strFormat = super.getFormatString();
         if (isNotEmpty(strFormat)) {
             String strFormatted = String.format("%1$" + strFormat, dblValue);
             strFormatted = strFormatted.replace(",", ".");
             return strFormatted.trim();
         }
-        return super.Value();
+        return super.getValue();
     }
 
     @Override
-    public void Value(final String pstrValue) {
+    public void setValue(final String pstrValue) {
         try {
             dblValue = toDouble(pstrValue);
-            super.Value(new Double(dblValue).toString());
+            super.setValue(new Double(dblValue).toString());
         } catch (Exception objException) {
             // TO DO: handle exception
         }

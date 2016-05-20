@@ -18,7 +18,7 @@ public class SOSOptionHexString extends SOSOptionFileString {
     }
 
     @Override
-    public String Value() {
+    public String getValue() {
         String strV = strValue;
         if (isNotEmpty(strV) && isHex(strV)) {
             try {

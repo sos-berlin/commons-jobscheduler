@@ -26,7 +26,7 @@ public class SOSOptionUrl extends SOSOptionString {
     }
 
     @Override
-    public void Value(final String pstrUrl) {
+    public void setValue(final String pstrUrl) {
         if (isNotEmpty(pstrUrl)) {
             // Possible Elements of an URL are:
             //
@@ -42,7 +42,7 @@ public class SOSOptionUrl extends SOSOptionString {
             String strUrl = pstrUrl;
             try {
                 objURL = new URL(strUrl);
-                super.Value(pstrUrl);
+                super.setValue(pstrUrl);
             } catch (MalformedURLException e) {
                 throw new JobSchedulerException(String.format("invalid url '%1$s' specified", pstrUrl), e);
                 // not a valid url. ignore it, because it could be a host name
@@ -61,7 +61,7 @@ public class SOSOptionUrl extends SOSOptionString {
             strPort = String.valueOf(objURL.getDefaultPort());
         }
         setIfNotDirty(pobjO.getPort(), strPort);
-        pobjO.getProtocol().Value(objURL.getProtocol());
+        pobjO.getProtocol().setValue(objURL.getProtocol());
         String strUserInfo = objURL.getUserInfo();
         String[] strU = strUserInfo.split(":");
         setIfNotDirty(pobjO.getUser(), strU[0]);
@@ -90,7 +90,7 @@ public class SOSOptionUrl extends SOSOptionString {
     private void setIfNotDirty(final SOSOptionElement objOption, final String pstrValue) {
         if (objOption.isNotDirty() && isNotEmpty(pstrValue)) {
             logger.trace("setValue = " + pstrValue);
-            objOption.Value(pstrValue);
+            objOption.setValue(pstrValue);
         }
     }
 

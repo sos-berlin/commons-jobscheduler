@@ -11,13 +11,12 @@ public class JobSchedulerException extends RuntimeException {
 
     protected String strMessage = null;
     protected SOSMsg objSOSMsg = null;
-    private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = Logger.getLogger(JobSchedulerException.class);
     private int intStatus = SUCCESS;
-    private int intErrorNumber = 0;
     private Exception nestedException;
+    private int intErrorNumber = 0;
     private String strCategory = "???";
-    private String strTyp = "???";
+    private String strType = "???";
     private JSOptionsClass objOptions = null;
     private String strAdditionalText = null;
     private String streMailSubject = null;
@@ -52,25 +51,17 @@ public class JobSchedulerException extends RuntimeException {
         super("*** JobSchedulerException ***");
     }
 
-    public void ErrorNumber(final int pintErrorNumber) {
-        intErrorNumber = pintErrorNumber;
-    }
-
-    public int ErrorNumber() {
-        return intErrorNumber;
-    }
-
     public JobSchedulerException(final String pstrMessage) {
         super(pstrMessage);
         setMessage(pstrMessage);
-        this.Status(JobSchedulerException.ERROR);
+        this.setStatus(JobSchedulerException.ERROR);
     }
 
     public JobSchedulerException(final SOSMsg pobjMsg) {
         super(pobjMsg.get());
         objSOSMsg = pobjMsg;
         setMessage(pobjMsg.get());
-        this.Status(JobSchedulerException.ERROR);
+        this.setStatus(JobSchedulerException.ERROR);
     }
 
     public JobSchedulerException(final String pstrMessage, final Exception e) {
@@ -79,6 +70,26 @@ public class JobSchedulerException extends RuntimeException {
         saveException(e);
     }
 
+    public JobSchedulerException(final SOSMsg pobjMsg, final Exception e) {
+        super(pobjMsg.get());
+        strMessage = pobjMsg.get();
+        objSOSMsg = pobjMsg;
+        setMessage(strMessage + " (" + e.getLocalizedMessage() + ")");
+        saveException(e);
+    }
+    public JobSchedulerException(final Exception e) {
+        super(e.getLocalizedMessage());
+        setMessage(e.getLocalizedMessage());
+        saveException(e);
+    }
+
+    public void setErrorNumber(final int pintErrorNumber) {
+        intErrorNumber = pintErrorNumber;
+    }
+
+    public int getErrorNumber() {
+        return intErrorNumber;
+    }
     private void saveException(final Exception e) {
         nestedException = e;
         if (e instanceof JobSchedulerException) {
@@ -95,20 +106,6 @@ public class JobSchedulerException extends RuntimeException {
         }
     }
 
-    public JobSchedulerException(final SOSMsg pobjMsg, final Exception e) {
-        super(pobjMsg.get());
-        strMessage = pobjMsg.get();
-        objSOSMsg = pobjMsg;
-        setMessage(strMessage + " (" + e.getMessage() + ")");
-        saveException(e);
-    }
-
-    public JobSchedulerException(final Exception e) {
-        super(e.getMessage());
-        setMessage(e.getMessage());
-        saveException(e);
-    }
-
     public void setMessage(final String pstrMsg) {
         strMessage = pstrMsg;
         LastErrorMessage += pstrMsg + "\n";
@@ -123,7 +120,7 @@ public class JobSchedulerException extends RuntimeException {
         return this;
     }
 
-    public int Status() {
+    public int getStatus() {
         if (intStatus == UNDEFINED) {
             intStatus = PENDING;
         }
@@ -134,7 +131,7 @@ public class JobSchedulerException extends RuntimeException {
         intStatus = status;
     }
 
-    public String StatusAction() {
+    public String getStatusAction() {
         String strT;
         switch (intStatus) {
         case JobSchedulerException.ERROR:
@@ -165,7 +162,7 @@ public class JobSchedulerException extends RuntimeException {
         return strT;
     }
 
-    public String StatusText() {
+    public String getStatusText() {
         String strT;
         switch (intStatus) {
         case JobSchedulerException.ERROR:
@@ -193,44 +190,44 @@ public class JobSchedulerException extends RuntimeException {
         return strT;
     }
 
-    public JobSchedulerException Status(final int pintStatus) {
+    public JobSchedulerException setStatus(final int pintStatus) {
         intStatus = pintStatus;
         return this;
     }
 
-    public String Category() {
+    public String getCategory() {
         return strCategory;
     }
 
-    public JobSchedulerException Category(final String pstrCategory) {
+    public JobSchedulerException setCategory(final String pstrCategory) {
         strCategory = pstrCategory;
         return this;
     }
 
-    public String Typ() {
-        return strTyp;
+    public String getType() {
+        return strType;
     }
 
-    public JobSchedulerException Typ(final String pstrTyp) {
-        strTyp = pstrTyp;
+    public JobSchedulerException setType(final String pstrTyp) {
+        strType = pstrTyp;
         return this;
     }
 
-    public String Message() {
+    public String getMessage() {
         return strMessage;
     }
 
-    public JobSchedulerException Message(final String pstrMessage) {
+    public JobSchedulerException message(final String pstrMessage) {
         strMessage = pstrMessage;
         return this;
     }
 
-    public String ExceptionText() {
+    public String getExceptionText() {
         String strT = "";
         strT += getText("Message ", strMessage);
         strT += "\n\n";
         strT += getText("Category", strCategory);
-        strT += getText("Type    ", strTyp);
+        strT += getText("Type    ", strType);
         if (objOptions != null) {
             strT += "\nOptions active:";
             strT += objOptions.toString();
@@ -240,14 +237,14 @@ public class JobSchedulerException extends RuntimeException {
         }
         if (intStatus != NONE) {
             strT += "\nfurther Actions:\n\n";
-            strT += StatusAction() + "\n";
+            strT += getStatusAction() + "\n";
         }
         if (nestedException != null) {
             strT += "\n" + nestedException.getMessage();
             strT += "\n" + nestedException.toString();
-            strT += "\nStackTrace of nested Exception:\n" + StackTrace2String(nestedException) + "\n";
+            strT += "\nStackTrace of nested Exception:\n" + stackTrace2String(nestedException) + "\n";
         } else {
-            strT += "\nStackTrace :\n" + StackTrace2String(this) + "\n";
+            strT += "\nStackTrace :\n" + stackTrace2String(this) + "\n";
         }
         return strT;
     }
@@ -260,7 +257,7 @@ public class JobSchedulerException extends RuntimeException {
         }
     }
 
-    public String StackTrace2String(final Exception e) {
+    public String stackTrace2String(final Exception e) {
         String strT = "";
         final StackTraceElement arrStack[] = e.getStackTrace();
         for (final StackTraceElement objS : arrStack) {
@@ -269,25 +266,25 @@ public class JobSchedulerException extends RuntimeException {
         return strT;
     }
 
-    public JobSchedulerException Options(final JSOptionsClass pobjOptions) {
+    public JobSchedulerException setOptions(final JSOptionsClass pobjOptions) {
         objOptions = pobjOptions;
         return this;
     }
 
-    public String AdditionalText() {
+    public String getAdditionalText() {
         return strAdditionalText;
     }
 
-    public JobSchedulerException AdditionalText(final String pstrAdditionalText) {
+    public JobSchedulerException setAdditionalText(final String pstrAdditionalText) {
         strAdditionalText = pstrAdditionalText;
         return this;
     }
 
     public String eMailSubject() {
         if (streMailSubject == null) {
-            streMailSubject = "JS: " + StatusText() + " - " + strMessage;
+            streMailSubject = "JS: " + getStatusText() + " - " + strMessage;
         } else {
-            streMailSubject = "JS: " + StatusText() + " - " + streMailSubject;
+            streMailSubject = "JS: " + getStatusText() + " - " + streMailSubject;
         }
         return streMailSubject;
     }

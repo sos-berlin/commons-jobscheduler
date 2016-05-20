@@ -21,10 +21,10 @@ public class JSDataElementDateISO extends JSDataElement {
 
     @Override
     public void doInit() {
-        super.Description("DateISO");
-        super.ColumnHeader("DateISO");
-        super.XMLTagName("DateISO");
-        super.OmitXMLTag(true);
+        super.description("DateISO");
+        super.columnHeader("DateISO");
+        super.xmlTagName("DateISO");
+        super.omitXMLTag(true);
     }
 
 }

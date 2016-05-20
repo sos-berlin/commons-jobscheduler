@@ -42,7 +42,7 @@ public class JSExceptionInputFileNotFound extends JobSchedulerException {
      * @param pstrMessage */
     public JSExceptionInputFileNotFound(String pstrMessage) {
         super(pstrMessage);
-        this.Status(JobSchedulerException.WARNING);
+        this.setStatus(JobSchedulerException.WARNING);
     }
 
     /** \brief JSExceptionInputFileNotFound
@@ -50,7 +50,7 @@ public class JSExceptionInputFileNotFound extends JobSchedulerException {
      * \details Construtor without message. */
     public JSExceptionInputFileNotFound() {
         super("Input File not found");
-        this.Status(JobSchedulerException.WARNING);
+        this.setStatus(JobSchedulerException.WARNING);
     }
 
 }

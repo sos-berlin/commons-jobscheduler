@@ -36,25 +36,29 @@ import javax.mail.internet.MimePart;
 
 public class Message {
 
-    private MimeMessage _msg;
-    private final Properties _properties = System.getProperties();
-    private Session _session = null;
-    private byte[] _body;
-    private final List _attachments = new LinkedList();
-    private final ArrayList file_input_streams = new ArrayList();
-    private String _smtp_user_name = "";
-    private String _smtp_password = "";
-    private String _encoding;
-    private String _content_type;
-    private boolean _built = false;
-    static final int current_version = 2;
+    private MimeMessage msg;
+    private final Properties properties = System.getProperties();
+    private Session session = null;
+    private byte[] body;
+    private final List attachments = new LinkedList();
+    private final ArrayList fileInputStreams = new ArrayList();
+    private String smtpUserName = "";
+    private String smtpPassword = "";
+    private String encoding;
+    private String contentType;
+    private boolean built = false;
+    static final int CURRENT_VERSION = 2;
 
-    abstract class My_data_source implements DataSource {
+    public Message() {
+        msg = new MimeMessage(getSession());
+    }
+
+    abstract class MyDataSource implements DataSource {
 
         final String name;
         final String content_type;
 
-        public My_data_source(final File new_filename, final String content_type) {
+        public MyDataSource(final File new_filename, final String content_type) {
             name = new_filename.getName();
             this.content_type = content_type;
         }
@@ -75,11 +79,11 @@ public class Message {
         }
     }
 
-    class Byte_array_data_source extends My_data_source {
+    class ByteArrayDataSource extends MyDataSource {
 
         final byte[] byte_array;
 
-        public Byte_array_data_source(final byte[] byte_array, final File new_filename, final String content_type) {
+        public ByteArrayDataSource(final byte[] byte_array, final File new_filename, final String content_type) {
             super(new_filename, content_type);
             this.byte_array = byte_array;
         }
@@ -90,11 +94,11 @@ public class Message {
         }
     }
 
-    class File_data_source extends My_data_source {
+    class FileDataSource extends MyDataSource {
 
         final File file;
 
-        public File_data_source(final File file, final File new_filename, final String content_type) {
+        public FileDataSource(final File file, final File new_filename, final String content_type) {
             super(new_filename, content_type);
             this.file = file;
         }
@@ -102,28 +106,24 @@ public class Message {
         @Override
         public InputStream getInputStream() throws IOException {
             FileInputStream f = new FileInputStream(file);
-            file_input_streams.add(f);
+            fileInputStreams.add(f);
             return f;
         }
     }
 
-    public class My_authenticator extends Authenticator {
+    public class MyAuthenticator extends Authenticator {
 
         @Override
         public PasswordAuthentication getPasswordAuthentication() {
-            return new PasswordAuthentication(_smtp_user_name, _smtp_password);
+            return new PasswordAuthentication(smtpUserName, smtpPassword);
         }
-    }
-
-    public Message() {
-        _msg = new MimeMessage(get_session());
     }
 
     public void close() throws Exception {
         Exception exception = null;
-        for (int i = 0; i < file_input_streams.size(); i++) {
+        for (int i = 0; i < fileInputStreams.size(); i++) {
             try {
-                ((FileInputStream) file_input_streams.get(i)).close();
+                ((FileInputStream) fileInputStreams.get(i)).close();
             } catch (Exception x) {
                 if (exception == null) {
                     exception = x;
@@ -135,64 +135,64 @@ public class Message {
         }
     }
 
-    public void need_version(final int version) throws Exception {
-        if (version > current_version) {
+    public void needVersion(final int version) throws Exception {
+        if (version > CURRENT_VERSION) {
             throw new Exception("Class sos.mail.Message (sos.mail.jar) is not up to date");
         }
     }
 
-    private Session get_session() {
-        if (_session == null) {
-            _session = Session.getInstance(_properties, new My_authenticator());
+    private Session getSession() {
+        if (session == null) {
+            session = Session.getInstance(properties, new MyAuthenticator());
         }
-        return _session;
+        return session;
     }
 
     public void set(final String what, final byte[] value) throws AddressException, MessagingException, UnsupportedEncodingException {
         if ("smtp".equals(what)) {
-            _properties.put("mail.smtp.host", new String(value, "iso8859-1"));
+            properties.put("mail.smtp.host", new String(value, "iso8859-1"));
         } else if ("from".equals(what)) {
             InternetAddress[] addr = InternetAddress.parse(new String(value, "iso8859-1"));
             if (addr.length != 0) {
-                _msg.setFrom(addr[0]);
+                msg.setFrom(addr[0]);
             }
         } else if ("reply-to".equals(what)) {
-            _msg.setReplyTo(InternetAddress.parse(new String(value, "iso8859-1")));
+            msg.setReplyTo(InternetAddress.parse(new String(value, "iso8859-1")));
         } else if ("to".equals(what)) {
-            _msg.setRecipients(RecipientType.TO, InternetAddress.parse(new String(value, "iso8859-1")));
+            msg.setRecipients(RecipientType.TO, InternetAddress.parse(new String(value, "iso8859-1")));
         } else if ("cc".equals(what)) {
-            _msg.setRecipients(RecipientType.CC, InternetAddress.parse(new String(value, "iso8859-1")));
+            msg.setRecipients(RecipientType.CC, InternetAddress.parse(new String(value, "iso8859-1")));
         } else if ("bcc".equals(what)) {
-            _msg.setRecipients(RecipientType.BCC, InternetAddress.parse(new String(value, "iso8859-1")));
+            msg.setRecipients(RecipientType.BCC, InternetAddress.parse(new String(value, "iso8859-1")));
         } else if ("subject".equals(what)) {
-            _msg.setSubject(new String(value, "iso8859-1"));
+            msg.setSubject(new String(value, "iso8859-1"));
         } else if ("body".equals(what)) {
-            _body = value;
+            body = value;
         } else if ("content_type".equals(what)) {
-            _content_type = new String(value, "iso8859-1");
+            contentType = new String(value, "iso8859-1");
         } else if ("encoding".equals(what)) {
-            _encoding = new String(value, "iso8859-1");
+            encoding = new String(value, "iso8859-1");
         } else if ("send_rfc822".equals(what)) {
-            _msg = new MimeMessage(get_session(), new ByteArrayInputStream(value));
+            msg = new MimeMessage(getSession(), new ByteArrayInputStream(value));
             send2();
         } else if ("debug".equals(what)) {
-            get_session().setDebug("1".equals(new String(value, "iso8859-1")));
+            getSession().setDebug("1".equals(new String(value, "iso8859-1")));
         } else {
             throw new RuntimeException("sos.mail.Message.set: what");
         }
     }
 
-    public void set_property(final String name, final String value) {
+    public void setProperty(final String name, final String value) {
         if ("mail.smtp.user".equals(name)) {
-            _smtp_user_name = value;
+            smtpUserName = value;
         } else if ("mail.smtp.password".equals(name)) {
-            _smtp_password = value;
+            smtpPassword = value;
         } else {
-            _properties.put(name, value);
+            properties.put(name, value);
         }
     }
 
-    private String string_from_addresses(final Address[] addresses) {
+    private String stringFromAddresses(final Address[] addresses) {
         if (addresses == null) {
             return "";
         }
@@ -208,60 +208,60 @@ public class Message {
 
     public String get(final String what) throws Exception {
         if ("smtp".equals(what)) {
-            return (String) _properties.get("mail.smtp.host");
+            return (String) properties.get("mail.smtp.host");
         } else if ("from".equals(what)) {
-            return string_from_addresses(_msg.getFrom());
+            return stringFromAddresses(msg.getFrom());
         } else if ("reply-to".equals(what)) {
-            return string_from_addresses(_msg.getReplyTo());
+            return stringFromAddresses(msg.getReplyTo());
         } else if ("to".equals(what)) {
-            return string_from_addresses(_msg.getRecipients(RecipientType.TO));
+            return stringFromAddresses(msg.getRecipients(RecipientType.TO));
         } else if ("cc".equals(what)) {
-            return string_from_addresses(_msg.getRecipients(RecipientType.CC));
+            return stringFromAddresses(msg.getRecipients(RecipientType.CC));
         } else if ("bcc".equals(what)) {
-            return string_from_addresses(_msg.getRecipients(RecipientType.BCC));
+            return stringFromAddresses(msg.getRecipients(RecipientType.BCC));
         } else if ("subject".equals(what)) {
-            return _msg.getSubject();
+            return msg.getSubject();
         } else if ("body".equals(what)) {
-            return _body == null ? "" : new String(_body, "iso8859-1");
+            return body == null ? "" : new String(body, "iso8859-1");
         } else if ("rfc822_text".equals(what)) {
             build();
             ByteArrayOutputStream os = new ByteArrayOutputStream();
-            _msg.writeTo(os);
+            msg.writeTo(os);
             return os.toString();
         } else {
             throw new RuntimeException("sos.mail.Message.get: what=\"" + what + "\" ist unbekannt");
         }
     }
 
-    public void add_header_field(final String name, final String value) throws MessagingException {
-        _msg.setHeader(name, value);
+    public void addHeaderField(final String name, final String value) throws MessagingException {
+        msg.setHeader(name, value);
     }
 
-    public void add_file(final String real_filename, String new_filename, String content_type, final String encoding) throws Exception {
-        if (new_filename == null || new_filename.isEmpty()) {
-            new_filename = real_filename;
+    public void addFile(final String realFilename, String newFilename, String contentType, final String encoding) throws Exception {
+        if (newFilename == null || newFilename.isEmpty()) {
+            newFilename = realFilename;
         }
-        if (content_type == null || content_type.isEmpty()) {
-            content_type = FileTypeMap.getDefaultFileTypeMap().getContentType(new_filename);
+        if (contentType == null || contentType.isEmpty()) {
+            contentType = FileTypeMap.getDefaultFileTypeMap().getContentType(newFilename);
         }
         MimeBodyPart attachment = new MimeBodyPart();
-        DataSource data_source = new File_data_source(new File(real_filename), new File(new_filename), content_type);
+        DataSource data_source = new FileDataSource(new File(realFilename), new File(newFilename), contentType);
         DataHandler data_handler = new DataHandler(data_source);
         attachment.setDataHandler(data_handler);
         attachment.setFileName(data_handler.getName());
-        _attachments.add(attachment);
+        attachments.add(attachment);
     }
 
-    public void add_attachment(final byte[] data, final String filename, String content_type, final String encoding) throws MessagingException {
-        if (content_type.isEmpty()) {
-            content_type = FileTypeMap.getDefaultFileTypeMap().getContentType(filename);
+    public void addAttachment(final byte[] data, final String filename, String contentType, final String encoding) throws MessagingException {
+        if (contentType.isEmpty()) {
+            contentType = FileTypeMap.getDefaultFileTypeMap().getContentType(filename);
         }
         MimeBodyPart attachment = new MimeBodyPart();
-        DataSource data_source = new Byte_array_data_source(data, new File(filename), content_type);
+        DataSource data_source = new ByteArrayDataSource(data, new File(filename), contentType);
         DataHandler data_handler = new DataHandler(data_source);
         attachment.setDataHandler(data_handler);
         attachment.setFileName(data_handler.getName());
-        _attachments.add(attachment);
+        attachments.add(attachment);
     }
 
     public void send() throws Exception {
@@ -270,38 +270,38 @@ public class Message {
     }
 
     public void build() throws Exception {
-        if (_built) {
+        if (built) {
             return;
         }
-        _msg.setSentDate(new Date());
-        if (_content_type == null || "".equals(_content_type)) {
-            _content_type = "text/plain";
+        msg.setSentDate(new Date());
+        if (contentType == null || "".equals(contentType)) {
+            contentType = "text/plain";
         }
-        if (_attachments.isEmpty()) {
-            set_body_in(_msg);
+        if (attachments.isEmpty()) {
+            setBodyIn(msg);
         } else {
             MimeMultipart multipart = new MimeMultipart();
             MimeBodyPart b = new MimeBodyPart();
-            set_body_in(b);
+            setBodyIn(b);
             multipart.addBodyPart(b);
-            ListIterator i = _attachments.listIterator();
+            ListIterator i = attachments.listIterator();
             while (i.hasNext()) {
                 multipart.addBodyPart((BodyPart) i.next());
             }
-            _msg.setContent(multipart);
+            msg.setContent(multipart);
         }
-        _built = true;
+        built = true;
     }
 
-    private void set_body_in(final MimePart body_part) throws Exception {
-        body_part.setContent(new String(_body, "iso8859-1"), _content_type);
+    private void setBodyIn(final MimePart bodyPart) throws Exception {
+        bodyPart.setContent(new String(body, "iso8859-1"), contentType);
     }
 
     protected void send2() throws MessagingException, NoSuchProviderException {
-        if (!_smtp_user_name.isEmpty()) {
-            _properties.put("mail.smtp.auth", "true");
+        if (!smtpUserName.isEmpty()) {
+            properties.put("mail.smtp.auth", "true");
         }
-        Transport.send(_msg);
+        Transport.send(msg);
     }
 
 }

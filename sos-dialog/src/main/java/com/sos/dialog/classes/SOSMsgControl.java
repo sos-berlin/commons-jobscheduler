@@ -36,7 +36,7 @@ public abstract class SOSMsgControl extends SOSMsg {
 
     public abstract SOSMsgControl newMsg(final String pstrMessageCode);
 
-    public Text Control(final Text pobjC) {
+    public Text control(final Text pobjC) {
         pobjC.setToolTipText(tooltip());
         setKeyListener(pobjC);
         pobjC.addFocusListener(new FocusAdapter() {
@@ -72,59 +72,59 @@ public abstract class SOSMsgControl extends SOSMsg {
         return pobjC;
     }
 
-    public Label Control(final Label pobjC) {
+    public Label control(final Label pobjC) {
         pobjC.setText(label());
         pobjC.setToolTipText(this.tooltip());
         setKeyListener(pobjC);
         return pobjC;
     }
 
-    public Group Control(final Group pobjC) {
+    public Group control(final Group pobjC) {
         pobjC.setText(caption());
         pobjC.setToolTipText(tooltip());
         setKeyListener(pobjC);
         return pobjC;
     }
 
-    public Button Control(final Button pobjC) {
+    public Button control(final Button pobjC) {
         pobjC.setText(caption());
         pobjC.setToolTipText(tooltip());
         setKeyListener(pobjC);
         return pobjC;
     }
 
-    public Combo Control(final Combo pobjC) {
+    public Combo control(final Combo pobjC) {
         pobjC.setText(caption());
         pobjC.setToolTipText(tooltip());
         setKeyListener(pobjC);
         return pobjC;
     }
 
-    public Composite Control(final Composite pobjC) {
+    public Composite control(final Composite pobjC) {
         pobjC.setToolTipText(tooltip());
         setKeyListener(pobjC);
         return pobjC;
     }
 
-    public CCombo Control(final CCombo pobjC) {
+    public CCombo control(final CCombo pobjC) {
         pobjC.setToolTipText(tooltip());
         setKeyListener(pobjC);
         return pobjC;
     }
 
-    public TableColumn Control(final TableColumn pobjC) {
+    public TableColumn control(final TableColumn pobjC) {
         pobjC.setText(caption());
         pobjC.setToolTipText(tooltip());
         return pobjC;
     }
 
-    public TableColumn Control(final TableColumn pobjC, final int intDefaultSize) {
+    public TableColumn control(final TableColumn pobjC, final int intDefaultSize) {
         pobjC.setText(caption());
         pobjC.setToolTipText(tooltip());
         return pobjC;
     }
 
-    public Table Control(final Table pobjC) {
+    public Table control(final Table pobjC) {
         pobjC.setToolTipText(tooltip());
         setKeyListener(pobjC);
         pobjC.setLinesVisible(true);
@@ -132,59 +132,59 @@ public abstract class SOSMsgControl extends SOSMsg {
         return pobjC;
     }
 
-    public SOSTable Control(final SOSTable pobjC) {
+    public SOSTable control(final SOSTable pobjC) {
         pobjC.setToolTipText(tooltip());
         setKeyListener(pobjC);
         return pobjC;
     }
 
-    public FileDialog Control(final FileDialog pobjC) {
+    public FileDialog control(final FileDialog pobjC) {
         pobjC.setText(caption());
         return pobjC;
     }
 
-    public Spinner Control(final Spinner pobjC) {
+    public Spinner control(final Spinner pobjC) {
         pobjC.setToolTipText(tooltip());
         setKeyListener(pobjC);
         return pobjC;
     }
 
-    public MessageBox Control(final MessageBox pobjC) {
+    public MessageBox control(final MessageBox pobjC) {
         pobjC.setMessage(this.caption());
         return pobjC;
     }
 
-    public List Control(final List pobjC) {
+    public List control(final List pobjC) {
         pobjC.setToolTipText(tooltip());
         setKeyListener(pobjC);
         return pobjC;
     }
 
-    public Tree Control(final Tree pobjC) {
+    public Tree control(final Tree pobjC) {
         pobjC.setToolTipText(this.tooltip());
         setKeyListener(pobjC);
         return pobjC;
     }
 
-    public TreeColumn Control(final TreeColumn pobjC) {
+    public TreeColumn control(final TreeColumn pobjC) {
         pobjC.setText(caption());
         pobjC.setToolTipText(tooltip());
         return pobjC;
     }
 
-    public TabItem Control(final TabItem pobjC) {
+    public TabItem control(final TabItem pobjC) {
         pobjC.setText(caption());
         pobjC.setToolTipText(this.tooltip());
         return pobjC;
     }
 
-    public CTabItem Control(final CTabItem pobjC) {
+    public CTabItem control(final CTabItem pobjC) {
         pobjC.setText(label());
         pobjC.setToolTipText(this.tooltip());
         return pobjC;
     }
 
-    public SOSDateTime Control(final SOSDateTime pobjC) {
+    public SOSDateTime control(final SOSDateTime pobjC) {
         pobjC.setToolTipText(this.tooltip());
         return pobjC;
     }
@@ -209,5 +209,5 @@ public abstract class SOSMsgControl extends SOSMsg {
     public void openHelp(final String helpKey) {
         //
     }
-
+    
 }

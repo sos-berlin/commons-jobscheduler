@@ -27,7 +27,7 @@ public class SOSFTPOptionsTest {
         objH.put("source_Protocol_Command_Listener", "true");
         objH.put("Protocol_Command_Listener", "true");
         SOSFTPOptions objO = new SOSFTPOptions(objH);
-        assertTrue("ProtocolCommandListeneris not true", objO.getConnectionOptions().Source().protocolCommandListener.value());
+        assertTrue("ProtocolCommandListeneris not true", objO.getConnectionOptions().getSource().protocolCommandListener.value());
     }
 
     @Test
@@ -50,15 +50,15 @@ public class SOSFTPOptionsTest {
         try {
             SOSFTPOptions objO = new SOSFTPOptions(objH);
             SOSConnection2Options objCO = objO.getConnectionOptions();
-            SOSConnection2OptionsAlternate objSource = objCO.Source();
+            SOSConnection2OptionsAlternate objSource = objCO.getSource();
             SOSCredentialStoreOptions objCS = objSource.getCredentialStore();
-            LOGGER.debug("objSource.UserName.Value() = " + objSource.user.Value());
-            LOGGER.debug("objSource.passwrod.Value() = " + objSource.password.Value());
-            LOGGER.debug("objSource.getAlternativeOptions().Directory.Value() = " + objSource.getAlternativeOptions().directory.Value());
+            LOGGER.debug("objSource.UserName.Value() = " + objSource.user.getValue());
+            LOGGER.debug("objSource.passwrod.Value() = " + objSource.password.getValue());
+            LOGGER.debug("objSource.getAlternativeOptions().Directory.Value() = " + objSource.getAlternativeOptions().directory.getValue());
             LOGGER.debug("objSource.dirtyString() = " + objSource.dirtyString());
             LOGGER.debug("objSource.getAlternativeOptions().dirtyString() = " + objSource.getAlternativeOptions().dirtyString());
             LOGGER.debug("testSOSCredentialStore1 " + objCS.dirtyString());
-            assertEquals("source_CredentialStore_use_credential_Store", "./keepassX-test.kdb", objCS.credentialStoreFileName.Value());
+            assertEquals("source_CredentialStore_use_credential_Store", "./keepassX-test.kdb", objCS.credentialStoreFileName.getValue());
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -70,7 +70,7 @@ public class SOSFTPOptionsTest {
         objH.put("source_Protocol_Command_Listener", "true");
         objH.put("Protocol_Command_Listener", "true");
         SOSFTPOptions objO = new SOSFTPOptions(objH);
-        assertTrue("ProtocolCommandListeneris not true", objO.getConnectionOptions().Source().protocolCommandListener.value());
+        assertTrue("ProtocolCommandListeneris not true", objO.getConnectionOptions().getSource().protocolCommandListener.value());
         String strT = objO.getOptionsAsKeyValuePairs();
         LOGGER.info(strT);
     }
@@ -81,7 +81,7 @@ public class SOSFTPOptionsTest {
         SOSSmtpMailOptions objM = new SOSSmtpMailOptions();
         objH.put(objM.SMTPHost.getShortKey(), "smtp.sos");
         SOSFTPOptions objO = new SOSFTPOptions(objH);
-        assertEquals("host", "smtp.sos", objO.getMailOptions().SMTPHost.Value());
+        assertEquals("host", "smtp.sos", objO.getMailOptions().SMTPHost.getValue());
     }
 
     @Test
@@ -89,9 +89,9 @@ public class SOSFTPOptionsTest {
         HashMap<String, String> objH = new HashMap<String, String>();
         objH.put("replacing", ".*");
         SOSFTPOptions objO = new SOSFTPOptions(objH);
-        SOSConnection2OptionsAlternate objSO = objO.Source();
-        assertEquals("replacing", ".*", objO.replacing.Value());
-        assertEquals("replacing", "", objSO.replacing.Value());
+        SOSConnection2OptionsAlternate objSO = objO.getSource();
+        assertEquals("replacing", ".*", objO.replacing.getValue());
+        assertEquals("replacing", "", objSO.replacing.getValue());
     }
 
     @Test
@@ -104,7 +104,7 @@ public class SOSFTPOptionsTest {
         objH.put("dirname", "myDearName");
         try {
             SOSFTPOptions objO = new SOSFTPOptions(objH);
-            LOGGER.info(objO.DirtyString());
+            LOGGER.info(objO.dirtyString());
             String strReplaceIn =
                     "--- %{source_protocol} --- %{dirname} --- %{TargetFileName} --- %{source_dir} ---  %{user} --- %{password} --- ${date} --- %{date} --- ${time} --- %{time} ---";
             strReplaceIn = objO.replaceVars(strReplaceIn);
@@ -117,12 +117,12 @@ public class SOSFTPOptionsTest {
     @Test
     public void testIgnoreCertificateError() {
         SOSFTPOptions objO = new SOSFTPOptions();
-        SOSConnection2OptionsAlternate objSO = objO.Source();
-        objSO.IgnoreCertificateError.value(false);
-        SOSConnection2OptionsAlternate objTarget = objO.Target();
-        objTarget.IgnoreCertificateError.value(false);
-        assertFalse("source_IgnoreCertificateError ", objSO.IgnoreCertificateError.value());
-        assertFalse("target_IgnoreCertificateError", objTarget.IgnoreCertificateError.value());
+        SOSConnection2OptionsAlternate objSO = objO.getSource();
+        objSO.ignoreCertificateError.value(false);
+        SOSConnection2OptionsAlternate objTarget = objO.getTarget();
+        objTarget.ignoreCertificateError.value(false);
+        assertFalse("source_IgnoreCertificateError ", objSO.ignoreCertificateError.value());
+        assertFalse("target_IgnoreCertificateError", objTarget.ignoreCertificateError.value());
     }
 
     @Test
@@ -131,22 +131,22 @@ public class SOSFTPOptionsTest {
         objH.put("source_IgnoreCertificateError", "false");
         objH.put("target_IgnoreCertificateError", "false");
         SOSFTPOptions objO = new SOSFTPOptions(objH);
-        SOSConnection2OptionsAlternate objSO = objO.Source();
-        objSO.IgnoreCertificateError.value(false);
-        SOSConnection2OptionsAlternate objTarget = objO.Target();
-        objTarget.IgnoreCertificateError.value(false);
-        assertFalse("source_IgnoreCertificateError ", objSO.IgnoreCertificateError.value());
-        assertFalse("target_IgnoreCertificateError", objTarget.IgnoreCertificateError.value());
+        SOSConnection2OptionsAlternate objSO = objO.getSource();
+        objSO.ignoreCertificateError.value(false);
+        SOSConnection2OptionsAlternate objTarget = objO.getTarget();
+        objTarget.ignoreCertificateError.value(false);
+        assertFalse("source_IgnoreCertificateError ", objSO.ignoreCertificateError.value());
+        assertFalse("target_IgnoreCertificateError", objTarget.ignoreCertificateError.value());
     }
 
     @Test
     public final void testStoreOptionValues() {
         SOSFTPOptions objOC = new SOSFTPOptions();
-        objOC.Locale.Value("en_EN");
+        objOC.locale.setValue("en_EN");
         objOC.storeOptionValues();
         objOC = new SOSFTPOptions();
         objOC.initializeOptionValues();
-        Assert.assertEquals("locale is wrong", "en_EN", objOC.Locale.Value());
+        Assert.assertEquals("locale is wrong", "en_EN", objOC.locale.getValue());
     }
 
 }

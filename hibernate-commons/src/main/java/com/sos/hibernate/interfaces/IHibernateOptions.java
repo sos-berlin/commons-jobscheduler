@@ -9,167 +9,48 @@ import com.sos.JSHelper.Options.SOSOptionString;
 
 public interface IHibernateOptions {
 
-    /** \brief gethibernate_connection_isolation :
-     * 
-     * \details
-     * 
-     *
-     * \return */
-    public abstract SOSOptionString gethibernate_connection_isolation();
+    public abstract SOSOptionString getHibernateConnectionIsolation();
 
-    /** \brief sethibernate_connection_isolation :
-     * 
-     * \details
-     * 
-     *
-     * @param hibernate_connection_isolation : */
-    public abstract void sethibernate_connection_isoalation(SOSOptionString p_hibernate_connection_isolation);
+    public abstract void setHibernateConnectionIsolation(SOSOptionString pHibernateConnectionIsolation);
 
-    /** \brief gethibernate_connection_autocommit :
-     * 
-     * \details
-     * 
-     *
-     * \return */
-    public abstract SOSOptionBoolean gethibernate_connection_autocommit();
+    public abstract SOSOptionBoolean getHibernateConnectionAutocommit();
 
-    /** \brief sethibernate_connection_autocommit :
-     * 
-     * \details
-     * 
-     *
-     * @param hibernate_connection_autocommit : */
-    public abstract void sethibernate_connection_autocommit(SOSOptionBoolean p_hibernate_connection_autocommit);
+    public abstract void setHibernateConnectionAutocommit(SOSOptionBoolean pHibernateConnectionAutocommit);
 
-    /** \brief gethibernate_connection_config_file :
-     * 
-     * \details Hibernate configuration file of the database connection
-     *
-     * \return */
-    public abstract SOSOptionInFileName gethibernate_connection_config_file();
+    public abstract SOSOptionInFileName getHibernateConnectionConfigFile();
 
-    /** \brief sethibernate_connection_config_file :
-     * 
-     * \details Hibernate configuration file of the database connection
-     *
-     * @param hibernate_connection_config_file : */
-    public abstract void sethibernate_connection_config_file(SOSOptionInFileName p_hibernate_connection_config_file);
+    public abstract void setHibernateConnectionConfigFile(SOSOptionInFileName pHibernateConnectionConfigFile);
 
-    /** \brief gethibernate_connection_driver_class :
-     * 
-     * \details Class of JBDC driver of the database connection
-     *
-     * \return */
-    public abstract SOSOptionDBDriver gethibernate_connection_driver_class();
+    public abstract SOSOptionDBDriver getHibernateConnectionDriverClass();
 
-    /** \brief sethibernate_connection_driver_class :
-     * 
-     * \details Class of JBDC driver of the database connection
-     *
-     * @param hibernate_connection_driver_class : */
-    public abstract void sethibernate_connection_driver_class(SOSOptionDBDriver p_hibernate_connection_driver_class);
+    public abstract void setHibernateConnectionDriverClass(SOSOptionDBDriver pHibernateConnectionDriverClass);
 
-    /** \brief gethibernate_connection_password :
-     * 
-     * \details Password of the database connection
-     *
-     * \return */
-    public abstract SOSOptionPassword gethibernate_connection_password();
+    public abstract SOSOptionPassword getHibernateConnectionPassword();
 
-    /** \brief sethibernate_connection_password :
-     * 
-     * \details Password of the database connection
-     *
-     * @param hibernate_connection_password : */
-    public abstract void sethibernate_connection_password(SOSOptionPassword p_hibernate_connection_password);
+    public abstract void setHibernateConnectionPassword(SOSOptionPassword pHibernateConnectionPassword);
 
-    /** \brief gethibernate_connection_url :
-     * 
-     * \details JDBC URL of the database connection
-     *
-     * \return */
-    public abstract SOSOptionJdbcUrl gethibernate_connection_url();
+    public abstract SOSOptionJdbcUrl getHibernateConnectionUrl();
 
-    /** \brief sethibernate_connection_url :
-     * 
-     * \details JDBC URL of the database connection
-     *
-     * @param hibernate_connection_url : */
-    public abstract void sethibernate_connection_url(SOSOptionJdbcUrl p_hibernate_connection_url);
+    public abstract void setHibernateConnectionUrl(SOSOptionJdbcUrl pHibernateConnectionUrl);
 
-    /** \brief gethibernate_connection_username :
-     * 
-     * \details User of the database connection
-     *
-     * \return */
-    public abstract SOSOptionString gethibernate_connection_username();
+    public abstract SOSOptionString getHibernateConnectionUsername();
 
-    /** \brief sethibernate_connection_username :
-     * 
-     * \details User of the database connection
-     *
-     * @param hibernate_connection_username : */
-    public abstract void sethibernate_connection_username(SOSOptionString p_hibernate_connection_username);
+    public abstract void setHibernateConnectionUsername(SOSOptionString pHibernateConnectionUsername);
 
-    /** \brief gethibernate_dialect :
-     * 
-     * \details Hibernate dialect of the database connection
-     *
-     * \return */
-    public abstract SOSOptionString gethibernate_dialect();
+    public abstract SOSOptionString getHibernateDialect();
 
-    /** \brief sethibernate_dialect :
-     * 
-     * \details Hibernate dialect of the database connection
-     *
-     * @param hibernate_dialect : */
-    public abstract void sethibernate_dialect(SOSOptionString p_hibernate_dialect);
+    public abstract void setHibernateDialect(SOSOptionString pHibernateDialect);
 
-    /** \brief gethibernate_format_sql :
-     * 
-     * \details
-     * 
-     *
-     * \return */
-    public abstract SOSOptionBoolean gethibernate_format_sql();
+    public abstract SOSOptionBoolean getHibernateFormatSql();
 
-    /** \brief sethibernate_format_sql :
-     * 
-     * \details
-     * 
-     *
-     * @param hibernate_format_sql : */
-    public abstract void sethibernate_format_sql(SOSOptionBoolean p_hibernate_format_sql);
+    public abstract void setHibernateFormatSql(SOSOptionBoolean pHibernateFormatSql);
 
-    /** \brief gethibernate_show_sql :
-     * 
-     * \details
-     * 
-     *
-     * \return */
-    public abstract SOSOptionBoolean gethibernate_show_sql();
+    public abstract SOSOptionBoolean getHibernateShowSql();
 
-    /** \brief sethibernate_show_sql :
-     * 
-     * \details
-     * 
-     *
-     * @param hibernate_show_sql : */
-    public abstract void sethibernate_show_sql(SOSOptionBoolean p_hibernate_show_sql);
+    public abstract void setHibernateShowSql(SOSOptionBoolean pHibernateShowSql);
 
-    /** \brief gethibernate_jdbc_use_scrollable_resultset :
-     * 
-     * \details
-     * 
-     *
-     * \return */
-    public abstract SOSOptionBoolean gethibernate_jdbc_use_scrollable_resultset();
+    public abstract SOSOptionBoolean getHibernateJdbcUseScrollableResultset();
 
-    /** \brief sethibernate_jdbc_use_scrollable_resultset :
-     * 
-     * \details
-     * 
-     *
-     * @param hibernate_jdbc_use_scrollable_resultset : */
-    public abstract void sethibernate_jdbc_use_scrollable_resultset(SOSOptionBoolean p_hibernate_jdbc_use_scrollable_resultset);
+    public abstract void setHibernateJdbcUseScrollableResultset(SOSOptionBoolean pHibernateJdbcUseScrollableResultset);
+
 }

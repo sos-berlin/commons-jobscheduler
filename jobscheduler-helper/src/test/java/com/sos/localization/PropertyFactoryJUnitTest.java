@@ -25,7 +25,7 @@ public class PropertyFactoryJUnitTest extends JSToolBox {
     @Test
     @Ignore("Test set to Ignore for later examination")
     public void testExecute() throws Exception {
-        objE.Execute();
+        objE.execute();
     }
 
 }

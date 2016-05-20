@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.MenuItem;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.io.Files.JSFile;
-import com.sos.VirtualFileSystem.shell.cmdShell;
+import com.sos.VirtualFileSystem.shell.CmdShell;
 import com.sos.dialog.Globals;
 import com.sos.dialog.classes.WindowsSaver;
 import com.sos.dialog.swtdesigner.SWTResourceManager;
@@ -108,7 +108,7 @@ public class TextArea extends StyledText {
                 if ((e.stateMask & SWT.MOD1) == SWT.MOD1) {
                     switch (e.keyCode) {
                     case 'a':
-                        _selectAll();
+                        doSelectAll();
                         return;
                     case 'i':
                         doInsertFile();
@@ -229,8 +229,8 @@ public class TextArea extends StyledText {
         String text = getText();
         try {
             JSFile objTempF = new JSFile(File.createTempFile("SOS-JOE", ".xml").getAbsolutePath());
-            objTempF.Write(text);
-            cmdShell objShell = new cmdShell();
+            objTempF.write(text);
+            CmdShell objShell = new CmdShell();
             String strCommandString = String.format("uedit32.exe \"%1$s\"", objTempF);
             objShell.setCommand(strCommandString);
             objShell.run();
@@ -282,7 +282,7 @@ public class TextArea extends StyledText {
             @Override
             public void handleEvent(final Event e) {
                 LOGGER.debug("getCopyListener was pressed....");
-                _copy();
+                doCopy();
             }
         };
     }
@@ -293,7 +293,7 @@ public class TextArea extends StyledText {
             @Override
             public void handleEvent(final Event e) {
                 LOGGER.debug("getCopyListener was pressed....");
-                _paste();
+                doPaste();
             }
         };
     }
@@ -304,7 +304,7 @@ public class TextArea extends StyledText {
             @Override
             public void handleEvent(final Event e) {
                 LOGGER.debug("getCopyListener was pressed....");
-                _cut();
+                doCut();
             }
         };
     }
@@ -315,24 +315,24 @@ public class TextArea extends StyledText {
             @Override
             public void handleEvent(final Event e) {
                 LOGGER.debug("getSelectAllListener was pressed....");
-                _selectAll();
+                doSelectAll();
             }
         };
     }
 
-    private void _copy() {
+    private void doCopy() {
         this.copy();
     }
 
-    private void _paste() {
+    private void doPaste() {
         this.paste();
     }
 
-    private void _cut() {
+    private void doCut() {
         this.cut();
     }
 
-    private void _selectAll() {
+    private void doSelectAll() {
         this.selectAll();
     }
 
@@ -415,7 +415,7 @@ public class TextArea extends StyledText {
                 return false;
             }
             JSFile objFile = new JSFile(strFilename4Save);
-            objFile.WriteLine(getText());
+            objFile.writeLine(getText());
             objFile.close();
             if (objFormPosSizeHandler != null) {
                 objFormPosSizeHandler.saveProperty("LastSelectedFile4Save", strFilename4Save);

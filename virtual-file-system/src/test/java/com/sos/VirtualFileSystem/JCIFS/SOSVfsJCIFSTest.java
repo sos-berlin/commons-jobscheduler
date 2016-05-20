@@ -34,33 +34,33 @@ public class SOSVfsJCIFSTest {
     @Before
     public void setUp() throws Exception {
         objOptions = new SOSFTPOptions(SOSOptionTransferType.enuTransferTypes.smb);
-        objOptions.protocol.Value(SOSOptionTransferType.enuTransferTypes.smb);
-        objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
+        objOptions.protocol.setValue(SOSOptionTransferType.enuTransferTypes.smb);
+        objVFS = VFSFactory.getHandler(objOptions.protocol.getValue());
         objVfsClient = (ISOSVfsFileTransfer) objVFS;
     }
 
     private void connect() throws Exception {
-        objOptions.host.Value(HOST);
+        objOptions.host.setValue(HOST);
         objOptions.port.value(0);
-        SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().Source();
-        objSource.host.Value(HOST);
-        objSource.user.Value(USER);
-        objSource.protocol.Value(SOSOptionTransferType.enuTransferTypes.smb);
-        objOptions.operation.Value("send");
+        SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().getSource();
+        objSource.host.setValue(HOST);
+        objSource.user.setValue(USER);
+        objSource.protocol.setValue(SOSOptionTransferType.enuTransferTypes.smb);
+        objOptions.operation.setValue("send");
         VFSFactory.setConnectionOptions(objSource);
-        objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
+        objVFS = VFSFactory.getHandler(objOptions.protocol.getValue());
         objVfsClient = (ISOSVfsFileTransfer) objVFS;
-        objVFS.Connect(objOptions.getConnectionOptions().Source());
+        objVFS.connect(objOptions.getConnectionOptions().getSource());
     }
 
     private void authenticate() throws Exception {
-        SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().Source();
-        objSource.domain.Value("");
-        objSource.host.Value(HOST);
-        objSource.user.Value(USER);
-        objSource.password.Value(PASS);
-        objSource.protocol.Value(SOSOptionTransferType.enuTransferTypes.smb);
-        objVFS.Authenticate(objSource);
+        SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().getSource();
+        objSource.domain.setValue("");
+        objSource.host.setValue(HOST);
+        objSource.user.setValue(USER);
+        objSource.password.setValue(PASS);
+        objSource.protocol.setValue(SOSOptionTransferType.enuTransferTypes.smb);
+        objVFS.authenticate(objSource);
     }
 
     @Test
@@ -103,7 +103,7 @@ public class SOSVfsJCIFSTest {
     private String createTestFile() throws Exception {
         String strTestFileName = LOCAL_BASE_PATH + "webdav-test.dat";
         JSTextFile objF = new JSTextFile(strTestFileName);
-        objF.WriteLine("Die Basis ist das Fundament der Grundlage");
+        objF.writeLine("Die Basis ist das Fundament der Grundlage");
         objF.deleteOnExit();
         objF.close();
         return strTestFileName;
@@ -224,7 +224,7 @@ public class SOSVfsJCIFSTest {
         connect();
         authenticate();
         String lineSeparator = "\n";
-        objVFS.ExecuteCommand("cd /home/test" + lineSeparator + "cd /home/kb");
+        objVFS.executeCommand("cd /home/test" + lineSeparator + "cd /home/kb");
         objVfsClient.disconnect();
     }
 

@@ -25,12 +25,12 @@ public class SOSFilterOptions extends SOSFilterOptionsSuperClass {
     public Vector<SOSNullFilter> getFilter() {
         if (lstFilters == null) {
             lstFilters = new Vector();
-            if (FilterSequence.isDirty() == true) {
-                for (String strFilterName : FilterSequence.getValueList()) {
+            if (filterSequence.isDirty() == true) {
+                for (String strFilterName : filterSequence.getValueList()) {
                     lstFilters.add(getFilterInstance(strFilterName));
                 }
             } else {
-                if (exclude_lines_after.isDirty() || excludeLinesBefore.isDirty()) {
+                if (excludeLinesAfter.isDirty() || excludeLinesBefore.isDirty()) {
                     SOSNullFilter objF = new SOSRecordsFilter(this);
                     lstFilters.add(objF);
                 }

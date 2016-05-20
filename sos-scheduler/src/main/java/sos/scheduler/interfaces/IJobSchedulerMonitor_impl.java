@@ -1,7 +1,6 @@
 package sos.scheduler.interfaces;
 
-/** @author KB
- * @author Joacim Zschimmer */
+/** @author Joacim Zschimmer */
 public interface IJobSchedulerMonitor_impl {
 
     static final boolean continueWithProcess = true;

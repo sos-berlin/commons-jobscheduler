@@ -24,7 +24,7 @@ public class SOSVfsJCIFSFile extends SOSVfsTransferFileBaseClass {
             }
             return is.read(bteBuffer);
         } catch (Exception e) {
-            RaiseException(e, SOSVfs_E_173.params("read", fileName));
+            raiseException(e, SOSVfs_E_173.params("read", fileName));
             return 0;
         }
     }
@@ -38,7 +38,7 @@ public class SOSVfsJCIFSFile extends SOSVfsTransferFileBaseClass {
             }
             return is.read(bteBuffer, intOffset, intLength);
         } catch (Exception e) {
-            RaiseException(e, SOSVfs_E_173.params("read", fileName));
+            raiseException(e, SOSVfs_E_173.params("read", fileName));
             return 0;
         }
     }
@@ -52,7 +52,7 @@ public class SOSVfsJCIFSFile extends SOSVfsTransferFileBaseClass {
             }
             os.write(bteBuffer, intOffset, intLength);
         } catch (Exception e) {
-            RaiseException(e, SOSVfs_E_173.params("write", fileName));
+            raiseException(e, SOSVfs_E_173.params("write", fileName));
         }
     }
 
@@ -60,7 +60,7 @@ public class SOSVfsJCIFSFile extends SOSVfsTransferFileBaseClass {
     public OutputStream getFileOutputStream() {
         try {
             if (objOutputStream == null) {
-                fileName = super.AdjustRelativePathName(fileName);
+                fileName = super.adjustRelativePathName(fileName);
                 SOSVfsJCIFS objJ = (SOSVfsJCIFS) objVFSHandler;
                 objOutputStream = objJ.getOutputStream(fileName);
                 if (objOutputStream == null) {
@@ -68,7 +68,7 @@ public class SOSVfsJCIFSFile extends SOSVfsTransferFileBaseClass {
                 }
             }
         } catch (Exception e) {
-            RaiseException(e, SOSVfs_E_158.params("getFileOutputStream()", fileName));
+            raiseException(e, SOSVfs_E_158.params("getFileOutputStream()", fileName));
         }
         return objOutputStream;
     }

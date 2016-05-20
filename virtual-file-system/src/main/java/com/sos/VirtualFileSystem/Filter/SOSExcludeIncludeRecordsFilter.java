@@ -35,10 +35,10 @@ public class SOSExcludeIncludeRecordsFilter extends SOSNullFilter {
         if (objOptions.excludeEmptyLines.isDirty() && strT.trim().isEmpty()) {
             flgIncludeRecord = false;
         }
-        if (objOptions.excludeLines.IsNotEmpty() && flgIncludeRecord && objOptions.excludeLines.match(strT)) {
+        if (objOptions.excludeLines.isNotEmpty() && flgIncludeRecord && objOptions.excludeLines.match(strT)) {
             flgIncludeRecord = false;
         }
-        if (objOptions.includeLines.IsNotEmpty() && flgIncludeRecord && !objOptions.includeLines.match(strT)) {
+        if (objOptions.includeLines.isNotEmpty() && flgIncludeRecord && !objOptions.includeLines.match(strT)) {
             flgIncludeRecord = false;
         }
         if (flgIncludeRecord) {

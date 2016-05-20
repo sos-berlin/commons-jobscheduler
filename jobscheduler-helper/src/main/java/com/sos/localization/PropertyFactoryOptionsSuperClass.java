@@ -2,8 +2,6 @@ package com.sos.localization;
 
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
-
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
@@ -24,55 +22,31 @@ public class PropertyFactoryOptionsSuperClass extends JSOptionsClass {
         return Operation;
     }
 
-    public SOSOptionString Operation() {
-        return Operation;
-    }
-
     public void setOperation(SOSOptionString p_Operation) {
         this.Operation = p_Operation;
     }
 
-    public void Operation(SOSOptionString p_Operation) {
-        this.Operation = p_Operation;
-    }
-
     @JSOptionDefinition(name = "PropertyFileNamePrefix", description = "", key = "PropertyFileNamePrefix", type = "SOSOptionString", mandatory = true)
-    public SOSOptionString PropertyFileNamePrefix = new SOSOptionString(this, CLASSNAME + ".PropertyFileNamePrefix", "", " ", " ", true);
+    public SOSOptionString propertyFileNamePrefix = new SOSOptionString(this, CLASSNAME + ".PropertyFileNamePrefix", "", " ", " ", true);
 
     public SOSOptionString getPropertyFileNamePrefix() {
-        return PropertyFileNamePrefix;
+        return propertyFileNamePrefix;
     }
 
-    public SOSOptionString PropertyFileNamePrefix() {
-        return PropertyFileNamePrefix;
-    }
-
-    public void setPropertyFileNamePrefix(SOSOptionString p_PropertyFileNamePrefix) {
-        this.PropertyFileNamePrefix = p_PropertyFileNamePrefix;
-    }
-
-    public void PropertyFileNamePrefix(SOSOptionString p_PropertyFileNamePrefix) {
-        this.PropertyFileNamePrefix = p_PropertyFileNamePrefix;
+    public void setPropertyFileNamePrefix(SOSOptionString pPropertyFileNamePrefix) {
+        this.propertyFileNamePrefix = pPropertyFileNamePrefix;
     }
 
     @JSOptionDefinition(name = "SourceFolderName", description = "The Folder, which has all the I18N Property files.", key = "SourceFolderName", type = "SOSOptionFolderName", mandatory = true)
-    public SOSOptionFolderName SourceFolderName = new SOSOptionFolderName(this, CLASSNAME + ".SourceFolderName",
+    public SOSOptionFolderName sourceFolderName = new SOSOptionFolderName(this, CLASSNAME + ".SourceFolderName",
             "The Folder, which has all the I18N Property files.", " ", " ", true);
 
     public SOSOptionFolderName getSourceFolderName() {
-        return SourceFolderName;
+        return sourceFolderName;
     }
 
-    public SOSOptionFolderName SourceFolderName() {
-        return SourceFolderName;
-    }
-
-    public void setSourceFolderName(SOSOptionFolderName p_SourceFolderName) {
-        this.SourceFolderName = p_SourceFolderName;
-    }
-
-    public void SourceFolderName(SOSOptionFolderName p_SourceFolderName) {
-        this.SourceFolderName = p_SourceFolderName;
+    public void setSourceFolderName(SOSOptionFolderName pSourceFolderName) {
+        this.sourceFolderName = pSourceFolderName;
     }
 
     public PropertyFactoryOptionsSuperClass() {
@@ -87,6 +61,7 @@ public class PropertyFactoryOptionsSuperClass extends JSOptionsClass {
     @Override
     public void setAllOptions(HashMap<String, String> pobjJSSettings) {
         objSettings = pobjJSSettings;
+        super.setSettings(objSettings);
         super.setAllOptions(pobjJSSettings);
     }
 

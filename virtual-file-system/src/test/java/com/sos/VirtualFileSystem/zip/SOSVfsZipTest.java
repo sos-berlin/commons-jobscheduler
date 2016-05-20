@@ -26,7 +26,6 @@ public class SOSVfsZipTest {
     private static final String ZIP_FILE1 = TEST_PATH_NAME + "sos-net-src.zip";
     private ISOSVFSHandler objVFS = null;
     private ISOSVfsFileTransfer objFileSystemHandler = null;
-
     @Before
     public void setUp() throws Exception {
         objVFS = VFSFactory.getHandler("zip");
@@ -53,7 +52,7 @@ public class SOSVfsZipTest {
 
     @Test
     @Ignore("Test set to Ignore for later examination")
-    public final void testgetFiles() throws Exception {
+    public final void testGetFiles() throws Exception {
         objVFS.setSource();
         Vector<ISOSVirtualFile> objFileList = objFileSystemHandler.getFiles(ZIP_FILE1);
         for (ISOSVirtualFile objVF : objFileList) {
@@ -91,7 +90,7 @@ public class SOSVfsZipTest {
 
     @Test
     @Ignore("Test set to Ignore for later examination")
-    public final void CreateZipWithMultipleFiles() throws Exception {
+    public final void createZipWithMultipleFiles() throws Exception {
         boolean flgF = new File(TEST_ZIP).delete();
         objVFS.setTarget();
         objFileSystemHandler.changeWorkingDirectory(TEST_ZIP);
@@ -107,7 +106,7 @@ public class SOSVfsZipTest {
 
     @Test
     @Ignore("Test set to Ignore for later examination")
-    public final void Directory4ZipWithMultipleFiles() throws Exception {
+    public final void directory4ZipWithMultipleFiles() throws Exception {
         objFileSystemHandler.changeWorkingDirectory(TEST_ZIP);
         String[] strA = objFileSystemHandler.getFilelist(TEST_PATH_NAME, "^.*\\.txt$", 1, false, null);
         for (String strFileName : strA) {
@@ -118,13 +117,13 @@ public class SOSVfsZipTest {
 
     @Test
     @Ignore("Test set to Ignore for later examination")
-    public final void ExtractWithMultipleFiles() throws Exception {
+    public final void extractWithMultipleFiles() throws Exception {
         objFileSystemHandler.changeWorkingDirectory(TEST_ZIP);
         String[] strA = objFileSystemHandler.getFilelist("c:\\temp\\", ".*\\.txt$", 1, false, null);
-        ISOSVFSHandler objLocalVFS = VFSFactory.getHandler(enuTransferTypes.local.Text());
+        ISOSVFSHandler objLocalVFS = VFSFactory.getHandler(enuTransferTypes.local.getText());
         ISOSVfsFileTransfer objLocalFiles = (ISOSVfsFileTransfer) objLocalVFS;
         for (String strFileName : strA) {
-            System.out.println(strFileName);
+            LOGGER.info(strFileName);
             ISOSVirtualFile objVF = objFileSystemHandler.getFileHandle(strFileName);
             ISOSVirtualFile objLocalFile = objLocalFiles.getFileHandle(strFileName);
             objLocalFile.putFile(objVF);

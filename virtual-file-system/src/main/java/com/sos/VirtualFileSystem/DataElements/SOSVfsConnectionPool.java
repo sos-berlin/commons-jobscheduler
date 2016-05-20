@@ -73,7 +73,7 @@ public class SOSVfsConnectionPool {
         if (list != null) {
             for (ISOSVFSHandler objHandler : list) {
                 try {
-                    objHandler.CloseSession();
+                    objHandler.closeSession();
                 } catch (Exception e) {
                     logger.error(e.getLocalizedMessage());
                 }

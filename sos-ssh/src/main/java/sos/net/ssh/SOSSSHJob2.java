@@ -80,9 +80,9 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         getVFS();
         getOptions().checkMandatory();
         try {
-            objVFS.Connect(objOptions);
+            objVFS.connect(objOptions);
             ISOSAuthenticationOptions objAU = objOptions;
-            ISOSConnection authenticate = objVFS.Authenticate(objAU);
+            ISOSConnection authenticate = objVFS.authenticate(objAU);
             logger.debug("connection established");
         } catch (Exception e) {
             throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
@@ -100,7 +100,7 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     public void disconnect() {
         if (isConnected == true) {
             try {
-                objVFS.CloseConnection();
+                objVFS.closeConnection();
             } catch (Exception e) {
                 throw new SSHConnectionError("problems closing connection", e);
             }
@@ -129,7 +129,7 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         if (isNotNull(intExitCode)) {
             objJSJobUtilities.setJSParam(conExit_code, intExitCode.toString());
             if (!intExitCode.equals(new Integer(0))) {
-                if (objOptions.ignoreError.isTrue() || objOptions.ignoreExitCode.Values().contains(intExitCode)) {
+                if (objOptions.ignoreError.isTrue() || objOptions.ignoreExitCode.getValues().contains(intExitCode)) {
                     logger.info("SOS-SSH-E-140: exit code is ignored due to option-settings: " + intExitCode);
                     objJSJobUtilities.setJSParam("exit_code_ignored", "true");
                 } else {
