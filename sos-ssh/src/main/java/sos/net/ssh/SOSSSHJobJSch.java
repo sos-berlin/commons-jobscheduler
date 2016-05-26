@@ -95,7 +95,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             if (objOptions.command.isNotEmpty()) {
                 strCommands2Execute = objOptions.command.values();
             } else {
-                if (objOptions.isScript() == true) {
+                if (objOptions.isScript()) {
                     strCommands2Execute = new String[1];
                     String strTemp = objOptions.commandScript.getValue();
                     if (objOptions.commandScript.IsEmpty()) {
@@ -104,7 +104,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                     strTemp = objJSJobUtilities.replaceSchedulerVars(strTemp);
                     strCommands2Execute[0] = vfsHandler.createScriptFile(strTemp);
                     add2Files2Delete(strCommands2Execute[0]);
-                    flgScriptFileCreated = true; // http://www.sos-berlin.com/jira/browse/JITL-17
+                    flgScriptFileCreated = true;
                     strCommands2Execute[0] += " " + objOptions.commandScriptParam.getValue();
                 } else {
                     throw new SSHMissingCommandError(objMsg.getMsg(SOS_SSH_E_100));
@@ -276,7 +276,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         try {
             prePostCommandVFSHandler.executeCommand(postCommandRead);
             if (prePostCommandVFSHandler.getExitCode() == 0) {
-                if (prePostCommandVFSHandler.getStdOut().toString().length() > 0) {
+                if (!prePostCommandVFSHandler.getStdOut().toString().isEmpty()) {
                     BufferedReader reader = new BufferedReader(new StringReader(new String(prePostCommandVFSHandler.getStdOut())));
                     String line = null;
                     logger.debug(SOSVfsMessageCodes.SOSVfs_D_284.getFullMessage());
