@@ -219,8 +219,7 @@ public class Msg implements Serializable {
         m_getFailed = false;
         m_bundleBaseName = basename;
         m_locale = locale;
-        m_bundle = null; // will be lazily set the next time we call getMsg() or
-                         // getLastMessage()
+        m_bundle = null;
         m_lastMessage = null;
         m_lastKey = null;
         m_lastVarargs = null;
@@ -245,7 +244,6 @@ public class Msg implements Serializable {
      *
      * @see Msg#Msg(com.sos.i18n.Msg.BundleBaseName, Locale) */
     public Msg(BundleBaseName basename) {
-        // this(basename, Locale.getDefault());
         this(basename, SOSOptionLocale.i18nLocale);
     }
 
@@ -279,8 +277,7 @@ public class Msg implements Serializable {
 
         if (!locale.equals(getLocale())) {
             m_locale = locale;
-            m_bundle = null; // the locale changed so the bundle we used before
-                             // is no longer valid
+            m_bundle = null;
         }
 
         return;
@@ -400,7 +397,6 @@ public class Msg implements Serializable {
      *         messages */
     protected ResourceBundle getResourceBundle() {
         // We want to use the actual setted locale
-        // setLocale(SOSOptionLocale.i18nLocale);
         Locale locale = getLocale();
         BundleBaseName basename = getBundleBaseName();
         ResourceBundle bundle = ResourceBundle.getBundle(basename.getBundleBaseName(), locale);

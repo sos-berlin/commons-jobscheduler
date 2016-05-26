@@ -22,13 +22,6 @@ public class JSObjAt extends RunTime.At implements ISOSJsObjStartTimes {
         return fmtDate.parseDateTime(getAt());
     }
 
-    // @Override
-    // public List<DateTime> getDtNextSingleStarts() {
-    // List<DateTime> result = new ArrayList<DateTime>();
-    // result.add(getDtAt());
-    // return result;
-    // }
-
     @Override
     public RunTimeElements getRunTimeElements(Interval timeRange) {
         RunTimeElements result = new RunTimeElements(timeRange);

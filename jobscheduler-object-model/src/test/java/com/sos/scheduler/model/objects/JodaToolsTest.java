@@ -1,97 +1,83 @@
 package com.sos.scheduler.model.objects;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.Interval;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.sos.scheduler.model.tools.JodaTools;
 
 public class JodaToolsTest {
 
-    @SuppressWarnings("unused")
-    private final static Logger logger = Logger.getLogger(JodaToolsTest.class);
-
-    private final static DateTimeFormatter fmtDate = DateTimeFormat.forPattern("yyyy-MM-dd");
-    // private final static DateTimeFormatter fmtDateTime =
-    // DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
-
-    private final static DateTime baseDate = new DateTime(2012, 3, 12, 0, 0, 0, 0);
-
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-    }
+    private static final DateTimeFormatter FMT_DATE = DateTimeFormat.forPattern("yyyy-MM-dd");
+    private static final DateTime BASE_DATE = new DateTime(2012, 3, 12, 0, 0, 0, 0);
 
     @Test
     public final void testStartOfMonth() {
-        DateTime result = JodaTools.getStartOfMonth(baseDate);
-        assertEquals("2012-03-01", fmtDate.print(result));
+        DateTime result = JodaTools.getStartOfMonth(BASE_DATE);
+        assertEquals("2012-03-01", FMT_DATE.print(result));
     }
 
     @Test
     public final void testEndOfMonth() {
-        DateTime result = JodaTools.getEndOfMonth(baseDate);
-        assertEquals("2012-03-31", fmtDate.print(result));
+        DateTime result = JodaTools.getEndOfMonth(BASE_DATE);
+        assertEquals("2012-03-31", FMT_DATE.print(result));
     }
 
     @Test
     public final void testGetNextWeekday() {
-        DateTime result = JodaTools.getNextWeekday(baseDate, DateTimeConstants.WEDNESDAY);
-        assertEquals("2012-03-14", fmtDate.print(result));
+        DateTime result = JodaTools.getNextWeekday(BASE_DATE, DateTimeConstants.WEDNESDAY);
+        assertEquals("2012-03-14", FMT_DATE.print(result));
     }
 
     @Test
     public final void testGetPreviousWeekday() {
-        DateTime result = JodaTools.getPreviousWeekday(baseDate, DateTimeConstants.WEDNESDAY);
-        assertEquals("2012-03-07", fmtDate.print(result));
+        DateTime result = JodaTools.getPreviousWeekday(BASE_DATE, DateTimeConstants.WEDNESDAY);
+        assertEquals("2012-03-07", FMT_DATE.print(result));
     }
 
     @Test
     public final void testGetWeekdayInMonth() {
-        DateTime result = JodaTools.getWeekdayInMonth(baseDate, DateTimeConstants.WEDNESDAY, 3);
-        assertEquals("2012-03-21", fmtDate.print(result));
-        result = JodaTools.getWeekdayInMonth(baseDate, DateTimeConstants.WEDNESDAY, -3);
-        assertEquals("2012-03-14", fmtDate.print(result));
+        DateTime result = JodaTools.getWeekdayInMonth(BASE_DATE, DateTimeConstants.WEDNESDAY, 3);
+        assertEquals("2012-03-21", FMT_DATE.print(result));
+        result = JodaTools.getWeekdayInMonth(BASE_DATE, DateTimeConstants.WEDNESDAY, -3);
+        assertEquals("2012-03-14", FMT_DATE.print(result));
     }
 
     @Test
     public final void testGetWeekdayInIntervalOrNull() {
-        Interval baseInterval = new Interval(baseDate, baseDate.plusDays(31));
+        Interval baseInterval = new Interval(BASE_DATE, BASE_DATE.plusDays(31));
         DateTime result = JodaTools.getWeekdayInIntervalOrNull(baseInterval, DateTimeConstants.WEDNESDAY, 1);
-        assertEquals("2012-04-04", fmtDate.print(result));
-
-        baseInterval = new Interval(baseDate, baseDate.plusDays(5));
+        assertEquals("2012-04-04", FMT_DATE.print(result));
+        baseInterval = new Interval(BASE_DATE, BASE_DATE.plusDays(5));
         result = JodaTools.getWeekdayInIntervalOrNull(baseInterval, DateTimeConstants.WEDNESDAY, 1);
         assertEquals(null, result);
     }
 
     @Test
     public final void testGetDayInMonth() {
-        DateTime result = JodaTools.getDayInMonth(baseDate, 19);
-        assertEquals("2012-03-19", fmtDate.print(result));
-        result = JodaTools.getDayInMonth(baseDate, -3);
-        assertEquals("2012-03-28", fmtDate.print(result));
-        result = JodaTools.getDayInMonth(baseDate, 0);
-        assertEquals("2012-03-31", fmtDate.print(result));
-        result = JodaTools.getDayInMonth(baseDate, -1);
-        assertEquals("2012-03-30", fmtDate.print(result));
+        DateTime result = JodaTools.getDayInMonth(BASE_DATE, 19);
+        assertEquals("2012-03-19", FMT_DATE.print(result));
+        result = JodaTools.getDayInMonth(BASE_DATE, -3);
+        assertEquals("2012-03-28", FMT_DATE.print(result));
+        result = JodaTools.getDayInMonth(BASE_DATE, 0);
+        assertEquals("2012-03-31", FMT_DATE.print(result));
+        result = JodaTools.getDayInMonth(BASE_DATE, -1);
+        assertEquals("2012-03-30", FMT_DATE.print(result));
     }
 
     @Test
     public final void testGetMonthWeekdayOrNull() {
-        Interval baseInterval = new Interval(baseDate, baseDate.plusDays(31));
+        Interval baseInterval = new Interval(BASE_DATE, BASE_DATE.plusDays(31));
         DateTime result = JodaTools.getDayInIntervalOrNull(baseInterval, 12);
-        assertEquals("2012-03-12", fmtDate.print(result));
-
-        baseInterval = new Interval(baseDate, baseDate.plusDays(5));
+        assertEquals("2012-03-12", FMT_DATE.print(result));
+        baseInterval = new Interval(BASE_DATE, BASE_DATE.plusDays(5));
         result = JodaTools.getDayInIntervalOrNull(baseInterval, -5);
         assertEquals(null, result);
     }

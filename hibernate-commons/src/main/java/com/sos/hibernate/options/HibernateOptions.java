@@ -2,8 +2,6 @@ package com.sos.hibernate.options;
 
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
-
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Annotations.JSOptionDefinition;
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
@@ -15,440 +13,202 @@ import com.sos.JSHelper.Options.SOSOptionJdbcUrl;
 import com.sos.JSHelper.Options.SOSOptionPassword;
 import com.sos.JSHelper.Options.SOSOptionString;
 import com.sos.hibernate.interfaces.IHibernateOptions;
-import com.sos.JSHelper.Archiver.IJSArchiverOptions;
 
 @JSOptionClass(name = "JobNetOptionsSuperClass", description = "JobNetOptionsSuperClass")
 public class HibernateOptions extends JSOptionsClass implements IHibernateOptions {
 
-    /**
-	 * 
-	 */
     private static final long serialVersionUID = 5713555021974034071L;
     private final String conClassName = "JSHibernateOptions";
-    @SuppressWarnings("unused")
-    private static Logger logger = Logger.getLogger(HibernateOptions.class);
 
-    /** \var hibernate_connection_isolation : */
-    @JSOptionDefinition(name = "hibernate_connection_isolation", description = "", key = "hibernate_connection_isolation", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString hibernate_connection_isolation = new SOSOptionString(this, conClassName + ".hibernate_connection_isolation", // HashMap-Key
-            "", // Titel
-            "2", // InitValue
-            "2", // DefaultValue
-            false // isMandatory
-            );
+    @JSOptionDefinition(name = "hibernate_connection_isolation", description = "", key = "hibernate_connection_isolation", type = "SOSOptionString",
+            mandatory = false)
+    public SOSOptionString hibernateConnectionIsolation = new SOSOptionString(this, conClassName + ".hibernate_connection_isolation",
+            "", "2", "2", false);
 
-    /*
-     * (non-Javadoc)
-     * @see com.sos.jobnet.options.ISOSJSHibernateOptions#
-     * gethibernate_connection_autocommit()
-     */
     @Override
     public SOSOptionString getHibernateConnectionIsolation() {
-        return hibernate_connection_isolation;
+        return hibernateConnectionIsolation;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.sos.jobnet.options.ISOSJSHibernateOptions#
-     * sethibernate_connection_autocommit
-     * (com.sos.JSHelper.Options.SOSOptionBoolean)
-     */
     @Override
-    public void setHibernateConnectionIsolation(SOSOptionString p_hibernate_connection_isolation) {
-        this.hibernate_connection_isolation = p_hibernate_connection_isolation;
+    public void setHibernateConnectionIsolation(SOSOptionString pHibernateConnectionIsolation) {
+        this.hibernateConnectionIsolation = pHibernateConnectionIsolation;
     }
 
-    /** \var hibernate_connection_autocommit : */
-    @JSOptionDefinition(name = "hibernate_connection_autocommit", description = "", key = "hibernate_connection_autocommit", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean hibernate_connection_autocommit = new SOSOptionBoolean(this, conClassName + ".hibernate_connection_autocommit", // HashMap-Key
-            "", // Titel
-            "false", // InitValue
-            "false", // DefaultValue
-            false // isMandatory
-            );
+    @JSOptionDefinition(name = "hibernate_connection_autocommit", description = "", key = "hibernate_connection_autocommit",
+            type = "SOSOptionBoolean", mandatory = false)
+    public SOSOptionBoolean hibernateConnectionAutocommit = new SOSOptionBoolean(this, conClassName + ".hibernate_connection_autocommit",
+            "", "false", "false", false);
 
-    /*
-     * (non-Javadoc)
-     * @see com.sos.jobnet.options.ISOSJSHibernateOptions#
-     * gethibernate_connection_autocommit()
-     */
     @Override
     public SOSOptionBoolean getHibernateConnectionAutocommit() {
-        return hibernate_connection_autocommit;
+        return hibernateConnectionAutocommit;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.sos.jobnet.options.ISOSJSHibernateOptions#
-     * sethibernate_connection_autocommit
-     * (com.sos.JSHelper.Options.SOSOptionBoolean)
-     */
     @Override
-    public void setHibernateConnectionAutocommit(SOSOptionBoolean p_hibernate_connection_autocommit) {
-        this.hibernate_connection_autocommit = p_hibernate_connection_autocommit;
+    public void setHibernateConnectionAutocommit(SOSOptionBoolean pHibernateConnectionAutocommit) {
+        this.hibernateConnectionAutocommit = pHibernateConnectionAutocommit;
     }
 
-    /** \var hibernate_connection_config_file : Hibernate configuration file of
-     * the database connection */
-    @JSOptionDefinition(name = "hibernate_connection_config_file", description = "", key = "hibernate_connection_config_file", type = "SOSOptionInFileName", mandatory = false)
-    public SOSOptionInFileName hibernate_connection_config_file = new SOSOptionInFileName(this, conClassName + ".hibernate_connection_config_file", // HashMap-Key
-            "", // Titel
-            "config/hibernate.cfg.xml", // InitValue
-            "config/hibernate.cfg.xml", // DefaultValue
-            false // isMandatory
-            );
+    @JSOptionDefinition(name = "hibernate_connection_config_file", description = "", key = "hibernate_connection_config_file",
+            type = "SOSOptionInFileName", mandatory = false)
+    public SOSOptionInFileName hibernateConnectionConfigFile = new SOSOptionInFileName(this, conClassName + ".hibernate_connection_config_file",
+            "", "config/hibernate.cfg.xml", "config/hibernate.cfg.xml", false);
 
-    /*
-     * (non-Javadoc)
-     * @see com.sos.jobnet.options.ISOSJSHibernateOptions#
-     * gethibernate_connection_config_file()
-     */
     @Override
     public SOSOptionInFileName getHibernateConnectionConfigFile() {
-        return hibernate_connection_config_file;
+        return hibernateConnectionConfigFile;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.sos.jobnet.options.ISOSJSHibernateOptions#
-     * sethibernate_connection_config_file
-     * (com.sos.JSHelper.Options.SOSOptionInFileName)
-     */
     @Override
-    public void setHibernateConnectionConfigFile(SOSOptionInFileName p_hibernate_connection_config_file) {
-        this.hibernate_connection_config_file = p_hibernate_connection_config_file;
+    public void setHibernateConnectionConfigFile(SOSOptionInFileName pHibernateConnectionConfigFile) {
+        this.hibernateConnectionConfigFile = pHibernateConnectionConfigFile;
     }
 
-    /** \var hibernate_connection_driver_class : Class of JBDC driver of the
-     * database connection */
-    @JSOptionDefinition(name = "hibernate_connection_driver_class", description = "", key = "hibernate_connection_driver_class", type = "SOSOptionDBDriver", mandatory = false)
-    public SOSOptionDBDriver hibernate_connection_driver_class = new SOSOptionDBDriver(this, conClassName + ".hibernate_connection_driver_class", // HashMap-Key
-            "", // Titel
-            "oracle.jdbc.driver.OracleDriver", // InitValue
-            "oracle.jdbc.driver.OracleDriver", // DefaultValue
-            false // isMandatory
-            );
+    @JSOptionDefinition(name = "hibernate_connection_driver_class", description = "", key = "hibernate_connection_driver_class",
+            type = "SOSOptionDBDriver", mandatory = false)
+    public SOSOptionDBDriver hibernateConnectionDriverClass = new SOSOptionDBDriver(this, conClassName + ".hibernate_connection_driver_class",
+            "", "oracle.jdbc.driver.OracleDriver", "oracle.jdbc.driver.OracleDriver", false);
 
-    /*
-     * (non-Javadoc)
-     * @see com.sos.jobnet.options.ISOSJSHibernateOptions#
-     * gethibernate_connection_driver_class()
-     */
     @Override
     public SOSOptionDBDriver getHibernateConnectionDriverClass() {
-        return hibernate_connection_driver_class;
+        return hibernateConnectionDriverClass;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.sos.jobnet.options.ISOSJSHibernateOptions#
-     * sethibernate_connection_driver_class
-     * (com.sos.JSHelper.Options.SOSOptionDBDriver)
-     */
     @Override
-    public void setHibernateConnectionDriverClass(SOSOptionDBDriver p_hibernate_connection_driver_class) {
-        this.hibernate_connection_driver_class = p_hibernate_connection_driver_class;
+    public void setHibernateConnectionDriverClass(SOSOptionDBDriver pHibernateConnectionDriverClass) {
+        this.hibernateConnectionDriverClass = pHibernateConnectionDriverClass;
     }
 
-    /** \var hibernate_connection_password : Password of the database connection */
-    @JSOptionDefinition(name = "hibernate_connection_password", description = "", key = "hibernate_connection_password", type = "SOSOptionPassword", mandatory = false)
-    public SOSOptionPassword hibernate_connection_password = new SOSOptionPassword(this, conClassName + ".hibernate_connection_password", // HashMap-Key
-            "", // Titel
-            "", // InitValue
-            "", // DefaultValue
-            false // isMandatory
-            );
+    @JSOptionDefinition(name = "hibernate_connection_password", description = "", key = "hibernate_connection_password", type = "SOSOptionPassword",
+            mandatory = false)
+    public SOSOptionPassword hibernateConnectionPassword = new SOSOptionPassword(this, conClassName + ".hibernate_connection_password",
+            "", "", "", false);
 
-    /*
-     * (non-Javadoc)
-     * @see com.sos.jobnet.options.ISOSJSHibernateOptions#
-     * gethibernate_connection_password()
-     */
     @Override
     public SOSOptionPassword getHibernateConnectionPassword() {
-        return hibernate_connection_password;
+        return hibernateConnectionPassword;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.sos.jobnet.options.ISOSJSHibernateOptions#
-     * sethibernate_connection_password
-     * (com.sos.JSHelper.Options.SOSOptionPassword)
-     */
     @Override
-    public void setHibernateConnectionPassword(SOSOptionPassword p_hibernate_connection_password) {
-        this.hibernate_connection_password = p_hibernate_connection_password;
+    public void setHibernateConnectionPassword(SOSOptionPassword pHibernateConnectionPassword) {
+        this.hibernateConnectionPassword = pHibernateConnectionPassword;
     }
 
-    /** \var hibernate_connection_url : JDBC URL of the database connection */
-    @JSOptionDefinition(name = "hibernate_connection_url", description = "", key = "hibernate_connection_url", type = "SOSOptionJdbcUrl", mandatory = false)
-    public SOSOptionJdbcUrl hibernate_connection_url = new SOSOptionJdbcUrl(this, conClassName + ".hibernate_connection_url", // HashMap-Key
-            "", // Titel
-            "", // InitValue
-            "", // DefaultValue
-            false // isMandatory
-            );
+    @JSOptionDefinition(name = "hibernate_connection_url", description = "", key = "hibernate_connection_url", type = "SOSOptionJdbcUrl",
+            mandatory = false)
+    public SOSOptionJdbcUrl hibernateConnectionUrl = new SOSOptionJdbcUrl(this, conClassName + ".hibernate_connection_url", "", "", "", false);
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * com.sos.jobnet.options.ISOSJSHibernateOptions#gethibernate_connection_url
-     * ()
-     */
     @Override
     public SOSOptionJdbcUrl getHibernateConnectionUrl() {
-        return hibernate_connection_url;
+        return hibernateConnectionUrl;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * com.sos.jobnet.options.ISOSJSHibernateOptions#sethibernate_connection_url
-     * (com.sos.JSHelper.Options.SOSOptionJdbcUrl)
-     */
     @Override
-    public void setHibernateConnectionUrl(SOSOptionJdbcUrl p_hibernate_connection_url) {
-        this.hibernate_connection_url = p_hibernate_connection_url;
+    public void setHibernateConnectionUrl(SOSOptionJdbcUrl pHibernateConnectionUrl) {
+        this.hibernateConnectionUrl = pHibernateConnectionUrl;
     }
 
-    /** \var hibernate_connection_username : User of the database connection */
-    @JSOptionDefinition(name = "hibernate_connection_username", description = "", key = "hibernate_connection_username", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString hibernate_connection_username = new SOSOptionString(this, conClassName + ".hibernate_connection_username", // HashMap-Key
-            "", // Titel
-            "", // InitValue
-            "", // DefaultValue
-            false // isMandatory
-            );
+    @JSOptionDefinition(name = "hibernate_connection_username", description = "", key = "hibernate_connection_username", type = "SOSOptionString",
+            mandatory = false)
+    public SOSOptionString hibernateConnectionUsername = new SOSOptionString(this, conClassName + ".hibernate_connection_username", "", "", "",
+            false);
 
-    /*
-     * (non-Javadoc)
-     * @see com.sos.jobnet.options.ISOSJSHibernateOptions#
-     * gethibernate_connection_username()
-     */
     @Override
     public SOSOptionString getHibernateConnectionUsername() {
-        return hibernate_connection_username;
+        return hibernateConnectionUsername;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.sos.jobnet.options.ISOSJSHibernateOptions#
-     * sethibernate_connection_username
-     * (com.sos.JSHelper.Options.SOSOptionString)
-     */
     @Override
-    public void setHibernateConnectionUsername(SOSOptionString p_hibernate_connection_username) {
-        this.hibernate_connection_username = p_hibernate_connection_username;
+    public void setHibernateConnectionUsername(SOSOptionString pHibernateConnectionUsername) {
+        this.hibernateConnectionUsername = pHibernateConnectionUsername;
     }
 
-    /** \var hibernate_dialect : Hibernate dialect of the database connection */
     @JSOptionDefinition(name = "hibernate_dialect", description = "", key = "hibernate_dialect", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString hibernate_dialect = new SOSOptionString(this, conClassName + ".hibernate_dialect", // HashMap-Key
-            "", // Titel
-            "org.hibernate.dialect.Oracle10gDialect", // InitValue
-            "org.hibernate.dialect.Oracle10gDialect", // DefaultValue
-            false // isMandatory
-            );
+    public SOSOptionString hibernateDialect = new SOSOptionString(this, conClassName + ".hibernate_dialect", "",
+            "org.hibernate.dialect.Oracle10gDialect", "org.hibernate.dialect.Oracle10gDialect", false);
 
-    /*
-     * (non-Javadoc)
-     * @see com.sos.jobnet.options.ISOSJSHibernateOptions#gethibernate_dialect()
-     */
     @Override
     public SOSOptionString getHibernateDialect() {
-        return hibernate_dialect;
+        return hibernateDialect;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * com.sos.jobnet.options.ISOSJSHibernateOptions#sethibernate_dialect(com
-     * .sos.JSHelper.Options.SOSOptionString)
-     */
     @Override
-    public void setHibernateDialect(SOSOptionString p_hibernate_dialect) {
-        this.hibernate_dialect = p_hibernate_dialect;
+    public void setHibernateDialect(SOSOptionString pHibernateDialect) {
+        this.hibernateDialect = pHibernateDialect;
     }
 
-    /** \var hibernate_format_sql : */
     @JSOptionDefinition(name = "hibernate_format_sql", description = "", key = "hibernate_format_sql", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean hibernate_format_sql = new SOSOptionBoolean(this, conClassName + ".hibernate_format_sql", // HashMap-Key
-            "", // Titel
-            "false", // InitValue
-            "false", // DefaultValue
-            false // isMandatory
-            );
+    public SOSOptionBoolean hibernateFormatSql = new SOSOptionBoolean(this, conClassName + ".hibernate_format_sql", "", "false", "false", false);
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * com.sos.jobnet.options.ISOSJSHibernateOptions#gethibernate_format_sql()
-     */
     @Override
     public SOSOptionBoolean getHibernateFormatSql() {
-        return hibernate_format_sql;
+        return hibernateFormatSql;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * com.sos.jobnet.options.ISOSJSHibernateOptions#sethibernate_format_sql
-     * (com.sos.JSHelper.Options.SOSOptionBoolean)
-     */
     @Override
-    public void setHibernateFormatSql(SOSOptionBoolean p_hibernate_format_sql) {
-        this.hibernate_format_sql = p_hibernate_format_sql;
+    public void setHibernateFormatSql(SOSOptionBoolean pHibernateFormatSql) {
+        this.hibernateFormatSql = pHibernateFormatSql;
     }
 
-    /** \var hibernate_show_sql : */
     @JSOptionDefinition(name = "hibernate_show_sql", description = "", key = "hibernate_show_sql", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean hibernate_show_sql = new SOSOptionBoolean(this, conClassName + ".hibernate_show_sql", // HashMap-Key
-            "", // Titel
-            "false", // InitValue
-            "false", // DefaultValue
-            false // isMandatory
-            );
+    public SOSOptionBoolean hibernateShowSql = new SOSOptionBoolean(this, conClassName + ".hibernate_show_sql", "", "false", "false", false);
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * com.sos.jobnet.options.ISOSJSHibernateOptions#gethibernate_show_sql()
-     */
     @Override
     public SOSOptionBoolean getHibernateShowSql() {
-        return hibernate_show_sql;
+        return hibernateShowSql;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * com.sos.jobnet.options.ISOSJSHibernateOptions#sethibernate_show_sql(com
-     * .sos.JSHelper.Options.SOSOptionBoolean)
-     */
     @Override
     public void setHibernateShowSql(SOSOptionBoolean p_hibernate_show_sql) {
-        this.hibernate_show_sql = p_hibernate_show_sql;
+        this.hibernateShowSql = p_hibernate_show_sql;
     }
 
-    /** \var hibernate_jdbc_use_scrollable_resultset : */
-    @JSOptionDefinition(name = "hibernate_jdbc_use_scrollable_resultset", description = "", key = "hibernate_jdbc_use_scrollable_resultset", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean hibernate_jdbc_use_scrollable_resultset = new SOSOptionBoolean(this, conClassName
-            + ".hibernate_jdbc_use_scrollable_resultset", // HashMap-Key
-            "", // Titel
-            "true", // InitValue
-            "true", // DefaultValue
-            false // isMandatory
-            );
+    @JSOptionDefinition(name = "hibernate_jdbc_use_scrollable_resultset", description = "", key = "hibernate_jdbc_use_scrollable_resultset",
+            type = "SOSOptionBoolean", mandatory = false)
+    public SOSOptionBoolean hibernateJdbcUseScrollableResultset = new SOSOptionBoolean(this, conClassName
+            + ".hibernate_jdbc_use_scrollable_resultset", "", "true", "true", false);
 
-    /*
-     * (non-Javadoc)
-     * @see com.sos.jobnet.options.ISOSJSHibernateOptions#
-     * gethibernate_jdbc_use_scrollable_resultset()
-     */
     @Override
     public SOSOptionBoolean getHibernateJdbcUseScrollableResultset() {
-        return hibernate_jdbc_use_scrollable_resultset;
+        return hibernateJdbcUseScrollableResultset;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.sos.jobnet.options.ISOSJSHibernateOptions#
-     * sethibernate_jdbc_use_scrollable_resultset
-     * (com.sos.JSHelper.Options.SOSOptionBoolean)
-     */
     @Override
-    public void setHibernateJdbcUseScrollableResultset(SOSOptionBoolean p_hibernate_jdbc_use_scrollable_resultset) {
-        this.hibernate_jdbc_use_scrollable_resultset = p_hibernate_jdbc_use_scrollable_resultset;
+    public void setHibernateJdbcUseScrollableResultset(SOSOptionBoolean val) {
+        this.hibernateJdbcUseScrollableResultset = val;
     }
 
     public HibernateOptions() {
         objParentClass = this.getClass();
-    } // public JobNetOptionsSuperClass
+    }
 
-    //
     public HibernateOptions(HashMap<String, String> JSSettings) throws Exception {
         this();
         this.setAllOptions(JSSettings);
-    } // public JobNetOptionsSuperClass (HashMap JSSettings)
+    }
 
-    /** \brief getAllOptionsAsString - liefert die Werte und Beschreibung aller
-     * Optionen als String
-     * 
-     * \details
-     * 
-     * \see toString \see toOut */
-    private String getAllOptionsAsString() {
-        @SuppressWarnings("unused")
-        final String conMethodName = conClassName + "::getAllOptionsAsString";
-        String strT = conClassName + "\n";
-        final StringBuffer strBuffer = new StringBuffer();
-        // strT += IterateAllDataElementsByAnnotation(objParentClass, this,
-        // JSOptionsClass.IterationTypes.toString, strBuffer);
-        // strT += IterateAllDataElementsByAnnotation(objParentClass, this, 13,
-        // strBuffer);
-        strT += this.toString(); // fix
-        //
-        return strT;
-    } // private String getAllOptionsAsString ()
-
-    /** \brief setAllOptions - übernimmt die OptionenWerte aus der HashMap
-     * 
-     * \details In der als Parameter anzugebenden HashMap sind Schlüssel (Name)
-     * und Wert der jeweiligen Option als Paar angegeben. Ein Beispiel für den
-     * Aufbau einer solchen HashMap findet sich in der Beschreibung dieser
-     * Klasse (\ref TestData "setJobSchedulerSSHJobOptions"). In dieser Routine
-     * werden die Schlüssel analysiert und, falls gefunden, werden die
-     * dazugehörigen Werte den Properties dieser Klasse zugewiesen.
-     * 
-     * Nicht bekannte Schlüssel werden ignoriert.
-     * 
-     * \see JSOptionsClass::getItem
-     * 
-     * @param pobjJSSettings
-     * @throws Exception */
     public void setAllOptions(HashMap<String, String> pobjJSSettings) {
-        @SuppressWarnings("unused")
-        final String conMethodName = conClassName + "::setAllOptions";
         flgSetAllOptions = true;
         objSettings = pobjJSSettings;
         super.setSettings(objSettings);
         super.setAllOptions(pobjJSSettings);
         flgSetAllOptions = false;
-    } // public void setAllOptions (HashMap <String, String> JSSettings)
+    }
 
-    /** \brief CheckMandatory - prüft alle Muss-Optionen auf Werte
-     * 
-     * \details
-     * 
-     * @throws Exception
-     * 
-     * @throws Exception - wird ausgelöst, wenn eine mandatory-Option keinen
-     *             Wert hat */
     @Override
-    public void checkMandatory() throws JSExceptionMandatoryOptionMissing //
-            , Exception {
+    public void checkMandatory() throws JSExceptionMandatoryOptionMissing, Exception {
         try {
             super.checkMandatory();
         } catch (Exception e) {
             throw new JSExceptionMandatoryOptionMissing(e.toString());
         }
-    } // public void CheckMandatory ()
+    }
 
-    /** \brief CommandLineArgs - Übernehmen der Options/Settings aus der
-     * Kommandozeile
-     * 
-     * \details Die in der Kommandozeile beim Starten der Applikation
-     * angegebenen Parameter werden hier in die HashMap übertragen und danach
-     * den Optionen als Wert zugewiesen.
-     * 
-     * \return void
-     * 
-     * @param pstrArgs
-     * @throws Exception */
     @Override
     public void commandLineArgs(String[] pstrArgs) {
         super.commandLineArgs(pstrArgs);
         this.setAllOptions(super.objSettings);
     }
 
-} // public class JobNetOptionsSuperClass
+}

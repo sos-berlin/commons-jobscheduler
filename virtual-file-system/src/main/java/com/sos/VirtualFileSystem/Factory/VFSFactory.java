@@ -32,8 +32,8 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class VFSFactory extends SOSVfsMessageCodes {
 
-    private static Logger logger = Logger.getRootLogger();
     protected static Msg objMsg = new Msg(new BundleBaseName("SOSVirtualFileSystem"));
+    private static final Logger LOGGER = Logger.getLogger(VFSFactory.class);
     private static final String USE_TRILEAD = ".TRILEAD";
     private static final String USE_JSCH = ".JSCH";
     private static SOSConnection2OptionsAlternate objConnectionOptions = null;
@@ -43,8 +43,8 @@ public class VFSFactory extends SOSVfsMessageCodes {
             @I18NMessage(value = "%1$s liefert eine Instanz der Klasse %2$s", locale = "de", explanation = "%1$s returns instance of %2$s"),
             @I18NMessage(value = "%1$s returns instance of %2$s", locale = "es", explanation = "%1$s returns instance of %2$s"),
             @I18NMessage(value = "%1$s returns instance of %2$s", locale = "fr", explanation = "%1$s returns instance of %2$s"),
-            @I18NMessage(value = "%1$s returns instance of %2$s", locale = "it", explanation = "%1$s returns instance of %2$s") }, msgnum = "SOSVfs-D-0201",
-            msgurl = "SOSVfs-D-0201")
+            @I18NMessage(value = "%1$s returns instance of %2$s", locale = "it", explanation = "%1$s returns instance of %2$s") },
+            msgnum = "SOSVfs-D-0201", msgurl = "SOSVfs-D-0201")
     private static String strParentLoggerName = "";
     private static ClassLoader classLoader = null;
     public static String sFTPHandlerClassName = "com.sos.VirtualFileSystem.SFTP.SOSVfsSFtpJCraft";
@@ -96,9 +96,10 @@ public class VFSFactory extends SOSVfsMessageCodes {
         try {
             objURL = new URL(pstrWhatURL);
             strWhatSystem = objURL.getProtocol();
-            logger.info(objURL.getFile());
-            logger.info(objURL.getPath());
+            LOGGER.info(objURL.getFile());
+            LOGGER.info(objURL.getPath());
         } catch (MalformedURLException e) {
+            //
         }
         classLoader = Thread.currentThread().getContextClassLoader();
         if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.ssh2.getText())) {
@@ -109,12 +110,12 @@ public class VFSFactory extends SOSVfsMessageCodes {
                 objA = classLoader.loadClass("com.sos.VirtualFileSystem.SFTP.SOSVfsSFtpJCraft");
             }
             ISOSVFSHandler objD = (ISOSVFSHandler) objA.newInstance();
-            logger.trace(SOSVfs_D_0201.params(methodName, objD.toString()));
+            LOGGER.trace(SOSVfs_D_0201.params(methodName, objD.toString()));
             if (objD instanceof ISOSVFSHandler) {
-                logger.trace("ISOSVFSHandler is part of class   ...  " + objA.toString());
+                LOGGER.trace("ISOSVFSHandler is part of class   ...  " + objA.toString());
                 objC = objD;
             } else {
-                logger.error("ISOSVFSHandler not part of class");
+                LOGGER.error("ISOSVFSHandler not part of class");
             }
         }
         if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.ftp.getText())) {
@@ -122,7 +123,7 @@ public class VFSFactory extends SOSVfsMessageCodes {
         }
         if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.ftps.getText())) {
             objC = new SOSVfsFtpS();
-            logger.trace(SOSVfs_D_0201.params(methodName, SOSVfsFtpS.class.toString()));
+            LOGGER.trace(SOSVfs_D_0201.params(methodName, SOSVfsFtpS.class.toString()));
         }
         if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.sftp.getText())) {
             objC = getDynamicVFSHandler(sFTPHandlerClassName);
@@ -130,24 +131,24 @@ public class VFSFactory extends SOSVfsMessageCodes {
         if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.local.getText())
                 || strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.file.getText())) {
             objC = new SOSVfsLocal();
-            logger.trace(SOSVfs_D_0201.params(methodName, SOSVfsLocal.class.toString()));
+            LOGGER.trace(SOSVfs_D_0201.params(methodName, SOSVfsLocal.class.toString()));
             authenticate = false;
         }
         if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.zip.getText())) {
             objC = new SOSVfsZip();
-            logger.trace(SOSVfs_D_0201.params(methodName, SOSVfsZip.class.toString()));
+            LOGGER.trace(SOSVfs_D_0201.params(methodName, SOSVfsZip.class.toString()));
         }
         if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.webdav.getText())) {
             objC = new SOSVfsWebDAV();
-            logger.trace(SOSVfs_D_0201.params(methodName, SOSVfsWebDAV.class.toString()));
+            LOGGER.trace(SOSVfs_D_0201.params(methodName, SOSVfsWebDAV.class.toString()));
         }
         if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.http.getText())) {
             objC = new SOSVfsHTTP();
-            logger.trace(SOSVfs_D_0201.params(methodName, SOSVfsHTTP.class.toString()));
+            LOGGER.trace(SOSVfs_D_0201.params(methodName, SOSVfsHTTP.class.toString()));
         }
         if (strWhatSystem.equalsIgnoreCase(SOSOptionTransferType.enuTransferTypes.smb.getText())) {
             objC = new SOSVfsJCIFS();
-            logger.trace(SOSVfs_D_0201.params(methodName, SOSVfsJCIFS.class.toString()));
+            LOGGER.trace(SOSVfs_D_0201.params(methodName, SOSVfsJCIFS.class.toString()));
         }
         if (objC == null) {
             throw new Exception(SOSVfs_E_0203.params(strWhatSystem));
@@ -159,8 +160,6 @@ public class VFSFactory extends SOSVfsMessageCodes {
                 objC.connect(strHost, intPort);
                 ISOSAuthenticationOptions objAO = new SOSFTPOptions();
                 String strUserInfo = objURL.getUserInfo();
-                // JITL-145: can contain password, therefore shouldn't be logged
-                // logger.info("User-Info = " + strUserInfo);
                 String[] strUI = strUserInfo.split(":");
                 objAO.getUser().setValue(strUI[0]);
                 objAO.getPassword().setValue("");
@@ -169,8 +168,8 @@ public class VFSFactory extends SOSVfsMessageCodes {
                 }
                 objC.authenticate(objAO);
                 objAO = null;
-                logger.info("objURL.getAuthority() : " + objURL.getAuthority());
-                logger.info("objURL.getFile()" + objURL.getFile());
+                LOGGER.info("objURL.getAuthority() : " + objURL.getAuthority());
+                LOGGER.info("objURL.getFile()" + objURL.getFile());
             }
         }
         return objC;
@@ -180,11 +179,6 @@ public class VFSFactory extends SOSVfsMessageCodes {
         objConnectionOptions = pobjConnectionOptions;
     }
 
-    /** Load a specified Class of type ISOSVFSHandlerInterface for the logical
-     * data provider
-     *
-     * @param pstrLoadClassNameDefault
-     * @return */
     private static ISOSVFSHandler getDynamicVFSHandler(final String pstrLoadClassNameDefault) {
         String strLoadClassName = pstrLoadClassNameDefault;
         if (objConnectionOptions != null && objConnectionOptions.loadClassName.isDirty()) {
@@ -192,7 +186,7 @@ public class VFSFactory extends SOSVfsMessageCodes {
             if (strLoadClassName.isEmpty()) {
                 strLoadClassName = pstrLoadClassNameDefault;
             } else {
-                logger.trace(String.format("loadClassName changed from '%1$s' to '%2$s'", pstrLoadClassNameDefault, strLoadClassName));
+                LOGGER.trace(String.format("loadClassName changed from '%1$s' to '%2$s'", pstrLoadClassNameDefault, strLoadClassName));
             }
         }
         ISOSVFSHandler objC = null;
@@ -212,9 +206,9 @@ public class VFSFactory extends SOSVfsMessageCodes {
             objA = classLoader.loadClass(strLoadClassName);
             objC = (ISOSVFSHandler) objA.newInstance();
             if (objC instanceof ISOSVFSHandler) {
-                logger.trace("ISOSVFSHandler is part of class   ...  " + objA.toString());
+                LOGGER.trace("ISOSVFSHandler is part of class   ...  " + objA.toString());
             } else {
-                logger.error("ISOSVFSHandler not part of class" + objA.toString());
+                LOGGER.error("ISOSVFSHandler not part of class" + objA.toString());
             }
         } catch (Exception e) {
             throw new JobSchedulerException(String.format("Class with Name '%1$s' not found and not loaded", strLoadClassName), e);
@@ -232,12 +226,12 @@ public class VFSFactory extends SOSVfsMessageCodes {
                         try {
                             addUrlMethod.invoke(classLoader1, jar.toURI().toURL());
                         } catch (Exception e) {
-                            logger.error(e.getLocalizedMessage());
+                            LOGGER.error(e.getLocalizedMessage());
                         }
                     }
                 }
             } catch (Exception e) {
-                logger.error(e.getLocalizedMessage());
+                LOGGER.error(e.getLocalizedMessage());
             }
         }
     }

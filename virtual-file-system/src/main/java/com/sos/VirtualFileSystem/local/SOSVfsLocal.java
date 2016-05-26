@@ -38,32 +38,18 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer, ISOSVFSHandler, ISOSVirtualFileSystem, ISOSConnection {
 
-    private final Logger logger = Logger.getLogger(SOSVfsLocal.class);
+    private static final Logger LOGGER = Logger.getLogger(SOSVfsLocal.class);
     private final InputStream objInputStream = null;
     private final OutputStream objOutputStream = null;
-
     private String strReplyString = "";
-    @SuppressWarnings("unused")
     private File objWorkingDirectory = null;
-
     private CmdShell objCmdShell = null;
-
     private boolean simulateShell = false;
 
     public SOSVfsLocal() {
+        //
     }
 
-    /** \brief appendFile
-     *
-     * \details Appends a File, which pathname is given as a String-Parameter,
-     * to another file, with name is given as string-parameter.
-     *
-     * \return the size of the file after append-operation
-     *
-     * @param localFile
-     * @param remoteFile
-     * @return */
-    // TODO appendFile with ISOSVirtualFile
     @Override
     public long appendFile(final String strSourceFileName, final String strTargetFileName) {
         JSFile objTargetFile = new JSFile(strTargetFileName);
@@ -72,7 +58,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
             lngFileSize = objTargetFile.appendFile(strSourceFileName);
         } catch (Exception e) {
             String strM = SOSVfs_E_134.params("appendFile()");
-            logger.error(strM, e);
+            LOGGER.error(strM, e);
             throw new JobSchedulerException(strM, e);
         }
         return lngFileSize;
@@ -80,6 +66,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
 
     @Override
     public void ascii() {
+        //
     }
 
     @Override
@@ -90,12 +77,12 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
 
     @Override
     public void binary() {
+        //
     }
 
     @Override
     public boolean changeWorkingDirectory(final String pstrPathName) {
         boolean flgResult = true;
-        // TODO use this directory on any file-operation
         File fleFile = new File(pstrPathName);
         if (fleFile.exists()) {
             if (fleFile.isDirectory()) {
@@ -111,6 +98,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
 
     @Override
     public void close() {
+        //
     }
 
     @Override
@@ -120,10 +108,12 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
 
     @Override
     public void closeInput() {
+        //
     }
 
     @Override
     public void closeOutput() {
+        //
     }
 
     @Override
@@ -133,6 +123,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
 
     @Override
     public void completePendingCommand() {
+        //
     }
 
     @Override
@@ -164,6 +155,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
 
     @Override
     public void controlEncoding(final String pstrControlEncoding) {
+        //
     }
 
     @Override
@@ -189,11 +181,12 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
 
     @Override
     public void disconnect() throws IOException {
+        //
     }
 
     @Override
     public void doPostLoginOperations() {
-
+        //
     }
 
     @Override
@@ -207,10 +200,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
             objCmdShell = new CmdShell();
         }
         String strT = strCmd;
-        if (objCmdShell.isWindows() == true) {
-            // strT = strT.replaceAll("/", "\\\\");
-            // Kommandos auf Windows koennen Optionen haben wie /F /Y, die nicht
-            // in \F \Y umbenannt werden duerfen
+        if (objCmdShell.isWindows()) {
             strT = replaceCommand4Windows(strT);
         }
         int exitCode = objCmdShell.executeCommand(strT);
@@ -221,23 +211,14 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
 
     public String replaceCommand4Windows(final String strCmd) {
         String strT = strCmd;
-        // http://www.sos-berlin.com/jira/browse/SOSFTP-204
-        // Die folgenden beiden "replace" Aufrufe aendern nur Slashes, denen
-        // kein Leerzeichen vorangeht und kein Slash folgt.
-        // 1.Schritt: alle slashs, denen ein slash folgt, bevor ein Leerzeichen
-        // folgt ( " /F //host/c/foo/bar c:/foo/bar" -> " /F \\host\c\foo/bar
-        // c:\foo/bar")
         strT = strT.replaceAll("/(?=[^ ]*/)", "\\\\");
-        // 2.Schritt: alle slashs, die nicht auf ein Leerzeichen folgen (
-        // " /F //host/c/foo/bar c:/foo/bar" -> " /F \\host\c\foo\bar
-        // c:\foo\bar")
         strT = strT.replaceAll("(?<! )/", "\\\\");
-
         return strT;
     }
 
     @Override
     public void flush() {
+        //
     }
 
     @Override
@@ -267,10 +248,8 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
 
     @Override
     public long getFile(final String pstrSourceFileName, final String pstrTargetFileName, final boolean append) throws Exception {
-
         long lngFileSize = 0;
-
-        if (append == false) {
+        if (!append) {
             JSFile objF = new JSFile(pstrSourceFileName);
             lngFileSize = objF.length();
             objF.copy(pstrTargetFileName);
@@ -288,65 +267,50 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public String[] getFilelist(final String folder, final String regexp, final int flag, final boolean pflgRecurseSubFolder, String integrityHashType) {
+    public String[] getFilelist(final String folder, final String regexp, final int flag, final boolean pflgRecurseSubFolder,
+            String integrityHashType) {
         String[] strS = null;
         try {
             Vector<File> objA = SOSFile.getFolderlist(folder, regexp, flag, pflgRecurseSubFolder);
             Vector<String> objV = new Vector<String>(objA.size());
             for (File objF : objA) {
-                // file list should not contain the checksum files
                 if (integrityHashType != null && objF.getName().endsWith(integrityHashType)) {
                     continue;
                 }
-                if (objF.isDirectory() == false) {
+                if (!objF.isDirectory()) {
                     objV.add(objF.getPath());
                 }
             }
             strS = objV.toArray(new String[objV.size()]);
         } catch (Exception e) {
-            logger.error(e.getLocalizedMessage());
+            LOGGER.error(e.getLocalizedMessage());
         }
         return strS;
     }
 
     private Vector<File> getFilelistVector(final String folder, final String regexp, final int RegExpFlag) throws Exception {
-
         Vector<File> filelist = new Vector<File>();
-
-        if (folder == null || folder.length() == 0) {
+        if (folder == null || folder.isEmpty()) {
             throw new FileNotFoundException("empty directory not allowed!!");
         }
-
         File f = new File(folder);
         if (!f.exists()) {
             throw new FileNotFoundException("directory does not exist: " + folder);
         }
-
         filelist = new Vector<File>();
         File[] files = f.listFiles(new SOSFilelistFilter(regexp, RegExpFlag));
         for (File file : files) {
-            if (file.isDirectory()) {
-            } else if (file.isFile()) {
+            if (file.isFile()) {
                 filelist.add(file);
-            } else {
-                // unknown
             }
         }
-
         return filelist;
     }
 
-    /** @param folder
-     * @param regexp
-     * @param flag
-     * @param withSubFolder
-     * @return
-     * @throws Exception */
     private Vector<File> getFilelistVector(final String folder, final String regexp, final int flag, final boolean withSubFolder) throws Exception {
         Vector<File> filelist = new Vector<File>();
         File file = null;
         File[] subDir = null;
-
         file = new File(folder);
         subDir = file.listFiles();
         filelist.addAll(getFilelistVector(folder, regexp, flag));
@@ -389,13 +353,13 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
             Vector<File> objA = SOSFile.getFolderlist(folder, regexp, flag, pflgRecurseSubFolder);
             Vector<String> objV = new Vector<String>(objA.size());
             for (File objF : objA) {
-                if (objF.isDirectory() == true) {
+                if (objF.isDirectory()) {
                     objV.add(objF.getAbsolutePath());
                 }
             }
             strS = objV.toArray(new String[objV.size()]);
         } catch (Exception e) {
-            logger.error(e.getLocalizedMessage());
+            LOGGER.error(e.getLocalizedMessage());
         }
         return strS;
     }
@@ -446,12 +410,12 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
 
     @Override
     public StringBuffer getStdErr() throws Exception {
-        return new StringBuffer("");
+        return new StringBuffer();
     }
 
     @Override
     public StringBuffer getStdOut() throws Exception {
-        return new StringBuffer("");
+        return new StringBuffer();
     }
 
     @Override
@@ -469,18 +433,8 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
         return false;
     }
 
-    /** \brief listNames
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param pathname
-     * @return
-     * @throws IOException */
     @Override
     public String[] listNames(final String pathname) throws IOException {
-
         File objF = new File(pathname);
         File[] objA = objF.listFiles();
         String[] strT = new String[objA.length];
@@ -491,59 +445,29 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
         return strT;
     }
 
-    /** \brief login
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param strUserName
-     * @param strPassword */
     @Override
     public void login(final String strUserName, final String strPassword) {
+        //
     }
 
-    /** \brief logout
-     *
-     * \details
-     *
-     * \return
-     *
-     * @throws IOException */
     @Override
     public void logout() throws IOException {
+        //
     }
 
-    /** \brief mkdir
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param pobjFolderName
-     * @return
-     * @throws IOException */
     @Override
     public ISOSVirtualFolder mkdir(final SOSFolderName pobjFolderName) throws IOException {
         new File(pobjFolderName.getValue()).mkdir();
         return null;
     }
 
-    /** \brief mkdir
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param pathname
-     * @throws IOException */
     @Override
     public void mkdir(final String pathname) throws IOException {
         File objF = new File(pathname);
-        if (objF.exists() == false) {
+        if (!objF.exists()) {
             objF.mkdirs();
         } else {
-            if (objF.isDirectory() == false) {
+            if (!objF.isDirectory()) {
                 throw new JobSchedulerException(SOSVfs_E_277.params(pathname));
             }
         }
@@ -593,31 +517,21 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
         return 0;
     }
 
-    /** \brief put
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param localFile
-     * @param remoteFile */
     @Override
     public void put(final String localFile, final String remoteFile) {
+        //
     }
 
     @Override
     public void putFile(final ISOSVirtualFile objVirtualFile) {
-
         String strName = objVirtualFile.getName();
         strName = new File(strName).getAbsolutePath();
-        if (strName.startsWith("c:") == true) {
+        if (strName.startsWith("c:")) {
             strName = strName.substring(3);
         }
         ISOSVirtualFile objVF = this.getFileHandle(strName);
         OutputStream objOS = objVF.getFileOutputStream();
-
         InputStream objFI = objVirtualFile.getFileInputStream();
-
         int lngBufferSize = 1024;
         byte[] buffer = new byte[lngBufferSize];
         int intBytesTransferred;
@@ -634,9 +548,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
             }
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_134.params("putFile()"), e);
-        } finally {
         }
-
     }
 
     @Override
@@ -666,6 +578,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
 
     @Override
     public void rename(final String strFileName, final String pstrNewFileName) {
+        //
     }
 
     @Override
@@ -681,10 +594,12 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
 
     @Override
     public void setJSJobUtilites(final JSJobUtilities pobjJSJobUtilities) {
+        //
     }
 
     @Override
     public void setLogin(final boolean pflgIsLogin) {
+        //
     }
 
     @Override
@@ -709,6 +624,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
 
     @Override
     public void reconnect(SOSConnection2OptionsAlternate options) {
+        //
     }
 
     @Override
@@ -720,4 +636,5 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     public void setSimulateShell(boolean simulateShell) {
         this.simulateShell = simulateShell;
     }
+
 }

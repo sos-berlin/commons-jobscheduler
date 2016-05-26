@@ -20,9 +20,7 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
     private String userNameAttribute;
 
     public boolean supports(AuthenticationToken token) {
-        SOSLdapAuthorizing authorizing = new SOSLdapAuthorizing();
-        setAuthorizing(authorizing);
-
+        setAuthorizing(new SOSLdapAuthorizing());
         return true;
     }
 
@@ -32,8 +30,6 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
         if (authorizing != null) {
             authorizing.setSosLdapAuthorizingRealm(this);
             authzInfo = authorizing.setRoles(authzInfo, principalCollection);
-            // authzInfo =
-            // authorizing.setPermittions(authzInfo,principalCollection);
         }
         return authzInfo;
     }
@@ -52,8 +48,6 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
     }
 
     public void setGroupRolesMap(Map<String, String> groupRolesMap) {
-        // group1:SYSTEM_ADMINISTRATOR, group2:PARTICIPANT_MANAGER,
-        // group3:DATA_COLLECTION_OPERATOR, group4:PARTICIPANT_RECEPTIONIST
         this.groupRolesMap = groupRolesMap;
     }
 

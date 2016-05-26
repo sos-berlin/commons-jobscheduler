@@ -13,8 +13,6 @@ public class JobSchedulerShowParams extends JobSchedulerJob {
         Variable_set params = spooler_task.params();
         spooler_log.info("Params for task: " + spooler_task.id());
         if (params != null) {
-            // JITL-145
-            // spooler_log.info("Job params: \n" + params.xml());
             spooler_log.info("Job params: \n" + getCleanedParams(params).xml());
         }
         Order order = spooler_task.order();
@@ -35,7 +33,6 @@ public class JobSchedulerShowParams extends JobSchedulerJob {
 
     private Variable_set getCleanedParams(Variable_set originalParams) {
         Variable_set cleanedParams = spooler.create_variable_set();
-        String names = originalParams.names();
         java.util.StringTokenizer tokenizer = new java.util.StringTokenizer(originalParams.names(), ";");
         while (tokenizer.hasMoreTokens()) {
             String name = tokenizer.nextToken();

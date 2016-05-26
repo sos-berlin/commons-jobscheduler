@@ -10,12 +10,12 @@ import com.sos.i18n.I18NBase;
 /** @author Uwe Risse */
 public abstract class SOSHibernateFilter extends I18NBase {
 
-    private String sortMode = "asc";
-    private String orderCriteria;
-    private int limit = 0;
     protected String dateFormat = "yyyy-MM-dd HH:mm:ss";
     protected Date endTime;
     protected String status = "";
+    private String sortMode = "asc";
+    private String orderCriteria;
+    private int limit = 0;
 
     public String getDateFormat() {
         return dateFormat;
@@ -61,6 +61,7 @@ public abstract class SOSHibernateFilter extends I18NBase {
         try {
             this.limit = Integer.parseInt(limit);
         } catch (NumberFormatException e) {
+            //
         }
     }
 

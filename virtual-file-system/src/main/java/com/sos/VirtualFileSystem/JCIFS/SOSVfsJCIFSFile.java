@@ -13,29 +13,15 @@ public class SOSVfsJCIFSFile extends SOSVfsTransferFileBaseClass {
 
     private String strFileName = null;
 
-    /** \brief SOSVfsJCIFSFile
-     *
-     * \details
-     *
-     * @param pstrFileName */
     public SOSVfsJCIFSFile(final String pstrFileName) {
         super(pstrFileName);
-        strFileName = pstrFileName;
+        this.strFileName = pstrFileName;
     }
 
-    /** \brief read
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param bteBuffer
-     * @return */
     @Override
     public int read(final byte[] bteBuffer) {
         try {
             InputStream is = this.getFileInputStream();
-
             if (is == null) {
                 throw new JobSchedulerException(SOSVfs_E_177.get());
             }
@@ -46,16 +32,6 @@ public class SOSVfsJCIFSFile extends SOSVfsTransferFileBaseClass {
         }
     }
 
-    /** \brief read
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param bteBuffer
-     * @param intOffset
-     * @param intLength
-     * @return */
     @Override
     public int read(final byte[] bteBuffer, final int intOffset, final int intLength) {
         try {
@@ -70,24 +46,11 @@ public class SOSVfsJCIFSFile extends SOSVfsTransferFileBaseClass {
         }
     }
 
-    /** \brief write
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param bteBuffer
-     * @param intOffset
-     * @param intLength */
-
-    // private final OutputStream os = null;
-
     @Override
     public void write(final byte[] bteBuffer, final int intOffset, final int intLength) {
         try {
             OutputStream os = this.getFileOutputStream();
             if (os == null) {
-
                 throw new Exception(SOSVfs_E_147.get());
             }
             os.write(bteBuffer, intOffset, intLength);
@@ -96,22 +59,13 @@ public class SOSVfsJCIFSFile extends SOSVfsTransferFileBaseClass {
         }
     }
 
-    /** \brief getFileOutputStream
-     *
-     * \details
-     *
-     * \return
-     *
-     * @return */
     @Override
     public OutputStream getFileOutputStream() {
         try {
             if (objOutputStream == null) {
                 fileName = super.adjustRelativePathName(fileName);
-
                 SOSVfsJCIFS objJ = (SOSVfsJCIFS) objVFSHandler;
                 objOutputStream = objJ.getOutputStream(fileName);
-
                 if (objOutputStream == null) {
                     objVFSHandler.openOutputFile(fileName);
                 }
@@ -122,20 +76,4 @@ public class SOSVfsJCIFSFile extends SOSVfsTransferFileBaseClass {
         return objOutputStream;
     }
 
-    // @Override
-    // public void closeOutput() {
-    // if (objOutputStream != null) {
-    // try {
-    // objOutputStream.flush();
-    // }
-    // catch (IOException e) {}
-    // try {
-    // objOutputStream.close();
-    // }
-    // catch (IOException e) {
-    // RaiseException(e, SOSVfs_E_173.params("write", fileName));
-    // }
-    // objOutputStream = null;
-    // }
-    // }
 }

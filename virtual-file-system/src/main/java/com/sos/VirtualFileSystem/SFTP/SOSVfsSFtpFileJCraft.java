@@ -12,23 +12,10 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
 
-    /** \brief SOSVfsSFtpFileJCraft
-     *
-     * \details
-     *
-     * @param pstrFileName */
     public SOSVfsSFtpFileJCraft(final String pstrFileName) {
         super(pstrFileName);
     }
 
-    /** \brief read
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param bteBuffer
-     * @return */
     @Override
     public int read(final byte[] bteBuffer) {
         try {
@@ -43,26 +30,17 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
         }
     }
 
-    /** \brief getFileInputStream
-     *
-     * \details
-     *
-     * \return
-     *
-     * @return */
     @Override
     public InputStream getFileInputStream() {
         try {
             if (objInputStream == null) {
                 fileName = adjustRelativePathName(fileName);
-
                 int intTransferMode = ChannelSftp.OVERWRITE;
                 if (flgModeAppend) {
                     intTransferMode = ChannelSftp.APPEND;
                 } else if (flgModeRestart) {
                     intTransferMode = ChannelSftp.RESUME;
                 }
-
                 SOSVfsSFtpJCraft objJ = (SOSVfsSFtpJCraft) objVFSHandler;
                 objInputStream = objJ.getClient().get(fileName, intTransferMode);
                 if (objInputStream == null) {
@@ -75,16 +53,6 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
         return objInputStream;
     }
 
-    /** \brief read
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param bteBuffer
-     * @param intOffset
-     * @param intLength
-     * @return */
     @Override
     public int read(final byte[] bteBuffer, final int intOffset, final int intLength) {
         try {
@@ -99,22 +67,11 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
         }
     }
 
-    /** \brief write
-     *
-     * \details
-     *
-     * \return
-     *
-     * @param bteBuffer
-     * @param intOffset
-     * @param intLength */
     @Override
     public void write(final byte[] bteBuffer, final int intOffset, final int intLength) {
         try {
-
             OutputStream os = this.getFileOutputStream();
             if (os == null) {
-
                 throw new Exception(SOSVfs_E_147.get());
             }
             os.write(bteBuffer, intOffset, intLength);
@@ -132,13 +89,6 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
         }
     }
 
-    /** \brief getFileOutputStream
-     *
-     * \details
-     *
-     * \return
-     *
-     * @return */
     @Override
     public OutputStream getFileOutputStream() {
         try {
@@ -150,16 +100,8 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
                 } else if (flgModeRestart) {
                     intTransferMode = ChannelSftp.RESUME;
                 }
-
                 SOSVfsSFtpJCraft objJ = (SOSVfsSFtpJCraft) objVFSHandler;
-                /** kb 2014-07-21 warum wurde die folgende Zeile auskommentiert
-                 * und durch die dahinter stehende, jetzt auskkommentiert,
-                 * ersetzt? Damit ist kein AppendMode möglich und das ist ein
-                 * schwerer Fehler. siehe hierzu:
-                 * https://change.sos-berlin.com/browse/SOSFTP-202 */
                 objOutputStream = objJ.getClient().put(fileName, intTransferMode);
-                // objOutputStream = objJ.getClient().put(fileName);
-
                 if (objOutputStream == null) {
                     objVFSHandler.openOutputFile(fileName);
                 }
@@ -172,28 +114,11 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
 
     @Override
     public long getModificationDateTime() {
-
-        String dateTime = null;
-        long mt = 0;
-
-        // try {
-        // SftpATTRS objAttr = objVFSHandler. (fileName);
-        // if (objAttr != null) {
-        // mt = objAttr.getMTime();
-        // DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        // dateTime = df.format(new Date(mt));
-        // }
-        // }
-        // catch (SftpException e) {
-        // // e.printStackTrace();
-        // }
-        return mt;
+        return 0;
     }
 
     @Override
     public long setModificationDateTime(final long pdteDateTime) {
-
-        // TODO Auto-generated method stub
         return 0;
     }
 

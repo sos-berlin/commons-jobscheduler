@@ -1,24 +1,17 @@
-/**
- * 
- */
 package com.sos.dialog.menu;
 
 /** @author KB */
 public class SOSMenueEvent {
 
+    private String strMessage = "";
     public boolean doIt = false;
     public boolean showMenueItem = true;
+    public enuOperation operation = enuOperation.execute;
 
     public static enum enuOperation {
         show, execute;
     }
 
-    public enuOperation operation = enuOperation.execute;
-    private String strMessage = "";
-
-    /**
-	 * 
-	 */
     public SOSMenueEvent() {
         strMessage = "";
     }
@@ -33,15 +26,12 @@ public class SOSMenueEvent {
 
     public void addMessage(final String pstrMessage) {
         if (pstrMessage != null) {
-            // if (strMessage.length() > 0) {
-            // strMessage += "\n";
-            // }
             strMessage += pstrMessage + "\n";
         }
-
     }
 
     public boolean hasMessage() {
-        return strMessage.length() > 0;
+        return !strMessage.isEmpty();
     }
+
 }
