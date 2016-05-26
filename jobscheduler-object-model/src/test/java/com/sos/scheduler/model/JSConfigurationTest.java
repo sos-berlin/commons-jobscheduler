@@ -1,7 +1,6 @@
 package com.sos.scheduler.model;
 
 import org.apache.log4j.Logger;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -27,11 +26,6 @@ public class JSConfigurationTest {
         LOGGER.debug("test start");
         objFactory = new SchedulerObjectFactory("8of9.sos", 4210);
         objFactory.initMarshaller(Spooler.class);
-    }
-
-    @AfterClass
-    public static void tearDownAfterClass() throws Exception {
-        LOGGER.debug("test ended");
     }
 
     private final void prepareLocalVfs() {

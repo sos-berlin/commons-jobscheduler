@@ -1,7 +1,6 @@
 package com.sos.scheduler.cmd;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-// import com.sos.JSHelper.Options.SOSOptionProtocol;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.answers.Answer;
 import com.sos.scheduler.model.answers.ERROR;

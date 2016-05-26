@@ -8,7 +8,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-/** @author KlausBuettner */
+/** @author Klaus Buettner */
 public class JSTextFile extends JSFile {
 
     private static final long serialVersionUID = 1L;

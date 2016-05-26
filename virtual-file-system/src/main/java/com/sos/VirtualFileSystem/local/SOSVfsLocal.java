@@ -1,6 +1,7 @@
 package com.sos.VirtualFileSystem.local;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -15,6 +16,7 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Options.SOSOptionTransferMode;
 import com.sos.JSHelper.interfaces.ISOSConnectionOptions;
 import com.sos.JSHelper.interfaces.ISOSDataProviderOptions;
+import com.sos.JSHelper.io.SOSFilelistFilter;
 import com.sos.JSHelper.io.Files.JSFile;
 import com.sos.VirtualFileSystem.DataElements.SOSFileList;
 import com.sos.VirtualFileSystem.DataElements.SOSFolderName;
@@ -44,6 +46,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     private CmdShell objCmdShell = null;
     private boolean simulateShell = false;
 
+        //
     @Override
     public long appendFile(final String strSourceFileName, final String strTargetFileName) {
         JSFile objTargetFile = new JSFile(strTargetFileName);
@@ -261,13 +264,13 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     }
 
     @Override
-    public String[] getFilelist(final String folder, final String regexp, final int flag, final boolean pflgRecurseSubFolder, String integrityHashType) {
+    public String[] getFilelist(final String folder, final String regexp, final int flag, final boolean pflgRecurseSubFolder,
+            String integrityHashType) {
         String[] strS = null;
         try {
             Vector<File> objA = SOSFile.getFolderlist(folder, regexp, flag, pflgRecurseSubFolder);
             Vector<String> objV = new Vector<String>(objA.size());
             for (File objF : objA) {
-                // file list should not contain the checksum files
                 if (integrityHashType != null && objF.getName().endsWith(integrityHashType)) {
                     continue;
                 }
@@ -280,6 +283,42 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
             LOGGER.error(e.getLocalizedMessage());
         }
         return strS;
+    }
+
+    private Vector<File> getFilelistVector(final String folder, final String regexp, final int RegExpFlag) throws Exception {
+        Vector<File> filelist = new Vector<File>();
+        if (folder == null || folder.isEmpty()) {
+            throw new FileNotFoundException("empty directory not allowed!!");
+        }
+        File f = new File(folder);
+        if (!f.exists()) {
+            throw new FileNotFoundException("directory does not exist: " + folder);
+        }
+        filelist = new Vector<File>();
+        File[] files = f.listFiles(new SOSFilelistFilter(regexp, RegExpFlag));
+        for (File file : files) {
+            if (file.isFile()) {
+                filelist.add(file);
+            }
+        }
+        return filelist;
+    }
+
+    private Vector<File> getFilelistVector(final String folder, final String regexp, final int flag, final boolean withSubFolder) throws Exception {
+        Vector<File> filelist = new Vector<File>();
+        File file = null;
+        File[] subDir = null;
+        file = new File(folder);
+        subDir = file.listFiles();
+        filelist.addAll(getFilelistVector(folder, regexp, flag));
+        if (withSubFolder) {
+            for (File element : subDir) {
+                if (element.isDirectory()) {
+                    filelist.addAll(getFilelistVector(element.getPath(), regexp, flag, true));
+                }
+            }
+        }
+        return filelist;
     }
 
     @Override
@@ -484,7 +523,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
     public void putFile(final ISOSVirtualFile objVirtualFile) {
         String strName = objVirtualFile.getName();
         strName = new File(strName).getAbsolutePath();
-        if (strName.startsWith("c:") == true) {
+        if (strName.startsWith("c:")) {
             strName = strName.substring(3);
         }
         ISOSVirtualFile objVF = this.getFileHandle(strName);

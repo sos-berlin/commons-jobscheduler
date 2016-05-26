@@ -14,7 +14,6 @@ import com.sos.scheduler.JobSchedulerLog4JAppender;
 public class JobSchedulerLog4JAppenderTest {
 
     private static final Logger LOGGER = Logger.getLogger(JobSchedulerLog4JAppenderTest.class);
-
     public void testSubAppendLoggingEvent() {
         IJobSchedulerLoggingAppender objJSAppender = null;
         Appender objStdoutAppender = LOGGER.getAppender("stdout");

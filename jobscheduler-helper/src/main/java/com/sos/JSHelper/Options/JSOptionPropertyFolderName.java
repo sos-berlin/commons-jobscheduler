@@ -12,8 +12,8 @@ public class JSOptionPropertyFolderName extends SOSOptionFolderName {
 
     @Override
     public void setValue(String pstrFolderName) {
-        final String conMethodName = CLASSNAME + "::Value";
-        pstrFolderName = objParentClass.checkIsFileWritable(pstrFolderName, conMethodName);
+        final String methodName = CLASSNAME + "::Value";
+        pstrFolderName = objParentClass.checkIsFileWritable(pstrFolderName, methodName);
         super.setValue(pstrFolderName);
         if (isNotEmpty(strValue)) {
             System.setProperty("user.dir", strValue);

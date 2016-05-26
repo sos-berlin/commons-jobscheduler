@@ -171,8 +171,7 @@ public class JobSchedulerImportJob extends JobSchedulerJob {
                 }
                 if (sosUpdateStateConnection != null) {
                     sosUpdateStateConnection.rollback();
-                    String upStr =
-                            "UPDATE " + JobSchedulerSignalJob.TABLE_SCHEDULER_SIGNAL_OBECTS + " SET \"STATUS\" = 1003 WHERE  \"SIGNAL_ID\" = "
+                    String upStr = "UPDATE " + JobSchedulerSignalJob.TABLE_SCHEDULER_SIGNAL_OBECTS + " SET \"STATUS\" = 1003 WHERE  \"SIGNAL_ID\" = "
                                     + signalId;
                     sosUpdateStateConnection.executeUpdate(upStr);
                     sosUpdateStateConnection.commit();

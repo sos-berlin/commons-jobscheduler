@@ -5,17 +5,17 @@ public class SOSOptionBoolean extends SOSOptionElement {
     private static final long serialVersionUID = -955477664516893069L;
     public final String ControlType = "checkbox";
 
-    @Override
-    public String getControlType() {
-        return ControlType;
-    }
-
     public SOSOptionBoolean(final JSOptionsClass pobjParent, final String pPstrKey, final String pPstrDescription, final String pPstrValue,
             final String pPstrDefaultValue, final boolean pPflgIsMandatory) {
         super(pobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
         intOptionType = isOptionTypeBoolean;
         this.setValue(pPstrValue);
         this.setNotDirty();
+    }
+
+    @Override
+    public String getControlType() {
+        return ControlType;
     }
 
     @Override

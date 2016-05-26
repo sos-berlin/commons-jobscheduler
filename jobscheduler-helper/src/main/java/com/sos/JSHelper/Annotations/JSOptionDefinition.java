@@ -12,21 +12,13 @@ import java.lang.annotation.Target;
 public @interface JSOptionDefinition {
 
     String name();
-
     String description();
-
     String key() default "";
-
     String xmltagname() default "";
-
     int size() default -1;
-
     boolean mandatory() default false;
-
     String type() default "JSOptionString";
-
     String value() default "";
-
     String defaultvalue() default "";
 
 }

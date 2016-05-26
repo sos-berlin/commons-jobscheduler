@@ -44,7 +44,8 @@ public class VFSFactory extends SOSVfsMessageCodes {
             @I18NMessage(value = "%1$s liefert eine Instanz der Klasse %2$s", locale = "de", explanation = "%1$s returns instance of %2$s"),
             @I18NMessage(value = "%1$s returns instance of %2$s", locale = "es", explanation = "%1$s returns instance of %2$s"),
             @I18NMessage(value = "%1$s returns instance of %2$s", locale = "fr", explanation = "%1$s returns instance of %2$s"),
-            @I18NMessage(value = "%1$s returns instance of %2$s", locale = "it", explanation = "%1$s returns instance of %2$s") }, msgnum = "SOSVfs-D-0201", msgurl = "SOSVfs-D-0201")
+            @I18NMessage(value = "%1$s returns instance of %2$s", locale = "it", explanation = "%1$s returns instance of %2$s") },
+            msgnum = "SOSVfs-D-0201", msgurl = "SOSVfs-D-0201")
     private static String strParentLoggerName = "";
     private static ClassLoader classLoader = null;
     public static String sFTPHandlerClassName = "com.sos.VirtualFileSystem.SFTP.SOSVfsSFtpJCraft";
@@ -222,12 +223,12 @@ public class VFSFactory extends SOSVfsMessageCodes {
                         try {
                             addUrlMethod.invoke(classLoader1, jar.toURI().toURL());
                         } catch (Exception e) {
-                            LOGGER.error(e.getMessage());
+                            LOGGER.error(e.getLocalizedMessage());
                         }
                     }
                 }
             } catch (Exception e) {
-                LOGGER.error(e.getMessage());
+                LOGGER.error(e.getLocalizedMessage());
             }
         }
     }

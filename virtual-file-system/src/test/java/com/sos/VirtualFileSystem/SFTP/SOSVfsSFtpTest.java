@@ -3,10 +3,7 @@ package com.sos.VirtualFileSystem.SFTP;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -24,9 +21,9 @@ import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 /** @author KB */
 public class SOSVfsSFtpTest extends JSToolBox {
 
-    protected static Logger logger = Logger.getLogger(SOSVfsFtpTest.class);
-    protected final String LOCAL_BASE_PATH = "R:\\nobackup\\junittests\\testdata\\SFTP\\";
-    protected final String REMOTE_BASE_PATH = "/home/kb/";
+    protected static final Logger LOGGER = Logger.getLogger(SOSVfsFtpTest.class);
+    protected static final String LOCAL_BASE_PATH = "R:\\nobackup\\junittests\\testdata\\SFTP\\";
+    protected static final String REMOTE_BASE_PATH = "/home/kb/";
     protected SOSFTPOptions objOptions = null;
     protected ISOSVFSHandler objVFS = null;
     protected ISOSVfsFileTransfer ftpClient = null;
@@ -213,7 +210,7 @@ public class SOSVfsSFtpTest extends JSToolBox {
         ftpClient.changeWorkingDirectory("/home/re/Documents");
         Vector<String> v = ftpClient.nList(true);
         for (String item : v) {
-            logger.info("item = " + item);
+            LOGGER.info("item = " + item);
         }
         ftpClient.disconnect();
     }
@@ -259,14 +256,14 @@ public class SOSVfsSFtpTest extends JSToolBox {
     public void testGetReplyString() throws Exception {
         connect();
         ftpClient.login("kb", "kb");
-        logger.info("Replay = " + ftpClient.getReplyString());
+        LOGGER.info("Replay = " + ftpClient.getReplyString());
         ftpClient.disconnect();
     }
 
     @Test
     public void testIsConnected() throws Exception {
         connect();
-        logger.debug("IS CONNECTED = " + ftpClient.isConnected());
+        LOGGER.debug("IS CONNECTED = " + ftpClient.isConnected());
         ftpClient.disconnect();
     }
 
@@ -292,7 +289,7 @@ public class SOSVfsSFtpTest extends JSToolBox {
     public void testGetHandler() throws Exception {
         connect();
         authenticate();
-        logger.debug("HANDLER = " + ftpClient.getHandler());
+        LOGGER.debug("HANDLER = " + ftpClient.getHandler());
         ftpClient.disconnect();
     }
 
@@ -312,7 +309,7 @@ public class SOSVfsSFtpTest extends JSToolBox {
         authenticate();
         String[] result = ftpClient.getFilelist(REMOTE_BASE_PATH, "", 0, false, null);
         for (String element : result) {
-            logger.info(element);
+            LOGGER.info(element);
         }
         ftpClient.disconnect();
     }

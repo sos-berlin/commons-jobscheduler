@@ -10,6 +10,6 @@ public class JSMailOptions extends JSOptionsClass {
     public void setAllOptions(final HashMap<String, String> pobjJSSettings) {
         objSettings = pobjJSSettings;
         super.setSettings(objSettings);
-}
+    }
 
 }

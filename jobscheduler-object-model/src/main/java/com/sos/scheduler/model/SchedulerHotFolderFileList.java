@@ -37,8 +37,8 @@ public class SchedulerHotFolderFileList {
         @Override
         public int compare(JSObjBase jsObjBase0, JSObjBase jsObjBase1) {
             int compareRet = 0;
-            boolean jsObjBase0IsFolder = (jsObjBase0 instanceof SchedulerHotFolder);
-            boolean jsObjBase1IsFolder = (jsObjBase1 instanceof SchedulerHotFolder);
+            boolean jsObjBase0IsFolder = jsObjBase0 instanceof SchedulerHotFolder;
+            boolean jsObjBase1IsFolder = jsObjBase1 instanceof SchedulerHotFolder;
             if (jsObjBase0IsFolder && !jsObjBase1IsFolder) {
                 compareRet = -1;
             } else if (!jsObjBase0IsFolder && jsObjBase1IsFolder) {

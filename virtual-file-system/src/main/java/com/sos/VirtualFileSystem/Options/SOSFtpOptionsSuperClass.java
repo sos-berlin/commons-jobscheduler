@@ -298,8 +298,6 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     public SOSOptionBoolean keepModificationDate = new SOSOptionBoolean(this, CLASSNAME + ".keep_modification_date", 
             "Keep Modification Date of File", "false", "false", false);
     
-//    public SOSOptionBoolean keepModificationDate = (SOSOptionBoolean) keepModificationDate.SetAlias("KeepModificationate");
-
     public String getKeepModificationDate() {
         return keepModificationDate.getValue();
     }
@@ -515,8 +513,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
             key = "PreFtpCommands", type = "SOSOptionString", mandatory = false)
     public SOSOptionCommandString preFtpCommands = new SOSOptionCommandString(this, CLASSNAME + ".Pre_Ftp_Commands", 
             "FTP commands, which has to be executed before the transfer started.", "", "", false);
-    
-    public SOSOptionCommandString PreTransferCommands = (SOSOptionCommandString) preFtpCommands.setAlias("pre_transfer_commands");
+    public SOSOptionCommandString preTransferCommands = (SOSOptionCommandString) preFtpCommands.setAlias("pre_transfer_commands");
 
     public String getPreFtpCommands() {
         return preFtpCommands.getValue();
@@ -531,7 +528,6 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
             key = "PostTransferCommands", type = "SOSOptionString", mandatory = false)
     public SOSOptionCommandString postTransferCommands = new SOSOptionCommandString(this, CLASSNAME + ".post_transfer_Commands", 
             "FTP commands, which has to be executed after the transfer ended.", "", "", false);
-    
     public SOSOptionString postFtpCommands = (SOSOptionString) postTransferCommands.setAlias("post_Transfer_commands");
 
     public String getPostTransferCommands() {
@@ -546,7 +542,6 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "IntegrityHashType", description = "", key = "integrity_hash_type", type = "SOSOptionString", mandatory = false)
     public SOSOptionString integrityHashType = new SOSOptionString(this, CLASSNAME + ".integrity_hash_type", 
             "The Type of the integrity hash, e.g. md5", "md5", "md5", false);
-    
     public SOSOptionString securityHashType = (SOSOptionString) integrityHashType.setAlias("security_hash_type");
 
     @JSOptionDefinition(name = "DecompressAfterTransfer", description = "", key = "Decompress_After_Transfer", type = "SOSOptionBoolean", 
@@ -561,7 +556,6 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "CheckIntegrityHash", description = "", key = "check_integrity_hash", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean checkIntegrityHash = new SOSOptionBoolean(this, CLASSNAME + ".check_integrity_hash", 
             "Calculates the integrity hash", "false", "false", false);
-    
     public SOSOptionBoolean checkSecurityHash = (SOSOptionBoolean) checkIntegrityHash.setAlias("check_security_hash");
 
     @JSOptionDefinition(name = "MaxConcurrentTransfers", description = "", key = "Max_Concurrent_Transfers", type = "SOSOptionInteger", 
@@ -573,7 +567,6 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
             mandatory = false)
     public SOSOptionBoolean createIntegrityHashFile = new SOSOptionBoolean(this, CLASSNAME + ".create_integrity_hash_file", 
             "Flag if an integrity hash file will be created on the target", "false", "false", false);
-
     public SOSOptionBoolean createSecurityHashFile = (SOSOptionBoolean) createIntegrityHashFile.setAlias("create_security_hash_file");
 
     @JSOptionDefinition(name = "BufferSize", description = "", key = "buffer_Size", type = "SOSOptionInteger", mandatory = false)
@@ -642,6 +635,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
             key = "max_file_age", type = "SOSOptionTime", mandatory = false)
     public SOSOptionTime maxFileAge = new SOSOptionTime(this, CLASSNAME + ".max_file_age", 
             "maximum age of a file Specifies the maximum age of a file. If a file", "0", "0", false);
+    public SOSOptionTime fileAgeMaximum = (SOSOptionTime) maxFileAge.setAlias(CLASSNAME + ".FileAgeMaximum");
 
     public SOSOptionTime getMaxFileAge() {
         return maxFileAge;
@@ -651,12 +645,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         maxFileAge = pMaxFileAge;
     }
 
-    public SOSOptionTime fileAgeMaximum = (SOSOptionTime) maxFileAge.setAlias(CLASSNAME + ".FileAgeMaximum");
-
     @JSOptionDefinition(name = "max_file_size", description = "maximum size of a file Specifies the maximum size of a file in", 
             key = "max_file_size", type = "SOSOptionFileSize", mandatory = false)
     public SOSOptionFileSize maxFileSize = new SOSOptionFileSize(this, CLASSNAME + ".max_file_size", 
             "maximum size of a file Specifies the maximum size of a file in", "-1", "-1", false);
+    public SOSOptionFileSize fileSizeMaximum = (SOSOptionFileSize) maxFileSize.setAlias(CLASSNAME + ".FileSizeMaximum");
 
     public SOSOptionFileSize getMaxFileSize() {
         return maxFileSize;
@@ -666,12 +659,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         maxFileSize = pMaxFileSize;
     }
 
-    public SOSOptionFileSize fileSizeMaximum = (SOSOptionFileSize) maxFileSize.setAlias(CLASSNAME + ".FileSizeMaximum");
-
     @JSOptionDefinition(name = "min_file_age", description = "minimum age of a file Specifies the minimum age of a files. If the fi", 
             key = "min_file_age", type = "SOSOptionTime", mandatory = false)
     public SOSOptionTime minFileAge = new SOSOptionTime(this, CLASSNAME + ".min_file_age", 
             "minimum age of a file Specifies the minimum age of a files. If the fi", "0", "0", false);
+    public SOSOptionTime fileAgeMinimum = (SOSOptionTime) minFileAge.setAlias(CLASSNAME + ".FileAgeMinimum");
 
     public SOSOptionTime getMinFileAge() {
         return minFileAge;
@@ -681,12 +673,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         minFileAge = pMinFileAge;
     }
 
-    public SOSOptionTime fileAgeMinimum = (SOSOptionTime) minFileAge.setAlias(CLASSNAME + ".FileAgeMinimum");
-
     @JSOptionDefinition(name = "min_file_size", description = "minimum size of one or multiple files Specifies the minimum size of one", 
             key = "min_file_size", type = "SOSOptionFileSize", mandatory = false)
     public SOSOptionFileSize minFileSize = new SOSOptionFileSize(this, CLASSNAME + ".min_file_size", 
             "minimum size of one or multiple files Specifies the minimum size of one", "-1", "-1", false);
+    public SOSOptionFileSize fileSizeMinimum = (SOSOptionFileSize) minFileSize.setAlias(CLASSNAME + ".FileSizeMinimum");
 
     public SOSOptionFileSize getMinFileSize() {
         return minFileSize;
@@ -695,8 +686,6 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     public void setMinFileSize(final SOSOptionFileSize pMinFileSize) {
         minFileSize = pMinFileSize;
     }
-
-    public SOSOptionFileSize fileSizeMinimum = (SOSOptionFileSize) minFileSize.setAlias(CLASSNAME + ".FileSizeMinimum");
 
     @JSOptionDefinition(name = "MergeOrderParameter", description = "Merge created order parameter with parameter of current order", 
             key = "MergeOrderParameter", type = "SOSOptionBoolean", mandatory = false)
@@ -847,6 +836,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
             key = "scheduler_sosfileoperations_resultsetsize", type = "SOSOptionsInteger", mandatory = false)
     public SOSOptionInteger schedulerSosFileOperationsResultsetSize = new SOSOptionInteger(this, 
             CLASSNAME + ".scheduler_sosfileoperations_resultsetsize", "The amount of hits in the result set of the operation", "", "", false);
+    public SOSOptionInteger resultSetSize = (SOSOptionInteger) schedulerSosFileOperationsResultsetSize.setAlias(CLASSNAME + ".ResultSetSize");
 
     public SOSOptionInteger getSchedulerSosFileOperationsResultsetSize() {
         return schedulerSosFileOperationsResultsetSize;
@@ -856,12 +846,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         schedulerSosFileOperationsResultsetSize = pSchedulerSosFileOperationsResultsetSize;
     }
 
-    public SOSOptionInteger resultSetSize = (SOSOptionInteger) schedulerSosFileOperationsResultsetSize.setAlias(CLASSNAME + ".ResultSetSize");
-
     @JSOptionDefinition(name = "skip_first_files", description = "number of files to remove from the top of the result-set The numbe", 
             key = "skip_first_files", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionInteger skipFirstFiles = new SOSOptionInteger(this, CLASSNAME + ".skip_first_files", 
             "number of files to remove from the top of the result-set The numbe", "0", "0", false);
+    public SOSOptionInteger noOfFirstFiles2Skip = (SOSOptionInteger) skipFirstFiles.setAlias(CLASSNAME + ".NoOfFirstFiles2Skip");
 
     public SOSOptionInteger getSkipFirstFiles() {
         return skipFirstFiles;
@@ -871,12 +860,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         skipFirstFiles = pSkipFirstFiles;
     }
 
-    public SOSOptionInteger noOfFirstFiles2Skip = (SOSOptionInteger) skipFirstFiles.setAlias(CLASSNAME + ".NoOfFirstFiles2Skip");
-
     @JSOptionDefinition(name = "skip_last_files", description = "number of files to remove from the bottom of the result-set The numbe", 
             key = "skip_last_files", type = "SOSOptionInteger", mandatory = false)
     public SOSOptionInteger skipLastFiles = new SOSOptionInteger(this, CLASSNAME + ".skip_last_files", 
             "number of files to remove from the bottom of the result-set The numbe", "0", "0", false);
+    public SOSOptionInteger noOfLastFiles2Skip = (SOSOptionInteger) skipLastFiles.setAlias(CLASSNAME + ".NoOfLastFiles2Skip");
 
     public SOSOptionInteger getSkipLastFiles() {
         return skipLastFiles;
@@ -885,8 +873,6 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     public void setSkipLastFiles(final SOSOptionInteger pSkipLastFiles) {
         skipLastFiles = pSkipLastFiles;
     }
-
-    public SOSOptionInteger noOfLastFiles2Skip = (SOSOptionInteger) skipLastFiles.setAlias(CLASSNAME + ".NoOfLastFiles2Skip");
 
     @JSOptionDefinition(name = "Max_Files", description = "Maximum number of files to process", key = "Max_Files", type = "SOSOptionInteger", 
             mandatory = false)
@@ -920,8 +906,6 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     public SOSOptionTime checkSteadyStateInterval = new SOSOptionTime(this, CLASSNAME + ".check_steady_state_interval", 
             "The intervall for steady state checking", "1", "1", false);
     
-//    public SOSOptionTime checkSteadyStateInterval = (SOSOptionTime) checkSteadyStateInterval.SetAlias("check_steady_state_interval");
-
     public String getCheckSteadyStateInterval() {
         return checkSteadyStateInterval.getValue();
     }
@@ -949,7 +933,6 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
             type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionJobChainNode pollErrorState = new SOSOptionJobChainNode(this, CLASSNAME + ".Poll_Error_State", 
             "Next state in Chain if no files found", "", "", false);
-    
     public SOSOptionJobChainNode noFilesState = (SOSOptionJobChainNode) pollErrorState.setAlias("No_files_state");
 
     public String getPollErrorState() {
@@ -966,8 +949,6 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
             type = "SOSOptionJobChainNode", mandatory = false)
     public SOSOptionJobChainNode steadyStateErrorState = new SOSOptionJobChainNode(this, CLASSNAME + ".Steady_state_error_state", 
             "Next state in JobChain if check steady state did not comes to an normal end", "", "", false);
-    
-//    public SOSOptionJobChainNode SteadyStateErrorState = (SOSOptionJobChainNode) steadyStateErrorState.SetAlias("SteadyErrorState");
 
     public String getSteadyStateErrorState() {
         return steadyStateErrorState.getValue();
@@ -982,7 +963,6 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
             mandatory = false)
     public SOSOptionBoolean makeDirs = new SOSOptionBoolean(this, CLASSNAME + ".make_Dirs", "Create missing Directory on Target", "true", "true", 
             false);
-    
     public SOSOptionBoolean createFoldersOnTarget = (SOSOptionBoolean) makeDirs.setAlias("create_folders_on_target");
 
     public String getMakeDirs() {
@@ -1012,7 +992,6 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
             type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean createResultSet = new SOSOptionBoolean(this, CLASSNAME + ".Create_Result_Set", "Write the ResultSet to a file", 
             "false", "false", false);
-    
     public SOSOptionBoolean createResultList = (SOSOptionBoolean) createResultSet.setAlias("create_result_list");
 
     public String getCreateResultSet() {
@@ -1294,7 +1273,6 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
             type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean checkSize = new SOSOptionBoolean(this, CLASSNAME + ".check_size", "This parameter determines whether the original f", 
             "true", "true", false);
-
     public SOSOptionBoolean checkFileSizeAfterTransfer = (SOSOptionBoolean) checkSize.setAlias(CLASSNAME + ".CheckFileSizeAfterTransfer");
 
     @JSOptionDefinition(name = "classpath_base", description = "The parameter is used during installation of this", key = "classpath_base", 
@@ -1356,8 +1334,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
             type = "SOSOptionRegExp", mandatory = false)
     public SOSOptionRegExp fileSpec = new SOSOptionRegExp(this, CLASSNAME + ".file_spec", "file_spec This parameter expects a regular expressi", 
             "^.*$", "^.*$", false);
-    
     public SOSOptionRegExp fileNameRegExp = (SOSOptionRegExp) fileSpec.setAlias(CLASSNAME + ".FileNameRegExp");
+    public SOSOptionRegExp fileNamePatternRegExp = (SOSOptionRegExp) fileSpec.setAlias(CLASSNAME + ".FileNamePatternRegExp");
 
     @Override
     public SOSOptionRegExp getFileSpec() {
@@ -1369,13 +1347,10 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         fileSpec = pFileSpec;
     }
 
-    public SOSOptionRegExp fileNamePatternRegExp = (SOSOptionRegExp) fileSpec.setAlias(CLASSNAME + ".FileNamePatternRegExp");
-
     @JSOptionDefinition(name = "force_files", description = "This parameter specifies whether an error should b", key = "force_files", 
             type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean forceFiles = new SOSOptionBoolean(this, CLASSNAME + ".force_files", 
             "This parameter specifies whether an error should b", "true", "true", false);
-    
     public SOSOptionBoolean errorOnNoDataFound = (SOSOptionBoolean) forceFiles.setAlias("error_on_no_data_found", "error_when_no_data_found");
 
     @Override
@@ -1392,8 +1367,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
             type = "SOSOptionOutFileName", mandatory = false)
     public SOSOptionOutFileName history = new SOSOptionOutFileName(this, CLASSNAME + ".history", 
             "This parameter causes a history file to be written", "", "", false);
-
     public SOSOptionOutFileName historyFileName = (SOSOptionOutFileName) history.setAlias("history_file_name");
+    public SOSOptionOutFileName sosFtpHistoryFileName = (SOSOptionOutFileName) history.setAlias(CLASSNAME + ".SOSFtpHistoryFileName");
 
     @Override
     public SOSOptionOutFileName getHistory() {
@@ -1404,8 +1379,6 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     public void setHistory(final SOSOptionOutFileName pHistory) {
         history = pHistory;
     }
-
-    public SOSOptionOutFileName SOSFtpHistoryFileName = (SOSOptionOutFileName) history.setAlias(CLASSNAME + ".SOSFtpHistoryFileName");
 
     @JSOptionDefinition(name = "history_repeat", description = "The parameter is used in order to synchronize para", key = "history_repeat", 
             type = "SOSOptionInteger", mandatory = false)
@@ -1440,6 +1413,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     @JSOptionDefinition(name = "host", description = "Host-Name This parameter specifies th", key = "host", type = "SOSOptionHostName", 
             mandatory = false)
     public SOSOptionHostName host = new SOSOptionHostName(this, CLASSNAME + ".host", "Host-Name This parameter specifies th", "", "", false);
+    public SOSOptionHostName hostName = (SOSOptionHostName) host.setAlias(CLASSNAME + ".HostName");
 
     @Override
     public SOSOptionHostName getHost() {
@@ -1450,8 +1424,6 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     public void setHost(final SOSOptionHostName pHost) {
         host = pHost;
     }
-
-    public SOSOptionHostName hostName = (SOSOptionHostName) host.setAlias(CLASSNAME + ".HostName");
 
     @JSOptionDefinition(name = "http_proxy_host", description = "The value of this parameter is the host name or th", key = "http_proxy_host", 
             type = "SOSOptionString", mandatory = false)
@@ -2549,7 +2521,6 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
             type = "SOSOptionZeroByteTransfer", mandatory = false)
     public SOSOptionZeroByteTransfer zeroByteTransfer = new SOSOptionZeroByteTransfer(this, CLASSNAME + ".zero_byte_transfer", 
             "This parameter specifies whether zero byte files", "yes", "yes", false);
-    
     public SOSOptionZeroByteTransfer transferZeroByteFiles = (SOSOptionZeroByteTransfer) zeroByteTransfer.setAlias("transfer_zero_byte_files");
 
     public void setAllOptions(final Properties pobjProperties) {
@@ -2590,38 +2561,37 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 
     @Override
     public SOSOptionPassword getProxyPassword() {
-        // TO DO Auto-generated method stub
         return null;
     }
 
     @Override
     public SOSOptionPortNumber getProxyPort() {
-        // TO DO Auto-generated method stub
         return null;
     }
 
     @Override
     public SOSOptionUserName getProxyUser() {
-        // TO DO Auto-generated method stub
         return null;
     }
 
     @Override
     public void setProxyHost(final SOSOptionString proxyHost) {
-        // TO DO Auto-generated method stub
+        //
     }
 
     @Override
     public void setProxyPassword(final SOSOptionPassword proxyPassword) {
+        //
     }
 
     @Override
     public void setProxyPort(final SOSOptionPortNumber proxyPort) {
+        //
     }
 
     @Override
     public void setProxyUser(final SOSOptionUserName proxyUser) {
-        // TO DO Auto-generated method stub
+        //
     }
 
     @Override
@@ -2641,18 +2611,17 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 
     @Override
     public void setAuthMethod(final SOSOptionAuthenticationMethod authMethod) {
-        // TO DO Auto-generated method stub
+        //
     }
 
     @Override
     public SOSOptionRegExp getFileSpec2() {
-        // TO DO Auto-generated method stub
         return null;
     }
 
     @Override
     public void setFileSpec2(final SOSOptionRegExp p_file_spec2) {
-        // TO DO Auto-generated method stub
+        //
     }
 
     @Override

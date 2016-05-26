@@ -15,12 +15,12 @@ import org.junit.*;
 /** @author KB */
 public class SOSVfsWebDAVTest {
 
-    protected static Logger logger = Logger.getLogger(SOSVfsWebDAVTest.class);
-    protected final String LOCAL_BASE_PATH = "R:/backup/sos/java/junittests/testdata/JADE/";
-    protected final String REMOTE_BASE_PATH = "/webdav/";
-    protected final String WEB_URI = "http://homer.sos/webdav";
-    protected final String WEB_USER = "test";
-    protected final String WEB_PASS = "12345";
+    protected static final Logger LOGGER = Logger.getLogger(SOSVfsWebDAVTest.class);
+    protected static final String LOCAL_BASE_PATH = "R:/backup/sos/java/junittests/testdata/JADE/";
+    protected static final String REMOTE_BASE_PATH = "/webdav/";
+    protected static final String WEB_URI = "http://homer.sos/webdav";
+    protected static final String WEB_USER = "test";
+    protected static final String WEB_PASS = "12345";
     protected SOSFTPOptions objOptions = null;
     protected ISOSVFSHandler objVFS = null;
     protected ISOSVfsFileTransfer objVfsClient = null;
@@ -67,7 +67,7 @@ public class SOSVfsWebDAVTest {
         objVfsClient.rmdir(REMOTE_BASE_PATH + "kb/test1");
         objVfsClient.mkdir(REMOTE_BASE_PATH + "kb/test1");
         ISOSVirtualFile objVF = objVfsClient.getFileHandle(REMOTE_BASE_PATH + "kb/test1");
-        logger.info(objVF.getFileSize());
+        LOGGER.info(objVF.getFileSize());
         objVfsClient.disconnect();
     }
 
@@ -92,7 +92,7 @@ public class SOSVfsWebDAVTest {
     public void testSize() throws Exception {
         connect();
         authenticate();
-        logger.info(objVfsClient.getFileSize(REMOTE_BASE_PATH + "text.txt"));
+        LOGGER.info(objVfsClient.getFileSize(REMOTE_BASE_PATH + "text.txt"));
         objVfsClient.disconnect();
     }
 
@@ -114,7 +114,7 @@ public class SOSVfsWebDAVTest {
         objVfsClient.putFile(createTestFile(), strTargetFileName);
         ISOSVirtualFile objVF = objVfsClient.getFileHandle(strTargetFileName);
         long intFileSize = objVF.getFileSize();
-        logger.info("Size of Targetfile = " + intFileSize);
+        LOGGER.info("Size of Targetfile = " + intFileSize);
         objVfsClient.delete(strTargetFileName);
         objVfsClient.disconnect();
     }
@@ -130,7 +130,7 @@ public class SOSVfsWebDAVTest {
         objVF.write("hallo".getBytes());
         objVF.closeOutput();
         long intFileSize = objVF.getFileSize();
-        logger.info("Size of Targetfile = " + intFileSize);
+        LOGGER.info("Size of Targetfile = " + intFileSize);
         objVfsClient.delete(strTargetFileName);
         objVfsClient.disconnect();
     }
@@ -171,14 +171,14 @@ public class SOSVfsWebDAVTest {
     public void testGetReplyString() throws Exception {
         connect();
         objVfsClient.login(WEB_USER, WEB_PASS);
-        logger.info("Replay = " + objVfsClient.getReplyString());
+        LOGGER.info("Replay = " + objVfsClient.getReplyString());
         objVfsClient.disconnect();
     }
 
     @Test
     public void testIsConnected() throws Exception {
         connect();
-        logger.debug("IS CONNECTED = " + objVfsClient.isConnected());
+        LOGGER.debug("IS CONNECTED = " + objVfsClient.isConnected());
         objVfsClient.disconnect();
     }
 
@@ -217,7 +217,7 @@ public class SOSVfsWebDAVTest {
     public void testGetHandler() throws Exception {
         connect();
         authenticate();
-        logger.debug("HANDLER = " + objVfsClient.getHandler());
+        LOGGER.debug("HANDLER = " + objVfsClient.getHandler());
         objVfsClient.disconnect();
     }
 
@@ -234,7 +234,7 @@ public class SOSVfsWebDAVTest {
     public void testGetFileHandle() throws Exception {
         connect();
         authenticate();
-        logger.info(objVfsClient.getModificationTime(REMOTE_BASE_PATH + "text.txt"));
+        LOGGER.info(objVfsClient.getModificationTime(REMOTE_BASE_PATH + "text.txt"));
         objVfsClient.disconnect();
     }
 
@@ -244,7 +244,7 @@ public class SOSVfsWebDAVTest {
         authenticate();
         String[] result = objVfsClient.getFilelist(REMOTE_BASE_PATH + "kb", "", 0, true, null);
         for (String element : result) {
-            logger.info(element);
+            LOGGER.info(element);
         }
         objVfsClient.disconnect();
     }

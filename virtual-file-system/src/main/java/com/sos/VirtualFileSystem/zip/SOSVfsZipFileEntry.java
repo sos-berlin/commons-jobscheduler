@@ -54,7 +54,7 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
 
     @Override
     public InputStream getFileInputStream() {
-        final String conMethodName = CLASSNAME + "::getFileInputStream";
+        final String methodName = CLASSNAME + "::getFileInputStream";
         String strEntryName = "";
         try {
             if (objInputStream == null) {
@@ -69,7 +69,7 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
                 LOGGER.debug(SOSVfs_D_207.params(strEntryName));
             }
         } catch (Exception e) {
-            String strT = SOSVfs_E_134.params(conMethodName);
+            String strT = SOSVfs_E_134.params(methodName);
             LOGGER.error(strT, e);
             throw new JobSchedulerException(strT, e);
         }
@@ -78,14 +78,13 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
 
     @Override
     public OutputStream getFileOutputStream() {
-        final String conMethodName = CLASSNAME + "::getFileOutputStream";
+        final String methodName = CLASSNAME + "::getFileOutputStream";
         try {
             if (objOutputStream == null) {
                 objOutputStream = objVFSHandler.getOutputStream(objZipEntry.getName());
             }
         } catch (Exception e) {
-            String strT = SOSVfs_E_134.params(conMethodName);
-            throw new JobSchedulerException(strT, e);
+            throw new JobSchedulerException(SOSVfs_E_134.params(methodName), e);
         }
         return objOutputStream;
     }
@@ -166,7 +165,7 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
 
     @Override
     public void setHandler(final ISOSVfsFileTransfer pobjVFSHandler) {
-        objVFSHandler = pobjVFSHandler;
+        this.objVFSHandler = pobjVFSHandler;
     }
 
     @Override
@@ -182,14 +181,14 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
 
     @Override
     public void closeInput() {
-        final String conMethodName = CLASSNAME + "::closeInput";
+        final String methodName = CLASSNAME + "::closeInput";
         try {
             if (objInputStream != null) {
                 objInputStream.close();
             }
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
-            throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);
+            throw new JobSchedulerException(SOSVfs_E_134.params(methodName), e);
         } finally {
             objInputStream = null;
         }
@@ -197,7 +196,7 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
 
     @Override
     public void closeOutput() {
-        final String conMethodName = CLASSNAME + "::closeOutput";
+        final String methodName = CLASSNAME + "::closeOutput";
         try {
             if (objEntryOutputStream == null) {
                 return;
@@ -206,7 +205,7 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
             objEntryOutputStream.closeEntry();
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
-            throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);
+            throw new JobSchedulerException(SOSVfs_E_134.params(methodName), e);
         } finally {
             objOutputStream = null;
         }
@@ -214,60 +213,60 @@ public class SOSVfsZipFileEntry extends SOSVfsCommonFile {
 
     @Override
     public void flush() {
-        final String conMethodName = CLASSNAME + "::flush";
+        final String methodName = CLASSNAME + "::flush";
         try {
             this.getFileOutputStream().flush();
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
-            throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);
+            throw new JobSchedulerException(SOSVfs_E_134.params(methodName), e);
         }
     }
 
     @Override
     public int read(final byte[] bteBuffer) {
-        final String conMethodName = CLASSNAME + "::read";
+        final String methodName = CLASSNAME + "::read";
         int lngBytesRed = 0;
         try {
             lngBytesRed = this.getFileInputStream().read(bteBuffer);
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
-            throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);
+            throw new JobSchedulerException(SOSVfs_E_134.params(methodName), e);
         }
         return lngBytesRed;
     }
 
     @Override
     public int read(final byte[] bteBuffer, final int intOffset, final int intLength) {
-        final String conMethodName = CLASSNAME + "::read";
+        final String methodName = CLASSNAME + "::read";
         int lngBytesRed = 0;
         try {
             lngBytesRed = this.getFileInputStream().read(bteBuffer, intOffset, intLength);
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
-            throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);
+            throw new JobSchedulerException(SOSVfs_E_134.params(methodName), e);
         }
         return lngBytesRed;
     }
 
     @Override
     public void write(final byte[] bteBuffer, final int intOffset, final int intLength) {
-        final String conMethodName = CLASSNAME + "::write";
+        final String methodName = CLASSNAME + "::write";
         try {
             this.getFileOutputStream().write(bteBuffer, intOffset, intLength);
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
-            throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);
+            throw new JobSchedulerException(SOSVfs_E_134.params(methodName), e);
         }
     }
 
     @Override
     public void write(final byte[] bteBuffer) {
-        final String conMethodName = CLASSNAME + "::write";
+        final String methodName = CLASSNAME + "::write";
         try {
             this.getFileOutputStream().write(bteBuffer);
         } catch (IOException e) {
             LOGGER.error(e.getMessage());
-            throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);
+            throw new JobSchedulerException(SOSVfs_E_134.params(methodName), e);
         }
     }
 

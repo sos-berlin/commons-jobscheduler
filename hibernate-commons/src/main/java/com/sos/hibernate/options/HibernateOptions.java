@@ -20,154 +20,163 @@ public class HibernateOptions extends JSOptionsClass implements IHibernateOption
     private static final long serialVersionUID = 5713555021974034071L;
     private static final String CLASSNAME = "JSHibernateOptions";
 
-    @JSOptionDefinition(name = "hibernate_connection_isolation", description = "", key = "hibernate_connection_isolation", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString hibernate_connection_isolation = new SOSOptionString(this, CLASSNAME + ".hibernate_connection_isolation", "", "2", "2",
-            false);
+    @JSOptionDefinition(name = "hibernate_connection_isolation", description = "", key = "hibernate_connection_isolation", type = "SOSOptionString",
+            mandatory = false)
+    public SOSOptionString hibernateConnectionIsolation = new SOSOptionString(this, conClassName + ".hibernate_connection_isolation",
+            "", "2", "2", false);
 
     @Override
     public SOSOptionString getHibernateConnectionIsolation() {
-        return hibernate_connection_isolation;
+        return hibernateConnectionIsolation;
     }
 
     @Override
-    public void setHibernateConnectionIsolation(SOSOptionString p_hibernate_connection_isolation) {
-        this.hibernate_connection_isolation = p_hibernate_connection_isolation;
+    public void setHibernateConnectionIsolation(SOSOptionString pHibernateConnectionIsolation) {
+        this.hibernateConnectionIsolation = pHibernateConnectionIsolation;
     }
 
-    @JSOptionDefinition(name = "hibernate_connection_autocommit", description = "", key = "hibernate_connection_autocommit", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean hibernate_connection_autocommit = new SOSOptionBoolean(this, CLASSNAME + ".hibernate_connection_autocommit", "", "false",
-            "false", false);
+    @JSOptionDefinition(name = "hibernate_connection_autocommit", description = "", key = "hibernate_connection_autocommit",
+            type = "SOSOptionBoolean", mandatory = false)
+    public SOSOptionBoolean hibernateConnectionAutocommit = new SOSOptionBoolean(this, conClassName + ".hibernate_connection_autocommit",
+            "", "false", "false", false);
 
     @Override
     public SOSOptionBoolean getHibernateConnectionAutocommit() {
-        return hibernate_connection_autocommit;
+        return hibernateConnectionAutocommit;
     }
 
     @Override
-    public void setHibernateConnectionAutocommit(SOSOptionBoolean p_hibernate_connection_autocommit) {
-        this.hibernate_connection_autocommit = p_hibernate_connection_autocommit;
+    public void setHibernateConnectionAutocommit(SOSOptionBoolean pHibernateConnectionAutocommit) {
+        this.hibernateConnectionAutocommit = pHibernateConnectionAutocommit;
     }
 
-    @JSOptionDefinition(name = "hibernate_connection_config_file", description = "", key = "hibernate_connection_config_file", type = "SOSOptionInFileName", mandatory = false)
-    public SOSOptionInFileName hibernate_connection_config_file = new SOSOptionInFileName(this, CLASSNAME + ".hibernate_connection_config_file", "",
-            "config/hibernate.cfg.xml", "config/hibernate.cfg.xml", false);
+    @JSOptionDefinition(name = "hibernate_connection_config_file", description = "", key = "hibernate_connection_config_file",
+            type = "SOSOptionInFileName", mandatory = false)
+    public SOSOptionInFileName hibernateConnectionConfigFile = new SOSOptionInFileName(this, conClassName + ".hibernate_connection_config_file",
+            "", "config/hibernate.cfg.xml", "config/hibernate.cfg.xml", false);
 
     @Override
     public SOSOptionInFileName getHibernateConnectionConfigFile() {
-        return hibernate_connection_config_file;
+        return hibernateConnectionConfigFile;
     }
 
     @Override
-    public void setHibernateConnectionConfigFile(SOSOptionInFileName p_hibernate_connection_config_file) {
-        this.hibernate_connection_config_file = p_hibernate_connection_config_file;
+    public void setHibernateConnectionConfigFile(SOSOptionInFileName pHibernateConnectionConfigFile) {
+        this.hibernateConnectionConfigFile = pHibernateConnectionConfigFile;
     }
 
-    @JSOptionDefinition(name = "hibernate_connection_driver_class", description = "", key = "hibernate_connection_driver_class", type = "SOSOptionDBDriver", mandatory = false)
-    public SOSOptionDBDriver hibernate_connection_driver_class = new SOSOptionDBDriver(this, CLASSNAME + ".hibernate_connection_driver_class", "",
-            "oracle.jdbc.driver.OracleDriver", "oracle.jdbc.driver.OracleDriver", false);
+    @JSOptionDefinition(name = "hibernate_connection_driver_class", description = "", key = "hibernate_connection_driver_class",
+            type = "SOSOptionDBDriver", mandatory = false)
+    public SOSOptionDBDriver hibernateConnectionDriverClass = new SOSOptionDBDriver(this, conClassName + ".hibernate_connection_driver_class",
+            "", "oracle.jdbc.driver.OracleDriver", "oracle.jdbc.driver.OracleDriver", false);
 
     @Override
     public SOSOptionDBDriver getHibernateConnectionDriverClass() {
-        return hibernate_connection_driver_class;
+        return hibernateConnectionDriverClass;
     }
 
     @Override
-    public void setHibernateConnectionDriverClass(SOSOptionDBDriver p_hibernate_connection_driver_class) {
-        this.hibernate_connection_driver_class = p_hibernate_connection_driver_class;
+    public void setHibernateConnectionDriverClass(SOSOptionDBDriver pHibernateConnectionDriverClass) {
+        this.hibernateConnectionDriverClass = pHibernateConnectionDriverClass;
     }
 
-    @JSOptionDefinition(name = "hibernate_connection_password", description = "", key = "hibernate_connection_password", type = "SOSOptionPassword", mandatory = false)
-    public SOSOptionPassword hibernate_connection_password = new SOSOptionPassword(this, CLASSNAME + ".hibernate_connection_password", "", "", "",
-            false);
+    @JSOptionDefinition(name = "hibernate_connection_password", description = "", key = "hibernate_connection_password", type = "SOSOptionPassword",
+            mandatory = false)
+    public SOSOptionPassword hibernateConnectionPassword = new SOSOptionPassword(this, conClassName + ".hibernate_connection_password",
+            "", "", "", false);
 
     @Override
     public SOSOptionPassword getHibernateConnectionPassword() {
-        return hibernate_connection_password;
+        return hibernateConnectionPassword;
     }
 
     @Override
-    public void setHibernateConnectionPassword(SOSOptionPassword p_hibernate_connection_password) {
-        this.hibernate_connection_password = p_hibernate_connection_password;
+    public void setHibernateConnectionPassword(SOSOptionPassword pHibernateConnectionPassword) {
+        this.hibernateConnectionPassword = pHibernateConnectionPassword;
     }
 
-    @JSOptionDefinition(name = "hibernate_connection_url", description = "", key = "hibernate_connection_url", type = "SOSOptionJdbcUrl", mandatory = false)
-    public SOSOptionJdbcUrl hibernate_connection_url = new SOSOptionJdbcUrl(this, CLASSNAME + ".hibernate_connection_url", "", "", "", false);
+    @JSOptionDefinition(name = "hibernate_connection_url", description = "", key = "hibernate_connection_url", type = "SOSOptionJdbcUrl",
+            mandatory = false)
+    public SOSOptionJdbcUrl hibernateConnectionUrl = new SOSOptionJdbcUrl(this, conClassName + ".hibernate_connection_url", "", "", "", false);
 
     @Override
     public SOSOptionJdbcUrl getHibernateConnectionUrl() {
-        return hibernate_connection_url;
+        return hibernateConnectionUrl;
     }
 
     @Override
-    public void setHibernateConnectionUrl(SOSOptionJdbcUrl p_hibernate_connection_url) {
-        this.hibernate_connection_url = p_hibernate_connection_url;
+    public void setHibernateConnectionUrl(SOSOptionJdbcUrl pHibernateConnectionUrl) {
+        this.hibernateConnectionUrl = pHibernateConnectionUrl;
     }
 
-    @JSOptionDefinition(name = "hibernate_connection_username", description = "", key = "hibernate_connection_username", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString hibernate_connection_username = new SOSOptionString(this, CLASSNAME + ".hibernate_connection_username", "", "", "", false);
+    @JSOptionDefinition(name = "hibernate_connection_username", description = "", key = "hibernate_connection_username", type = "SOSOptionString",
+            mandatory = false)
+    public SOSOptionString hibernateConnectionUsername = new SOSOptionString(this, conClassName + ".hibernate_connection_username", "", "", "",
+            false);
 
     @Override
     public SOSOptionString getHibernateConnectionUsername() {
-        return hibernate_connection_username;
+        return hibernateConnectionUsername;
     }
 
     @Override
-    public void setHibernateConnectionUsername(SOSOptionString p_hibernate_connection_username) {
-        this.hibernate_connection_username = p_hibernate_connection_username;
+    public void setHibernateConnectionUsername(SOSOptionString pHibernateConnectionUsername) {
+        this.hibernateConnectionUsername = pHibernateConnectionUsername;
     }
 
     @JSOptionDefinition(name = "hibernate_dialect", description = "", key = "hibernate_dialect", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString hibernate_dialect = new SOSOptionString(this, CLASSNAME + ".hibernate_dialect", "",
+    public SOSOptionString hibernateDialect = new SOSOptionString(this, conClassName + ".hibernate_dialect", "",
             "org.hibernate.dialect.Oracle10gDialect", "org.hibernate.dialect.Oracle10gDialect", false);
 
     @Override
     public SOSOptionString getHibernateDialect() {
-        return hibernate_dialect;
+        return hibernateDialect;
     }
 
     @Override
-    public void setHibernateDialect(SOSOptionString p_hibernate_dialect) {
-        this.hibernate_dialect = p_hibernate_dialect;
+    public void setHibernateDialect(SOSOptionString pHibernateDialect) {
+        this.hibernateDialect = pHibernateDialect;
     }
 
     @JSOptionDefinition(name = "hibernate_format_sql", description = "", key = "hibernate_format_sql", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean hibernate_format_sql = new SOSOptionBoolean(this, CLASSNAME + ".hibernate_format_sql", "", "false", "false", false);
+    public SOSOptionBoolean hibernateFormatSql = new SOSOptionBoolean(this, conClassName + ".hibernate_format_sql", "", "false", "false", false);
 
     @Override
     public SOSOptionBoolean getHibernateFormatSql() {
-        return hibernate_format_sql;
+        return hibernateFormatSql;
     }
 
     @Override
-    public void setHibernateFormatSql(SOSOptionBoolean p_hibernate_format_sql) {
-        this.hibernate_format_sql = p_hibernate_format_sql;
+    public void setHibernateFormatSql(SOSOptionBoolean pHibernateFormatSql) {
+        this.hibernateFormatSql = pHibernateFormatSql;
     }
 
     @JSOptionDefinition(name = "hibernate_show_sql", description = "", key = "hibernate_show_sql", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean hibernate_show_sql = new SOSOptionBoolean(this, CLASSNAME + ".hibernate_show_sql", "", "false", "false", false);
+    public SOSOptionBoolean hibernateShowSql = new SOSOptionBoolean(this, conClassName + ".hibernate_show_sql", "", "false", "false", false);
 
     @Override
     public SOSOptionBoolean getHibernateShowSql() {
-        return hibernate_show_sql;
+        return hibernateShowSql;
     }
 
     @Override
     public void setHibernateShowSql(SOSOptionBoolean p_hibernate_show_sql) {
-        this.hibernate_show_sql = p_hibernate_show_sql;
+        this.hibernateShowSql = p_hibernate_show_sql;
     }
 
-    @JSOptionDefinition(name = "hibernate_jdbc_use_scrollable_resultset", description = "", key = "hibernate_jdbc_use_scrollable_resultset", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean hibernate_jdbc_use_scrollable_resultset = new SOSOptionBoolean(this, CLASSNAME
+    @JSOptionDefinition(name = "hibernate_jdbc_use_scrollable_resultset", description = "", key = "hibernate_jdbc_use_scrollable_resultset",
+            type = "SOSOptionBoolean", mandatory = false)
+    public SOSOptionBoolean hibernateJdbcUseScrollableResultset = new SOSOptionBoolean(this, conClassName
             + ".hibernate_jdbc_use_scrollable_resultset", "", "true", "true", false);
 
     @Override
     public SOSOptionBoolean getHibernateJdbcUseScrollableResultset() {
-        return hibernate_jdbc_use_scrollable_resultset;
+        return hibernateJdbcUseScrollableResultset;
     }
 
     @Override
-    public void setHibernateJdbcUseScrollableResultset(SOSOptionBoolean p_hibernate_jdbc_use_scrollable_resultset) {
-        this.hibernate_jdbc_use_scrollable_resultset = p_hibernate_jdbc_use_scrollable_resultset;
+    public void setHibernateJdbcUseScrollableResultset(SOSOptionBoolean val) {
+        this.hibernateJdbcUseScrollableResultset = val;
     }
 
     public HibernateOptions() {

@@ -113,7 +113,7 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
     public void delete(final String pathname) throws IOException {
         throw new JSNotImplementedException();
     }
-
+    
     @Override
     public void disconnect() throws IOException {
         //
@@ -419,7 +419,7 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
                 objF.objEntryOutputStream = objZipOutputStream;
                 objF.setHandler(this);
             } catch (IOException e) {
-                LOGGER.error(e.getLocalizedMessage());
+                LOGGER.error(e.getMessage());
             }
         }
         objF.setHandler(this);
@@ -512,7 +512,7 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
             try {
                 objI = objWorkingDirectory.getInputStream(objZE);
             } catch (IOException e) {
-                LOGGER.error(e.getLocalizedMessage());
+                LOGGER.error(e.getMessage());
                 throw new JobSchedulerException(e);
             }
         }
@@ -534,7 +534,7 @@ public class SOSVfsZip extends SOSVfsBaseClass implements ISOSVfsFileTransfer, I
                 objZOS = new ZipOutputStream(objFOS);
                 objZOS.putNextEntry(objZE);
             } catch (Exception e) {
-                LOGGER.error(e.getLocalizedMessage());
+                LOGGER.error(e.getMessage());
                 throw new JobSchedulerException(e);
             }
         }

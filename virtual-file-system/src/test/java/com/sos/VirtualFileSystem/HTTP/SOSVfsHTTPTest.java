@@ -15,18 +15,18 @@ import com.sos.VirtualFileSystem.Options.SOSFTPOptions;
 /** @author KB */
 public class SOSVfsHTTPTest {
 
-    protected static Logger logger = Logger.getLogger(SOSVfsHTTPTest.class);
-    protected final String LOCAL_BASE_PATH = "R:/backup/sos/java/junittests/testdata/JADE/";
-    protected final String HTTP_URI = "www.sos-berlin.com";
-    protected final int HTTP_PORT = 80;
-    protected final String HTTPS_URI = "https://kb.sos-berlin.com";
-    protected final int HTTPS_PORT = 443;
+    protected static final Logger LOGGER = Logger.getLogger(SOSVfsHTTPTest.class);
+    protected static final String LOCAL_BASE_PATH = "R:/backup/sos/java/junittests/testdata/JADE/";
+    protected static final String HTTP_URI = "www.sos-berlin.com";
+    protected static final int HTTP_PORT = 80;
+    protected static final String HTTPS_URI = "https://kb.sos-berlin.com";
+    protected static final int HTTPS_PORT = 443;
     protected SOSFTPOptions objOptions = null;
     protected ISOSVFSHandler objVFS = null;
     protected ISOSVfsFileTransfer objVfsClient = null;
+    SOSConnection2OptionsAlternate objSource = null;
     protected String dynamicClassNameSource = null;
     protected String dynamicClassNameTarget = null;
-    SOSConnection2OptionsAlternate objSource = null;
 
     @Before
     public void setUp() throws Exception {
@@ -142,7 +142,7 @@ public class SOSVfsHTTPTest {
     @Test
     public void testIsConnected() throws Exception {
         connect();
-        logger.debug("IS CONNECTED = " + objVfsClient.isConnected());
+        LOGGER.debug("IS CONNECTED = " + objVfsClient.isConnected());
         disconnect();
     }
 
@@ -163,7 +163,7 @@ public class SOSVfsHTTPTest {
     public void testGetHandler() throws Exception {
         connect();
         authenticate();
-        logger.debug("HANDLER = " + objVfsClient.getHandler());
+        LOGGER.debug("HANDLER = " + objVfsClient.getHandler());
         disconnect();
     }
 

@@ -18,10 +18,10 @@ public class SOSVfsXmlExport extends SOSVfsMessageCodes implements ISOSTransferH
 
     private static final String CLASSNAME = "SOSVfsXmlExport";
     private static final Logger LOGGER = Logger.getLogger(SOSVfsXmlExport.class);
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private final String rootElementName = "transfer_history";
     private final String exportElementName = "summary";
     private final String exportDetailsElementName = "items";
-    private final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private SOSFTPOptions objOptions = null;
     private JSXMLFile objXMLFile = null;
     private IJadeTransferHistoryData jadeTransferExportData = null;
@@ -37,9 +37,9 @@ public class SOSVfsXmlExport extends SOSVfsMessageCodes implements ISOSTransferH
 
     @Override
     public void doTransferDetail() {
-        final String conMethodName = CLASSNAME + "::doExportDetail";
+        final String methodName = CLASSNAME + "::doExportDetail";
         if (isNull(jadeTransferDetailExportData)) {
-            throw new JobSchedulerException(SOSVfs_E_261.params(conMethodName));
+            throw new JobSchedulerException(SOSVfs_E_261.params(methodName));
         }
         open();
         try {
@@ -69,16 +69,16 @@ public class SOSVfsXmlExport extends SOSVfsMessageCodes implements ISOSTransferH
                 objXMLFile.endTag(exportDetailsElementName);
             }
         } catch (Exception e) {
-            LOGGER.error(e.getLocalizedMessage());
-            throw new JobSchedulerException(SOSVfs_E_260.params(conMethodName), e);
+            LOGGER.error(e.getMessage());
+            throw new JobSchedulerException(SOSVfs_E_260.params(methodName), e);
         }
     }
 
     @Override
     public void doTransferSummary() {
-        final String conMethodName = CLASSNAME + "::doExportSummary";
+        final String methodName = CLASSNAME + "::doExportSummary";
         if (isNull(jadeTransferExportData)) {
-            throw new JobSchedulerException(SOSVfs_E_261.params(conMethodName));
+            throw new JobSchedulerException(SOSVfs_E_261.params(methodName));
         }
         open();
         try {
@@ -113,23 +113,23 @@ public class SOSVfsXmlExport extends SOSVfsMessageCodes implements ISOSTransferH
                 objXMLFile.endTag(exportElementName);
             }
         } catch (Exception e) {
-            LOGGER.error(e.getLocalizedMessage());
-            throw new JobSchedulerException(SOSVfs_E_260.params(conMethodName), e);
+            LOGGER.error(e.getMessage());
+            throw new JobSchedulerException(SOSVfs_E_260.params(methodName), e);
         }
     }
 
     @Override
     public void close() {
-        final String conMethodName = CLASSNAME + "::close";
+        final String methodName = CLASSNAME + "::close";
         if (isNotNull(objXMLFile)) {
             try {
-                if (objXMLFile.isOpened() == true) {
+                if (objXMLFile.isOpened()) {
                     objXMLFile.endTag(rootElementName);
                     objXMLFile.close();
                 }
             } catch (Exception e) {
                 LOGGER.error(e.getLocalizedMessage());
-                throw new JobSchedulerException(SOSVfs_E_260.params(conMethodName), e);
+                throw new JobSchedulerException(SOSVfs_E_260.params(methodName), e);
             }
             objXMLFile = null;
         }
@@ -179,7 +179,7 @@ public class SOSVfsXmlExport extends SOSVfsMessageCodes implements ISOSTransferH
 
     private void writeItem(final String name, final Date value) throws Exception {
         if (isNotNull(value)) {
-            writeItem(name, dateFormatter.format(value));
+            writeItem(name, DATE_FORMAT.format(value));
         }
     }
 
@@ -210,7 +210,7 @@ public class SOSVfsXmlExport extends SOSVfsMessageCodes implements ISOSTransferH
                     objXMLFile.writeXMLDeclaration().newTag(rootElementName);
                 }
             } catch (Exception e) {
-                LOGGER.error(e.getLocalizedMessage());
+                LOGGER.error(e.getMessage());
                 throw new JobSchedulerException(SOSVfs_E_260.params(conMethodName), e);
             }
         }

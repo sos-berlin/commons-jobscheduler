@@ -29,9 +29,9 @@ public class DialogAdapter extends Dialog {
     protected Shell shell;
     private WindowsSaver objFormHelper;
     private IDialogActionHandler objDialogActionHandler = null;
+    private Composite objC = null;
     private GridLayout gridLayout = null;
     private GridData GridData4Column = null;
-    private Composite objC = null;
 
     public DialogAdapter(final Shell parent, final int style) {
         super(parent, style);
@@ -65,8 +65,7 @@ public class DialogAdapter extends Dialog {
         objC.layout(true, true);
         shell.layout(true, true);
         shell.setRedraw(true);
-        Object objO = null;
-        return objO;
+        return null;
     }
 
     public Object open(final IDialogActionHandler pobjDialogActionHandler) {

@@ -20,9 +20,9 @@ import com.sos.scheduler.model.TestBase;
 public class JSObjRunTimeTest extends TestBase {
 
     private static final Logger LOGGER = Logger.getLogger(JSObjRunTimeTest.class);
-    private static final DateTimeFormatter FORMAT_DATE_TIME = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm");
-    private static final DateTimeFormatter FORMAT_DATE = DateTimeFormat.forPattern("yyyy-MM-dd");
-    private static final DateTimeFormatter FORMAT_TIME = DateTimeFormat.forPattern("HH:mm:ss");
+    private static final DateTimeFormatter FMT_DATE_TIME = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm");
+    private static final DateTimeFormatter FMT_DATE = DateTimeFormat.forPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter FMT_TIME = DateTimeFormat.forPattern("HH:mm:ss");
     private static final Interval NEXT_24H = IntervalConstants.NEXT_24H.getInterval();
     private static final Interval CURRENT_WEEK = IntervalConstants.CURRENT_WEEK.getInterval();
     private static SchedulerObjectFactory factory = null;
@@ -102,22 +102,22 @@ public class JSObjRunTimeTest extends TestBase {
         xml = "<run_time single_start='15:00' when_holiday='previous_non_holiday'/>";
         JSObjRunTime runtime = new JSObjRunTime(factory, xml);
         DateTime d = new DateTime(2012, 3, 7, 16, 0, 0, 0);
-        assertEquals("2012-03-07 15:00", FORMAT_DATE_TIME.print(runtime.getRunTimePeriod().getDtSingleStartOrNull(d)));
+        assertEquals("2012-03-07 15:00", FMT_DATE_TIME.print(runtime.getRunTimePeriod().getDtSingleStartOrNull(d)));
         DateTime start = d.minusMillis(d.getMillisOfDay());
         Interval i = new Interval(start, start.plusDays(1));
-        assertEquals("2012-03-07 15:00", FORMAT_DATE_TIME.print(runtime.getDtSingleStarts(i).get(0)));
+        assertEquals("2012-03-07 15:00", FMT_DATE_TIME.print(runtime.getDtSingleStarts(i).get(0)));
     }
 
     @Test
     public final void testNextSingleStart() {
         DateTime single = new DateTime().plusMinutes(1);
-        xml = "<run_time single_start='" + FORMAT_TIME.print(single) + "' />";
+        xml = "<run_time single_start='" + FMT_TIME.print(single) + "' />";
         JSObjRunTime runtime = new JSObjRunTime(factory, xml);
-        assertEquals(FORMAT_DATE_TIME.print(single), FORMAT_DATE_TIME.print(runtime.getDtSingleStarts(NEXT_24H).get(0)));
+        assertEquals(FMT_DATE_TIME.print(single), FMT_DATE_TIME.print(runtime.getDtSingleStarts(NEXT_24H).get(0)));
         single = new DateTime().minusMinutes(1);
-        xml = "<run_time single_start='" + FORMAT_TIME.print(single) + "' />";
+        xml = "<run_time single_start='" + FMT_TIME.print(single) + "' />";
         runtime = new JSObjRunTime(factory, xml);
-        assertEquals(FORMAT_DATE_TIME.print(single.plusDays(1)), FORMAT_DATE_TIME.print(runtime.getDtSingleStarts(NEXT_24H).get(0)));
+        assertEquals(FMT_DATE_TIME.print(single.plusDays(1)), FMT_DATE_TIME.print(runtime.getDtSingleStarts(NEXT_24H).get(0)));
     }
 
     @Test
@@ -125,8 +125,8 @@ public class JSObjRunTimeTest extends TestBase {
         xml = "<run_time begin='15:00' end='17:30'/>";
         JSObjRunTime runtime = new JSObjRunTime(factory, xml);
         DateTime d = new DateTime(2012, 3, 8, 16, 0, 0, 0);
-        assertEquals("2012-03-08 15:00", FORMAT_DATE_TIME.print(runtime.getRunTimePeriod().getDtBeginOrNull(d)));
-        assertEquals("2012-03-08 17:30", FORMAT_DATE_TIME.print(runtime.getRunTimePeriod().getDtEndOrNull(d)));
+        assertEquals("2012-03-08 15:00", FMT_DATE_TIME.print(runtime.getRunTimePeriod().getDtBeginOrNull(d)));
+        assertEquals("2012-03-08 17:30", FMT_DATE_TIME.print(runtime.getRunTimePeriod().getDtEndOrNull(d)));
     }
 
     @Test
@@ -180,8 +180,8 @@ public class JSObjRunTimeTest extends TestBase {
         xml = "<run_time>" + "<period single_start=\"21:00\" />" + "<period single_start=\"22:00\" />" + "</run_time>";
         JSObjRunTime runtime = new JSObjRunTime(factoryWithDefaultPeriod, xml);
         List<DateTime> result = runtime.getDtSingleStarts(NEXT_24H);
-        assertEquals("21:00:00", FORMAT_TIME.print(result.get(0)));
-        assertEquals("22:00:00", FORMAT_TIME.print(result.get(1)));
+        assertEquals("21:00:00", FMT_TIME.print(result.get(0)));
+        assertEquals("22:00:00", FMT_TIME.print(result.get(1)));
     }
 
     @Test
@@ -192,11 +192,11 @@ public class JSObjRunTimeTest extends TestBase {
                         + "<period single_start=\"19:00\" />" + "<period single_start=\"11:00\" />" + "</day>" + "</weekdays>" + "</run_time>";
         JSObjRunTime runtime = new JSObjRunTime(factory, xml);
         List<DateTime> result = runtime.getDtSingleStarts(CURRENT_WEEK);
-        String datePrefix = FORMAT_DATE.print(new DateTime()) + " ";
+        String datePrefix = FMT_DATE.print(new DateTime()) + " ";
         assertEquals(3, result.size());
-        assertEquals(datePrefix + "11:00", FORMAT_DATE_TIME.print(result.get(0)));
-        assertEquals(datePrefix + "15:00", FORMAT_DATE_TIME.print(result.get(1)));
-        assertEquals(datePrefix + "19:00", FORMAT_DATE_TIME.print(result.get(2)));
+        assertEquals(datePrefix + "11:00", FMT_DATE_TIME.print(result.get(0)));
+        assertEquals(datePrefix + "15:00", FMT_DATE_TIME.print(result.get(1)));
+        assertEquals(datePrefix + "19:00", FMT_DATE_TIME.print(result.get(2)));
     }
 
     @Test
@@ -237,15 +237,15 @@ public class JSObjRunTimeTest extends TestBase {
         List<DateTime> result = runtime.getDtSingleStarts(march2012);
         String timeString = " " + expectedTime;
         assertEquals(9, result.size());
-        assertEquals("2012-03-06" + timeString, FORMAT_DATE_TIME.print(result.get(0)));
-        assertEquals("2012-03-13" + timeString, FORMAT_DATE_TIME.print(result.get(1)));
-        assertEquals("2012-03-20" + timeString, FORMAT_DATE_TIME.print(result.get(2)));
-        assertEquals("2012-03-21" + timeString, FORMAT_DATE_TIME.print(result.get(3)));
-        assertEquals("2012-03-22" + timeString, FORMAT_DATE_TIME.print(result.get(4)));
-        assertEquals("2012-03-23" + timeString, FORMAT_DATE_TIME.print(result.get(5)));
-        assertEquals("2012-03-27" + timeString, FORMAT_DATE_TIME.print(result.get(6)));
-        assertEquals("2012-03-28" + timeString, FORMAT_DATE_TIME.print(result.get(7)));
-        assertEquals("2012-03-31" + timeString, FORMAT_DATE_TIME.print(result.get(8)));
+        assertEquals("2012-03-06" + timeString, FMT_DATE_TIME.print(result.get(0)));
+        assertEquals("2012-03-13" + timeString, FMT_DATE_TIME.print(result.get(1)));
+        assertEquals("2012-03-20" + timeString, FMT_DATE_TIME.print(result.get(2)));
+        assertEquals("2012-03-21" + timeString, FMT_DATE_TIME.print(result.get(3)));
+        assertEquals("2012-03-22" + timeString, FMT_DATE_TIME.print(result.get(4)));
+        assertEquals("2012-03-23" + timeString, FMT_DATE_TIME.print(result.get(5)));
+        assertEquals("2012-03-27" + timeString, FMT_DATE_TIME.print(result.get(6)));
+        assertEquals("2012-03-28" + timeString, FMT_DATE_TIME.print(result.get(7)));
+        assertEquals("2012-03-31" + timeString, FMT_DATE_TIME.print(result.get(8)));
     }
 
     @Test
@@ -260,23 +260,22 @@ public class JSObjRunTimeTest extends TestBase {
         assertEquals(9, result.size());
         result = runStartDatesAwareHolidays(previousNonHoliday);
         assertEquals(4, result.size());
-        assertEquals("2012-03-09", FORMAT_DATE.print(result.get(0)));
-        assertEquals("2012-03-16", FORMAT_DATE.print(result.get(1)));
-        assertEquals("2012-03-23", FORMAT_DATE.print(result.get(2)));
-        assertEquals("2012-03-29", FORMAT_DATE.print(result.get(3)));
+        assertEquals("2012-03-09", FMT_DATE.print(result.get(0)));
+        assertEquals("2012-03-16", FMT_DATE.print(result.get(1)));
+        assertEquals("2012-03-23", FMT_DATE.print(result.get(2)));
+        assertEquals("2012-03-29", FMT_DATE.print(result.get(3)));
         result = runStartDatesAwareHolidays(nextNonHoliday);
         assertEquals(4, result.size());
-        assertEquals("2012-03-05", FORMAT_DATE.print(result.get(0)));
-        assertEquals("2012-03-12", FORMAT_DATE.print(result.get(1)));
-        assertEquals("2012-03-19", FORMAT_DATE.print(result.get(2)));
-        assertEquals("2012-03-26", FORMAT_DATE.print(result.get(3)));
+        assertEquals("2012-03-05", FMT_DATE.print(result.get(0)));
+        assertEquals("2012-03-12", FMT_DATE.print(result.get(1)));
+        assertEquals("2012-03-19", FMT_DATE.print(result.get(2)));
+        assertEquals("2012-03-26", FMT_DATE.print(result.get(3)));
     }
 
     public List<DateTime> runStartDatesAwareHolidays(String period) {
         DateTime from = new DateTime(2012, 3, 1, 0, 0, 0, 0);
         Interval march2012 = new Interval(from, from.plusMonths(1));
-        xml =
-                "<run_time>" + "<weekdays>" + "<day day=\"6\">" + period + "</day>" + "<day day=\"7\">" + period + "</day>" + "</weekdays>"
+        xml = "<run_time>" + "<weekdays>" + "<day day=\"6\">" + period + "</day>" + "<day day=\"7\">" + period + "</day>" + "</weekdays>"
                         + "<holidays>" + "<holiday date=\"2012-03-01\"/>" + "<holiday date=\"2012-03-02\"/>" + "<holiday date=\"2012-03-30\"/>"
                         + "<weekdays>" + "<day day=\"6\"/>" + "<day day=\"7\"/>" + "</weekdays>" + "</holidays>" + "</run_time>";
         JSObjRunTime runtime = new JSObjRunTime(factoryWithDefaultPeriod, xml);

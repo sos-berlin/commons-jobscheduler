@@ -22,6 +22,7 @@ public class TestLoadSchedulerXML implements Runnable {
 
     private static final Logger LOGGER = Logger.getLogger(TestLoadSchedulerXML.class);
 
+        //
     @Override
     public void run() {
         try {
@@ -56,9 +57,9 @@ public class TestLoadSchedulerXML implements Runnable {
             try {
                 objStartJob.run();
             } catch (JobSchedulerException e) {
-                // TO DO: handle exception
+                //
             } catch (Exception e) {
-                // TO DO: handle exception
+                //
             }
             Task objTask = objStartJob.getTask();
             LOGGER.info("task-id  = " + objTask.getTaskId());
@@ -67,9 +68,9 @@ public class TestLoadSchedulerXML implements Runnable {
             try {
                 objStartJob.run();
             } catch (JobSchedulerException e) {
-                // TO DO: handle exception
+                //
             } catch (Exception e) {
-                // TO DO: handle exception
+                //
             }
             JSCmdShowState objShowState = objFactory.createShowState();
             objShowState.setWhat("all");

@@ -20,8 +20,7 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
     private String userNameAttribute;
 
     public boolean supports(AuthenticationToken token) {
-        SOSLdapAuthorizing authorizing = new SOSLdapAuthorizing();
-        setAuthorizing(authorizing);
+        setAuthorizing(new SOSLdapAuthorizing());
         return true;
     }
 

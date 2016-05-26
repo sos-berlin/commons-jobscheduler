@@ -1,6 +1,3 @@
-/**
- *
- */
 package com.sos.VirtualFileSystem.Filter.Options;
 
 import java.util.Vector;
@@ -25,7 +22,7 @@ public class SOSFilterOptions extends SOSFilterOptionsSuperClass {
     public Vector<SOSNullFilter> getFilter() {
         if (lstFilters == null) {
             lstFilters = new Vector();
-            if (filterSequence.isDirty() == true) {
+            if (filterSequence.isDirty()) {
                 for (String strFilterName : filterSequence.getValueList()) {
                     lstFilters.add(getFilterInstance(strFilterName));
                 }

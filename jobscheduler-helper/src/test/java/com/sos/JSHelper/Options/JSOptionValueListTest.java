@@ -14,12 +14,12 @@ import org.junit.Test;
 public class JSOptionValueListTest {
 
     private static final Logger LOGGER = Logger.getLogger(JSOptionValueListTest.class);
-    private HashMap<String, String> settings = null;
-    private JSOptionsClass objOptions = null;
     private final String strKey = "sql_statement";
     private final String strDescr = "SQL Statements";
     private final String strDelimiter = ";";
     private final String[] strStatements = new String[10];
+    private HashMap<String, String> settings = null;
+    private JSOptionsClass objOptions = null;
     private JSOptionValueList optionValueList = null;
 
     @Before

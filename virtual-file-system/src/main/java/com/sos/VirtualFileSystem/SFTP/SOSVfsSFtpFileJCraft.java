@@ -113,8 +113,7 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
 
     @Override
     public long getModificationDateTime() {
-        long mt = 0;
-        return mt;
+        return 0;
     }
 
     @Override

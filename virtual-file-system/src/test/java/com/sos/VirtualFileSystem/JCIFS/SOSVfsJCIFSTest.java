@@ -19,12 +19,12 @@ import static org.junit.Assert.assertEquals;
 /** @author KB */
 public class SOSVfsJCIFSTest {
 
-    protected final String LOCAL_BASE_PATH = "R:/backup/sos/java/junittests/testdata/JADE/";
-    protected final String REMOTE_BASE_PATH = "/test/unittests/testdata/JADE/";
-    protected final String HOST = "wilma.sos";
-    protected final String USER = "test";
-    protected final String PASS = "12345";
-    protected Logger logger = Logger.getLogger(this.getClass());
+    protected static final Logger LOGGER = Logger.getLogger(SOSVfsJCIFSTest.class);
+    protected static final String LOCAL_BASE_PATH = "R:/backup/sos/java/junittests/testdata/JADE/";
+    protected static final String REMOTE_BASE_PATH = "/test/unittests/testdata/JADE/";
+    protected static final String HOST = "wilma.sos";
+    protected static final String USER = "test";
+    protected static final String PASS = "12345";
     protected SOSFTPOptions objOptions = null;
     protected ISOSVFSHandler objVFS = null;
     protected ISOSVfsFileTransfer objVfsClient = null;
@@ -70,7 +70,7 @@ public class SOSVfsJCIFSTest {
         objVfsClient.rmdir(REMOTE_BASE_PATH + "test1");
         objVfsClient.mkdir(REMOTE_BASE_PATH + "test1");
         ISOSVirtualFile objVF = objVfsClient.getFileHandle(REMOTE_BASE_PATH + "test1");
-        logger.info(objVF.getFileSize());
+        LOGGER.info(objVF.getFileSize());
         objVfsClient.disconnect();
     }
 
@@ -96,7 +96,7 @@ public class SOSVfsJCIFSTest {
     public void testSize() throws Exception {
         connect();
         authenticate();
-        logger.info(objVfsClient.getFileSize(REMOTE_BASE_PATH + "BVG.pdf"));
+        LOGGER.info(objVfsClient.getFileSize(REMOTE_BASE_PATH + "BVG.pdf"));
         objVfsClient.disconnect();
     }
 
@@ -118,7 +118,7 @@ public class SOSVfsJCIFSTest {
         objVfsClient.putFile(createTestFile(), strTargetFileName);
         ISOSVirtualFile objVF = objVfsClient.getFileHandle(strTargetFileName);
         long intFileSize = objVF.getFileSize();
-        logger.info("Size of Targetfile = " + intFileSize);
+        LOGGER.info("Size of Targetfile = " + intFileSize);
         objVfsClient.delete(strTargetFileName);
         objVfsClient.disconnect();
     }
@@ -135,7 +135,7 @@ public class SOSVfsJCIFSTest {
         out.close();
         ISOSVirtualFile objVF = objVfsClient.getFileHandle(strTargetFileName);
         long intFileSize = objVF.getFileSize();
-        logger.info("Size of Targetfile = " + intFileSize);
+        LOGGER.info("Size of Targetfile = " + intFileSize);
         objVfsClient.disconnect();
         assertEquals(intFileSize, hallo.length());
     }
@@ -181,14 +181,14 @@ public class SOSVfsJCIFSTest {
     public void testGetReplyString() throws Exception {
         connect();
         objVfsClient.login(USER, PASS);
-        logger.info("Replay = " + objVfsClient.getReplyString());
+        LOGGER.info("Replay = " + objVfsClient.getReplyString());
         objVfsClient.disconnect();
     }
 
     @Test
     public void testIsConnected() throws Exception {
         connect();
-        logger.debug("IS CONNECTED = " + objVfsClient.isConnected());
+        LOGGER.debug("IS CONNECTED = " + objVfsClient.isConnected());
         objVfsClient.disconnect();
     }
 
@@ -215,7 +215,7 @@ public class SOSVfsJCIFSTest {
     public void testGetHandler() throws Exception {
         connect();
         authenticate();
-        logger.debug("HANDLER = " + objVfsClient.getHandler());
+        LOGGER.debug("HANDLER = " + objVfsClient.getHandler());
         objVfsClient.disconnect();
     }
 
@@ -232,7 +232,7 @@ public class SOSVfsJCIFSTest {
     public void testGetFileHandle() throws Exception {
         connect();
         authenticate();
-        logger.info(objVfsClient.getModificationTime(REMOTE_BASE_PATH + "sos-net-src.zip"));
+        LOGGER.info(objVfsClient.getModificationTime(REMOTE_BASE_PATH + "sos-net-src.zip"));
         objVfsClient.disconnect();
     }
 
@@ -242,7 +242,7 @@ public class SOSVfsJCIFSTest {
         authenticate();
         String[] result = objVfsClient.getFilelist(REMOTE_BASE_PATH, "\\.pdf$", 0, true, null);
         for (String element : result) {
-            logger.info(element);
+            LOGGER.info(element);
         }
         objVfsClient.disconnect();
     }

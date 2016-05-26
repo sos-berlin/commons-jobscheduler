@@ -59,7 +59,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             prePostCommandVFSHandler.authenticate(objOptions);
             logger.debug("connection established");
         } catch (Exception e) {
-            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
+            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getMessage(), e);
         }
         prePostCommandVFSHandler.setJSJobUtilites(objJSJobUtilities);
     }
@@ -147,8 +147,9 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             processPostCommands(getTempFileName());
         } catch (Exception e) {
             if (objOptions.raiseExceptionOnError.value()) {
-                String strErrMsg = "SOS-SSH-E-120: error occurred processing ssh command: \"" + executedCommand + "\""
-                        + "\nSOS-SSH-E-120: full command String: \"" + completeCommand + "\"";
+                String strErrMsg =
+                        "SOS-SSH-E-120: error occurred processing ssh command: \"" + executedCommand + "\""
+                                + "\nSOS-SSH-E-120: full command String: \"" + completeCommand + "\"";
                 if (objOptions.ignoreError.value()) {
                     if (objOptions.ignoreStderr.value()) {
                         logger.debug(this.stackTrace2String(e));
@@ -176,7 +177,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
 
     @Override
     public void disconnect() {
-        if (isConnected == true) {
+        if (isConnected) {
             try {
                 vfsHandler.closeConnection();
             } catch (Exception e) {
@@ -204,7 +205,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             vfsHandler.authenticate(objOptions);
             logger.debug("connection established");
         } catch (Exception e) {
-            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
+            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getMessage(), e);
         }
         isConnected = true;
         preparePostCommandHandler();
@@ -219,15 +220,19 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
 
     @Override
     public String getPreCommand() {
+        StringBuilder strb = new StringBuilder();
         if (objOptions.runWithWatchdog.value()) {
             readGetPidCommandFromPropertiesFile();
-            return String.format(ssh_job_get_pid_command + objOptions.commandDelimiter.getValue() + ssh_job_get_pid_command + " >> " + pidFileName
-                    + objOptions.commandDelimiter.getValue() + objOptions.getPreCommand().getValue() + objOptions.commandDelimiter.getValue(),
-                    SCHEDULER_RETURN_VALUES, tempFileName);
+            strb.append(ssh_job_get_pid_command).append(objOptions.commandDelimiter.getValue()).append(ssh_job_get_pid_command);
+            strb.append(" >> ").append(pidFileName).append(objOptions.commandDelimiter.getValue());
+            strb.append(String.format(objOptions.getPreCommand().getValue(), SCHEDULER_RETURN_VALUES, tempFileName));
+            strb.append(objOptions.commandDelimiter.getValue());
+            return strb.toString();
         }
-        return String.format(
-                ssh_job_get_pid_command + objOptions.commandDelimiter.getValue() + objOptions.getPreCommand().getValue() + objOptions.commandDelimiter.getValue(),
-                SCHEDULER_RETURN_VALUES, tempFileName);
+        strb.append(ssh_job_get_pid_command).append(objOptions.commandDelimiter.getValue());
+        strb.append(String.format(objOptions.getPreCommand().getValue(), SCHEDULER_RETURN_VALUES, tempFileName));
+        strb.append(objOptions.commandDelimiter.getValue());
+        return strb.toString();
     }
 
     private String getEnvCommand() {
