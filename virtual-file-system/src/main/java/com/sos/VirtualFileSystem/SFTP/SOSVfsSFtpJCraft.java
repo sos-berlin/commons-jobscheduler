@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.omg.SendingContext.RunTime;
 
 import sos.util.SOSString;
 
@@ -52,11 +51,8 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     private static final Logger LOGGER = Logger.getLogger(SOSVfsSFtpJCraft.class);
-    /** ssh connection object */
     private Channel sshConnection = null;
-    /** ssh session object */
     private Session sshSession = null;
-    /** SFTP Client **/
     private ChannelSftp sftpClient = null;
     private JSch secureChannel = null;
     private Map environmentVariables = null;
@@ -236,8 +232,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     @Override
     public boolean isDirectory(final String filename) {
-        /** Problem: the concept of links is not considered in the Concept of
-         * SOSVfs Therefore: wie return here "true" if the filename is a link */
         boolean flgR = false;
         try {
             SftpATTRS attributes = this.getClient().stat(filename);
@@ -248,6 +242,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 }
             }
         } catch (Exception e) {
+            //
         }
         return flgR;
     }
@@ -257,6 +252,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         try {
             attributes = this.getClient().stat(filename);
         } catch (Exception e) {
+            //
         }
         return attributes;
     }
@@ -342,6 +338,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 try {
                     fos.close();
                 } catch (Exception ex) {
+                    //
                 }
             }
         }
@@ -427,7 +424,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                     if (i < 0) {
                         break;
                     }
-                    // output line
                     outContent.append(new String(tmp, 0, i));
                 }
                 if (channelExec.isClosed()) {
@@ -439,7 +435,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 } catch (Exception ee) {
                 }
             }
-            // sdout output will be used from another applications
             if (outContent.length() > 0) {
                 LOGGER.info(outContent);
             }
@@ -480,24 +475,28 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
                 try {
                     out.close();
                 } catch (Exception e) {
+                    //
                 }
             }
             if (errReader != null) {
                 try {
                     errReader.close();
                 } catch (Exception e) {
+                    //
                 }
             }
             if (err != null) {
                 try {
                     err.close();
                 } catch (Exception e) {
+                    //
                 }
             }
             if (channelExec != null) {
                 try {
                     channelExec.disconnect();
                 } catch (Exception e) {
+                    //
                 }
             }
             logINFO(getHostID(SOSVfs_I_192.params(getReplyString())));
@@ -636,12 +635,11 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             }
         }
         try {
-            // JITL-206
             sshSession.setConfig("PreferredAuthentications", authenticationOptions.getAuthMethod().getValue());
             sshSession.connect();
             this.createSftpClient();
         } catch (Exception e) {
-            throw new JobSchedulerException(getHostID(e.getClass().getName() + " - " + e.getLocalizedMessage()), e);
+            throw new JobSchedulerException(getHostID(e.getClass().getName() + " - " + e.getMessage()), e);
         }
         reply = "OK";
         LOGGER.info(SOSVfs_D_133.params(userName));
@@ -691,7 +689,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
         sshSession.setConfig(config);
         setCommandsTimeout();
         setProxy();
-        // am Ende
         setConnectionTimeout();
     }
 
@@ -709,8 +706,8 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     private void setProxy() throws Exception {
         if (!SOSString.isEmpty(this.proxyHost)) {
             int connTimeout = 30000;
-            LOGGER.info(String.format("using proxy: protocol = %s, host = %s, port = %s, user = %s, pass = ?", proxyProtocol.getValue(), proxyHost, proxyPort,
-                    proxyUser));
+            LOGGER.info(String.format("using proxy: protocol = %s, host = %s, port = %s, user = %s, pass = ?", proxyProtocol.getValue(),
+                    proxyHost, proxyPort, proxyUser));
             if (proxyProtocol.isHttp()) {
                 ProxyHTTP proxy = new ProxyHTTP(proxyHost, proxyPort);
                 if (!SOSString.isEmpty(proxyUser)) {
@@ -784,7 +781,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     @Override
     public void close() {
-
+        //
     }
 
     @Override

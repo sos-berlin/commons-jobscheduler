@@ -8,6 +8,8 @@ import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
+
 import sos.net.ssh.SOSSSHJob2;
 import sos.net.ssh.SOSSSHJobJSch;
 import sos.net.ssh.SOSSSHJobOptions;
@@ -34,6 +36,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
     private static final String STD_OUT_OUTPUT = "std_out_output";
     private static final String EXIT_CODE = "exit_code";
     private static final String EXIT_SIGNAL = "exit_signal";
+    private static final Logger LOGGER = Logger.getLogger(SOSSSHJob2JSAdapter.class);
     private boolean useTrilead = true;
     private String pidFileName;
     private String envVarNamePrefix;
@@ -44,7 +47,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
             super.spooler_process();
             doProcessing();
         } catch (Exception e) {
-            logger.fatal(stackTrace2String(e));
+            LOGGER.fatal(stackTrace2String(e));
             throw new JobSchedulerException(e);
         }
         return signalSuccess();
@@ -69,7 +72,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
         }
         SOSSSHJobOptions objO = null;
         if ("false".equalsIgnoreCase(useJSch)) {
-            // this is the default value for v1.10 [SP]
+            // this is the default value since v1.10 [SP]
             useTrilead = true;
             objR = new SOSSSHJobTrilead();
             objO = objR.getOptions();
@@ -137,7 +140,8 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
             spooler_log.debug9("uses jobchainname from parameter");
             spooler_log.debug9("Jobchainname: " + spooler_task.params().value(PARAM_CLEANUP_JOBCHAIN));
         } else {
-            logger.error("No jobchain configured to received the order! Please configure the cleanupJobchain Parameter in your SSH Job Configuration.");
+            LOGGER.error(
+                    "No jobchain configured to received the order! Please configure the cleanupJobchain Parameter in your SSH Job Configuration.");
         }
         chain.add_or_replace_order(order);
         spooler_log.debug9("order send");

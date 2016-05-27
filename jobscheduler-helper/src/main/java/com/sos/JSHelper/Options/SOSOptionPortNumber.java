@@ -53,7 +53,7 @@ public class SOSOptionPortNumber extends SOSOptionInteger {
                 }
             }
         } catch (Exception e) {
-            throw new JobSchedulerException(String.format("invalid port number: %1$s\n%2$s", strP, e.getLocalizedMessage()));
+            throw new JobSchedulerException(String.format("invalid port number: %1$s\n%2$s", strP, e.getMessage()));
         }
     }
 

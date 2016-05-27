@@ -67,7 +67,7 @@ public class JobSchedulerException extends RuntimeException {
 
     public JobSchedulerException(final String pstrMessage, final Exception e) {
         super(pstrMessage);
-        setMessage(pstrMessage + " (" + e.getLocalizedMessage() + ")");
+        setMessage(pstrMessage + " (" + e.getMessage() + ")");
         saveException(e);
     }
 
@@ -75,13 +75,13 @@ public class JobSchedulerException extends RuntimeException {
         super(pobjMsg.get());
         strMessage = pobjMsg.get();
         objSOSMsg = pobjMsg;
-        setMessage(strMessage + " (" + e.getLocalizedMessage() + ")");
+        setMessage(strMessage + " (" + e.getMessage() + ")");
         saveException(e);
     }
 
     public JobSchedulerException(final Exception e) {
-        super(e.getLocalizedMessage());
-        setMessage(e.getLocalizedMessage());
+        super(e.getMessage());
+        setMessage(e.getMessage());
         saveException(e);
     }
 
@@ -97,7 +97,7 @@ public class JobSchedulerException extends RuntimeException {
         nestedException = e;
         if (e instanceof JobSchedulerException) {
             JobSchedulerException objXE = (JobSchedulerException) e;
-            if (objXE.flgStackTracePrinted == false) {
+            if (!objXE.flgStackTracePrinted) {
                 LOGGER.trace("", e);
                 objXE.flgStackTracePrinted = true;
             }

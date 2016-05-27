@@ -108,7 +108,7 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
                 }
             }
         } catch (Exception e) {
-            LOGGER.error(e.getLocalizedMessage());
+            LOGGER.error(e.getMessage());
             throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);
         }
         return objOutputStream;
@@ -315,7 +315,7 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
                 SFTPv3FileAttributes objFA = objFileHandle.getClient().fstat(objFileHandle);
                 lngR = objFA.mtime;
             } catch (IOException e) {
-                LOGGER.error(e.getLocalizedMessage());
+                LOGGER.error(e.getMessage());
             }
         }
         return lngR;
@@ -330,7 +330,7 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
                 objFA.mtime = new Integer((int) pdteDateTime);
                 lngR = pdteDateTime;
             } catch (IOException e) {
-                LOGGER.error(e.getLocalizedMessage());
+                LOGGER.error(e.getMessage());
             }
         }
         return lngR;

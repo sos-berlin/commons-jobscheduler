@@ -1,5 +1,7 @@
 package sos.net.ssh;
 
+import org.apache.log4j.Logger;
+
 import sos.net.ssh.exceptions.SSHExecutionError;
 import sos.net.ssh.exceptions.SSHMissingCommandError;
 
@@ -11,6 +13,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "com_sos_net_messages", defaultLocale = "en")
 public class SOSSSHJobTrilead extends SOSSSHJob2 {
 
+    private static final Logger LOGGER = Logger.getLogger(SOSSSHJobTrilead.class);
     private ISOSVFSHandler vfsHandler;
 
     @Override
@@ -84,7 +87,7 @@ public class SOSSSHJobTrilead extends SOSSSHJob2 {
             for (String strCmd : strCommands2Execute) {
                 try {
                     strCmd = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strCmd);
-                    logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
+                    LOGGER.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
                     vfsHandler.executeCommand(strCmd);
                     objJSJobUtilities.setJSParam(conExit_code, "0");
                     checkStdOut();

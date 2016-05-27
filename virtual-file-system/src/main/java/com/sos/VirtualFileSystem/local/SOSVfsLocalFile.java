@@ -224,7 +224,7 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
                 objInputStream.close();
             }
         } catch (IOException e) {
-            LOGGER.error(e.getLocalizedMessage());
+            LOGGER.error(e.getMessage());
             throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_134.params(conMethodName), e);
         } finally {
             objInputStream = null;
@@ -354,7 +354,7 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
             this.closeOutput();
             flgClosingDone = true;
         } catch (Exception e) {
-            LOGGER.error(e.getLocalizedMessage());
+            LOGGER.error(e.getMessage());
             throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_266.get(), e);
         } finally {
             if (!flgClosingDone) {

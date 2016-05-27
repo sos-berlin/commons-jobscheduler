@@ -2441,7 +2441,7 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         try {
             super.setAllOptions(map);
         } catch (Exception e) {
-            LOGGER.error(e.getLocalizedMessage());
+            LOGGER.error(e.getMessage());
         }
     }
 

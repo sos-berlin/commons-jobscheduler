@@ -239,7 +239,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
         try {
             lngNoOfBytesRead = this.getFile(remoteFile, localFile, flgAppendLocalFile);
         } catch (Exception e) {
-            LOGGER.error(e.getLocalizedMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         }
         return lngNoOfBytesRead;
     }
@@ -676,7 +676,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
     }
 
     protected void raiseException(final Exception e, final String msg) {
-        LOGGER.error(msg + " (" + e.getLocalizedMessage() + ")");
+        LOGGER.error(msg + " (" + e.getMessage() + ")");
         throw new JobSchedulerException(msg, e);
     }
 
@@ -750,7 +750,7 @@ public abstract class SOSVfsTransferBaseClass extends SOSVfsBaseClass implements
         try {
             fileList = listNames(path);
         } catch (IOException e) {
-            LOGGER.error(e.getLocalizedMessage());
+            LOGGER.error(e.getMessage());
         }
         if (fileList == null) {
             return directoryListing;

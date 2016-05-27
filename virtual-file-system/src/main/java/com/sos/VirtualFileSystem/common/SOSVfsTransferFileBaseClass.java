@@ -256,7 +256,7 @@ public class SOSVfsTransferFileBaseClass extends SOSVfsCommonFile {
     }
 
     protected void raiseException(final Exception e, final String msg) {
-        LOGGER.error(msg + " (" + e.getLocalizedMessage() + ")");
+        LOGGER.error(msg + " (" + e.getMessage() + ")");
         throw new JobSchedulerException(msg, e);
     }
 
