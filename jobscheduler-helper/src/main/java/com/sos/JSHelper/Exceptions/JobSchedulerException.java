@@ -74,12 +74,12 @@ public class JobSchedulerException extends RuntimeException {
         super(pobjMsg.get());
         strMessage = pobjMsg.get();
         objSOSMsg = pobjMsg;
-        setMessage(strMessage + " (" + e.getLocalizedMessage() + ")");
+        setMessage(strMessage + " (" + e.getMessage() + ")");
         saveException(e);
     }
     public JobSchedulerException(final Exception e) {
-        super(e.getLocalizedMessage());
-        setMessage(e.getLocalizedMessage());
+        super(e.getMessage());
+        setMessage(e.getMessage());
         saveException(e);
     }
 

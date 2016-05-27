@@ -195,7 +195,7 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
                             this.deleteFile(strFileNameToDelete);
                             LOGGER.debug(SOSVfs_I_0113.params(strFileNameToDelete));
                         } catch (Exception e) {
-                            LOGGER.error(e.getLocalizedMessage());
+                            LOGGER.error(e.getMessage());
                         }
                     }
                     vecFilesToDelete = null;

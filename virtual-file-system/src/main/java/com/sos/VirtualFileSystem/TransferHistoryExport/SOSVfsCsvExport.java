@@ -18,9 +18,9 @@ public class SOSVfsCsvExport extends SOSVfsMessageCodes implements ISOSTransferH
 
     private static final String CLASSNAME = "SOSVfsCsvExport";
     private static final Logger LOGGER = Logger.getLogger(SOSVfsCsvExport.class);
+    private static final String CSV_FILE_NAME = "c:/temp/jade-csv.csv";
     private SOSFTPOptions objOptions = null;
     private JSCsvFile objCSVFile = null;
-    private final String strCsvFileName = "c:/temp/jade-csv.csv";
 
     public SOSVfsCsvExport() {
         //
@@ -30,8 +30,8 @@ public class SOSVfsCsvExport extends SOSVfsMessageCodes implements ISOSTransferH
     public void doTransferDetail() {
         final String conMethodName = CLASSNAME + "::doExportDetail";
         if (objCSVFile == null) {
-            objCSVFile = new JSCsvFile(strCsvFileName);
-            LOGGER.debug(SOSVfs_D_259.params(strCsvFileName));
+            objCSVFile = new JSCsvFile(CSV_FILE_NAME);
+            LOGGER.debug(SOSVfs_D_259.params(CSV_FILE_NAME));
         }
         String pid = ManagementFactory.getRuntimeMXBean().getName();
         String strA[] = pid.split("@");
@@ -48,15 +48,14 @@ public class SOSVfsCsvExport extends SOSVfsMessageCodes implements ISOSTransferH
                     .addCellValue(objOptions.logFilename.getValue()).addCellValue(" ").addCellValue(" ").addCellValue(" ").addCellValue(" ").addCellValue(" ")
                     .newLine();
         } catch (Exception e) {
-            LOGGER.error(e.getLocalizedMessage());
+            LOGGER.error(e.getMessage());
             throw new JobSchedulerException(SOSVfs_E_260.params(conMethodName), e);
         }
     }
 
     @Override
     public void doTransferSummary() {
-        // TO DO Auto-generated method stub
-        return;
+        //
     }
 
     @Override
@@ -70,7 +69,7 @@ public class SOSVfsCsvExport extends SOSVfsMessageCodes implements ISOSTransferH
             try {
                 objCSVFile.close();
             } catch (IOException e) {
-                LOGGER.error(e.getLocalizedMessage());
+                LOGGER.error(e.getMessage());
             }
             objCSVFile = null;
         }
@@ -78,17 +77,16 @@ public class SOSVfsCsvExport extends SOSVfsMessageCodes implements ISOSTransferH
 
     @Override
     public void setJadeTransferData(final IJadeTransferHistoryData jadeTransferHistoryExportData) {
-        // TO DO Auto-generated method stub
+        //
     }
 
     @Override
     public void setJadeTransferDetailData(final IJadeTransferDetailHistoryData jadeTransferDetailHistoryExportData) {
-        // TO DO Auto-generated method stub
+        //
     }
 
     @Override
     public String getFileName() {
-        // TO DO Auto-generated method stub
         return null;
     }
 

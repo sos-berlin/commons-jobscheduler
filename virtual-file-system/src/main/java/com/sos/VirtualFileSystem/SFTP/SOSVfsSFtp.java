@@ -203,7 +203,7 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
             try {
                 fileList = listNames(lstrPathName);
             } catch (IOException e) {
-                LOGGER.error(e.getLocalizedMessage());
+                LOGGER.error(e.getMessage());
             }
             if (fileList == null) {
                 return vecDirectoryListing;
@@ -415,7 +415,7 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
         } catch (com.trilead.ssh2.SFTPException e) {
             return lngFileSize;
         } catch (Exception e) {
-            LOGGER.error(e.getLocalizedMessage());
+            LOGGER.error(e.getMessage());
             throw new JobSchedulerException(SOSVfs_E_161.params("checking size", e));
         }
     }
@@ -560,7 +560,7 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
         try {
             lngNoOfBytesRead = this.getFile(remoteFile, localFile, flgAppendLocalFile);
         } catch (Exception e) {
-            LOGGER.error(e.getLocalizedMessage());
+            LOGGER.error(e.getMessage());
         }
         return lngNoOfBytesRead;
     }
@@ -570,7 +570,7 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
         try {
             long lngBytesWritten = this.putFile(localFile, remoteFile);
         } catch (Exception e) {
-            LOGGER.error(e.getLocalizedMessage());
+            LOGGER.error(e.getMessage());
         }
     }
 
@@ -755,7 +755,7 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
             LOGGER.info(SOSVfs_D_133.params(strUserName));
             logReply();
         } catch (IOException e) {
-            LOGGER.error(e.getLocalizedMessage());
+            LOGGER.error(e.getMessage());
         }
         logReply();
     }
@@ -940,7 +940,7 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
             try {
                 objFTPClient = new SFTPv3Client(sshConnection);
             } catch (IOException e) {
-                LOGGER.error(e.getLocalizedMessage());
+                LOGGER.error(e.getMessage());
             }
         }
         return objFTPClient;
@@ -1019,7 +1019,7 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
             int port = objConnectionOptions.getPort().value();
             this.connect(host, port);
         } catch (Exception e) {
-            LOGGER.error(e.getLocalizedMessage());
+            LOGGER.error(e.getMessage());
         }
         return this;
     }
@@ -1223,7 +1223,7 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
             intL = objFTPClient.read(objInputFile, lngReadOffset, bteBuffer, 0, intMaxBuffLen);
             lngReadOffset += intL;
         } catch (IOException e) {
-            LOGGER.error(e.getLocalizedMessage());
+            LOGGER.error(e.getMessage());
         }
         return intL;
     }
@@ -1235,7 +1235,7 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
             intL = objFTPClient.read(objInputFile, lngReadOffset, bteBuffer, 0, intLength);
             lngReadOffset += intL;
         } catch (IOException e) {
-            LOGGER.error(e.getLocalizedMessage());
+            LOGGER.error(e.getMessage());
         }
         return intL;
     }
@@ -1246,7 +1246,7 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
             objFTPClient.write(objOutputFile, lngWriteOffset, bteBuffer, 0, intLength);
             lngWriteOffset += intLength;
         } catch (IOException e) {
-            LOGGER.error(e.getLocalizedMessage());
+            LOGGER.error(e.getMessage());
         }
     }
 
@@ -1263,7 +1263,7 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
                 lngReadOffset = 0;
             }
         } catch (Exception e) {
-            LOGGER.error(e.getLocalizedMessage());
+            LOGGER.error(e.getMessage());
         }
     }
 
@@ -1272,7 +1272,7 @@ public class SOSVfsSFtp extends SOSVfsBaseClass implements ISOSVfsFileTransfer, 
         try {
             objOutputFile = openFileWR(pstrFileName);
         } catch (Exception e) {
-            LOGGER.error(e.getLocalizedMessage());
+            LOGGER.error(e.getMessage());
         }
     }
 

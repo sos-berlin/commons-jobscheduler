@@ -41,7 +41,7 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch {
             vfsHandler.authenticate(objOptions);
             LOGGER.debug("connection for kill commands established");
         } catch (Exception e) {
-            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
+            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getMessage(), e);
         }
         vfsHandler.setJSJobUtilites(objJSJobUtilities);
     }
@@ -56,7 +56,7 @@ public class SOSSSHKillRemotePidJob extends SOSSSHJobJSch {
             vfsHandler.authenticate(objOptions);
             LOGGER.debug("connection established");
         } catch (Exception e) {
-            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
+            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getMessage(), e);
         }
         flgIsWindowsShell = vfsHandler.remoteIsWindowsShell();
         getKillCommandFromJobParameters();

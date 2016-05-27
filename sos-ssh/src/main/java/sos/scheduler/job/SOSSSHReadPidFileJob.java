@@ -42,7 +42,7 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
             vfsHandler.authenticate(objOptions);
             LOGGER.debug("connection established");
         } catch (Exception e) {
-            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
+            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getMessage(), e);
         }
         prePostCommandVFSHandler.setJSJobUtilites(objJSJobUtilities);
     }
@@ -101,11 +101,11 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
                             LOGGER.debug(this.stackTrace2String(e));
                         } else {
                             LOGGER.error(this.stackTrace2String(e));
-                            throw new SSHExecutionError("Exception raised: " + e, e);
+                            throw new SSHExecutionError("Exception raised: " + e.getMessage(), e);
                         }
                     } else {
                         LOGGER.error(this.stackTrace2String(e));
-                        throw new SSHExecutionError("Exception raised: " + e, e);
+                        throw new SSHExecutionError("Exception raised: " + e.getMessage(), e);
                     }
                 }
             } finally {
@@ -180,7 +180,7 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
             vfsHandler.authenticate(objOptions);
             LOGGER.debug("connection established");
         } catch (Exception e) {
-            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
+            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getMessage(), e);
         }
         isConnected = true;
         preparePostCommandHandler();

@@ -266,7 +266,7 @@ public class SOSMsg {
 
     public String get(final Exception pobjEx) {
         String strT = "";
-        String strM = pobjEx.getLocalizedMessage();
+        String strM = pobjEx.getMessage();
         if (!flgFullMessageReported) {
             strT = getFullMessage();
         } else {

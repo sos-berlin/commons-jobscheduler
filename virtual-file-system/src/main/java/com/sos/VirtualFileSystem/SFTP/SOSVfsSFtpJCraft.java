@@ -234,8 +234,6 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
 
     @Override
     public boolean isDirectory(final String filename) {
-        /** Problem: the concept of links is not considered in the Concept of
-         * SOSVfs Therefore: wie return here "true" if the filename is a link */
         boolean result = false;
         try {
             SftpATTRS attributes = this.getClient().stat(filename);
@@ -640,7 +638,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
             sshSession.connect();
             this.createSftpClient();
         } catch (Exception e) {
-            throw new JobSchedulerException(getHostID(e.getClass().getName() + " - " + e.getLocalizedMessage()), e);
+            throw new JobSchedulerException(getHostID(e.getClass().getName() + " - " + e.getMessage()), e);
         }
         reply = "OK";
         LOGGER.info(SOSVfs_D_133.params(userName));
@@ -747,8 +745,8 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     private void setProxy() throws Exception {
         if (!SOSString.isEmpty(this.proxyHost)) {
             int connTimeout = 30000; // 0,5 Minute
-            LOGGER.info(String.format("using proxy: protocol = %s, host = %s, port = %s, user = %s, pass = ?", proxyProtocol.getValue(), proxyHost, proxyPort,
-                    proxyUser));
+            LOGGER.info(String.format("using proxy: protocol = %s, host = %s, port = %s, user = %s, pass = ?", proxyProtocol.getValue(),
+                    proxyHost, proxyPort, proxyUser));
             if (proxyProtocol.isHttp()) {
                 ProxyHTTP proxy = new ProxyHTTP(proxyHost, proxyPort);
                 if (!SOSString.isEmpty(proxyUser)) {

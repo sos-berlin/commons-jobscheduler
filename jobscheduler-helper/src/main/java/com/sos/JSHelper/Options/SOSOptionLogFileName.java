@@ -104,7 +104,7 @@ public class SOSOptionLogFileName extends SOSOptionOutFileName {
                     logger.info("No File Appender found");
                 }
             } catch (Exception e) {
-                logger.error(e.getLocalizedMessage());
+                logger.error(e.getMessage());
                 throw new JobSchedulerException("Problems with log4jappender", e);
             }
         } else {

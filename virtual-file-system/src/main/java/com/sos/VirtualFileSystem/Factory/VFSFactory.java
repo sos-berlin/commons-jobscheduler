@@ -223,12 +223,12 @@ public class VFSFactory extends SOSVfsMessageCodes {
                         try {
                             addUrlMethod.invoke(classLoader1, jar.toURI().toURL());
                         } catch (Exception e) {
-                            LOGGER.error(e.getLocalizedMessage());
+                            LOGGER.error(e.getMessage());
                         }
                     }
                 }
             } catch (Exception e) {
-                LOGGER.error(e.getLocalizedMessage());
+                LOGGER.error(e.getMessage());
             }
         }
     }

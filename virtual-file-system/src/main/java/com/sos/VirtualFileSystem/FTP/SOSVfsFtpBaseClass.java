@@ -437,7 +437,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
                 Client().disconnect();
             }
         } catch (IOException e) {
-            LOGGER.warn(SOSVfs_W_136.get() + e.getLocalizedMessage());
+            LOGGER.warn(SOSVfs_W_136.get() + e.getMessage());
         }
     }
 
@@ -1201,7 +1201,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     }
 
     protected void raiseException(final Exception e, final String pstrM) {
-        LOGGER.error(pstrM + " (" + e.getLocalizedMessage() + ")");
+        LOGGER.error(pstrM + " (" + e.getMessage() + ")");
         throw new JobSchedulerException(pstrM, e);
     }
 

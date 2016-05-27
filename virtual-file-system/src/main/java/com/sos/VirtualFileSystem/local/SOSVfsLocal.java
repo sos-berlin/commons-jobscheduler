@@ -280,7 +280,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
             }
             strS = objV.toArray(new String[objV.size()]);
         } catch (Exception e) {
-            LOGGER.error(e.getLocalizedMessage());
+            LOGGER.error(e.getMessage());
         }
         return strS;
     }
@@ -356,7 +356,7 @@ public class SOSVfsLocal extends SOSVfsBaseClass implements ISOSVfsFileTransfer,
             }
             strS = objV.toArray(new String[objV.size()]);
         } catch (Exception e) {
-            LOGGER.error(e.getLocalizedMessage());
+            LOGGER.error(e.getMessage());
         }
         return strS;
     }

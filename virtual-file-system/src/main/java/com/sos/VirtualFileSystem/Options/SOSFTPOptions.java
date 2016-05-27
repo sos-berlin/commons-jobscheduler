@@ -193,7 +193,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         try {
             this.setChildClasses(map);
         } catch (Exception e) {
-            LOGGER.error(e.getLocalizedMessage());
+            LOGGER.error(e.getMessage());
         }
     }
 
@@ -488,7 +488,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         try {
             this.commandLineArgs(pstrArgs.split(" "));
         } catch (Exception e) {
-            LOGGER.error(e.getLocalizedMessage());
+            LOGGER.error(e.getMessage());
             throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_153.params("command lines args"), e);
         }
     }

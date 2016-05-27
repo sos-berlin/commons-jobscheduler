@@ -128,7 +128,7 @@ public class SOSVfsXmlExport extends SOSVfsMessageCodes implements ISOSTransferH
                     objXMLFile.close();
                 }
             } catch (Exception e) {
-                LOGGER.error(e.getLocalizedMessage());
+                LOGGER.error(e.getMessage());
                 throw new JobSchedulerException(SOSVfs_E_260.params(methodName), e);
             }
             objXMLFile = null;
