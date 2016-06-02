@@ -30,7 +30,7 @@ public class SOSOptionMailSubject extends SOSOptionString {
     }
 
     @Override
-    public void Value(final String pstrValue) {
+    public void setValue(final String pstrValue) {
 
         @SuppressWarnings("unused")
         final String conMethodName = conClassName + "::Value";
@@ -39,9 +39,9 @@ public class SOSOptionMailSubject extends SOSOptionString {
         if (objF.exists()) {
             this.strSubjectFileName = pstrValue;
             flgSubjectFromFile = true;
-            super.Value(objF.getContent());
+            super.setValue(objF.getContent());
         } else {
-            super.Value(pstrValue);
+            super.setValue(pstrValue);
         }
 
     } // public void Value

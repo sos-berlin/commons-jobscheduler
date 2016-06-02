@@ -32,62 +32,62 @@ public class SOSConnection2OptionsJUnitTest extends JSToolBox {
     @Test
     public void testPreCommand() {
         String strCmd = "chmod $TargetfileName 777";
-        objOptions.Source().Pre_Command.Value(strCmd);
-        assertEquals("chmod ", strCmd, objOptions.Source().Pre_Command.Value());
-        objOptions.Target().Pre_Command.Value(strCmd);
-        assertEquals("chmod ", strCmd, objOptions.Target().Pre_Command.Value());
+        objOptions.getSource().preCommand.setValue(strCmd);
+        assertEquals("chmod ", strCmd, objOptions.getSource().preCommand.getValue());
+        objOptions.getTarget().preCommand.setValue(strCmd);
+        assertEquals("chmod ", strCmd, objOptions.getTarget().preCommand.getValue());
     }
 
     @Test
     public void testhost() {
-        objOptions.host.Value("++----++");
-        assertEquals("Host-Name This parameter specifies th", objOptions.host.Value(), "++----++");
+        objOptions.host.setValue("++----++");
+        assertEquals("Host-Name This parameter specifies th", objOptions.host.getValue(), "++----++");
     }
 
     @Test
-    public void testpassive_mode() {
-        objOptions.passive_mode.Value("true");
-        assertTrue("passive_mode Passive mode for FTP is often used wit", objOptions.passive_mode.value());
-        objOptions.passive_mode.Value("false");
-        assertFalse("passive_mode Passive mode for FTP is often used wit", objOptions.passive_mode.value());
+    public void testPassiveMode() {
+        objOptions.passiveMode.setValue("true");
+        assertTrue("passive_mode Passive mode for FTP is often used wit", objOptions.passiveMode.value());
+        objOptions.passiveMode.setValue("false");
+        assertFalse("passive_mode Passive mode for FTP is often used wit", objOptions.passiveMode.value());
     }
 
     @Test
-    public void testport() {
-        objOptions.port.Value("21");
-        assertEquals("Port-Number to be used for Data-Transfer", objOptions.port.Value(), "21");
+    public void testPort() {
+        objOptions.port.setValue("21");
+        assertEquals("Port-Number to be used for Data-Transfer", objOptions.port.getValue(), "21");
     }
 
     @Test
-    public void testprotocol() {
-        objOptions.protocol.Value("++ftp++");
-        assertEquals("Type of requested Datatransfer The values ftp, sftp", objOptions.protocol.Value(), "++ftp++");
+    public void testProtocol() {
+        objOptions.protocol.setValue("++ftp++");
+        assertEquals("Type of requested Datatransfer The values ftp, sftp", objOptions.protocol.getValue(), "++ftp++");
     }
 
     @Test
-    public void testtransfer_mode() {
-        objOptions.transfer_mode.Value("++binary++");
-        assertEquals("Type of Character-Encoding Transfe", objOptions.transfer_mode.Value(), "++binary++");
+    public void testTransferMode() {
+        objOptions.transferMode.setValue("++binary++");
+        assertEquals("Type of Character-Encoding Transfe", objOptions.transferMode.getValue(), "++binary++");
     }
 
     @Test
     public void testKeyWithPrefix() throws Exception {
-        objOptions = new SOSConnection2Options(SetJobSchedulerSSHJobOptions(new HashMap<String, String>()));
-        assertEquals("host failed", "test1", objOptions.host.Value());
-        assertEquals("alternative_host failed", "test2", objOptions.Alternatives().getHost().Value());
-        assertEquals("source_host failed", "test3", objOptions.Source().host.Value());
-        assertEquals("target_host failed", "test5", objOptions.Target().host.Value());
-        assertEquals("source_alternative_host failed", "test4", objOptions.Source().Alternatives().host.Value());
+        objOptions = new SOSConnection2Options(setJobSchedulerSSHJobOptions(new HashMap<String, String>()));
+        assertEquals("host failed", "test1", objOptions.host.getValue());
+        assertEquals("alternative_host failed", "test2", objOptions.getAlternatives().getHost().getValue());
+        assertEquals("source_host failed", "test3", objOptions.getSource().host.getValue());
+        assertEquals("target_host failed", "test5", objOptions.getTarget().host.getValue());
+        assertEquals("source_alternative_host failed", "test4", objOptions.getSource().getAlternatives().host.getValue());
     }
 
     @Test
     public void testKeyWithAlias() throws Exception {
-        objOptions = new SOSConnection2Options(SetJobSchedulerSSHJobOptions(new HashMap<String, String>()));
-        assertEquals("host failed", "test1", objOptions.host.Value());
-        assertEquals("alternative_host failed", "test2", objOptions.Alternatives().host.Value());
-        assertEquals("source_host failed", "test3", objOptions.Source().host.Value());
-        assertEquals("target_host failed", "test5", objOptions.Target().host.Value());
-        assertEquals("source_alternative_host failed", "test4", objOptions.Source().Alternatives().host.Value());
+        objOptions = new SOSConnection2Options(setJobSchedulerSSHJobOptions(new HashMap<String, String>()));
+        assertEquals("host failed", "test1", objOptions.host.getValue());
+        assertEquals("alternative_host failed", "test2", objOptions.getAlternatives().host.getValue());
+        assertEquals("source_host failed", "test3", objOptions.getSource().host.getValue());
+        assertEquals("target_host failed", "test5", objOptions.getTarget().host.getValue());
+        assertEquals("source_alternative_host failed", "test4", objOptions.getSource().getAlternatives().host.getValue());
     }
 
     @Test
@@ -99,27 +99,27 @@ public class SOSConnection2OptionsJUnitTest extends JSToolBox {
         objT.put("alternative_port", "22");
         objT.put("alternative_protocol", "test2");
         objOptions = new SOSConnection2Options(objT);
-        assertEquals("alternative_host failed", "test2", objOptions.Alternatives().host.Value());
+        assertEquals("alternative_host failed", "test2", objOptions.getAlternatives().host.getValue());
     }
 
     @Test
     public void testStrictHostKeyChecking() {
         objOptions = new SOSConnection2Options();
-        assertEquals("StrictHostKeyChecking", "no", objOptions.strictHostKeyChecking.Value());
-        objOptions.strictHostKeyChecking.Value("yes");
-        assertEquals("StrictHostKeyChecking", "yes", objOptions.strictHostKeyChecking.Value());
+        assertEquals("StrictHostKeyChecking", "no", objOptions.strictHostKeyChecking.getValue());
+        objOptions.strictHostKeyChecking.setValue("yes");
+        assertEquals("StrictHostKeyChecking", "yes", objOptions.strictHostKeyChecking.getValue());
     }
 
     @Test
     public void testForUnknownOptions() throws Exception {
-        HashMap<String, String> objT = SetJobSchedulerSSHJobOptionsAlias(new HashMap<String, String>());
+        HashMap<String, String> objT = setJobSchedulerSSHJobOptionsAlias(new HashMap<String, String>());
         objT.put("IsAnUnknownOption", "ValueOfUnknownOption");
         objOptions = new SOSConnection2Options(objT);
-        boolean flgAllOptionsProcessed = objOptions.CheckNotProcessedOptions();
+        boolean flgAllOptionsProcessed = objOptions.checkNotProcessedOptions();
         assertFalse("Unknown Option found", flgAllOptionsProcessed);
     }
 
-    private HashMap<String, String> SetJobSchedulerSSHJobOptions(final HashMap<String, String> pobjHM) {
+    private HashMap<String, String> setJobSchedulerSSHJobOptions(final HashMap<String, String> pobjHM) {
         pobjHM.put("host", "test1");
         pobjHM.put("port", "21");
         pobjHM.put("protocol", "test1");
@@ -141,7 +141,7 @@ public class SOSConnection2OptionsJUnitTest extends JSToolBox {
         return pobjHM;
     }
 
-    private HashMap<String, String> SetJobSchedulerSSHJobOptionsAlias(final HashMap<String, String> pobjHM) {
+    private HashMap<String, String> setJobSchedulerSSHJobOptionsAlias(final HashMap<String, String> pobjHM) {
         pobjHM.put("ftp_host", "wilma.sos");
         pobjHM.put("ftp_port", "21");
         pobjHM.put("ftp_protocol", "test1");

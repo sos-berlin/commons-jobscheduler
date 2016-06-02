@@ -297,7 +297,7 @@ public class SOSCTabFolder extends CTabFolder {
             }
             objTabItem = new SOSCTabItem(this, SWT.NONE);
             SOSMsgControl objMsg = MsgHandler.newMsg(pstrI18NKey);
-            objMsg.Control(objTabItem);
+            objMsg.control(objTabItem);
             objTabItem.setData(conTABITEM_I18NKEY, pstrI18NKey);
             objTabItem.setFont(Globals.stFontRegistry.get("tabitem-text"));
             objTabItem.setImage(SWTResourceManager.getImageFromResource(objMsg.icon()));

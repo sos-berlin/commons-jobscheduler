@@ -21,7 +21,7 @@ public class MessagesTest {
     }
 
     @Test
-    public void TestVarArgs() {
+    public void testVarArgs() {
         String strM = "das ist '%1$s', '%2$s' und '%3$s' ...";
         strM = Messages.getMsg(strM, "eins", "zwei", "drei", Locale.getDefault());
         assertEquals("get message-text with parameter", "das ist 'eins', 'zwei' und 'drei' ...", strM);
@@ -81,6 +81,8 @@ public class MessagesTest {
         assertEquals("JSJ-I-106", Messages.getMsg("JSJ-I-106", Locale.getDefault()), strM);
     }
 
+    @Test
+    @Ignore
     public void testGetMsgSingle_ja() {
         String strM = Messages.getMsg("JSJ-I-105", Locale.JAPANESE);
         LOGGER.info(strM);

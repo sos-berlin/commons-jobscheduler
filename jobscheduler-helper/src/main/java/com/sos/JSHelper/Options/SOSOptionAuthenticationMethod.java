@@ -14,6 +14,12 @@ public class SOSOptionAuthenticationMethod extends SOSOptionStringValueList {
     private static final String URL = "url";
     private enuAuthenticationMethods enuMethod = enuAuthenticationMethods.notDefined;
 
+    public SOSOptionAuthenticationMethod(final JSOptionsClass pPobjParent, final String pPstrKey, final String pPstrDescription,
+            final String pPstrValue, final String pPstrDefaultValue, final boolean pPflgIsMandatory) {
+        super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
+        super.valueList(enuAuthenticationMethods.getArray());
+    }
+
     @Override
     public String getControlType() {
         return ControlType;
@@ -29,9 +35,8 @@ public class SOSOptionAuthenticationMethod extends SOSOptionStringValueList {
             this(null);
         }
 
-        public String Text() {
-            String strT = this.name();
-            return strT;
+        public String getText() {
+            return this.name();
         }
 
         private enuAuthenticationMethods(final String name) {
@@ -55,38 +60,30 @@ public class SOSOptionAuthenticationMethod extends SOSOptionStringValueList {
         }
     }
 
-    public SOSOptionAuthenticationMethod(final JSOptionsClass pPobjParent, final String pPstrKey, final String pPstrDescription,
-            final String pPstrValue, final String pPstrDefaultValue, final boolean pPflgIsMandatory) {
-        super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
-        super.valueList(enuAuthenticationMethods.getArray());
-    }
-
     @Override
-    public void Value(final String pstrAuthenticationMethod) {
+    public void setValue(final String pstrAuthenticationMethod) {
         try {
-            // oh 2014-10-29 NullPointer in switch if pstrAuthenticationMethod
-            // is null.
             if (isNull(pstrAuthenticationMethod)) {
-                super.Value(pstrAuthenticationMethod);
+                super.setValue(pstrAuthenticationMethod);
                 enuMethod = enuAuthenticationMethods.notDefined;
             } else {
                 switch (pstrAuthenticationMethod) {
                 case "ppk":
                 case "privatekey":
                 case PUBLICKEY:
-                    super.Value(pstrAuthenticationMethod);
+                    super.setValue(pstrAuthenticationMethod);
                     enuMethod = enuAuthenticationMethods.publicKey;
                     break;
                 case PASSWORD:
-                    super.Value(pstrAuthenticationMethod);
+                    super.setValue(pstrAuthenticationMethod);
                     enuMethod = enuAuthenticationMethods.password;
                     break;
                 case URL:
-                    super.Value(pstrAuthenticationMethod);
+                    super.setValue(pstrAuthenticationMethod);
                     enuMethod = enuAuthenticationMethods.url;
                     break;
                 default:
-                    super.Value("*invalid*: " + pstrAuthenticationMethod);
+                    super.setValue("*invalid*: " + pstrAuthenticationMethod);
                     enuMethod = enuAuthenticationMethods.notDefined;
                     break;
                 }
@@ -96,20 +93,20 @@ public class SOSOptionAuthenticationMethod extends SOSOptionStringValueList {
         }
     }
 
-    public void Value(final enuAuthenticationMethods penuAuthMethod) {
+    public void setValue(final enuAuthenticationMethods penuAuthMethod) {
         switch (penuAuthMethod) {
         case password:
-            super.Value(PASSWORD);
+            super.setValue(PASSWORD);
             enuMethod = penuAuthMethod;
             break;
         case publicKey:
         case privatekey:
         case ppk:
-            super.Value(PUBLICKEY);
+            super.setValue(PUBLICKEY);
             enuMethod = penuAuthMethod;
             break;
         case url:
-            super.Value(URL);
+            super.setValue(URL);
             enuMethod = penuAuthMethod;
             break;
         default:
@@ -119,37 +116,37 @@ public class SOSOptionAuthenticationMethod extends SOSOptionStringValueList {
 
     public void isPassword(final boolean flgF) {
         if (flgF) {
-            this.Value(PASSWORD);
+            this.setValue(PASSWORD);
         } else {
-            this.Value(PUBLICKEY);
+            this.setValue(PUBLICKEY);
         }
     }
 
     public void isURL(final boolean flgF) {
         if (flgF) {
-            this.Value(URL);
+            this.setValue(URL);
         } else {
-            this.Value(URL);
+            this.setValue(URL);
         }
     }
 
     public boolean isPassword() {
-        this.Value(strValue);
+        this.setValue(strValue);
         return enuMethod == enuAuthenticationMethods.password;
     }
 
     public boolean isURL() {
-        this.Value(strValue);
+        this.setValue(strValue);
         return enuMethod == enuAuthenticationMethods.url;
     }
 
     public boolean isPublicKey() {
-        this.Value(strValue);
+        this.setValue(strValue);
         return enuMethod == enuAuthenticationMethods.publicKey || enuMethod == enuAuthenticationMethods.ppk
                 || enuMethod == enuAuthenticationMethods.privatekey;
     }
 
-    public enuAuthenticationMethods AuthenticationMethod() {
+    public enuAuthenticationMethods getAuthenticationMethod() {
         return enuMethod;
     }
 

@@ -299,8 +299,8 @@ public class SOSOptionRegExp extends SOSOptionStringWVariables {
     }
 
     @Override
-    public void Value(final String pstrValue) {
-        super.Value(pstrValue);
+    public void setValue(final String pstrValue) {
+        super.setValue(pstrValue);
         if (isNotEmpty(strValue)) {
             try {
                 Pattern.compile(strValue);

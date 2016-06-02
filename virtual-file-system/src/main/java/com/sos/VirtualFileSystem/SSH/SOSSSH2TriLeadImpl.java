@@ -89,7 +89,7 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
     }
 
     @Override
-    public ISOSConnection Connect(final String pstrHostName, final int pintPortNumber) throws Exception {
+    public ISOSConnection connect(final String pstrHostName, final int pintPortNumber) throws Exception {
         try {
             isConnected = false;
             this.setSshConnection(new Connection(pstrHostName, pintPortNumber));
@@ -108,22 +108,23 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
     }
 
     @Override
-    public ISOSConnection Connect() throws Exception {
+    public ISOSConnection connect() throws Exception {
         if (objCO == null) {
             throw new JobSchedulerException(SOSVfs_F_102.get());
         }
         try {
             isConnected = false;
-            String strHostName = objCO.getHost().Value();
+            String strHostName = objCO.getHost().getValue();
             int intPortNo = objCO.getPort().value();
             this.setSshConnection(new Connection(strHostName, intPortNo));
-            if (objCO.getProxy_host().IsNotEmpty()) {
+            if (objCO.getProxyHost().isNotEmpty()) {
                 HTTPProxyData objProxy = null;
-                if (objCO.getProxy_user().IsEmpty()) {
-                    objProxy = new HTTPProxyData(objCO.getProxy_host().Value(), objCO.getProxy_port().value());
+                if (objCO.getProxyUser().IsEmpty()) {
+                    objProxy = new HTTPProxyData(objCO.getProxyHost().getValue(), objCO.getProxyPort().value());
                 } else {
-                    objProxy = new HTTPProxyData(objCO.getProxy_host().Value(), objCO.getProxy_port().value(), objCO.getProxy_user().Value(),
-                                    objCO.getProxy_password().Value());
+                    objProxy =
+                            new HTTPProxyData(objCO.getProxyHost().getValue(), objCO.getProxyPort().value(), objCO.getProxyUser().getValue(),
+                                    objCO.getProxyPassword().getValue());
                 }
                 this.getSshConnection().setProxyData(objProxy);
             }
@@ -194,7 +195,7 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
                             this.deleteFile(strFileNameToDelete);
                             LOGGER.debug(SOSVfs_I_0113.params(strFileNameToDelete));
                         } catch (Exception e) {
-                            LOGGER.error(e.getLocalizedMessage());
+                            LOGGER.error(e.getMessage());
                         }
                     }
                     vecFilesToDelete = null;
@@ -285,7 +286,7 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
             LOGGER.debug(SOSVfs_D_255.get());
             String[] paramNames = params.names().split(";");
             for (String name : paramNames) {
-                SignalDebug(SOSVfs_D_256.params(name));
+                signalDebug(SOSVfs_D_256.params(name));
                 String regex = "(?i)";
                 if (isWindows) {
                     regex += "%SCHEDULER_PARAM_" + name + "%";
@@ -314,25 +315,25 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
     }
 
     @Override
-    public ISOSConnection Connect(final ISOSConnectionOptions pobjConnectionOptions) throws Exception {
+    public ISOSConnection connect(final ISOSConnectionOptions pobjConnectionOptions) throws Exception {
         objCO = pobjConnectionOptions;
         if (objCO != null) {
-            this.Connect();
+            this.connect();
         }
         return this;
     }
 
     @Override
-    public void CloseConnection() throws Exception {
+    public void closeConnection() throws Exception {
         this.setSshConnection(null);
     }
 
     @Override
-    public ISOSConnection Authenticate(final ISOSAuthenticationOptions pobjAO) throws Exception {
+    public ISOSConnection authenticate(final ISOSAuthenticationOptions pobjAO) throws Exception {
         final String conMethodName = "SOSSSH2TriLeadImpl::Authenticate";
         objAO = pobjAO;
-        if (objAO.getAuth_method().isPublicKey()) {
-            File authenticationFile = new File(objAO.getAuth_file().Value());
+        if (objAO.getAuthMethod().isPublicKey()) {
+            File authenticationFile = new File(objAO.getAuthFile().getValue());
             if (!authenticationFile.exists()) {
                 throw new JobSchedulerException(SOSVfs_E_257.params(authenticationFile.getCanonicalPath()));
             }
@@ -340,14 +341,14 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
                 throw new JobSchedulerException(SOSVfs_E_258.params(authenticationFile.getCanonicalPath()));
             }
             isAuthenticated =
-                    this.getSshConnection().authenticateWithPublicKey(objAO.getUser().Value(), authenticationFile, objAO.getPassword().Value());
-        } else if (objAO.getAuth_method().isPassword()) {
-            isAuthenticated = getSshConnection().authenticateWithPassword(objAO.getUser().Value(), objAO.getPassword().Value());
+                    this.getSshConnection().authenticateWithPublicKey(objAO.getUser().getValue(), authenticationFile, objAO.getPassword().getValue());
+        } else if (objAO.getAuthMethod().isPassword()) {
+            isAuthenticated = getSshConnection().authenticateWithPassword(objAO.getUser().getValue(), objAO.getPassword().getValue());
         }
         if (!isAuthenticated) {
             throw new JobSchedulerException(SOSVfs_E_235.params(conMethodName, objAO.toString()));
         }
-        LOGGER.info(SOSVfs_D_133.params(objAO.getUser().Value()));
+        LOGGER.info(SOSVfs_D_133.params(objAO.getUser().getValue()));
         return this;
     }
 
@@ -418,7 +419,7 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
             boolean exists = true;
             while (exists) {
                 try {
-                    FtpClient().stat(strFileName);
+                    getFtpClient().stat(strFileName);
                 } catch (SFTPException e) {
                     LOGGER.debug(SOSVfs_E_241.params(e.getServerErrorCode()));
                     exists = false;
@@ -470,20 +471,20 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
     public SFTPv3FileHandle getFileHandle(final String pstrFileName, final Integer pintPermissions) throws Exception {
         SFTPv3FileAttributes attr = new SFTPv3FileAttributes();
         attr.permissions = pintPermissions;
-        SFTPv3FileHandle fileHandle = this.FtpClient().createFileTruncate(pstrFileName, attr);
+        SFTPv3FileHandle fileHandle = this.getFtpClient().createFileTruncate(pstrFileName, attr);
         return fileHandle;
     }
 
     public void setFilePermissions(final String pstrFileName, final Integer pintPermissions) throws Exception {
         SFTPv3FileAttributes attr = new SFTPv3FileAttributes();
         attr.permissions = pintPermissions;
-        SFTPv3FileHandle fileHandle = this.FtpClient().createFileTruncate(pstrFileName, attr);
+        SFTPv3FileHandle fileHandle = this.getFtpClient().createFileTruncate(pstrFileName, attr);
     }
 
     public void deleteFile(final String pstrCommandFile) throws Exception {
         try {
             if (isNotEmpty(pstrCommandFile)) {
-                this.FtpClient().rm(pstrCommandFile);
+                this.getFtpClient().rm(pstrCommandFile);
                 LOGGER.debug(SOSVfs_I_0113.params(pstrCommandFile));
             }
         } catch (Exception e) {
@@ -492,7 +493,7 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
         }
     }
 
-    private SFTPv3Client FtpClient() throws Exception {
+    private SFTPv3Client getFtpClient() throws Exception {
         if (sftpClient == null) {
             sftpClient = new SFTPv3Client(this.getSshConnection());
         }
@@ -500,20 +501,20 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
     }
 
     @Override
-    public void CloseSession() throws Exception {
+    public void closeSession() throws Exception {
         //
     }
 
     @Override
-    public ISOSSession OpenSession(final ISOSShellOptions pobjShellOptions) throws Exception {
+    public ISOSSession openSession(final ISOSShellOptions pobjShellOptions) throws Exception {
         objSO = pobjShellOptions;
         if (objSO == null) {
             throw new JobSchedulerException(SOSVfs_E_245.get());
         }
-        long loginTimeout = objSO.getSimulate_shell_login_timeout().value();
-        String strPromptTrigger = objSO.getSimulate_shell_prompt_trigger().Value();
+        long loginTimeout = objSO.getSimulateShellLoginTimeout().value();
+        String strPromptTrigger = objSO.getSimulateShellPromptTrigger().getValue();
         this.setSshSession(this.getSshConnection().openSession());
-        if (objSO.getSimulate_shell().value()) {
+        if (objSO.getSimulateShell().value()) {
             LOGGER.debug(SOSVfs_D_246.params("PTY"));
             this.getSshSession().requestDumbPTY();
             LOGGER.debug(SOSVfs_D_247.params("shell"));
@@ -532,18 +533,18 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
             boolean loggedIn = false;
             while (!loggedIn) {
                 if (lngLastTime > 0) {
-                    loggedIn = Check4TimeOutOrPrompt(loginTimeout, strPromptTrigger);
+                    loggedIn = check4TimeOutOrPrompt(loginTimeout, strPromptTrigger);
                 }
             }
         } else {
-            if (!objSO.getIgnore_hangup_signal().value()) {
+            if (!objSO.getIgnoreHangupSignal().value()) {
                 sshSession.requestPTY("vt100");
             }
         }
         return this;
     }
 
-    private boolean Check4TimeOutOrPrompt(final long plngLoginTimeOut, final String pstrPromptTrigger) {
+    private boolean check4TimeOutOrPrompt(final long plngLoginTimeOut, final String pstrPromptTrigger) {
         long now = System.currentTimeMillis();
         if (plngLoginTimeOut > 0 && lngLastTime + plngLoginTimeOut < now) {
             return true;
@@ -559,22 +560,22 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
     }
 
     @Override
-    public void ExecuteCommand(final String pstrCmd) throws Exception {
+    public void executeCommand(final String pstrCmd) throws Exception {
         exitStatus = null;
         exitSignal = null;
         int retval = 0;
         String strCmd = pstrCmd;
-        long loginTimeout = objSO.getSimulate_shell_login_timeout().value();
-        String strPromptTrigger = objSO.getSimulate_shell_prompt_trigger().Value();
+        long loginTimeout = objSO.getSimulateShellLoginTimeout().value();
+        String strPromptTrigger = objSO.getSimulateShellPromptTrigger().getValue();
         strbStderrOutput = new StringBuffer();
         strbStdoutOutput = new StringBuffer();
-        if (objSO.getSimulate_shell().value()) {
+        if (objSO.getSimulateShell().value()) {
             LOGGER.debug("executing: " + strCmd);
             stdinWriter.write(strCmd + strEndOfLine);
             stdinWriter.flush();
             boolean prompt = false;
             while (!prompt) {
-                prompt = Check4TimeOutOrPrompt(loginTimeout, strPromptTrigger);
+                prompt = check4TimeOutOrPrompt(loginTimeout, strPromptTrigger);
             }
             strCurrentLine = "";
             LOGGER.info(SOSVfs_D_163.params("stdout", strCmd));
@@ -739,7 +740,7 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
     }
 
     @Override
-    public ISOSConnection Connect(final SOSConnection2OptionsAlternate pobjConnectionOptions) throws Exception {
+    public ISOSConnection connect(final SOSConnection2OptionsAlternate pobjConnectionOptions) throws Exception {
         return null;
     }
 
@@ -749,7 +750,7 @@ public class SOSSSH2TriLeadImpl extends SOSVfsBaseClass implements ISOSShell, IS
     }
 
     @Override
-    public ISOSConnection Connect(final ISOSDataProviderOptions pobjConnectionOptions) throws Exception {
+    public ISOSConnection connect(final ISOSDataProviderOptions pobjConnectionOptions) throws Exception {
         return null;
     }
 

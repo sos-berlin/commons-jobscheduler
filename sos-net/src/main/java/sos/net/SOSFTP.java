@@ -56,7 +56,7 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
                 this.addProtocolCommandListener(listener);
             }
             super.connect(host, port);
-            LogReply();
+            logReply();
         }
     }
 
@@ -65,7 +65,7 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
         if (!isConnected()) {
             super.connect(hostname);
         }
-        LogReply();
+        logReply();
     }
 
     @Override
@@ -101,7 +101,7 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
     private Vector<String> getFilenames(final String pstrPathName, final boolean flgRecurseSubFolders) throws IOException {
         Vector<String> vecListFileItems = new Vector<String>();
         String[] fileList = null;
-        String strCurrentDirectoryName = DoPWD();
+        String strCurrentDirectoryName = doPWD();
         String lstrPathName = pstrPathName.trim();
         if (lstrPathName.isEmpty()) {
             lstrPathName = ".";
@@ -116,7 +116,7 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
         }
         for (String strCurrentFileName : fileList) {
             if (isNotHiddenFile(strCurrentFileName)) {
-                DoCD(strCurrentFileName);
+                doCD(strCurrentFileName);
                 if (isNegativeCommandCompletion()) {
                     if (flgRecurseSubFolders && !strCurrentFileName.startsWith(strCurrentDirectoryName) && !strCurrentDirectoryName.isEmpty()) {
                         strCurrentFileName = strCurrentDirectoryName + "/" + strCurrentFileName;
@@ -124,7 +124,7 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
                     strCurrentFileName = strCurrentFileName.replaceAll(conRegExpBackslash, "/");
                     vecListFileItems.add(strCurrentFileName);
                 } else {
-                    DoCDUP();
+                    doCDUP();
                     if (flgRecurseSubFolders) {
                         Vector<String> vecNames = getFilenames(strCurrentFileName);
                         if (vecNames != null) {
@@ -135,12 +135,12 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
             }
         }
         LOGGER.debug("strCurrentDirectory = " + strCurrentDirectoryName);
-        DoCD(strCurrentDirectoryName);
-        DoPWD();
+        doCD(strCurrentDirectoryName);
+        doPWD();
         return vecListFileItems;
     }
 
-    public String DoPWD() {
+    public String doPWD() {
         String strCurrentPathName = "";
         try {
             pwd();
@@ -153,26 +153,26 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
                     strCurrentPathName = strCurrentPathName.substring(0, idx);
                 }
             }
-            LogReply();
+            logReply();
         } catch (IOException e) {
-            RaiseException("Problems with pwd", e);
+            raiseException("Problems with pwd", e);
         }
         return strCurrentPathName;
     }
 
-    private int DoCDUP() {
+    private int doCDUP() {
         try {
             LOGGER.debug("Try cdup .");
             cdup();
-            LogReply();
-            DoPWD();
+            logReply();
+            doPWD();
         } catch (IOException e) {
             //
         }
         return 0;
     }
 
-    private int DoCD(final String strFolderName) {
+    private int doCD(final String strFolderName) {
         int x = 0;
         try {
             x = cd(strFolderName);
@@ -182,7 +182,7 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
         return x;
     }
 
-    private boolean LogReply() {
+    private boolean logReply() {
         LOGGER.debug(getReplyString());
         return true;
     }
@@ -477,11 +477,11 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
         }
-        LogReply();
+        logReply();
         return true;
     }
 
-    protected void RaiseException(final Exception e, final String pstrM) {
+    protected void raiseException(final Exception e, final String pstrM) {
         if (e != null) {
             LOGGER.error(pstrM, e);
             throw new JobSchedulerException(pstrM, e);
@@ -491,12 +491,12 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
         }
     }
 
-    protected void RaiseException(final String pstrM, final Exception e) {
-        RaiseException(e, pstrM);
+    protected void raiseException(final String pstrM, final Exception e) {
+        raiseException(e, pstrM);
     }
 
-    protected void RaiseException(final String pstrM) {
-        RaiseException(null, pstrM);
+    protected void raiseException(final String pstrM) {
+        raiseException(null, pstrM);
     }
 
 }

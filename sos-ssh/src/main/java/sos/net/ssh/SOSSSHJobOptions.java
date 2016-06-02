@@ -38,19 +38,19 @@ public class SOSSSHJobOptions extends SOSSSHJobOptionsSuperClass {
     }
 
     @Override
-    public void CheckMandatory() {
-        command.command_delimiter.Value(command_delimiter.Value());
-        super.CheckMandatory();
-        if (!(auth_method.isPassword() || auth_method.isPublicKey())) {
+    public void checkMandatory() {
+        command.command_delimiter.setValue(commandDelimiter.getValue());
+        super.checkMandatory();
+        if (!(authMethod.isPassword() || authMethod.isPublicKey())) {
             throw new JSExceptionMandatoryOptionMissing("ErrSSH010 invalid or no AuthenticationMethod specified");
         }
-        if (auth_method.isPassword() && password.IsEmpty()) {
+        if (authMethod.isPassword() && password.IsEmpty()) {
             throw new JSExceptionMandatoryOptionMissing(
                     "ErrSSH020 AuthenticationMethod 'password' requires a Password, but no password was specified");
         }
-        if (auth_method.isPublicKey()) {
-            if (auth_file.IsNotEmpty()) {
-                auth_file.CheckMandatory(true);
+        if (authMethod.isPublicKey()) {
+            if (authFile.isNotEmpty()) {
+                authFile.checkMandatory(true);
             } else {
                 throw new JSExceptionMandatoryOptionMissing(
                         "ErrSSH050 AuthenticationMethod 'publickey' requires a keyfile, but no keyfile was specified");
@@ -59,11 +59,11 @@ public class SOSSSHJobOptions extends SOSSSHJobOptionsSuperClass {
     }
 
     public boolean commandSpecified() {
-        return command.isDirty() && command_script.isDirty() && command_script_file.isDirty();
+        return command.isDirty() && commandScript.isDirty() && commandScriptFile.isDirty();
     }
 
     public boolean isScript() throws Exception {
-        return !command_script.IsEmpty() || !command_script_file.IsEmpty();
+        return !commandScript.IsEmpty() || !commandScriptFile.IsEmpty();
     }
 
 }

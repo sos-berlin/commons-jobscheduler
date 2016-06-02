@@ -19,10 +19,10 @@ public class TrafficLightsException extends JobSchedulerException {
      * @param pstrMessage the message of the exception */
     public TrafficLightsException(final String pstrMessage) {
         super(pstrMessage);
-        this.Message(pstrMessage);
-        this.Status(JobSchedulerException.WARNING);
-        this.Category(CategoryFileTransfer);
-        this.Typ(TypeTL);
+        this.message(pstrMessage);
+        this.setStatus(JobSchedulerException.WARNING);
+        this.setCategory(CategoryFileTransfer);
+        this.setType(TypeTL);
         this.eMailSubject("Problems with Traffic-Lights: " + pstrMessage);
     }
 

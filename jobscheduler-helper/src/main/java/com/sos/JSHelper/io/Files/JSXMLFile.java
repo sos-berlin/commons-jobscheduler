@@ -58,8 +58,8 @@ public class JSXMLFile extends JSTextFile {
     }
 
     public JSXMLFile(final SOSOptionFileName pobjOptionElementFileName) throws Exception {
-        super(pobjOptionElementFileName.Value());
-        strFileName = pobjOptionElementFileName.Value();
+        super(pobjOptionElementFileName.getValue());
+        strFileName = pobjOptionElementFileName.getValue();
     }
 
     public JSXMLFile(final String pstrFileName) throws Exception {
@@ -71,12 +71,12 @@ public class JSXMLFile extends JSTextFile {
         //
     }
 
-    public JSXMLFile XMLTagV(final String pstrTagName, final String pstrTagValue) throws Exception {
+    public JSXMLFile getXMLTagV(final String pstrTagName, final String pstrTagValue) throws Exception {
         return this.newTag(pstrTagName, pstrTagValue);
     }
 
     private String getStartTag(final String strTagName) {
-        final String strT = addBraces(adjustTagName(strTagName) + BuildAttributesString());
+        final String strT = addBraces(adjustTagName(strTagName) + buildAttributesString());
         if (strTagName.startsWith("/")) {
             flgDecrIndent = true;
         } else {
@@ -86,13 +86,13 @@ public class JSXMLFile extends JSTextFile {
     }
 
     private String getEmptyTag(final String strTagName) {
-        final String strT = addBraces(adjustTagName(strTagName) + BuildAttributesString() + " /");
+        final String strT = addBraces(adjustTagName(strTagName) + buildAttributesString() + " /");
         flgDecrIndent = true;
         flgIncrIndent = true;
         return strT;
     }
 
-    private String BuildAttributesString() {
+    private String buildAttributesString() {
         String strT = "";
         if (lstAttributes != null) {
             for (int i = 0; i < lstAttributes.size(); i++) {
@@ -122,7 +122,7 @@ public class JSXMLFile extends JSTextFile {
             strValue = "";
         } else {
             if (strValue.matches(".*[&<>].*") && !pstrTagValue.contains("![CDATA[")) {
-                strValue = MakeCData(strValue);
+                strValue = makeCData(strValue);
             }
         }
         String strTemp = "";
@@ -139,7 +139,7 @@ public class JSXMLFile extends JSTextFile {
         if (strValue == null) {
             strValue = "";
         } else if (strValue.matches(".*[&<>].*") && !pstrTagValue.contains("![CDATA[")) {
-            strValue = MakeCData(strValue);
+            strValue = makeCData(strValue);
         }
         String strTemp = "";
         if (strValue.isEmpty()) {
@@ -147,11 +147,11 @@ public class JSXMLFile extends JSTextFile {
         } else {
             strTemp = String.format("%1$s%2$s%3$s", getStartTag(pstrTagName), strValue, getEndTag(pstrTagName));
         }
-        Write2File(strTemp);
+        write2File(strTemp);
         return this;
     }
 
-    public JSXMLFile Write2File(final String pstrS) throws Exception {
+    public JSXMLFile write2File(final String pstrS) throws Exception {
         String strT = "";
         if (!flgFileIsOpen) {
             flgFileIsOpen = true;
@@ -166,7 +166,7 @@ public class JSXMLFile extends JSTextFile {
             flgDecrIndent = false;
             strT = getIndent();
         }
-        super.Write(strT + pstrS);
+        super.write(strT + pstrS);
         return this;
     }
 
@@ -191,7 +191,7 @@ public class JSXMLFile extends JSTextFile {
         if (strCharset == null || strCharset.isEmpty()) {
             strCharset = "ISO-8859-1";
         }
-        Write2File(addBraces("?xml version='1.0' encoding='" + strCharset + "' ?"));
+        write2File(addBraces("?xml version='1.0' encoding='" + strCharset + "' ?"));
         intNumberOfXMLDeclarations++;
         return this;
     }
@@ -202,7 +202,7 @@ public class JSXMLFile extends JSTextFile {
     }
 
     public JSXMLFile comment(final String pstrComment) throws Exception {
-        Write2File(addBraces("!-- " + pstrComment + " --"));
+        write2File(addBraces("!-- " + pstrComment + " --"));
         return this;
     }
 
@@ -211,33 +211,33 @@ public class JSXMLFile extends JSTextFile {
     }
 
     public JSXMLFile newTag(final String pstrTagName) throws Exception {
-        Write2File(getStartTag(pstrTagName));
+        write2File(getStartTag(pstrTagName));
         return this;
     }
 
     public JSXMLFile endTag(final String pstrTagName) throws Exception {
-        Write2File(getEndTag(pstrTagName));
+        write2File(getEndTag(pstrTagName));
         return this;
     }
 
     public JSXMLFile newCDataTag(final String pstrTagName) throws Exception {
-        Write2File(getStartTag(pstrTagName) + "<![CDATA[");
+        write2File(getStartTag(pstrTagName) + "<![CDATA[");
         return this;
     }
 
     public JSXMLFile endCDataTag(final String pstrTagName) throws Exception {
-        Write2File("]]>" + getEndTag(pstrTagName));
+        write2File("]]>" + getEndTag(pstrTagName));
         return this;
     }
 
     public JSXMLFile newCDataTag(final String pstrTagName, final String pstrTagValue) throws Exception {
         if (pstrTagValue != null && pstrTagName != null && !pstrTagValue.isEmpty()) {
-            this.newTag(pstrTagName, MakeCData(pstrTagValue));
+            this.newTag(pstrTagName, makeCData(pstrTagValue));
         }
         return this;
     }
 
-    public String MakeCData(final String pstrValue) {
+    public String makeCData(final String pstrValue) {
         return addBraces("![CDATA[" + pstrValue + "]]");
     }
 
@@ -257,7 +257,7 @@ public class JSXMLFile extends JSTextFile {
         return this;
     }
 
-    public void Transform(final File xslFile, final File outputFile) throws TransformerException, TransformerConfigurationException,
+    public void transform(final File xslFile, final File outputFile) throws TransformerException, TransformerConfigurationException,
             FileNotFoundException, Exception {
         Transformer transformer = null;
         System.setProperty("javax.xml.transform.TransformerFactory", "net.sf.saxon.TransformerFactoryImpl");
@@ -281,9 +281,9 @@ public class JSXMLFile extends JSTextFile {
             }
         }
         JSDataElementDateISO objISODate = new JSDataElementDateISO();
-        objISODate.Now();
-        transf.setParameter("sos.timestamp", objISODate.Now());
-        transformer.setParameter("sos.timestamp", objISODate.Now());
+        objISODate.now();
+        transf.setParameter("sos.timestamp", objISODate.now());
+        transformer.setParameter("sos.timestamp", objISODate.now());
         StringWriter writer = new StringWriter();
         StreamResult result = new StreamResult(writer);
         transf.transform(objDS, result);
@@ -312,7 +312,7 @@ public class JSXMLFile extends JSTextFile {
         return strT;
     }
 
-    public void Validate() throws SAXException, IOException {
+    public void validate() throws SAXException, IOException {
         if (intNumberOfXMLDeclarations > 1) {
             return;
         }
@@ -349,11 +349,6 @@ public class JSXMLFile extends JSTextFile {
             //
         }
 
-        @Override
-        public String toString() {
-            return "not implemented";
-        }
-
         public SOSXMLTag(final String pstrTagName) {
             this(pstrTagName, "");
         }
@@ -361,6 +356,11 @@ public class JSXMLFile extends JSTextFile {
         public SOSXMLTag(final String pstrTagName, final String pstrTagValue) {
             Name = pstrTagName;
             Value = pstrTagValue;
+        }
+
+        @Override
+        public String toString() {
+            return "not implemented";
         }
 
         public int getDataType() {
@@ -467,7 +467,7 @@ public class JSXMLFile extends JSTextFile {
         hsmParameters = pobjHshMap;
     }
 
-    public void EnvironmentCheck() throws Exception {
+    public void environmentCheck() throws Exception {
         EnvironmentCheck ec = new EnvironmentCheck();
         StringWriter sWri = new StringWriter();
         PrintWriter pWri = new PrintWriter(new StringWriter());

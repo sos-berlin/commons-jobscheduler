@@ -12,19 +12,19 @@ public interface ISOSConnectionOptions {
 
     public SOSOptionHostName getHost();
 
-    public void setalternative_host(SOSOptionHostName p_alternative_host);
+    public void setAlternativeHost(SOSOptionHostName pAlternativeHost);
 
-    public SOSOptionHostName getalternative_host();
+    public SOSOptionHostName getAlternativeHost();
 
-    public void setalternative_password(SOSOptionPassword p_alternative_password);
+    public void setAlternativePassword(SOSOptionPassword pAlternativePassword);
 
-    public SOSOptionPassword getalternative_password();
+    public SOSOptionPassword getAlternativePassword();
 
-    public SOSOptionString getalternative_account();
+    public SOSOptionString getAlternativeAccount();
 
-    public SOSOptionString getalternative_passive_mode();
+    public SOSOptionString getAlternativePassiveMode();
 
-    public SOSOptionPortNumber getalternative_port();
+    public SOSOptionPortNumber getAlternativePort();
 
     public abstract void setHost(SOSOptionHostName host);
 
@@ -32,24 +32,24 @@ public interface ISOSConnectionOptions {
 
     public abstract void setPort(SOSOptionPortNumber port);
 
-    public abstract SOSOptionString getProxy_host();
+    public abstract SOSOptionString getProxyHost();
 
-    public abstract void setProxy_host(SOSOptionString proxyHost);
+    public abstract void setProxyHost(SOSOptionString proxyHost);
 
-    public abstract SOSOptionPortNumber getProxy_port();
+    public abstract SOSOptionPortNumber getProxyPort();
 
-    public abstract void setProxy_port(SOSOptionPortNumber proxyPort);
+    public abstract void setProxyPort(SOSOptionPortNumber proxyPort);
 
-    public abstract void setProxy_user(SOSOptionUserName proxyUser);
+    public abstract void setProxyUser(SOSOptionUserName proxyUser);
 
-    public abstract SOSOptionUserName getProxy_user();
+    public abstract SOSOptionUserName getProxyUser();
 
-    public abstract void setProxy_password(SOSOptionPassword proxyPassword);
+    public abstract void setProxyPassword(SOSOptionPassword proxyPassword);
 
-    public abstract SOSOptionPassword getProxy_password();
+    public abstract SOSOptionPassword getProxyPassword();
 
     public abstract SOSOptionUserName getUser();
 
-    public SOSOptionBoolean getraise_exception_on_error();
+    public SOSOptionBoolean getRaiseExceptionOnError();
 
 }

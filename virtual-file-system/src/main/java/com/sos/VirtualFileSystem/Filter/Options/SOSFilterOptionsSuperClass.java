@@ -24,166 +24,173 @@ public abstract class SOSFilterOptionsSuperClass extends JSOptionsClass {
         this.setAllOptions(JSSettings);
     }
 
-    @JSOptionDefinition(name = "Line_numbering_position", description = "Insert line number at position", key = "Line_numbering_position", type = "SOSOptionInteger", mandatory = false)
-    public SOSOptionInteger Line_numbering_position = new SOSOptionInteger(this, CLASSNAME + ".Line_numbering_position",
-            "Insert line number at position", "1", "1", false);
+    @JSOptionDefinition(name = "Line_numbering_position", description = "Insert line number at position", key = "Line_numbering_position",
+            type = "SOSOptionInteger", mandatory = false)
+    public SOSOptionInteger lineNumberingPosition = new SOSOptionInteger(this, CLASSNAME + ".Line_numbering_position", "Insert line number at position", "1", "1",
+            false);
 
-    public SOSOptionInteger getLine_numbering_position() {
-        return Line_numbering_position;
+    public SOSOptionInteger getLineNumberingPosition() {
+        return lineNumberingPosition;
     }
 
-    public SOSFilterOptionsSuperClass setLine_numbering_position(final SOSOptionInteger pstrValue) {
-        Line_numbering_position = pstrValue;
+    public SOSFilterOptionsSuperClass setLineNumberingPosition(final SOSOptionInteger pstrValue) {
+        lineNumberingPosition = pstrValue;
         return this;
     }
 
-    @JSOptionDefinition(name = "Line_Numbering_Format", description = "Format mask of line numbering value", key = "Line_Numbering_Format", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString Line_Numbering_Format = new SOSOptionString(this, CLASSNAME + ".Line_Numbering_Format",
-            "Format mask of line numbering value", "%08d", "%08d", false);
+    @JSOptionDefinition(name = "Line_Numbering_Format", description = "Format mask of line numbering value", key = "Line_Numbering_Format",
+            type = "SOSOptionString", mandatory = false)
+    public SOSOptionString lineNumberingFormat = new SOSOptionString(this, CLASSNAME + ".Line_Numbering_Format", "Format mask of line numbering value", 
+            "%08d", "%08d", false);
 
-    public SOSOptionString getLine_Numbering_Format() {
-        return Line_Numbering_Format;
+    public SOSOptionString getLineNumberingFormat() {
+        return lineNumberingFormat;
     }
 
-    public SOSFilterOptionsSuperClass setLine_Numbering_Format(final SOSOptionString pstrValue) {
-        Line_Numbering_Format = pstrValue;
+    public SOSFilterOptionsSuperClass setLineNumberingFormat(final SOSOptionString pstrValue) {
+        lineNumberingFormat = pstrValue;
         return this;
     }
 
-    @JSOptionDefinition(name = "Line_Numbering_Increment_Value", description = "Increment value for line-numbering", key = "Line_Numbering_Increment_Value", type = "SOSOptionInteger", mandatory = false)
-    public SOSOptionInteger Line_Numbering_Increment_Value = new SOSOptionInteger(this, CLASSNAME + ".Line_Numbering_Increment_Value",
+    @JSOptionDefinition(name = "Line_Numbering_Increment_Value", description = "Increment value for line-numbering", key = "Line_Numbering_Increment_Value",
+            type = "SOSOptionInteger", mandatory = false)
+    public SOSOptionInteger lineNumberingIncrementValue = new SOSOptionInteger(this, CLASSNAME + ".Line_Numbering_Increment_Value", 
             "Increment value for line-numbering", "1", "1", false);
 
-    public SOSOptionInteger getLine_Numbering_Increment_Value() {
-        return Line_Numbering_Increment_Value;
+    public SOSOptionInteger getLineNumberingIncrementValue() {
+        return lineNumberingIncrementValue;
     }
 
-    public SOSFilterOptionsSuperClass setLine_Numbering_Increment_Value(final SOSOptionInteger pstrValue) {
-        Line_Numbering_Increment_Value = pstrValue;
+    public SOSFilterOptionsSuperClass setLineNumberingIncrementValue(final SOSOptionInteger pstrValue) {
+        lineNumberingIncrementValue = pstrValue;
         return this;
     }
 
-    @JSOptionDefinition(name = "Line_numbering_start_value", description = "STart value for line numbering", key = "Line_numbering_start_value", type = "SOSOptionInteger", mandatory = false)
-    public SOSOptionInteger Line_numbering_start_value = new SOSOptionInteger(this, CLASSNAME + ".Line_numbering_start_value",
-            "Start value for line numbering", "1", "1", false);
+    @JSOptionDefinition(name = "Line_numbering_start_value", description = "STart value for line numbering", key = "Line_numbering_start_value",
+            type = "SOSOptionInteger", mandatory = false)
+    public SOSOptionInteger lineNumberingStartValue = new SOSOptionInteger(this, CLASSNAME + ".Line_numbering_start_value", "Start value for line numbering",
+            "1", "1", false);
 
-    public SOSOptionInteger getLine_numbering_start_value() {
-        return Line_numbering_start_value;
+    public SOSOptionInteger getLineNumberingStartValue() {
+        return lineNumberingStartValue;
     }
 
-    public SOSFilterOptionsSuperClass setLine_numbering_start_value(final SOSOptionInteger pstrValue) {
-        Line_numbering_start_value = pstrValue;
+    public SOSFilterOptionsSuperClass setLineNumberingStartValue(final SOSOptionInteger pstrValue) {
+        lineNumberingStartValue = pstrValue;
         return this;
     }
 
-    @JSOptionDefinition(name = "create_line_numbers", description = "Create line number for all lines of a file", key = "create_line_numbers", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean create_line_numbers = new SOSOptionBoolean(this, CLASSNAME + ".create_line_numbers",
-            "Create line number for all lines of a file", "false", "false", false);
-
-    public SOSOptionBoolean getcreate_line_numbers() {
-        return create_line_numbers;
-    }
-
-    public SOSFilterOptionsSuperClass setcreate_line_numbers(final SOSOptionBoolean pstrValue) {
-        create_line_numbers = pstrValue;
-        return this;
-    }
-
-    @JSOptionDefinition(name = "renumber_lines", description = "Make a renumbering of all lines in a file", key = "renumber_lines", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean renumber_lines = new SOSOptionBoolean(this, CLASSNAME + ".renumber_lines", "Make a renumbering of all lines in a file",
+    @JSOptionDefinition(name = "create_line_numbers", description = "Create line number for all lines of a file", key = "create_line_numbers",
+            type = "SOSOptionBoolean", mandatory = false)
+    public SOSOptionBoolean createLineNumbers = new SOSOptionBoolean(this, CLASSNAME + ".create_line_numbers", "Create line number for all lines of a file",
             "false", "false", false);
 
-    public SOSOptionBoolean getrenumber_lines() {
-        return renumber_lines;
+    public SOSOptionBoolean getCreateLineNumbers() {
+        return createLineNumbers;
     }
 
-    public SOSFilterOptionsSuperClass setrenumber_lines(final SOSOptionBoolean pstrValue) {
-        renumber_lines = pstrValue;
+    public SOSFilterOptionsSuperClass setCreateLineNumbers(final SOSOptionBoolean pstrValue) {
+        createLineNumbers = pstrValue;
         return this;
     }
 
-    @JSOptionDefinition(name = "Filter_sequence", description = "Filter definitions: what to process and in what sequence", key = "Filter_sequence", type = "SOSOptionValueList", mandatory = false)
-    public SOSOptionFilterSequence FilterSequence = new SOSOptionFilterSequence(this, CLASSNAME + ".Filter_sequence",
-            "Filter definitions: what to process and in what sequence", "nullFilter", "", true);
+    @JSOptionDefinition(name = "renumber_lines", description = "Make a renumbering of all lines in a file", key = "renumber_lines", type = "SOSOptionBoolean",
+            mandatory = false)
+    public SOSOptionBoolean renumberLines = new SOSOptionBoolean(this, CLASSNAME + ".renumber_lines", "Make a renumbering of all lines in a file", "false", 
+            "false", false);
 
-    public String getFilter_sequence() {
-        return FilterSequence.Value();
+    public SOSOptionBoolean getRenumberLines() {
+        return renumberLines;
     }
 
-    public SOSFilterOptionsSuperClass setFilter_sequence(final String pstrValue) {
-        FilterSequence.Value(pstrValue);
+    public SOSFilterOptionsSuperClass setRenumberLines(final SOSOptionBoolean pstrValue) {
+        renumberLines = pstrValue;
+        return this;
+    }
+
+    @JSOptionDefinition(name = "Filter_sequence", description = "Filter definitions: what to process and in what sequence", key = "Filter_sequence",
+            type = "SOSOptionValueList", mandatory = false)
+    public SOSOptionFilterSequence filterSequence = new SOSOptionFilterSequence(this, CLASSNAME + ".Filter_sequence", 
+            "Filter definitions: what to process and in what sequence", "nullFilter", "", true);
+
+    public String getFilterSequence() {
+        return filterSequence.getValue();
+    }
+
+    public SOSFilterOptionsSuperClass setFilterSequence(final String pstrValue) {
+        filterSequence.setValue(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "do_replacing", description = "Activate replacing", key = "do_replacing", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean doReplacing = new SOSOptionBoolean(this, CLASSNAME + ".do_replacing", "Activate replacing", "false", "false", false);
 
-    public String getdo_replacing() {
-        return doReplacing.Value();
+    public String getDoReplacing() {
+        return doReplacing.getValue();
     }
 
-    public SOSFilterOptionsSuperClass setdo_replacing(final String pstrValue) {
-        doReplacing.Value(pstrValue);
+    public SOSFilterOptionsSuperClass setDoReplacing(final String pstrValue) {
+        doReplacing.setValue(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "replace_what", description = "Replacing what", key = "replace_what", type = "SOSOptionRegExp", mandatory = false)
     public SOSOptionRegExp replaceWhat = new SOSOptionRegExp(this, CLASSNAME + ".replace_what", "Replacing what", "", "", false);
 
-    public String getreplace_what() {
-        return replaceWhat.Value();
+    public String getReplaceWhat() {
+        return replaceWhat.getValue();
     }
 
-    public SOSFilterOptionsSuperClass setreplace_what(final String pstrValue) {
-        replaceWhat.Value(pstrValue);
+    public SOSFilterOptionsSuperClass setReplaceWhat(final String pstrValue) {
+        replaceWhat.setValue(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "replace_with", description = "replace with", key = "replace_with", type = "SOSOptionRegExp", mandatory = false)
     public SOSOptionRegExp replaceWith = new SOSOptionRegExp(this, CLASSNAME + ".replace_with", "replaced with", "", "", false);
 
-    public String getreplace_with() {
-        return replaceWith.Value();
+    public String getReplaceWith() {
+        return replaceWith.getValue();
     }
 
-    public SOSFilterOptionsSuperClass setreplace_with(final String pstrValue) {
-        replaceWith.Value(pstrValue);
+    public SOSFilterOptionsSuperClass setReplaceWith(final String pstrValue) {
+        replaceWith.setValue(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "exclude_lines_before", description = "exclude_lines_before", key = "exclude_lines_before", type = "SOSOptionRegExp", mandatory = false)
     public SOSOptionRegExp excludeLinesBefore = new SOSOptionRegExp(this, CLASSNAME + ".exclude_lines_before", "exclude_lines_before", "", "", false);
 
-    public String getexclude_lines_before() {
-        return excludeLinesBefore.Value();
+    public String getExcludeLinesBefore() {
+        return excludeLinesBefore.getValue();
     }
 
-    public SOSFilterOptionsSuperClass setexclude_lines_before(final String pstrValue) {
-        excludeLinesBefore.Value(pstrValue);
+    public SOSFilterOptionsSuperClass setExcludeLinesBefore(final String pstrValue) {
+        excludeLinesBefore.setValue(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "exclude_lines_after", description = "exclude_lines_after", key = "exclude_lines_after", type = "SOSOptionRegExp", mandatory = false)
-    public SOSOptionRegExp exclude_lines_after = new SOSOptionRegExp(this, CLASSNAME + ".exclude_lines_after", "exclude_lines_after", "", "", false);
+    public SOSOptionRegExp excludeLinesAfter = new SOSOptionRegExp(this, CLASSNAME + ".exclude_lines_after", "exclude_lines_after", "", "", false);
 
-    public String getexclude_lines_after() {
-        return exclude_lines_after.Value();
+    public String getExcludeLinesAfter() {
+        return excludeLinesAfter.getValue();
     }
 
-    public SOSFilterOptionsSuperClass setexclude_lines_after(final String pstrValue) {
-        exclude_lines_after.Value(pstrValue);
+    public SOSFilterOptionsSuperClass setExcludeLinesAfter(final String pstrValue) {
+        excludeLinesAfter.setValue(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "exclude_lines", description = "exclude lines", key = "exclude_lines", type = "SOSOptionRegExp", mandatory = false)
     public SOSOptionRegExp excludeLines = new SOSOptionRegExp(this, CLASSNAME + ".exclude_lines", "exclude lines", "", "", false);
 
-    public String getexclude_lines() {
-        return excludeLines.Value();
+    public String getExcludeLines() {
+        return excludeLines.getValue();
     }
 
-    public SOSFilterOptionsSuperClass setexclude_lines(final String pstrValue) {
-        excludeLines.Value(pstrValue);
+    public SOSFilterOptionsSuperClass setExcludeLines(final String pstrValue) {
+        excludeLines.setValue(pstrValue);
         return this;
     }
 
@@ -191,24 +198,24 @@ public abstract class SOSFilterOptionsSuperClass extends JSOptionsClass {
     public SOSOptionBoolean excludeEmptyLines = new SOSOptionBoolean(this, CLASSNAME + ".exclude_empty_lines", "exclude empty lines", "false",
             "false", false);
 
-    public String getexclude_empty_lines() {
-        return excludeEmptyLines.Value();
+    public String getExcludeEmptyLines() {
+        return excludeEmptyLines.getValue();
     }
 
-    public SOSFilterOptionsSuperClass setexclude_empty_lines(final String pstrValue) {
-        excludeEmptyLines.Value(pstrValue);
+    public SOSFilterOptionsSuperClass setExcludeEmptyLines(final String pstrValue) {
+        excludeEmptyLines.setValue(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "include_lines", description = "include lines", key = "include_lines", type = "SOSOptionRegExp", mandatory = false)
     public SOSOptionRegExp includeLines = new SOSOptionRegExp(this, CLASSNAME + ".include_lines", "include lines", "", "", false);
 
-    public String getinclude_lines() {
-        return includeLines.Value();
+    public String getIncludeLines() {
+        return includeLines.getValue();
     }
 
-    public SOSFilterOptionsSuperClass setinclude_lines(final String pstrValue) {
-        includeLines.Value(pstrValue);
+    public SOSFilterOptionsSuperClass setIncludeLines(final String pstrValue) {
+        includeLines.setValue(pstrValue);
         return this;
     }
 

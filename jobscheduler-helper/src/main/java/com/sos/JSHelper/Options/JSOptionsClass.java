@@ -64,20 +64,20 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     private static String conEnvVarJS_TEST_MODE = new String("JS_TEST_MODE");
     private static Properties objP = new Properties();
     private final StringBuffer strBuffer = new StringBuffer("");
-    private boolean flgIgnoreEnvironmentVariables = false;
     private final String strOptionNamePrefix = "-";
+    private final String conFilePathSeparator = File.separator;
+    private boolean flgIgnoreEnvironmentVariables = false;
     private String strCommandLineArgs[];
     private String strCurrentNodeName = "";
     private String strCurrentJobName = "";
     private int intCurrentJobId = 0;
     private String strCurrentJobFolder = "";
-    private final String conFilePathSeparator = File.separator;
     private String strTempDirName = System.getProperty("java.io.tmpdir") + conFilePathSeparator;
     private String strUserDirName = System.getProperty("user.dir") + conFilePathSeparator;
-    public final static String newLine = System.getProperty("line.separator");
-    public JSOptionPropertyFolderName UserDir = new JSOptionPropertyFolderName(this, "", "", "", "", false);
+    public static final String newLine = System.getProperty("line.separator");
     public static boolean gflgUseBase64ForObject = true;
     public static boolean flgIncludeProcessingInProgress = false;
+    public JSOptionPropertyFolderName UserDir = new JSOptionPropertyFolderName(this, "", "", "", "", false);
     public boolean gflgSubsituteVariables = true;
     public String TestVar = "Wert von TestVar";
     public Class objParentClass = this.getClass();
@@ -86,9 +86,9 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     public Preferences objPreferenceStore = null;
 
     protected enum IterationTypes {
-        setRecord(1), getRecord(2), toOut(3), createXML(4), setDefaultValues(5), clearAllValues(6), countSegmentFields(7), CheckMandatory(12), setPrefix(
-                14), toString(13), getCommandLine(14), DirtyToString(15), getKeyValuePair(16), LoadValues(17), StoreValues(18), getQuotedCommandLine(
-                19);
+        setRecord(1), getRecord(2), toOut(3), createXML(4), setDefaultValues(5), clearAllValues(6), countSegmentFields(7), CheckMandatory(12),
+        setPrefix(14), toString(13), getCommandLine(14), DirtyToString(15), getKeyValuePair(16), LoadValues(17), StoreValues(18),
+        getQuotedCommandLine(19);
 
         private int intType;
 
@@ -96,7 +96,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
             intType = pintType;
         }
 
-        public int Code() {
+        public int getCode() {
             return intType;
         }
     }
@@ -111,216 +111,229 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
 
     public JSOptionsClass(final HashMap<String, String> pobjSettings) {
         this();
-        this.Settings(pobjSettings);
-        ArchiverOptions();
+        this.setSettings(pobjSettings);
+        archiverOptions();
     }
 
-    @JSOptionDefinition(name = "BaseDirectory", description = "A Base Directory for all relative FileNames used by SOSOptionFileName", key = "Base_Directory", type = "SOSOptionFolderName", mandatory = false)
-    public SOSOptionFolderName BaseDirectory = new SOSOptionFolderName(this, CLASS_NAME + ".Base_Directory",
+    @JSOptionDefinition(name = "BaseDirectory", description = "A Base Directory for all relative FileNames used by SOSOptionFileName",
+            key = "Base_Directory", type = "SOSOptionFolderName", mandatory = false)
+    public SOSOptionFolderName baseDirectory = new SOSOptionFolderName(this, CLASS_NAME + ".Base_Directory",
             "A Base Directory for all relative FileNames used by SOSOptionFileName", "env:user.dir", "env:user.dir", false);
 
     public SOSOptionFolderName getBaseDirectory() {
-        return BaseDirectory;
+        return baseDirectory;
     }
 
     public JSOptionsClass setBaseDirectory(final SOSOptionFolderName pstrValue) {
-        BaseDirectory = pstrValue;
+        baseDirectory = pstrValue;
         return this;
     }
 
-    @JSOptionDefinition(name = "DateFormatMask", description = "General Mask for date fomatting", key = "Date_Format_Mask", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString DateFormatMask = new SOSOptionString(this, CLASS_NAME + ".Date_Format_Mask", "General Mask for date fomatting",
+    @JSOptionDefinition(name = "DateFormatMask", description = "General Mask for date fomatting", key = "Date_Format_Mask", type = "SOSOptionString",
+            mandatory = false)
+    public SOSOptionString dateFormatMask = new SOSOptionString(this, CLASS_NAME + ".Date_Format_Mask", "General Mask for date fomatting",
             "yyyy-MM-dd", "yyyy-MM-dd", false);
 
     public SOSOptionString getDateFormatMask() {
-        return DateFormatMask;
+        return dateFormatMask;
     }
 
     public JSOptionsClass setDateFormatMask(final SOSOptionString pstrValue) {
-        DateFormatMask = pstrValue;
+        dateFormatMask = pstrValue;
         return this;
     }
 
-    @JSOptionDefinition(name = "TimeFormatMask", description = "General Mask for time formatting", key = "Time_Format_Mask", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString TimeFormatMask = new SOSOptionString(this, CLASS_NAME + ".Time_Format_Mask", "General Mask for time formatting",
+    @JSOptionDefinition(name = "TimeFormatMask", description = "General Mask for time formatting", key = "Time_Format_Mask",
+            type = "SOSOptionString", mandatory = false)
+    public SOSOptionString timeFormatMask = new SOSOptionString(this, CLASS_NAME + ".Time_Format_Mask", "General Mask for time formatting",
             "HH:mm:ss", "HH:mm:ss", false);
 
     public SOSOptionString getTimeFormatMask() {
-        return TimeFormatMask;
+        return timeFormatMask;
     }
 
     public JSOptionsClass setTimeFormatMask(final SOSOptionString pstrValue) {
-        TimeFormatMask = pstrValue;
+        timeFormatMask = pstrValue;
         return this;
     }
 
-    @JSOptionDefinition(name = "Scheduler_Hot_Folder", description = "Pathname to the JobScheduler live-folder", key = "Scheduler_Hot_Folder", type = "SOSOptionFolderName", mandatory = true)
-    public SOSOptionFolderName Scheduler_Hot_Folder = new SOSOptionFolderName(this, CLASS_NAME + ".Scheduler_Hot_Folder",
+    @JSOptionDefinition(name = "Scheduler_Hot_Folder", description = "Pathname to the JobScheduler live-folder", key = "Scheduler_Hot_Folder",
+            type = "SOSOptionFolderName", mandatory = true)
+    public SOSOptionFolderName schedulerHotFolder = new SOSOptionFolderName(this, CLASS_NAME + ".Scheduler_Hot_Folder",
             "Pathname to the JobScheduler live-folder", "${SCHEDULER_DATA}/config/live", "", true);
 
-    public String getScheduler_Hot_Folder() {
-        return Scheduler_Hot_Folder.Value();
+    public String getSchedulerHotFolder() {
+        return schedulerHotFolder.getValue();
     }
 
-    public JSOptionsClass setScheduler_Hot_Folder(final String pstrValue) {
-        Scheduler_Hot_Folder.Value(pstrValue);
+    public JSOptionsClass setSchedulerHotFolder(final String pstrValue) {
+        schedulerHotFolder.setValue(pstrValue);
         return this;
     }
 
-    @JSOptionDefinition(name = "Scheduler_Data", description = "Data Folder of JobScheduler Installation", key = "Scheduler_Data", type = "SOSOptionFolderName", mandatory = false)
-    public SOSOptionFolderName Scheduler_Data = new SOSOptionFolderName(this, CLASS_NAME + ".Scheduler_Data",
+    @JSOptionDefinition(name = "Scheduler_Data", description = "Data Folder of JobScheduler Installation", key = "Scheduler_Data",
+            type = "SOSOptionFolderName", mandatory = false)
+    public SOSOptionFolderName schedulerData = new SOSOptionFolderName(this, CLASS_NAME + ".Scheduler_Data",
             "Data Folder of JobScheduler Installation", "env:SCHEDULER_DATA", "env:SCHEDULER_DATA", false);
 
-    public String getScheduler_Data() {
-        return Scheduler_Data.Value();
+    public String getSchedulerData() {
+        return schedulerData.getValue();
     }
 
-    public JSOptionsClass setScheduler_Data(final String pstrValue) {
-        Scheduler_Data.Value(pstrValue);
+    public JSOptionsClass setSchedulerData(final String pstrValue) {
+        schedulerData.setValue(pstrValue);
         return this;
     }
 
-    @JSOptionDefinition(name = "Scheduler_Home", description = "Home Root Folder of JobScheduler", key = "Scheduler_Home", type = "SOSOptionFileName", mandatory = true)
-    public SOSOptionFolderName Scheduler_Home = new SOSOptionFolderName(this, CLASS_NAME + ".Scheduler_Home", "Home Root Folder of JobScheduler",
+    @JSOptionDefinition(name = "Scheduler_Home", description = "Home Root Folder of JobScheduler", key = "Scheduler_Home",
+            type = "SOSOptionFileName", mandatory = true)
+    public SOSOptionFolderName schedulerHome = new SOSOptionFolderName(this, CLASS_NAME + ".Scheduler_Home", "Home Root Folder of JobScheduler",
             "env:SCHEDULER_HOME", "env:SCHEDULER_HOME", false);
 
-    public String getScheduler_Home() {
-        return Scheduler_Home.Value();
+    public String getSchedulerHome() {
+        return schedulerHome.getValue();
     }
 
-    public JSOptionsClass setScheduler_Home(final String pstrValue) {
-        Scheduler_Home.Value(pstrValue);
+    public JSOptionsClass setSchedulerHome(final String pstrValue) {
+        schedulerHome.setValue(pstrValue);
         return this;
     }
 
-    @JSOptionDefinition(name = "Local_user", description = "I18N is for internationalization of Application", key = "Local_user", type = "SOSOptionUserName", mandatory = true)
-    public SOSOptionUserName UserName = new SOSOptionUserName(this, CLASS_NAME + ".local_user", "Name of local user",
+    @JSOptionDefinition(name = "Local_user", description = "I18N is for internationalization of Application", key = "Local_user",
+            type = "SOSOptionUserName", mandatory = true)
+    public SOSOptionUserName userName = new SOSOptionUserName(this, CLASS_NAME + ".local_user", "Name of local user",
             System.getProperty("user.name"), System.getProperty("user.name"), true);
 
-    @JSOptionDefinition(name = "Locale", description = "I18N is for internationalization of Application", key = "Locale", type = "SOSOptionString", mandatory = true)
-    public SOSOptionLocale Locale = new SOSOptionLocale(this, CLASS_NAME + ".Locale", "I18N is for internationalization of Application",
+    @JSOptionDefinition(name = "Locale", description = "I18N is for internationalization of Application", key = "Locale", type = "SOSOptionString",
+            mandatory = true)
+    public SOSOptionLocale locale = new SOSOptionLocale(this, CLASS_NAME + ".Locale", "I18N is for internationalization of Application",
             "env:SOS_LOCALE", java.util.Locale.getDefault().toString(), true);
 
     public java.util.Locale getI18NLocale() {
-        return new java.util.Locale(Locale.Value());
+        return new java.util.Locale(locale.getValue());
     }
 
     public String getLocale() {
-        return Locale.Value();
+        return locale.getValue();
     }
 
     @Override
     public void setLocale(final String pstrValue) {
-        Locale.Value(pstrValue);
+        locale.setValue(pstrValue);
     }
 
     @JSOptionDefinition(name = "CheckNotProcessedOptions", description = "If this Option is set to true, all not processed or recognized options "
             + "are reported as a warning", key = "CheckNotProcessedOptions", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean CheckNotProcessedOptions = new SOSOptionBoolean(this, CLASS_NAME + ".CheckNotProcessedOptions",
+    public SOSOptionBoolean checkNotProcessedOptions = new SOSOptionBoolean(this, CLASS_NAME + ".CheckNotProcessedOptions",
             "If this Option is set to true, all not processed or recognized options are reported as a warning", "false", "false", false);
 
     public String getCheckNotProcessedOptions() {
-        return CheckNotProcessedOptions.Value();
+        return checkNotProcessedOptions.getValue();
     }
 
     public JSOptionsClass setCheckNotProcessedOptions(final String pstrValue) {
-        CheckNotProcessedOptions.Value(pstrValue);
+        checkNotProcessedOptions.setValue(pstrValue);
         return this;
     }
 
     @JSOptionDefinition(name = "XmlId", description = "This ist the ...", key = "XmlId", type = "SOSOptionString", mandatory = true)
-    public SOSOptionString XmlId = new SOSOptionString(this, CLASS_NAME + ".XmlId", "This ist the ...", "root", "root", true);
+    public SOSOptionString xmlId = new SOSOptionString(this, CLASS_NAME + ".XmlId", "This ist the ...", "root", "root", true);
 
     public String getXmlId() throws Exception {
-        return XmlId.Value();
+        return xmlId.getValue();
     }
 
     public JSOptionsClass setXmlId(final String pstrValue) throws Exception {
-        XmlId.Value(pstrValue);
+        xmlId.setValue(pstrValue);
         return this;
     }
 
-    @JSOptionDefinition(name = "ArchiverOptions", value = "", description = "Optionen fï¿½r die Dateiarchivierung", key = "", type = "JSOptionClass", mandatory = false)
+    @JSOptionDefinition(name = "ArchiverOptions", value = "", description = "Optionen für die Dateiarchivierung", key = "", type = "JSOptionClass",
+            mandatory = false)
     private JSArchiverOptions objArchiverOptions = null;
 
-    @JSOptionDefinition(name = "TestMode", value = "false", description = "Test Modus schalten ", key = "TestMode", type = "JSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean TestMode = new SOSOptionBoolean(this, CLASS_NAME + ".TestMode", "Test Modus schalten ", "false", "false", false);
+    @JSOptionDefinition(name = "TestMode", value = "false", description = "Test Modus schalten ", key = "TestMode", type = "JSOptionBoolean",
+            mandatory = false)
+    public SOSOptionBoolean testMode = new SOSOptionBoolean(this, CLASS_NAME + ".TestMode", "Test Modus schalten ", "false", "false", false);
 
-    @JSOptionDefinition(name = "Debug", value = "false", description = "Debug-Modus schalten (true/false)", key = "Debug", type = "JSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean Debug = new SOSOptionBoolean(this, CLASS_NAME + ".Debug", "Debug-Modus schalten (true/false)", "false", "false", false);
+    @JSOptionDefinition(name = "Debug", value = "false", description = "Debug-Modus schalten (true/false)", key = "Debug", type = "JSOptionBoolean",
+            mandatory = false)
+    public SOSOptionBoolean debug = new SOSOptionBoolean(this, CLASS_NAME + ".Debug", "Debug-Modus schalten (true/false)", "false", "false", false);
 
-    @JSOptionDefinition(name = "DebugLevel", value = "0", description = "DebugLevel", key = "DebugLevel", type = "JSOptionInteger", mandatory = false)
-    public SOSOptionInteger DebugLevel = new SOSOptionInteger(this, CLASS_NAME + ".DebugLevel", "DebugLevel", "0", "0", false);
+    @JSOptionDefinition(name = "DebugLevel", value = "0", description = "DebugLevel", key = "DebugLevel", type = "JSOptionInteger",
+            mandatory = false)
+    public SOSOptionInteger debugLevel = new SOSOptionInteger(this, CLASS_NAME + ".DebugLevel", "DebugLevel", "0", "0", false);
 
-    @JSOptionDefinition(name = "log_filename", description = "Name der Datei mit den Logging-Eintrï¿½gen", key = "log_filename", type = "SOSOptionFileName", mandatory = false)
-    public SOSOptionLogFileName log_filename = new SOSOptionLogFileName(this, CLASS_NAME + ".log_filename",
-            "Name der Datei mit den Logging-Eintrï¿½gen", "stdout", "stdout", false);
+    @JSOptionDefinition(name = "log_filename", description = "Name der Datei mit den Logging-Einträgen", key = "log_filename",
+            type = "SOSOptionFileName", mandatory = false)
+    public SOSOptionLogFileName logFilename = new SOSOptionLogFileName(this, CLASS_NAME + ".log_filename",
+            "Name der Datei mit den Logging-Einträgen", "stdout", "stdout", false);
 
-    public SOSOptionLogFileName getlog_filename() {
-        return log_filename;
+    public SOSOptionLogFileName getLogFilename() {
+        return logFilename;
     }
 
-    public void setlog_filename(final SOSOptionLogFileName pstrValue) {
-        log_filename = pstrValue;
+    public void setLogFilename(final SOSOptionLogFileName pstrValue) {
+        logFilename = pstrValue;
     }
 
-    @JSOptionDefinition(name = "log4jPropertyFileName", description = "Name of the LOG4J Property File", key = "log4j_Property_FileName", type = "SOSOptionInFileName", mandatory = false)
+    @JSOptionDefinition(name = "log4jPropertyFileName", description = "Name of the LOG4J Property File", key = "log4j_Property_FileName",
+            type = "SOSOptionInFileName", mandatory = false)
     public SOSOptionInFileName log4jPropertyFileName = new SOSOptionInFileName(this, CLASS_NAME + ".log4j_Property_FileName",
             "Name of the LOG4J Property File", "env:log4j.configuration", "./log4j.properties", false);
 
-    public void log4jPropertyFileName(SOSOptionLog4JPropertyFile pobjO) {
+    public void setLog4jPropertyFileName(SOSOptionLog4JPropertyFile pobjO) {
         log4jPropertyFileName = pobjO;
     }
 
     public String getlog4jPropertyFileName() {
-        return log4jPropertyFileName.Value();
+        return log4jPropertyFileName.getValue();
     }
 
     public JSOptionsClass setlog4jPropertyFileName(final String pstrValue) {
-        log4jPropertyFileName.Value(pstrValue);
+        log4jPropertyFileName.setValue(pstrValue);
         return this;
     }
 
-    @JSOptionDefinition(name = "ApplicationName", description = "Name of the Application", key = "ApplicationName", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString ApplicationName = new SOSOptionString(this, CLASS_NAME + ".ApplicationName", "Name of the Application",
+    @JSOptionDefinition(name = "ApplicationName", description = "Name of the Application", key = "ApplicationName", type = "SOSOptionString",
+            mandatory = false)
+    public SOSOptionString applicationName = new SOSOptionString(this, CLASS_NAME + ".ApplicationName", "Name of the Application",
             "env:SOSApplicationName", "env:SOSApplicationName", false);
 
-    public SOSOptionString ApplicationName() {
-        return ApplicationName;
-    }
-
     public SOSOptionString getApplicationName() {
-        return ApplicationName;
+        return applicationName;
     }
 
     public JSOptionsClass setApplicationName(final SOSOptionString pstrValue) {
-        ApplicationName = pstrValue;
+        applicationName = pstrValue;
         return this;
     }
 
-    @JSOptionDefinition(name = "ApplicationDocuUrl", description = "The Url of the Documentation of this Application", key = "ApplicationDocuUrl", type = "SOSOptionUrl", mandatory = false)
-    public SOSOptionUrl ApplicationDocuUrl = new SOSOptionUrl(this, CLASS_NAME + ".ApplicationDocuUrl",
+    @JSOptionDefinition(name = "ApplicationDocuUrl", description = "The Url of the Documentation of this Application", key = "ApplicationDocuUrl",
+            type = "SOSOptionUrl", mandatory = false)
+    public SOSOptionUrl applicationDocuUrl = new SOSOptionUrl(this, CLASS_NAME + ".ApplicationDocuUrl",
             "The Url of the Documentation of this Application", "env:SOSApplicationDocuUrl", "env:SOSApplicationDocuUrl", false);
 
     public SOSOptionUrl getApplicationDocuUrl() {
-        return ApplicationDocuUrl;
+        return applicationDocuUrl;
     }
 
     public JSOptionsClass setApplicationDocuUrl(final SOSOptionUrl pstrValue) {
-        ApplicationDocuUrl = pstrValue;
+        applicationDocuUrl = pstrValue;
         return this;
     }
 
-    @JSOptionDefinition(name = "AllowEmptyParameterList", description = "If true, an empty parameter list leads not into an error", key = "AllowEmptyParameterList", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean AllowEmptyParameterList = new SOSOptionBoolean(this, CLASS_NAME + ".AllowEmptyParameterList",
+    @JSOptionDefinition(name = "AllowEmptyParameterList", description = "If true, an empty parameter list leads not into an error",
+            key = "AllowEmptyParameterList", type = "SOSOptionBoolean", mandatory = false)
+    public SOSOptionBoolean allowEmptyParameterList = new SOSOptionBoolean(this, CLASS_NAME + ".AllowEmptyParameterList",
             "If true, an empty parameter list leads not into an error", "true", "true", false);
 
     public SOSOptionBoolean getAllowEmptyParameterList() {
-        return AllowEmptyParameterList;
+        return allowEmptyParameterList;
     }
 
     public JSOptionsClass setAllowEmptyParameterList(final SOSOptionBoolean pstrValue) {
-        AllowEmptyParameterList = pstrValue;
+        allowEmptyParameterList = pstrValue;
         return this;
     }
 
@@ -335,17 +348,17 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         return pstrValue;
     }
 
-    public HashMap<String, String> Settings() {
+    public HashMap<String, String> settings() {
         if (objSettings == null) {
             objSettings = new HashMap<String, String>();
         }
         return objSettings;
     }
 
-    public HashMap<String, String> Settings4StepName() {
+    public HashMap<String, String> getSettings4StepName() {
         HashMap<String, String> objS = new HashMap<String, String>();
         int intStartPos = strCurrentNodeName.length() + 1;
-        for (final Object element : Settings().entrySet()) {
+        for (final Object element : settings().entrySet()) {
             final Map.Entry<String, String> mapItem = (Map.Entry<String, String>) element;
             String strMapKey = mapItem.getKey().toString();
             String strValue = mapItem.getValue();
@@ -364,27 +377,27 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         return objS;
     }
 
-    public String TempDirName() {
-        return this.TempDir();
+    public String getTempDirName() {
+        return this.getTempDir();
     }
 
-    public String TempDir() {
+    public String getTempDir() {
         return strTempDirName;
     }
 
-    public void TempDir(final String pstrTempDirName) {
+    public void setTempDir(final String pstrTempDirName) {
         strTempDirName = pstrTempDirName;
     }
 
-    public String UserDir() {
+    public String getUserDir() {
         return strUserDirName;
     }
 
-    public void UserDir(final String pstrUserDirName) {
+    public void setUserDir(final String pstrUserDirName) {
         strUserDirName = pstrUserDirName;
     }
 
-    public void Settings(final HashMap<String, String> pobjSettings) {
+    public void setSettings(final HashMap<String, String> pobjSettings) {
         objSettings = pobjSettings;
         setAllCommonOptions(pobjSettings);
     }
@@ -482,7 +495,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         return strTemp;
     }
 
-    public boolean CheckNotProcessedOptions() {
+    public boolean checkNotProcessedOptions() {
         boolean flgIsOK = true;
         int intNumberOfNotProcessedOptions = 0;
         if (objSettings != null) {
@@ -527,10 +540,10 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     }
 
     protected int getIntItem(final String pstrKey) {
-        return String2Integer(this.getItem(pstrKey));
+        return string2Integer(this.getItem(pstrKey));
     }
 
-    protected int String2Integer(final String pstrValue) {
+    protected int string2Integer(final String pstrValue) {
         int intT = 0;
         if (isNotEmpty(pstrValue)) {
             try {
@@ -545,7 +558,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     protected boolean getBoolItem(final String pstrKey) {
         boolean flgT = false;
         if (isNotEmpty(pstrKey)) {
-            flgT = String2Bool(this.getItem(pstrKey));
+            flgT = string2Bool(this.getItem(pstrKey));
         }
         return flgT;
     }
@@ -553,7 +566,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     protected boolean getBoolItem(final String pstrKey, final boolean pflgDefault) {
         boolean flgT = false;
         if (isNotEmpty(pstrKey)) {
-            flgT = String2Bool(this.getItem(pstrKey));
+            flgT = string2Bool(this.getItem(pstrKey));
         } else {
             flgT = pflgDefault;
         }
@@ -561,7 +574,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     }
 
     @Override
-    public boolean String2Bool(final String pstrVal) {
+    public boolean string2Bool(final String pstrVal) {
         boolean flgT = false;
         if (isNotEmpty(pstrVal)
                 && ("1".equals(pstrVal) || "y".equalsIgnoreCase(pstrVal) || "yes".equalsIgnoreCase(pstrVal) || "j".equalsIgnoreCase(pstrVal)
@@ -610,7 +623,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         return strT;
     }
 
-    public void Options2ClipBoard() {
+    public void options2ClipBoard() {
         String strT = "";
         if (objSettings != null) {
             for (final Object element : objSettings.entrySet()) {
@@ -630,7 +643,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     private String getAllOptionsAsString(final IterationTypes penuIterationType) {
         String strT = "";
         if (objParentClass != null) {
-            strT += IterateAllDataElementsByAnnotation(objParentClass, this, penuIterationType, new StringBuffer(""));
+            strT += iterateAllDataElementsByAnnotation(objParentClass, this, penuIterationType, new StringBuffer(""));
         }
         return strT;
     }
@@ -642,77 +655,78 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     protected void setAllCommonOptions(final HashMap<String, String> JSSettings) {
         objSettings = JSSettings;
         if (objParentClass != null) {
-            IterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.setRecord, strBuffer);
+            iterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.countSegmentFields, strBuffer);
+            iterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.setRecord, strBuffer);
         }
-        UserDir.MapValue();
-        if (!this.IgnoreEnvironmentVariables()) {
+        UserDir.mapValue();
+        if (!this.isIgnoreEnvironmentVariables()) {
             getEnvironmentVariables();
         }
     }
 
     public JSOptionsClass getEnvironmentVariables() {
-        String strT = EnvironmentVariable(JSOptionsClass.conEnvVarJS_TEST_MODE);
+        String strT = environmentVariable(JSOptionsClass.conEnvVarJS_TEST_MODE);
         if (isNotEmpty(strT)) {
-            this.TestMode(String2Bool(strT));
+            this.setTestMode(string2Bool(strT));
         }
-        strT = EnvironmentVariable("JS_DEBUG");
+        strT = environmentVariable("JS_DEBUG");
         if (isNotEmpty(strT)) {
-            this.Debug(String2Bool(strT));
+            this.setDebug(string2Bool(strT));
         }
-        strT = EnvironmentVariable("JS_DEBUG_LEVEL");
+        strT = environmentVariable("JS_DEBUG_LEVEL");
         if (isNotEmpty(strT)) {
-            this.DebugLevel(String2Integer(strT));
+            this.setDebugLevel(string2Integer(strT));
         }
         return this;
     }
 
-    public void CheckMandatory() throws Exception {
+    public void checkMandatory() throws Exception {
         if (objParentClass != null) {
-            IterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.CheckMandatory, strBuffer);
+            iterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.CheckMandatory, strBuffer);
         }
     }
 
-    public boolean TestMode() {
-        return TestMode.value();
+    public boolean isTestMode() {
+        return testMode.value();
     }
 
-    public void TestMode(final boolean pflgTestMode) {
-        TestMode.value(pflgTestMode);
+    public void setTestMode(final boolean pflgTestMode) {
+        testMode.value(pflgTestMode);
     }
 
-    public boolean Debug() {
-        return Debug.value();
+    public boolean isDebug() {
+        return debug.value();
     }
 
-    public void Debug(final boolean pflgDebug) {
-        Debug.value(pflgDebug);
+    public void setDebug(final boolean pflgDebug) {
+        debug.value(pflgDebug);
     }
 
-    public int DebugLevel() {
-        return DebugLevel.value();
+    public int getDebugLevel() {
+        return debugLevel.value();
     }
 
-    public void DebugLevel(final int pintDebugLevel) {
-        DebugLevel.value(pintDebugLevel);
+    public void setDebugLevel(final int pintDebugLevel) {
+        debugLevel.value(pintDebugLevel);
     }
 
-    protected String CheckFileIsReadable(final String pstrFileName, final String pstrMethodName) {
+    protected String checkFileIsReadable(final String pstrFileName, final String pstrMethodName) {
         if (isNotEmpty(pstrFileName)) {
             final File fleF = new File(pstrFileName);
             String strT = null;
             if (!fleF.exists()) {
                 strT = String.format("%2$s: File '%1$s' does not exist.", pstrFileName, pstrMethodName);
-                this.SignalError(new JSExceptionInputFileNotFound(strT), strT);
+                this.signalError(new JSExceptionInputFileNotFound(strT), strT);
             }
             if (!fleF.canRead()) {
                 strT = String.format("%2$s: File '%1$s'. canRead returns false. Check permissions.", pstrFileName, pstrMethodName);
-                this.SignalError(new JSExceptionFileNotReadable(strT), strT);
+                this.signalError(new JSExceptionFileNotReadable(strT), strT);
             }
         }
         return pstrFileName;
     }
 
-    public String CheckFolder(String pstrFileName, final String pstrMethodName, final Boolean flgCreateIfNotExist) {
+    public String checkFolder(String pstrFileName, final String pstrMethodName, final Boolean flgCreateIfNotExist) {
         if (isNotEmpty(pstrFileName)) {
             final String strSep = System.getProperty("file.separator");
             if (!pstrFileName.endsWith(strSep)) {
@@ -721,20 +735,20 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
             final File fleF = new File(pstrFileName);
             if (!fleF.exists()) {
                 if (!flgCreateIfNotExist) {
-                    this.SignalError(String.format("%2$s: Folder '%1$s' does not exist.", pstrFileName, pstrMethodName));
+                    this.signalError(String.format("%2$s: Folder '%1$s' does not exist.", pstrFileName, pstrMethodName));
                 } else {
                     fleF.mkdir();
-                    SignalInfo(String.format("%2$s: Folder '%1$s' created.", pstrFileName, pstrMethodName));
+                    signalInfo(String.format("%2$s: Folder '%1$s' created.", pstrFileName, pstrMethodName));
                 }
             }
             if (!fleF.canRead()) {
-                this.SignalError(String.format("%2$s: File '%1$s'. canRead returns false. Check permissions.", pstrFileName, pstrMethodName));
+                this.signalError(String.format("%2$s: File '%1$s'. canRead returns false. Check permissions.", pstrFileName, pstrMethodName));
             }
         }
         return pstrFileName;
     }
 
-    public String CheckIsFileWritable(final String pstrFileName, final String pstrMethodName) {
+    public String checkIsFileWritable(final String pstrFileName, final String pstrMethodName) {
         String strT = null;
         if (isNotEmpty(pstrFileName)) {
             try {
@@ -749,10 +763,10 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
             } catch (final Exception objException) {
                 strT = String.format("%2$s: File '%1$s'. Exception thrown. Check permissions.", pstrFileName, pstrMethodName);
                 final JobSchedulerException objJSEx = new JobSchedulerException(strT, objException);
-                this.SignalError(objJSEx, strT);
+                this.signalError(objJSEx, strT);
             }
             if (strT != null) {
-                this.SignalError(strT);
+                this.signalError(strT);
             }
         }
         return pstrFileName;
@@ -767,7 +781,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     }
 
     @Override
-    public JSArchiverOptions ArchiverOptions() {
+    public JSArchiverOptions archiverOptions() {
         if (objArchiverOptions == null) {
             objArchiverOptions = new JSArchiverOptions();
             objArchiverOptions.registerMessageListener(this);
@@ -778,7 +792,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         return objArchiverOptions;
     }
 
-    protected String NormalizeDirectoryName(final String pstrDirectoryName) {
+    protected String normalizeDirectoryName(final String pstrDirectoryName) {
         String strT = pstrDirectoryName;
         if (strT == null || strT.trim().isEmpty()) {
             strT = "";
@@ -789,31 +803,31 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
             if (strT.startsWith("./")) {
                 strT = strT.substring(2);
                 try {
-                    strT = AbsolutFileName(strT);
+                    strT = getAbsolutFileName(strT);
                 } catch (final Exception objException) {
                     // handle exception
                 }
             }
-            strT = SubstituteVariables(strT);
+            strT = substituteVariables(strT);
         }
         return strT;
     }
 
-    protected String NormalizeFileName(final String pstrFileName) {
+    protected String normalizeFileName(final String pstrFileName) {
         String strT = pstrFileName;
-        strT = SubstituteVariables(pstrFileName);
+        strT = substituteVariables(pstrFileName);
         return strT;
     }
 
-    public String NormalizeFileName(final String pstrFileName, final String pstrDirectoryName) {
+    public String normalizeFileName(final String pstrFileName, final String pstrDirectoryName) {
         String strNewFileName = pstrFileName;
         if (pstrFileName.indexOf("/") < 0) {
-            strNewFileName = NormalizeDirectoryName(pstrDirectoryName) + pstrFileName;
+            strNewFileName = normalizeDirectoryName(pstrDirectoryName) + pstrFileName;
         }
         return strNewFileName;
     }
 
-    public String AbsolutFileName(final String pstrFileName) throws Exception {
+    public String getAbsolutFileName(final String pstrFileName) throws Exception {
         String strT = pstrFileName;
         if (strT == null) {
             return strT;
@@ -835,7 +849,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         return strT;
     }
 
-    public String SubstituteVariables(final String pstrValue) {
+    public String substituteVariables(final String pstrValue) {
         String strT = pstrValue;
         if (strT == null) {
             return null;
@@ -845,45 +859,45 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         return strT;
     }
 
-    public boolean IgnoreEnvironmentVariables() {
+    public boolean isIgnoreEnvironmentVariables() {
         return flgIgnoreEnvironmentVariables;
     }
 
-    public JSOptionsClass IgnoreEnvironmentVariables(final boolean pflgIgnoreEnvironmentVariables) throws Exception {
+    public JSOptionsClass setIgnoreEnvironmentVariables(final boolean pflgIgnoreEnvironmentVariables) throws Exception {
         flgIgnoreEnvironmentVariables = pflgIgnoreEnvironmentVariables;
         return this;
     }
 
-    protected String[] SplitString(final String pstrStr) {
+    protected String[] splitString(final String pstrStr) {
         if (pstrStr == null) {
             return null;
         }
         return pstrStr.trim().split("[;|,]");
     }
 
-    protected void CheckNull(final String pstrMethodName, final String pstrTitel, final String pstrOptionName, final String pstrOptionValue)
+    protected void checkNull(final String pstrMethodName, final String pstrTitel, final String pstrOptionName, final String pstrOptionValue)
             throws Exception {
         if (isEmpty(pstrOptionValue)) {
-            this.SignalError(String.format(conNullButMandatory, pstrMethodName, pstrTitel, pstrOptionName));
+            this.signalError(String.format(conNullButMandatory, pstrMethodName, pstrTitel, pstrOptionName));
         }
     }
 
-    public void CommandLineArgs(final String pstrArgs) {
+    public void commandLineArgs(final String pstrArgs) {
         StrTokenizer objT = new StrTokenizer(pstrArgs);
         String[] strA = objT.getTokenArray();
-        CommandLineArgs(strA);
+        commandLineArgs(strA);
     }
 
-    public void CommandLineArgs(final String[] pstrArgs) {
+    public void commandLineArgs(final String[] pstrArgs) {
         final String conMethodName = CLASS_NAME + "::CommandLineArgs ";
-        if (AllowEmptyParameterList.isFalse() && pstrArgs.length <= 0) {
-            throw new ParametersMissingButRequiredException(ApplicationName.Value(), ApplicationDocuUrl.Value());
+        if (allowEmptyParameterList.isFalse() && pstrArgs.length <= 0) {
+            throw new ParametersMissingButRequiredException(applicationName.getValue(), applicationDocuUrl.getValue());
         }
         strCommandLineArgs = pstrArgs;
         boolean flgOption = true;
         String strOptionName = null;
         String strOptionValue = null;
-        this.Settings();
+        this.settings();
         final int l = strOptionNamePrefix.length();
         for (final String strCommandLineArg : strCommandLineArgs) {
             if (flgOption) {
@@ -897,13 +911,13 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
                     int intESPos = strOptionName.indexOf("=");
                     if (intESPos > 0) {
                         strOptionValue = strOptionName.substring(intESPos + 1);
-                        strOptionValue = StripQuotes(strOptionValue);
+                        strOptionValue = stripQuotes(strOptionValue);
                         strOptionName = strOptionName.substring(0, intESPos);
                         objSettings.put(strOptionName, strOptionValue);
                         if ("password".equalsIgnoreCase(strOptionName) || "proxy_password".equalsIgnoreCase(strOptionName)) {
-                            this.SignalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", conMethodName, strOptionName, "*****"));
+                            this.signalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", conMethodName, strOptionName, "*****"));
                         } else {
-                            this.SignalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", conMethodName, strOptionName, strOptionValue));
+                            this.signalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", conMethodName, strOptionName, strOptionValue));
                         }
                         flgOption = true;
                     }
@@ -914,9 +928,9 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
                     flgOption = true;
                     objSettings.put(strOptionName, strOptionValue);
                     if ("password".equalsIgnoreCase(strOptionName) || "proxy_password".equalsIgnoreCase(strOptionName)) {
-                        this.SignalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", conMethodName, strOptionName, "*****"));
+                        this.signalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", conMethodName, strOptionName, "*****"));
                     } else {
-                        this.SignalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", conMethodName, strOptionName, strOptionValue));
+                        this.signalDebug(String.format("%1$s: Name = %2$s, Wert = %3$s", conMethodName, strOptionName, strOptionValue));
                     }
                     strOptionName = null;
                 }
@@ -924,7 +938,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         }
         final String strPropertyFileName = this.getItem("PropertyFileName", "");
         if (!strPropertyFileName.isEmpty()) {
-            LoadProperties(strPropertyFileName);
+            loadProperties(strPropertyFileName);
             strOptionName = null;
             flgOption = true;
             for (final String strCommandLineArg : strCommandLineArgs) {
@@ -939,9 +953,9 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
                         flgOption = true;
                         objSettings.put(strOptionName, strOptionValue);
                         if ("password".equalsIgnoreCase(strOptionName) || "proxy_password".equalsIgnoreCase(strOptionName)) {
-                            this.SignalDebug(String.format("%1$s: CmdSettings. Name = %2$s, value = %3$s", conMethodName, strOptionName, "*****"));
+                            this.signalDebug(String.format("%1$s: CmdSettings. Name = %2$s, value = %3$s", conMethodName, strOptionName, "*****"));
                         } else {
-                            this.SignalDebug(String.format("%1$s: CmdSettings. Name = %2$s, value = %3$s", conMethodName, strOptionName,
+                            this.signalDebug(String.format("%1$s: CmdSettings. Name = %2$s, value = %3$s", conMethodName, strOptionName,
                                     strOptionValue));
                         }
                         strOptionName = null;
@@ -950,21 +964,21 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
             }
             message(conMethodName + ": Property-File loaded. " + strPropertyFileName);
         }
-        DumpSettings();
+        dumpSettings();
         setAllOptions(objSettings);
     }
 
-    public String[] CommandLineArgs() {
+    public String[] commandLineArgs() {
         return strCommandLineArgs;
     }
 
-    public void LoadProperties(final String pstrPropertiesFileName) {
+    public void loadProperties(final String pstrPropertiesFileName) {
         final String conMethodName = CLASS_NAME + "::LoadProperties ";
         try {
             final Properties objProp = new Properties();
             objProp.load(new FileInputStream(pstrPropertiesFileName));
             message(conMethodName + ": PropertyFile red. Name '" + pstrPropertiesFileName + "'.");
-            this.Settings();
+            this.settings();
             for (final Object element : objProp.entrySet()) {
                 final Map.Entry mapItem = (Map.Entry) element;
                 final String strMapKey = mapItem.getKey().toString();
@@ -983,14 +997,14 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         }
     }
 
-    public void LoadSystemProperties() throws Exception {
+    public void loadSystemProperties() throws Exception {
         Properties objProp = new Properties();
         objProp = System.getProperties();
-        LoadProperties(objProp);
+        loadProperties(objProp);
     }
 
-    public void LoadProperties(final Properties pobjProp) {
-        this.Settings();
+    public void loadProperties(final Properties pobjProp) {
+        this.settings();
         for (final Object element : pobjProp.entrySet()) {
             final Map.Entry mapItem = (Map.Entry) element;
             final String strMapKey = mapItem.getKey().toString();
@@ -1014,7 +1028,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         if (strAlternativePrefix.isEmpty()) {
             strAlternativePrefix = pstrAlternativePrefix;
             if (objParentClass != null) {
-                IterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.setPrefix, strBuffer);
+                iterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.setPrefix, strBuffer);
             }
         }
         this.setAllOptions(pobjJSSettings);
@@ -1024,43 +1038,43 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         setAllCommonOptions(hshMap);
     }
 
-    public String CurrentNodeName() {
+    public String getCurrentNodeName() {
         return strCurrentNodeName;
     }
 
-    public JSOptionsClass CurrentNodeName(final String pstrCurrentNodeName) throws Exception {
+    public JSOptionsClass setCurrentNodeName(final String pstrCurrentNodeName) throws Exception {
         strCurrentNodeName = pstrCurrentNodeName;
         return this;
     }
 
-    public JSOptionsClass CurrentJobName(final String pstrCurrentJobName) throws Exception {
+    public JSOptionsClass setCurrentJobName(final String pstrCurrentJobName) throws Exception {
         strCurrentJobName = pstrCurrentJobName;
         return this;
     }
 
-    public String CurrentJobName() {
+    public String getCurrentJobName() {
         return strCurrentJobName;
     }
 
-    public JSOptionsClass CurrentJobId(final int pintCurrentJobId) throws Exception {
+    public JSOptionsClass setCurrentJobId(final int pintCurrentJobId) throws Exception {
         intCurrentJobId = pintCurrentJobId;
         return this;
     }
 
-    public int CurrentJobId() {
+    public int getCurrentJobId() {
         return intCurrentJobId;
     }
 
-    public JSOptionsClass CurrentJobFolder(final String pstrCurrentJobFolder) throws Exception {
+    public JSOptionsClass setCurrentJobFolder(final String pstrCurrentJobFolder) throws Exception {
         strCurrentJobFolder = pstrCurrentJobFolder;
         return this;
     }
 
-    public String CurrentJobFolder() {
+    public String getCurrentJobFolder() {
         return strCurrentJobFolder;
     }
 
-    public String OptionByName(final String pstrOptionName) {
+    public String getOptionByName(final String pstrOptionName) {
         String strValue = null;
         Class c = this.getClass();
         strValue = getOptionValue(c, pstrOptionName);
@@ -1082,7 +1096,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
             } else {
                 if (objO instanceof SOSOptionElement) {
                     SOSOptionElement objDE = (SOSOptionElement) objO;
-                    strValue = objDE.Value();
+                    strValue = objDE.getValue();
                 }
             }
         } catch (final NoSuchFieldException objException) {
@@ -1117,8 +1131,8 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     public String replaceVars(final String pstrReplaceIn) {
         getTextProperties();
         try {
-            objP.put("date", SOSOptionTime.getCurrentDateAsString(DateFormatMask.Value()));
-            objP.put("time", SOSOptionTime.getCurrentTimeAsString(TimeFormatMask.Value()));
+            objP.put("date", SOSOptionTime.getCurrentDateAsString(dateFormatMask.getValue()));
+            objP.put("time", SOSOptionTime.getCurrentTimeAsString(timeFormatMask.getValue()));
             objP.put("local_user", System.getProperty("user.name"));
             java.net.InetAddress localMachine = java.net.InetAddress.getLocalHost();
             objP.put("localhost", localMachine.getHostName());
@@ -1147,7 +1161,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
                             continue;
                         }
                         String strPP = "(\\$|%)\\{" + strKey + "\\}";
-                        strVal = this.OptionByName(strKey);
+                        strVal = this.getOptionByName(strKey);
                         if (isNotNull(strVal)) {
                             strVal = strVal.replace('\\', '/');
                             string = string.replaceAll(strPP, Matcher.quoteReplacement(strVal));
@@ -1156,7 +1170,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
                             if (strVal != null) {
                                 string = string.replaceAll(strPP, Matcher.quoteReplacement(strVal));
                             } else {
-                                strVal = Settings().get(strKey);
+                                strVal = settings().get(strKey);
                                 if (strVal != null) {
                                     string = string.replaceAll(strPP, Matcher.quoteReplacement(strVal));
                                 } else {
@@ -1175,7 +1189,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         return strNewString;
     }
 
-    public void DumpSettings() {
+    public void dumpSettings() {
         final String conMethodName = CLASS_NAME + "::DumpSettings";
         for (final Object element : objSettings.entrySet()) {
             final Map.Entry mapItem = (Map.Entry) element;
@@ -1186,9 +1200,9 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
                     strTemp = "***";
                 }
                 if ("password".equalsIgnoreCase(strMapKey)) {
-                    this.SignalDebug(conMethodName + ": Key = " + strMapKey + " --> " + "*****");
+                    this.signalDebug(conMethodName + ": Key = " + strMapKey + " --> " + "*****");
                 } else {
-                    this.SignalDebug(conMethodName + ": Key = " + strMapKey + " --> " + strTemp);
+                    this.signalDebug(conMethodName + ": Key = " + strMapKey + " --> " + strTemp);
                 }
             }
         }
@@ -1226,10 +1240,11 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     }
 
     private String populateOptions(final IterationTypes intIt) {
-        return Iterate(intIt).toString();
+        return iterate(intIt).toString();
     }
 
-    public StringBuffer IterateAllDataElementsByAnnotation(final Class<?> objC, final Object objP, final IterationTypes enuIterate4What, StringBuffer pstrBuffer) {
+    public StringBuffer iterateAllDataElementsByAnnotation(final Class<?> objC, final Object objP, final IterationTypes enuIterate4What,
+            StringBuffer pstrBuffer) {
         final String METHODNAME = CLASS_NAME + "::IterateAllDataElementsByAnnotation";
         
         if (objC == null) {
@@ -1242,7 +1257,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
             final StringBuffer strXML = new StringBuffer("");
             String strT = objC.getName();
             if (enuIterate4What == IterationTypes.createXML) {
-                strXML.append("<" + strT + " id=" + XmlId.QuotedValue() + ">");
+                strXML.append("<" + strT + " id=" + xmlId.getQuotedValue() + ">");
             }
             for (final Field objField : objFields) {
 
@@ -1264,10 +1279,10 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
                             if (enuIterate4What == IterationTypes.setRecord) {
                                 SOSOptionElement.gflgProcessHashMap = true;
                                 objDE.gflgProcessHashMap = true;
-                                objDE.MapValue();
+                                objDE.mapValue();
                             }
                             if (enuIterate4What == IterationTypes.CheckMandatory) {
-                                objDE.CheckMandatory();
+                                objDE.checkMandatory();
                             }
                             if (enuIterate4What == IterationTypes.toOut) {
                                 LOGGER.debug(objDE.toString());
@@ -1276,19 +1291,19 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
                                 pstrBuffer.append(objDE.toString() + "\n");
                             }
                             if (enuIterate4What == IterationTypes.DirtyToString && objDE.isDirty()) {
-                                pstrBuffer.append(objDE.DirtyToString() + "\n");
+                                pstrBuffer.append(objDE.getDirtyToString() + "\n");
                             }
                             if (enuIterate4What == IterationTypes.createXML) {
                                 strXML.append(objDE.toXml());
                             }
                             if (enuIterate4What == IterationTypes.setDefaultValues) {
-                                final String strV = objDE.Value();
+                                final String strV = objDE.getValue();
                                 if (strV.isEmpty()) {
-                                    objDE.Value(objDE.DefaultValue());
+                                    objDE.setValue(objDE.getDefaultValue());
                                 }
                             }
                             if (enuIterate4What == IterationTypes.clearAllValues) {
-                                objDE.Value("");
+                                objDE.setValue("");
                             }
                             if (enuIterate4What == IterationTypes.getCommandLine) {
                                 pstrBuffer.append(objDE.toCommandLine());
@@ -1302,6 +1317,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
                                     pstrBuffer.append(strT + "\n");
                                 }
                             }
+                            iterateAllDataElementsByAnnotation(objDE.getClass(), objDE, enuIterate4What, pstrBuffer);
                         }
                     }
                 } catch (final ClassCastException objException) {
@@ -1323,10 +1339,10 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     }
 
 
-    public StringBuffer Iterate(final IterationTypes enuIterate4What) {
+    public StringBuffer iterate(final IterationTypes enuIterate4What) {
         StringBuffer strB = new StringBuffer();
         if (objParentClass != null) {
-            strB = IterateAllDataElementsByAnnotation(objParentClass, this, enuIterate4What, strB);
+            strB = iterateAllDataElementsByAnnotation(objParentClass, this, enuIterate4What, strB);
         }
         return strB;
     }
@@ -1349,7 +1365,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         try {
             JSFile objFile = new JSFile(pstrFileName);
             String encoded = getObjectAsString();
-            objFile.Write(encoded);
+            objFile.write(encoded);
             objFile.close();
         } catch (Exception e) {
             throw new JobSchedulerException("Error occured writing object to file: " + e);
@@ -1377,7 +1393,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     public static JSOptionsClass getObject(final String pstrFileName) {
         try {
             JSOptionsClass schedulerObject;
-            String encoded = new JSTextFile(pstrFileName).File2String();
+            String encoded = new JSTextFile(pstrFileName).file2String();
             if (encoded == null || encoded.isEmpty()) {
                 return null;
             }
@@ -1397,11 +1413,11 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
         }
     }
 
-    public void LoadXML(final JSXMLFile pobjXMLFile) {
-        this.LoadXML(pobjXMLFile, null);
+    public void loadXML(final JSXMLFile pobjXMLFile) {
+        this.loadXML(pobjXMLFile, null);
     }
 
-    public Properties LoadXML(final JSXMLFile pobjXMLFile, final String pstrXPathExpr) {
+    public Properties loadXML(final JSXMLFile pobjXMLFile, final String pstrXPathExpr) {
         DOMParser parser = new DOMParser();
         Properties objProp = new Properties();
         try {
@@ -1416,7 +1432,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
             if (isEmpty(pstrXPathExpr)) {
                 traverse(document, objProp);
             }
-            LoadProperties(objProp);
+            loadProperties(objProp);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             throw new JobSchedulerException(String.format("Exception ", pobjXMLFile.getAbsolutePath()));
@@ -1455,7 +1471,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
             objXF = new JSXMLFile(pstrXMLFileName);
             objXF.writeXMLDeclaration();
             objXF.comment(String.format("Created by %1$s", CLASS_NAME));
-            objXF.Write(this.toXML());
+            objXF.write(this.toXML());
             objXF.close();
         } catch (Exception e) {
             throw new JobSchedulerException("Exception:", e);
@@ -1464,10 +1480,10 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
     }
 
     public StringBuffer toXML() {
-        return Iterate(IterationTypes.createXML);
+        return iterate(IterationTypes.createXML);
     }
 
-    public HashMap<String, String> DeletePrefix(final HashMap<String, String> phsmParameters, final String pstrPrefix) {
+    public HashMap<String, String> deletePrefix(final HashMap<String, String> phsmParameters, final String pstrPrefix) {
         String strTemp;
         HashMap<String, String> hsmNewMap = new HashMap<String, String>();
         if (phsmParameters != null) {
@@ -1544,7 +1560,7 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
             getPreferenceStore();
             objClassName4PreferenceStore = objParentClass;
             StringBuffer strB = new StringBuffer();
-            IterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.LoadValues, strB);
+            iterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.LoadValues, strB);
         }
     }
 
@@ -1553,14 +1569,14 @@ public class JSOptionsClass extends I18NBase implements IJSArchiverOptions, Seri
             getPreferenceStore();
             objClassName4PreferenceStore = objParentClass;
             StringBuffer strB = new StringBuffer();
-            IterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.StoreValues, strB);
+            iterateAllDataElementsByAnnotation(objParentClass, this, IterationTypes.StoreValues, strB);
         }
     }
 
     protected void setIfNotDirty(final SOSOptionElement objOption, final String pstrValue) {
         if (objOption.isNotDirty() && isNotEmpty(pstrValue)) {
             LOGGER.trace("setValue = " + pstrValue);
-            objOption.Value(pstrValue);
+            objOption.setValue(pstrValue);
         }
     }
 

@@ -30,19 +30,17 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
 
     public SOSVfsFtpFile(final FTPFile pobjFileFile) {
         super(SOSVfsConstants.strBundleBaseName);
-        String strF = pobjFileFile.getName();
-        strFileName = strF;
+        strFileName = pobjFileFile.getName();
     }
 
     @Override
-    public boolean FileExists() {
+    public boolean fileExists() {
         final String conMethodName = CLASSNAME + "::FileExists";
         boolean flgResult = false;
         LOGGER.debug(SOSVfs_D_172.params(conMethodName, strFileName));
         if (objVFSHandler.getFileSize(strFileName) >= 0) {
             flgResult = true;
         }
-        LOGGER.debug(SOSVfs_D_157.params(conMethodName, flgResult, strFileName));
         return flgResult;
     }
 
@@ -62,7 +60,6 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
         final String conMethodName = CLASSNAME + "::getFileAppendStream";
         OutputStream objO = null;
         try {
-            strFileName = AdjustRelativePathName(strFileName);
             objO = objVFSHandler.getAppendFileStream(strFileName);
         } catch (JobSchedulerException e) {
             throw e;
@@ -77,7 +74,6 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
         final String conMethodName = CLASSNAME + "::getFileInputStream";
         try {
             if (objInputStream == null) {
-                strFileName = AdjustRelativePathName(strFileName);
                 objInputStream = objVFSHandler.getInputStream(strFileName);
                 if (objInputStream == null) {
                     objVFSHandler.openInputFile(strFileName);
@@ -96,7 +92,6 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
         final String conMethodName = CLASSNAME + "::getFileOutputStream";
         try {
             if (objOutputStream == null) {
-                strFileName = AdjustRelativePathName(strFileName);
                 if (flgModeAppend) {
                     objOutputStream = objVFSHandler.getAppendFileStream(strFileName);
                 } else {
@@ -112,10 +107,6 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
             throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);
         }
         return objOutputStream;
-    }
-
-    private String AdjustRelativePathName(final String pstrPathName) {
-        return pstrPathName;
     }
 
     @Override
@@ -164,7 +155,7 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
         final String conMethodName = CLASSNAME + "::notExists";
         boolean flgResult = false;
         try {
-            flgResult = !this.FileExists();
+            flgResult = !this.fileExists();
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);
         }
@@ -229,9 +220,9 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
                 try {
                     objInputStream.close();
                     objInputStream = null;
-                    objVFSHandler.CompletePendingCommand();
+                    objVFSHandler.completePendingCommand();
                 } catch (Exception e) {
-                    LOGGER.error(e.getLocalizedMessage());
+                    LOGGER.error(e.getMessage());
                     throw new JobSchedulerException(e);
                 }
             }
@@ -251,7 +242,7 @@ public class SOSVfsFtpFile extends SOSVfsCommonFile {
             if (objOutputStream != null) {
                 objOutputStream.flush();
                 objOutputStream.close();
-                objVFSHandler.CompletePendingCommand();
+                objVFSHandler.completePendingCommand();
                 if (objVFSHandler.isNegativeCommandCompletion()) {
                     throw new JobSchedulerException(SOSVfs_E_175.params(strFileName, objVFSHandler.getReplyString()));
                 }

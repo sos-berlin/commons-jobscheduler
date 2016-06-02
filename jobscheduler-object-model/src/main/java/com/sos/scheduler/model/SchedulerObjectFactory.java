@@ -134,7 +134,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
     public static enum enu4What {
         remote_schedulers, all, folders, job_chains, job_chain_jobs, running, no_subfolders, log, task_queue;
 
-        public String Text() {
+        public String getText() {
             String strT = this.name();
             return strT;
         }
@@ -148,6 +148,19 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
 
     public SchedulerObjectFactory(final LiveConnector liveConnector) {
         this();
+        this.liveConnector = liveConnector;
+        liveFolder = createSchedulerHotFolder(liveConnector.getHotFolderHandle());
+    }
+
+    public SchedulerObjectFactory(final String pstrServerName, final int pintPort) {
+        this();
+        this.Options().ServerName.setValue(pstrServerName);
+        this.Options().PortNumber.value(pintPort);
+        initMarshaller(DEFAULT_MARSHALLER);
+    }
+
+    public SchedulerObjectFactory(final String pstrServerName, final int pintPort, final LiveConnector liveConnector) {
+        this(pstrServerName, pintPort);
         this.liveConnector = liveConnector;
         liveFolder = createSchedulerHotFolder(liveConnector.getHotFolderHandle());
     }
@@ -209,7 +222,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
                         }
                     }
                 } else {
-                    throw new JobSchedulerException(String.format("TransferMethod '%1$s' not supported (yet)", objOptions.TransferMethod.Value()));
+                    throw new JobSchedulerException(String.format("TransferMethod '%1$s' not supported (yet)", objOptions.TransferMethod.getValue()));
                 }
             }
         } catch (Exception e) {
@@ -443,19 +456,6 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
             objOptions = new SchedulerObjectFactoryOptions();
         }
         return objOptions;
-    }
-
-    public SchedulerObjectFactory(final String pstrServerName, final int pintPort) {
-        this();
-        this.Options().ServerName.Value(pstrServerName);
-        this.Options().PortNumber.value(pintPort);
-        initMarshaller(DEFAULT_MARSHALLER);
-    }
-
-    public SchedulerObjectFactory(final String pstrServerName, final int pintPort, final LiveConnector liveConnector) {
-        this(pstrServerName, pintPort);
-        this.liveConnector = liveConnector;
-        liveFolder = createSchedulerHotFolder(liveConnector.getHotFolderHandle());
     }
 
     public SchedulerSocket getSocket() {
@@ -827,7 +827,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         return objStartJobCmd;
     }
 
-    public JSCmdStartJob StartJob(final String pstrJobName) {
+    public JSCmdStartJob startJob(final String pstrJobName) {
         JSCmdStartJob objStartJobCmd = new JSCmdStartJob(this);
         objStartJobCmd.setJob(pstrJobName);
         objStartJobCmd.setForce(true);
@@ -836,7 +836,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         return objStartJobCmd;
     }
 
-    public JSCmdStartJob StartJob(final String pstrJobName, final boolean raiseOk) {
+    public JSCmdStartJob startJob(final String pstrJobName, final boolean raiseOk) {
         JSCmdStartJob objStartJobCmd = new JSCmdStartJob(this);
         objStartJobCmd.setJob(pstrJobName);
         objStartJobCmd.setForce(true);
@@ -880,8 +880,8 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         JSCmdShowJob objShowJobCmd = createShowJob();
         objShowJobCmd.setJob(pstrJobName);
         objShowJobCmd.setWhat(new JSCmdShowJob.enu4What[] { JSCmdShowJob.enu4What.log, JSCmdShowJob.enu4What.task_queue });
-        objShowJobCmd.MaxTaskHistory(1);
-        objShowJobCmd.MaxOrders(1);
+        objShowJobCmd.maxTaskHistory(1);
+        objShowJobCmd.maxOrders(1);
         return objShowJobCmd;
     }
 
@@ -889,8 +889,8 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         JSCmdShowJob objShowJobCmd = new JSCmdShowJob(this);
         objShowJobCmd.setJob(pstrJobName);
         objShowJobCmd.setWhat(penuWhat);
-        objShowJobCmd.MaxTaskHistory(1);
-        objShowJobCmd.MaxOrders(1);
+        objShowJobCmd.maxTaskHistory(1);
+        objShowJobCmd.maxOrders(1);
         return objShowJobCmd;
     }
 
@@ -1130,7 +1130,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         return objModifyOrder;
     }
 
-    public JSCmdModifyOrder StartOrder(final String pstrJobChainName, final String pstrOrderName) {
+    public JSCmdModifyOrder startOrder(final String pstrJobChainName, final String pstrOrderName) {
         JSCmdModifyOrder objModifyOrder = new JSCmdModifyOrder(this);
         objModifyOrder.setJobChain(pstrJobChainName);
         objModifyOrder.setOrder(pstrOrderName);
@@ -1140,7 +1140,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         return objModifyOrder;
     }
 
-    public JSCmdModifyOrder StartOrder(final String pstrJobChainName, final String pstrOrderName, final boolean raiseOk) {
+    public JSCmdModifyOrder startOrder(final String pstrJobChainName, final String pstrOrderName, final boolean raiseOk) {
         JSCmdModifyOrder objModifyOrder = new JSCmdModifyOrder(this);
         objModifyOrder.setJobChain(pstrJobChainName);
         objModifyOrder.setOrder(pstrOrderName);

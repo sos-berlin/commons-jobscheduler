@@ -53,12 +53,12 @@ public class SOSOptionSchedulerID extends SOSOptionString {
     }
 
     @Override
-    public void Value(final String pstrValue) {
+    public void setValue(final String pstrValue) {
         @SuppressWarnings("unused")
         final String conMethodName = conClassName + "::Value";
         String patternString = "[^/\\\\:;*?!$%&\"<>()|^]+";
         Pattern pattern = Pattern.compile(patternString);
-        super.Value(pstrValue);
+        super.setValue(pstrValue);
         if (isNotEmpty(this.strValue) && !pattern.matcher(this.strValue).matches()) {
             throw new JobSchedulerException(String.format("invalid special characters in SchedulerID (\"%2$s\"). Please omit:\n%1$s",
                     "/ \\ : ; * ? ! $ % & \" < > ( ) | ^", this.strValue));

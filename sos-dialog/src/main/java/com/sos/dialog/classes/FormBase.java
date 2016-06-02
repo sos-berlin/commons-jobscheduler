@@ -76,7 +76,7 @@ public class FormBase extends JSToolBox {
         objLastCursor = null;
     }
 
-    protected void RestoreCursor() {
+    protected void restoreCursor() {
         if (!shell.isDisposed()) {
             if (objLastCursor == null) {
                 shell.setCursor(getCursor(SWT.CURSOR_ARROW));

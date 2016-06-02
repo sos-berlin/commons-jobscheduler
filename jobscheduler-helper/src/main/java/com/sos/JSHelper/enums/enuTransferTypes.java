@@ -1,27 +1,20 @@
-/**
- * 
- */
 package com.sos.JSHelper.enums;
 
 /** @author KB */
 public enum enuTransferTypes {
-    local, /* filesystem on localhost */
-    file, /* same as local */
-    ftp, sftp, ftps, ssh2, zip, mq, // Message Queue
-    http, https, svn, webdav, smb, smtp, imap
-    /* */;
+    local, file, ftp, sftp, ftps, ssh2, zip, mq, http, https, svn, webdav, smb, smtp, imap;
 
-    public String Text() {
-        String strT = this.name();
-        return strT;
+    public String getText() {
+        return this.name();
     }
 
     public static String[] getArray() {
         String[] strA = new String[15];
         int i = 0;
         for (enuTransferTypes enuType : enuTransferTypes.values()) {
-            strA[i++] = enuType.Text();
+            strA[i++] = enuType.getText();
         }
         return strA;
     }
+
 }

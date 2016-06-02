@@ -2,6 +2,8 @@ package com.sos.JSHelper.io.Files;
 
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
+
 import com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Listener.JSListener;
@@ -9,7 +11,8 @@ import com.sos.JSHelper.Options.JSOptionsClass;
 
 public class JSCsvFileOptions extends JSOptionsClass {
 
-    private static final long serialVersionUID = -7057158679889287553L;
+    private static final long serialVersionUID = -8996877249675870658L;
+    private static final Logger LOGGER = Logger.getLogger(JSCsvFileOptions.class);
     private static final String CLASSNAME = "JSCsvFileOptions";
     private static final String DELIMITER_SETTINGS_KEY = CLASSNAME + ".Delimiter";
     private static final String CSV_COLUMN_DELIMITER_SETTINGS_KEY = CLASSNAME + ".CSVColumnDelimiter";
@@ -33,7 +36,7 @@ public class JSCsvFileOptions extends JSOptionsClass {
 
     @Override
     public void toOut() {
-        System.out.println(getAllOptionsAsString());
+        LOGGER.info(getAllOptionsAsString());
     }
 
     @Override
@@ -43,9 +46,9 @@ public class JSCsvFileOptions extends JSOptionsClass {
 
     private String getAllOptionsAsString() {
         String strT = CLASSNAME + "\n";
-        strT += "Delimiter      Feld-Trennzeichen : " + this.Delimiter() + "\n";
-        strT += "SkipFirstLine  Erste Zeile als Überschrift interpretieren und überlesen : " + this.SkipFirstLine() + "\n";
-        strT += "IgnoreValueDelimiter Ignore Value Delimiter : " + this.IgnoreValueDelimiter() + "\n";
+        strT += "Delimiter      Feld-Trennzeichen : " + this.getDelimiter() + "\n";
+        strT += "SkipFirstLine  Erste Zeile als Überschrift interpretieren und überlesen : " + this.isSkipFirstLine() + "\n";
+        strT += "IgnoreValueDelimiter Ignore Value Delimiter : " + this.isIgnoreValueDelimiter() + "\n";
         return strT;
     }
 
@@ -53,39 +56,36 @@ public class JSCsvFileOptions extends JSOptionsClass {
     public void setAllOptions(final HashMap<String, String> JSSettings) {
         try {
             objSettings = JSSettings;
-            super.Settings(objSettings);
-
+            super.setSettings(objSettings);
             final String strT = super.getItem(DELIMITER_SETTINGS_KEY);
-
             if (isNotEmpty(strT)) {
-                this.Delimiter(strT);
+                this.setDelimiter(strT);
             } else {
-                this.Delimiter(super.getItem(CSV_COLUMN_DELIMITER_SETTINGS_KEY));
+                this.setDelimiter(super.getItem(CSV_COLUMN_DELIMITER_SETTINGS_KEY));
             }
-            this.SkipFirstLine(super.getBoolItem(SKIP_FIRST_LINE_SETTINGS_KEY));
-            this.IgnoreValueDelimiter(super.getBoolItem(IGNORE_VALUE_DELIMITER_SETTINGS_KEY));
-
+            this.setSkipFirstLine(super.getBoolItem(SKIP_FIRST_LINE_SETTINGS_KEY));
+            this.setIgnoreValueDelimiter(super.getBoolItem(IGNORE_VALUE_DELIMITER_SETTINGS_KEY));
         } catch (Exception e) {
             throw new JobSchedulerException(e);
         }
     }
 
     @Override
-    public void CheckMandatory() throws Exception {
+    public void checkMandatory() throws Exception {
         try {
-            this.Delimiter(this.Delimiter());
+            this.setDelimiter(this.getDelimiter());
         } catch (final Exception e) {
             throw new JSExceptionMandatoryOptionMissing(e.toString());
         }
     }
 
-    public String Delimiter() {
+    public String getDelimiter() {
         return strDelimiter;
     }
 
-    public JSCsvFileOptions Delimiter(final String pstrDelimiter) throws Exception {
+    public JSCsvFileOptions setDelimiter(final String pstrDelimiter) throws Exception {
         if (pstrDelimiter == null) {
-            SignalError(CLASSNAME + ":Delimiter" + conNullButMandatory);
+            signalError(CLASSNAME + ":Delimiter" + conNullButMandatory);
         } else {
             if (pstrDelimiter.matches("^[0-9]+$")) {
                 strDelimiter = String.valueOf((char) Integer.parseInt(pstrDelimiter));
@@ -96,20 +96,20 @@ public class JSCsvFileOptions extends JSOptionsClass {
         return this;
     }
 
-    public boolean SkipFirstLine() {
+    public boolean isSkipFirstLine() {
         return flgSkipFirstLine;
     }
 
-    public JSCsvFileOptions SkipFirstLine(final boolean pflgSkipFirstLine) throws Exception {
+    public JSCsvFileOptions setSkipFirstLine(final boolean pflgSkipFirstLine) throws Exception {
         flgSkipFirstLine = pflgSkipFirstLine;
         return this;
     }
 
-    public boolean IgnoreValueDelimiter() {
+    public boolean isIgnoreValueDelimiter() {
         return flgIgnoreValueDelimiter;
     }
 
-    public JSCsvFileOptions IgnoreValueDelimiter(final boolean pflgIgnoreValueDelimiter) throws Exception {
+    public JSCsvFileOptions setIgnoreValueDelimiter(final boolean pflgIgnoreValueDelimiter) throws Exception {
         flgIgnoreValueDelimiter = pflgIgnoreValueDelimiter;
         return this;
     }

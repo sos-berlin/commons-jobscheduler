@@ -68,7 +68,7 @@ public abstract class SOSVfsCommonFile extends SOSVfsMessageCodes implements ISO
     }
 
     @Override
-    public String File2String() {
+    public String file2String() {
         InputStream objFI = this.getFileInputStream();
         if (objFI == null) {
             throw new JobSchedulerException(SOSVfs_E_177);
@@ -89,7 +89,7 @@ public abstract class SOSVfsCommonFile extends SOSVfsMessageCodes implements ISO
     }
 
     @Override
-    public void String2File(final String pstrContent) {
+    public void string2File(final String pstrContent) {
 
         try {
             OutputStream objOS = this.getFileOutputStream();
@@ -134,7 +134,7 @@ public abstract class SOSVfsCommonFile extends SOSVfsMessageCodes implements ISO
     }
 
     @Override
-    public boolean FileExists() throws Exception {
+    public boolean fileExists() throws Exception {
         // TODO Auto-generated method stub
         return false;
     }

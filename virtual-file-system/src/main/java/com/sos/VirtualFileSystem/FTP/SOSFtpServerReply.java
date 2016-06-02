@@ -37,14 +37,13 @@ public class SOSFtpServerReply extends JSToolBox {
     }
 
     public SOSFtpServerReply(final String messages1) {
-        ParseServerReply(messages1);
+        parseServerReply(messages1);
     }
 
-    public void ParseServerReply(final String pstrReply) {
+    public void parseServerReply(final String pstrReply) {
         if (isEmpty(pstrReply)) {
             return;
         }
-
         int code1 = 0;
         ArrayList<String> messages1 = new ArrayList<String>();
         String[] strM = pstrReply.split("\r\n");
@@ -93,14 +92,11 @@ public class SOSFtpServerReply extends JSToolBox {
                 messages1.add(statement);
             }
         }
-
         int size = messages1.size();
-
         String[] m = new String[size];
         for (int i = 0; i < size; i++) {
             m[i] = messages1.get(i);
         }
-
         code = code1;
         messages = m;
     }

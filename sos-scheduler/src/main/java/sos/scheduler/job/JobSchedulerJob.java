@@ -35,7 +35,7 @@ public class JobSchedulerJob extends Job_impl {
     private String jobFolder = null;
     private String jobTitle = null;
 
-    public SOSConnection ConnectToJSDataBase() {
+    public SOSConnection connectToJSDataBase() {
         try {
             boolean isUniversalAgent = false;
             try {
@@ -139,7 +139,7 @@ public class JobSchedulerJob extends Job_impl {
 
     public SOSConnection getConnection() {
         if (sosConnection == null) {
-            ConnectToJSDataBase();
+            connectToJSDataBase();
         }
         return sosConnection;
     }
@@ -241,13 +241,11 @@ public class JobSchedulerJob extends Job_impl {
         SOSArguments arguments = new SOSArguments(dbProperty);
         SOSConnection conn;
         if (log != null) {
-            conn =
-                    SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.as_string("-class=", ""),
-                            arguments.as_string("-url=", ""), arguments.as_string("-user=", ""), arguments.as_string("-password=", ""), log);
+            conn = SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.asString("-class=", ""),
+                    arguments.asString("-url=", ""), arguments.asString("-user=", ""), arguments.asString("-password=", ""), log);
         } else {
-            conn =
-                    SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.as_string("-class=", ""),
-                            arguments.as_string("-url=", ""), arguments.as_string("-user=", ""), arguments.as_string("-password=", ""));
+            conn = SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.asString("-class=", ""),
+                    arguments.asString("-url=", ""), arguments.asString("-user=", ""), arguments.asString("-password=", ""));
         }
         return conn;
     }

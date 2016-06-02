@@ -22,12 +22,12 @@ public class SOSSSHJob2SuperClass extends JSToolBox {
         //
     }
 
-    public void Options(final SOSSSHJobOptions pobjOptions) throws Exception {
+    public void setOptions(final SOSSSHJobOptions pobjOptions) throws Exception {
         objOptions = pobjOptions;
-        objOptions.CheckMandatory();
+        objOptions.checkMandatory();
     }
 
-    public SOSSSHJobOptions Options() {
+    public SOSSSHJobOptions getOptions() {
         if (objOptions == null) {
             objOptions = new SOSSSHJobOptions();
         }
@@ -38,28 +38,28 @@ public class SOSSSHJob2SuperClass extends JSToolBox {
         final String conMethodName = "SOSSSHJob2SuperClass::getBaseAuthentication";
         try {
             boolean isAuthenticated = false;
-            this.setSshConnection(new Connection(Options().host.Value(), objOptions.port.value()));
-            if (!objOptions.proxy_host.IsEmpty()) {
-                if (!objOptions.proxy_user.IsEmpty()) {
-                    this.getSshConnection().setProxyData(new HTTPProxyData(objOptions.proxy_host.Value(), objOptions.proxy_port.value()));
+            this.setSshConnection(new Connection(getOptions().host.getValue(), objOptions.port.value()));
+            if (!objOptions.proxyHost.IsEmpty()) {
+                if (!objOptions.proxyUser.IsEmpty()) {
+                    this.getSshConnection().setProxyData(new HTTPProxyData(objOptions.proxyHost.getValue(), objOptions.proxyPort.value()));
                 } else {
                     this.getSshConnection().setProxyData(
-                            new HTTPProxyData(objOptions.proxy_host.Value(), objOptions.proxy_port.value(), objOptions.proxy_user.Value(),
-                                    objOptions.proxy_password.Value()));
+                            new HTTPProxyData(objOptions.proxyHost.getValue(), objOptions.proxyPort.value(), objOptions.proxyUser.getValue(),
+                                    objOptions.proxyPassword.getValue()));
                 }
             }
             this.getSshConnection().connect();
-            if (objOptions.auth_method.isPublicKey()) {
-                File authenticationFile = new File(objOptions.auth_file.Value());
+            if (objOptions.authMethod.isPublicKey()) {
+                File authenticationFile = new File(objOptions.authFile.getValue());
                 if (!authenticationFile.exists()) {
                     throw new Exception("authentication file does not exist: " + authenticationFile.getCanonicalPath());
                 }
                 if (!authenticationFile.canRead()) {
                     throw new Exception("authentication file not accessible: " + authenticationFile.getCanonicalPath());
                 }
-                isAuthenticated = this.getSshConnection().authenticateWithPublicKey(objOptions.user.Value(), authenticationFile, objOptions.password.Value());
-            } else if (objOptions.auth_method.isPassword()) {
-                isAuthenticated = this.getSshConnection().authenticateWithPassword(objOptions.user.Value(), objOptions.password.Value());
+                isAuthenticated = this.getSshConnection().authenticateWithPublicKey(objOptions.user.getValue(), authenticationFile, objOptions.password.getValue());
+            } else if (objOptions.authMethod.isPassword()) {
+                isAuthenticated = this.getSshConnection().authenticateWithPassword(objOptions.user.getValue(), objOptions.password.getValue());
             }
             if (!isAuthenticated) {
                 throw new Exception(conMethodName + ": " + "authentication failed " + objOptions.toString());
@@ -115,14 +115,6 @@ public class SOSSSHJob2SuperClass extends JSToolBox {
         } catch (Exception e) {
             return 0;
         }
-    }
-
-    private String normalizePath(String path) throws Exception {
-        String normalizedPath = path.replaceAll("\\\\", "/");
-        while (normalizedPath.endsWith("\\") || normalizedPath.endsWith("/")) {
-            normalizedPath = normalizedPath.substring(0, normalizedPath.length() - 1);
-        }
-        return normalizedPath;
     }
 
     protected Connection getSshConnection() {

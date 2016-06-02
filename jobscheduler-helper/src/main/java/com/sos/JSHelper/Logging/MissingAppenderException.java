@@ -11,18 +11,18 @@ public class MissingAppenderException extends JobSchedulerException {
 
     public MissingAppenderException(String pstrMessage) {
         super(pstrMessage);
-        this.Message(pstrMessage);
-        this.Status(JobSchedulerException.PENDING);
-        LOGGER.error(this.ExceptionText());
+        this.message(pstrMessage);
+        this.setStatus(JobSchedulerException.PENDING);
+        LOGGER.error(this.getExceptionText());
     }
 
     public MissingAppenderException() {
         this("exception 'MissingAppenderException' raised ...");
-        LOGGER.error(this.ExceptionText());
+        LOGGER.error(this.getExceptionText());
     }
 
-    public String ExceptionText() {
-        return super.ExceptionText();
+    public String getExceptionText() {
+        return super.getExceptionText();
     }
 
 }

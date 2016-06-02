@@ -15,12 +15,12 @@ import org.junit.*;
 /** @author KB */
 public class SOSVfsWebDAVTest {
 
-    protected static Logger logger = Logger.getLogger(SOSVfsWebDAVTest.class);
-    protected final String LOCAL_BASE_PATH = "R:/backup/sos/java/junittests/testdata/JADE/";
-    protected final String REMOTE_BASE_PATH = "/webdav/";
-    protected final String WEB_URI = "http://homer.sos/webdav";
-    protected final String WEB_USER = "test";
-    protected final String WEB_PASS = "12345";
+    protected static final Logger LOGGER = Logger.getLogger(SOSVfsWebDAVTest.class);
+    protected static final String LOCAL_BASE_PATH = "R:/backup/sos/java/junittests/testdata/JADE/";
+    protected static final String REMOTE_BASE_PATH = "/webdav/";
+    protected static final String WEB_URI = "http://homer.sos/webdav";
+    protected static final String WEB_USER = "test";
+    protected static final String WEB_PASS = "12345";
     protected SOSFTPOptions objOptions = null;
     protected ISOSVFSHandler objVFS = null;
     protected ISOSVfsFileTransfer objVfsClient = null;
@@ -30,34 +30,34 @@ public class SOSVfsWebDAVTest {
     @Before
     public void setUp() throws Exception {
         objOptions = new SOSFTPOptions(SOSOptionTransferType.enuTransferTypes.webdav);
-        objOptions.protocol.Value(SOSOptionTransferType.enuTransferTypes.webdav);
-        objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
+        objOptions.protocol.setValue(SOSOptionTransferType.enuTransferTypes.webdav);
+        objVFS = VFSFactory.getHandler(objOptions.protocol.getValue());
         objVfsClient = (ISOSVfsFileTransfer) objVFS;
     }
 
     private void connect() throws Exception {
-        objOptions.host.Value(WEB_URI);
+        objOptions.host.setValue(WEB_URI);
         objOptions.port.value(8080);
-        SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().Source();
-        objSource.host.Value(WEB_URI);
-        objSource.user.Value(WEB_USER);
+        SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().getSource();
+        objSource.host.setValue(WEB_URI);
+        objSource.user.setValue(WEB_USER);
         objSource.port.value(8080);
-        objSource.protocol.Value("webdav");
-        objOptions.operation.Value("send");
+        objSource.protocol.setValue("webdav");
+        objOptions.operation.setValue("send");
         VFSFactory.setConnectionOptions(objSource);
-        objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
+        objVFS = VFSFactory.getHandler(objOptions.protocol.getValue());
         objVfsClient = (ISOSVfsFileTransfer) objVFS;
-        objVFS.Connect(objOptions.getConnectionOptions().Source());
+        objVFS.connect(objOptions.getConnectionOptions().getSource());
     }
 
     private void authenticate() throws Exception {
-        SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().Source();
-        objSource.host.Value(WEB_URI);
-        objSource.user.Value(WEB_USER);
-        objSource.password.Value(WEB_PASS);
-        objSource.protocol.Value("webdav");
-        objSource.ssh_auth_method.isURL(true);
-        objVFS.Authenticate(objSource);
+        SOSConnection2OptionsAlternate objSource = objOptions.getConnectionOptions().getSource();
+        objSource.host.setValue(WEB_URI);
+        objSource.user.setValue(WEB_USER);
+        objSource.password.setValue(WEB_PASS);
+        objSource.protocol.setValue("webdav");
+        objSource.sshAuthMethod.isURL(true);
+        objVFS.authenticate(objSource);
     }
 
     @Test
@@ -67,7 +67,7 @@ public class SOSVfsWebDAVTest {
         objVfsClient.rmdir(REMOTE_BASE_PATH + "kb/test1");
         objVfsClient.mkdir(REMOTE_BASE_PATH + "kb/test1");
         ISOSVirtualFile objVF = objVfsClient.getFileHandle(REMOTE_BASE_PATH + "kb/test1");
-        logger.info(objVF.getFileSize());
+        LOGGER.info(objVF.getFileSize());
         objVfsClient.disconnect();
     }
 
@@ -92,14 +92,14 @@ public class SOSVfsWebDAVTest {
     public void testSize() throws Exception {
         connect();
         authenticate();
-        logger.info(objVfsClient.getFileSize(REMOTE_BASE_PATH + "text.txt"));
+        LOGGER.info(objVfsClient.getFileSize(REMOTE_BASE_PATH + "text.txt"));
         objVfsClient.disconnect();
     }
 
     private String createTestFile() throws Exception {
         String strTestFileName = LOCAL_BASE_PATH + "webdav-test.dat";
         JSTextFile objF = new JSTextFile(strTestFileName);
-        objF.WriteLine("Die Basis ist das Fundament der Grundlage");
+        objF.writeLine("Die Basis ist das Fundament der Grundlage");
         objF.deleteOnExit();
         objF.close();
         return strTestFileName;
@@ -114,7 +114,7 @@ public class SOSVfsWebDAVTest {
         objVfsClient.putFile(createTestFile(), strTargetFileName);
         ISOSVirtualFile objVF = objVfsClient.getFileHandle(strTargetFileName);
         long intFileSize = objVF.getFileSize();
-        logger.info("Size of Targetfile = " + intFileSize);
+        LOGGER.info("Size of Targetfile = " + intFileSize);
         objVfsClient.delete(strTargetFileName);
         objVfsClient.disconnect();
     }
@@ -130,7 +130,7 @@ public class SOSVfsWebDAVTest {
         objVF.write("hallo".getBytes());
         objVF.closeOutput();
         long intFileSize = objVF.getFileSize();
-        logger.info("Size of Targetfile = " + intFileSize);
+        LOGGER.info("Size of Targetfile = " + intFileSize);
         objVfsClient.delete(strTargetFileName);
         objVfsClient.disconnect();
     }
@@ -171,14 +171,14 @@ public class SOSVfsWebDAVTest {
     public void testGetReplyString() throws Exception {
         connect();
         objVfsClient.login(WEB_USER, WEB_PASS);
-        logger.info("Replay = " + objVfsClient.getReplyString());
+        LOGGER.info("Replay = " + objVfsClient.getReplyString());
         objVfsClient.disconnect();
     }
 
     @Test
     public void testIsConnected() throws Exception {
         connect();
-        logger.debug("IS CONNECTED = " + objVfsClient.isConnected());
+        LOGGER.debug("IS CONNECTED = " + objVfsClient.isConnected());
         objVfsClient.disconnect();
     }
 
@@ -217,7 +217,7 @@ public class SOSVfsWebDAVTest {
     public void testGetHandler() throws Exception {
         connect();
         authenticate();
-        logger.debug("HANDLER = " + objVfsClient.getHandler());
+        LOGGER.debug("HANDLER = " + objVfsClient.getHandler());
         objVfsClient.disconnect();
     }
 
@@ -226,7 +226,7 @@ public class SOSVfsWebDAVTest {
         connect();
         authenticate();
         String lineSeparator = "\n";
-        objVFS.ExecuteCommand("cd /home/test" + lineSeparator + "cd /home/kb");
+        objVFS.executeCommand("cd /home/test" + lineSeparator + "cd /home/kb");
         objVfsClient.disconnect();
     }
 
@@ -234,7 +234,7 @@ public class SOSVfsWebDAVTest {
     public void testGetFileHandle() throws Exception {
         connect();
         authenticate();
-        logger.info(objVfsClient.getModificationTime(REMOTE_BASE_PATH + "text.txt"));
+        LOGGER.info(objVfsClient.getModificationTime(REMOTE_BASE_PATH + "text.txt"));
         objVfsClient.disconnect();
     }
 
@@ -244,7 +244,7 @@ public class SOSVfsWebDAVTest {
         authenticate();
         String[] result = objVfsClient.getFilelist(REMOTE_BASE_PATH + "kb", "", 0, true, null);
         for (String element : result) {
-            logger.info(element);
+            LOGGER.info(element);
         }
         objVfsClient.disconnect();
     }

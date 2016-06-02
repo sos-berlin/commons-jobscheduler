@@ -1,7 +1,6 @@
 package com.sos.scheduler.cmd;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
-// import com.sos.JSHelper.Options.SOSOptionProtocol;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.answers.Answer;
 import com.sos.scheduler.model.answers.ERROR;
@@ -47,7 +46,7 @@ abstract class JSCommand implements Runnable {
             throw new JobSchedulerException("Command not set - please call setCommand() first.");
         }
         try {
-            objectFactory.Options().TransferMethod.Value("tcp");
+            objectFactory.Options().TransferMethod.setValue("tcp");
             doCommand(jsCommand);
         } catch (Exception e) {
             String msg = "Error fetching command.";

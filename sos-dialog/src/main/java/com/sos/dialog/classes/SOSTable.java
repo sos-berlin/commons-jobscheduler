@@ -34,7 +34,7 @@ public abstract class SOSTable extends Table implements ISOSTable {
 
         @Override
         public void handleEvent(final Event e) {
-            formPosSizeHandler.TableColumnOrderSave(getThis());
+            formPosSizeHandler.tableColumnOrderSave(getThis());
         }
     };
 
@@ -94,7 +94,7 @@ public abstract class SOSTable extends Table implements ISOSTable {
             column.setMoveable(moveable);
             column.addListener(SWT.Move, ColumnMoveListener);
         }
-        formPosSizeHandler.TableColumnOrderRestore(this);
+        formPosSizeHandler.tableColumnOrderRestore(this);
     }
 
     private int calculateColumnWidth() {

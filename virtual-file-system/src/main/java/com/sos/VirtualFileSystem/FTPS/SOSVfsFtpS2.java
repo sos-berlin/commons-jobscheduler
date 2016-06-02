@@ -26,14 +26,14 @@ public class SOSVfsFtpS2 extends SOSVfsFtpBaseClass2 {
     protected FTPSClient Client() {
         if (objFTPClient == null) {
             try {
-                String strProtocol = objConnection2Options.FtpS_protocol.Value();
+                String strProtocol = objConnection2Options.ftpsProtocol.getValue();
                 objFTPClient = new FTPSClient(strProtocol);
             } catch (Exception e) {
                 throw new JobSchedulerException("can not create FTPS-Client", e);
             }
             FTPClientConfig conf = new FTPClientConfig();
-            objProtocolCommandListener = new SOSFtpClientLogger(HostID(""));
-            if (objConnection2Options != null && objConnection2Options.ProtocolCommandListener.isTrue()) {
+            objProtocolCommandListener = new SOSFtpClientLogger(getHostID(""));
+            if (objConnection2Options != null && objConnection2Options.protocolCommandListener.isTrue()) {
                 objFTPClient.addProtocolCommandListener(objProtocolCommandListener);
             }
             String strAddFTPProtocol = System.getenv("AddFTPProtocol");
@@ -45,20 +45,20 @@ public class SOSVfsFtpS2 extends SOSVfsFtpBaseClass2 {
     }
 
     @Override
-    public void connect(final String phost, final int pport) {
+    public void doConnect(final String phost, final int pport) {
         try {
             if (!isConnected()) {
                 super.connect(phost, pport);
                 Client().execPBSZ(0);
-                LogReply();
+                logReply();
                 Client().execPROT("P");
-                LogReply();
+                logReply();
                 Client().enterLocalPassiveMode();
             } else {
                 LOGGER.warn(SOSVfs_D_0102.params(host, port));
             }
         } catch (Exception e) {
-            String strM = HostID("connect returns an exception");
+            String strM = getHostID("connect returns an exception");
             LOGGER.error(strM, e);
         }
     }

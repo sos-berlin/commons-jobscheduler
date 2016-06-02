@@ -14,12 +14,12 @@ public class JSDataElementTimeStampISOTest {
         String strT;
         JSDataElementTimeStampISO ValidFromDate =
                 new JSDataElementTimeStampISO(" ", "Date as of which the price is valid", 8, 20, " ", "ValidFromDate", "ValidFromDate");
-        ValidFromDate.Value("2009-08-31T15:36:53");
+        ValidFromDate.setValue("2009-08-31T15:36:53");
         strT = ValidFromDate.toXml();
         assertEquals("Date as XML is", "<ValidFromDate>2009-08-31T15:36:53</ValidFromDate>", strT);
         ValidFromDate = new JSDataElementTimeStampISO(" ", "Date as of which the price is valid", 8, 20, " ", "ValidFromDate", "ValidFromDate");
-        ValidFromDate.FormatString(JSDateFormat.dfDATE_SHORT);
-        ValidFromDate.Value("2009-08-31T15:36:53");
+        ValidFromDate.setFormatString(JSDateFormat.dfDATE_SHORT);
+        ValidFromDate.setValue("2009-08-31T15:36:53");
         strT = ValidFromDate.toXml();
         assertEquals("Date as XML is", "<ValidFromDate>2009-08-31</ValidFromDate>", strT);
     }
@@ -28,8 +28,8 @@ public class JSDataElementTimeStampISOTest {
     public void testValidFromDate() throws Exception {
         final JSDataElementValidFromDate ValidFromDate =
                 new JSDataElementValidFromDate(" ", "Date as of which the price is valid", 8, 20, " ", "ValidFromDate", "ValidFromDate");
-        ValidFromDate.FormatString(JSDateFormat.dfDATE_SHORT);
-        ValidFromDate.Value("2009-08-31T15:36:53");
+        ValidFromDate.setFormatString(JSDateFormat.dfDATE_SHORT);
+        ValidFromDate.setValue("2009-08-31T15:36:53");
         assertEquals("Date as XML is", "<ValidFromDate>2009-08-31</ValidFromDate>", ValidFromDate.toXml());
     }
 

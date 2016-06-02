@@ -47,11 +47,11 @@ public class SOSOptionBackgroundServiceTransferMethod extends SOSOptionStringVal
     }
 
     public boolean isTcp() {
-        return this.Value().equalsIgnoreCase(enuBackgroundServiceTransferMethods.tcp.description);
+        return this.getValue().equalsIgnoreCase(enuBackgroundServiceTransferMethods.tcp.description);
     }
 
     public boolean isUdp() {
-        return this.Value().equalsIgnoreCase(enuBackgroundServiceTransferMethods.udp.description);
+        return this.getValue().equalsIgnoreCase(enuBackgroundServiceTransferMethods.udp.description);
     }
 
     public String getDescription() {

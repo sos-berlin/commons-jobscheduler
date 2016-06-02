@@ -135,10 +135,10 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
             }
             try {
                 if (host == null || host.isEmpty()) {
-                    RaiseException("no host was specified");
+                    raiseException("no host was specified");
                 }
                 if (user == null || user.isEmpty()) {
-                    RaiseException("no user was specified");
+                    raiseException("no user was specified");
                 }
             } catch (Exception e) {
                 throw new Exception("invalid or insufficient parameters: " + e.getMessage());
@@ -151,7 +151,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                         }
                     }
                     if (localDir.startsWith("file://") && !new File(createURI(localDir)).exists()) {
-                        RaiseException("local directory does not exist or is not accessible: " + localDir);
+                        raiseException("local directory does not exist or is not accessible: " + localDir);
                     }
                     this.getLogger().debug1(
                             "connecting by " + protocol + " to host " + host + ", port " + port + ", local directory " + localDir
@@ -171,7 +171,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                             } else if ("ftps".equalsIgnoreCase(protocol)) {
                                 initSOSFTPS();
                             } else {
-                                RaiseException("Unknown protocol: " + protocol);
+                                raiseException("Unknown protocol: " + protocol);
                             }
                             if (sosString.parseToString(arguments, "user").isEmpty() && "anonymous".equals(sosString.parseToString(user))) {
                                 setParam("user", "anonymous");
@@ -213,7 +213,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                                                 + "], [account=" + account + "], [remoteDir=" + remoteDir + "], [passiveMode=" + passiveMode + "], "
                                                 + "[transferMode=" + transferMode + "]");
                             } else {
-                                RaiseException("..error in ftp server init with [host=" + host + "], [port=" + port + "] " + ex.getMessage());
+                                raiseException("..error in ftp server init with [host=" + host + "], [port=" + port + "] " + ex.getMessage());
                             }
                         }
                     }
@@ -221,7 +221,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                     this.getLogger().debug1("reusing connection from previous transfer");
                 }
                 if (!isLoggedIn) {
-                    RaiseException(".. server reply [login failed] [user=" + user + "], [account=" + account + "]: " + ftpClient.getReplyString());
+                    raiseException(".. server reply [login failed] [user=" + user + "], [account=" + account + "]: " + ftpClient.getReplyString());
                 }
                 if (ftpClient instanceof SOSFTP) {
                     SOSFTP sosftp = (SOSFTP) ftpClient;
@@ -229,7 +229,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                         sosftp.enterLocalPassiveMode();
                         sosftp.passive();
                         if (sosftp.getReplyCode() > ERROR_CODE) {
-                            RaiseException("..ftp server reply [passive]: " + ftpClient.getReplyString());
+                            raiseException("..ftp server reply [passive]: " + ftpClient.getReplyString());
                         } else {
                             this.getLogger().debug("..ftp server reply [passive]: " + ftpClient.getReplyString());
                         }
@@ -239,7 +239,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                             this.getLogger().debug("..using ASCII mode for file transfer");
                             this.getLogger().debug("..ftp server reply [ascii]: " + ftpClient.getReplyString());
                         } else {
-                            RaiseException(".. could not switch to ASCII mode for file transfer ..ftp server reply [ascii]: "
+                            raiseException(".. could not switch to ASCII mode for file transfer ..ftp server reply [ascii]: "
                                     + ftpClient.getReplyString());
                         }
                     } else {
@@ -247,7 +247,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                             this.getLogger().debug("using binary mode for file transfer");
                             this.getLogger().debug("..ftp server reply [binary]: " + ftpClient.getReplyString());
                         } else {
-                            RaiseException(".. could not switch to binary mode for file transfer .. ftp server reply [ascii]: "
+                            raiseException(".. could not switch to binary mode for file transfer .. ftp server reply [ascii]: "
                                     + ftpClient.getReplyString());
                         }
                     }
@@ -290,7 +290,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                             filelist.remove(checkFile);
                             if (removeFiles) {
                                 if (!checkFile.delete()) {
-                                    RaiseException("..error occurred, could not remove local file: " + checkFile.getAbsolutePath());
+                                    raiseException("..error occurred, could not remove local file: " + checkFile.getAbsolutePath());
                                 } else {
                                     this.getLogger().debug1("removing file: " + checkFile.getAbsolutePath());
                                 }
@@ -601,7 +601,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                     try {
                         proxyPort = Integer.parseInt(sosString.parseToString(arguments.get("ssh_proxy_port")));
                     } catch (Exception ex) {
-                        RaiseException("illegal non-numeric value for parameter [ssh_proxy_port]: "
+                        raiseException("illegal non-numeric value for parameter [ssh_proxy_port]: "
                                 + sosString.parseToString(arguments.get("ssh_proxy_port")));
                     }
                 } else {
@@ -618,7 +618,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                             || "password".equalsIgnoreCase(sosString.parseToString(arguments.get("ssh_auth_method")))) {
                         authenticationMethod = sosString.parseToString(arguments.get("ssh_auth_method"));
                     } else {
-                        RaiseException("invalid authentication method [publickey, password] specified: "
+                        raiseException("invalid authentication method [publickey, password] specified: "
                                 + sosString.parseToString(arguments.get("ssh_auth_method")));
                     }
                 } else {
@@ -628,7 +628,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                     authenticationFilename = sosString.parseToString(arguments.get("ssh_auth_file"));
                 } else {
                     if ("publickey".equalsIgnoreCase(authenticationMethod)) {
-                        RaiseException("no authentication filename was specified as parameter [ssh_auth_file]");
+                        raiseException("no authentication filename was specified as parameter [ssh_auth_file]");
                     }
                 }
             }
@@ -657,16 +657,16 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                 mailQueueDir = sosString.parseToString(arguments.get("mail_queue_dir"));
             }
         } catch (Exception e) {
-            RaiseException("error while processing parameters in " + sos.util.SOSClassUtil.getMethodName() + ". cause: " + e.toString());
+            raiseException("error while processing parameters in " + sos.util.SOSClassUtil.getMethodName() + ". cause: " + e.toString());
         }
     }
 
     private void checkParameter() throws Exception {
         if (replacing != null && replacement == null) {
-            RaiseException("parameter is missing for specified parameter [replacing=" + replacing + "]: [replacement]");
+            raiseException("parameter is missing for specified parameter [replacing=" + replacing + "]: [replacement]");
         }
         if (appendFiles && compressFiles) {
-            RaiseException("unsupported parameter settings [append_files, compress_files]: cannot append to compressed files");
+            raiseException("unsupported parameter settings [append_files, compress_files]: cannot append to compressed files");
         }
         if (!sosString.parseToString(arguments.get("file_path")).isEmpty()) {
             filePath = sosString.parseToString(arguments.get("file_path"));
@@ -693,7 +693,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                 }
             }
         } catch (Exception e) {
-            RaiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " , cause: " + e);
+            raiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " , cause: " + e);
         }
     }
 
@@ -765,7 +765,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                 //
             }
         } catch (Exception e) {
-            RaiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " could not read parameters, cause: " + e);
+            raiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " could not read parameters, cause: " + e);
         }
     }
 
@@ -780,7 +780,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
             passiveMode = alternativePassiveMode;
             transferMode = getAlternative(transferMode, alternativeTransferMode);
         } catch (Exception e) {
-            RaiseException("..error in setAlternativeParameter, cause: " + e);
+            raiseException("..error in setAlternativeParameter, cause: " + e);
         }
     }
 
@@ -794,7 +794,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                 } else {
                     boolean ok = ftpClient.mkdir(remoteDir, intPosixPermissions);
                     if (!ok) {
-                        RaiseException("..error occurred creating directory [" + remoteDir + "]: " + ftpClient.getReplyString());
+                        raiseException("..error occurred creating directory [" + remoteDir + "]: " + ftpClient.getReplyString());
                     } else {
                         this.getLogger().debug("..ftp server reply [mkdir] [" + remoteDir + "]: " + ftpClient.getReplyString());
                         cd = ftpClient.changeWorkingDirectory(remoteDir);
@@ -810,12 +810,12 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                 remoteDir = alternativeRemoteDir;
             }
             if (!cd) {
-                RaiseException("..ftp server reply [cd] [remoteDir=" + remoteDir + "]: " + ftpClient.getReplyString());
+                raiseException("..ftp server reply [cd] [remoteDir=" + remoteDir + "]: " + ftpClient.getReplyString());
             } else {
                 this.getLogger().debug("..ftp server reply [cd] [remoteDir=" + remoteDir + "]: " + ftpClient.getReplyString());
             }
         } catch (Exception e) {
-            RaiseException("..error in Make_Dirs, cause: " + e.getMessage(), e);
+            raiseException("..error in Make_Dirs, cause: " + e.getMessage(), e);
         }
     }
 
@@ -835,7 +835,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
             filelist = filelist_;
             this.getLogger().debug("..ftp server reply [listNames] " + ftpClient.getReplyString());
         } catch (Exception e) {
-            RaiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " , cause: " + e.getMessage(), e);
+            raiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " , cause: " + e.getMessage(), e);
         }
     }
 
@@ -855,7 +855,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                 File subParent = null;
                 String subPath = "";
                 if (!localFile.exists()) {
-                    RaiseException(".. file [" + localFile + "] does not exist ");
+                    raiseException(".. file [" + localFile + "] does not exist ");
                 }
                 if (recursive && !isFilePath && localFile.getParent() != null && localFile.getParentFile().isDirectory()) {
                     subPath = fn.toString().substring(localDir.length());
@@ -868,8 +868,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                         if (ftpFiles == null || ftpFiles.length == 0) {
                             boolean ok = ftpClient.mkdir(remoteDir + "/" + subPath, intPosixPermissions);
                             if (!ok) {
-                                RaiseException("..error occurred creating sub-directory [" + remoteDir + "/" + subPath + "]: "
-                                        + ftpClient.getReplyString());
+                                raiseException("..error occurred creating sub-directory [" + remoteDir + "/" + subPath + "]: " + ftpClient.getReplyString());
                             } else {
                                 this.getLogger().debug(
                                         "..ftp server reply [mkdir sub-directory] [" + remoteDir + "/" + subPath + "]: " + ftpClient.getReplyString());
@@ -933,7 +932,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                         if (!ftpFiles.isEmpty() && ftpFiles.contains(transferFilename)) {
                             boolean ok = ftpClient.delete(transferFilename);
                             if (!ok) {
-                                RaiseException("..error occurred overwriting file [" + transferFilename + "]: " + ftpClient.getReplyString());
+                                raiseException("..error occurred overwriting file [" + transferFilename + "]: " + ftpClient.getReplyString());
                             } else {
                                 this.getLogger().debug("..ftp server reply [delete] [" + transferFilename + "]: " + ftpClient.getReplyString());
                             }
@@ -976,7 +975,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                             setParam("successful_transfers", String.valueOf(++successful_transfers));
                             writeHistory(sourceFile.getAbsolutePath(), transferFile.getAbsolutePath());
                         } else {
-                            RaiseException("append is not implemented for protocol " + protocol);
+                            raiseException("append is not implemented for protocol " + protocol);
                         }
                     } else {
                         if (compressFiles) {
@@ -996,7 +995,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                 }
                 if (ftpClient instanceof SOSFTP) {
                     if (((SOSFTP) ftpClient).getReplyCode() > ERROR_CODE) {
-                        RaiseException("..error occurred sending file [" + transferFile.getAbsolutePath() + "]: " + ftpClient.getReplyString());
+                        raiseException("..error occurred sending file [" + transferFile.getAbsolutePath() + "]: " + ftpClient.getReplyString());
                     } else {
                         this.getLogger().debug(
                                 "..ftp server reply [put] [" + transferFilename + "---" + transferFile.getAbsolutePath() + ", size=" + bytesSend
@@ -1005,12 +1004,12 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                 }
                 long lngTransferFileSize = transferFile.length();
                 if (checkSize && lngTransferFileSize > 0 && lngTransferFileSize != bytesSend) {
-                    RaiseException("..error occurred sending file, target file size [" + lngTransferFileSize
-                            + "] does not match number of bytes transferred [" + bytesSend + "]");
+                    raiseException("..error occurred sending file, target file size [" + lngTransferFileSize + "] does not match number of bytes transferred ["
+                            + bytesSend + "]");
                 }
                 if (compressFiles) {
                     if (!sourceFile.delete()) {
-                        RaiseException("..error occurred, could not delete compressed local file: " + sourceFile.getAbsolutePath());
+                        raiseException("..error occurred, could not delete compressed local file: " + sourceFile.getAbsolutePath());
                     } else {
                         this.getLogger().debug3("delete compressed file: " + sourceFile.getAbsolutePath());
                     }
@@ -1019,7 +1018,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                     transActionalLocalFiles.add(localFile);
                 } else if (removeFiles) {
                     if (!localFile.delete()) {
-                        RaiseException(".. error occurred, could not remove local file: " + localFile.getAbsolutePath());
+                        raiseException(".. error occurred, could not remove local file: " + localFile.getAbsolutePath());
                     } else {
                         this.getLogger().debug1("removing file: " + localFile.getAbsolutePath());
                     }
@@ -1040,7 +1039,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
             if (!getLogger().hasWarnings() && !sosString.parseToString(postCommands).isEmpty()) {
                 this.setCommands(postCommands.split(getCommandDelimiter()));
                 if (!execute()) {
-                    RaiseException("error occurred processing command:" + normalizedPassword(postCommands));
+                    raiseException("error occurred processing command:" + normalizedPassword(postCommands));
                 }
             }
             String com =
@@ -1056,7 +1055,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                     for (int i = 0; i < filelist.size(); i++) {
                         File f = new File(sosString.parseToString(filelist.get(i)));
                         if (!f.delete()) {
-                            RaiseException("..error occurred, could not remove local file: " + f.getAbsolutePath());
+                            raiseException("..error occurred, could not remove local file: " + f.getAbsolutePath());
                         } else {
                             this.getLogger().debug1("removing localfile: " + f.getAbsolutePath());
                         }
@@ -1067,7 +1066,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                 }
             }
         } catch (Exception e) {
-            RaiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " , cause: " + e);
+            raiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " , cause: " + e);
         }
         return rc;
     }
@@ -1112,9 +1111,9 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                     this.getLogger().debug1("no matching files found, " + zeroByteCount + " zero byte files skipped");
                     state = "no matching files found, " + zeroByteCount + " zero byte files skipped";
                 } else if (zeroByteCount > 0 && zeroByteFilesStrict) {
-                    RaiseException("zero byte file(s) found");
+                    raiseException("zero byte file(s) found");
                 } else if (forceFiles) {
-                    RaiseException("no matching files found");
+                    raiseException("no matching files found");
                 } else {
                     this.getLogger().debug1("no matching files found");
                     state = "no matching files found";
@@ -1133,7 +1132,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                 break;
             }
         } catch (Exception e) {
-            RaiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " , cause: " + e);
+            raiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " , cause: " + e);
         }
         return rc;
     }
@@ -1196,7 +1195,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                         setParam("jump_command_script_file", sh);
                         flgJumpTransferDefined = false;
                         if (!execute()) {
-                            RaiseException("error occurred processing command: " + normalizedPassword(commands));
+                            raiseException("error occurred processing command: " + normalizedPassword(commands));
                         }
                         arguments.remove("xx_make_temp_directory_xx");
                     }
@@ -1244,7 +1243,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                     if (!v.isEmpty()) {
                         filePath1 = filePath1.concat(sosString.parseToString(v.get(v.size() - 1))).concat(";");
                     } else {
-                        RaiseException("missing library " + element + "to install sosftp");
+                        raiseException("missing library " + element + "to install sosftp");
                     }
                 }
                 filePath1 = filePath1 + installpaths.replaceAll("%\\{local_dir\\}/", localDir1);
@@ -1294,7 +1293,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
             }
             arguments.remove("local_dir");
         } catch (Exception e) {
-            RaiseException("error while get instal files, cause: " + e.toString());
+            raiseException("error while get instal files, cause: " + e.toString());
         } finally {
             if (out != null) {
                 out.close();
@@ -1421,7 +1420,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                 listOfSuccessTransfer.add(p);
             }
         } catch (Exception e) {
-            RaiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " , cause: " + e.getMessage(), e);
+            raiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " , cause: " + e.getMessage(), e);
         }
     }
 
@@ -1444,8 +1443,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                     if (ftpClient.rename(transferFilename, rTransferFilename)) {
                         if (ftpClient instanceof SOSFTP) {
                             if (((SOSFTP) ftpClient).getReplyCode() > ERROR_CODE) {
-                                RaiseException("..error occurred renaming tranactional file [" + transferFilename + "]: "
-                                        + ftpClient.getReplyString());
+                                raiseException("..error occurred renaming tranactional file [" + transferFilename + "]: " + ftpClient.getReplyString());
                             } else {
                                 this.getLogger().debug(
                                         "..ftp server reply [rename] " + transferFilename + " in " + rTransferFilename + ": "
@@ -1453,12 +1451,12 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                             }
                         }
                     } else {
-                        RaiseException("..error occurred renaming tranactional file [" + transferFilename + "]: " + ftpClient.getReplyString());
+                        raiseException("..error occurred renaming tranactional file [" + transferFilename + "]: " + ftpClient.getReplyString());
                     }
                 }
             }
         } catch (Exception e) {
-            RaiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " , cause: " + e.getMessage(), e);
+            raiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " , cause: " + e.getMessage(), e);
         }
     }
 
@@ -1472,11 +1470,11 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                 int tries = 0;
                 boolean found = true;
                 getLogger().info("polling for file: " + fileName);
-                lastmd5file = sos.util.SOSCrypt.MD5encrypt(new File(fileName));
+                lastmd5file = sos.util.SOSCrypt.md5encrypt(new File(fileName));
                 Thread.sleep((long) delay * 1000);
                 for (int i = 0; i < nrOfTries; i++) {
                     tries++;
-                    String newMD5File = sos.util.SOSCrypt.MD5encrypt(new File(fileName));
+                    String newMD5File = sos.util.SOSCrypt.md5encrypt(new File(fileName));
                     getLogger().debug3(i + " polling and checking md5 hash: " + newMD5File);
                     if (!lastmd5file.equals(newMD5File)) {
                         lastmd5file = newMD5File;
@@ -1494,7 +1492,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                     message = "During triggering for " + pollTimeout + " minutes the file " + message + " has been changed repeatedly";
                     if (forceFiles) {
                         getLogger().warn(message);
-                        RaiseException(message);
+                        raiseException(message);
                     } else {
                         getLogger().info(message);
                         return false;
@@ -1502,7 +1500,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                 }
             }
         } catch (Exception e) {
-            RaiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " error while polling, cause: " + e.getMessage(), e);
+            raiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " error while polling, cause: " + e.getMessage(), e);
         }
         return true;
     }
@@ -1530,7 +1528,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                 } else {
                     boolean ok = ftpClient.mkdir(remoteDir, intPosixPermissions);
                     if (!ok) {
-                        RaiseException("..error occurred creating directory [" + remoteDir + "]: " + ftpClient.getReplyString());
+                        raiseException("..error occurred creating directory [" + remoteDir + "]: " + ftpClient.getReplyString());
                     } else {
                         this.getLogger().debug("..ftp server reply [mkdir] [" + remoteDir + "]: " + ftpClient.getReplyString());
                         cd = ftpClient.changeWorkingDirectory(remoteDir);
@@ -1547,7 +1545,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
                 remoteDir = alternativeRemoteDir;
             }
             if (!cd) {
-                RaiseException("..ftp server reply [cd] [remoteDir=" + remoteDir + "]: " + ftpClient.getReplyString());
+                raiseException("..ftp server reply [cd] [remoteDir=" + remoteDir + "]: " + ftpClient.getReplyString());
             } else {
                 this.getLogger().debug("..ftp server reply [cd] [remoteDir=" + remoteDir + "]: " + ftpClient.getReplyString());
             }
@@ -1559,7 +1557,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
             String targetFile =
                     new File(sosString.parseToString(remoteDir), new File(filePath).getName()).getPath().replaceAll(conRegExpBackslash, "/");
             if (!new File(localFile).exists()) {
-                RaiseException(".. file [" + localFile + "] does not exist ");
+                raiseException(".. file [" + localFile + "] does not exist ");
             }
             long bytesSend = ftpClient.putFile(localFile, targetFile);
             this.getLogger().debug("..ftp server reply [putFile] [" + targetFile + ", size=" + bytesSend + "]: " + ftpClient.getReplyString());
@@ -1573,7 +1571,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
             setParam("successful_transfers", "1");
         } catch (Exception e) {
             setParam("failed_transfers", "1");
-            RaiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " error while transfer simple File, cause: " + e.getMessage(), e);
+            raiseException("error in  " + sos.util.SOSClassUtil.getMethodName() + " error while transfer simple File, cause: " + e.getMessage(), e);
         }
         return true;
     }
@@ -1581,7 +1579,7 @@ public class SOSFTPCommandSend extends SOSFTPCommand {
     private boolean isSimpleTransfer() throws Exception {
         boolean simpleTransfer = sosString.parseToBoolean(sosString.parseToString(arguments.get("simple_transfer")));
         if (simpleTransfer && sosString.parseToString(arguments.get("file_path")).isEmpty()) {
-            RaiseException("job parameter is missing for specified parameter [ftp_simple_transfer]: [ftp_file_path]");
+            raiseException("job parameter is missing for specified parameter [ftp_simple_transfer]: [ftp_file_path]");
         }
         if (simpleTransfer) {
             getLogger().info(

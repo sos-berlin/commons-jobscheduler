@@ -23,16 +23,12 @@ public class TestSOSFTP {
 
     private static final String C_TEMP_TEST = "c:/temp/test";
     private static final Logger LOGGER = Logger.getLogger(TestSOSFTP.class);
+    private static final String TEST_FOLDER_NAME = "./TestSOSFtp";
+    private static final String TEST_FILE_NAME = "text.txt";
+    private static final String TEST_PATH_NAME = "R:\\backup\\sos\\java\\junittests\\testdata\\SOSDataExchange/";
     private static SOSFTP sosftp = null;
-    private final String strTestFolderName = "./TestSOSFtp";
-    private final String strTestFileName = "text.txt";
-    private final String strTestPathName = "R:\\backup\\sos\\java\\junittests\\testdata\\SOSDataExchange/";
     private String[] strArguments = null;
     public static final String conSettingFILE_SPEC = "file_spec";
-
-    public TestSOSFTP() {
-        //
-    }
 
     @Test
     public void testUml() {
@@ -56,7 +52,7 @@ public class TestSOSFTP {
     }
 
     @Test
-    public void TestHiddenFile() {
+    public void testHiddenFile() {
         assertEquals("Ist hidden file", false, sosftp.isNotHiddenFile(".."));
         assertEquals("Ist hidden file", false, sosftp.isNotHiddenFile("."));
         assertEquals("Ist nothidden file", true, sosftp.isNotHiddenFile("/home/kb"));
@@ -71,11 +67,11 @@ public class TestSOSFTP {
     }
 
     @Test
-    public void TestMKDIR() {
+    public void testMKDIR() {
         try {
-            boolean flgOK = sosftp.mkdir(strTestFolderName);
+            boolean flgOK = sosftp.mkdir(TEST_FOLDER_NAME);
             assertTrue("Folder created", flgOK);
-            flgOK = sosftp.changeWorkingDirectory(strTestFolderName);
+            flgOK = sosftp.changeWorkingDirectory(TEST_FOLDER_NAME);
             assertTrue("CD is possible", flgOK);
             if (flgOK) {
                 sosftp.cdup();
@@ -86,10 +82,10 @@ public class TestSOSFTP {
     }
 
     @Test
-    public void TestRMDIR() {
+    public void testRMDIR() {
         try {
-            sosftp.rmdir(strTestFolderName);
-            boolean flgOK = sosftp.changeWorkingDirectory(strTestFolderName);
+            sosftp.rmdir(TEST_FOLDER_NAME);
+            boolean flgOK = sosftp.changeWorkingDirectory(TEST_FOLDER_NAME);
             assertFalse("Folder is deleted", flgOK);
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
@@ -97,7 +93,7 @@ public class TestSOSFTP {
     }
 
     @Test
-    public void TestnList() throws Exception {
+    public void testnList() throws Exception {
         try {
             LOGGER.info("~~~~~~~~~~~~~Test mit nlist~~~~~~~~~~~~~~~~~~~");
             long s1 = System.currentTimeMillis();
@@ -114,7 +110,7 @@ public class TestSOSFTP {
     }
 
     @Test
-    public void TestnListRecurseSubFolder() throws Exception {
+    public void testnListRecurseSubFolder() throws Exception {
         try {
             long s1 = System.currentTimeMillis();
             Vector<String> strListOfAllFiles = sosftp.nList(".", false);
@@ -176,7 +172,7 @@ public class TestSOSFTP {
         return strRet;
     }
 
-    private boolean Check4MultipleFileSpecs(final String pstrRegExp) {
+    private boolean check4MultipleFileSpecs(final String pstrRegExp) {
         boolean flgMultipleFileSpecs = false;
         int intFileSpecSize = conSettingFILE_SPEC.length();
         if (pstrRegExp.startsWith(conSettingFILE_SPEC) && pstrRegExp.length() > intFileSpecSize) {
@@ -199,27 +195,26 @@ public class TestSOSFTP {
 
     @Test
     public void testFileSpec() {
-        assertTrue("is numeric file_spec", Check4MultipleFileSpecs("file_spec_17"));
-        assertTrue("is numeric file_spec", Check4MultipleFileSpecs("file_spec17"));
+        assertTrue("is numeric file_spec", check4MultipleFileSpecs("file_spec_17"));
+        assertTrue("is numeric file_spec", check4MultipleFileSpecs("file_spec17"));
     }
 
     @Test
     public void testFileSpec2() {
-        assertFalse("is regular file_spec", Check4MultipleFileSpecs("file_spec"));
+        assertFalse("is regular file_spec", check4MultipleFileSpecs("file_spec"));
     }
 
     @Test
     public void testFileSpec3() {
-        assertFalse("is invalid numeric file_spec", Check4MultipleFileSpecs("file_spec_abc"));
-        assertFalse("is invalid numeric file_spec", Check4MultipleFileSpecs("file_spec1o"));
+        assertFalse("is invalid numeric file_spec", check4MultipleFileSpecs("file_spec_abc"));
+        assertFalse("is invalid numeric file_spec", check4MultipleFileSpecs("file_spec1o"));
     }
 
     @Test
     public void testSendUsingFilePathAndLocalDir() {
-        CreateTestFile();
-        strArguments =
-                new String[] { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
-                        "-local_dir=" + strTestPathName, "-file_path=" + strTestPathName + strTestFileName };
+        createTestFile();
+        strArguments = new String[] { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
+                "-local_dir=" + TEST_PATH_NAME, "-file_path=" + TEST_PATH_NAME + TEST_FILE_NAME };
         callSOSFtp(strArguments);
     }
 
@@ -230,57 +225,52 @@ public class TestSOSFTP {
 
     @Test
     public void testSendUsingFilePathAndLocalDir2() {
-        CreateTestFile();
-        String[] strArguments =
-                { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
-                        "-local_dir=" + strTestPathName + "hugo/", "-file_path=" + strTestPathName + strTestFileName };
+        createTestFile();
+        String[] strArguments = { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
+                "-local_dir=" + TEST_PATH_NAME + "hugo/", "-file_path=" + TEST_PATH_NAME + TEST_FILE_NAME };
         callSOSFtp(strArguments);
     }
 
     @Test
     public void testSendUsingFilePathAndLocalDir3() {
-        CreateTestFile();
-        String[] strArguments =
-                { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
-                        "-local_dir=" + strTestPathName, "-file_path=" + strTestFileName };
+        createTestFile();
+        String[] strArguments = { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
+                "-local_dir=" + TEST_PATH_NAME, "-file_path=" + TEST_FILE_NAME };
         callSOSFtp(strArguments);
     }
 
     @Test
     public void testSendUsingFilePathAndLocalDir4() {
-        CreateTestFile();
-        String[] strArguments =
-                { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
-                        "-local_dir=R:/backup/sos/java/junittests/testdata/", "-file_path=./SOSDataExchange/" + strTestFileName };
+        createTestFile();
+        String[] strArguments = { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
+                "-local_dir=R:/backup/sos/java/junittests/testdata/", "-file_path=./SOSDataExchange/" + TEST_FILE_NAME };
         callSOSFtp(strArguments);
     }
 
     @Test
     public void testSendUsingFilePathAndLocalDir5() {
-        CreateTestFile();
-        String[] strArguments =
-                { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
-                        "-file_path=" + strTestPathName + strTestFileName };
+        createTestFile();
+        String[] strArguments = { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
+                "-file_path=" + TEST_PATH_NAME + TEST_FILE_NAME };
         callSOSFtp(strArguments);
     }
 
     @Test
     public void testSendUsingFilePathAndLocalDir6() {
-        CreateTestFile();
-        String[] strArguments =
-                { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb", "-local_dir=\"\" ",
-                        "-file_path=" + strTestPathName + strTestFileName };
+        createTestFile();
+        String[] strArguments = { "-verbose=9", "-remote_dir=./relative", "-operation=send", "-host=wilma.sos", "-user=kb", "-password=kb",
+                "-local_dir=\"\" ", "-file_path=" + TEST_PATH_NAME + TEST_FILE_NAME };
         callSOSFtp(strArguments);
     }
 
-    private void CreateTestFile() {
-        CreateTestFile(strTestFileName);
+    private void createTestFile() {
+        createTestFile(TEST_FILE_NAME);
     }
 
-    private void CreateTestFile(final String pstrFileName) {
-        JSFile objFile = new JSFile(strTestPathName, pstrFileName);
+    private void createTestFile(final String pstrFileName) {
+        JSFile objFile = new JSFile(TEST_PATH_NAME, pstrFileName);
         try {
-            objFile.WriteLine("This is a simple Testfile. nothing else.");
+            objFile.writeLine("This is a simple Testfile. nothing else.");
             objFile.close();
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);

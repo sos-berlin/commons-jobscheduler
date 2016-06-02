@@ -65,23 +65,23 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
 
     @JSOptionDefinition(name = "raise_exception_on_error", description = "Raise an Exception if an error occured", key = "raise_exception_on_error",
             type = "SOSOptionBoolean", mandatory = true)
-    public SOSOptionBoolean raise_exception_on_error = new SOSOptionBoolean(this, CLASSNAME + ".raise_exception_on_error", 
+    public SOSOptionBoolean raiseExceptionOnError = new SOSOptionBoolean(this, CLASSNAME + ".raise_exception_on_error", 
             "Raise an Exception if an error occured", "true", "true", true);
 
-    public SOSOptionBoolean getraise_exception_on_error() {
-        return raise_exception_on_error;
+    public SOSOptionBoolean getRaiseExceptionOnError() {
+        return raiseExceptionOnError;
     }
 
-    public void setraise_exception_on_error(final SOSOptionBoolean raiseExceptionOnError) {
-        this.raise_exception_on_error = raiseExceptionOnError;
+    public void setRaiseExceptionOnError(final SOSOptionBoolean raiseExceptionOnError) {
+        this.raiseExceptionOnError = raiseExceptionOnError;
     }
 
     @JSOptionDefinition(name = "auth_file", description = "auth_file", key = "auth_file", type = "SOSOptionString", mandatory = false)
-    public SOSOptionInFileName auth_file = new SOSOptionInFileName(this, CLASSNAME + ".auth_file", "auth_file", null, null, false);
+    public SOSOptionInFileName authFile = new SOSOptionInFileName(this, CLASSNAME + ".auth_file", "auth_file", null, null, false);
 
     @JSOptionDefinition(name = "auth_method", description = "This parameter specifies the authorization method for the", key = "auth_method", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionAuthenticationMethod auth_method = new SOSOptionAuthenticationMethod(this, CLASSNAME + ".auth_method", "auth_method", 
+    public SOSOptionAuthenticationMethod authMethod = new SOSOptionAuthenticationMethod(this, CLASSNAME + ".auth_method", "auth_method", 
             "publickey", "publickey", false);
     
     @JSOptionDefinition(name = "command", description = "This parameter specifies a command that is to be executed", key = "command", 
@@ -91,22 +91,22 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
 
     @JSOptionDefinition(name = "command_delimiter", description = "Command delimiter characters are specified using this par", 
             key = "command_delimiter", type = "SOSOptionString", mandatory = true)
-    public SOSOptionRegExp command_delimiter = new SOSOptionRegExp(this, CLASSNAME + ".command_delimiter", 
+    public SOSOptionRegExp commandDelimiter = new SOSOptionRegExp(this, CLASSNAME + ".command_delimiter", 
             "Command delimiter characters are specified using this par", "%%", "%%", true);
 
     @JSOptionDefinition(name = "command_script", description = "This parameter can be used as an alternative to command,", key = "command_script", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionCommandString command_script = new SOSOptionCommandString(this, CLASSNAME + ".command_script", 
+    public SOSOptionCommandString commandScript = new SOSOptionCommandString(this, CLASSNAME + ".command_script", 
             "This parameter can be used as an alternative to command,", null, null, false);
 
     @JSOptionDefinition(name = "command_script_file", description = "This parameter can be used as an alternative to command,", 
             key = "command_script_file", type = "SOSOptionString", mandatory = false)
-    public SOSOptionInFileName command_script_file = new SOSOptionInFileName(this, CLASSNAME + ".command_script_file", 
+    public SOSOptionInFileName commandScriptFile = new SOSOptionInFileName(this, CLASSNAME + ".command_script_file", 
             "This parameter can be used as an alternative to command,", null, null, false);
 
     @JSOptionDefinition(name = "command_script_param", description = "This parameter contains a parameterstring, which will be", 
             key = "command_script_param", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString command_script_param = new SOSOptionString(this, CLASSNAME + ".command_script_param", 
+    public SOSOptionString commandScriptParam = new SOSOptionString(this, CLASSNAME + ".command_script_param", 
             "This parameter contains a parameterstring, which will be", null, null, false);
 
     @JSOptionDefinition(name = "host", description = "This parameter specifies the hostname or IP address of th", key = "host", 
@@ -114,43 +114,43 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
     public SOSOptionHostName host = new SOSOptionHostName(this, CLASSNAME + ".host", "This parameter specifies the hostname or IP address of th", 
             "localhost", null, true);
     
-    public SOSOptionHostName HostName = (SOSOptionHostName) host.SetAlias("host_name", "ssh_server_name");
+    public SOSOptionHostName hostName = (SOSOptionHostName) host.setAlias("host_name", "ssh_server_name");
 
     @JSOptionDefinition(name = "protocol", description = "Type of requested Datatransfer The values ftp, sftp", key = "protocol", 
             type = "SOSOptionStringValueList", mandatory = true)
     public SOSOptionTransferType protocol = new SOSOptionTransferType(this, CLASSNAME + ".protocol", 
             "Type of requested Datatransfer The values ftp, sftp", "ssh", "ssh", true);
     
-    public SOSOptionTransferType ftp_protocol = (SOSOptionTransferType) protocol.SetAlias("ftp_protocol");
+    public SOSOptionTransferType ftpProtocol = (SOSOptionTransferType) protocol.setAlias("ftp_protocol");
 
     public SOSOptionTransferType getProtocol() {
         return protocol;
     }
 
-    public void setProtocol(final SOSOptionTransferType p_protocol) {
-        protocol = p_protocol;
+    public void setProtocol(final SOSOptionTransferType pProtocol) {
+        protocol = pProtocol;
     }
 
-    public SOSOptionTransferType TransferProtocol = (SOSOptionTransferType) protocol.SetAlias(CLASSNAME + ".TransferProtocol");
+    public SOSOptionTransferType transferProtocol = (SOSOptionTransferType) protocol.setAlias(CLASSNAME + ".TransferProtocol");
 
     @JSOptionDefinition(name = "ignore_error", description = "Should the value true be specified, then execution errors", key = "ignore_error", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionBoolean ignore_error = new SOSOptionBoolean(this, CLASSNAME + ".ignore_error", 
+    public SOSOptionBoolean ignoreError = new SOSOptionBoolean(this, CLASSNAME + ".ignore_error", 
             "Should the value true be specified, then execution errors", "false", "false", false);
 
     @JSOptionDefinition(name = "ignore_exit_code", description = "This parameter configures one or more exit codes which wi", 
             key = "ignore_exit_code", type = "SOSOptionString", mandatory = false)
-    public SOSOptionIntegerArray ignore_exit_code = new SOSOptionIntegerArray(this, CLASSNAME + ".ignore_exit_code", 
+    public SOSOptionIntegerArray ignoreExitCode = new SOSOptionIntegerArray(this, CLASSNAME + ".ignore_exit_code", 
             "This parameter configures one or more exit codes which wi", null, null, false);
 
     @JSOptionDefinition(name = "ignore_signal", description = "Should the value true be specified, then on", key = "ignore_signal", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionBoolean ignore_signal = new SOSOptionBoolean(this, CLASSNAME + ".ignore_signal", "Should the value true be specified, then on", 
+    public SOSOptionBoolean ignoreSignal = new SOSOptionBoolean(this, CLASSNAME + ".ignore_signal", "Should the value true be specified, then on", 
             "false", "false", false);
 
     @JSOptionDefinition(name = "ignore_stderr", description = "This job checks if any output to stderr has been created", key = "ignore_stderr", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionBoolean ignore_stderr = new SOSOptionBoolean(this, CLASSNAME + ".ignore_stderr", 
+    public SOSOptionBoolean ignoreStderr = new SOSOptionBoolean(this, CLASSNAME + ".ignore_stderr", 
             "This job checks if any output to stderr has been created", "false", "false", false);
 
     @JSOptionDefinition(name = "password", description = "This parameter specifies the user account password for au", key = "password", 
@@ -165,42 +165,42 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
 
     @JSOptionDefinition(name = "proxy_host", description = "The value of this parameter is the host name or the IP ad", key = "proxy_host", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionString proxy_host = new SOSOptionString(this, CLASSNAME + ".proxy_host", 
+    public SOSOptionString proxyHost = new SOSOptionString(this, CLASSNAME + ".proxy_host", 
             "The value of this parameter is the host name or the IP ad", null, null, false);
 
     @JSOptionDefinition(name = "proxy_password", description = "This parameter specifies the password for the proxy serve", key = "proxy_password", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionPassword proxy_password = new SOSOptionPassword(this, CLASSNAME + ".proxy_password", 
+    public SOSOptionPassword proxyPassword = new SOSOptionPassword(this, CLASSNAME + ".proxy_password", 
             "This parameter specifies the password for the proxy serve", null, null, false);
 
     @JSOptionDefinition(name = "proxy_port", description = "This parameter specifies the port number of the proxy,", key = "proxy_port", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionPortNumber proxy_port = new SOSOptionPortNumber(this, CLASSNAME + ".proxy_port", 
+    public SOSOptionPortNumber proxyPort = new SOSOptionPortNumber(this, CLASSNAME + ".proxy_port", 
             "This parameter specifies the port number of the proxy,", null, null, false);
 
     @JSOptionDefinition(name = "proxy_user", description = "The value of this parameter specifies the user account fo", key = "proxy_user", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionUserName proxy_user = new SOSOptionUserName(this, CLASSNAME + ".proxy_user", 
+    public SOSOptionUserName proxyUser = new SOSOptionUserName(this, CLASSNAME + ".proxy_user", 
             "The value of this parameter specifies the user account fo", "user", null, false);
 
     @JSOptionDefinition(name = "simulate_shell", description = "Should the value true be specified for this parameter,", key = "simulate_shell", 
             type = "SOSOptionString", mandatory = false)
-    public SOSOptionBoolean simulate_shell = new SOSOptionBoolean(this, CLASSNAME + ".simulate_shell", 
+    public SOSOptionBoolean simulateShell = new SOSOptionBoolean(this, CLASSNAME + ".simulate_shell", 
             "Should the value true be specified for this parameter,", "false", "false", false);
 
     @JSOptionDefinition(name = "simulate_shell_inactivity_timeout", description = "If no new characters are written to stdout or stderr afte", 
             key = "simulate_shell_inactivity_timeout", type = "SOSOptionString", mandatory = false)
-    public SOSOptionInteger simulate_shell_inactivity_timeout = new SOSOptionInteger(this, CLASSNAME + ".simulate_shell_inactivity_timeout", 
+    public SOSOptionInteger simulateShellInactivityTimeout = new SOSOptionInteger(this, CLASSNAME + ".simulate_shell_inactivity_timeout", 
             "If no new characters are written to stdout or stderr afte", "0", "0", false);
 
     @JSOptionDefinition(name = "simulate_shell_login_timeout", description = "If no new characters are written to stdout or stderr afte", 
             key = "simulate_shell_login_timeout", type = "SOSOptionString", mandatory = false)
-    public SOSOptionInteger simulate_shell_login_timeout = new SOSOptionInteger(this, CLASSNAME + ".simulate_shell_login_timeout", 
+    public SOSOptionInteger simulateShellLoginTimeout = new SOSOptionInteger(this, CLASSNAME + ".simulate_shell_login_timeout", 
             "If no new characters are written to stdout or stderr afte", "0", "0", false);
 
     @JSOptionDefinition(name = "simulate_shell_prompt_trigger", description = "The expected comman line prompt. Using this prompt the jo", 
             key = "simulate_shell_prompt_trigger", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString simulate_shell_prompt_trigger = new SOSOptionString(this, CLASSNAME + ".simulate_shell_prompt_trigger", 
+    public SOSOptionString simulateShellPromptTrigger = new SOSOptionString(this, CLASSNAME + ".simulate_shell_prompt_trigger", 
             "The expected comman line prompt. Using this prompt the jo", null, null, false);
 
     @JSOptionDefinition(name = "user", description = "This parameter specifies the user account to be used when", key = "user", 
@@ -210,13 +210,13 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
 
     @JSOptionDefinition(name = "ignore_hangup_signal", description = "Should the value true be specified, then execution errors", 
             key = "ignore_hangup_signal", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean ignore_hangup_signal = new SOSOptionBoolean(this, CLASSNAME + ".ignore_hangup_signal", 
+    public SOSOptionBoolean ignoreHangupSignal = new SOSOptionBoolean(this, CLASSNAME + ".ignore_hangup_signal", 
             "Should the value true be specified, then execution errors", "true", "true", false);
 
     @JSOptionDefinition(name = "preCommand", description = "the preCommand to set an environmental variable on the remote host", key = "preCommand", 
             type = "SOSOptionString", mandatory = false)
     public SOSOptionString preCommand = new SOSOptionString(this, CLASSNAME + ".preCommand", 
-            "the preCommand to set an environmental variable on the remote host", "export %1s=%2s", "export %1s=%2s", false);
+            "the preCommand to set an environmental variable on the remote host", "export %1$s=%2$s", "export %1$s=%2$s", false);
 
     public SOSOptionString getPreCommand() {
         return preCommand;
@@ -293,122 +293,129 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
 
     @JSOptionDefinition(name = "ssh_job_kill_pid_command", description = "The command to kill a remote running pid", 
             key = "ssh_job_kill_pid_command", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString ssh_job_kill_pid_command = new SOSOptionString(this, CLASSNAME + ".ssh_job_kill_pid_command", 
+    public SOSOptionString sshJobKillPidCommand = new SOSOptionString(this, CLASSNAME + ".ssh_job_kill_pid_command", 
             "The command to to kill a remote running pid", "", "kill -9 ${pid}", false);
 
-    public SOSOptionString getssh_job_kill_pid_command() {
-        return ssh_job_kill_pid_command;
+    public SOSOptionString getSshJobKillPidCommand() {
+        return sshJobKillPidCommand;
     }
 
-    public void setssh_job_kill_pid_command(SOSOptionString ssh_job_kill_pid_command) {
-        this.ssh_job_kill_pid_command = ssh_job_kill_pid_command;
+    public void setSshJobKillPidCommand(SOSOptionString value) {
+        this.sshJobKillPidCommand = value;
     }
 
     @JSOptionDefinition(name = "ssh_job_terminate_pid_command", description = "The command to to terminate a remote running pid", 
             key = "ssh_job_terminate_pid_command", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString ssh_job_terminate_pid_command = new SOSOptionString(this, CLASSNAME + ".ssh_job_terminate_pid_command", 
+    public SOSOptionString sshJobTerminatePidCommand = new SOSOptionString(this, CLASSNAME + ".ssh_job_terminate_pid_command", 
             "The command to to terminate a remote running pid", "", "kill -15 ${pid}", false);
 
-    public SOSOptionString getssh_job_terminate_pid_command() {
-        return ssh_job_terminate_pid_command;
+    public SOSOptionString getSshJobTerminatePidCommand() {
+        return sshJobTerminatePidCommand;
     }
 
-    public void setssh_job_terminate_pid_command(SOSOptionString ssh_job_terminate_pid_command) {
-        this.ssh_job_terminate_pid_command = ssh_job_terminate_pid_command;
+    public void setSshJobTerminatePidCommand(SOSOptionString value) {
+        this.sshJobTerminatePidCommand = value;
     }
 
     @JSOptionDefinition(name = "ssh_job_get_pid_command", description = "The command to get the PID of the active shell", 
             key = "ssh_job_get_pid_command", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString ssh_job_get_pid_command = new SOSOptionString(this, CLASSNAME + ".ssh_job_get_pid_command", 
+    public SOSOptionString sshJobGetPidCommand = new SOSOptionString(this, CLASSNAME + ".ssh_job_get_pid_command", 
             "The command to get the PID of the active shell", "", "echo $$", false);
 
-    public SOSOptionString getssh_job_get_pid_command() {
-        return ssh_job_get_pid_command;
+    public SOSOptionString getSshJobGetPidCommand() {
+        return sshJobGetPidCommand;
     }
 
-    public void setssh_job_get_pid_command(SOSOptionString ssh_job_get_pid_command) {
-        this.ssh_job_get_pid_command = ssh_job_get_pid_command;
+    public void setSshJobGetPidCommand(SOSOptionString value) {
+        this.sshJobGetPidCommand = value;
     }
 
     @JSOptionDefinition(name = "ssh_job_get_child_processes_command", description = "The command to get the child processes related to the given pid", 
             key = "ssh_job_get_child_processes_command", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString ssh_job_get_child_processes_command = new SOSOptionString(this, CLASSNAME + ".ssh_job_get_child_processes_command", 
+    public SOSOptionString sshJobGetChildProcessesCommand = new SOSOptionString(this, CLASSNAME + ".ssh_job_get_child_processes_command", 
             "The command to get the child processes related to the given pid", "", "/bin/ps -ef | pgrep -P${pid}", false);
 
-    public SOSOptionString getssh_job_get_child_processes_command() {
-        return ssh_job_get_child_processes_command;
+    public SOSOptionString getSshJobGetChildProcessesCommand() {
+        return sshJobGetChildProcessesCommand;
     }
 
-    public void setssh_job_get_child_processes_command(SOSOptionString ssh_job_get_child_processes_command) {
-        this.ssh_job_get_child_processes_command = ssh_job_get_child_processes_command;
+    public void setSshJobGetChildProcessesCommand(SOSOptionString value) {
+        this.sshJobGetChildProcessesCommand = value;
     }
 
     @JSOptionDefinition(name = "ssh_job_get_active_processes_command", description = "The command to check if the given process is still running", 
             key = "ssh_job_get_active_processes_command", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString ssh_job_get_active_processes_command = new SOSOptionString(this, CLASSNAME + ".ssh_job_get_active_processes_command", 
+    public SOSOptionString sshJobGetActiveProcessesCommand = new SOSOptionString(this, CLASSNAME + ".ssh_job_get_active_processes_command", 
             "The command to check if the given process is still running", "", "/bin/ps -ef | grep ${pid} | grep ${user} | grep -v grep", false);
 
-    public SOSOptionString getssh_job_get_active_processes_command() {
-        return ssh_job_get_active_processes_command;
+    public SOSOptionString getSshJobGetActiveProcessesCommand() {
+        return sshJobGetActiveProcessesCommand;
     }
 
-    public void setssh_job_get_active_processes_command(SOSOptionString ssh_job_get_active_processes_command) {
-        this.ssh_job_get_active_processes_command = ssh_job_get_active_processes_command;
+    public void setSshJobGetActiveProcessesCommand(SOSOptionString value) {
+        this.sshJobGetActiveProcessesCommand = value;
     }
 
     @JSOptionDefinition(name = "ssh_job_timeout_kill_after", description = "The timeout in seconds after which a kill signal will be send", 
             key = "ssh_job_timeout_kill_after", type = "SOSOptionInteger", mandatory = false)
-    public SOSOptionInteger ssh_job_timeout_kill_after = new SOSOptionInteger(this, CLASSNAME + ".ssh_job_timeout_kill_after", 
+    public SOSOptionInteger sshJobTimeoutKillAfter = new SOSOptionInteger(this, CLASSNAME + ".ssh_job_timeout_kill_after", 
             "The timeout in seconds after which a kill signal will be send", "", "", false);
 
-    public SOSOptionInteger getssh_job_timeout_kill_after() {
-        return ssh_job_timeout_kill_after;
+    public SOSOptionInteger getSshJobTimeoutKillAfter() {
+        return sshJobTimeoutKillAfter;
     }
 
-    public void setssh_job_timeout_kill_after(SOSOptionInteger ssh_job_timeout_kill_after) {
-        this.ssh_job_timeout_kill_after = ssh_job_timeout_kill_after;
+    public void setSshJobTimeoutKillAfter(SOSOptionInteger value) {
+        this.sshJobTimeoutKillAfter = value;
     }
 
     @Override
     public void setAllOptions(final HashMap<String, String> pobjJSSettings) {
         objSettings = pobjJSSettings;
+        super.setSettings(objSettings);
         super.setAllOptions(pobjJSSettings);
     }
 
     @Override
-    public void CheckMandatory() throws JSExceptionMandatoryOptionMissing {
+    public void checkMandatory() throws JSExceptionMandatoryOptionMissing {
         try {
             getCredentialStore().checkCredentialStoreOptions();
-            super.CheckMandatory();
+            super.checkMandatory();
         } catch (Exception e) {
             throw new JSExceptionMandatoryOptionMissing(e.toString());
         }
     }
 
     @Override
-    public void CommandLineArgs(final String[] pstrArgs) {
-        super.CommandLineArgs(pstrArgs);
+    public void commandLineArgs(final String[] pstrArgs) {
+        super.commandLineArgs(pstrArgs);
         this.setAllOptions(super.objSettings);
     }
 
     @Override
-    public SOSOptionInFileName getAuth_file() {
-        return auth_file;
+    public void commandLineArgs(final String value) {
+        super.commandLineArgs(value);
+        this.setAllOptions(super.objSettings);
     }
 
     @Override
-    public void setAuth_file(final SOSOptionInFileName authFile) {
-        auth_file = authFile;
+    public SOSOptionInFileName getAuthFile() {
+        return authFile;
     }
 
     @Override
-    public SOSOptionAuthenticationMethod getAuth_method() {
-        return auth_method;
+    public void setAuthFile(final SOSOptionInFileName authFile) {
+        this.authFile = authFile;
     }
 
     @Override
-    public void setAuth_method(final SOSOptionAuthenticationMethod authMethod) {
-        auth_method = authMethod;
+    public SOSOptionAuthenticationMethod getAuthMethod() {
+        return authMethod;
+    }
+
+    @Override
+    public void setAuthMethod(final SOSOptionAuthenticationMethod authMethod) {
+        this.authMethod = authMethod;
     }
 
     @Override
@@ -422,43 +429,43 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
     }
 
     @Override
-    public SOSOptionRegExp getCommand_delimiter() {
-        return command_delimiter;
+    public SOSOptionRegExp getCommandDelimiter() {
+        return commandDelimiter;
     }
 
     @Override
-    public void setCommand_delimiter(final SOSOptionRegExp commandDelimiter) {
-        command_delimiter = commandDelimiter;
+    public void setCommandDelimiter(final SOSOptionRegExp commandDelimiter) {
+        this.commandDelimiter = commandDelimiter;
     }
 
     @Override
-    public SOSOptionCommandString getCommand_script() {
-        return command_script;
+    public SOSOptionCommandString getCommandScript() {
+        return commandScript;
     }
 
     @Override
-    public void setCommand_script(final SOSOptionCommandString commandScript) {
-        command_script = commandScript;
+    public void setCommandScript(final SOSOptionCommandString commandScript) {
+        this.commandScript = commandScript;
     }
 
     @Override
-    public SOSOptionInFileName getCommand_script_file() {
-        return command_script_file;
+    public SOSOptionInFileName getCommandScriptFile() {
+        return commandScriptFile;
     }
 
     @Override
-    public void setCommand_script_file(final SOSOptionInFileName commandScriptFile) {
-        command_script_file = commandScriptFile;
+    public void setCommandScriptFile(final SOSOptionInFileName commandScriptFile) {
+        this.commandScriptFile = commandScriptFile;
     }
 
     @Override
-    public SOSOptionString getCommand_script_param() {
-        return command_script_param;
+    public SOSOptionString getCommandScriptParam() {
+        return commandScriptParam;
     }
 
     @Override
-    public void setCommand_script_param(final SOSOptionString commandScriptParam) {
-        command_script_param = commandScriptParam;
+    public void setCommandScriptParam(final SOSOptionString commandScriptParam) {
+        this.commandScriptParam = commandScriptParam;
     }
 
     @Override
@@ -472,43 +479,43 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
     }
 
     @Override
-    public SOSOptionBoolean getIgnore_error() {
-        return ignore_error;
+    public SOSOptionBoolean getIgnoreError() {
+        return ignoreError;
     }
 
     @Override
-    public void setIgnore_error(final SOSOptionBoolean ignoreError) {
-        ignore_error = ignoreError;
+    public void setIgnoreError(final SOSOptionBoolean ignoreError) {
+        this.ignoreError = ignoreError;
     }
 
     @Override
-    public SOSOptionIntegerArray getIgnore_exit_code() {
-        return ignore_exit_code;
+    public SOSOptionIntegerArray getIgnoreExitCode() {
+        return ignoreExitCode;
     }
 
     @Override
-    public void setIgnore_exit_code(final SOSOptionIntegerArray ignoreExitCode) {
-        ignore_exit_code = ignoreExitCode;
+    public void setIgnoreExitCode(final SOSOptionIntegerArray ignoreExitCode) {
+        this.ignoreExitCode = ignoreExitCode;
     }
 
     @Override
-    public SOSOptionBoolean getIgnore_signal() {
-        return ignore_signal;
+    public SOSOptionBoolean getIgnoreSignal() {
+        return ignoreSignal;
     }
 
     @Override
-    public void setIgnore_signal(final SOSOptionBoolean ignoreSignal) {
-        ignore_signal = ignoreSignal;
+    public void setIgnoreSignal(final SOSOptionBoolean ignoreSignal) {
+        this.ignoreSignal = ignoreSignal;
     }
 
     @Override
-    public SOSOptionBoolean getIgnore_stderr() {
-        return ignore_stderr;
+    public SOSOptionBoolean getIgnoreStderr() {
+        return ignoreStderr;
     }
 
     @Override
-    public void setIgnore_stderr(final SOSOptionBoolean ignoreStderr) {
-        ignore_stderr = ignoreStderr;
+    public void setIgnoreStderr(final SOSOptionBoolean ignoreStderr) {
+        this.ignoreStderr = ignoreStderr;
     }
 
     @Override
@@ -532,83 +539,83 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
     }
 
     @Override
-    public SOSOptionString getProxy_host() {
-        return proxy_host;
+    public SOSOptionString getProxyHost() {
+        return proxyHost;
     }
 
     @Override
-    public void setProxy_host(final SOSOptionString proxyHost) {
-        proxy_host = proxyHost;
+    public void setProxyHost(final SOSOptionString proxyHost) {
+        this.proxyHost = proxyHost;
     }
 
     @Override
-    public SOSOptionPassword getProxy_password() {
-        return proxy_password;
+    public SOSOptionPassword getProxyPassword() {
+        return proxyPassword;
     }
 
     @Override
-    public void setProxy_password(final SOSOptionPassword proxyPassword) {
-        proxy_password = proxyPassword;
+    public void setProxyPassword(final SOSOptionPassword proxyPassword) {
+        this.proxyPassword = proxyPassword;
     }
 
     @Override
-    public SOSOptionPortNumber getProxy_port() {
-        return proxy_port;
+    public SOSOptionPortNumber getProxyPort() {
+        return proxyPort;
     }
 
     @Override
-    public void setProxy_port(final SOSOptionPortNumber proxyPort) {
-        proxy_port = proxyPort;
+    public void setProxyPort(final SOSOptionPortNumber proxyPort) {
+        this.proxyPort = proxyPort;
     }
 
     @Override
-    public SOSOptionUserName getProxy_user() {
-        return proxy_user;
+    public SOSOptionUserName getProxyUser() {
+        return proxyUser;
     }
 
     @Override
-    public void setProxy_user(final SOSOptionUserName proxyUser) {
-        proxy_user = proxyUser;
+    public void setProxyUser(final SOSOptionUserName proxyUser) {
+        this.proxyUser = proxyUser;
     }
 
     @Override
-    public SOSOptionBoolean getSimulate_shell() {
-        return simulate_shell;
+    public SOSOptionBoolean getSimulateShell() {
+        return simulateShell;
     }
 
     @Override
-    public void setSimulate_shell(final SOSOptionBoolean simulateShell) {
-        simulate_shell = simulateShell;
+    public void setSimulateShell(final SOSOptionBoolean simulateShell) {
+        this.simulateShell = simulateShell;
     }
 
     @Override
-    public SOSOptionInteger getSimulate_shell_inactivity_timeout() {
-        return simulate_shell_inactivity_timeout;
+    public SOSOptionInteger getSimulateShellInactivityTimeout() {
+        return simulateShellInactivityTimeout;
     }
 
     @Override
-    public void setSimulate_shell_inactivity_timeout(final SOSOptionInteger simulateShellInactivityTimeout) {
-        simulate_shell_inactivity_timeout = simulateShellInactivityTimeout;
+    public void setSimulateShellInactivityTimeout(final SOSOptionInteger simulateShellInactivityTimeout) {
+        this.simulateShellInactivityTimeout = simulateShellInactivityTimeout;
     }
 
     @Override
-    public SOSOptionInteger getSimulate_shell_login_timeout() {
-        return simulate_shell_login_timeout;
+    public SOSOptionInteger getSimulateShellLoginTimeout() {
+        return simulateShellLoginTimeout;
     }
 
     @Override
-    public void setSimulate_shell_login_timeout(final SOSOptionInteger simulateShellLoginTimeout) {
-        simulate_shell_login_timeout = simulateShellLoginTimeout;
+    public void setSimulateShellLoginTimeout(final SOSOptionInteger simulateShellLoginTimeout) {
+        this.simulateShellLoginTimeout = simulateShellLoginTimeout;
     }
 
     @Override
-    public SOSOptionString getSimulate_shell_prompt_trigger() {
-        return simulate_shell_prompt_trigger;
+    public SOSOptionString getSimulateShellPromptTrigger() {
+        return simulateShellPromptTrigger;
     }
 
     @Override
-    public void setSimulate_shell_prompt_trigger(final SOSOptionString simulateShellPromptTrigger) {
-        simulate_shell_prompt_trigger = simulateShellPromptTrigger;
+    public void setSimulateShellPromptTrigger(final SOSOptionString simulateShellPromptTrigger) {
+        this.simulateShellPromptTrigger = simulateShellPromptTrigger;
     }
 
     @Override
@@ -622,47 +629,47 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
     }
 
     @Override
-    public SOSOptionBoolean getIgnore_hangup_signal() {
-        return ignore_hangup_signal;
+    public SOSOptionBoolean getIgnoreHangupSignal() {
+        return ignoreHangupSignal;
     }
 
     @Override
-    public void setIgnore_hangup_signal(final SOSOptionBoolean pIgnoreHangupSignal) {
-        ignore_hangup_signal = pIgnoreHangupSignal;
+    public void setIgnoreHangupSignal(final SOSOptionBoolean pIgnoreHangupSignal) {
+        ignoreHangupSignal = pIgnoreHangupSignal;
     }
 
     @Override
-    public SOSOptionString getalternative_account() {
+    public SOSOptionString getAlternativeAccount() {
         return null;
     }
 
     @Override
-    public SOSOptionHostName getalternative_host() {
+    public SOSOptionHostName getAlternativeHost() {
         return null;
     }
 
     @Override
-    public SOSOptionString getalternative_passive_mode() {
+    public SOSOptionString getAlternativePassiveMode() {
         return null;
     }
 
     @Override
-    public SOSOptionPassword getalternative_password() {
+    public SOSOptionPassword getAlternativePassword() {
         return null;
     }
 
     @Override
-    public SOSOptionPortNumber getalternative_port() {
+    public SOSOptionPortNumber getAlternativePort() {
         return null;
     }
 
     @Override
-    public void setalternative_host(final SOSOptionHostName pAlternativeHost) {
+    public void setAlternativeHost(final SOSOptionHostName pAlternativeHost) {
         //
     }
 
     @Override
-    public void setalternative_password(final SOSOptionPassword pAlternativePassword) {
+    public void setAlternativePassword(final SOSOptionPassword pAlternativePassword) {
         //
     }
 
@@ -683,25 +690,25 @@ public class SOSSSHJobOptionsSuperClass extends JSOptionsClass implements ISOSCo
     public SOSOptionBoolean strictHostKeyChecking = new SOSOptionBoolean(this, CLASSNAME + ".strict_hostkey_checking", 
             "Check the hostkey against known hosts for SSH", "false", "false", false);
 
-    public String getstrict_hostKey_checking() {
-        return strictHostKeyChecking.Value();
+    public String getStrictHostKeyChecking() {
+        return strictHostKeyChecking.getValue();
     }
 
-    public void setstrict_hostKey_checking(final String pstrValue) {
-        strictHostKeyChecking.Value(pstrValue);
+    public void setStrictHostKeyChecking(final String pstrValue) {
+        strictHostKeyChecking.setValue(pstrValue);
     }
 
     @JSOptionDefinition(name = "proxy_protocol", description = "Proxy protocol", key = "proxy_protocol", type = "SOSOptionProxyProtocol", 
             mandatory = false)
-    public SOSOptionProxyProtocol proxy_protocol = new SOSOptionProxyProtocol(this, CLASSNAME + ".proxy_protocol", "Proxy protocol", 
+    public SOSOptionProxyProtocol proxyProtocol = new SOSOptionProxyProtocol(this, CLASSNAME + ".proxy_protocol", "Proxy protocol", 
             SOSOptionProxyProtocol.Protocol.http.name(), SOSOptionProxyProtocol.Protocol.http.name(), false);
 
-    public SOSOptionProxyProtocol getproxy_protocol() {
-        return proxy_protocol;
+    public SOSOptionProxyProtocol getProxyProtocol() {
+        return proxyProtocol;
     }
 
-    public void setproxy_host(SOSOptionProxyProtocol val) {
-        proxy_protocol = val;
+    public void setProxyHost(SOSOptionProxyProtocol val) {
+        proxyProtocol = val;
     }
 
 }

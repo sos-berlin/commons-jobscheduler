@@ -7,7 +7,7 @@ public class NoFilesFoundException extends JobSchedulerException {
 
     public NoFilesFoundException(String pstrMessage) {
         super(pstrMessage);
-        this.Status(JobSchedulerException.PENDING);
+        this.setStatus(JobSchedulerException.PENDING);
     }
 
     public NoFilesFoundException() {

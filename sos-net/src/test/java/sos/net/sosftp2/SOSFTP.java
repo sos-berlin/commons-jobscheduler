@@ -42,7 +42,7 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
     public void connect(String host, int port) throws SocketException, IOException, UnknownHostException {
         if (!isConnected()) {
             super.connect(host, port);
-            LogReply();
+            logReply();
         }
     }
 
@@ -50,7 +50,7 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
         if (!isConnected()) {
             super.connect(hostname);
         }
-        LogReply();
+        logReply();
     }
 
     public boolean mkdir(String pathname) throws IOException {
@@ -76,7 +76,7 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
     private Vector<String> getFilenames(String pstrPathName, boolean flgRecurseSubFolders) throws IOException {
         Vector<String> vecListFileItems = new Vector<String>();
         String[] fileList = null;
-        String strCurrentDirectory = DoPWD();
+        String strCurrentDirectory = doPWD();
         String lstrPathName = pstrPathName.trim();
         if (lstrPathName.isEmpty()) {
             lstrPathName = ".";
@@ -90,14 +90,14 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
         }
         for (String strCurrentFile : fileList) {
             if (isNotHiddenFile(strCurrentFile)) {
-                DoCD(strCurrentFile);
+                doCD(strCurrentFile);
                 if (isNegativeCommandCompletion()) {
                     if (!strCurrentFile.startsWith(strCurrentDirectory)) {
                         strCurrentFile = strCurrentDirectory + "/" + strCurrentFile;
                     }
                     vecListFileItems.add(strCurrentFile);
                 } else {
-                    DoCDUP();
+                    doCDUP();
                     if (flgRecurseSubFolders) {
                         Vector<String> vecNames = getFilenames(strCurrentFile);
                         if (vecNames != null) {
@@ -108,12 +108,12 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
             }
         }
         LOGGER.debug("strCurrentDirectory = " + strCurrentDirectory);
-        DoCD(strCurrentDirectory);
-        DoPWD();
+        doCD(strCurrentDirectory);
+        doPWD();
         return vecListFileItems;
     }
 
-    public String DoPWD() {
+    public String doPWD() {
         String strCurrentPath = "";
         try {
             LOGGER.debug("Try pwd.");
@@ -123,38 +123,38 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
             if (idx >= 0) {
                 strCurrentPath = strCurrentPath.substring(idx + 1, strCurrentPath.length() - idx + 1);
             }
-            LogReply();
+            logReply();
         } catch (IOException e) {
             LOGGER.error("Problems with pwd", e);
         }
         return strCurrentPath;
     }
 
-    private int DoCDUP() {
+    private int doCDUP() {
         try {
             LOGGER.debug("Try cdup .");
             cdup();
-            LogReply();
-            DoPWD();
+            logReply();
+            doPWD();
         } catch (IOException e) {
             LOGGER.error("Problems with CDUP", e);
         }
         return 0;
     }
 
-    private int DoCD(final String strFolderName) {
+    private int doCD(final String strFolderName) {
         int x = 0;
         try {
             LOGGER.debug("Try cd with '" + strFolderName + "'.");
             x = cd(strFolderName);
-            LogReply();
+            logReply();
         } catch (IOException e) {
             //
         }
         return x;
     }
 
-    private boolean LogReply() {
+    private boolean logReply() {
         String strReply = getReplyString();
         LOGGER.debug(strReply);
         return true;
@@ -450,7 +450,7 @@ public class SOSFTP extends FTPClient implements SOSFileTransfer {
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
         }
-        LogReply();
+        logReply();
         return true;
     }
 

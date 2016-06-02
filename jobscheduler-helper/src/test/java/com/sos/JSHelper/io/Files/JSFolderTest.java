@@ -18,8 +18,8 @@ public class JSFolderTest {
     @Test
     public void testNewFile() throws IOException {
         JSFolder objF = JSFolder.getTempDir();
-        JSFile objFle = objF.newFile("testNewFile.tmp");
-        objFle.WriteLine("testNewFile.tmp");
+        JSFile objFle = objF.getNewFile("testNewFile.tmp");
+        objFle.writeLine("testNewFile.tmp");
         assertTrue("File must exist", objFle.exists());
         objFle.delete();
     }

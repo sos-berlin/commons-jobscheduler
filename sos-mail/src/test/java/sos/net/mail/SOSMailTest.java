@@ -10,15 +10,15 @@ public class SOSMailTest {
     @Test
     public void testSendMail() throws RuntimeException, Exception {
         SOSSmtpMailOptions objO = new SOSSmtpMailOptions();
-        objO.host.Value("smtp.sos");
+        objO.host.setValue("smtp.sos");
         objO.port.value(25);
-        objO.from.Value("JUnit-Test@sos-berlin.com");
-        objO.body.Value("bodobodododo");
-        objO.subject.Value("mail from JUnit-Test");
-        objO.to.Value("scheduler_test@sos-berlin.com");
-        objO.cc.Value("scheduler_test@sos-berlin.com;info@sos-berlin.com");
-        objO.bcc.Value("scheduler_test@sos-berlin.com;scheduler_test@sos-berlin.com");
-        SOSMail objMail = new SOSMail(objO.host.Value());
+        objO.from.setValue("JUnit-Test@sos-berlin.com");
+        objO.body.setValue("bodobodododo");
+        objO.subject.setValue("mail from JUnit-Test");
+        objO.to.setValue("scheduler_test@sos-berlin.com");
+        objO.cc.setValue("scheduler_test@sos-berlin.com;info@sos-berlin.com");
+        objO.bcc.setValue("scheduler_test@sos-berlin.com;scheduler_test@sos-berlin.com");
+        SOSMail objMail = new SOSMail(objO.host.getValue());
         objMail.sendMail(objO);
     }
 

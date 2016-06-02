@@ -10,7 +10,7 @@ public class FTPCommandPendingException extends JobSchedulerException {
 
     public FTPCommandPendingException(String pstrMessage) {
         super(pstrMessage);
-        this.Status(JobSchedulerException.PENDING);
+        this.setStatus(JobSchedulerException.PENDING);
         this.eMailSubject("FTP-problem occured.");
     }
 

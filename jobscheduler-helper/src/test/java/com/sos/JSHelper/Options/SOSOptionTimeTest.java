@@ -18,17 +18,17 @@ public class SOSOptionTimeTest {
 
     @Test
     public final void testGetTimeAsSeconds() {
-        objTime.Value("10");
+        objTime.setValue("10");
         LOGGER.info("time in seconds : " + objTime.getTimeAsSeconds());
-        objTime.Value("1:50");
+        objTime.setValue("1:50");
         LOGGER.info("time in seconds : " + objTime.getTimeAsSeconds());
-        objTime.Value("1:30:45");
+        objTime.setValue("1:30:45");
         LOGGER.info("time in seconds : " + objTime.getTimeAsSeconds());
-        objTime.Value("13045");
+        objTime.setValue("13045");
         LOGGER.info("time in seconds : " + objTime.getTimeAsSeconds());
-        objTime.Value("48:30:45");
+        objTime.setValue("48:30:45");
         LOGGER.info("time in seconds : " + objTime.getTimeAsSeconds());
-        objTime.Value("99:99:99");
+        objTime.setValue("99:99:99");
         LOGGER.info("time in seconds : " + objTime.getTimeAsSeconds());
         objTime.value(17);
         LOGGER.info("time in seconds : " + objTime.getTimeAsSeconds());

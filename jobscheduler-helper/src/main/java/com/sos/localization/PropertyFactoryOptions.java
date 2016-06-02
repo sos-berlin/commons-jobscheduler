@@ -58,9 +58,9 @@ public class PropertyFactoryOptions extends PropertyFactoryOptionsSuperClass {
      *             Wert hat */
     @Override
     // PropertyFactoryOptionsSuperClass
-    public void CheckMandatory() {
+    public void checkMandatory() {
         try {
-            super.CheckMandatory();
+            super.checkMandatory();
         } catch (Exception e) {
             throw new JSExceptionMandatoryOptionMissing(e.toString());
         }

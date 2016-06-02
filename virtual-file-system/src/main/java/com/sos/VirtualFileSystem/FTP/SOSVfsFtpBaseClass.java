@@ -114,9 +114,9 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     }
 
     @Override
-    public ISOSConnection Authenticate(final ISOSAuthenticationOptions pobjAO) throws Exception {
-        String user = pobjAO.getUser().Value();
-        String Passwd = pobjAO.getPassword().Value();
+    public ISOSConnection authenticate(final ISOSAuthenticationOptions pobjAO) throws Exception {
+        String user = pobjAO.getUser().getValue();
+        String Passwd = pobjAO.getPassword().getValue();
         this.login(user, Passwd);
         objAO = pobjAO;
         return this;
@@ -159,13 +159,13 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     }
 
     @Override
-    public void CloseConnection() throws Exception {
+    public void closeConnection() throws Exception {
         if (Client().isConnected()) {
             Client().disconnect();
             if (objConnection2Options != null) {
-                LOGGER.debug(SOSVfs_D_125.params(objConnection2Options.getHost().Value()));
+                LOGGER.debug(SOSVfs_D_125.params(objConnection2Options.getHost().getValue()));
             }
-            LogReply();
+            logReply();
         }
     }
 
@@ -203,36 +203,36 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     public void closeOutput() {
         final String conMethodName = CLASS_NAME + "::closeOutput";
         try {
-            this.CompletePendingCommand();
+            this.completePendingCommand();
         } catch (Exception e) {
-            RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
+            raiseException(e, getHostID(SOSVfs_E_0105.params(conMethodName)));
         }
     }
 
     @Override
-    public void CloseSession() throws Exception {
+    public void closeSession() throws Exception {
         this.logout();
     }
 
     @Override
-    public void CompletePendingCommand() {
+    public void completePendingCommand() {
         final String conMethodName = CLASS_NAME + "::CompletePendingCommand";
         LOGGER.trace("completePendingCommand");
         try {
             if (!Client().completePendingCommand()) {
                 logout();
                 disconnect();
-                RaiseException(HostID(SOSVfs_E_0105.params(conMethodName)));
+                raiseException(getHostID(SOSVfs_E_0105.params(conMethodName)));
             }
         } catch (IOException e) {
-            RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
+            raiseException(e, getHostID(SOSVfs_E_0105.params(conMethodName)));
         }
         if (isNegativeCommandCompletion()) {
             throw new JobSchedulerException(SOSVfs_E_124.params(getReplyString()));
         }
     }
 
-    public void connect(final String phost, final int pport) {
+    public void doConnect(final String phost, final int pport) {
         try {
             host = phost;
             port = pport;
@@ -241,50 +241,59 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
             if (!isConnected()) {
                 Client().connect(host, port);
                 LOGGER.info(SOSVfs_D_0102.params(host, port));
-                LogReply();
+                logReply();
                 Client().setControlKeepAliveTimeout(180);
             } else {
                 LOGGER.warn(SOSVfs_D_0103.params(host, port));
             }
         } catch (Exception e) {
-            throw new JobSchedulerException(HostID(e.getClass().getName() + " - " + e.getLocalizedMessage()), e);
+            throw new JobSchedulerException(getHostID(e.getClass().getName() + " - " + e.getMessage()), e);
         }
     }
 
     @Override
-    public ISOSConnection Connect() {
+    public ISOSConnection connect(final String pstrHostName, final int pintPortNumber) throws Exception {
+        this.doConnect(pstrHostName, pintPortNumber);
+        if (objConnectionOptions != null) {
+            objConnectionOptions.getHost().setValue(pstrHostName);
+            objConnectionOptions.getPort().value(pintPortNumber);
+        }
+        return this;
+    }
+
+    @Override
+    public ISOSConnection connect() {
         final String conMethodName = CLASS_NAME + "::Connect";
-        String strH = host = objConnectionOptions.getHost().Value();
+        String strH = host = objConnectionOptions.getHost().getValue();
         int intP = port = objConnectionOptions.getPort().value();
         LOGGER.debug(SOSVfs_D_0101.params(strH, intP));
         try {
             if (objConnection2Options != null) {
-                proxyProtocol = objConnection2Options.proxy_protocol;
-                proxyHost = objConnection2Options.proxy_host.Value();
-                proxyPort = objConnection2Options.proxy_port.value();
-                proxyUser = objConnection2Options.proxy_user.Value();
-                proxyPassword = objConnection2Options.proxy_password.Value();
+                proxyProtocol = objConnection2Options.proxyProtocol;
+                proxyHost = objConnection2Options.proxyHost.getValue();
+                proxyPort = objConnection2Options.proxyPort.value();
+                proxyUser = objConnection2Options.proxyUser.getValue();
+                proxyPassword = objConnection2Options.proxyPassword.getValue();
             }
-            this.connect(strH, intP);
+            this.doConnect(strH, intP);
             LOGGER.info(SOSVfs_D_0102.params(strH, intP));
             Client().setControlKeepAliveTimeout(180);
         } catch (RuntimeException e) {
             LOGGER.info(SOSVfs_E_0107.params(host, port, e.getMessage()));
-            if (objConnectionOptions.getalternative_host().isDirty()) {
-                String strAltHost = host = objConnectionOptions.getalternative_host().Value();
-                int intAltPort = port = objConnectionOptions.getalternative_port().value();
+            if (objConnectionOptions.getAlternativeHost().isDirty()) {
+                String strAltHost = host = objConnectionOptions.getAlternativeHost().getValue();
+                int intAltPort = port = objConnectionOptions.getAlternativePort().value();
                 if (isNotEmpty(strAltHost) && intAltPort > 0) {
                     try {
                         JobSchedulerException.gflgStackTracePrinted = false;
                         this.connect(strAltHost, intAltPort);
                     } catch (Exception e1) {
                         LOGGER.info(SOSVfs_E_0107.params(host, port, e1.getMessage()));
-                        throw e1;
                     }
                     LOGGER.info(SOSVfs_D_0102.params(strAltHost, intAltPort));
                 } else {
                     LOGGER.info(SOSVfs_E_0107.params(host, port, e.getMessage()));
-                    RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
+                    raiseException(e, getHostID(SOSVfs_E_0105.params(conMethodName)));
                 }
             } else {
                 LOGGER.info(SOSVfs_E_0107.params(host, port, e.getMessage()));
@@ -296,10 +305,10 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 
     @Deprecated
     @Override
-    public ISOSConnection Connect(final ISOSConnectionOptions pobjConnectionOptions) throws Exception {
+    public ISOSConnection connect(final ISOSConnectionOptions pobjConnectionOptions) throws Exception {
         try {
             objConnectionOptions = pobjConnectionOptions;
-            this.Connect();
+            this.connect();
         } catch (Exception e) {
             throw e;
         }
@@ -307,63 +316,53 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     }
 
     @Override
-    public ISOSConnection Connect(final SOSConnection2OptionsAlternate pobjConnectionOptions) {
+    public ISOSConnection connect(final SOSConnection2OptionsAlternate pobjConnectionOptions) {
         final String conMethodName = CLASS_NAME + "::Connect";
         objConnection2Options = pobjConnectionOptions;
         try {
             objHost = objConnection2Options.getHost();
-            objPort = objConnection2Options.getport();
-            proxyProtocol = objConnection2Options.proxy_protocol;
-            proxyHost = objConnection2Options.proxy_host.Value();
-            proxyPort = objConnection2Options.proxy_port.value();
-            proxyUser = objConnection2Options.proxy_user.Value();
-            proxyPassword = objConnection2Options.proxy_password.Value();
-            this.connect(objHost.Value(), objPort.value());
+            objPort = objConnection2Options.getPort();
+            proxyProtocol = objConnection2Options.proxyProtocol;
+            proxyHost = objConnection2Options.proxyHost.getValue();
+            proxyPort = objConnection2Options.proxyPort.value();
+            proxyUser = objConnection2Options.proxyUser.getValue();
+            proxyPassword = objConnection2Options.proxyPassword.getValue();
+            this.connect(objHost.getValue(), objPort.value());
             if (!Client().isConnected()) {
-                SOSConnection2OptionsSuperClass objAlternate = objConnection2Options.Alternatives();
+                SOSConnection2OptionsSuperClass objAlternate = objConnection2Options.getAlternatives();
                 objHost = objAlternate.host;
                 objPort = objAlternate.port;
-                proxyProtocol = objAlternate.proxy_protocol;
-                proxyHost = objAlternate.proxy_host.Value();
-                proxyPort = objAlternate.proxy_port.value();
-                proxyUser = objAlternate.proxy_user.Value();
-                proxyPassword = objAlternate.proxy_password.Value();
+                proxyProtocol = objAlternate.proxyProtocol;
+                proxyHost = objAlternate.proxyHost.getValue();
+                proxyPort = objAlternate.proxyPort.value();
+                proxyUser = objAlternate.proxyUser.getValue();
+                proxyPassword = objAlternate.proxyPassword.getValue();
                 LOGGER.info(SOSVfs_I_0121.params(host));
-                this.connect(objHost.Value(), objPort.value());
+                this.connect(objHost.getValue(), objPort.value());
                 if (!Client().isConnected()) {
                     objHost = null;
                     objPort = null;
                     host = "";
                     port = -1;
-                    RaiseException(SOSVfs_E_204.get());
+                    raiseException(SOSVfs_E_204.get());
                 }
             }
         } catch (Exception e) {
-            RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
+            raiseException(e, getHostID(SOSVfs_E_0105.params(conMethodName)));
         }
         return this;
     }
 
     @Override
-    public ISOSConnection Connect(final ISOSDataProviderOptions pobjConnectionOptions) throws Exception {
+    public ISOSConnection connect(final ISOSDataProviderOptions pobjConnectionOptions) throws Exception {
         return null;
     }
 
     @Override
-    public ISOSConnection Connect(final String pstrHostName, final int pintPortNumber) throws Exception {
-        this.connect(pstrHostName, pintPortNumber);
-        if (objConnectionOptions != null) {
-            objConnectionOptions.getHost().Value(pstrHostName);
-            objConnectionOptions.getPort().value(pintPortNumber);
-        }
-        return this;
-    }
-
-    @Override
-    public void ControlEncoding(final String pstrControlEncoding) {
+    public void controlEncoding(final String pstrControlEncoding) {
         if (!pstrControlEncoding.isEmpty()) {
             Client().setControlEncoding(pstrControlEncoding);
-            LogReply();
+            logReply();
         }
     }
 
@@ -378,12 +377,12 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         try {
             Client().deleteFile(pathname);
             if (isNegativeCommandCompletion()) {
-                RaiseException(SOSVfs_E_144.params("delete()", pathname, getReplyString()));
+                raiseException(SOSVfs_E_144.params("delete()", pathname, getReplyString()));
             } else {
                 LOGGER.info(SOSVfs_I_131.params(pathname, getReplyString()));
             }
         } catch (IOException e) {
-            RaiseException(e, SOSVfs_E_134.params("delete()"));
+            raiseException(e, SOSVfs_E_134.params("delete()"));
         }
     }
 
@@ -397,7 +396,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 
     @Override
     public SOSFileList dir(final SOSFolderName pobjFolderName) {
-        this.dir(pobjFolderName.Value());
+        this.dir(pobjFolderName.getValue());
         return null;
     }
 
@@ -438,32 +437,32 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
                 Client().disconnect();
             }
         } catch (IOException e) {
-            LOGGER.warn(SOSVfs_W_136.get() + e.getLocalizedMessage());
+            LOGGER.warn(SOSVfs_W_136.get() + e.getMessage());
         }
     }
 
-    private int DoCD(final String strFolderName) {
+    private int doCD(final String strFolderName) {
         int x = 0;
         try {
             String strT = strFolderName.replaceAll("\\\\", "/");
             LOGGER.debug(SOSVfs_D_127.params(strT));
             x = cd(strT);
-            LogReply();
+            logReply();
         } catch (IOException e) {
             //
         }
         return x;
     }
 
-    protected int DoCDUP() {
+    protected int doCDUP() {
         final String conMethodName = CLASS_NAME + "::DoCDUP";
         try {
             LOGGER.debug(SOSVfs_D_141.params("cdup"));
             Client().cdup();
-            LogReply();
-            DoPWD();
+            logReply();
+            doPWD();
         } catch (IOException e) {
-            RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
+            raiseException(e, getHostID(SOSVfs_E_0105.params(conMethodName)));
         }
         return 0;
     }
@@ -476,9 +475,9 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
             strT = Client().getSystemType();
             LOGGER.debug(String.format("System-Type = %1$s", strT));
         } catch (IOException e) {
-            LOGGER.info(e.getLocalizedMessage());
+            LOGGER.info(e.getMessage());
         }
-        if (objOptions.CheckServerFeatures().isTrue()) {
+        if (objOptions.checkServerFeatures().isTrue()) {
             sendCommand("FEAT");
             if (objFTPReply.getCode() == FTPReply.SYSTEM_STATUS) {
                 String[] lines = objFTPReply.getMessages();
@@ -510,7 +509,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     }
 
     @Override
-    public final String DoPWD() {
+    public final String doPWD() {
         final String conMethodName = CLASS_NAME + "::DoPWD";
         String lstrCurrentPath = "";
         try {
@@ -519,13 +518,13 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         } catch (JobSchedulerException e) {
             throw e;
         } catch (Exception e) {
-            RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
+            raiseException(e, getHostID(SOSVfs_E_0105.params(conMethodName)));
         }
         return lstrCurrentPath;
     }
 
     @Override
-    public void ExecuteCommand(final String strCmd) throws Exception {
+    public void executeCommand(final String strCmd) throws Exception {
         String command = strCmd.endsWith("\n") ? strCmd : strCmd + "\n";
         sendCommand(command);
         LOGGER.info(SOSVfs_D_151.params(strCmd, getReplyString()));
@@ -562,7 +561,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         try {
             objO = Client().appendFileStream(strFileName);
         } catch (IOException e) {
-            RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
+            raiseException(e, getHostID(SOSVfs_E_0105.params(conMethodName)));
         }
         return objO;
     }
@@ -578,10 +577,10 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         try {
             Client().pwd();
             lstrCurrentPath = getReplyString();
-            LOGGER.debug(HostID(SOSVfs_E_0106.params(conMethodName, "", lstrCurrentPath)));
+            LOGGER.debug(getHostID(SOSVfs_E_0106.params(conMethodName, "", lstrCurrentPath)));
             lstrCurrentPath = lstrCurrentPath.replaceFirst("^[^\"]*\"([^\"]*)\".*", "$1");
         } catch (IOException e) {
-            RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
+            raiseException(e, getHostID(SOSVfs_E_0105.params(conMethodName)));
         }
         return lstrCurrentPath;
     }
@@ -645,7 +644,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         } catch (JobSchedulerException e) {
             throw e;
         } catch (IOException e) {
-            RaiseException(e, SOSVfs_E_130.params("getFile"));
+            raiseException(e, SOSVfs_E_130.params("getFile"));
         } finally {
             closeInput(in);
             closeObject(out);
@@ -708,13 +707,13 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         try {
             ftpFileList = Client().listFiles(pathName);
         } catch (IOException e) {
-            RaiseException(e, HostID(SOSVfs_E_0105.params("getFilenames")));
+            raiseException(e, getHostID(SOSVfs_E_0105.params("getFilenames")));
         }
         if (ftpFileList == null || ftpFileList.length <= 0) {
             if (isNegativeCommandCompletion()) {
-                String message = HostID(SOSVfs_E_0105.params("getFilenames")) + ":" + getReplyString();
+                String message = getHostID(SOSVfs_E_0105.params("getFilenames")) + ":" + getReplyString();
                 if (checkReplyCode) {
-                    RaiseException(message);
+                    raiseException(message);
                 } else {
                     LOGGER.warn(message);
                 }
@@ -763,7 +762,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         try {
             lngFileSize = size(strFileName);
         } catch (Exception e) {
-            RaiseException(SOSVfs_E_153.params(conMethodName, e));
+            raiseException(SOSVfs_E_153.params(conMethodName, e));
         }
         return lngFileSize;
     }
@@ -795,7 +794,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
                 objFTPFile = ftpFiles[0];
             }
         } catch (Exception e) {
-            RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
+            raiseException(e, getHostID(SOSVfs_E_0105.params(conMethodName)));
         }
         return objFTPFile;
     }
@@ -823,9 +822,9 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         } catch (JobSchedulerException e) {
             throw e;
         } catch (IOException e) {
-            RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
+            raiseException(e, getHostID(SOSVfs_E_0105.params(conMethodName)));
         } finally {
-            LogReply();
+            logReply();
         }
         return objI;
     }
@@ -837,14 +836,14 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         try {
             strT = Client().getModificationTime(strFileName);
         } catch (Exception e) {
-            RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
+            raiseException(e, getHostID(SOSVfs_E_0105.params(conMethodName)));
         }
         return strT;
     }
 
     public SOSFileListEntry getNewVirtualFile(final String pstrFileName) {
         SOSFileListEntry objF = new SOSFileListEntry(pstrFileName);
-        objF.VfsHandler(this);
+        objF.setVfsHandler(this);
         return objF;
     }
 
@@ -858,9 +857,9 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         OutputStream objO = null;
         try {
             objO = Client().storeFileStream(strFileName);
-            LogReply();
+            logReply();
         } catch (IOException e) {
-            throw new JobSchedulerException(HostID(SOSVfs_E_0105.params("getOutputStream", e.getMessage())), e);
+            throw new JobSchedulerException(getHostID(SOSVfs_E_0105.params("getOutputStream", e.getMessage())), e);
         }
         return objO;
     }
@@ -894,7 +893,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         return null;
     }
 
-    protected final String HostID(final String pstrText) {
+    protected final String getHostID(final String pstrText) {
         return "(" + gstrUser + "@" + host + ":" + port + ") " + pstrText;
     }
 
@@ -922,9 +921,9 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
             if (strCurrentPath.replaceFirst("/$", "").equals(pstrPathName.replaceFirst("/$", ""))) {
                 flgResult = true;
             } else {
-                DoCD(pstrPathName);
+                doCD(pstrPathName);
                 if (isPositiveCommandCompletion()) {
-                    DoCD(strCurrentPath);
+                    doCD(strCurrentPath);
                     flgResult = true;
                 }
             }
@@ -971,11 +970,11 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         try {
             LOGGER.debug(SOSVfs_D_132.params(strUserName));
             Client().login(strUserName, strPassword);
-            LogReply();
+            logReply();
             if (objFTPReply.isSuccessCode()) {
                 LOGGER.debug(SOSVfs_D_132.params(strUserName));
-                objProtocolCommandListener.setClientId(HostID(""));
-                LOGGER.info(HostID(SOSVfs_D_133.params(strUserName)));
+                objProtocolCommandListener.setClientId(getHostID(""));
+                LOGGER.info(getHostID(SOSVfs_D_133.params(strUserName)));
                 try {
                     doPostLoginOperations();
                 } catch (Exception e) {
@@ -999,7 +998,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
                 this.Client().logout();
                 String strHost = host;
                 if (objHost != null) {
-                    strHost = objHost.Value();
+                    strHost = objHost.getValue();
                 }
                 LOGGER.debug(SOSVfs_D_138.params(strHost, getReplyString()));
             } else {
@@ -1010,9 +1009,9 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         }
     }
 
-    protected boolean LogReply() {
+    protected boolean logReply() {
         strReply = getReplyString();
-        if (objConnection2Options.ProtocolCommandListener.isFalse()) {
+        if (objConnection2Options.protocolCommandListener.isFalse()) {
             LOGGER.trace(strReply);
         }
         return true;
@@ -1020,7 +1019,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
 
     @Override
     public ISOSVirtualFolder mkdir(final SOSFolderName pobjFolderName) {
-        this.mkdir(pobjFolderName.Value());
+        this.mkdir(pobjFolderName.getValue());
         return null;
     }
 
@@ -1029,7 +1028,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         final String conMethodName = CLASS_NAME + "::mkdir";
         try {
             SOSOptionFolderName objF = new SOSOptionFolderName(pstrPathName);
-            LOGGER.debug(HostID(SOSVfs_D_179.params("mkdir", pstrPathName)));
+            LOGGER.debug(getHostID(SOSVfs_D_179.params("mkdir", pstrPathName)));
             String[] subfolders = objF.getSubFolderArrayReverse();
             int idx = subfolders.length;
             for (String strSubFolder : objF.getSubFolderArrayReverse()) {
@@ -1042,10 +1041,10 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
             subfolders = objF.getSubFolderArray();
             for (int i = idx; i < subfolders.length; i++) {
                 Client().makeDirectory(subfolders[i]);
-                LOGGER.debug(HostID(SOSVfs_E_0106.params(conMethodName, subfolders[i], getReplyString())));
+                LOGGER.debug(getHostID(SOSVfs_E_0106.params(conMethodName, subfolders[i], getReplyString())));
             }
         } catch (IOException e) {
-            RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
+            raiseException(e, getHostID(SOSVfs_E_0105.params(conMethodName)));
         }
     }
 
@@ -1084,7 +1083,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     }
 
     @Override
-    public final ISOSSession OpenSession(final ISOSShellOptions pobjShellOptions) throws Exception {
+    public final ISOSSession openSession(final ISOSShellOptions pobjShellOptions) throws Exception {
         notImplemented();
         return null;
     }
@@ -1095,14 +1094,14 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         try {
             int i = Client().pasv();
             if (isPositiveCommandCompletion() == false) {
-                throw new JobSchedulerException(HostID(SOSVfs_E_0106.params("pasv", "", getReplyString())));
+                throw new JobSchedulerException(getHostID(SOSVfs_E_0106.params("pasv", "", getReplyString())));
             } else {
-                LOGGER.info(HostID(SOSVfs_E_0106.params("pasv", "", getReplyString())));
+                LOGGER.info(getHostID(SOSVfs_E_0106.params("pasv", "", getReplyString())));
                 Client().enterLocalPassiveMode();
             }
             return i;
         } catch (IOException e) {
-            RaiseException(e, HostID(SOSVfs_E_0105.params(conMethodName)));
+            raiseException(e, getHostID(SOSVfs_E_0105.params(conMethodName)));
         }
         return 0;
     }
@@ -1115,12 +1114,12 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
             in = new FileInputStream(localFile);
             rc = Client().storeFile(remoteFile, in);
             if (!rc) {
-                RaiseException(SOSVfs_E_142.params("put"));
+                raiseException(SOSVfs_E_142.params("put"));
             }
         } catch (JobSchedulerException e) {
             throw e;
         } catch (Exception e) {
-            RaiseException(e, SOSVfs_E_130.params("put"));
+            raiseException(e, SOSVfs_E_130.params("put"));
         } finally {
             closeInput(in);
         }
@@ -1154,7 +1153,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     @Override
     public long putFile(final String localFile, final OutputStream out) {
         if (out == null) {
-            RaiseException(SOSVfs_E_147.get());
+            raiseException(SOSVfs_E_147.get());
         }
         FileInputStream in = null;
         long lngTotalBytesWritten = 0;
@@ -1173,16 +1172,16 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
             if (!Client().completePendingCommand()) {
                 logout();
                 disconnect();
-                RaiseException(SOSVfs_E_134.params("File transfer") + SOSVfs_E_148.get());
+                raiseException(SOSVfs_E_134.params("File transfer") + SOSVfs_E_148.get());
             }
             if (isNegativeCommandCompletion()) {
-                RaiseException(SOSVfs_E_144.params("getFile()", localFile, getReplyString()));
+                raiseException(SOSVfs_E_144.params("getFile()", localFile, getReplyString()));
             }
             return lngTotalBytesWritten;
         } catch (JobSchedulerException e) {
             throw e;
         } catch (Exception e) {
-            RaiseException(e, SOSVfs_E_130.params("putfile"));
+            raiseException(e, SOSVfs_E_130.params("putfile"));
         } finally {
             closeInput(in);
             closeObject(out);
@@ -1194,19 +1193,19 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     public long putFile(final String localFile, final String remoteFile) throws Exception {
         OutputStream outputStream = Client().storeFileStream(remoteFile);
         if (isNegativeCommandCompletion()) {
-            RaiseException(SOSVfs_E_144.params("storeFileStream()", remoteFile, getReplyString()));
+            raiseException(SOSVfs_E_144.params("storeFileStream()", remoteFile, getReplyString()));
         }
         long i = putFile(localFile, outputStream);
         LOGGER.debug(SOSVfs_D_146.params(localFile, remoteFile));
         return i;
     }
 
-    protected void RaiseException(final Exception e, final String pstrM) {
-        LOGGER.error(pstrM + " (" + e.getLocalizedMessage() + ")");
+    protected void raiseException(final Exception e, final String pstrM) {
+        LOGGER.error(pstrM + " (" + e.getMessage() + ")");
         throw new JobSchedulerException(pstrM, e);
     }
 
-    protected void RaiseException(final String pstrM) {
+    protected void raiseException(final String pstrM) {
         LOGGER.error(pstrM);
         throw new JobSchedulerException(pstrM);
     }
@@ -1231,18 +1230,18 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         try {
             this.Client().rename(from, to);
             if (isNegativeCommandCompletion()) {
-                RaiseException(SOSVfs_E_144.params("rename()", from, getReplyString()));
+                raiseException(SOSVfs_E_144.params("rename()", from, getReplyString()));
             } else {
                 LOGGER.info(String.format(SOSVfs_I_150.params(from, to)));
             }
         } catch (IOException e) {
-            RaiseException(e, SOSVfs_E_134.params("rename()"));
+            raiseException(e, SOSVfs_E_134.params("rename()"));
         }
     }
 
     @Override
     public boolean rmdir(final SOSFolderName pobjFolderName) throws IOException {
-        this.rmdir(pobjFolderName.Value());
+        this.rmdir(pobjFolderName.getValue());
         return true;
     }
 
@@ -1254,10 +1253,10 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
             for (String subfolder : objF.getSubFolderArrayReverse()) {
                 String strT = subfolder + "/";
                 Client().removeDirectory(strT);
-                LOGGER.debug(HostID(SOSVfs_E_0106.params(conMethodName, strT, getReplyString())));
+                LOGGER.debug(getHostID(SOSVfs_E_0106.params(conMethodName, strT, getReplyString())));
             }
         } catch (Exception e) {
-            String strM = HostID(SOSVfs_E_0105.params(conMethodName));
+            String strM = getHostID(SOSVfs_E_0105.params(conMethodName));
             throw new JobSchedulerException(strM, e);
         }
     }
@@ -1268,7 +1267,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         } catch (IOException e) {
             throw new JobSchedulerException("command failed: " + pstrCommand, e);
         }
-        LogReply();
+        logReply();
     }
 
     @Override
@@ -1292,7 +1291,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
             this.binary();
         }
         Client().sendCommand("SIZE " + remoteFile);
-        LogReply();
+        logReply();
         if (Client().getReplyCode() == FTPReply.FILE_STATUS) {
             lngFileSize = Long.parseLong(trimResponseCode(this.getReplyString()));
         }
@@ -1303,7 +1302,7 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     }
 
     @Override
-    public final ISOSVirtualFile TransferMode(final SOSOptionTransferMode pobjFileTransferMode) {
+    public final ISOSVirtualFile transferMode(final SOSOptionTransferMode pobjFileTransferMode) {
         objTransferMode = pobjFileTransferMode;
         String strMode = pobjFileTransferMode.getDescription();
         if (pobjFileTransferMode.isAscii()) {
@@ -1390,7 +1389,8 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
         return new Proxy(Proxy.Type.HTTP, new InetSocketAddress(getProxyHost(), getProxyPort()));
     }
 
-    public KeyStore loadKeyStore(String storeType, File storePath, String storePass) throws KeyStoreException, IOException, GeneralSecurityException {
+    public KeyStore loadKeyStore(String storeType, File storePath, String storePass) throws KeyStoreException, IOException,
+            GeneralSecurityException {
         KeyStore ks = KeyStore.getInstance(storeType);
         FileInputStream stream = null;
         try {
@@ -1406,13 +1406,13 @@ public class SOSVfsFtpBaseClass extends SOSVfsBaseClass implements ISOSVfsFileTr
     public void reconnect(SOSConnection2OptionsAlternate options) {
         if (!isConnected()) {
             try {
-                Connect(options);
-                Authenticate(options);
-                if (options.passive_mode.value()) {
+                connect(options);
+                authenticate(options);
+                if (options.passiveMode.value()) {
                     passive();
                 }
-                if (options.transfer_mode.isDirty() && options.transfer_mode.IsNotEmpty()) {
-                    TransferMode(options.transfer_mode);
+                if (options.transferMode.isDirty() && options.transferMode.isNotEmpty()) {
+                    transferMode(options.transferMode);
                 }
             } catch (JobSchedulerException e) {
                 throw e;

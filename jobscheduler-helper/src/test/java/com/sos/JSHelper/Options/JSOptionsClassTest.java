@@ -1,17 +1,17 @@
 package com.sos.JSHelper.Options;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.junit.Assert;
 import org.junit.Test;
 
 /** @author KB */
 public class JSOptionsClassTest {
-
+    
     private static final Logger LOGGER = Logger.getLogger(JSOptionsClassTest.class);
 
     @Test
@@ -24,7 +24,7 @@ public class JSOptionsClassTest {
     @Test
     public void testGetValuePairs() throws Exception {
         JSOptionsClass objOC = new JSOptionsClass();
-        objOC.Locale.Value("DE");
+        objOC.locale.setValue("DE");
         LOGGER.info(objOC.getOptionsAsKeyValuePairs());
     }
 
@@ -57,22 +57,20 @@ public class JSOptionsClassTest {
         String strCmd = "SITE chmod 777 $SourceFileName";
         objHsh.put("source_pre_command", strCmd);
         objHsh.put("target_pre_command", strCmd);
-        objOC.CurrentNodeName("test");
+        objOC.setCurrentNodeName("test");
         objOC.setAllOptions(objHsh);
-        HashMap<String, String> objS4SN = objOC.Settings4StepName();
-        String strS = objS4SN.get("source/source_user");
-        String strS2 = objS4SN.get("target_user");
-        LOGGER.info(strS + " / " + strS2);
+        HashMap<String, String> objS4SN = objOC.getSettings4StepName();
+        LOGGER.info(objS4SN.get("source/source_user") + " / " + objS4SN.get("target_user"));
     }
 
     @Test
     public final void testStoreOptionValues() {
         JSOptionsClass objOC = new JSOptionsClass();
-        objOC.Locale.Value("en_EN");
+        objOC.locale.setValue("en_EN");
         objOC.storeOptionValues();
         objOC = new JSOptionsClass();
         objOC.initializeOptionValues();
-        Assert.assertEquals("locale is wrong", "en_EN", objOC.Locale.Value());
+        assertEquals("locale is wrong", "en_EN", objOC.locale.getValue());
     }
 
 }

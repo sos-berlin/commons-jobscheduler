@@ -19,24 +19,24 @@ public class JSDataElementDate extends JSDataElement {
     }
 
     public JSDataElementDate(final String pstrDate, final String pstrTime) {
-        super.Value(pstrDate + pstrTime);
+        super.setValue(pstrDate + pstrTime);
     }
 
     public JSDataElementDate(final JSDataElement pelemDate, final JSDataElement pelemTime) {
-        final String strD = pelemDate.Value();
-        String strT = pelemTime.Value();
+        final String strD = pelemDate.getValue();
+        String strT = pelemTime.getValue();
         if (strT.trim().isEmpty()) {
             strT = "000000";
         }
-        super.Value(strD + strT);
+        super.setValue(strD + strT);
     }
 
     public JSDataElementDate(final String pstrDate) {
-        super.Value(pstrDate);
+        super.setValue(pstrDate);
     }
 
     public JSDataElementDate(final String pstrDate, final JSDateFormat pobjFormat) {
-        super.Value(pstrDate);
+        super.setValue(pstrDate);
         objFormat = pobjFormat;
     }
 
@@ -47,7 +47,7 @@ public class JSDataElementDate extends JSDataElement {
 
     public JSDataElementDate(final Date pdatDate) {
         JSDateFormat objFormat = JSDateFormat.dfTIMESTAMPS24;
-        this.Value(objFormat.format(pdatDate));
+        this.setValue(objFormat.format(pdatDate));
     }
 
     public JSDataElementDate(final String pPstrValue, final String pPstrDescription, final int pPintSize, final int pPintPos,
@@ -56,18 +56,18 @@ public class JSDataElementDate extends JSDataElement {
     }
 
     @Override
-    public void Value(String pstrValue) {
+    public void setValue(String pstrValue) {
         if (pstrValue == null || "00000000".equals(pstrValue)) {
             pstrValue = "";
         }
-        super.Value(pstrValue);
+        super.setValue(pstrValue);
     }
 
     public void Value(final Date pdatValue) {
         if (objFormat == null) {
             objFormat = JSDateFormat.dfDATE_N8;
         }
-        super.Value(objFormat.format(pdatValue));
+        super.setValue(objFormat.format(pdatValue));
     }
 
     public Date getDateObject() {
@@ -75,7 +75,7 @@ public class JSDataElementDate extends JSDataElement {
             if (objFormat == null) {
                 objFormat = JSDateFormat.dfDATE_N8;
             }
-            Date objD = objFormat.parse(this.Value());
+            Date objD = objFormat.parse(this.getValue());
             return objD;
         } catch (final ParseException e) {
             message(e.getMessage());
@@ -93,16 +93,16 @@ public class JSDataElementDate extends JSDataElement {
     }
 
     public void setFormatPattern(final JSDateFormat pobjFormat) {
-        super.FormatString(pobjFormat.toPattern());
+        super.setFormatString(pobjFormat.toPattern());
     }
 
     @Override
     public void doInit() {
-        super.FormatString(JSDateFormat.dfDATE_N8.toPattern());
-        super.Description("Date");
-        super.ColumnHeader("Date");
-        super.XMLTagName("Date");
-        final String strFormat = super.FormatString();
+        super.setFormatString(JSDateFormat.dfDATE_N8.toPattern());
+        super.description("Date");
+        super.columnHeader("Date");
+        super.xmlTagName("Date");
+        final String strFormat = super.getFormatString();
         if (isNotEmpty(strFormat)) {
             final JSDateFormat df = new JSDateFormat(strFormat);
             super.setFormatPattern(df.toPattern());
@@ -110,16 +110,16 @@ public class JSDataElementDate extends JSDataElement {
     }
 
     @Override
-    public String FormattedValue() {
-        String strFormat = super.FormatString();
+    public String getFormattedValue() {
+        String strFormat = super.getFormatString();
         if (strFormat.isEmpty()) {
             strFormat = JSDateFormat.dfDATE_N8.toPattern();
         }
-        if (isNotEmpty(strFormat) && HasAValue()) {
+        if (isNotEmpty(strFormat) && hasAValue()) {
             final JSDateFormat df = new JSDateFormat(strFormat);
             return df.format(getDateObject());
         } else {
-            return this.Value();
+            return this.getValue();
         }
     }
 
@@ -127,31 +127,31 @@ public class JSDataElementDate extends JSDataElement {
     public void checkFormatPattern() throws FormatPatternException {
         if (objFormat != null) {
             try {
-                objFormat.parse(this.Value());
+                objFormat.parse(this.getValue());
             } catch (final ParseException e) {
-                throw new FormatPatternException("the value '" + this.Value() + "' does not correspond with the pattern " + objFormat.toPattern());
+                throw new FormatPatternException("the value '" + this.getValue() + "' does not correspond with the pattern " + objFormat.toPattern());
             }
         }
     }
 
-    public boolean HasAValue() {
+    public boolean hasAValue() {
         return !this.isEmpty();
     }
 
     public boolean isEmpty() {
-        return super.Value().trim().isEmpty() || "00000000".equals(super.Value().trim());
+        return super.getValue().trim().isEmpty() || "00000000".equals(super.getValue().trim());
     }
 
     @Override
-    public String SQLValue() {
-        this.FormatString(JSDateFormat.dfTIMESTAMPS.toPattern());
-        String strV = FormattedValue();
+    public String getSQLValue() {
+        this.setFormatString(JSDateFormat.dfTIMESTAMPS.toPattern());
+        String strV = getFormattedValue();
         strV = strV.substring(0, 14);
         final String strMask = "YYYYMMDDHH24MISS";
         return "to_date(" + strV + ", '" + strMask + "')";
     }
 
-    public Date Now() {
+    public Date now() {
         final java.util.Calendar now = java.util.Calendar.getInstance();
         return now.getTime();
     }
@@ -207,4 +207,5 @@ public class JSDataElementDate extends JSDataElement {
     public int getLastThursday(int month, int year) {
         return getLastFridayInAMonth(month, year) - 1;
     }
+
 }

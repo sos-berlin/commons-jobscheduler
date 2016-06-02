@@ -24,7 +24,7 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
             }
             return is.read(buffer);
         } catch (Exception e) {
-            RaiseException(e, SOSVfs_E_173.params("read", fileName));
+            raiseException(e, SOSVfs_E_173.params("read", fileName));
             return 0;
         }
     }
@@ -33,7 +33,7 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
     public InputStream getFileInputStream() {
         try {
             if (objInputStream == null) {
-                fileName = AdjustRelativePathName(fileName);
+                fileName = adjustRelativePathName(fileName);
                 int transferMode = ChannelSftp.OVERWRITE;
                 if (flgModeAppend) {
                     transferMode = ChannelSftp.APPEND;
@@ -47,7 +47,7 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
                 }
             }
         } catch (Exception e) {
-            RaiseException(e, SOSVfs_E_158.params("getFileInputStream()", fileName));
+            raiseException(e, SOSVfs_E_158.params("getFileInputStream()", fileName));
         }
         return objInputStream;
     }
@@ -61,7 +61,7 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
             }
             return is.read(buffer, offset, length);
         } catch (Exception e) {
-            RaiseException(e, SOSVfs_E_173.params("read", fileName));
+            raiseException(e, SOSVfs_E_173.params("read", fileName));
             return 0;
         }
     }
@@ -75,7 +75,7 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
             }
             os.write(buffer, offset, length);
         } catch (Exception e) {
-            RaiseException(e, SOSVfs_E_173.params("write", fileName));
+            raiseException(e, SOSVfs_E_173.params("write", fileName));
         }
     }
 
@@ -84,7 +84,7 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
         try {
             this.getFileOutputStream().write(buffer);
         } catch (IOException e) {
-            RaiseException(e, SOSVfs_E_134.params("write()"));
+            raiseException(e, SOSVfs_E_134.params("write()"));
         }
     }
 
@@ -92,7 +92,7 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
     public OutputStream getFileOutputStream() {
         try {
             if (objOutputStream == null) {
-                fileName = super.AdjustRelativePathName(fileName);
+                fileName = super.adjustRelativePathName(fileName);
                 int transferMode = ChannelSftp.OVERWRITE;
                 if (flgModeAppend) {
                     transferMode = ChannelSftp.APPEND;
@@ -106,15 +106,14 @@ public class SOSVfsSFtpFileJCraft extends SOSVfsTransferFileBaseClass {
                 }
             }
         } catch (Exception e) {
-            RaiseException(e, SOSVfs_E_158.params("getFileOutputStream()", fileName));
+            raiseException(e, SOSVfs_E_158.params("getFileOutputStream()", fileName));
         }
         return objOutputStream;
     }
 
     @Override
     public long getModificationDateTime() {
-        long mt = 0;
-        return mt;
+        return 0;
     }
 
     @Override

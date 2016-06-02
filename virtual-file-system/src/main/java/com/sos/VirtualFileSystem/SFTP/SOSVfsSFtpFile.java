@@ -30,7 +30,7 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
         final String conMethodName = CLASSNAME + "::SOSVfsSFtpFile";
         String strF = pstrFileName;
         if (objVFSHandler != null) {
-            String strCurrDir = objVFSHandler.DoPWD();
+            String strCurrDir = objVFSHandler.doPWD();
             LOGGER.debug(SOSVfs_D_171.params(conMethodName, strCurrDir));
             if (strF.startsWith("./") == true) {
                 strF = strF.replace("./", strCurrDir + "/");
@@ -40,7 +40,7 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
     }
 
     @Override
-    public boolean FileExists() {
+    public boolean fileExists() {
         final String conMethodName = CLASSNAME + "::FileExists";
         boolean flgResult = false;
         LOGGER.debug(SOSVfs_D_172.params(conMethodName, strFileName));
@@ -108,7 +108,7 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
                 }
             }
         } catch (Exception e) {
-            LOGGER.error(e.getLocalizedMessage());
+            LOGGER.error(e.getMessage());
             throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);
         }
         return objOutputStream;
@@ -117,7 +117,7 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
     private String AdjustRelativePathName(final String pstrPathName) {
         String strT = pstrPathName;
         if (pstrPathName.startsWith("./") || pstrPathName.startsWith(".\\")) {
-            String strPath = objVFSHandler.DoPWD() + "/";
+            String strPath = objVFSHandler.doPWD() + "/";
             strT = new File(pstrPathName).getName();
             strT = strPath + strT;
             LOGGER.debug(SOSVfs_D_159.params(pstrPathName, strT));
@@ -171,7 +171,7 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
         final String conMethodName = CLASSNAME + "::notExists";
         boolean flgResult = false;
         try {
-            flgResult = !this.FileExists();
+            flgResult = !this.fileExists();
         } catch (Exception e) {
             throw new JobSchedulerException(SOSVfs_E_134.params(conMethodName), e);
         }
@@ -315,7 +315,7 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
                 SFTPv3FileAttributes objFA = objFileHandle.getClient().fstat(objFileHandle);
                 lngR = objFA.mtime;
             } catch (IOException e) {
-                LOGGER.error(e.getLocalizedMessage());
+                LOGGER.error(e.getMessage());
             }
         }
         return lngR;
@@ -330,7 +330,7 @@ public class SOSVfsSFtpFile extends SOSVfsCommonFile {
                 objFA.mtime = new Integer((int) pdteDateTime);
                 lngR = pdteDateTime;
             } catch (IOException e) {
-                LOGGER.error(e.getLocalizedMessage());
+                LOGGER.error(e.getMessage());
             }
         }
         return lngR;

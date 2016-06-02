@@ -14,7 +14,7 @@ import com.google.common.io.Resources;
 
 public class ResourceListTest {
 
-    private final static String testResource = "com/sos/testframework/h2/Table1.sql";
+    private static final String TEST_RESOURCE = "com/sos/testframework/h2/Table1.sql";
 
     @Test
     public void testFile() throws IOException {
@@ -22,7 +22,6 @@ public class ResourceListTest {
         Files.append("this is a test.", f, Charset.defaultCharset());
         ResourceList r = new ResourceList();
         r.add("com.sos.mypackage.TestFile.txt", f);
-        String dir = normalize(r.getWorkingDirectory());
         File result = r.getFilelist().get(0);
         assertEquals(normalize(f), normalize(result));
         assertEquals("this is a test.", Files.toString(result, Charset.defaultCharset()));
@@ -42,7 +41,7 @@ public class ResourceListTest {
 
     @Test
     public void testURL() {
-        URL url = Resources.getResource(testResource);
+        URL url = Resources.getResource(TEST_RESOURCE);
         ResourceList r = new ResourceList();
         r.add("com.sos.testframework.h2.Table1DBItem", url);
         String dir = normalize(r.getWorkingDirectory());
@@ -54,4 +53,5 @@ public class ResourceListTest {
     private String normalize(File file) {
         return file.getAbsolutePath().replaceAll("\\\\", "/");
     }
+
 }

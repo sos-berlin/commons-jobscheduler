@@ -33,7 +33,7 @@ public class SOSSearchAndReplaceFilter extends SOSNullFilter {
         final String conMethodName = conClassName + "::doProcess";
         String strT = byte2String(bteBuffer);
 
-        strT = strT.replaceAll(objOptions.replaceWhat.Value(), objOptions.replaceWith.Value());
+        strT = strT.replaceAll(objOptions.replaceWhat.getValue(), objOptions.replaceWith.getValue());
 
         bteBuffer = strT.getBytes();
         logger.debug(byte2String(bteBuffer));

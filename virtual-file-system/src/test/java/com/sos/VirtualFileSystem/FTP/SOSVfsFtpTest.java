@@ -40,12 +40,12 @@ public class SOSVfsFtpTest {
     @Before
     public void setUp() throws Exception {
         objOptions = new SOSFTPOptions();
-        objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
+        objVFS = VFSFactory.getHandler(objOptions.protocol.getValue());
         ftpClient = (ISOSVfsFileTransfer) objVFS;
     }
 
     @Test
-    public void testisIncludeDirective() {
+    public void testIsIncludeDirective() {
         boolean flgR = objOptions.isIncludeDirective("include");
         Assert.assertTrue("include", flgR);
         flgR = objOptions.isIncludeDirective("source_include");
@@ -53,7 +53,7 @@ public class SOSVfsFtpTest {
     }
 
     @Test
-    public void testgetIncludePrefix() {
+    public void testGetIncludePrefix() {
         String strR = objOptions.getIncludePrefix("include");
         Assert.assertEquals("include", "", strR);
         strR = objOptions.getIncludePrefix("source_include");
@@ -65,7 +65,7 @@ public class SOSVfsFtpTest {
         HashMap<String, String> objHsh = new HashMap<String, String>();
         objHsh.put("operation", "rename");
         objOptions = new SOSFTPOptions(objHsh);
-        assertEquals("", "rename", objOptions.operation.Value());
+        assertEquals("", "rename", objOptions.operation.getValue());
     }
 
     @Test
@@ -75,20 +75,20 @@ public class SOSVfsFtpTest {
         objHsh.put("target_host", "tux.sos");
         objOptions = new SOSFTPOptions();
         objOptions.setAllOptions(objHsh);
-        assertEquals("", "wilma.sos", objOptions.getConnectionOptions().Source().host.Value());
-        assertEquals("", "tux.sos", objOptions.getConnectionOptions().Target().host.Value());
+        assertEquals("", "wilma.sos", objOptions.getConnectionOptions().getSource().host.getValue());
+        assertEquals("", "tux.sos", objOptions.getConnectionOptions().getTarget().host.getValue());
     }
 
     @Test
     @Ignore("Test set to Ignore for later examination")
     public void testIniFile1() throws Exception {
         LOGGER.info("*********************************************** SOSVfsFtpTest::CreateIniFile******************");
-        CreateIniFile();
-        objOptions.settings.Value(constrSettingsTestFile);
-        objOptions.profile.Value("globals");
-        objOptions.ReadSettingsFile();
-        Assert.assertEquals("User ID", "kb", objOptions.user.Value());
-        Assert.assertEquals("password", "kb", objOptions.password.Value());
+        createIniFile();
+        objOptions.settings.setValue(constrSettingsTestFile);
+        objOptions.profile.setValue("globals");
+        objOptions.readSettingsFile();
+        Assert.assertEquals("User ID", "kb", objOptions.user.getValue());
+        Assert.assertEquals("password", "kb", objOptions.password.getValue());
     }
 
     @Test
@@ -96,159 +96,159 @@ public class SOSVfsFtpTest {
     public void testIniFileUsingCmdLine() throws Exception {
         LOGGER.info("*********************************************** SOSVfsFtpTest::CreateIniFile******************");
         String[] strCmdLineParameters = new String[] { "-settings=" + constrSettingsTestFile, "-profile=globals" };
-        CreateIniFile();
-        objOptions.CommandLineArgs(strCmdLineParameters);
-        Assert.assertEquals("User ID", "kb", objOptions.user.Value());
-        Assert.assertEquals("password", "kb", objOptions.password.Value());
+        createIniFile();
+        objOptions.commandLineArgs(strCmdLineParameters);
+        Assert.assertEquals("User ID", "kb", objOptions.user.getValue());
+        Assert.assertEquals("password", "kb", objOptions.password.getValue());
     }
 
     @Test(expected = com.sos.JSHelper.Exceptions.JobSchedulerException.class)
     @Ignore("Test set to Ignore for later examination")
     public void testIniFile2() throws Exception {
         LOGGER.info("*********************************************** SOSVfsFtpTest::testIniFile2******************");
-        CreateIniFile();
-        objOptions.settings.Value(constrSettingsTestFile);
-        objOptions.profile.Value("include-TestTest");
-        objOptions.ReadSettingsFile();
-        Assert.assertEquals("User ID", "kb", objOptions.user.Value());
-        Assert.assertEquals("password", "kb", objOptions.password.Value());
+        createIniFile();
+        objOptions.settings.setValue(constrSettingsTestFile);
+        objOptions.profile.setValue("include-TestTest");
+        objOptions.readSettingsFile();
+        Assert.assertEquals("User ID", "kb", objOptions.user.getValue());
+        Assert.assertEquals("password", "kb", objOptions.password.getValue());
     }
 
     @Test
     @Ignore("Test set to Ignore for later examination")
     public void testIniFile3() throws Exception {
         LOGGER.info("*********************************************** SOSVfsFtpTest::testIniFile3******************");
-        CreateIniFile();
-        objOptions.settings.Value(constrSettingsTestFile);
-        objOptions.profile.Value("include-Test");
-        objOptions.ReadSettingsFile();
-        objOptions.local_dir.Value(".");
-        Assert.assertEquals("User ID", "kb", objOptions.user.Value());
-        Assert.assertEquals("password", "kb", objOptions.password.Value());
-        Assert.assertEquals("Hostname", "hostFromInclude1", objOptions.host.Value());
+        createIniFile();
+        objOptions.settings.setValue(constrSettingsTestFile);
+        objOptions.profile.setValue("include-Test");
+        objOptions.readSettingsFile();
+        objOptions.localDir.setValue(".");
+        Assert.assertEquals("User ID", "kb", objOptions.user.getValue());
+        Assert.assertEquals("password", "kb", objOptions.password.getValue());
+        Assert.assertEquals("Hostname", "hostFromInclude1", objOptions.host.getValue());
         Assert.assertEquals("port", 88, objOptions.port.value());
-        Assert.assertEquals("protocol", "scp", objOptions.protocol.Value());
-        objOptions.CheckMandatory();
+        Assert.assertEquals("protocol", "scp", objOptions.protocol.getValue());
+        objOptions.checkMandatory();
     }
 
     @Test(expected = com.sos.JSHelper.Exceptions.JobSchedulerException.class)
     @Ignore("Test set to Ignore for later examination")
     public void testIniFile4() throws Exception {
         LOGGER.info("*********************************************** SOSVfsFtpTest::testIniFile4******************");
-        CreateIniFile();
-        objOptions.settings.Value(constrSettingsTestFile);
-        objOptions.profile.Value("include-TestWithNonexistenceInclude");
-        objOptions.ReadSettingsFile();
-        Assert.assertEquals("User ID", "kb", objOptions.user.Value());
-        Assert.assertEquals("password", "kb", objOptions.password.Value());
+        createIniFile();
+        objOptions.settings.setValue(constrSettingsTestFile);
+        objOptions.profile.setValue("include-TestWithNonexistenceInclude");
+        objOptions.readSettingsFile();
+        Assert.assertEquals("User ID", "kb", objOptions.user.getValue());
+        Assert.assertEquals("password", "kb", objOptions.password.getValue());
     }
 
     @Test
     @Ignore("Test set to Ignore for later examination")
     public void testIniFile5() throws Exception {
         LOGGER.info("*********************************************** SOSVfsFtpTest::testIniFile5******************");
-        CreateIniFile();
-        objOptions.settings.Value(constrSettingsTestFile);
-        objOptions.profile.Value("substitute-Test");
-        objOptions.ReadSettingsFile();
+        createIniFile();
+        objOptions.settings.setValue(constrSettingsTestFile);
+        objOptions.profile.setValue("substitute-Test");
+        objOptions.readSettingsFile();
         String strComputerName = System.getenv("computername");
-        Assert.assertEquals("User ID", System.getenv("username"), objOptions.user.Value());
-        Assert.assertEquals("Hostname", strComputerName, objOptions.host.Value());
-        Assert.assertEquals("Hostnameon Target ", strComputerName + "-abc", objOptions.getConnectionOptions().Target().HostName.Value());
+        Assert.assertEquals("User ID", System.getenv("username"), objOptions.user.getValue());
+        Assert.assertEquals("Hostname", strComputerName, objOptions.host.getValue());
+        Assert.assertEquals("Hostnameon Target ", strComputerName + "-abc", objOptions.getConnectionOptions().getTarget().hostName.getValue());
     }
 
-    private void CreateIniFile() throws Exception {
+    private void createIniFile() throws Exception {
         JSFile objIni = new JSFile(constrSettingsTestFile);
         if (objIni.exists()) {
             return;
         }
-        objIni.WriteLine("[globals]");
-        objIni.WriteLine("user=kb");
-        objIni.WriteLine("password=kb");
-        objIni.WriteLine("[include1]");
-        objIni.WriteLine("host=hostFromInclude1");
-        objIni.WriteLine("[include2]");
-        objIni.WriteLine("port=88");
-        objIni.WriteLine("[include3]");
-        objIni.WriteLine("protocol=scp");
-        objIni.WriteLine("[include-Test]");
-        objIni.WriteLine("include=include1,include2,include3");
-        objIni.WriteLine("[include-TestWithNonexistenceInclude]");
-        objIni.WriteLine("include=include1,includeabcd2,include3");
-        objIni.WriteLine("[substitute-Test]");
-        objIni.WriteLine("user=${USERNAME}");
-        objIni.WriteLine("host=${COMPUTERNAME}");
-        objIni.WriteLine("cannotsubstitutet=${waltraut}");
-        objIni.WriteLine("target_host=${host}-abc");
-        objIni.WriteLine("alternate_target_host=${host}-abc");
+        objIni.writeLine("[globals]");
+        objIni.writeLine("user=kb");
+        objIni.writeLine("password=kb");
+        objIni.writeLine("[include1]");
+        objIni.writeLine("host=hostFromInclude1");
+        objIni.writeLine("[include2]");
+        objIni.writeLine("port=88");
+        objIni.writeLine("[include3]");
+        objIni.writeLine("protocol=scp");
+        objIni.writeLine("[include-Test]");
+        objIni.writeLine("include=include1,include2,include3");
+        objIni.writeLine("[include-TestWithNonexistenceInclude]");
+        objIni.writeLine("include=include1,includeabcd2,include3");
+        objIni.writeLine("[substitute-Test]");
+        objIni.writeLine("user=${USERNAME}");
+        objIni.writeLine("host=${COMPUTERNAME}");
+        objIni.writeLine("cannotsubstitutet=${waltraut}");
+        objIni.writeLine("target_host=${host}-abc");
+        objIni.writeLine("alternate_target_host=${host}-abc");
     }
 
     @Test(expected = java.lang.Exception.class)
     public void testConnect() throws Exception {
         System.setProperty("AddFTPProtocol", "true");
-        objOptions.host.Value("wilma.sos");
-        objOptions.user.Value("kbxsy");
-        objOptions.passive_mode.setTrue();
-        objVFS.Connect(objOptions);
+        objOptions.host.setValue("wilma.sos");
+        objOptions.user.setValue("kbxsy");
+        objOptions.passiveMode.setTrue();
+        objVFS.connect(objOptions);
     }
 
     @Test
     public void testHttpProxyConnect() throws Exception {
-        SOSConnection2OptionsAlternate options = objOptions.getConnectionOptions().Source();
-        options.host.Value("wilma.sos");
+        SOSConnection2OptionsAlternate options = objOptions.getConnectionOptions().getSource();
+        options.host.setValue("wilma.sos");
         options.port.value(SOSOptionPortNumber.getStandardFTPPort());
-        options.user.Value("kb");
-        options.password.Value("kb");
-        options.protocol.Value("ftp");
-        options.ssh_auth_method.isPassword(true);
-        options.proxy_protocol.Value(SOSOptionProxyProtocol.Protocol.http.name());
-        options.proxy_host.Value("homer.sos");
-        options.proxy_port.value(3128);
-        options.proxy_user.Value("proxy_user");
-        options.proxy_password.Value("12345");
-        objOptions.operation.Value("send");
-        objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
+        options.user.setValue("kb");
+        options.password.setValue("kb");
+        options.protocol.setValue("ftp");
+        options.sshAuthMethod.isPassword(true);
+        options.proxyProtocol.setValue(SOSOptionProxyProtocol.Protocol.http.name());
+        options.proxyHost.setValue("homer.sos");
+        options.proxyPort.value(3128);
+        options.proxyUser.setValue("proxy_user");
+        options.proxyPassword.setValue("12345");
+        objOptions.operation.setValue("send");
+        objVFS = VFSFactory.getHandler(objOptions.protocol.getValue());
         ftpClient = (ISOSVfsFileTransfer) objVFS;
-        objVFS.Connect(objOptions.getConnectionOptions().Source());
-        objVFS.Authenticate(options);
+        objVFS.connect(objOptions.getConnectionOptions().getSource());
+        objVFS.authenticate(options);
         ftpClient.disconnect();
     }
 
     @Test
     public void testSocks5ProxyConnect() throws Exception {
-        SOSConnection2OptionsAlternate options = objOptions.getConnectionOptions().Source();
-        options.host.Value("wilma.sos");
+        SOSConnection2OptionsAlternate options = objOptions.getConnectionOptions().getSource();
+        options.host.setValue("wilma.sos");
         options.port.value(SOSOptionPortNumber.getStandardFTPPort());
-        options.user.Value("kb");
-        options.password.Value("kb");
-        options.protocol.Value("ftp");
-        options.ssh_auth_method.isPassword(true);
-        options.proxy_protocol.Value(SOSOptionProxyProtocol.Protocol.socks5.name());
-        options.proxy_host.Value("homer.sos");
-        options.proxy_port.value(1080);
-        options.proxy_user.Value("sos");
-        options.proxy_password.Value("sos");
-        objOptions.operation.Value("send");
-        objVFS = VFSFactory.getHandler(objOptions.protocol.Value());
+        options.user.setValue("kb");
+        options.password.setValue("kb");
+        options.protocol.setValue("ftp");
+        options.sshAuthMethod.isPassword(true);
+        options.proxyProtocol.setValue(SOSOptionProxyProtocol.Protocol.socks5.name());
+        options.proxyHost.setValue("homer.sos");
+        options.proxyPort.value(1080);
+        options.proxyUser.setValue("sos");
+        options.proxyPassword.setValue("sos");
+        objOptions.operation.setValue("send");
+        objVFS = VFSFactory.getHandler(objOptions.protocol.getValue());
         ftpClient = (ISOSVfsFileTransfer) objVFS;
-        objVFS.Connect(objOptions.getConnectionOptions().Source());
-        objVFS.Authenticate(options);
+        objVFS.connect(objOptions.getConnectionOptions().getSource());
+        objVFS.authenticate(options);
         ftpClient.disconnect();
     }
 
     @Test(expected = com.sos.JSHelper.Exceptions.JobSchedulerException.class)
     public void testConnectFailed() throws Exception {
-        objOptions.host.Value("wilmaxxx.sos");
-        objVFS.Options(objOptions);
-        objVFS.Connect(objOptions);
+        objOptions.host.setValue("wilmaxxx.sos");
+        objVFS.getOptions(objOptions);
+        objVFS.connect(objOptions);
     }
 
     @Test(expected = com.sos.JSHelper.Exceptions.JobSchedulerException.class)
     public void testConnectAlternateFailed() throws Exception {
-        objOptions.host.Value("wilmaxxx.sos");
-        objOptions.alternative_host.Value("kwkwkwk.sos");
-        objVFS.Options(objOptions);
-        objVFS.Connect(objOptions);
+        objOptions.host.setValue("wilmaxxx.sos");
+        objOptions.alternativeHost.setValue("kwkwkwk.sos");
+        objVFS.getOptions(objOptions);
+        objVFS.connect(objOptions);
     }
 
     @Test
@@ -301,62 +301,62 @@ public class SOSVfsFtpTest {
 
     @Test
     public void testExecuteCommand() throws Exception {
-        objOptions.host.Value("8of9.sos");
-        objOptions.host.Value("wilma.sos");
-        objOptions.user.Value("kb");
-        objOptions.password.Value("kb");
-        objVFS.Connect(objOptions);
-        objVFS.Authenticate(objOptions);
-        objVFS.ExecuteCommand("SYST");
-        objVFS.ExecuteCommand("FEAT");
-        objVFS.ExecuteCommand("OPTS");
-        objVFS.ExecuteCommand("OPTS UTF8 NLST");
-        objVFS.ExecuteCommand("OPTS UTF-8 NLST");
-        objVFS.ExecuteCommand("OPTS UTF8 OFF");
-        objVFS.ExecuteCommand("OPTS UTF8 ON");
-        objVFS.ExecuteCommand("OPTS MLST Type;Size;Modify;UNIX.mode;UNIX.owner;UNIX.group;");
-        objVFS.ExecuteCommand("MLST /Büttner.dat");
-        objVFS.ExecuteCommand("OPTS UTF8 OFF");
-        objVFS.ExecuteCommand("MLST /Büttner.dat");
-        objVFS.ExecuteCommand("PORT 127,0,0,1,6,81");
-        objVFS.ExecuteCommand("LIST");
-        objVFS.ExecuteCommand("MLSD");
+        objOptions.host.setValue("8of9.sos");
+        objOptions.host.setValue("wilma.sos");
+        objOptions.user.setValue("kb");
+        objOptions.password.setValue("kb");
+        objVFS.connect(objOptions);
+        objVFS.authenticate(objOptions);
+        objVFS.executeCommand("SYST");
+        objVFS.executeCommand("FEAT");
+        objVFS.executeCommand("OPTS");
+        objVFS.executeCommand("OPTS UTF8 NLST");
+        objVFS.executeCommand("OPTS UTF-8 NLST");
+        objVFS.executeCommand("OPTS UTF8 OFF");
+        objVFS.executeCommand("OPTS UTF8 ON");
+        objVFS.executeCommand("OPTS MLST Type;Size;Modify;UNIX.mode;UNIX.owner;UNIX.group;");
+        objVFS.executeCommand("MLST /Büttner.dat");
+        objVFS.executeCommand("OPTS UTF8 OFF");
+        objVFS.executeCommand("MLST /Büttner.dat");
+        objVFS.executeCommand("PORT 127,0,0,1,6,81");
+        objVFS.executeCommand("LIST");
+        objVFS.executeCommand("MLSD");
     }
 
     @Test
     public void testAuthenticate() throws Exception {
-        objOptions.host.Value("wilma.sos");
-        objVFS.Connect(objOptions);
+        objOptions.host.setValue("wilma.sos");
+        objVFS.connect(objOptions);
         String strR = ftpClient.getReplyString();
         assertEquals("Connect message", "220 (vsFTPd 2.0.1)", strR.substring(0, strR.length() - 2));
-        objOptions.user.Value("kb");
-        objOptions.password.Value("kb");
-        objVFS.Authenticate(objOptions);
+        objOptions.user.setValue("kb");
+        objOptions.password.setValue("kb");
+        objVFS.authenticate(objOptions);
         strR = ftpClient.getReplyString();
-        objVFS.CloseSession();
+        objVFS.closeSession();
         strR = ftpClient.getReplyString();
         assertEquals("Login message", "221 Goodbye.", strR.substring(0, strR.length() - 2));
-        objVFS.CloseConnection();
+        objVFS.closeConnection();
     }
 
     private void authenticate() throws Exception {
-        objOptions.host.Value("wilma.sos");
-        objVFS.Connect(objOptions);
+        objOptions.host.setValue("wilma.sos");
+        objVFS.connect(objOptions);
         String strR = ftpClient.getReplyString();
         if (strR != null) {
             assertEquals("Connect message", "220 (vsFTPd 2.0.1)", strR.substring(0, strR.length() - 2));
         }
-        objOptions.user.Value("kb");
-        objOptions.password.Value("kb");
-        objVFS.Authenticate(objOptions);
+        objOptions.user.setValue("kb");
+        objOptions.password.setValue("kb");
+        objVFS.authenticate(objOptions);
         ftpClient.passive();
     }
 
-    private void CreateTestFile() {
+    private void createTestFile() {
         JSFile objFile = new JSFile(strTestPathName + strTestFileName);
         objFile.deleteOnExit();
         try {
-            objFile.WriteLine("Das ist eine Testdatei. Weiter nichts");
+            objFile.writeLine("Das ist eine Testdatei. Weiter nichts");
             objFile.close();
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
@@ -366,33 +366,33 @@ public class SOSVfsFtpTest {
     @Test
     @Ignore("Test set to Ignore for later examination")
     public void testPutFileString() throws Exception {
-        CreateTestFile();
-        objOptions.host.Value("wilma.sos");
-        objVFS.Connect(objOptions);
+        createTestFile();
+        objOptions.host.setValue("wilma.sos");
+        objVFS.connect(objOptions);
         String strR = ftpClient.getReplyString();
         assertEquals("Connect message", "220 (vsFTPd 2.0.1)", strR.substring(0, strR.length() - 2));
-        objOptions.user.Value("kb");
-        objOptions.password.Value("kb");
-        objVFS.Authenticate(objOptions);
+        objOptions.user.setValue("kb");
+        objOptions.password.setValue("kb");
+        objVFS.authenticate(objOptions);
         strR = ftpClient.getReplyString();
         ftpClient.putFile(strTestPathName + strTestFileName, strTestFileName);
-        objVFS.CloseSession();
+        objVFS.closeSession();
         strR = ftpClient.getReplyString();
         assertEquals("Logout message", "221 Goodbye.", strR.substring(0, strR.length() - 2));
-        objVFS.CloseConnection();
+        objVFS.closeConnection();
     }
 
     @Test
-    public void MessageTest() {
+    public void messageTest() {
         String strM = SOSVfsMessageCodes.SOSVfs_E_0010.get();
         LOGGER.debug(strM);
-        objOptions.Locale.setLocale(Locale.ENGLISH);
+        objOptions.locale.setLocale(Locale.ENGLISH);
         strM = SOSVfsMessageCodes.SOSVfs_E_0010.get();
         LOGGER.debug(strM);
-        objOptions.Locale.setLocale(Locale.GERMAN);
+        objOptions.locale.setLocale(Locale.GERMAN);
         strM = SOSVfsMessageCodes.SOSVfs_E_0010.get();
         LOGGER.debug(strM);
-        objOptions.Locale.setLocale(Locale.FRENCH);
+        objOptions.locale.setLocale(Locale.FRENCH);
         strM = SOSVfsMessageCodes.SOSVfs_E_0010.get();
         LOGGER.debug(strM);
     }

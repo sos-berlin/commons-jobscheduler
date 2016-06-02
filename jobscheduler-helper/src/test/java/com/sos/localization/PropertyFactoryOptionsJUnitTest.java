@@ -28,20 +28,20 @@ public class PropertyFactoryOptionsJUnitTest extends JSToolBox {
 
     @Test
     public void testOperation() {
-        objOptions.Operation.Value("++merge++");
-        assertEquals("", objOptions.Operation.Value(), "++merge++");
+        objOptions.Operation.setValue("++merge++");
+        assertEquals("", objOptions.Operation.getValue(), "++merge++");
     }
 
     @Test
     public void testPropertyFileNamePrefix() {
-        objOptions.PropertyFileNamePrefix.Value("++----++");
-        assertEquals("", objOptions.PropertyFileNamePrefix.Value(), "++----++");
+        objOptions.propertyFileNamePrefix.setValue("++----++");
+        assertEquals("", objOptions.propertyFileNamePrefix.getValue(), "++----++");
     }
 
     @Test
     public void testSourceFolderName() {
-        objOptions.SourceFolderName.Value("++----++");
-        assertEquals("The Folder, which has all the I18N Property files.", "++----++" + "/", objOptions.SourceFolderName.Value());
+        objOptions.sourceFolderName.setValue("++----++");
+        assertEquals("The Folder, which has all the I18N Property files.", "++----++" + "/", objOptions.sourceFolderName.getValue());
     }
 
 }

@@ -15,15 +15,15 @@ public class SOSOptionTimeHorizonTest {
     @Test
     public final void testValueString() {
         String expected = "-60";
-        timeHorizon.Value(expected);
-        assertEquals(expected, timeHorizon.Value());
-        LOGGER.info(timeHorizon.Value());
+        timeHorizon.setValue(expected);
+        assertEquals(expected, timeHorizon.getValue());
+        LOGGER.info(timeHorizon.getValue());
         LOGGER.info(timeHorizon.getEndFromNow().toString());
     }
 
     @Test
     public void testIsDirty() {
-        timeHorizon.Value("-30");
+        timeHorizon.setValue("-30");
         LOGGER.info(timeHorizon.isDirty());
     }
 

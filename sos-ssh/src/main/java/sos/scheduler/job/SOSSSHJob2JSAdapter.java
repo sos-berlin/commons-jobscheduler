@@ -8,6 +8,8 @@ import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
+
 import sos.net.ssh.SOSSSHJob2;
 import sos.net.ssh.SOSSSHJobJSch;
 import sos.net.ssh.SOSSSHJobOptions;
@@ -34,6 +36,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
     private static final String STD_OUT_OUTPUT = "std_out_output";
     private static final String EXIT_CODE = "exit_code";
     private static final String EXIT_SIGNAL = "exit_signal";
+    private static final Logger LOGGER = Logger.getLogger(SOSSSHJob2JSAdapter.class);
     private boolean useTrilead = true;
     private String pidFileName;
     private String envVarNamePrefix;
@@ -44,7 +47,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
             super.spooler_process();
             doProcessing();
         } catch (Exception e) {
-            logger.fatal(StackTrace2String(e));
+            LOGGER.fatal(stackTrace2String(e));
             throw new JobSchedulerException(e);
         }
         return signalSuccess();
@@ -69,7 +72,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
         }
         SOSSSHJobOptions objO = null;
         if ("false".equalsIgnoreCase(useJSch)) {
-            // this is the default value for v1.10 [SP]
+            // this is the default value since v1.10 [SP]
             useTrilead = true;
             objR = new SOSSSHJobTrilead();
             objO = objR.getOptions();
@@ -80,7 +83,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
             objO = objR.getOptions();
             spooler_log.debug9("uses JSch implementation of SSH");
         }
-        objO.CurrentNodeName(this.getCurrentNodeName(true));
+        objO.setCurrentNodeName(this.getCurrentNodeName(true));
         HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties();
         if (!useTrilead && !"false".equalsIgnoreCase(hsmParameters1.get("create_environment_variables"))) {
             Map<String, String> allEnvVars = new HashMap<String, String>();
@@ -88,14 +91,14 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
             allEnvVars.putAll(prefixSchedulerEnvVars(hsmParameters1));
             ((SOSSSHJobJSch) objR).setSchedulerEnvVars(allEnvVars);
         }
-        objO.setAllOptions(objO.DeletePrefix(hsmParameters1, "ssh_"));
+        objO.setAllOptions(objO.deletePrefix(hsmParameters1, "ssh_"));
         objR.setJSJobUtilites(this);
         if (!objO.commandSpecified()) {
-            setJobScript(objO.command_script);
+            setJobScript(objO.commandScript);
         }
-        objO.CheckMandatory();
+        objO.checkMandatory();
         if (!useTrilead) {
-            spooler_log.debug9("Run with watchdog set to: " + objO.runWithWatchdog.Value());
+            spooler_log.debug9("Run with watchdog set to: " + objO.runWithWatchdog.getValue());
             if (objO.runWithWatchdog.value()) {
                 pidFileName = generateTempPidFileName();
                 ((SOSSSHJobJSch) objR).setPidFileName(pidFileName);
@@ -109,8 +112,8 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
         // but here a command delimiter (known by the os) is needed to chain
         // commands together
         // TO DO: a solution which fits for both cases [SP]
-        if (!useTrilead && objO.command_delimiter.isNotDirty()) {
-            objO.command_delimiter.Value(";");
+        if (!useTrilead && objO.commandDelimiter.isNotDirty()) {
+            objO.commandDelimiter.setValue(";");
         }
         objR.execute();
         if (!useTrilead && !((SOSSSHJobJSch) objR).getReturnValues().isEmpty()) {
@@ -137,7 +140,8 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
             spooler_log.debug9("uses jobchainname from parameter");
             spooler_log.debug9("Jobchainname: " + spooler_task.params().value(PARAM_CLEANUP_JOBCHAIN));
         } else {
-            logger.error("No jobchain configured to received the order! Please configure the cleanupJobchain Parameter in your SSH Job Configuration.");
+            LOGGER.error(
+                    "No jobchain configured to received the order! Please configure the cleanupJobchain Parameter in your SSH Job Configuration.");
         }
         chain.add_or_replace_order(order);
         spooler_log.debug9("order send");
@@ -231,7 +235,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
             }
             return result;
         } catch (Exception e) {
-            throw new JobSchedulerException(JSJ_F_0060.params(StackTrace2String(e)), e);
+            throw new JobSchedulerException(JSJ_F_0060.params(stackTrace2String(e)), e);
         }
     }
 

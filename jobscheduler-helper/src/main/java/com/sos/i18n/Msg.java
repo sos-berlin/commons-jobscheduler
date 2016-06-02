@@ -218,7 +218,6 @@ public class Msg implements Serializable {
         m_bundleBaseName = basename;
         m_locale = locale;
         m_bundle = null;
-        // will be lazily set the next time we call getMsg() or getLastMessage()
         m_lastMessage = null;
         m_lastKey = null;
         m_lastVarargs = null;
@@ -275,8 +274,6 @@ public class Msg implements Serializable {
         if (!locale.equals(getLocale())) {
             m_locale = locale;
             m_bundle = null;
-            // the locale changed so the bundle we used before is no longer
-            // valid
         }
         return;
     }

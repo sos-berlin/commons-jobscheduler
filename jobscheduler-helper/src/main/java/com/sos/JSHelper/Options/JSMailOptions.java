@@ -9,7 +9,7 @@ public class JSMailOptions extends JSOptionsClass {
     @Override
     public void setAllOptions(final HashMap<String, String> pobjJSSettings) {
         objSettings = pobjJSSettings;
-        super.setAllOptions(pobjJSSettings);
-}
+        super.setSettings(objSettings);
+    }
 
 }

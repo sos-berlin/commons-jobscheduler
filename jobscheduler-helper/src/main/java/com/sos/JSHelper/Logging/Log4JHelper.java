@@ -44,7 +44,7 @@ public class Log4JHelper implements JSListener {
     private void configure(final String pstrPropFileName, final String pstrName) {
         if (pstrPropFileName == null || "./log4j.properties".equalsIgnoreCase(pstrPropFileName)) {
             JSOptionsClass objO = new JSOptionsClass();
-            String strF = objO.log4jPropertyFileName.Value();
+            String strF = objO.log4jPropertyFileName.getValue();
             if (strF != null) {
                 strPropfileName = strF;
             }
@@ -64,14 +64,14 @@ public class Log4JHelper implements JSListener {
         if (objFile != null && objFile.getParentFile() != null) {
             if (!objFile.exists() && objFile.getParentFile().canWrite()) {
                 try {
-                    objFile.WriteLine("log4j.rootCategory=info, stdout");
+                    objFile.writeLine("log4j.rootCategory=info, stdout");
                     if (!flgUseJobSchedulerLog4JAppender) {
-                        objFile.WriteLine("log4j.appender.stdout=org.apache.log4j.ConsoleAppender");
+                        objFile.writeLine("log4j.appender.stdout=org.apache.log4j.ConsoleAppender");
                     } else {
-                        objFile.WriteLine("log4j.appender.stdout=com.sos.scheduler.JobSchedulerLog4JAppender");
+                        objFile.writeLine("log4j.appender.stdout=com.sos.scheduler.JobSchedulerLog4JAppender");
                     }
-                    objFile.WriteLine("log4j.appender.stdout.layout=org.apache.log4j.PatternLayout");
-                    objFile.WriteLine("log4j.appender.stdout.layout.ConversionPattern=%5p [%t] (%F:%L) - %m%n");
+                    objFile.writeLine("log4j.appender.stdout.layout=org.apache.log4j.PatternLayout");
+                    objFile.writeLine("log4j.appender.stdout.layout.ConversionPattern=%5p [%t] (%F:%L) - %m%n");
                     objFile.close();
                     flgNew = true;
                     flgPropFileIsOk = true;
@@ -127,7 +127,7 @@ public class Log4JHelper implements JSListener {
 
     public void attachFile(final String pstrFilename) throws Exception {
         JSTextFile objF = new JSTextFile(pstrFilename);
-        objF.MustExist();
+        objF.mustExist();
         objFiles.add(pstrFilename);
     }
 

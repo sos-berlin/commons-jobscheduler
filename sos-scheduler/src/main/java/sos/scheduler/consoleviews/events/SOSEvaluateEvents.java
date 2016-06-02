@@ -144,18 +144,18 @@ public class SOSEvaluateEvents {
                         Node n = events.item(ii);
                         NamedNodeMap attr = n.getAttributes();
                         SchedulerEvent e = new SchedulerEvent();
-                        e.event_class = getText(attr.getNamedItem("event_class"));
-                        e.event_id = getText(attr.getNamedItem("event_id"));
-                        e.job_name = getText(attr.getNamedItem("job_name"));
-                        e.job_chain = getText(attr.getNamedItem("job_chain"));
-                        e.order_id = getText(attr.getNamedItem("order_id"));
-                        e.exit_code = getText(attr.getNamedItem("exit_code"));
+                        e.eventClass = getText(attr.getNamedItem("event_class"));
+                        e.eventId = getText(attr.getNamedItem("event_id"));
+                        e.jobName = getText(attr.getNamedItem("job_name"));
+                        e.jobChain = getText(attr.getNamedItem("job_chain"));
+                        e.orderId = getText(attr.getNamedItem("order_id"));
+                        e.exitCode = getText(attr.getNamedItem("exit_code"));
                         e.created = getText(attr.getNamedItem("created"));
                         e.expires = getText(attr.getNamedItem("expires"));
                         e.comment = getText(attr.getNamedItem("comment"));
-                        e.scheduler_id = getText(attr.getNamedItem("scheduler_id"));
-                        e.remote_scheduler_host = getText(attr.getNamedItem("remote_scheduler_host"));
-                        e.remote_scheduler_port = getText(attr.getNamedItem("remote_scheduler_port"));
+                        e.schedulerId = getText(attr.getNamedItem("scheduler_id"));
+                        e.remoteSchedulerHost = getText(attr.getNamedItem("remote_scheduler_host"));
+                        e.remoteSchedulerPort = getText(attr.getNamedItem("remote_scheduler_port"));
                         listOfActiveEvents.add(e);
                     }
                 }
@@ -184,23 +184,23 @@ public class SOSEvaluateEvents {
             if ("event".equals(event.getNodeName())) {
                 NamedNodeMap attr = event.getAttributes();
                 SchedulerEvent e = new SchedulerEvent();
-                e.event_class = getTextDefault("", attr.getNamedItem("event_class"));
-                if ("".equals(e.event_class)) {
-                    e.event_class = evg.event_class;
+                e.eventClass = getTextDefault("", attr.getNamedItem("event_class"));
+                if ("".equals(e.eventClass)) {
+                    e.eventClass = evg.event_class;
                 }
-                e.setEvent_name(getText(attr.getNamedItem("event_name")));
-                e.event_title = getText(attr.getNamedItem("event_title"));
-                e.event_id = getText(attr.getNamedItem("event_id"));
-                e.job_name = getText(attr.getNamedItem("job_name"));
-                e.job_chain = getText(attr.getNamedItem("job_chain"));
-                e.order_id = getText(attr.getNamedItem("order_id"));
-                e.exit_code = getText(attr.getNamedItem("exit_code"));
+                e.setEventName(getText(attr.getNamedItem("event_name")));
+                e.eventTitle = getText(attr.getNamedItem("event_title"));
+                e.eventId = getText(attr.getNamedItem("event_id"));
+                e.jobName = getText(attr.getNamedItem("job_name"));
+                e.jobChain = getText(attr.getNamedItem("job_chain"));
+                e.orderId = getText(attr.getNamedItem("order_id"));
+                e.exitCode = getText(attr.getNamedItem("exit_code"));
                 e.created = getText(attr.getNamedItem("created"));
                 e.expires = getText(attr.getNamedItem("expires"));
                 e.comment = getText(attr.getNamedItem("comment"));
-                e.remote_scheduler_host = getText(attr.getNamedItem("remote_scheduler_host"));
-                e.remote_scheduler_port = getText(attr.getNamedItem("remote_scheduler_port"));
-                e.scheduler_id = getText(attr.getNamedItem("scheduler_id"));
+                e.remoteSchedulerHost = getText(attr.getNamedItem("remote_scheduler_host"));
+                e.remoteSchedulerPort = getText(attr.getNamedItem("remote_scheduler_port"));
+                e.schedulerId = getText(attr.getNamedItem("scheduler_id"));
                 evg.listOfEvents.add(e);
             }
         }
@@ -334,7 +334,7 @@ public class SOSEvaluateEvents {
                     Iterator iEvents = evg.getListOfEvents().iterator();
                     while (iEvents.hasNext()) {
                         SchedulerEvent event = (SchedulerEvent) iEvents.next();
-                        LOGGER.debug(event.getJob_name() + " " + eval.getEventStatus(event));
+                        LOGGER.debug(event.getJobName() + " " + eval.getEventStatus(event));
                     }
                 }
             }

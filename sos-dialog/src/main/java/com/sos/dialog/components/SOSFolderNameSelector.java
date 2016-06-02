@@ -2,6 +2,7 @@ package com.sos.dialog.components;
 
 import java.io.File;
 
+import org.apache.activemq.broker.scheduler.JobListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
@@ -48,10 +49,10 @@ public class SOSFolderNameSelector extends SOSPreferenceStoreText {
             }
             MenuItem item = null;
             item = new MenuItem(objContextMenu, SWT.PUSH);
-            item.addListener(SWT.Selection, CopyToClipboardListener());
+            item.addListener(SWT.Selection, copyToClipboardListener());
             item.setText("Copy to Clipboard");
             item = new MenuItem(objContextMenu, SWT.PUSH);
-            item.addListener(SWT.Selection, OpenListener());
+            item.addListener(SWT.Selection, openListener());
             item.setText("Open");
             setMenu(objContextMenu);
         }
@@ -65,7 +66,11 @@ public class SOSFolderNameSelector extends SOSPreferenceStoreText {
         return strI18NKey;
     }
 
-    private Listener CopyToClipboardListener() {
+    public void setDataProvider(final JobListener pobjDataProvider) {
+        //
+    }
+
+    private Listener copyToClipboardListener() {
         return new Listener() {
 
             @Override
@@ -75,7 +80,7 @@ public class SOSFolderNameSelector extends SOSPreferenceStoreText {
         };
     }
 
-    private Listener OpenListener() {
+    private Listener openListener() {
         return new Listener() {
 
             @Override
@@ -148,8 +153,7 @@ public class SOSFolderNameSelector extends SOSPreferenceStoreText {
         if (filename == null || filename.trim().isEmpty()) {
             return filename;
         }
-        filename = filename.replaceAll("\\\\", "/");
-        return filename;
+        return filename.replaceAll("\\\\", "/");
     }
 
     public void refreshContent() {

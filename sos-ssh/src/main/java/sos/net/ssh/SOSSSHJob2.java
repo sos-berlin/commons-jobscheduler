@@ -23,16 +23,16 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
     protected String[] strCommands2Execute = {};
-    protected final Logger logger = Logger.getLogger(this.getClass());
     protected final String conExit_code = "exit_code";
     protected Msg objMsg;
     protected StringBuffer strbStdoutOutput;
     protected StringBuffer strbStderrOutput;
     protected Vector<String> tempFilesToDelete = new Vector<String>();
+    private static final Logger LOGGER = Logger.getLogger(SOSSSHJob2.class);
+    private static final String STD_ERR_OUTPUT = "std_err_output";
+    private static final String STD_OUT_OUTPUT = "std_out_output";
+    private static final String EXIT_SIGNAL = "exit_signal";
     private ISOSVFSHandler objVFS = null;
-    private final String conStd_err_output = "std_err_output";
-    private final String conStd_out_output = "std_out_output";
-    private final String conExit_signal = "exit_signal";
     public boolean isConnected = false;
     public boolean flgIsWindowsShell = false;
     public boolean keepConnected = false;
@@ -78,14 +78,14 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
 
     public SOSSSHJob2 connect() {
         getVFS();
-        getOptions().CheckMandatory();
+        getOptions().checkMandatory();
         try {
-            objVFS.Connect(objOptions);
+            objVFS.connect(objOptions);
             ISOSAuthenticationOptions objAU = objOptions;
-            ISOSConnection authenticate = objVFS.Authenticate(objAU);
-            logger.debug("connection established");
+            ISOSConnection authenticate = objVFS.authenticate(objAU);
+            LOGGER.debug("connection established");
         } catch (Exception e) {
-            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
+            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getMessage(), e);
         }
         flgIsWindowsShell = objVFS.remoteIsWindowsShell();
         isConnected = true;
@@ -98,9 +98,9 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     public abstract SOSSSHJob2 execute() throws Exception;
 
     public void disconnect() {
-        if (isConnected == true) {
+        if (isConnected) {
             try {
-                objVFS.CloseConnection();
+                objVFS.closeConnection();
             } catch (Exception e) {
                 throw new SSHConnectionError("problems closing connection", e);
             }
@@ -111,14 +111,14 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     public String changeExitSignal() {
         String strExitSignal = objVFS.getExitSignal();
         if (isNotEmpty(strExitSignal)) {
-            objJSJobUtilities.setJSParam(conExit_signal, strExitSignal);
-            if (objOptions.ignore_signal.isTrue()) {
-                logger.info("SOS-SSH-I-130: exit signal is ignored due to option-settings: " + strExitSignal);
+            objJSJobUtilities.setJSParam(EXIT_SIGNAL, strExitSignal);
+            if (objOptions.ignoreSignal.isTrue()) {
+                LOGGER.info("SOS-SSH-I-130: exit signal is ignored due to option-settings: " + strExitSignal);
             } else {
                 throw new SSHExecutionError("SOS-SSH-E-140: remote command terminated with exit signal: " + strExitSignal);
             }
         } else {
-            objJSJobUtilities.setJSParam(conExit_signal, "");
+            objJSJobUtilities.setJSParam(EXIT_SIGNAL, "");
         }
         return strExitSignal;
     }
@@ -129,17 +129,17 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
         if (isNotNull(intExitCode)) {
             objJSJobUtilities.setJSParam(conExit_code, intExitCode.toString());
             if (!intExitCode.equals(new Integer(0))) {
-                if (objOptions.ignore_error.isTrue() || objOptions.ignore_exit_code.Values().contains(intExitCode)) {
-                    logger.info("SOS-SSH-E-140: exit code is ignored due to option-settings: " + intExitCode);
+                if (objOptions.ignoreError.isTrue() || objOptions.ignoreExitCode.getValues().contains(intExitCode)) {
+                    LOGGER.info("SOS-SSH-E-140: exit code is ignored due to option-settings: " + intExitCode);
                     objJSJobUtilities.setJSParam("exit_code_ignored", "true");
                 } else {
                     String strM = "SOS-SSH-E-150: remote command terminated with exit code: " + intExitCode;
                     objJSJobUtilities.setCC(intExitCode);
-                    if (objOptions.raise_exception_on_error.isTrue()) {
-                        if (objOptions.ignore_error.value()) {
-                            logger.info(strM);
+                    if (objOptions.raiseExceptionOnError.isTrue()) {
+                        if (objOptions.ignoreError.value()) {
+                            LOGGER.info(strM);
                         } else {
-                            logger.error(strM);
+                            LOGGER.error(strM);
                         }
                         throw new SSHExecutionError(strM);
                     }
@@ -157,18 +157,18 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
             }
             strbStderrOutput.append(stbStdErr);
         } catch (Exception e) {
-            throw new JobSchedulerException(e.getLocalizedMessage(), e);
+            throw new JobSchedulerException(e.getMessage(), e);
         }
         if (isNotEmpty(strbStderrOutput)) {
-            logger.info("stderr = " + strbStderrOutput.toString());
+            LOGGER.info("stderr = " + strbStderrOutput.toString());
 
-            objJSJobUtilities.setJSParam(conStd_err_output, strbStderrOutput);
-            if (objOptions.ignore_stderr.value()) {
-                logger.info("SOS-SSH-I-150: output to stderr is ignored: " + strbStderrOutput);
+            objJSJobUtilities.setJSParam(STD_ERR_OUTPUT, strbStderrOutput);
+            if (objOptions.ignoreStderr.value()) {
+                LOGGER.info("SOS-SSH-I-150: output to stderr is ignored: " + strbStderrOutput);
             } else {
                 String strM = "SOS-SSH-E-160: remote execution reports error: " + strbStderrOutput;
-                logger.error(strM);
-                if (objOptions.raise_exception_on_error.value()) {
+                LOGGER.error(strM);
+                if (objOptions.raiseExceptionOnError.value()) {
                     throw new SSHExecutionError(strM);
                 }
             }
@@ -188,10 +188,10 @@ public abstract class SOSSSHJob2 extends JSJobUtilitiesClass<SOSSSHJobOptions> {
             }
             strbStdoutOutput.append(stbStdOut);
         } catch (Exception e) {
-            logger.error(this.StackTrace2String(e));
-            throw new JobSchedulerException(e.getLocalizedMessage(), e);
+            LOGGER.error(this.stackTrace2String(e));
+            throw new JobSchedulerException(e.getMessage(), e);
         }
-        objJSJobUtilities.setJSParam(conStd_out_output, strbStdoutOutput);
+        objJSJobUtilities.setJSParam(STD_OUT_OUTPUT, strbStdoutOutput);
     }
 
     public StringBuffer getStdOut() throws Exception {

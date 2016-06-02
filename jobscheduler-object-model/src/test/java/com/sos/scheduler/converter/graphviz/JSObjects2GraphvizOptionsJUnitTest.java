@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import com.sos.JSHelper.Basics.JSToolBox;
 import com.sos.JSHelper.Listener.JSListenerClass;
-
 public class JSObjects2GraphvizOptionsJUnitTest extends JSToolBox {
 
     protected JSObjects2GraphvizOptions objOptions = null;
@@ -24,15 +23,15 @@ public class JSObjects2GraphvizOptionsJUnitTest extends JSToolBox {
     }
 
     @Test
-    public void testlive_folder_name() {
-        objOptions.live_folder_name.Value("++----++");
-        assertEquals("", "++----++" + "/", objOptions.live_folder_name.Value());
+    public void testLiveFolderName() {
+        objOptions.liveFolderName.setValue("++----++");
+        assertEquals("", "++----++" + "/", objOptions.liveFolderName.getValue());
     }
 
     @Test
-    public void testoutput_folder_name() {
-        objOptions.output_folder_name.Value("++----++");
-        assertEquals("", "++----++" + "/", objOptions.output_folder_name.Value());
+    public void testOutputFolderName() {
+        objOptions.outputFolderName.setValue("++----++");
+        assertEquals("", "++----++" + "/", objOptions.outputFolderName.getValue());
     }
 
 }

@@ -18,114 +18,115 @@ import com.sos.JSHelper.Options.SOSOptionUserName;
 
 public interface ISOSDataProviderOptions {
 
-    public abstract SOSOptionUrl geturl();
+    public abstract SOSOptionUrl getUrl();
 
-    public abstract ISOSDataProviderOptions seturl(SOSOptionUrl pstrValue);
+    public abstract ISOSDataProviderOptions setUrl(SOSOptionUrl pstrValue);
 
-    public abstract String getinclude();
+    public abstract String getInclude();
 
-    public abstract ISOSDataProviderOptions setinclude(String pstrValue);
+    public abstract ISOSDataProviderOptions setInclude(String pstrValue);
 
-    public abstract SOSOptionBoolean getuse_zlib_compression();
+    public abstract SOSOptionBoolean getUseZlibCompression();
 
-    public abstract ISOSDataProviderOptions setuse_zlib_compression(SOSOptionBoolean pstrValue);
+    public abstract ISOSDataProviderOptions setUseZlibCompression(SOSOptionBoolean pstrValue);
 
-    public abstract SOSOptionInteger getzlib_compression_level();
+    public abstract SOSOptionInteger getZlibCompressionLevel();
 
-    public abstract ISOSDataProviderOptions setzlib_compression_level(SOSOptionInteger pstrValue);
+    public abstract ISOSDataProviderOptions setZlibCompressionLevel(SOSOptionInteger pstrValue);
 
     public abstract String getProtocolCommandListener();
 
     public abstract ISOSDataProviderOptions setProtocolCommandListener(String pstrValue);
 
-    public abstract SOSOptionString getaccount();
+    public abstract SOSOptionString getAccount();
 
-    public abstract void setaccount(SOSOptionString p_account);
+    public abstract void setAccount(SOSOptionString pAccount);
 
-    public abstract String getmake_Dirs();
+    public abstract String getMakeDirs();
 
-    public abstract ISOSDataProviderOptions setmake_Dirs(String pstrValue);
+    public abstract ISOSDataProviderOptions setMakeDirs(String pstrValue);
 
-    public abstract String getplatform();
+    public abstract String getPlatform();
 
-    public abstract ISOSDataProviderOptions setplatform(String pstrValue);
+    public abstract ISOSDataProviderOptions setPlatform(String pstrValue);
 
-    public abstract SOSOptionString getreplacement();
+    public abstract SOSOptionString getReplacement();
 
-    public abstract void setreplacement(SOSOptionString p_replacement);
+    public abstract void setReplacement(SOSOptionString pReplacement);
 
-    public abstract SOSOptionRegExp getreplacing();
+    public abstract SOSOptionRegExp getReplacing();
 
-    public abstract void setreplacing(SOSOptionRegExp p_replacing);
+    public abstract void setReplacing(SOSOptionRegExp pReplacing);
 
-    public abstract SOSOptionBoolean getstrict_hostKey_checking();
+    public abstract SOSOptionBoolean getStrictHostKeyChecking();
 
-    public abstract void setstrict_hostKey_checking(String pstrValue);
+    public abstract void setStrictHostKeyChecking(String pstrValue);
 
-    public abstract SOSOptionString getTFN_Post_Command();
+    public abstract SOSOptionString getTfnPostCommand();
 
-    public abstract ISOSDataProviderOptions setTFN_Post_Command(SOSOptionString pstrValue);
+    public abstract ISOSDataProviderOptions setTfnPostCommand(SOSOptionString pstrValue);
 
-    public abstract String getPost_Command();
+    public abstract String getPostCommand();
 
-    public abstract ISOSDataProviderOptions setPost_Command(String pstrValue);
+    public abstract ISOSDataProviderOptions setPostCommand(String pstrValue);
 
-    public abstract String getPre_Command();
+    public abstract String getPreCommand();
 
-    public abstract ISOSDataProviderOptions setPre_Command(String pstrValue);
+    public abstract ISOSDataProviderOptions setPreCommand(String pstrValue);
 
-    public abstract String getFtpS_protocol();
+    public abstract String getFtpsProtocol();
 
-    public abstract ISOSDataProviderOptions setFtpS_protocol(String pstrValue);
+    public abstract ISOSDataProviderOptions setFtpsProtocol(String pstrValue);
 
-    public abstract String getloadClassName();
+    public abstract String getLoadClassName();
 
-    public abstract ISOSDataProviderOptions setloadClassName(String pstrValue);
+    public abstract ISOSDataProviderOptions setLoadClassName(String pstrValue);
 
-    public abstract SOSOptionString getjavaClassPath();
+    public abstract SOSOptionString getJavaClassPath();
 
-    public abstract void setjavaClassPath(SOSOptionString p_javaClassPath);
+    public abstract void setJavaClassPath(SOSOptionString pJavaClassPath);
 
     public abstract SOSOptionHostName getHost();
 
-    public abstract void setHost(SOSOptionHostName p_host);
+    public abstract void setHost(SOSOptionHostName pHost);
 
-    public abstract SOSOptionBoolean getpassive_mode();
+    public abstract SOSOptionBoolean getPassiveMode();
 
-    public abstract void setpassive_mode(SOSOptionBoolean p_passive_mode);
+    public abstract void setPassiveMode(SOSOptionBoolean pPassiveMode);
 
-    public abstract SOSOptionPortNumber getport();
+    public abstract SOSOptionPortNumber getPort();
 
-    public abstract void setport(SOSOptionPortNumber p_port);
+    public abstract void setPort(SOSOptionPortNumber pPort);
 
-    public abstract SOSOptionTransferType getprotocol();
+    public abstract SOSOptionTransferType getProtocol();
 
-    public abstract void setprotocol(SOSOptionTransferType p_protocol);
+    public abstract void setProtocol(SOSOptionTransferType pProtocol);
 
-    public abstract SOSOptionTransferMode gettransfer_mode();
+    public abstract SOSOptionTransferMode getTransferMode();
 
-    public abstract void settransfer_mode(SOSOptionTransferMode p_transfer_mode);
+    public abstract void setTransferMode(SOSOptionTransferMode pTransferMode);
 
     public abstract SOSOptionUserName getUser();
 
     public abstract SOSOptionPassword getPassword();
 
-    public abstract void setPassword(SOSOptionPassword p_password);
+    public abstract void setPassword(SOSOptionPassword pPassword);
 
     public abstract void setAllOptions(HashMap<String, String> pobjJSSettings) throws Exception;
 
-    public abstract SOSOptionInFileName getAuth_file();
+    public abstract SOSOptionInFileName getAuthFile();
 
-    public abstract void setAuth_file(SOSOptionInFileName p_ssh_auth_file);
+    public abstract void setAuthFile(SOSOptionInFileName pSshAuthFile);
 
-    public abstract SOSOptionAuthenticationMethod getAuth_method();
+    public abstract SOSOptionAuthenticationMethod getAuthMethod();
 
-    public abstract void setAuth_method(SOSOptionAuthenticationMethod p_ssh_auth_method);
+    public abstract void setAuthMethod(SOSOptionAuthenticationMethod pSshAuthMethod);
 
     public abstract void setUser(SOSOptionUserName pobjUser);
 
-    public abstract SOSOptionString getdomain();
+    public abstract SOSOptionString getDomain();
 
-    public abstract void setdomain(SOSOptionString p_domain);
+    public abstract void setDomain(SOSOptionString pDomain);
+
 
 }

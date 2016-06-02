@@ -509,7 +509,7 @@ public class XmlRegionAnalyzerTests {
      * 
      * @throws Exception */
     @Test
-    public void testExampleThatFailed_1() throws Exception {
+    public void testExampleThatFailed1() throws Exception {
         String test = loadResource("/net/vzurczak/tests/StackOverflowExample.xml");
         assertNotNull(test);
         XmlRegionAnalyzer analyzer = new XmlRegionAnalyzer();

@@ -34,21 +34,21 @@ public class SOSOptionProtocol extends JSOptionValueList {
     }
 
     public boolean isTcp() {
-        return this.Value().equalsIgnoreCase(Type.tcp.name());
+        return this.getValue().equalsIgnoreCase(Type.tcp.name());
     }
 
     public boolean isUdp() {
-        return this.Value().equalsIgnoreCase(Type.udp.name());
+        return this.getValue().equalsIgnoreCase(Type.udp.name());
     }
 
-    public void Value(String value) {
+    public void setValue(String value) {
         String testValue = value.toLowerCase();
         try {
             SOSOptionProtocol.Type t = SOSOptionProtocol.Type.valueOf(testValue);
         } catch (Exception e) {
             throw new JobSchedulerException("Value " + testValue + " is not valid for " + strKey + " - valid values are " + Type.asString() + ".");
         }
-        super.Value(testValue);
+        super.setValue(testValue);
     }
 
 }

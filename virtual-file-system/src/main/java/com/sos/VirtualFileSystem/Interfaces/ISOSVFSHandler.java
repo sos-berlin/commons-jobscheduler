@@ -25,9 +25,9 @@ public interface ISOSVFSHandler extends ISOSShell, ISOSConnection, ISOSSession {
 
     public void lock();
 
-    public SOSFTPOptions Options();
+    public SOSFTPOptions getOptions();
 
-    public void Options(final SOSFTPOptions pobjOptions);
+    public void getOptions(final SOSFTPOptions pobjOptions);
 
     public void release();
 
@@ -41,7 +41,7 @@ public interface ISOSVFSHandler extends ISOSShell, ISOSConnection, ISOSSession {
 
     public void setTarget();
 
-    public enuSourceOrTarget SourceOrTarget();
+    public enuSourceOrTarget sourceOrTarget();
 
     public void setSimulateShell(boolean simulateShell);
 

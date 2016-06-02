@@ -1,5 +1,7 @@
 package sos.net.ssh;
 
+import org.apache.log4j.Logger;
+
 import sos.net.ssh.exceptions.SSHExecutionError;
 import sos.net.ssh.exceptions.SSHMissingCommandError;
 
@@ -11,6 +13,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 @I18NResourceBundle(baseName = "com_sos_net_messages", defaultLocale = "en")
 public class SOSSSHJobTrilead extends SOSSSHJob2 {
 
+    private static final Logger LOGGER = Logger.getLogger(SOSSSHJobTrilead.class);
     private ISOSVFSHandler vfsHandler;
 
     @Override
@@ -64,19 +67,19 @@ public class SOSSSHJobTrilead extends SOSSSHJob2 {
             if (!isConnected) {
                 this.connect();
             }
-            vfsHandler.OpenSession(objOptions);
+            vfsHandler.openSession(objOptions);
             if (!objOptions.command.IsEmpty()) {
                 strCommands2Execute = objOptions.command.values();
             } else {
                 if (objOptions.isScript()) {
                     strCommands2Execute = new String[1];
-                    String strTemp = objOptions.command_script.Value();
-                    if (objOptions.command_script.IsEmpty()) {
-                        strTemp = objOptions.command_script_file.JSFile().File2String();
+                    String strTemp = objOptions.commandScript.getValue();
+                    if (objOptions.commandScript.IsEmpty()) {
+                        strTemp = objOptions.commandScriptFile.getJSFile().file2String();
                     }
                     strTemp = objJSJobUtilities.replaceSchedulerVars(strTemp);
                     strCommands2Execute[0] = vfsHandler.createScriptFile(strTemp);
-                    strCommands2Execute[0] += " " + objOptions.command_script_param.Value();
+                    strCommands2Execute[0] += " " + objOptions.commandScriptParam.getValue();
                 } else {
                     throw new SSHMissingCommandError(objMsg.getMsg(SOS_SSH_E_100));
                 }
@@ -84,8 +87,8 @@ public class SOSSSHJobTrilead extends SOSSSHJob2 {
             for (String strCmd : strCommands2Execute) {
                 try {
                     strCmd = objJSJobUtilities.replaceSchedulerVars(strCmd);
-                    logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
-                    vfsHandler.ExecuteCommand(strCmd);
+                    LOGGER.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
+                    vfsHandler.executeCommand(strCmd);
                     objJSJobUtilities.setJSParam(conExit_code, "0");
                     checkStdOut();
                     checkStdErr();

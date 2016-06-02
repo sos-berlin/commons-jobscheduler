@@ -10,16 +10,10 @@ import com.sos.JSHelper.io.Files.JSXMLFile;
 /** @author EQCPN */
 public class JSDataElement extends JSToolBox {
 
-    private static final String CLASSNAME = "JSDataElement";
-    public static boolean flgXMLTagOnSingleLine = false;
-    public static boolean flgTrimValues = false;
-    public static boolean flgOmitEmptyXMLTags = true;
-    public static boolean flgExceptionOnFieldTruncation = true;
     private String strValue = "";
     private String strDefaultValue = "";
     private String strDescription = "";
     private int intSize = 0;
-    public int intPos = 0;
     private String strTitle = "";
     private String strColumnHeader = "";
     private String strXMLTagName = "";
@@ -30,8 +24,49 @@ public class JSDataElement extends JSToolBox {
     private boolean flgTrimValue = false;
     private boolean flgIsCData = false;
     private boolean flgIsDirty = false;
+    public static boolean flgXMLTagOnSingleLine = false;
+    public static boolean flgTrimValues = false;
+    public static boolean flgOmitEmptyXMLTags = true;
+    public static boolean flgExceptionOnFieldTruncation = true;
+    public int intPos = 0;
 
-    public void isDirty(final boolean pflgIsDirty) {
+    public JSDataElement() {
+        doInit();
+    }
+
+    public JSDataElement(final String pstrValue) {
+        setValue(pstrValue);
+        doInit();
+    }
+
+    public JSDataElement(final String pstrValue, final String pstrDescription) {
+        this.setValue(pstrValue);
+        this.description(pstrDescription);
+        doInit();
+    }
+
+    public JSDataElement(final String pstrValue, final String pstrDescription, final int pintSize, final int pintPos, final String pstrFormatString,
+            final String pstrColumnHeader, final String pstrXMLTagName) {
+        doInit();
+        this.setValue(pstrValue);
+        this.description(pstrDescription);
+        this.size(pintSize);
+        intPos = pintPos;
+        this.setFormatString(pstrFormatString.trim());
+        this.description(pstrDescription);
+        if (pstrColumnHeader.length() <= 0) {
+            this.columnHeader(pstrDescription);
+        } else {
+            this.columnHeader(pstrColumnHeader);
+        }
+        if (pstrXMLTagName.length() <= 0) {
+            this.xmlTagName(pstrDescription);
+        } else {
+            this.xmlTagName(pstrXMLTagName);
+        }
+    }
+
+    public void setDirty(final boolean pflgIsDirty) {
         flgIsDirty = pflgIsDirty;
     }
 
@@ -39,7 +74,7 @@ public class JSDataElement extends JSToolBox {
         return flgIsDirty;
     }
 
-    public void isCData(final boolean pflgIsCData) {
+    public void setCData(final boolean pflgIsCData) {
         flgIsCData = pflgIsCData;
     }
 
@@ -52,78 +87,42 @@ public class JSDataElement extends JSToolBox {
         return strDescription + ": " + strValue;
     }
 
-    public JSDataElement() {
-        doInit();
-    }
-
-    public JSDataElement(final String pstrValue) {
-        Value(pstrValue);
-        doInit();
-    }
-
-    public JSDataElement(final String pstrValue, final String pstrDescription) {
-        this.Value(pstrValue);
-        this.Description(pstrDescription);
-        doInit();
-    }
-
-    public JSDataElement(final String pstrValue, final String pstrDescription, final int pintSize, final int pintPos, final String pstrFormatString,
-            final String pstrColumnHeader, final String pstrXMLTagName) {
-        doInit();
-        this.Value(pstrValue);
-        this.Description(pstrDescription);
-        this.Size(pintSize);
-        intPos = pintPos;
-        this.FormatString(pstrFormatString.trim());
-        this.Description(pstrDescription);
-        if (pstrColumnHeader.length() <= 0) {
-            this.ColumnHeader(pstrDescription);
-        } else {
-            this.ColumnHeader(pstrColumnHeader);
-        }
-        if (pstrXMLTagName.length() <= 0) {
-            this.XMLTagName(pstrDescription);
-        } else {
-            this.XMLTagName(pstrXMLTagName);
-        }
-    }
-
-    public JSDataElement ColumnHeader(final String pstrColumnHeader) {
+    public JSDataElement columnHeader(final String pstrColumnHeader) {
         if (pstrColumnHeader != null) {
             strColumnHeader = pstrColumnHeader;
         }
         return this;
     }
 
-    public String ColumnHeader() {
+    public String getColumnHeader() {
         if (strColumnHeader == null) {
             strColumnHeader = "";
         }
         return strColumnHeader;
     }
 
-    public JSDataElement Title(final String pstrTitle) {
+    public JSDataElement title(final String pstrTitle) {
         if (pstrTitle != null) {
             strTitle = pstrTitle;
         }
         return this;
     }
 
-    public String Title() {
+    public String getTitle() {
         if (strTitle == null) {
             strTitle = "";
         }
         return strTitle;
     }
 
-    public void Value(final JSDataElement objDE) {
-        Value(objDE.Value());
+    public void setValue(final JSDataElement objDE) {
+        setValue(objDE.getValue());
     }
 
-    public void Value(final String pstrValue) {
+    public void setValue(final String pstrValue) {
         if (pstrValue != null) {
             if (!strValue.equals(pstrValue)) {
-                isDirty(true);
+                setDirty(true);
                 strValue = pstrValue;
                 if (flgTrimValue || flgTrimValues) {
                     strValue = strValue.trim();
@@ -135,62 +134,62 @@ public class JSDataElement extends JSToolBox {
 
     }
 
-    public String Value() {
+    public String getValue() {
         if (strValue == null) {
             strValue = "";
         }
         return strValue;
     }
 
-    public JSDataElement DefaultValue(final String pstrDefaultValue) {
+    public JSDataElement defaultValue(final String pstrDefaultValue) {
         strDefaultValue = pstrDefaultValue;
         return this;
     }
 
-    public String DefaultValue() {
+    public String getDefaultValue() {
         return strDefaultValue;
     }
 
-    public JSDataElement Description(final String pstrDescription) {
+    public JSDataElement description(final String pstrDescription) {
         if (pstrDescription != null) {
             strDescription = pstrDescription;
         }
         return this;
     }
 
-    public String Description() {
+    public String getDescription() {
         if (strDescription == null) {
             strDescription = "";
         }
         return strDescription;
     }
 
-    public JSDataElement Size(final int pintSize) {
+    public JSDataElement size(final int pintSize) {
         intSize = pintSize;
         return this;
     }
 
-    public JSDataElement Size(final Integer pintSize) {
+    public JSDataElement size(final Integer pintSize) {
         intSize = pintSize;
         return this;
     }
 
-    public int Size() {
+    public int getIntSize() {
         return intSize;
     }
 
-    public Integer ISize() {
+    public Integer getIntegerSize() {
         return new Integer(intSize);
     }
 
-    public JSDataElement XMLTagName(final String pstrXMLTagName) {
+    public JSDataElement xmlTagName(final String pstrXMLTagName) {
         if (pstrXMLTagName != null) {
             strXMLTagName = pstrXMLTagName;
         }
         return this;
     }
 
-    public String XMLTagName() {
+    public String getXMLTagName() {
         if (strXMLTagName == null) {
             strXMLTagName = "";
         }
@@ -198,7 +197,7 @@ public class JSDataElement extends JSToolBox {
     }
 
     public String toXml(final String pstrTagName) {
-        if (OmittXMLTag()) {
+        if (isOmittXMLTag()) {
             if (this instanceof JSDataElementDouble) {
                 final JSDataElementDouble objT = (JSDataElementDouble) this;
                 if (objT.dblValue == 0.0) {
@@ -211,17 +210,17 @@ public class JSDataElement extends JSToolBox {
                     return "";
                 }
             }
-            if (FormattedValue().isEmpty()) {
+            if (getFormattedValue().isEmpty()) {
                 return "";
             }
         }
         String strT = "";
-        if (!this.Value().isEmpty()) {
+        if (!this.getValue().isEmpty()) {
             strT = "<" + pstrTagName + ">";
             if (this.isCData()) {
-                strT += "<![CDATA[" + FormattedValue() + "]]>";
+                strT += "<![CDATA[" + getFormattedValue() + "]]>";
             } else {
-                strT += FormattedValue();
+                strT += getFormattedValue();
             }
             strT += "</" + pstrTagName + ">";
         } else {
@@ -234,14 +233,14 @@ public class JSDataElement extends JSToolBox {
     }
 
     public String toXml() {
-        return this.toXml(this.XMLTagName());
+        return this.toXml(this.getXMLTagName());
     }
 
     public void toXml(final JSXMLFile pobjXMLFile) throws Exception {
-        pobjXMLFile.WriteLine(this.toXml());
+        pobjXMLFile.writeLine(this.toXml());
     }
 
-    public void FormatString(final String pstrFormatString) {
+    public void setFormatString(final String pstrFormatString) {
         if (!isEmpty(pstrFormatString)) {
             strFormatString = pstrFormatString;
         } else {
@@ -251,11 +250,11 @@ public class JSDataElement extends JSToolBox {
         }
     }
 
-    public void FormatString(final JSDateFormat pJSDateFormat) {
-        this.FormatString(pJSDateFormat.toPattern());
+    public void setFormatString(final JSDateFormat pJSDateFormat) {
+        this.setFormatString(pJSDateFormat.toPattern());
     }
 
-    public String FormatString() {
+    public String getFormatString() {
         if (strFormatString == null) {
             strFormatString = "";
         }
@@ -266,50 +265,46 @@ public class JSDataElement extends JSToolBox {
         //
     }
 
-    public String FormattedValue() {
-        return this.Value();
+    public String getFormattedValue() {
+        return this.getValue();
     }
 
-    public JSDataElement OmitXMLTag(final boolean pflgOmitXMLTag) {
+    public JSDataElement omitXMLTag(final boolean pflgOmitXMLTag) {
         flgOmitXMLTag = pflgOmitXMLTag;
         return this;
     }
 
-    public boolean OmittXMLTag() {
-        boolean flgF = flgOmitXMLTag;
-        if (flgOmitXMLTag) {
-            flgF = true;
-        }
-        return flgF;
+    public boolean isOmittXMLTag() {
+        return flgOmitXMLTag;
     }
 
-    public boolean IsEmpty() {
-        return this.Value().trim().isEmpty();
+    public boolean isEmpty() {
+        return this.getValue().trim().isEmpty();
     }
 
-    public boolean IsNotEmpty() {
-        return !IsEmpty();
+    public boolean isNotEmpty() {
+        return !isEmpty();
     }
 
     public boolean hasValue() {
-        return !this.Value().trim().isEmpty();
+        return !this.getValue().trim().isEmpty();
     }
 
-    public void TrimValue(final boolean pflgTrimValue) {
+    public void setTrimValue(final boolean pflgTrimValue) {
         flgTrimValue = pflgTrimValue;
     }
 
-    public void RecordValue(final StringBuffer pstrRecord) {
-        this.Value(pstrRecord.substring(intPos, intPos + intSize).trim());
+    public void setRecordValue(final StringBuffer pstrRecord) {
+        this.setValue(pstrRecord.substring(intPos, intPos + intSize).trim());
     }
 
-    public void BuildRecord(final StringBuffer pstrRecord) throws Exception {
-        String strVal = this.Value();
-        if (strVal.length() > intSize || !this.FormatString().isEmpty()) {
-            strVal = FormattedValue();
+    public void buildRecord(final StringBuffer pstrRecord) throws Exception {
+        String strVal = this.getValue();
+        if (strVal.length() > intSize || !this.getFormatString().isEmpty()) {
+            strVal = getFormattedValue();
             if (strVal.length() > intSize && flgExceptionOnFieldTruncation) {
-                throw new Exception("Value truncated. max " + intSize + ", actual " + this.Value().length() + ". Description:" + this.Description()
-                        + ". Value = '" + this.Value() + "', " + FormattedValue());
+                throw new Exception("Value truncated. max " + intSize + ", actual " + this.getValue().length() + ". Description:"
+                        + this.getDescription() + ". Value = '" + this.getValue() + "', " + getFormattedValue());
             }
         }
         doReplace(pstrRecord, intPos, intPos + intSize, strVal);
@@ -338,11 +333,11 @@ public class JSDataElement extends JSToolBox {
     }
 
     public void checkFormatPattern() throws FormatPatternException {
-        if (isNotEmpty(strFormatPattern) && (!flgAllowEmptyValue || !"".equals(this.Value().trim()))) {
+        if (isNotEmpty(strFormatPattern) && (!flgAllowEmptyValue || !"".equals(this.getValue().trim()))) {
             final Pattern objP = Pattern.compile(strFormatPattern);
-            final Matcher objM = objP.matcher(this.Value());
+            final Matcher objM = objP.matcher(this.getValue());
             if (!objM.find()) {
-                throw new FormatPatternException("the value '" + this.Value() + "' does not correspond with the pattern " + strFormatPattern);
+                throw new FormatPatternException("the value '" + this.getValue() + "' does not correspond with the pattern " + strFormatPattern);
             }
         }
     }
@@ -350,13 +345,13 @@ public class JSDataElement extends JSToolBox {
     public boolean isEqual(final JSDataElement pobjO) {
         boolean flgC = false;
         if (pobjO != null) {
-            flgC = this.Value().equalsIgnoreCase(pobjO.Value());
+            flgC = this.getValue().equalsIgnoreCase(pobjO.getValue());
         }
         return flgC;
     }
 
-    public String SQLValue() {
-        String strT = this.Value();
+    public String getSQLValue() {
+        String strT = this.getValue();
         strT = strT.replace("'", "''");
         return "'" + strT + "'";
     }
@@ -365,10 +360,10 @@ public class JSDataElement extends JSToolBox {
     public boolean equals(final Object pobjO) {
         if (pobjO instanceof String) {
             final String strT = (String) pobjO;
-            return this.Value().equals(strT);
+            return this.getValue().equals(strT);
         }
         if (pobjO instanceof JSDataElement) {
-            return this.Value().equals(((JSDataElement) pobjO).Value());
+            return this.getValue().equals(((JSDataElement) pobjO).getValue());
         }
         return pobjO.equals(this);
     }

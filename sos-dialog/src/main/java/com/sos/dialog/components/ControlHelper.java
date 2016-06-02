@@ -84,7 +84,7 @@ public class ControlHelper implements IValueChangedListener {
         objControl.setToolTipText(getToolTip());
         if (objControl instanceof Text) {
             Text objText = (Text) objControl;
-            objText.setText(objOptionElement.Value());
+            objText.setText(objOptionElement.getValue());
             setNoFocusColor(objControl);
             objText.setToolTipText(getToolTip());
             if (objOptionElement.isProtected()) {
@@ -102,7 +102,7 @@ public class ControlHelper implements IValueChangedListener {
         }
         if (objControl instanceof Combo) {
             Combo objCombo = (Combo) objControl;
-            objCombo.setText(pobjOptionElement.Value());
+            objCombo.setText(pobjOptionElement.getValue());
             if (pobjOptionElement instanceof SOSOptionStringValueList) {
                 SOSOptionStringValueList objValueList = (SOSOptionStringValueList) pobjOptionElement;
                 objCombo.setItems(objValueList.getValueList());
@@ -129,7 +129,7 @@ public class ControlHelper implements IValueChangedListener {
             }
             // set this after setting the items of the combobox, otherwise text
             // will be deleted
-            objCombo.setText(objOptionElement.Value());
+            objCombo.setText(objOptionElement.getValue());
             objCombo.addModifyListener(new ModifyListener() {
 
                 @Override
@@ -166,7 +166,7 @@ public class ControlHelper implements IValueChangedListener {
             public void focusGained(final FocusEvent e) {
                 Control objC = (Control) e.getSource();
                 setFocusColor(objC);
-                Globals.setStatus(objOptionElement.Description());
+                Globals.setStatus(objOptionElement.getDescription());
             }
 
             @Override
@@ -178,7 +178,7 @@ public class ControlHelper implements IValueChangedListener {
                 Globals.setStatus("");
                 if (objC instanceof Text && flgIsDirty) {
                     Text objText = (Text) objC;
-                    objOptionElement.Value(objText.getText());
+                    objOptionElement.setValue(objText.getText());
                 }
                 if (objC instanceof SOSCheckBox) {
                     SOSCheckBox objCheck = (SOSCheckBox) objC;
@@ -186,11 +186,11 @@ public class ControlHelper implements IValueChangedListener {
                 }
                 if (objC instanceof Combo) {
                     Combo objCheck = (Combo) objC;
-                    objOptionElement.Value(objCheck.getText());
+                    objOptionElement.setValue(objCheck.getText());
                 }
                 if (objC instanceof CCombo) {
                     CCombo objCheck = (CCombo) objC;
-                    objOptionElement.Value(objCheck.getText());
+                    objOptionElement.setValue(objCheck.getText());
                 }
                 if (flgControlValueInError) {
                     Display.getCurrent().asyncExec(new Runnable() {
@@ -276,12 +276,12 @@ public class ControlHelper implements IValueChangedListener {
     }
 
     @Override
-    public void ValueHasChanged(final SOSOptionElement pobjOptionElement) {
+    public void valueHasChanged(final SOSOptionElement pobjOptionElement) {
         if (objControl.isDisposed()) {
             LOGGER.debug("Control is disposed");
             return;
         }
-        String strCurrValue = pobjOptionElement.Value();
+        String strCurrValue = pobjOptionElement.getValue();
         LOGGER.debug("value changed to " + strCurrValue + " (name of control is:  " + objControl.getClass().getName());
         if (objControl instanceof Text) {
             Text objText = (Text) objControl;
@@ -307,7 +307,7 @@ public class ControlHelper implements IValueChangedListener {
     }
 
     @Override
-    public void ValidationError(final SOSValidationError pobjVE) {
+    public void validationError(final SOSValidationError pobjVE) {
         flgControlValueInError = true;
         MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", pobjVE.getErrorMessage());
     }

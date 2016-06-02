@@ -46,7 +46,6 @@ public class SOSlogin {
             this.init();
             createSubject(user, pwd);
         }
-
     }
 
     public void logout() {

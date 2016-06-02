@@ -21,15 +21,15 @@ public class SOSOptionFileStringTest {
     @Test
     public void testValueString() throws Exception {
         JSOptionsClass objO = new JSOptionsClass();
-        String strF = objO.TempDir() + "testSOSOptionFileString.txt";
+        String strF = objO.getTempDir() + "testSOSOptionFileString.txt";
         JSFile objF = new JSFile(strF);
         objF.deleteOnExit();
         String strT = "Select * from table;";
-        objF.Write(strT);
+        objF.write(strT);
         objF.close();
-        objCS.Value(strF);
-        LOGGER.info(objCS.Value());
-        assertEquals("select", strT, objCS.Value());
+        objCS.setValue(strF);
+        LOGGER.info(objCS.getValue());
+        assertEquals("select", strT, objCS.getValue());
     }
 
 }

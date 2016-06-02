@@ -18,11 +18,11 @@ public class SOSOptionPassword extends SOSOptionString {
     }
 
     @Override
-    public String Value() {
+    public String getValue() {
         String strReturnPassword = strValue;
         if (strValue != null) {
             try {
-                if (ExecuteCommandToGetPassword()) {
+                if (executeCommandToGetPassword()) {
                     if (strCachedPW.isEmpty()) {
                         String command = strValue.substring(1, strValue.length() - 1);
                         Vector returnValues = new SOSCommandline().execute(command);
@@ -43,7 +43,7 @@ public class SOSOptionPassword extends SOSOptionString {
         return strReturnPassword;
     }
 
-    public boolean ExecuteCommandToGetPassword() {
+    public boolean executeCommandToGetPassword() {
         boolean flgExecuteCommandToGetPassword = false;
         if (strValue.startsWith(conBackTic) && strValue.endsWith(conBackTic)) {
             flgExecuteCommandToGetPassword = true;

@@ -21,7 +21,8 @@ public class SOSSSHJobOptionsTest {
     private static final String USER = "user";
     private static final String AUTH_FILE = "auth_file";
     private static final String CLASSNAME = "SOSSSHJobOptionsTest";
-    private static final String KEEPASS_DB_FILE_NAME = "R:/backup/sos/java/junittests/testdata/keepassX-test.kdb";
+    private static final String KEE_PASS_DB_FILE_NAME = "R:/backup/sos/java/junittests/testdata/keepassX-test.kdb";
+
 
     @Test
     public void TestToXml() throws Exception {
@@ -29,123 +30,123 @@ public class SOSSSHJobOptionsTest {
         String strParameterValue = "JunitTestUser";
         String strCmdLineArgs[] = { "-" + strParameterName, strParameterValue };
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
-        objOptions.CommandLineArgs(strCmdLineArgs);
-        assertEquals(strParameterName, strParameterValue, objOptions.user.Value());
+        objOptions.commandLineArgs(strCmdLineArgs);
+        assertEquals(strParameterName, strParameterValue, objOptions.user.getValue());
         String strTempFileName = "C:/temp/" + CLASSNAME + ".xml";
         JSXMLFile objXF = objOptions.toXMLFile(strTempFileName);
         SOSSSHJobOptions objO2 = new SOSSSHJobOptions();
-        objO2.LoadXML(objXF);
-        assertEquals(strParameterName, strParameterValue, objO2.user.Value());
+        objO2.loadXML(objXF);
+        assertEquals(strParameterName, strParameterValue, objO2.user.getValue());
     }
 
     @Test
     public void testCommand_Script() {
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
-        objOptions.command_script.Value();
-        objOptions.command.Value();
+        objOptions.commandScript.getValue();
+        objOptions.command.getValue();
     }
 
     @Test
     @Ignore("Test set to Ignore for later examination")
-    public void TestSerialize() throws Exception {
+    public void testSerialize() throws Exception {
         String strParameterName = USER;
         String strCmdLineArgs[] = { "-" + strParameterName, "JunitTestUser" };
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
-        objOptions.CommandLineArgs(strCmdLineArgs);
-        assertEquals(strParameterName, "JunitTestUser", objOptions.user.Value());
+        objOptions.commandLineArgs(strCmdLineArgs);
+        assertEquals(strParameterName, "JunitTestUser", objOptions.user.getValue());
         String strSerializedFileName = "c:/temp/test.object";
         objOptions.putObject(strSerializedFileName);
         System.setProperty(strParameterName, "sos-user2");
-        objOptions.LoadSystemProperties();
-        assertEquals(strParameterName, "sos-user2", objOptions.user.Value());
+        objOptions.loadSystemProperties();
+        assertEquals(strParameterName, "sos-user2", objOptions.user.getValue());
         SOSSSHJobOptions objO2 = new SOSSSHJobOptions();
         objO2 = (SOSSSHJobOptions) JSOptionsClass.getObject(strSerializedFileName);
-        assertEquals(strParameterName, "JunitTestUser", objO2.user.Value());
+        assertEquals(strParameterName, "JunitTestUser", objO2.user.getValue());
     }
 
     @Test
-    public void TestSystemProperties() throws Exception {
+    public void testSystemProperties() throws Exception {
         String strCmdLineArgs[] = { "-user", "JunitTestUser" };
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
         System.setProperty("SOSSSHJobOptions.user", SOS_USER);
-        objOptions.LoadSystemProperties();
-        assertEquals(USER, System.getProperty("SOSSSHJobOptions.user"), objOptions.user.Value());
+        objOptions.loadSystemProperties();
+        assertEquals(USER, System.getProperty("SOSSSHJobOptions.user"), objOptions.user.getValue());
         System.setProperty("SOSSSHJobOptions.user", "");
         objOptions.setAllOptions(new HashMap<String, String>());
         System.setProperty(USER, SOS_USER);
-        objOptions.LoadSystemProperties();
-        assertEquals(USER, SOS_USER, objOptions.user.Value());
+        objOptions.loadSystemProperties();
+        assertEquals(USER, SOS_USER, objOptions.user.getValue());
         System.setProperty("SOSSSHJobOptions.user", "");
-        objOptions.CommandLineArgs(strCmdLineArgs);
-        assertEquals(USER, "JunitTestUser", objOptions.user.Value());
+        objOptions.commandLineArgs(strCmdLineArgs);
+        assertEquals(USER, "JunitTestUser", objOptions.user.getValue());
         System.setProperty(USER, "sos-user2");
-        objOptions.LoadSystemProperties();
-        assertEquals(USER, "sos-user2", objOptions.user.Value());
+        objOptions.loadSystemProperties();
+        assertEquals(USER, "sos-user2", objOptions.user.getValue());
     }
 
     @Test
-    public void SetHashMap() throws Exception {
+    public void setHashMap() throws Exception {
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
-        objOptions.setAllOptions(this.SetJobSchedulerSSHJobOptions(new HashMap<String, String>()));
-        assertEquals(AUTH_FILE, "test", objOptions.auth_file.Value());
-        assertEquals(USER, "test", objOptions.user.Value());
-        objOptions.CurrentNodeName("step1");
-        objOptions.setAllOptions(this.SetJobSchedulerSSHJobOptions(new HashMap<String, String>()));
-        assertEquals(USER, "step1user", objOptions.user.Value());
-        objOptions.CurrentNodeName("step2");
-        objOptions.setAllOptions(this.SetJobSchedulerSSHJobOptions(new HashMap<String, String>()));
-        assertEquals(USER, "userofstep2", objOptions.user.Value());
+        objOptions.setAllOptions(this.setJobSchedulerSSHJobOptions(new HashMap<String, String>()));
+        assertEquals(AUTH_FILE, "test", objOptions.authFile.getValue());
+        assertEquals(USER, "test", objOptions.user.getValue());
+        objOptions.setCurrentNodeName("step1");
+        objOptions.setAllOptions(this.setJobSchedulerSSHJobOptions(new HashMap<String, String>()));
+        assertEquals(USER, "step1user", objOptions.user.getValue());
+        objOptions.setCurrentNodeName("step2");
+        objOptions.setAllOptions(this.setJobSchedulerSSHJobOptions(new HashMap<String, String>()));
+        assertEquals(USER, "userofstep2", objOptions.user.getValue());
         LOGGER.info(objOptions.toString());
     }
 
     @Test
-    public void SetCmdArgs() throws Exception {
+    public void setCmdArgs() throws Exception {
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
         String strArgs[] = new String[] { "-command", "ls", "-auth_method", "password", "-host", "8of9.sos", "-auth_file", "test", "-user", "kb",
                 "-password", "huhu" };
-        objOptions.CommandLineArgs(strArgs);
-        objOptions.CheckMandatory();
-        assertEquals(AUTH_FILE, objOptions.auth_file.Value(), "test");
-        assertEquals(USER, objOptions.user.Value(), "kb");
-        objOptions.CommandLineArgs(new String[] { "-user", "testtest" });
-        assertEquals(USER, "testtest", objOptions.user.Value());
+        objOptions.commandLineArgs(strArgs);
+        objOptions.checkMandatory();
+        assertEquals(AUTH_FILE, objOptions.authFile.getValue(), "test");
+        assertEquals(USER, objOptions.user.getValue(), "kb");
+        objOptions.commandLineArgs(new String[] { "-user", "testtest" });
+        assertEquals(USER, "testtest", objOptions.user.getValue());
         LOGGER.info(objOptions.toString());
     }
 
     @Test
-    public void SetCmdArgs2() throws Exception {
+    public void setCmdArgs2() throws Exception {
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
         String strArgs[] = new String[] { "-command=ls", "-auth_method=password", "-host=8of9.sos", "-AuthFile=test", "-user=kb", "-password=huhu" };
-        objOptions.CommandLineArgs(strArgs);
-        objOptions.CheckMandatory();
-        assertEquals(AUTH_FILE, objOptions.auth_file.Value(), "test");
-        assertEquals(USER, objOptions.user.Value(), "kb");
+        objOptions.commandLineArgs(strArgs);
+        objOptions.checkMandatory();
+        assertEquals(AUTH_FILE, objOptions.authFile.getValue(), "test");
+        assertEquals(USER, objOptions.user.getValue(), "kb");
         LOGGER.info(objOptions.toString());
     }
 
     @Test
-    public void SetCmdArgsString() throws Exception {
+    public void setCmdArgsString() throws Exception {
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
         String strArgs = new String("-command=ls -auth_method=password -host=8of9.sos -AuthFile=test -user=kb -password=huhu");
-        objOptions.CommandLineArgs(strArgs);
-        objOptions.CheckMandatory();
-        assertEquals(AUTH_FILE, objOptions.auth_file.Value(), "test");
-        assertEquals(USER, objOptions.user.Value(), "kb");
+        objOptions.commandLineArgs(strArgs);
+        objOptions.checkMandatory();
+        assertEquals(AUTH_FILE, objOptions.authFile.getValue(), "test");
+        assertEquals(USER, objOptions.user.getValue(), "kb");
         LOGGER.info(objOptions.toString());
     }
 
     @Test(expected = com.sos.JSHelper.Exceptions.JSExceptionMandatoryOptionMissing.class)
-    public void SetEmptyPassw() throws Exception {
+    public void setEmptyPassw() throws Exception {
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
         String strArgs[] = new String[] { "-auth_method=password", "-host=ftphost", "-auth_file=test", "-user=kb", "-password=" };
-        objOptions.CommandLineArgs(strArgs);
-        objOptions.CheckMandatory();
-        assertEquals(AUTH_FILE, objOptions.auth_file.Value(), "test");
-        assertEquals(USER, objOptions.user.Value(), "kb");
+        objOptions.commandLineArgs(strArgs);
+        objOptions.checkMandatory();
+        assertEquals(AUTH_FILE, objOptions.authFile.getValue(), "test");
+        assertEquals(USER, objOptions.user.getValue(), "kb");
         LOGGER.info(objOptions.toString());
     }
 
-    private HashMap<String, String> SetJobSchedulerSSHJobOptions(final HashMap<String, String> pobjHM) {
+    private HashMap<String, String> setJobSchedulerSSHJobOptions(final HashMap<String, String> pobjHM) {
         pobjHM.put("step1/user", "step1user");
         pobjHM.put("step2/user", "userofstep2");
         pobjHM.put("SOSSSHJobOptions.authfile", "test");
@@ -176,14 +177,14 @@ public class SOSSSHJobOptionsTest {
         pobjHM.put(USER, "test");
         pobjHM.put("step1/SOSSSHJobOptions.user", "step1user");
         pobjHM.put("step2/SOSSSHJobOptions.user", "userofstep2");
-        pobjHM.put("UseCredentialStore", "true");
-        pobjHM.put("CredentialStoreFileName", KEEPASS_DB_FILE_NAME);
+        pobjHM.put("UseCredentialStore", "true"); 
+        pobjHM.put("CredentialStoreFileName", KEE_PASS_DB_FILE_NAME);
         pobjHM.put("CredentialStorePassword", "testing");
         pobjHM.put("CredentialStoreKeyPath", "sos/server/wilma.sos");
         return pobjHM;
     }
 
-    private HashMap<String, String> SetSSHJobOptionsUsingCredentialStore(final HashMap<String, String> pobjHM) {
+    private HashMap<String, String> setSSHJobOptionsUsingCredentialStore(final HashMap<String, String> pobjHM) {
         pobjHM.put("SOSSSHJobOptions.command_delimiter", "%%");
         pobjHM.put("SOSSSHJobOptions.command_script", "test");
         pobjHM.put("SOSSSHJobOptions.command_script_file", "test");
@@ -193,7 +194,7 @@ public class SOSSSHJobOptionsTest {
         pobjHM.put("SOSSSHJobOptions.ignore_signal", "false");
         pobjHM.put("SOSSSHJobOptions.ignore_stderr", "false");
         pobjHM.put("UseCredentialStore", "true");
-        pobjHM.put("CredentialStore_FileName", KEEPASS_DB_FILE_NAME);
+        pobjHM.put("CredentialStore_FileName", KEE_PASS_DB_FILE_NAME);
         pobjHM.put("CredentialStore_Password", "testing");
         pobjHM.put("CredentialStore_KeyPath", "/sos/server/wilma.sos");
         pobjHM.put("CredentialStore_ProcessNotesParams", "true");
@@ -203,10 +204,10 @@ public class SOSSSHJobOptionsTest {
     @Test(expected = java.lang.RuntimeException.class)
     public void testCredentialStore1() {
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
-        SOSCredentialStoreOptions objCSO = objOptions.getCredentialStore().Options();
+        SOSCredentialStoreOptions objCSO = objOptions.getCredentialStore().getOptions();
         assertTrue("not null", objCSO != null);
-        objCSO.use_credential_Store.setTrue();
-        objCSO.CredentialStore_FileName.Value("c:/temp/t.1");
+        objCSO.useCredentialStore.setTrue();
+        objCSO.credentialStoreFileName.setValue("c:/temp/t.1");
         objOptions.getCredentialStore().checkCredentialStoreOptions();
     }
 
@@ -214,25 +215,25 @@ public class SOSSSHJobOptionsTest {
     @Ignore("Test set to Ignore for later examination")
     public void testCredentialStore2() {
         SOSSSHJobOptions objOptions = new SOSSSHJobOptions();
-        SOSCredentialStoreOptions objCSO = objOptions.getCredentialStore().Options();
+        SOSCredentialStoreOptions objCSO = objOptions.getCredentialStore().getOptions();
         assertTrue("not null", objCSO != null);
-        objCSO.use_credential_Store.setTrue();
-        objCSO.CredentialStore_FileName.Value(KEEPASS_DB_FILE_NAME);
-        objCSO.CredentialStore_password.Value("testing");
-        objCSO.CredentialStore_KeyPath.Value("/sos/server/wilma.sos");
+        objCSO.useCredentialStore.setTrue();
+        objCSO.credentialStoreFileName.setValue(KEE_PASS_DB_FILE_NAME);
+        objCSO.credentialStorePassword.setValue("testing");
+        objCSO.credentialStoreKeyPath.setValue("/sos/server/wilma.sos");
         objOptions.getCredentialStore().checkCredentialStoreOptions();
-        assertEquals("userid", "test", objOptions.user.Value());
-        assertEquals("password", "12345", objOptions.password.Value());
+        assertEquals("userid", "test", objOptions.user.getValue());
+        assertEquals("password", "12345", objOptions.password.getValue());
     }
 
     @Test
     @Ignore("Test set to Ignore for later examination")
     public void testCredentialStore3() throws Exception {
-        SOSSSHJobOptions objOptions = new SOSSSHJobOptions(SetSSHJobOptionsUsingCredentialStore(new HashMap<String, String>()));
+        SOSSSHJobOptions objOptions = new SOSSSHJobOptions(setSSHJobOptionsUsingCredentialStore(new HashMap<String, String>()));
         assertTrue("not null", objOptions != null);
-        assertEquals("userid", "test", objOptions.user.Value());
-        assertEquals("password", "12345", objOptions.password.Value());
-        assertEquals("command", "test.bsh", objOptions.command.Value());
+        assertEquals("userid", "test", objOptions.user.getValue());
+        assertEquals("password", "12345", objOptions.password.getValue());
+        assertEquals("command", "test.bsh", objOptions.command.getValue());
     }
 
 }

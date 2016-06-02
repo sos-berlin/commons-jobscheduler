@@ -5,19 +5,19 @@ public class JSDataElementInteger extends JSDataElementNumeric {
     private int intValue = 0;
 
     public JSDataElementInteger() {
-        super.TrimValue(true);
+        super.setTrimValue(true);
     }
 
     public JSDataElementInteger(final String pstrValue) {
-        super.Value(pstrValue);
-        super.TrimValue(true);
+        super.setValue(pstrValue);
+        super.setTrimValue(true);
         getInt();
     }
 
     public JSDataElementInteger(final int pintValue) {
         intValue = pintValue;
-        super.TrimValue(true);
-        this.Value(pintValue);
+        super.setTrimValue(true);
+        this.setValue(pintValue);
     }
 
     public JSDataElementInteger(final String pPstrValue, final String pPstrDescription, final int pPintSize, final int pPintPos,
@@ -26,20 +26,20 @@ public class JSDataElementInteger extends JSDataElementNumeric {
     }
 
     @Override
-    public void Value(final String pstrValue) {
-        super.Value(pstrValue);
+    public void setValue(final String pstrValue) {
+        super.setValue(pstrValue);
         getInt();
     }
 
-    public void Value(final int pintValue) {
+    public void setValue(final int pintValue) {
         intValue = pintValue;
-        super.Value(new Integer(pintValue).toString());
+        super.setValue(new Integer(pintValue).toString());
     }
 
     public int getInt() {
         try {
             intValue = 0;
-            String strT = super.Value().trim();
+            String strT = super.getValue().trim();
             final int intLen = strT.length();
             if (intLen > 0) {
                 if (strT.endsWith("-")) {
@@ -62,30 +62,30 @@ public class JSDataElementInteger extends JSDataElementNumeric {
     }
 
     @Override
-    public String FormattedValue() {
-        final String strFormat = super.FormatString();
+    public String getFormattedValue() {
+        final String strFormat = super.getFormatString();
         if (isNotEmpty(strFormat.trim())) {
             String strFormatted = String.format("%1$" + strFormat, getInt());
             strFormatted = strFormatted.trim();
-            if (super.MaxSize() != 0 && strFormatted.length() > super.MaxSize()) {
+            if (super.getMaxSize() != 0 && strFormatted.length() > super.getMaxSize()) {
                 strFormatted = "";
-                for (int i = 0; i < super.MaxSize(); i++) {
+                for (int i = 0; i < super.getMaxSize(); i++) {
                     strFormatted += "*";
                 }
             }
             return strFormatted;
         } else {
-            return super.Value();
+            return super.getValue();
         }
     }
 
     @Override
     public void doInit() {
-        super.MaxSize(15);
-        super.FormatString("-,15d");
-        super.Description("Integer");
-        super.ColumnHeader("Integer");
-        super.XMLTagName("Integer");
+        super.setMaxSize(15);
+        super.setFormatString("-,15d");
+        super.description("Integer");
+        super.columnHeader("Integer");
+        super.xmlTagName("Integer");
     }
 
 }

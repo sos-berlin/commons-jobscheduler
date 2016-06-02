@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.BasicConfigurator;
@@ -50,13 +52,13 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     protected final String EMPTY_STRING = "";
     protected final boolean continue_with_spooler_process = true;
     protected final boolean continue_with_task = true;
-    private final static int MAX_LENGTH_OF_STATUSTEXT = 100;
+    private static final int MAX_LENGTH_OF_STATUSTEXT = 100;
     private JobSchedulerLog4JAppender objJSAppender = null;
+    public static final boolean conJobSuccess = false;
+    public static final boolean conJobFailure = false;
+    public static final boolean conJobChainSuccess = true;
+    public static final boolean conJobChainFailure = false;
     public final String conMessageFilePath = "com_sos_scheduler_messages";
-    public final static boolean conJobSuccess = false;
-    public final static boolean conJobFailure = false;
-    public final static boolean conJobChainSuccess = true;
-    public final static boolean conJobChainFailure = false;
     private ParameterSubstitutor parameterSubstitutor;
 
     public JobSchedulerJobAdapter() {
@@ -170,9 +172,9 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                     }
                 }
             }
-            schedulerParameters = DeleteCurrentNodeNameFromKeys(schedulerParameters);
+            schedulerParameters = deleteCurrentNodeNameFromKeys(schedulerParameters);
         } catch (Exception e) {
-            throw new JobSchedulerException(JSJ_F_0060.params(StackTrace2String(e)), e);
+            throw new JobSchedulerException(JSJ_F_0060.params(stackTrace2String(e)), e);
         }
         return schedulerParameters;
     }
@@ -194,11 +196,11 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             }
             return result;
         } catch (Exception e) {
-            throw new JobSchedulerException(JSJ_F_0060.params(StackTrace2String(e)), e);
+            throw new JobSchedulerException(JSJ_F_0060.params(stackTrace2String(e)), e);
         }
     }
 
-    public HashMap<String, String> DeleteCurrentNodeNameFromKeys(final HashMap<String, String> pSchedulerParameterSet) {
+    public HashMap<String, String> deleteCurrentNodeNameFromKeys(final HashMap<String, String> pSchedulerParameterSet) {
         String strCurrentNodeName = getCurrentNodeName(false) + "/";
         int intNNLen = strCurrentNodeName.length();
         HashMap<String, String> newSchedulerParameters = new HashMap<String, String>();
@@ -214,6 +216,35 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             }
         }
         return newSchedulerParameters;
+    }
+
+    protected HashMap<String, String> getSchedulerParameterAsProperties(final HashMap<String, String> pSchedulerParameterSet) {
+        schedulerParameters = new HashMap<String, String>();
+        try {
+            if (isNotNull(pSchedulerParameterSet)) {
+                Set<Map.Entry<String, String>> set = pSchedulerParameterSet.entrySet();
+                for (Map.Entry<String, String> entry : set) {
+                    schedulerParameters.put(entry.getKey(), entry.getValue());
+                    schedulerParameters.put(entry.getKey().replaceAll("_", EMPTY_STRING), entry.getValue());
+                }
+                set = schedulerParameters.entrySet();
+                schedulerParameters.putAll(getSpecialParameters());
+                for (Map.Entry<String, String> entry : set) {
+                    String key = entry.getKey();
+                    String val = entry.getValue();
+                    if (val != null) {
+                        String strR = replaceVars(schedulerParameters, key, val);
+                        if (!strR.equalsIgnoreCase(val)) {
+                            schedulerParameters.put(key, strR);
+                        }
+                    }
+                }
+            }
+            schedulerParameters = deleteCurrentNodeNameFromKeys(schedulerParameters);
+            return schedulerParameters;
+        } catch (Exception e) {
+            throw new JobSchedulerException(JSJ_F_0060.params(e.getMessage()), e);
+        }
     }
 
     protected Variable_set getJobOrOrderParameters() {
@@ -294,6 +325,22 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         return resultString;
     }
 
+    @Deprecated
+    public String replaceVars(final HashMap<String, String> params, final String name, String pstrReplaceIn) {
+        if (pstrReplaceIn != null && pstrReplaceIn.matches(".*%[^%]+%.*")) {
+            for (String param : params.keySet()) {
+                String paramValue = params.get(param);
+                if (isNotNull(paramValue)) {
+                    String paramPattern = "%" + Pattern.quote(param) + "%";
+                    paramValue = paramValue.replace('\\', '/');
+                    paramValue = Matcher.quoteReplacement(paramValue);
+                    pstrReplaceIn = pstrReplaceIn.replaceAll(paramPattern, paramValue);
+                } 
+            }
+        }
+        return pstrReplaceIn;
+    }
+
     private HashMap<String, String> getSpecialParameters() {
         HashMap<String, String> specialParams = new HashMap<String, String>();
         if (spooler == null) {
@@ -339,7 +386,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         return result;
     }
 
-    public String StackTrace2String(final Exception e) {
+    public String stackTrace2String(final Exception e) {
         String strT = null;
         if (isNotNull(e)) {
             strT = e.getMessage() + "\n";
@@ -524,7 +571,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         if (pobjOptionElement.isNotDirty()) {
             String strS = getJobScript();
             if (isNotEmpty(strS)) {
-                pobjOptionElement.Value(strS);
+                pobjOptionElement.setValue(strS);
                 logger.debug(String.format("copy script from script-tag of job '%2$s' to option '%1$s'", pobjOptionElement.getShortKey(),
                         getJob().name()));
             }

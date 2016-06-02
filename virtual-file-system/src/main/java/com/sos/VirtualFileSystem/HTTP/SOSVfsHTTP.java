@@ -62,27 +62,27 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
     }
 
     @Override
-    public ISOSConnection Connect() throws Exception {
-        this.Connect(this.connection2OptionsAlternate);
+    public ISOSConnection connect() throws Exception {
+        this.connect(this.connection2OptionsAlternate);
         return this;
     }
 
     @Override
-    public ISOSConnection Connect(final SOSConnection2OptionsAlternate options) throws Exception {
+    public ISOSConnection connect(final SOSConnection2OptionsAlternate options) throws Exception {
         connection2OptionsAlternate = options;
         if (connection2OptionsAlternate == null) {
-            RaiseException(SOSVfs_E_190.params("connection2OptionsAlternate"));
+            raiseException(SOSVfs_E_190.params("connection2OptionsAlternate"));
         }
-        proxyHost = connection2OptionsAlternate.proxy_host.Value();
-        proxyPort = connection2OptionsAlternate.proxy_port.value();
-        proxyUser = connection2OptionsAlternate.proxy_user.Value();
-        proxyPassword = connection2OptionsAlternate.proxy_password.Value();
-        this.connect(connection2OptionsAlternate.host.Value(), connection2OptionsAlternate.port.value());
+        proxyHost = connection2OptionsAlternate.proxyHost.getValue();
+        proxyPort = connection2OptionsAlternate.proxyPort.value();
+        proxyUser = connection2OptionsAlternate.proxyUser.getValue();
+        proxyPassword = connection2OptionsAlternate.proxyPassword.getValue();
+        this.doConnect(connection2OptionsAlternate.host.getValue(), connection2OptionsAlternate.port.value());
         return this;
     }
 
     @Override
-    public ISOSConnection Authenticate(final ISOSAuthenticationOptions options) {
+    public ISOSConnection authenticate(final ISOSAuthenticationOptions options) {
         authenticationOptions = options;
         try {
             this.doAuthenticate(authenticationOptions);
@@ -100,9 +100,9 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
             this.doLogin(user, password);
             reply = "OK";
             LOGGER.info(SOSVfs_D_133.params(userName));
-            this.LogReply();
+            this.logReply();
         } catch (Exception e) {
-            RaiseException(e, SOSVfs_E_134.params("authentication"));
+            raiseException(e, SOSVfs_E_134.params("authentication"));
         }
     }
 
@@ -152,10 +152,10 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
             }
             fileSize = local.length();
             reply = "get OK";
-            LOGGER.info(HostID(SOSVfs_I_182.params("getFile", remoteFile, localFile, getReplyString())));
+            LOGGER.info(getHostID(SOSVfs_I_182.params("getFile", remoteFile, localFile, getReplyString())));
         } catch (Exception ex) {
             reply = ex.toString();
-            RaiseException(ex, SOSVfs_E_184.params("getFile", remoteFile, localFile));
+            raiseException(ex, SOSVfs_E_184.params("getFile", remoteFile, localFile));
         } finally {
             try {
                 if (outputStream != null) {
@@ -224,11 +224,11 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
 
     private ISOSConnection doAuthenticate(final ISOSAuthenticationOptions options) throws Exception {
         authenticationOptions = options;
-        this.doLogin(authenticationOptions.getUser().Value(), authenticationOptions.getPassword().Value());
+        this.doLogin(authenticationOptions.getUser().getValue(), authenticationOptions.getPassword().getValue());
         return this;
     }
 
-    private void connect(final String phost, final int pport) {
+    private void doConnect(final String phost, final int pport) {
         if (!this.isConnected()) {
             try {
                 this.port = pport;
@@ -245,7 +245,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
                     if ("https".equalsIgnoreCase(url.getProtocol())) {
                         this.rootUrl = new HttpsURL(_rootUrl);
                         StrictSSLProtocolSocketFactory psf = new StrictSSLProtocolSocketFactory();
-                        psf.setCheckHostname(connection2OptionsAlternate.verify_certificate_hostname.value());
+                        psf.setCheckHostname(connection2OptionsAlternate.verifyCertificateHostname.value());
                         if (!psf.getCheckHostname()) {
                             LOGGER.info("*********************** Security warning *********************************************************************");
                             LOGGER.info("Jade option \"verify_certificate_hostname\" is currently \"false\". ");
@@ -253,7 +253,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
                             LOGGER.info("with the hostname of the server in the URL used by the Jade client.");
                             LOGGER.info("**************************************************************************************************************");
                         }
-                        if (connection2OptionsAlternate.accept_untrusted_certificate.value()) {
+                        if (connection2OptionsAlternate.acceptUntrustedCertificate.value()) {
                             psf.useDefaultJavaCiphers();
                             psf.addTrustMaterial(TrustMaterial.TRUST_ALL);
                         }
@@ -273,7 +273,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
                 httpClient = new HttpClient(connectionManager);
                 httpClient.setHostConfiguration(hc);
                 this.setProxyCredentionals();
-                this.LogReply();
+                this.logReply();
             } catch (Exception ex) {
                 throw new JobSchedulerException(ex);
             }
@@ -405,7 +405,7 @@ public class SOSVfsHTTP extends SOSVfsTransferBaseClass {
             }
             return method.getResponseBodyAsStream();
         } catch (Exception ex) {
-            RaiseException(ex, SOSVfs_E_193.params("getInputStream()", fileName));
+            raiseException(ex, SOSVfs_E_193.params("getInputStream()", fileName));
             return null;
         }
     }

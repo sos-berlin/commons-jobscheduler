@@ -31,9 +31,9 @@ public class JSObjects2Graphviz extends JSJobUtilitiesClass<JSObjects2GraphvizOp
     }
 
     public JSObjects2Graphviz initialize() throws Exception {
-        getOptions().CheckMandatory();
+        getOptions().checkMandatory();
         LOGGER.debug(getOptions().dirtyString());
-        String liveFolderName = objOptions.live_folder_name.Value();
+        String liveFolderName = objOptions.liveFolderName.getValue();
         objVFS = VFSFactory.getHandler("local");
         objFileSystemHandler = (ISOSVfsFileTransfer) objVFS;
         objFactory = new SchedulerObjectFactory();
@@ -42,12 +42,12 @@ public class JSObjects2Graphviz extends JSJobUtilitiesClass<JSObjects2GraphvizOp
         SchedulerHotFolder objSchedulerHotFolder = objFactory.createSchedulerHotFolder(objHotFolder);
         LOGGER.info(String.format("... load %1$s", liveFolderName));
         objSchedulerHotFolderFileList = objSchedulerHotFolder.loadRecursive();
-        strOutputFolderName = objOptions.output_folder_name.Value();
+        strOutputFolderName = objOptions.outputFolderName.getValue();
         return this;
     }
 
-    public JSObjects2Graphviz Execute() throws Exception {
-        final String methodName = CLASSNAME + "::Execute";
+    public JSObjects2Graphviz execute() throws Exception {
+        final String methodName = CLASSNAME + "::execute";
         JOM_I_110.toLog(methodName);
         try {
             initialize();
@@ -58,7 +58,7 @@ public class JSObjects2Graphviz extends JSJobUtilitiesClass<JSObjects2GraphvizOp
                     jsObjJobChain.setGraphVizImageType(FileType.pdf);
                     jsObjJobChain.setDotOutputPath(strOutputFolderName);
                     LOGGER.info(String.format("... call generator %1$s", strOutputFolderName));
-                    jsObjJobChain.createGraphVizImageFile(new File(objOptions.live_folder_name.Value()), true);
+                    jsObjJobChain.createGraphVizImageFile(new File(objOptions.liveFolderName.getValue()), true);
                 }
             }
         } catch (Exception e) {

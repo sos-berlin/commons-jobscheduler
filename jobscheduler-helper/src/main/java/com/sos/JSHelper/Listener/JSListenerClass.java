@@ -22,7 +22,7 @@ public class JSListenerClass implements JSListener {
     public final String conClassName = "JSListenerClass";
 
     public JSListenerClass() {
-
+        //
     }
 
     public void message(final String pstrMsg) {
@@ -35,7 +35,7 @@ public class JSListenerClass implements JSListener {
         }
     }
 
-    public JSListener Listener() {
+    public JSListener getListener() {
         return JSListener;
     }
 
@@ -43,7 +43,7 @@ public class JSListenerClass implements JSListener {
         JSListener = l;
     }
 
-    public void SignalAbort(final String strS) throws Exception {
+    public void signalAbort(final String strS) throws Exception {
         String strT = " ###ProgramAbort### ";
         strT = strT + strS + strT;
         message(strT);
@@ -51,30 +51,30 @@ public class JSListenerClass implements JSListener {
         throw expE;
     }
 
-    public void SignalInfo(final String strS) {
+    public void signalInfo(final String strS) {
         message(strS);
     }
 
-    public void SignalError(final JobSchedulerException expE, final String strS) {
+    public void signalError(final JobSchedulerException expE, final String strS) {
         String strT = " ### Error ### ";
         strT = strT + strS + strT;
         message(strT);
         if (expE != null) {
-            expE.Message(strS);
-            expE.Status(JobSchedulerException.ERROR);
+            expE.message(strS);
+            expE.setStatus(JobSchedulerException.ERROR);
             throw expE;
         }
     }
 
-    public void SignalError(final String strS) {
-        this.SignalError(new JobSchedulerException(strS), strS);
+    public void signalError(final String strS) {
+        this.signalError(new JobSchedulerException(strS), strS);
     }
 
-    public void SignalDebug(final String pstrDebugMessage) {
-        this.SignalDebug(pstrDebugMessage, 5);
+    public void signalDebug(final String pstrDebugMessage) {
+        this.signalDebug(pstrDebugMessage, 5);
     }
 
-    public void SignalDebug(final String pstrMsg, final Integer pintDebugLevel) {
+    public void signalDebug(final String pstrMsg, final Integer pintDebugLevel) {
         final String strT = pstrMsg;
         if (!JSListenerClass.bolLogDebugInformation) {
             return;

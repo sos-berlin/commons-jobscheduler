@@ -55,7 +55,7 @@ public class SOSOptionUserName extends SOSOptionString {
      *
      * @return */
     public String getSystemUserIfUserIsEmpty() {
-        String user = this.Value();
+        String user = this.getValue();
         if (this.IsEmpty()) {
             user = System.getProperty("user.name");
         }

@@ -36,13 +36,13 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
         try {
             if (!vfsHandler.isConnected()) {
                 SOSConnection2OptionsAlternate postAlternateOptions = getAlternateOptions(objOptions);
-                postAlternateOptions.raise_exception_on_error.value(false);
-                vfsHandler.Connect(postAlternateOptions);
+                postAlternateOptions.raiseExceptionOnError.value(false);
+                vfsHandler.connect(postAlternateOptions);
             }
-            vfsHandler.Authenticate(objOptions);
+            vfsHandler.authenticate(objOptions);
             LOGGER.debug("connection established");
         } catch (Exception e) {
-            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
+            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getMessage(), e);
         }
         prePostCommandVFSHandler.setJSJobUtilites(objJSJobUtilities);
     }
@@ -66,12 +66,12 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
             }
             add2Files2Delete(getTempPidFileName());
             try {
-                String strCmd = String.format(objOptions.getPostCommandRead().Value(), getTempPidFileName());
+                String strCmd = String.format(objOptions.getPostCommandRead().getValue(), getTempPidFileName());
                 LOGGER.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
                 strCmd = objJSJobUtilities.replaceSchedulerVars(strCmd);
                 LOGGER.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
                 LOGGER.debug("***Execute read pid file command!***");
-                vfsHandler.ExecuteCommand(strCmd);
+                vfsHandler.executeCommand(strCmd);
                 objJSJobUtilities.setJSParam(conExit_code, "0");
                 String pid = null;
                 BufferedReader reader = new BufferedReader(new StringReader(new String(vfsHandler.getStdOut())));
@@ -95,17 +95,17 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
                 checkExitCode();
                 changeExitSignal();
             } catch (Exception e) {
-                if (objOptions.raise_exception_on_error.value()) {
-                    if (objOptions.ignore_error.value()) {
-                        if (objOptions.ignore_stderr.value()) {
-                            LOGGER.debug(this.StackTrace2String(e));
+                if (objOptions.raiseExceptionOnError.value()) {
+                    if (objOptions.ignoreError.value()) {
+                        if (objOptions.ignoreStderr.value()) {
+                            LOGGER.debug(this.stackTrace2String(e));
                         } else {
-                            LOGGER.error(this.StackTrace2String(e));
-                            throw new SSHExecutionError("Exception raised: " + e, e);
+                            LOGGER.error(this.stackTrace2String(e));
+                            throw new SSHExecutionError("Exception raised: " + e.getMessage(), e);
                         }
                     } else {
-                        LOGGER.error(this.StackTrace2String(e));
-                        throw new SSHExecutionError("Exception raised: " + e, e);
+                        LOGGER.error(this.stackTrace2String(e));
+                        throw new SSHExecutionError("Exception raised: " + e.getMessage(), e);
                     }
                 }
             } finally {
@@ -125,19 +125,19 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
             }
             processPostCommands(getTempPidFileName());
         } catch (Exception e) {
-            if (objOptions.raise_exception_on_error.value()) {
+            if (objOptions.raiseExceptionOnError.value()) {
                 String strErrMsg = "SOS-SSH-E-120: error occurred processing ssh command: ";
-                if (objOptions.ignore_error.value()) {
-                    if (objOptions.ignore_stderr.value()) {
-                        LOGGER.debug(this.StackTrace2String(e));
+                if (objOptions.ignoreError.value()) {
+                    if (objOptions.ignoreStderr.value()) {
+                        LOGGER.debug(this.stackTrace2String(e));
                         LOGGER.debug(strErrMsg, e);
                     } else {
-                        LOGGER.error(this.StackTrace2String(e));
+                        LOGGER.error(this.stackTrace2String(e));
                         LOGGER.error(strErrMsg, e);
                         throw new SSHExecutionError(strErrMsg, e);
                     }
                 } else {
-                    LOGGER.error(this.StackTrace2String(e));
+                    LOGGER.error(this.stackTrace2String(e));
                     LOGGER.error(strErrMsg, e);
                     throw new SSHExecutionError(strErrMsg, e);
                 }
@@ -154,7 +154,7 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
     public void disconnect() {
         if (isConnected) {
             try {
-                vfsHandler.CloseConnection();
+                vfsHandler.closeConnection();
             } catch (Exception e) {
                 throw new SSHConnectionError("problems closing connection", e);
             }
@@ -173,14 +173,14 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
     @Override
     public SOSSSHJob2 connect() {
         getVFS();
-        getOptions().CheckMandatory();
+        getOptions().checkMandatory();
         try {
             SOSConnection2OptionsAlternate alternateOptions = getAlternateOptions(objOptions);
-            vfsHandler.Connect(alternateOptions);
-            vfsHandler.Authenticate(objOptions);
+            vfsHandler.connect(alternateOptions);
+            vfsHandler.authenticate(objOptions);
             LOGGER.debug("connection established");
         } catch (Exception e) {
-            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getLocalizedMessage(), e);
+            throw new SSHConnectionError("Error occured during connection/authentication: " + e.getMessage(), e);
         }
         isConnected = true;
         preparePostCommandHandler();
@@ -212,18 +212,18 @@ public class SOSSSHReadPidFileJob extends SOSSSHJobJSch {
 
     public SOSConnection2OptionsAlternate getAlternateOptions(SOSSSHJobOptions options) {
         SOSConnection2OptionsAlternate alternateOptions = new SOSConnection2OptionsAlternate();
-        alternateOptions.setstrict_hostKey_checking("no");
-        alternateOptions.host.Value(options.getHost().Value());
+        alternateOptions.setStrictHostKeyChecking("no");
+        alternateOptions.host.setValue(options.getHost().getValue());
         alternateOptions.port.value(options.getPort().value());
-        alternateOptions.user.Value(options.getUser().Value());
-        alternateOptions.password.Value(options.getPassword().Value());
-        alternateOptions.proxy_protocol.Value(options.getproxy_protocol().Value());
-        alternateOptions.proxy_host.Value(options.getProxy_host().Value());
-        alternateOptions.proxy_port.value(options.getProxy_port().value());
-        alternateOptions.proxy_user.Value(options.getProxy_user().Value());
-        alternateOptions.proxy_password.Value(options.getProxy_password().Value());
-        alternateOptions.raise_exception_on_error.value(options.getraise_exception_on_error().value());
-        alternateOptions.ignore_error.value(options.getIgnore_error().value());
+        alternateOptions.user.setValue(options.getUser().getValue());
+        alternateOptions.password.setValue(options.getPassword().getValue());
+        alternateOptions.proxyProtocol.setValue(options.getProxyProtocol().getValue());
+        alternateOptions.proxyHost.setValue(options.getProxyHost().getValue());
+        alternateOptions.proxyPort.value(options.getProxyPort().value());
+        alternateOptions.proxyUser.setValue(options.getProxyUser().getValue());
+        alternateOptions.proxyPassword.setValue(options.getProxyPassword().getValue());
+        alternateOptions.raiseExceptionOnError.value(options.getRaiseExceptionOnError().value());
+        alternateOptions.ignoreError.value(options.getIgnoreError().value());
         return alternateOptions;
     }
 

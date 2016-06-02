@@ -20,7 +20,7 @@ public class SOSSSHReadPidFileJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
             super.spooler_process();
             doProcessing();
         } catch (Exception e) {
-            logger.fatal(StackTrace2String(e));
+            logger.fatal(stackTrace2String(e));
             throw new JobSchedulerException(e);
         }
         return signalSuccess();
@@ -35,23 +35,23 @@ public class SOSSSHReadPidFileJobJSAdapter extends SOSSSHJob2JSBaseAdapter {
             ((SOSSSHReadPidFileJob) sshJob).setTempPidFileName(allParams.value(PID_FILE_NAME_KEY));
             logger.debug("SOSSSHReadPidFileJob instantiated!");
             options = sshJob.getOptions();
-            options.CurrentNodeName(this.getCurrentNodeName(false));
+            options.setCurrentNodeName(this.getCurrentNodeName(false));
             HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(allParams);
-            options.setAllOptions(options.DeletePrefix(hsmParameters1, "ssh_"));
+            options.setAllOptions(options.deletePrefix(hsmParameters1, "ssh_"));
             sshJob.setJSJobUtilites(this);
-            options.CheckMandatory();
+            options.checkMandatory();
             sshJob.execute();
         } catch (Exception e) {
-            if (options.raise_exception_on_error.value()) {
-                if (options.ignore_error.value()) {
-                    if (options.ignore_stderr.value()) {
-                        logger.debug(this.StackTrace2String(e));
+            if (options.raiseExceptionOnError.value()) {
+                if (options.ignoreError.value()) {
+                    if (options.ignoreStderr.value()) {
+                        logger.debug(this.stackTrace2String(e));
                     } else {
-                        logger.error(this.StackTrace2String(e));
+                        logger.error(this.stackTrace2String(e));
                         throw new SSHExecutionError("Exception raised: " + e, e);
                     }
                 } else {
-                    logger.error(this.StackTrace2String(e));
+                    logger.error(this.stackTrace2String(e));
                     throw new SSHExecutionError("Exception raised: " + e, e);
                 }
             }

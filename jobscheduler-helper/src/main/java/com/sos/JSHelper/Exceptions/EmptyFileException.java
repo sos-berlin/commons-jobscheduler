@@ -17,8 +17,8 @@ public class EmptyFileException extends JobSchedulerException {
     public EmptyFileException(final String message) {
         super(message);
         int i;
-        this.Status(JobSchedulerException.ERROR);
-        this.Category(CategoryFileHandling);
+        this.setStatus(JobSchedulerException.ERROR);
+        this.setCategory(CategoryFileHandling);
     }
 
     /** Construtor without message. */

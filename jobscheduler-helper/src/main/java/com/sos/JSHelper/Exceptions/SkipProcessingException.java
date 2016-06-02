@@ -7,7 +7,7 @@ public class SkipProcessingException extends JobSchedulerException {
 
     public SkipProcessingException(String message) {
         super(message);
-        this.Status(JobSchedulerException.SKIPPROCESSING);
+        this.setStatus(JobSchedulerException.SKIPPROCESSING);
         this.eMailSubject("Skip processing.");
     }
 

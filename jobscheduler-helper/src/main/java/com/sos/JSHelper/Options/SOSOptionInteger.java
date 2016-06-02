@@ -6,10 +6,9 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
 public class SOSOptionInteger extends SOSOptionElement {
 
+    protected int intValue = 0;
     private static final long serialVersionUID = -7044542882191150064L;
     public final String ControlType = "inttext";
-    protected int intValue = 0;
-
     public SOSOptionInteger(final JSOptionsClass pPobjParent, final String pPstrKey, final String pPstrDescription, final String pPstrValue,
             final String pPstrDefaultValue, final boolean pPflgIsMandatory) {
         super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
@@ -19,7 +18,7 @@ public class SOSOptionInteger extends SOSOptionElement {
     public void value(final int pintval) {
         try {
             intValue = pintval;
-            this.Value(new Integer(pintval).toString());
+            this.setValue(new Integer(pintval).toString());
         } catch (final Exception e) {
             //
         }

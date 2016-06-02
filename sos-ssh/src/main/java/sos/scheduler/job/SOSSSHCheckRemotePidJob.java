@@ -28,10 +28,10 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch {
         try {
             if (!vfsHandler.isConnected()) {
                 SOSConnection2OptionsAlternate postAlternateOptions = getAlternateOptions(objOptions);
-                postAlternateOptions.raise_exception_on_error.value(false);
-                vfsHandler.Connect(postAlternateOptions);
+                postAlternateOptions.raiseExceptionOnError.value(false);
+                vfsHandler.connect(postAlternateOptions);
             }
-            vfsHandler.Authenticate(objOptions);
+            vfsHandler.authenticate(objOptions);
             LOGGER.debug("connection for kill commands established");
         } catch (Exception e) {
             throw new SSHConnectionError("Error occured during connection/authentication: " + e.getMessage(), e);
@@ -42,11 +42,11 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch {
     @Override
     public SOSSSHJob2 connect() {
         getVFS();
-        getOptions().CheckMandatory();
+        getOptions().checkMandatory();
         try {
             SOSConnection2OptionsAlternate alternateOptions = getAlternateOptions(objOptions);
-            vfsHandler.Connect(alternateOptions);
-            vfsHandler.Authenticate(objOptions);
+            vfsHandler.connect(alternateOptions);
+            vfsHandler.authenticate(objOptions);
             LOGGER.debug("connection established");
         } catch (Exception e) {
             throw new SSHConnectionError("Error occured during connection/authentication: " + e.getMessage(), e);
@@ -61,25 +61,25 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch {
     public SOSSSHJob2 execute() {
         vfsHandler.setJSJobUtilites(objJSJobUtilities);
         openSession();
-        boolean configuredRaiseExeptionOnError = objOptions.raise_exception_on_error.value();
-        boolean configuredIgnoreError = objOptions.ignore_error.value();
+        boolean configuredRaiseExeptionOnError = objOptions.raiseExceptionOnError.value();
+        boolean configuredIgnoreError = objOptions.ignoreError.value();
         List<Integer> pidsToKillFromOrder = getPidsToKill();
         List<Integer> pidsStillRunning = new ArrayList<Integer>();
         try {
             if (!isConnected) {
                 this.connect();
             }
-            objOptions.raise_exception_on_error.value(false);
-            objOptions.ignore_error.value(true);
+            objOptions.raiseExceptionOnError.value(false);
+            objOptions.ignoreError.value(true);
             for (Integer pid : pidsToKillFromOrder) {
                 String checkPidCommand = null;
                 if (ssh_job_get_active_processes_command.contains("${user}")) {
-                    checkPidCommand = ssh_job_get_active_processes_command.replace("${user}", objOptions.user.Value());
+                    checkPidCommand = ssh_job_get_active_processes_command.replace("${user}", objOptions.user.getValue());
                 }
                 if (ssh_job_get_active_processes_command.contains("${pid}")) {
                     checkPidCommand = checkPidCommand.replace("${pid}", pid.toString());
                 }
-                vfsHandler.ExecuteCommand(checkPidCommand);
+                vfsHandler.executeCommand(checkPidCommand);
                 if (vfsHandler.getExitCode() == 0) {
                     pidsStillRunning.add(pid);
                     LOGGER.debug("PID " + pid + " is still running");
@@ -110,22 +110,22 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch {
                 objJSJobUtilities.setJSParam(PARAM_PIDS_TO_KILL, "");
             }
         } catch (Exception e) {
-            if (objOptions.raise_exception_on_error.value()) {
-                if (objOptions.ignore_error.value()) {
-                    if (objOptions.ignore_stderr.value()) {
-                        LOGGER.debug(this.StackTrace2String(e));
+            if (objOptions.raiseExceptionOnError.value()) {
+                if (objOptions.ignoreError.value()) {
+                    if (objOptions.ignoreStderr.value()) {
+                        LOGGER.debug(this.stackTrace2String(e));
                     } else {
-                        LOGGER.error(this.StackTrace2String(e));
+                        LOGGER.error(this.stackTrace2String(e));
                         throw new SSHExecutionError("Exception raised: " + e, e);
                     }
                 } else {
-                    LOGGER.error(this.StackTrace2String(e));
+                    LOGGER.error(this.stackTrace2String(e));
                     throw new SSHExecutionError("Exception raised: " + e, e);
                 }
             }
         } finally {
-            objOptions.raise_exception_on_error.value(configuredRaiseExeptionOnError);
-            objOptions.ignore_error.value(configuredIgnoreError);
+            objOptions.raiseExceptionOnError.value(configuredRaiseExeptionOnError);
+            objOptions.ignoreError.value(configuredIgnoreError);
         }
         return this;
     }
@@ -150,8 +150,8 @@ public class SOSSSHCheckRemotePidJob extends SOSSSHJobJSch {
     }
 
     private void readCheckIfProcessesIsStillActiveCommandFromPropertiesFile() {
-        if (objOptions.ssh_job_get_active_processes_command.isDirty() && !objOptions.ssh_job_get_active_processes_command.Value().isEmpty()) {
-            ssh_job_get_active_processes_command = objOptions.ssh_job_get_active_processes_command.Value();
+        if (objOptions.sshJobGetActiveProcessesCommand.isDirty() && !objOptions.sshJobGetActiveProcessesCommand.getValue().isEmpty()) {
+            ssh_job_get_active_processes_command = objOptions.sshJobGetActiveProcessesCommand.getValue();
             LOGGER.debug("Command to check if PID is still running from Job Parameter used!");
         } else {
             if (flgIsWindowsShell) {

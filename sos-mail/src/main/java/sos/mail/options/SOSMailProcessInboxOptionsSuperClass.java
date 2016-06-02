@@ -30,245 +30,245 @@ public class SOSMailProcessInboxOptionsSuperClass extends JSOptionsClass {
     @JSOptionDefinition(name = "mailPassword", description = "", key = "mailPassword", type = "SOSOptionPassword", mandatory = false)
     public SOSOptionPassword mailPassword = new SOSOptionPassword(this, CLASSNAME + ".mailPassword", "", "", "", false);
 
-    public SOSOptionPassword getmailPassword() {
+    public SOSOptionPassword getMailPassword() {
         return mailPassword;
     }
 
-    public void setmailPassword(final SOSOptionPassword p_mailPassword) {
-        mailPassword = p_mailPassword;
+    public void setMailPassword(final SOSOptionPassword pMailPassword) {
+        mailPassword = pMailPassword;
     }
 
     @JSOptionDefinition(name = "mail_action", description = "", key = "mail_action", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString mail_action = new SOSOptionString(this, CLASSNAME + ".mail_action", "", "", "", false);
+    public SOSOptionString mailAction = new SOSOptionString(this, CLASSNAME + ".mail_action", "", "", "", false);
 
-    public SOSOptionString getmail_action() {
-        return mail_action;
+    public SOSOptionString getMailAction() {
+        return mailAction;
     }
 
-    public void setmail_action(final SOSOptionString p_mail_action) {
-        mail_action = p_mail_action;
+    public void setMailAction(final SOSOptionString pMailAction) {
+        mailAction = pMailAction;
     }
 
     @JSOptionDefinition(name = "mail_body_pattern", description = "", key = "mail_body_pattern", type = "SOSOptionRegExp", mandatory = false)
-    public SOSOptionRegExp mail_body_pattern = new SOSOptionRegExp(this, CLASSNAME + ".mail_body_pattern", "", "", "", false);
+    public SOSOptionRegExp mailBodyPattern = new SOSOptionRegExp(this, CLASSNAME + ".mail_body_pattern", "", "", "", false);
 
-    public SOSOptionRegExp getmail_body_pattern() {
-        return mail_body_pattern;
+    public SOSOptionRegExp getMailBodyPattern() {
+        return mailBodyPattern;
     }
 
-    public void setmail_body_pattern(final SOSOptionRegExp p_mail_body_pattern) {
-        mail_body_pattern = p_mail_body_pattern;
+    public void setMailBodyPattern(final SOSOptionRegExp pMailBodyPattern) {
+        mailBodyPattern = pMailBodyPattern;
     }
 
     @JSOptionDefinition(name = "mail_dump_dir", description = "", key = "mail_dump_dir", type = "SOSOptionFolderName", mandatory = false)
-    public SOSOptionFolderName mail_dump_dir = new SOSOptionFolderName(this, CLASSNAME + ".mail_dump_dir", "", "", "", false);
+    public SOSOptionFolderName mailDumpDir = new SOSOptionFolderName(this, CLASSNAME + ".mail_dump_dir", "", "", "", false);
 
-    public SOSOptionFolderName getmail_dump_dir() {
-        return mail_dump_dir;
+    public SOSOptionFolderName getMailDumpDir() {
+        return mailDumpDir;
     }
 
-    public void setmail_dump_dir(final SOSOptionFolderName p_mail_dump_dir) {
-        mail_dump_dir = p_mail_dump_dir;
+    public void setMailDumpDir(final SOSOptionFolderName pMailDumpDir) {
+        mailDumpDir = pMailDumpDir;
     }
 
     @JSOptionDefinition(name = "mail_host", description = "", key = "mail_host", type = "SOSOptionHostName", mandatory = true)
-    public SOSOptionHostName mail_host = new SOSOptionHostName(this, CLASSNAME + ".mail_host", "", "", "", true);
+    public SOSOptionHostName mailHost = new SOSOptionHostName(this, CLASSNAME + ".mail_host", "", "", "", true);
 
-    public SOSOptionHostName getmail_host() {
-        return mail_host;
+    public SOSOptionHostName getMailHost() {
+        return mailHost;
     }
 
-    public void setmail_host(final SOSOptionHostName p_mail_host) {
-        mail_host = p_mail_host;
+    public void setMailHost(final SOSOptionHostName pMailHost) {
+        mailHost = pMailHost;
     }
 
     @JSOptionDefinition(name = "mail_jobchain", description = "", key = "mail_jobchain", type = "JSJobChainName", mandatory = false)
-    public JSJobChainName mail_jobchain = new JSJobChainName(this, CLASSNAME + ".mail_jobchain", "", "", "", false);
+    public JSJobChainName mailJobchain = new JSJobChainName(this, CLASSNAME + ".mail_jobchain", "", "", "", false);
 
-    public JSJobChainName getmail_jobchain() {
-        return mail_jobchain;
+    public JSJobChainName getMailJobchain() {
+        return mailJobchain;
     }
 
-    public void setmail_jobchain(final JSJobChainName p_mail_jobchain) {
-        mail_jobchain = p_mail_jobchain;
+    public void setMailJobchain(final JSJobChainName pMailJobchain) {
+        mailJobchain = pMailJobchain;
     }
 
     @JSOptionDefinition(name = "mail_message_folder", description = "", key = "mail_message_folder", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString mail_message_folder = new SOSOptionString(this, CLASSNAME + ".mail_message_folder", "", "INBOX", "INBOX", false);
+    public SOSOptionString mailMessageFolder = new SOSOptionString(this, CLASSNAME + ".mail_message_folder", "", "INBOX", "INBOX", false);
 
-    public SOSOptionString getmail_message_folder() {
-        return mail_message_folder;
+    public SOSOptionString getMailMessageFolder() {
+        return mailMessageFolder;
     }
 
-    public void setmail_message_folder(final SOSOptionString p_mail_message_folder) {
-        mail_message_folder = p_mail_message_folder;
+    public void setMailMessageFolder(final SOSOptionString pMailMessageFolder) {
+        mailMessageFolder = pMailMessageFolder;
     }
 
     @JSOptionDefinition(name = "mail_order_id", description = "", key = "mail_order_id", type = "JSOrderId", mandatory = false)
-    public JSOrderId mail_order_id = new JSOrderId(this, CLASSNAME + ".mail_order_id", "", "", "", false);
+    public JSOrderId mailOrderId = new JSOrderId(this, CLASSNAME + ".mail_order_id", "", "", "", false);
 
-    public JSOrderId getmail_order_id() {
-        return mail_order_id;
+    public JSOrderId getMailOrderId() {
+        return mailOrderId;
     }
 
-    public void setmail_order_id(final JSOrderId p_mail_order_id) {
-        mail_order_id = p_mail_order_id;
+    public void setMailOrderId(final JSOrderId pMailOrderId) {
+        mailOrderId = pMailOrderId;
     }
 
     @JSOptionDefinition(name = "mail_order_state", description = "", key = "mail_order_state", type = "SOSOptionJobChainNode", mandatory = false)
-    public SOSOptionJobChainNode mail_order_state = new SOSOptionJobChainNode(this, CLASSNAME + ".mail_order_state", "", "", "", false);
+    public SOSOptionJobChainNode mailOrderState = new SOSOptionJobChainNode(this, CLASSNAME + ".mail_order_state", "", "", "", false);
 
-    public SOSOptionJobChainNode getmail_order_state() {
-        return mail_order_state;
+    public SOSOptionJobChainNode getMailOrderState() {
+        return mailOrderState;
     }
 
-    public void setmail_order_state(final SOSOptionJobChainNode p_mail_order_state) {
-        mail_order_state = p_mail_order_state;
+    public void setMailOrderState(final SOSOptionJobChainNode pMailOrderState) {
+        mailOrderState = pMailOrderState;
     }
 
     @JSOptionDefinition(name = "mail_order_title", description = "", key = "mail_order_title", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString mail_order_title = new SOSOptionString(this, CLASSNAME + ".mail_order_title", "", "", "", false);
+    public SOSOptionString mailOrderTitle = new SOSOptionString(this, CLASSNAME + ".mail_order_title", "", "", "", false);
 
-    public SOSOptionString getmail_order_title() {
-        return mail_order_title;
+    public SOSOptionString getMailOrderTitle() {
+        return mailOrderTitle;
     }
 
-    public void setmail_order_title(final SOSOptionString p_mail_order_title) {
-        mail_order_title = p_mail_order_title;
+    public void setMailOrderTitle(final SOSOptionString pMailOrderTitle) {
+        mailOrderTitle = pMailOrderTitle;
     }
 
     @JSOptionDefinition(name = "mail_port", description = "", key = "mail_port", type = "SOSOptionPortNumber", mandatory = false)
-    public SOSOptionPortNumber mail_port = new SOSOptionPortNumber(this, CLASSNAME + ".mail_port", "", "110", "110", false);
+    public SOSOptionPortNumber mailPort = new SOSOptionPortNumber(this, CLASSNAME + ".mail_port", "", "110", "110", false);
 
-    public SOSOptionPortNumber getmail_port() {
-        return mail_port;
+    public SOSOptionPortNumber getMailPort() {
+        return mailPort;
     }
 
-    public void setmail_port(final SOSOptionPortNumber p_mail_port) {
-        mail_port = p_mail_port;
+    public void setMailPort(final SOSOptionPortNumber pMailPort) {
+        mailPort = pMailPort;
     }
 
     @JSOptionDefinition(name = "mail_scheduler_host", description = "", key = "mail_scheduler_host", type = "SOSOptionHostName", mandatory = false)
-    public SOSOptionHostName mail_scheduler_host = new SOSOptionHostName(this, CLASSNAME + ".mail_scheduler_host", "", "", "", false);
+    public SOSOptionHostName mailSchedulerHost = new SOSOptionHostName(this, CLASSNAME + ".mail_scheduler_host", "", "", "", false);
 
-    public SOSOptionHostName getmail_scheduler_host() {
-        return mail_scheduler_host;
+    public SOSOptionHostName getMailSchedulerHost() {
+        return mailSchedulerHost;
     }
 
-    public void setmail_scheduler_host(final SOSOptionHostName p_mail_scheduler_host) {
-        mail_scheduler_host = p_mail_scheduler_host;
+    public void setMailSchedulerHost(final SOSOptionHostName pMailSchedulerHost) {
+        mailSchedulerHost = pMailSchedulerHost;
     }
 
     @JSOptionDefinition(name = "mail_scheduler_port", description = "", key = "mail_scheduler_port", type = "SOSOptionPortNumber", mandatory = false)
-    public SOSOptionPortNumber mail_scheduler_port = new SOSOptionPortNumber(this, CLASSNAME + ".mail_scheduler_port", "", "0", "0", false);
+    public SOSOptionPortNumber mailSchedulerPort = new SOSOptionPortNumber(this, CLASSNAME + ".mail_scheduler_port", "", "0", "0", false);
 
-    public SOSOptionPortNumber getmail_scheduler_port() {
-        return mail_scheduler_port;
+    public SOSOptionPortNumber getMailSchedulerPort() {
+        return mailSchedulerPort;
     }
 
-    public void setmail_scheduler_port(final SOSOptionPortNumber p_mail_scheduler_port) {
-        mail_scheduler_port = p_mail_scheduler_port;
+    public void setMailSchedulerPort(final SOSOptionPortNumber pMailSchedulerPort) {
+        mailSchedulerPort = pMailSchedulerPort;
     }
 
     @JSOptionDefinition(name = "max_mails_to_process", description = "", key = "max_mails_to_process", type = "SOSOptionInteger", mandatory = false)
-    public SOSOptionInteger max_mails_to_process = new SOSOptionInteger(this, CLASSNAME + ".max_mails_to_process", "", "0", "1000", false);
+    public SOSOptionInteger maxMailsToProcess = new SOSOptionInteger(this, CLASSNAME + ".max_mails_to_process", "", "0", "1000", false);
 
-    public SOSOptionInteger getmax_mails_to_process() {
-        return max_mails_to_process;
+    public SOSOptionInteger getMaxMailsToProcess() {
+        return maxMailsToProcess;
     }
 
-    public void setmax_mails_to_process(final SOSOptionInteger p_max_mails_to_process) {
-        max_mails_to_process = p_max_mails_to_process;
+    public void setMaxMailsToProcess(final SOSOptionInteger pMaxMailsToProcess) {
+        maxMailsToProcess = pMaxMailsToProcess;
     }
 
     @JSOptionDefinition(name = "mail_server_timeout", description = "", key = "mail_server_timeout", type = "SOSOptionInteger", mandatory = false)
-    public SOSOptionInteger mail_server_timeout = new SOSOptionInteger(this, CLASSNAME + ".mail_server_timeout", "", "0", "0", false);
+    public SOSOptionInteger mailServerTimeout = new SOSOptionInteger(this, CLASSNAME + ".mail_server_timeout", "", "0", "0", false);
 
-    public SOSOptionInteger getmail_server_timeout() {
-        return mail_server_timeout;
+    public SOSOptionInteger getMailServerTimeout() {
+        return mailServerTimeout;
     }
 
-    public void setmail_server_timeout(final SOSOptionInteger p_mail_server_timeout) {
-        mail_server_timeout = p_mail_server_timeout;
+    public void setMailServerTimeout(final SOSOptionInteger pMailServerTimeout) {
+        mailServerTimeout = pMailServerTimeout;
     }
 
     @JSOptionDefinition(name = "mail_server_type", description = "", key = "mail_server_type", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString mail_server_type = new SOSOptionString(this, CLASSNAME + ".mail_server_type", "", "POP3", "POP3", false);
+    public SOSOptionString mailServerType = new SOSOptionString(this, CLASSNAME + ".mail_server_type", "", "POP3", "POP3", false);
 
-    public SOSOptionString getmail_server_type() {
-        return mail_server_type;
+    public SOSOptionString getMailServerType() {
+        return mailServerType;
     }
 
-    public void setmail_server_type(final SOSOptionString p_mail_server_type) {
-        mail_server_type = p_mail_server_type;
+    public void setMailServerType(final SOSOptionString pMailServerType) {
+        mailServerType = pMailServerType;
     }
 
     @JSOptionDefinition(name = "mail_set_seen", description = "", key = "mail_set_seen", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean mail_set_seen = new SOSOptionBoolean(this, CLASSNAME + ".mail_set_seen", "", "false", "false", false);
+    public SOSOptionBoolean mailSetSeen = new SOSOptionBoolean(this, CLASSNAME + ".mail_set_seen", "", "false", "false", false);
 
-    public SOSOptionBoolean getmail_set_seen() {
-        return mail_set_seen;
+    public SOSOptionBoolean getMailSetSeen() {
+        return mailSetSeen;
     }
 
-    public void setmail_set_seen(final SOSOptionBoolean p_mail_set_seen) {
-        mail_set_seen = p_mail_set_seen;
+    public void setMailSetSeen(final SOSOptionBoolean pMailSetSeen) {
+        mailSetSeen = pMailSetSeen;
     }
 
     @JSOptionDefinition(name = "mail_subject_filter", description = "", key = "mail_subject_filter", type = "SOSOptionString", mandatory = false)
-    public SOSOptionString mail_subject_filter = new SOSOptionString(this, CLASSNAME + ".mail_subject_filter", "", "", "", false);
+    public SOSOptionString mailSubjectFilter = new SOSOptionString(this, CLASSNAME + ".mail_subject_filter", "", "", "", false);
 
-    public SOSOptionString getmail_subject_filter() {
-        return mail_subject_filter;
+    public SOSOptionString getMailSubjectFilter() {
+        return mailSubjectFilter;
     }
 
-    public void setmail_subject_filter(final SOSOptionString p_mail_subject_filter) {
-        mail_subject_filter = p_mail_subject_filter;
+    public void setMailSubjectFilter(final SOSOptionString pMailSubjectFilter) {
+        mailSubjectFilter = pMailSubjectFilter;
     }
 
     @JSOptionDefinition(name = "mail_subject_pattern", description = "", key = "mail_subject_pattern", type = "SOSOptionRegExp", mandatory = false)
-    public SOSOptionRegExp mail_subject_pattern = new SOSOptionRegExp(this, CLASSNAME + ".mail_subject_pattern", "", "", "", false);
+    public SOSOptionRegExp mailSubjectPattern = new SOSOptionRegExp(this, CLASSNAME + ".mail_subject_pattern", "", "", "", false);
 
-    public SOSOptionRegExp getmail_subject_pattern() {
-        return mail_subject_pattern;
+    public SOSOptionRegExp getMailSubjectPattern() {
+        return mailSubjectPattern;
     }
 
-    public void setmail_subject_pattern(final SOSOptionRegExp p_mail_subject_pattern) {
-        mail_subject_pattern = p_mail_subject_pattern;
+    public void setMailSubjectPattern(final SOSOptionRegExp pMailSubjectPattern) {
+        mailSubjectPattern = pMailSubjectPattern;
     }
 
     @JSOptionDefinition(name = "mail_use_seen", description = "", key = "mail_use_seen", type = "SOSOptionBoolean", mandatory = false)
-    public SOSOptionBoolean mail_use_seen = new SOSOptionBoolean(this, CLASSNAME + ".mail_use_seen", "", "true", "true", false);
+    public SOSOptionBoolean mailUseSeen = new SOSOptionBoolean(this, CLASSNAME + ".mail_use_seen", "", "true", "true", false);
 
-    public SOSOptionBoolean getmail_use_seen() {
-        return mail_use_seen;
+    public SOSOptionBoolean getMailUseSeen() {
+        return mailUseSeen;
     }
 
-    public void setmail_use_seen(final SOSOptionBoolean p_mail_use_seen) {
-        mail_use_seen = p_mail_use_seen;
+    public void setMailUseSeen(final SOSOptionBoolean pMailUseSeen) {
+        mailUseSeen = pMailUseSeen;
     }
 
     @JSOptionDefinition(name = "mail_user", description = "", key = "mail_user", type = "SOSOptionUserName", mandatory = true)
-    public SOSOptionUserName mail_user = new SOSOptionUserName(this, CLASSNAME + ".mail_user", "", "", "", true);
+    public SOSOptionUserName mailUser = new SOSOptionUserName(this, CLASSNAME + ".mail_user", "", "", "", true);
 
-    public SOSOptionUserName getmail_user() {
-        return mail_user;
+    public SOSOptionUserName getMailUser() {
+        return mailUser;
     }
 
-    public void setmail_user(final SOSOptionUserName p_mail_user) {
-        mail_user = p_mail_user;
+    public void setMailUser(final SOSOptionUserName pMailUser) {
+        mailUser = pMailUser;
     }
 
     @JSOptionDefinition(name = "min_file_age", description = "Objects, which are younger than min_file_age are not processed", key = "min_file_age", type = "SOSOptionTime", mandatory = false)
-    public SOSOptionTimeHorizon min_file_age = new SOSOptionTimeHorizon(this, CLASSNAME + ".min_file_age",
+    public SOSOptionTimeHorizon minFileAge = new SOSOptionTimeHorizon(this, CLASSNAME + ".min_file_age", 
             "Objects, which are younger than min_file_age are not processed", "", "", false);
-    public SOSOptionTimeHorizon MinAge = (SOSOptionTimeHorizon) min_file_age.SetAlias("min_age");
+    public SOSOptionTimeHorizon minAge = (SOSOptionTimeHorizon) minFileAge.setAlias("min_age");
 
-    public String getmin_file_age() {
-        return min_file_age.Value();
+    public String getMinFileAge() {
+        return minFileAge.getValue();
     }
 
-    public SOSMailProcessInboxOptionsSuperClass setmin_file_age(final String pstrValue) {
-        min_file_age.Value(pstrValue);
+    public SOSMailProcessInboxOptionsSuperClass setMinFileAge(final String pstrValue) {
+        minFileAge.setValue(pstrValue);
         return this;
     }
 
@@ -289,21 +289,22 @@ public class SOSMailProcessInboxOptionsSuperClass extends JSOptionsClass {
     @Override
     public void setAllOptions(final HashMap<String, String> pobjJSSettings) {
         objSettings = pobjJSSettings;
+        super.setSettings(objSettings);
         super.setAllOptions(pobjJSSettings);
     }
 
     @Override
-    public void CheckMandatory() throws JSExceptionMandatoryOptionMissing, Exception {
+    public void checkMandatory() throws JSExceptionMandatoryOptionMissing, Exception {
         try {
-            super.CheckMandatory();
+            super.checkMandatory();
         } catch (Exception e) {
             throw new JSExceptionMandatoryOptionMissing(e.toString());
         }
     }
 
     @Override
-    public void CommandLineArgs(final String[] pstrArgs) {
-        super.CommandLineArgs(pstrArgs);
+    public void commandLineArgs(final String[] pstrArgs) {
+        super.commandLineArgs(pstrArgs);
         this.setAllOptions(super.objSettings);
     }
 

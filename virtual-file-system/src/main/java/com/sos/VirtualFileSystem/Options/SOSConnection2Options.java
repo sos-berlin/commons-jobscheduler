@@ -30,12 +30,19 @@ public class SOSConnection2Options extends SOSConnection2OptionsSuperClass {
     }
 
     public SOSConnection2Options(final String prefix) {
+        //
     }
 
     @Deprecated
     public SOSConnection2Options(final JSListener listener) {
         this();
         this.registerMessageListener(listener);
+    }
+
+    public SOSConnection2Options(final HashMap<String, String> pobjJSSettings) throws Exception {
+        super(pobjJSSettings);
+        initChildOptions();
+        setPrefixedValues(pobjJSSettings);
     }
 
     private void initChildOptions() {
@@ -58,25 +65,17 @@ public class SOSConnection2Options extends SOSConnection2OptionsSuperClass {
         }
     }
 
-    public SOSConnection2Options(final HashMap<String, String> settings) throws Exception {
-        super(settings);
-        initChildOptions();
-        setPrefixedValues(settings);
-    }
-
     public void setPrefixedValues(final HashMap<String, String> settings) throws Exception {
-        alternativeOptions.setAllOptions(settings, strAlternativePrefix + conParamNamePrefixALTERNATIVE);
-        this.addProcessedOptions(alternativeOptions.getProcessedOptions());
         alternativeOptions.setAllOptions(settings);
         this.addProcessedOptions(alternativeOptions.getProcessedOptions());
 
         sourceOptions.setAllOptions(settings, conParamNamePrefixSOURCE);
-        sourceOptions.Alternatives().setChildClasses(settings, conParamNamePrefixSOURCE);
+        sourceOptions.getAlternatives().setChildClasses(settings, conParamNamePrefixSOURCE);
         sourceOptions.setChildClasses(settings, conParamNamePrefixSOURCE);
         this.addProcessedOptions(sourceOptions.getProcessedOptions());
 
         targetOptions.setAllOptions(settings, conParamNamePrefixTARGET);
-        targetOptions.Alternatives().setChildClasses(settings, conParamNamePrefixTARGET);
+        targetOptions.getAlternatives().setChildClasses(settings, conParamNamePrefixTARGET);
         targetOptions.setChildClasses(settings, conParamNamePrefixTARGET);
         this.addProcessedOptions(targetOptions.getProcessedOptions());
 
@@ -85,55 +84,53 @@ public class SOSConnection2Options extends SOSConnection2OptionsSuperClass {
     }
 
     @Override
-    public void CheckMandatory() {
+    public void checkMandatory() {
         try {
-            super.CheckMandatory();
+            super.checkMandatory();
         } catch (Exception e) {
             throw new JSExceptionMandatoryOptionMissing(e.toString());
         }
     }
 
-    public SOSConnection2OptionsAlternate Alternatives() {
+    public SOSConnection2OptionsAlternate getAlternatives() {
         return alternativeOptions;
     }
 
-    public void Alternatives(final SOSConnection2OptionsAlternate val) {
-        if (alternativeOptions == null) {
-            alternativeOptions = new SOSConnection2OptionsAlternate(conParamNamePrefixALTERNATIVE);
-        }
+    public void setAlternatives(final SOSConnection2OptionsAlternate val) {
         alternativeOptions = val;
     }
 
-    public SOSConnection2OptionsAlternate Source() {
+    public SOSConnection2OptionsAlternate getSource() {
         if (sourceOptions == null) {
             sourceOptions = new SOSConnection2OptionsAlternate(conParamNamePrefixSOURCE);
         }
         return sourceOptions;
     }
 
-    public void Source(final SOSConnection2OptionsAlternate val) {
+    public void setSource(final SOSConnection2OptionsAlternate val) {
         sourceOptions = val;
     }
 
-    public SOSConnection2OptionsAlternate JumpServer() {
+    public SOSConnection2OptionsAlternate getJumpServer() {
         if (jumpOptions == null) {
             jumpOptions = new SOSConnection2OptionsAlternate("");
         }
         return jumpOptions;
     }
 
-    public void JumpServer(final SOSConnection2OptionsAlternate val) {
+    public void setJumpServer(final SOSConnection2OptionsAlternate val) {
         jumpOptions = val;
     }
 
-    public SOSConnection2OptionsAlternate Target() {
+    public SOSConnection2OptionsAlternate getTarget() {
         if (targetOptions == null) {
             targetOptions = new SOSConnection2OptionsAlternate("");
         }
         return targetOptions;
     }
 
-    public void Target(final SOSConnection2OptionsAlternate val) {
+    public void setTarget(final SOSConnection2OptionsAlternate val) {
         targetOptions = val;
     }
+    
 }

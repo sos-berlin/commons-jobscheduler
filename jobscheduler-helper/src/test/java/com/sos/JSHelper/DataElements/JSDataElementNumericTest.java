@@ -10,8 +10,8 @@ public class JSDataElementNumericTest {
     public void testSubtract() throws Exception {
         final JSDataElementNumeric objEins = new JSDataElementNumeric("1");
         final JSDataElementNumeric objDeliveryNumberIDoc = new JSDataElementNumeric("10");
-        objDeliveryNumberIDoc.Subtract(objEins).Value();
-        assertEquals("Eins subtrahieren => 10-1=9", "9", objDeliveryNumberIDoc.Value());
+        objDeliveryNumberIDoc.subtract(objEins).getValue();
+        assertEquals("Eins subtrahieren => 10-1=9", "9", objDeliveryNumberIDoc.getValue());
     }
 
 }

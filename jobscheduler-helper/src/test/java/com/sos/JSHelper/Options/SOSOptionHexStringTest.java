@@ -13,9 +13,9 @@ public class SOSOptionHexStringTest {
     @Test
     public void testValue() {
         SOSOptionHexString objHS = new SOSOptionHexString(null, "key", "desc", "value", "", false);
-        objHS.Value("das&#x0d; ist&#x0a; das&#x0d; Haus&#x0a; vom&#x0d; Nikolaus");
-        LOGGER.info(objHS.Value());
-        assertEquals("unescapeXMLEntities", "das\r ist\n das\r Haus\n vom\r Nikolaus", objHS.Value());
+        objHS.setValue("das&#x0d; ist&#x0a; das&#x0d; Haus&#x0a; vom&#x0d; Nikolaus");
+        LOGGER.info(objHS.getValue());
+        assertEquals("unescapeXMLEntities", "das\r ist\n das\r Haus\n vom\r Nikolaus", objHS.getValue());
     }
 
 }

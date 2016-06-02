@@ -36,15 +36,15 @@ public class SOSOptionJSTransferMethod extends SOSOptionStringValueList {
     }
 
     public boolean isTcp() {
-        return this.Value().equalsIgnoreCase(enuJSTransferModes.tcp.description);
+        return this.getValue().equalsIgnoreCase(enuJSTransferModes.tcp.description);
     }
 
     public boolean isUdp() {
-        return this.Value().equalsIgnoreCase(enuJSTransferModes.udp.description);
+        return this.getValue().equalsIgnoreCase(enuJSTransferModes.udp.description);
     }
 
     public boolean isJMS() {
-        return this.Value().equalsIgnoreCase(enuJSTransferModes.jms.description);
+        return this.getValue().equalsIgnoreCase(enuJSTransferModes.jms.description);
     }
 
     public String getDescription() {

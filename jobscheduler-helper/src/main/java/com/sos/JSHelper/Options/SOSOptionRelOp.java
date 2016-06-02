@@ -10,10 +10,10 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 public class SOSOptionRelOp extends SOSOptionString {
 
     private static final long serialVersionUID = 1935027172360607987L;
-    private static HashMap<String, Integer> objRelOp = null;
     private static final String JSH_T_0010 = "JSH_T_0010";
     private static final String JSJ_E_0017 = "JSJ_E_0017";
-
+    private static HashMap<String, Integer> objRelOp = null;
+ 
     public SOSOptionRelOp(JSOptionsClass pPobjParent, String pPstrKey, String pPstrDescription, String pPstrValue, String pPstrDefaultValue,
             boolean pPflgIsMandatory) {
         super(pPobjParent, pPstrKey, pPstrDescription, pPstrValue, pPstrDefaultValue, pPflgIsMandatory);
@@ -48,7 +48,7 @@ public class SOSOptionRelOp extends SOSOptionString {
     }
 
     @Override
-    public void Value(final String pstrValue) {
+    public void setValue(final String pstrValue) {
         if (objRelOp == null) {
             setRelOpTab();
         }

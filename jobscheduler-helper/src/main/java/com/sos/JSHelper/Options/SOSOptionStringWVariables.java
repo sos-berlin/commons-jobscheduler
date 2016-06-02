@@ -56,21 +56,21 @@ public class SOSOptionStringWVariables extends SOSOptionElement {
         }
     }
 
-    public String OriginalValue() {
+    public String getOriginalValue() {
         return strOriginalValue;
     }
 
     public void doReSubstitution() {
         try {
             String strT = substituteAllDate();
-            super.Value(strT);
+            super.setValue(strT);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
     }
 
     @Override
-    public String Value() {
+    public String getValue() {
         String strT = strValue;
         try {
             if (objParentClass != null && objParentClass.gflgSubsituteVariables) {
@@ -85,9 +85,9 @@ public class SOSOptionStringWVariables extends SOSOptionElement {
     }
 
     @Override
-    public void Value(final String pstrStringValue) {
+    public void setValue(final String pstrStringValue) {
         strOriginalValue = pstrStringValue;
-        super.Value(pstrStringValue);
+        super.setValue(pstrStringValue);
     }
 
 }

@@ -28,15 +28,15 @@ public class PropertyFactory extends JSJobUtilitiesClass<PropertyFactoryOptions>
         return objOptions;
     }
 
-    public PropertyFactory Execute() throws Exception {
+    public PropertyFactory execute() throws Exception {
         try {
-            getOptions().CheckMandatory();
+            getOptions().checkMandatory();
             LOGGER.debug(getOptions().dirtyString());
-            String strPropertyFileName = objOptions.PropertyFileNamePrefix.Value();
+            String strPropertyFileName = objOptions.propertyFileNamePrefix.getValue();
             HashMap<String, HashMap<String, I18NObject>> allKeys = new HashMap<>();
             HashMap<String, I18NObject> mapKeys = new HashMap<>();
             Vector<String> vecLanguages = new Vector<>();
-            for (File objFile : objOptions.SourceFolderName.listFiles()) {
+            for (File objFile : objOptions.sourceFolderName.listFiles()) {
                 String strFileName = objFile.getName();
                 if (strFileName.startsWith(strPropertyFileName) && strFileName.endsWith(".properties")) {
                     LOGGER.info("FileName = " + objFile.getName());
@@ -83,14 +83,6 @@ public class PropertyFactory extends JSJobUtilitiesClass<PropertyFactoryOptions>
             throw e;
         }
         return this;
-    }
-
-    public void init() {
-        doInitialize();
-    }
-
-    private void doInitialize() {
-        // doInitialize
     }
 
 }

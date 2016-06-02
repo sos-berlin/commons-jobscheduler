@@ -25,7 +25,7 @@ public interface ISOSVirtualFile {
 
     public void setFilePermissions(final Integer pintNewPermission) throws Exception;
 
-    public boolean FileExists() throws Exception;
+    public boolean fileExists() throws Exception;
 
     public boolean isDirectory() throws Exception;
 
@@ -75,9 +75,9 @@ public interface ISOSVirtualFile {
 
     public void closeOutput();
 
-    public String File2String();
+    public String file2String();
 
-    public void String2File(final String pstrContent);
+    public void string2File(final String pstrContent);
 
     public long getModificationDateTime();
 

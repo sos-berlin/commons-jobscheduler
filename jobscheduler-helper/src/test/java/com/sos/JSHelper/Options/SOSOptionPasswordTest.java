@@ -15,10 +15,6 @@ public class SOSOptionPasswordTest {
     private static final Logger LOGGER = Logger.getLogger(SOSOptionPasswordTest.class);
     private SOSOptionPassword objOption = null;
 
-    public SOSOptionPasswordTest() {
-        //
-    }
-
     @Before
     public void setUp() throws Exception {
         String strLog4JFileName = "./log4j.properties";
@@ -28,20 +24,20 @@ public class SOSOptionPasswordTest {
 
     @Test
     public final void testToString() {
-        objOption.Value("huhu");
-        org.junit.Assert.assertEquals("password", "huhu", objOption.Value());
-        String strFileName = CreateTestFile();
-        objOption.Value(SOSOptionPassword.conBackTic + strFileName + SOSOptionPassword.conBackTic);
-        org.junit.Assert.assertEquals("password", "huhu", objOption.Value());
+        objOption.setValue("huhu");
+        org.junit.Assert.assertEquals("password", "huhu", objOption.getValue());
+        String strFileName = createTestFile();
+        objOption.setValue(SOSOptionPassword.conBackTic + strFileName + SOSOptionPassword.conBackTic);
+        org.junit.Assert.assertEquals("password", "huhu", objOption.getValue());
     }
 
-    private String CreateTestFile() {
+    private String createTestFile() {
         String strFileName = System.getProperty("java.io.tmpdir") + "test.cmd";
         JSFile objFile = new JSFile(strFileName);
         objFile.deleteOnExit();
         try {
-            objFile.WriteLine("@echo off");
-            objFile.WriteLine("echo huhu");
+            objFile.writeLine("@echo off");
+            objFile.writeLine("echo huhu");
             objFile.close();
             objFile.setExecutable(true);
         } catch (IOException e) {
@@ -52,13 +48,13 @@ public class SOSOptionPasswordTest {
 
     @Test
     public final void testValueString() {
-        objOption.Value("[uuid:]");
-        LOGGER.debug(objOption.Value());
-        objOption.Value("[env:username]");
-        LOGGER.debug(objOption.Value());
-        String strFilenName = CreateTestFile();
-        objOption.Value("[shell:" + strFilenName + "]");
-        LOGGER.debug(objOption.Value());
+        objOption.setValue("[uuid:]");
+        LOGGER.debug(objOption.getValue());
+        objOption.setValue("[env:username]");
+        LOGGER.debug(objOption.getValue());
+        String strFilenName = createTestFile();
+        objOption.setValue("[shell:" + strFilenName + "]");
+        LOGGER.debug(objOption.getValue());
     }
 
 }

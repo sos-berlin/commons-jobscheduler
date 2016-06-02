@@ -32,18 +32,18 @@ public class SOSOptionProxyProtocol extends JSOptionValueList {
     }
 
     public boolean isHttp() {
-        return this.Value().equalsIgnoreCase(Protocol.http.name());
+        return this.getValue().equalsIgnoreCase(Protocol.http.name());
     }
 
     public boolean isSocks4() {
-        return this.Value().equalsIgnoreCase(Protocol.socks4.name());
+        return this.getValue().equalsIgnoreCase(Protocol.socks4.name());
     }
 
     public boolean isSocks5() {
-        return this.Value().equalsIgnoreCase(Protocol.socks5.name());
+        return this.getValue().equalsIgnoreCase(Protocol.socks5.name());
     }
 
-    public void Value(String value) {
+    public void setValue(String value) {
         String testValue = value.toLowerCase();
         try {
             SOSOptionProxyProtocol.Protocol.valueOf(testValue);
@@ -51,7 +51,7 @@ public class SOSOptionProxyProtocol extends JSOptionValueList {
             throw new JobSchedulerException(String.format("Value \"%s\" is not valid for %s - valid values are %s : %s", testValue, strKey,
                     Protocol.asString(), e.toString()));
         }
-        super.Value(testValue);
+        super.setValue(testValue);
     }
 
 }

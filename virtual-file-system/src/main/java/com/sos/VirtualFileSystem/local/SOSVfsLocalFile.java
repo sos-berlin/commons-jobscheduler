@@ -39,7 +39,7 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
     }
 
     @Override
-    public boolean FileExists() throws Exception {
+    public boolean fileExists() throws Exception {
         return super.exists();
     }
 
@@ -118,7 +118,7 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
     @Override
     public String getModificationTime() {
         Date dteModificationTime = new Date(super.lastModified());
-        return new JSDataElementDateTime(dteModificationTime).FormattedValue();
+        return new JSDataElementDateTime(dteModificationTime).getFormattedValue();
     }
 
     @Override
@@ -224,7 +224,7 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
                 objInputStream.close();
             }
         } catch (IOException e) {
-            LOGGER.error(e.getLocalizedMessage());
+            LOGGER.error(e.getMessage());
             throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_134.params(conMethodName), e);
         } finally {
             objInputStream = null;
@@ -300,7 +300,7 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
     }
 
     @Override
-    public void String2File(final String pstrContent) {
+    public void string2File(final String pstrContent) {
         try {
             OutputStream objOS = this.getFileOutputStream();
             objOS.write(pstrContent.getBytes());
@@ -312,7 +312,7 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
     }
 
     @Override
-    public String File2String() {
+    public String file2String() {
         InputStream objFI = this.getFileInputStream();
         if (objFI == null) {
             throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_265.get());
@@ -354,7 +354,7 @@ public class SOSVfsLocalFile extends JSFile implements ISOSVirtualFile {
             this.closeOutput();
             flgClosingDone = true;
         } catch (Exception e) {
-            LOGGER.error(e.getLocalizedMessage());
+            LOGGER.error(e.getMessage());
             throw new JobSchedulerException(SOSVfsMessageCodes.SOSVfs_E_266.get(), e);
         } finally {
             if (!flgClosingDone) {

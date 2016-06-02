@@ -6,48 +6,48 @@ import java.util.LinkedHashSet;
 
 public class SchedulerEvent {
 
-    protected String event_title;
-    protected String event_class;
-    protected String event_id;
-    protected String job_name;
-    protected String job_chain;
-    protected String order_id;
-    protected String exit_code;
+    protected String eventTitle;
+    protected String eventClass;
+    protected String eventId;
+    protected String jobName;
+    protected String jobChain;
+    protected String orderId;
+    protected String exitCode;
     protected String created;
     protected String expires;
-    protected String remote_scheduler_host;
-    protected String remote_scheduler_port;
-    protected String scheduler_id;
+    protected String remoteSchedulerHost;
+    protected String remoteSchedulerPort;
+    protected String schedulerId;
     protected String logic = "";
     protected String comment = "";
-    private String event_name;
+    private String eventName;
 
-    public String getEvent_title() {
-        return event_title;
+    public String getEventTitle() {
+        return eventTitle;
     }
 
-    public String getEvent_class() {
-        return event_class;
+    public String getEventClass() {
+        return eventClass;
     }
 
-    public String getEvent_id() {
-        return event_id;
+    public String getEventId() {
+        return eventId;
     }
 
-    public String getJob_name() {
-        return job_name;
+    public String getJobName() {
+        return jobName;
     }
 
-    public String getJob_chain() {
-        return job_chain;
+    public String getJobChain() {
+        return jobChain;
     }
 
-    public String getOrder_id() {
-        return order_id;
+    public String getOrderId() {
+        return orderId;
     }
 
-    public String getExit_code() {
-        return exit_code;
+    public String getExitCode() {
+        return exitCode;
     }
 
     public String getCreated() {
@@ -58,16 +58,16 @@ public class SchedulerEvent {
         return expires;
     }
 
-    public String getRemote_scheduler_host() {
-        return remote_scheduler_host;
+    public String getRemoteSchedulerHost() {
+        return remoteSchedulerHost;
     }
 
-    public String getRemote_scheduler_port() {
-        return remote_scheduler_port;
+    public String getRemoteSchedulerPort() {
+        return remoteSchedulerPort;
     }
 
-    public String getScheduler_id() {
-        return scheduler_id;
+    public String getSchedulerId() {
+        return schedulerId;
     }
 
     public String getLogic() {
@@ -76,16 +76,16 @@ public class SchedulerEvent {
 
     private HashMap properties() {
         HashMap attr = new HashMap();
-        attr.put("event_title", event_title);
-        attr.put("event_class", event_class);
-        attr.put("event_id", event_id);
-        attr.put("job_name", job_name);
-        attr.put("job_chain", job_chain);
-        attr.put("order_id", order_id);
-        attr.put("exit_code", exit_code);
-        attr.put("remote_scheduler_host", remote_scheduler_host);
-        attr.put("remote_scheduler_port", remote_scheduler_port);
-        attr.put("scheduler_id", scheduler_id);
+        attr.put("event_title", eventTitle);
+        attr.put("event_class", eventClass);
+        attr.put("event_id", eventId);
+        attr.put("job_name", jobName);
+        attr.put("job_chain", jobChain);
+        attr.put("order_id", orderId);
+        attr.put("exit_code", exitCode);
+        attr.put("remote_scheduler_host", remoteSchedulerHost);
+        attr.put("remote_scheduler_port", remoteSchedulerPort);
+        attr.put("scheduler_id", schedulerId);
         return attr;
     }
 
@@ -113,8 +113,8 @@ public class SchedulerEvent {
         return erg;
     }
 
-    public void setEvent_name(String event_name) {
-        this.event_name = event_name;
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
     }
 
     public void setLogic(String logic) {
@@ -125,15 +125,15 @@ public class SchedulerEvent {
         return comment;
     }
 
-    public String getEvent_name() {
-        if ("".equals(this.event_name)) {
-            if ("".equals(this.event_class)) {
-                return this.event_id;
+    public String getEventName() {
+        if ("".equals(this.eventName)) {
+            if ("".equals(this.eventClass)) {
+                return this.eventId;
             } else {
-                return this.event_class + "." + this.event_id;
+                return this.eventClass + "." + this.eventId;
             }
         } else {
-            return event_name;
+            return eventName;
         }
     }
 

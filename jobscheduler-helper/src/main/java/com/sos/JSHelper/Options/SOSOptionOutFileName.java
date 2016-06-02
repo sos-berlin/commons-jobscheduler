@@ -18,16 +18,16 @@ public class SOSOptionOutFileName extends SOSOptionFileName {
     }
 
     @Override
-    public void CheckMandatory(final boolean pflgSetMandatory) {
+    public void checkMandatory(final boolean pflgSetMandatory) {
         this.isMandatory(pflgSetMandatory);
-        this.CheckMandatory();
+        this.checkMandatory();
     }
 
     @Override
-    public void CheckMandatory() {
+    public void checkMandatory() {
         final String conMethodName = "JSOptionOutFileName::CheckMandatory";
         if (this.isMandatory()) {
-            this.JSFile();
+            this.getJSFile();
             if (objFile != null) {
                 String lstrFileName = strValue;
                 try {
@@ -45,7 +45,7 @@ public class SOSOptionOutFileName extends SOSOptionFileName {
     }
 
     @Override
-    public JSFile JSFile() {
+    public JSFile getJSFile() {
         if (objFile == null && isNotEmpty(strValue)) {
             objFile = new JSFile(strValue);
         }

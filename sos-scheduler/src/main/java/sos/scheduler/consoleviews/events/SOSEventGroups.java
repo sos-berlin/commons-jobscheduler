@@ -42,7 +42,7 @@ public class SOSEventGroups {
                 BooleanExp exp = new BooleanExp(logic);
                 while (i.hasNext()) {
                     SchedulerEvent e = (SchedulerEvent) i.next();
-                    exp.replace(e.getEvent_name(), exp.trueFalse(e.isIn(listOfActiveEvents)));
+                    exp.replace(e.getEventName(), exp.trueFalse(e.isIn(listOfActiveEvents)));
                 }
                 erg = exp.evaluateExpression();
             }

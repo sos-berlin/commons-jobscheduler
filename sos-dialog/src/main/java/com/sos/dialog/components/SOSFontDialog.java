@@ -28,7 +28,6 @@ public class SOSFontDialog extends SOSPreferenceStore {
     private FontData fontData;
     private RGB foreGround;
     private Shell objParentShell = null;
-    private final Class<?> objClass = this.getClass();
 
     public SOSFontDialog(final Shell pobjParentShell, final String pstrPreferenceStoreKey) {
         super();
@@ -106,8 +105,7 @@ public class SOSFontDialog extends SOSPreferenceStore {
     }
 
     public void show() {
-        final Display d = new Display();
-        show(d);
+        show(new Display());
     }
 
     public FontData getFontData() {

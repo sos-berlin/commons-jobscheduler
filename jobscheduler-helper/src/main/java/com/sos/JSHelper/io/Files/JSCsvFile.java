@@ -29,15 +29,6 @@ public class JSCsvFile extends JSTextFile {
     public static char BLOCK_DELIMITER = '\n';
     public static char VALUE_DELIMITER = '\"';
 
-    public JSCsvFile ColumnDelimiter(final String pstrColumnDelimiter) {
-        chrColumnDelimiter = pstrColumnDelimiter.toCharArray()[0];
-        return this;
-    }
-
-    public char ColumnDelimiter() {
-        return chrColumnDelimiter;
-    }
-
     public JSCsvFile(final String pstrFileName) {
         super(pstrFileName);
     }
@@ -47,44 +38,53 @@ public class JSCsvFile extends JSTextFile {
         registerMessageListener(objListener);
     }
 
+    public JSCsvFile setColumnDelimiter(final String pstrColumnDelimiter) {
+        chrColumnDelimiter = pstrColumnDelimiter.toCharArray()[0];
+        return this;
+    }
+
+    public char getColumnDelimiter() {
+        return chrColumnDelimiter;
+    }
+
     public void loadHeaders() throws Exception {
         if (strHeaders == null) {
             strHeaders = readCSVLine();
         }
     }
 
-    public boolean CheckColumnCount() {
+    public boolean isCheckColumnCount() {
         return flgCheckColumnCount;
     }
 
-    public void CheckColumnCount(final boolean pflgCheckColumnCount) {
+    public void setCheckColumnCount(final boolean pflgCheckColumnCount) {
         flgCheckColumnCount = pflgCheckColumnCount;
     }
 
-    public JSCsvFile Headers(final String[] pstrHeaders) throws Exception {
+    public JSCsvFile setHeaders(final String[] pstrHeaders) throws Exception {
         strHeaders = pstrHeaders;
-        WriteHeaders();
+        writeHeaders();
         return this;
     }
 
-    public JSCsvFile Headers(final ArrayList<String> fields) throws Exception {
+    public JSCsvFile setHeaders(final ArrayList<String> fields) throws Exception {
         strHeaders = new String[fields.size()];
         for (int j = 0; j < fields.size(); j++) {
             strHeaders[j] = fields.get(j);
         }
-        WriteHeaders();
+        writeHeaders();
         return this;
     }
 
-    public JSCsvFile WriteHeaders() throws Exception {
-        if (!flgHeadersWritten && NoOfCharsInBuffer() <= 0) {
+    public JSCsvFile writeHeaders() throws Exception {
+        if (!flgHeadersWritten && getNoOfCharsInBuffer() <= 0) {
             this.append(strHeaders);
             flgHeadersWritten = true;
         }
         return this;
     }
 
-    public String[] Headers() {
+    public String[] getHeaders() {
         return strHeaders;
     }
 
@@ -130,7 +130,7 @@ public class JSCsvFile extends JSTextFile {
         StringBuilder stbBuilder = new StringBuilder();
         boolean flgFieldIsQuoted = false;
         int intLast = -1;
-        int ch = Reader().read();
+        int ch = getReader().read();
         if (ch == -1) {
             return null;
         }
@@ -147,7 +147,7 @@ public class JSCsvFile extends JSTextFile {
                 }
             }
         }
-        while ((ch = Reader().read()) != -1) {
+        while ((ch = getReader().read()) != -1) {
             if (ch == chrRecordDelimiter && !flgFieldIsQuoted) {
                 final int intL = stbBuilder.length();
                 if (intL > 1 && stbBuilder.charAt(stbBuilder.length() - 1) == '\r') {
@@ -227,12 +227,12 @@ public class JSCsvFile extends JSTextFile {
     public JSCsvFile append(final Object[] fields) throws Exception {
         final StringBuilder builder = new StringBuilder();
         for (int i = 0; i < fields.length; i++) {
-            builder.append(MaskSpecialChars(String.valueOf(fields[i])));
+            builder.append(maskSpecialChars(String.valueOf(fields[i])));
             if (i < fields.length - 1) {
                 builder.append(chrColumnDelimiter);
             }
         }
-        Write(builder.toString());
+        write(builder.toString());
         return this;
     }
 
@@ -240,12 +240,12 @@ public class JSCsvFile extends JSTextFile {
         final StringBuilder builder = new StringBuilder();
         final int intSize = fields.size();
         for (int i = 0; i < intSize; i++) {
-            builder.append(MaskSpecialChars(String.valueOf(fields.elementAt(i))));
+            builder.append(maskSpecialChars(String.valueOf(fields.elementAt(i))));
             if (i < intSize - 1) {
                 builder.append(chrColumnDelimiter);
             }
         }
-        Write(builder.toString());
+        write(builder.toString());
         return this;
     }
 
@@ -253,44 +253,44 @@ public class JSCsvFile extends JSTextFile {
         final StringBuilder builder = new StringBuilder();
         while (fields.hasNext()) {
             final String elem = fields.next();
-            builder.append(MaskSpecialChars(elem));
+            builder.append(maskSpecialChars(elem));
             if (fields.hasNext()) {
                 builder.append(chrColumnDelimiter);
             }
         }
-        Write(builder.toString());
+        write(builder.toString());
         return this;
     }
 
-    public JSCsvFile AddCellValues(final Object[] fields) throws Exception {
+    public JSCsvFile addCellValues(final Object[] fields) throws Exception {
         for (final Object field : fields) {
-            AddCellValue(String.valueOf(field));
+            addCellValue(String.valueOf(field));
         }
         return this;
     }
 
-    public JSCsvFile AddCellValues(final Iterator<String> fields) throws Exception {
+    public JSCsvFile addCellValues(final Iterator<String> fields) throws Exception {
         this.append(fields);
         return this;
     }
 
     @Override
-    public JSCsvFile NewLine() throws Exception {
-        super.NewLine();
+    public JSCsvFile newLine() throws Exception {
+        super.newLine();
         lngNoOfFieldsInBuffer = 0;
         return this;
     }
 
-    public JSCsvFile AddCellValue(final String pstrS) throws Exception {
-        if (NoOfCharsInBuffer() > 0 || lngNoOfFieldsInBuffer > 0) {
-            OutChar(chrColumnDelimiter);
+    public JSCsvFile addCellValue(final String pstrS) throws Exception {
+        if (getNoOfCharsInBuffer() > 0 || lngNoOfFieldsInBuffer > 0) {
+            outChar(chrColumnDelimiter);
         }
-        OutString(MaskSpecialChars(pstrS));
+        outString(maskSpecialChars(pstrS));
         lngNoOfFieldsInBuffer++;
         return this;
     }
 
-    private String MaskSpecialChars(String strT) {
+    private String maskSpecialChars(String strT) {
         boolean flgSurroundWithQuotes = false;
         final String strDelim = String.valueOf(chrValueDelimiter);
         final int iPos = strT.indexOf(chrValueDelimiter);
@@ -307,20 +307,20 @@ public class JSCsvFile extends JSTextFile {
         return strT;
     }
 
-    public boolean AlwaysSurroundFielJSithQuotes() {
+    public boolean isAlwaysSurroundFielJSithQuotes() {
         return flgAlwaysSurroundFielJSithQuotes;
     }
 
-    public JSCsvFile AlwaysSurroundFielJSithQuotes(final boolean pflgAlwaysSurroundFielJSithQuotes) throws Exception {
+    public JSCsvFile setAlwaysSurroundFielJSithQuotes(final boolean pflgAlwaysSurroundFielJSithQuotes) throws Exception {
         flgAlwaysSurroundFielJSithQuotes = pflgAlwaysSurroundFielJSithQuotes;
         return this;
     }
 
-    public boolean IgnoreValueDelimiter() {
+    public boolean isIgnoreValueDelimiter() {
         return flgIgnoreValueDelimiter;
     }
 
-    public JSCsvFile IgnoreValueDelimiter(final boolean pflgIgnoreValueDelimiter) throws Exception {
+    public JSCsvFile setIgnoreValueDelimiter(final boolean pflgIgnoreValueDelimiter) throws Exception {
         flgIgnoreValueDelimiter = pflgIgnoreValueDelimiter;
         return this;
     }
@@ -335,22 +335,22 @@ public class JSCsvFile extends JSTextFile {
             if (pstrCells[i] == null) {
                 pstrCells[i] = "";
             } else {
-                pstrCells[i] = AdjustCsvValue(pstrCells[i]);
+                pstrCells[i] = adjustCsvValue(pstrCells[i]);
             }
             strT += pstrCells[i] + FIELD_DELIMITER;
         }
         if (bufWriter == null) {
-            Writer();
+            getWriter();
         }
         bufWriter.write(strT);
     }
 
-    public void WriteLine(final String[] pstrCells) throws Exception {
+    public void writeLine(final String[] pstrCells) throws Exception {
         write(pstrCells);
-        this.WriteLine("");
+        this.writeLine("");
     }
 
-    public String AdjustCsvValue(final String pstrV) {
+    public String adjustCsvValue(final String pstrV) {
         String strT = pstrV;
         if (pstrV.indexOf(FIELD_DELIMITER) > 0) {
             strT = VALUE_DELIMITER + strT + VALUE_DELIMITER;

@@ -36,14 +36,14 @@ public class SOSOptionLog4JPropertyFile extends SOSOptionInFileName {
     }
 
     public Logger getLoggerInstance(final String pstrParentClassName) {
-        if (this.Value() == null || ("./" + conLOG4J_PROPERTIESDefaultFileName).equalsIgnoreCase(this.Value())) {
+        if (this.getValue() == null || ("./" + conLOG4J_PROPERTIESDefaultFileName).equalsIgnoreCase(this.getValue())) {
             JSOptionsClass objO = new JSOptionsClass();
-            String strF = objO.log4jPropertyFileName.Value();
+            String strF = objO.log4jPropertyFileName.getValue();
             if (strF != null) {
                 strPropfileName = strF;
             }
         } else {
-            strPropfileName = this.Value();
+            strPropfileName = this.getValue();
             if ("null".equalsIgnoreCase(strPropfileName)) {
                 BasicConfigurator.configure();
                 return Logger.getRootLogger();
@@ -55,14 +55,14 @@ public class SOSOptionLog4JPropertyFile extends SOSOptionInFileName {
         boolean flgPropFileIsOk = false;
         if (!objLog4JPropertyFile.exists() && objLog4JPropertyFile.getParentFile().canWrite()) {
             try {
-                objLog4JPropertyFile.WriteLine("log4j.rootCategory=info, stdout");
+                objLog4JPropertyFile.writeLine("log4j.rootCategory=info, stdout");
                 if (flgUseJobSchedulerLog4JAppender == false) {
-                    objLog4JPropertyFile.WriteLine("log4j.appender.stdout=org.apache.log4j.ConsoleAppender");
+                    objLog4JPropertyFile.writeLine("log4j.appender.stdout=org.apache.log4j.ConsoleAppender");
                 } else {
-                    objLog4JPropertyFile.WriteLine("log4j.appender.stdout=com.sos.scheduler.JobSchedulerLog4JAppender");
+                    objLog4JPropertyFile.writeLine("log4j.appender.stdout=com.sos.scheduler.JobSchedulerLog4JAppender");
                 }
-                objLog4JPropertyFile.WriteLine("log4j.appender.stdout.layout=org.apache.log4j.PatternLayout");
-                objLog4JPropertyFile.WriteLine("log4j.appender.stdout.layout.ConversionPattern=%5p [%t] (%F:%L) - %m%n");
+                objLog4JPropertyFile.writeLine("log4j.appender.stdout.layout=org.apache.log4j.PatternLayout");
+                objLog4JPropertyFile.writeLine("log4j.appender.stdout.layout.ConversionPattern=%5p [%t] (%F:%L) - %m%n");
                 objLog4JPropertyFile.close();
                 flgNew = true;
                 flgPropFileIsOk = true;

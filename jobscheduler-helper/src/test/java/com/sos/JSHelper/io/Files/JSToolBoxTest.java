@@ -11,7 +11,7 @@ public class JSToolBoxTest {
     @Test
     public void TestConstructor() {
         JSToolBox objT = new JSToolBox();
-        assertEquals("Constructor-Test", true, (objT != null));
+        assertEquals("Constructor-Test", true, objT != null);
     }
 
 }

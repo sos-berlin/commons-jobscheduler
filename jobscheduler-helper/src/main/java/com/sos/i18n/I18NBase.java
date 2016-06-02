@@ -5,9 +5,9 @@ import java.util.Locale;
 /** @author KB */
 public class I18NBase extends com.sos.JSHelper.Basics.JSToolBox {
 
-    static Msg.BundleBaseName BUNDLE_BASE_NAME;
     private String strLocale = Locale.getDefault().toString();
     private Locale objLocale = Locale.getDefault();
+    static Msg.BundleBaseName BUNDLE_BASE_NAME;
 
     protected I18NBase() {
         //

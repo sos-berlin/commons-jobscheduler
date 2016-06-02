@@ -58,7 +58,7 @@ public class SOSSSH2JSchTest {
         }
 
         @Override
-        public void setAuth_method(SOSOptionAuthenticationMethod authMethod) {
+        public void setAuthMethod(SOSOptionAuthenticationMethod authMethod) {
             optionAuthenticationMethod = authMethod;
         }
 
@@ -73,17 +73,17 @@ public class SOSSSH2JSchTest {
         }
 
         @Override
-        public SOSOptionAuthenticationMethod getAuth_method() {
+        public SOSOptionAuthenticationMethod getAuthMethod() {
             return optionAuthenticationMethod;
         }
 
         @Override
-        public SOSOptionInFileName getAuth_file() {
+        public SOSOptionInFileName getAuthFile() {
             return optionAuthFileName;
         }
 
         @Override
-        public void setAuth_file(SOSOptionInFileName authFile) {
+        public void setAuthFile(SOSOptionInFileName authFile) {
             optionAuthFileName = authFile;
         }
     };
@@ -92,7 +92,7 @@ public class SOSSSH2JSchTest {
     public void setup() {
         authenticationOptions.setUser(new SOSOptionUserName(null, null, null, USERNAME, USERNAME, false));
         authenticationOptions.setPassword(new SOSOptionPassword(null, null, null, PASSWD, PASSWD, false));
-        authenticationOptions.setAuth_method(new SOSOptionAuthenticationMethod(null, null, null, AUTH_METHOD, AUTH_METHOD, false));
+        authenticationOptions.setAuthMethod(new SOSOptionAuthenticationMethod(null, null, null, AUTH_METHOD, AUTH_METHOD, false));
         secureChannel = new JSch();
     }
 
@@ -237,15 +237,15 @@ public class SOSSSH2JSchTest {
     }
 
     private void sessionConnect() throws JSchException, RuntimeException {
-        sshSession = secureChannel.getSession(authenticationOptions.getUser().Value(), HOST, PORT);
-        sshSession.setPassword(authenticationOptions.getPassword().Value().toString());
+        sshSession = secureChannel.getSession(authenticationOptions.getUser().getValue(), HOST, PORT);
+        sshSession.setPassword(authenticationOptions.getPassword().getValue().toString());
         sshSession.setConfig("StrictHostKeyChecking", "no");
         sshSession.connect();
     }
 
     private void sessionConnectWindows() throws JSchException, RuntimeException {
-        sshSession = secureChannel.getSession(authenticationOptions.getUser().Value(), WINDOWS_HOST, PORT);
-        sshSession.setPassword(authenticationOptions.getPassword().Value().toString());
+        sshSession = secureChannel.getSession(authenticationOptions.getUser().getValue(), WINDOWS_HOST, PORT);
+        sshSession.setPassword(authenticationOptions.getPassword().getValue().toString());
         sshSession.setConfig("StrictHostKeyChecking", "no");
         sshSession.connect();
     }

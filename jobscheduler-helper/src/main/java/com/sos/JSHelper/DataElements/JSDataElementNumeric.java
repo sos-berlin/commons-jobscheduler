@@ -12,7 +12,7 @@ public class JSDataElementNumeric extends JSDataElement {
     }
 
     public JSDataElementNumeric(final String pstrValue) {
-        super.Value(pstrValue);
+        super.setValue(pstrValue);
     }
 
     public JSDataElementNumeric(final String pPstrValue, final String pPstrDescription, final int pPintSize, final int pPintPos,
@@ -20,68 +20,68 @@ public class JSDataElementNumeric extends JSDataElement {
         super(pPstrValue, pPstrDescription, pPintSize, pPintPos, pPstrFormatString, pPstrColumnHeader, pPstrXMLTagName);
     }
 
-    public int MinSize() {
+    public int getMinSize() {
         return 0;
     }
 
-    public void MinSize(final int pintMinSize) {
+    public void setMinSize(final int pintMinSize) {
         //
     }
 
-    public int MaxSize() {
+    public int getMaxSize() {
         return 0;
     }
 
-    public void MaxSize(final int pintMaxSize) {
+    public void setMaxSize(final int pintMaxSize) {
         //
     }
 
     @Override
-    public String FormattedValue() {
-        final String strFormat = super.FormatString();
+    public String getFormattedValue() {
+        final String strFormat = super.getFormatString();
         if (isNotEmpty(strFormat)) {
             try {
-                final String strFormatted = String.format("%1$" + strFormat, new Integer(this.Value()));
+                final String strFormatted = String.format("%1$" + strFormat, new Integer(this.getValue()));
                 return strFormatted.trim();
             } catch (final Exception numberFormException) {
-                return super.Value();
+                return super.getValue();
             }
         } else {
-            return super.Value();
+            return super.getValue();
         }
     }
 
-    public void Decimal(final int pintDecimal) {
+    public void setDecimal(final int pintDecimal) {
         LOGGER.info("JSDataElementNumeric.Decimal()" + pintDecimal);
         intDecimal = pintDecimal;
     }
 
-    public int Decimal() {
+    public int getDecimal() {
         return intDecimal;
     }
 
-    public int IntValue() {
-        return new Integer(super.Value()).intValue();
+    public int getIntegerValue() {
+        return new Integer(super.getValue()).intValue();
     }
 
-    public JSDataElementNumeric Subtract(final JSDataElementNumeric pobjDataElementNumeric) {
-        final Integer intValue = new Integer(IntValue() - pobjDataElementNumeric.IntValue());
-        this.Value(intValue.toString());
+    public JSDataElementNumeric subtract(final JSDataElementNumeric pobjDataElementNumeric) {
+        final Integer intValue = new Integer(getIntegerValue() - pobjDataElementNumeric.getIntegerValue());
+        this.setValue(intValue.toString());
         return this;
     }
 
-    public JSDataElementNumeric Add(final JSDataElementNumeric pobjDataElementNumeric) {
-        final Integer intValue = new Integer(IntValue() + pobjDataElementNumeric.IntValue());
-        this.Value(intValue.toString());
+    public JSDataElementNumeric add(final JSDataElementNumeric pobjDataElementNumeric) {
+        final Integer intValue = new Integer(getIntegerValue() + pobjDataElementNumeric.getIntegerValue());
+        this.setValue(intValue.toString());
         return this;
     }
 
     @Override
-    public String SQLValue() {
-        if (isEmpty(this.Value())) {
+    public String getSQLValue() {
+        if (isEmpty(this.getValue())) {
             return "null";
         }
-        return this.Value();
+        return this.getValue();
     }
 
 }

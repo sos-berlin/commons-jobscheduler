@@ -57,7 +57,7 @@ public class JobSchedulerFTPSend extends JobSchedulerJobAdapter {
             getLogger().info(VersionInfo.VERSION_STRING);
             try {
                 params = getParameters();
-                schedulerParams = objOptions.DeletePrefix(super.getSchedulerParameterAsProperties(params), "ftp_");
+                schedulerParams = objOptions.deletePrefix(super.getSchedulerParameterAsProperties(params), "ftp_");
                 schedulerParams.putAll(getParameterDefaults(params));
                 checkParallel = sosString.parseToBoolean(sosString.parseToString(schedulerParams.get(PARAMETER_CHECK_PARALLEL)));
                 parallelTransfer = sosString.parseToBoolean(sosString.parseToString(schedulerParams.get(PARAMETER_PARALLEL)));

@@ -398,12 +398,10 @@ public class SOSVfsMessageCodes extends JSToolBox {
     @I18NMsg
     public static final SOSMsgVfs SOSVfs_I_285 = new SOSMsgVfs("SOSVfs_I_285");
 
-    @Deprecated
     public SOSVfsMessageCodes() {
         super("SOSVirtualFileSystem");
     }
 
-    @Deprecated
     public SOSVfsMessageCodes(final String pstrBundleBaseName) {
         super(pstrBundleBaseName);
     }

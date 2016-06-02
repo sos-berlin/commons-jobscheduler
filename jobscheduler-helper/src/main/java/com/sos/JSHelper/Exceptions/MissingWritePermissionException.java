@@ -30,8 +30,8 @@ public class MissingWritePermissionException extends JobSchedulerException {
 
     public MissingWritePermissionException(String message) {
         super(message);
-        this.Status(JobSchedulerException.PENDING);
-        this.Category(CategoryFileHandling);
+        this.setStatus(JobSchedulerException.PENDING);
+        this.setCategory(CategoryFileHandling);
 
     }
 
