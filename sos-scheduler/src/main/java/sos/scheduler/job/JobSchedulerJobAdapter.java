@@ -16,8 +16,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.BasicConfigurator;
@@ -237,35 +235,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         return deleteCurrentNodeNameFromKeys(pSchedulerParameterSet);
     }
 
-    protected HashMap<String, String> getSchedulerParameterAsProperties(final HashMap<String, String> pSchedulerParameterSet) {
-        schedulerParameters = new HashMap<String, String>();
-        try {
-            if (isNotNull(pSchedulerParameterSet)) {
-                Set<Map.Entry<String, String>> set = pSchedulerParameterSet.entrySet();
-                for (Map.Entry<String, String> entry : set) {
-                    schedulerParameters.put(entry.getKey(), entry.getValue());
-                    schedulerParameters.put(entry.getKey().replaceAll("_", EMPTY_STRING), entry.getValue());
-                }
-                set = schedulerParameters.entrySet();
-                schedulerParameters.putAll(getSpecialParameters());
-                for (Map.Entry<String, String> entry : set) {
-                    String key = entry.getKey();
-                    String val = entry.getValue();
-                    if (val != null) {
-                        String strR = replaceVars(schedulerParameters, key, val);
-                        if (!strR.equalsIgnoreCase(val)) {
-                            schedulerParameters.put(key, strR);
-                        }
-                    }
-                }
-            }
-            schedulerParameters = deleteCurrentNodeNameFromKeys(schedulerParameters);
-            return schedulerParameters;
-        } catch (Exception e) {
-            throw new JobSchedulerException(JSJ_F_0060.params(e.getMessage()), e);
-        }
-    }
-
+ 
     protected Variable_set getJobOrOrderParameters() {
         try {
             Variable_set objJobOrOrderParameters = spooler.create_variable_set();
@@ -343,23 +313,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         }
         return resultString;
     }
-
-    @Deprecated
-    public String replaceVars(final HashMap<String, String> params, final String name, String pstrReplaceIn) {
-        if (pstrReplaceIn != null && pstrReplaceIn.matches(".*%[^%]+%.*")) {
-            for (String param : params.keySet()) {
-                String paramValue = params.get(param);
-                if (isNotNull(paramValue)) {
-                    String paramPattern = "%" + Pattern.quote(param) + "%";
-                    paramValue = paramValue.replace('\\', '/');
-                    paramValue = Matcher.quoteReplacement(paramValue);
-                    pstrReplaceIn = pstrReplaceIn.replaceAll(paramPattern, paramValue);
-                } 
-            }
-        }
-        return pstrReplaceIn;
-    }
-
+ 
     private HashMap<String, String> getSpecialParameters() {
         HashMap<String, String> specialParams = new HashMap<String, String>();
         if (spooler == null) {
@@ -398,12 +352,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         return specialParams;
     }
 
-    private HashMap<String, String> getAllParametersAsProperties() {
-        HashMap<String, String> result = convertVariableSet2HashMap(getGlobalSchedulerParameters());
-        result.putAll(getSpecialParameters());
-        result.putAll(getSchedulerParameterAsProperties(getParameters()));
-        return result;
-    }
+ 
 
     public String stackTrace2String(final Exception e) {
         String strT = null;
