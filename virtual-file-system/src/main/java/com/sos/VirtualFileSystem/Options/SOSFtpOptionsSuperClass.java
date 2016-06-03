@@ -281,7 +281,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return this;
     }
 
-    @JSOptionDefinition(name = "title", description = "The Title for a section /profile", key = "title", type = "SOSOptionString", mandatory = false)
+    @JSOptionDefinition(name = "title", description = "The Title for a section /profile", key = "title", type = "SOSOptionString",
+            mandatory = false)
     public SOSOptionString title = new SOSOptionString(this, CLASSNAME + ".title", "The Title for a section /profile", "", "", false);
 
     public String getTitle() {
@@ -876,7 +877,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 
     @JSOptionDefinition(name = "Max_Files", description = "Maximum number of files to process", key = "Max_Files", type = "SOSOptionInteger", 
             mandatory = false)
-    public SOSOptionInteger maxFiles = new SOSOptionInteger(this, CLASSNAME + ".Max_Files", "Maximum number of files to process", "-1", "-1", false);
+    public SOSOptionInteger maxFiles = new SOSOptionInteger(this, CLASSNAME + ".Max_Files", "Maximum number of files to process", "-1", "-1",
+            false);
 
     public String getMaxFiles() {
         return maxFiles.getValue();
@@ -1838,7 +1840,9 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         jumpPlatform = val;
     }
 
-    @JSOptionDefinition(name = "jump_configuration_files", description = "Configuration file with JCraft settings located on the YADE client system", key = "jump_configuration_files", type = "SOSOptionString", mandatory = false)
+    @JSOptionDefinition(name = "jump_configuration_files",
+            description = "Configuration file with JCraft settings located on the YADE client system", key = "jump_configuration_files",
+            type = "SOSOptionString", mandatory = false)
     public SOSOptionString jumpConfigurationFiles = new SOSOptionString(this, CLASSNAME + ".jump_configuration_files",
             "Configuration file with JCraft settings located on the YADE client system", "", "", false);
 
@@ -1910,7 +1914,9 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         overwriteFiles = pOverwriteFiles;
     }
 
-    @JSOptionDefinition(name = "jump_pre_command", description = "Command, which has to be executed on the jump host for each file before the transfer started.", key = "jump_pre_command", type = "SOSOptionCommandString", mandatory = false)
+    @JSOptionDefinition(name = "jump_pre_command",
+            description = "Command, which has to be executed on the jump host for each file before the transfer started.",
+            key = "jump_pre_command", type = "SOSOptionCommandString", mandatory = false)
     public SOSOptionCommandString jumpPreCommand = new SOSOptionCommandString(this, CLASSNAME + ".jump_pre_command",
             "Commands, which has to be executed on the jump host for each file before the transfer started.", "", "", false);
 
@@ -1922,7 +1928,9 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         this.jumpPreCommand = jumpPreCommand;
     }
 
-    @JSOptionDefinition(name = "jump_post_command_on_success", description = "Command, which has to be executed on the jump host for each file after the transfer of the file succesfull ended.", key = "jump_post_command_on_success", type = "SOSOptionCommandString", mandatory = false)
+    @JSOptionDefinition(name = "jump_post_command_on_success",
+            description = "Command, which has to be executed on the jump host for each file after the transfer of the file succesfull ended.",
+            key = "jump_post_command_on_success", type = "SOSOptionCommandString", mandatory = false)
     public SOSOptionCommandString jumpPostCommandOnSuccess = new SOSOptionCommandString(this, CLASSNAME + ".jump_post_command_on_success",
             "Commands, which has to be executed on the jump host for each file after the transfer of the file succesfull ended.", "", "", false);
 
@@ -1934,7 +1942,9 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         this.jumpPostCommandOnSuccess = jumpPostCommandOnSuccess;
     }
 
-    @JSOptionDefinition(name = "jump_pre_transfer_commands", description = "Commands, which has to be executed on the jump host before the transfer started.", key = "jump_pre_transfer_commands", type = "SOSOptionCommandString", mandatory = false)
+    @JSOptionDefinition(name = "jump_pre_transfer_commands",
+            description = "Commands, which has to be executed on the jump host before the transfer started.", key = "jump_pre_transfer_commands",
+            type = "SOSOptionCommandString", mandatory = false)
     public SOSOptionCommandString jumpPreTransferCommands = new SOSOptionCommandString(this, CLASSNAME + ".jump_pre_transfer_commands",
             "Commands, which has to be executed on the jump host before the transfer started.", "", "", false);
 
@@ -1946,10 +1956,12 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         this.jumpPreTransferCommands = jumpPreTransferCommands;
     }
 
-    @JSOptionDefinition(name = "jump_post_transfer_commands_on_success", description = "Commands, which has to be executed on the jump host after the transfer ended successful.", key = "jump_post_transfer_commands_on_success", type = "SOSOptionCommandString", mandatory = false)
+    @JSOptionDefinition(name = "jump_post_transfer_commands_on_success",
+            description = "Commands, which has to be executed on the jump host after the transfer ended successful.",
+            key = "jump_post_transfer_commands_on_success", type = "SOSOptionCommandString", mandatory = false)
     public SOSOptionCommandString jumpPostTransferCommandsOnSuccess = new SOSOptionCommandString(this, CLASSNAME
-            + ".jump_post_transfer_commands_on_success", "Commands, which has to be executed on the jump host after the transfer ended successful.",
-            "", "", false);
+            + ".jump_post_transfer_commands_on_success",
+            "Commands, which has to be executed on the jump host after the transfer ended successful.", "", "", false);
  
     public SOSOptionCommandString getJumpPostTransferCommandsOnSuccess() {
         return jumpPostTransferCommandsOnSuccess;
@@ -1959,7 +1971,9 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         this.jumpPostTransferCommandsOnSuccess = jumpPostTransferCommandsOnSuccess;
     }
 
-    @JSOptionDefinition(name = "jump_post_transfer_commands_on_error", description = "Commands, which has to be executed on the jump host after the transfer ended with errors.", key = "jump_post_transfer_commands_on_error", type = "SOSOptionCommandString", mandatory = false)
+    @JSOptionDefinition(name = "jump_post_transfer_commands_on_error",
+            description = "Commands, which has to be executed on the jump host after the transfer ended with errors.",
+            key = "jump_post_transfer_commands_on_error", type = "SOSOptionCommandString", mandatory = false)
     public SOSOptionCommandString jumpPostTransferCommandsOnError = new SOSOptionCommandString(this, CLASSNAME
             + ".jump_post_transfer_commands_on_error", "Commands, which has to be executed on the jump host after the transfer ended with errors.",
             "", "", false);
@@ -1972,7 +1986,9 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         this.jumpPostTransferCommandsOnError = jumpPostTransferCommandsOnError;
     }
 
-    @JSOptionDefinition(name = "jump_post_transfer_commands_final", description = "Commands, which has to be executed on the jump host after the transfer ended independet of the transfer status.", key = "jump_post_transfer_commands_final", type = "SOSOptionCommandString", mandatory = false)
+    @JSOptionDefinition(name = "jump_post_transfer_commands_final",
+            description = "Commands, which has to be executed on the jump host after the transfer ended independet of the transfer status.",
+            key = "jump_post_transfer_commands_final", type = "SOSOptionCommandString", mandatory = false)
     public SOSOptionCommandString jumpPostTransferCommandsFinal = new SOSOptionCommandString(this, CLASSNAME
             + ".jump_post_transfer_commands_final",
             "Commands, which has to be executed on the jump host after the transfer ended independet of the transfer status.", "", "", false);
@@ -2123,7 +2139,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 
     @JSOptionDefinition(name = "profile", description = "The Name of a Profile-Section to be executed", key = "profile", type = "SOSOptionString", 
             mandatory = false)
-    public SOSOptionString profile = new SOSOptionString(this, CLASSNAME + ".profile", "The Name of a Profile-Section to be executed", "", "", false);
+    public SOSOptionString profile = new SOSOptionString(this, CLASSNAME + ".profile", "The Name of a Profile-Section to be executed", "", "",
+            false);
 
     @Override
     public SOSOptionString getProfile() {
@@ -2410,8 +2427,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         sshProxyHost = pSshProxyHost;
     }
 
-    @JSOptionDefinition(name = "ssh_proxy_password", description = "This parameter specifies the password for the prox", key = "ssh_proxy_password",
-            type = "SOSOptionString", mandatory = false)
+    @JSOptionDefinition(name = "ssh_proxy_password", description = "This parameter specifies the password for the prox",
+            key = "ssh_proxy_password", type = "SOSOptionString", mandatory = false)
     public SOSOptionString sshProxyPassword = new SOSOptionString(this, CLASSNAME + ".ssh_proxy_password", 
             "This parameter specifies the password for the prox", "", "", false);
 
@@ -2487,7 +2504,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         transferMode = pTransferMode;
     }
 
-    @JSOptionDefinition(name = "user", description = "UserID of user in charge User name", key = "user", type = "SOSOptionUserName", mandatory = true)
+    @JSOptionDefinition(name = "user", description = "UserID of user in charge User name", key = "user", type = "SOSOptionUserName",
+            mandatory = true)
     public SOSOptionUserName user = new SOSOptionUserName(this, CLASSNAME + ".user", "UserID of user in charge User name", "", "anonymous", false);
 
     @Override
@@ -2634,8 +2652,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         return targetDir;
     }
 
-    @JSOptionDefinition(name = "raise_exception_on_error", description = "Raise an Exception if an error occured", key = "raise_exception_on_error",
-            type = "SOSOptionBoolean", mandatory = true)
+    @JSOptionDefinition(name = "raise_exception_on_error", description = "Raise an Exception if an error occured",
+            key = "raise_exception_on_error", type = "SOSOptionBoolean", mandatory = true)
     public SOSOptionBoolean raiseExceptionOnError = new SOSOptionBoolean(this, CLASSNAME + ".raise_exception_on_error", 
             "Raise an Exception if an error occured", "true", "true", true);
 
@@ -2653,12 +2671,15 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
             "Activate the logging for Apache ftp client", "false", "false", true);
 
 
-    @JSOptionDefinition(name = "system_property_files", description = "List of the java property files separated by semicolon", key = "system_property_files", type = "SOSOptionString", mandatory = false)
+    @JSOptionDefinition(name = "system_property_files", description = "List of the java property files separated by semicolon",
+            key = "system_property_files", type = "SOSOptionString", mandatory = false)
     public SOSOptionString system_property_files = new SOSOptionString(this, CLASSNAME + ".system_property_files",
             "List of the java property files separated by semicolon", "", "", false);
 
 
-    @JSOptionDefinition(name = "updateConfiguration", description = "determines if a YADE configuration should be updated with the given XML snippet", key = "updateConfiguration", type = "SOSOptionBoolean", mandatory = false)
+    @JSOptionDefinition(name = "updateConfiguration",
+            description = "determines if a YADE configuration should be updated with the given XML snippet", key = "updateConfiguration",
+            type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean updateConfiguration = new SOSOptionBoolean(this, CLASSNAME + ".updateConfiguration",
             "determines if a YADE configuration should be updated with the given XML snippet", "", "", false);
 
@@ -2670,7 +2691,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
         this.updateConfiguration = updateConfiguration;
     }
 
-    @JSOptionDefinition(name = "xmlUpdate", description = "the XML configuration snippet to update a YADE configuration with", key = "xmlUpdate", type = "SOSOptionString", mandatory = false)
+    @JSOptionDefinition(name = "xmlUpdate", description = "the XML configuration snippet to update a YADE configuration with", key = "xmlUpdate",
+            type = "SOSOptionString", mandatory = false)
     public SOSOptionString xmlUpdate = new SOSOptionString(this, CLASSNAME + ".xmlUpdate",
             "the XML configuration snippet to update a YADE configuration with", "", "", false);
 
