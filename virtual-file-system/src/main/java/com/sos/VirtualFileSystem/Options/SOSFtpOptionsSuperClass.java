@@ -2036,7 +2036,8 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
 
     @JSOptionDefinition(name = "profile", description = "The Name of a Profile-Section to be executed", key = "profile", type = "SOSOptionString", 
             mandatory = false)
-    public SOSOptionString profile = new SOSOptionString(this, CLASSNAME + ".profile", "The Name of a Profile-Section to be executed", "", "", false);
+    public SOSOptionString profile = new SOSOptionString(this, CLASSNAME + ".profile", "The Name of a Profile-Section to be executed", "", "",
+            false);
 
     @Override
     public SOSOptionString getProfile() {
