@@ -60,6 +60,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     public static final boolean conJobChainFailure = false;
     public final String conMessageFilePath = "com_sos_scheduler_messages";
     private ParameterSubstitutor parameterSubstitutor;
+    private String jobNameForTest="job_name_for_test";
+    private String orderStateForTest="order_state_for_test";
 
     public JobSchedulerJobAdapter() {
         Messages = new Messages(conMessageFilePath, Locale.getDefault());
@@ -199,23 +201,40 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             throw new JobSchedulerException(JSJ_F_0060.params(stackTrace2String(e)), e);
         }
     }
+    
+    private String getParameterName(String parameterName){
+        String currentNodeName = getCurrentNodeName(false).toLowerCase();
+        String currentJob = getCurrentJob().toLowerCase();        
+        
+        String pattern1 = "^" + currentNodeName + "/(.*)";
+        String pattern2 = "^job::" + currentJob + "/(.*)";
+        String pattern3 = "^job::" + currentJob + "\\." + currentNodeName + "/(.*)";
+    
+        String newParameter = parameterName.replaceAll(pattern3, "$1");
+        newParameter = newParameter.replaceAll(pattern2, "$1");
+        newParameter = newParameter.replaceAll(pattern1, "$1");
+        return newParameter;
+    }
 
-    public HashMap<String, String> deleteCurrentNodeNameFromKeys(final HashMap<String, String> pSchedulerParameterSet) {
-        String strCurrentNodeName = getCurrentNodeName(false) + "/";
-        int intNNLen = strCurrentNodeName.length();
+    private HashMap<String, String> deleteCurrentNodeNameFromKeys(final HashMap<String, String> pSchedulerParameterSet) {
+
         HashMap<String, String> newSchedulerParameters = new HashMap<String, String>();
         newSchedulerParameters.putAll(pSchedulerParameterSet);
         Set<Map.Entry<String, String>> set = pSchedulerParameterSet.entrySet();
         for (Map.Entry<String, String> entry : set) {
             String key = entry.getKey();
-            if (key.startsWith(strCurrentNodeName)) {
+            String newParameterName = getParameterName(key);
+            System.out.println(key + "=>" + newParameterName);
+            if (!key.equals(newParameterName)){
                 String val = entry.getValue();
-                key = key.substring(intNNLen);
-                newSchedulerParameters.put(key, val);
-                schedulerParameters.put(key, val);
+                newSchedulerParameters.put(newParameterName,val);
             }
         }
         return newSchedulerParameters;
+    }
+
+    public HashMap<String, String> testDeleteCurrentNodeNameFromKeys(final HashMap<String, String> pSchedulerParameterSet) {
+        return deleteCurrentNodeNameFromKeys(pSchedulerParameterSet);
     }
 
     protected HashMap<String, String> getSchedulerParameterAsProperties(final HashMap<String, String> pSchedulerParameterSet) {
@@ -429,10 +448,20 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                     JSJ_I_0010.toLog(conMethodName, lstrNodeName);
                 }
             }
+        }else{
+            return orderStateForTest;
         }
         return lstrNodeName;
     }
 
+    public String getCurrentJob(){
+        if (spooler_task == null){
+            return jobNameForTest;
+        }else{
+            return spooler_task.job().name();
+        }
+    }
+    
     public Job getJob() {
         return spooler_task.job();
     }
