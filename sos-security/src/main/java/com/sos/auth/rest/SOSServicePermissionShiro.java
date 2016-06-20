@@ -26,15 +26,23 @@ import org.apache.shiro.session.Session;
 public class SOSServicePermissionShiro {
 
     private SOSShiroCurrentUser currentUser;
-    private static SOSShiroCurrentUsersList currentUsersList;
+    public static SOSShiroCurrentUsersList currentUsersList;
 
     // @Path("/permissions/{name}/{pwd}")
+
+    private SOSShiroCurrentUser getCurrentUser(String sessionId) {
+        if (currentUsersList != null) {
+            return currentUsersList.getUser(sessionId);
+        } else {
+            return null;
+        }
+
+    }
 
     @GET
     @Path("/permissions")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSPermissionShiro getPermissions(@QueryParam("session_id") String sessionId, @QueryParam("user") String user,
-            @QueryParam("pwd") String pwd) {
+    public SOSPermissionShiro getPermissions(@QueryParam("session_id") String sessionId, @QueryParam("user") String user, @QueryParam("pwd") String pwd) {
 
         if (currentUsersList != null && sessionId != null && sessionId.length() > 0) {
             currentUser = currentUsersList.getUser(sessionId);
@@ -167,6 +175,13 @@ public class SOSServicePermissionShiro {
     }
 
     @GET
+    @Path("/login")
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    public SOSShiroCurrentUserAnswer login(@QueryParam("user") String user, @QueryParam("pwd") String pwd) {
+        return authenticate(user, pwd);
+    }
+
+    @GET
     @Path("/logout")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public SOSShiroCurrentUserAnswer logout(@QueryParam("session_id") String sessionId) {
@@ -186,8 +201,8 @@ public class SOSServicePermissionShiro {
     @GET
     @Path("/role")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSShiroCurrentUserAnswer hasRole(@QueryParam("session_id") String sessionId, @QueryParam("user") String user,
-            @QueryParam("pwd") String pwd, @QueryParam("role") String role) {
+    public SOSShiroCurrentUserAnswer hasRole(@QueryParam("session_id") String sessionId, @QueryParam("user") String user, @QueryParam("pwd") String pwd,
+            @QueryParam("role") String role) {
 
         if (currentUsersList != null && sessionId != null && sessionId.length() > 0) {
             currentUser = currentUsersList.getUser(sessionId);
@@ -212,8 +227,8 @@ public class SOSServicePermissionShiro {
     @GET
     @Path("/permission")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSShiroCurrentUserAnswer isPermitted(@QueryParam("session_id") String sessionId, @QueryParam("user") String user,
-            @QueryParam("pwd") String pwd, @QueryParam("permission") String permission) {
+    public SOSShiroCurrentUserAnswer isPermitted(@QueryParam("session_id") String sessionId, @QueryParam("user") String user, @QueryParam("pwd") String pwd,
+            @QueryParam("permission") String permission) {
 
         if (currentUsersList != null && sessionId != null && sessionId.length() > 0) {
             currentUser = currentUsersList.getUser(sessionId);

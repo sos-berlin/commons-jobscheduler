@@ -95,7 +95,6 @@ public class SOSCommandSecurityWebservice {
         } else {
             return null;
         }
-
     }
 
     private String getResource(String sessionId) {
