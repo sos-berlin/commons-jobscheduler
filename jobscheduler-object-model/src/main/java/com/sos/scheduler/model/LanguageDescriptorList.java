@@ -15,6 +15,7 @@ public class LanguageDescriptorList {
     public static final String PL_SQL = "plsql";
     public static final String PERL_SCRIPT = "perlScript";
     public static final String VB_SCRIPT = "VBScript";
+    public static final String VB_SCRIPT_CONTROL = "scriptcontrol:vbscript";
     public static final String JAVASCRIPT = "javascript";
     public static final String SHELL = "shell";
     public static final String JAVA = "java";
@@ -29,9 +30,10 @@ public class LanguageDescriptorList {
             new LanguageDescriptor(PERL_SCRIPT, 3, false, PERL_SCRIPT, "", "",true, true), 
             new LanguageDescriptor(POWERSHELL, 4, false, POWERSHELL, "", "", true, true), 
             new LanguageDescriptor(VB_SCRIPT, 5, false, VB_SCRIPT, "", "", true, true), 
-            new LanguageDescriptor(JAVAX_SCRIPT_RHINO, 6, false, JAVAX_SCRIPT_RHINO, "", "", true, true), 
-            new LanguageDescriptor(JAVAX_SCRIPT_ECMASCRIPT, 7, false, JAVAX_SCRIPT_ECMASCRIPT, "", "", true, true), 
-            new LanguageDescriptor(JAVASCRIPT, 8, false, JAVASCRIPT, "", "", true, true)
+            new LanguageDescriptor(VB_SCRIPT_CONTROL, 6, false, VB_SCRIPT_CONTROL, "", "", true, true), 
+            new LanguageDescriptor(JAVAX_SCRIPT_RHINO, 7, false, JAVAX_SCRIPT_RHINO, "", "", true, true), 
+            new LanguageDescriptor(JAVAX_SCRIPT_ECMASCRIPT, 8, false, JAVAX_SCRIPT_ECMASCRIPT, "", "", true, true), 
+            new LanguageDescriptor(JAVASCRIPT, 9, false, JAVASCRIPT, "", "", true, true)
             );
 
     public LanguageDescriptorList() {
