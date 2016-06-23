@@ -162,7 +162,7 @@ public class SOSCommandSecurityWebservice {
             SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord) {
         String sessionId = "-";
         if (sosWebserviceAuthenticationRecord != null) {
-            sessionId = sosWebserviceAuthenticationRecord.getSessionId();
+            sessionId = sosWebserviceAuthenticationRecord.getAccessToken();
         }
         SOSCommandSecurityWebserviceAnswer m = new SOSCommandSecurityWebserviceAnswer();
         m.setIsEnabled(getIsEnabled());
@@ -176,7 +176,7 @@ public class SOSCommandSecurityWebservice {
 
     private String checkAuthentication(SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord, String item) throws MalformedURLException {
         if (getIsEnabled()) {
-            sosWebserviceAuthenticationRecord.setResource(this.getResource(sosWebserviceAuthenticationRecord.getSessionId()));
+            sosWebserviceAuthenticationRecord.setResource(this.getResource(sosWebserviceAuthenticationRecord.getAccessToken()));
             String permission = sosWebserviceAuthenticationRecord.getPermission() + ":" + item;
             permission = permission.replace("/", ":");
             sosWebserviceAuthenticationRecord.setPermission(permission);
@@ -216,7 +216,7 @@ public class SOSCommandSecurityWebservice {
             sosWebserviceAuthenticationRecord.setResource(currentUser.getResource());
             sosWebserviceAuthenticationRecord.setUser(currentUser.getUsername());
         }
-        sosWebserviceAuthenticationRecord.setSessionId(sessionId);
+        sosWebserviceAuthenticationRecord.setAccessToken(sessionId);
         sosWebserviceAuthenticationRecord.setPermission(permission);
         return sosWebserviceAuthenticationRecord;
     }
@@ -652,9 +652,9 @@ public class SOSCommandSecurityWebservice {
             sosWebserviceAuthenticationRecord.setPassword(password);
             sosWebserviceAuthenticationRecord.setResource(resource);
             sosShiroCurrentUserAnswer = authenticate(sosWebserviceAuthenticationRecord);
-            sosWebserviceAuthenticationRecord.setSessionId(sosShiroCurrentUserAnswer.getSessionId());
+            sosWebserviceAuthenticationRecord.setAccessToken(sosShiroCurrentUserAnswer.getAccessToken());
             SOSCommandSecurityWebserviceCurrentUser c = new SOSCommandSecurityWebserviceCurrentUser();
-            c.setSessionId(sosShiroCurrentUserAnswer.getSessionId());
+            c.setAccessToken(sosShiroCurrentUserAnswer.getAccessToken());
             c.setPassword(password);
             c.setUsername(user);
             c.setResource(resource);
@@ -680,8 +680,8 @@ public class SOSCommandSecurityWebservice {
         String resource = sosWebserviceAuthenticationRecord.getResource() + "/logout" + "?session_id=%s";
         sosWebserviceAuthenticationRecord.setResource(resource);
         sosRestShiroClient.getSOSShiroCurrentUserAnswer(new URL(String.format(sosWebserviceAuthenticationRecord.getResource(),
-                sosWebserviceAuthenticationRecord.getSessionId())));
-        SOSCommandSecurityWebserviceAnswer message = createAnswer("", String.format("%s --> Abgemeldet", sosWebserviceAuthenticationRecord.getSessionId()),
+                sosWebserviceAuthenticationRecord.getAccessToken())));
+        SOSCommandSecurityWebserviceAnswer message = createAnswer("", String.format("%s --> Abgemeldet", sosWebserviceAuthenticationRecord.getAccessToken()),
                 sosWebserviceAuthenticationRecord);
         if (currentUserList != null) {
             currentUserList.removeUser(sessionId);

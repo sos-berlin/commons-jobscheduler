@@ -90,7 +90,7 @@
 			</xs:sequence>
 			<xs:attribute name="authenticated" type="xs:boolean"/>
 			<xs:attribute name="user" type="xs:string"/>
-			<xs:attribute name="session_id" type="xs:string"/>
+			<xs:attribute name="access_token" type="xs:string"/>
 			<xs:attribute name="security_server_url" type="xs:string"/>
 		</xs:complexType>
 	</xs:element>
@@ -99,6 +99,269 @@
 			<xs:sequence minOccurs="0" maxOccurs="unbounded">
 				<xs:element ref="SOSPermission"/>
 			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SOSPermissionJocCockpit">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="JobschedulerMaster">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="view">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="status" type="xs:boolean"/>
+										<xs:element name="mainlog" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="pauseContinue" type="xs:boolean"/>
+							<xs:element name="restart" type="xs:boolean"/>
+							<xs:element name="terminateRestart" type="xs:boolean"/>
+							<xs:element name="abortRestart" type="xs:boolean"/>
+							<xs:element name="manageCategories" type="xs:boolean"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="JobschedulerMasterCluster">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="view">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="clusterStatus" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="terminateClusterMember" type="xs:boolean"/>
+							<xs:element name="restartClusterMember" type="xs:boolean"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="JobschedulerUniversalAgent">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="view">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="status" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="stop" type="xs:boolean"/>
+							<xs:element name="abort" type="xs:boolean"/>
+							<xs:element name="restart" type="xs:boolean"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="DailyPlan">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="view">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="status" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="History">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="view" type="xs:boolean"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Order">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="view">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="configuration" type="xs:boolean"/>
+										<xs:element name="history" type="xs:boolean"/>
+										<xs:element name="orderLog" type="xs:boolean"/>
+										<xs:element name="status" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="change">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="startAndEndNode" type="xs:boolean"/>
+										<xs:element name="timeForAdhocOrder" type="xs:boolean"/>
+										<xs:element name="parameter"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="start" type="xs:boolean"/>
+							<xs:element name="update" type="xs:boolean"/>
+							<xs:element name="suspend" type="xs:boolean"/>
+							<xs:element name="resume" type="xs:boolean"/>
+							<xs:element name="deleteAdhocOrdersBlacklistOrders" type="xs:boolean"/>
+							<xs:element name="removeSetback" type="xs:boolean"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="JobChain">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="view">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="orderLog" type="xs:boolean"/>
+										<xs:element name="configuration" type="xs:boolean"/>
+										<xs:element name="history" type="xs:boolean"/>
+										<xs:element name="status" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="stop" type="xs:boolean"/>
+							<xs:element name="unstop" type="xs:boolean"/>
+							<xs:element name="addOrder" type="xs:boolean"/>
+							<xs:element name="deleteTemporayOders" type="xs:boolean"/>
+							<xs:element name="skipOrUnskipJobNodes" type="xs:boolean"/>
+							<xs:element name="stopJob" type="xs:boolean"/>
+							<xs:element name="unstopJob" type="xs:boolean"/>
+							<xs:element name="stopJobNode" type="xs:boolean"/>
+							<xs:element name="unstopJobNode" type="xs:boolean"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Job">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="view">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="status" type="xs:boolean"/>
+										<xs:element name="taskLog" type="xs:boolean"/>
+										<xs:element name="configuration" type="xs:boolean"/>
+										<xs:element name="history" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="start">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="task" type="xs:boolean"/>
+										<xs:element name="taskImmediate" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="stop" type="xs:boolean"/>
+							<xs:element name="unstop" type="xs:boolean"/>
+							<xs:element name="terminate" type="xs:boolean"/>
+							<xs:element name="kill" type="xs:boolean"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="ProcessClass">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="view">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="status" type="xs:boolean"/>
+										<xs:element name="configuration" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Schedule">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="view">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="status" type="xs:boolean"/>
+										<xs:element name="configuration" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="edit" type="xs:boolean"/>
+							<xs:element name="addSubstitute" type="xs:boolean"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Lock">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="view">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="status" type="xs:boolean"/>
+										<xs:element name="configuration" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Event">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="view">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="status" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="delete" type="xs:boolean"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="EventAction">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="view">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="status" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="createEventsManually" type="xs:boolean"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="HolidayCalendar">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="view">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="status" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="MaintenanceWindow">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="view">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="status" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="enableDisableMaintenanceWindow" type="xs:boolean"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element ref="SOSPermissionRoles"/>
+			</xs:sequence>
+			<xs:attribute name="authenticated" type="xs:boolean"/>
+			<xs:attribute name="user" type="xs:string"/>
+			<xs:attribute name="access_token" type="xs:string"/>
 		</xs:complexType>
 	</xs:element>
 </xs:schema>

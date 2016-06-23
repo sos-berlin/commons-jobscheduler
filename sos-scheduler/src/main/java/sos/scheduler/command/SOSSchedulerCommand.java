@@ -22,9 +22,7 @@ import org.xml.sax.InputSource;
 
 import com.sos.scheduler.model.ISOSSchedulerSocket;
 
-/** @author ghassan beydoun
- * @Deprecated use SOSJobSchedulerModel */
-@Deprecated
+  
 public class SOSSchedulerCommand {
 
     protected ISOSSchedulerSocket objO = null;

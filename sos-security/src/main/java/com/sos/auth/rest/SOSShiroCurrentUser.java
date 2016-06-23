@@ -7,7 +7,7 @@ public class SOSShiroCurrentUser {
     private Subject currentSubject;
     private String username;
     private String password;
-    private String sessionId;
+    private String accessToken;
 
     public SOSShiroCurrentUser(String username, String password) {
         super();
@@ -15,12 +15,12 @@ public class SOSShiroCurrentUser {
         this.password = password;
     }
 
-    public String getSessionId() {
-        return sessionId;
+    public String getAccessToken() {
+        return accessToken;
     }
 
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
     }
 
     public Subject getCurrentSubject() {

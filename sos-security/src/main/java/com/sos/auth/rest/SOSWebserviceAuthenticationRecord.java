@@ -2,7 +2,7 @@ package com.sos.auth.rest;
 
 public class SOSWebserviceAuthenticationRecord {
 
-    private String sessionId = "";
+    private String accessToken = "";
     private String user = "";
     private String password = "";
     private String permission = "";
@@ -27,12 +27,12 @@ public class SOSWebserviceAuthenticationRecord {
         return this.user;
     }
 
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
     }
 
-    public String getSessionId() {
-        return this.sessionId;
+    public String getAccessToken() {
+        return this.accessToken;
     }
 
     public void setResource(String resource) {

@@ -40,7 +40,7 @@ public class SOSJaxbSubject {
         if (sosPermissionShiro == null) {
             return "";
         } else {
-            return sosPermissionShiro.getSessionId();
+            return sosPermissionShiro.getAccessToken();
         }
     }
 

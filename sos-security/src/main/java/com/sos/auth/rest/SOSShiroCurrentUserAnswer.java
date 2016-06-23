@@ -16,7 +16,7 @@ public class SOSShiroCurrentUserAnswer {
     private boolean isPermittet;
     private boolean hasRole;
     private boolean isAuthenticated;
-    private String sessionId;
+    private String accessToken;
 
     public SOSShiroCurrentUserAnswer() {
     }
@@ -79,16 +79,16 @@ public class SOSShiroCurrentUserAnswer {
     }
 
     @XmlElement
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
     }
 
-    public String getSessionId() {
-        return this.sessionId;
+    public String getAccessToken() {
+        return this.accessToken;
     }
 
-    public String sessionId() {
-        return getSessionId();
+    public String accessToken() {
+        return getAccessToken();
     }
 
     @XmlElement
@@ -106,7 +106,7 @@ public class SOSShiroCurrentUserAnswer {
 
     @Override
     public String toString() {
-        return String.format("User: %s Role: %s hasRole: %s Permission: %s isPermitted: %s -- SessionId=%s", this.user, this.role, this.hasRole,
-                this.permission, this.isPermittet, this.sessionId);
+        return String.format("User: %s Role: %s hasRole: %s Permission: %s isPermitted: %s -- AccessToken=%s", this.user, this.role, this.hasRole,
+                this.permission, this.isPermittet, this.accessToken);
     }
 }

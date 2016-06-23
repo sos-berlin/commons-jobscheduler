@@ -59,7 +59,7 @@ public class SOSRestShiroClient {
     public SOSPermissionShiro getPermissions(SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord) throws MalformedURLException {
         return getSOSPermissionShiro(new URL(String.format(sosWebserviceAuthenticationRecord.getResource(), sosWebserviceAuthenticationRecord.getUser(),
                 sosWebserviceAuthenticationRecord.getPassword(), sosWebserviceAuthenticationRecord.getPermission(),
-                sosWebserviceAuthenticationRecord.getSessionId())));
+                sosWebserviceAuthenticationRecord.getAccessToken())));
     }
 
     public boolean isEnabled(URL url) throws Exception {
@@ -74,12 +74,12 @@ public class SOSRestShiroClient {
     public SOSShiroCurrentUserAnswer getSOSShiroCurrentUserAnswer(SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord) {
         String url = String.format(sosWebserviceAuthenticationRecord.getResource(), sosWebserviceAuthenticationRecord.getUser(),
                 sosWebserviceAuthenticationRecord.getPassword(), sosWebserviceAuthenticationRecord.getPermission(),
-                sosWebserviceAuthenticationRecord.getSessionId());
+                sosWebserviceAuthenticationRecord.getAccessToken());
         try {
             return getSOSShiroCurrentUserAnswer(new URL(url));
         } catch (MalformedURLException e) {
             SOSShiroCurrentUserAnswer a = new SOSShiroCurrentUserAnswer();
-            a.setSessionId(String.format("could not establish a session: MalformedUrlException %s", url));
+            a.setAccessToken(String.format("could not establish a session: MalformedUrlException %s", url));
             return a;
         }
     }
