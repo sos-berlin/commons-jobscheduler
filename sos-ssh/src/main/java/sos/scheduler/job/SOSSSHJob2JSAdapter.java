@@ -85,6 +85,14 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
         }
         objO.setCurrentNodeName(this.getCurrentNodeName(true));
         HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties(getJobOrOrderParameters());
+        // if command_delimiter is not set by customer then we override the default value due to compatibility issues
+        // the default command delimiter is used in the option class to split the commands with a delimiter not known by the os
+        // but here a command delimiter (known by the os) is needed to chain commands together
+        // TO DO: a solution which fits for both cases [SP]
+        if (!useTrilead && objO.commandDelimiter.isNotDirty()) {
+            objO.commandDelimiter.setValue(";");
+            spooler_log.debug9("UPDATED COMMAND DELIMITER IS: \"" + objO.commandDelimiter.getValue() + "\"");
+        }
         if (!useTrilead && !"false".equalsIgnoreCase(hsmParameters1.get("create_environment_variables"))) {
             Map<String, String> allEnvVars = new HashMap<String, String>();
             allEnvVars.putAll(getSchedulerEnvironmentVariables());
@@ -104,16 +112,6 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
                 ((SOSSSHJobJSch) objR).setPidFileName(pidFileName);
                 createOrderForWatchdog();
             }
-        }
-        // if command_delimiter is not set by customer then we override the
-        // default value due to compatibility issues
-        // the default command delimiter is used in the option class to split
-        // the commands with a delimiter not known by the os
-        // but here a command delimiter (known by the os) is needed to chain
-        // commands together
-        // TO DO: a solution which fits for both cases [SP]
-        if (!useTrilead && objO.commandDelimiter.isNotDirty()) {
-            objO.commandDelimiter.setValue(";");
         }
         objR.execute();
         if (!useTrilead && !((SOSSSHJobJSch) objR).getReturnValues().isEmpty()) {
@@ -140,8 +138,7 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
             spooler_log.debug9("uses jobchainname from parameter");
             spooler_log.debug9("Jobchainname: " + spooler_task.params().value(PARAM_CLEANUP_JOBCHAIN));
         } else {
-            LOGGER.error(
-                    "No jobchain configured to received the order! Please configure the cleanupJobchain Parameter in your SSH Job Configuration.");
+            LOGGER.error("No jobchain configured to received the order! Please configure the cleanupJobchain Parameter in your SSH Job Configuration.");
         }
         chain.add_or_replace_order(order);
         spooler_log.debug9("order send");
@@ -213,9 +210,9 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
     }
 
     @Override
-    // TO DO remove if process is reviewed and fixed! Original in
-    // JobSchedulerJobAdapter puts duplicated key/Value pair
-    protected HashMap<String, String> convertVariableSet2HashMap(final Variable_set variableSet) {
+    // TO DO remove if process is reviewed and fixed! Original in JobSchedulerJobAdapter puts duplicated key/Value pair
+        protected
+        HashMap<String, String> convertVariableSet2HashMap(final Variable_set variableSet) {
         HashMap<String, String> result = new HashMap<String, String>();
         try {
             if (isNotNull(variableSet)) {
