@@ -27,7 +27,7 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 public class SOSSSHJobJSch extends SOSSSHJob2 {
 
     protected ISOSVFSHandler prePostCommandVFSHandler = null;
-    private final Logger logger = Logger.getLogger(this.getClass());
+    private static final Logger logger = Logger.getLogger(SOSSSHJobJSch.class);
     private static final String SCHEDULER_RETURN_VALUES = "SCHEDULER_RETURN_VALUES";
     private String tempFileName;
     private String pidFileName;
@@ -87,7 +87,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         String executedCommand = "";
         String completeCommand = "";
         try {
-            if (isConnected == false) {
+            if (!isConnected) {
                 this.connect();
             }
             // first check if windows is running on the remote host
@@ -240,7 +240,16 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         for (Object key : schedulerEnvVars.keySet()) {
             if (!"SCHEDULER_PARAM_JOBSCHEDULEREVENTJOB.EVENTS".equals(key.toString())) {
                 String envVarValue = schedulerEnvVars.get(key).toString();
+                if(key.toString().contains("()")){
+                    logger.debug("*******************************");
+                    logger.debug("KEY BEFORE REPLACEMENT: " + key);
+                    logger.debug("*******************************");
+                }
                 String keyVal = key.toString().replaceAll("\\.|\\(|\\)", "_");
+                if(key.toString().contains("()")){
+                    logger.debug("KEY AFTER REPLACEMENT: " + keyVal);
+                    logger.debug("*******************************");
+                }
                 envVarValue = envVarValue.replaceAll("\"", "\\\"");
                 envVarValue = "'" + envVarValue + "'";
                 if (!flgIsWindowsShell) {
