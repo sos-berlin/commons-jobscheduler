@@ -12,7 +12,7 @@ public class SOSCommandSecurityWebserviceCurrentUsersList {
     }
 
     public void addUser(SOSCommandSecurityWebserviceCurrentUser user) {
-        this.currentUsers.put(user.getSessionId(), user);
+        this.currentUsers.put(user.getAccessToken(), user);
     }
 
     public SOSCommandSecurityWebserviceCurrentUser getUser(String sessionId) {
