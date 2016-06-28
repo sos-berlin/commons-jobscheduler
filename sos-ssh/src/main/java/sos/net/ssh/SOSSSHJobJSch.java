@@ -242,12 +242,12 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                 String envVarValue = schedulerEnvVars.get(key).toString();
                 if(key.toString().contains("()")){
                     logger.debug("*******************************");
-                    logger.debug("KEY BEFORE REPLACEMENT: " + key);
+                    logger.debug("  KEY BEFORE REPLACEMENT: " + key);
                     logger.debug("*******************************");
                 }
-                String keyVal = key.toString().replaceAll("\\.|\\(|\\)", "_");
+                String keyVal = key.toString().replaceAll("\\.|\\(|\\)|%{2}", "_");
                 if(key.toString().contains("()")){
-                    logger.debug("KEY AFTER REPLACEMENT: " + keyVal);
+                    logger.debug("  KEY AFTER REPLACEMENT: " + keyVal);
                     logger.debug("*******************************");
                 }
                 envVarValue = envVarValue.replaceAll("\"", "\\\"");
