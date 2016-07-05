@@ -190,8 +190,10 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                 String[] names = variableSet.names().split(";");
                 String value = EMPTY_STRING;
                 for (String key : names) {
-                    value = variableSet.var(key);
-                    result.put(key, value);
+                    if (!"".equals(key)){
+                        value = variableSet.var(key);
+                        result.put(key, value);
+                    }
                 }
             }
             return result;
