@@ -328,7 +328,7 @@ public class JSObjJobChain extends JobChain {
         ISOSVfsFileTransfer objFileSystemHandler = (ISOSVfsFileTransfer) objVFS;
         ISOSVirtualFile objHotFolder = objFileSystemHandler.getFileHandle(liveFolderName);
         SchedulerHotFolder objSchedulerHotFolder = objFactory.createSchedulerHotFolder(objHotFolder);
-        SchedulerHotFolderFileList objSchedulerHotFolderFileList = objSchedulerHotFolder.load();
+        SchedulerHotFolderFileList objSchedulerHotFolderFileList = objSchedulerHotFolder.loadOrderObjects();
         for (JSObjBase hotFolderItem : objSchedulerHotFolderFileList.getOrderList()) {
             if (hotFolderItem instanceof JSObjOrder) {
                 JSObjOrder order = (JSObjOrder) hotFolderItem;

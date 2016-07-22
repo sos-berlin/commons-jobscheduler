@@ -44,6 +44,14 @@ public class SchedulerHotFolder extends JSObjBase {
         return objHotFolderFileList;
     }
 
+    public SchedulerHotFolderFileList loadOrderObjects() {
+        if (isLoaded) {
+            return getHotFolderFileList();
+        }
+        objHotFolderFileList = load(this.getHotFolderSrc(),".*(" + JSObjOrder.fileNameExtension+")");
+        return objHotFolderFileList;
+    }
+
     public SchedulerHotFolderFileList loadRecursive() {
         if (isLoaded) {
             return getHotFolderFileList();
@@ -81,6 +89,10 @@ public class SchedulerHotFolder extends JSObjBase {
     }
 
     private SchedulerHotFolderFileList load(final ISOSVirtualFile pobjVirtualDir) {
+        return load(pobjVirtualDir);
+    }
+    
+    private SchedulerHotFolderFileList load(final ISOSVirtualFile pobjVirtualDir,String regex) {
         final String conMethodName = "SchedulerHotFolder::load";
         SchedulerHotFolderFileList result = new SchedulerHotFolderFileList();
         try {
@@ -109,7 +121,7 @@ public class SchedulerHotFolder extends JSObjBase {
             }
         }
         LOGGER.debug("getFilelist from: " + pobjVirtualDir.getName());
-        filenames = objVFSHandler.getFilelist(pobjVirtualDir.getName(), ".*", 0, false, null);
+        filenames = objVFSHandler.getFilelist(pobjVirtualDir.getName(), regex, 0, false, null);
         for (String filename : filenames) {
             ISOSVirtualFile objVirtualFile1 = objVFSHandler.getFileHandle(filename);
             String lowerFilename = filename.toLowerCase();
@@ -159,7 +171,9 @@ public class SchedulerHotFolder extends JSObjBase {
         LOGGER.debug(String.format("%1$s objects found in %2$s", result.getFileList().size(), pobjVirtualDir.getName()));
         return result;
     }
-
+ 
+    
+    
     public SchedulerHotFolderFileList getHotFolderFileList() {
         return objHotFolderFileList;
     }
