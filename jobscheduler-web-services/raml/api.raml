@@ -1,0 +1,358 @@
+#%RAML 0.8
+title: Please type API title here
+version: v1
+baseUri: http://example.com
+protocols: [ HTTP ]
+schemas:
+  - myWebserviceAnswer-xml: !include schemas/myWebserviceAnswer-xml-schema.xsd
+  - myWebserviceAnswer: !include schemas/myWebserviceAnswer-schema.json
+  - SOSCommandSecurityWebserviceAnswer-xml: !include schemas/SOSCommandSecurityWebserviceAnswer-xml-schema.xsd
+  - SOSCommandSecurityWebserviceAnswer: !include schemas/SOSCommandSecurityWebserviceAnswer-schema.json
+/plugin: 
+  description: ""
+  /security: 
+    description: ""
+    /add_order: 
+      post: 
+        queryParameters: 
+          session_id: 
+          job_chain: 
+          order: 
+          at: 
+          end_state: 
+          priority: 
+          replace: 
+          state: 
+          title: 
+          web_service: 
+          params: 
+          runtime: 
+        responses: 
+          200: 
+            body: 
+              application/xml: 
+                schema: SOSCommandSecurityWebserviceAnswer-xml
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.xml
+              application/json: 
+                schema: SOSCommandSecurityWebserviceAnswer
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.json
+    /consumes: 
+      post: 
+        queryParameters: 
+          session_id: 
+          job_chain: 
+        body: 
+          text/plain: 
+        responses: 
+          200: 
+            body: 
+              application/xml: 
+                schema: SOSCommandSecurityWebserviceAnswer-xml
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.xml
+              application/json: 
+                schema: SOSCommandSecurityWebserviceAnswer
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.json
+    /is_enabled: 
+      get: 
+        responses: 
+          200: 
+            body: 
+              application/xml: 
+                schema: SOSCommandSecurityWebserviceAnswer-xml
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.xml
+              application/json: 
+                schema: SOSCommandSecurityWebserviceAnswer
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.json
+    /job_chain: 
+      post: 
+        queryParameters: 
+          session_id: 
+          distributed: 
+          max_orders: 
+          name: 
+          orders_recoverable: 
+          title: 
+          visible: 
+        responses: 
+          200: 
+            body: 
+              application/xml: 
+                schema: SOSCommandSecurityWebserviceAnswer-xml
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.xml
+              application/json: 
+                schema: SOSCommandSecurityWebserviceAnswer
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.json
+    /job_chain_modify: 
+      post: 
+        queryParameters: 
+          session_id: 
+          job_chain: 
+          state: 
+        responses: 
+          200: 
+            body: 
+              application/xml: 
+                schema: SOSCommandSecurityWebserviceAnswer-xml
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.xml
+              application/json: 
+                schema: SOSCommandSecurityWebserviceAnswer
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.json
+    /job_chain_node_modify: 
+      post: 
+        queryParameters: 
+          session_id: 
+          job_chain: 
+          action: 
+          state: 
+        responses: 
+          200: 
+            body: 
+              application/xml: 
+                schema: SOSCommandSecurityWebserviceAnswer-xml
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.xml
+              application/json: 
+                schema: SOSCommandSecurityWebserviceAnswer
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.json
+    /kill_task: 
+      post: 
+        queryParameters: 
+          session_id: 
+          id: 
+          immediately: 
+          job: 
+        responses: 
+          200: 
+            body: 
+              application/xml: 
+                schema: SOSCommandSecurityWebserviceAnswer-xml
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.xml
+              application/json: 
+                schema: SOSCommandSecurityWebserviceAnswer
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.json
+    /lock: 
+      post: 
+        queryParameters: 
+          session_id: 
+          max_non_exclusive: 
+          name: 
+        responses: 
+          200: 
+            body: 
+              application/xml: 
+                schema: SOSCommandSecurityWebserviceAnswer-xml
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.xml
+              application/json: 
+                schema: SOSCommandSecurityWebserviceAnswer
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.json
+    /lock_remove: 
+      post: 
+        queryParameters: 
+          session_id: 
+          lock: 
+        responses: 
+          200: 
+            body: 
+              application/xml: 
+                schema: SOSCommandSecurityWebserviceAnswer-xml
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.xml
+              application/json: 
+                schema: SOSCommandSecurityWebserviceAnswer
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.json
+    /login: 
+      post: 
+        queryParameters: 
+          user: 
+          password: 
+        responses: 
+          200: 
+            body: 
+              application/xml: 
+                schema: SOSCommandSecurityWebserviceAnswer-xml
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.xml
+              application/json: 
+                schema: SOSCommandSecurityWebserviceAnswer
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.json
+    /logout: 
+      post: 
+        queryParameters: 
+          session_id: 
+        responses: 
+          200: 
+            body: 
+              application/xml: 
+                schema: SOSCommandSecurityWebserviceAnswer-xml
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.xml
+              application/json: 
+                schema: SOSCommandSecurityWebserviceAnswer
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.json
+    /modify_job: 
+      post: 
+        queryParameters: 
+          session_id: 
+          job: 
+          cmd: 
+        responses: 
+          200: 
+            body: 
+              application/xml: 
+                schema: SOSCommandSecurityWebserviceAnswer-xml
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.xml
+              application/json: 
+                schema: SOSCommandSecurityWebserviceAnswer
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.json
+    /modify_order: 
+      post: 
+        queryParameters: 
+          session_id: 
+          job_chain: 
+          order: 
+          action: 
+          at: 
+          end_state: 
+          priority: 
+          setback: 
+          state: 
+          suspended: 
+          title: 
+          params: 
+          runtime: 
+        responses: 
+          200: 
+            body: 
+              application/xml: 
+                schema: SOSCommandSecurityWebserviceAnswer-xml
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.xml
+              application/json: 
+                schema: SOSCommandSecurityWebserviceAnswer
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.json
+    /modify_spooler: 
+      post: 
+        queryParameters: 
+          session_id: 
+          cmd: 
+          timeout: 
+        responses: 
+          200: 
+            body: 
+              application/xml: 
+                schema: SOSCommandSecurityWebserviceAnswer-xml
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.xml
+              application/json: 
+                schema: SOSCommandSecurityWebserviceAnswer
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.json
+    /process_class: 
+      post: 
+        queryParameters: 
+          session_id: 
+          scheduler_id: 
+          name: 
+          remote_scheduler: 
+          replace: 
+          max_processes: 
+        responses: 
+          200: 
+            body: 
+              application/xml: 
+                schema: SOSCommandSecurityWebserviceAnswer-xml
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.xml
+              application/json: 
+                schema: SOSCommandSecurityWebserviceAnswer
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.json
+    /process_class_remove: 
+      post: 
+        queryParameters: 
+          session_id: 
+          process_class: 
+        responses: 
+          200: 
+            body: 
+              application/xml: 
+                schema: SOSCommandSecurityWebserviceAnswer-xml
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.xml
+              application/json: 
+                schema: SOSCommandSecurityWebserviceAnswer
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.json
+    /remove_job_chain: 
+      post: 
+        queryParameters: 
+          session_id: 
+          job_chain: 
+        responses: 
+          200: 
+            body: 
+              application/xml: 
+                schema: SOSCommandSecurityWebserviceAnswer-xml
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.xml
+              application/json: 
+                schema: SOSCommandSecurityWebserviceAnswer
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.json
+    /remove_order: 
+      post: 
+        queryParameters: 
+          session_id: 
+          job_chain: 
+          order: 
+        responses: 
+          200: 
+            body: 
+              application/xml: 
+                schema: SOSCommandSecurityWebserviceAnswer-xml
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.xml
+              application/json: 
+                schema: SOSCommandSecurityWebserviceAnswer
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.json
+    /start_job: 
+      post: 
+        queryParameters: 
+          session_id: 
+          job: 
+          at: 
+          force: 
+          name: 
+          params: 
+        responses: 
+          200: 
+            body: 
+              application/xml: 
+                schema: SOSCommandSecurityWebserviceAnswer-xml
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.xml
+              application/json: 
+                schema: SOSCommandSecurityWebserviceAnswer
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.json
+    /terminate: 
+      post: 
+        queryParameters: 
+          session_id: 
+          all_schedulers: 
+          continue_exclusive_operation: 
+          restart: 
+          timeout: 
+        responses: 
+          200: 
+            body: 
+              application/xml: 
+                schema: SOSCommandSecurityWebserviceAnswer-xml
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.xml
+              application/json: 
+                schema: SOSCommandSecurityWebserviceAnswer
+                example: !include examples/SOSCommandSecurityWebserviceAnswer-example.json
+    /test: 
+      get: 
+        queryParameters: 
+          name: 
+          email: 
+        responses: 
+          200: 
+            body: 
+              application/xml: 
+                schema: myWebserviceAnswer-xml
+                example: !include examples/myWebserviceAnswer-example.xml
+              application/json: 
+                schema: myWebserviceAnswer
+                example: !include examples/myWebserviceAnswer-example.json
+    /test2: 
+      get: 
+        responses: 
+          200: 
+            body: 
+              text/plain: 

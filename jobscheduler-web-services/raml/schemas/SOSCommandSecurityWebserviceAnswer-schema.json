@@ -1,0 +1,31 @@
+{
+  "$schema" : "http://json-schema.org/draft-03/schema" ,
+  "type" : "object" ,
+  "required" : true ,
+  "properties" : {
+    "Message" : {
+      "required" : false ,
+      "type" : ["string",null]
+    } ,
+    "JobSchedulerAnswer" : {
+      "required" : false ,
+      "type" : ["string",null]
+    } ,
+    "User" : {
+      "required" : false ,
+      "type" : ["string",null]
+    } ,
+    "SessionId" : {
+      "required" : false ,
+      "type" : ["string",null]
+    } ,
+    "Resource" : {
+      "required" : false ,
+      "type" : ["string",null]
+    } ,
+    "IsEnabled" : {
+      "required" : false ,
+      "type" : ["string",null]
+    }
+  }
+}

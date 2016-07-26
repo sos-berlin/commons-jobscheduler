@@ -1,0 +1,19 @@
+{
+  "$schema" : "http://json-schema.org/draft-03/schema" ,
+  "type" : "object" ,
+  "required" : true ,
+  "properties" : {
+    "Email" : {
+      "required" : false ,
+      "type" : "string"
+    } ,
+    "Telephone" : {
+      "required" : false ,
+      "type" : "string"
+    } ,
+    "Name" : {
+      "required" : false ,
+      "type" : "string"
+    }
+  }
+}

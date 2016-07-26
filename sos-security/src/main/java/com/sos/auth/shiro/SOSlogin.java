@@ -1,6 +1,7 @@
 package com.sos.auth.shiro;
 
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authc.UnknownAccountException;
@@ -25,7 +26,7 @@ public class SOSlogin {
         UsernamePasswordToken token = new UsernamePasswordToken(user, pwd);
         try {
             currentUser.login(token);
-        } catch (UnknownAccountException uae) {
+          } catch (UnknownAccountException uae) {
             setMsg("There is no user with username/password combination of " + token.getPrincipal());
         } catch (IncorrectCredentialsException ice) {
             setMsg("Password for account " + token.getPrincipal() + " was incorrect!");
@@ -44,6 +45,7 @@ public class SOSlogin {
                 logout();
             }
             this.init();
+
             createSubject(user, pwd);
         }
     }

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="sos_security_webservice_answer" type="sosCommandSecurityWebserviceAnswer"/>
+
+  <xs:complexType name="sosCommandSecurityWebserviceAnswer">
+    <xs:sequence>
+      <xs:element name="isEnabled" type="xs:boolean"/>
+      <xs:element name="jobSchedulerAnswer" type="xs:string" minOccurs="0"/>
+      <xs:element name="message" type="xs:string" minOccurs="0"/>
+      <xs:element name="resource" type="xs:string" minOccurs="0"/>
+      <xs:element name="sessionId" type="xs:string" minOccurs="0"/>
+      <xs:element name="user" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+

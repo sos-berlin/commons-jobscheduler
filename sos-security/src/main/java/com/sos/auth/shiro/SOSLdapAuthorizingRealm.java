@@ -12,12 +12,17 @@ import org.apache.shiro.subject.PrincipalCollection;
 
 public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
 
+    private static final String DEFAULT_USER_NAME_ATTRIBUTE = "CN";
+    private static final String DEFAULT_GROUP_NAME_ATTRIBUTE = "memberOf";
     private SOSLdapAuthorizing authorizing;
     private String searchBase;
     private Map<String, String> groupRolesMap;
     private Map<String, String> permissions;
     private String groupNameAttribute;
     private String userNameAttribute;
+
+    private String userSearchFilter;
+    private AuthenticationToken authcToken;
 
     public boolean supports(AuthenticationToken token) {
         setAuthorizing(new SOSLdapAuthorizing());
@@ -28,7 +33,10 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         SimpleAuthorizationInfo authzInfo = null;
         if (authorizing != null) {
+
+            authorizing.setAuthcToken(authcToken);
             authorizing.setSosLdapAuthorizingRealm(this);
+
             authzInfo = authorizing.setRoles(authzInfo, principalCollection);
         }
         return authzInfo;
@@ -36,6 +44,8 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authcToken) throws AuthenticationException {
+        this.authcToken = authcToken;
+
         return super.doGetAuthenticationInfo(authcToken);
     }
 
@@ -51,10 +61,6 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
         this.groupRolesMap = groupRolesMap;
     }
 
-    public SOSLdapAuthorizing getAuthorizing() {
-        return authorizing;
-    }
-
     public String getSearchBase() {
         return searchBase;
     }
@@ -64,7 +70,11 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
     }
 
     public String getGroupNameAttribute() {
-        return groupNameAttribute;
+        if (groupNameAttribute == null) {
+            return DEFAULT_GROUP_NAME_ATTRIBUTE;
+        } else {
+            return groupNameAttribute;
+        }
     }
 
     public void setGroupNameAttribute(String groupNameAttribute) {
@@ -72,7 +82,11 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
     }
 
     public String getUserNameAttribute() {
-        return userNameAttribute;
+        if (userNameAttribute == null) {
+            return DEFAULT_USER_NAME_ATTRIBUTE;
+        } else {
+            return userNameAttribute;
+        }
     }
 
     public void setUserNameAttribute(String userNameAttribute) {
@@ -85,6 +99,18 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
 
     public void setPermissions(Map<String, String> permissions) {
         this.permissions = permissions;
+    }
+
+    public Object getLdapPrincipal(AuthenticationToken token) {
+        return super.getLdapPrincipal(token);
+    }
+
+    public String getUserSearchFilter() {
+        return userSearchFilter;
+    }
+
+    public void setUserSearchFilter(String userSearchFilter) {
+        this.userSearchFilter = userSearchFilter;
     }
 
 }

@@ -1,0 +1,146 @@
+{
+  "authenticated": true,
+  "user": "root",
+  "access_token": "4e8b311d-6630-4da8-a9db-ef30034a8801",
+  "JobschedulerMaster": {
+    "view": {
+      "status": true,
+      "mainlog": true
+    },
+    "pauseContinue": true,
+    "restart": true,
+    "terminateRestart": true,
+    "abortRestart": true,
+    "manageCategories": true
+  },
+  "JobschedulerMasterCluster": {
+    "view": {
+      "clusterStatus": true
+    },
+    "terminateClusterMember": true,
+    "restartClusterMember": true
+  },
+  "JobschedulerUniversalAgent": {
+    "view": {
+      "status": true
+    },
+    "stop": true,
+    "abort": true,
+    "restart": true
+  },
+  "DailyPlan": {
+    "view": {
+      "status": true
+    }
+  },
+  "History": {
+    "view": true
+  },
+  "Order": {
+    "view": {
+      "configuration": true,
+      "history": true,
+      "orderLog": true,
+      "status": true
+    },
+    "change": {
+      "startAndEndNode": true,
+      "timeForAdhocOrder": true,
+      "parameter": {
+        "type": "boolean",
+        "value": true
+      }
+    },
+    "start": true,
+    "update": true,
+    "suspend": true,
+    "resume": true,
+    "deleteAdhocOrdersBlacklistOrders": true,
+    "removeSetback": true
+  },
+  "JobChain": {
+    "view": {
+      "orderLog": true,
+      "configuration": true,
+      "history": true,
+      "status": true
+    },
+    "stop": true,
+    "unstop": true,
+    "addOrder": true,
+    "deleteTemporayOders": true,
+    "skipOrUnskipJobNodes": true,
+    "stopJob": true,
+    "unstopJob": true,
+    "stopJobNode": true,
+    "unstopJobNode": true
+  },
+  "Job": {
+    "view": {
+      "status": true,
+      "taskLog": true,
+      "configuration": true,
+      "history": true
+    },
+    "start": {
+      "task": true,
+      "taskImmediate": true
+    },
+    "stop": true,
+    "unstop": true,
+    "terminate": true,
+    "kill": true,
+    "history": false
+  },
+  "ProcessClass": {
+    "view": {
+      "status": true,
+      "configuration": true
+    }
+  },
+  "Schedule": {
+    "view": {
+      "status": true,
+      "configuration": true
+    },
+    "edit": true,
+    "addSubstitute": true
+  },
+  "Lock": {
+    "view": {
+      "status": true,
+      "configuration": true
+    }
+  },
+  "Event": {
+    "view": {
+      "status": true
+    },
+    "delete": true
+  },
+  "EventAction": {
+    "view": {
+      "status": true
+    },
+    "createEventsManually": true
+  },
+  "HolidayCalendar": {
+    "view": {
+      "status": true
+    }
+  },
+  "MaintenanceWindow": {
+    "view": {
+      "status": true
+    },
+    "enableDisableMaintenanceWindow": true
+  },
+  "SOSPermissionRoles": {
+    "SOSPermissionRole": [
+      "application_manager",
+      "it_operator",
+      "incident_manager",
+      "business_user"
+    ]
+  }
+}

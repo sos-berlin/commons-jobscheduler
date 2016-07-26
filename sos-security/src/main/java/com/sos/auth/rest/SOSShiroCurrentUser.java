@@ -1,6 +1,10 @@
 package com.sos.auth.rest;
 
+import java.util.HashMap;
+
 import org.apache.shiro.subject.Subject;
+
+import com.sos.scheduler.db.SchedulerInstancesDBItem;
 
 public class SOSShiroCurrentUser {
 
@@ -8,9 +12,12 @@ public class SOSShiroCurrentUser {
     private String username;
     private String password;
     private String accessToken;
-
+    private HashMap <String, SchedulerInstancesDBItem> listOfSchedulerInstances;
+  
+  
     public SOSShiroCurrentUser(String username, String password) {
         super();
+        this.listOfSchedulerInstances = new HashMap<String, SchedulerInstancesDBItem>();
         this.username = username;
         this.password = password;
     }
@@ -61,6 +68,14 @@ public class SOSShiroCurrentUser {
         } else {
             return false;
         }
+    }
+    
+    public SchedulerInstancesDBItem getSchedulerInstanceDBItem(String schedulerId){
+        return listOfSchedulerInstances.get(schedulerId);
+    }
+    
+    public void addSchedulerInstanceDBItem(String schedulerId, SchedulerInstancesDBItem schedulerInstancesDBItem){
+        listOfSchedulerInstances.put(schedulerId, schedulerInstancesDBItem);
     }
 
 }

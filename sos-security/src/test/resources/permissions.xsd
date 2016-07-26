@@ -65,14 +65,7 @@
 	</xs:element>
 	<xs:element name="SOSPermissionRole">
 		<xs:simpleType>
-			<xs:restriction base="xs:string">
-				<xs:enumeration value="SOSRoleJoc"/>
-				<xs:enumeration value="SOSRoleJoe"/>
-				<xs:enumeration value="SOSRoleEvent"/>
-				<xs:enumeration value="SOSRoleAdmin"/>
-				<xs:enumeration value="SOSRoleSuper"/>
-				<xs:enumeration value="SOSRoleDashboard"/>
-			</xs:restriction>
+			<xs:restriction base="xs:string"/>
 		</xs:simpleType>
 	</xs:element>
 	<xs:element name="SOSPermissionRoles">
@@ -115,10 +108,18 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="pauseContinue" type="xs:boolean"/>
-							<xs:element name="restart" type="xs:boolean"/>
-							<xs:element name="terminateRestart" type="xs:boolean"/>
-							<xs:element name="abortRestart" type="xs:boolean"/>
+							<xs:element name="pause" type="xs:boolean"/>
+							<xs:element name="continue" type="xs:boolean"/>
+							<xs:element name="restart">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="terminate" type="xs:boolean"/>
+										<xs:element name="abort" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="terminate" type="xs:boolean"/>
+							<xs:element name="abort" type="xs:boolean"/>
 							<xs:element name="manageCategories" type="xs:boolean"/>
 						</xs:sequence>
 					</xs:complexType>
@@ -133,8 +134,9 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="terminateClusterMember" type="xs:boolean"/>
-							<xs:element name="restartClusterMember" type="xs:boolean"/>
+							<xs:element name="terminateFailSafe" type="xs:boolean"/>
+							<xs:element name="restart" type="xs:boolean"/>
+							<xs:element name="terminate" type="xs:boolean"/>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -148,9 +150,16 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="stop" type="xs:boolean"/>
+							<xs:element name="terminate" type="xs:boolean"/>
 							<xs:element name="abort" type="xs:boolean"/>
-							<xs:element name="restart" type="xs:boolean"/>
+							<xs:element name="restart">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="terminate" type="xs:boolean"/>
+										<xs:element name="abort" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -181,7 +190,6 @@
 								<xs:complexType>
 									<xs:sequence>
 										<xs:element name="configuration" type="xs:boolean"/>
-										<xs:element name="history" type="xs:boolean"/>
 										<xs:element name="orderLog" type="xs:boolean"/>
 										<xs:element name="status" type="xs:boolean"/>
 									</xs:sequence>
@@ -192,7 +200,7 @@
 									<xs:sequence>
 										<xs:element name="startAndEndNode" type="xs:boolean"/>
 										<xs:element name="timeForAdhocOrder" type="xs:boolean"/>
-										<xs:element name="parameter"/>
+										<xs:element name="parameter" type="xs:boolean"/>
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
@@ -200,7 +208,14 @@
 							<xs:element name="update" type="xs:boolean"/>
 							<xs:element name="suspend" type="xs:boolean"/>
 							<xs:element name="resume" type="xs:boolean"/>
-							<xs:element name="deleteAdhocOrdersBlacklistOrders" type="xs:boolean"/>
+							<xs:element name="delete">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="temporary" type="xs:boolean"/>
+										<xs:element name="permanent" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
 							<xs:element name="removeSetback" type="xs:boolean"/>
 						</xs:sequence>
 					</xs:complexType>
@@ -211,7 +226,6 @@
 							<xs:element name="view">
 								<xs:complexType>
 									<xs:sequence>
-										<xs:element name="orderLog" type="xs:boolean"/>
 										<xs:element name="configuration" type="xs:boolean"/>
 										<xs:element name="history" type="xs:boolean"/>
 										<xs:element name="status" type="xs:boolean"/>
@@ -221,12 +235,10 @@
 							<xs:element name="stop" type="xs:boolean"/>
 							<xs:element name="unstop" type="xs:boolean"/>
 							<xs:element name="addOrder" type="xs:boolean"/>
-							<xs:element name="deleteTemporayOders" type="xs:boolean"/>
-							<xs:element name="skipOrUnskipJobNodes" type="xs:boolean"/>
-							<xs:element name="stopJob" type="xs:boolean"/>
-							<xs:element name="unstopJob" type="xs:boolean"/>
-							<xs:element name="stopJobNode" type="xs:boolean"/>
-							<xs:element name="unstopJobNode" type="xs:boolean"/>
+							<xs:element name="skipJobChainNode" type="xs:boolean"/>
+							<xs:element name="unskipJobChainNode" type="xs:boolean"/>
+							<xs:element name="stopJobChainNode" type="xs:boolean"/>
+							<xs:element name="unstopJobChainNode" type="xs:boolean"/>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -247,7 +259,7 @@
 								<xs:complexType>
 									<xs:sequence>
 										<xs:element name="task" type="xs:boolean"/>
-										<xs:element name="taskImmediate" type="xs:boolean"/>
+										<xs:element name="taskImmediately" type="xs:boolean"/>
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
@@ -359,9 +371,9 @@
 				</xs:element>
 				<xs:element ref="SOSPermissionRoles"/>
 			</xs:sequence>
-			<xs:attribute name="authenticated" type="xs:boolean"/>
+			<xs:attribute name="isAuthenticated" type="xs:boolean"/>
 			<xs:attribute name="user" type="xs:string"/>
-			<xs:attribute name="access_token" type="xs:string"/>
+			<xs:attribute name="accessToken" type="xs:string"/>
 		</xs:complexType>
 	</xs:element>
 </xs:schema>
