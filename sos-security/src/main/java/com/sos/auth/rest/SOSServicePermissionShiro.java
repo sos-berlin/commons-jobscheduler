@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 import java.util.List;
 import java.util.Properties;
+import java.util.TimeZone;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -31,6 +32,7 @@ import com.sos.auth.rest.permission.model.SOSPermissionShiro;
 import com.sos.auth.rest.permission.model.SOSPermissionWorkingplan;
 import com.sos.auth.rest.permission.model.SOSPermissions;
 import com.sos.auth.shiro.SOSlogin;
+import com.sos.hibernate.layer.SOSHibernateDBLayer;
 
 import org.apache.log4j.Logger;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
@@ -72,12 +74,12 @@ public class SOSServicePermissionShiro {
             addRole(roles.getSOSPermissionRole(), "joe");
             addRole(roles.getSOSPermissionRole(), "joc");
             addRole(roles.getSOSPermissionRole(), "events");
+            addRole(roles.getSOSPermissionRole(), "administrator");
             addRole(roles.getSOSPermissionRole(), "application_manager");
             addRole(roles.getSOSPermissionRole(), "it_operator");
             addRole(roles.getSOSPermissionRole(), "incident_manager");
             addRole(roles.getSOSPermissionRole(), "business_user");
             addRole(roles.getSOSPermissionRole(), "api_user");
-            addRole(roles.getSOSPermissionRole(), "events");
 
             SOSPermissions sosPermissions = o.createSOSPermissions();
 
@@ -252,8 +254,9 @@ public class SOSServicePermissionShiro {
         }
         setCurrentUserfromAccessToken(sosWebserviceAuthenticationRecord.getAccessToken(), sosWebserviceAuthenticationRecord.getUser(), sosWebserviceAuthenticationRecord
                 .getPassword());
-        return createPermissionObject(sosWebserviceAuthenticationRecord.getAccessToken(), sosWebserviceAuthenticationRecord.getUser(), sosWebserviceAuthenticationRecord
-                .getPassword());
+        //createPermissionObject(sosWebserviceAuthenticationRecord.getAccessToken(), sosWebserviceAuthenticationRecord.getUser(), sosWebserviceAuthenticationRecord
+        //        .getPassword());
+        return currentUser.getSosPermissionJocCockpit();
     }
 
     @GET
@@ -276,7 +279,10 @@ public class SOSServicePermissionShiro {
         String accessToken = this.getAccessToken(accessTokenFromHeader, accessTokenFromQuery);
 
         currentUser = currentUsersList.getUser(accessToken);
-
+        if (currentUser.getSosHibernateDBLayer() != null && currentUser.getSosHibernateDBLayer() != null) {        
+            currentUser.getSosHibernateDBLayer().getConnection().disconnect();
+        }
+        
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer("");
         if (currentUser != null) {
             sosShiroCurrentUserAnswer.setUser("*Unknown User*");
@@ -392,12 +398,12 @@ public class SOSServicePermissionShiro {
             addRole(roles.getSOSPermissionRole(), "joe");
             addRole(roles.getSOSPermissionRole(), "joc");
             addRole(roles.getSOSPermissionRole(), "events");
+            addRole(roles.getSOSPermissionRole(), "administrator");
             addRole(roles.getSOSPermissionRole(), "application_manager");
             addRole(roles.getSOSPermissionRole(), "it_operator");
             addRole(roles.getSOSPermissionRole(), "incident_manager");
             addRole(roles.getSOSPermissionRole(), "business_user");
             addRole(roles.getSOSPermissionRole(), "api_user");
-            addRole(roles.getSOSPermissionRole(), "events");
 
             sosPermissionJocCockpit.setJobschedulerMaster(o.createSOSPermissionJocCockpitJobschedulerMaster());
             sosPermissionJocCockpit.setJobschedulerMasterCluster(o.createSOSPermissionJocCockpitJobschedulerMasterCluster());
@@ -562,6 +568,12 @@ public class SOSServicePermissionShiro {
         currentUser.setAccessToken(accessToken);
         currentUsersList.addUser(currentUser);
 
+        SOSPermissionJocCockpit sosPermissionJocCockpit = createPermissionObject(accessToken, "","");
+        currentUser.setSosPermissionJocCockpit(sosPermissionJocCockpit);
+
+        SOSShiroProperties sosShiroProperties = new SOSShiroProperties();
+        currentUser.setSosHibernateDBLayer(new SOSHibernateDBLayer(sosShiroProperties.getProperty("hibernate_configuration_file")));
+ 
     }
 
     private SOSShiroCurrentUser getUserPwdFromHeaderOrQuery(String basicAuthorization, String user, String pwd) {
@@ -611,6 +623,7 @@ public class SOSServicePermissionShiro {
 
     private Response login(String basicAuthorization, String user, String pwd) {
 
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         currentUser = getUserPwdFromHeaderOrQuery(basicAuthorization, user, pwd);
         Response.ResponseBuilder responseBuilder = null;
         if (currentUser == null) {
@@ -644,7 +657,7 @@ public class SOSServicePermissionShiro {
         if (currentUser != null) {
             currentUser.getCurrentSubject().getSession().touch();
         } else {
-            LOGGER.warn("current user is empty");
+            LOGGER.warn("current user is null");
         }
     }
 

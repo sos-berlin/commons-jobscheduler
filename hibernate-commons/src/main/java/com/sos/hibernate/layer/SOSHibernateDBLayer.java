@@ -30,14 +30,20 @@ public class SOSHibernateDBLayer {
     }
 
     public void initConnection(String configFileName) {
-        this.configurationFileName = configFileName;
-        try {
-            connection = new SOSHibernateConnection(configurationFileName);
-            connection.addClassMapping(getDefaultClassMapping());
-            connection.connect();
-        } catch (Exception e) {
-            LOGGER.error(String.format("Could not initiate hibernate connection for database using file %s", configurationFileName), e);
+        if (connection == null) {
+            this.configurationFileName = configFileName;
+            try {
+                connection = new SOSHibernateConnection(configurationFileName);
+                connection.addClassMapping(getDefaultClassMapping());
+                connection.connect();
+            } catch (Exception e) {
+                LOGGER.error(String.format("Could not initiate hibernate connection for database using file %s", configurationFileName), e);
+            }
         }
+    }
+
+    public void initConnection(SOSHibernateConnection connection) {
+        this.connection = connection;
     }
 
     public String getConfigurationFileName() {
