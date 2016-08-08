@@ -7,8 +7,7 @@ import org.apache.shiro.subject.Subject;
 import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateConnection;
-import com.sos.hibernate.layer.SOSHibernateDBLayer;
-import com.sos.scheduler.db.SchedulerInstancesDBItem;
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 
 public class SOSShiroCurrentUser {
 
@@ -17,20 +16,20 @@ public class SOSShiroCurrentUser {
     private String password;
     private String accessToken;
     private SOSPermissionJocCockpit sosPermissionJocCockpit;
-    private HashMap <String, SchedulerInstancesDBItem> listOfSchedulerInstances;
-    SOSHibernateDBLayer sosHibernateDBLayer;
+    private HashMap <String, DBItemInventoryInstance> listOfSchedulerInstances;
+    SOSHibernateConnection sosHibernateConnection;
     
-    public SOSHibernateDBLayer getSosHibernateDBLayer() {
-        return sosHibernateDBLayer;
+    public SOSHibernateConnection getSOSHibernateConnection() {
+        return sosHibernateConnection;
     }
 
-    public void setSosHibernateDBLayer(SOSHibernateDBLayer sosHibernateDBLayer) {
-        this.sosHibernateDBLayer = sosHibernateDBLayer;
+    public void setSOSHibernateConnection(SOSHibernateConnection sosHibernateConnection) {
+        this.sosHibernateConnection = sosHibernateConnection;
     }
 
     public SOSShiroCurrentUser(String username, String password) {
         super();
-        this.listOfSchedulerInstances = new HashMap<String, SchedulerInstancesDBItem>();
+        this.listOfSchedulerInstances = new HashMap<String, DBItemInventoryInstance>();
         this.username = username;
         this.password = password;
     }
@@ -91,11 +90,11 @@ public class SOSShiroCurrentUser {
         }
     }
     
-    public SchedulerInstancesDBItem getSchedulerInstanceDBItem(JobSchedulerIdentifier jobSchedulerIdentifier){
+    public DBItemInventoryInstance getSchedulerInstanceDBItem(JobSchedulerIdentifier jobSchedulerIdentifier){
         return listOfSchedulerInstances.get(jobSchedulerIdentifier.getId());
     }
     
-    public void addSchedulerInstanceDBItem(JobSchedulerIdentifier jobSchedulerIdentifier, SchedulerInstancesDBItem schedulerInstancesDBItem){
+    public void addSchedulerInstanceDBItem(JobSchedulerIdentifier jobSchedulerIdentifier, DBItemInventoryInstance schedulerInstancesDBItem){
         listOfSchedulerInstances.put(jobSchedulerIdentifier.getId(), schedulerInstancesDBItem);
     }
 

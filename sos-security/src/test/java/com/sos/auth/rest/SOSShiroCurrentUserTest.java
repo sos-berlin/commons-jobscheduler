@@ -6,9 +6,8 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import com.sos.auth.classes.JobSchedulerIdentifier;
-import com.sos.auth.classes.SOSShiroProperties;
-import com.sos.scheduler.db.SchedulerInstancesDBItem;
-import com.sos.scheduler.db.SchedulerInstancesDBLayer;
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.jitl.reporting.db.DBLayerReporting;
 
 public class SOSShiroCurrentUserTest {
     private static final String LDAP_PASSWORD = "sos01";
@@ -16,18 +15,18 @@ public class SOSShiroCurrentUserTest {
 
     @Test
 
-    public void getJobSchedulerInstance() {
+    public void getJobSchedulerInstance() throws Exception {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobSchedulerIdentifier jobSchedulerIdentifier = new JobSchedulerIdentifier("scheduler_current");
         SOSShiroCurrentUser sosShiroCurrentUser = SOSServicePermissionShiro.currentUsersList.getUser(sosShiroCurrentUserAnswer.getAccessToken());
 
-        SOSShiroProperties sosShiroProperties = new SOSShiroProperties();
-        SchedulerInstancesDBLayer schedulerInstancesDBLayer = new SchedulerInstancesDBLayer(sosShiroProperties.getProperty("hibernate_configuration_file"));
-        sosShiroCurrentUser.addSchedulerInstanceDBItem (jobSchedulerIdentifier,schedulerInstancesDBLayer.getInstance("scheduler_current","",0));
-        SchedulerInstancesDBItem schedulerInstancesDBItem = sosShiroCurrentUser.getSchedulerInstanceDBItem(jobSchedulerIdentifier);
+         
+        DBLayerReporting dbLayer = new DBLayerReporting(sosShiroCurrentUser.getSOSHibernateConnection());
+        sosShiroCurrentUser.addSchedulerInstanceDBItem (jobSchedulerIdentifier,dbLayer.getInventoryInstanceBySchedulerId(jobSchedulerIdentifier.getSchedulerId()));
+        DBItemInventoryInstance schedulerInstancesDBItem = sosShiroCurrentUser.getSchedulerInstanceDBItem(jobSchedulerIdentifier);
         
-        assertEquals("getJobSchedulerInstance", "http://localhost:4000", schedulerInstancesDBItem.getUrl());
+        assertEquals("getJobSchedulerInstance", "http://localhost:4444", schedulerInstancesDBItem.getUrl());
 
     }
 

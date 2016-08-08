@@ -32,7 +32,9 @@ import com.sos.auth.rest.permission.model.SOSPermissionShiro;
 import com.sos.auth.rest.permission.model.SOSPermissionWorkingplan;
 import com.sos.auth.rest.permission.model.SOSPermissions;
 import com.sos.auth.shiro.SOSlogin;
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.hibernate.layer.SOSHibernateDBLayer;
+import com.sos.jitl.reporting.db.DBLayer;
 
 import org.apache.log4j.Logger;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
@@ -254,8 +256,10 @@ public class SOSServicePermissionShiro {
         }
         setCurrentUserfromAccessToken(sosWebserviceAuthenticationRecord.getAccessToken(), sosWebserviceAuthenticationRecord.getUser(), sosWebserviceAuthenticationRecord
                 .getPassword());
-        //createPermissionObject(sosWebserviceAuthenticationRecord.getAccessToken(), sosWebserviceAuthenticationRecord.getUser(), sosWebserviceAuthenticationRecord
-        //        .getPassword());
+        // createPermissionObject(sosWebserviceAuthenticationRecord.getAccessToken(),
+        // sosWebserviceAuthenticationRecord.getUser(),
+        // sosWebserviceAuthenticationRecord
+        // .getPassword());
         return currentUser.getSosPermissionJocCockpit();
     }
 
@@ -279,10 +283,10 @@ public class SOSServicePermissionShiro {
         String accessToken = this.getAccessToken(accessTokenFromHeader, accessTokenFromQuery);
 
         currentUser = currentUsersList.getUser(accessToken);
-        if (currentUser.getSosHibernateDBLayer() != null && currentUser.getSosHibernateDBLayer() != null) {        
-            currentUser.getSosHibernateDBLayer().getConnection().disconnect();
+        if (currentUser.getSOSHibernateConnection() != null) {
+            currentUser.getSOSHibernateConnection().disconnect();
         }
-        
+
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer("");
         if (currentUser != null) {
             sosShiroCurrentUserAnswer.setUser("*Unknown User*");
@@ -361,7 +365,11 @@ public class SOSServicePermissionShiro {
         } else {
             if (user != null && user.length() > 0 && pwd != null && pwd.length() > 0) {
                 currentUser = new SOSShiroCurrentUser(user, pwd);
-                createUser();
+                try {
+                    createUser();
+                } catch (Exception e) {
+                    LOGGER.error(e);
+                }
             }
         }
         resetTimeOut();
@@ -551,7 +559,7 @@ public class SOSServicePermissionShiro {
 
     }
 
-    private void createUser() {
+    private void createUser() throws Exception   {
         if (currentUsersList == null) {
             currentUsersList = new SOSShiroCurrentUsersList();
         }
@@ -568,12 +576,16 @@ public class SOSServicePermissionShiro {
         currentUser.setAccessToken(accessToken);
         currentUsersList.addUser(currentUser);
 
-        SOSPermissionJocCockpit sosPermissionJocCockpit = createPermissionObject(accessToken, "","");
+        SOSPermissionJocCockpit sosPermissionJocCockpit = createPermissionObject(accessToken, "", "");
         currentUser.setSosPermissionJocCockpit(sosPermissionJocCockpit);
 
         SOSShiroProperties sosShiroProperties = new SOSShiroProperties();
-        currentUser.setSosHibernateDBLayer(new SOSHibernateDBLayer(sosShiroProperties.getProperty("hibernate_configuration_file")));
- 
+
+        currentUser.setSOSHibernateConnection((new SOSHibernateConnection(sosShiroProperties.getProperty("hibernate_configuration_file"))));
+        currentUser.getSOSHibernateConnection().addClassMapping(DBLayer.getInventoryClassMapping());
+        currentUser.getSOSHibernateConnection().connect();
+
+        
     }
 
     private SOSShiroCurrentUser getUserPwdFromHeaderOrQuery(String basicAuthorization, String user, String pwd) {
@@ -600,7 +612,7 @@ public class SOSServicePermissionShiro {
         return new SOSShiroCurrentUser(user, pwd);
     }
 
-    private SOSShiroCurrentUserAnswer authenticate() {
+    private SOSShiroCurrentUserAnswer authenticate() throws Exception {
 
         createUser();
 
@@ -649,7 +661,7 @@ public class SOSServicePermissionShiro {
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
             responseBuilder = get401ResponseBuilder();
-            return responseBuilder.entity("Authorization Header with Basic based64part expected").build();
+            return responseBuilder.entity(e.getMessage()).build();
         }
     }
 
