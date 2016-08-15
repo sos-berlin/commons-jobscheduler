@@ -16,16 +16,8 @@ public class SOSShiroCurrentUser {
     private String password;
     private String accessToken;
     private SOSPermissionJocCockpit sosPermissionJocCockpit;
-    private HashMap <String, DBItemInventoryInstance> listOfSchedulerInstances;
-    SOSHibernateConnection sosHibernateConnection;
-    
-    public SOSHibernateConnection getSOSHibernateConnection() {
-        return sosHibernateConnection;
-    }
-
-    public void setSOSHibernateConnection(SOSHibernateConnection sosHibernateConnection) {
-        this.sosHibernateConnection = sosHibernateConnection;
-    }
+    private HashMap<String, DBItemInventoryInstance> listOfSchedulerInstances;
+    private SOSHibernateConnection sosHibernateConnection;
 
     public SOSShiroCurrentUser(String username, String password) {
         super();
@@ -89,13 +81,21 @@ public class SOSShiroCurrentUser {
             return false;
         }
     }
-    
-    public DBItemInventoryInstance getSchedulerInstanceDBItem(JobSchedulerIdentifier jobSchedulerIdentifier){
+
+    public DBItemInventoryInstance getSchedulerInstanceDBItem(JobSchedulerIdentifier jobSchedulerIdentifier) {
         return listOfSchedulerInstances.get(jobSchedulerIdentifier.getId());
     }
-    
-    public void addSchedulerInstanceDBItem(JobSchedulerIdentifier jobSchedulerIdentifier, DBItemInventoryInstance schedulerInstancesDBItem){
+
+    public void addSchedulerInstanceDBItem(JobSchedulerIdentifier jobSchedulerIdentifier, DBItemInventoryInstance schedulerInstancesDBItem) {
         listOfSchedulerInstances.put(jobSchedulerIdentifier.getId(), schedulerInstancesDBItem);
+    }
+
+    public SOSHibernateConnection getSosHibernateConnection() {
+        return sosHibernateConnection;
+    }
+
+    public void setSosHibernateConnection(SOSHibernateConnection sosHibernateConnection) {
+        this.sosHibernateConnection = sosHibernateConnection;
     }
 
 }

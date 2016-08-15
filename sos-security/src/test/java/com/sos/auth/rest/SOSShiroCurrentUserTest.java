@@ -22,7 +22,7 @@ public class SOSShiroCurrentUserTest {
         SOSShiroCurrentUser sosShiroCurrentUser = SOSServicePermissionShiro.currentUsersList.getUser(sosShiroCurrentUserAnswer.getAccessToken());
 
          
-        DBLayerReporting dbLayer = new DBLayerReporting(sosShiroCurrentUser.getSOSHibernateConnection());
+        DBLayerReporting dbLayer = new DBLayerReporting(SOSServicePermissionShiro.sosHibernateConnection);
         sosShiroCurrentUser.addSchedulerInstanceDBItem (jobSchedulerIdentifier,dbLayer.getInventoryInstanceBySchedulerId(jobSchedulerIdentifier.getSchedulerId()));
         DBItemInventoryInstance schedulerInstancesDBItem = sosShiroCurrentUser.getSchedulerInstanceDBItem(jobSchedulerIdentifier);
         

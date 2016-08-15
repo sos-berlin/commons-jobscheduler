@@ -1,11 +1,8 @@
 package com.sos.auth.rest;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 import java.util.List;
-import java.util.Properties;
 import java.util.TimeZone;
 
 import javax.ws.rs.Consumes;
@@ -33,11 +30,9 @@ import com.sos.auth.rest.permission.model.SOSPermissionWorkingplan;
 import com.sos.auth.rest.permission.model.SOSPermissions;
 import com.sos.auth.shiro.SOSlogin;
 import com.sos.hibernate.classes.SOSHibernateConnection;
-import com.sos.hibernate.layer.SOSHibernateDBLayer;
 import com.sos.jitl.reporting.db.DBLayer;
 
 import org.apache.log4j.Logger;
-import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.session.Session;
 
 @Path("/security")
@@ -46,6 +41,8 @@ public class SOSServicePermissionShiro {
 
     private SOSShiroCurrentUser currentUser;
     public static SOSShiroCurrentUsersList currentUsersList;
+    public static SOSHibernateConnection sosHibernateConnection;
+    
 
     @GET
     @Path("/permissions")
@@ -283,10 +280,7 @@ public class SOSServicePermissionShiro {
         String accessToken = this.getAccessToken(accessTokenFromHeader, accessTokenFromQuery);
 
         currentUser = currentUsersList.getUser(accessToken);
-        if (currentUser.getSOSHibernateConnection() != null) {
-            currentUser.getSOSHibernateConnection().disconnect();
-        }
-
+      
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer("");
         if (currentUser != null) {
             sosShiroCurrentUserAnswer.setUser("*Unknown User*");
@@ -297,7 +291,11 @@ public class SOSServicePermissionShiro {
         sosShiroCurrentUserAnswer.setIsPermitted(false);
         sosShiroCurrentUserAnswer.setAccessToken("");
         currentUsersList.removeUser(accessToken);
-
+        
+        if (currentUsersList.size() == 0 && sosHibernateConnection != null) {
+            sosHibernateConnection.disconnect();
+        }
+        
         return sosShiroCurrentUserAnswer;
     }
 
@@ -581,9 +579,12 @@ public class SOSServicePermissionShiro {
 
         SOSShiroProperties sosShiroProperties = new SOSShiroProperties();
 
-        currentUser.setSOSHibernateConnection((new SOSHibernateConnection(sosShiroProperties.getProperty("hibernate_configuration_file"))));
-        currentUser.getSOSHibernateConnection().addClassMapping(DBLayer.getInventoryClassMapping());
-        currentUser.getSOSHibernateConnection().connect();
+        if (sosHibernateConnection == null){
+            sosHibernateConnection = new SOSHibernateConnection(sosShiroProperties.getProperty("hibernate_configuration_file"));
+            sosHibernateConnection.addClassMapping(DBLayer.getInventoryClassMapping());
+            sosHibernateConnection.connect();
+        }
+        currentUser.setSosHibernateConnection(sosHibernateConnection);
 
         
     }
@@ -659,6 +660,7 @@ public class SOSServicePermissionShiro {
 
             return responseBuilder.build();
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             LOGGER.error(e.getMessage());
             responseBuilder = get401ResponseBuilder();
             return responseBuilder.entity(e.getMessage()).build();

@@ -22,5 +22,10 @@ public class SOSShiroCurrentUsersList {
     public void removeUser(String accessToken) {
         currentUsers.remove(accessToken);
     }
+    
+    public int size(){
+        return currentUsers.size();
+    }
+   
 
 }
