@@ -27,14 +27,15 @@ import com.sos.i18n.annotation.I18NResourceBundle;
 public class SOSSSHJobJSch extends SOSSSHJob2 {
 
     protected ISOSVFSHandler prePostCommandVFSHandler = null;
-    private static final Logger logger = Logger.getLogger(SOSSSHJobJSch.class);
+    protected ISOSVFSHandler vfsHandler;
+    private static final Logger LOGGER = Logger.getLogger(SOSSSHJobJSch.class);
     private static final String SCHEDULER_RETURN_VALUES = "SCHEDULER_RETURN_VALUES";
-    private String tempFileName;
-    private String pidFileName;
+    private static final String COMMAND_DELIMITER = ";";
     private static final String DEFAULT_LINUX_GET_PID_COMMAND = "echo $$";
     private static final String DEFAULT_WINDOWS_GET_PID_COMMAND = "echo Add command to get PID of active shell here!";
+    private String tempFileName;
+    private String pidFileName;
     private String ssh_job_get_pid_command = "echo $$";
-    protected ISOSVFSHandler vfsHandler;
     private Map allParams = null;
     private Map<String, String> returnValues = new HashMap<String, String>();
     private Map schedulerEnvVars;
@@ -57,7 +58,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                 prePostCommandVFSHandler.connect(postAlternateOptions);
             }
             prePostCommandVFSHandler.authenticate(objOptions);
-            logger.debug("connection established");
+            LOGGER.debug("connection established");
         } catch (Exception e) {
             throw new SSHConnectionError("Error occured during connection/authentication: " + e.getMessage(), e);
         }
@@ -112,7 +113,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             }
             for (String strCmd : strCommands2Execute) {
                 executedCommand = strCmd;
-                logger.debug("createEnvironmentVariables (Options) = " + objOptions.getCreateEnvironmentVariables().value());
+                LOGGER.debug("createEnvironmentVariables (Options) = " + objOptions.getCreateEnvironmentVariables().value());
                 if (objOptions.getCreateEnvironmentVariables().value()) {
                     completeCommand = getEnvCommand() + getPreCommand() + strCmd;
                 } else {
@@ -120,7 +121,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                 }
                 try {
                     strCmd = objJSJobUtilities.replaceSchedulerVars(strCmd);
-                    logger.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
+                    LOGGER.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
                     vfsHandler.setSimulateShell(objOptions.simulateShell.value());
                     vfsHandler.executeCommand(completeCommand);
                     objJSJobUtilities.setJSParam(conExit_code, "0");
@@ -132,13 +133,13 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                     if (objOptions.raiseExceptionOnError.value()) {
                         if (objOptions.ignoreError.value()) {
                             if (objOptions.ignoreStderr.value()) {
-                                logger.debug(this.stackTrace2String(e));
+                                LOGGER.debug(this.stackTrace2String(e));
                             } else {
-                                logger.error(this.stackTrace2String(e));
+                                LOGGER.error(this.stackTrace2String(e));
                                 throw new SSHExecutionError("Exception raised: " + e, e);
                             }
                         } else {
-                            logger.error(this.stackTrace2String(e));
+                            LOGGER.error(this.stackTrace2String(e));
                             throw new SSHExecutionError("Exception raised: " + e, e);
                         }
                     }
@@ -152,16 +153,16 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                                 + "\nSOS-SSH-E-120: full command String: \"" + completeCommand + "\"";
                 if (objOptions.ignoreError.value()) {
                     if (objOptions.ignoreStderr.value()) {
-                        logger.debug(this.stackTrace2String(e));
-                        logger.debug(strErrMsg, e);
+                        LOGGER.debug(this.stackTrace2String(e));
+                        LOGGER.debug(strErrMsg, e);
                     } else {
-                        logger.error(this.stackTrace2String(e));
-                        logger.error(strErrMsg, e);
+                        LOGGER.error(this.stackTrace2String(e));
+                        LOGGER.error(strErrMsg, e);
                         throw new SSHExecutionError(strErrMsg, e);
                     }
                 } else {
-                    logger.error(this.stackTrace2String(e));
-                    logger.error(strErrMsg, e);
+                    LOGGER.error(this.stackTrace2String(e));
+                    LOGGER.error(strErrMsg, e);
                     throw new SSHExecutionError(strErrMsg, e);
                 }
             }
@@ -192,7 +193,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             tempFilesToDelete = new Vector<String>();
         }
         tempFilesToDelete.add(fileNameToDelete);
-        logger.debug(String.format(SOSVfsMessageCodes.SOSVfs_D_254.params(fileNameToDelete)));
+        LOGGER.debug(String.format(SOSVfsMessageCodes.SOSVfs_D_254.params(fileNameToDelete)));
     }
 
     @Override
@@ -203,7 +204,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
             SOSConnection2OptionsAlternate alternateOptions = getAlternateOptions(objOptions);
             vfsHandler.connect(alternateOptions);
             vfsHandler.authenticate(objOptions);
-            logger.debug("connection established");
+            LOGGER.debug("connection established");
         } catch (Exception e) {
             throw new SSHConnectionError("Error occured during connection/authentication: " + e.getMessage(), e);
         }
@@ -223,41 +224,43 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         StringBuilder strb = new StringBuilder();
         if (objOptions.runWithWatchdog.value()) {
             readGetPidCommandFromPropertiesFile();
-            strb.append(ssh_job_get_pid_command).append(objOptions.commandDelimiter.getValue()).append(ssh_job_get_pid_command);
-            strb.append(" >> ").append(pidFileName).append(objOptions.commandDelimiter.getValue());
+            strb.append(ssh_job_get_pid_command).append(COMMAND_DELIMITER).append(ssh_job_get_pid_command);
+            strb.append(" >> ").append(pidFileName).append(COMMAND_DELIMITER);
             strb.append(String.format(objOptions.getPreCommand().getValue(), SCHEDULER_RETURN_VALUES, tempFileName));
-            strb.append(objOptions.commandDelimiter.getValue());
+            strb.append(COMMAND_DELIMITER);
             return strb.toString();
         }
-        strb.append(ssh_job_get_pid_command).append(objOptions.commandDelimiter.getValue());
+        strb.append(ssh_job_get_pid_command).append(COMMAND_DELIMITER);
         strb.append(String.format(objOptions.getPreCommand().getValue(), SCHEDULER_RETURN_VALUES, tempFileName));
-        strb.append(objOptions.commandDelimiter.getValue());
+        strb.append(COMMAND_DELIMITER);
         return strb.toString();
     }
 
     private String getEnvCommand() {
         StringBuilder sb = new StringBuilder();
-        for (Object key : schedulerEnvVars.keySet()) {
-            if (!"SCHEDULER_PARAM_JOBSCHEDULEREVENTJOB.EVENTS".equals(key.toString())) {
-                String envVarValue = schedulerEnvVars.get(key).toString();
-                if(key.toString().contains("()")){
-                    logger.debug("*******************************");
-                    logger.debug("  KEY BEFORE REPLACEMENT: " + key);
-                    logger.debug("*******************************");
-                }
-                String keyVal = key.toString().replaceAll("\\.|\\(|\\)|%{2}", "_");
-                if(key.toString().contains("()")){
-                    logger.debug("  KEY AFTER REPLACEMENT: " + keyVal);
-                    logger.debug("*******************************");
-                }
-                envVarValue = envVarValue.replaceAll("\"", "\\\"");
-                envVarValue = "'" + envVarValue + "'";
-                if (!flgIsWindowsShell) {
-                    envVarValue = envVarValue.replaceAll("\\\\", "\\\\\\\\");
-                }
-                if (!"SCHEDULER_PARAM_std_out_output".equalsIgnoreCase(keyVal) && !"SCHEDULER_PARAM_std_err_output".equalsIgnoreCase(keyVal)) {
-                    sb.append(String.format(objOptions.getPreCommand().getValue(), keyVal.toUpperCase(), envVarValue));
-                    sb.append(objOptions.commandDelimiter.getValue());
+        if (schedulerEnvVars != null) {
+            for (Object key : schedulerEnvVars.keySet()) {
+                if (!"SCHEDULER_PARAM_JOBSCHEDULEREVENTJOB.EVENTS".equals(key.toString())) {
+                    String envVarValue = schedulerEnvVars.get(key).toString();
+                    if (key.toString().contains("()")) {
+                        LOGGER.debug("*******************************");
+                        LOGGER.debug("  KEY BEFORE REPLACEMENT: " + key);
+                        LOGGER.debug("*******************************");
+                    }
+                    String keyVal = key.toString().replaceAll("\\.|\\(|\\)|%{2}", "_");
+                    if (key.toString().contains("()")) {
+                        LOGGER.debug("  KEY AFTER REPLACEMENT: " + keyVal);
+                        LOGGER.debug("*******************************");
+                    }
+                    envVarValue = envVarValue.replaceAll("\"", "\\\"");
+                    envVarValue = "'" + envVarValue + "'";
+                    if (!flgIsWindowsShell) {
+                        envVarValue = envVarValue.replaceAll("\\\\", "\\\\\\\\");
+                    }
+                    if (!"SCHEDULER_PARAM_std_out_output".equalsIgnoreCase(keyVal) && !"SCHEDULER_PARAM_std_err_output".equalsIgnoreCase(keyVal)) {
+                        sb.append(String.format(objOptions.getPreCommand().getValue(), keyVal.toUpperCase(), envVarValue));
+                        sb.append(COMMAND_DELIMITER);
+                    }
                 }
             }
         }
@@ -283,7 +286,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
         if (tempFilesToDelete != null && !tempFilesToDelete.isEmpty()) {
             for (String tempFileName : tempFilesToDelete) {
                 ((SOSVfsSFtpJCraft) vfsHandler).delete(tempFileName);
-                logger.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tempFileName));
+                LOGGER.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tempFileName));
             }
         }
         tempFilesToDelete = null;
@@ -293,7 +296,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                 if (!prePostCommandVFSHandler.getStdOut().toString().isEmpty()) {
                     BufferedReader reader = new BufferedReader(new StringReader(new String(prePostCommandVFSHandler.getStdOut())));
                     String line = null;
-                    logger.debug(SOSVfsMessageCodes.SOSVfs_D_284.getFullMessage());
+                    LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_284.getFullMessage());
                     while ((line = reader.readLine()) != null) {
                         Matcher regExMatcher = Pattern.compile("^([^=]+)=(.*)").matcher(line);
                         if (regExMatcher.find()) {
@@ -304,19 +307,19 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                     }
                     String postCommandDelete = String.format(objOptions.getPostCommandDelete().getValue(), tmpFileName);
                     prePostCommandVFSHandler.executeCommand(postCommandDelete);
-                    logger.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tmpFileName));
+                    LOGGER.debug(SOSVfsMessageCodes.SOSVfs_I_0113.params(tmpFileName));
                 } else {
-                    logger.debug(SOSVfsMessageCodes.SOSVfs_D_280.getFullMessage());
+                    LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_280.getFullMessage());
                 }
             } else {
-                logger.debug(SOSVfsMessageCodes.SOSVfs_D_281.getFullMessage());
+                LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_281.getFullMessage());
                 stdErr = prePostCommandVFSHandler.getStdErr().toString();
                 if (stdErr.length() > 0) {
-                    logger.debug(stdErr);
+                    LOGGER.debug(stdErr);
                 }
             }
         } catch (Exception e) {
-            logger.debug(SOSVfsMessageCodes.SOSVfs_D_282.getFullMessage());
+            LOGGER.debug(SOSVfsMessageCodes.SOSVfs_D_282.getFullMessage());
         }
     }
 
@@ -348,14 +351,14 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     private void readGetPidCommandFromPropertiesFile() {
         if (objOptions.sshJobGetPidCommand.isDirty() && !objOptions.sshJobGetPidCommand.getValue().isEmpty()) {
             ssh_job_get_pid_command = objOptions.sshJobGetPidCommand.getValue();
-            logger.debug("Command to receive PID of the active shell from Job Parameter used!");
+            LOGGER.debug("Command to receive PID of the active shell from Job Parameter used!");
         } else {
             if (flgIsWindowsShell) {
                 ssh_job_get_pid_command = DEFAULT_WINDOWS_GET_PID_COMMAND;
-                logger.debug("Default Windows command used to receive PID of the active shell!");
+                LOGGER.debug("Default Windows command used to receive PID of the active shell!");
             } else {
                 ssh_job_get_pid_command = DEFAULT_LINUX_GET_PID_COMMAND;
-                logger.debug("Default Linux command used to receive PID of the active shell!");
+                LOGGER.debug("Default Linux command used to receive PID of the active shell!");
             }
         }
     }

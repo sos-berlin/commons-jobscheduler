@@ -100,10 +100,10 @@ public class SOSSSHJob2Test extends JSJobUtilitiesClass<SOSSSHJobOptions> {
     }
 
     @Test
-    @Ignore("Test set to Ignore for later examination")
+//    @Ignore("Test set to Ignore for later examination")
     public void testExecuteWithCCAndDelimiter() throws Exception {
         initializeClazz();
-        String strArgs[] = new String[] { "-command", "ls hallo%%exit 0", "-auth_method", "password", "-host", "wilma.sos", "-auth_file", "test",
+        String strArgs[] = new String[] { "-command", "ls data%%exit 0", "-auth_method", "password", "-host", "homer.sos", "-auth_file", "test",
                 "-user", "test", "-password", "12345", "-ignore_stderr", "false" };
         objOptions.commandLineArgs(strArgs);
         objSSH.execute();
