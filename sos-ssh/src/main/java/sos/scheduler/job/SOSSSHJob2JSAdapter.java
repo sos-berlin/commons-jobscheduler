@@ -85,14 +85,6 @@ public class SOSSSHJob2JSAdapter extends SOSSSHJob2JSBaseAdapter {
         }
         objO.setCurrentNodeName(this.getCurrentNodeName(true));
         HashMap<String, String> hsmParameters1 = getSchedulerParameterAsProperties();
-        // if command_delimiter is not set by customer then we override the default value due to compatibility issues
-        // the default command delimiter is used in the option class to split the commands with a delimiter not known by the os
-        // but here a command delimiter (known by the os) is needed to chain commands together
-        // TO DO: a solution which fits for both cases [SP]
-        if (!useTrilead && objO.commandDelimiter.isNotDirty()) {
-            objO.commandDelimiter.setValue(";");
-            spooler_log.debug9("UPDATED COMMAND DELIMITER IS: \"" + objO.commandDelimiter.getValue() + "\"");
-        }
         if (!useTrilead && !"false".equalsIgnoreCase(hsmParameters1.get("create_environment_variables"))) {
             Map<String, String> allEnvVars = new HashMap<String, String>();
             allEnvVars.putAll(getSchedulerEnvironmentVariables());
