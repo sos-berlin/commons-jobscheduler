@@ -47,6 +47,7 @@ import sos.util.SOSString;
 
 public class SOSHibernateConnection implements Serializable {
 
+    private static final String HIBERNATE_PROPERTY_JAVAX_PERSISTENCE_VALIDATION_MODE = "javax.persistence.validation.mode";
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateConnection.class);
     private Optional<File> configFile;
@@ -442,6 +443,8 @@ public class SOSHibernateConnection implements Serializable {
         defaultConfigurationProperties.put(HIBERNATE_PROPERTY_AUTO_COMMIT, "false");
         defaultConfigurationProperties.put(HIBERNATE_PROPERTY_USE_SCROLLABLE_RESULTSET, "true");
         defaultConfigurationProperties.put(HIBERNATE_PROPERTY_CURRENT_SESSION_CONTEXT_CLASS, "jta");
+        defaultConfigurationProperties.put(HIBERNATE_PROPERTY_JAVAX_PERSISTENCE_VALIDATION_MODE, "none");
+
         configurationProperties = new Properties();
     }
 
