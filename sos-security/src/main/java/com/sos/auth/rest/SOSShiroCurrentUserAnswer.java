@@ -17,6 +17,7 @@ public class SOSShiroCurrentUserAnswer {
     private boolean hasRole;
     private boolean isAuthenticated;
     private String accessToken;
+    private String message;
 
     public SOSShiroCurrentUserAnswer() {
     }
@@ -104,9 +105,18 @@ public class SOSShiroCurrentUserAnswer {
         return getIsAuthenticated();
     }
 
+    public String getMessage() {
+        return message;
+    }
+
+    @XmlAttribute
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
     @Override
     public String toString() {
-        return String.format("User: %s Role: %s hasRole: %s Permission: %s isPermitted: %s -- AccessToken=%s", this.user, this.role, this.hasRole,
-                this.permission, this.isPermittet, this.accessToken);
+        return String.format("User: %s Role: %s hasRole: %s Permission: %s isPermitted: %s -- AccessToken=%s", this.user, this.role, this.hasRole, this.permission,
+                this.isPermittet, this.accessToken);
     }
 }

@@ -16,7 +16,7 @@ public class SOSShiroCurrentUsersList {
     }
 
     public SOSShiroCurrentUser getUser(String accessToken) {
-        return (SOSShiroCurrentUser) this.currentUsers.get(accessToken);
+        return this.currentUsers.get(accessToken);
     }
 
     public void removeUser(String accessToken) {

@@ -89,7 +89,6 @@ public class SOSLdapAuthorizing {
         this.sosLdapAuthorizingRealm = sosLdapAuthorizingRealm;
 
         ldapContextFactory = sosLdapAuthorizingRealm.getContextFactory();
-        String s = sosLdapAuthorizingRealm.getUserDnTemplate();
 
         Object principal = sosLdapAuthorizingRealm.getLdapPrincipal(authcToken);
         Object credentials = authcToken.getCredentials();
@@ -97,7 +96,7 @@ public class SOSLdapAuthorizing {
         try {
             ldapContext = ldapContextFactory.getLdapContext(principal, credentials);
         } catch (NamingException e) {
-            e.printStackTrace();
+            LOGGER.error(e);
         }
     }
 

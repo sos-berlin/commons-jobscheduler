@@ -31,7 +31,6 @@ import com.sos.auth.rest.permission.model.SOSPermissions;
 import com.sos.auth.shiro.SOSlogin;
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBLayer;
-
 import org.apache.log4j.Logger;
 import org.apache.shiro.session.Session;
 
@@ -42,7 +41,6 @@ public class SOSServicePermissionShiro {
     private SOSShiroCurrentUser currentUser;
     public static SOSShiroCurrentUsersList currentUsersList;
     public static SOSHibernateConnection sosHibernateConnection;
-    
 
     @GET
     @Path("/permissions")
@@ -245,19 +243,42 @@ public class SOSServicePermissionShiro {
     @Path("/joc_cockpit_permissions")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSPermissionJocCockpit postJocCockpitPermissions(@HeaderParam("access_token") String accessTokenFromHeader,
-            SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord) {
+    public Response postJocCockpitPermissions(@HeaderParam("access_token") String accessTokenFromHeader, SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord) {
 
-        if (!"".equals(accessTokenFromHeader)) {
-            sosWebserviceAuthenticationRecord.setAccessToken(accessTokenFromHeader);
+        Response.ResponseBuilder responseBuilder = null;
+     
+        try {
+
+            if (!"".equals(accessTokenFromHeader)) {
+                sosWebserviceAuthenticationRecord.setAccessToken(accessTokenFromHeader);
+            }
+
+            setCurrentUserfromAccessToken(sosWebserviceAuthenticationRecord.getAccessToken(), sosWebserviceAuthenticationRecord.getUser(), sosWebserviceAuthenticationRecord
+                    .getPassword());
+
+     
+            if (currentUser == null) {
+                responseBuilder = get401ResponseBuilder();
+                LOGGER.debug("user is null");
+                return responseBuilder.entity("Authorization Header with Basic based64part expected").build();
+            }
+            
+            responseBuilder = Response.status(200).header("Content-Type", MediaType.APPLICATION_JSON);
+            responseBuilder.header("access_token", accessTokenFromHeader).build();
+            responseBuilder.entity(currentUser.getSosPermissionJocCockpit());
+
+            return responseBuilder.build();
+        }catch (org.apache.shiro.session.ExpiredSessionException e){
+            LOGGER.error(e.getMessage());
+            responseBuilder = get440ResponseBuilder();
+            return responseBuilder.entity(e.getMessage()).build();
         }
-        setCurrentUserfromAccessToken(sosWebserviceAuthenticationRecord.getAccessToken(), sosWebserviceAuthenticationRecord.getUser(), sosWebserviceAuthenticationRecord
-                .getPassword());
-        // createPermissionObject(sosWebserviceAuthenticationRecord.getAccessToken(),
-        // sosWebserviceAuthenticationRecord.getUser(),
-        // sosWebserviceAuthenticationRecord
-        // .getPassword());
-        return currentUser.getSosPermissionJocCockpit();
+            
+          catch (Exception ee) {
+            LOGGER.error(ee.getMessage());
+            responseBuilder = get420ResponseBuilder();
+            return responseBuilder.entity(ee.getMessage()).build();
+        }
     }
 
     @GET
@@ -280,7 +301,7 @@ public class SOSServicePermissionShiro {
         String accessToken = this.getAccessToken(accessTokenFromHeader, accessTokenFromQuery);
 
         currentUser = currentUsersList.getUser(accessToken);
-      
+
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer("");
         if (currentUser != null) {
             sosShiroCurrentUserAnswer.setUser("*Unknown User*");
@@ -291,11 +312,11 @@ public class SOSServicePermissionShiro {
         sosShiroCurrentUserAnswer.setIsPermitted(false);
         sosShiroCurrentUserAnswer.setAccessToken("");
         currentUsersList.removeUser(accessToken);
-        
+
         if (currentUsersList.size() == 0 && sosHibernateConnection != null) {
             sosHibernateConnection.disconnect();
         }
-        
+
         return sosShiroCurrentUserAnswer;
     }
 
@@ -557,7 +578,7 @@ public class SOSServicePermissionShiro {
 
     }
 
-    private void createUser() throws Exception   {
+    private void createUser() throws Exception {
         if (currentUsersList == null) {
             currentUsersList = new SOSShiroCurrentUsersList();
         }
@@ -579,14 +600,14 @@ public class SOSServicePermissionShiro {
 
         SOSShiroProperties sosShiroProperties = new SOSShiroProperties();
 
-        if (sosHibernateConnection == null){
+        if (sosHibernateConnection == null) {
             sosHibernateConnection = new SOSHibernateConnection(sosShiroProperties.getProperty("hibernate_configuration_file"));
             sosHibernateConnection.addClassMapping(DBLayer.getInventoryClassMapping());
+            // sosHibernateConnection.setUseOpenStatelessSession(true);
             sosHibernateConnection.connect();
         }
         currentUser.setSosHibernateConnection(sosHibernateConnection);
 
-        
     }
 
     private SOSShiroCurrentUser getUserPwdFromHeaderOrQuery(String basicAuthorization, String user, String pwd) {
@@ -631,7 +652,20 @@ public class SOSServicePermissionShiro {
         responseBuilder = Response.status(401).header("Content-Type", MediaType.APPLICATION_JSON);
         responseBuilder.header("access_token", "").build();
         return responseBuilder;
+    }
 
+    private ResponseBuilder get440ResponseBuilder() {
+        Response.ResponseBuilder responseBuilder = null;
+        responseBuilder = Response.status(404).header("Content-Type", MediaType.APPLICATION_JSON);
+        responseBuilder.header("access_token", "").build();
+        return responseBuilder;
+    }
+
+    private ResponseBuilder get420ResponseBuilder() {
+        Response.ResponseBuilder responseBuilder = null;
+        responseBuilder = Response.status(420).header("Content-Type", MediaType.APPLICATION_JSON);
+        responseBuilder.header("access_token", "").build();
+        return responseBuilder;
     }
 
     private Response login(String basicAuthorization, String user, String pwd) {
