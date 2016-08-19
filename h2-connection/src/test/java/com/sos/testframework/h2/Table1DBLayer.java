@@ -19,16 +19,12 @@ public class Table1DBLayer extends SOSHibernateDBLayer {
         initConnection(configurationFile);
     }
 
-    private Query setQueryParams(Table1Filter filter, String hql) {
+    private Query setQueryParams(Table1Filter filter, String hql) throws Exception {
         Query query = null;
-        try {
-            getConnection().beginTransaction();
-            query = getConnection().createQuery(hql);
-            if (filter.getName() != null) {
-                query.setParameter(FIELD1, filter.getName());
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Error creating Query", e);
+        getConnection().beginTransaction();
+        query = getConnection().createQuery(hql);
+        if (filter.getName() != null) {
+            query.setParameter(FIELD1, filter.getName());
         }
         return query;
     }
@@ -43,7 +39,7 @@ public class Table1DBLayer extends SOSHibernateDBLayer {
         return (where.isEmpty()) ? where : "where " + where;
     }
 
-    public Table1DBItem getByName(String name) {
+    public Table1DBItem getByName(String name) throws Exception {
         Table1Filter filter = new Table1Filter();
         filter.setName(name);
         LOGGER.info("check name " + filter.getName());
@@ -53,17 +49,12 @@ public class Table1DBLayer extends SOSHibernateDBLayer {
         return record;
     }
 
-    public long addRecord(String name) {
+    public long addRecord(String name) throws Exception {
         Table1DBItem record = new Table1DBItem();
         record.setName(name);
-        try {
-            this.getConnection().connect();
-            this.getConnection().beginTransaction();
-            this.getConnection().saveOrUpdate(record);
-            this.getConnection().commit();
-        } catch (Exception e) {
-            LOGGER.error("Error occurred adding record: ", e);
-        }
+        this.getConnection().beginTransaction();
+        this.getConnection().saveOrUpdate(record);
+        this.getConnection().commit();
         return record.getId();
     }
 

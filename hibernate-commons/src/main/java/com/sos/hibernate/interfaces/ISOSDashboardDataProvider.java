@@ -35,7 +35,7 @@ import com.sos.hibernate.classes.SOSSearchFilterData;
 
 public interface ISOSDashboardDataProvider {
 
-    public void getData(int limit);
+    public void getData(int limit) throws Exception;
 
     public void fillTable(Table table);
 
@@ -43,7 +43,7 @@ public interface ISOSDashboardDataProvider {
 
     public void resetFilter();
 
-    public void fillSchedulerIds(CCombo cbSchedulerId);
+    public void fillSchedulerIds(CCombo cbSchedulerId) throws Exception;
 
     public void setSchedulerId(String schedulerId);
 

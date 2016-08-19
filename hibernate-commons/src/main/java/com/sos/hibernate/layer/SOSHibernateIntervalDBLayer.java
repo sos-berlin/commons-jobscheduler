@@ -13,31 +13,23 @@ import com.sos.hibernate.classes.SOSHibernateIntervalFilter;
 public abstract class SOSHibernateIntervalDBLayer extends SOSHibernateDBLayer {
 
     private static final Logger LOGGER = Logger.getLogger(SOSHibernateIntervalDBLayer.class);
-
     public abstract SOSHibernateIntervalFilter getFilter();
-
-    public abstract void onAfterDeleting(DbItem h);
-
-    public abstract List<DbItem> getListOfItemsToDelete();
-
-    public abstract long deleteInterval();
+    public abstract void onAfterDeleting(DbItem h) throws Exception;
+    public abstract List<DbItem> getListOfItemsToDelete() throws Exception;
+    public abstract long deleteInterval() throws Exception;
 
     public SOSHibernateIntervalDBLayer() {
         super();
     }
 
-    public long deleteInterval(int interval, int limit) {
+    public long deleteInterval(int interval, int limit) throws Exception {
         long deleted = 0;
         if (limit == 0) {
             GregorianCalendar to = new GregorianCalendar();
             to.add(GregorianCalendar.DAY_OF_YEAR, -interval);
             this.getFilter().setIntervalFrom(null);
             this.getFilter().setIntervalTo(to.getTime());
-            try {
-                deleted = deleteInterval();
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage(), e);
-            }
+            deleted = deleteInterval();
         } else {
             if (connection == null) {
                 initConnection(getConfigurationFileName());
@@ -53,14 +45,9 @@ public abstract class SOSHibernateIntervalDBLayer extends SOSHibernateDBLayer {
                 int i = 0;
                 while (dbitemEntries.hasNext()) {
                     DbItem h = (DbItem) dbitemEntries.next();
-                    try {
-                        connection.connect();
-                        connection.beginTransaction();
-                        connection.delete(h);
-                        connection.commit();
-                    } catch (Exception e) {
-                        LOGGER.error("Error occurred connecting to DB: ", e);
-                    }
+                    connection.beginTransaction();
+                    connection.delete(h);
+                    connection.commit();
                     this.onAfterDeleting(h);
                     deleted = deleted + 1;
                     i = i + 1;
@@ -73,7 +60,7 @@ public abstract class SOSHibernateIntervalDBLayer extends SOSHibernateDBLayer {
         return deleted;
     }
 
-    public long deleteInterval(int interval) {
+    public long deleteInterval(int interval) throws Exception {
         return deleteInterval(interval, 300);
     }
 

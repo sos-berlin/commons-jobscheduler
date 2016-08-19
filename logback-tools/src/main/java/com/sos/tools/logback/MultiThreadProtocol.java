@@ -64,7 +64,7 @@ import java.util.List;
  * @author stefan schaedlich */
 public class MultiThreadProtocol implements org.slf4j.Logger {
 
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(MultiThreadProtocol.class);
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(MultiThreadProtocol.class);
     private Logger threadLogger;
     private final String item;
     private final String itemIndicator;
@@ -76,16 +76,16 @@ public class MultiThreadProtocol implements org.slf4j.Logger {
             this.threadLogger = (Logger) LoggerFactory.getLogger(loggerName);
             SiftingAppender appender = hasSiftingappender(threadLogger);
             if (appender != null) {
-                logger.info("The appender for the jobnet protocol is " + appender.getName());
+                LOGGER.info("The appender for the jobnet protocol is " + appender.getName());
                 MDC.put("fileIndicator", fileIndicator);
                 MDC.put("item", item);
                 MDC.put("itemIndicator", itemIndicator);
             } else {
-                logger.warn("No sifting appender is configured in logback configuration - no protocol file for fileIndicator=" + fileIndicator
+                LOGGER.warn("No sifting appender is configured in logback configuration - no protocol file for fileIndicator=" + fileIndicator
                         + ", item=" + item + " will be created.");
             }
         } else {
-            logger.warn("Logger '" + loggerName + "' not defined - no logback protocol will be created.");
+            LOGGER.warn("Logger '" + loggerName + "' not defined - no logback protocol will be created.");
         }
     }
 
@@ -109,7 +109,7 @@ public class MultiThreadProtocol implements org.slf4j.Logger {
         return forItem + "." + forUUID;
     }
 
-    public static String getProtocolAsText(String configurationFileName, String forUUID, String forItem, String forLogger) {
+    public static String getProtocolAsText(String configurationFileName, String forUUID, String forItem, String forLogger) throws Exception {
         LoggingEventPropertyDBLayer loggingDBLayer = new LoggingEventPropertyDBLayer(configurationFileName);
         String itemIndicator = getItemIndicator(forUUID, forItem);
         List<LoggingEventDBItem> records = loggingDBLayer.getProtocol("itemIndicator", itemIndicator, forLogger);
@@ -117,7 +117,7 @@ public class MultiThreadProtocol implements org.slf4j.Logger {
         return result;
     }
 
-    public static String getProtocolAsText(String configurationFileName, String forUUID, String forLogger) {
+    public static String getProtocolAsText(String configurationFileName, String forUUID, String forLogger) throws Exception {
         LoggingEventPropertyDBLayer loggingDBLayer = new LoggingEventPropertyDBLayer(configurationFileName);
         List<LoggingEventDBItem> records = loggingDBLayer.getProtocol("fileIndicator", forUUID, forLogger);
         String result = loggingDBLayer.asText(records);

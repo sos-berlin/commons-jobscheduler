@@ -23,20 +23,18 @@ public class LoggingEventDBLayer extends SOSHibernateDBLayer {
         this.filter.setOrderCriteria(EVENT_ID);
     }
 
-    private Query setQueryParams(String hql) {
+    private Query setQueryParams(String hql) throws Exception {
         Query query = null;
-        try {
-            connection.connect();
-            connection.beginTransaction();
-            query = connection.createQuery(hql);
-            if (filter.getEventId() != null) {
-                query.setLong(EVENT_ID, filter.getEventId());
-            }
-            if (filter.getLoggerName() != null) {
-                query.setParameter(LOGGER_NAME, filter.getLoggerName());
-            }
-        } catch (Exception e) {
-            logger.error("Error occurred creating query: ", e);
+        if (connection == null) {
+            initConnection(getConfigurationFileName());
+        }
+        connection.beginTransaction();
+        query = connection.createQuery(hql);
+        if (filter.getEventId() != null) {
+            query.setLong(EVENT_ID, filter.getEventId());
+        }
+        if (filter.getLoggerName() != null) {
+            query.setParameter(LOGGER_NAME, filter.getLoggerName());
         }
         return query;
     }
@@ -55,14 +53,14 @@ public class LoggingEventDBLayer extends SOSHibernateDBLayer {
         return (where.isEmpty()) ? where : "where " + where;
     }
 
-    public int deleteAll() {
+    public int deleteAll() throws Exception {
         String hql = "delete from LoggingEventDBItem";
         Query query = setQueryParams(hql);
         int row = query.executeUpdate();
         return row;
     }
 
-    public List<LoggingEventDBItem> getAll() {
+    public List<LoggingEventDBItem> getAll() throws Exception {
         Query query = setQueryParams("from LoggingEventDBItem " + this.filter.getOrderCriteria() + this.filter.getSortMode());
         return query.list();
     }

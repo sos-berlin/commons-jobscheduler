@@ -101,7 +101,7 @@ public class SOSHibernateConnection implements Serializable {
             initSessionFactory();
             openSession();
         } catch (Exception ex) {
-            throw new Exception(String.format("%s: %s", method, ex.toString()));
+            throw new Exception(String.format("%s: %s", method, ex.toString()), ex);
         }
     }
 
@@ -116,7 +116,7 @@ public class SOSHibernateConnection implements Serializable {
             LOGGER.debug(String.format("%s: autocommit = %s, transaction isolation = %s, %s, %s", method, getAutoCommit(),
                     getTransactionIsolationName(isolationLevel), openSessionMethodName, connFile));
         } catch (Exception ex) {
-            throw new Exception(String.format("%s: %s", method, ex.toString()));
+            throw new Exception(String.format("%s: %s", method, ex.toString()), ex);
         }
     }
 
@@ -183,12 +183,12 @@ public class SOSHibernateConnection implements Serializable {
         try {
             dialect = sf.getDialect();
         } catch (Exception ex) {
-            throw new Exception(String.format("%s: cannot get dialect : %s", method, ex.toString()));
+            throw new Exception(String.format("%s: cannot get dialect : %s", method, ex.toString()), ex);
         }
         try {
             jdbcConnection = sf.getConnectionProvider().getConnection();
         } catch (Exception ex) {
-            throw new Exception(String.format("%s: cannot get jdbcConnection : %s", method, ex.toString()));
+            throw new Exception(String.format("%s: cannot get jdbcConnection : %s", method, ex.toString()), ex);
         }
         setDbms();
     }
@@ -308,7 +308,7 @@ public class SOSHibernateConnection implements Serializable {
                 }
             }
         } catch (Exception ex) {
-            LOGGER.warn(String.format("%s: cannot set dbms. %s", method, ex.toString()));
+            LOGGER.warn(String.format("%s: cannot set dbms. %s", method, ex.toString()), ex);
         }
     }
 
@@ -444,7 +444,6 @@ public class SOSHibernateConnection implements Serializable {
         defaultConfigurationProperties.put(HIBERNATE_PROPERTY_USE_SCROLLABLE_RESULTSET, "true");
         defaultConfigurationProperties.put(HIBERNATE_PROPERTY_CURRENT_SESSION_CONTEXT_CLASS, "jta");
         defaultConfigurationProperties.put(HIBERNATE_PROPERTY_JAVAX_PERSISTENCE_VALIDATION_MODE, "none");
-
         configurationProperties = new Properties();
     }
 

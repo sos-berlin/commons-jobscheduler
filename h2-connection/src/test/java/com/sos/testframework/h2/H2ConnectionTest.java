@@ -33,11 +33,15 @@ public class H2ConnectionTest {
         LOGGER.info(connection.getConnectionString());
         File f = connection.createTemporaryHibernateConfiguration();
         final String expected = "myName";
-        Table1DBLayer dbLayer = new Table1DBLayer(f.getAbsolutePath());
-        dbLayer.addRecord(expected);
-        Table1DBItem record = dbLayer.getByName(expected);
-        assertEquals(expected, record.getName());
-        connection.close();
+        try {
+            Table1DBLayer dbLayer = new Table1DBLayer(f.getAbsolutePath());
+            dbLayer.addRecord(expected);
+            Table1DBItem record = dbLayer.getByName(expected);
+            assertEquals(expected, record.getName());
+            connection.close();
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
     }
 
     @Test
@@ -47,12 +51,16 @@ public class H2ConnectionTest {
         LOGGER.info(connection.getConnectionString());
         File f = connection.createTemporaryHibernateConfiguration();
         final String expected = "myName";
-        Table1DBLayer dbLayer = new Table1DBLayer(f.getAbsolutePath());
-        dbLayer.addRecord(expected);
-        Table1DBItem record = dbLayer.getByName(expected);
-        assertEquals(expected, record.getName());
-        connection.close();
-        connection.removeTemporaryFiles();
+        try {
+            Table1DBLayer dbLayer = new Table1DBLayer(f.getAbsolutePath());
+            dbLayer.addRecord(expected);
+            Table1DBItem record = dbLayer.getByName(expected);
+            assertEquals(expected, record.getName());
+            connection.close();
+            connection.removeTemporaryFiles();
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
     }
 
     private static String getSQLFileName(String baseName) {

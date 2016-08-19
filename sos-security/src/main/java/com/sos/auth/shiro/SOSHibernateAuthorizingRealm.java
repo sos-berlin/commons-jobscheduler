@@ -2,6 +2,7 @@ package com.sos.auth.shiro;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -17,6 +18,7 @@ import com.sos.auth.shiro.db.SOSUserDBLayer;
 
 public class SOSHibernateAuthorizingRealm extends AuthorizingRealm {
 
+    private static final Logger LOGGER = Logger.getLogger(SOSHibernateAuthorizingRealm.class);
     private String hibernateConfigurationFile;
     private ISOSAuthorizing authorizing;
     private UsernamePasswordToken authToken;
@@ -62,7 +64,12 @@ public class SOSHibernateAuthorizingRealm extends AuthorizingRealm {
         authToken = (UsernamePasswordToken) authcToken;
         SOSUserDBLayer sosUserDBLayer = new SOSUserDBLayer(hibernateConfigurationFile);
         sosUserDBLayer.getFilter().setUserName(authToken.getUsername());
-        List<SOSUserDBItem> sosUserList = sosUserDBLayer.getSOSUserList(0);
+        List<SOSUserDBItem> sosUserList = null;
+        try {
+            sosUserList = sosUserDBLayer.getSOSUserList(0);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
         SOSUserDBItem sosUserDBItem = sosUserList.get(0);
         String s = sosUserDBItem.getSosUserPassword();
         String pw = String.valueOf(authToken.getPassword());

@@ -2,6 +2,7 @@ package com.sos.auth.shiro;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.subject.PrincipalCollection;
 
@@ -12,6 +13,7 @@ import com.sos.auth.shiro.db.SOSUserRightDBItem;
 
 public class SOSHibernateAuthorizing implements ISOSAuthorizing {
 
+    private static final Logger LOGGER = Logger.getLogger(SOSHibernateAuthorizing.class);
     private SimpleAuthorizationInfo authorizationInfo = null;
     private String configurationFileName = null;
 
@@ -30,7 +32,12 @@ public class SOSHibernateAuthorizing implements ISOSAuthorizing {
         String userName = (String) principalCollection.getPrimaryPrincipal();
         SOSUserDBLayer sosUserDBLayer = new SOSUserDBLayer(configurationFileName);
         sosUserDBLayer.getFilter().setUserName(userName);
-        List<SOSUserDBItem> sosUserList = sosUserDBLayer.getSOSUserList(0);
+        List<SOSUserDBItem> sosUserList = null;
+        try {
+            sosUserList = sosUserDBLayer.getSOSUserList(0);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
         for (SOSUserDBItem sosUserDBItem : sosUserList) {
             for (SOSUser2RoleDBItem sosUser2RoleDBItem : sosUserDBItem.getSOSUserRoleDBItems()) {
                 if (sosUser2RoleDBItem.getSosUserRoleDBItem() != null) {
@@ -53,7 +60,12 @@ public class SOSHibernateAuthorizing implements ISOSAuthorizing {
         String userName = (String) principalCollection.getPrimaryPrincipal();
         SOSUserDBLayer sosUserDBLayer = new SOSUserDBLayer(configurationFileName);
         sosUserDBLayer.getFilter().setUserName(userName);
-        List<SOSUserDBItem> sosUserList = sosUserDBLayer.getSOSUserList(0);
+        List<SOSUserDBItem> sosUserList = null;
+        try {
+            sosUserList = sosUserDBLayer.getSOSUserList(0);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
         for (SOSUserDBItem sosUserDBItem : sosUserList) {
             // Die direkt zugewiesenen Rechte.
             for (SOSUserRightDBItem sosUserRightDBItem : sosUserDBItem.getSOSUserRightDBItems()) {

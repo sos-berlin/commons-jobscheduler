@@ -28,26 +28,24 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
         this.initConnection(this.getConfigurationFileName());
     }
 
-    private Query setQueryParams(String hql) {
+    private Query setQueryParams(String hql) throws Exception {
         Query query = null;
-        try {
-            connection.connect();
-            connection.beginTransaction();
-            query = connection.createQuery(hql);
-            if (filter.getEventId() != null) {
-                query.setLong(EVENT_ID, filter.getEventId());
-            }
-            if (filter.getMappedKey() != null && !filter.getMappedKey().equals("")) {
-                query.setParameter(MAPPED_KEY, filter.getMappedKey());
-            }
-            if (filter.getMappedValue() != null && !filter.getMappedValue().equals("")) {
-                query.setParameter(MAPPED_VALUE, filter.getMappedValue());
-            }
-            if (filter.getLoggerName() != null && !filter.getLoggerName().equals("")) {
-                query.setParameter(LOGGER_NAME, filter.getLoggerName());
-            }
-        } catch (Exception e) {
-            logger.error("Error occurred creating query: ", e);
+        if (connection == null) {
+            initConnection(getConfigurationFileName());
+        }
+        connection.beginTransaction();
+        query = connection.createQuery(hql);
+        if (filter.getEventId() != null) {
+            query.setLong(EVENT_ID, filter.getEventId());
+        }
+        if (filter.getMappedKey() != null && !filter.getMappedKey().equals("")) {
+            query.setParameter(MAPPED_KEY, filter.getMappedKey());
+        }
+        if (filter.getMappedValue() != null && !filter.getMappedValue().equals("")) {
+            query.setParameter(MAPPED_VALUE, filter.getMappedValue());
+        }
+        if (filter.getLoggerName() != null && !filter.getLoggerName().equals("")) {
+            query.setParameter(LOGGER_NAME, filter.getLoggerName());
         }
         return query;
     }
@@ -74,7 +72,7 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
         return (where.isEmpty()) ? where : "where " + where;
     }
 
-    public List<LoggingEventDBItem> getProtocol(String mappedKey, String mappedValue, String loggerName) {
+    public List<LoggingEventDBItem> getProtocol(String mappedKey, String mappedValue, String loggerName) throws Exception {
         List<LoggingEventDBItem> result = new ArrayList<LoggingEventDBItem>();
         List<LoggingEventPropertyDBItem> records = getListOfPropertyDBItems(mappedKey, mappedValue, loggerName);
         for (LoggingEventPropertyDBItem item : records) {
@@ -98,14 +96,14 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
         return result.toString();
     }
 
-    public List<LoggingEventPropertyDBItem> getListOfPropertyDBItems(String mappedKey, String mappedValue, String loggerName) {
+    public List<LoggingEventPropertyDBItem> getListOfPropertyDBItems(String mappedKey, String mappedValue, String loggerName) throws Exception {
         filter = new LoggingEventPropertyFilter();
         filter.setOrderCriteria(EVENT_ID);
         filter.setMappedKey(mappedKey);
         filter.setMappedValue(mappedValue);
         filter.setLoggerName(loggerName);
-        Query query =
-                setQueryParams("from LoggingEventPropertyDBItem events " + getWhere() + this.filter.getOrderCriteria() + this.filter.getSortMode());
+        Query query = setQueryParams("from LoggingEventPropertyDBItem events " + getWhere() + this.filter.getOrderCriteria()
+                + this.filter.getSortMode());
         return query.list();
     }
 
@@ -115,16 +113,16 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
      *
      * @param eventId
      * @return List<LoggingEventPropertyDBItem> */
-    public List<LoggingEventPropertyDBItem> getListOfPropertyDBItems(Long eventId) {
+    public List<LoggingEventPropertyDBItem> getListOfPropertyDBItems(Long eventId) throws Exception {
         filter = new LoggingEventPropertyFilter();
         filter.setOrderCriteria(EVENT_ID);
         filter.setEventId(eventId);
-        Query query =
-                setQueryParams("from LoggingEventPropertyDBItem events " + getWhere() + this.filter.getOrderCriteria() + this.filter.getSortMode());
+        Query query = setQueryParams("from LoggingEventPropertyDBItem events " + getWhere() + this.filter.getOrderCriteria()
+                + this.filter.getSortMode());
         return query.list();
     }
 
-    public List<LoggingEventPropertyDBItem> getAll() {
+    public List<LoggingEventPropertyDBItem> getAll() throws Exception {
         filter = new LoggingEventPropertyFilter();
         filter.setOrderCriteria(EVENT_ID);
         Query query = setQueryParams("from LoggingEventPropertyDBItem events " + this.filter.getOrderCriteria() + this.filter.getSortMode());
@@ -135,16 +133,14 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
         return 0;
     }
 
-    public int delete(Long eventId) {
+    public int delete(Long eventId) throws Exception {
         LoggingEventDBLayer eventLayer = new LoggingEventDBLayer(getConfigurationFileName());
-        try {
-            connection.connect();
-            connection.beginTransaction();
-            connection.delete(eventId);
-            connection.commit();
-        } catch (Exception e) {
-            logger.error("Error occurred deleting Item: ", e);
+        if (connection == null) {
+            initConnection(getConfigurationFileName());
         }
+        connection.beginTransaction();
+        connection.delete(eventId);
+        connection.commit();
         filter = new LoggingEventPropertyFilter();
         filter.setOrderCriteria(EVENT_ID);
         filter.setEventId(eventId);
@@ -154,25 +150,23 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
         return row;
     }
 
-    public int deleteAll() {
+    public int deleteAll() throws Exception {
         String hql = "delete from LoggingEventPropertyDBItem";
         Query query = setQueryParams(hql);
         int row = query.executeUpdate();
         return row;
     }
 
-    public void delete(String mappedKey, String mappedValue, String loggerName) {
+    public void delete(String mappedKey, String mappedValue, String loggerName) throws Exception {
         List<LoggingEventPropertyDBItem> records = getListOfPropertyDBItems(mappedKey, mappedValue, loggerName);
-        try {
-            connection.connect();
-            connection.beginTransaction();
-            for (LoggingEventPropertyDBItem item : records) {
-                connection.delete(item);
-            }
-            connection.commit();
-        } catch (Exception e) {
-            logger.error("Error occurred deleting items: ", e);
+        if (connection == null) {
+            initConnection(getConfigurationFileName());
         }
+        connection.beginTransaction();
+        for (LoggingEventPropertyDBItem item : records) {
+            connection.delete(item);
+        }
+        connection.commit();
     }
 
 }

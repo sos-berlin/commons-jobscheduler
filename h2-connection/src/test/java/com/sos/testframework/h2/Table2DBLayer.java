@@ -19,16 +19,12 @@ public class Table2DBLayer extends SOSHibernateDBLayer {
         initConnection(configurationFile);
     }
 
-    private Query setQueryParams(Table2Filter filter, String hql) {
+    private Query setQueryParams(Table2Filter filter, String hql) throws Exception {
         Query query = null;
-        try {
-            getConnection().beginTransaction();
-            query = getConnection().createQuery(hql);
-            if (filter.getName() != null) {
-                query.setParameter(FIELD1, filter.getName());
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Error creating Query", e);
+        getConnection().beginTransaction();
+        query = getConnection().createQuery(hql);
+        if (filter.getName() != null) {
+            query.setParameter(FIELD1, filter.getName());
         }
         return query;
     }
@@ -43,7 +39,7 @@ public class Table2DBLayer extends SOSHibernateDBLayer {
         return (where.isEmpty()) ? where : "where " + where;
     }
 
-    public Table2DBItem getByName(String name) {
+    public Table2DBItem getByName(String name) throws Exception {
         Table2Filter filter = new Table2Filter();
         filter.setName(name);
         LOGGER.info("check name " + filter.getName());
@@ -53,17 +49,13 @@ public class Table2DBLayer extends SOSHibernateDBLayer {
         return record;
     }
 
-    public long addRecord(String name) {
+    public long addRecord(String name) throws Exception {
         Table2DBItem record = new Table2DBItem();
         record.setName(name);
-        try {
-            this.getConnection().connect();
-            this.getConnection().beginTransaction();
-            this.getConnection().saveOrUpdate(record);
-            this.getConnection().commit();
-        } catch (Exception e) {
-            LOGGER.error("Error occurred adding record: ", e);
-        }
+        this.getConnection().connect();
+        this.getConnection().beginTransaction();
+        this.getConnection().saveOrUpdate(record);
+        this.getConnection().commit();
         return record.getId();
     }
 
