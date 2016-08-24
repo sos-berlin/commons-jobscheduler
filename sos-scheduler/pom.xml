@@ -75,12 +75,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.sos-berlin.commons</groupId>
-            <artifactId>sos-textprocessor</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.sos-berlin.jobscheduler</groupId>
             <artifactId>jobscheduler-object-model</artifactId>
             <version>${project.version}</version>
