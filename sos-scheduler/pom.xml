@@ -86,12 +86,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>sos</groupId>
-            <artifactId>hostware</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
         <!-- These are the dependencies for third party libraries -->
         <dependency>
             <groupId>log4j</groupId>
