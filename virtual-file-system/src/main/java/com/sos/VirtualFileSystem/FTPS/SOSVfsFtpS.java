@@ -70,7 +70,11 @@ public class SOSVfsFtpS extends SOSVfsFtpBaseClass {
     public void doConnect(final String phost, final int pport) {
         try {
             if (!isConnected()) {
-                super.connect(phost, pport);
+                super.doConnect(phost, pport);
+                if (objConnectionOptions != null) {
+                    objConnectionOptions.getHost().setValue(phost);
+                    objConnectionOptions.getPort().value(pport);
+                }
                 Client().execPBSZ(0);
                 logReply();
                 Client().execPROT("P");
