@@ -694,7 +694,6 @@ public class SOSServicePermissionShiro {
 
             return responseBuilder.build();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             LOGGER.error(e.getMessage());
             responseBuilder = get401ResponseBuilder();
             return responseBuilder.entity(e.getMessage()).build();
