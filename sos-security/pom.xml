@@ -17,6 +17,14 @@
 
 
 	<build>
+	    <resources>
+			<resource>
+		        <directory>/src/main/resources</directory>
+		        <excludes>
+					<exclude>joc.properties.ini</exclude>
+		        </excludes>
+	      </resource>
+	    </resources>
 
 		<plugins>
 
@@ -78,8 +86,6 @@
 			<artifactId>jersey-client</artifactId>
 		</dependency>
 
-		<!--dependency> <groupId>com.sun.jersey</groupId> <artifactId>jersey-server</artifactId> 
-			</dependency -->
 		<dependency>
 			<groupId>org.glassfish.jersey.media</groupId>
 			<artifactId>jersey-media-moxy</artifactId>
@@ -136,12 +142,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>com.sos-berlin.jid</groupId>
-			<artifactId>scheduler-instances</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		
 		<dependency>
 			<groupId>com.sos-berlin.jitl</groupId>
 			<artifactId>jitl-jobs</artifactId>
