@@ -440,7 +440,7 @@ public class JSObjJobChain extends JobChain {
             if (jobChainNodeItem instanceof JobChainNode) {
                 JobChainNode jobChainNode = (JobChainNode) jobChainNodeItem;
                 state = jobChainNode.getState();
-                int i = state.indexOf(":");
+                int i = state.lastIndexOf(":");
                 LOGGER.debug("createGraphVizImageFile.job_chain_node found:" + state);
                 if (i > 0 && jobChainNodes.get(state.substring(0, i)) != null) {
                     String from = state.substring(0, i);
