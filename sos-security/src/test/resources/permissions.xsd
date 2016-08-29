@@ -217,6 +217,9 @@
 								</xs:complexType>
 							</xs:element>
 							<xs:element name="removeSetback" type="xs:boolean"/>
+							<xs:element name="setRunTime" type="xs:boolean"/>
+							<xs:element name="setState" type="xs:boolean"/>
+							<xs:element name="reset" type="xs:boolean"/>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -267,6 +270,10 @@
 							<xs:element name="unstop" type="xs:boolean"/>
 							<xs:element name="terminate" type="xs:boolean"/>
 							<xs:element name="kill" type="xs:boolean"/>
+							<xs:element name="setRunTime" type="xs:boolean"/>
+							<xs:element name="endAllTasks" type="xs:boolean"/>
+							<xs:element name="suspendAllTasks" type="xs:boolean"/>
+							<xs:element name="continueAllTasks" type="xs:boolean"/>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>

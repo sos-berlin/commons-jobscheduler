@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2016.07.19 um 03:28:40 PM CEST 
+// Generiert: 2016.08.29 um 04:30:14 PM CEST 
 //
 
 
@@ -204,6 +204,9 @@ import javax.xml.bind.annotation.XmlType;
  *                     &lt;/complexType>
  *                   &lt;/element>
  *                   &lt;element name="removeSetback" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                   &lt;element name="setRunTime" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                   &lt;element name="setState" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                   &lt;element name="reset" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -274,6 +277,10 @@ import javax.xml.bind.annotation.XmlType;
  *                   &lt;element name="unstop" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                   &lt;element name="terminate" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                   &lt;element name="kill" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                   &lt;element name="setRunTime" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                   &lt;element name="endAllTasks" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                   &lt;element name="suspendAllTasks" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                   &lt;element name="continueAllTasks" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -1532,6 +1539,10 @@ public class SOSPermissionJocCockpit {
      *         &lt;element name="unstop" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *         &lt;element name="terminate" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *         &lt;element name="kill" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *         &lt;element name="setRunTime" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *         &lt;element name="endAllTasks" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *         &lt;element name="suspendAllTasks" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *         &lt;element name="continueAllTasks" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -1547,7 +1558,11 @@ public class SOSPermissionJocCockpit {
         "stop",
         "unstop",
         "terminate",
-        "kill"
+        "kill",
+        "setRunTime",
+        "endAllTasks",
+        "suspendAllTasks",
+        "continueAllTasks"
     })
     public static class Job {
 
@@ -1559,6 +1574,10 @@ public class SOSPermissionJocCockpit {
         protected boolean unstop;
         protected boolean terminate;
         protected boolean kill;
+        protected boolean setRunTime;
+        protected boolean endAllTasks;
+        protected boolean suspendAllTasks;
+        protected boolean continueAllTasks;
 
         /**
          * Ruft den Wert der view-Eigenschaft ab.
@@ -1670,6 +1689,70 @@ public class SOSPermissionJocCockpit {
          */
         public void setKill(boolean value) {
             this.kill = value;
+        }
+
+        /**
+         * Ruft den Wert der setRunTime-Eigenschaft ab.
+         * 
+         */
+        public boolean isSetRunTime() {
+            return setRunTime;
+        }
+
+        /**
+         * Legt den Wert der setRunTime-Eigenschaft fest.
+         * 
+         */
+        public void setSetRunTime(boolean value) {
+            this.setRunTime = value;
+        }
+
+        /**
+         * Ruft den Wert der endAllTasks-Eigenschaft ab.
+         * 
+         */
+        public boolean isEndAllTasks() {
+            return endAllTasks;
+        }
+
+        /**
+         * Legt den Wert der endAllTasks-Eigenschaft fest.
+         * 
+         */
+        public void setEndAllTasks(boolean value) {
+            this.endAllTasks = value;
+        }
+
+        /**
+         * Ruft den Wert der suspendAllTasks-Eigenschaft ab.
+         * 
+         */
+        public boolean isSuspendAllTasks() {
+            return suspendAllTasks;
+        }
+
+        /**
+         * Legt den Wert der suspendAllTasks-Eigenschaft fest.
+         * 
+         */
+        public void setSuspendAllTasks(boolean value) {
+            this.suspendAllTasks = value;
+        }
+
+        /**
+         * Ruft den Wert der continueAllTasks-Eigenschaft ab.
+         * 
+         */
+        public boolean isContinueAllTasks() {
+            return continueAllTasks;
+        }
+
+        /**
+         * Legt den Wert der continueAllTasks-Eigenschaft fest.
+         * 
+         */
+        public void setContinueAllTasks(boolean value) {
+            this.continueAllTasks = value;
         }
 
 
@@ -3193,6 +3276,9 @@ public class SOSPermissionJocCockpit {
      *           &lt;/complexType>
      *         &lt;/element>
      *         &lt;element name="removeSetback" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *         &lt;element name="setRunTime" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *         &lt;element name="setState" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *         &lt;element name="reset" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -3210,7 +3296,10 @@ public class SOSPermissionJocCockpit {
         "suspend",
         "resume",
         "delete",
-        "removeSetback"
+        "removeSetback",
+        "setRunTime",
+        "setState",
+        "reset"
     })
     public static class Order {
 
@@ -3225,6 +3314,9 @@ public class SOSPermissionJocCockpit {
         @XmlElement(required = true)
         protected SOSPermissionJocCockpit.Order.Delete delete;
         protected boolean removeSetback;
+        protected boolean setRunTime;
+        protected boolean setState;
+        protected boolean reset;
 
         /**
          * Ruft den Wert der view-Eigenschaft ab.
@@ -3376,6 +3468,54 @@ public class SOSPermissionJocCockpit {
          */
         public void setRemoveSetback(boolean value) {
             this.removeSetback = value;
+        }
+
+        /**
+         * Ruft den Wert der setRunTime-Eigenschaft ab.
+         * 
+         */
+        public boolean isSetRunTime() {
+            return setRunTime;
+        }
+
+        /**
+         * Legt den Wert der setRunTime-Eigenschaft fest.
+         * 
+         */
+        public void setSetRunTime(boolean value) {
+            this.setRunTime = value;
+        }
+
+        /**
+         * Ruft den Wert der setState-Eigenschaft ab.
+         * 
+         */
+        public boolean isSetState() {
+            return setState;
+        }
+
+        /**
+         * Legt den Wert der setState-Eigenschaft fest.
+         * 
+         */
+        public void setSetState(boolean value) {
+            this.setState = value;
+        }
+
+        /**
+         * Ruft den Wert der reset-Eigenschaft ab.
+         * 
+         */
+        public boolean isReset() {
+            return reset;
+        }
+
+        /**
+         * Legt den Wert der reset-Eigenschaft fest.
+         * 
+         */
+        public void setReset(boolean value) {
+            this.reset = value;
         }
 
 

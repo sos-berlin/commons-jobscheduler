@@ -1,7 +1,7 @@
 package com.sos.auth.shiro;
 
+import org.apache.log4j.Logger;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authc.UnknownAccountException;
@@ -11,7 +11,10 @@ import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.Factory;
 
+  
 public class SOSlogin {
+
+    private static final Logger LOGGER = Logger.getLogger(SOSlogin.class);
 
     private String inifile;
     private Subject currentUser;
@@ -59,7 +62,11 @@ public class SOSlogin {
         SecurityManager securityManager = factory.getInstance();
         SecurityUtils.setSecurityManager(securityManager);
         currentUser = SecurityUtils.getSubject();
-        currentUser.logout();
+        try {
+            currentUser.logout();
+        }catch (Exception e){
+            LOGGER.warn("Shiro init: " + e.getMessage(),e);
+        }
     }
 
     public Subject getCurrentUser() {
