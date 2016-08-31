@@ -5,7 +5,6 @@ import java.math.BigInteger;
 import org.apache.log4j.Logger;
 
 import com.sos.scheduler.model.SchedulerObjectFactory;
-import com.sos.scheduler.model.objects.JobChainNodeAction;
 
 public class JSCmdKillTask extends KillTask {
 
@@ -25,6 +24,20 @@ public class JSCmdKillTask extends KillTask {
         }
     }
 
+    public void setTimeoutIfNotEmpty(String value) {
+        if (!isEmpty(value)) {
+            super.setTimeout(value);
+        }
+    }
+
+    public void setTimeout(Integer value) {
+        if (value != null) {
+            super.setTimeout(String.valueOf(value));
+        }
+    }
+
+     
+    
     public void setImmediatelyIfNotEmpty(String value) {
         if (!isEmpty(value)) {
             super.setImmediately(value);
@@ -38,4 +51,9 @@ public class JSCmdKillTask extends KillTask {
         }
     }
 
+    public void setIdIfNotEmpty(Integer value) {
+        if (value != null) {
+             super.setId(BigInteger.valueOf(value));
+        }
+    }
 }

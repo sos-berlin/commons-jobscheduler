@@ -51,6 +51,8 @@ public class KillTask extends JSCmdBase {
     @XmlAttribute(name = "immediately")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     protected String immediately;
+    @XmlAttribute(name = "timeout", required = false)
+    protected String timeout;
 
     /** Gets the value of the job property.
      * 
@@ -66,6 +68,20 @@ public class KillTask extends JSCmdBase {
         this.job = value;
     }
 
+    /** Gets the value of the timeout property.
+     * 
+     * @return possible object is {@link String } */
+    public String getTimeout() {
+        return timeout;
+    }
+
+    /** Sets the value of the timeout property.
+     * 
+     * @param value allowed object is {@link String } */
+    public void setTimeout(String value) {
+        this.timeout = value;
+    }
+    
     /** Gets the value of the id property.
      * 
      * @return possible object is {@link BigInteger } */
