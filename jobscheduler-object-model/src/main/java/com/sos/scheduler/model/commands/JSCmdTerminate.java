@@ -41,4 +41,9 @@ public class JSCmdTerminate extends Terminate {
             super.setTimeout(new BigInteger(value));
         }
     }
+    public void setTimeoutIfNotEmpty(Integer value) {
+        if (value != null) {
+            super.setTimeout( BigInteger.valueOf(value.intValue()));
+        }
+    }
 }

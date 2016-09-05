@@ -31,5 +31,11 @@ public class JSCmdModifySpooler extends ModifySpooler {
             super.setTimeout(b);
         }
     }
+    public void setTimeoutIfNotEmpty(Integer value) {
+        if (value != null) {
+            BigInteger b =  BigInteger.valueOf(value.intValue());
+            super.setTimeout(b);
+        }
+    }
 
 }
