@@ -31,21 +31,47 @@ import com.sos.auth.rest.permission.model.SOSPermissions;
 import com.sos.auth.shiro.SOSlogin;
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.joc.Globals;
+import com.sos.scheduler.model.SchedulerObjectFactory;
+import com.sos.scheduler.model.objects.Spooler;
+
 import org.apache.log4j.Logger;
 import org.apache.shiro.session.Session;
 
 @Path("/security")
 public class SOSServicePermissionShiro {
+    private static final String TIMEOUT = "timeout";
+    private static final String UTC = "UTC";
+    private static final String UNKNOWN_USER = "*Unknown User*";
+    private static final String EMPTY_STRING = "";
+    private static final String USER_IS_NULL = "user is null";
+    private static final String CONTENT_TYPE = "Content-Type";
+    private static final String AUTHORIZATION_HEADER_WITH_BASIC_BASED64PART_EXPECTED = "Authorization Header with Basic based64part expected";
+    private static final String ROLE_API_USER = "api_user";
+    private static final String ROLE_BUSINESS_USER = "business_user";
+    private static final String ROLE_INCIDENT_MANAGER = "incident_manager";
+    private static final String ROLE_IT_OPERATOR = "it_operator";
+    private static final String ROLE_APPLICATION_MANAGER = "application_manager";
+    private static final String ROLE_ADMINISTRATOR = "administrator";
+    private static final String ROLE_EVENTS = "events";
+    private static final String ROLE_JOC = "joc";
+    private static final String ROLE_JOE = "joe";
+    private static final String ROLE_JID = "jid";
+    private static final String ROLE_WORKINGPLAN = "workingplan";
+    private static final String ROLE_CONTROLLER = "controller";
+    private static final String ROLE_JOBEDITOR = "jobeditor";
+    private static final String ROLE_JOC_ADMIN = "joc_admin";
+    private static final String ROLE_ADMIN = "admin";
+    private static final String ROLE_SUPER = "super";
+    private static final String ACCESS_TOKEN = "access_token";
     private static final Logger LOGGER = Logger.getLogger(SOSServicePermissionShiro.class);
 
     private SOSShiroCurrentUser currentUser;
-    public static SOSShiroCurrentUsersList currentUsersList;
-    public static SOSHibernateConnection sosHibernateConnection;
 
     @GET
     @Path("/permissions")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSPermissionShiro getPermissions(@HeaderParam("access_token") String accessTokenFromHeader, @QueryParam("access_token") String accessTokenFromQuery,
+    public SOSPermissionShiro getPermissions(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader, @QueryParam(ACCESS_TOKEN) String accessTokenFromQuery,
             @QueryParam("user") String user, @QueryParam("pwd") String pwd) {
 
         String accessToken = this.getAccessToken(accessTokenFromHeader, accessTokenFromQuery);
@@ -61,22 +87,22 @@ public class SOSServicePermissionShiro {
             sosPermissionShiro.setUser(currentUser.getUsername());
 
             SOSPermissionRoles roles = o.createSOSPermissionRoles();
-            addRole(roles.getSOSPermissionRole(), "super");
-            addRole(roles.getSOSPermissionRole(), "admin");
-            addRole(roles.getSOSPermissionRole(), "joc_admin");
-            addRole(roles.getSOSPermissionRole(), "jobeditor");
-            addRole(roles.getSOSPermissionRole(), "controller");
-            addRole(roles.getSOSPermissionRole(), "workingplan");
-            addRole(roles.getSOSPermissionRole(), "jid");
-            addRole(roles.getSOSPermissionRole(), "joe");
-            addRole(roles.getSOSPermissionRole(), "joc");
-            addRole(roles.getSOSPermissionRole(), "events");
-            addRole(roles.getSOSPermissionRole(), "administrator");
-            addRole(roles.getSOSPermissionRole(), "application_manager");
-            addRole(roles.getSOSPermissionRole(), "it_operator");
-            addRole(roles.getSOSPermissionRole(), "incident_manager");
-            addRole(roles.getSOSPermissionRole(), "business_user");
-            addRole(roles.getSOSPermissionRole(), "api_user");
+            addRole(roles.getSOSPermissionRole(), ROLE_SUPER);
+            addRole(roles.getSOSPermissionRole(), ROLE_ADMIN);
+            addRole(roles.getSOSPermissionRole(), ROLE_JOC_ADMIN);
+            addRole(roles.getSOSPermissionRole(), ROLE_JOBEDITOR);
+            addRole(roles.getSOSPermissionRole(), ROLE_CONTROLLER);
+            addRole(roles.getSOSPermissionRole(), ROLE_WORKINGPLAN);
+            addRole(roles.getSOSPermissionRole(), ROLE_JID);
+            addRole(roles.getSOSPermissionRole(), ROLE_JOE);
+            addRole(roles.getSOSPermissionRole(), ROLE_JOC);
+            addRole(roles.getSOSPermissionRole(), ROLE_EVENTS);
+            addRole(roles.getSOSPermissionRole(), ROLE_ADMINISTRATOR);
+            addRole(roles.getSOSPermissionRole(), ROLE_APPLICATION_MANAGER);
+            addRole(roles.getSOSPermissionRole(), ROLE_IT_OPERATOR);
+            addRole(roles.getSOSPermissionRole(), ROLE_INCIDENT_MANAGER);
+            addRole(roles.getSOSPermissionRole(), ROLE_BUSINESS_USER);
+            addRole(roles.getSOSPermissionRole(), ROLE_API_USER);
 
             SOSPermissions sosPermissions = o.createSOSPermissions();
 
@@ -238,7 +264,7 @@ public class SOSServicePermissionShiro {
     @GET
     @Path("/joc_cockpit_permissions")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSPermissionJocCockpit getJocCockpitPermissions(@HeaderParam("access_token") String accessTokenFromHeader, @QueryParam("access_token") String accessTokenFromQuery,
+    public SOSPermissionJocCockpit getJocCockpitPermissions(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader, @QueryParam(ACCESS_TOKEN) String accessTokenFromQuery,
             @QueryParam("user") String user, @QueryParam("pwd") String pwd) {
         String accessToken = getAccessToken(accessTokenFromHeader, accessTokenFromQuery);
 
@@ -250,14 +276,14 @@ public class SOSServicePermissionShiro {
     @Path("/joc_cockpit_permissions")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public Response postJocCockpitPermissions(@HeaderParam("access_token") String accessTokenFromHeader) {
+    public Response postJocCockpitPermissions(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader) {
 
         Response.ResponseBuilder responseBuilder = null;
         SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord=new SOSWebserviceAuthenticationRecord();
         
         try {
 
-            if (!"".equals(accessTokenFromHeader)) {
+            if (!EMPTY_STRING.equals(accessTokenFromHeader)) {
                 sosWebserviceAuthenticationRecord.setAccessToken(accessTokenFromHeader);
             }
 
@@ -267,12 +293,12 @@ public class SOSServicePermissionShiro {
      
             if (currentUser == null) {
                 responseBuilder = get401ResponseBuilder();
-                LOGGER.debug("user is null");
-                return responseBuilder.entity("Authorization Header with Basic based64part expected").build();
+                LOGGER.debug(USER_IS_NULL);
+                return responseBuilder.entity(AUTHORIZATION_HEADER_WITH_BASIC_BASED64PART_EXPECTED).build();
             }
             
-            responseBuilder = Response.status(200).header("Content-Type", MediaType.APPLICATION_JSON);
-            responseBuilder.header("access_token", accessTokenFromHeader).build();
+            responseBuilder = Response.status(200).header(CONTENT_TYPE, MediaType.APPLICATION_JSON);
+            responseBuilder.header(ACCESS_TOKEN, accessTokenFromHeader).build();
             responseBuilder.entity(currentUser.getSosPermissionJocCockpit());
 
             return responseBuilder.build();
@@ -308,21 +334,21 @@ public class SOSServicePermissionShiro {
 
         String accessToken = this.getAccessToken(accessTokenFromHeader, accessTokenFromQuery);
 
-        currentUser = currentUsersList.getUser(accessToken);
+        currentUser = Globals.currentUsersList.getUser(accessToken);
 
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer("");
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer(EMPTY_STRING);
         if (currentUser != null) {
-            sosShiroCurrentUserAnswer.setUser("*Unknown User*");
+            sosShiroCurrentUserAnswer.setUser(UNKNOWN_USER);
             sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer(currentUser.getUsername());
         }
         sosShiroCurrentUserAnswer.setIsAuthenticated(false);
         sosShiroCurrentUserAnswer.setHasRole(false);
         sosShiroCurrentUserAnswer.setIsPermitted(false);
-        sosShiroCurrentUserAnswer.setAccessToken("");
-        currentUsersList.removeUser(accessToken);
+        sosShiroCurrentUserAnswer.setAccessToken(EMPTY_STRING);
+        Globals.currentUsersList.removeUser(accessToken);
 
-        if (currentUsersList.size() == 0 && sosHibernateConnection != null) {
-            sosHibernateConnection.disconnect();
+        if (Globals.currentUsersList.size() == 0 && Globals.sosHibernateConnection != null) {
+            Globals.sosHibernateConnection.disconnect();
         }
 
         return sosShiroCurrentUserAnswer;
@@ -332,21 +358,21 @@ public class SOSServicePermissionShiro {
     @Path("/logout")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSShiroCurrentUserAnswer logoutPost(@HeaderParam("access_token") String accessTokenFromHeader) {
-        return logout(accessTokenFromHeader, "");
+    public SOSShiroCurrentUserAnswer logoutPost(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader) {
+        return logout(accessTokenFromHeader, EMPTY_STRING);
     }
 
     @GET
     @Path("/logout")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSShiroCurrentUserAnswer logoutGet(@HeaderParam("access_token") String accessTokenFromHeader, @QueryParam("access_token") String accessTokenFromQuery) {
+    public SOSShiroCurrentUserAnswer logoutGet(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader, @QueryParam(ACCESS_TOKEN) String accessTokenFromQuery) {
         return logout(accessTokenFromHeader, accessTokenFromQuery);
     }
 
     @GET
     @Path("/role")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSShiroCurrentUserAnswer hasRole(@HeaderParam("access_token") String accessTokenFromHeader, @QueryParam("access_token") String accessTokenFromQuery,
+    public SOSShiroCurrentUserAnswer hasRole(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader, @QueryParam(ACCESS_TOKEN) String accessTokenFromQuery,
             @QueryParam("user") String user, @QueryParam("pwd") String pwd, @QueryParam("role") String role) {
 
         String accessToken = getAccessToken(accessTokenFromHeader, accessTokenFromQuery);
@@ -356,10 +382,7 @@ public class SOSServicePermissionShiro {
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer(currentUser.getUsername());
         sosShiroCurrentUserAnswer.setRole(role);
         sosShiroCurrentUserAnswer.setIsAuthenticated(currentUser.isAuthenticated());
-        currentUser.getCurrentSubject().hasRole("xxx");
-
         sosShiroCurrentUserAnswer.setHasRole(currentUser.hasRole(role));
-
         sosShiroCurrentUserAnswer.setAccessToken(currentUser.getAccessToken());
 
         return sosShiroCurrentUserAnswer;
@@ -369,7 +392,7 @@ public class SOSServicePermissionShiro {
     @GET
     @Path("/permission")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSShiroCurrentUserAnswer isPermitted(@HeaderParam("access_token") String accessTokenFromHeader, @QueryParam("access_token") String accessTokenFromQuery,
+    public SOSShiroCurrentUserAnswer isPermitted(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader, @QueryParam(ACCESS_TOKEN) String accessTokenFromQuery,
             @QueryParam("user") String user, @QueryParam("pwd") String pwd, @QueryParam("permission") String permission) {
 
         String accessToken = getAccessToken(accessTokenFromHeader, accessTokenFromQuery);
@@ -387,8 +410,8 @@ public class SOSServicePermissionShiro {
     }
 
     private void setCurrentUserfromAccessToken(String accessToken, String user, String pwd) {
-        if (currentUsersList != null && accessToken != null && accessToken.length() > 0) {
-            currentUser = currentUsersList.getUser(accessToken);
+        if (Globals.currentUsersList != null && accessToken != null && accessToken.length() > 0) {
+            currentUser = Globals.currentUsersList.getUser(accessToken);
         } else {
             if (user != null && user.length() > 0 && pwd != null && pwd.length() > 0) {
                 currentUser = new SOSShiroCurrentUser(user, pwd);
@@ -403,7 +426,7 @@ public class SOSServicePermissionShiro {
     }
 
     private String getAccessToken(String accessTokenFromHeader, String accessTokenFromQuery) {
-        if (accessTokenFromHeader != null && !"".equals(accessTokenFromHeader)) {
+        if (accessTokenFromHeader != null && !EMPTY_STRING.equals(accessTokenFromHeader)) {
             accessTokenFromQuery = accessTokenFromHeader;
         }
         return accessTokenFromQuery;
@@ -423,22 +446,22 @@ public class SOSServicePermissionShiro {
             sosPermissionJocCockpit.setUser(currentUser.getUsername());
 
             SOSPermissionRoles roles = o.createSOSPermissionRoles();
-            addRole(roles.getSOSPermissionRole(), "super");
-            addRole(roles.getSOSPermissionRole(), "admin");
-            addRole(roles.getSOSPermissionRole(), "joc_admin");
-            addRole(roles.getSOSPermissionRole(), "jobeditor");
-            addRole(roles.getSOSPermissionRole(), "controller");
-            addRole(roles.getSOSPermissionRole(), "workingplan");
-            addRole(roles.getSOSPermissionRole(), "jid");
-            addRole(roles.getSOSPermissionRole(), "joe");
-            addRole(roles.getSOSPermissionRole(), "joc");
-            addRole(roles.getSOSPermissionRole(), "events");
-            addRole(roles.getSOSPermissionRole(), "administrator");
-            addRole(roles.getSOSPermissionRole(), "application_manager");
-            addRole(roles.getSOSPermissionRole(), "it_operator");
-            addRole(roles.getSOSPermissionRole(), "incident_manager");
-            addRole(roles.getSOSPermissionRole(), "business_user");
-            addRole(roles.getSOSPermissionRole(), "api_user");
+            addRole(roles.getSOSPermissionRole(), ROLE_SUPER);
+            addRole(roles.getSOSPermissionRole(), ROLE_ADMIN);
+            addRole(roles.getSOSPermissionRole(), ROLE_JOC_ADMIN);
+            addRole(roles.getSOSPermissionRole(), ROLE_JOBEDITOR);
+            addRole(roles.getSOSPermissionRole(), ROLE_CONTROLLER);
+            addRole(roles.getSOSPermissionRole(), ROLE_WORKINGPLAN);
+            addRole(roles.getSOSPermissionRole(), ROLE_JID);
+            addRole(roles.getSOSPermissionRole(), ROLE_JOE);
+            addRole(roles.getSOSPermissionRole(), ROLE_JOC);
+            addRole(roles.getSOSPermissionRole(), ROLE_EVENTS);
+            addRole(roles.getSOSPermissionRole(), ROLE_ADMINISTRATOR);
+            addRole(roles.getSOSPermissionRole(), ROLE_APPLICATION_MANAGER);
+            addRole(roles.getSOSPermissionRole(), ROLE_IT_OPERATOR);
+            addRole(roles.getSOSPermissionRole(), ROLE_INCIDENT_MANAGER);
+            addRole(roles.getSOSPermissionRole(), ROLE_BUSINESS_USER);
+            addRole(roles.getSOSPermissionRole(), ROLE_API_USER);
 
             sosPermissionJocCockpit.setJobschedulerMaster(o.createSOSPermissionJocCockpitJobschedulerMaster());
             sosPermissionJocCockpit.setJobschedulerMasterCluster(o.createSOSPermissionJocCockpitJobschedulerMasterCluster());
@@ -594,8 +617,8 @@ public class SOSServicePermissionShiro {
     }
 
     private void createUser() throws Exception {
-        if (currentUsersList == null) {
-            currentUsersList = new SOSShiroCurrentUsersList();
+        if (Globals.currentUsersList == null) {
+            Globals.currentUsersList = new SOSShiroCurrentUsersList();
         }
 
         SOSlogin sosLogin = new SOSlogin();
@@ -606,27 +629,25 @@ public class SOSServicePermissionShiro {
         Session session = sosLogin.getCurrentUser().getSession();
         String accessToken = session.getId().toString();
 
-        // currentUser.getCurrentSubject().getSession().setTimeout(30000);
         currentUser.setAccessToken(accessToken);
-        currentUsersList.addUser(currentUser);
+        Globals.currentUsersList.addUser(currentUser);
 
-        SOSPermissionJocCockpit sosPermissionJocCockpit = createPermissionObject(accessToken, "", "");
+        SOSPermissionJocCockpit sosPermissionJocCockpit = createPermissionObject(accessToken, EMPTY_STRING, EMPTY_STRING);
         currentUser.setSosPermissionJocCockpit(sosPermissionJocCockpit);
 
         SOSShiroProperties sosShiroProperties = new SOSShiroProperties();
 
-        if (sosHibernateConnection == null) {
-            sosHibernateConnection = new SOSHibernateConnection(sosShiroProperties.getProperty("hibernate_configuration_file"));
-            sosHibernateConnection.addClassMapping(DBLayer.getInventoryClassMapping());
-            // sosHibernateConnection.setUseOpenStatelessSession(true);
-            sosHibernateConnection.connect();
+        if (Globals.sosHibernateConnection == null) {
+            Globals.sosHibernateConnection = new SOSHibernateConnection(sosShiroProperties.getProperty("hibernate_configuration_file"));
+            Globals.sosHibernateConnection.addClassMapping(DBLayer.getInventoryClassMapping());
+            Globals.sosHibernateConnection.connect();
         }
-        currentUser.setSosHibernateConnection(sosHibernateConnection);
+        currentUser.setSosHibernateConnection(Globals.sosHibernateConnection);
 
     }
 
     private SOSShiroCurrentUser getUserPwdFromHeaderOrQuery(String basicAuthorization, String user, String pwd) {
-        String authorization = "";
+        String authorization = EMPTY_STRING;
         try {
             if (basicAuthorization != null) {
                 String[] authorizationParts = basicAuthorization.split(" ");
@@ -664,34 +685,38 @@ public class SOSServicePermissionShiro {
 
     private ResponseBuilder get401ResponseBuilder() {
         Response.ResponseBuilder responseBuilder = null;
-        responseBuilder = Response.status(401).header("Content-Type", MediaType.APPLICATION_JSON);
-        responseBuilder.header("access_token", "").build();
+        responseBuilder = Response.status(401).header(CONTENT_TYPE, MediaType.APPLICATION_JSON);
+        responseBuilder.header(ACCESS_TOKEN, EMPTY_STRING).build();
         return responseBuilder;
     }
 
     private ResponseBuilder get440ResponseBuilder() {
         Response.ResponseBuilder responseBuilder = null;
-        responseBuilder = Response.status(404).header("Content-Type", MediaType.APPLICATION_JSON);
-        responseBuilder.header("access_token", "").build();
+        responseBuilder = Response.status(404).header(CONTENT_TYPE, MediaType.APPLICATION_JSON);
+        responseBuilder.header(ACCESS_TOKEN, EMPTY_STRING).build();
         return responseBuilder;
     }
 
     private ResponseBuilder get420ResponseBuilder() {
         Response.ResponseBuilder responseBuilder = null;
-        responseBuilder = Response.status(420).header("Content-Type", MediaType.APPLICATION_JSON);
-        responseBuilder.header("access_token", "").build();
+        responseBuilder = Response.status(420).header(CONTENT_TYPE, MediaType.APPLICATION_JSON);
+        responseBuilder.header(ACCESS_TOKEN, EMPTY_STRING).build();
         return responseBuilder;
     }
 
     private Response login(String basicAuthorization, String user, String pwd) {
 
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+        TimeZone.setDefault(TimeZone.getTimeZone(UTC));
+        
+        Globals.schedulerObjectFactory = new SchedulerObjectFactory();
+        Globals.schedulerObjectFactory.initMarshaller(Spooler.class);
+        
         currentUser = getUserPwdFromHeaderOrQuery(basicAuthorization, user, pwd);
         Response.ResponseBuilder responseBuilder = null;
         if (currentUser == null) {
             responseBuilder = get401ResponseBuilder();
-            LOGGER.debug("user is null");
-            return responseBuilder.entity("Authorization Header with Basic based64part expected").build();
+            LOGGER.debug(USER_IS_NULL);
+            return responseBuilder.entity(AUTHORIZATION_HEADER_WITH_BASIC_BASED64PART_EXPECTED).build();
         }
 
         try {
@@ -701,9 +726,9 @@ public class SOSServicePermissionShiro {
                 responseBuilder = get401ResponseBuilder();
                 responseBuilder.entity(sosShiroCurrentUserAnswer);
             } else {
-                responseBuilder = Response.status(200).header("Content-Type", MediaType.APPLICATION_JSON);
-                responseBuilder.header("access_token", sosShiroCurrentUserAnswer.getAccessToken()).build();
-                responseBuilder.header("timeout", currentUser.getCurrentSubject().getSession().getTimeout()).build();
+                responseBuilder = Response.status(200).header(CONTENT_TYPE, MediaType.APPLICATION_JSON);
+                responseBuilder.header(ACCESS_TOKEN, sosShiroCurrentUserAnswer.getAccessToken()).build();
+                responseBuilder.header(TIMEOUT, currentUser.getCurrentSubject().getSession().getTimeout()).build();
                 responseBuilder.entity(sosShiroCurrentUserAnswer);
             }
 
@@ -719,7 +744,7 @@ public class SOSServicePermissionShiro {
         if (currentUser != null) {
             currentUser.getCurrentSubject().getSession().touch();
         } else {
-            LOGGER.warn("current user is null");
+            LOGGER.warn(USER_IS_NULL);
         }
     }
 
