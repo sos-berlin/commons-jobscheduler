@@ -32,6 +32,10 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.log4j.Logger;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
+import org.w3c.dom.bootstrap.DOMImplementationRegistry;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSOutput;
+import org.w3c.dom.ls.LSSerializer;
 
 import sos.spooler.Variable_set;
 
@@ -115,6 +119,8 @@ import com.sos.scheduler.model.objects.Spooler;
 
 public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
 
+    private static final String UTF_8 = "UTF-8";
+    private static final String DOM_IMPLEMENTATION = "XML 3.0 LS 3.0";
     private static final Class<Spooler> DEFAULT_MARSHALLER = Spooler.class;
     private static final Logger LOGGER = Logger.getLogger(SchedulerObjectFactory.class);
     private SchedulerObjectFactoryOptions objOptions = new SchedulerObjectFactoryOptions();
@@ -130,6 +136,11 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
     private Marshaller objM4Answers = null;
     private String strLastAnswer = null;
     private boolean useDefaultPeriod;
+    private boolean ommitXmlDeclaration=false;
+
+    public void setOmmitXmlDeclaration(boolean ommitXmlDeclaration) {
+        this.ommitXmlDeclaration = ommitXmlDeclaration;
+    }
 
     public static enum enu4What {
         remote_schedulers, all, folders, job_chains, job_chain_jobs, running, no_subfolders, log, task_queue;
@@ -408,6 +419,8 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
     }
 
     private String toXMLString(final Object objO, final Marshaller objMarshaller) {
+        
+       
         String strT = "";
         try {
             XMLSerializer serializer = getXMLSerializer();
@@ -415,6 +428,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
             objOutputFormat.setEncoding("utf-8");
             objOutputFormat.setIndenting(true);
             objOutputFormat.setIndent(4);
+            objOutputFormat.setOmitXMLDeclaration(ommitXmlDeclaration);
             objOutputFormat.setLineWidth(80);
             serializer.setOutputFormat(objOutputFormat);
             StringWriter objSW = new StringWriter();

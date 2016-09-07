@@ -710,6 +710,7 @@ public class SOSServicePermissionShiro {
         
         Globals.schedulerObjectFactory = new SchedulerObjectFactory();
         Globals.schedulerObjectFactory.initMarshaller(Spooler.class);
+        Globals.schedulerObjectFactory.setOmmitXmlDeclaration(true);
         
         currentUser = getUserPwdFromHeaderOrQuery(basicAuthorization, user, pwd);
         Response.ResponseBuilder responseBuilder = null;
