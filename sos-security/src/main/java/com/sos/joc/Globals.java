@@ -7,6 +7,7 @@ import com.sos.scheduler.model.SchedulerObjectFactory;
 public class Globals {
     public static SOSShiroCurrentUsersList currentUsersList;
     public static SOSHibernateConnection sosHibernateConnection;
+    public static SOSHibernateConnection sosSchedulerHibernateConnection;
     public static SchedulerObjectFactory schedulerObjectFactory;
 
 

@@ -6,7 +6,6 @@ import org.apache.shiro.subject.Subject;
 
 import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
-import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 
 public class SOSShiroCurrentUser {
@@ -17,7 +16,6 @@ public class SOSShiroCurrentUser {
     private String accessToken;
     private SOSPermissionJocCockpit sosPermissionJocCockpit;
     private HashMap<String, DBItemInventoryInstance> listOfSchedulerInstances;
-    private SOSHibernateConnection sosHibernateConnection;
 
     public SOSShiroCurrentUser(String username, String password) {
         super();
@@ -89,13 +87,6 @@ public class SOSShiroCurrentUser {
     public void addSchedulerInstanceDBItem(JobSchedulerIdentifier jobSchedulerIdentifier, DBItemInventoryInstance schedulerInstancesDBItem) {
         listOfSchedulerInstances.put(jobSchedulerIdentifier.getId(), schedulerInstancesDBItem);
     }
-
-    public SOSHibernateConnection getSosHibernateConnection() {
-        return sosHibernateConnection;
-    }
-
-    public void setSosHibernateConnection(SOSHibernateConnection sosHibernateConnection) {
-        this.sosHibernateConnection = sosHibernateConnection;
-    }
+ 
 
 }

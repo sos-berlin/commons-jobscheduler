@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.Map.Entry;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -34,6 +35,8 @@ import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.objects.Spooler;
+
+import sos.scheduler.misc.ParameterSubstitutor;
 
 import org.apache.log4j.Logger;
 import org.apache.shiro.session.Session;
@@ -637,12 +640,21 @@ public class SOSServicePermissionShiro {
 
         SOSShiroProperties sosShiroProperties = new SOSShiroProperties();
 
+     
         if (Globals.sosHibernateConnection == null) {
             Globals.sosHibernateConnection = new SOSHibernateConnection(sosShiroProperties.getProperty("hibernate_configuration_file"));
             Globals.sosHibernateConnection.addClassMapping(DBLayer.getInventoryClassMapping());
             Globals.sosHibernateConnection.connect();
         }
-        currentUser.setSosHibernateConnection(Globals.sosHibernateConnection);
+        
+ 
+
+        if (Globals.sosSchedulerHibernateConnection == null) {
+            Globals.sosSchedulerHibernateConnection = new SOSHibernateConnection(sosShiroProperties.getProperty("hibernate_configuration_file"));
+            Globals.sosSchedulerHibernateConnection.addClassMapping(DBLayer.getSchedulerClassMapping());
+            Globals.sosSchedulerHibernateConnection.connect();
+        }
+
 
     }
 
