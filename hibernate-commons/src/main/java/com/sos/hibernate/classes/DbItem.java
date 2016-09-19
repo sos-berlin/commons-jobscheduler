@@ -202,7 +202,7 @@ public class DbItem {
     }
 
     @Transient
-    public String getState() {
+    public String getStateAsString() {
         return "";
     }
 
