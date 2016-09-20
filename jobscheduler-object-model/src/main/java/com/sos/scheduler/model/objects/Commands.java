@@ -104,6 +104,7 @@ import java.util.List;
  * &lt;/complexType>
  * </pre> */
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "commands")
 @XmlType(name = "Commands", propOrder = { "addJobsOrAddOrderOrCheckFolders" })
 public class Commands extends JSCmdBase {
 

@@ -13,6 +13,8 @@ public class JSCmdCommands extends JSObjCommands {
 
     public JSCmdCommands(SchedulerObjectFactory schedulerObjectFactory) {
         super(schedulerObjectFactory);
+        objFactory = schedulerObjectFactory;
+
     }
 
 }
