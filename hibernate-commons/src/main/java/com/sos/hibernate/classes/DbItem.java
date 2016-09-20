@@ -201,11 +201,11 @@ public class DbItem {
         return null;
     }
 
-    @Transient
-    public String getStateAsString() {
-        return "";
-    }
-
+//    @Transient
+//    public String getStateAsString() {
+//        return "";
+//    }
+//
     @Transient
     public String getJobOrJobchain() {
         return "";
