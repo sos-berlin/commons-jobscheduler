@@ -149,8 +149,7 @@ public class SOSHibernateConnection implements Serializable {
 
     private void openSession() {
         String method = getMethodName("openSession");
-        LOGGER.debug(String.format("%s: useOpenStatelessSession = %s, useGetCurrentSession = %s", method, useOpenStatelessSession,
-                useGetCurrentSession));
+        LOGGER.debug(String.format("%s: useOpenStatelessSession = %s, useGetCurrentSession = %s", method, useOpenStatelessSession, useGetCurrentSession));
         openSessionMethodName = "";
         if (useOpenStatelessSession) {
             currentSession = sessionFactory.openStatelessSession(jdbcConnection);
@@ -872,6 +871,15 @@ public class SOSHibernateConnection implements Serializable {
             }
         }
         return columnName;
+    }
+
+    public Object get(Class<?> entityClass, Serializable id) throws Exception {
+        if (currentSession instanceof Session) {
+            return ((Session) currentSession).get(entityClass, id);
+        } else if (currentSession instanceof StatelessSession) {
+            return ((StatelessSession) currentSession).get(entityClass, id);
+        }
+        return null;
     }
 
     public boolean isUseOpenStatelessSession() {
