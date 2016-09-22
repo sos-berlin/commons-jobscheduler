@@ -1,10 +1,9 @@
 package com.sos.auth.rest;
 
 import static org.junit.Assert.assertEquals;
-
 import java.net.MalformedURLException;
-
 import org.junit.Test;
+
 
 /** @author Uwe Risse */
 public class TestSOSShiroCurrentUserAnswer {

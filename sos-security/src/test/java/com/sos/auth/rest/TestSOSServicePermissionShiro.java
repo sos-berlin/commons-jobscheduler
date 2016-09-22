@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.sos.auth.classes.SOSShiroProperties;
 import com.sos.auth.rest.permission.model.SOSPermissionShiro;
 
 public class TestSOSServicePermissionShiro {

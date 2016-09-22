@@ -17,14 +17,14 @@
 
 
 	<build>
-	    <resources>
+		<resources>
 			<resource>
-		        <directory>/src/main/resources</directory>
-		        <excludes>
+				<directory>/src/main/resources</directory>
+				<excludes>
 					<exclude>joc.properties.ini</exclude>
-		        </excludes>
-	      </resource>
-	    </resources>
+				</excludes>
+			</resource>
+		</resources>
 
 		<plugins>
 
@@ -147,6 +147,20 @@
 			<artifactId>jitl-jobs</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.sos-berlin.joc</groupId>
+			<artifactId>webservice-global</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.servlet</groupId>
+					<artifactId>servlet-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+
 
 	</dependencies>
 

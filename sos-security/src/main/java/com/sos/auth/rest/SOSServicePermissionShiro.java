@@ -4,7 +4,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 import java.util.List;
 import java.util.TimeZone;
-import java.util.Map.Entry;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -33,10 +32,10 @@ import com.sos.auth.shiro.SOSlogin;
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
+import com.sos.joc.classes.JOCDefaultResponse;
+import com.sos.joc.model.common.Error420Schema;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.objects.Spooler;
-
-import sos.scheduler.misc.ParameterSubstitutor;
 
 import org.apache.log4j.Logger;
 import org.apache.shiro.session.Session;
@@ -44,6 +43,7 @@ import org.apache.shiro.session.Session;
 @Path("/security")
 public class SOSServicePermissionShiro {
     private static final String TIMEOUT = "timeout";
+    private static final String ACCESS_TOKEN = "access_token";
     private static final String UTC = "UTC";
     private static final String UNKNOWN_USER = "*Unknown User*";
     private static final String EMPTY_STRING = "";
@@ -66,7 +66,6 @@ public class SOSServicePermissionShiro {
     private static final String ROLE_JOC_ADMIN = "joc_admin";
     private static final String ROLE_ADMIN = "admin";
     private static final String ROLE_SUPER = "super";
-    private static final String ACCESS_TOKEN = "access_token";
     private static final Logger LOGGER = Logger.getLogger(SOSServicePermissionShiro.class);
 
     private SOSShiroCurrentUser currentUser;
@@ -267,23 +266,22 @@ public class SOSServicePermissionShiro {
     @GET
     @Path("/joc_cockpit_permissions")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSPermissionJocCockpit getJocCockpitPermissions(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader, @QueryParam(ACCESS_TOKEN) String accessTokenFromQuery,
+    public JOCDefaultResponse getJocCockpitPermissions(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader, @QueryParam(ACCESS_TOKEN) String accessTokenFromQuery,
             @QueryParam("user") String user, @QueryParam("pwd") String pwd) {
         String accessToken = getAccessToken(accessTokenFromHeader, accessTokenFromQuery);
 
         this.setCurrentUserfromAccessToken(accessToken, user, pwd);
-        return createPermissionObject(accessToken, user, pwd);
+        return JOCDefaultResponse.responseStatus200(createPermissionObject(accessToken, user, pwd));
     }
 
     @POST
     @Path("/joc_cockpit_permissions")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public Response postJocCockpitPermissions(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader) {
+    public JOCDefaultResponse postJocCockpitPermissions(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader) {
 
-        Response.ResponseBuilder responseBuilder = null;
-        SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord=new SOSWebserviceAuthenticationRecord();
-        
+        SOSWebserviceAuthenticationRecord sosWebserviceAuthenticationRecord = new SOSWebserviceAuthenticationRecord();
+
         try {
 
             if (!EMPTY_STRING.equals(accessTokenFromHeader)) {
@@ -293,35 +291,28 @@ public class SOSServicePermissionShiro {
             setCurrentUserfromAccessToken(sosWebserviceAuthenticationRecord.getAccessToken(), sosWebserviceAuthenticationRecord.getUser(), sosWebserviceAuthenticationRecord
                     .getPassword());
 
-     
             if (currentUser == null) {
-                responseBuilder = get401ResponseBuilder();
-                LOGGER.debug(USER_IS_NULL);
-                return responseBuilder.entity(AUTHORIZATION_HEADER_WITH_BASIC_BASED64PART_EXPECTED).build();
+                LOGGER.debug(USER_IS_NULL + " " + AUTHORIZATION_HEADER_WITH_BASIC_BASED64PART_EXPECTED);
+                return JOCDefaultResponse.responseStatusJSError(USER_IS_NULL + " " + AUTHORIZATION_HEADER_WITH_BASIC_BASED64PART_EXPECTED);
             }
-            
-            responseBuilder = Response.status(200).header(CONTENT_TYPE, MediaType.APPLICATION_JSON);
-            responseBuilder.header(ACCESS_TOKEN, accessTokenFromHeader).build();
-            responseBuilder.entity(currentUser.getSosPermissionJocCockpit());
 
-            return responseBuilder.build();
-        }catch (org.apache.shiro.session.ExpiredSessionException e){
+            return JOCDefaultResponse.responseStatus200(currentUser.getSosPermissionJocCockpit());
+        } catch (org.apache.shiro.session.ExpiredSessionException e) {
             LOGGER.error(e.getMessage());
-            responseBuilder = get440ResponseBuilder();
-            return responseBuilder.entity(e.getMessage()).build();
+            SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = createSOSShiroCurrentUserAnswer(accessTokenFromHeader,sosWebserviceAuthenticationRecord.getUser(),e.getMessage());
+            return JOCDefaultResponse.responseStatus440(sosShiroCurrentUserAnswer);
         }
-            
-          catch (Exception ee) {
+
+        catch (Exception ee) {
             LOGGER.error(ee.getMessage());
-            responseBuilder = get420ResponseBuilder();
-            return responseBuilder.entity(ee.getMessage()).build();
+            return JOCDefaultResponse.responseStatusJSError(ee.getMessage());
         }
     }
 
     @GET
     @Path("/login")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public Response loginGet(@HeaderParam("Authorization") String basicAuthorization, @QueryParam("user") String user, @QueryParam("pwd") String pwd) {
+    public JOCDefaultResponse loginGet(@HeaderParam("Authorization") String basicAuthorization, @QueryParam("user") String user, @QueryParam("pwd") String pwd) {
         return login(basicAuthorization, user, pwd);
     }
 
@@ -329,7 +320,7 @@ public class SOSServicePermissionShiro {
     @Path("/login")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public Response loginPost(@HeaderParam("Authorization") String basicAuthorization, @QueryParam("user") String user, @QueryParam("pwd") String pwd) {
+    public JOCDefaultResponse loginPost(@HeaderParam("Authorization") String basicAuthorization, @QueryParam("user") String user, @QueryParam("pwd") String pwd) {
         return login(basicAuthorization, user, pwd);
     }
 
@@ -640,21 +631,17 @@ public class SOSServicePermissionShiro {
 
         SOSShiroProperties sosShiroProperties = new SOSShiroProperties();
 
-     
         if (Globals.sosHibernateConnection == null) {
             Globals.sosHibernateConnection = new SOSHibernateConnection(sosShiroProperties.getProperty("hibernate_configuration_file"));
             Globals.sosHibernateConnection.addClassMapping(DBLayer.getInventoryClassMapping());
             Globals.sosHibernateConnection.connect();
         }
-        
- 
 
         if (Globals.sosSchedulerHibernateConnection == null) {
             Globals.sosSchedulerHibernateConnection = new SOSHibernateConnection(sosShiroProperties.getProperty("hibernate_configuration_file"));
             Globals.sosSchedulerHibernateConnection.addClassMapping(DBLayer.getSchedulerClassMapping());
             Globals.sosSchedulerHibernateConnection.connect();
         }
-
 
     }
 
@@ -695,61 +682,32 @@ public class SOSServicePermissionShiro {
 
     }
 
-    private ResponseBuilder get401ResponseBuilder() {
-        Response.ResponseBuilder responseBuilder = null;
-        responseBuilder = Response.status(401).header(CONTENT_TYPE, MediaType.APPLICATION_JSON);
-        responseBuilder.header(ACCESS_TOKEN, EMPTY_STRING).build();
-        return responseBuilder;
-    }
-
-    private ResponseBuilder get440ResponseBuilder() {
-        Response.ResponseBuilder responseBuilder = null;
-        responseBuilder = Response.status(404).header(CONTENT_TYPE, MediaType.APPLICATION_JSON);
-        responseBuilder.header(ACCESS_TOKEN, EMPTY_STRING).build();
-        return responseBuilder;
-    }
-
-    private ResponseBuilder get420ResponseBuilder() {
-        Response.ResponseBuilder responseBuilder = null;
-        responseBuilder = Response.status(420).header(CONTENT_TYPE, MediaType.APPLICATION_JSON);
-        responseBuilder.header(ACCESS_TOKEN, EMPTY_STRING).build();
-        return responseBuilder;
-    }
-
-    private Response login(String basicAuthorization, String user, String pwd) {
+   
+    private JOCDefaultResponse login(String basicAuthorization, String user, String pwd) {
 
         TimeZone.setDefault(TimeZone.getTimeZone(UTC));
-        
+
         Globals.schedulerObjectFactory = new SchedulerObjectFactory();
         Globals.schedulerObjectFactory.initMarshaller(Spooler.class);
         Globals.schedulerObjectFactory.setOmmitXmlDeclaration(true);
-        
+
         currentUser = getUserPwdFromHeaderOrQuery(basicAuthorization, user, pwd);
-        Response.ResponseBuilder responseBuilder = null;
         if (currentUser == null) {
-            responseBuilder = get401ResponseBuilder();
-            LOGGER.debug(USER_IS_NULL);
-            return responseBuilder.entity(AUTHORIZATION_HEADER_WITH_BASIC_BASED64PART_EXPECTED).build();
+            return JOCDefaultResponse.responseStatusJSError(USER_IS_NULL + " " + AUTHORIZATION_HEADER_WITH_BASIC_BASED64PART_EXPECTED);
         }
 
         try {
             SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = authenticate();
 
             if (!sosShiroCurrentUserAnswer.isAuthenticated()) {
-                responseBuilder = get401ResponseBuilder();
-                responseBuilder.entity(sosShiroCurrentUserAnswer);
+                return JOCDefaultResponse.responseStatus401(sosShiroCurrentUserAnswer);
             } else {
-                responseBuilder = Response.status(200).header(CONTENT_TYPE, MediaType.APPLICATION_JSON);
-                responseBuilder.header(ACCESS_TOKEN, sosShiroCurrentUserAnswer.getAccessToken()).build();
-                responseBuilder.header(TIMEOUT, currentUser.getCurrentSubject().getSession().getTimeout()).build();
-                responseBuilder.entity(sosShiroCurrentUserAnswer);
+                return JOCDefaultResponse.responseStatus200WithHeaders(sosShiroCurrentUserAnswer,sosShiroCurrentUserAnswer.getAccessToken(),currentUser.getCurrentSubject().getSession().getTimeout());
             }
 
-            return responseBuilder.build();
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-            responseBuilder = get401ResponseBuilder();
-            return responseBuilder.entity(e.getMessage()).build();
+            LOGGER.error(e.getMessage(), e);
+            return JOCDefaultResponse.responseStatusJSError(e.getMessage());
         }
     }
 
@@ -759,6 +717,17 @@ public class SOSServicePermissionShiro {
         } else {
             LOGGER.warn(USER_IS_NULL);
         }
+    }
+
+    private SOSShiroCurrentUserAnswer createSOSShiroCurrentUserAnswer(String accessToken, String user, String message) {
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer();
+        sosShiroCurrentUserAnswer.setAccessToken(accessToken);
+        sosShiroCurrentUserAnswer.setUser(user);
+        sosShiroCurrentUserAnswer.setHasRole(false);
+        sosShiroCurrentUserAnswer.setIsAuthenticated(false);
+        sosShiroCurrentUserAnswer.setIsPermitted(false);
+        sosShiroCurrentUserAnswer.setMessage(message);
+        return sosShiroCurrentUserAnswer;
     }
 
 }
