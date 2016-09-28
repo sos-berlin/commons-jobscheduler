@@ -13,10 +13,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 
-import com.sos.auth.classes.SOSShiroProperties;
 import com.sos.auth.rest.permission.model.ObjectFactory;
 import com.sos.auth.rest.permission.model.SOSPermissionDashboard;
 import com.sos.auth.rest.permission.model.SOSPermissionEvents;
@@ -33,6 +30,7 @@ import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
+import com.sos.joc.classes.JocCockpitProperties;
 import com.sos.joc.model.common.Error420Schema;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.objects.Spooler;
@@ -42,13 +40,11 @@ import org.apache.shiro.session.Session;
 
 @Path("/security")
 public class SOSServicePermissionShiro {
-    private static final String TIMEOUT = "timeout";
     private static final String ACCESS_TOKEN = "access_token";
     private static final String UTC = "UTC";
     private static final String UNKNOWN_USER = "*Unknown User*";
     private static final String EMPTY_STRING = "";
     private static final String USER_IS_NULL = "user is null";
-    private static final String CONTENT_TYPE = "Content-Type";
     private static final String AUTHORIZATION_HEADER_WITH_BASIC_BASED64PART_EXPECTED = "Authorization Header with Basic based64part expected";
     private static final String ROLE_API_USER = "api_user";
     private static final String ROLE_BUSINESS_USER = "business_user";
@@ -629,7 +625,7 @@ public class SOSServicePermissionShiro {
         SOSPermissionJocCockpit sosPermissionJocCockpit = createPermissionObject(accessToken, EMPTY_STRING, EMPTY_STRING);
         currentUser.setSosPermissionJocCockpit(sosPermissionJocCockpit);
 
-        SOSShiroProperties sosShiroProperties = new SOSShiroProperties();
+        JocCockpitProperties sosShiroProperties = new JocCockpitProperties();
 
         if (Globals.sosHibernateConnection == null) {
             Globals.sosHibernateConnection = new SOSHibernateConnection(sosShiroProperties.getProperty("hibernate_configuration_file"));
