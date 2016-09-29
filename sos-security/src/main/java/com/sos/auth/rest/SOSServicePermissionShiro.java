@@ -632,13 +632,6 @@ public class SOSServicePermissionShiro {
             Globals.sosHibernateConnection.addClassMapping(DBLayer.getInventoryClassMapping());
             Globals.sosHibernateConnection.connect();
         }
-
-        if (Globals.sosSchedulerHibernateConnection == null) {
-            Globals.sosSchedulerHibernateConnection = new SOSHibernateConnection(sosShiroProperties.getProperty("hibernate_configuration_file"));
-            Globals.sosSchedulerHibernateConnection.addClassMapping(DBLayer.getSchedulerClassMapping());
-            Globals.sosSchedulerHibernateConnection.connect();
-        }
-
     }
 
     private SOSShiroCurrentUser getUserPwdFromHeaderOrQuery(String basicAuthorization, String user, String pwd) {
