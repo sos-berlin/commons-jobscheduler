@@ -2,6 +2,7 @@ package com.sos.auth.rest;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -295,7 +296,8 @@ public class SOSServicePermissionShiro {
             return JOCDefaultResponse.responseStatus200(currentUser.getSosPermissionJocCockpit());
         } catch (org.apache.shiro.session.ExpiredSessionException e) {
             LOGGER.error(e.getMessage());
-            SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = createSOSShiroCurrentUserAnswer(accessTokenFromHeader,sosWebserviceAuthenticationRecord.getUser(),e.getMessage());
+            SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = createSOSShiroCurrentUserAnswer(accessTokenFromHeader, sosWebserviceAuthenticationRecord.getUser(), e
+                    .getMessage());
             return JOCDefaultResponse.responseStatus440(sosShiroCurrentUserAnswer);
         }
 
@@ -340,6 +342,11 @@ public class SOSServicePermissionShiro {
         if (Globals.currentUsersList.size() == 0 && Globals.sosHibernateConnection != null) {
             Globals.sosHibernateConnection.disconnect();
         }
+        if (Globals.sosSchedulerHibernateConnections != null) {
+            for (SOSHibernateConnection sosHibernateConnection : Globals.sosSchedulerHibernateConnections.values()) {
+                sosHibernateConnection.disconnect();
+            }
+        }
 
         return sosShiroCurrentUserAnswer;
     }
@@ -350,6 +357,30 @@ public class SOSServicePermissionShiro {
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public SOSShiroCurrentUserAnswer logoutPost(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader) {
         return logout(accessTokenFromHeader, EMPTY_STRING);
+    }
+
+    @POST
+    @Path("/db_refresh")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+    public JOCDefaultResponse dbRefresh() {
+        try {
+            if (Globals.sosHibernateConnection != null) {
+                Globals.sosHibernateConnection.disconnect();
+                Globals.sosHibernateConnection.connect();
+
+            }
+            if (Globals.sosSchedulerHibernateConnections != null) {
+                for (SOSHibernateConnection sosHibernateConnection : Globals.sosSchedulerHibernateConnections.values()) {
+                    sosHibernateConnection.disconnect();
+                    sosHibernateConnection.connect();
+                }
+            }
+
+            return JOCDefaultResponse.responseStatus200("Db connections reconnected");
+        } catch (Exception e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
+        }
     }
 
     @GET
@@ -632,6 +663,18 @@ public class SOSServicePermissionShiro {
             Globals.sosHibernateConnection.addClassMapping(DBLayer.getInventoryClassMapping());
             Globals.sosHibernateConnection.connect();
         }
+        
+        if (Globals.sosHibernateConnection.getCurrentSession() == null){
+            Globals.sosHibernateConnection.connect();
+        }
+        
+        if (Globals.sosSchedulerHibernateConnections != null){
+            for (SOSHibernateConnection sosHibernateConnection : Globals.sosSchedulerHibernateConnections.values()) {
+                if (sosHibernateConnection.getCurrentSession() == null){
+                    sosHibernateConnection.connect();
+                }
+             }
+        }
     }
 
     private SOSShiroCurrentUser getUserPwdFromHeaderOrQuery(String basicAuthorization, String user, String pwd) {
@@ -671,7 +714,6 @@ public class SOSServicePermissionShiro {
 
     }
 
-   
     private JOCDefaultResponse login(String basicAuthorization, String user, String pwd) {
 
         TimeZone.setDefault(TimeZone.getTimeZone(UTC));
@@ -691,7 +733,8 @@ public class SOSServicePermissionShiro {
             if (!sosShiroCurrentUserAnswer.isAuthenticated()) {
                 return JOCDefaultResponse.responseStatus401(sosShiroCurrentUserAnswer);
             } else {
-                return JOCDefaultResponse.responseStatus200WithHeaders(sosShiroCurrentUserAnswer,sosShiroCurrentUserAnswer.getAccessToken(),currentUser.getCurrentSubject().getSession().getTimeout());
+                return JOCDefaultResponse.responseStatus200WithHeaders(sosShiroCurrentUserAnswer, sosShiroCurrentUserAnswer.getAccessToken(), currentUser.getCurrentSubject()
+                        .getSession().getTimeout());
             }
 
         } catch (Exception e) {
