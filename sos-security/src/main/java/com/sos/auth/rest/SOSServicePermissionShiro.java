@@ -723,6 +723,8 @@ public class SOSServicePermissionShiro {
         Globals.schedulerObjectFactory.setOmmitXmlDeclaration(true);
 
         currentUser = getUserPwdFromHeaderOrQuery(basicAuthorization, user, pwd);
+        currentUser.setAuthorization(basicAuthorization);
+
         if (currentUser == null) {
             return JOCDefaultResponse.responseStatusJSError(USER_IS_NULL + " " + AUTHORIZATION_HEADER_WITH_BASIC_BASED64PART_EXPECTED);
         }
