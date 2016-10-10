@@ -2,7 +2,6 @@ package com.sos.auth.rest;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -32,7 +31,6 @@ import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JocCockpitProperties;
-import com.sos.joc.model.common.Error420Schema;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.objects.Spooler;
 

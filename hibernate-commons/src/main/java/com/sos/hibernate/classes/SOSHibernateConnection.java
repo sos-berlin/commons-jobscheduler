@@ -326,6 +326,10 @@ public class SOSHibernateConnection implements Serializable {
     public Enum<SOSHibernateConnection.Dbms> getDbms() {
         return dbms;
     }
+    
+    public boolean dbmsIsPostgres() {
+        return dbms == SOSHibernateConnection.Dbms.PGSQL;
+    }
 
     public Dialect getDialect() {
         return dialect;
