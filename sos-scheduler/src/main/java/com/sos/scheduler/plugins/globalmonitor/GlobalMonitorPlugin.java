@@ -51,7 +51,7 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
     public byte[] changeXmlConfiguration(FileBasedType typ, AbsolutePath path, byte[] xmlBytes) {
         LOGGER.debug("---------  changeXmlConfiguration");
         Document doc = null;
-        if (typ == FileBasedType.Job) {
+        if (typ == FileBasedType.job) {
             doc = xmlBytesToDom(xmlBytes);
         }
         try {
@@ -64,7 +64,7 @@ public class GlobalMonitorPlugin extends AbstractPlugin implements XmlConfigurat
 
     @Override
     public Set<FileBasedType> fileBasedTypes() {
-        return toScalaSet(FileBasedType.Job);
+        return toScalaSet(FileBasedType.job);
     }
 
     private String getStringFromDocument(Document doc) {
