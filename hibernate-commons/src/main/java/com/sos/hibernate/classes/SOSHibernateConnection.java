@@ -738,11 +738,15 @@ public class SOSHibernateConnection implements Serializable {
         }
         if (currentSession instanceof Session) {
             Session session = ((Session) currentSession);
+            session.beginTransaction();
             session.delete(item);
             session.flush();
+            commit();
         } else if (currentSession instanceof StatelessSession) {
             StatelessSession session = ((StatelessSession) currentSession);
+            session.beginTransaction();
             session.delete(item);
+            commit();
         }
     }
 

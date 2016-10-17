@@ -659,6 +659,7 @@ public class SOSServicePermissionShiro {
         if (Globals.sosHibernateConnection == null) {
             Globals.sosHibernateConnection = new SOSHibernateConnection(sosShiroProperties.getProperty("hibernate_configuration_file"));
             Globals.sosHibernateConnection.addClassMapping(DBLayer.getInventoryClassMapping());
+            Globals.sosHibernateConnection.addClassMapping(DBLayer.getSchedulerClassMapping());
             Globals.sosHibernateConnection.connect();
         }
         
