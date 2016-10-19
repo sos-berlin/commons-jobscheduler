@@ -682,9 +682,7 @@ public class SOSServicePermissionShiro {
             if (basicAuthorization != null) {
                 String[] authorizationParts = basicAuthorization.split(" ");
                 if (authorizationParts.length > 1) {
-                    System.out.println("...decode " + authorizationParts[1]);
                     authorization = new String(Base64.getDecoder().decode(authorizationParts[1].getBytes("UTF-8")), "UTF-8");
-                    System.out.println("... --> decoded " + authorization);
                 }
             }
         } catch (UnsupportedEncodingException e) {
@@ -695,7 +693,6 @@ public class SOSServicePermissionShiro {
         if (authorizationParts.length == 2) {
             user = authorizationParts[0];
             pwd = authorizationParts[1];
-            System.out.println("...user=" + user + " pwd=" + pwd);
         }
         return new SOSShiroCurrentUser(user, pwd);
     }
