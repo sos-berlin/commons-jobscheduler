@@ -694,7 +694,10 @@ public class SOSServicePermissionShiro {
             user = authorizationParts[0];
             pwd = authorizationParts[1];
         }
-        return new SOSShiroCurrentUser(user, pwd);
+        if (user != null) {
+           return new SOSShiroCurrentUser(user, pwd); 
+        }
+        return null;
     }
 
     private SOSShiroCurrentUserAnswer authenticate() throws Exception {
@@ -719,11 +722,11 @@ public class SOSServicePermissionShiro {
         Globals.schedulerObjectFactory.setOmmitXmlDeclaration(true);
 
         currentUser = getUserPwdFromHeaderOrQuery(basicAuthorization, user, pwd);
-        currentUser.setAuthorization(basicAuthorization);
-
         if (currentUser == null) {
-            return JOCDefaultResponse.responseStatusJSError(USER_IS_NULL + " " + AUTHORIZATION_HEADER_WITH_BASIC_BASED64PART_EXPECTED);
+            SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = createSOSShiroCurrentUserAnswer(null, null, USER_IS_NULL + " " + AUTHORIZATION_HEADER_WITH_BASIC_BASED64PART_EXPECTED);
+            return JOCDefaultResponse.responseStatus401(sosShiroCurrentUserAnswer);
         }
+        currentUser.setAuthorization(basicAuthorization);
 
         try {
             SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = authenticate();
@@ -743,7 +746,12 @@ public class SOSServicePermissionShiro {
 
     private void resetTimeOut() {
         if (currentUser != null) {
-            currentUser.getCurrentSubject().getSession().touch();
+            Session curSession = currentUser.getCurrentSubject().getSession(false);
+            if (curSession != null) {
+                curSession.touch();
+            } else {
+                throw new org.apache.shiro.session.InvalidSessionException("Session doesn't exist");
+            }
         } else {
             LOGGER.warn(USER_IS_NULL);
         }
