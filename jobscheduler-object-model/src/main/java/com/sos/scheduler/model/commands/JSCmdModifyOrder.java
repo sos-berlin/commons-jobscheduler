@@ -1,6 +1,7 @@
 package com.sos.scheduler.model.commands;
 
 import java.math.BigInteger;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -39,6 +40,12 @@ public class JSCmdModifyOrder extends ModifyOrder {
 
         return objParams;
     } // private Params setParams
+    
+    public Params setParams(Map<String, String> params) {
+        Params objParams = objFactory.setParams(params);
+        super.setParams(objParams);
+        return objParams;
+    }
 
     /** Sets the value of the xmlPayload property. */
     public void setXmlPayloadIfNotEmpty(XmlPayload value) {

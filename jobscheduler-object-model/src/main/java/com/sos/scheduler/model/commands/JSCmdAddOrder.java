@@ -1,6 +1,7 @@
 package com.sos.scheduler.model.commands;
 
 import java.math.BigInteger;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -87,5 +88,11 @@ public class JSCmdAddOrder extends JSObjOrder {
 
         return objParams;
     } // private Params setParams
+    
+    public Params setParams(Map<String, String> params) {
+        Params objParams = objFactory.setParams(params);
+        super.setParams(objParams);
+        return objParams;
+    }
 
 }

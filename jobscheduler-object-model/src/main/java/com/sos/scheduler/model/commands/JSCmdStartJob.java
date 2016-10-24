@@ -1,5 +1,7 @@
 package com.sos.scheduler.model.commands;
 
+import java.util.Map;
+
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.answers.Ok;
 import com.sos.scheduler.model.answers.Task;
@@ -23,6 +25,12 @@ public class JSCmdStartJob extends StartJob {
 
     public Params setParams(String[] pstrParamArray) {
         Params objParams = objFactory.setParams(pstrParamArray);
+        super.setParams(objParams);
+        return objParams;
+    }
+    
+    public Params setParams(Map<String, String> params) {
+        Params objParams = objFactory.setParams(params);
         super.setParams(objParams);
         return objParams;
     }
