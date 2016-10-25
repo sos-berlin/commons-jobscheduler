@@ -14,6 +14,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.log4j.Logger;
+import org.apache.shiro.session.Session;
+
 import com.sos.auth.rest.permission.model.ObjectFactory;
 import com.sos.auth.rest.permission.model.SOSPermissionDashboard;
 import com.sos.auth.rest.permission.model.SOSPermissionEvents;
@@ -33,9 +36,6 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JocCockpitProperties;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.objects.Spooler;
-
-import org.apache.log4j.Logger;
-import org.apache.shiro.session.Session;
 
 @Path("/security")
 public class SOSServicePermissionShiro {
@@ -64,7 +64,7 @@ public class SOSServicePermissionShiro {
     private static final Logger LOGGER = Logger.getLogger(SOSServicePermissionShiro.class);
 
     private SOSShiroCurrentUser currentUser;
-
+ 
     @GET
     @Path("/permissions")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
@@ -616,13 +616,17 @@ public class SOSServicePermissionShiro {
         }
         return sosPermissionJocCockpit;
     }
+    
+    private boolean isPermitted(String permission){
+        return (currentUser != null && currentUser.isPermitted(permission) && currentUser.isAuthenticated());    
+    }
 
     private boolean haveRight(String permission) {
-        return (currentUser != null && currentUser.isPermitted(permission) && currentUser.isAuthenticated());
+        return isPermitted(permission);
     }
 
     private void addPermission(List<String> sosPermission, String permission) {
-        if (currentUser != null && currentUser.isPermitted(permission) && currentUser.isAuthenticated()) {
+        if (isPermitted(permission)) {
             sosPermission.add(permission);
         }
 
@@ -634,7 +638,7 @@ public class SOSServicePermissionShiro {
         }
 
     }
-
+    
     private void createUser() throws Exception {
         if (Globals.currentUsersList == null) {
             Globals.currentUsersList = new SOSShiroCurrentUsersList();
@@ -654,25 +658,24 @@ public class SOSServicePermissionShiro {
         SOSPermissionJocCockpit sosPermissionJocCockpit = createPermissionObject(accessToken, EMPTY_STRING, EMPTY_STRING);
         currentUser.setSosPermissionJocCockpit(sosPermissionJocCockpit);
 
-        JocCockpitProperties sosShiroProperties = new JocCockpitProperties();
-
         if (Globals.sosHibernateConnection == null) {
-            Globals.sosHibernateConnection = new SOSHibernateConnection(sosShiroProperties.getProperty("hibernate_configuration_file"));
+            JocCockpitProperties sosShiroProperties = new JocCockpitProperties();
+            String hibernateConfigurationFileName = sosShiroProperties.getProperty("hibernate_configuration_file","./hibernate.cfg.xml");
+            Globals.sosHibernateConnection = new SOSHibernateConnection(hibernateConfigurationFileName);
             Globals.sosHibernateConnection.addClassMapping(DBLayer.getInventoryClassMapping());
-            Globals.sosHibernateConnection.addClassMapping(DBLayer.getReportingClassMapping());
             Globals.sosHibernateConnection.connect();
         }
-        
-        if (Globals.sosHibernateConnection.getCurrentSession() == null){
+
+        if (Globals.sosHibernateConnection.getCurrentSession() == null) {
             Globals.sosHibernateConnection.connect();
         }
-        
-        if (Globals.sosSchedulerHibernateConnections != null){
+
+        if (Globals.sosSchedulerHibernateConnections != null) {
             for (SOSHibernateConnection sosHibernateConnection : Globals.sosSchedulerHibernateConnections.values()) {
-                if (sosHibernateConnection.getCurrentSession() == null){
+                if (sosHibernateConnection.getCurrentSession() == null) {
                     sosHibernateConnection.connect();
                 }
-             }
+            }
         }
     }
 
@@ -682,7 +685,9 @@ public class SOSServicePermissionShiro {
             if (basicAuthorization != null) {
                 String[] authorizationParts = basicAuthorization.split(" ");
                 if (authorizationParts.length > 1) {
+                    System.out.println("...decode " + authorizationParts[1]);
                     authorization = new String(Base64.getDecoder().decode(authorizationParts[1].getBytes("UTF-8")), "UTF-8");
+                    System.out.println("... --> decoded " + authorization);
                 }
             }
         } catch (UnsupportedEncodingException e) {
@@ -693,11 +698,9 @@ public class SOSServicePermissionShiro {
         if (authorizationParts.length == 2) {
             user = authorizationParts[0];
             pwd = authorizationParts[1];
+            System.out.println("...user=" + user + " pwd=" + pwd);
         }
-        if (user != null) {
-           return new SOSShiroCurrentUser(user, pwd); 
-        }
-        return null;
+        return new SOSShiroCurrentUser(user, pwd);
     }
 
     private SOSShiroCurrentUserAnswer authenticate() throws Exception {
@@ -722,10 +725,11 @@ public class SOSServicePermissionShiro {
         Globals.schedulerObjectFactory.setOmmitXmlDeclaration(true);
 
         currentUser = getUserPwdFromHeaderOrQuery(basicAuthorization, user, pwd);
+
         if (currentUser == null) {
-            SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = createSOSShiroCurrentUserAnswer(null, null, USER_IS_NULL + " " + AUTHORIZATION_HEADER_WITH_BASIC_BASED64PART_EXPECTED);
-            return JOCDefaultResponse.responseStatus401(sosShiroCurrentUserAnswer);
+            return JOCDefaultResponse.responseStatusJSError(USER_IS_NULL + " " + AUTHORIZATION_HEADER_WITH_BASIC_BASED64PART_EXPECTED);
         }
+
         currentUser.setAuthorization(basicAuthorization);
 
         try {
@@ -739,12 +743,12 @@ public class SOSServicePermissionShiro {
             }
 
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            return JOCDefaultResponse.responseStatusJSError(e.getMessage());
+            return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
 
     private void resetTimeOut() {
+
         if (currentUser != null) {
             Session curSession = currentUser.getCurrentSubject().getSession(false);
             if (curSession != null) {
@@ -753,7 +757,7 @@ public class SOSServicePermissionShiro {
                 throw new org.apache.shiro.session.InvalidSessionException("Session doesn't exist");
             }
         } else {
-            LOGGER.warn(USER_IS_NULL);
+            LOGGER.error(USER_IS_NULL);
         }
     }
 
