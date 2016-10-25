@@ -45,6 +45,7 @@ public class JSCommands extends JSCommand {
         }
         xmlCmd.append("</commands>");
         logger.info(xmlCmd.toString());
+        @SuppressWarnings("unchecked")
         JAXBElement<JSObjBase> obj = (JAXBElement<JSObjBase>) cmdContainer.unMarshal(xmlCmd.toString());
         cmdContainer.setObjectFieldsFrom(obj.getValue());
         logger.info(cmdContainer.toXMLString());

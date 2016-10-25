@@ -68,7 +68,6 @@ public class JSObjParams extends Params {
     }
 
     public void setParamsFromString(final String paramString) {
-        JSObjParams result = objFactory.createParams();
         try {
             if (!Strings.isNullOrEmpty(paramString)) {
                 Params params = (Params) objFactory.unMarshall(paramString);

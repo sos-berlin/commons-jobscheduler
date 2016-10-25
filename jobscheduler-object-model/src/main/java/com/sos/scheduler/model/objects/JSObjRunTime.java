@@ -25,6 +25,7 @@ public class JSObjRunTime extends RunTime {
         period = getPeriodObject();
     }
 
+    @SuppressWarnings("unchecked")
     public JSObjRunTime(final SchedulerObjectFactory schedulerObjectFactory, final String xmlContent) {
         super();
         objFactory = schedulerObjectFactory;

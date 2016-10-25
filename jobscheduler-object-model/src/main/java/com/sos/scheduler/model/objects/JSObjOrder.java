@@ -16,6 +16,7 @@ public class JSObjOrder extends Order {
     private static final Logger LOGGER = Logger.getLogger(JSObjOrder.class);
     public final static String fileNameExtension = ".order.xml";
 
+    @SuppressWarnings("unchecked")
     public JSObjOrder(final SchedulerObjectFactory schedulerObjectFactory) {
         try {
             objFactory = schedulerObjectFactory;
@@ -28,6 +29,7 @@ public class JSObjOrder extends Order {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public JSObjOrder(final SchedulerObjectFactory schedulerObjectFactory, final String rootElementName) {
         objFactory = schedulerObjectFactory;
         objJAXBElement = (JAXBElement<JSObjBase>) unMarshal("<" + rootElementName + "/>");
@@ -35,6 +37,7 @@ public class JSObjOrder extends Order {
         doInit();
     }
 
+    @SuppressWarnings("unchecked")
     public JSObjOrder(final SchedulerObjectFactory schedulerObjectFactory, final ISOSVirtualFile pobjVirtualFile) {
         objFactory = schedulerObjectFactory;
         objJAXBElement = (JAXBElement<JSObjBase>) unMarshal(pobjVirtualFile);
@@ -56,6 +59,7 @@ public class JSObjOrder extends Order {
         return super.getRunTime();
     }
 
+    @SuppressWarnings("unchecked")
     public JSObjOrder getOrderFromXMLString(final String xmlString) {
         objJAXBElement = (JAXBElement<JSObjBase>) unMarshal(xmlString);
         Order o = (Order) objJAXBElement.getValue();

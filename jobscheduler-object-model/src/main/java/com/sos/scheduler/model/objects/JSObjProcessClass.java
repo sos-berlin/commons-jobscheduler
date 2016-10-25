@@ -29,6 +29,7 @@ public class JSObjProcessClass extends ProcessClass {
         setObjectFieldsFrom(origOrder);
     }
 
+    @SuppressWarnings("unchecked")
     public JSObjProcessClass(final SchedulerObjectFactory schedulerObjectFactory, final ISOSVirtualFile pobjVirtualFile) {
         objFactory = schedulerObjectFactory;
         objJAXBElement = (JAXBElement<JSObjBase>) unMarshal(pobjVirtualFile);

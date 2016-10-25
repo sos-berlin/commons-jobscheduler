@@ -15,6 +15,7 @@ public class JSCmdSubsystemShow extends SubsystemShow {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public JSCmdSubsystemShow(SchedulerObjectFactory schedulerObjectFactory) {
         super();
         objFactory = schedulerObjectFactory;

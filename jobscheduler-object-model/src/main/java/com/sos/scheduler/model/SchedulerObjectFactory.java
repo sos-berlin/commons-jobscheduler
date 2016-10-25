@@ -420,7 +420,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
 
     private String toXMLString(final Object objO, final Marshaller objMarshaller) {
         
-       
+        
         String strT = "";
         try {
             XMLSerializer serializer = getXMLSerializer();
@@ -449,6 +449,9 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         if (objO.getClass().getName().startsWith("com.sos.scheduler.model.answers.")) {
             return answerToXMLString(objO);
         }
+        if (objO.getClass().getName().startsWith("com.sos.scheduler.model.commands.")) {
+            return cmdToXMLString(objO);
+        }
         return toXMLString(objO, objM);
     }
 
@@ -456,7 +459,21 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         initAnswerMarshaller();
         return toXMLString(objO, objM4Answers);
     }
-
+    
+    private String cmdToXMLString(final Object objO) {
+        StringWriter s = new StringWriter();
+        try {
+            objM.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            objM.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+            objM.marshal(objO, s);
+        } catch (JAXBException e) {
+            throw new JobSchedulerException(e.getMessage(), e);
+        } catch (Exception e) {
+            throw new JobSchedulerException(e.getMessage(), e);
+        }
+        return s.toString();
+    }
+    
     private XMLSerializer getXMLSerializer() {
         OutputFormat of = new OutputFormat();
         of.setCDataElements(new String[] { "^description", "^script", "^scheduler_script", "^log_mail_to", "^log_mail_cc", "^log_mail_bcc" });
@@ -507,13 +524,9 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
     }
 
     public Params setParams(final Properties pobjProperties) {
-        String strParamValue = "";
         Params objParams = super.createParams();
-        for (final Entry element : pobjProperties.entrySet()) {
-            final Map.Entry<String, String> mapItem = element;
-            String key = mapItem.getKey().toString();
-            strParamValue = mapItem.getValue();
-            Param objP = this.createParam(key, strParamValue);
+        for (final Entry<Object,Object> element : pobjProperties.entrySet()) {
+            Param objP = this.createParam(element.getKey().toString(), element.getValue().toString());
             objParams.getParamOrCopyParamsOrInclude().add(objP);
         }
         return objParams;

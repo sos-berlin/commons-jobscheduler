@@ -2,7 +2,6 @@ package com.sos.auth.shiro.db;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.hibernate.Query;
 
 import com.sos.hibernate.layer.SOSHibernateDBLayer;
@@ -10,7 +9,6 @@ import com.sos.hibernate.layer.SOSHibernateDBLayer;
 /** @author Uwe Risse */
 public class SOSUserDBLayer extends SOSHibernateDBLayer {
 
-    private static final Logger LOGGER = Logger.getLogger(SOSUserDBLayer.class);
     private SOSUserFilter filter = null;
 
     public SOSUserDBLayer(String configurationFileName) {
@@ -54,6 +52,7 @@ public class SOSUserDBLayer extends SOSHibernateDBLayer {
         return where;
     }
 
+    @SuppressWarnings("unchecked")
     public List<SOSUserDBItem> getSOSUserList(final int limit) throws Exception {
         if (connection == null) {
             initConnection(getConfigurationFileName());

@@ -3,20 +3,14 @@ package com.sos.scheduler.model.commands;
 import java.math.BigInteger;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.objects.Params;
-import com.sos.scheduler.model.objects.RunTime;
 import com.sos.scheduler.model.objects.XmlPayload;
 
 public class JSCmdModifyOrder extends ModifyOrder {
 
-    @SuppressWarnings("unused")
     private final String conClassName = "JSCmdModifyOrder";
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(JSCmdModifyOrder.class);
-
+    
     public JSCmdModifyOrder(SchedulerObjectFactory schedulerObjectFactory) {
         super();
         objFactory = schedulerObjectFactory;

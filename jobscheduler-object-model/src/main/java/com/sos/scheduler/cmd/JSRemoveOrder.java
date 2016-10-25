@@ -9,6 +9,7 @@ public class JSRemoveOrder extends JSCommand {
 
     private final Logger logger = Logger.getLogger(JSRemoveOrder.class);
 
+    @SuppressWarnings("unused")
     private final JSCmdRemoveOrder cmdRemoveOrder;
 
     public JSRemoveOrder(String host, Integer port, String orderId, String jobChain) {

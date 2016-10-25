@@ -1,7 +1,5 @@
 package com.sos.scheduler.model.objects;
 
-import org.apache.log4j.Logger;
-
 import com.sos.scheduler.model.SchedulerObjectFactory;
 
 import javax.xml.bind.JAXBElement;
@@ -36,9 +34,8 @@ public class JSObjCommands extends Commands {
 
     @SuppressWarnings("unused")
     private final String conClassName = "JSObjCommands";
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(JSObjCommands.class);
 
+    @SuppressWarnings("unchecked")
     public JSObjCommands(SchedulerObjectFactory schedulerObjectFactory) {
         super();
         objFactory = schedulerObjectFactory;

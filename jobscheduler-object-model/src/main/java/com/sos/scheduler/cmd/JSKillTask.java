@@ -10,6 +10,7 @@ public class JSKillTask extends JSCommand {
 
     private final Logger logger = Logger.getLogger(JSKillTask.class);
 
+    @SuppressWarnings("unused")
     private final JSCmdKillTask cmdKillTask;
 
     public JSKillTask(String host, Integer port, Integer taskId, String jobName, Boolean immediately) {
