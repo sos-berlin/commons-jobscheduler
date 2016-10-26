@@ -663,6 +663,7 @@ public class SOSServicePermissionShiro {
             String hibernateConfigurationFileName = sosShiroProperties.getProperty("hibernate_configuration_file","./hibernate.cfg.xml");
             Globals.sosHibernateConnection = new SOSHibernateConnection(hibernateConfigurationFileName);
             Globals.sosHibernateConnection.addClassMapping(DBLayer.getInventoryClassMapping());
+            Globals.sosHibernateConnection.addClassMapping(DBLayer.getReportingClassMapping());
             Globals.sosHibernateConnection.connect();
         }
 
