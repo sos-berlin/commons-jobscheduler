@@ -696,7 +696,6 @@ public class SOSServicePermissionShiro {
         if (authorizationParts.length == 2) {
             user = authorizationParts[0];
             pwd = authorizationParts[1];
-            System.out.println("...user=" + user + " pwd=" + pwd);
         }
         return new SOSShiroCurrentUser(user, pwd);
     }
