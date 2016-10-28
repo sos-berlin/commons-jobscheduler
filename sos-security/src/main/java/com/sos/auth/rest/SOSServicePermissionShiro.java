@@ -34,6 +34,7 @@ import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JocCockpitProperties;
+import com.sos.joc.classes.WebserviceConstants;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.objects.Spooler;
 
@@ -305,12 +306,6 @@ public class SOSServicePermissionShiro {
         }
     }
 
-    @GET
-    @Path("/login")
-    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse loginGet(@HeaderParam("Authorization") String basicAuthorization, @QueryParam("user") String user, @QueryParam("pwd") String pwd) {
-        return login(basicAuthorization, user, pwd);
-    }
 
     @POST
     @Path("/login")
@@ -381,12 +376,6 @@ public class SOSServicePermissionShiro {
         }
     }
 
-    @GET
-    @Path("/logout")
-    @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSShiroCurrentUserAnswer logoutGet(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader, @QueryParam(ACCESS_TOKEN) String accessTokenFromQuery) {
-        return logout(accessTokenFromHeader, accessTokenFromQuery);
-    }
 
     @GET
     @Path("/role")
@@ -709,7 +698,12 @@ public class SOSServicePermissionShiro {
         sosShiroCurrentUserAnswer.setIsAuthenticated(currentUser.getCurrentSubject().isAuthenticated());
         sosShiroCurrentUserAnswer.setAccessToken(currentUser.getAccessToken());
         sosShiroCurrentUserAnswer.setUser(currentUser.getUsername());
-
+        sosShiroCurrentUserAnswer.setSessionTimeout(currentUser.getCurrentSubject().getSession().getTimeout());
+        
+        JocCockpitProperties sosShiroProperties = new JocCockpitProperties();
+        boolean enableTouch = "true".equals(sosShiroProperties.getProperty(WebserviceConstants.ENABLE_SESSION_TOUCH,WebserviceConstants.ENABLE_SESSION_TOUCH_DEFAULT));
+        sosShiroCurrentUserAnswer.setEnableTouch(enableTouch);
+ 
         return sosShiroCurrentUserAnswer;
 
     }
