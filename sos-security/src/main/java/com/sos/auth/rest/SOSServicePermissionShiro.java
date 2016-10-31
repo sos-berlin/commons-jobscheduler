@@ -259,15 +259,18 @@ public class SOSServicePermissionShiro {
 
     }
 
+    public JOCDefaultResponse getJocCockpitPermissions(String accessToken, String user, String pwd) {
+        this.setCurrentUserfromAccessToken(accessToken, user, pwd);
+        return JOCDefaultResponse.responseStatus200(createPermissionObject(accessToken, user, pwd));
+    }
+    
     @GET
     @Path("/joc_cockpit_permissions")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public JOCDefaultResponse getJocCockpitPermissions(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader, @QueryParam(ACCESS_TOKEN) String accessTokenFromQuery,
             @QueryParam("user") String user, @QueryParam("pwd") String pwd) {
         String accessToken = getAccessToken(accessTokenFromHeader, accessTokenFromQuery);
-
-        this.setCurrentUserfromAccessToken(accessToken, user, pwd);
-        return JOCDefaultResponse.responseStatus200(createPermissionObject(accessToken, user, pwd));
+        return getJocCockpitPermissions(accessToken, user, pwd);
     }
 
     @POST
@@ -603,6 +606,9 @@ public class SOSServicePermissionShiro {
                     "sos:products:joc_cockpit:maintenance_window:enable_disable_mainenance_window"));
 
         }
+        
+        currentUser.setSosPermissionJocCockpit(sosPermissionJocCockpit);
+        Globals.currentUsersList.addUser(currentUser);
         return sosPermissionJocCockpit;
     }
     
