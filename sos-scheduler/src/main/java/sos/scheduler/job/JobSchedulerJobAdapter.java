@@ -224,7 +224,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         for (Map.Entry<String, String> entry : set) {
             String key = entry.getKey();
             String newParameterName = getParameterName(key);
-            System.out.println(key + "=>" + newParameterName);
             if (!key.equals(newParameterName)){
                 String val = entry.getValue();
                 newSchedulerParameters.put(newParameterName,val);
