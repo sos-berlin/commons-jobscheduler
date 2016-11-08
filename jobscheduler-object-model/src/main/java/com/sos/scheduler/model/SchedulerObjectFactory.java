@@ -465,6 +465,7 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         try {
             objM.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             objM.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+            objM.setProperty(Marshaller.JAXB_FRAGMENT, ommitXmlDeclaration);
             objM.marshal(objO, s);
         } catch (JAXBException e) {
             throw new JobSchedulerException(e.getMessage(), e);
