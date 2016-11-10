@@ -706,8 +706,7 @@ public class SOSServicePermissionShiro {
         sosShiroCurrentUserAnswer.setUser(currentUser.getUsername());
         sosShiroCurrentUserAnswer.setSessionTimeout(currentUser.getCurrentSubject().getSession().getTimeout());
         
-        JocCockpitProperties sosShiroProperties = new JocCockpitProperties();
-        boolean enableTouch = "true".equals(sosShiroProperties.getProperty(WebserviceConstants.ENABLE_SESSION_TOUCH,WebserviceConstants.ENABLE_SESSION_TOUCH_DEFAULT));
+        boolean enableTouch = "true".equals(Globals.sosShiroProperties.getProperty(WebserviceConstants.ENABLE_SESSION_TOUCH,WebserviceConstants.ENABLE_SESSION_TOUCH_DEFAULT));
         sosShiroCurrentUserAnswer.setEnableTouch(enableTouch);
  
         return sosShiroCurrentUserAnswer;
@@ -721,6 +720,7 @@ public class SOSServicePermissionShiro {
         Globals.schedulerObjectFactory = new SchedulerObjectFactory();
         Globals.schedulerObjectFactory.initMarshaller(Spooler.class);
         Globals.schedulerObjectFactory.setOmmitXmlDeclaration(true);
+        Globals.sosShiroProperties = new JocCockpitProperties();
 
         currentUser = getUserPwdFromHeaderOrQuery(basicAuthorization, user, pwd);
 

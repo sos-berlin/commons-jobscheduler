@@ -45,9 +45,7 @@ public abstract class SOSHibernateIntervalDBLayer extends SOSHibernateDBLayer {
                 int i = 0;
                 while (dbitemEntries.hasNext()) {
                     DbItem h = (DbItem) dbitemEntries.next();
-                    connection.beginTransaction();
                     connection.delete(h);
-                    connection.commit();
                     this.onAfterDeleting(h);
                     deleted = deleted + 1;
                     i = i + 1;

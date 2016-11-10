@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
 
 import com.sos.hibernate.classes.ClassList;
 import com.sos.hibernate.classes.SOSHibernateConnection;
-
+ 
 /** @author Uwe Risse */
 public class SOSHibernateDBLayer {
 
@@ -35,6 +35,7 @@ public class SOSHibernateDBLayer {
             try {
                 connection = new SOSHibernateConnection(configurationFileName);
                 connection.addClassMapping(getDefaultClassMapping());
+
                 connection.connect();
             } catch (Exception e) {
                 LOGGER.error(String.format("Could not initiate hibernate connection for database using file %s", configurationFileName), e);
@@ -65,6 +66,8 @@ public class SOSHibernateDBLayer {
     private static ClassList getDefaultClassMapping() {
         ClassList classList = new ClassList();
         classList.addClassIfExist("com.sos.dailyschedule.db.DailyScheduleDBItem");
+        classList.addClassIfExist("com.sos.jitl.dailyplan.db.DailyPlanDBItem");
+        classList.addClassIfExist("com.sos.scheduler.notification.db.DBItemSchedulerMonChecks");
         classList.addClassIfExist("com.sos.scheduler.history.db.SchedulerTaskHistoryDBItem");
         classList.addClassIfExist("com.sos.scheduler.history.db.SchedulerOrderStepHistoryDBItem");
         classList.addClassIfExist("com.sos.scheduler.history.db.SchedulerOrderHistoryDBItem");
@@ -87,6 +90,10 @@ public class SOSHibernateDBLayer {
         classList.addClassIfExist("com.sos.scheduler.notification.db.DBItemSchedulerMonSystemNotifications");
         classList.addClassIfExist("com.sos.scheduler.notification.db.DBItemSchedulerMonResults");
         classList.addClassIfExist("com.sos.scheduler.notification.db.DBItemSchedulerMonChecks");
+        classList.addClassIfExist("com.sos.jitl.reporting.db.DBItemReportTrigger");
+        classList.addClassIfExist("com.sos.jitl.reporting.db.DBItemReportExecution");
+        classList.addClassIfExist("com.sos.jitl.reporting.db.DBItemReportTrigger.DBItemReportTriggerResult");
+        classList.addClassIfExist("com.sos.jitl.reporting.db.DBItemReportTrigger.DBItemReportExecutionDate");
         return classList;
     }
 
