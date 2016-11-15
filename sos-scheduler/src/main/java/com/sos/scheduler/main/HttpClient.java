@@ -32,14 +32,15 @@ public class HttpClient {
         String portFromCommandLine = null;
         boolean answerWithIndent = false;
         for (int i=0; i < args.length; i++) {
-            if (args[i].startsWith(SCHEDULER_XML_OPTION)) {
-                schedulerXml = getValueOfCliOption(args[i], SCHEDULER_XML_OPTION);
-            } else if (args[i].startsWith(HTTP_PORT_OPTION)) {
-                portFromCommandLine = getValueOfCliOption(args[i], HTTP_PORT_OPTION);
-            } else if (args[i].startsWith(WITH_INDENT_OPTION)) {
+            String arg = args[i].replaceFirst("^\"", "").replaceFirst("\"$", "");
+            if (arg.startsWith(SCHEDULER_XML_OPTION)) {
+                schedulerXml = getValueOfCliOption(arg, SCHEDULER_XML_OPTION);
+            } else if (arg.startsWith(HTTP_PORT_OPTION)) {
+                portFromCommandLine = getValueOfCliOption(arg, HTTP_PORT_OPTION);
+            } else if (arg.startsWith(WITH_INDENT_OPTION)) {
                 answerWithIndent = true;
-            } else if (!args[i].startsWith("-")) {
-                xmlCommand = getValueOfCliOption(args[i], null);
+            } else if (!arg.startsWith("-")) {
+                xmlCommand = getValueOfCliOption(arg, null);
             }
         }
         try {
