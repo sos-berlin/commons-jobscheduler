@@ -23,6 +23,7 @@ public class HttpClient {
     private static final String SCHEDULER_XML_OPTION = "-config=";
     private static final String HTTP_PORT_OPTION = "-http-port=";
     private static final String WITH_INDENT_OPTION = "-with-indent";
+    private static final String XML_COMMAND_OPTION = "-xml-command";
     private static final String XML_COMMAND_API_PATH = "http://localhost:%1$s/jobscheduler/master/api/command";
 
     public static void main(String[] args) {
@@ -39,17 +40,17 @@ public class HttpClient {
                 portFromCommandLine = getValueOfCliOption(arg, HTTP_PORT_OPTION);
             } else if (arg.startsWith(WITH_INDENT_OPTION)) {
                 answerWithIndent = true;
-            } else if (!arg.startsWith("-")) {
-                xmlCommand = getValueOfCliOption(arg, null);
+            } else if (arg.startsWith(XML_COMMAND_OPTION)) {
+                xmlCommand = getValueOfCliOption(arg, XML_COMMAND_OPTION);
             }
         }
         try {
             if (xmlCommand == null) {
                 throw new IllegalArgumentException("xml command is required"); 
             }
-            if (portFromCommandLine != null) {
+            if (portFromCommandLine != null && !portFromCommandLine.isEmpty()) {
                 port = portFromCommandLine; 
-            } else if (schedulerXml != null) {
+            } else if (schedulerXml != null && !schedulerXml.isEmpty()) {
                 port = getPortFromSchedulerXml(schedulerXml);
             }
             if (port == null) {
