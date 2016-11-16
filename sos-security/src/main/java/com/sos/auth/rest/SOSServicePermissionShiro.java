@@ -142,7 +142,7 @@ public class SOSServicePermissionShiro {
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:abort");
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master:manage_categories");
 
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master_cluster:view:cluster_status");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master_cluster:view:status");
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master_cluster:terminate_fail_safe");
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master_cluster:restart");
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master_cluster:terminate");
@@ -522,8 +522,8 @@ public class SOSServicePermissionShiro {
             sosPermissionJocCockpit.getJobschedulerMaster().setAbort(haveRight("sos:products:joc_cockpit:jobscheduler_master:abort"));
             sosPermissionJocCockpit.getJobschedulerMaster().setManageCategories(haveRight("sos:products:joc_cockpit:jobscheduler_master:manage_categories"));
 
-            sosPermissionJocCockpit.getJobschedulerMasterCluster().getView().setClusterStatus(haveRight(
-                    "sos:products:joc_cockpit:jobscheduler_master_cluster:view:cluster_status"));
+            sosPermissionJocCockpit.getJobschedulerMasterCluster().getView().setStatus(haveRight(
+                    "sos:products:joc_cockpit:jobscheduler_master_cluster:view:status"));
             sosPermissionJocCockpit.getJobschedulerMasterCluster().setTerminateFailSafe(haveRight("sos:products:joc_cockpit:jobscheduler_master_cluster:terminate_fail_safe"));
             sosPermissionJocCockpit.getJobschedulerMasterCluster().setRestart(haveRight("sos:products:joc_cockpit:jobscheduler_master_cluster:restart"));
             sosPermissionJocCockpit.getJobschedulerMasterCluster().setTerminate(haveRight("sos:products:joc_cockpit:jobscheduler_master_cluster:terminate"));
@@ -659,6 +659,8 @@ public class SOSServicePermissionShiro {
             Globals.sosHibernateConnection = new SOSHibernateConnection(hibernateConfigurationFileName);
             Globals.sosHibernateConnection.addClassMapping(DBLayer.getInventoryClassMapping());
             Globals.sosHibernateConnection.addClassMapping(DBLayer.getReportingClassMapping());
+            //TODO: Das scheduler classMapping entfernen, wenn daily plan auf die reporting tabellen geht.
+            Globals.sosHibernateConnection.addClassMapping(DBLayer.getSchedulerClassMapping());
             Globals.sosHibernateConnection.connect();
         }
 
