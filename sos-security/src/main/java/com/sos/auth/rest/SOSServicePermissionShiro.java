@@ -221,7 +221,7 @@ public class SOSServicePermissionShiro {
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:holiday_calendar:view:status");
 
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:maintenance_window:view:status");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:maintenance_window:enable_disable_mainenance_window");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:maintenance_window:enable_disable_maintenance_window");
 
             sosPermissions.setSOSPermissionJoc(sosPermissionJoc);
 
@@ -603,7 +603,7 @@ public class SOSServicePermissionShiro {
 
             sosPermissionJocCockpit.getMaintenanceWindow().getView().setStatus(haveRight("sos:products:joc_cockpit:maintenance_window:view:status"));
             sosPermissionJocCockpit.getMaintenanceWindow().setEnableDisableMaintenanceWindow(haveRight(
-                    "sos:products:joc_cockpit:maintenance_window:enable_disable_mainenance_window"));
+                    "sos:products:joc_cockpit:maintenance_window:enable_disable_maintenance_window"));
 
         }
         
