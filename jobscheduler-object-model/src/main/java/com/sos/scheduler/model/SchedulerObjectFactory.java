@@ -468,10 +468,8 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
             objM.setProperty(Marshaller.JAXB_FRAGMENT, ommitXmlDeclaration);
             objM.marshal(objO, s);
         } catch (JAXBException e) {
-            throw new JobSchedulerException(e.getMessage(), e);
-        } catch (Exception e) {
-            throw new JobSchedulerException(e.getMessage(), e);
-        }
+            throw new RuntimeException(e);
+        } 
         return s.toString();
     }
     
