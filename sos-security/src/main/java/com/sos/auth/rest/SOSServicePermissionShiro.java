@@ -35,8 +35,6 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JocCockpitProperties;
 import com.sos.joc.classes.WebserviceConstants;
-import com.sos.scheduler.model.SchedulerObjectFactory;
-import com.sos.scheduler.model.objects.Commands;
 
 @Path("/security")
 public class SOSServicePermissionShiro {
@@ -719,9 +717,6 @@ public class SOSServicePermissionShiro {
 
         TimeZone.setDefault(TimeZone.getTimeZone(UTC));
 
-        Globals.schedulerObjectFactory = new SchedulerObjectFactory();
-        Globals.schedulerObjectFactory.initMarshaller(Commands.class);
-        Globals.schedulerObjectFactory.setOmmitXmlDeclaration(true);
         Globals.sosShiroProperties = new JocCockpitProperties();
 
         currentUser = getUserPwdFromHeaderOrQuery(basicAuthorization, user, pwd);
