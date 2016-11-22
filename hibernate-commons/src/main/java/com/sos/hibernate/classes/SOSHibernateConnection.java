@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
@@ -19,8 +20,10 @@ import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.engine.SessionImplementor;
@@ -73,6 +76,7 @@ public class SOSHibernateConnection implements Serializable {
     public static final String HIBERNATE_PROPERTY_USE_SCROLLABLE_RESULTSET = "hibernate.jdbc.use_scrollable_resultset";
     public static final String HIBERNATE_PROPERTY_CURRENT_SESSION_CONTEXT_CLASS = "hibernate.current_session_context_class";
     public static final String HIBERNATE_PROPERTY_JDBC_FETCH_SIZE = "hibernate.jdbc.fetch_size";
+    public static final int  LIMIT_IN_CLAUSE = 1000;
     public static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     public SOSHibernateConnection() throws Exception {
@@ -824,6 +828,28 @@ public class SOSHibernateConnection implements Serializable {
     private String getMethodName(String name) {
         String prefix = connectionIdentifier == null ? "" : String.format("[%s] ", connectionIdentifier);
         return String.format("%s%s", prefix, name);
+    }
+    
+    public static Criterion createInCriterion(String propertyName, List<?> list) {
+    	Criterion criterion = null;
+    	int size = list.size();
+    	
+    	for (int i=0; i<size;i+=LIMIT_IN_CLAUSE) {
+    		List<?> subList;
+    		if (size > i+LIMIT_IN_CLAUSE) {
+    			subList = list.subList(i,(i+LIMIT_IN_CLAUSE));
+    		} 
+    		else {
+    			subList = list.subList(i,size);
+    		}
+    		if(criterion != null) {
+    			criterion = Restrictions.or(criterion,Restrictions.in(propertyName,subList));
+    		} 
+    		else {
+    			criterion = Restrictions.in(propertyName,subList);
+    		}
+    	}
+    	return criterion;
     }
 
     public String getSqlStringFromCriteria(Criteria criteria) throws Exception {
