@@ -224,5 +224,10 @@ public class DbItem {
             return c;
         }
     }
+    
+    @Transient
+    public String normalizePath(String s) {
+        return ("/"+s).replaceAll("//+", "/");
+    }
 
 }
