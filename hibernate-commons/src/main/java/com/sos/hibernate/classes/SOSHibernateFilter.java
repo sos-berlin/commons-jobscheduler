@@ -10,7 +10,7 @@ import com.sos.i18n.I18NBase;
 /** @author Uwe Risse */
 public abstract class SOSHibernateFilter extends I18NBase {
 
-    protected String dateFormat = "yyyy-MM-dd HH:mm:ss";
+    protected String dateFormat = "yyyy-MM-dd HH:mm:ss.SSS";
     protected Date endTime;
     protected String status = "";
     private String sortMode = "asc";
