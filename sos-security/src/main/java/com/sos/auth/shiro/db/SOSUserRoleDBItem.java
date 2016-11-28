@@ -35,7 +35,7 @@ public class SOSUserRoleDBItem extends DbItem {
 
     private Long id;
     private String sosUserRole;
-    private List<SOSUserRightDBItem> sosUserRightDBItems;
+    private List<SOSUserPermissionDBItem> sosUserPermissionDBItems;
 
     public SOSUserRoleDBItem() {
 
@@ -54,12 +54,12 @@ public class SOSUserRoleDBItem extends DbItem {
     }
 
     @OneToMany(mappedBy = "roleId")
-    public List<SOSUserRightDBItem> getSOSUserRightDBItems() {
-        return sosUserRightDBItems;
+    public List<SOSUserPermissionDBItem> getSOSUserPermissionDBItems() {
+        return sosUserPermissionDBItems;
     }
 
-    public void setSOSUserRightDBItems(List<SOSUserRightDBItem> sosUserRightDBItems) {
-        this.sosUserRightDBItems = sosUserRightDBItems;
+    public void setSOSUserPermissionDBItems(List<SOSUserPermissionDBItem> sosUserPermissionDBItems) {
+        this.sosUserPermissionDBItems = sosUserPermissionDBItems;
     }
 
     @Column(name = "`SOS_USER_ROLE`", nullable = false)

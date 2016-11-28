@@ -9,7 +9,7 @@ import org.apache.shiro.subject.PrincipalCollection;
 import com.sos.auth.shiro.db.SOSUser2RoleDBItem;
 import com.sos.auth.shiro.db.SOSUserDBItem;
 import com.sos.auth.shiro.db.SOSUserDBLayer;
-import com.sos.auth.shiro.db.SOSUserRightDBItem;
+import com.sos.auth.shiro.db.SOSUserPermissionDBItem;
 
 public class SOSHibernateAuthorizing implements ISOSAuthorizing {
 
@@ -68,13 +68,13 @@ public class SOSHibernateAuthorizing implements ISOSAuthorizing {
         }
         for (SOSUserDBItem sosUserDBItem : sosUserList) {
             // Die direkt zugewiesenen Rechte.
-            for (SOSUserRightDBItem sosUserRightDBItem : sosUserDBItem.getSOSUserRightDBItems()) {
-                authorizationInfo.addStringPermission(sosUserRightDBItem.getSosUserRight());
+            for (SOSUserPermissionDBItem sosUserPermissionDBItem : sosUserDBItem.getSOSUserPermissionDBItems()) {
+                authorizationInfo.addStringPermission(sosUserPermissionDBItem.getSosUserPermission());
             }
             // Die über die Rollen zugewiesenen Rechte
             for (SOSUser2RoleDBItem sosUser2RoleDBItem : sosUserDBItem.getSOSUserRoleDBItems()) {
-                for (SOSUserRightDBItem sosUserRightDBItemFromRole : sosUser2RoleDBItem.getSosUserRoleDBItem().getSOSUserRightDBItems()) {
-                    authorizationInfo.addStringPermission(sosUserRightDBItemFromRole.getSosUserRight());
+                for (SOSUserPermissionDBItem sosUserPermissionDBItemFromRole : sosUser2RoleDBItem.getSosUserRoleDBItem().getSOSUserPermissionDBItems()) {
+                    authorizationInfo.addStringPermission(sosUserPermissionDBItemFromRole.getSosUserPermission());
                 }
             }
         }
