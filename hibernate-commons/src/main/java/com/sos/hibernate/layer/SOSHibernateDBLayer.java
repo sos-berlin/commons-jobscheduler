@@ -38,6 +38,7 @@ public class SOSHibernateDBLayer {
 
                 connection.connect();
             } catch (Exception e) {
+                LOGGER.error(e.getMessage());
                 LOGGER.error(String.format("Could not initiate hibernate connection for database using file %s", configurationFileName), e);
             }
         }
@@ -76,7 +77,7 @@ public class SOSHibernateDBLayer {
         classList.addClassIfExist("sos.jadehistory.db.JadeFilesHistoryDBItem");
         classList.addClassIfExist("com.sos.eventing.db.SchedulerEventDBItem");
         classList.addClassIfExist("com.sos.auth.shiro.db.SOSUserDBItem");
-        classList.addClassIfExist("com.sos.auth.shiro.db.SOSUserRightDBItem");
+        classList.addClassIfExist("com.sos.auth.shiro.db.SOSUserPermissionDBItem");
         classList.addClassIfExist("com.sos.auth.shiro.db.SOSUserRoleDBItem");
         classList.addClassIfExist("com.sos.auth.shiro.db.SOSUser2RoleDBItem");
         classList.addClassIfExist("com.sos.tools.logback.db.LoggingEventDBItem");
