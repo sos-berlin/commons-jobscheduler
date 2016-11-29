@@ -92,6 +92,7 @@ public class SOSHibernateDBLayer {
         classList.addClassIfExist("com.sos.scheduler.notification.db.DBItemSchedulerMonResults");
         classList.addClassIfExist("com.sos.scheduler.notification.db.DBItemSchedulerMonChecks");
         classList.addClassIfExist("com.sos.jitl.reporting.db.DBItemReportTrigger");
+        classList.addClassIfExist("com.sos.jitl.reporting.db.DBItemReportTriggerResult");
         classList.addClassIfExist("com.sos.jitl.reporting.db.DBItemReportExecution");
         classList.addClassIfExist("com.sos.jitl.reporting.db.DBItemReportTrigger.DBItemReportTriggerResult");
         classList.addClassIfExist("com.sos.jitl.reporting.db.DBItemReportTrigger.DBItemReportExecutionDate");
