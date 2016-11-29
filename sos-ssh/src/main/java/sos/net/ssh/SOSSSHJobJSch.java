@@ -6,6 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,6 +43,7 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
     private Map allParams = null;
     private Map<String, String> returnValues = new HashMap<String, String>();
     private Map schedulerEnvVars;
+    private Future<Void> commandExecution;
 
     @Override
     public ISOSVFSHandler getVFSSSH2Handler() {
@@ -123,7 +128,31 @@ public class SOSSSHJobJSch extends SOSSSHJob2 {
                     strCmd = objJSJobUtilities.replaceSchedulerVars(flgIsWindowsShell, strCmd);
                     LOGGER.debug(String.format(objMsg.getMsg(SOS_SSH_D_110), strCmd));
                     vfsHandler.setSimulateShell(objOptions.simulateShell.value());
-                    vfsHandler.executeCommand(completeCommand);
+                    ExecutorService executorService = Executors.newFixedThreadPool(2);
+                    final String cmdToExecute = completeCommand;
+                    Callable<Void> runCompleteCmd = new Callable<Void>() {
+                        @Override
+                        public Void call() throws Exception {
+                            vfsHandler.executeCommand(cmdToExecute);
+                            return null;
+                        }
+                    };
+                    commandExecution = executorService.submit(runCompleteCmd);
+                    Callable<Void> sendSignal = new Callable<Void>() {
+                        @Override
+                        public Void call() throws Exception {
+                            Thread.sleep(1000);
+                            while(!commandExecution.isDone()) {
+                                Thread.sleep(60000);
+                                ((SOSVfsSFtpJCraft)vfsHandler).getChannelExec().sendSignal("CONT");
+                            }
+                            return null;
+                        }
+                    };
+                    @SuppressWarnings("unused")
+                    Future<Void> sendSignalExecution = executorService.submit(sendSignal);
+                    // wait until command execution is finished 
+                    commandExecution.get();
                     objJSJobUtilities.setJSParam(conExit_code, "0");
                     checkStdOut();
                     checkStdErr();
