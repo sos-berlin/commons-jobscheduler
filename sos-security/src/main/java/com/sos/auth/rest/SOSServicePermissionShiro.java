@@ -321,6 +321,10 @@ public class SOSServicePermissionShiro {
         String accessToken = this.getAccessToken(accessTokenFromHeader, accessTokenFromQuery);
 
         currentUser = Globals.currentUsersList.getUser(accessToken);
+        
+        try {
+            Globals.forceClosingHttpClients(currentUser.getCurrentSubject().getSession(false));
+        } catch (Exception e) {}
 
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer(EMPTY_STRING);
         if (currentUser != null) {
