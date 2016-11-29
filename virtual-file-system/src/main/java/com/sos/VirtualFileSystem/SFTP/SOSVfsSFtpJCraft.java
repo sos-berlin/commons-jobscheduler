@@ -69,6 +69,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     private int proxyPort = 0;
     private String proxyUser = null;
     private String proxyPassword = null;
+    private ChannelExec channelExec = null;
 
     public SOSVfsSFtpJCraft() {
         super();
@@ -394,7 +395,7 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     @Override
     public void executeCommand(String cmd) {
         final String endOfLine = System.getProperty("line.separator");
-        ChannelExec channelExec = null;
+        channelExec = null;
         exitCode = null;
         InputStream out = null;
         InputStream err = null;
@@ -884,6 +885,10 @@ public class SOSVfsSFtpJCraft extends SOSVfsTransferBaseClass {
     @Override
     public void setSimulateShell(boolean simulateShell) {
         this.simulateShell = simulateShell;
+    }
+
+    public ChannelExec getChannelExec() {
+        return channelExec;
     }
 
 }
