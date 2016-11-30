@@ -15,9 +15,7 @@ public class SOSUserPermissionDBItem extends DbItem {
     private Long userId;
     private String sosUserPermission;
 
-    public SOSUserPermissionDBItem() {
-
-    }
+    public SOSUserPermissionDBItem() {}
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

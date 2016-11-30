@@ -30,11 +30,15 @@ import com.sos.auth.rest.permission.model.SOSPermissionWorkingplan;
 import com.sos.auth.rest.permission.model.SOSPermissions;
 import com.sos.auth.shiro.SOSlogin;
 import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.jitl.reporting.db.DBItemReportTrigger;
 import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.jitl.reporting.db.ReportTriggerDBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
+import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.JocCockpitProperties;
 import com.sos.joc.classes.WebserviceConstants;
+import com.sos.joc.model.order.OrderPath;
 
 @Path("/security")
 public class SOSServicePermissionShiro {
@@ -708,7 +712,7 @@ public class SOSServicePermissionShiro {
         
         boolean enableTouch = "true".equals(Globals.sosShiroProperties.getProperty(WebserviceConstants.ENABLE_SESSION_TOUCH,WebserviceConstants.ENABLE_SESSION_TOUCH_DEFAULT));
         sosShiroCurrentUserAnswer.setEnableTouch(enableTouch);
- 
+         
         return sosShiroCurrentUserAnswer;
 
     }
