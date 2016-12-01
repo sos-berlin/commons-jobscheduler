@@ -3,7 +3,6 @@ package com.sos.hibernate.classes;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import javax.persistence.Transient;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -33,54 +32,6 @@ public class DbItem {
         return this.dateTimeZone4Getters;
     }
 
-    @Transient
-    public String getLogAsString() throws IOException {
-        return "";
-    }
-
-    @Transient
-    public Long getLogId() {
-        return Long.valueOf(-1);
-    }
-
-    @Transient
-    public String getTitle() {
-        return "";
-    }
-
-    @Transient
-    public boolean isStandalone() {
-        return false;
-    }
-
-    @Transient
-    public String getIdentifier() {
-        return "";
-    }
-
-    public String getSchedulerId() {
-        return "";
-    }
-
-    @Transient
-    public String getJob() {
-        return "";
-    }
-
-    @Transient
-    public String getJobChain() {
-        return "";
-    }
-
-    @Transient
-    public String getOrderId() {
-        return "";
-    }
-
-    @Transient
-    public void setOrderId(String orderId) {
-        //
-    }
 
     private boolean isToday(Date d) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
@@ -161,61 +112,8 @@ public class DbItem {
             return seconds;
         }
     }
-
-    public boolean haveError() {
-        return false;
-    }
-
-    @Transient
-    public String getJobName() {
-        return "";
-    }
-
-    @Transient
-    public String getStartTimeFormated() {
-        return "";
-    }
-
-    @Transient
-    public String getDurationFormated() {
-        return "";
-    }
-
-    @Transient
-    public String getEndTimeFormated() {
-        return "";
-    }
-
-    @Transient
-    public String getExecResult() {
-        return "";
-    }
-
-    @Transient
-    public String getSpoolerId() {
-        return "";
-    }
-
-    @Transient
-    public Date getEndTime() {
-        return null;
-    }
-
-//    @Transient
-//    public String getStateAsString() {
-//        return "";
-//    }
-//
-    @Transient
-    public String getJobOrJobchain() {
-        return "";
-    }
-
-    @Transient
-    public boolean isOrderJob() {
-        return false;
-    }
-
+ 
+    
     @Transient
     public String getValueOrBlank(String c) {
         if (c == null) {
