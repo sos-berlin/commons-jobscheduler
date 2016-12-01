@@ -163,7 +163,7 @@ public class DbItem {
     }
 
     public boolean haveError() {
-        return error;
+        return false;
     }
 
     @Transient
