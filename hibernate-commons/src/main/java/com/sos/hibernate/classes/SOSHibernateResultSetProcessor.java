@@ -114,8 +114,8 @@ public class SOSHibernateResultSetProcessor implements Serializable {
     private void createMetadata(CriteriaQueryTranslator translator) throws Exception {
         String method = "createMetadata";
         if (translator.getRootCriteria().getProjection() == null) {
-            throw new Exception(String.format("%s: translator.getRootCriteria().getProjection() is NULL. Please use the Projection in the criteria definition",
-                    method));
+            throw new Exception(
+                    String.format("%s: translator.getRootCriteria().getProjection() is NULL. Please use the Projection in the criteria definition", method));
         }
         entityGetMethods = new HashMap<String, Method>();
         entitySetMethods = new HashMap<String, Method>();
@@ -168,8 +168,12 @@ public class SOSHibernateResultSetProcessor implements Serializable {
             Method setter = setters.getValue();
             Method getter = entityGetMethods.get(field);
             String returnTypeName = getter.getReturnType().getSimpleName();
-            if ("Long".equalsIgnoreCase(returnTypeName)) {
+            if ("String".equalsIgnoreCase(returnTypeName)) {
+                setter.invoke(bean, resultSet.getString(field));
+            } else if ("Long".equalsIgnoreCase(returnTypeName)) {
                 setter.invoke(bean, resultSet.getLong(field));
+            } else if ("Integer".equalsIgnoreCase(returnTypeName)) {
+                setter.invoke(bean, resultSet.getInt(field));
             } else if ("Timestamp".equals(returnTypeName)) {
                 setter.invoke(bean, resultSet.getTimestamp(field));
             } else if ("Date".equals(returnTypeName)) {
@@ -186,7 +190,7 @@ public class SOSHibernateResultSetProcessor implements Serializable {
                     setter.invoke(bean, resultSet.getBoolean(field));
                 }
             } else {
-                setter.invoke(bean, resultSet.getString(field));
+                setter.invoke(bean, resultSet.getObject(field));
             }
         }
         return bean;
