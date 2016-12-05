@@ -169,8 +169,12 @@ public class SOSHibernateResultSetProcessor implements Serializable {
             Method setter = setters.getValue();
             Method getter = entityGetMethods.get(field);
             String returnTypeName = getter.getReturnType().getSimpleName();
-            if ("Long".equalsIgnoreCase(returnTypeName)) {
+            if ("String".equalsIgnoreCase(returnTypeName)) {
+                setter.invoke(bean, resultSet.getString(field));
+            } else if ("Long".equalsIgnoreCase(returnTypeName)) {
                 setter.invoke(bean, resultSet.getLong(field));
+            } else if ("Integer".equalsIgnoreCase(returnTypeName)) {
+                setter.invoke(bean, resultSet.getInt(field));
             } else if ("Timestamp".equals(returnTypeName)) {
                 setter.invoke(bean, resultSet.getTimestamp(field));
             } else if ("Date".equals(returnTypeName)) {
@@ -187,7 +191,7 @@ public class SOSHibernateResultSetProcessor implements Serializable {
                     setter.invoke(bean, resultSet.getBoolean(field));
                 }
             } else {
-                setter.invoke(bean, resultSet.getString(field));
+                setter.invoke(bean, resultSet.getObject(field));
             }
         }
         return bean;
