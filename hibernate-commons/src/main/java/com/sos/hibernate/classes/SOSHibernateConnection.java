@@ -760,15 +760,11 @@ public class SOSHibernateConnection implements Serializable {
         }
         if (currentSession instanceof Session) {
             Session session = ((Session) currentSession);
-            session.beginTransaction();
             session.delete(item);
             session.flush();
-            commit();
         } else if (currentSession instanceof StatelessSession) {
             StatelessSession session = ((StatelessSession) currentSession);
-            session.beginTransaction();
             session.delete(item);
-            commit();
         }
     }
 
@@ -900,6 +896,9 @@ public class SOSHibernateConnection implements Serializable {
             if (dbms.equals(Dbms.ORACLE)) {
                 String val = SOSHibernateConnection.getDateAsString((Date) value);
                 return "to_date('" + val + "','yyyy-mm-dd HH24:MI:SS')";
+            } else if (dbms.equals(Dbms.MSSQL)) {
+                String val = SOSHibernateConnection.getDateAsString((Date) value);
+                return "'" + val.replace(" ", "T") + "'";
             } else {
                 return TimestampType.INSTANCE.objectToSQLString((Date) value, dialect);
             }
