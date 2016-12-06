@@ -2,6 +2,8 @@ package com.sos.hibernate.classes;
 
 import java.io.File;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -80,10 +82,17 @@ public class SOSHibernateConnection implements Serializable {
     public static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     public SOSHibernateConnection() throws Exception {
-        this(null);
+        this((String) null);
     }
 
     public SOSHibernateConnection(String hibernateConfigFile) throws Exception {
+        initConfigFile(hibernateConfigFile);
+        initClassMapping();
+        initConfigurationProperties();
+        initSessionProperties();
+    }
+    
+    public SOSHibernateConnection(Path hibernateConfigFile) throws Exception {
         initConfigFile(hibernateConfigFile);
         initClassMapping();
         initConfigurationProperties();
@@ -459,10 +468,19 @@ public class SOSHibernateConnection implements Serializable {
         if (hibernateConfigFile != null) {
             file = new File(hibernateConfigFile);
             if (!file.exists()) {
-                throw new Exception(String.format("hibernate config file not found: %s", file.getCanonicalPath()));
+                throw new Exception(String.format("hibernate config file not found: %s", file.getAbsolutePath()));
             }
         }
         configFile = Optional.of(file);
+    }
+    
+    private void initConfigFile(Path hibernateConfigFile) throws Exception {
+        if (hibernateConfigFile != null) {
+            if (!Files.exists(hibernateConfigFile)) {
+                throw new Exception(String.format("hibernate config file not found: %s", hibernateConfigFile.toString()));
+            }
+        }
+        configFile = Optional.of(hibernateConfigFile.toFile());
     }
 
     private void logConfigurationProperties() {

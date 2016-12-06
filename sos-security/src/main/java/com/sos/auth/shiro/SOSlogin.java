@@ -16,13 +16,21 @@ public class SOSlogin {
 
     private static final Logger LOGGER = Logger.getLogger(SOSlogin.class);
 
+    private static final String DEFAULT_INI_FILE = "classpath:shiro.ini";
     private String inifile;
     private Subject currentUser;
     private String msg;
 
     public SOSlogin() {
-        super();
-        this.inifile = "classpath:shiro.ini";
+        this.inifile = DEFAULT_INI_FILE;
+    }
+    
+    public SOSlogin(String inifile) {
+        this.inifile = inifile;
+    }
+
+    public void setInifile(String inifile) {
+        this.inifile = inifile;
     }
 
     public void createSubject(String user, String pwd) {

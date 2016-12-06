@@ -30,15 +30,11 @@ import com.sos.auth.rest.permission.model.SOSPermissionWorkingplan;
 import com.sos.auth.rest.permission.model.SOSPermissions;
 import com.sos.auth.shiro.SOSlogin;
 import com.sos.hibernate.classes.SOSHibernateConnection;
-import com.sos.jitl.reporting.db.DBItemReportTrigger;
 import com.sos.jitl.reporting.db.DBLayer;
-import com.sos.jitl.reporting.db.ReportTriggerDBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.JocCockpitProperties;
 import com.sos.joc.classes.WebserviceConstants;
-import com.sos.joc.model.order.OrderPath;
 
 @Path("/security")
 public class SOSServicePermissionShiro {
@@ -67,7 +63,7 @@ public class SOSServicePermissionShiro {
     private static final Logger LOGGER = Logger.getLogger(SOSServicePermissionShiro.class);
 
     private SOSShiroCurrentUser currentUser;
- 
+    
     @GET
     @Path("/permissions")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
@@ -646,6 +642,7 @@ public class SOSServicePermissionShiro {
         }
 
         SOSlogin sosLogin = new SOSlogin();
+        sosLogin.setInifile(Globals.getShiroIniInClassPath());
         sosLogin.login(currentUser.getUsername(), currentUser.getPassword());
 
         currentUser.setCurrentSubject(sosLogin.getCurrentUser());
@@ -660,9 +657,11 @@ public class SOSServicePermissionShiro {
         currentUser.setSosPermissionJocCockpit(sosPermissionJocCockpit);
 
         if (Globals.sosHibernateConnection == null) {
-            JocCockpitProperties sosShiroProperties = new JocCockpitProperties();
-            String hibernateConfigurationFileName = sosShiroProperties.getProperty("hibernate_configuration_file","./hibernate.cfg.xml");
-            Globals.sosHibernateConnection = new SOSHibernateConnection(hibernateConfigurationFileName);
+            if (Globals.sosShiroProperties == null) {
+                Globals.sosShiroProperties = new JocCockpitProperties();
+            }
+            String hibernateConfigurationFileName = Globals.sosShiroProperties.getProperty("hibernate_configuration_file","./hibernate.cfg.xml");
+            Globals.sosHibernateConnection = new SOSHibernateConnection(Globals.sosShiroProperties.resolvePath(hibernateConfigurationFileName));
             Globals.sosHibernateConnection.addClassMapping(DBLayer.getInventoryClassMapping());
             Globals.sosHibernateConnection.addClassMapping(DBLayer.getReportingClassMapping());
             //TODO: Das scheduler classMapping entfernen, wenn daily plan auf die reporting tabellen geht.
