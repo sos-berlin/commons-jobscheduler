@@ -23,7 +23,7 @@ public class HttpClient {
     private static final String SCHEDULER_XML_OPTION = "-config=";
     private static final String HTTP_PORT_OPTION = "-http-port=";
     private static final String WITH_INDENT_OPTION = "-with-indent";
-    private static final String XML_COMMAND_OPTION = "-xml-command";
+    private static final String XML_COMMAND_OPTION = "-xml-command=";
     private static final String XML_COMMAND_API_PATH = "http://localhost:%1$s/jobscheduler/master/api/command";
 
     public static void main(String[] args) {
@@ -74,7 +74,7 @@ public class HttpClient {
             System.exit(8);
         }
     }
-    
+
     private static String getValueOfCliOption(String arg, String key) {
         if (key != null) {
             arg = arg.substring(key.length());
