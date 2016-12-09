@@ -1,3 +1,3 @@
-"C:\Program Files\Java\jdk1.8.0_31\bin\xjc" -p com.sos.auth.rest.permission.model  -d C:\development\products\commons-jobscheduler\sos-security\src\main\java\  "C:\development\products\commons-jobscheduler\sos-security\src\test\resources\permissions.xsd"
+"C:\Program Files\Java\jdk1.8.0_31\bin\xjc" -p com.sos.auth.rest.permission.model  -d C:\development\products\joc\webservice-global\src\main\java\  "C:\development\products\commons-jobscheduler\sos-security\src\test\resources\permissions.xsd"
                                                                                                                                                                                                  
  pause

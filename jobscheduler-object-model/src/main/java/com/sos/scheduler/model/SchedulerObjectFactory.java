@@ -292,6 +292,19 @@ public class SchedulerObjectFactory extends ObjectFactory implements Runnable {
         }
     }
 
+
+    public void initMarshaller(String context) {
+        try {
+            if (jc == null) {
+                jc = JAXBContext.newInstance(context);
+            }
+            u = jc.createUnmarshaller();
+            objM = jc.createMarshaller();
+        } catch (JAXBException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+    }
+    
     public void initAnswerMarshaller() {
         try {
             if (jc4Answers == null) {
