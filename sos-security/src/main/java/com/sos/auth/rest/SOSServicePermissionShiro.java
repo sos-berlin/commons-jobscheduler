@@ -721,7 +721,7 @@ public class SOSServicePermissionShiro {
             user = authorizationParts[0];
             pwd = authorizationParts[1];
         }
-        return new SOSShiroCurrentUser(user, pwd);
+        return new SOSShiroCurrentUser(user, pwd, authorization);
     }
 
     private SOSShiroCurrentUserAnswer authenticate() throws Exception {
@@ -749,7 +749,7 @@ public class SOSServicePermissionShiro {
 
         currentUser = getUserPwdFromHeaderOrQuery(basicAuthorization, user, pwd);
 
-        if (currentUser == null) {
+        if (currentUser == null || currentUser.getAuthorization() == null) {
             return JOCDefaultResponse.responseStatusJSError(USER_IS_NULL + " " + AUTHORIZATION_HEADER_WITH_BASIC_BASED64PART_EXPECTED);
         }
 
