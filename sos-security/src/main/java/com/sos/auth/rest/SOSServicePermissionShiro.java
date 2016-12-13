@@ -682,15 +682,12 @@ public class SOSServicePermissionShiro {
             if (Globals.sosShiroProperties == null) {
                 Globals.sosShiroProperties = new JocCockpitProperties();
             }
-            String hibernateConfigurationFileName = Globals.sosShiroProperties.getProperty("hibernate_configuration_file","./hibernate.cfg.xml");
-            Globals.sosHibernateConnection = new SOSHibernateConnection(Globals.sosShiroProperties.resolvePath(hibernateConfigurationFileName));
-            Globals.sosHibernateConnection.addClassMapping(DBLayer.getInventoryClassMapping());
-            Globals.sosHibernateConnection.addClassMapping(DBLayer.getReportingClassMapping());
-
-            Globals.sosHibernateConnection.connect();
+            Globals.getConnection();
         }
 
         if (Globals.sosHibernateConnection.getCurrentSession() == null) {
+            Globals.sosHibernateConnection.setAutoCommit(true);
+            Globals.sosHibernateConnection.setIgnoreAutoCommitTransactions(true);
             Globals.sosHibernateConnection.connect();
         }
 
