@@ -164,12 +164,20 @@ public class SOSHibernateBatchProcessor implements Serializable {
             connection.getJdbcConnection().commit();
             return result;
         } catch (SQLException e) {
-            connection.getJdbcConnection().rollback();
-            LOGGER.error(e.getMessage(), e);
-            if (e.getNextException() == null) {
-                throw e;
+            try{
+                connection.getJdbcConnection().rollback();
             }
-            throw new Exception(e.getNextException());
+            catch(Exception ex){
+                LOGGER.error(ex.getMessage(), ex);
+            }
+            LOGGER.error(e.getMessage(), e);
+            Throwable exx = e;
+            if (e instanceof SQLException) {
+                if(((SQLException)e.getNextException()) != null){
+                   exx = (SQLException)e.getNextException(); 
+                }
+            }
+            throw new Exception(exx);
         } finally {
             countCurrentBatches = 0;
         }
@@ -197,6 +205,7 @@ public class SOSHibernateBatchProcessor implements Serializable {
             try {
                 preparedStatement.close();
             } catch (Exception ex) {
+                //
             }
         }
         dispose();
