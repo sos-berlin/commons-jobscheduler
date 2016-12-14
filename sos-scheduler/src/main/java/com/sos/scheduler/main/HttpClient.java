@@ -38,7 +38,7 @@ public class HttpClient {
                 schedulerXml = getValueOfCliOption(arg, SCHEDULER_XML_OPTION);
             } else if (arg.startsWith(HTTP_PORT_OPTION)) {
                 portFromCommandLine = getValueOfCliOption(arg, HTTP_PORT_OPTION);
-            } else if (arg.startsWith(WITH_INDENT_OPTION)) {
+            } else if (arg.equals(WITH_INDENT_OPTION)) {
                 answerWithIndent = true;
             } else if (arg.startsWith(XML_COMMAND_OPTION)) {
                 xmlCommand = getValueOfCliOption(arg, XML_COMMAND_OPTION);
@@ -57,6 +57,8 @@ public class HttpClient {
                 throw new IllegalArgumentException("http port is required"); 
             }
             SOSXmlCommand sosXmlCommand = new SOSXmlCommand(String.format(XML_COMMAND_API_PATH, port));
+            sosXmlCommand.setConnectTimeout(5000);
+            sosXmlCommand.setReadTimeout(5000);
             String response = sosXmlCommand.executeXMLPost(xmlCommand);
             String responseError = sosXmlCommand.getSosxml().selectSingleNodeValue("/spooler/answer/ERROR/@text");
             if (responseError != null && !responseError.isEmpty()) {

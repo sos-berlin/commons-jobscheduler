@@ -649,59 +649,44 @@ public class SOSHibernateConnection implements Serializable {
         }
     }
 
+    public Transaction getTransaction() throws Exception{
+        Transaction tr = null;
+        if (currentSession == null) {
+            throw new Exception(String.format("currentSession is NULL"));
+        }
+        if (currentSession instanceof Session) {
+            Session session = ((Session) currentSession);
+            tr = session.getTransaction();
+        } else if (currentSession instanceof StatelessSession) {
+            StatelessSession session = ((StatelessSession) currentSession);
+            tr = session.getTransaction();
+        }
+        return tr;
+    }
+    
     public void commit() throws Exception {
         if (ignoreAutoCommitTransactions && this.getAutoCommit()) {
             return;
         }
-        String method = getMethodName("commit");
-        if (currentSession == null) {
-            throw new Exception(String.format("currentSession is NULL"));
+        Transaction tr = getTransaction();
+        if (tr == null) {
+            throw new Exception(String.format("session transaction is NULL"));
         }
         if (currentSession instanceof Session) {
-            LOGGER.debug(String.format("%s", method));
-            Session session = ((Session) currentSession);
-            Transaction tr = session.getTransaction();
-            if (tr == null) {
-                throw new Exception(String.format("session transaction is NULL"));
-            }
-            session.flush();
-            tr.commit();
-        } else if (currentSession instanceof StatelessSession) {
-            LOGGER.debug(String.format("%s", method));
-            StatelessSession session = ((StatelessSession) currentSession);
-            Transaction tr = session.getTransaction();
-            if (tr == null) {
-                throw new Exception(String.format("stateless session transaction is NULL"));
-            }
-            tr.commit();
+            ((Session) currentSession).flush(); 
         }
+        tr.commit();
     }
-
+    
     public void rollback() throws Exception {
         if (ignoreAutoCommitTransactions && this.getAutoCommit()) {
             return;
         }
-        String method = getMethodName("rollback");
-        if (currentSession == null) {
-            throw new Exception(String.format("currentSession is NULL"));
+        Transaction tr = getTransaction();
+        if (tr == null) {
+            throw new Exception(String.format("session transaction is NULL"));
         }
-        if (currentSession instanceof Session) {
-            LOGGER.debug(String.format("%s", method));
-            Session session = ((Session) currentSession);
-            Transaction tr = session.getTransaction();
-            if (tr == null) {
-                throw new Exception(String.format("session transaction is NULL"));
-            }
-            tr.rollback();
-        } else if (currentSession instanceof StatelessSession) {
-            LOGGER.debug(String.format("%s", method));
-            StatelessSession session = ((StatelessSession) currentSession);
-            Transaction tr = session.getTransaction();
-            if (tr == null) {
-                throw new Exception(String.format("stateless session transaction is NULL"));
-            }
-            tr.rollback();
-        }
+        tr.rollback();
     }
 
     public void save(Object item) throws Exception {
