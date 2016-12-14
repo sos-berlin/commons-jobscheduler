@@ -95,12 +95,8 @@ public class SOSRestShiroClient {
         SOSPermissionShiro shiro = sosRestShiroClient.getPermissions(sosWebserviceAuthenticationRecord);
         System.out.println("Output xml client .... \n");
         System.out.println("Roles " + shiro.getSOSPermissionRoles().getSOSPermissionRole());
-        System.out.println("Joe " + shiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionJoe().getSOSPermission());
-        System.out.println("Joc " + shiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionJoc().getSOSPermission());
-        System.out.println("Jid " + shiro.getSOSPermissions().getSOSPermissionJid().getSOSPermission());
-        System.out.println("Events " + shiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionEvents().getSOSPermission());
-        System.out.println("Dashboard " + shiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionDashboard().getSOSPermission());
-        System.out.println("Workingplan " + shiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionWorkingplan().getSOSPermission());
+        System.out.println("JOC " + shiro.getSOSPermissions().getSOSPermissionListJoc().getSOSPermission());
+        System.out.println("Commands " + shiro.getSOSPermissions().getSOSPermissionListCommands().getSOSPermission());
 
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = sosRestShiroClient.getSOSShiroCurrentUserAnswer(sosWebserviceAuthenticationRecord);
         System.out.println("SOS01:" + sosShiroCurrentUserAnswer.getIsAuthenticated());

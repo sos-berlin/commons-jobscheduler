@@ -8,7 +8,6 @@ import com.sos.auth.rest.permission.model.SOSPermissionShiro;
 
 public class TestSOSServicePermissionShiro {
 
-    private static final String SHIRO_PERMISSION = "sos:products:jid:execute";
     private static final String SHIRO_MAPPED_ROLE = "application_manager";
     private static final String LDAP_PASSWORD = "secret";
     private static final String LDAP_USER = "root";
@@ -17,15 +16,9 @@ public class TestSOSServicePermissionShiro {
     public void testGetPermissions() {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSPermissionShiro sosPermissionShiro = sosServicePermissionShiro.getPermissions("","", LDAP_USER, LDAP_PASSWORD);
-        String permissisonsJid = sosPermissionShiro.getSOSPermissions().getSOSPermissionJid().getSOSPermission().get(0);
-        String permissisonsJoe = sosPermissionShiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionJoe().getSOSPermission().get(0);
-        String permissisonsJoc = sosPermissionShiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionJoc().getSOSPermission().get(0);
-        String permissisonsDashboard =
-                sosPermissionShiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionDashboard().getSOSPermission().get(0);
-        assertEquals("testClient", SHIRO_PERMISSION, permissisonsJid);
-        assertEquals("testClient", "sos:products:joe:execute", permissisonsJoe);
-        assertEquals("testClient", "sos:products:joc:execute", permissisonsJoc);
-        assertEquals("testClient", "sos:products:jid:jobstart", permissisonsDashboard);
+        String permissisonsCommand = sosPermissionShiro.getSOSPermissions().getSOSPermissionListCommands().getSOSPermission().get(0);
+        String permissisonsJoc = sosPermissionShiro.getSOSPermissions().getSOSPermissionListJoc().getSOSPermission().get(0);
+
     }
 
     @Test

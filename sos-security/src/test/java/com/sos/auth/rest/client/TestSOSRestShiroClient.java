@@ -27,14 +27,6 @@ public class TestSOSRestShiroClient {
         sosWebserviceAuthenticationRecord.setPassword(LDAP_PASSWORD);
         sosWebserviceAuthenticationRecord.setResource(JETTY_URL);
         SOSPermissionShiro shiro = sosRestShiroClient.getPermissions(sosWebserviceAuthenticationRecord);
-        String permissisonsJid = shiro.getSOSPermissions().getSOSPermissionJid().getSOSPermission().get(0);
-        String permissisonsJoe = shiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionJoe().getSOSPermission().get(0);
-        String permissisonsJoc = shiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionJoc().getSOSPermission().get(0);
-        String permissisonsDashboard = shiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionDashboard().getSOSPermission().get(0);
-        assertEquals("testClient", "sos:products:jid:execute", permissisonsJid);
-        assertEquals("testClient", "sos:products:joe:execute", permissisonsJoe);
-        assertEquals("testClient", "sos:products:joc:execute", permissisonsJoc);
-        assertEquals("testClient", "sos:products:jid:dashboard:start_job", permissisonsDashboard);
     }
 
     @Test

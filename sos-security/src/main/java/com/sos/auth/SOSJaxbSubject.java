@@ -16,18 +16,12 @@ public class SOSJaxbSubject {
     }
 
     public boolean isPermitted(String permission) {
-        if ("sos:products:jid:jobstart".equals(permission)) {
-            return (sosPermissionShiro != null && sosPermissionShiro.getSOSPermissions().getSOSPermissionJid().getSOSPermissionDashboard().getSOSPermission()
-                    .contains(permission));
+
+        if (permission.startsWith("sos:products:joc_cockpit:")) {
+            return (sosPermissionShiro != null && sosPermissionShiro.getSOSPermissions().getSOSPermissionListJoc().getSOSPermission().contains(permission));
         }
-        if (permission.startsWith("sos:products:jid:")) {
-            return (sosPermissionShiro != null && sosPermissionShiro.getSOSPermissions().getSOSPermissionJid().getSOSPermission().contains(permission));
-        }
-        if (permission.startsWith("sos:products:joc:")) {
-            return (sosPermissionShiro != null && sosPermissionShiro.getSOSPermissions().getSOSPermissionJoc().getSOSPermission().contains(permission));
-        }
-        if (permission.startsWith("sos:products:joe:")) {
-            return (sosPermissionShiro != null && sosPermissionShiro.getSOSPermissions().getSOSPermissionJoe().getSOSPermission().contains(permission));
+        if (permission.startsWith("sos:products:commands:")) {
+            return (sosPermissionShiro != null && sosPermissionShiro.getSOSPermissions().getSOSPermissionListCommands().getSOSPermission().contains(permission));
         }
         return false;
     }
