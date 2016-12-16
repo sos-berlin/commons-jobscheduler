@@ -332,15 +332,29 @@ public class SOSServicePermissionShiro {
 
             SOSPermissionListJoc sosPermissionJoc = o.createSOSPermissionListJoc();
 
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:commands:jobscheduler_master:view:status");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:commands:jobscheduler_master:view:parameter");
+            addPermission(sosPermissionJoc.getSOSPermission(),"sos:products:joc_cockpit:jobscheduler_master:view:mainlog");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:commands:jobscheduler_master:execute:restart:terminate");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:commands:jobscheduler_master:execute:restart:abort");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:commands:jobscheduler_master:execute:pause");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:commands:jobscheduler_master:execute:continue");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:commands:jobscheduler_master:execute:terminate");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:commands:jobscheduler_master:execute:abort");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:commands:jobscheduler_master:execute:stop");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:commands:jobscheduler_master:manage_categories");
+            
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master_cluster:view:status");
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master_cluster:execute:terminate_fail_safe");
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master_cluster:execute:restart");
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_master_cluster:execute:terminate");
+            
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_universal_agent:view:status");
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_universal_agent:execute:restart:abort");
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_universal_agent:execute:restart:terminate");
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_universal_agent:execute:abort");
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:jobscheduler_universal_agent:execute:terminate");
+            
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:daily_plan:view:status");
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:history:view");
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:order:view:status");
@@ -415,6 +429,7 @@ public class SOSServicePermissionShiro {
             addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:execute:abort");
             addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:execute:stop");
             addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:manage_categories");
+            
             addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master_cluster:execute:terminate_fail_safe");
             addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master_cluster:execute:restart");
             addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master_cluster:execute:terminate");
