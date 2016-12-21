@@ -409,6 +409,7 @@ public class SOSServicePermissionShiro {
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:schedule:view:configuration");
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:schedule:view:status");
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:schedule:add_substitute");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:schedule:change");
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:schedule:modify_hot_folder");
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:lock:view:configuration");
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:lock:view:status");
@@ -665,6 +666,7 @@ public class SOSServicePermissionShiro {
 
             sosPermissionJocCockpit.getSchedule().getView().setConfiguration(haveRight("sos:products:joc_cockpit:schedule:view:configuration"));
             sosPermissionJocCockpit.getSchedule().getView().setStatus(haveRight("sos:products:joc_cockpit:schedule:view:status"));
+            sosPermissionJocCockpit.getSchedule().setEdit(haveRight("sos:products:joc_cockpit:schedule:change"));
             sosPermissionJocCockpit.getSchedule().setAddSubstitute(haveRight("sos:products:joc_cockpit:schedule:add_substitute"));
             sosPermissionJocCockpit.getSchedule().setModifyHotFolder(haveRight("sos:products:joc_cockpit:schedule:modify_hot_folder"));
 
