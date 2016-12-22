@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -55,7 +56,7 @@ public class SOSHibernateConnection implements Serializable {
     private static final String HIBERNATE_PROPERTY_JAVAX_PERSISTENCE_VALIDATION_MODE = "javax.persistence.validation.mode";
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateConnection.class);
-    private Optional<File> configFile;
+    private Optional<File> configFile = Optional.empty();
     private Configuration configuration;
     private SessionFactory sessionFactory;
     private Dialect dialect;
@@ -86,14 +87,14 @@ public class SOSHibernateConnection implements Serializable {
     }
 
     public SOSHibernateConnection(String hibernateConfigFile) throws Exception {
-        initConfigFile(hibernateConfigFile);
+        setConfigFile(hibernateConfigFile);
         initClassMapping();
         initConfigurationProperties();
         initSessionProperties();
     }
     
     public SOSHibernateConnection(Path hibernateConfigFile) throws Exception {
-        initConfigFile(hibernateConfigFile);
+        setConfigFile(hibernateConfigFile);
         initClassMapping();
         initConfigurationProperties();
         initSessionProperties();
@@ -463,24 +464,17 @@ public class SOSHibernateConnection implements Serializable {
         configurationProperties = new Properties();
     }
 
-    private void initConfigFile(String hibernateConfigFile) throws Exception {
-        File file = null;
-        if (hibernateConfigFile != null) {
-            file = new File(hibernateConfigFile);
-            if (!file.exists()) {
-                throw new Exception(String.format("hibernate config file not found: %s", file.getAbsolutePath()));
-            }
-        }
-        configFile = Optional.of(file);
+    public void setConfigFile(String hibernateConfigFile) throws Exception {
+    	setConfigFile(hibernateConfigFile == null ? null : Paths.get(hibernateConfigFile));
     }
     
-    private void initConfigFile(Path hibernateConfigFile) throws Exception {
+    public void setConfigFile(Path hibernateConfigFile) throws Exception {
         if (hibernateConfigFile != null) {
             if (!Files.exists(hibernateConfigFile)) {
                 throw new Exception(String.format("hibernate config file not found: %s", hibernateConfigFile.toString()));
             }
+            configFile = Optional.of(hibernateConfigFile.toFile());
         }
-        configFile = Optional.of(hibernateConfigFile.toFile());
     }
 
     private void logConfigurationProperties() {
@@ -772,7 +766,7 @@ public class SOSHibernateConnection implements Serializable {
             classMapping.add(c);
         }
     }
-
+    
     public Optional<File> getConfigFile() {
         return configFile;
     }
