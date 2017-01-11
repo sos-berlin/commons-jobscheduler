@@ -206,7 +206,6 @@
 							<xs:element name="skipJobChainNode" type="xs:boolean"/>
 							<xs:element name="processJobChainNode" type="xs:boolean"/>
 							<xs:element name="stopJobChainNode" type="xs:boolean"/>
-							<xs:element name="modifyHotFolder" type="xs:boolean"/>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -232,7 +231,6 @@
 							<xs:element name="endAllTasks" type="xs:boolean"/>
 							<xs:element name="suspendAllTasks" type="xs:boolean"/>
 							<xs:element name="continueAllTasks" type="xs:boolean"/>
-							<xs:element name="modifyHotFolder" type="xs:boolean"/>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -247,7 +245,6 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="modifyHotFolder" type="xs:boolean"/>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -264,7 +261,6 @@
 							</xs:element>
 							<xs:element name="edit" type="xs:boolean"/>
 							<xs:element name="addSubstitute" type="xs:boolean"/>
-							<xs:element name="modifyHotFolder" type="xs:boolean"/>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -279,7 +275,6 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="modifyHotFolder" type="xs:boolean"/>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>

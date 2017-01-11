@@ -641,14 +641,12 @@ public class SOSServicePermissionShiro {
             sosPermissionJocCockpit.getJobChain().setProcessJobChainNode(haveRight(
                     "sos:products:joc_cockpit:job_chain:execute:process_jobchain_node"));
             sosPermissionJocCockpit.getJobChain().setStopJobChainNode(haveRight("sos:products:joc_cockpit:job_chain:execute:stop_jobchain_node"));
-            sosPermissionJocCockpit.getJobChain().setModifyHotFolder(haveRight("sos:products:joc_cockpit:job_chain:change:hot_folder"));
 
             sosPermissionJocCockpit.getJob().getView().setStatus(haveRight("sos:products:joc_cockpit:job:view:status"));
             sosPermissionJocCockpit.getJob().getView().setTaskLog(haveRight("sos:products:joc_cockpit:job:view:task_log"));
             sosPermissionJocCockpit.getJob().getView().setConfiguration(haveRight("sos:products:joc_cockpit:job:view:configuration"));
             sosPermissionJocCockpit.getJob().getView().setHistory(haveRight("sos:products:joc_cockpit:job:view:history"));
             sosPermissionJocCockpit.getJob().setSetRunTime(haveRight("sos:products:joc_cockpit:job:change:run_time"));
-            sosPermissionJocCockpit.getJob().setModifyHotFolder(haveRight("sos:products:joc_cockpit:job:change:hot_folder"));
             sosPermissionJocCockpit.getJob().setStart(haveRight("sos:products:joc_cockpit:job:execute:start"));
             sosPermissionJocCockpit.getJob().setStop(haveRight("sos:products:joc_cockpit:job:execute:stop"));
             sosPermissionJocCockpit.getJob().setUnstop(haveRight("sos:products:joc_cockpit:job:execute:unstop"));
@@ -662,17 +660,14 @@ public class SOSServicePermissionShiro {
             sosPermissionJocCockpit.getProcessClass().getView().setStatus(haveRight("sos:products:joc_cockpit:process_class:view:status"));
             sosPermissionJocCockpit.getProcessClass().getView().setConfiguration(haveRight(
                     "sos:products:joc_cockpit:process_class:view:configuration"));
-            sosPermissionJocCockpit.getProcessClass().setModifyHotFolder(haveRight("sos:products:joc_cockpit:process_class:modify_hot_folder"));
 
             sosPermissionJocCockpit.getSchedule().getView().setConfiguration(haveRight("sos:products:joc_cockpit:schedule:view:configuration"));
             sosPermissionJocCockpit.getSchedule().getView().setStatus(haveRight("sos:products:joc_cockpit:schedule:view:status"));
             sosPermissionJocCockpit.getSchedule().setEdit(haveRight("sos:products:joc_cockpit:schedule:change"));
             sosPermissionJocCockpit.getSchedule().setAddSubstitute(haveRight("sos:products:joc_cockpit:schedule:add_substitute"));
-            sosPermissionJocCockpit.getSchedule().setModifyHotFolder(haveRight("sos:products:joc_cockpit:schedule:modify_hot_folder"));
 
             sosPermissionJocCockpit.getLock().getView().setConfiguration(haveRight("sos:products:joc_cockpit:lock:view:configuration"));
             sosPermissionJocCockpit.getLock().getView().setStatus(haveRight("sos:products:joc_cockpit:lock:view:status"));
-            sosPermissionJocCockpit.getLock().setModifyHotFolder(haveRight("sos:products:joc_cockpit:lock:modify_hot_folder"));
 
             sosPermissionJocCockpit.getEvent().getView().setStatus(haveRight("sos:products:joc_cockpit:event:view:status"));
             sosPermissionJocCockpit.getEvent().setDelete(haveRight("sos:products:joc_cockpit:event:delete"));
