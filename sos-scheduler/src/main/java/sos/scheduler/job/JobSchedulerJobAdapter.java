@@ -292,25 +292,39 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     public void setJSParam(final String pstrKey, final StringBuffer pstrValue) {
         setJSParam(pstrKey, pstrValue.toString());
     }
+    
+    private void fillParameterSubstitutor(){
+        if (parameterSubstitutor == null) {
+            parameterSubstitutor = new ParameterSubstitutor();
+            for (Entry<String, String> entry : schedulerParameters.entrySet()) {
+                String value = entry.getValue();
+                String paramName = entry.getKey();
+
+                if (value != null && !value.isEmpty()) {
+                    parameterSubstitutor.addKey(paramName, value);
+                }
+            }
+        }
+        
+    }
 
     @Override
     public String replaceSchedulerVars(final String string2Modify) {
         String resultString = string2Modify;
         if (isNotNull(schedulerParameters)) {
+            fillParameterSubstitutor();
             if (string2Modify.matches("(?s).*\\$\\{[^{]+\\}.*")) {
-                if (parameterSubstitutor == null) {
-                    parameterSubstitutor = new ParameterSubstitutor();
-                    for (Entry<String, String> entry : schedulerParameters.entrySet()) {
-                        String value = entry.getValue();
-                        String paramName = entry.getKey();
-
-                        if (value != null && !value.isEmpty()) {
-                            parameterSubstitutor.addKey(paramName, value);
-                        }
-                    }
-                }
+                parameterSubstitutor.setOpenTag("${");
+                parameterSubstitutor.setCloseTag("}");
                 resultString = parameterSubstitutor.replace(string2Modify);
             }
+            
+            if (string2Modify.matches("(.*)%(.+)%(.*)")) {
+                parameterSubstitutor.setOpenTag("%");
+                parameterSubstitutor.setCloseTag("%");
+                resultString = parameterSubstitutor.replace(string2Modify);
+            }
+            
         }
         return resultString;
     }
