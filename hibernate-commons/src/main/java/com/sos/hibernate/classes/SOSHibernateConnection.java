@@ -74,12 +74,13 @@ public class SOSHibernateConnection implements Serializable {
     private Enum<SOSHibernateConnection.Dbms> dbms = Dbms.UNKNOWN;
     private boolean ignoreAutoCommitTransactions = false;
     private String openSessionMethodName;
+//    private Document hibernateConfigDocument = null;
     public static final String HIBERNATE_PROPERTY_TRANSACTION_ISOLATION = "hibernate.connection.isolation";
     public static final String HIBERNATE_PROPERTY_AUTO_COMMIT = "hibernate.connection.autocommit";
     public static final String HIBERNATE_PROPERTY_USE_SCROLLABLE_RESULTSET = "hibernate.jdbc.use_scrollable_resultset";
     public static final String HIBERNATE_PROPERTY_CURRENT_SESSION_CONTEXT_CLASS = "hibernate.current_session_context_class";
     public static final String HIBERNATE_PROPERTY_JDBC_FETCH_SIZE = "hibernate.jdbc.fetch_size";
-    public static final int  LIMIT_IN_CLAUSE = 1000;
+    public static final int LIMIT_IN_CLAUSE = 1000;
     public static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     public SOSHibernateConnection() throws Exception {
@@ -92,7 +93,7 @@ public class SOSHibernateConnection implements Serializable {
         initConfigurationProperties();
         initSessionProperties();
     }
-    
+
     public SOSHibernateConnection(Path hibernateConfigFile) throws Exception {
         setConfigFile(hibernateConfigFile);
         initClassMapping();
@@ -150,6 +151,7 @@ public class SOSHibernateConnection implements Serializable {
         if (configFile.isPresent()) {
             LOGGER.debug(String.format("%s: configure connection with hibernate file = %s", method, configFile.get().getCanonicalPath()));
             configuration.configure(configFile.get());
+//            configuration.configure(hibernateConfigDocument);
         } else {
             LOGGER.debug(String.format("%s: configure connection without the hibernate file", method));
             configuration.configure();
@@ -164,7 +166,8 @@ public class SOSHibernateConnection implements Serializable {
 
     private void openSession() {
         String method = getMethodName("openSession");
-        LOGGER.debug(String.format("%s: useOpenStatelessSession = %s, useGetCurrentSession = %s", method, useOpenStatelessSession, useGetCurrentSession));
+        LOGGER.debug(String.format("%s: useOpenStatelessSession = %s, useGetCurrentSession = %s", method, useOpenStatelessSession,
+                useGetCurrentSession));
         openSessionMethodName = "";
         if (useOpenStatelessSession) {
             currentSession = sessionFactory.openStatelessSession(jdbcConnection);
@@ -340,7 +343,7 @@ public class SOSHibernateConnection implements Serializable {
     public Enum<SOSHibernateConnection.Dbms> getDbms() {
         return dbms;
     }
-    
+
     public boolean dbmsIsPostgres() {
         return dbms == SOSHibernateConnection.Dbms.PGSQL;
     }
@@ -465,11 +468,18 @@ public class SOSHibernateConnection implements Serializable {
     }
 
     public void setConfigFile(String hibernateConfigFile) throws Exception {
-    	setConfigFile(hibernateConfigFile == null ? null : Paths.get(hibernateConfigFile));
+//        if(hibernateConfigDocument == null) {
+//            hibernateConfigDocument = parseConfiguration(hibernateConfigFile);
+//        }
+        setConfigFile(hibernateConfigFile == null ? null : Paths.get(hibernateConfigFile));
     }
-    
+
     public void setConfigFile(Path hibernateConfigFile) throws Exception {
         if (hibernateConfigFile != null) {
+//            LOGGER.info("********** " + hibernateConfigFile.toString() + " **********");
+//            if(hibernateConfigDocument == null) {
+//                hibernateConfigDocument = parseConfiguration(hibernateConfigFile.toString());
+//            }
             if (!Files.exists(hibernateConfigFile)) {
                 throw new Exception(String.format("hibernate config file not found: %s", hibernateConfigFile.toString()));
             }
@@ -536,6 +546,7 @@ public class SOSHibernateConnection implements Serializable {
         Query q = null;
         if (currentSession instanceof Session) {
             q = ((Session) currentSession).createQuery(query);
+            q.setCacheable(false);
         } else if (currentSession instanceof StatelessSession) {
             q = ((StatelessSession) currentSession).createQuery(query);
         }
@@ -643,7 +654,7 @@ public class SOSHibernateConnection implements Serializable {
         }
     }
 
-    public Transaction getTransaction() throws Exception{
+    public Transaction getTransaction() throws Exception {
         Transaction tr = null;
         if (currentSession == null) {
             throw new Exception(String.format("currentSession is NULL"));
@@ -657,7 +668,7 @@ public class SOSHibernateConnection implements Serializable {
         }
         return tr;
     }
-    
+
     public void commit() throws Exception {
         if (ignoreAutoCommitTransactions && this.getAutoCommit()) {
             return;
@@ -667,11 +678,11 @@ public class SOSHibernateConnection implements Serializable {
             throw new Exception(String.format("session transaction is NULL"));
         }
         if (currentSession instanceof Session) {
-            ((Session) currentSession).flush(); 
+            ((Session) currentSession).flush();
         }
         tr.commit();
     }
-    
+
     public void rollback() throws Exception {
         if (ignoreAutoCommitTransactions && this.getAutoCommit()) {
             return;
@@ -766,7 +777,7 @@ public class SOSHibernateConnection implements Serializable {
             classMapping.add(c);
         }
     }
-    
+
     public Optional<File> getConfigFile() {
         return configFile;
     }
@@ -822,27 +833,25 @@ public class SOSHibernateConnection implements Serializable {
         String prefix = connectionIdentifier == null ? "" : String.format("[%s] ", connectionIdentifier);
         return String.format("%s%s", prefix, name);
     }
-    
+
     public static Criterion createInCriterion(String propertyName, List<?> list) {
-    	Criterion criterion = null;
-    	int size = list.size();
-    	
-    	for (int i=0; i<size;i+=LIMIT_IN_CLAUSE) {
-    		List<?> subList;
-    		if (size > i+LIMIT_IN_CLAUSE) {
-    			subList = list.subList(i,(i+LIMIT_IN_CLAUSE));
-    		} 
-    		else {
-    			subList = list.subList(i,size);
-    		}
-    		if(criterion != null) {
-    			criterion = Restrictions.or(criterion,Restrictions.in(propertyName,subList));
-    		} 
-    		else {
-    			criterion = Restrictions.in(propertyName,subList);
-    		}
-    	}
-    	return criterion;
+        Criterion criterion = null;
+        int size = list.size();
+
+        for (int i = 0; i < size; i += LIMIT_IN_CLAUSE) {
+            List<?> subList;
+            if (size > i + LIMIT_IN_CLAUSE) {
+                subList = list.subList(i, (i + LIMIT_IN_CLAUSE));
+            } else {
+                subList = list.subList(i, size);
+            }
+            if (criterion != null) {
+                criterion = Restrictions.or(criterion, Restrictions.in(propertyName, subList));
+            } else {
+                criterion = Restrictions.in(propertyName, subList);
+            }
+        }
+        return criterion;
     }
 
     public String getSqlStringFromCriteria(Criteria criteria) throws Exception {
@@ -958,4 +967,27 @@ public class SOSHibernateConnection implements Serializable {
         return jdbcFetchSize;
     }
 
+
+//    /**
+//     * Parse the configuration on our own to switch off the XML validation of the hibernate configuration file
+//     * to prevent network problems
+//     * 
+//     * @param resourcePath to the hibernate configuration file
+//     * @return a Document object of the hibernate configuration file
+//     * @throws Exception
+//     */
+//    private Document parseConfiguration(String resourcePath) throws Exception {
+//        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+//        // Don't validate DTD
+//        factory.setValidating(false);
+//        DocumentBuilder builder = factory.newDocumentBuilder();
+//        LOGGER.info("********** " + resourcePath + " **********");
+//        InputStream inStream = builder.getClass().getResourceAsStream(resourcePath);
+//        if(inStream != null) {
+//            return builder.parse(inStream);
+//        } else {
+//            return builder.parse(new FileInputStream(resourcePath));
+//        }
+//    }
+//
 }
