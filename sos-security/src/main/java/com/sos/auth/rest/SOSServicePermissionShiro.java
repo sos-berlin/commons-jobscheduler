@@ -917,9 +917,8 @@ public class SOSServicePermissionShiro {
 
     private JOCDefaultResponse login(String basicAuthorization, String user, String pwd) {
 
-        TimeZone.setDefault(TimeZone.getTimeZone(UTC));
-
         Globals.sosShiroProperties = new JocCockpitProperties();
+        TimeZone.setDefault(TimeZone.getTimeZone(UTC));
 
         currentUser = getUserPwdFromHeaderOrQuery(basicAuthorization, user, pwd);
 
