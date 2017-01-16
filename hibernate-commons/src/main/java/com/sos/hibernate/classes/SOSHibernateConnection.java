@@ -546,7 +546,7 @@ public class SOSHibernateConnection implements Serializable {
         Query q = null;
         if (currentSession instanceof Session) {
             q = ((Session) currentSession).createQuery(query);
-            q.setCacheable(false);
+//            q.setCacheable(false);
         } else if (currentSession instanceof StatelessSession) {
             q = ((StatelessSession) currentSession).createQuery(query);
         }
