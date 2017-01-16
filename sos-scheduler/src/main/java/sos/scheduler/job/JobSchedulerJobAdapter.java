@@ -58,8 +58,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     public static final boolean conJobChainFailure = false;
     public final String conMessageFilePath = "com_sos_scheduler_messages";
     private ParameterSubstitutor parameterSubstitutor;
-    private String jobNameForTest="job_name_for_test";
-    private String orderStateForTest="order_state_for_test";
+    private String jobNameForTest = "job_name_for_test";
+    private String orderStateForTest = "order_state_for_test";
 
     public JobSchedulerJobAdapter() {
         Messages = new Messages(conMessageFilePath, Locale.getDefault());
@@ -190,7 +190,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                 String[] names = variableSet.names().split(";");
                 String value = EMPTY_STRING;
                 for (String key : names) {
-                    if (!"".equals(key)){
+                    if (!"".equals(key)) {
                         value = variableSet.var(key);
                         result.put(key, value);
                     }
@@ -201,15 +201,15 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             throw new JobSchedulerException(JSJ_F_0060.params(stackTrace2String(e)), e);
         }
     }
-    
-    private String getParameterName(String parameterName){
-        String currentNodeName = getCurrentNodeName(false).toLowerCase();
-        String currentJob = getCurrentJob().toLowerCase();        
+
+    private String getParameterName(String parameterName) {
+        String currentNodeName = getCurrentNodeName(false);
+        String currentJob = getCurrentJob();
         
         String pattern1 = "^" + currentNodeName + "/(.*)";
         String pattern2 = "^job::" + currentJob + "/(.*)";
         String pattern3 = "^job::" + currentJob + "\\." + currentNodeName + "/(.*)";
-    
+
         String newParameter = parameterName.replaceAll(pattern3, "$1");
         newParameter = newParameter.replaceAll(pattern2, "$1");
         newParameter = newParameter.replaceAll(pattern1, "$1");
@@ -224,9 +224,9 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         for (Map.Entry<String, String> entry : set) {
             String key = entry.getKey();
             String newParameterName = getParameterName(key);
-            if (!key.equals(newParameterName)){
+            if (!key.equals(newParameterName)) {
                 String val = entry.getValue();
-                newSchedulerParameters.put(newParameterName,val);
+                newSchedulerParameters.put(newParameterName, val);
             }
         }
         return newSchedulerParameters;
@@ -236,7 +236,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         return deleteCurrentNodeNameFromKeys(pSchedulerParameterSet);
     }
 
- 
     protected Variable_set getJobOrOrderParameters() {
         try {
             Variable_set objJobOrOrderParameters = spooler.create_variable_set();
@@ -292,8 +291,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     public void setJSParam(final String pstrKey, final StringBuffer pstrValue) {
         setJSParam(pstrKey, pstrValue.toString());
     }
-    
-    private void fillParameterSubstitutor(){
+
+    private void fillParameterSubstitutor() {
         if (parameterSubstitutor == null) {
             parameterSubstitutor = new ParameterSubstitutor();
             for (Entry<String, String> entry : schedulerParameters.entrySet()) {
@@ -305,7 +304,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                 }
             }
         }
-        
+
     }
 
     @Override
@@ -318,17 +317,17 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                 parameterSubstitutor.setCloseTag("}");
                 resultString = parameterSubstitutor.replace(string2Modify);
             }
-            
+
             if (string2Modify.matches("(.*)%(.+)%(.*)")) {
                 parameterSubstitutor.setOpenTag("%");
                 parameterSubstitutor.setCloseTag("%");
                 resultString = parameterSubstitutor.replace(string2Modify);
             }
-            
+
         }
         return resultString;
     }
- 
+
     private HashMap<String, String> getSpecialParameters() {
         HashMap<String, String> specialParams = new HashMap<String, String>();
         if (spooler == null) {
@@ -366,8 +365,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
         }
         return specialParams;
     }
-
- 
 
     public String stackTrace2String(final Exception e) {
         String strT = null;
@@ -412,20 +409,20 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
                     JSJ_I_0010.toLog(conMethodName, lstrNodeName);
                 }
             }
-        }else{
+        } else {
             return orderStateForTest;
         }
         return lstrNodeName;
     }
 
-    public String getCurrentJob(){
-        if (spooler_task == null){
+    public String getCurrentJob() {
+        if (spooler_task == null) {
             return jobNameForTest;
-        }else{
+        } else {
             return spooler_task.job().name();
         }
     }
-    
+
     public Job getJob() {
         return spooler_task.job();
     }
@@ -565,8 +562,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
             String strS = getJobScript();
             if (isNotEmpty(strS)) {
                 pobjOptionElement.setValue(strS);
-                logger.debug(String.format("copy script from script-tag of job '%2$s' to option '%1$s'", pobjOptionElement.getShortKey(),
-                        getJob().name()));
+                logger.debug(String.format("copy script from script-tag of job '%2$s' to option '%1$s'", pobjOptionElement.getShortKey(), getJob().name()));
             }
         }
     }
