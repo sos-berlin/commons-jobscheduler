@@ -917,19 +917,19 @@ public class SOSServicePermissionShiro {
 
     private JOCDefaultResponse login(String basicAuthorization, String user, String pwd) {
 
-        Globals.sosShiroProperties = new JocCockpitProperties();
-        Globals.setProperties();
-        TimeZone.setDefault(TimeZone.getTimeZone(UTC));
-
-        currentUser = getUserPwdFromHeaderOrQuery(basicAuthorization, user, pwd);
-
-        if (currentUser == null || currentUser.getAuthorization() == null) {
-            return JOCDefaultResponse.responseStatusJSError(USER_IS_NULL + " " + AUTHORIZATION_HEADER_WITH_BASIC_BASED64PART_EXPECTED);
-        }
-
-        currentUser.setAuthorization(basicAuthorization);
-
         try {
+            Globals.sosShiroProperties = new JocCockpitProperties();
+            Globals.setProperties();
+            TimeZone.setDefault(TimeZone.getTimeZone(UTC));
+
+            currentUser = getUserPwdFromHeaderOrQuery(basicAuthorization, user, pwd);
+
+            if (currentUser == null || currentUser.getAuthorization() == null) {
+                return JOCDefaultResponse.responseStatusJSError(USER_IS_NULL + " " + AUTHORIZATION_HEADER_WITH_BASIC_BASED64PART_EXPECTED);
+            }
+
+            currentUser.setAuthorization(basicAuthorization);
+        
             SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = authenticate();
 
             if (!sosShiroCurrentUserAnswer.isAuthenticated()) {
