@@ -66,8 +66,9 @@ public class SOSHibernateDBLayer {
 
     private static ClassList getDefaultClassMapping() {
         ClassList classList = new ClassList();
-        classList.addClassIfExist("com.sos.dailyschedule.db.DailyScheduleDBItem");
         classList.addClassIfExist("com.sos.jitl.dailyplan.db.DailyPlanDBItem");
+        classList.addClassIfExist("com.sos.jitl.dailyplan.db.DailyPlanWithReportTriggerDBItem");
+        classList.addClassIfExist("com.sos.jitl.dailyplan.db.DailyPlanWithReportExecutionDBItem");
         classList.addClassIfExist("com.sos.scheduler.notification.db.DBItemSchedulerMonChecks");
         classList.addClassIfExist("com.sos.scheduler.history.db.SchedulerTaskHistoryDBItem");
         classList.addClassIfExist("com.sos.scheduler.history.db.SchedulerOrderStepHistoryDBItem");
@@ -92,7 +93,6 @@ public class SOSHibernateDBLayer {
         classList.addClassIfExist("com.sos.scheduler.notification.db.DBItemSchedulerMonResults");
         classList.addClassIfExist("com.sos.scheduler.notification.db.DBItemSchedulerMonChecks");
         classList.addClassIfExist("com.sos.jitl.reporting.db.DBItemReportTrigger");
-        classList.addClassIfExist("com.sos.jitl.reporting.db.DBItemReportTriggerAndResult");
         classList.addClassIfExist("com.sos.jitl.reporting.db.DBItemReportTriggerWithResult");
         classList.addClassIfExist("com.sos.jitl.reporting.db.DBItemReportTriggerResult");
         classList.addClassIfExist("com.sos.jitl.reporting.db.DBItemReportExecution");
