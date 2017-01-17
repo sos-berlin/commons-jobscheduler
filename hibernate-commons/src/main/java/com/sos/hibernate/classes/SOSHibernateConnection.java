@@ -49,6 +49,8 @@ import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.exception.DBSessionException;
+
 import sos.util.SOSString;
 
 public class SOSHibernateConnection implements Serializable {
@@ -379,7 +381,7 @@ public class SOSHibernateConnection implements Serializable {
         String method = getMethodName("clearSession");
         LOGGER.debug(String.format("%s", method));
         if (currentSession == null) {
-            throw new Exception(String.format("currentSession is NULL"));
+            throw new DBSessionException("currentSession is NULL");
         }
         if (currentSession instanceof Session) {
             Session session = (Session) currentSession;
@@ -391,7 +393,7 @@ public class SOSHibernateConnection implements Serializable {
         String method = getMethodName("sessionDoWork");
         LOGGER.debug(String.format("%s", method));
         if (currentSession == null) {
-            throw new Exception(String.format("currentSession is NULL"));
+            throw new DBSessionException("currentSession is NULL");
         }
         if (currentSession instanceof Session) {
             Session session = (Session) currentSession;
@@ -541,7 +543,7 @@ public class SOSHibernateConnection implements Serializable {
         String method = getMethodName("createQuery");
         LOGGER.debug(String.format("%s: query = %s", method, query));
         if (currentSession == null) {
-            throw new Exception(String.format("currentSession is NULL"));
+            throw new DBSessionException("currentSession is NULL");
         }
         Query q = null;
         if (currentSession instanceof Session) {
@@ -561,7 +563,7 @@ public class SOSHibernateConnection implements Serializable {
         String method = getMethodName("createSQLQuery");
         LOGGER.debug(String.format("%s: query = %s", method, query));
         if (currentSession == null) {
-            throw new Exception(String.format("currentSession is NULL"));
+            throw new DBSessionException("currentSession is NULL");
         }
         SQLQuery q = null;
         if (currentSession instanceof Session) {
@@ -579,7 +581,7 @@ public class SOSHibernateConnection implements Serializable {
         String method = getMethodName("createCriteria");
         LOGGER.debug(String.format("%s: class = %s", method, cl.getSimpleName()));
         if (currentSession == null) {
-            throw new Exception(String.format("currentSession is NULL"));
+            throw new DBSessionException("currentSession is NULL");
         }
         Criteria cr = null;
         if (currentSession instanceof Session) {
@@ -643,7 +645,7 @@ public class SOSHibernateConnection implements Serializable {
         String method = getMethodName("beginTransaction");
         LOGGER.debug(String.format("%s", method));
         if (currentSession == null) {
-            throw new Exception(String.format("currentSession is NULL"));
+            throw new DBSessionException("currentSession is NULL");
         }
         if (currentSession instanceof Session) {
             Session session = ((Session) currentSession);
@@ -657,7 +659,7 @@ public class SOSHibernateConnection implements Serializable {
     public Transaction getTransaction() throws Exception {
         Transaction tr = null;
         if (currentSession == null) {
-            throw new Exception(String.format("currentSession is NULL"));
+            throw new DBSessionException("currentSession is NULL");
         }
         if (currentSession instanceof Session) {
             Session session = ((Session) currentSession);
@@ -698,7 +700,7 @@ public class SOSHibernateConnection implements Serializable {
         String method = getMethodName("save");
         LOGGER.debug(String.format("%s: item = %s", method, item));
         if (currentSession == null) {
-            throw new Exception(String.format("currentSession is NULL"));
+            throw new DBSessionException("currentSession is NULL");
         }
         if (currentSession instanceof Session) {
             Session session = ((Session) currentSession);
@@ -714,7 +716,7 @@ public class SOSHibernateConnection implements Serializable {
         String method = getMethodName("update");
         LOGGER.debug(String.format("%s: item = %s", method, item));
         if (currentSession == null) {
-            throw new Exception(String.format("currentSession is NULL"));
+            throw new DBSessionException("currentSession is NULL");
         }
         if (currentSession instanceof Session) {
             Session session = ((Session) currentSession);
@@ -730,7 +732,7 @@ public class SOSHibernateConnection implements Serializable {
         String method = getMethodName("saveOrUpdate");
         LOGGER.debug(String.format("%s: item = %s", method, item));
         if (currentSession == null) {
-            throw new Exception(String.format("currentSession is NULL"));
+            throw new DBSessionException("currentSession is NULL");
         }
         if (currentSession instanceof Session) {
             Session session = ((Session) currentSession);
@@ -746,7 +748,7 @@ public class SOSHibernateConnection implements Serializable {
         String method = getMethodName("delete");
         LOGGER.debug(String.format("%s: item = %s", method, item));
         if (currentSession == null) {
-            throw new Exception(String.format("currentSession is NULL"));
+            throw new DBSessionException("currentSession is NULL");
         }
         if (currentSession instanceof Session) {
             Session session = ((Session) currentSession);
