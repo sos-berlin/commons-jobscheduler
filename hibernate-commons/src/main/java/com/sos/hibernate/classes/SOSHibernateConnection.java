@@ -672,7 +672,10 @@ public class SOSHibernateConnection implements Serializable {
     }
 
     public void commit() throws Exception {
-        if (ignoreAutoCommitTransactions && this.getAutoCommit()) {
+    	String method = getMethodName("commit");
+        LOGGER.debug(String.format("%s", method));
+        
+    	if (ignoreAutoCommitTransactions && this.getAutoCommit()) {
             return;
         }
         Transaction tr = getTransaction();
@@ -686,6 +689,8 @@ public class SOSHibernateConnection implements Serializable {
     }
 
     public void rollback() throws Exception {
+    	String method = getMethodName("rollback");
+        LOGGER.debug(String.format("%s", method));
         if (ignoreAutoCommitTransactions && this.getAutoCommit()) {
             return;
         }
