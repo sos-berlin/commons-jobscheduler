@@ -9,11 +9,6 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
-import sos.configuration.SOSConfiguration;
-import sos.net.mail.options.SOSSmtpMailOptions;
-import sos.util.SOSLogger;
-import sos.util.SOSStandardLogger;
-
 import com.sos.JSHelper.Annotations.JSOptionClass;
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.JSHelper.Listener.JSListener;
@@ -31,6 +26,11 @@ import com.sos.JSHelper.Options.SOSOptionTransferType;
 import com.sos.JSHelper.Options.SOSOptionTransferType.enuTransferTypes;
 import com.sos.VirtualFileSystem.common.SOSVfsMessageCodes;
 import com.sos.i18n.annotation.I18NResourceBundle;
+
+import sos.configuration.SOSConfiguration;
+import sos.net.mail.options.SOSSmtpMailOptions;
+import sos.util.SOSLogger;
+import sos.util.SOSStandardLogger;
 
 @I18NResourceBundle(baseName = "SOSVirtualFileSystem", defaultLocale = "en")
 public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
@@ -552,6 +552,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         SOSConfiguration conf = null;
         Properties properties = new Properties();
         try {
+            LOGGER.debug(String.format("readSettingsFile: settings=%s",settings.getValue()));
             sosLogger = new SOSStandardLogger(0);
             getEnvVars();
             conf = new SOSConfiguration(settings.getValue(), profile.getValue(), sosLogger);
