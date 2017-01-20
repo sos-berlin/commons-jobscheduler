@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -16,27 +17,24 @@ import java.util.Properties;
 
 import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
-import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.engine.SessionImplementor;
 import org.hibernate.exception.SQLGrammarException;
-import org.hibernate.impl.CriteriaImpl;
-import org.hibernate.impl.SessionFactoryImpl;
+import org.hibernate.internal.SessionImpl;
+import org.hibernate.internal.StatelessSessionImpl;
 import org.hibernate.jdbc.Work;
-import org.hibernate.loader.criteria.CriteriaJoinWalker;
-import org.hibernate.loader.criteria.CriteriaQueryTranslator;
-import org.hibernate.persister.entity.OuterJoinLoadable;
+import org.hibernate.query.Query;
+import org.hibernate.service.ServiceRegistry;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.NumericBooleanType;
@@ -69,14 +67,13 @@ public class SOSHibernateConnection implements Serializable {
     private FlushMode sessionFlushMode;
     private Properties defaultConfigurationProperties;
     private Properties configurationProperties;
-    private ClassList classMapping;
+    private com.sos.hibernate.classes.ClassList classMapping;
     private boolean useDefaultConfigurationProperties = true;
     private String connectionIdentifier;
     private Optional<Integer> jdbcFetchSize = Optional.empty();
     private Enum<SOSHibernateConnection.Dbms> dbms = Dbms.UNKNOWN;
     private boolean ignoreAutoCommitTransactions = false;
     private String openSessionMethodName;
-//    private Document hibernateConfigDocument = null;
     public static final String HIBERNATE_PROPERTY_TRANSACTION_ISOLATION = "hibernate.connection.isolation";
     public static final String HIBERNATE_PROPERTY_AUTO_COMMIT = "hibernate.connection.autocommit";
     public static final String HIBERNATE_PROPERTY_USE_SCROLLABLE_RESULTSET = "hibernate.jdbc.use_scrollable_resultset";
@@ -84,6 +81,7 @@ public class SOSHibernateConnection implements Serializable {
     public static final String HIBERNATE_PROPERTY_JDBC_FETCH_SIZE = "hibernate.jdbc.fetch_size";
     public static final int LIMIT_IN_CLAUSE = 1000;
     public static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    // private HashMap<String,StatelessSession> statelessSessions;
 
     public SOSHibernateConnection() throws Exception {
         this((String) null);
@@ -112,9 +110,7 @@ public class SOSHibernateConnection implements Serializable {
         try {
             LOGGER.info(String.format("%s: useOpenStatelessSession = %s", method, useOpenStatelessSession));
             disconnect();
-            if (configuration == null) {
-                initConfiguration();
-            }
+            initConfiguration();
             initSessionFactory();
             openSession();
         } catch (Exception ex) {
@@ -130,8 +126,8 @@ public class SOSHibernateConnection implements Serializable {
             openSession();
             String connFile = (configFile.isPresent()) ? configFile.get().getCanonicalPath() : "without config file";
             int isolationLevel = getTransactionIsolation();
-            LOGGER.debug(String.format("%s: autocommit = %s, transaction isolation = %s, %s, %s", method, getAutoCommit(),
-                    getTransactionIsolationName(isolationLevel), openSessionMethodName, connFile));
+            LOGGER.debug(String.format("%s: autocommit = %s, transaction isolation = %s, %s, %s", method, getAutoCommit(), getTransactionIsolationName(isolationLevel),
+                    openSessionMethodName, connFile));
         } catch (Exception ex) {
             throw new Exception(String.format("%s: %s", method, ex.toString()), ex);
         }
@@ -153,7 +149,6 @@ public class SOSHibernateConnection implements Serializable {
         if (configFile.isPresent()) {
             LOGGER.debug(String.format("%s: configure connection with hibernate file = %s", method, configFile.get().getCanonicalPath()));
             configuration.configure(configFile.get());
-//            configuration.configure(hibernateConfigDocument);
         } else {
             LOGGER.debug(String.format("%s: configure connection without the hibernate file", method));
             configuration.configure();
@@ -166,29 +161,130 @@ public class SOSHibernateConnection implements Serializable {
         useGetCurrentSession = false;
     }
 
-    private void openSession() {
+    private void openSession() throws Exception {
         String method = getMethodName("openSession");
-        LOGGER.debug(String.format("%s: useOpenStatelessSession = %s, useGetCurrentSession = %s", method, useOpenStatelessSession,
-                useGetCurrentSession));
+        LOGGER.debug(String.format("%s: useOpenStatelessSession = %s, useGetCurrentSession = %s", method, useOpenStatelessSession, useGetCurrentSession));
         openSessionMethodName = "";
+
+        if (currentSession != null) {
+            if (currentSession instanceof Session) {
+                ((Session) currentSession).close();
+            } else {
+                ((StatelessSession) currentSession).close();
+            }
+        }
         if (useOpenStatelessSession) {
-            currentSession = sessionFactory.openStatelessSession(jdbcConnection);
+            currentSession = sessionFactory.openStatelessSession();
             openSessionMethodName = "openStatelessSession";
         } else {
             Session session = null;
-            if (useGetCurrentSession) {
+            if (useGetCurrentSession && jdbcConnection != null) {
                 session = sessionFactory.getCurrentSession();
                 openSessionMethodName = "getCurrentSession";
             } else {
-                session = sessionFactory.openSession(jdbcConnection);
+                session = sessionFactory.withOptions().connection(jdbcConnection).openSession();
                 openSessionMethodName = "openSession";
             }
             if (sessionFlushMode != null) {
-                session.setFlushMode(sessionFlushMode);
+                session.setHibernateFlushMode(sessionFlushMode);
             }
             currentSession = session;
         }
+        if (currentSession instanceof Session) {
+            SessionImpl sf = (SessionImpl) currentSession;
+            try {
+                dialect = sf.getJdbcServices().getDialect();
+            } catch (Exception ex) {
+                throw new Exception(String.format("%s: cannot get dialect : %s", method, ex.toString()), ex);
+            }
+            try {
+                jdbcConnection = sf.connection();
+            } catch (Exception ex) {
+                throw new Exception(String.format("%s: cannot get jdbcConnection : %s", method, ex.toString()), ex);
+            }
+        } else {
+            StatelessSessionImpl sf = (StatelessSessionImpl) currentSession;
+            try {
+                dialect = sf.getJdbcServices().getDialect();
+            } catch (Exception ex) {
+                throw new Exception(String.format("%s: cannot get dialect : %s", method, ex.toString()), ex);
+            }
+            try {
+                jdbcConnection = sf.connection();
+            } catch (Exception ex) {
+                throw new Exception(String.format("%s: cannot get jdbcConnection : %s", method, ex.toString()), ex);
+            }
+        }
+        setDbms();
+
     }
+
+    // private StatelessSession createStatelessSession(String id){
+    // String method = getMethodName("createStatelessSession");
+    // LOGGER.debug(String.format("%s: createStatelessSession, id = %s",
+    // method,id));
+    //
+    // StatelessSession statelessSession = statelessSessions.get(id);
+    //
+    // if (statelessSession != null){
+    // statelessSession.close();
+    // }
+    //
+    // StatelessSession statelessSession =
+    // sessionFactory.openStatelessSession();
+    // statelessSessions.put(id, statelessSession);
+    // return statelessSession;
+    // }
+
+    public Session createSession() {
+        String method = getMethodName("createSession");
+        LOGGER.debug(String.format("%s: createSession", method));
+        return sessionFactory.openSession();
+    }
+
+    public StatelessSession createStatelessSession() {
+        String method = getMethodName("createStatelessSession");
+        LOGGER.debug(String.format("%s: createStatelessSession", method));
+        return sessionFactory.openStatelessSession();
+    }
+
+    // public StatelessSession getStatelessSession(String id){
+    // String method = getMethodName("getStatelessSession");
+    // LOGGER.debug(String.format("%s: getStatelessSession, id = %s",
+    // method,id));
+    //
+    // if (statelessSessions == null){
+    // statelessSessions = new HashMap<String,StatelessSession>();
+    // }
+    //
+    // StatelessSession statelessSession = statelessSessions.get(id);
+    //
+    // if (statelessSession == null){
+    // statelessSession = createStatelessSession(id);
+    // }else{
+    // if (!statelessSession.isOpen()){
+    // statelessSession = sessionFactory.openStatelessSession();
+    // }
+    // }
+    //
+    // return statelessSession;
+    // }
+    //
+    // public void closeStatelessSession(String id){
+    // String method = getMethodName("getStatelessSession");
+    // LOGGER.debug(String.format("%s: getStatelessSession, id = %s",
+    // method,id));
+    //
+    // if (statelessSessions == null){
+    // statelessSessions = new HashMap<String,StatelessSession>();
+    // }
+    //
+    // StatelessSession statelessSession = statelessSessions.get(id);
+    //
+    // if (statelessSession != null){
+    // statelessSession.close();
+    // }
+    // }
 
     private void initSessionFactory() throws Exception {
         String method = getMethodName("initSessionFactory");
@@ -196,19 +292,7 @@ public class SOSHibernateConnection implements Serializable {
         if (currentSession != null) {
             disconnect();
         }
-        sessionFactory = configuration.buildSessionFactory();
-        SessionFactoryImpl sf = (SessionFactoryImpl) sessionFactory;
-        try {
-            dialect = sf.getDialect();
-        } catch (Exception ex) {
-            throw new Exception(String.format("%s: cannot get dialect : %s", method, ex.toString()), ex);
-        }
-        try {
-            jdbcConnection = sf.getConnectionProvider().getConnection();
-        } catch (Exception ex) {
-            throw new Exception(String.format("%s: cannot get jdbcConnection : %s", method, ex.toString()), ex);
-        }
-        setDbms();
+        sessionFactory = configuration.configure(configFile.get()).buildSessionFactory();
     }
 
     public boolean getConfiguredAutoCommit() throws Exception {
@@ -334,8 +418,7 @@ public class SOSHibernateConnection implements Serializable {
         if (ex instanceof SQLGrammarException) {
             SQLGrammarException sqlGrEx = (SQLGrammarException) ex;
             SQLException sqlEx = sqlGrEx.getSQLException();
-            return new Exception(String.format("%s [exception: %s, sql: %s]", ex.getMessage(), sqlEx == null ? "" : sqlEx.getMessage(),
-                    sqlGrEx.getSQL()), sqlEx);
+            return new Exception(String.format("%s [exception: %s, sql: %s]", ex.getMessage(), sqlEx == null ? "" : sqlEx.getMessage(), sqlGrEx.getSQL()), sqlEx);
         } else if (ex.getCause() != null) {
             return ex.getCause();
         }
@@ -399,8 +482,8 @@ public class SOSHibernateConnection implements Serializable {
             Session session = (Session) currentSession;
             session.doWork(work);
         } else {
-            LOGGER.warn(String.format("%s: this method will be ignored for current openSessionMethodName : %s (%s)", method, openSessionMethodName,
-                    currentSession.getClass().getSimpleName()));
+            LOGGER.warn(String.format("%s: this method will be ignored for current openSessionMethodName : %s (%s)", method, openSessionMethodName, currentSession.getClass()
+                    .getSimpleName()));
         }
     }
 
@@ -470,18 +553,11 @@ public class SOSHibernateConnection implements Serializable {
     }
 
     public void setConfigFile(String hibernateConfigFile) throws Exception {
-//        if(hibernateConfigDocument == null) {
-//            hibernateConfigDocument = parseConfiguration(hibernateConfigFile);
-//        }
         setConfigFile(hibernateConfigFile == null ? null : Paths.get(hibernateConfigFile));
     }
 
     public void setConfigFile(Path hibernateConfigFile) throws Exception {
         if (hibernateConfigFile != null) {
-//            LOGGER.info("********** " + hibernateConfigFile.toString() + " **********");
-//            if(hibernateConfigDocument == null) {
-//                hibernateConfigDocument = parseConfiguration(hibernateConfigFile.toString());
-//            }
             if (!Files.exists(hibernateConfigFile)) {
                 throw new Exception(String.format("hibernate config file not found: %s", hibernateConfigFile.toString()));
             }
@@ -548,13 +624,43 @@ public class SOSHibernateConnection implements Serializable {
         Query q = null;
         if (currentSession instanceof Session) {
             q = ((Session) currentSession).createQuery(query);
-//            q.setCacheable(false);
+            // q.setCacheable(false);
         } else if (currentSession instanceof StatelessSession) {
             q = ((StatelessSession) currentSession).createQuery(query);
         }
         return q;
     }
 
+    public Query createQuery(String query, Object session) throws Exception {
+        String method = getMethodName("createQuery");
+        LOGGER.debug(String.format("%s: query = %s", method, query));
+        if (session == null) {
+            throw new DBSessionException("currentSession is NULL");
+        }
+        Query q = null;
+        if (session instanceof Session) {
+            q = ((Session) session).createQuery(query);
+            // q.setCacheable(false);
+        } else if (session instanceof StatelessSession) {
+            q = ((StatelessSession) session).createQuery(query);
+        }
+        return q;
+    }
+
+    // public Query createQuery(String query,Object session) throws Exception {
+    // String method = getMethodName("createQuery");
+    // LOGGER.debug(String.format("%s: query = %s", method, query));
+    // if (session == null) {
+    // throw new DBSessionException("currentSession is NULL");
+    // }
+    // Query q = null;
+    // if (session instanceof Session) {
+    // q = ((Session) session).createQuery(query);
+    // } else if (session instanceof StatelessSession) {
+    // q = ((StatelessSession) session).createQuery(query);
+    // }
+    // return q;
+    // }
     public SQLQuery createSQLQuery(String query) throws Exception {
         return createSQLQuery(query, null);
     }
@@ -862,16 +968,23 @@ public class SOSHibernateConnection implements Serializable {
     }
 
     public String getSqlStringFromCriteria(Criteria criteria) throws Exception {
-        CriteriaImpl criteriaImpl = (CriteriaImpl) criteria;
-        SessionImplementor session = criteriaImpl.getSession();
-        SessionFactoryImplementor factory = session.getFactory();
-        CriteriaQueryTranslator translator =
-                new CriteriaQueryTranslator(factory, criteriaImpl, criteriaImpl.getEntityOrClassName(), CriteriaQueryTranslator.ROOT_SQL_ALIAS);
-        String[] implementors = factory.getImplementors(criteriaImpl.getEntityOrClassName());
-        CriteriaJoinWalker walker =
-                new CriteriaJoinWalker((OuterJoinLoadable) factory.getEntityPersister(implementors[0]), translator, factory, criteriaImpl,
-                        criteriaImpl.getEntityOrClassName(), session.getLoadQueryInfluencers());
-        return walker.getSQLString();
+        // Erstmal stillgelegt. Wird nirgendwo aufgerufen.
+        /*
+         * CriteriaImpl criteriaImpl = (CriteriaImpl) criteria;
+         * SessionImplementor session = criteriaImpl.getSession();
+         * SessionFactoryImplementor factory = session.getFactory();
+         * CriteriaQueryTranslator translator = new
+         * CriteriaQueryTranslator(factory, criteriaImpl,
+         * criteriaImpl.getEntityOrClassName(),
+         * CriteriaQueryTranslator.ROOT_SQL_ALIAS); String[] implementors =
+         * factory.getImplementors(criteriaImpl.getEntityOrClassName());
+         * CriteriaJoinWalker walker = new
+         * CriteriaJoinWalker((OuterJoinLoadable)
+         * factory.getEntityPersister(implementors[0]), translator, factory,
+         * criteriaImpl, criteriaImpl.getEntityOrClassName(),
+         * session.getLoadQueryInfluencers()); return walker.getSQLString();
+         */
+        return "";
     }
 
     public String quote(Type type, Object value) throws Exception {
@@ -974,27 +1087,4 @@ public class SOSHibernateConnection implements Serializable {
         return jdbcFetchSize;
     }
 
-
-//    /**
-//     * Parse the configuration on our own to switch off the XML validation of the hibernate configuration file
-//     * to prevent network problems
-//     * 
-//     * @param resourcePath to the hibernate configuration file
-//     * @return a Document object of the hibernate configuration file
-//     * @throws Exception
-//     */
-//    private Document parseConfiguration(String resourcePath) throws Exception {
-//        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-//        // Don't validate DTD
-//        factory.setValidating(false);
-//        DocumentBuilder builder = factory.newDocumentBuilder();
-//        LOGGER.info("********** " + resourcePath + " **********");
-//        InputStream inStream = builder.getClass().getResourceAsStream(resourcePath);
-//        if(inStream != null) {
-//            return builder.parse(inStream);
-//        } else {
-//            return builder.parse(new FileInputStream(resourcePath));
-//        }
-//    }
-//
 }

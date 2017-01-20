@@ -867,11 +867,11 @@ public class SOSServicePermissionShiro {
         if (Globals.sosShiroProperties == null) {
             Globals.sosShiroProperties = new JocCockpitProperties();
         }
-        Globals.checkConnection();
+        Globals.trySelect(null);
 
         if (Globals.sosSchedulerHibernateConnections != null) {
             for (String schedulerId : Globals.sosSchedulerHibernateConnections.keySet()) {
-                Globals.checkConnection(schedulerId);
+                Globals.trySelect(schedulerId);
             }
         }
     }

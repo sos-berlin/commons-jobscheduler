@@ -3,19 +3,22 @@ package com.sos.hibernate.layer;
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.StatelessSession;
 
 import com.sos.hibernate.classes.ClassList;
 import com.sos.hibernate.classes.SOSHibernateConnection;
- 
+
 /** @author Uwe Risse */
 public class SOSHibernateDBLayer {
 
     private static final Logger LOGGER = Logger.getLogger(SOSHibernateDBLayer.class);
     protected SOSHibernateConnection connection = null;
     private String configurationFileName = null;
+    protected StatelessSession statelessSession;
+    protected Session session;
 
     public SOSHibernateDBLayer() {
-        //
     }
 
     public SOSHibernateDBLayer(String configFileName) {
@@ -64,16 +67,40 @@ public class SOSHibernateDBLayer {
         return connection;
     }
 
+    public void openSession() {
+        if (this.connection.isUseOpenStatelessSession()) {
+            this.statelessSession = this.connection.createStatelessSession();
+        }else{
+            this.session = (Session) this.connection.createSession();
+        }
+    }
+
+    public Object getSession() {
+        if (this.connection.isUseOpenStatelessSession()) {
+            return this.statelessSession;
+        }else{
+            return this.session;
+        }
+    }
+    
+    public void closeSession() {
+        if (statelessSession != null) {
+            statelessSession.close();
+        }
+        if (session != null) {
+            session.close();
+        }
+    }
+
     private static ClassList getDefaultClassMapping() {
         ClassList classList = new ClassList();
         classList.addClassIfExist("com.sos.jitl.dailyplan.db.DailyPlanDBItem");
         classList.addClassIfExist("com.sos.jitl.dailyplan.db.DailyPlanWithReportTriggerDBItem");
         classList.addClassIfExist("com.sos.jitl.dailyplan.db.DailyPlanWithReportExecutionDBItem");
         classList.addClassIfExist("com.sos.scheduler.notification.db.DBItemSchedulerMonChecks");
-        classList.addClassIfExist("com.sos.scheduler.history.db.SchedulerTaskHistoryDBItem");
-        classList.addClassIfExist("com.sos.scheduler.history.db.SchedulerOrderStepHistoryDBItem");
-        classList.addClassIfExist("com.sos.scheduler.history.db.SchedulerOrderHistoryDBItem");
-        classList.addClassIfExist("com.sos.scheduler.db.SchedulerInstancesDBItem");
+        classList.addClassIfExist("com.sos.jitl.schedulerhistory.db.SchedulerTaskHistoryDBItem");
+        classList.addClassIfExist("com.sos.jitl.schedulerhistory.db.SchedulerOrderStepHistoryDBItem");
+        classList.addClassIfExist("com.sos.jitl.schedulerhistory.db.SchedulerOrderHistoryDBItem");
         classList.addClassIfExist("sos.jadehistory.db.JadeFilesDBItem");
         classList.addClassIfExist("sos.jadehistory.db.JadeFilesHistoryDBItem");
         classList.addClassIfExist("com.sos.eventing.db.SchedulerEventDBItem");
@@ -96,8 +123,8 @@ public class SOSHibernateDBLayer {
         classList.addClassIfExist("com.sos.jitl.reporting.db.DBItemReportTriggerWithResult");
         classList.addClassIfExist("com.sos.jitl.reporting.db.DBItemReportTriggerResult");
         classList.addClassIfExist("com.sos.jitl.reporting.db.DBItemReportExecution");
-        classList.addClassIfExist("com.sos.jitl.reporting.db.DBItemReportTrigger.DBItemReportTriggerResult");
-        classList.addClassIfExist("com.sos.jitl.reporting.db.DBItemReportTrigger.DBItemReportExecutionDate");
+        classList.addClassIfExist("com.sos.jitl.reporting.db.DBItemReportTriggerResult");
+        classList.addClassIfExist("com.sos.jitl.reporting.db.DBItemReportExecutionDate");
         return classList;
     }
 

@@ -14,7 +14,7 @@ public class ClassListTest {
     private static final List<String> EXPECTED_CLASSES = Arrays.asList("com.sos.hibernate.classes.DbItem");
 
     @Test
-    public void test() {
+    public void testSettingOfClasslist() {
         ClassList classList = new ClassList();
         classList.addClassIfExist("com.sos.scheduler.db.SchedulerInstancesDBItem");
         classList.addClassIfExist("com.sos.hibernate.classes.DbItem");

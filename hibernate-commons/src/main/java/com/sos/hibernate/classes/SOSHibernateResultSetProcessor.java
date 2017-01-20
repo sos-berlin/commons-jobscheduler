@@ -11,10 +11,11 @@ import java.util.Optional;
 
 import org.hibernate.Criteria;
 import org.hibernate.ScrollMode;
-import org.hibernate.engine.QueryParameters;
-import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.engine.SessionImplementor;
-import org.hibernate.impl.CriteriaImpl;
+import org.hibernate.engine.spi.QueryParameters;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.loader.criteria.CriteriaJoinWalker;
 import org.hibernate.loader.criteria.CriteriaQueryTranslator;
 import org.hibernate.persister.entity.OuterJoinLoadable;
@@ -59,8 +60,9 @@ public class SOSHibernateResultSetProcessor implements Serializable {
                 entity = Class.forName(criteriaImpl.getEntityOrClassName());
             } else {
                 entity = resultEntity;
+                
             }
-            SessionImplementor session = criteriaImpl.getSession();
+            SharedSessionContractImplementor session = criteriaImpl.getSession();
             SessionFactoryImplementor factory = session.getFactory();
             CriteriaQueryTranslator translator =
                     new CriteriaQueryTranslator(factory, criteriaImpl, criteriaImpl.getEntityOrClassName(), CriteriaQueryTranslator.ROOT_SQL_ALIAS);
