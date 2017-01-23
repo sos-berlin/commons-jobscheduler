@@ -822,6 +822,22 @@ public class SOSHibernateConnection implements Serializable {
             session.insert(item);
         }
     }
+    
+    public void insert(Object item,Object session) throws Exception {
+        String method = getMethodName("save");
+        LOGGER.debug(String.format("%s: item = %s", method, item));
+        if (session == null) {
+            throw new DBSessionException("session is NULL");
+        }
+        if (session instanceof Session) {
+            Session s = ((Session) session);
+            s.save(item);
+            s.flush();
+        } else if (session instanceof StatelessSession) {
+            StatelessSession s = ((StatelessSession) session);
+            s.insert(item);
+        }
+    }
 
     public void update(Object item) throws Exception {
         String method = getMethodName("update");
@@ -839,6 +855,23 @@ public class SOSHibernateConnection implements Serializable {
         }
     }
 
+
+    public void update(Object item,Object session) throws Exception {
+        String method = getMethodName("update");
+        LOGGER.debug(String.format("%s: item = %s", method, item));
+        if (session == null) {
+            throw new DBSessionException("session is NULL");
+        }
+        if (session instanceof Session) {
+            Session s = ((Session) session);
+            s.update(item);
+            s.flush();
+        } else if (session instanceof StatelessSession) {
+            StatelessSession s = ((StatelessSession) session);
+            s.update(item);
+        }
+    }
+    
     public Object saveOrUpdate(Object item) throws Exception {
         String method = getMethodName("saveOrUpdate");
         LOGGER.debug(String.format("%s: item = %s", method, item));
@@ -1043,6 +1076,15 @@ public class SOSHibernateConnection implements Serializable {
             return ((Session) currentSession).get(entityClass, id);
         } else if (currentSession instanceof StatelessSession) {
             return ((StatelessSession) currentSession).get(entityClass, id);
+        }
+        return null;
+    }
+
+    public Object get(Class<?> entityClass, Serializable id,Object session) throws Exception {
+        if (session instanceof Session) {
+            return ((Session) session).get(entityClass, id);
+        } else if (session instanceof StatelessSession) {
+            return ((StatelessSession) session).get(entityClass, id);
         }
         return null;
     }
