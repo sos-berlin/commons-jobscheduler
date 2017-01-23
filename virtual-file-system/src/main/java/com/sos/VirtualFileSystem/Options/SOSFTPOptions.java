@@ -45,6 +45,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     private boolean flgReadSettingsFileIsActive = false;
     private boolean flgSettingsFileProcessed = false;
     private Properties propAllEnvironmentVariables = null;
+    private String originalSettingsFile = null;
     @JSOptionClass(description = "objConnectionOptions", name = "SOSConnection2Options")
     private SOSConnection2Options objConnectionOptions;
     @JSOptionClass(description = "objMailOptions", name = "objMailOptions")
@@ -1019,4 +1020,11 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         return dmzOptions.getOrDefault(dmzOptionKey, "");
     }
 
+    public void setOriginalSettingsFile(String val) {
+        this.originalSettingsFile = val;
+    }
+
+    public String getOriginalSettingsFile() {
+        return this.originalSettingsFile;
+    }
 }
