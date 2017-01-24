@@ -40,8 +40,6 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.exception.DBSessionException;
 
-import sos.util.SOSString;
-
 public class SOSHibernateConnection implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -293,7 +291,6 @@ public class SOSHibernateConnection implements Serializable {
         LOGGER.debug(String.format("%s", method));
         closeTransaction();
         closeSession();
-        dialect = null;
     }
 
    
@@ -339,6 +336,9 @@ public class SOSHibernateConnection implements Serializable {
             }
         }
         currentSession = null;
+        openSessionMethodName = null;
+        dialect = null;
+        jdbcConnection = null;
     }
 
     private void closeTransaction() {
