@@ -50,7 +50,6 @@ public class JadeFilesDBLayer extends SOSHibernateIntervalDBLayer implements Ser
     public JadeFilesDBLayer(String configurationFile_) {
         super();
         this.setConfigurationFileName(configurationFile_);
-        this.initConnection(this.getConfigurationFileName());
         this.resetFilter();
 
     }

@@ -22,7 +22,7 @@ public class SOSHibernateAuthorizing implements ISOSAuthorizing {
     }
 
     @Override
-    public SimpleAuthorizationInfo setRoles(SimpleAuthorizationInfo authorizationInfo_, PrincipalCollection principalCollection) {
+    public SimpleAuthorizationInfo setRoles(SimpleAuthorizationInfo authorizationInfo_, PrincipalCollection principalCollection)  {
         if (authorizationInfo_ == null) {
             SimpleAuthorizationInfo simpleAuthorizationInfo = new SimpleAuthorizationInfo();
             authorizationInfo = simpleAuthorizationInfo;
@@ -30,7 +30,13 @@ public class SOSHibernateAuthorizing implements ISOSAuthorizing {
             authorizationInfo = authorizationInfo_;
         }
         String userName = (String) principalCollection.getPrimaryPrincipal();
-        SOSUserDBLayer sosUserDBLayer = new SOSUserDBLayer(configurationFileName);
+        SOSUserDBLayer sosUserDBLayer;
+        try {
+            sosUserDBLayer = new SOSUserDBLayer(configurationFileName);
+        } catch (Exception e1) {
+             e1.printStackTrace();
+             return null;
+        }
         sosUserDBLayer.getFilter().setUserName(userName);
         List<SOSUserDBItem> sosUserList = null;
         try {
@@ -58,7 +64,13 @@ public class SOSHibernateAuthorizing implements ISOSAuthorizing {
             authorizationInfo = authorizationInfo_;
         }
         String userName = (String) principalCollection.getPrimaryPrincipal();
-        SOSUserDBLayer sosUserDBLayer = new SOSUserDBLayer(configurationFileName);
+        SOSUserDBLayer sosUserDBLayer;
+        try {
+            sosUserDBLayer = new SOSUserDBLayer(configurationFileName);
+        } catch (Exception e1) {
+            e1.printStackTrace();
+            return null;
+        }
         sosUserDBLayer.getFilter().setUserName(userName);
         List<SOSUserDBItem> sosUserList = null;
         try {

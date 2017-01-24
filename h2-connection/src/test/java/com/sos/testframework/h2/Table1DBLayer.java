@@ -16,7 +16,6 @@ public class Table1DBLayer extends SOSHibernateDBLayer {
     public Table1DBLayer(String configurationFile) {
         super();
         this.setConfigurationFileName(configurationFile);
-        initConnection(configurationFile);
     }
 
     private Query setQueryParams(Table1Filter filter, String hql) throws Exception {

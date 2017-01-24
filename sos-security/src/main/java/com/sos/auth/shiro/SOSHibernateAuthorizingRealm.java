@@ -62,7 +62,13 @@ public class SOSHibernateAuthorizingRealm extends AuthorizingRealm {
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authcToken) throws AuthenticationException {
         authToken = (UsernamePasswordToken) authcToken;
-        SOSUserDBLayer sosUserDBLayer = new SOSUserDBLayer(hibernateConfigurationFile);
+        SOSUserDBLayer sosUserDBLayer;
+        try {
+            sosUserDBLayer = new SOSUserDBLayer(hibernateConfigurationFile);
+        } catch (Exception e1) {
+            e1.printStackTrace();
+            return null;
+        }
         sosUserDBLayer.getFilter().setUserName(authToken.getUsername());
         List<SOSUserDBItem> sosUserList = null;
         try {

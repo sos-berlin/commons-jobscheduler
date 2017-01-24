@@ -27,6 +27,7 @@ import com.sos.auth.rest.permission.model.SOSPermissionShiro;
 import com.sos.auth.rest.permission.model.SOSPermissions;
 import com.sos.auth.shiro.SOSlogin;
 import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JocCockpitProperties;
@@ -194,12 +195,12 @@ public class SOSServicePermissionShiro {
         sosShiroCurrentUserAnswer.setAccessToken(EMPTY_STRING);
         Globals.currentUsersList.removeUser(accessToken);
 
-        if (Globals.currentUsersList.size() == 0 && Globals.sosHibernateConnection != null) {
-            Globals.sosHibernateConnection.disconnect();
+        if (Globals.currentUsersList.size() == 0 && Globals.sosHibernateFactory != null) {
+            Globals.sosHibernateFactory.close();
         }
-        if (Globals.currentUsersList.size() == 0 && Globals.sosSchedulerHibernateConnections != null) {
-            for (SOSHibernateConnection sosHibernateConnection : Globals.sosSchedulerHibernateConnections.values()) {
-                sosHibernateConnection.disconnect();
+        if (Globals.currentUsersList.size() == 0 && Globals.sosSchedulerHibernateFactories != null) {
+            for (SOSHibernateFactory sosHibernateFactory : Globals.sosSchedulerHibernateFactories.values()) {
+                sosHibernateFactory.close();
             }
         }
 
@@ -220,15 +221,15 @@ public class SOSServicePermissionShiro {
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public JOCDefaultResponse dbRefresh() {
         try {
-            if (Globals.sosHibernateConnection != null) {
-                Globals.sosHibernateConnection.disconnect();
-                Globals.sosHibernateConnection.connect();
+            if (Globals.sosHibernateFactory != null) {
+                Globals.sosHibernateFactory.close();
+                Globals.sosHibernateFactory.open();
 
             }
-            if (Globals.sosSchedulerHibernateConnections != null) {
-                for (SOSHibernateConnection sosHibernateConnection : Globals.sosSchedulerHibernateConnections.values()) {
-                    sosHibernateConnection.disconnect();
-                    sosHibernateConnection.connect();
+            if (Globals.sosSchedulerHibernateFactories != null) {
+                for (SOSHibernateFactory sosHibernateFactory : Globals.sosSchedulerHibernateFactories.values()) {
+                    sosHibernateFactory.close();
+                    sosHibernateFactory.open();
                 }
             }
 
@@ -869,8 +870,8 @@ public class SOSServicePermissionShiro {
         }
         Globals.trySelect(null);
 
-        if (Globals.sosSchedulerHibernateConnections != null) {
-            for (String schedulerId : Globals.sosSchedulerHibernateConnections.keySet()) {
+        if (Globals.sosSchedulerHibernateFactories != null) {
+            for (String schedulerId : Globals.sosSchedulerHibernateFactories.keySet()) {
                 Globals.trySelect(schedulerId);
             }
         }

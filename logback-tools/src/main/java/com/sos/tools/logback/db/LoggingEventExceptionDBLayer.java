@@ -21,14 +21,10 @@ public class LoggingEventExceptionDBLayer extends SOSHibernateDBLayer {
         this.filter = new LoggingEventExceptionFilter();
         this.setConfigurationFileName(configurationFileName);
         this.filter.setOrderCriteria(EVENT_ID);
-        this.initConnection(this.getConfigurationFileName());
     }
 
     private Query setQueryParams(String hql) throws Exception {
         Query query = null;
-        if (connection == null) {
-            initConnection(getConfigurationFileName());
-        }
         connection.beginTransaction();
         query = connection.createQuery(hql);
         if (filter.getEventId() != null) {

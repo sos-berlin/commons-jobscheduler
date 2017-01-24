@@ -2,7 +2,7 @@ package com.sos.auth.shiro.db;
 
 import java.util.List;
 
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 
 import com.sos.hibernate.layer.SOSHibernateDBLayer;
 
@@ -11,10 +11,10 @@ public class SOSUserDBLayer extends SOSHibernateDBLayer {
 
     private SOSUserFilter filter = null;
 
-    public SOSUserDBLayer(String configurationFileName) {
+    public SOSUserDBLayer(String configurationFileName) throws Exception {
         super();
         this.setConfigurationFileName(configurationFileName);
-        this.initConnection(this.getConfigurationFileName());
+        this.createStatefullConnection(this.getConfigurationFileName());
         resetFilter();
     }
 
@@ -24,9 +24,6 @@ public class SOSUserDBLayer extends SOSHibernateDBLayer {
     }
 
     public int delete() throws Exception {
-        if (connection == null) {
-            initConnection(getConfigurationFileName());
-        }
         String hql = "delete from SOSUserDBItem " + getWhere();
         Query query = null;
         int row = 0;
@@ -54,9 +51,6 @@ public class SOSUserDBLayer extends SOSHibernateDBLayer {
 
     @SuppressWarnings("unchecked")
     public List<SOSUserDBItem> getSOSUserList(final int limit) throws Exception {
-        if (connection == null) {
-            initConnection(getConfigurationFileName());
-        }
         List<SOSUserDBItem> sosUserList = null;
         connection.beginTransaction();
         Query query = connection.createQuery("from SOSUserDBItem " + getWhere() + filter.getOrderCriteria() + filter.getSortMode());
