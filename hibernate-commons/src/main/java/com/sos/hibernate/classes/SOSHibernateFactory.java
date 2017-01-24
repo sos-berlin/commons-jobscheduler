@@ -11,9 +11,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.exception.SQLGrammarException;
+import org.hibernate.service.ServiceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,7 +115,9 @@ public class SOSHibernateFactory implements Serializable {
     private void initSessionFactory() throws Exception {
         String method = getMethodName("initSessionFactory");
         LOGGER.debug(String.format("%s", method));
-        sessionFactory = configuration.configure(configFile.get()).buildSessionFactory();
+        ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
+        		.applySettings(configuration.getProperties()).build();
+        sessionFactory = configuration.buildSessionFactory(serviceRegistry);
     }
 
     public boolean getAutoCommit() throws Exception {
