@@ -37,7 +37,6 @@ public class SOSHibernateConnection implements Serializable {
 	private SOSHibernateFactory factory;
 	private SessionFactory sessionFactory;
 	private Object currentSession;
-	private Connection jdbcConnection;
 	private boolean useOpenStatelessSession;
 	private boolean useGetCurrentSession;
 	private FlushMode sessionFlushMode;
@@ -70,7 +69,8 @@ public class SOSHibernateConnection implements Serializable {
 					: "without config file";
 			int isolationLevel = getFactory().getTransactionIsolation();
 			LOGGER.debug(String.format("%s: autocommit = %s, transaction isolation = %s, %s, %s", method,
-					getFactory().getAutoCommit(), getTransactionIsolationName(isolationLevel), openSessionMethodName, connFile));
+					getFactory().getAutoCommit(), SOSHibernateFactory.getTransactionIsolationName(isolationLevel), openSessionMethodName,
+					connFile));
 		} catch (Exception ex) {
 			throw new Exception(String.format("%s: %s", method, ex.toString()), ex);
 		}
@@ -86,9 +86,9 @@ public class SOSHibernateConnection implements Serializable {
 		String method = getMethodName("openSession");
 		LOGGER.debug(String.format("%s: useOpenStatelessSession = %s, useGetCurrentSession = %s", method,
 				useOpenStatelessSession, useGetCurrentSession));
-		
+
 		closeSession();
-		
+
 		openSessionMethodName = "";
 		if (useOpenStatelessSession) {
 			currentSession = sessionFactory.openStatelessSession();
@@ -107,7 +107,6 @@ public class SOSHibernateConnection implements Serializable {
 			}
 			currentSession = session;
 		}
-		setJdbcConnection();
 	}
 
 	public Session createSession() {
@@ -120,37 +119,6 @@ public class SOSHibernateConnection implements Serializable {
 		String method = getMethodName("createStatelessSession");
 		LOGGER.debug(String.format("%s: createStatelessSession", method));
 		return sessionFactory.openStatelessSession();
-	}
-
-	public boolean getJdbcAutoCommit() throws Exception {
-		if (jdbcConnection == null) {
-			throw new Exception("jdbcConnection is NULL");
-		}
-		return jdbcConnection.getAutoCommit();
-	}
-
-	public int getJdbcTransactionIsolation() throws Exception {
-		if (jdbcConnection == null) {
-			throw new Exception("jdbcConnection is NULL");
-		}
-		return jdbcConnection.getTransactionIsolation();
-	}
-
-	public static String getTransactionIsolationName(int isolationLevel) throws Exception {
-		switch (isolationLevel) {
-		case Connection.TRANSACTION_NONE:
-			return "TRANSACTION_NONE";
-		case Connection.TRANSACTION_READ_UNCOMMITTED:
-			return "TRANSACTION_READ_UNCOMMITTED";
-		case Connection.TRANSACTION_READ_COMMITTED:
-			return "TRANSACTION_READ_COMMITTED";
-		case Connection.TRANSACTION_REPEATABLE_READ:
-			return "TRANSACTION_REPEATABLE_READ";
-		case Connection.TRANSACTION_SERIALIZABLE:
-			return "TRANSACTION_SERIALIZABLE";
-		default:
-			throw new Exception(String.format("Invalid transaction isolation level = %s.", isolationLevel));
-		}
 	}
 
 	public static Throwable getException(Throwable ex) {
@@ -215,26 +183,6 @@ public class SOSHibernateConnection implements Serializable {
 		}
 		currentSession = null;
 		openSessionMethodName = null;
-		jdbcConnection = null;
-	}
-	
-	private void setJdbcConnection(){
-		String method = "setJdbcConnection";
-		if (currentSession instanceof Session) {
-			SessionImpl sf = (SessionImpl) currentSession;
-			try {
-				jdbcConnection = sf.connection();
-			} catch (Exception ex) {
-				LOGGER.warn(String.format("%s: %s",method,ex.toString()),ex);
-			}
-		} else {
-			StatelessSessionImpl sf = (StatelessSessionImpl) currentSession;
-			try {
-				jdbcConnection = sf.connection();
-			} catch (Exception ex) {
-				LOGGER.warn(String.format("%s: %s",method,ex.toString()),ex);
-			}
-		}
 	}
 
 	private void closeTransaction() {
@@ -501,14 +449,23 @@ public class SOSHibernateConnection implements Serializable {
 	}
 
 	public Connection getJdbcConnection() {
-		return jdbcConnection;
-	}
-
-	public PreparedStatement jdbcConnectionPrepareStatement(String sql) throws Exception {
-		if (jdbcConnection == null) {
-			throw new Exception("jdbcConnection is NULL");
+		String method = "getJdbcConnection";
+		if (currentSession instanceof Session) {
+			SessionImpl sf = (SessionImpl) currentSession;
+			try {
+				return sf.connection();
+			} catch (Exception ex) {
+				LOGGER.warn(String.format("%s: %s", method, ex.toString()), ex);
+			}
+		} else {
+			StatelessSessionImpl sf = (StatelessSessionImpl) currentSession;
+			try {
+				return sf.connection();
+			} catch (Exception ex) {
+				LOGGER.warn(String.format("%s: %s", method, ex.toString()), ex);
+			}
 		}
-		return jdbcConnection.prepareStatement(sql);
+		return null;
 	}
 
 	public FlushMode getSessionFlushMode() {
