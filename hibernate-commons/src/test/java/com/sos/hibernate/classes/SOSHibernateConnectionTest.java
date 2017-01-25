@@ -105,9 +105,14 @@ public class SOSHibernateConnectionTest {
 
 	}
 
+	
+	
 	public static void main(String[] args) throws Exception {
 		String hibernateConfigFile = "D:/Arbeit/scheduler/jobscheduler_data/re-dell_4444_jobscheduler.1.11x64-snapshot/config/hibernate.cfg.xml";
-		SOSHibernateConnection conn = null;
+		SOSHibernateFactory factory = new SOSHibernateFactory(hibernateConfigFile);
+		factory.build();
+		
+		LOGGER.info(factory.getDialect().toString());
 		
 		/**
 		try {

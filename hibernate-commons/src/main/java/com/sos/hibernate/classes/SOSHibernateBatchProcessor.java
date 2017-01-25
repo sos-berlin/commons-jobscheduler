@@ -38,7 +38,7 @@ public class SOSHibernateBatchProcessor implements Serializable {
         if (connection == null) {
             throw new Exception(String.format("%s: connection is NULL", method));
         }
-        if (connection.getDialect() == null) {
+        if (connection.getFactory().getDialect() == null) {
             throw new Exception(String.format("%s: dialect is NULL", method));
         }
         Table t = entity.getAnnotation(Table.class);
@@ -63,7 +63,7 @@ public class SOSHibernateBatchProcessor implements Serializable {
                             fieldsMap.put(fieldName, m);
                         } else {
                             try {
-                                sequenceNextValString = connection.getDialect().getSelectSequenceNextValString(gv.generator());
+                                sequenceNextValString = connection.getFactory().getDialect().getSelectSequenceNextValString(gv.generator());
                                 identifier = fieldName;
                             } catch (Exception ex) {
                                 // exception if not supported
