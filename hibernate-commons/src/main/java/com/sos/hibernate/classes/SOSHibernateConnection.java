@@ -84,10 +84,14 @@ public class SOSHibernateConnection implements Serializable {
 
 	private void openSession() throws Exception {
 		String method = getMethodName("openSession");
+		
+		if(this.currentSession != null){
+			LOGGER.debug(String.format("%s: close currentSession", method));
+			closeSession();
+		}
+		
 		LOGGER.debug(String.format("%s: useOpenStatelessSession = %s, useGetCurrentSession = %s", method,
 				useOpenStatelessSession, useGetCurrentSession));
-
-		closeSession();
 
 		openSessionMethodName = "";
 		if (useOpenStatelessSession) {
@@ -448,24 +452,23 @@ public class SOSHibernateConnection implements Serializable {
 		return factory.getConfiguration();
 	}
 
-	public Connection getJdbcConnection() {
+	public Connection getJdbcConnection() throws Exception {
 		String method = "getJdbcConnection";
 		if (currentSession instanceof Session) {
 			SessionImpl sf = (SessionImpl) currentSession;
 			try {
 				return sf.connection();
-			} catch (Exception ex) {
-				LOGGER.warn(String.format("%s: %s", method, ex.toString()), ex);
+			} catch (Exception e) {
+				throw new Exception(String.format("%s: %s", method, e.toString()), e);
 			}
 		} else {
 			StatelessSessionImpl sf = (StatelessSessionImpl) currentSession;
 			try {
 				return sf.connection();
-			} catch (Exception ex) {
-				LOGGER.warn(String.format("%s: %s", method, ex.toString()), ex);
+			} catch (Exception e) {
+				throw new Exception(String.format("%s: %s", method, e.toString()), e);
 			}
 		}
-		return null;
 	}
 
 	public FlushMode getSessionFlushMode() {
