@@ -868,13 +868,13 @@ public class SOSServicePermissionShiro {
         if (Globals.sosShiroProperties == null) {
             Globals.sosShiroProperties = new JocCockpitProperties();
         }
-        Globals.trySelect(null);
+//        Globals.trySelect(null);
 
-        if (Globals.sosSchedulerHibernateFactories != null) {
-            for (String schedulerId : Globals.sosSchedulerHibernateFactories.keySet()) {
-                Globals.trySelect(schedulerId);
-            }
-        }
+//        if (Globals.sosSchedulerHibernateFactories != null) {
+//            for (String schedulerId : Globals.sosSchedulerHibernateFactories.keySet()) {
+//                Globals.trySelect(schedulerId);
+//            }
+//        }
     }
 
     private SOSShiroCurrentUser getUserPwdFromHeaderOrQuery(String basicAuthorization, String user, String pwd) {
