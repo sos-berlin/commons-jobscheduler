@@ -6,7 +6,7 @@ public class SOSHibernateStatelessConnection extends SOSHibernateConnection {
 
 	public SOSHibernateStatelessConnection(SOSHibernateFactory factory) {
         super(factory);
-        this.setUseOpenStatelessSession(false);
+        this.setUseOpenStatelessSession(true);
     }
 
 }
