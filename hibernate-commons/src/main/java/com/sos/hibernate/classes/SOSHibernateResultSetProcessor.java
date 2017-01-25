@@ -91,8 +91,8 @@ public class SOSHibernateResultSetProcessor implements Serializable {
         statement = connection.getJdbcConnection().createStatement(getResultSetType(scrollMode), getConcurrencyMode(isReadOnly));
         if (fetchSize.isPresent()) {
             statement.setFetchSize(fetchSize.get());
-        } else if (connection.getJdbcFetchSize().isPresent()) {
-            statement.setFetchSize(connection.getJdbcFetchSize().get());
+        } else if (connection.getFactory().getJdbcFetchSize().isPresent()) {
+            statement.setFetchSize(connection.getFactory().getJdbcFetchSize().get());
         }
         resultSet = statement.executeQuery(sqlStatement);
         LOGGER.debug(String.format("%s: statement.getFetchSize = %s", method, statement.getFetchSize()));
@@ -107,7 +107,7 @@ public class SOSHibernateResultSetProcessor implements Serializable {
         for (int i = 0; i < values.length; i++) {
             int index = where.indexOf("?");
             if (index > 0) {
-                String val = connection.quote(types[i], values[i]);
+                String val = connection.getFactory().quote(types[i], values[i]);
                 where = where.replaceFirst("\\?", val);
             }
         }

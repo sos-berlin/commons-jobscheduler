@@ -4,9 +4,7 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
@@ -20,7 +18,6 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.dialect.Dialect;
 import org.hibernate.exception.SQLGrammarException;
 import org.hibernate.internal.SessionImpl;
 import org.hibernate.internal.StatelessSessionImpl;
@@ -28,18 +25,10 @@ import org.hibernate.jdbc.Work;
 import org.hibernate.query.Query;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.transform.Transformers;
-import org.hibernate.type.NumericBooleanType;
-import org.hibernate.type.StringType;
-import org.hibernate.type.TimestampType;
-import org.hibernate.type.Type;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.exception.DBSessionException;
-import com.sos.hibernate.classes.SOSHibernateFactory.Dbms;
 
 public class SOSHibernateConnection implements Serializable {
 
@@ -53,10 +42,8 @@ public class SOSHibernateConnection implements Serializable {
 	private boolean useGetCurrentSession;
 	private FlushMode sessionFlushMode;
 	private String connectionIdentifier;
-	private Optional<Integer> jdbcFetchSize = Optional.empty();
 	private String openSessionMethodName;
 	public static final int LIMIT_IN_CLAUSE = 1000;
-	public static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 	public SOSHibernateConnection(SOSHibernateFactory hibernateFactory) {
 		this.factory = hibernateFactory;
@@ -557,57 +544,6 @@ public class SOSHibernateConnection implements Serializable {
 		return criterion;
 	}
 
-	public String quote(Type type, Object value) throws Exception {
-		Dialect dialect  = getFactory().getDialect();
-		Enum<SOSHibernateFactory.Dbms> dbms = getFactory().getDbms();
-		if (value == null) {
-			return "NULL";
-		}
-		if (type instanceof org.hibernate.type.NumericBooleanType) {
-			return NumericBooleanType.INSTANCE.objectToSQLString((Boolean) value, dialect);
-		} else if (type instanceof org.hibernate.type.LongType) {
-			return org.hibernate.type.LongType.INSTANCE.objectToSQLString((Long) value, dialect);
-		} else if (type instanceof org.hibernate.type.StringType) {
-			return StringType.INSTANCE.objectToSQLString((String) value, dialect);
-		} else if (type instanceof org.hibernate.type.TimestampType) {
-			if (dbms.equals(Dbms.ORACLE)) {
-				String val = SOSHibernateConnection.getDateAsString((Date) value);
-				return "to_date('" + val + "','yyyy-mm-dd HH24:MI:SS')";
-			} else if (dbms.equals(Dbms.MSSQL)) {
-				String val = SOSHibernateConnection.getDateAsString((Date) value);
-				return "'" + val.replace(" ", "T") + "'";
-			} else {
-				return TimestampType.INSTANCE.objectToSQLString((Date) value, dialect);
-			}
-		}
-		return null;
-	}
-
-	public static String getDateAsString(Date d) throws Exception {
-		DateTimeFormatter f = DateTimeFormat.forPattern(DATETIME_FORMAT);
-		DateTime dt = new DateTime(d);
-		return f.print(dt);
-	}
-
-	public String quoteFieldName(String columnName) {
-		Dialect dialect = getFactory().getDialect();
-		if (dialect != null && columnName != null) {
-			String[] arr = columnName.split("\\.");
-			if (arr.length == 1) {
-				columnName = dialect.openQuote() + columnName + dialect.closeQuote();
-			} else {
-				StringBuilder sb = new StringBuilder();
-				String cn = arr[arr.length - 1];
-				for (int i = 0; i < arr.length - 1; i++) {
-					sb.append(arr[i] + ".");
-				}
-				sb.append(dialect.openQuote() + cn + dialect.closeQuote());
-				columnName = sb.toString();
-			}
-		}
-		return columnName;
-	}
-
 	public Object get(Class<?> entityClass, Serializable id) throws Exception {
 		if (currentSession instanceof Session) {
 			return ((Session) currentSession).get(entityClass, id);
@@ -643,10 +579,6 @@ public class SOSHibernateConnection implements Serializable {
 
 	public boolean isIgnoreAutoCommitTransactions() {
 		return factory.isIgnoreAutoCommitTransactions();
-	}
-
-	public Optional<Integer> getJdbcFetchSize() {
-		return jdbcFetchSize;
 	}
 
 	public SOSHibernateFactory getFactory() {

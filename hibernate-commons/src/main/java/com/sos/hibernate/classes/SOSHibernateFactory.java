@@ -7,9 +7,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
@@ -17,6 +19,13 @@ import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.exception.SQLGrammarException;
 import org.hibernate.service.ServiceRegistry;
+import org.hibernate.type.NumericBooleanType;
+import org.hibernate.type.StringType;
+import org.hibernate.type.TimestampType;
+import org.hibernate.type.Type;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,7 +121,7 @@ public class SOSHibernateFactory implements Serializable {
 		sessionFactory = configuration.buildSessionFactory(serviceRegistry);
 
 		SessionFactoryImplementor impl = (SessionFactoryImplementor) sessionFactory;
-		if(impl != null){
+		if (impl != null) {
 			dialect = impl.getJdbcServices().getDialect();
 			setDbms(dialect);
 		}
@@ -191,10 +200,10 @@ public class SOSHibernateFactory implements Serializable {
 		sessionFactory = null;
 	}
 
-	public boolean dbmsIsPostgres(){
+	public boolean dbmsIsPostgres() {
 		return dbms == SOSHibernateFactory.Dbms.PGSQL;
 	}
-	
+
 	private void initClassMapping() {
 		classMapping = new ClassList();
 	}
@@ -274,7 +283,7 @@ public class SOSHibernateFactory implements Serializable {
 			}
 		}
 	}
-	
+
 	private void setDbms(Dialect dialect) {
 		dbms = Dbms.UNKNOWN;
 		if (dialect != null) {
@@ -309,6 +318,54 @@ public class SOSHibernateFactory implements Serializable {
 				}
 			}
 		}
+	}
+
+	public static String getDateAsString(Date d) throws Exception {
+		DateTimeFormatter f = DateTimeFormat.forPattern(DATETIME_FORMAT);
+		DateTime dt = new DateTime(d);
+		return f.print(dt);
+	}
+
+	public String quote(Type type, Object value) throws Exception {
+		if (value == null) {
+			return "NULL";
+		}
+		if (type instanceof org.hibernate.type.NumericBooleanType) {
+			return NumericBooleanType.INSTANCE.objectToSQLString((Boolean) value, dialect);
+		} else if (type instanceof org.hibernate.type.LongType) {
+			return org.hibernate.type.LongType.INSTANCE.objectToSQLString((Long) value, dialect);
+		} else if (type instanceof org.hibernate.type.StringType) {
+			return StringType.INSTANCE.objectToSQLString((String) value, dialect);
+		} else if (type instanceof org.hibernate.type.TimestampType) {
+			if (dbms.equals(Dbms.ORACLE)) {
+				String val = SOSHibernateFactory.getDateAsString((Date) value);
+				return "to_date('" + val + "','yyyy-mm-dd HH24:MI:SS')";
+			} else if (dbms.equals(Dbms.MSSQL)) {
+				String val = SOSHibernateFactory.getDateAsString((Date) value);
+				return "'" + val.replace(" ", "T") + "'";
+			} else {
+				return TimestampType.INSTANCE.objectToSQLString((Date) value, dialect);
+			}
+		}
+		return null;
+	}
+
+	public String quoteFieldName(String columnName) {
+		if (dialect != null && columnName != null) {
+			String[] arr = columnName.split("\\.");
+			if (arr.length == 1) {
+				columnName = dialect.openQuote() + columnName + dialect.closeQuote();
+			} else {
+				StringBuilder sb = new StringBuilder();
+				String cn = arr[arr.length - 1];
+				for (int i = 0; i < arr.length - 1; i++) {
+					sb.append(arr[i] + ".");
+				}
+				sb.append(dialect.openQuote() + cn + dialect.closeQuote());
+				columnName = sb.toString();
+			}
+		}
+		return columnName;
 	}
 
 	public void addClassMapping(ClassList list) {
@@ -373,8 +430,8 @@ public class SOSHibernateFactory implements Serializable {
 	public Optional<Integer> getJdbcFetchSize() {
 		return jdbcFetchSize;
 	}
-	
-	public Enum<SOSHibernateFactory.Dbms> getDbms(){
+
+	public Enum<SOSHibernateFactory.Dbms> getDbms() {
 		return this.dbms;
 	}
 
