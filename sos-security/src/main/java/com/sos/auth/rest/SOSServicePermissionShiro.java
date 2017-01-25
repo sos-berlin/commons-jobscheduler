@@ -223,13 +223,13 @@ public class SOSServicePermissionShiro {
         try {
             if (Globals.sosHibernateFactory != null) {
                 Globals.sosHibernateFactory.close();
-                Globals.sosHibernateFactory.open();
+                Globals.sosHibernateFactory.build();
 
             }
             if (Globals.sosSchedulerHibernateFactories != null) {
                 for (SOSHibernateFactory sosHibernateFactory : Globals.sosSchedulerHibernateFactories.values()) {
                     sosHibernateFactory.close();
-                    sosHibernateFactory.open();
+                    sosHibernateFactory.build();
                 }
             }
 

@@ -39,7 +39,7 @@ public class SOSHibernateDBLayer {
         if (sosHibernateFactory == null) {
                 sosHibernateFactory = new SOSHibernateFactory(confFile);
                 sosHibernateFactory.addClassMapping(getDefaultClassMapping());
-                sosHibernateFactory.open();
+                sosHibernateFactory.build();
         }
         connection = new SOSHibernateConnection(sosHibernateFactory);
         connection.connect();
@@ -51,7 +51,7 @@ public class SOSHibernateDBLayer {
         if (sosHibernateFactory == null) {
                 sosHibernateFactory = new SOSHibernateFactory(confFile);
                 sosHibernateFactory.addClassMapping(getDefaultClassMapping());
-                sosHibernateFactory.open();
+                sosHibernateFactory.build();
         }
         connection = new SOSHibernateStatelessConnection(sosHibernateFactory);
         connection.connect();

@@ -44,7 +44,7 @@ public class SOSHibernateConnection implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateConnection.class);
-    private SOSHibernateFactory sosHibernateFactory;
+    private SOSHibernateFactory factory;
     private SessionFactory sessionFactory;
     private Dialect dialect;
     private Object currentSession;
@@ -64,9 +64,9 @@ public class SOSHibernateConnection implements Serializable {
     public static final int LIMIT_IN_CLAUSE = 1000;
     public static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-    public SOSHibernateConnection(SOSHibernateFactory sosHibernateFactory) {
-        this.sosHibernateFactory = sosHibernateFactory;
-        this.sessionFactory = sosHibernateFactory.getSessionFactory();
+    public SOSHibernateConnection(SOSHibernateFactory hibernateFactory) {
+        this.factory = hibernateFactory;
+        this.sessionFactory = hibernateFactory.getSessionFactory();
         initSessionProperties();
     }
 
@@ -89,7 +89,7 @@ public class SOSHibernateConnection implements Serializable {
         String method = getMethodName("connect");
         try {
             openSession();
-            String connFile = (sosHibernateFactory.getConfigFile().isPresent()) ? sosHibernateFactory.getConfigFile().get().getCanonicalPath() : "without config file";
+            String connFile = (factory.getConfigFile().isPresent()) ? factory.getConfigFile().get().getCanonicalPath() : "without config file";
             int isolationLevel = getTransactionIsolation();
             LOGGER.debug(String.format("%s: autocommit = %s, transaction isolation = %s, %s, %s", method, getAutoCommit(), getTransactionIsolationName(isolationLevel),
                     openSessionMethodName, connFile));
@@ -463,7 +463,7 @@ public class SOSHibernateConnection implements Serializable {
     }
 
     public void beginTransaction() throws Exception {
-        if (sosHibernateFactory.isIgnoreAutoCommitTransactions() && this.getAutoCommit()) {
+        if (factory.isIgnoreAutoCommitTransactions() && this.getAutoCommit()) {
          //   return;
         }
         String method = getMethodName("beginTransaction");
@@ -503,7 +503,7 @@ public class SOSHibernateConnection implements Serializable {
         String method = getMethodName("commit");
         LOGGER.debug(String.format("%s", method));
 
-        if (sosHibernateFactory.isIgnoreAutoCommitTransactions() && this.getAutoCommit()) {
+        if (factory.isIgnoreAutoCommitTransactions() && this.getAutoCommit()) {
             return;
         }
         Transaction tr = getTransaction(currentSession);
@@ -519,7 +519,7 @@ public class SOSHibernateConnection implements Serializable {
     public void rollback() throws Exception {
         String method = getMethodName("rollback");
         LOGGER.debug(String.format("%s", method));
-        if (sosHibernateFactory.isIgnoreAutoCommitTransactions() && this.getAutoCommit()) {
+        if (factory.isIgnoreAutoCommitTransactions() && this.getAutoCommit()) {
             return;
         }
         Transaction tr = getTransaction(currentSession);
@@ -598,7 +598,7 @@ public class SOSHibernateConnection implements Serializable {
     }
 
     public Configuration getConfiguration() {
-        return sosHibernateFactory.getConfiguration();
+        return factory.getConfiguration();
     }
 
     public Connection getJdbcConnection() {
@@ -732,15 +732,14 @@ public class SOSHibernateConnection implements Serializable {
     }
 
     public boolean isIgnoreAutoCommitTransactions() {
-        return sosHibernateFactory.isIgnoreAutoCommitTransactions();
-    }
-
-    public SessionFactory getSessionFactory() {
-        return sessionFactory;
+        return factory.isIgnoreAutoCommitTransactions();
     }
 
     public Optional<Integer> getJdbcFetchSize() {
         return jdbcFetchSize;
     }
 
+    public SOSHibernateFactory getFactory(){
+    	return this.factory;
+    }
 }

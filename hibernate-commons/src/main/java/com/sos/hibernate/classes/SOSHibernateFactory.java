@@ -77,8 +77,8 @@ public class SOSHibernateFactory implements Serializable {
         }
     }
 
-    public void open() throws Exception {
-        String method = getMethodName("connect");
+    public void build() throws Exception {
+        String method = getMethodName("build");
         try {
             initConfiguration();
             initSessionFactory();
