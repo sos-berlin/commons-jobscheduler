@@ -334,6 +334,19 @@
 					</xs:complexType>
 				</xs:element>
 				<xs:element ref="SOSPermissionRoles"/>
+				<xs:element name="AuditLog">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="view">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="status" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
 			</xs:sequence>
 			<xs:attribute name="isAuthenticated" type="xs:boolean"/>
 			<xs:attribute name="user" type="xs:string"/>

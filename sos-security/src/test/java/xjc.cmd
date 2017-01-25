@@ -1,2 +1,0 @@
-"C:\Program Files (x86)\Java\jdk1.7.0_15\bin\xjc.exe" -p com.sos.auth.rest.permission.model  -d C:\development\products\jobscheduler\sos-security\src\main\java\com\sos\auth\rest\permission\model1  C:\development\products\jobscheduler\sos-security\src\main\resources\permissions.xsd 
-pause

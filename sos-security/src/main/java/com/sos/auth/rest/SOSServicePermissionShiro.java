@@ -423,6 +423,8 @@ public class SOSServicePermissionShiro {
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:maintenance_window:view:status");
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:maintenance_window:enable_disable_maintenance_window");
 
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:audit_log:view:status");
+
             sosPermissions.setSOSPermissionListJoc(sosPermissionJoc);
             SOSPermissionListCommands sosPermissionCommands = o.createSOSPermissionListCommands();
             addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:view:status");
@@ -550,6 +552,7 @@ public class SOSServicePermissionShiro {
             sosPermissionJocCockpit.setEvent(o.createSOSPermissionJocCockpitEvent());
             sosPermissionJocCockpit.setEventAction(o.createSOSPermissionJocCockpitEventAction());
             sosPermissionJocCockpit.setHolidayCalendar(o.createSOSPermissionJocCockpitHolidayCalendar());
+            sosPermissionJocCockpit.setAuditLog(o.createSOSPermissionJocCockpitAuditLog());
             sosPermissionJocCockpit.setMaintenanceWindow(o.createSOSPermissionJocCockpitMaintenanceWindow());
 
             sosPermissionJocCockpit.getJobschedulerMaster().setView(o.createSOSPermissionJocCockpitJobschedulerMasterView());
@@ -570,6 +573,7 @@ public class SOSServicePermissionShiro {
             sosPermissionJocCockpit.getEvent().setView(o.createSOSPermissionJocCockpitEventView());
             sosPermissionJocCockpit.getEventAction().setView(o.createSOSPermissionJocCockpitEventActionView());
             sosPermissionJocCockpit.getHolidayCalendar().setView(o.createSOSPermissionJocCockpitHolidayCalendarView());
+            sosPermissionJocCockpit.getAuditLog().setView(o.createSOSPermissionJocCockpitAuditLogView());
             sosPermissionJocCockpit.getMaintenanceWindow().setView(o.createSOSPermissionJocCockpitMaintenanceWindowView());
 
             sosPermissionJocCockpit.getJobschedulerMaster().getView().setStatus(haveRight(
@@ -678,6 +682,7 @@ public class SOSServicePermissionShiro {
                     "sos:products:joc_cockpit:event_action:create_event_manually"));
 
             sosPermissionJocCockpit.getHolidayCalendar().getView().setStatus(haveRight("sos:products:joc_cockpit:holiday_calendar:view:status"));
+            sosPermissionJocCockpit.getAuditLog().getView().setStatus(haveRight("sos:products:joc_cockpit:audit_log:view:status"));
 
             sosPermissionJocCockpit.getMaintenanceWindow().getView().setStatus(haveRight("sos:products:joc_cockpit:maintenance_window:view:status"));
             sosPermissionJocCockpit.getMaintenanceWindow().setEnableDisableMaintenanceWindow(haveRight(
