@@ -68,9 +68,9 @@ public class SOSHibernateConnection implements Serializable {
 			openSession();
 			String connFile = (factory.getConfigFile().isPresent()) ? factory.getConfigFile().get().getCanonicalPath()
 					: "without config file";
-			int isolationLevel = getTransactionIsolation();
+			int isolationLevel = getFactory().getTransactionIsolation();
 			LOGGER.debug(String.format("%s: autocommit = %s, transaction isolation = %s, %s, %s", method,
-					getAutoCommit(), getTransactionIsolationName(isolationLevel), openSessionMethodName, connFile));
+					getFactory().getAutoCommit(), getTransactionIsolationName(isolationLevel), openSessionMethodName, connFile));
 		} catch (Exception ex) {
 			throw new Exception(String.format("%s: %s", method, ex.toString()), ex);
 		}
@@ -86,15 +86,10 @@ public class SOSHibernateConnection implements Serializable {
 		String method = getMethodName("openSession");
 		LOGGER.debug(String.format("%s: useOpenStatelessSession = %s, useGetCurrentSession = %s", method,
 				useOpenStatelessSession, useGetCurrentSession));
+		
+		closeSession();
+		
 		openSessionMethodName = "";
-
-		if (currentSession != null) {
-			if (currentSession instanceof Session) {
-				((Session) currentSession).close();
-			} else {
-				((StatelessSession) currentSession).close();
-			}
-		}
 		if (useOpenStatelessSession) {
 			currentSession = sessionFactory.openStatelessSession();
 			openSessionMethodName = "openStatelessSession";
@@ -112,21 +107,7 @@ public class SOSHibernateConnection implements Serializable {
 			}
 			currentSession = session;
 		}
-		if (currentSession instanceof Session) {
-			SessionImpl sf = (SessionImpl) currentSession;
-			try {
-				jdbcConnection = sf.connection();
-			} catch (Exception ex) {
-				throw new Exception(String.format("%s: cannot get jdbcConnection : %s", method, ex.toString()), ex);
-			}
-		} else {
-			StatelessSessionImpl sf = (StatelessSessionImpl) currentSession;
-			try {
-				jdbcConnection = sf.connection();
-			} catch (Exception ex) {
-				throw new Exception(String.format("%s: cannot get jdbcConnection : %s", method, ex.toString()), ex);
-			}
-		}
+		setJdbcConnection();
 	}
 
 	public Session createSession() {
@@ -141,14 +122,14 @@ public class SOSHibernateConnection implements Serializable {
 		return sessionFactory.openStatelessSession();
 	}
 
-	public boolean getAutoCommit() throws Exception {
+	public boolean getJdbcAutoCommit() throws Exception {
 		if (jdbcConnection == null) {
 			throw new Exception("jdbcConnection is NULL");
 		}
 		return jdbcConnection.getAutoCommit();
 	}
 
-	public int getTransactionIsolation() throws Exception {
+	public int getJdbcTransactionIsolation() throws Exception {
 		if (jdbcConnection == null) {
 			throw new Exception("jdbcConnection is NULL");
 		}
@@ -235,6 +216,25 @@ public class SOSHibernateConnection implements Serializable {
 		currentSession = null;
 		openSessionMethodName = null;
 		jdbcConnection = null;
+	}
+	
+	private void setJdbcConnection(){
+		String method = "setJdbcConnection";
+		if (currentSession instanceof Session) {
+			SessionImpl sf = (SessionImpl) currentSession;
+			try {
+				jdbcConnection = sf.connection();
+			} catch (Exception ex) {
+				LOGGER.warn(String.format("%s: %s",method,ex.toString()),ex);
+			}
+		} else {
+			StatelessSessionImpl sf = (StatelessSessionImpl) currentSession;
+			try {
+				jdbcConnection = sf.connection();
+			} catch (Exception ex) {
+				LOGGER.warn(String.format("%s: %s",method,ex.toString()),ex);
+			}
+		}
 	}
 
 	private void closeTransaction() {
@@ -361,7 +361,7 @@ public class SOSHibernateConnection implements Serializable {
 	}
 
 	public void beginTransaction() throws Exception {
-		if (factory.isIgnoreAutoCommitTransactions() && this.getAutoCommit()) {
+		if (factory.isIgnoreAutoCommitTransactions() && this.getFactory().getAutoCommit()) {
 			// return;
 		}
 		String method = getMethodName("beginTransaction");
@@ -401,7 +401,7 @@ public class SOSHibernateConnection implements Serializable {
 		String method = getMethodName("commit");
 		LOGGER.debug(String.format("%s", method));
 
-		if (factory.isIgnoreAutoCommitTransactions() && this.getAutoCommit()) {
+		if (factory.isIgnoreAutoCommitTransactions() && this.getFactory().getAutoCommit()) {
 			return;
 		}
 		Transaction tr = getTransaction(currentSession);
@@ -417,7 +417,7 @@ public class SOSHibernateConnection implements Serializable {
 	public void rollback() throws Exception {
 		String method = getMethodName("rollback");
 		LOGGER.debug(String.format("%s", method));
-		if (factory.isIgnoreAutoCommitTransactions() && this.getAutoCommit()) {
+		if (factory.isIgnoreAutoCommitTransactions() && this.getFactory().getAutoCommit()) {
 			return;
 		}
 		Transaction tr = getTransaction(currentSession);

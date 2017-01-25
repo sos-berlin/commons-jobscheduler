@@ -19,52 +19,52 @@ public class SOSHibernateConnectionTest {
 		boolean delete = false;
 		SQLQuery q = null;
 
-		LOGGER.info("autocommit 1= " + conn.getAutoCommit());
+		LOGGER.info("autocommit 1= " + conn.getFactory().getAutoCommit());
 
 		conn.beginTransaction();
-		LOGGER.info("autocommit 1.1= " + conn.getAutoCommit());
+		LOGGER.info("autocommit 1.1= " + conn.getFactory().getAutoCommit());
 		q = conn.createSQLQuery("select * from SCHEDULER_VARIABLES where \"NAME\"='test'");
-		LOGGER.info("autocommit 1.2= " + conn.getAutoCommit());
+		LOGGER.info("autocommit 1.2= " + conn.getFactory().getAutoCommit());
 		List result = q.list();
-		LOGGER.info("autocommit 1.3= " + conn.getAutoCommit());
+		LOGGER.info("autocommit 1.3= " + conn.getFactory().getAutoCommit());
 		conn.commit();
 
-		LOGGER.info("autocommit 2= " + conn.getAutoCommit());
+		LOGGER.info("autocommit 2= " + conn.getFactory().getAutoCommit());
 
 		if (result == null || result.size() == 0) {
 			conn.beginTransaction();
-			LOGGER.info("autocommit 2.1= " + conn.getAutoCommit());
+			LOGGER.info("autocommit 2.1= " + conn.getFactory().getAutoCommit());
 			q = conn.createSQLQuery(
 					"insert into SCHEDULER_VARIABLES(\"NAME\",\"WERT\",\"TEXTWERT\") values('test',0,'test')");
-			LOGGER.info("autocommit 2.2= " + conn.getAutoCommit());
+			LOGGER.info("autocommit 2.2= " + conn.getFactory().getAutoCommit());
 			q.executeUpdate();
-			LOGGER.info("autocommit 2.3= " + conn.getAutoCommit());
+			LOGGER.info("autocommit 2.3= " + conn.getFactory().getAutoCommit());
 			conn.commit();
 		}
 
-		LOGGER.info("autocommit 3= " + conn.getAutoCommit());
+		LOGGER.info("autocommit 3= " + conn.getFactory().getAutoCommit());
 
 		conn.beginTransaction();
-		LOGGER.info("autocommit 3.1= " + conn.getAutoCommit());
+		LOGGER.info("autocommit 3.1= " + conn.getFactory().getAutoCommit());
 		q = conn.createSQLQuery("update SCHEDULER_VARIABLES set \"WERT\" = 1 where \"NAME\"='test'");
-		LOGGER.info("autocommit 3.2= " + conn.getAutoCommit());
+		LOGGER.info("autocommit 3.2= " + conn.getFactory().getAutoCommit());
 		q.executeUpdate();
-		LOGGER.info("autocommit 3.3= " + conn.getAutoCommit());
+		LOGGER.info("autocommit 3.3= " + conn.getFactory().getAutoCommit());
 		conn.commit();
 
-		LOGGER.info("autocommit 4= " + conn.getAutoCommit());
+		LOGGER.info("autocommit 4= " + conn.getFactory().getAutoCommit());
 
 		if (delete) {
 			conn.beginTransaction();
-			LOGGER.info("autocommit 4.1= " + conn.getAutoCommit());
+			LOGGER.info("autocommit 4.1= " + conn.getFactory().getAutoCommit());
 			q = conn.createSQLQuery("delete from SCHEDULER_VARIABLES where \"NAME\"='test'");
-			LOGGER.info("autocommit 4.2= " + conn.getAutoCommit());
+			LOGGER.info("autocommit 4.2= " + conn.getFactory().getAutoCommit());
 			q.executeUpdate();
-			LOGGER.info("autocommit 4.3= " + conn.getAutoCommit());
+			LOGGER.info("autocommit 4.3= " + conn.getFactory().getAutoCommit());
 			conn.commit();
 
 			// TimeUnit.SECONDS.sleep(5);
-			LOGGER.info("autocommit 6= " + conn.getAutoCommit());
+			LOGGER.info("autocommit 6= " + conn.getFactory().getAutoCommit());
 		}
 
 	}
@@ -75,25 +75,25 @@ public class SOSHibernateConnectionTest {
 
 		SQLQuery q = null;
 
-		LOGGER.info("autocommit 1 = " + conn.getAutoCommit());
+		LOGGER.info("autocommit 1 = " + conn.getFactory().getAutoCommit());
 		q = conn.createSQLQuery(
 				"insert into SCHEDULER_VARIABLES(\"NAME\",\"WERT\",\"TEXTWERT\") values('test',0,'test')");
-		LOGGER.info("autocommit 1.1= " + conn.getAutoCommit());
+		LOGGER.info("autocommit 1.1= " + conn.getFactory().getAutoCommit());
 		q.executeUpdate();
 
-		LOGGER.info("autocommit 2= " + conn.getAutoCommit());
+		LOGGER.info("autocommit 2= " + conn.getFactory().getAutoCommit());
 
 		q = conn.createSQLQuery("select * from SCHEDULER_VARIABLES");
-		LOGGER.info("autocommit 2.1= " + conn.getAutoCommit());
+		LOGGER.info("autocommit 2.1= " + conn.getFactory().getAutoCommit());
 		q.list();
 
-		LOGGER.info("autocommit 3= " + conn.getAutoCommit());
+		LOGGER.info("autocommit 3= " + conn.getFactory().getAutoCommit());
 
 		q = conn.createSQLQuery("update SCHEDULER_VARIABLES set \"WERT\" = 1 where \"NAME\"='test'");
-		LOGGER.info("autocommit 3.1= " + conn.getAutoCommit());
+		LOGGER.info("autocommit 3.1= " + conn.getFactory().getAutoCommit());
 		q.executeUpdate();
 
-		LOGGER.info("autocommit 4= " + conn.getAutoCommit());
+		LOGGER.info("autocommit 4= " + conn.getFactory().getAutoCommit());
 		/**
 		 * q = conn.createSQLQuery(
 		 * "delete from SCHEDULER_VARIABLES where \"NAME\"='test'");
@@ -101,7 +101,7 @@ public class SOSHibernateConnectionTest {
 		 * q.executeUpdate();
 		 */
 		// TimeUnit.SECONDS.sleep(5);
-		LOGGER.info("autocommit 5= " + conn.getAutoCommit());
+		LOGGER.info("autocommit 5= " + conn.getFactory().getAutoCommit());
 
 	}
 
