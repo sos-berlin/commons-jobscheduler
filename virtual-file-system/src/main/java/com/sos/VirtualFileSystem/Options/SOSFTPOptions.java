@@ -46,6 +46,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     private boolean flgSettingsFileProcessed = false;
     private Properties propAllEnvironmentVariables = null;
     private String originalSettingsFile = null;
+    private boolean deleteSettingsFileOnExit = false;
     @JSOptionClass(description = "objConnectionOptions", name = "SOSConnection2Options")
     private SOSConnection2Options objConnectionOptions;
     @JSOptionClass(description = "objMailOptions", name = "objMailOptions")
@@ -1026,5 +1027,13 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
 
     public String getOriginalSettingsFile() {
         return this.originalSettingsFile;
+    }
+    
+    public void setDeleteSettingsFileOnExit(boolean val) {
+        this.deleteSettingsFileOnExit = val;
+    }
+
+    public boolean getDeleteSettingsFileOnExit() {
+        return this.deleteSettingsFileOnExit;
     }
 }
