@@ -2,7 +2,6 @@ package com.sos.hibernate.classes;
 
 import java.io.Serializable;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 

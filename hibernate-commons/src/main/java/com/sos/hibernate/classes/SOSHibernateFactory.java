@@ -53,6 +53,7 @@ public class SOSHibernateFactory implements Serializable {
 	public static final String HIBERNATE_PROPERTY_USE_SCROLLABLE_RESULTSET = "hibernate.jdbc.use_scrollable_resultset";
 	public static final String HIBERNATE_PROPERTY_CURRENT_SESSION_CONTEXT_CLASS = "hibernate.current_session_context_class";
 	public static final String HIBERNATE_PROPERTY_JDBC_FETCH_SIZE = "hibernate.jdbc.fetch_size";
+	public static final String HIBERNATE_PROPERTY_ID_NEW_GENERATOR_MAPPINGS = "hibernate.id.new_generator_mappings";
 	public static final int LIMIT_IN_CLAUSE = 1000;
 	public static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
@@ -216,6 +217,7 @@ public class SOSHibernateFactory implements Serializable {
 		defaultConfigurationProperties.put(HIBERNATE_PROPERTY_USE_SCROLLABLE_RESULTSET, "true");
 		defaultConfigurationProperties.put(HIBERNATE_PROPERTY_CURRENT_SESSION_CONTEXT_CLASS, "jta");
 		defaultConfigurationProperties.put(HIBERNATE_PROPERTY_JAVAX_PERSISTENCE_VALIDATION_MODE, "none");
+		defaultConfigurationProperties.put(HIBERNATE_PROPERTY_ID_NEW_GENERATOR_MAPPINGS,"false");
 		configurationProperties = new Properties();
 	}
 
