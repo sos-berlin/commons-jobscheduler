@@ -32,6 +32,8 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JocCockpitProperties;
 import com.sos.joc.classes.WebserviceConstants;
+import com.sos.joc.exceptions.JocError;
+import com.sos.joc.exceptions.JocException;
 
 @Path("/security")
 public class SOSServicePermissionShiro {
@@ -181,6 +183,7 @@ public class SOSServicePermissionShiro {
 
         try {
             Globals.forceClosingHttpClients(currentUser.getCurrentSubject().getSession(false));
+            currentUser.getCurrentSubject().getSession().stop();
         } catch (Exception e) {
         }
 
@@ -203,7 +206,6 @@ public class SOSServicePermissionShiro {
                 sosHibernateFactory.close();
             }
         }
-
         return sosShiroCurrentUserAnswer;
     }
 
@@ -858,6 +860,11 @@ public class SOSServicePermissionShiro {
 
         currentUser.setCurrentSubject(sosLogin.getCurrentUser());
 
+        if (sosLogin.getCurrentUser() == null){
+            JocError error = new JocError();
+            error.setMessage(String.format("Could not login with user: %s passwort:*******",currentUser.getUsername()));
+            throw new JocException(error);
+        }
         Session session = sosLogin.getCurrentUser().getSession();
         String accessToken = session.getId().toString();
 

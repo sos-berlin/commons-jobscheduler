@@ -64,12 +64,10 @@ public class SOSHibernateConnection implements Serializable {
 		String method = getMethodName("connect");
 		try {
 			openSession();
-			String connFile = (factory.getConfigFile().isPresent()) ? factory.getConfigFile().get().getCanonicalPath()
-					: "without config file";
+            String connFile = (factory.getConfigFile().isPresent()) ? factory.getConfigFile().get().getCanonicalPath() : "without config file";
 			int isolationLevel = getFactory().getTransactionIsolation();
-			LOGGER.debug(String.format("%s: autocommit = %s, transaction isolation = %s, %s, %s", method,
-					getFactory().getAutoCommit(), SOSHibernateFactory.getTransactionIsolationName(isolationLevel), openSessionMethodName,
-					connFile));
+            LOGGER.debug(String.format("%s: autocommit = %s, transaction isolation = %s, %s, %s", method, getFactory().getAutoCommit(), SOSHibernateFactory
+                    .getTransactionIsolationName(isolationLevel), openSessionMethodName, connFile));
 		} catch (Exception ex) {
 			throw new Exception(String.format("%s: %s", method, ex.toString()), ex);
 		}
@@ -112,24 +110,12 @@ public class SOSHibernateConnection implements Serializable {
 		}
 	}
 
-	public Session createSession() {
-		String method = getMethodName("createSession");
-		LOGGER.debug(String.format("%s: createSession", method));
-		return sessionFactory.openSession();
-	}
-
-	public StatelessSession createStatelessSession() {
-		String method = getMethodName("createStatelessSession");
-		LOGGER.debug(String.format("%s: createStatelessSession", method));
-		return sessionFactory.openStatelessSession();
-	}
-
+ 
 	public static Throwable getException(Throwable ex) {
 		if (ex instanceof SQLGrammarException) {
 			SQLGrammarException sqlGrEx = (SQLGrammarException) ex;
 			SQLException sqlEx = sqlGrEx.getSQLException();
-			return new Exception(String.format("%s [exception: %s, sql: %s]", ex.getMessage(),
-					sqlEx == null ? "" : sqlEx.getMessage(), sqlGrEx.getSQL()), sqlEx);
+            return new Exception(String.format("%s [exception: %s, sql: %s]", ex.getMessage(), sqlEx == null ? "" : sqlEx.getMessage(), sqlGrEx.getSQL()), sqlEx);
 		} else if (ex.getCause() != null) {
 			return ex.getCause();
 		}
@@ -165,8 +151,8 @@ public class SOSHibernateConnection implements Serializable {
 			Session session = (Session) currentSession;
 			session.doWork(work);
 		} else {
-			LOGGER.warn(String.format("%s: this method will be ignored for current openSessionMethodName : %s (%s)",
-					method, openSessionMethodName, currentSession.getClass().getSimpleName()));
+            LOGGER.warn(String.format("%s: this method will be ignored for current openSessionMethodName : %s (%s)", method, openSessionMethodName, currentSession.getClass()
+                    .getSimpleName()));
 		}
 	}
 
@@ -271,8 +257,7 @@ public class SOSHibernateConnection implements Serializable {
 		return createCriteria(cl, selectProperties, null);
 	}
 
-	public Criteria createCriteria(Class<?> cl, String[] selectProperties, ResultTransformer transformer)
-			throws Exception {
+    public Criteria createCriteria(Class<?> cl, String[] selectProperties, ResultTransformer transformer) throws Exception {
 		Criteria cr = createCriteria(cl);
 		if (cr == null) {
 			throw new Exception("Criteria is NULL");
@@ -298,8 +283,7 @@ public class SOSHibernateConnection implements Serializable {
 		return createSingleListCriteria(cl, selectProperty, null);
 	}
 
-	public Criteria createSingleListCriteria(Class<?> cl, String selectProperty, ResultTransformer transformer)
-			throws Exception {
+    public Criteria createSingleListCriteria(Class<?> cl, String selectProperty, ResultTransformer transformer) throws Exception {
 		return createCriteria(cl, new String[] { selectProperty }, transformer);
 	}
 
@@ -421,9 +405,14 @@ public class SOSHibernateConnection implements Serializable {
 			session.saveOrUpdate(item);
 			session.flush();
 		} else if (currentSession instanceof StatelessSession) {
-			throw new Exception(String.format("saveOrUpdate method is not allowed for this session instance: %s",
-					currentSession.toString()));
+            StatelessSession session = ((StatelessSession) currentSession);
+
+            try {
+                session.update(item);
+            } catch (Exception e) {
+                session.insert(item);
 		}
+        }
 		return item;
 	}
 
