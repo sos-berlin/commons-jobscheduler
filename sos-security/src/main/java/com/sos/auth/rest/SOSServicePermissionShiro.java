@@ -198,14 +198,7 @@ public class SOSServicePermissionShiro {
         sosShiroCurrentUserAnswer.setAccessToken(EMPTY_STRING);
         Globals.currentUsersList.removeUser(accessToken);
 
-        if (Globals.currentUsersList.size() == 0 && Globals.sosHibernateFactory != null) {
-            Globals.sosHibernateFactory.close();
-        }
-        if (Globals.currentUsersList.size() == 0 && Globals.sosSchedulerHibernateFactories != null) {
-            for (SOSHibernateFactory sosHibernateFactory : Globals.sosSchedulerHibernateFactories.values()) {
-                sosHibernateFactory.close();
-            }
-        }
+      
         return sosShiroCurrentUserAnswer;
     }
 
