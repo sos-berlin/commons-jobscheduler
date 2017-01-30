@@ -46,7 +46,6 @@ public class SOSHibernateFactory implements Serializable {
 	private boolean useDefaultConfigurationProperties = true;
 	private String connectionIdentifier;
 	private Optional<Integer> jdbcFetchSize = Optional.empty();
-	private boolean ignoreAutoCommitTransactions = false;
 	private Enum<SOSHibernateFactory.Dbms> dbms = Dbms.UNKNOWN;
 	public static final String HIBERNATE_PROPERTY_TRANSACTION_ISOLATION = "hibernate.connection.isolation";
 	public static final String HIBERNATE_PROPERTY_AUTO_COMMIT = "hibernate.connection.autocommit";
@@ -415,14 +414,6 @@ public class SOSHibernateFactory implements Serializable {
 
 	public void setConnectionIdentifier(String val) {
 		connectionIdentifier = val;
-	}
-
-	public boolean isIgnoreAutoCommitTransactions() {
-		return ignoreAutoCommitTransactions;
-	}
-
-	public void setIgnoreAutoCommitTransactions(boolean val) {
-		ignoreAutoCommitTransactions = val;
 	}
 
 	public SessionFactory getSessionFactory() {

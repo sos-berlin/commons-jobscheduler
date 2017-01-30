@@ -296,10 +296,11 @@ public class SOSHibernateConnection implements Serializable {
 	}
 
 	public void beginTransaction() throws Exception {
-		if (factory.isIgnoreAutoCommitTransactions() && this.getFactory().getAutoCommit()) {
-			// return;
-		}
 		String method = getMethodName("beginTransaction");
+		if (this.getFactory().getAutoCommit()) {
+			LOGGER.debug(String.format("%s: skip (autoCommit is true)", method));
+			return;
+		}
 		LOGGER.debug(String.format("%s", method));
 		if (currentSession == null) {
 			throw new DBSessionException("currentSession is NULL");
@@ -334,11 +335,11 @@ public class SOSHibernateConnection implements Serializable {
 
 	public void commit() throws Exception {
 		String method = getMethodName("commit");
-		LOGGER.debug(String.format("%s", method));
-
-		if (factory.isIgnoreAutoCommitTransactions() && this.getFactory().getAutoCommit()) {
+		if (this.getFactory().getAutoCommit()) {
+			LOGGER.debug(String.format("%s: skip (autoCommit is true)", method));
 			return;
 		}
+		LOGGER.debug(String.format("%s", method));
 		Transaction tr = getTransaction(currentSession);
 		if (tr == null) {
 			throw new Exception(String.format("session transaction is NULL"));
@@ -351,10 +352,11 @@ public class SOSHibernateConnection implements Serializable {
 
 	public void rollback() throws Exception {
 		String method = getMethodName("rollback");
-		LOGGER.debug(String.format("%s", method));
-		if (factory.isIgnoreAutoCommitTransactions() && this.getFactory().getAutoCommit()) {
+		if (this.getFactory().getAutoCommit()) {
+			LOGGER.debug(String.format("%s: skip (autoCommit is true)", method));
 			return;
 		}
+		LOGGER.debug(String.format("%s", method));
 		Transaction tr = getTransaction(currentSession);
 		if (tr == null) {
 			throw new Exception(String.format("session transaction is NULL"));
@@ -524,11 +526,7 @@ public class SOSHibernateConnection implements Serializable {
 	public void setConnectionIdentifier(String val) {
 		connectionIdentifier = val;
 	}
-
-	public boolean isIgnoreAutoCommitTransactions() {
-		return factory.isIgnoreAutoCommitTransactions();
-	}
-
+	
 	public SOSHibernateFactory getFactory() {
 		return this.factory;
 	}
