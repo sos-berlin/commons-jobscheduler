@@ -176,19 +176,15 @@ public class SOSHibernateConnection implements Serializable {
 
 	private void closeTransaction() {
 		String method = getMethodName("closeTransaction");
-		LOGGER.debug(String.format("%s", method));
 		try {
 			if (currentSession != null) {
-				Transaction tr = null;
-				if (currentSession instanceof Session) {
-					Session session = (Session) currentSession;
-					tr = session.getTransaction();
-				} else if (currentSession instanceof StatelessSession) {
-					StatelessSession s = (StatelessSession) currentSession;
-					tr = s.getTransaction();
-				}
+				Transaction tr = getTransaction();
 				if (tr != null) {
+					LOGGER.debug(String.format("%s", method));
 					tr.rollback();
+				}
+				else{
+					LOGGER.debug(String.format("%s: skip (transaction is null)", method));
 				}
 			}
 		} catch (Exception ex) {
@@ -315,19 +311,15 @@ public class SOSHibernateConnection implements Serializable {
 	}
 
 	public Transaction getTransaction() throws Exception {
-		return getTransaction(currentSession);
-	}
-
-	public Transaction getTransaction(Object session) throws Exception {
 		Transaction tr = null;
-		if (session == null) {
-			throw new DBSessionException("session is NULL");
+		if (currentSession == null) {
+			throw new DBSessionException("currentSession is NULL");
 		}
-		if (session instanceof Session) {
-			Session s = ((Session) session);
+		if (currentSession instanceof Session) {
+			Session s = ((Session) currentSession);
 			tr = s.getTransaction();
-		} else if (session instanceof StatelessSession) {
-			StatelessSession s = ((StatelessSession) session);
+		} else if (currentSession instanceof StatelessSession) {
+			StatelessSession s = ((StatelessSession) currentSession);
 			tr = s.getTransaction();
 		}
 		return tr;
@@ -340,7 +332,7 @@ public class SOSHibernateConnection implements Serializable {
 			return;
 		}
 		LOGGER.debug(String.format("%s", method));
-		Transaction tr = getTransaction(currentSession);
+		Transaction tr = getTransaction();
 		if (tr == null) {
 			throw new Exception(String.format("session transaction is NULL"));
 		}
@@ -357,7 +349,7 @@ public class SOSHibernateConnection implements Serializable {
 			return;
 		}
 		LOGGER.debug(String.format("%s", method));
-		Transaction tr = getTransaction(currentSession);
+		Transaction tr = getTransaction();
 		if (tr == null) {
 			throw new Exception(String.format("session transaction is NULL"));
 		}
