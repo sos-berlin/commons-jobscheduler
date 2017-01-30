@@ -180,11 +180,11 @@ public class SOSHibernateConnection implements Serializable {
 			if (currentSession != null) {
 				Transaction tr = getTransaction();
 				if (tr != null) {
-					LOGGER.debug(String.format("%s", method));
+					LOGGER.debug(String.format("%s: rollback", method));
 					tr.rollback();
 				}
 				else{
-					LOGGER.debug(String.format("%s: skip (transaction is null)", method));
+					LOGGER.debug(String.format("%s: skip rollback (transaction is null)", method));
 				}
 			}
 		} catch (Exception ex) {
