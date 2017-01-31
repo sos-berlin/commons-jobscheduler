@@ -4,6 +4,9 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -14,15 +17,24 @@ import sos.settings.SOSConnectionSettings;
 import sos.settings.SOSProfileSettings;
 import sos.settings.SOSSettings;
 import sos.spooler.Job_impl;
+import sos.spooler.Variable_set;
 import sos.util.SOSArguments;
 import sos.util.SOSLogger;
 import sos.util.SOSSchedulerLogger;
+import sos.util.SOSString;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
 /** @author Andreas Liebert */
 public class JobSchedulerJob extends Job_impl {
 
+	public static final String HIBERNATE_DEFAULT_FILE_NAME_SCHEDULER = "hibernate.cfg.xml";
+	public static final String HIBERNATE_DEFAULT_FILE_NAME_REPORTING = "reporting.hibernate.cfg.xml";
+
+	public static final String SCHEDULER_PARAM_PROXY_URL = "sos.proxy_url";
+	public static final String SCHEDULER_PARAM_HIBERNATE_SCHEDULER = "sos.hibernate_configuration_scheduler";
+	public static final String SCHEDULER_PARAM_HIBERNATE_REPORTING = "sos.hibernate_configuration_reporting";
+	
     protected String application = new String("");
     protected SOSSchedulerLogger sosLogger = null;
     private static final Logger LOGGER = Logger.getLogger(JobSchedulerJob.class);
@@ -250,6 +262,28 @@ public class JobSchedulerJob extends Job_impl {
         return conn;
     }
 
+    public String getHibernateConfigurationReporting(){
+    	Variable_set vs = spooler.variables();
+		Path configFile = null;
+		if(vs == null){
+			configFile = Paths.get("./config/"+HIBERNATE_DEFAULT_FILE_NAME_REPORTING);
+			if(Files.exists(configFile)){
+				return configFile.toString();
+			}
+		}
+		else{
+			String varReporting = vs.value(SCHEDULER_PARAM_HIBERNATE_REPORTING);
+			String varScheduler = vs.value(SCHEDULER_PARAM_HIBERNATE_SCHEDULER);
+			if(!SOSString.isEmpty(varReporting)){
+				return varReporting;
+			}
+			else if(!SOSString.isEmpty(varScheduler)){
+				return varScheduler;
+			}
+		}
+		return "./config/"+HIBERNATE_DEFAULT_FILE_NAME_SCHEDULER;
+    }
+    
     private boolean getSettings() {
         try {
 
