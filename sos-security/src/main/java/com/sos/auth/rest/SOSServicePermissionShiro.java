@@ -60,6 +60,7 @@ public class SOSServicePermissionShiro {
     private static final String ROLE_ADMIN = "admin";
     private static final String ROLE_SUPER = "super";
     private static final Logger LOGGER = Logger.getLogger(SOSServicePermissionShiro.class);
+    
 
     private SOSShiroCurrentUser currentUser;
 
@@ -175,8 +176,8 @@ public class SOSServicePermissionShiro {
 
         String accessToken = this.getAccessToken(accessTokenFromHeader, accessTokenFromQuery);
 
-        if (Globals.currentUsersList != null) {
-            currentUser = Globals.currentUsersList.getUser(accessToken);
+        if (Globals.jocWebserviceDataContainer.getCurrentUsersList() != null) {
+            currentUser = Globals.jocWebserviceDataContainer.getCurrentUsersList().getUser(accessToken);
         }
         String user = "";
         if (currentUser != null){
@@ -199,7 +200,7 @@ public class SOSServicePermissionShiro {
         sosShiroCurrentUserAnswer.setHasRole(false);
         sosShiroCurrentUserAnswer.setIsPermitted(false);
         sosShiroCurrentUserAnswer.setAccessToken(EMPTY_STRING);
-        Globals.currentUsersList.removeUser(accessToken);
+        Globals.jocWebserviceDataContainer.getCurrentUsersList().removeUser(accessToken);
 
         return sosShiroCurrentUserAnswer;
     }
@@ -277,8 +278,8 @@ public class SOSServicePermissionShiro {
     }
 
     private void setCurrentUserfromAccessToken(String accessToken, String user, String pwd) {
-        if (Globals.currentUsersList != null && accessToken != null && accessToken.length() > 0) {
-            currentUser = Globals.currentUsersList.getUser(accessToken);
+        if (Globals.jocWebserviceDataContainer.getCurrentUsersList() != null && accessToken != null && accessToken.length() > 0) {
+            currentUser = Globals.jocWebserviceDataContainer.getCurrentUsersList().getUser(accessToken);
             LOGGER.debug(String.format("Method: %s, access_token: %s","setCurrentUserfromAccessToken", accessToken));
         } else {
             if (user != null && user.length() > 0 && pwd != null && pwd.length() > 0) {
@@ -781,7 +782,7 @@ public class SOSServicePermissionShiro {
         sosPermissionJocCockpit.setSOSPermissionRoles(getRoles());
 
         currentUser.setSosPermissionJocCockpit(sosPermissionJocCockpit);
-        Globals.currentUsersList.addUser(currentUser);
+        Globals.jocWebserviceDataContainer.getCurrentUsersList().addUser(currentUser);
         return sosPermissionJocCockpit;
     }
 
@@ -793,7 +794,7 @@ public class SOSServicePermissionShiro {
 
         currentUser.setSosPermissionJocCockpit(sosPermissionJocCockpit);
         currentUser.setSosPermissionCommands(sosPermissionCommands);
-        Globals.currentUsersList.addUser(currentUser);
+        Globals.jocWebserviceDataContainer.getCurrentUsersList().addUser(currentUser);
         return sosPermissionCommands;
     }
 
@@ -819,8 +820,8 @@ public class SOSServicePermissionShiro {
     }
 
     private void createUser() throws Exception {
-        if (Globals.currentUsersList == null) {
-            Globals.currentUsersList = new SOSShiroCurrentUsersList();
+        if (Globals.jocWebserviceDataContainer.getCurrentUsersList() == null) {
+            Globals.jocWebserviceDataContainer.setCurrentUsersList(new SOSShiroCurrentUsersList());
         }
 
         SOSlogin sosLogin = new SOSlogin();
@@ -838,7 +839,7 @@ public class SOSServicePermissionShiro {
         String accessToken = session.getId().toString();
 
         currentUser.setAccessToken(accessToken);
-        Globals.currentUsersList.addUser(currentUser);
+        Globals.jocWebserviceDataContainer.getCurrentUsersList().addUser(currentUser);
 
         SOSPermissionJocCockpit sosPermissionJocCockpit = createJocCockpitPermissionObject(accessToken, EMPTY_STRING, EMPTY_STRING);
         currentUser.setSosPermissionJocCockpit(sosPermissionJocCockpit);
