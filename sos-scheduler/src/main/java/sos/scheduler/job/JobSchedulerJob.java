@@ -262,26 +262,26 @@ public class JobSchedulerJob extends Job_impl {
         return conn;
     }
 
-    public String getHibernateConfigurationReporting(){
+    public Path getHibernateConfigurationReporting(){
     	Variable_set vs = spooler.variables();
 		Path configFile = null;
 		if(vs == null){
-			configFile = Paths.get("./config/"+HIBERNATE_DEFAULT_FILE_NAME_REPORTING);
+			configFile = Paths.get(spooler.configuration_directory()).getParent().resolve(HIBERNATE_DEFAULT_FILE_NAME_REPORTING);
 			if(Files.exists(configFile)){
-				return configFile.toString();
+				return configFile;
 			}
 		}
 		else{
 			String varReporting = vs.value(SCHEDULER_PARAM_HIBERNATE_REPORTING);
 			String varScheduler = vs.value(SCHEDULER_PARAM_HIBERNATE_SCHEDULER);
 			if(!SOSString.isEmpty(varReporting)){
-				return varReporting;
+				return Paths.get(varReporting);
 			}
 			else if(!SOSString.isEmpty(varScheduler)){
-				return varScheduler;
+				return Paths.get(varScheduler);
 			}
 		}
-		return "./config/"+HIBERNATE_DEFAULT_FILE_NAME_SCHEDULER;
+		return Paths.get(spooler.configuration_directory()).getParent().resolve(HIBERNATE_DEFAULT_FILE_NAME_SCHEDULER);
     }
     
     private boolean getSettings() {
