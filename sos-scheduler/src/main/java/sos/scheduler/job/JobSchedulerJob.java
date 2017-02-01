@@ -262,26 +262,30 @@ public class JobSchedulerJob extends Job_impl {
         return conn;
     }
 
-    public Path getHibernateConfigurationReporting(){
+    public Path getHibernateConfigurationScheduler(){
     	Variable_set vs = spooler.variables();
-		Path configFile = null;
-		if(vs == null){
-			configFile = Paths.get(spooler.configuration_directory()).getParent().resolve(HIBERNATE_DEFAULT_FILE_NAME_REPORTING);
-			if(Files.exists(configFile)){
-				return configFile;
-			}
-		}
-		else{
-			String varReporting = vs.value(SCHEDULER_PARAM_HIBERNATE_REPORTING);
-			String varScheduler = vs.value(SCHEDULER_PARAM_HIBERNATE_SCHEDULER);
-			if(!SOSString.isEmpty(varReporting)){
-				return Paths.get(varReporting);
-			}
-			else if(!SOSString.isEmpty(varScheduler)){
-				return Paths.get(varScheduler);
+		if(vs != null){
+			String var = vs.value(SCHEDULER_PARAM_HIBERNATE_SCHEDULER);
+			if(!SOSString.isEmpty(var)){
+				return Paths.get(var);
 			}
 		}
 		return Paths.get(spooler.configuration_directory()).getParent().resolve(HIBERNATE_DEFAULT_FILE_NAME_SCHEDULER);
+    }
+    
+    public Path getHibernateConfigurationReporting(){
+    	Variable_set vs = spooler.variables();
+		if(vs != null){
+			String var = vs.value(SCHEDULER_PARAM_HIBERNATE_REPORTING);
+			if(!SOSString.isEmpty(var)){
+				return Paths.get(var);
+			}
+		}
+		Path configFile = Paths.get(spooler.configuration_directory()).getParent().resolve(HIBERNATE_DEFAULT_FILE_NAME_REPORTING);
+		if(Files.exists(configFile)){
+			return configFile;
+		}
+		return getHibernateConfigurationScheduler();
     }
     
     private boolean getSettings() {
