@@ -15,8 +15,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.log4j.Logger;
+import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.auth.rest.permission.model.ObjectFactory;
 import com.sos.auth.rest.permission.model.SOSPermissionCommands;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
@@ -29,14 +31,18 @@ import com.sos.auth.shiro.SOSlogin;
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
+import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.classes.JocCockpitProperties;
 import com.sos.joc.classes.WebserviceConstants;
+import com.sos.joc.classes.audit.JocAuditLog;
+import com.sos.joc.classes.audit.SecurityAudit;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 
 @Path("/security")
 public class SOSServicePermissionShiro {
 
+    private static final String ROLE_ALL = "all";
     private static final String ACCESS_TOKEN = "access_token";
     private static final String UTC = "UTC";
     private static final String UNKNOWN_USER = "*Unknown User*";
@@ -60,7 +66,6 @@ public class SOSServicePermissionShiro {
     private static final String ROLE_ADMIN = "admin";
     private static final String ROLE_SUPER = "super";
     private static final Logger LOGGER = Logger.getLogger(SOSServicePermissionShiro.class);
-    
 
     private SOSShiroCurrentUser currentUser;
 
@@ -180,14 +185,19 @@ public class SOSServicePermissionShiro {
             currentUser = Globals.jocWebserviceDataContainer.getCurrentUsersList().getUser(accessToken);
         }
         String user = "";
-        if (currentUser != null){
+        String comment = "";
+        if (currentUser != null) {
             user = currentUser.getUsername();
         }
-        LOGGER.debug(String.format("Method: %s, User: %s, access_token: %s","logout",user, accessToken));
+        LOGGER.debug(String.format("Method: %s, User: %s, access_token: %s", "logout", user, accessToken));
 
         try {
             Globals.forceClosingHttpClients(currentUser.getCurrentSubject().getSession(false));
+            currentUser.getCurrentSubject().getSession().getTimeout();
             currentUser.getCurrentSubject().getSession().stop();
+
+        } catch (InvalidSessionException e) {
+            comment = "Session time out";
         } catch (Exception e) {
         }
 
@@ -201,6 +211,13 @@ public class SOSServicePermissionShiro {
         sosShiroCurrentUserAnswer.setIsPermitted(false);
         sosShiroCurrentUserAnswer.setAccessToken(EMPTY_STRING);
         Globals.jocWebserviceDataContainer.getCurrentUsersList().removeUser(accessToken);
+
+        JobSchedulerUser sosJobschedulerUser = new JobSchedulerUser(currentUser.getAccessToken());
+        JocAuditLog jocAuditLog = new JocAuditLog(sosJobschedulerUser, "-");
+        SecurityAudit s = new SecurityAudit(String.format("User: %s, access_token: %s %s", user, accessToken,comment));
+        jocAuditLog.setRequest("./logout");
+        jocAuditLog.logAuditMessage(s);
+        jocAuditLog.storeAuditLogEntry(s);
 
         return sosShiroCurrentUserAnswer;
     }
@@ -280,10 +297,10 @@ public class SOSServicePermissionShiro {
     private void setCurrentUserfromAccessToken(String accessToken, String user, String pwd) {
         if (Globals.jocWebserviceDataContainer.getCurrentUsersList() != null && accessToken != null && accessToken.length() > 0) {
             currentUser = Globals.jocWebserviceDataContainer.getCurrentUsersList().getUser(accessToken);
-            LOGGER.debug(String.format("Method: %s, access_token: %s","setCurrentUserfromAccessToken", accessToken));
+            LOGGER.debug(String.format("Method: %s, access_token: %s", "setCurrentUserfromAccessToken", accessToken));
         } else {
             if (user != null && user.length() > 0 && pwd != null && pwd.length() > 0) {
-                LOGGER.debug(String.format("Method: %s, User: %s, access_token: %s","setCurrentUserfromAccessToken",user, accessToken));
+                LOGGER.debug(String.format("Method: %s, User: %s, access_token: %s", "setCurrentUserfromAccessToken", user, accessToken));
                 currentUser = new SOSShiroCurrentUser(user, pwd);
                 try {
                     createUser();
@@ -422,6 +439,17 @@ public class SOSServicePermissionShiro {
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:maintenance_window:enable_disable_maintenance_window");
 
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:audit_log:view:status");
+            
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:configurations:share:view");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:configurations:share:delete");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:configurations:share:edit_content");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:configurations:share:make_private");
+            
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:configurations:private:make_shared");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:configurations:private:delete");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:configurations:private:edit_content");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:configurations:private:view");
+            
 
             sosPermissions.setSOSPermissionListJoc(sosPermissionJoc);
             SOSPermissionListCommands sosPermissionCommands = o.createSOSPermissionListCommands();
@@ -506,6 +534,7 @@ public class SOSServicePermissionShiro {
 
         SOSPermissionRoles roles = o.createSOSPermissionRoles();
         addRole(roles.getSOSPermissionRole(), ROLE_SUPER);
+        addRole(roles.getSOSPermissionRole(), ROLE_ALL);
         addRole(roles.getSOSPermissionRole(), ROLE_ADMIN);
         addRole(roles.getSOSPermissionRole(), ROLE_JOC_ADMIN);
         addRole(roles.getSOSPermissionRole(), ROLE_JOBEDITOR);
@@ -553,6 +582,10 @@ public class SOSServicePermissionShiro {
             sosPermissionJocCockpit.setAuditLog(o.createSOSPermissionJocCockpitAuditLog());
             sosPermissionJocCockpit.setMaintenanceWindow(o.createSOSPermissionJocCockpitMaintenanceWindow());
 
+            sosPermissionJocCockpit.setJOCConfigurations(o.createSOSPermissionJocCockpitJOCConfigurations());
+            sosPermissionJocCockpit.getJOCConfigurations().setPrivate(o.createSOSPermissionJocCockpitJOCConfigurationsPrivate());
+            sosPermissionJocCockpit.getJOCConfigurations().setShare(o.createSOSPermissionJocCockpitJOCConfigurationsShare());
+ 
             sosPermissionJocCockpit.getJobschedulerMaster().setView(o.createSOSPermissionJocCockpitJobschedulerMasterView());
             sosPermissionJocCockpit.getJobschedulerMaster().setRestart(o.createSOSPermissionJocCockpitJobschedulerMasterRestart());
             sosPermissionJocCockpit.getJobschedulerMasterCluster().setView(o.createSOSPermissionJocCockpitJobschedulerMasterClusterView());
@@ -665,6 +698,16 @@ public class SOSServicePermissionShiro {
             sosPermissionJocCockpit.getHolidayCalendar().getView().setStatus(haveRight("sos:products:joc_cockpit:holiday_calendar:view:status"));
             sosPermissionJocCockpit.getAuditLog().getView().setStatus(haveRight("sos:products:joc_cockpit:audit_log:view:status"));
 
+            sosPermissionJocCockpit.getJOCConfigurations().getPrivate().setView(haveRight("sos:products:joc_cockpit:configurations:private:view"));
+            sosPermissionJocCockpit.getJOCConfigurations().getPrivate().setDelete(haveRight("sos:products:joc_cockpit:configurations:private:delete"));
+            sosPermissionJocCockpit.getJOCConfigurations().getPrivate().setEditContent(haveRight("sos:products:joc_cockpit:configurations:private:edit_content"));
+            sosPermissionJocCockpit.getJOCConfigurations().getPrivate().setMakeShared(haveRight("sos:products:joc_cockpit:configurations:private:make_shared"));
+
+            sosPermissionJocCockpit.getJOCConfigurations().getShare().setView(haveRight("sos:products:joc_cockpit:configurations:share:view"));
+            sosPermissionJocCockpit.getJOCConfigurations().getShare().setDelete(haveRight("sos:products:joc_cockpit:configurations:share:delete"));
+            sosPermissionJocCockpit.getJOCConfigurations().getShare().setEditContent(haveRight("sos:products:joc_cockpit:configurations:share:edit_content"));
+            sosPermissionJocCockpit.getJOCConfigurations().getShare().setMakePrivate(haveRight("sos:products:joc_cockpit:configurations:share:make_private"));
+ 
             sosPermissionJocCockpit.getMaintenanceWindow().getView().setStatus(haveRight("sos:products:joc_cockpit:maintenance_window:view:status"));
             sosPermissionJocCockpit.getMaintenanceWindow().setEnableDisableMaintenanceWindow(haveRight(
                     "sos:products:joc_cockpit:maintenance_window:enable_disable_maintenance_window"));
@@ -861,7 +904,7 @@ public class SOSServicePermissionShiro {
             if (authorizationParts.length > 1) {
                 authorization = new String(Base64.getDecoder().decode(authorizationParts[1].getBytes("UTF-8")), "UTF-8");
             }
-        }else{
+        } else {
             JocError error = new JocError();
             error.setMessage("The Header Authorization with the Base64 encoded authorization string is missing");
             throw new JocException(error);
@@ -892,6 +935,14 @@ public class SOSServicePermissionShiro {
 
     }
 
+    private String getRolesAsString(){
+        String roles = "  ";
+        SOSPermissionRoles listOfRoles = getRoles(); 
+        for (int i = 0;i<listOfRoles.getSOSPermissionRole().size();i++){
+            roles = roles + listOfRoles.getSOSPermissionRole().get(i) + ",";
+        }
+        return roles.substring(0,roles.length()-1).trim();
+    }
     private JOCDefaultResponse login(String basicAuthorization, String user, String pwd) {
 
         try {
@@ -906,9 +957,15 @@ public class SOSServicePermissionShiro {
             }
 
             currentUser.setAuthorization(basicAuthorization);
-
             SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = authenticate();
-            LOGGER.debug(String.format("Method: %s, User: %s, access_token: %s","login",currentUser.getUsername(), currentUser.getAccessToken()));
+            LOGGER.debug(String.format("Method: %s, User: %s, access_token: %s", "login", currentUser.getUsername(), currentUser.getAccessToken()));
+
+            JobSchedulerUser sosJobschedulerUser = new JobSchedulerUser(currentUser.getAccessToken());
+            JocAuditLog jocAuditLog = new JocAuditLog(sosJobschedulerUser, "-");
+            jocAuditLog.setRequest("./login");
+            SecurityAudit s = new SecurityAudit(getRolesAsString());
+            jocAuditLog.logAuditMessage(s);
+            jocAuditLog.storeAuditLogEntry(s);
 
             if (!sosShiroCurrentUserAnswer.isAuthenticated()) {
                 return JOCDefaultResponse.responseStatus401(sosShiroCurrentUserAnswer);
