@@ -190,6 +190,17 @@ public class SOSServicePermissionShiro {
         }
         LOGGER.debug(String.format("Method: %s, User: %s, access_token: %s", "logout", user, accessToken));
 
+        if (currentUser != null) {
+            JobSchedulerUser sosJobschedulerUser = new JobSchedulerUser(currentUser.getAccessToken());
+            JocAuditLog jocAuditLog = new JocAuditLog(sosJobschedulerUser, "-");
+            SecurityAudit s = new SecurityAudit(comment);
+            jocAuditLog.setRequest("./logout");
+            jocAuditLog.logAuditMessage(s);
+            jocAuditLog.storeAuditLogEntry(s);
+        }else{
+            LOGGER.warn(String.format("Unknown User --> Method: %s, access_token: %s", "logout", accessToken));
+        }
+
         try {
             Globals.forceClosingHttpClients(currentUser.getCurrentSubject().getSession(false));
             currentUser.getCurrentSubject().getSession().getTimeout();
@@ -210,11 +221,6 @@ public class SOSServicePermissionShiro {
         sosShiroCurrentUserAnswer.setIsPermitted(false);
         sosShiroCurrentUserAnswer.setAccessToken(EMPTY_STRING);
         Globals.jocWebserviceDataContainer.getCurrentUsersList().removeUser(accessToken);
-
-        JocAuditLog jocAuditLog = new JocAuditLog(user, "./logout");
-        SecurityAudit s = new SecurityAudit(String.format("User: %s, access_token: %s %s", user, accessToken, comment));
-        jocAuditLog.logAuditMessage(s);
-        jocAuditLog.storeAuditLogEntry(s);
 
         return sosShiroCurrentUserAnswer;
     }
@@ -440,9 +446,10 @@ public class SOSServicePermissionShiro {
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:audit_log:view:status");
 
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:configurations:share:view");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:configurations:share:delete");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:configurations:share:edit_content");
-            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:configurations:share:make_private");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:configurations:share:change:delete");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:configurations:share:change:edit_content");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:configurations:share:change:shared_status:make_private");
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:configurations:share:change:shared_status:make_share");
 
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:configurations:private:make_shared");
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:configurations:private:delete");
@@ -581,8 +588,9 @@ public class SOSServicePermissionShiro {
             sosPermissionJocCockpit.setMaintenanceWindow(o.createSOSPermissionJocCockpitMaintenanceWindow());
 
             sosPermissionJocCockpit.setJOCConfigurations(o.createSOSPermissionJocCockpitJOCConfigurations());
-            sosPermissionJocCockpit.getJOCConfigurations().setPrivate(o.createSOSPermissionJocCockpitJOCConfigurationsPrivate());
             sosPermissionJocCockpit.getJOCConfigurations().setShare(o.createSOSPermissionJocCockpitJOCConfigurationsShare());
+            sosPermissionJocCockpit.getJOCConfigurations().getShare().setChange(o.createSOSPermissionJocCockpitJOCConfigurationsShareChange());
+            sosPermissionJocCockpit.getJOCConfigurations().getShare().getChange().setSharedStatus(o.createSOSPermissionJocCockpitJOCConfigurationsShareChangeSharedStatus());
 
             sosPermissionJocCockpit.getJobschedulerMaster().setView(o.createSOSPermissionJocCockpitJobschedulerMasterView());
             sosPermissionJocCockpit.getJobschedulerMaster().setRestart(o.createSOSPermissionJocCockpitJobschedulerMasterRestart());
@@ -713,20 +721,13 @@ public class SOSServicePermissionShiro {
             sosPermissionJocCockpit.getHolidayCalendar().getView().setStatus(haveRight("sos:products:joc_cockpit:holiday_calendar:view:status"));
             sosPermissionJocCockpit.getAuditLog().getView().setStatus(haveRight("sos:products:joc_cockpit:audit_log:view:status"));
 
-            sosPermissionJocCockpit.getJOCConfigurations().getPrivate().setView(haveRight("sos:products:joc_cockpit:configurations:private:view"));
-            sosPermissionJocCockpit.getJOCConfigurations().getPrivate().setDelete(haveRight(
-                    "sos:products:joc_cockpit:configurations:private:delete"));
-            sosPermissionJocCockpit.getJOCConfigurations().getPrivate().setEditContent(haveRight(
-                    "sos:products:joc_cockpit:configurations:private:edit_content"));
-            sosPermissionJocCockpit.getJOCConfigurations().getPrivate().setMakeShared(haveRight(
-                    "sos:products:joc_cockpit:configurations:private:make_shared"));
-
             sosPermissionJocCockpit.getJOCConfigurations().getShare().setView(haveRight("sos:products:joc_cockpit:configurations:share:view"));
-            sosPermissionJocCockpit.getJOCConfigurations().getShare().setDelete(haveRight("sos:products:joc_cockpit:configurations:share:delete"));
-            sosPermissionJocCockpit.getJOCConfigurations().getShare().setEditContent(haveRight(
-                    "sos:products:joc_cockpit:configurations:share:edit_content"));
-            sosPermissionJocCockpit.getJOCConfigurations().getShare().setMakePrivate(haveRight(
-                    "sos:products:joc_cockpit:configurations:share:make_private"));
+            sosPermissionJocCockpit.getJOCConfigurations().getShare().getChange().setDelete(haveRight("sos:products:joc_cockpit:configurations:share:change:delete"));
+            sosPermissionJocCockpit.getJOCConfigurations().getShare().getChange().setEditContent(haveRight("sos:products:joc_cockpit:configurations:share:change:edit_content"));
+            sosPermissionJocCockpit.getJOCConfigurations().getShare().getChange().getSharedStatus().setMakePrivate(haveRight(
+                    "sos:products:joc_cockpit:configurations:share:change:shared_status:make_private"));
+            sosPermissionJocCockpit.getJOCConfigurations().getShare().getChange().getSharedStatus().setMakeShared(haveRight(
+                    "sos:products:joc_cockpit:configurations:share:change:shared_status:make_share"));
 
             sosPermissionJocCockpit.getMaintenanceWindow().getView().setStatus(haveRight("sos:products:joc_cockpit:maintenance_window:view:status"));
             sosPermissionJocCockpit.getMaintenanceWindow().setEnableDisableMaintenanceWindow(haveRight(
