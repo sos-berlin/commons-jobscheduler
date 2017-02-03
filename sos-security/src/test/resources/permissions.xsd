@@ -353,20 +353,23 @@
 							<xs:element name="share">
 								<xs:complexType>
 									<xs:sequence>
+										<xs:element name="change">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="editContent" type="xs:boolean"/>
+													<xs:element name="delete" type="xs:boolean"/>
+													<xs:element name="sharedStatus">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="makePrivate" type="xs:boolean"/>
+																<xs:element name="makeShared" type="xs:boolean"/>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
 										<xs:element name="view" type="xs:boolean"/>
-										<xs:element name="editContent" type="xs:boolean"/>
-										<xs:element name="delete" type="xs:boolean"/>
-										<xs:element name="makePrivate" type="xs:boolean"/>
-									</xs:sequence>
-								</xs:complexType>
-							</xs:element>
-							<xs:element name="private">
-								<xs:complexType>
-									<xs:sequence>
-										<xs:element name="view" type="xs:boolean"/>
-										<xs:element name="editContent" type="xs:boolean"/>
-										<xs:element name="delete" type="xs:boolean"/>
-										<xs:element name="makeShared" type="xs:boolean"/>
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
