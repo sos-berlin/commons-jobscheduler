@@ -30,6 +30,7 @@ import com.sos.auth.shiro.SOSlogin;
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
+import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.classes.JocCockpitProperties;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.classes.audit.JocAuditLog;
@@ -192,9 +193,8 @@ public class SOSServicePermissionShiro {
 
         if (currentUser != null) {
             JobSchedulerUser sosJobschedulerUser = new JobSchedulerUser(currentUser.getAccessToken());
-            JocAuditLog jocAuditLog = new JocAuditLog(sosJobschedulerUser, "-");
+            JocAuditLog jocAuditLog = new JocAuditLog(sosJobschedulerUser.getSosShiroCurrentUser().getUsername(), "./logout");
             SecurityAudit s = new SecurityAudit(comment);
-            jocAuditLog.setRequest("./logout");
             jocAuditLog.logAuditMessage(s);
             jocAuditLog.storeAuditLogEntry(s);
         }else{
