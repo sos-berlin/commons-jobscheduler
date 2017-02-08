@@ -203,9 +203,12 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
         try {
             if (objConnectionOptions == null) {
                 objConnectionOptions = new SOSConnection2Options(JSSettings);
-                objMailOptions = new SOSSmtpMailOptions(JSSettings);
+                //objMailOptions = new SOSSmtpMailOptions(JSSettings);
             } else {
                 objConnectionOptions.setPrefixedValues(JSSettings);
+            }
+            if (objMailOptions == null) {
+                objMailOptions = new SOSSmtpMailOptions(JSSettings); 
             }
         } catch (Exception e) {
             throw new JobSchedulerException(e);
