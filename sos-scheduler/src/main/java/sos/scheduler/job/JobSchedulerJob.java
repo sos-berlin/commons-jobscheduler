@@ -34,6 +34,7 @@ public class JobSchedulerJob extends Job_impl {
 	public static final String SCHEDULER_PARAM_PROXY_URL = "sos.proxy_url";
 	public static final String SCHEDULER_PARAM_HIBERNATE_SCHEDULER = "sos.hibernate_configuration_scheduler";
 	public static final String SCHEDULER_PARAM_HIBERNATE_REPORTING = "sos.hibernate_configuration_reporting";
+	public static final String SCHEDULER_PARAM_USE_NOTIFICATION = "sos.use_notification";
 	
     protected String application = new String("");
     protected SOSSchedulerLogger sosLogger = null;
