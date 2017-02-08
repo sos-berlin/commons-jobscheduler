@@ -21,6 +21,7 @@ import org.hibernate.exception.SQLGrammarException;
 import org.hibernate.internal.SessionImpl;
 import org.hibernate.internal.StatelessSessionImpl;
 import org.hibernate.jdbc.Work;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.transform.Transformers;
@@ -207,11 +208,32 @@ public class SOSHibernateConnection implements Serializable {
 		}
 		return q;
 	}
-
+	
+	public NativeQuery createNativeQuery(String query) throws Exception{
+		return createNativeQuery(query,null);
+	}
+	
+	public NativeQuery createNativeQuery(String query, Class<?> entityClass) throws Exception {
+		String method = getMethodName("createNativeQuery");
+		LOGGER.debug(String.format("%s: query = %s", method, query));
+		if (currentSession == null) {
+			throw new DBSessionException("currentSession is NULL");
+		}
+		NativeQuery q = null;
+		if (currentSession instanceof Session) {
+			q = ((Session) currentSession).createNativeQuery(query,entityClass);
+		} else if (currentSession instanceof StatelessSession) {
+			q = ((StatelessSession) currentSession).createNativeQuery(query,entityClass);
+		}
+		return q;
+	}
+	
+	@Deprecated
 	public SQLQuery createSQLQuery(String query) throws Exception {
 		return createSQLQuery(query, null);
 	}
 
+	@Deprecated
 	public SQLQuery createSQLQuery(String query, Class<?> entityClass) throws Exception {
 		String method = getMethodName("createSQLQuery");
 		LOGGER.debug(String.format("%s: query = %s", method, query));
