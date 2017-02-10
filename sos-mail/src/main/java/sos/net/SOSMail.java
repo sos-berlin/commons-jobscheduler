@@ -1598,45 +1598,46 @@ public class SOSMail {
         sosMail.clearRecipients();
     }
 
-    public void sendMail(final ISOSSmtpMailOptions pobjO) throws Exception {
-        final String strDelims = ",|;";
+    public void sendMail(final ISOSSmtpMailOptions options) throws Exception {
+        final String delims = ",|;";
         try {
             SOSMail sosMail = this;
             sosMail.init();
-            sosMail.setHost(pobjO.getHost().getValue());
-            sosMail.setPort(pobjO.getPort().getValue());
-            sosMail.setQueueDir(pobjO.getQueueDirectory().getValue());
-            sosMail.setFrom(pobjO.getFrom().getValue());
-            sosMail.setContentType(pobjO.getContentType().getValue());
-            sosMail.setEncoding(pobjO.getEncoding().getValue());
-            String recipient = pobjO.getTo().getValue();
-            String recipients[] = recipient.trim().split(strDelims);
+            sosMail.setHost(options.getHost().getValue());
+            sosMail.setPort(options.getPort().getValue());
+            sosMail.setQueueDir(options.getQueueDirectory().getValue());
+            sosMail.setFrom(options.getFrom().getValue());
+            sosMail.setFromName(options.getFromName().getValue());
+            sosMail.setContentType(options.getContentType().getValue());
+            sosMail.setEncoding(options.getEncoding().getValue());
+            String recipient = options.getTo().getValue();
+            String recipients[] = recipient.trim().split(delims);
             for (String recipient2 : recipients) {
                 sosMail.addRecipient(recipient2.trim());
             }
-            String recipientCC = pobjO.getCc().getValue();
+            String recipientCC = options.getCc().getValue();
             if (!recipientCC.trim().isEmpty()) {
-                String recipientsCC[] = recipientCC.trim().split(strDelims);
+                String recipientsCC[] = recipientCC.trim().split(delims);
                 for (String element : recipientsCC) {
                     sosMail.addCC(element.trim());
                 }
             }
-            String recipientBCC = pobjO.getBcc().getValue().trim();
+            String recipientBCC = options.getBcc().getValue().trim();
             if (!recipientBCC.isEmpty()) {
-                String recipientsBCC[] = recipientBCC.trim().split(strDelims);
+                String recipientsBCC[] = recipientBCC.trim().split(delims);
                 for (String element : recipientsBCC) {
                     sosMail.addBCC(element.trim());
                 }
             }
-            String strAttachments = pobjO.getAttachment().getValue().trim();
+            String strAttachments = options.getAttachment().getValue().trim();
             if (!strAttachments.isEmpty()) {
-                String strAttachmentsA[] = strAttachments.trim().split(strDelims);
+                String strAttachmentsA[] = strAttachments.trim().split(delims);
                 for (String element : strAttachmentsA) {
                     sosMail.addAttachment(element.trim());
                 }
             }
-            sosMail.setSubject(pobjO.getSubject().getValue());
-            sosMail.setBody(pobjO.getBody().getValue());
+            sosMail.setSubject(options.getSubject().getValue());
+            sosMail.setBody(options.getBody().getValue());
             if (sosLogger != null) {
                 sosLogger.debug("sending mail: \n" + sosMail.dumpMessageAsString());
             }
