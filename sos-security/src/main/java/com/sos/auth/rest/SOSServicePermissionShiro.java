@@ -47,7 +47,8 @@ public class SOSServicePermissionShiro {
     private static final String UNKNOWN_USER = "*Unknown User*";
     private static final String EMPTY_STRING = "";
     private static final String USER_IS_NULL = "user is null";
-    private static final String AUTHORIZATION_HEADER_WITH_BASIC_BASED64PART_EXPECTED = "Authorization Header with Basic based64part expected";
+    private static final String AUTHORIZATION_HEADER_WITH_BASIC_BASED64PART_EXPECTED = "Authorization header with basic based64part expected";
+    private static final String ACCESS_TOKEN_EXPECTED = "Access token header expected";
     private static final String ROLE_API_USER = "api_user";
     private static final String ROLE_BUSINESS_USER = "business_user";
     private static final String ROLE_INCIDENT_MANAGER = "incident_manager";
@@ -176,8 +177,12 @@ public class SOSServicePermissionShiro {
         return login(basicAuthorization, user, pwd);
     }
 
-    private SOSShiroCurrentUserAnswer logout(String accessTokenFromHeader, String accessTokenFromQuery) {
+    private JOCDefaultResponse logout(String accessTokenFromHeader, String accessTokenFromQuery) {
 
+        if (accessTokenFromHeader == null){
+            return JOCDefaultResponse.responseStatusJSError(ACCESS_TOKEN_EXPECTED);
+        }
+        
         String accessToken = this.getAccessToken(accessTokenFromHeader, accessTokenFromQuery);
 
         if (Globals.jocWebserviceDataContainer.getCurrentUsersList() != null) {
@@ -223,14 +228,14 @@ public class SOSServicePermissionShiro {
         sosShiroCurrentUserAnswer.setAccessToken(EMPTY_STRING);
         Globals.jocWebserviceDataContainer.getCurrentUsersList().removeUser(accessToken);
 
-        return sosShiroCurrentUserAnswer;
+        return JOCDefaultResponse.responseStatus200(sosShiroCurrentUserAnswer);
     }
 
     @POST
     @Path("/logout")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-    public SOSShiroCurrentUserAnswer logoutPost(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader) {
+    public JOCDefaultResponse logoutPost(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader) {
         return logout(accessTokenFromHeader, EMPTY_STRING);
     }
 
