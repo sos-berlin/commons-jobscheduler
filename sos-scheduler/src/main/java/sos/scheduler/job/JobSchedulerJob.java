@@ -262,6 +262,22 @@ public class JobSchedulerJob extends Job_impl {
         }
         return conn;
     }
+    
+    public static SOSConnection getReportingConnection(final SOSSettings reportingSettings, final SOSLogger log) throws Exception {
+        Properties dbProperties = reportingSettings.getSection("configuration");
+        String dbClass = dbProperties.getProperty("class");
+        String dbDriver = dbProperties.getProperty("driver");
+        String dbUrl = dbProperties.getProperty("url");
+        String dbUser = dbProperties.getProperty("user");
+        String dbPassword = dbProperties.getProperty("password");
+        SOSConnection conn;
+        if (log != null) {
+            conn = SOSConnection.createInstance(dbClass, dbDriver, dbUrl, dbUser, dbPassword, log);
+        } else {
+            conn = SOSConnection.createInstance(dbClass, dbDriver, dbUrl, dbUser, dbPassword);
+        }
+        return conn;
+    }
 
     public Path getHibernateConfigurationScheduler(){
     	Variable_set vs = spooler.variables();
