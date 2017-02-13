@@ -1,6 +1,5 @@
 package com.sos.hibernate.classes;
 
-import java.io.File;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,7 +35,7 @@ public class SOSHibernateFactory implements Serializable {
 	private static final String HIBERNATE_PROPERTY_JAVAX_PERSISTENCE_VALIDATION_MODE = "javax.persistence.validation.mode";
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateConnection.class);
-	private Optional<File> configFile = Optional.empty();
+	private Optional<Path> configFile = Optional.empty();
 	private Configuration configuration;
 	private SessionFactory sessionFactory;
 	private Dialect dialect;
@@ -81,7 +80,7 @@ public class SOSHibernateFactory implements Serializable {
 		try {
 			initConfiguration();
 			initSessionFactory();
-			String connFile = (configFile.isPresent()) ? configFile.get().getCanonicalPath() : "without config file";
+			String connFile = (configFile.isPresent()) ? configFile.get().toAbsolutePath().toString() : "without config file";
 			int isolationLevel = getTransactionIsolation();
 			LOGGER.debug(String.format("%s: autocommit = %s, transaction isolation = %s, %s", method, getAutoCommit(),
 					getTransactionIsolationName(isolationLevel), connFile));
@@ -105,8 +104,8 @@ public class SOSHibernateFactory implements Serializable {
 		String method = getMethodName("configure");
 		if (configFile.isPresent()) {
 			LOGGER.debug(String.format("%s: configure connection with hibernate file = %s", method,
-					configFile.get().getCanonicalPath()));
-			configuration.configure(configFile.get());
+					configFile.get().toAbsolutePath().toString()));
+			configuration.configure(configFile.get().toUri().toURL());
 		} else {
 			LOGGER.debug(String.format("%s: configure connection without the hibernate file", method));
 			configuration.configure();
@@ -230,7 +229,7 @@ public class SOSHibernateFactory implements Serializable {
 				throw new Exception(
 						String.format("hibernate config file not found: %s", hibernateConfigFile.toString()));
 			}
-			configFile = Optional.of(hibernateConfigFile.toFile());
+			configFile = Optional.of(hibernateConfigFile);
 		}
 	}
 
@@ -375,7 +374,7 @@ public class SOSHibernateFactory implements Serializable {
 		}
 	}
 
-	public Optional<File> getConfigFile() {
+	public Optional<Path> getConfigFile() {
 		return configFile;
 	}
 

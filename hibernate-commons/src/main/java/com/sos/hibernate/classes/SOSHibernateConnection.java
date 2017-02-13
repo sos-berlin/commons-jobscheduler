@@ -65,7 +65,7 @@ public class SOSHibernateConnection implements Serializable {
 		String method = getMethodName("connect");
 		try {
 			openSession();
-            String connFile = (factory.getConfigFile().isPresent()) ? factory.getConfigFile().get().getCanonicalPath() : "without config file";
+            String connFile = (factory.getConfigFile().isPresent()) ? factory.getConfigFile().get().toAbsolutePath().toString() : "without config file";
 			int isolationLevel = getFactory().getTransactionIsolation();
             LOGGER.debug(String.format("%s: autocommit = %s, transaction isolation = %s, %s, %s", method, getFactory().getAutoCommit(), SOSHibernateFactory
                     .getTransactionIsolationName(isolationLevel), openSessionMethodName, connFile));
