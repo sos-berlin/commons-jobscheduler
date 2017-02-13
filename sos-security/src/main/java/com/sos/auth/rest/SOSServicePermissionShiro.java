@@ -15,8 +15,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.log4j.Logger;
+import org.apache.shiro.session.ExpiredSessionException;
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
+import org.apache.shiro.session.UnknownSessionException;
 
 import com.sos.auth.rest.permission.model.ObjectFactory;
 import com.sos.auth.rest.permission.model.SOSPermissionCommands;
@@ -37,6 +39,7 @@ import com.sos.joc.classes.audit.JocAuditLog;
 import com.sos.joc.classes.audit.SecurityAudit;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.SessionNotExistException;
 
 @Path("/security")
 public class SOSServicePermissionShiro {
@@ -179,10 +182,10 @@ public class SOSServicePermissionShiro {
 
     private JOCDefaultResponse logout(String accessTokenFromHeader, String accessTokenFromQuery) {
 
-        if (accessTokenFromHeader == null){
+        if (accessTokenFromHeader == null) {
             return JOCDefaultResponse.responseStatusJSError(ACCESS_TOKEN_EXPECTED);
         }
-        
+
         String accessToken = this.getAccessToken(accessTokenFromHeader, accessTokenFromQuery);
 
         if (Globals.jocWebserviceDataContainer.getCurrentUsersList() != null) {
@@ -195,26 +198,36 @@ public class SOSServicePermissionShiro {
         }
         LOGGER.debug(String.format("Method: %s, User: %s, access_token: %s", "logout", user, accessToken));
         try {
+
+            if (currentUser == null || currentUser.getCurrentSubject() == null) {
+                comment = "Session time out";
+                throw new SessionNotExistException("Session doesn't exist");
+            }
+
             currentUser.getCurrentSubject().getSession().getTimeout();
-        } catch (InvalidSessionException e) {
-            comment = "Session time out";
+             
+        } catch (ExpiredSessionException ex) {
+            comment = "Session time out: " + ex.getMessage();
+        } catch (SessionNotExistException e) {
+            comment = "Session time out: " + e.getMessage();
+        } catch (UnknownSessionException u) {
+            comment = "Session time out: " + u.getMessage();
         }
 
-        if (currentUser != null) {
+        if (currentUser != null && currentUser.getCurrentSubject() != null) {
             JocAuditLog jocAuditLog = new JocAuditLog(user, "./logout");
             SecurityAudit s = new SecurityAudit(comment);
             jocAuditLog.logAuditMessage(s);
             jocAuditLog.storeAuditLogEntry(s);
+            try {
+                Globals.forceClosingHttpClients(currentUser.getCurrentSubject().getSession(false));
+                currentUser.getCurrentSubject().getSession().getTimeout();
+                currentUser.getCurrentSubject().getSession().stop();
+
+            } catch (Exception e) {
+            }
         } else {
             LOGGER.warn(String.format("Unknown User --> Method: %s, access_token: %s", "logout", accessToken));
-        }
-
-        try {
-            Globals.forceClosingHttpClients(currentUser.getCurrentSubject().getSession(false));
-            currentUser.getCurrentSubject().getSession().getTimeout();
-            currentUser.getCurrentSubject().getSession().stop();
-
-        } catch (Exception e) {
         }
 
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer(EMPTY_STRING);
@@ -226,7 +239,9 @@ public class SOSServicePermissionShiro {
         sosShiroCurrentUserAnswer.setHasRole(false);
         sosShiroCurrentUserAnswer.setIsPermitted(false);
         sosShiroCurrentUserAnswer.setAccessToken(EMPTY_STRING);
-        Globals.jocWebserviceDataContainer.getCurrentUsersList().removeUser(accessToken);
+        if (Globals.jocWebserviceDataContainer.getCurrentUsersList() != null) {
+            Globals.jocWebserviceDataContainer.getCurrentUsersList().removeUser(accessToken);
+        }
 
         return JOCDefaultResponse.responseStatus200(sosShiroCurrentUserAnswer);
     }
