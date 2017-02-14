@@ -32,18 +32,10 @@ public class JobSchedulerProcessCheckFileMailJob extends JobSchedulerProcessSend
                 fileContent = this.getParameters().value("file_content");
             }
         } catch (Exception e) {
-            try {
-                this.getLogger().warn("error occurred checking parameters: " + e.getMessage());
-            } catch (Exception ex) {
-                //
-            }
+            spooler_log.warn("error occurred checking parameters: " + e.getMessage());
         }
         if (fileSpec.isEmpty() && fileContent.isEmpty() && filePath.isEmpty()) {
-            try {
-                getLogger().info("JobSchedulerProcessCheckFileMailJob is not configured, suppressing mail.");
-            } catch (Exception e) {
-                //
-            }
+            spooler_log.info("JobSchedulerProcessCheckFileMailJob is not configured, suppressing mail.");
             return false;
         }
         try {
@@ -54,7 +46,7 @@ public class JobSchedulerProcessCheckFileMailJob extends JobSchedulerProcessSend
             } else {
                 fileList = SOSFile.getFilelist(filePath, fileSpec, 0);
             }
-            getLogger().debug3("Lenght of filelist: " + fileList.size());
+            spooler_log.debug3("Lenght of filelist: " + fileList.size());
             Iterator iter = fileList.iterator();
             Pattern pattern = null;
             if (!fileContent.isEmpty()) {
@@ -63,7 +55,7 @@ public class JobSchedulerProcessCheckFileMailJob extends JobSchedulerProcessSend
             while (iter.hasNext()) {
                 File curFile = (File) iter.next();
                 if (pattern == null && curFile.exists()) {
-                    getLogger().info("Found file " + curFile.getAbsolutePath() + ", sending mail.");
+                    spooler_log.info("Found file " + curFile.getAbsolutePath() + ", sending mail.");
                     found = true;
                     break;
                 }
@@ -73,11 +65,7 @@ public class JobSchedulerProcessCheckFileMailJob extends JobSchedulerProcessSend
                 }
             }
         } catch (Exception e) {
-            try {
-                this.getLogger().warn("error occurred checking file(s): " + e.getMessage());
-            } catch (Exception ex) {
-                //
-            }
+            spooler_log.warn("error occurred checking file(s): " + e.getMessage());
         }
         return found;
     }
@@ -85,14 +73,14 @@ public class JobSchedulerProcessCheckFileMailJob extends JobSchedulerProcessSend
     private boolean grep(File file, Pattern regex) throws Exception {
         boolean found = false;
         try {
-            getLogger().debug7("Grepping file " + file.getAbsolutePath() + " for regex: " + regex.pattern());
+            spooler_log.debug7("Grepping file " + file.getAbsolutePath() + " for regex: " + regex.pattern());
             BufferedReader in = new BufferedReader(new FileReader(file));
             String currentLine = "";
             while ((currentLine = in.readLine()) != null) {
                 Matcher matcher = regex.matcher(currentLine);
                 if (matcher.find()) {
                     String match = matcher.group();
-                    getLogger().debug1("Found String '" + match + "' in file " + file.getAbsolutePath() + ", sending mail.");
+                    spooler_log.debug1("Found String '" + match + "' in file " + file.getAbsolutePath() + ", sending mail.");
                     found = true;
                     String body = "";
                     if (this.getParameters().value("body") != null && !this.getParameters().value("body").isEmpty()) {

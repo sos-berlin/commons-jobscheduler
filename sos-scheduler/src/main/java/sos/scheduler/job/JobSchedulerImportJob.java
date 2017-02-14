@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
+
 import sos.connection.SOSConnection;
 // import sos.util.SOSImport;
 import sos.marshalling.SOSImport;
@@ -17,6 +19,7 @@ import sos.util.SOSString;
 /** @author mueruevet oeksuez */
 public class JobSchedulerImportJob extends JobSchedulerJob {
 
+    private static final Logger LOGGER = Logger.getLogger(JobSchedulerImportJob.class);
     private Variable_set parameters = null;
     private SOSConnection sosConnection = null;
     private SOSConnection sosUpdateStateConnection = null;
@@ -32,7 +35,6 @@ public class JobSchedulerImportJob extends JobSchedulerJob {
     public boolean spooler_init() {
         boolean rc = super.spooler_init();
         try {
-            this.setLogger(new sos.util.SOSSchedulerLogger(spooler_log));
             String filename = "";
             if (rc) {
                 sosString = new SOSString();
@@ -45,29 +47,29 @@ public class JobSchedulerImportJob extends JobSchedulerJob {
                 }
                 if (this.getParameters().value("sos_settings_file") != null && !this.getParameters().value("sos_settings_file").isEmpty()) {
                     sosSettingsFile = this.getParameters().value("sos_settings_file");
-                    getLogger().debug1(".. parameter [sos_settings_file]: " + sosSettingsFile);
+                    spooler_log.debug1(".. parameter [sos_settings_file]: " + sosSettingsFile);
                 }
                 if (this.getParameters().value("sos_setting_file_status_update") != null
                         && !this.getParameters().value("sos_setting_file_status_update").isEmpty()) {
                     sosSettingsUpdateStateFile = this.getParameters().value("sos_setting_file_status_update");
-                    getLogger().debug1(".. parameter [sos_setting_file_status_update]: " + sosSettingsUpdateStateFile);
+                    spooler_log.debug1(".. parameter [sos_setting_file_status_update]: " + sosSettingsUpdateStateFile);
                 }
                 if (this.getParameters().value("input_path") != null && !this.getParameters().value("input_path").isEmpty()) {
                     inputPath = this.getParameters().value("input_path");
-                    getLogger().debug1(".. parameter [sos_setting_file_status_update]: " + inputPath);
+                    spooler_log.debug1(".. parameter [sos_setting_file_status_update]: " + inputPath);
                 }
                 if (this.getParameters().value("reg_ex") != null && !this.getParameters().value("reg_ex").isEmpty()) {
                     regEx = this.getParameters().value("reg_ex");
-                    getLogger().debug1(".. parameter [reg_ex]: " + regEx);
+                    spooler_log.debug1(".. parameter [reg_ex]: " + regEx);
                 }
                 if (this.getParameters().value("filename") != null && !this.getParameters().value("filename").isEmpty()) {
                     filename = this.getParameters().value("filename");
-                    getLogger().debug1(".. parameter [filename]: " + filename);
+                    spooler_log.debug1(".. parameter [filename]: " + filename);
                 }
                 String mappingFilename = null;
                 if (this.getParameters().value("mapping_table_names") != null && !this.getParameters().value("mapping_table_names").isEmpty()) {
                     mappingFilename = this.getParameters().value("mapping_table_names");
-                    getLogger().debug1(".. parameter [mapping_table_names]: " + mappingFilename);
+                    spooler_log.debug1(".. parameter [mapping_table_names]: " + mappingFilename);
                 }
                 if (!sosString.parseToString(mappingFilename).isEmpty()) {
                     mappingTablenames = getMappingFilename(mappingFilename);
@@ -100,13 +102,7 @@ public class JobSchedulerImportJob extends JobSchedulerJob {
                 }
             }
         } catch (Exception e) {
-            if (this.getLogger() != null) {
-                try {
-                    this.getLogger().error(e.getMessage());
-                } catch (Exception ex) {
-                    //
-                }
-            }
+            LOGGER.error(e.getMessage());
             return false;
         }
         return rc;
@@ -130,19 +126,19 @@ public class JobSchedulerImportJob extends JobSchedulerJob {
                 String filename = "";
                 if (this.getParameters().value("filename") != null && !this.getParameters().value("filename").isEmpty()) {
                     filename = this.getParameters().value("filename");
-                    getLogger().debug1(".. parameter [filename]: " + filename);
+                    spooler_log.debug1(".. parameter [filename]: " + filename);
                 }
                 triggerfile = spooler_task.trigger_files();
                 if (!sosString.parseToString(triggerfile).isEmpty()) {
-                    getLogger().debug3("order start cause trigger files: " + triggerfile);
+                    spooler_log.debug3("order start cause trigger files: " + triggerfile);
                 } else if (!sosString.parseToString(filename).isEmpty()) {
                     triggerfile = sosString.parseToString(getParameters().value("filename"));
-                    getLogger().debug3("order cause parameter [filename= " + triggerfile);
+                    spooler_log.debug3("order cause parameter [filename= " + triggerfile);
                 }
             } else {
                 triggerfile = sosString.parseToString(listOfFiles.next());
                 if (triggerfile.isEmpty()) {
-                    getLogger().debug("there is no file to import.");
+                    spooler_log.debug("there is no file to import.");
                     return false;
                 }
             }
@@ -151,7 +147,7 @@ public class JobSchedulerImportJob extends JobSchedulerJob {
                 int iPos2 = triggerfile.substring(0, iPos1).lastIndexOf("_");
                 if (iPos2 > -1 && iPos1 > -1) {
                     signalId = triggerfile.substring(iPos2 + 1, iPos1);
-                    getLogger().debug7("signal_id is: " + signalId);
+                    spooler_log.debug7("signal_id is: " + signalId);
                 }
                 importfile(triggerfile);
                 String upStr =
@@ -161,7 +157,7 @@ public class JobSchedulerImportJob extends JobSchedulerJob {
                 String time = Math.round((System.currentTimeMillis() - timeInSec) / 1000) + "s";
                 String stateText = "successfully import Database to XML-File " + triggerfile + " (" + time + ")";
                 spooler_job.set_state_text(stateText);
-                getLogger().info(stateText);
+                spooler_log.info(stateText);
             }
             return spooler_job.order_queue() != null ? rc : listOfFiles.hasNext();
         } catch (Exception e) {
@@ -181,12 +177,7 @@ public class JobSchedulerImportJob extends JobSchedulerJob {
             }
             String stateText = "could not import Database to XML-File " + triggerfile + " cause: " + e.getMessage();
             spooler_job.set_state_text(stateText);
-            try {
-                getLogger().warn(stateText);
-                getLogger().error(stateText);
-            } catch (Exception ea) {
-                //
-            }
+            spooler_log.warn(stateText);
             return spooler_job.order_queue() != null ? rc : listOfFiles.hasNext();
         }
     }
@@ -203,7 +194,7 @@ public class JobSchedulerImportJob extends JobSchedulerJob {
             }
         } catch (Exception e) {
             try {
-                getLogger().warn("spooler_exit(): disconnect failed: " + e.toString());
+                spooler_log.warn("spooler_exit(): disconnect failed: " + e.toString());
             } catch (Exception es) {
                 //
             }
@@ -211,10 +202,10 @@ public class JobSchedulerImportJob extends JobSchedulerJob {
     }
 
     public void importfile(final String triggerfile) throws Exception {
-        SOSStandardLogger sosLogger = null;
+//        SOSStandardLogger sosLogger = null;
         try {
-            sosLogger = new SOSStandardLogger(spooler.log().filename(), getLogger().getLogLevel());
-            SOSImport imp = new SOSImport(sosConnection, triggerfile, null, null, null, sosLogger);
+//            sosLogger = new SOSStandardLogger(spooler.log().filename(), getLogger().getLogLevel());
+            SOSImport imp = new SOSImport(sosConnection, triggerfile, null, null, null);
             if (mappingTablenames != null && !mappingTablenames.isEmpty()) {
                 imp.setMappingTablenames(mappingTablenames);
             }
@@ -249,7 +240,7 @@ public class JobSchedulerImportJob extends JobSchedulerJob {
         SOSConnection conn = null;
         try {
             spooler_log.debug3("DB Connecting.. .");
-            conn = SOSConnection.createInstance(settingsfile, new sos.util.SOSSchedulerLogger(spooler_log));
+            conn = SOSConnection.createInstance(settingsfile/*, new sos.util.SOSSchedulerLogger(spooler_log)*/);
             conn.connect();
             spooler_log.debug3("DB Connected");
         } catch (Exception e) {

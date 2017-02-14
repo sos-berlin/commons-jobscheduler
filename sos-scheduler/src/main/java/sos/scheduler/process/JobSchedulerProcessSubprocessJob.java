@@ -2,7 +2,6 @@ package sos.scheduler.process;
 
 import sos.spooler.Order;
 import sos.spooler.Subprocess;
-import sos.util.SOSSchedulerLogger;
 
 public class JobSchedulerProcessSubprocessJob extends ProcessOrderJob {
 
@@ -12,7 +11,6 @@ public class JobSchedulerProcessSubprocessJob extends ProcessOrderJob {
         Subprocess subprocess = null;
         try {
             try {
-                this.setLogger(new SOSSchedulerLogger(spooler_log));
                 if (spooler_job.order_queue() != null) {
                     order = spooler_task.order();
                     orderId = order.id();
@@ -49,15 +47,11 @@ public class JobSchedulerProcessSubprocessJob extends ProcessOrderJob {
         } finally {
             try {
                 this.cleanup();
-            } catch (Exception e) {
-                //
-            }
+            } catch (Exception e) {}
             if (subprocess != null) {
                 try {
                     subprocess.close();
-                } catch (Exception e) {
-                    //
-                }
+                } catch (Exception e) {}
             }
         }
     }

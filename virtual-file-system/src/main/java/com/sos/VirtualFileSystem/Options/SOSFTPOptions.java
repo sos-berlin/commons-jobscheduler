@@ -560,13 +560,13 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
             LOGGER.debug(String.format("readSettingsFile: settings=%s",settings.getValue()));
             sosLogger = new SOSStandardLogger(0);
             getEnvVars();
-            conf = new SOSConfiguration(settings.getValue(), profile.getValue(), sosLogger);
+            conf = new SOSConfiguration(settings.getValue(), profile.getValue());
             Properties profileProps = conf.getParameterAsProperties();
             if (profileProps.isEmpty()) {
                 String strM = SOSVfsMessageCodes.SOSVfs_E_0060.params(profile.getValue(), settings.getValue());
                 throw new JobSchedulerException(strM);
             }
-            conf = new SOSConfiguration(settings.getValue(), "globals", sosLogger);
+            conf = new SOSConfiguration(settings.getValue(), "globals");
             Properties globalsProps = conf.getParameterAsProperties();
             globalsProps = resolveIncludes(globalsProps, sosLogger);
             properties.putAll(globalsProps);
@@ -644,7 +644,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
                 }
                 for (String include : includes) {
                     include = include.trim();
-                    conf = new SOSConfiguration(settings.getValue(), include, sosLogger);
+                    conf = new SOSConfiguration(settings.getValue(), include);
                     Properties includedProps = conf.getParameterAsProperties(includePrefix);
                     if (includedProps.isEmpty()) {
                         String strM = SOSVfsMessageCodes.SOSVfs_E_0000.params(include, settings.getValue());

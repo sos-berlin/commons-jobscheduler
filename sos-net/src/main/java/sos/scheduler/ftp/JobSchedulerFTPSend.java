@@ -53,8 +53,7 @@ public class JobSchedulerFTPSend extends JobSchedulerJobAdapter {
         boolean orderSelfDestruct = false;
         HashMap<String, String> schedulerParams = null;
         try {
-            this.setLogger(new SOSSchedulerLogger(spooler_log));
-            getLogger().info(VersionInfo.VERSION_STRING);
+            spooler_log.info(VersionInfo.VERSION_STRING);
             try {
                 params = getParameters();
                 schedulerParams = objOptions.deletePrefix(super.getSchedulerParameterAsProperties(params), "ftp_");
@@ -77,18 +76,18 @@ public class JobSchedulerFTPSend extends JobSchedulerJobAdapter {
                                 --retry;
                                 spooler.variables().set_var("cur_transfer_retry" + normalize(spooler_task.order().id()), String.valueOf(retry));
                                 if (retry == 0) {
-                                    getLogger().debug("terminated cause max order setback reached: " + paramNames[i]);
+                                    spooler_log.debug("terminated cause max order setback reached: " + paramNames[i]);
                                     spooler.variables().set_var("terminated_cause_max_order_setback_" + normalize(spooler_task.order().id()), "1");
                                     return false;
                                 }
-                                getLogger().debug("launching setback: " + parallelTransferCheckRetry + " * " + parallelTransferCheckSetback);
+                                spooler_log.debug("launching setback: " + parallelTransferCheckRetry + " * " + parallelTransferCheckSetback);
                                 spooler_task.order().setback();
                                 return false;
                             } else if ("1".equals(sosString.parseToString(spooler.var(paramNames[i])))) {
-                                getLogger().debug("successfully terminated: " + paramNames[i]);
+                                spooler_log.debug("successfully terminated: " + paramNames[i]);
                             } else if ("2".equals(sosString.parseToString(spooler.var(paramNames[i])))) {
                                 bSuccess = false;
-                                getLogger().debug("terminated with error : " + paramNames[i]);
+                                spooler_log.debug("terminated with error : " + paramNames[i]);
                             }
                         }
                     }
@@ -114,7 +113,7 @@ public class JobSchedulerFTPSend extends JobSchedulerJobAdapter {
                     p.put("skip_transfer", "yes");
                     SOSConfiguration con =
                             new SOSConfiguration(null, p, sosString.parseToString(schedulerParams.get(PARAMETER_SETTINGS)),
-                                    sosString.parseToString(schedulerParams.get(PARAMETER_PROFILE)), null, new SOSSchedulerLogger(spooler_log));
+                                    sosString.parseToString(schedulerParams.get(PARAMETER_PROFILE)), null);
                     con.checkConfigurationItems();
                     sos.net.sosftp.SOSFTPCommandSend ftpCommand = new sos.net.sosftp.SOSFTPCommandSend(con, new SOSSchedulerLogger(spooler_log));
                     ftpCommand.setSchedulerJob(this);
@@ -127,7 +126,7 @@ public class JobSchedulerFTPSend extends JobSchedulerJobAdapter {
                             Variable_set newParams = params;
                             newParams.set_var("ftp_file_path", fileName.getCanonicalPath());
                             newParams.set_var("ftp_local_dir", "");
-                            getLogger().info("launching job for parallel transfer with parameter ftp_file_path: " + fileName.getCanonicalPath());
+                            spooler_log.info("launching job for parallel transfer with parameter ftp_file_path: " + fileName.getCanonicalPath());
                             spooler.job(spooler_task.job().name()).start(params);
                         }
                         return signalSuccess();
@@ -145,7 +144,7 @@ public class JobSchedulerFTPSend extends JobSchedulerJobAdapter {
                             newOrder.set_state(spooler_task.order().state());
                             newOrder.set_params(newParams);
                             spooler.job_chain(spooler_task.order().job_chain().name()).add_order(newOrder);
-                            getLogger().info("launching order for parallel transfer with parameter ftp_file_path: " + fileName.getCanonicalPath());
+                            spooler_log.info("launching order for parallel transfer with parameter ftp_file_path: " + fileName.getCanonicalPath());
                             spooler.variables().set_var("ftp_order",
                                     normalize(spooler_task.order().id()) + "." + normalize(newOrder.id()) + "." + "0");
                             spooler.variables().set_var("ftp_check_send_" + normalize(spooler_task.order().id()) + "." + normalize(newOrder.id()),
@@ -162,9 +161,8 @@ public class JobSchedulerFTPSend extends JobSchedulerJobAdapter {
                     }
                 }
                 SOSConfiguration con =
-                        new SOSConfiguration(null, mapToProperties(schedulerParams),
-                                sosString.parseToString(schedulerParams.get(PARAMETER_SETTINGS)),
-                                sosString.parseToString(schedulerParams.get(PARAMETER_PROFILE)), null, new SOSSchedulerLogger(spooler_log));
+                        new SOSConfiguration(null, mapToProperties(schedulerParams), sosString.parseToString(schedulerParams.get(PARAMETER_SETTINGS)),
+                                sosString.parseToString(schedulerParams.get(PARAMETER_PROFILE)), null);
                 con.checkConfigurationItems();
                 sos.net.sosftp.SOSFTPCommandSend ftpCommand = new sos.net.sosftp.SOSFTPCommandSend(con, new SOSSchedulerLogger(spooler_log));
                 ftpCommand.setSchedulerJob(this);
@@ -195,7 +193,7 @@ public class JobSchedulerFTPSend extends JobSchedulerJobAdapter {
                                 state = node.state();
                             }
                         }
-                        this.getLogger().debug9("..set state for parallel order job: " + state);
+                        spooler_log.debug9("..set state for parallel order job: " + state);
                         spooler_task.order().set_state(state);
                     }
                 }

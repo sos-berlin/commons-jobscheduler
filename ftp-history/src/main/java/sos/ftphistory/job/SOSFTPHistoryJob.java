@@ -87,7 +87,7 @@ public class SOSFTPHistoryJob extends JobSchedulerJobAdapter {
                 parameters.merge(spooler_task.params());
             if (spooler_job.order_queue() != null)
                 parameters.merge(spooler_task.order().params());
-            setConnection(SOSFTPHistory.getConnection(spooler, getConnection(), parameters, getLogger()));
+            setConnection(SOSFTPHistory.getConnection(spooler, getConnection(), parameters));
             recordCount = this.doImport(parameters);
             getLogger().info("records: imported = " + recordCount + " ( found = " + _recordFoundCount + " skipped = " + _recordSkippedCount
                     + " skipped [error] = " + _recordSkippedErrorCount + " )");

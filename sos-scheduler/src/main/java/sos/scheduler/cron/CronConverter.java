@@ -146,7 +146,7 @@ public class CronConverter extends JSToolBox {
     public static void main(final String[] args) {
         logger.info("SOS CronConverter - Main");
         try {
-            SOSLogger sosLogger;
+//            SOSLogger sosLogger;
             String sourceFile = "";
             String targetFile = "";
             String changeUser = "";
@@ -228,10 +228,10 @@ public class CronConverter extends JSToolBox {
             if (logLevel == 0) {
                 logLevel = SOSLogger.INFO;
             }
-            sosLogger = new SOSStandardLogger(logLevel);
+//            sosLogger = new SOSStandardLogger(logLevel);
             target = new File(targetFile);
             source = new File(sourceFile);
-            CronConverter cc = new CronConverter(sosLogger);
+            CronConverter cc = new CronConverter(/*sosLogger*/);
             if (jobTimeout != null && !jobTimeout.isEmpty()) {
                 cc.setTimeout(jobTimeout);
             }
@@ -316,7 +316,7 @@ public class CronConverter extends JSToolBox {
         return value;
     }
 
-    public CronConverter(final SOSLogger log) throws Exception {
+    public CronConverter(/*final SOSLogger log*/) throws Exception {
         docBuilder = docFactory.newDocumentBuilder();
         cronRegExAliasPattern = Pattern.compile(CRON_REGEX_ALIAS);
         cronRegExPattern = Pattern.compile(CRON_REGEX);

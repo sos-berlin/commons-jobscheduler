@@ -6,7 +6,6 @@ import java.util.Vector;
 
 import sos.connection.SOSConnection;
 import sos.spooler.Order;
-import sos.util.SOSSchedulerLogger;
 
 /** @author andreas.pueschel@sos-berlin.com
  * @deprecated use sos.scheduler.managed.JobSchedulerManagedDatabaseJob */
@@ -20,7 +19,6 @@ public class JobSchedulerProcessDatabaseJob extends ProcessOrderJob {
         boolean rc = true;
         try {
             try {
-                this.setLogger(new SOSSchedulerLogger(spooler_log));
                 if (spooler_job.order_queue() != null) {
                     order = spooler_task.order();
                     orderId = order.id();
@@ -68,16 +66,13 @@ public class JobSchedulerProcessDatabaseJob extends ProcessOrderJob {
                         try {
                             this.getConnection().rollback();
                             this.getConnection().disconnect();
-                        } catch (Exception ex) {
-                            // gracefully ignore this error
-                        }
+                        } catch (Exception ex) {}
                     }
-                    this.getLogger().debug3("connecting to database ...");
+                    spooler_log.debug3("connecting to database ...");
                     this.setConnection(SOSConnection.createInstance(this.getParameters().value("db_class"), this.getParameters().value("db_driver"),
-                            this.getParameters().value("db_url"), this.getParameters().value("db_user"), this.getParameters().value("db_password"),
-                            this.getLogger()));
+                            this.getParameters().value("db_url"), this.getParameters().value("db_user"), this.getParameters().value("db_password")));
                     this.getConnection().connect();
-                    this.getLogger().debug3("connected to database");
+                    spooler_log.debug3("connected to database");
                 } catch (Exception e) {
                     throw (new Exception("connect to database failed: " + e.getMessage()));
                 }
@@ -87,7 +82,7 @@ public class JobSchedulerProcessDatabaseJob extends ProcessOrderJob {
                         this.setCommand(this.getCommand().replaceAll("\\$\\{" + parameterNames[i] + "\\}",
                                 this.getParameters().value(parameterNames[i])));
                     }
-                    this.getLogger().info("executing database command: " + this.getCommand());
+                    spooler_log.info("executing database command: " + this.getCommand());
                     this.executeStatements(this.getConnection(), this.getCommand());
                     if (this.getConnection().getResultSet() != null) {
                         String warning = "";
@@ -104,7 +99,7 @@ public class JobSchedulerProcessDatabaseJob extends ProcessOrderJob {
                             }
                         }
                         if (warning != null && !warning.isEmpty()) {
-                            this.getLogger().warn(warning);
+                            spooler_log.warn(warning);
                         }
                     }
                 } catch (Exception e) {
@@ -127,9 +122,7 @@ public class JobSchedulerProcessDatabaseJob extends ProcessOrderJob {
                 try {
                     this.getConnection().rollback();
                     this.getConnection().disconnect();
-                } catch (Exception e) {
-                    // gracefully ignore this error
-                }
+                } catch (Exception e) {}
             }
         }
     }
@@ -144,18 +137,16 @@ public class JobSchedulerProcessDatabaseJob extends ProcessOrderJob {
         try {
             Vector output = connection.getOutput();
             if (!output.isEmpty()) {
-                this.getLogger().info("output from database server:");
+                spooler_log.info("output from database server:");
                 Iterator it = output.iterator();
                 while (it.hasNext()) {
                     String line = (String) it.next();
-                    this.getLogger().info("  " + line);
+                    spooler_log.info("  " + line);
                 }
             } else {
-                this.getLogger().debug9("no output from database server.");
+                spooler_log.debug9("no output from database server.");
             }
-        } catch (Exception e) {
-            // gracefully ignore errors from dbms output processing
-        }
+        } catch (Exception e) {}
         if (exception != null) {
             throw new Exception(exception);
         }

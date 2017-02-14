@@ -165,18 +165,18 @@ public class ProcessOrderJob extends ProcessJob {
                                             myReplaceAll(envValue, "\\$\\{" + varName + "\\}", this.getParameters().value(varName).replaceAll(
                                                     "[\\\\]", "\\\\\\\\"));
                                 }
-                                this.getLogger().debug9("environment variable substituted: " + varName);
+                                spooler_log.debug9("environment variable substituted: " + varName);
                             } else {
-                                this.getLogger().info("unsubstitutable variable found for environment: " + varName);
+                                spooler_log.info("unsubstitutable variable found for environment: " + varName);
                             }
                         }
                         varBegin = envValue.indexOf("${", varEnd + 1);
                     }
-                    this.getLogger().debug1(".. setting environment variable: " + envName + "=" + envValue);
+                    spooler_log.debug1(".. setting environment variable: " + envName + "=" + envValue);
                     subprocess.set_environment(envName, envValue);
                 }
             }
-            this.getLogger().info("executing command: " + commandLine);
+            spooler_log.info("executing command: " + commandLine);
             subprocess.start(commandLine);
             if (this.getTimeout() > 0) {
                 terminated = subprocess.wait_for_termination(this.getTimeout());
@@ -184,23 +184,23 @@ public class ProcessOrderJob extends ProcessJob {
                 subprocess.wait_for_termination();
             }
             if (!terminated) {
-                this.getLogger().warn("timeout reached for subprocess, process will be terminated");
+                spooler_log.warn("timeout reached for subprocess, process will be terminated");
                 subprocess.kill();
                 subprocess.wait_for_termination();
             }
             boolean stdErrEmpty = true;
             String stdErrString = "";
             String stdOutString = "";
-            this.getLogger().info("output reported to stdout for " + commandLine + ":");
+            spooler_log.info("output reported to stdout for " + commandLine + ":");
             while (this.stdoutStream != null && this.stdoutStream.ready()) {
                 String stdOutLine = stdoutStream.readLine();
-                this.getLogger().info(stdOutLine);
+                spooler_log.info(stdOutLine);
                 stdOutString += stdOutLine + "\n";
             }
-            this.getLogger().info("output reported to stderr for " + commandLine + ":");
+            spooler_log.info("output reported to stderr for " + commandLine + ":");
             while (this.stderrStream != null && this.stderrStream.ready()) {
                 String stdErrLine = stderrStream.readLine();
-                this.getLogger().info(stdErrLine);
+                spooler_log.info(stdErrLine);
                 if (!stdErrLine.trim().isEmpty()) {
                     stdErrEmpty = false;
                 }
@@ -214,14 +214,14 @@ public class ProcessOrderJob extends ProcessJob {
             }
             if (subprocess.exit_code() != 0) {
                 if (this.isIgnoreError()) {
-                    this.getLogger().info("command terminated with exit code: " + subprocess.exit_code());
+                    spooler_log.info("command terminated with exit code: " + subprocess.exit_code());
                 } else {
                     throw new Exception("command terminated with exit code: " + subprocess.exit_code());
                 }
             }
             if (subprocess.termination_signal() != 0) {
                 if (this.isIgnoreSignal()) {
-                    this.getLogger().info("command terminated with signal: " + subprocess.termination_signal());
+                    spooler_log.info("command terminated with signal: " + subprocess.termination_signal());
                 } else {
                     throw new Exception("command terminated with signal: " + subprocess.termination_signal());
                 }
@@ -231,8 +231,7 @@ public class ProcessOrderJob extends ProcessJob {
             }
             return subprocess;
         } catch (Exception e) {
-            this.getLogger().warn("error occurred executing subprocess: " + e.getMessage());
-            throw new Exception(this.getLogger().getWarning());
+            throw new Exception("error occurred executing subprocess: " + e.getMessage());
         }
     }
 
@@ -261,7 +260,7 @@ public class ProcessOrderJob extends ProcessJob {
 
     public void prepareParameters() throws Exception {
         try {
-            this.getLogger().debug1("calling " + SOSClassUtil.getMethodName());
+            spooler_log.debug1("calling " + SOSClassUtil.getMethodName());
             this.setJobParameters(spooler_task.params());
             if (spooler_task.job().order_queue() != null) {
                 this.setOrderParameters(spooler_task.order().params());
@@ -277,46 +276,45 @@ public class ProcessOrderJob extends ProcessJob {
                 this.getParameters().merge(this.getOrderParameters());
             }
         } catch (Exception e) {
-            this.getLogger().warn("error occurred preparing parameters: " + e.getMessage());
-            throw new Exception(this.getLogger().getWarning());
+            throw new Exception("error occurred preparing parameters: " + e.getMessage());
         }
     }
 
     public void prepareAttributes() throws Exception {
         try {
-            this.getLogger().debug1("calling " + SOSClassUtil.getMethodName());
+            spooler_log.debug1("calling " + SOSClassUtil.getMethodName());
             if (this.getParameters().value("configuration_path") != null && !this.getParameters().value("configuration_path").isEmpty()) {
                 this.setConfigurationPath(this.getParameters().value("configuration_path"));
-                this.getLogger().debug1(".. parameter [configuration_path]: " + this.getConfigurationPath());
+                spooler_log.debug1(".. parameter [configuration_path]: " + this.getConfigurationPath());
             } else {
                 this.setConfigurationPath(new File(spooler.ini_path()).getParent());
-                this.getLogger().debug1(".. parameter [configuration_path]: " + this.getConfigurationPath());
+                spooler_log.debug1(".. parameter [configuration_path]: " + this.getConfigurationPath());
             }
             if (this.getParameters().value("configuration_file") != null && !this.getParameters().value("configuration_file").isEmpty()) {
                 this.setConfigurationFilename(this.getParameters().value("configuration_file"));
-                this.getLogger().debug1(".. parameter [configuration_file]: " + this.getConfigurationFilename());
+                spooler_log.debug1(".. parameter [configuration_file]: " + this.getConfigurationFilename());
             } else {
                 if (spooler_job.order_queue() != null) {
                     this.setConfigurationFilename("scheduler_" + spooler_task.order().job_chain().name() + ".config.xml");
-                    this.getLogger().debug1(".. parameter [configuration_file]: " + this.getConfigurationFilename());
+                    spooler_log.debug1(".. parameter [configuration_file]: " + this.getConfigurationFilename());
                 }
             }
             if (this.getParameters().value("scheduler_file_path") != null && !this.getParameters().value("scheduler_file_path").isEmpty()) {
                 this.setTriggerFilename(this.getParameters().value("scheduler_file_path"));
-                this.getLogger().debug1(".. parameter [scheduler_file_path]: " + this.getTriggerFilename());
+                spooler_log.debug1(".. parameter [scheduler_file_path]: " + this.getTriggerFilename());
             } else {
                 this.setTriggerFilename("");
             }
             if (this.getParameters().value("scheduler_order_command") != null && !this.getParameters().value("scheduler_order_command").isEmpty()) {
                 this.setCommand(this.getParameters().value("scheduler_order_command"));
-                this.getLogger().debug1(".. parameter [scheduler_order_command]: " + this.getCommand());
+                spooler_log.debug1(".. parameter [scheduler_order_command]: " + this.getCommand());
             } else {
                 this.setCommand("");
             }
             if (this.getParameters().value("scheduler_order_command_parameters") != null
                     && !this.getParameters().value("scheduler_order_command_parameters").isEmpty()) {
                 this.setCommandParameters(this.getParameters().value("scheduler_order_command_parameters"));
-                this.getLogger().debug1(".. parameter [scheduler_order_command_parameters]: " + this.getCommandParameters());
+                spooler_log.debug1(".. parameter [scheduler_order_command_parameters]: " + this.getCommandParameters());
             } else {
                 this.setCommandParameters("");
             }
@@ -329,7 +327,7 @@ public class ProcessOrderJob extends ProcessJob {
                 } else {
                     this.setIgnoreStderr(false);
                 }
-                this.getLogger().debug1(".. parameter [scheduler_order_ignore_stderr]: " + this.isIgnoreStderr());
+                spooler_log.debug1(".. parameter [scheduler_order_ignore_stderr]: " + this.isIgnoreStderr());
             } else {
                 this.setIgnoreStderr(false);
             }
@@ -342,7 +340,7 @@ public class ProcessOrderJob extends ProcessJob {
                 } else {
                     this.setIgnoreError(false);
                 }
-                this.getLogger().debug1(".. parameter [scheduler_order_ignore_error]: " + this.isIgnoreError());
+                spooler_log.debug1(".. parameter [scheduler_order_ignore_error]: " + this.isIgnoreError());
             } else {
                 this.setIgnoreError(false);
             }
@@ -355,21 +353,21 @@ public class ProcessOrderJob extends ProcessJob {
                 } else {
                     this.setIgnoreSignal(false);
                 }
-                this.getLogger().debug1(".. parameter [scheduler_order_ignore_signal]: " + this.isIgnoreSignal());
+                spooler_log.debug1(".. parameter [scheduler_order_ignore_signal]: " + this.isIgnoreSignal());
             } else {
                 this.setIgnoreSignal(false);
             }
             if (this.getParameters().value("scheduler_order_priority_class") != null
                     && !this.getParameters().value("scheduler_order_priority_class").isEmpty()) {
                 this.setPriorityClass(this.getParameters().value("scheduler_order_priority_class"));
-                this.getLogger().debug1(".. parameter [scheduler_order_priority_class]: " + this.getPriorityClass());
+                spooler_log.debug1(".. parameter [scheduler_order_priority_class]: " + this.getPriorityClass());
             } else {
                 this.setPriorityClass("normal");
             }
             try {
                 if (this.getParameters().value("scheduler_order_timeout") != null && !this.getParameters().value("scheduler_order_timeout").isEmpty()) {
                     this.setTimeout(Double.parseDouble(this.getParameters().value("scheduler_order_timeout")));
-                    this.getLogger().debug1(".. parameter [scheduler_order_timeout]: " + this.getTimeout());
+                    spooler_log.debug1(".. parameter [scheduler_order_timeout]: " + this.getTimeout());
                 } else {
                     this.setTimeout(0);
                 }
@@ -377,8 +375,7 @@ public class ProcessOrderJob extends ProcessJob {
                 throw new Exception("illegal value for parameter [scheduler_order_timeout]: " + this.getParameters().value("scheduler_order_timeout"));
             }
         } catch (Exception e) {
-            this.getLogger().warn("error occurred processing attributes: " + e.getMessage());
-            throw new Exception(this.getLogger().getWarning());
+            throw new Exception("error occurred processing attributes: " + e.getMessage());
         }
     }
 
@@ -442,7 +439,7 @@ public class ProcessOrderJob extends ProcessJob {
                 if (configurationFilename == null || configurationFilename.isEmpty()) {
                     throw new Exception("no configuration filename was specified");
                 }
-                this.getLogger().debug1(".. config file " + configurationFilename);
+                spooler_log.debug1(".. config file " + configurationFilename);
                 File configurationFile = new File(configurationFilename);
                 if (!configurationFile.exists()) {
                     throw new Exception("configuration file not found: " + configurationFile.getCanonicalPath());
@@ -462,8 +459,7 @@ public class ProcessOrderJob extends ProcessJob {
                 spooler_task.order().params().set_var("configuration_file", configurationFilename);
             }
         } catch (Exception e) {
-            this.getLogger().warn("error occurred initializing configuration: " + e.getMessage());
-            throw new Exception(this.getLogger().getWarning());
+            throw new Exception("error occurred initializing configuration: " + e.getMessage());
         } finally {
             try {
                 if (fis != null) {
@@ -480,7 +476,7 @@ public class ProcessOrderJob extends ProcessJob {
         String nodeQuery = "";
         String payload = "";
         try {
-            this.getLogger().debug1("calling " + SOSClassUtil.getMethodName());
+            spooler_log.debug1("calling " + SOSClassUtil.getMethodName());
             this.orderParameterKeys = new Vector();
             if (spooler_task.job().order_queue() != null) {
                 if (spooler_task.order().xml_payload() == null || spooler_task.order().xml_payload().isEmpty()
@@ -509,28 +505,28 @@ public class ProcessOrderJob extends ProcessJob {
                 if (nodeSettings != null) {
                     nodeMapSettings = nodeSettings.getAttributes();
                     if (nodeMapSettings != null && nodeMapSettings.getNamedItem("value") != null) {
-                        this.getLogger().debug1(
+                        spooler_log.debug1(
                                 "Log Level is: " + nodeMapSettings.getNamedItem("value").getNodeValue() + "("
                                         + this.logLevel2Int(nodeMapSettings.getNamedItem("value").getNodeValue()) + ")");
-                        this.getLogger().setLogLevel(this.logLevel2Int(nodeMapSettings.getNamedItem("value").getNodeValue()));
+                        spooler_log.set_level(this.logLevel2Int(nodeMapSettings.getNamedItem("value").getNodeValue()));
                     }
                 }
                 this.setEnvVars();
                 String env = "";
                 boolean globalEnv = false;
                 nodeQuery = "//job_chain[@name='" + spooler_task.order().job_chain().name() + "']/order";
-                this.getLogger().debug9("lookup order query for job chain: " + nodeQuery);
+                spooler_log.debug9("lookup order query for job chain: " + nodeQuery);
                 Node nodeParams = xpath.selectSingleNode(nodeQuery + "/params");
                 if (nodeParams == null || !nodeParams.hasChildNodes()) {
                     nodeQuery = "//application[@name='" + spooler_task.order().job_chain().name() + "']/order";
-                    this.getLogger().debug9("lookup order query for application: " + nodeQuery);
+                    spooler_log.debug9("lookup order query for application: " + nodeQuery);
                     nodeParams = xpath.selectSingleNode(nodeQuery + "/params");
                 }
                 if (nodeParams != null && nodeParams.hasAttributes()) {
                     NamedNodeMap nodeMapParams = nodeParams.getAttributes();
                     if (nodeMapParams != null && nodeMapParams.getNamedItem("env") != null) {
                         env = nodeMapParams.getNamedItem("env").getNodeValue();
-                        this.getLogger().debug3(".. parameter section with env=" + env + " found");
+                        spooler_log.debug3(".. parameter section with env=" + env + " found");
                         globalEnv = "yes".equalsIgnoreCase(env) || "1".equals(env) || "on".equalsIgnoreCase(env) || "true".equalsIgnoreCase(env);
                     }
                 }
@@ -556,7 +552,7 @@ public class ProcessOrderJob extends ProcessJob {
                                     }
                                 }
                             }
-                            this.getLogger().debug1(".. global configuration parameter [" + nodeName + "]: " + nodeValue);
+                            spooler_log.debug1(".. global configuration parameter [" + nodeName + "]: " + nodeValue);
                             spooler_task.order().params().set_var(nodeName, nodeValue);
                             if (globalEnv || nodeMap.getNamedItem("env") != null) {
                                 if (nodeMap.getNamedItem("env") != null) {
@@ -578,18 +574,18 @@ public class ProcessOrderJob extends ProcessJob {
                 nodeQuery =
                         "//job_chain[@name='" + spooler_task.order().job_chain().name() + "']/order/process[@state='" + spooler_task.order().state()
                                 + "']";
-                this.getLogger().debug9("lookup order node query: " + nodeQuery + "/params/param");
+                spooler_log.debug9("lookup order node query: " + nodeQuery + "/params/param");
                 nodeList = xpath.selectNodeList(nodeQuery + "/params/param");
                 if (nodeList == null || nodeList.getLength() == 0) {
                     nodeQuery =
                             "//application[@name='" + spooler_task.order().job_chain().name() + "']/order/process[@state='"
                                     + spooler_task.order().state() + "']";
-                    this.getLogger().debug9("lookup order node query: " + nodeQuery + "/params/param");
+                    spooler_log.debug9("lookup order node query: " + nodeQuery + "/params/param");
                     nodeList = xpath.selectNodeList(nodeQuery + "/params/param");
                 }
                 for (int i = 0; i < nodeList.getLength(); i++) {
                     Node node = nodeList.item(i);
-                    this.getLogger().debug1("---->" + node.getNodeName());
+                    spooler_log.debug1("---->" + node.getNodeName());
                     if ("param".equalsIgnoreCase(node.getNodeName())) {
                         NamedNodeMap nodeMap = node.getAttributes();
                         if (nodeMap != null && nodeMap.getNamedItem("name") != null) {
@@ -607,7 +603,7 @@ public class ProcessOrderJob extends ProcessJob {
                                     }
                                 }
                             }
-                            this.getLogger().debug1(".. configuration parameter [" + nodeMap.getNamedItem("name").getNodeValue() + "]: " + value);
+                            spooler_log.debug1(".. configuration parameter [" + nodeMap.getNamedItem("name").getNodeValue() + "]: " + value);
                             spooler_task.order().params().set_var(nodeMap.getNamedItem("name").getNodeValue(), value);
                             this.orderParameterKeys.add(nodeMap.getNamedItem("name").getNodeValue());
                         }
@@ -623,9 +619,9 @@ public class ProcessOrderJob extends ProcessJob {
                         String parameterValue = spooler_task.order().params().value(parameterNames[i]);
                         int trials = 0;
                         while (parameterValue.indexOf("${") != -1 && trials <= 1) {
-                            this.getLogger().debug1("substitution trial:" + trials + " --> " + parameterValue);
+                            spooler_log.debug1("substitution trial:" + trials + " --> " + parameterValue);
                             for (int j = 0; j < parameterNames.length; j++) {
-                                this.getLogger().debug9(
+                                spooler_log.debug9(
                                         "parameterNames[j]=" + parameterNames[j] + " -->" + parameterValue.indexOf("${" + parameterNames[j] + "}"));
                                 if (!parameterNames[i].equals(parameterNames[j])
                                         && (parameterValue.indexOf("${" + parameterNames[j] + "}") != -1 || parameterValue.indexOf("${basename:"
@@ -683,15 +679,15 @@ public class ProcessOrderJob extends ProcessJob {
                             }
                         }
                         if (parameterFound) {
-                            this.getLogger().debug3("parameter substitution [" + parameterNames[i] + "]: " + parameterValue);
+                            spooler_log.debug3("parameter substitution [" + parameterNames[i] + "]: " + parameterValue);
                             spooler_task.order().params().set_var(parameterNames[i], parameterValue);
                         }
                         if (envFound) {
-                            this.getLogger().debug3("environment variable substitution [" + parameterNames[i] + "]: " + parameterValue);
+                            spooler_log.debug3("environment variable substitution [" + parameterNames[i] + "]: " + parameterValue);
                             spooler_task.order().params().set_var(parameterNames[i], parameterValue);
                         }
                         if (additionalEnvFound) {
-                            this.getLogger().debug3("additional environment variable substitution [" + parameterNames[i] + "]: " + parameterValue);
+                            spooler_log.debug3("additional environment variable substitution [" + parameterNames[i] + "]: " + parameterValue);
                             spooler_task.order().params().set_var(parameterNames[i], parameterValue);
                         }
                     }
@@ -699,8 +695,7 @@ public class ProcessOrderJob extends ProcessJob {
             }
             return this.getConfiguration();
         } catch (Exception e) {
-            this.getLogger().warn("error occurred preparing configuration: " + e.getMessage());
-            throw new Exception(this.getLogger().getWarning());
+            throw new Exception("error occurred preparing configuration: " + e.getMessage());
         }
     }
 
@@ -817,14 +812,14 @@ public class ProcessOrderJob extends ProcessJob {
             win = true;
         }
         Variable_set env = spooler_task.create_subprocess().env();
-        this.getLogger().debug9(env.names());
+        spooler_log.debug9(env.names());
         StringTokenizer t = new StringTokenizer(env.names(), ";");
         while (t.hasMoreTokens()) {
             String envname = t.nextToken();
             if (envname != null) {
                 String envvalue = env.value(envname);
                 if (win) {
-                    this.getLogger().debug9(envname.toUpperCase() + "=" + envvalue);
+                    spooler_log.debug9(envname.toUpperCase() + "=" + envvalue);
                     this.envvars.put(envname.toUpperCase(), envvalue);
                 } else {
                     this.envvars.put(envname, envvalue);
@@ -836,7 +831,7 @@ public class ProcessOrderJob extends ProcessJob {
     private int logLevel2Int(String l) {
         HashMap levels = new HashMap();
         if (l == null) {
-            return this.getLogger().getLogLevel();
+            return spooler_log.level();
         } else {
             levels.put("info", "10");
             levels.put("warn", "11");
@@ -853,7 +848,7 @@ public class ProcessOrderJob extends ProcessJob {
             if (levels.get(l) != null) {
                 return Integer.parseInt(levels.get(l).toString());
             } else {
-                return this.getLogger().getLogLevel();
+                return spooler_log.level();
             }
         }
     }

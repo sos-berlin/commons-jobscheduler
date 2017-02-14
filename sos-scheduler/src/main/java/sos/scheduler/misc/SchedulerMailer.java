@@ -2,14 +2,14 @@ package sos.scheduler.misc;
 
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
 import sos.net.SOSMail;
 import sos.scheduler.job.JobSchedulerJob;
 import sos.settings.SOSProfileSettings;
 import sos.settings.SOSSettings;
 import sos.spooler.Spooler;
 import sos.spooler.Variable_set;
-import sos.util.SOSLogger;
-import sos.util.SOSSchedulerLogger;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
@@ -116,8 +116,8 @@ import com.sos.JSHelper.Exceptions.JobSchedulerException;
 public class SchedulerMailer {
 
     private SOSMail sosMail;
-    private SOSLogger logger;
     private final Spooler spooler;
+    private Logger LOGGER = Logger.getLogger(SchedulerMailer.class);
 
     public SchedulerMailer(final sos.spooler.Job_impl job) throws Exception {
         spooler = job.spooler;
@@ -161,7 +161,6 @@ public class SchedulerMailer {
      * @throws Exception */
     public SchedulerMailer(final JobSchedulerJob job) throws Exception {
         spooler = job.spooler;
-        logger = job.getLogger();
         Variable_set params = job.spooler.create_variable_set();
         params.merge(job.spooler_task.params());
         if (job.spooler_job.order_queue() != null && job.spooler_task.order() != null) {
@@ -172,7 +171,6 @@ public class SchedulerMailer {
                 && ("yes".equalsIgnoreCase(readSettings) || "1".equalsIgnoreCase(readSettings) || "true".equalsIgnoreCase(readSettings))) {
             if (job.getConnectionSettings() != null && !job.getConnectionSettings().getSection("email", "mail_server").isEmpty()) {
                 sosMail = new SOSMail(job.getConnectionSettings());
-                sosMail.setSOSLogger(logger);
             } else {
                 throw new Exception("Mail Settings could not be found.");
             }
@@ -185,10 +183,6 @@ public class SchedulerMailer {
     private void init(final sos.spooler.Log spooler_log) throws Exception {
         try {
             sosMail = new SOSMail(spooler_log.mail().smtp());
-            if (logger == null) {
-                logger = new SOSSchedulerLogger(spooler_log);
-            }
-            sosMail.setSOSLogger(logger);
             sosMail.setQueueDir(spooler_log.mail().queue_dir());
             sosMail.setFrom(spooler_log.mail().from());
             sosMail.addRecipient(spooler_log.mail().to());
@@ -211,7 +205,7 @@ public class SchedulerMailer {
 
     private void readParams(final Variable_set params) throws Exception {
         try {
-            logger.debug1("Setting mail parameters:");
+            LOGGER.debug("Setting mail parameters:");
             if (params.value("to") != null && !params.value("to").isEmpty()) {
                 sosMail.clearRecipients();
                 sosMail.addRecipient(params.value("to"));
@@ -298,7 +292,7 @@ public class SchedulerMailer {
                 String[] attachments = params.value("attachment").split(";");
                 for (int i = 0; i < attachments.length; i++) {
                     String attFile = attachments[i];
-                    logger.debug1(".. mail attachment [" + i + "]: " + attFile);
+                    LOGGER.debug(".. mail attachment [" + i + "]: " + attFile);
                     sosMail.addAttachment(attFile);
                 }
             }
@@ -311,13 +305,11 @@ public class SchedulerMailer {
     private void debugParameter(final Variable_set params, final String paramName) {
         try {
             if (paramName.contains("password")) {
-                logger.debug1(".. mail parameter [" + paramName + "]: *****");
+                LOGGER.debug(".. mail parameter [" + paramName + "]: *****");
             } else {
-                logger.debug1(".. mail parameter [" + paramName + "]: " + params.value(paramName));
+                LOGGER.debug(".. mail parameter [" + paramName + "]: " + params.value(paramName));
             }
-        } catch (Exception e) {
-            // No error handling
-        }
+        } catch (Exception e) {}
 
     }
 

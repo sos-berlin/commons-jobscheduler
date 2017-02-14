@@ -9,7 +9,6 @@ import sos.settings.SOSSettings;
 import sos.spooler.Job_impl;
 import sos.util.SOSArguments;
 import sos.util.SOSLogger;
-import sos.util.SOSSchedulerLogger;
 
 /** @author andreas pueschel
  * @deprecated use sos.scheduler.managed.configuration.ConfigurationJob */
@@ -17,7 +16,6 @@ import sos.util.SOSSchedulerLogger;
 public class ProcessJob extends Job_impl {
 
     protected String application = new String("");
-    private SOSSchedulerLogger sosLogger = null;
     private SOSConnection sosConnection = null;
     private SOSConnectionSettings connectionSettings = null;
     private SOSSettings jobSettings = null;
@@ -33,7 +31,6 @@ public class ProcessJob extends Job_impl {
             if (!rc) {
                 return false;
             }
-            this.setLogger(new SOSSchedulerLogger(spooler_log));
             try {
                 this.setJobSettings(new SOSProfileSettings(spooler.ini_path()));
                 this.setJobProperties(jobSettings.getSection("spooler"));
@@ -46,15 +43,11 @@ public class ProcessJob extends Job_impl {
                 if (this.getJobProperties().getProperty("db_class") == null || this.getJobProperties().getProperty("db_class").isEmpty()) {
                     throw new Exception("no settings found for entry [db_class] in section [spooler] of configuration file: " + spooler.ini_path());
                 }
-                if (this.getLogger() != null) {
-                    sosLogger.debug6("connecting to database...");
-                }
-                this.setConnection(getSchedulerConnection(this.getJobSettings(), this.getLogger()));
+                spooler_log.debug6("connecting to database...");
+                this.setConnection(getSchedulerConnection(this.getJobSettings()));
                 this.getConnection().connect();
-                this.setConnectionSettings(new SOSConnectionSettings(this.getConnection(), "SETTINGS", this.getLogger()));
-                if (this.getLogger() != null) {
-                    this.getLogger().debug6("..successfully connected to Job Scheduler database.");
-                }
+                this.setConnectionSettings(new SOSConnectionSettings(this.getConnection(), "SETTINGS"));
+                spooler_log.debug6("..successfully connected to Job Scheduler database.");
             } catch (Exception e) {
                 spooler_log.info("connect to database failed: " + e.getMessage());
                 spooler_log.info("running without database...");
@@ -111,14 +104,6 @@ public class ProcessJob extends Job_impl {
 
     public void setConnection(final SOSConnection sosConnection) {
         this.sosConnection = sosConnection;
-    }
-
-    public SOSSchedulerLogger getLogger() {
-        return sosLogger;
-    }
-
-    public void setLogger(final SOSSchedulerLogger sosLogger) {
-        this.sosLogger = sosLogger;
     }
 
     public Properties getJobProperties() {
@@ -186,16 +171,8 @@ public class ProcessJob extends Job_impl {
         }
         SOSArguments arguments = new SOSArguments(dbProperty);
         SOSConnection conn;
-        if (log != null) {
-            conn =
-                    SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.asString("-class=", ""),
-                            arguments.asString("-url=", ""), arguments.asString("-user=", ""), arguments.asString("-password=", ""), log);
-        } else {
-            conn =
-                    SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.asString("-class=", ""),
-                            arguments.asString("-url=", ""), arguments.asString("-user=", ""), arguments.asString("-password=", ""));
-        }
-        return conn;
+        return SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.asString("-class=", ""),
+                arguments.asString("-url=", ""), arguments.asString("-user=", ""), arguments.asString("-password=", ""));
     }
 
     private boolean getSettings() {

@@ -154,12 +154,10 @@ public class JobSchedulerProcessSendMailJob extends ProcessOrderJob {
                         attachment.setContentType(attachmentContentType);
                         sosMail.addAttachment(attachment);
                     }
-                    sosMail.setSOSLogger(this.getLogger());
-                    this.getLogger().info("sending mail: \n" + sosMail.dumpMessageAsString());
+                    spooler_log.info("sending mail: \n" + sosMail.dumpMessageAsString());
                     if (!sosMail.send()) {
-                        this.getLogger().warn(
-                                "mail server is unavailable, mail for recipient [" + to + "] is queued in local directory [" + sosMail.getQueueDir()
-                                        + "]:" + sosMail.getLastError());
+                        spooler_log.warn("mail server is unavailable, mail for recipient [" + to + "] is queued in local directory [" + sosMail.getQueueDir()
+                                + "]:" + sosMail.getLastError());
                     }
                     if (cleanupAttachment) {
                         for (int i = 0; i < attachments.length; i++) {

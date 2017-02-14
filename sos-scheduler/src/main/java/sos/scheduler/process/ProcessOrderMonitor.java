@@ -3,14 +3,12 @@ package sos.scheduler.process;
 import java.io.File;
 
 import sos.spooler.Order;
-import sos.util.SOSSchedulerLogger;
 
 /** @author andreas pueschel */
 public class ProcessOrderMonitor extends ProcessBaseMonitor {
 
     public boolean spooler_process_before() {
         try {
-            this.setLogger(new SOSSchedulerLogger(spooler_log));
             Order order = spooler_task.order();
             if (order.params().value("configuration_path") != null && !order.params().value("configuration_path").isEmpty()) {
                 this.setConfigurationPath(order.params().value("configuration_path"));
@@ -18,7 +16,7 @@ public class ProcessOrderMonitor extends ProcessBaseMonitor {
                 this.setConfigurationPath(spooler_task.params().value("configuration_path"));
             } else {
                 this.setConfigurationPath(new File(spooler.ini_path()).getParent());
-                this.getLogger().debug1(".. parameter [configuration_path]: " + this.getConfigurationPath());
+                spooler_log.debug1(".. parameter [configuration_path]: " + this.getConfigurationPath());
             }
 
             if (order.params().value("configuration_file") != null && !order.params().value("configuration_file").isEmpty()) {
@@ -27,9 +25,9 @@ public class ProcessOrderMonitor extends ProcessBaseMonitor {
                 this.setConfigurationFilename(spooler_task.params().value("configuration_file"));
             } else {
                 if (spooler_job.order_queue() != null) {
-                    this.getLogger().debug1(".. parameter [configuration_file]: " + this.getConfigurationFilename());
+                    spooler_log.debug1(".. parameter [configuration_file]: " + this.getConfigurationFilename());
                     this.setConfigurationFilename("scheduler_" + spooler_task.order().job_chain().name() + ".config.xml");
-                    this.getLogger().debug1(".. parameter [configuration_file]: " + this.getConfigurationFilename());
+                    spooler_log.debug1(".. parameter [configuration_file]: " + this.getConfigurationFilename());
                 }
             }
             this.initConfiguration();
@@ -43,12 +41,9 @@ public class ProcessOrderMonitor extends ProcessBaseMonitor {
 
     public boolean spooler_process_after(boolean rc) throws Exception {
         try {
-            this.setLogger(new SOSSchedulerLogger(spooler_log));
             Order order = spooler_task.order();
-            if (!rc
-                    && !(order.params() != null && order.params().value("setback") != null && ("false".equalsIgnoreCase(order.params().value(
-                            "setback"))
-                            || "no".equalsIgnoreCase(order.params().value("setback")) || "0".equals(order.params().value("setback"))))) {
+            if (!rc && !(order.params() != null && order.params().value("setback") != null && ("false".equalsIgnoreCase(order.params().value("setback"))
+                    || "no".equalsIgnoreCase(order.params().value("setback")) || "0".equals(order.params().value("setback"))))) {
                 spooler_task.order().setback();
             }
             return rc;
@@ -58,9 +53,7 @@ public class ProcessOrderMonitor extends ProcessBaseMonitor {
         } finally {
             try {
                 this.cleanupConfiguration();
-            } catch (Exception e) {
-                //
-            }
+            } catch (Exception e) {}
         }
     }
 

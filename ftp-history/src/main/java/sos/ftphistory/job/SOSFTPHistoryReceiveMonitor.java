@@ -26,7 +26,6 @@ public class SOSFTPHistoryReceiveMonitor extends Monitor_impl {
             return arg0;
         }
         SOSConnection conn = null;
-        SOSSchedulerLogger log = null;
         Variable_set parameters = null;
         String host = null;
         String remoteDir = null;
@@ -38,7 +37,7 @@ public class SOSFTPHistoryReceiveMonitor extends Monitor_impl {
             if (spooler_job.order_queue() != null) {
                 parameters.merge(spooler_task.order().params());
             }
-            SOSFTPHistory.debugParams(parameters, spooler_log);
+            SOSFTPHistory.debugParams(parameters);
             if (parameters != null && parameters.count() > 0) {
                 if ("0".equalsIgnoreCase(parameters.value("ftp_result_files"))) {
                     spooler_log.debug9("no files were received");
@@ -48,8 +47,7 @@ public class SOSFTPHistoryReceiveMonitor extends Monitor_impl {
                     if (host != null && !host.isEmpty() && remoteDir != null && !remoteDir.isEmpty()) {
                         try {
                             String[] files = parameters.value("ftp_result_filepaths").split(";");
-                            log = new SOSSchedulerLogger(spooler_log);
-                            conn = SOSFTPHistory.getConnection(spooler, conn, parameters, log);
+                            conn = SOSFTPHistory.getConnection(spooler, conn, parameters);
                             for (String file : files) {
                                 fillPosition(conn, host, remoteDir, file);
                             }
@@ -108,8 +106,7 @@ public class SOSFTPHistoryReceiveMonitor extends Monitor_impl {
         } catch (Exception e) {
             try {
                 conn.rollback();
-            } catch (Exception ee) {
-            }
+            } catch (Exception ee) {}
             throw new Exception(SOSClassUtil.getMethodName() + " : " + e.getMessage());
         }
     }

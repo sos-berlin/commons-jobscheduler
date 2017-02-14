@@ -2,6 +2,7 @@ package sos.scheduler.launcher;
 
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Node;
 
 import sos.scheduler.command.SOSSchedulerCommand;
@@ -13,6 +14,7 @@ import sos.xml.SOSXMLXPath;
 /** @author Mürüvet Öksüz */
 public class JobSchedulerLoadTestLauncher {
 
+    private static final Logger LOGGER = Logger.getLogger(JobSchedulerLoadTestLauncher.class);
     private String schedulerLauncherHost = "localhost";
     private int schedulerLauncherPort = 4444;
     private String schedulerLauncherProtocol = "tcp";
@@ -35,38 +37,35 @@ public class JobSchedulerLoadTestLauncher {
     private String schedulerLauncherOrderAt = "";
     private String schedulerLauncherOrderPriority = "";
     private String schedulerLauncherOrderWebService = "";
-    private SOSLogger sosLogger = null;
     private SOSString sosString = null;
     private HashMap allParam = new HashMap();
     private String configFile = "";
     private String stateText = "";
     private String jobname = "";
 
-    public JobSchedulerLoadTestLauncher(SOSLogger sosLogger_) throws Exception {
+    public JobSchedulerLoadTestLauncher() throws Exception {
         try {
-            this.sosLogger = sosLogger_;
             init();
         } catch (Exception e) {
             throw new Exception("..error in " + SOSClassUtil.getMethodName() + ": " + e.getMessage(), e);
         }
     }
 
-    public JobSchedulerLoadTestLauncher(SOSLogger sosLogger_, String configFile_, String jobname_, String host_, int port_) throws Exception {
+    public JobSchedulerLoadTestLauncher(String configFile_, String jobname_, String host_, int port_) throws Exception {
         try {
-            this.sosLogger = sosLogger_;
             this.configFile = configFile_;
             if (jobname_ != null && !jobname_.isEmpty()) {
                 this.jobname = jobname_;
-                sosLogger.debug3("..argument[job] = " + jobname);
+                LOGGER.debug("..argument[job] = " + jobname);
             }
             init();
             if (!sosString.parseToString(host_).isEmpty()) {
                 this.schedulerLauncherHost = host_;
-                sosLogger.debug3("..argument[host] = " + schedulerLauncherHost);
+                LOGGER.debug("..argument[host] = " + schedulerLauncherHost);
             }
             if ((port_ != -1) && (!sosString.parseToString(String.valueOf(port_)).isEmpty())) {
                 this.schedulerLauncherPort = port_;
-                sosLogger.debug3("..argument[port] = " + schedulerLauncherPort);
+                LOGGER.debug("..argument[port] = " + schedulerLauncherPort);
             }
         } catch (Exception e) {
             throw new Exception("..error in " + SOSClassUtil.getMethodName() + ": " + e.getMessage(), e);
@@ -87,7 +86,7 @@ public class JobSchedulerLoadTestLauncher {
     }
 
     private void extractParameters() throws Exception {
-        sosLogger.debug1("..reading parameters ...");
+        LOGGER.debug("..reading parameters ...");
         String paramName = "";
         String paramValue = "";
         try {
@@ -106,7 +105,7 @@ public class JobSchedulerLoadTestLauncher {
                         j++;
                         paramValue = map.item(j).getNodeValue();
                     }
-                    sosLogger.debug6(".. parameter: " + paramName + "=" + paramValue);
+                    LOGGER.debug(".. parameter: " + paramName + "=" + paramValue);
                     allParam.put(paramName, paramValue);
                 }
             }
@@ -139,7 +138,7 @@ public class JobSchedulerLoadTestLauncher {
                             j++;
                             paramValue = map.item(j).getNodeValue();
                         }
-                        sosLogger.debug6(".. attribute: " + paramName + "=" + paramValue);
+                        LOGGER.debug(".. attribute: " + paramName + "=" + paramValue);
                         allParam.put(paramName, paramValue);
                     }
                 }
@@ -163,27 +162,27 @@ public class JobSchedulerLoadTestLauncher {
     }
 
     private void getParameters() throws Exception {
-        sosLogger.debug3("get parameters ...");
+        LOGGER.debug("get parameters ...");
         try {
 
             if (sosString.parseToString(schedulerLauncherHost).isEmpty() && !sosString.parseToString(allParam, "scheduler_launcher_host").isEmpty()) {
                 schedulerLauncherHost = sosString.parseToString(allParam, "scheduler_launcher_host");
-                sosLogger.debug3("..parameter[scheduler_launcher_host] = " + schedulerLauncherHost);
+                LOGGER.debug("..parameter[scheduler_launcher_host] = " + schedulerLauncherHost);
             }
             if (!sosString.parseToString(allParam, "scheduler_launcher_port").isEmpty()) {
                 schedulerLauncherPort = Integer.parseInt(sosString.parseToString(allParam, "scheduler_launcher_port"));
-                sosLogger.debug3("..parameter[scheduler_launcher_port] = " + schedulerLauncherPort);
+                LOGGER.debug("..parameter[scheduler_launcher_port] = " + schedulerLauncherPort);
             }
             if (!sosString.parseToString(allParam, "scheduler_launcher_protocol").isEmpty()) {
                 schedulerLauncherProtocol = sosString.parseToString(allParam, "scheduler_launcher_protocol");
-                sosLogger.debug3("..parameter[scheduler_launcher_protocol] = " + schedulerLauncherProtocol);
+                LOGGER.debug("..parameter[scheduler_launcher_protocol] = " + schedulerLauncherProtocol);
             }
             if (!sosString.parseToString(allParam, "scheduler_launcher_min_starts").isEmpty()) {
                 schedulerLauncherMinStarts = Integer.parseInt(sosString.parseToString(allParam, "scheduler_launcher_min_starts"));
-                sosLogger.debug3("..parameter[scheduler_launcher_min_starts] = " + schedulerLauncherMinStarts);
+                LOGGER.debug("..parameter[scheduler_launcher_min_starts] = " + schedulerLauncherMinStarts);
             }
             if (!sosString.parseToString(allParam, "scheduler_launcher_start_increment").isEmpty()) {
-                sosLogger.debug3("..parameter[scheduler_launcher_start_increment] = " + schedulerLauncherStartIncrement);
+                LOGGER.debug("..parameter[scheduler_launcher_start_increment] = " + schedulerLauncherStartIncrement);
                 if (sosString.parseToString(allParam, "scheduler_launcher_start_increment").trim().startsWith("+")
                         || sosString.parseToString(allParam, "scheduler_launcher_start_increment").trim().startsWith("*")) {
                     schedulerLauncherStartIncrement =
@@ -196,63 +195,63 @@ public class JobSchedulerLoadTestLauncher {
             }
             if (!sosString.parseToString(allParam, "scheduler_launcher_max_starts").isEmpty()) {
                 this.schedulerLauncherMaxStarts = Integer.parseInt(sosString.parseToString(allParam, "scheduler_launcher_max_starts"));
-                sosLogger.debug3("..parameter[scheduler_launcher_max_starts] = " + schedulerLauncherMaxStarts);
+                LOGGER.debug("..parameter[scheduler_launcher_max_starts] = " + schedulerLauncherMaxStarts);
             }
             if (!sosString.parseToString(allParam, "scheduler_launcher_interval").isEmpty()) {
                 schedulerLauncherInterval = Integer.parseInt(sosString.parseToString(allParam, "scheduler_launcher_interval"));
-                sosLogger.debug3("..parameter[scheduler_launcher_interval] = " + schedulerLauncherInterval);
+                LOGGER.debug("..parameter[scheduler_launcher_interval] = " + schedulerLauncherInterval);
             }
             if (!sosString.parseToString(allParam, "scheduler_launcher_job").isEmpty()) {
                 schedulerLauncherJob = sosString.parseToString(allParam, "scheduler_launcher_job");
-                sosLogger.debug3("..parameter[scheduler_launcher_job] = " + schedulerLauncherJob);
+                LOGGER.debug("..parameter[scheduler_launcher_job] = " + schedulerLauncherJob);
             }
             if (!sosString.parseToString(allParam, "scheduler_launcher_job_after").isEmpty()) {
                 schedulerLauncherJobAfter = sosString.parseToString(allParam, "scheduler_launcher_job_after");
-                sosLogger.debug3("..parameter[scheduler_launcher_job_after] = " + schedulerLauncherJobAfter);
+                LOGGER.debug("..parameter[scheduler_launcher_job_after] = " + schedulerLauncherJobAfter);
             }
             if (!sosString.parseToString(allParam, "scheduler_launcher_job_at").isEmpty()) {
                 schedulerLauncherJobAt = sosString.parseToString(allParam, "scheduler_launcher_job_at");
-                sosLogger.debug3("..parameter[scheduler_launcher_job_at] = " + schedulerLauncherJobAt);
+                LOGGER.debug("..parameter[scheduler_launcher_job_at] = " + schedulerLauncherJobAt);
             }
             if (!sosString.parseToString(allParam, "scheduler_launcher_duration").isEmpty()) {
                 schedulerLauncherDuration = Long.parseLong(sosString.parseToString(allParam, "scheduler_launcher_duration"));
-                sosLogger.debug3("..parameter[scheduler_launcher_duration] = " + schedulerLauncherDuration);
+                LOGGER.debug("..parameter[scheduler_launcher_duration] = " + schedulerLauncherDuration);
             }
             if (!sosString.parseToString(allParam, "scheduler_launcher_job_web_service").isEmpty()) {
                 schedulerLauncherJobWebService = sosString.parseToString(allParam, "scheduler_launcher_job_web_service");
-                sosLogger.debug3("..parameter[scheduler_launcher_web_service] = " + schedulerLauncherJobWebService);
+                LOGGER.debug("..parameter[scheduler_launcher_web_service] = " + schedulerLauncherJobWebService);
             }
             if (!sosString.parseToString(allParam, "scheduler_launcher_order").isEmpty()) {
                 schedulerLauncherOrder = sosString.parseToString(allParam, "scheduler_launcher_order");
-                sosLogger.debug3("..parameter[scheduler_launcher_order] = " + schedulerLauncherOrder);
+                LOGGER.debug("..parameter[scheduler_launcher_order] = " + schedulerLauncherOrder);
             }
             if (!sosString.parseToString(allParam, "scheduler_launcher_order_replace").isEmpty()) {
                 schedulerLauncherOrderReplace = sosString.parseToBoolean(sosString.parseToString(allParam, "scheduler_launcher_order_replace"));
-                sosLogger.debug3("..parameter[scheduler_launcher_order_replace] = " + schedulerLauncherOrderReplace);
+                LOGGER.debug("..parameter[scheduler_launcher_order_replace] = " + schedulerLauncherOrderReplace);
             }
             if (!sosString.parseToString(allParam, "scheduler_launcher_order_job_chain").isEmpty()) {
                 schedulerLauncherOrderJobChain = sosString.parseToString(allParam, "scheduler_launcher_order_job_chain");
-                sosLogger.debug3("..parameter[scheduler_launcher_order_job_chain] = " + schedulerLauncherOrderJobChain);
+                LOGGER.debug("..parameter[scheduler_launcher_order_job_chain] = " + schedulerLauncherOrderJobChain);
             }
             if (!sosString.parseToString(allParam, "scheduler_launcher_order_state").isEmpty()) {
                 schedulerLauncherOrderState = sosString.parseToString(allParam, "scheduler_launcher_order_state");
-                sosLogger.debug3("..parameter[scheduler_launcher_order_state] = " + schedulerLauncherOrderState);
+                LOGGER.debug("..parameter[scheduler_launcher_order_state] = " + schedulerLauncherOrderState);
             }
             if (!sosString.parseToString(allParam, "scheduler_launcher_order_title").isEmpty()) {
                 schedulerLauncherOrderTitle = sosString.parseToString(allParam, "scheduler_launcher_order_title");
-                sosLogger.debug3("..parameter[scheduler_launcher_title] = " + schedulerLauncherOrderTitle);
+                LOGGER.debug("..parameter[scheduler_launcher_title] = " + schedulerLauncherOrderTitle);
             }
             if (!sosString.parseToString(allParam, "scheduler_launcher_order_at").isEmpty()) {
                 schedulerLauncherOrderAt = sosString.parseToString(allParam, "scheduler_launcher_order_at");
-                sosLogger.debug3("..parameter[scheduler_launcher_order_at] = " + schedulerLauncherOrderAt);
+                LOGGER.debug("..parameter[scheduler_launcher_order_at] = " + schedulerLauncherOrderAt);
             }
             if (!sosString.parseToString(allParam, "scheduler_launcher_order_priority").isEmpty()) {
                 schedulerLauncherOrderPriority = sosString.parseToString(allParam, "scheduler_launcher_order_priority");
-                sosLogger.debug3("..parameter[scheduler_launcher_order_priority] = " + schedulerLauncherOrderPriority);
+                LOGGER.debug("..parameter[scheduler_launcher_order_priority] = " + schedulerLauncherOrderPriority);
             }
             if (!sosString.parseToString(allParam, "scheduler_launcher_order_web_service").isEmpty()) {
                 schedulerLauncherOrderWebService = sosString.parseToString(allParam, "scheduler_launcher_order_web_service");
-                sosLogger.debug3("..parameter[scheduler_launcher_order_web_service] = " + schedulerLauncherOrderWebService);
+                LOGGER.debug("..parameter[scheduler_launcher_order_web_service] = " + schedulerLauncherOrderWebService);
             }
         } catch (Exception e) {
             throw new Exception("..error occurred processing job parameters: " + e.getMessage(), e);
@@ -327,7 +326,7 @@ public class JobSchedulerLoadTestLauncher {
                 request += "</params>";
                 request += "</start_job>";
             }
-            sosLogger.debug("request: " + request);
+            LOGGER.debug("request: " + request);
             return request;
         } catch (Exception e) {
             throw new Exception("..error in " + SOSClassUtil.getClassName() + ": " + e.getMessage(), e);
@@ -350,12 +349,12 @@ public class JobSchedulerLoadTestLauncher {
             remoteCommand.connect(this.schedulerLauncherHost, this.schedulerLauncherPort);
             boolean loop = true;
             terminateTimeInSec = System.currentTimeMillis() + (this.schedulerLauncherDuration * 1000);
-            sosLogger.debug("..time until termination: " + terminateTimeInSec);
+            LOGGER.debug("..time until termination: " + terminateTimeInSec);
             while (loop) {
-                sosLogger.info("..sending request to job scheduler [" + this.schedulerLauncherHost + ":" + this.schedulerLauncherPort + "]: "
+                LOGGER.info("..sending request to job scheduler [" + this.schedulerLauncherHost + ":" + this.schedulerLauncherPort + "]: "
                         + request);
                 if (System.currentTimeMillis() > this.terminateTimeInSec) {
-                    sosLogger.debug("..time until termination: " + terminateTimeInSec);
+                    LOGGER.debug("..time until termination: " + terminateTimeInSec);
                     loop = false;
                     break;
                 }
@@ -367,23 +366,23 @@ public class JobSchedulerLoadTestLauncher {
                         SOSXMLXPath xpath = new SOSXMLXPath(new StringBuffer(response));
                         String errCode = xpath.selectSingleNodeValue("//ERROR/@code");
                         String errMessage = xpath.selectSingleNodeValue("//ERROR/@text");
-                        sosLogger.info("..job scheduler response: " + response);
+                        LOGGER.info("..job scheduler response: " + response);
                         if ((errCode != null && !errCode.isEmpty()) || (errMessage != null && !errMessage.isEmpty())) {
-                            sosLogger.warn("..job scheduler response reports error message: " + errMessage + " [" + errCode + "]");
+                            LOGGER.warn("..job scheduler response reports error message: " + errMessage + " [" + errCode + "]");
                             counterError++;
                         }
                     }
                 }
                 schedulerLauncherMinStarts = this.startIncrement(schedulerLauncherMinStarts);
             }
-            sosLogger.info("..number of jobs launched: " + counter);
+            LOGGER.info("..number of jobs launched: " + counter);
             stateText = "..number of jobs launched: " + (counter) + "(error=" + (counterError) + ";success=" + (counter - counterError) + ")";
             showSummary(counter, counterError, timeInSec);
         } catch (Exception e) {
             stateText =
                     "..number of jobs launched: " + (counter) + "(error=" + counterError + ";success=" + (counter - counterError) + ")"
                             + e.getMessage();
-            sosLogger.info("..error in " + SOSClassUtil.getClassName() + ": " + e.getMessage());
+            LOGGER.info("..error in " + SOSClassUtil.getClassName() + ": " + e.getMessage());
             throw new Exception("..error in " + SOSClassUtil.getClassName() + ": " + e.getMessage(), e);
         } finally {
             if (remoteCommand != null) {
@@ -422,13 +421,13 @@ public class JobSchedulerLoadTestLauncher {
             }
             if (retVal > this.schedulerLauncherMaxStarts) {
                 retVal = schedulerLauncherMaxStarts;
-                sosLogger.debug4("..maximum number of jobs to be launched is reached: " + schedulerLauncherMaxStarts);
+                LOGGER.debug("..maximum number of jobs to be launched is reached: " + schedulerLauncherMaxStarts);
             }
             if (schedulerLauncherInterval > 0) {
-                sosLogger.debug3("..delay " + schedulerLauncherInterval + " sec.");
+                LOGGER.debug("..delay " + schedulerLauncherInterval + " sec.");
                 Thread.sleep(schedulerLauncherInterval * 1000);
             }
-            sosLogger.debug5("..next start increment from " + i + " to " + retVal);
+            LOGGER.debug("..next start increment from " + i + " to " + retVal);
             return retVal;
         } catch (Exception e) {
             throw new Exception("..error in " + SOSClassUtil.getClassName() + ": " + e.getMessage(), e);
@@ -437,13 +436,13 @@ public class JobSchedulerLoadTestLauncher {
 
     public void showSummary(int counter, int counterError, long timeInSec) throws Exception {
         try {
-            sosLogger.debug5("..end time in miliseconds: " + System.currentTimeMillis());
-            sosLogger.info("---------------------------------------------------------------");
-            sosLogger.info("..number of job starts                            : " + counter);
-            sosLogger.info("..number of jobs processed successfully           : " + (counter - counterError));
-            sosLogger.info("..number of jobs processed with errors            : " + counterError);
-            sosLogger.info("..time elapsed in seconds                         : " + Math.round((System.currentTimeMillis() - timeInSec) / 1000) + "s");
-            sosLogger.info("---------------------------------------------------------------");
+            LOGGER.debug("..end time in miliseconds: " + System.currentTimeMillis());
+            LOGGER.info("---------------------------------------------------------------");
+            LOGGER.info("..number of job starts                            : " + counter);
+            LOGGER.info("..number of jobs processed successfully           : " + (counter - counterError));
+            LOGGER.info("..number of jobs processed with errors            : " + counterError);
+            LOGGER.info("..time elapsed in seconds                         : " + Math.round((System.currentTimeMillis() - timeInSec) / 1000) + "s");
+            LOGGER.info("---------------------------------------------------------------");
         } catch (Exception e) {
             throw new Exception("..error occurred in " + SOSClassUtil.getMethodName() + ": " + e.getMessage(), e);
         }
@@ -516,7 +515,7 @@ public class JobSchedulerLoadTestLauncher {
                     job = currArg[1];
                 }
             }
-            launcher = new JobSchedulerLoadTestLauncher(sosLogger, configFile, job, host, port);
+            launcher = new JobSchedulerLoadTestLauncher(configFile, job, host, port);
             launcher.process();
         } catch (Exception e) {
             System.err.println(e.getMessage());

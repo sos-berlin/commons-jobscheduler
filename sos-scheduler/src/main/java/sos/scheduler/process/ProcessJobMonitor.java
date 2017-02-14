@@ -1,13 +1,11 @@
 package sos.scheduler.process;
 
-import sos.util.SOSSchedulerLogger;
 
 /** @author andreas. pueschel */
 public class ProcessJobMonitor extends ProcessBaseMonitor {
 
     public boolean spooler_task_before() {
         try {
-            this.setLogger(new SOSSchedulerLogger(spooler_log));
             if (spooler_task.params().value("configuration_path") != null && !spooler_task.params().value("configuration_path").isEmpty()) {
                 this.setConfigurationPath(spooler_task.params().value("configuration_path"));
             }
@@ -24,7 +22,6 @@ public class ProcessJobMonitor extends ProcessBaseMonitor {
 
     public boolean spooler_task_after(boolean rc) {
         try {
-            this.setLogger(new SOSSchedulerLogger(spooler_log));
             if (!rc) {
                 spooler_task.order().setback();
             }
@@ -35,9 +32,7 @@ public class ProcessJobMonitor extends ProcessBaseMonitor {
         } finally {
             try {
                 this.cleanupConfiguration();
-            } catch (Exception e) {
-                //
-            }
+            } catch (Exception e) {}
         }
     }
 

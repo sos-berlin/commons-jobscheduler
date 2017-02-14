@@ -8,20 +8,17 @@ import static com.sos.scheduler.messages.JSMessages.JSJ_F_0060;
 import static com.sos.scheduler.messages.JSMessages.JSJ_I_0010;
 import static com.sos.scheduler.messages.JSMessages.JSJ_I_0020;
 import static com.sos.scheduler.messages.JSMessages.LOG_D_0020;
-import static com.sos.scheduler.messages.JSMessages.LOG_I_0010;
 
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Map.Entry;
 
-import org.apache.log4j.Appender;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.SimpleLayout;
 
 import sos.scheduler.interfaces.IJobSchedulerMonitor_impl;
 import sos.scheduler.misc.ParameterSubstitutor;
@@ -29,7 +26,6 @@ import sos.spooler.Job;
 import sos.spooler.Order;
 import sos.spooler.Supervisor_client;
 import sos.spooler.Variable_set;
-import sos.util.SOSSchedulerLogger;
 
 import com.sos.JSHelper.Basics.IJSCommands;
 import com.sos.JSHelper.Basics.JSJobUtilities;
@@ -51,7 +47,6 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     protected final boolean continue_with_spooler_process = true;
     protected final boolean continue_with_task = true;
     private static final int MAX_LENGTH_OF_STATUSTEXT = 100;
-    private JobSchedulerLog4JAppender objJSAppender = null;
     public static final boolean conJobSuccess = false;
     public static final boolean conJobFailure = false;
     public static final boolean conJobChainSuccess = true;
@@ -60,6 +55,7 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     private ParameterSubstitutor parameterSubstitutor;
     private String jobNameForTest = "job_name_for_test";
     private String orderStateForTest = "order_state_for_test";
+    private boolean loggerConfigured = false;
 
     public JobSchedulerJobAdapter() {
         Messages = new Messages(conMessageFilePath, Locale.getDefault());
@@ -91,58 +87,22 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     }
 
     protected void initializeLog4jAppenderClass() {
-        if (sosLogger == null && spooler_log != null) {
-            try {
-                this.setLogger(new SOSSchedulerLogger(spooler_log));
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
-            }
-        }
-        String strJobName = this.getJobName();
-        if (strJobName == null) {
-            if (spooler_job != null) {
-                this.setJobName(spooler_job.name());
-            }
-            strJobName = this.getJobName();
-        }
-        strJobName = strJobName.replace('/', '-');
         logger = Logger.getRootLogger();
-        Appender objStdoutAppender = logger.getAppender("stdout");
-        if (objStdoutAppender instanceof JobSchedulerLog4JAppender) {
-            objJSAppender = (JobSchedulerLog4JAppender) objStdoutAppender;
-            objJSAppender.setSchedulerLogger(sosLogger);
-            LOG_D_0020.toLog();
-            if (spooler_log.level() > 1) {
-                logger.setLevel(Level.ERROR);
-            } else if (spooler_log.level() == 1) {
-                logger.setLevel(Level.WARN);
-            } else if (spooler_log.level() == 0) {
-                logger.setLevel(Level.INFO);
-            } else if (spooler_log.level() < 0) {
-                logger.setLevel(Level.DEBUG);
-            } else if (spooler_log.level() == -9) {
-                logger.setLevel(Level.TRACE);
+            if (!loggerConfigured) {
+                LOG_D_0020.toLog();
+                if (spooler_log.level() > 1) {
+                    logger.setLevel(Level.ERROR);
+                } else if (spooler_log.level() == 1) {
+                    logger.setLevel(Level.WARN);
+                } else if (spooler_log.level() == 0) {
+                    logger.setLevel(Level.INFO);
+                } else if (spooler_log.level() == -9) {
+                    logger.setLevel(Level.TRACE);
+                } else if (spooler_log.level() < 0) {
+                    logger.setLevel(Level.DEBUG);
+                }
+                loggerConfigured = true;
             }
-        }
-        if (isNull(objJSAppender)) {
-            SimpleLayout layout = new SimpleLayout();
-            objJSAppender = new JobSchedulerLog4JAppender(layout);
-            Appender consoleAppender = objJSAppender;
-            logger.addAppender(consoleAppender);
-            if (spooler_log.level() > 1) {
-                logger.setLevel(Level.ERROR);
-            } else if (spooler_log.level() == 1) {
-                logger.setLevel(Level.WARN);
-            } else if (spooler_log.level() == 0) {
-                logger.setLevel(Level.INFO);
-            } else if (spooler_log.level() < 0) {
-                logger.setLevel(Level.DEBUG);
-            } else if (spooler_log.level() == -9) {
-                logger.setLevel(Level.TRACE);
-            }
-            LOG_I_0010.toLog();
-        }
-        objJSAppender.setSchedulerLogger(sosLogger);
     }
 
     protected HashMap<String, String> getSchedulerParameterAsProperties(final Variable_set pSchedulerParameterSet) {

@@ -2,22 +2,22 @@ package sos.scheduler.launcher;
 
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
+
 import sos.spooler.Job_impl;
 import sos.spooler.Variable_set;
 import sos.util.SOSClassUtil;
-import sos.util.SOSSchedulerLogger;
 import sos.util.SOSString;
 
 /** @author Mürüvet Öksüz */
 public class JobSchedulerLoadTestLauncherJob extends Job_impl {
 
+    private static final Logger LOGGER = Logger.getLogger(JobSchedulerLoadTestLauncherJob.class);
     private SOSString sosString = null;
-    private SOSSchedulerLogger sosLogger = null;
 
     public boolean spooler_init() {
         try {
             sosString = new SOSString();
-            sosLogger = new SOSSchedulerLogger(spooler_log);
             return true;
         } catch (Exception e) {
             spooler_log.error("error occurred initializing job: " + e.getMessage());
@@ -30,14 +30,13 @@ public class JobSchedulerLoadTestLauncherJob extends Job_impl {
         HashMap allParams = null;
         JobSchedulerLoadTestLauncher launcher = null;
         try {
-            sosLogger = new SOSSchedulerLogger(spooler_log);
-            sosLogger.debug3(".. calling " + SOSClassUtil.getMethodName());
+            spooler_log.debug3(".. calling " + SOSClassUtil.getMethodName());
             parameters = spooler_task.params();
             if (spooler_job.order_queue() != null) {
                 parameters.merge(spooler_task.order().params());
             }
             allParams = this.getParameters();
-            launcher = new JobSchedulerLoadTestLauncher(sosLogger);
+            launcher = new JobSchedulerLoadTestLauncher();
             launcher.setParameters(allParams);
             launcher.process();
             spooler_job.set_state_text(launcher.getStateText());
@@ -53,7 +52,7 @@ public class JobSchedulerLoadTestLauncherJob extends Job_impl {
         String[] names = null;
         HashMap allParam = new HashMap();
         try {
-            sosLogger.debug3(".. calling " + SOSClassUtil.getMethodName());
+            spooler_log.debug3(".. calling " + SOSClassUtil.getMethodName());
             parameters = spooler_task.params();
             if (parameters.count() > 0) {
                 names = parameters.names().split(";");

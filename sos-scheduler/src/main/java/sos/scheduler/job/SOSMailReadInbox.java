@@ -13,6 +13,8 @@ import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.search.SubjectTerm;
 
+import org.apache.log4j.Logger;
+
 import sos.net.SOSMailReceiver;
 import sos.net.SOSMimeMessage;
 import sos.scheduler.command.SOSSchedulerCommand;
@@ -25,6 +27,7 @@ import sos.util.SOSSchedulerLogger;
 /** @author Uwe Risse */
 public class SOSMailReadInbox extends Job_impl {
 
+    private static final Logger LOGGER = Logger.getLogger(SOSMailReadInbox.class);
     /** Settings Attribut: mailHost: Host des mail servers */
     private String mailHost = "";
     /** Settings Attribut: mailHost: Host des mail servers */
@@ -78,60 +81,58 @@ public class SOSMailReadInbox extends Job_impl {
     private Variable_set params;
     private Pattern subjectPattern;
     private Pattern bodyPattern;
-    private SOSSchedulerLogger sosLogger = null;
 
     @Override
     public boolean spooler_init() throws Exception {
         params = spooler_task.params();
-        sosLogger = new SOSSchedulerLogger(spooler_log);
         mailHost = getParams("mail_host", "");
-        sosLogger.debug3(".. current setting [mail_host]: " + mailHost);
+        spooler_log.debug3(".. current setting [mail_host]: " + mailHost);
         mailUser = getParams("mail_user");
-        sosLogger.debug3(".. current setting [mail_user]: " + mailUser);
+        spooler_log.debug3(".. current setting [mail_user]: " + mailUser);
         mailPassword = getParams("mail_password", "");
-        sosLogger.debug3(".. current setting [mail_password]: " + "**********");
+        spooler_log.debug3(".. current setting [mail_password]: " + "**********");
         mailPort = getParams("mail_port", mailPort);
-        sosLogger.debug3(".. current setting [mail_port]: " + mailPort);
+        spooler_log.debug3(".. current setting [mail_port]: " + mailPort);
         mailMessageFolder = getParams("mail_message_folder", "INBOX");
-        sosLogger.debug3(".. current setting [mail_message_folder]: " + mailMessageFolder);
+        spooler_log.debug3(".. current setting [mail_message_folder]: " + mailMessageFolder);
         mailSubjectFilter = params.value("mail_subject_filter");
-        sosLogger.debug3(".. current setting [mail_subject_filter]: " + mailSubjectFilter);
+        spooler_log.debug3(".. current setting [mail_subject_filter]: " + mailSubjectFilter);
         mailSubjectPattern = getParams("mail_subject_pattern", "");
-        sosLogger.debug3(".. current setting [mail_subject_pattern]: " + mailSubjectPattern);
+        spooler_log.debug3(".. current setting [mail_subject_pattern]: " + mailSubjectPattern);
         mailBodyPattern = getParams("mail_body_pattern", "");
-        sosLogger.debug3(".. current setting [mail_body_pattern]: " + mailBodyPattern);
+        spooler_log.debug3(".. current setting [mail_body_pattern]: " + mailBodyPattern);
         mailBodyAsSchedulerCommand =
                 "true".equalsIgnoreCase(getParams("mail_body_as_scheduler_command", "true"))
                         || "1".equalsIgnoreCase(getParams("mail_body_as_scheduler_command", "true"))
                         || "yes".equalsIgnoreCase(getParams("mail_body_as_scheduler_command", "true"));
-        sosLogger.debug3(".. current setting [mail_body_as_scheduler_command]: " + mailBodyAsSchedulerCommand);
+        spooler_log.debug3(".. current setting [mail_body_as_scheduler_command]: " + mailBodyAsSchedulerCommand);
         mailJobchain = getParams("mail_jobchain", "");
-        sosLogger.debug3(".. current setting [mail_jobchain]: " + mailJobchain);
+        spooler_log.debug3(".. current setting [mail_jobchain]: " + mailJobchain);
         mailOrderId = getParams("mail_order_id", "");
-        sosLogger.debug3(".. current setting [mail_order_id]: " + mailOrderId);
+        spooler_log.debug3(".. current setting [mail_order_id]: " + mailOrderId);
         mailOrderTitle = getParams("mail_order_title", "");
-        sosLogger.debug3(".. current setting [mail_order_title]: " + mailOrderTitle);
+        spooler_log.debug3(".. current setting [mail_order_title]: " + mailOrderTitle);
         mailOrderState = getParams("mail_order_state", "");
-        sosLogger.debug3(".. current setting [mail_order_state]: " + mailOrderState);
+        spooler_log.debug3(".. current setting [mail_order_state]: " + mailOrderState);
         mailDumpDir = params.value("mail_dump_dir");
-        sosLogger.debug3(".. current setting [mail_dump_dir]: " + mailDumpDir);
+        spooler_log.debug3(".. current setting [mail_dump_dir]: " + mailDumpDir);
         mailAction = params.value("mail_action");
-        sosLogger.debug3(".. current setting [mail_action]: " + mailAction);
+        spooler_log.debug3(".. current setting [mail_action]: " + mailAction);
         mailSchedulerHost = getParams("mail_scheduler_host", spooler.hostname());
-        sosLogger.debug3(".. current setting [mail_scheduler_host]: " + mailSchedulerHost);
+        spooler_log.debug3(".. current setting [mail_scheduler_host]: " + mailSchedulerHost);
         mailSchedulerPort = getInt(getParams("mail_scheduler_port", String.valueOf(spooler.tcp_port())), 0);
-        sosLogger.debug3(".. current setting [mail_scheduler_port]: " + mailSchedulerPort);
+        spooler_log.debug3(".. current setting [mail_scheduler_port]: " + mailSchedulerPort);
         mailServerTimeout = getInt(getParams("mail_server_timeout"), 0);
-        sosLogger.debug3(".. current setting [mail_server_timeout]: " + mailServerTimeout);
+        spooler_log.debug3(".. current setting [mail_server_timeout]: " + mailServerTimeout);
         mailServerType = getParams("mail_server_type", "POP3");
-        sosLogger.debug3(".. current setting [mail_server_type]: " + mailServerType);
+        spooler_log.debug3(".. current setting [mail_server_type]: " + mailServerType);
         mailUseSeen =
                 "true".equalsIgnoreCase(getParams("mail_use_seen", "true")) || "1".equalsIgnoreCase(getParams("mail_use_seen", "true"))
                         || "yes".equalsIgnoreCase(getParams("mail_use_seen", "true"));
         mailSetSeen =
                 mailUseSeen || "true".equalsIgnoreCase(getParams("mail_set_seen", "true"))
                         || "1".equalsIgnoreCase(getParams("mail_set_seen", "true")) || "yes".equalsIgnoreCase(getParams("mail_set_seen", "true"));
-        sosLogger.debug3(".. current setting [mail_set_seen]: " + mailSetSeen);
+        spooler_log.debug3(".. current setting [mail_set_seen]: " + mailSetSeen);
         subjectPattern = Pattern.compile(mailSubjectPattern, 0);
         bodyPattern = Pattern.compile(mailBodyPattern, 0);
         return true;
@@ -162,9 +163,9 @@ public class SOSMailReadInbox extends Job_impl {
             }
         } catch (Exception e) {
             String stateText = e.toString();
-            sosLogger.warn("an error occurred while processing: " + stateText);
+            spooler_log.warn("an error occurred while processing: " + stateText);
             spooler_job.set_state_text(stateText);
-            sosLogger.info("Job " + spooler_job.name() + " step terminated with errors.");
+            spooler_log.info("Job " + spooler_job.name() + " step terminated with errors.");
             spooler_task.end();
         }
         return true;
@@ -202,47 +203,46 @@ public class SOSMailReadInbox extends Job_impl {
     private ArrayList<SOSMimeMessage> findMessages() throws Exception {
         ArrayList<SOSMimeMessage> messages = new ArrayList<SOSMimeMessage>();
         try {
-            sosLogger.debug3("Connecting to Mailserver " + mailHost + ":" + mailPort + "(" + mailServerType + ")...");
+            spooler_log.debug3("Connecting to Mailserver " + mailHost + ":" + mailPort + "(" + mailServerType + ")...");
             receiver = new SOSMailReceiver(mailHost, mailPort, mailUser, mailPassword);
-            receiver.setLogger(sosLogger);
             receiver.connect(mailServerType);
             if (mailServerTimeout > 0) {
                 receiver.setTimeout(mailServerTimeout);
             }
-            sosLogger.debug3("reading " + mailMessageFolder);
+            spooler_log.debug3("reading " + mailMessageFolder);
             Folder folder = receiver.openFolder(mailMessageFolder, receiver.READ_WRITE);
             int max = folder.getMessageCount();
             if (fromMail > max) {
-                sosLogger.debug3("all messages found.");
+                spooler_log.debug3("all messages found.");
                 return null;
             }
             SubjectTerm term = null;
             Message[] msgs = null;
             Message[] msgs2 = null;
-            sosLogger.debug3(max - fromMail + 1 + " messages left.");
+            spooler_log.debug3(max - fromMail + 1 + " messages left.");
             term = new SubjectTerm(mailSubjectFilter);
             msgs = folder.getMessages(fromMail, min(max, fromMail + nextMail));
-            sosLogger.debug3(msgs.length + " messages found.");
+            spooler_log.debug3(msgs.length + " messages found.");
             if (!"".equals(mailSubjectFilter)) {
-                sosLogger.debug3("looking for " + mailSubjectFilter);
+                spooler_log.debug3("looking for " + mailSubjectFilter);
                 msgs2 = folder.search(term, msgs);
-                sosLogger.debug3(msgs2.length + " messages found with " + mailSubjectFilter);
+                spooler_log.debug3(msgs2.length + " messages found with " + mailSubjectFilter);
             } else {
                 msgs2 = msgs;
-                sosLogger.debug3(msgs2.length + " messages found");
+                spooler_log.debug3(msgs2.length + " messages found");
             }
             if (msgs2.length > 0) {
                 for (Message element : msgs2) {
                     if (mailUseSeen && element.isSet(Flags.Flag.SEEN)) {
-                        sosLogger.info("message skipped, already seen: " + element.getSubject());
+                        spooler_log.info("message skipped, already seen: " + element.getSubject());
                         continue;
                     }
-                    SOSMimeMessage message = new SOSMimeMessage(element, sosLogger);
+                    SOSMimeMessage message = new SOSMimeMessage(element);
                     // skip mails that do not match the subject pattern
                     if (!"".equals(mailSubjectPattern)) {
                         Matcher subjectMatcher = subjectPattern.matcher(message.getSubject());
                         if (!subjectMatcher.find()) {
-                            sosLogger.info("message skipped, subject does not match [" + mailSubjectPattern + "]: " + message.getSubject());
+                            spooler_log.info("message skipped, subject does not match [" + mailSubjectPattern + "]: " + message.getSubject());
                             continue;
                         }
                     }
@@ -251,7 +251,7 @@ public class SOSMailReadInbox extends Job_impl {
                     if (!"".equals(mailBodyPattern)) {
                         Matcher bodyMatcher = bodyPattern.matcher(message.getPlainTextBody());
                         if (!bodyMatcher.find()) {
-                            sosLogger.info("message skipped, no match found for  [" + mailBodyPattern + "]: " + message.getPlainTextBody());
+                            spooler_log.info("message skipped, no match found for  [" + mailBodyPattern + "]: " + message.getPlainTextBody());
                             continue;
                         }
                     }
@@ -260,7 +260,7 @@ public class SOSMailReadInbox extends Job_impl {
             }
             fromMail = fromMail + nextMail + 1;
         } catch (Exception e) {
-            sosLogger.error(e.getMessage() + e.toString());
+            LOGGER.error(e.getMessage(), e);
             throw new Exception("Error occured querying mail server. " + e);
         }
         return messages;
@@ -268,7 +268,7 @@ public class SOSMailReadInbox extends Job_impl {
 
     private void executeCommand(final SOSMimeMessage message, final String host_, final int port_) throws Exception {
         if (mailSchedulerHost.equals(spooler.hostname()) && mailSchedulerPort == spooler.tcp_port()) {
-            sosLogger.debug3("...host/port is this host and port. Using API");
+            spooler_log.debug3("...host/port is this host and port. Using API");
             spooler.execute_xml(message.getPlainTextBody());
         } else {
             executeXml(host_, port_, message.getPlainTextBody());
@@ -280,12 +280,12 @@ public class SOSMailReadInbox extends Job_impl {
             throw new Exception("No output directory specified.");
         }
         File messageFile = new File(mailDumpDir, message.getMessageId());
-        sosLogger.debug3("saving message to file: " + messageFile.getAbsolutePath());
+        spooler_log.debug3("saving message to file: " + messageFile.getAbsolutePath());
         message.dumpMessageToFile(messageFile, true, false);
     }
 
     private void deleteMessage(final SOSMimeMessage message) throws Exception {
-        sosLogger.debug3("deleting message : " + message.getSubject());
+        spooler_log.debug3("deleting message : " + message.getSubject());
         message.deleteMessage();
     }
 
@@ -294,7 +294,7 @@ public class SOSMailReadInbox extends Job_impl {
         try {
             erg = Integer.parseInt(s);
         } catch (NumberFormatException e) {
-            sosLogger.warn("Wrong value for " + s + ". Using default=" + d);
+            spooler_log.warn("Wrong value for " + s + ". Using default=" + d);
             erg = d;
         }
         return erg;
@@ -319,7 +319,7 @@ public class SOSMailReadInbox extends Job_impl {
     private void startOrder(final SOSMimeMessage message, final String host_, final int port_, final String jobchain, final String id,
             final String state, final String title) throws Exception {
         Variable_set order_params = spooler.create_variable_set();
-        sosLogger.debug3("....merge");
+        spooler_log.debug3("....merge");
         order_params.merge(spooler_task.params());
         order_params.set_var("mail_from", message.getFrom());
         if (message.getFromName() != null) {
@@ -332,12 +332,12 @@ public class SOSMailReadInbox extends Job_impl {
         order_params.set_var("mail_body", message.getPlainTextBody());
         order_params.set_var("mail_send_at", message.getSentDateAsString());
         if (mailSchedulerHost.equals(spooler.hostname()) && mailSchedulerPort == spooler.tcp_port()) {
-            sosLogger.debug3("...host/port is this host and port. Using API");
+            spooler_log.debug3("...host/port is this host and port. Using API");
             Job_chain j = spooler.job_chain(jobchain);
-            sosLogger.debug3("...jobchain " + jobchain + " created.");
+            spooler_log.debug3("...jobchain " + jobchain + " created.");
             Order o = spooler.create_order();
             o.params().merge(order_params);
-            sosLogger.debug3("...order " + o.id() + " created.");
+            spooler_log.debug3("...order " + o.id() + " created.");
             if (!"".equals(state)) {
                 o.set_state(state);
             }
@@ -345,7 +345,7 @@ public class SOSMailReadInbox extends Job_impl {
                 o.set_title(title);
             }
             j.add_order(o);
-            sosLogger.debug3("...order added to " + jobchain);
+            spooler_log.debug3("...order added to " + jobchain);
         } else {
             startOrderXML(host_, port_, jobchain, id, state, title, order_params);
         }
@@ -353,7 +353,7 @@ public class SOSMailReadInbox extends Job_impl {
 
     private void startOrderXML(final String host_, final int port_, final String jobchain, String id, String state, String title,
             final Variable_set params_) throws Exception {
-        sosLogger.debug3("Starting order " + id + " at " + jobchain + " with xml-command");
+        spooler_log.debug3("Starting order " + id + " at " + jobchain + " with xml-command");
         if ("".equals(host_)) {
             throw new Exception("Missing host while starting order.");
         }
@@ -386,10 +386,10 @@ public class SOSMailReadInbox extends Job_impl {
         SOSSchedulerCommand command;
         command = new SOSSchedulerCommand(host_, port_);
         command.setProtocol("udp");
-        sosLogger.debug3("Trying connection to " + host_ + ":" + port_);
+        spooler_log.debug3("Trying connection to " + host_ + ":" + port_);
         command.connect();
-        sosLogger.debug3("...connected");
-        sosLogger.debug3("Sending add_order command:\n" + xml);
+        spooler_log.debug3("...connected");
+        spooler_log.debug3("Sending add_order command:\n" + xml);
         command.sendRequest(xml);
     }
 

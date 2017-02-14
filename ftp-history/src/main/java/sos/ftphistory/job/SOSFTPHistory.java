@@ -31,6 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE. end of preamble */
 package sos.ftphistory.job;
 
+import org.apache.log4j.Logger;
+
 import sos.connection.SOSConnection;
 import sos.connection.SOSMySQLConnection;
 import sos.connection.SOSPgSQLConnection;
@@ -45,6 +47,7 @@ public class SOSFTPHistory {
 
     @SuppressWarnings("unused")
     private final String conClassName = "SOSFTPHistory";
+    private static final Logger LOGGER = Logger.getLogger(SOSFTPHistory.class);
     public final String conSVNVersion = "$Id: SOSDataExchangeEngine.java 19091 2013-02-08 12:49:32Z kb $";
 
     public static String TABLE_FILES = "SOSFTP_FILES";
@@ -69,37 +72,30 @@ public class SOSFTPHistory {
      * @param log
      * @return
      * @throws Exception */
-    public static SOSConnection getConnection(final Spooler spooler, SOSConnection conn, final Variable_set parameters, final SOSLogger log)
-            throws Exception {
+    public static SOSConnection getConnection(final Spooler spooler, SOSConnection conn, final Variable_set parameters) throws Exception {
         try { // to get the database connection
             if (parameters.value("db_class") != null && parameters.value("db_class").length() > 0) {
                 if (conn != null) {
                     try {
                         conn.rollback();
                         conn.disconnect();
-                    } catch (Exception ex) {
-                    } // gracefully ignore this error
+                    } catch (Exception ex) {}
                 }
-
-                log.debug3("connecting to database using order params ...");
+                LOGGER.debug("connecting to database using order params ...");
                 conn = SOSConnection.createInstance(parameters.value("db_class"), parameters.value("db_driver"), parameters.value("db_url"),
-                        parameters.value("db_user"), parameters.value("db_password"), log);
-
+                        parameters.value("db_user"), parameters.value("db_password"));
                 conn.connect();
-                log.debug3("connected to database using order params");
+                LOGGER.debug("connected to database using order params");
             } else {
                 if (conn == null) {
-                    log.debug3("connecting to database using Job Scheduler connection ...");
-
-                    conn = JobSchedulerJob.getSchedulerConnection(new SOSProfileSettings(spooler.ini_path()), log);
-
+                    LOGGER.debug("connecting to database using Job Scheduler connection ...");
+                    conn = JobSchedulerJob.getSchedulerConnection(new SOSProfileSettings(spooler.ini_path()));
                     conn.connect();
-                    log.debug3("connected to database using Job Scheduler connection");
+                    LOGGER.debug("connected to database using Job Scheduler connection");
                 } else {
-                    log.debug3("using existing connection");
+                    LOGGER.debug("using existing connection");
                 }
             }
-
         } catch (Exception e) {
             throw new Exception("connect to database failed: " + e.getMessage());
         }
@@ -111,11 +107,9 @@ public class SOSFTPHistory {
      * @param val
      * @return */
     public static String getNormalizedValue(String val) {
-
         if (val != null && val.length() > 0) {
             val = val.toLowerCase().replaceAll("\\\\", "/");
         }
-
         return val;
     }
 
@@ -127,12 +121,10 @@ public class SOSFTPHistory {
      * @param length max. field length
      * @return */
     public static String getNormalizedField(final SOSConnection conn, String value, final int length) {
-
-        if (value == null || value.length() == 0)
+        if (value == null || value.length() == 0) {
             return "";
-
+        }
         value = value.length() > length ? value.substring(0, length) : value;
-
         if (conn instanceof SOSPgSQLConnection || conn instanceof SOSMySQLConnection) {
             value = value.replaceAll("\\\\", "\\\\\\\\");
         }
@@ -144,16 +136,12 @@ public class SOSFTPHistory {
      * @param params
      * @param log
      * @throws Exception */
-    public static void debugParams(final Variable_set params, final Log log) throws Exception {
+    public static void debugParams(final Variable_set params) throws Exception {
+        if (_doDebug && params != null && params.count() > 0) {
+            String[] names = params.names().split(";");
+            for (String name : names) {
+                LOGGER.info("debugParams : " + name + " = " + params.value(name));
 
-        if (_doDebug) {
-            if (params != null && params.count() > 0) {
-
-                String[] names = params.names().split(";");
-                for (String name : names) {
-                    log.info("debugParams : " + name + " = " + params.value(name));
-
-                }
             }
         }
     }

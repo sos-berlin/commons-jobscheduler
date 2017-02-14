@@ -3,6 +3,8 @@ package sos.scheduler.job;
 import java.io.File;
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
+
 import sos.connection.SOSConnection;
 import sos.marshalling.SOSExport;
 import sos.spooler.Variable_set;
@@ -14,6 +16,7 @@ import sos.util.SOSString;
 /** @author mueruevet oeksuez */
 public class JobSchedulerExportJob extends JobSchedulerJob {
 
+    private static final Logger LOGGER = Logger.getLogger(JobSchedulerExportJob.class);
     private String exportPath = "";
     private String outputFilenameMask = "[dataobject]_[id]_[datetime].xml";
     private Variable_set parameters = null;
@@ -29,7 +32,6 @@ public class JobSchedulerExportJob extends JobSchedulerJob {
         if (rc) {
             try {
                 sosString = new SOSString();
-                this.setLogger(new sos.util.SOSSchedulerLogger(spooler_log));
                 this.setParameters(spooler.create_variable_set());
                 if (spooler_task.params() != null) {
                     this.getParameters().merge(spooler_task.params());
@@ -39,30 +41,30 @@ public class JobSchedulerExportJob extends JobSchedulerJob {
                 }
                 if (this.getParameters().value("export_path") != null && !this.getParameters().value("export_path").isEmpty()) {
                     exportPath = this.getParameters().value("export_path");
-                    getLogger().debug1(".. parameter [export_path]: ");
+                    spooler_log.debug1(".. parameter [export_path]: ");
                 } else {
-                    getLogger().warn(".. missing parameter [export_path]: ");
+                    spooler_log.warn(".. missing parameter [export_path]: ");
                     throw new Exception(".. missing parameter [export_path]: ");
                 }
                 if (this.getParameters().value("query_filename") != null && !this.getParameters().value("query_filename").isEmpty()) {
                     queryFilename = this.getParameters().value("query_filename");
-                    getLogger().debug1(".. parameter [query_filename]: " + queryFilename);
+                    spooler_log.debug1(".. parameter [query_filename]: " + queryFilename);
                     if (!new File(queryFilename).exists()) {
-                        getLogger().warn("..missing query file " + queryFilename);
+                        spooler_log.warn("..missing query file " + queryFilename);
                         throw new Exception("..missing query file " + queryFilename);
                     }
                 } else {
-                    getLogger().warn(".. missing parameter [query_filename] ");
+                    spooler_log.warn(".. missing parameter [query_filename] ");
                     throw new Exception(".. missing parameter [query_filename] ");
                 }
                 if (this.getParameters().value("sos_settings_file") != null && !this.getParameters().value("sos_settings_file").isEmpty()) {
                     sosSettingsFile = this.getParameters().value("sos_settings_file");
-                    getLogger().debug1(".. parameter [sos_settings_file]: " + sosSettingsFile);
+                    spooler_log.debug1(".. parameter [sos_settings_file]: " + sosSettingsFile);
                 }
                 if (this.getParameters().value("sos_setting_file_status_update") != null
                         && !this.getParameters().value("sos_setting_file_status_update").isEmpty()) {
                     sosSettingsUpdateStateFile = this.getParameters().value("sos_setting_file_status_update");
-                    getLogger().debug1(".. parameter [sos_setting_file_status_update]: " + sosSettingsUpdateStateFile);
+                    spooler_log.debug1(".. parameter [sos_setting_file_status_update]: " + sosSettingsUpdateStateFile);
                 }
                 sosConnection = getConnections(sosSettingsFile);
                 if (sosString.parseToString(sosSettingsFile).equalsIgnoreCase(sosString.parseToString(sosSettingsUpdateStateFile))) {
@@ -71,13 +73,7 @@ public class JobSchedulerExportJob extends JobSchedulerJob {
                     sosUpdateStateConnection = getConnections(sosSettingsUpdateStateFile);
                 }
             } catch (Exception e) {
-                if (this.getLogger() != null) {
-                    try {
-                        this.getLogger().error(e.getMessage());
-                    } catch (Exception ex) {
-                        //
-                    }
-                }
+                LOGGER.error(e.getMessage());
                 return false;
             }
         }
@@ -104,11 +100,11 @@ public class JobSchedulerExportJob extends JobSchedulerJob {
                 try {
                     signalId = Integer.parseInt(sSignalId);
                 } catch (Exception e) {
-                    getLogger().warn("..missing signal_id in Title: " + sSignalId);
+                    spooler_log.warn("..missing signal_id in Title: " + sSignalId);
                     return false;
                 }
             } else {
-                getLogger().warn("..missing signal_id in Title: " + sSignalId);
+                spooler_log.warn("..missing signal_id in Title: " + sSignalId);
                 return false;
             }
             if (spooler_task.params() != null) {
@@ -119,24 +115,24 @@ public class JobSchedulerExportJob extends JobSchedulerJob {
             }
             if (this.getParameters().value("export_path") != null && !this.getParameters().value("export_path").isEmpty()) {
                 exportPath = this.getParameters().value("export_path");
-                getLogger().debug1(".. parameter [export_path]: ");
+                spooler_log.debug1(".. parameter [export_path]: ");
             } else {
-                getLogger().warn(".. missing parameter [export_path]: ");
+                LOGGER.warn(".. missing parameter [export_path]: ");
                 throw new Exception(".. missing parameter [export_path]: ");
             }
             if (this.getParameters().value("query_filename") != null && !this.getParameters().value("query_filename").isEmpty()) {
                 queryFilename = this.getParameters().value("query_filename");
-                getLogger().debug1(".. parameter [query_filename]: " + queryFilename);
+                spooler_log.debug1(".. parameter [query_filename]: " + queryFilename);
                 if (!new File(queryFilename).exists()) {
                     throw new Exception("..missing query file " + queryFilename);
                 }
             } else {
-                getLogger().warn(".. missing parameter [query_filename] ");
+                spooler_log.warn(".. missing parameter [query_filename] ");
                 throw new Exception("..missing query file " + queryFilename);
             }
             if (this.getParameters().value("operation") != null && !this.getParameters().value("operation").isEmpty()) {
                 operation = this.getParameters().value("operation");
-                getLogger().debug1(".. parameter [operation]: ");
+                spooler_log.debug1(".. parameter [operation]: ");
             }
             jobChainname = spooler_task.order().job_chain().name();
             filename = normalizedPath(exportPath) + getNewFilename(jobChainname, sSignalId);
@@ -145,16 +141,16 @@ public class JobSchedulerExportJob extends JobSchedulerJob {
             File fMove = new File(normalizedPath(exportPath) + f.getName().substring(0, f.getName().length() - 1));
             if (f.renameTo(fMove)) {
                 spooler_task.order().params().set_var("filename", fMove.getCanonicalPath());
-                getLogger().debug("filename is renamed in " + fMove.getCanonicalPath());
+                spooler_log.debug1("filename is renamed in " + fMove.getCanonicalPath());
             } else {
-                getLogger().warn("filename could not rename to " + fMove.getCanonicalPath());
+                spooler_log.warn("filename could not rename to " + fMove.getCanonicalPath());
             }
             String upStr = "UPDATE " + JobSchedulerSignalJob.TABLE_SCHEDULER_SIGNAL_OBECTS + " SET \"STATUS\" = 2 WHERE  \"SIGNAL_ID\" = " + signalId;
             sosUpdateStateConnection.executeUpdate(upStr);
             sosUpdateStateConnection.commit();
             String time = Math.round((System.currentTimeMillis() - timeInSec) / 1000) + "s";
             String stateText = "successfully export Database to XML-File " + filename + " (" + time + ")";
-            getLogger().info(stateText);
+            spooler_log.info(stateText);
             spooler_job.set_state_text(stateText);
             return spooler_job.order_queue() != null ? rc : false;
         } catch (Exception e) {
@@ -176,7 +172,7 @@ public class JobSchedulerExportJob extends JobSchedulerJob {
             }
             String stateText = "error occurred export filename : " + filename + " cause: " + e.getMessage();
             spooler_job.set_state_text(stateText);
-            spooler_log.error(stateText);
+            LOGGER.error(stateText);
             return false;
         }
     }
@@ -197,11 +193,9 @@ public class JobSchedulerExportJob extends JobSchedulerJob {
 
     public void export(SOSConnection sosConnection, String queryfile, String filename, String jobChain, String operation) throws Exception {
         org.w3c.dom.Element queries = null;
-        SOSStandardLogger sosLogger = null;
         SOSExport export = null;
         try {
-            sosLogger = new SOSStandardLogger(spooler.log().filename(), getLogger().getLogLevel());
-            export = new SOSExport(sosConnection, filename, "EXPORT", sosLogger);
+            export = new SOSExport(sosConnection, filename, "EXPORT", new SOSStandardLogger(spooler_log.level()));
             queries = getQueryElement(queryfile, jobChain);
             if (queries != null) {
                 exportQueryRecursiv(queries, export, -1, operation);
@@ -257,7 +251,7 @@ public class JobSchedulerExportJob extends JobSchedulerJob {
         SOSConnection conn = null;
         try {
             spooler_log.debug3("DB Connecting.. .");
-            conn = SOSConnection.createInstance(settingsfile, new sos.util.SOSSchedulerLogger(spooler_log));
+            conn = SOSConnection.createInstance(settingsfile/*, new sos.util.SOSSchedulerLogger(spooler_log)*/);
             conn.connect();
             spooler_log.debug3("DB Connected");
         } catch (Exception e) {
@@ -309,7 +303,7 @@ public class JobSchedulerExportJob extends JobSchedulerJob {
             String retval = query;
             Variable_set set = getParameters();
             String[] split = set.names().split(";");
-            getLogger().debug("query before replace: " + query);
+            spooler_log.debug1("query before replace: " + query);
             for (int i = 0; i < split.length; i++) {
                 String name = "\\$\\{" + split[i] + "\\}";
                 String value = set.value(split[i]);
@@ -317,7 +311,7 @@ public class JobSchedulerExportJob extends JobSchedulerJob {
                 retval = retval.replaceAll(name.toLowerCase(), value);
                 retval = retval.replaceAll(name.toUpperCase(), value);
             }
-            getLogger().debug("query after replace: " + retval);
+            spooler_log.debug1("query after replace: " + retval);
             return retval;
         } catch (Exception e) {
             spooler_log.warn("error in " + SOSClassUtil.getClassName() + " :" + e.getMessage());

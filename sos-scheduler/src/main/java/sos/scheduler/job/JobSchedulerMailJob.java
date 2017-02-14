@@ -136,8 +136,7 @@ public class JobSchedulerMailJob extends JobSchedulerJob {
             try {
                 if (this.getConnection() != null && this.hasDatabase()) {
                     this.sosMailSettings =
-                            new SOSConnectionSettings(this.getConnection(), this.getTableMailSettings(), this.getApplicationMail(),
-                                    this.getSectionMail(), this.getLogger());
+                            new SOSConnectionSettings(this.getConnection(), this.getTableMailSettings(), this.getApplicationMail(), this.getSectionMail());
                     if (this.sosMailSettings.getSectionEntry("mail_to") != null && !this.sosMailSettings.getSectionEntry("mail_to").isEmpty()) {
                         this.setMailTo(this.sosMailSettings.getSectionEntry("mail_to"));
                         spooler_log.debug6(".. job settings [mail_to]: " + this.getMailTo());

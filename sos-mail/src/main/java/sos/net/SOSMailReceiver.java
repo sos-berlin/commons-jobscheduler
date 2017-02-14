@@ -1,6 +1,5 @@
 package sos.net;
 
-import java.io.OutputStreamWriter;
 import java.util.Properties;
 
 import javax.mail.Folder;
@@ -8,9 +7,9 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Store;
 
-import sos.util.NullBufferedWriter;
+import org.apache.log4j.Logger;
+
 import sos.util.SOSLogger;
-import sos.util.SOSStandardLogger;
 
 import com.sos.JSHelper.Exceptions.JobSchedulerException;
 
@@ -19,6 +18,7 @@ public class SOSMailReceiver {
 
     protected SOSMailAuthenticator authenticator = null;
     protected int timeout = 5000;
+    private static final Logger LOGGER = Logger.getLogger(SOSMailReceiver.class);
     private Store store;
     private Folder folder = null;
     private String protocol = "POP3";
@@ -30,7 +30,6 @@ public class SOSMailReceiver {
     private final String password;
     public int READ_ONLY = Folder.READ_ONLY;
     public int READ_WRITE = Folder.READ_WRITE;
-    SOSLogger logger = null;
 
     public SOSMailReceiver(final String host, final String port, final String user, final String password) throws Exception {
         this.host = host;
@@ -38,14 +37,6 @@ public class SOSMailReceiver {
         this.user = user;
         this.password = password;
         createSession();
-        setStubLogger();
-    }
-
-    private void setStubLogger() throws Exception {
-        if (logger == null) {
-            logger = new SOSStandardLogger(new NullBufferedWriter(new OutputStreamWriter(System.out)), SOSStandardLogger.DEBUG1);
-        }
-        return;
     }
 
     public Session createSession() throws Exception {
@@ -67,7 +58,7 @@ public class SOSMailReceiver {
         session.getProperties().put("mail." + strMailProtocolName + ".timeout", String.valueOf(timeout));
         store = session.getStore(strMailProtocolName);
         store.connect(host, user, password);
-        logger.debug5("..connected to host [" + host + ":" + port + "] successfully done.");
+        LOGGER.debug("..connected to host [" + host + ":" + port + "] successfully done.");
     }
 
     /** opens the given folder
@@ -133,14 +124,6 @@ public class SOSMailReceiver {
 
     public void setFolderName(final String folderName) {
         this.folderName = folderName;
-    }
-
-    public SOSLogger getLogger() {
-        return logger;
-    }
-
-    public void setLogger(final SOSLogger logger) {
-        this.logger = logger;
     }
 
     public Session getSession() {

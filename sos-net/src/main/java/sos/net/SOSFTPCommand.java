@@ -2844,8 +2844,7 @@ abstract public class SOSFTPCommand {
             Properties arg_s = sosConfiguration.getParameterAsProperties();
             if (!sosString.parseToString(arg_s.get("settings")).isEmpty() && !sosString.parseToString(arg_s.get("include")).isEmpty()) {
                 sos.configuration.SOSConfiguration config_ =
-                        new sos.configuration.SOSConfiguration(sosString.parseToString(arg_s.get("settings")),
-                                sosString.parseToString(arg_s.get("include")), logger);
+                        new sos.configuration.SOSConfiguration(sosString.parseToString(arg_s.get("settings")), sosString.parseToString(arg_s.get("include")));
                 SOSConfigurationItem[] items = config_.checkConfigurationItems(null);
                 arg_s.putAll(config_.getParameterAsProperties());
             }
@@ -2983,7 +2982,7 @@ abstract public class SOSFTPCommand {
                 return;
             }
             try {
-                sosConfiguration = new sos.configuration.SOSConfiguration(arg, settingsFile, settingsSection, logger);
+                sosConfiguration = new sos.configuration.SOSConfiguration(arg, settingsFile, settingsSection);
                 SOSConfigurationItem[] items = sosConfiguration.checkConfigurationItems(null);
             } catch (Exception e) {
                 LOGGER.debug("[ERROR] could not init Configuration, cause: " + e.getMessage(), e);

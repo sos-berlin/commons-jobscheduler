@@ -12,7 +12,6 @@ public class ProcessWebServiceResponseOrderMonitor extends ProcessOrderMonitor {
 
     public boolean spooler_process_after(boolean rc) {
         try {
-            this.setLogger(new SOSSchedulerLogger(spooler_log));
             if (!rc) {
                 spooler_task.order().setback();
             }

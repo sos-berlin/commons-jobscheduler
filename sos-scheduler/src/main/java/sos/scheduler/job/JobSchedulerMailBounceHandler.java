@@ -120,7 +120,6 @@ public class JobSchedulerMailBounceHandler extends JobSchedulerMailJob {
         try {
             this.getLogger().debug3("Calling " + SOSClassUtil.getMethodName());
             receiver = new SOSMailReceiver(receiverHost, receiverPort, pop3_user, pop3_password);
-            receiver.setLogger(this.getLogger());
             receiver.connect(protocol);
             folder = receiver.openFolder("INBOX", receiver.READ_WRITE);
             if (this.isHandleBouncedMessagesOnly()) {

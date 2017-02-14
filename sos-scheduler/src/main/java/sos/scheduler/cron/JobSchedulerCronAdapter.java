@@ -37,7 +37,7 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
     private static final String XPATH_SPOOLER_ANSWER_ERROR = "//spooler/answer/ERROR";
     private File schedulerCronConfigurationDir = new File("config/live/cron");
     private String crontab = "";
-    private SOSLogger logger;
+//    private SOSLogger logger;
     private CronConverter converter;
     private boolean useDynamicConfiguration = false;
     private String monitoredLiveDir = null;
@@ -51,7 +51,7 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
     public boolean spooler_init() throws Exception {
         File liveFolder = new File(spooler.configuration_directory());
         schedulerCronConfigurationDir = new File(liveFolder, "cron");
-        logger = new SOSSchedulerLogger(spooler_log);
+//        logger = new SOSSchedulerLogger(spooler_log);
         monitoredLiveDir = spooler.variables().value("cron_adapter_dynamic_configuration_dir");
         if (monitoredLiveDir != null && !monitoredLiveDir.isEmpty()) {
             spooler_log.info("parameter cron_adapter_dynamic_configuration_dir: " + monitoredLiveDir);
@@ -63,7 +63,7 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
             spooler.variables().set_var("cron_adapter_use_dynamic_configuration", "1");
             if (monitoredLiveDir == null) {
                 spooler_log.info("Using dynamic configuration files. Deleting files in " + schedulerCronConfigurationDir.getAbsolutePath());
-                SOSFileOperations.removeFile(schedulerCronConfigurationDir, logger);
+                SOSFileOperations.removeFile(schedulerCronConfigurationDir/*, logger*/);
             } else {
                 for (String currentDir : monitoredLiveDirs) {
                     File fDir = new File(currentDir);
@@ -77,7 +77,7 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
                     while (iter.hasNext()) {
                         File crontabFile = iter.next();
                         spooler_log.info("Deleting configuration files in " + crontabFile.getParent());
-                        SOSFileOperations.removeFile(crontabFile.getParentFile(), ".*\\.xml$", SOSFileOperations.GRACIOUS, logger);
+                        SOSFileOperations.removeFile(crontabFile.getParentFile(), ".*\\.xml$", SOSFileOperations.GRACIOUS/*, logger*/);
                     }
                 }
             }
@@ -97,12 +97,12 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
             if (crontab.isEmpty()) {
                 throw new Exception("missing parameter crontab");
             }
-            logger.info("parameter crontab: " + crontab);
+            spooler_log.info("parameter crontab: " + crontab);
             String dc = spooler.variables().var("cron_adapter_use_dynamic_configuration");
             if (dc != null && "1".equals(dc)) {
                 useDynamicConfiguration = true;
                 if (monitoredLiveDir == null) {
-                    logger.info("Using dynamic configuration files in directory " + schedulerCronConfigurationDir.getAbsolutePath());
+                    LOGGER.info("Using dynamic configuration files in directory " + schedulerCronConfigurationDir.getAbsolutePath());
                 }
             }
             if ("/etc/crontab".equalsIgnoreCase(crontab)) {
@@ -111,7 +111,7 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
             String sOldRunTime = params.value("old_run_time");
             if ("1".equalsIgnoreCase(sOldRunTime) || "true".equalsIgnoreCase(sOldRunTime) || "yes".equalsIgnoreCase(sOldRunTime)) {
                 oldRunTime = true;
-                logger.info("parameter old_run_time: true");
+                spooler_log.info("parameter old_run_time: true");
             }
             String sSystemCrontab = params.value("systab");
             if (sSystemCrontab != null && !sSystemCrontab.isEmpty()) {
@@ -120,28 +120,28 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
                 } else {
                     systemCrontab = false;
                 }
-                logger.info("parameter systab: " + sSystemCrontab);
+                spooler_log.info("parameter systab: " + sSystemCrontab);
             }
             sChangeUser = params.value("changeuser");
             if (sChangeUser != null && !sChangeUser.isEmpty()) {
-                logger.info("parameter changeuser: " + sChangeUser);
+                spooler_log.info("parameter changeuser: " + sChangeUser);
             } else {
                 sChangeUser = "";
             }
             if (systemCrontab && "su".equalsIgnoreCase(sChangeUser) && !"root".equalsIgnoreCase(systemUser)) {
-                logger.warn("You are running the Job Scheduler as " + systemUser + " and you are trying to use a system crontab with 'su'. "
+                spooler_log.warn("You are running the Job Scheduler as " + systemUser + " and you are trying to use a system crontab with 'su'. "
                         + "This will not work. Either run the Job Scheduler as root, or use 'sudo' as change_user_command parameter");
             }
             timeout = params.value("timeout");
             if (timeout != null && !timeout.isEmpty()) {
-                logger.info("parameter timeout: " + timeout);
+                spooler_log.info("parameter timeout: " + timeout);
             }
         } catch (Exception e) {
             LOGGER.error("Error reading job parameters: " + e.getMessage(), e);
             return false;
         }
         try {
-            converter = new CronConverter(logger);
+            converter = new CronConverter(/*logger*/);
             converter.setOldRunTime(oldRunTime);
             converter.setSystemCronTab(systemCrontab);
             converter.setChangeUserCommand(sChangeUser);
@@ -187,7 +187,7 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
             }
             spooler_job.start_when_directory_changed(crontabFile.getParentFile(), "^" + crontabFile.getName() + "$");
             if (!crontabFile.canRead()) {
-                logger.info("Failed to read crontab " + crontabFile.getAbsolutePath());
+                LOGGER.info("Failed to read crontab " + crontabFile.getAbsolutePath());
             }
             HashMap<String, Element> previousMapping =
                     (HashMap<String, Element>) SchedulerJavaObject.getObject(spooler.variables(), spooler_job.name() + "_"
@@ -212,7 +212,7 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
             if (previousEnvVariables == null) {
                 previousEnvVariables = new HashSet<Object>();
             }
-            logger.debug1("Comparing new jobs with jobs of previous run.");
+            spooler_log.debug1("Comparing new jobs with jobs of previous run.");
             changedJobs.putAll(previousMapping);
             converter.getReservedJobNames().clear();
             converter.getSkipLines().clear();
@@ -256,9 +256,9 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
                     String previousCommentForThisJob = previousCommentsMapping.get(currentLine).toString();
                     String commentForThisJob = currentCommentJobName + "-" + currentCommentJobTitle + "-" + currentCommentJobTimeout;
                     if (!previousCommentForThisJob.equals(commentForThisJob)) {
-                        logger.debug6("Job-Manipulating comments for current line have changed.");
+                        spooler_log.debug6("Job-Manipulating comments for current line have changed.");
                     } else {
-                        logger.debug6("current line was already submitted in last run: " + currentLine);
+                        spooler_log.debug6("current line was already submitted in last run: " + currentLine);
                         converter.getSkipLines().add(currentLine);
                         converter.getReservedJobNames().add(jobName);
                         changedJobs.remove(currentLine);
@@ -274,7 +274,7 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
             }
             if (environmentChanged) {
                 if (!previousMapping.isEmpty()) {
-                    logger.info("Environment has changed, all jobs need to be submitted again.");
+                    spooler_log.info("Environment has changed, all jobs need to be submitted again.");
                 }
                 converter.getSkipLines().clear();
                 converter.getReservedJobNames().clear();
@@ -290,7 +290,7 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
             if (crontabFile.canRead()) {
                 converter.cronFile2SchedulerXML(crontabFile, updatedMapping);
             }
-            logger.debug1("updating changed jobs");
+            spooler_log.debug1("updating changed jobs");
             Iterator<Element> updatedJobsIterator = updatedMapping.values().iterator();
             while (updatedJobsIterator.hasNext()) {
                 Element updatedJob = updatedJobsIterator.next();
@@ -299,7 +299,7 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
                 updateJob(updatedJob);
             }
             if (!changedJobNames.isEmpty()) {
-                logger.debug1("removing renamed/deleted jobs");
+                spooler_log.debug1("removing renamed/deleted jobs");
                 Iterator<String> removedJobsIter = changedJobNames.iterator();
                 while (removedJobsIter.hasNext()) {
                     String jobName = removedJobsIter.next().toString();
@@ -311,14 +311,14 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
                 previousMapping.remove(changedJobsIter.next());
             }
             previousMapping.putAll(updatedMapping);
-            logger.debug3("Storing mapping to Scheduler variable");
+            spooler_log.debug3("Storing mapping to Scheduler variable");
             SchedulerJavaObject.putObject(previousMapping, spooler.variables(), spooler_job.name() + "_" + crontabFile.getAbsolutePath()
                     + "_cron2job_mapping");
-            logger.debug3("Storing comments mapping to Scheduler variable");
+            spooler_log.debug3("Storing comments mapping to Scheduler variable");
             debugHashMap(currentCommentsMapping, "currentCommentsMapping");
             SchedulerJavaObject.putObject(currentCommentsMapping, spooler.variables(), spooler_job.name() + "_" + crontabFile.getAbsolutePath()
                     + "_cron2comments_mapping");
-            logger.debug3("Storing environment variables to Scheduler variable");
+            spooler_log.debug3("Storing environment variables to Scheduler variable");
             SchedulerJavaObject.putObject(currentEnvVariables, spooler.variables(), spooler_job.name() + "_" + crontabFile.getAbsolutePath()
                     + "_env_variables");
         } catch (Exception e) {
@@ -331,14 +331,14 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
     }
 
     private void debugHashMap(final HashMap<String, String> map, final String name) throws Exception {
-        logger.debug9(name + ":");
+        spooler_log.debug9(name + ":");
         Set<String> keys = map.keySet();
         if (keys != null) {
             Iterator<String> iter = keys.iterator();
             while (iter.hasNext()) {
                 String key = iter.next().toString();
                 String value = map.get(key).toString();
-                logger.debug9("[" + key + "]: " + value);
+                spooler_log.debug9("[" + key + "]: " + value);
             }
         }
     }
@@ -350,13 +350,13 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
             } else {
                 removeJobXMLCommand(jobName);
             }
-            logger.info(String.format("job '%1$s' removed from JS."));
+            spooler_log.info(String.format("job '%1$s' removed from JS."));
         } catch (Exception e) {
-            try {
-                logger.warn("Failed to remove job \"" + jobName + "\": " + e);
-            } catch (Exception ex) {
-                //
-            }
+//            try {
+                spooler_log.warn("Failed to remove job \"" + jobName + "\": " + e);
+//            } catch (Exception ex) {
+//                //
+//            }
         }
     }
 
@@ -391,7 +391,7 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
         }
         Element objJob = jobDocument.getDocumentElement();
         String jobName = objJob.getAttribute(conAttributeJobNAME);
-        logger.info(String.format("job '%1$s' updated in JS.", jobName));
+        spooler_log.info(String.format("job '%1$s' updated in JS.", jobName));
     }
 
     private void updateJobXMLCommand(final Document updatedJobDoc) throws Exception {
@@ -407,10 +407,10 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
             XMLSerializer serializer = new XMLSerializer(out, format);
             serializer.setNamespaces(true);
             serializer.serialize(updatedJobDoc);
-            logger.info("submitting job...  " + jobName);
-            logger.debug9(out.toString());
+            spooler_log.info("submitting job...  " + jobName);
+            spooler_log.debug9(out.toString());
             String answer = spooler.execute_xml(out.toString());
-            logger.debug3("answer from JobScheduler: " + answer);
+            spooler_log.debug3("answer from JobScheduler: " + answer);
             SOSXMLXPath xpath = new SOSXMLXPath(new StringBuffer(answer));
             String errorMsg = "";
             if (xpath.selectSingleNodeValue(XPATH_SPOOLER_ANSWER_ERROR) != null) {
@@ -442,7 +442,7 @@ public class JobSchedulerCronAdapter extends sos.spooler.Job_impl {
             format.setIndenting(true);
             format.setIndent(2);
             XMLSerializer serializer = new XMLSerializer(out, format);
-            logger.debug3("Writing file " + jobFile.getAbsolutePath());
+            spooler_log.debug3("Writing file " + jobFile.getAbsolutePath());
             serializer.serialize(updatedJobDoc);
             out.close();
         } catch (Exception e) {

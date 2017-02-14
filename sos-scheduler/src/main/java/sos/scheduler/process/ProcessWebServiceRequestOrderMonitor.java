@@ -5,8 +5,6 @@ import sos.spooler.Variable_set;
 import sos.spooler.Web_service_operation;
 import sos.spooler.Web_service_request;
 import sos.spooler.Xslt_stylesheet;
-
-import sos.util.SOSSchedulerLogger;
 import sos.xml.SOSXMLXPath;
 
 /** @author andreas pueschel */
@@ -14,7 +12,6 @@ public class ProcessWebServiceRequestOrderMonitor extends ProcessOrderMonitor {
 
     public boolean spooler_process_before() {
         try {
-            this.setLogger(new SOSSchedulerLogger(spooler_log));
             if (!super.spooler_process_before()) {
                 return false;
             }

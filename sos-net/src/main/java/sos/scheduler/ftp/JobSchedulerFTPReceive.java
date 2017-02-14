@@ -58,8 +58,7 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
         Properties schedulerParams = null;
         try {
             try {
-                this.setLogger(new SOSSchedulerLogger(spooler_log));
-                getLogger().debug(VersionInfo.VERSION_STRING);
+                spooler_log.debug(VersionInfo.VERSION_STRING);
                 params = getParameters();
                 schedulerParams = getSchedulerParameterAsProperties(params);
                 checkParallel = sosString.parseToBoolean(sosString.parseToString(schedulerParams.get("check_parallel")));
@@ -82,18 +81,18 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
                                 --retry;
                                 spooler.variables().set_var("cur_transfer_retry" + normalize(spooler_task.order().id()), String.valueOf(retry));
                                 if (retry == 0) {
-                                    getLogger().debug("terminated cause max order setback reached: " + paramNames[i]);
+                                    spooler_log.debug("terminated cause max order setback reached: " + paramNames[i]);
                                     spooler.variables().set_var("terminated_cause_max_order_setback_" + normalize(spooler_task.order().id()), "1");
                                     return false;
                                 }
-                                getLogger().debug("launch setback: " + parallelTransferCheckRetry + " * " + parallelTransferCheckSetback);
+                                spooler_log.debug("launch setback: " + parallelTransferCheckRetry + " * " + parallelTransferCheckSetback);
                                 spooler_task.order().setback();
                                 return false;
                             } else if ("1".equals(sosString.parseToString(spooler.var(paramNames[i])))) {
-                                getLogger().debug("successfully terminated: " + paramNames[i]);
+                                spooler_log.debug("successfully terminated: " + paramNames[i]);
                             } else if ("2".equals(sosString.parseToString(spooler.var(paramNames[i])))) {
                                 bSuccess = false;
-                                getLogger().debug("terminated with error : " + paramNames[i]);
+                                spooler_log.debug("terminated with error : " + paramNames[i]);
                             }
                         }
                     }
@@ -122,9 +121,8 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
                 String remoteDir = sosString.parseToString(schedulerParams.get("remoteDir"));
                 if (parallelTransfer && !isFilePath) {
                     schedulerParams.put("skip_transfer", "yes");
-                    SOSConfiguration con =
-                            new SOSConfiguration(null, schedulerParams, sosString.parseToString(schedulerParams.get("settings")),
-                                    sosString.parseToString(schedulerParams.get("profile")), null, new SOSSchedulerLogger(spooler_log));
+                    SOSConfiguration con = new SOSConfiguration(null, schedulerParams, sosString.parseToString(schedulerParams.get("settings")),
+                                    sosString.parseToString(schedulerParams.get("profile")), null);
                     con.checkConfigurationItems();
                     SOSFTPCommandReceive ftpCommand = new SOSFTPCommandReceive(con, new SOSSchedulerLogger(spooler_log));
                     ftpCommand.setSchedulerJob(this);
@@ -172,7 +170,7 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
                                 newOrder.set_state(spooler_task.order().state());
                                 newOrder.set_params(newParams);
                                 spooler_task.order().job_chain().add_order(newOrder);
-                                getLogger().info(
+                                spooler_log.info(
                                         "launching order for parallel transfer with parameter: ftp_file_path "
                                                 + (remoteDir.endsWith("/") || remoteDir.endsWith("\\") ? remoteDir : remoteDir + "/") + fileName);
                                 spooler.variables().set_var("ftp_order",
@@ -192,7 +190,7 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
                 }
                 SOSConfiguration con =
                         new SOSConfiguration(null, schedulerParams, sosString.parseToString(schedulerParams.get("settings")),
-                                sosString.parseToString(schedulerParams.get("profile")), null, new SOSSchedulerLogger(spooler_log));
+                                sosString.parseToString(schedulerParams.get("profile")), null);
                 con.checkConfigurationItems();
                 sos.net.sosftp.SOSFTPCommandReceive ftpCommand = new sos.net.sosftp.SOSFTPCommandReceive(con, new SOSSchedulerLogger(spooler_log));
                 ftpCommand.setSchedulerJob(this);
@@ -255,7 +253,7 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
                 params.merge(spooler_task.order().params());
                 Variable_set orderParams = spooler_task.order().params();
                 String setbackCount = orderParams.value(VARNAME_SETBACK_COUNT);
-                getLogger().debug9("setback_count read: " + setbackCount);
+                spooler_log.debug9("setback_count read: " + setbackCount);
                 if (setbackCount != null && !setbackCount.isEmpty()) {
                     iSetbackCount = Integer.parseInt(setbackCount);
                     iSetbackCount++;
@@ -275,7 +273,7 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
                 return new Properties();
             }
             String[] names = params.names().split(";");
-            getLogger().debug9("names " + params.names());
+            spooler_log.debug9("names " + params.names());
             for (int i = 0; i < names.length; i++) {
                 String key = names[i];
                 String val = params.var(names[i]);
@@ -283,9 +281,9 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
                     key = key.substring(PREFIX_FTP.length());
                 }
                 if (key.contains("password")) {
-                    getLogger().debug("param [" + key + "=*****]");
+                    spooler_log.debug("param [" + key + "=*****]");
                 } else {
-                    getLogger().debug("param [" + key + "=" + val + "]");
+                    spooler_log.debug("param [" + key + "=" + val + "]");
                 }
                 schedulerParams.put(key, val);
             }
@@ -385,7 +383,7 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
             boolean recursive, boolean forceFiles, int pollTimeout, int pollIntervall, int pollMinFiles, String pollFilesErrorState1)
             throws Exception {
         double delay = pollIntervall;
-        getLogger().debug("calling: " + sos.util.SOSClassUtil.getMethodName());
+        spooler_log.debug("calling: " + sos.util.SOSClassUtil.getMethodName());
         if (pollTimeout > 0) {
             boolean flgStopPolling = false;
             boolean giveUpPoll = false;
@@ -407,34 +405,34 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
                                 found = true;
                             }
                         } catch (Exception e) {
-                            getLogger().debug9("File " + fileName + " not found.");
+                            spooler_log.debug9("File " + fileName + " not found.");
                         }
                         if (found) {
                             matchedFiles++;
-                            getLogger().debug8("Found matching file " + fileName);
+                            spooler_log.debug8("Found matching file " + fileName);
                         }
                     } else {
                         Pattern pattern = Pattern.compile(fileSpec, 0);
                         Matcher matcher = pattern.matcher(strFileName4Matcher);
                         if (matcher.find()) {
                             matchedFiles++;
-                            getLogger().debug8("Found matching file " + fileName);
+                            spooler_log.debug8("Found matching file " + fileName);
                         }
                     }
                 }
-                getLogger().debug3(matchedFiles + " matching files found");
+                spooler_log.debug3(matchedFiles + " matching files found");
                 if (matchedFiles < pollMinFiles) {
                     if (flgUseOrderSetBack && (spooler_job.order_queue() != null && spooler_task.order() != null)) {
                         iSetbackCount = spooler_task.order().setback_count();
                         flgStopPolling = true;
                         Variable_set orderParams = spooler_task.order().params();
-                        getLogger().info("setback_count is now: " + iSetbackCount + " , maximum number of setbacks: " + nrOfTries);
+                        spooler_log.info("setback_count is now: " + iSetbackCount + " , maximum number of setbacks: " + nrOfTries);
                         if (iSetbackCount >= nrOfTries) {
                             orderParams.set_var(VARNAME_SETBACK_COUNT, "");
-                            getLogger().info("give up polling due to max setbacks reached");
+                            spooler_log.info("give up polling due to max setbacks reached");
                             giveUpPoll = true;
                         } else {
-                            getLogger().info(matchedFiles + " matching files found." + pollMinFiles + " files required, setting back order.");
+                            spooler_log.info(matchedFiles + " matching files found." + pollMinFiles + " files required, setting back order.");
                             spooler_job.set_delay_order_after_setback(1, delay);
                             spooler_job.set_max_order_setbacks((int) nrOfTries);
                             spooler_task.order().setback();
@@ -452,7 +450,7 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
                                 filelist = ftpClient.nList(recursive);
                             }
                             for (int i = 0; i < filelist.size(); i++) {
-                                getLogger().debug9(i + " filelist 2 -> " + filelist.get(i));
+                                spooler_log.debug9(i + " filelist 2 -> " + filelist.get(i));
                             }
                             iterator = filelist.iterator();
                         } else {
@@ -470,12 +468,12 @@ public class JobSchedulerFTPReceive extends JobSchedulerJob {
                         message = "Failed to find file \"" + filePath + "\" ";
                     }
                     message += "after triggering for " + pollTimeout + " minutes.";
-                    getLogger().debug(message);
+                    spooler_log.debug(message);
                     if (matchedFiles > 0) {
                         message += " (only " + matchedFiles + " files found)";
                     }
                     if (pollFilesErrorState1 != null && !pollFilesErrorState1.isEmpty()) {
-                        getLogger().debug("set order-state to " + pollFilesErrorState1);
+                        spooler_log.debug("set order-state to " + pollFilesErrorState1);
                         spooler_task.order().set_state(pollFilesErrorState1);
                         spooler_task.order().params().set_var(VARNAME_FTP_RESULT_ERROR_MESSAGE, message);
                     }

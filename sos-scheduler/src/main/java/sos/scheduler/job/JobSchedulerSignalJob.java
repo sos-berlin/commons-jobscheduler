@@ -12,7 +12,6 @@ import sos.settings.SOSProfileSettings;
 import sos.spooler.Job_impl;
 import sos.spooler.Variable_set;
 import sos.util.SOSClassUtil;
-import sos.util.SOSSchedulerLogger;
 import sos.util.SOSString;
 import sos.xml.SOSXMLXPath;
 
@@ -218,7 +217,7 @@ public class JobSchedulerSignalJob extends Job_impl {
                 parameters = spooler_task.params();
                 if ((sosString.parseToString(getHost()).isEmpty() || "localhost".equalsIgnoreCase(sosString.parseToString(getHost())))
                         && getPort() == 4444) {
-                    SOSConnectionSettings settings = new SOSConnectionSettings(sosConnection, "SETTINGS", new SOSSchedulerLogger(this.spooler.log()));
+                    SOSConnectionSettings settings = new SOSConnectionSettings(sosConnection, "SETTINGS");
                     Properties section = settings.getSection(application, sectionname);
                     if (!sosString.parseToString(section, "scheduler.host").isEmpty()) {
                         setHost(sosString.parseToString(section, "scheduler.host"));
@@ -325,9 +324,7 @@ public class JobSchedulerSignalJob extends Job_impl {
             if (remoteCommand != null) {
                 try {
                     remoteCommand.disconnect();
-                } catch (Exception x) {
-                    // gracefully ignore this error
-                }
+                } catch (Exception x) {}
             }
         }
     }
@@ -480,7 +477,7 @@ public class JobSchedulerSignalJob extends Job_impl {
             conn = getConnectionFromINIFile();
         }
         if (conn == null) {
-            conn = JobSchedulerJob.getSchedulerConnection(new SOSProfileSettings(spooler.ini_path()), new SOSSchedulerLogger(spooler_log));
+            conn = JobSchedulerJob.getSchedulerConnection(new SOSProfileSettings(spooler.ini_path())/*, new SOSSchedulerLogger(spooler_log)*/);
         }
         return conn;
     }
@@ -489,7 +486,7 @@ public class JobSchedulerSignalJob extends Job_impl {
         SOSConnection conn = null;
         try {
             spooler_log.debug3("DB Connecting.. .");
-            conn = SOSConnection.createInstance(getSosSettingsFile(), new sos.util.SOSSchedulerLogger(spooler_log));
+            conn = SOSConnection.createInstance(getSosSettingsFile());
             conn.connect();
             spooler_log.debug3("DB Connected");
         } catch (Exception e) {
@@ -502,15 +499,11 @@ public class JobSchedulerSignalJob extends Job_impl {
         if (sosConnection != null) {
             try {
                 sosConnection.disconnect();
-            } catch (Exception x) {
-                //
-            }
+            } catch (Exception x) {}
         }
         try {
             showSummary();
-        } catch (Exception x) {
-            //
-        }
+        } catch (Exception x) {}
     }
 
     public void showSummary() throws Exception {
@@ -520,11 +513,9 @@ public class JobSchedulerSignalJob extends Job_impl {
             spooler_log.info("..number of documents                             : " + (countProcessOk + countProcessError));
             spooler_log.info("..number of records processed successfully        : " + countProcessOk);
             spooler_log.info("..number of records processed with errors         : " + countProcessError);
-            spooler_log.info("..time elapsed in seconds                         : " + Math.round((System.currentTimeMillis() - timeInSec) / 1000)
-                    + "s");
+            spooler_log.info("..time elapsed in seconds                         : " + Math.round((System.currentTimeMillis() - timeInSec) / 1000) + "s");
             spooler_log.info("---------------------------------------------------------------");
-            String stateText =
-                    "..number of create order: " + (countProcessOk + countProcessError) + "(error=" + countProcessError + ";successfully="
+            String stateText = "..number of create order: " + (countProcessOk + countProcessError) + "(error=" + countProcessError + ";successfully="
                             + countProcessOk + ")";
             spooler_log.info(stateText);
             spooler_job.set_state_text(stateText);

@@ -74,9 +74,9 @@ public class JobSchedulerJob extends Job_impl {
                 } else {
                     LOGGER.debug("connecting to database...");
                 }
-                this.setConnection(getSchedulerConnection(this.getJobSettings(), this.getLogger()));
+                this.setConnection(getSchedulerConnection(this.getJobSettings()));
                 this.getConnection().connect();
-                this.setConnectionSettings(new SOSConnectionSettings(this.getConnection(), "SETTINGS", this.getLogger()));
+                this.setConnectionSettings(new SOSConnectionSettings(this.getConnection(), "SETTINGS"));
                 if (this.getLogger() != null) {
                     this.getLogger().debug6("..successfully connected to JobScheduler database.");
                 } else {
@@ -242,41 +242,24 @@ public class JobSchedulerJob extends Job_impl {
     }
 
     public static SOSConnection getSchedulerConnection(final SOSSettings schedulerSettings) throws Exception {
-        return getSchedulerConnection(schedulerSettings, null);
-    }
-
-    public static SOSConnection getSchedulerConnection(final SOSSettings schedulerSettings, final SOSLogger log) throws Exception {
         String dbProperty = schedulerSettings.getSection("spooler").getProperty("db").replaceAll("jdbc:", "-url=jdbc:");
         dbProperty = dbProperty.substring(dbProperty.indexOf('-'));
         if (dbProperty.endsWith("-password=")) {
             dbProperty = dbProperty.substring(0, dbProperty.length() - 10);
         }
         SOSArguments arguments = new SOSArguments(dbProperty);
-        SOSConnection conn;
-        if (log != null) {
-            conn = SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.asString("-class=", ""),
-                    arguments.asString("-url=", ""), arguments.asString("-user=", ""), arguments.asString("-password=", ""), log);
-        } else {
-            conn = SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.asString("-class=", ""),
-                    arguments.asString("-url=", ""), arguments.asString("-user=", ""), arguments.asString("-password=", ""));
-        }
-        return conn;
+        return SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.asString("-class=", ""),
+                arguments.asString("-url=", ""), arguments.asString("-user=", ""), arguments.asString("-password=", ""));
     }
     
-    public static SOSConnection getReportingConnection(final SOSSettings reportingSettings, final SOSLogger log) throws Exception {
+    public static SOSConnection getReportingConnection(final SOSSettings reportingSettings) throws Exception {
         Properties dbProperties = reportingSettings.getSection("configuration");
         String dbClass = dbProperties.getProperty("class");
         String dbDriver = dbProperties.getProperty("driver");
         String dbUrl = dbProperties.getProperty("url");
         String dbUser = dbProperties.getProperty("user");
         String dbPassword = dbProperties.getProperty("password");
-        SOSConnection conn;
-        if (log != null) {
-            conn = SOSConnection.createInstance(dbClass, dbDriver, dbUrl, dbUser, dbPassword, log);
-        } else {
-            conn = SOSConnection.createInstance(dbClass, dbDriver, dbUrl, dbUser, dbPassword);
-        }
-        return conn;
+        return SOSConnection.createInstance(dbClass, dbDriver, dbUrl, dbUser, dbPassword);
     }
 
     public Path getHibernateConfigurationScheduler(){
