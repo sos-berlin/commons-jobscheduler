@@ -15,8 +15,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.log4j.Logger;
+import org.apache.shiro.config.Ini;
+import org.apache.shiro.config.Ini.Section;
 import org.apache.shiro.session.ExpiredSessionException;
-import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
 
@@ -32,7 +33,6 @@ import com.sos.auth.shiro.SOSlogin;
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.classes.JocCockpitProperties;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.classes.audit.JocAuditLog;
@@ -44,7 +44,6 @@ import com.sos.joc.exceptions.SessionNotExistException;
 @Path("/security")
 public class SOSServicePermissionShiro {
 
-    private static final String ROLE_ALL = "all";
     private static final String ACCESS_TOKEN = "access_token";
     private static final String UTC = "UTC";
     private static final String UNKNOWN_USER = "*Unknown User*";
@@ -52,22 +51,6 @@ public class SOSServicePermissionShiro {
     private static final String USER_IS_NULL = "user is null";
     private static final String AUTHORIZATION_HEADER_WITH_BASIC_BASED64PART_EXPECTED = "Authorization header with basic based64part expected";
     private static final String ACCESS_TOKEN_EXPECTED = "Access token header expected";
-    private static final String ROLE_API_USER = "api_user";
-    private static final String ROLE_BUSINESS_USER = "business_user";
-    private static final String ROLE_INCIDENT_MANAGER = "incident_manager";
-    private static final String ROLE_IT_OPERATOR = "it_operator";
-    private static final String ROLE_APPLICATION_MANAGER = "application_manager";
-    private static final String ROLE_ADMINISTRATOR = "administrator";
-    private static final String ROLE_EVENTS = "events";
-    private static final String ROLE_JOC = "joc";
-    private static final String ROLE_JOE = "joe";
-    private static final String ROLE_JID = "jid";
-    private static final String ROLE_WORKINGPLAN = "workingplan";
-    private static final String ROLE_CONTROLLER = "controller";
-    private static final String ROLE_JOBEDITOR = "jobeditor";
-    private static final String ROLE_JOC_ADMIN = "joc_admin";
-    private static final String ROLE_ADMIN = "admin";
-    private static final String ROLE_SUPER = "super";
     private static final Logger LOGGER = Logger.getLogger(SOSServicePermissionShiro.class);
 
     private SOSShiroCurrentUser currentUser;
@@ -355,23 +338,16 @@ public class SOSServicePermissionShiro {
             sosPermissionShiro.setUser(currentUser.getUsername());
 
             SOSPermissionRoles roles = o.createSOSPermissionRoles();
-            addRole(roles.getSOSPermissionRole(), ROLE_SUPER);
-            addRole(roles.getSOSPermissionRole(), ROLE_ADMIN);
-            addRole(roles.getSOSPermissionRole(), ROLE_JOC_ADMIN);
-            addRole(roles.getSOSPermissionRole(), ROLE_JOBEDITOR);
-            addRole(roles.getSOSPermissionRole(), ROLE_CONTROLLER);
-            addRole(roles.getSOSPermissionRole(), ROLE_WORKINGPLAN);
-            addRole(roles.getSOSPermissionRole(), ROLE_JID);
-            addRole(roles.getSOSPermissionRole(), ROLE_JOE);
-            addRole(roles.getSOSPermissionRole(), ROLE_JOC);
-            addRole(roles.getSOSPermissionRole(), ROLE_EVENTS);
-            addRole(roles.getSOSPermissionRole(), ROLE_ADMINISTRATOR);
-            addRole(roles.getSOSPermissionRole(), ROLE_APPLICATION_MANAGER);
-            addRole(roles.getSOSPermissionRole(), ROLE_IT_OPERATOR);
-            addRole(roles.getSOSPermissionRole(), ROLE_INCIDENT_MANAGER);
-            addRole(roles.getSOSPermissionRole(), ROLE_BUSINESS_USER);
-            addRole(roles.getSOSPermissionRole(), ROLE_API_USER);
-
+            
+            Ini ini = Ini.fromResourcePath(Globals.getShiroIniInClassPath());
+            
+            Section s = ini.getSection("roles");
+            
+            for (String role : s.keySet()) {
+                addRole(roles.getSOSPermissionRole(), role);
+            }
+            
+             
             SOSPermissions sosPermissions = o.createSOSPermissions();
 
             SOSPermissionListJoc sosPermissionJoc = o.createSOSPermissionListJoc();
@@ -555,25 +531,13 @@ public class SOSServicePermissionShiro {
     private SOSPermissionRoles getRoles() {
 
         ObjectFactory o = new ObjectFactory();
-
         SOSPermissionRoles roles = o.createSOSPermissionRoles();
-        addRole(roles.getSOSPermissionRole(), ROLE_SUPER);
-        addRole(roles.getSOSPermissionRole(), ROLE_ALL);
-        addRole(roles.getSOSPermissionRole(), ROLE_ADMIN);
-        addRole(roles.getSOSPermissionRole(), ROLE_JOC_ADMIN);
-        addRole(roles.getSOSPermissionRole(), ROLE_JOBEDITOR);
-        addRole(roles.getSOSPermissionRole(), ROLE_CONTROLLER);
-        addRole(roles.getSOSPermissionRole(), ROLE_WORKINGPLAN);
-        addRole(roles.getSOSPermissionRole(), ROLE_JID);
-        addRole(roles.getSOSPermissionRole(), ROLE_JOE);
-        addRole(roles.getSOSPermissionRole(), ROLE_JOC);
-        addRole(roles.getSOSPermissionRole(), ROLE_EVENTS);
-        addRole(roles.getSOSPermissionRole(), ROLE_ADMINISTRATOR);
-        addRole(roles.getSOSPermissionRole(), ROLE_APPLICATION_MANAGER);
-        addRole(roles.getSOSPermissionRole(), ROLE_IT_OPERATOR);
-        addRole(roles.getSOSPermissionRole(), ROLE_INCIDENT_MANAGER);
-        addRole(roles.getSOSPermissionRole(), ROLE_BUSINESS_USER);
-        addRole(roles.getSOSPermissionRole(), ROLE_API_USER);
+        
+        Ini ini = Ini.fromResourcePath(Globals.getShiroIniInClassPath());
+        Section s = ini.getSection("roles");
+        for (String role : s.keySet()) {
+            addRole(roles.getSOSPermissionRole(), role);        
+        }
         return roles;
     }
 
