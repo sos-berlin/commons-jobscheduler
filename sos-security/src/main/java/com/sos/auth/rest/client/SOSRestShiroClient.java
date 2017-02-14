@@ -3,15 +3,17 @@ package com.sos.auth.rest.client;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.auth.rest.SOSWebserviceAuthenticationRecord;
 import com.sos.auth.rest.permission.model.SOSPermissionShiro;
 import com.sos.jobscheduler.tools.webservices.globals.SOSCommandSecurityWebserviceAnswer;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
+ 
 
 public class SOSRestShiroClient {
 
@@ -20,38 +22,41 @@ public class SOSRestShiroClient {
     }
 
     public SOSPermissionShiro getSOSPermissionShiro(URL resource) {
-        Client client = Client.create();
-        WebResource webResource = client.resource(resource.toExternalForm());
-        ClientResponse response = webResource.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target(resource.toExternalForm());
+      
+        Response response = target.request(MediaType.APPLICATION_XML).get();
         if (response.getStatus() != 200) {
             throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
         }
-        SOSPermissionShiro shiro = response.getEntity(SOSPermissionShiro.class);
+        SOSPermissionShiro shiro = response.readEntity(SOSPermissionShiro.class);
         shiro.setSecurityServerUrl(String.format("%s://%s:%s", resource.getProtocol(), resource.getHost(), resource.getPort()));
         return shiro;
 
     }
 
     private SOSCommandSecurityWebserviceAnswer getSOSCommandSecurityPlugin(URL resource) {
-        Client client = Client.create();
-        WebResource webResource = client.resource(resource.toExternalForm());
-        ClientResponse response = webResource.accept(MediaType.APPLICATION_XML).get(ClientResponse.class);
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target(resource.toExternalForm());
+
+        Response response = target.request(MediaType.APPLICATION_XML).get();
         if (response.getStatus() != 200) {
             throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
         }
-        SOSCommandSecurityWebserviceAnswer answer = response.getEntity(SOSCommandSecurityWebserviceAnswer.class);
+        SOSCommandSecurityWebserviceAnswer answer = response.readEntity(SOSCommandSecurityWebserviceAnswer.class);
         return answer;
 
     }
 
     public SOSShiroCurrentUserAnswer getSOSShiroCurrentUserAnswer(URL resource) {
-        Client client = Client.create();
-        WebResource webResource = client.resource(resource.toExternalForm());
-        ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target(resource.toExternalForm());
+
+        Response response = target.request(MediaType.APPLICATION_JSON).get();
         if (response.getStatus() != 200) {
             throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
         }
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = response.getEntity(SOSShiroCurrentUserAnswer.class);
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = response.readEntity(SOSShiroCurrentUserAnswer.class);
         return sosShiroCurrentUserAnswer;
 
     }
