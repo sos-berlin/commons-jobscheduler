@@ -59,13 +59,15 @@ public class SOSLdapAuthorizing {
 
         Ini ini = Ini.fromResourcePath(Globals.getShiroIniInClassPath());
         Section s = ini.getSection("users");
-        String roles = s.get(username);
+        if (s != null) {
+            String roles = s.get(username);
 
-        if (roles != null) {
-            String[] listOfRoles = roles.split(",");
-            if (listOfRoles.length > 1) {
-                for (int i = 1; i < listOfRoles.length; i++) {
-                    authorizationInfo.addRole(listOfRoles[i].trim());
+            if (roles != null) {
+                String[] listOfRoles = roles.split(",");
+                if (listOfRoles.length > 1) {
+                    for (int i = 1; i < listOfRoles.length; i++) {
+                        authorizationInfo.addRole(listOfRoles[i].trim());
+                    }
                 }
             }
         }
@@ -74,7 +76,7 @@ public class SOSLdapAuthorizing {
         searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
         String userPrincipalName = username;
-        
+
         if (sosLdapAuthorizingRealm.getSearchBase() != null && sosLdapAuthorizingRealm.getUserSearchFilter() != null) {
             String searchFilter = String.format(sosLdapAuthorizingRealm.getUserSearchFilter(), userPrincipalName);
             NamingEnumeration<SearchResult> answer = ldapContext.search(sosLdapAuthorizingRealm.getSearchBase(), searchFilter, searchCtls);
@@ -87,7 +89,7 @@ public class SOSLdapAuthorizing {
             String groupNameAttribute;
 
             groupNameAttribute = sosLdapAuthorizingRealm.getGroupNameAttribute();
-            
+
             Attribute memberOf = result.getAttributes().get(groupNameAttribute);
             if (memberOf != null) {
                 Collection<String> groupNames = LdapUtils.getAllAttributeValues(memberOf);
