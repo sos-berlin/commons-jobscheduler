@@ -24,6 +24,7 @@ import com.sos.JSHelper.Options.SOSOptionBoolean;
 import com.sos.JSHelper.Options.SOSOptionCommandString;
 import com.sos.JSHelper.Options.SOSOptionElement;
 import com.sos.JSHelper.Options.SOSOptionPassword;
+import com.sos.JSHelper.Options.SOSOptionString;
 import com.sos.i18n.annotation.I18NResourceBundle;
 
 @JSOptionClass(name = "SOSConnection2OptionsAlternate", description = "Options for a connection to an uri (server, site, e.g.)")
@@ -117,6 +118,11 @@ public class SOSConnection2OptionsAlternate extends SOSConnection2OptionsSuperCl
         ignoreCertificateError.value(val);
         return this;
     }
+    
+    @JSOptionDefinition(name = "command_delimiter", description = "Command delimiter for pre and post commands", 
+            key = "command_delimiter", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString commandDelimiter = new SOSOptionString(this, CLASSNAME + ".command_delimiter", 
+            "Command delimiter for pre and post commands", ";", ";", true);
 
     @JSOptionDefinition(name = "AlternateOptionsUsed", description = "Alternate Options used for connection and/or authentication",
             key = "AlternateOptionsUsed", type = "SOSOptionBoolean", mandatory = false)

@@ -361,22 +361,45 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     }
 
     private void executeCommands(final ISOSVfsFileTransfer pobjDataClient, final SOSOptionString pstrCommandString) {
+        executeCommands(pobjDataClient, pstrCommandString, null);
+    }
+        
+    private void executeCommands(final ISOSVfsFileTransfer pobjDataClient, final SOSOptionString pstrCommandString, final SOSOptionString commandDelimiter) {
         final String conMethodName = "SOSFileListEntry::executeCommands";
         if (pstrCommandString.isNotEmpty()) {
             String strT = pstrCommandString.getValue();
             strT = replaceVariables(strT);
             String strM = SOSVfs_D_0151.params(strT);
             LOGGER.debug(strM);
-            String[] strA = strT.split(";");
-            for (String strCmd : strA) {
+            String delimiter = null;
+            if (commandDelimiter != null) {
+                delimiter = commandDelimiter.getValue();
+            }
+            if (delimiter == null) {
+                delimiter = ";";
+            }
+            if (delimiter.isEmpty()) {
                 try {
-                    pobjDataClient.getHandler().executeCommand(strCmd);
+                    pobjDataClient.getHandler().executeCommand(strT);
                 } catch (JobSchedulerException e) {
                     LOGGER.error(e.toString());
                     throw e;
                 } catch (Exception e) {
                     LOGGER.error(e.toString());
                     throw new JobSchedulerException(conMethodName, e);
+                }
+            } else {
+                String[] strA = strT.split(delimiter);
+                for (String strCmd : strA) {
+                    try {
+                        pobjDataClient.getHandler().executeCommand(strCmd);
+                    } catch (JobSchedulerException e) {
+                        LOGGER.error(e.toString());
+                        throw e;
+                    } catch (Exception e) {
+                        LOGGER.error(e.toString());
+                        throw new JobSchedulerException(conMethodName, e);
+                    }
                 }
             }
         }
@@ -385,48 +408,48 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
     public void executeTFNPostCommnands() {
         SOSConnection2OptionsAlternate target = objOptions.getConnectionOptions().getTarget();
         if (target.alternateOptionsUsed.isTrue()) {
-            executeCommands(objDataTargetClient, target.getAlternatives().tfnPostCommand);
+            executeCommands(objDataTargetClient, target.getAlternatives().tfnPostCommand, target.getAlternatives().commandDelimiter);
         } else {
             executeCommands(objDataTargetClient, objOptions.tfnPostCommand);
-            executeCommands(objDataTargetClient, target.tfnPostCommand);
+            executeCommands(objDataTargetClient, target.tfnPostCommand, target.commandDelimiter);
         }
         SOSConnection2OptionsAlternate source = objOptions.getConnectionOptions().getSource();
         if (source.alternateOptionsUsed.isTrue()) {
-            executeCommands(objDataSourceClient, source.getAlternatives().tfnPostCommand);
+            executeCommands(objDataSourceClient, source.getAlternatives().tfnPostCommand, source.getAlternatives().commandDelimiter);
         } else {
-            executeCommands(objDataSourceClient, source.tfnPostCommand);
+            executeCommands(objDataSourceClient, source.tfnPostCommand, source.commandDelimiter);
         }
     }
 
     public void executePostCommands() {
         SOSConnection2OptionsAlternate target = objOptions.getConnectionOptions().getTarget();
         if (target.alternateOptionsUsed.isTrue()) {
-            executeCommands(objDataTargetClient, target.getAlternatives().postCommand);
+            executeCommands(objDataTargetClient, target.getAlternatives().postCommand, target.getAlternatives().commandDelimiter);
         } else {
             executeCommands(objDataTargetClient, objOptions.postCommand);
-            executeCommands(objDataTargetClient, target.postCommand);
+            executeCommands(objDataTargetClient, target.postCommand, target.commandDelimiter);
         }
         SOSConnection2OptionsAlternate source = objOptions.getConnectionOptions().getSource();
         if (source.alternateOptionsUsed.isTrue()) {
-            executeCommands(objDataSourceClient, source.getAlternatives().postCommand);
+            executeCommands(objDataSourceClient, source.getAlternatives().postCommand, source.getAlternatives().commandDelimiter);
         } else {
-            executeCommands(objDataSourceClient, source.postCommand);
+            executeCommands(objDataSourceClient, source.postCommand, source.commandDelimiter);
         }
     }
 
     private void executePreCommands() {
         SOSConnection2OptionsAlternate target = objOptions.getConnectionOptions().getTarget();
         if (target.alternateOptionsUsed.isTrue()) {
-            executeCommands(objDataTargetClient, target.getAlternatives().preCommand);
+            executeCommands(objDataTargetClient, target.getAlternatives().preCommand, target.commandDelimiter);
         } else {
             executeCommands(objDataTargetClient, objOptions.preCommand);
-            executeCommands(objDataTargetClient, target.preCommand);
+            executeCommands(objDataTargetClient, target.preCommand, target.commandDelimiter);
         }
         SOSConnection2OptionsAlternate source = objOptions.getConnectionOptions().getSource();
         if (source.alternateOptionsUsed.isTrue()) {
-            executeCommands(objDataSourceClient, source.getAlternatives().preCommand);
+            executeCommands(objDataSourceClient, source.getAlternatives().preCommand, source.getAlternatives().commandDelimiter);
         } else {
-            executeCommands(objDataSourceClient, source.preCommand);
+            executeCommands(objDataSourceClient, source.preCommand, source.commandDelimiter);
         }
     }
 
