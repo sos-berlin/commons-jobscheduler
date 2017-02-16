@@ -54,6 +54,7 @@ public class SOSServicePermissionShiro {
     private static final Logger LOGGER = Logger.getLogger(SOSServicePermissionShiro.class);
 
     private SOSShiroCurrentUser currentUser;
+    private SOSlogin sosLogin;
 
     public JOCDefaultResponse getJocCockpitPermissions(String accessToken, String user, String pwd) {
         this.setCurrentUserfromAccessToken(accessToken, user, pwd);
@@ -188,7 +189,7 @@ public class SOSServicePermissionShiro {
             }
 
             currentUser.getCurrentSubject().getSession().getTimeout();
-             
+
         } catch (ExpiredSessionException ex) {
             comment = "Session time out: " + ex.getMessage();
         } catch (SessionNotExistException e) {
@@ -338,16 +339,15 @@ public class SOSServicePermissionShiro {
             sosPermissionShiro.setUser(currentUser.getUsername());
 
             SOSPermissionRoles roles = o.createSOSPermissionRoles();
-            
+
             Ini ini = Ini.fromResourcePath(Globals.getShiroIniInClassPath());
-            
+
             Section s = ini.getSection("roles");
-            
+
             for (String role : s.keySet()) {
                 addRole(roles.getSOSPermissionRole(), role);
             }
-            
-             
+
             SOSPermissions sosPermissions = o.createSOSPermissions();
 
             SOSPermissionListJoc sosPermissionJoc = o.createSOSPermissionListJoc();
@@ -532,11 +532,11 @@ public class SOSServicePermissionShiro {
 
         ObjectFactory o = new ObjectFactory();
         SOSPermissionRoles roles = o.createSOSPermissionRoles();
-        
+
         Ini ini = Ini.fromResourcePath(Globals.getShiroIniInClassPath());
         Section s = ini.getSection("roles");
         for (String role : s.keySet()) {
-            addRole(roles.getSOSPermissionRole(), role);        
+            addRole(roles.getSOSPermissionRole(), role);
         }
         return roles;
     }
@@ -854,7 +854,7 @@ public class SOSServicePermissionShiro {
             Globals.jocWebserviceDataContainer.setCurrentUsersList(new SOSShiroCurrentUsersList());
         }
 
-        SOSlogin sosLogin = new SOSlogin();
+        sosLogin = new SOSlogin();
         sosLogin.setInifile(Globals.getShiroIniInClassPath());
         sosLogin.login(currentUser.getUsername(), currentUser.getPassword());
 
@@ -954,6 +954,9 @@ public class SOSServicePermissionShiro {
             jocAuditLog.storeAuditLogEntry(s);
 
             if (!sosShiroCurrentUserAnswer.isAuthenticated()) {
+                if (sosLogin != null) {
+                    LOGGER.info(sosLogin.getMsg());
+                }
                 return JOCDefaultResponse.responseStatus401(sosShiroCurrentUserAnswer);
             } else {
                 return JOCDefaultResponse.responseStatus200WithHeaders(sosShiroCurrentUserAnswer, sosShiroCurrentUserAnswer.getAccessToken(), currentUser.getCurrentSubject()

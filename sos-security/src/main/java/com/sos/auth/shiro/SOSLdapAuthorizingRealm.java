@@ -14,6 +14,7 @@ public class SOSLdapAuthorizingRealm extends JndiLdapRealm {
 
     private static final String DEFAULT_USER_NAME_ATTRIBUTE = "CN";
     private static final String DEFAULT_GROUP_NAME_ATTRIBUTE = "memberOf";
+    private static final String DEFAULT_USER_SEARCH_FILTER = "(&(objectClass=user)(cn=%s))";
     private SOSLdapAuthorizing authorizing;
     private String searchBase;
     private Map<String, String> groupRolesMap;
