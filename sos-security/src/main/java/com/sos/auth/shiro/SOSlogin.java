@@ -8,6 +8,7 @@ import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.Factory;
 
@@ -62,7 +63,9 @@ public class SOSlogin {
     }
 
     public void logout() {
-        currentUser.logout();
+        if (currentUser != null) {
+            currentUser.logout();
+        }
     }
 
     private void init() {
@@ -71,9 +74,11 @@ public class SOSlogin {
         SecurityUtils.setSecurityManager(securityManager);
         currentUser = SecurityUtils.getSubject();
         try {
-            currentUser.logout();
-        }catch (Exception e){
-            LOGGER.warn("Shiro init: " + e.getMessage(),e);
+            logout();
+        } catch (InvalidSessionException e) {
+            //this is raised always?
+        } catch (Exception e) {
+            LOGGER.info(String.format("Shiro init: %1$s: %2$s", e.getClass().getSimpleName(), e.getMessage()));
         }
     }
 
