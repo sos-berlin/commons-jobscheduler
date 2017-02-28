@@ -1,6 +1,7 @@
 package com.sos.hibernate.classes;
 
 import java.io.Serializable;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -11,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
+import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
@@ -80,7 +82,8 @@ public class SOSHibernateFactory implements Serializable {
 		try {
 			initConfiguration();
 			initSessionFactory();
-			String connFile = (configFile.isPresent()) ? configFile.get().toAbsolutePath().toString() : "without config file";
+			String connFile = (configFile.isPresent()) ? configFile.get().toAbsolutePath().toString()
+					: "without config file";
 			int isolationLevel = getTransactionIsolation();
 			LOGGER.debug(String.format("%s: autocommit = %s, transaction isolation = %s, %s", method, getAutoCommit(),
 					getTransactionIsolationName(isolationLevel), connFile));
@@ -215,7 +218,7 @@ public class SOSHibernateFactory implements Serializable {
 		defaultConfigurationProperties.put(HIBERNATE_PROPERTY_USE_SCROLLABLE_RESULTSET, "true");
 		defaultConfigurationProperties.put(HIBERNATE_PROPERTY_CURRENT_SESSION_CONTEXT_CLASS, "jta");
 		defaultConfigurationProperties.put(HIBERNATE_PROPERTY_JAVAX_PERSISTENCE_VALIDATION_MODE, "none");
-		defaultConfigurationProperties.put(HIBERNATE_PROPERTY_ID_NEW_GENERATOR_MAPPINGS,"false");
+		defaultConfigurationProperties.put(HIBERNATE_PROPERTY_ID_NEW_GENERATOR_MAPPINGS, "false");
 		configurationProperties = new Properties();
 	}
 
@@ -285,25 +288,41 @@ public class SOSHibernateFactory implements Serializable {
 	}
 
 	private void setDbms(Dialect dialect) {
-		dbms = Dbms.UNKNOWN;
+		dbms = getDbms(dialect);
+
+	}
+
+	private Enum<SOSHibernateFactory.Dbms> getDbms(Dialect dialect) {
+		SOSHibernateFactory.Dbms db = SOSHibernateFactory.Dbms.UNKNOWN;
 		if (dialect != null) {
 			String dialectClassName = dialect.getClass().getSimpleName().toLowerCase();
 			if (dialectClassName.contains("db2")) {
-				dbms = Dbms.DB2;
+				db = Dbms.DB2;
 			} else if (dialectClassName.contains("firebird")) {
-				dbms = Dbms.FBSQL;
+				db = Dbms.FBSQL;
 			} else if (dialectClassName.contains("sqlserver")) {
-				dbms = Dbms.MSSQL;
+				db = Dbms.MSSQL;
 			} else if (dialectClassName.contains("mysql")) {
-				dbms = Dbms.MYSQL;
+				db = Dbms.MYSQL;
 			} else if (dialectClassName.contains("oracle")) {
-				dbms = Dbms.ORACLE;
+				db = Dbms.ORACLE;
 			} else if (dialectClassName.contains("postgre")) {
-				dbms = Dbms.PGSQL;
+				db = Dbms.PGSQL;
 			} else if (dialectClassName.contains("sybase")) {
-				dbms = Dbms.SYBASE;
+				db = Dbms.SYBASE;
 			}
 		}
+		return db;
+	}
+
+	public Enum<SOSHibernateFactory.Dbms> getDbmsBeforeBuild() throws Exception {
+		Configuration conf = new Configuration();
+		if (configFile.isPresent()) {
+			conf.configure(configFile.get().toUri().toURL());
+		} else {
+			conf.configure();
+		}
+		return getDbms(Dialect.getDialect(conf.getProperties()));
 	}
 
 	public void setConfigurationProperties(Properties properties) {
