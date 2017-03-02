@@ -251,17 +251,7 @@ public class JobSchedulerJob extends Job_impl {
         return SOSConnection.createInstance(schedulerSettings.getSection("spooler").getProperty("db_class"), arguments.asString("-class=", ""),
                 arguments.asString("-url=", ""), arguments.asString("-user=", ""), arguments.asString("-password=", ""));
     }
-    
-    public static SOSConnection getReportingConnection(final SOSSettings reportingSettings) throws Exception {
-        Properties dbProperties = reportingSettings.getSection("configuration");
-        String dbClass = dbProperties.getProperty("class");
-        String dbDriver = dbProperties.getProperty("driver");
-        String dbUrl = dbProperties.getProperty("url");
-        String dbUser = dbProperties.getProperty("user");
-        String dbPassword = dbProperties.getProperty("password");
-        return SOSConnection.createInstance(dbClass, dbDriver, dbUrl, dbUser, dbPassword);
-    }
-
+ 
     public Path getHibernateConfigurationScheduler(){
     	Variable_set vs = spooler.variables();
 		if(vs != null){
