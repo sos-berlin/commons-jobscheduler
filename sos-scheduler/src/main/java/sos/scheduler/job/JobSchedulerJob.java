@@ -17,6 +17,7 @@ import sos.settings.SOSConnectionSettings;
 import sos.settings.SOSProfileSettings;
 import sos.settings.SOSSettings;
 import sos.spooler.Job_impl;
+import sos.spooler.Spooler;
 import sos.spooler.Variable_set;
 import sos.util.SOSArguments;
 import sos.util.SOSLogger;
@@ -253,6 +254,10 @@ public class JobSchedulerJob extends Job_impl {
     }
  
     public Path getHibernateConfigurationScheduler(){
+        return getHibernateConfigurationScheduler(spooler);
+    }
+    
+    public static Path getHibernateConfigurationScheduler(Spooler spooler){
     	Variable_set vs = spooler.variables();
 		if(vs != null){
 			String var = vs.value(SCHEDULER_PARAM_HIBERNATE_SCHEDULER);
@@ -264,6 +269,10 @@ public class JobSchedulerJob extends Job_impl {
     }
     
     public Path getHibernateConfigurationReporting(){
+        return getHibernateConfigurationReporting(spooler);
+    }
+    
+    public static Path getHibernateConfigurationReporting(Spooler spooler){
     	Variable_set vs = spooler.variables();
 		if(vs != null){
 			String var = vs.value(SCHEDULER_PARAM_HIBERNATE_REPORTING);
@@ -275,7 +284,7 @@ public class JobSchedulerJob extends Job_impl {
 		if(Files.exists(configFile)){
 			return configFile;
 		}
-		return getHibernateConfigurationScheduler();
+		return getHibernateConfigurationScheduler(spooler);
     }
     
     private boolean getSettings() {
