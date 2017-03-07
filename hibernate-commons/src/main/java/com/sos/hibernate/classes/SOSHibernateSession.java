@@ -1,9 +1,14 @@
 package com.sos.hibernate.classes;
 
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
@@ -174,7 +179,42 @@ public class SOSHibernateSession implements Serializable {
 		currentSession = null;
 		openSessionMethodName = null;
 	}
+	
+	public void executeNativeQueries(Path file) throws Exception{
+	    executeNativeQueries(new String(Files.readAllBytes(file)));
+	}
+	
+	public void executeNativeQueries(String content) throws Exception{
+	    SOSSqlCommandExtractor extractor = new SOSSqlCommandExtractor(this.factory.getDbms());
+	    try{
+	        beginTransaction();
+	        
+	        ArrayList<String> commands = extractor.extractCommands(content);
+	        for (int i = 0; i < commands.size(); i++) {
+                NativeQuery<?> q = createNativeQuery(commands.get(i));
+                if(isResultListQuery(commands.get(i))){
+                    q.getResultList();
+                }
+                else{
+                    q.executeUpdate();
+                }
+            }
+	    }
+	    catch(Exception e){
+	        throw e;
+	    }
+	    finally {
+            rollback();
+        }
+	}
 
+	private boolean isResultListQuery(String statement){
+	    String patterns = "^select|^exec";
+        Pattern p = Pattern.compile(patterns, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = p.matcher(statement);
+        return matcher.find();
+	}
+	
 	private void closeTransaction() {
 		String method = getMethodName("closeTransaction");
 		try {
@@ -194,13 +234,13 @@ public class SOSHibernateSession implements Serializable {
 
 	}
 
-	public Query createQuery(String query) throws Exception {
+	public Query<?> createQuery(String query) throws Exception {
 		String method = getMethodName("createQuery");
 		LOGGER.debug(String.format("%s: query = %s", method, query));
 		if (currentSession == null) {
 			throw new DBSessionException("Session is NULL");
 		}
-		Query q = null;
+		Query<?> q = null;
 		if (currentSession instanceof Session) {
 			q = ((Session) currentSession).createQuery(query);
 		} else if (currentSession instanceof StatelessSession) {
@@ -209,49 +249,48 @@ public class SOSHibernateSession implements Serializable {
 		return q;
 	}
 	
-	public NativeQuery createNativeQuery(String query) throws Exception{
-        String method = getMethodName("createNativeQuery");
-        LOGGER.debug(String.format("%s: query = %s", method, query));
-        if (currentSession == null) {
-            throw new DBSessionException("currentSession is NULL");
-        }
-        NativeQuery q = null;
-        if (currentSession instanceof Session) {
-            q = ((Session) currentSession).createNativeQuery(query);
-        } else if (currentSession instanceof StatelessSession) {
-            q = ((StatelessSession) currentSession).createNativeQuery(query);
-        }
-        return q;
+	public NativeQuery<?> createNativeQuery(String query) throws Exception{
+        return createNativeQuery(query,null);
 	}
 	
-	public NativeQuery createNativeQuery(String query, Class<?> entityClass) throws Exception {
+	public NativeQuery<?> createNativeQuery(String query, Class<?> entityClass) throws Exception {
 		String method = getMethodName("createNativeQuery");
 		LOGGER.debug(String.format("%s: query = %s", method, query));
 		if (currentSession == null) {
 			throw new DBSessionException("currentSession is NULL");
 		}
-		NativeQuery q = null;
+		NativeQuery<?> q = null;
 		if (currentSession instanceof Session) {
-			q = ((Session) currentSession).createNativeQuery(query,entityClass);
+		    if(entityClass == null){
+		        q = ((Session) currentSession).createNativeQuery(query);
+		    }
+		    else{
+	           q = ((Session) currentSession).createNativeQuery(query,entityClass);
+		    }
 		} else if (currentSession instanceof StatelessSession) {
-			q = ((StatelessSession) currentSession).createNativeQuery(query,entityClass);
+		    if(entityClass == null){
+		        q = ((StatelessSession) currentSession).createNativeQuery(query);
+		    }
+		    else{
+		      q = ((StatelessSession) currentSession).createNativeQuery(query,entityClass);
+		    }
 		}
 		return q;
 	}
 	
 	@Deprecated
-	public SQLQuery createSQLQuery(String query) throws Exception {
+	public SQLQuery<?> createSQLQuery(String query) throws Exception {
 		return createSQLQuery(query, null);
 	}
 
 	@Deprecated
-	public SQLQuery createSQLQuery(String query, Class<?> entityClass) throws Exception {
+	public SQLQuery<?> createSQLQuery(String query, Class<?> entityClass) throws Exception {
 		String method = getMethodName("createSQLQuery");
 		LOGGER.debug(String.format("%s: query = %s", method, query));
 		if (currentSession == null) {
 			throw new DBSessionException("currentSession is NULL");
 		}
-		SQLQuery q = null;
+		SQLQuery<?> q = null;
 		if (currentSession instanceof Session) {
 			q = ((Session) currentSession).createSQLQuery(query);
 		} else if (currentSession instanceof StatelessSession) {
@@ -263,6 +302,7 @@ public class SOSHibernateSession implements Serializable {
 		return q;
 	}
 
+	@Deprecated
 	public Criteria createCriteria(Class<?> cl, String alias) throws Exception {
 		String method = getMethodName("createCriteria");
 		LOGGER.debug(String.format("%s: class = %s", method, cl.getSimpleName()));
