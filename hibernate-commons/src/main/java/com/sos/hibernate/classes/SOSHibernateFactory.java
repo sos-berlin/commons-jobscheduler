@@ -113,6 +113,18 @@ public class SOSHibernateFactory implements Serializable {
         return openStatelessSession(this.identifier);
     }
 	
+    public SOSHibernateSession getCurrentSession(String identifier) throws Exception{
+        SOSHibernateSession session = new SOSHibernateSession(this);
+        session.setUseGetCurrentSession(true);
+        session.setIdentifier(identifier);
+        session.connect();
+        return session;
+    }
+    
+    public SOSHibernateSession getCurrentSession() throws Exception{
+        return getCurrentSession(this.identifier);
+    }
+    
 	private void initConfiguration() throws Exception {
 		String method = getMethodName("initConfiguration");
 		LOGGER.debug(String.format("%s", method));
