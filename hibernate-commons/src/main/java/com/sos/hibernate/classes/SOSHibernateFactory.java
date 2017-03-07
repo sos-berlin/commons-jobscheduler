@@ -1,7 +1,6 @@
 package com.sos.hibernate.classes;
 
 import java.io.Serializable;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,7 +11,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
-import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
@@ -45,7 +43,7 @@ public class SOSHibernateFactory implements Serializable {
 	private Properties configurationProperties;
 	private com.sos.hibernate.classes.ClassList classMapping;
 	private boolean useDefaultConfigurationProperties = true;
-	private String connectionIdentifier;
+	private String identifier;
 	private Optional<Integer> jdbcFetchSize = Optional.empty();
 	private Enum<SOSHibernateFactory.Dbms> dbms = Dbms.UNKNOWN;
 	public static final String HIBERNATE_PROPERTY_TRANSACTION_ISOLATION = "hibernate.connection.isolation";
@@ -92,6 +90,29 @@ public class SOSHibernateFactory implements Serializable {
 		}
 	}
 
+	public SOSHibernateSession openSession(String identifier) throws Exception{
+        SOSHibernateSession session = new SOSHibernateSession(this);
+        session.setIdentifier(identifier);
+        session.connect();
+        return session;
+    }
+	
+	public SOSHibernateSession openSession() throws Exception{
+	    return openSession(this.identifier);
+	}
+	
+	public SOSHibernateSession openStatelessSession(String identifier) throws Exception{
+        SOSHibernateSession session = new SOSHibernateSession(this);
+        session.setUseOpenStatelessSession(true);
+        session.setIdentifier(identifier);
+        session.connect();
+        return session;
+    }
+    
+    public SOSHibernateSession openStatelessSession() throws Exception{
+        return openStatelessSession(this.identifier);
+    }
+	
 	private void initConfiguration() throws Exception {
 		String method = getMethodName("initConfiguration");
 		LOGGER.debug(String.format("%s", method));
@@ -422,16 +443,16 @@ public class SOSHibernateFactory implements Serializable {
 	}
 
 	private String getMethodName(String name) {
-		String prefix = connectionIdentifier == null ? "" : String.format("[%s] ", connectionIdentifier);
+		String prefix = identifier == null ? "" : String.format("[%s] ", identifier);
 		return String.format("%s%s", prefix, name);
 	}
 
-	public String getConnectionIdentifier() {
-		return connectionIdentifier;
+	public String getIdentifier() {
+		return identifier;
 	}
 
-	public void setConnectionIdentifier(String val) {
-		connectionIdentifier = val;
+	public void setIdentifier(String val) {
+	    identifier = val;
 	}
 
 	public SessionFactory getSessionFactory() {

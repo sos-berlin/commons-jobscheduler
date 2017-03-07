@@ -40,7 +40,7 @@ public class SOSHibernateSession implements Serializable {
 	private boolean useOpenStatelessSession;
 	private boolean useGetCurrentSession;
 	private FlushMode sessionFlushMode;
-	private String connectionIdentifier;
+	private String identifier;
 	private String openSessionMethodName;
 	public static final int LIMIT_IN_CLAUSE = 1000;
 
@@ -506,7 +506,7 @@ public class SOSHibernateSession implements Serializable {
 	}
 
 	private String getMethodName(String name) {
-		String prefix = connectionIdentifier == null ? "" : String.format("[%s] ", connectionIdentifier);
+		String prefix = identifier == null ? "" : String.format("[%s] ", identifier);
 		return String.format("%s%s", prefix, name);
 	}
 
@@ -555,12 +555,12 @@ public class SOSHibernateSession implements Serializable {
 		this.useGetCurrentSession = useGetCurrentSession;
 	}
 
-	public String getConnectionIdentifier() {
-		return connectionIdentifier;
+	public String getIdentifier() {
+		return identifier;
 	}
 
-	public void setConnectionIdentifier(String val) {
-		connectionIdentifier = val;
+	public void setIdentifier(String val) {
+	    identifier = val;
 	}
 	
 	public SOSHibernateFactory getFactory() {
