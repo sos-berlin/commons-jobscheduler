@@ -1,10 +1,10 @@
 package com.sos.hibernate.classes;
 
-public class SOSHibernateStatelessConnection extends SOSHibernateConnection {
+public class SOSHibernateStatelessSession extends SOSHibernateSession {
 
 	private static final long serialVersionUID = 1L;
 
-	public SOSHibernateStatelessConnection(SOSHibernateFactory factory) {
+	public SOSHibernateStatelessSession(SOSHibernateFactory factory) {
         super(factory);
         this.setUseOpenStatelessSession(true);
     }

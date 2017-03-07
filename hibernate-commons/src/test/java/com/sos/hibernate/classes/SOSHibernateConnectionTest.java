@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 public class SOSHibernateConnectionTest {
 	final static Logger LOGGER = LoggerFactory.getLogger(SOSHibernateConnectionTest.class);
 
-	public void withTransaction(SOSHibernateConnection conn) throws Exception {
+	public void withTransaction(SOSHibernateSession conn) throws Exception {
 		//conn.setAutoCommit(false);
 		conn.connect();
 
@@ -69,7 +69,7 @@ public class SOSHibernateConnectionTest {
 
 	}
 
-	public void withoutTransaction(SOSHibernateConnection conn) throws Exception {
+	public void withoutTransaction(SOSHibernateSession conn) throws Exception {
 		//conn.setAutoCommit(true);
 		conn.connect();
 

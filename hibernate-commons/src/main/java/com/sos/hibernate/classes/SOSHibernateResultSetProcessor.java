@@ -27,7 +27,7 @@ public class SOSHibernateResultSetProcessor implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateResultSetProcessor.class);
-    private SOSHibernateConnection connection;
+    private SOSHibernateSession connection;
     private Statement statement;
     private ResultSet resultSet;
     private Class<?> entity;
@@ -35,7 +35,7 @@ public class SOSHibernateResultSetProcessor implements Serializable {
     private HashMap<String, Method> entitySetMethods;
     private String sqlStatement;
 
-    public SOSHibernateResultSetProcessor(SOSHibernateConnection conn) {
+    public SOSHibernateResultSetProcessor(SOSHibernateSession conn) {
         connection = conn;
     }
 

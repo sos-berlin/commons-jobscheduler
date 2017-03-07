@@ -3,15 +3,15 @@ package com.sos.hibernate.layer;
 import java.io.File;
 import org.apache.log4j.Logger;
 import com.sos.hibernate.classes.ClassList;
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.classes.SOSHibernateFactory;
-import com.sos.hibernate.classes.SOSHibernateStatelessConnection;
+import com.sos.hibernate.classes.SOSHibernateStatelessSession;
   
 /** @author Uwe Risse */
 public class SOSHibernateDBLayer {
 
     private static final Logger LOGGER = Logger.getLogger(SOSHibernateDBLayer.class);
-    protected SOSHibernateConnection connection = null;
+    protected SOSHibernateSession connection = null;
     private SOSHibernateFactory sosHibernateFactory=null;
     private String configurationFileName = null;
   
@@ -31,29 +31,29 @@ public class SOSHibernateDBLayer {
         this.configurationFileName = configurationFileName;
     }
 
-    public SOSHibernateConnection getConnection() {
+    public SOSHibernateSession getConnection() {
         return connection;
     }
     
-    public SOSHibernateConnection createStatefullConnection(String confFile) throws Exception{
+    public SOSHibernateSession createStatefullConnection(String confFile) throws Exception{
         if (sosHibernateFactory == null) {
                 sosHibernateFactory = new SOSHibernateFactory(confFile);
                 sosHibernateFactory.addClassMapping(getDefaultClassMapping());
                 sosHibernateFactory.build();
         }
-        connection = new SOSHibernateConnection(sosHibernateFactory);
+        connection = new SOSHibernateSession(sosHibernateFactory);
         connection.connect();
         return connection;
     }
 
 
-    public SOSHibernateConnection createStatelessConnection(String confFile) throws Exception{
+    public SOSHibernateSession createStatelessConnection(String confFile) throws Exception{
         if (sosHibernateFactory == null) {
                 sosHibernateFactory = new SOSHibernateFactory(confFile);
                 sosHibernateFactory.addClassMapping(getDefaultClassMapping());
                 sosHibernateFactory.build();
         }
-        connection = new SOSHibernateStatelessConnection(sosHibernateFactory);
+        connection = new SOSHibernateStatelessSession(sosHibernateFactory);
         connection.connect();
         return connection;
     }

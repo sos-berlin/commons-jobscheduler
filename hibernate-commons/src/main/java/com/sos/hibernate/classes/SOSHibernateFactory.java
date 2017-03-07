@@ -36,7 +36,7 @@ public class SOSHibernateFactory implements Serializable {
 
 	private static final String HIBERNATE_PROPERTY_JAVAX_PERSISTENCE_VALIDATION_MODE = "javax.persistence.validation.mode";
 	private static final long serialVersionUID = 1L;
-	private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateConnection.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateFactory.class);
 	private Optional<Path> configFile = Optional.empty();
 	private Configuration configuration;
 	private SessionFactory sessionFactory;

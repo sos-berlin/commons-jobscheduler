@@ -30,10 +30,10 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.exception.DBSessionException;
 
-public class SOSHibernateConnection implements Serializable {
+public class SOSHibernateSession implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateConnection.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateSession.class);
 	private SOSHibernateFactory factory;
 	private SessionFactory sessionFactory;
 	private Object currentSession;
@@ -44,7 +44,7 @@ public class SOSHibernateConnection implements Serializable {
 	private String openSessionMethodName;
 	public static final int LIMIT_IN_CLAUSE = 1000;
 
-	public SOSHibernateConnection(SOSHibernateFactory hibernateFactory) {
+	public SOSHibernateSession(SOSHibernateFactory hibernateFactory) {
 		this.factory = hibernateFactory;
 		this.sessionFactory = hibernateFactory.getSessionFactory();
 		initSessionProperties();

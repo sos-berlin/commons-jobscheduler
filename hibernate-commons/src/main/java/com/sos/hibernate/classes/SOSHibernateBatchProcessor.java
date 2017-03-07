@@ -21,13 +21,13 @@ public class SOSHibernateBatchProcessor implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateBatchProcessor.class);
-    private SOSHibernateConnection connection;
+    private SOSHibernateSession connection;
     private PreparedStatement preparedStatement;
     private String sqlStatement;
     private LinkedHashMap<String, Method> fieldsMetadata;
     private int countCurrentBatches;
 
-    public SOSHibernateBatchProcessor(SOSHibernateConnection conn) {
+    public SOSHibernateBatchProcessor(SOSHibernateSession conn) {
         connection = conn;
         countCurrentBatches = 0;
     }
