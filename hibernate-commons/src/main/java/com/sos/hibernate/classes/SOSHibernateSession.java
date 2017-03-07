@@ -234,13 +234,13 @@ public class SOSHibernateSession implements Serializable {
 
 	}
 
-	public Query<?> createQuery(String query) throws Exception {
+	public Query createQuery(String query) throws Exception {
 		String method = getMethodName("createQuery");
 		LOGGER.debug(String.format("%s: query = %s", method, query));
 		if (currentSession == null) {
 			throw new DBSessionException("Session is NULL");
 		}
-		Query<?> q = null;
+		Query q = null;
 		if (currentSession instanceof Session) {
 			q = ((Session) currentSession).createQuery(query);
 		} else if (currentSession instanceof StatelessSession) {
@@ -249,11 +249,11 @@ public class SOSHibernateSession implements Serializable {
 		return q;
 	}
 	
-	public NativeQuery<?> createNativeQuery(String query) throws Exception{
+	public NativeQuery createNativeQuery(String query) throws Exception{
         return createNativeQuery(query,null);
 	}
 	
-	public NativeQuery<?> createNativeQuery(String query, Class<?> entityClass) throws Exception {
+	public NativeQuery createNativeQuery(String query, Class<?> entityClass) throws Exception {
 		String method = getMethodName("createNativeQuery");
 		LOGGER.debug(String.format("%s: query = %s", method, query));
 		if (currentSession == null) {
