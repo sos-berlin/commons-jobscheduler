@@ -10,14 +10,13 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
@@ -40,27 +39,22 @@ public class SOSHibernateSession implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateSession.class);
     private SOSHibernateFactory factory;
-    private SessionFactory sessionFactory;
     private Object currentSession;
-    private boolean useOpenStatelessSession;
-    private boolean useGetCurrentSession;
-    private FlushMode sessionFlushMode;
+    private boolean useOpenStatelessSession = false;
+    private boolean useGetCurrentSession = false;
+    private FlushMode defaultHibernateFlushMode = FlushMode.ALWAYS;
     private String identifier;
     private String openSessionMethodName;
     public static final int LIMIT_IN_CLAUSE = 1000;
 
-    /** 
-     * @deprecated
+    /** @deprecated
      * 
-     * use factory.openSession() or factory.openStatelessSession(); 
+     *             use factory.openSession() or factory.openStatelessSession();
      * 
-     * constructor will be set later as not public (protected)
-     */
+     *             constructor will be set later as not public (protected) */
     @Deprecated
     public SOSHibernateSession(SOSHibernateFactory hibernateFactory) {
         this.factory = hibernateFactory;
-        this.sessionFactory = hibernateFactory.getSessionFactory();
-        initSessionProperties();
     }
 
     @Deprecated
@@ -75,11 +69,9 @@ public class SOSHibernateSession implements Serializable {
         }
     }
 
-    /** 
-     * @deprecated
+    /** @deprecated
      * 
-     * use factory.openSession() or factory.openStatelessSession(); 
-     */
+     *             use factory.openSession() or factory.openStatelessSession(); */
     @Deprecated
     public void connect() throws Exception {
         String method = getMethodName("connect");
@@ -95,12 +87,6 @@ public class SOSHibernateSession implements Serializable {
         }
     }
 
-    private void initSessionProperties() {
-        sessionFlushMode = FlushMode.ALWAYS;
-        useOpenStatelessSession = false;
-        useGetCurrentSession = false;
-    }
-
     protected void openSession() throws Exception {
         String method = getMethodName("openSession");
 
@@ -114,19 +100,19 @@ public class SOSHibernateSession implements Serializable {
 
         openSessionMethodName = "";
         if (useOpenStatelessSession) {
-            currentSession = sessionFactory.openStatelessSession();
+            currentSession = factory.getSessionFactory().openStatelessSession();
             openSessionMethodName = "openStatelessSession";
         } else {
             Session session = null;
             if (useGetCurrentSession) {
-                session = sessionFactory.getCurrentSession();
+                session = factory.getSessionFactory().getCurrentSession();
                 openSessionMethodName = "getCurrentSession";
             } else {
-                session = sessionFactory.openSession();
+                session = factory.getSessionFactory().openSession();
                 openSessionMethodName = "openSession";
             }
-            if (sessionFlushMode != null) {
-                session.setHibernateFlushMode(sessionFlushMode);
+            if (defaultHibernateFlushMode != null) {
+                session.setHibernateFlushMode(defaultHibernateFlushMode);
             }
             currentSession = session;
         }
@@ -144,11 +130,9 @@ public class SOSHibernateSession implements Serializable {
         return ex;
     }
 
-    /** 
-     * @deprecated
+    /** @deprecated
      * 
-     * use close(); 
-     */
+     *             use close(); */
     @Deprecated
     public void disconnect() {
         close();
@@ -206,7 +190,7 @@ public class SOSHibernateSession implements Serializable {
 
     }
 
-    public void closeSession() {
+    private void closeSession() {
         String method = getMethodName("closeSession");
         LOGGER.debug(String.format("%s", method));
         try {
@@ -216,7 +200,7 @@ public class SOSHibernateSession implements Serializable {
                     if (session.isOpen()) {
                         session.close();
                     }
-                } else if (currentSession instanceof StatelessSession) {
+                } else {
                     StatelessSession s = (StatelessSession) currentSession;
                     s.close();
                 }
@@ -268,7 +252,7 @@ public class SOSHibernateSession implements Serializable {
         Query q = null;
         if (currentSession instanceof Session) {
             q = ((Session) currentSession).createQuery(query);
-        } else if (currentSession instanceof StatelessSession) {
+        } else {
             q = ((StatelessSession) currentSession).createQuery(query);
         }
         return q;
@@ -291,7 +275,7 @@ public class SOSHibernateSession implements Serializable {
             } else {
                 q = ((Session) currentSession).createNativeQuery(query, entityClass);
             }
-        } else if (currentSession instanceof StatelessSession) {
+        } else {
             if (entityClass == null) {
                 q = ((StatelessSession) currentSession).createNativeQuery(query);
             } else {
@@ -301,11 +285,17 @@ public class SOSHibernateSession implements Serializable {
         return q;
     }
 
+    /** @deprecated
+     * 
+     *             use createNativeQuery */
     @Deprecated
     public SQLQuery<?> createSQLQuery(String query) throws Exception {
         return createSQLQuery(query, null);
     }
 
+    /** @deprecated
+     * 
+     *             use createNativeQuery */
     @Deprecated
     public SQLQuery<?> createSQLQuery(String query, Class<?> entityClass) throws Exception {
         String method = getMethodName("createSQLQuery");
@@ -316,7 +306,7 @@ public class SOSHibernateSession implements Serializable {
         SQLQuery<?> q = null;
         if (currentSession instanceof Session) {
             q = ((Session) currentSession).createSQLQuery(query);
-        } else if (currentSession instanceof StatelessSession) {
+        } else {
             q = ((StatelessSession) currentSession).createSQLQuery(query);
         }
         if (q != null && entityClass != null) {
@@ -335,7 +325,7 @@ public class SOSHibernateSession implements Serializable {
         Criteria cr = null;
         if (currentSession instanceof Session) {
             cr = ((Session) currentSession).createCriteria(cl, alias);
-        } else if (currentSession instanceof StatelessSession) {
+        } else {
             cr = ((StatelessSession) currentSession).createCriteria(cl, alias);
         }
         return cr;
@@ -400,7 +390,7 @@ public class SOSHibernateSession implements Serializable {
         if (currentSession instanceof Session) {
             Session session = ((Session) currentSession);
             session.beginTransaction();
-        } else if (currentSession instanceof StatelessSession) {
+        } else {
             StatelessSession session = ((StatelessSession) currentSession);
             session.beginTransaction();
         }
@@ -414,7 +404,7 @@ public class SOSHibernateSession implements Serializable {
         if (currentSession instanceof Session) {
             Session s = ((Session) currentSession);
             tr = s.getTransaction();
-        } else if (currentSession instanceof StatelessSession) {
+        } else {
             StatelessSession s = ((StatelessSession) currentSession);
             tr = s.getTransaction();
         }
@@ -462,7 +452,7 @@ public class SOSHibernateSession implements Serializable {
             Session session = ((Session) currentSession);
             session.save(item);
             session.flush();
-        } else if (currentSession instanceof StatelessSession) {
+        } else {
             StatelessSession session = ((StatelessSession) currentSession);
             session.insert(item);
         }
@@ -478,7 +468,7 @@ public class SOSHibernateSession implements Serializable {
             Session session = ((Session) currentSession);
             session.update(item);
             session.flush();
-        } else if (currentSession instanceof StatelessSession) {
+        } else {
             StatelessSession session = ((StatelessSession) currentSession);
             session.update(item);
         }
@@ -494,7 +484,7 @@ public class SOSHibernateSession implements Serializable {
             Session session = ((Session) currentSession);
             session.saveOrUpdate(item);
             session.flush();
-        } else if (currentSession instanceof StatelessSession) {
+        } else {
             StatelessSession session = ((StatelessSession) currentSession);
             /*
              * The following error will always be logged in the try segment, if the item id field is null: SQL Error: -1, SQLState: 07004 Parameter at position
@@ -520,7 +510,7 @@ public class SOSHibernateSession implements Serializable {
             Session session = ((Session) currentSession);
             session.delete(item);
             session.flush();
-        } else if (currentSession instanceof StatelessSession) {
+        } else {
             StatelessSession session = ((StatelessSession) currentSession);
             session.delete(item);
         }
@@ -530,12 +520,8 @@ public class SOSHibernateSession implements Serializable {
         return currentSession;
     }
 
-    public Configuration getConfiguration() {
-        return factory.getConfiguration();
-    }
-
-    public Connection getJdbcConnection() throws Exception {
-        String method = "getJdbcConnection";
+    public Connection getConnection() throws Exception {
+        String method = "getConnection";
         if (currentSession instanceof Session) {
             SessionImpl sf = (SessionImpl) currentSession;
             try {
@@ -553,12 +539,77 @@ public class SOSHibernateSession implements Serializable {
         }
     }
 
-    public FlushMode getSessionFlushMode() {
-        return sessionFlushMode;
+    public void setHibernateFlushMode(FlushMode flushMode) {
+        if (currentSession instanceof Session) {
+            Session session = (Session) currentSession;
+            session.setHibernateFlushMode(flushMode);
+        }
     }
 
-    public void setSessionFlushMode(FlushMode sessionFlushMode) {
-        this.sessionFlushMode = sessionFlushMode;
+    public FlushMode getHibernateFlushMode() {
+        if (currentSession instanceof Session) {
+            Session session = (Session) currentSession;
+            return session.getHibernateFlushMode();
+        }
+        return null;
+    }
+
+    public void setCacheMode(CacheMode cacheMode) {
+        if (currentSession instanceof Session) {
+            Session session = (Session) currentSession;
+            session.setCacheMode(cacheMode);
+        }
+    }
+
+    public CacheMode getCacheMode() {
+        if (currentSession instanceof Session) {
+            Session session = (Session) currentSession;
+            return session.getCacheMode();
+        }
+        return null;
+    }
+
+    public boolean isOpen() {
+        if (currentSession instanceof Session) {
+            Session session = (Session) currentSession;
+            return session.isOpen();
+        } else {
+            StatelessSession session = ((StatelessSession) currentSession);
+            return session.isOpen();
+        }
+    }
+
+    public boolean isConnected() {
+        if (currentSession instanceof Session) {
+            Session session = (Session) currentSession;
+            return session.isConnected();
+        } else {
+            StatelessSession session = ((StatelessSession) currentSession);
+            return session.isConnected();
+        }
+    }
+
+    public void refresh(Object object) {
+        refresh(null, object);
+    }
+
+    public void refresh(String entityName, Object object) {
+        if (currentSession instanceof Session) {
+            Session session = (Session) currentSession;
+            if (entityName == null) {
+                session.refresh(object);
+            } else {
+                session.refresh(entityName, object);
+            }
+        } else {
+            StatelessSession session = ((StatelessSession) currentSession);
+            if (entityName == null) {
+                session.refresh(object);
+            } else {
+                session.refresh(entityName, object);
+            }
+
+        }
     }
 
     private String getMethodName(String name) {
@@ -589,17 +640,16 @@ public class SOSHibernateSession implements Serializable {
     public Object get(Class<?> entityClass, Serializable id) throws Exception {
         if (currentSession instanceof Session) {
             return ((Session) currentSession).get(entityClass, id);
-        } else if (currentSession instanceof StatelessSession) {
+        } else {
             return ((StatelessSession) currentSession).get(entityClass, id);
         }
-        return null;
     }
 
     public boolean isUseOpenStatelessSession() {
         return useOpenStatelessSession;
     }
 
-    public void setUseOpenStatelessSession(boolean useOpenStatelessSession) {
+    protected void setUseOpenStatelessSession(boolean useOpenStatelessSession) {
         this.useOpenStatelessSession = useOpenStatelessSession;
     }
 
@@ -607,7 +657,7 @@ public class SOSHibernateSession implements Serializable {
         return useGetCurrentSession;
     }
 
-    public void setUseGetCurrentSession(boolean useGetCurrentSession) {
+    protected void setUseGetCurrentSession(boolean useGetCurrentSession) {
         this.useGetCurrentSession = useGetCurrentSession;
     }
 

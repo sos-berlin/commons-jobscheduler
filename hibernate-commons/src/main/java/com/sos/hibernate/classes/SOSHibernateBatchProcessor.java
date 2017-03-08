@@ -21,24 +21,24 @@ public class SOSHibernateBatchProcessor implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateBatchProcessor.class);
-    private SOSHibernateSession connection;
+    private SOSHibernateSession session;
     private PreparedStatement preparedStatement;
     private String sqlStatement;
     private LinkedHashMap<String, Method> fieldsMetadata;
     private int countCurrentBatches;
 
-    public SOSHibernateBatchProcessor(SOSHibernateSession conn) {
-        connection = conn;
+    public SOSHibernateBatchProcessor(SOSHibernateSession sess) {
+        session = sess;
         countCurrentBatches = 0;
     }
 
     public void createInsertBatch(Class<?> entity) throws Exception {
         String method = "createInsertBatch";
         LOGGER.debug(String.format("%s: entity = %s ", method, entity.getSimpleName()));
-        if (connection == null) {
-            throw new Exception(String.format("%s: connection is NULL", method));
+        if (session == null) {
+            throw new Exception(String.format("%s: session is NULL", method));
         }
-        if (connection.getFactory().getDialect() == null) {
+        if (session.getFactory().getDialect() == null) {
             throw new Exception(String.format("%s: dialect is NULL", method));
         }
         Table t = entity.getAnnotation(Table.class);
@@ -63,7 +63,7 @@ public class SOSHibernateBatchProcessor implements Serializable {
                             fieldsMap.put(fieldName, m);
                         } else {
                             try {
-                                sequenceNextValString = connection.getFactory().getDialect().getSelectSequenceNextValString(gv.generator());
+                                sequenceNextValString = session.getFactory().getDialect().getSelectSequenceNextValString(gv.generator());
                                 identifier = fieldName;
                             } catch (Exception ex) {
                                 // exception if not supported
@@ -76,13 +76,13 @@ public class SOSHibernateBatchProcessor implements Serializable {
         StringBuilder sql = new StringBuilder("insert into " + t.name() + " (");
         StringBuilder sqlFields = new StringBuilder();
         if (identifier != null && sequenceNextValString != null) {
-            sqlFields.append(connection.getFactory().quoteFieldName(identifier));
+            sqlFields.append(session.getFactory().quoteFieldName(identifier));
         }
         for (Map.Entry<String, Method> entry : fieldsMap.entrySet()) {
             if (!sqlFields.toString().isEmpty()) {
                 sqlFields.append(",");
             }
-            sqlFields.append(connection.getFactory().quoteFieldName(entry.getKey()));
+            sqlFields.append(session.getFactory().quoteFieldName(entry.getKey()));
         }
         sql.append(sqlFields);
         sql.append(") values (");
@@ -100,7 +100,7 @@ public class SOSHibernateBatchProcessor implements Serializable {
         sql.append(")");
         sqlStatement = sql.toString();
         fieldsMetadata = fieldsMap;
-        preparedStatement = connection.getJdbcConnection().prepareStatement(sqlStatement);
+        preparedStatement = session.getConnection().prepareStatement(sqlStatement);
     }
 
     public void addBatch(Object entity) throws Exception {
@@ -156,25 +156,24 @@ public class SOSHibernateBatchProcessor implements Serializable {
         if (preparedStatement == null) {
             throw new Exception(String.format("%s: preparedStatement is NULL", method));
         }
-        if (connection == null) {
+        if (session == null) {
             throw new Exception(String.format("%s: connection is NULL", method));
         }
         try {
             int[] result = preparedStatement.executeBatch();
-            connection.getJdbcConnection().commit();
+            session.getConnection().commit();
             return result;
         } catch (SQLException e) {
-            try{
-                connection.getJdbcConnection().rollback();
-            }
-            catch(Exception ex){
+            try {
+                session.getConnection().rollback();
+            } catch (Exception ex) {
                 LOGGER.error(ex.getMessage(), ex);
             }
             LOGGER.error(e.getMessage(), e);
             Throwable exx = e;
             if (e instanceof SQLException) {
-                if(((SQLException)e.getNextException()) != null){
-                   exx = (SQLException)e.getNextException(); 
+                if (((SQLException) e.getNextException()) != null) {
+                    exx = (SQLException) e.getNextException();
                 }
             }
             throw new Exception(exx);

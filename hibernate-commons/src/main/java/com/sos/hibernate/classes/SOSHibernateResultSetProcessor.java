@@ -13,7 +13,6 @@ import org.hibernate.Criteria;
 import org.hibernate.ScrollMode;
 import org.hibernate.engine.spi.QueryParameters;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.loader.criteria.CriteriaJoinWalker;
@@ -27,7 +26,7 @@ public class SOSHibernateResultSetProcessor implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateResultSetProcessor.class);
-    private SOSHibernateSession connection;
+    private SOSHibernateSession session;
     private Statement statement;
     private ResultSet resultSet;
     private Class<?> entity;
@@ -35,8 +34,8 @@ public class SOSHibernateResultSetProcessor implements Serializable {
     private HashMap<String, Method> entitySetMethods;
     private String sqlStatement;
 
-    public SOSHibernateResultSetProcessor(SOSHibernateSession conn) {
-        connection = conn;
+    public SOSHibernateResultSetProcessor(SOSHibernateSession sess) {
+        session = sess;
     }
 
     public ResultSet createResultSet(Criteria criteria, ScrollMode scrollMode) throws Exception {
@@ -60,16 +59,15 @@ public class SOSHibernateResultSetProcessor implements Serializable {
                 entity = Class.forName(criteriaImpl.getEntityOrClassName());
             } else {
                 entity = resultEntity;
-                
+
             }
             SharedSessionContractImplementor session = criteriaImpl.getSession();
             SessionFactoryImplementor factory = session.getFactory();
-            CriteriaQueryTranslator translator =
-                    new CriteriaQueryTranslator(factory, criteriaImpl, criteriaImpl.getEntityOrClassName(), CriteriaQueryTranslator.ROOT_SQL_ALIAS);
+            CriteriaQueryTranslator translator = new CriteriaQueryTranslator(factory, criteriaImpl, criteriaImpl.getEntityOrClassName(),
+                    CriteriaQueryTranslator.ROOT_SQL_ALIAS);
             String[] implementors = factory.getImplementors(criteriaImpl.getEntityOrClassName());
-            CriteriaJoinWalker walker =
-                    new CriteriaJoinWalker((OuterJoinLoadable) factory.getEntityPersister(implementors[0]), translator, factory, criteriaImpl,
-                            criteriaImpl.getEntityOrClassName(), session.getLoadQueryInfluencers());
+            CriteriaJoinWalker walker = new CriteriaJoinWalker((OuterJoinLoadable) factory.getEntityPersister(implementors[0]), translator, factory,
+                    criteriaImpl, criteriaImpl.getEntityOrClassName(), session.getLoadQueryInfluencers());
             String sql = createSqlStatement(translator, walker.getSQLString());
             createMetadata(translator);
             resultSet = createResultSet(sql, scrollMode, criteria.isReadOnly(), fetchSize);
@@ -86,13 +84,13 @@ public class SOSHibernateResultSetProcessor implements Serializable {
     public ResultSet createResultSet(String sql, ScrollMode scrollMode, boolean isReadOnly, Optional<Integer> fetchSize) throws Exception {
         String method = "createResultSet";
         sqlStatement = sql;
-        LOGGER.debug(String.format("%s: sqlStatement = %s, scrollMode = %s, isReadOnly = %s, fetchSize= %s", method, sqlStatement,
-                scrollMode.toString(), isReadOnly, fetchSize));
-        statement = connection.getJdbcConnection().createStatement(getResultSetType(scrollMode), getConcurrencyMode(isReadOnly));
+        LOGGER.debug(String.format("%s: sqlStatement = %s, scrollMode = %s, isReadOnly = %s, fetchSize= %s", method, sqlStatement, scrollMode
+                .toString(), isReadOnly, fetchSize));
+        statement = session.getConnection().createStatement(getResultSetType(scrollMode), getConcurrencyMode(isReadOnly));
         if (fetchSize.isPresent()) {
             statement.setFetchSize(fetchSize.get());
-        } else if (connection.getFactory().getJdbcFetchSize().isPresent()) {
-            statement.setFetchSize(connection.getFactory().getJdbcFetchSize().get());
+        } else if (session.getFactory().getJdbcFetchSize().isPresent()) {
+            statement.setFetchSize(session.getFactory().getJdbcFetchSize().get());
         }
         resultSet = statement.executeQuery(sqlStatement);
         LOGGER.debug(String.format("%s: statement.getFetchSize = %s", method, statement.getFetchSize()));
@@ -107,7 +105,7 @@ public class SOSHibernateResultSetProcessor implements Serializable {
         for (int i = 0; i < values.length; i++) {
             int index = where.indexOf("?");
             if (index > 0) {
-                String val = connection.getFactory().quote(types[i], values[i]);
+                String val = session.getFactory().quote(types[i], values[i]);
                 where = where.replaceFirst("\\?", val);
             }
         }
