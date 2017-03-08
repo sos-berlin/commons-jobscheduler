@@ -90,7 +90,8 @@ public class SOSHibernateFactory implements Serializable {
 		}
 	}
 
-	public SOSHibernateSession openSession(String identifier) throws Exception{
+	@SuppressWarnings("deprecation")
+    public SOSHibernateSession openSession(String identifier) throws Exception{
         SOSHibernateSession session = new SOSHibernateSession(this);
         session.setIdentifier(identifier);
         session.openSession();
@@ -101,6 +102,7 @@ public class SOSHibernateFactory implements Serializable {
 	    return openSession(this.identifier);
 	}
 	
+	@SuppressWarnings("deprecation")
 	public SOSHibernateSession openStatelessSession(String identifier) throws Exception{
         SOSHibernateSession session = new SOSHibernateSession(this);
         session.setUseOpenStatelessSession(true);
@@ -113,6 +115,7 @@ public class SOSHibernateFactory implements Serializable {
         return openStatelessSession(this.identifier);
     }
 	
+    @SuppressWarnings("deprecation")
     public SOSHibernateSession getCurrentSession(String identifier) throws Exception{
         SOSHibernateSession session = new SOSHibernateSession(this);
         session.setUseGetCurrentSession(true);

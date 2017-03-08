@@ -53,6 +53,8 @@ public class SOSHibernateSession implements Serializable {
      * @deprecated
      * 
      * use factory.openSession() or factory.openStatelessSession(); 
+     * 
+     * constructor will be set later as not public (protected)
      */
     @Deprecated
     public SOSHibernateSession(SOSHibernateFactory hibernateFactory) {
