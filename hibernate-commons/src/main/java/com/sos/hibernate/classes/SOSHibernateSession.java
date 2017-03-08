@@ -61,6 +61,7 @@ public class SOSHibernateSession implements Serializable {
         initSessionProperties();
     }
 
+    @Deprecated
     public void reconnect() throws Exception {
         String method = getMethodName("reconnect");
         try {
