@@ -193,10 +193,6 @@ public class SOSSqlCommandExtractor {
             String content = init();
             content = stripComments(content);
             commands = content.split(commandSpltter);
-
-            LOGGER.info("AAA1 = " + content);
-            LOGGER.info("AAA2 = " + commands.length);
-
         }
 
         public String[] getCommands() {
@@ -264,6 +260,7 @@ public class SOSSqlCommandExtractor {
             StringTokenizer st = new StringTokenizer(content, "\n");
             boolean addRow = true;
             boolean isVersionComment = false;
+            boolean isMySQL = this.dbms.equals(SOSHibernateFactory.Dbms.MYSQL);
             while (st.hasMoreTokens()) {
                 String row = st.nextToken().trim();
                 if (row == null || row.isEmpty()) {
@@ -275,6 +272,15 @@ public class SOSSqlCommandExtractor {
                 row = row.replaceAll("^[/][*](?s).*?[*][/][\\s]*;*", "");
                 if (row.isEmpty()) {
                     continue;
+                }
+                if (isMySQL){ 
+                    String rowUpper = row.toUpperCase();
+                    if (rowUpper.startsWith("DELIMITER")) {
+                        continue;
+                    }
+                    else if(rowUpper.startsWith("END$$;")) {
+                        row = "END;";
+                    }
                 }
                 if (row.startsWith("/*!")) {
                     String[] rowArr = row.substring(3).trim().split(" ");
