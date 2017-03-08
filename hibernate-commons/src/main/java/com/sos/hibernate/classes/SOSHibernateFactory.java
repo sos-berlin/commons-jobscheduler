@@ -93,7 +93,7 @@ public class SOSHibernateFactory implements Serializable {
 	public SOSHibernateSession openSession(String identifier) throws Exception{
         SOSHibernateSession session = new SOSHibernateSession(this);
         session.setIdentifier(identifier);
-        session.connect();
+        session.openSession();
         return session;
     }
 	
@@ -105,7 +105,7 @@ public class SOSHibernateFactory implements Serializable {
         SOSHibernateSession session = new SOSHibernateSession(this);
         session.setUseOpenStatelessSession(true);
         session.setIdentifier(identifier);
-        session.connect();
+        session.openSession();
         return session;
     }
     
@@ -117,7 +117,7 @@ public class SOSHibernateFactory implements Serializable {
         SOSHibernateSession session = new SOSHibernateSession(this);
         session.setUseGetCurrentSession(true);
         session.setIdentifier(identifier);
-        session.connect();
+        session.openSession();
         return session;
     }
     

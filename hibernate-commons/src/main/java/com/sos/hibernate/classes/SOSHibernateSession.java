@@ -65,7 +65,8 @@ public class SOSHibernateSession implements Serializable {
 			throw new Exception(String.format("%s: %s", method, ex.toString()), ex);
 		}
 	}
-
+    
+	@Deprecated
 	public void connect() throws Exception {
 		String method = getMethodName("connect");
 		try {
@@ -85,7 +86,7 @@ public class SOSHibernateSession implements Serializable {
 		useGetCurrentSession = false;
 	}
 
-	private void openSession() throws Exception {
+	protected void openSession() throws Exception {
 		String method = getMethodName("openSession");
 		
 		if(this.currentSession != null){
@@ -128,13 +129,18 @@ public class SOSHibernateSession implements Serializable {
 		return ex;
 	}
 
+	@Deprecated
 	public void disconnect() {
-		String method = getMethodName("disconnect");
-		LOGGER.debug(String.format("%s", method));
-		closeTransaction();
-		closeSession();
+		close();
 	}
 
+	public void close() {
+        String method = getMethodName("close");
+        LOGGER.debug(String.format("%s", method));
+        closeTransaction();
+        closeSession();
+    }
+	
 	public void clearSession() throws Exception {
 		String method = getMethodName("clearSession");
 		LOGGER.debug(String.format("%s", method));
