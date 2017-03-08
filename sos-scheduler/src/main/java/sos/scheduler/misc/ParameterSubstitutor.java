@@ -18,6 +18,7 @@ public class ParameterSubstitutor {
     private StrSubstitutor strSubstitutor;
     private boolean caseSensitive = false;
     private String openTag = "${";
+    private String closeTag = "}";
 
     public void setOpenTag(String openTag) {
         this.openTag = openTag;
@@ -26,8 +27,6 @@ public class ParameterSubstitutor {
     public void setCloseTag(String closeTag) {
         this.closeTag = closeTag;
     }
-
-    private String closeTag = "}";
 
     public ParameterSubstitutor() {
         super();
@@ -64,12 +63,10 @@ public class ParameterSubstitutor {
 
     public String replaceEnvVars(String source) {
         if (strSubstitutorEnv == null) {
-            if (caseSensitive) {
-                strSubstitutorEnv = new StrSubstitutor(System.getenv());
-            } else {
-                strSubstitutorEnv = new StrSubstitutor(new CaseInsensitivLookupForParameter<String>(System.getenv()));
-            }
+            strSubstitutorEnv = new StrSubstitutor(System.getenv());
         }
+        strSubstitutorEnv.setVariablePrefix(openTag);
+        strSubstitutorEnv.setVariableSuffix(closeTag);
         return strSubstitutorEnv.replace(source);
     }
 

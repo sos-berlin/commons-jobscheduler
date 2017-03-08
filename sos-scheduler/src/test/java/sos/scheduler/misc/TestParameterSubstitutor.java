@@ -19,5 +19,13 @@ public class TestParameterSubstitutor {
         File out = new File("C:/temp/1.txt");
         parameterSubstitutor.replaceInFile(in, out);
     }
+    
+    @Test
+    public void testReplaceWithEnv()  {
+        ParameterSubstitutor parameterSubstitutor = new ParameterSubstitutor();
+         
+        String s = parameterSubstitutor.replaceEnvVars("${HOMEDRIVE}");
+        assertEquals("testReplaceWithEnv", "C:", s);
 
+    }
 }
