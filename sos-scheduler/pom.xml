@@ -70,12 +70,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.sos-berlin.commons</groupId>
-			<artifactId>sos-xml</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
 			<groupId>com.sos-berlin.jobscheduler</groupId>
 			<artifactId>sos-mail</artifactId>
 			<version>${project.version}</version>
