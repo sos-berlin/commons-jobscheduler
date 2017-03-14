@@ -3,6 +3,7 @@ package sos.scheduler.command;
 import java.io.File;
 import java.io.StringReader;
 import java.net.URL;
+import java.nio.file.Paths;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -150,22 +151,22 @@ public class SOSSchedulerCommand {
     }
     
     
-    public static int getHTTPPortFromSchedulerXML(Spooler spooler)  {
+    public static int getHTTPPortFromSchedulerXML(Spooler spooler) {
         int iPort = 0;
-        try{
-        File schedulerXmlFile = new File(new File(spooler.configuration_directory()).getParent(),"scheduler.xml");
-        if (schedulerXmlFile.exists()) {
-            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            XPath xPath = XPathFactory.newInstance().newXPath();
-            Document doc = builder.parse(schedulerXmlFile);
-            String port = (String) xPath.evaluate("/spooler/config/@http_port", doc, XPathConstants.STRING);
-           
-            if (port != null && !port.isEmpty()) {
-                iPort = Integer.parseInt(port);
+        try {
+            File schedulerXmlFile = Paths.get(spooler.directory(), "config", "scheduler.xml").toFile();
+            if (schedulerXmlFile.exists()) {
+                DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                XPath xPath = XPathFactory.newInstance().newXPath();
+                Document doc = builder.parse(schedulerXmlFile);
+                String port = (String) xPath.evaluate("/spooler/config/@http_port", doc, XPathConstants.STRING);
+
+                if (port != null && !port.isEmpty()) {
+                    iPort = Integer.parseInt(port);
+                }
             }
-        }
-        return iPort;
-        }catch(Exception e){
+            return iPort;
+        } catch (Exception e) {
             return 40444;
         }
     }
