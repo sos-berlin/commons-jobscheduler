@@ -1,15 +1,8 @@
 package sos.scheduler.command;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.io.StringReader;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.Socket;
+import java.net.URL;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -21,20 +14,20 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
 import com.sos.scheduler.model.ISOSSchedulerSocket;
+import com.sos.xml.SOSXmlCommand;
 
-  
+import sos.spooler.Spooler;
+
 public class SOSSchedulerCommand {
 
+    private static final String XML_COMMAND_API_PATH = "/jobscheduler/master/api/command";
     protected ISOSSchedulerSocket objO = null;
-    private static final String SCHEDULER_DEFAULT_CHARSET = "ISO-8859-1";
     private String host = "localhost";
-    private int port = 4444;
-    private String protocol = "tcp";
-    private Socket socket = null;
-    private DatagramSocket udpSocket = null;
+    private int port = 40444;
+    private String protocol = "http";
     private int timeout = 60;
-    private BufferedReader in = null;
-    private PrintWriter out = null;
+    private SOSXmlCommand sosXmlCommand;
+    private String answer;
 
     public SOSSchedulerCommand() {
     }
@@ -86,28 +79,29 @@ public class SOSSchedulerCommand {
         return protocol;
     }
 
-    public void setProtocol(final String protocol) {
+    public void setProtocol(String protocol) {
+        if ("tcp".equalsIgnoreCase(protocol) || "udp".equals(protocol)){
+            protocol = "http";
+        }
         this.protocol = protocol;
     }
 
     public void connect(final String host, final int port) throws Exception {
+        this.host = host;
+        this.port = port;
+
         if (host == null || host.isEmpty()) {
             throw new Exception("hostname missing.");
         }
         if (port == 0) {
             throw new Exception("port missing.");
         }
-        if ("udp".equalsIgnoreCase(protocol)) {
-            udpSocket = new DatagramSocket();
-            udpSocket.connect(InetAddress.getByName(this.host), this.port);
-        } else {
-            socket = new Socket(host, port);
-            if (this.getTimeout() > 0) {
-                socket.setSoTimeout(this.getTimeout() * 1000);
-            }
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream(), SCHEDULER_DEFAULT_CHARSET));
-            out = new PrintWriter(socket.getOutputStream(), true);
-        }
+
+        URL url = new URL(protocol, host, port, XML_COMMAND_API_PATH);
+        sosXmlCommand = new SOSXmlCommand(url.toExternalForm());
+        sosXmlCommand.setConnectTimeout(timeout*1000);
+        sosXmlCommand.setReadTimeout(timeout*1000);
+
     }
 
     public void connect() throws Exception {
@@ -115,64 +109,24 @@ public class SOSSchedulerCommand {
     }
 
     public void sendRequest(String command) throws Exception {
-        if ("udp".equalsIgnoreCase(protocol)) {
-            if (command.indexOf("<?xml") == -1) {
-                command = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>" + command + "\r\n";
-            }
-            byte[] commandBytes = command.getBytes();
-            udpSocket.send(new DatagramPacket(commandBytes, commandBytes.length, InetAddress.getByName(host), port));
+
+        if (command.indexOf("<?xml") == 0) {
+            answer = sosXmlCommand.executeXMLPost(command + "\r\n");
         } else {
-            if (command.indexOf("<?xml") == 0) {
-                out.print(command + "\r\n");
-            } else {
-                out.print("<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>" + command + "\r\n");
-            }
-            out.flush();
+            answer = sosXmlCommand.executeXMLPost("<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>" + command + "\r\n");
         }
     }
 
-    public String getResponse() throws IOException, RuntimeException {
-        int b;
-        StringBuilder response = new StringBuilder();
-        if (in != null) {
-            while ((b = in.read()) != -1) {
-                if (b == 0) {
-                    break;
-                }
-                response.append((char) b);
-            }
-        }
-        return response.toString();
+    public String getResponse(){
+        return answer;
     }
 
-    public static void sendCommand(final String host, final int port, final String xmlCommand) throws Exception {
-        SOSSchedulerCommand command = null;
-        try {
-            command = new SOSSchedulerCommand();
-            command.setHost(host);
-            command.setPort(port);
-            command.setProtocol("udp");
-            command.connect();
-            command.sendRequest(xmlCommand);
-        } catch (Exception e) {
-            throw new Exception("startJob: could not start job: " + e.getMessage());
-        }
-    }
-
-    public static void addOrder(final String host, final int port, final int status, final String jobChain) throws Exception {
-        sendCommand(host, port, "<add_order job_chain=\"" + jobChain + "\" state=\"" + status + "\">" + "<params></params></add_order>");
-    }
-
-    public static void startJob(final String host, final int port, final String job) throws Exception {
-        sendCommand(host, port, "<job job=\"" + job + "\">");
-    }
-
-    public static String getResponseErrorText(final String response) throws Exception {
+    public String getResponseErrorText() throws Exception {
         String errorText = null;
-        if (response != null && !response.isEmpty()) {
+        if (answer != null && !answer.isEmpty()) {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             XPath xPath = XPathFactory.newInstance().newXPath();
-            Document doc = builder.parse(new InputSource(new StringReader(response)));
+            Document doc = builder.parse(new InputSource(new StringReader(answer)));
             errorText = (String) xPath.evaluate("/spooler/answer/ERROR/@text", doc, XPathConstants.STRING);
         }
         return errorText;
@@ -194,23 +148,62 @@ public class SOSSchedulerCommand {
         }
         return iPort;
     }
-
-    public void disconnect() throws Exception {
-        if (socket != null) {
-            socket.close();
+    
+    
+    public static int getHTTPPortFromSchedulerXML(Spooler spooler)  {
+        int iPort = 0;
+        try{
+        File schedulerXmlFile = new File(new File(spooler.configuration_directory()).getParent(),"scheduler.xml");
+        if (schedulerXmlFile.exists()) {
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            XPath xPath = XPathFactory.newInstance().newXPath();
+            Document doc = builder.parse(schedulerXmlFile);
+            String port = (String) xPath.evaluate("/spooler/config/@http_port", doc, XPathConstants.STRING);
+           
+            if (port != null && !port.isEmpty()) {
+                iPort = Integer.parseInt(port);
+            }
         }
-        if (in != null) {
-            in.close();
+        return iPort;
+        }catch(Exception e){
+            return 40444;
         }
-        if (out != null) {
-            out.close();
+    }
+    
+    public static void sendCommand(final String host, final int port, final String xmlCommand) throws Exception {
+        SOSSchedulerCommand command = null;
+        try {
+            command = new SOSSchedulerCommand(host,port);
+            command.connect();
+            command.sendRequest(xmlCommand);
+        } catch (Exception e) {
+            throw new Exception(String.format("sendCommand: could not sendCommand %s to %s:%s --> %s",xmlCommand,host,port + e.getMessage()));
         }
     }
 
+    public static void addOrder(final String host, final int port, final int status, final String jobChain) throws Exception {
+        sendCommand(host, port, "<add_order job_chain=\"" + jobChain + "\" state=\"" + status + "\">" + "<params></params></add_order>");
+    }
+
+    public static void startJob(final String host, final int port, final String job) throws Exception {
+        sendCommand(host, port, "<job job=\"" + job + "\">");
+    }
+
+    public static String getResponseErrorText(final String response) throws Exception {
+        String errorText = null;
+        if (response != null && !response.isEmpty()) {
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            XPath xPath = XPathFactory.newInstance().newXPath();
+            Document doc = builder.parse(new InputSource(new StringReader(response)));
+            errorText = (String) xPath.evaluate("/spooler/answer/ERROR/@text", doc, XPathConstants.STRING);
+        }
+        return errorText;
+    }
+    public void disconnect() throws Exception {}
+
     public static void main(final String[] args) throws Exception {
-        final String USAGE =
-                "\nUsage: java -cp com.sos.scheduler-xxx.jar:log4j-xxx.jar sos.scheduler.command.SOSSchedulerCommand"
-                        + "  -host <host> -port <port> [-timeout <timeout>]  \"<xml-command>\"";
+        final String USAGE = "\nUsage: java -cp com.sos.scheduler-xxx.jar:log4j-xxx.jar sos.scheduler.command.SOSSchedulerCommand"
+                + "  -host <host> -port <port> [-timeout <timeout>]  \"<xml-command>\"";
         String host = "localhost";
         String command = null;
         String schedulerXml = null;
@@ -279,13 +272,13 @@ public class SOSSchedulerCommand {
             System.err.println(USAGE);
             System.exit(2);
         }
-        SOSSchedulerCommand socket = null;
+        SOSSchedulerCommand sosSchedulerCommand = null;
         try {
-            socket = new SOSSchedulerCommand();
-            socket.setTimeout(timeout);
-            socket.connect(host, port);
-            socket.sendRequest(command);
-            String response = socket.getResponse();
+            sosSchedulerCommand = new SOSSchedulerCommand();
+            sosSchedulerCommand.setTimeout(timeout);
+            sosSchedulerCommand.connect(host, port);
+            sosSchedulerCommand.sendRequest(command);
+            String response = sosSchedulerCommand.getResponse();
             System.out.println(response);
             try {
                 if (command.contains("<modify_spooler") && command.contains("abort_immediately")) {
@@ -293,7 +286,7 @@ public class SOSSchedulerCommand {
                 } else if (response == null || response.isEmpty()) {
                     errorText = String.format("No response from JobScheduler [%1$s:%2$d]: Please check the security settings", host, port);
                 } else {
-                    errorText = SOSSchedulerCommand.getResponseErrorText(response);
+                    errorText = sosSchedulerCommand.getResponseErrorText();
                 }
                 if (errorText != null && !errorText.isEmpty()) {
                     System.err.println(errorText);
@@ -306,8 +299,8 @@ public class SOSSchedulerCommand {
             System.err.println(String.format("%1$s [%2$s:%3$d]", e.getMessage(), host, port));
             rc = 3;
         } finally {
-            if (socket != null) {
-                socket.disconnect();
+            if (sosSchedulerCommand != null) {
+                sosSchedulerCommand.disconnect();
             }
         }
         System.exit(rc);

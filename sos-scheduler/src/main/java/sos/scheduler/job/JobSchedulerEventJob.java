@@ -81,21 +81,24 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
     private Iterator<Object> eventHandlerResultFileListIterator = null;
     private int socket_timeout = 5;
     private ParameterSubstitutor parameterSubstitutor;
+    private int httpPort;
 
     @Override
     public boolean spooler_init() {
+        try {
+            httpPort = SOSSchedulerCommand.getHTTPPortFromSchedulerXML(spooler);
+        } catch (Exception e) {
+            getLogger().debug3("could not read http port from scheduler.xml");
+        }
+
         boolean rc = super.spooler_init();
         EnvironmentCheck ec = new EnvironmentCheck();
         StringWriter sWri = new StringWriter();
         PrintWriter pWri = new PrintWriter(sWri);
         ec.checkEnvironment(pWri);
         pWri.close();
-        try {
-            getLogger().debug3("Checking Xalan environment...");
-            getLogger().debug3(sWri.toString());
-        } catch (Exception ex) {
-            //
-        }
+        getLogger().debug3("Checking Xalan environment...");
+        getLogger().debug3(sWri.toString());
         return rc;
     }
 
@@ -456,7 +459,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
             if (actionEventHandler.exists() && actionEventHandler.canRead()) {
                 erg = true;
                 this.getLogger().debug1(".. analysing action event handler: " + actionEventHandler.getCanonicalPath());
-                SOSEvaluateEvents eval = new SOSEvaluateEvents(spooler.hostname(), spooler.tcp_port());
+                SOSEvaluateEvents eval = new SOSEvaluateEvents(spooler.hostname(), httpPort);
                 try {
                     eval.setActiveEvents(this.getEvents());
                     eval.readConfigurationFile(actionEventHandler);
@@ -683,8 +686,8 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
                         Node command = commands.item(i);
                         NamedNodeMap commandAttributes = command.getAttributes();
                         String commandHost = spooler.hostname();
-                        String commandPort = Integer.toString(spooler.tcp_port());
-                        String commandProtocol = "tcp";
+                        String commandPort = Integer.toString(httpPort);
+                        String commandProtocol = "http";
                         for (int j = 0; j < commandAttributes.getLength(); j++) {
                             if ("scheduler_host".equals(commandAttributes.item(j).getNodeName())
                                     && !commandAttributes.item(j).getNodeValue().isEmpty()) {

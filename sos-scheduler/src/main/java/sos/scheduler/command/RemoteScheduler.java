@@ -1,29 +1,24 @@
 package sos.scheduler.command;
 
-/** @Deprecated use SOSJobSchedulerModel */
-@Deprecated
-public class RemoteScheduler {
+ public class RemoteScheduler {
 
     private String host;
-    private int tcpPort;
-    private int udpPort;
+    private int port;
 
     public RemoteScheduler(final String host, final int tcpPort) {
         this.host = host;
-        this.tcpPort = tcpPort;
+        this.port = tcpPort;
     }
 
     public RemoteScheduler(final String host, final int tcpPort, final int udpPort) {
         this.host = host;
-        this.tcpPort = tcpPort;
-        this.udpPort = udpPort;
+        this.port = tcpPort;
     }
 
     public String sendCommand(final String command) throws Exception {
         SOSSchedulerCommand schedulerCommand = new SOSSchedulerCommand();
-        schedulerCommand.setHost(getHost());
-        schedulerCommand.setPort(getTcpPort());
-        schedulerCommand.setProtocol("tcp");
+        schedulerCommand.setHost(host);
+        schedulerCommand.setPort(port);
         try {
             schedulerCommand.connect();
             schedulerCommand.sendRequest(command);
@@ -31,12 +26,6 @@ public class RemoteScheduler {
             return response;
         } catch (Exception e) {
             throw new Exception("Error contacting remote Job Scheduler " + this + ": " + e, e);
-        } finally {
-            try {
-                schedulerCommand.disconnect();
-            } catch (Exception ex) {
-                //
-            }
         }
     }
 
@@ -44,28 +33,13 @@ public class RemoteScheduler {
         return host;
     }
 
-    public void setHost(final String host) {
-        this.host = host;
+     
+    public int getPort() {
+        return port;
     }
-
-    public int getTcpPort() {
-        return tcpPort;
-    }
-
-    public void setTcpPort(final int tcpPort) {
-        this.tcpPort = tcpPort;
-    }
-
-    public int getUdpPort() {
-        return udpPort;
-    }
-
-    public void setUdpPort(final int udpPort) {
-        this.udpPort = udpPort;
-    }
-
+  
     public String toString() {
-        return host + ":" + tcpPort;
+        return "http://" + host + ":" + port;
     }
 
 }

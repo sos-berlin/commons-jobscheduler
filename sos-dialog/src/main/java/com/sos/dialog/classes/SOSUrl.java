@@ -8,7 +8,7 @@ public class SOSUrl {
 
     private static final Logger LOGGER = Logger.getLogger(SOSUrl.class);
     private static final String DEFAULT_PROTOCOL = "http";
-    private static final int DEFAULT_PORT = 4444;
+    private static final int DEFAULT_PORT = 40444;
     private static final String DEFAULT_HOST = "localhost";
     private URL url;
     private String urlValue;

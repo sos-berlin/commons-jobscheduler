@@ -22,7 +22,6 @@ import sos.spooler.Job_chain;
 import sos.spooler.Job_impl;
 import sos.spooler.Order;
 import sos.spooler.Variable_set;
-import sos.util.SOSSchedulerLogger;
 
 /** @author Uwe Risse */
 public class SOSMailReadInbox extends Job_impl {
@@ -81,9 +80,11 @@ public class SOSMailReadInbox extends Job_impl {
     private Variable_set params;
     private Pattern subjectPattern;
     private Pattern bodyPattern;
+    private int httpPort;
 
     @Override
     public boolean spooler_init() throws Exception {
+        httpPort = SOSSchedulerCommand.getHTTPPortFromSchedulerXML(spooler);
         params = spooler_task.params();
         mailHost = getParams("mail_host", "");
         spooler_log.debug3(".. current setting [mail_host]: " + mailHost);

@@ -29,7 +29,7 @@ public class SOSSearchFilter {
     private boolean enableFilterCheckbox = false;
     private Shell dialogShell;
     private Button btnFilter;
-    final int conDefaultPort = 4444;
+    final int conDefaultPort = 40444;
     Composite parent;
 
     public SOSSearchFilter(Shell parentShell) {
