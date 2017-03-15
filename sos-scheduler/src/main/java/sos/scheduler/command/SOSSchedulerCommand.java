@@ -2,6 +2,7 @@ package sos.scheduler.command;
 
 import java.io.File;
 import java.io.StringReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Paths;
 
@@ -151,23 +152,13 @@ public class SOSSchedulerCommand {
     }
     
     
-    public static int getHTTPPortFromSchedulerXML(Spooler spooler) {
-        int iPort = 0;
+    public static int getHTTPPortFromScheduler (Spooler spooler) {
+        URL url;
         try {
-            File schedulerXmlFile = Paths.get(spooler.directory(), "config", "scheduler.xml").toFile();
-            if (schedulerXmlFile.exists()) {
-                DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-                XPath xPath = XPathFactory.newInstance().newXPath();
-                Document doc = builder.parse(schedulerXmlFile);
-                String port = (String) xPath.evaluate("/spooler/config/@http_port", doc, XPathConstants.STRING);
-
-                if (port != null && !port.isEmpty()) {
-                    iPort = Integer.parseInt(port);
-                }
-            }
-            return iPort;
-        } catch (Exception e) {
-            return 40444;
+            url = new URL(spooler.uri());
+            return url.getPort();
+        } catch (MalformedURLException e) {
+             return 40444;
         }
     }
     

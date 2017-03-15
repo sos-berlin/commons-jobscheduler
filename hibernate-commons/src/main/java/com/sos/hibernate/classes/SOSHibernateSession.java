@@ -487,14 +487,9 @@ public class SOSHibernateSession implements Serializable {
         } else {
             StatelessSession session = ((StatelessSession) currentSession);
             /*
-             * The following error will always be logged in the try segment, if the item id field is null: 
-             * SQL Error: -1, SQLState: 07004
-             * Parameter at position 9 is not set
-             * HHH000010: On release of batch it still contained JDBC statements 
-             * 
-             * in a stateless session it is better to check if the item is a new
-             * entry and then call save() or an existing item and then call update() 
-             * there is no need to create an error to switch the statement afterwards
+             * The following error will always be logged in the try segment, if the item id field is null: SQL Error: -1, SQLState: 07004 Parameter at position
+             * 9 is not set HHH000010: On release of batch it still contained JDBC statements in a stateless session it is better to check if the item is a new
+             * entry and then call save() or an existing item and then call update() there is no need to create an error to switch the statement afterwards
              */
             try {
                 session.update(item);

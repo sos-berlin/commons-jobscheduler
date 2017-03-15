@@ -29,13 +29,13 @@ public abstract class SOSHibernateIntervalDBLayer extends SOSHibernateDBLayer {
             to.add(GregorianCalendar.DAY_OF_YEAR, -interval);
             this.getFilter().setIntervalFrom(null);
             this.getFilter().setIntervalTo(to.getTime());
-            this.getConnection().beginTransaction();
+            this.getSession().beginTransaction();
             deleted = deleteInterval();
-            this.getConnection().commit();
+            this.getSession().commit();
 
         } else {
-            if (connection == null) {
-                this.getConnection().beginTransaction();
+            if (sosHibernateSession == null) {
+                this.getSession().beginTransaction();
             }
             if (interval > 0) {
                 GregorianCalendar to = new GregorianCalendar();
@@ -48,7 +48,7 @@ public abstract class SOSHibernateIntervalDBLayer extends SOSHibernateDBLayer {
                 int i = 0;
                 while (dbitemEntries.hasNext()) {
                     DbItem h = (DbItem) dbitemEntries.next();
-                    connection.delete(h);
+                    sosHibernateSession.delete(h);
                     this.onAfterDeleting(h);
                     deleted = deleted + 1;
                     i = i + 1;
@@ -56,7 +56,7 @@ public abstract class SOSHibernateIntervalDBLayer extends SOSHibernateDBLayer {
                         i = 0;
                     }
                 }
-                this.getConnection().commit();
+                this.getSession().commit();
             }
         }
         return deleted;

@@ -25,8 +25,8 @@ public class LoggingEventExceptionDBLayer extends SOSHibernateDBLayer {
 
     private Query setQueryParams(String hql) throws Exception {
         Query query = null;
-        connection.beginTransaction();
-        query = connection.createQuery(hql);
+        sosHibernateSession.beginTransaction();
+        query = sosHibernateSession.createQuery(hql);
         if (filter.getEventId() != null) {
             query.setLong(EVENT_ID, filter.getEventId());
         }

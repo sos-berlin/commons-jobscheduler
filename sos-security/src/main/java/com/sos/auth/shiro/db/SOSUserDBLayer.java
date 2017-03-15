@@ -27,8 +27,8 @@ public class SOSUserDBLayer extends SOSHibernateDBLayer {
         String hql = "delete from SOSUserDBItem " + getWhere();
         Query query = null;
         int row = 0;
-        connection.beginTransaction();
-        query = connection.createQuery(hql);
+        sosHibernateSession.beginTransaction();
+        query = sosHibernateSession.createQuery(hql);
         if (filter.getUserName() != null && !filter.getUserName().equals("")) {
             query.setParameter("sosUserName", filter.getUserName());
         }
@@ -52,8 +52,8 @@ public class SOSUserDBLayer extends SOSHibernateDBLayer {
     @SuppressWarnings("unchecked")
     public List<SOSUserDBItem> getSOSUserList(final int limit) throws Exception {
         List<SOSUserDBItem> sosUserList = null;
-        connection.beginTransaction();
-        Query query = connection.createQuery("from SOSUserDBItem " + getWhere() + filter.getOrderCriteria() + filter.getSortMode());
+        sosHibernateSession.beginTransaction();
+        Query query = sosHibernateSession.createQuery("from SOSUserDBItem " + getWhere() + filter.getOrderCriteria() + filter.getSortMode());
         if (filter.getUserName() != null && !filter.getUserName().equals("")) {
             query.setParameter("sosUserName", filter.getUserName());
         }

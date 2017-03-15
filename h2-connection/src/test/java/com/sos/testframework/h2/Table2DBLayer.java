@@ -20,8 +20,8 @@ public class Table2DBLayer extends SOSHibernateDBLayer {
 
     private Query setQueryParams(Table2Filter filter, String hql) throws Exception {
         Query query = null;
-        getConnection().beginTransaction();
-        query = getConnection().createQuery(hql);
+        getSession().beginTransaction();
+        query = getSession().createQuery(hql);
         if (filter.getName() != null) {
             query.setParameter(FIELD1, filter.getName());
         }
@@ -51,10 +51,10 @@ public class Table2DBLayer extends SOSHibernateDBLayer {
     public long addRecord(String name) throws Exception {
         Table2DBItem record = new Table2DBItem();
         record.setName(name);
-        this.getConnection().connect();
-        this.getConnection().beginTransaction();
-        this.getConnection().saveOrUpdate(record);
-        this.getConnection().commit();
+        this.getSession().connect();
+        this.getSession().beginTransaction();
+        this.getSession().saveOrUpdate(record);
+        this.getSession().commit();
         return record.getId();
     }
 

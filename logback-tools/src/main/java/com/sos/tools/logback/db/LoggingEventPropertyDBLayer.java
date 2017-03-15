@@ -29,8 +29,8 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
 
     private Query setQueryParams(String hql) throws Exception {
         Query query = null;
-        connection.beginTransaction();
-        query = connection.createQuery(hql);
+        sosHibernateSession.beginTransaction();
+        query = sosHibernateSession.createQuery(hql);
         if (filter.getEventId() != null) {
             query.setLong(EVENT_ID, filter.getEventId());
         }
@@ -131,9 +131,9 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
 
     public int delete(Long eventId) throws Exception {
         LoggingEventDBLayer eventLayer = new LoggingEventDBLayer(getConfigurationFileName());
-        connection.beginTransaction();
-        connection.delete(eventId);
-        connection.commit();
+        sosHibernateSession.beginTransaction();
+        sosHibernateSession.delete(eventId);
+        sosHibernateSession.commit();
         filter = new LoggingEventPropertyFilter();
         filter.setOrderCriteria(EVENT_ID);
         filter.setEventId(eventId);
@@ -152,11 +152,11 @@ public class LoggingEventPropertyDBLayer extends SOSHibernateDBLayer {
 
     public void delete(String mappedKey, String mappedValue, String loggerName) throws Exception {
         List<LoggingEventPropertyDBItem> records = getListOfPropertyDBItems(mappedKey, mappedValue, loggerName);
-        connection.beginTransaction();
+        sosHibernateSession.beginTransaction();
         for (LoggingEventPropertyDBItem item : records) {
-            connection.delete(item);
+            sosHibernateSession.delete(item);
         }
-        connection.commit();
+        sosHibernateSession.commit();
     }
 
 }

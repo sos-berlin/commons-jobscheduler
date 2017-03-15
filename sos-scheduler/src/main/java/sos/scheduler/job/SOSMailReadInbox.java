@@ -84,7 +84,7 @@ public class SOSMailReadInbox extends Job_impl {
 
     @Override
     public boolean spooler_init() throws Exception {
-        httpPort = SOSSchedulerCommand.getHTTPPortFromSchedulerXML(spooler);
+        httpPort = SOSSchedulerCommand.getHTTPPortFromScheduler(spooler);
         params = spooler_task.params();
         mailHost = getParams("mail_host", "");
         spooler_log.debug3(".. current setting [mail_host]: " + mailHost);

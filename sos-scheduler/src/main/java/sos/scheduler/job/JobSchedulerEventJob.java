@@ -86,7 +86,7 @@ public class JobSchedulerEventJob extends JobSchedulerJob {
     @Override
     public boolean spooler_init() {
         try {
-            httpPort = SOSSchedulerCommand.getHTTPPortFromSchedulerXML(spooler);
+            httpPort = SOSSchedulerCommand.getHTTPPortFromScheduler(spooler);
         } catch (Exception e) {
             getLogger().debug3("could not read http port from scheduler.xml");
         }

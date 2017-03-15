@@ -62,9 +62,9 @@ public class JadeFilesHistoryDBLayer extends SOSHibernateIntervalDBLayer impleme
         }
 
         try {
-            this.getConnection().connect();
-            this.getConnection().beginTransaction();
-            return (JadeFilesHistoryDBItem) ((Session) this.getConnection().getCurrentSession()).get(JadeFilesHistoryDBItem.class, guid);
+            this.getSession().connect();
+            this.getSession().beginTransaction();
+            return (JadeFilesHistoryDBItem) ((Session) this.getSession().getCurrentSession()).get(JadeFilesHistoryDBItem.class, guid);
         } catch (Exception e) {
             return null;
         }
@@ -417,9 +417,9 @@ public class JadeFilesHistoryDBLayer extends SOSHibernateIntervalDBLayer impleme
         filter.setCreatedTo(to);
         List<DbItem> resultset = null;
         try {
-            connection.connect();
-            connection.beginTransaction();
-            Query query = connection.createQuery("  from JadeFilesHistoryDBItem " + getWhere());
+            sosHibernateSession.connect();
+            sosHibernateSession.beginTransaction();
+            Query query = sosHibernateSession.createQuery("  from JadeFilesHistoryDBItem " + getWhere());
             if (filter.getCreatedFrom() != null) {
                 query.setTimestamp("createdFrom", filter.getCreatedFrom());
             }
@@ -438,9 +438,9 @@ public class JadeFilesHistoryDBLayer extends SOSHibernateIntervalDBLayer impleme
     public List<JadeFilesHistoryDBItem> getFilesHistoryById(Long sosftpId) throws ParseException {
         List<JadeFilesHistoryDBItem> resultset = null;
         try {
-            connection.connect();
-            connection.beginTransaction();
-            Query query = connection.createQuery("  from JadeFilesHistoryDBItem where sosftpId=:sosftpId");
+            sosHibernateSession.connect();
+            sosHibernateSession.beginTransaction();
+            Query query = sosHibernateSession.createQuery("  from JadeFilesHistoryDBItem where sosftpId=:sosftpId");
             query.setLong("sosftpId", sosftpId);
             resultset = query.list();
         } catch (Exception e) {
@@ -453,9 +453,9 @@ public class JadeFilesHistoryDBLayer extends SOSHibernateIntervalDBLayer impleme
     public JadeFilesDBItem getJadeFileItemById(Long sosftpId) throws ParseException {
         List<JadeFilesDBItem> resultset = null;
         try {
-            connection.connect();
-            connection.beginTransaction();
-            Query query = connection.createQuery("  from JadeFilesDBItem where id=:sosftpId");
+            sosHibernateSession.connect();
+            sosHibernateSession.beginTransaction();
+            Query query = sosHibernateSession.createQuery("  from JadeFilesDBItem where id=:sosftpId");
             query.setLong("sosftpId", sosftpId);
             resultset = query.list();
         } catch (Exception e) {
@@ -469,9 +469,9 @@ public class JadeFilesHistoryDBLayer extends SOSHibernateIntervalDBLayer impleme
     public List<JadeFilesHistoryDBItem> getHistoryFiles() throws ParseException {
         List<JadeFilesHistoryDBItem> resultset = null;
         try {
-            connection.connect();
-            connection.beginTransaction();
-            Query query = connection.createQuery("  from JadeFilesHistoryDBItem history " + getWhere());
+            sosHibernateSession.connect();
+            sosHibernateSession.beginTransaction();
+            Query query = sosHibernateSession.createQuery("  from JadeFilesHistoryDBItem history " + getWhere());
             setWhere(query);
             resultset = query.list();
         } catch (HibernateException e) {
@@ -487,9 +487,9 @@ public class JadeFilesHistoryDBLayer extends SOSHibernateIntervalDBLayer impleme
     public List<JadeFilesHistoryDBItem> getHistoryFilesOrderedByTimestamp() throws ParseException {
         List<JadeFilesHistoryDBItem> resultset = null;
         try {
-            connection.connect();
-            connection.beginTransaction();
-            Query query = connection.createQuery("  from JadeFilesHistoryDBItem history " + getWhere() + " order by transferTimestamp desc");
+            sosHibernateSession.connect();
+            sosHibernateSession.beginTransaction();
+            Query query = sosHibernateSession.createQuery("  from JadeFilesHistoryDBItem history " + getWhere() + " order by transferTimestamp desc");
             setWhere(query);
             resultset = query.list();
         } catch (Exception e) {
