@@ -47,23 +47,20 @@ public class SOSHibernateSession implements Serializable {
     private String openSessionMethodName;
     public static final int LIMIT_IN_CLAUSE = 1000;
 
-    /** @deprecated
-     * 
-     *             use factory.openSession() or factory.openStatelessSession();
-     * 
-     *             constructor will be set later as not public (protected) */
-    @Deprecated
-    public SOSHibernateSession(SOSHibernateFactory hibernateFactory) {
+    /** 
+     *use factory.openSession() or factory.openStatelessSession();
+     *
+     */
+    protected SOSHibernateSession(SOSHibernateFactory hibernateFactory) {
         this.factory = hibernateFactory;
     }
 
-    @Deprecated
-    public void reconnect() throws Exception {
-        String method = getMethodName("reconnect");
+    public void reopen() throws Exception {
+        String method = getMethodName("reopen");
         try {
             LOGGER.info(String.format("%s: useOpenStatelessSession = %s", method, useOpenStatelessSession));
-            disconnect();
-            connect();
+            closeSession();
+            openSession();
         } catch (Exception ex) {
             throw new Exception(String.format("%s: %s", method, ex.toString()), ex);
         }
