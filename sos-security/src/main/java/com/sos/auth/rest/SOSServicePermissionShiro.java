@@ -428,6 +428,8 @@ public class SOSServicePermissionShiro {
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:schedule:change");
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:schedule:modify_hot_folder");
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:lock:view:configuration");
+         
+            addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:lock:view:status");
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:lock:view:status");
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:lock:modify_hot_folder");
             addPermission(sosPermissionJoc.getSOSPermission(), "sos:products:joc_cockpit:event:view:status");
@@ -454,6 +456,7 @@ public class SOSServicePermissionShiro {
             sosPermissions.setSOSPermissionListJoc(sosPermissionJoc);
             SOSPermissionListCommands sosPermissionCommands = o.createSOSPermissionListCommands();
             addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:view:status");
+            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:view:calendar");
             addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:view:parameter");
             addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:execute:restart:terminate");
             addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:jobscheduler_master:execute:restart:abort");
@@ -511,6 +514,8 @@ public class SOSServicePermissionShiro {
             addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:schedule:add_substitute");
             addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:schedule:modify_hot_folder");
             addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:lock:view:status");
+            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:lock:remove");
+            
 
             sosPermissions.setSOSPermissionListCommands(sosPermissionCommands);
 
@@ -715,6 +720,8 @@ public class SOSServicePermissionShiro {
             sosPermissionCommands.setAccessToken(currentUser.getAccessToken());
             sosPermissionCommands.setUser(currentUser.getUsername());
 
+            sosPermissionCommands.setDailyPlan(o.createSOSPermissionCommandsDailyPlan());
+            sosPermissionCommands.getDailyPlan().setView(o.createSOSPermissionCommandsDailyPlanView());
             sosPermissionCommands.setJobschedulerMaster(o.createSOSPermissionCommandsJobschedulerMaster());
             sosPermissionCommands.setJobschedulerMasterCluster(o.createSOSPermissionCommandsJobschedulerMasterCluster());
             sosPermissionCommands.setHistory(o.createSOSPermissionCommandsHistory());
@@ -750,6 +757,8 @@ public class SOSServicePermissionShiro {
             sosPermissionCommands.getJobschedulerMasterCluster().setTerminateFailSafe(haveRight("sos:products:commands:jobscheduler_master_cluster:execute:terminate_fail_safe"));
             sosPermissionCommands.getJobschedulerMasterCluster().setRestart(haveRight("sos:products:commands:jobscheduler_master_cluster:execute:restart"));
             sosPermissionCommands.getJobschedulerMasterCluster().setTerminate(haveRight("sos:products:commands:jobscheduler_master_cluster:execute:terminate"));
+
+            sosPermissionCommands.getDailyPlan().getView().setStatus(haveRight("sos:products:commands:jobscheduler_master:view:calendar"));
 
             sosPermissionCommands.getHistory().setView(haveRight("sos:products:commands:history:view"));
 
@@ -801,6 +810,7 @@ public class SOSServicePermissionShiro {
             sosPermissionCommands.getSchedule().setModifyHotFolder(haveRight("sos:products:commands:schedule:modify_hot_folder"));
 
             sosPermissionCommands.getLock().getView().setStatus(haveRight("sos:products:commands:lock:view:status"));
+            sosPermissionCommands.getLock().setRemove(haveRight("sos:products:commands:lock:remove"));
             sosPermissionCommands.getLock().setModifyHotFolder(haveRight("sos:products:commands:lock:modify_hot_folder"));
         }
         return sosPermissionCommands;
