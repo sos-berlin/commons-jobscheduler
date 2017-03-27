@@ -906,12 +906,15 @@ public class SOSServicePermissionShiro {
             error.setMessage("The Header Authorization with the Base64 encoded authorization string is missing");
             throw new JocException(error);
         }
-
-        String[] authorizationParts = authorization.split(":");
-        if (authorizationParts.length == 2) {
-            user = authorizationParts[0];
-            pwd = authorizationParts[1];
+        
+        int idx = authorization.indexOf(':');
+        if (idx == -1) {
+           user = authorization;
+        }else{
+            user = authorization.substring(0, idx);
+            pwd = authorization.substring(idx + 1);
         }
+
         return new SOSShiroCurrentUser(user, pwd, authorization);
     }
 
