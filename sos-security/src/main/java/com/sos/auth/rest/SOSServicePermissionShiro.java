@@ -488,6 +488,7 @@ public class SOSServicePermissionShiro {
             addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:order:delete");
             addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:job_chain:view:status");
             addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:job_chain:execute:stop");
+            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:job_chain:remove");           
             addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:job_chain:execute:unstop");
             addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:job_chain:execute:add_order");
             addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:job_chain:execute:skip_jobchain_node");
@@ -786,6 +787,7 @@ public class SOSServicePermissionShiro {
             sosPermissionCommands.getJobChain().setProcessJobChainNode(haveRight("sos:products:commands:job_chain:execute:process_jobchain_node"));
             sosPermissionCommands.getJobChain().setStopJobChainNode(haveRight("sos:products:commands:job_chain:execute:stop_jobchain_node"));
             sosPermissionCommands.getJobChain().setModifyHotFolder(haveRight("sos:products:commands:job_chain:change:hot_folder"));
+            sosPermissionCommands.getJobChain().setRemove(haveRight("sos:products:commands:job_chain:remove"));
 
             sosPermissionCommands.getJob().getView().setStatus(haveRight("sos:products:commands:job:view:status"));
             sosPermissionCommands.getJob().setSetRunTime(haveRight("sos:products:commands:job:change:run_time"));
