@@ -57,7 +57,7 @@ public class SOSFTPOptions extends SOSFtpOptionsSuperClass {
     public static final String conSystemPropertyFILE_SEPARATOR = "file.separator";
     public static final String conOperationRECEIVE = "receive";
     public boolean flgCumulativeTargetDeleted = false;
-
+ 
     private final Map<String, String> includeDirectives = new HashMap<String, String>() {
 
         private static final long serialVersionUID = 1L;
