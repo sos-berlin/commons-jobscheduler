@@ -598,6 +598,18 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     public void setCreateOrdersForAllFiles(final SOSOptionBoolean pCreateOrdersForAllFiles) {
         createOrdersForAllFiles = pCreateOrdersForAllFiles;
     }
+    @JSOptionDefinition(name = "create_orders_for_new_files", description = "Create a file-order for each new file in the result-list", 
+            key = "create_orders_for_new_files", type = "SOSOptionBoolean", mandatory = false)
+    public SOSOptionBoolean createOrdersForNewFiles = new SOSOptionBoolean(this, CLASSNAME + ".create_orders_for_new_files", 
+            "Create a file-order for each new file in the result-list", "false", "false", false);
+
+    public SOSOptionBoolean getCreateOrdersForNewFiles() {
+        return createOrdersForNewFiles;
+    }
+
+    public void setCreateOrdersForNewFiles(final SOSOptionBoolean pCreateOrdersForNewFiles) {
+        createOrdersForNewFiles = pCreateOrdersForNewFiles;
+    }
 
     @JSOptionDefinition(name = "expected_size_of_result_set", description = "number of expected hits in result-list", 
             key = "expected_size_of_result_set", type = "SOSOptionInteger", mandatory = false)
