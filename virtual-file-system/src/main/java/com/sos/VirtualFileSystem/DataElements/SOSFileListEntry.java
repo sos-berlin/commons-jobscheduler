@@ -928,10 +928,11 @@ public class SOSFileListEntry extends SOSVfsMessageCodes implements Runnable, IJ
                 LOGGER.debug(strM);
                 JADE_REPORT_LOGGER.info(strM);
             }
-            if (objOptions.isDoNotOverwrite()) {
-                flgFileExists = objTargetFile.fileExists();
-                if (flgFileExists) {
-                    this.setTargetFileAlreadyExists(true);
+
+            flgFileExists = objTargetFile.fileExists();
+            if (flgFileExists) {
+                this.setTargetFileAlreadyExists(true);
+                if (objOptions.isDoNotOverwrite()) {
                     LOGGER.debug(SOSVfs_E_228.params(strTargetFileName));
                     this.setNotOverwritten();
                 }
