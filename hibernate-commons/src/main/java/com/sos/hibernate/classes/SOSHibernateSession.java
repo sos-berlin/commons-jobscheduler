@@ -13,7 +13,6 @@ import java.util.regex.Pattern;
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
@@ -281,37 +280,7 @@ public class SOSHibernateSession implements Serializable {
         }
         return q;
     }
-
-    /** @deprecated
-     * 
-     *             use createNativeQuery */
-    @Deprecated
-    public SQLQuery<?> createSQLQuery(String query) throws Exception {
-        return createSQLQuery(query, null);
-    }
-
-    /** @deprecated
-     * 
-     *             use createNativeQuery */
-    @Deprecated
-    public SQLQuery<?> createSQLQuery(String query, Class<?> entityClass) throws Exception {
-        String method = getMethodName("createSQLQuery");
-        LOGGER.debug(String.format("%s: query = %s", method, query));
-        if (currentSession == null) {
-            throw new DBSessionException("currentSession is NULL");
-        }
-        SQLQuery<?> q = null;
-        if (currentSession instanceof Session) {
-            q = ((Session) currentSession).createSQLQuery(query);
-        } else {
-            q = ((StatelessSession) currentSession).createSQLQuery(query);
-        }
-        if (q != null && entityClass != null) {
-            q.addEntity(entityClass);
-        }
-        return q;
-    }
-
+   
     @Deprecated
     public Criteria createCriteria(Class<?> cl, String alias) throws Exception {
         String method = getMethodName("createCriteria");
