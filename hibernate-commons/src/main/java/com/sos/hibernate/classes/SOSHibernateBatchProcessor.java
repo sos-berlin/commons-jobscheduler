@@ -76,13 +76,13 @@ public class SOSHibernateBatchProcessor implements Serializable {
         StringBuilder sql = new StringBuilder("insert into " + t.name() + " (");
         StringBuilder sqlFields = new StringBuilder();
         if (identifier != null && sequenceNextValString != null) {
-            sqlFields.append(session.getFactory().quoteFieldName(identifier));
+            sqlFields.append(session.getFactory().quoteColumn(identifier));
         }
         for (Map.Entry<String, Method> entry : fieldsMap.entrySet()) {
             if (!sqlFields.toString().isEmpty()) {
                 sqlFields.append(",");
             }
-            sqlFields.append(session.getFactory().quoteFieldName(entry.getKey()));
+            sqlFields.append(session.getFactory().quoteColumn(entry.getKey()));
         }
         sql.append(sqlFields);
         sql.append(") values (");

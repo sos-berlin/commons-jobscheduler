@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
@@ -16,7 +15,6 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.exception.SQLGrammarException;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.type.NumericBooleanType;
 import org.hibernate.type.StringType;
@@ -384,7 +382,7 @@ public class SOSHibernateFactory implements Serializable {
         return null;
     }
 
-    public String quoteFieldName(String columnName) {
+    public String quoteColumn(String columnName) {
         if (dialect != null && columnName != null) {
             String[] arr = columnName.split("\\.");
             if (arr.length == 1) {
