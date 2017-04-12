@@ -6,7 +6,9 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,6 +35,8 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.exception.DBSessionException;
 
+import sos.util.SOSDate;
+
 public class SOSHibernateSession implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -46,10 +50,7 @@ public class SOSHibernateSession implements Serializable {
     private String openSessionMethodName;
     public static final int LIMIT_IN_CLAUSE = 1000;
 
-    /** 
-     *use factory.openSession() or factory.openStatelessSession();
-     *
-     */
+    /** use factory.openSession() or factory.openStatelessSession(); */
     protected SOSHibernateSession(SOSHibernateFactory hibernateFactory) {
         this.factory = hibernateFactory;
     }
@@ -239,13 +240,14 @@ public class SOSHibernateSession implements Serializable {
         return matcher.find();
     }
 
-    public Query createQuery(String query) throws Exception {
+    @SuppressWarnings("unchecked")
+    public <T> Query<T> createQuery(String query) throws Exception {
         String method = getMethodName("createQuery");
         LOGGER.debug(String.format("%s: query = %s", method, query));
         if (currentSession == null) {
             throw new DBSessionException("Session is NULL");
         }
-        Query q = null;
+        Query<T> q = null;
         if (currentSession instanceof Session) {
             q = ((Session) currentSession).createQuery(query);
         } else {
@@ -254,17 +256,18 @@ public class SOSHibernateSession implements Serializable {
         return q;
     }
 
-    public NativeQuery createNativeQuery(String query) throws Exception {
+    public <T> NativeQuery<T> createNativeQuery(String query) throws Exception {
         return createNativeQuery(query, null);
     }
 
-    public NativeQuery createNativeQuery(String query, Class<?> entityClass) throws Exception {
+    @SuppressWarnings("unchecked")
+    public <T> NativeQuery<T> createNativeQuery(String query, Class<T> entityClass) throws Exception {
         String method = getMethodName("createNativeQuery");
         LOGGER.debug(String.format("%s: query = %s", method, query));
         if (currentSession == null) {
             throw new DBSessionException("currentSession is NULL");
         }
-        NativeQuery<?> q = null;
+        NativeQuery<T> q = null;
         if (currentSession instanceof Session) {
             if (entityClass == null) {
                 q = ((Session) currentSession).createNativeQuery(query);
@@ -280,7 +283,110 @@ public class SOSHibernateSession implements Serializable {
         }
         return q;
     }
-   
+
+    /** return the first possible value or null
+     * 
+     * difference to Query.getSingleResult - not throw NoResultException, return single value as string */
+    public <T> String getSingleValue(Query<T> query) throws Exception {
+        String result = null;
+
+        List<T> results = query.getResultList();
+        if (results != null && !results.isEmpty()) {
+            if (results.get(0) instanceof Object[]) {
+                Object[] obj = (Object[]) results.get(0);
+                result = obj[0] + "";
+            } else {
+                result = results.get(0) + "";
+            }
+        }
+        return result;
+    }
+
+    /** return the first possible result or null
+     * 
+     * difference to Query.getSingleResult - not throw NoResultException */
+    public <T> T getSingleResult(Query<T> query) throws Exception {
+        T result = null;
+
+        List<T> results = query.getResultList();
+        if (results != null && !results.isEmpty()) {
+            result = results.get(0);
+        }
+        return result;
+    }
+
+    public <T> Map<String, String> getSingleResult(NativeQuery<T> query) throws Exception {
+        return getSingleResult(query, null);
+    }
+
+    /** return a single row represented by Map<String,String>
+     * 
+     * Map - see getResultList */
+    public <T> Map<String, String> getSingleResult(NativeQuery<T> query, String dateTimeFormat) throws Exception {
+        Map<String, String> result = null;
+        List<Map<String, String>> resultList = getResultList(query, dateTimeFormat);
+        if (resultList != null && !resultList.isEmpty()) {
+            result = new HashMap<String, String>();
+            Map<String, String> map = resultList.get(0);
+            for (String key : map.keySet()) {
+                result.put(key, map.get(key));
+            }
+        }
+        return result;
+    }
+
+    public <T> List<Map<String, String>> getResultList(NativeQuery<T> query) throws Exception {
+        return getResultList(query, null);
+    }
+
+    /** return a list of rows represented by Map<String,String>:
+     * 
+     * Map key - column name (lower case), Map value - value as string
+     * 
+     * 
+     * setResultTransformer is deprecated (see below), but currently without alternative
+     * 
+     * excerpt from Query.setResultTransformer comment:
+     * 
+     * deprecated (since 5.2), todo develop a new approach to result transformers */
+    @SuppressWarnings({ "deprecation", "unchecked" })
+    public <T> List<Map<String, String>> getResultList(NativeQuery<T> query, String dateTimeFormat) throws Exception {
+        query.setResultTransformer(new ResultTransformer() {
+
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public Object transformTuple(Object[] tuple, String[] aliases) {
+                Map<String, String> result = new HashMap<String, String>(tuple.length);
+                for (int i = 0; i < tuple.length; i++) {
+                    String alias = aliases[i];
+                    if (alias != null) {
+                        Object origValue = tuple[i];
+                        String value = "";
+                        if (origValue != null) {
+                            value = origValue + "";
+                            if (origValue instanceof java.sql.Timestamp && dateTimeFormat != null) {
+                                try {
+                                    value = SOSDate.getDateTimeAsString(value, dateTimeFormat);
+                                } catch (Exception e) {
+                                }
+                            }
+                        }
+                        result.put(alias.toLowerCase(), value);
+                    }
+                }
+                return result;
+            }
+
+            @SuppressWarnings("rawtypes")
+            @Override
+            public List<?> transformList(List collection) {
+                return collection;
+            }
+        });
+        return (List<Map<String, String>>) query.getResultList();
+    }
+
     @Deprecated
     public Criteria createCriteria(Class<?> cl, String alias) throws Exception {
         String method = getMethodName("createCriteria");
