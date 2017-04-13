@@ -7,7 +7,6 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -252,17 +251,17 @@ public class SOSHibernateSession implements Serializable {
         openSessionMethodName = null;
     }
 
-    public int executeUpdateSQLCallableStatement(String sqlStmt) throws Exception {
+    public int executeUpdateSQLCallableStatement(String sql) throws Exception {
         String method = getMethodName("executeUpdateSQLCallableStatement");
         int result = -1;
         Connection conn = getConnection();
         if (conn == null) {
             throw new Exception(String.format("%s: jdbc connection is null", method));
         }
-        LOGGER.debug(String.format("%s: sqlStmt=%s", method, sqlStmt));
+        LOGGER.debug(String.format("%s: sqlStmt=%s", method, sql));
         CallableStatement stmt = null;
         try {
-            stmt = conn.prepareCall(sqlStmt);
+            stmt = conn.prepareCall(sql);
             result = stmt.executeUpdate();
         } catch (Throwable e) {
             throw e;
@@ -277,7 +276,7 @@ public class SOSHibernateSession implements Serializable {
         return result;
     }
 
-    public boolean executeSQLStatement(String... sqlStmts) throws Exception {
+    public boolean executeSQLStatement(String... sqls) throws Exception {
         String method = getMethodName("executeSQLStatement");
         boolean result = false;
         Connection conn = getConnection();
@@ -287,9 +286,9 @@ public class SOSHibernateSession implements Serializable {
         Statement stmt = null;
         try {
             stmt = conn.createStatement();
-            for (String sqlStmt : sqlStmts) {
-                LOGGER.debug(String.format("%s: sqlStmt=%s", method, sqlStmt));
-                result = stmt.execute(sqlStmt);
+            for (String sql : sqls) {
+                LOGGER.debug(String.format("%s: sql=%s", method, sql));
+                result = stmt.execute(sql);
             }
         } catch (Throwable e) {
             throw e;
@@ -304,7 +303,7 @@ public class SOSHibernateSession implements Serializable {
         return result;
     }
 
-    public int[] executeSQLStatementBatch(String... sqlStmts) throws Exception {
+    public int[] executeSQLStatementBatch(String... sqls) throws Exception {
         String method = getMethodName("executeSQLStatementBatch");
         int[] result = null;
         Connection conn = getConnection();
@@ -314,9 +313,9 @@ public class SOSHibernateSession implements Serializable {
         Statement stmt = null;
         try {
             stmt = conn.createStatement();
-            for (String sqlStmt : sqlStmts) {
-                LOGGER.debug(String.format("%s: addBatch sqlStmt=%s", method, sqlStmt));
-                stmt.addBatch(sqlStmt);
+            for (String sql : sqls) {
+                LOGGER.debug(String.format("%s: addBatch sql=%s", method, sql));
+                stmt.addBatch(sql);
             }
             result = stmt.executeBatch();
         } catch (Throwable e) {
@@ -365,48 +364,48 @@ public class SOSHibernateSession implements Serializable {
         }
     }
 
-    private boolean isResultListQuery(String statement) {
+    private boolean isResultListQuery(String sql) {
         String patterns = "^select|^exec";
         Pattern p = Pattern.compile(patterns, Pattern.CASE_INSENSITIVE);
-        Matcher matcher = p.matcher(statement);
+        Matcher matcher = p.matcher(sql);
         return matcher.find();
     }
 
     @SuppressWarnings("unchecked")
-    public <T> Query<T> createQuery(String query) throws Exception {
+    public <T> Query<T> createQuery(String hql) throws Exception {
         String method = getMethodName("createQuery");
-        LOGGER.debug(String.format("%s: query = %s", method, query));
+        LOGGER.debug(String.format("%s: hql = %s", method, hql));
         if (currentSession == null) {
             throw new DBSessionException("Session is NULL");
         }
         Query<T> q = null;
         if (currentSession instanceof Session) {
-            q = ((Session) currentSession).createQuery(query);
+            q = ((Session) currentSession).createQuery(hql);
         } else {
-            q = ((StatelessSession) currentSession).createQuery(query);
+            q = ((StatelessSession) currentSession).createQuery(hql);
         }
         return q;
     }
 
     /** @deprecated method for compatibility with the 1.11.0 an 1.11.1 versions use createNativeQuery */
     @Deprecated
-    public SQLQuery<?> createSQLQuery(String query) throws Exception {
-        return createSQLQuery(query, null);
+    public SQLQuery<?> createSQLQuery(String sql) throws Exception {
+        return createSQLQuery(sql, null);
     }
 
     /** @deprecated method for compatibility with the 1.11.0 an 1.11.1 versions use createNativeQuery */
     @Deprecated
-    public SQLQuery<?> createSQLQuery(String query, Class<?> entityClass) throws Exception {
+    public SQLQuery<?> createSQLQuery(String sql, Class<?> entityClass) throws Exception {
         String method = getMethodName("createSQLQuery");
-        LOGGER.debug(String.format("%s: query = %s", method, query));
+        LOGGER.debug(String.format("%s: sql=%s", method, sql));
         if (currentSession == null) {
             throw new DBSessionException("currentSession is NULL");
         }
         SQLQuery<?> q = null;
         if (currentSession instanceof Session) {
-            q = ((Session) currentSession).createSQLQuery(query);
+            q = ((Session) currentSession).createSQLQuery(sql);
         } else {
-            q = ((StatelessSession) currentSession).createSQLQuery(query);
+            q = ((StatelessSession) currentSession).createSQLQuery(sql);
         }
         if (q != null && entityClass != null) {
             q.addEntity(entityClass);
@@ -414,29 +413,29 @@ public class SOSHibernateSession implements Serializable {
         return q;
     }
 
-    public <T> NativeQuery<T> createNativeQuery(String query) throws Exception {
-        return createNativeQuery(query, null);
+    public <T> NativeQuery<T> createNativeQuery(String sql) throws Exception {
+        return createNativeQuery(sql, null);
     }
 
     @SuppressWarnings("unchecked")
-    public <T> NativeQuery<T> createNativeQuery(String query, Class<T> entityClass) throws Exception {
+    public <T> NativeQuery<T> createNativeQuery(String sql, Class<T> entityClass) throws Exception {
         String method = getMethodName("createNativeQuery");
-        LOGGER.debug(String.format("%s: query = %s", method, query));
+        LOGGER.debug(String.format("%s: sql=%s", method, sql));
         if (currentSession == null) {
             throw new DBSessionException("currentSession is NULL");
         }
         NativeQuery<T> q = null;
         if (currentSession instanceof Session) {
             if (entityClass == null) {
-                q = ((Session) currentSession).createNativeQuery(query);
+                q = ((Session) currentSession).createNativeQuery(sql);
             } else {
-                q = ((Session) currentSession).createNativeQuery(query, entityClass);
+                q = ((Session) currentSession).createNativeQuery(sql, entityClass);
             }
         } else {
             if (entityClass == null) {
-                q = ((StatelessSession) currentSession).createNativeQuery(query);
+                q = ((StatelessSession) currentSession).createNativeQuery(sql);
             } else {
-                q = ((StatelessSession) currentSession).createNativeQuery(query, entityClass);
+                q = ((StatelessSession) currentSession).createNativeQuery(sql, entityClass);
             }
         }
         return q;
@@ -446,8 +445,8 @@ public class SOSHibernateSession implements Serializable {
         return getSingleValue(createQuery(hql));
     }
 
-    public String getNativeQuerySingleValue(String stmt) throws Exception {
-        return getSingleValue(createNativeQuery(stmt));
+    public String getNativeQuerySingleValue(String sql) throws Exception {
+        return getSingleValue(createNativeQuery(sql));
     }
 
     /** return the first possible value or null
@@ -468,6 +467,10 @@ public class SOSHibernateSession implements Serializable {
         return result;
     }
 
+    public <T> T getSingleResult(String hql) throws Exception {
+        return getSingleResult(createQuery(hql));
+    }
+
     /** return the first possible result or null
      * 
      * difference to Query.getSingleResult - not throw NoResultException */
@@ -479,6 +482,14 @@ public class SOSHibernateSession implements Serializable {
             result = results.get(0);
         }
         return result;
+    }
+
+    public <T> Map<String, String> getNativeQuerySingleResult(String sql) throws Exception {
+        return getNativeQuerySingleResult(sql, null);
+    }
+
+    public <T> Map<String, String> getNativeQuerySingleResult(String sql, String dateTimeFormat) throws Exception {
+        return getSingleResult(createNativeQuery(sql), dateTimeFormat);
     }
 
     public <T> Map<String, String> getSingleResult(NativeQuery<T> query) throws Exception {
@@ -499,6 +510,14 @@ public class SOSHibernateSession implements Serializable {
             }
         }
         return result;
+    }
+
+    public <T> List<Map<String, String>> getNativeQueryResultList(String sql) throws Exception {
+        return getNativeQueryResultList(sql, null);
+    }
+
+    public <T> List<Map<String, String>> getNativeQueryResultList(String sql, String dateTimeFormat) throws Exception {
+        return getResultList(createNativeQuery(sql), dateTimeFormat);
     }
 
     public <T> List<Map<String, String>> getResultList(NativeQuery<T> query) throws Exception {
