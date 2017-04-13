@@ -332,16 +332,24 @@ public class SOSHibernateSession implements Serializable {
         return result;
     }
 
+    public List<String> getNativeQueries(Path file) throws Exception {
+        return getNativeQueries(new String(Files.readAllBytes(file)));
+    }
+
+    public List<String> getNativeQueries(String content) throws Exception {
+        SOSSqlCommandExtractor extractor = new SOSSqlCommandExtractor(this.factory.getDbms());
+        return extractor.extractCommands(content);
+    }
+
     public void executeNativeQueries(Path file) throws Exception {
         executeNativeQueries(new String(Files.readAllBytes(file)));
     }
 
     public void executeNativeQueries(String content) throws Exception {
-        SOSSqlCommandExtractor extractor = new SOSSqlCommandExtractor(this.factory.getDbms());
         try {
             beginTransaction();
 
-            ArrayList<String> commands = extractor.extractCommands(content);
+            List<String> commands = getNativeQueries(content);
             for (int i = 0; i < commands.size(); i++) {
                 NativeQuery<?> q = createNativeQuery(commands.get(i));
                 if (isResultListQuery(commands.get(i))) {

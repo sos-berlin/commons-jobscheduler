@@ -1,6 +1,7 @@
 package com.sos.hibernate.classes;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,14 +29,14 @@ public class SOSSqlCommandExtractor {
         this.dbms = dbms;
     }
 
-    public ArrayList<String> extractCommands(String content) throws Exception {
+    public List<String> extractCommands(String content) throws Exception {
         String method = "extractCommands";
         if (SOSString.isEmpty(content)) {
             throw new Exception("content is empty");
         }
         LOGGER.debug(String.format("%s: content=%s", method, content));
 
-        ArrayList<String> commands = new ArrayList<String>();
+        List<String> commands = new ArrayList<String>();
         Preparer preparer = new Preparer(dbms, majorVersion, minorVersion, content);
         preparer.prepare();
 
@@ -51,7 +52,7 @@ public class SOSSqlCommandExtractor {
 
                     LOGGER.debug(String.format("%s: command=%s%s", method, command, preparer.getCommandCloser()));
                 } else {
-                    this.split(commands, replace(command), null, preparer.getCommandCloser(), true, 0);
+                    split(commands, replace(command), null, preparer.getCommandCloser(), true, 0);
                     if (!"".equals(beginProcedure)) {
                         int posBeginProcedure = command.indexOf(beginProcedure);
                         String subCommand = command.substring(posBeginProcedure);
@@ -62,7 +63,7 @@ public class SOSSqlCommandExtractor {
                 }
             } else {
                 String end = preparer.addCommandCloser() ? preparer.getCommandCloser() : "";
-                this.split(commands, replace(command), null, end, false, 0);
+                split(commands, replace(command), null, end, false, 0);
             }
 
         }
@@ -75,7 +76,7 @@ public class SOSSqlCommandExtractor {
         return new StringBuffer(s.trim());
     }
 
-    private void split(final ArrayList<String> commands, final StringBuffer st, final Integer position, final String procedurEnd,
+    private void split(final List<String> commands, final StringBuffer st, final Integer position, final String procedurEnd,
             final boolean returnProcedureBegin, int count) throws Exception {
         String method = "split";
 
@@ -115,13 +116,13 @@ public class SOSSqlCommandExtractor {
             if (semicolon != -1) {
                 sub = new StringBuffer(st.substring(semicolon + 1));
                 if (sub != null && sub.length() != 0) {
-                    this.split(commands, sub, null, procedurEnd, returnProcedureBegin, count);
+                    split(commands, sub, null, procedurEnd, returnProcedureBegin, count);
                 }
             }
         } else {
             int apostropheSecond = st.indexOf("'", apostropheFirst + 1);
             if (apostropheSecond != -1) {
-                this.split(commands, st, new Integer(apostropheSecond + 1), procedurEnd, returnProcedureBegin, count);
+                split(commands, st, new Integer(apostropheSecond + 1), procedurEnd, returnProcedureBegin, count);
             } else {
                 throw new Exception(String.format("closing apostrophe not found = %s = %s ", apostropheFirst, st));
             }
@@ -216,10 +217,10 @@ public class SOSSqlCommandExtractor {
             commandCloser = "";
             addCommandCloser = true;
 
-            //replaceAll(":=","\\\\:=")) to avoid hibernate 
-            //"Space is not allowed after parameter prefix ':'" Exception 
-            //e.g. Oracle:  myVar := SYSDATE; 
-            StringBuffer sb = new StringBuffer(this.content.replaceAll("\r\n", "\n").replaceAll("\\;[ \\t]", ";").replaceAll(":=","\\\\:="));
+            // replaceAll(":=","\\\\:=")) to avoid hibernate
+            // "Space is not allowed after parameter prefix ':'" Exception
+            // e.g. Oracle: myVar := SYSDATE;
+            StringBuffer sb = new StringBuffer(this.content.replaceAll("\r\n", "\n").replaceAll("\\;[ \\t]", ";").replaceAll(":=", "\\\\:="));
             if (this.dbms.equals(SOSHibernateFactory.Dbms.MSSQL)) {
                 commandSpltter = "(?i)\nGO\\s*\n|\n/\n";
             } else if (this.dbms.equals(SOSHibernateFactory.Dbms.MYSQL)) {
@@ -273,12 +274,11 @@ public class SOSSqlCommandExtractor {
                 if (row.isEmpty()) {
                     continue;
                 }
-                if (isMySQL){ 
+                if (isMySQL) {
                     String rowUpper = row.toUpperCase();
                     if (rowUpper.startsWith("DELIMITER")) {
                         continue;
-                    }
-                    else if(rowUpper.startsWith("END$$;")) {
+                    } else if (rowUpper.startsWith("END$$;")) {
                         row = "END;";
                     }
                 }
