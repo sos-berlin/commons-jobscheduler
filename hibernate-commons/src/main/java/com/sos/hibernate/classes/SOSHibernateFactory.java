@@ -382,6 +382,16 @@ public class SOSHibernateFactory implements Serializable {
         return null;
     }
 
+    /**
+     * @deprecated use quoteColumn instead
+     * 
+     * method for compatibility with the 1.11.0 an 1.11.1 versions
+     */
+    @Deprecated
+    public String quoteFieldName(String columnName) {
+        return quoteColumn(columnName);
+    }
+    
     public String quoteColumn(String columnName) {
         if (dialect != null && columnName != null) {
             String[] arr = columnName.split("\\.");
