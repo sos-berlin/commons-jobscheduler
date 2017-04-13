@@ -338,6 +338,26 @@ public class SOSHibernateFactory implements Serializable {
         return getDbms(Dialect.getDialect(conf.getProperties()));
     }
 
+    /** Hibernate Dialect does not provide the functions to identify the last inserted sequence value.
+     * 
+     * only for the next value: e.g. dialiect.getSelectSequenceNextValString(sequenceName), dialect.getSequenceNextValString(sequenceName) */
+    public String getSequenceLastValString(String sequenceName) {
+        if (dbms.equals(SOSHibernateFactory.Dbms.MSSQL)) {
+            return "SELECT @@IDENTITY";
+        } else if (dbms.equals(SOSHibernateFactory.Dbms.MYSQL)) {
+            return "SELECT LAST_INSERT_ID();";
+        } else if (dbms.equals(SOSHibernateFactory.Dbms.ORACLE)) {
+            return "SELECT " + sequenceName + ".currval FROM DUAL";
+        } else if (dbms.equals(SOSHibernateFactory.Dbms.PGSQL)) {
+            return "SELECT currval('" + sequenceName + "');";
+        } else if (dbms.equals(SOSHibernateFactory.Dbms.DB2)) {
+            return "SELECT IDENTITY_VAL_LOCAL() AS INSERT_ID FROM SYSIBM.SYSDUMMY1";
+        } else if (dbms.equals(SOSHibernateFactory.Dbms.SYBASE)) {
+            return "SELECT @@IDENTITY";
+        }
+        return null;
+    }
+
     public void setConfigurationProperties(Properties properties) {
         if (configurationProperties.isEmpty()) {
             configurationProperties = properties;
@@ -382,16 +402,14 @@ public class SOSHibernateFactory implements Serializable {
         return null;
     }
 
-    /**
-     * @deprecated use quoteColumn instead
+    /** @deprecated use quoteColumn instead
      * 
-     * method for compatibility with the 1.11.0 an 1.11.1 versions
-     */
+     *             method for compatibility with the 1.11.0 an 1.11.1 versions */
     @Deprecated
     public String quoteFieldName(String columnName) {
         return quoteColumn(columnName);
     }
-    
+
     public String quoteColumn(String columnName) {
         if (dialect != null && columnName != null) {
             String[] arr = columnName.split("\\.");
