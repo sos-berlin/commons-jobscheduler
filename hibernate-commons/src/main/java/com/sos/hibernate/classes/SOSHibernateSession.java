@@ -3,8 +3,10 @@ package com.sos.hibernate.classes;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -116,6 +118,47 @@ public class SOSHibernateSession implements Serializable {
         }
     }
 
+    public void setDefaults() throws Exception {
+        String method = getMethodName("setDefaults");
+        LOGGER.debug(String.format("%s: dbms=%s", method, factory.getDbms()));
+
+        if (factory.getDbms().equals(SOSHibernateFactory.Dbms.MSSQL)) {
+            String dateFormat = "set DATEFORMAT ymd";
+            String language = "set LANGUAGE British";
+            String lockTimeout = "set LOCK_TIMEOUT 3000";
+            executeSQLStatement(dateFormat, language, lockTimeout);
+        } else if (factory.getDbms().equals(SOSHibernateFactory.Dbms.MYSQL)) {
+            executeSQLStatement("SET SESSION SQL_MODE='ANSI_QUOTES'");
+        } else if (factory.getDbms().equals(SOSHibernateFactory.Dbms.ORACLE)) {
+            String nlsNumericCharacters = "ALTER SESSION SET NLS_NUMERIC_CHARACTERS='.,'";
+            String nlsDateFormat = "ALTER SESSION SET NLS_DATE_FORMAT='YYYY-MM-DD HH24:MI:SS'";
+            String nlsSort = "ALTER SESSION SET NLS_SORT='BINARY'";
+            executeSQLStatementBatch(nlsNumericCharacters, nlsDateFormat, nlsSort);
+            executeUpdateSQLCallableStatement("begin dbms_output.enable(10000); end;");
+        } else if (factory.getDbms().equals(SOSHibernateFactory.Dbms.PGSQL)) {
+            String lcNumeric = "SELECT set_config('lc_numeric', '', true)";
+            String dateStyle = "SELECT set_config('datestyle', 'ISO, YMD', true)";
+            String defaultTransactionIsolation = "SELECT set_config('default_transaction_isolation', 'repeatable read', true)";
+            executeSQLStatement(lcNumeric, dateStyle, defaultTransactionIsolation);
+        } else if (factory.getDbms().equals(SOSHibernateFactory.Dbms.SYBASE)) {
+            String isolationLevel = "set TRANSACTION ISOLATION LEVEL READ COMMITTED";
+            String chainedOn = "set CHAINED ON";
+            String quotedIdentifier = "set QUOTED_IDENTIFIER ON";
+            String lockTimeout = "set LOCK WAIT 3";
+            String closeOnEndtran = "set CLOSE ON ENDTRAN ON";
+            String datefirst = "set DATEFIRST 1";
+            String dateFormat = "set DATEFORMAT 'ymd'";
+            String language = "set LANGUAGE us_english";
+            String textsize = "set TEXTSIZE 2048000";
+            executeSQLStatement(isolationLevel, chainedOn, quotedIdentifier, lockTimeout, closeOnEndtran, datefirst, dateFormat, language, textsize);
+        }
+    }
+
+    public String getLastSequenceValue(String sequenceName) throws Exception {
+        String stmt = factory.getSequenceLastValString(sequenceName);
+        return stmt == null ? null : getNativeQuerySingleValue(stmt);
+    }
+
     public static Throwable getException(Throwable ex) {
         if (ex instanceof SQLGrammarException) {
             SQLGrammarException sqlGrEx = (SQLGrammarException) ex;
@@ -209,6 +252,86 @@ public class SOSHibernateSession implements Serializable {
         openSessionMethodName = null;
     }
 
+    public int executeUpdateSQLCallableStatement(String sqlStmt) throws Exception {
+        String method = getMethodName("executeUpdateSQLCallableStatement");
+        int result = -1;
+        Connection conn = getConnection();
+        if (conn == null) {
+            throw new Exception(String.format("%s: jdbc connection is null", method));
+        }
+        LOGGER.debug(String.format("%s: sqlStmt=%s", method, sqlStmt));
+        CallableStatement stmt = null;
+        try {
+            stmt = conn.prepareCall(sqlStmt);
+            result = stmt.executeUpdate();
+        } catch (Throwable e) {
+            throw e;
+        } finally {
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (Throwable e) {
+                }
+            }
+        }
+        return result;
+    }
+
+    public boolean executeSQLStatement(String... sqlStmts) throws Exception {
+        String method = getMethodName("executeSQLStatement");
+        boolean result = false;
+        Connection conn = getConnection();
+        if (conn == null) {
+            throw new Exception(String.format("%s: jdbc connection is null", method));
+        }
+        Statement stmt = null;
+        try {
+            stmt = conn.createStatement();
+            for (String sqlStmt : sqlStmts) {
+                LOGGER.debug(String.format("%s: sqlStmt=%s", method, sqlStmt));
+                result = stmt.execute(sqlStmt);
+            }
+        } catch (Throwable e) {
+            throw e;
+        } finally {
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (Throwable e) {
+                }
+            }
+        }
+        return result;
+    }
+
+    public int[] executeSQLStatementBatch(String... sqlStmts) throws Exception {
+        String method = getMethodName("executeSQLStatementBatch");
+        int[] result = null;
+        Connection conn = getConnection();
+        if (conn == null) {
+            throw new Exception(String.format("%s: jdbc connection is null", method));
+        }
+        Statement stmt = null;
+        try {
+            stmt = conn.createStatement();
+            for (String sqlStmt : sqlStmts) {
+                LOGGER.debug(String.format("%s: addBatch sqlStmt=%s", method, sqlStmt));
+                stmt.addBatch(sqlStmt);
+            }
+            result = stmt.executeBatch();
+        } catch (Throwable e) {
+            throw e;
+        } finally {
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (Throwable e) {
+                }
+            }
+        }
+        return result;
+    }
+
     public void executeNativeQueries(Path file) throws Exception {
         executeNativeQueries(new String(Files.readAllBytes(file)));
     }
@@ -257,17 +380,13 @@ public class SOSHibernateSession implements Serializable {
         return q;
     }
 
-    /** @deprecated
-     * method for compatibility with the 1.11.0 an 1.11.1 versions
-     *             use createNativeQuery */
+    /** @deprecated method for compatibility with the 1.11.0 an 1.11.1 versions use createNativeQuery */
     @Deprecated
     public SQLQuery<?> createSQLQuery(String query) throws Exception {
         return createSQLQuery(query, null);
     }
 
-    /** @deprecated
-     * method for compatibility with the 1.11.0 an 1.11.1 versions
-     *             use createNativeQuery */
+    /** @deprecated method for compatibility with the 1.11.0 an 1.11.1 versions use createNativeQuery */
     @Deprecated
     public SQLQuery<?> createSQLQuery(String query, Class<?> entityClass) throws Exception {
         String method = getMethodName("createSQLQuery");
@@ -286,7 +405,7 @@ public class SOSHibernateSession implements Serializable {
         }
         return q;
     }
-    
+
     public <T> NativeQuery<T> createNativeQuery(String query) throws Exception {
         return createNativeQuery(query, null);
     }
@@ -313,6 +432,14 @@ public class SOSHibernateSession implements Serializable {
             }
         }
         return q;
+    }
+
+    public String getSingleValue(String hql) throws Exception {
+        return getSingleValue(createQuery(hql));
+    }
+
+    public String getNativeQuerySingleValue(String stmt) throws Exception {
+        return getSingleValue(createNativeQuery(stmt));
     }
 
     /** return the first possible value or null
