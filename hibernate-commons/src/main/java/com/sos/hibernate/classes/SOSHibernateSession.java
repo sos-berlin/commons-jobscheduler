@@ -1,10 +1,19 @@
 package com.sos.hibernate.classes;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.InputStream;
+import java.io.Reader;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
@@ -38,15 +47,16 @@ import org.slf4j.LoggerFactory;
 import com.sos.exception.DBSessionException;
 
 import sos.util.SOSDate;
+import sos.util.SOSString;
 
 public class SOSHibernateSession implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateSession.class);
-    private SOSHibernateFactory factory;
+    private final SOSHibernateFactory factory;
     private Object currentSession;
-    private boolean useOpenStatelessSession = false;
-    private boolean useGetCurrentSession = false;
+    private boolean isStatelessSession = false;
+    private boolean isGetCurrentSession = false;
     private FlushMode defaultHibernateFlushMode = FlushMode.ALWAYS;
     private String identifier;
     private String openSessionMethodName;
@@ -57,63 +67,29 @@ public class SOSHibernateSession implements Serializable {
         this.factory = hibernateFactory;
     }
 
-    public void reopen() throws Exception {
-        String method = getMethodName("reopen");
-        try {
-            LOGGER.info(String.format("%s: useOpenStatelessSession = %s", method, useOpenStatelessSession));
-            closeSession();
-            openSession();
-        } catch (Exception ex) {
-            throw new Exception(String.format("%s: %s", method, ex.toString()), ex);
+    public void setIdentifier(String val) {
+        identifier = val;
+    }
+
+    protected void setIsStatelessSession(boolean val) {
+        isStatelessSession = val;
+    }
+
+    protected void setIsGetCurrentSession(boolean val) {
+        isGetCurrentSession = val;
+    }
+
+    public void setHibernateFlushMode(FlushMode flushMode) {
+        if (currentSession instanceof Session) {
+            Session session = (Session) currentSession;
+            session.setHibernateFlushMode(flushMode);
         }
     }
 
-    /** @deprecated
-     * 
-     *             use factory.openSession() or factory.openStatelessSession(); */
-    @Deprecated
-    public void connect() throws Exception {
-        String method = getMethodName("connect");
-        try {
-            openSession();
-            String connFile = (factory.getConfigFile().isPresent()) ? factory.getConfigFile().get().toAbsolutePath().toString()
-                    : "without config file";
-            int isolationLevel = getFactory().getTransactionIsolation();
-            LOGGER.debug(String.format("%s: autocommit = %s, transaction isolation = %s, %s, %s", method, getFactory().getAutoCommit(),
-                    SOSHibernateFactory.getTransactionIsolationName(isolationLevel), openSessionMethodName, connFile));
-        } catch (Exception ex) {
-            throw new Exception(String.format("%s: %s", method, ex.toString()), ex);
-        }
-    }
-
-    protected void openSession() throws Exception {
-        String method = getMethodName("openSession");
-
-        if (this.currentSession != null) {
-            LOGGER.debug(String.format("%s: close currentSession", method));
-            closeSession();
-        }
-
-        LOGGER.debug(String.format("%s: useOpenStatelessSession = %s, useGetCurrentSession = %s", method, useOpenStatelessSession,
-                useGetCurrentSession));
-
-        openSessionMethodName = "";
-        if (useOpenStatelessSession) {
-            currentSession = factory.getSessionFactory().openStatelessSession();
-            openSessionMethodName = "openStatelessSession";
-        } else {
-            Session session = null;
-            if (useGetCurrentSession) {
-                session = factory.getSessionFactory().getCurrentSession();
-                openSessionMethodName = "getCurrentSession";
-            } else {
-                session = factory.getSessionFactory().openSession();
-                openSessionMethodName = "openSession";
-            }
-            if (defaultHibernateFlushMode != null) {
-                session.setHibernateFlushMode(defaultHibernateFlushMode);
-            }
-            currentSession = session;
+    public void setCacheMode(CacheMode cacheMode) {
+        if (currentSession instanceof Session) {
+            Session session = (Session) currentSession;
+            session.setCacheMode(cacheMode);
         }
     }
 
@@ -153,9 +129,79 @@ public class SOSHibernateSession implements Serializable {
         }
     }
 
-    public String getLastSequenceValue(String sequenceName) throws Exception {
-        String stmt = factory.getSequenceLastValString(sequenceName);
-        return stmt == null ? null : getNativeQuerySingleValue(stmt);
+    public boolean isStatelessSession() {
+        return isStatelessSession;
+    }
+
+    public boolean isGetCurrentSession() {
+        return isGetCurrentSession;
+    }
+
+    public boolean isOpen() {
+        if (currentSession instanceof Session) {
+            Session session = (Session) currentSession;
+            return session.isOpen();
+        } else {
+            StatelessSession session = ((StatelessSession) currentSession);
+            return session.isOpen();
+        }
+    }
+
+    public boolean isConnected() {
+        if (currentSession instanceof Session) {
+            Session session = (Session) currentSession;
+            return session.isConnected();
+        } else {
+            StatelessSession session = ((StatelessSession) currentSession);
+            return session.isConnected();
+        }
+    }
+
+    public SOSHibernateFactory getFactory() {
+        return factory;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public FlushMode getHibernateFlushMode() {
+        if (currentSession instanceof Session) {
+            Session session = (Session) currentSession;
+            return session.getHibernateFlushMode();
+        }
+        return null;
+    }
+  
+    public CacheMode getCacheMode() {
+        if (currentSession instanceof Session) {
+            Session session = (Session) currentSession;
+            return session.getCacheMode();
+        }
+        return null;
+    }
+
+    public Object getCurrentSession() throws Exception {
+        return currentSession;
+    }
+
+    public Connection getConnection() throws Exception {
+        String method = "getConnection";
+        if (currentSession instanceof Session) {
+            SessionImpl sf = (SessionImpl) currentSession;
+            try {
+                return sf.connection();
+            } catch (Exception e) {
+                throw new Exception(String.format("%s: %s", method, e.toString()), e);
+            }
+        } else {
+            StatelessSessionImpl sf = (StatelessSessionImpl) currentSession;
+            try {
+                return sf.connection();
+            } catch (Exception e) {
+                throw new Exception(String.format("%s: %s", method, e.toString()), e);
+            }
+        }
     }
 
     public static Throwable getException(Throwable ex) {
@@ -170,19 +216,57 @@ public class SOSHibernateSession implements Serializable {
         return ex;
     }
 
-    /** @deprecated
-     * 
-     *             use close(); */
-    @Deprecated
-    public void disconnect() {
-        close();
+    public String getLastSequenceValue(String sequenceName) throws Exception {
+        String stmt = factory.getSequenceLastValString(sequenceName);
+        return stmt == null ? null : getNativeQuerySingleValue(stmt);
     }
 
-    public void close() {
-        String method = getMethodName("close");
-        LOGGER.debug(String.format("%s", method));
-        closeTransaction();
-        closeSession();
+    protected void openSession() throws Exception {
+        String method = getMethodName("openSession");
+
+        if (this.currentSession != null) {
+            LOGGER.debug(String.format("%s: close currentSession", method));
+            closeSession();
+        }
+
+        LOGGER.debug(String.format("%s: isStatelessSession = %s, isGetCurrentSession = %s", method, isStatelessSession, isGetCurrentSession));
+
+        openSessionMethodName = "";
+        if (isStatelessSession) {
+            currentSession = factory.getSessionFactory().openStatelessSession();
+            openSessionMethodName = "openStatelessSession";
+        } else {
+            Session session = null;
+            if (isGetCurrentSession) {
+                session = factory.getSessionFactory().getCurrentSession();
+                openSessionMethodName = "getCurrentSession";
+            } else {
+                session = factory.getSessionFactory().openSession();
+                openSessionMethodName = "openSession";
+            }
+            if (defaultHibernateFlushMode != null) {
+                session.setHibernateFlushMode(defaultHibernateFlushMode);
+            }
+            currentSession = session;
+        }
+    }
+
+    /** @deprecated
+     * 
+     *             use factory.openSession() or factory.openStatelessSession(); */
+    @Deprecated
+    public void connect() throws Exception {
+        String method = getMethodName("connect");
+        try {
+            openSession();
+            String connFile = (factory.getConfigFile().isPresent()) ? factory.getConfigFile().get().toAbsolutePath().toString()
+                    : "without config file";
+            int isolationLevel = getFactory().getTransactionIsolation();
+            LOGGER.debug(String.format("%s: autocommit = %s, transaction isolation = %s, %s, %s", method, getFactory().getAutoCommit(),
+                    SOSHibernateFactory.getTransactionIsolationName(isolationLevel), openSessionMethodName, connFile));
+        } catch (Exception ex) {
+            throw new Exception(String.format("%s: %s", method, ex.toString()), ex);
+        }
     }
 
     public void clearSession() throws Exception {
@@ -212,43 +296,200 @@ public class SOSHibernateSession implements Serializable {
         }
     }
 
-    private void closeTransaction() {
-        String method = getMethodName("closeTransaction");
+    public void reopen() throws Exception {
+        String method = getMethodName("reopen");
         try {
-            if (currentSession != null) {
-                Transaction tr = getTransaction();
-                if (tr != null) {
-                    LOGGER.debug(String.format("%s: rollback", method));
-                    tr.rollback();
-                } else {
-                    LOGGER.debug(String.format("%s: skip rollback (transaction is null)", method));
-                }
-            }
+            LOGGER.info(String.format("%s: isStatelessSession = %s", method, isStatelessSession));
+            closeSession();
+            openSession();
         } catch (Exception ex) {
-            //
+            throw new Exception(String.format("%s: %s", method, ex.toString()), ex);
         }
-
     }
 
-    private void closeSession() {
-        String method = getMethodName("closeSession");
+    /** @deprecated
+     * 
+     *             use close(); */
+    @Deprecated
+    public void disconnect() {
+        close();
+    }
+
+    public void close() {
+        String method = getMethodName("close");
         LOGGER.debug(String.format("%s", method));
-        try {
-            if (currentSession != null) {
-                if (currentSession instanceof Session) {
-                    Session session = (Session) currentSession;
-                    if (session.isOpen()) {
-                        session.close();
-                    }
-                } else {
-                    StatelessSession s = (StatelessSession) currentSession;
-                    s.close();
-                }
-            }
-        } catch (Throwable e) {
+        closeTransaction();
+        closeSession();
+    }
+
+    public void beginTransaction() throws Exception {
+        String method = getMethodName("beginTransaction");
+        if (this.getFactory().getAutoCommit()) {
+            LOGGER.debug(String.format("%s: skip (autoCommit is true)", method));
+            return;
         }
-        currentSession = null;
-        openSessionMethodName = null;
+        LOGGER.debug(String.format("%s", method));
+        if (currentSession == null) {
+            throw new DBSessionException("currentSession is NULL");
+        }
+        if (currentSession instanceof Session) {
+            Session session = ((Session) currentSession);
+            session.beginTransaction();
+        } else {
+            StatelessSession session = ((StatelessSession) currentSession);
+            session.beginTransaction();
+        }
+    }
+
+    public void commit() throws Exception {
+        String method = getMethodName("commit");
+        if (this.getFactory().getAutoCommit()) {
+            LOGGER.debug(String.format("%s: skip (autoCommit is true)", method));
+            return;
+        }
+        LOGGER.debug(String.format("%s", method));
+        Transaction tr = getTransaction();
+        if (tr == null) {
+            throw new Exception(String.format("session transaction is NULL"));
+        }
+        if (currentSession instanceof Session) {
+            ((Session) currentSession).flush();
+        }
+        tr.commit();
+    }
+
+    public void rollback() throws Exception {
+        String method = getMethodName("rollback");
+        if (this.getFactory().getAutoCommit()) {
+            LOGGER.debug(String.format("%s: skip (autoCommit is true)", method));
+            return;
+        }
+        LOGGER.debug(String.format("%s", method));
+        Transaction tr = getTransaction();
+        if (tr == null) {
+            throw new Exception(String.format("session transaction is NULL"));
+        }
+        tr.rollback();
+    }
+
+    public Transaction getTransaction() throws Exception {
+        Transaction tr = null;
+        if (currentSession == null) {
+            throw new DBSessionException("currentSession is NULL");
+        }
+        if (currentSession instanceof Session) {
+            Session s = ((Session) currentSession);
+            tr = s.getTransaction();
+        } else {
+            StatelessSession s = ((StatelessSession) currentSession);
+            tr = s.getTransaction();
+        }
+        return tr;
+    }
+
+    public void save(Object item) throws Exception {
+        String method = getMethodName("save");
+        LOGGER.debug(String.format("%s: item = %s", method, item));
+        if (currentSession == null) {
+            throw new DBSessionException("session is NULL");
+        }
+        if (currentSession instanceof Session) {
+            Session session = ((Session) currentSession);
+            session.save(item);
+            session.flush();
+        } else {
+            StatelessSession session = ((StatelessSession) currentSession);
+            session.insert(item);
+        }
+    }
+
+    public void update(Object item) throws Exception {
+        String method = getMethodName("update");
+        LOGGER.debug(String.format("%s: item = %s", method, item));
+        if (currentSession == null) {
+            throw new DBSessionException("session is NULL");
+        }
+        if (currentSession instanceof Session) {
+            Session session = ((Session) currentSession);
+            session.update(item);
+            session.flush();
+        } else {
+            StatelessSession session = ((StatelessSession) currentSession);
+            session.update(item);
+        }
+    }
+
+    public Object saveOrUpdate(Object item) throws Exception {
+        String method = getMethodName("saveOrUpdate");
+        LOGGER.debug(String.format("%s: item = %s", method, item));
+        if (currentSession == null) {
+            throw new DBSessionException("currentSession is NULL");
+        }
+        if (currentSession instanceof Session) {
+            Session session = ((Session) currentSession);
+            session.saveOrUpdate(item);
+            session.flush();
+        } else {
+            StatelessSession session = ((StatelessSession) currentSession);
+            /*
+             * The following error will always be logged in the try segment, if the item id field is null: SQL Error: -1, SQLState: 07004 Parameter at position
+             * 9 is not set HHH000010: On release of batch it still contained JDBC statements in a stateless session it is better to check if the item is a new
+             * entry and then call save() or an existing item and then call update() there is no need to create an error to switch the statement afterwards
+             */
+            try {
+                session.update(item);
+            } catch (Exception e) {
+                session.insert(item);
+            }
+        }
+        return item;
+    }
+
+    public void delete(Object item) throws Exception {
+        String method = getMethodName("delete");
+        LOGGER.debug(String.format("%s: item = %s", method, item));
+        if (currentSession == null) {
+            throw new DBSessionException("currentSession is NULL");
+        }
+        if (currentSession instanceof Session) {
+            Session session = ((Session) currentSession);
+            session.delete(item);
+            session.flush();
+        } else {
+            StatelessSession session = ((StatelessSession) currentSession);
+            session.delete(item);
+        }
+    }
+
+    public void refresh(Object object) {
+        refresh(null, object);
+    }
+
+    public void refresh(String entityName, Object object) {
+        if (currentSession instanceof Session) {
+            Session session = (Session) currentSession;
+            if (entityName == null) {
+                session.refresh(object);
+            } else {
+                session.refresh(entityName, object);
+            }
+        } else {
+            StatelessSession session = ((StatelessSession) currentSession);
+            if (entityName == null) {
+                session.refresh(object);
+            } else {
+                session.refresh(entityName, object);
+            }
+
+        }
+    }
+
+    public Object get(Class<?> entityClass, Serializable id) throws Exception {
+        if (currentSession instanceof Session) {
+            return ((Session) currentSession).get(entityClass, id);
+        } else {
+            return ((StatelessSession) currentSession).get(entityClass, id);
+        }
     }
 
     public int executeUpdateSQLCallableStatement(String sql) throws Exception {
@@ -256,7 +497,7 @@ public class SOSHibernateSession implements Serializable {
         int result = -1;
         Connection conn = getConnection();
         if (conn == null) {
-            throw new Exception(String.format("%s: jdbc connection is null", method));
+            throw new Exception(String.format("%s: connection is null", method));
         }
         LOGGER.debug(String.format("%s: sqlStmt=%s", method, sql));
         CallableStatement stmt = null;
@@ -281,7 +522,7 @@ public class SOSHibernateSession implements Serializable {
         boolean result = false;
         Connection conn = getConnection();
         if (conn == null) {
-            throw new Exception(String.format("%s: jdbc connection is null", method));
+            throw new Exception(String.format("%s: connection is null", method));
         }
         Statement stmt = null;
         try {
@@ -308,7 +549,7 @@ public class SOSHibernateSession implements Serializable {
         int[] result = null;
         Connection conn = getConnection();
         if (conn == null) {
-            throw new Exception(String.format("%s: jdbc connection is null", method));
+            throw new Exception(String.format("%s: connection is null", method));
         }
         Statement stmt = null;
         try {
@@ -327,6 +568,440 @@ public class SOSHibernateSession implements Serializable {
                 } catch (Throwable e) {
                 }
             }
+        }
+        return result;
+    }
+
+    public int executeSQLStatementUpdateBlob(byte[] data, String tableName, String columnName, String condition) throws Exception {
+        String method = getMethodName("executeSQLStatementUpdateBlob");
+
+        if (data == null || data.length <= 0) {
+            throw new Exception(String.format("%s: missing data", method));
+        }
+        int result = data.length;
+        executeSQLStatementUpdateBlob(new ByteArrayInputStream(data), result, tableName, columnName, condition);
+        return result;
+    }
+
+    public int executeSQLStatementUpdateBlob(Path path, String tableName, String columnName, String condition) throws Exception {
+        String method = getMethodName("executeSQLStatementUpdateBlob");
+
+        if (path == null) {
+            throw new Exception(String.format("%s: path is null", method));
+        }
+        File file = path.toFile();
+        int result = (int) file.length();
+        if (!file.exists()) {
+            throw new Exception(String.format("%s: file %s doesn't exist", method, file.getCanonicalPath()));
+        }
+        executeSQLStatementUpdateBlob(new FileInputStream(file), result, tableName, columnName, condition);
+        return result;
+    }
+
+    public void executeSQLStatementUpdateBlob(InputStream inputStream, int dataLength, String tableName, String columnName, String condition)
+            throws Exception {
+        String method = getMethodName("executeSQLStatementUpdateBlob");
+
+        PreparedStatement pstmt = null;
+        try {
+            if (SOSString.isEmpty(tableName)) {
+                throw new Exception("missing tableName");
+            }
+            if (SOSString.isEmpty(columnName)) {
+                throw new Exception("missing columnName");
+            }
+            if (inputStream == null) {
+                throw new Exception("input stream is null");
+            }
+            StringBuilder query = new StringBuilder();
+            query.append("UPDATE ");
+            query.append(tableName);
+            query.append(" SET ").append(columnName).append(" = ? ");
+            if (condition != null) {
+                String where = condition.trim();
+                if (!SOSString.isEmpty(where)) {
+                    if (where.toUpperCase().startsWith("WHERE")) {
+                        query.append(" ").append(where);
+                    } else {
+                        query.append(" WHERE ").append(where);
+                    }
+                }
+            }
+            Connection conn = getConnection();
+            if (conn == null) {
+                throw new Exception("connection is null");
+            }
+            pstmt = conn.prepareStatement(query.toString());
+            pstmt.setBinaryStream(1, inputStream, dataLength);
+            pstmt.executeUpdate();
+        } catch (Exception e) {
+            throw new Exception(String.format("%s: %s", method, e.toString()), e);
+        } finally {
+            if (pstmt != null) {
+                try {
+                    pstmt.close();
+                } catch (Exception e) {
+                    //
+                }
+            }
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (Exception e) {
+                    //
+                }
+            }
+        }
+    }
+
+    public int executeSQLStatementUpdateClob(String data, String tableName, String columnName, String condition) throws Exception {
+        String method = getMethodName("executeSQLStatementUpdateClob");
+
+        if (SOSString.isEmpty(data)) {
+            throw new Exception(String.format("%s: missing data", method));
+        }
+        int result = data.length();
+        executeSQLStatementUpdateClob(new java.io.StringReader(data), result, tableName, columnName, condition);
+        return result;
+    }
+
+    public int executeSQLStatementUpdateClob(Path path, String tableName, String columnName, String condition) throws Exception {
+        String method = getMethodName("executeSQLStatementUpdateClob");
+
+        if (path == null) {
+            throw new NullPointerException(String.format("%s: path is null.", method));
+        }
+        File file = path.toFile();
+        int result = (int) file.length();
+        if (!file.exists()) {
+            throw new Exception(String.format("%s: file %s doesn't exist.", method, file.getCanonicalPath()));
+        }
+        executeSQLStatementUpdateClob(new FileReader(file), result, tableName, columnName, condition);
+        return result;
+    }
+
+    public void executeSQLStatementUpdateClob(Reader reader, int dataLength, String tableName, String columnName, String condition) throws Exception {
+        String method = getMethodName("executeSQLStatementUpdateClob");
+
+        PreparedStatement pstmt = null;
+        try {
+            if (SOSString.isEmpty(tableName)) {
+                throw new Exception("missing tableName.");
+            }
+            if (SOSString.isEmpty(columnName)) {
+                throw new NullPointerException("missing columnName.");
+            }
+            if (reader == null) {
+                throw new Exception("reader is null.");
+            }
+            StringBuilder query = new StringBuilder();
+            query.append("UPDATE ");
+            query.append(tableName);
+            query.append(" SET ").append(columnName).append(" = ? ");
+            if (condition != null) {
+                String where = condition.trim();
+                if (!SOSString.isEmpty(where)) {
+                    if (where.toUpperCase().startsWith("WHERE")) {
+                        query.append(" ").append(where);
+                    } else {
+                        query.append(" WHERE ").append(where);
+                    }
+                }
+            }
+            Connection conn = getConnection();
+            if (conn == null) {
+                throw new Exception("connection is null");
+            }
+            pstmt = conn.prepareStatement(query.toString());
+            pstmt.setCharacterStream(1, reader, dataLength);
+            pstmt.executeUpdate();
+        } catch (Exception e) {
+            throw new Exception(String.format("%s: %s", method, e.toString()), e);
+        } finally {
+            if (pstmt != null) {
+                try {
+                    pstmt.close();
+                } catch (Exception e) {
+                    //
+                }
+            }
+            if (reader != null) {
+                reader.close();
+            }
+        }
+    }
+
+    public long getSQLStatementBlob(String sql, Path path) throws Exception {
+        String method = getMethodName("getSQLStatementBlob");
+
+        Statement stmt = null;
+        ResultSet rs = null;
+        InputStream in = null;
+        FileOutputStream out = null;
+
+        long result = 0;
+        try {
+            if (SOSString.isEmpty(sql)) {
+                throw new Exception("missing sql");
+            }
+            if (path == null) {
+                throw new Exception("path is null");
+            }
+
+            Connection conn = getConnection();
+            if (conn == null) {
+                throw new Exception("connection is null");
+            }
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            int len = 0;
+            if (rs.next()) {
+                in = rs.getBinaryStream(1);
+                if (in == null) {
+                    return result;
+                }
+                byte[] buff = new byte[1024];
+                if ((len = in.read(buff)) > 0) {
+                    out = new FileOutputStream(path.toFile());
+                    out.write(buff, 0, len);
+                    result += len;
+                } else {
+                    return result;
+                }
+                while (0 < (len = in.read(buff))) {
+                    out.write(buff, 0, len);
+                    result += len;
+                }
+            }
+        } catch (Exception e) {
+            throw new Exception(String.format("%s: %s", method, e.toString()), e);
+        } finally {
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (Exception e) {
+                    //
+                }
+            }
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (Exception e) {
+                    //
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (Exception e) {
+                    //
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (Exception e) {
+                    //
+                }
+            }
+        }
+        return result;
+    }
+
+    public byte[] getSQLStatementBlob(String sql) throws Exception {
+        String method = getMethodName("getSQLStatementBlob");
+
+        Statement stmt = null;
+        ResultSet rs = null;
+        byte[] result = {};
+        try {
+            if (SOSString.isEmpty(sql)) {
+                throw new Exception("missing sql");
+            }
+
+            Connection conn = getConnection();
+            if (conn == null) {
+                throw new Exception("connection is null");
+            }
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(sql);
+            if (rs.next()) {
+                result = rs.getBytes(1);
+            }
+            if (result == null) {
+                return result;
+            }
+        } catch (Exception e) {
+            throw new Exception(String.format("%s: %s", method, e.toString()), e);
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (Exception e) {
+                    //
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (Exception e) {
+                    //
+                }
+            }
+
+        }
+        return result;
+    }
+
+    public String getSQLStatementClob(String sql) throws Exception {
+        String method = getMethodName("getSQLStatementClob");
+
+        Statement stmt = null;
+        ResultSet rs = null;
+        Reader in = null;
+        StringBuilder result = new StringBuilder();
+        try {
+            if (SOSString.isEmpty(sql)) {
+                throw new Exception("missing sql");
+            }
+            Connection conn = getConnection();
+            if (conn == null) {
+                throw new Exception("connection is null");
+            }
+            stmt = conn.createStatement();
+            try {
+                rs = stmt.executeQuery(sql);
+            } catch (Exception e) {
+                throw new Exception("exception on executeQuery: " + e.toString());
+            }
+
+            int bytesRead;
+            if (rs.next()) {
+                in = rs.getCharacterStream(1);
+                if (in == null) {
+                    return "";
+                }
+                if ((bytesRead = in.read()) != -1) {
+                    result.append((char) bytesRead);
+                } else {
+                    return "";
+                }
+                while ((bytesRead = in.read()) != -1) {
+                    result.append((char) bytesRead);
+                }
+            }
+        } catch (Exception e) {
+            throw new Exception(String.format("%s: %s", method, e.toString()), e);
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (Exception e) {
+                    //
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (Exception e) {
+                    //
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (Exception e) {
+                    //
+                }
+            }
+        }
+        return result.toString();
+    }
+
+    public long getSQLStatementClob(String sql, Path path) throws Exception {
+        String method = getMethodName("getSQLStatementClob");
+
+        Statement stmt = null;
+        ResultSet rs = null;
+        Reader in = null;
+        FileOutputStream out = null;
+        long result = 0;
+        try {
+            if (SOSString.isEmpty(sql)) {
+                throw new Exception("missing sql");
+            }
+            if (path == null) {
+                throw new Exception("path is null");
+            }
+            Connection conn = getConnection();
+            if (conn == null) {
+                throw new Exception("connection is null");
+            }
+
+            stmt = conn.createStatement();
+            try {
+                rs = stmt.executeQuery(sql);
+            } catch (Exception e) {
+                throw new Exception("exception on executeQuery: " + e.toString());
+            }
+
+            int bytesRead = 0;
+            if (rs.next()) {
+                in = rs.getCharacterStream(1);
+                if (in == null) {
+                    return result;
+                }
+                if ((bytesRead = in.read()) != -1) {
+                    out = new FileOutputStream(path.toFile());
+                    out.write(bytesRead);
+                    result++;
+                } else {
+                    return result;
+                }
+                while ((bytesRead = in.read()) != -1) {
+                    out.write(bytesRead);
+                    result++;
+                }
+            }
+        } catch (Exception e) {
+            throw new Exception(String.format("%s: %s", method, e.toString()), e);
+        } finally {
+            try {
+                out.flush();
+            } catch (Exception e) {
+                //
+            }
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (Exception e) {
+                    //
+                }
+            }
+
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (Exception e) {
+                    //
+                }
+            }
+
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (Exception e) {
+                    //
+                }
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (Exception e) {
+                    //
+                }
+            }
+
         }
         return result;
     }
@@ -362,13 +1037,6 @@ public class SOSHibernateSession implements Serializable {
         } finally {
             rollback();
         }
-    }
-
-    private boolean isResultListQuery(String sql) {
-        String patterns = "^select|^exec";
-        Pattern p = Pattern.compile(patterns, Pattern.CASE_INSENSITIVE);
-        Matcher matcher = p.matcher(sql);
-        return matcher.find();
     }
 
     @SuppressWarnings("unchecked")
@@ -588,14 +1256,17 @@ public class SOSHibernateSession implements Serializable {
         return cr;
     }
 
+    @Deprecated
     public Criteria createCriteria(Class<?> cl) throws Exception {
         return createCriteria(cl, (String) null);
     }
 
+    @Deprecated
     public Criteria createCriteria(Class<?> cl, String[] selectProperties) throws Exception {
         return createCriteria(cl, selectProperties, null);
     }
 
+    @Deprecated
     public Criteria createCriteria(Class<?> cl, String[] selectProperties, ResultTransformer transformer) throws Exception {
         Criteria cr = createCriteria(cl);
         if (cr == null) {
@@ -614,264 +1285,29 @@ public class SOSHibernateSession implements Serializable {
         return cr;
     }
 
+    @Deprecated
     public Criteria createSingleListTransform2BeanCriteria(Class<?> cl, String selectProperty) throws Exception {
         return createSingleListCriteria(cl, selectProperty, Transformers.aliasToBean(cl));
     }
 
+    @Deprecated
     public Criteria createSingleListCriteria(Class<?> cl, String selectProperty) throws Exception {
         return createSingleListCriteria(cl, selectProperty, null);
     }
 
+    @Deprecated
     public Criteria createSingleListCriteria(Class<?> cl, String selectProperty, ResultTransformer transformer) throws Exception {
         return createCriteria(cl, new String[] { selectProperty }, transformer);
     }
 
+    @Deprecated
     public Criteria createTransform2BeanCriteria(Class<?> cl) throws Exception {
         return createCriteria(cl, null, null);
     }
 
+    @Deprecated
     public Criteria createTransform2BeanCriteria(Class<?> cl, String[] selectProperties) throws Exception {
         return createCriteria(cl, selectProperties, Transformers.aliasToBean(cl));
-    }
-
-    public void beginTransaction() throws Exception {
-        String method = getMethodName("beginTransaction");
-        if (this.getFactory().getAutoCommit()) {
-            LOGGER.debug(String.format("%s: skip (autoCommit is true)", method));
-            return;
-        }
-        LOGGER.debug(String.format("%s", method));
-        if (currentSession == null) {
-            throw new DBSessionException("currentSession is NULL");
-        }
-        if (currentSession instanceof Session) {
-            Session session = ((Session) currentSession);
-            session.beginTransaction();
-        } else {
-            StatelessSession session = ((StatelessSession) currentSession);
-            session.beginTransaction();
-        }
-    }
-
-    public Transaction getTransaction() throws Exception {
-        Transaction tr = null;
-        if (currentSession == null) {
-            throw new DBSessionException("currentSession is NULL");
-        }
-        if (currentSession instanceof Session) {
-            Session s = ((Session) currentSession);
-            tr = s.getTransaction();
-        } else {
-            StatelessSession s = ((StatelessSession) currentSession);
-            tr = s.getTransaction();
-        }
-        return tr;
-    }
-
-    public void commit() throws Exception {
-        String method = getMethodName("commit");
-        if (this.getFactory().getAutoCommit()) {
-            LOGGER.debug(String.format("%s: skip (autoCommit is true)", method));
-            return;
-        }
-        LOGGER.debug(String.format("%s", method));
-        Transaction tr = getTransaction();
-        if (tr == null) {
-            throw new Exception(String.format("session transaction is NULL"));
-        }
-        if (currentSession instanceof Session) {
-            ((Session) currentSession).flush();
-        }
-        tr.commit();
-    }
-
-    public void rollback() throws Exception {
-        String method = getMethodName("rollback");
-        if (this.getFactory().getAutoCommit()) {
-            LOGGER.debug(String.format("%s: skip (autoCommit is true)", method));
-            return;
-        }
-        LOGGER.debug(String.format("%s", method));
-        Transaction tr = getTransaction();
-        if (tr == null) {
-            throw new Exception(String.format("session transaction is NULL"));
-        }
-        tr.rollback();
-    }
-
-    public void save(Object item) throws Exception {
-        String method = getMethodName("save");
-        LOGGER.debug(String.format("%s: item = %s", method, item));
-        if (currentSession == null) {
-            throw new DBSessionException("session is NULL");
-        }
-        if (currentSession instanceof Session) {
-            Session session = ((Session) currentSession);
-            session.save(item);
-            session.flush();
-        } else {
-            StatelessSession session = ((StatelessSession) currentSession);
-            session.insert(item);
-        }
-    }
-
-    public void update(Object item) throws Exception {
-        String method = getMethodName("update");
-        LOGGER.debug(String.format("%s: item = %s", method, item));
-        if (currentSession == null) {
-            throw new DBSessionException("session is NULL");
-        }
-        if (currentSession instanceof Session) {
-            Session session = ((Session) currentSession);
-            session.update(item);
-            session.flush();
-        } else {
-            StatelessSession session = ((StatelessSession) currentSession);
-            session.update(item);
-        }
-    }
-
-    public Object saveOrUpdate(Object item) throws Exception {
-        String method = getMethodName("saveOrUpdate");
-        LOGGER.debug(String.format("%s: item = %s", method, item));
-        if (currentSession == null) {
-            throw new DBSessionException("currentSession is NULL");
-        }
-        if (currentSession instanceof Session) {
-            Session session = ((Session) currentSession);
-            session.saveOrUpdate(item);
-            session.flush();
-        } else {
-            StatelessSession session = ((StatelessSession) currentSession);
-            /*
-             * The following error will always be logged in the try segment, if the item id field is null: SQL Error: -1, SQLState: 07004 Parameter at position
-             * 9 is not set HHH000010: On release of batch it still contained JDBC statements in a stateless session it is better to check if the item is a new
-             * entry and then call save() or an existing item and then call update() there is no need to create an error to switch the statement afterwards
-             */
-            try {
-                session.update(item);
-            } catch (Exception e) {
-                session.insert(item);
-            }
-        }
-        return item;
-    }
-
-    public void delete(Object item) throws Exception {
-        String method = getMethodName("delete");
-        LOGGER.debug(String.format("%s: item = %s", method, item));
-        if (currentSession == null) {
-            throw new DBSessionException("currentSession is NULL");
-        }
-        if (currentSession instanceof Session) {
-            Session session = ((Session) currentSession);
-            session.delete(item);
-            session.flush();
-        } else {
-            StatelessSession session = ((StatelessSession) currentSession);
-            session.delete(item);
-        }
-    }
-
-    public Object getCurrentSession() throws Exception {
-        return currentSession;
-    }
-
-    public Connection getConnection() throws Exception {
-        String method = "getConnection";
-        if (currentSession instanceof Session) {
-            SessionImpl sf = (SessionImpl) currentSession;
-            try {
-                return sf.connection();
-            } catch (Exception e) {
-                throw new Exception(String.format("%s: %s", method, e.toString()), e);
-            }
-        } else {
-            StatelessSessionImpl sf = (StatelessSessionImpl) currentSession;
-            try {
-                return sf.connection();
-            } catch (Exception e) {
-                throw new Exception(String.format("%s: %s", method, e.toString()), e);
-            }
-        }
-    }
-
-    public void setHibernateFlushMode(FlushMode flushMode) {
-        if (currentSession instanceof Session) {
-            Session session = (Session) currentSession;
-            session.setHibernateFlushMode(flushMode);
-        }
-    }
-
-    public FlushMode getHibernateFlushMode() {
-        if (currentSession instanceof Session) {
-            Session session = (Session) currentSession;
-            return session.getHibernateFlushMode();
-        }
-        return null;
-    }
-
-    public void setCacheMode(CacheMode cacheMode) {
-        if (currentSession instanceof Session) {
-            Session session = (Session) currentSession;
-            session.setCacheMode(cacheMode);
-        }
-    }
-
-    public CacheMode getCacheMode() {
-        if (currentSession instanceof Session) {
-            Session session = (Session) currentSession;
-            return session.getCacheMode();
-        }
-        return null;
-    }
-
-    public boolean isOpen() {
-        if (currentSession instanceof Session) {
-            Session session = (Session) currentSession;
-            return session.isOpen();
-        } else {
-            StatelessSession session = ((StatelessSession) currentSession);
-            return session.isOpen();
-        }
-    }
-
-    public boolean isConnected() {
-        if (currentSession instanceof Session) {
-            Session session = (Session) currentSession;
-            return session.isConnected();
-        } else {
-            StatelessSession session = ((StatelessSession) currentSession);
-            return session.isConnected();
-        }
-    }
-
-    public void refresh(Object object) {
-        refresh(null, object);
-    }
-
-    public void refresh(String entityName, Object object) {
-        if (currentSession instanceof Session) {
-            Session session = (Session) currentSession;
-            if (entityName == null) {
-                session.refresh(object);
-            } else {
-                session.refresh(entityName, object);
-            }
-        } else {
-            StatelessSession session = ((StatelessSession) currentSession);
-            if (entityName == null) {
-                session.refresh(object);
-            } else {
-                session.refresh(entityName, object);
-            }
-
-        }
-    }
-
-    private String getMethodName(String name) {
-        String prefix = identifier == null ? "" : String.format("[%s] ", identifier);
-        return String.format("%s%s", prefix, name);
     }
 
     public static Criterion createInCriterion(String propertyName, List<?> list) {
@@ -894,39 +1330,54 @@ public class SOSHibernateSession implements Serializable {
         return criterion;
     }
 
-    public Object get(Class<?> entityClass, Serializable id) throws Exception {
-        if (currentSession instanceof Session) {
-            return ((Session) currentSession).get(entityClass, id);
-        } else {
-            return ((StatelessSession) currentSession).get(entityClass, id);
+    private String getMethodName(String name) {
+        String prefix = identifier == null ? "" : String.format("[%s] ", identifier);
+        return String.format("%s%s", prefix, name);
+    }
+
+    private void closeTransaction() {
+        String method = getMethodName("closeTransaction");
+        try {
+            if (currentSession != null) {
+                Transaction tr = getTransaction();
+                if (tr != null) {
+                    LOGGER.debug(String.format("%s: rollback", method));
+                    tr.rollback();
+                } else {
+                    LOGGER.debug(String.format("%s: skip rollback (transaction is null)", method));
+                }
+            }
+        } catch (Exception ex) {
+            //
         }
+
     }
 
-    public boolean isUseOpenStatelessSession() {
-        return useOpenStatelessSession;
+    private void closeSession() {
+        String method = getMethodName("closeSession");
+        LOGGER.debug(String.format("%s", method));
+        try {
+            if (currentSession != null) {
+                if (currentSession instanceof Session) {
+                    Session session = (Session) currentSession;
+                    if (session.isOpen()) {
+                        session.close();
+                    }
+                } else {
+                    StatelessSession s = (StatelessSession) currentSession;
+                    s.close();
+                }
+            }
+        } catch (Throwable e) {
+        }
+        currentSession = null;
+        openSessionMethodName = null;
     }
 
-    protected void setUseOpenStatelessSession(boolean useOpenStatelessSession) {
-        this.useOpenStatelessSession = useOpenStatelessSession;
-    }
-
-    public boolean isUseGetCurrentSession() {
-        return useGetCurrentSession;
-    }
-
-    protected void setUseGetCurrentSession(boolean useGetCurrentSession) {
-        this.useGetCurrentSession = useGetCurrentSession;
-    }
-
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    public void setIdentifier(String val) {
-        identifier = val;
-    }
-
-    public SOSHibernateFactory getFactory() {
-        return this.factory;
+    private boolean isResultListQuery(String sql) {
+        String patterns = "^select|^exec";
+        Pattern p = Pattern.compile(patterns, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = p.matcher(sql);
+        return matcher.find();
     }
 }
