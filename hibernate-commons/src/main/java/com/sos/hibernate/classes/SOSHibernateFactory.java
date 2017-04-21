@@ -20,12 +20,10 @@ import org.hibernate.type.NumericBooleanType;
 import org.hibernate.type.StringType;
 import org.hibernate.type.TimestampType;
 import org.hibernate.type.Type;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import sos.util.SOSDate;
 import sos.util.SOSString;
 
 public class SOSHibernateFactory implements Serializable {
@@ -38,7 +36,6 @@ public class SOSHibernateFactory implements Serializable {
     public static final String HIBERNATE_PROPERTY_ID_NEW_GENERATOR_MAPPINGS = "hibernate.id.new_generator_mappings";
     public static final String HIBERNATE_PROPERTY_JAVAX_PERSISTENCE_VALIDATION_MODE = "javax.persistence.validation.mode";
     public static final int LIMIT_IN_CLAUSE = 1000;
-    public static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateFactory.class);
@@ -188,19 +185,19 @@ public class SOSHibernateFactory implements Serializable {
         } else if (type instanceof org.hibernate.type.LongType) {
             return org.hibernate.type.LongType.INSTANCE.objectToSQLString((Long) value, dialect);
         } else if (type instanceof org.hibernate.type.StringType) {
-            return StringType.INSTANCE.objectToSQLString((String) value, dialect);
+            return "'" + value.toString().replaceAll("'", "''") + "'";
         } else if (type instanceof org.hibernate.type.TimestampType) {
             if (dbms.equals(Dbms.ORACLE)) {
-                String val = SOSHibernateFactory.getDateAsString((Date) value);
+                String val = SOSDate.getDateAsString((Date) value, "yyyy-MM-dd HH:mm:ss");
                 return "to_date('" + val + "','yyyy-mm-dd HH24:MI:SS')";
             } else if (dbms.equals(Dbms.MSSQL)) {
-                String val = SOSHibernateFactory.getDateAsString((Date) value);
+                String val = SOSDate.getDateAsString((Date) value, "yyyy-MM-dd HH:mm:ss.SSS");
                 return "'" + val.replace(" ", "T") + "'";
             } else {
                 return TimestampType.INSTANCE.objectToSQLString((Date) value, dialect);
             }
         }
-        return null;
+        return value + "";
     }
 
     /** @deprecated use quoteColumn instead
@@ -301,7 +298,6 @@ public class SOSHibernateFactory implements Serializable {
         }
     }
 
-    
     /** Hibernate Dialect does not provide the functions to identify the last inserted sequence value.
      * 
      * only for the next value: e.g. dialiect.getSelectSequenceNextValString(sequenceName), dialect.getSequenceNextValString(sequenceName) */
@@ -320,12 +316,6 @@ public class SOSHibernateFactory implements Serializable {
             return "SELECT @@IDENTITY";
         }
         return null;
-    }
-
-    public static String getDateAsString(Date d) throws Exception {
-        DateTimeFormatter f = DateTimeFormat.forPattern(DATETIME_FORMAT);
-        DateTime dt = new DateTime(d);
-        return f.print(dt);
     }
 
     public Optional<Path> getConfigFile() {
@@ -390,7 +380,7 @@ public class SOSHibernateFactory implements Serializable {
             setDbms(dialect);
         }
     }
-    
+
     private void initClassMapping() {
         classMapping = new ClassList();
     }
@@ -482,7 +472,6 @@ public class SOSHibernateFactory implements Serializable {
         }
         return db;
     }
-
 
     private String getMethodName(String name) {
         String prefix = identifier == null ? "" : String.format("[%s] ", identifier);
