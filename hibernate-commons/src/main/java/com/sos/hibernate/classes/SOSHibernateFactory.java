@@ -17,7 +17,6 @@ import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.type.NumericBooleanType;
-import org.hibernate.type.StringType;
 import org.hibernate.type.TimestampType;
 import org.hibernate.type.Type;
 import org.slf4j.Logger;
@@ -253,8 +252,12 @@ public class SOSHibernateFactory implements Serializable {
     public void close() {
         String method = getMethodName("close");
         LOGGER.debug(String.format("%s", method));
-        if (sessionFactory != null && !sessionFactory.isClosed()) {
-            sessionFactory.close();
+        try {
+            if (sessionFactory != null && !sessionFactory.isClosed()) {
+                sessionFactory.close();
+            }
+        } catch (Throwable e) {
+            LOGGER.warn(String.format("%s:%s",method,e.toString()),e);
         }
         sessionFactory = null;
     }
