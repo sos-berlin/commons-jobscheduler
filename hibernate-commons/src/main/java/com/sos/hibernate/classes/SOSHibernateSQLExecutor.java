@@ -17,7 +17,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -117,7 +116,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
         Statement stmt = null;
         try {
             stmt = conn.createStatement();
-            List<String> commands = getSQLQueries(content);
+            List<String> commands = getStatements(content);
             for (int i = 0; i < commands.size(); i++) {
                 String command = commands.get(i);
                 if (isResultListQuery(command)) {
@@ -249,7 +248,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
     /** see executeQuery */
     public Map<String, String> next(ResultSet rs) throws Exception {
         Map<String, String> record = new LinkedHashMap<String, String>();
-        if (rs.next()) {
+        if (rs != null && rs.next()) {
             ResultSetMetaData meta = rs.getMetaData();
             int count = meta.getColumnCount();
             for (int i = 1; i <= count; i++) {
@@ -739,11 +738,11 @@ public class SOSHibernateSQLExecutor implements Serializable {
         return result;
     }
 
-    public List<String> getSQLQueries(Path file) throws Exception {
-        return getSQLQueries(new String(Files.readAllBytes(file)));
+    public List<String> getStatements(Path file) throws Exception {
+        return getStatements(new String(Files.readAllBytes(file)));
     }
 
-    public List<String> getSQLQueries(String content) throws Exception {
+    public List<String> getStatements(String content) throws Exception {
         SOSSQLCommandExtractor extractor = new SOSSQLCommandExtractor(session.getFactory().getDbms());
         return extractor.extractCommands(content);
     }
