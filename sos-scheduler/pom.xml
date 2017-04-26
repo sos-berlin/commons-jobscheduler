@@ -172,6 +172,12 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>com.sos-berlin.jobscheduler.engine</groupId>
+			<artifactId>base_2.11</artifactId>
+			<version>1.12.0-SNAPSHOT</version>
+		</dependency>
+		
 	</dependencies>
 
 </project>

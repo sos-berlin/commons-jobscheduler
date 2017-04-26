@@ -13,14 +13,14 @@ import javax.xml.transform.stream.StreamResult;
 
 import scala.collection.immutable.Set;
 
-import com.sos.scheduler.engine.data.filebased.AbsolutePath;
+import com.sos.jobscheduler.data.filebased.AbsolutePath;
 import com.sos.scheduler.engine.data.filebased.FileBasedType;
 import com.sos.scheduler.engine.kernel.plugin.AbstractPlugin;
 import com.sos.scheduler.engine.kernel.plugin.Plugins;
 import com.sos.scheduler.engine.kernel.plugin.XmlConfigurationChangingPlugin;
 
-import static com.sos.scheduler.engine.common.xml.XmlUtils.loadXml;
-import static com.sos.scheduler.engine.common.xml.XmlUtils.toXmlBytes;
+import static com.sos.scheduler.engine.common.xml.CppXmlUtils.loadXml;
+import static com.sos.scheduler.engine.common.xml.CppXmlUtils.toXmlBytes;
 import static com.sos.scheduler.engine.common.javautils.ScalaInJava.toScalaSet;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
