@@ -5,10 +5,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+
+import com.sos.hibernate.classes.ClassList;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -45,7 +48,7 @@ public class SOSHibernateFactory implements Serializable {
     private Dialect dialect;
     private Properties defaultConfigurationProperties;
     private Properties configurationProperties;
-    private com.sos.hibernate.classes.ClassList classMapping;
+    private ClassList classMapping;
     private boolean useDefaultConfigurationProperties = true;
     private String identifier;
     private Optional<Integer> jdbcFetchSize = Optional.empty();
@@ -474,6 +477,10 @@ public class SOSHibernateFactory implements Serializable {
             }
         }
         return db;
+    }
+
+    public void addClassMapping(Class<?> c) {
+        classMapping.add(c);
     }
 
     private String getMethodName(String name) {
