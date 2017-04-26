@@ -1,26 +1,11 @@
 package com.sos.hibernate.classes;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.InputStream;
-import java.io.Reader;
 import java.io.Serializable;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
@@ -43,11 +28,8 @@ import org.hibernate.transform.ResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.sos.exception.DBSessionException;
-
 import sos.util.SOSDate;
-import sos.util.SOSString;
 
 public class SOSHibernateSession implements Serializable {
 
@@ -60,6 +42,7 @@ public class SOSHibernateSession implements Serializable {
     private FlushMode defaultHibernateFlushMode = FlushMode.ALWAYS;
     private String identifier;
     private String openSessionMethodName;
+    private SOSHibernateSQLExecutor sqlExecutor;
     public static final int LIMIT_IN_CLAUSE = 1000;
 
     /** use factory.openSession() or factory.openStatelessSession(); */
@@ -90,42 +73,6 @@ public class SOSHibernateSession implements Serializable {
         if (currentSession instanceof Session) {
             Session session = (Session) currentSession;
             session.setCacheMode(cacheMode);
-        }
-    }
-
-    public void setDefaults() throws Exception {
-        String method = getMethodName("setDefaults");
-        LOGGER.debug(String.format("%s: dbms=%s", method, factory.getDbms()));
-
-        if (factory.getDbms().equals(SOSHibernateFactory.Dbms.MSSQL)) {
-            String dateFormat = "set DATEFORMAT ymd";
-            String language = "set LANGUAGE British";
-            String lockTimeout = "set LOCK_TIMEOUT 3000";
-            executeSQLStatement(dateFormat, language, lockTimeout);
-        } else if (factory.getDbms().equals(SOSHibernateFactory.Dbms.MYSQL)) {
-            executeSQLStatement("SET SESSION SQL_MODE='ANSI_QUOTES'");
-        } else if (factory.getDbms().equals(SOSHibernateFactory.Dbms.ORACLE)) {
-            String nlsNumericCharacters = "ALTER SESSION SET NLS_NUMERIC_CHARACTERS='.,'";
-            String nlsDateFormat = "ALTER SESSION SET NLS_DATE_FORMAT='YYYY-MM-DD HH24:MI:SS'";
-            String nlsSort = "ALTER SESSION SET NLS_SORT='BINARY'";
-            executeSQLStatementBatch(nlsNumericCharacters, nlsDateFormat, nlsSort);
-            executeUpdateSQLCallableStatement("begin dbms_output.enable(10000); end;");
-        } else if (factory.getDbms().equals(SOSHibernateFactory.Dbms.PGSQL)) {
-            String lcNumeric = "SELECT set_config('lc_numeric', '', true)";
-            String dateStyle = "SELECT set_config('datestyle', 'ISO, YMD', true)";
-            String defaultTransactionIsolation = "SELECT set_config('default_transaction_isolation', 'repeatable read', true)";
-            executeSQLStatement(lcNumeric, dateStyle, defaultTransactionIsolation);
-        } else if (factory.getDbms().equals(SOSHibernateFactory.Dbms.SYBASE)) {
-            String isolationLevel = "set TRANSACTION ISOLATION LEVEL READ COMMITTED";
-            String chainedOn = "set CHAINED ON";
-            String quotedIdentifier = "set QUOTED_IDENTIFIER ON";
-            String lockTimeout = "set LOCK WAIT 3";
-            String closeOnEndtran = "set CLOSE ON ENDTRAN ON";
-            String datefirst = "set DATEFIRST 1";
-            String dateFormat = "set DATEFORMAT 'ymd'";
-            String language = "set LANGUAGE us_english";
-            String textsize = "set TEXTSIZE 2048000";
-            executeSQLStatement(isolationLevel, chainedOn, quotedIdentifier, lockTimeout, closeOnEndtran, datefirst, dateFormat, language, textsize);
         }
     }
 
@@ -172,7 +119,7 @@ public class SOSHibernateSession implements Serializable {
         }
         return null;
     }
-  
+
     public CacheMode getCacheMode() {
         if (currentSession instanceof Session) {
             Session session = (Session) currentSession;
@@ -219,6 +166,13 @@ public class SOSHibernateSession implements Serializable {
     public String getLastSequenceValue(String sequenceName) throws Exception {
         String stmt = factory.getSequenceLastValString(sequenceName);
         return stmt == null ? null : getNativeQuerySingleValue(stmt);
+    }
+
+    public SOSHibernateSQLExecutor getSQLExecutor() {
+        if (sqlExecutor == null) {
+            sqlExecutor = new SOSHibernateSQLExecutor(this);
+        }
+        return sqlExecutor;
     }
 
     protected void openSession() throws Exception {
@@ -489,553 +443,6 @@ public class SOSHibernateSession implements Serializable {
             return ((Session) currentSession).get(entityClass, id);
         } else {
             return ((StatelessSession) currentSession).get(entityClass, id);
-        }
-    }
-
-    public int executeUpdateSQLCallableStatement(String sql) throws Exception {
-        String method = getMethodName("executeUpdateSQLCallableStatement");
-        int result = -1;
-        Connection conn = getConnection();
-        if (conn == null) {
-            throw new Exception(String.format("%s: connection is null", method));
-        }
-        LOGGER.debug(String.format("%s: sqlStmt=%s", method, sql));
-        CallableStatement stmt = null;
-        try {
-            stmt = conn.prepareCall(sql);
-            result = stmt.executeUpdate();
-        } catch (Throwable e) {
-            throw e;
-        } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (Throwable e) {
-                }
-            }
-        }
-        return result;
-    }
-
-    public boolean executeSQLStatement(String... sqls) throws Exception {
-        String method = getMethodName("executeSQLStatement");
-        boolean result = false;
-        Connection conn = getConnection();
-        if (conn == null) {
-            throw new Exception(String.format("%s: connection is null", method));
-        }
-        Statement stmt = null;
-        try {
-            stmt = conn.createStatement();
-            for (String sql : sqls) {
-                LOGGER.debug(String.format("%s: sql=%s", method, sql));
-                result = stmt.execute(sql);
-            }
-        } catch (Throwable e) {
-            throw e;
-        } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (Throwable e) {
-                }
-            }
-        }
-        return result;
-    }
-
-    public int[] executeSQLStatementBatch(String... sqls) throws Exception {
-        String method = getMethodName("executeSQLStatementBatch");
-        int[] result = null;
-        Connection conn = getConnection();
-        if (conn == null) {
-            throw new Exception(String.format("%s: connection is null", method));
-        }
-        Statement stmt = null;
-        try {
-            stmt = conn.createStatement();
-            for (String sql : sqls) {
-                LOGGER.debug(String.format("%s: addBatch sql=%s", method, sql));
-                stmt.addBatch(sql);
-            }
-            result = stmt.executeBatch();
-        } catch (Throwable e) {
-            throw e;
-        } finally {
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (Throwable e) {
-                }
-            }
-        }
-        return result;
-    }
-
-    public int executeSQLStatementUpdateBlob(byte[] data, String tableName, String columnName, String condition) throws Exception {
-        String method = getMethodName("executeSQLStatementUpdateBlob");
-
-        if (data == null || data.length <= 0) {
-            throw new Exception(String.format("%s: missing data", method));
-        }
-        int result = data.length;
-        executeSQLStatementUpdateBlob(new ByteArrayInputStream(data), result, tableName, columnName, condition);
-        return result;
-    }
-
-    public int executeSQLStatementUpdateBlob(Path path, String tableName, String columnName, String condition) throws Exception {
-        String method = getMethodName("executeSQLStatementUpdateBlob");
-
-        if (path == null) {
-            throw new Exception(String.format("%s: path is null", method));
-        }
-        File file = path.toFile();
-        int result = (int) file.length();
-        if (!file.exists()) {
-            throw new Exception(String.format("%s: file %s doesn't exist", method, file.getCanonicalPath()));
-        }
-        executeSQLStatementUpdateBlob(new FileInputStream(file), result, tableName, columnName, condition);
-        return result;
-    }
-
-    public void executeSQLStatementUpdateBlob(InputStream inputStream, int dataLength, String tableName, String columnName, String condition)
-            throws Exception {
-        String method = getMethodName("executeSQLStatementUpdateBlob");
-
-        PreparedStatement pstmt = null;
-        try {
-            if (SOSString.isEmpty(tableName)) {
-                throw new Exception("missing tableName");
-            }
-            if (SOSString.isEmpty(columnName)) {
-                throw new Exception("missing columnName");
-            }
-            if (inputStream == null) {
-                throw new Exception("input stream is null");
-            }
-            StringBuilder query = new StringBuilder();
-            query.append("UPDATE ");
-            query.append(tableName);
-            query.append(" SET ").append(columnName).append(" = ? ");
-            if (condition != null) {
-                String where = condition.trim();
-                if (!SOSString.isEmpty(where)) {
-                    if (where.toUpperCase().startsWith("WHERE")) {
-                        query.append(" ").append(where);
-                    } else {
-                        query.append(" WHERE ").append(where);
-                    }
-                }
-            }
-            Connection conn = getConnection();
-            if (conn == null) {
-                throw new Exception("connection is null");
-            }
-            pstmt = conn.prepareStatement(query.toString());
-            pstmt.setBinaryStream(1, inputStream, dataLength);
-            pstmt.executeUpdate();
-        } catch (Exception e) {
-            throw new Exception(String.format("%s: %s", method, e.toString()), e);
-        } finally {
-            if (pstmt != null) {
-                try {
-                    pstmt.close();
-                } catch (Exception e) {
-                    //
-                }
-            }
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (Exception e) {
-                    //
-                }
-            }
-        }
-    }
-
-    public int executeSQLStatementUpdateClob(String data, String tableName, String columnName, String condition) throws Exception {
-        String method = getMethodName("executeSQLStatementUpdateClob");
-
-        if (SOSString.isEmpty(data)) {
-            throw new Exception(String.format("%s: missing data", method));
-        }
-        int result = data.length();
-        executeSQLStatementUpdateClob(new java.io.StringReader(data), result, tableName, columnName, condition);
-        return result;
-    }
-
-    public int executeSQLStatementUpdateClob(Path path, String tableName, String columnName, String condition) throws Exception {
-        String method = getMethodName("executeSQLStatementUpdateClob");
-
-        if (path == null) {
-            throw new NullPointerException(String.format("%s: path is null.", method));
-        }
-        File file = path.toFile();
-        int result = (int) file.length();
-        if (!file.exists()) {
-            throw new Exception(String.format("%s: file %s doesn't exist.", method, file.getCanonicalPath()));
-        }
-        executeSQLStatementUpdateClob(new FileReader(file), result, tableName, columnName, condition);
-        return result;
-    }
-
-    public void executeSQLStatementUpdateClob(Reader reader, int dataLength, String tableName, String columnName, String condition) throws Exception {
-        String method = getMethodName("executeSQLStatementUpdateClob");
-
-        PreparedStatement pstmt = null;
-        try {
-            if (SOSString.isEmpty(tableName)) {
-                throw new Exception("missing tableName.");
-            }
-            if (SOSString.isEmpty(columnName)) {
-                throw new NullPointerException("missing columnName.");
-            }
-            if (reader == null) {
-                throw new Exception("reader is null.");
-            }
-            StringBuilder query = new StringBuilder();
-            query.append("UPDATE ");
-            query.append(tableName);
-            query.append(" SET ").append(columnName).append(" = ? ");
-            if (condition != null) {
-                String where = condition.trim();
-                if (!SOSString.isEmpty(where)) {
-                    if (where.toUpperCase().startsWith("WHERE")) {
-                        query.append(" ").append(where);
-                    } else {
-                        query.append(" WHERE ").append(where);
-                    }
-                }
-            }
-            Connection conn = getConnection();
-            if (conn == null) {
-                throw new Exception("connection is null");
-            }
-            pstmt = conn.prepareStatement(query.toString());
-            pstmt.setCharacterStream(1, reader, dataLength);
-            pstmt.executeUpdate();
-        } catch (Exception e) {
-            throw new Exception(String.format("%s: %s", method, e.toString()), e);
-        } finally {
-            if (pstmt != null) {
-                try {
-                    pstmt.close();
-                } catch (Exception e) {
-                    //
-                }
-            }
-            if (reader != null) {
-                reader.close();
-            }
-        }
-    }
-
-    public long getSQLStatementBlob(String sql, Path path) throws Exception {
-        String method = getMethodName("getSQLStatementBlob");
-
-        Statement stmt = null;
-        ResultSet rs = null;
-        InputStream in = null;
-        FileOutputStream out = null;
-
-        long result = 0;
-        try {
-            if (SOSString.isEmpty(sql)) {
-                throw new Exception("missing sql");
-            }
-            if (path == null) {
-                throw new Exception("path is null");
-            }
-
-            Connection conn = getConnection();
-            if (conn == null) {
-                throw new Exception("connection is null");
-            }
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(sql);
-            int len = 0;
-            if (rs.next()) {
-                in = rs.getBinaryStream(1);
-                if (in == null) {
-                    return result;
-                }
-                byte[] buff = new byte[1024];
-                if ((len = in.read(buff)) > 0) {
-                    out = new FileOutputStream(path.toFile());
-                    out.write(buff, 0, len);
-                    result += len;
-                } else {
-                    return result;
-                }
-                while (0 < (len = in.read(buff))) {
-                    out.write(buff, 0, len);
-                    result += len;
-                }
-            }
-        } catch (Exception e) {
-            throw new Exception(String.format("%s: %s", method, e.toString()), e);
-        } finally {
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (Exception e) {
-                    //
-                }
-            }
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (Exception e) {
-                    //
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (Exception e) {
-                    //
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (Exception e) {
-                    //
-                }
-            }
-        }
-        return result;
-    }
-
-    public byte[] getSQLStatementBlob(String sql) throws Exception {
-        String method = getMethodName("getSQLStatementBlob");
-
-        Statement stmt = null;
-        ResultSet rs = null;
-        byte[] result = {};
-        try {
-            if (SOSString.isEmpty(sql)) {
-                throw new Exception("missing sql");
-            }
-
-            Connection conn = getConnection();
-            if (conn == null) {
-                throw new Exception("connection is null");
-            }
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(sql);
-            if (rs.next()) {
-                result = rs.getBytes(1);
-            }
-            if (result == null) {
-                return result;
-            }
-        } catch (Exception e) {
-            throw new Exception(String.format("%s: %s", method, e.toString()), e);
-        } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (Exception e) {
-                    //
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (Exception e) {
-                    //
-                }
-            }
-
-        }
-        return result;
-    }
-
-    public String getSQLStatementClob(String sql) throws Exception {
-        String method = getMethodName("getSQLStatementClob");
-
-        Statement stmt = null;
-        ResultSet rs = null;
-        Reader in = null;
-        StringBuilder result = new StringBuilder();
-        try {
-            if (SOSString.isEmpty(sql)) {
-                throw new Exception("missing sql");
-            }
-            Connection conn = getConnection();
-            if (conn == null) {
-                throw new Exception("connection is null");
-            }
-            stmt = conn.createStatement();
-            try {
-                rs = stmt.executeQuery(sql);
-            } catch (Exception e) {
-                throw new Exception("exception on executeQuery: " + e.toString());
-            }
-
-            int bytesRead;
-            if (rs.next()) {
-                in = rs.getCharacterStream(1);
-                if (in == null) {
-                    return "";
-                }
-                if ((bytesRead = in.read()) != -1) {
-                    result.append((char) bytesRead);
-                } else {
-                    return "";
-                }
-                while ((bytesRead = in.read()) != -1) {
-                    result.append((char) bytesRead);
-                }
-            }
-        } catch (Exception e) {
-            throw new Exception(String.format("%s: %s", method, e.toString()), e);
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (Exception e) {
-                    //
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (Exception e) {
-                    //
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (Exception e) {
-                    //
-                }
-            }
-        }
-        return result.toString();
-    }
-
-    public long getSQLStatementClob(String sql, Path path) throws Exception {
-        String method = getMethodName("getSQLStatementClob");
-
-        Statement stmt = null;
-        ResultSet rs = null;
-        Reader in = null;
-        FileOutputStream out = null;
-        long result = 0;
-        try {
-            if (SOSString.isEmpty(sql)) {
-                throw new Exception("missing sql");
-            }
-            if (path == null) {
-                throw new Exception("path is null");
-            }
-            Connection conn = getConnection();
-            if (conn == null) {
-                throw new Exception("connection is null");
-            }
-
-            stmt = conn.createStatement();
-            try {
-                rs = stmt.executeQuery(sql);
-            } catch (Exception e) {
-                throw new Exception("exception on executeQuery: " + e.toString());
-            }
-
-            int bytesRead = 0;
-            if (rs.next()) {
-                in = rs.getCharacterStream(1);
-                if (in == null) {
-                    return result;
-                }
-                if ((bytesRead = in.read()) != -1) {
-                    out = new FileOutputStream(path.toFile());
-                    out.write(bytesRead);
-                    result++;
-                } else {
-                    return result;
-                }
-                while ((bytesRead = in.read()) != -1) {
-                    out.write(bytesRead);
-                    result++;
-                }
-            }
-        } catch (Exception e) {
-            throw new Exception(String.format("%s: %s", method, e.toString()), e);
-        } finally {
-            try {
-                out.flush();
-            } catch (Exception e) {
-                //
-            }
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (Exception e) {
-                    //
-                }
-            }
-
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (Exception e) {
-                    //
-                }
-            }
-
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (Exception e) {
-                    //
-                }
-            }
-            if (stmt != null) {
-                try {
-                    stmt.close();
-                } catch (Exception e) {
-                    //
-                }
-            }
-
-        }
-        return result;
-    }
-
-    public List<String> getNativeQueries(Path file) throws Exception {
-        return getNativeQueries(new String(Files.readAllBytes(file)));
-    }
-
-    public List<String> getNativeQueries(String content) throws Exception {
-        SOSSqlCommandExtractor extractor = new SOSSqlCommandExtractor(this.factory.getDbms());
-        return extractor.extractCommands(content);
-    }
-
-    public void executeNativeQueries(Path file) throws Exception {
-        executeNativeQueries(new String(Files.readAllBytes(file)));
-    }
-
-    public void executeNativeQueries(String content) throws Exception {
-        try {
-            beginTransaction();
-
-            List<String> commands = getNativeQueries(content);
-            for (int i = 0; i < commands.size(); i++) {
-                NativeQuery<?> q = createNativeQuery(commands.get(i));
-                if (isResultListQuery(commands.get(i))) {
-                    q.getResultList();
-                } else {
-                    q.executeUpdate();
-                }
-            }
-        } catch (Exception e) {
-            throw e;
-        } finally {
-            rollback();
         }
     }
 
@@ -1374,10 +781,4 @@ public class SOSHibernateSession implements Serializable {
         openSessionMethodName = null;
     }
 
-    private boolean isResultListQuery(String sql) {
-        String patterns = "^select|^exec";
-        Pattern p = Pattern.compile(patterns, Pattern.CASE_INSENSITIVE);
-        Matcher matcher = p.matcher(sql);
-        return matcher.find();
-    }
 }

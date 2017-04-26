@@ -1,17 +1,11 @@
 package com.sos.hibernate.classes;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.Reader;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.hibernate.query.NativeQuery;
 import org.hibernate.tool.hbm2ddl.MultipleLinesSqlCommandExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +20,6 @@ public class SOSHibernateSessionTest {
         try {
             reader = new FileReader(file);
             String[] commands = ex.extractCommands(reader);
-
             for (int i = 0; i < commands.length; i++) {
                 LOGGER.info("####### " + i + " START #####");
                 LOGGER.info(commands[i]);
@@ -41,9 +34,8 @@ public class SOSHibernateSessionTest {
             }
         }
     }
-   
-    
-    public StringBuilder getFileContent(String inputFile) throws Exception{
+
+    public StringBuilder getFileContent(String inputFile) throws Exception {
         FileReader fr = null;
         BufferedReader br = null;
         StringBuilder sb = new StringBuilder();
@@ -75,11 +67,11 @@ public class SOSHibernateSessionTest {
         }
         return sb;
     }
-    
+
     public static void main(String[] args) throws Exception {
         String configFile = "./src/test/resources/hibernate.cfg.xml";
-        String sqlFile = "test.sql";
-        
+        String sqlFile = "./src/test/resources/statements.sql";
+
         SOSHibernateFactory factory = null;
         SOSHibernateSession session = null;
         try {
@@ -89,14 +81,13 @@ public class SOSHibernateSessionTest {
 
             LOGGER.info(factory.getDialect().toString());
             session = factory.openStatelessSession();
-            session.executeNativeQueries(Paths.get(sqlFile));
-            
-            //SOSHibernateSessionTest t = new SOSHibernateSessionTest();
+            session.getSQLExecutor().executeStatements(Paths.get(sqlFile));
+
         } catch (Exception e) {
             throw e;
         } finally {
             if (session != null) {
-                session.disconnect();
+                session.close();
             }
             if (factory != null) {
                 factory.close();

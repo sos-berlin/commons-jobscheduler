@@ -11,9 +11,9 @@ import org.slf4j.LoggerFactory;
 
 import sos.util.SOSString;
 
-public class SOSSqlCommandExtractor {
+public class SOSSQLCommandExtractor {
 
-    final static Logger LOGGER = LoggerFactory.getLogger(SOSSqlCommandExtractor.class);
+    final static Logger LOGGER = LoggerFactory.getLogger(SOSSQLCommandExtractor.class);
 
     private final Enum<SOSHibernateFactory.Dbms> dbms;
     private int majorVersion = -1;
@@ -25,7 +25,7 @@ public class SOSSqlCommandExtractor {
     private static final String REPLACEMENT_DOUBLE_APOSTROPHE = "YyyyY";
     private String beginProcedure = "";
 
-    public SOSSqlCommandExtractor(Enum<SOSHibernateFactory.Dbms> dbms) {
+    public SOSSQLCommandExtractor(Enum<SOSHibernateFactory.Dbms> dbms) {
         this.dbms = dbms;
     }
 
@@ -217,10 +217,10 @@ public class SOSSqlCommandExtractor {
             commandCloser = "";
             addCommandCloser = true;
 
-            // replaceAll(":=","\\\\:=")) to avoid hibernate
+            // sb.replaceAll(":=","\\\\:=")) to avoid hibernate
             // "Space is not allowed after parameter prefix ':'" Exception
             // e.g. Oracle: myVar := SYSDATE;
-            StringBuffer sb = new StringBuffer(this.content.replaceAll("\r\n", "\n").replaceAll("\\;[ \\t]", ";").replaceAll(":=", "\\\\:="));
+            StringBuffer sb = new StringBuffer(this.content.replaceAll("\r\n", "\n").replaceAll("\\;[ \\t]", ";"));
             if (this.dbms.equals(SOSHibernateFactory.Dbms.MSSQL)) {
                 commandSpltter = "(?i)\nGO\\s*\n|\n/\n";
             } else if (this.dbms.equals(SOSHibernateFactory.Dbms.MYSQL)) {
