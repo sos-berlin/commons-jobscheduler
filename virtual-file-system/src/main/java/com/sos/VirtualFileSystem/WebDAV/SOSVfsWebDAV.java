@@ -98,6 +98,9 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
             LOGGER.debug(SOSVfs_D_132.params(userName));
             HttpURL httpUrl = this.setRootHttpURL(userName, pPassword, host, port);
             davClient = getWebdavResource(httpUrl);
+            if (!davClient.exists() && SOSString.isEmpty(davClient.getStatusMessage())) {
+                davClient.setProperties(0);
+            }
             if (!davClient.exists()) {
                 throw new Exception(String.format("%s: HTTP-DAV isn't enabled %s ", method, getStatusMessage(davClient)));
             }
@@ -630,6 +633,9 @@ public class SOSVfsWebDAV extends SOSVfsTransferBaseClass {
                 LOGGER.info(String.format("using proxy: %s:%s, proxy user = %s", proxyHost, proxyPort, proxyUser));
             }
             davClient = getWebdavResource(getWebdavRessourceURL(httpUrl));
+            if (!davClient.exists() && SOSString.isEmpty(davClient.getStatusMessage())) {
+                davClient.setProperties(0);
+            }
             if (!davClient.exists()) {
                 throw new JobSchedulerException(getStatusMessage(davClient));
             }
