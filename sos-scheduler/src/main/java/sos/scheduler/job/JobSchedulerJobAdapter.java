@@ -509,15 +509,8 @@ public class JobSchedulerJobAdapter extends JobSchedulerJob implements JSJobUtil
     }
 
     public boolean isJobchain() {
-        boolean flgIsJobChain = false;
-        if (isNotNull(spooler_job)) {
-            flgIsJobChain = isNotNull(spooler_job.order_queue());
+        return isNotNull(spooler_job) && isNotNull(spooler_task) && isNotNull(spooler_task.order()) && isNotNull(spooler_job.order_queue());
         }
-        if (!flgIsJobChain && isNotNull(spooler_task)) {
-            flgIsJobChain = isNotNull(spooler_task.order());
-        }
-        return flgIsJobChain;
-    }
 
     public String setOrderParameter(final String pstrParameterName, final String pstrParameterValue) {
         if (isJobchain()) {
