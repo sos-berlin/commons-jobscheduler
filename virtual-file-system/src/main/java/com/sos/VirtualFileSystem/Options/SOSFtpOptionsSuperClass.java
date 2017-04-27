@@ -594,10 +594,11 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     public SOSOptionBoolean getCreateOrdersForAllFiles() {
         return createOrdersForAllFiles;
     }
-
+   
     public void setCreateOrdersForAllFiles(final SOSOptionBoolean pCreateOrdersForAllFiles) {
         createOrdersForAllFiles = pCreateOrdersForAllFiles;
     }
+    
     @JSOptionDefinition(name = "create_orders_for_new_files", description = "Create a file-order for each new file in the result-list", 
             key = "create_orders_for_new_files", type = "SOSOptionBoolean", mandatory = false)
     public SOSOptionBoolean createOrdersForNewFiles = new SOSOptionBoolean(this, CLASSNAME + ".create_orders_for_new_files", 
@@ -610,6 +611,20 @@ public abstract class SOSFtpOptionsSuperClass extends JSOptionsClass implements 
     public void setCreateOrdersForNewFiles(final SOSOptionBoolean pCreateOrdersForNewFiles) {
         createOrdersForNewFiles = pCreateOrdersForNewFiles;
     }
+    
+    @JSOptionDefinition(name = "param_name_for_path", description = "Sets the name of the parameter for the transfered file", 
+            key = "param_name_for_path", type = "SOSOptionString", mandatory = false)
+    public SOSOptionString paramNameForPath = new SOSOptionString(this, CLASSNAME + ".param_name_for_path", 
+            "Sets the name of the parameter for the transfered file", "", "scheduler_file_path", false); 
+        
+    public SOSOptionString getParamNameForPath() {
+        return paramNameForPath;
+    }
+ 
+    public void getParamNameForPath(final SOSOptionString pParamNameForPath) {
+        paramNameForPath = pParamNameForPath;
+    }
+
 
     @JSOptionDefinition(name = "expected_size_of_result_set", description = "number of expected hits in result-list", 
             key = "expected_size_of_result_set", type = "SOSOptionInteger", mandatory = false)
