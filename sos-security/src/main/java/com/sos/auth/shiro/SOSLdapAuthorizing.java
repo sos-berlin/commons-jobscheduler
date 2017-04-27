@@ -56,16 +56,18 @@ public class SOSLdapAuthorizing {
     }
 
     private void getRoleNamesForUser(String username) throws Exception {
-
+    	LOGGER.debug(String.format("Getting roles for user %s",username));
         Ini ini = Ini.fromResourcePath(Globals.getShiroIniInClassPath());
         Section s = ini.getSection("users");
         if (s != null) {
+        	LOGGER.debug("reading roles from section [users]");
             String roles = s.get(username);
 
             if (roles != null) {
                 String[] listOfRoles = roles.split(",");
                 if (listOfRoles.length > 1) {
                     for (int i = 1; i < listOfRoles.length; i++) {
+                    	LOGGER.debug("add role" + listOfRoles[i].trim());
                         authorizationInfo.addRole(listOfRoles[i].trim());
                     }
                 }
@@ -76,9 +78,14 @@ public class SOSLdapAuthorizing {
         searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
         String userPrincipalName = username;
+        
 
         if (sosLdapAuthorizingRealm.getSearchBase() != null && sosLdapAuthorizingRealm.getUserSearchFilter() != null) {
+            LOGGER.debug(String.format("getting groups from ldap using search filter %s with search base %s",sosLdapAuthorizingRealm.getSearchBase(),sosLdapAuthorizingRealm.getUserSearchFilter()));
+
             String searchFilter = String.format(sosLdapAuthorizingRealm.getUserSearchFilter(), userPrincipalName);
+            LOGGER.debug(String.format("getting groups from ldap using search filter %s with search base %s",sosLdapAuthorizingRealm.getSearchBase(),searchFilter));
+
             NamingEnumeration<SearchResult> answer = ldapContext.search(sosLdapAuthorizingRealm.getSearchBase(), searchFilter, searchCtls);
 
             if (!answer.hasMore()) {
@@ -89,10 +96,12 @@ public class SOSLdapAuthorizing {
             String groupNameAttribute;
 
             groupNameAttribute = sosLdapAuthorizingRealm.getGroupNameAttribute();
-
+            
+            
             Attribute memberOf = result.getAttributes().get(groupNameAttribute);
             if (memberOf != null) {
-                Collection<String> groupNames = LdapUtils.getAllAttributeValues(memberOf);
+            	LOGGER.debug("getting all attribute values using attribute" +  memberOf);
+            	Collection<String> groupNames = LdapUtils.getAllAttributeValues(memberOf);
                 getRoleNamesForGroups(groupNames);
                 // groups.add(new GrantedAuthorityImpl(att.get().toString()));
             }
@@ -106,6 +115,7 @@ public class SOSLdapAuthorizing {
             for (String groupName : groupNames) {
                 String strRoleNames = sosLdapAuthorizingRealm.getGroupRolesMap().get(groupName);
                 if (strRoleNames != null) {
+                	LOGGER.debug(String.format("roles for group %s: %s",groupName, strRoleNames ));
                     for (String roleName : strRoleNames.split(ROLE_NAMES_DELIMETER)) {
                         authorizationInfo.addRole(roleName);
                     }
