@@ -57,6 +57,7 @@ public class SOSHibernateDBLayer {
 
     private static ClassList getDefaultClassMapping() {
         ClassList classList = new ClassList();
+        
         classList.addClassIfExist("com.sos.jitl.dailyplan.db.DailyPlanDBItem");
         classList.addClassIfExist("com.sos.jitl.dailyplan.db.DailyPlanWithReportTriggerDBItem");
         classList.addClassIfExist("com.sos.jitl.dailyplan.db.DailyPlanWithReportExecutionDBItem");
@@ -65,6 +66,7 @@ public class SOSHibernateDBLayer {
         classList.addClassIfExist("com.sos.jitl.schedulerhistory.db.SchedulerOrderHistoryDBItem");
         classList.addClassIfExist("sos.jadehistory.db.JadeFilesDBItem");
         classList.addClassIfExist("sos.jadehistory.db.JadeFilesHistoryDBItem");
+        classList.addClassIfExist("com.sos.jitl.eventing.db.SchedulerEventDBItem");
         classList.addClassIfExist("com.sos.jitl.reporting.db.DBItemReportTrigger");
         classList.addClassIfExist("com.sos.jitl.reporting.db.DBItemReportTriggerWithResult");
         classList.addClassIfExist("com.sos.jitl.reporting.db.DBItemReportTriggerResult");
