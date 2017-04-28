@@ -2,7 +2,7 @@ package sos.scheduler.job;
 
 import sos.spooler.Monitor_impl;
 
-public class JobSchedulerSubmitEventMonitorProcessBeforeMonitor extends Monitor_impl {
+public class JobSchedulerSubmitEventProcessBeforeMonitor extends Monitor_impl {
 
     public boolean spooler_process_before() throws Exception {
 
