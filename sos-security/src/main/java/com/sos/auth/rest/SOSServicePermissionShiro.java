@@ -885,9 +885,18 @@ public class SOSServicePermissionShiro {
 
         SOSPermissionJocCockpit sosPermissionJocCockpit = createJocCockpitPermissionObject(accessToken, EMPTY_STRING, EMPTY_STRING);
         currentUser.setSosPermissionJocCockpit(sosPermissionJocCockpit);
+      
+        currentUser.initFolders();
+       
+        Ini ini = Ini.fromResourcePath(Globals.getShiroIniInClassPath());
+        Section s = ini.getSection("folders");
+        for (String role : s.keySet()) {
+            	currentUser.addFolder(role,s.get(role));
+        }
 
         SOSPermissionCommands sosPermissionCommands = createCommandsPermissionObject(accessToken, EMPTY_STRING, EMPTY_STRING);
         currentUser.setSosPermissionCommands(sosPermissionCommands);
+        
 
         if (Globals.sosShiroProperties == null) {
             Globals.sosShiroProperties = new JocCockpitProperties();
