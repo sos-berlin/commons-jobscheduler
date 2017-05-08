@@ -137,21 +137,16 @@ public class SOSHibernateSession implements Serializable {
     }
 
     public Connection getConnection() throws DBConnectionException {
-        String method = "getConnection";
-        if (currentSession instanceof Session) {
-            SessionImpl sf = (SessionImpl) currentSession;
-            try {
+        try {
+            if (currentSession instanceof Session) {
+                SessionImpl sf = (SessionImpl) currentSession;
                 return sf.connection();
-            } catch (Exception e) {
-                throw new DBConnectionException(String.format("%s: %s", method, e.toString()), e);
-            }
-        } else {
-            StatelessSessionImpl sf = (StatelessSessionImpl) currentSession;
-            try {
+            } else {
+                StatelessSessionImpl sf = (StatelessSessionImpl) currentSession;
                 return sf.connection();
-            } catch (Exception e) {
-                throw new DBConnectionException(String.format("%s: %s", method, e.toString()), e);
             }
+        } catch (Throwable e) {
+            throw new DBConnectionException(e);
         }
     }
     
