@@ -2,7 +2,7 @@ package sos.scheduler.job;
 
 
 
-public class JobSchedulerSubmitEvenTaskBeforeMonitor extends JobSchedulerJobAdapter {
+public class JobSchedulerSubmitEventTaskBeforeMonitor extends JobSchedulerJobAdapter {
 
     @Override
     public boolean spooler_task_before() throws Exception {
