@@ -2,7 +2,6 @@ package com.sos.hibernate.classes;
 
 import java.io.Serializable;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +9,7 @@ import java.util.Map;
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
+import org.hibernate.JDBCException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.StatelessSession;
@@ -18,7 +18,6 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.exception.SQLGrammarException;
 import org.hibernate.internal.SessionImpl;
 import org.hibernate.internal.StatelessSessionImpl;
 import org.hibernate.jdbc.Work;
@@ -28,7 +27,12 @@ import org.hibernate.transform.ResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sos.exception.DBConnectionException;
 import com.sos.exception.DBSessionException;
+import com.sos.exception.SOSException;
+import com.sos.exception.SOSJDBCException;
+
 import sos.util.SOSDate;
 
 public class SOSHibernateSession implements Serializable {
@@ -128,39 +132,50 @@ public class SOSHibernateSession implements Serializable {
         return null;
     }
 
-    public Object getCurrentSession() throws Exception {
+    public Object getCurrentSession() {
         return currentSession;
     }
 
-    public Connection getConnection() throws Exception {
+    public Connection getConnection() throws DBConnectionException {
         String method = "getConnection";
         if (currentSession instanceof Session) {
             SessionImpl sf = (SessionImpl) currentSession;
             try {
                 return sf.connection();
             } catch (Exception e) {
-                throw new Exception(String.format("%s: %s", method, e.toString()), e);
+                throw new DBConnectionException(String.format("%s: %s", method, e.toString()), e);
             }
         } else {
             StatelessSessionImpl sf = (StatelessSessionImpl) currentSession;
             try {
                 return sf.connection();
             } catch (Exception e) {
-                throw new Exception(String.format("%s: %s", method, e.toString()), e);
+                throw new DBConnectionException(String.format("%s: %s", method, e.toString()), e);
             }
         }
     }
-
-    public static Throwable getException(Throwable ex) {
-        if (ex instanceof SQLGrammarException) {
-            SQLGrammarException sqlGrEx = (SQLGrammarException) ex;
-            SQLException sqlEx = sqlGrEx.getSQLException();
-            return new Exception(String.format("%s [exception: %s, sql: %s]", ex.getMessage(), sqlEx == null ? "" : sqlEx.getMessage(), sqlGrEx
-                    .getSQL()), sqlEx);
-        } else if (ex.getCause() != null) {
-            return ex.getCause();
-        }
+    
+    public static SOSJDBCException getException(JDBCException ex) {
+        return getException(ex, ex);
+    }
+    
+    private static SOSJDBCException getException(JDBCException ex, Throwable t) {
+        return new SOSJDBCException(ex.getMessage(), ex.getSQLException(), t, ex.getSQL());
+    }
+    
+    public static SOSException getException(SOSException ex) {
         return ex;
+    }
+    
+    public static Throwable getException(Throwable t) {
+        Throwable e = t;
+        while (e != null) {
+            if (e instanceof JDBCException) {
+                return getException((JDBCException) e, t);
+            }
+            e = e.getCause();
+        }
+        return t; 
     }
 
     public String getLastSequenceValue(String sequenceName) throws Exception {
@@ -175,7 +190,7 @@ public class SOSHibernateSession implements Serializable {
         return sqlExecutor;
     }
 
-    protected void openSession() throws Exception {
+    protected void openSession() {
         String method = getMethodName("openSession");
 
         if (this.currentSession != null) {
