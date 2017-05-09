@@ -12,7 +12,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 
-import com.sos.exception.NoResponseException;
+import com.sos.exception.SOSNoResponseException;
 import com.sos.exception.SOSException;
 import com.sos.xml.SOSXmlCommand;
 
@@ -66,7 +66,7 @@ public class HttpClient {
             }
             System.out.println(getIndentAnswer(answerWithIndent, sosXmlCommand, response));
             System.exit(0);
-        } catch (NoResponseException e) {
+        } catch (SOSNoResponseException e) {
             if (!schedulerXml.contains("abort_immediately")) {
                 System.err.println(e.toString());
                 System.exit(8);
