@@ -45,7 +45,6 @@ public class SOSHibernateSession implements Serializable {
     private boolean isGetCurrentSession = false;
     private FlushMode defaultHibernateFlushMode = FlushMode.ALWAYS;
     private String identifier;
-    private String openSessionMethodName;
     private SOSHibernateSQLExecutor sqlExecutor;
     public static final int LIMIT_IN_CLAUSE = 1000;
 
@@ -137,6 +136,8 @@ public class SOSHibernateSession implements Serializable {
     }
 
     public Connection getConnection() throws DBConnectionException {
+        String method = getMethodName("getConnection");
+        LOGGER.debug(String.format("%s", method));
         try {
             if (currentSession instanceof Session) {
                 SessionImpl sf = (SessionImpl) currentSession;
@@ -187,27 +188,21 @@ public class SOSHibernateSession implements Serializable {
 
     protected void openSession() throws DBSessionException {
         String method = getMethodName("openSession");
-
+        if (currentSession != null) {
+            LOGGER.debug(String.format("%s: close currentSession", method));
+            closeSession();
+        }
+        LOGGER.debug(String.format("%s: isStatelessSession = %s, isGetCurrentSession = %s", method, isStatelessSession, isGetCurrentSession));
         try {
-            if (currentSession != null) {
-                LOGGER.debug(String.format("%s: close currentSession", method));
-                closeSession();
-            }
 
-            LOGGER.debug(String.format("%s: isStatelessSession = %s, isGetCurrentSession = %s", method, isStatelessSession, isGetCurrentSession));
-
-            openSessionMethodName = "";
             if (isStatelessSession) {
                 currentSession = factory.getSessionFactory().openStatelessSession();
-                openSessionMethodName = "openStatelessSession";
             } else {
                 Session session = null;
                 if (isGetCurrentSession) {
                     session = factory.getSessionFactory().getCurrentSession();
-                    openSessionMethodName = "getCurrentSession";
                 } else {
                     session = factory.getSessionFactory().openSession();
-                    openSessionMethodName = "openSession";
                 }
                 if (defaultHibernateFlushMode != null) {
                     session.setHibernateFlushMode(defaultHibernateFlushMode);
@@ -228,8 +223,8 @@ public class SOSHibernateSession implements Serializable {
         openSession();
         String connFile = (factory.getConfigFile().isPresent()) ? factory.getConfigFile().get().toAbsolutePath().toString() : "without config file";
         int isolationLevel = getFactory().getTransactionIsolation();
-        LOGGER.debug(String.format("%s: autocommit = %s, transaction isolation = %s, %s, %s", method, getFactory().getAutoCommit(),
-                SOSHibernateFactory.getTransactionIsolationName(isolationLevel), openSessionMethodName, connFile));
+        LOGGER.debug(String.format("%s: autocommit = %s, transaction isolation = %s, %s", method, getFactory().getAutoCommit(), SOSHibernateFactory
+                .getTransactionIsolationName(isolationLevel), connFile));
 
     }
 
@@ -239,9 +234,13 @@ public class SOSHibernateSession implements Serializable {
         if (currentSession == null) {
             throw new DBSessionException("session is NULL");
         }
-        if (currentSession instanceof Session) {
-            Session session = (Session) currentSession;
-            session.clear();
+        try {
+            if (currentSession instanceof Session) {
+                Session session = (Session) currentSession;
+                session.clear();
+            }
+        } catch (Throwable e) {
+            throw new DBSessionException(getException(e));
         }
     }
 
@@ -251,14 +250,10 @@ public class SOSHibernateSession implements Serializable {
         if (currentSession == null) {
             throw new DBSessionException("currentSession is NULL");
         }
-
         try {
             if (currentSession instanceof Session) {
                 Session session = (Session) currentSession;
                 session.doWork(work);
-            } else {
-                LOGGER.warn(String.format("%s: this method will be ignored for current openSessionMethodName : %s (%s)", method,
-                        openSessionMethodName, currentSession.getClass().getSimpleName()));
             }
         } catch (Throwable e) {
             throw new DBSessionException(getException(e));
@@ -267,7 +262,7 @@ public class SOSHibernateSession implements Serializable {
 
     public void reopen() throws DBSessionException {
         String method = getMethodName("reopen");
-        LOGGER.info(String.format("%s: isStatelessSession = %s", method, isStatelessSession));
+        LOGGER.debug(String.format("%s: isStatelessSession = %s", method, isStatelessSession));
         closeSession();
         openSession();
     }
@@ -354,7 +349,6 @@ public class SOSHibernateSession implements Serializable {
         if (currentSession == null) {
             throw new DBSessionException("currentSession is NULL");
         }
-
         try {
             if (currentSession instanceof Session) {
                 Session s = ((Session) currentSession);
@@ -375,7 +369,6 @@ public class SOSHibernateSession implements Serializable {
         if (currentSession == null) {
             throw new DBSessionException("session is NULL");
         }
-
         try {
             if (currentSession instanceof Session) {
                 Session session = ((Session) currentSession);
@@ -396,7 +389,6 @@ public class SOSHibernateSession implements Serializable {
         if (currentSession == null) {
             throw new DBSessionException("session is NULL");
         }
-
         try {
             if (currentSession instanceof Session) {
                 Session session = ((Session) currentSession);
@@ -864,7 +856,6 @@ public class SOSHibernateSession implements Serializable {
         } catch (Throwable e) {
         }
         currentSession = null;
-        openSessionMethodName = null;
     }
 
 }
