@@ -72,19 +72,33 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="pause" type="xs:boolean"/>
-							<xs:element name="continue" type="xs:boolean"/>
-							<xs:element name="restart">
+							<xs:element name="Execute">
 								<xs:complexType>
 									<xs:sequence>
+										<xs:element name="restart">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="terminate" type="xs:boolean"/>
+													<xs:element name="abort" type="xs:boolean"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+										<xs:element name="pause" type="xs:boolean"/>
+										<xs:element name="continue" type="xs:boolean"/>
 										<xs:element name="terminate" type="xs:boolean"/>
 										<xs:element name="abort" type="xs:boolean"/>
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="terminate" type="xs:boolean"/>
-							<xs:element name="abort" type="xs:boolean"/>
-							<xs:element name="manageCategories" type="xs:boolean"/>
+							<xs:element name="administration">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="removeOldInstances" type="xs:boolean"/>
+										<xs:element name="manageCategories" type="xs:boolean"/>
+										<xs:element name="editPermissions" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -98,9 +112,15 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="terminateFailSafe" type="xs:boolean"/>
-							<xs:element name="restart" type="xs:boolean"/>
-							<xs:element name="terminate" type="xs:boolean"/>
+							<xs:element name="execute">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="restart" type="xs:boolean"/>
+										<xs:element name="terminate" type="xs:boolean"/>
+										<xs:element name="terminateFailSafe" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -114,11 +134,17 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="terminate" type="xs:boolean"/>
-							<xs:element name="abort" type="xs:boolean"/>
-							<xs:element name="restart">
+							<xs:element name="execute">
 								<xs:complexType>
 									<xs:sequence>
+										<xs:element name="restart">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="terminate" type="xs:boolean"/>
+													<xs:element name="abort" type="xs:boolean"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
 										<xs:element name="terminate" type="xs:boolean"/>
 										<xs:element name="abort" type="xs:boolean"/>
 									</xs:sequence>
@@ -164,14 +190,13 @@
 									<xs:sequence>
 										<xs:element name="startAndEndNode" type="xs:boolean"/>
 										<xs:element name="timeForAdhocOrder" type="xs:boolean"/>
+										<xs:element name="runTime" type="xs:boolean"/>
+										<xs:element name="state" type="xs:boolean"/>
 										<xs:element name="parameter" type="xs:boolean"/>
+										<xs:element name="hotFolder" type="xs:boolean"/>
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="start" type="xs:boolean"/>
-							<xs:element name="update" type="xs:boolean"/>
-							<xs:element name="suspend" type="xs:boolean"/>
-							<xs:element name="resume" type="xs:boolean"/>
 							<xs:element name="delete">
 								<xs:complexType>
 									<xs:sequence>
@@ -180,11 +205,18 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="removeSetback" type="xs:boolean"/>
-							<xs:element name="setRunTime" type="xs:boolean"/>
-							<xs:element name="setState" type="xs:boolean"/>
-							<xs:element name="reset" type="xs:boolean"/>
-							<xs:element name="modifyHotFolder" type="xs:boolean"/>
+							<xs:element name="execute">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="start" type="xs:boolean"/>
+										<xs:element name="update" type="xs:boolean"/>
+										<xs:element name="suspend" type="xs:boolean"/>
+										<xs:element name="resume" type="xs:boolean"/>
+										<xs:element name="reset" type="xs:boolean"/>
+										<xs:element name="removeSetback" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -200,12 +232,25 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="stop" type="xs:boolean"/>
-							<xs:element name="unstop" type="xs:boolean"/>
-							<xs:element name="addOrder" type="xs:boolean"/>
-							<xs:element name="skipJobChainNode" type="xs:boolean"/>
-							<xs:element name="processJobChainNode" type="xs:boolean"/>
-							<xs:element name="stopJobChainNode" type="xs:boolean"/>
+							<xs:element name="execute">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="stop" type="xs:boolean"/>
+										<xs:element name="unstop" type="xs:boolean"/>
+										<xs:element name="addOrder" type="xs:boolean"/>
+										<xs:element name="skipJobChainNode" type="xs:boolean"/>
+										<xs:element name="processJobChainNode" type="xs:boolean"/>
+										<xs:element name="stopJobChainNode" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="change">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="hotFolder" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -222,15 +267,28 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="start" type="xs:boolean"/>
-							<xs:element name="stop" type="xs:boolean"/>
-							<xs:element name="unstop" type="xs:boolean"/>
-							<xs:element name="terminate" type="xs:boolean"/>
-							<xs:element name="kill" type="xs:boolean"/>
-							<xs:element name="setRunTime" type="xs:boolean"/>
-							<xs:element name="endAllTasks" type="xs:boolean"/>
-							<xs:element name="suspendAllTasks" type="xs:boolean"/>
-							<xs:element name="continueAllTasks" type="xs:boolean"/>
+							<xs:element name="change">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="runTime" type="xs:boolean"/>
+										<xs:element name="hotfolder" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="execute">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="start" type="xs:boolean"/>
+										<xs:element name="stop" type="xs:boolean"/>
+										<xs:element name="unstop" type="xs:boolean"/>
+										<xs:element name="terminate" type="xs:boolean"/>
+										<xs:element name="kill" type="xs:boolean"/>
+										<xs:element name="endAllTasks" type="xs:boolean"/>
+										<xs:element name="suspendAllTasks" type="xs:boolean"/>
+										<xs:element name="continueAllTasks" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -242,6 +300,13 @@
 									<xs:sequence>
 										<xs:element name="status" type="xs:boolean"/>
 										<xs:element name="configuration" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="change">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="hotFolder" type="xs:boolean"/>
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
@@ -259,8 +324,15 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="edit" type="xs:boolean"/>
-							<xs:element name="addSubstitute" type="xs:boolean"/>
+							<xs:element name="change">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="addSubstitute" type="xs:boolean"/>
+										<xs:element name="hotFolder" type="xs:boolean"/>
+										<xs:element name="editContent" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -272,6 +344,13 @@
 									<xs:sequence>
 										<xs:element name="status" type="xs:boolean"/>
 										<xs:element name="configuration" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="change">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="hotFolder" type="xs:boolean"/>
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
@@ -333,7 +412,6 @@
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
-				<xs:element ref="SOSPermissionRoles"/>
 				<xs:element name="AuditLog">
 					<xs:complexType>
 						<xs:sequence>
@@ -376,6 +454,7 @@
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
+				<xs:element ref="SOSPermissionRoles"/>
 			</xs:sequence>
 			<xs:attribute name="isAuthenticated" type="xs:boolean"/>
 			<xs:attribute name="user" type="xs:string"/>
@@ -396,30 +475,48 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="restart">
+							<xs:element name="execute">
 								<xs:complexType>
 									<xs:sequence>
+										<xs:element name="stop" type="xs:boolean"/>
+										<xs:element name="continue" type="xs:boolean"/>
+										<xs:element name="pause" type="xs:boolean"/>
 										<xs:element name="terminate" type="xs:boolean"/>
 										<xs:element name="abort" type="xs:boolean"/>
+										<xs:element name="reload" type="xs:boolean"/>
+										<xs:element name="restart">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="terminate" type="xs:boolean"/>
+													<xs:element name="abort" type="xs:boolean"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="manageCategories" type="xs:boolean"/>
-							<xs:element name="abort" type="xs:boolean"/>
-							<xs:element name="terminate" type="xs:boolean"/>
-							<xs:element name="reload" type="xs:boolean"/>
-							<xs:element name="pause" type="xs:boolean"/>
-							<xs:element name="continue" type="xs:boolean"/>
-							<xs:element name="stop" type="xs:boolean"/>
+							<xs:element name="administration">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="manageCategories" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
 				<xs:element name="JobschedulerMasterCluster">
 					<xs:complexType>
 						<xs:sequence>
-							<xs:element name="restart" type="xs:boolean"/>
-							<xs:element name="terminate" type="xs:boolean"/>
-							<xs:element name="terminateFailSafe" type="xs:boolean"/>
+							<xs:element name="execute">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="terminateFailSafe" type="xs:boolean"/>
+										<xs:element name="terminate" type="xs:boolean"/>
+										<xs:element name="restart" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -453,26 +550,32 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
+							<xs:element name="delete" type="xs:boolean"/>
+							<xs:element name="execute">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="reset" type="xs:boolean"/>
+										<xs:element name="removeSetback" type="xs:boolean"/>
+										<xs:element name="resume" type="xs:boolean"/>
+										<xs:element name="suspend" type="xs:boolean"/>
+										<xs:element name="update" type="xs:boolean"/>
+										<xs:element name="start" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
 							<xs:element name="change">
 								<xs:complexType>
 									<xs:sequence>
 										<xs:element name="parameter" type="xs:boolean"/>
+										<xs:element name="state" type="xs:boolean"/>
+										<xs:element name="runTime" type="xs:boolean"/>
 										<xs:element name="timeForAdhocOrder" type="xs:boolean"/>
 										<xs:element name="startAndEndNode" type="xs:boolean"/>
+										<xs:element name="hotFolder" type="xs:boolean"/>
 										<xs:element name="other" type="xs:boolean"/>
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="start" type="xs:boolean"/>
-							<xs:element name="update" type="xs:boolean"/>
-							<xs:element name="suspend" type="xs:boolean"/>
-							<xs:element name="resume" type="xs:boolean"/>
-							<xs:element name="delete" type="xs:boolean"/>
-							<xs:element name="removeSetback" type="xs:boolean"/>
-							<xs:element name="setRunTime" type="xs:boolean"/>
-							<xs:element name="setState" type="xs:boolean"/>
-							<xs:element name="reset" type="xs:boolean"/>
-							<xs:element name="modifyHotFolder" type="xs:boolean"/>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -486,14 +589,26 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="remove" type="xs:boolean"/>
-							<xs:element name="stop" type="xs:boolean"/>
-							<xs:element name="addOrder" type="xs:boolean"/>
-							<xs:element name="skipJobChainNode" type="xs:boolean"/>
-							<xs:element name="stopJobChainNode" type="xs:boolean"/>
-							<xs:element name="processJobChainNode" type="xs:boolean"/>
-							<xs:element name="unstop" type="xs:boolean"/>
-							<xs:element name="modifyHotFolder" type="xs:boolean"/>
+							<xs:element name="execute">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="stop" type="xs:boolean"/>
+										<xs:element name="unstop" type="xs:boolean"/>
+										<xs:element name="skipJobChainNode" type="xs:boolean"/>
+										<xs:element name="stopJobChainNode" type="xs:boolean"/>
+										<xs:element name="processJobChainNode" type="xs:boolean"/>
+										<xs:element name="addOrder" type="xs:boolean"/>
+										<xs:element name="remove" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="change">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="hotFolder" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -507,16 +622,28 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="setRunTime" type="xs:boolean"/>
-							<xs:element name="start" type="xs:boolean"/>
-							<xs:element name="stop" type="xs:boolean"/>
-							<xs:element name="unstop" type="xs:boolean"/>
-							<xs:element name="suspendAllTasks" type="xs:boolean"/>
-							<xs:element name="endAllTasks" type="xs:boolean"/>
-							<xs:element name="terminate" type="xs:boolean"/>
-							<xs:element name="kill" type="xs:boolean"/>
-							<xs:element name="continueAllTasks" type="xs:boolean"/>
-							<xs:element name="modifyHotFolder" type="xs:boolean"/>
+							<xs:element name="execute">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="start" type="xs:boolean"/>
+										<xs:element name="stop" type="xs:boolean"/>
+										<xs:element name="unstop" type="xs:boolean"/>
+										<xs:element name="suspendAllTasks" type="xs:boolean"/>
+										<xs:element name="endAllTasks" type="xs:boolean"/>
+										<xs:element name="continueAllTasks" type="xs:boolean"/>
+										<xs:element name="terminate" type="xs:boolean"/>
+										<xs:element name="kill" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="change">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="runTime" type="xs:boolean"/>
+										<xs:element name="hotFolder" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -530,9 +657,15 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="change" type="xs:boolean"/>
 							<xs:element name="remove" type="xs:boolean"/>
-							<xs:element name="modifyHotFolder" type="xs:boolean"/>
+							<xs:element name="change">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="editContent"/>
+										<xs:element name="hotFolder" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -546,10 +679,15 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="change" type="xs:boolean"/>
 							<xs:element name="remove" type="xs:boolean"/>
-							<xs:element name="addSubstitute" type="xs:boolean"/>
-							<xs:element name="modifyHotFolder" type="xs:boolean"/>
+							<xs:element name="change">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="addSubstitute" type="xs:boolean"/>
+										<xs:element name="hotFolder" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
@@ -564,7 +702,13 @@
 								</xs:complexType>
 							</xs:element>
 							<xs:element name="remove" type="xs:boolean"/>
-							<xs:element name="modifyHotFolder" type="xs:boolean"/>
+							<xs:element name="change">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="hotFolder" type="xs:boolean"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
