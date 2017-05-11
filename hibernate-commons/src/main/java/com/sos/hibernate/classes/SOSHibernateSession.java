@@ -89,21 +89,21 @@ public class SOSHibernateSession implements Serializable {
     }
 
     public boolean isOpen() {
-        if (currentSession instanceof Session) {
-            Session session = (Session) currentSession;
+        if (isStatelessSession) {
+            StatelessSession session = ((StatelessSession) currentSession);
             return session.isOpen();
         } else {
-            StatelessSession session = ((StatelessSession) currentSession);
+            Session session = (Session) currentSession;
             return session.isOpen();
         }
     }
 
     public boolean isConnected() {
-        if (currentSession instanceof Session) {
-            Session session = (Session) currentSession;
+        if (isStatelessSession) {
+            StatelessSession session = ((StatelessSession) currentSession);
             return session.isConnected();
         } else {
-            StatelessSession session = ((StatelessSession) currentSession);
+            Session session = (Session) currentSession;
             return session.isConnected();
         }
     }
@@ -117,7 +117,7 @@ public class SOSHibernateSession implements Serializable {
     }
 
     public FlushMode getHibernateFlushMode() {
-        if (currentSession instanceof Session) {
+        if (!isStatelessSession) {
             Session session = (Session) currentSession;
             return session.getHibernateFlushMode();
         }
@@ -125,7 +125,7 @@ public class SOSHibernateSession implements Serializable {
     }
 
     public CacheMode getCacheMode() {
-        if (currentSession instanceof Session) {
+        if (!isStatelessSession) {
             Session session = (Session) currentSession;
             return session.getCacheMode();
         }
@@ -140,11 +140,11 @@ public class SOSHibernateSession implements Serializable {
         String method = getMethodName("getConnection");
         LOGGER.debug(String.format("%s", method));
         try {
-            if (currentSession instanceof Session) {
-                SessionImpl sf = (SessionImpl) currentSession;
+            if (isStatelessSession) {
+                StatelessSessionImpl sf = (StatelessSessionImpl) currentSession;
                 return sf.connection();
             } else {
-                StatelessSessionImpl sf = (StatelessSessionImpl) currentSession;
+                SessionImpl sf = (SessionImpl) currentSession;
                 return sf.connection();
             }
         } catch (Throwable e) {
@@ -174,7 +174,7 @@ public class SOSHibernateSession implements Serializable {
         }
         return t;
     }
-    
+
     public static SOSDBException getSOSDBException(Throwable t) {
         Throwable e = t;
         while (e != null) {
@@ -185,7 +185,7 @@ public class SOSHibernateSession implements Serializable {
         }
         return new SOSDBException(t);
     }
-    
+
     public static SOSException getSOSDBException(SOSException ex) {
         return ex;
     }
@@ -251,7 +251,7 @@ public class SOSHibernateSession implements Serializable {
             throw new SOSDBSessionException("session is NULL");
         }
         try {
-            if (currentSession instanceof Session) {
+            if (!isStatelessSession) {
                 Session session = (Session) currentSession;
                 session.clear();
             }
@@ -267,7 +267,7 @@ public class SOSHibernateSession implements Serializable {
             throw new SOSDBSessionException("currentSession is NULL");
         }
         try {
-            if (currentSession instanceof Session) {
+            if (!isStatelessSession) {
                 Session session = (Session) currentSession;
                 session.doWork(work);
             }
@@ -309,11 +309,11 @@ public class SOSHibernateSession implements Serializable {
             throw new SOSDBSessionException("currentSession is NULL");
         }
         try {
-            if (currentSession instanceof Session) {
-                Session session = ((Session) currentSession);
+            if (isStatelessSession) {
+                StatelessSession session = ((StatelessSession) currentSession);
                 session.beginTransaction();
             } else {
-                StatelessSession session = ((StatelessSession) currentSession);
+                Session session = ((Session) currentSession);
                 session.beginTransaction();
             }
         } catch (Throwable e) {
@@ -333,7 +333,7 @@ public class SOSHibernateSession implements Serializable {
             throw new SOSDBSessionException(String.format("session transaction is NULL"));
         }
         try {
-            if (currentSession instanceof Session) {
+            if (!isStatelessSession) {
                 ((Session) currentSession).flush();
             }
             tr.commit();
@@ -366,11 +366,11 @@ public class SOSHibernateSession implements Serializable {
             throw new SOSDBSessionException("currentSession is NULL");
         }
         try {
-            if (currentSession instanceof Session) {
-                Session s = ((Session) currentSession);
+            if (isStatelessSession) {
+                StatelessSession s = ((StatelessSession) currentSession);
                 tr = s.getTransaction();
             } else {
-                StatelessSession s = ((StatelessSession) currentSession);
+                Session s = ((Session) currentSession);
                 tr = s.getTransaction();
             }
         } catch (Throwable e) {
@@ -386,13 +386,13 @@ public class SOSHibernateSession implements Serializable {
             throw new SOSDBSessionException("session is NULL");
         }
         try {
-            if (currentSession instanceof Session) {
+            if (isStatelessSession) {
+                StatelessSession session = ((StatelessSession) currentSession);
+                session.insert(item);
+            } else {
                 Session session = ((Session) currentSession);
                 session.save(item);
                 session.flush();
-            } else {
-                StatelessSession session = ((StatelessSession) currentSession);
-                session.insert(item);
             }
         } catch (Throwable e) {
             throw new SOSDBSessionException(getException(e));
@@ -406,13 +406,13 @@ public class SOSHibernateSession implements Serializable {
             throw new SOSDBSessionException("session is NULL");
         }
         try {
-            if (currentSession instanceof Session) {
+            if (isStatelessSession) {
+                StatelessSession session = ((StatelessSession) currentSession);
+                session.update(item);
+            } else {
                 Session session = ((Session) currentSession);
                 session.update(item);
                 session.flush();
-            } else {
-                StatelessSession session = ((StatelessSession) currentSession);
-                session.update(item);
             }
         } catch (Throwable e) {
             throw new SOSDBSessionException(getException(e));
@@ -426,11 +426,7 @@ public class SOSHibernateSession implements Serializable {
             throw new SOSDBSessionException("currentSession is NULL");
         }
         try {
-            if (currentSession instanceof Session) {
-                Session session = ((Session) currentSession);
-                session.saveOrUpdate(item);
-                session.flush();
-            } else {
+            if (isStatelessSession) {
                 StatelessSession session = ((StatelessSession) currentSession);
                 /*
                  * The following error will always be logged in the try segment, if the item id field is null: SQL Error: -1, SQLState: 07004 Parameter at
@@ -443,6 +439,10 @@ public class SOSHibernateSession implements Serializable {
                 } catch (Exception e) {
                     session.insert(item);
                 }
+            } else {
+                Session session = ((Session) currentSession);
+                session.saveOrUpdate(item);
+                session.flush();
             }
         } catch (Throwable e) {
             throw new SOSDBSessionException(getException(e));
@@ -457,13 +457,13 @@ public class SOSHibernateSession implements Serializable {
             throw new SOSDBSessionException("currentSession is NULL");
         }
         try {
-            if (currentSession instanceof Session) {
+            if (isStatelessSession) {
+                StatelessSession session = ((StatelessSession) currentSession);
+                session.delete(item);
+            } else {
                 Session session = ((Session) currentSession);
                 session.delete(item);
                 session.flush();
-            } else {
-                StatelessSession session = ((StatelessSession) currentSession);
-                session.delete(item);
             }
         } catch (Throwable e) {
             throw new SOSDBSessionException(getException(e));
@@ -476,15 +476,15 @@ public class SOSHibernateSession implements Serializable {
 
     public void refresh(String entityName, Object object) throws SOSDBSessionException {
         try {
-            if (currentSession instanceof Session) {
-                Session session = (Session) currentSession;
+            if (isStatelessSession) {
+                StatelessSession session = ((StatelessSession) currentSession);
                 if (entityName == null) {
                     session.refresh(object);
                 } else {
                     session.refresh(entityName, object);
                 }
             } else {
-                StatelessSession session = ((StatelessSession) currentSession);
+                Session session = (Session) currentSession;
                 if (entityName == null) {
                     session.refresh(object);
                 } else {
@@ -498,16 +498,16 @@ public class SOSHibernateSession implements Serializable {
 
     public Object get(Class<?> entityClass, Serializable id) throws SOSDBSessionException {
         try {
-            if (currentSession instanceof Session) {
-                return ((Session) currentSession).get(entityClass, id);
-            } else {
+            if (isStatelessSession) {
                 return ((StatelessSession) currentSession).get(entityClass, id);
+            } else {
+                return ((Session) currentSession).get(entityClass, id);
             }
         } catch (Throwable e) {
             throw new SOSDBSessionException(getException(e));
         }
     }
-    
+
     public <T> Query<T> createQuery(String hql) throws SOSDBSessionException {
         return createQuery(hql, null);
     }
@@ -521,17 +521,17 @@ public class SOSHibernateSession implements Serializable {
         }
         Query<T> q = null;
         try {
-            if (currentSession instanceof Session) {
-                if (entityClass == null) {
-                    q = ((Session) currentSession).createQuery(hql);
-                } else {
-                    q = ((Session) currentSession).createQuery(hql, entityClass);
-                }
-            } else {
+            if (isStatelessSession) {
                 if (entityClass == null) {
                     q = ((StatelessSession) currentSession).createQuery(hql);
                 } else {
                     q = ((StatelessSession) currentSession).createQuery(hql, entityClass);
+                }
+            } else {
+                if (entityClass == null) {
+                    q = ((Session) currentSession).createQuery(hql);
+                } else {
+                    q = ((Session) currentSession).createQuery(hql, entityClass);
                 }
             }
         } catch (Throwable e) {
@@ -556,10 +556,10 @@ public class SOSHibernateSession implements Serializable {
         }
         SQLQuery<?> q = null;
         try {
-            if (currentSession instanceof Session) {
-                q = ((Session) currentSession).createSQLQuery(sql);
-            } else {
+            if (isStatelessSession) {
                 q = ((StatelessSession) currentSession).createSQLQuery(sql);
+            } else {
+                q = ((Session) currentSession).createSQLQuery(sql);
             }
             if (q != null && entityClass != null) {
                 q.addEntity(entityClass);
@@ -583,17 +583,17 @@ public class SOSHibernateSession implements Serializable {
         }
         NativeQuery<T> q = null;
         try {
-            if (currentSession instanceof Session) {
-                if (entityClass == null) {
-                    q = ((Session) currentSession).createNativeQuery(sql);
-                } else {
-                    q = ((Session) currentSession).createNativeQuery(sql, entityClass);
-                }
-            } else {
+            if (isStatelessSession) {
                 if (entityClass == null) {
                     q = ((StatelessSession) currentSession).createNativeQuery(sql);
                 } else {
                     q = ((StatelessSession) currentSession).createNativeQuery(sql, entityClass);
+                }
+            } else {
+                if (entityClass == null) {
+                    q = ((Session) currentSession).createNativeQuery(sql);
+                } else {
+                    q = ((Session) currentSession).createNativeQuery(sql, entityClass);
                 }
             }
         } catch (Throwable e) {
@@ -754,10 +754,10 @@ public class SOSHibernateSession implements Serializable {
         }
         Criteria cr = null;
         try {
-            if (currentSession instanceof Session) {
-                cr = ((Session) currentSession).createCriteria(cl, alias);
-            } else {
+            if (isStatelessSession) {
                 cr = ((StatelessSession) currentSession).createCriteria(cl, alias);
+            } else {
+                cr = ((Session) currentSession).createCriteria(cl, alias);
             }
         } catch (Throwable e) {
             throw new SOSDBSessionException(getException(e));
@@ -871,14 +871,14 @@ public class SOSHibernateSession implements Serializable {
         LOGGER.debug(String.format("%s", method));
         try {
             if (currentSession != null) {
-                if (currentSession instanceof Session) {
+                if (isStatelessSession) {
+                    StatelessSession s = (StatelessSession) currentSession;
+                    s.close();
+                } else {
                     Session session = (Session) currentSession;
                     if (session.isOpen()) {
                         session.close();
                     }
-                } else {
-                    StatelessSession s = (StatelessSession) currentSession;
-                    s.close();
                 }
             }
         } catch (Throwable e) {
