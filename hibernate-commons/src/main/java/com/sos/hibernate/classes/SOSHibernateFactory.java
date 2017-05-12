@@ -5,13 +5,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
-
-import com.sos.hibernate.classes.ClassList;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -24,6 +21,8 @@ import org.hibernate.type.TimestampType;
 import org.hibernate.type.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sos.hibernate.exceptions.SOSHibernateException;
 
 import sos.util.SOSDate;
 import sos.util.SOSString;
@@ -154,7 +153,7 @@ public class SOSHibernateFactory implements Serializable {
         return openSession(identifier);
     }
 
-    public SOSHibernateSession openStatelessSession(String identifier) throws Exception {
+    public SOSHibernateSession openStatelessSession(String identifier) throws SOSHibernateException {
         SOSHibernateSession session = new SOSHibernateSession(this);
         session.setIsStatelessSession(true);
         session.setIdentifier(identifier);
@@ -162,7 +161,7 @@ public class SOSHibernateFactory implements Serializable {
         return session;
     }
 
-    public SOSHibernateSession openStatelessSession() throws Exception {
+    public SOSHibernateSession openStatelessSession() throws SOSHibernateException {
         return openStatelessSession(identifier);
     }
 
