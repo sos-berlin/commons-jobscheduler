@@ -9,6 +9,9 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.hibernate.exceptions.SOSHibernateSQLCommandExtractorException;
+
 import sos.util.SOSString;
 
 public class SOSSQLCommandExtractor {
@@ -29,10 +32,10 @@ public class SOSSQLCommandExtractor {
         this.dbms = dbms;
     }
 
-    public List<String> extractCommands(String content) throws Exception {
+    public List<String> extractCommands(String content) throws SOSHibernateException {
         String method = "extractCommands";
         if (SOSString.isEmpty(content)) {
-            throw new Exception("content is empty");
+            throw new SOSHibernateSQLCommandExtractorException("content is empty");
         }
         LOGGER.debug(String.format("%s: content=%s", method, content));
 
@@ -77,7 +80,7 @@ public class SOSSQLCommandExtractor {
     }
 
     private void split(final List<String> commands, final StringBuffer st, final Integer position, final String procedurEnd,
-            final boolean returnProcedureBegin, int count) throws Exception {
+            final boolean returnProcedureBegin, int count) throws SOSHibernateException {
         String method = "split";
 
         beginProcedure = "";
@@ -124,14 +127,14 @@ public class SOSSQLCommandExtractor {
             if (apostropheSecond != -1) {
                 split(commands, st, new Integer(apostropheSecond + 1), procedurEnd, returnProcedureBegin, count);
             } else {
-                throw new Exception(String.format("closing apostrophe not found = %s = %s ", apostropheFirst, st));
+                throw new SOSHibernateSQLCommandExtractorException(String.format("closing apostrophe not found = %s = %s ", apostropheFirst, st));
             }
         }
     }
 
-    private boolean isProcedureSyntax(String command) throws Exception {
+    private boolean isProcedureSyntax(String command) throws SOSHibernateException {
         if (command == null) {
-            throw new Exception("command is empty");
+            throw new SOSHibernateSQLCommandExtractorException("command is empty");
         }
         command = command.toLowerCase().trim();
         if (command.startsWith("procedure") || command.startsWith("function") || command.startsWith("declare") || command.startsWith("begin")) {
@@ -190,7 +193,7 @@ public class SOSSQLCommandExtractor {
 
         }
 
-        public void prepare() throws Exception {
+        public void prepare() throws SOSHibernateException {
             String content = init();
             content = stripComments(content);
             commands = content.split(commandSpltter);
@@ -212,7 +215,7 @@ public class SOSSQLCommandExtractor {
             return commandSpltter;
         }
 
-        private String init() throws Exception {
+        private String init() throws SOSHibernateException {
             String method = "init";
             commandCloser = "";
             addCommandCloser = true;
@@ -248,7 +251,7 @@ public class SOSSQLCommandExtractor {
                     commandSpltter = "\n/\n";
                 }
             } else {
-                throw new Exception(String.format("unsupported dbms=%s", this.dbms));
+                throw new SOSHibernateSQLCommandExtractorException(String.format("unsupported dbms=%s", this.dbms));
             }
 
             LOGGER.debug(String.format("%s: commandSpltter=%s, commandCloser=%s", method, commandSpltter, commandCloser));
@@ -256,7 +259,7 @@ public class SOSSQLCommandExtractor {
             return sb.toString();
         }
 
-        private String stripComments(String content) throws Exception {
+        private String stripComments(String content) throws SOSHibernateException {
             StringBuilder sb = new StringBuilder();
             StringTokenizer st = new StringTokenizer(content, "\n");
             boolean addRow = true;

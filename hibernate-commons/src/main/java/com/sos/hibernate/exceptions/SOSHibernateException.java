@@ -21,6 +21,11 @@ public class SOSHibernateException extends SOSException {
         message = msg;
     }
 
+    public SOSHibernateException(String msg, Throwable cause) {
+        message = msg;
+        initCause(cause);
+    }
+
     public SOSHibernateException(Throwable cause) {
         Throwable e = cause;
         while (e != null) {

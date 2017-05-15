@@ -202,7 +202,7 @@ public class SOSHibernateSession implements Serializable {
         return ex;
     }
 
-    public String getLastSequenceValue(String sequenceName) throws Exception {
+    public String getLastSequenceValue(String sequenceName) throws SOSHibernateException {
         String stmt = factory.getSequenceLastValString(sequenceName);
         return stmt == null ? null : getNativeQuerySingleValue(stmt);
     }
@@ -246,7 +246,7 @@ public class SOSHibernateSession implements Serializable {
      * 
      *             use factory.openSession() or factory.openStatelessSession(); */
     @Deprecated
-    public void connect() throws Exception {
+    public void connect() throws SOSHibernateException {
         String method = getMethodName("connect");
         openSession();
         String connFile = (factory.getConfigFile().isPresent()) ? factory.getConfigFile().get().toAbsolutePath().toString() : "without config file";
@@ -318,7 +318,7 @@ public class SOSHibernateSession implements Serializable {
         closeSession();
     }
 
-    public void beginTransaction() throws Exception {
+    public void beginTransaction() throws SOSHibernateException {
         String method = getMethodName("beginTransaction");
         if (getFactory().getAutoCommit()) {
             LOGGER.debug(String.format("%s: skip (autoCommit is true)", method));
@@ -341,7 +341,7 @@ public class SOSHibernateSession implements Serializable {
         }
     }
 
-    public void commit() throws Exception {
+    public void commit() throws SOSHibernateException {
         String method = getMethodName("commit");
         if (getFactory().getAutoCommit()) {
             LOGGER.debug(String.format("%s: skip (autoCommit is true)", method));
@@ -350,7 +350,7 @@ public class SOSHibernateSession implements Serializable {
         LOGGER.debug(String.format("%s", method));
         Transaction tr = getTransaction();
         if (tr == null) {
-            throw new SOSHibernateTransactionException(String.format("session transaction is NULL"));
+            throw new SOSHibernateTransactionException("session transaction is NULL");
         }
         try {
             if (!isStatelessSession) {
@@ -362,7 +362,7 @@ public class SOSHibernateSession implements Serializable {
         }
     }
 
-    public void rollback() throws Exception {
+    public void rollback() throws SOSHibernateException {
         String method = getMethodName("rollback");
         if (getFactory().getAutoCommit()) {
             LOGGER.debug(String.format("%s: skip (autoCommit is true)", method));
@@ -371,7 +371,7 @@ public class SOSHibernateSession implements Serializable {
         LOGGER.debug(String.format("%s", method));
         Transaction tr = getTransaction();
         if (tr == null) {
-            throw new SOSHibernateTransactionException(String.format("session transaction is NULL"));
+            throw new SOSHibernateTransactionException("session transaction is NULL");
         }
         try {
             tr.rollback();
@@ -537,7 +537,7 @@ public class SOSHibernateSession implements Serializable {
         String method = getMethodName("createQuery");
         LOGGER.debug(String.format("%s: hql = %s", method, hql));
         if (currentSession == null) {
-            throw new SOSHibernateSessionException("Session is NULL");
+            throw new SOSHibernateQueryException("session is NULL");
         }
         Query<T> q = null;
         try {
@@ -572,7 +572,7 @@ public class SOSHibernateSession implements Serializable {
         String method = getMethodName("createSQLQuery");
         LOGGER.debug(String.format("%s: sql=%s", method, sql));
         if (currentSession == null) {
-            throw new SOSHibernateSessionException("currentSession is NULL");
+            throw new SOSHibernateQueryException("currentSession is NULL");
         }
         SQLQuery<?> q = null;
         try {
@@ -599,7 +599,7 @@ public class SOSHibernateSession implements Serializable {
         String method = getMethodName("createNativeQuery");
         LOGGER.debug(String.format("%s: sql=%s", method, sql));
         if (currentSession == null) {
-            throw new SOSHibernateSessionException("currentSession is NULL");
+            throw new SOSHibernateQueryException("currentSession is NULL");
         }
         NativeQuery<T> q = null;
         try {
@@ -764,13 +764,21 @@ public class SOSHibernateSession implements Serializable {
             throw new SOSHibernateQueryException(e);
         }
     }
+    
+    public <T> List<T> getResultList(Query<T> query) throws SOSHibernateException{
+        try{
+            return query.getResultList();
+        } catch (Throwable e) {
+            throw new SOSHibernateQueryException(e);
+        }
+    }
 
     @Deprecated
     public Criteria createCriteria(Class<?> cl, String alias) throws SOSHibernateException {
         String method = getMethodName("createCriteria");
         LOGGER.debug(String.format("%s: class = %s", method, cl.getSimpleName()));
         if (currentSession == null) {
-            throw new SOSHibernateSessionException("currentSession is NULL");
+            throw new SOSHibernateCriteriaException("currentSession is NULL");
         }
         Criteria cr = null;
         try {
@@ -799,7 +807,7 @@ public class SOSHibernateSession implements Serializable {
     public Criteria createCriteria(Class<?> cl, String[] selectProperties, ResultTransformer transformer) throws SOSHibernateException {
         Criteria cr = createCriteria(cl);
         if (cr == null) {
-            throw new SOSHibernateSessionException("Criteria is NULL");
+            throw new SOSHibernateCriteriaException("criteria is NULL");
         }
         try {
             if (selectProperties != null) {
