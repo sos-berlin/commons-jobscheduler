@@ -1,12 +1,12 @@
 package com.sos.hibernate.exceptions;
 
-import org.hibernate.HibernateException;
+import javax.persistence.PersistenceException;
 
 public class SOSHibernateFactoryBuildException extends SOSHibernateException {
 
     private static final long serialVersionUID = 1L;
 
-    public SOSHibernateFactoryBuildException(HibernateException cause) {
+    public SOSHibernateFactoryBuildException(PersistenceException cause) {
         super(cause);
     }
 }

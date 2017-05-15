@@ -1,6 +1,6 @@
 package com.sos.hibernate.exceptions;
 
-import org.hibernate.HibernateException;
+import javax.persistence.PersistenceException;
 
 public class SOSHibernateConfigurationException extends SOSHibernateException {
 
@@ -14,7 +14,7 @@ public class SOSHibernateConfigurationException extends SOSHibernateException {
         super(msg, cause);
     }
 
-    public SOSHibernateConfigurationException(HibernateException cause) {
+    public SOSHibernateConfigurationException(PersistenceException cause) {
         super(cause);
     }
 }

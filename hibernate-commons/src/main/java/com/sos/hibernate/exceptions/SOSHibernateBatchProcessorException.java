@@ -14,7 +14,7 @@ public class SOSHibernateBatchProcessorException extends SOSHibernateException {
         super(msg, e);
     }
 
-    public SOSHibernateBatchProcessorException(SQLException cause) {
-        super(cause);
+    public SOSHibernateBatchProcessorException(SQLException cause, String sql) {
+        super(cause, sql);
     }
 }

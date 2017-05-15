@@ -107,7 +107,7 @@ public class SOSHibernateBatchProcessor implements Serializable {
         try {
             preparedStatement = session.getConnection().prepareStatement(sqlStatement);
         } catch (SQLException e) {
-            throw new SOSHibernateBatchProcessorException(e);
+            throw new SOSHibernateBatchProcessorException(e, sqlStatement);
         }
     }
 
@@ -156,7 +156,7 @@ public class SOSHibernateBatchProcessor implements Serializable {
         } catch (ReflectiveOperationException e) {
             throw new SOSHibernateBatchProcessorException(String.format("can't invoke method for entity %s", entity.getClass().getSimpleName()), e);
         } catch (SQLException e) {
-            throw new SOSHibernateBatchProcessorException(e);
+            throw new SOSHibernateBatchProcessorException(e, sqlStatement);
         }
         countCurrentBatches++;
     }
@@ -184,7 +184,7 @@ public class SOSHibernateBatchProcessor implements Serializable {
                 LOGGER.error(ex.getMessage(), ex);
             }
             LOGGER.error(e.getMessage(), e);
-            throw new SOSHibernateBatchProcessorException(e);
+            throw new SOSHibernateBatchProcessorException(e,sqlStatement);
         } finally {
             countCurrentBatches = 0;
         }
