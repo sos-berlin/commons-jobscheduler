@@ -15,7 +15,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,6 +24,9 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.hibernate.exceptions.SOSHibernateSQLExecutorException;
 
 import sos.util.SOSString;
 
@@ -39,7 +41,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
         session = sess;
     }
 
-    public void setDefaults() throws Exception {
+    public void setDefaults() throws SOSHibernateException {
         String method = getMethodName("setDefaults");
 
         Enum<SOSHibernateFactory.Dbms> dbms = session.getFactory().getDbms();
@@ -77,20 +79,20 @@ public class SOSHibernateSQLExecutor implements Serializable {
         }
     }
 
-    public int executeUpdateCallableStatement(String sql) throws Exception {
+    public int executeUpdateCallableStatement(String sql) throws SOSHibernateException {
         String method = getMethodName("executeUpdateCallableStatement");
+        LOGGER.debug(String.format("%s: sqlStmt=%s", method, sql));
         int result = -1;
         Connection conn = session.getConnection();
         if (conn == null) {
-            throw new Exception(String.format("%s: connection is null", method));
+            throw new SOSHibernateSQLExecutorException("connection is null");
         }
-        LOGGER.debug(String.format("%s: sqlStmt=%s", method, sql));
         CallableStatement stmt = null;
         try {
             stmt = conn.prepareCall(sql);
             result = stmt.executeUpdate();
         } catch (Throwable e) {
-            throw e;
+            throw new SOSHibernateSQLExecutorException(e);
         } finally {
             if (stmt != null) {
                 try {
@@ -102,16 +104,20 @@ public class SOSHibernateSQLExecutor implements Serializable {
         return result;
     }
 
-    public void executeStatements(Path file) throws Exception {
-        executeStatements(new String(Files.readAllBytes(file)));
+    public void executeStatements(Path file) throws SOSHibernateException {
+        try {
+            executeStatements(new String(Files.readAllBytes(file)));
+        } catch (Throwable e) {
+            throw new SOSHibernateSQLExecutorException(String.format("cannot read file %s", file), e);
+        }
     }
 
-    public void executeStatements(String content) throws Exception {
+    public void executeStatements(String content) throws SOSHibernateException {
         String method = getMethodName("executeStatements");
 
         Connection conn = session.getConnection();
         if (conn == null) {
-            throw new Exception(String.format("%s: connection is null", method));
+            throw new SOSHibernateSQLExecutorException("connection is null");
         }
         Statement stmt = null;
         try {
@@ -137,20 +143,23 @@ public class SOSHibernateSQLExecutor implements Serializable {
                 }
             }
         } catch (Throwable e) {
-            throw e;
+            throw new SOSHibernateSQLExecutorException(e);
         } finally {
             if (stmt != null) {
-                stmt.close();
+                try {
+                    stmt.close();
+                } catch (Throwable e) {
+                }
             }
         }
     }
 
-    public boolean execute(String... sqls) throws Exception {
+    public boolean execute(String... sqls) throws SOSHibernateException {
         String method = getMethodName("execute");
         boolean result = false;
         Connection conn = session.getConnection();
         if (conn == null) {
-            throw new Exception(String.format("%s: connection is null", method));
+            throw new SOSHibernateSQLExecutorException("connection is null");
         }
         Statement stmt = null;
         try {
@@ -160,7 +169,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
                 result = stmt.execute(sql);
             }
         } catch (Throwable e) {
-            throw e;
+            throw new SOSHibernateSQLExecutorException(e);
         } finally {
             if (stmt != null) {
                 try {
@@ -172,12 +181,12 @@ public class SOSHibernateSQLExecutor implements Serializable {
         return result;
     }
 
-    public int executeUpdate(String... sqls) throws Exception {
+    public int executeUpdate(String... sqls) throws SOSHibernateException {
         String method = getMethodName("executeUpdate");
         int result = 0;
         Connection conn = session.getConnection();
         if (conn == null) {
-            throw new Exception(String.format("%s: connection is null", method));
+            throw new SOSHibernateSQLExecutorException("connection is null");
         }
         Statement stmt = null;
         try {
@@ -187,7 +196,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
                 result += stmt.executeUpdate(sql);
             }
         } catch (Throwable e) {
-            throw e;
+            throw new SOSHibernateSQLExecutorException(e);
         } finally {
             if (stmt != null) {
                 try {
@@ -199,26 +208,32 @@ public class SOSHibernateSQLExecutor implements Serializable {
         return result;
     }
 
-    public void executeQuery(String sql) throws Exception {
+    public void executeQuery(String sql) throws SOSHibernateException {
         String method = getMethodName("executeQuery");
         Connection conn = session.getConnection();
         if (conn == null) {
-            throw new Exception(String.format("%s: connection is null", method));
+            throw new SOSHibernateSQLExecutorException("connection is null");
         }
+        LOGGER.debug(String.format("%s: sql=%s", method, sql));
         Statement stmt = null;
         ResultSet rs = null;
-        LOGGER.debug(String.format("%s: sql=%s", method, sql));
         try {
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
-        } catch (Exception e) {
-            throw e;
+        } catch (Throwable e) {
+            throw new SOSHibernateSQLExecutorException(e);
         } finally {
             if (rs != null) {
-                rs.close();
+                try {
+                    rs.close();
+                } catch (Throwable e) {
+                }
             }
             if (stmt != null) {
-                stmt.close();
+                try {
+                    stmt.close();
+                } catch (Throwable e) {
+                }
             }
         }
     }
@@ -234,31 +249,39 @@ public class SOSHibernateSQLExecutor implements Serializable {
      * }
      * 
      * session.getSQLExecutor().close(rs); */
-    public ResultSet getResultSet(String sql) throws Exception {
+    public ResultSet getResultSet(String sql) throws SOSHibernateException {
         String method = getMethodName("getResultSet");
+        LOGGER.debug(String.format("%s: sql=%s", method, sql));
         Connection conn = session.getConnection();
         if (conn == null) {
-            throw new Exception(String.format("%s: connection is null", method));
+            throw new SOSHibernateSQLExecutorException("connection is null");
         }
-        Statement stmt = conn.createStatement();
-        LOGGER.debug(String.format("%s: sql=%s", method, sql));
-        return stmt.executeQuery(sql);
+        try {
+            Statement stmt = conn.createStatement();
+            return stmt.executeQuery(sql);
+        } catch (Throwable e) {
+            throw new SOSHibernateSQLExecutorException(e);
+        }
     }
 
     /** see executeQuery */
-    public Map<String, String> next(ResultSet rs) throws Exception {
+    public Map<String, String> next(ResultSet rs) throws SOSHibernateException {
         Map<String, String> record = new LinkedHashMap<String, String>();
-        if (rs != null && rs.next()) {
-            ResultSetMetaData meta = rs.getMetaData();
-            int count = meta.getColumnCount();
-            for (int i = 1; i <= count; i++) {
-                String name = meta.getColumnName(i);
-                String value = rs.getString(name);
-                if (SOSString.isEmpty(value)) {
-                    value = "";
+        try {
+            if (rs != null && rs.next()) {
+                ResultSetMetaData meta = rs.getMetaData();
+                int count = meta.getColumnCount();
+                for (int i = 1; i <= count; i++) {
+                    String name = meta.getColumnName(i);
+                    String value = rs.getString(name);
+                    if (SOSString.isEmpty(value)) {
+                        value = "";
+                    }
+                    record.put(name.toLowerCase(), value.trim());
                 }
-                record.put(name.toLowerCase(), value.trim());
             }
+        } catch (Throwable e) {
+            throw new SOSHibernateSQLExecutorException(e);
         }
         return record;
     }
@@ -268,22 +291,22 @@ public class SOSHibernateSQLExecutor implements Serializable {
         if (rs != null) {
             try {
                 rs.close();
-            } catch (SQLException e) {
+            } catch (Throwable e) {
             }
             try {
                 rs.getStatement().close();
-            } catch (SQLException e) {
+            } catch (Throwable e) {
             }
         }
     }
 
-    public int[] executeBatch(String... sqls) throws Exception {
+    public int[] executeBatch(String... sqls) throws SOSHibernateException {
         String method = getMethodName("executeBatch");
-        int[] result = null;
         Connection conn = session.getConnection();
         if (conn == null) {
-            throw new Exception(String.format("%s: connection is null", method));
+            throw new SOSHibernateSQLExecutorException("connection is null");
         }
+        int[] result = null;
         Statement stmt = null;
         try {
             stmt = conn.createStatement();
@@ -293,7 +316,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
             }
             result = stmt.executeBatch();
         } catch (Throwable e) {
-            throw e;
+            throw new SOSHibernateSQLExecutorException(e);
         } finally {
             if (stmt != null) {
                 try {
@@ -305,45 +328,53 @@ public class SOSHibernateSQLExecutor implements Serializable {
         return result;
     }
 
-    public int updateBlob(byte[] data, String tableName, String columnName, String condition) throws Exception {
+    public int updateBlob(byte[] data, String tableName, String columnName, String condition) throws SOSHibernateException {
         String method = getMethodName("updateBlob");
-
+        LOGGER.debug(String.format("%s: tableName=%s, columnName=%s, condition=%s", method, tableName, columnName, condition));
         if (data == null || data.length <= 0) {
-            throw new Exception(String.format("%s: missing data", method));
+            throw new SOSHibernateSQLExecutorException("missing data");
         }
         int result = data.length;
         updateBlob(new ByteArrayInputStream(data), result, tableName, columnName, condition);
         return result;
     }
 
-    public int updateBlob(Path path, String tableName, String columnName, String condition) throws Exception {
+    public int updateBlob(Path path, String tableName, String columnName, String condition) throws SOSHibernateException {
         String method = getMethodName("updateBlob");
-
+        LOGGER.debug(String.format("%s: path=%s, tableName=%s, columnName=%s, condition=%s", method, path, tableName, columnName, condition));
         if (path == null) {
-            throw new Exception(String.format("%s: path is null", method));
+            throw new SOSHibernateSQLExecutorException("path is null");
         }
         File file = path.toFile();
         int result = (int) file.length();
         if (!file.exists()) {
-            throw new Exception(String.format("%s: file %s doesn't exist", method, file.getCanonicalPath()));
+            throw new SOSHibernateSQLExecutorException(String.format("file %s doesn't exist", path));
         }
-        updateBlob(new FileInputStream(file), result, tableName, columnName, condition);
+
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(file);
+        } catch (Throwable e) {
+            throw new SOSHibernateSQLExecutorException(String.format("cannot read file %s", file), e);
+        }
+        updateBlob(fis, result, tableName, columnName, condition);
         return result;
     }
 
-    public void updateBlob(InputStream inputStream, int dataLength, String tableName, String columnName, String condition) throws Exception {
+    public void updateBlob(InputStream inputStream, int dataLength, String tableName, String columnName, String condition)
+            throws SOSHibernateException {
         String method = getMethodName("updateBlob");
-
+        LOGGER.debug(String.format("%s: tableName=%s, columnName=%s, condition=%s", method, tableName, columnName, condition));
         PreparedStatement pstmt = null;
         try {
             if (SOSString.isEmpty(tableName)) {
-                throw new Exception("missing tableName");
+                throw new SOSHibernateSQLExecutorException("missing tableName");
             }
             if (SOSString.isEmpty(columnName)) {
-                throw new Exception("missing columnName");
+                throw new SOSHibernateSQLExecutorException("missing columnName");
             }
             if (inputStream == null) {
-                throw new Exception("input stream is null");
+                throw new SOSHibernateSQLExecutorException("input stream is null");
             }
             StringBuilder query = new StringBuilder();
             query.append("UPDATE ");
@@ -361,13 +392,15 @@ public class SOSHibernateSQLExecutor implements Serializable {
             }
             Connection conn = session.getConnection();
             if (conn == null) {
-                throw new Exception("connection is null");
+                throw new SOSHibernateSQLExecutorException("connection is null");
             }
             pstmt = conn.prepareStatement(query.toString());
             pstmt.setBinaryStream(1, inputStream, dataLength);
             pstmt.executeUpdate();
-        } catch (Exception e) {
-            throw new Exception(String.format("%s: %s", method, e.toString()), e);
+        } catch (SOSHibernateSQLExecutorException e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new SOSHibernateSQLExecutorException(e);
         } finally {
             if (pstmt != null) {
                 try {
@@ -386,45 +419,49 @@ public class SOSHibernateSQLExecutor implements Serializable {
         }
     }
 
-    public int updateClob(String data, String tableName, String columnName, String condition) throws Exception {
-        String method = getMethodName("updateClob");
-
+    public int updateClob(String data, String tableName, String columnName, String condition) throws SOSHibernateException {
         if (SOSString.isEmpty(data)) {
-            throw new Exception(String.format("%s: missing data", method));
+            throw new SOSHibernateSQLExecutorException("missing data");
         }
         int result = data.length();
         updateClob(new java.io.StringReader(data), result, tableName, columnName, condition);
         return result;
     }
 
-    public int updateClob(Path path, String tableName, String columnName, String condition) throws Exception {
+    public int updateClob(Path path, String tableName, String columnName, String condition) throws SOSHibernateException {
         String method = getMethodName("updateClob");
-
+        LOGGER.debug(String.format("%s: path=%s, tableName=%s, columnName=%s, condition=%s", method, path, tableName, columnName, condition));
         if (path == null) {
-            throw new NullPointerException(String.format("%s: path is null.", method));
+            throw new SOSHibernateSQLExecutorException("path is null");
         }
         File file = path.toFile();
         int result = (int) file.length();
         if (!file.exists()) {
-            throw new Exception(String.format("%s: file %s doesn't exist.", method, file.getCanonicalPath()));
+            throw new SOSHibernateSQLExecutorException(String.format("file %s doesn't exist", path));
         }
-        updateClob(new FileReader(file), result, tableName, columnName, condition);
+        FileReader fr = null;
+        try {
+            fr = new FileReader(file);
+        } catch (Throwable e) {
+            throw new SOSHibernateSQLExecutorException(String.format("cannot read file %s", file), e);
+        }
+        updateClob(fr, result, tableName, columnName, condition);
         return result;
     }
 
-    public void updateClob(Reader reader, int dataLength, String tableName, String columnName, String condition) throws Exception {
+    public void updateClob(Reader reader, int dataLength, String tableName, String columnName, String condition) throws SOSHibernateException {
         String method = getMethodName("updateClob");
-
+        LOGGER.debug(String.format("%s: tableName=%s, columnName=%s, condition=%s", method, tableName, columnName, condition));
         PreparedStatement pstmt = null;
         try {
             if (SOSString.isEmpty(tableName)) {
-                throw new Exception("missing tableName.");
+                throw new SOSHibernateSQLExecutorException("missing tableName");
             }
             if (SOSString.isEmpty(columnName)) {
-                throw new NullPointerException("missing columnName.");
+                throw new SOSHibernateSQLExecutorException("missing columnName");
             }
             if (reader == null) {
-                throw new Exception("reader is null.");
+                throw new SOSHibernateSQLExecutorException("reader is null");
             }
             StringBuilder query = new StringBuilder();
             query.append("UPDATE ");
@@ -442,13 +479,15 @@ public class SOSHibernateSQLExecutor implements Serializable {
             }
             Connection conn = session.getConnection();
             if (conn == null) {
-                throw new Exception("connection is null");
+                throw new SOSHibernateSQLExecutorException("connection is null");
             }
             pstmt = conn.prepareStatement(query.toString());
             pstmt.setCharacterStream(1, reader, dataLength);
             pstmt.executeUpdate();
-        } catch (Exception e) {
-            throw new Exception(String.format("%s: %s", method, e.toString()), e);
+        } catch (SOSHibernateSQLExecutorException e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new SOSHibernateSQLExecutorException(e);
         } finally {
             if (pstmt != null) {
                 try {
@@ -458,31 +497,32 @@ public class SOSHibernateSQLExecutor implements Serializable {
                 }
             }
             if (reader != null) {
-                reader.close();
+                try {
+                    reader.close();
+                } catch (Throwable e) {
+                }
             }
         }
     }
 
-    public long getBlob(String sql, Path path) throws Exception {
+    public long getBlob(String sql, Path path) throws SOSHibernateException {
         String method = getMethodName("getBlob");
-
+        LOGGER.debug(String.format("%s: sql=%s, path=%s", method, sql, path));
         Statement stmt = null;
         ResultSet rs = null;
         InputStream in = null;
         FileOutputStream out = null;
-
         long result = 0;
         try {
             if (SOSString.isEmpty(sql)) {
-                throw new Exception("missing sql");
+                throw new SOSHibernateSQLExecutorException("missing sql");
             }
             if (path == null) {
-                throw new Exception("path is null");
+                throw new SOSHibernateSQLExecutorException("path is null");
             }
-
             Connection conn = session.getConnection();
             if (conn == null) {
-                throw new Exception("connection is null");
+                throw new SOSHibernateSQLExecutorException("connection is null");
             }
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
@@ -505,8 +545,10 @@ public class SOSHibernateSQLExecutor implements Serializable {
                     result += len;
                 }
             }
-        } catch (Exception e) {
-            throw new Exception(String.format("%s: %s", method, e.toString()), e);
+        } catch (SOSHibernateSQLExecutorException e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new SOSHibernateSQLExecutorException(e);
         } finally {
             if (out != null) {
                 try {
@@ -540,20 +582,19 @@ public class SOSHibernateSQLExecutor implements Serializable {
         return result;
     }
 
-    public byte[] getBlob(String sql) throws Exception {
+    public byte[] getBlob(String sql) throws SOSHibernateException {
         String method = getMethodName("getBlob");
-
+        LOGGER.debug(String.format("%s: sql=%s", method, sql));
         Statement stmt = null;
         ResultSet rs = null;
         byte[] result = {};
         try {
             if (SOSString.isEmpty(sql)) {
-                throw new Exception("missing sql");
+                throw new SOSHibernateSQLExecutorException("missing sql");
             }
-
             Connection conn = session.getConnection();
             if (conn == null) {
-                throw new Exception("connection is null");
+                throw new SOSHibernateSQLExecutorException("connection is null");
             }
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
@@ -563,8 +604,10 @@ public class SOSHibernateSQLExecutor implements Serializable {
             if (result == null) {
                 return result;
             }
-        } catch (Exception e) {
-            throw new Exception(String.format("%s: %s", method, e.toString()), e);
+        } catch (SOSHibernateSQLExecutorException e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new SOSHibernateSQLExecutorException(e);
         } finally {
             if (rs != null) {
                 try {
@@ -585,26 +628,26 @@ public class SOSHibernateSQLExecutor implements Serializable {
         return result;
     }
 
-    public String getClob(String sql) throws Exception {
+    public String getClob(String sql) throws SOSHibernateException {
         String method = getMethodName("getClob");
-
+        LOGGER.debug(String.format("%s: sql=%s", method, sql));
         Statement stmt = null;
         ResultSet rs = null;
         Reader in = null;
         StringBuilder result = new StringBuilder();
         try {
             if (SOSString.isEmpty(sql)) {
-                throw new Exception("missing sql");
+                throw new SOSHibernateSQLExecutorException("missing sql");
             }
             Connection conn = session.getConnection();
             if (conn == null) {
-                throw new Exception("connection is null");
+                throw new SOSHibernateSQLExecutorException("connection is null");
             }
             stmt = conn.createStatement();
             try {
                 rs = stmt.executeQuery(sql);
-            } catch (Exception e) {
-                throw new Exception("exception on executeQuery: " + e.toString());
+            } catch (Throwable e) {
+                throw new SOSHibernateSQLExecutorException(e);
             }
 
             int bytesRead;
@@ -622,8 +665,10 @@ public class SOSHibernateSQLExecutor implements Serializable {
                     result.append((char) bytesRead);
                 }
             }
-        } catch (Exception e) {
-            throw new Exception(String.format("%s: %s", method, e.toString()), e);
+        } catch (SOSHibernateSQLExecutorException e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new SOSHibernateSQLExecutorException(e);
         } finally {
             if (in != null) {
                 try {
@@ -650,9 +695,9 @@ public class SOSHibernateSQLExecutor implements Serializable {
         return result.toString();
     }
 
-    public long getClob(String sql, Path path) throws Exception {
+    public long getClob(String sql, Path path) throws SOSHibernateException {
         String method = getMethodName("getClob");
-
+        LOGGER.debug(String.format("%s: sql=%s, path=%s", method, sql, path));
         Statement stmt = null;
         ResultSet rs = null;
         Reader in = null;
@@ -660,23 +705,21 @@ public class SOSHibernateSQLExecutor implements Serializable {
         long result = 0;
         try {
             if (SOSString.isEmpty(sql)) {
-                throw new Exception("missing sql");
+                throw new SOSHibernateSQLExecutorException("missing sql");
             }
             if (path == null) {
-                throw new Exception("path is null");
+                throw new SOSHibernateSQLExecutorException("path is null");
             }
             Connection conn = session.getConnection();
             if (conn == null) {
-                throw new Exception("connection is null");
+                throw new SOSHibernateSQLExecutorException("connection is null");
             }
-
             stmt = conn.createStatement();
             try {
                 rs = stmt.executeQuery(sql);
             } catch (Exception e) {
-                throw new Exception("exception on executeQuery: " + e.toString());
+                throw new SOSHibernateSQLExecutorException(e);
             }
-
             int bytesRead = 0;
             if (rs.next()) {
                 in = rs.getCharacterStream(1);
@@ -695,8 +738,10 @@ public class SOSHibernateSQLExecutor implements Serializable {
                     result++;
                 }
             }
-        } catch (Exception e) {
-            throw new Exception(String.format("%s: %s", method, e.toString()), e);
+        } catch (SOSHibernateSQLExecutorException e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new SOSHibernateSQLExecutorException(e);
         } finally {
             try {
                 out.flush();
@@ -738,11 +783,17 @@ public class SOSHibernateSQLExecutor implements Serializable {
         return result;
     }
 
-    public List<String> getStatements(Path file) throws Exception {
-        return getStatements(new String(Files.readAllBytes(file)));
+    public List<String> getStatements(Path file) throws SOSHibernateException {
+        byte[] bytes = null;
+        try {
+            bytes = Files.readAllBytes(file);
+        } catch (Throwable e) {
+            throw new SOSHibernateSQLExecutorException(String.format("cannot read file %s", file), e);
+        }
+        return getStatements(new String(bytes));
     }
 
-    public List<String> getStatements(String content) throws Exception {
+    public List<String> getStatements(String content) throws SOSHibernateException {
         SOSSQLCommandExtractor extractor = new SOSSQLCommandExtractor(session.getFactory().getDbms());
         return extractor.extractCommands(content);
     }
