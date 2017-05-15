@@ -1,6 +1,8 @@
 package com.sos.hibernate.exceptions;
 
-import org.hibernate.HibernateException;
+import javax.persistence.PersistenceException;
+
+import org.hibernate.query.Query;
 
 public class SOSHibernateQueryException extends SOSHibernateException {
 
@@ -10,7 +12,19 @@ public class SOSHibernateQueryException extends SOSHibernateException {
         super(msg);
     }
 
-    public SOSHibernateQueryException(HibernateException cause) {
+    public SOSHibernateQueryException(Query<?> query, Throwable cause) {
+        super(query, cause);
+    }
+
+    public SOSHibernateQueryException(IllegalArgumentException cause) {
+        super(cause);
+    }
+
+    public SOSHibernateQueryException(IllegalStateException cause) {
+        super(cause);
+    }
+
+    public SOSHibernateQueryException(PersistenceException cause) {
         super(cause);
     }
 }

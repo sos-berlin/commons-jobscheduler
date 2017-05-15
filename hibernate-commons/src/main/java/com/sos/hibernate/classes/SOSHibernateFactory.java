@@ -11,7 +11,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
-import org.hibernate.HibernateException;
+import javax.persistence.PersistenceException;
+
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
@@ -134,7 +135,7 @@ public class SOSHibernateFactory implements Serializable {
             }
         } catch (MalformedURLException e) {
             throw new SOSHibernateConfigurationException(String.format("exception on get configFile %s as url", configFile), e);
-        } catch (HibernateException e) {
+        } catch (PersistenceException e) {
             throw new SOSHibernateConfigurationException(e);
         }
         return getDbms(Dialect.getDialect(conf.getProperties()));
@@ -149,7 +150,7 @@ public class SOSHibernateFactory implements Serializable {
             int isolationLevel = getTransactionIsolation();
             LOGGER.debug(String.format("%s: autocommit = %s, transaction isolation = %s, %s", method, getAutoCommit(), getTransactionIsolationName(
                     isolationLevel), connFile));
-        } catch (HibernateException ex) {
+        } catch (PersistenceException ex) {
             throw new SOSHibernateFactoryBuildException(ex);
         }
     }
@@ -392,7 +393,7 @@ public class SOSHibernateFactory implements Serializable {
             }
         } catch (MalformedURLException e) {
             throw new SOSHibernateConfigurationException(String.format("exception on get configFile %s as url", configFile), e);
-        } catch (HibernateException e) {
+        } catch (PersistenceException e) {
             throw new SOSHibernateConfigurationException(e);
         }
     }
@@ -409,7 +410,7 @@ public class SOSHibernateFactory implements Serializable {
                 dialect = impl.getJdbcServices().getDialect();
                 setDbms(dialect);
             }
-        } catch (HibernateException e) {
+        } catch (PersistenceException e) {
             throw new SOSHibernateInitSessionFactoryException(e);
         }
     }

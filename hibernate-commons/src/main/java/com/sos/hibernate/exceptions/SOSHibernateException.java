@@ -2,8 +2,11 @@ package com.sos.hibernate.exceptions;
 
 import java.sql.SQLException;
 
-import org.hibernate.HibernateException;
+import javax.persistence.PersistenceException;
+
 import org.hibernate.JDBCException;
+import org.hibernate.hql.internal.ast.QuerySyntaxException;
+import org.hibernate.query.Query;
 
 import com.sos.exception.SOSException;
 
@@ -12,7 +15,7 @@ public class SOSHibernateException extends SOSException {
     private static final long serialVersionUID = 1L;
     private String message = null;
     private SQLException sqlException = null;
-    private String sqlStatement = null;
+    private String statement = null;
 
     public SOSHibernateException(String msg) {
         message = msg;
@@ -23,7 +26,14 @@ public class SOSHibernateException extends SOSException {
         initCause(cause);
     }
 
-    public SOSHibernateException(HibernateException cause) {
+    @SuppressWarnings("deprecation")
+    public SOSHibernateException(Query<?> query, Throwable cause) {
+        message = String.format("%s %s", cause.getClass().getSimpleName(), cause.getMessage());
+        statement = query.getQueryString();
+        initCause(cause);
+    }
+
+    public SOSHibernateException(PersistenceException cause) {
         Throwable e = cause;
         while (e != null) {
             if (e instanceof JDBCException) {
@@ -32,7 +42,7 @@ public class SOSHibernateException extends SOSException {
                 initCause(je);
                 message = je.getMessage();
                 sqlException = je.getSQLException();
-                sqlStatement = je.getSQL();
+                statement = je.getSQL();
 
                 if (sqlException != null && sqlException.getMessage() != null) {
                     message = String.format("%s: %d %s", message, sqlException.getErrorCode(), sqlException.getMessage());
@@ -41,13 +51,37 @@ public class SOSHibernateException extends SOSException {
             }
             e = e.getCause();
         }
+
+        initCause(cause);
+        message = String.format("%s %s", cause.getClass().getSimpleName(), cause.getMessage());
+    }
+
+    public SOSHibernateException(IllegalArgumentException cause) {
+        Throwable e = cause;
+        while (e != null) {
+            if (e instanceof QuerySyntaxException) {
+                QuerySyntaxException je = (QuerySyntaxException) e;
+
+                initCause(je);
+                message = je.getMessage();
+                statement = je.getQueryString(); // hql statement is already in the message
+                return;
+            }
+            e = e.getCause();
+        }
         initCause(cause);
         message = cause.getMessage();
     }
 
-    public SOSHibernateException(SQLException cause) {
+    public SOSHibernateException(IllegalStateException cause) {
+        initCause(cause);
+        message = cause.getMessage();
+    }
+
+    public SOSHibernateException(SQLException cause, String sql) {
         initCause(cause);
         sqlException = cause;
+        statement = sql;
         message = String.format("%d %s", sqlException.getErrorCode(), sqlException.getMessage());
     }
 
@@ -55,8 +89,8 @@ public class SOSHibernateException extends SOSException {
         return sqlException;
     }
 
-    public String getSqlStatement() {
-        return sqlStatement;
+    public String getStatement() {
+        return statement;
     }
 
     @Override
