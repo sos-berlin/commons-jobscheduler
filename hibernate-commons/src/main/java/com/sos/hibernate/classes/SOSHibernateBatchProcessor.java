@@ -17,6 +17,9 @@ import javax.persistence.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.hibernate.exceptions.SOSHibernateBatchProcessorException;
+import com.sos.hibernate.exceptions.SOSHibernateException;
+
 public class SOSHibernateBatchProcessor implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -32,18 +35,18 @@ public class SOSHibernateBatchProcessor implements Serializable {
         countCurrentBatches = 0;
     }
 
-    public void createInsertBatch(Class<?> entity) throws Exception {
+    public void createInsertBatch(Class<?> entity) throws SOSHibernateException {
         String method = "createInsertBatch";
         LOGGER.debug(String.format("%s: entity = %s ", method, entity.getSimpleName()));
         if (session == null) {
-            throw new Exception(String.format("%s: session is NULL", method));
+            throw new SOSHibernateBatchProcessorException("session is NULL");
         }
         if (session.getFactory().getDialect() == null) {
-            throw new Exception(String.format("%s: dialect is NULL", method));
+            throw new SOSHibernateBatchProcessorException("dialect is NULL");
         }
         Table t = entity.getAnnotation(Table.class);
         if (t == null) {
-            throw new Exception(String.format("%s: missing table annotation in entity %s", method, entity.getSimpleName()));
+            throw new SOSHibernateBatchProcessorException(String.format("missing table annotation in entity %s", entity.getSimpleName()));
         }
         Method[] ms = entity.getDeclaredMethods();
         LinkedHashMap<String, Method> fieldsMap = new LinkedHashMap<String, Method>();
@@ -100,64 +103,75 @@ public class SOSHibernateBatchProcessor implements Serializable {
         sql.append(")");
         sqlStatement = sql.toString();
         fieldsMetadata = fieldsMap;
-        preparedStatement = session.getConnection().prepareStatement(sqlStatement);
+
+        try {
+            preparedStatement = session.getConnection().prepareStatement(sqlStatement);
+        } catch (SQLException e) {
+            throw new SOSHibernateBatchProcessorException(e);
+        }
     }
 
-    public void addBatch(Object entity) throws Exception {
+    public void addBatch(Object entity) throws SOSHibernateException {
         String method = "addBatch";
         LOGGER.debug(String.format("%s: entity = %s ", method, entity.getClass().getSimpleName()));
         if (fieldsMetadata == null) {
-            throw new Exception(String.format("%s: fieldsMetadata is NULL", method));
+            throw new SOSHibernateBatchProcessorException("fieldsMetadata is NULL");
         }
         if (preparedStatement == null) {
-            throw new Exception(String.format("%s: preparedStatement is NULL", method));
+            throw new SOSHibernateBatchProcessorException("preparedStatement is NULL");
         }
         int index = 1;
-        for (Map.Entry<String, Method> entry : fieldsMetadata.entrySet()) {
-            Method m = entry.getValue();
-            Object obj = m.invoke(entity);
-            if (obj == null) {
-                String rt = m.getReturnType().getSimpleName();
-                if ("boolean".equalsIgnoreCase(rt)) {
-                    preparedStatement.setNull(index, java.sql.Types.INTEGER);
-                } else if ("long".equalsIgnoreCase(rt)) {
-                    preparedStatement.setNull(index, java.sql.Types.INTEGER);
-                } else if ("date".equalsIgnoreCase(rt)) {
-                    preparedStatement.setNull(index, java.sql.Types.TIMESTAMP);
+        try {
+            for (Map.Entry<String, Method> entry : fieldsMetadata.entrySet()) {
+                Method m = entry.getValue();
+                Object obj = m.invoke(entity);
+                if (obj == null) {
+                    String rt = m.getReturnType().getSimpleName();
+                    if ("boolean".equalsIgnoreCase(rt)) {
+                        preparedStatement.setNull(index, java.sql.Types.INTEGER);
+                    } else if ("long".equalsIgnoreCase(rt)) {
+                        preparedStatement.setNull(index, java.sql.Types.INTEGER);
+                    } else if ("date".equalsIgnoreCase(rt)) {
+                        preparedStatement.setNull(index, java.sql.Types.TIMESTAMP);
+                    } else {
+                        preparedStatement.setString(index, null);
+                    }
                 } else {
-                    preparedStatement.setString(index, null);
+                    if (obj instanceof Date) {
+                        Date d = (Date) obj;
+                        preparedStatement.setTimestamp(index, new Timestamp(d.getTime()));
+                    } else if (obj instanceof Long) {
+                        preparedStatement.setLong(index, (Long) obj);
+                    } else if (obj instanceof Integer) {
+                        preparedStatement.setInt(index, (Integer) obj);
+                    } else if (obj instanceof Boolean) {
+                        preparedStatement.setInt(index, (Boolean) obj ? 1 : 0);
+                    } else {
+                        preparedStatement.setString(index, obj.toString());
+                    }
                 }
-            } else {
-                if (obj instanceof Date) {
-                    Date d = (Date) obj;
-                    preparedStatement.setTimestamp(index, new Timestamp(d.getTime()));
-                } else if (obj instanceof Long) {
-                    preparedStatement.setLong(index, (Long) obj);
-                } else if (obj instanceof Integer) {
-                    preparedStatement.setInt(index, (Integer) obj);
-                } else if (obj instanceof Boolean) {
-                    preparedStatement.setInt(index, (Boolean) obj ? 1 : 0);
-                } else {
-                    preparedStatement.setString(index, obj.toString());
-                }
+                index++;
             }
-            index++;
+            preparedStatement.addBatch();
+        } catch (ReflectiveOperationException e) {
+            throw new SOSHibernateBatchProcessorException(String.format("can't invoke method for entity %s", entity.getClass().getSimpleName()), e);
+        } catch (SQLException e) {
+            throw new SOSHibernateBatchProcessorException(e);
         }
-        preparedStatement.addBatch();
         countCurrentBatches++;
     }
 
-    public int[] executeBatch() throws Exception {
+    public int[] executeBatch() throws SOSHibernateException {
         String method = "executeBatch";
         LOGGER.debug(String.format("%s", method));
         if (countCurrentBatches == 0) {
             return new int[0];
         }
         if (preparedStatement == null) {
-            throw new Exception(String.format("%s: preparedStatement is NULL", method));
+            throw new SOSHibernateBatchProcessorException("preparedStatement is NULL");
         }
         if (session == null) {
-            throw new Exception(String.format("%s: connection is NULL", method));
+            throw new SOSHibernateBatchProcessorException("connection is NULL");
         }
         try {
             int[] result = preparedStatement.executeBatch();
@@ -170,13 +184,7 @@ public class SOSHibernateBatchProcessor implements Serializable {
                 LOGGER.error(ex.getMessage(), ex);
             }
             LOGGER.error(e.getMessage(), e);
-            Throwable exx = e;
-            if (e instanceof SQLException) {
-                if (((SQLException) e.getNextException()) != null) {
-                    exx = (SQLException) e.getNextException();
-                }
-            }
-            throw new Exception(exx);
+            throw new SOSHibernateBatchProcessorException(e);
         } finally {
             countCurrentBatches = 0;
         }

@@ -7,8 +7,4 @@ public class SOSHibernateSQLCommandExtractorException extends SOSHibernateExcept
     public SOSHibernateSQLCommandExtractorException(String msg) {
         super(msg);
     }
-  
-    public SOSHibernateSQLCommandExtractorException(Throwable cause) {
-        super(cause);
-    }
 }

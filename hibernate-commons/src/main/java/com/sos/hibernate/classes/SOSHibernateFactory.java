@@ -1,6 +1,7 @@
 package com.sos.hibernate.classes;
 
 import java.io.Serializable;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -10,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
+import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
@@ -130,7 +132,9 @@ public class SOSHibernateFactory implements Serializable {
             } else {
                 conf.configure();
             }
-        } catch (Throwable e) {
+        } catch (MalformedURLException e) {
+            throw new SOSHibernateConfigurationException(String.format("exception on get configFile %s as url", configFile), e);
+        } catch (HibernateException e) {
             throw new SOSHibernateConfigurationException(e);
         }
         return getDbms(Dialect.getDialect(conf.getProperties()));
@@ -145,7 +149,7 @@ public class SOSHibernateFactory implements Serializable {
             int isolationLevel = getTransactionIsolation();
             LOGGER.debug(String.format("%s: autocommit = %s, transaction isolation = %s, %s", method, getAutoCommit(), getTransactionIsolationName(
                     isolationLevel), connFile));
-        } catch (Exception ex) {
+        } catch (HibernateException ex) {
             throw new SOSHibernateFactoryBuildException(ex);
         }
     }
@@ -207,8 +211,8 @@ public class SOSHibernateFactory implements Serializable {
                     return TimestampType.INSTANCE.objectToSQLString((Date) value, dialect);
                 }
             }
-        } catch (Throwable e) {
-            throw new SOSHibernateConvertException(e);
+        } catch (Exception e) {
+            throw new SOSHibernateConvertException(String.format("can't convert value=%s to SQL string", value), e);
         }
         return value + "";
     }
@@ -386,7 +390,9 @@ public class SOSHibernateFactory implements Serializable {
                 LOGGER.debug(String.format("%s: configure connection without the hibernate file", method));
                 configuration.configure();
             }
-        } catch (Throwable e) {
+        } catch (MalformedURLException e) {
+            throw new SOSHibernateConfigurationException(String.format("exception on get configFile %s as url", configFile), e);
+        } catch (HibernateException e) {
             throw new SOSHibernateConfigurationException(e);
         }
     }
@@ -403,7 +409,7 @@ public class SOSHibernateFactory implements Serializable {
                 dialect = impl.getJdbcServices().getDialect();
                 setDbms(dialect);
             }
-        } catch (Throwable e) {
+        } catch (HibernateException e) {
             throw new SOSHibernateInitSessionFactoryException(e);
         }
     }

@@ -1,5 +1,7 @@
 package com.sos.hibernate.exceptions;
 
+import java.sql.SQLException;
+
 public class SOSHibernateSQLExecutorException extends SOSHibernateException {
 
     private static final long serialVersionUID = 1L;
@@ -12,7 +14,7 @@ public class SOSHibernateSQLExecutorException extends SOSHibernateException {
         super(msg, cause);
     }
 
-    public SOSHibernateSQLExecutorException(Throwable cause) {
+    public SOSHibernateSQLExecutorException(SQLException cause) {
         super(cause);
     }
 }

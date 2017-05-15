@@ -1,5 +1,7 @@
 package com.sos.hibernate.exceptions;
 
+import org.hibernate.HibernateException;
+
 public class SOSHibernateConfigurationException extends SOSHibernateException {
 
     private static final long serialVersionUID = 1L;
@@ -8,7 +10,11 @@ public class SOSHibernateConfigurationException extends SOSHibernateException {
         super(msg);
     }
 
-    public SOSHibernateConfigurationException(Throwable cause) {
+    public SOSHibernateConfigurationException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+
+    public SOSHibernateConfigurationException(HibernateException cause) {
         super(cause);
     }
 }
