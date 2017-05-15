@@ -9,6 +9,7 @@ import java.util.Map;
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
+import org.hibernate.HibernateException;
 import org.hibernate.JDBCException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -153,7 +154,7 @@ public class SOSHibernateSession implements Serializable {
                 SessionImpl sf = (SessionImpl) currentSession;
                 return sf.connection();
             }
-        } catch (Throwable e) {
+        } catch (HibernateException e) {
             throw new SOSHibernateConnectionException(e);
         }
     }
@@ -237,7 +238,7 @@ public class SOSHibernateSession implements Serializable {
                 }
                 currentSession = session;
             }
-        } catch (Throwable e) {
+        } catch (HibernateException e) {
             throw new SOSHibernateOpenSessionException(e);
         }
     }
@@ -259,7 +260,7 @@ public class SOSHibernateSession implements Serializable {
     public int executeUpdate(Query<?> q) throws SOSHibernateException {
         try {
             return q.executeUpdate();
-        } catch (Throwable e) {
+        } catch (HibernateException e) {
             throw new SOSHibernateQueryException(e);
         }
     }
@@ -275,7 +276,7 @@ public class SOSHibernateSession implements Serializable {
                 Session session = (Session) currentSession;
                 session.clear();
             }
-        } catch (Throwable e) {
+        } catch (HibernateException e) {
             throw new SOSHibernateSessionException(e);
         }
     }
@@ -291,7 +292,7 @@ public class SOSHibernateSession implements Serializable {
                 Session session = (Session) currentSession;
                 session.doWork(work);
             }
-        } catch (Throwable e) {
+        } catch (HibernateException e) {
             throw new SOSHibernateSessionException(e);
         }
     }
@@ -336,7 +337,7 @@ public class SOSHibernateSession implements Serializable {
                 Session session = ((Session) currentSession);
                 session.beginTransaction();
             }
-        } catch (Throwable e) {
+        } catch (HibernateException e) {
             throw new SOSHibernateTransactionException(e);
         }
     }
@@ -357,7 +358,7 @@ public class SOSHibernateSession implements Serializable {
                 ((Session) currentSession).flush();
             }
             tr.commit();
-        } catch (Throwable e) {
+        } catch (HibernateException e) {
             throw new SOSHibernateTransactionException(e);
         }
     }
@@ -375,7 +376,7 @@ public class SOSHibernateSession implements Serializable {
         }
         try {
             tr.rollback();
-        } catch (Throwable e) {
+        } catch (HibernateException e) {
             throw new SOSHibernateTransactionException(e);
         }
     }
@@ -393,7 +394,7 @@ public class SOSHibernateSession implements Serializable {
                 Session s = ((Session) currentSession);
                 tr = s.getTransaction();
             }
-        } catch (Throwable e) {
+        } catch (HibernateException e) {
             throw new SOSHibernateTransactionException(e);
         }
         return tr;
@@ -414,7 +415,7 @@ public class SOSHibernateSession implements Serializable {
                 session.save(item);
                 session.flush();
             }
-        } catch (Throwable e) {
+        } catch (HibernateException e) {
             throw new SOSHibernateSessionException(e);
         }
     }
@@ -434,7 +435,7 @@ public class SOSHibernateSession implements Serializable {
                 session.update(item);
                 session.flush();
             }
-        } catch (Throwable e) {
+        } catch (HibernateException e) {
             throw new SOSHibernateSessionException(e);
         }
     }
@@ -464,7 +465,7 @@ public class SOSHibernateSession implements Serializable {
                 session.saveOrUpdate(item);
                 session.flush();
             }
-        } catch (Throwable e) {
+        } catch (HibernateException e) {
             throw new SOSHibernateSessionException(e);
         }
         return item;
@@ -485,7 +486,7 @@ public class SOSHibernateSession implements Serializable {
                 session.delete(item);
                 session.flush();
             }
-        } catch (Throwable e) {
+        } catch (HibernateException e) {
             throw new SOSHibernateSessionException(e);
         }
     }
@@ -511,7 +512,7 @@ public class SOSHibernateSession implements Serializable {
                     session.refresh(entityName, object);
                 }
             }
-        } catch (Throwable e) {
+        } catch (HibernateException e) {
             throw new SOSHibernateSessionException(e);
         }
     }
@@ -523,7 +524,7 @@ public class SOSHibernateSession implements Serializable {
             } else {
                 return ((Session) currentSession).get(entityClass, id);
             }
-        } catch (Throwable e) {
+        } catch (HibernateException e) {
             throw new SOSHibernateSessionException(e);
         }
     }
@@ -554,7 +555,7 @@ public class SOSHibernateSession implements Serializable {
                     q = ((Session) currentSession).createQuery(hql, entityClass);
                 }
             }
-        } catch (Throwable e) {
+        } catch (HibernateException e) {
             throw new SOSHibernateQueryException(e);
         }
         return q;
@@ -584,7 +585,7 @@ public class SOSHibernateSession implements Serializable {
             if (q != null && entityClass != null) {
                 q.addEntity(entityClass);
             }
-        } catch (Throwable e) {
+        } catch (HibernateException e) {
             throw new SOSHibernateQueryException(e);
         }
         return q;
@@ -616,7 +617,7 @@ public class SOSHibernateSession implements Serializable {
                     q = ((Session) currentSession).createNativeQuery(sql, entityClass);
                 }
             }
-        } catch (Throwable e) {
+        } catch (HibernateException e) {
             throw new SOSHibernateQueryException(e);
         }
         return q;
@@ -638,7 +639,7 @@ public class SOSHibernateSession implements Serializable {
         List<T> results = null;
         try {
             results = query.getResultList();
-        } catch (Throwable e) {
+        } catch (HibernateException e) {
             throw new SOSHibernateQueryException(e);
         }
         if (results != null && !results.isEmpty()) {
@@ -664,7 +665,7 @@ public class SOSHibernateSession implements Serializable {
         List<T> results = null;
         try {
             results = query.getResultList();
-        } catch (Throwable e) {
+        } catch (HibernateException e) {
             throw new SOSHibernateQueryException(e);
         }
         if (results != null && !results.isEmpty()) {
@@ -760,15 +761,15 @@ public class SOSHibernateSession implements Serializable {
                 }
             });
             return (List<Map<String, String>>) query.getResultList();
-        } catch (Throwable e) {
+        } catch (HibernateException e) {
             throw new SOSHibernateQueryException(e);
         }
     }
-    
-    public <T> List<T> getResultList(Query<T> query) throws SOSHibernateException{
-        try{
+
+    public <T> List<T> getResultList(Query<T> query) throws SOSHibernateException {
+        try {
             return query.getResultList();
-        } catch (Throwable e) {
+        } catch (HibernateException e) {
             throw new SOSHibernateQueryException(e);
         }
     }
@@ -787,7 +788,7 @@ public class SOSHibernateSession implements Serializable {
             } else {
                 cr = ((Session) currentSession).createCriteria(cl, alias);
             }
-        } catch (Throwable e) {
+        } catch (HibernateException e) {
             throw new SOSHibernateCriteriaException(e);
         }
         return cr;
@@ -820,7 +821,7 @@ public class SOSHibernateSession implements Serializable {
             if (transformer != null) {
                 cr.setResultTransformer(transformer);
             }
-        } catch (Throwable e) {
+        } catch (HibernateException e) {
             throw new SOSHibernateCriteriaException(e);
         }
         return cr;

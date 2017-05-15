@@ -2,6 +2,7 @@ package com.sos.hibernate.exceptions;
 
 import java.sql.SQLException;
 
+import org.hibernate.HibernateException;
 import org.hibernate.JDBCException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ public class SOSHibernateException extends SOSException {
         initCause(cause);
     }
 
-    public SOSHibernateException(Throwable cause) {
+    public SOSHibernateException(HibernateException cause) {
         Throwable e = cause;
         while (e != null) {
             if (e instanceof JDBCException) {
@@ -46,6 +47,12 @@ public class SOSHibernateException extends SOSException {
         }
         initCause(cause);
         message = cause.getMessage();
+    }
+
+    public SOSHibernateException(SQLException cause) {
+        initCause(cause);
+        sqlException = cause;
+        message = String.format("%d %s", sqlException.getErrorCode(), sqlException.getMessage());
     }
 
     public SQLException getSqlException() {

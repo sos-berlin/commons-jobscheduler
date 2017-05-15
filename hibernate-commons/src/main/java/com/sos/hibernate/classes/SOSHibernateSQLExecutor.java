@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Serializable;
@@ -15,6 +16,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -91,7 +93,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
         try {
             stmt = conn.prepareCall(sql);
             result = stmt.executeUpdate();
-        } catch (Throwable e) {
+        } catch (SQLException e) {
             throw new SOSHibernateSQLExecutorException(e);
         } finally {
             if (stmt != null) {
@@ -105,11 +107,13 @@ public class SOSHibernateSQLExecutor implements Serializable {
     }
 
     public void executeStatements(Path file) throws SOSHibernateException {
+        byte[] bytes = null;
         try {
-            executeStatements(new String(Files.readAllBytes(file)));
+            bytes = Files.readAllBytes(file);
         } catch (Throwable e) {
             throw new SOSHibernateSQLExecutorException(String.format("cannot read file %s", file), e);
         }
+        executeStatements(new String(bytes));
     }
 
     public void executeStatements(String content) throws SOSHibernateException {
@@ -142,7 +146,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
                     stmt.executeUpdate(command);
                 }
             }
-        } catch (Throwable e) {
+        } catch (SQLException e) {
             throw new SOSHibernateSQLExecutorException(e);
         } finally {
             if (stmt != null) {
@@ -168,7 +172,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
                 LOGGER.debug(String.format("%s: sql=%s", method, sql));
                 result = stmt.execute(sql);
             }
-        } catch (Throwable e) {
+        } catch (SQLException e) {
             throw new SOSHibernateSQLExecutorException(e);
         } finally {
             if (stmt != null) {
@@ -195,7 +199,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
                 LOGGER.debug(String.format("%s: sql=%s", method, sql));
                 result += stmt.executeUpdate(sql);
             }
-        } catch (Throwable e) {
+        } catch (SQLException e) {
             throw new SOSHibernateSQLExecutorException(e);
         } finally {
             if (stmt != null) {
@@ -220,7 +224,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
         try {
             stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
-        } catch (Throwable e) {
+        } catch (SQLException e) {
             throw new SOSHibernateSQLExecutorException(e);
         } finally {
             if (rs != null) {
@@ -259,7 +263,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
         try {
             Statement stmt = conn.createStatement();
             return stmt.executeQuery(sql);
-        } catch (Throwable e) {
+        } catch (SQLException e) {
             throw new SOSHibernateSQLExecutorException(e);
         }
     }
@@ -280,7 +284,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
                     record.put(name.toLowerCase(), value.trim());
                 }
             }
-        } catch (Throwable e) {
+        } catch (SQLException e) {
             throw new SOSHibernateSQLExecutorException(e);
         }
         return record;
@@ -315,7 +319,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
                 stmt.addBatch(sql);
             }
             result = stmt.executeBatch();
-        } catch (Throwable e) {
+        } catch (SQLException e) {
             throw new SOSHibernateSQLExecutorException(e);
         } finally {
             if (stmt != null) {
@@ -399,7 +403,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
             pstmt.executeUpdate();
         } catch (SOSHibernateSQLExecutorException e) {
             throw e;
-        } catch (Throwable e) {
+        } catch (SQLException e) {
             throw new SOSHibernateSQLExecutorException(e);
         } finally {
             if (pstmt != null) {
@@ -486,7 +490,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
             pstmt.executeUpdate();
         } catch (SOSHibernateSQLExecutorException e) {
             throw e;
-        } catch (Throwable e) {
+        } catch (SQLException e) {
             throw new SOSHibernateSQLExecutorException(e);
         } finally {
             if (pstmt != null) {
@@ -547,7 +551,9 @@ public class SOSHibernateSQLExecutor implements Serializable {
             }
         } catch (SOSHibernateSQLExecutorException e) {
             throw e;
-        } catch (Throwable e) {
+        } catch (IOException e) {
+            throw new SOSHibernateSQLExecutorException(String.format("can't write to file %s", path), e);
+        } catch (SQLException e) {
             throw new SOSHibernateSQLExecutorException(e);
         } finally {
             if (out != null) {
@@ -606,7 +612,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
             }
         } catch (SOSHibernateSQLExecutorException e) {
             throw e;
-        } catch (Throwable e) {
+        } catch (SQLException e) {
             throw new SOSHibernateSQLExecutorException(e);
         } finally {
             if (rs != null) {
@@ -646,7 +652,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
             stmt = conn.createStatement();
             try {
                 rs = stmt.executeQuery(sql);
-            } catch (Throwable e) {
+            } catch (SQLException e) {
                 throw new SOSHibernateSQLExecutorException(e);
             }
 
@@ -667,7 +673,9 @@ public class SOSHibernateSQLExecutor implements Serializable {
             }
         } catch (SOSHibernateSQLExecutorException e) {
             throw e;
-        } catch (Throwable e) {
+        } catch (IOException e) {
+            throw new SOSHibernateSQLExecutorException("exception during read bytes from clob", e);
+        } catch (SQLException e) {
             throw new SOSHibernateSQLExecutorException(e);
         } finally {
             if (in != null) {
@@ -717,7 +725,7 @@ public class SOSHibernateSQLExecutor implements Serializable {
             stmt = conn.createStatement();
             try {
                 rs = stmt.executeQuery(sql);
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 throw new SOSHibernateSQLExecutorException(e);
             }
             int bytesRead = 0;
@@ -740,7 +748,9 @@ public class SOSHibernateSQLExecutor implements Serializable {
             }
         } catch (SOSHibernateSQLExecutorException e) {
             throw e;
-        } catch (Throwable e) {
+        } catch (IOException e) {
+            throw new SOSHibernateSQLExecutorException(String.format("can't write to file %s", path), e);
+        } catch (SQLException e) {
             throw new SOSHibernateSQLExecutorException(e);
         } finally {
             try {
