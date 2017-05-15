@@ -519,7 +519,7 @@ public class SOSServicePermissionShiro {
             addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:job:change:hot_folder");
 
             addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:process_class:view:status");
-            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:process_class:change:editContent");
+            addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:process_class:change:edit_content");
             addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:process_class:remove");
             addPermission(sosPermissionCommands.getSOSPermission(), "sos:products:commands:process_class:change:hot_folder");
 
@@ -712,7 +712,7 @@ public class SOSServicePermissionShiro {
 
             sosPermissionJocCockpit.getSchedule().getView().setConfiguration(haveRight("sos:products:joc_cockpit:schedule:view:configuration"));
             sosPermissionJocCockpit.getSchedule().getView().setStatus(haveRight("sos:products:joc_cockpit:schedule:view:status"));
-            sosPermissionJocCockpit.getSchedule().getChange().setEditContent(haveRight("sos:products:joc_cockpit:schedule:change:editContent"));
+            sosPermissionJocCockpit.getSchedule().getChange().setEditContent(haveRight("sos:products:joc_cockpit:schedule:change:edit_content"));
             sosPermissionJocCockpit.getSchedule().getChange().setAddSubstitute(haveRight("sos:products:joc_cockpit:schedule:change:add_substitute"));
 
             sosPermissionJocCockpit.getLock().getView().setConfiguration(haveRight("sos:products:joc_cockpit:lock:view:configuration"));
@@ -852,7 +852,7 @@ public class SOSServicePermissionShiro {
 
             sosPermissionCommands.getProcessClass().getView().setStatus(haveRight("sos:products:commands:process_class:view:status"));
             sosPermissionCommands.getProcessClass().setRemove(haveRight("sos:products:commands:process_class:remove"));
-            sosPermissionCommands.getProcessClass().getChange().setEditContent(haveRight("sos:products:commands:process_class:change:editContent"));
+            sosPermissionCommands.getProcessClass().getChange().setEditContent(haveRight("sos:products:commands:process_class:change:edit_content"));
             sosPermissionCommands.getProcessClass().getChange().setHotFolder(haveRight("sos:products:commands:process_class:change:hot_folder"));
 
             sosPermissionCommands.getSchedule().getView().setStatus(haveRight("sos:products:commands:schedule:view:status"));

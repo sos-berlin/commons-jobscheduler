@@ -72,7 +72,7 @@
 									</xs:sequence>
 								</xs:complexType>
 							</xs:element>
-							<xs:element name="Execute">
+							<xs:element name="execute">
 								<xs:complexType>
 									<xs:sequence>
 										<xs:element name="restart">
