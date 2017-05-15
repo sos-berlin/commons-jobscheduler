@@ -4,19 +4,15 @@ import java.sql.SQLException;
 
 import org.hibernate.HibernateException;
 import org.hibernate.JDBCException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.sos.exception.SOSException;
 
 public class SOSHibernateException extends SOSException {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SOSHibernateException.class);
     private static final long serialVersionUID = 1L;
     private String message = null;
     private SQLException sqlException = null;
     private String sqlStatement = null;
-    private boolean sqlStatementIsLogged = false;
 
     public SOSHibernateException(String msg) {
         message = msg;
@@ -66,14 +62,5 @@ public class SOSHibernateException extends SOSException {
     @Override
     public String getMessage() {
         return message;
-    }
-
-    @Override
-    public String toString() {
-        if (sqlStatement != null && !sqlStatementIsLogged) {
-            LOGGER.info("sql statement: " + sqlStatement);
-            sqlStatementIsLogged = true;
-        }
-        return super.toString();
     }
 }
