@@ -4,6 +4,7 @@ import java.io.File;
 import org.apache.log4j.Logger;
 import com.sos.hibernate.classes.ClassList;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.hibernate.classes.SOSHibernateFactory;
   
 /** @author Uwe Risse */
@@ -34,7 +35,7 @@ public class SOSHibernateDBLayer {
         return sosHibernateSession;
     }
     
-    public SOSHibernateSession createStatefullConnection(String confFile) throws Exception{
+    public SOSHibernateSession createStatefullConnection(String confFile) throws SOSHibernateException{
         if (sosHibernateFactory == null) {
                 sosHibernateFactory = new SOSHibernateFactory(confFile);
                 sosHibernateFactory.addClassMapping(getDefaultClassMapping());
@@ -45,7 +46,7 @@ public class SOSHibernateDBLayer {
     }
 
 
-    public SOSHibernateSession createStatelessConnection(String confFile) throws Exception{
+    public SOSHibernateSession createStatelessConnection(String confFile) throws SOSHibernateException {
         if (sosHibernateFactory == null) {
                 sosHibernateFactory = new SOSHibernateFactory(confFile);
                 sosHibernateFactory.addClassMapping(getDefaultClassMapping());

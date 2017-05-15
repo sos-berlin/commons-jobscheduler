@@ -8,21 +8,22 @@ import org.apache.log4j.Logger;
 
 import com.sos.hibernate.classes.DbItem;
 import com.sos.hibernate.classes.SOSHibernateIntervalFilter;
+import com.sos.hibernate.exceptions.SOSHibernateException;
 
 /** @author Uwe Risse */
 public abstract class SOSHibernateIntervalDBLayer extends SOSHibernateDBLayer {
 
     private static final Logger LOGGER = Logger.getLogger(SOSHibernateIntervalDBLayer.class);
     public abstract SOSHibernateIntervalFilter getFilter();
-    public abstract void onAfterDeleting(DbItem h) throws Exception;
-    public abstract List<DbItem> getListOfItemsToDelete() throws Exception;
-    public abstract long deleteInterval() throws Exception;
+    public abstract void onAfterDeleting(DbItem h) throws SOSHibernateException ;
+    public abstract List<DbItem> getListOfItemsToDelete() throws SOSHibernateException;
+    public abstract long deleteInterval() throws SOSHibernateException;
 
     public SOSHibernateIntervalDBLayer() {
         super();
     }
 
-    public long deleteInterval(int interval, int limit) throws Exception {
+    public long deleteInterval(int interval, int limit) throws SOSHibernateException  {
         long deleted = 0;
         if (limit == 0) {
             GregorianCalendar to = new GregorianCalendar();
@@ -62,7 +63,7 @@ public abstract class SOSHibernateIntervalDBLayer extends SOSHibernateDBLayer {
         return deleted;
     }
 
-    public long deleteInterval(int interval) throws Exception {
+    public long deleteInterval(int interval) throws SOSHibernateException {
         return deleteInterval(interval, 300);
     }
 
