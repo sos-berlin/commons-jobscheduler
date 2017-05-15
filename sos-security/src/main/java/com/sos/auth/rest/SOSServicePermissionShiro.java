@@ -284,7 +284,8 @@ public class SOSServicePermissionShiro {
 
     }
 
-    @GET
+    
+    @POST
     @Path("/permission")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public SOSShiroCurrentUserAnswer isPermitted(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader,
