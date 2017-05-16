@@ -324,7 +324,7 @@ public class SOSServicePermissionShiro {
         resetTimeOut();
     }
 
-    @GET
+    @POST
     @Path("/permissions")
     @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
     public SOSPermissionShiro getPermissions(@HeaderParam(ACCESS_TOKEN) String accessTokenFromHeader,
@@ -349,7 +349,7 @@ public class SOSServicePermissionShiro {
             Section s = ini.getSection("roles");
 
             for (String role : s.keySet()) {
-                addRole(roles.getSOSPermissionRole(), role);
+                addAllRole(roles.getSOSPermissionRole(), role);
             }
 
             SOSPermissions sosPermissions = o.createSOSPermissions();
@@ -910,6 +910,12 @@ public class SOSServicePermissionShiro {
         }
     }
 
+    private void addAllRole(List<String> sosRoles, String role) {
+        if (currentUser != null && currentUser.isAuthenticated()) {
+            sosRoles.add(role);
+        }
+    }
+    
     private void createUser() throws Exception {
         if (Globals.jocWebserviceDataContainer.getCurrentUsersList() == null) {
             Globals.jocWebserviceDataContainer.setCurrentUsersList(new SOSShiroCurrentUsersList());
