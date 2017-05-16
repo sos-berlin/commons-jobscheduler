@@ -27,9 +27,8 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.exceptions.SOSHibernateConfigurationException;
 import com.sos.hibernate.exceptions.SOSHibernateConvertException;
-import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.hibernate.exceptions.SOSHibernateFactoryBuildException;
-import com.sos.hibernate.exceptions.SOSHibernateInitSessionFactoryException;
+import com.sos.hibernate.exceptions.SOSHibernateOpenSessionException;
 
 import sos.util.SOSDate;
 import sos.util.SOSString;
@@ -64,17 +63,17 @@ public class SOSHibernateFactory implements Serializable {
         UNKNOWN, DB2, FBSQL, MSSQL, MYSQL, ORACLE, PGSQL, SYBASE
     }
 
-    public SOSHibernateFactory() throws SOSHibernateException {
+    public SOSHibernateFactory() throws SOSHibernateConfigurationException {
         this((String) null);
     }
 
-    public SOSHibernateFactory(String hibernateConfigFile) throws SOSHibernateException {
+    public SOSHibernateFactory(String hibernateConfigFile) throws SOSHibernateConfigurationException {
         setConfigFile(hibernateConfigFile);
         initClassMapping();
         initConfigurationProperties();
     }
 
-    public SOSHibernateFactory(Path hibernateConfigFile) throws SOSHibernateException {
+    public SOSHibernateFactory(Path hibernateConfigFile) throws SOSHibernateConfigurationException {
         setConfigFile(hibernateConfigFile);
         initClassMapping();
         initConfigurationProperties();
@@ -98,11 +97,11 @@ public class SOSHibernateFactory implements Serializable {
         configurationProperties.put(HIBERNATE_PROPERTY_TRANSACTION_ISOLATION, String.valueOf(level));
     }
 
-    public void setConfigFile(String hibernateConfigFile) throws SOSHibernateException {
+    public void setConfigFile(String hibernateConfigFile) throws SOSHibernateConfigurationException {
         setConfigFile(hibernateConfigFile == null ? null : Paths.get(hibernateConfigFile));
     }
 
-    public void setConfigFile(Path hibernateConfigFile) throws SOSHibernateException {
+    public void setConfigFile(Path hibernateConfigFile) throws SOSHibernateConfigurationException {
         if (hibernateConfigFile != null) {
             if (!Files.exists(hibernateConfigFile)) {
                 throw new SOSHibernateConfigurationException(String.format("hibernate config file not found: %s", hibernateConfigFile.toString()));
@@ -125,23 +124,25 @@ public class SOSHibernateFactory implements Serializable {
         }
     }
 
-    public Enum<SOSHibernateFactory.Dbms> getDbmsBeforeBuild() throws SOSHibernateException {
+    public Enum<SOSHibernateFactory.Dbms> getDbmsBeforeBuild() throws SOSHibernateConfigurationException {
         Configuration conf = new Configuration();
+        Dialect dt = null;
         try {
             if (configFile.isPresent()) {
                 conf.configure(configFile.get().toUri().toURL());
             } else {
                 conf.configure();
             }
+            dt = Dialect.getDialect(conf.getProperties());
         } catch (MalformedURLException e) {
             throw new SOSHibernateConfigurationException(String.format("exception on get configFile %s as url", configFile), e);
         } catch (PersistenceException e) {
             throw new SOSHibernateConfigurationException(e);
         }
-        return getDbms(Dialect.getDialect(conf.getProperties()));
+        return getDbms(dt);
     }
 
-    public void build() throws SOSHibernateException {
+    public void build() throws SOSHibernateFactoryBuildException {
         String method = getMethodName("build");
         try {
             initConfiguration();
@@ -150,23 +151,25 @@ public class SOSHibernateFactory implements Serializable {
             int isolationLevel = getTransactionIsolation();
             LOGGER.debug(String.format("%s: autocommit = %s, transaction isolation = %s, %s", method, getAutoCommit(), getTransactionIsolationName(
                     isolationLevel), connFile));
+        } catch (SOSHibernateConfigurationException ex) {
+            throw new SOSHibernateFactoryBuildException("unable to configure", ex);
         } catch (PersistenceException ex) {
             throw new SOSHibernateFactoryBuildException(ex);
         }
     }
 
-    public SOSHibernateSession openSession(String identifier) throws SOSHibernateException {
+    public SOSHibernateSession openSession(String identifier) throws SOSHibernateOpenSessionException {
         SOSHibernateSession session = new SOSHibernateSession(this);
         session.setIdentifier(identifier);
         session.openSession();
         return session;
     }
 
-    public SOSHibernateSession openSession() throws SOSHibernateException {
+    public SOSHibernateSession openSession() throws SOSHibernateOpenSessionException {
         return openSession(identifier);
     }
 
-    public SOSHibernateSession openStatelessSession(String identifier) throws SOSHibernateException {
+    public SOSHibernateSession openStatelessSession(String identifier) throws SOSHibernateOpenSessionException {
         SOSHibernateSession session = new SOSHibernateSession(this);
         session.setIsStatelessSession(true);
         session.setIdentifier(identifier);
@@ -174,11 +177,11 @@ public class SOSHibernateFactory implements Serializable {
         return session;
     }
 
-    public SOSHibernateSession openStatelessSession() throws SOSHibernateException {
+    public SOSHibernateSession openStatelessSession() throws SOSHibernateOpenSessionException {
         return openStatelessSession(identifier);
     }
 
-    public SOSHibernateSession getCurrentSession(String identifier) throws SOSHibernateException {
+    public SOSHibernateSession getCurrentSession(String identifier) throws SOSHibernateOpenSessionException {
         SOSHibernateSession session = new SOSHibernateSession(this);
         session.setIsGetCurrentSession(true);
         session.setIdentifier(identifier);
@@ -186,11 +189,11 @@ public class SOSHibernateFactory implements Serializable {
         return session;
     }
 
-    public SOSHibernateSession getCurrentSession() throws SOSHibernateException {
+    public SOSHibernateSession getCurrentSession() throws SOSHibernateOpenSessionException {
         return getCurrentSession(identifier);
     }
 
-    public String quote(Type type, Object value) throws SOSHibernateException {
+    public String quote(Type type, Object value) throws SOSHibernateConvertException {
         if (value == null) {
             return "NULL";
         }
@@ -281,7 +284,7 @@ public class SOSHibernateFactory implements Serializable {
         sessionFactory = null;
     }
 
-    public boolean getAutoCommit() throws SOSHibernateException {
+    public boolean getAutoCommit() throws SOSHibernateConfigurationException {
         if (configuration == null) {
             throw new SOSHibernateConfigurationException("configuration is NULL");
         }
@@ -292,7 +295,7 @@ public class SOSHibernateFactory implements Serializable {
         return Boolean.parseBoolean(p);
     }
 
-    public int getTransactionIsolation() throws SOSHibernateException {
+    public int getTransactionIsolation() throws SOSHibernateConfigurationException {
         if (configuration == null) {
             throw new SOSHibernateConfigurationException("configuration is NULL");
         }
@@ -304,7 +307,7 @@ public class SOSHibernateFactory implements Serializable {
         return Integer.parseInt(p);
     }
 
-    public static String getTransactionIsolationName(int isolationLevel) throws SOSHibernateException {
+    public static String getTransactionIsolationName(int isolationLevel) throws SOSHibernateConfigurationException {
         switch (isolationLevel) {
         case Connection.TRANSACTION_NONE:
             return "TRANSACTION_NONE";
@@ -369,7 +372,7 @@ public class SOSHibernateFactory implements Serializable {
         return defaultConfigurationProperties;
     }
 
-    private void initConfiguration() throws SOSHibernateException {
+    private void initConfiguration() throws SOSHibernateConfigurationException {
         String method = getMethodName("initConfiguration");
         LOGGER.debug(String.format("%s", method));
         configuration = new Configuration();
@@ -380,7 +383,7 @@ public class SOSHibernateFactory implements Serializable {
         logConfigurationProperties();
     }
 
-    private void configure() throws SOSHibernateException {
+    private void configure() throws SOSHibernateConfigurationException {
         String method = getMethodName("configure");
         try {
             if (configFile.isPresent()) {
@@ -398,20 +401,16 @@ public class SOSHibernateFactory implements Serializable {
         }
     }
 
-    private void initSessionFactory() throws SOSHibernateException {
+    private void initSessionFactory() {
         String method = getMethodName("initSessionFactory");
         LOGGER.debug(String.format("%s", method));
-        try {
-            ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
-            sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+        ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();
+        sessionFactory = configuration.buildSessionFactory(serviceRegistry);
 
-            SessionFactoryImplementor impl = (SessionFactoryImplementor) sessionFactory;
-            if (impl != null) {
-                dialect = impl.getJdbcServices().getDialect();
-                setDbms(dialect);
-            }
-        } catch (PersistenceException e) {
-            throw new SOSHibernateInitSessionFactoryException(e);
+        SessionFactoryImplementor impl = (SessionFactoryImplementor) sessionFactory;
+        if (impl != null) {
+            dialect = impl.getJdbcServices().getDialect();
+            setDbms(dialect);
         }
     }
 

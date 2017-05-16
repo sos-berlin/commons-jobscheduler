@@ -20,6 +20,7 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.hql.internal.QueryExecutionRequestException;
 import org.hibernate.internal.SessionImpl;
 import org.hibernate.internal.StatelessSessionImpl;
 import org.hibernate.jdbc.Work;
@@ -33,9 +34,11 @@ import org.slf4j.LoggerFactory;
 import com.sos.exception.SOSDBException;
 import com.sos.exception.SOSException;
 import com.sos.exception.SOSJDBCException;
+import com.sos.hibernate.exceptions.SOSHibernateConfigurationException;
 import com.sos.hibernate.exceptions.SOSHibernateConnectionException;
 import com.sos.hibernate.exceptions.SOSHibernateCriteriaException;
 import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.hibernate.exceptions.SOSHibernateOpenSessionException;
 import com.sos.hibernate.exceptions.SOSHibernateQueryException;
 import com.sos.hibernate.exceptions.SOSHibernateSessionException;
@@ -96,23 +99,29 @@ public class SOSHibernateSession implements Serializable {
     }
 
     public boolean isOpen() {
-        if (isStatelessSession) {
-            StatelessSession session = ((StatelessSession) currentSession);
-            return session.isOpen();
-        } else {
-            Session session = (Session) currentSession;
-            return session.isOpen();
+        if (currentSession != null) {
+            if (isStatelessSession) {
+                StatelessSession session = ((StatelessSession) currentSession);
+                return session.isOpen();
+            } else {
+                Session session = (Session) currentSession;
+                return session.isOpen();
+            }
         }
+        return false;
     }
 
     public boolean isConnected() {
-        if (isStatelessSession) {
-            StatelessSession session = ((StatelessSession) currentSession);
-            return session.isConnected();
-        } else {
-            Session session = (Session) currentSession;
-            return session.isConnected();
+        if (currentSession != null) {
+            if (isStatelessSession) {
+                StatelessSession session = ((StatelessSession) currentSession);
+                return session.isConnected();
+            } else {
+                Session session = (Session) currentSession;
+                return session.isConnected();
+            }
         }
+        return false;
     }
 
     public SOSHibernateFactory getFactory() {
@@ -124,7 +133,7 @@ public class SOSHibernateSession implements Serializable {
     }
 
     public FlushMode getHibernateFlushMode() {
-        if (!isStatelessSession) {
+        if (!isStatelessSession && currentSession != null) {
             Session session = (Session) currentSession;
             return session.getHibernateFlushMode();
         }
@@ -132,7 +141,7 @@ public class SOSHibernateSession implements Serializable {
     }
 
     public CacheMode getCacheMode() {
-        if (!isStatelessSession) {
+        if (!isStatelessSession && currentSession != null) {
             Session session = (Session) currentSession;
             return session.getCacheMode();
         }
@@ -143,9 +152,12 @@ public class SOSHibernateSession implements Serializable {
         return currentSession;
     }
 
-    public Connection getConnection() throws SOSHibernateException {
+    public Connection getConnection() throws SOSHibernateInvalidSessionException, SOSHibernateConnectionException {
         String method = getMethodName("getConnection");
         LOGGER.debug(String.format("%s", method));
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("session is NULL");
+        }
         try {
             if (isStatelessSession) {
                 StatelessSessionImpl sf = (StatelessSessionImpl) currentSession;
@@ -154,6 +166,8 @@ public class SOSHibernateSession implements Serializable {
                 SessionImpl sf = (SessionImpl) currentSession;
                 return sf.connection();
             }
+        } catch (IllegalStateException e) {
+            throw new SOSHibernateInvalidSessionException(e, (String) null);
         } catch (PersistenceException e) {
             throw new SOSHibernateConnectionException(e);
         }
@@ -203,7 +217,7 @@ public class SOSHibernateSession implements Serializable {
         return ex;
     }
 
-    public String getLastSequenceValue(String sequenceName) throws SOSHibernateException {
+    public String getLastSequenceValue(String sequenceName) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
         String stmt = factory.getSequenceLastValString(sequenceName);
         return stmt == null ? null : getNativeQuerySingleValue(stmt);
     }
@@ -215,7 +229,7 @@ public class SOSHibernateSession implements Serializable {
         return sqlExecutor;
     }
 
-    protected void openSession() throws SOSHibernateException {
+    protected void openSession() throws SOSHibernateOpenSessionException {
         String method = getMethodName("openSession");
         if (currentSession != null) {
             LOGGER.debug(String.format("%s: close currentSession", method));
@@ -238,6 +252,8 @@ public class SOSHibernateSession implements Serializable {
                 }
                 currentSession = session;
             }
+        } catch (IllegalStateException e) {
+            throw new SOSHibernateOpenSessionException(e, (String) null);
         } catch (PersistenceException e) {
             throw new SOSHibernateOpenSessionException(e);
         }
@@ -247,7 +263,7 @@ public class SOSHibernateSession implements Serializable {
      * 
      *             use factory.openSession() or factory.openStatelessSession(); */
     @Deprecated
-    public void connect() throws SOSHibernateException {
+    public void connect() throws SOSHibernateConfigurationException, SOSHibernateOpenSessionException {
         String method = getMethodName("connect");
         openSession();
         String connFile = (factory.getConfigFile().isPresent()) ? factory.getConfigFile().get().toAbsolutePath().toString() : "without config file";
@@ -257,52 +273,67 @@ public class SOSHibernateSession implements Serializable {
 
     }
 
+    public int executeUpdate(String hql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
+        return executeUpdate(createQuery(hql));
+    }
+
     @SuppressWarnings("deprecation")
-    public int executeUpdate(Query<?> query) throws SOSHibernateException {
+    public int executeUpdate(Query<?> query) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
         String method = getMethodName("executeUpdate");
         LOGGER.debug(String.format("%s: query[hql=%s]", method, query.getQueryString()));
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("session is NULL");
+        }
         try {
             return query.executeUpdate();
         } catch (IllegalStateException e) {
-            throw new SOSHibernateQueryException(e);
+            if (e.getCause() != null && e.getCause() instanceof QueryExecutionRequestException) {
+                throw new SOSHibernateQueryException(e, query);
+            } else {
+                throw new SOSHibernateInvalidSessionException(e, query);
+            }
         } catch (PersistenceException e) {
-            throw new SOSHibernateQueryException(query,e);
+            throw new SOSHibernateQueryException(e, query);
         }
     }
 
-    public void clearSession() throws SOSHibernateException {
+    public void clearSession() throws SOSHibernateInvalidSessionException, SOSHibernateSessionException {
         String method = getMethodName("clearSession");
         LOGGER.debug(String.format("%s", method));
         if (currentSession == null) {
-            throw new SOSHibernateSessionException("session is NULL");
+            throw new SOSHibernateInvalidSessionException("session is NULL");
         }
         try {
             if (!isStatelessSession) {
                 Session session = (Session) currentSession;
                 session.clear();
             }
+        } catch (IllegalStateException e) {
+            throw new SOSHibernateInvalidSessionException(e, (String) null);
         } catch (PersistenceException e) {
             throw new SOSHibernateSessionException(e);
         }
     }
 
-    public void sessionDoWork(Work work) throws SOSHibernateException {
+    public void sessionDoWork(Work work) throws SOSHibernateInvalidSessionException, SOSHibernateSessionException {
         String method = getMethodName("sessionDoWork");
         LOGGER.debug(String.format("%s", method));
         if (currentSession == null) {
-            throw new SOSHibernateSessionException("currentSession is NULL");
+            throw new SOSHibernateInvalidSessionException("session is NULL");
         }
         try {
             if (!isStatelessSession) {
                 Session session = (Session) currentSession;
                 session.doWork(work);
             }
+        } catch (IllegalStateException e) {
+            throw new SOSHibernateInvalidSessionException(e, (String) null);
         } catch (PersistenceException e) {
             throw new SOSHibernateSessionException(e);
         }
     }
 
-    public void reopen() throws SOSHibernateException {
+    public void reopen() throws SOSHibernateOpenSessionException {
         String method = getMethodName("reopen");
         LOGGER.debug(String.format("%s: isStatelessSession=%s", method, isStatelessSession));
         closeSession();
@@ -324,15 +355,19 @@ public class SOSHibernateSession implements Serializable {
         closeSession();
     }
 
-    public void beginTransaction() throws SOSHibernateException {
+    public void beginTransaction() throws SOSHibernateInvalidSessionException, SOSHibernateTransactionException {
         String method = getMethodName("beginTransaction");
-        if (getFactory().getAutoCommit()) {
-            LOGGER.debug(String.format("%s: skip (autoCommit is true)", method));
-            return;
+        try {
+            if (getFactory().getAutoCommit()) {
+                LOGGER.debug(String.format("%s: skip (autoCommit is true)", method));
+                return;
+            }
+        } catch (SOSHibernateConfigurationException e) {
+            throw new SOSHibernateTransactionException("can't get configured autocommit", e);
         }
         LOGGER.debug(String.format("%s", method));
         if (currentSession == null) {
-            throw new SOSHibernateSessionException("currentSession is NULL");
+            throw new SOSHibernateInvalidSessionException("session is NULL");
         }
         try {
             if (isStatelessSession) {
@@ -342,54 +377,68 @@ public class SOSHibernateSession implements Serializable {
                 Session session = ((Session) currentSession);
                 session.beginTransaction();
             }
+        } catch (IllegalStateException e) {
+            throw new SOSHibernateInvalidSessionException(e, (String) null);
         } catch (PersistenceException e) {
             throw new SOSHibernateTransactionException(e);
         }
     }
 
-    public void commit() throws SOSHibernateException {
+    public void commit() throws SOSHibernateInvalidSessionException, SOSHibernateTransactionException {
         String method = getMethodName("commit");
-        if (getFactory().getAutoCommit()) {
-            LOGGER.debug(String.format("%s: skip (autoCommit is true)", method));
-            return;
+        try {
+            if (getFactory().getAutoCommit()) {
+                LOGGER.debug(String.format("%s: skip (autoCommit is true)", method));
+                return;
+            }
+        } catch (SOSHibernateConfigurationException e) {
+            throw new SOSHibernateTransactionException("can't get configured autocommit", e);
         }
         LOGGER.debug(String.format("%s", method));
         Transaction tr = getTransaction();
         if (tr == null) {
-            throw new SOSHibernateTransactionException("session transaction is NULL");
+            throw new SOSHibernateTransactionException("transaction is NULL");
         }
         try {
             if (!isStatelessSession) {
                 ((Session) currentSession).flush();
             }
             tr.commit();
+        } catch (IllegalStateException e) {
+            throw new SOSHibernateInvalidSessionException(e, (String) null);
         } catch (PersistenceException e) {
             throw new SOSHibernateTransactionException(e);
         }
     }
 
-    public void rollback() throws SOSHibernateException {
+    public void rollback() throws SOSHibernateInvalidSessionException, SOSHibernateTransactionException {
         String method = getMethodName("rollback");
-        if (getFactory().getAutoCommit()) {
-            LOGGER.debug(String.format("%s: skip (autoCommit is true)", method));
-            return;
+        try {
+            if (getFactory().getAutoCommit()) {
+                LOGGER.debug(String.format("%s: skip (autoCommit is true)", method));
+                return;
+            }
+        } catch (SOSHibernateConfigurationException e) {
+            throw new SOSHibernateTransactionException("can't get configured autocommit", e);
         }
         LOGGER.debug(String.format("%s", method));
         Transaction tr = getTransaction();
         if (tr == null) {
-            throw new SOSHibernateTransactionException("session transaction is NULL");
+            throw new SOSHibernateTransactionException("transaction is NULL");
         }
         try {
             tr.rollback();
+        } catch (IllegalStateException e) {
+            throw new SOSHibernateInvalidSessionException(e, (String) null);
         } catch (PersistenceException e) {
             throw new SOSHibernateTransactionException(e);
         }
     }
 
-    public Transaction getTransaction() throws SOSHibernateException {
+    public Transaction getTransaction() throws SOSHibernateInvalidSessionException, SOSHibernateTransactionException {
         Transaction tr = null;
         if (currentSession == null) {
-            throw new SOSHibernateSessionException("currentSession is NULL");
+            throw new SOSHibernateInvalidSessionException("session is NULL");
         }
         try {
             if (isStatelessSession) {
@@ -399,17 +448,19 @@ public class SOSHibernateSession implements Serializable {
                 Session s = ((Session) currentSession);
                 tr = s.getTransaction();
             }
+        } catch (IllegalStateException e) {
+            throw new SOSHibernateInvalidSessionException(e, (String) null);
         } catch (PersistenceException e) {
             throw new SOSHibernateTransactionException(e);
         }
         return tr;
     }
 
-    public void save(Object item) throws SOSHibernateException {
+    public void save(Object item) throws SOSHibernateInvalidSessionException, SOSHibernateSessionException {
         String method = getMethodName("save");
         LOGGER.debug(String.format("%s: item=%s", method, item));
         if (currentSession == null) {
-            throw new SOSHibernateSessionException("session is NULL");
+            throw new SOSHibernateInvalidSessionException("session is NULL");
         }
         try {
             if (isStatelessSession) {
@@ -420,16 +471,18 @@ public class SOSHibernateSession implements Serializable {
                 session.save(item);
                 session.flush();
             }
+        } catch (IllegalStateException e) {
+            throw new SOSHibernateInvalidSessionException(e, (String) null);
         } catch (PersistenceException e) {
             throw new SOSHibernateSessionException(e);
         }
     }
 
-    public void update(Object item) throws SOSHibernateException {
+    public void update(Object item) throws SOSHibernateInvalidSessionException, SOSHibernateSessionException {
         String method = getMethodName("update");
         LOGGER.debug(String.format("%s: item=%s", method, item));
         if (currentSession == null) {
-            throw new SOSHibernateSessionException("session is NULL");
+            throw new SOSHibernateInvalidSessionException("session is NULL");
         }
         try {
             if (isStatelessSession) {
@@ -440,16 +493,18 @@ public class SOSHibernateSession implements Serializable {
                 session.update(item);
                 session.flush();
             }
+        } catch (IllegalStateException e) {
+            throw new SOSHibernateInvalidSessionException(e, (String) null);
         } catch (PersistenceException e) {
             throw new SOSHibernateSessionException(e);
         }
     }
 
-    public Object saveOrUpdate(Object item) throws SOSHibernateException {
+    public Object saveOrUpdate(Object item) throws SOSHibernateInvalidSessionException, SOSHibernateSessionException {
         String method = getMethodName("saveOrUpdate");
         LOGGER.debug(String.format("%s: item=%s", method, item));
         if (currentSession == null) {
-            throw new SOSHibernateSessionException("currentSession is NULL");
+            throw new SOSHibernateInvalidSessionException("session is NULL");
         }
         try {
             if (isStatelessSession) {
@@ -470,17 +525,19 @@ public class SOSHibernateSession implements Serializable {
                 session.saveOrUpdate(item);
                 session.flush();
             }
+        } catch (IllegalStateException e) {
+            throw new SOSHibernateInvalidSessionException(e, (String) null);
         } catch (PersistenceException e) {
             throw new SOSHibernateSessionException(e);
         }
         return item;
     }
 
-    public void delete(Object item) throws SOSHibernateException {
+    public void delete(Object item) throws SOSHibernateInvalidSessionException, SOSHibernateSessionException {
         String method = getMethodName("delete");
         LOGGER.debug(String.format("%s: item=%s", method, item));
         if (currentSession == null) {
-            throw new SOSHibernateSessionException("currentSession is NULL");
+            throw new SOSHibernateInvalidSessionException("session is NULL");
         }
         try {
             if (isStatelessSession) {
@@ -491,18 +548,23 @@ public class SOSHibernateSession implements Serializable {
                 session.delete(item);
                 session.flush();
             }
+        } catch (IllegalStateException e) {
+            throw new SOSHibernateInvalidSessionException(e, (String) null);
         } catch (PersistenceException e) {
             throw new SOSHibernateSessionException(e);
         }
     }
 
-    public void refresh(Object object) throws SOSHibernateException {
+    public void refresh(Object object) throws SOSHibernateInvalidSessionException, SOSHibernateSessionException {
         refresh(null, object);
     }
 
-    public void refresh(String entityName, Object object) throws SOSHibernateException {
+    public void refresh(String entityName, Object object) throws SOSHibernateInvalidSessionException, SOSHibernateSessionException {
         String method = getMethodName("refresh");
         LOGGER.debug(String.format("%s: entityName=%s", method, entityName));
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("session is NULL");
+        }
         try {
             if (isStatelessSession) {
                 StatelessSession session = ((StatelessSession) currentSession);
@@ -519,35 +581,42 @@ public class SOSHibernateSession implements Serializable {
                     session.refresh(entityName, object);
                 }
             }
+        } catch (IllegalStateException e) {
+            throw new SOSHibernateInvalidSessionException(e, (String) null);
         } catch (PersistenceException e) {
             throw new SOSHibernateSessionException(e);
         }
     }
 
-    public Object get(Class<?> entityClass, Serializable id) throws SOSHibernateException {
+    public Object get(Class<?> entityClass, Serializable id) throws SOSHibernateInvalidSessionException, SOSHibernateSessionException {
         String method = getMethodName("get");
         LOGGER.debug(String.format("%s: entityClass=%s", method, entityClass.getName()));
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("session is NULL");
+        }
         try {
             if (isStatelessSession) {
                 return ((StatelessSession) currentSession).get(entityClass, id);
             } else {
                 return ((Session) currentSession).get(entityClass, id);
             }
+        } catch (IllegalStateException e) {
+            throw new SOSHibernateInvalidSessionException(e, (String) null);
         } catch (PersistenceException e) {
             throw new SOSHibernateSessionException(e);
         }
     }
 
-    public <T> Query<T> createQuery(String hql) throws SOSHibernateException {
+    public <T> Query<T> createQuery(String hql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
         return createQuery(hql, null);
     }
 
     @SuppressWarnings("unchecked")
-    public <T> Query<T> createQuery(String hql, Class<T> entityClass) throws SOSHibernateException {
+    public <T> Query<T> createQuery(String hql, Class<T> entityClass) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
         String method = getMethodName("createQuery");
         LOGGER.debug(String.format("%s: hql=%s", method, hql));
         if (currentSession == null) {
-            throw new SOSHibernateQueryException("session is NULL");
+            throw new SOSHibernateInvalidSessionException("session is NULL", hql);
         }
         Query<T> q = null;
         try {
@@ -564,8 +633,10 @@ public class SOSHibernateSession implements Serializable {
                     q = ((Session) currentSession).createQuery(hql, entityClass);
                 }
             }
+        } catch (IllegalStateException e) {
+            throw new SOSHibernateInvalidSessionException(e, hql);
         } catch (IllegalArgumentException e) {
-            throw new SOSHibernateQueryException(e);
+            throw new SOSHibernateQueryException(e, hql);
         } catch (PersistenceException e) {
             throw new SOSHibernateQueryException(e);
         }
@@ -574,17 +645,17 @@ public class SOSHibernateSession implements Serializable {
 
     /** @deprecated method for compatibility with the 1.11.0 an 1.11.1 versions use createNativeQuery */
     @Deprecated
-    public SQLQuery<?> createSQLQuery(String sql) throws SOSHibernateException {
+    public SQLQuery<?> createSQLQuery(String sql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
         return createSQLQuery(sql, null);
     }
 
     /** @deprecated method for compatibility with the 1.11.0 an 1.11.1 versions use createNativeQuery */
     @Deprecated
-    public SQLQuery<?> createSQLQuery(String sql, Class<?> entityClass) throws SOSHibernateException {
+    public SQLQuery<?> createSQLQuery(String sql, Class<?> entityClass) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
         String method = getMethodName("createSQLQuery");
         LOGGER.debug(String.format("%s: sql=%s", method, sql));
         if (currentSession == null) {
-            throw new SOSHibernateQueryException("currentSession is NULL");
+            throw new SOSHibernateInvalidSessionException("session is NULL", sql);
         }
         SQLQuery<?> q = null;
         try {
@@ -596,22 +667,27 @@ public class SOSHibernateSession implements Serializable {
             if (q != null && entityClass != null) {
                 q.addEntity(entityClass);
             }
+        } catch (IllegalStateException e) {
+            throw new SOSHibernateInvalidSessionException(e, sql);
+        } catch (IllegalArgumentException e) {
+            throw new SOSHibernateQueryException(e, sql);
         } catch (PersistenceException e) {
             throw new SOSHibernateQueryException(e);
         }
         return q;
     }
 
-    public <T> NativeQuery<T> createNativeQuery(String sql) throws SOSHibernateException {
+    public <T> NativeQuery<T> createNativeQuery(String sql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
         return createNativeQuery(sql, null);
     }
 
     @SuppressWarnings("unchecked")
-    public <T> NativeQuery<T> createNativeQuery(String sql, Class<T> entityClass) throws SOSHibernateException {
+    public <T> NativeQuery<T> createNativeQuery(String sql, Class<T> entityClass) throws SOSHibernateInvalidSessionException,
+            SOSHibernateQueryException {
         String method = getMethodName("createNativeQuery");
         LOGGER.debug(String.format("%s: sql=%s", method, sql));
         if (currentSession == null) {
-            throw new SOSHibernateQueryException("currentSession is NULL");
+            throw new SOSHibernateInvalidSessionException("session is NULL", sql);
         }
         NativeQuery<T> q = null;
         try {
@@ -628,17 +704,21 @@ public class SOSHibernateSession implements Serializable {
                     q = ((Session) currentSession).createNativeQuery(sql, entityClass);
                 }
             }
+        } catch (IllegalStateException e) {
+            throw new SOSHibernateInvalidSessionException(e, sql);
+        } catch (IllegalArgumentException e) {
+            throw new SOSHibernateQueryException(e, sql);
         } catch (PersistenceException e) {
             throw new SOSHibernateQueryException(e);
         }
         return q;
     }
 
-    public String getSingleValue(String hql) throws SOSHibernateException {
+    public String getSingleValue(String hql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
         return getSingleValue(createQuery(hql));
     }
 
-    public String getNativeQuerySingleValue(String sql) throws SOSHibernateException {
+    public String getNativeQuerySingleValue(String sql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
         return getSingleValue(createNativeQuery(sql));
     }
 
@@ -646,15 +726,22 @@ public class SOSHibernateSession implements Serializable {
      * 
      * difference to Query.getSingleResult - not throw NoResultException, return single value as string */
     @SuppressWarnings("deprecation")
-    public <T> String getSingleValue(Query<T> query) throws SOSHibernateException {
+    public <T> String getSingleValue(Query<T> query) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
         String method = getMethodName("getSingleValue");
         LOGGER.debug(String.format("%s: query[hql=%s]", method, query.getQueryString()));
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("session is NULL", query);
+        }
         String result = null;
         List<T> results = null;
         try {
             results = query.getResultList();
         } catch (IllegalStateException e) {
-            throw new SOSHibernateQueryException(e);
+            if (e.getCause() == null) {
+                throw new SOSHibernateInvalidSessionException(e, query);
+            } else {
+                throw new SOSHibernateQueryException(e, query);
+            }
         } catch (PersistenceException e) {
             throw new SOSHibernateQueryException(e);
         }
@@ -669,7 +756,7 @@ public class SOSHibernateSession implements Serializable {
         return result;
     }
 
-    public <T> T getSingleResult(String hql) throws SOSHibernateException {
+    public <T> T getSingleResult(String hql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
         return getSingleResult(createQuery(hql));
     }
 
@@ -677,15 +764,22 @@ public class SOSHibernateSession implements Serializable {
      * 
      * difference to Query.getSingleResult - not throw NoResultException */
     @SuppressWarnings("deprecation")
-    public <T> T getSingleResult(Query<T> query) throws SOSHibernateException {
+    public <T> T getSingleResult(Query<T> query) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
         String method = getMethodName("getSingleResult");
         LOGGER.debug(String.format("%s: query[hql=%s]", method, query.getQueryString()));
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("session is NULL", query);
+        }
         T result = null;
         List<T> results = null;
         try {
             results = query.getResultList();
         } catch (IllegalStateException e) {
-            throw new SOSHibernateQueryException(e);
+            if (e.getCause() == null) {
+                throw new SOSHibernateInvalidSessionException(e, query);
+            } else {
+                throw new SOSHibernateQueryException(e, query);
+            }
         } catch (PersistenceException e) {
             throw new SOSHibernateQueryException(e);
         }
@@ -695,15 +789,16 @@ public class SOSHibernateSession implements Serializable {
         return result;
     }
 
-    public <T> Map<String, String> getNativeQuerySingleResult(String sql) throws SOSHibernateException {
+    public <T> Map<String, String> getNativeQuerySingleResult(String sql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
         return getNativeQuerySingleResult(sql, null);
     }
 
-    public <T> Map<String, String> getNativeQuerySingleResult(String sql, String dateTimeFormat) throws SOSHibernateException {
+    public <T> Map<String, String> getNativeQuerySingleResult(String sql, String dateTimeFormat) throws SOSHibernateInvalidSessionException,
+            SOSHibernateQueryException {
         return getSingleResult(createNativeQuery(sql), dateTimeFormat);
     }
 
-    public <T> Map<String, String> getSingleResult(NativeQuery<T> query) throws SOSHibernateException {
+    public <T> Map<String, String> getSingleResult(NativeQuery<T> query) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
         return getSingleResult(query, null);
     }
 
@@ -711,7 +806,8 @@ public class SOSHibernateSession implements Serializable {
      * 
      * Map - see getResultList */
     @SuppressWarnings("deprecation")
-    public <T> Map<String, String> getSingleResult(NativeQuery<T> nativeQuery, String dateTimeFormat) throws SOSHibernateException {
+    public <T> Map<String, String> getSingleResult(NativeQuery<T> nativeQuery, String dateTimeFormat) throws SOSHibernateInvalidSessionException,
+            SOSHibernateQueryException {
         String method = getMethodName("getSingleResult");
         LOGGER.debug(String.format("%s: nativeQuery[sql=%s], dateTimeFormat=%s", method, nativeQuery.getQueryString(), dateTimeFormat));
         Map<String, String> result = null;
@@ -726,15 +822,16 @@ public class SOSHibernateSession implements Serializable {
         return result;
     }
 
-    public <T> List<Map<String, String>> getNativeQueryResultList(String sql) throws SOSHibernateException {
+    public <T> List<Map<String, String>> getNativeQueryResultList(String sql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
         return getNativeQueryResultList(sql, null);
     }
 
-    public <T> List<Map<String, String>> getNativeQueryResultList(String sql, String dateTimeFormat) throws SOSHibernateException {
+    public <T> List<Map<String, String>> getNativeQueryResultList(String sql, String dateTimeFormat) throws SOSHibernateInvalidSessionException,
+            SOSHibernateQueryException {
         return getResultList(createNativeQuery(sql), dateTimeFormat);
     }
 
-    public <T> List<Map<String, String>> getResultList(NativeQuery<T> query) throws SOSHibernateException {
+    public <T> List<Map<String, String>> getResultList(NativeQuery<T> query) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
         return getResultList(query, null);
     }
 
@@ -749,9 +846,13 @@ public class SOSHibernateSession implements Serializable {
      * 
      * deprecated (since 5.2), todo develop a new approach to result transformers */
     @SuppressWarnings({ "deprecation", "unchecked" })
-    public <T> List<Map<String, String>> getResultList(NativeQuery<T> nativeQuery, String dateTimeFormat) throws SOSHibernateException {
+    public <T> List<Map<String, String>> getResultList(NativeQuery<T> nativeQuery, String dateTimeFormat) throws SOSHibernateInvalidSessionException,
+            SOSHibernateQueryException {
         String method = getMethodName("getResultList");
         LOGGER.debug(String.format("%s: nativeQuery[sql=%s], dateTimeFormat=%s", method, nativeQuery.getQueryString(), dateTimeFormat));
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("session is NULL", nativeQuery);
+        }
         try {
             nativeQuery.setResultTransformer(new ResultTransformer() {
 
@@ -787,35 +888,48 @@ public class SOSHibernateSession implements Serializable {
                 }
             });
             return (List<Map<String, String>>) nativeQuery.getResultList();
+        } catch (IllegalStateException e) {
+            if (e.getCause() == null) {
+                throw new SOSHibernateInvalidSessionException(e, nativeQuery);
+            } else {
+                throw new SOSHibernateQueryException(e, nativeQuery);
+            }
         } catch (PersistenceException e) {
             throw new SOSHibernateQueryException(e);
         }
     }
 
     @SuppressWarnings("deprecation")
-    public <T> List<T> getResultList(Query<T> query) throws SOSHibernateException {
+    public <T> List<T> getResultList(Query<T> query) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
         String method = getMethodName("getResultList");
         LOGGER.debug(String.format("%s: query[hql=%s]", method, query.getQueryString()));
+        if (currentSession == null) {
+            throw new SOSHibernateInvalidSessionException("session is NULL", query);
+        }
         try {
             return query.getResultList();
         } catch (IllegalStateException e) {
-            throw new SOSHibernateQueryException(e);
+            if (e.getCause() == null) {
+                throw new SOSHibernateInvalidSessionException(e, query);
+            } else {
+                throw new SOSHibernateQueryException(e, query);
+            }
         } catch (PersistenceException e) {
             throw new SOSHibernateQueryException(e);
         }
     }
 
-    public <T> List<T> getResultList(String hql) throws SOSHibernateException {
+    public <T> List<T> getResultList(String hql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
         Query<T> query = createQuery(hql);
         return getResultList(query);
     }
 
     @Deprecated
-    public Criteria createCriteria(Class<?> cl, String alias) throws SOSHibernateException {
+    public Criteria createCriteria(Class<?> cl, String alias) throws SOSHibernateInvalidSessionException, SOSHibernateCriteriaException {
         String method = getMethodName("createCriteria");
         LOGGER.debug(String.format("%s: class=%s", method, cl.getSimpleName()));
         if (currentSession == null) {
-            throw new SOSHibernateCriteriaException("currentSession is NULL");
+            throw new SOSHibernateInvalidSessionException("session is NULL");
         }
         Criteria cr = null;
         try {
@@ -824,6 +938,12 @@ public class SOSHibernateSession implements Serializable {
             } else {
                 cr = ((Session) currentSession).createCriteria(cl, alias);
             }
+        } catch (IllegalStateException e) {
+            if (e.getCause() == null) {
+                throw new SOSHibernateInvalidSessionException(e, (String) null);
+            } else {
+                throw new SOSHibernateCriteriaException(e, (String) null);
+            }
         } catch (PersistenceException e) {
             throw new SOSHibernateCriteriaException(e);
         }
@@ -831,17 +951,18 @@ public class SOSHibernateSession implements Serializable {
     }
 
     @Deprecated
-    public Criteria createCriteria(Class<?> cl) throws SOSHibernateException {
+    public Criteria createCriteria(Class<?> cl) throws SOSHibernateInvalidSessionException, SOSHibernateCriteriaException {
         return createCriteria(cl, (String) null);
     }
 
     @Deprecated
-    public Criteria createCriteria(Class<?> cl, String[] selectProperties) throws SOSHibernateException {
+    public Criteria createCriteria(Class<?> cl, String[] selectProperties) throws SOSHibernateInvalidSessionException, SOSHibernateCriteriaException {
         return createCriteria(cl, selectProperties, null);
     }
 
     @Deprecated
-    public Criteria createCriteria(Class<?> cl, String[] selectProperties, ResultTransformer transformer) throws SOSHibernateException {
+    public Criteria createCriteria(Class<?> cl, String[] selectProperties, ResultTransformer transformer) throws SOSHibernateInvalidSessionException,
+            SOSHibernateCriteriaException {
         Criteria cr = createCriteria(cl);
         if (cr == null) {
             throw new SOSHibernateCriteriaException("criteria is NULL");
@@ -857,6 +978,12 @@ public class SOSHibernateSession implements Serializable {
             if (transformer != null) {
                 cr.setResultTransformer(transformer);
             }
+        } catch (IllegalStateException e) {
+            if (e.getCause() == null) {
+                throw new SOSHibernateInvalidSessionException(e, (String) null);
+            } else {
+                throw new SOSHibernateCriteriaException(e, (String) null);
+            }
         } catch (PersistenceException e) {
             throw new SOSHibernateCriteriaException(e);
         }
@@ -864,27 +991,31 @@ public class SOSHibernateSession implements Serializable {
     }
 
     @Deprecated
-    public Criteria createSingleListTransform2BeanCriteria(Class<?> cl, String selectProperty) throws SOSHibernateException {
+    public Criteria createSingleListTransform2BeanCriteria(Class<?> cl, String selectProperty) throws SOSHibernateInvalidSessionException,
+            SOSHibernateCriteriaException {
         return createSingleListCriteria(cl, selectProperty, Transformers.aliasToBean(cl));
     }
 
     @Deprecated
-    public Criteria createSingleListCriteria(Class<?> cl, String selectProperty) throws SOSHibernateException {
+    public Criteria createSingleListCriteria(Class<?> cl, String selectProperty) throws SOSHibernateInvalidSessionException,
+            SOSHibernateCriteriaException {
         return createSingleListCriteria(cl, selectProperty, null);
     }
 
     @Deprecated
-    public Criteria createSingleListCriteria(Class<?> cl, String selectProperty, ResultTransformer transformer) throws SOSHibernateException {
+    public Criteria createSingleListCriteria(Class<?> cl, String selectProperty, ResultTransformer transformer)
+            throws SOSHibernateInvalidSessionException, SOSHibernateCriteriaException {
         return createCriteria(cl, new String[] { selectProperty }, transformer);
     }
 
     @Deprecated
-    public Criteria createTransform2BeanCriteria(Class<?> cl) throws Exception {
+    public Criteria createTransform2BeanCriteria(Class<?> cl) throws SOSHibernateInvalidSessionException, SOSHibernateCriteriaException {
         return createCriteria(cl, null, null);
     }
 
     @Deprecated
-    public Criteria createTransform2BeanCriteria(Class<?> cl, String[] selectProperties) throws SOSHibernateException {
+    public Criteria createTransform2BeanCriteria(Class<?> cl, String[] selectProperties) throws SOSHibernateInvalidSessionException,
+            SOSHibernateCriteriaException {
         return createCriteria(cl, selectProperties, Transformers.aliasToBean(cl));
     }
 

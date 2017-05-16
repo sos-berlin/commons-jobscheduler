@@ -9,4 +9,8 @@ public class SOSHibernateOpenSessionException extends SOSHibernateException {
     public SOSHibernateOpenSessionException(PersistenceException cause) {
         super(cause);
     }
+
+    public SOSHibernateOpenSessionException(IllegalStateException cause, String stmt) {
+        super(cause, stmt);
+    }
 }

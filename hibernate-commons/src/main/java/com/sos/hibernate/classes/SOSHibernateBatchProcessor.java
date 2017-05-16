@@ -18,7 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.exceptions.SOSHibernateBatchProcessorException;
-import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.hibernate.exceptions.SOSHibernateConnectionException;
+import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 
 public class SOSHibernateBatchProcessor implements Serializable {
 
@@ -35,7 +36,8 @@ public class SOSHibernateBatchProcessor implements Serializable {
         countCurrentBatches = 0;
     }
 
-    public void createInsertBatch(Class<?> entity) throws SOSHibernateException {
+    public void createInsertBatch(Class<?> entity) throws SOSHibernateInvalidSessionException, SOSHibernateConnectionException,
+            SOSHibernateBatchProcessorException {
         String method = "createInsertBatch";
         LOGGER.debug(String.format("%s: entity = %s ", method, entity.getSimpleName()));
         if (session == null) {
@@ -111,7 +113,7 @@ public class SOSHibernateBatchProcessor implements Serializable {
         }
     }
 
-    public void addBatch(Object entity) throws SOSHibernateException {
+    public void addBatch(Object entity) throws SOSHibernateBatchProcessorException {
         String method = "addBatch";
         LOGGER.debug(String.format("%s: entity = %s ", method, entity.getClass().getSimpleName()));
         if (fieldsMetadata == null) {
@@ -161,7 +163,7 @@ public class SOSHibernateBatchProcessor implements Serializable {
         countCurrentBatches++;
     }
 
-    public int[] executeBatch() throws SOSHibernateException {
+    public int[] executeBatch() throws SOSHibernateInvalidSessionException, SOSHibernateConnectionException, SOSHibernateBatchProcessorException {
         String method = "executeBatch";
         LOGGER.debug(String.format("%s", method));
         if (countCurrentBatches == 0) {
@@ -171,7 +173,7 @@ public class SOSHibernateBatchProcessor implements Serializable {
             throw new SOSHibernateBatchProcessorException("preparedStatement is NULL");
         }
         if (session == null) {
-            throw new SOSHibernateBatchProcessorException("connection is NULL");
+            throw new SOSHibernateBatchProcessorException("session is NULL");
         }
         try {
             int[] result = preparedStatement.executeBatch();
@@ -184,7 +186,7 @@ public class SOSHibernateBatchProcessor implements Serializable {
                 LOGGER.error(ex.getMessage(), ex);
             }
             LOGGER.error(e.getMessage(), e);
-            throw new SOSHibernateBatchProcessorException(e,sqlStatement);
+            throw new SOSHibernateBatchProcessorException(e, sqlStatement);
         } finally {
             countCurrentBatches = 0;
         }

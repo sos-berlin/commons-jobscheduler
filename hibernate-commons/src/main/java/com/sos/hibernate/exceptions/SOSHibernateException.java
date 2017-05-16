@@ -21,14 +21,33 @@ public class SOSHibernateException extends SOSException {
         message = msg;
     }
 
+    public SOSHibernateException(String msg, String stmt) {
+        message = msg;
+        statement = stmt;
+    }
+
+    @SuppressWarnings("deprecation")
+    public SOSHibernateException(String msg, Query<?> query) {
+        message = msg;
+        statement = query.getQueryString();
+    }
+
     public SOSHibernateException(String msg, Throwable cause) {
         message = msg;
         initCause(cause);
     }
 
     @SuppressWarnings("deprecation")
-    public SOSHibernateException(Query<?> query, Throwable cause) {
-        message = String.format("%s %s", cause.getClass().getSimpleName(), cause.getMessage());
+    public SOSHibernateException(Throwable cause, Query<?> query) {
+        if (cause instanceof IllegalStateException) {
+            if (cause.getCause() != null) {
+                message = cause.getCause().getMessage();
+            } else {
+                message = cause.getMessage();
+            }
+        } else {
+            message = String.format("%s %s", cause.getClass().getSimpleName(), cause.getMessage());
+        }
         statement = query.getQueryString();
         initCause(cause);
     }
@@ -56,26 +75,40 @@ public class SOSHibernateException extends SOSException {
         message = String.format("%s %s", cause.getClass().getSimpleName(), cause.getMessage());
     }
 
-    public SOSHibernateException(IllegalArgumentException cause) {
+    public SOSHibernateException(IllegalArgumentException cause, String stmt) {
         Throwable e = cause;
         while (e != null) {
             if (e instanceof QuerySyntaxException) {
                 QuerySyntaxException je = (QuerySyntaxException) e;
 
                 initCause(je);
-                message = je.getMessage();
-                statement = je.getQueryString(); // hql statement is already in the message
+                message = je.getMessage();// message contains hql as [hql statement]
+                statement = je.getQueryString();
+                // remove hql statement from the message
+                if (message != null && statement != null) {
+                    message = message.replace("[" + statement + "]", "");
+                }
+
                 return;
             }
             e = e.getCause();
         }
         initCause(cause);
         message = cause.getMessage();
+        statement = stmt;
     }
 
-    public SOSHibernateException(IllegalStateException cause) {
+    public SOSHibernateException(IllegalStateException cause, String stmt) {
         initCause(cause);
         message = cause.getMessage();
+        statement = stmt;
+    }
+
+    @SuppressWarnings("deprecation")
+    public SOSHibernateException(IllegalStateException cause, Query<?> query) {
+        initCause(cause);
+        message = cause.getMessage();
+        statement = query.getQueryString();
     }
 
     public SOSHibernateException(SQLException cause, String sql) {
@@ -96,5 +129,13 @@ public class SOSHibernateException extends SOSException {
     @Override
     public String getMessage() {
         return message;
+    }
+
+    @Override
+    public String toString() {
+        if (statement != null) {
+            return String.format("%s [%s]", super.toString(), statement);
+        }
+        return super.toString();
     }
 }

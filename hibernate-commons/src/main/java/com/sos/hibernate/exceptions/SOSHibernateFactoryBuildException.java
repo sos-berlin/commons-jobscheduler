@@ -9,4 +9,8 @@ public class SOSHibernateFactoryBuildException extends SOSHibernateException {
     public SOSHibernateFactoryBuildException(PersistenceException cause) {
         super(cause);
     }
+
+    public SOSHibernateFactoryBuildException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
 }

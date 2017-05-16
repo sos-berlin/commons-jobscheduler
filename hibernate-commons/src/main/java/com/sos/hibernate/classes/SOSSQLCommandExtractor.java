@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.hibernate.exceptions.SOSHibernateSQLCommandExtractorException;
 
 import sos.util.SOSString;
@@ -32,7 +31,7 @@ public class SOSSQLCommandExtractor {
         this.dbms = dbms;
     }
 
-    public List<String> extractCommands(String content) throws SOSHibernateException {
+    public List<String> extractCommands(String content) throws SOSHibernateSQLCommandExtractorException {
         String method = "extractCommands";
         if (SOSString.isEmpty(content)) {
             throw new SOSHibernateSQLCommandExtractorException("content is empty");
@@ -80,7 +79,7 @@ public class SOSSQLCommandExtractor {
     }
 
     private void split(final List<String> commands, final StringBuffer st, final Integer position, final String procedurEnd,
-            final boolean returnProcedureBegin, int count) throws SOSHibernateException {
+            final boolean returnProcedureBegin, int count) throws SOSHibernateSQLCommandExtractorException {
         String method = "split";
 
         beginProcedure = "";
@@ -132,7 +131,7 @@ public class SOSSQLCommandExtractor {
         }
     }
 
-    private boolean isProcedureSyntax(String command) throws SOSHibernateException {
+    private boolean isProcedureSyntax(String command) throws SOSHibernateSQLCommandExtractorException {
         if (command == null) {
             throw new SOSHibernateSQLCommandExtractorException("command is empty");
         }
@@ -193,7 +192,7 @@ public class SOSSQLCommandExtractor {
 
         }
 
-        public void prepare() throws SOSHibernateException {
+        public void prepare() throws SOSHibernateSQLCommandExtractorException {
             String content = init();
             content = stripComments(content);
             commands = content.split(commandSpltter);
@@ -215,7 +214,7 @@ public class SOSSQLCommandExtractor {
             return commandSpltter;
         }
 
-        private String init() throws SOSHibernateException {
+        private String init() throws SOSHibernateSQLCommandExtractorException {
             String method = "init";
             commandCloser = "";
             addCommandCloser = true;
@@ -259,7 +258,7 @@ public class SOSSQLCommandExtractor {
             return sb.toString();
         }
 
-        private String stripComments(String content) throws SOSHibernateException {
+        private String stripComments(String content) throws SOSHibernateSQLCommandExtractorException {
             StringBuilder sb = new StringBuilder();
             StringTokenizer st = new StringTokenizer(content, "\n");
             boolean addRow = true;
