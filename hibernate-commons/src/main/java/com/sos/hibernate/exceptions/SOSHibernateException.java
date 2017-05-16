@@ -131,6 +131,10 @@ public class SOSHibernateException extends SOSException {
         return message;
     }
 
+    public void setMessage(String val) {
+        message = val;
+    }
+
     @Override
     public String toString() {
         if (statement != null) {

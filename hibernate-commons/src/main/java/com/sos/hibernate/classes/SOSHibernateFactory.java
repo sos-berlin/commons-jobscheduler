@@ -152,7 +152,7 @@ public class SOSHibernateFactory implements Serializable {
             LOGGER.debug(String.format("%s: autocommit = %s, transaction isolation = %s, %s", method, getAutoCommit(), getTransactionIsolationName(
                     isolationLevel), connFile));
         } catch (SOSHibernateConfigurationException ex) {
-            throw new SOSHibernateFactoryBuildException("unable to configure", ex);
+            throw new SOSHibernateFactoryBuildException(ex, configFile);
         } catch (PersistenceException ex) {
             throw new SOSHibernateFactoryBuildException(ex);
         }

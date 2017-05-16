@@ -9,7 +9,7 @@ public class SOSHibernateConnectionException extends SOSHibernateException {
     public SOSHibernateConnectionException(String msg) {
         super(msg);
     }
-    
+
     public SOSHibernateConnectionException(PersistenceException cause) {
         super(cause);
     }
