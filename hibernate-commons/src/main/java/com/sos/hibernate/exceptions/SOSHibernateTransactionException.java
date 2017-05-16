@@ -10,6 +10,10 @@ public class SOSHibernateTransactionException extends SOSHibernateException {
         super(msg);
     }
 
+    public SOSHibernateTransactionException(IllegalStateException cause, String stmt) {
+        super(cause, stmt);
+    }
+
     public SOSHibernateTransactionException(String msg, Throwable cause) {
         super(msg, cause);
     }

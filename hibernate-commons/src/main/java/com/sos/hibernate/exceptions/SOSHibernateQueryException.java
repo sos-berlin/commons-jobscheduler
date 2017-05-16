@@ -12,6 +12,10 @@ public class SOSHibernateQueryException extends SOSHibernateException {
         super(cause, query);
     }
 
+    public SOSHibernateQueryException(IllegalStateException cause, String stmt) {
+        super(cause, stmt);
+    }
+
     public SOSHibernateQueryException(IllegalArgumentException cause, String stmt) {
         super(cause, stmt);
     }
