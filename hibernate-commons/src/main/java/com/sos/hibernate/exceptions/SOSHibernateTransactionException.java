@@ -10,6 +10,10 @@ public class SOSHibernateTransactionException extends SOSHibernateException {
         super(msg);
     }
 
+    public SOSHibernateTransactionException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+
     public SOSHibernateTransactionException(PersistenceException cause) {
         super(cause);
     }

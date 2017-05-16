@@ -10,6 +10,10 @@ public class SOSHibernateCriteriaException extends SOSHibernateException {
         super(msg);
     }
 
+    public SOSHibernateCriteriaException(IllegalStateException cause, String stmt) {
+        super(cause, stmt);
+    }
+
     public SOSHibernateCriteriaException(PersistenceException cause) {
         super(cause);
     }

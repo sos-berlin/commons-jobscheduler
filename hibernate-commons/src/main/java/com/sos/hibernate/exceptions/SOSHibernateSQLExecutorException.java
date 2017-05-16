@@ -15,6 +15,6 @@ public class SOSHibernateSQLExecutorException extends SOSHibernateException {
     }
 
     public SOSHibernateSQLExecutorException(SQLException cause, String sql) {
-        super(cause,sql);
+        super(cause, sql);
     }
 }
