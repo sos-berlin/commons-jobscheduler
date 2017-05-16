@@ -1,6 +1,10 @@
 package com.sos.hibernate.exceptions;
 
+import java.nio.file.Path;
+import java.util.Optional;
+
 import javax.persistence.PersistenceException;
+import javax.xml.stream.XMLStreamException;
 
 public class SOSHibernateFactoryBuildException extends SOSHibernateException {
 
@@ -10,7 +14,25 @@ public class SOSHibernateFactoryBuildException extends SOSHibernateException {
         super(cause);
     }
 
-    public SOSHibernateFactoryBuildException(String msg, Throwable cause) {
-        super(msg, cause);
+    public SOSHibernateFactoryBuildException(SOSHibernateConfigurationException cause, Optional<Path> file) {
+        super(cause.getMessage());
+        Throwable e = cause;
+        while (e != null) {
+            if (e instanceof XMLStreamException) {
+                XMLStreamException xe = (XMLStreamException) e;
+                initCause(xe);
+                setMessage(getErrorMessage(xe.getMessage(), file));
+                return;
+            }
+            e = e.getCause();
+        }
+        initCause(cause);
+    }
+
+    private String getErrorMessage(String err, Optional<Path> file) {
+        if (file.isPresent()) {
+            return String.format("[%s] %s", file.get(), err);
+        }
+        return err;
     }
 }
