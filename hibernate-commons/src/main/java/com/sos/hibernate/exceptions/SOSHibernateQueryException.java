@@ -8,7 +8,7 @@ public class SOSHibernateQueryException extends SOSHibernateException {
 
     private static final long serialVersionUID = 1L;
 
-    public SOSHibernateQueryException(Throwable cause, Query<?> query) {
+    public SOSHibernateQueryException(IllegalStateException cause, Query<?> query) {
         super(cause, query);
     }
 
@@ -22,5 +22,13 @@ public class SOSHibernateQueryException extends SOSHibernateException {
 
     public SOSHibernateQueryException(PersistenceException cause) {
         super(cause);
+    }
+
+    @SuppressWarnings("deprecation")
+    public SOSHibernateQueryException(PersistenceException cause, Query<?> query) {
+        super(cause);
+        if (getStatement() == null && query != null) {
+            setStatement(query.getQueryString());
+        }
     }
 }

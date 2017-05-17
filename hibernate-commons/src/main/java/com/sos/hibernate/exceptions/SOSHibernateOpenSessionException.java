@@ -10,6 +10,10 @@ public class SOSHibernateOpenSessionException extends SOSHibernateException {
         super(cause);
     }
 
+    public SOSHibernateOpenSessionException(IllegalStateException cause) {
+        super(cause);
+    }
+
     public SOSHibernateOpenSessionException(IllegalStateException cause, String stmt) {
         super(cause, stmt);
     }

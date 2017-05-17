@@ -166,9 +166,9 @@ public class SOSHibernateSession implements Serializable {
             }
         } catch (IllegalStateException e) {
             if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e, (String) null);
+                throw new SOSHibernateInvalidSessionException(e);
             } else {
-                throw new SOSHibernateConnectionException(e, (String) null);
+                throw new SOSHibernateConnectionException(e);
             }
         } catch (PersistenceException e) {
             throw new SOSHibernateConnectionException(e);
@@ -255,7 +255,7 @@ public class SOSHibernateSession implements Serializable {
                 currentSession = session;
             }
         } catch (IllegalStateException e) {
-            throw new SOSHibernateOpenSessionException(e, (String) null);
+            throw new SOSHibernateOpenSessionException(e);
         } catch (PersistenceException e) {
             throw new SOSHibernateOpenSessionException(e);
         }
@@ -312,9 +312,9 @@ public class SOSHibernateSession implements Serializable {
             }
         } catch (IllegalStateException e) {
             if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e, (String) null);
+                throw new SOSHibernateInvalidSessionException(e);
             } else {
-                throw new SOSHibernateSessionException(e, (String) null);
+                throw new SOSHibernateSessionException(e);
             }
         } catch (PersistenceException e) {
             throw new SOSHibernateSessionException(e);
@@ -334,9 +334,9 @@ public class SOSHibernateSession implements Serializable {
             }
         } catch (IllegalStateException e) {
             if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e, (String) null);
+                throw new SOSHibernateInvalidSessionException(e);
             } else {
-                throw new SOSHibernateSessionException(e, (String) null);
+                throw new SOSHibernateSessionException(e);
             }
         } catch (PersistenceException e) {
             throw new SOSHibernateSessionException(e);
@@ -389,9 +389,9 @@ public class SOSHibernateSession implements Serializable {
             }
         } catch (IllegalStateException e) {
             if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e, (String) null);
+                throw new SOSHibernateInvalidSessionException(e);
             } else {
-                throw new SOSHibernateTransactionException(e, (String) null);
+                throw new SOSHibernateTransactionException(e);
             }
         } catch (PersistenceException e) {
             throw new SOSHibernateTransactionException(e);
@@ -420,9 +420,9 @@ public class SOSHibernateSession implements Serializable {
             tr.commit();
         } catch (IllegalStateException e) {
             if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e, (String) null);
+                throw new SOSHibernateInvalidSessionException(e);
             } else {
-                throw new SOSHibernateTransactionException(e, (String) null);
+                throw new SOSHibernateTransactionException(e);
             }
         } catch (PersistenceException e) {
             throw new SOSHibernateTransactionException(e);
@@ -448,9 +448,9 @@ public class SOSHibernateSession implements Serializable {
             tr.rollback();
         } catch (IllegalStateException e) {
             if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e, (String) null);
+                throw new SOSHibernateInvalidSessionException(e);
             } else {
-                throw new SOSHibernateTransactionException(e, (String) null);
+                throw new SOSHibernateTransactionException(e);
             }
         } catch (PersistenceException e) {
             throw new SOSHibernateTransactionException(e);
@@ -472,9 +472,9 @@ public class SOSHibernateSession implements Serializable {
             }
         } catch (IllegalStateException e) {
             if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e, (String) null);
+                throw new SOSHibernateInvalidSessionException(e);
             } else {
-                throw new SOSHibernateTransactionException(e, (String) null);
+                throw new SOSHibernateTransactionException(e);
             }
         } catch (PersistenceException e) {
             throw new SOSHibernateTransactionException(e);
@@ -499,9 +499,9 @@ public class SOSHibernateSession implements Serializable {
             }
         } catch (IllegalStateException e) {
             if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e, (String) null);
+                throw new SOSHibernateInvalidSessionException(e);
             } else {
-                throw new SOSHibernateSessionException(e, (String) null);
+                throw new SOSHibernateSessionException(e);
             }
         } catch (PersistenceException e) {
             throw new SOSHibernateSessionException(e);
@@ -525,9 +525,9 @@ public class SOSHibernateSession implements Serializable {
             }
         } catch (IllegalStateException e) {
             if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e, (String) null);
+                throw new SOSHibernateInvalidSessionException(e);
             } else {
-                throw new SOSHibernateSessionException(e, (String) null);
+                throw new SOSHibernateSessionException(e);
             }
         } catch (PersistenceException e) {
             throw new SOSHibernateSessionException(e);
@@ -561,9 +561,9 @@ public class SOSHibernateSession implements Serializable {
             }
         } catch (IllegalStateException e) {
             if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e, (String) null);
+                throw new SOSHibernateInvalidSessionException(e);
             } else {
-                throw new SOSHibernateSessionException(e, (String) null);
+                throw new SOSHibernateSessionException(e);
             }
         } catch (PersistenceException e) {
             throw new SOSHibernateSessionException(e);
@@ -588,9 +588,9 @@ public class SOSHibernateSession implements Serializable {
             }
         } catch (IllegalStateException e) {
             if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e, (String) null);
+                throw new SOSHibernateInvalidSessionException(e);
             } else {
-                throw new SOSHibernateSessionException(e, (String) null);
+                throw new SOSHibernateSessionException(e);
             }
         } catch (PersistenceException e) {
             throw new SOSHibernateSessionException(e);
@@ -625,9 +625,9 @@ public class SOSHibernateSession implements Serializable {
             }
         } catch (IllegalStateException e) {
             if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e, (String) null);
+                throw new SOSHibernateInvalidSessionException(e);
             } else {
-                throw new SOSHibernateSessionException(e, (String) null);
+                throw new SOSHibernateSessionException(e);
             }
         } catch (PersistenceException e) {
             throw new SOSHibernateSessionException(e);
@@ -648,9 +648,9 @@ public class SOSHibernateSession implements Serializable {
             }
         } catch (IllegalStateException e) {
             if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e, (String) null);
+                throw new SOSHibernateInvalidSessionException(e);
             } else {
-                throw new SOSHibernateSessionException(e, (String) null);
+                throw new SOSHibernateSessionException(e);
             }
         } catch (PersistenceException e) {
             throw new SOSHibernateSessionException(e);
@@ -1002,9 +1002,9 @@ public class SOSHibernateSession implements Serializable {
             }
         } catch (IllegalStateException e) {
             if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e, (String) null);
+                throw new SOSHibernateInvalidSessionException(e);
             } else {
-                throw new SOSHibernateCriteriaException(e, (String) null);
+                throw new SOSHibernateCriteriaException(e);
             }
         } catch (PersistenceException e) {
             throw new SOSHibernateCriteriaException(e);
@@ -1042,9 +1042,9 @@ public class SOSHibernateSession implements Serializable {
             }
         } catch (IllegalStateException e) {
             if (e.getCause() == null) {
-                throw new SOSHibernateInvalidSessionException(e, (String) null);
+                throw new SOSHibernateInvalidSessionException(e);
             } else {
-                throw new SOSHibernateCriteriaException(e, (String) null);
+                throw new SOSHibernateCriteriaException(e);
             }
         } catch (PersistenceException e) {
             throw new SOSHibernateCriteriaException(e);
