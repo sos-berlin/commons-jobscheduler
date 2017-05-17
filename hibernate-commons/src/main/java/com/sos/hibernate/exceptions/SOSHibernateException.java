@@ -13,6 +13,7 @@ import com.sos.exception.SOSException;
 public class SOSHibernateException extends SOSException {
 
     private static final long serialVersionUID = 1L;
+    private static String STATEMENT_NOT_AVAILABLE = "n/a";
     private String message = null;
     private SQLException sqlException = null;
     private String statement = null;
@@ -60,6 +61,21 @@ public class SOSHibernateException extends SOSException {
 
         initCause(cause);
         message = String.format("%s %s", cause.getClass().getSimpleName(), cause.getMessage());
+    }
+
+    @SuppressWarnings("deprecation")
+    public SOSHibernateException(PersistenceException cause, Query<?> query) {
+        this(cause);
+        if ((statement == null || statement.equals(STATEMENT_NOT_AVAILABLE)) && query != null) {
+            statement = query.getQueryString();
+            if (message != null) {
+                // message can contains sql as [Query is:<new line> sql statement]
+                int index = message.indexOf("Query is:");
+                if (index > 0) {
+                    message = message.substring(0, index).trim();
+                }
+            }
+        }
     }
 
     public SOSHibernateException(IllegalArgumentException cause, String stmt) {
@@ -133,7 +149,7 @@ public class SOSHibernateException extends SOSException {
         message = String.format("%d %s", sqlException.getErrorCode(), sqlException.getMessage());
     }
 
-    public SQLException getSqlException() {
+    public SQLException getSQLException() {
         return sqlException;
     }
 

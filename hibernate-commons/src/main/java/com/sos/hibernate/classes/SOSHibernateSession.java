@@ -30,9 +30,8 @@ import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.exception.SOSDBException;
 import com.sos.exception.SOSException;
-import com.sos.exception.SOSJDBCException;
+import com.sos.hibernate.exceptions.SOSDBException;
 import com.sos.hibernate.exceptions.SOSHibernateConfigurationException;
 import com.sos.hibernate.exceptions.SOSHibernateConnectionException;
 import com.sos.hibernate.exceptions.SOSHibernateCriteriaException;
@@ -41,6 +40,7 @@ import com.sos.hibernate.exceptions.SOSHibernateOpenSessionException;
 import com.sos.hibernate.exceptions.SOSHibernateQueryException;
 import com.sos.hibernate.exceptions.SOSHibernateSessionException;
 import com.sos.hibernate.exceptions.SOSHibernateTransactionException;
+import com.sos.hibernate.exceptions.SOSJDBCException;
 
 import sos.util.SOSDate;
 
@@ -221,7 +221,7 @@ public class SOSHibernateSession implements Serializable {
 
     public String getLastSequenceValue(String sequenceName) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
         String stmt = factory.getSequenceLastValString(sequenceName);
-        return stmt == null ? null : getNativeQuerySingleValue(stmt);
+        return stmt == null ? null : getSingleValueNativeQuery(stmt);
     }
 
     public SOSHibernateSQLExecutor getSQLExecutor() {
@@ -273,6 +273,10 @@ public class SOSHibernateSession implements Serializable {
         LOGGER.debug(String.format("%s: autocommit=%s, transaction isolation=%s, %s", method, getFactory().getAutoCommit(), SOSHibernateFactory
                 .getTransactionIsolationName(isolationLevel), connFile));
 
+    }
+
+    public int executeUpdateNativeQuery(String sql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
+        return executeUpdate(createNativeQuery(sql));
     }
 
     public int executeUpdate(String hql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
@@ -780,7 +784,7 @@ public class SOSHibernateSession implements Serializable {
         return getSingleValue(createQuery(hql));
     }
 
-    public String getNativeQuerySingleValue(String sql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
+    public String getSingleValueNativeQuery(String sql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
         return getSingleValue(createNativeQuery(sql));
     }
 
@@ -851,11 +855,11 @@ public class SOSHibernateSession implements Serializable {
         return result;
     }
 
-    public <T> Map<String, String> getNativeQuerySingleResult(String sql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
-        return getNativeQuerySingleResult(sql, null);
+    public <T> Map<String, String> getSingleResultNativeQuery(String sql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
+        return getSingleResultNativeQuery(sql, null);
     }
 
-    public <T> Map<String, String> getNativeQuerySingleResult(String sql, String dateTimeFormat) throws SOSHibernateInvalidSessionException,
+    public <T> Map<String, String> getSingleResultNativeQuery(String sql, String dateTimeFormat) throws SOSHibernateInvalidSessionException,
             SOSHibernateQueryException {
         return getSingleResult(createNativeQuery(sql), dateTimeFormat);
     }
@@ -884,11 +888,11 @@ public class SOSHibernateSession implements Serializable {
         return result;
     }
 
-    public <T> List<Map<String, String>> getNativeQueryResultList(String sql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
-        return getNativeQueryResultList(sql, null);
+    public <T> List<Map<String, String>> getResultListNativeQuery(String sql) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
+        return getResultListNativeQuery(sql, null);
     }
 
-    public <T> List<Map<String, String>> getNativeQueryResultList(String sql, String dateTimeFormat) throws SOSHibernateInvalidSessionException,
+    public <T> List<Map<String, String>> getResultListNativeQuery(String sql, String dateTimeFormat) throws SOSHibernateInvalidSessionException,
             SOSHibernateQueryException {
         return getResultList(createNativeQuery(sql), dateTimeFormat);
     }

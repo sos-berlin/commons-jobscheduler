@@ -24,11 +24,7 @@ public class SOSHibernateQueryException extends SOSHibernateException {
         super(cause);
     }
 
-    @SuppressWarnings("deprecation")
     public SOSHibernateQueryException(PersistenceException cause, Query<?> query) {
-        super(cause);
-        if (getStatement() == null && query != null) {
-            setStatement(query.getQueryString());
-        }
+        super(cause, query);
     }
 }
